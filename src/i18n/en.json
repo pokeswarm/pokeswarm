@@ -1,0 +1,5 @@
+{
+  "debug.tick": "Tick: {tick}",
+  "debug.position": "Position: ({x}, {y})",
+  "debug.controls": "Move with WASD / arrow keys"
+}

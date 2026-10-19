@@ -1,0 +1,5 @@
+{
+  "tickRate": 30,
+  "maxTicksPerFrame": 5,
+  "defaultSeed": 20261020
+}

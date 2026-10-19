@@ -1,0 +1,22 @@
+# 依存・ビルド成果物
+node_modules/
+dist/
+*.tsbuildinfo
+
+# 環境ごとの設定・秘密情報（Firebase の公開してよい設定値以外は入れない）
+.env
+.env.*
+!.env.example
+
+# 取得したスプライト（リポジトリに含めるかは未決定: docs/06_roadmap.md 未決定事項7）
+public/sprites/
+scripts/.cache/
+
+# エディタ・OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

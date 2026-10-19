@@ -1,0 +1,5 @@
+{
+  "debug.tick": "更新: {tick}",
+  "debug.position": "位置: ({x}, {y})",
+  "debug.controls": "WASD / 矢印キーで移動"
+}

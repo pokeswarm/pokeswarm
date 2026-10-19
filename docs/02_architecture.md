@@ -5,11 +5,11 @@
 | 用途 | 採用 | 理由 |
 |---|---|---|
 | 言語 | TypeScript | 型でデータ構造（技・ポケモン・アンロック条件）を守る |
-| ビルド | Vite | 静的サイトとして出力でき、Cloudflare Pages にそのまま置ける |
+| ビルド | Vite | 静的サイトとして出力でき、Cloudflare にそのまま置ける |
 | 描画・演出 | Phaser（実装開始時点の最新安定版） | パーティクル・トゥイーン・光や画面揺れの演出が標準でそろい、技エフェクトを作りやすい |
 | 認証・保存・接続仲介 | Firebase（Authentication / Cloud Firestore / Realtime Database） | `03_network.md` 参照 |
 | 協力プレイの通信 | WebRTC（DataChannel）。つながらない場合は Firebase Realtime Database で中継 | `03_network.md` 参照 |
-| 配信 | Cloudflare Pages（GitHub 連携で自動公開） | `05_operations.md` 参照 |
+| 配信 | Cloudflare Workers の静的アセット配信（GitHub 連携で自動公開。設定は `wrangler.jsonc`） | `05_operations.md` 参照 |
 
 ## 2. 設計の原則
 

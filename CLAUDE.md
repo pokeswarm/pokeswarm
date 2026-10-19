@@ -21,7 +21,7 @@ PokéSwarm（ポケモン題材のサバイバー系ブラウザゲーム、最�
 ## 技術構成
 
 - TypeScript / Vite / Phaser / Firebase（Authentication・Cloud Firestore・Realtime Database）/ WebRTC
-- 配信: Cloudflare Pages（GitHub 組織 `pokeswarm` のリポジトリ `pokeswarm` と連携）
+- 配信: Cloudflare Workers の静的アセット配信（設定は `wrangler.jsonc`。GitHub 組織 `pokeswarm` のリポジトリ `pokeswarm` と連携）
 - 動作環境: PC のブラウザ（スマホ対応は将来）
 
 ## 必ず守ること

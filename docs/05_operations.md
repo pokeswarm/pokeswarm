@@ -7,8 +7,8 @@
 | 項目 | 内容 |
 |---|---|
 | コード | GitHub 組織 `pokeswarm` / リポジトリ `pokeswarm` |
-| 配信 | Cloudflare Pages（GitHub 連携。main へのプッシュで自動公開） |
-| 開発中のアドレス | Cloudflare Pages の無料アドレス（`*.pages.dev`） |
+| 配信 | Cloudflare Workers の静的アセット配信（Workers Builds の GitHub 連携。main へのプッシュで自動公開。設定は `wrangler.jsonc`） |
+| 開発中のアドレス | Cloudflare Workers の無料アドレス（`*.workers.dev`） |
 | 本番のアドレス | `pokeswarm.org`（Cloudflare で取得） |
 
 - 【決定】ドメインは一般公開の前に取得する。公開後にアドレスを変えると、ログイン状態やブラウザ内のデータが引き継がれず、広まったリンクも切れるため。

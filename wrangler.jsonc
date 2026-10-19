@@ -1,0 +1,15 @@
+// Cloudflare Workers（静的アセット）での配信設定。
+// このファイルがあると、ビルド時に wrangler が Vite の設定を書き換えようとしなくなる。
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pokeswarm",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    // npm run build の出力先
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

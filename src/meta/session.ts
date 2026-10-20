@@ -45,6 +45,8 @@ class Session {
       const { Account } = await import('../firebase/account');
       this.account = await Account.start(this.store);
       this.setStatus(this.account.kind);
+      // ブラウザの一時保存の方が新しかった（前回 Firestore に書く前に閉じた）なら、すぐ書いておく
+      void this.store.flush();
     } catch (err) {
       console.warn('[account] ログインに失敗しました。ブラウザだけに保存して続けます', err);
       this.fail(err);

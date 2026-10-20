@@ -210,7 +210,7 @@ export class RunScene extends Phaser.Scene {
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.levelUpPanel.hide());
     this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));
-    this.effects = new EffectRenderer(this, effectRecipes, 2);
+    this.effects = new EffectRenderer(this, effectRecipes, 2, spriteRender.effectPixel);
     const local = this.sim.world.players.find((p) => p.id === this.localId)!;
     if (this.playerSprite && new URLSearchParams(window.location.search).has('gallery')) {
       addSpriteGallery(this, this.playerSprite, spriteRender, local.x, local.y - 200);
@@ -227,6 +227,9 @@ export class RunScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-F3', () => {
       this.showDebug = !this.showDebug;
     });
+    this.applyZoom();
+    this.scale.on('resize', this.applyZoom, this);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.scale.off('resize', this.applyZoom, this));
     // 時計を作った後で始める
     if (this.net) this.keepRunningWhenHidden();
   }
@@ -275,6 +278,27 @@ export class RunScene extends Phaser.Scene {
     this.scene.start('result', data);
   }
 
+  /**
+   * 画面に見えるワールドの高さをおおよそ一定にする（大きな画面で見え過ぎると、画面の外から出るはずの敵が見えてしまう）。
+   * ドット絵が崩れにくいよう、拡大率は決まった刻みにする
+   */
+  private applyZoom(): void {
+    const c = spriteRender.camera;
+    const zoom = Math.max(1, Math.round(this.scale.height / c.viewHeight / c.zoomStep) * c.zoomStep);
+    this.cameras.main.setZoom(zoom);
+  }
+
+  /**
+   * 画面に固定する表示（文字・バー）を、カメラの拡大率に関係なく画面の (x, y) に等倍で置く。
+   * カメラは画面の中心を基準に拡大するので、その分を戻す
+   */
+  private placeUi(obj: Phaser.GameObjects.Components.Transform, x: number, y: number): void {
+    const cam = this.cameras.main;
+    const z = cam.zoom;
+    obj.setScale(1 / z);
+    obj.setPosition(cam.width / 2 + (x - cam.width / 2) / z, cam.height / 2 + (y - cam.height / 2) / z);
+  }
+
   /** 画面の真ん中に、しばらくお知らせを出す */
   private announce(text: string, color: string): void {
     this.tweens.killTweensOf(this.announceText);
@@ -320,8 +344,12 @@ export class RunScene extends Phaser.Scene {
     const cx = cam.width / 2;
     const now = elapsedSeconds(w);
     const limit = w.rules.stage.durationSeconds;
-    this.timerText.setX(cx).setText(now < limit ? t('run.timer', { time: formatTime(now), limit: formatTime(limit) }) : t('run.bossTime', { time: formatTime(now - limit) }));
-    this.announceText.setPosition(cx, cam.height * 0.3);
+    this.placeUi(this.timerText, cx, 10);
+    this.placeUi(this.bossName, cx, 50);
+    this.placeUi(this.bossBar, 0, 0);
+    this.placeUi(this.announceText, cx, cam.height * 0.3);
+    this.placeUi(this.hud, 8, 8);
+    this.timerText.setText(now < limit ? t('run.timer', { time: formatTime(now), limit: formatTime(limit) }) : t('run.bossTime', { time: formatTime(now - limit) }));
     this.bossBar.clear();
     const i = this.bossId === null ? -1 : findEnemyIndex(w, this.bossId);
     if (i === -1 || w.enemies.hp[i]! <= 0) {
@@ -333,7 +361,7 @@ export class RunScene extends Phaser.Scene {
     const ratio = Math.max(0, w.enemies.hp[i]! / w.enemies.maxHp[i]!);
     this.bossBar.fillStyle(0x000000, 0.6).fillRect(cx - barW / 2 - 2, 70, barW + 4, 14);
     this.bossBar.fillStyle(kind.rank === 'boss' ? 0xff7043 : 0xffca28).fillRect(cx - barW / 2, 72, barW * ratio, 10);
-    this.bossName.setX(cx).setText(localName(generated.pokemon[kind.species ?? kind.id]?.names, getLocale(), kind.id));
+    this.bossName.setText(localName(generated.pokemon[kind.species ?? kind.id]?.names, getLocale(), kind.id));
   }
 
   private runSteps(steps: number, visible: boolean): void {

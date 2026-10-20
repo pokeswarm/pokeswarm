@@ -61,13 +61,30 @@ export class EffectRenderer {
   private readonly burstEmitters = new Map<string, Phaser.GameObjects.Particles.ParticleEmitter>();
   /** 軌跡のパーティクルを出す間隔の端数（レシピごと） */
   private readonly trailBudgets = new Map<string, number>();
+  /** 演出をまとめる入れ物（まとめてドット絵風のフィルターを掛ける） */
+  private readonly layer: Phaser.GameObjects.Layer;
 
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly recipes: Record<string, EffectRecipe>,
     private readonly depth: number,
+    pixel: { size: number; colorSteps: number; alphaSteps: number } = { size: 0, colorSteps: 2, alphaSteps: 2 },
   ) {
     ensureGlowTexture(scene);
+    // 演出は光なので、まとめた絵を背景に足し合わせる（中で加算した色が、透明の上で暗く濁らないように）
+    this.layer = scene.add.layer().setDepth(depth).setBlendMode(Phaser.BlendModes.ADD);
+    // ポケモンのドット絵に合わせて、なめらかな光を角ばった少ない色の形にする
+    if (pixel.size > 0 && scene.renderer.type === Phaser.WEBGL) {
+      this.layer.enableFilters();
+      const f = this.layer.filters!.internal;
+      f.addBlocky({ size: pixel.size });
+      f.addQuantize({ steps: [pixel.colorSteps, pixel.colorSteps, pixel.colorSteps, pixel.alphaSteps] });
+    }
+  }
+
+  private add<T extends Phaser.GameObjects.GameObject>(obj: T): T {
+    this.layer.add(obj);
+    return obj;
   }
 
   private recipe(id: string): EffectRecipe {
@@ -84,7 +101,7 @@ export class EffectRenderer {
   ): Phaser.GameObjects.Particles.ParticleEmitter {
     let em = cache.get(id);
     if (!em) {
-      em = this.scene.add.particles(0, 0, GLOW_TEXTURE, emitterConfig(def)).setDepth(depth);
+      em = this.add(this.scene.add.particles(0, 0, GLOW_TEXTURE, emitterConfig(def)).setDepth(depth));
       cache.set(id, em);
     }
     return em;
@@ -131,8 +148,8 @@ export class EffectRenderer {
       let glow = this.glows[used];
       let core = this.cores[used];
       if (!glow || !core) {
-        glow = this.scene.add.image(0, 0, GLOW_TEXTURE).setDepth(this.depth).setBlendMode(Phaser.BlendModes.ADD);
-        core = this.scene.add.image(0, 0, GLOW_TEXTURE).setDepth(this.depth + 0.1).setBlendMode(Phaser.BlendModes.ADD);
+        glow = this.add(this.scene.add.image(0, 0, GLOW_TEXTURE).setDepth(this.depth).setBlendMode(Phaser.BlendModes.ADD));
+        core = this.add(this.scene.add.image(0, 0, GLOW_TEXTURE).setDepth(this.depth + 0.1).setBlendMode(Phaser.BlendModes.ADD));
         this.glows.push(glow);
         this.cores.push(core);
       }
@@ -174,8 +191,7 @@ export class EffectRenderer {
     }
     if (impact.flash) {
       const f = impact.flash;
-      const img = this.scene.add
-        .image(x, y, GLOW_TEXTURE)
+      const img = this.add(this.scene.add.image(x, y, GLOW_TEXTURE))
         .setDepth(this.depth + 1)
         .setBlendMode(Phaser.BlendModes.ADD)
         .setTint(hexColor(f.color))

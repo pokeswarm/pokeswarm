@@ -97,6 +97,8 @@ export interface World {
     readonly hpMultiplier: number;
     readonly damageMultiplier: number;
     readonly xpMultiplier: number;
+    readonly spawnPerSecond: number;
+    readonly capPerPlayer: number;
     readonly kinds: readonly number[];
   }[];
   /** 全員で共有する復活可能数 */
@@ -158,6 +160,8 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
       hpMultiplier: w.hpMultiplier,
       damageMultiplier: w.damageMultiplier,
       xpMultiplier: w.xpMultiplier ?? 1,
+      spawnPerSecond: w.spawnPerSecond ?? rules.spawn.spawnPerSecond,
+      capPerPlayer: w.capPerPlayer ?? rules.spawn.capPerPlayer,
       kinds: w.kinds.map((id) => {
         const i = rules.enemies.kinds.findIndex((k) => k.id === id);
         if (i === -1) throw new Error(`敵の種類 ${id} がありません`);
@@ -192,10 +196,10 @@ export function findPlayer(world: World, id: PlayerId): Player | undefined {
   return world.players.find((p) => p.id === id);
 }
 
-/** 実際の敵の上限: min(全体の上限, 1人あたりの上限 × 人数) */
+/** 実際の敵の上限: min(全体の上限, 今の時間帯の1人あたりの上限 × 人数) */
 export function enemyCap(world: World): number {
-  const s = world.rules.spawn;
-  return Math.min(s.capGlobal, s.capPerPlayer * world.players.length);
+  const wave = world.waves[currentWaveIndex(world)]!;
+  return Math.min(world.rules.spawn.capGlobal, wave.capPerPlayer * world.players.length);
 }
 
 export function findEnemyIndex(world: World, id: number): number {

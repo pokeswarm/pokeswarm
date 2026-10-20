@@ -20,6 +20,12 @@ export function applyDebugOverrides(rules: SimRules, search: string): SimRules {
       ...rules.spawn,
       ...(cap !== undefined && { capGlobal: Math.floor(cap), capPerPlayer: Math.floor(cap) }),
       ...(spawn !== undefined && { spawnPerSecond: spawn }),
+      // 時間帯ごとの値より、URL の指定を優先する
+      waves: rules.spawn.waves.map((w) => ({
+        ...w,
+        ...(cap !== undefined && { capPerPlayer: Math.floor(cap) }),
+        ...(spawn !== undefined && { spawnPerSecond: spawn }),
+      })),
     },
   };
 }

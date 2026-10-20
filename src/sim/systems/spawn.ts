@@ -11,9 +11,9 @@ export function spawnEnemies(world: World): void {
   if (players.length === 0 || world.role === 'guest') return;
   const s = world.rules.spawn;
   const kinds = world.rules.enemies.kinds;
-  world.spawnAccumulator += s.spawnPerSecond * world.dt;
-  const cap = enemyCap(world);
   const wave = world.waves[currentWaveIndex(world)]!;
+  world.spawnAccumulator += wave.spawnPerSecond * world.dt;
+  const cap = enemyCap(world);
   while (world.spawnAccumulator >= 1) {
     if (enemies.count >= cap) {
       // 空きができても一度にまとめて出さないよう、たまった分は捨てる

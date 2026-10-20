@@ -1,9 +1,9 @@
 {
   "spawnPerSecond": 20,
-  "spawnDistanceMin": 450,
-  "spawnDistanceMax": 550,
-  "relocateDistance": 900,
-  "relocateSideSpread": 400,
+  "spawnDistanceMin": 720,
+  "spawnDistanceMax": 820,
+  "relocateDistance": 1100,
+  "relocateSideSpread": 600,
   "capGlobal": 600,
   "capPerPlayer": 400,
   "separation": {
@@ -15,6 +15,8 @@
   "waves": [
     {
       "startSeconds": 0,
+      "spawnPerSecond": 5,
+      "capPerPlayer": 80,
       "hpMultiplier": 1,
       "damageMultiplier": 1,
       "xpMultiplier": 1,
@@ -29,8 +31,10 @@
     },
     {
       "startSeconds": 112,
-      "hpMultiplier": 1.6,
-      "damageMultiplier": 1.3,
+      "spawnPerSecond": 8,
+      "capPerPlayer": 130,
+      "hpMultiplier": 1.3,
+      "damageMultiplier": 1.2,
       "xpMultiplier": 1,
       "kinds": [
         "pidgey",
@@ -42,8 +46,10 @@
     },
     {
       "startSeconds": 225,
-      "hpMultiplier": 2.4,
-      "damageMultiplier": 1.6,
+      "spawnPerSecond": 11,
+      "capPerPlayer": 180,
+      "hpMultiplier": 1.7,
+      "damageMultiplier": 1.4,
       "xpMultiplier": 1,
       "kinds": [
         "oddish",
@@ -54,8 +60,10 @@
     },
     {
       "startSeconds": 337,
-      "hpMultiplier": 3.4,
-      "damageMultiplier": 1.9,
+      "spawnPerSecond": 14,
+      "capPerPlayer": 240,
+      "hpMultiplier": 2.2,
+      "damageMultiplier": 1.6,
       "xpMultiplier": 1,
       "kinds": [
         "growlithe",
@@ -66,8 +74,10 @@
     },
     {
       "startSeconds": 450,
-      "hpMultiplier": 4.6,
-      "damageMultiplier": 2.2,
+      "spawnPerSecond": 17,
+      "capPerPlayer": 300,
+      "hpMultiplier": 2.8,
+      "damageMultiplier": 1.8,
       "xpMultiplier": 1,
       "kinds": [
         "doduo",
@@ -79,8 +89,10 @@
     },
     {
       "startSeconds": 562,
-      "hpMultiplier": 6,
-      "damageMultiplier": 2.5,
+      "spawnPerSecond": 21,
+      "capPerPlayer": 360,
+      "hpMultiplier": 3.4,
+      "damageMultiplier": 2,
       "xpMultiplier": 1,
       "kinds": [
         "tentacool",
@@ -90,8 +102,10 @@
     },
     {
       "startSeconds": 675,
-      "hpMultiplier": 7.6,
-      "damageMultiplier": 2.8,
+      "spawnPerSecond": 25,
+      "capPerPlayer": 420,
+      "hpMultiplier": 4.1,
+      "damageMultiplier": 2.2,
       "xpMultiplier": 1,
       "kinds": [
         "seel",
@@ -102,8 +116,10 @@
     },
     {
       "startSeconds": 787,
-      "hpMultiplier": 9.4,
-      "damageMultiplier": 3.1,
+      "spawnPerSecond": 30,
+      "capPerPlayer": 480,
+      "hpMultiplier": 4.9,
+      "damageMultiplier": 2.4,
       "xpMultiplier": 1,
       "kinds": [
         "machoke",

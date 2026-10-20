@@ -107,6 +107,9 @@ export const spawnConfigSchema = z
           damageMultiplier: z.number().positive(),
           /** その時間帯に出る雑魚が落とす経験値の倍率（省略時は 1） */
           xpMultiplier: z.number().positive().optional(),
+          /** その時間帯の1秒あたりの出現数と、1人あたりの上限（省略時は全体の値）。後の時間帯ほど増やして群れの圧力を上げる */
+          spawnPerSecond: z.number().nonnegative().optional(),
+          capPerPlayer: z.number().int().positive().optional(),
           kinds: z.array(z.string()).min(1),
         }),
       )
@@ -405,6 +408,21 @@ export const spriteRenderSchema = z.object({
   enemyPreloadSeconds: z.number().nonnegative(),
   /** 確認用の一覧表示（?gallery）の間隔 */
   gallerySpacing: z.number().positive(),
+  /**
+   * 技の演出をドット絵に合わせる（WebGL のときだけ）。演出をまとめて描いた後で、
+   * size（ワールドの長さ。スプライトの拡大率と同じにすると1ドットがそろう）ごとの四角に区切り、
+   * 色と透明度を colorSteps・alphaSteps 段階に減らす。size 0 で使わない
+   */
+  /**
+   * 画面に見えるワールドの高さをおおよそ viewHeight にそろえる（大きな画面で見え過ぎて、敵が画面の中に出ないように）。
+   * 拡大率はドット絵が崩れにくいよう zoomStep 刻み（1 未満にはしない）
+   */
+  camera: z.object({ viewHeight: z.number().positive(), zoomStep: z.number().positive() }),
+  effectPixel: z.object({
+    size: z.number().int().nonnegative(),
+    colorSteps: z.number().int().min(2),
+    alphaSteps: z.number().int().min(2),
+  }),
 });
 export type SpriteRenderConfig = z.infer<typeof spriteRenderSchema>;
 

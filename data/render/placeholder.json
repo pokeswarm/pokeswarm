@@ -4,6 +4,5 @@
   "gridColor": "#2a3f2a",
   "playerColor": "#ffb74d",
   "playerFacingColor": "#ffffff",
-  "enemyColor": "#9575cd",
-  "enemyEmpoweredColor": "#e53935"
+  "enemyColor": "#9575cd"
 }

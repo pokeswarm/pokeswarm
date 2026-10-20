@@ -6,10 +6,6 @@
   "relocateSideSpread": 400,
   "capGlobal": 600,
   "capPerPlayer": 400,
-  "overflow": {
-    "empowerHpMultiplier": 1.5,
-    "maxEmpowerLevel": 5
-  },
   "separation": {
     "strength": 0.5,
     "maxNeighbors": 6
@@ -19,6 +15,7 @@
   "waves": [
     {
       "startSeconds": 0,
+      "hpMultiplier": 1,
       "kinds": [
         "rattata",
         "pidgey",
@@ -27,6 +24,7 @@
     },
     {
       "startSeconds": 40,
+      "hpMultiplier": 1.6,
       "kinds": [
         "weedle",
         "metapod",
@@ -36,6 +34,7 @@
     },
     {
       "startSeconds": 80,
+      "hpMultiplier": 2.4,
       "kinds": [
         "zubat",
         "geodude",

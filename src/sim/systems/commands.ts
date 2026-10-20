@@ -29,11 +29,6 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         e.add(cmd.id, cmd.kind, cmd.x, cmd.y, kind.hp, kind.moveSpeed, kind.radius);
         break;
       }
-      case 'empowerEnemy': {
-        const i = findEnemyIndex(world, cmd.id);
-        if (i !== -1) e.empower[i] = cmd.level;
-        break;
-      }
       case 'damageEnemy': {
         const i = findEnemyIndex(world, cmd.id);
         if (i === -1 || e.hp[i]! <= 0) break;

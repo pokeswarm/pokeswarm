@@ -243,16 +243,15 @@ export class RunScene extends Phaser.Scene {
     const halfH = cam.height / 2 / cam.zoom;
     const view = { left: cx - halfW, top: cy - halfH, right: cx + halfW, bottom: cy + halfH };
     const enemyColor = hexColor(placeholderRender.enemyColor);
-    const empoweredColor = hexColor(placeholderRender.enemyEmpoweredColor);
     const e = world.enemies;
     this.streamer.update(world);
     const drawn =
-      this.enemySpriteView.update(e, alpha, view, (i) => (e.empower[i]! > 0 ? empoweredColor : null)) +
+      this.enemySpriteView.update(e, alpha, view) +
       this.enemyView.update(
         e,
         alpha,
         view,
-        (i) => (e.empower[i]! > 0 ? empoweredColor : enemyColor),
+        () => enemyColor,
         (i) => this.streamer.manifestOf(e.kind[i]!) === null,
       );
     const sprites = this.streamer.stats();
@@ -262,7 +261,7 @@ export class RunScene extends Phaser.Scene {
       t('debug.controls'),
       t('debug.fps', { fps: this.game.loop.actualFps.toFixed(1), steps: this.lastSteps }),
       t('debug.enemies', { count: e.count, cap: enemyCap(world), drawn }),
-      t('debug.combat', { kills: world.stats.kills, empowered: world.stats.empowered, projectiles: world.projectiles.count }),
+      t('debug.combat', { kills: world.stats.kills, projectiles: world.projectiles.count }),
       t('debug.simTime', { ms: this.simMs.toFixed(3) }),
       t('debug.frameTime', { ms: this.frameMs.toFixed(2) }),
       t('debug.enemySprites', { wave: currentWaveIndex(world) + 1, count: sprites.count, mb: (sprites.gpuBytes / 1048576).toFixed(2) }),

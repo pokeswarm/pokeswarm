@@ -25,13 +25,6 @@ export interface EnemySpawnedEvent {
   readonly y: number;
 }
 
-/** ホスト: 敵を強化した（ゲストへ送る） */
-export interface EnemyEmpoweredEvent {
-  readonly type: 'enemyEmpowered';
-  readonly id: number;
-  readonly level: number;
-}
-
 /** ゲスト: 自分の攻撃が敵に当たった（ホストへ送り、ホストが HP を集計する） */
 export interface DamageDealtEvent {
   readonly type: 'damageDealt';
@@ -50,6 +43,5 @@ export type SimEvent =
   | EnemyKilledEvent
   | ProjectileHitEvent
   | EnemySpawnedEvent
-  | EnemyEmpoweredEvent
   | DamageDealtEvent
   | EnemyRetiredEvent;

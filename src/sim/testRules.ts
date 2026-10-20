@@ -12,11 +12,10 @@ export function testRules(overrides: { spawn?: Partial<SimRules['spawn']>; attac
       relocateSideSpread: 400,
       capGlobal: 100,
       capPerPlayer: 100,
-      overflow: { empowerHpMultiplier: 1.5, maxEmpowerLevel: 5 },
       separation: { strength: 0.5, maxNeighbors: 6 },
       spatialCellSize: 64,
       retireOldWaveKinds: true,
-      waves: [{ startSeconds: 0, kinds: ['test'] }],
+      waves: [{ startSeconds: 0, hpMultiplier: 1, kinds: ['test'] }],
       ...overrides.spawn,
     },
     attack: {

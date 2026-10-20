@@ -36,7 +36,6 @@ export const placeholderRenderSchema = z.object({
   playerColor: colorString,
   playerFacingColor: colorString,
   enemyColor: colorString,
-  enemyEmpoweredColor: colorString,
 });
 export type PlaceholderRenderConfig = z.infer<typeof placeholderRenderSchema>;
 
@@ -70,11 +69,6 @@ export const spawnConfigSchema = z
     capGlobal: z.number().int().positive(),
     /** プレイヤー1人あたりの上限（実際の上限は min(全体, 1人あたり × 人数)） */
     capPerPlayer: z.number().int().positive(),
-    /** 上限に達したときの挙動（仮）: 新しく出す代わりに既存の敵を強化する */
-    overflow: z.object({
-      empowerHpMultiplier: z.number().min(1),
-      maxEmpowerLevel: z.number().int().nonnegative(),
-    }),
     /** 敵同士の簡易的な押し合い */
     separation: z.object({
       strength: z.number().min(0).max(1),
@@ -86,10 +80,18 @@ export const spawnConfigSchema = z
     retireOldWaveKinds: z.boolean(),
     /**
      * 時間帯ごとに出す雑魚の種類（data/game/enemies.json の id）。startSeconds の小さい順に並べ、最初は 0。
-     * その時間帯の種類から等しい確率で選ぶ
+     * その時間帯の種類から等しい確率で選ぶ。
+     * hpMultiplier はその時間帯に出る敵の HP の倍率（後の時間帯ほど強い = 原作で後に出るポケモンほどレベルが高い感覚）。
+     * 同じ種類は続いた時間帯にだけ出せる（一度いなくなった種類は後で戻らない）
      */
     waves: z
-      .array(z.object({ startSeconds: z.number().nonnegative(), kinds: z.array(z.string()).min(1) }))
+      .array(
+        z.object({
+          startSeconds: z.number().nonnegative(),
+          hpMultiplier: z.number().positive(),
+          kinds: z.array(z.string()).min(1),
+        }),
+      )
       .min(1),
   })
   .refine((s) => s.spawnDistanceMin <= s.spawnDistanceMax, { message: 'spawnDistanceMin <= spawnDistanceMax' })
@@ -97,8 +99,32 @@ export const spawnConfigSchema = z
   .refine((s) => s.waves[0]!.startSeconds === 0, { message: 'waves の最初は startSeconds: 0' })
   .refine((s) => s.waves.every((w, i) => i === 0 || w.startSeconds > s.waves[i - 1]!.startSeconds), {
     message: 'waves は startSeconds の小さい順に並べる',
+  })
+  .superRefine((s, ctx) => {
+    const problem = findReappearingKind(s.waves);
+    if (problem) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `waves: "${problem.kind}" が時間帯 ${problem.leftAt + 1} でいなくなった後、時間帯 ${problem.backAt + 1} で再び出ている（一度いなくなった種類は後で戻さない）`,
+      });
+    }
   });
 export type SpawnConfig = z.infer<typeof spawnConfigSchema>;
+
+/** 一度いなくなった種類が後の時間帯で再び出ていれば、その種類と時間帯の番号を返す */
+export function findReappearingKind(
+  waves: readonly { kinds: readonly string[] }[],
+): { kind: string; leftAt: number; backAt: number } | null {
+  const lastSeen = new Map<string, number>();
+  for (let i = 0; i < waves.length; i++) {
+    for (const kind of waves[i]!.kinds) {
+      const last = lastSeen.get(kind);
+      if (last !== undefined && last < i - 1) return { kind, leftAt: last + 1, backAt: i };
+      lastSeen.set(kind, i);
+    }
+  }
+  return null;
+}
 
 /** 仮の自動攻撃（技の仕組みができたら置き換える） */
 export const attackConfigSchema = z.object({

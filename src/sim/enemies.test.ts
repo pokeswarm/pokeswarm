@@ -11,11 +11,10 @@ function makeSim(rules: SimRules, players = 1): Simulation {
 }
 
 describe('雑魚敵', () => {
-  it('出現数が上限で止まり、超えた分は既存の敵の強化になる', () => {
+  it('出現数が上限で止まる（上限を超えた分は出さない）', () => {
     const sim = makeSim(testRules({ spawn: { spawnPerSecond: 300, capGlobal: 50, capPerPlayer: 50 }, attack: { damage: 0.0001 } }));
     for (let i = 0; i < 60; i++) sim.step([]);
     expect(sim.world.enemies.count).toBe(50);
-    expect(sim.world.stats.empowered).toBeGreaterThan(0);
   });
 
   it('実際の上限は min(全体, 1人あたり × 人数)', () => {
@@ -83,8 +82,8 @@ describe('時間帯ごとの出現', () => {
         capGlobal: 1000,
         capPerPlayer: 1000,
         waves: [
-          { startSeconds: 0, kinds: ['a'] },
-          { startSeconds: 2, kinds: ['b', 'c'] },
+          { startSeconds: 0, hpMultiplier: 1, kinds: ['a'] },
+          { startSeconds: 2, hpMultiplier: 2, kinds: ['b', 'c'] },
         ],
       },
       attack: { range: 1 },
@@ -102,13 +101,21 @@ describe('時間帯ごとの出現', () => {
     const before = sim.world.enemies.count;
     for (let t = 0; t < 60; t++) sim.step([]);
     expect(kindsAt(before)).toEqual(new Set([1, 2]));
+    // 後の時間帯の敵ほど HP が多い
+    expect(sim.world.enemies.maxHp[0]).toBe(20);
+    expect(sim.world.enemies.maxHp[sim.world.enemies.count - 1]).toBe(40);
   });
 });
 
 describe('前の時間帯の敵', () => {
   it('離れすぎたら移し替えずに消す（撃破には数えない）', () => {
     const rules = testRules({
-      spawn: { waves: [{ startSeconds: 0, kinds: ['a'] }, { startSeconds: 1, kinds: ['b'] }] },
+      spawn: {
+        waves: [
+          { startSeconds: 0, hpMultiplier: 1, kinds: ['a'] },
+          { startSeconds: 1, hpMultiplier: 1, kinds: ['b'] },
+        ],
+      },
       attack: { range: 1 },
     });
     rules.enemies.kinds = ['a', 'b'].map((id) => ({ id, hp: 20, moveSpeed: 0, radius: 10 }));

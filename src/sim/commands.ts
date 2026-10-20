@@ -36,13 +36,6 @@ export interface SpawnEnemyCommand {
   readonly y: number;
 }
 
-/** ゲスト: ホストが決めた敵の強化（上限到達時） */
-export interface EmpowerEnemyCommand {
-  readonly type: 'empowerEnemy';
-  readonly id: number;
-  readonly level: number;
-}
-
 /** ホスト: ゲストの攻撃が当たった（ゲストのブラウザで判定したもの） */
 export interface DamageEnemyCommand {
   readonly type: 'damageEnemy';
@@ -74,7 +67,6 @@ export type InputCommand =
   | MoveCommand
   | RemotePlayerCommand
   | SpawnEnemyCommand
-  | EmpowerEnemyCommand
   | DamageEnemyCommand
   | KillEnemyCommand
   | RetireEnemyCommand

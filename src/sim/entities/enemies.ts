@@ -15,8 +15,6 @@ export class EnemyStore {
   readonly maxHp: Float64Array;
   readonly speed: Float64Array;
   readonly radius: Float64Array;
-  /** 上限到達時の強化段階 */
-  readonly empower: Uint8Array;
   /** 移し替えた回数（移し替え先を決める番号に使う） */
   readonly relocations: Uint16Array;
 
@@ -31,7 +29,6 @@ export class EnemyStore {
     this.maxHp = new Float64Array(capacity);
     this.speed = new Float64Array(capacity);
     this.radius = new Float64Array(capacity);
-    this.empower = new Uint8Array(capacity);
     this.relocations = new Uint16Array(capacity);
   }
 
@@ -46,7 +43,6 @@ export class EnemyStore {
     this.hp[i] = this.maxHp[i] = hp;
     this.speed[i] = speed;
     this.radius[i] = radius;
-    this.empower[i] = 0;
     this.relocations[i] = 0;
     return i;
   }
@@ -65,7 +61,6 @@ export class EnemyStore {
     this.maxHp[i] = this.maxHp[last]!;
     this.speed[i] = this.speed[last]!;
     this.radius[i] = this.radius[last]!;
-    this.empower[i] = this.empower[last]!;
     this.relocations[i] = this.relocations[last]!;
   }
 

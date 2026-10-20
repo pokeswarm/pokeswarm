@@ -7,8 +7,6 @@ export type NetMessage =
   | { t: 'p'; x: number; y: number; fx: number; fy: number; ix: number; iy: number }
   /** 出現（ホスト→ゲスト）: [id, 種類, x, y, ...] */
   | { t: 'sp'; e: number[] }
-  /** 強化（ホスト→ゲスト）: [id, 段階, ...] */
-  | { t: 'em'; e: number[] }
   /** 撃破の確定（ホスト→ゲスト）: [id, とどめを刺したプレイヤー, ...] */
   | { t: 'k'; e: number[] }
   /** 前の時間帯の敵を消した（ホスト→ゲスト）: [id, ...] */

@@ -1,7 +1,10 @@
 import { randomUnit } from '../math';
 import { currentWaveIndex, enemyCap, type World } from '../world';
 
-/** プレイヤーの周囲（画面外）に雑魚敵を出す。上限に達していたら既存の敵を強化する（仮） */
+/**
+ * プレイヤーの周囲（画面外）に雑魚敵を出す。種類と HP の倍率は今の時間帯で決まる。
+ * 上限に達していたら出さない（敵の強さは時間帯ごとの HP の倍率で上げる）。
+ */
 export function spawnEnemies(world: World): void {
   const { players, enemies, rng } = world;
   // ゲストは出現をホストから受け取る
@@ -10,35 +13,23 @@ export function spawnEnemies(world: World): void {
   const kinds = world.rules.enemies.kinds;
   world.spawnAccumulator += s.spawnPerSecond * world.dt;
   const cap = enemyCap(world);
+  const wave = world.waves[currentWaveIndex(world)]!;
   while (world.spawnAccumulator >= 1) {
-    world.spawnAccumulator -= 1;
     if (enemies.count >= cap) {
-      empowerRandomEnemy(world);
-      continue;
+      // 空きができても一度にまとめて出さないよう、たまった分は捨てる
+      world.spawnAccumulator = 0;
+      break;
     }
+    world.spawnAccumulator -= 1;
     const p = players[rng.int(players.length)]!;
     const [ux, uy] = randomUnit(rng);
     const dist = rng.range(s.spawnDistanceMin, s.spawnDistanceMax);
-    const wave = world.waves[currentWaveIndex(world)]!;
     const kindIndex = wave.kinds[rng.int(wave.kinds.length)]!;
     const kind = kinds[kindIndex]!;
     const id = world.nextEnemyId++;
     const x = p.x + ux * dist;
     const y = p.y + uy * dist;
-    enemies.add(id, kindIndex, x, y, kind.hp, kind.moveSpeed, kind.radius);
+    enemies.add(id, kindIndex, x, y, kind.hp * wave.hpMultiplier, kind.moveSpeed, kind.radius);
     world.events.push({ type: 'enemySpawned', id, kind: kindIndex, x, y });
   }
-}
-
-function empowerRandomEnemy(world: World): void {
-  const { enemies, rng } = world;
-  if (enemies.count === 0) return;
-  const o = world.rules.spawn.overflow;
-  const i = rng.int(enemies.count);
-  if (enemies.empower[i]! >= o.maxEmpowerLevel) return;
-  enemies.empower[i]!++;
-  world.events.push({ type: 'enemyEmpowered', id: enemies.id[i]!, level: enemies.empower[i]! });
-  enemies.maxHp[i]! *= o.empowerHpMultiplier;
-  enemies.hp[i]! *= o.empowerHpMultiplier;
-  world.stats.empowered++;
 }

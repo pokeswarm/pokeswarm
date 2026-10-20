@@ -96,7 +96,21 @@ export function testRules(
         { id: 'defenseDown', damagePerSecond: 0, speedMultiplier: 1, damageTakenMultiplier: 2, breaksOnDamage: false, healsAttacker: false, color: '#888888' },
       ],
     },
-    pickups: { xpPerKill: 1, gemRadius: 6, maxGems: 50, magnetSpeed: 420, bigGemValue: 10, ...overrides.pickups },
+    pickups: {
+      xpPerKill: 1,
+      gemRadius: 6,
+      maxGems: 50,
+      magnetSpeed: 420,
+      bigGemValue: 10,
+      itemRadius: 10,
+      maxItems: 16,
+      items: {
+        potion: { dropChance: 0, healPct: 30 },
+        magnet: { dropChance: 0, speed: 1400 },
+        'rare-candy': { revealSeconds: 1, levels: [{ levels: 3, weight: 1 }] },
+      },
+      ...overrides.pickups,
+    },
     combat: {
       maxProjectiles: 128,
       hitMemory: 8,

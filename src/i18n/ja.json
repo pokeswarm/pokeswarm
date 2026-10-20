@@ -69,7 +69,6 @@
   "itemDesc.iron": "防御 +8%",
   "itemDesc.carbos": "移動速度 +6%",
   "itemDesc.pp-up": "クールダウン −5%",
-  "itemDesc.leftovers": "HP がゆっくり回復する",
   "itemDesc.dowsing-machine": "経験値の玉の取得範囲 +20%",
   "itemDesc.wide-lens": "技の範囲 +8%",
   "itemDesc.lucky-egg": "経験値 +10%",
@@ -247,8 +246,6 @@
   "shop.armor.desc": "受けるダメージ −3% / ランク",
   "shop.max-health.name": "最大HP",
   "shop.max-health.desc": "最大HP +10% / ランク",
-  "shop.recovery.name": "回復",
-  "shop.recovery.desc": "HP が毎秒 0.2 回復 / ランク",
   "shop.haste.name": "クールダウン",
   "shop.haste.desc": "技のクールダウン −2.5% / ランク",
   "shop.area.name": "範囲",
@@ -270,5 +267,8 @@
   "shop.reroll-plus.name": "リロール",
   "shop.reroll-plus.desc": "ランの始めのリロール権 +2 / ランク",
   "shop.banish.name": "候補の除外",
-  "shop.banish.desc": "ランの始めの除外の回数 +1 / ランク（選択画面で B）"
+  "shop.banish.desc": "ランの始めの除外の回数 +1 / ランク（選択画面で B）",
+  "item.magnet": "マグネット！ 経験値を一気に集める",
+  "candy.rolling": "{name}！ レベル +{levels}…",
+  "candy.result": "{name}！ レベル +{levels}！"
 }

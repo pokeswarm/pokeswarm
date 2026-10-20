@@ -1,5 +1,5 @@
 import type { HitEffect } from './events';
-import type { LegendaryResult, RunOutcome, UpgradeOffer } from './world';
+import type { ItemKind, LegendaryResult, RunOutcome, UpgradeOffer } from './world';
 
 /**
  * 入力コマンド。シミュレーションはこれだけを受け取って進む。
@@ -201,6 +201,31 @@ export interface RevivePlayerCommand {
   readonly revives: number;
 }
 
+/** ゲスト: ホストが落とした道具 */
+export interface SpawnItemCommand {
+  readonly type: 'spawnItem';
+  readonly id: number;
+  readonly kind: ItemKind;
+  readonly x: number;
+  readonly y: number;
+}
+
+/** ホスト: ゲストが道具に触れた */
+export interface RequestItemCommand {
+  readonly type: 'requestItem';
+  readonly id: number;
+  readonly by: PlayerId;
+}
+
+/** ゲスト: ホストが確定した道具の取得 */
+export interface CollectItemCommand {
+  readonly type: 'collectItem';
+  readonly id: number;
+  readonly by: PlayerId;
+  readonly kind: ItemKind;
+  readonly levels: number;
+}
+
 /** プレイヤーが抜けた（切断） */
 export interface RemovePlayerCommand {
   readonly type: 'removePlayer';
@@ -239,4 +264,7 @@ export type InputCommand =
   | EndRunCommand
   | RemovePlayerCommand
   | RevivePlayerCommand
-  | LegendaryWarningCommand;
+  | LegendaryWarningCommand
+  | SpawnItemCommand
+  | RequestItemCommand
+  | CollectItemCommand;

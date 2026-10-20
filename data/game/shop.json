@@ -8,21 +8,112 @@
     "legendary": 500
   },
   "upgrades": [
-    { "id": "might", "maxLevel": 5, "baseCost": 200, "perLevel": { "powerPct": 5 } },
-    { "id": "armor", "maxLevel": 3, "baseCost": 600, "perLevel": { "damageTakenPct": -3 } },
-    { "id": "max-health", "maxLevel": 3, "baseCost": 200, "perLevel": { "maxHpPct": 10 } },
-    { "id": "recovery", "maxLevel": 5, "baseCost": 200, "perLevel": { "regenPerSecond": 0.2 } },
-    { "id": "haste", "maxLevel": 2, "baseCost": 900, "perLevel": { "cooldownPct": -2.5 } },
-    { "id": "area", "maxLevel": 2, "baseCost": 300, "perLevel": { "areaPct": 5 } },
-    { "id": "projectile-speed", "maxLevel": 2, "baseCost": 300, "perLevel": { "projectileSpeedPct": 10 } },
-    { "id": "move-speed", "maxLevel": 2, "baseCost": 300, "perLevel": { "moveSpeedPct": 5 } },
-    { "id": "magnet", "maxLevel": 2, "baseCost": 300, "perLevel": { "pickupRangePct": 25 } },
-    { "id": "luck", "maxLevel": 3, "baseCost": 600, "perLevel": { "critChancePct": 3 } },
-    { "id": "growth", "maxLevel": 5, "baseCost": 900, "perLevel": { "xpPct": 3 } },
-    { "id": "greed", "maxLevel": 5, "baseCost": 200, "grants": "coinPct", "amount": 10 },
-    { "id": "revival", "maxLevel": 1, "baseCost": 10000, "grants": "revives" },
-    { "id": "reroll-plus", "maxLevel": 2, "baseCost": 5000, "grants": "rerolls", "amount": 2 },
-    { "id": "banish", "maxLevel": 3, "baseCost": 200, "grants": "bans" }
+    {
+      "id": "might",
+      "maxLevel": 5,
+      "baseCost": 200,
+      "perLevel": {
+        "powerPct": 5
+      }
+    },
+    {
+      "id": "armor",
+      "maxLevel": 3,
+      "baseCost": 600,
+      "perLevel": {
+        "damageTakenPct": -3
+      }
+    },
+    {
+      "id": "max-health",
+      "maxLevel": 3,
+      "baseCost": 200,
+      "perLevel": {
+        "maxHpPct": 10
+      }
+    },
+    {
+      "id": "haste",
+      "maxLevel": 2,
+      "baseCost": 900,
+      "perLevel": {
+        "cooldownPct": -2.5
+      }
+    },
+    {
+      "id": "area",
+      "maxLevel": 2,
+      "baseCost": 300,
+      "perLevel": {
+        "areaPct": 5
+      }
+    },
+    {
+      "id": "projectile-speed",
+      "maxLevel": 2,
+      "baseCost": 300,
+      "perLevel": {
+        "projectileSpeedPct": 10
+      }
+    },
+    {
+      "id": "move-speed",
+      "maxLevel": 2,
+      "baseCost": 300,
+      "perLevel": {
+        "moveSpeedPct": 5
+      }
+    },
+    {
+      "id": "magnet",
+      "maxLevel": 2,
+      "baseCost": 300,
+      "perLevel": {
+        "pickupRangePct": 25
+      }
+    },
+    {
+      "id": "luck",
+      "maxLevel": 3,
+      "baseCost": 600,
+      "perLevel": {
+        "critChancePct": 3
+      }
+    },
+    {
+      "id": "growth",
+      "maxLevel": 5,
+      "baseCost": 900,
+      "perLevel": {
+        "xpPct": 3
+      }
+    },
+    {
+      "id": "greed",
+      "maxLevel": 5,
+      "baseCost": 200,
+      "grants": "coinPct",
+      "amount": 10
+    },
+    {
+      "id": "revival",
+      "maxLevel": 1,
+      "baseCost": 10000,
+      "grants": "revives"
+    },
+    {
+      "id": "reroll-plus",
+      "maxLevel": 2,
+      "baseCost": 5000,
+      "grants": "rerolls",
+      "amount": 2
+    },
+    {
+      "id": "banish",
+      "maxLevel": 3,
+      "baseCost": 200,
+      "grants": "bans"
+    }
   ],
   "legacyBaseCosts": {
     "max-hp": 100,
@@ -35,6 +126,7 @@
     "xp": 200,
     "revive": 1000,
     "reroll": 200,
-    "ban": 200
+    "ban": 200,
+    "recovery": 200
   }
 }

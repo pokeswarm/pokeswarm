@@ -6,6 +6,7 @@ import { confirmPickup } from './gems';
 import { addXp, applyOffer, banUpgrade, chooseUpgrade, mirrorLevelUp, rerollUpgrades, skipUpgrade } from './leveling';
 import { addHazard, endRun } from './stage';
 import { applyRevive } from './health';
+import { applyItem, confirmItem, spawnItem } from './items';
 
 export function applyCommands(world: World, commands: readonly InputCommand[]): void {
   const e = world.enemies;
@@ -150,6 +151,15 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
           world.hazards.length = 0;
           world.events.push({ type: 'legendaryWarning', kind: cmd.kind });
         }
+        break;
+      case 'spawnItem':
+        if (world.role === 'guest') spawnItem(world, cmd.id, cmd.kind, cmd.x, cmd.y);
+        break;
+      case 'requestItem':
+        if (world.role === 'host') confirmItem(world, cmd.id, cmd.by);
+        break;
+      case 'collectItem':
+        if (world.role === 'guest') applyItem(world, cmd.id, cmd.by, cmd.kind, cmd.levels);
         break;
       case 'revivePlayer':
         if (world.role === 'guest') applyRevive(world, cmd.playerId, cmd.revives);

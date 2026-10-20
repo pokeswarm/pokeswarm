@@ -6,7 +6,6 @@
     "iron": { "maxLevel": 5, "perLevel": { "defensePct": 8 } },
     "carbos": { "maxLevel": 5, "perLevel": { "moveSpeedPct": 6 } },
     "pp-up": { "maxLevel": 5, "perLevel": { "cooldownPct": -5 } },
-    "leftovers": { "maxLevel": 5, "perLevel": { "regenPerSecond": 0.3 } },
     "dowsing-machine": { "maxLevel": 5, "perLevel": { "pickupRangePct": 20 } },
     "wide-lens": { "maxLevel": 5, "perLevel": { "areaPct": 8 } },
     "lucky-egg": { "maxLevel": 5, "perLevel": { "xpPct": 10 } }

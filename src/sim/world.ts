@@ -40,6 +40,9 @@ export interface LevelUpState {
   ticksLeft: number;
 }
 
+/** マップに落ちる道具の種類 */
+export type ItemKind = 'potion' | 'magnet' | 'rare-candy';
+
 /** ランの結果（disconnected: ホストとの接続が切れて終わった） */
 export type RunOutcome = 'clear' | 'fail' | 'disconnected';
 
@@ -83,6 +86,11 @@ export interface World {
   /** 経験値の玉 */
   readonly gems: GemStore;
   nextGemId: number;
+  /** マップに落ちている道具（少ないので配列で持つ）。pending は拾ってホストの確定を待っている（ゲスト） */
+  readonly items: { id: number; kind: ItemKind; x: number; y: number; pending: boolean }[];
+  nextItemId: number;
+  /** 拾ったふしぎなアメ: 抽選の演出が終わるまでの残りと、上がるレベルの数 */
+  readonly candies: { levels: number; ticksLeft: number; by: PlayerId }[];
   /** 全員で共有する経験値の合計（ホストが確定する） */
   xp: number;
   /** 全員で共有するレベルと、次のレベルまでに貯めた経験値 */
@@ -164,6 +172,9 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     // ゲストは、拾ってホストの確定を待っている玉の分だけホストより多くなりうるので余裕を持たせる
     gems: new GemStore(role === 'guest' ? rules.pickups.maxGems * 2 : rules.pickups.maxGems),
     nextGemId: 1,
+    items: [],
+    nextItemId: 1,
+    candies: [],
     xp: 0,
     revives: rules.stats.revive.initialCount,
     outcome: null,

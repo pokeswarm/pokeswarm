@@ -89,6 +89,12 @@
       "en": "Poison Barb"
     }
   },
+  "potion": {
+    "names": {
+      "ja": "キズぐすり",
+      "en": "Potion"
+    }
+  },
   "pp-up": {
     "names": {
       "ja": "ポイントアップ",
@@ -99,6 +105,12 @@
     "names": {
       "ja": "タウリン",
       "en": "Protein"
+    }
+  },
+  "rare-candy": {
+    "names": {
+      "ja": "ふしぎなアメ",
+      "en": "Rare Candy"
     }
   },
   "sharp-beak": {

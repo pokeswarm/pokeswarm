@@ -179,6 +179,31 @@ export interface LegendaryWarningEvent {
   readonly kind: number;
 }
 
+/** ホスト: 道具を落とした（ゲストへ送る） */
+export interface ItemSpawnedEvent {
+  readonly type: 'itemSpawned';
+  readonly id: number;
+  readonly kind: 'potion' | 'magnet' | 'rare-candy';
+  readonly x: number;
+  readonly y: number;
+}
+
+/** ゲスト: 道具に触れた（ホストへ送り、ホストが先着で確定する） */
+export interface ItemRequestedEvent {
+  readonly type: 'itemRequested';
+  readonly id: number;
+  readonly by: PlayerId;
+}
+
+/** 道具の取得が確定した（levels はふしぎなアメで上がるレベルの数） */
+export interface ItemCollectedEvent {
+  readonly type: 'itemCollected';
+  readonly id: number;
+  readonly by: PlayerId;
+  readonly kind: 'potion' | 'magnet' | 'rare-candy';
+  readonly levels: number;
+}
+
 /** プレイヤーが抜けた（切断） */
 export interface PlayerLeftEvent {
   readonly type: 'playerLeft';
@@ -216,4 +241,7 @@ export type SimEvent =
   | RunEndedEvent
   | PlayerLeftEvent
   | SwarmStartedEvent
+  | ItemSpawnedEvent
+  | ItemRequestedEvent
+  | ItemCollectedEvent
   | LegendaryWarningEvent;

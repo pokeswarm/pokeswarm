@@ -1,5 +1,6 @@
 import type { Axis, InputCommand, PlayerId } from '../sim/commands';
 import { levelUpSnapshot } from '../sim/systems/leveling';
+import { ITEM_KINDS } from '../sim/systems/items';
 import type { World } from '../sim/world';
 import { round2, type NetMessage } from './protocol';
 
@@ -91,6 +92,9 @@ export class SyncSession {
     const pickups: number[] = [];
     const hazards: number[] = [];
     const movers: number[] = [];
+    const itemSpawns: number[] = [];
+    const itemRequests: number[] = [];
+    const itemCollects: number[] = [];
     for (const ev of world.events) {
       switch (ev.type) {
         case 'enemySpawned':
@@ -133,6 +137,15 @@ export class SyncSession {
         case 'runEnded':
           if (host) out.push({ t: 'end', o: ev.outcome, lg: ev.legendary });
           break;
+        case 'itemSpawned':
+          if (host) itemSpawns.push(ev.id, ITEM_KINDS.indexOf(ev.kind), round2(ev.x), round2(ev.y));
+          break;
+        case 'itemRequested':
+          if (role === 'guest') itemRequests.push(ev.id);
+          break;
+        case 'itemCollected':
+          if (host) itemCollects.push(ev.id, ev.by, ITEM_KINDS.indexOf(ev.kind), ev.levels);
+          break;
         case 'playerLeft':
           if (host) out.push({ t: 'rm', i: ev.playerId });
           break;
@@ -154,6 +167,9 @@ export class SyncSession {
     if (pickups.length) out.push({ t: 'pr', e: pickups });
     if (hazards.length) out.push({ t: 'hz', e: hazards });
     if (movers.length) out.push({ t: 'sv', e: movers });
+    if (itemSpawns.length) out.push({ t: 'is', e: itemSpawns });
+    if (itemRequests.length) out.push({ t: 'iq', e: itemRequests });
+    if (itemCollects.length) out.push({ t: 'ic', e: itemCollects });
 
     if (host) {
       // レベルアップの選択の状態は、変わったときだけ送る（残り時間はゲストが自分で減らす）
@@ -305,6 +321,19 @@ export class SyncSession {
           break;
         case 'end':
           if (guest) cmds.push({ type: 'endRun', outcome: m.o, legendary: m.lg });
+          break;
+        case 'is':
+          if (guest) for (let k = 0; k + 3 < m.e.length; k += 4) cmds.push({ type: 'spawnItem', id: m.e[k]!, kind: ITEM_KINDS[m.e[k + 1]!]!, x: m.e[k + 2]!, y: m.e[k + 3]! });
+          break;
+        case 'iq':
+          if (host) for (const id of m.e) cmds.push({ type: 'requestItem', id, by: from });
+          break;
+        case 'ic':
+          if (guest) {
+            for (let k = 0; k + 3 < m.e.length; k += 4) {
+              cmds.push({ type: 'collectItem', id: m.e[k]!, by: m.e[k + 1]!, kind: ITEM_KINDS[m.e[k + 2]!]!, levels: m.e[k + 3]! });
+            }
+          }
           break;
         case 'rm':
           if (guest) cmds.push({ type: 'removePlayer', playerId: m.i });

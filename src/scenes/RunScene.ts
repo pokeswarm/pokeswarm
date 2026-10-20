@@ -100,6 +100,8 @@ export class RunScene extends Phaser.Scene {
   private uiCommands: InputCommand[] = [];
   /** ボスの範囲技の予告 */
   private hazardView!: Phaser.GameObjects.Graphics;
+  /** マップに落ちている道具（きずぐすり・マグネット・ふしぎなアメ） */
+  private itemView!: Phaser.GameObjects.Graphics;
   /** 画面上の真ん中: 経過時間、中ボス・ボスの HP、お知らせ */
   private timerText!: Phaser.GameObjects.Text;
   private bossBar!: Phaser.GameObjects.Graphics;
@@ -215,6 +217,7 @@ export class RunScene extends Phaser.Scene {
     this.ground = new GroundTiles(this, groundConfig, elapsedSeconds(this.sim.world));
     this.enemyView = new PooledCircles(this, 0);
     this.gemView = new PooledCircles(this, -1);
+    this.itemView = this.add.graphics().setDepth(0.4);
     this.streamer = new SpriteStreamer(
       this,
       rules.enemies.kinds.map((k) => k.sprite),
@@ -465,6 +468,11 @@ export class RunScene extends Phaser.Scene {
         this.bossId = ev.id;
         const name = localName(generated.pokemon[kind.species ?? kind.id]?.names, getLocale(), kind.id);
         this.announce(t(kind.rank === 'boss' ? 'run.bossAppeared' : 'run.midbossAppeared', { name }), kind.rank === 'boss' ? '#ff8a65' : '#ffe082');
+      } else if (ev.type === 'itemCollected') {
+        const it = ev;
+        if (it.kind === 'rare-candy') this.playCandy(it.levels);
+        else if (it.kind === 'magnet') this.announce(t('item.magnet'), '#ef9a9a');
+        else if (it.by === this.localId) this.announce(localName(generated.items.potion?.names, getLocale(), ''), '#ce93d8');
       } else if (ev.type === 'playerLeft') {
         this.playerViews.get(ev.playerId)?.container.destroy();
         this.playerViews.delete(ev.playerId);
@@ -520,6 +528,62 @@ export class RunScene extends Phaser.Scene {
       g.fillStyle(0xff1744, 0.25).fillCircle(h.x, h.y, h.radius * progress);
       g.lineStyle(2, 0xff5252, 0.9).strokeCircle(h.x, h.y, h.radius);
     }
+  }
+
+  /**
+   * マップに落ちている道具を描く（仮の図形。作り込みはフェーズ4）。
+   * きずぐすり＝紫のびん、マグネット＝赤い U 字、ふしぎなアメ＝青いアメ。ふわふわ上下させて目立たせる
+   */
+  private drawItems(timeMs: number): void {
+    const g = this.itemView;
+    g.clear();
+    for (const it of this.sim.world.items) {
+      if (it.pending) continue;
+      const x = it.x;
+      const y = it.y + Math.sin(timeMs / 250 + it.id) * 3;
+      g.fillStyle(0x000000, 0.25).fillEllipse(it.x, it.y + 12, 18, 6);
+      if (it.kind === 'potion') {
+        g.fillStyle(0x8e24aa).fillRoundedRect(x - 7, y - 6, 14, 16, 4);
+        g.fillStyle(0xe1bee7).fillRect(x - 4, y - 12, 8, 6);
+        g.fillStyle(0xffffff, 0.6).fillRect(x - 4, y - 3, 3, 8);
+      } else if (it.kind === 'magnet') {
+        g.lineStyle(6, 0xe53935).beginPath();
+        g.arc(x, y, 9, 0, Math.PI, false).strokePath();
+        g.fillStyle(0xe53935).fillRect(x - 12, y - 10, 6, 10).fillRect(x + 6, y - 10, 6, 10);
+        g.fillStyle(0xeeeeee).fillRect(x - 12, y - 14, 6, 5).fillRect(x + 6, y - 14, 6, 5);
+      } else {
+        g.fillStyle(0x1e88e5).fillCircle(x, y, 8);
+        g.fillStyle(0x1e88e5).fillTriangle(x - 8, y, x - 15, y - 6, x - 15, y + 6).fillTriangle(x + 8, y, x + 15, y - 6, x + 15, y + 6);
+        g.fillStyle(0xffffff, 0.8).fillCircle(x - 3, y - 3, 2.5);
+        g.lineStyle(2, 0xffffff, 0.7).strokeCircle(x, y, 8);
+      }
+    }
+  }
+
+  /**
+   * ふしぎなアメの抽選の演出: 「+1 / +3 / +5」を回してから、当たった数を出す（シミュレーションは演出の時間の後に上げる）。
+   * 連続でレベルアップの選択が出る
+   */
+  private playCandy(levels: number): void {
+    const choices = this.sim.world.rules.pickups.items['rare-candy'].levels.map((x) => x.levels);
+    const reveal = this.sim.world.rules.pickups.items['rare-candy'].revealSeconds * 1000;
+    const name = localName(generated.items['rare-candy']?.names, getLocale(), '');
+    this.tweens.killTweensOf(this.announceText);
+    this.announceText.setColor('#90caf9').setAlpha(1);
+    let k = 0;
+    const timer = this.time.addEvent({
+      delay: 70,
+      loop: true,
+      callback: () => {
+        this.announceText.setText(t('candy.rolling', { name, levels: choices[k++ % choices.length]! }));
+      },
+    });
+    this.time.delayedCall(Math.max(0, reveal - 100), () => {
+      timer.remove();
+      this.announceText.setText(t('candy.result', { name, levels })).setColor('#ffe082');
+      this.cameras.main.flash(250, 255, 255, 255);
+      this.tweens.add({ targets: this.announceText, alpha: 0, delay: 1500, duration: 600 });
+    });
   }
 
   /** 経過時間と、中ボス・ボスの HP のバー */
@@ -695,6 +759,7 @@ export class RunScene extends Phaser.Scene {
     );
 
     this.drawHazards(world.hazards);
+    this.drawItems(timeMs);
     this.drawTopCenter();
 
     const lu = world.levelUp;
@@ -763,3 +828,4 @@ export class RunScene extends Phaser.Scene {
     this.hud.setText(lines);
   }
 }
+

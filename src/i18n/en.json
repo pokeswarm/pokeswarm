@@ -69,7 +69,6 @@
   "itemDesc.iron": "Defense +8%",
   "itemDesc.carbos": "Move speed +6%",
   "itemDesc.pp-up": "Cooldown −5%",
-  "itemDesc.leftovers": "Slowly restores HP",
   "itemDesc.dowsing-machine": "XP gem pickup range +20%",
   "itemDesc.wide-lens": "Move area +8%",
   "itemDesc.lucky-egg": "XP +10%",
@@ -247,8 +246,6 @@
   "shop.armor.desc": "Damage taken −3% per rank",
   "shop.max-health.name": "Max Health",
   "shop.max-health.desc": "Max HP +10% per rank",
-  "shop.recovery.name": "Recovery",
-  "shop.recovery.desc": "Recover 0.2 HP per second per rank",
   "shop.haste.name": "Cooldown",
   "shop.haste.desc": "Move cooldown −2.5% per rank",
   "shop.area.name": "Area",
@@ -270,5 +267,8 @@
   "shop.reroll-plus.name": "Reroll",
   "shop.reroll-plus.desc": "+2 rerolls per rank at the start of a run",
   "shop.banish.name": "Banish",
-  "shop.banish.desc": "+1 banish per rank at the start of a run (B on the level-up screen)"
+  "shop.banish.desc": "+1 banish per rank at the start of a run (B on the level-up screen)",
+  "item.magnet": "Magnet! Pulling in all experience",
+  "candy.rolling": "{name}! Level +{levels}...",
+  "candy.result": "{name}! Level +{levels}!"
 }

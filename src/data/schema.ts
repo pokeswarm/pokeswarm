@@ -85,6 +85,8 @@ export const enemyKindSchema = z.object({
   rank: z.enum(['normal', 'midboss', 'boss', 'legendary']).optional(),
   /** 倒したときに落とす経験値。省略時は pickups.json の xpPerKill（雑魚には時間帯の xpMultiplier を掛ける） */
   xp: z.number().nonnegative().optional(),
+  /** 倒したときに落とす道具（中ボスのふしぎなアメ）。経験値の代わり */
+  drop: z.enum(['potion', 'magnet', 'rare-candy']).optional(),
   /** スプライトの大きさの倍率（省略時は 1。中ボス・ボスを大きく描く） */
   spriteScale: z.number().positive().optional(),
 });
@@ -691,6 +693,20 @@ export const pickupConfigSchema = z.object({
   magnetSpeed: z.number().positive(),
   /** この経験値以上の玉は大きい玉として表示する（見た目だけ） */
   bigGemValue: z.number().positive(),
+  /** マップに落ちる道具（きずぐすり・マグネット・ふしぎなアメ）の当たりの大きさと、同時に落ちている数の上限 */
+  itemRadius: z.number().positive(),
+  maxItems: z.number().int().positive(),
+  items: z.object({
+    /** 雑魚を倒したときに落とす確率（1体あたり）と、回復する量（最大HPの %） */
+    potion: z.object({ dropChance: z.number().min(0).max(1), healPct: z.number().positive() }),
+    /** 雑魚を倒したときに落とす確率と、玉を吸い寄せる速さ */
+    magnet: z.object({ dropChance: z.number().min(0).max(1), speed: z.number().positive() }),
+    /** 中ボスが落とす。上がるレベルの数とその重み、抽選の演出の時間 */
+    'rare-candy': z.object({
+      revealSeconds: z.number().nonnegative(),
+      levels: z.array(z.object({ levels: z.number().int().positive(), weight: z.number().positive() })).min(1),
+    }),
+  }),
 });
 export type PickupConfig = z.infer<typeof pickupConfigSchema>;
 

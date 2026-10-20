@@ -3,5 +3,34 @@
   "gemRadius": 6,
   "maxGems": 500,
   "magnetSpeed": 420,
-  "bigGemValue": 10
+  "bigGemValue": 10,
+  "itemRadius": 10,
+  "maxItems": 64,
+  "items": {
+    "potion": {
+      "dropChance": 0.003,
+      "healPct": 30
+    },
+    "magnet": {
+      "dropChance": 0.0012,
+      "speed": 1400
+    },
+    "rare-candy": {
+      "revealSeconds": 1.2,
+      "levels": [
+        {
+          "levels": 1,
+          "weight": 60
+        },
+        {
+          "levels": 3,
+          "weight": 30
+        },
+        {
+          "levels": 5,
+          "weight": 10
+        }
+      ]
+    }
+  }
 }

@@ -38,6 +38,8 @@ export function dropGems(world: World): void {
 export function moveGems(world: World): void {
   const { gems, players } = world;
   const speed = world.rules.pickups.magnetSpeed * world.dt;
+  // マグネットの道具で吸い寄せられている玉（attracted 2）は速く、どれだけ遠くからでも来る
+  const fast = world.rules.pickups.items.magnet.speed * world.dt;
   for (let i = 0; i < gems.count; i++) {
     gems.prevX[i] = gems.x[i]!;
     gems.prevY[i] = gems.y[i]!;
@@ -58,7 +60,7 @@ export function moveGems(world: World): void {
     }
     if (!gems.attracted[i] || best === Infinity || best === 0) continue;
     const d = Math.sqrt(best);
-    const step = Math.min(speed, d);
+    const step = Math.min(gems.attracted[i] === 2 ? fast : speed, d);
     gems.x[i]! += ((tx - gems.x[i]!) / d) * step;
     gems.y[i]! += ((ty - gems.y[i]!) / d) * step;
   }

@@ -7,7 +7,8 @@ import { testRules } from './testRules';
  * 1秒30回の更新なら、1回あたり 33ms の中に描画も含めて収める必要がある。
  */
 function filled(count: number): Simulation {
-  const rules = testRules({ spawn: { spawnPerSecond: 3000, capGlobal: count, capPerPlayer: count } });
+  // レベルアップで止まると計測にならないので、レベルは上がらないようにする
+  const rules = testRules({ spawn: { spawnPerSecond: 3000, capGlobal: count, capPerPlayer: count }, leveling: { maxLevel: 1 } });
   const sim = new Simulation({ tickRate: 30, seed: 1, rules });
   sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150 });
   sim.step([{ type: 'move', playerId: 1, dx: 1, dy: 1 }]);

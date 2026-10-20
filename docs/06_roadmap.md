@@ -11,9 +11,9 @@
 ### フェーズ0: 技術検証
 目的: 構想が技術的に成り立つかを確かめる。見た目や内容は仮でよい。
 
-- [ ] プロジェクトの土台（TypeScript + Vite + Phaser、Cloudflare への自動公開）
+- [x] プロジェクトの土台（TypeScript + Vite + Phaser、Cloudflare への自動公開）
   - [x] TypeScript + Vite + Phaser の土台
-  - [ ] Cloudflare Workers（静的アセット）への自動公開（pokeswarm 専用アカウントで作り直し中）（https://pokeswarm.pokeswarm-dev.workers.dev/）
+  - [x] Cloudflare Workers（静的アセット）への自動公開（https://pokeswarm.pokeswarm-dev.workers.dev/）
 - [x] シミュレーションと描画の分離、入力コマンドの仕組み、固定間隔の更新
 - [x] 敵300体以上を PC のブラウザで60fpsで動かす（空間ハッシュによる当たり判定、敵の移し替え、上限）
 - [x] SpriteCollab のスプライトを1体分取り込み、動作・向きのアニメーションを表示する

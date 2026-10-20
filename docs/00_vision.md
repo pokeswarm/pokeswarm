@@ -65,3 +65,4 @@ PokéSwarm は、ブラウザ・協力プレイ・**選択に代償があるビ�
 | `04_data_pipeline.md` | 素材とデータの生成 |
 | `05_operations.md` | 公開・運営・費用 |
 | `06_roadmap.md` | 開発の順番と未決定事項 |
+| `07_content_draft.md` | フェーズ1の中身のたたき台（御三家） |

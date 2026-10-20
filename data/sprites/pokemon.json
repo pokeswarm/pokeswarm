@@ -1,5 +1,15 @@
 {
   "pokemon": [
-    { "key": "charmander", "dex": 4 }
+    { "key": "charmander", "dex": 4 },
+    { "key": "caterpie", "dex": 10 },
+    { "key": "metapod", "dex": 11 },
+    { "key": "weedle", "dex": 13 },
+    { "key": "kakuna", "dex": 14 },
+    { "key": "pidgey", "dex": 16 },
+    { "key": "rattata", "dex": 19 },
+    { "key": "spearow", "dex": 21 },
+    { "key": "paras", "dex": 46 },
+    { "key": "zubat", "dex": 41 },
+    { "key": "geodude", "dex": 74 }
   ]
 }

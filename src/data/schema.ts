@@ -42,6 +42,8 @@ export type PlaceholderRenderConfig = z.infer<typeof placeholderRenderSchema>;
 
 export const enemyKindSchema = z.object({
   id: z.string().min(1),
+  /** 表示に使うスプライト（public/sprites/<key>）。無ければ仮の円で描く */
+  sprite: z.string().optional(),
   hp: z.number().positive(),
   moveSpeed: z.number().nonnegative(),
   radius: z.number().positive(),
@@ -173,6 +175,9 @@ export const spriteRenderSchema = z.object({
   playerScale: z.number().positive(),
   idleAnimation: z.string(),
   walkAnimation: z.string(),
+  /** 敵の拡大率と、敵に使う動作 */
+  enemyScale: z.number().positive(),
+  enemyAnimation: z.string(),
   /** 確認用の一覧表示（?gallery）の間隔 */
   gallerySpacing: z.number().positive(),
 });

@@ -23,5 +23,6 @@
   "net.role.host": "host",
   "net.role.guest": "guest",
   "net.mode.p2p": "direct (WebRTC)",
-  "net.mode.relay": "relay (Realtime Database)"
+  "net.mode.relay": "relay (Realtime Database)",
+  "debug.frameTime": "Frame work: {ms} ms (update to render submit)"
 }

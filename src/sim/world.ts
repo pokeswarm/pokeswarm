@@ -41,6 +41,8 @@ export interface World {
   readonly scratch: Int32Array;
   /** 発射体の命中候補の作業用 */
   readonly hitScratch: Int32Array;
+  /** 押し合いの近傍検索の作業用（小さくして、密集時に集めすぎないようにする） */
+  readonly neighborScratch: Int32Array;
 }
 
 export function createWorld(tickRate: number, seed: number, rules: SimRules, role: SimRole, localPlayerId: PlayerId): World {
@@ -65,6 +67,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     stats: { kills: 0, empowered: 0 },
     scratch: new Int32Array(capacity * 2),
     hitScratch: new Int32Array(capacity * 2),
+    neighborScratch: new Int32Array(Math.max(8, rules.spawn.separation.maxNeighbors * 4)),
   };
 }
 

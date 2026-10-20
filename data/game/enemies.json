@@ -1,5 +1,74 @@
 {
   "kinds": [
-    { "id": "placeholder", "hp": 20, "moveSpeed": 60, "radius": 10 }
+    {
+      "id": "rattata",
+      "sprite": "rattata",
+      "hp": 20,
+      "moveSpeed": 60,
+      "radius": 10
+    },
+    {
+      "id": "pidgey",
+      "sprite": "pidgey",
+      "hp": 20,
+      "moveSpeed": 60,
+      "radius": 10
+    },
+    {
+      "id": "caterpie",
+      "sprite": "caterpie",
+      "hp": 20,
+      "moveSpeed": 60,
+      "radius": 10
+    },
+    {
+      "id": "weedle",
+      "sprite": "weedle",
+      "hp": 20,
+      "moveSpeed": 60,
+      "radius": 10
+    },
+    {
+      "id": "metapod",
+      "sprite": "metapod",
+      "hp": 20,
+      "moveSpeed": 60,
+      "radius": 10
+    },
+    {
+      "id": "kakuna",
+      "sprite": "kakuna",
+      "hp": 20,
+      "moveSpeed": 60,
+      "radius": 10
+    },
+    {
+      "id": "spearow",
+      "sprite": "spearow",
+      "hp": 20,
+      "moveSpeed": 60,
+      "radius": 10
+    },
+    {
+      "id": "zubat",
+      "sprite": "zubat",
+      "hp": 20,
+      "moveSpeed": 60,
+      "radius": 10
+    },
+    {
+      "id": "geodude",
+      "sprite": "geodude",
+      "hp": 20,
+      "moveSpeed": 60,
+      "radius": 10
+    },
+    {
+      "id": "paras",
+      "sprite": "paras",
+      "hp": 20,
+      "moveSpeed": 60,
+      "radius": 10
+    }
   ]
 }

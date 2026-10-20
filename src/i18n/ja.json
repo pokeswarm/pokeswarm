@@ -23,5 +23,6 @@
   "net.role.host": "ホスト",
   "net.role.guest": "ゲスト",
   "net.mode.p2p": "直接（WebRTC）",
-  "net.mode.relay": "中継（Realtime Database）"
+  "net.mode.relay": "中継（Realtime Database）",
+  "debug.frameTime": "1フレームの処理: {ms} ms（更新〜描画の命令まで）"
 }

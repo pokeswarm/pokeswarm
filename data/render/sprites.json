@@ -3,5 +3,7 @@
   "playerScale": 2,
   "idleAnimation": "Idle",
   "walkAnimation": "Walk",
-  "gallerySpacing": 80
+  "gallerySpacing": 80,
+  "enemyScale": 2,
+  "enemyAnimation": "Walk"
 }

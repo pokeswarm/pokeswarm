@@ -58,7 +58,8 @@ export function rebuildEnemyHash(world: World): void {
 
 /** 敵同士の簡易的な押し合い。調べる相手の数に上限を設けて負荷を抑える */
 export function separateEnemies(world: World): void {
-  const { enemies: e, enemyHash, scratch } = world;
+  // 密集していても集める数は neighborScratch の大きさまで（負荷が敵の密度に比例して増えないように）
+  const { enemies: e, enemyHash, neighborScratch: scratch } = world;
   const { strength, maxNeighbors } = world.rules.spawn.separation;
   if (strength === 0 || maxNeighbors === 0) return;
   for (let i = 0; i < e.count; i++) {

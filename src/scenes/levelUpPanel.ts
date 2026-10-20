@@ -2,15 +2,21 @@ import { generated } from '../data';
 import { localName } from '../data/simRules';
 import { getLocale, t, tMaybe } from '../i18n';
 import type { Player } from '../sim/entities/player';
+import { derivationCompletedBy } from '../sim/systems/leveling';
 import type { UpgradeOffer, World } from '../sim/world';
 
-/** 候補1つの表示用の文章 */
+/** カード1枚の表示用の文章 */
 export interface OfferText {
   kind: string;
   name: string;
+  /** レベルの変化（NEW / Lv 1 → 2） */
+  level: string;
+  /** 短い説明（技はタイプと出し方、持ち物・パッシブは効果） */
   detail: string;
-  /** 派生・固有技（必ず出る候補）なら true（目立たせる） */
+  /** 派生・固有技そのもののカード */
   special: boolean;
+  /** 「進化できる！」を出す（以前に達成した派生で、このカードを取ると条件がそろう） */
+  evolvable: boolean;
 }
 
 function moveName(world: World, move: number): string {
@@ -28,65 +34,74 @@ function moveDetail(world: World, move: number): string {
   return `${localName(generated.types[typeKey]?.names, getLocale(), typeKey)}・${tMaybe(`pattern.${def.pattern}`)}`;
 }
 
-/** 候補を、画面に出す文章にする（名前は PokeAPI の各言語の名前、それ以外は翻訳ファイル） */
-export function offerText(world: World, p: Player, offer: UpgradeOffer): OfferText {
+/**
+ * 候補を、カードに出す文章にする（名前は PokeAPI の各言語の名前、それ以外は翻訳ファイル）。
+ * 派生の材料などのヒントは出さない。「進化できる！」は、以前に達成した派生（discovered に派生先の技のキー）で、
+ * このカードを取ると条件がそろうときだけ出す。
+ */
+export function offerText(world: World, p: Player, offer: UpgradeOffer, discovered: ReadonlySet<string>): OfferText {
   const r = world.rules;
+  const completes = derivationCompletedBy(world, p, offer);
+  const evolvable = completes !== null && discovered.has(r.moves[completes.to]!.key);
+  const base = { special: false, evolvable };
   switch (offer.kind) {
     case 'moveNew':
-      return { kind: t('upgrade.kind.moveNew'), name: moveName(world, offer.move), detail: `${t('levelUp.new')}　${moveDetail(world, offer.move)}`, special: false };
+      return { ...base, kind: t('upgrade.kind.moveNew'), name: moveName(world, offer.move), level: t('levelUp.new'), detail: moveDetail(world, offer.move) };
     case 'moveUp': {
       const pm = p.moves[offer.slot]!;
       return {
+        ...base,
         kind: t('upgrade.kind.moveUp'),
         name: moveName(world, pm.move),
-        detail: t('levelUp.levelChange', { from: pm.level, to: pm.level + 1 }),
-        special: false,
+        level: t('levelUp.levelChange', { from: pm.level, to: pm.level + 1 }),
+        detail: moveDetail(world, pm.move),
       };
     }
     case 'itemNew': {
       const key = r.items[offer.item]!.key;
-      return { kind: t('upgrade.kind.itemNew'), name: itemName(key), detail: `${t('levelUp.new')}　${tMaybe(`itemDesc.${key}`)}`, special: false };
+      return { ...base, kind: t('upgrade.kind.itemNew'), name: itemName(key), level: t('levelUp.new'), detail: tMaybe(`itemDesc.${key}`) };
     }
     case 'itemUp': {
       const it = p.items[offer.slot]!;
       const key = r.items[it.item]!.key;
       return {
+        ...base,
         kind: t('upgrade.kind.itemUp'),
         name: itemName(key),
-        detail: `${t('levelUp.levelChange', { from: it.level, to: it.level + 1 })}　${tMaybe(`itemDesc.${key}`)}`,
-        special: false,
+        level: t('levelUp.levelChange', { from: it.level, to: it.level + 1 }),
+        detail: tMaybe(`itemDesc.${key}`),
       };
     }
     case 'passiveNew': {
       const key = r.passives[offer.passive]!.key;
-      return { kind: t('upgrade.kind.passiveNew'), name: itemName(key), detail: `${t('levelUp.new')}　${tMaybe(`itemDesc.${key}`)}`, special: false };
+      return { ...base, kind: t('upgrade.kind.passiveNew'), name: itemName(key), level: t('levelUp.new'), detail: tMaybe(`itemDesc.${key}`) };
     }
     case 'passiveUp': {
       const ps = p.passives[offer.slot]!;
       const key = r.passives[ps.passive]!.key;
       return {
+        ...base,
         kind: t('upgrade.kind.passiveUp'),
         name: itemName(key),
-        detail: `${t('levelUp.levelChange', { from: ps.level, to: ps.level + 1 })}　${tMaybe(`itemDesc.${key}`)}`,
-        special: false,
+        level: t('levelUp.levelChange', { from: ps.level, to: ps.level + 1 }),
+        detail: tMaybe(`itemDesc.${key}`),
       };
     }
-    case 'derive': {
-      const item = r.items[offer.item]!;
-      const params = { from: moveName(world, p.moves[offer.slot]!.move), to: moveName(world, offer.to), item: itemName(item.key) };
+    case 'derive':
       return {
         kind: t(offer.unique ? 'upgrade.kind.unique' : 'upgrade.kind.derive'),
         name: moveName(world, offer.to),
-        detail: t(item.consumable ? 'levelUp.deriveDetail' : 'levelUp.deriveKeepItem', params),
+        level: t('levelUp.new'),
+        detail: moveDetail(world, offer.to),
         special: true,
+        evolvable: false,
       };
-    }
   }
 }
 
 /**
- * レベルアップの選択画面（DOM で出す。技術検証の段階の簡単なもの。見た目の作り込みはフェーズ4）。
- * 数字キー・クリックで選ぶ。R でリロール、S で見送る。
+ * レベルアップの選択画面（DOM。見た目の作り込みはフェーズ4）。
+ * 画面の横幅いっぱいに、大きなカードを横に並べる。数字キー・クリックで選び、R でリロール、X で見送る。
  */
 export class LevelUpPanel {
   private readonly root: HTMLDivElement;
@@ -99,18 +114,17 @@ export class LevelUpPanel {
     this.root = document.createElement('div');
     Object.assign(this.root.style, {
       position: 'fixed',
-      left: '50%',
+      left: '0',
+      right: '0',
       top: '50%',
-      transform: 'translate(-50%, -50%)',
-      width: 'min(520px, 92vw)',
-      padding: '16px',
-      background: 'rgba(10,16,10,0.92)',
+      transform: 'translateY(-50%)',
+      padding: '20px 2vw',
+      background: 'rgba(8,14,8,0.88)',
       color: '#fff',
-      font: '14px/1.5 sans-serif',
-      borderRadius: '10px',
-      border: '1px solid #4a6',
+      font: '16px/1.5 sans-serif',
       zIndex: '20',
       display: 'none',
+      boxSizing: 'border-box',
     });
     document.body.appendChild(this.root);
   }
@@ -120,28 +134,50 @@ export class LevelUpPanel {
     const key = JSON.stringify([level, offers, rerolls, secondsLeft]);
     if (key === this.shownKey) return;
     this.shownKey = key;
+
+    const header = document.createElement('div');
+    header.style.cssText = 'display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px';
     const title = document.createElement('div');
-    title.style.cssText = 'font-size:20px;font-weight:bold;margin-bottom:4px';
+    title.style.cssText = 'font-size:26px;font-weight:bold';
     title.textContent = t('levelUp.title', { level });
-    const sub = document.createElement('div');
-    sub.style.cssText = 'opacity:0.8;margin-bottom:10px';
-    sub.textContent = `${t('levelUp.timeLeft', { seconds: secondsLeft })}　${t('levelUp.hint')}`;
-    const list = offers.map((o, i) => {
-      const b = document.createElement('button');
-      b.style.cssText = `display:block;width:100%;text-align:left;margin:6px 0;padding:8px 10px;border-radius:8px;cursor:pointer;color:#fff;font:inherit;background:${o.special ? '#5a3a10' : '#1e2e1e'};border:1px solid ${o.special ? '#fb3' : '#486'}`;
-      b.innerHTML = '';
-      const head = document.createElement('div');
-      head.textContent = `${i + 1}. [${o.kind}] ${o.name}`;
-      head.style.fontWeight = 'bold';
+    const timer = document.createElement('div');
+    timer.style.cssText = 'opacity:0.85';
+    timer.textContent = `${t('levelUp.timeLeft', { seconds: secondsLeft })}　${t('levelUp.hint')}`;
+    header.append(title, timer);
+
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:2vw;align-items:stretch';
+    offers.forEach((o, i) => {
+      const card = document.createElement('button');
+      const border = o.special ? '#ffb300' : o.evolvable ? '#4fc3f7' : '#4a7a4a';
+      const bg = o.special ? '#3d2a08' : '#162416';
+      card.style.cssText = `flex:1 1 0;min-width:0;min-height:30vh;padding:18px;border-radius:14px;border:2px solid ${border};background:${bg};color:#fff;font:inherit;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:8px;overflow:hidden`;
+      const top = document.createElement('div');
+      top.style.cssText = 'display:flex;justify-content:space-between;gap:8px;font-size:14px;opacity:0.85';
+      const kind = document.createElement('span');
+      kind.textContent = `${i + 1}. ${o.kind}`;
+      const lv = document.createElement('span');
+      lv.textContent = o.level;
+      top.append(kind, lv);
+      const name = document.createElement('div');
+      name.style.cssText = 'font-size:clamp(20px,2.4vw,30px);font-weight:bold;line-height:1.2;overflow-wrap:anywhere';
+      name.textContent = o.name;
       const detail = document.createElement('div');
+      detail.style.cssText = 'font-size:clamp(14px,1.3vw,17px);opacity:0.9;overflow-wrap:anywhere';
       detail.textContent = o.detail;
-      detail.style.opacity = '0.85';
-      b.append(head, detail);
-      b.onclick = () => this.handlers.choose(i);
-      return b;
+      card.append(top, name, detail);
+      if (o.evolvable) {
+        const badge = document.createElement('div');
+        badge.style.cssText = 'margin-top:auto;align-self:flex-start;padding:2px 10px;border-radius:10px;background:#0277bd;font-weight:bold;font-size:14px';
+        badge.textContent = t('levelUp.evolvable');
+        card.append(badge);
+      }
+      card.onclick = () => this.handlers.choose(i);
+      row.append(card);
     });
+
     const footer = document.createElement('div');
-    footer.style.cssText = 'display:flex;gap:8px;margin-top:8px';
+    footer.style.cssText = 'display:flex;gap:2vw;margin-top:14px';
     const reroll = document.createElement('button');
     reroll.textContent = t('levelUp.reroll', { count: rerolls });
     reroll.disabled = rerolls <= 0;
@@ -149,18 +185,20 @@ export class LevelUpPanel {
     const skip = document.createElement('button');
     skip.textContent = t('levelUp.skip');
     skip.onclick = () => this.handlers.skip();
-    for (const b of [reroll, skip]) b.style.cssText = 'flex:1;padding:6px;border-radius:6px;cursor:pointer';
+    for (const b of [reroll, skip]) b.style.cssText = 'flex:1;padding:10px;border-radius:8px;cursor:pointer;font:inherit';
     footer.append(reroll, skip);
-    this.root.replaceChildren(title, sub, ...list, footer);
+
+    this.root.replaceChildren(header, row, footer);
     this.root.style.display = 'block';
     if (!this.onKey) {
       this.onKey = (ev) => {
-        // 移動キーを押したまま開いたときの自動の繰り返しで、勝手に選ばれないようにする
+        // キーを押したまま開いたときの自動の繰り返しで、勝手に選ばれないようにする
         if (ev.repeat) return;
         const n = Number(ev.key);
         if (n >= 1 && n <= 9) this.handlers.choose(n - 1);
         else if (ev.key === 'r' || ev.key === 'R') this.handlers.reroll();
-        else if (ev.key === 's' || ev.key === 'S') this.handlers.skip();
+        // 見送るは移動キー（WASD）と重ならない X
+        else if (ev.key === 'x' || ev.key === 'X') this.handlers.skip();
       };
       window.addEventListener('keydown', this.onKey);
     }

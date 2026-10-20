@@ -21,6 +21,7 @@ import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, enemyCap, type SimRole } from '../sim/world';
 import { applyDebugOverrides, parseMovesParam } from './debugOverrides';
+import { Discoveries } from '../meta/discoveries';
 import { LevelUpPanel, offerText } from './levelUpPanel';
 import type { NetPanel } from './netPanel';
 
@@ -78,6 +79,7 @@ export class RunScene extends Phaser.Scene {
   /** 最後に描画のタイミングが来た時刻 */
   private lastFrameAt = 0;
   private levelUpPanel!: LevelUpPanel;
+  private readonly discoveries = new Discoveries();
   /** 画面の操作（レベルアップの選択など）から作ったコマンド。次の更新で渡す */
   private uiCommands: InputCommand[] = [];
 
@@ -191,6 +193,10 @@ export class RunScene extends Phaser.Scene {
       if (visible) {
         for (const ev of this.sim.world.events) {
           if (ev.type === 'projectileHit') this.effects.playImpact(this.sim.world.rules.moves[ev.move]!.effect, ev.x, ev.y);
+          // 派生・固有技を達成したら記録する（次からの「進化できる！」の表示に使う）
+          if (ev.type === 'upgradeChosen' && ev.playerId === this.localId && ev.offer.kind === 'derive') {
+            this.discoveries.add(this.sim.world.rules.moves[ev.offer.to]!.key);
+          }
         }
       }
       if (this.net && this.sync) this.net.transport.send(this.sync.outgoing(this.sim.world));
@@ -306,7 +312,7 @@ export class RunScene extends Phaser.Scene {
 
     const lu = world.levelUp;
     if (lu && !lu.done.has(this.localId)) {
-      const offers = (lu.offers.get(this.localId) ?? []).map((o) => offerText(world, local, o));
+      const offers = (lu.offers.get(this.localId) ?? []).map((o) => offerText(world, local, o, this.discoveries.all));
       this.levelUpPanel.show(lu.level, offers, local.rerolls, Math.ceil(lu.ticksLeft * world.dt));
     } else {
       this.levelUpPanel.hide();

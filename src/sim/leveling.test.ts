@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Simulation } from './simulation';
-import { addXp, applyOffer, makeOffers } from './systems/leveling';
+import { addXp, applyOffer, derivationCompletedBy, makeOffers } from './systems/leveling';
 import { testMove, testRules } from './testRules';
 import { emptyModifiers, type SimUpgradeDef } from './upgrades';
 
@@ -168,5 +168,23 @@ describe('持ち物・パッシブの効果', () => {
     const { sim, p } = makeSim();
     applyOffer(sim.world, p, { kind: 'passiveNew', passive: 0 });
     expect(p.moveSpeed).toBeCloseTo(110);
+  });
+});
+
+describe('「進化できる！」の判定（このカードを取ると派生の条件がそろうか）', () => {
+  it('元の技が最大で材料の持ち物が候補に出たとき・材料を持っていて最後の強化が候補に出たとき', () => {
+    const { sim, p } = makeSim();
+    // テスト用の技は最大レベル1なので、ひのこ役（番号1）は最初から最大
+    expect(derivationCompletedBy(sim.world, p, { kind: 'itemNew', item: 0 })).toMatchObject({ from: 1, to: 2 });
+    expect(derivationCompletedBy(sim.world, p, { kind: 'itemNew', item: 1 })).toBeNull();
+    expect(derivationCompletedBy(sim.world, p, { kind: 'passiveNew', passive: 0 })).toBeNull();
+  });
+
+  it('派生先をもう持っていれば出さない', () => {
+    const { sim, p } = makeSim('charmander', [
+      { move: 1, level: 1 },
+      { move: 2, level: 1 },
+    ]);
+    expect(derivationCompletedBy(sim.world, p, { kind: 'itemNew', item: 0 })).toBeNull();
   });
 });

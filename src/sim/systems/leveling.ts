@@ -1,6 +1,7 @@
 import type { PlayerId } from '../commands';
 import type { Player } from '../entities/player';
 import { addModifiers, emptyModifiers } from '../upgrades';
+import type { SimDerivation } from '../upgrades';
 import type { UpgradeOffer, World } from '../world';
 
 /**
@@ -185,4 +186,36 @@ export function recomputeModifiers(world: World, p: Player): void {
   p.mods = mods;
   p.moveSpeed = p.baseMoveSpeed * (1 + mods.moveSpeedPct / 100);
   p.pickupRange = p.basePickupRange * (1 + mods.pickupRangePct / 100);
+}
+
+/**
+ * この候補を取ると、派生（固有技を含む）の条件がそろうなら、その派生を返す（そろわなければ null）。
+ * 選択画面で「進化できる！」を出すかの判定に使う（出すのは、以前に達成したことのある派生だけ）。
+ */
+export function derivationCompletedBy(world: World, p: Player, offer: UpgradeOffer): SimDerivation | null {
+  const rules = world.rules;
+  const maxOf = (move: number): number => rules.moves[move]!.levels.length;
+  const lineOk = (d: SimDerivation): boolean => d.line === null || d.line === p.line;
+  const notYet = (d: SimDerivation): boolean => !p.moves.some((m) => m.move === d.to);
+  for (const d of rules.derivations) {
+    if (!lineOk(d) || !notYet(d)) continue;
+    const hasItem = p.items.some((it) => it.item === d.item);
+    const fromAtMax = p.moves.some((m) => m.move === d.from && m.level >= maxOf(d.from));
+    switch (offer.kind) {
+      case 'itemNew':
+        if (offer.item === d.item && fromAtMax) return d;
+        break;
+      case 'moveUp': {
+        const pm = p.moves[offer.slot]!;
+        if (pm.move === d.from && pm.level + 1 >= maxOf(d.from) && hasItem) return d;
+        break;
+      }
+      case 'moveNew':
+        if (offer.move === d.from && maxOf(d.from) <= 1 && hasItem) return d;
+        break;
+      default:
+        break;
+    }
+  }
+  return null;
 }

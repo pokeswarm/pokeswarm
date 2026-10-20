@@ -321,6 +321,30 @@
       "contactDamage": 6
     },
     {
+      "id": "onix",
+      "sprite": "enemy/onix",
+      "hp": 12,
+      "moveSpeed": 55,
+      "radius": 14,
+      "contactDamage": 6
+    },
+    {
+      "id": "haunter",
+      "sprite": "enemy/haunter",
+      "hp": 12,
+      "moveSpeed": 63,
+      "radius": 11,
+      "contactDamage": 6
+    },
+    {
+      "id": "dragonair",
+      "sprite": "enemy/dragonair",
+      "hp": 12,
+      "moveSpeed": 55,
+      "radius": 12,
+      "contactDamage": 6
+    },
+    {
       "id": "swarm-beedrill",
       "species": "beedrill",
       "sprite": "enemy/beedrill",

@@ -63,6 +63,8 @@ describe('ランの記録', () => {
     expect(s.kills).toBe(1);
     expect(s['defeated.test']).toBe(1);
     expect(s['defeated.mid']).toBe(1);
+    expect(s['bossDefeated.mid']).toBe(1);
+    expect(s['bossDefeated.test']).toBeUndefined();
     expect(s.midbossKills).toBe(1);
   });
 });

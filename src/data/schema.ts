@@ -112,6 +112,11 @@ export const spawnConfigSchema = z
           hpMultiplier: z.number().positive(),
           /** その時間帯に出る敵の接触ダメージの倍率 */
           damageMultiplier: z.number().positive(),
+          /**
+           * この時間帯だけ、ボス・スウォームのポケモン（とその進化前）も雑魚に出してよい
+           * （作者の決定: 四天王ラッシュでは四天王の手持ちのイワーク・ゴースト・ハクリューも出す）
+           */
+          allowBossSpecies: z.boolean().optional(),
           /** その時間帯に出る雑魚が落とす経験値の倍率（省略時は 1） */
           xpMultiplier: z.number().positive().optional(),
           /** その時間帯の1秒あたりの出現数と、1人あたりの上限（省略時は全体の値）。後の時間帯ほど増やして群れの圧力を上げる */

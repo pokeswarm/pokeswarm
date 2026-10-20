@@ -184,6 +184,7 @@ for (const u of unlocksConfig.unlocks) {
     for (const pre of generated.pokemon[species]?.preEvolutions ?? []) reserved.set(pre, species);
   }
   spawnConfig.waves.forEach((wave, i) => {
+    if (wave.allowBossSpecies) return;
     for (const id of wave.kinds) {
       const species = enemiesConfig.kinds.find((k) => k.id === id)?.species ?? id;
       const by = reserved.get(species);

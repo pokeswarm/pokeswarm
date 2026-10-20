@@ -151,6 +151,7 @@
     },
     {
       "startSeconds": 1020,
+      "allowBossSpecies": true,
       "spawnPerSecond": 15,
       "minimum": 250,
       "capPerPlayer": 500,
@@ -162,11 +163,14 @@
         "cloyster",
         "slowbro",
         "jynx",
+        "onix",
         "hitmonlee",
         "hitmonchan",
         "golbat",
+        "haunter",
         "arbok",
         "gyarados",
+        "dragonair",
         "aerodactyl"
       ]
     }

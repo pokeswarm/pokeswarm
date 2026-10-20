@@ -8,119 +8,119 @@
     {
       "pokemon": "onix",
       "condition": {
-        "stat": "defeated.onix",
+        "stat": "bossDefeated.onix",
         "atLeast": 20
       }
     },
     {
       "pokemon": "starmie",
       "condition": {
-        "stat": "defeated.starmie",
+        "stat": "bossDefeated.starmie",
         "atLeast": 20
       }
     },
     {
       "pokemon": "raichu",
       "condition": {
-        "stat": "defeated.raichu",
+        "stat": "bossDefeated.raichu",
         "atLeast": 20
       }
     },
     {
       "pokemon": "arcanine",
       "condition": {
-        "stat": "defeated.arcanine",
+        "stat": "bossDefeated.arcanine",
         "atLeast": 20
       }
     },
     {
       "pokemon": "alakazam",
       "condition": {
-        "stat": "defeated.alakazam",
+        "stat": "bossDefeated.alakazam",
         "atLeast": 20
       }
     },
     {
       "pokemon": "weezing",
       "condition": {
-        "stat": "defeated.weezing",
+        "stat": "bossDefeated.weezing",
         "atLeast": 20
       }
     },
     {
       "pokemon": "vileplume",
       "condition": {
-        "stat": "defeated.vileplume",
+        "stat": "bossDefeated.vileplume",
         "atLeast": 20
       }
     },
     {
       "pokemon": "rhydon",
       "condition": {
-        "stat": "defeated.rhydon",
+        "stat": "bossDefeated.rhydon",
         "atLeast": 20
       }
     },
     {
       "pokemon": "lapras",
       "condition": {
-        "stat": "defeated.lapras",
+        "stat": "bossDefeated.lapras",
         "atLeast": 10
       }
     },
     {
       "pokemon": "machamp",
       "condition": {
-        "stat": "defeated.machamp",
+        "stat": "bossDefeated.machamp",
         "atLeast": 10
       }
     },
     {
       "pokemon": "gengar",
       "condition": {
-        "stat": "defeated.gengar",
+        "stat": "bossDefeated.gengar",
         "atLeast": 10
       }
     },
     {
       "pokemon": "dragonite",
       "condition": {
-        "stat": "defeated.dragonite",
+        "stat": "bossDefeated.dragonite",
         "atLeast": 10
       }
     },
     {
       "pokemon": "mewtwo",
       "condition": {
-        "stat": "defeated.mewtwo",
+        "stat": "bossDefeated.mewtwo",
         "atLeast": 5
       }
     },
     {
       "pokemon": "mew",
       "condition": {
-        "stat": "defeated.mew",
+        "stat": "bossDefeated.mew",
         "atLeast": 5
       }
     },
     {
       "pokemon": "articuno",
       "condition": {
-        "stat": "defeated.articuno",
+        "stat": "bossDefeated.articuno",
         "atLeast": 5
       }
     },
     {
       "pokemon": "zapdos",
       "condition": {
-        "stat": "defeated.zapdos",
+        "stat": "bossDefeated.zapdos",
         "atLeast": 5
       }
     },
     {
       "pokemon": "moltres",
       "condition": {
-        "stat": "defeated.moltres",
+        "stat": "bossDefeated.moltres",
         "atLeast": 5
       }
     }

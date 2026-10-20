@@ -1,10 +1,30 @@
+import type { LevelUpSnapshot } from '../sim/commands';
+import type { RunOutcome, UpgradeOffer } from '../sim/world';
+
 /**
  * 協力プレイで送るメッセージ。1回の更新で送るものを配列にまとめて1つの文字列（JSON）にする。
  * 数が多いもの（出現・撃破など）は、通信量を抑えるため数値を平らに並べる。
  */
 export type NetMessage =
-  /** 送り手のプレイヤーの状態: 位置・向き・入力 */
-  | { t: 'p'; x: number; y: number; fx: number; fy: number; ix: number; iy: number }
+  /**
+   * プレイヤーの状態: 位置・向き・入力・HP・最大HP・倒れているか（1/0）。i はプレイヤーの番号。
+   * ゲストの分はホストがほかのゲストへ中継する
+   */
+  | { t: 'p'; i: number; x: number; y: number; fx: number; fy: number; ix: number; iy: number; h: number; m: number; dn: number }
+  /** レベルアップの選択の状態（ホスト→ゲスト。変わったときだけ） */
+  | { t: 'lu'; s: LevelUpSnapshot | null; r: [number, number][] }
+  /** ホストが確定した選択（ホスト→ゲスト） */
+  | { t: 'ua'; i: number; o: UpgradeOffer }
+  /** 選択の要望（ゲスト→ホスト）: c 選ぶ（n は候補の番号）・s 見送る・r リロール */
+  | { t: 'rq'; k: 'c' | 's' | 'r'; n: number }
+  /** ボスの範囲技の予告（ホスト→ゲスト）: [x, y, ...] */
+  | { t: 'hz'; e: number[] }
+  /** 中ボス・ボスの HP（ホスト→ゲスト）: [id, HP, 最大HP, ...] */
+  | { t: 'bh'; e: number[] }
+  /** プレイヤーが抜けた（ホスト→ゲスト） */
+  | { t: 'rm'; i: number }
+  /** ランの終わり（ホスト→ゲスト） */
+  | { t: 'end'; o: RunOutcome }
   /** 出現（ホスト→ゲスト）: [id, 種類, x, y, ...] */
   | { t: 'sp'; e: number[] }
   /** 撃破の確定（ホスト→ゲスト）: [id, とどめを刺したプレイヤー, ...] */
@@ -25,8 +45,8 @@ export type NetMessage =
   | { t: 'gc'; e: number[] }
   /** 玉に触れた（ゲスト→ホスト）: [id, 触れたプレイヤー, ...] */
   | { t: 'pr'; e: number[] }
-  /** 敵の位置の補正（ホスト→ゲスト）: [id, x, y, ...] */
-  | { t: 'c'; e: number[] }
+  /** 敵の位置の補正（ホスト→ゲスト）: [id, x, y, ...]。k はホストの更新回数（ゲストの経過時間をそろえる） */
+  | { t: 'c'; e: number[]; k: number }
   /** 往復時間の計測 */
   | { t: 'ping'; s: number }
   | { t: 'pong'; s: number };

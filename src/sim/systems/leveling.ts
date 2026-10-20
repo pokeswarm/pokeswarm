@@ -1,4 +1,4 @@
-import type { PlayerId } from '../commands';
+import type { LevelUpSnapshot, PlayerId } from '../commands';
 import type { Player } from '../entities/player';
 import { deriveStats } from '../species';
 import { addModifiers, emptyModifiers } from '../upgrades';
@@ -27,17 +27,23 @@ export function addXp(world: World, amount: number): void {
 }
 
 /**
- * 選択を待っているレベルアップがあれば、選択を始める（ゲームを止める）。
- * 協力プレイでの全員同時のレベルアップと候補の配布はフェーズ3で作るので、今はソロだけ選択を行う。
+ * 選択を待っているレベルアップがあれば、選択を始める（全員のゲームを止める。03_network.md 3.5）。
+ * 候補はソロ・ホストが全員分を作る。同じ回で同じ持ち物を2人に出さない。
+ * ゲストは自分では始めず、ホストから届く状態に合わせる（mirrorLevelUp）。
  */
 export function openLevelUpIfPending(world: World): void {
   if (world.levelUp || world.pendingLevelUps === 0) return;
-  if (world.role !== 'solo') {
+  if (world.role === 'guest') {
     world.pendingLevelUps = 0;
     return;
   }
   const offers = new Map<PlayerId, UpgradeOffer[]>();
-  for (const p of world.players) offers.set(p.id, makeOffers(world, p));
+  const offeredItems = new Set<number>();
+  for (const p of world.players) {
+    const list = makeOffers(world, p, offeredItems);
+    for (const o of list) if (o.kind === 'itemNew') offeredItems.add(o.item);
+    offers.set(p.id, list);
+  }
   world.levelUp = {
     level: world.level - world.pendingLevelUps + 1,
     offers,
@@ -51,6 +57,11 @@ export function stepLevelUp(world: World): void {
   const lu = world.levelUp;
   if (!lu) return;
   lu.ticksLeft--;
+  // ゲストは閉じるのもホストに合わせる（残り時間は表示のために減らすだけ）
+  if (world.role === 'guest') {
+    lu.ticksLeft = Math.max(0, lu.ticksLeft);
+    return;
+  }
   const allDone = world.players.every((p) => lu.done.has(p.id));
   if (!allDone && lu.ticksLeft > 0) return;
   // 時間切れは「見送る」と同じ扱い（リロール権 +1）
@@ -61,12 +72,54 @@ export function stepLevelUp(world: World): void {
     openLevelUpIfPending(world);
     return;
   }
-  // 再開時に全員へごく短い無敵時間
+  resumeInvincible(world);
+}
+
+/** 再開時に全員へごく短い無敵時間 */
+function resumeInvincible(world: World): void {
   const ticks = Math.round(world.rules.leveling.resumeInvincibleSeconds / world.dt);
   for (const p of world.players) p.invincibleTicks = Math.max(p.invincibleTicks, ticks);
 }
 
+/** ホスト: 今のレベルアップの選択の状態（ゲストへ送る） */
+export function levelUpSnapshot(world: World): LevelUpSnapshot | null {
+  const lu = world.levelUp;
+  if (!lu) return null;
+  return {
+    level: lu.level,
+    ticksLeft: lu.ticksLeft,
+    offers: [...lu.offers.entries()],
+    done: [...lu.done],
+    rerolls: world.players.map((p) => [p.id, p.rerolls] as const),
+  };
+}
+
+/** ゲスト: ホストから届いたレベルアップの選択の状態に合わせる。閉じたら再開時の無敵時間を付ける */
+export function mirrorLevelUp(world: World, s: LevelUpSnapshot | null): void {
+  if (!s) {
+    if (world.levelUp) {
+      world.levelUp = null;
+      resumeInvincible(world);
+    }
+    return;
+  }
+  const opening = !world.levelUp;
+  world.levelUp = {
+    level: s.level,
+    ticksLeft: s.ticksLeft,
+    offers: new Map(s.offers.map(([id, list]) => [id, [...list]])),
+    done: new Set(s.done),
+  };
+  for (const [id, n] of s.rerolls) {
+    const p = world.players.find((x) => x.id === id);
+    if (p) p.rerolls = n;
+  }
+  if (opening) world.events.push({ type: 'levelUp', level: s.level });
+}
+
+/** 選ぶ・見送る・リロールは、協力プレイではホストが確定する（ゲストは要望をホストへ送るだけ） */
 export function chooseUpgrade(world: World, playerId: PlayerId, index: number): void {
+  if (world.role === 'guest') return;
   const lu = world.levelUp;
   const p = world.players.find((x) => x.id === playerId);
   if (!lu || !p || lu.done.has(playerId)) return;
@@ -77,6 +130,7 @@ export function chooseUpgrade(world: World, playerId: PlayerId, index: number): 
 }
 
 export function skipUpgrade(world: World, playerId: PlayerId): void {
+  if (world.role === 'guest') return;
   const lu = world.levelUp;
   const p = world.players.find((x) => x.id === playerId);
   if (!lu || !p || lu.done.has(playerId)) return;
@@ -85,11 +139,15 @@ export function skipUpgrade(world: World, playerId: PlayerId): void {
 }
 
 export function rerollUpgrades(world: World, playerId: PlayerId): void {
+  if (world.role === 'guest') return;
   const lu = world.levelUp;
   const p = world.players.find((x) => x.id === playerId);
   if (!lu || !p || lu.done.has(playerId) || p.rerolls <= 0) return;
   p.rerolls--;
-  lu.offers.set(playerId, makeOffers(world, p));
+  // ほかの人に出ている持ち物は出さない
+  const others = new Set<number>();
+  for (const [id, list] of lu.offers) if (id !== playerId) for (const o of list) if (o.kind === 'itemNew') others.add(o.item);
+  lu.offers.set(playerId, makeOffers(world, p, others));
 }
 
 /** 派生していない技（タイプの技）かどうか。派生先・固有技は候補に直接は出さない */
@@ -102,7 +160,7 @@ function isBaseMove(world: World, move: number): boolean {
  * - 派生・固有技の条件（元の技が最大レベル ＋ 材料の持ち物）がそろっていれば必ず出す
  * - 残りは、技（自分のタイプとノーマル。枠が空いていれば新しい技、覚えている技の強化）・持ち物（誰かが持っているものは出さない）・パッシブから選ぶ
  */
-export function makeOffers(world: World, p: Player): UpgradeOffer[] {
+export function makeOffers(world: World, p: Player, excludeItems: ReadonlySet<number> = new Set()): UpgradeOffer[] {
   const rules = world.rules;
   const count = rules.leveling.offerCount;
   const guaranteed: UpgradeOffer[] = [];
@@ -134,6 +192,8 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
     rules.items.forEach((_, item) => {
       // 協力プレイ: 誰かがすでに持っている持ち物は候補に出さない
       if (world.players.some((q) => q.items.some((it) => it.item === item))) return;
+      // 同じ回で、ほかの人の候補に出ている持ち物も出さない
+      if (excludeItems.has(item)) return;
       pool.push({ kind: 'itemNew', item });
     });
   }

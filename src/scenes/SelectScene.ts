@@ -25,7 +25,7 @@ export class SelectScene extends Phaser.Scene {
       const key = keys[i];
       if (!key || chosen) return;
       chosen = true;
-      const data: RunSceneData = { pokemon: key, playerSprite: this.manifests.get(key) ?? null, net: null, panel: null };
+      const data: RunSceneData = { pokemon: key, playerSprite: this.manifests.get(key) ?? null, coop: null };
       this.scene.start('run', data);
     };
     const layout = (): void => {

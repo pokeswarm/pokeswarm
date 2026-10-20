@@ -41,7 +41,8 @@ export function hurtPlayer(world: World, p: Player, raw: number): void {
  */
 function downOrRevive(world: World, p: Player): void {
   const cfg = world.rules.stats.revive;
-  if (world.revives > 0) {
+  // 協力プレイでは自動で復活しない（触れて復活させる。復活可能数は全員で共有し、ホストが管理する）
+  if (world.role === 'solo' && world.revives > 0) {
     world.revives--;
     p.hp = (p.maxHp * cfg.hpPct) / 100;
     p.invincibleTicks = Math.round(cfg.invincibleSeconds / world.dt);

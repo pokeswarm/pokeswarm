@@ -153,6 +153,12 @@ export interface HazardStruckEvent {
   readonly effect: string;
 }
 
+/** プレイヤーが抜けた（切断） */
+export interface PlayerLeftEvent {
+  readonly type: 'playerLeft';
+  readonly playerId: PlayerId;
+}
+
 /** ランが終わった */
 export interface RunEndedEvent {
   readonly type: 'runEnded';
@@ -179,4 +185,5 @@ export type SimEvent =
   | BossAppearedEvent
   | HazardTelegraphedEvent
   | HazardStruckEvent
-  | RunEndedEvent;
+  | RunEndedEvent
+  | PlayerLeftEvent;

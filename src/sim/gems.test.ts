@@ -36,18 +36,18 @@ describe('経験値の玉（ソロ）', () => {
   });
 });
 
-function peer(role: SimRole, localId: number, remoteId: number) {
+function peer(role: SimRole, localId: number) {
   const sim = new Simulation({ tickRate: 30, seed: 1, rules: testRules({ move: { range: 1 } }), role, localPlayerId: localId });
   // 2人とも同じ場所に立つ
   sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150, remote: localId !== 1, pickupRange: 80 });
   sim.addPlayer({ id: 2, x: 0, y: 0, radius: 12, moveSpeed: 150, remote: localId !== 2, pickupRange: 80 });
-  return { sim, session: new SyncSession(remoteId, { playerStateIntervalTicks: 1, correctionIntervalTicks: 30 }, 30, () => 0) };
+  return { sim, session: new SyncSession({ playerStateIntervalTicks: 1, correctionIntervalTicks: 30 }, 30, () => 0) };
 }
 
 describe('経験値の玉（協力プレイ）', () => {
   it('2人が同じ玉に同時に触れても、経験値は1回だけ数える', () => {
-    const host = peer('host', 1, 2);
-    const guest = peer('guest', 2, 1);
+    const host = peer('host', 1);
+    const guest = peer('guest', 2);
     // 同じ玉が両方にある状態（ホストが作ってゲストへ届いた後）
     host.sim.world.gems.add(7, 0, 0, 5, 6);
     guest.sim.world.gems.add(7, 0, 0, 5, 6);
@@ -59,8 +59,8 @@ describe('経験値の玉（協力プレイ）', () => {
     // メッセージを交換する
     const toGuest = encode(host.session.outgoing(host.sim.world));
     const toHost = encode(guest.session.outgoing(guest.sim.world));
-    const hostCmds = host.session.incoming(host.sim.world, decode(toHost));
-    const guestCmds = guest.session.incoming(guest.sim.world, decode(toGuest));
+    const hostCmds = host.session.incoming(host.sim.world, decode(toHost), 2);
+    const guestCmds = guest.session.incoming(guest.sim.world, decode(toGuest), 1);
     host.sim.step(hostCmds);
     guest.sim.step(guestCmds);
     expect(host.sim.world.xp).toBe(5);

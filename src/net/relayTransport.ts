@@ -19,11 +19,11 @@ export class RelayTransport implements Transport {
 
   constructor(
     private readonly db: Database,
-    roomId: string,
+    /** この2人の間の中継の場所（rooms/<部屋ID>/relay/<ゲストの番号>） */
+    base: string,
     role: 'host' | 'guest',
     flushIntervalMs: number,
   ) {
-    const base = `rooms/${roomId}/relay`;
     this.outPath = `${base}/${role === 'host' ? 'toGuest' : 'toHost'}`;
     const inPath = `${base}/${role === 'host' ? 'toHost' : 'toGuest'}`;
     this.unsubscribe = onChildAdded(ref(db, inPath), (snap) => {

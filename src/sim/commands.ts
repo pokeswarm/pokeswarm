@@ -1,4 +1,5 @@
 import type { HitEffect } from './events';
+import type { RunOutcome, UpgradeOffer } from './world';
 
 /**
  * 入力コマンド。シミュレーションはこれだけを受け取って進む。
@@ -27,6 +28,10 @@ export interface RemotePlayerCommand {
   readonly facingY: Axis;
   readonly inputX: Axis;
   readonly inputY: Axis;
+  /** HP と倒れているか（各自が自分の分を管理して送る） */
+  readonly hp?: number;
+  readonly maxHp?: number;
+  readonly down?: boolean;
 }
 
 /** ゲスト: ホストが決めた雑魚敵の出現 */
@@ -116,10 +121,64 @@ export interface SkipUpgradeCommand {
   readonly playerId: PlayerId;
 }
 
+/** レベルアップの選択の状態（ホストが作って全員へ送る。null なら選択中でない） */
+export interface LevelUpSnapshot {
+  readonly level: number;
+  readonly ticksLeft: number;
+  readonly offers: readonly (readonly [PlayerId, readonly UpgradeOffer[]])[];
+  readonly done: readonly PlayerId[];
+  /** プレイヤーごとのリロール権 */
+  readonly rerolls: readonly (readonly [PlayerId, number])[];
+}
+
+/** ゲスト: ホストのレベルアップの選択の状態に合わせる */
+export interface LevelUpStateCommand {
+  readonly type: 'levelUpState';
+  readonly state: LevelUpSnapshot | null;
+  /** プレイヤーごとのリロール権（選択していないときも送る） */
+  readonly rerolls?: readonly (readonly [PlayerId, number])[];
+}
+
+/** ゲスト: ホストが確定した、あるプレイヤーの選択（全員のブラウザで同じ強化を当てはめる） */
+export interface ApplyUpgradeCommand {
+  readonly type: 'applyUpgrade';
+  readonly playerId: PlayerId;
+  readonly offer: UpgradeOffer;
+}
+
+/** ゲスト: ホストが作ったボスの範囲技の予告 */
+export interface AddHazardCommand {
+  readonly type: 'addHazard';
+  readonly x: number;
+  readonly y: number;
+}
+
+/** ゲスト: 中ボス・ボスの HP（ホストが集計したもの） */
+export interface BossHpCommand {
+  readonly type: 'bossHp';
+  readonly id: number;
+  readonly hp: number;
+  readonly maxHp: number;
+}
+
+/** ゲスト: ホストが決めたランの終わり */
+export interface EndRunCommand {
+  readonly type: 'endRun';
+  readonly outcome: RunOutcome;
+}
+
+/** プレイヤーが抜けた（切断） */
+export interface RemovePlayerCommand {
+  readonly type: 'removePlayer';
+  readonly playerId: PlayerId;
+}
+
 /** ゲスト: ホストによる敵の位置の補正。[id, x, y, id, x, y, ...] */
 export interface CorrectEnemiesCommand {
   readonly type: 'correctEnemies';
   readonly data: readonly number[];
+  /** ホストの更新回数（ゲストの経過時間をそろえる。タブが裏にあって遅れた場合など） */
+  readonly tick?: number;
 }
 
 export type InputCommand =
@@ -137,4 +196,10 @@ export type InputCommand =
   | RerollUpgradesCommand
   | SkipUpgradeCommand
   | RetireEnemyCommand
-  | CorrectEnemiesCommand;
+  | CorrectEnemiesCommand
+  | LevelUpStateCommand
+  | ApplyUpgradeCommand
+  | AddHazardCommand
+  | BossHpCommand
+  | EndRunCommand
+  | RemovePlayerCommand;

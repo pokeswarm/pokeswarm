@@ -3,7 +3,8 @@ import type { HitEffect } from '../events';
 import { currentWaveIndex, findEnemyIndex, findPlayer, type World } from '../world';
 import { breakOnDamage, damageTakenMultiplier } from './status';
 import { confirmPickup } from './gems';
-import { addXp, chooseUpgrade, rerollUpgrades, skipUpgrade } from './leveling';
+import { addXp, applyOffer, chooseUpgrade, mirrorLevelUp, rerollUpgrades, skipUpgrade } from './leveling';
+import { addHazard, endRun } from './stage';
 
 export function applyCommands(world: World, commands: readonly InputCommand[]): void {
   const e = world.enemies;
@@ -25,6 +26,9 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         p.facingY = cmd.facingY;
         p.inputX = cmd.inputX;
         p.inputY = cmd.inputY;
+        if (cmd.maxHp !== undefined) p.maxHp = cmd.maxHp;
+        if (cmd.hp !== undefined) p.hp = cmd.hp;
+        if (cmd.down !== undefined) p.down = cmd.down;
         break;
       }
       case 'spawnEnemy': {
@@ -97,7 +101,45 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
       case 'skipUpgrade':
         skipUpgrade(world, cmd.playerId);
         break;
+      case 'levelUpState':
+        if (world.role === 'guest') {
+          mirrorLevelUp(world, cmd.state);
+          for (const [id, n] of cmd.rerolls ?? []) {
+            const p = findPlayer(world, id);
+            if (p) p.rerolls = n;
+          }
+        }
+        break;
+      case 'applyUpgrade': {
+        const p = findPlayer(world, cmd.playerId);
+        if (p && world.role === 'guest') applyOffer(world, p, cmd.offer);
+        break;
+      }
+      case 'addHazard':
+        if (world.role === 'guest') addHazard(world, cmd.x, cmd.y);
+        break;
+      case 'bossHp': {
+        const i = findEnemyIndex(world, cmd.id);
+        if (i !== -1 && e.hp[i]! > 0) {
+          e.hp[i] = Math.max(1, cmd.hp);
+          e.maxHp[i] = cmd.maxHp;
+        }
+        break;
+      }
+      case 'endRun':
+        if (world.role === 'guest') endRun(world, cmd.outcome);
+        break;
+      case 'removePlayer': {
+        const k = world.players.findIndex((p) => p.id === cmd.playerId);
+        if (k !== -1 && cmd.playerId !== world.localPlayerId) {
+          world.players.splice(k, 1);
+          world.events.push({ type: 'playerLeft', playerId: cmd.playerId });
+        }
+        break;
+      }
       case 'correctEnemies': {
+        // 経過時間（時間帯・ボスの出現時刻の表示）をホストにそろえる。少しのずれは通信の遅れなので気にしない
+        if (cmd.tick !== undefined && world.role === 'guest' && Math.abs(world.tick - cmd.tick) > 3) world.tick = cmd.tick;
         const index = new Map<number, number>();
         for (let i = 0; i < e.count; i++) index.set(e.id[i]!, i);
         for (let k = 0; k + 2 < cmd.data.length; k += 3) {

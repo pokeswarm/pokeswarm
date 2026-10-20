@@ -1,5 +1,9 @@
 {
-  "iceServers": [{ "urls": "stun:stun.l.google.com:19302" }],
+  "iceServers": [
+    {
+      "urls": "stun:stun.l.google.com:19302"
+    }
+  ],
   "p2pTimeoutMs": 10000,
   "p2p": {
     "playerStateIntervalTicks": 1,
@@ -11,5 +15,6 @@
     "flushIntervalMs": 100
   },
   "pingIntervalTicks": 30,
-  "guestSpawnOffsetX": 60
+  "guestSpawnOffsetX": 60,
+  "maxPlayers": 4
 }

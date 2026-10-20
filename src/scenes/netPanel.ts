@@ -1,8 +1,7 @@
 import { t, type MessageKey } from '../i18n';
 
 /**
- * 協力プレイの接続中に出す案内（技術検証用の簡単な DOM の表示）。
- * 参加用 URL をコピーできるよう、Phaser の画面ではなく HTML で出す。
+ * 協力プレイのラン中に出す案内（切断など。簡単な DOM の表示）。
  */
 export class NetPanel {
   private readonly root: HTMLDivElement;
@@ -27,22 +26,6 @@ export class NetPanel {
 
   show(key: MessageKey, params?: Record<string, string | number>): void {
     this.root.replaceChildren(document.createTextNode(t(key, params)));
-    this.root.style.display = 'block';
-  }
-
-  /** 参加用 URL とコピーのボタンを出す */
-  showJoinUrl(url: string): void {
-    const text = document.createElement('div');
-    text.textContent = t('net.waitingGuest');
-    const link = document.createElement('input');
-    Object.assign(link, { value: url, readOnly: true });
-    Object.assign(link.style, { width: '100%', margin: '8px 0', font: '14px monospace' });
-    const button = document.createElement('button');
-    button.textContent = t('net.copy');
-    button.onclick = () => {
-      void navigator.clipboard.writeText(url).then(() => (button.textContent = t('net.copied')));
-    };
-    this.root.replaceChildren(text, link, button);
     this.root.style.display = 'block';
   }
 

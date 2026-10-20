@@ -521,8 +521,10 @@ export const networkConfigSchema = z.object({
   relay: syncRateSchema.extend({ flushIntervalMs: z.number().int().positive() }),
   /** 往復時間を測る間隔（更新回数） */
   pingIntervalTicks: z.number().int().positive(),
-  /** ゲストの出現位置（ホストからの横のずれ） */
+  /** ゲストの出現位置（ホストからの横のずれ。プレイヤーの番号ごとにずらす） */
   guestSpawnOffsetX: z.number(),
+  /** 部屋の最大人数（ホストを含む） */
+  maxPlayers: z.number().int().min(2),
 });
 export type NetworkConfig = z.infer<typeof networkConfigSchema>;
 

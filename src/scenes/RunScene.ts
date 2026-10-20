@@ -3,7 +3,7 @@ import { effectRecipes, generated, networkConfig, placeholderRender, playerConfi
 import { buildSimRules, localName, playableLoadout } from '../data/simRules';
 import type { SpriteAnims } from '../data/schema';
 import { getLocale, t } from '../i18n';
-import type { RoomConnection } from '../net/room';
+import type { Room, RoomPlayer } from '../net/room';
 import { SyncSession } from '../net/sync';
 import { hexColor } from '../render/color';
 import { EffectRenderer } from '../render/effects/EffectRenderer';
@@ -27,23 +27,29 @@ import { addDiscovery } from '../meta/discoveries';
 import { RunRecorder } from '../meta/runRecorder';
 import { session } from '../meta/session';
 import { LevelUpPanel, offerText } from './levelUpPanel';
-import type { NetPanel } from './netPanel';
+import { NetPanel } from './netPanel';
 import { formatTime, type ResultSceneData } from './ResultScene';
 import { atlasKey } from '../render/sprites/PokemonSprite';
 
-/** ソロとホストは 1、ゲストは 2 */
+/** ソロとホストのプレイヤーの番号（ゲストは部屋でもらった番号 2〜） */
 const HOST_PLAYER_ID: PlayerId = 1;
-const GUEST_PLAYER_ID: PlayerId = 2;
+
+/** 協力プレイのラン（待合室で決まったもの） */
+export interface CoopRun {
+  room: Room;
+  /** 参加者とポケモン（番号の順） */
+  players: RoomPlayer[];
+  /** ポケモンごとのスプライト（待合室で読み込んだもの） */
+  sprites: Map<string, SpriteAnims | null>;
+}
 
 export interface RunSceneData {
-  /** プレイヤーのポケモン（data/game/playables.json のキー） */
+  /** 自分のポケモン（data/game/playables.json のキー） */
   pokemon: string;
-  /** プレイヤーのスプライト。取得していなければ null（仮の円で描く） */
+  /** 自分のスプライト。取得していなければ null（仮の円で描く） */
   playerSprite: SpriteAnims | null;
-  /** 協力プレイの接続。ソロなら null */
-  net: RoomConnection | null;
-  /** 接続の案内（切断の表示に使う） */
-  panel: NetPanel | null;
+  /** 協力プレイ。ソロなら null */
+  coop: CoopRun | null;
 }
 
 /**
@@ -73,7 +79,7 @@ export class RunScene extends Phaser.Scene {
   private simMs = 0;
   private playerSprite: SpriteAnims | null = null;
   private pokemon = '';
-  private net: RoomConnection | null = null;
+  private coop: CoopRun | null = null;
   private panel: NetPanel | null = null;
   private sync: SyncSession | null = null;
   /** 届いたメッセージを直したコマンド（次の更新で適用する） */
@@ -124,8 +130,8 @@ export class RunScene extends Phaser.Scene {
     this.showDebug = new URLSearchParams(window.location.search).has('debug');
     this.playerSprite = data.playerSprite;
     this.pokemon = data.pokemon;
-    this.net = data.net;
-    this.panel = data.panel;
+    this.coop = data.coop;
+    this.panel = null;
   }
 
   preload(): void {
@@ -137,33 +143,35 @@ export class RunScene extends Phaser.Scene {
     if (this.playerSprite) registerPokemonAnimations(this, this.playerSprite);
     const rules = applyDebugOverrides(buildSimRules(), window.location.search);
     // 技は確認用に URL で指定できる（?moves=ember:8,fire-spin:3）。協力プレイでは参加用 URL に引き継ぐので2人とも同じになる
-    const loadout = playableLoadout(rules, this.pokemon);
-    const moves = parseMovesParam(rules, window.location.search) ?? loadout.moves;
-    const role: SimRole = this.net?.role ?? 'solo';
-    this.localId = role === 'guest' ? GUEST_PLAYER_ID : HOST_PLAYER_ID;
+    const role: SimRole = this.coop?.room.role ?? 'solo';
+    this.localId = this.coop?.room.localId ?? HOST_PLAYER_ID;
     this.sim = new Simulation({
       tickRate: simulationConfig.tickRate,
-      seed: this.net?.seed ?? simulationConfig.defaultSeed,
+      seed: this.coop?.room.seed ?? simulationConfig.defaultSeed,
       rules,
       role,
       localPlayerId: this.localId,
     });
-    const ids = this.net ? [HOST_PLAYER_ID, GUEST_PLAYER_ID] : [HOST_PLAYER_ID];
-    for (const id of ids) {
+    const roster: RoomPlayer[] = this.coop?.players ?? [{ id: HOST_PLAYER_ID, pokemon: this.pokemon }];
+    // 確認用の ?moves= はソロのときだけ
+    const debugMoves = this.coop ? null : parseMovesParam(rules, window.location.search);
+    for (const { id, pokemon } of roster) {
+      const loadout = playableLoadout(rules, pokemon);
       const p = this.sim.addPlayer({
         id,
-        x: playerConfig.spawnX + (id === GUEST_PLAYER_ID ? networkConfig.guestSpawnOffsetX : 0),
+        x: playerConfig.spawnX + (id - 1) * networkConfig.guestSpawnOffsetX,
         y: playerConfig.spawnY,
         radius: playerConfig.radius,
         moveSpeed: playerConfig.moveSpeed,
         remote: id !== this.localId,
         pickupRange: playerConfig.pickupRange,
         types: loadout.types,
-        moves,
+        moves: debugMoves ?? loadout.moves,
         line: loadout.line,
         species: loadout.species,
       });
-      const view = new PlayerView(this, p, placeholderRender, spriteRender, this.playerSprite, !p.remote);
+      const sprite = id === this.localId ? this.playerSprite : (this.coop?.sprites.get(pokemon) ?? null);
+      const view = new PlayerView(this, p, placeholderRender, spriteRender, sprite, true);
       view.container.setDepth(id === this.localId ? 1.1 : 1);
       // 相手のプレイヤーは少し透かして見分ける
       if (p.remote) view.container.setAlpha(0.7);
@@ -186,7 +194,7 @@ export class RunScene extends Phaser.Scene {
       w.tick = Math.round(startTime * simulationConfig.tickRate);
       while (w.nextBoss < w.bossSchedule.length && w.bossSchedule[w.nextBoss]!.tick < w.tick) w.nextBoss++;
     }
-    if (this.net) this.setupNet(this.net);
+    if (this.coop) this.setupNet(this.coop.room);
 
     this.clock = new FixedStepClock(simulationConfig.tickRate, simulationConfig.maxTicksPerFrame);
     this.keyboard = new KeyboardInput(this);
@@ -208,10 +216,12 @@ export class RunScene extends Phaser.Scene {
     );
     this.hazardView = this.add.graphics().setDepth(0.5);
     this.measureFrameTime();
+    // ゲストの選択はホストが確定するので、要望としてホストへ送る
+    const guest = role === 'guest';
     this.levelUpPanel = new LevelUpPanel({
-      choose: (index) => this.uiCommands.push({ type: 'chooseUpgrade', playerId: this.localId, index }),
-      reroll: () => this.uiCommands.push({ type: 'rerollUpgrades', playerId: this.localId }),
-      skip: () => this.uiCommands.push({ type: 'skipUpgrade', playerId: this.localId }),
+      choose: (index) => (guest ? this.sync?.requestUpgrade('c', index) : this.uiCommands.push({ type: 'chooseUpgrade', playerId: this.localId, index })),
+      reroll: () => (guest ? this.sync?.requestUpgrade('r') : this.uiCommands.push({ type: 'rerollUpgrades', playerId: this.localId })),
+      skip: () => (guest ? this.sync?.requestUpgrade('s') : this.uiCommands.push({ type: 'skipUpgrade', playerId: this.localId })),
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.levelUpPanel.hide());
     this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));
@@ -236,18 +246,56 @@ export class RunScene extends Phaser.Scene {
     this.scale.on('resize', this.applyZoom, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.scale.off('resize', this.applyZoom, this));
     // 時計を作った後で始める
-    if (this.net) this.keepRunningWhenHidden();
+    if (this.coop) this.keepRunningWhenHidden();
     this.setupSaving();
   }
 
-  private setupNet(net: RoomConnection): void {
-    const remoteId = net.role === 'host' ? GUEST_PLAYER_ID : HOST_PLAYER_ID;
-    this.sync = new SyncSession(remoteId, net.transport.kind === 'p2p' ? networkConfig.p2p : networkConfig.relay, networkConfig.pingIntervalTicks);
-    net.transport.onMessages = (messages) => {
-      if (this.sync) this.inbox.push(...this.sync.incoming(this.sim.world, messages));
+  /**
+   * 協力プレイの通信をつなぐ。ホストは各ゲストと、ゲストはホストとだけ通信する。
+   * 1つでも中継の通信路があれば、送る頻度を中継に合わせて下げる
+   */
+  private setupNet(room: Room): void {
+    const relay = [...room.transports.values()].some((t) => t.kind === 'relay');
+    this.sync = new SyncSession(relay ? networkConfig.relay : networkConfig.p2p, networkConfig.pingIntervalTicks);
+    this.panel = new NetPanel();
+    this.panel.hide();
+    const panel = this.panel;
+    // ランの画面を離れたら部屋を出る（ホストなら部屋ごと消える）
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      panel.hide();
+      room.onLeave = null;
+      void room.leave();
+    });
+    for (const id of room.transports.keys()) {
+      room.attach(id, (messages) => {
+        if (this.sync) this.inbox.push(...this.sync.incoming(this.sim.world, messages, id));
+      });
+    }
+    room.onLeave = (id) => {
+      if (id === HOST_PLAYER_ID) {
+        this.panel?.show('net.hostLeft');
+      } else {
+        // ホスト: 抜けたプレイヤーを外して続ける（ゲストへも知らせる）
+        this.inbox.push({ type: 'removePlayer', playerId: id });
+      }
     };
-    net.transport.onClose = () => this.panel?.show('net.disconnected');
     this.netStartedAt = performance.now();
+  }
+
+  /** 1回の更新の結果を送る。ホストは各ゲストへ（ほかのゲストの状態の中継を含む）、ゲストはホストへ */
+  private sendNet(): void {
+    const room = this.coop?.room;
+    if (!room || !this.sync) return;
+    const out = this.sync.outgoing(this.sim.world);
+    if (room.role === 'guest') {
+      room.transports.get(HOST_PLAYER_ID)?.send(out);
+      return;
+    }
+    const forwards = this.sync.takeForwards();
+    for (const [id, transport] of room.transports) {
+      const relayed = forwards.filter((f) => f.from !== id).flatMap((f) => f.messages);
+      transport.send(relayed.length ? [...out, ...relayed] : out);
+    }
   }
 
   override update(time: number, delta: number): void {
@@ -310,7 +358,7 @@ export class RunScene extends Phaser.Scene {
         }),
       },
       // 協力プレイはもう一度を出さない（部屋を作り直す必要がある）
-      retry: this.net ? null : { ...this.runData },
+      retry: this.coop ? null : { ...this.runData },
     };
     this.resultAt = null;
     this.scene.start('result', data);
@@ -352,6 +400,10 @@ export class RunScene extends Phaser.Scene {
         this.bossId = ev.id;
         const name = localName(generated.pokemon[kind.species ?? kind.id]?.names, getLocale(), kind.id);
         this.announce(t(kind.rank === 'boss' ? 'run.bossAppeared' : 'run.midbossAppeared', { name }), kind.rank === 'boss' ? '#ff8a65' : '#ffe082');
+      } else if (ev.type === 'playerLeft') {
+        this.playerViews.get(ev.playerId)?.container.destroy();
+        this.playerViews.delete(ev.playerId);
+        this.announce(t('net.playerLeft', { n: ev.playerId }), '#ef9a9a');
       } else if (ev.type === 'hazardStruck') {
         this.effects.playImpact(ev.effect, ev.x, ev.y);
       } else if (ev.type === 'runEnded') {
@@ -418,7 +470,7 @@ export class RunScene extends Phaser.Scene {
         }
       }
       if (visible) this.onSimEvents();
-      if (this.net && this.sync) this.net.transport.send(this.sync.outgoing(this.sim.world));
+      this.sendNet();
     }
   }
 
@@ -591,13 +643,14 @@ export class RunScene extends Phaser.Scene {
       }),
       ...(this.showDebug ? debugLines : []),
     ];
-    if (this.net && this.sync) {
-      const stats = this.net.transport.stats;
+    if (this.coop && this.sync) {
+      const transports = [...this.coop.room.transports.values()];
+      const stats = transports.reduce((a, tr) => ({ sentBytes: a.sentBytes + tr.stats.sentBytes, receivedBytes: a.receivedBytes + tr.stats.receivedBytes }), { sentBytes: 0, receivedBytes: 0 });
       lines.push(
         t('debug.net', {
-          role: t(this.net.role === 'host' ? 'net.role.host' : 'net.role.guest'),
-          room: this.net.roomId,
-          mode: t(this.net.transport.kind === 'p2p' ? 'net.mode.p2p' : 'net.mode.relay'),
+          role: t(this.coop.room.role === 'host' ? 'net.role.host' : 'net.role.guest'),
+          room: this.coop.room.roomId,
+          mode: t(transports.some((tr) => tr.kind === 'relay') ? 'net.mode.relay' : 'net.mode.p2p'),
           rtt: this.sync.rttMs === null ? '-' : Math.round(this.sync.rttMs),
         }),
         t('debug.netTraffic', {

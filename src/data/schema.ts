@@ -70,8 +70,10 @@ export type EnemiesConfig = z.infer<typeof enemiesConfigSchema>;
 
 export const spawnConfigSchema = z
   .object({
-    /** 1秒あたりの出現数 */
+    /** 1秒あたりの出現数（時間帯で指定が無いとき） */
     spawnPerSecond: z.number().nonnegative(),
+    /** 敵が最低数より少ないときに補充する、1秒あたりの数（省略時は 0 = 補充しない） */
+    fillPerSecond: z.number().nonnegative().optional(),
     /** プレイヤーからこの距離の輪の中に出す（画面外になる距離） */
     spawnDistanceMin: z.number().positive(),
     spawnDistanceMax: z.number().positive(),
@@ -110,6 +112,11 @@ export const spawnConfigSchema = z
           /** その時間帯の1秒あたりの出現数と、1人あたりの上限（省略時は全体の値）。後の時間帯ほど増やして群れの圧力を上げる */
           spawnPerSecond: z.number().nonnegative().optional(),
           capPerPlayer: z.number().int().positive().optional(),
+          /**
+           * 1人あたりの最低数。敵がこれより少なければ fillPerSecond の速さで補充する
+           * （ヴァンパイアサバイバーズの「最低数」と同じ考え方。倒し続けても画面が空になりすぎない）
+           */
+          minimum: z.number().int().nonnegative().optional(),
           kinds: z.array(z.string()).min(1),
         }),
       )

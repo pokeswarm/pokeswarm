@@ -2,8 +2,8 @@ import { randomUnit } from '../math';
 import { currentWaveIndex, enemyCap, type World } from '../world';
 
 /**
- * プレイヤーの周囲（画面外）に雑魚敵を出す。種類と HP の倍率は今の時間帯で決まる。
- * 上限に達していたら出さない（敵の強さは時間帯ごとの HP の倍率で上げる）。
+ * プレイヤーの周囲（画面外）に雑魚敵を出す。種類・HP の倍率・出現数は今の時間帯で決まる。
+ * 時間帯の出現数で出し続け、最低数（人数分）より少なければ補充の速さを足す。上限に達していたら出さない。
  */
 export function spawnEnemies(world: World): void {
   const { players, enemies, rng } = world;
@@ -12,7 +12,8 @@ export function spawnEnemies(world: World): void {
   const s = world.rules.spawn;
   const kinds = world.rules.enemies.kinds;
   const wave = world.waves[currentWaveIndex(world)]!;
-  world.spawnAccumulator += wave.spawnPerSecond * world.dt;
+  const fill = enemies.count < wave.minimum * players.length ? (s.fillPerSecond ?? 0) : 0;
+  world.spawnAccumulator += (wave.spawnPerSecond + fill) * world.dt;
   const cap = enemyCap(world);
   while (world.spawnAccumulator >= 1) {
     if (enemies.count >= cap) {

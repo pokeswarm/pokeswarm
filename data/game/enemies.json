@@ -4,7 +4,7 @@
       "id": "rattata",
       "sprite": "enemy/rattata",
       "hp": 20,
-      "moveSpeed": 76,
+      "moveSpeed": 55,
       "radius": 10,
       "contactDamage": 6
     },
@@ -12,7 +12,7 @@
       "id": "pidgey",
       "sprite": "enemy/pidgey",
       "hp": 20,
-      "moveSpeed": 68,
+      "moveSpeed": 50,
       "radius": 10,
       "contactDamage": 6
     },
@@ -20,7 +20,7 @@
       "id": "caterpie",
       "sprite": "enemy/caterpie",
       "hp": 20,
-      "moveSpeed": 63,
+      "moveSpeed": 46,
       "radius": 10,
       "contactDamage": 6
     },
@@ -28,7 +28,7 @@
       "id": "weedle",
       "sprite": "enemy/weedle",
       "hp": 20,
-      "moveSpeed": 65,
+      "moveSpeed": 48,
       "radius": 10,
       "contactDamage": 6
     },
@@ -36,7 +36,7 @@
       "id": "metapod",
       "sprite": "enemy/metapod",
       "hp": 20,
-      "moveSpeed": 55,
+      "moveSpeed": 41,
       "radius": 10,
       "contactDamage": 6
     },
@@ -44,7 +44,7 @@
       "id": "kakuna",
       "sprite": "enemy/kakuna",
       "hp": 20,
-      "moveSpeed": 58,
+      "moveSpeed": 42,
       "radius": 10,
       "contactDamage": 6
     },
@@ -52,7 +52,7 @@
       "id": "spearow",
       "sprite": "enemy/spearow",
       "hp": 20,
-      "moveSpeed": 75,
+      "moveSpeed": 55,
       "radius": 10,
       "contactDamage": 6
     },
@@ -60,7 +60,7 @@
       "id": "zubat",
       "sprite": "enemy/zubat",
       "hp": 20,
-      "moveSpeed": 68,
+      "moveSpeed": 49,
       "radius": 10,
       "contactDamage": 6
     },
@@ -68,7 +68,7 @@
       "id": "geodude",
       "sprite": "enemy/geodude",
       "hp": 20,
-      "moveSpeed": 50,
+      "moveSpeed": 37,
       "radius": 10,
       "contactDamage": 6
     },
@@ -76,7 +76,7 @@
       "id": "paras",
       "sprite": "enemy/paras",
       "hp": 20,
-      "moveSpeed": 53,
+      "moveSpeed": 39,
       "radius": 10,
       "contactDamage": 6
     },
@@ -84,7 +84,7 @@
       "id": "oddish",
       "sprite": "enemy/oddish",
       "hp": 20,
-      "moveSpeed": 55,
+      "moveSpeed": 41,
       "radius": 10,
       "contactDamage": 6
     },
@@ -92,7 +92,7 @@
       "id": "abra",
       "sprite": "enemy/abra",
       "hp": 20,
-      "moveSpeed": 85,
+      "moveSpeed": 62,
       "radius": 10,
       "contactDamage": 6
     },
@@ -100,7 +100,7 @@
       "id": "mankey",
       "sprite": "enemy/mankey",
       "hp": 20,
-      "moveSpeed": 75,
+      "moveSpeed": 55,
       "radius": 10,
       "contactDamage": 6
     },
@@ -108,7 +108,7 @@
       "id": "meowth",
       "sprite": "enemy/meowth",
       "hp": 20,
-      "moveSpeed": 85,
+      "moveSpeed": 62,
       "radius": 10,
       "contactDamage": 6
     },
@@ -116,7 +116,7 @@
       "id": "growlithe",
       "sprite": "enemy/growlithe",
       "hp": 20,
-      "moveSpeed": 70,
+      "moveSpeed": 51,
       "radius": 10,
       "contactDamage": 6
     },
@@ -124,7 +124,7 @@
       "id": "vulpix",
       "sprite": "enemy/vulpix",
       "hp": 20,
-      "moveSpeed": 73,
+      "moveSpeed": 53,
       "radius": 10,
       "contactDamage": 6
     },
@@ -132,7 +132,7 @@
       "id": "gastly",
       "sprite": "enemy/gastly",
       "hp": 20,
-      "moveSpeed": 80,
+      "moveSpeed": 58,
       "radius": 10,
       "contactDamage": 6
     },
@@ -140,7 +140,7 @@
       "id": "cubone",
       "sprite": "enemy/cubone",
       "hp": 20,
-      "moveSpeed": 58,
+      "moveSpeed": 42,
       "radius": 10,
       "contactDamage": 6
     },
@@ -148,7 +148,7 @@
       "id": "doduo",
       "sprite": "enemy/doduo",
       "hp": 20,
-      "moveSpeed": 78,
+      "moveSpeed": 56,
       "radius": 10,
       "contactDamage": 6
     },
@@ -156,7 +156,7 @@
       "id": "raticate",
       "sprite": "enemy/raticate",
       "hp": 20,
-      "moveSpeed": 89,
+      "moveSpeed": 64,
       "radius": 10,
       "contactDamage": 6
     },
@@ -164,7 +164,7 @@
       "id": "chansey",
       "sprite": "enemy/chansey",
       "hp": 20,
-      "moveSpeed": 65,
+      "moveSpeed": 48,
       "radius": 10,
       "contactDamage": 6
     },
@@ -172,7 +172,7 @@
       "id": "tauros",
       "sprite": "enemy/tauros",
       "hp": 20,
-      "moveSpeed": 95,
+      "moveSpeed": 69,
       "radius": 10,
       "contactDamage": 6
     },
@@ -180,7 +180,7 @@
       "id": "scyther",
       "sprite": "enemy/scyther",
       "hp": 20,
-      "moveSpeed": 93,
+      "moveSpeed": 67,
       "radius": 10,
       "contactDamage": 6
     },
@@ -188,7 +188,7 @@
       "id": "tentacool",
       "sprite": "enemy/tentacool",
       "hp": 20,
-      "moveSpeed": 75,
+      "moveSpeed": 55,
       "radius": 10,
       "contactDamage": 6
     },
@@ -196,7 +196,7 @@
       "id": "magikarp",
       "sprite": "enemy/magikarp",
       "hp": 20,
-      "moveSpeed": 80,
+      "moveSpeed": 58,
       "radius": 10,
       "contactDamage": 6
     },
@@ -204,7 +204,7 @@
       "id": "horsea",
       "sprite": "enemy/horsea",
       "hp": 20,
-      "moveSpeed": 70,
+      "moveSpeed": 51,
       "radius": 10,
       "contactDamage": 6
     },
@@ -212,7 +212,7 @@
       "id": "seel",
       "sprite": "enemy/seel",
       "hp": 20,
-      "moveSpeed": 63,
+      "moveSpeed": 46,
       "radius": 10,
       "contactDamage": 6
     },
@@ -220,7 +220,7 @@
       "id": "koffing",
       "sprite": "enemy/koffing",
       "hp": 20,
-      "moveSpeed": 58,
+      "moveSpeed": 42,
       "radius": 10,
       "contactDamage": 6
     },
@@ -228,7 +228,7 @@
       "id": "grimer",
       "sprite": "enemy/grimer",
       "hp": 20,
-      "moveSpeed": 53,
+      "moveSpeed": 39,
       "radius": 10,
       "contactDamage": 6
     },
@@ -236,7 +236,7 @@
       "id": "ponyta",
       "sprite": "enemy/ponyta",
       "hp": 20,
-      "moveSpeed": 85,
+      "moveSpeed": 62,
       "radius": 10,
       "contactDamage": 6
     },
@@ -244,7 +244,7 @@
       "id": "machoke",
       "sprite": "enemy/machoke",
       "hp": 20,
-      "moveSpeed": 63,
+      "moveSpeed": 46,
       "radius": 10,
       "contactDamage": 6
     },
@@ -252,7 +252,7 @@
       "id": "golbat",
       "sprite": "enemy/golbat",
       "hp": 20,
-      "moveSpeed": 85,
+      "moveSpeed": 62,
       "radius": 10,
       "contactDamage": 6
     },
@@ -260,7 +260,7 @@
       "id": "graveler",
       "sprite": "enemy/graveler",
       "hp": 20,
-      "moveSpeed": 58,
+      "moveSpeed": 42,
       "radius": 10,
       "contactDamage": 6
     },

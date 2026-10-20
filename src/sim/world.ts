@@ -99,6 +99,7 @@ export interface World {
     readonly xpMultiplier: number;
     readonly spawnPerSecond: number;
     readonly capPerPlayer: number;
+    readonly minimum: number;
     readonly kinds: readonly number[];
   }[];
   /** 全員で共有する復活可能数 */
@@ -162,6 +163,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
       xpMultiplier: w.xpMultiplier ?? 1,
       spawnPerSecond: w.spawnPerSecond ?? rules.spawn.spawnPerSecond,
       capPerPlayer: w.capPerPlayer ?? rules.spawn.capPerPlayer,
+      minimum: w.minimum ?? 0,
       kinds: w.kinds.map((id) => {
         const i = rules.enemies.kinds.findIndex((k) => k.id === id);
         if (i === -1) throw new Error(`敵の種類 ${id} がありません`);

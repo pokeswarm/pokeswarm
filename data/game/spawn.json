@@ -15,8 +15,9 @@
   "waves": [
     {
       "startSeconds": 0,
-      "spawnPerSecond": 5,
-      "capPerPlayer": 80,
+      "spawnPerSecond": 1,
+      "minimum": 15,
+      "capPerPlayer": 60,
       "hpMultiplier": 1,
       "damageMultiplier": 1,
       "xpMultiplier": 1,
@@ -31,11 +32,12 @@
     },
     {
       "startSeconds": 112,
-      "spawnPerSecond": 8,
-      "capPerPlayer": 130,
+      "spawnPerSecond": 2,
+      "minimum": 30,
+      "capPerPlayer": 100,
       "hpMultiplier": 1.3,
       "damageMultiplier": 1.2,
-      "xpMultiplier": 1,
+      "xpMultiplier": 1.4,
       "kinds": [
         "pidgey",
         "spearow",
@@ -46,11 +48,12 @@
     },
     {
       "startSeconds": 225,
-      "spawnPerSecond": 11,
-      "capPerPlayer": 180,
+      "spawnPerSecond": 3,
+      "minimum": 50,
+      "capPerPlayer": 150,
       "hpMultiplier": 1.7,
       "damageMultiplier": 1.4,
-      "xpMultiplier": 1,
+      "xpMultiplier": 1.8,
       "kinds": [
         "oddish",
         "abra",
@@ -60,11 +63,12 @@
     },
     {
       "startSeconds": 337,
-      "spawnPerSecond": 14,
-      "capPerPlayer": 240,
+      "spawnPerSecond": 4,
+      "minimum": 60,
+      "capPerPlayer": 200,
       "hpMultiplier": 2.2,
       "damageMultiplier": 1.6,
-      "xpMultiplier": 1,
+      "xpMultiplier": 2.2,
       "kinds": [
         "growlithe",
         "vulpix",
@@ -74,11 +78,12 @@
     },
     {
       "startSeconds": 450,
-      "spawnPerSecond": 17,
-      "capPerPlayer": 300,
+      "spawnPerSecond": 5,
+      "minimum": 80,
+      "capPerPlayer": 250,
       "hpMultiplier": 2.8,
       "damageMultiplier": 1.8,
-      "xpMultiplier": 1,
+      "xpMultiplier": 2.6,
       "kinds": [
         "doduo",
         "raticate",
@@ -89,11 +94,12 @@
     },
     {
       "startSeconds": 562,
-      "spawnPerSecond": 21,
-      "capPerPlayer": 360,
+      "spawnPerSecond": 7,
+      "minimum": 100,
+      "capPerPlayer": 300,
       "hpMultiplier": 3.4,
       "damageMultiplier": 2,
-      "xpMultiplier": 1,
+      "xpMultiplier": 3,
       "kinds": [
         "tentacool",
         "magikarp",
@@ -102,11 +108,12 @@
     },
     {
       "startSeconds": 675,
-      "spawnPerSecond": 25,
-      "capPerPlayer": 420,
+      "spawnPerSecond": 9,
+      "minimum": 150,
+      "capPerPlayer": 380,
       "hpMultiplier": 4.1,
       "damageMultiplier": 2.2,
-      "xpMultiplier": 1,
+      "xpMultiplier": 3.3,
       "kinds": [
         "seel",
         "koffing",
@@ -116,16 +123,18 @@
     },
     {
       "startSeconds": 787,
-      "spawnPerSecond": 30,
-      "capPerPlayer": 480,
+      "spawnPerSecond": 12,
+      "minimum": 200,
+      "capPerPlayer": 450,
       "hpMultiplier": 4.9,
       "damageMultiplier": 2.4,
-      "xpMultiplier": 1,
+      "xpMultiplier": 3.6,
       "kinds": [
         "machoke",
         "golbat",
         "graveler"
       ]
     }
-  ]
+  ],
+  "fillPerSecond": 20
 }

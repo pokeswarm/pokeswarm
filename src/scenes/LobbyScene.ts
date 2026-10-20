@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import { generated, networkConfig, playablesConfig } from '../data';
+import { generated, networkConfig, playablesConfig, unlocksConfig } from '../data';
+import { isUnlocked } from '../meta/progress';
 import { localName } from '../data/simRules';
 import type { SpriteAnims } from '../data/schema';
 import { getLocale, t, type MessageKey } from '../i18n';
@@ -133,7 +134,7 @@ export class LobbyScene extends Phaser.Scene {
   }
 
   private choose(index: number): void {
-    const key = Object.keys(playablesConfig.pokemon)[index];
+    const key = this.choosable()[index];
     if (key && this.room) void this.room.choosePokemon(key);
   }
 
@@ -143,6 +144,11 @@ export class LobbyScene extends Phaser.Scene {
     if (n >= 1 && n <= 9) this.choose(n - 1);
     else if (ev.key === 'Enter' && this.room?.canStart) void this.room.start();
     else if (ev.key === 'Escape') this.scene.start('title');
+  }
+
+  /** 選べるポケモン（解放していて、遊べるもの） */
+  private choosable(): string[] {
+    return Object.keys(playablesConfig.pokemon).filter((k) => isUnlocked(session.store.current, unlocksConfig, k));
   }
 
   private pokemonName(key: string): string {
@@ -204,7 +210,7 @@ export class LobbyScene extends Phaser.Scene {
       const choices = document.createElement('div');
       choices.style.cssText = 'display:flex;gap:8px;margin:6px 0 16px';
       const mine = room.memberList.find((m) => m.id === room.localId)?.pokemon;
-      Object.keys(playablesConfig.pokemon).forEach((key, i) => {
+      this.choosable().forEach((key, i) => {
         const b = document.createElement('button');
         b.style.cssText = BUTTON + `;flex:1;${mine === key ? 'border-color:#ffb300;background:#3d2a08' : ''}`;
         b.textContent = `${i + 1}. ${this.pokemonName(key)}`;

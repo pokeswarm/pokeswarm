@@ -5,6 +5,8 @@ import type { UpgradeOffer } from './world';
 export interface EnemyKilledEvent {
   readonly type: 'enemyKilled';
   readonly enemyId: number;
+  /** 敵の種類（SimRules.enemies.kinds の番号。記録に使う。倒れた敵はこの更新の最後に取り除かれるので一緒に持つ） */
+  readonly kind: number;
   /** とどめを刺したプレイヤー */
   readonly by: PlayerId;
 }

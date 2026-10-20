@@ -139,6 +139,31 @@ export const spawnConfigSchema = z
   });
 export type SpawnConfig = z.infer<typeof spawnConfigSchema>;
 
+// ---- 実績・ポケモンの解放 ----
+
+/** 条件: 記録（src/meta/runRecorder.ts の名前）が数以上。all（すべて）・any（どれか）で組み合わせる */
+export type StatCondition = { stat: string; atLeast: number } | { all: StatCondition[] } | { any: StatCondition[] };
+export const statConditionSchema: z.ZodType<StatCondition> = z.lazy(() =>
+  z.union([
+    z.object({ stat: z.string().min(1), atLeast: z.number().positive() }),
+    z.object({ all: z.array(statConditionSchema).min(1) }),
+    z.object({ any: z.array(statConditionSchema).min(1) }),
+  ]),
+);
+
+/** 実績。名前と説明は翻訳ファイルの achievement.<id>.name・desc。hidden は達成するまで中身を隠す（裏実績） */
+export const achievementsConfigSchema = z.object({
+  achievements: z.array(z.object({ id: z.string().min(1), condition: statConditionSchema, hidden: z.boolean().default(false) })),
+});
+export type AchievementsConfig = z.infer<typeof achievementsConfigSchema>;
+
+/** ポケモンの解放。initial は最初から使える */
+export const unlocksConfigSchema = z.object({
+  initial: z.array(z.string().min(1)).min(1),
+  unlocks: z.array(z.object({ pokemon: z.string().min(1), condition: statConditionSchema })),
+});
+export type UnlocksConfig = z.infer<typeof unlocksConfigSchema>;
+
 // ---- セーブ ----
 
 export const saveConfigSchema = z.object({

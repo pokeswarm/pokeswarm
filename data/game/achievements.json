@@ -1,0 +1,38 @@
+{
+  "achievements": [
+    { "id": "first-run", "condition": { "stat": "runs", "atLeast": 1 } },
+    { "id": "first-clear", "condition": { "stat": "clears", "atLeast": 1 } },
+    { "id": "clear-charmander", "condition": { "stat": "clears.charmander", "atLeast": 1 } },
+    { "id": "clear-bulbasaur", "condition": { "stat": "clears.bulbasaur", "atLeast": 1 } },
+    { "id": "clear-squirtle", "condition": { "stat": "clears.squirtle", "atLeast": 1 } },
+    { "id": "clear-coop", "condition": { "stat": "clears.coop", "atLeast": 1 } },
+    { "id": "kills-1000", "condition": { "stat": "kills", "atLeast": 1000 } },
+    { "id": "kills-10000", "condition": { "stat": "kills", "atLeast": 10000 } },
+    { "id": "first-midboss", "condition": { "stat": "midbossKills", "atLeast": 1 } },
+    { "id": "first-boss", "condition": { "stat": "bossKills", "atLeast": 1 } },
+    { "id": "first-derivation", "condition": { "stat": "derivations", "atLeast": 1 } },
+    { "id": "first-unique", "condition": { "stat": "uniqueMoves", "atLeast": 1 } },
+    {
+      "id": "final-evolution",
+      "condition": {
+        "any": [
+          { "stat": "evolvedTo.charizard", "atLeast": 1 },
+          { "stat": "evolvedTo.venusaur", "atLeast": 1 },
+          { "stat": "evolvedTo.blastoise", "atLeast": 1 }
+        ]
+      }
+    },
+    {
+      "id": "all-starters-final",
+      "condition": {
+        "all": [
+          { "stat": "evolvedTo.charizard", "atLeast": 1 },
+          { "stat": "evolvedTo.venusaur", "atLeast": 1 },
+          { "stat": "evolvedTo.blastoise", "atLeast": 1 }
+        ]
+      }
+    },
+    { "id": "level-70", "hidden": true, "condition": { "stat": "bestLevel", "atLeast": 70 } },
+    { "id": "kills-in-run-5000", "hidden": true, "condition": { "stat": "bestKills", "atLeast": 5000 } }
+  ]
+}

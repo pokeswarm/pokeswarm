@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { effectRecipes, generated, networkConfig, placeholderRender, playerConfig, saveConfig, simulationConfig, spriteRender, stageConfig } from '../data';
 import { buildSimRules, localName, playableLoadout } from '../data/simRules';
 import type { SpriteAnims } from '../data/schema';
-import { getLocale, t } from '../i18n';
+import { getLocale, t, tMaybe } from '../i18n';
 import type { Room, RoomPlayer } from '../net/room';
 import { SyncSession } from '../net/sync';
 import { hexColor } from '../render/color';
@@ -128,6 +128,8 @@ export class RunScene extends Phaser.Scene {
     this.bossId = null;
     this.resultAt = null;
     this.runRecorded = false;
+    this.newAchievements = [];
+    this.newUnlocks = [];
     this.showDebug = new URLSearchParams(window.location.search).has('debug');
     this.playerSprite = data.playerSprite;
     this.pokemon = data.pokemon;
@@ -342,6 +344,7 @@ export class RunScene extends Phaser.Scene {
       loop: true,
       callback: () => {
         this.recorder.commit(this.sim.world);
+        this.noteProgress();
         void session.store.flush();
       },
     });
@@ -359,7 +362,22 @@ export class RunScene extends Phaser.Scene {
   private recordRunEnd(): void {
     this.runRecorded = true;
     this.recorder.finish(this.sim.world);
+    this.noteProgress();
     void session.store.flush();
+  }
+
+  /** このランで新しく達成した実績・解放したポケモン（結果画面に出す） */
+  private newAchievements: string[] = [];
+  private newUnlocks: string[] = [];
+
+  /** 記録を足した後: 新しく達成した実績を知らせ、結果画面のために覚えておく */
+  private noteProgress(): void {
+    const found = session.checkProgress();
+    this.newAchievements.push(...found.achievements);
+    this.newUnlocks.push(...found.unlocks);
+    if (found.achievements.length && !this.sim.world.outcome) {
+      this.announce(found.achievements.map((id) => t('run.achievement', { name: tMaybe(`achievement.${id}.name`) })).join('\n'), '#a5d6a7');
+    }
   }
 
   /** 結果画面へ移る */
@@ -377,6 +395,8 @@ export class RunScene extends Phaser.Scene {
           const def = w.rules.moves[m.move]!;
           return `${localName(generated.moves[def.key]?.names, getLocale(), def.key)} Lv${m.level}`;
         }),
+        newAchievements: this.newAchievements.map((id) => tMaybe(`achievement.${id}.name`)),
+        newUnlocks: this.newUnlocks.map((key) => localName(generated.pokemon[key]?.names, getLocale(), key)),
       },
       // 協力プレイはもう一度を出さない（部屋を作り直す必要がある）
       retry: this.coop ? null : { ...this.runData },
@@ -480,15 +500,16 @@ export class RunScene extends Phaser.Scene {
       const t0 = performance.now();
       this.sim.step([...this.collectCommands(), ...this.inbox.splice(0)]);
       this.simMs = this.simMs * 0.95 + (performance.now() - t0) * 0.05;
-      if (visible) {
-        for (const ev of this.sim.world.events) {
-          if (ev.type === 'projectileHit') this.effects.playImpact(this.sim.world.rules.moves[ev.move]!.effect, ev.x, ev.y);
-          if (ev.type === 'evolved') this.onEvolved(ev.playerId, ev.to);
-          // 派生・固有技を達成したら記録する（次からの「進化できる！」の表示に使う）
-          if (ev.type === 'upgradeChosen' && ev.playerId === this.localId && ev.offer.kind === 'derive') {
-            addDiscovery(session.store, this.sim.world.rules.moves[ev.offer.to]!.key);
-          }
+      // 記録は、タブが裏にあって描画しないときも数える
+      this.recorder.observe(this.sim.world);
+      for (const ev of this.sim.world.events) {
+        // 派生・固有技を達成したら記録する（次からの「おや……？」の表示に使う）
+        if (ev.type === 'upgradeChosen' && ev.playerId === this.localId && ev.offer.kind === 'derive') {
+          addDiscovery(session.store, this.sim.world.rules.moves[ev.offer.to]!.key);
         }
+        if (!visible) continue;
+        if (ev.type === 'projectileHit') this.effects.playImpact(this.sim.world.rules.moves[ev.move]!.effect, ev.x, ev.y);
+        if (ev.type === 'evolved') this.onEvolved(ev.playerId, ev.to);
       }
       if (visible) this.onSimEvents();
       this.sendNet();

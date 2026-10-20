@@ -1,0 +1,8 @@
+{
+  "initial": ["charmander", "bulbasaur", "squirtle"],
+  "unlocks": [
+    { "pokemon": "onix", "condition": { "stat": "defeated.onix", "atLeast": 20 } },
+    { "pokemon": "starmie", "condition": { "stat": "defeated.starmie", "atLeast": 20 } },
+    { "pokemon": "lapras", "condition": { "stat": "defeated.lapras", "atLeast": 10 } }
+  ]
+}

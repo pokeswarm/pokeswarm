@@ -1,0 +1,34 @@
+import { describe, expect, it } from 'vitest';
+import type { AchievementsConfig, UnlocksConfig } from '../data/schema';
+import { applyProgress, isUnlocked, meets, progressOf } from './progress';
+import { emptySave } from './saveData';
+
+const achievements: AchievementsConfig = {
+  achievements: [
+    { id: 'a', hidden: false, condition: { stat: 'kills', atLeast: 10 } },
+    { id: 'b', hidden: true, condition: { all: [{ stat: 'x', atLeast: 1 }, { stat: 'y', atLeast: 1 }] } },
+    { id: 'c', hidden: false, condition: { any: [{ stat: 'x', atLeast: 5 }, { stat: 'z', atLeast: 1 }] } },
+  ],
+};
+const unlocks: UnlocksConfig = { initial: ['charmander'], unlocks: [{ pokemon: 'onix', condition: { stat: 'defeated.onix', atLeast: 20 } }] };
+
+describe('実績と解放', () => {
+  it('条件の組み合わせ（すべて・どれか）', () => {
+    expect(meets({ x: 1, y: 1 }, achievements.achievements[1]!.condition)).toBe(true);
+    expect(meets({ x: 1 }, achievements.achievements[1]!.condition)).toBe(false);
+    expect(meets({ z: 1 }, achievements.achievements[2]!.condition)).toBe(true);
+    expect(progressOf({ kills: 4 }, achievements.achievements[0]!.condition)).toEqual({ current: 4, target: 10 });
+    expect(progressOf({}, achievements.achievements[1]!.condition)).toBeNull();
+  });
+
+  it('新しく満たしたものだけを足し、2回目は足さない', () => {
+    const save = emptySave();
+    save.stats = { kills: 12, 'defeated.onix': 20 };
+    expect(applyProgress(save, achievements, unlocks)).toEqual({ achievements: ['a'], unlocks: ['onix'] });
+    expect(applyProgress(save, achievements, unlocks)).toEqual({ achievements: [], unlocks: [] });
+    expect(save.achievements).toEqual(['a']);
+    expect(isUnlocked(save, unlocks, 'onix')).toBe(true);
+    expect(isUnlocked(save, unlocks, 'charmander')).toBe(true);
+    expect(isUnlocked(emptySave(), unlocks, 'onix')).toBe(false);
+  });
+});

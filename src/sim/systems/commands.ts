@@ -53,7 +53,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         e.hp[i]! -= cmd.amount * damageTakenMultiplier(world, i);
         breakOnDamage(world, i);
         if (e.hp[i]! <= 0) {
-          world.events.push({ type: 'enemyKilled', enemyId: cmd.id, by: cmd.by });
+          world.events.push({ type: 'enemyKilled', enemyId: cmd.id, kind: e.kind[i]!, by: cmd.by });
           world.stats.kills++;
         }
         break;
@@ -69,7 +69,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         const i = findEnemyIndex(world, cmd.id);
         if (i === -1 || e.hp[i]! <= 0) break;
         e.hp[i] = 0;
-        world.events.push({ type: 'enemyKilled', enemyId: cmd.id, by: cmd.by });
+        world.events.push({ type: 'enemyKilled', enemyId: cmd.id, kind: e.kind[i]!, by: cmd.by });
         world.stats.kills++;
         break;
       }

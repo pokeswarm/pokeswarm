@@ -23,6 +23,7 @@ export class TitleScene extends Phaser.Scene {
       // 協力プレイは Firebase の設定値があるときだけ
       if (firebaseOptionsFromEnv()) this.add.text(width / 2, height * 0.7 + 44, t('title.coop'), { fontFamily: 'sans-serif', fontSize: '18px', color: '#cfd8dc' }).setOrigin(0.5);
       if (firebaseOptionsFromEnv()) this.add.text(width / 2, height * 0.7 + 74, t('title.friends'), { fontFamily: 'sans-serif', fontSize: '18px', color: '#cfd8dc' }).setOrigin(0.5);
+      this.add.text(width / 2, height * 0.7 + 104, t('title.achievements'), { fontFamily: 'sans-serif', fontSize: '18px', color: '#cfd8dc' }).setOrigin(0.5);
     };
     layout();
     this.scale.on('resize', layout);
@@ -39,6 +40,7 @@ export class TitleScene extends Phaser.Scene {
     this.input.once('pointerdown', go);
     if (firebaseOptionsFromEnv()) this.input.keyboard?.once('keydown-C', () => this.scene.start('lobby', { mode: 'host' }));
     if (firebaseOptionsFromEnv()) this.input.keyboard?.once('keydown-F', () => this.scene.start('friends'));
+    this.input.keyboard?.once('keydown-A', () => this.scene.start('achievements'));
     session.setPresence('menu');
   }
 }

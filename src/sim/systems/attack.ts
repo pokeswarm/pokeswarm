@@ -397,7 +397,7 @@ export function moveProjectiles(world: World): void {
       e.hp[j]! -= amount * damageTakenMultiplier(world, j);
       breakOnDamage(world, j);
       if (e.hp[j]! <= 0) {
-        world.events.push({ type: 'enemyKilled', enemyId: e.id[j]!, by: ownerId });
+        world.events.push({ type: 'enemyKilled', enemyId: e.id[j]!, kind: e.kind[j]!, by: ownerId });
         world.stats.kills++;
       }
     }

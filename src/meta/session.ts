@@ -1,6 +1,8 @@
 import type { Account, SaveChooser } from '../firebase/account';
 import type { PresenceState, Social } from '../firebase/social';
 import { firebaseOptionsFromEnv } from '../firebase/config';
+import { achievementsConfig, unlocksConfig } from '../data';
+import { applyProgress } from './progress';
 import { SaveStore } from './saveStore';
 
 export type AccountStatus = 'offline' | 'connecting' | 'guest' | 'google' | 'error';
@@ -27,6 +29,13 @@ class Session {
   /** ニックネーム#タグ・フレンド・招待（Google でログインしているときだけ） */
   private socialValue: Social | null = null;
   private presence: PresenceState = 'menu';
+
+  /** 記録を足した後に呼ぶ: 新しく満たした実績・解放をセーブデータに足して返す（無ければ変更しない） */
+  checkProgress(): { achievements: string[]; unlocks: string[] } {
+    const found = applyProgress(structuredClone(this.store.current) as Parameters<typeof applyProgress>[0], achievementsConfig, unlocksConfig);
+    if (found.achievements.length || found.unlocks.length) this.store.update((d) => void applyProgress(d, achievementsConfig, unlocksConfig));
+    return found;
+  }
 
   get social(): Social | null {
     return this.socialValue;

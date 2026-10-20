@@ -3,6 +3,7 @@ import { placeholderRender, playablesConfig } from './data';
 import { migrateOldDiscoveries } from './meta/discoveries';
 import { session } from './meta/session';
 import { loadSpriteManifest } from './render/sprites/spriteManifest';
+import { AchievementsScene } from './scenes/AchievementsScene';
 import { FriendsScene } from './scenes/FriendsScene';
 import { InviteToast } from './scenes/inviteToast';
 import { LobbyScene, type LobbySceneData } from './scenes/LobbyScene';
@@ -20,7 +21,11 @@ import { TitleScene } from './scenes/TitleScene';
  */
 async function start(): Promise<void> {
   // ログインとセーブデータの読み込みは待たずに始める（タイトル画面に状態を出す）
-  const sessionReady = session.start().then(() => migrateOldDiscoveries(session.store));
+  const sessionReady = session.start().then(() => {
+    migrateOldDiscoveries(session.store);
+    // 実績の仕組みより前に遊んだ記録でも、条件を満たしていれば達成にする
+    session.checkProgress();
+  });
   const q = new URLSearchParams(window.location.search);
   const joinId = q.get('join');
   let lobby: LobbySceneData | null = null;
@@ -55,6 +60,7 @@ async function start(): Promise<void> {
   game.scene.add('run', RunScene, !!run, run ?? undefined);
   game.scene.add('result', ResultScene, false);
   game.scene.add('friends', FriendsScene, false);
+  game.scene.add('achievements', AchievementsScene, false);
 
   // フレンドからの招待: ラン中でなければ、今の画面を閉じて待合室へ移る
   const running = (): boolean => game.scene.isActive('run');

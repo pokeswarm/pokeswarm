@@ -13,6 +13,9 @@ export interface RunSummary {
   pokemonName: string;
   /** 覚えていた技（名前と技のレベル） */
   moves: string[];
+  /** このランで新しく達成した実績・解放したポケモン（名前） */
+  newAchievements: string[];
+  newUnlocks: string[];
 }
 
 export interface ResultSceneData {
@@ -64,6 +67,8 @@ export class ResultScene extends Phaser.Scene {
         t('result.level', { level: summary.level }),
         t('result.kills', { kills: summary.kills }),
         t('result.moves', { moves: summary.moves.join(' / ') }),
+        ...(summary.newAchievements.length ? ['', t('result.newAchievements', { list: summary.newAchievements.join(' / ') })] : []),
+        ...(summary.newUnlocks.length ? [t('result.newUnlocks', { list: summary.newUnlocks.join(' / ') })] : []),
       ];
       this.add
         .text(width / 2, height * 0.33, lines, { fontFamily: 'sans-serif', fontSize: '22px', color: '#ffffff', align: 'center', lineSpacing: 10, wordWrap: { width: width * 0.9 } })

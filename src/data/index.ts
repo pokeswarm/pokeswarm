@@ -14,6 +14,10 @@ import derivationsJson from '../../data/game/derivations.json';
 import statsJson from '../../data/game/stats.json';
 import stageJson from '../../data/game/stage.json';
 import saveJson from '../../data/game/save.json';
+import achievementsJson from '../../data/game/achievements.json';
+import unlocksJson from '../../data/game/unlocks.json';
+import ja from '../i18n/ja.json';
+import en from '../i18n/en.json';
 import spriteRenderJson from '../../data/render/sprites.json';
 import networkJson from '../../data/game/network.json';
 import statusJson from '../../data/game/status.json';
@@ -46,6 +50,8 @@ import {
   spriteRenderSchema,
   stageConfigSchema,
   saveConfigSchema,
+  achievementsConfigSchema,
+  unlocksConfigSchema,
   statsConfigSchema,
   statusConfigSchema,
 } from './schema';
@@ -73,6 +79,8 @@ export const derivationsConfig = load('game/derivations.json', derivationsConfig
 export const statsConfig = load('game/stats.json', statsConfigSchema, statsJson);
 export const stageConfig = load('game/stage.json', stageConfigSchema, stageJson);
 export const saveConfig = load('game/save.json', saveConfigSchema, saveJson);
+export const achievementsConfig = load('game/achievements.json', achievementsConfigSchema, achievementsJson);
+export const unlocksConfig = load('game/unlocks.json', unlocksConfigSchema, unlocksJson);
 export const statusConfig = load('game/status.json', statusConfigSchema, statusJson);
 export const pickupConfig = load('game/pickups.json', pickupConfigSchema, pickupsJson);
 export const spriteRender = load('render/sprites.json', spriteRenderSchema, spriteRenderJson);
@@ -138,4 +146,19 @@ for (const d of [...derivationsConfig.derivations, ...derivationsConfig.unique])
 }
 for (const u of derivationsConfig.unique) {
   check(!!playablesConfig.pokemon[u.line], `data/game/derivations.json の固有技 "${u.to}" の系統 "${u.line}" が data/game/playables.json にありません`);
+}
+
+// 実績の名前・説明は翻訳ファイルに、解放するポケモンは PokeAPI のデータに必要
+check(new Set(achievementsConfig.achievements.map((x) => x.id)).size === achievementsConfig.achievements.length, 'data/game/achievements.json の id が重複しています');
+for (const a of achievementsConfig.achievements) {
+  for (const [lang, messages] of [['ja', ja], ['en', en]] as const) {
+    const m = messages as Record<string, string>;
+    check(!!m[`achievement.${a.id}.name`] && !!m[`achievement.${a.id}.desc`], `実績 "${a.id}" の名前・説明が src/i18n/${lang}.json にありません`);
+  }
+}
+for (const key of unlocksConfig.initial) {
+  check(!!playablesConfig.pokemon[key], `data/game/unlocks.json の initial "${key}" が data/game/playables.json にありません`);
+}
+for (const u of unlocksConfig.unlocks) {
+  check(!!generated.pokemon[u.pokemon], `data/game/unlocks.json の "${u.pokemon}" が data/generated/pokemon.json にありません`);
 }

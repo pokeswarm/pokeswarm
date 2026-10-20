@@ -42,7 +42,7 @@ export function tickStatuses(world: World): void {
       // やどりぎ: 継続ダメージの分だけ、付けたプレイヤーが回復する
       if (world.statusKinds[s]!.healsAttacker) healPlayer(world, e.statusBy[k]!, dps * world.dt * taken);
       if (e.hp[i]! <= 0) {
-        world.events.push({ type: 'enemyKilled', enemyId: e.id[i]!, by: e.statusBy[k]! });
+        world.events.push({ type: 'enemyKilled', enemyId: e.id[i]!, kind: e.kind[i]!, by: e.statusBy[k]! });
         world.stats.kills++;
       }
     }

@@ -45,3 +45,11 @@ export function tickStatuses(world: World): void {
     }
   }
 }
+
+/** ダメージを受けたら治る状態異常（ねむり）を治す。HP を減らした側（ソロ・ホスト）が呼ぶ */
+export function breakOnDamage(world: World, i: number): void {
+  const e = world.enemies;
+  for (let s = 0; s < world.statusKinds.length; s++) {
+    if (world.statusKinds[s]!.breaksOnDamage) e.statusTicks[i * e.statusCount + s] = 0;
+  }
+}

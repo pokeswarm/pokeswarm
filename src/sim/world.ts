@@ -17,6 +17,29 @@ import { SpatialHash } from './spatial/spatialHash';
  */
 export type SimRole = 'solo' | 'host' | 'guest';
 
+/** レベルアップの候補1つ */
+export type UpgradeOffer =
+  | { readonly kind: 'moveNew'; readonly move: number }
+  | { readonly kind: 'moveUp'; readonly slot: number }
+  | { readonly kind: 'itemNew'; readonly item: number }
+  | { readonly kind: 'itemUp'; readonly slot: number }
+  | { readonly kind: 'passiveNew'; readonly passive: number }
+  | { readonly kind: 'passiveUp'; readonly slot: number }
+  /** 派生・固有技: slot の技を to に置き換える（材料の持ち物が消える持ち物ならなくなる） */
+  | { readonly kind: 'derive'; readonly slot: number; readonly to: number; readonly item: number; readonly unique: boolean };
+
+/** レベルアップの選択の状態 */
+export interface LevelUpState {
+  /** 上がった後のレベル */
+  readonly level: number;
+  /** プレイヤーごとの候補 */
+  readonly offers: Map<PlayerId, UpgradeOffer[]>;
+  /** 選び終えた（または見送った）プレイヤー */
+  readonly done: Set<PlayerId>;
+  /** 時間切れまでの残り（更新回数） */
+  ticksLeft: number;
+}
+
 /** シミュレーションの全状態 */
 export interface World {
   tick: number;
@@ -35,6 +58,13 @@ export interface World {
   nextGemId: number;
   /** 全員で共有する経験値の合計（ホストが確定する） */
   xp: number;
+  /** 全員で共有するレベルと、次のレベルまでに貯めた経験値 */
+  level: number;
+  xpIntoLevel: number;
+  /** 選択を待っているレベルアップの数 */
+  pendingLevelUps: number;
+  /** レベルアップの選択中（ゲームは止まっている）。null なら選択中でない */
+  levelUp: LevelUpState | null;
   /** 敵の空間ハッシュ（毎回作り直す） */
   readonly enemyHash: SpatialHash;
   readonly rng: Rng;
@@ -74,6 +104,10 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     gems: new GemStore(role === 'guest' ? rules.pickups.maxGems * 2 : rules.pickups.maxGems),
     nextGemId: 1,
     xp: 0,
+    level: 1,
+    xpIntoLevel: 0,
+    pendingLevelUps: 0,
+    levelUp: null,
     projectiles: new ProjectileStore(rules.combat.maxProjectiles, rules.combat.hitMemory),
     enemyHash: new SpatialHash(rules.spawn.spatialCellSize, capacity),
     rng: new Rng(seed),

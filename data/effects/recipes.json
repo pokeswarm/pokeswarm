@@ -273,6 +273,225 @@
           "intensity": 0
         }
       }
+    },
+    "poison.base": {
+      "projectile": {
+        "coreColor": "#f3e5f5",
+        "coreScale": 0.6,
+        "glowColor": "#ab47bc",
+        "glowScale": 2.2,
+        "glowAlpha": 0.8
+      },
+      "impact": {
+        "burst": {
+          "count": 8,
+          "colors": [
+            "#e1bee7",
+            "#ab47bc",
+            "#4a148c"
+          ],
+          "lifespanMs": [
+            200,
+            380
+          ],
+          "speed": [
+            50,
+            170
+          ],
+          "scale": [
+            0.5,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 30,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#ba68c8",
+          "radius": 20,
+          "durationMs": 120,
+          "alpha": 0.5
+        }
+      }
+    },
+    "flying.base": {
+      "projectile": {
+        "coreColor": "#ffffff",
+        "coreScale": 0.5,
+        "glowColor": "#b3e5fc",
+        "glowScale": 1.6,
+        "glowAlpha": 0.6
+      },
+      "impact": {
+        "burst": {
+          "count": 8,
+          "colors": [
+            "#ffffff",
+            "#e1f5fe",
+            "#81d4fa"
+          ],
+          "lifespanMs": [
+            200,
+            380
+          ],
+          "speed": [
+            50,
+            170
+          ],
+          "scale": [
+            0.5,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#e1f5fe",
+          "radius": 22,
+          "durationMs": 100,
+          "alpha": 0.5
+        }
+      }
+    },
+    "fire-fang": {
+      "extends": "fire.base"
+    },
+    "flamethrower": {
+      "extends": "fire.base"
+    },
+    "flare-blitz": {
+      "extends": "fire.base",
+      "projectile": {
+        "glowScale": 1.2,
+        "coreScale": 0.4
+      }
+    },
+    "blast-burn": {
+      "extends": "fire.base",
+      "impact": {
+        "shake": {
+          "durationMs": 80,
+          "intensity": 0.003
+        }
+      },
+      "projectile": {
+        "glowScale": 1.2,
+        "coreScale": 0.5
+      }
+    },
+    "gust": {
+      "extends": "flying.base"
+    },
+    "air-slash": {
+      "extends": "flying.base"
+    },
+    "bubble": {
+      "extends": "water.base"
+    },
+    "hydro-pump": {
+      "extends": "water.base"
+    },
+    "surf": {
+      "extends": "water.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.3
+      }
+    },
+    "hydro-cannon": {
+      "extends": "water.base",
+      "impact": {
+        "shake": {
+          "durationMs": 80,
+          "intensity": 0.003
+        }
+      }
+    },
+    "razor-leaf": {
+      "extends": "grass.base"
+    },
+    "leech-seed": {
+      "extends": "grass.base"
+    },
+    "solar-beam": {
+      "extends": "grass.base",
+      "impact": {
+        "shake": {
+          "durationMs": 80,
+          "intensity": 0.003
+        }
+      }
+    },
+    "petal-dance": {
+      "extends": "grass.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.2
+      }
+    },
+    "giga-drain": {
+      "extends": "grass.base"
+    },
+    "frenzy-plant": {
+      "extends": "grass.base",
+      "impact": {
+        "shake": {
+          "durationMs": 80,
+          "intensity": 0.003
+        }
+      },
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.4
+      }
+    },
+    "poison-sting": {
+      "extends": "poison.base"
+    },
+    "sleep-powder": {
+      "extends": "poison.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.2
+      }
+    },
+    "sludge-bomb": {
+      "extends": "poison.base",
+      "projectile": {
+        "glowScale": 1.15,
+        "coreScale": 0.35
+      }
+    },
+    "quick-attack": {
+      "extends": "normal.base"
+    },
+    "swift": {
+      "extends": "normal.base"
+    },
+    "body-slam": {
+      "extends": "normal.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.3
+      }
+    },
+    "hyper-beam": {
+      "extends": "normal.base",
+      "impact": {
+        "shake": {
+          "durationMs": 80,
+          "intensity": 0.003
+        }
+      }
     }
   }
 }

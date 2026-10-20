@@ -1,0 +1,21 @@
+{
+  "derivations": [
+    { "from": "ember", "item": "x-attack", "to": "flamethrower" },
+    { "from": "ember", "item": "x-defense", "to": "fire-spin" },
+    { "from": "fire-fang", "item": "dire-hit", "to": "flare-blitz" },
+    { "from": "gust", "item": "x-speed", "to": "air-slash" },
+    { "from": "water-gun", "item": "dire-hit", "to": "hydro-pump" },
+    { "from": "bubble", "item": "x-defense", "to": "surf" },
+    { "from": "vine-whip", "item": "x-speed", "to": "petal-dance" },
+    { "from": "razor-leaf", "item": "x-attack", "to": "solar-beam" },
+    { "from": "leech-seed", "item": "x-defense", "to": "giga-drain" },
+    { "from": "poison-sting", "item": "dire-hit", "to": "sludge-bomb" },
+    { "from": "tackle", "item": "x-defense", "to": "body-slam" },
+    { "from": "swift", "item": "x-attack", "to": "hyper-beam" }
+  ],
+  "unique": [
+    { "from": "flamethrower", "item": "fire-stone", "to": "blast-burn", "line": "charmander" },
+    { "from": "solar-beam", "item": "leaf-stone", "to": "frenzy-plant", "line": "bulbasaur" },
+    { "from": "hydro-pump", "item": "water-stone", "to": "hydro-cannon", "line": "squirtle" }
+  ]
+}

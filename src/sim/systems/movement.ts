@@ -4,6 +4,7 @@ export function movePlayers(world: World): void {
   for (const p of world.players) {
     p.prevX = p.x;
     p.prevY = p.y;
+    if (p.invincibleTicks > 0) p.invincibleTicks--;
     if (p.remote) {
       // 別のブラウザのプレイヤーは、本人から届いた位置をそのまま使う
       p.x = p.netX;

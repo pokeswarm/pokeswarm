@@ -1,9 +1,62 @@
 {
   "kinds": [
-    { "id": "burn", "damagePerSecond": 4, "speedMultiplier": 1, "damageTakenMultiplier": 1, "color": "#ff7043" },
-    { "id": "poison", "damagePerSecond": 3, "speedMultiplier": 1, "damageTakenMultiplier": 1, "color": "#ab47bc" },
-    { "id": "paralysis", "damagePerSecond": 0, "speedMultiplier": 0.5, "damageTakenMultiplier": 1, "color": "#ffee58" },
-    { "id": "freeze", "damagePerSecond": 0, "speedMultiplier": 0, "damageTakenMultiplier": 1, "color": "#80deea" },
-    { "id": "defenseDown", "damagePerSecond": 0, "speedMultiplier": 1, "damageTakenMultiplier": 1.3, "color": "#90a4ae" }
+    {
+      "id": "burn",
+      "damagePerSecond": 4,
+      "speedMultiplier": 1,
+      "damageTakenMultiplier": 1,
+      "color": "#ff7043"
+    },
+    {
+      "id": "poison",
+      "damagePerSecond": 3,
+      "speedMultiplier": 1,
+      "damageTakenMultiplier": 1,
+      "color": "#ab47bc"
+    },
+    {
+      "id": "paralysis",
+      "damagePerSecond": 0,
+      "speedMultiplier": 0.5,
+      "damageTakenMultiplier": 1,
+      "color": "#ffee58"
+    },
+    {
+      "id": "freeze",
+      "damagePerSecond": 0,
+      "speedMultiplier": 0,
+      "damageTakenMultiplier": 1,
+      "color": "#80deea"
+    },
+    {
+      "id": "defenseDown",
+      "damagePerSecond": 0,
+      "speedMultiplier": 1,
+      "damageTakenMultiplier": 1.3,
+      "color": "#90a4ae"
+    },
+    {
+      "id": "sleep",
+      "damagePerSecond": 0,
+      "speedMultiplier": 0,
+      "damageTakenMultiplier": 1,
+      "breaksOnDamage": true,
+      "color": "#7986cb"
+    },
+    {
+      "id": "flinch",
+      "damagePerSecond": 0,
+      "speedMultiplier": 0,
+      "damageTakenMultiplier": 1,
+      "color": "#ffffff"
+    },
+    {
+      "id": "leech",
+      "damagePerSecond": 3,
+      "speedMultiplier": 1,
+      "damageTakenMultiplier": 1,
+      "healsAttacker": true,
+      "color": "#9ccc65"
+    }
   ]
 }

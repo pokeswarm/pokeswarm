@@ -27,3 +27,9 @@ export function t(key: MessageKey, params?: Record<string, string | number>): st
   if (!params) return template;
   return template.replace(/\{(\w+)\}/g, (match, name: string) => (name in params ? String(params[name]) : match));
 }
+
+/** キーを組み立てて引くとき用（例: `itemDesc.${key}`）。無いキーなら空文字 */
+export function tMaybe(key: string, params?: Record<string, string | number>): string {
+  if (!(key in messages.ja)) return '';
+  return t(key as MessageKey, params);
+}

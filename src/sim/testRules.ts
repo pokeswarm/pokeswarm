@@ -1,5 +1,6 @@
 import type { MoveStats, SimMoveDef } from './moves';
 import type { SimRules } from './rules';
+import { buildXpTable, type SimUpgradeDef } from './upgrades';
 
 /** テスト用の技の性能（一番近い敵へ1発ずつ撃つ、仮の自動攻撃と同じ動き） */
 export const TEST_MOVE: MoveStats = {
@@ -18,6 +19,8 @@ export const TEST_MOVE: MoveStats = {
   status: -1,
   statusChance: 0,
   statusSeconds: 0,
+  spreadDegrees: 0,
+  lifestealPct: 0,
 };
 
 /** テスト用のタイプ: 0 ノーマル、1 ほのお、2 くさ、3 みず（ほのお → くさ がばつぐん、など） */
@@ -38,6 +41,10 @@ export function testRules(
     /** 技（番号0、ノーマルタイプ）の性能の上書き */
     move?: Partial<MoveStats>;
     pickups?: Partial<SimRules['pickups']>;
+    leveling?: Partial<Omit<SimRules['leveling'], 'xpToNext'>>;
+    items?: SimUpgradeDef[];
+    passives?: SimUpgradeDef[];
+    derivations?: SimRules['derivations'];
     /** 追加の技 */
     extraMoves?: SimMoveDef[];
   } = {},
@@ -49,6 +56,16 @@ export function testRules(
     damageClass: 'special',
     levels: [{ ...TEST_MOVE, ...overrides.move }],
     effect: 'test',
+  };
+  const leveling = {
+    maxLevel: 100,
+    xpCurve: { base: 5, exponent: 1.3 },
+    offerCount: 3,
+    choiceSeconds: 15,
+    initialRerolls: 1,
+    resumeInvincibleSeconds: 1,
+    maxItemSlots: 4,
+    ...overrides.leveling,
   };
   return {
     enemies: { kinds: [{ id: 'test', hp: 20, moveSpeed: 60, radius: 10, types: [0] }] },
@@ -68,9 +85,9 @@ export function testRules(
     },
     status: {
       kinds: [
-        { id: 'burn', damagePerSecond: 6, speedMultiplier: 1, damageTakenMultiplier: 1, color: '#ff0000' },
-        { id: 'freeze', damagePerSecond: 0, speedMultiplier: 0, damageTakenMultiplier: 1, color: '#00ffff' },
-        { id: 'defenseDown', damagePerSecond: 0, speedMultiplier: 1, damageTakenMultiplier: 2, color: '#888888' },
+        { id: 'burn', damagePerSecond: 6, speedMultiplier: 1, damageTakenMultiplier: 1, breaksOnDamage: false, healsAttacker: false, color: '#ff0000' },
+        { id: 'freeze', damagePerSecond: 0, speedMultiplier: 0, damageTakenMultiplier: 1, breaksOnDamage: false, healsAttacker: false, color: '#00ffff' },
+        { id: 'defenseDown', damagePerSecond: 0, speedMultiplier: 1, damageTakenMultiplier: 2, breaksOnDamage: false, healsAttacker: false, color: '#888888' },
       ],
     },
     pickups: { xpPerKill: 1, gemRadius: 6, maxGems: 50, magnetSpeed: 420, bigGemValue: 10, ...overrides.pickups },
@@ -79,9 +96,14 @@ export function testRules(
       hitMemory: 8,
       typeMultipliers: { stab: 1.1, superEffective: 1.2, notVeryEffective: 0.8 },
       maxMoveSlots: 4,
+      critMultiplier: 1.5,
     },
     moves: [testMove, ...(overrides.extraMoves ?? [])],
     types: TYPES,
+    leveling: { ...leveling, xpToNext: buildXpTable(leveling) },
+    items: overrides.items ?? [],
+    passives: overrides.passives ?? [],
+    derivations: overrides.derivations ?? [],
   };
 }
 

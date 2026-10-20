@@ -97,6 +97,25 @@ export interface CollectGemCommand {
   readonly value: number;
 }
 
+/** レベルアップの候補を選ぶ（index は候補の並び） */
+export interface ChooseUpgradeCommand {
+  readonly type: 'chooseUpgrade';
+  readonly playerId: PlayerId;
+  readonly index: number;
+}
+
+/** リロール権を使って候補を引き直す */
+export interface RerollUpgradesCommand {
+  readonly type: 'rerollUpgrades';
+  readonly playerId: PlayerId;
+}
+
+/** 見送る（リロール権 +1） */
+export interface SkipUpgradeCommand {
+  readonly type: 'skipUpgrade';
+  readonly playerId: PlayerId;
+}
+
 /** ゲスト: ホストによる敵の位置の補正。[id, x, y, id, x, y, ...] */
 export interface CorrectEnemiesCommand {
   readonly type: 'correctEnemies';
@@ -114,5 +133,8 @@ export type InputCommand =
   | MergeGemCommand
   | RequestPickupCommand
   | CollectGemCommand
+  | ChooseUpgradeCommand
+  | RerollUpgradesCommand
+  | SkipUpgradeCommand
   | RetireEnemyCommand
   | CorrectEnemiesCommand;

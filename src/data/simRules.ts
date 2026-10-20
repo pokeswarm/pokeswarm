@@ -1,10 +1,15 @@
 import { buildTypeChart, resolveMoveLevels, type SimMoveDef } from '../sim/moves';
+import { buildXpTable, resolveModifiers, type SimUpgradeDef } from '../sim/upgrades';
 import type { SimRules } from '../sim/rules';
 import {
   combatConfig,
+  derivationsConfig,
   enemiesConfig,
   generated,
+  itemsConfig,
+  levelingConfig,
   movesConfig,
+  passivesConfig,
   pickupConfig,
   playablesConfig,
   spawnConfig,
@@ -36,6 +41,15 @@ export function buildSimRules(): SimRules {
       effect: def.effect,
     };
   });
+  const moveIndex = (key: string): number => moves.findIndex((m) => m.key === key);
+  const upgrades = (defs: Record<string, { maxLevel: number; consumable: boolean; perLevel: Parameters<typeof resolveModifiers>[0] }>): SimUpgradeDef[] =>
+    Object.entries(defs).map(([key, d]) => ({ key, maxLevel: d.maxLevel, consumable: d.consumable, perLevel: resolveModifiers(d.perLevel, types.names) }));
+  const items = upgrades(itemsConfig.items);
+  const itemIndex = (key: string): number => items.findIndex((i) => i.key === key);
+  const derivations = [
+    ...derivationsConfig.derivations.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: null })),
+    ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: d.line })),
+  ];
   return {
     enemies: { kinds: enemiesConfig.kinds.map((k) => ({ ...k, types: generated.pokemon[k.id]!.types.map(typeIndex) })) },
     spawn: spawnConfig,
@@ -44,6 +58,10 @@ export function buildSimRules(): SimRules {
     combat: combatConfig,
     moves,
     types,
+    leveling: { ...levelingConfig, xpToNext: buildXpTable(levelingConfig) },
+    items,
+    passives: upgrades(passivesConfig.passives),
+    derivations,
   };
 }
 
@@ -54,12 +72,14 @@ export function moveIndexOf(rules: SimRules, key: string): number {
 }
 
 /** プレイアブルのポケモンの、シミュレーションでの初期値（タイプと最初の技） */
-export function playableLoadout(rules: SimRules, pokemon: string): { types: number[]; moves: { move: number; level: number }[] } {
+export function playableLoadout(rules: SimRules, pokemon: string): { types: number[]; moves: { move: number; level: number }[]; line: string } {
   const p = playablesConfig.pokemon[pokemon] ?? playablesConfig.pokemon[playablesConfig.default]!;
   const species = generated.pokemon[pokemon] ?? generated.pokemon[playablesConfig.default]!;
   return {
     types: species.types.map((t) => rules.types.names.indexOf(t)),
     moves: p.startingMoves.map((m) => ({ move: moveIndexOf(rules, m), level: 1 })),
+    // 系統はプレイアブルのキー（固有技の判定。進化しても変わらない）
+    line: playablesConfig.pokemon[pokemon] ? pokemon : playablesConfig.default,
   };
 }
 

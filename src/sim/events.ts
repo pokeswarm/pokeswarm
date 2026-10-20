@@ -1,4 +1,5 @@
 import type { PlayerId } from './commands';
+import type { UpgradeOffer } from './world';
 
 /** 1回の更新の中で起きた出来事。描画・通信・実績の判定が読む */
 export interface EnemyKilledEvent {
@@ -88,6 +89,19 @@ export interface PickupRequestedEvent {
   readonly by: PlayerId;
 }
 
+/** レベルが上がった（全員で共有） */
+export interface LevelUpEvent {
+  readonly type: 'levelUp';
+  readonly level: number;
+}
+
+/** レベルアップの候補を選んだ */
+export interface UpgradeChosenEvent {
+  readonly type: 'upgradeChosen';
+  readonly playerId: PlayerId;
+  readonly offer: UpgradeOffer;
+}
+
 export type SimEvent =
   | EnemyKilledEvent
   | ProjectileHitEvent
@@ -98,4 +112,6 @@ export type SimEvent =
   | GemMergedEvent
   | GemCollectedEvent
   | PickupRequestedEvent
+  | LevelUpEvent
+  | UpgradeChosenEvent
   | EnemyRetiredEvent;

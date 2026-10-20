@@ -6,5 +6,6 @@
     "superEffective": 1.2,
     "notVeryEffective": 0.8
   },
-  "maxMoveSlots": 4
+  "maxMoveSlots": 4,
+  "critMultiplier": 1.5
 }

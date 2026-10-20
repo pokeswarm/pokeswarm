@@ -1,5 +1,6 @@
 import type { PlayerId } from '../commands';
 import { findEnemyIndex, type World } from '../world';
+import { addXp } from './leveling';
 
 /**
  * 倒した敵の場所に経験値の玉を落とす（ソロ・ホストだけ。ゲストはホストから受け取る）。
@@ -83,9 +84,11 @@ export function collectGems(world: World): void {
 export function confirmPickup(world: World, id: number, by: PlayerId): boolean {
   const g = world.gems.indexOf(id);
   if (g === -1) return false;
-  const value = world.gems.value[g]!;
+  const collector = world.players.find((p) => p.id === by);
+  // 拾ったプレイヤーの経験値アップ（しあわせタマゴなど）を掛ける
+  const value = world.gems.value[g]! * (1 + (collector?.mods.xpPct ?? 0) / 100);
   world.gems.removeAt(g);
-  world.xp += value;
+  addXp(world, value);
   world.events.push({ type: 'gemCollected', id, by, value });
   return true;
 }

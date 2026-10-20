@@ -6,6 +6,15 @@ export const MOTION_LINEAR = 0;
 export const MOTION_FOLLOW = 1;
 /** 持ち主の周りを回る */
 export const MOTION_ORBIT = 2;
+/** 飛んで、減速して戻ってくる */
+export const MOTION_BOOMERANG = 3;
+/** 一番近い敵を追いかける */
+export const MOTION_HOMING = 4;
+
+/** 当たり判定の形: 円（半径 radius） */
+export const SHAPE_CIRCLE = 0;
+/** 直線（始点 x, y から向き dir に長さ length、太さ radius） */
+export const SHAPE_LINE = 1;
 
 export interface ProjectileSpawn {
   owner: PlayerId;
@@ -32,6 +41,13 @@ export interface ProjectileSpawn {
   pierce: number;
   /** 同じ敵に当たり直すまでの更新回数。0 なら1回だけ */
   hitIntervalTicks: number;
+  shape: number;
+  /** SHAPE_LINE: 長さと向き（単位ベクトル） */
+  length: number;
+  dirX: number;
+  dirY: number;
+  /** 半径が1秒に広がる量（nova） */
+  growth: number;
 }
 
 /**
@@ -61,6 +77,13 @@ export class ProjectileStore {
   /** 残りの貫通可能数（無限は Infinity） */
   readonly pierceLeft: Float64Array;
   readonly hitIntervalTicks: Uint16Array;
+  readonly shape: Uint8Array;
+  readonly length: Float64Array;
+  readonly dirX: Float64Array;
+  readonly dirY: Float64Array;
+  readonly growth: Float64Array;
+  /** 出したときの残り時間（boomerang の戻りの計算に使う） */
+  readonly maxLife: Float64Array;
   /** 当てた敵の id と当てた更新番号（発射体ごとに hitMemory 個の輪状の記録） */
   readonly hitIds: Uint32Array;
   readonly hitTicks: Uint32Array;
@@ -91,6 +114,12 @@ export class ProjectileStore {
     this.radius = new Float64Array(capacity);
     this.pierceLeft = new Float64Array(capacity);
     this.hitIntervalTicks = new Uint16Array(capacity);
+    this.shape = new Uint8Array(capacity);
+    this.length = new Float64Array(capacity);
+    this.dirX = new Float64Array(capacity);
+    this.dirY = new Float64Array(capacity);
+    this.growth = new Float64Array(capacity);
+    this.maxLife = new Float64Array(capacity);
     this.hitIds = new Uint32Array(capacity * hitMemory);
     this.hitTicks = new Uint32Array(capacity * hitMemory);
     this.hitCount = new Uint32Array(capacity);
@@ -117,6 +146,12 @@ export class ProjectileStore {
     this.radius[i] = p.radius;
     this.pierceLeft[i] = p.pierce;
     this.hitIntervalTicks[i] = Math.min(p.hitIntervalTicks, 0xffff);
+    this.shape[i] = p.shape;
+    this.length[i] = p.length;
+    this.dirX[i] = p.dirX;
+    this.dirY[i] = p.dirY;
+    this.growth[i] = p.growth;
+    this.maxLife[i] = p.life;
     this.hitCount[i] = 0;
     return i;
   }
@@ -144,6 +179,12 @@ export class ProjectileStore {
     this.radius[i] = this.radius[last]!;
     this.pierceLeft[i] = this.pierceLeft[last]!;
     this.hitIntervalTicks[i] = this.hitIntervalTicks[last]!;
+    this.shape[i] = this.shape[last]!;
+    this.length[i] = this.length[last]!;
+    this.dirX[i] = this.dirX[last]!;
+    this.dirY[i] = this.dirY[last]!;
+    this.growth[i] = this.growth[last]!;
+    this.maxLife[i] = this.maxLife[last]!;
     this.hitCount[i] = this.hitCount[last]!;
     const m = this.hitMemory;
     this.hitIds.copyWithin(i * m, last * m, (last + 1) * m);

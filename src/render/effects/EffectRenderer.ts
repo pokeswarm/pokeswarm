@@ -91,7 +91,15 @@ export class EffectRenderer {
   }
 
   /** 発射体・攻撃の当たり判定の見た目と軌跡を描く（毎フレーム）。レシピは当たり判定ごとに recipeOf で引く */
-  drawProjectiles(src: CircleSource, alpha: number, recipeOf: (index: number) => string, deltaMs: number, timeMs: number): void {
+  drawProjectiles(
+    src: CircleSource,
+    alpha: number,
+    recipeOf: (index: number) => string,
+    deltaMs: number,
+    timeMs: number,
+    /** 直線の当たり判定（ビーム）なら長さと向き。円なら null */
+    lineOf: (index: number) => { length: number; dirX: number; dirY: number } | null = () => null,
+  ): void {
     // 軌跡のパーティクルを出す数は、レシピごとの間隔で決める
     const trailCounts = new Map<string, number>();
     const trailCountOf = (id: string, trail: NonNullable<EffectRecipe['trail']>): number => {
@@ -130,13 +138,21 @@ export class EffectRenderer {
       }
       // glowScale・coreScale は当たり判定の直径に対する倍率
       const unit = (r * 2) / GLOW_SIZE;
-      glow
-        .setPosition(x, y)
-        .setScale(unit * body.glowScale * pulse)
-        .setTint(hexColor(body.glowColor))
-        .setAlpha(body.glowAlpha)
-        .setVisible(true);
-      core.setPosition(x, y).setScale(unit * body.coreScale).setTint(hexColor(body.coreColor)).setVisible(true);
+      const line = lineOf(i);
+      if (line) {
+        // ビーム: 円の画像を線の長さに引き伸ばし、向きに合わせて回す
+        const cx = x + (line.dirX * line.length) / 2;
+        const cy = y + (line.dirY * line.length) / 2;
+        const rot = Math.atan2(line.dirY, line.dirX);
+        const lx = (line.length * 1.1) / GLOW_SIZE;
+        glow.setPosition(cx, cy).setRotation(rot).setScale(lx, unit * body.glowScale * 0.6 * pulse);
+        core.setPosition(cx, cy).setRotation(rot).setScale(lx, unit * body.coreScale);
+      } else {
+        glow.setPosition(x, y).setRotation(0).setScale(unit * body.glowScale * pulse);
+        core.setPosition(x, y).setRotation(0).setScale(unit * body.coreScale);
+      }
+      glow.setTint(hexColor(body.glowColor)).setAlpha(body.glowAlpha).setVisible(true);
+      core.setTint(hexColor(body.coreColor)).setVisible(true);
       used++;
     }
     for (let k = used; k < this.visible; k++) {

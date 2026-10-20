@@ -1,0 +1,18 @@
+{
+  "items": {
+    "x-attack": { "maxLevel": 5, "perLevel": { "powerPct": 10 } },
+    "x-defense": { "maxLevel": 5, "perLevel": { "damageTakenPct": -8 } },
+    "x-speed": { "maxLevel": 5, "perLevel": { "projectileSpeedPct": 10, "cooldownPct": -4 } },
+    "dire-hit": { "maxLevel": 5, "perLevel": { "critChancePct": 5 } },
+    "charcoal": { "maxLevel": 5, "perLevel": { "typePowerPct": { "fire": 15 } } },
+    "mystic-water": { "maxLevel": 5, "perLevel": { "typePowerPct": { "water": 15 } } },
+    "miracle-seed": { "maxLevel": 5, "perLevel": { "typePowerPct": { "grass": 15 } } },
+    "poison-barb": { "maxLevel": 5, "perLevel": { "typePowerPct": { "poison": 15 } } },
+    "sharp-beak": { "maxLevel": 5, "perLevel": { "typePowerPct": { "flying": 15 } } },
+    "fire-stone": { "maxLevel": 1, "consumable": true, "perLevel": { "typeAreaPct": { "fire": 10 } } },
+    "water-stone": { "maxLevel": 1, "consumable": true, "perLevel": { "typeAreaPct": { "water": 10 } } },
+    "leaf-stone": { "maxLevel": 1, "consumable": true, "perLevel": { "typeAreaPct": { "grass": 10 } } },
+    "thunder-stone": { "maxLevel": 1, "consumable": true, "perLevel": { "typeAreaPct": { "electric": 10 } } },
+    "linking-cord": { "maxLevel": 1, "consumable": true, "perLevel": {} }
+  }
+}

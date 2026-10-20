@@ -151,19 +151,26 @@ export const combatConfigSchema = z.object({
   }),
   /** 覚えられる技の数 */
   maxMoveSlots: z.number().int().positive(),
+  /** 急所のダメージの倍率 */
+  critMultiplier: z.number().min(1),
 });
 export type CombatConfig = z.infer<typeof combatConfigSchema>;
 
 // ---- 技 ----
 
 /**
- * 技の出し方（01_game_design.md 4.1）。区切り1で作ったもの:
+ * 技の出し方（01_game_design.md 4.1）:
  * - nearest: 一番近い敵へ発射体を飛ばす（count 発を interval ごとに）
- * - facing: 向いている方向へ発射体を飛ばす（count 発を interval ごとに）
- * - melee: 向いている方向の近くに一瞬だけ当たり判定を出す（count 2 で反対側にも）
+ * - facing: 向いている方向へ発射体を飛ばす（count 発を interval ごとに。spreadDegrees で広がる。360 でランダムな方向）
+ * - melee: 向いている方向の近くに当たり判定を出し、持ち主に付いていく（count 2 で反対側にも。range 0 で自分の周り全体 = オーラ）
  * - orbit: 自分の周りを count 個の当たり判定が回る（duration の間）
+ * - beam: 一番近い敵（いなければ向いている方向）へ長さ range・太さ size の直線を出す
+ * - boomerang: 向いている方向へ飛び、減速して戻ってくる
+ * - ground: 一番近い敵の位置（いなければ前方）に、地面に残る当たり判定を置く（count 2 以上は周りに散らす）
+ * - nova: 自分を中心に、size から range まで広がる輪
+ * - homing: 一番近い敵を追いかける発射体
  */
-export const MOVE_PATTERNS = ['nearest', 'facing', 'melee', 'orbit'] as const;
+export const MOVE_PATTERNS = ['nearest', 'facing', 'melee', 'orbit', 'beam', 'boomerang', 'ground', 'nova', 'homing'] as const;
 export type MovePattern = (typeof MOVE_PATTERNS)[number];
 
 const pierceValue = z.union([z.number().int().positive(), z.literal('infinite')]);
@@ -197,6 +204,10 @@ export const moveStatsSchema = z.object({
   statusId: z.string().optional(),
   statusChance: z.number().min(0).max(1),
   statusSeconds: z.number().nonnegative(),
+  /** 発射の向きのばらつき（度）。360 で全方向 */
+  spreadDegrees: z.number().min(0).max(360).default(0),
+  /** 与えたダメージのうち回復する割合（%）。HP は区切り3で作るので、今は効果なし */
+  lifestealPct: z.number().nonnegative().default(0),
 });
 export type MoveStatsData = z.infer<typeof moveStatsSchema>;
 
@@ -217,6 +228,8 @@ export const moveLevelDeltaSchema = z
     knockbackSeconds: z.number(),
     statusChance: z.number(),
     statusSeconds: z.number(),
+    spreadDegrees: z.number(),
+    lifestealPct: z.number(),
   })
   .partial();
 export type MoveLevelDelta = z.infer<typeof moveLevelDeltaSchema>;
@@ -437,6 +450,10 @@ export const statusKindSchema = z.object({
   damagePerSecond: z.number().nonnegative(),
   speedMultiplier: z.number().min(0),
   damageTakenMultiplier: z.number().positive(),
+  /** ダメージを受けると治る（ねむり） */
+  breaksOnDamage: z.boolean().default(false),
+  /** 継続ダメージの分だけ、付けたプレイヤーが回復する（やどりぎ。HP は区切り3で作るので、今は効果なし） */
+  healsAttacker: z.boolean().default(false),
   /** かかっている間の敵の色（見た目だけ） */
   color: colorString,
 });
@@ -520,3 +537,77 @@ export const generatedTypeEntrySchema = z.object({
 });
 export type GeneratedType = z.infer<typeof generatedTypeEntrySchema>;
 export const generatedTypesSchema = z.record(z.string(), generatedTypeEntrySchema);
+
+// ---- レベルアップ・持ち物・パッシブ・派生 ----
+
+export const levelingConfigSchema = z.object({
+  maxLevel: z.number().int().positive(),
+  /** レベル L から L+1 に必要な経験値 = base × L^exponent（区切り4で、強化なしで15分レベル50になるよう調整する） */
+  xpCurve: z.object({ base: z.number().positive(), exponent: z.number().positive() }),
+  /** レベルアップで出る候補の数 */
+  offerCount: z.number().int().positive(),
+  /** 選ぶまでの制限時間（秒）。時間切れは見送ると同じ */
+  choiceSeconds: z.number().positive(),
+  /** ランの始めのリロール権（永続強化で増やす） */
+  initialRerolls: z.number().int().nonnegative(),
+  /** 再開したときの無敵時間（秒） */
+  resumeInvincibleSeconds: z.number().nonnegative(),
+  /** 持ち物の枠 */
+  maxItemSlots: z.number().int().positive(),
+});
+export type LevelingConfig = z.infer<typeof levelingConfigSchema>;
+
+/**
+ * 持ち物・パッシブの効果（1段階あたり）。% の項目は足し合わせてから掛ける。
+ * typePowerPct・typeAreaPct はタイプ（PokeAPI のキー）ごと。
+ */
+export const modifierSchema = z
+  .object({
+    powerPct: z.number(),
+    physicalPowerPct: z.number(),
+    specialPowerPct: z.number(),
+    typePowerPct: z.record(z.string(), z.number()),
+    areaPct: z.number(),
+    typeAreaPct: z.record(z.string(), z.number()),
+    cooldownPct: z.number(),
+    projectileSpeedPct: z.number(),
+    critChancePct: z.number(),
+    damageTakenPct: z.number(),
+    defensePct: z.number(),
+    maxHpPct: z.number(),
+    regenPerSecond: z.number(),
+    moveSpeedPct: z.number(),
+    pickupRangePct: z.number(),
+    xpPct: z.number(),
+  })
+  .partial();
+export type ModifierData = z.infer<typeof modifierSchema>;
+
+const upgradeDefSchema = z.object({
+  maxLevel: z.number().int().positive(),
+  /** 進化・派生に使うとなくなる（進化の石・つながりのヒモ） */
+  consumable: z.boolean().default(false),
+  perLevel: modifierSchema,
+});
+
+/** 持ち物。キーは PokeAPI の持ち物の名前 */
+export const itemsConfigSchema = z.object({ items: z.record(z.string(), upgradeDefSchema) });
+export type ItemsConfig = z.infer<typeof itemsConfigSchema>;
+/** パッシブ（枠を使わない強化）。キーは PokeAPI の持ち物の名前（名前を借りる） */
+export const passivesConfigSchema = z.object({ passives: z.record(z.string(), upgradeDefSchema) });
+export type PassivesConfig = z.infer<typeof passivesConfigSchema>;
+
+/** 派生（技 + 持ち物 → 派生技）と固有技（派生技 + 持ち物 → 固有技。その系統だけ） */
+export const derivationsConfigSchema = z.object({
+  derivations: z.array(z.object({ from: z.string(), item: z.string(), to: z.string() })),
+  unique: z.array(
+    z.object({
+      from: z.string(),
+      item: z.string(),
+      to: z.string(),
+      /** 系統（data/game/playables.json のキー） */
+      line: z.string(),
+    }),
+  ),
+});
+export type DerivationsConfig = z.infer<typeof derivationsConfigSchema>;

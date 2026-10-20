@@ -7,6 +7,10 @@ import spawnJson from '../../data/game/spawn.json';
 import combatJson from '../../data/game/combat.json';
 import movesJson from '../../data/game/moves.json';
 import playablesJson from '../../data/game/playables.json';
+import levelingJson from '../../data/game/leveling.json';
+import itemsJson from '../../data/game/items.json';
+import passivesJson from '../../data/game/passives.json';
+import derivationsJson from '../../data/game/derivations.json';
 import spriteRenderJson from '../../data/render/sprites.json';
 import networkJson from '../../data/game/network.json';
 import statusJson from '../../data/game/status.json';
@@ -19,6 +23,10 @@ import generatedTypesJson from '../../data/generated/types.json';
 import { resolveEffectRecipes } from './effects';
 import {
   combatConfigSchema,
+  derivationsConfigSchema,
+  itemsConfigSchema,
+  levelingConfigSchema,
+  passivesConfigSchema,
   enemiesConfigSchema,
   generatedItemsSchema,
   generatedMovesSchema,
@@ -52,6 +60,10 @@ export const spawnConfig = load('game/spawn.json', spawnConfigSchema, spawnJson)
 export const combatConfig = load('game/combat.json', combatConfigSchema, combatJson);
 export const movesConfig = load('game/moves.json', movesConfigSchema, movesJson);
 export const playablesConfig = load('game/playables.json', playablesConfigSchema, playablesJson);
+export const levelingConfig = load('game/leveling.json', levelingConfigSchema, levelingJson);
+export const itemsConfig = load('game/items.json', itemsConfigSchema, itemsJson);
+export const passivesConfig = load('game/passives.json', passivesConfigSchema, passivesJson);
+export const derivationsConfig = load('game/derivations.json', derivationsConfigSchema, derivationsJson);
 export const statusConfig = load('game/status.json', statusConfigSchema, statusJson);
 export const pickupConfig = load('game/pickups.json', pickupConfigSchema, pickupsJson);
 export const spriteRender = load('render/sprites.json', spriteRenderSchema, spriteRenderJson);
@@ -92,3 +104,13 @@ for (const [key, p] of Object.entries(playablesConfig.pokemon)) {
   for (const m of p.startingMoves) check(!!movesConfig.moves[m], `data/game/playables.json の "${key}" の最初の技 "${m}" が data/game/moves.json にありません`);
 }
 check(!!playablesConfig.pokemon[playablesConfig.default], `data/game/playables.json の default "${playablesConfig.default}" がありません`);
+for (const key of [...Object.keys(itemsConfig.items), ...Object.keys(passivesConfig.passives)]) {
+  check(!!generated.items[key], `持ち物・パッシブ "${key}" が data/generated/items.json にありません（data/pokeapi/targets.json に足して npm run pokeapi）`);
+}
+for (const d of [...derivationsConfig.derivations, ...derivationsConfig.unique]) {
+  check(!!movesConfig.moves[d.from] && !!movesConfig.moves[d.to], `data/game/derivations.json の "${d.from} → ${d.to}" の技が data/game/moves.json にありません`);
+  check(!!itemsConfig.items[d.item], `data/game/derivations.json の材料 "${d.item}" が data/game/items.json にありません`);
+}
+for (const u of derivationsConfig.unique) {
+  check(!!playablesConfig.pokemon[u.line], `data/game/derivations.json の固有技 "${u.to}" の系統 "${u.line}" が data/game/playables.json にありません`);
+}

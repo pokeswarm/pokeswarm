@@ -16,10 +16,12 @@ import { EnemySprites } from '../render/sprites/EnemySprites';
 import { SpriteStreamer } from '../render/sprites/SpriteStreamer';
 import { addSpriteGallery } from '../render/sprites/SpriteGallery';
 import type { Axis, InputCommand, PlayerId } from '../sim/commands';
+import { SHAPE_LINE } from '../sim/entities/projectiles';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, enemyCap, type SimRole } from '../sim/world';
 import { applyDebugOverrides, parseMovesParam } from './debugOverrides';
+import { LevelUpPanel, offerText } from './levelUpPanel';
 import type { NetPanel } from './netPanel';
 
 /** ソロとホストは 1、ゲストは 2 */
@@ -75,6 +77,9 @@ export class RunScene extends Phaser.Scene {
   private hiddenTimer: ReturnType<typeof setInterval> | null = null;
   /** 最後に描画のタイミングが来た時刻 */
   private lastFrameAt = 0;
+  private levelUpPanel!: LevelUpPanel;
+  /** 画面の操作（レベルアップの選択など）から作ったコマンド。次の更新で渡す */
+  private uiCommands: InputCommand[] = [];
 
   constructor() {
     super('run');
@@ -118,6 +123,7 @@ export class RunScene extends Phaser.Scene {
         pickupRange: playerConfig.pickupRange,
         types: loadout.types,
         moves,
+        line: loadout.line,
       });
       const view = new PlayerView(this, p, placeholderRender, spriteRender, this.playerSprite);
       view.container.setDepth(id === this.localId ? 1.1 : 1);
@@ -139,6 +145,12 @@ export class RunScene extends Phaser.Scene {
     );
     this.enemySpriteView = new EnemySprites(this, (kind) => this.streamer.manifestOf(kind), spriteRender.enemyScale, spriteRender.enemyAnimation, 0);
     this.measureFrameTime();
+    this.levelUpPanel = new LevelUpPanel({
+      choose: (index) => this.uiCommands.push({ type: 'chooseUpgrade', playerId: this.localId, index }),
+      reroll: () => this.uiCommands.push({ type: 'rerollUpgrades', playerId: this.localId }),
+      skip: () => this.uiCommands.push({ type: 'skipUpgrade', playerId: this.localId }),
+    });
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.levelUpPanel.hide());
     this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));
     this.effects = new EffectRenderer(this, effectRecipes, 2);
     const local = this.sim.world.players.find((p) => p.id === this.localId)!;
@@ -236,10 +248,11 @@ export class RunScene extends Phaser.Scene {
 
   /** ローカルの入力を、変化があったときだけコマンドにする */
   private collectCommands(): InputCommand[] {
+    const out = this.uiCommands.splice(0);
     const { dx, dy } = this.keyboard.read();
-    if (dx === this.lastSent.dx && dy === this.lastSent.dy) return [];
+    if (dx === this.lastSent.dx && dy === this.lastSent.dy) return out;
     this.lastSent = { dx, dy };
-    return [{ type: 'move', playerId: this.localId, dx, dy }];
+    return [...out, { type: 'move', playerId: this.localId, dx, dy }];
   }
 
   private draw(alpha: number, deltaMs: number, timeMs: number): void {
@@ -282,7 +295,22 @@ export class RunScene extends Phaser.Scene {
       );
     const sprites = this.streamer.stats();
     const pr = world.projectiles;
-    this.effects.drawProjectiles(pr, alpha, (i) => world.rules.moves[pr.move[i]!]!.effect, deltaMs, timeMs);
+    this.effects.drawProjectiles(
+      pr,
+      alpha,
+      (i) => world.rules.moves[pr.move[i]!]!.effect,
+      deltaMs,
+      timeMs,
+      (i) => (pr.shape[i] === SHAPE_LINE ? { length: pr.length[i]!, dirX: pr.dirX[i]!, dirY: pr.dirY[i]! } : null),
+    );
+
+    const lu = world.levelUp;
+    if (lu && !lu.done.has(this.localId)) {
+      const offers = (lu.offers.get(this.localId) ?? []).map((o) => offerText(world, local, o));
+      this.levelUpPanel.show(lu.level, offers, local.rerolls, Math.ceil(lu.ticksLeft * world.dt));
+    } else {
+      this.levelUpPanel.hide();
+    }
 
     const lines = [
       t('debug.controls'),
@@ -290,6 +318,7 @@ export class RunScene extends Phaser.Scene {
       t('debug.enemies', { count: e.count, cap: enemyCap(world), drawn }),
       t('debug.combat', { kills: world.stats.kills, projectiles: world.projectiles.count }),
       t('debug.xp', { xp: Math.round(world.xp), gems: gems.count }),
+      t('debug.level', { level: world.level, xp: Math.floor(world.xpIntoLevel), need: world.rules.leveling.xpToNext[world.level] ?? 0, rerolls: local.rerolls }),
       t('debug.moves', {
         moves: local.moves
           .map((m) => {
@@ -298,6 +327,12 @@ export class RunScene extends Phaser.Scene {
             return `${name} Lv${m.level}/${def.levels.length}`;
           })
           .join(' / '),
+      }),
+      t('debug.items', {
+        items: local.items.map((it) => localName(generated.items[world.rules.items[it.item]!.key]?.names, getLocale(), '') + ' Lv' + it.level).join(' / '),
+      }),
+      t('debug.passives', {
+        passives: local.passives.map((ps) => localName(generated.items[world.rules.passives[ps.passive]!.key]?.names, getLocale(), '') + ' Lv' + ps.level).join(' / '),
       }),
       t('debug.simTime', { ms: this.simMs.toFixed(3) }),
       t('debug.frameTime', { ms: this.frameMs.toFixed(2) }),

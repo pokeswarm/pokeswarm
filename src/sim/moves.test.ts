@@ -15,7 +15,7 @@ describe('技のレベルごとの性能', () => {
     effect: 'x',
     base: {
       power: 10, cooldownSeconds: 0.3, count: 1, intervalSeconds: 0, speed: 100, size: 5, range: 100, durationSeconds: 1,
-      pierce: 'infinite' as const, hitIntervalSeconds: 0, knockback: 0, knockbackSeconds: 0, statusId: 'burn', statusChance: 0.9, statusSeconds: 1,
+      pierce: 'infinite' as const, hitIntervalSeconds: 0, knockback: 0, knockbackSeconds: 0, statusId: 'burn', statusChance: 0.9, statusSeconds: 1, spreadDegrees: 0, lifestealPct: 0,
     },
     levels: [{ power: 5 }, { count: 1, cooldownSeconds: -0.5 }, { statusChance: 0.5 }],
   };
@@ -126,5 +126,70 @@ describe('技の出し方', () => {
     sim.world.enemies.add(1, 1, px + 150, 0, 100, 0, 10);
     for (let t = 0; t < 30; t++) sim.step([]);
     expect(damageTaken(sim, 1)).toBeCloseTo(10 * 1.2 * 1.1);
+  });
+});
+
+describe('技の出し方（区切り2で追加）', () => {
+  it('beam: 一直線上の敵すべてに当たり、線の外の敵には当たらない', () => {
+    const sim = simWith(testMove('b', 'beam', { cooldownSeconds: 100, size: 8, range: 400, durationSeconds: 0.2, pierce: Infinity }));
+    const p = sim.world.players[0]!;
+    sim.world.enemies.add(1, 0, p.x + 100, p.y, 100, 0, 10);
+    sim.world.enemies.add(2, 0, p.x + 300, p.y, 100, 0, 10);
+    sim.world.enemies.add(3, 0, p.x + 200, p.y + 80, 100, 0, 10);
+    for (let t = 0; t < 10; t++) sim.step([]);
+    expect([damageTaken(sim, 1), damageTaken(sim, 2), damageTaken(sim, 3)]).toEqual([10, 10, 0]);
+  });
+
+  it('boomerang: 行きと帰りで同じ敵に2回当たる', () => {
+    const sim = simWith(
+      testMove('r', 'boomerang', { cooldownSeconds: 100, speed: 400, size: 8, durationSeconds: 1.4, pierce: Infinity, hitIntervalSeconds: 0.3 }),
+    );
+    const p = sim.world.players[0]!;
+    sim.world.enemies.add(1, 0, p.x + 80, p.y, 1000, 0, 10);
+    for (let t = 0; t < 50; t++) sim.step([]);
+    expect(damageTaken(sim, 1)).toBe(20);
+  });
+
+  it('nova: 広がる輪が、はじめは届かない距離の敵にも当たる', () => {
+    const sim = simWith(testMove('n', 'nova', { cooldownSeconds: 100, size: 10, range: 150, durationSeconds: 0.5, pierce: Infinity }));
+    const p = sim.world.players[0]!;
+    sim.world.enemies.add(1, 0, p.x + 120, p.y, 100, 0, 10);
+    sim.step([]);
+    expect(damageTaken(sim, 1)).toBe(0);
+    for (let t = 0; t < 20; t++) sim.step([]);
+    expect(damageTaken(sim, 1)).toBe(10);
+  });
+
+  it('ground: 敵の位置に残り、当たり直しの間隔ごとに当たる', () => {
+    // 敵がいないと前方に置くので、技を使う前に敵を置く
+    const rules = testRules({
+      extraMoves: [testMove('g', 'ground', { cooldownSeconds: 100, size: 20, range: 300, durationSeconds: 1.0, pierce: Infinity, hitIntervalSeconds: 0.25 })],
+    });
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150, moves: [{ move: 1, level: 1 }] });
+    sim.world.enemies.add(1, 0, 200, 0, 1000, 0, 10);
+    for (let t = 0; t < 40; t++) sim.step([]);
+    expect(damageTaken(sim, 1)).toBe(40);
+  });
+
+  it('homing: 横にいる敵にも曲がって当たる', () => {
+    const sim = simWith(testMove('h', 'homing', { cooldownSeconds: 100, speed: 300, durationSeconds: 2 }));
+    const p = sim.world.players[0]!;
+    sim.world.enemies.add(1, 0, p.x, p.y + 200, 100, 0, 10);
+    for (let t = 0; t < 40; t++) sim.step([]);
+    expect(damageTaken(sim, 1)).toBe(10);
+  });
+
+  it('ねむりはダメージを受けると治る（継続ダメージでは治らない）', () => {
+    const r = testRules({ move: { cooldownSeconds: 100, power: 1 } });
+    r.status.kinds.push({ id: 'sleep', damagePerSecond: 0, speedMultiplier: 0, damageTakenMultiplier: 1, breaksOnDamage: true, healsAttacker: false, color: '#000000' });
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules: r });
+    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150 });
+    const e = sim.world.enemies;
+    e.add(1, 0, 150, 0, 100, 0, 10);
+    const SLEEP = r.status.kinds.length - 1;
+    e.applyStatus(0, SLEEP, 300, 1);
+    for (let t = 0; t < 30; t++) sim.step([]);
+    expect(e.hasStatus(0, SLEEP)).toBe(false);
   });
 });

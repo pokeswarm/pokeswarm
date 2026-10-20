@@ -18,6 +18,8 @@ export interface MoveStats {
   status: number;
   statusChance: number;
   statusSeconds: number;
+  spreadDegrees: number;
+  lifestealPct: number;
 }
 
 /** シミュレーションが使う技の定義 */
@@ -63,6 +65,8 @@ export function resolveMoveLevels(def: MoveDefData, statusIndexOf: (id: string) 
     status: b.statusId ? statusIndexOf(b.statusId) : -1,
     statusChance: b.statusChance,
     statusSeconds: b.statusSeconds,
+    spreadDegrees: b.spreadDegrees,
+    lifestealPct: b.lifestealPct,
   };
   const out = [cur];
   for (const delta of def.levels) {

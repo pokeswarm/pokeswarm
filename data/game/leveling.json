@@ -1,0 +1,9 @@
+{
+  "maxLevel": 100,
+  "xpCurve": { "base": 5, "exponent": 1.3 },
+  "offerCount": 3,
+  "choiceSeconds": 15,
+  "initialRerolls": 1,
+  "resumeInvincibleSeconds": 1.0,
+  "maxItemSlots": 4
+}

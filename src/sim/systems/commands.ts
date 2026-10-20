@@ -1,8 +1,9 @@
 import type { InputCommand } from '../commands';
 import type { HitEffect } from '../events';
 import { findEnemyIndex, findPlayer, type World } from '../world';
-import { damageTakenMultiplier } from './status';
+import { breakOnDamage, damageTakenMultiplier } from './status';
 import { confirmPickup } from './gems';
+import { addXp, chooseUpgrade, rerollUpgrades, skipUpgrade } from './leveling';
 
 export function applyCommands(world: World, commands: readonly InputCommand[]): void {
   const e = world.enemies;
@@ -38,6 +39,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         applyHitEffect(world, i, cmd, cmd.by);
         world.events.push({ type: 'enemyAffected', enemyId: cmd.id, by: cmd.by, ...pickEffect(cmd) });
         e.hp[i]! -= cmd.amount * damageTakenMultiplier(world, i);
+        breakOnDamage(world, i);
         if (e.hp[i]! <= 0) {
           world.events.push({ type: 'enemyKilled', enemyId: cmd.id, by: cmd.by });
           world.stats.kills++;
@@ -79,9 +81,18 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         // 経験値はホストが確定したものだけを足す（同じ玉を2回数えない）
         const g = world.gems.indexOf(cmd.id);
         if (g !== -1) world.gems.removeAt(g);
-        world.xp += cmd.value;
+        addXp(world, cmd.value);
         break;
       }
+      case 'chooseUpgrade':
+        chooseUpgrade(world, cmd.playerId, cmd.index);
+        break;
+      case 'rerollUpgrades':
+        rerollUpgrades(world, cmd.playerId);
+        break;
+      case 'skipUpgrade':
+        skipUpgrade(world, cmd.playerId);
+        break;
       case 'correctEnemies': {
         const index = new Map<number, number>();
         for (let i = 0; i < e.count; i++) index.set(e.id[i]!, i);

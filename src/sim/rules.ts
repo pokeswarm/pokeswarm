@@ -1,5 +1,6 @@
 import type { CombatConfig, EnemyKind, PickupConfig, SpawnConfig, StatusConfig } from '../data/schema';
 import type { SimMoveDef, TypeChart } from './moves';
+import type { SimDerivation, SimLeveling, SimUpgradeDef } from './upgrades';
 
 /** シミュレーションが使う敵の種類（data/game/enemies.json に、PokeAPI のタイプを足したもの） */
 export interface SimEnemyKind extends EnemyKind {
@@ -17,4 +18,10 @@ export interface SimRules {
   /** 技の定義。番号は並び順 */
   moves: SimMoveDef[];
   types: TypeChart;
+  leveling: SimLeveling;
+  /** 持ち物・パッシブ。番号は並び順 */
+  items: SimUpgradeDef[];
+  passives: SimUpgradeDef[];
+  /** 派生と固有技 */
+  derivations: SimDerivation[];
 }

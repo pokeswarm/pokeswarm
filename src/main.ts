@@ -26,6 +26,8 @@ async function start(): Promise<void> {
     migrateOldDiscoveries(session.store);
     // 実績の仕組みより前に遊んだ記録でも、条件を満たしていれば達成にする
     session.checkProgress();
+    // ショップの強化の一覧を作り直したので、前の版の強化は使ったコインを全額返す
+    session.refundLegacyUpgrades();
   });
   const q = new URLSearchParams(window.location.search);
   const joinId = q.get('join');

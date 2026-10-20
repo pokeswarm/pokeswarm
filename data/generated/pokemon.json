@@ -438,6 +438,26 @@
     ],
     "evolvesTo": []
   },
+  "ditto": {
+    "dex": 132,
+    "names": {
+      "ja": "メタモン",
+      "en": "Ditto"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 48,
+      "attack": 48,
+      "defense": 48,
+      "specialAttack": 48,
+      "specialDefense": 48,
+      "speed": 48
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
+  },
   "doduo": {
     "dex": 84,
     "names": {
@@ -645,6 +665,29 @@
     },
     "preEvolutions": [
       "exeggcute"
+    ],
+    "evolvesTo": []
+  },
+  "fearow": {
+    "dex": 22,
+    "names": {
+      "ja": "オニドリル",
+      "en": "Fearow"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 90,
+      "defense": 65,
+      "specialAttack": 61,
+      "specialDefense": 61,
+      "speed": 100
+    },
+    "preEvolutions": [
+      "spearow"
     ],
     "evolvesTo": []
   },
@@ -1371,6 +1414,62 @@
     "preEvolutions": [],
     "evolvesTo": []
   },
+  "nidorina": {
+    "dex": 30,
+    "names": {
+      "ja": "ニドリーナ",
+      "en": "Nidorina"
+    },
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 62,
+      "defense": 67,
+      "specialAttack": 55,
+      "specialDefense": 55,
+      "speed": 56
+    },
+    "preEvolutions": [
+      "nidoran-f"
+    ],
+    "evolvesTo": [
+      {
+        "to": "nidoqueen",
+        "trigger": "item",
+        "item": "moon-stone"
+      }
+    ]
+  },
+  "nidorino": {
+    "dex": 33,
+    "names": {
+      "ja": "ニドリーノ",
+      "en": "Nidorino"
+    },
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 61,
+      "attack": 72,
+      "defense": 57,
+      "specialAttack": 55,
+      "specialDefense": 55,
+      "speed": 65
+    },
+    "preEvolutions": [
+      "nidoran-m"
+    ],
+    "evolvesTo": [
+      {
+        "to": "nidoking",
+        "trigger": "item",
+        "item": "moon-stone"
+      }
+    ]
+  },
   "oddish": {
     "dex": 43,
     "names": {
@@ -1448,6 +1547,35 @@
         "to": "parasect",
         "trigger": "level",
         "level": 24
+      }
+    ]
+  },
+  "pidgeotto": {
+    "dex": 17,
+    "names": {
+      "ja": "ピジョン",
+      "en": "Pidgeotto"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 63,
+      "attack": 60,
+      "defense": 55,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 71
+    },
+    "preEvolutions": [
+      "pidgey"
+    ],
+    "evolvesTo": [
+      {
+        "to": "pidgeot",
+        "trigger": "level",
+        "level": 36
       }
     ]
   },
@@ -1758,6 +1886,31 @@
       "staryu"
     ],
     "evolvesTo": []
+  },
+  "tangela": {
+    "dex": 114,
+    "names": {
+      "ja": "モンジャラ",
+      "en": "Tangela"
+    },
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 55,
+      "defense": 115,
+      "specialAttack": 100,
+      "specialDefense": 40,
+      "speed": 60
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "tangrowth",
+        "trigger": "other"
+      }
+    ]
   },
   "tauros": {
     "dex": 128,

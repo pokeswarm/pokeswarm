@@ -20,7 +20,7 @@ describe('経験値の玉（ソロ）', () => {
     expect(sim.world.xp).toBe(1);
   });
 
-  it('玉が上限に達したら、新しい経験値は一番古い玉にまとめる', () => {
+  it('玉が上限に達したら、新しい玉を作らず経験値をまとめる（合計は失わない）', () => {
     const sim = new Simulation({
       tickRate: 30,
       seed: 1,
@@ -33,6 +33,18 @@ describe('経験値の玉（ソロ）', () => {
     expect(sim.world.stats.kills).toBe(5);
     expect(g.count).toBe(2);
     expect(g.value[0]! + g.value[1]!).toBe(5);
+  });
+
+  it('上限に達したときは、倒した場所に一番近い玉にまとめる（遠くの古い玉にたまらない）', () => {
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules: testRules({ move: { range: 1 }, pickups: { maxGems: 2 } }) });
+    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, pickupRange: 0 });
+    const g = sim.world.gems;
+    g.add(1, 5000, 0, 1, 6); // 遠くの古い玉
+    g.add(2, 300, 0, 1, 6); // 近くの新しい玉
+    sim.world.enemies.add(9, 0, 310, 0, 10, 0, 10);
+    sim.step([{ type: 'damageEnemy', id: 9, amount: 50, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);
+    expect(g.value[g.indexOf(1)]).toBe(1);
+    expect(g.value[g.indexOf(2)]).toBe(2);
   });
 });
 

@@ -106,6 +106,13 @@
       ]
     },
     {
+      "key": "pidgeotto",
+      "dex": 17,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "rattata",
       "dex": 19,
       "uses": [
@@ -127,6 +134,13 @@
       ]
     },
     {
+      "key": "fearow",
+      "dex": 22,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "ekans",
       "dex": 23,
       "uses": [
@@ -143,6 +157,20 @@
     {
       "key": "raichu",
       "dex": 26,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "nidorina",
+      "dex": 30,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "nidorino",
+      "dex": 33,
       "uses": [
         "enemy"
       ]
@@ -435,6 +463,13 @@
       ]
     },
     {
+      "key": "tangela",
+      "dex": 114,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "horsea",
       "dex": 116,
       "uses": [
@@ -486,6 +521,13 @@
     {
       "key": "lapras",
       "dex": 131,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "ditto",
+      "dex": 132,
       "uses": [
         "enemy"
       ]

@@ -1,7 +1,8 @@
 import type { Account, SaveChooser } from '../firebase/account';
 import type { PresenceState, Social } from '../firebase/social';
 import { firebaseOptionsFromEnv } from '../firebase/config';
-import { achievementsConfig, unlocksConfig } from '../data';
+import { achievementsConfig, shopConfig, unlocksConfig } from '../data';
+import { refundLegacy } from './shop';
 import { applyProgress } from './progress';
 import { SaveStore } from './saveStore';
 
@@ -29,6 +30,13 @@ class Session {
   /** ニックネーム#タグ・フレンド・招待（Google でログインしているときだけ） */
   private socialValue: Social | null = null;
   private presence: PresenceState = 'menu';
+
+  /** 前の版のショップの強化（今は無いもの）を払い戻す（起動時に1回） */
+  refundLegacyUpgrades(): number {
+    const found = refundLegacy(structuredClone(this.store.current) as Parameters<typeof refundLegacy>[0], shopConfig);
+    if (found > 0) this.store.update((d) => void refundLegacy(d, shopConfig));
+    return found;
+  }
 
   /** 記録を足した後に呼ぶ: 新しく満たした実績・解放をセーブデータに足して返す（無ければ変更しない） */
   checkProgress(): { achievements: string[]; unlocks: string[] } {

@@ -345,6 +345,54 @@
       "contactDamage": 6
     },
     {
+      "id": "pidgeotto",
+      "sprite": "enemy/pidgeotto",
+      "hp": 12,
+      "moveSpeed": 55,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "ditto",
+      "sprite": "enemy/ditto",
+      "hp": 12,
+      "moveSpeed": 47,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "fearow",
+      "sprite": "enemy/fearow",
+      "hp": 12,
+      "moveSpeed": 65,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "tangela",
+      "sprite": "enemy/tangela",
+      "hp": 12,
+      "moveSpeed": 51,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "nidorino",
+      "sprite": "enemy/nidorino",
+      "hp": 12,
+      "moveSpeed": 53,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "nidorina",
+      "sprite": "enemy/nidorina",
+      "hp": 12,
+      "moveSpeed": 50,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
       "id": "swarm-beedrill",
       "species": "beedrill",
       "sprite": "enemy/beedrill",

@@ -1,0 +1,32 @@
+{
+  "key": "enemy/fearow",
+  "dex": 22,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 40,
+      "frameHeight": 64,
+      "durations": [
+        4,
+        5,
+        6,
+        4,
+        5,
+        6
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

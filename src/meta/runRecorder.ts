@@ -3,7 +3,7 @@ import { elapsedSeconds } from '../sim/world';
 import { addStat, maxStat } from './saveData';
 import type { SaveStore } from './saveStore';
 import type { ShopConfig } from '../data/schema';
-import { coinsForRun } from './shop';
+import { coinsForRun, permanentBonus } from './shop';
 
 /**
  * ラン中の記録をセーブデータに足す（01_game_design.md 8.2）。
@@ -122,15 +122,19 @@ export class RunRecorder {
     this.commit(world);
     this.finished = true;
     // コイン（01_game_design.md 8.3。失敗・切断でも、そこまでの分をもらえる）
+    const greed = this.shop ? permanentBonus(this.store.current, this.shop).coinPct : 0;
     this.coinsEarned = this.shop
-      ? coinsForRun(this.shop, {
+      ? Math.floor(
+          coinsForRun(this.shop, {
           seconds: elapsedSeconds(world),
           kills: this.runKills,
           midbosses: this.runMidbosses,
           bosses: this.runBosses,
           clear,
           legendaryWon: this.runLegendary > 0,
-        })
+          }) *
+            (1 + greed / 100),
+        )
       : 0;
     this.store.update((d) => {
       d.coins += this.coinsEarned;

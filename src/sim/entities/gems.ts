@@ -62,6 +62,21 @@ export class GemStore {
   }
 
   /** 一番古い（id が一番小さい）玉の index。無ければ -1 */
+  /** (x, y) に一番近い玉（拾って確定を待っている玉は除く）。無ければ -1 */
+  nearest(x: number, y: number): number {
+    let best = -1;
+    let bestD = Infinity;
+    for (let i = 0; i < this.count; i++) {
+      if (this.pending[i]) continue;
+      const d = (this.x[i]! - x) ** 2 + (this.y[i]! - y) ** 2;
+      if (d < bestD) {
+        bestD = d;
+        best = i;
+      }
+    }
+    return best;
+  }
+
   oldest(): number {
     let best = -1;
     for (let i = 0; i < this.count; i++) if (best === -1 || this.id[i]! < this.id[best]!) best = i;

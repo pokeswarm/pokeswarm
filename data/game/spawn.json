@@ -100,9 +100,9 @@
       "damageMultiplier": 1.75,
       "xpMultiplier": 2.5,
       "kinds": [
-        "tentacool",
-        "magikarp",
-        "horsea"
+        "pidgeotto",
+        "ditto",
+        "grimer"
       ]
     },
     {
@@ -114,8 +114,10 @@
       "damageMultiplier": 1.9,
       "xpMultiplier": 2.8,
       "kinds": [
+        "tentacool",
+        "magikarp",
+        "horsea",
         "seel",
-        "grimer",
         "ponyta"
       ]
     },
@@ -128,10 +130,10 @@
       "damageMultiplier": 2.05,
       "xpMultiplier": 3.1,
       "kinds": [
-        "golbat",
-        "graveler",
-        "marowak",
-        "venomoth"
+        "fearow",
+        "tangela",
+        "nidorino",
+        "nidorina"
       ]
     },
     {

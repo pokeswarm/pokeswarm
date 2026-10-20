@@ -834,9 +834,13 @@ export const shopConfigSchema = z.object({
       maxLevel: z.number().int().positive(),
       baseCost: z.number().int().positive(),
       perLevel: modifierSchema.optional(),
-      grants: z.enum(['revives', 'rerolls', 'bans']).optional(),
+      /** 効果の代わりに増えるもの（復活・リロール・除外の回数、もらえるコインの %）。amount は1レベルあたり（省略時は 1） */
+      grants: z.enum(['revives', 'rerolls', 'bans', 'coinPct']).optional(),
+      amount: z.number().positive().optional(),
     }),
   ),
+  /** 前の版の強化（今は無いもの）の基本の費用。起動時に、使ったコインを全額返して消す */
+  legacyBaseCosts: z.record(z.string(), z.number().int().positive()).default({}),
 });
 export type ShopConfig = z.infer<typeof shopConfigSchema>;
 

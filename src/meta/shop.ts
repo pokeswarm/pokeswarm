@@ -69,6 +69,8 @@ export interface PermanentBonus {
   readonly revives: number;
   readonly rerolls: number;
   readonly bans: number;
+  /** もらえるコインの増加（%） */
+  readonly coinPct: number;
 }
 
 export function permanentBonus(save: Readonly<SaveData>, cfg: ShopConfig): PermanentBonus {
@@ -76,13 +78,29 @@ export function permanentBonus(save: Readonly<SaveData>, cfg: ShopConfig): Perma
   let revives = 0;
   let rerolls = 0;
   let bans = 0;
+  let coinPct = 0;
   for (const def of cfg.upgrades) {
     const level = Math.min(upgradeLevel(save, def.id), def.maxLevel);
     if (level <= 0) continue;
-    if (def.grants === 'revives') revives += level;
-    else if (def.grants === 'rerolls') rerolls += level;
-    else if (def.grants === 'bans') bans += level;
+    const n = level * (def.amount ?? 1);
+    if (def.grants === 'revives') revives += n;
+    else if (def.grants === 'rerolls') rerolls += n;
+    else if (def.grants === 'bans') bans += n;
+    else if (def.grants === 'coinPct') coinPct += n;
     else levels[def.id] = level;
   }
-  return { levels, revives, rerolls, bans };
+  return { levels, revives, rerolls, bans, coinPct };
+}
+
+/** 前の版の強化（今の一覧に無いもの）を戻し、使ったコインを全額返す。返したコインの数 */
+export function refundLegacy(save: SaveData, cfg: ShopConfig): number {
+  let total = 0;
+  for (const [id, level] of Object.entries(save.upgrades)) {
+    if (cfg.upgrades.some((u) => u.id === id)) continue;
+    const base = cfg.legacyBaseCosts[id] ?? 0;
+    for (let l = 1; l <= level; l++) total += base * l;
+    delete save.upgrades[id];
+  }
+  save.coins += total;
+  return total;
 }

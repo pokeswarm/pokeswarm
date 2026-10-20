@@ -4,7 +4,8 @@ import { addXp } from './leveling';
 
 /**
  * 倒した敵の場所に経験値の玉を落とす（ソロ・ホストだけ。ゲストはホストから受け取る）。
- * 玉が上限に達していたら、新しい玉を作らずに一番古い玉へ経験値をまとめる。
+ * 玉が上限に達していたら、新しい玉を作らずに、倒した場所に一番近い玉へ経験値をまとめる
+ * （一番古い玉にまとめると、遠くの拾わない玉にたまり続け、経験値が出なくなったように見えるため）。
  * 倒れた敵はこの更新の最後に取り除かれるので、それより前に呼ぶ。
  */
 export function dropGems(world: World): void {
@@ -21,7 +22,8 @@ export function dropGems(world: World): void {
     const value = (kind?.xp ?? p.xpPerKill) * ((kind?.rank ?? 'normal') === 'normal' ? waveXp : 1);
     if (value <= 0) continue;
     if (gems.count >= gems.capacity) {
-      const g = gems.oldest();
+      const g = gems.nearest(e.x[i]!, e.y[i]!);
+      if (g === -1) continue;
       gems.value[g]! += value;
       world.events.push({ type: 'gemMerged', id: gems.id[g]!, value: gems.value[g]! });
       continue;

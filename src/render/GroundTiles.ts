@@ -37,7 +37,10 @@ export class GroundTiles {
         .setTileScale(ground.tileScale)
         .setVisible(i === 0),
     );
-    scene.scale.on(Phaser.Scale.Events.RESIZE, (size: Phaser.Structs.Size) => this.sprites.forEach((s) => s.setSize(size.width, size.height)));
+    const onResize = (size: Phaser.Structs.Size): void => this.sprites.forEach((s) => s.setSize(size.width, size.height));
+    scene.scale.on(Phaser.Scale.Events.RESIZE, onResize);
+    // ランを始め直したとき（もう一度）に、前のランのタイルへ届き続けないよう外す
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => scene.scale.off(Phaser.Scale.Events.RESIZE, onResize));
   }
 
   update(camera: Phaser.Cameras.Scene2D.Camera, seconds: number, deltaMs: number): void {

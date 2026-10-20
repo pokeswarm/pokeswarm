@@ -1,5 +1,9 @@
 {
   "debug.tick": "更新: {tick}",
   "debug.position": "位置: ({x}, {y})",
-  "debug.controls": "WASD / 矢印キーで移動"
+  "debug.controls": "WASD / 矢印キーで移動",
+  "debug.fps": "FPS: {fps}（1フレームの更新: {steps}回）",
+  "debug.enemies": "敵: {count} / 上限 {cap}（描画 {drawn}）",
+  "debug.combat": "撃破: {kills}　強化: {empowered}　弾: {projectiles}",
+  "debug.simTime": "シミュレーション: {ms} ms/回"
 }

@@ -1,5 +1,9 @@
 {
   "debug.tick": "Tick: {tick}",
   "debug.position": "Position: ({x}, {y})",
-  "debug.controls": "Move with WASD / arrow keys"
+  "debug.controls": "Move with WASD / arrow keys",
+  "debug.fps": "FPS: {fps} (sim steps this frame: {steps})",
+  "debug.enemies": "Enemies: {count} / cap {cap} (drawn {drawn})",
+  "debug.combat": "Kills: {kills}  Empowered: {empowered}  Projectiles: {projectiles}",
+  "debug.simTime": "Simulation: {ms} ms/step"
 }

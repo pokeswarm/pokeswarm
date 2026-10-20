@@ -15,6 +15,8 @@ export interface Player {
   facingY: Axis;
   radius: number;
   moveSpeed: number;
+  /** 仮の自動攻撃の残り待ち時間（秒） */
+  attackCooldown: number;
 }
 
 export function createPlayer(id: PlayerId, x: number, y: number, radius: number, moveSpeed: number): Player {
@@ -30,5 +32,6 @@ export function createPlayer(id: PlayerId, x: number, y: number, radius: number,
     facingY: 1,
     radius,
     moveSpeed,
+    attackCooldown: 0,
   };
 }

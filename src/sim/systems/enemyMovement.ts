@@ -1,0 +1,84 @@
+import type { Player } from '../entities/player';
+import { axisToUnit } from '../math';
+import type { World } from '../world';
+
+/**
+ * 雑魚敵の移動。一番近いプレイヤーへまっすぐ向かう。
+ * 一番近いプレイヤーからも離れすぎた敵は、そのプレイヤーの進行方向側へ移し替える。
+ */
+export function moveEnemies(world: World): void {
+  const { enemies: e, players, rng } = world;
+  if (players.length === 0) return;
+  const s = world.rules.spawn;
+  const relocate2 = s.relocateDistance * s.relocateDistance;
+  for (let i = 0; i < e.count; i++) {
+    const x = e.x[i]!;
+    const y = e.y[i]!;
+    e.prevX[i] = x;
+    e.prevY[i] = y;
+
+    let target: Player = players[0]!;
+    let best = Infinity;
+    for (const p of players) {
+      const dx = p.x - x;
+      const dy = p.y - y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 < best) {
+        best = d2;
+        target = p;
+      }
+    }
+
+    if (best > relocate2) {
+      const [fx, fy] = axisToUnit(target.facingX, target.facingY);
+      const dist = rng.range(s.spawnDistanceMin, s.spawnDistanceMax);
+      const side = rng.range(-s.relocateSideSpread, s.relocateSideSpread);
+      // 進行方向 (fx, fy) の先、横方向 (-fy, fx) にばらつかせる
+      e.x[i] = e.prevX[i] = target.x + fx * dist - fy * side;
+      e.y[i] = e.prevY[i] = target.y + fy * dist + fx * side;
+      continue;
+    }
+    if (best === 0) continue;
+    const d = Math.sqrt(best);
+    const step = Math.min(e.speed[i]! * world.dt, d);
+    e.x[i] = x + ((target.x - x) / d) * step;
+    e.y[i] = y + ((target.y - y) / d) * step;
+  }
+}
+
+export function rebuildEnemyHash(world: World): void {
+  const { enemies: e, enemyHash } = world;
+  enemyHash.clear();
+  for (let i = 0; i < e.count; i++) enemyHash.insert(i, e.x[i]!, e.y[i]!);
+}
+
+/** 敵同士の簡易的な押し合い。調べる相手の数に上限を設けて負荷を抑える */
+export function separateEnemies(world: World): void {
+  const { enemies: e, enemyHash, scratch } = world;
+  const { strength, maxNeighbors } = world.rules.spawn.separation;
+  if (strength === 0 || maxNeighbors === 0) return;
+  for (let i = 0; i < e.count; i++) {
+    const r = e.radius[i]!;
+    const n = enemyHash.queryRect(e.x[i]! - r * 2, e.y[i]! - r * 2, e.x[i]! + r * 2, e.y[i]! + r * 2, scratch);
+    let checked = 0;
+    for (let k = 0; k < n && checked < maxNeighbors; k++) {
+      const j = scratch[k]!;
+      if (j === i) continue;
+      checked++;
+      const dx = e.x[i]! - e.x[j]!;
+      const dy = e.y[i]! - e.y[j]!;
+      const minD = r + e.radius[j]!;
+      const d2 = dx * dx + dy * dy;
+      if (d2 >= minD * minD) continue;
+      if (d2 === 0) {
+        // 完全に重なっていたら番号で決まる向きにずらす
+        e.x[i]! += i < j ? 0.5 : -0.5;
+        continue;
+      }
+      const d = Math.sqrt(d2);
+      const push = ((minD - d) / d) * strength * 0.5;
+      e.x[i]! += dx * push;
+      e.y[i]! += dy * push;
+    }
+  }
+}

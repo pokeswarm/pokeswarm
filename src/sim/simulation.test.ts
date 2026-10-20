@@ -2,9 +2,10 @@ import { describe, expect, it } from 'vitest';
 import type { InputCommand } from './commands';
 import { FixedStepClock } from './fixedStep';
 import { Simulation } from './simulation';
+import { testRules } from './testRules';
 
 function makeSim(): Simulation {
-  const sim = new Simulation({ tickRate: 30, seed: 1 });
+  const sim = new Simulation({ tickRate: 30, seed: 1, rules: testRules() });
   sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150 });
   return sim;
 }

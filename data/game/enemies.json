@@ -1,0 +1,5 @@
+{
+  "kinds": [
+    { "id": "placeholder", "hp": 20, "moveSpeed": 60, "radius": 10 }
+  ]
+}

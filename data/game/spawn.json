@@ -1,0 +1,18 @@
+{
+  "spawnPerSecond": 20,
+  "spawnDistanceMin": 450,
+  "spawnDistanceMax": 550,
+  "relocateDistance": 900,
+  "relocateSideSpread": 400,
+  "capGlobal": 600,
+  "capPerPlayer": 400,
+  "overflow": {
+    "empowerHpMultiplier": 1.5,
+    "maxEmpowerLevel": 5
+  },
+  "separation": {
+    "strength": 0.5,
+    "maxNeighbors": 6
+  },
+  "spatialCellSize": 64
+}

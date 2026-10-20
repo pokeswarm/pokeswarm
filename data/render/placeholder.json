@@ -5,6 +5,5 @@
   "playerColor": "#ffb74d",
   "playerFacingColor": "#ffffff",
   "enemyColor": "#9575cd",
-  "enemyEmpoweredColor": "#e53935",
-  "projectileColor": "#fff176"
+  "enemyEmpoweredColor": "#e53935"
 }

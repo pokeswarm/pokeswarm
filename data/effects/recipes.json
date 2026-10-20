@@ -1,0 +1,47 @@
+{
+  "recipes": {
+    "fire.base": {
+      "projectile": {
+        "coreColor": "#fff8e1",
+        "coreScale": 0.5,
+        "glowColor": "#ff7043",
+        "glowScale": 1.5,
+        "glowAlpha": 0.85,
+        "pulse": { "amount": 0.2, "periodMs": 140 }
+      },
+      "trail": {
+        "intervalMs": 12,
+        "colors": ["#fff59d", "#ffb74d", "#f4511e", "#6d1b1b"],
+        "lifespanMs": [220, 360],
+        "speed": [5, 30],
+        "scale": [0.45, 0],
+        "alpha": [0.9, 0],
+        "gravityY": -80,
+        "spread": 4,
+        "blend": "add"
+      },
+      "impact": {
+        "burst": {
+          "count": 16,
+          "colors": ["#ffffff", "#ffcc80", "#ff7043", "#b71c1c"],
+          "lifespanMs": [250, 450],
+          "speed": [60, 200],
+          "scale": [0.6, 0],
+          "alpha": [1, 0],
+          "gravityY": -120,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": { "color": "#ffab40", "radius": 26, "durationMs": 160, "alpha": 0.8 },
+        "shake": { "durationMs": 50, "intensity": 0.0015 }
+      }
+    },
+    "ember": {
+      "extends": "fire.base",
+      "impact": {
+        "burst": { "count": 10 },
+        "shake": { "durationMs": 0, "intensity": 0 }
+      }
+    }
+  }
+}

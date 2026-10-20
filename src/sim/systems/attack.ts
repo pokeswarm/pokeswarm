@@ -68,6 +68,7 @@ export function moveProjectiles(world: World): void {
       if (dx * dx + dy * dy <= r * r && (hit === -1 || e.id[j]! < e.id[hit]!)) hit = j;
     }
     if (hit === -1) continue;
+    world.events.push({ type: 'projectileHit', x, y, owner: pr.owner[i]! });
     e.hp[hit]! -= pr.damage[i]!;
     if (e.hp[hit]! <= 0) {
       world.events.push({ type: 'enemyKilled', enemyId: e.id[hit]!, by: pr.owner[i]! });

@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "bench": "vitest run --mode bench --silent=false"
+    "bench": "vitest run --mode bench --silent=false",
+    "sprites": "node scripts/fetch-sprites.ts"
   },
   "dependencies": {
     "phaser": "^4.2.1",
@@ -17,6 +18,8 @@
   },
   "devDependencies": {
     "@types/node": "^24.19.2",
+    "@types/pngjs": "^6.0.5",
+    "pngjs": "^7.0.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.4",
     "vitest": "^5.0.5",

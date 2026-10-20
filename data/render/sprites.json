@@ -1,0 +1,7 @@
+{
+  "playerSprite": "charmander",
+  "playerScale": 2,
+  "idleAnimation": "Idle",
+  "walkAnimation": "Walk",
+  "gallerySpacing": 80
+}

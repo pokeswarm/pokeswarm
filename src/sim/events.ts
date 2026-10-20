@@ -8,4 +8,12 @@ export interface EnemyKilledEvent {
   readonly by: PlayerId;
 }
 
-export type SimEvent = EnemyKilledEvent;
+/** 発射体が敵に当たった（見た目の演出用） */
+export interface ProjectileHitEvent {
+  readonly type: 'projectileHit';
+  readonly x: number;
+  readonly y: number;
+  readonly owner: PlayerId;
+}
+
+export type SimEvent = EnemyKilledEvent | ProjectileHitEvent;

@@ -5,6 +5,9 @@ import placeholderJson from '../../data/render/placeholder.json';
 import enemiesJson from '../../data/game/enemies.json';
 import spawnJson from '../../data/game/spawn.json';
 import attackJson from '../../data/game/attack.json';
+import spriteRenderJson from '../../data/render/sprites.json';
+import effectRecipesJson from '../../data/effects/recipes.json';
+import { resolveEffectRecipes } from './effects';
 import {
   attackConfigSchema,
   enemiesConfigSchema,
@@ -12,6 +15,7 @@ import {
   playerConfigSchema,
   simulationConfigSchema,
   spawnConfigSchema,
+  spriteRenderSchema,
 } from './schema';
 
 function load<T extends z.ZodType>(name: string, schema: T, raw: unknown): z.infer<T> {
@@ -28,3 +32,6 @@ export const placeholderRender = load('render/placeholder.json', placeholderRend
 export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enemiesJson);
 export const spawnConfig = load('game/spawn.json', spawnConfigSchema, spawnJson);
 export const attackConfig = load('game/attack.json', attackConfigSchema, attackJson);
+export const spriteRender = load('render/sprites.json', spriteRenderSchema, spriteRenderJson);
+export const effectRecipes = resolveEffectRecipes(effectRecipesJson);
+if (!effectRecipes[attackConfig.effect]) throw new Error(`data/game/attack.json の effect "${attackConfig.effect}" のレシピがありません`);

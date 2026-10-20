@@ -1,0 +1,14 @@
+{
+  "source": {
+    "repo": "PMDCollab/SpriteCollab",
+    "ref": "f18cffdaa1c27a155ee813c2b728f40bbd134149"
+  },
+  "animations": ["Idle", "Walk", "Attack", "Hurt", "Faint"],
+  "fallbacks": {
+    "Walk": "Idle",
+    "Attack": "Idle",
+    "Hurt": "Idle",
+    "Faint": "Hurt"
+  },
+  "maxAtlasSize": 4096
+}

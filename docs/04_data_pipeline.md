@@ -74,3 +74,19 @@ SpriteCollab ─┘                         └─▶ スプライトアトラ�
 
 - 最初は 8bit 風の生成音源を作者が用意する。公式の音楽は使わない。
 - 使った音源・効果音の出典と利用条件を、ファイルごとに記録し、クレジットに表示する。
+
+## 7. 実装メモ（フェーズ0 区切り3）
+
+### 7.1 スプライトの取得・変換（`npm run sprites` → `scripts/fetch-sprites.ts`）
+- 対象は `data/sprites/pokemon.json`（使用するポケモンの一覧）、取得元・取り出す動作・欠けたときの代わりは `data/sprites/pipeline.json` で指定する。
+- 取得元は SpriteCollab の**特定のコミットに固定**する（`source.ref`）。同じ設定なら何度実行しても同じ結果になる。取得したファイルは `scripts/.cache/` に保存し、再取得しない。
+- `AnimData.xml` の `CopyOf`（別の動作の絵を使い回す指定）をたどる。
+- 動作が欠けていれば `fallbacks` の代わりをたどり、結果を `public/sprites/report.json` とコンソールに一覧で出す。代わりも無い動作は出力に含めず、ゲーム側は最初の動作で代用する。
+- 出力（`public/sprites/<key>/`）: 使うシートを縦に積んだ1枚のアトラス `atlas.png`・Phaser のアトラス形式 `atlas.json`・アニメーション定義 `anims.json`。コマの名前は `<動作>/<方向の番号>/<コマ番号>`。方向の番号は SpriteCollab の行の並び（下, 右下, 右, 右上, 上, 左上, 左, 左下）。1方向しかない動作は全方向で同じ行を使う。
+- コマの表示時間は AnimData の値（1/60 秒単位）をそのまま持ち、ゲーム側でミリ秒に直す。
+- 作者一覧は各フォルダの `credits.txt` と `credit_names.txt` から `public/sprites/credits.json` に出力する。Discord の ID は連絡先として載せない。
+- 出力はすべて `.gitignore` 済み（3.2 の未決定事項のため）。スプライトが無い環境（公開版など）では、プレイヤーを仮の円で表示する。
+- 確認用に、URL に `?gallery` を付けると待機・歩きを8方向すべて並べて表示する。
+
+### 7.2 分かったこと
+- **ヒトカゲ（0004）の作者は `CHUNSOFT`、つまり公式ゲーム（ポケモン不思議のダンジョン）の素材そのものだった。** SpriteCollab の README によると、Chunsoft の公式スプライトは上書き・改変しない方針で収録されている。こうした公式素材には、SpriteCollab の CC BY-NC 4.0 は及ばないと考えられる。カントーの151匹を調べたところ（コミット f18cffd の `credits.txt`）、**151匹すべてに CHUNSOFT の素材が含まれ**、うち123匹は CHUNSOFT のみ、28匹は CHUNSOFT とコミュニティの作者の混在だった。生成スクリプトは公式素材を含むポケモンを報告に出す（`official`）。扱い方は作者の判断が必要（`06_roadmap.md` 未決定事項9）。

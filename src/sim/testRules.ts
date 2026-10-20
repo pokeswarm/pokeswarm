@@ -25,6 +25,7 @@ export function testRules(overrides: { spawn?: Partial<SimRules['spawn']>; attac
       projectileRadius: 5,
       projectileLifetimeSeconds: 1.2,
       maxProjectiles: 128,
+      effect: 'test',
       ...overrides.attack,
     },
   };

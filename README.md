@@ -53,6 +53,18 @@ npm run dev
 
 スプライトは `npm run sprites` で取得したときだけ表示されます（取得していなければ仮の円）。
 
+## Firebase の準備（ログイン・セーブ・協力プレイ）
+
+1. `.env.example` を `.env.local` にコピーし、Firebase の Web アプリの設定値を入れる（`.env.local` はコミットしない）
+2. Firebase コンソールで:
+   - Authentication → Sign-in method: 「匿名」と「Google」を有効にする
+   - Authentication → 設定 → 承認済みドメイン: 公開先（`pokeswarm.pokeswarm-dev.workers.dev` など）を追加
+   - Firestore Database を作成し（場所は asia-northeast1）、ルールに `firestore.rules` の内容を貼り付けて公開する
+   - Realtime Database のルールに `database.rules.json` の内容を貼り付けて公開する（協力プレイ用）
+3. `npm run dev` を起動し直す
+
+設定値が無ければ「オフライン」になり、記録はそのブラウザだけに保存されます。
+
 ## 2人の協力プレイ（技術検証版）
 
 1. `.env.example` を `.env.local` にコピーし、Firebase の Web アプリの設定値を入れる（`.env.local` はコミットしない）

@@ -101,5 +101,20 @@
   "result.moves": "技　{moves}",
   "result.retry": "もう一度（R / Enter）",
   "result.toTitle": "タイトルへ（T / Esc）",
-  "title.name": "PokéSwarm"
+  "title.name": "PokéSwarm",
+  "account.status.offline": "オフライン（記録はこのブラウザだけに保存）",
+  "account.status.connecting": "接続しています…",
+  "account.status.guest": "ゲストで遊んでいます（Google でログインすると、ほかの PC でも続きを遊べます）",
+  "account.status.google": "Google でログインしています",
+  "account.status.error": "接続できませんでした（記録はこのブラウザだけに保存）",
+  "account.signIn": "Google でログイン",
+  "account.signOut": "ログアウト",
+  "account.error": "エラー: {message}",
+  "account.record": "ラン {runs} 回　クリア {clears} 回　倒した数 {kills}　コイン {coins}",
+  "account.chooseTitle": "データが2つあります。残す方を選んでください",
+  "account.chooseHint": "選ばなかった方のデータは使えなくなります",
+  "account.guestData": "いま遊んでいたゲストのデータ",
+  "account.googleData": "Google アカウントのデータ",
+  "account.updatedAt": "最後に遊んだ日時: {date}",
+  "account.loadFailed": "セーブデータを読み込めませんでした（Firestore の準備ができていないか、通信できません）"
 }

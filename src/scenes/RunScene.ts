@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { effectRecipes, generated, networkConfig, placeholderRender, playerConfig, simulationConfig, spriteRender, stageConfig } from '../data';
+import { effectRecipes, generated, networkConfig, placeholderRender, playerConfig, saveConfig, simulationConfig, spriteRender, stageConfig } from '../data';
 import { buildSimRules, localName, playableLoadout } from '../data/simRules';
 import type { SpriteAnims } from '../data/schema';
 import { getLocale, t } from '../i18n';
@@ -23,7 +23,9 @@ import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole } from '../sim/world';
 import { applyDebugOverrides, parseLevelParam, parseMovesParam, parseTimeParam } from './debugOverrides';
 import { addXp } from '../sim/systems/leveling';
-import { Discoveries } from '../meta/discoveries';
+import { addDiscovery } from '../meta/discoveries';
+import { RunRecorder } from '../meta/runRecorder';
+import { session } from '../meta/session';
 import { LevelUpPanel, offerText } from './levelUpPanel';
 import type { NetPanel } from './netPanel';
 import { formatTime, type ResultSceneData } from './ResultScene';
@@ -83,7 +85,9 @@ export class RunScene extends Phaser.Scene {
   /** 最後に描画のタイミングが来た時刻 */
   private lastFrameAt = 0;
   private levelUpPanel!: LevelUpPanel;
-  private readonly discoveries = new Discoveries();
+  /** ラン中の記録（撃破数など）をセーブデータに足す */
+  private recorder!: RunRecorder;
+  private runRecorded = false;
   /** 画面の操作（レベルアップの選択など）から作ったコマンド。次の更新で渡す */
   private uiCommands: InputCommand[] = [];
   /** ボスの範囲技の予告 */
@@ -116,6 +120,7 @@ export class RunScene extends Phaser.Scene {
     this.hiddenTimer = null;
     this.bossId = null;
     this.resultAt = null;
+    this.runRecorded = false;
     this.showDebug = new URLSearchParams(window.location.search).has('debug');
     this.playerSprite = data.playerSprite;
     this.pokemon = data.pokemon;
@@ -232,6 +237,7 @@ export class RunScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.scale.off('resize', this.applyZoom, this));
     // 時計を作った後で始める
     if (this.net) this.keepRunningWhenHidden();
+    this.setupSaving();
   }
 
   private setupNet(net: RoomConnection): void {
@@ -252,7 +258,39 @@ export class RunScene extends Phaser.Scene {
     this.draw(this.clock.alpha, delta, time);
     // タブが裏にあって終わりの知らせを描画で受け取れなかった場合も、結果画面へ移る
     if (this.sim.world.outcome && this.resultAt === null) this.resultAt = performance.now() + stageConfig.endDelaySeconds * 1000;
+    if (this.sim.world.outcome && !this.runRecorded) this.recordRunEnd();
     if (this.resultAt !== null && performance.now() >= this.resultAt) this.showResult();
+  }
+
+  /**
+   * 記録の保存: ラン中は数分ごとに記録を足して Firestore へ書き、ラン終了時にまとめて書く。
+   * タブが裏に回ったら、ブラウザへの一時保存と Firestore への書き込みをしておく
+   */
+  private setupSaving(): void {
+    this.recorder = new RunRecorder(session.store, this.pokemon);
+    const autosave = this.time.addEvent({
+      delay: saveConfig.autosaveSeconds * 1000,
+      loop: true,
+      callback: () => {
+        this.recorder.commit(this.sim.world);
+        void session.store.flush();
+      },
+    });
+    const onHidden = (): void => {
+      if (document.visibilityState === 'hidden') this.recorder.commit(this.sim.world);
+    };
+    document.addEventListener('visibilitychange', onHidden);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      autosave.remove();
+      document.removeEventListener('visibilitychange', onHidden);
+    });
+  }
+
+  /** ランが終わった: 記録をまとめてセーブデータに足し、保存する */
+  private recordRunEnd(): void {
+    this.runRecorded = true;
+    this.recorder.finish(this.sim.world);
+    void session.store.flush();
   }
 
   /** 結果画面へ移る */
@@ -375,7 +413,7 @@ export class RunScene extends Phaser.Scene {
           if (ev.type === 'evolved') this.onEvolved(ev.playerId, ev.to);
           // 派生・固有技を達成したら記録する（次からの「進化できる！」の表示に使う）
           if (ev.type === 'upgradeChosen' && ev.playerId === this.localId && ev.offer.kind === 'derive') {
-            this.discoveries.add(this.sim.world.rules.moves[ev.offer.to]!.key);
+            addDiscovery(session.store, this.sim.world.rules.moves[ev.offer.to]!.key);
           }
         }
       }
@@ -509,7 +547,7 @@ export class RunScene extends Phaser.Scene {
 
     const lu = world.levelUp;
     if (lu && !lu.done.has(this.localId) && !world.outcome) {
-      const offers = (lu.offers.get(this.localId) ?? []).map((o) => offerText(world, local, o, this.discoveries.all));
+      const offers = (lu.offers.get(this.localId) ?? []).map((o) => offerText(world, local, o, new Set(session.store.current.discoveries)));
       this.levelUpPanel.show(lu.level, offers, local.rerolls, Math.ceil(lu.ticksLeft * world.dt));
     } else {
       this.levelUpPanel.hide();

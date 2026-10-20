@@ -101,5 +101,20 @@
   "result.moves": "Moves　{moves}",
   "result.retry": "Retry (R / Enter)",
   "result.toTitle": "Title (T / Esc)",
-  "title.name": "PokéSwarm"
+  "title.name": "PokéSwarm",
+  "account.status.offline": "Offline (progress is saved in this browser only)",
+  "account.status.connecting": "Connecting...",
+  "account.status.guest": "Playing as a guest (sign in with Google to continue on other PCs)",
+  "account.status.google": "Signed in with Google",
+  "account.status.error": "Could not connect (progress is saved in this browser only)",
+  "account.signIn": "Sign in with Google",
+  "account.signOut": "Sign out",
+  "account.error": "Error: {message}",
+  "account.record": "Runs {runs}　Clears {clears}　Defeated {kills}　Coins {coins}",
+  "account.chooseTitle": "There are two saves. Choose the one to keep",
+  "account.chooseHint": "The other save will no longer be available",
+  "account.guestData": "The guest save you were just playing",
+  "account.googleData": "The save on your Google account",
+  "account.updatedAt": "Last played: {date}",
+  "account.loadFailed": "Could not load your save (Firestore is not ready or unreachable)"
 }

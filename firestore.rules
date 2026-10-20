@@ -1,0 +1,11 @@
+rules_version = '2';
+
+// Firestore のセキュリティルール（Firebase コンソール → Firestore Database → ルール に貼り付ける）。
+// セーブデータは本人だけが読み書きできる。ほかは誰も読み書きできない。
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /saves/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}

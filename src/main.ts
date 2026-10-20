@@ -8,6 +8,8 @@ import { ResultScene } from './scenes/ResultScene';
 import { RunScene, type RunSceneData } from './scenes/RunScene';
 import { SelectScene } from './scenes/SelectScene';
 import { TitleScene } from './scenes/TitleScene';
+import { migrateOldDiscoveries } from './meta/discoveries';
+import { session } from './meta/session';
 
 /**
  * 協力プレイ（技術検証用）の入り口:
@@ -59,12 +61,16 @@ async function connectIfRequested(panel: NetPanel): Promise<RoomConnection | nul
  * 確認用に ?pokemon=bulbasaur を付けるか、協力プレイ（?host・?join=）のときは、すぐにランを始める。
  */
 async function start(): Promise<void> {
+  // ログインとセーブデータの読み込みは待たずに始める（タイトル画面に状態を出す）
+  const sessionReady = session.start().then(() => migrateOldDiscoveries(session.store));
   const panel = new NetPanel();
   panel.hide();
   const q = new URLSearchParams(window.location.search);
   const direct = q.has('pokemon') || q.has('host') || q.has('join');
   let data: RunSceneData | null = null;
   if (direct) {
+    // 協力プレイの接続は同じログインを使うので、ログインを待ってから（匿名ログインを2回しないため）
+    await sessionReady;
     // 雑魚のスプライトは起動時には読まず、時間帯に合わせて読む（SpriteStreamer）
     const requested = q.get('pokemon') ?? '';
     const pokemon = playablesConfig.pokemon[requested] ? requested : playablesConfig.default;

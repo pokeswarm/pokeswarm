@@ -139,6 +139,14 @@ export const spawnConfigSchema = z
   });
 export type SpawnConfig = z.infer<typeof spawnConfigSchema>;
 
+// ---- セーブ ----
+
+export const saveConfigSchema = z.object({
+  /** ラン中に Firestore へ保存する間隔（書き込み回数を抑えるため、まとめて保存する） */
+  autosaveSeconds: z.number().positive(),
+});
+export type SaveConfig = z.infer<typeof saveConfigSchema>;
+
 // ---- ステージ（ランの長さ・中ボス・ボス） ----
 
 /**

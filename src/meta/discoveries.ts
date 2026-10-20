@@ -1,37 +1,27 @@
-const STORAGE_KEY = 'pokeswarm.discoveredDerivations';
+import type { SaveStore } from './saveStore';
+
+/** セーブデータができる前に、ブラウザに仮に保存していた場所 */
+const OLD_KEY = 'pokeswarm.discoveredDerivations';
 
 /**
- * 一度でも達成した派生（固有技を含む）の記録。派生先の技のキー（PokeAPI の名前）で持つ。
- * 選択画面の「進化できる！」は、ここに記録された派生だけに出す。
- * セーブデータ（フェーズ2）ができるまでは、ブラウザに仮に保存する（消えても遊べる）。
+ * 派生（固有技を含む）を達成したことを記録する。派生先の技のキー（PokeAPI の名前）で持つ。
+ * 選択画面の「おや……？」は、ここに記録された派生だけに出す。
  */
-export class Discoveries {
-  private readonly set: Set<string>;
+export function addDiscovery(store: SaveStore, moveKey: string): void {
+  if (store.current.discoveries.includes(moveKey)) return;
+  store.update((d) => {
+    d.discoveries.push(moveKey);
+  });
+}
 
-  constructor() {
-    this.set = new Set(Discoveries.read());
-  }
-
-  get all(): ReadonlySet<string> {
-    return this.set;
-  }
-
-  add(moveKey: string): void {
-    if (this.set.has(moveKey)) return;
-    this.set.add(moveKey);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([...this.set]));
-    } catch {
-      // 保存できない環境（プライベートブラウズなど）では、このラン中だけ覚えておく
-    }
-  }
-
-  private static read(): string[] {
-    try {
-      const v: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
-      return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
-    } catch {
-      return [];
-    }
+/** 以前ブラウザに仮に保存していた記録を、セーブデータへ移す（1回だけ） */
+export function migrateOldDiscoveries(store: SaveStore): void {
+  try {
+    const raw: unknown = JSON.parse(localStorage.getItem(OLD_KEY) ?? 'null');
+    if (!Array.isArray(raw)) return;
+    for (const key of raw) if (typeof key === 'string') addDiscovery(store, key);
+    localStorage.removeItem(OLD_KEY);
+  } catch {
+    // 読めなければ移さない（消えても遊べる記録）
   }
 }

@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { t } from '../i18n';
+import { AccountPanel } from './accountPanel';
 
-/** タイトル画面（見た目の作り込みはフェーズ4）。Enter かクリックでポケモン選択へ */
+/** タイトル画面（見た目の作り込みはフェーズ4）。Enter かクリックでポケモン選択へ。下にログインの状態と記録を出す */
 export class TitleScene extends Phaser.Scene {
   constructor() {
     super('title');
@@ -20,7 +21,11 @@ export class TitleScene extends Phaser.Scene {
     };
     layout();
     this.scale.on('resize', layout);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.scale.off('resize', layout));
+    const account = new AccountPanel();
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.scale.off('resize', layout);
+      account.destroy();
+    });
     const go = (): void => {
       this.scene.start('select');
     };

@@ -24,6 +24,46 @@
       }
     ]
   },
+  "articuno": {
+    "dex": 144,
+    "names": {
+      "ja": "フリーザー",
+      "en": "Articuno"
+    },
+    "types": [
+      "ice",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 85,
+      "defense": 100,
+      "specialAttack": 95,
+      "specialDefense": 125,
+      "speed": 85
+    },
+    "evolvesTo": []
+  },
+  "beedrill": {
+    "dex": 15,
+    "names": {
+      "ja": "スピアー",
+      "en": "Beedrill"
+    },
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 90,
+      "defense": 40,
+      "specialAttack": 45,
+      "specialDefense": 80,
+      "speed": 75
+    },
+    "evolvesTo": []
+  },
   "blastoise": {
     "dex": 9,
     "names": {
@@ -239,6 +279,26 @@
       }
     ]
   },
+  "dragonite": {
+    "dex": 149,
+    "names": {
+      "ja": "カイリュー",
+      "en": "Dragonite"
+    },
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 91,
+      "attack": 134,
+      "defense": 95,
+      "specialAttack": 100,
+      "specialDefense": 100,
+      "speed": 80
+    },
+    "evolvesTo": []
+  },
   "eevee": {
     "dex": 133,
     "names": {
@@ -294,6 +354,26 @@
       }
     ]
   },
+  "exeggutor": {
+    "dex": 103,
+    "names": {
+      "ja": "ナッシー",
+      "en": "Exeggutor"
+    },
+    "types": [
+      "grass",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 95,
+      "defense": 85,
+      "specialAttack": 125,
+      "specialDefense": 75,
+      "speed": 55
+    },
+    "evolvesTo": []
+  },
   "flareon": {
     "dex": 136,
     "names": {
@@ -338,6 +418,26 @@
         "level": 25
       }
     ]
+  },
+  "gengar": {
+    "dex": 94,
+    "names": {
+      "ja": "ゲンガー",
+      "en": "Gengar"
+    },
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 65,
+      "defense": 60,
+      "specialAttack": 130,
+      "specialDefense": 75,
+      "speed": 110
+    },
+    "evolvesTo": []
   },
   "geodude": {
     "dex": 74,
@@ -606,6 +706,25 @@
     },
     "evolvesTo": []
   },
+  "machamp": {
+    "dex": 68,
+    "names": {
+      "ja": "カイリキー",
+      "en": "Machamp"
+    },
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 130,
+      "defense": 80,
+      "specialAttack": 65,
+      "specialDefense": 85,
+      "speed": 55
+    },
+    "evolvesTo": []
+  },
   "machoke": {
     "dex": 67,
     "names": {
@@ -735,6 +854,64 @@
       }
     ]
   },
+  "mew": {
+    "dex": 151,
+    "names": {
+      "ja": "ミュウ",
+      "en": "Mew"
+    },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 100,
+      "defense": 100,
+      "specialAttack": 100,
+      "specialDefense": 100,
+      "speed": 100
+    },
+    "evolvesTo": []
+  },
+  "mewtwo": {
+    "dex": 150,
+    "names": {
+      "ja": "ミュウツー",
+      "en": "Mewtwo"
+    },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 106,
+      "attack": 110,
+      "defense": 90,
+      "specialAttack": 154,
+      "specialDefense": 90,
+      "speed": 130
+    },
+    "evolvesTo": []
+  },
+  "moltres": {
+    "dex": 146,
+    "names": {
+      "ja": "ファイヤー",
+      "en": "Moltres"
+    },
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 100,
+      "defense": 90,
+      "specialAttack": 125,
+      "specialDefense": 85,
+      "speed": 90
+    },
+    "evolvesTo": []
+  },
   "oddish": {
     "dex": 43,
     "names": {
@@ -863,6 +1040,25 @@
       }
     ]
   },
+  "raichu": {
+    "dex": 26,
+    "names": {
+      "ja": "ライチュウ",
+      "en": "Raichu"
+    },
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 90,
+      "defense": 55,
+      "specialAttack": 90,
+      "specialDefense": 80,
+      "speed": 110
+    },
+    "evolvesTo": []
+  },
   "raticate": {
     "dex": 20,
     "names": {
@@ -904,6 +1100,31 @@
         "to": "raticate",
         "trigger": "level",
         "level": 20
+      }
+    ]
+  },
+  "rhydon": {
+    "dex": 112,
+    "names": {
+      "ja": "サイドン",
+      "en": "Rhydon"
+    },
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "attack": 130,
+      "defense": 120,
+      "specialAttack": 45,
+      "specialDefense": 45,
+      "speed": 40
+    },
+    "evolvesTo": [
+      {
+        "to": "rhyperior",
+        "trigger": "trade"
       }
     ]
   },
@@ -1192,6 +1413,26 @@
         "level": 7
       }
     ]
+  },
+  "zapdos": {
+    "dex": 145,
+    "names": {
+      "ja": "サンダー",
+      "en": "Zapdos"
+    },
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 90,
+      "defense": 85,
+      "specialAttack": 125,
+      "specialDefense": 90,
+      "speed": 100
+    },
+    "evolvesTo": []
   },
   "zubat": {
     "dex": 41,

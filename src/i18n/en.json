@@ -82,7 +82,6 @@
   "select.hint": "Press a number key or click to choose. Esc: back to title",
   "select.startingMove": "First move: {move}",
   "run.timer": "{time} / {limit}",
-  "run.bossTime": "Boss battle {time}",
   "run.midbossAppeared": "A wild {name} appeared!",
   "run.bossAppeared": "The boss {name} appeared!",
   "run.clear": "Run clear!",
@@ -220,5 +219,14 @@
   "title.achievements": "Press A for achievements",
   "result.newAchievements": "New achievements: {list}",
   "result.newUnlocks": "Newly unlocked: {list}",
-  "run.achievement": "Achievement: {name}"
+  "run.achievement": "Achievement: {name}",
+  "run.danger": "DANGER",
+  "run.legendTime": "Legendary {time} left",
+  "swarm.rush": "A swarm of {name} is charging in!",
+  "swarm.encircle": "Surrounded by {name}!",
+  "result.legendary.won": "You defeated the legendary {name}!",
+  "result.legendary.lost": "Defeated by the legendary {name} (your clear still counts)",
+  "result.legendary.timeUp": "The legendary {name} got away (your clear still counts)",
+  "achievement.first-legendary.name": "A Legendary Encounter",
+  "achievement.first-legendary.desc": "Defeat a legendary Pokémon that appears after a clear"
 }

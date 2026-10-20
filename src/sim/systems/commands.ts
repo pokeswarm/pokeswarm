@@ -41,7 +41,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         // 接触ダメージは自分の今の時間帯の倍率で（自分が受けるダメージは自分のブラウザで判定するため）
         const wave = world.waves[currentWaveIndex(world)]!;
         const boss = (kind.rank ?? 'normal') !== 'normal';
-        e.add(cmd.id, cmd.kind, cmd.x, cmd.y, kind.hp, kind.moveSpeed, kind.radius, kind.contactDamage * (boss ? 1 : wave.damageMultiplier));
+        e.add(cmd.id, cmd.kind, cmd.x, cmd.y, kind.hp, kind.moveSpeed, kind.radius, kind.contactDamage * (boss ? 1 : wave.damageMultiplier), cmd.vx ?? 0, cmd.vy ?? 0);
         if (boss) world.events.push({ type: 'bossAppeared', id: cmd.id, kind: cmd.kind });
         break;
       }
@@ -120,18 +120,33 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         break;
       }
       case 'addHazard':
-        if (world.role === 'guest') addHazard(world, cmd.x, cmd.y);
+        if (world.role === 'guest') addHazard(world, cmd.move, cmd.x, cmd.y, cmd.dirX, cmd.dirY, cmd.dasher);
         break;
       case 'bossHp': {
         const i = findEnemyIndex(world, cmd.id);
         if (i !== -1 && e.hp[i]! > 0) {
           e.hp[i] = Math.max(1, cmd.hp);
           e.maxHp[i] = cmd.maxHp;
+          if (cmd.x !== undefined && cmd.y !== undefined) {
+            e.x[i] = cmd.x;
+            e.y[i] = cmd.y;
+          }
         }
         break;
       }
       case 'endRun':
-        if (world.role === 'guest') endRun(world, cmd.outcome);
+        if (world.role === 'guest') {
+          if (cmd.legendary) world.legendary = { kind: cmd.legendary.kind, appearTick: 0, endTick: 0, spawned: true, result: cmd.legendary.result };
+          endRun(world, cmd.outcome);
+        }
+        break;
+      case 'legendaryWarning':
+        if (world.role === 'guest' && !world.legendary) {
+          world.legendary = { kind: cmd.kind, appearTick: 0, endTick: 0, spawned: false, result: null };
+          world.cleared = true;
+          world.hazards.length = 0;
+          world.events.push({ type: 'legendaryWarning', kind: cmd.kind });
+        }
         break;
       case 'revivePlayer':
         if (world.role === 'guest') applyRevive(world, cmd.playerId, cmd.revives);

@@ -1,0 +1,32 @@
+{
+  "key": "enemy/mewtwo",
+  "dex": 150,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 48,
+      "frameHeight": 56,
+      "durations": [
+        12,
+        6,
+        6,
+        12,
+        6,
+        6
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

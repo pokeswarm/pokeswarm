@@ -43,16 +43,28 @@ export interface LevelUpState {
 /** ランの結果（disconnected: ホストとの接続が切れて終わった） */
 export type RunOutcome = 'clear' | 'fail' | 'disconnected';
 
+/** 伝説戦の結果（won 倒した・lost 全員倒れた・timeUp 逃げられた） */
+export type LegendaryResult = 'won' | 'lost' | 'timeUp';
+
 /** ボスの範囲技の予告中の範囲。ticksLeft が 0 になったときに中にいたらダメージを受ける */
 export interface Hazard {
+  /** 技の番号（stage.moves の並び） */
+  readonly move: number;
+  readonly shape: 'circle' | 'line';
+  /** 円の中心・直線の始点 */
   readonly x: number;
   readonly y: number;
+  /** 円の半径・直線の幅の半分 */
   readonly radius: number;
+  /** 直線の向き（長さ1）と長さ */
+  readonly dirX: number;
+  readonly dirY: number;
+  readonly length: number;
+  /** 突進する敵（直線の技。落ちたときに線に沿って進む。-1 なら突進しない） */
+  readonly dasher: number;
   readonly damage: number;
   ticksLeft: number;
   readonly totalTicks: number;
-  /** 落ちたときの演出 */
-  readonly effect: string;
 }
 
 /** シミュレーションの全状態 */
@@ -111,10 +123,20 @@ export interface World {
   /** ランの結果。決まったらシミュレーションは進まない */
   outcome: RunOutcome | null;
   /** 中ボス・ボスを出す予定（更新回数の順）。nextBoss は次に出す予定の番号 */
-  readonly bossSchedule: readonly { readonly tick: number; readonly kind: number }[];
+  readonly bossSchedule: readonly BossEntry[];
   nextBoss: number;
-  /** 出ているボス（範囲技を使う rank: boss）と、次の技までの残り（ソロ・ホスト） */
-  readonly bosses: { id: number; cooldown: number }[];
+  /** 出ている、範囲技を使う敵（ボス・伝説）と、次の技までの残り・次に使う技（ソロ・ホスト） */
+  readonly bosses: { id: number; cooldown: number; interval: number; moves: readonly number[]; next: number }[];
+  /** クリアに必要で、まだ倒していない敵の種類（四天王）。最初の数は requiredTotal */
+  readonly requiredLeft: Set<number>;
+  readonly requiredTotal: number;
+  /** クリアが確定した（四天王を全員倒した）。伝説戦の間も true */
+  cleared: boolean;
+  /** 伝説戦（クリア後の乱入）。始まっていなければ null */
+  legendary: { kind: number; appearTick: number; endTick: number; spawned: boolean; result: LegendaryResult | null } | null;
+  /** スウォームイベントの予定（更新回数の順）と、次に出す番号 */
+  readonly swarmSchedule: readonly { readonly tick: number; readonly swarm: number }[];
+  nextSwarm: number;
   /** 予告中の範囲 */
   readonly hazards: Hazard[];
   /** 近傍検索の作業用（更新中にメモリを確保しないため） */
@@ -150,6 +172,12 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     bossSchedule: buildBossSchedule(rules, tickRate),
     nextBoss: 0,
     bosses: [],
+    requiredLeft: new Set(rules.stage.bosses.filter((b) => b.required).map((b) => kindIndexOf(rules, b.kind))),
+    requiredTotal: rules.stage.bosses.filter((b) => b.required).length,
+    cleared: false,
+    legendary: null,
+    swarmSchedule: buildSwarmSchedule(rules, tickRate),
+    nextSwarm: 0,
     hazards: [],
     level: 1,
     xpIntoLevel: 0,
@@ -188,10 +216,39 @@ function kindIndexOf(rules: SimRules, id: string): number {
   return i;
 }
 
-/** 中ボス（stage.midbosses）とボス（ランの長さの時点）を出す予定 */
-function buildBossSchedule(rules: SimRules, tickRate: number): { tick: number; kind: number }[] {
-  const out = rules.stage.midbosses.map((m) => ({ tick: Math.round(m.atSeconds * tickRate), kind: kindIndexOf(rules, m.kind) }));
-  if (rules.stage.boss) out.push({ tick: Math.round(rules.stage.durationSeconds * tickRate), kind: kindIndexOf(rules, rules.stage.boss.kind) });
+/** 中ボス・ボスを出す予定の1つ */
+export interface BossEntry {
+  readonly tick: number;
+  readonly kind: number;
+  /** 使う範囲技（stage.moves の番号）を順に使う */
+  readonly moves: readonly number[];
+  readonly interval: number;
+}
+
+export function moveIndexOfStage(rules: SimRules, id: string): number {
+  const i = rules.stage.moves.findIndex((m) => m.id === id);
+  if (i === -1) throw new Error(`範囲技 ${id} がありません`);
+  return i;
+}
+
+/** 中ボス・ボスを出す予定（stage.bosses） */
+function buildBossSchedule(rules: SimRules, tickRate: number): BossEntry[] {
+  return rules.stage.bosses
+    .map((b) => ({
+      tick: Math.round(b.atSeconds * tickRate),
+      kind: kindIndexOf(rules, b.kind),
+      moves: b.moves.map((id) => moveIndexOfStage(rules, id)),
+      interval: Math.round((b.moveIntervalSeconds ?? 4) * tickRate),
+    }))
+    .sort((a, b) => a.tick - b.tick);
+}
+
+/** スウォームイベントの予定（atSeconds から everySeconds ごと、untilSeconds まで） */
+function buildSwarmSchedule(rules: SimRules, tickRate: number): { tick: number; swarm: number }[] {
+  const out: { tick: number; swarm: number }[] = [];
+  rules.stage.swarms.forEach((s, swarm) => {
+    for (let at = s.atSeconds; at <= s.untilSeconds; at += s.everySeconds) out.push({ tick: Math.round(at * tickRate), swarm });
+  });
   return out.sort((a, b) => a.tick - b.tick);
 }
 

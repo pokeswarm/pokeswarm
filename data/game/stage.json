@@ -1,28 +1,191 @@
 {
-  "durationSeconds": 900,
-  "midbosses": [
+  "durationSeconds": 1200,
+  "bosses": [
     {
-      "atSeconds": 112,
+      "atSeconds": 120,
       "kind": "midboss-onix"
     },
     {
-      "atSeconds": 225,
+      "atSeconds": 240,
       "kind": "midboss-starmie"
+    },
+    {
+      "atSeconds": 360,
+      "kind": "midboss-raichu"
+    },
+    {
+      "atSeconds": 960,
+      "kind": "midboss-rhydon"
+    },
+    {
+      "atSeconds": 1020,
+      "kind": "boss-lapras",
+      "moves": [
+        "blizzard"
+      ],
+      "moveIntervalSeconds": 3.5,
+      "required": true
+    },
+    {
+      "atSeconds": 1050,
+      "kind": "boss-machamp",
+      "moves": [
+        "earthquake"
+      ],
+      "moveIntervalSeconds": 4,
+      "required": true
+    },
+    {
+      "atSeconds": 1080,
+      "kind": "boss-gengar",
+      "moves": [
+        "shadow-ball"
+      ],
+      "moveIntervalSeconds": 3,
+      "required": true
+    },
+    {
+      "atSeconds": 1110,
+      "kind": "boss-dragonite",
+      "moves": [
+        "draco-meteor"
+      ],
+      "moveIntervalSeconds": 4.5,
+      "required": true
     }
   ],
-  "boss": {
-    "kind": "boss-lapras",
-    "move": {
+  "moves": [
+    {
+      "id": "blizzard",
       "move": "blizzard",
       "effect": "blizzard",
-      "intervalSeconds": 3.5,
+      "shape": "circle",
+      "target": "player",
       "telegraphSeconds": 1.2,
       "radius": 90,
       "damage": 30,
       "count": 3,
       "spread": 160
+    },
+    {
+      "id": "earthquake",
+      "move": "earthquake",
+      "effect": "quake",
+      "shape": "circle",
+      "target": "self",
+      "telegraphSeconds": 1.5,
+      "radius": 260,
+      "damage": 35
+    },
+    {
+      "id": "shadow-ball",
+      "move": "shadow-ball",
+      "effect": "shadow",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 1,
+      "radius": 70,
+      "damage": 30,
+      "count": 2,
+      "spread": 120
+    },
+    {
+      "id": "draco-meteor",
+      "move": "draco-meteor",
+      "effect": "meteor",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 1.4,
+      "radius": 70,
+      "damage": 35,
+      "count": 6,
+      "spread": 260
+    },
+    {
+      "id": "legend-dash",
+      "effect": "beam",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 1,
+      "radius": 30,
+      "length": 500,
+      "damage": 40,
+      "dashSpeed": 700
+    },
+    {
+      "id": "legend-beam",
+      "move": "hyper-beam",
+      "effect": "beam",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 1.2,
+      "radius": 26,
+      "length": 900,
+      "damage": 45
+    },
+    {
+      "id": "legend-nova",
+      "move": "psychic",
+      "effect": "psy",
+      "shape": "circle",
+      "target": "self",
+      "telegraphSeconds": 1.4,
+      "radius": 280,
+      "damage": 40
+    },
+    {
+      "id": "legend-meteor",
+      "move": "ancient-power",
+      "effect": "meteor",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 1.4,
+      "radius": 80,
+      "damage": 35,
+      "count": 5,
+      "spread": 240
     }
+  ],
+  "legendary": {
+    "chance": 0.5,
+    "kinds": [
+      "legend-mewtwo",
+      "legend-mew",
+      "legend-articuno",
+      "legend-zapdos",
+      "legend-moltres"
+    ],
+    "moves": [
+      "legend-dash",
+      "legend-beam",
+      "legend-nova",
+      "legend-meteor"
+    ],
+    "moveIntervalSeconds": 2.5,
+    "warningSeconds": 3,
+    "timeLimitSeconds": 180
   },
+  "swarms": [
+    {
+      "atSeconds": 75,
+      "everySeconds": 150,
+      "untilSeconds": 1000,
+      "kind": "swarm-beedrill",
+      "pattern": "rush",
+      "count": 25,
+      "spacing": 22,
+      "speed": 300
+    },
+    {
+      "atSeconds": 150,
+      "everySeconds": 150,
+      "untilSeconds": 1000,
+      "kind": "swarm-exeggutor",
+      "pattern": "encircle",
+      "count": 18,
+      "radius": 520
+    }
+  ],
   "bossRules": {
     "knockbackMultiplier": 0,
     "stopStatusMultiplier": 0.25,

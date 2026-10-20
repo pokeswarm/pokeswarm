@@ -7,6 +7,14 @@
     "type": "flying",
     "damageClass": "special"
   },
+  "ancient-power": {
+    "names": {
+      "ja": "げんしのちから",
+      "en": "Ancient Power"
+    },
+    "type": "rock",
+    "damageClass": "special"
+  },
   "blast-burn": {
     "names": {
       "ja": "ブラストバーン",
@@ -39,10 +47,34 @@
     "type": "water",
     "damageClass": "special"
   },
+  "draco-meteor": {
+    "names": {
+      "ja": "りゅうせいぐん",
+      "en": "Draco Meteor"
+    },
+    "type": "dragon",
+    "damageClass": "special"
+  },
+  "earthquake": {
+    "names": {
+      "ja": "じしん",
+      "en": "Earthquake"
+    },
+    "type": "ground",
+    "damageClass": "physical"
+  },
   "ember": {
     "names": {
       "ja": "ひのこ",
       "en": "Ember"
+    },
+    "type": "fire",
+    "damageClass": "special"
+  },
+  "fire-blast": {
+    "names": {
+      "ja": "だいもんじ",
+      "en": "Fire Blast"
     },
     "type": "fire",
     "damageClass": "special"
@@ -103,6 +135,14 @@
     "type": "flying",
     "damageClass": "special"
   },
+  "hurricane": {
+    "names": {
+      "ja": "ぼうふう",
+      "en": "Hurricane"
+    },
+    "type": "flying",
+    "damageClass": "special"
+  },
   "hydro-cannon": {
     "names": {
       "ja": "ハイドロカノン",
@@ -151,6 +191,22 @@
     "type": "poison",
     "damageClass": "physical"
   },
+  "psychic": {
+    "names": {
+      "ja": "サイコキネシス",
+      "en": "Psychic"
+    },
+    "type": "psychic",
+    "damageClass": "special"
+  },
+  "psystrike": {
+    "names": {
+      "ja": "サイコブレイク",
+      "en": "Psystrike"
+    },
+    "type": "psychic",
+    "damageClass": "special"
+  },
   "quick-attack": {
     "names": {
       "ja": "でんこうせっか",
@@ -166,6 +222,14 @@
     },
     "type": "grass",
     "damageClass": "physical"
+  },
+  "shadow-ball": {
+    "names": {
+      "ja": "シャドーボール",
+      "en": "Shadow Ball"
+    },
+    "type": "ghost",
+    "damageClass": "special"
   },
   "sleep-powder": {
     "names": {
@@ -214,6 +278,14 @@
     },
     "type": "normal",
     "damageClass": "physical"
+  },
+  "thunder": {
+    "names": {
+      "ja": "かみなり",
+      "en": "Thunder"
+    },
+    "type": "electric",
+    "damageClass": "special"
   },
   "vine-whip": {
     "names": {

@@ -124,8 +124,10 @@ export function testRules(
     // 既定ではボスが出ない（ランが終わらない）
     stage: {
       durationSeconds: 100000,
-      midbosses: [],
-      boss: null,
+      bosses: [],
+      moves: [],
+      legendary: null,
+      swarms: [],
       bossRules: { knockbackMultiplier: 0, stopStatusMultiplier: 0.25, hpPerExtraPlayerPct: 50, spawnDistance: 300 },
       endDelaySeconds: 1,
       ...overrides.stage,

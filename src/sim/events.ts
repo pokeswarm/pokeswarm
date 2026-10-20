@@ -21,13 +21,15 @@ export interface ProjectileHitEvent {
   readonly move: number;
 }
 
-/** ホスト: 雑魚敵を出した（ゲストへ送る） */
+/** ホスト: 敵を出した（ゲストへ送る）。vx・vy はまっすぐ進む敵（スウォームの突進）の速度 */
 export interface EnemySpawnedEvent {
   readonly type: 'enemySpawned';
   readonly id: number;
   readonly kind: number;
   readonly x: number;
   readonly y: number;
+  readonly vx?: number;
+  readonly vy?: number;
 }
 
 /** 命中で付いた効果（ノックバック・状態異常）。status が -1 なら状態異常なし */
@@ -142,9 +144,14 @@ export interface BossAppearedEvent {
 /** ボスの範囲技の予告が始まった */
 export interface HazardTelegraphedEvent {
   readonly type: 'hazardTelegraphed';
+  /** stage.moves の番号 */
+  readonly move: number;
   readonly x: number;
   readonly y: number;
-  readonly radius: number;
+  readonly dirX: number;
+  readonly dirY: number;
+  /** 突進する敵の id（無ければ -1） */
+  readonly dasher: number;
 }
 
 /** ボスの範囲技が落ちた（演出用） */
@@ -154,6 +161,22 @@ export interface HazardStruckEvent {
   readonly y: number;
   readonly radius: number;
   readonly effect: string;
+  readonly shape: 'circle' | 'line';
+  readonly dirX: number;
+  readonly dirY: number;
+  readonly length: number;
+}
+
+/** スウォームイベントが始まった（swarm は stage.swarms の番号） */
+export interface SwarmStartedEvent {
+  readonly type: 'swarmStarted';
+  readonly swarm: number;
+}
+
+/** 四天王を全員倒し、伝説が乱入してくる（「DANGER」） */
+export interface LegendaryWarningEvent {
+  readonly type: 'legendaryWarning';
+  readonly kind: number;
 }
 
 /** プレイヤーが抜けた（切断） */
@@ -166,6 +189,8 @@ export interface PlayerLeftEvent {
 export interface RunEndedEvent {
   readonly type: 'runEnded';
   readonly outcome: 'clear' | 'fail' | 'disconnected';
+  /** 伝説戦があれば、その伝説（敵の種類の番号）と結果 */
+  readonly legendary: { readonly kind: number; readonly result: 'won' | 'lost' | 'timeUp' | null } | null;
 }
 
 export type SimEvent =
@@ -189,4 +214,6 @@ export type SimEvent =
   | HazardTelegraphedEvent
   | HazardStruckEvent
   | RunEndedEvent
-  | PlayerLeftEvent;
+  | PlayerLeftEvent
+  | SwarmStartedEvent
+  | LegendaryWarningEvent;

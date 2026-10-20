@@ -116,15 +116,26 @@ for (const wave of spawnConfig.waves) {
     check((enemiesConfig.kinds.find((k) => k.id === id)?.rank ?? 'normal') === 'normal', `data/game/spawn.json の waves の "${id}" は雑魚（rank: normal）ではありません`);
   }
 }
-for (const m of stageConfig.midbosses) {
-  check(enemiesConfig.kinds.find((k) => k.id === m.kind)?.rank === 'midboss', `data/game/stage.json の中ボス "${m.kind}" が data/game/enemies.json に rank: "midboss" でありません`);
-  check(m.atSeconds < stageConfig.durationSeconds, `data/game/stage.json の中ボス "${m.kind}" の atSeconds は durationSeconds より前にする`);
+const stageMoveIds = new Set(stageConfig.moves.map((m) => m.id));
+for (const m of stageConfig.moves) {
+  check(!m.move || !!generated.moves[m.move], `data/game/stage.json の範囲技 "${m.id}" の技 "${m.move}" が data/generated/moves.json にありません`);
+  check(!!effectRecipes[m.effect], `data/game/stage.json の範囲技 "${m.id}" の effect "${m.effect}" のレシピがありません`);
+  check(m.shape !== 'line' || !!m.length, `data/game/stage.json の範囲技 "${m.id}" は直線なので length が必要です`);
 }
-if (stageConfig.boss) {
-  const b = stageConfig.boss;
-  check(enemiesConfig.kinds.find((k) => k.id === b.kind)?.rank === 'boss', `data/game/stage.json のボス "${b.kind}" が data/game/enemies.json に rank: "boss" でありません`);
-  check(!!generated.moves[b.move.move], `data/game/stage.json のボスの技 "${b.move.move}" が data/generated/moves.json にありません`);
-  check(!!effectRecipes[b.move.effect], `data/game/stage.json のボスの技の effect "${b.move.effect}" のレシピがありません`);
+for (const b of stageConfig.bosses) {
+  const rank = enemiesConfig.kinds.find((k) => k.id === b.kind)?.rank;
+  check(rank === 'midboss' || rank === 'boss', `data/game/stage.json の "${b.kind}" が data/game/enemies.json に rank: "midboss" か "boss" でありません`);
+  check(b.atSeconds < stageConfig.durationSeconds, `data/game/stage.json の "${b.kind}" の atSeconds は durationSeconds より前にする`);
+  for (const id of b.moves) check(stageMoveIds.has(id), `data/game/stage.json の "${b.kind}" の範囲技 "${id}" がありません`);
+}
+if (stageConfig.legendary) {
+  for (const id of stageConfig.legendary.kinds) {
+    check(enemiesConfig.kinds.find((k) => k.id === id)?.rank === 'legendary', `data/game/stage.json の伝説 "${id}" が data/game/enemies.json に rank: "legendary" でありません`);
+  }
+  for (const id of stageConfig.legendary.moves) check(stageMoveIds.has(id), `data/game/stage.json の伝説の範囲技 "${id}" がありません`);
+}
+for (const s of stageConfig.swarms) {
+  check(enemiesConfig.kinds.some((k) => k.id === s.kind), `data/game/stage.json のスウォーム "${s.kind}" が data/game/enemies.json にありません`);
 }
 for (const [key, def] of Object.entries(movesConfig.moves)) {
   check(!!generated.moves[key], `data/game/moves.json の "${key}" が data/generated/moves.json にありません（data/pokeapi/targets.json に足して npm run pokeapi）`);

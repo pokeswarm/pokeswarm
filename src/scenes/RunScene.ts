@@ -130,6 +130,7 @@ export class RunScene extends Phaser.Scene {
     this.runRecorded = false;
     this.newAchievements = [];
     this.newUnlocks = [];
+    this.legendaryResult = null;
     this.showDebug = new URLSearchParams(window.location.search).has('debug');
     this.playerSprite = data.playerSprite;
     this.pokemon = data.pokemon;
@@ -196,6 +197,7 @@ export class RunScene extends Phaser.Scene {
       const w = this.sim.world;
       w.tick = Math.round(startTime * simulationConfig.tickRate);
       while (w.nextBoss < w.bossSchedule.length && w.bossSchedule[w.nextBoss]!.tick < w.tick) w.nextBoss++;
+      while (w.nextSwarm < w.swarmSchedule.length && w.swarmSchedule[w.nextSwarm]!.tick < w.tick) w.nextSwarm++;
     }
     if (this.coop) this.setupNet(this.coop.room);
 
@@ -366,6 +368,14 @@ export class RunScene extends Phaser.Scene {
     void session.store.flush();
   }
 
+  /** 伝説戦の結果（結果画面に出す） */
+  private legendaryResult: { kind: number; result: 'won' | 'lost' | 'timeUp' | null } | null = null;
+
+  private enemyName(kind: number): string {
+    const k = this.sim.world.rules.enemies.kinds[kind];
+    return k ? localName(generated.pokemon[k.species ?? k.id]?.names, getLocale(), k.id) : '';
+  }
+
   /** このランで新しく達成した実績・解放したポケモン（結果画面に出す） */
   private newAchievements: string[] = [];
   private newUnlocks: string[] = [];
@@ -397,6 +407,9 @@ export class RunScene extends Phaser.Scene {
         }),
         newAchievements: this.newAchievements.map((id) => tMaybe(`achievement.${id}.name`)),
         newUnlocks: this.newUnlocks.map((key) => localName(generated.pokemon[key]?.names, getLocale(), key)),
+        legendary: this.legendaryResult?.result
+          ? { name: this.enemyName(this.legendaryResult.kind), result: this.legendaryResult.result }
+          : null,
       },
       // 協力プレイはもう一度を出さない（部屋を作り直す必要がある）
       retry: this.coop ? null : { ...this.runData },
@@ -446,11 +459,26 @@ export class RunScene extends Phaser.Scene {
         this.playerViews.delete(ev.playerId);
         this.announce(t('net.playerLeft', { n: ev.playerId }), '#ef9a9a');
       } else if (ev.type === 'hazardStruck') {
-        this.effects.playImpact(ev.effect, ev.x, ev.y);
+        if (ev.shape === 'line') {
+          // 直線は、線に沿っていくつか演出を出す
+          for (let d = 0; d <= ev.length; d += Math.max(60, ev.length / 6)) this.effects.playImpact(ev.effect, ev.x + ev.dirX * d, ev.y + ev.dirY * d);
+        } else {
+          this.effects.playImpact(ev.effect, ev.x, ev.y);
+        }
+      } else if (ev.type === 'legendaryWarning') {
+        // 伝説の乱入（01_game_design.md 7.1 の「DANGER」）
+        this.tweens.killTweensOf(this.announceText);
+        this.announceText.setText(t('run.danger')).setColor('#ff5252').setAlpha(1);
+        this.tweens.add({ targets: this.announceText, alpha: 0.2, duration: 250, yoyo: true, repeat: 5, onComplete: () => this.announceText.setAlpha(0) });
+        this.cameras.main.shake(600, 0.006);
+      } else if (ev.type === 'swarmStarted') {
+        const s = w.rules.stage.swarms[ev.swarm];
+        if (s) this.announce(tMaybe(`swarm.${s.pattern}`, { name: localName(generated.pokemon[s.kind.replace(/^swarm-/, '')]?.names, getLocale(), s.kind) }), '#ffcc80');
       } else if (ev.type === 'runEnded') {
         const clear = ev.outcome === 'clear';
         this.tweens.killTweensOf(this.announceText);
         this.announceText.setText(t(`run.${ev.outcome}`)).setColor(clear ? '#ffe082' : '#ef9a9a').setAlpha(1);
+        this.legendaryResult = ev.legendary;
         this.resultAt = performance.now() + stageConfig.endDelaySeconds * 1000;
       }
     }
@@ -462,6 +490,21 @@ export class RunScene extends Phaser.Scene {
     g.clear();
     for (const h of hazards) {
       const progress = 1 - h.ticksLeft / h.totalTicks;
+      if (h.shape === 'line') {
+        // 直線: 幅 radius*2 の帯。落ちるまでの残りは、始点から伸びる帯で見せる
+        const nx = -h.dirY * h.radius;
+        const ny = h.dirX * h.radius;
+        const band = (len: number): Phaser.Math.Vector2[] => [
+          new Phaser.Math.Vector2(h.x + nx, h.y + ny),
+          new Phaser.Math.Vector2(h.x + nx + h.dirX * len, h.y + ny + h.dirY * len),
+          new Phaser.Math.Vector2(h.x - nx + h.dirX * len, h.y - ny + h.dirY * len),
+          new Phaser.Math.Vector2(h.x - nx, h.y - ny),
+        ];
+        g.fillStyle(0xff1744, 0.12).fillPoints(band(h.length), true);
+        g.fillStyle(0xff1744, 0.25).fillPoints(band(h.length * progress), true);
+        g.lineStyle(2, 0xff5252, 0.9).strokePoints(band(h.length), true);
+        continue;
+      }
       g.fillStyle(0xff1744, 0.12).fillCircle(h.x, h.y, h.radius);
       g.fillStyle(0xff1744, 0.25).fillCircle(h.x, h.y, h.radius * progress);
       g.lineStyle(2, 0xff5252, 0.9).strokeCircle(h.x, h.y, h.radius);
@@ -480,7 +523,10 @@ export class RunScene extends Phaser.Scene {
     this.placeUi(this.bossBar, 0, 0);
     this.placeUi(this.announceText, cx, cam.height * 0.3);
     this.placeUi(this.hud, 8, 8);
-    this.timerText.setText(now < limit ? t('run.timer', { time: formatTime(now), limit: formatTime(limit) }) : t('run.bossTime', { time: formatTime(now - limit) }));
+    // 伝説戦の間は、逃げられるまでの残り時間
+    const lg = w.legendary;
+    const legendLeft = lg && lg.endTick > 0 ? Math.max(0, (lg.endTick - w.tick) * w.dt) : null;
+    this.timerText.setText(legendLeft !== null ? t('run.legendTime', { time: formatTime(legendLeft) }) : t('run.timer', { time: formatTime(Math.min(now, limit)), limit: formatTime(limit) }));
     this.bossBar.clear();
     const i = this.bossId === null ? -1 : findEnemyIndex(w, this.bossId);
     if (i === -1 || w.enemies.hp[i]! <= 0) {

@@ -8,7 +8,7 @@ import { currentWaveIndex, enemyCap, type World } from '../world';
 export function spawnEnemies(world: World): void {
   const { players, enemies, rng } = world;
   // ゲストは出現をホストから受け取る
-  if (players.length === 0 || world.role === 'guest') return;
+  if (players.length === 0 || world.role === 'guest' || world.legendary) return;
   const s = world.rules.spawn;
   const kinds = world.rules.enemies.kinds;
   const wave = world.waves[currentWaveIndex(world)]!;

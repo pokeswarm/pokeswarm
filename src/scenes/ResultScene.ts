@@ -16,6 +16,8 @@ export interface RunSummary {
   /** このランで新しく達成した実績・解放したポケモン（名前） */
   newAchievements: string[];
   newUnlocks: string[];
+  /** 伝説戦の結果（伝説の名前と、won 倒した・lost 全員倒れた・timeUp 逃げられた） */
+  legendary: { name: string; result: 'won' | 'lost' | 'timeUp' } | null;
 }
 
 export interface ResultSceneData {
@@ -67,6 +69,7 @@ export class ResultScene extends Phaser.Scene {
         t('result.level', { level: summary.level }),
         t('result.kills', { kills: summary.kills }),
         t('result.moves', { moves: summary.moves.join(' / ') }),
+        ...(summary.legendary ? [t(`result.legendary.${summary.legendary.result}`, { name: summary.legendary.name })] : []),
         ...(summary.newAchievements.length ? ['', t('result.newAchievements', { list: summary.newAchievements.join(' / ') })] : []),
         ...(summary.newUnlocks.length ? [t('result.newUnlocks', { list: summary.newUnlocks.join(' / ') })] : []),
       ];

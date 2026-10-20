@@ -92,6 +92,13 @@
       ]
     },
     {
+      "key": "beedrill",
+      "dex": 15,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "pidgey",
       "dex": 16,
       "uses": [
@@ -115,6 +122,13 @@
     {
       "key": "spearow",
       "dex": 21,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "raichu",
+      "dex": 26,
       "uses": [
         "enemy"
       ]
@@ -190,6 +204,13 @@
       ]
     },
     {
+      "key": "machamp",
+      "dex": 68,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "tentacool",
       "dex": 72,
       "uses": [
@@ -246,8 +267,22 @@
       ]
     },
     {
+      "key": "gengar",
+      "dex": 94,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "onix",
       "dex": 95,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "exeggutor",
+      "dex": 103,
       "uses": [
         "enemy"
       ]
@@ -262,6 +297,13 @@
     {
       "key": "koffing",
       "dex": 109,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "rhydon",
+      "dex": 112,
       "uses": [
         "enemy"
       ]
@@ -311,6 +353,48 @@
     {
       "key": "lapras",
       "dex": 131,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "articuno",
+      "dex": 144,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "zapdos",
+      "dex": 145,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "moltres",
+      "dex": 146,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "dragonite",
+      "dex": 149,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "mewtwo",
+      "dex": 150,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "mew",
+      "dex": 151,
       "uses": [
         "enemy"
       ]

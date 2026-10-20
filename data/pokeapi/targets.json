@@ -48,7 +48,19 @@
     "scyther",
     "tauros",
     "magikarp",
-    "lapras"
+    "lapras",
+    "beedrill",
+    "raichu",
+    "machamp",
+    "exeggutor",
+    "rhydon",
+    "gengar",
+    "dragonite",
+    "mewtwo",
+    "mew",
+    "articuno",
+    "zapdos",
+    "moltres"
   ],
   "moves": [
     "ember",
@@ -79,7 +91,16 @@
     "swift",
     "body-slam",
     "hyper-beam",
-    "blizzard"
+    "blizzard",
+    "earthquake",
+    "shadow-ball",
+    "draco-meteor",
+    "psystrike",
+    "psychic",
+    "hurricane",
+    "thunder",
+    "fire-blast",
+    "ancient-power"
   ],
   "items": [
     "x-attack",

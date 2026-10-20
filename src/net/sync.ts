@@ -90,10 +90,12 @@ export class SyncSession {
     const gemCollects: number[] = [];
     const pickups: number[] = [];
     const hazards: number[] = [];
+    const movers: number[] = [];
     for (const ev of world.events) {
       switch (ev.type) {
         case 'enemySpawned':
-          if (host) spawns.push(ev.id, ev.kind, ev.x, ev.y);
+          if (host && (ev.vx || ev.vy)) movers.push(ev.id, ev.kind, round2(ev.x), round2(ev.y), round2(ev.vx ?? 0), round2(ev.vy ?? 0));
+          else if (host) spawns.push(ev.id, ev.kind, ev.x, ev.y);
           break;
         case 'enemyKilled':
           if (host) kills.push(ev.enemyId, ev.by);
@@ -123,10 +125,13 @@ export class SyncSession {
           if (host) out.push({ t: 'ua', i: ev.playerId, o: ev.offer });
           break;
         case 'hazardTelegraphed':
-          if (host) hazards.push(round2(ev.x), round2(ev.y));
+          if (host) hazards.push(ev.move, round2(ev.x), round2(ev.y), round2(ev.dirX), round2(ev.dirY), ev.dasher);
+          break;
+        case 'legendaryWarning':
+          if (host) out.push({ t: 'lw', k: ev.kind });
           break;
         case 'runEnded':
-          if (host) out.push({ t: 'end', o: ev.outcome });
+          if (host) out.push({ t: 'end', o: ev.outcome, lg: ev.legendary });
           break;
         case 'playerLeft':
           if (host) out.push({ t: 'rm', i: ev.playerId });
@@ -148,6 +153,7 @@ export class SyncSession {
     if (gemCollects.length) out.push({ t: 'gc', e: gemCollects });
     if (pickups.length) out.push({ t: 'pr', e: pickups });
     if (hazards.length) out.push({ t: 'hz', e: hazards });
+    if (movers.length) out.push({ t: 'sv', e: movers });
 
     if (host) {
       // レベルアップの選択の状態は、変わったときだけ送る（残り時間はゲストが自分で減らす）
@@ -173,7 +179,9 @@ export class SyncSession {
         const e = world.enemies;
         const bosses: number[] = [];
         for (let i = 0; i < e.count; i++) {
-          if (e.hp[i]! > 0 && (world.rules.enemies.kinds[e.kind[i]!]?.rank ?? 'normal') !== 'normal') bosses.push(e.id[i]!, Math.ceil(e.hp[i]!), Math.ceil(e.maxHp[i]!));
+          if (e.hp[i]! > 0 && (world.rules.enemies.kinds[e.kind[i]!]?.rank ?? 'normal') !== 'normal') {
+            bosses.push(e.id[i]!, Math.ceil(e.hp[i]!), Math.ceil(e.maxHp[i]!), round2(e.x[i]!), round2(e.y[i]!));
+          }
         }
         if (bosses.length) out.push({ t: 'bh', e: bosses });
       }
@@ -275,13 +283,27 @@ export class SyncSession {
           }
           break;
         case 'hz':
-          if (guest) for (let k = 0; k + 1 < m.e.length; k += 2) cmds.push({ type: 'addHazard', x: m.e[k]!, y: m.e[k + 1]! });
+          if (guest) {
+            for (let k = 0; k + 5 < m.e.length; k += 6) {
+              cmds.push({ type: 'addHazard', move: m.e[k]!, x: m.e[k + 1]!, y: m.e[k + 2]!, dirX: m.e[k + 3]!, dirY: m.e[k + 4]!, dasher: m.e[k + 5]! });
+            }
+          }
           break;
         case 'bh':
-          if (guest) for (let k = 0; k + 2 < m.e.length; k += 3) cmds.push({ type: 'bossHp', id: m.e[k]!, hp: m.e[k + 1]!, maxHp: m.e[k + 2]! });
+          if (guest) for (let k = 0; k + 4 < m.e.length; k += 5) cmds.push({ type: 'bossHp', id: m.e[k]!, hp: m.e[k + 1]!, maxHp: m.e[k + 2]!, x: m.e[k + 3]!, y: m.e[k + 4]! });
+          break;
+        case 'sv':
+          if (guest) {
+            for (let k = 0; k + 5 < m.e.length; k += 6) {
+              cmds.push({ type: 'spawnEnemy', id: m.e[k]!, kind: m.e[k + 1]!, x: m.e[k + 2]!, y: m.e[k + 3]!, vx: m.e[k + 4]!, vy: m.e[k + 5]! });
+            }
+          }
+          break;
+        case 'lw':
+          if (guest) cmds.push({ type: 'legendaryWarning', kind: m.k });
           break;
         case 'end':
-          if (guest) cmds.push({ type: 'endRun', outcome: m.o });
+          if (guest) cmds.push({ type: 'endRun', outcome: m.o, legendary: m.lg });
           break;
         case 'rm':
           if (guest) cmds.push({ type: 'removePlayer', playerId: m.i });

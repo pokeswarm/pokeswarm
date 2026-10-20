@@ -574,6 +574,211 @@
           "intensity": 0.004
         }
       }
+    },
+    "quake": {
+      "impact": {
+        "burst": {
+          "count": 48,
+          "colors": [
+            "#d7ccc8",
+            "#a1887f",
+            "#6d4c41"
+          ],
+          "lifespanMs": [
+            400,
+            800
+          ],
+          "speed": [
+            60,
+            240
+          ],
+          "scale": [
+            0.8,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 40,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#bcaaa4",
+          "radius": 260,
+          "durationMs": 300,
+          "alpha": 0.8
+        },
+        "shake": {
+          "durationMs": 120,
+          "intensity": 0.005
+        }
+      }
+    },
+    "shadow": {
+      "impact": {
+        "burst": {
+          "count": 32,
+          "colors": [
+            "#e1bee7",
+            "#9c27b0",
+            "#4a148c"
+          ],
+          "lifespanMs": [
+            400,
+            800
+          ],
+          "speed": [
+            60,
+            240
+          ],
+          "scale": [
+            0.8,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 40,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#ce93d8",
+          "radius": 70,
+          "durationMs": 300,
+          "alpha": 0.8
+        },
+        "shake": {
+          "durationMs": 120,
+          "intensity": 0.005
+        }
+      }
+    },
+    "meteor": {
+      "impact": {
+        "burst": {
+          "count": 32,
+          "colors": [
+            "#fff3e0",
+            "#ffb74d",
+            "#e65100"
+          ],
+          "lifespanMs": [
+            400,
+            800
+          ],
+          "speed": [
+            60,
+            240
+          ],
+          "scale": [
+            0.8,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 40,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#ffcc80",
+          "radius": 80,
+          "durationMs": 300,
+          "alpha": 0.8
+        },
+        "shake": {
+          "durationMs": 120,
+          "intensity": 0.005
+        }
+      }
+    },
+    "psy": {
+      "impact": {
+        "burst": {
+          "count": 48,
+          "colors": [
+            "#fce4ec",
+            "#f48fb1",
+            "#ad1457"
+          ],
+          "lifespanMs": [
+            400,
+            800
+          ],
+          "speed": [
+            60,
+            240
+          ],
+          "scale": [
+            0.8,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 40,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#f8bbd0",
+          "radius": 280,
+          "durationMs": 300,
+          "alpha": 0.8
+        },
+        "shake": {
+          "durationMs": 120,
+          "intensity": 0.005
+        }
+      }
+    },
+    "beam": {
+      "impact": {
+        "burst": {
+          "count": 12,
+          "colors": [
+            "#ffffff",
+            "#fff59d",
+            "#ffca28"
+          ],
+          "lifespanMs": [
+            400,
+            800
+          ],
+          "speed": [
+            60,
+            240
+          ],
+          "scale": [
+            0.8,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 40,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#fff9c4",
+          "radius": 60,
+          "durationMs": 300,
+          "alpha": 0.8
+        },
+        "shake": {
+          "durationMs": 120,
+          "intensity": 0.005
+        }
+      }
     }
   }
 }

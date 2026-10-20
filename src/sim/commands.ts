@@ -1,5 +1,5 @@
 import type { HitEffect } from './events';
-import type { RunOutcome, UpgradeOffer } from './world';
+import type { LegendaryResult, RunOutcome, UpgradeOffer } from './world';
 
 /**
  * 入力コマンド。シミュレーションはこれだけを受け取って進む。
@@ -41,6 +41,9 @@ export interface SpawnEnemyCommand {
   readonly kind: number;
   readonly x: number;
   readonly y: number;
+  /** まっすぐ進む敵（スウォームの突進）の速度 */
+  readonly vx?: number;
+  readonly vy?: number;
 }
 
 /** ホスト: ゲストの攻撃が当たった（ゲストのブラウザで判定したもの。効果も一緒に届く） */
@@ -149,8 +152,13 @@ export interface ApplyUpgradeCommand {
 /** ゲスト: ホストが作ったボスの範囲技の予告 */
 export interface AddHazardCommand {
   readonly type: 'addHazard';
+  /** stage.moves の番号 */
+  readonly move: number;
   readonly x: number;
   readonly y: number;
+  readonly dirX: number;
+  readonly dirY: number;
+  readonly dasher: number;
 }
 
 /** ゲスト: 中ボス・ボスの HP（ホストが集計したもの） */
@@ -159,12 +167,23 @@ export interface BossHpCommand {
   readonly id: number;
   readonly hp: number;
   readonly maxHp: number;
+  /** 位置（突進などで大きく動くので、補正より短い間隔で送る） */
+  readonly x?: number;
+  readonly y?: number;
+}
+
+/** ゲスト: 伝説の乱入（「DANGER」） */
+export interface LegendaryWarningCommand {
+  readonly type: 'legendaryWarning';
+  readonly kind: number;
 }
 
 /** ゲスト: ホストが決めたランの終わり */
 export interface EndRunCommand {
   readonly type: 'endRun';
   readonly outcome: RunOutcome;
+  /** 伝説戦の結果（ゲスト） */
+  readonly legendary?: { readonly kind: number; readonly result: LegendaryResult | null } | null;
 }
 
 /** ゲスト: ホストが味方を復活させた（revives は残りの復活可能数） */
@@ -210,4 +229,5 @@ export type InputCommand =
   | BossHpCommand
   | EndRunCommand
   | RemovePlayerCommand
-  | RevivePlayerCommand;
+  | RevivePlayerCommand
+  | LegendaryWarningCommand;

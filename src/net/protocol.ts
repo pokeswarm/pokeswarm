@@ -1,5 +1,5 @@
 import type { LevelUpSnapshot } from '../sim/commands';
-import type { RunOutcome, UpgradeOffer } from '../sim/world';
+import type { LegendaryResult, RunOutcome, UpgradeOffer } from '../sim/world';
 
 /**
  * 協力プレイで送るメッセージ。1回の更新で送るものを配列にまとめて1つの文字列（JSON）にする。
@@ -17,16 +17,20 @@ export type NetMessage =
   | { t: 'ua'; i: number; o: UpgradeOffer }
   /** 選択の要望（ゲスト→ホスト）: c 選ぶ（n は候補の番号）・s 見送る・r リロール */
   | { t: 'rq'; k: 'c' | 's' | 'r'; n: number }
-  /** ボスの範囲技の予告（ホスト→ゲスト）: [x, y, ...] */
+  /** ボス・伝説の範囲技の予告（ホスト→ゲスト）: [技の番号, x, y, 向きx, 向きy, 突進する敵の id（無ければ -1）, ...] */
   | { t: 'hz'; e: number[] }
-  /** 中ボス・ボスの HP（ホスト→ゲスト）: [id, HP, 最大HP, ...] */
+  /** 中ボス・ボス・伝説の HP と位置（ホスト→ゲスト）: [id, HP, 最大HP, x, y, ...] */
   | { t: 'bh'; e: number[] }
+  /** まっすぐ進む敵の出現（ホスト→ゲスト。スウォームの突進）: [id, 種類, x, y, 速度x, 速度y, ...] */
+  | { t: 'sv'; e: number[] }
+  /** 伝説の乱入（ホスト→ゲスト。「DANGER」） */
+  | { t: 'lw'; k: number }
   /** 味方を復活させた（ホスト→ゲスト）: i は復活したプレイヤー、n は残りの復活可能数 */
   | { t: 'rv'; i: number; n: number }
   /** プレイヤーが抜けた（ホスト→ゲスト） */
   | { t: 'rm'; i: number }
-  /** ランの終わり（ホスト→ゲスト） */
-  | { t: 'end'; o: RunOutcome }
+  /** ランの終わり（ホスト→ゲスト）。lg は伝説戦の結果 */
+  | { t: 'end'; o: RunOutcome; lg: { kind: number; result: LegendaryResult | null } | null }
   /** 出現（ホスト→ゲスト）: [id, 種類, x, y, ...] */
   | { t: 'sp'; e: number[] }
   /** 撃破の確定（ホスト→ゲスト）: [id, とどめを刺したプレイヤー, ...] */

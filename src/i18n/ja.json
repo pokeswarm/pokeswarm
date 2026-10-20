@@ -82,7 +82,6 @@
   "select.hint": "数字キーかクリックで選ぶ　Esc でタイトルへ",
   "select.startingMove": "最初の技: {move}",
   "run.timer": "{time} / {limit}",
-  "run.bossTime": "ボス戦 {time}",
   "run.midbossAppeared": "{name}が あらわれた！",
   "run.bossAppeared": "ボスの {name}が あらわれた！",
   "run.clear": "ランクリア！",
@@ -220,5 +219,14 @@
   "title.achievements": "A キーで 実績",
   "result.newAchievements": "新しく達成した実績: {list}",
   "result.newUnlocks": "新しく解放したポケモン: {list}",
-  "run.achievement": "実績を達成: {name}"
+  "run.achievement": "実績を達成: {name}",
+  "run.danger": "DANGER",
+  "run.legendTime": "伝説 残り {time}",
+  "swarm.rush": "{name}の群れが突っ込んでくる！",
+  "swarm.encircle": "{name}に囲まれた！",
+  "result.legendary.won": "伝説の {name} を倒した！",
+  "result.legendary.lost": "伝説の {name} に敗れた（クリアは確定しています）",
+  "result.legendary.timeUp": "伝説の {name} に逃げられた（クリアは確定しています）",
+  "achievement.first-legendary.name": "でんせつとの であい",
+  "achievement.first-legendary.desc": "乱入した伝説のポケモンを倒す"
 }

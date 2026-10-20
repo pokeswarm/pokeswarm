@@ -19,6 +19,9 @@ export class EnemyStore {
   readonly damage: Float64Array;
   /** 移し替えた回数（移し替え先を決める番号に使う） */
   readonly relocations: Uint16Array;
+  /** まっすぐ進む敵（スウォームの突進）の速度。0 ならプレイヤーを追う */
+  readonly vx: Float64Array;
+  readonly vy: Float64Array;
   /** ノックバックの速さ（ワールド単位/秒）と残りの更新回数 */
   readonly kbVx: Float64Array;
   readonly kbVy: Float64Array;
@@ -45,6 +48,8 @@ export class EnemyStore {
     this.radius = new Float64Array(capacity);
     this.damage = new Float64Array(capacity);
     this.relocations = new Uint16Array(capacity);
+    this.vx = new Float64Array(capacity);
+    this.vy = new Float64Array(capacity);
     this.kbVx = new Float64Array(capacity);
     this.kbVy = new Float64Array(capacity);
     this.kbTicks = new Uint16Array(capacity);
@@ -53,7 +58,7 @@ export class EnemyStore {
   }
 
   /** 追加して index を返す。満杯なら -1 */
-  add(id: number, kind: number, x: number, y: number, hp: number, speed: number, radius: number, damage = 0): number {
+  add(id: number, kind: number, x: number, y: number, hp: number, speed: number, radius: number, damage = 0, vx = 0, vy = 0): number {
     if (this.count >= this.capacity) return -1;
     const i = this.count++;
     this.id[i] = id;
@@ -65,6 +70,8 @@ export class EnemyStore {
     this.radius[i] = radius;
     this.damage[i] = damage;
     this.relocations[i] = 0;
+    this.vx[i] = vx;
+    this.vy[i] = vy;
     this.kbVx[i] = this.kbVy[i] = 0;
     this.kbTicks[i] = 0;
     this.statusTicks.fill(0, i * this.statusCount, (i + 1) * this.statusCount);
@@ -87,6 +94,8 @@ export class EnemyStore {
     this.radius[i] = this.radius[last]!;
     this.damage[i] = this.damage[last]!;
     this.relocations[i] = this.relocations[last]!;
+    this.vx[i] = this.vx[last]!;
+    this.vy[i] = this.vy[last]!;
     this.kbVx[i] = this.kbVx[last]!;
     this.kbVy[i] = this.kbVy[last]!;
     this.kbTicks[i] = this.kbTicks[last]!;

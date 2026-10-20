@@ -1,8 +1,100 @@
 {
-  "initial": ["charmander", "bulbasaur", "squirtle"],
+  "initial": [
+    "charmander",
+    "bulbasaur",
+    "squirtle"
+  ],
   "unlocks": [
-    { "pokemon": "onix", "condition": { "stat": "defeated.onix", "atLeast": 20 } },
-    { "pokemon": "starmie", "condition": { "stat": "defeated.starmie", "atLeast": 20 } },
-    { "pokemon": "lapras", "condition": { "stat": "defeated.lapras", "atLeast": 10 } }
+    {
+      "pokemon": "onix",
+      "condition": {
+        "stat": "defeated.onix",
+        "atLeast": 20
+      }
+    },
+    {
+      "pokemon": "starmie",
+      "condition": {
+        "stat": "defeated.starmie",
+        "atLeast": 20
+      }
+    },
+    {
+      "pokemon": "raichu",
+      "condition": {
+        "stat": "defeated.raichu",
+        "atLeast": 20
+      }
+    },
+    {
+      "pokemon": "rhydon",
+      "condition": {
+        "stat": "defeated.rhydon",
+        "atLeast": 20
+      }
+    },
+    {
+      "pokemon": "lapras",
+      "condition": {
+        "stat": "defeated.lapras",
+        "atLeast": 10
+      }
+    },
+    {
+      "pokemon": "machamp",
+      "condition": {
+        "stat": "defeated.machamp",
+        "atLeast": 10
+      }
+    },
+    {
+      "pokemon": "gengar",
+      "condition": {
+        "stat": "defeated.gengar",
+        "atLeast": 10
+      }
+    },
+    {
+      "pokemon": "dragonite",
+      "condition": {
+        "stat": "defeated.dragonite",
+        "atLeast": 10
+      }
+    },
+    {
+      "pokemon": "mewtwo",
+      "condition": {
+        "stat": "defeated.mewtwo",
+        "atLeast": 5
+      }
+    },
+    {
+      "pokemon": "mew",
+      "condition": {
+        "stat": "defeated.mew",
+        "atLeast": 5
+      }
+    },
+    {
+      "pokemon": "articuno",
+      "condition": {
+        "stat": "defeated.articuno",
+        "atLeast": 5
+      }
+    },
+    {
+      "pokemon": "zapdos",
+      "condition": {
+        "stat": "defeated.zapdos",
+        "atLeast": 5
+      }
+    },
+    {
+      "pokemon": "moltres",
+      "condition": {
+        "stat": "defeated.moltres",
+        "atLeast": 5
+      }
+    }
   ]
 }

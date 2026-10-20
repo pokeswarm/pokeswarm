@@ -9,7 +9,7 @@ import type { SaveStore } from './saveStore';
  * まとめて足す（Firestore の書き込みを増やさない）。足した分は消すので、同じ分を2回足さない。
  *
  * 記録の名前（data/game/achievements.json・unlocks.json の条件で使う）:
- *   kills, defeated.<ポケモン>, midbossKills, bossKills, evolutions, evolvedTo.<ポケモン>,
+ *   kills, defeated.<ポケモン>, midbossKills, bossKills, legendaryKills, evolutions, evolvedTo.<ポケモン>,
  *   derivations, derived.<技>, uniqueMoves, playSeconds,
  *   runs, runs.<ポケモン>, clears, clears.<ポケモン>, clears.solo, clears.coop,
  *   bestKills, bestLevel, longestSeconds（最高記録）
@@ -52,6 +52,7 @@ export class RunRecorder {
           this.count(`defeated.${species}`);
           if (rank === 'midboss') this.count('midbossKills');
           if (rank === 'boss') this.count('bossKills');
+          if (rank === 'legendary') this.count('legendaryKills');
           break;
         }
         case 'evolved':

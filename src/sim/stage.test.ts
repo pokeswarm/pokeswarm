@@ -1,19 +1,35 @@
 import { describe, expect, it } from 'vitest';
+import type { BossMove } from '../data/schema';
 import type { SimRules } from './rules';
 import { Simulation } from './simulation';
 import { testRules } from './testRules';
 
-const BOSS_MOVE = { move: 'blizzard', effect: 'test', intervalSeconds: 1, telegraphSeconds: 0.5, radius: 50, damage: 30, count: 1, spread: 0 };
+const CIRCLE: BossMove = { id: 'circle', effect: 'test', shape: 'circle', target: 'player', telegraphSeconds: 0.5, radius: 50, damage: 30, count: 1, spread: 0 };
+const NOVA: BossMove = { id: 'nova', effect: 'test', shape: 'circle', target: 'self', telegraphSeconds: 0.5, radius: 200, damage: 20, count: 1, spread: 0 };
+const DASH: BossMove = { id: 'dash', effect: 'test', shape: 'line', target: 'player', telegraphSeconds: 0.5, radius: 20, length: 300, damage: 25, count: 1, spread: 0, dashSpeed: 600 };
 
-/** 番号1が中ボス、番号2がボス。中ボスは1秒、ボスは2秒で出る */
-function stageRules(overrides: Partial<SimRules['stage']> = {}): SimRules {
+/** 敵の種類: 0 雑魚・1 中ボス・2 四天王A・3 四天王B・4 伝説・5 突進の群れ・6 囲む群れ */
+function stageRules(stage: Partial<SimRules['stage']> = {}): SimRules {
   return testRules({
     move: { range: 1 },
     extraKinds: [
       { id: 'mid', rank: 'midboss', hp: 500, moveSpeed: 0, radius: 20, contactDamage: 0, xp: 50, types: [0] },
-      { id: 'boss', rank: 'boss', hp: 1000, moveSpeed: 0, radius: 30, contactDamage: 0, xp: 0, types: [0] },
+      { id: 'e4a', rank: 'boss', hp: 1000, moveSpeed: 0, radius: 30, contactDamage: 0, xp: 0, types: [0] },
+      { id: 'e4b', rank: 'boss', hp: 1000, moveSpeed: 0, radius: 30, contactDamage: 0, xp: 0, types: [0] },
+      { id: 'legend', rank: 'legendary', hp: 2000, moveSpeed: 0, radius: 30, contactDamage: 0, xp: 0, types: [0] },
+      { id: 'rush', hp: 10, moveSpeed: 0, radius: 10, contactDamage: 0, types: [0] },
+      { id: 'ring', hp: 50, moveSpeed: 30, radius: 14, contactDamage: 0, types: [0] },
     ],
-    stage: { durationSeconds: 2, midbosses: [{ atSeconds: 1, kind: 'mid' }], boss: { kind: 'boss', move: BOSS_MOVE }, ...overrides },
+    stage: {
+      durationSeconds: 100,
+      bosses: [
+        { atSeconds: 1, kind: 'mid', moves: [], required: false },
+        { atSeconds: 2, kind: 'e4a', moves: ['circle'], moveIntervalSeconds: 1, required: true },
+        { atSeconds: 2, kind: 'e4b', moves: [], required: true },
+      ],
+      moves: [CIRCLE, NOVA, DASH],
+      ...stage,
+    },
   });
 }
 
@@ -26,36 +42,44 @@ function run(sim: Simulation, ticks: number): string[] {
   return types;
 }
 
-describe('中ボス・ボスの出現', () => {
-  it('予定の時間に中ボス、ランの長さでボスが出る', () => {
-    const sim = new Simulation({ tickRate: 30, seed: 1, rules: stageRules() });
-    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
-    run(sim, 30);
-    expect(sim.world.enemies.count).toBe(0);
-    expect(run(sim, 1)).toContain('bossAppeared');
-    expect(sim.world.enemies.kind[0]).toBe(1);
-    run(sim, 30);
-    expect(sim.world.enemies.count).toBe(2);
-    expect(sim.world.bosses).toHaveLength(1);
-  });
+function killKind(sim: Simulation, kind: number): void {
+  const e = sim.world.enemies;
+  for (let i = 0; i < e.count; i++) {
+    if (e.kind[i] !== kind || e.hp[i]! <= 0) continue;
+    sim.step([{ type: 'damageEnemy', id: e.id[i]!, amount: 1e9, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);
+    return;
+  }
+  throw new Error(`種類 ${kind} の敵がいません`);
+}
 
-  it('HP は参加人数に応じて上がる', () => {
+function solo(rules: SimRules, moveSpeed = 0) {
+  const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+  const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed });
+  return { sim, p };
+}
+
+describe('中ボス・ボスの出現', () => {
+  it('予定の時間に出て、HP は参加人数に応じて上がる', () => {
     const sim = new Simulation({ tickRate: 30, seed: 1, rules: stageRules() });
     sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
     sim.addPlayer({ id: 2, x: 0, y: 0, radius: 12, moveSpeed: 0 });
-    run(sim, 31);
+    run(sim, 30);
+    expect(sim.world.enemies.count).toBe(0);
+    expect(run(sim, 1)).toContain('bossAppeared');
     // hpPerExtraPlayerPct 50 → 2人で 1.5倍
     expect(sim.world.enemies.hp[0]).toBe(750);
+    run(sim, 30);
+    expect(sim.world.enemies.count).toBe(3);
+    expect(sim.world.bosses).toHaveLength(1);
   });
 
   it('前の時間帯の種類でも、中ボスは離れすぎても消さない', () => {
-    const rules = stageRules({ boss: null });
+    const rules = stageRules({ bosses: [{ atSeconds: 1, kind: 'mid', moves: [], required: false }] });
     rules.spawn.waves = [
       { startSeconds: 0, hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] },
       { startSeconds: 0.5, hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] },
     ];
-    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
-    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
+    const { sim, p } = solo(rules);
     run(sim, 31);
     p.x = 5000;
     expect(run(sim, 2)).not.toContain('enemyRetired');
@@ -63,8 +87,7 @@ describe('中ボス・ボスの出現', () => {
   });
 
   it('中ボスはノックバックされず、こおりの時間が短い', () => {
-    const sim = new Simulation({ tickRate: 30, seed: 1, rules: stageRules({ boss: null, midbosses: [] }) });
-    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
+    const { sim } = solo(stageRules({ bosses: [] }));
     sim.world.enemies.add(1, 1, 100, 0, 500, 0, 20);
     sim.step([{ type: 'damageEnemy', id: 1, amount: 1, by: 1, kbx: 100, kby: 0, kbTicks: 10, status: 1, statusTicks: 40 }]);
     expect(sim.world.enemies.kbTicks[0]).toBe(0);
@@ -73,58 +96,70 @@ describe('中ボス・ボスの出現', () => {
   });
 });
 
-describe('ボスの範囲技', () => {
-  function bossSim() {
-    const sim = new Simulation({ tickRate: 30, seed: 1, rules: stageRules({ midbosses: [], durationSeconds: 0 }) });
-    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 200 });
-    return { sim, p };
-  }
+describe('範囲技', () => {
+  const only = (moves: string[]) => stageRules({ bosses: [{ atSeconds: 0, kind: 'e4a', moves, moveIntervalSeconds: 1, required: false }] });
 
-  it('足元に予告し、動かなければ当たる', () => {
-    const { sim, p } = bossSim();
-    const events = run(sim, 31);
-    expect(events).toContain('hazardTelegraphed');
-    expect(sim.world.hazards).toHaveLength(1);
-    run(sim, 15);
-    expect(p.hp).toBe(70);
+  it('円: 足元に予告し、動かなければ当たる。予告の間に外へ出れば当たらない', () => {
+    const hit = solo(only(['circle']), 200);
+    expect(run(hit.sim, 31)).toContain('hazardTelegraphed');
+    run(hit.sim, 15);
+    expect(hit.p.hp).toBe(70);
+    const dodge = solo(only(['circle']), 200);
+    run(dodge.sim, 31);
+    dodge.sim.step([{ type: 'move', playerId: 1, dx: 1, dy: 0 }]);
+    run(dodge.sim, 14);
+    expect(dodge.p.hp).toBe(100);
   });
 
-  it('予告の間に範囲の外へ出れば当たらない', () => {
-    const { sim, p } = bossSim();
+  it('自分の周り: ボスの位置を中心に落ちる', () => {
+    const { sim, p } = solo(only(['nova']));
     run(sim, 31);
-    sim.step([{ type: 'move', playerId: 1, dx: 1, dy: 0 }]);
-    run(sim, 14);
-    expect(p.x).toBeGreaterThan(62);
+    const hz = sim.world.hazards[0]!;
+    expect(Math.hypot(hz.x - sim.world.enemies.x[0]!, hz.y - sim.world.enemies.y[0]!)).toBeLessThan(1);
+    run(sim, 15);
+    // ボスは spawnDistance 300 の所。半径200の外なので当たらない
     expect(p.hp).toBe(100);
+  });
+
+  it('直線の突進: 線の上にいれば当たり、ボスは線に沿って進む', () => {
+    const { sim, p } = solo(only(['dash']));
+    run(sim, 31);
+    const before = { x: sim.world.enemies.x[0]!, y: sim.world.enemies.y[0]! };
+    run(sim, 15);
+    expect(p.hp).toBe(75);
+    run(sim, 10);
+    const moved = Math.hypot(sim.world.enemies.x[0]! - before.x, sim.world.enemies.y[0]! - before.y);
+    expect(moved).toBeGreaterThan(150);
   });
 });
 
-describe('ランの終わり', () => {
-  it('ボスを倒すとクリアになり、シミュレーションが止まる', () => {
-    const sim = new Simulation({ tickRate: 30, seed: 1, rules: stageRules({ midbosses: [], durationSeconds: 0 }) });
-    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
-    sim.step([]);
-    const id = sim.world.enemies.id[0]!;
-    sim.step([{ type: 'damageEnemy', id, amount: 5000, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);
-    expect(sim.world.events.map((e) => e.type)).toContain('runEnded');
+describe('ランの進行と終わり', () => {
+  it('四天王を全員倒すとクリア。中ボスを倒してもクリアにならず、経験値を落とす', () => {
+    const { sim } = solo(stageRules());
+    run(sim, 61);
+    killKind(sim, 1);
+    expect(sim.world.outcome).toBeNull();
+    expect(sim.world.gems.value[0]).toBe(50);
+    killKind(sim, 2);
+    expect(sim.world.outcome).toBeNull();
+    killKind(sim, 3);
     expect(sim.world.outcome).toBe('clear');
     const tick = sim.world.tick;
     run(sim, 10);
     expect(sim.world.tick).toBe(tick);
   });
 
-  it('中ボスを倒してもクリアにならず、経験値を落とす', () => {
-    const sim = new Simulation({ tickRate: 30, seed: 1, rules: stageRules({ boss: null, midbosses: [] }) });
-    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
-    sim.world.enemies.add(1, 1, 300, 0, 500, 0, 20);
-    sim.step([{ type: 'damageEnemy', id: 1, amount: 5000, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);
-    expect(sim.world.outcome).toBeNull();
-    expect(sim.world.gems.value[0]).toBe(50);
+  it('制限時間までに四天王が残っていたら失敗', () => {
+    const { sim } = solo(stageRules({ durationSeconds: 3 }));
+    run(sim, 61);
+    killKind(sim, 2);
+    const types = run(sim, 40);
+    expect(types).toContain('runEnded');
+    expect(sim.world.outcome).toBe('fail');
   });
 
   it('全員が倒れると失敗', () => {
-    const sim = new Simulation({ tickRate: 30, seed: 1, rules: stageRules({ boss: null, midbosses: [] }) });
-    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
+    const { sim, p } = solo(stageRules({ bosses: [] }));
     sim.world.enemies.add(1, 0, 0, 0, 1000, 0, 10, 1000);
     sim.step([]);
     expect(p.down).toBe(true);
@@ -132,12 +167,71 @@ describe('ランの終わり', () => {
   });
 
   it('雑魚の経験値に時間帯の倍率を掛ける', () => {
-    const rules = stageRules({ boss: null, midbosses: [] });
+    const rules = stageRules({ bosses: [] });
     rules.spawn.waves = [{ startSeconds: 0, hpMultiplier: 1, damageMultiplier: 1, xpMultiplier: 3, kinds: ['test'] }];
-    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
-    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
+    const { sim } = solo(rules);
     sim.world.enemies.add(1, 0, 300, 0, 10, 0, 10);
     sim.step([{ type: 'damageEnemy', id: 1, amount: 50, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);
     expect(sim.world.gems.value[0]).toBe(3);
+  });
+});
+
+describe('伝説の乱入', () => {
+  const legendary = { chance: 1, kinds: ['legend'], moves: ['circle'], moveIntervalSeconds: 1, warningSeconds: 1, timeLimitSeconds: 2 };
+
+  it('クリアすると「DANGER」の後、雑魚が消えて伝説が出る。倒すとクリア（倒した）', () => {
+    const { sim } = solo(stageRules({ legendary }));
+    run(sim, 61);
+    sim.world.enemies.add(999, 0, 200, 0, 10, 0, 10);
+    killKind(sim, 2);
+    killKind(sim, 3);
+    expect(sim.world.events.map((e) => e.type)).toContain('legendaryWarning');
+    expect(sim.world.outcome).toBeNull();
+    expect(sim.world.cleared).toBe(true);
+    run(sim, 31);
+    // 雑魚と中ボスは消え、伝説だけ
+    const kinds = Array.from(sim.world.enemies.kind.subarray(0, sim.world.enemies.count));
+    expect(kinds).toEqual([4]);
+    killKind(sim, 4);
+    expect(sim.world.outcome).toBe('clear');
+    expect(sim.world.legendary?.result).toBe('won');
+  });
+
+  it('時間内に倒せなければ逃げられるが、クリアのまま', () => {
+    const { sim } = solo(stageRules({ legendary }));
+    run(sim, 61);
+    killKind(sim, 2);
+    killKind(sim, 3);
+    run(sim, 30 + 61);
+    expect(sim.world.outcome).toBe('clear');
+    expect(sim.world.legendary?.result).toBe('timeUp');
+  });
+});
+
+describe('スウォームイベント', () => {
+  it('突進の群れはプレイヤーを追わずにまっすぐ進み、離れたら消える', () => {
+    const { sim } = solo(
+      stageRules({ bosses: [], swarms: [{ atSeconds: 0, everySeconds: 100, untilSeconds: 0, kind: 'rush', pattern: 'rush', count: 9, spacing: 20, speed: 900 }] }),
+    );
+    expect(run(sim, 1)).toContain('swarmStarted');
+    expect(sim.world.enemies.count).toBe(9);
+    const e = sim.world.enemies;
+    const v0 = [e.vx[0]!, e.vy[0]!];
+    run(sim, 10);
+    expect([e.vx[0], e.vy[0]]).toEqual(v0);
+    // 900/秒で通り抜け、移し替えの距離（900）より離れたら消える
+    const types = run(sim, 90);
+    expect(types).toContain('enemyRetired');
+    expect(sim.world.enemies.count).toBe(0);
+  });
+
+  it('囲む群れはプレイヤーの周りにぐるりと出る', () => {
+    const { sim } = solo(
+      stageRules({ bosses: [], swarms: [{ atSeconds: 0, everySeconds: 100, untilSeconds: 0, kind: 'ring', pattern: 'encircle', count: 12, radius: 400 }] }),
+    );
+    run(sim, 1);
+    const e = sim.world.enemies;
+    expect(e.count).toBe(12);
+    for (let i = 0; i < e.count; i++) expect(Math.hypot(e.x[i]!, e.y[i]!)).toBeCloseTo(400 - 30 / 30, 0);
   });
 });

@@ -21,6 +21,18 @@ export function moveEnemies(world: World): void {
     e.prevX[i] = x;
     e.prevY[i] = y;
 
+    // まっすぐ進む敵（スウォームの突進）: 追わずに進み、離れすぎたら消す（移し替えない）
+    if (e.vx[i] !== 0 || e.vy[i] !== 0) {
+      const m = speedMultiplier(world, i);
+      e.x[i] = x + e.vx[i]! * m * world.dt;
+      e.y[i] = y + e.vy[i]! * m * world.dt;
+      if (world.role !== 'guest' && !players.some((p) => (p.x - x) ** 2 + (p.y - y) ** 2 <= relocate2)) {
+        e.hp[i] = 0;
+        world.events.push({ type: 'enemyRetired', id: e.id[i]! });
+      }
+      continue;
+    }
+
     let target: Player = players[0]!;
     let best = Infinity;
     for (const p of players) {
@@ -73,15 +85,32 @@ export function rebuildEnemyHash(world: World): void {
   for (let i = 0; i < e.count; i++) enemyHash.insert(i, e.x[i]!, e.y[i]!);
 }
 
-/** 敵同士の簡易的な押し合い。調べる相手の数に上限を設けて負荷を抑える */
+/**
+ * 敵同士の押し合い（大きさの判定）。重ならないように押し合い、群れが一点に固まらないようにする
+ * （ヴァンパイアサバイバーズのように、群れが画面に広がって圧迫感が出る）。
+ * 調べる相手の数に上限を設けて負荷を抑える。1回の更新で iterations 回押し合う
+ */
 export function separateEnemies(world: World): void {
+  const { iterations = 1 } = world.rules.spawn.separation;
+  for (let it = 0; it < iterations; it++) {
+    separateOnce(world);
+    // 押した後の位置で、次の回の近傍を探す
+    if (it + 1 < iterations) rebuildEnemyHash(world);
+  }
+}
+
+function separateOnce(world: World): void {
   // 密集していても集める数は neighborScratch の大きさまで（負荷が敵の密度に比例して増えないように）
   const { enemies: e, enemyHash, neighborScratch: scratch } = world;
   const { strength, maxNeighbors } = world.rules.spawn.separation;
   if (strength === 0 || maxNeighbors === 0) return;
+  // 大きな敵（中ボスなど）も相手として見つかるよう、探す範囲は「自分 + 一番大きな敵」の半径
+  let maxR = 0;
+  for (const k of world.rules.enemies.kinds) maxR = Math.max(maxR, k.radius);
   for (let i = 0; i < e.count; i++) {
     const r = e.radius[i]!;
-    const n = enemyHash.queryRect(e.x[i]! - r * 2, e.y[i]! - r * 2, e.x[i]! + r * 2, e.y[i]! + r * 2, scratch);
+    const reach = r + maxR;
+    const n = enemyHash.queryRect(e.x[i]! - reach, e.y[i]! - reach, e.x[i]! + reach, e.y[i]! + reach, scratch);
     let checked = 0;
     for (let k = 0; k < n && checked < maxNeighbors; k++) {
       const j = scratch[k]!;
@@ -98,7 +127,10 @@ export function separateEnemies(world: World): void {
         continue;
       }
       const d = Math.sqrt(d2);
-      const push = ((minD - d) / d) * strength * 0.5;
+      // 大きい敵ほど押されにくい（同じ大きさなら半分ずつ。中ボスは雑魚を押しのけて進む）
+      const rj = e.radius[j]!;
+      const share = (rj * rj) / (r * r + rj * rj);
+      const push = ((minD - d) / d) * strength * share;
       e.x[i]! += dx * push;
       e.y[i]! += dy * push;
     }

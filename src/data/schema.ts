@@ -55,7 +55,7 @@ export const enemyKindSchema = z.object({
   /** PokeAPI のポケモンのキー（タイプ・名前に使う）。省略時は id */
   species: z.string().optional(),
   /** 雑魚（normal・省略時）・中ボス（midboss）・ボス（boss）。中ボス・ボスは data/game/stage.json の予定で出す */
-  rank: z.enum(['normal', 'midboss', 'boss']).optional(),
+  rank: z.enum(['normal', 'midboss', 'boss', 'legendary']).optional(),
   /** 倒したときに落とす経験値。省略時は pickups.json の xpPerKill（雑魚には時間帯の xpMultiplier を掛ける） */
   xp: z.number().nonnegative().optional(),
   /** スプライトの大きさの倍率（省略時は 1。中ボス・ボスを大きく描く） */
@@ -86,9 +86,14 @@ export const spawnConfigSchema = z
     /** プレイヤー1人あたりの上限（実際の上限は min(全体, 1人あたり × 人数)） */
     capPerPlayer: z.number().int().positive(),
     /** 敵同士の簡易的な押し合い */
+    /**
+     * 敵同士の押し合い（大きさの判定）。重ならないよう押し合い、群れが一点に固まらず画面に広がる。
+     * strength は1回で重なりのどれだけを解消するか（1 で全部）、iterations は1回の更新で押し合う回数
+     */
     separation: z.object({
       strength: z.number().min(0).max(1),
       maxNeighbors: z.number().int().nonnegative(),
+      iterations: z.number().int().positive().optional(),
     }),
     /** 空間ハッシュの格子の大きさ */
     spatialCellSize: z.number().positive(),
@@ -175,32 +180,85 @@ export type SaveConfig = z.infer<typeof saveConfigSchema>;
 // ---- ステージ（ランの長さ・中ボス・ボス） ----
 
 /**
- * ボスの範囲技。狙ったプレイヤーの足元に範囲を予告し、telegraphSeconds 後にその範囲へダメージを与える。
- * 当たったかは受けたプレイヤーのブラウザで判定する（01_game_design.md 2.3）。
+ * ボス・伝説の範囲技（01_game_design.md 2.2）。範囲を予告し、telegraphSeconds 後にその範囲へダメージを与える。
+ * 当たったかは受けたプレイヤーのブラウザで判定する（2.3）。
+ * - shape: circle（円。radius が半径）・line（直線。radius が幅の半分、length が長さ）
+ * - target: player（一番近いプレイヤーを狙う。円は足元と周りに count 個）・self（自分の周り・自分から向かう直線）
+ * - dashSpeed: 直線の技で、落ちたときにボスが線に沿って突進する
  */
 export const bossMoveSchema = z.object({
-  /** 技の名前に使う PokeAPI の技のキー */
-  move: z.string().min(1),
+  id: z.string().min(1),
+  /** 技の名前に使う PokeAPI の技のキー（表示しない技は省略） */
+  move: z.string().min(1).optional(),
   /** 範囲に落ちたときの演出（data/effects/recipes.json） */
   effect: z.string().min(1),
-  intervalSeconds: z.number().positive(),
+  shape: z.enum(['circle', 'line']).default('circle'),
+  target: z.enum(['player', 'self']).default('player'),
   telegraphSeconds: z.number().positive(),
   radius: z.number().positive(),
+  length: z.number().positive().optional(),
   damage: z.number().nonnegative(),
-  /** 1回に落とす範囲の数 */
-  count: z.number().int().positive(),
+  /** 1回に落とす範囲の数（target: player の円） */
+  count: z.number().int().positive().default(1),
   /** 狙ったプレイヤーの位置からのばらつき（2つ目以降の範囲） */
-  spread: z.number().nonnegative(),
+  spread: z.number().nonnegative().default(0),
+  dashSpeed: z.number().positive().optional(),
 });
 export type BossMove = z.infer<typeof bossMoveSchema>;
 
+/**
+ * スウォームイベント（作者の決定。2026年10月）: 冗長なプレイにならないよう、気を付けないといけない群れを定期的に出す。
+ * - rush: 画面の外から、まっすぐ高速で横切る群れ（count 体が spacing の間隔で並ぶ。プレイヤーを追わない）
+ * - encircle: プレイヤーの周り（radius）にぐるりと出て、ゆっくり囲んでくる群れ
+ */
+export const swarmSchema = z.object({
+  atSeconds: z.number().nonnegative(),
+  everySeconds: z.number().positive(),
+  untilSeconds: z.number().positive(),
+  kind: z.string().min(1),
+  pattern: z.enum(['rush', 'encircle']),
+  count: z.number().int().positive(),
+  spacing: z.number().positive().optional(),
+  speed: z.number().positive().optional(),
+  radius: z.number().positive().optional(),
+});
+export type SwarmConfig = z.infer<typeof swarmSchema>;
+
 export const stageConfigSchema = z.object({
-  /** ランの長さ。この時間でボスが出る */
+  /**
+   * ランの長さ（制限時間）。required の付いたボス（四天王）がこの時間までに全員倒れていなければ失敗。
+   * 全員倒した時点でクリア（報酬はこの時点で確定）
+   */
   durationSeconds: z.number().positive(),
-  /** 中ボスの出る時間と種類（data/game/enemies.json の rank: "midboss"） */
-  midbosses: z.array(z.object({ atSeconds: z.number().nonnegative(), kind: z.string().min(1) })),
-  /** ボス（rank: "boss"）。倒せばランクリア。null ならボスなし（テスト用） */
-  boss: z.object({ kind: z.string().min(1), move: bossMoveSchema }).nullable(),
+  /** 中ボス（rank: midboss）・ボス（rank: boss）を出す予定。moves は使う範囲技（moves の id）を順に使う */
+  bosses: z.array(
+    z.object({
+      atSeconds: z.number().nonnegative(),
+      kind: z.string().min(1),
+      moves: z.array(z.string()).default([]),
+      moveIntervalSeconds: z.number().positive().optional(),
+      /** 倒すとクリアに必要（四天王） */
+      required: z.boolean().default(false),
+    }),
+  ),
+  /** 範囲技の定義 */
+  moves: z.array(bossMoveSchema),
+  /** クリア後の伝説の乱入。null なら無し */
+  legendary: z
+    .object({
+      /** 乱入する確率（0〜1） */
+      chance: z.number().min(0).max(1),
+      /** 候補（rank: legendary）。1匹を選ぶ */
+      kinds: z.array(z.string().min(1)).min(1),
+      moves: z.array(z.string()).min(1),
+      moveIntervalSeconds: z.number().positive(),
+      /** 「DANGER」の表示から出現までの時間 */
+      warningSeconds: z.number().nonnegative(),
+      /** この時間で倒せなければ、逃げられて終わる（クリアは確定済み） */
+      timeLimitSeconds: z.number().positive(),
+    })
+    .nullable(),
+  swarms: z.array(swarmSchema).default([]),
   bossRules: z.object({
     /** 中ボス・ボスのノックバックの倍率（0 で押されない） */
     knockbackMultiplier: z.number().min(0),

@@ -18,8 +18,8 @@ import { elapsedSeconds, type UpgradeOffer } from './world';
 const OFFER_PRIORITY: Record<UpgradeOffer['kind'], number> = { derive: 0, moveUp: 1, moveNew: 2, itemNew: 3, itemUp: 4, passiveNew: 5, passiveUp: 6 };
 /** 向きを変える間隔（毎回変えると細かく揺れるだけになる） */
 const RETARGET_SECONDS = 0.3;
-/** ボスが倒せないときに打ち切る時間 */
-const LIMIT_SECONDS = 20 * 60;
+/** 打ち切る時間（ランは20分で終わる。伝説戦があればその分長くなる） */
+const LIMIT_SECONDS = 25 * 60;
 
 function simulateRun(pokemon: string): void {
   const rules = buildSimRules();
@@ -85,6 +85,7 @@ function simulateRun(pokemon: string): void {
       `ボス出現 ${bossSeenAt < 0 ? '-' : fmt(bossSeenAt)}  出た中ボス・ボス ${w.nextBoss}  （${steps} 回, ${(ms / 1000).toFixed(1)} 秒）`,
   );
   console.log(`${name} 分ごとのレベル ${byMinute.map((l, i) => `${i}:${l}`).join(' ')}`);
+  console.log(`${name} 四天王の残り ${w.requiredLeft.size}  伝説 ${w.legendary ? `${w.rules.enemies.kinds[w.legendary.kind]!.id} ${w.legendary.result}` : '-'}`);
   console.log(`${name} 分ごとの撃破数 ${killsByMinute.map((k, i) => `${i}:${k}`).join(' ')}`);
   console.log(`${name} 技 ${p.moves.map((m) => `${w.rules.moves[m.move]!.key}:${m.level}`).join(' ')}  持ち物 ${p.items.length}  パッシブ ${p.passives.length}`);
 }

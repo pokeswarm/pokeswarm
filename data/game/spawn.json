@@ -148,6 +148,27 @@
         "marowak",
         "venomoth"
       ]
+    },
+    {
+      "startSeconds": 1020,
+      "spawnPerSecond": 15,
+      "minimum": 250,
+      "capPerPlayer": 500,
+      "hpMultiplier": 3.5,
+      "damageMultiplier": 2.4,
+      "xpMultiplier": 3.7,
+      "kinds": [
+        "dewgong",
+        "cloyster",
+        "slowbro",
+        "jynx",
+        "hitmonlee",
+        "hitmonchan",
+        "golbat",
+        "arbok",
+        "gyarados",
+        "aerodactyl"
+      ]
     }
   ],
   "fillPerSecond": 20

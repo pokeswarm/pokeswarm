@@ -1,0 +1,36 @@
+{
+  "key": "enemy/haunter",
+  "dex": 93,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 32,
+      "frameHeight": 56,
+      "durations": [
+        6,
+        6,
+        6,
+        10,
+        6,
+        6,
+        6,
+        6,
+        10,
+        6
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

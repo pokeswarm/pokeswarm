@@ -134,6 +134,13 @@
       ]
     },
     {
+      "key": "arbok",
+      "dex": 24,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "raichu",
       "dex": 26,
       "uses": [
@@ -288,6 +295,13 @@
       ]
     },
     {
+      "key": "slowbro",
+      "dex": 80,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "doduo",
       "dex": 84,
       "uses": [
@@ -302,6 +316,13 @@
       ]
     },
     {
+      "key": "dewgong",
+      "dex": 87,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "grimer",
       "dex": 88,
       "uses": [
@@ -309,8 +330,22 @@
       ]
     },
     {
+      "key": "cloyster",
+      "dex": 91,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "gastly",
       "dex": 92,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "haunter",
+      "dex": 93,
       "uses": [
         "enemy"
       ]
@@ -353,6 +388,20 @@
     {
       "key": "marowak",
       "dex": 105,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "hitmonlee",
+      "dex": 106,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "hitmonchan",
+      "dex": 107,
       "uses": [
         "enemy"
       ]
@@ -407,6 +456,13 @@
       ]
     },
     {
+      "key": "jynx",
+      "dex": 124,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "tauros",
       "dex": 128,
       "uses": [
@@ -421,8 +477,22 @@
       ]
     },
     {
+      "key": "gyarados",
+      "dex": 130,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "lapras",
       "dex": 131,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "aerodactyl",
+      "dex": 142,
       "uses": [
         "enemy"
       ]
@@ -444,6 +514,13 @@
     {
       "key": "moltres",
       "dex": 146,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "dragonair",
+      "dex": 148,
       "uses": [
         "enemy"
       ]

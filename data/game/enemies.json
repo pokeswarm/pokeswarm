@@ -249,6 +249,78 @@
       "contactDamage": 6
     },
     {
+      "id": "dewgong",
+      "sprite": "enemy/dewgong",
+      "hp": 12,
+      "moveSpeed": 55,
+      "radius": 12,
+      "contactDamage": 6
+    },
+    {
+      "id": "cloyster",
+      "sprite": "enemy/cloyster",
+      "hp": 12,
+      "moveSpeed": 55,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "slowbro",
+      "sprite": "enemy/slowbro",
+      "hp": 12,
+      "moveSpeed": 41,
+      "radius": 12,
+      "contactDamage": 6
+    },
+    {
+      "id": "jynx",
+      "sprite": "enemy/jynx",
+      "hp": 12,
+      "moveSpeed": 63,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "hitmonlee",
+      "sprite": "enemy/hitmonlee",
+      "hp": 12,
+      "moveSpeed": 60,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "hitmonchan",
+      "sprite": "enemy/hitmonchan",
+      "hp": 12,
+      "moveSpeed": 57,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "arbok",
+      "sprite": "enemy/arbok",
+      "hp": 12,
+      "moveSpeed": 58,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "gyarados",
+      "sprite": "enemy/gyarados",
+      "hp": 12,
+      "moveSpeed": 58,
+      "radius": 14,
+      "contactDamage": 6
+    },
+    {
+      "id": "aerodactyl",
+      "sprite": "enemy/aerodactyl",
+      "hp": 12,
+      "moveSpeed": 75,
+      "radius": 13,
+      "contactDamage": 6
+    },
+    {
       "id": "swarm-beedrill",
       "species": "beedrill",
       "sprite": "enemy/beedrill",

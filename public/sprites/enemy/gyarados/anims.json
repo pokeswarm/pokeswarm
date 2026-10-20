@@ -1,0 +1,30 @@
+{
+  "key": "enemy/gyarados",
+  "dex": 130,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 88,
+      "frameHeight": 128,
+      "durations": [
+        10,
+        14,
+        10,
+        14
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

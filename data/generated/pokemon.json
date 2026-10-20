@@ -25,6 +25,27 @@
       }
     ]
   },
+  "aerodactyl": {
+    "dex": 142,
+    "names": {
+      "ja": "プテラ",
+      "en": "Aerodactyl"
+    },
+    "types": [
+      "rock",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 105,
+      "defense": 65,
+      "specialAttack": 60,
+      "specialDefense": 75,
+      "speed": 130
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
+  },
   "alakazam": {
     "dex": 65,
     "names": {
@@ -45,6 +66,28 @@
     "preEvolutions": [
       "abra",
       "kadabra"
+    ],
+    "evolvesTo": []
+  },
+  "arbok": {
+    "dex": 24,
+    "names": {
+      "ja": "アーボック",
+      "en": "Arbok"
+    },
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 95,
+      "defense": 69,
+      "specialAttack": 65,
+      "specialDefense": 79,
+      "speed": 80
+    },
+    "preEvolutions": [
+      "ekans"
     ],
     "evolvesTo": []
   },
@@ -323,6 +366,29 @@
       }
     ]
   },
+  "cloyster": {
+    "dex": 91,
+    "names": {
+      "ja": "パルシェン",
+      "en": "Cloyster"
+    },
+    "types": [
+      "water",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 95,
+      "defense": 180,
+      "specialAttack": 85,
+      "specialDefense": 45,
+      "speed": 70
+    },
+    "preEvolutions": [
+      "shellder"
+    ],
+    "evolvesTo": []
+  },
   "cubone": {
     "dex": 104,
     "names": {
@@ -349,6 +415,29 @@
       }
     ]
   },
+  "dewgong": {
+    "dex": 87,
+    "names": {
+      "ja": "ジュゴン",
+      "en": "Dewgong"
+    },
+    "types": [
+      "water",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 70,
+      "defense": 80,
+      "specialAttack": 70,
+      "specialDefense": 95,
+      "speed": 70
+    },
+    "preEvolutions": [
+      "seel"
+    ],
+    "evolvesTo": []
+  },
   "doduo": {
     "dex": 84,
     "names": {
@@ -373,6 +462,34 @@
         "to": "dodrio",
         "trigger": "level",
         "level": 31
+      }
+    ]
+  },
+  "dragonair": {
+    "dex": 148,
+    "names": {
+      "ja": "ハクリュー",
+      "en": "Dragonair"
+    },
+    "types": [
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 61,
+      "attack": 84,
+      "defense": 65,
+      "specialAttack": 70,
+      "specialDefense": 70,
+      "speed": 70
+    },
+    "preEvolutions": [
+      "dratini"
+    ],
+    "evolvesTo": [
+      {
+        "to": "dragonite",
+        "trigger": "level",
+        "level": 55
       }
     ]
   },
@@ -739,6 +856,101 @@
       }
     ]
   },
+  "gyarados": {
+    "dex": 130,
+    "names": {
+      "ja": "ギャラドス",
+      "en": "Gyarados"
+    },
+    "types": [
+      "water",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 125,
+      "defense": 79,
+      "specialAttack": 60,
+      "specialDefense": 100,
+      "speed": 81
+    },
+    "preEvolutions": [
+      "magikarp"
+    ],
+    "evolvesTo": []
+  },
+  "haunter": {
+    "dex": 93,
+    "names": {
+      "ja": "ゴースト",
+      "en": "Haunter"
+    },
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 50,
+      "defense": 45,
+      "specialAttack": 115,
+      "specialDefense": 55,
+      "speed": 95
+    },
+    "preEvolutions": [
+      "gastly"
+    ],
+    "evolvesTo": [
+      {
+        "to": "gengar",
+        "trigger": "trade"
+      }
+    ]
+  },
+  "hitmonchan": {
+    "dex": 107,
+    "names": {
+      "ja": "エビワラー",
+      "en": "Hitmonchan"
+    },
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 105,
+      "defense": 79,
+      "specialAttack": 35,
+      "specialDefense": 110,
+      "speed": 76
+    },
+    "preEvolutions": [
+      "tyrogue"
+    ],
+    "evolvesTo": []
+  },
+  "hitmonlee": {
+    "dex": 106,
+    "names": {
+      "ja": "サワムラー",
+      "en": "Hitmonlee"
+    },
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 120,
+      "defense": 53,
+      "specialAttack": 35,
+      "specialDefense": 110,
+      "speed": 87
+    },
+    "preEvolutions": [
+      "tyrogue"
+    ],
+    "evolvesTo": []
+  },
   "horsea": {
     "dex": 116,
     "names": {
@@ -813,6 +1025,29 @@
     },
     "preEvolutions": [
       "eevee"
+    ],
+    "evolvesTo": []
+  },
+  "jynx": {
+    "dex": 124,
+    "names": {
+      "ja": "ルージュラ",
+      "en": "Jynx"
+    },
+    "types": [
+      "ice",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 50,
+      "defense": 35,
+      "specialAttack": 115,
+      "specialDefense": 95,
+      "speed": 95
+    },
+    "preEvolutions": [
+      "smoochum"
     ],
     "evolvesTo": []
   },
@@ -1424,6 +1659,29 @@
         "level": 34
       }
     ]
+  },
+  "slowbro": {
+    "dex": 80,
+    "names": {
+      "ja": "ヤドラン",
+      "en": "Slowbro"
+    },
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 75,
+      "defense": 110,
+      "specialAttack": 100,
+      "specialDefense": 80,
+      "speed": 30
+    },
+    "preEvolutions": [
+      "slowpoke"
+    ],
+    "evolvesTo": []
   },
   "spearow": {
     "dex": 21,

@@ -1,5 +1,5 @@
 import { randomUnit } from '../math';
-import { enemyCap, type World } from '../world';
+import { currentWaveIndex, enemyCap, type World } from '../world';
 
 /** プレイヤーの周囲（画面外）に雑魚敵を出す。上限に達していたら既存の敵を強化する（仮） */
 export function spawnEnemies(world: World): void {
@@ -19,7 +19,8 @@ export function spawnEnemies(world: World): void {
     const p = players[rng.int(players.length)]!;
     const [ux, uy] = randomUnit(rng);
     const dist = rng.range(s.spawnDistanceMin, s.spawnDistanceMax);
-    const kindIndex = rng.int(kinds.length);
+    const wave = world.waves[currentWaveIndex(world)]!;
+    const kindIndex = wave.kinds[rng.int(wave.kinds.length)]!;
     const kind = kinds[kindIndex]!;
     const id = world.nextEnemyId++;
     const x = p.x + ux * dist;

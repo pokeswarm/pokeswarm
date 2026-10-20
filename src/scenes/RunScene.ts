@@ -22,11 +22,12 @@ import { PlayerView } from '../render/PlayerView';
 import { PooledCircles } from '../render/PooledCircles';
 import { preloadPokemonAtlas, registerPokemonAnimations } from '../render/sprites/PokemonSprite';
 import { EnemySprites } from '../render/sprites/EnemySprites';
+import { SpriteStreamer } from '../render/sprites/SpriteStreamer';
 import { addSpriteGallery } from '../render/sprites/SpriteGallery';
 import type { Axis, InputCommand, PlayerId } from '../sim/commands';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
-import { enemyCap, type SimRole } from '../sim/world';
+import { currentWaveIndex, enemyCap, type SimRole } from '../sim/world';
 import { applyDebugOverrides } from './debugOverrides';
 import type { NetPanel } from './netPanel';
 
@@ -37,8 +38,6 @@ const GUEST_PLAYER_ID: PlayerId = 2;
 export interface RunSceneData {
   /** プレイヤーのスプライト。取得していなければ null（仮の円で描く） */
   playerSprite: SpriteAnims | null;
-  /** 敵の種類ごとのスプライト（data/game/enemies.json の並び）。無い種類は null */
-  enemySprites: (SpriteAnims | null)[];
   /** 協力プレイの接続。ソロなら null */
   net: RoomConnection | null;
   /** 接続の案内（切断の表示に使う） */
@@ -56,9 +55,9 @@ export class RunScene extends Phaser.Scene {
   private keyboard!: KeyboardInput;
   private playerViews = new Map<PlayerId, PlayerView>();
   private enemyView!: PooledCircles;
-  /** 全種類のスプライトがそろっていれば、敵をスプライトで描く */
-  private enemySpriteView: EnemySprites | null = null;
-  private enemySprites: (SpriteAnims | null)[] = [];
+  /** 敵をスプライトで描く（読み込み済みの種類だけ。まだの種類は円で描く） */
+  private enemySpriteView!: EnemySprites;
+  private streamer!: SpriteStreamer;
   /** 1フレームの処理時間（シミュレーション・描画の命令を含む。移動平均, ms） */
   private frameMs = 0;
   private effects!: EffectRenderer;
@@ -87,23 +86,16 @@ export class RunScene extends Phaser.Scene {
 
   init(data: RunSceneData): void {
     this.playerSprite = data.playerSprite;
-    this.enemySprites = data.enemySprites;
     this.net = data.net;
     this.panel = data.panel;
   }
 
-  /** 読み込むスプライト（同じものは1回だけ） */
-  private allSprites(): SpriteAnims[] {
-    const list = [this.playerSprite, ...this.enemySprites].filter((m): m is SpriteAnims => m !== null);
-    return [...new Map(list.map((m) => [m.key, m])).values()];
-  }
-
   preload(): void {
-    for (const m of this.allSprites()) preloadPokemonAtlas(this, m);
+    if (this.playerSprite) preloadPokemonAtlas(this, this.playerSprite);
   }
 
   create(): void {
-    for (const m of this.allSprites()) registerPokemonAnimations(this, m);
+    if (this.playerSprite) registerPokemonAnimations(this, this.playerSprite);
     const rules = applyDebugOverrides({ enemies: enemiesConfig, spawn: spawnConfig, attack: attackConfig }, window.location.search);
     const role: SimRole = this.net?.role ?? 'solo';
     this.localId = role === 'guest' ? GUEST_PLAYER_ID : HOST_PLAYER_ID;
@@ -136,9 +128,12 @@ export class RunScene extends Phaser.Scene {
     this.keyboard = new KeyboardInput(this);
     this.ground = new GroundGrid(this, placeholderRender);
     this.enemyView = new PooledCircles(this, 0);
-    if (this.enemySprites.length > 0 && this.enemySprites.every((m) => m !== null)) {
-      this.enemySpriteView = new EnemySprites(this, this.enemySprites as SpriteAnims[], spriteRender.enemyScale, spriteRender.enemyAnimation, 0);
-    }
+    this.streamer = new SpriteStreamer(
+      this,
+      rules.enemies.kinds.map((k) => k.sprite),
+      Math.round(spriteRender.enemyPreloadSeconds * simulationConfig.tickRate),
+    );
+    this.enemySpriteView = new EnemySprites(this, (kind) => this.streamer.manifestOf(kind), spriteRender.enemyScale, spriteRender.enemyAnimation, 0);
     this.measureFrameTime();
     this.effects = new EffectRenderer(this, effectRecipes, 2);
     const local = this.sim.world.players.find((p) => p.id === this.localId)!;
@@ -250,9 +245,17 @@ export class RunScene extends Phaser.Scene {
     const enemyColor = hexColor(placeholderRender.enemyColor);
     const empoweredColor = hexColor(placeholderRender.enemyEmpoweredColor);
     const e = world.enemies;
-    const drawn = this.enemySpriteView
-      ? this.enemySpriteView.update(e, alpha, view, (i) => (e.empower[i]! > 0 ? empoweredColor : null))
-      : this.enemyView.update(e, alpha, view, (i) => (e.empower[i]! > 0 ? empoweredColor : enemyColor));
+    this.streamer.update(world);
+    const drawn =
+      this.enemySpriteView.update(e, alpha, view, (i) => (e.empower[i]! > 0 ? empoweredColor : null)) +
+      this.enemyView.update(
+        e,
+        alpha,
+        view,
+        (i) => (e.empower[i]! > 0 ? empoweredColor : enemyColor),
+        (i) => this.streamer.manifestOf(e.kind[i]!) === null,
+      );
+    const sprites = this.streamer.stats();
     this.effects.drawProjectiles(world.projectiles, alpha, attackConfig.effect, deltaMs, timeMs);
 
     const lines = [
@@ -262,6 +265,7 @@ export class RunScene extends Phaser.Scene {
       t('debug.combat', { kills: world.stats.kills, empowered: world.stats.empowered, projectiles: world.projectiles.count }),
       t('debug.simTime', { ms: this.simMs.toFixed(3) }),
       t('debug.frameTime', { ms: this.frameMs.toFixed(2) }),
+      t('debug.enemySprites', { wave: currentWaveIndex(world) + 1, count: sprites.count, mb: (sprites.gpuBytes / 1048576).toFixed(2) }),
       t('debug.tick', { tick: world.tick }),
       t('debug.position', { x: Math.round(local.x), y: Math.round(local.y) }),
     ];

@@ -34,6 +34,15 @@ export const placeholderRender = load('render/placeholder.json', placeholderRend
 export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enemiesJson);
 export const spawnConfig = load('game/spawn.json', spawnConfigSchema, spawnJson);
 export const attackConfig = load('game/attack.json', attackConfigSchema, attackJson);
+
+// ファイルをまたぐ参照の検証
+for (const wave of spawnConfig.waves) {
+  for (const kind of wave.kinds) {
+    if (!enemiesConfig.kinds.some((k) => k.id === kind)) {
+      throw new Error(`data/game/spawn.json の waves にある敵 "${kind}" が data/game/enemies.json にありません`);
+    }
+  }
+}
 export const spriteRender = load('render/sprites.json', spriteRenderSchema, spriteRenderJson);
 export const effectRecipes = resolveEffectRecipes(effectRecipesJson);
 if (!effectRecipes[attackConfig.effect]) throw new Error(`data/game/attack.json の effect "${attackConfig.effect}" のレシピがありません`);

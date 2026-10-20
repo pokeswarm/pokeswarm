@@ -24,5 +24,6 @@
   "net.role.guest": "guest",
   "net.mode.p2p": "direct (WebRTC)",
   "net.mode.relay": "relay (Realtime Database)",
-  "debug.frameTime": "Frame work: {ms} ms (update to render submit)"
+  "debug.frameTime": "Frame work: {ms} ms (update to render submit)",
+  "debug.enemySprites": "Wave {wave}  enemy sprites loaded: {count} kinds (GPU ~{mb} MB)"
 }

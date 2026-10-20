@@ -74,3 +74,54 @@ describe('雑魚敵', () => {
     expect(b.rng.getState()).toEqual(a.rng.getState());
   });
 });
+
+describe('時間帯ごとの出現', () => {
+  it('その時間帯の種類だけが出る', () => {
+    const rules = testRules({
+      spawn: {
+        spawnPerSecond: 30,
+        capGlobal: 1000,
+        capPerPlayer: 1000,
+        waves: [
+          { startSeconds: 0, kinds: ['a'] },
+          { startSeconds: 2, kinds: ['b', 'c'] },
+        ],
+      },
+      attack: { range: 1 },
+    });
+    rules.enemies.kinds = ['a', 'b', 'c'].map((id) => ({ id, hp: 20, moveSpeed: 0, radius: 10 }));
+    const sim = makeSim(rules);
+    const kindsAt = (from: number): Set<number> => {
+      const e = sim.world.enemies;
+      const out = new Set<number>();
+      for (let i = from; i < e.count; i++) out.add(e.kind[i]!);
+      return out;
+    };
+    for (let t = 0; t < 60; t++) sim.step([]);
+    expect(kindsAt(0)).toEqual(new Set([0]));
+    const before = sim.world.enemies.count;
+    for (let t = 0; t < 60; t++) sim.step([]);
+    expect(kindsAt(before)).toEqual(new Set([1, 2]));
+  });
+});
+
+describe('前の時間帯の敵', () => {
+  it('離れすぎたら移し替えずに消す（撃破には数えない）', () => {
+    const rules = testRules({
+      spawn: { waves: [{ startSeconds: 0, kinds: ['a'] }, { startSeconds: 1, kinds: ['b'] }] },
+      attack: { range: 1 },
+    });
+    rules.enemies.kinds = ['a', 'b'].map((id) => ({ id, hp: 20, moveSpeed: 0, radius: 10 }));
+    const sim = makeSim(rules);
+    const e = sim.world.enemies;
+    e.add(1, 0, 300, 0, 20, 0, 10); // 前の時間帯の種類（a）
+    e.add(2, 1, 400, 0, 20, 0, 10); // 次の時間帯の種類（b）
+    for (let t = 0; t < 31; t++) sim.step([]);
+    // 時間帯が b に切り替わった後で、両方を遠くへ離す
+    for (let i = 0; i < e.count; i++) e.x[i] = e.id[i] === 1 ? -5000 : 5000;
+    sim.step([]);
+    const ids = Array.from(sim.world.enemies.id.subarray(0, sim.world.enemies.count));
+    expect(ids).toEqual([2]);
+    expect(sim.world.stats.kills).toBe(0);
+  });
+});

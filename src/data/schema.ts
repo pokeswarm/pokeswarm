@@ -82,9 +82,22 @@ export const spawnConfigSchema = z
     }),
     /** 空間ハッシュの格子の大きさ */
     spatialCellSize: z.number().positive(),
+    /** 前の時間帯の種類の敵は、離れすぎたら移し替えずに消す（時間帯が進むと前の種類が自然にいなくなる） */
+    retireOldWaveKinds: z.boolean(),
+    /**
+     * 時間帯ごとに出す雑魚の種類（data/game/enemies.json の id）。startSeconds の小さい順に並べ、最初は 0。
+     * その時間帯の種類から等しい確率で選ぶ
+     */
+    waves: z
+      .array(z.object({ startSeconds: z.number().nonnegative(), kinds: z.array(z.string()).min(1) }))
+      .min(1),
   })
   .refine((s) => s.spawnDistanceMin <= s.spawnDistanceMax, { message: 'spawnDistanceMin <= spawnDistanceMax' })
-  .refine((s) => s.spawnDistanceMax < s.relocateDistance, { message: 'spawnDistanceMax < relocateDistance' });
+  .refine((s) => s.spawnDistanceMax < s.relocateDistance, { message: 'spawnDistanceMax < relocateDistance' })
+  .refine((s) => s.waves[0]!.startSeconds === 0, { message: 'waves の最初は startSeconds: 0' })
+  .refine((s) => s.waves.every((w, i) => i === 0 || w.startSeconds > s.waves[i - 1]!.startSeconds), {
+    message: 'waves は startSeconds の小さい順に並べる',
+  });
 export type SpawnConfig = z.infer<typeof spawnConfigSchema>;
 
 /** 仮の自動攻撃（技の仕組みができたら置き換える） */
@@ -124,6 +137,12 @@ export const spritePokemonListSchema = z.object({
       dex: z.number().int().positive(),
       /** フォルムのフォルダ（例: "0001"）。通常の姿なら省略 */
       form: z.string().optional(),
+      /**
+       * 作る画像の種類（省略時は full）
+       * - full: 全動作（プレイアブル・中ボス・ボス）。public/sprites/<key>/
+       * - enemy: 雑魚用。enemyAnimations の動作だけ。public/sprites/enemy/<key>/
+       */
+      uses: z.array(z.enum(['full', 'enemy'])).min(1).default(['full']),
     }),
   ),
 });
@@ -137,6 +156,8 @@ export const spritePipelineSchema = z.object({
   }),
   /** 取り出す動作（AnimData.xml の Name） */
   animations: z.array(z.string().min(1)).min(1),
+  /** 雑魚用に取り出す動作（GPU のメモリを抑えるため最小限にする） */
+  enemyAnimations: z.array(z.string().min(1)).min(1),
   /** 動作が欠けているときの代わり（代わりも欠けていればさらにたどる） */
   fallbacks: z.record(z.string(), z.string()),
   maxAtlasSize: z.number().int().positive(),
@@ -178,6 +199,8 @@ export const spriteRenderSchema = z.object({
   /** 敵の拡大率と、敵に使う動作 */
   enemyScale: z.number().positive(),
   enemyAnimation: z.string(),
+  /** 次の時間帯の雑魚のスプライトを、始まる何秒前から読み込むか */
+  enemyPreloadSeconds: z.number().nonnegative(),
   /** 確認用の一覧表示（?gallery）の間隔 */
   gallerySpacing: z.number().positive(),
 });

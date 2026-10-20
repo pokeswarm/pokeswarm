@@ -14,5 +14,33 @@
     "strength": 0.5,
     "maxNeighbors": 6
   },
-  "spatialCellSize": 64
+  "spatialCellSize": 64,
+  "retireOldWaveKinds": true,
+  "waves": [
+    {
+      "startSeconds": 0,
+      "kinds": [
+        "rattata",
+        "pidgey",
+        "caterpie"
+      ]
+    },
+    {
+      "startSeconds": 40,
+      "kinds": [
+        "weedle",
+        "metapod",
+        "kakuna",
+        "spearow"
+      ]
+    },
+    {
+      "startSeconds": 80,
+      "kinds": [
+        "zubat",
+        "geodude",
+        "paras"
+      ]
+    }
+  ]
 }

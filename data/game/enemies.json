@@ -2,70 +2,70 @@
   "kinds": [
     {
       "id": "rattata",
-      "sprite": "rattata",
+      "sprite": "enemy/rattata",
       "hp": 20,
       "moveSpeed": 60,
       "radius": 10
     },
     {
       "id": "pidgey",
-      "sprite": "pidgey",
+      "sprite": "enemy/pidgey",
       "hp": 20,
       "moveSpeed": 60,
       "radius": 10
     },
     {
       "id": "caterpie",
-      "sprite": "caterpie",
+      "sprite": "enemy/caterpie",
       "hp": 20,
       "moveSpeed": 60,
       "radius": 10
     },
     {
       "id": "weedle",
-      "sprite": "weedle",
+      "sprite": "enemy/weedle",
       "hp": 20,
       "moveSpeed": 60,
       "radius": 10
     },
     {
       "id": "metapod",
-      "sprite": "metapod",
+      "sprite": "enemy/metapod",
       "hp": 20,
       "moveSpeed": 60,
       "radius": 10
     },
     {
       "id": "kakuna",
-      "sprite": "kakuna",
+      "sprite": "enemy/kakuna",
       "hp": 20,
       "moveSpeed": 60,
       "radius": 10
     },
     {
       "id": "spearow",
-      "sprite": "spearow",
+      "sprite": "enemy/spearow",
       "hp": 20,
       "moveSpeed": 60,
       "radius": 10
     },
     {
       "id": "zubat",
-      "sprite": "zubat",
+      "sprite": "enemy/zubat",
       "hp": 20,
       "moveSpeed": 60,
       "radius": 10
     },
     {
       "id": "geodude",
-      "sprite": "geodude",
+      "sprite": "enemy/geodude",
       "hp": 20,
       "moveSpeed": 60,
       "radius": 10
     },
     {
       "id": "paras",
-      "sprite": "paras",
+      "sprite": "enemy/paras",
       "hp": 20,
       "moveSpeed": 60,
       "radius": 10

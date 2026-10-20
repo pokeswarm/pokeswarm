@@ -58,6 +58,12 @@ export interface KillEnemyCommand {
   readonly by: PlayerId;
 }
 
+/** ゲスト: ホストが前の時間帯の敵を消した（撃破ではない） */
+export interface RetireEnemyCommand {
+  readonly type: 'retireEnemy';
+  readonly id: number;
+}
+
 /** ゲスト: ホストによる敵の位置の補正。[id, x, y, id, x, y, ...] */
 export interface CorrectEnemiesCommand {
   readonly type: 'correctEnemies';
@@ -71,4 +77,5 @@ export type InputCommand =
   | EmpowerEnemyCommand
   | DamageEnemyCommand
   | KillEnemyCommand
+  | RetireEnemyCommand
   | CorrectEnemiesCommand;

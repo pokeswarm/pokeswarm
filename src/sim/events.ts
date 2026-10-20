@@ -40,4 +40,16 @@ export interface DamageDealtEvent {
   readonly by: PlayerId;
 }
 
-export type SimEvent = EnemyKilledEvent | ProjectileHitEvent | EnemySpawnedEvent | EnemyEmpoweredEvent | DamageDealtEvent;
+/** ホスト: 前の時間帯の敵が離れすぎたので消した（撃破ではない。ゲストへ送る） */
+export interface EnemyRetiredEvent {
+  readonly type: 'enemyRetired';
+  readonly id: number;
+}
+
+export type SimEvent =
+  | EnemyKilledEvent
+  | ProjectileHitEvent
+  | EnemySpawnedEvent
+  | EnemyEmpoweredEvent
+  | DamageDealtEvent
+  | EnemyRetiredEvent;

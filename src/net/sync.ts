@@ -51,6 +51,7 @@ export class SyncSession {
     const spawns: number[] = [];
     const empowers: number[] = [];
     const kills: number[] = [];
+    const retired: number[] = [];
     const damages: number[] = [];
     for (const ev of world.events) {
       switch (ev.type) {
@@ -63,6 +64,9 @@ export class SyncSession {
         case 'enemyKilled':
           if (role === 'host') kills.push(ev.enemyId, ev.by);
           break;
+        case 'enemyRetired':
+          if (role === 'host') retired.push(ev.id);
+          break;
         case 'damageDealt':
           if (role === 'guest') damages.push(ev.enemyId, ev.amount, ev.by);
           break;
@@ -73,6 +77,7 @@ export class SyncSession {
     if (spawns.length) out.push({ t: 'sp', e: spawns });
     if (empowers.length) out.push({ t: 'em', e: empowers });
     if (kills.length) out.push({ t: 'k', e: kills });
+    if (retired.length) out.push({ t: 'rt', e: retired });
     if (damages.length) out.push({ t: 'd', e: damages });
 
     if (role === 'host' && world.tick % this.rate.correctionIntervalTicks === 0 && world.enemies.count > 0) {
@@ -118,6 +123,9 @@ export class SyncSession {
           break;
         case 'k':
           if (guest) for (let k = 0; k + 1 < m.e.length; k += 2) cmds.push({ type: 'killEnemy', id: m.e[k]!, by: m.e[k + 1]! });
+          break;
+        case 'rt':
+          if (guest) for (const id of m.e) cmds.push({ type: 'retireEnemy', id });
           break;
         case 'd':
           if (host) {

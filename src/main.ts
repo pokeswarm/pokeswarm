@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
-import { enemiesConfig, networkConfig, placeholderRender, spriteRender } from './data';
-import type { SpriteAnims } from './data/schema';
+import { networkConfig, placeholderRender, spriteRender } from './data';
 import { firebaseOptionsFromEnv } from './firebase/config';
 import type { RoomConnection } from './net/room';
 import { loadSpriteManifest } from './render/sprites/spriteManifest';
@@ -51,19 +50,10 @@ async function connectIfRequested(panel: NetPanel): Promise<RoomConnection | nul
 async function start(): Promise<void> {
   const panel = new NetPanel();
   panel.hide();
-  // スプライトの定義は種類ごとに1回だけ読む
-  const manifests = new Map<string, Promise<SpriteAnims | null>>();
-  const manifest = (key: string): Promise<SpriteAnims | null> => {
-    if (!manifests.has(key)) manifests.set(key, loadSpriteManifest(key));
-    return manifests.get(key)!;
-  };
-  const [playerSprite, enemySprites, net] = await Promise.all([
-    manifest(spriteRender.playerSprite),
-    Promise.all(enemiesConfig.kinds.map((k) => (k.sprite ? manifest(k.sprite) : Promise.resolve(null)))),
-    connectIfRequested(panel),
-  ]);
+  // 雑魚のスプライトは起動時には読まず、時間帯に合わせて読む（SpriteStreamer）
+  const [playerSprite, net] = await Promise.all([loadSpriteManifest(spriteRender.playerSprite), connectIfRequested(panel)]);
   panel.hide();
-  const data: RunSceneData = { playerSprite, enemySprites, net, panel };
+  const data: RunSceneData = { playerSprite, net, panel };
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',

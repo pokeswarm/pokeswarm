@@ -115,15 +115,23 @@ function parseCreditNames(text: string): Map<string, Author> {
   return map;
 }
 
+/** 作る画像の種類。full は全動作、enemy は雑魚用の最小限の動作 */
+interface Variant {
+  /** 出力先とゲーム内のキー（例: "charmander"、"enemy/rattata"） */
+  outKey: string;
+  animations: readonly string[];
+}
+
 async function processPokemon(
   pipeline: SpritePipeline,
   entry: { key: string; dex: number; form?: string | undefined },
+  variant: Variant,
   creditNames: Map<string, Author>,
 ) {
   const folder = `sprite/${String(entry.dex).padStart(4, '0')}${entry.form ? `/${entry.form}` : ''}`;
   const xml = await fetchFile(pipeline, `${folder}/AnimData.xml`);
   if (!xml) {
-    return { key: entry.key, ok: false as const, reason: `${folder}/AnimData.xml がありません` };
+    return { key: variant.outKey, ok: false as const, reason: `${folder}/AnimData.xml がありません` };
   }
   const animData = parseAnimData(xml.toString('utf8'));
 
@@ -144,7 +152,7 @@ async function processPokemon(
 
   const animations: SpriteAnims['animations'] = {};
   const missing: SpriteAnims['missing'] = [];
-  for (const wanted of pipeline.animations) {
+  for (const wanted of variant.animations) {
     let name: string | undefined = wanted;
     const visited = new Set<string>();
     let sheet: { def: AnimDef; png: Png } | null = null;
@@ -170,7 +178,7 @@ async function processPokemon(
   const width = Math.max(...used.map((s) => s.png.width));
   const height = used.reduce((sum, s) => sum + s.png.height, 0);
   if (width > pipeline.maxAtlasSize || height > pipeline.maxAtlasSize) {
-    throw new Error(`${entry.key}: アトラスが大きすぎます (${width}x${height})`);
+    throw new Error(`${variant.outKey}: アトラスが大きすぎます (${width}x${height})`);
   }
   const atlas = new PNG({ width, height });
   const frames: Record<string, unknown> = {};
@@ -180,7 +188,7 @@ async function processPokemon(
     const cols = Math.floor(png.width / def.frameWidth);
     const rows = Math.floor(png.height / def.frameHeight);
     if (cols !== def.durations.length) {
-      throw new Error(`${entry.key}/${def.name}: コマ数が AnimData と一致しません (${cols} != ${def.durations.length})`);
+      throw new Error(`${variant.outKey}/${def.name}: コマ数が AnimData と一致しません (${cols} != ${def.durations.length})`);
     }
     for (let dir = 0; dir < SPRITE_DIRECTIONS.length; dir++) {
       // 1方向しかない動作は、全方向で同じ行を使う
@@ -199,7 +207,7 @@ async function processPokemon(
   }
 
   const anims: SpriteAnims = spriteAnimsSchema.parse({
-    key: entry.key,
+    key: variant.outKey,
     dex: entry.dex,
     durationUnitMs: DURATION_UNIT_MS,
     directions: [...SPRITE_DIRECTIONS],
@@ -207,7 +215,7 @@ async function processPokemon(
     missing,
   });
 
-  const outDir = join(OUT_DIR, entry.key);
+  const outDir = join(OUT_DIR, ...variant.outKey.split('/'));
   await mkdir(outDir, { recursive: true });
   await writeFile(join(outDir, 'atlas.png'), PNG.sync.write(atlas));
   await writeFile(
@@ -226,7 +234,8 @@ async function processPokemon(
   const authors = [...authorIds].map((id) => creditNames.get(id) ?? { name: id, contact: null });
 
   return {
-    key: entry.key,
+    key: variant.outKey,
+    pokemon: entry.key,
     ok: true as const,
     dex: entry.dex,
     folder,
@@ -234,6 +243,8 @@ async function processPokemon(
     authors,
     official: authors.some((a) => a.name === OFFICIAL_AUTHOR),
     atlasSize: `${width}x${height}`,
+    /** GPU で使うメモリの目安（幅 × 高さ × 4バイト） */
+    gpuBytes: width * height * 4,
   };
 }
 
@@ -247,12 +258,25 @@ async function main(): Promise<void> {
   await mkdir(OUT_DIR, { recursive: true });
 
   const results = [];
-  for (const entry of list.pokemon) results.push(await processPokemon(pipeline, entry, creditNames));
+  for (const entry of list.pokemon) {
+    for (const use of entry.uses) {
+      const variant: Variant =
+        use === 'full'
+          ? { outKey: entry.key, animations: pipeline.animations }
+          : { outKey: `enemy/${entry.key}`, animations: pipeline.enemyAnimations };
+      results.push(await processPokemon(pipeline, entry, variant, creditNames));
+    }
+  }
 
   const sourceUrl = `https://github.com/${pipeline.source.repo}/tree/${pipeline.source.ref}`;
-  const credits = results.flatMap((r) =>
-    r.ok ? [{ key: r.key, dex: r.dex, authors: r.authors, license: 'CC BY-NC 4.0', source: `${sourceUrl}/${r.folder}` }] : [],
-  );
+  // 作者一覧はポケモンごとに1回（full と enemy の両方を作っても重複させない）
+  const creditMap = new Map<string, unknown>();
+  for (const r of results) {
+    if (r.ok && !creditMap.has(r.pokemon)) {
+      creditMap.set(r.pokemon, { key: r.pokemon, dex: r.dex, authors: r.authors, license: 'CC BY-NC 4.0', source: `${sourceUrl}/${r.folder}` });
+    }
+  }
+  const credits = [...creditMap.values()];
   await writeFile(join(OUT_DIR, 'credits.json'), JSON.stringify(credits, null, 2));
   await writeFile(join(OUT_DIR, 'report.json'), JSON.stringify(results, null, 2));
 
@@ -263,7 +287,7 @@ async function main(): Promise<void> {
       console.log(`  ✗ ${r.key}: ${r.reason}`);
       continue;
     }
-    console.log(`  ✓ ${r.key} (#${r.dex}) アトラス ${r.atlasSize}  作者: ${r.authors.map((a) => a.name).join(', ')}`);
+    console.log(`  ✓ ${r.key} (#${r.dex}) アトラス ${r.atlasSize}（GPU 約 ${(r.gpuBytes / 1048576).toFixed(2)} MB）  作者: ${r.authors.map((a) => a.name).join(', ')}`);
     if (r.official) console.log(`    ! 公式ゲーム（${OFFICIAL_AUTHOR}）の素材を含みます`);
     for (const m of r.missing) {
       console.log(`    - 欠けている動作: ${m.animation} → ${m.usedInstead ?? '代わりなし'}`);

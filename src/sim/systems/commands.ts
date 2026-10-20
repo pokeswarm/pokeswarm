@@ -52,6 +52,11 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         world.stats.kills++;
         break;
       }
+      case 'retireEnemy': {
+        const i = findEnemyIndex(world, cmd.id);
+        if (i !== -1) e.hp[i] = 0;
+        break;
+      }
       case 'correctEnemies': {
         const index = new Map<number, number>();
         for (let i = 0; i < e.count; i++) index.set(e.id[i]!, i);

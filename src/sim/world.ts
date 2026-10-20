@@ -37,6 +37,8 @@ export interface World {
   /** この更新で起きた出来事（更新のたびに空にする） */
   readonly events: SimEvent[];
   readonly stats: { kills: number; empowered: number };
+  /** 時間帯ごとに出す敵の種類（rules.spawn.waves を更新回数と種類の番号に直したもの） */
+  readonly waves: readonly { readonly startTick: number; readonly kinds: readonly number[] }[];
   /** 近傍検索の作業用（更新中にメモリを確保しないため） */
   readonly scratch: Int32Array;
   /** 発射体の命中候補の作業用 */
@@ -65,6 +67,14 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     spawnAccumulator: 0,
     events: [],
     stats: { kills: 0, empowered: 0 },
+    waves: rules.spawn.waves.map((w) => ({
+      startTick: Math.round(w.startSeconds * tickRate),
+      kinds: w.kinds.map((id) => {
+        const i = rules.enemies.kinds.findIndex((k) => k.id === id);
+        if (i === -1) throw new Error(`敵の種類 ${id} がありません`);
+        return i;
+      }),
+    })),
     scratch: new Int32Array(capacity * 2),
     hitScratch: new Int32Array(capacity * 2),
     neighborScratch: new Int32Array(Math.max(8, rules.spawn.separation.maxNeighbors * 4)),
@@ -85,4 +95,11 @@ export function findEnemyIndex(world: World, id: number): number {
   const e = world.enemies;
   for (let i = 0; i < e.count; i++) if (e.id[i] === id) return i;
   return -1;
+}
+
+/** 今の時間帯の番号 */
+export function currentWaveIndex(world: World, tick = world.tick): number {
+  let i = 0;
+  while (i + 1 < world.waves.length && world.waves[i + 1]!.startTick <= tick) i++;
+  return i;
 }

@@ -35,9 +35,11 @@ export class PooledCircles {
     alpha: number,
     view: { left: number; top: number; right: number; bottom: number },
     colorOf: (index: number) => number,
+    include: (index: number) => boolean = () => true,
   ): number {
     let used = 0;
     for (let i = 0; i < src.count; i++) {
+      if (!include(i)) continue;
       const r = src.radius[i]!;
       const x = src.prevX[i]! + (src.x[i]! - src.prevX[i]!) * alpha;
       const y = src.prevY[i]! + (src.y[i]! - src.prevY[i]!) * alpha;

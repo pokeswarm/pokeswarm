@@ -1,15 +1,81 @@
 {
   "pokemon": [
-    { "key": "charmander", "dex": 4 },
-    { "key": "caterpie", "dex": 10 },
-    { "key": "metapod", "dex": 11 },
-    { "key": "weedle", "dex": 13 },
-    { "key": "kakuna", "dex": 14 },
-    { "key": "pidgey", "dex": 16 },
-    { "key": "rattata", "dex": 19 },
-    { "key": "spearow", "dex": 21 },
-    { "key": "paras", "dex": 46 },
-    { "key": "zubat", "dex": 41 },
-    { "key": "geodude", "dex": 74 }
+    {
+      "key": "charmander",
+      "dex": 4,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "caterpie",
+      "dex": 10,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "metapod",
+      "dex": 11,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "weedle",
+      "dex": 13,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "kakuna",
+      "dex": 14,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "pidgey",
+      "dex": 16,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "rattata",
+      "dex": 19,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "spearow",
+      "dex": 21,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "paras",
+      "dex": 46,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "zubat",
+      "dex": 41,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "geodude",
+      "dex": 74,
+      "uses": [
+        "enemy"
+      ]
+    }
   ]
 }

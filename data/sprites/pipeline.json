@@ -3,7 +3,16 @@
     "repo": "PMDCollab/SpriteCollab",
     "ref": "f18cffdaa1c27a155ee813c2b728f40bbd134149"
   },
-  "animations": ["Idle", "Walk", "Attack", "Hurt", "Faint"],
+  "animations": [
+    "Idle",
+    "Walk",
+    "Attack",
+    "Hurt",
+    "Faint"
+  ],
+  "enemyAnimations": [
+    "Walk"
+  ],
   "fallbacks": {
     "Walk": "Idle",
     "Attack": "Idle",

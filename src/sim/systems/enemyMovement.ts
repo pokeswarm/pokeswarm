@@ -1,6 +1,6 @@
 import type { Player } from '../entities/player';
 import { axisToUnit, hash01 } from '../math';
-import type { World } from '../world';
+import { currentWaveIndex, type World } from '../world';
 
 /**
  * 雑魚敵の移動。一番近いプレイヤーへまっすぐ向かう。
@@ -11,6 +11,9 @@ export function moveEnemies(world: World): void {
   if (players.length === 0) return;
   const s = world.rules.spawn;
   const relocate2 = s.relocateDistance * s.relocateDistance;
+  // 前の時間帯の種類を消すのはホスト（ソロ）だけ。ゲストはホストから知らせを受けて消す
+  const retire = s.retireOldWaveKinds && world.role !== 'guest';
+  const waveKinds = world.waves[currentWaveIndex(world)]!.kinds;
   for (let i = 0; i < e.count; i++) {
     const x = e.x[i]!;
     const y = e.y[i]!;
@@ -30,6 +33,11 @@ export function moveEnemies(world: World): void {
     }
 
     if (best > relocate2) {
+      if (retire && !waveKinds.includes(e.kind[i]!)) {
+        e.hp[i] = 0;
+        world.events.push({ type: 'enemyRetired', id: e.id[i]! });
+        continue;
+      }
       const [fx, fy] = axisToUnit(target.facingX, target.facingY);
       // 移し替え先は共有の乱数ではなく、敵の id と移し替えた回数から決める
       // （ホストとゲストで乱数の使い方や更新番号が違っても、同じ場所になる）

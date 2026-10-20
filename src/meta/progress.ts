@@ -20,6 +20,11 @@ export function isUnlocked(save: Readonly<SaveData>, unlocks: UnlocksConfig, pok
   return unlocks.initial.includes(pokemon) || save.unlocked.includes(pokemon);
 }
 
+/** 遊べるポケモン（playables.json のキーと、その解放の名前）が解放済みか */
+export function isPlayableUnlocked(save: Readonly<SaveData>, unlocks: UnlocksConfig, key: string, unlock: string | undefined): boolean {
+  return isUnlocked(save, unlocks, unlock ?? key);
+}
+
 /** 新しく条件を満たした実績と解放を、セーブデータに足して返す */
 export function applyProgress(save: SaveData, achievements: AchievementsConfig, unlocks: UnlocksConfig): { achievements: string[]; unlocks: string[] } {
   const newAchievements: string[] = [];

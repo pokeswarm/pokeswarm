@@ -451,6 +451,11 @@ export const playablesConfigSchema = z.object({
       sprite: z.string(),
       /** 最初に覚えている技 */
       startingMoves: z.array(z.string()).min(1),
+      /**
+       * 解放の名前（data/game/unlocks.json の pokemon）。省略時はこのキー。
+       * 解放したポケモンは進化前の姿から始めるので、ヒトデマンはスターミーの解放で遊べるようになる
+       */
+      unlock: z.string().optional(),
     }),
   ),
   /** 指定が無いときのポケモン */

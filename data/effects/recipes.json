@@ -779,6 +779,413 @@
           "intensity": 0.005
         }
       }
+    },
+    "electric.base": {
+      "projectile": {
+        "coreColor": "#fffde7",
+        "coreScale": 0.8,
+        "glowColor": "#ffeb3b",
+        "glowScale": 2.4,
+        "glowAlpha": 0.85
+      },
+      "impact": {
+        "burst": {
+          "count": 12,
+          "colors": [
+            "#ffffff",
+            "#fff176",
+            "#fdd835",
+            "#f9a825"
+          ],
+          "lifespanMs": [
+            200,
+            400
+          ],
+          "speed": [
+            60,
+            200
+          ],
+          "scale": [
+            0.55,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#fff59d",
+          "radius": 22,
+          "durationMs": 140,
+          "alpha": 0.6
+        },
+        "shake": {
+          "durationMs": 40,
+          "intensity": 0.0012
+        }
+      }
+    },
+    "rock.base": {
+      "projectile": {
+        "coreColor": "#efebe9",
+        "coreScale": 0.8,
+        "glowColor": "#a1887f",
+        "glowScale": 2.4,
+        "glowAlpha": 0.85
+      },
+      "impact": {
+        "burst": {
+          "count": 12,
+          "colors": [
+            "#d7ccc8",
+            "#a1887f",
+            "#6d4c41",
+            "#3e2723"
+          ],
+          "lifespanMs": [
+            200,
+            400
+          ],
+          "speed": [
+            60,
+            200
+          ],
+          "scale": [
+            0.55,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#bcaaa4",
+          "radius": 22,
+          "durationMs": 140,
+          "alpha": 0.6
+        },
+        "shake": {
+          "durationMs": 40,
+          "intensity": 0.0012
+        }
+      }
+    },
+    "ground.base": {
+      "projectile": {
+        "coreColor": "#fff3e0",
+        "coreScale": 0.8,
+        "glowColor": "#c8a165",
+        "glowScale": 2.4,
+        "glowAlpha": 0.85
+      },
+      "impact": {
+        "burst": {
+          "count": 12,
+          "colors": [
+            "#ffe0b2",
+            "#d7a86e",
+            "#a1754a",
+            "#5d4037"
+          ],
+          "lifespanMs": [
+            200,
+            400
+          ],
+          "speed": [
+            60,
+            200
+          ],
+          "scale": [
+            0.55,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#d7b98e",
+          "radius": 22,
+          "durationMs": 140,
+          "alpha": 0.6
+        },
+        "shake": {
+          "durationMs": 40,
+          "intensity": 0.0012
+        }
+      }
+    },
+    "psychic.base": {
+      "projectile": {
+        "coreColor": "#fce4ec",
+        "coreScale": 0.8,
+        "glowColor": "#f06292",
+        "glowScale": 2.4,
+        "glowAlpha": 0.85
+      },
+      "impact": {
+        "burst": {
+          "count": 12,
+          "colors": [
+            "#ffffff",
+            "#f8bbd0",
+            "#ec407a",
+            "#880e4f"
+          ],
+          "lifespanMs": [
+            200,
+            400
+          ],
+          "speed": [
+            60,
+            200
+          ],
+          "scale": [
+            0.55,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#f48fb1",
+          "radius": 22,
+          "durationMs": 140,
+          "alpha": 0.6
+        },
+        "shake": {
+          "durationMs": 40,
+          "intensity": 0.0012
+        }
+      }
+    },
+    "thunder-shock": {
+      "extends": "electric.base"
+    },
+    "thunder-punch": {
+      "extends": "electric.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      }
+    },
+    "thunderbolt": {
+      "extends": "electric.base",
+      "projectile": {
+        "glowScale": 2.8,
+        "coreScale": 0.9
+      }
+    },
+    "thunder": {
+      "extends": "electric.base",
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "rock-throw": {
+      "extends": "rock.base",
+      "projectile": {
+        "glowScale": 1.2,
+        "coreScale": 0.6
+      }
+    },
+    "rock-slide": {
+      "extends": "rock.base",
+      "projectile": {
+        "glowScale": 1.2,
+        "coreScale": 0.6
+      },
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "magnitude": {
+      "extends": "ground.base"
+    },
+    "earthquake": {
+      "extends": "ground.base",
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "bonemerang": {
+      "extends": "ground.base",
+      "projectile": {
+        "coreColor": "#fafafa",
+        "glowScale": 1.6
+      }
+    },
+    "sand-tomb": {
+      "extends": "ground.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      }
+    },
+    "confusion": {
+      "extends": "psychic.base"
+    },
+    "psybeam": {
+      "extends": "psychic.base",
+      "projectile": {
+        "glowColor": "#ce93d8"
+      }
+    },
+    "psychic": {
+      "extends": "psychic.base",
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "future-sight": {
+      "extends": "psychic.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.4
+      },
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "stone-edge": {
+      "extends": "rock.base",
+      "projectile": {
+        "glowScale": 1.3,
+        "coreScale": 0.7
+      },
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "rapid-spin": {
+      "extends": "water.base",
+      "projectile": {
+        "glowScale": 1.8,
+        "coreScale": 0.8
+      }
+    },
+    "volt-tackle": {
+      "extends": "electric.base",
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "petal-blizzard": {
+      "extends": "grass.base",
+      "projectile": {
+        "glowColor": "#f48fb1",
+        "glowScale": 1.8
+      }
+    },
+    "explosion": {
+      "extends": "fire.base",
+      "impact": {
+        "flash": {
+          "radius": 120
+        },
+        "shake": {
+          "durationMs": 160,
+          "intensity": 0.006
+        }
+      }
+    },
+    "psycho-boost": {
+      "extends": "psychic.base",
+      "projectile": {
+        "glowScale": 1.2,
+        "coreScale": 0.4
+      },
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "extreme-speed": {
+      "extends": "normal.base",
+      "projectile": {
+        "glowColor": "#ffe082",
+        "glowScale": 2.6
+      }
+    },
+    "rock-wrecker": {
+      "extends": "rock.base",
+      "projectile": {
+        "glowScale": 2,
+        "coreScale": 1
+      },
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
     }
   }
 }

@@ -39,12 +39,28 @@
     "type": "normal",
     "damageClass": "physical"
   },
+  "bonemerang": {
+    "names": {
+      "ja": "ホネブーメラン",
+      "en": "Bonemerang"
+    },
+    "type": "ground",
+    "damageClass": "physical"
+  },
   "bubble": {
     "names": {
       "ja": "あわ",
       "en": "Bubble"
     },
     "type": "water",
+    "damageClass": "special"
+  },
+  "confusion": {
+    "names": {
+      "ja": "ねんりき",
+      "en": "Confusion"
+    },
+    "type": "psychic",
     "damageClass": "special"
   },
   "draco-meteor": {
@@ -70,6 +86,22 @@
     },
     "type": "fire",
     "damageClass": "special"
+  },
+  "explosion": {
+    "names": {
+      "ja": "だいばくはつ",
+      "en": "Explosion"
+    },
+    "type": "normal",
+    "damageClass": "physical"
+  },
+  "extreme-speed": {
+    "names": {
+      "ja": "しんそく",
+      "en": "Extreme Speed"
+    },
+    "type": "normal",
+    "damageClass": "physical"
   },
   "fire-blast": {
     "names": {
@@ -117,6 +149,14 @@
       "en": "Frenzy Plant"
     },
     "type": "grass",
+    "damageClass": "special"
+  },
+  "future-sight": {
+    "names": {
+      "ja": "みらいよち",
+      "en": "Future Sight"
+    },
+    "type": "psychic",
     "damageClass": "special"
   },
   "giga-drain": {
@@ -175,6 +215,22 @@
     "type": "grass",
     "damageClass": "status"
   },
+  "magnitude": {
+    "names": {
+      "ja": "マグニチュード",
+      "en": "Magnitude"
+    },
+    "type": "ground",
+    "damageClass": "physical"
+  },
+  "petal-blizzard": {
+    "names": {
+      "ja": "はなふぶき",
+      "en": "Petal Blizzard"
+    },
+    "type": "grass",
+    "damageClass": "physical"
+  },
   "petal-dance": {
     "names": {
       "ja": "はなびらのまい",
@@ -191,10 +247,26 @@
     "type": "poison",
     "damageClass": "physical"
   },
+  "psybeam": {
+    "names": {
+      "ja": "サイケこうせん",
+      "en": "Psybeam"
+    },
+    "type": "psychic",
+    "damageClass": "special"
+  },
   "psychic": {
     "names": {
       "ja": "サイコキネシス",
       "en": "Psychic"
+    },
+    "type": "psychic",
+    "damageClass": "special"
+  },
+  "psycho-boost": {
+    "names": {
+      "ja": "サイコブースト",
+      "en": "Psycho Boost"
     },
     "type": "psychic",
     "damageClass": "special"
@@ -215,12 +287,52 @@
     "type": "normal",
     "damageClass": "physical"
   },
+  "rapid-spin": {
+    "names": {
+      "ja": "こうそくスピン",
+      "en": "Rapid Spin"
+    },
+    "type": "normal",
+    "damageClass": "physical"
+  },
   "razor-leaf": {
     "names": {
       "ja": "はっぱカッター",
       "en": "Razor Leaf"
     },
     "type": "grass",
+    "damageClass": "physical"
+  },
+  "rock-slide": {
+    "names": {
+      "ja": "いわなだれ",
+      "en": "Rock Slide"
+    },
+    "type": "rock",
+    "damageClass": "physical"
+  },
+  "rock-throw": {
+    "names": {
+      "ja": "いわおとし",
+      "en": "Rock Throw"
+    },
+    "type": "rock",
+    "damageClass": "physical"
+  },
+  "rock-wrecker": {
+    "names": {
+      "ja": "がんせきほう",
+      "en": "Rock Wrecker"
+    },
+    "type": "rock",
+    "damageClass": "physical"
+  },
+  "sand-tomb": {
+    "names": {
+      "ja": "すなじごく",
+      "en": "Sand Tomb"
+    },
+    "type": "ground",
     "damageClass": "physical"
   },
   "shadow-ball": {
@@ -255,6 +367,14 @@
     "type": "grass",
     "damageClass": "special"
   },
+  "stone-edge": {
+    "names": {
+      "ja": "ストーンエッジ",
+      "en": "Stone Edge"
+    },
+    "type": "rock",
+    "damageClass": "physical"
+  },
   "surf": {
     "names": {
       "ja": "なみのり",
@@ -287,12 +407,44 @@
     "type": "electric",
     "damageClass": "special"
   },
+  "thunder-punch": {
+    "names": {
+      "ja": "かみなりパンチ",
+      "en": "Thunder Punch"
+    },
+    "type": "electric",
+    "damageClass": "physical"
+  },
+  "thunder-shock": {
+    "names": {
+      "ja": "でんきショック",
+      "en": "Thunder Shock"
+    },
+    "type": "electric",
+    "damageClass": "special"
+  },
+  "thunderbolt": {
+    "names": {
+      "ja": "１０まんボルト",
+      "en": "Thunderbolt"
+    },
+    "type": "electric",
+    "damageClass": "special"
+  },
   "vine-whip": {
     "names": {
       "ja": "つるのムチ",
       "en": "Vine Whip"
     },
     "type": "grass",
+    "damageClass": "physical"
+  },
+  "volt-tackle": {
+    "names": {
+      "ja": "ボルテッカー",
+      "en": "Volt Tackle"
+    },
+    "type": "electric",
     "damageClass": "physical"
   },
   "water-gun": {

@@ -87,7 +87,12 @@
     "pidgeotto",
     "fearow",
     "tangela",
-    "ditto"
+    "ditto",
+    "pikachu",
+    "gloom",
+    "kadabra",
+    "rhyhorn",
+    "staryu"
   ],
   "moves": [
     "ember",
@@ -127,7 +132,26 @@
     "hurricane",
     "thunder",
     "fire-blast",
-    "ancient-power"
+    "ancient-power",
+    "thunder-shock",
+    "thunderbolt",
+    "thunder-punch",
+    "rock-throw",
+    "rock-slide",
+    "magnitude",
+    "bonemerang",
+    "sand-tomb",
+    "confusion",
+    "psybeam",
+    "future-sight",
+    "stone-edge",
+    "rapid-spin",
+    "volt-tackle",
+    "petal-blizzard",
+    "explosion",
+    "psycho-boost",
+    "extreme-speed",
+    "rock-wrecker"
   ],
   "items": [
     "x-attack",
@@ -155,6 +179,10 @@
     "wide-lens",
     "lucky-egg",
     "potion",
-    "rare-candy"
+    "rare-candy",
+    "magnet",
+    "hard-stone",
+    "soft-sand",
+    "twisted-spoon"
   ]
 }

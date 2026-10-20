@@ -791,6 +791,40 @@
       }
     ]
   },
+  "gloom": {
+    "dex": 44,
+    "names": {
+      "ja": "クサイハナ",
+      "en": "Gloom"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 65,
+      "defense": 70,
+      "specialAttack": 85,
+      "specialDefense": 75,
+      "speed": 40
+    },
+    "preEvolutions": [
+      "oddish"
+    ],
+    "evolvesTo": [
+      {
+        "to": "vileplume",
+        "trigger": "item",
+        "item": "leaf-stone"
+      },
+      {
+        "to": "bellossom",
+        "trigger": "item",
+        "item": "sun-stone"
+      }
+    ]
+  },
   "golbat": {
     "dex": 42,
     "names": {
@@ -1093,6 +1127,33 @@
       "smoochum"
     ],
     "evolvesTo": []
+  },
+  "kadabra": {
+    "dex": 64,
+    "names": {
+      "ja": "ユンゲラー",
+      "en": "Kadabra"
+    },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 35,
+      "defense": 30,
+      "specialAttack": 120,
+      "specialDefense": 70,
+      "speed": 105
+    },
+    "preEvolutions": [
+      "abra"
+    ],
+    "evolvesTo": [
+      {
+        "to": "alakazam",
+        "trigger": "trade"
+      }
+    ]
   },
   "kakuna": {
     "dex": 14,
@@ -1606,6 +1667,34 @@
       }
     ]
   },
+  "pikachu": {
+    "dex": 25,
+    "names": {
+      "ja": "ピカチュウ",
+      "en": "Pikachu"
+    },
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 55,
+      "defense": 40,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 90
+    },
+    "preEvolutions": [
+      "pichu"
+    ],
+    "evolvesTo": [
+      {
+        "to": "raichu",
+        "trigger": "item",
+        "item": "thunder-stone"
+      }
+    ]
+  },
   "ponyta": {
     "dex": 77,
     "names": {
@@ -1728,6 +1817,33 @@
       {
         "to": "rhyperior",
         "trigger": "trade"
+      }
+    ]
+  },
+  "rhyhorn": {
+    "dex": 111,
+    "names": {
+      "ja": "サイホーン",
+      "en": "Rhyhorn"
+    },
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 85,
+      "defense": 95,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 25
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "rhydon",
+        "trigger": "level",
+        "level": 42
       }
     ]
   },
@@ -1886,6 +2002,32 @@
       "staryu"
     ],
     "evolvesTo": []
+  },
+  "staryu": {
+    "dex": 120,
+    "names": {
+      "ja": "ヒトデマン",
+      "en": "Staryu"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 45,
+      "defense": 55,
+      "specialAttack": 70,
+      "specialDefense": 55,
+      "speed": 85
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "starmie",
+        "trigger": "item",
+        "item": "water-stone"
+      }
+    ]
   },
   "tangela": {
     "dex": 114,

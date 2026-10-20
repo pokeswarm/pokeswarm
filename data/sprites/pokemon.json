@@ -155,10 +155,18 @@
       ]
     },
     {
+      "key": "pikachu",
+      "dex": 25,
+      "uses": [
+        "full"
+      ]
+    },
+    {
       "key": "raichu",
       "dex": 26,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -200,14 +208,23 @@
       "key": "oddish",
       "dex": 43,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
+      ]
+    },
+    {
+      "key": "gloom",
+      "dex": 44,
+      "uses": [
+        "full"
       ]
     },
     {
       "key": "vileplume",
       "dex": 45,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -249,28 +266,39 @@
       "key": "growlithe",
       "dex": 58,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "arcanine",
       "dex": 59,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "abra",
       "dex": 63,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
+      ]
+    },
+    {
+      "key": "kadabra",
+      "dex": 64,
+      "uses": [
+        "full"
       ]
     },
     {
       "key": "alakazam",
       "dex": 65,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -389,7 +417,8 @@
       "key": "onix",
       "dex": 95,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -438,21 +467,31 @@
       "key": "koffing",
       "dex": 109,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "weezing",
       "dex": 110,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
+      ]
+    },
+    {
+      "key": "rhyhorn",
+      "dex": 111,
+      "uses": [
+        "full"
       ]
     },
     {
       "key": "rhydon",
       "dex": 112,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -477,10 +516,18 @@
       ]
     },
     {
+      "key": "staryu",
+      "dex": 120,
+      "uses": [
+        "full"
+      ]
+    },
+    {
       "key": "starmie",
       "dex": 121,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {

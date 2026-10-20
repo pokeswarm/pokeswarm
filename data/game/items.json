@@ -13,6 +13,10 @@
     "water-stone": { "maxLevel": 1, "consumable": true, "perLevel": { "typeAreaPct": { "water": 10 } } },
     "leaf-stone": { "maxLevel": 1, "consumable": true, "perLevel": { "typeAreaPct": { "grass": 10 } } },
     "thunder-stone": { "maxLevel": 1, "consumable": true, "perLevel": { "typeAreaPct": { "electric": 10 } } },
-    "linking-cord": { "maxLevel": 1, "consumable": true, "perLevel": {} }
+    "linking-cord": { "maxLevel": 1, "consumable": true, "perLevel": {} },
+    "magnet": { "maxLevel": 5, "perLevel": { "typePowerPct": { "electric": 15 } } },
+    "hard-stone": { "maxLevel": 5, "perLevel": { "typePowerPct": { "rock": 15 } } },
+    "soft-sand": { "maxLevel": 5, "perLevel": { "typePowerPct": { "ground": 15 } } },
+    "twisted-spoon": { "maxLevel": 5, "perLevel": { "typePowerPct": { "psychic": 15 } } }
   }
 }

@@ -158,6 +158,10 @@ for (const [key, def] of Object.entries(movesConfig.moves)) {
 for (const [key, p] of Object.entries(playablesConfig.pokemon)) {
   check(!!generated.pokemon[key], `data/game/playables.json の "${key}" が data/generated/pokemon.json にありません`);
   for (const m of p.startingMoves) check(!!movesConfig.moves[m], `data/game/playables.json の "${key}" の最初の技 "${m}" が data/game/moves.json にありません`);
+  if (p.unlock) {
+    const u = p.unlock;
+    check(unlocksConfig.unlocks.some((x) => x.pokemon === u), `data/game/playables.json の "${key}" の解放 "${u}" が data/game/unlocks.json にありません`);
+  }
 }
 check(!!playablesConfig.pokemon[playablesConfig.default], `data/game/playables.json の default "${playablesConfig.default}" がありません`);
 for (const key of [...Object.keys(itemsConfig.items), ...Object.keys(passivesConfig.passives)]) {

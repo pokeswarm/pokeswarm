@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { generated, networkConfig, playablesConfig, unlocksConfig } from '../data';
-import { isUnlocked } from '../meta/progress';
+import { isPlayableUnlocked } from '../meta/progress';
 import { localName } from '../data/simRules';
 import type { SpriteAnims } from '../data/schema';
 import { getLocale, t, type MessageKey } from '../i18n';
@@ -150,7 +150,9 @@ export class LobbyScene extends Phaser.Scene {
 
   /** 選べるポケモン（解放していて、遊べるもの） */
   private choosable(): string[] {
-    return Object.keys(playablesConfig.pokemon).filter((k) => isUnlocked(session.store.current, unlocksConfig, k));
+    return Object.keys(playablesConfig.pokemon).filter((k) =>
+      isPlayableUnlocked(session.store.current, unlocksConfig, k, playablesConfig.pokemon[k]!.unlock),
+    );
   }
 
   private pokemonName(key: string): string {

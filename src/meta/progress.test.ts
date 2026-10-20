@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { AchievementsConfig, UnlocksConfig } from '../data/schema';
-import { applyProgress, isUnlocked, meets, progressOf } from './progress';
+import { applyProgress, isPlayableUnlocked, isUnlocked, meets, progressOf } from './progress';
 import { emptySave } from './saveData';
 
 const achievements: AchievementsConfig = {
@@ -30,5 +30,9 @@ describe('実績と解放', () => {
     expect(isUnlocked(save, unlocks, 'onix')).toBe(true);
     expect(isUnlocked(save, unlocks, 'charmander')).toBe(true);
     expect(isUnlocked(emptySave(), unlocks, 'onix')).toBe(false);
+    // 進化前から始めるポケモンは、解放の名前（進化後）で判定する
+    save.unlocked.push('starmie');
+    expect(isPlayableUnlocked(save, unlocks, 'staryu', 'starmie')).toBe(true);
+    expect(isPlayableUnlocked(emptySave(), unlocks, 'staryu', 'starmie')).toBe(false);
   });
 });

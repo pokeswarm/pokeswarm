@@ -149,6 +149,17 @@ describe('候補', () => {
       for (const o of makeOffers(sim.world, p)) if (o.kind === 'itemNew') expect(o.item).not.toBe(0);
     }
   });
+  it('タイプの持ち物は、自分のタイプのものだけ候補に出る', () => {
+    const WATER = 2;
+    const r = rules({ items: [upgrade('charcoal', 5, false, {}), upgrade('mystic-water', 5, false, {})] });
+    r.items[0]!.perLevel.typePowerPct[FIRE] = 15;
+    r.items[1]!.perLevel.typePowerPct[WATER] = 15;
+    const sim = new Simulation({ tickRate: 30, seed: 5, rules: r });
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100, types: [FIRE], moves: [] });
+    const seen = new Set<number>();
+    for (let k = 0; k < 40; k++) for (const o of makeOffers(sim.world, p)) if (o.kind === 'itemNew') seen.add(o.item);
+    expect([...seen]).toEqual([0]);
+  });
 });
 
 describe('持ち物・パッシブの効果', () => {

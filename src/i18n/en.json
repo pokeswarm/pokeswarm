@@ -270,5 +270,9 @@
   "shop.banish.desc": "+1 banish per rank at the start of a run (B on the level-up screen)",
   "item.magnet": "Magnet! Pulling in all experience",
   "candy.rolling": "{name}! Level +{levels}...",
-  "candy.result": "{name}! Level +{levels}!"
+  "candy.result": "{name}! Level +{levels}!",
+  "itemDesc.magnet": "Electric moves +15%",
+  "itemDesc.hard-stone": "Rock moves +15%",
+  "itemDesc.soft-sand": "Ground moves +15%",
+  "itemDesc.twisted-spoon": "Psychic moves +15%"
 }

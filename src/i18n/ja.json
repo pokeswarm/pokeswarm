@@ -270,5 +270,9 @@
   "shop.banish.desc": "ランの始めの除外の回数 +1 / ランク（選択画面で B）",
   "item.magnet": "マグネット！ 経験値を一気に集める",
   "candy.rolling": "{name}！ レベル +{levels}…",
-  "candy.result": "{name}！ レベル +{levels}！"
+  "candy.result": "{name}！ レベル +{levels}！",
+  "itemDesc.magnet": "でんきの技 +15%",
+  "itemDesc.hard-stone": "いわの技 +15%",
+  "itemDesc.soft-sand": "じめんの技 +15%",
+  "itemDesc.twisted-spoon": "エスパーの技 +15%"
 }

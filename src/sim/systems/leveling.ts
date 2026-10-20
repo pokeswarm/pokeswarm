@@ -214,6 +214,19 @@ function isBaseMove(world: World, move: number): boolean {
  * - 派生・固有技の条件（元の技が最大レベル ＋ 材料の持ち物）がそろっていれば必ず出す
  * - 残りは、技（自分のタイプとノーマル。枠が空いていれば新しい技、覚えている技の強化）・持ち物（誰かが持っているものは出さない）・パッシブから選ぶ
  */
+/**
+ * 持ち物がこのプレイヤーの候補に出るか。タイプの持ち物（もくたん・石など）は、自分のタイプのものか、
+ * 今の姿の進化に使うものだけ出す（遊べるポケモンが増えて、関係ない持ち物で候補が薄まらないように）
+ */
+function itemFitsPlayer(world: World, p: Player, item: number): boolean {
+  const def = world.rules.items[item]!.perLevel;
+  const types: number[] = [];
+  def.typePowerPct.forEach((v, t) => v && types.push(t));
+  def.typeAreaPct.forEach((v, t) => v && types.push(t));
+  if (types.length === 0 || types.some((t) => p.types.includes(t))) return true;
+  return world.rules.species[p.species]?.evolutions.some((e) => e.trigger !== 'level' && e.item === item) ?? false;
+}
+
 export function makeOffers(world: World, p: Player, excludeItems: ReadonlySet<number> = new Set()): UpgradeOffer[] {
   const rules = world.rules;
   const count = rules.leveling.offerCount;
@@ -248,6 +261,7 @@ export function makeOffers(world: World, p: Player, excludeItems: ReadonlySet<nu
       if (world.players.some((q) => q.items.some((it) => it.item === item))) return;
       // 同じ回で、ほかの人の候補に出ている持ち物も出さない
       if (excludeItems.has(item)) return;
+      if (!itemFitsPlayer(world, p, item)) return;
       pool.push({ kind: 'itemNew', item });
     });
   }

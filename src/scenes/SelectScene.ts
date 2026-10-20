@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { generated, playablesConfig, spriteRender, unlocksConfig } from '../data';
-import { isUnlocked } from '../meta/progress';
+import { isPlayableUnlocked } from '../meta/progress';
 import { session } from '../meta/session';
 import { localName } from '../data/simRules';
 import type { SpriteAnims } from '../data/schema';
@@ -21,7 +21,9 @@ export class SelectScene extends Phaser.Scene {
   }
 
   create(): void {
-    const keys = Object.keys(playablesConfig.pokemon).filter((k) => isUnlocked(session.store.current, unlocksConfig, k));
+    const keys = Object.keys(playablesConfig.pokemon).filter((k) =>
+      isPlayableUnlocked(session.store.current, unlocksConfig, k, playablesConfig.pokemon[k]!.unlock),
+    );
     let chosen = false;
     const choose = (i: number): void => {
       const key = keys[i];

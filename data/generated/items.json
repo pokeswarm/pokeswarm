@@ -35,6 +35,12 @@
       "en": "Fire Stone"
     }
   },
+  "hard-stone": {
+    "names": {
+      "ja": "かたいいし",
+      "en": "Hard Stone"
+    }
+  },
   "hp-up": {
     "names": {
       "ja": "マックスアップ",
@@ -69,6 +75,12 @@
     "names": {
       "ja": "しあわせタマゴ",
       "en": "Lucky Egg"
+    }
+  },
+  "magnet": {
+    "names": {
+      "ja": "じしゃく",
+      "en": "Magnet"
     }
   },
   "miracle-seed": {
@@ -119,10 +131,22 @@
       "en": "Sharp Beak"
     }
   },
+  "soft-sand": {
+    "names": {
+      "ja": "やわらかいすな",
+      "en": "Soft Sand"
+    }
+  },
   "thunder-stone": {
     "names": {
       "ja": "かみなりのいし",
       "en": "Thunder Stone"
+    }
+  },
+  "twisted-spoon": {
+    "names": {
+      "ja": "まがったスプーン",
+      "en": "Twisted Spoon"
     }
   },
   "water-stone": {

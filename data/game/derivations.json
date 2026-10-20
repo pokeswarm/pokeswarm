@@ -11,11 +11,26 @@
     { "from": "leech-seed", "item": "x-defense", "to": "giga-drain" },
     { "from": "poison-sting", "item": "dire-hit", "to": "sludge-bomb" },
     { "from": "tackle", "item": "x-defense", "to": "body-slam" },
-    { "from": "swift", "item": "x-attack", "to": "hyper-beam" }
+    { "from": "swift", "item": "x-attack", "to": "hyper-beam" },
+    { "from": "thunder-shock", "item": "x-attack", "to": "thunderbolt" },
+    { "from": "thunder-punch", "item": "dire-hit", "to": "thunder" },
+    { "from": "rock-throw", "item": "x-defense", "to": "rock-slide" },
+    { "from": "magnitude", "item": "x-attack", "to": "earthquake" },
+    { "from": "bonemerang", "item": "x-speed", "to": "sand-tomb" },
+    { "from": "confusion", "item": "x-attack", "to": "psychic" },
+    { "from": "psybeam", "item": "x-speed", "to": "future-sight" }
   ],
   "unique": [
     { "from": "flamethrower", "item": "fire-stone", "to": "blast-burn", "line": "charmander" },
     { "from": "solar-beam", "item": "leaf-stone", "to": "frenzy-plant", "line": "bulbasaur" },
-    { "from": "hydro-pump", "item": "water-stone", "to": "hydro-cannon", "line": "squirtle" }
+    { "from": "hydro-pump", "item": "water-stone", "to": "hydro-cannon", "line": "squirtle" },
+    { "from": "rock-slide", "item": "hard-stone", "to": "stone-edge", "line": "onix" },
+    { "from": "surf", "item": "water-stone", "to": "rapid-spin", "line": "staryu" },
+    { "from": "thunder", "item": "thunder-stone", "to": "volt-tackle", "line": "pikachu" },
+    { "from": "petal-dance", "item": "leaf-stone", "to": "petal-blizzard", "line": "oddish" },
+    { "from": "sludge-bomb", "item": "poison-barb", "to": "explosion", "line": "koffing" },
+    { "from": "future-sight", "item": "twisted-spoon", "to": "psycho-boost", "line": "abra" },
+    { "from": "flare-blitz", "item": "fire-stone", "to": "extreme-speed", "line": "growlithe" },
+    { "from": "earthquake", "item": "hard-stone", "to": "rock-wrecker", "line": "rhyhorn" }
   ]
 }

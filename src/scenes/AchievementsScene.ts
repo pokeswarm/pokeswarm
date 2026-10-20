@@ -67,7 +67,8 @@ export class AchievementsScene extends Phaser.Scene {
         const row = document.createElement('div');
         let state: string;
         if (isUnlocked(save, unlocksConfig, u.pokemon)) {
-          state = t(playablesConfig.pokemon[u.pokemon] ? 'achievements.unlockPlayable' : 'achievements.unlockNotPlayable');
+          const playable = Object.entries(playablesConfig.pokemon).some(([k, p]) => (p.unlock ?? k) === u.pokemon);
+          state = t(playable ? 'achievements.unlockPlayable' : 'achievements.unlockNotPlayable');
         } else {
           const p = progressOf(save.stats, u.condition);
           state = p ? t('achievements.unlockLocked', { name, current: Math.floor(p.current), target: p.target }) : '';

@@ -41,6 +41,7 @@ function simulateRun(pokemon: string): void {
   const w = sim.world;
   const byMinute: number[] = [];
   const killsByMinute: number[] = [];
+  const evolutions: string[] = [];
   let bossSeenAt = -1;
   let dir = '';
   const t0 = performance.now();
@@ -70,6 +71,7 @@ function simulateRun(pokemon: string): void {
     steps++;
     for (const ev of w.events) {
       if (ev.type === 'bossAppeared' && w.rules.enemies.kinds[ev.kind]!.rank === 'boss') bossSeenAt = elapsedSeconds(w);
+      if (ev.type === 'evolved') evolutions.push(`${Math.floor(elapsedSeconds(w) / 60)}分 ${w.rules.species[ev.to]!.key}`);
     }
     const minute = Math.floor(elapsedSeconds(w) / 60);
     if (!w.levelUp && byMinute.length <= minute && w.tick % (60 * tickRate) === 0) {
@@ -86,6 +88,7 @@ function simulateRun(pokemon: string): void {
   );
   console.log(`${name} 分ごとのレベル ${byMinute.map((l, i) => `${i}:${l}`).join(' ')}`);
   console.log(`${name} 四天王の残り ${w.requiredLeft.size}  伝説 ${w.legendary ? `${w.rules.enemies.kinds[w.legendary.kind]!.id} ${w.legendary.result}` : '-'}`);
+  console.log(`${name} 進化 ${evolutions.join(' → ') || '-'}`);
   console.log(`${name} 分ごとの撃破数 ${killsByMinute.map((k, i) => `${i}:${k}`).join(' ')}`);
   console.log(`${name} 技 ${p.moves.map((m) => `${w.rules.moves[m.move]!.key}:${m.level}`).join(' ')}  持ち物 ${p.items.length}  パッシブ ${p.passives.length}`);
 }

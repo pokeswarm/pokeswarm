@@ -79,6 +79,19 @@ interface EvolutionNode {
   evolves_to: EvolutionNode[];
 }
 
+/** 進化の系統から、あるポケモンの進化前（系統の根から順に）を取り出す */
+function preEvolutionsOf(chain: EvolutionNode, species: string): string[] {
+  const walk = (node: EvolutionNode, path: string[]): string[] | null => {
+    if (node.species.name === species) return path;
+    for (const child of node.evolves_to) {
+      const hit = walk(child, [...path, node.species.name]);
+      if (hit) return hit;
+    }
+    return null;
+  };
+  return walk(chain, []) ?? [];
+}
+
 /** 進化の系統から、あるポケモンの「次の進化」を取り出す */
 function evolutionsOf(chain: EvolutionNode, species: string): GeneratedPokemon['evolvesTo'] {
   const find = (node: EvolutionNode): EvolutionNode | null => {
@@ -131,6 +144,7 @@ async function main(): Promise<void> {
         speed: stat('speed'),
       },
       evolvesTo: evolutionsOf(chain.chain, key),
+      preEvolutions: preEvolutionsOf(chain.chain, key),
     };
   }
 

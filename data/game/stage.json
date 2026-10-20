@@ -14,6 +14,22 @@
       "kind": "midboss-raichu"
     },
     {
+      "atSeconds": 480,
+      "kind": "midboss-vileplume"
+    },
+    {
+      "atSeconds": 600,
+      "kind": "midboss-weezing"
+    },
+    {
+      "atSeconds": 720,
+      "kind": "midboss-alakazam"
+    },
+    {
+      "atSeconds": 840,
+      "kind": "midboss-arcanine"
+    },
+    {
       "atSeconds": 960,
       "kind": "midboss-rhydon"
     },

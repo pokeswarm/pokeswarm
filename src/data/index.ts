@@ -173,3 +173,21 @@ for (const key of unlocksConfig.initial) {
 for (const u of unlocksConfig.unlocks) {
   check(!!generated.pokemon[u.pokemon], `data/game/unlocks.json の "${u.pokemon}" が data/generated/pokemon.json にありません`);
 }
+
+// 中ボス・ボス・伝説・スウォームに出るポケモンと、その進化前は、時間帯の雑魚に出さない（作者の決定）
+{
+  const reserved = new Map<string, string>();
+  for (const k of enemiesConfig.kinds) {
+    if (!k.rank && !stageConfig.swarms.some((s) => s.kind === k.id)) continue;
+    const species = k.species ?? k.id;
+    reserved.set(species, species);
+    for (const pre of generated.pokemon[species]?.preEvolutions ?? []) reserved.set(pre, species);
+  }
+  spawnConfig.waves.forEach((wave, i) => {
+    for (const id of wave.kinds) {
+      const species = enemiesConfig.kinds.find((k) => k.id === id)?.species ?? id;
+      const by = reserved.get(species);
+      check(!by, `data/game/spawn.json の時間帯 ${i + 1} の "${id}" は、ボスかスウォームの "${by}"（またはその進化前）なので雑魚に出せません`);
+    }
+  });
+}

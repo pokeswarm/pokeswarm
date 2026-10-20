@@ -16,6 +16,7 @@
       "specialDefense": 55,
       "speed": 90
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "kadabra",
@@ -23,6 +24,51 @@
         "level": 16
       }
     ]
+  },
+  "alakazam": {
+    "dex": 65,
+    "names": {
+      "ja": "フーディン",
+      "en": "Alakazam"
+    },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 50,
+      "defense": 45,
+      "specialAttack": 135,
+      "specialDefense": 95,
+      "speed": 120
+    },
+    "preEvolutions": [
+      "abra",
+      "kadabra"
+    ],
+    "evolvesTo": []
+  },
+  "arcanine": {
+    "dex": 59,
+    "names": {
+      "ja": "ウインディ",
+      "en": "Arcanine"
+    },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 110,
+      "defense": 80,
+      "specialAttack": 100,
+      "specialDefense": 80,
+      "speed": 95
+    },
+    "preEvolutions": [
+      "growlithe"
+    ],
+    "evolvesTo": []
   },
   "articuno": {
     "dex": 144,
@@ -42,6 +88,7 @@
       "specialDefense": 125,
       "speed": 85
     },
+    "preEvolutions": [],
     "evolvesTo": []
   },
   "beedrill": {
@@ -62,7 +109,38 @@
       "specialDefense": 80,
       "speed": 75
     },
+    "preEvolutions": [
+      "weedle",
+      "kakuna"
+    ],
     "evolvesTo": []
+  },
+  "bellsprout": {
+    "dex": 69,
+    "names": {
+      "ja": "マダツボミ",
+      "en": "Bellsprout"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 75,
+      "defense": 35,
+      "specialAttack": 70,
+      "specialDefense": 30,
+      "speed": 40
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "weepinbell",
+        "trigger": "level",
+        "level": 21
+      }
+    ]
   },
   "blastoise": {
     "dex": 9,
@@ -81,6 +159,10 @@
       "specialDefense": 105,
       "speed": 78
     },
+    "preEvolutions": [
+      "squirtle",
+      "wartortle"
+    ],
     "evolvesTo": []
   },
   "bulbasaur": {
@@ -101,6 +183,7 @@
       "specialDefense": 65,
       "speed": 45
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "ivysaur",
@@ -126,6 +209,7 @@
       "specialDefense": 20,
       "speed": 45
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "metapod",
@@ -151,6 +235,9 @@
       "specialDefense": 105,
       "speed": 50
     },
+    "preEvolutions": [
+      "happiny"
+    ],
     "evolvesTo": [
       {
         "to": "blissey",
@@ -176,6 +263,10 @@
       "specialDefense": 85,
       "speed": 100
     },
+    "preEvolutions": [
+      "charmander",
+      "charmeleon"
+    ],
     "evolvesTo": []
   },
   "charmander": {
@@ -195,6 +286,7 @@
       "specialDefense": 50,
       "speed": 65
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "charmeleon",
@@ -220,6 +312,9 @@
       "specialDefense": 65,
       "speed": 80
     },
+    "preEvolutions": [
+      "charmander"
+    ],
     "evolvesTo": [
       {
         "to": "charizard",
@@ -245,6 +340,7 @@
       "specialDefense": 50,
       "speed": 35
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "marowak",
@@ -271,6 +367,7 @@
       "specialDefense": 35,
       "speed": 75
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "dodrio",
@@ -297,7 +394,37 @@
       "specialDefense": 100,
       "speed": 80
     },
+    "preEvolutions": [
+      "dratini",
+      "dragonair"
+    ],
     "evolvesTo": []
+  },
+  "drowzee": {
+    "dex": 96,
+    "names": {
+      "ja": "スリープ",
+      "en": "Drowzee"
+    },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 48,
+      "defense": 45,
+      "specialAttack": 43,
+      "specialDefense": 90,
+      "speed": 42
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "hypno",
+        "trigger": "level",
+        "level": 26
+      }
+    ]
   },
   "eevee": {
     "dex": 133,
@@ -316,6 +443,7 @@
       "specialDefense": 65,
       "speed": 55
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "vaporeon",
@@ -354,6 +482,32 @@
       }
     ]
   },
+  "ekans": {
+    "dex": 23,
+    "names": {
+      "ja": "アーボ",
+      "en": "Ekans"
+    },
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 60,
+      "defense": 44,
+      "specialAttack": 40,
+      "specialDefense": 54,
+      "speed": 55
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "arbok",
+        "trigger": "level",
+        "level": 22
+      }
+    ]
+  },
   "exeggutor": {
     "dex": 103,
     "names": {
@@ -372,6 +526,9 @@
       "specialDefense": 75,
       "speed": 55
     },
+    "preEvolutions": [
+      "exeggcute"
+    ],
     "evolvesTo": []
   },
   "flareon": {
@@ -391,6 +548,9 @@
       "specialDefense": 110,
       "speed": 65
     },
+    "preEvolutions": [
+      "eevee"
+    ],
     "evolvesTo": []
   },
   "gastly": {
@@ -411,6 +571,7 @@
       "specialDefense": 35,
       "speed": 80
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "haunter",
@@ -437,6 +598,10 @@
       "specialDefense": 75,
       "speed": 110
     },
+    "preEvolutions": [
+      "gastly",
+      "haunter"
+    ],
     "evolvesTo": []
   },
   "geodude": {
@@ -457,6 +622,7 @@
       "specialDefense": 30,
       "speed": 20
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "graveler",
@@ -483,6 +649,9 @@
       "specialDefense": 75,
       "speed": 90
     },
+    "preEvolutions": [
+      "zubat"
+    ],
     "evolvesTo": [
       {
         "to": "crobat",
@@ -508,6 +677,9 @@
       "specialDefense": 45,
       "speed": 35
     },
+    "preEvolutions": [
+      "geodude"
+    ],
     "evolvesTo": [
       {
         "to": "golem",
@@ -532,6 +704,7 @@
       "specialDefense": 50,
       "speed": 25
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "muk",
@@ -557,6 +730,7 @@
       "specialDefense": 50,
       "speed": 60
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "arcanine",
@@ -582,6 +756,7 @@
       "specialDefense": 25,
       "speed": 60
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "seadra",
@@ -608,6 +783,9 @@
       "specialDefense": 80,
       "speed": 60
     },
+    "preEvolutions": [
+      "bulbasaur"
+    ],
     "evolvesTo": [
       {
         "to": "venusaur",
@@ -633,6 +811,9 @@
       "specialDefense": 95,
       "speed": 130
     },
+    "preEvolutions": [
+      "eevee"
+    ],
     "evolvesTo": []
   },
   "kakuna": {
@@ -653,6 +834,9 @@
       "specialDefense": 25,
       "speed": 35
     },
+    "preEvolutions": [
+      "weedle"
+    ],
     "evolvesTo": [
       {
         "to": "beedrill",
@@ -678,6 +862,7 @@
       "specialDefense": 45,
       "speed": 35
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "weezing",
@@ -704,6 +889,7 @@
       "specialDefense": 95,
       "speed": 60
     },
+    "preEvolutions": [],
     "evolvesTo": []
   },
   "machamp": {
@@ -723,6 +909,10 @@
       "specialDefense": 85,
       "speed": 55
     },
+    "preEvolutions": [
+      "machop",
+      "machoke"
+    ],
     "evolvesTo": []
   },
   "machoke": {
@@ -742,6 +932,9 @@
       "specialDefense": 60,
       "speed": 45
     },
+    "preEvolutions": [
+      "machop"
+    ],
     "evolvesTo": [
       {
         "to": "machamp",
@@ -766,6 +959,7 @@
       "specialDefense": 20,
       "speed": 80
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "gyarados",
@@ -791,6 +985,7 @@
       "specialDefense": 45,
       "speed": 70
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "primeape",
@@ -798,6 +993,28 @@
         "level": 28
       }
     ]
+  },
+  "marowak": {
+    "dex": 105,
+    "names": {
+      "ja": "ガラガラ",
+      "en": "Marowak"
+    },
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 80,
+      "defense": 110,
+      "specialAttack": 50,
+      "specialDefense": 80,
+      "speed": 45
+    },
+    "preEvolutions": [
+      "cubone"
+    ],
+    "evolvesTo": []
   },
   "meowth": {
     "dex": 52,
@@ -816,6 +1033,7 @@
       "specialDefense": 40,
       "speed": 90
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "persian",
@@ -846,6 +1064,9 @@
       "specialDefense": 25,
       "speed": 30
     },
+    "preEvolutions": [
+      "caterpie"
+    ],
     "evolvesTo": [
       {
         "to": "butterfree",
@@ -871,6 +1092,7 @@
       "specialDefense": 100,
       "speed": 100
     },
+    "preEvolutions": [],
     "evolvesTo": []
   },
   "mewtwo": {
@@ -890,6 +1112,7 @@
       "specialDefense": 90,
       "speed": 130
     },
+    "preEvolutions": [],
     "evolvesTo": []
   },
   "moltres": {
@@ -910,6 +1133,7 @@
       "specialDefense": 85,
       "speed": 90
     },
+    "preEvolutions": [],
     "evolvesTo": []
   },
   "oddish": {
@@ -930,6 +1154,7 @@
       "specialDefense": 65,
       "speed": 30
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "gloom",
@@ -956,6 +1181,7 @@
       "specialDefense": 45,
       "speed": 70
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "steelix",
@@ -981,6 +1207,7 @@
       "specialDefense": 55,
       "speed": 25
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "parasect",
@@ -1007,6 +1234,7 @@
       "specialDefense": 35,
       "speed": 56
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "pidgeotto",
@@ -1032,6 +1260,7 @@
       "specialDefense": 65,
       "speed": 90
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "rapidash",
@@ -1057,6 +1286,10 @@
       "specialDefense": 80,
       "speed": 110
     },
+    "preEvolutions": [
+      "pichu",
+      "pikachu"
+    ],
     "evolvesTo": []
   },
   "raticate": {
@@ -1076,6 +1309,9 @@
       "specialDefense": 70,
       "speed": 97
     },
+    "preEvolutions": [
+      "rattata"
+    ],
     "evolvesTo": []
   },
   "rattata": {
@@ -1095,6 +1331,7 @@
       "specialDefense": 35,
       "speed": 72
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "raticate",
@@ -1121,6 +1358,9 @@
       "specialDefense": 45,
       "speed": 40
     },
+    "preEvolutions": [
+      "rhyhorn"
+    ],
     "evolvesTo": [
       {
         "to": "rhyperior",
@@ -1146,6 +1386,7 @@
       "specialDefense": 80,
       "speed": 105
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "scizor",
@@ -1175,6 +1416,7 @@
       "specialDefense": 70,
       "speed": 45
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "dewgong",
@@ -1201,6 +1443,7 @@
       "specialDefense": 31,
       "speed": 70
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "fearow",
@@ -1226,6 +1469,7 @@
       "specialDefense": 64,
       "speed": 43
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "wartortle",
@@ -1252,6 +1496,9 @@
       "specialDefense": 85,
       "speed": 115
     },
+    "preEvolutions": [
+      "staryu"
+    ],
     "evolvesTo": []
   },
   "tauros": {
@@ -1271,6 +1518,7 @@
       "specialDefense": 70,
       "speed": 110
     },
+    "preEvolutions": [],
     "evolvesTo": []
   },
   "tentacool": {
@@ -1291,6 +1539,7 @@
       "specialDefense": 100,
       "speed": 70
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "tentacruel",
@@ -1316,7 +1565,60 @@
       "specialDefense": 95,
       "speed": 65
     },
+    "preEvolutions": [
+      "eevee"
+    ],
     "evolvesTo": []
+  },
+  "venomoth": {
+    "dex": 49,
+    "names": {
+      "ja": "モルフォン",
+      "en": "Venomoth"
+    },
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 65,
+      "defense": 60,
+      "specialAttack": 90,
+      "specialDefense": 75,
+      "speed": 90
+    },
+    "preEvolutions": [
+      "venonat"
+    ],
+    "evolvesTo": []
+  },
+  "venonat": {
+    "dex": 48,
+    "names": {
+      "ja": "コンパン",
+      "en": "Venonat"
+    },
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 55,
+      "defense": 50,
+      "specialAttack": 40,
+      "specialDefense": 55,
+      "speed": 45
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "venomoth",
+        "trigger": "level",
+        "level": 31
+      }
+    ]
   },
   "venusaur": {
     "dex": 3,
@@ -1336,6 +1638,34 @@
       "specialDefense": 100,
       "speed": 80
     },
+    "preEvolutions": [
+      "bulbasaur",
+      "ivysaur"
+    ],
+    "evolvesTo": []
+  },
+  "vileplume": {
+    "dex": 45,
+    "names": {
+      "ja": "ラフレシア",
+      "en": "Vileplume"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 80,
+      "defense": 85,
+      "specialAttack": 110,
+      "specialDefense": 90,
+      "speed": 50
+    },
+    "preEvolutions": [
+      "oddish",
+      "gloom"
+    ],
     "evolvesTo": []
   },
   "vulpix": {
@@ -1355,6 +1685,7 @@
       "specialDefense": 65,
       "speed": 65
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "ninetales",
@@ -1380,6 +1711,9 @@
       "specialDefense": 80,
       "speed": 58
     },
+    "preEvolutions": [
+      "squirtle"
+    ],
     "evolvesTo": [
       {
         "to": "blastoise",
@@ -1406,6 +1740,7 @@
       "specialDefense": 20,
       "speed": 50
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "kakuna",
@@ -1413,6 +1748,28 @@
         "level": 7
       }
     ]
+  },
+  "weezing": {
+    "dex": 110,
+    "names": {
+      "ja": "マタドガス",
+      "en": "Weezing"
+    },
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 90,
+      "defense": 120,
+      "specialAttack": 85,
+      "specialDefense": 70,
+      "speed": 60
+    },
+    "preEvolutions": [
+      "koffing"
+    ],
+    "evolvesTo": []
   },
   "zapdos": {
     "dex": 145,
@@ -1432,6 +1789,7 @@
       "specialDefense": 90,
       "speed": 100
     },
+    "preEvolutions": [],
     "evolvesTo": []
   },
   "zubat": {
@@ -1452,6 +1810,7 @@
       "specialDefense": 40,
       "speed": 55
     },
+    "preEvolutions": [],
     "evolvesTo": [
       {
         "to": "golbat",

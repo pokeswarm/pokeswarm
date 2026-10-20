@@ -25,26 +25,10 @@
       "contactDamage": 6
     },
     {
-      "id": "weedle",
-      "sprite": "enemy/weedle",
-      "hp": 12,
-      "moveSpeed": 48,
-      "radius": 10,
-      "contactDamage": 6
-    },
-    {
       "id": "metapod",
       "sprite": "enemy/metapod",
       "hp": 12,
       "moveSpeed": 41,
-      "radius": 10,
-      "contactDamage": 6
-    },
-    {
-      "id": "kakuna",
-      "sprite": "enemy/kakuna",
-      "hp": 12,
-      "moveSpeed": 42,
       "radius": 10,
       "contactDamage": 6
     },
@@ -81,22 +65,6 @@
       "contactDamage": 6
     },
     {
-      "id": "oddish",
-      "sprite": "enemy/oddish",
-      "hp": 12,
-      "moveSpeed": 41,
-      "radius": 10,
-      "contactDamage": 6
-    },
-    {
-      "id": "abra",
-      "sprite": "enemy/abra",
-      "hp": 12,
-      "moveSpeed": 62,
-      "radius": 10,
-      "contactDamage": 6
-    },
-    {
       "id": "mankey",
       "sprite": "enemy/mankey",
       "hp": 12,
@@ -113,26 +81,10 @@
       "contactDamage": 6
     },
     {
-      "id": "growlithe",
-      "sprite": "enemy/growlithe",
-      "hp": 12,
-      "moveSpeed": 51,
-      "radius": 10,
-      "contactDamage": 6
-    },
-    {
       "id": "vulpix",
       "sprite": "enemy/vulpix",
       "hp": 12,
       "moveSpeed": 53,
-      "radius": 10,
-      "contactDamage": 6
-    },
-    {
-      "id": "gastly",
-      "sprite": "enemy/gastly",
-      "hp": 12,
-      "moveSpeed": 58,
       "radius": 10,
       "contactDamage": 6
     },
@@ -217,14 +169,6 @@
       "contactDamage": 6
     },
     {
-      "id": "koffing",
-      "sprite": "enemy/koffing",
-      "hp": 12,
-      "moveSpeed": 42,
-      "radius": 10,
-      "contactDamage": 6
-    },
-    {
       "id": "grimer",
       "sprite": "enemy/grimer",
       "hp": 12,
@@ -241,14 +185,6 @@
       "contactDamage": 6
     },
     {
-      "id": "machoke",
-      "sprite": "enemy/machoke",
-      "hp": 12,
-      "moveSpeed": 46,
-      "radius": 10,
-      "contactDamage": 6
-    },
-    {
       "id": "golbat",
       "sprite": "enemy/golbat",
       "hp": 12,
@@ -261,6 +197,54 @@
       "sprite": "enemy/graveler",
       "hp": 12,
       "moveSpeed": 42,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "bellsprout",
+      "sprite": "enemy/bellsprout",
+      "hp": 12,
+      "moveSpeed": 44,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "venonat",
+      "sprite": "enemy/venonat",
+      "hp": 12,
+      "moveSpeed": 46,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "drowzee",
+      "sprite": "enemy/drowzee",
+      "hp": 12,
+      "moveSpeed": 45,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "ekans",
+      "sprite": "enemy/ekans",
+      "hp": 12,
+      "moveSpeed": 49,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "marowak",
+      "sprite": "enemy/marowak",
+      "hp": 12,
+      "moveSpeed": 46,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "venomoth",
+      "sprite": "enemy/venomoth",
+      "hp": 12,
+      "moveSpeed": 62,
       "radius": 10,
       "contactDamage": 6
     },
@@ -440,6 +424,54 @@
       "contactDamage": 35,
       "xp": 0,
       "spriteScale": 2.6
+    },
+    {
+      "id": "midboss-vileplume",
+      "species": "vileplume",
+      "rank": "midboss",
+      "sprite": "enemy/vileplume",
+      "hp": 1300,
+      "moveSpeed": 45,
+      "radius": 26,
+      "contactDamage": 19,
+      "xp": 220,
+      "spriteScale": 2.2
+    },
+    {
+      "id": "midboss-weezing",
+      "species": "weezing",
+      "rank": "midboss",
+      "sprite": "enemy/weezing",
+      "hp": 1600,
+      "moveSpeed": 45,
+      "radius": 28,
+      "contactDamage": 20,
+      "xp": 250,
+      "spriteScale": 2.2
+    },
+    {
+      "id": "midboss-alakazam",
+      "species": "alakazam",
+      "rank": "midboss",
+      "sprite": "enemy/alakazam",
+      "hp": 1900,
+      "moveSpeed": 60,
+      "radius": 24,
+      "contactDamage": 21,
+      "xp": 280,
+      "spriteScale": 2.2
+    },
+    {
+      "id": "midboss-arcanine",
+      "species": "arcanine",
+      "rank": "midboss",
+      "sprite": "enemy/arcanine",
+      "hp": 2300,
+      "moveSpeed": 70,
+      "radius": 28,
+      "contactDamage": 22,
+      "xp": 320,
+      "spriteScale": 2.2
     }
   ]
 }

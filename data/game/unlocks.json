@@ -27,6 +27,34 @@
       }
     },
     {
+      "pokemon": "arcanine",
+      "condition": {
+        "stat": "defeated.arcanine",
+        "atLeast": 20
+      }
+    },
+    {
+      "pokemon": "alakazam",
+      "condition": {
+        "stat": "defeated.alakazam",
+        "atLeast": 20
+      }
+    },
+    {
+      "pokemon": "weezing",
+      "condition": {
+        "stat": "defeated.weezing",
+        "atLeast": 20
+      }
+    },
+    {
+      "pokemon": "vileplume",
+      "condition": {
+        "stat": "defeated.vileplume",
+        "atLeast": 20
+      }
+    },
+    {
       "pokemon": "rhydon",
       "condition": {
         "stat": "defeated.rhydon",

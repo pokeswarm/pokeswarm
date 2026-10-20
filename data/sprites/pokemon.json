@@ -127,6 +127,13 @@
       ]
     },
     {
+      "key": "ekans",
+      "dex": 23,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "raichu",
       "dex": 26,
       "uses": [
@@ -162,8 +169,29 @@
       ]
     },
     {
+      "key": "vileplume",
+      "dex": 45,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "paras",
       "dex": 46,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "venonat",
+      "dex": 48,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "venomoth",
+      "dex": 49,
       "uses": [
         "enemy"
       ]
@@ -190,8 +218,22 @@
       ]
     },
     {
+      "key": "arcanine",
+      "dex": 59,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "abra",
       "dex": 63,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "alakazam",
+      "dex": 65,
       "uses": [
         "enemy"
       ]
@@ -206,6 +248,13 @@
     {
       "key": "machamp",
       "dex": 68,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "bellsprout",
+      "dex": 69,
       "uses": [
         "enemy"
       ]
@@ -281,6 +330,13 @@
       ]
     },
     {
+      "key": "drowzee",
+      "dex": 96,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "exeggutor",
       "dex": 103,
       "uses": [
@@ -295,8 +351,22 @@
       ]
     },
     {
+      "key": "marowak",
+      "dex": 105,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "koffing",
       "dex": 109,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "weezing",
+      "dex": 110,
       "uses": [
         "enemy"
       ]

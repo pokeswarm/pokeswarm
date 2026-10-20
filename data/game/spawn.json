@@ -26,9 +26,7 @@
         "rattata",
         "pidgey",
         "caterpie",
-        "weedle",
-        "metapod",
-        "kakuna"
+        "metapod"
       ]
     },
     {
@@ -56,10 +54,10 @@
       "damageMultiplier": 1.3,
       "xpMultiplier": 1.6,
       "kinds": [
-        "oddish",
-        "abra",
         "mankey",
-        "meowth"
+        "meowth",
+        "bellsprout",
+        "venonat"
       ]
     },
     {
@@ -71,10 +69,10 @@
       "damageMultiplier": 1.45,
       "xpMultiplier": 1.9,
       "kinds": [
-        "growlithe",
         "vulpix",
-        "gastly",
-        "cubone"
+        "cubone",
+        "drowzee",
+        "ekans"
       ]
     },
     {
@@ -117,7 +115,6 @@
       "xpMultiplier": 2.8,
       "kinds": [
         "seel",
-        "koffing",
         "grimer",
         "ponyta"
       ]
@@ -131,9 +128,10 @@
       "damageMultiplier": 2.05,
       "xpMultiplier": 3.1,
       "kinds": [
-        "machoke",
         "golbat",
-        "graveler"
+        "graveler",
+        "marowak",
+        "venomoth"
       ]
     },
     {
@@ -145,9 +143,10 @@
       "damageMultiplier": 2.2,
       "xpMultiplier": 3.4,
       "kinds": [
-        "machoke",
         "golbat",
-        "graveler"
+        "graveler",
+        "marowak",
+        "venomoth"
       ]
     }
   ],

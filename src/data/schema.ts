@@ -686,6 +686,8 @@ export const generatedPokemonEntrySchema = z.object({
     specialDefense: z.number().int(),
     speed: z.number().int(),
   }),
+  /** 進化前（系統の根から順に。ピカチュウなら ["pichu"]）。取得していない段階も含む */
+  preEvolutions: z.array(z.string()).default([]),
   /** 次の進化（原作の条件。赤・緑の条件があればそれ） */
   evolvesTo: z.array(
     z.object({

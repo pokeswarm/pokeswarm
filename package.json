@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "bench": "vitest run --mode bench --silent=false",
-    "sprites": "node scripts/fetch-sprites.ts"
+    "sprites": "node scripts/fetch-sprites.ts",
+    "pokeapi": "node scripts/fetch-pokeapi.ts"
   },
   "dependencies": {
     "firebase": "^13.0.0",

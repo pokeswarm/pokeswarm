@@ -1,20 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import type { SimRules } from './rules';
+import type { MoveStats } from './moves';
 import { Simulation } from './simulation';
 import { testRules } from './testRules';
 
 const BURN = 0;
 const FREEZE = 1;
 
-function makeSim(attack: Partial<SimRules['attack']> = {}): Simulation {
-  const sim = new Simulation({ tickRate: 30, seed: 3, rules: testRules({ attack }) });
+function makeSim(move: Partial<MoveStats> = {}): Simulation {
+  const sim = new Simulation({ tickRate: 30, seed: 3, rules: testRules({ move }) });
   sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150 });
   return sim;
 }
 
 describe('ノックバック', () => {
   it('当たった敵が攻撃の向きへ押し返される', () => {
-    const sim = makeSim({ knockback: { speed: 300, durationSeconds: 0.2 }, cooldownSeconds: 100, damage: 1 });
+    const sim = makeSim({ knockback: 300, knockbackSeconds: 0.2, cooldownSeconds: 100, power: 1 });
     const e = sim.world.enemies;
     e.add(1, 0, 200, 0, 1000, 0, 10);
     for (let t = 0; t < 30; t++) sim.step([]);
@@ -61,7 +61,7 @@ describe('状態異常', () => {
   });
 
   it('ぼうぎょダウン: 受けるダメージが増える', () => {
-    const sim = makeSim({ cooldownSeconds: 100, damage: 5, status: { id: 'defenseDown', chance: 1, durationSeconds: 5 } });
+    const sim = makeSim({ cooldownSeconds: 100, power: 5, status: 2, statusChance: 1, statusSeconds: 5 });
     const e = sim.world.enemies;
     e.add(1, 0, 200, 0, 100, 0, 10);
     for (let t = 0; t < 30; t++) sim.step([]);

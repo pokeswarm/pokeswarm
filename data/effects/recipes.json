@@ -3,19 +3,39 @@
     "fire.base": {
       "projectile": {
         "coreColor": "#fff8e1",
-        "coreScale": 0.5,
+        "coreScale": 1,
         "glowColor": "#ff7043",
-        "glowScale": 1.5,
+        "glowScale": 3,
         "glowAlpha": 0.85,
-        "pulse": { "amount": 0.2, "periodMs": 140 }
+        "pulse": {
+          "amount": 0.2,
+          "periodMs": 140
+        }
       },
       "trail": {
         "intervalMs": 12,
-        "colors": ["#fff59d", "#ffb74d", "#f4511e", "#6d1b1b"],
-        "lifespanMs": [220, 360],
-        "speed": [5, 30],
-        "scale": [0.45, 0],
-        "alpha": [0.9, 0],
+        "colors": [
+          "#fff59d",
+          "#ffb74d",
+          "#f4511e",
+          "#6d1b1b"
+        ],
+        "lifespanMs": [
+          220,
+          360
+        ],
+        "speed": [
+          5,
+          30
+        ],
+        "scale": [
+          0.45,
+          0
+        ],
+        "alpha": [
+          0.9,
+          0
+        ],
         "gravityY": -80,
         "spread": 4,
         "blend": "add"
@@ -23,24 +43,235 @@
       "impact": {
         "burst": {
           "count": 16,
-          "colors": ["#ffffff", "#ffcc80", "#ff7043", "#b71c1c"],
-          "lifespanMs": [250, 450],
-          "speed": [60, 200],
-          "scale": [0.6, 0],
-          "alpha": [1, 0],
+          "colors": [
+            "#ffffff",
+            "#ffcc80",
+            "#ff7043",
+            "#b71c1c"
+          ],
+          "lifespanMs": [
+            250,
+            450
+          ],
+          "speed": [
+            60,
+            200
+          ],
+          "scale": [
+            0.6,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
           "gravityY": -120,
           "spread": 2,
           "blend": "add"
         },
-        "flash": { "color": "#ffab40", "radius": 26, "durationMs": 160, "alpha": 0.8 },
-        "shake": { "durationMs": 50, "intensity": 0.0015 }
+        "flash": {
+          "color": "#ffab40",
+          "radius": 26,
+          "durationMs": 160,
+          "alpha": 0.8
+        },
+        "shake": {
+          "durationMs": 50,
+          "intensity": 0.0015
+        }
       }
     },
     "ember": {
       "extends": "fire.base",
       "impact": {
-        "burst": { "count": 10 },
-        "shake": { "durationMs": 0, "intensity": 0 }
+        "burst": {
+          "count": 10
+        },
+        "shake": {
+          "durationMs": 0,
+          "intensity": 0
+        }
+      }
+    },
+    "water.base": {
+      "projectile": {
+        "coreColor": "#e1f5fe",
+        "coreScale": 1,
+        "glowColor": "#29b6f6",
+        "glowScale": 2.8,
+        "glowAlpha": 0.85
+      },
+      "trail": {
+        "intervalMs": 16,
+        "colors": [
+          "#b3e5fc",
+          "#4fc3f7",
+          "#0277bd"
+        ],
+        "lifespanMs": [
+          150,
+          280
+        ],
+        "speed": [
+          5,
+          25
+        ],
+        "scale": [
+          0.35,
+          0
+        ],
+        "alpha": [
+          0.8,
+          0
+        ],
+        "gravityY": 60,
+        "spread": 3,
+        "blend": "add"
+      },
+      "impact": {
+        "burst": {
+          "count": 10,
+          "colors": [
+            "#ffffff",
+            "#81d4fa",
+            "#0288d1"
+          ],
+          "lifespanMs": [
+            200,
+            380
+          ],
+          "speed": [
+            50,
+            170
+          ],
+          "scale": [
+            0.5,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 160,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#4fc3f7",
+          "radius": 20,
+          "durationMs": 120,
+          "alpha": 0.6
+        }
+      }
+    },
+    "water-gun": {
+      "extends": "water.base"
+    },
+    "grass.base": {
+      "projectile": {
+        "coreColor": "#f1f8e9",
+        "coreScale": 0.4,
+        "glowColor": "#66bb6a",
+        "glowScale": 1.1,
+        "glowAlpha": 0.7
+      },
+      "impact": {
+        "burst": {
+          "count": 8,
+          "colors": [
+            "#dcedc8",
+            "#7cb342",
+            "#33691e"
+          ],
+          "lifespanMs": [
+            200,
+            380
+          ],
+          "speed": [
+            50,
+            170
+          ],
+          "scale": [
+            0.5,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 40,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#9ccc65",
+          "radius": 24,
+          "durationMs": 120,
+          "alpha": 0.5
+        }
+      }
+    },
+    "vine-whip": {
+      "extends": "grass.base"
+    },
+    "normal.base": {
+      "projectile": {
+        "coreColor": "#ffffff",
+        "coreScale": 0.3,
+        "glowColor": "#eeeeee",
+        "glowScale": 1,
+        "glowAlpha": 0.5
+      },
+      "impact": {
+        "burst": {
+          "count": 8,
+          "colors": [
+            "#ffffff",
+            "#e0e0e0",
+            "#9e9e9e"
+          ],
+          "lifespanMs": [
+            200,
+            380
+          ],
+          "speed": [
+            50,
+            170
+          ],
+          "scale": [
+            0.5,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#ffffff",
+          "radius": 22,
+          "durationMs": 100,
+          "alpha": 0.5
+        }
+      }
+    },
+    "tackle": {
+      "extends": "normal.base"
+    },
+    "fire-spin": {
+      "extends": "fire.base",
+      "projectile": {
+        "glowScale": 1.6,
+        "coreScale": 0.7
+      },
+      "impact": {
+        "shake": {
+          "durationMs": 0,
+          "intensity": 0
+        }
       }
     }
   }

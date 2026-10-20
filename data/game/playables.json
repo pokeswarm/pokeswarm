@@ -1,0 +1,8 @@
+{
+  "pokemon": {
+    "charmander": { "sprite": "charmander", "startingMoves": ["ember"] },
+    "bulbasaur": { "sprite": "bulbasaur", "startingMoves": ["vine-whip"] },
+    "squirtle": { "sprite": "squirtle", "startingMoves": ["water-gun"] }
+  },
+  "default": "charmander"
+}

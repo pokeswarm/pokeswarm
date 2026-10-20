@@ -1,7 +1,7 @@
 import type { InputCommand, PlayerId } from './commands';
-import { createPlayer, type Player } from './entities/player';
+import { createPlayer, type Player, type PlayerInit } from './entities/player';
 import type { SimRules } from './rules';
-import { playerAttacks, moveProjectiles } from './systems/attack';
+import { moveProjectiles, useMoves } from './systems/attack';
 import { applyCommands } from './systems/commands';
 import { moveEnemies, rebuildEnemyHash, separateEnemies } from './systems/enemyMovement';
 import { movePlayers } from './systems/movement';
@@ -20,17 +20,8 @@ export interface SimulationOptions {
   localPlayerId?: PlayerId;
 }
 
-export interface PlayerSpawn {
-  id: PlayerId;
-  x: number;
-  y: number;
-  radius: number;
-  moveSpeed: number;
-  /** 別のブラウザが操作するプレイヤー */
-  remote?: boolean;
-  /** 経験値の玉を吸い寄せ始める距離（省略時は 0） */
-  pickupRange?: number;
-}
+/** プレイヤーの初期値。技を省略したら技の定義の最初の技をレベル1で覚える（テスト用の簡便さ） */
+export type PlayerSpawn = PlayerInit;
 
 /**
  * シミュレーション本体。Phaser に依存しない。
@@ -44,7 +35,8 @@ export class Simulation {
   }
 
   addPlayer(spawn: PlayerSpawn): Player {
-    const p = createPlayer(spawn.id, spawn.x, spawn.y, spawn.radius, spawn.moveSpeed, spawn.remote ?? false, spawn.pickupRange ?? 0);
+    const moves = spawn.moves ?? (this.world.rules.moves.length > 0 ? [{ move: 0, level: 1 }] : []);
+    const p = createPlayer({ ...spawn, moves: moves.slice(0, this.world.rules.combat.maxMoveSlots) });
     this.world.players.push(p);
     return p;
   }
@@ -59,7 +51,7 @@ export class Simulation {
     rebuildEnemyHash(w);
     separateEnemies(w);
     tickStatuses(w);
-    playerAttacks(w);
+    useMoves(w);
     moveProjectiles(w);
     dropGems(w);
     moveGems(w);

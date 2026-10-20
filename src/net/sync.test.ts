@@ -2,15 +2,15 @@ import { describe, expect, it } from 'vitest';
 import type { InputCommand } from '../sim/commands';
 import { Simulation } from '../sim/simulation';
 import { testRules } from '../sim/testRules';
-import type { SimRules } from '../sim/rules';
+import type { MoveStats } from '../sim/moves';
 import type { SimRole, World } from '../sim/world';
 import { decode, encode, type NetMessage } from './protocol';
 import { SyncSession } from './sync';
 
 const rate = { playerStateIntervalTicks: 1, correctionIntervalTicks: 30 };
 
-function makePeer(role: SimRole, localId: number, remoteId: number, attack: Partial<SimRules['attack']> = {}) {
-  const rules = testRules({ spawn: { spawnPerSecond: 30, capGlobal: 200, capPerPlayer: 100 }, attack: { range: 300, ...attack } });
+function makePeer(role: SimRole, localId: number, remoteId: number, move: Partial<MoveStats> = {}) {
+  const rules = testRules({ spawn: { spawnPerSecond: 30, capGlobal: 200, capPerPlayer: 100 }, move: { range: 300, ...move } });
   const sim = new Simulation({ tickRate: 30, seed: 7, rules, role, localPlayerId: localId });
   sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150, remote: localId !== 1, pickupRange: 80 });
   sim.addPlayer({ id: 2, x: 60, y: 0, radius: 12, moveSpeed: 150, remote: localId !== 2, pickupRange: 80 });
@@ -22,11 +22,11 @@ function makePeer(role: SimRole, localId: number, remoteId: number, attack: Part
 function runPair(
   ticks: number,
   delayTicks: number,
-  attack: Partial<SimRules['attack']> = {},
+  move: Partial<MoveStats> = {},
   inspect?: (host: World, guest: World) => void,
 ) {
-  const host = makePeer('host', 1, 2, attack);
-  const guest = makePeer('guest', 2, 1, attack);
+  const host = makePeer('host', 1, 2, move);
+  const guest = makePeer('guest', 2, 1, move);
   const wire: { at: number; to: 'host' | 'guest'; text: string }[] = [];
   for (let t = 0; t < ticks; t++) {
     // 両者とも動き回る
@@ -97,7 +97,7 @@ describe('協力プレイの同期', () => {
 });
 
 describe('ノックバック・状態異常の同期', () => {
-  const attack = { knockback: { speed: 240, durationSeconds: 0.12 }, status: { id: 'burn', chance: 1, durationSeconds: 3 } };
+  const attack: Partial<MoveStats> = { knockback: 240, knockbackSeconds: 0.12, status: 0, statusChance: 1, statusSeconds: 3 };
 
   /** 指定したプレイヤーが付けたやけどがかかっている敵がいるか */
   function hasBurnBy(w: World, by: number): boolean {

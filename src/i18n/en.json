@@ -26,5 +26,6 @@
   "net.mode.relay": "relay (Realtime Database)",
   "debug.frameTime": "Frame work: {ms} ms (update to render submit)",
   "debug.enemySprites": "Wave {wave}  enemy sprites loaded: {count} kinds (GPU ~{mb} MB)",
-  "debug.xp": "XP (shared): {xp}  gems: {gems}"
+  "debug.xp": "XP (shared): {xp}  gems: {gems}",
+  "debug.moves": "Moves: {moves}"
 }

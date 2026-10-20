@@ -59,8 +59,8 @@ export class EffectRenderer {
   private visible = 0;
   private readonly trailEmitters = new Map<string, Phaser.GameObjects.Particles.ParticleEmitter>();
   private readonly burstEmitters = new Map<string, Phaser.GameObjects.Particles.ParticleEmitter>();
-  /** 軌跡のパーティクルを出す間隔の端数 */
-  private trailBudgetMs = 0;
+  /** 軌跡のパーティクルを出す間隔の端数（レシピごと） */
+  private readonly trailBudgets = new Map<string, number>();
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -90,27 +90,36 @@ export class EffectRenderer {
     return em;
   }
 
-  /** 発射体の本体と軌跡を描く（毎フレーム） */
-  drawProjectiles(src: CircleSource, alpha: number, recipeId: string, deltaMs: number, timeMs: number): void {
-    const recipe = this.recipe(recipeId);
-    const body = recipe.projectile;
-    const trail = recipe.trail;
-
-    this.trailBudgetMs += deltaMs;
-    const trailCount = trail ? Math.floor(this.trailBudgetMs / trail.intervalMs) : 0;
-    if (trail) this.trailBudgetMs -= trailCount * trail.intervalMs;
-    const trailEmitter = trail ? this.emitter(this.trailEmitters, recipeId, trail, this.depth - 0.5) : null;
-
-    const pulse = body?.pulse ? 1 + Math.sin((timeMs / body.pulse.periodMs) * Math.PI * 2) * body.pulse.amount : 1;
+  /** 発射体・攻撃の当たり判定の見た目と軌跡を描く（毎フレーム）。レシピは当たり判定ごとに recipeOf で引く */
+  drawProjectiles(src: CircleSource, alpha: number, recipeOf: (index: number) => string, deltaMs: number, timeMs: number): void {
+    // 軌跡のパーティクルを出す数は、レシピごとの間隔で決める
+    const trailCounts = new Map<string, number>();
+    const trailCountOf = (id: string, trail: NonNullable<EffectRecipe['trail']>): number => {
+      let n = trailCounts.get(id);
+      if (n === undefined) {
+        const budget = (this.trailBudgets.get(id) ?? 0) + deltaMs;
+        n = Math.floor(budget / trail.intervalMs);
+        this.trailBudgets.set(id, budget - n * trail.intervalMs);
+        trailCounts.set(id, n);
+      }
+      return n;
+    };
     let used = 0;
     for (let i = 0; i < src.count; i++) {
+      const recipeId = recipeOf(i);
+      const recipe = this.recipe(recipeId);
+      const body = recipe.projectile;
+      const trail = recipe.trail;
       const x = src.prevX[i]! + (src.x[i]! - src.prevX[i]!) * alpha;
       const y = src.prevY[i]! + (src.y[i]! - src.prevY[i]!) * alpha;
       const r = src.radius[i]!;
-      if (trail && trailEmitter) {
-        for (let k = 0; k < trailCount; k++) trailEmitter.emitParticleAt(x + scatter(trail.spread), y + scatter(trail.spread), 1);
+      if (trail) {
+        const em = this.emitter(this.trailEmitters, recipeId, trail, this.depth - 0.5);
+        const n = trailCountOf(recipeId, trail);
+        for (let k = 0; k < n; k++) em.emitParticleAt(x + scatter(trail.spread), y + scatter(trail.spread), 1);
       }
       if (!body) continue;
+      const pulse = body.pulse ? 1 + Math.sin((timeMs / body.pulse.periodMs) * Math.PI * 2) * body.pulse.amount : 1;
       let glow = this.glows[used];
       let core = this.cores[used];
       if (!glow || !core) {
@@ -119,14 +128,15 @@ export class EffectRenderer {
         this.glows.push(glow);
         this.cores.push(core);
       }
+      // glowScale・coreScale は当たり判定の直径に対する倍率
       const unit = (r * 2) / GLOW_SIZE;
       glow
         .setPosition(x, y)
-        .setScale(unit * body.glowScale * 2 * pulse)
+        .setScale(unit * body.glowScale * pulse)
         .setTint(hexColor(body.glowColor))
         .setAlpha(body.glowAlpha)
         .setVisible(true);
-      core.setPosition(x, y).setScale(unit * body.coreScale * 2).setTint(hexColor(body.coreColor)).setVisible(true);
+      core.setPosition(x, y).setScale(unit * body.coreScale).setTint(hexColor(body.coreColor)).setVisible(true);
       used++;
     }
     for (let k = used; k < this.visible; k++) {

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { networkConfig, placeholderRender, spriteRender } from './data';
+import { networkConfig, placeholderRender, playablesConfig } from './data';
 import { firebaseOptionsFromEnv } from './firebase/config';
 import type { RoomConnection } from './net/room';
 import { loadSpriteManifest } from './render/sprites/spriteManifest';
@@ -55,9 +55,12 @@ async function start(): Promise<void> {
   const panel = new NetPanel();
   panel.hide();
   // 雑魚のスプライトは起動時には読まず、時間帯に合わせて読む（SpriteStreamer）
-  const [playerSprite, net] = await Promise.all([loadSpriteManifest(spriteRender.playerSprite), connectIfRequested(panel)]);
+  // プレイヤーのポケモンは確認用に ?pokemon=bulbasaur で選べる（ポケモン選択の画面は区切り4で作る）
+  const requested = new URLSearchParams(window.location.search).get('pokemon') ?? '';
+  const pokemon = playablesConfig.pokemon[requested] ? requested : playablesConfig.default;
+  const [playerSprite, net] = await Promise.all([loadSpriteManifest(playablesConfig.pokemon[pokemon]!.sprite), connectIfRequested(panel)]);
   panel.hide();
-  const data: RunSceneData = { playerSprite, net, panel };
+  const data: RunSceneData = { pokemon, playerSprite, net, panel };
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',

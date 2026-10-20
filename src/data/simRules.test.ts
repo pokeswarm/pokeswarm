@@ -1,0 +1,37 @@
+import { describe, expect, it } from 'vitest';
+import { generated, movesConfig, playablesConfig } from './index';
+import { buildSimRules, playableLoadout } from './simRules';
+
+describe('data/ から組み立てたシミュレーションの定義', () => {
+  const rules = buildSimRules();
+
+  it('技はすべて PokeAPI のタイプ・分類と結び付き、レベルの表がそろう', () => {
+    expect(rules.moves.map((m) => m.key).sort()).toEqual(Object.keys(movesConfig.moves).sort());
+    const ember = rules.moves.find((m) => m.key === 'ember')!;
+    expect(rules.types.names[ember.type]).toBe('fire');
+    expect(ember.damageClass).toBe('special');
+    expect(ember.levels).toHaveLength(movesConfig.moves.ember!.levels.length + 1);
+    const vineWhip = rules.moves.find((m) => m.key === 'vine-whip')!;
+    expect(vineWhip.damageClass).toBe('physical');
+    expect(vineWhip.levels[0]!.pierce).toBe(Infinity);
+  });
+
+  it('敵の種類に PokeAPI のタイプが付く（ポッポ: ノーマル・ひこう）', () => {
+    const pidgey = rules.enemies.kinds.find((k) => k.id === 'pidgey')!;
+    expect(pidgey.types.map((t) => rules.types.names[t])).toEqual(['normal', 'flying']);
+  });
+
+  it('原作の相性表になっている（ほのお → くさ ×2、ノーマル → ゴースト ×0）', () => {
+    const i = (n: string) => rules.types.names.indexOf(n);
+    expect(rules.types.chart[i('fire')]![i('grass')]).toBe(2);
+    expect(rules.types.chart[i('normal')]![i('ghost')]).toBe(0);
+  });
+
+  it('御三家の最初の技とタイプ', () => {
+    for (const key of Object.keys(playablesConfig.pokemon)) {
+      const l = playableLoadout(rules, key);
+      expect(l.types.map((t) => rules.types.names[t])).toEqual(generated.pokemon[key]!.types);
+      expect(l.moves.map((m) => rules.moves[m.move]!.key)).toEqual(playablesConfig.pokemon[key]!.startingMoves);
+    }
+  });
+});

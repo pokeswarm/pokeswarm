@@ -1,19 +1,8 @@
 import Phaser from 'phaser';
-import {
-  attackConfig,
-  effectRecipes,
-  enemiesConfig,
-  networkConfig,
-  placeholderRender,
-  playerConfig,
-  simulationConfig,
-  spawnConfig,
-  spriteRender,
-  statusConfig,
-  pickupConfig,
-} from '../data';
+import { effectRecipes, generated, networkConfig, placeholderRender, playerConfig, simulationConfig, spriteRender } from '../data';
+import { buildSimRules, localName, playableLoadout } from '../data/simRules';
 import type { SpriteAnims } from '../data/schema';
-import { t } from '../i18n';
+import { getLocale, t } from '../i18n';
 import type { RoomConnection } from '../net/room';
 import { SyncSession } from '../net/sync';
 import { hexColor } from '../render/color';
@@ -30,7 +19,7 @@ import type { Axis, InputCommand, PlayerId } from '../sim/commands';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, enemyCap, type SimRole } from '../sim/world';
-import { applyDebugOverrides } from './debugOverrides';
+import { applyDebugOverrides, parseMovesParam } from './debugOverrides';
 import type { NetPanel } from './netPanel';
 
 /** ソロとホストは 1、ゲストは 2 */
@@ -38,6 +27,8 @@ const HOST_PLAYER_ID: PlayerId = 1;
 const GUEST_PLAYER_ID: PlayerId = 2;
 
 export interface RunSceneData {
+  /** プレイヤーのポケモン（data/game/playables.json のキー） */
+  pokemon: string;
   /** プレイヤーのスプライト。取得していなければ null（仮の円で描く） */
   playerSprite: SpriteAnims | null;
   /** 協力プレイの接続。ソロなら null */
@@ -72,6 +63,7 @@ export class RunScene extends Phaser.Scene {
   /** シミュレーション1回あたりの処理時間（移動平均, ms） */
   private simMs = 0;
   private playerSprite: SpriteAnims | null = null;
+  private pokemon = '';
   private net: RoomConnection | null = null;
   private panel: NetPanel | null = null;
   private sync: SyncSession | null = null;
@@ -90,6 +82,7 @@ export class RunScene extends Phaser.Scene {
 
   init(data: RunSceneData): void {
     this.playerSprite = data.playerSprite;
+    this.pokemon = data.pokemon;
     this.net = data.net;
     this.panel = data.panel;
   }
@@ -100,7 +93,10 @@ export class RunScene extends Phaser.Scene {
 
   create(): void {
     if (this.playerSprite) registerPokemonAnimations(this, this.playerSprite);
-    const rules = applyDebugOverrides({ enemies: enemiesConfig, spawn: spawnConfig, attack: attackConfig, status: statusConfig, pickups: pickupConfig }, window.location.search);
+    const rules = applyDebugOverrides(buildSimRules(), window.location.search);
+    // 技は確認用に URL で指定できる（?moves=ember:8,fire-spin:3）。協力プレイでは参加用 URL に引き継ぐので2人とも同じになる
+    const loadout = playableLoadout(rules, this.pokemon);
+    const moves = parseMovesParam(rules, window.location.search) ?? loadout.moves;
     const role: SimRole = this.net?.role ?? 'solo';
     this.localId = role === 'guest' ? GUEST_PLAYER_ID : HOST_PLAYER_ID;
     this.sim = new Simulation({
@@ -120,6 +116,8 @@ export class RunScene extends Phaser.Scene {
         moveSpeed: playerConfig.moveSpeed,
         remote: id !== this.localId,
         pickupRange: playerConfig.pickupRange,
+        types: loadout.types,
+        moves,
       });
       const view = new PlayerView(this, p, placeholderRender, spriteRender, this.playerSprite);
       view.container.setDepth(id === this.localId ? 1.1 : 1);
@@ -180,7 +178,7 @@ export class RunScene extends Phaser.Scene {
       this.simMs = this.simMs * 0.95 + (performance.now() - t0) * 0.05;
       if (visible) {
         for (const ev of this.sim.world.events) {
-          if (ev.type === 'projectileHit') this.effects.playImpact(attackConfig.effect, ev.x, ev.y);
+          if (ev.type === 'projectileHit') this.effects.playImpact(this.sim.world.rules.moves[ev.move]!.effect, ev.x, ev.y);
         }
       }
       if (this.net && this.sync) this.net.transport.send(this.sync.outgoing(this.sim.world));
@@ -268,7 +266,7 @@ export class RunScene extends Phaser.Scene {
       gems,
       alpha,
       view,
-      (i) => (gems.value[i]! >= pickupConfig.bigGemValue ? bigGemColor : gemColor),
+      (i) => (gems.value[i]! >= world.rules.pickups.bigGemValue ? bigGemColor : gemColor),
       // 拾ってホストの確定を待っている玉は、自分の画面では消して見せる
       (i) => gems.pending[i] === 0,
     );
@@ -283,7 +281,8 @@ export class RunScene extends Phaser.Scene {
         (i) => this.streamer.manifestOf(e.kind[i]!) === null,
       );
     const sprites = this.streamer.stats();
-    this.effects.drawProjectiles(world.projectiles, alpha, attackConfig.effect, deltaMs, timeMs);
+    const pr = world.projectiles;
+    this.effects.drawProjectiles(pr, alpha, (i) => world.rules.moves[pr.move[i]!]!.effect, deltaMs, timeMs);
 
     const lines = [
       t('debug.controls'),
@@ -291,6 +290,15 @@ export class RunScene extends Phaser.Scene {
       t('debug.enemies', { count: e.count, cap: enemyCap(world), drawn }),
       t('debug.combat', { kills: world.stats.kills, projectiles: world.projectiles.count }),
       t('debug.xp', { xp: Math.round(world.xp), gems: gems.count }),
+      t('debug.moves', {
+        moves: local.moves
+          .map((m) => {
+            const def = world.rules.moves[m.move]!;
+            const name = localName(generated.moves[def.key]?.names, getLocale(), def.key);
+            return `${name} Lv${m.level}/${def.levels.length}`;
+          })
+          .join(' / '),
+      }),
       t('debug.simTime', { ms: this.simMs.toFixed(3) }),
       t('debug.frameTime', { ms: this.frameMs.toFixed(2) }),
       t('debug.enemySprites', { wave: currentWaveIndex(world) + 1, count: sprites.count, mb: (sprites.gpuBytes / 1048576).toFixed(2) }),

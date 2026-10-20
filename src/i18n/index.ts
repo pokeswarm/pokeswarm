@@ -14,6 +14,10 @@ function detectLocale(): Locale {
   return lang.toLowerCase().startsWith('ja') ? 'ja' : 'en';
 }
 
+export function getLocale(): Locale {
+  return current;
+}
+
 export function setLocale(locale: Locale): void {
   current = locale;
 }

@@ -26,5 +26,6 @@
   "net.mode.relay": "中継（Realtime Database）",
   "debug.frameTime": "1フレームの処理: {ms} ms（更新〜描画の命令まで）",
   "debug.enemySprites": "時間帯 {wave}　敵のスプライト: {count} 種類を読み込み中（GPU 約 {mb} MB）",
-  "debug.xp": "経験値（全員で共有）: {xp}　玉: {gems} 個"
+  "debug.xp": "経験値（全員で共有）: {xp}　玉: {gems} 個",
+  "debug.moves": "技: {moves}"
 }

@@ -1,0 +1,10 @@
+{
+  "maxProjectiles": 1024,
+  "hitMemory": 32,
+  "typeMultipliers": {
+    "stab": 1.1,
+    "superEffective": 1.2,
+    "notVeryEffective": 0.8
+  },
+  "maxMoveSlots": 4
+}

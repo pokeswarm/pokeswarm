@@ -74,7 +74,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     gems: new GemStore(role === 'guest' ? rules.pickups.maxGems * 2 : rules.pickups.maxGems),
     nextGemId: 1,
     xp: 0,
-    projectiles: new ProjectileStore(rules.attack.maxProjectiles, rules.attack.hitMemory),
+    projectiles: new ProjectileStore(rules.combat.maxProjectiles, rules.combat.hitMemory),
     enemyHash: new SpatialHash(rules.spawn.spatialCellSize, capacity),
     rng: new Rng(seed),
     nextEnemyId: 1,

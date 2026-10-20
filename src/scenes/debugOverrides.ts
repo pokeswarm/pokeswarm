@@ -1,10 +1,8 @@
 import type { SimRules } from '../sim/rules';
 
 /**
- * 計測用に URL のパラメータで data/ の値を一時的に上書きする（技術検証用）。
+ * 確認用に URL のパラメータで data/ の値を一時的に上書きする。
  * 例: ?cap=1000&spawn=200 … 敵の上限を1000、出現を毎秒200にする
- *     ?status=freeze&chance=1 … 仮の自動攻撃の状態異常を「こおり・必ず付く」にする
- *     ?kb=600 … ノックバックの速さを600にする
  */
 export function applyDebugOverrides(rules: SimRules, search: string): SimRules {
   const q = new URLSearchParams(search);
@@ -16,23 +14,30 @@ export function applyDebugOverrides(rules: SimRules, search: string): SimRules {
   };
   const cap = num('cap');
   const spawn = num('spawn');
-  const status = q.get('status');
-  const chance = num('chance');
-  const kb = num('kb');
-  const attack = { ...rules.attack };
-  if (status && rules.status.kinds.some((k) => k.id === status)) {
-    attack.status = { id: status, chance: Math.min(1, chance ?? 1), durationSeconds: rules.attack.status?.durationSeconds ?? 3 };
-  } else if (chance !== undefined && attack.status) {
-    attack.status = { ...attack.status, chance: Math.min(1, chance) };
-  }
-  if (kb !== undefined) attack.knockback = { speed: kb, durationSeconds: rules.attack.knockback?.durationSeconds ?? 0.12 };
   return {
     ...rules,
-    attack,
     spawn: {
       ...rules.spawn,
       ...(cap !== undefined && { capGlobal: Math.floor(cap), capPerPlayer: Math.floor(cap) }),
       ...(spawn !== undefined && { spawnPerSecond: spawn }),
     },
   };
+}
+
+/**
+ * 確認用: ?moves=ember:8,fire-spin:3 で覚えている技とレベルを指定する（無ければ null）。
+ * 知らない技は無視し、レベルは 1〜最大に収める。技の数は覚えられる数まで。
+ */
+export function parseMovesParam(rules: SimRules, search: string): { move: number; level: number }[] | null {
+  const v = new URLSearchParams(search).get('moves');
+  if (!v) return null;
+  const out: { move: number; level: number }[] = [];
+  for (const part of v.split(',')) {
+    const [key, lv] = part.split(':');
+    const move = rules.moves.findIndex((m) => m.key === key);
+    if (move === -1) continue;
+    const max = rules.moves[move]!.levels.length;
+    out.push({ move, level: Math.max(1, Math.min(max, Number(lv) || 1)) });
+  }
+  return out.slice(0, rules.combat.maxMoveSlots);
 }

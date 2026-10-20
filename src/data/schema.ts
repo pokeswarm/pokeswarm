@@ -130,32 +130,127 @@ export function findReappearingKind(
   return null;
 }
 
-/** 仮の自動攻撃（技の仕組みができたら置き換える） */
-export const attackConfigSchema = z.object({
-  cooldownSeconds: z.number().positive(),
-  range: z.number().positive(),
-  damage: z.number().positive(),
-  /** 1つの発射体が当たれる敵の数。"infinite" なら貫通無限（近接攻撃など） */
-  pierce: z.union([z.number().int().positive(), z.literal('infinite')]),
-  /** ノックバック: 当たった敵を、攻撃の向きへ speed（ワールド単位/秒）で durationSeconds 秒押し返す。無ければ押し返さない */
-  knockback: z.object({ speed: z.number().nonnegative(), durationSeconds: z.number().nonnegative() }).optional(),
-  /** 状態異常: 当たったとき chance の確率で id の状態異常を durationSeconds 秒付ける。無ければ付けない */
-  status: z
-    .object({ id: z.string(), chance: z.number().min(0).max(1), durationSeconds: z.number().positive() })
-    .optional(),
-  projectileSpeed: z.number().positive(),
-  projectileRadius: z.number().positive(),
-  projectileLifetimeSeconds: z.number().positive(),
+// ---- 戦闘の共通設定 ----
+
+export const combatConfigSchema = z.object({
+  /** 発射体・攻撃の当たり判定の数の上限（全プレイヤー合計） */
   maxProjectiles: z.number().int().positive(),
   /**
-   * 1つの発射体が覚えておける「当てた敵」の数。同じ敵に2回当たらないようにするため。
+   * 1つの攻撃が覚えておける「当てた敵」の数。同じ敵に当たり直しすぎないようにするため。
    * これを超えて当てると古いものから忘れる（その敵には再び当たりうる）
    */
   hitMemory: z.number().int().positive(),
-  /** 見た目のレシピ（data/effects/recipes.json のキー）。シミュレーションは使わない */
-  effect: z.string(),
+  /** タイプ相性の倍率（01_game_design.md 4.5） */
+  typeMultipliers: z.object({
+    /** タイプ一致 */
+    stab: z.number().positive(),
+    /** 効果はばつぐん */
+    superEffective: z.number().positive(),
+    /** 効果はいまひとつ（原作の「効果がない」もこれにする） */
+    notVeryEffective: z.number().positive(),
+  }),
+  /** 覚えられる技の数 */
+  maxMoveSlots: z.number().int().positive(),
 });
-export type AttackConfig = z.infer<typeof attackConfigSchema>;
+export type CombatConfig = z.infer<typeof combatConfigSchema>;
+
+// ---- 技 ----
+
+/**
+ * 技の出し方（01_game_design.md 4.1）。区切り1で作ったもの:
+ * - nearest: 一番近い敵へ発射体を飛ばす（count 発を interval ごとに）
+ * - facing: 向いている方向へ発射体を飛ばす（count 発を interval ごとに）
+ * - melee: 向いている方向の近くに一瞬だけ当たり判定を出す（count 2 で反対側にも）
+ * - orbit: 自分の周りを count 個の当たり判定が回る（duration の間）
+ */
+export const MOVE_PATTERNS = ['nearest', 'facing', 'melee', 'orbit'] as const;
+export type MovePattern = (typeof MOVE_PATTERNS)[number];
+
+const pierceValue = z.union([z.number().int().positive(), z.literal('infinite')]);
+
+/** 技の性能（レベルごとに変わる部分） */
+export const moveStatsSchema = z.object({
+  /** 威力（ダメージの元。ポケモンのステータスとタイプ相性を掛ける） */
+  power: z.number().nonnegative(),
+  /** 再使用までの時間（秒） */
+  cooldownSeconds: z.number().positive(),
+  /** 1回に出す数 */
+  count: z.number().int().positive(),
+  /** 複数出すときの間隔（秒。nearest・facing） */
+  intervalSeconds: z.number().nonnegative(),
+  /** 発射体の速さ（ワールド単位/秒）。orbit では回る速さ */
+  speed: z.number().nonnegative(),
+  /** 当たり判定の大きさ（半径） */
+  size: z.number().positive(),
+  /** 狙える距離（nearest）・前に出る距離（melee）・回る半径（orbit） */
+  range: z.number().nonnegative(),
+  /** 当たり判定が残る時間（秒） */
+  durationSeconds: z.number().positive(),
+  /** 貫通可能数。"infinite" で無限 */
+  pierce: pierceValue,
+  /** 同じ敵に当たり直すまでの間隔（秒）。0 なら1回だけ当たる */
+  hitIntervalSeconds: z.number().nonnegative(),
+  /** ノックバックの速さと時間 */
+  knockback: z.number().nonnegative(),
+  knockbackSeconds: z.number().nonnegative(),
+  /** 状態異常（data/game/status.json の id）。無ければ付けない */
+  statusId: z.string().optional(),
+  statusChance: z.number().min(0).max(1),
+  statusSeconds: z.number().nonnegative(),
+});
+export type MoveStatsData = z.infer<typeof moveStatsSchema>;
+
+/** レベルが1上がるごとに足す量（数値の項目だけ。pierce も数で足す） */
+export const moveLevelDeltaSchema = z
+  .object({
+    power: z.number(),
+    cooldownSeconds: z.number(),
+    count: z.number().int(),
+    intervalSeconds: z.number(),
+    speed: z.number(),
+    size: z.number(),
+    range: z.number(),
+    durationSeconds: z.number(),
+    pierce: z.number().int(),
+    hitIntervalSeconds: z.number(),
+    knockback: z.number(),
+    knockbackSeconds: z.number(),
+    statusChance: z.number(),
+    statusSeconds: z.number(),
+  })
+  .partial();
+export type MoveLevelDelta = z.infer<typeof moveLevelDeltaSchema>;
+
+export const moveDefSchema = z.object({
+  pattern: z.enum(MOVE_PATTERNS),
+  /** 見た目のレシピ（data/effects/recipes.json のキー） */
+  effect: z.string(),
+  /** レベル1の性能 */
+  base: moveStatsSchema,
+  /** レベル2以降で足す量。最大レベルは levels の数 + 1 */
+  levels: z.array(moveLevelDeltaSchema),
+});
+export type MoveDefData = z.infer<typeof moveDefSchema>;
+
+/** 技の定義。キーは PokeAPI の技の名前（タイプ・分類・名前は data/generated/moves.json から） */
+export const movesConfigSchema = z.object({ moves: z.record(z.string(), moveDefSchema) });
+export type MovesConfig = z.infer<typeof movesConfigSchema>;
+
+/** プレイアブルのポケモン。キーは PokeAPI のポケモンの名前 */
+export const playablesConfigSchema = z.object({
+  pokemon: z.record(
+    z.string(),
+    z.object({
+      /** スプライトのキー（public/sprites/<key>） */
+      sprite: z.string(),
+      /** 最初に覚えている技 */
+      startingMoves: z.array(z.string()).min(1),
+    }),
+  ),
+  /** 指定が無いときのポケモン */
+  default: z.string(),
+});
+export type PlayablesConfig = z.infer<typeof playablesConfigSchema>;
 
 // ---- スプライト（SpriteCollab からの取得・変換） ----
 
@@ -367,3 +462,61 @@ export const pickupConfigSchema = z.object({
   bigGemValue: z.number().positive(),
 });
 export type PickupConfig = z.infer<typeof pickupConfigSchema>;
+
+// ---- PokeAPI から生成するデータ（data/generated/。scripts/fetch-pokeapi.ts） ----
+
+export const pokeapiTargetsSchema = z.object({
+  pokemon: z.array(z.string()),
+  moves: z.array(z.string()),
+  items: z.array(z.string()),
+});
+
+const localizedNames = z.object({ ja: z.string().min(1), en: z.string().min(1) });
+export type LocalizedNames = z.infer<typeof localizedNames>;
+
+export const generatedPokemonEntrySchema = z.object({
+  dex: z.number().int().positive(),
+  names: localizedNames,
+  /** タイプのキー（1つ目が主のタイプ） */
+  types: z.array(z.string()).min(1).max(2),
+  baseStats: z.object({
+    hp: z.number().int(),
+    attack: z.number().int(),
+    defense: z.number().int(),
+    specialAttack: z.number().int(),
+    specialDefense: z.number().int(),
+    speed: z.number().int(),
+  }),
+  /** 次の進化（原作の条件。赤・緑の条件があればそれ） */
+  evolvesTo: z.array(
+    z.object({
+      to: z.string(),
+      trigger: z.enum(['level', 'item', 'trade', 'other']),
+      level: z.number().int().optional(),
+      item: z.string().optional(),
+    }),
+  ),
+});
+export type GeneratedPokemon = z.infer<typeof generatedPokemonEntrySchema>;
+export const generatedPokemonSchema = z.record(z.string(), generatedPokemonEntrySchema);
+
+export const generatedMoveEntrySchema = z.object({
+  names: localizedNames,
+  type: z.string(),
+  /** 原作の分類。physical / special / status */
+  damageClass: z.enum(['physical', 'special', 'status']),
+});
+export type GeneratedMove = z.infer<typeof generatedMoveEntrySchema>;
+export const generatedMovesSchema = z.record(z.string(), generatedMoveEntrySchema);
+
+export const generatedItemsSchema = z.record(z.string(), z.object({ names: localizedNames }));
+
+export const generatedTypeEntrySchema = z.object({
+  names: localizedNames,
+  /** 攻撃側として、効果ばつぐん・いまひとつ・効果なしになる相手のタイプ */
+  doubleDamageTo: z.array(z.string()),
+  halfDamageTo: z.array(z.string()),
+  noDamageTo: z.array(z.string()),
+});
+export type GeneratedType = z.infer<typeof generatedTypeEntrySchema>;
+export const generatedTypesSchema = z.record(z.string(), generatedTypeEntrySchema);

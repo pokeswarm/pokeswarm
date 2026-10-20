@@ -12,7 +12,7 @@ function makeSim(rules: SimRules, players = 1): Simulation {
 
 describe('雑魚敵', () => {
   it('出現数が上限で止まる（上限を超えた分は出さない）', () => {
-    const sim = makeSim(testRules({ spawn: { spawnPerSecond: 300, capGlobal: 50, capPerPlayer: 50 }, attack: { damage: 0.0001 } }));
+    const sim = makeSim(testRules({ spawn: { spawnPerSecond: 300, capGlobal: 50, capPerPlayer: 50 }, move: { power: 0.0001 } }));
     for (let i = 0; i < 60; i++) sim.step([]);
     expect(sim.world.enemies.count).toBe(50);
   });
@@ -24,7 +24,7 @@ describe('雑魚敵', () => {
   });
 
   it('一番近いプレイヤーに近づく', () => {
-    const sim = makeSim(testRules({ attack: { range: 1 } }));
+    const sim = makeSim(testRules({ move: { range: 1 } }));
     const e = sim.world.enemies;
     e.add(1, 0, 400, 0, 20, 60, 10);
     sim.step([]);
@@ -33,7 +33,7 @@ describe('雑魚敵', () => {
   });
 
   it('離れすぎた敵はプレイヤーの進行方向側へ移し替える', () => {
-    const sim = makeSim(testRules({ attack: { range: 1 } }));
+    const sim = makeSim(testRules({ move: { range: 1 } }));
     const e = sim.world.enemies;
     e.add(1, 0, -5000, 0, 20, 60, 10);
     sim.step([{ type: 'move', playerId: 1, dx: 1, dy: 0 }]);
@@ -86,9 +86,9 @@ describe('時間帯ごとの出現', () => {
           { startSeconds: 2, hpMultiplier: 2, kinds: ['b', 'c'] },
         ],
       },
-      attack: { range: 1 },
+      move: { range: 1 },
     });
-    rules.enemies.kinds = ['a', 'b', 'c'].map((id) => ({ id, hp: 20, moveSpeed: 0, radius: 10 }));
+    rules.enemies.kinds = ['a', 'b', 'c'].map((id) => ({ id, hp: 20, moveSpeed: 0, radius: 10, types: [0] }));
     const sim = makeSim(rules);
     const kindsAt = (from: number): Set<number> => {
       const e = sim.world.enemies;
@@ -116,9 +116,9 @@ describe('前の時間帯の敵', () => {
           { startSeconds: 1, hpMultiplier: 1, kinds: ['b'] },
         ],
       },
-      attack: { range: 1 },
+      move: { range: 1 },
     });
-    rules.enemies.kinds = ['a', 'b'].map((id) => ({ id, hp: 20, moveSpeed: 0, radius: 10 }));
+    rules.enemies.kinds = ['a', 'b'].map((id) => ({ id, hp: 20, moveSpeed: 0, radius: 10, types: [0] }));
     const sim = makeSim(rules);
     const e = sim.world.enemies;
     e.add(1, 0, 300, 0, 20, 0, 10); // 前の時間帯の種類（a）

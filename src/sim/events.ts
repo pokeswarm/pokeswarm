@@ -14,6 +14,8 @@ export interface ProjectileHitEvent {
   readonly x: number;
   readonly y: number;
   readonly owner: PlayerId;
+  /** 技の番号（命中の演出のレシピを引く） */
+  readonly move: number;
 }
 
 /** ホスト: 雑魚敵を出した（ゲストへ送る） */

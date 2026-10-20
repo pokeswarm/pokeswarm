@@ -27,19 +27,22 @@ npm run dev
 | `npm run preview` | `dist/` の内容をローカルで配信して確認 |
 | `npm test` | テスト（シミュレーションの単体テスト）を実行 |
 | `npm run bench` | シミュレーションの処理時間を敵の数ごとに計測 |
+| `npm run pokeapi` | PokeAPI からポケモン・技・持ち物・タイプのデータを取得して `data/generated/` に出力（コミットする） |
 | `npm run sprites` | SpriteCollab からスプライトを取得・変換して `public/sprites/` に出力（欠けている動作も報告） |
 | `npm run typecheck` | 型チェックのみ |
 
 ## 操作（現時点の技術検証版）
 
 - 移動: WASD / 矢印キー
-- 攻撃: 自動（近くの敵へ弾を撃つ）
+- 技: 自動で発動（最初の技はポケモンごと。ヒトカゲ: ひのこ、フシギダネ: つるのムチ、ゼニガメ: みずでっぽう）
 
 確認用の URL パラメータ:
 
 | パラメータ | 内容 |
 |---|---|
 | `?cap=3000&spawn=600` | 敵の上限と1秒あたりの出現数を一時的に変える（負荷の計測用） |
+| `?pokemon=bulbasaur` | プレイヤーのポケモン（charmander / bulbasaur / squirtle） |
+| `?moves=ember:8,fire-spin:3` | 覚えている技とレベルを指定（技のキーは PokeAPI の英語名） |
 | `?gallery` | プレイヤーのスプライトの待機・歩きを8方向すべて並べて表示 |
 
 スプライトは `npm run sprites` で取得したときだけ表示されます（取得していなければ仮の円）。

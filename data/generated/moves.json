@@ -1,0 +1,226 @@
+{
+  "air-slash": {
+    "names": {
+      "ja": "エアスラッシュ",
+      "en": "Air Slash"
+    },
+    "type": "flying",
+    "damageClass": "special"
+  },
+  "blast-burn": {
+    "names": {
+      "ja": "ブラストバーン",
+      "en": "Blast Burn"
+    },
+    "type": "fire",
+    "damageClass": "special"
+  },
+  "body-slam": {
+    "names": {
+      "ja": "のしかかり",
+      "en": "Body Slam"
+    },
+    "type": "normal",
+    "damageClass": "physical"
+  },
+  "bubble": {
+    "names": {
+      "ja": "あわ",
+      "en": "Bubble"
+    },
+    "type": "water",
+    "damageClass": "special"
+  },
+  "ember": {
+    "names": {
+      "ja": "ひのこ",
+      "en": "Ember"
+    },
+    "type": "fire",
+    "damageClass": "special"
+  },
+  "fire-fang": {
+    "names": {
+      "ja": "ほのおのキバ",
+      "en": "Fire Fang"
+    },
+    "type": "fire",
+    "damageClass": "physical"
+  },
+  "fire-spin": {
+    "names": {
+      "ja": "ほのおのうず",
+      "en": "Fire Spin"
+    },
+    "type": "fire",
+    "damageClass": "special"
+  },
+  "flamethrower": {
+    "names": {
+      "ja": "かえんほうしゃ",
+      "en": "Flamethrower"
+    },
+    "type": "fire",
+    "damageClass": "special"
+  },
+  "flare-blitz": {
+    "names": {
+      "ja": "フレアドライブ",
+      "en": "Flare Blitz"
+    },
+    "type": "fire",
+    "damageClass": "physical"
+  },
+  "frenzy-plant": {
+    "names": {
+      "ja": "ハードプラント",
+      "en": "Frenzy Plant"
+    },
+    "type": "grass",
+    "damageClass": "special"
+  },
+  "giga-drain": {
+    "names": {
+      "ja": "ギガドレイン",
+      "en": "Giga Drain"
+    },
+    "type": "grass",
+    "damageClass": "special"
+  },
+  "gust": {
+    "names": {
+      "ja": "かぜおこし",
+      "en": "Gust"
+    },
+    "type": "flying",
+    "damageClass": "special"
+  },
+  "hydro-cannon": {
+    "names": {
+      "ja": "ハイドロカノン",
+      "en": "Hydro Cannon"
+    },
+    "type": "water",
+    "damageClass": "special"
+  },
+  "hydro-pump": {
+    "names": {
+      "ja": "ハイドロポンプ",
+      "en": "Hydro Pump"
+    },
+    "type": "water",
+    "damageClass": "special"
+  },
+  "hyper-beam": {
+    "names": {
+      "ja": "はかいこうせん",
+      "en": "Hyper Beam"
+    },
+    "type": "normal",
+    "damageClass": "special"
+  },
+  "leech-seed": {
+    "names": {
+      "ja": "やどりぎのタネ",
+      "en": "Leech Seed"
+    },
+    "type": "grass",
+    "damageClass": "status"
+  },
+  "petal-dance": {
+    "names": {
+      "ja": "はなびらのまい",
+      "en": "Petal Dance"
+    },
+    "type": "grass",
+    "damageClass": "special"
+  },
+  "poison-sting": {
+    "names": {
+      "ja": "どくばり",
+      "en": "Poison Sting"
+    },
+    "type": "poison",
+    "damageClass": "physical"
+  },
+  "quick-attack": {
+    "names": {
+      "ja": "でんこうせっか",
+      "en": "Quick Attack"
+    },
+    "type": "normal",
+    "damageClass": "physical"
+  },
+  "razor-leaf": {
+    "names": {
+      "ja": "はっぱカッター",
+      "en": "Razor Leaf"
+    },
+    "type": "grass",
+    "damageClass": "physical"
+  },
+  "sleep-powder": {
+    "names": {
+      "ja": "ねむりごな",
+      "en": "Sleep Powder"
+    },
+    "type": "grass",
+    "damageClass": "status"
+  },
+  "sludge-bomb": {
+    "names": {
+      "ja": "ヘドロばくだん",
+      "en": "Sludge Bomb"
+    },
+    "type": "poison",
+    "damageClass": "special"
+  },
+  "solar-beam": {
+    "names": {
+      "ja": "ソーラービーム",
+      "en": "Solar Beam"
+    },
+    "type": "grass",
+    "damageClass": "special"
+  },
+  "surf": {
+    "names": {
+      "ja": "なみのり",
+      "en": "Surf"
+    },
+    "type": "water",
+    "damageClass": "special"
+  },
+  "swift": {
+    "names": {
+      "ja": "スピードスター",
+      "en": "Swift"
+    },
+    "type": "normal",
+    "damageClass": "special"
+  },
+  "tackle": {
+    "names": {
+      "ja": "たいあたり",
+      "en": "Tackle"
+    },
+    "type": "normal",
+    "damageClass": "physical"
+  },
+  "vine-whip": {
+    "names": {
+      "ja": "つるのムチ",
+      "en": "Vine Whip"
+    },
+    "type": "grass",
+    "damageClass": "physical"
+  },
+  "water-gun": {
+    "names": {
+      "ja": "みずでっぽう",
+      "en": "Water Gun"
+    },
+    "type": "water",
+    "damageClass": "special"
+  }
+}

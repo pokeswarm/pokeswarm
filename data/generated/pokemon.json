@@ -1,0 +1,582 @@
+{
+  "blastoise": {
+    "dex": 9,
+    "names": {
+      "ja": "カメックス",
+      "en": "Blastoise"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 79,
+      "attack": 83,
+      "defense": 100,
+      "specialAttack": 85,
+      "specialDefense": 105,
+      "speed": 78
+    },
+    "evolvesTo": []
+  },
+  "bulbasaur": {
+    "dex": 1,
+    "names": {
+      "ja": "フシギダネ",
+      "en": "Bulbasaur"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 49,
+      "defense": 49,
+      "specialAttack": 65,
+      "specialDefense": 65,
+      "speed": 45
+    },
+    "evolvesTo": [
+      {
+        "to": "ivysaur",
+        "trigger": "level",
+        "level": 16
+      }
+    ]
+  },
+  "caterpie": {
+    "dex": 10,
+    "names": {
+      "ja": "キャタピー",
+      "en": "Caterpie"
+    },
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 30,
+      "defense": 35,
+      "specialAttack": 20,
+      "specialDefense": 20,
+      "speed": 45
+    },
+    "evolvesTo": [
+      {
+        "to": "metapod",
+        "trigger": "level",
+        "level": 7
+      }
+    ]
+  },
+  "charizard": {
+    "dex": 6,
+    "names": {
+      "ja": "リザードン",
+      "en": "Charizard"
+    },
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "attack": 84,
+      "defense": 78,
+      "specialAttack": 109,
+      "specialDefense": 85,
+      "speed": 100
+    },
+    "evolvesTo": []
+  },
+  "charmander": {
+    "dex": 4,
+    "names": {
+      "ja": "ヒトカゲ",
+      "en": "Charmander"
+    },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 39,
+      "attack": 52,
+      "defense": 43,
+      "specialAttack": 60,
+      "specialDefense": 50,
+      "speed": 65
+    },
+    "evolvesTo": [
+      {
+        "to": "charmeleon",
+        "trigger": "level",
+        "level": 16
+      }
+    ]
+  },
+  "charmeleon": {
+    "dex": 5,
+    "names": {
+      "ja": "リザード",
+      "en": "Charmeleon"
+    },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 58,
+      "attack": 64,
+      "defense": 58,
+      "specialAttack": 80,
+      "specialDefense": 65,
+      "speed": 80
+    },
+    "evolvesTo": [
+      {
+        "to": "charizard",
+        "trigger": "level",
+        "level": 36
+      }
+    ]
+  },
+  "eevee": {
+    "dex": 133,
+    "names": {
+      "ja": "イーブイ",
+      "en": "Eevee"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 55,
+      "defense": 50,
+      "specialAttack": 45,
+      "specialDefense": 65,
+      "speed": 55
+    },
+    "evolvesTo": [
+      {
+        "to": "vaporeon",
+        "trigger": "item",
+        "item": "water-stone"
+      },
+      {
+        "to": "jolteon",
+        "trigger": "item",
+        "item": "thunder-stone"
+      },
+      {
+        "to": "flareon",
+        "trigger": "item",
+        "item": "fire-stone"
+      },
+      {
+        "to": "espeon",
+        "trigger": "other"
+      },
+      {
+        "to": "umbreon",
+        "trigger": "other"
+      },
+      {
+        "to": "leafeon",
+        "trigger": "other"
+      },
+      {
+        "to": "glaceon",
+        "trigger": "other"
+      },
+      {
+        "to": "sylveon",
+        "trigger": "other"
+      }
+    ]
+  },
+  "flareon": {
+    "dex": 136,
+    "names": {
+      "ja": "ブースター",
+      "en": "Flareon"
+    },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 130,
+      "defense": 60,
+      "specialAttack": 95,
+      "specialDefense": 110,
+      "speed": 65
+    },
+    "evolvesTo": []
+  },
+  "geodude": {
+    "dex": 74,
+    "names": {
+      "ja": "イシツブテ",
+      "en": "Geodude"
+    },
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 80,
+      "defense": 100,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 20
+    },
+    "evolvesTo": [
+      {
+        "to": "graveler",
+        "trigger": "level",
+        "level": 25
+      }
+    ]
+  },
+  "ivysaur": {
+    "dex": 2,
+    "names": {
+      "ja": "フシギソウ",
+      "en": "Ivysaur"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 62,
+      "defense": 63,
+      "specialAttack": 80,
+      "specialDefense": 80,
+      "speed": 60
+    },
+    "evolvesTo": [
+      {
+        "to": "venusaur",
+        "trigger": "level",
+        "level": 32
+      }
+    ]
+  },
+  "jolteon": {
+    "dex": 135,
+    "names": {
+      "ja": "サンダース",
+      "en": "Jolteon"
+    },
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 65,
+      "defense": 60,
+      "specialAttack": 110,
+      "specialDefense": 95,
+      "speed": 130
+    },
+    "evolvesTo": []
+  },
+  "kakuna": {
+    "dex": 14,
+    "names": {
+      "ja": "コクーン",
+      "en": "Kakuna"
+    },
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 25,
+      "defense": 50,
+      "specialAttack": 25,
+      "specialDefense": 25,
+      "speed": 35
+    },
+    "evolvesTo": [
+      {
+        "to": "beedrill",
+        "trigger": "level",
+        "level": 10
+      }
+    ]
+  },
+  "metapod": {
+    "dex": 11,
+    "names": {
+      "ja": "トランセル",
+      "en": "Metapod"
+    },
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 20,
+      "defense": 55,
+      "specialAttack": 25,
+      "specialDefense": 25,
+      "speed": 30
+    },
+    "evolvesTo": [
+      {
+        "to": "butterfree",
+        "trigger": "level",
+        "level": 10
+      }
+    ]
+  },
+  "paras": {
+    "dex": 46,
+    "names": {
+      "ja": "パラス",
+      "en": "Paras"
+    },
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 70,
+      "defense": 55,
+      "specialAttack": 45,
+      "specialDefense": 55,
+      "speed": 25
+    },
+    "evolvesTo": [
+      {
+        "to": "parasect",
+        "trigger": "level",
+        "level": 24
+      }
+    ]
+  },
+  "pidgey": {
+    "dex": 16,
+    "names": {
+      "ja": "ポッポ",
+      "en": "Pidgey"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 45,
+      "defense": 40,
+      "specialAttack": 35,
+      "specialDefense": 35,
+      "speed": 56
+    },
+    "evolvesTo": [
+      {
+        "to": "pidgeotto",
+        "trigger": "level",
+        "level": 18
+      }
+    ]
+  },
+  "rattata": {
+    "dex": 19,
+    "names": {
+      "ja": "コラッタ",
+      "en": "Rattata"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 56,
+      "defense": 35,
+      "specialAttack": 25,
+      "specialDefense": 35,
+      "speed": 72
+    },
+    "evolvesTo": [
+      {
+        "to": "raticate",
+        "trigger": "level",
+        "level": 20
+      }
+    ]
+  },
+  "spearow": {
+    "dex": 21,
+    "names": {
+      "ja": "オニスズメ",
+      "en": "Spearow"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 60,
+      "defense": 30,
+      "specialAttack": 31,
+      "specialDefense": 31,
+      "speed": 70
+    },
+    "evolvesTo": [
+      {
+        "to": "fearow",
+        "trigger": "level",
+        "level": 20
+      }
+    ]
+  },
+  "squirtle": {
+    "dex": 7,
+    "names": {
+      "ja": "ゼニガメ",
+      "en": "Squirtle"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 44,
+      "attack": 48,
+      "defense": 65,
+      "specialAttack": 50,
+      "specialDefense": 64,
+      "speed": 43
+    },
+    "evolvesTo": [
+      {
+        "to": "wartortle",
+        "trigger": "level",
+        "level": 16
+      }
+    ]
+  },
+  "vaporeon": {
+    "dex": 134,
+    "names": {
+      "ja": "シャワーズ",
+      "en": "Vaporeon"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 130,
+      "attack": 65,
+      "defense": 60,
+      "specialAttack": 110,
+      "specialDefense": 95,
+      "speed": 65
+    },
+    "evolvesTo": []
+  },
+  "venusaur": {
+    "dex": 3,
+    "names": {
+      "ja": "フシギバナ",
+      "en": "Venusaur"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 82,
+      "defense": 83,
+      "specialAttack": 100,
+      "specialDefense": 100,
+      "speed": 80
+    },
+    "evolvesTo": []
+  },
+  "wartortle": {
+    "dex": 8,
+    "names": {
+      "ja": "カメール",
+      "en": "Wartortle"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 59,
+      "attack": 63,
+      "defense": 80,
+      "specialAttack": 65,
+      "specialDefense": 80,
+      "speed": 58
+    },
+    "evolvesTo": [
+      {
+        "to": "blastoise",
+        "trigger": "level",
+        "level": 36
+      }
+    ]
+  },
+  "weedle": {
+    "dex": 13,
+    "names": {
+      "ja": "ビードル",
+      "en": "Weedle"
+    },
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 35,
+      "defense": 30,
+      "specialAttack": 20,
+      "specialDefense": 20,
+      "speed": 50
+    },
+    "evolvesTo": [
+      {
+        "to": "kakuna",
+        "trigger": "level",
+        "level": 7
+      }
+    ]
+  },
+  "zubat": {
+    "dex": 41,
+    "names": {
+      "ja": "ズバット",
+      "en": "Zubat"
+    },
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 45,
+      "defense": 35,
+      "specialAttack": 30,
+      "specialDefense": 40,
+      "speed": 55
+    },
+    "evolvesTo": [
+      {
+        "to": "golbat",
+        "trigger": "level",
+        "level": 22
+      }
+    ]
+  }
+}

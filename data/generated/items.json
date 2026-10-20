@@ -1,0 +1,146 @@
+{
+  "calcium": {
+    "names": {
+      "ja": "リゾチウム",
+      "en": "Calcium"
+    }
+  },
+  "carbos": {
+    "names": {
+      "ja": "インドメタシン",
+      "en": "Carbos"
+    }
+  },
+  "charcoal": {
+    "names": {
+      "ja": "もくたん",
+      "en": "Charcoal"
+    }
+  },
+  "dire-hit": {
+    "names": {
+      "ja": "クリティカット",
+      "en": "Dire Hit"
+    }
+  },
+  "dowsing-machine": {
+    "names": {
+      "ja": "ダウジングマシン",
+      "en": "Dowsing Machine"
+    }
+  },
+  "fire-stone": {
+    "names": {
+      "ja": "ほのおのいし",
+      "en": "Fire Stone"
+    }
+  },
+  "hp-up": {
+    "names": {
+      "ja": "マックスアップ",
+      "en": "HP Up"
+    }
+  },
+  "iron": {
+    "names": {
+      "ja": "ブロムヘキシン",
+      "en": "Iron"
+    }
+  },
+  "leaf-stone": {
+    "names": {
+      "ja": "リーフのいし",
+      "en": "Leaf Stone"
+    }
+  },
+  "leftovers": {
+    "names": {
+      "ja": "たべのこし",
+      "en": "Leftovers"
+    }
+  },
+  "linking-cord": {
+    "names": {
+      "ja": " つながりのヒモ",
+      "en": "Linking Cord"
+    }
+  },
+  "lucky-egg": {
+    "names": {
+      "ja": "しあわせタマゴ",
+      "en": "Lucky Egg"
+    }
+  },
+  "miracle-seed": {
+    "names": {
+      "ja": "きせきのタネ",
+      "en": "Miracle Seed"
+    }
+  },
+  "mystic-water": {
+    "names": {
+      "ja": "しんぴのしずく",
+      "en": "Mystic Water"
+    }
+  },
+  "poison-barb": {
+    "names": {
+      "ja": "どくバリ",
+      "en": "Poison Barb"
+    }
+  },
+  "pp-up": {
+    "names": {
+      "ja": "ポイントアップ",
+      "en": "PP Up"
+    }
+  },
+  "protein": {
+    "names": {
+      "ja": "タウリン",
+      "en": "Protein"
+    }
+  },
+  "sharp-beak": {
+    "names": {
+      "ja": "するどいくちばし",
+      "en": "Sharp Beak"
+    }
+  },
+  "thunder-stone": {
+    "names": {
+      "ja": "かみなりのいし",
+      "en": "Thunder Stone"
+    }
+  },
+  "water-stone": {
+    "names": {
+      "ja": "みずのいし",
+      "en": "Water Stone"
+    }
+  },
+  "wide-lens": {
+    "names": {
+      "ja": "こうかくレンズ",
+      "en": "Wide Lens"
+    }
+  },
+  "x-attack": {
+    "names": {
+      "ja": "プラスパワー",
+      "en": "X Attack"
+    }
+  },
+  "x-defense": {
+    "names": {
+      "ja": "ディフェンダー",
+      "en": "X Defense"
+    }
+  },
+  "x-speed": {
+    "names": {
+      "ja": "スピーダー",
+      "en": "X Speed"
+    }
+  }
+}

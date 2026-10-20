@@ -7,7 +7,7 @@ import type { SimRole } from './world';
 
 describe('経験値の玉（ソロ）', () => {
   it('倒した場所に玉が落ち、取得範囲に入ると吸い寄せられて拾える', () => {
-    const sim = new Simulation({ tickRate: 30, seed: 1, rules: testRules({ attack: { damage: 100, cooldownSeconds: 100 } }) });
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules: testRules({ move: { power: 100, cooldownSeconds: 100 } }) });
     sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150, pickupRange: 80 });
     sim.world.enemies.add(1, 0, 60, 0, 20, 0, 10);
     let dropped = false;
@@ -24,7 +24,7 @@ describe('経験値の玉（ソロ）', () => {
     const sim = new Simulation({
       tickRate: 30,
       seed: 1,
-      rules: testRules({ attack: { damage: 100, cooldownSeconds: 0.05, range: 400 }, pickups: { maxGems: 2 } }),
+      rules: testRules({ move: { power: 100, cooldownSeconds: 0.05, range: 400 }, pickups: { maxGems: 2 } }),
     });
     sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150, pickupRange: 0 });
     for (let k = 0; k < 5; k++) sim.world.enemies.add(k + 1, 0, 200 + k * 30, 0, 20, 0, 10);
@@ -37,7 +37,7 @@ describe('経験値の玉（ソロ）', () => {
 });
 
 function peer(role: SimRole, localId: number, remoteId: number) {
-  const sim = new Simulation({ tickRate: 30, seed: 1, rules: testRules({ attack: { range: 1 } }), role, localPlayerId: localId });
+  const sim = new Simulation({ tickRate: 30, seed: 1, rules: testRules({ move: { range: 1 } }), role, localPlayerId: localId });
   // 2人とも同じ場所に立つ
   sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150, remote: localId !== 1, pickupRange: 80 });
   sim.addPlayer({ id: 2, x: 0, y: 0, radius: 12, moveSpeed: 150, remote: localId !== 2, pickupRange: 80 });

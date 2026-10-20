@@ -106,8 +106,22 @@
       ]
     },
     {
+      "key": "raticate",
+      "dex": 20,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "spearow",
       "dex": 21,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "vulpix",
+      "dex": 37,
       "uses": [
         "enemy"
       ]
@@ -120,6 +134,20 @@
       ]
     },
     {
+      "key": "golbat",
+      "dex": 42,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "oddish",
+      "dex": 43,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "paras",
       "dex": 46,
       "uses": [
@@ -127,8 +155,162 @@
       ]
     },
     {
+      "key": "meowth",
+      "dex": 52,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "mankey",
+      "dex": 56,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "growlithe",
+      "dex": 58,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "abra",
+      "dex": 63,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "machoke",
+      "dex": 67,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "tentacool",
+      "dex": 72,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "geodude",
       "dex": 74,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "graveler",
+      "dex": 75,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "ponyta",
+      "dex": 77,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "doduo",
+      "dex": 84,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "seel",
+      "dex": 86,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "grimer",
+      "dex": 88,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "gastly",
+      "dex": 92,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "onix",
+      "dex": 95,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "cubone",
+      "dex": 104,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "koffing",
+      "dex": 109,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "chansey",
+      "dex": 113,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "horsea",
+      "dex": 116,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "starmie",
+      "dex": 121,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "scyther",
+      "dex": 123,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "tauros",
+      "dex": 128,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "magikarp",
+      "dex": 129,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "lapras",
+      "dex": 131,
       "uses": [
         "enemy"
       ]

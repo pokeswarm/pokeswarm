@@ -17,31 +17,98 @@
       "startSeconds": 0,
       "hpMultiplier": 1,
       "damageMultiplier": 1,
+      "xpMultiplier": 1,
       "kinds": [
         "rattata",
         "pidgey",
-        "caterpie"
-      ]
-    },
-    {
-      "startSeconds": 40,
-      "hpMultiplier": 1.6,
-      "damageMultiplier": 1.3,
-      "kinds": [
+        "caterpie",
         "weedle",
         "metapod",
-        "kakuna",
-        "spearow"
+        "kakuna"
       ]
     },
     {
-      "startSeconds": 80,
-      "hpMultiplier": 2.4,
-      "damageMultiplier": 1.6,
+      "startSeconds": 112,
+      "hpMultiplier": 1.6,
+      "damageMultiplier": 1.3,
+      "xpMultiplier": 1,
       "kinds": [
+        "pidgey",
+        "spearow",
         "zubat",
         "geodude",
         "paras"
+      ]
+    },
+    {
+      "startSeconds": 225,
+      "hpMultiplier": 2.4,
+      "damageMultiplier": 1.6,
+      "xpMultiplier": 1,
+      "kinds": [
+        "oddish",
+        "abra",
+        "mankey",
+        "meowth"
+      ]
+    },
+    {
+      "startSeconds": 337,
+      "hpMultiplier": 3.4,
+      "damageMultiplier": 1.9,
+      "xpMultiplier": 1,
+      "kinds": [
+        "growlithe",
+        "vulpix",
+        "gastly",
+        "cubone"
+      ]
+    },
+    {
+      "startSeconds": 450,
+      "hpMultiplier": 4.6,
+      "damageMultiplier": 2.2,
+      "xpMultiplier": 1,
+      "kinds": [
+        "doduo",
+        "raticate",
+        "chansey",
+        "tauros",
+        "scyther"
+      ]
+    },
+    {
+      "startSeconds": 562,
+      "hpMultiplier": 6,
+      "damageMultiplier": 2.5,
+      "xpMultiplier": 1,
+      "kinds": [
+        "tentacool",
+        "magikarp",
+        "horsea"
+      ]
+    },
+    {
+      "startSeconds": 675,
+      "hpMultiplier": 7.6,
+      "damageMultiplier": 2.8,
+      "xpMultiplier": 1,
+      "kinds": [
+        "seel",
+        "koffing",
+        "grimer",
+        "ponyta"
+      ]
+    },
+    {
+      "startSeconds": 787,
+      "hpMultiplier": 9.4,
+      "damageMultiplier": 3.1,
+      "xpMultiplier": 1,
+      "kinds": [
+        "machoke",
+        "golbat",
+        "graveler"
       ]
     }
   ]

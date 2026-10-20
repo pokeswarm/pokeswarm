@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
     chunkSizeWarningLimit: 2000,
   },
   test: {
-    // 処理時間の計測（*.perf.ts）は npm run bench のときだけ動かす
-    include: mode === 'bench' ? ['src/**/*.perf.ts'] : ['src/**/*.test.ts'],
+    // 処理時間の計測（*.perf.ts）は npm run bench、1ランの通し（*.balance.ts）は npm run balance のときだけ動かす
+    include: mode === 'bench' ? ['src/**/*.perf.ts'] : mode === 'balance' ? ['src/**/*.balance.ts'] : ['src/**/*.test.ts'],
   },
 }));

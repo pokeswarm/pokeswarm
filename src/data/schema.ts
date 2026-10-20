@@ -52,6 +52,14 @@ export const enemyKindSchema = z.object({
   radius: z.number().positive(),
   /** プレイヤーに触れたときのダメージ（時間帯の damageMultiplier を掛ける） */
   contactDamage: z.number().nonnegative(),
+  /** PokeAPI のポケモンのキー（タイプ・名前に使う）。省略時は id */
+  species: z.string().optional(),
+  /** 雑魚（normal・省略時）・中ボス（midboss）・ボス（boss）。中ボス・ボスは data/game/stage.json の予定で出す */
+  rank: z.enum(['normal', 'midboss', 'boss']).optional(),
+  /** 倒したときに落とす経験値。省略時は pickups.json の xpPerKill（雑魚には時間帯の xpMultiplier を掛ける） */
+  xp: z.number().nonnegative().optional(),
+  /** スプライトの大きさの倍率（省略時は 1。中ボス・ボスを大きく描く） */
+  spriteScale: z.number().positive().optional(),
 });
 export type EnemyKind = z.infer<typeof enemyKindSchema>;
 
@@ -97,6 +105,8 @@ export const spawnConfigSchema = z
           hpMultiplier: z.number().positive(),
           /** その時間帯に出る敵の接触ダメージの倍率 */
           damageMultiplier: z.number().positive(),
+          /** その時間帯に出る雑魚が落とす経験値の倍率（省略時は 1） */
+          xpMultiplier: z.number().positive().optional(),
           kinds: z.array(z.string()).min(1),
         }),
       )
@@ -118,6 +128,50 @@ export const spawnConfigSchema = z
     }
   });
 export type SpawnConfig = z.infer<typeof spawnConfigSchema>;
+
+// ---- ステージ（ランの長さ・中ボス・ボス） ----
+
+/**
+ * ボスの範囲技。狙ったプレイヤーの足元に範囲を予告し、telegraphSeconds 後にその範囲へダメージを与える。
+ * 当たったかは受けたプレイヤーのブラウザで判定する（01_game_design.md 2.3）。
+ */
+export const bossMoveSchema = z.object({
+  /** 技の名前に使う PokeAPI の技のキー */
+  move: z.string().min(1),
+  /** 範囲に落ちたときの演出（data/effects/recipes.json） */
+  effect: z.string().min(1),
+  intervalSeconds: z.number().positive(),
+  telegraphSeconds: z.number().positive(),
+  radius: z.number().positive(),
+  damage: z.number().nonnegative(),
+  /** 1回に落とす範囲の数 */
+  count: z.number().int().positive(),
+  /** 狙ったプレイヤーの位置からのばらつき（2つ目以降の範囲） */
+  spread: z.number().nonnegative(),
+});
+export type BossMove = z.infer<typeof bossMoveSchema>;
+
+export const stageConfigSchema = z.object({
+  /** ランの長さ。この時間でボスが出る */
+  durationSeconds: z.number().positive(),
+  /** 中ボスの出る時間と種類（data/game/enemies.json の rank: "midboss"） */
+  midbosses: z.array(z.object({ atSeconds: z.number().nonnegative(), kind: z.string().min(1) })),
+  /** ボス（rank: "boss"）。倒せばランクリア。null ならボスなし（テスト用） */
+  boss: z.object({ kind: z.string().min(1), move: bossMoveSchema }).nullable(),
+  bossRules: z.object({
+    /** 中ボス・ボスのノックバックの倍率（0 で押されない） */
+    knockbackMultiplier: z.number().min(0),
+    /** 中ボス・ボスの、動きを止める状態異常（speedMultiplier が 0 のもの）の時間の倍率 */
+    stopStatusMultiplier: z.number().min(0),
+    /** 2人目以降の1人あたりの HP の増加（%） */
+    hpPerExtraPlayerPct: z.number().min(0),
+    /** プレイヤーからこの距離に出す */
+    spawnDistance: z.number().positive(),
+  }),
+  /** クリア・失敗が決まってから結果画面に移るまでの時間 */
+  endDelaySeconds: z.number().nonnegative(),
+});
+export type StageConfig = z.infer<typeof stageConfigSchema>;
 
 /** 一度いなくなった種類が後の時間帯で再び出ていれば、その種類と時間帯の番号を返す */
 export function findReappearingKind(

@@ -4,7 +4,10 @@ import { firebaseOptionsFromEnv } from './firebase/config';
 import type { RoomConnection } from './net/room';
 import { loadSpriteManifest } from './render/sprites/spriteManifest';
 import { NetPanel } from './scenes/netPanel';
+import { ResultScene } from './scenes/ResultScene';
 import { RunScene, type RunSceneData } from './scenes/RunScene';
+import { SelectScene } from './scenes/SelectScene';
+import { TitleScene } from './scenes/TitleScene';
 
 /**
  * 協力プレイ（技術検証用）の入り口:
@@ -51,16 +54,24 @@ async function connectIfRequested(panel: NetPanel): Promise<RoomConnection | nul
   }
 }
 
+/**
+ * 通常はタイトル → ポケモン選択 → ラン → 結果画面の順に進む。
+ * 確認用に ?pokemon=bulbasaur を付けるか、協力プレイ（?host・?join=）のときは、すぐにランを始める。
+ */
 async function start(): Promise<void> {
   const panel = new NetPanel();
   panel.hide();
-  // 雑魚のスプライトは起動時には読まず、時間帯に合わせて読む（SpriteStreamer）
-  // プレイヤーのポケモンは確認用に ?pokemon=bulbasaur で選べる（ポケモン選択の画面は区切り4で作る）
-  const requested = new URLSearchParams(window.location.search).get('pokemon') ?? '';
-  const pokemon = playablesConfig.pokemon[requested] ? requested : playablesConfig.default;
-  const [playerSprite, net] = await Promise.all([loadSpriteManifest(playablesConfig.pokemon[pokemon]!.sprite), connectIfRequested(panel)]);
-  panel.hide();
-  const data: RunSceneData = { pokemon, playerSprite, net, panel };
+  const q = new URLSearchParams(window.location.search);
+  const direct = q.has('pokemon') || q.has('host') || q.has('join');
+  let data: RunSceneData | null = null;
+  if (direct) {
+    // 雑魚のスプライトは起動時には読まず、時間帯に合わせて読む（SpriteStreamer）
+    const requested = q.get('pokemon') ?? '';
+    const pokemon = playablesConfig.pokemon[requested] ? requested : playablesConfig.default;
+    const [playerSprite, net] = await Promise.all([loadSpriteManifest(playablesConfig.pokemon[pokemon]!.sprite), connectIfRequested(panel)]);
+    panel.hide();
+    data = { pokemon, playerSprite, net, panel };
+  }
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
@@ -73,7 +84,10 @@ async function start(): Promise<void> {
       height: '100%',
     },
   });
-  game.scene.add('run', RunScene, true, data);
+  game.scene.add('title', TitleScene, !data);
+  game.scene.add('select', SelectScene, false);
+  game.scene.add('run', RunScene, !!data, data ?? undefined);
+  game.scene.add('result', ResultScene, false);
 }
 
 void start();

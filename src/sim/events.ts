@@ -129,6 +129,36 @@ export interface EvolvedEvent {
   readonly to: number;
 }
 
+/** 中ボス・ボスが出た */
+export interface BossAppearedEvent {
+  readonly type: 'bossAppeared';
+  readonly id: number;
+  readonly kind: number;
+}
+
+/** ボスの範囲技の予告が始まった */
+export interface HazardTelegraphedEvent {
+  readonly type: 'hazardTelegraphed';
+  readonly x: number;
+  readonly y: number;
+  readonly radius: number;
+}
+
+/** ボスの範囲技が落ちた（演出用） */
+export interface HazardStruckEvent {
+  readonly type: 'hazardStruck';
+  readonly x: number;
+  readonly y: number;
+  readonly radius: number;
+  readonly effect: string;
+}
+
+/** ランが終わった */
+export interface RunEndedEvent {
+  readonly type: 'runEnded';
+  readonly outcome: 'clear' | 'fail';
+}
+
 export type SimEvent =
   | EnemyKilledEvent
   | ProjectileHitEvent
@@ -145,4 +175,8 @@ export type SimEvent =
   | PlayerRevivedEvent
   | PlayerDownEvent
   | EvolvedEvent
-  | EnemyRetiredEvent;
+  | EnemyRetiredEvent
+  | BossAppearedEvent
+  | HazardTelegraphedEvent
+  | HazardStruckEvent
+  | RunEndedEvent;

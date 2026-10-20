@@ -1,5 +1,5 @@
 import type { PlayerId } from '../commands';
-import { findEnemyIndex, type World } from '../world';
+import { currentWaveIndex, findEnemyIndex, type World } from '../world';
 import { addXp } from './leveling';
 
 /**
@@ -11,19 +11,24 @@ export function dropGems(world: World): void {
   if (world.role === 'guest') return;
   const { gems, enemies: e } = world;
   const p = world.rules.pickups;
+  const waveXp = world.waves[currentWaveIndex(world)]!.xpMultiplier;
   for (const ev of world.events) {
     if (ev.type !== 'enemyKilled') continue;
     const i = findEnemyIndex(world, ev.enemyId);
     if (i === -1) continue;
+    // 経験値: 種類ごとの値（省略時は xpPerKill）。雑魚には時間帯の倍率を掛ける
+    const kind = world.rules.enemies.kinds[e.kind[i]!];
+    const value = (kind?.xp ?? p.xpPerKill) * ((kind?.rank ?? 'normal') === 'normal' ? waveXp : 1);
+    if (value <= 0) continue;
     if (gems.count >= gems.capacity) {
       const g = gems.oldest();
-      gems.value[g]! += p.xpPerKill;
+      gems.value[g]! += value;
       world.events.push({ type: 'gemMerged', id: gems.id[g]!, value: gems.value[g]! });
       continue;
     }
     const id = world.nextGemId++;
-    gems.add(id, e.x[i]!, e.y[i]!, p.xpPerKill, p.gemRadius);
-    world.events.push({ type: 'gemSpawned', id, x: e.x[i]!, y: e.y[i]!, value: p.xpPerKill });
+    gems.add(id, e.x[i]!, e.y[i]!, value, p.gemRadius);
+    world.events.push({ type: 'gemSpawned', id, x: e.x[i]!, y: e.y[i]!, value });
   }
 }
 

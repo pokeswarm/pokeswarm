@@ -40,6 +40,21 @@ export interface LevelUpState {
   ticksLeft: number;
 }
 
+/** ランの結果 */
+export type RunOutcome = 'clear' | 'fail';
+
+/** ボスの範囲技の予告中の範囲。ticksLeft が 0 になったときに中にいたらダメージを受ける */
+export interface Hazard {
+  readonly x: number;
+  readonly y: number;
+  readonly radius: number;
+  readonly damage: number;
+  ticksLeft: number;
+  readonly totalTicks: number;
+  /** 落ちたときの演出 */
+  readonly effect: string;
+}
+
 /** シミュレーションの全状態 */
 export interface World {
   tick: number;
@@ -81,10 +96,20 @@ export interface World {
     readonly startTick: number;
     readonly hpMultiplier: number;
     readonly damageMultiplier: number;
+    readonly xpMultiplier: number;
     readonly kinds: readonly number[];
   }[];
   /** 全員で共有する復活可能数 */
   revives: number;
+  /** ランの結果。決まったらシミュレーションは進まない */
+  outcome: RunOutcome | null;
+  /** 中ボス・ボスを出す予定（更新回数の順）。nextBoss は次に出す予定の番号 */
+  readonly bossSchedule: readonly { readonly tick: number; readonly kind: number }[];
+  nextBoss: number;
+  /** 出ているボス（範囲技を使う rank: boss）と、次の技までの残り（ソロ・ホスト） */
+  readonly bosses: { id: number; cooldown: number }[];
+  /** 予告中の範囲 */
+  readonly hazards: Hazard[];
   /** 近傍検索の作業用（更新中にメモリを確保しないため） */
   readonly scratch: Int32Array;
   /** 発射体の命中候補の作業用 */
@@ -112,6 +137,11 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     nextGemId: 1,
     xp: 0,
     revives: rules.stats.revive.initialCount,
+    outcome: null,
+    bossSchedule: buildBossSchedule(rules, tickRate),
+    nextBoss: 0,
+    bosses: [],
+    hazards: [],
     level: 1,
     xpIntoLevel: 0,
     pendingLevelUps: 0,
@@ -127,6 +157,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
       startTick: Math.round(w.startSeconds * tickRate),
       hpMultiplier: w.hpMultiplier,
       damageMultiplier: w.damageMultiplier,
+      xpMultiplier: w.xpMultiplier ?? 1,
       kinds: w.kinds.map((id) => {
         const i = rules.enemies.kinds.findIndex((k) => k.id === id);
         if (i === -1) throw new Error(`敵の種類 ${id} がありません`);
@@ -137,6 +168,24 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     hitScratch: new Int32Array(capacity * 2),
     neighborScratch: new Int32Array(Math.max(8, rules.spawn.separation.maxNeighbors * 4)),
   };
+}
+
+function kindIndexOf(rules: SimRules, id: string): number {
+  const i = rules.enemies.kinds.findIndex((k) => k.id === id);
+  if (i === -1) throw new Error(`敵の種類 ${id} がありません`);
+  return i;
+}
+
+/** 中ボス（stage.midbosses）とボス（ランの長さの時点）を出す予定 */
+function buildBossSchedule(rules: SimRules, tickRate: number): { tick: number; kind: number }[] {
+  const out = rules.stage.midbosses.map((m) => ({ tick: Math.round(m.atSeconds * tickRate), kind: kindIndexOf(rules, m.kind) }));
+  if (rules.stage.boss) out.push({ tick: Math.round(rules.stage.durationSeconds * tickRate), kind: kindIndexOf(rules, rules.stage.boss.kind) });
+  return out.sort((a, b) => a.tick - b.tick);
+}
+
+/** ランの経過秒数（レベルアップの選択で止まっている間は進まない） */
+export function elapsedSeconds(world: World): number {
+  return world.tick * world.dt;
 }
 
 export function findPlayer(world: World, id: PlayerId): Player | undefined {

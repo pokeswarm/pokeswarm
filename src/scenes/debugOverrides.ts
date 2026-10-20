@@ -47,3 +47,9 @@ export function parseLevelParam(search: string): number | null {
   const v = Number(new URLSearchParams(search).get('level'));
   return Number.isInteger(v) && v > 1 ? v : null;
 }
+
+/** 確認用: ?time=880 で、ランの途中（秒）から始める（中ボス・ボスの確認用）。無ければ null */
+export function parseTimeParam(search: string): number | null {
+  const v = Number(new URLSearchParams(search).get('time'));
+  return Number.isFinite(v) && v > 0 ? v : null;
+}

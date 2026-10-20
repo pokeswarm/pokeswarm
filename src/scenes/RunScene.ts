@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { effectRecipes, generated, networkConfig, placeholderRender, playerConfig, simulationConfig, spriteRender } from '../data';
+import { effectRecipes, generated, networkConfig, placeholderRender, playerConfig, simulationConfig, spriteRender, stageConfig } from '../data';
 import { buildSimRules, localName, playableLoadout } from '../data/simRules';
 import type { SpriteAnims } from '../data/schema';
 import { getLocale, t } from '../i18n';
@@ -20,12 +20,14 @@ import type { Axis, InputCommand, PlayerId } from '../sim/commands';
 import { SHAPE_LINE } from '../sim/entities/projectiles';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
-import { currentWaveIndex, enemyCap, type SimRole } from '../sim/world';
-import { applyDebugOverrides, parseLevelParam, parseMovesParam } from './debugOverrides';
+import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole } from '../sim/world';
+import { applyDebugOverrides, parseLevelParam, parseMovesParam, parseTimeParam } from './debugOverrides';
 import { addXp } from '../sim/systems/leveling';
 import { Discoveries } from '../meta/discoveries';
 import { LevelUpPanel, offerText } from './levelUpPanel';
 import type { NetPanel } from './netPanel';
+import { formatTime, type ResultSceneData } from './ResultScene';
+import { atlasKey } from '../render/sprites/PokemonSprite';
 
 /** ソロとホストは 1、ゲストは 2 */
 const HOST_PLAYER_ID: PlayerId = 1;
@@ -84,12 +86,37 @@ export class RunScene extends Phaser.Scene {
   private readonly discoveries = new Discoveries();
   /** 画面の操作（レベルアップの選択など）から作ったコマンド。次の更新で渡す */
   private uiCommands: InputCommand[] = [];
+  /** ボスの範囲技の予告 */
+  private hazardView!: Phaser.GameObjects.Graphics;
+  /** 画面上の真ん中: 経過時間、中ボス・ボスの HP、お知らせ */
+  private timerText!: Phaser.GameObjects.Text;
+  private bossBar!: Phaser.GameObjects.Graphics;
+  private bossName!: Phaser.GameObjects.Text;
+  private announceText!: Phaser.GameObjects.Text;
+  /** HP のバーを出している中ボス・ボス（最後に出たもの） */
+  private bossId: number | null = null;
+  /** 詳しい情報（確認用）を出すか。F3 で切り替える */
+  private showDebug = false;
+  /** ランが終わって結果画面へ移る時刻（performance.now） */
+  private resultAt: number | null = null;
+  private runData!: RunSceneData;
 
   constructor() {
     super('run');
   }
 
   init(data: RunSceneData): void {
+    // 結果画面から「もう一度」で同じシーンを始め直すので、前のランの状態を残さない
+    this.runData = data;
+    this.playerViews = new Map();
+    this.inbox = [];
+    this.uiCommands = [];
+    this.lastSent = { dx: 0, dy: 0 };
+    this.sync = null;
+    this.hiddenTimer = null;
+    this.bossId = null;
+    this.resultAt = null;
+    this.showDebug = new URLSearchParams(window.location.search).has('debug');
     this.playerSprite = data.playerSprite;
     this.pokemon = data.pokemon;
     this.net = data.net;
@@ -97,7 +124,8 @@ export class RunScene extends Phaser.Scene {
   }
 
   preload(): void {
-    if (this.playerSprite) preloadPokemonAtlas(this, this.playerSprite);
+    // ポケモン選択の画面で読み込み済みなら読み直さない
+    if (this.playerSprite && !this.textures.exists(atlasKey(this.playerSprite.key))) preloadPokemonAtlas(this, this.playerSprite);
   }
 
   create(): void {
@@ -146,6 +174,13 @@ export class RunScene extends Phaser.Scene {
       w.pendingLevelUps = 0;
       w.events.length = 0;
     }
+    // 確認用: ?time=880 で、ランの途中から始める（それより前の中ボスは出さない）
+    const startTime = parseTimeParam(window.location.search);
+    if (startTime) {
+      const w = this.sim.world;
+      w.tick = Math.round(startTime * simulationConfig.tickRate);
+      while (w.nextBoss < w.bossSchedule.length && w.bossSchedule[w.nextBoss]!.tick < w.tick) w.nextBoss++;
+    }
     if (this.net) this.setupNet(this.net);
 
     this.clock = new FixedStepClock(simulationConfig.tickRate, simulationConfig.maxTicksPerFrame);
@@ -158,7 +193,15 @@ export class RunScene extends Phaser.Scene {
       rules.enemies.kinds.map((k) => k.sprite),
       Math.round(spriteRender.enemyPreloadSeconds * simulationConfig.tickRate),
     );
-    this.enemySpriteView = new EnemySprites(this, (kind) => this.streamer.manifestOf(kind), spriteRender.enemyScale, spriteRender.enemyAnimation, 0);
+    this.enemySpriteView = new EnemySprites(
+      this,
+      (kind) => this.streamer.manifestOf(kind),
+      spriteRender.enemyScale,
+      spriteRender.enemyAnimation,
+      0,
+      (kind) => rules.enemies.kinds[kind]?.spriteScale ?? 1,
+    );
+    this.hazardView = this.add.graphics().setDepth(0.5);
     this.measureFrameTime();
     this.levelUpPanel = new LevelUpPanel({
       choose: (index) => this.uiCommands.push({ type: 'chooseUpgrade', playerId: this.localId, index }),
@@ -176,6 +219,14 @@ export class RunScene extends Phaser.Scene {
       .text(8, 8, '', { fontFamily: 'monospace', fontSize: '14px', color: '#ffffff', backgroundColor: '#00000080' })
       .setScrollFactor(0)
       .setDepth(1000);
+    const center = { fontFamily: 'sans-serif', color: '#ffffff', stroke: '#000000', strokeThickness: 4 };
+    this.timerText = this.add.text(0, 10, '', { ...center, fontSize: '28px', fontStyle: 'bold' }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1000);
+    this.bossBar = this.add.graphics().setScrollFactor(0).setDepth(1000);
+    this.bossName = this.add.text(0, 50, '', { ...center, fontSize: '16px' }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1000);
+    this.announceText = this.add.text(0, 0, '', { ...center, fontSize: '40px', fontStyle: 'bold', align: 'center' }).setOrigin(0.5).setScrollFactor(0).setDepth(1001);
+    this.input.keyboard?.on('keydown-F3', () => {
+      this.showDebug = !this.showDebug;
+    });
     // 時計を作った後で始める
     if (this.net) this.keepRunningWhenHidden();
   }
@@ -196,6 +247,93 @@ export class RunScene extends Phaser.Scene {
     this.runSteps(steps, true);
     this.lastSteps = steps;
     this.draw(this.clock.alpha, delta, time);
+    // タブが裏にあって終わりの知らせを描画で受け取れなかった場合も、結果画面へ移る
+    if (this.sim.world.outcome && this.resultAt === null) this.resultAt = performance.now() + stageConfig.endDelaySeconds * 1000;
+    if (this.resultAt !== null && performance.now() >= this.resultAt) this.showResult();
+  }
+
+  /** 結果画面へ移る */
+  private showResult(): void {
+    const w = this.sim.world;
+    const local = w.players.find((p) => p.id === this.localId);
+    const data: ResultSceneData = {
+      summary: {
+        outcome: w.outcome ?? 'fail',
+        seconds: elapsedSeconds(w),
+        level: w.level,
+        kills: w.stats.kills,
+        pokemonName: localName(generated.pokemon[w.rules.species[local?.species ?? -1]?.key ?? '']?.names, getLocale(), ''),
+        moves: (local?.moves ?? []).map((m) => {
+          const def = w.rules.moves[m.move]!;
+          return `${localName(generated.moves[def.key]?.names, getLocale(), def.key)} Lv${m.level}`;
+        }),
+      },
+      // 協力プレイはもう一度を出さない（部屋を作り直す必要がある）
+      retry: this.net ? null : { ...this.runData },
+    };
+    this.resultAt = null;
+    this.scene.start('result', data);
+  }
+
+  /** 画面の真ん中に、しばらくお知らせを出す */
+  private announce(text: string, color: string): void {
+    this.tweens.killTweensOf(this.announceText);
+    this.announceText.setText(text).setColor(color).setAlpha(1);
+    this.tweens.add({ targets: this.announceText, alpha: 0, delay: 2500, duration: 600 });
+  }
+
+  private onSimEvents(): void {
+    const w = this.sim.world;
+    for (const ev of w.events) {
+      if (ev.type === 'bossAppeared') {
+        const kind = w.rules.enemies.kinds[ev.kind]!;
+        this.bossId = ev.id;
+        const name = localName(generated.pokemon[kind.species ?? kind.id]?.names, getLocale(), kind.id);
+        this.announce(t(kind.rank === 'boss' ? 'run.bossAppeared' : 'run.midbossAppeared', { name }), kind.rank === 'boss' ? '#ff8a65' : '#ffe082');
+      } else if (ev.type === 'hazardStruck') {
+        this.effects.playImpact(ev.effect, ev.x, ev.y);
+      } else if (ev.type === 'runEnded') {
+        const clear = ev.outcome === 'clear';
+        this.tweens.killTweensOf(this.announceText);
+        this.announceText.setText(t(clear ? 'run.clear' : 'run.fail')).setColor(clear ? '#ffe082' : '#ef9a9a').setAlpha(1);
+        this.resultAt = performance.now() + stageConfig.endDelaySeconds * 1000;
+      }
+    }
+  }
+
+  /** ボスの範囲技の予告: 範囲の円と、落ちるまでの残りを内側から広がる円で見せる */
+  private drawHazards(hazards: readonly Hazard[]): void {
+    const g = this.hazardView;
+    g.clear();
+    for (const h of hazards) {
+      const progress = 1 - h.ticksLeft / h.totalTicks;
+      g.fillStyle(0xff1744, 0.12).fillCircle(h.x, h.y, h.radius);
+      g.fillStyle(0xff1744, 0.25).fillCircle(h.x, h.y, h.radius * progress);
+      g.lineStyle(2, 0xff5252, 0.9).strokeCircle(h.x, h.y, h.radius);
+    }
+  }
+
+  /** 経過時間と、中ボス・ボスの HP のバー */
+  private drawTopCenter(): void {
+    const w = this.sim.world;
+    const cam = this.cameras.main;
+    const cx = cam.width / 2;
+    const now = elapsedSeconds(w);
+    const limit = w.rules.stage.durationSeconds;
+    this.timerText.setX(cx).setText(now < limit ? t('run.timer', { time: formatTime(now), limit: formatTime(limit) }) : t('run.bossTime', { time: formatTime(now - limit) }));
+    this.announceText.setPosition(cx, cam.height * 0.3);
+    this.bossBar.clear();
+    const i = this.bossId === null ? -1 : findEnemyIndex(w, this.bossId);
+    if (i === -1 || w.enemies.hp[i]! <= 0) {
+      this.bossName.setText('');
+      return;
+    }
+    const kind = w.rules.enemies.kinds[w.enemies.kind[i]!]!;
+    const barW = Math.min(480, cam.width * 0.6);
+    const ratio = Math.max(0, w.enemies.hp[i]! / w.enemies.maxHp[i]!);
+    this.bossBar.fillStyle(0x000000, 0.6).fillRect(cx - barW / 2 - 2, 70, barW + 4, 14);
+    this.bossBar.fillStyle(kind.rank === 'boss' ? 0xff7043 : 0xffca28).fillRect(cx - barW / 2, 72, barW * ratio, 10);
+    this.bossName.setX(cx).setText(localName(generated.pokemon[kind.species ?? kind.id]?.names, getLocale(), kind.id));
   }
 
   private runSteps(steps: number, visible: boolean): void {
@@ -213,6 +351,7 @@ export class RunScene extends Phaser.Scene {
           }
         }
       }
+      if (visible) this.onSimEvents();
       if (this.net && this.sync) this.net.transport.send(this.sync.outgoing(this.sim.world));
     }
   }
@@ -337,20 +476,30 @@ export class RunScene extends Phaser.Scene {
       (i) => (pr.shape[i] === SHAPE_LINE ? { length: pr.length[i]!, dirX: pr.dirX[i]!, dirY: pr.dirY[i]! } : null),
     );
 
+    this.drawHazards(world.hazards);
+    this.drawTopCenter();
+
     const lu = world.levelUp;
-    if (lu && !lu.done.has(this.localId)) {
+    if (lu && !lu.done.has(this.localId) && !world.outcome) {
       const offers = (lu.offers.get(this.localId) ?? []).map((o) => offerText(world, local, o, this.discoveries.all));
       this.levelUpPanel.show(lu.level, offers, local.rerolls, Math.ceil(lu.ticksLeft * world.dt));
     } else {
       this.levelUpPanel.hide();
     }
 
-    const lines = [
-      t('debug.controls'),
+    const debugLines = [
       t('debug.fps', { fps: this.game.loop.actualFps.toFixed(1), steps: this.lastSteps }),
       t('debug.enemies', { count: e.count, cap: enemyCap(world), drawn }),
       t('debug.combat', { kills: world.stats.kills, projectiles: world.projectiles.count }),
       t('debug.xp', { xp: Math.round(world.xp), gems: gems.count }),
+      t('debug.simTime', { ms: this.simMs.toFixed(3) }),
+      t('debug.frameTime', { ms: this.frameMs.toFixed(2) }),
+      t('debug.enemySprites', { wave: currentWaveIndex(world) + 1, count: sprites.count, mb: (sprites.gpuBytes / 1048576).toFixed(2) }),
+      t('debug.tick', { tick: world.tick }),
+      t('debug.position', { x: Math.round(local.x), y: Math.round(local.y) }),
+    ];
+    const lines = [
+      `${t('debug.controls')}　${t('run.debugToggle')}`,
       t('debug.player', {
         name: localName(generated.pokemon[world.rules.species[local.species]?.key ?? '']?.names, getLocale(), ''),
         hp: Math.ceil(local.hp),
@@ -374,11 +523,7 @@ export class RunScene extends Phaser.Scene {
       t('debug.passives', {
         passives: local.passives.map((ps) => localName(generated.items[world.rules.passives[ps.passive]!.key]?.names, getLocale(), '') + ' Lv' + ps.level).join(' / '),
       }),
-      t('debug.simTime', { ms: this.simMs.toFixed(3) }),
-      t('debug.frameTime', { ms: this.frameMs.toFixed(2) }),
-      t('debug.enemySprites', { wave: currentWaveIndex(world) + 1, count: sprites.count, mb: (sprites.gpuBytes / 1048576).toFixed(2) }),
-      t('debug.tick', { tick: world.tick }),
-      t('debug.position', { x: Math.round(local.x), y: Math.round(local.y) }),
+      ...(this.showDebug ? debugLines : []),
     ];
     if (this.net && this.sync) {
       const stats = this.net.transport.stats;

@@ -48,6 +48,9 @@ export function testRules(
     derivations?: SimRules['derivations'];
     species?: SimSpecies[];
     stats?: Partial<SimRules['stats']>;
+    stage?: Partial<SimRules['stage']>;
+    /** 追加の敵の種類 */
+    extraKinds?: SimRules['enemies']['kinds'];
     /** 追加の技 */
     extraMoves?: SimMoveDef[];
   } = {},
@@ -71,7 +74,7 @@ export function testRules(
     ...overrides.leveling,
   };
   return {
-    enemies: { kinds: [{ id: 'test', hp: 20, moveSpeed: 60, radius: 10, contactDamage: 0, types: [0] }] },
+    enemies: { kinds: [{ id: 'test', hp: 20, moveSpeed: 60, radius: 10, contactDamage: 0, types: [0] }, ...(overrides.extraKinds ?? [])] },
     spawn: {
       spawnPerSecond: 0,
       spawnDistanceMin: 450,
@@ -117,6 +120,15 @@ export function testRules(
       hurtInvincibleSeconds: 0.5,
       revive: { initialCount: 0, hpPct: 50, invincibleSeconds: 2 },
       ...overrides.stats,
+    },
+    // 既定ではボスが出ない（ランが終わらない）
+    stage: {
+      durationSeconds: 100000,
+      midbosses: [],
+      boss: null,
+      bossRules: { knockbackMultiplier: 0, stopStatusMultiplier: 0.25, hpPerExtraPlayerPct: 50, spawnDistance: 300 },
+      endDelaySeconds: 1,
+      ...overrides.stage,
     },
   };
 }

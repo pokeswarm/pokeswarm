@@ -12,6 +12,7 @@ import itemsJson from '../../data/game/items.json';
 import passivesJson from '../../data/game/passives.json';
 import derivationsJson from '../../data/game/derivations.json';
 import statsJson from '../../data/game/stats.json';
+import stageJson from '../../data/game/stage.json';
 import spriteRenderJson from '../../data/render/sprites.json';
 import networkJson from '../../data/game/network.json';
 import statusJson from '../../data/game/status.json';
@@ -42,6 +43,7 @@ import {
   simulationConfigSchema,
   spawnConfigSchema,
   spriteRenderSchema,
+  stageConfigSchema,
   statsConfigSchema,
   statusConfigSchema,
 } from './schema';
@@ -67,6 +69,7 @@ export const itemsConfig = load('game/items.json', itemsConfigSchema, itemsJson)
 export const passivesConfig = load('game/passives.json', passivesConfigSchema, passivesJson);
 export const derivationsConfig = load('game/derivations.json', derivationsConfigSchema, derivationsJson);
 export const statsConfig = load('game/stats.json', statsConfigSchema, statsJson);
+export const stageConfig = load('game/stage.json', stageConfigSchema, stageJson);
 export const statusConfig = load('game/status.json', statusConfigSchema, statusJson);
 export const pickupConfig = load('game/pickups.json', pickupConfigSchema, pickupsJson);
 export const spriteRender = load('render/sprites.json', spriteRenderSchema, spriteRenderJson);
@@ -94,7 +97,23 @@ for (const wave of spawnConfig.waves) {
   }
 }
 for (const kind of enemiesConfig.kinds) {
-  check(!!generated.pokemon[kind.id], `data/game/enemies.json の "${kind.id}" が data/generated/pokemon.json にありません（data/pokeapi/targets.json に足して npm run pokeapi）`);
+  const species = kind.species ?? kind.id;
+  check(!!generated.pokemon[species], `data/game/enemies.json の "${kind.id}" のポケモン "${species}" が data/generated/pokemon.json にありません（data/pokeapi/targets.json に足して npm run pokeapi）`);
+}
+for (const wave of spawnConfig.waves) {
+  for (const id of wave.kinds) {
+    check((enemiesConfig.kinds.find((k) => k.id === id)?.rank ?? 'normal') === 'normal', `data/game/spawn.json の waves の "${id}" は雑魚（rank: normal）ではありません`);
+  }
+}
+for (const m of stageConfig.midbosses) {
+  check(enemiesConfig.kinds.find((k) => k.id === m.kind)?.rank === 'midboss', `data/game/stage.json の中ボス "${m.kind}" が data/game/enemies.json に rank: "midboss" でありません`);
+  check(m.atSeconds < stageConfig.durationSeconds, `data/game/stage.json の中ボス "${m.kind}" の atSeconds は durationSeconds より前にする`);
+}
+if (stageConfig.boss) {
+  const b = stageConfig.boss;
+  check(enemiesConfig.kinds.find((k) => k.id === b.kind)?.rank === 'boss', `data/game/stage.json のボス "${b.kind}" が data/game/enemies.json に rank: "boss" でありません`);
+  check(!!generated.moves[b.move.move], `data/game/stage.json のボスの技 "${b.move.move}" が data/generated/moves.json にありません`);
+  check(!!effectRecipes[b.move.effect], `data/game/stage.json のボスの技の effect "${b.move.effect}" のレシピがありません`);
 }
 for (const [key, def] of Object.entries(movesConfig.moves)) {
   check(!!generated.moves[key], `data/game/moves.json の "${key}" が data/generated/moves.json にありません（data/pokeapi/targets.json に足して npm run pokeapi）`);

@@ -533,6 +533,47 @@
           "intensity": 0.004
         }
       }
+    },
+    "blizzard": {
+      "impact": {
+        "burst": {
+          "count": 36,
+          "colors": [
+            "#ffffff",
+            "#e1f5fe",
+            "#81d4fa"
+          ],
+          "lifespanMs": [
+            400,
+            800
+          ],
+          "speed": [
+            60,
+            220
+          ],
+          "scale": [
+            0.8,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 40,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#e1f5fe",
+          "radius": 90,
+          "durationMs": 300,
+          "alpha": 0.8
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
     }
   }
 }

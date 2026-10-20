@@ -14,6 +14,7 @@ import {
   pickupConfig,
   playablesConfig,
   spawnConfig,
+  stageConfig,
   statsConfig,
   statusConfig,
 } from './index';
@@ -68,7 +69,7 @@ export function buildSimRules(): SimRules {
     return { key, types: g.types.map(typeIndex), baseStats: g.baseStats, evolutions };
   });
   return {
-    enemies: { kinds: enemiesConfig.kinds.map((k) => ({ ...k, types: generated.pokemon[k.id]!.types.map(typeIndex) })) },
+    enemies: { kinds: enemiesConfig.kinds.map((k) => ({ ...k, types: generated.pokemon[k.species ?? k.id]!.types.map(typeIndex) })) },
     spawn: spawnConfig,
     status: statusConfig,
     pickups: pickupConfig,
@@ -81,6 +82,7 @@ export function buildSimRules(): SimRules {
     derivations,
     species,
     stats: statsConfig,
+    stage: stageConfig,
   };
 }
 

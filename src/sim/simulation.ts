@@ -12,6 +12,7 @@ import { openLevelUpIfPending, recomputeModifiers, stepLevelUp } from './systems
 import { emptyModifiers } from './upgrades';
 import { checkEvolutionAll } from './systems/evolution';
 import { contactDamage, regenerate } from './systems/health';
+import { bossAttacks, checkRunEnd, spawnBosses } from './systems/stage';
 import { createWorld, type SimRole, type World } from './world';
 
 export interface SimulationOptions {
@@ -58,6 +59,8 @@ export class Simulation {
   step(commands: readonly InputCommand[]): void {
     const w = this.world;
     w.events.length = 0;
+    // ランが終わったら進めない（結果画面へ移るまでそのまま見せる）
+    if (w.outcome) return;
     applyCommands(w, commands);
     // レベルアップの選択中は全員のゲームを止める（入力の状態と選択だけ受け付ける）
     if (w.levelUp) {
@@ -66,19 +69,22 @@ export class Simulation {
     }
     movePlayers(w);
     spawnEnemies(w);
+    spawnBosses(w);
     moveEnemies(w);
     rebuildEnemyHash(w);
     separateEnemies(w);
     tickStatuses(w);
     contactDamage(w);
     regenerate(w);
+    bossAttacks(w);
     useMoves(w);
     moveProjectiles(w);
     dropGems(w);
+    checkRunEnd(w);
     moveGems(w);
     collectGems(w);
     checkEvolutionAll(w);
-    openLevelUpIfPending(w);
+    if (!w.outcome) openLevelUpIfPending(w);
     w.enemies.removeDead();
     w.tick++;
   }

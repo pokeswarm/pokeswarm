@@ -1,4 +1,29 @@
 {
+  "abra": {
+    "dex": 63,
+    "names": {
+      "ja": "ケーシィ",
+      "en": "Abra"
+    },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 25,
+      "attack": 20,
+      "defense": 15,
+      "specialAttack": 105,
+      "specialDefense": 55,
+      "speed": 90
+    },
+    "evolvesTo": [
+      {
+        "to": "kadabra",
+        "trigger": "level",
+        "level": 16
+      }
+    ]
+  },
   "blastoise": {
     "dex": 9,
     "names": {
@@ -69,6 +94,30 @@
       }
     ]
   },
+  "chansey": {
+    "dex": 113,
+    "names": {
+      "ja": "ラッキー",
+      "en": "Chansey"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 250,
+      "attack": 5,
+      "defense": 5,
+      "specialAttack": 35,
+      "specialDefense": 105,
+      "speed": 50
+    },
+    "evolvesTo": [
+      {
+        "to": "blissey",
+        "trigger": "other"
+      }
+    ]
+  },
   "charizard": {
     "dex": 6,
     "names": {
@@ -136,6 +185,57 @@
         "to": "charizard",
         "trigger": "level",
         "level": 36
+      }
+    ]
+  },
+  "cubone": {
+    "dex": 104,
+    "names": {
+      "ja": "カラカラ",
+      "en": "Cubone"
+    },
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 50,
+      "defense": 95,
+      "specialAttack": 40,
+      "specialDefense": 50,
+      "speed": 35
+    },
+    "evolvesTo": [
+      {
+        "to": "marowak",
+        "trigger": "level",
+        "level": 28
+      }
+    ]
+  },
+  "doduo": {
+    "dex": 84,
+    "names": {
+      "ja": "ドードー",
+      "en": "Doduo"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 85,
+      "defense": 45,
+      "specialAttack": 35,
+      "specialDefense": 35,
+      "speed": 75
+    },
+    "evolvesTo": [
+      {
+        "to": "dodrio",
+        "trigger": "level",
+        "level": 31
       }
     ]
   },
@@ -213,6 +313,32 @@
     },
     "evolvesTo": []
   },
+  "gastly": {
+    "dex": 92,
+    "names": {
+      "ja": "ゴース",
+      "en": "Gastly"
+    },
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 35,
+      "defense": 30,
+      "specialAttack": 100,
+      "specialDefense": 35,
+      "speed": 80
+    },
+    "evolvesTo": [
+      {
+        "to": "haunter",
+        "trigger": "level",
+        "level": 25
+      }
+    ]
+  },
   "geodude": {
     "dex": 74,
     "names": {
@@ -236,6 +362,131 @@
         "to": "graveler",
         "trigger": "level",
         "level": 25
+      }
+    ]
+  },
+  "golbat": {
+    "dex": 42,
+    "names": {
+      "ja": "ゴルバット",
+      "en": "Golbat"
+    },
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 80,
+      "defense": 70,
+      "specialAttack": 65,
+      "specialDefense": 75,
+      "speed": 90
+    },
+    "evolvesTo": [
+      {
+        "to": "crobat",
+        "trigger": "other"
+      }
+    ]
+  },
+  "graveler": {
+    "dex": 75,
+    "names": {
+      "ja": "ゴローン",
+      "en": "Graveler"
+    },
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 95,
+      "defense": 115,
+      "specialAttack": 45,
+      "specialDefense": 45,
+      "speed": 35
+    },
+    "evolvesTo": [
+      {
+        "to": "golem",
+        "trigger": "trade"
+      }
+    ]
+  },
+  "grimer": {
+    "dex": 88,
+    "names": {
+      "ja": "ベトベター",
+      "en": "Grimer"
+    },
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 80,
+      "defense": 50,
+      "specialAttack": 40,
+      "specialDefense": 50,
+      "speed": 25
+    },
+    "evolvesTo": [
+      {
+        "to": "muk",
+        "trigger": "level",
+        "level": 38
+      }
+    ]
+  },
+  "growlithe": {
+    "dex": 58,
+    "names": {
+      "ja": "ガーディ",
+      "en": "Growlithe"
+    },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 70,
+      "defense": 45,
+      "specialAttack": 70,
+      "specialDefense": 50,
+      "speed": 60
+    },
+    "evolvesTo": [
+      {
+        "to": "arcanine",
+        "trigger": "item",
+        "item": "fire-stone"
+      }
+    ]
+  },
+  "horsea": {
+    "dex": 116,
+    "names": {
+      "ja": "タッツー",
+      "en": "Horsea"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 40,
+      "defense": 70,
+      "specialAttack": 70,
+      "specialDefense": 25,
+      "speed": 60
+    },
+    "evolvesTo": [
+      {
+        "to": "seadra",
+        "trigger": "level",
+        "level": 32
       }
     ]
   },
@@ -310,6 +561,155 @@
       }
     ]
   },
+  "koffing": {
+    "dex": 109,
+    "names": {
+      "ja": "ドガース",
+      "en": "Koffing"
+    },
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 65,
+      "defense": 95,
+      "specialAttack": 60,
+      "specialDefense": 45,
+      "speed": 35
+    },
+    "evolvesTo": [
+      {
+        "to": "weezing",
+        "trigger": "level",
+        "level": 35
+      }
+    ]
+  },
+  "lapras": {
+    "dex": 131,
+    "names": {
+      "ja": "ラプラス",
+      "en": "Lapras"
+    },
+    "types": [
+      "water",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 130,
+      "attack": 85,
+      "defense": 80,
+      "specialAttack": 85,
+      "specialDefense": 95,
+      "speed": 60
+    },
+    "evolvesTo": []
+  },
+  "machoke": {
+    "dex": 67,
+    "names": {
+      "ja": "ゴーリキー",
+      "en": "Machoke"
+    },
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 100,
+      "defense": 70,
+      "specialAttack": 50,
+      "specialDefense": 60,
+      "speed": 45
+    },
+    "evolvesTo": [
+      {
+        "to": "machamp",
+        "trigger": "trade"
+      }
+    ]
+  },
+  "magikarp": {
+    "dex": 129,
+    "names": {
+      "ja": "コイキング",
+      "en": "Magikarp"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 20,
+      "attack": 10,
+      "defense": 55,
+      "specialAttack": 15,
+      "specialDefense": 20,
+      "speed": 80
+    },
+    "evolvesTo": [
+      {
+        "to": "gyarados",
+        "trigger": "level",
+        "level": 20
+      }
+    ]
+  },
+  "mankey": {
+    "dex": 56,
+    "names": {
+      "ja": "マンキー",
+      "en": "Mankey"
+    },
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 80,
+      "defense": 35,
+      "specialAttack": 35,
+      "specialDefense": 45,
+      "speed": 70
+    },
+    "evolvesTo": [
+      {
+        "to": "primeape",
+        "trigger": "level",
+        "level": 28
+      }
+    ]
+  },
+  "meowth": {
+    "dex": 52,
+    "names": {
+      "ja": "ニャース",
+      "en": "Meowth"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 45,
+      "defense": 35,
+      "specialAttack": 40,
+      "specialDefense": 40,
+      "speed": 90
+    },
+    "evolvesTo": [
+      {
+        "to": "persian",
+        "trigger": "level",
+        "level": 28
+      },
+      {
+        "to": "perrserker",
+        "trigger": "level",
+        "level": 28
+      }
+    ]
+  },
   "metapod": {
     "dex": 11,
     "names": {
@@ -332,6 +732,57 @@
         "to": "butterfree",
         "trigger": "level",
         "level": 10
+      }
+    ]
+  },
+  "oddish": {
+    "dex": 43,
+    "names": {
+      "ja": "ナゾノクサ",
+      "en": "Oddish"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 50,
+      "defense": 55,
+      "specialAttack": 75,
+      "specialDefense": 65,
+      "speed": 30
+    },
+    "evolvesTo": [
+      {
+        "to": "gloom",
+        "trigger": "level",
+        "level": 21
+      }
+    ]
+  },
+  "onix": {
+    "dex": 95,
+    "names": {
+      "ja": "イワーク",
+      "en": "Onix"
+    },
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 45,
+      "defense": 160,
+      "specialAttack": 30,
+      "specialDefense": 45,
+      "speed": 70
+    },
+    "evolvesTo": [
+      {
+        "to": "steelix",
+        "trigger": "trade"
       }
     ]
   },
@@ -387,6 +838,50 @@
       }
     ]
   },
+  "ponyta": {
+    "dex": 77,
+    "names": {
+      "ja": "ポニータ",
+      "en": "Ponyta"
+    },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 85,
+      "defense": 55,
+      "specialAttack": 65,
+      "specialDefense": 65,
+      "speed": 90
+    },
+    "evolvesTo": [
+      {
+        "to": "rapidash",
+        "trigger": "level",
+        "level": 40
+      }
+    ]
+  },
+  "raticate": {
+    "dex": 20,
+    "names": {
+      "ja": "ラッタ",
+      "en": "Raticate"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 81,
+      "defense": 60,
+      "specialAttack": 50,
+      "specialDefense": 70,
+      "speed": 97
+    },
+    "evolvesTo": []
+  },
   "rattata": {
     "dex": 19,
     "names": {
@@ -409,6 +904,61 @@
         "to": "raticate",
         "trigger": "level",
         "level": 20
+      }
+    ]
+  },
+  "scyther": {
+    "dex": 123,
+    "names": {
+      "ja": "ストライク",
+      "en": "Scyther"
+    },
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 110,
+      "defense": 80,
+      "specialAttack": 55,
+      "specialDefense": 80,
+      "speed": 105
+    },
+    "evolvesTo": [
+      {
+        "to": "scizor",
+        "trigger": "trade"
+      },
+      {
+        "to": "kleavor",
+        "trigger": "item",
+        "item": "black-augurite"
+      }
+    ]
+  },
+  "seel": {
+    "dex": 86,
+    "names": {
+      "ja": "パウワウ",
+      "en": "Seel"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 45,
+      "defense": 55,
+      "specialAttack": 45,
+      "specialDefense": 70,
+      "speed": 45
+    },
+    "evolvesTo": [
+      {
+        "to": "dewgong",
+        "trigger": "level",
+        "level": 34
       }
     ]
   },
@@ -463,6 +1013,71 @@
       }
     ]
   },
+  "starmie": {
+    "dex": 121,
+    "names": {
+      "ja": "スターミー",
+      "en": "Starmie"
+    },
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 75,
+      "defense": 85,
+      "specialAttack": 100,
+      "specialDefense": 85,
+      "speed": 115
+    },
+    "evolvesTo": []
+  },
+  "tauros": {
+    "dex": 128,
+    "names": {
+      "ja": "ケンタロス",
+      "en": "Tauros"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 100,
+      "defense": 95,
+      "specialAttack": 40,
+      "specialDefense": 70,
+      "speed": 110
+    },
+    "evolvesTo": []
+  },
+  "tentacool": {
+    "dex": 72,
+    "names": {
+      "ja": "メノクラゲ",
+      "en": "Tentacool"
+    },
+    "types": [
+      "water",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 40,
+      "defense": 35,
+      "specialAttack": 50,
+      "specialDefense": 100,
+      "speed": 70
+    },
+    "evolvesTo": [
+      {
+        "to": "tentacruel",
+        "trigger": "level",
+        "level": 30
+      }
+    ]
+  },
   "vaporeon": {
     "dex": 134,
     "names": {
@@ -501,6 +1116,31 @@
       "speed": 80
     },
     "evolvesTo": []
+  },
+  "vulpix": {
+    "dex": 37,
+    "names": {
+      "ja": "ロコン",
+      "en": "Vulpix"
+    },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 38,
+      "attack": 41,
+      "defense": 40,
+      "specialAttack": 50,
+      "specialDefense": 65,
+      "speed": 65
+    },
+    "evolvesTo": [
+      {
+        "to": "ninetales",
+        "trigger": "item",
+        "item": "fire-stone"
+      }
+    ]
   },
   "wartortle": {
     "dex": 8,

@@ -15,6 +15,14 @@
     "type": "fire",
     "damageClass": "special"
   },
+  "blizzard": {
+    "names": {
+      "ja": "ふぶき",
+      "en": "Blizzard"
+    },
+    "type": "ice",
+    "damageClass": "special"
+  },
   "body-slam": {
     "names": {
       "ja": "のしかかり",

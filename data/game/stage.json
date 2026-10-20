@@ -1,0 +1,33 @@
+{
+  "durationSeconds": 900,
+  "midbosses": [
+    {
+      "atSeconds": 112,
+      "kind": "midboss-onix"
+    },
+    {
+      "atSeconds": 225,
+      "kind": "midboss-starmie"
+    }
+  ],
+  "boss": {
+    "kind": "boss-lapras",
+    "move": {
+      "move": "blizzard",
+      "effect": "blizzard",
+      "intervalSeconds": 3.5,
+      "telegraphSeconds": 1.2,
+      "radius": 90,
+      "damage": 30,
+      "count": 3,
+      "spread": 160
+    }
+  },
+  "bossRules": {
+    "knockbackMultiplier": 0,
+    "stopStatusMultiplier": 0.25,
+    "hpPerExtraPlayerPct": 60,
+    "spawnDistance": 380
+  },
+  "endDelaySeconds": 2.5
+}

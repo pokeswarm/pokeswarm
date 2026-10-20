@@ -34,7 +34,8 @@ export function moveEnemies(world: World): void {
     }
 
     if (best > relocate2) {
-      if (retire && !waveKinds.includes(e.kind[i]!)) {
+      // 中ボス・ボスは消さない（移し替える）
+      if (retire && !waveKinds.includes(e.kind[i]!) && (world.rules.enemies.kinds[e.kind[i]!]?.rank ?? 'normal') === 'normal') {
         e.hp[i] = 0;
         world.events.push({ type: 'enemyRetired', id: e.id[i]! });
         continue;

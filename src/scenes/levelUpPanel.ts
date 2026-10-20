@@ -15,7 +15,7 @@ export interface OfferText {
   detail: string;
   /** 派生・固有技そのもののカード */
   special: boolean;
-  /** 「進化できる！」を出す（以前に達成した派生で、このカードを取ると条件がそろう） */
+  /** 「おや……？」を出す（以前に達成した派生で、このカードを取ると条件がそろう） */
   evolvable: boolean;
 }
 
@@ -36,7 +36,7 @@ function moveDetail(world: World, move: number): string {
 
 /**
  * 候補を、カードに出す文章にする（名前は PokeAPI の各言語の名前、それ以外は翻訳ファイル）。
- * 派生の材料などのヒントは出さない。「進化できる！」は、以前に達成した派生（discovered に派生先の技のキー）で、
+ * 派生の材料などのヒントは出さない。「おや……？」は、以前に達成した派生（discovered に派生先の技のキー）で、
  * このカードを取ると条件がそろうときだけ出す。
  */
 export function offerText(world: World, p: Player, offer: UpgradeOffer, discovered: ReadonlySet<string>): OfferText {

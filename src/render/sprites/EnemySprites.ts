@@ -26,6 +26,8 @@ export class EnemySprites {
     private readonly scale: number,
     private readonly animation: string,
     private readonly depth: number,
+    /** 種類ごとの大きさの倍率（中ボス・ボスを大きく描く） */
+    private readonly scaleOfKind: (kind: number) => number = () => 1,
   ) {}
 
   /** 描いた数を返す */
@@ -49,7 +51,9 @@ export class EnemySprites {
       const id = e.id[i]!;
       let slot = this.slots.get(id);
       if (!slot) {
-        const sprite = this.free.pop() ?? this.scene.add.sprite(0, 0, atlasKey(manifest.key)).setScale(this.scale).setDepth(this.depth);
+        const sprite = this.free.pop() ?? this.scene.add.sprite(0, 0, atlasKey(manifest.key)).setDepth(this.depth);
+        // 使い回すスプライトは前の種類の大きさのままなので、毎回合わせる
+        sprite.setScale(this.scale * this.scaleOfKind(e.kind[i]!));
         slot = { sprite, dir: 0, seen: false };
         this.slots.set(id, slot);
         sprite.setVisible(true);

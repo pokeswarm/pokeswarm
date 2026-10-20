@@ -32,7 +32,9 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         if (!kind) break;
         // 接触ダメージは自分の今の時間帯の倍率で（自分が受けるダメージは自分のブラウザで判定するため）
         const wave = world.waves[currentWaveIndex(world)]!;
-        e.add(cmd.id, cmd.kind, cmd.x, cmd.y, kind.hp, kind.moveSpeed, kind.radius, kind.contactDamage * wave.damageMultiplier);
+        const boss = (kind.rank ?? 'normal') !== 'normal';
+        e.add(cmd.id, cmd.kind, cmd.x, cmd.y, kind.hp, kind.moveSpeed, kind.radius, kind.contactDamage * (boss ? 1 : wave.damageMultiplier));
+        if (boss) world.events.push({ type: 'bossAppeared', id: cmd.id, kind: cmd.kind });
         break;
       }
       case 'damageEnemy': {
@@ -112,8 +114,16 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
 
 /** 命中の効果（ノックバック・状態異常）を敵に付ける */
 export function applyHitEffect(world: World, i: number, fx: HitEffect, by: number): void {
-  world.enemies.knockBack(i, fx.kbx, fx.kby, fx.kbTicks);
-  if (fx.status >= 0 && fx.status < world.statusKinds.length) world.enemies.applyStatus(i, fx.status, fx.statusTicks, by);
+  // 中ボス・ボスは押されにくく、動きを止める状態異常の時間が短い（止め続けて倒せないようにする）
+  const boss = (world.rules.enemies.kinds[world.enemies.kind[i]!]?.rank ?? 'normal') !== 'normal';
+  const br = world.rules.stage.bossRules;
+  const kb = boss ? br.knockbackMultiplier : 1;
+  world.enemies.knockBack(i, fx.kbx * kb, fx.kby * kb, kb > 0 ? fx.kbTicks : 0);
+  if (fx.status >= 0 && fx.status < world.statusKinds.length) {
+    const stops = world.statusKinds[fx.status]!.speedMultiplier === 0;
+    const ticks = boss && stops ? Math.round(fx.statusTicks * br.stopStatusMultiplier) : fx.statusTicks;
+    if (ticks > 0) world.enemies.applyStatus(i, fx.status, ticks, by);
+  }
 }
 
 export function pickEffect(fx: HitEffect): HitEffect {

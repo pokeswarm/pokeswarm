@@ -60,7 +60,7 @@ describe('HP とダメージ', () => {
   });
 
   it('HP が無くなると、復活可能数があれば自動で復活する。無ければ倒れて動かなくなる', () => {
-    const { sim, p } = hurtSim({ revive: { initialCount: 1, hpPct: 50, invincibleSeconds: 0.1 } });
+    const { sim, p } = hurtSim({ revive: { initialCount: 1, hpPct: 50, invincibleSeconds: 0.1, touchSeconds: 1, touchRange: 40 } });
     p.hp = 5;
     sim.step([]);
     expect(p.down).toBe(false);

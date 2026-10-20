@@ -129,5 +129,7 @@
   "net.started": "The run in this room has already started (you cannot join midway)",
   "net.hostLeft": "Lost connection to the host",
   "net.playerLeft": "Player {n} left",
-  "title.coop": "Press C to create a co-op room"
+  "title.coop": "Press C to create a co-op room",
+  "run.downCoop": "Down: a teammate can revive you by staying close ({revives} revives left for the team)",
+  "run.disconnected": "Disconnected from the host"
 }

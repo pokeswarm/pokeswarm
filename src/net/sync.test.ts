@@ -20,7 +20,7 @@ function makePeer(role: SimRole, localId: number, count: number, move: Partial<M
   const rules = testRules({ spawn: { spawnPerSecond: 30, capGlobal: 200, capPerPlayer: 100 }, move: { range: 300, ...move } });
   const sim = new Simulation({ tickRate: 30, seed: 7, rules, role, localPlayerId: localId });
   for (let id = 1; id <= count; id++) sim.addPlayer({ id, x: (id - 1) * 60, y: 0, radius: 12, moveSpeed: 150, remote: localId !== id, pickupRange: 80 });
-  return { id: localId, sim, session: new SyncSession(rate, 30, () => 0), inbox: [] };
+  return { id: localId, sim, session: new SyncSession(rate, 1000, () => 0), inbox: [] };
 }
 
 /**

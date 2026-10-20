@@ -41,7 +41,7 @@ function peer(role: SimRole, localId: number) {
   // 2人とも同じ場所に立つ
   sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150, remote: localId !== 1, pickupRange: 80 });
   sim.addPlayer({ id: 2, x: 0, y: 0, radius: 12, moveSpeed: 150, remote: localId !== 2, pickupRange: 80 });
-  return { sim, session: new SyncSession({ playerStateIntervalTicks: 1, correctionIntervalTicks: 30 }, 30, () => 0) };
+  return { sim, session: new SyncSession({ playerStateIntervalTicks: 1, correctionIntervalTicks: 30 }, 1000, () => 0) };
 }
 
 describe('経験値の玉（協力プレイ）', () => {

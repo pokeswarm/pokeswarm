@@ -14,7 +14,8 @@
     "correctionIntervalTicks": 150,
     "flushIntervalMs": 100
   },
-  "pingIntervalTicks": 30,
   "guestSpawnOffsetX": 60,
-  "maxPlayers": 4
+  "maxPlayers": 4,
+  "pingIntervalMs": 1000,
+  "silenceTimeoutSeconds": 10
 }

@@ -109,10 +109,11 @@ export interface PlayerDamagedEvent {
   readonly amount: number;
 }
 
-/** 倒れたが、復活可能数を使って自動で復活した */
+/** 復活した（ソロは自動、協力プレイは味方が触れて）。revives は残りの復活可能数 */
 export interface PlayerRevivedEvent {
   readonly type: 'playerRevived';
   readonly playerId: PlayerId;
+  readonly revives: number;
 }
 
 /** 倒れた（復活可能数が無い） */
@@ -162,7 +163,7 @@ export interface PlayerLeftEvent {
 /** ランが終わった */
 export interface RunEndedEvent {
   readonly type: 'runEnded';
-  readonly outcome: 'clear' | 'fail';
+  readonly outcome: 'clear' | 'fail' | 'disconnected';
 }
 
 export type SimEvent =

@@ -129,5 +129,7 @@
   "net.started": "この部屋のランはもう始まっています（途中からは入れません）",
   "net.hostLeft": "ホストとの接続が切れました",
   "net.playerLeft": "プレイヤー{n}が抜けました",
-  "title.coop": "C キーで 協力プレイの部屋を作る"
+  "title.coop": "C キーで 協力プレイの部屋を作る",
+  "run.downCoop": "倒れた: 味方が近くに来ると復活できる（全員の残り {revives} 回）",
+  "run.disconnected": "ホストとの接続が切れました"
 }

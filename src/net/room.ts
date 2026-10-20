@@ -277,12 +277,14 @@ export class Room {
     this.subs.add(
       onValue(ref(this.db, `${this.base}/host`), (snap) => {
         if (snap.exists()) seen = true;
-        else if (seen && !this.closed) {
-          this.transports.get(1)?.onClose?.();
-          this.onLeave?.(1);
-        }
+        else if (seen && !this.closed) this.dropPeer(1);
       }),
     );
+  }
+
+  /** 相手を切断したものとして外す（なにも届かない時間が続いたときなど） */
+  disconnect(id: PlayerId): void {
+    this.dropPeer(id);
   }
 
   private dropPeer(id: PlayerId): void {
@@ -291,7 +293,7 @@ export class Room {
     const t = this.transports.get(id);
     if (!t) return;
     this.transports.delete(id);
-    t.onClose?.();
+    t.onClose = null;
     t.close();
     this.onLeave?.(id);
   }
@@ -305,6 +307,8 @@ export class Room {
     const queue: NetMessage[][] = [];
     this.pending.set(id, queue);
     transport.onMessages = (messages) => queue.push(messages);
+    // 通信路が切れた（相手のブラウザが閉じた・回線が切れた）: その相手が抜けたものとして扱う
+    transport.onClose = () => this.dropPeer(id);
     this.changed();
   }
 

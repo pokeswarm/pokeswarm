@@ -5,6 +5,7 @@ import { breakOnDamage, damageTakenMultiplier } from './status';
 import { confirmPickup } from './gems';
 import { addXp, applyOffer, chooseUpgrade, mirrorLevelUp, rerollUpgrades, skipUpgrade } from './leveling';
 import { addHazard, endRun } from './stage';
+import { applyRevive } from './health';
 
 export function applyCommands(world: World, commands: readonly InputCommand[]): void {
   const e = world.enemies;
@@ -27,8 +28,11 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         p.inputX = cmd.inputX;
         p.inputY = cmd.inputY;
         if (cmd.maxHp !== undefined) p.maxHp = cmd.maxHp;
-        if (cmd.hp !== undefined) p.hp = cmd.hp;
-        if (cmd.down !== undefined) p.down = cmd.down;
+        // 復活させた直後は、本人から「倒れている」がまだ届くので無視する
+        if (!world.reviveGrace.has(p.id)) {
+          if (cmd.hp !== undefined) p.hp = cmd.hp;
+          if (cmd.down !== undefined) p.down = cmd.down;
+        }
         break;
       }
       case 'spawnEnemy': {
@@ -128,6 +132,9 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
       }
       case 'endRun':
         if (world.role === 'guest') endRun(world, cmd.outcome);
+        break;
+      case 'revivePlayer':
+        if (world.role === 'guest') applyRevive(world, cmd.playerId, cmd.revives);
         break;
       case 'removePlayer': {
         const k = world.players.findIndex((p) => p.id === cmd.playerId);

@@ -33,10 +33,12 @@ export class SyncSession {
   private lastLevelUp = '';
   /** 直近の往復時間（ms） */
   rttMs: number | null = null;
+  private lastPingAt = -Infinity;
 
   constructor(
     rate: SyncRate,
-    private readonly pingIntervalTicks: number,
+    /** 往復時間の計測を送る間隔（実際の時間。止まっている間も送るので、生存の確認にもなる） */
+    private readonly pingIntervalMs: number,
     private readonly now: () => number = () => performance.now(),
   ) {
     this.rate = rate;
@@ -129,6 +131,9 @@ export class SyncSession {
         case 'playerLeft':
           if (host) out.push({ t: 'rm', i: ev.playerId });
           break;
+        case 'playerRevived':
+          if (host) out.push({ t: 'rv', i: ev.playerId, n: ev.revives });
+          break;
         default:
           break;
       }
@@ -173,7 +178,11 @@ export class SyncSession {
         if (bosses.length) out.push({ t: 'bh', e: bosses });
       }
     }
-    if (world.tick % this.pingIntervalTicks === 0) out.push({ t: 'ping', s: this.now() });
+    const now = this.now();
+    if (now - this.lastPingAt >= this.pingIntervalMs) {
+      this.lastPingAt = now;
+      out.push({ t: 'ping', s: now });
+    }
     return out;
   }
 
@@ -276,6 +285,9 @@ export class SyncSession {
           break;
         case 'rm':
           if (guest) cmds.push({ type: 'removePlayer', playerId: m.i });
+          break;
+        case 'rv':
+          if (guest) cmds.push({ type: 'revivePlayer', playerId: m.i, revives: m.n });
           break;
         case 'ping':
           this.replies.push({ t: 'pong', s: m.s });

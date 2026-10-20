@@ -37,16 +37,12 @@ export function hurtPlayer(world: World, p: Player, raw: number): void {
 
 /**
  * HP が無くなったとき: 復活可能数（全員で共有）が残っていれば自動で復活する（ソロ）。無ければ倒れる。
- * 協力プレイの「触れて復活」はフェーズ3。
+ * 協力プレイでは倒れて、味方が触れると復活する（touchRevive）。
  */
 function downOrRevive(world: World, p: Player): void {
-  const cfg = world.rules.stats.revive;
   // 協力プレイでは自動で復活しない（触れて復活させる。復活可能数は全員で共有し、ホストが管理する）
   if (world.role === 'solo' && world.revives > 0) {
-    world.revives--;
-    p.hp = (p.maxHp * cfg.hpPct) / 100;
-    p.invincibleTicks = Math.round(cfg.invincibleSeconds / world.dt);
-    world.events.push({ type: 'playerRevived', playerId: p.id });
+    revive(world, p);
     return;
   }
   p.hp = 0;
@@ -54,6 +50,65 @@ function downOrRevive(world: World, p: Player): void {
   p.inputX = 0;
   p.inputY = 0;
   world.events.push({ type: 'playerDown', playerId: p.id });
+}
+
+/** 復活させる: 共有の復活可能数を1つ使い、HP を戻して無敵時間を付ける */
+export function revive(world: World, p: Player): void {
+  const cfg = world.rules.stats.revive;
+  world.revives = Math.max(0, world.revives - 1);
+  p.down = false;
+  p.hp = (p.maxHp * cfg.hpPct) / 100;
+  p.invincibleTicks = Math.round(cfg.invincibleSeconds / world.dt);
+  world.reviveTouch.delete(p.id);
+  world.events.push({ type: 'playerRevived', playerId: p.id, revives: world.revives });
+}
+
+/**
+ * 協力プレイの「触れて復活」（01_game_design.md 6章）: 倒れた味方の近くに、倒れていない誰かがいる間、時間を数える。
+ * 決まった時間に達し、復活可能数が残っていれば、ホストが復活させて全員へ知らせる（ゲストは表示のために数えるだけ）。
+ * 離れると数え直し。
+ */
+export function touchRevive(world: World): void {
+  if (world.role === 'solo') return;
+  const cfg = world.rules.stats.revive;
+  const need = Math.round(cfg.touchSeconds / world.dt);
+  for (const [id, left] of world.reviveGrace) {
+    if (left <= 1) world.reviveGrace.delete(id);
+    else world.reviveGrace.set(id, left - 1);
+  }
+  for (const p of world.players) {
+    if (!p.down) {
+      world.reviveTouch.delete(p.id);
+      continue;
+    }
+    const r = cfg.touchRange + p.radius;
+    const touched = world.players.some((q) => q !== p && !q.down && (q.x - p.x) ** 2 + (q.y - p.y) ** 2 <= r * r);
+    if (!touched || world.revives <= 0) {
+      world.reviveTouch.delete(p.id);
+      continue;
+    }
+    const t = (world.reviveTouch.get(p.id) ?? 0) + 1;
+    world.reviveTouch.set(p.id, Math.min(t, need));
+    if (t >= need && world.role === 'host') {
+      revive(world, p);
+      world.reviveGrace.set(p.id, Math.round(1 / world.dt));
+    }
+  }
+}
+
+/** 協力プレイ: ホストが復活させたことを受け取る（自分なら HP を戻す。残りの復活可能数もそろえる） */
+export function applyRevive(world: World, playerId: PlayerId, revives: number): void {
+  const p = world.players.find((x) => x.id === playerId);
+  world.revives = revives;
+  if (!p) return;
+  const cfg = world.rules.stats.revive;
+  p.down = false;
+  world.reviveTouch.delete(p.id);
+  if (p.id === world.localPlayerId) {
+    p.hp = (p.maxHp * cfg.hpPct) / 100;
+    p.invincibleTicks = Math.round(cfg.invincibleSeconds / world.dt);
+  }
+  world.events.push({ type: 'playerRevived', playerId, revives });
 }
 
 /** 自分の HP を回復する（自分の HP は自分のブラウザで管理するので、ほかのプレイヤーの分は回復しない） */

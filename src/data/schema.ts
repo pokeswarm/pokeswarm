@@ -520,7 +520,13 @@ export const networkConfigSchema = z.object({
   /** 中継時は送る頻度を下げ、まとめて書き込む（通信量と書き込み回数を抑える） */
   relay: syncRateSchema.extend({ flushIntervalMs: z.number().int().positive() }),
   /** 往復時間を測る間隔（更新回数） */
-  pingIntervalTicks: z.number().int().positive(),
+  pingIntervalMs: z.number().int().positive(),
+  /**
+   * 相手からこの秒数なにも届かなければ、切断したものとみなす（タブを閉じた・回線が切れたときに、
+   * Realtime Database の切断の知らせが遅れても気づけるように）。往復時間の計測を実際の時間で送るので、
+   * レベルアップで止まっている間も通信は途切れない
+   */
+  silenceTimeoutSeconds: z.number().positive(),
   /** ゲストの出現位置（ホストからの横のずれ。プレイヤーの番号ごとにずらす） */
   guestSpawnOffsetX: z.number(),
   /** 部屋の最大人数（ホストを含む） */
@@ -723,7 +729,17 @@ export const statsConfigSchema = z
     /** 敵に触れてダメージを受けた後の無敵時間（秒） */
     hurtInvincibleSeconds: z.number().nonnegative(),
     /** 倒れたときの自動復活（ソロ）。復活可能数は全員で共有し、永続強化で増やす */
-    revive: z.object({ initialCount: z.number().int().nonnegative(), hpPct: z.number().positive(), invincibleSeconds: z.number().nonnegative() }),
+    /**
+     * 復活: 全員で共有する回数の初期値・復活時の HP（最大の %）・無敵時間。
+     * 協力プレイでは、倒れた味方の touchRange 以内に touchSeconds いると復活させられる
+     */
+    revive: z.object({
+      initialCount: z.number().int().nonnegative(),
+      hpPct: z.number().positive(),
+      invincibleSeconds: z.number().nonnegative(),
+      touchSeconds: z.number().positive(),
+      touchRange: z.number().positive(),
+    }),
   })
   .refine((s) => s.rankMultipliers.length === s.rankThresholds.length + 1, { message: 'rankMultipliers は rankThresholds より1つ多くする' });
 export type StatsConfig = z.infer<typeof statsConfigSchema>;

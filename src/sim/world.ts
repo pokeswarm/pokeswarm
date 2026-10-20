@@ -40,8 +40,8 @@ export interface LevelUpState {
   ticksLeft: number;
 }
 
-/** ランの結果 */
-export type RunOutcome = 'clear' | 'fail';
+/** ランの結果（disconnected: ホストとの接続が切れて終わった） */
+export type RunOutcome = 'clear' | 'fail' | 'disconnected';
 
 /** ボスの範囲技の予告中の範囲。ticksLeft が 0 になったときに中にいたらダメージを受ける */
 export interface Hazard {
@@ -102,8 +102,12 @@ export interface World {
     readonly minimum: number;
     readonly kinds: readonly number[];
   }[];
-  /** 全員で共有する復活可能数 */
+  /** 全員で共有する復活可能数（協力プレイではホストが管理する） */
   revives: number;
+  /** 協力プレイ: 倒れたプレイヤーごとの、味方が触れている時間（更新回数） */
+  readonly reviveTouch: Map<PlayerId, number>;
+  /** ホスト: 復活させた直後のプレイヤー（本人からの「倒れている」がまだ届くので、しばらく無視する。残りの更新回数） */
+  readonly reviveGrace: Map<PlayerId, number>;
   /** ランの結果。決まったらシミュレーションは進まない */
   outcome: RunOutcome | null;
   /** 中ボス・ボスを出す予定（更新回数の順）。nextBoss は次に出す予定の番号 */
@@ -141,6 +145,8 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     xp: 0,
     revives: rules.stats.revive.initialCount,
     outcome: null,
+    reviveTouch: new Map(),
+    reviveGrace: new Map(),
     bossSchedule: buildBossSchedule(rules, tickRate),
     nextBoss: 0,
     bosses: [],

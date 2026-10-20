@@ -11,7 +11,7 @@ import { collectGems, dropGems, moveGems } from './systems/gems';
 import { openLevelUpIfPending, recomputeModifiers, stepLevelUp } from './systems/leveling';
 import { emptyModifiers } from './upgrades';
 import { checkEvolutionAll } from './systems/evolution';
-import { contactDamage, regenerate } from './systems/health';
+import { contactDamage, regenerate, touchRevive } from './systems/health';
 import { bossAttacks, checkRunEnd, spawnBosses } from './systems/stage';
 import { createWorld, type SimRole, type World } from './world';
 
@@ -76,6 +76,7 @@ export class Simulation {
     tickStatuses(w);
     contactDamage(w);
     regenerate(w);
+    touchRevive(w);
     bossAttacks(w);
     useMoves(w);
     moveProjectiles(w);

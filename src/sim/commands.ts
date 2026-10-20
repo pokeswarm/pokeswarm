@@ -167,6 +167,13 @@ export interface EndRunCommand {
   readonly outcome: RunOutcome;
 }
 
+/** ゲスト: ホストが味方を復活させた（revives は残りの復活可能数） */
+export interface RevivePlayerCommand {
+  readonly type: 'revivePlayer';
+  readonly playerId: PlayerId;
+  readonly revives: number;
+}
+
 /** プレイヤーが抜けた（切断） */
 export interface RemovePlayerCommand {
   readonly type: 'removePlayer';
@@ -202,4 +209,5 @@ export type InputCommand =
   | AddHazardCommand
   | BossHpCommand
   | EndRunCommand
-  | RemovePlayerCommand;
+  | RemovePlayerCommand
+  | RevivePlayerCommand;

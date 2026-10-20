@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
 import { t } from '../i18n';
+import type { RunOutcome } from '../sim/world';
 import type { RunSceneData } from './RunScene';
 
 export interface RunSummary {
-  outcome: 'clear' | 'fail';
+  outcome: RunOutcome;
   /** ランの経過秒数 */
   seconds: number;
   level: number;
@@ -55,7 +56,7 @@ export class ResultScene extends Phaser.Scene {
       const { width, height } = this.scale;
       const clear = summary.outcome === 'clear';
       this.add
-        .text(width / 2, height * 0.2, t(clear ? 'run.clear' : 'run.fail'), { fontFamily: 'sans-serif', fontSize: '56px', fontStyle: 'bold', color: clear ? '#ffe082' : '#ef9a9a' })
+        .text(width / 2, height * 0.2, t(`run.${summary.outcome}`), { fontFamily: 'sans-serif', fontSize: '56px', fontStyle: 'bold', color: clear ? '#ffe082' : '#ef9a9a' })
         .setOrigin(0.5);
       const lines = [
         t('result.pokemon', { name: summary.pokemonName }),

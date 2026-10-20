@@ -112,7 +112,7 @@ export function checkRunEnd(world: World): void {
   if (world.players.length > 0 && world.players.every((p) => p.down)) endRun(world, 'fail');
 }
 
-export function endRun(world: World, outcome: 'clear' | 'fail'): void {
+export function endRun(world: World, outcome: 'clear' | 'fail' | 'disconnected'): void {
   if (world.outcome) return;
   world.outcome = outcome;
   world.hazards.length = 0;

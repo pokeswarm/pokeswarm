@@ -123,6 +123,7 @@ export class RunScene extends Phaser.Scene {
     this.uiCommands = [];
     this.lastSent = { dx: 0, dy: 0 };
     this.sync = null;
+    this.lastHeard = new Map();
     this.hiddenTimer = null;
     this.bossId = null;
     this.resultAt = null;
@@ -256,7 +257,7 @@ export class RunScene extends Phaser.Scene {
    */
   private setupNet(room: Room): void {
     const relay = [...room.transports.values()].some((t) => t.kind === 'relay');
-    this.sync = new SyncSession(relay ? networkConfig.relay : networkConfig.p2p, networkConfig.pingIntervalTicks);
+    this.sync = new SyncSession(relay ? networkConfig.relay : networkConfig.p2p, networkConfig.pingIntervalMs);
     this.panel = new NetPanel();
     this.panel.hide();
     const panel = this.panel;
@@ -266,14 +267,30 @@ export class RunScene extends Phaser.Scene {
       room.onLeave = null;
       void room.leave();
     });
+    const start = performance.now();
     for (const id of room.transports.keys()) {
+      this.lastHeard.set(id, start);
       room.attach(id, (messages) => {
+        this.lastHeard.set(id, performance.now());
         if (this.sync) this.inbox.push(...this.sync.incoming(this.sim.world, messages, id));
       });
     }
+    // なにも届かない時間が続いたら、切断したものとみなす
+    const watchdog = setInterval(() => {
+      const now = performance.now();
+      for (const [id, at] of this.lastHeard) {
+        if (now - at > networkConfig.silenceTimeoutSeconds * 1000) {
+          this.lastHeard.delete(id);
+          room.disconnect(id);
+        }
+      }
+    }, 1000);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => clearInterval(watchdog));
     room.onLeave = (id) => {
       if (id === HOST_PLAYER_ID) {
+        // ホストとの接続が切れたら、ランを終えて（ここまでの記録を保存して）結果画面へ
         this.panel?.show('net.hostLeft');
+        this.inbox.push({ type: 'endRun', outcome: 'disconnected' });
       } else {
         // ホスト: 抜けたプレイヤーを外して続ける（ゲストへも知らせる）
         this.inbox.push({ type: 'removePlayer', playerId: id });
@@ -281,6 +298,9 @@ export class RunScene extends Phaser.Scene {
     };
     this.netStartedAt = performance.now();
   }
+
+  /** 相手ごとの、最後に通信が届いた時刻 */
+  private lastHeard = new Map<PlayerId, number>();
 
   /** 1回の更新の結果を送る。ホストは各ゲストへ（ほかのゲストの状態の中継を含む）、ゲストはホストへ */
   private sendNet(): void {
@@ -409,7 +429,7 @@ export class RunScene extends Phaser.Scene {
       } else if (ev.type === 'runEnded') {
         const clear = ev.outcome === 'clear';
         this.tweens.killTweensOf(this.announceText);
-        this.announceText.setText(t(clear ? 'run.clear' : 'run.fail')).setColor(clear ? '#ffe082' : '#ef9a9a').setAlpha(1);
+        this.announceText.setText(t(`run.${ev.outcome}`)).setColor(clear ? '#ffe082' : '#ef9a9a').setAlpha(1);
         this.resultAt = performance.now() + stageConfig.endDelaySeconds * 1000;
       }
     }
@@ -547,7 +567,8 @@ export class RunScene extends Phaser.Scene {
 
   private draw(alpha: number, deltaMs: number, timeMs: number): void {
     const world = this.sim.world;
-    for (const p of world.players) this.playerViews.get(p.id)?.update(p, alpha);
+    const reviveNeed = Math.round(world.rules.stats.revive.touchSeconds / world.dt);
+    for (const p of world.players) this.playerViews.get(p.id)?.update(p, alpha, (world.reviveTouch.get(p.id) ?? 0) / reviveNeed);
     const local = world.players.find((p) => p.id === this.localId);
     const localView = this.playerViews.get(this.localId);
     if (!local || !localView) return;
@@ -624,7 +645,7 @@ export class RunScene extends Phaser.Scene {
         maxHp: Math.round(local.maxHp),
         revives: world.revives,
       }),
-      ...(local.down ? [t('debug.down')] : []),
+      ...(local.down ? [t(this.coop ? 'run.downCoop' : 'debug.down', { revives: world.revives })] : []),
       t('debug.level', { level: world.level, xp: Math.floor(world.xpIntoLevel), need: world.rules.leveling.xpToNext[world.level] ?? 0, rerolls: local.rerolls }),
       t('debug.moves', {
         moves: local.moves

@@ -47,7 +47,8 @@ export class PlayerView {
     this.container.addAt(this.pokemon.sprite, 0);
   }
 
-  update(player: Player, alpha: number): void {
+  /** reviveRatio: 倒れているとき、味方が触れて復活するまでの進み具合（0〜1。触れていなければ 0） */
+  update(player: Player, alpha: number, reviveRatio = 0): void {
     this.container.setPosition(
       player.prevX + (player.x - player.prevX) * alpha,
       player.prevY + (player.y - player.prevY) * alpha,
@@ -70,6 +71,15 @@ export class PlayerView {
       const y = this.radius + 10;
       this.hpBar.fillStyle(0x000000, 0.6).fillRect(-HP_BAR_WIDTH / 2 - 1, y - 1, HP_BAR_WIDTH + 2, HP_BAR_HEIGHT + 2);
       this.hpBar.fillStyle(ratio > 0.5 ? 0x66bb6a : ratio > 0.2 ? 0xffca28 : 0xef5350).fillRect(-HP_BAR_WIDTH / 2, y, HP_BAR_WIDTH * ratio, HP_BAR_HEIGHT);
+    }
+    // 倒れている味方の周りに、復活までの進み具合を円で出す
+    if (player.down) {
+      const r = this.radius + 14;
+      this.hpBar.lineStyle(3, 0x000000, 0.5).strokeCircle(0, 0, r);
+      if (reviveRatio > 0) {
+        this.hpBar.lineStyle(3, 0x81c784, 1).beginPath();
+        this.hpBar.arc(0, 0, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * reviveRatio, false).strokePath();
+      }
     }
   }
 }

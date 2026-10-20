@@ -21,6 +21,8 @@ export type NetMessage =
   | { t: 'hz'; e: number[] }
   /** 中ボス・ボスの HP（ホスト→ゲスト）: [id, HP, 最大HP, ...] */
   | { t: 'bh'; e: number[] }
+  /** 味方を復活させた（ホスト→ゲスト）: i は復活したプレイヤー、n は残りの復活可能数 */
+  | { t: 'rv'; i: number; n: number }
   /** プレイヤーが抜けた（ホスト→ゲスト） */
   | { t: 'rm'; i: number }
   /** ランの終わり（ホスト→ゲスト） */

@@ -16,6 +16,7 @@
     {
       "startSeconds": 0,
       "hpMultiplier": 1,
+      "damageMultiplier": 1,
       "kinds": [
         "rattata",
         "pidgey",
@@ -25,6 +26,7 @@
     {
       "startSeconds": 40,
       "hpMultiplier": 1.6,
+      "damageMultiplier": 1.3,
       "kinds": [
         "weedle",
         "metapod",
@@ -35,6 +37,7 @@
     {
       "startSeconds": 80,
       "hpMultiplier": 2.4,
+      "damageMultiplier": 1.6,
       "kinds": [
         "zubat",
         "geodude",

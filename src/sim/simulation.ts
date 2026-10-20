@@ -10,6 +10,8 @@ import { tickStatuses } from './systems/status';
 import { collectGems, dropGems, moveGems } from './systems/gems';
 import { openLevelUpIfPending, recomputeModifiers, stepLevelUp } from './systems/leveling';
 import { emptyModifiers } from './upgrades';
+import { checkEvolutionAll } from './systems/evolution';
+import { contactDamage, regenerate } from './systems/health';
 import { createWorld, type SimRole, type World } from './world';
 
 export interface SimulationOptions {
@@ -44,7 +46,11 @@ export class Simulation {
       moves: moves.slice(0, this.world.rules.combat.maxMoveSlots),
       mods: emptyModifiers(this.world.rules.types.names.length),
     });
+    // 最初は HP 満タン
+    p.hp = 0;
+    p.maxHp = 0;
     recomputeModifiers(this.world, p);
+    p.hp = p.maxHp;
     this.world.players.push(p);
     return p;
   }
@@ -64,11 +70,14 @@ export class Simulation {
     rebuildEnemyHash(w);
     separateEnemies(w);
     tickStatuses(w);
+    contactDamage(w);
+    regenerate(w);
     useMoves(w);
     moveProjectiles(w);
     dropGems(w);
     moveGems(w);
     collectGems(w);
+    checkEvolutionAll(w);
     openLevelUpIfPending(w);
     w.enemies.removeDead();
     w.tick++;

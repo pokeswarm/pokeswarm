@@ -1,5 +1,6 @@
 import { buildTypeChart, resolveMoveLevels, type SimMoveDef } from '../sim/moves';
 import { buildXpTable, resolveModifiers, type SimUpgradeDef } from '../sim/upgrades';
+import type { SimEvolution, SimSpecies } from '../sim/species';
 import type { SimRules } from '../sim/rules';
 import {
   combatConfig,
@@ -13,6 +14,7 @@ import {
   pickupConfig,
   playablesConfig,
   spawnConfig,
+  statsConfig,
   statusConfig,
 } from './index';
 import type { LocalizedNames } from './schema';
@@ -50,6 +52,21 @@ export function buildSimRules(): SimRules {
     ...derivationsConfig.derivations.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: null })),
     ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: d.line })),
   ];
+  // ポケモンの種類: PokeAPI から生成したすべて。進化先・進化の道具が無いものは進化の一覧から外す
+  const speciesKeys = Object.keys(generated.pokemon);
+  const linkingCord = itemIndex('linking-cord');
+  const species: SimSpecies[] = speciesKeys.map((key) => {
+    const g = generated.pokemon[key]!;
+    const evolutions: SimEvolution[] = [];
+    for (const e of g.evolvesTo) {
+      const to = speciesKeys.indexOf(e.to);
+      if (to === -1) continue;
+      if (e.trigger === 'level' && e.level) evolutions.push({ to, trigger: 'level', level: e.level });
+      else if (e.trigger === 'item' && e.item && itemIndex(e.item) !== -1) evolutions.push({ to, trigger: 'item', item: itemIndex(e.item) });
+      else if (e.trigger === 'trade' && linkingCord !== -1) evolutions.push({ to, trigger: 'trade', item: linkingCord });
+    }
+    return { key, types: g.types.map(typeIndex), baseStats: g.baseStats, evolutions };
+  });
   return {
     enemies: { kinds: enemiesConfig.kinds.map((k) => ({ ...k, types: generated.pokemon[k.id]!.types.map(typeIndex) })) },
     spawn: spawnConfig,
@@ -62,6 +79,8 @@ export function buildSimRules(): SimRules {
     items,
     passives: upgrades(passivesConfig.passives),
     derivations,
+    species,
+    stats: statsConfig,
   };
 }
 
@@ -72,7 +91,10 @@ export function moveIndexOf(rules: SimRules, key: string): number {
 }
 
 /** プレイアブルのポケモンの、シミュレーションでの初期値（タイプと最初の技） */
-export function playableLoadout(rules: SimRules, pokemon: string): { types: number[]; moves: { move: number; level: number }[]; line: string } {
+export function playableLoadout(
+  rules: SimRules,
+  pokemon: string,
+): { types: number[]; moves: { move: number; level: number }[]; line: string; species: number } {
   const p = playablesConfig.pokemon[pokemon] ?? playablesConfig.pokemon[playablesConfig.default]!;
   const species = generated.pokemon[pokemon] ?? generated.pokemon[playablesConfig.default]!;
   return {
@@ -80,6 +102,7 @@ export function playableLoadout(rules: SimRules, pokemon: string): { types: numb
     moves: p.startingMoves.map((m) => ({ move: moveIndexOf(rules, m), level: 1 })),
     // 系統はプレイアブルのキー（固有技の判定。進化しても変わらない）
     line: playablesConfig.pokemon[pokemon] ? pokemon : playablesConfig.default,
+    species: rules.species.findIndex((s) => s.key === (playablesConfig.pokemon[pokemon] ? pokemon : playablesConfig.default)),
   };
 }
 

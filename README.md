@@ -44,6 +44,7 @@ npm run dev
 | `?cap=3000&spawn=600` | 敵の上限と1秒あたりの出現数を一時的に変える（負荷の計測用） |
 | `?pokemon=bulbasaur` | プレイヤーのポケモン（charmander / bulbasaur / squirtle） |
 | `?moves=ember:8,fire-spin:3` | 覚えている技とレベルを指定（技のキーは PokeAPI の英語名） |
+| `?level=15` | そのレベルから始める（進化の確認用） |
 | `?gallery` | プレイヤーのスプライトの待機・歩きを8方向すべて並べて表示 |
 
 スプライトは `npm run sprites` で取得したときだけ表示されます（取得していなければ仮の円）。

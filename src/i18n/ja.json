@@ -79,5 +79,7 @@
   "itemDesc.dowsing-machine": "経験値の玉の取得範囲 +20%",
   "itemDesc.wide-lens": "技の範囲 +8%",
   "itemDesc.lucky-egg": "経験値 +10%",
-  "levelUp.evolvable": "進化できる！"
+  "levelUp.evolvable": "進化できる！",
+  "debug.player": "{name}　HP {hp}/{maxHp}　復活 {revives}",
+  "debug.down": "倒れた（復活できる回数がない。結果画面は区切り4で作る）"
 }

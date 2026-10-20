@@ -1,0 +1,8 @@
+{
+  "rankThresholds": [50, 70, 90, 110, 130],
+  "rankMultipliers": [0.7, 0.85, 1.0, 1.15, 1.3, 1.45],
+  "base": { "maxHp": 100, "power": 1, "defense": 20 },
+  "perLevelPct": { "maxHp": 2, "power": 1, "defense": 1 },
+  "hurtInvincibleSeconds": 0.6,
+  "revive": { "initialCount": 1, "hpPct": 50, "invincibleSeconds": 2 }
+}

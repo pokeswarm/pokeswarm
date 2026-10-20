@@ -29,7 +29,7 @@ export function spawnEnemies(world: World): void {
     const id = world.nextEnemyId++;
     const x = p.x + ux * dist;
     const y = p.y + uy * dist;
-    enemies.add(id, kindIndex, x, y, kind.hp * wave.hpMultiplier, kind.moveSpeed, kind.radius);
+    enemies.add(id, kindIndex, x, y, kind.hp * wave.hpMultiplier, kind.moveSpeed, kind.radius, kind.contactDamage * wave.damageMultiplier);
     world.events.push({ type: 'enemySpawned', id, kind: kindIndex, x, y });
   }
 }

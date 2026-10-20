@@ -1,8 +1,8 @@
 import type Phaser from 'phaser';
 import type { SpriteAnims } from '../../data/schema';
 import { currentWaveIndex, type World } from '../../sim/world';
-import { animKey, atlasKey, registerPokemonAnimations } from './PokemonSprite';
-import { loadSpriteManifest, spriteBaseUrl } from './spriteManifest';
+import { animKey, atlasKey } from './PokemonSprite';
+import { loadPokemonAtRuntime } from './runtimeLoad';
 
 /**
  * 雑魚敵のスプライトを、時間帯に合わせて読み込み・解放する。
@@ -60,27 +60,13 @@ export class SpriteStreamer {
   private async load(key: string): Promise<void> {
     this.loading.add(key);
     try {
-      const manifest = await loadSpriteManifest(key);
-      if (!manifest) {
+      const loaded = await loadPokemonAtRuntime(this.scene, key);
+      if (!loaded) {
         this.failed.add(key);
         return;
       }
-      const base = spriteBaseUrl(key);
-      const [image, atlas] = await Promise.all([
-        (async () => {
-          const img = new Image();
-          img.src = `${base}atlas.png`;
-          await img.decode();
-          return img;
-        })(),
-        fetch(`${base}atlas.json`).then((r) => r.json() as Promise<object>),
-      ]);
-      // 読み込みの間にシーンが終わっていたら何もしない
-      if (!this.scene.sys.isActive()) return;
-      if (!this.scene.textures.exists(atlasKey(key))) this.scene.textures.addAtlasJSONHash(atlasKey(key), image, atlas);
-      registerPokemonAnimations(this.scene, manifest);
-      this.gpuBytes.set(key, image.naturalWidth * image.naturalHeight * 4);
-      this.loaded.set(key, manifest);
+      this.gpuBytes.set(key, loaded.gpuBytes);
+      this.loaded.set(key, loaded.manifest);
     } catch (err) {
       console.warn(`[sprites] ${key} を読み込めませんでした`, err);
       this.failed.add(key);

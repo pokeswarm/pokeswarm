@@ -79,5 +79,7 @@
   "itemDesc.dowsing-machine": "XP gem pickup range +20%",
   "itemDesc.wide-lens": "Move area +8%",
   "itemDesc.lucky-egg": "XP +10%",
-  "levelUp.evolvable": "Can evolve!"
+  "levelUp.evolvable": "Can evolve!",
+  "debug.player": "{name}  HP {hp}/{maxHp}  revives {revives}",
+  "debug.down": "Fainted (no revives left. Result screen comes in milestone 4)"
 }

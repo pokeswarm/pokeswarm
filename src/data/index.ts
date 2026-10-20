@@ -11,6 +11,7 @@ import levelingJson from '../../data/game/leveling.json';
 import itemsJson from '../../data/game/items.json';
 import passivesJson from '../../data/game/passives.json';
 import derivationsJson from '../../data/game/derivations.json';
+import statsJson from '../../data/game/stats.json';
 import spriteRenderJson from '../../data/render/sprites.json';
 import networkJson from '../../data/game/network.json';
 import statusJson from '../../data/game/status.json';
@@ -41,6 +42,7 @@ import {
   simulationConfigSchema,
   spawnConfigSchema,
   spriteRenderSchema,
+  statsConfigSchema,
   statusConfigSchema,
 } from './schema';
 
@@ -64,6 +66,7 @@ export const levelingConfig = load('game/leveling.json', levelingConfigSchema, l
 export const itemsConfig = load('game/items.json', itemsConfigSchema, itemsJson);
 export const passivesConfig = load('game/passives.json', passivesConfigSchema, passivesJson);
 export const derivationsConfig = load('game/derivations.json', derivationsConfigSchema, derivationsJson);
+export const statsConfig = load('game/stats.json', statsConfigSchema, statsJson);
 export const statusConfig = load('game/status.json', statusConfigSchema, statusJson);
 export const pickupConfig = load('game/pickups.json', pickupConfigSchema, pickupsJson);
 export const spriteRender = load('render/sprites.json', spriteRenderSchema, spriteRenderJson);

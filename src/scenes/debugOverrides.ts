@@ -41,3 +41,9 @@ export function parseMovesParam(rules: SimRules, search: string): { move: number
   }
   return out.slice(0, rules.combat.maxMoveSlots);
 }
+
+/** 確認用: ?level=15 で、そのレベルから始める（進化などの確認用）。無ければ null */
+export function parseLevelParam(search: string): number | null {
+  const v = Number(new URLSearchParams(search).get('level'));
+  return Number.isInteger(v) && v > 1 ? v : null;
+}

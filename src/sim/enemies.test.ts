@@ -82,13 +82,13 @@ describe('時間帯ごとの出現', () => {
         capGlobal: 1000,
         capPerPlayer: 1000,
         waves: [
-          { startSeconds: 0, hpMultiplier: 1, kinds: ['a'] },
-          { startSeconds: 2, hpMultiplier: 2, kinds: ['b', 'c'] },
+          { startSeconds: 0, hpMultiplier: 1, damageMultiplier: 1, kinds: ['a'] },
+          { startSeconds: 2, hpMultiplier: 2, damageMultiplier: 1, kinds: ['b', 'c'] },
         ],
       },
       move: { range: 1 },
     });
-    rules.enemies.kinds = ['a', 'b', 'c'].map((id) => ({ id, hp: 20, moveSpeed: 0, radius: 10, types: [0] }));
+    rules.enemies.kinds = ['a', 'b', 'c'].map((id) => ({ id, hp: 20, moveSpeed: 0, radius: 10, contactDamage: 0, types: [0] }));
     const sim = makeSim(rules);
     const kindsAt = (from: number): Set<number> => {
       const e = sim.world.enemies;
@@ -112,13 +112,13 @@ describe('前の時間帯の敵', () => {
     const rules = testRules({
       spawn: {
         waves: [
-          { startSeconds: 0, hpMultiplier: 1, kinds: ['a'] },
-          { startSeconds: 1, hpMultiplier: 1, kinds: ['b'] },
+          { startSeconds: 0, hpMultiplier: 1, damageMultiplier: 1, kinds: ['a'] },
+          { startSeconds: 1, hpMultiplier: 1, damageMultiplier: 1, kinds: ['b'] },
         ],
       },
       move: { range: 1 },
     });
-    rules.enemies.kinds = ['a', 'b'].map((id) => ({ id, hp: 20, moveSpeed: 0, radius: 10, types: [0] }));
+    rules.enemies.kinds = ['a', 'b'].map((id) => ({ id, hp: 20, moveSpeed: 0, radius: 10, contactDamage: 0, types: [0] }));
     const sim = makeSim(rules);
     const e = sim.world.enemies;
     e.add(1, 0, 300, 0, 20, 0, 10); // 前の時間帯の種類（a）

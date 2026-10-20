@@ -8,6 +8,20 @@
       ]
     },
     {
+      "key": "ivysaur",
+      "dex": 2,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "venusaur",
+      "dex": 3,
+      "uses": [
+        "full"
+      ]
+    },
+    {
       "key": "charmander",
       "dex": 4,
       "uses": [
@@ -15,8 +29,36 @@
       ]
     },
     {
+      "key": "charmeleon",
+      "dex": 5,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "charizard",
+      "dex": 6,
+      "uses": [
+        "full"
+      ]
+    },
+    {
       "key": "squirtle",
       "dex": 7,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "wartortle",
+      "dex": 8,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "blastoise",
+      "dex": 9,
       "uses": [
         "full"
       ]

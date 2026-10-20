@@ -492,6 +492,47 @@
           "intensity": 0.003
         }
       }
+    },
+    "evolution": {
+      "impact": {
+        "burst": {
+          "count": 40,
+          "colors": [
+            "#ffffff",
+            "#fff9c4",
+            "#b3e5fc"
+          ],
+          "lifespanMs": [
+            400,
+            800
+          ],
+          "speed": [
+            80,
+            260
+          ],
+          "scale": [
+            0.9,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": -40,
+          "spread": 6,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#ffffff",
+          "radius": 90,
+          "durationMs": 500,
+          "alpha": 0.9
+        },
+        "shake": {
+          "durationMs": 120,
+          "intensity": 0.004
+        }
+      }
     }
   }
 }

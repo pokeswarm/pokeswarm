@@ -231,7 +231,10 @@ async function processPokemon(
     const id = line.split('\t')[1];
     if (id) authorIds.add(id);
   }
-  const authors = [...authorIds].map((id) => creditNames.get(id) ?? { name: id, contact: null });
+  // 名前の一覧に無い作者は、Discord の ID をそのまま載せない
+  const authors = [...authorIds].map(
+    (id) => creditNames.get(id) ?? { name: id.startsWith('<@') ? 'Unknown (Discord)' : id, contact: null },
+  );
 
   return {
     key: variant.outKey,

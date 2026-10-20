@@ -1,6 +1,6 @@
 import type { InputCommand } from '../commands';
 import type { HitEffect } from '../events';
-import { findEnemyIndex, findPlayer, type World } from '../world';
+import { currentWaveIndex, findEnemyIndex, findPlayer, type World } from '../world';
 import { breakOnDamage, damageTakenMultiplier } from './status';
 import { confirmPickup } from './gems';
 import { addXp, chooseUpgrade, rerollUpgrades, skipUpgrade } from './leveling';
@@ -30,7 +30,9 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
       case 'spawnEnemy': {
         const kind = world.rules.enemies.kinds[cmd.kind];
         if (!kind) break;
-        e.add(cmd.id, cmd.kind, cmd.x, cmd.y, kind.hp, kind.moveSpeed, kind.radius);
+        // 接触ダメージは自分の今の時間帯の倍率で（自分が受けるダメージは自分のブラウザで判定するため）
+        const wave = world.waves[currentWaveIndex(world)]!;
+        e.add(cmd.id, cmd.kind, cmd.x, cmd.y, kind.hp, kind.moveSpeed, kind.radius, kind.contactDamage * wave.damageMultiplier);
         break;
       }
       case 'damageEnemy': {

@@ -77,7 +77,14 @@ export interface World {
   /** 状態異常の種類（番号は data/game/status.json の並び） */
   readonly statusKinds: readonly StatusKind[];
   /** 時間帯ごとに出す敵の種類（rules.spawn.waves を更新回数と種類の番号に直したもの） */
-  readonly waves: readonly { readonly startTick: number; readonly hpMultiplier: number; readonly kinds: readonly number[] }[];
+  readonly waves: readonly {
+    readonly startTick: number;
+    readonly hpMultiplier: number;
+    readonly damageMultiplier: number;
+    readonly kinds: readonly number[];
+  }[];
+  /** 全員で共有する復活可能数 */
+  revives: number;
   /** 近傍検索の作業用（更新中にメモリを確保しないため） */
   readonly scratch: Int32Array;
   /** 発射体の命中候補の作業用 */
@@ -104,6 +111,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     gems: new GemStore(role === 'guest' ? rules.pickups.maxGems * 2 : rules.pickups.maxGems),
     nextGemId: 1,
     xp: 0,
+    revives: rules.stats.revive.initialCount,
     level: 1,
     xpIntoLevel: 0,
     pendingLevelUps: 0,
@@ -118,6 +126,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     waves: rules.spawn.waves.map((w) => ({
       startTick: Math.round(w.startSeconds * tickRate),
       hpMultiplier: w.hpMultiplier,
+      damageMultiplier: w.damageMultiplier,
       kinds: w.kinds.map((id) => {
         const i = rules.enemies.kinds.findIndex((k) => k.id === id);
         if (i === -1) throw new Error(`敵の種類 ${id} がありません`);

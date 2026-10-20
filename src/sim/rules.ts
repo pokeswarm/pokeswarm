@@ -1,4 +1,5 @@
-import type { CombatConfig, EnemyKind, PickupConfig, SpawnConfig, StatusConfig } from '../data/schema';
+import type { CombatConfig, EnemyKind, PickupConfig, SpawnConfig, StatsConfig, StatusConfig } from '../data/schema';
+import type { SimSpecies } from './species';
 import type { SimMoveDef, TypeChart } from './moves';
 import type { SimDerivation, SimLeveling, SimUpgradeDef } from './upgrades';
 
@@ -24,4 +25,7 @@ export interface SimRules {
   passives: SimUpgradeDef[];
   /** 派生と固有技 */
   derivations: SimDerivation[];
+  /** ポケモンの種類（プレイヤーの種族値・進化）。番号は並び順 */
+  species: SimSpecies[];
+  stats: StatsConfig;
 }

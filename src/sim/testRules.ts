@@ -1,5 +1,6 @@
 import type { MoveStats, SimMoveDef } from './moves';
 import type { SimRules } from './rules';
+import type { SimSpecies } from './species';
 import { buildXpTable, type SimUpgradeDef } from './upgrades';
 
 /** テスト用の技の性能（一番近い敵へ1発ずつ撃つ、仮の自動攻撃と同じ動き） */
@@ -45,6 +46,8 @@ export function testRules(
     items?: SimUpgradeDef[];
     passives?: SimUpgradeDef[];
     derivations?: SimRules['derivations'];
+    species?: SimSpecies[];
+    stats?: Partial<SimRules['stats']>;
     /** 追加の技 */
     extraMoves?: SimMoveDef[];
   } = {},
@@ -68,7 +71,7 @@ export function testRules(
     ...overrides.leveling,
   };
   return {
-    enemies: { kinds: [{ id: 'test', hp: 20, moveSpeed: 60, radius: 10, types: [0] }] },
+    enemies: { kinds: [{ id: 'test', hp: 20, moveSpeed: 60, radius: 10, contactDamage: 0, types: [0] }] },
     spawn: {
       spawnPerSecond: 0,
       spawnDistanceMin: 450,
@@ -80,7 +83,7 @@ export function testRules(
       separation: { strength: 0.5, maxNeighbors: 6 },
       spatialCellSize: 64,
       retireOldWaveKinds: true,
-      waves: [{ startSeconds: 0, hpMultiplier: 1, kinds: ['test'] }],
+      waves: [{ startSeconds: 0, hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] }],
       ...overrides.spawn,
     },
     status: {
@@ -104,6 +107,17 @@ export function testRules(
     items: overrides.items ?? [],
     passives: overrides.passives ?? [],
     derivations: overrides.derivations ?? [],
+    // 種族値がすべて 80（ランクの倍率 1）のポケモン。ステータスの倍率が 1 になり、ほかのテストの数値に影響しない
+    species: overrides.species ?? [{ key: 'test', types: [0], baseStats: { hp: 80, attack: 80, defense: 80, specialAttack: 80, specialDefense: 80, speed: 80 }, evolutions: [] }],
+    stats: {
+      rankThresholds: [50, 70, 90, 110, 130],
+      rankMultipliers: [0.7, 0.85, 1, 1.15, 1.3, 1.45],
+      base: { maxHp: 100, power: 1, defense: 0 },
+      perLevelPct: { maxHp: 0, power: 0, defense: 0 },
+      hurtInvincibleSeconds: 0.5,
+      revive: { initialCount: 0, hpPct: 50, invincibleSeconds: 2 },
+      ...overrides.stats,
+    },
   };
 }
 

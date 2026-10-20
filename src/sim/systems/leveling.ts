@@ -1,6 +1,8 @@
 import type { PlayerId } from '../commands';
 import type { Player } from '../entities/player';
+import { deriveStats } from '../species';
 import { addModifiers, emptyModifiers } from '../upgrades';
+import { checkEvolution } from './evolution';
 import type { SimDerivation } from '../upgrades';
 import type { UpgradeOffer, World } from '../world';
 
@@ -20,6 +22,8 @@ export function addXp(world: World, amount: number): void {
     world.events.push({ type: 'levelUp', level: world.level });
   }
   if (world.level >= cfg.maxLevel) world.xpIntoLevel = 0;
+  // レベルでステータスが伸びる
+  for (const p of world.players) recomputeModifiers(world, p);
 }
 
 /**
@@ -176,15 +180,29 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
   }
   world.events.push({ type: 'upgradeChosen', playerId: p.id, offer });
   recomputeModifiers(world, p);
+  // 石を取ったら進化することがある（イーブイなど）
+  checkEvolution(world, p);
 }
 
-/** 持ち物・パッシブの効果を合計し直し、移動の速さ・取得範囲に反映する */
+/**
+ * ステータスを作り直す: 種族値のランク・レベル（01_game_design.md 5.1）と、持ち物・パッシブの効果を合わせる。
+ * 最大HPが増えた分は今の HP にも足す。
+ */
 export function recomputeModifiers(world: World, p: Player): void {
   const mods = emptyModifiers(world.rules.types.names.length);
   for (const it of p.items) addModifiers(mods, world.rules.items[it.item]!.perLevel, it.level);
   for (const ps of p.passives) addModifiers(mods, world.rules.passives[ps.passive]!.perLevel, ps.level);
   p.mods = mods;
-  p.moveSpeed = p.baseMoveSpeed * (1 + mods.moveSpeedPct / 100);
+  const sp = world.rules.species[p.species];
+  const d = sp ? deriveStats(world.rules.stats, sp, world.level) : null;
+  const oldMax = p.maxHp;
+  p.maxHp = (d?.maxHp ?? 100) * Math.max(0.1, 1 + mods.maxHpPct / 100);
+  if (p.maxHp > oldMax && !p.down) p.hp += p.maxHp - oldMax;
+  p.hp = Math.min(p.hp, p.maxHp);
+  p.physicalPower = d?.physicalPower ?? 1;
+  p.specialPower = d?.specialPower ?? 1;
+  p.defense = (d?.defense ?? 0) * Math.max(0, 1 + mods.defensePct / 100);
+  p.moveSpeed = p.baseMoveSpeed * (d?.speed ?? 1) * (1 + mods.moveSpeedPct / 100);
   p.pickupRange = p.basePickupRange * (1 + mods.pickupRangePct / 100);
 }
 

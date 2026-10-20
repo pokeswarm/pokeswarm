@@ -14,6 +14,7 @@ import { axisToUnit } from '../math';
 import { typeMultiplier, type MoveStats } from '../moves';
 import type { World } from '../world';
 import { applyHitEffect } from './commands';
+import { healPlayer } from './health';
 import { breakOnDamage, damageTakenMultiplier } from './status';
 
 /** 技のレベルの性能（レベルは 1〜最大に収める） */
@@ -28,8 +29,11 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
   const m = p.mods;
   const classPct = def.damageClass === 'physical' ? m.physicalPowerPct : m.specialPowerPct;
   return {
-    // ポケモンのステータス（物理・特殊の威力）は区切り3で掛ける
-    power: st.power * Math.max(0, 1 + (m.powerPct + classPct + (m.typePowerPct[def.type] ?? 0)) / 100),
+    // ポケモンのステータス（物理・特殊の威力。種族値のランクとレベル）と、持ち物・パッシブの効果を掛ける
+    power:
+      st.power *
+      (def.damageClass === 'physical' ? p.physicalPower : p.specialPower) *
+      Math.max(0, 1 + (m.powerPct + classPct + (m.typePowerPct[def.type] ?? 0)) / 100),
     size: st.size * Math.max(0.1, 1 + (m.areaPct + (m.typeAreaPct[def.type] ?? 0)) / 100),
     speed: st.speed * Math.max(0.1, 1 + m.projectileSpeedPct / 100),
     cooldownSeconds: st.cooldownSeconds * Math.max(0.2, 1 + m.cooldownPct / 100),
@@ -79,6 +83,8 @@ function spread(world: World, dx: number, dy: number, degrees: number): [number,
  */
 export function useMoves(world: World): void {
   for (const p of world.players) {
+    // 倒れている間は技を使わない
+    if (p.down) continue;
     for (const pm of p.moves) {
       const def = world.rules.moves[pm.move];
       if (!def) continue;
@@ -381,6 +387,8 @@ export function moveProjectiles(world: World): void {
         pr.damage[i]! *
         typeMultiplier(world.rules.types, world.rules.combat.typeMultipliers, def.type, owner?.types ?? [], kind?.types ?? []) *
         (crit ? world.rules.combat.critMultiplier : 1);
+      // 吸収（ギガドレインなど）: 与えたダメージの一部を回復する
+      if (st.lifestealPct > 0) healPlayer(world, ownerId, (amount * st.lifestealPct) / 100);
       if (world.role === 'guest') {
         world.events.push({ type: 'damageDealt', enemyId: e.id[j]!, amount, by: ownerId, ...fx });
         continue;

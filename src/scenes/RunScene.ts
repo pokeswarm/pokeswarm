@@ -14,13 +14,15 @@ import { PooledCircles } from '../render/PooledCircles';
 import { preloadPokemonAtlas, registerPokemonAnimations } from '../render/sprites/PokemonSprite';
 import { EnemySprites } from '../render/sprites/EnemySprites';
 import { SpriteStreamer } from '../render/sprites/SpriteStreamer';
+import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
 import { addSpriteGallery } from '../render/sprites/SpriteGallery';
 import type { Axis, InputCommand, PlayerId } from '../sim/commands';
 import { SHAPE_LINE } from '../sim/entities/projectiles';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, enemyCap, type SimRole } from '../sim/world';
-import { applyDebugOverrides, parseMovesParam } from './debugOverrides';
+import { applyDebugOverrides, parseLevelParam, parseMovesParam } from './debugOverrides';
+import { addXp } from '../sim/systems/leveling';
 import { Discoveries } from '../meta/discoveries';
 import { LevelUpPanel, offerText } from './levelUpPanel';
 import type { NetPanel } from './netPanel';
@@ -126,12 +128,23 @@ export class RunScene extends Phaser.Scene {
         types: loadout.types,
         moves,
         line: loadout.line,
+        species: loadout.species,
       });
-      const view = new PlayerView(this, p, placeholderRender, spriteRender, this.playerSprite);
+      const view = new PlayerView(this, p, placeholderRender, spriteRender, this.playerSprite, !p.remote);
       view.container.setDepth(id === this.localId ? 1.1 : 1);
       // 相手のプレイヤーは少し透かして見分ける
       if (p.remote) view.container.setAlpha(0.7);
       this.playerViews.set(id, view);
+    }
+    // 確認用: ?level=15 で、そのレベルから始める（選択は飛ばす。進化の条件は最初の更新で判定される）
+    const startLevel = parseLevelParam(window.location.search);
+    if (startLevel) {
+      const w = this.sim.world;
+      let need = 0;
+      for (let l = 1; l < Math.min(startLevel, w.rules.leveling.maxLevel); l++) need += w.rules.leveling.xpToNext[l]!;
+      addXp(w, need);
+      w.pendingLevelUps = 0;
+      w.events.length = 0;
     }
     if (this.net) this.setupNet(this.net);
 
@@ -193,6 +206,7 @@ export class RunScene extends Phaser.Scene {
       if (visible) {
         for (const ev of this.sim.world.events) {
           if (ev.type === 'projectileHit') this.effects.playImpact(this.sim.world.rules.moves[ev.move]!.effect, ev.x, ev.y);
+          if (ev.type === 'evolved') this.onEvolved(ev.playerId, ev.to);
           // 派生・固有技を達成したら記録する（次からの「進化できる！」の表示に使う）
           if (ev.type === 'upgradeChosen' && ev.playerId === this.localId && ev.offer.kind === 'derive') {
             this.discoveries.add(this.sim.world.rules.moves[ev.offer.to]!.key);
@@ -233,6 +247,19 @@ export class RunScene extends Phaser.Scene {
       if (e.hasStatus(i, s)) return this.statusColors[s]!;
     }
     return null;
+  }
+
+  /** 進化したら、光の演出を出して見た目を差し替える（スプライトは途中で読み込む） */
+  private onEvolved(playerId: PlayerId, species: number): void {
+    const view = this.playerViews.get(playerId);
+    const p = this.sim.world.players.find((x) => x.id === playerId);
+    if (!view || !p) return;
+    this.effects.playImpact('evolution', p.x, p.y);
+    const key = this.sim.world.rules.species[species]?.key;
+    if (!key) return;
+    void loadPokemonAtRuntime(this, key).then((loaded) => {
+      if (loaded) view.setSprite(loaded.manifest);
+    });
   }
 
   /** 1フレームの処理時間を測る（更新の始まりから描画の命令を出し終えるまで） */
@@ -324,6 +351,13 @@ export class RunScene extends Phaser.Scene {
       t('debug.enemies', { count: e.count, cap: enemyCap(world), drawn }),
       t('debug.combat', { kills: world.stats.kills, projectiles: world.projectiles.count }),
       t('debug.xp', { xp: Math.round(world.xp), gems: gems.count }),
+      t('debug.player', {
+        name: localName(generated.pokemon[world.rules.species[local.species]?.key ?? '']?.names, getLocale(), ''),
+        hp: Math.ceil(local.hp),
+        maxHp: Math.round(local.maxHp),
+        revives: world.revives,
+      }),
+      ...(local.down ? [t('debug.down')] : []),
       t('debug.level', { level: world.level, xp: Math.floor(world.xpIntoLevel), need: world.rules.leveling.xpToNext[world.level] ?? 0, rerolls: local.rerolls }),
       t('debug.moves', {
         moves: local.moves

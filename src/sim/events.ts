@@ -102,6 +102,33 @@ export interface UpgradeChosenEvent {
   readonly offer: UpgradeOffer;
 }
 
+/** プレイヤーがダメージを受けた（自分のブラウザで判定） */
+export interface PlayerDamagedEvent {
+  readonly type: 'playerDamaged';
+  readonly playerId: PlayerId;
+  readonly amount: number;
+}
+
+/** 倒れたが、復活可能数を使って自動で復活した */
+export interface PlayerRevivedEvent {
+  readonly type: 'playerRevived';
+  readonly playerId: PlayerId;
+}
+
+/** 倒れた（復活可能数が無い） */
+export interface PlayerDownEvent {
+  readonly type: 'playerDown';
+  readonly playerId: PlayerId;
+}
+
+/** 進化した（from・to は SimRules.species の番号） */
+export interface EvolvedEvent {
+  readonly type: 'evolved';
+  readonly playerId: PlayerId;
+  readonly from: number;
+  readonly to: number;
+}
+
 export type SimEvent =
   | EnemyKilledEvent
   | ProjectileHitEvent
@@ -114,4 +141,8 @@ export type SimEvent =
   | PickupRequestedEvent
   | LevelUpEvent
   | UpgradeChosenEvent
+  | PlayerDamagedEvent
+  | PlayerRevivedEvent
+  | PlayerDownEvent
+  | EvolvedEvent
   | EnemyRetiredEvent;

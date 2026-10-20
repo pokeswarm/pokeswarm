@@ -1,4 +1,5 @@
 import type { World } from '../world';
+import { healPlayer } from './health';
 
 /** 状態異常による移動の速さの倍率（かかっているもののうち一番遅いもの） */
 export function speedMultiplier(world: World, i: number): number {
@@ -38,6 +39,8 @@ export function tickStatuses(world: World): void {
       const dps = world.statusKinds[s]!.damagePerSecond;
       if (!applyDamage || dps === 0 || e.hp[i]! <= 0) continue;
       e.hp[i]! -= dps * world.dt * taken;
+      // やどりぎ: 継続ダメージの分だけ、付けたプレイヤーが回復する
+      if (world.statusKinds[s]!.healsAttacker) healPlayer(world, e.statusBy[k]!, dps * world.dt * taken);
       if (e.hp[i]! <= 0) {
         world.events.push({ type: 'enemyKilled', enemyId: e.id[i]!, by: e.statusBy[k]! });
         world.stats.kills++;

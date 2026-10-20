@@ -5,6 +5,8 @@ export function movePlayers(world: World): void {
     p.prevX = p.x;
     p.prevY = p.y;
     if (p.invincibleTicks > 0) p.invincibleTicks--;
+    // 倒れている間は動かない
+    if (p.down) continue;
     if (p.remote) {
       // 別のブラウザのプレイヤーは、本人から届いた位置をそのまま使う
       p.x = p.netX;

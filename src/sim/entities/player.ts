@@ -51,6 +51,17 @@ export interface Player {
   basePickupRange: number;
   /** 残りの無敵時間（更新回数） */
   invincibleTicks: number;
+  /** ポケモンの種類（SimRules.species の番号）。進化で変わる */
+  species: number;
+  hp: number;
+  maxHp: number;
+  /** 物理・特殊の技のダメージに掛ける倍率（種族値のランクとレベル） */
+  physicalPower: number;
+  specialPower: number;
+  /** 防御（受けるダメージ = ダメージ × 100 / (100 + 防御)） */
+  defense: number;
+  /** 倒れていて、復活を待っている（ソロでは復活可能数が無ければランの失敗） */
+  down: boolean;
   /** リロール権 */
   rerolls: number;
 }
@@ -67,6 +78,8 @@ export interface PlayerInit {
   moves?: { move: number; level: number }[];
   line?: string;
   rerolls?: number;
+  /** ポケモンの種類（SimRules.species の番号。省略時は 0） */
+  species?: number;
   /** 効果の合計の初期値（タイプの数に合わせた空のもの） */
   mods: Modifiers;
 }
@@ -98,5 +111,12 @@ export function createPlayer(init: PlayerInit): Player {
     basePickupRange: init.pickupRange ?? 0,
     invincibleTicks: 0,
     rerolls: init.rerolls ?? 0,
+    species: init.species ?? 0,
+    hp: 1,
+    maxHp: 1,
+    physicalPower: 1,
+    specialPower: 1,
+    defense: 0,
+    down: false,
   };
 }

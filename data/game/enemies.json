@@ -5,70 +5,80 @@
       "sprite": "enemy/rattata",
       "hp": 20,
       "moveSpeed": 60,
-      "radius": 10
+      "radius": 10,
+      "contactDamage": 6
     },
     {
       "id": "pidgey",
       "sprite": "enemy/pidgey",
       "hp": 20,
       "moveSpeed": 60,
-      "radius": 10
+      "radius": 10,
+      "contactDamage": 6
     },
     {
       "id": "caterpie",
       "sprite": "enemy/caterpie",
       "hp": 20,
       "moveSpeed": 60,
-      "radius": 10
+      "radius": 10,
+      "contactDamage": 6
     },
     {
       "id": "weedle",
       "sprite": "enemy/weedle",
       "hp": 20,
       "moveSpeed": 60,
-      "radius": 10
+      "radius": 10,
+      "contactDamage": 6
     },
     {
       "id": "metapod",
       "sprite": "enemy/metapod",
       "hp": 20,
       "moveSpeed": 60,
-      "radius": 10
+      "radius": 10,
+      "contactDamage": 6
     },
     {
       "id": "kakuna",
       "sprite": "enemy/kakuna",
       "hp": 20,
       "moveSpeed": 60,
-      "radius": 10
+      "radius": 10,
+      "contactDamage": 6
     },
     {
       "id": "spearow",
       "sprite": "enemy/spearow",
       "hp": 20,
       "moveSpeed": 60,
-      "radius": 10
+      "radius": 10,
+      "contactDamage": 6
     },
     {
       "id": "zubat",
       "sprite": "enemy/zubat",
       "hp": 20,
       "moveSpeed": 60,
-      "radius": 10
+      "radius": 10,
+      "contactDamage": 6
     },
     {
       "id": "geodude",
       "sprite": "enemy/geodude",
       "hp": 20,
       "moveSpeed": 60,
-      "radius": 10
+      "radius": 10,
+      "contactDamage": 6
     },
     {
       "id": "paras",
       "sprite": "enemy/paras",
       "hp": 20,
       "moveSpeed": 60,
-      "radius": 10
+      "radius": 10,
+      "contactDamage": 6
     }
   ]
 }

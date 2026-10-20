@@ -50,6 +50,8 @@ export const enemyKindSchema = z.object({
   hp: z.number().positive(),
   moveSpeed: z.number().nonnegative(),
   radius: z.number().positive(),
+  /** プレイヤーに触れたときのダメージ（時間帯の damageMultiplier を掛ける） */
+  contactDamage: z.number().nonnegative(),
 });
 export type EnemyKind = z.infer<typeof enemyKindSchema>;
 
@@ -93,6 +95,8 @@ export const spawnConfigSchema = z
         z.object({
           startSeconds: z.number().nonnegative(),
           hpMultiplier: z.number().positive(),
+          /** その時間帯に出る敵の接触ダメージの倍率 */
+          damageMultiplier: z.number().positive(),
           kinds: z.array(z.string()).min(1),
         }),
       )
@@ -611,3 +615,26 @@ export const derivationsConfigSchema = z.object({
   ),
 });
 export type DerivationsConfig = z.infer<typeof derivationsConfigSchema>;
+
+// ---- プレイヤーのステータス ----
+
+/**
+ * ゲーム内の値 = 基準値 × 種族値のランクによる倍率 × レベルによる伸び（01_game_design.md 5.1）。
+ * ランク: 種族値が rankThresholds のどこに入るかで rankMultipliers の倍率を選ぶ（区切りの数 + 1 個）。
+ * 防御は ぼうぎょ と とくぼう の高い方。受けるダメージ = ダメージ × 100 / (100 + 防御)。
+ */
+export const statsConfigSchema = z
+  .object({
+    rankThresholds: z.array(z.number()).min(1),
+    rankMultipliers: z.array(z.number().positive()),
+    /** レベル1・ランク倍率 1 のときの値。威力は技のダメージに掛ける倍率 */
+    base: z.object({ maxHp: z.number().positive(), power: z.number().positive(), defense: z.number().nonnegative() }),
+    /** レベルが1上がるごとに伸びる割合（%） */
+    perLevelPct: z.object({ maxHp: z.number(), power: z.number(), defense: z.number() }),
+    /** 敵に触れてダメージを受けた後の無敵時間（秒） */
+    hurtInvincibleSeconds: z.number().nonnegative(),
+    /** 倒れたときの自動復活（ソロ）。復活可能数は全員で共有し、永続強化で増やす */
+    revive: z.object({ initialCount: z.number().int().nonnegative(), hpPct: z.number().positive(), invincibleSeconds: z.number().nonnegative() }),
+  })
+  .refine((s) => s.rankMultipliers.length === s.rankThresholds.length + 1, { message: 'rankMultipliers は rankThresholds より1つ多くする' });
+export type StatsConfig = z.infer<typeof statsConfigSchema>;

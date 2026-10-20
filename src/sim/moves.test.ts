@@ -121,7 +121,7 @@ describe('技の出し方', () => {
 
   it('タイプ相性とタイプ一致がダメージに掛かる', () => {
     const sim = simWith(testMove('fire', 'nearest', { cooldownSeconds: 100, speed: 600 }, FIRE), [FIRE]);
-    sim.world.rules.enemies.kinds.push({ id: 'grass', hp: 100, moveSpeed: 0, radius: 10, types: [GRASS] });
+    sim.world.rules.enemies.kinds.push({ id: 'grass', hp: 100, moveSpeed: 0, radius: 10, contactDamage: 0, types: [GRASS] });
     const px = sim.world.players[0]!.x;
     sim.world.enemies.add(1, 1, px + 150, 0, 100, 0, 10);
     for (let t = 0; t < 30; t++) sim.step([]);

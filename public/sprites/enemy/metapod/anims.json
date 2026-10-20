@@ -1,0 +1,36 @@
+{
+  "key": "enemy/metapod",
+  "dex": 11,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "durations": [
+        4,
+        2,
+        2,
+        2,
+        2,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

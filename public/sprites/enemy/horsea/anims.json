@@ -1,0 +1,30 @@
+{
+  "key": "enemy/horsea",
+  "dex": 116,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 24,
+      "frameHeight": 48,
+      "durations": [
+        8,
+        12,
+        8,
+        12
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

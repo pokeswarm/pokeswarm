@@ -1,0 +1,30 @@
+{
+  "key": "enemy/onix",
+  "dex": 95,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 88,
+      "frameHeight": 112,
+      "durations": [
+        10,
+        14,
+        10,
+        14
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

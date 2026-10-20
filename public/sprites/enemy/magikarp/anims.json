@@ -1,0 +1,33 @@
+{
+  "key": "enemy/magikarp",
+  "dex": 129,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 32,
+      "frameHeight": 40,
+      "durations": [
+        6,
+        2,
+        4,
+        6,
+        4,
+        2,
+        6
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

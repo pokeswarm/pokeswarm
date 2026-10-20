@@ -8,8 +8,9 @@ dist/
 .env.*
 !.env.example
 
-# 取得したスプライト（リポジトリに含めるかは未決定: docs/06_roadmap.md 未決定事項7）
-public/sprites/
+# 取得したスプライトはリポジトリに含めて公開版でも表示する（2026年10月 作者が決定）。
+# 取得時の確認用の報告だけは含めない
+public/sprites/report.json
 scripts/.cache/
 
 # エディタ・OS

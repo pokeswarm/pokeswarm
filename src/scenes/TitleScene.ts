@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { firebaseOptionsFromEnv } from '../firebase/config';
 import { t } from '../i18n';
 import { AccountPanel } from './accountPanel';
+import { session } from '../meta/session';
 
 /** タイトル画面（見た目の作り込みはフェーズ4）。Enter かクリックでポケモン選択へ、C で協力プレイの部屋を作る。下にログインの状態と記録を出す */
 export class TitleScene extends Phaser.Scene {
@@ -21,6 +22,7 @@ export class TitleScene extends Phaser.Scene {
       this.tweens.add({ targets: start, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
       // 協力プレイは Firebase の設定値があるときだけ
       if (firebaseOptionsFromEnv()) this.add.text(width / 2, height * 0.7 + 44, t('title.coop'), { fontFamily: 'sans-serif', fontSize: '18px', color: '#cfd8dc' }).setOrigin(0.5);
+      if (firebaseOptionsFromEnv()) this.add.text(width / 2, height * 0.7 + 74, t('title.friends'), { fontFamily: 'sans-serif', fontSize: '18px', color: '#cfd8dc' }).setOrigin(0.5);
     };
     layout();
     this.scale.on('resize', layout);
@@ -36,5 +38,7 @@ export class TitleScene extends Phaser.Scene {
     this.input.keyboard?.once('keydown-SPACE', go);
     this.input.once('pointerdown', go);
     if (firebaseOptionsFromEnv()) this.input.keyboard?.once('keydown-C', () => this.scene.start('lobby', { mode: 'host' }));
+    if (firebaseOptionsFromEnv()) this.input.keyboard?.once('keydown-F', () => this.scene.start('friends'));
+    session.setPresence('menu');
   }
 }

@@ -3,6 +3,8 @@ import { placeholderRender, playablesConfig } from './data';
 import { migrateOldDiscoveries } from './meta/discoveries';
 import { session } from './meta/session';
 import { loadSpriteManifest } from './render/sprites/spriteManifest';
+import { FriendsScene } from './scenes/FriendsScene';
+import { InviteToast } from './scenes/inviteToast';
 import { LobbyScene, type LobbySceneData } from './scenes/LobbyScene';
 import { ResultScene } from './scenes/ResultScene';
 import { RunScene, type RunSceneData } from './scenes/RunScene';
@@ -52,6 +54,16 @@ async function start(): Promise<void> {
   game.scene.add('lobby', LobbyScene, !!lobby, lobby ?? undefined);
   game.scene.add('run', RunScene, !!run, run ?? undefined);
   game.scene.add('result', ResultScene, false);
+  game.scene.add('friends', FriendsScene, false);
+
+  // フレンドからの招待: ラン中でなければ、今の画面を閉じて待合室へ移る
+  const running = (): boolean => game.scene.isActive('run');
+  new InviteToast((roomId) => {
+    if (running()) return false;
+    for (const s of game.scene.getScenes(true)) game.scene.stop(s.scene.key);
+    game.scene.start('lobby', { mode: 'join', roomId } satisfies LobbySceneData);
+    return true;
+  }, running);
 }
 
 void start();

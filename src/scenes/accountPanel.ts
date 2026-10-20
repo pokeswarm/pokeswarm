@@ -1,5 +1,6 @@
 import { t } from '../i18n';
 import type { SaveData } from '../meta/saveData';
+import { formatTag } from '../meta/nickname';
 import { session } from '../meta/session';
 
 const BUTTON = 'padding:8px 16px;border-radius:8px;cursor:pointer;font:inherit;border:1px solid #4a7a4a;background:#162416;color:#fff';
@@ -52,6 +53,8 @@ export class AccountPanel {
   private render(): void {
     const status = document.createElement('div');
     status.textContent = t(`account.status.${session.status}`);
+    const profile = session.social?.profile;
+    if (profile) status.textContent += `　${formatTag(profile.nickname, profile.tag)}`;
     const record = document.createElement('div');
     record.style.cssText = 'opacity:0.8;font-size:14px';
     record.textContent = summary(session.store.current);

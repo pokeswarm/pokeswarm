@@ -249,6 +249,7 @@ export class RunScene extends Phaser.Scene {
     // 時計を作った後で始める
     if (this.coop) this.keepRunningWhenHidden();
     this.setupSaving();
+    session.setPresence('run');
   }
 
   /**

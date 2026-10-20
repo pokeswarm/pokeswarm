@@ -5,6 +5,8 @@ import type { SpriteAnims } from '../data/schema';
 import { getLocale, t, type MessageKey } from '../i18n';
 import type { Room, RoomPlayer } from '../net/room';
 import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
+import { formatTag } from '../meta/nickname';
+import { session } from '../meta/session';
 import type { RunSceneData } from './RunScene';
 
 export interface LobbySceneData {
@@ -29,6 +31,8 @@ export class LobbyScene extends Phaser.Scene {
   private readonly sprites = new Map<string, SpriteAnims | null>();
   private message: { key: MessageKey; params?: Record<string, string | number> } | null = null;
   private starting = false;
+  /** 招待を送ったフレンド */
+  private invited = new Set<string>();
 
   constructor() {
     super('lobby');
@@ -39,6 +43,7 @@ export class LobbyScene extends Phaser.Scene {
     this.room = null;
     this.message = null;
     this.starting = false;
+    this.invited = new Set();
   }
 
   create(): void {
@@ -62,6 +67,22 @@ export class LobbyScene extends Phaser.Scene {
     for (const [key, p] of Object.entries(playablesConfig.pokemon)) {
       void loadPokemonAtRuntime(this, p.sprite).then((loaded) => this.sprites.set(key, loaded?.manifest ?? null));
     }
+    session.setPresence('lobby');
+    // フレンドのオンライン状態が変わったら、招待の一覧を作り直す
+    let offSocial: (() => void) | null = null;
+    const bind = (): void => {
+      offSocial?.();
+      offSocial = session.social?.onChange(() => this.render()) ?? null;
+      this.render();
+    };
+    const offStatus = session.onStatus(bind);
+    offSocial = session.social?.onChange(() => this.render()) ?? null;
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      offStatus();
+      offSocial?.();
+      // 送った招待は取り消す（開始した・部屋を出た）
+      void session.social?.cancelInvites();
+    });
     this.message = { key: this.params.mode === 'host' ? 'lobby.creating' : 'lobby.joining' };
     this.render();
     void this.connect();
@@ -191,6 +212,36 @@ export class LobbyScene extends Phaser.Scene {
         choices.append(b);
       });
       children.push(chooseLabel, choices);
+
+      // ホスト: オンラインのフレンドを招待する（Google でログインしてニックネームを登録しているとき）
+      const social = session.social;
+      if (room.role === 'host' && social?.profile) {
+        const label = document.createElement('div');
+        label.textContent = t('lobby.friends');
+        const list = document.createElement('div');
+        list.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px';
+        const online = social.friends.filter((f) => f.presence);
+        if (online.length === 0) {
+          const none = document.createElement('div');
+          none.style.opacity = '0.75';
+          none.textContent = t('lobby.noFriendsOnline');
+          list.append(none);
+        }
+        for (const f of online) {
+          const b = document.createElement('button');
+          const invited = this.invited.has(f.uid);
+          b.style.cssText = BUTTON + (invited ? ';opacity:0.6' : '');
+          b.textContent = `${formatTag(f.nickname, f.tag)}　${t(invited ? 'lobby.invited' : 'lobby.invite')}`;
+          b.disabled = invited;
+          b.onclick = () => {
+            this.invited.add(f.uid);
+            void social.invite(f.uid, room.roomId);
+            this.render();
+          };
+          list.append(b);
+        }
+        children.push(label, list);
+      }
     }
 
     const footer = document.createElement('div');

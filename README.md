@@ -60,7 +60,7 @@ npm run dev
    - Authentication → Sign-in method: 「匿名」と「Google」を有効にする
    - Authentication → 設定 → 承認済みドメイン: 公開先（`pokeswarm.pokeswarm-dev.workers.dev` など）を追加
    - Firestore Database を作成し（場所は asia-northeast1）、ルールに `firestore.rules` の内容を貼り付けて公開する
-   - Realtime Database のルールに `database.rules.json` の内容を貼り付けて公開する（協力プレイ用）
+   - Realtime Database のルールに `database.rules.json` の内容を貼り付けて公開する（協力プレイ・オンライン状態・招待用）
 3. `npm run dev` を起動し直す
 
 設定値が無ければ「オフライン」になり、記録はそのブラウザだけに保存されます。
@@ -72,6 +72,8 @@ npm run dev
 1. タイトル画面で C を押すと部屋ができ、参加用 URL が表示される（公開版でも同じ）
 2. 一緒に遊ぶ人がその URL を開くと待合室に入る（最大4人）
 3. 各自がポケモンを選び、全員そろったらホストが「開始」を押す
+
+フレンド（Google でログインした人だけ）: タイトルで F → ニックネームを登録すると「ニックネーム#1234」のタグが付く。相手のタグで申請し、承認されるとフレンドになる。待合室ではオンラインのフレンドを招待できる。
 
 同じ PC で試すときは、タブではなく**ウィンドウを並べる**と全員の動きが見られます（裏のタブは画面の更新が止まるので、待合室から開始するときは各タブを一度前に出す）。
 

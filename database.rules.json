@@ -7,6 +7,20 @@
         ".read": "auth != null",
         ".write": "auth != null"
       }
+    },
+    "presence": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "invites": {
+      "$to": {
+        ".read": "auth != null && auth.uid === $to",
+        "$from": {
+          ".write": "auth != null && (auth.uid === $from || auth.uid === $to)"
+        }
+      }
     }
   }
 }

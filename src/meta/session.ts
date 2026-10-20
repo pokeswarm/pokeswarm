@@ -1,4 +1,5 @@
 import type { Account, SaveChooser } from '../firebase/account';
+import type { PresenceState, Social } from '../firebase/social';
 import { firebaseOptionsFromEnv } from '../firebase/config';
 import { SaveStore } from './saveStore';
 
@@ -23,6 +24,19 @@ class Session {
   private statusValue: AccountStatus = 'offline';
   private errorMessage = '';
   private readonly listeners = new Set<() => void>();
+  /** ニックネーム#タグ・フレンド・招待（Google でログインしているときだけ） */
+  private socialValue: Social | null = null;
+  private presence: PresenceState = 'menu';
+
+  get social(): Social | null {
+    return this.socialValue;
+  }
+
+  /** オンライン状態（タイトルなど・待合室・ラン中）をフレンドに知らせる */
+  setPresence(state: PresenceState): void {
+    this.presence = state;
+    void this.socialValue?.setPresence(state).catch(() => undefined);
+  }
 
   get status(): AccountStatus {
     return this.statusValue;
@@ -71,6 +85,8 @@ class Session {
 
   async signOut(): Promise<void> {
     if (!this.account) return;
+    this.socialValue?.dispose();
+    this.socialValue = null;
     await this.account.signOut();
     this.setStatus(this.account.kind);
   }
@@ -83,8 +99,32 @@ class Session {
   private setStatus(status: AccountStatus, clearError = true): void {
     if (clearError) this.errorMessage = '';
     this.statusValue = status === 'error' && this.account ? this.account.kind : status;
+    void this.syncSocial();
     for (const fn of this.listeners) fn();
   }
+
+  /** Google でログインしたらフレンドの機能を始め、ログアウトしたら止める */
+  private async syncSocial(): Promise<void> {
+    const google = this.statusValue === 'google';
+    if (google && !this.socialValue && !this.socialStarting) {
+      this.socialStarting = true;
+      try {
+        const { Social } = await import('../firebase/social');
+        this.socialValue = await Social.start();
+        void this.socialValue.setPresence(this.presence);
+      } catch (err) {
+        console.warn('[social] フレンドの機能を始められませんでした', err);
+      } finally {
+        this.socialStarting = false;
+      }
+      for (const fn of this.listeners) fn();
+    } else if (!google && this.socialValue) {
+      this.socialValue.dispose();
+      this.socialValue = null;
+    }
+  }
+
+  private socialStarting = false;
 }
 
 export const session = new Session();

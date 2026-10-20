@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
-import { effectRecipes, generated, groundConfig, networkConfig, placeholderRender, playerConfig, saveConfig, simulationConfig, spriteRender, stageConfig } from '../data';
-import { buildSimRules, localName, playableLoadout } from '../data/simRules';
+import { effectRecipes, generated, groundConfig, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig } from '../data';
+import { buildSimRules, localName, permanentModifiers, playableLoadout } from '../data/simRules';
+import { permanentBonus } from '../meta/shop';
+import { emptySave } from '../meta/saveData';
 import type { SpriteAnims } from '../data/schema';
 import { getLocale, t, tMaybe } from '../i18n';
 import type { Room, RoomPlayer } from '../net/room';
@@ -157,11 +159,14 @@ export class RunScene extends Phaser.Scene {
       role,
       localPlayerId: this.localId,
     });
-    const roster: RoomPlayer[] = this.coop?.players ?? [{ id: HOST_PLAYER_ID, pokemon: this.pokemon }];
+    const roster: RoomPlayer[] = this.coop?.players ?? [{ id: HOST_PLAYER_ID, pokemon: this.pokemon, upgrades: session.store.current.upgrades }];
     // 確認用の ?moves= はソロのときだけ
     const debugMoves = this.coop ? null : parseMovesParam(rules, window.location.search);
-    for (const { id, pokemon } of roster) {
+    for (const { id, pokemon, upgrades } of roster) {
       const loadout = playableLoadout(rules, pokemon);
+      // フレンドリィショップの強化（01_game_design.md 8.3）。協力プレイでは各自の強化を待合室で受け取っている
+      const bonus = permanentBonus({ ...emptySave(), upgrades: { ...upgrades } }, shopConfig);
+      this.sim.world.revives += bonus.revives;
       const p = this.sim.addPlayer({
         id,
         x: playerConfig.spawnX + (id - 1) * networkConfig.guestSpawnOffsetX,
@@ -174,6 +179,9 @@ export class RunScene extends Phaser.Scene {
         moves: debugMoves ?? loadout.moves,
         line: loadout.line,
         species: loadout.species,
+        rerolls: rules.leveling.initialRerolls + bonus.rerolls,
+        permanent: permanentModifiers(rules, bonus.levels),
+        bans: bonus.bans,
       });
       const sprite = id === this.localId ? this.playerSprite : (this.coop?.sprites.get(pokemon) ?? null);
       const view = new PlayerView(this, p, placeholderRender, spriteRender, sprite, true);
@@ -228,6 +236,7 @@ export class RunScene extends Phaser.Scene {
       choose: (index) => (guest ? this.sync?.requestUpgrade('c', index) : this.uiCommands.push({ type: 'chooseUpgrade', playerId: this.localId, index })),
       reroll: () => (guest ? this.sync?.requestUpgrade('r') : this.uiCommands.push({ type: 'rerollUpgrades', playerId: this.localId })),
       skip: () => (guest ? this.sync?.requestUpgrade('s') : this.uiCommands.push({ type: 'skipUpgrade', playerId: this.localId })),
+      ban: (index) => (guest ? this.sync?.requestUpgrade('b', index) : this.uiCommands.push({ type: 'banUpgrade', playerId: this.localId, index })),
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.levelUpPanel.hide());
     this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));
@@ -341,7 +350,7 @@ export class RunScene extends Phaser.Scene {
    * タブが裏に回ったら、ブラウザへの一時保存と Firestore への書き込みをしておく
    */
   private setupSaving(): void {
-    this.recorder = new RunRecorder(session.store, this.pokemon);
+    this.recorder = new RunRecorder(session.store, this.pokemon, shopConfig);
     const autosave = this.time.addEvent({
       delay: saveConfig.autosaveSeconds * 1000,
       loop: true,
@@ -408,6 +417,7 @@ export class RunScene extends Phaser.Scene {
         }),
         newAchievements: this.newAchievements.map((id) => tMaybe(`achievement.${id}.name`)),
         newUnlocks: this.newUnlocks.map((key) => localName(generated.pokemon[key]?.names, getLocale(), key)),
+        coins: this.recorder.coinsEarned,
         legendary: this.legendaryResult?.result
           ? { name: this.enemyName(this.legendaryResult.kind), result: this.legendaryResult.result }
           : null,
@@ -690,7 +700,7 @@ export class RunScene extends Phaser.Scene {
     const lu = world.levelUp;
     if (lu && !lu.done.has(this.localId) && !world.outcome) {
       const offers = (lu.offers.get(this.localId) ?? []).map((o) => offerText(world, local, o, new Set(session.store.current.discoveries)));
-      this.levelUpPanel.show(lu.level, offers, local.rerolls, Math.ceil(lu.ticksLeft * world.dt));
+      this.levelUpPanel.show(lu.level, offers, local.rerolls, Math.ceil(lu.ticksLeft * world.dt), local.bans);
     } else {
       this.levelUpPanel.hide();
     }

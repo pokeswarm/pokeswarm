@@ -4,6 +4,7 @@ import { migrateOldDiscoveries } from './meta/discoveries';
 import { session } from './meta/session';
 import { loadSpriteManifest } from './render/sprites/spriteManifest';
 import { AchievementsScene } from './scenes/AchievementsScene';
+import { ShopScene } from './scenes/ShopScene';
 import { FriendsScene } from './scenes/FriendsScene';
 import { InviteToast } from './scenes/inviteToast';
 import { LobbyScene, type LobbySceneData } from './scenes/LobbyScene';
@@ -61,6 +62,7 @@ async function start(): Promise<void> {
   game.scene.add('result', ResultScene, false);
   game.scene.add('friends', FriendsScene, false);
   game.scene.add('achievements', AchievementsScene, false);
+  game.scene.add('shop', ShopScene, false);
 
   // フレンドからの招待: ラン中でなければ、今の画面を閉じて待合室へ移る
   const running = (): boolean => game.scene.isActive('run');

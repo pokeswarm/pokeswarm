@@ -1,0 +1,23 @@
+{
+  "coins": {
+    "perSecondsSurvived": 30,
+    "perKills": 100,
+    "midboss": 10,
+    "boss": 20,
+    "clear": 100,
+    "legendary": 150
+  },
+  "upgrades": [
+    { "id": "max-hp", "maxLevel": 5, "baseCost": 100, "perLevel": { "maxHpPct": 4 } },
+    { "id": "attack", "maxLevel": 5, "baseCost": 150, "perLevel": { "physicalPowerPct": 3 } },
+    { "id": "sp-attack", "maxLevel": 5, "baseCost": 150, "perLevel": { "specialPowerPct": 3 } },
+    { "id": "defense", "maxLevel": 5, "baseCost": 100, "perLevel": { "defensePct": 3 } },
+    { "id": "speed", "maxLevel": 3, "baseCost": 150, "perLevel": { "moveSpeedPct": 3 } },
+    { "id": "cooldown", "maxLevel": 3, "baseCost": 300, "perLevel": { "cooldownPct": -2 } },
+    { "id": "pickup", "maxLevel": 3, "baseCost": 80, "perLevel": { "pickupRangePct": 8 } },
+    { "id": "xp", "maxLevel": 5, "baseCost": 200, "perLevel": { "xpPct": 3 } },
+    { "id": "revive", "maxLevel": 2, "baseCost": 1000, "grants": "revives" },
+    { "id": "reroll", "maxLevel": 5, "baseCost": 200, "grants": "rerolls" },
+    { "id": "ban", "maxLevel": 5, "baseCost": 200, "grants": "bans" }
+  ]
+}

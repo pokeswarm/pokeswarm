@@ -2,6 +2,8 @@ import type { World } from '../sim/world';
 import { elapsedSeconds } from '../sim/world';
 import { addStat, maxStat } from './saveData';
 import type { SaveStore } from './saveStore';
+import type { ShopConfig } from '../data/schema';
+import { coinsForRun } from './shop';
 
 /**
  * ラン中の記録をセーブデータに足す（01_game_design.md 8.2）。
@@ -20,12 +22,20 @@ export class RunRecorder {
   private seconds = 0;
   /** このランで自分が倒した数（最高記録に使う） */
   private runKills = 0;
+  /** このランで倒した中ボス・四天王・伝説（全員に数える。コインに使う） */
+  private runMidbosses = 0;
+  private runBosses = 0;
+  private runLegendary = 0;
   private finished = false;
+  /** ラン終了時にもらったコイン（結果画面に出す） */
+  coinsEarned = 0;
 
   constructor(
     private readonly store: SaveStore,
     /** 使ったポケモン（data/game/playables.json のキー） */
     private readonly pokemon: string,
+    /** コインの入り方（省略するとコインは入らない。テスト用） */
+    private readonly shop: ShopConfig | null = null,
   ) {}
 
   private count(key: string, n = 1): void {
@@ -51,9 +61,18 @@ export class RunRecorder {
           }
           this.count(`defeated.${species}`);
           if (rank !== 'normal') this.count(`bossDefeated.${species}`);
-          if (rank === 'midboss') this.count('midbossKills');
-          if (rank === 'boss') this.count('bossKills');
-          if (rank === 'legendary') this.count('legendaryKills');
+          if (rank === 'midboss') {
+            this.count('midbossKills');
+            this.runMidbosses++;
+          }
+          if (rank === 'boss') {
+            this.count('bossKills');
+            this.runBosses++;
+          }
+          if (rank === 'legendary') {
+            this.count('legendaryKills');
+            this.runLegendary++;
+          }
           break;
         }
         case 'evolved':
@@ -102,7 +121,20 @@ export class RunRecorder {
     }
     this.commit(world);
     this.finished = true;
+    // コイン（01_game_design.md 8.3。失敗・切断でも、そこまでの分をもらえる）
+    this.coinsEarned = this.shop
+      ? coinsForRun(this.shop, {
+          seconds: elapsedSeconds(world),
+          kills: this.runKills,
+          midbosses: this.runMidbosses,
+          bosses: this.runBosses,
+          clear,
+          legendaryWon: this.runLegendary > 0,
+        })
+      : 0;
     this.store.update((d) => {
+      d.coins += this.coinsEarned;
+      if (this.coinsEarned > 0) d.stats.coinsEarned = (d.stats.coinsEarned ?? 0) + this.coinsEarned;
       maxStat(d, 'bestKills', this.runKills);
       maxStat(d, 'bestLevel', world.level);
       maxStat(d, 'longestSeconds', Math.floor(elapsedSeconds(world)));

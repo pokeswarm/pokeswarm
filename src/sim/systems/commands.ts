@@ -3,7 +3,7 @@ import type { HitEffect } from '../events';
 import { currentWaveIndex, findEnemyIndex, findPlayer, type World } from '../world';
 import { breakOnDamage, damageTakenMultiplier } from './status';
 import { confirmPickup } from './gems';
-import { addXp, applyOffer, chooseUpgrade, mirrorLevelUp, rerollUpgrades, skipUpgrade } from './leveling';
+import { addXp, applyOffer, banUpgrade, chooseUpgrade, mirrorLevelUp, rerollUpgrades, skipUpgrade } from './leveling';
 import { addHazard, endRun } from './stage';
 import { applyRevive } from './health';
 
@@ -104,6 +104,9 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         break;
       case 'skipUpgrade':
         skipUpgrade(world, cmd.playerId);
+        break;
+      case 'banUpgrade':
+        banUpgrade(world, cmd.playerId, cmd.index);
         break;
       case 'levelUpState':
         if (world.role === 'guest') {

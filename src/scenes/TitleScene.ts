@@ -24,6 +24,7 @@ export class TitleScene extends Phaser.Scene {
       if (firebaseOptionsFromEnv()) this.add.text(width / 2, height * 0.7 + 44, t('title.coop'), { fontFamily: 'sans-serif', fontSize: '18px', color: '#cfd8dc' }).setOrigin(0.5);
       if (firebaseOptionsFromEnv()) this.add.text(width / 2, height * 0.7 + 74, t('title.friends'), { fontFamily: 'sans-serif', fontSize: '18px', color: '#cfd8dc' }).setOrigin(0.5);
       this.add.text(width / 2, height * 0.7 + 104, t('title.achievements'), { fontFamily: 'sans-serif', fontSize: '18px', color: '#cfd8dc' }).setOrigin(0.5);
+      this.add.text(width / 2, height * 0.7 + 134, t('title.shop'), { fontFamily: 'sans-serif', fontSize: '18px', color: '#cfd8dc' }).setOrigin(0.5);
     };
     layout();
     this.scale.on('resize', layout);
@@ -41,6 +42,7 @@ export class TitleScene extends Phaser.Scene {
     if (firebaseOptionsFromEnv()) this.input.keyboard?.once('keydown-C', () => this.scene.start('lobby', { mode: 'host' }));
     if (firebaseOptionsFromEnv()) this.input.keyboard?.once('keydown-F', () => this.scene.start('friends'));
     this.input.keyboard?.once('keydown-A', () => this.scene.start('achievements'));
+    this.input.keyboard?.once('keydown-S', () => this.scene.start('shop'));
     session.setPresence('menu');
   }
 }

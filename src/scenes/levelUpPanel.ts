@@ -102,14 +102,19 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
 /**
  * レベルアップの選択画面（DOM。見た目の作り込みはフェーズ4）。
  * 画面の横幅いっぱいに、大きなカードを横に並べる。数字キー・クリックで選び、R でリロール、X で見送る。
+ * B で除外のモードに入り、次に押した番号（クリック）の候補を除外する（派生・固有技は除外できない）。Esc でやめる。
  */
 export class LevelUpPanel {
   private readonly root: HTMLDivElement;
   private shownKey = '';
   private onKey: ((ev: KeyboardEvent) => void) | null = null;
+  /** 除外のモード（次に選んだ候補を除外する） */
+  private banning = false;
+  /** 最後に出した内容（除外のモードの切り替えで作り直すため） */
+  private last: { level: number; offers: OfferText[]; rerolls: number; secondsLeft: number; bans: number } | null = null;
 
   constructor(
-    private readonly handlers: { choose: (index: number) => void; reroll: () => void; skip: () => void },
+    private readonly handlers: { choose: (index: number) => void; reroll: () => void; skip: () => void; ban: (index: number) => void },
   ) {
     this.root = document.createElement('div');
     Object.assign(this.root.style, {
@@ -130,8 +135,10 @@ export class LevelUpPanel {
   }
 
   /** 毎フレーム呼ぶ。内容が変わったときだけ作り直す */
-  show(level: number, offers: OfferText[], rerolls: number, secondsLeft: number): void {
-    const key = JSON.stringify([level, offers, rerolls, secondsLeft]);
+  show(level: number, offers: OfferText[], rerolls: number, secondsLeft: number, bans = 0): void {
+    this.last = { level, offers, rerolls, secondsLeft, bans };
+    if (bans <= 0) this.banning = false;
+    const key = JSON.stringify([level, offers, rerolls, secondsLeft, bans, this.banning]);
     if (key === this.shownKey) return;
     this.shownKey = key;
 
@@ -142,15 +149,16 @@ export class LevelUpPanel {
     title.textContent = t('levelUp.title', { level });
     const timer = document.createElement('div');
     timer.style.cssText = 'opacity:0.85';
-    timer.textContent = `${t('levelUp.timeLeft', { seconds: secondsLeft })}　${t('levelUp.hint')}`;
+    timer.textContent = `${t('levelUp.timeLeft', { seconds: secondsLeft })}　${t(this.banning ? 'levelUp.banHint' : 'levelUp.hint')}`;
     header.append(title, timer);
 
     const row = document.createElement('div');
     row.style.cssText = 'display:flex;gap:2vw;align-items:stretch';
     offers.forEach((o, i) => {
       const card = document.createElement('button');
-      const border = o.special ? '#ffb300' : o.evolvable ? '#4fc3f7' : '#4a7a4a';
-      const bg = o.special ? '#3d2a08' : '#162416';
+      // 除外のモードでは、除外できるカードを赤く、できないカードを薄くする
+      const border = this.banning ? (o.special ? '#4a7a4a' : '#ef5350') : o.special ? '#ffb300' : o.evolvable ? '#4fc3f7' : '#4a7a4a';
+      const bg = this.banning && !o.special ? '#3a1414' : o.special ? '#3d2a08' : '#162416';
       card.style.cssText = `flex:1 1 0;min-width:0;min-height:30vh;padding:18px;border-radius:14px;border:2px solid ${border};background:${bg};color:#fff;font:inherit;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:8px;overflow:hidden`;
       const top = document.createElement('div');
       top.style.cssText = 'display:flex;justify-content:space-between;gap:8px;font-size:14px;opacity:0.85';
@@ -172,7 +180,8 @@ export class LevelUpPanel {
         badge.textContent = t('levelUp.evolvable');
         card.append(badge);
       }
-      card.onclick = () => this.handlers.choose(i);
+      if (this.banning && o.special) card.style.opacity = '0.4';
+      card.onclick = () => this.pick(i);
       row.append(card);
     });
 
@@ -185,8 +194,13 @@ export class LevelUpPanel {
     const skip = document.createElement('button');
     skip.textContent = t('levelUp.skip');
     skip.onclick = () => this.handlers.skip();
-    for (const b of [reroll, skip]) b.style.cssText = 'flex:1;padding:10px;border-radius:8px;cursor:pointer;font:inherit';
-    footer.append(reroll, skip);
+    const ban = document.createElement('button');
+    ban.textContent = t('levelUp.ban', { count: bans });
+    ban.disabled = bans <= 0;
+    ban.onclick = () => this.toggleBan();
+    for (const b of [reroll, skip, ban]) b.style.cssText = 'flex:1;padding:10px;border-radius:8px;cursor:pointer;font:inherit';
+    if (this.banning) ban.style.outline = '3px solid #ef5350';
+    footer.append(reroll, skip, ban);
 
     this.root.replaceChildren(header, row, footer);
     this.root.style.display = 'block';
@@ -195,7 +209,9 @@ export class LevelUpPanel {
         // キーを押したまま開いたときの自動の繰り返しで、勝手に選ばれないようにする
         if (ev.repeat) return;
         const n = Number(ev.key);
-        if (n >= 1 && n <= 9) this.handlers.choose(n - 1);
+        if (n >= 1 && n <= 9) this.pick(n - 1);
+        else if (ev.key === 'b' || ev.key === 'B') this.toggleBan();
+        else if (ev.key === 'Escape' && this.banning) this.toggleBan();
         else if (ev.key === 'r' || ev.key === 'R') this.handlers.reroll();
         // 見送るは移動キー（WASD）と重ならない X
         else if (ev.key === 'x' || ev.key === 'X') this.handlers.skip();
@@ -204,7 +220,27 @@ export class LevelUpPanel {
     }
   }
 
+  /** 候補を選ぶ。除外のモードなら除外する（派生・固有技は除外できない） */
+  private pick(index: number): void {
+    if (!this.banning) {
+      this.handlers.choose(index);
+      return;
+    }
+    const offer = this.last?.offers[index];
+    if (!offer || offer.special) return;
+    this.banning = false;
+    this.handlers.ban(index);
+  }
+
+  private toggleBan(): void {
+    if (!this.last || this.last.bans <= 0) return;
+    this.banning = !this.banning;
+    const l = this.last;
+    this.show(l.level, l.offers, l.rerolls, l.secondsLeft, l.bans);
+  }
+
   hide(): void {
+    this.banning = false;
     if (this.root.style.display === 'none') return;
     this.root.style.display = 'none';
     this.shownKey = '';

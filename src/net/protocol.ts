@@ -15,8 +15,8 @@ export type NetMessage =
   | { t: 'lu'; s: LevelUpSnapshot | null; r: [number, number][] }
   /** ホストが確定した選択（ホスト→ゲスト） */
   | { t: 'ua'; i: number; o: UpgradeOffer }
-  /** 選択の要望（ゲスト→ホスト）: c 選ぶ（n は候補の番号）・s 見送る・r リロール */
-  | { t: 'rq'; k: 'c' | 's' | 'r'; n: number }
+  /** 選択の要望（ゲスト→ホスト）: c 選ぶ・b 除外（n は候補の番号）・s 見送る・r リロール */
+  | { t: 'rq'; k: 'c' | 's' | 'r' | 'b'; n: number }
   /** ボス・伝説の範囲技の予告（ホスト→ゲスト）: [技の番号, x, y, 向きx, 向きy, 突進する敵の id（無ければ -1）, ...] */
   | { t: 'hz'; e: number[] }
   /** 中ボス・ボス・伝説の HP と位置（ホスト→ゲスト）: [id, HP, 最大HP, x, y, ...] */

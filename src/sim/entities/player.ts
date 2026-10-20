@@ -64,6 +64,11 @@ export interface Player {
   down: boolean;
   /** リロール権 */
   rerolls: number;
+  /** フレンドリィショップの永続強化の効果（ランの間は変わらない。持ち物・パッシブと一緒に足す） */
+  readonly permanent: Modifiers | null;
+  /** 候補の除外（BAN）の残り回数と、除外したもの（"move:番号" など。そのランでは二度と候補に出ない） */
+  bans: number;
+  readonly banned: Set<string>;
 }
 
 export interface PlayerInit {
@@ -82,6 +87,10 @@ export interface PlayerInit {
   species?: number;
   /** 効果の合計の初期値（タイプの数に合わせた空のもの） */
   mods: Modifiers;
+  /** 永続強化の効果（無ければ null） */
+  permanent?: Modifiers | null;
+  /** 候補の除外の回数 */
+  bans?: number;
 }
 
 export function createPlayer(init: PlayerInit): Player {
@@ -118,5 +127,8 @@ export function createPlayer(init: PlayerInit): Player {
     specialPower: 1,
     defense: 0,
     down: false,
+    permanent: init.permanent ?? null,
+    bans: init.bans ?? 0,
+    banned: new Set(),
   };
 }

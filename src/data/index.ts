@@ -17,6 +17,7 @@ import stageJson from '../../data/game/stage.json';
 import saveJson from '../../data/game/save.json';
 import achievementsJson from '../../data/game/achievements.json';
 import unlocksJson from '../../data/game/unlocks.json';
+import shopJson from '../../data/game/shop.json';
 import ja from '../i18n/ja.json';
 import en from '../i18n/en.json';
 import spriteRenderJson from '../../data/render/sprites.json';
@@ -54,6 +55,7 @@ import {
   saveConfigSchema,
   achievementsConfigSchema,
   unlocksConfigSchema,
+  shopConfigSchema,
   statsConfigSchema,
   statusConfigSchema,
 } from './schema';
@@ -84,6 +86,7 @@ export const stageConfig = load('game/stage.json', stageConfigSchema, stageJson)
 export const saveConfig = load('game/save.json', saveConfigSchema, saveJson);
 export const achievementsConfig = load('game/achievements.json', achievementsConfigSchema, achievementsJson);
 export const unlocksConfig = load('game/unlocks.json', unlocksConfigSchema, unlocksJson);
+export const shopConfig = load('game/shop.json', shopConfigSchema, shopJson);
 export const statusConfig = load('game/status.json', statusConfigSchema, statusJson);
 export const pickupConfig = load('game/pickups.json', pickupConfigSchema, pickupsJson);
 export const spriteRender = load('render/sprites.json', spriteRenderSchema, spriteRenderJson);
@@ -200,4 +203,13 @@ for (const u of unlocksConfig.unlocks) {
       check(!by, `data/game/spawn.json の時間帯 ${i + 1} の "${id}" は、ボスかスウォームの "${by}"（またはその進化前）なので雑魚に出せません`);
     }
   });
+}
+
+// ショップの強化は、効果（perLevel）か増える回数（grants）のどちらか1つ。名前と説明は翻訳ファイルに
+for (const u of shopConfig.upgrades) {
+  check(!!u.perLevel !== !!u.grants, `data/game/shop.json の "${u.id}" は perLevel か grants のどちらか1つを書いてください`);
+  for (const [lang, messages] of [['ja', ja], ['en', en]] as const) {
+    const m = messages as Record<string, string>;
+    check(!!m[`shop.${u.id}.name`] && !!m[`shop.${u.id}.desc`], `ショップの強化 "${u.id}" の名前・説明が src/i18n/${lang}.json にありません`);
+  }
 }

@@ -49,7 +49,7 @@ export class SyncSession {
   }
 
   /** ゲスト: レベルアップの選択（選ぶ・見送る・リロール）をホストへ頼む */
-  requestUpgrade(kind: 'c' | 's' | 'r', index = 0): void {
+  requestUpgrade(kind: 'c' | 's' | 'r' | 'b', index = 0): void {
     this.requests.push({ t: 'rq', k: kind, n: index });
   }
 
@@ -279,6 +279,7 @@ export class SyncSession {
           if (host) {
             if (m.k === 'c') cmds.push({ type: 'chooseUpgrade', playerId: from, index: m.n });
             else if (m.k === 's') cmds.push({ type: 'skipUpgrade', playerId: from });
+            else if (m.k === 'b') cmds.push({ type: 'banUpgrade', playerId: from, index: m.n });
             else cmds.push({ type: 'rerollUpgrades', playerId: from });
           }
           break;

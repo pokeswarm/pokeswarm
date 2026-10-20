@@ -813,6 +813,33 @@ export type ItemsConfig = z.infer<typeof itemsConfigSchema>;
 export const passivesConfigSchema = z.object({ passives: z.record(z.string(), upgradeDefSchema) });
 export type PassivesConfig = z.infer<typeof passivesConfigSchema>;
 
+/**
+ * フレンドリィショップ（永続強化。01_game_design.md 8.3）。少し有利になる程度にとどめる。
+ * - coins: ラン終了時のコイン（生きていた秒数・自分が倒した数ごと、中ボス・四天王（全員）、クリア、伝説）
+ * - upgrades: perLevel はパッシブと同じ形の効果。grants は効果の代わりに増える回数（復活・リロール・候補の除外）
+ *   費用は baseCost × 次のレベル。名前と説明は翻訳ファイルの shop.<id>.name・desc
+ */
+export const shopConfigSchema = z.object({
+  coins: z.object({
+    perSecondsSurvived: z.number().positive(),
+    perKills: z.number().positive(),
+    midboss: z.number().nonnegative(),
+    boss: z.number().nonnegative(),
+    clear: z.number().nonnegative(),
+    legendary: z.number().nonnegative(),
+  }),
+  upgrades: z.array(
+    z.object({
+      id: z.string().min(1),
+      maxLevel: z.number().int().positive(),
+      baseCost: z.number().int().positive(),
+      perLevel: modifierSchema.optional(),
+      grants: z.enum(['revives', 'rerolls', 'bans']).optional(),
+    }),
+  ),
+});
+export type ShopConfig = z.infer<typeof shopConfigSchema>;
+
 /** 派生（技 + 持ち物 → 派生技）と固有技（派生技 + 持ち物 → 固有技。その系統だけ） */
 export const derivationsConfigSchema = z.object({
   derivations: z.array(z.object({ from: z.string(), item: z.string(), to: z.string() })),

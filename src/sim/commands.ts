@@ -118,6 +118,13 @@ export interface RerollUpgradesCommand {
   readonly playerId: PlayerId;
 }
 
+/** 候補を除外する（BAN。index は候補の並び） */
+export interface BanUpgradeCommand {
+  readonly type: 'banUpgrade';
+  readonly playerId: PlayerId;
+  readonly index: number;
+}
+
 /** 見送る（リロール権 +1） */
 export interface SkipUpgradeCommand {
   readonly type: 'skipUpgrade';
@@ -130,8 +137,9 @@ export interface LevelUpSnapshot {
   readonly ticksLeft: number;
   readonly offers: readonly (readonly [PlayerId, readonly UpgradeOffer[]])[];
   readonly done: readonly PlayerId[];
-  /** プレイヤーごとのリロール権 */
+  /** プレイヤーごとのリロール権・除外の回数 */
   readonly rerolls: readonly (readonly [PlayerId, number])[];
+  readonly bans: readonly (readonly [PlayerId, number])[];
 }
 
 /** ゲスト: ホストのレベルアップの選択の状態に合わせる */
@@ -221,6 +229,7 @@ export type InputCommand =
   | ChooseUpgradeCommand
   | RerollUpgradesCommand
   | SkipUpgradeCommand
+  | BanUpgradeCommand
   | RetireEnemyCommand
   | CorrectEnemiesCommand
   | LevelUpStateCommand

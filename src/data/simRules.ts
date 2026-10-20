@@ -1,5 +1,5 @@
 import { buildTypeChart, resolveMoveLevels, type SimMoveDef } from '../sim/moves';
-import { buildXpTable, resolveModifiers, type SimUpgradeDef } from '../sim/upgrades';
+import { addModifiers, buildXpTable, emptyModifiers, resolveModifiers, type Modifiers, type SimUpgradeDef } from '../sim/upgrades';
 import type { SimEvolution, SimSpecies } from '../sim/species';
 import type { SimRules } from '../sim/rules';
 import {
@@ -13,6 +13,7 @@ import {
   passivesConfig,
   pickupConfig,
   playablesConfig,
+  shopConfig,
   spawnConfig,
   stageConfig,
   statsConfig,
@@ -106,6 +107,18 @@ export function playableLoadout(
     line: playablesConfig.pokemon[pokemon] ? pokemon : playablesConfig.default,
     species: rules.species.findIndex((s) => s.key === (playablesConfig.pokemon[pokemon] ? pokemon : playablesConfig.default)),
   };
+}
+
+/** 永続強化のレベルから、プレイヤーに足す効果を作る（ショップの perLevel × レベル）。何も無ければ null */
+export function permanentModifiers(rules: SimRules, levels: Readonly<Record<string, number>>): Modifiers | null {
+  let out: Modifiers | null = null;
+  for (const def of shopConfig.upgrades) {
+    const level = Math.min(levels[def.id] ?? 0, def.maxLevel);
+    if (!def.perLevel || level <= 0) continue;
+    out ??= emptyModifiers(rules.types.names.length);
+    addModifiers(out, resolveModifiers(def.perLevel, rules.types.names), level);
+  }
+  return out;
 }
 
 /** PokeAPI 由来の名前を、今の言語で取り出す */

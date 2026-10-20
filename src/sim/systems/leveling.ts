@@ -91,6 +91,7 @@ export function levelUpSnapshot(world: World): LevelUpSnapshot | null {
     offers: [...lu.offers.entries()],
     done: [...lu.done],
     rerolls: world.players.map((p) => [p.id, p.rerolls] as const),
+    bans: world.players.map((p) => [p.id, p.bans] as const),
   };
 }
 
@@ -113,6 +114,10 @@ export function mirrorLevelUp(world: World, s: LevelUpSnapshot | null): void {
   for (const [id, n] of s.rerolls) {
     const p = world.players.find((x) => x.id === id);
     if (p) p.rerolls = n;
+  }
+  for (const [id, n] of s.bans) {
+    const p = world.players.find((x) => x.id === id);
+    if (p) p.bans = n;
   }
   if (opening) world.events.push({ type: 'levelUp', level: s.level });
 }
@@ -148,6 +153,55 @@ export function rerollUpgrades(world: World, playerId: PlayerId): void {
   const others = new Set<number>();
   for (const [id, list] of lu.offers) if (id !== playerId) for (const o of list) if (o.kind === 'itemNew') others.add(o.item);
   lu.offers.set(playerId, makeOffers(world, p, others));
+}
+
+/**
+ * 候補の除外（BAN。01_game_design.md 8.3）の対象を表す名前。技・持ち物・パッシブごと（新しく覚える・強化の両方）。
+ * 派生・固有技は除外できない（null）
+ */
+export function banKey(p: Player, offer: UpgradeOffer): string | null {
+  switch (offer.kind) {
+    case 'moveNew':
+      return `move:${offer.move}`;
+    case 'moveUp':
+      return `move:${p.moves[offer.slot]?.move}`;
+    case 'itemNew':
+      return `item:${offer.item}`;
+    case 'itemUp':
+      return `item:${p.items[offer.slot]?.item}`;
+    case 'passiveNew':
+      return `passive:${offer.passive}`;
+    case 'passiveUp':
+      return `passive:${p.passives[offer.slot]?.passive}`;
+    default:
+      return null;
+  }
+}
+
+/**
+ * 候補を除外する: そのランでは二度と候補に出さず、その候補だけ引き直す（除外の回数を1つ使う）。
+ * ほかの候補はそのまま。代わりが無ければ、その候補は消える
+ */
+export function banUpgrade(world: World, playerId: PlayerId, index: number): void {
+  if (world.role === 'guest') return;
+  const lu = world.levelUp;
+  const p = world.players.find((x) => x.id === playerId);
+  const list = lu?.offers.get(playerId);
+  if (!lu || !p || !list || lu.done.has(playerId) || p.bans <= 0) return;
+  const offer = list[index];
+  const key = offer ? banKey(p, offer) : null;
+  if (!key) return;
+  p.bans--;
+  p.banned.add(key);
+  // 代わり: 今の候補・ほかの人に出ている持ち物と重ならないもの
+  const others = new Set<number>();
+  for (const [id, l] of lu.offers) if (id !== playerId) for (const o of l) if (o.kind === 'itemNew') others.add(o.item);
+  const same = (a: UpgradeOffer, b: UpgradeOffer): boolean => JSON.stringify(a) === JSON.stringify(b);
+  const replacement = makeOffers(world, p, others).find((o) => !list.some((x) => same(x, o)));
+  const next = [...list];
+  if (replacement) next[index] = replacement;
+  else next.splice(index, 1);
+  lu.offers.set(playerId, next);
 }
 
 /** 派生していない技（タイプの技）かどうか。派生先・固有技は候補に直接は出さない */
@@ -203,6 +257,11 @@ export function makeOffers(world: World, p: Player, excludeItems: ReadonlySet<nu
     else if (p.passives[owned]!.level < def.maxLevel) pool.push({ kind: 'passiveUp', slot: owned });
   });
 
+  // 除外したものは出さない
+  for (let k = pool.length - 1; k >= 0; k--) {
+    const key = banKey(p, pool[k]!);
+    if (key && p.banned.has(key)) pool.splice(k, 1);
+  }
   // 必ず出すものを先に、残りは乱数で選ぶ（シード付きの乱数なので再現できる）
   const out = guaranteed.slice(0, count);
   while (out.length < count && pool.length > 0) {
@@ -250,6 +309,7 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
  */
 export function recomputeModifiers(world: World, p: Player): void {
   const mods = emptyModifiers(world.rules.types.names.length);
+  if (p.permanent) addModifiers(mods, p.permanent, 1);
   for (const it of p.items) addModifiers(mods, world.rules.items[it.item]!.perLevel, it.level);
   for (const ps of p.passives) addModifiers(mods, world.rules.passives[ps.passive]!.perLevel, ps.level);
   p.mods = mods;

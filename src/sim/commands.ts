@@ -66,6 +66,37 @@ export interface RetireEnemyCommand {
   readonly id: number;
 }
 
+/** ゲスト: ホストが作った経験値の玉 */
+export interface SpawnGemCommand {
+  readonly type: 'spawnGem';
+  readonly id: number;
+  readonly x: number;
+  readonly y: number;
+  readonly value: number;
+}
+
+/** ゲスト: ホストが玉にまとめた（value はまとめた後の値） */
+export interface MergeGemCommand {
+  readonly type: 'mergeGem';
+  readonly id: number;
+  readonly value: number;
+}
+
+/** ホスト: ゲストが玉に触れた */
+export interface RequestPickupCommand {
+  readonly type: 'requestPickup';
+  readonly id: number;
+  readonly by: PlayerId;
+}
+
+/** ゲスト: ホストが玉の取得を確定した */
+export interface CollectGemCommand {
+  readonly type: 'collectGem';
+  readonly id: number;
+  readonly by: PlayerId;
+  readonly value: number;
+}
+
 /** ゲスト: ホストによる敵の位置の補正。[id, x, y, id, x, y, ...] */
 export interface CorrectEnemiesCommand {
   readonly type: 'correctEnemies';
@@ -79,5 +110,9 @@ export type InputCommand =
   | DamageEnemyCommand
   | KillEnemyCommand
   | AffectEnemyCommand
+  | SpawnGemCommand
+  | MergeGemCommand
+  | RequestPickupCommand
+  | CollectGemCommand
   | RetireEnemyCommand
   | CorrectEnemiesCommand;

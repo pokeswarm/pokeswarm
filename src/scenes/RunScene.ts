@@ -10,6 +10,7 @@ import {
   spawnConfig,
   spriteRender,
   statusConfig,
+  pickupConfig,
 } from '../data';
 import type { SpriteAnims } from '../data/schema';
 import { t } from '../i18n';
@@ -56,6 +57,7 @@ export class RunScene extends Phaser.Scene {
   private keyboard!: KeyboardInput;
   private playerViews = new Map<PlayerId, PlayerView>();
   private enemyView!: PooledCircles;
+  private gemView!: PooledCircles;
   /** 敵をスプライトで描く（読み込み済みの種類だけ。まだの種類は円で描く） */
   private enemySpriteView!: EnemySprites;
   private streamer!: SpriteStreamer;
@@ -98,7 +100,7 @@ export class RunScene extends Phaser.Scene {
 
   create(): void {
     if (this.playerSprite) registerPokemonAnimations(this, this.playerSprite);
-    const rules = applyDebugOverrides({ enemies: enemiesConfig, spawn: spawnConfig, attack: attackConfig, status: statusConfig }, window.location.search);
+    const rules = applyDebugOverrides({ enemies: enemiesConfig, spawn: spawnConfig, attack: attackConfig, status: statusConfig, pickups: pickupConfig }, window.location.search);
     const role: SimRole = this.net?.role ?? 'solo';
     this.localId = role === 'guest' ? GUEST_PLAYER_ID : HOST_PLAYER_ID;
     this.sim = new Simulation({
@@ -117,6 +119,7 @@ export class RunScene extends Phaser.Scene {
         radius: playerConfig.radius,
         moveSpeed: playerConfig.moveSpeed,
         remote: id !== this.localId,
+        pickupRange: playerConfig.pickupRange,
       });
       const view = new PlayerView(this, p, placeholderRender, spriteRender, this.playerSprite);
       view.container.setDepth(id === this.localId ? 1.1 : 1);
@@ -130,6 +133,7 @@ export class RunScene extends Phaser.Scene {
     this.keyboard = new KeyboardInput(this);
     this.ground = new GroundGrid(this, placeholderRender);
     this.enemyView = new PooledCircles(this, 0);
+    this.gemView = new PooledCircles(this, -1);
     this.streamer = new SpriteStreamer(
       this,
       rules.enemies.kinds.map((k) => k.sprite),
@@ -257,6 +261,17 @@ export class RunScene extends Phaser.Scene {
     const view = { left: cx - halfW, top: cy - halfH, right: cx + halfW, bottom: cy + halfH };
     const enemyColor = hexColor(placeholderRender.enemyColor);
     const e = world.enemies;
+    const gems = world.gems;
+    const gemColor = hexColor(placeholderRender.gemColor);
+    const bigGemColor = hexColor(placeholderRender.bigGemColor);
+    this.gemView.update(
+      gems,
+      alpha,
+      view,
+      (i) => (gems.value[i]! >= pickupConfig.bigGemValue ? bigGemColor : gemColor),
+      // 拾ってホストの確定を待っている玉は、自分の画面では消して見せる
+      (i) => gems.pending[i] === 0,
+    );
     this.streamer.update(world);
     const drawn =
       this.enemySpriteView.update(e, alpha, view, (i) => this.statusTint(i)) +
@@ -275,6 +290,7 @@ export class RunScene extends Phaser.Scene {
       t('debug.fps', { fps: this.game.loop.actualFps.toFixed(1), steps: this.lastSteps }),
       t('debug.enemies', { count: e.count, cap: enemyCap(world), drawn }),
       t('debug.combat', { kills: world.stats.kills, projectiles: world.projectiles.count }),
+      t('debug.xp', { xp: Math.round(world.xp), gems: gems.count }),
       t('debug.simTime', { ms: this.simMs.toFixed(3) }),
       t('debug.frameTime', { ms: this.frameMs.toFixed(2) }),
       t('debug.enemySprites', { wave: currentWaveIndex(world) + 1, count: sprites.count, mb: (sprites.gpuBytes / 1048576).toFixed(2) }),

@@ -12,8 +12,8 @@ const rate = { playerStateIntervalTicks: 1, correctionIntervalTicks: 30 };
 function makePeer(role: SimRole, localId: number, remoteId: number, attack: Partial<SimRules['attack']> = {}) {
   const rules = testRules({ spawn: { spawnPerSecond: 30, capGlobal: 200, capPerPlayer: 100 }, attack: { range: 300, ...attack } });
   const sim = new Simulation({ tickRate: 30, seed: 7, rules, role, localPlayerId: localId });
-  sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150, remote: localId !== 1 });
-  sim.addPlayer({ id: 2, x: 60, y: 0, radius: 12, moveSpeed: 150, remote: localId !== 2 });
+  sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150, remote: localId !== 1, pickupRange: 80 });
+  sim.addPlayer({ id: 2, x: 60, y: 0, radius: 12, moveSpeed: 150, remote: localId !== 2, pickupRange: 80 });
   const session = new SyncSession(remoteId, rate, 30, () => 0);
   return { sim, session, inbox: [] as InputCommand[] };
 }
@@ -136,5 +136,15 @@ describe('ノックバック・状態異常の同期', () => {
       if (p) worst = Math.max(worst, Math.hypot(p[0] - guest.enemies.x[i]!, p[1] - guest.enemies.y[i]!));
     }
     expect(worst).toBeLessThan(80);
+  });
+});
+
+describe('経験値の玉の同期', () => {
+  it('経験値の合計がホストとゲストで一致し、玉の集まりも一致する', () => {
+    const { host, guest } = runPair(900, 3);
+    expect(host.xp).toBeGreaterThan(0);
+    expect(guest.xp).toBe(host.xp);
+    const ids = (w: World) => Array.from(w.gems.id.subarray(0, w.gems.count)).sort((a, b) => a - b);
+    expect(ids(guest)).toEqual(ids(host));
   });
 });

@@ -2,5 +2,6 @@
   "moveSpeed": 160,
   "radius": 12,
   "spawnX": 0,
-  "spawnY": 0
+  "spawnY": 0,
+  "pickupRange": 80
 }

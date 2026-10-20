@@ -22,9 +22,19 @@ export interface Player {
   moveSpeed: number;
   /** 仮の自動攻撃の残り待ち時間（秒） */
   attackCooldown: number;
+  /** 経験値の玉を吸い寄せ始める距離 */
+  pickupRange: number;
 }
 
-export function createPlayer(id: PlayerId, x: number, y: number, radius: number, moveSpeed: number, remote = false): Player {
+export function createPlayer(
+  id: PlayerId,
+  x: number,
+  y: number,
+  radius: number,
+  moveSpeed: number,
+  remote = false,
+  pickupRange = 0,
+): Player {
   return {
     id,
     remote,
@@ -41,5 +51,6 @@ export function createPlayer(id: PlayerId, x: number, y: number, radius: number,
     radius,
     moveSpeed,
     attackCooldown: 0,
+    pickupRange,
   };
 }

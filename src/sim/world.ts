@@ -1,5 +1,6 @@
 import type { PlayerId } from './commands';
 import { EnemyStore } from './entities/enemies';
+import { GemStore } from './entities/gems';
 import type { Player } from './entities/player';
 import { ProjectileStore } from './entities/projectiles';
 import type { SimEvent } from './events';
@@ -29,6 +30,11 @@ export interface World {
   readonly players: Player[];
   readonly enemies: EnemyStore;
   readonly projectiles: ProjectileStore;
+  /** 経験値の玉 */
+  readonly gems: GemStore;
+  nextGemId: number;
+  /** 全員で共有する経験値の合計（ホストが確定する） */
+  xp: number;
   /** 敵の空間ハッシュ（毎回作り直す） */
   readonly enemyHash: SpatialHash;
   readonly rng: Rng;
@@ -64,6 +70,10 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     players: [],
     enemies: new EnemyStore(capacity, rules.status.kinds.length),
     statusKinds: rules.status.kinds,
+    // ゲストは、拾ってホストの確定を待っている玉の分だけホストより多くなりうるので余裕を持たせる
+    gems: new GemStore(role === 'guest' ? rules.pickups.maxGems * 2 : rules.pickups.maxGems),
+    nextGemId: 1,
+    xp: 0,
     projectiles: new ProjectileStore(rules.attack.maxProjectiles, rules.attack.hitMemory),
     enemyHash: new SpatialHash(rules.spawn.spatialCellSize, capacity),
     rng: new Rng(seed),

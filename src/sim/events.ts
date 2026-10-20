@@ -55,10 +55,45 @@ export interface EnemyRetiredEvent {
   readonly id: number;
 }
 
+/** ホスト: 経験値の玉を作った（ゲストへ送る） */
+export interface GemSpawnedEvent {
+  readonly type: 'gemSpawned';
+  readonly id: number;
+  readonly x: number;
+  readonly y: number;
+  readonly value: number;
+}
+
+/** ホスト: 玉が多すぎるので、新しい経験値を古い玉にまとめた（ゲストへ送る） */
+export interface GemMergedEvent {
+  readonly type: 'gemMerged';
+  readonly id: number;
+  readonly value: number;
+}
+
+/** ホスト: 玉の取得を確定した（ゲストへ送る。経験値は全員で共有） */
+export interface GemCollectedEvent {
+  readonly type: 'gemCollected';
+  readonly id: number;
+  readonly by: PlayerId;
+  readonly value: number;
+}
+
+/** ゲスト: 自分が玉に触れた（ホストへ送り、ホストが先着で確定する） */
+export interface PickupRequestedEvent {
+  readonly type: 'pickupRequested';
+  readonly id: number;
+  readonly by: PlayerId;
+}
+
 export type SimEvent =
   | EnemyKilledEvent
   | ProjectileHitEvent
   | EnemySpawnedEvent
   | DamageDealtEvent
   | EnemyAffectedEvent
+  | GemSpawnedEvent
+  | GemMergedEvent
+  | GemCollectedEvent
+  | PickupRequestedEvent
   | EnemyRetiredEvent;

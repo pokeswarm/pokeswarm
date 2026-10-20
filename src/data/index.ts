@@ -8,6 +8,7 @@ import attackJson from '../../data/game/attack.json';
 import spriteRenderJson from '../../data/render/sprites.json';
 import networkJson from '../../data/game/network.json';
 import statusJson from '../../data/game/status.json';
+import pickupsJson from '../../data/game/pickups.json';
 import effectRecipesJson from '../../data/effects/recipes.json';
 import { resolveEffectRecipes } from './effects';
 import {
@@ -19,6 +20,7 @@ import {
   simulationConfigSchema,
   spawnConfigSchema,
   statusConfigSchema,
+  pickupConfigSchema,
   spriteRenderSchema,
 } from './schema';
 
@@ -37,6 +39,7 @@ export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enem
 export const spawnConfig = load('game/spawn.json', spawnConfigSchema, spawnJson);
 export const attackConfig = load('game/attack.json', attackConfigSchema, attackJson);
 export const statusConfig = load('game/status.json', statusConfigSchema, statusJson);
+export const pickupConfig = load('game/pickups.json', pickupConfigSchema, pickupsJson);
 
 // ファイルをまたぐ参照の検証
 if (attackConfig.status && !statusConfig.kinds.some((k) => k.id === attackConfig.status!.id)) {

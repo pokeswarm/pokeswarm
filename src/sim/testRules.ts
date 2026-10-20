@@ -1,7 +1,9 @@
 import type { SimRules } from './rules';
 
 /** テスト用の定義。data/ に依存させず、テストの意図が読めるように値を直接書く */
-export function testRules(overrides: { spawn?: Partial<SimRules['spawn']>; attack?: Partial<SimRules['attack']> } = {}): SimRules {
+export function testRules(
+  overrides: { spawn?: Partial<SimRules['spawn']>; attack?: Partial<SimRules['attack']>; pickups?: Partial<SimRules['pickups']> } = {},
+): SimRules {
   return {
     enemies: { kinds: [{ id: 'test', hp: 20, moveSpeed: 60, radius: 10 }] },
     spawn: {
@@ -38,5 +40,6 @@ export function testRules(overrides: { spawn?: Partial<SimRules['spawn']>; attac
         { id: 'defenseDown', damagePerSecond: 0, speedMultiplier: 1, damageTakenMultiplier: 2, color: '#888888' },
       ],
     },
+    pickups: { xpPerKill: 1, gemRadius: 6, maxGems: 50, magnetSpeed: 420, bigGemValue: 10, ...overrides.pickups },
   };
 }

@@ -7,6 +7,7 @@ import { moveEnemies, rebuildEnemyHash, separateEnemies } from './systems/enemyM
 import { movePlayers } from './systems/movement';
 import { spawnEnemies } from './systems/spawn';
 import { tickStatuses } from './systems/status';
+import { collectGems, dropGems, moveGems } from './systems/gems';
 import { createWorld, type SimRole, type World } from './world';
 
 export interface SimulationOptions {
@@ -27,6 +28,8 @@ export interface PlayerSpawn {
   moveSpeed: number;
   /** 別のブラウザが操作するプレイヤー */
   remote?: boolean;
+  /** 経験値の玉を吸い寄せ始める距離（省略時は 0） */
+  pickupRange?: number;
 }
 
 /**
@@ -41,7 +44,7 @@ export class Simulation {
   }
 
   addPlayer(spawn: PlayerSpawn): Player {
-    const p = createPlayer(spawn.id, spawn.x, spawn.y, spawn.radius, spawn.moveSpeed, spawn.remote ?? false);
+    const p = createPlayer(spawn.id, spawn.x, spawn.y, spawn.radius, spawn.moveSpeed, spawn.remote ?? false, spawn.pickupRange ?? 0);
     this.world.players.push(p);
     return p;
   }
@@ -58,6 +61,9 @@ export class Simulation {
     tickStatuses(w);
     playerAttacks(w);
     moveProjectiles(w);
+    dropGems(w);
+    moveGems(w);
+    collectGems(w);
     w.enemies.removeDead();
     w.tick++;
   }

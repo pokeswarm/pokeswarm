@@ -2,6 +2,7 @@ import type { InputCommand } from '../commands';
 import type { HitEffect } from '../events';
 import { findEnemyIndex, findPlayer, type World } from '../world';
 import { damageTakenMultiplier } from './status';
+import { confirmPickup } from './gems';
 
 export function applyCommands(world: World, commands: readonly InputCommand[]): void {
   const e = world.enemies;
@@ -61,6 +62,24 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
       case 'retireEnemy': {
         const i = findEnemyIndex(world, cmd.id);
         if (i !== -1) e.hp[i] = 0;
+        break;
+      }
+      case 'spawnGem':
+        world.gems.add(cmd.id, cmd.x, cmd.y, cmd.value, world.rules.pickups.gemRadius);
+        break;
+      case 'mergeGem': {
+        const g = world.gems.indexOf(cmd.id);
+        if (g !== -1) world.gems.value[g] = cmd.value;
+        break;
+      }
+      case 'requestPickup':
+        if (world.role === 'host') confirmPickup(world, cmd.id, cmd.by);
+        break;
+      case 'collectGem': {
+        // 経験値はホストが確定したものだけを足す（同じ玉を2回数えない）
+        const g = world.gems.indexOf(cmd.id);
+        if (g !== -1) world.gems.removeAt(g);
+        world.xp += cmd.value;
         break;
       }
       case 'correctEnemies': {

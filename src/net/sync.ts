@@ -57,6 +57,10 @@ export class SyncSession {
     const retired: number[] = [];
     const damages: number[] = [];
     const effects: number[] = [];
+    const gemSpawns: number[] = [];
+    const gemMerges: number[] = [];
+    const gemCollects: number[] = [];
+    const pickups: number[] = [];
     for (const ev of world.events) {
       switch (ev.type) {
         case 'enemySpawned':
@@ -71,6 +75,18 @@ export class SyncSession {
         case 'enemyAffected':
           if (role === 'host') effects.push(ev.enemyId, ev.by, round2(ev.kbx), round2(ev.kby), ev.kbTicks, ev.status, ev.statusTicks);
           break;
+        case 'gemSpawned':
+          if (role === 'host') gemSpawns.push(ev.id, round2(ev.x), round2(ev.y), ev.value);
+          break;
+        case 'gemMerged':
+          if (role === 'host') gemMerges.push(ev.id, ev.value);
+          break;
+        case 'gemCollected':
+          if (role === 'host') gemCollects.push(ev.id, ev.by, ev.value);
+          break;
+        case 'pickupRequested':
+          if (role === 'guest') pickups.push(ev.id, ev.by);
+          break;
         case 'damageDealt':
           if (role === 'guest') damages.push(ev.enemyId, ev.amount, ev.by, round2(ev.kbx), round2(ev.kby), ev.kbTicks, ev.status, ev.statusTicks);
           break;
@@ -83,6 +99,10 @@ export class SyncSession {
     if (retired.length) out.push({ t: 'rt', e: retired });
     if (damages.length) out.push({ t: 'd', e: damages });
     if (effects.length) out.push({ t: 'fx', e: effects });
+    if (gemSpawns.length) out.push({ t: 'g', e: gemSpawns });
+    if (gemMerges.length) out.push({ t: 'gm', e: gemMerges });
+    if (gemCollects.length) out.push({ t: 'gc', e: gemCollects });
+    if (pickups.length) out.push({ t: 'pr', e: pickups });
 
     if (role === 'host' && world.tick % this.rate.correctionIntervalTicks === 0 && world.enemies.count > 0) {
       const e = world.enemies;
@@ -147,6 +167,18 @@ export class SyncSession {
               cmds.push({ type: 'affectEnemy', id, by, kbx, kby, kbTicks, status, statusTicks });
             }
           }
+          break;
+        case 'g':
+          if (guest) for (let k = 0; k + 3 < m.e.length; k += 4) cmds.push({ type: 'spawnGem', id: m.e[k]!, x: m.e[k + 1]!, y: m.e[k + 2]!, value: m.e[k + 3]! });
+          break;
+        case 'gm':
+          if (guest) for (let k = 0; k + 1 < m.e.length; k += 2) cmds.push({ type: 'mergeGem', id: m.e[k]!, value: m.e[k + 1]! });
+          break;
+        case 'gc':
+          if (guest) for (let k = 0; k + 2 < m.e.length; k += 3) cmds.push({ type: 'collectGem', id: m.e[k]!, by: m.e[k + 1]!, value: m.e[k + 2]! });
+          break;
+        case 'pr':
+          if (host) for (let k = 0; k + 1 < m.e.length; k += 2) cmds.push({ type: 'requestPickup', id: m.e[k]!, by: m.e[k + 1]! });
           break;
         case 'c':
           if (guest) cmds.push({ type: 'correctEnemies', data: m.e });

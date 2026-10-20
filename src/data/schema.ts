@@ -24,6 +24,8 @@ export const playerConfigSchema = z.object({
   /** 1秒あたりの移動量（ピクセル相当のワールド単位） */
   moveSpeed: z.number().positive(),
   radius: z.number().positive(),
+  /** 経験値の玉を吸い寄せ始める距離（ステータス。パッシブ等で伸ばす） */
+  pickupRange: z.number().nonnegative(),
   spawnX: z.number(),
   spawnY: z.number(),
 });
@@ -36,6 +38,8 @@ export const placeholderRenderSchema = z.object({
   playerColor: colorString,
   playerFacingColor: colorString,
   enemyColor: colorString,
+  gemColor: colorString,
+  bigGemColor: colorString,
 });
 export type PlaceholderRenderConfig = z.infer<typeof placeholderRenderSchema>;
 
@@ -348,3 +352,18 @@ export const statusConfigSchema = z.object({
   kinds: z.array(statusKindSchema).min(1).max(255),
 });
 export type StatusConfig = z.infer<typeof statusConfigSchema>;
+
+// ---- 経験値の玉 ----
+
+export const pickupConfigSchema = z.object({
+  /** 雑魚1体が落とす経験値 */
+  xpPerKill: z.number().positive(),
+  gemRadius: z.number().positive(),
+  /** 玉の数の上限。超えたら新しい玉を作らず、一番古い玉に経験値をまとめる */
+  maxGems: z.number().int().positive(),
+  /** 吸い寄せられる速さ（ワールド単位/秒） */
+  magnetSpeed: z.number().positive(),
+  /** この経験値以上の玉は大きい玉として表示する（見た目だけ） */
+  bigGemValue: z.number().positive(),
+});
+export type PickupConfig = z.infer<typeof pickupConfigSchema>;

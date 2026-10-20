@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { effectRecipes, generated, networkConfig, placeholderRender, playerConfig, saveConfig, simulationConfig, spriteRender, stageConfig } from '../data';
+import { effectRecipes, generated, groundConfig, networkConfig, placeholderRender, playerConfig, saveConfig, simulationConfig, spriteRender, stageConfig } from '../data';
 import { buildSimRules, localName, playableLoadout } from '../data/simRules';
 import type { SpriteAnims } from '../data/schema';
 import { getLocale, t, tMaybe } from '../i18n';
@@ -7,7 +7,7 @@ import type { Room, RoomPlayer } from '../net/room';
 import { SyncSession } from '../net/sync';
 import { hexColor } from '../render/color';
 import { EffectRenderer } from '../render/effects/EffectRenderer';
-import { GroundGrid } from '../render/GroundGrid';
+import { GroundTiles, preloadGroundTiles } from '../render/GroundTiles';
 import { KeyboardInput } from '../render/KeyboardInput';
 import { PlayerView } from '../render/PlayerView';
 import { PooledCircles } from '../render/PooledCircles';
@@ -71,7 +71,7 @@ export class RunScene extends Phaser.Scene {
   private frameMs = 0;
   private statusColors: number[] = [];
   private effects!: EffectRenderer;
-  private ground!: GroundGrid;
+  private ground!: GroundTiles;
   private hud!: Phaser.GameObjects.Text;
   private lastSent: { dx: Axis; dy: Axis } = { dx: 0, dy: 0 };
   private lastSteps = 0;
@@ -139,6 +139,7 @@ export class RunScene extends Phaser.Scene {
   }
 
   preload(): void {
+    preloadGroundTiles(this, groundConfig);
     // ポケモン選択の画面で読み込み済みなら読み直さない
     if (this.playerSprite && !this.textures.exists(atlasKey(this.playerSprite.key))) preloadPokemonAtlas(this, this.playerSprite);
   }
@@ -203,7 +204,7 @@ export class RunScene extends Phaser.Scene {
 
     this.clock = new FixedStepClock(simulationConfig.tickRate, simulationConfig.maxTicksPerFrame);
     this.keyboard = new KeyboardInput(this);
-    this.ground = new GroundGrid(this, placeholderRender);
+    this.ground = new GroundTiles(this, groundConfig, elapsedSeconds(this.sim.world));
     this.enemyView = new PooledCircles(this, 0);
     this.gemView = new PooledCircles(this, -1);
     this.streamer = new SpriteStreamer(
@@ -644,7 +645,7 @@ export class RunScene extends Phaser.Scene {
     const cx = localView.container.x;
     const cy = localView.container.y;
     cam.centerOn(cx, cy);
-    this.ground.update(cam);
+    this.ground.update(cam, elapsedSeconds(world), deltaMs);
 
     const halfW = cam.width / 2 / cam.zoom;
     const halfH = cam.height / 2 / cam.zoom;

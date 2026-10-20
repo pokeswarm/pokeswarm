@@ -1,0 +1,22 @@
+{
+  "tileScale": 2,
+  "fadeSeconds": 2,
+  "tiles": {
+    "meadow": { "file": "map/kanto/meadow.png" },
+    "cave": { "file": "map/kanto/cave.png" },
+    "night_forest": { "file": "map/kanto/night_forest.png" },
+    "wasteland": { "file": "map/kanto/wasteland.png" },
+    "beach": { "file": "map/kanto/beach.png" },
+    "elite_hall": { "file": "map/kanto/elite_hall.png" }
+  },
+  "waves": [
+    { "startSeconds": 0, "tile": "meadow" },
+    { "startSeconds": 120, "tile": "cave" },
+    { "startSeconds": 240, "tile": "night_forest" },
+    { "startSeconds": 360, "tile": "wasteland" },
+    { "startSeconds": 480, "tile": "meadow" },
+    { "startSeconds": 600, "tile": "beach" },
+    { "startSeconds": 840, "tile": "cave" },
+    { "startSeconds": 1020, "tile": "elite_hall" }
+  ]
+}

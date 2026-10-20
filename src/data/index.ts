@@ -2,6 +2,7 @@ import type { z } from 'zod';
 import simulationJson from '../../data/game/simulation.json';
 import playerJson from '../../data/game/player.json';
 import placeholderJson from '../../data/render/placeholder.json';
+import groundJson from '../../data/render/ground.json';
 import enemiesJson from '../../data/game/enemies.json';
 import spawnJson from '../../data/game/spawn.json';
 import combatJson from '../../data/game/combat.json';
@@ -39,6 +40,7 @@ import {
   generatedMovesSchema,
   generatedPokemonSchema,
   generatedTypesSchema,
+  groundConfigSchema,
   movesConfigSchema,
   networkConfigSchema,
   pickupConfigSchema,
@@ -67,6 +69,7 @@ function load<T extends z.ZodType>(name: string, schema: T, raw: unknown): z.inf
 export const simulationConfig = load('game/simulation.json', simulationConfigSchema, simulationJson);
 export const playerConfig = load('game/player.json', playerConfigSchema, playerJson);
 export const placeholderRender = load('render/placeholder.json', placeholderRenderSchema, placeholderJson);
+export const groundConfig = load('render/ground.json', groundConfigSchema, groundJson);
 export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enemiesJson);
 export const spawnConfig = load('game/spawn.json', spawnConfigSchema, spawnJson);
 export const combatConfig = load('game/combat.json', combatConfigSchema, combatJson);
@@ -106,6 +109,12 @@ for (const wave of spawnConfig.waves) {
       `data/game/spawn.json の waves にある敵 "${kind}" が data/game/enemies.json にありません`,
     );
   }
+}
+for (const w of groundConfig.waves) {
+  check(
+    spawnConfig.waves.some((s) => s.startSeconds === w.startSeconds),
+    `data/render/ground.json の waves の startSeconds ${w.startSeconds} が data/game/spawn.json の waves にありません`,
+  );
 }
 for (const kind of enemiesConfig.kinds) {
   const species = kind.species ?? kind.id;

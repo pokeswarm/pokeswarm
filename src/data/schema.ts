@@ -33,8 +33,6 @@ export type PlayerConfig = z.infer<typeof playerConfigSchema>;
 
 export const placeholderRenderSchema = z.object({
   backgroundColor: colorString,
-  gridSize: z.number().int().positive(),
-  gridColor: colorString,
   playerColor: colorString,
   playerFacingColor: colorString,
   enemyColor: colorString,
@@ -42,6 +40,35 @@ export const placeholderRenderSchema = z.object({
   bigGemColor: colorString,
 });
 export type PlaceholderRenderConfig = z.infer<typeof placeholderRenderSchema>;
+
+/** マップの地面（繰り返しタイル）。時間帯（Wave）ごとに使うタイルをデータで切り替える */
+export const groundConfigSchema = z
+  .object({
+    /** タイル画像の1ドットを画面（ワールド）の何ピクセルで描くか。ポケモンのドット絵の拡大率にそろえる */
+    tileScale: z.number().positive(),
+    /** タイルが切り替わるとき、新しいタイルへ徐々に変える秒数（0 なら即座に切り替える） */
+    fadeSeconds: z.number().nonnegative(),
+    /** タイル ID → 画像（public/ からのパス） */
+    tiles: z.record(z.string(), z.object({ file: z.string() })),
+    /**
+     * 時間帯ごとのタイル。startSeconds の小さい順に並べ、最初は 0。
+     * startSeconds は data/game/spawn.json の waves のどれかと同じ値にする（書かなかった時間帯は前のタイルが続く）
+     */
+    waves: z.array(z.object({ startSeconds: z.number().nonnegative(), tile: z.string() })).min(1),
+  })
+  .refine((g) => g.waves[0]!.startSeconds === 0, { message: 'ground の waves の最初は startSeconds: 0' })
+  .refine((g) => g.waves.every((w, i) => i === 0 || w.startSeconds > g.waves[i - 1]!.startSeconds), {
+    message: 'ground の waves は startSeconds の小さい順に並べる',
+  })
+  .refine((g) => g.waves.every((w) => w.tile in g.tiles), { message: 'ground の waves に tiles にないタイル ID がある' });
+export type GroundConfig = z.infer<typeof groundConfigSchema>;
+
+/** 経過秒数のときに使うタイル ID */
+export function groundTileAt(ground: GroundConfig, seconds: number): string {
+  let tile = ground.waves[0]!.tile;
+  for (const w of ground.waves) if (w.startSeconds <= seconds) tile = w.tile;
+  return tile;
+}
 
 export const enemyKindSchema = z.object({
   id: z.string().min(1),

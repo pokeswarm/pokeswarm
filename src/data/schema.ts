@@ -9,6 +9,13 @@ export const simulationConfigSchema = z.object({
   tickRate: z.number().int().min(1).max(240),
   /** 1フレームで追いつく最大の更新回数（タブ復帰時などの暴走防止） */
   maxTicksPerFrame: z.number().int().min(1),
+  /**
+   * タブが裏に回っている間の1回の呼び出しで追いつく最大の更新回数。
+   * 裏のタブではブラウザがタイマーを1秒に1回程度まで間引くため、まとめて進める
+   */
+  hiddenMaxTicksPerCall: z.number().int().min(1),
+  /** 協力プレイ中、描画のタイミングがこの時間来なければ、タブが裏に回ったとみなしてタイマーで進める（ms） */
+  stalledFrameMs: z.number().int().positive(),
   defaultSeed: z.number().int().nonnegative(),
 });
 export type SimulationConfig = z.infer<typeof simulationConfigSchema>;
@@ -231,3 +238,27 @@ export type EffectRecipe = z.infer<typeof effectRecipeSchema>;
 export const effectRecipeFileSchema = z.object({
   recipes: z.record(z.string(), z.object({ extends: z.string().optional() }).catchall(z.unknown())),
 });
+
+// ---- 協力プレイの通信 ----
+
+const syncRateSchema = z.object({
+  /** 自分のプレイヤーの位置を送る間隔（更新回数） */
+  playerStateIntervalTicks: z.number().int().positive(),
+  /** ホストが敵の位置を補正する間隔（更新回数） */
+  correctionIntervalTicks: z.number().int().positive(),
+});
+
+export const networkConfigSchema = z.object({
+  /** WebRTC の接続に使う STUN サーバー */
+  iceServers: z.array(z.object({ urls: z.union([z.string(), z.array(z.string())]) })),
+  /** この時間内に直接つながらなければ Realtime Database の中継に切り替える */
+  p2pTimeoutMs: z.number().int().positive(),
+  p2p: syncRateSchema,
+  /** 中継時は送る頻度を下げ、まとめて書き込む（通信量と書き込み回数を抑える） */
+  relay: syncRateSchema.extend({ flushIntervalMs: z.number().int().positive() }),
+  /** 往復時間を測る間隔（更新回数） */
+  pingIntervalTicks: z.number().int().positive(),
+  /** ゲストの出現位置（ホストからの横のずれ） */
+  guestSpawnOffsetX: z.number(),
+});
+export type NetworkConfig = z.infer<typeof networkConfigSchema>;

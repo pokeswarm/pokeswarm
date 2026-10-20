@@ -1,10 +1,58 @@
 import Phaser from 'phaser';
-import { placeholderRender, spriteRender } from './data';
+import { networkConfig, placeholderRender, spriteRender } from './data';
+import { firebaseOptionsFromEnv } from './firebase/config';
+import type { RoomConnection } from './net/room';
 import { loadSpriteManifest } from './render/sprites/spriteManifest';
+import { NetPanel } from './scenes/netPanel';
 import { RunScene, type RunSceneData } from './scenes/RunScene';
 
+/**
+ * 協力プレイ（技術検証用）の入り口:
+ *   ?host            … 部屋を作る（参加用 URL が表示される）
+ *   ?host&relay      … 直接接続を試さず、Realtime Database の中継で始める
+ *   ?host&p2pfail    … 直接接続をわざと失敗させ、時間切れで中継に切り替わることを確かめる
+ *   ?join=<部屋ID>   … 部屋に入る
+ * Firebase のコードは協力プレイのときだけ読み込む。
+ */
+async function connectIfRequested(panel: NetPanel): Promise<RoomConnection | null> {
+  const q = new URLSearchParams(window.location.search);
+  const joinId = q.get('join');
+  if (!q.has('host') && !joinId) return null;
+  if (!firebaseOptionsFromEnv()) {
+    panel.show('net.firebaseMissing');
+    return null;
+  }
+  const room = await import('./net/room');
+  try {
+    if (joinId) {
+      return await room.joinRoom(networkConfig, joinId, { onStatus: (s) => panel.show(`net.${s}`) });
+    }
+    return await room.hostRoom(networkConfig, {
+      forceRelay: q.has('relay'),
+      simulateP2PFailure: q.has('p2pfail'),
+      onStatus: (s, roomId) => {
+        if (s === 'waitingGuest' && roomId) {
+          const url = new URL(window.location.href);
+          url.search = new URLSearchParams({ join: roomId }).toString();
+          panel.showJoinUrl(url.toString());
+        } else {
+          panel.show(`net.${s}`);
+        }
+      },
+    });
+  } catch (err) {
+    if (err instanceof room.RoomError && err.code !== 'closed') panel.show(err.code === 'full' ? 'net.full' : 'net.notFound');
+    else panel.show('net.failed', { message: err instanceof Error ? err.message : String(err) });
+    throw err;
+  }
+}
+
 async function start(): Promise<void> {
-  const data: RunSceneData = { playerSprite: await loadSpriteManifest(spriteRender.playerSprite) };
+  const panel = new NetPanel();
+  panel.hide();
+  const [playerSprite, net] = await Promise.all([loadSpriteManifest(spriteRender.playerSprite), connectIfRequested(panel)]);
+  panel.hide();
+  const data: RunSceneData = { playerSprite, net, panel };
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',

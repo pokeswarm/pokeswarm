@@ -6,10 +6,12 @@ import enemiesJson from '../../data/game/enemies.json';
 import spawnJson from '../../data/game/spawn.json';
 import attackJson from '../../data/game/attack.json';
 import spriteRenderJson from '../../data/render/sprites.json';
+import networkJson from '../../data/game/network.json';
 import effectRecipesJson from '../../data/effects/recipes.json';
 import { resolveEffectRecipes } from './effects';
 import {
   attackConfigSchema,
+  networkConfigSchema,
   enemiesConfigSchema,
   placeholderRenderSchema,
   playerConfigSchema,
@@ -35,3 +37,4 @@ export const attackConfig = load('game/attack.json', attackConfigSchema, attackJ
 export const spriteRender = load('render/sprites.json', spriteRenderSchema, spriteRenderJson);
 export const effectRecipes = resolveEffectRecipes(effectRecipesJson);
 if (!effectRecipes[attackConfig.effect]) throw new Error(`data/game/attack.json の effect "${attackConfig.effect}" のレシピがありません`);
+export const networkConfig = load('game/network.json', networkConfigSchema, networkJson);

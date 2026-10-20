@@ -1,0 +1,15 @@
+{
+  "iceServers": [{ "urls": "stun:stun.l.google.com:19302" }],
+  "p2pTimeoutMs": 10000,
+  "p2p": {
+    "playerStateIntervalTicks": 1,
+    "correctionIntervalTicks": 30
+  },
+  "relay": {
+    "playerStateIntervalTicks": 3,
+    "correctionIntervalTicks": 150,
+    "flushIntervalMs": 100
+  },
+  "pingIntervalTicks": 30,
+  "guestSpawnOffsetX": 60
+}

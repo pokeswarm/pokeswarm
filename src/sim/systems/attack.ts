@@ -75,6 +75,11 @@ export function moveProjectiles(world: World): void {
     if (hits === 0) continue;
     // 同じ更新で複数に重なったら id の小さい順に当てる（ハッシュの並び順に左右されないように）
     const candidates = hitScratch.subarray(0, hits).sort((a, b) => e.id[a]! - e.id[b]!);
+    // 命中の扱い（03_network.md 3.3）:
+    // - 自分の攻撃: ソロ・ホストはその場で HP を減らす。ゲストは命中をホストへ伝える（HP はホストが集計）
+    // - 別のブラウザのプレイヤーの攻撃: 見た目だけ（命中の判定はそのプレイヤーのブラウザが行う）
+    const owner = pr.owner[i]!;
+    const local = owner === world.localPlayerId;
     let hitAny = false;
     for (let k = 0; k < candidates.length && pr.pierceLeft[i]! > 0; k++) {
       const j = candidates[k]!;
@@ -83,9 +88,14 @@ export function moveProjectiles(world: World): void {
       pr.recordHit(i, e.id[j]!);
       pr.pierceLeft[i]!--;
       hitAny = true;
+      if (!local) continue;
+      if (world.role === 'guest') {
+        world.events.push({ type: 'damageDealt', enemyId: e.id[j]!, amount: pr.damage[i]!, by: owner });
+        continue;
+      }
       e.hp[j]! -= pr.damage[i]!;
       if (e.hp[j]! <= 0) {
-        world.events.push({ type: 'enemyKilled', enemyId: e.id[j]!, by: pr.owner[i]! });
+        world.events.push({ type: 'enemyKilled', enemyId: e.id[j]!, by: owner });
         world.stats.kills++;
       }
     }

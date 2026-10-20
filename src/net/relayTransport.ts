@@ -1,0 +1,60 @@
+import { onChildAdded, push, ref, type Database, type Unsubscribe } from 'firebase/database';
+import { decode, encode, type NetMessage } from './protocol';
+import type { Transport } from './transport';
+
+/**
+ * Realtime Database を経由した中継（直接つながらないとき）。
+ * 書き込み回数と通信量を抑えるため、一定間隔でまとめて1回書き込む。
+ * 位置や補正のように「最新だけあればよい」ものは、まとめる間に古いものを捨てる。
+ */
+export class RelayTransport implements Transport {
+  readonly kind = 'relay' as const;
+  onMessages: ((messages: NetMessage[]) => void) | null = null;
+  onClose: (() => void) | null = null;
+  readonly stats = { sentBytes: 0, receivedBytes: 0 };
+  private buffer: NetMessage[] = [];
+  private readonly timer: ReturnType<typeof setInterval>;
+  private readonly unsubscribe: Unsubscribe;
+  private readonly outPath: string;
+
+  constructor(
+    private readonly db: Database,
+    roomId: string,
+    role: 'host' | 'guest',
+    flushIntervalMs: number,
+  ) {
+    const base = `rooms/${roomId}/relay`;
+    this.outPath = `${base}/${role === 'host' ? 'toGuest' : 'toHost'}`;
+    const inPath = `${base}/${role === 'host' ? 'toHost' : 'toGuest'}`;
+    this.unsubscribe = onChildAdded(ref(db, inPath), (snap) => {
+      const text = (snap.val() as { m?: string } | null)?.m;
+      if (!text) return;
+      this.stats.receivedBytes += text.length;
+      this.onMessages?.(decode(text));
+    });
+    this.timer = setInterval(() => this.flush(), flushIntervalMs);
+  }
+
+  send(messages: NetMessage[]): void {
+    this.buffer.push(...messages);
+  }
+
+  private flush(): void {
+    if (this.buffer.length === 0) return;
+    // 最新だけあればよいもの（自分の位置・敵の位置の補正）は最後の1つだけ残す
+    const latest = new Map<string, number>();
+    this.buffer.forEach((m, i) => {
+      if (m.t === 'p' || m.t === 'c') latest.set(m.t, i);
+    });
+    const batch = this.buffer.filter((m, i) => (m.t !== 'p' && m.t !== 'c') || latest.get(m.t) === i);
+    this.buffer = [];
+    const text = encode(batch);
+    this.stats.sentBytes += text.length;
+    void push(ref(this.db, this.outPath), { m: text });
+  }
+
+  close(): void {
+    clearInterval(this.timer);
+    this.unsubscribe();
+  }
+}

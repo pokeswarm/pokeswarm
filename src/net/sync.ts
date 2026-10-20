@@ -1,0 +1,142 @@
+import type { Axis, InputCommand, PlayerId } from '../sim/commands';
+import type { World } from '../sim/world';
+import { round2, type NetMessage } from './protocol';
+
+export interface SyncRate {
+  playerStateIntervalTicks: number;
+  correctionIntervalTicks: number;
+}
+
+/**
+ * シミュレーションと通信の間の変換（03_network.md 3.2）。Phaser にも通信手段にも依存しない。
+ * - 送る: その更新で起きた出来事（出現・撃破・命中）と、自分の位置、ホストなら敵の位置の補正
+ * - 受け取る: 届いたメッセージをシミュレーションの入力コマンドに直す
+ */
+export class SyncSession {
+  private rate: SyncRate;
+  private readonly replies: NetMessage[] = [];
+  /** 直近の往復時間（ms） */
+  rttMs: number | null = null;
+
+  constructor(
+    private readonly remotePlayerId: PlayerId,
+    rate: SyncRate,
+    private readonly pingIntervalTicks: number,
+    private readonly now: () => number = () => performance.now(),
+  ) {
+    this.rate = rate;
+  }
+
+  setRate(rate: SyncRate): void {
+    this.rate = rate;
+  }
+
+  /** 1回の更新の後に呼び、送るメッセージを返す */
+  outgoing(world: World): NetMessage[] {
+    const out: NetMessage[] = this.replies.splice(0);
+    const role = world.role;
+    const local = world.players.find((p) => p.id === world.localPlayerId);
+    if (local && world.tick % this.rate.playerStateIntervalTicks === 0) {
+      out.push({
+        t: 'p',
+        x: round2(local.x),
+        y: round2(local.y),
+        fx: local.facingX,
+        fy: local.facingY,
+        ix: local.inputX,
+        iy: local.inputY,
+      });
+    }
+
+    const spawns: number[] = [];
+    const empowers: number[] = [];
+    const kills: number[] = [];
+    const damages: number[] = [];
+    for (const ev of world.events) {
+      switch (ev.type) {
+        case 'enemySpawned':
+          if (role === 'host') spawns.push(ev.id, ev.kind, ev.x, ev.y);
+          break;
+        case 'enemyEmpowered':
+          if (role === 'host') empowers.push(ev.id, ev.level);
+          break;
+        case 'enemyKilled':
+          if (role === 'host') kills.push(ev.enemyId, ev.by);
+          break;
+        case 'damageDealt':
+          if (role === 'guest') damages.push(ev.enemyId, ev.amount, ev.by);
+          break;
+        case 'projectileHit':
+          break;
+      }
+    }
+    if (spawns.length) out.push({ t: 'sp', e: spawns });
+    if (empowers.length) out.push({ t: 'em', e: empowers });
+    if (kills.length) out.push({ t: 'k', e: kills });
+    if (damages.length) out.push({ t: 'd', e: damages });
+
+    if (role === 'host' && world.tick % this.rate.correctionIntervalTicks === 0 && world.enemies.count > 0) {
+      const e = world.enemies;
+      const data: number[] = [];
+      for (let i = 0; i < e.count; i++) {
+        if (e.hp[i]! > 0) data.push(e.id[i]!, Math.round(e.x[i]! * 10) / 10, Math.round(e.y[i]! * 10) / 10);
+      }
+      out.push({ t: 'c', e: data });
+    }
+    if (world.tick % this.pingIntervalTicks === 0) out.push({ t: 'ping', s: this.now() });
+    return out;
+  }
+
+  /** 届いたメッセージを入力コマンドに直す（次の更新で適用する） */
+  incoming(world: World, messages: readonly NetMessage[]): InputCommand[] {
+    const cmds: InputCommand[] = [];
+    const guest = world.role === 'guest';
+    const host = world.role === 'host';
+    for (const m of messages) {
+      switch (m.t) {
+        case 'p':
+          cmds.push({
+            type: 'remotePlayer',
+            playerId: this.remotePlayerId,
+            x: m.x,
+            y: m.y,
+            facingX: m.fx as Axis,
+            facingY: m.fy as Axis,
+            inputX: m.ix as Axis,
+            inputY: m.iy as Axis,
+          });
+          break;
+        case 'sp':
+          if (guest) {
+            for (let k = 0; k + 3 < m.e.length; k += 4) {
+              cmds.push({ type: 'spawnEnemy', id: m.e[k]!, kind: m.e[k + 1]!, x: m.e[k + 2]!, y: m.e[k + 3]! });
+            }
+          }
+          break;
+        case 'em':
+          if (guest) for (let k = 0; k + 1 < m.e.length; k += 2) cmds.push({ type: 'empowerEnemy', id: m.e[k]!, level: m.e[k + 1]! });
+          break;
+        case 'k':
+          if (guest) for (let k = 0; k + 1 < m.e.length; k += 2) cmds.push({ type: 'killEnemy', id: m.e[k]!, by: m.e[k + 1]! });
+          break;
+        case 'd':
+          if (host) {
+            for (let k = 0; k + 2 < m.e.length; k += 3) {
+              cmds.push({ type: 'damageEnemy', id: m.e[k]!, amount: m.e[k + 1]!, by: m.e[k + 2]! });
+            }
+          }
+          break;
+        case 'c':
+          if (guest) cmds.push({ type: 'correctEnemies', data: m.e });
+          break;
+        case 'ping':
+          this.replies.push({ t: 'pong', s: m.s });
+          break;
+        case 'pong':
+          this.rttMs = this.now() - m.s;
+          break;
+      }
+    }
+    return cmds;
+  }
+}

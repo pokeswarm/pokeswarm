@@ -22,3 +22,18 @@ export function axisToUnit(ax: number, ay: number): [number, number] {
   if (ax !== 0 && ay !== 0) return [ax * Math.SQRT1_2, ay * Math.SQRT1_2];
   return [ax, ay];
 }
+
+/**
+ * 番号の組から決まる [0, 1) の値。共有の乱数列を進めないので、
+ * ホストとゲストで乱数の使い方が違っても、同じ敵・同じ更新なら同じ値になる。
+ */
+export function hash01(seed: number, a: number, b: number, salt: number): number {
+  let h = seed >>> 0;
+  for (const v of [a, b, salt]) {
+    h = Math.imul(h ^ (v >>> 0), 0x85ebca6b) >>> 0;
+    h = (h ^ (h >>> 13)) >>> 0;
+    h = Math.imul(h, 0xc2b2ae35) >>> 0;
+    h = (h ^ (h >>> 16)) >>> 0;
+  }
+  return h / 4294967296;
+}

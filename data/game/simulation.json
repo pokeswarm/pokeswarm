@@ -1,5 +1,7 @@
 {
   "tickRate": 30,
   "maxTicksPerFrame": 5,
-  "defaultSeed": 20261020
+  "defaultSeed": 20261020,
+  "hiddenMaxTicksPerCall": 60,
+  "stalledFrameMs": 250
 }

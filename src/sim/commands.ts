@@ -1,6 +1,6 @@
 /**
  * 入力コマンド。シミュレーションはこれだけを受け取って進む。
- * ソロでも協力プレイでも同じ形で扱う（協力プレイではこれがそのまま通信に乗る）。
+ * ソロでも協力プレイでも同じ形で扱う。協力プレイでは、通信で届いた内容もコマンドに直して渡す。
  */
 export type PlayerId = number;
 
@@ -15,4 +15,60 @@ export interface MoveCommand {
   readonly dy: Axis;
 }
 
-export type InputCommand = MoveCommand;
+/** 別のブラウザのプレイヤーの状態（本人から届いた位置・向き・入力） */
+export interface RemotePlayerCommand {
+  readonly type: 'remotePlayer';
+  readonly playerId: PlayerId;
+  readonly x: number;
+  readonly y: number;
+  readonly facingX: Axis;
+  readonly facingY: Axis;
+  readonly inputX: Axis;
+  readonly inputY: Axis;
+}
+
+/** ゲスト: ホストが決めた雑魚敵の出現 */
+export interface SpawnEnemyCommand {
+  readonly type: 'spawnEnemy';
+  readonly id: number;
+  readonly kind: number;
+  readonly x: number;
+  readonly y: number;
+}
+
+/** ゲスト: ホストが決めた敵の強化（上限到達時） */
+export interface EmpowerEnemyCommand {
+  readonly type: 'empowerEnemy';
+  readonly id: number;
+  readonly level: number;
+}
+
+/** ホスト: ゲストの攻撃が当たった（ゲストのブラウザで判定したもの） */
+export interface DamageEnemyCommand {
+  readonly type: 'damageEnemy';
+  readonly id: number;
+  readonly amount: number;
+  readonly by: PlayerId;
+}
+
+/** ゲスト: ホストが確定した撃破 */
+export interface KillEnemyCommand {
+  readonly type: 'killEnemy';
+  readonly id: number;
+  readonly by: PlayerId;
+}
+
+/** ゲスト: ホストによる敵の位置の補正。[id, x, y, id, x, y, ...] */
+export interface CorrectEnemiesCommand {
+  readonly type: 'correctEnemies';
+  readonly data: readonly number[];
+}
+
+export type InputCommand =
+  | MoveCommand
+  | RemotePlayerCommand
+  | SpawnEnemyCommand
+  | EmpowerEnemyCommand
+  | DamageEnemyCommand
+  | KillEnemyCommand
+  | CorrectEnemiesCommand;

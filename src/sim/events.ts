@@ -16,4 +16,28 @@ export interface ProjectileHitEvent {
   readonly owner: PlayerId;
 }
 
-export type SimEvent = EnemyKilledEvent | ProjectileHitEvent;
+/** ホスト: 雑魚敵を出した（ゲストへ送る） */
+export interface EnemySpawnedEvent {
+  readonly type: 'enemySpawned';
+  readonly id: number;
+  readonly kind: number;
+  readonly x: number;
+  readonly y: number;
+}
+
+/** ホスト: 敵を強化した（ゲストへ送る） */
+export interface EnemyEmpoweredEvent {
+  readonly type: 'enemyEmpowered';
+  readonly id: number;
+  readonly level: number;
+}
+
+/** ゲスト: 自分の攻撃が敵に当たった（ホストへ送り、ホストが HP を集計する） */
+export interface DamageDealtEvent {
+  readonly type: 'damageDealt';
+  readonly enemyId: number;
+  readonly amount: number;
+  readonly by: PlayerId;
+}
+
+export type SimEvent = EnemyKilledEvent | ProjectileHitEvent | EnemySpawnedEvent | EnemyEmpoweredEvent | DamageDealtEvent;

@@ -4,7 +4,8 @@ import { enemyCap, type World } from '../world';
 /** プレイヤーの周囲（画面外）に雑魚敵を出す。上限に達していたら既存の敵を強化する（仮） */
 export function spawnEnemies(world: World): void {
   const { players, enemies, rng } = world;
-  if (players.length === 0) return;
+  // ゲストは出現をホストから受け取る
+  if (players.length === 0 || world.role === 'guest') return;
   const s = world.rules.spawn;
   const kinds = world.rules.enemies.kinds;
   world.spawnAccumulator += s.spawnPerSecond * world.dt;
@@ -20,7 +21,11 @@ export function spawnEnemies(world: World): void {
     const dist = rng.range(s.spawnDistanceMin, s.spawnDistanceMax);
     const kindIndex = rng.int(kinds.length);
     const kind = kinds[kindIndex]!;
-    enemies.add(world.nextEnemyId++, kindIndex, p.x + ux * dist, p.y + uy * dist, kind.hp, kind.moveSpeed, kind.radius);
+    const id = world.nextEnemyId++;
+    const x = p.x + ux * dist;
+    const y = p.y + uy * dist;
+    enemies.add(id, kindIndex, x, y, kind.hp, kind.moveSpeed, kind.radius);
+    world.events.push({ type: 'enemySpawned', id, kind: kindIndex, x, y });
   }
 }
 
@@ -31,6 +36,7 @@ function empowerRandomEnemy(world: World): void {
   const i = rng.int(enemies.count);
   if (enemies.empower[i]! >= o.maxEmpowerLevel) return;
   enemies.empower[i]!++;
+  world.events.push({ type: 'enemyEmpowered', id: enemies.id[i]!, level: enemies.empower[i]! });
   enemies.maxHp[i]! *= o.empowerHpMultiplier;
   enemies.hp[i]! *= o.empowerHpMultiplier;
   world.stats.empowered++;

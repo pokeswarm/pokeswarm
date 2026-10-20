@@ -17,6 +17,8 @@ export class EnemyStore {
   readonly radius: Float64Array;
   /** 上限到達時の強化段階 */
   readonly empower: Uint8Array;
+  /** 移し替えた回数（移し替え先を決める番号に使う） */
+  readonly relocations: Uint16Array;
 
   constructor(readonly capacity: number) {
     this.id = new Uint32Array(capacity);
@@ -30,6 +32,7 @@ export class EnemyStore {
     this.speed = new Float64Array(capacity);
     this.radius = new Float64Array(capacity);
     this.empower = new Uint8Array(capacity);
+    this.relocations = new Uint16Array(capacity);
   }
 
   /** 追加して index を返す。満杯なら -1 */
@@ -44,6 +47,7 @@ export class EnemyStore {
     this.speed[i] = speed;
     this.radius[i] = radius;
     this.empower[i] = 0;
+    this.relocations[i] = 0;
     return i;
   }
 
@@ -62,6 +66,7 @@ export class EnemyStore {
     this.speed[i] = this.speed[last]!;
     this.radius[i] = this.radius[last]!;
     this.empower[i] = this.empower[last]!;
+    this.relocations[i] = this.relocations[last]!;
   }
 
   /** HP が 0 以下の敵をまとめて取り除く（順番は決まった手順で変わるので再現できる） */

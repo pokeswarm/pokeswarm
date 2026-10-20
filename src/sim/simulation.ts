@@ -6,12 +6,16 @@ import { applyCommands } from './systems/commands';
 import { moveEnemies, rebuildEnemyHash, separateEnemies } from './systems/enemyMovement';
 import { movePlayers } from './systems/movement';
 import { spawnEnemies } from './systems/spawn';
-import { createWorld, type World } from './world';
+import { createWorld, type SimRole, type World } from './world';
 
 export interface SimulationOptions {
   tickRate: number;
   seed: number;
   rules: SimRules;
+  /** 省略時は solo */
+  role?: SimRole;
+  /** このブラウザで操作するプレイヤー（省略時は 1） */
+  localPlayerId?: PlayerId;
 }
 
 export interface PlayerSpawn {
@@ -20,6 +24,8 @@ export interface PlayerSpawn {
   y: number;
   radius: number;
   moveSpeed: number;
+  /** 別のブラウザが操作するプレイヤー */
+  remote?: boolean;
 }
 
 /**
@@ -30,11 +36,11 @@ export class Simulation {
   readonly world: World;
 
   constructor(options: SimulationOptions) {
-    this.world = createWorld(options.tickRate, options.seed, options.rules);
+    this.world = createWorld(options.tickRate, options.seed, options.rules, options.role ?? 'solo', options.localPlayerId ?? 1);
   }
 
   addPlayer(spawn: PlayerSpawn): Player {
-    const p = createPlayer(spawn.id, spawn.x, spawn.y, spawn.radius, spawn.moveSpeed);
+    const p = createPlayer(spawn.id, spawn.x, spawn.y, spawn.radius, spawn.moveSpeed, spawn.remote ?? false);
     this.world.players.push(p);
     return p;
   }

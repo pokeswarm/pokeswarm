@@ -1,5 +1,5 @@
 import type { Player } from '../entities/player';
-import { axisToUnit } from '../math';
+import { axisToUnit, hash01 } from '../math';
 import type { World } from '../world';
 
 /**
@@ -7,7 +7,7 @@ import type { World } from '../world';
  * 一番近いプレイヤーからも離れすぎた敵は、そのプレイヤーの進行方向側へ移し替える。
  */
 export function moveEnemies(world: World): void {
-  const { enemies: e, players, rng } = world;
+  const { enemies: e, players } = world;
   if (players.length === 0) return;
   const s = world.rules.spawn;
   const relocate2 = s.relocateDistance * s.relocateDistance;
@@ -31,8 +31,12 @@ export function moveEnemies(world: World): void {
 
     if (best > relocate2) {
       const [fx, fy] = axisToUnit(target.facingX, target.facingY);
-      const dist = rng.range(s.spawnDistanceMin, s.spawnDistanceMax);
-      const side = rng.range(-s.relocateSideSpread, s.relocateSideSpread);
+      // 移し替え先は共有の乱数ではなく、敵の id と移し替えた回数から決める
+      // （ホストとゲストで乱数の使い方や更新番号が違っても、同じ場所になる）
+      const id = e.id[i]!;
+      const n = e.relocations[i]!++;
+      const dist = s.spawnDistanceMin + hash01(world.seed, id, n, 1) * (s.spawnDistanceMax - s.spawnDistanceMin);
+      const side = (hash01(world.seed, id, n, 2) * 2 - 1) * s.relocateSideSpread;
       // 進行方向 (fx, fy) の先、横方向 (-fy, fx) にばらつかせる
       e.x[i] = e.prevX[i] = target.x + fx * dist - fy * side;
       e.y[i] = e.prevY[i] = target.y + fy * dist + fx * side;

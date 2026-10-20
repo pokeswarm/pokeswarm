@@ -7,9 +7,21 @@ import { Rng } from './rng';
 import type { SimRules } from './rules';
 import { SpatialHash } from './spatial/spatialHash';
 
+/**
+ * このブラウザの役割。
+ * - solo: すべてをこのブラウザで決める
+ * - host: 敵の出現・HP の集計・撃破の確定を担い、結果をゲストへ送る
+ * - guest: 敵の出現と撃破はホストから受け取り、自分の攻撃の命中はホストへ伝える
+ */
+export type SimRole = 'solo' | 'host' | 'guest';
+
 /** シミュレーションの全状態 */
 export interface World {
   tick: number;
+  readonly role: SimRole;
+  /** このブラウザで操作しているプレイヤー */
+  readonly localPlayerId: PlayerId;
+  readonly seed: number;
   /** 1回の更新の秒数 */
   readonly dt: number;
   readonly rules: SimRules;
@@ -31,10 +43,15 @@ export interface World {
   readonly hitScratch: Int32Array;
 }
 
-export function createWorld(tickRate: number, seed: number, rules: SimRules): World {
-  const capacity = rules.spawn.capGlobal;
+export function createWorld(tickRate: number, seed: number, rules: SimRules, role: SimRole, localPlayerId: PlayerId): World {
+  // ゲストは、ホストで倒されたが撃破の知らせがまだ届いていない敵を持つため、上限より多くなりうる。
+  // 入れ物があふれて出現を取りこぼさないよう、余裕を持たせる
+  const capacity = role === 'guest' ? rules.spawn.capGlobal * 2 : rules.spawn.capGlobal;
   return {
     tick: 0,
+    role,
+    localPlayerId,
+    seed,
     dt: 1 / tickRate,
     rules,
     players: [],
@@ -59,4 +76,10 @@ export function findPlayer(world: World, id: PlayerId): Player | undefined {
 export function enemyCap(world: World): number {
   const s = world.rules.spawn;
   return Math.min(s.capGlobal, s.capPerPlayer * world.players.length);
+}
+
+export function findEnemyIndex(world: World, id: number): number {
+  const e = world.enemies;
+  for (let i = 0; i < e.count; i++) if (e.id[i] === id) return i;
+  return -1;
 }

@@ -13,13 +13,13 @@ export class FixedStepClock {
     this.stepMs = 1000 / tickRate;
   }
 
-  /** 経過ミリ秒を足し、今回進めるべき更新回数を返す */
-  advance(elapsedMs: number): number {
+  /** 経過ミリ秒を足し、今回進めるべき更新回数を返す。maxSteps を渡すとその回の上限を変える */
+  advance(elapsedMs: number, maxSteps = this.maxStepsPerFrame): number {
     this.accumulator += Math.max(0, elapsedMs);
     let steps = Math.floor(this.accumulator / this.stepMs);
-    if (steps > this.maxStepsPerFrame) {
-      // 大きく遅れた（タブが裏にあった等）ときは追いつくのを諦めて捨てる
-      steps = this.maxStepsPerFrame;
+    if (steps > maxSteps) {
+      // 大きく遅れたときは追いつくのを諦めて捨てる
+      steps = maxSteps;
       this.accumulator = 0;
     } else {
       this.accumulator -= steps * this.stepMs;

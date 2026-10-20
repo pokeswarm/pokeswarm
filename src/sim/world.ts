@@ -27,6 +27,8 @@ export interface World {
   readonly stats: { kills: number; empowered: number };
   /** 近傍検索の作業用（更新中にメモリを確保しないため） */
   readonly scratch: Int32Array;
+  /** 発射体の命中候補の作業用 */
+  readonly hitScratch: Int32Array;
 }
 
 export function createWorld(tickRate: number, seed: number, rules: SimRules): World {
@@ -37,7 +39,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules): Wo
     rules,
     players: [],
     enemies: new EnemyStore(capacity),
-    projectiles: new ProjectileStore(rules.attack.maxProjectiles),
+    projectiles: new ProjectileStore(rules.attack.maxProjectiles, rules.attack.hitMemory),
     enemyHash: new SpatialHash(rules.spawn.spatialCellSize, capacity),
     rng: new Rng(seed),
     nextEnemyId: 1,
@@ -45,6 +47,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules): Wo
     events: [],
     stats: { kills: 0, empowered: 0 },
     scratch: new Int32Array(capacity * 2),
+    hitScratch: new Int32Array(capacity * 2),
   };
 }
 

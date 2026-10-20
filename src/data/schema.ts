@@ -83,10 +83,17 @@ export const attackConfigSchema = z.object({
   cooldownSeconds: z.number().positive(),
   range: z.number().positive(),
   damage: z.number().positive(),
+  /** 1つの発射体が当たれる敵の数。"infinite" なら貫通無限（近接攻撃など） */
+  pierce: z.union([z.number().int().positive(), z.literal('infinite')]),
   projectileSpeed: z.number().positive(),
   projectileRadius: z.number().positive(),
   projectileLifetimeSeconds: z.number().positive(),
   maxProjectiles: z.number().int().positive(),
+  /**
+   * 1つの発射体が覚えておける「当てた敵」の数。同じ敵に2回当たらないようにするため。
+   * これを超えて当てると古いものから忘れる（その敵には再び当たりうる）
+   */
+  hitMemory: z.number().int().positive(),
   /** 見た目のレシピ（data/effects/recipes.json のキー）。シミュレーションは使わない */
   effect: z.string(),
 });

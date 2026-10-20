@@ -2,9 +2,11 @@
   "cooldownSeconds": 0.2,
   "range": 400,
   "damage": 10,
+  "pierce": 1,
   "projectileSpeed": 500,
   "projectileRadius": 5,
   "projectileLifetimeSeconds": 1.2,
   "maxProjectiles": 512,
+  "hitMemory": 32,
   "effect": "ember"
 }

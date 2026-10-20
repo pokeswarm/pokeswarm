@@ -1,0 +1,9 @@
+{
+  "kinds": [
+    { "id": "burn", "damagePerSecond": 4, "speedMultiplier": 1, "damageTakenMultiplier": 1, "color": "#ff7043" },
+    { "id": "poison", "damagePerSecond": 3, "speedMultiplier": 1, "damageTakenMultiplier": 1, "color": "#ab47bc" },
+    { "id": "paralysis", "damagePerSecond": 0, "speedMultiplier": 0.5, "damageTakenMultiplier": 1, "color": "#ffee58" },
+    { "id": "freeze", "damagePerSecond": 0, "speedMultiplier": 0, "damageTakenMultiplier": 1, "color": "#80deea" },
+    { "id": "defenseDown", "damagePerSecond": 0, "speedMultiplier": 1, "damageTakenMultiplier": 1.3, "color": "#90a4ae" }
+  ]
+}

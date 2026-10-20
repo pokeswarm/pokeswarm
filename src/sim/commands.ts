@@ -1,3 +1,5 @@
+import type { HitEffect } from './events';
+
 /**
  * 入力コマンド。シミュレーションはこれだけを受け取って進む。
  * ソロでも協力プレイでも同じ形で扱う。協力プレイでは、通信で届いた内容もコマンドに直して渡す。
@@ -36,11 +38,18 @@ export interface SpawnEnemyCommand {
   readonly y: number;
 }
 
-/** ホスト: ゲストの攻撃が当たった（ゲストのブラウザで判定したもの） */
-export interface DamageEnemyCommand {
+/** ホスト: ゲストの攻撃が当たった（ゲストのブラウザで判定したもの。効果も一緒に届く） */
+export interface DamageEnemyCommand extends HitEffect {
   readonly type: 'damageEnemy';
   readonly id: number;
   readonly amount: number;
+  readonly by: PlayerId;
+}
+
+/** ゲスト: ホストが付けた効果（ノックバック・状態異常） */
+export interface AffectEnemyCommand extends HitEffect {
+  readonly type: 'affectEnemy';
+  readonly id: number;
   readonly by: PlayerId;
 }
 
@@ -69,5 +78,6 @@ export type InputCommand =
   | SpawnEnemyCommand
   | DamageEnemyCommand
   | KillEnemyCommand
+  | AffectEnemyCommand
   | RetireEnemyCommand
   | CorrectEnemiesCommand;

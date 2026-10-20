@@ -3,6 +3,15 @@
   "range": 400,
   "damage": 10,
   "pierce": 1,
+  "knockback": {
+    "speed": 240,
+    "durationSeconds": 0.12
+  },
+  "status": {
+    "id": "burn",
+    "chance": 0.3,
+    "durationSeconds": 3
+  },
   "projectileSpeed": 500,
   "projectileRadius": 5,
   "projectileLifetimeSeconds": 1.2,

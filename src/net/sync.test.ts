@@ -2,14 +2,15 @@ import { describe, expect, it } from 'vitest';
 import type { InputCommand } from '../sim/commands';
 import { Simulation } from '../sim/simulation';
 import { testRules } from '../sim/testRules';
-import type { SimRole } from '../sim/world';
+import type { SimRules } from '../sim/rules';
+import type { SimRole, World } from '../sim/world';
 import { decode, encode, type NetMessage } from './protocol';
 import { SyncSession } from './sync';
 
 const rate = { playerStateIntervalTicks: 1, correctionIntervalTicks: 30 };
 
-function makePeer(role: SimRole, localId: number, remoteId: number) {
-  const rules = testRules({ spawn: { spawnPerSecond: 30, capGlobal: 200, capPerPlayer: 100 }, attack: { range: 300 } });
+function makePeer(role: SimRole, localId: number, remoteId: number, attack: Partial<SimRules['attack']> = {}) {
+  const rules = testRules({ spawn: { spawnPerSecond: 30, capGlobal: 200, capPerPlayer: 100 }, attack: { range: 300, ...attack } });
   const sim = new Simulation({ tickRate: 30, seed: 7, rules, role, localPlayerId: localId });
   sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150, remote: localId !== 1 });
   sim.addPlayer({ id: 2, x: 60, y: 0, radius: 12, moveSpeed: 150, remote: localId !== 2 });
@@ -18,9 +19,14 @@ function makePeer(role: SimRole, localId: number, remoteId: number) {
 }
 
 /** 2つのシミュレーションを、遅延のある通信路（文字列にして送る）でつないで進める */
-function runPair(ticks: number, delayTicks: number) {
-  const host = makePeer('host', 1, 2);
-  const guest = makePeer('guest', 2, 1);
+function runPair(
+  ticks: number,
+  delayTicks: number,
+  attack: Partial<SimRules['attack']> = {},
+  inspect?: (host: World, guest: World) => void,
+) {
+  const host = makePeer('host', 1, 2, attack);
+  const guest = makePeer('guest', 2, 1, attack);
   const wire: { at: number; to: 'host' | 'guest'; text: string }[] = [];
   for (let t = 0; t < ticks; t++) {
     // 両者とも動き回る
@@ -37,6 +43,7 @@ function runPair(ticks: number, delayTicks: number) {
     const toHost: NetMessage[] = guest.session.outgoing(guest.sim.world);
     if (toGuest.length) wire.push({ at: t + delayTicks, to: 'guest', text: encode(toGuest) });
     if (toHost.length) wire.push({ at: t + delayTicks, to: 'host', text: encode(toHost) });
+    inspect?.(host.sim.world, guest.sim.world);
   }
   // 通信路に残ったものを届けきる。ゲストは止まり、ホストの最後の更新の結果もゲストへ届ける
   for (const msg of wire) {
@@ -85,6 +92,49 @@ describe('協力プレイの同期', () => {
       worst = Math.max(worst, Math.hypot(p[0] - guest.enemies.x[i]!, p[1] - guest.enemies.y[i]!));
     }
     // 補正の間隔（1秒）の間に、敵の速さ（60/秒）程度まではずれうる
+    expect(worst).toBeLessThan(80);
+  });
+});
+
+describe('ノックバック・状態異常の同期', () => {
+  const attack = { knockback: { speed: 240, durationSeconds: 0.12 }, status: { id: 'burn', chance: 1, durationSeconds: 3 } };
+
+  /** 指定したプレイヤーが付けたやけどがかかっている敵がいるか */
+  function hasBurnBy(w: World, by: number): boolean {
+    const e = w.enemies;
+    for (let i = 0; i < e.count; i++) if (e.statusTicks[i * e.statusCount]! > 0 && e.statusBy[i * e.statusCount]! === by) return true;
+    return false;
+  }
+
+  it('ゲストが付けた状態異常はホストに、ホストが付けた状態異常はゲストに届く', () => {
+    let hostSawGuest = false;
+    let guestSawHost = false;
+    runPair(600, 3, attack, (host, guest) => {
+      hostSawGuest ||= hasBurnBy(host, 2);
+      guestSawHost ||= hasBurnBy(guest, 1);
+    });
+    expect(hostSawGuest).toBe(true);
+    expect(guestSawHost).toBe(true);
+  });
+
+  it('継続ダメージでの撃破もホストが確定し、ゲストと一致する', () => {
+    const { host, guest } = runPair(900, 3, attack);
+    expect(host.stats.kills).toBeGreaterThan(0);
+    expect(guest.stats.kills).toBe(host.stats.kills);
+    expect(Array.from(guest.enemies.id.subarray(0, guest.enemies.count)).sort((a, b) => a - b)).toEqual(
+      Array.from(host.enemies.id.subarray(0, host.enemies.count)).sort((a, b) => a - b),
+    );
+  });
+
+  it('ノックバックがあっても敵の位置のずれは補正で小さく保たれる', () => {
+    const { host, guest } = runPair(901, 3, attack);
+    const pos = new Map<number, [number, number]>();
+    for (let i = 0; i < host.enemies.count; i++) pos.set(host.enemies.id[i]!, [host.enemies.x[i]!, host.enemies.y[i]!]);
+    let worst = 0;
+    for (let i = 0; i < guest.enemies.count; i++) {
+      const p = pos.get(guest.enemies.id[i]!);
+      if (p) worst = Math.max(worst, Math.hypot(p[0] - guest.enemies.x[i]!, p[1] - guest.enemies.y[i]!));
+    }
     expect(worst).toBeLessThan(80);
   });
 });

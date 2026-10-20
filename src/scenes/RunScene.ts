@@ -9,6 +9,7 @@ import {
   simulationConfig,
   spawnConfig,
   spriteRender,
+  statusConfig,
 } from '../data';
 import type { SpriteAnims } from '../data/schema';
 import { t } from '../i18n';
@@ -60,6 +61,7 @@ export class RunScene extends Phaser.Scene {
   private streamer!: SpriteStreamer;
   /** 1フレームの処理時間（シミュレーション・描画の命令を含む。移動平均, ms） */
   private frameMs = 0;
+  private statusColors: number[] = [];
   private effects!: EffectRenderer;
   private ground!: GroundGrid;
   private hud!: Phaser.GameObjects.Text;
@@ -96,7 +98,7 @@ export class RunScene extends Phaser.Scene {
 
   create(): void {
     if (this.playerSprite) registerPokemonAnimations(this, this.playerSprite);
-    const rules = applyDebugOverrides({ enemies: enemiesConfig, spawn: spawnConfig, attack: attackConfig }, window.location.search);
+    const rules = applyDebugOverrides({ enemies: enemiesConfig, spawn: spawnConfig, attack: attackConfig, status: statusConfig }, window.location.search);
     const role: SimRole = this.net?.role ?? 'solo';
     this.localId = role === 'guest' ? GUEST_PLAYER_ID : HOST_PLAYER_ID;
     this.sim = new Simulation({
@@ -135,6 +137,7 @@ export class RunScene extends Phaser.Scene {
     );
     this.enemySpriteView = new EnemySprites(this, (kind) => this.streamer.manifestOf(kind), spriteRender.enemyScale, spriteRender.enemyAnimation, 0);
     this.measureFrameTime();
+    this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));
     this.effects = new EffectRenderer(this, effectRecipes, 2);
     const local = this.sim.world.players.find((p) => p.id === this.localId)!;
     if (this.playerSprite && new URLSearchParams(window.location.search).has('gallery')) {
@@ -202,6 +205,16 @@ export class RunScene extends Phaser.Scene {
     });
   }
 
+  /** 状態異常の色（data/game/status.json の並びで先にあるものを優先）。かかっていなければ null */
+  private statusTint(i: number): number | null {
+    const e = this.sim.world.enemies;
+    const kinds = this.sim.world.statusKinds;
+    for (let s = 0; s < kinds.length; s++) {
+      if (e.hasStatus(i, s)) return this.statusColors[s]!;
+    }
+    return null;
+  }
+
   /** 1フレームの処理時間を測る（更新の始まりから描画の命令を出し終えるまで） */
   private measureFrameTime(): void {
     let start = 0;
@@ -246,12 +259,12 @@ export class RunScene extends Phaser.Scene {
     const e = world.enemies;
     this.streamer.update(world);
     const drawn =
-      this.enemySpriteView.update(e, alpha, view) +
+      this.enemySpriteView.update(e, alpha, view, (i) => this.statusTint(i)) +
       this.enemyView.update(
         e,
         alpha,
         view,
-        () => enemyColor,
+        (i) => this.statusTint(i) ?? enemyColor,
         (i) => this.streamer.manifestOf(e.kind[i]!) === null,
       );
     const sprites = this.streamer.stats();

@@ -7,6 +7,7 @@ import spawnJson from '../../data/game/spawn.json';
 import attackJson from '../../data/game/attack.json';
 import spriteRenderJson from '../../data/render/sprites.json';
 import networkJson from '../../data/game/network.json';
+import statusJson from '../../data/game/status.json';
 import effectRecipesJson from '../../data/effects/recipes.json';
 import { resolveEffectRecipes } from './effects';
 import {
@@ -17,6 +18,7 @@ import {
   playerConfigSchema,
   simulationConfigSchema,
   spawnConfigSchema,
+  statusConfigSchema,
   spriteRenderSchema,
 } from './schema';
 
@@ -34,8 +36,12 @@ export const placeholderRender = load('render/placeholder.json', placeholderRend
 export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enemiesJson);
 export const spawnConfig = load('game/spawn.json', spawnConfigSchema, spawnJson);
 export const attackConfig = load('game/attack.json', attackConfigSchema, attackJson);
+export const statusConfig = load('game/status.json', statusConfigSchema, statusJson);
 
 // ファイルをまたぐ参照の検証
+if (attackConfig.status && !statusConfig.kinds.some((k) => k.id === attackConfig.status!.id)) {
+  throw new Error(`data/game/attack.json の status "${attackConfig.status.id}" が data/game/status.json にありません`);
+}
 for (const wave of spawnConfig.waves) {
   for (const kind of wave.kinds) {
     if (!enemiesConfig.kinds.some((k) => k.id === kind)) {

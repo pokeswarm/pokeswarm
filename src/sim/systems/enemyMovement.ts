@@ -1,6 +1,7 @@
 import type { Player } from '../entities/player';
 import { axisToUnit, hash01 } from '../math';
 import { currentWaveIndex, type World } from '../world';
+import { speedMultiplier } from './status';
 
 /**
  * 雑魚敵の移動。一番近いプレイヤーへまっすぐ向かう。
@@ -50,11 +51,18 @@ export function moveEnemies(world: World): void {
       e.y[i] = e.prevY[i] = target.y + fy * dist + fx * side;
       continue;
     }
-    if (best === 0) continue;
-    const d = Math.sqrt(best);
-    const step = Math.min(e.speed[i]! * world.dt, d);
-    e.x[i] = x + ((target.x - x) / d) * step;
-    e.y[i] = y + ((target.y - y) / d) * step;
+    if (best > 0) {
+      const d = Math.sqrt(best);
+      const step = Math.min(e.speed[i]! * speedMultiplier(world, i) * world.dt, d);
+      e.x[i] = x + ((target.x - x) / d) * step;
+      e.y[i] = y + ((target.y - y) / d) * step;
+    }
+    // ノックバックは止まっていても効く
+    if (e.kbTicks[i]! > 0) {
+      e.x[i]! += e.kbVx[i]! * world.dt;
+      e.y[i]! += e.kbVy[i]! * world.dt;
+      e.kbTicks[i]!--;
+    }
   }
 }
 

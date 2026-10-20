@@ -2,6 +2,10 @@ import type { Axis, InputCommand, PlayerId } from '../sim/commands';
 import type { World } from '../sim/world';
 import { round2, type NetMessage } from './protocol';
 
+/** 命中のメッセージ（'d'）と効果のメッセージ（'fx'）の1件あたりの数値の数 */
+const DAMAGE_STRIDE = 8;
+const EFFECT_STRIDE = 7;
+
 export interface SyncRate {
   playerStateIntervalTicks: number;
   correctionIntervalTicks: number;
@@ -52,6 +56,7 @@ export class SyncSession {
     const kills: number[] = [];
     const retired: number[] = [];
     const damages: number[] = [];
+    const effects: number[] = [];
     for (const ev of world.events) {
       switch (ev.type) {
         case 'enemySpawned':
@@ -63,8 +68,11 @@ export class SyncSession {
         case 'enemyRetired':
           if (role === 'host') retired.push(ev.id);
           break;
+        case 'enemyAffected':
+          if (role === 'host') effects.push(ev.enemyId, ev.by, round2(ev.kbx), round2(ev.kby), ev.kbTicks, ev.status, ev.statusTicks);
+          break;
         case 'damageDealt':
-          if (role === 'guest') damages.push(ev.enemyId, ev.amount, ev.by);
+          if (role === 'guest') damages.push(ev.enemyId, ev.amount, ev.by, round2(ev.kbx), round2(ev.kby), ev.kbTicks, ev.status, ev.statusTicks);
           break;
         case 'projectileHit':
           break;
@@ -74,6 +82,7 @@ export class SyncSession {
     if (kills.length) out.push({ t: 'k', e: kills });
     if (retired.length) out.push({ t: 'rt', e: retired });
     if (damages.length) out.push({ t: 'd', e: damages });
+    if (effects.length) out.push({ t: 'fx', e: effects });
 
     if (role === 'host' && world.tick % this.rate.correctionIntervalTicks === 0 && world.enemies.count > 0) {
       const e = world.enemies;
@@ -121,8 +130,21 @@ export class SyncSession {
           break;
         case 'd':
           if (host) {
-            for (let k = 0; k + 2 < m.e.length; k += 3) {
-              cmds.push({ type: 'damageEnemy', id: m.e[k]!, amount: m.e[k + 1]!, by: m.e[k + 2]! });
+            for (let k = 0; k + DAMAGE_STRIDE - 1 < m.e.length; k += DAMAGE_STRIDE) {
+              const [id, amount, by, kbx, kby, kbTicks, status, statusTicks] = m.e.slice(k, k + DAMAGE_STRIDE) as [
+                number, number, number, number, number, number, number, number,
+              ];
+              cmds.push({ type: 'damageEnemy', id, amount, by, kbx, kby, kbTicks, status, statusTicks });
+            }
+          }
+          break;
+        case 'fx':
+          if (guest) {
+            for (let k = 0; k + EFFECT_STRIDE - 1 < m.e.length; k += EFFECT_STRIDE) {
+              const [id, by, kbx, kby, kbTicks, status, statusTicks] = m.e.slice(k, k + EFFECT_STRIDE) as [
+                number, number, number, number, number, number, number,
+              ];
+              cmds.push({ type: 'affectEnemy', id, by, kbx, kby, kbTicks, status, statusTicks });
             }
           }
           break;

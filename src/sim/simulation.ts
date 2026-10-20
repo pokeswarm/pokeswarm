@@ -6,6 +6,7 @@ import { applyCommands } from './systems/commands';
 import { moveEnemies, rebuildEnemyHash, separateEnemies } from './systems/enemyMovement';
 import { movePlayers } from './systems/movement';
 import { spawnEnemies } from './systems/spawn';
+import { tickStatuses } from './systems/status';
 import { createWorld, type SimRole, type World } from './world';
 
 export interface SimulationOptions {
@@ -54,6 +55,7 @@ export class Simulation {
     moveEnemies(w);
     rebuildEnemyHash(w);
     separateEnemies(w);
+    tickStatuses(w);
     playerAttacks(w);
     moveProjectiles(w);
     w.enemies.removeDead();

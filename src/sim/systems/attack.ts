@@ -1,4 +1,7 @@
+import type { HitEffect } from '../events';
 import type { World } from '../world';
+import { applyHitEffect } from './commands';
+import { damageTakenMultiplier } from './status';
 
 /**
  * 仮の自動攻撃: 一定間隔で、射程内の一番近い敵へ弾を撃つ。
@@ -89,11 +92,15 @@ export function moveProjectiles(world: World): void {
       pr.pierceLeft[i]!--;
       hitAny = true;
       if (!local) continue;
+      // 効果（ノックバック・状態異常）は当てたプレイヤーの画面ですぐ付け、相手へは命中と一緒に送る
+      const fx = rollHitEffect(world, pr.vx[i]!, pr.vy[i]!);
+      applyHitEffect(world, j, fx, owner);
       if (world.role === 'guest') {
-        world.events.push({ type: 'damageDealt', enemyId: e.id[j]!, amount: pr.damage[i]!, by: owner });
+        world.events.push({ type: 'damageDealt', enemyId: e.id[j]!, amount: pr.damage[i]!, by: owner, ...fx });
         continue;
       }
-      e.hp[j]! -= pr.damage[i]!;
+      if (world.role === 'host') world.events.push({ type: 'enemyAffected', enemyId: e.id[j]!, by: owner, ...fx });
+      e.hp[j]! -= pr.damage[i]! * damageTakenMultiplier(world, j);
       if (e.hp[j]! <= 0) {
         world.events.push({ type: 'enemyKilled', enemyId: e.id[j]!, by: owner });
         world.stats.kills++;
@@ -102,4 +109,29 @@ export function moveProjectiles(world: World): void {
     if (hitAny) world.events.push({ type: 'projectileHit', x, y, owner: pr.owner[i]! });
     if (pr.pierceLeft[i]! <= 0) pr.removeAt(i);
   }
+}
+
+/**
+ * 仮の自動攻撃の効果を決める。ノックバックは発射体の進む向き。
+ * 状態異常が付くかの判定は、当てたプレイヤーのブラウザの乱数で行う（03_network.md 3.2）。
+ */
+function rollHitEffect(world: World, vx: number, vy: number): HitEffect {
+  const a = world.rules.attack;
+  const tickRate = 1 / world.dt;
+  let kbx = 0;
+  let kby = 0;
+  let kbTicks = 0;
+  if (a.knockback && a.knockback.speed > 0) {
+    const len = Math.sqrt(vx * vx + vy * vy) || 1;
+    kbx = (vx / len) * a.knockback.speed;
+    kby = (vy / len) * a.knockback.speed;
+    kbTicks = Math.round(a.knockback.durationSeconds * tickRate);
+  }
+  let status = -1;
+  let statusTicks = 0;
+  if (a.status && world.rng.next() < a.status.chance) {
+    status = world.statusKinds.findIndex((k) => k.id === a.status!.id);
+    statusTicks = Math.round(a.status.durationSeconds * tickRate);
+  }
+  return { kbx, kby, kbTicks, status, statusTicks };
 }

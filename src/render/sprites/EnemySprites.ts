@@ -33,6 +33,8 @@ export class EnemySprites {
     e: EnemyStore,
     alpha: number,
     view: { left: number; top: number; right: number; bottom: number },
+    /** 色を付けるなら色、付けないなら null（状態異常の表示） */
+    tintOf: (index: number) => number | null = () => null,
   ): number {
     for (const slot of this.slots.values()) slot.seen = false;
     let drawn = 0;
@@ -65,6 +67,9 @@ export class EnemySprites {
         slot.sprite.play({ key, startFrame: frame - 1 });
       }
       slot.sprite.setPosition(x, y);
+      const tint = tintOf(i);
+      if (tint === null) slot.sprite.clearTint();
+      else slot.sprite.setTint(tint);
       drawn++;
     }
     for (const [id, slot] of this.slots) {

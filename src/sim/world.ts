@@ -4,6 +4,7 @@ import type { Player } from './entities/player';
 import { ProjectileStore } from './entities/projectiles';
 import type { SimEvent } from './events';
 import { Rng } from './rng';
+import type { StatusKind } from '../data/schema';
 import type { SimRules } from './rules';
 import { SpatialHash } from './spatial/spatialHash';
 
@@ -37,6 +38,8 @@ export interface World {
   /** この更新で起きた出来事（更新のたびに空にする） */
   readonly events: SimEvent[];
   readonly stats: { kills: number };
+  /** 状態異常の種類（番号は data/game/status.json の並び） */
+  readonly statusKinds: readonly StatusKind[];
   /** 時間帯ごとに出す敵の種類（rules.spawn.waves を更新回数と種類の番号に直したもの） */
   readonly waves: readonly { readonly startTick: number; readonly hpMultiplier: number; readonly kinds: readonly number[] }[];
   /** 近傍検索の作業用（更新中にメモリを確保しないため） */
@@ -59,7 +62,8 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     dt: 1 / tickRate,
     rules,
     players: [],
-    enemies: new EnemyStore(capacity),
+    enemies: new EnemyStore(capacity, rules.status.kinds.length),
+    statusKinds: rules.status.kinds,
     projectiles: new ProjectileStore(rules.attack.maxProjectiles, rules.attack.hitMemory),
     enemyHash: new SpatialHash(rules.spawn.spatialCellSize, capacity),
     rng: new Rng(seed),

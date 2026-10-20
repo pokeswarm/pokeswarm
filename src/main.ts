@@ -33,7 +33,11 @@ async function connectIfRequested(panel: NetPanel): Promise<RoomConnection | nul
       onStatus: (s, roomId) => {
         if (s === 'waitingGuest' && roomId) {
           const url = new URL(window.location.href);
-          url.search = new URLSearchParams({ join: roomId }).toString();
+          // 確認用のパラメータ（?status= など）はゲストにも引き継ぐ。部屋の作り方の指定は外す
+          const params = new URLSearchParams(window.location.search);
+          for (const k of ['host', 'relay', 'p2pfail']) params.delete(k);
+          params.set('join', roomId);
+          url.search = params.toString();
           panel.showJoinUrl(url.toString());
         } else {
           panel.show(`net.${s}`);

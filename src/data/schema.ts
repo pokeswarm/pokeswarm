@@ -133,6 +133,12 @@ export const attackConfigSchema = z.object({
   damage: z.number().positive(),
   /** 1つの発射体が当たれる敵の数。"infinite" なら貫通無限（近接攻撃など） */
   pierce: z.union([z.number().int().positive(), z.literal('infinite')]),
+  /** ノックバック: 当たった敵を、攻撃の向きへ speed（ワールド単位/秒）で durationSeconds 秒押し返す。無ければ押し返さない */
+  knockback: z.object({ speed: z.number().nonnegative(), durationSeconds: z.number().nonnegative() }).optional(),
+  /** 状態異常: 当たったとき chance の確率で id の状態異常を durationSeconds 秒付ける。無ければ付けない */
+  status: z
+    .object({ id: z.string(), chance: z.number().min(0).max(1), durationSeconds: z.number().positive() })
+    .optional(),
   projectileSpeed: z.number().positive(),
   projectileRadius: z.number().positive(),
   projectileLifetimeSeconds: z.number().positive(),
@@ -316,3 +322,29 @@ export const networkConfigSchema = z.object({
   guestSpawnOffsetX: z.number(),
 });
 export type NetworkConfig = z.infer<typeof networkConfigSchema>;
+
+// ---- 状態異常 ----
+
+/**
+ * 状態異常の種類ごとの効果。効果の部品の組み合わせで表す（技術検証では次の3つ）:
+ * - damagePerSecond: 継続ダメージ（やけど・どく）
+ * - speedMultiplier: 移動の速さの倍率。0 で止まる（まひ・こおり）
+ * - damageTakenMultiplier: 受けるダメージの倍率（ぼうぎょダウン）
+ * 違う状態異常は同時にかかる。速さは一番遅いもの、受けるダメージは掛け合わせ。
+ * 同じ状態異常を重ねたら、残り時間の長いほうにする（重ねがけで強くしない）。
+ */
+export const statusKindSchema = z.object({
+  id: z.string().min(1),
+  damagePerSecond: z.number().nonnegative(),
+  speedMultiplier: z.number().min(0),
+  damageTakenMultiplier: z.number().positive(),
+  /** かかっている間の敵の色（見た目だけ） */
+  color: colorString,
+});
+export type StatusKind = z.infer<typeof statusKindSchema>;
+
+export const statusConfigSchema = z.object({
+  /** 種類の数は 255 まで（通信で番号を送るため） */
+  kinds: z.array(statusKindSchema).min(1).max(255),
+});
+export type StatusConfig = z.infer<typeof statusConfigSchema>;

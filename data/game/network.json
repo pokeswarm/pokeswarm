@@ -16,6 +16,7 @@
   },
   "guestSpawnOffsetX": 60,
   "maxPlayers": 4,
+  "smoothing": { "playerBlend": 0.35, "predictTicks": 8, "enemyBlend": 0.15, "snapDistance": 240 },
   "pingIntervalMs": 1000,
   "silenceTimeoutSeconds": 10
 }

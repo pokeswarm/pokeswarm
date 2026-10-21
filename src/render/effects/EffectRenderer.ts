@@ -5,6 +5,8 @@ import type { CircleSource } from '../PooledCircles';
 
 const GLOW_TEXTURE = 'effect-glow';
 const GLOW_SIZE = 64;
+/** 発射体の芯の大きさ（当たり判定の直径に対する割合。レシピの coreScale に掛ける） */
+const CORE_RATIO = 0.35;
 
 type ParticleDef = EffectParticle;
 
@@ -15,7 +17,21 @@ const BLEND: Record<ParticleDef['blend'], string> = {
   multiply: 'MULTIPLY',
 };
 
-/** 中心が明るく外へ向かって消える円（光・火の粉・破裂の共通素材）。画像素材は使わず実行時に作る */
+/** 縁のはっきりした円（発射体の芯。当たり判定の範囲はグラデーションで表さない。HitShapes を参照） */
+const CORE_TEXTURE = 'effect-core';
+function ensureCoreTexture(scene: Phaser.Scene): void {
+  if (scene.textures.exists(CORE_TEXTURE)) return;
+  const tex = scene.textures.createCanvas(CORE_TEXTURE, GLOW_SIZE, GLOW_SIZE);
+  if (!tex) return;
+  const ctx = tex.getContext();
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(GLOW_SIZE / 2, GLOW_SIZE / 2, GLOW_SIZE / 2, 0, Math.PI * 2);
+  ctx.fill();
+  tex.refresh();
+}
+
+/** 中心が明るく外へ向かって消える円（火の粉・破裂・命中の光など、パーティクルの共通素材）。画像素材は使わず実行時に作る */
 function ensureGlowTexture(scene: Phaser.Scene): void {
   if (scene.textures.exists(GLOW_TEXTURE)) return;
   const tex = scene.textures.createCanvas(GLOW_TEXTURE, GLOW_SIZE, GLOW_SIZE);
@@ -55,7 +71,6 @@ function scatter(spread: number): number {
  */
 export class EffectRenderer {
   private readonly cores: Phaser.GameObjects.Image[] = [];
-  private readonly glows: Phaser.GameObjects.Image[] = [];
   private visible = 0;
   private readonly trailEmitters = new Map<string, Phaser.GameObjects.Particles.ParticleEmitter>();
   private readonly burstEmitters = new Map<string, Phaser.GameObjects.Particles.ParticleEmitter>();
@@ -71,6 +86,7 @@ export class EffectRenderer {
     pixel: { size: number; colorSteps: number; alphaSteps: number } = { size: 0, colorSteps: 2, alphaSteps: 2 },
   ) {
     ensureGlowTexture(scene);
+    ensureCoreTexture(scene);
     // 演出は光なので、まとめた絵を背景に足し合わせる（中で加算した色が、透明の上で暗く濁らないように）
     this.layer = scene.add.layer().setDepth(depth).setBlendMode(Phaser.BlendModes.ADD);
     // ポケモンのドット絵に合わせて、なめらかな光を角ばった少ない色の形にする
@@ -139,56 +155,37 @@ export class EffectRenderer {
       const trail = recipe.trail;
       let x = src.prevX[i]! + (src.x[i]! - src.prevX[i]!) * alpha;
       let y = src.prevY[i]! + (src.y[i]! - src.prevY[i]!) * alpha;
-      let r = src.radius[i]!;
+      const r = src.radius[i]!;
       const sector = sectorOf(i);
-      if (sector) {
-        // 扇形: 自分の周り全部なら輪の上に薄く、前方の扇なら扇の真ん中に置く
-        if (sector.half < Math.PI) {
-          x += sector.dirX * r * 0.55;
-          y += sector.dirY * r * 0.55;
-          r *= Math.min(0.5, Math.sin(Math.min(sector.half, Math.PI / 2)) * 0.6 + 0.15);
-        } else {
-          r *= 0.8;
-        }
-      }
       if (trail) {
         const em = this.emitter(this.trailEmitters, recipeId, trail, this.depth - 0.5);
         const n = trailCountOf(recipeId, trail);
         for (let k = 0; k < n; k++) em.emitParticleAt(x + scatter(trail.spread), y + scatter(trail.spread), 1);
       }
-      if (!body) continue;
+      // 範囲そのもの（光の色）は HitShapes が平らに塗る。ここでは発射体の芯だけを、当たり判定の内側に小さく描く。扇形は芯を出さない
+      if (!body || sector) continue;
       const pulse = body.pulse ? 1 + Math.sin((timeMs / body.pulse.periodMs) * Math.PI * 2) * body.pulse.amount : 1;
-      let glow = this.glows[used];
       let core = this.cores[used];
-      if (!glow || !core) {
-        glow = this.add(this.scene.add.image(0, 0, GLOW_TEXTURE).setDepth(this.depth).setBlendMode(Phaser.BlendModes.ADD));
-        core = this.add(this.scene.add.image(0, 0, GLOW_TEXTURE).setDepth(this.depth + 0.1).setBlendMode(Phaser.BlendModes.ADD));
-        this.glows.push(glow);
+      if (!core) {
+        core = this.add(this.scene.add.image(0, 0, CORE_TEXTURE).setDepth(this.depth + 0.1).setBlendMode(Phaser.BlendModes.ADD));
         this.cores.push(core);
       }
-      // glowScale・coreScale は当たり判定の直径に対する倍率
+      // 芯の直径は当たり判定の直径 × coreScale × CORE_RATIO（当たり判定からはみ出さない）
       const unit = (r * 2) / GLOW_SIZE;
+      const size = Math.min(1, body.coreScale * CORE_RATIO * pulse);
       const line = lineOf(i);
       if (line) {
-        // ビーム: 円の画像を線の長さに引き伸ばし、向きに合わせて回す
+        // ビーム: 芯の円を線の長さに引き伸ばし、向きに合わせて回す
         const cx = x + (line.dirX * line.length) / 2;
         const cy = y + (line.dirY * line.length) / 2;
-        const rot = Math.atan2(line.dirY, line.dirX);
-        const lx = (line.length * 1.1) / GLOW_SIZE;
-        glow.setPosition(cx, cy).setRotation(rot).setScale(lx, unit * body.glowScale * 0.6 * pulse);
-        core.setPosition(cx, cy).setRotation(rot).setScale(lx, unit * body.coreScale);
+        core.setPosition(cx, cy).setRotation(Math.atan2(line.dirY, line.dirX)).setScale((line.length + r * 2 * size) / GLOW_SIZE, unit * size);
       } else {
-        glow.setPosition(x, y).setRotation(0).setScale(unit * body.glowScale * pulse);
-        core.setPosition(x, y).setRotation(0).setScale(unit * body.coreScale);
+        core.setPosition(x, y).setRotation(0).setScale(unit * size);
       }
-      glow.setTint(hexColor(body.glowColor)).setAlpha(body.glowAlpha).setVisible(true);
-      core.setTint(hexColor(body.coreColor)).setVisible(true);
+      core.setTint(hexColor(body.coreColor)).setAlpha(body.glowAlpha).setVisible(true);
       used++;
     }
-    for (let k = used; k < this.visible; k++) {
-      this.glows[k]!.setVisible(false);
-      this.cores[k]!.setVisible(false);
-    }
+    for (let k = used; k < this.visible; k++) this.cores[k]!.setVisible(false);
     this.visible = used;
   }
 

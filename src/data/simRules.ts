@@ -8,6 +8,7 @@ import {
   enemiesConfig,
   generated,
   itemsConfig,
+  networkConfig,
   levelingConfig,
   movesConfig,
   pickupConfig,
@@ -97,6 +98,7 @@ export function buildSimRules(): SimRules {
     stats: statsConfig,
     stage: stageConfig,
     obstacles: obstacleConfig,
+    netSmoothing: networkConfig.smoothing,
   };
 }
 

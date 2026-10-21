@@ -60,6 +60,8 @@ async function start(): Promise<void> {
       height: '100%',
     },
   });
+  // 開発中だけ、ブラウザの開発者ツールから画面を確かめられるようにする（公開版には入らない）
+  if (import.meta.env.DEV) (window as unknown as { game?: Phaser.Game }).game = game;
   game.scene.add('title', TitleScene, !lobby && !run);
   game.scene.add('select', SelectScene, false);
   game.scene.add('lobby', LobbyScene, !!lobby, lobby ?? undefined);

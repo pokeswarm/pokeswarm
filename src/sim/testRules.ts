@@ -92,6 +92,7 @@ export function testRules(
       spatialCellSize: 64,
       retireOldWaveKinds: true,
       hpPerLevelPct: 0,
+      perExtraPlayer: { spawnPct: 0, hpPct: 0, xpSharePct: 0 },
       waves: [{ hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] }],
       ...overrides.spawn,
     },
@@ -113,7 +114,7 @@ export function testRules(
       items: {
         potion: { dropChance: 0, healPct: 30 },
         magnet: { dropChance: 0, speed: 1400 },
-        'rare-candy': { revealSeconds: 1, levels: [{ levels: 3, weight: 1 }] },
+        'rare-candy': { revealSeconds: 1, holdSeconds: 0, levels: [{ levels: 3, weight: 1 }] },
       },
       ...overrides.pickups,
     },
@@ -153,6 +154,7 @@ export function testRules(
     },
     // 既定では障害物を置かない
     obstacles: { cellSize: 500, chance: 0, margin: 50, radius: 20, safeRadius: 0, sections: [['test']] },
+    netSmoothing: { playerBlend: 0.35, predictTicks: 8, enemyBlend: 0.15, snapDistance: 240 },
   };
 }
 

@@ -102,7 +102,7 @@ export class LevelUpPanel {
   /** 除外のモード（次に選んだ候補を除外する） */
   private banning = false;
   /** 最後に出した内容（除外のモードの切り替えで作り直すため） */
-  private last: { level: number; offers: OfferText[]; rerolls: number; secondsLeft: number; bans: number } | null = null;
+  private last: { level: number; offers: OfferText[]; rerolls: number; secondsLeft: number; bans: number; more: number } | null = null;
 
   constructor(
     private readonly handlers: {
@@ -133,10 +133,10 @@ export class LevelUpPanel {
   }
 
   /** 毎フレーム呼ぶ。内容が変わったときだけ作り直す */
-  show(level: number, offers: OfferText[], rerolls: number, secondsLeft: number, bans = 0): void {
-    this.last = { level, offers, rerolls, secondsLeft, bans };
+  show(level: number, offers: OfferText[], rerolls: number, secondsLeft: number, bans = 0, more = 0): void {
+    this.last = { level, offers, rerolls, secondsLeft, bans, more };
     if (bans <= 0) this.banning = false;
-    const key = JSON.stringify([level, offers, rerolls, secondsLeft, bans, this.banning]);
+    const key = JSON.stringify([level, offers, rerolls, secondsLeft, bans, more, this.banning]);
     if (key === this.shownKey) return;
     this.shownKey = key;
 
@@ -144,7 +144,8 @@ export class LevelUpPanel {
     header.style.cssText = 'display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px';
     const title = document.createElement('div');
     title.style.cssText = 'font-size:26px;font-weight:bold';
-    title.textContent = t('levelUp.title', { level });
+    // ふしぎなアメなどで続けて上がるときは、あと何回選ぶかも出す
+    title.textContent = more > 0 ? t('levelUp.titleMore', { level, more }) : t('levelUp.title', { level });
     const timer = document.createElement('div');
     timer.style.cssText = 'opacity:0.85';
     timer.textContent = `${t('levelUp.timeLeft', { seconds: secondsLeft })}　${t(this.banning ? 'levelUp.banHint' : 'levelUp.hint')}`;
@@ -240,7 +241,7 @@ export class LevelUpPanel {
     if (!this.last || this.last.bans <= 0) return;
     this.banning = !this.banning;
     const l = this.last;
-    this.show(l.level, l.offers, l.rerolls, l.secondsLeft, l.bans);
+    this.show(l.level, l.offers, l.rerolls, l.secondsLeft, l.bans, l.more);
   }
 
   hide(): void {

@@ -8,7 +8,7 @@
   "maxItems": 64,
   "items": {
     "potion": {
-      "dropChance": 0.003,
+      "dropChance": 0.0006,
       "healPct": 30
     },
     "magnet": {
@@ -17,6 +17,7 @@
     },
     "rare-candy": {
       "revealSeconds": 1.2,
+      "holdSeconds": 1.2,
       "levels": [
         {
           "levels": 1,

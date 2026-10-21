@@ -16,10 +16,21 @@ export function moveEnemies(world: World): void {
   const retire = s.retireOldWaveKinds && world.role !== 'guest';
   const waveKinds = world.waves[currentWaveIndex(world)]!.kinds;
   for (let i = 0; i < e.count; i++) {
+    e.prevX[i] = e.x[i]!;
+    e.prevY[i] = e.y[i]!;
+    // ホストの位置の補正を少しずつ寄せる（ゲストだけ。ソロ・ホストでは常に 0）
+    if (e.corrX[i] !== 0 || e.corrY[i] !== 0) {
+      const f = world.rules.netSmoothing.enemyBlend;
+      const cx = e.corrX[i]! * f;
+      const cy = e.corrY[i]! * f;
+      e.x[i]! += cx;
+      e.y[i]! += cy;
+      e.corrX[i]! -= cx;
+      e.corrY[i]! -= cy;
+      if (Math.abs(e.corrX[i]!) < 0.01 && Math.abs(e.corrY[i]!) < 0.01) e.corrX[i] = e.corrY[i] = 0;
+    }
     const x = e.x[i]!;
     const y = e.y[i]!;
-    e.prevX[i] = x;
-    e.prevY[i] = y;
 
     // まっすぐ進む敵（スウォームの突進）: 追わずに進み、離れすぎたら消す（移し替えない）
     if (e.vx[i] !== 0 || e.vy[i] !== 0) {

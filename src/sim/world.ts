@@ -325,5 +325,6 @@ export function ticksUntilNextSection(world: World): number | null {
 /** 雑魚の HP の倍率: 区間の倍率 × プレイヤーのレベル（全員で共有）による倍率 */
 export function enemyHpScale(world: World): number {
   const wave = world.waves[world.section]!;
-  return wave.hpMultiplier * (1 + (world.rules.spawn.hpPerLevelPct * (world.level - 1)) / 100);
+  const extra = Math.max(0, world.players.length - 1);
+  return wave.hpMultiplier * (1 + (world.rules.spawn.hpPerLevelPct * (world.level - 1)) / 100) * (1 + (world.rules.spawn.perExtraPlayer.hpPct * extra) / 100);
 }

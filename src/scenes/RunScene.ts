@@ -11,7 +11,7 @@ import { hexColor } from '../render/color';
 import { EffectRenderer } from '../render/effects/EffectRenderer';
 import { audio } from '../audio';
 import { RunSounds } from '../audio/runSounds';
-import { HitOutlines } from '../render/effects/HitOutlines';
+import { HitShapes } from '../render/effects/HitShapes';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
 import { ObstacleView } from '../render/ObstacleView';
 import { HudIcons } from '../render/HudIcons';
@@ -81,9 +81,9 @@ export class RunScene extends Phaser.Scene {
   private statusColors: number[] = [];
   private effects!: EffectRenderer;
   private sounds!: RunSounds;
-  private hitOutlines!: HitOutlines;
+  private hitShapes!: HitShapes;
   /** 技ごとの縁取りの色（明るい線・暗い線）。描かない技は null */
-  private outlineColors: ({ light: number; dark: number } | null)[] = [];
+  private shapeColors: ({ fill: number; edge: number } | null)[] = [];
   private ground!: GroundTiles;
   private hud!: Phaser.GameObjects.Text;
   /** 持っている技・持ち物・パッシブのアイコンとレベルの星 */
@@ -273,12 +273,12 @@ export class RunScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.levelUpPanel.hide());
     this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));
     this.effects = new EffectRenderer(this, effectRecipes, 2, spriteRender.effectPixel);
-    const outline = spriteRender.hitOutline;
-    this.hitOutlines = new HitOutlines(this, 2.5, outline.dot, outline.alpha);
-    this.outlineColors = rules.moves.map((m) => {
-      if (outline.moves && !outline.moves.includes(m.key)) return null;
-      const light = hexColor(effectRecipes[m.effect]?.projectile?.glowColor ?? '#ffffff');
-      return { light, dark: scaleColor(light, outline.dark) };
+    const shape = spriteRender.hitShape;
+    this.hitShapes = new HitShapes(this, 1.9, shape);
+    this.shapeColors = rules.moves.map((m) => {
+      if (shape.moves && !shape.moves.includes(m.key)) return null;
+      const fill = hexColor(effectRecipes[m.effect]?.projectile?.glowColor ?? '#ffffff');
+      return { fill, edge: lighten(fill, shape.edgeLighten) };
     });
     const local = this.sim.world.players.find((p) => p.id === this.localId)!;
     if (this.playerSprite && new URLSearchParams(window.location.search).has('gallery')) {
@@ -384,7 +384,9 @@ export class RunScene extends Phaser.Scene {
     const steps = this.clock.advance(delta);
     this.runSteps(steps, true);
     this.lastSteps = steps;
-    this.draw(this.clock.alpha, delta, time);
+    // 止まっている間（レベルアップの選択・ランの終わり）は前回と今回の位置の間を補間しない（補間の割合だけが毎フレーム変わり、画面全体が震えて見えた）
+    const w = this.sim.world;
+    this.draw(w.levelUp || w.outcome ? 1 : this.clock.alpha, delta, time);
     // タブが裏にあって終わりの知らせを描画で受け取れなかった場合も、結果画面へ移る
     if (this.sim.world.outcome && this.resultAt === null) this.resultAt = performance.now() + stageConfig.endDelaySeconds * 1000;
     if (this.sim.world.outcome && !this.runRecorded) this.recordRunEnd();
@@ -631,21 +633,43 @@ export class RunScene extends Phaser.Scene {
       timer.remove();
       shake.remove();
       box.setAngle(0).setTexture(pixelTextureKey('candy-box-open'));
-      this.announceText.setText(t('candy.result', { name, levels })).setColor('#ffe082');
+      // 当たりの数は箱の上に大きく出す（上の文字と重ならないよう、抽選中の文字は消す）
+      this.announceText.setAlpha(0);
       this.cameras.main.flash(250, 255, 255, 255);
       audio.sfx.play('candy.hit');
       this.burstCandies(bx, by, levels);
+      this.showCandyLevels(bx, by, levels);
       this.tweens.add({ targets: box, alpha: 0, delay: 1400, duration: 400, onComplete: () => box.destroy() });
-      this.tweens.add({ targets: this.announceText, alpha: 0, delay: 1500, duration: 600 });
     });
+  }
+
+  /**
+   * ふしぎなアメ: 当たったレベルの数を、箱のすぐ上に大きく出す（作者の指摘: 何レベル分の当たりか分かりづらい）。
+   * 当たりが大きいほど文字が大きく、色が派手で、「ちょっと／たくさん／大当たり」の言葉を添える
+   */
+  private showCandyLevels(x: number, y: number, levels: number): void {
+    const tier = candyTier(levels);
+    const style = { fontFamily: 'monospace', fontStyle: 'bold', stroke: '#000000', align: 'center' };
+    const big = this.add
+      .text(x, y - 34, t('candy.big', { levels }), { ...style, fontSize: `${tier.fontSize}px`, color: tier.color, strokeThickness: Math.round(tier.fontSize / 7) })
+      .setOrigin(0.5, 1)
+      .setDepth(1.7)
+      .setScale(0.2);
+    const label = this.add
+      .text(x, y - 34 - tier.fontSize, tMaybe(`candy.tier.${tier.levels}`), { ...style, fontSize: '16px', color: tier.color, strokeThickness: 4 })
+      .setOrigin(0.5, 1)
+      .setDepth(1.7)
+      .setAlpha(0);
+    this.tweens.add({ targets: big, scale: 1, duration: 260, ease: 'Back.easeOut' });
+    this.tweens.add({ targets: label, alpha: 1, delay: 180, duration: 200 });
+    this.tweens.add({ targets: [big, label], y: '-=24', alpha: 0, delay: 1600, duration: 500, onComplete: () => (big.destroy(), label.destroy()) });
   }
 
   /**
    * ふしぎなアメ: 箱からアメがあふれ出る（作者の決定: 上がるレベルが多いほどたくさん出る。+1 ちょっと・+3 たくさん・+5 大量）
    */
   private burstCandies(x: number, y: number, levels: number): void {
-    const table = itemSprites.candyBurst ?? [{ levels: 1, count: 4 }];
-    const count = (table.find((c) => c.levels === levels) ?? table.reduce((a, b) => (Math.abs(b.levels - levels) < Math.abs(a.levels - levels) ? b : a))).count;
+    const count = candyTier(levels).count;
     for (let i = 0; i < count; i++) {
       const candy = this.add.image(x, y - 8, pixelTextureKey('rare-candy')).setScale(itemSprites.dot).setDepth(1.6);
       // 上へ扇形に飛び出し、落ちながら消える
@@ -844,10 +868,10 @@ export class RunScene extends Phaser.Scene {
       (i) => (pr.shape[i] === SHAPE_LINE ? { length: pr.length[i]!, dirX: pr.dirX[i]!, dirY: pr.dirY[i]! } : null),
       (i) => (pr.shape[i] === SHAPE_SECTOR ? { dirX: pr.dirX[i]!, dirY: pr.dirY[i]!, half: pr.length[i]! } : null),
     );
-    this.hitOutlines.draw(
+    this.hitShapes.draw(
       pr,
       alpha,
-      (i) => this.outlineColors[pr.move[i]!] ?? null,
+      (i) => this.shapeColors[pr.move[i]!] ?? null,
       (i) => (pr.shape[i] === SHAPE_LINE ? { length: pr.length[i]!, dirX: pr.dirX[i]!, dirY: pr.dirY[i]! } : null),
       view,
       (i) => (pr.shape[i] === SHAPE_SECTOR ? { dirX: pr.dirX[i]!, dirY: pr.dirY[i]!, half: pr.length[i]! } : null),
@@ -861,7 +885,7 @@ export class RunScene extends Phaser.Scene {
     const lu = world.levelUp;
     if (lu && !lu.done.has(this.localId) && !world.outcome) {
       const offers = (lu.offers.get(this.localId) ?? []).map((o) => offerText(world, local, o, new Set(session.store.current.discoveries)));
-      this.levelUpPanel.show(lu.level, offers, local.rerolls, Math.ceil(lu.ticksLeft * world.dt), local.bans);
+      this.levelUpPanel.show(lu.level, offers, local.rerolls, Math.ceil(lu.ticksLeft * world.dt), local.bans, Math.max(0, world.level - lu.level));
     } else {
       this.levelUpPanel.hide();
     }
@@ -933,10 +957,14 @@ function enemyLayer(rules: { enemies: { kinds: readonly { id: string; rank?: str
   return rules.stage.swarms.some((s) => s.kind === k.id) ? 1 : 0;
 }
 
-/** 色の明るさを factor 倍にする（縁取りの暗い線） */
-function scaleColor(color: number, factor: number): number {
-  const r = Math.round(((color >> 16) & 0xff) * factor);
-  const g = Math.round(((color >> 8) & 0xff) * factor);
-  const b = Math.round((color & 0xff) * factor);
-  return (r << 16) | (g << 8) | b;
+/** ふしぎなアメの当たりの見た目（data/render/items.json の candyBurst。同じ数が無ければ一番近いもの） */
+function candyTier(levels: number): { levels: number; count: number; color: string; fontSize: number } {
+  const table = itemSprites.candyBurst ?? [{ levels: 1, count: 4, color: '#ffffff', fontSize: 28 }];
+  return table.find((c) => c.levels === levels) ?? table.reduce((a, b) => (Math.abs(b.levels - levels) < Math.abs(a.levels - levels) ? b : a));
+}
+
+/** 色を白へ amount の割合だけ寄せる（当たり判定の外周の明るい線） */
+function lighten(color: number, amount: number): number {
+  const mix = (c: number): number => Math.round(c + (255 - c) * amount);
+  return (mix((color >> 16) & 0xff) << 16) | (mix((color >> 8) & 0xff) << 8) | mix(color & 0xff);
 }

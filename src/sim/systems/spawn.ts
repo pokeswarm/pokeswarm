@@ -13,7 +13,9 @@ export function spawnEnemies(world: World): void {
   const kinds = world.rules.enemies.kinds;
   const wave = world.waves[currentWaveIndex(world)]!;
   const fill = enemies.count < wave.minimum * players.length ? (s.fillPerSecond ?? 0) : 0;
-  world.spawnAccumulator += (wave.spawnPerSecond + fill) * world.dt;
+  // 協力プレイでは人数に応じて出現を速くする（上限も人数分に増える）
+  const extra = (s.perExtraPlayer.spawnPct * (players.length - 1)) / 100;
+  world.spawnAccumulator += (wave.spawnPerSecond * (1 + extra) + fill) * world.dt;
   const cap = enemyCap(world);
   const hpScale = enemyHpScale(world);
   while (world.spawnAccumulator >= 1) {

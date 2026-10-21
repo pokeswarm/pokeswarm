@@ -24,6 +24,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         if (!p || !p.remote) break;
         p.netX = cmd.x;
         p.netY = cmd.y;
+        p.netAge = 0;
         p.facingX = cmd.facingX;
         p.facingY = cmd.facingY;
         p.inputX = cmd.inputX;
@@ -184,11 +185,21 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         if (cmd.tick !== undefined && world.role === 'guest' && Math.abs(world.tick - cmd.tick) > 3) world.tick = cmd.tick;
         const index = new Map<number, number>();
         for (let i = 0; i < e.count; i++) index.set(e.id[i]!, i);
+        // ずれは一度に直さず、敵の移動のたびに少しずつ寄せる（ワープして見えないように）。大きくずれたものだけ一度に合わせる
+        const snap2 = world.rules.netSmoothing.snapDistance ** 2;
         for (let k = 0; k + 2 < cmd.data.length; k += 3) {
           const i = index.get(cmd.data[k]!);
           if (i === undefined) continue;
-          e.x[i] = cmd.data[k + 1]!;
-          e.y[i] = cmd.data[k + 2]!;
+          const dx = cmd.data[k + 1]! - e.x[i]!;
+          const dy = cmd.data[k + 2]! - e.y[i]!;
+          if (dx * dx + dy * dy > snap2) {
+            e.x[i] = e.prevX[i] = cmd.data[k + 1]!;
+            e.y[i] = e.prevY[i] = cmd.data[k + 2]!;
+            e.corrX[i] = e.corrY[i] = 0;
+          } else {
+            e.corrX[i] = dx;
+            e.corrY[i] = dy;
+          }
         }
         break;
       }

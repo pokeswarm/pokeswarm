@@ -1,4 +1,4 @@
-import type { CombatConfig, EnemyKind, PickupConfig, SpawnConfig, StageConfig, StatsConfig, StatusConfig } from '../data/schema';
+import type { CombatConfig, EnemyKind, PickupConfig, SpawnConfig, StageConfig, StatsConfig, StatusConfig, NetSmoothing } from '../data/schema';
 import type { SimSpecies } from './species';
 import type { ObstacleRules } from './obstacles';
 import type { SimMoveDef, TypeChart } from './moves';
@@ -32,4 +32,6 @@ export interface SimRules {
   stage: StageConfig;
   /** マップの障害物 */
   obstacles: ObstacleRules;
+  /** 協力プレイで届いた位置をなめらかに見せる */
+  netSmoothing: NetSmoothing;
 }

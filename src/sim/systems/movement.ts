@@ -8,9 +8,22 @@ export function movePlayers(world: World): void {
     // 倒れている間は動かない
     if (p.down) continue;
     if (p.remote) {
-      // 別のブラウザのプレイヤーは、本人から届いた位置をそのまま使う
-      p.x = p.netX;
-      p.y = p.netY;
+      // 別のブラウザのプレイヤー: 届いた位置から、押している方向へ少し先まで進んだと予測した位置へなめらかに寄せる
+      // （位置は通信の都合でまとまって届くことがあり、そのまま使うとワープして見える）
+      const ns = world.rules.netSmoothing;
+      const ahead = Math.min(p.netAge, ns.predictTicks) * p.moveSpeed * world.dt * (p.inputX !== 0 && p.inputY !== 0 ? Math.SQRT1_2 : 1);
+      const tx = p.netX + p.inputX * ahead;
+      const ty = p.netY + p.inputY * ahead;
+      p.netAge++;
+      const dx = tx - p.x;
+      const dy = ty - p.y;
+      if (dx * dx + dy * dy > ns.snapDistance * ns.snapDistance) {
+        p.x = p.prevX = tx;
+        p.y = p.prevY = ty;
+      } else {
+        p.x += dx * ns.playerBlend;
+        p.y += dy * ns.playerBlend;
+      }
       continue;
     }
     if (p.inputX === 0 && p.inputY === 0) continue;

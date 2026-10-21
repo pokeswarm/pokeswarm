@@ -112,17 +112,8 @@
     ]
   },
   "candyBurst": [
-    {
-      "levels": 1,
-      "count": 4
-    },
-    {
-      "levels": 3,
-      "count": 14
-    },
-    {
-      "levels": 5,
-      "count": 42
-    }
+    {"levels": 1, "count": 4, "color": "#e0e0e0", "fontSize": 28},
+    {"levels": 3, "count": 14, "color": "#80d8ff", "fontSize": 40},
+    {"levels": 5, "count": 42, "color": "#ffd740", "fontSize": 60}
   ]
 }

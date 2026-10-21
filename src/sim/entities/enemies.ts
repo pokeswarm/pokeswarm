@@ -11,6 +11,9 @@ export class EnemyStore {
   readonly y: Float64Array;
   readonly prevX: Float64Array;
   readonly prevY: Float64Array;
+  /** ホストの位置の補正のうち、まだ寄せていないずれ（ゲストだけ使う） */
+  readonly corrX: Float64Array;
+  readonly corrY: Float64Array;
   readonly hp: Float64Array;
   readonly maxHp: Float64Array;
   readonly speed: Float64Array;
@@ -42,6 +45,8 @@ export class EnemyStore {
     this.y = new Float64Array(capacity);
     this.prevX = new Float64Array(capacity);
     this.prevY = new Float64Array(capacity);
+    this.corrX = new Float64Array(capacity);
+    this.corrY = new Float64Array(capacity);
     this.hp = new Float64Array(capacity);
     this.maxHp = new Float64Array(capacity);
     this.speed = new Float64Array(capacity);
@@ -65,6 +70,7 @@ export class EnemyStore {
     this.kind[i] = kind;
     this.x[i] = this.prevX[i] = x;
     this.y[i] = this.prevY[i] = y;
+    this.corrX[i] = this.corrY[i] = 0;
     this.hp[i] = this.maxHp[i] = hp;
     this.speed[i] = speed;
     this.radius[i] = radius;
@@ -95,6 +101,8 @@ export class EnemyStore {
     this.y[i] = this.y[last]!;
     this.prevX[i] = this.prevX[last]!;
     this.prevY[i] = this.prevY[last]!;
+    this.corrX[i] = this.corrX[last]!;
+    this.corrY[i] = this.corrY[last]!;
     this.hp[i] = this.hp[last]!;
     this.maxHp[i] = this.maxHp[last]!;
     this.speed[i] = this.speed[last]!;

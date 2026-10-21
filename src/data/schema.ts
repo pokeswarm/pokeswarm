@@ -125,6 +125,14 @@ export const spawnConfigSchema = z
      */
     hpPerLevelPct: z.number().nonnegative(),
     /**
+     * 協力プレイで、2人目以降1人につき（作者の指摘「人数に応じた難易度調整が簡単すぎる」。2026年10月21日）:
+     * - spawnPct: 出現の速さを何 % 上げるか（上限は capPerPlayer × 人数で増えるので、速さも合わせないと画面が埋まらない）
+     * - hpPct: 雑魚の HP を何 % 上げるか
+     * - xpSharePct: 雑魚1体の経験値を減らす割合（経験値は全員で共有し、レベルが上がると全員が強化を選ぶので、
+     *   倒す数が人数分に増えるとそのまま人数倍の速さで強くなる）。経験値 = 元の値 ÷ (1 + xpSharePct/100 × (人数 − 1))
+     */
+    perExtraPlayer: z.object({ spawnPct: z.number().min(0), hpPct: z.number().min(0), xpSharePct: z.number().min(0) }).default({ spawnPct: 0, hpPct: 0, xpSharePct: 0 }),
+    /**
      * 区間（時間帯）ごとに出す雑魚の種類（data/game/enemies.json の id）。原作の旅の順に並べる。
      * 区間は、その区間の中ボス（data/game/stage.json の gate）を倒すと次へ進む（作者の決定。2026年10月）。
      * 中ボスがいない区間は durationSeconds 後に次へ進む。その時間帯の種類から等しい確率で選ぶ。
@@ -621,13 +629,16 @@ export const spriteRenderSchema = z.object({
     alphaSteps: z.number().int().min(2),
   }),
   /**
-   * 技の当たり判定の形の縁取り（作者の指摘。2026年10月）。dot は1ドットのワールドの長さ（スプライトの拡大率と同じ）、
-   * dark は外側の暗い線の明るさ（レシピの光の色に掛ける）。moves を書くとその技だけ（試すとき）、省略で全部
+   * 技の当たり判定の形（作者の指摘。2026年10月21日）。グラデーションではなく、当たり判定の形を平らに塗り、外周に明るい線を引く。
+   * pixel は角ばったドットにするフィルターの大きさ、edge は線の太さ（ワールドの長さ）、fillAlpha・edgeAlpha は不透明度、
+   * edgeLighten は線の色をレシピの光の色から白へどれだけ寄せるか。moves を書くとその技だけ（試すとき）、省略で全部
    */
-  hitOutline: z.object({
-    dot: z.number().positive(),
-    alpha: z.number().min(0).max(1),
-    dark: z.number().min(0).max(1),
+  hitShape: z.object({
+    pixel: z.number().int().nonnegative(),
+    edge: z.number().positive(),
+    fillAlpha: z.number().min(0).max(1),
+    edgeAlpha: z.number().min(0).max(1),
+    edgeLighten: z.number().min(0).max(1),
     moves: z.array(z.string()).optional(),
   }),
 });
@@ -703,6 +714,20 @@ const syncRateSchema = z.object({
   correctionIntervalTicks: z.number().int().positive(),
 });
 
+/**
+ * 届いた位置をなめらかに見せる（作者の指摘「ゲストで敵も味方もワープする」。03_network.md 6.4）。
+ * - 相手のプレイヤー: 届いた位置から、押している方向へ predictTicks 回分まで先に進めた位置を目標にし、毎回 playerBlend の割合で寄せる
+ * - 敵の位置の補正: ずれを一度に直さず、毎回 enemyBlend の割合ずつ寄せる
+ * - ずれが snapDistance を超えたら（移し替え・復活など）一度に合わせる
+ */
+export const netSmoothingSchema = z.object({
+  playerBlend: z.number().gt(0).max(1),
+  predictTicks: z.number().int().nonnegative(),
+  enemyBlend: z.number().gt(0).max(1),
+  snapDistance: z.number().positive(),
+});
+export type NetSmoothing = z.infer<typeof netSmoothingSchema>;
+
 export const networkConfigSchema = z.object({
   /** WebRTC の接続に使う STUN サーバー */
   iceServers: z.array(z.object({ urls: z.union([z.string(), z.array(z.string())]) })),
@@ -723,6 +748,7 @@ export const networkConfigSchema = z.object({
   guestSpawnOffsetX: z.number(),
   /** 部屋の最大人数（ホストを含む） */
   maxPlayers: z.number().int().min(2),
+  smoothing: netSmoothingSchema,
 });
 export type NetworkConfig = z.infer<typeof networkConfigSchema>;
 
@@ -779,6 +805,8 @@ export const pickupConfigSchema = z.object({
     /** 中ボスが落とす。上がるレベルの数とその重み、抽選の演出の時間 */
     'rare-candy': z.object({
       revealSeconds: z.number().nonnegative(),
+      /** 当たりを見せてからレベルアップの選択を出すまでの時間（すぐ選択の画面が出ると、何レベル分の当たりか見えないため。作者の指摘 2026年10月21日） */
+      holdSeconds: z.number().nonnegative(),
       levels: z.array(z.object({ levels: z.number().int().positive(), weight: z.number().positive() })).min(1),
     }),
   }),
@@ -1078,7 +1106,7 @@ export type MusicScore = z.infer<typeof musicScoreSchema>;
 
 /**
  * 自作のドット絵（道具・アメの箱など）。1文字が1ドット（"." は透明）、色は palette。dot は1ドットのワールドの長さ。
- * candyBurst は、ふしぎなアメで上がるレベルの数ごとに、箱からあふれ出るアメの数（作者の決定: +1 ちょっと・+3 たくさん・+5 大量）
+ * candyBurst は、ふしぎなアメで上がるレベルの数ごとに、箱からあふれ出るアメの数（作者の決定: +1 ちょっと・+3 たくさん・+5 大量）と、箱の上に出す「+N」の見た目
  */
 export const pixelSpritesSchema = z
   .object({
@@ -1086,7 +1114,18 @@ export const pixelSpritesSchema = z
     /** #rrggbb（#rrggbbaa で半透明。影など） */
     palette: z.record(z.string().length(1), z.string().regex(/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/)),
     sprites: z.record(z.string(), z.array(z.string()).min(1)),
-    candyBurst: z.array(z.object({ levels: z.number().int().positive(), count: z.number().int().positive() })).min(1).optional(),
+    candyBurst: z
+      .array(
+        z.object({
+          levels: z.number().int().positive(),
+          count: z.number().int().positive(),
+          /** 箱の上に出す「+N」の色と文字の大きさ（当たりの大きさが一目で分かるように。作者の指摘 2026年10月21日） */
+          color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+          fontSize: z.number().positive(),
+        }),
+      )
+      .min(1)
+      .optional(),
   })
   .superRefine((d, ctx) => {
     for (const [name, rows] of Object.entries(d.sprites)) {

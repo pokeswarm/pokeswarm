@@ -12,7 +12,9 @@ export function dropGems(world: World): void {
   if (world.role === 'guest') return;
   const { gems, enemies: e } = world;
   const p = world.rules.pickups;
-  const waveXp = world.waves[currentWaveIndex(world)]!.xpMultiplier;
+  // 協力プレイでは雑魚1体の経験値を人数に応じて減らす（倒す数が増えても、レベルの上がる速さがソロから大きく離れないように）
+  const share = 1 / (1 + (world.rules.spawn.perExtraPlayer.xpSharePct * Math.max(0, world.players.length - 1)) / 100);
+  const waveXp = world.waves[currentWaveIndex(world)]!.xpMultiplier * share;
   for (const ev of world.events) {
     if (ev.type !== 'enemyKilled') continue;
     const i = findEnemyIndex(world, ev.enemyId);

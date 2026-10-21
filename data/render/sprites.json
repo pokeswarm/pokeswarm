@@ -16,9 +16,11 @@
     "viewHeight": 720,
     "zoomStep": 0.5
   },
-  "hitOutline": {
-    "dot": 2,
-    "alpha": 0.95,
-    "dark": 0.35
+  "hitShape": {
+    "pixel": 4,
+    "edge": 3,
+    "fillAlpha": 0.45,
+    "edgeAlpha": 0.9,
+    "edgeLighten": 0.45
   }
 }

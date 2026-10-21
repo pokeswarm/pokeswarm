@@ -25,6 +25,8 @@ export interface Player {
   /** 別のブラウザから届いた最新の位置（remote のときだけ使う） */
   netX: number;
   netY: number;
+  /** 最新の位置が届いてからの更新回数（その間は押している方向へ進んだと予測する） */
+  netAge: number;
   /** 現在押されている移動方向 */
   inputX: Axis;
   inputY: Axis;
@@ -102,6 +104,7 @@ export function createPlayer(init: PlayerInit): Player {
     prevY: init.y,
     netX: init.x,
     netY: init.y,
+    netAge: 0,
     inputX: 0,
     inputY: 0,
     facingX: 0,

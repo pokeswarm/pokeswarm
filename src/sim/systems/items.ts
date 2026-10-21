@@ -86,7 +86,7 @@ export function applyItem(world: World, id: number, by: PlayerId, kind: ItemKind
     const g = world.gems;
     for (let i = 0; i < g.count; i++) if (!g.pending[i]) g.attracted[i] = 2;
   } else {
-    world.candies.push({ levels, ticksLeft: Math.round(cfg['rare-candy'].revealSeconds / world.dt), by });
+    world.candies.push({ levels, ticksLeft: Math.round((cfg['rare-candy'].revealSeconds + cfg['rare-candy'].holdSeconds) / world.dt), by });
   }
   world.events.push({ type: 'itemCollected', id, by, kind, levels });
 }

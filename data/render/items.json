@@ -1,0 +1,128 @@
+{
+  "dot": 2,
+  "palette": {
+    "k": "#1f1530",
+    "g": "#c9ccd1",
+    "G": "#8a8f96",
+    "p": "#9c4fc4",
+    "P": "#d7a8ee",
+    "d": "#6a2d8f",
+    "w": "#ffffff",
+    "W": "#e9d3f5",
+    "R": "#ff6b5e",
+    "r": "#c62828",
+    "b": "#3f8cff",
+    "B": "#1f5fd1",
+    "y": "#ffd54f",
+    "Y": "#f9a825",
+    "o": "#c98a4b",
+    "O": "#e0a86a",
+    "n": "#8a5a2b"
+  },
+  "sprites": {
+    "potion": [
+      "......kkkk......",
+      ".....kggggk.....",
+      ".....kGgggk.....",
+      ".....kGgggk.....",
+      "....kGGGGGGk....",
+      "...kpWpppppdk...",
+      "...kpWpppppdk...",
+      "...kpWpppppdk...",
+      "...kwwwwwwwwk...",
+      "...kwwPPPPwwk...",
+      "...kwwwwwwwwk...",
+      "...kpppppppdk...",
+      "...kpppppppdk...",
+      "...kddddddddk...",
+      "....kkkkkkkk....",
+      "................"
+    ],
+    "magnet": [
+      "................",
+      "..kkkk....kkkk..",
+      ".kwwwwk..kwwwwk.",
+      ".kggggk..kggggk.",
+      ".krrRRk..kRRrrk.",
+      ".krrRRk..kRRrrk.",
+      ".krrRRk..kRRrrk.",
+      ".krrRRk..kRRrrk.",
+      ".krrRRk..kRRrrk.",
+      ".krrRRk..kRRrrk.",
+      ".krrRRRkkRRRrrk.",
+      "..krRRRRRRRRrk..",
+      "...krrrrrrrrk...",
+      "....krrrrrrk....",
+      ".....kkkkkk.....",
+      "................"
+    ],
+    "rare-candy": [
+      "................",
+      "................",
+      "................",
+      ".......kk.......",
+      ".....kkbbkk.....",
+      "...kkbbbbbbkk...",
+      "..kybbwbbbbbyk..",
+      ".kyybbwbbbbbyyk.",
+      "kyyYbbbbbbbBYyyk",
+      ".kyybbbbbbBByyk.",
+      "..kybbbbbBBByk..",
+      "...kkbbbBBBkk...",
+      ".....kkBBkk.....",
+      ".......kk.......",
+      "................",
+      "................"
+    ],
+    "candy-box": [
+      "................",
+      "................",
+      ".kkkkkkkkkkkkkk.",
+      "kOOOOOOYYOOOOOOk",
+      "kooooooYYooooook",
+      "kooooooYYooooook",
+      ".kOOOOOYYOOOOnk.",
+      ".koooooYYoooonk.",
+      ".koooooYYoooonk.",
+      ".koooooYYoooonk.",
+      ".koooooYYoooonk.",
+      ".koooooYYoooonk.",
+      ".koooooYYoooonk.",
+      ".koooooYYoooonk.",
+      ".knnnnnnnnnnnnk.",
+      "..kkkkkkkkkkkk.."
+    ],
+    "candy-box-open": [
+      ".kkkkkkkkkkk....",
+      "kOOOOOOYYOOOk...",
+      "kooooooYYoook...",
+      "kooooooYYoook...",
+      ".kkkkkkkkkkk....",
+      "................",
+      "................",
+      "....kkkkkkkk....",
+      "..kknnnnnnnnkk..",
+      ".kOOOOOYYOOOOnk.",
+      ".koooooYYoooonk.",
+      ".koooooYYoooonk.",
+      ".koooooYYoooonk.",
+      ".koooooYYoooonk.",
+      ".knnnnnnnnnnnnk.",
+      "..kkkkkkkkkkkk.."
+    ]
+  },
+  "candyBurst": [
+    {
+      "levels": 1,
+      "count": 4
+    },
+    {
+      "levels": 3,
+      "count": 14
+    },
+    {
+      "levels": 5,
+      "count": 42
+    }
+  ]
+}

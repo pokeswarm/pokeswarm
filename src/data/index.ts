@@ -3,6 +3,7 @@ import simulationJson from '../../data/game/simulation.json';
 import playerJson from '../../data/game/player.json';
 import placeholderJson from '../../data/render/placeholder.json';
 import groundJson from '../../data/render/ground.json';
+import itemSpritesJson from '../../data/render/items.json';
 import enemiesJson from '../../data/game/enemies.json';
 import spawnJson from '../../data/game/spawn.json';
 import combatJson from '../../data/game/combat.json';
@@ -63,6 +64,7 @@ import {
   sfxConfigSchema,
   bgmConfigSchema,
   musicScoreSchema,
+  pixelSpritesSchema,
 } from './schema';
 
 function load<T extends z.ZodType>(name: string, schema: T, raw: unknown): z.infer<T> {
@@ -77,6 +79,8 @@ export const simulationConfig = load('game/simulation.json', simulationConfigSch
 export const playerConfig = load('game/player.json', playerConfigSchema, playerJson);
 export const placeholderRender = load('render/placeholder.json', placeholderRenderSchema, placeholderJson);
 export const groundConfig = load('render/ground.json', groundConfigSchema, groundJson);
+/** 自作のドット絵（道具・アメの箱） */
+export const itemSprites = load('render/items.json', pixelSpritesSchema, itemSpritesJson);
 export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enemiesJson);
 export const spawnConfig = load('game/spawn.json', spawnConfigSchema, spawnJson);
 export const combatConfig = load('game/combat.json', combatConfigSchema, combatJson);
@@ -126,6 +130,10 @@ for (const wave of spawnConfig.waves) {
       `data/game/spawn.json の waves にある敵 "${kind}" が data/game/enemies.json にありません`,
     );
   }
+}
+// 道具のドット絵: マップの道具ごとと、アメの箱
+for (const name of ['potion', 'magnet', 'rare-candy', 'candy-box', 'candy-box-open']) {
+  check(!!itemSprites.sprites[name], `data/render/items.json に "${name}" のドット絵がありません`);
 }
 // BGM: 曲はファイルか楽譜のどちらかを持つ。楽譜は data/audio/music にあるもの
 for (const [id, track] of Object.entries(bgmConfig.tracks)) {

@@ -1041,3 +1041,22 @@ export const musicScoreSchema = z.object({
   order: z.array(z.string()).min(1),
 });
 export type MusicScore = z.infer<typeof musicScoreSchema>;
+
+/**
+ * 自作のドット絵（道具・アメの箱など）。1文字が1ドット（"." は透明）、色は palette。dot は1ドットのワールドの長さ。
+ * candyBurst は、ふしぎなアメで上がるレベルの数ごとに、箱からあふれ出るアメの数（作者の決定: +1 ちょっと・+3 たくさん・+5 大量）
+ */
+export const pixelSpritesSchema = z
+  .object({
+    dot: z.number().positive(),
+    palette: z.record(z.string().length(1), z.string().regex(/^#[0-9a-fA-F]{6}$/)),
+    sprites: z.record(z.string(), z.array(z.string()).min(1)),
+    candyBurst: z.array(z.object({ levels: z.number().int().positive(), count: z.number().int().positive() })).min(1),
+  })
+  .superRefine((d, ctx) => {
+    for (const [name, rows] of Object.entries(d.sprites)) {
+      if (rows.some((r) => r.length !== rows[0]!.length)) ctx.addIssue({ code: 'custom', message: `ドット絵 ${name} の行の長さがそろっていません` });
+      for (const ch of rows.join('')) if (ch !== '.' && !d.palette[ch]) ctx.addIssue({ code: 'custom', message: `ドット絵 ${name} の色 "${ch}" が palette にありません` });
+    }
+  });
+export type PixelSpritesConfig = z.infer<typeof pixelSpritesSchema>;

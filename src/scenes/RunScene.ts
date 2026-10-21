@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { effectRecipes, generated, groundConfig, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig } from '../data';
+import { effectRecipes, generated, groundConfig, itemSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig } from '../data';
 import { buildSimRules, localName, permanentModifiers, playableLoadout } from '../data/simRules';
 import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
@@ -12,6 +12,7 @@ import { EffectRenderer } from '../render/effects/EffectRenderer';
 import { audio } from '../audio';
 import { RunSounds } from '../audio/runSounds';
 import { HitOutlines } from '../render/effects/HitOutlines';
+import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
 import { GroundTiles, preloadGroundTiles } from '../render/GroundTiles';
 import { KeyboardInput } from '../render/KeyboardInput';
 import { PlayerView } from '../render/PlayerView';
@@ -107,8 +108,9 @@ export class RunScene extends Phaser.Scene {
   private uiCommands: InputCommand[] = [];
   /** ボスの範囲技の予告 */
   private hazardView!: Phaser.GameObjects.Graphics;
-  /** マップに落ちている道具（きずぐすり・マグネット・ふしぎなアメ） */
+  /** マップに落ちている道具（きずぐすり・マグネット・ふしぎなアメ）の影と、道具ごとのドット絵 */
   private itemView!: Phaser.GameObjects.Graphics;
+  private readonly itemImages = new Map<number, Phaser.GameObjects.Image>();
   /** 画面上の真ん中: 経過時間、中ボス・ボスの HP、お知らせ */
   private timerText!: Phaser.GameObjects.Text;
   private bossBar!: Phaser.GameObjects.Graphics;
@@ -232,6 +234,7 @@ export class RunScene extends Phaser.Scene {
     this.enemyView = new PooledCircles(this, 0);
     this.gemView = new PooledCircles(this, -1);
     this.itemView = this.add.graphics().setDepth(0.4);
+    ensurePixelTextures(this, itemSprites);
     this.streamer = new SpriteStreamer(
       this,
       rules.enemies.kinds.map((k) => k.sprite),
@@ -561,32 +564,29 @@ export class RunScene extends Phaser.Scene {
   }
 
   /**
-   * マップに落ちている道具を描く（仮の図形。作り込みはフェーズ4）。
-   * きずぐすり＝紫のびん、マグネット＝赤い U 字、ふしぎなアメ＝青いアメ。ふわふわ上下させて目立たせる
+   * マップに落ちている道具を、自作のドット絵（data/render/items.json）で描く。
+   * きずぐすり＝紫のスプレー、マグネット＝赤い U 字、ふしぎなアメ＝青いアメ。ふわふわ上下させて目立たせる
    */
   private drawItems(timeMs: number): void {
     const g = this.itemView;
     g.clear();
+    const seen = new Set<number>();
     for (const it of this.sim.world.items) {
       if (it.pending) continue;
-      const x = it.x;
-      const y = it.y + Math.sin(timeMs / 250 + it.id) * 3;
-      g.fillStyle(0x000000, 0.25).fillEllipse(it.x, it.y + 12, 18, 6);
-      if (it.kind === 'potion') {
-        g.fillStyle(0x8e24aa).fillRoundedRect(x - 7, y - 6, 14, 16, 4);
-        g.fillStyle(0xe1bee7).fillRect(x - 4, y - 12, 8, 6);
-        g.fillStyle(0xffffff, 0.6).fillRect(x - 4, y - 3, 3, 8);
-      } else if (it.kind === 'magnet') {
-        g.lineStyle(6, 0xe53935).beginPath();
-        g.arc(x, y, 9, 0, Math.PI, false).strokePath();
-        g.fillStyle(0xe53935).fillRect(x - 12, y - 10, 6, 10).fillRect(x + 6, y - 10, 6, 10);
-        g.fillStyle(0xeeeeee).fillRect(x - 12, y - 14, 6, 5).fillRect(x + 6, y - 14, 6, 5);
-      } else {
-        g.fillStyle(0x1e88e5).fillCircle(x, y, 8);
-        g.fillStyle(0x1e88e5).fillTriangle(x - 8, y, x - 15, y - 6, x - 15, y + 6).fillTriangle(x + 8, y, x + 15, y - 6, x + 15, y + 6);
-        g.fillStyle(0xffffff, 0.8).fillCircle(x - 3, y - 3, 2.5);
-        g.lineStyle(2, 0xffffff, 0.7).strokeCircle(x, y, 8);
+      seen.add(it.id);
+      let img = this.itemImages.get(it.id);
+      if (!img) {
+        img = this.add.image(it.x, it.y, pixelTextureKey(it.kind)).setScale(itemSprites.dot).setDepth(0.45);
+        this.itemImages.set(it.id, img);
       }
+      // ふわふわ上下させて目立たせる。足元に影
+      img.setPosition(it.x, it.y + Math.sin(timeMs / 250 + it.id) * 3);
+      g.fillStyle(0x000000, 0.25).fillEllipse(it.x, it.y + 14, 18, 6);
+    }
+    for (const [id, img] of this.itemImages) {
+      if (seen.has(id)) continue;
+      img.destroy();
+      this.itemImages.delete(id);
     }
   }
 
@@ -600,6 +600,12 @@ export class RunScene extends Phaser.Scene {
     const name = localName(generated.items['rare-candy']?.names, getLocale(), '');
     this.tweens.killTweensOf(this.announceText);
     this.announceText.setColor('#90caf9').setAlpha(1);
+    // 自分の頭の上に箱を出し、抽選の間は揺らす
+    const me = this.sim.world.players.find((p) => p.id === this.localId);
+    const bx = me?.x ?? 0;
+    const by = (me?.y ?? 0) - 56;
+    const box = this.add.image(bx, by, pixelTextureKey('candy-box')).setScale(itemSprites.dot * 1.5).setDepth(1.5);
+    const shake = this.tweens.add({ targets: box, angle: { from: -10, to: 10 }, duration: 90, yoyo: true, repeat: -1 });
     let k = 0;
     const timer = this.time.addEvent({
       delay: 70,
@@ -611,12 +617,44 @@ export class RunScene extends Phaser.Scene {
     });
     this.time.delayedCall(Math.max(0, reveal - 100), () => {
       timer.remove();
+      shake.remove();
+      box.setAngle(0).setTexture(pixelTextureKey('candy-box-open'));
       this.announceText.setText(t('candy.result', { name, levels })).setColor('#ffe082');
       this.cameras.main.flash(250, 255, 255, 255);
       audio.sfx.play('candy.hit');
+      this.burstCandies(bx, by, levels);
+      this.tweens.add({ targets: box, alpha: 0, delay: 1400, duration: 400, onComplete: () => box.destroy() });
       this.tweens.add({ targets: this.announceText, alpha: 0, delay: 1500, duration: 600 });
     });
   }
+
+  /**
+   * ふしぎなアメ: 箱からアメがあふれ出る（作者の決定: 上がるレベルが多いほどたくさん出る。+1 ちょっと・+3 たくさん・+5 大量）
+   */
+  private burstCandies(x: number, y: number, levels: number): void {
+    const table = itemSprites.candyBurst;
+    const count = (table.find((c) => c.levels === levels) ?? table.reduce((a, b) => (Math.abs(b.levels - levels) < Math.abs(a.levels - levels) ? b : a))).count;
+    for (let i = 0; i < count; i++) {
+      const candy = this.add.image(x, y - 8, pixelTextureKey('rare-candy')).setScale(itemSprites.dot).setDepth(1.6);
+      // 上へ扇形に飛び出し、落ちながら消える
+      const a = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * (count > 10 ? 1.4 : 0.9);
+      const speed = 60 + Math.random() * (count > 10 ? 140 : 80);
+      const delay = (i / count) * (count > 10 ? 500 : 200);
+      const dx = Math.cos(a) * speed;
+      const peak = Math.sin(a) * speed;
+      this.tweens.add({ targets: candy, x: x + dx, delay, duration: 900, ease: 'Linear' });
+      this.tweens.add({
+        targets: candy,
+        y: { from: y - 8, to: y - 8 + peak },
+        delay,
+        duration: 350,
+        ease: 'Quad.easeOut',
+        onComplete: () => this.tweens.add({ targets: candy, y: y + 40 + Math.random() * 30, alpha: 0, duration: 550, ease: 'Quad.easeIn', onComplete: () => candy.destroy() }),
+      });
+      this.tweens.add({ targets: candy, angle: (Math.random() - 0.5) * 360, delay, duration: 900 });
+    }
+  }
+
 
   /** 経過時間と、中ボス・ボスの HP のバー */
   private drawTopCenter(): void {

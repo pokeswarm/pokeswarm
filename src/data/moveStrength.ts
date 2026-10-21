@@ -39,3 +39,54 @@ export function moveStrength(def: MoveDefData, s: MoveStatsAt): number {
 export function moveStrengthRange(def: MoveDefData): { first: number; max: number } {
   return { first: moveStrength(def, moveStatsAt(def, 1)), max: moveStrength(def, moveStatsAt(def, moveMaxLevel(def))) };
 }
+
+/** 群れの強さの目安で使う、敵1体あたりの広さ（中盤の群れで、画面に敵がこのくらいの間隔でいるとみなす） */
+export const CROWD_AREA_PER_ENEMY = 5000;
+/** 1つの当たり判定が1回に当たる数の上限と、1回の技で当たる数の上限（まわりにいる敵の数を超えないように） */
+const CROWD_MAX_TARGETS = 20;
+const CROWD_MAX_PER_CAST = 40;
+
+/**
+ * 群れの強さの目安: 敵が群れでいるとき、1秒あたりに与えるダメージの合計の見込み。
+ * 当たり判定1つが1回に当たる数を「覆う広さ ÷ 敵1体あたりの広さ」で見積もり（貫通の数まで）、
+ * 威力 × 1回で当たる回数 × 当たる数（当たり判定の数 × 1つが当たる数。1回の技で40体まで）÷ 再使用 とする。範囲の広い技ほど大きく出る。
+ * 飛ぶ技は通り道の広さ、近接の扇形は扇の広さ、ビームは線の広さ、周りに広がる技は円の広さ、周回は当たり判定の近くで数える
+ */
+export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
+  if (def.pattern === 'metronome') return NaN;
+  const num = (k: string): number => (typeof s[k] === 'number' ? (s[k] as number) : 0);
+  const size = num('size');
+  const range = num('range');
+  const pierce = s.pierce === 'infinite' ? Infinity : num('pierce');
+  const interval = num('hitIntervalSeconds');
+  const hits = interval > 0 ? Math.max(1, Math.floor(num('durationSeconds') / interval)) : 1;
+  let area: number;
+  switch (def.pattern) {
+    case 'nearest':
+    case 'facing':
+    case 'homing':
+    case 'boomerang':
+      area = 2 * size * Math.min(num('speed') * num('durationSeconds'), range || Infinity) * (def.pattern === 'boomerang' ? 2 : 1);
+      break;
+    case 'melee': {
+      const arc = num('arcDegrees');
+      area = arc > 0 ? (Math.min(arc, 360) / 360) * Math.PI * (range + size) ** 2 : Math.PI * size * size;
+      break;
+    }
+    case 'beam':
+      area = range * 2 * size;
+      break;
+    case 'nova':
+      area = Math.PI * range * range;
+      break;
+    case 'orbit':
+      // 回りながら当たり直すので、1回に当たるのは当たり判定の近くだけ
+      area = 2 * Math.PI * size * size;
+      break;
+    default:
+      area = Math.PI * size * size;
+  }
+  const targets = Math.min(pierce, CROWD_MAX_TARGETS, 1 + area / CROWD_AREA_PER_ENEMY);
+  const perCast = Math.min(CROWD_MAX_PER_CAST, num('count') * targets);
+  return (num('power') * hits * perCast) / num('cooldownSeconds');
+}

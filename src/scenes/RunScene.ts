@@ -23,7 +23,7 @@ import { SHAPE_LINE } from '../sim/entities/projectiles';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole } from '../sim/world';
-import { applyDebugOverrides, parseLevelParam, parseMovesParam, parseTimeParam } from './debugOverrides';
+import { applyDebugOverrides, parseLevelParam, parseMovesParam, parseSectionParam, parseTimeParam } from './debugOverrides';
 import { addXp } from '../sim/systems/leveling';
 import { addDiscovery } from '../meta/discoveries';
 import { RunRecorder } from '../meta/runRecorder';
@@ -202,19 +202,26 @@ export class RunScene extends Phaser.Scene {
       w.pendingLevelUps = 0;
       w.events.length = 0;
     }
-    // 確認用: ?time=880 で、ランの途中から始める（それより前の中ボスは出さない）
+    // 確認用: ?time=880 で、ランの途中の時刻から始める（それより前のスウォームは出さない）。
+    // ?section=3 で、その区間から始める（それより前の区間の中ボスは出さない）
     const startTime = parseTimeParam(window.location.search);
     if (startTime) {
       const w = this.sim.world;
       w.tick = Math.round(startTime * simulationConfig.tickRate);
-      while (w.nextBoss < w.bossSchedule.length && w.bossSchedule[w.nextBoss]!.tick < w.tick) w.nextBoss++;
+      w.sectionStartTick = w.tick;
       while (w.nextSwarm < w.swarmSchedule.length && w.swarmSchedule[w.nextSwarm]!.tick < w.tick) w.nextSwarm++;
+    }
+    const startSection = parseSectionParam(window.location.search);
+    if (startSection) {
+      const w = this.sim.world;
+      w.section = Math.min(startSection, w.waves.length - 1);
+      while (w.nextBoss < w.bossSchedule.length && w.bossSchedule[w.nextBoss]!.wave < w.section) w.nextBoss++;
     }
     if (this.coop) this.setupNet(this.coop.room);
 
     this.clock = new FixedStepClock(simulationConfig.tickRate, simulationConfig.maxTicksPerFrame);
     this.keyboard = new KeyboardInput(this);
-    this.ground = new GroundTiles(this, groundConfig, elapsedSeconds(this.sim.world));
+    this.ground = new GroundTiles(this, groundConfig, currentWaveIndex(this.sim.world));
     this.enemyView = new PooledCircles(this, 0);
     this.gemView = new PooledCircles(this, -1);
     this.itemView = this.add.graphics().setDepth(0.4);
@@ -719,7 +726,7 @@ export class RunScene extends Phaser.Scene {
     const cx = localView.container.x;
     const cy = localView.container.y;
     cam.centerOn(cx, cy);
-    this.ground.update(cam, elapsedSeconds(world), deltaMs);
+    this.ground.update(cam, currentWaveIndex(world), deltaMs);
 
     const halfW = cam.width / 2 / cam.zoom;
     const halfH = cam.height / 2 / cam.zoom;

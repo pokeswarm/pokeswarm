@@ -8,20 +8,20 @@ describe('マップの地面の定義', () => {
     expect(groundConfigSchema.safeParse(groundJson).success).toBe(true);
   });
 
-  it('時間帯の境目でタイルが切り替わり、書いていない時間帯は前のタイルが続く', () => {
+  it('区間の番号でタイルを選び、区間が足りなければ最後のタイル', () => {
     expect(groundTileAt(groundConfig, 0)).toBe('meadow');
-    expect(groundTileAt(groundConfig, 119.9)).toBe('meadow');
-    expect(groundTileAt(groundConfig, 120)).toBe('cave');
-    expect(groundTileAt(groundConfig, 750)).toBe('beach');
-    expect(groundTileAt(groundConfig, 1020)).toBe('elite_hall');
+    expect(groundTileAt(groundConfig, 1)).toBe('cave');
+    expect(groundTileAt(groundConfig, 6)).toBe('beach');
+    expect(groundTileAt(groundConfig, 9)).toBe('elite_hall');
+    expect(groundTileAt(groundConfig, 99)).toBe('elite_hall');
   });
 
-  it('切り替えの時刻は spawn.json の時間帯の境目と一致している', () => {
-    for (const w of groundConfig.waves) expect(spawnConfig.waves.some((s) => s.startSeconds === w.startSeconds)).toBe(true);
+  it('区間の数は spawn.json の waves と同じ', () => {
+    expect(groundConfig.waves).toHaveLength(spawnConfig.waves.length);
   });
 
   it('tiles にないタイル ID はエラーにする', () => {
-    const bad = { ...groundJson, waves: [{ startSeconds: 0, tile: 'nowhere' }] };
+    const bad = { ...groundJson, waves: [{ tile: 'nowhere' }] };
     expect(groundConfigSchema.safeParse(bad).success).toBe(false);
   });
 });

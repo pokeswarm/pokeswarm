@@ -50,24 +50,15 @@ export const groundConfigSchema = z
     fadeSeconds: z.number().nonnegative(),
     /** タイル ID → 画像（public/ からのパス） */
     tiles: z.record(z.string(), z.object({ file: z.string() })),
-    /**
-     * 時間帯ごとのタイル。startSeconds の小さい順に並べ、最初は 0。
-     * startSeconds は data/game/spawn.json の waves のどれかと同じ値にする（書かなかった時間帯は前のタイルが続く）
-     */
-    waves: z.array(z.object({ startSeconds: z.number().nonnegative(), tile: z.string() })).min(1),
-  })
-  .refine((g) => g.waves[0]!.startSeconds === 0, { message: 'ground の waves の最初は startSeconds: 0' })
-  .refine((g) => g.waves.every((w, i) => i === 0 || w.startSeconds > g.waves[i - 1]!.startSeconds), {
-    message: 'ground の waves は startSeconds の小さい順に並べる',
+    /** 区間（data/game/spawn.json の waves と同じ並び・同じ数）ごとのタイル */
+    waves: z.array(z.object({ tile: z.string() })).min(1),
   })
   .refine((g) => g.waves.every((w) => w.tile in g.tiles), { message: 'ground の waves に tiles にないタイル ID がある' });
 export type GroundConfig = z.infer<typeof groundConfigSchema>;
 
-/** 経過秒数のときに使うタイル ID */
-export function groundTileAt(ground: GroundConfig, seconds: number): string {
-  let tile = ground.waves[0]!.tile;
-  for (const w of ground.waves) if (w.startSeconds <= seconds) tile = w.tile;
-  return tile;
+/** 区間の番号のときに使うタイル ID（区間が足りなければ最後のタイル） */
+export function groundTileAt(ground: GroundConfig, wave: number): string {
+  return ground.waves[Math.min(wave, ground.waves.length - 1)]!.tile;
 }
 
 export const enemyKindSchema = z.object({
@@ -129,15 +120,22 @@ export const spawnConfigSchema = z
     /** 前の時間帯の種類の敵は、離れすぎたら移し替えずに消す（時間帯が進むと前の種類が自然にいなくなる） */
     retireOldWaveKinds: z.boolean(),
     /**
-     * 時間帯ごとに出す雑魚の種類（data/game/enemies.json の id）。startSeconds の小さい順に並べ、最初は 0。
-     * その時間帯の種類から等しい確率で選ぶ。
+     * 雑魚の HP をプレイヤーのレベル1つごとに何 % 上げるか（作者の決定。2026年10月）。
+     * 序盤は最初の技の一撃で倒せる HP にし、強くなった分だけ固くする（時間がたっただけでは固くならない）
+     */
+    hpPerLevelPct: z.number().nonnegative(),
+    /**
+     * 区間（時間帯）ごとに出す雑魚の種類（data/game/enemies.json の id）。原作の旅の順に並べる。
+     * 区間は、その区間の中ボス（data/game/stage.json の gate）を倒すと次へ進む（作者の決定。2026年10月）。
+     * 中ボスがいない区間は durationSeconds 後に次へ進む。その時間帯の種類から等しい確率で選ぶ。
      * hpMultiplier はその時間帯に出る敵の HP の倍率（後の時間帯ほど強い = 原作で後に出るポケモンほどレベルが高い感覚）。
      * 同じ種類は続いた時間帯にだけ出せる（一度いなくなった種類は後で戻らない）
      */
     waves: z
       .array(
         z.object({
-          startSeconds: z.number().nonnegative(),
+          /** 中ボスのいない区間の長さ（秒）。この時間がたつと次の区間へ */
+          durationSeconds: z.number().positive().optional(),
           hpMultiplier: z.number().positive(),
           /** その時間帯に出る敵の接触ダメージの倍率 */
           damageMultiplier: z.number().positive(),
@@ -163,10 +161,6 @@ export const spawnConfigSchema = z
   })
   .refine((s) => s.spawnDistanceMin <= s.spawnDistanceMax, { message: 'spawnDistanceMin <= spawnDistanceMax' })
   .refine((s) => s.spawnDistanceMax < s.relocateDistance, { message: 'spawnDistanceMax < relocateDistance' })
-  .refine((s) => s.waves[0]!.startSeconds === 0, { message: 'waves の最初は startSeconds: 0' })
-  .refine((s) => s.waves.every((w, i) => i === 0 || w.startSeconds > s.waves[i - 1]!.startSeconds), {
-    message: 'waves は startSeconds の小さい順に並べる',
-  })
   .superRefine((s, ctx) => {
     const problem = findReappearingKind(s.waves);
     if (problem) {
@@ -264,10 +258,16 @@ export const stageConfigSchema = z.object({
    * 全員倒した時点でクリア（報酬はこの時点で確定）
    */
   durationSeconds: z.number().positive(),
-  /** 中ボス（rank: midboss）・ボス（rank: boss）を出す予定。moves は使う範囲技（moves の id）を順に使う */
+  /**
+   * 中ボス（rank: midboss）・ボス（rank: boss）を出す予定。区間（data/game/spawn.json の waves の番号）が始まって
+   * afterSeconds 後に出す。gate の付いた敵を倒すと次の区間へ進む。moves は使う範囲技（moves の id）を順に使う
+   */
   bosses: z.array(
     z.object({
-      atSeconds: z.number().nonnegative(),
+      wave: z.number().int().nonnegative(),
+      afterSeconds: z.number().nonnegative(),
+      /** 倒すと次の区間へ進む（ジムリーダーの相棒） */
+      gate: z.boolean().default(false),
       kind: z.string().min(1),
       moves: z.array(z.string()).default([]),
       moveIntervalSeconds: z.number().positive().optional(),

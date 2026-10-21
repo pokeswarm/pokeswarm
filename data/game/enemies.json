@@ -3,7 +3,7 @@
     {
       "id": "rattata",
       "sprite": "enemy/rattata",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 55,
       "radius": 10,
       "contactDamage": 6
@@ -11,7 +11,7 @@
     {
       "id": "pidgey",
       "sprite": "enemy/pidgey",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 50,
       "radius": 10,
       "contactDamage": 6
@@ -19,7 +19,7 @@
     {
       "id": "caterpie",
       "sprite": "enemy/caterpie",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 46,
       "radius": 10,
       "contactDamage": 6
@@ -27,7 +27,7 @@
     {
       "id": "metapod",
       "sprite": "enemy/metapod",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 41,
       "radius": 10,
       "contactDamage": 6
@@ -35,7 +35,7 @@
     {
       "id": "spearow",
       "sprite": "enemy/spearow",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 55,
       "radius": 10,
       "contactDamage": 6
@@ -43,7 +43,7 @@
     {
       "id": "zubat",
       "sprite": "enemy/zubat",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 49,
       "radius": 10,
       "contactDamage": 6
@@ -51,7 +51,7 @@
     {
       "id": "geodude",
       "sprite": "enemy/geodude",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 37,
       "radius": 10,
       "contactDamage": 6
@@ -59,7 +59,7 @@
     {
       "id": "paras",
       "sprite": "enemy/paras",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 39,
       "radius": 10,
       "contactDamage": 6
@@ -67,7 +67,7 @@
     {
       "id": "mankey",
       "sprite": "enemy/mankey",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 55,
       "radius": 10,
       "contactDamage": 6
@@ -75,7 +75,7 @@
     {
       "id": "meowth",
       "sprite": "enemy/meowth",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 62,
       "radius": 10,
       "contactDamage": 6
@@ -83,7 +83,7 @@
     {
       "id": "vulpix",
       "sprite": "enemy/vulpix",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 53,
       "radius": 10,
       "contactDamage": 6
@@ -91,7 +91,7 @@
     {
       "id": "cubone",
       "sprite": "enemy/cubone",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 42,
       "radius": 10,
       "contactDamage": 6
@@ -99,7 +99,7 @@
     {
       "id": "doduo",
       "sprite": "enemy/doduo",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 56,
       "radius": 10,
       "contactDamage": 6
@@ -107,7 +107,7 @@
     {
       "id": "raticate",
       "sprite": "enemy/raticate",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 64,
       "radius": 10,
       "contactDamage": 6
@@ -115,7 +115,7 @@
     {
       "id": "chansey",
       "sprite": "enemy/chansey",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 48,
       "radius": 10,
       "contactDamage": 6
@@ -123,7 +123,7 @@
     {
       "id": "tauros",
       "sprite": "enemy/tauros",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 69,
       "radius": 10,
       "contactDamage": 6
@@ -131,7 +131,7 @@
     {
       "id": "scyther",
       "sprite": "enemy/scyther",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 67,
       "radius": 10,
       "contactDamage": 6
@@ -139,7 +139,7 @@
     {
       "id": "tentacool",
       "sprite": "enemy/tentacool",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 55,
       "radius": 10,
       "contactDamage": 6
@@ -147,7 +147,7 @@
     {
       "id": "magikarp",
       "sprite": "enemy/magikarp",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 58,
       "radius": 10,
       "contactDamage": 6
@@ -155,7 +155,7 @@
     {
       "id": "horsea",
       "sprite": "enemy/horsea",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 51,
       "radius": 10,
       "contactDamage": 6
@@ -163,7 +163,7 @@
     {
       "id": "seel",
       "sprite": "enemy/seel",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 46,
       "radius": 10,
       "contactDamage": 6
@@ -171,7 +171,7 @@
     {
       "id": "grimer",
       "sprite": "enemy/grimer",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 39,
       "radius": 10,
       "contactDamage": 6
@@ -179,7 +179,7 @@
     {
       "id": "ponyta",
       "sprite": "enemy/ponyta",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 62,
       "radius": 10,
       "contactDamage": 6
@@ -187,7 +187,7 @@
     {
       "id": "golbat",
       "sprite": "enemy/golbat",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 62,
       "radius": 10,
       "contactDamage": 6
@@ -195,7 +195,7 @@
     {
       "id": "graveler",
       "sprite": "enemy/graveler",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 42,
       "radius": 10,
       "contactDamage": 6
@@ -203,7 +203,7 @@
     {
       "id": "bellsprout",
       "sprite": "enemy/bellsprout",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 44,
       "radius": 10,
       "contactDamage": 6
@@ -211,7 +211,7 @@
     {
       "id": "venonat",
       "sprite": "enemy/venonat",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 46,
       "radius": 10,
       "contactDamage": 6
@@ -219,7 +219,7 @@
     {
       "id": "drowzee",
       "sprite": "enemy/drowzee",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 45,
       "radius": 10,
       "contactDamage": 6
@@ -227,7 +227,7 @@
     {
       "id": "ekans",
       "sprite": "enemy/ekans",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 49,
       "radius": 10,
       "contactDamage": 6
@@ -235,7 +235,7 @@
     {
       "id": "marowak",
       "sprite": "enemy/marowak",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 46,
       "radius": 10,
       "contactDamage": 6
@@ -243,7 +243,7 @@
     {
       "id": "venomoth",
       "sprite": "enemy/venomoth",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 62,
       "radius": 10,
       "contactDamage": 6
@@ -251,7 +251,7 @@
     {
       "id": "dewgong",
       "sprite": "enemy/dewgong",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 55,
       "radius": 12,
       "contactDamage": 6
@@ -259,7 +259,7 @@
     {
       "id": "cloyster",
       "sprite": "enemy/cloyster",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 55,
       "radius": 10,
       "contactDamage": 6
@@ -267,7 +267,7 @@
     {
       "id": "slowbro",
       "sprite": "enemy/slowbro",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 41,
       "radius": 12,
       "contactDamage": 6
@@ -275,7 +275,7 @@
     {
       "id": "jynx",
       "sprite": "enemy/jynx",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 63,
       "radius": 10,
       "contactDamage": 6
@@ -283,7 +283,7 @@
     {
       "id": "hitmonlee",
       "sprite": "enemy/hitmonlee",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 60,
       "radius": 10,
       "contactDamage": 6
@@ -291,7 +291,7 @@
     {
       "id": "hitmonchan",
       "sprite": "enemy/hitmonchan",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 57,
       "radius": 10,
       "contactDamage": 6
@@ -299,7 +299,7 @@
     {
       "id": "arbok",
       "sprite": "enemy/arbok",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 58,
       "radius": 10,
       "contactDamage": 6
@@ -307,7 +307,7 @@
     {
       "id": "gyarados",
       "sprite": "enemy/gyarados",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 58,
       "radius": 14,
       "contactDamage": 6
@@ -315,7 +315,7 @@
     {
       "id": "aerodactyl",
       "sprite": "enemy/aerodactyl",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 75,
       "radius": 13,
       "contactDamage": 6
@@ -323,7 +323,7 @@
     {
       "id": "onix",
       "sprite": "enemy/onix",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 55,
       "radius": 14,
       "contactDamage": 6
@@ -331,7 +331,7 @@
     {
       "id": "haunter",
       "sprite": "enemy/haunter",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 63,
       "radius": 11,
       "contactDamage": 6
@@ -339,7 +339,7 @@
     {
       "id": "dragonair",
       "sprite": "enemy/dragonair",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 55,
       "radius": 12,
       "contactDamage": 6
@@ -347,7 +347,7 @@
     {
       "id": "pidgeotto",
       "sprite": "enemy/pidgeotto",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 55,
       "radius": 10,
       "contactDamage": 6
@@ -355,7 +355,7 @@
     {
       "id": "ditto",
       "sprite": "enemy/ditto",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 47,
       "radius": 10,
       "contactDamage": 6
@@ -363,7 +363,7 @@
     {
       "id": "fearow",
       "sprite": "enemy/fearow",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 65,
       "radius": 10,
       "contactDamage": 6
@@ -371,7 +371,7 @@
     {
       "id": "tangela",
       "sprite": "enemy/tangela",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 51,
       "radius": 10,
       "contactDamage": 6
@@ -379,7 +379,7 @@
     {
       "id": "nidorino",
       "sprite": "enemy/nidorino",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 53,
       "radius": 10,
       "contactDamage": 6
@@ -387,7 +387,7 @@
     {
       "id": "nidorina",
       "sprite": "enemy/nidorina",
-      "hp": 12,
+      "hp": 7,
       "moveSpeed": 50,
       "radius": 10,
       "contactDamage": 6

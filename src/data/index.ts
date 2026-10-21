@@ -113,12 +113,16 @@ for (const wave of spawnConfig.waves) {
     );
   }
 }
-for (const w of groundConfig.waves) {
-  check(
-    spawnConfig.waves.some((s) => s.startSeconds === w.startSeconds),
-    `data/render/ground.json の waves の startSeconds ${w.startSeconds} が data/game/spawn.json の waves にありません`,
-  );
-}
+check(
+  groundConfig.waves.length === spawnConfig.waves.length,
+  `data/render/ground.json の waves（${groundConfig.waves.length}）と data/game/spawn.json の waves（${spawnConfig.waves.length}）の数をそろえてください`,
+);
+// 最後の区間以外は、中ボス（gate）か durationSeconds で次へ進めるようにする
+spawnConfig.waves.forEach((w, i) => {
+  if (i === spawnConfig.waves.length - 1) return;
+  const gate = stageConfig.bosses.some((b) => b.wave === i && b.gate);
+  check(gate !== !!w.durationSeconds, `data/game/spawn.json の区間 ${i + 1} は、中ボス（stage.json の gate）か durationSeconds のどちらか1つで次へ進めてください`);
+});
 for (const kind of enemiesConfig.kinds) {
   const species = kind.species ?? kind.id;
   check(!!generated.pokemon[species], `data/game/enemies.json の "${kind.id}" のポケモン "${species}" が data/generated/pokemon.json にありません（data/pokeapi/targets.json に足して npm run pokeapi）`);
@@ -137,7 +141,8 @@ for (const m of stageConfig.moves) {
 for (const b of stageConfig.bosses) {
   const rank = enemiesConfig.kinds.find((k) => k.id === b.kind)?.rank;
   check(rank === 'midboss' || rank === 'boss', `data/game/stage.json の "${b.kind}" が data/game/enemies.json に rank: "midboss" か "boss" でありません`);
-  check(b.atSeconds < stageConfig.durationSeconds, `data/game/stage.json の "${b.kind}" の atSeconds は durationSeconds より前にする`);
+  check(b.wave < spawnConfig.waves.length, `data/game/stage.json の "${b.kind}" の wave ${b.wave} が data/game/spawn.json の waves にありません`);
+  check(!b.gate || b.wave < spawnConfig.waves.length - 1, `data/game/stage.json の "${b.kind}" は最後の区間なので gate にできません`);
   for (const id of b.moves) check(stageMoveIds.has(id), `data/game/stage.json の "${b.kind}" の範囲技 "${id}" がありません`);
 }
 if (stageConfig.legendary) {

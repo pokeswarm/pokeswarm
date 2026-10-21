@@ -24,9 +24,9 @@ export class GroundTiles {
   constructor(
     scene: Phaser.Scene,
     private readonly ground: GroundConfig,
-    seconds: number,
+    wave: number,
   ) {
-    this.current = groundTileAt(ground, seconds);
+    this.current = groundTileAt(ground, wave);
     const { width, height } = scene.scale;
     this.sprites = [0, 1].map((i) =>
       scene.add
@@ -43,8 +43,8 @@ export class GroundTiles {
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => scene.scale.off(Phaser.Scale.Events.RESIZE, onResize));
   }
 
-  update(camera: Phaser.Cameras.Scene2D.Camera, seconds: number, deltaMs: number): void {
-    const wanted = groundTileAt(this.ground, seconds);
+  update(camera: Phaser.Cameras.Scene2D.Camera, wave: number, deltaMs: number): void {
+    const wanted = groundTileAt(this.ground, wave);
     if (wanted !== this.current) this.switchTo(wanted);
     if (this.fade < 1) {
       this.fade = Math.min(1, this.fade + deltaMs / 1000 / this.ground.fadeSeconds);

@@ -2,39 +2,56 @@
   "durationSeconds": 1200,
   "bosses": [
     {
-      "atSeconds": 120,
+      "wave": 0,
+      "afterSeconds": 100,
+      "gate": true,
       "kind": "midboss-onix"
     },
     {
-      "atSeconds": 240,
+      "wave": 1,
+      "afterSeconds": 100,
+      "gate": true,
       "kind": "midboss-starmie"
     },
     {
-      "atSeconds": 360,
+      "wave": 2,
+      "afterSeconds": 100,
+      "gate": true,
       "kind": "midboss-raichu"
     },
     {
-      "atSeconds": 480,
+      "wave": 3,
+      "afterSeconds": 100,
+      "gate": true,
       "kind": "midboss-vileplume"
     },
     {
-      "atSeconds": 600,
+      "wave": 4,
+      "afterSeconds": 100,
+      "gate": true,
       "kind": "midboss-weezing"
     },
     {
-      "atSeconds": 720,
+      "wave": 5,
+      "afterSeconds": 100,
+      "gate": true,
       "kind": "midboss-alakazam"
     },
     {
-      "atSeconds": 840,
+      "wave": 6,
+      "afterSeconds": 100,
+      "gate": true,
       "kind": "midboss-arcanine"
     },
     {
-      "atSeconds": 960,
+      "wave": 7,
+      "afterSeconds": 100,
+      "gate": true,
       "kind": "midboss-rhydon"
     },
     {
-      "atSeconds": 1020,
+      "wave": 9,
+      "afterSeconds": 0,
       "kind": "boss-lapras",
       "moves": [
         "blizzard"
@@ -43,7 +60,8 @@
       "required": true
     },
     {
-      "atSeconds": 1050,
+      "wave": 9,
+      "afterSeconds": 30,
       "kind": "boss-machamp",
       "moves": [
         "earthquake"
@@ -52,7 +70,8 @@
       "required": true
     },
     {
-      "atSeconds": 1080,
+      "wave": 9,
+      "afterSeconds": 60,
       "kind": "boss-gengar",
       "moves": [
         "shadow-ball"
@@ -61,7 +80,8 @@
       "required": true
     },
     {
-      "atSeconds": 1110,
+      "wave": 9,
+      "afterSeconds": 90,
       "kind": "boss-dragonite",
       "moves": [
         "draco-meteor"

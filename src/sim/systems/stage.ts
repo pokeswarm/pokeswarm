@@ -1,6 +1,6 @@
 import type { BossMove } from '../../data/schema';
 import { randomUnit } from '../math';
-import { currentWaveIndex, findEnemyIndex, type LegendaryResult, type World } from '../world';
+import { currentWaveIndex, enemyHpScale, findEnemyIndex, type LegendaryResult, type World } from '../world';
 import { hurtPlayer } from './health';
 
 /**
@@ -17,8 +17,8 @@ export function isBossKind(world: World, kind: number): boolean {
   return (world.rules.enemies.kinds[kind]?.rank ?? 'normal') !== 'normal';
 }
 
-/** ボス・伝説を出す。HP は参加人数に応じて上げる（2.2） */
-function spawnBoss(world: World, kindIndex: number, moves: readonly number[], interval: number): void {
+/** ボス・伝説を出す。HP は参加人数に応じて上げる（2.2）。出せなければ -1 */
+function spawnBoss(world: World, kindIndex: number, moves: readonly number[], interval: number): number {
   const rules = world.rules.stage.bossRules;
   const kind = world.rules.enemies.kinds[kindIndex]!;
   const p = world.players[world.rng.int(world.players.length)]!;
@@ -27,13 +27,14 @@ function spawnBoss(world: World, kindIndex: number, moves: readonly number[], in
   const y = p.y + uy * rules.spawnDistance;
   const hp = kind.hp * (1 + (rules.hpPerExtraPlayerPct * (world.players.length - 1)) / 100);
   const id = world.nextEnemyId++;
-  if (world.enemies.add(id, kindIndex, x, y, hp, kind.moveSpeed, kind.radius, kind.contactDamage) === -1) return;
+  if (world.enemies.add(id, kindIndex, x, y, hp, kind.moveSpeed, kind.radius, kind.contactDamage) === -1) return -1;
   world.events.push({ type: 'enemySpawned', id, kind: kindIndex, x, y });
   world.events.push({ type: 'bossAppeared', id, kind: kindIndex });
   if (moves.length > 0) world.bosses.push({ id, cooldown: interval, interval, moves, next: 0 });
+  return id;
 }
 
-/** 予定の時間になったら中ボス・ボスを出す。伝説戦では伝説を出す */
+/** 区間が始まって予定の時間がたったら中ボス・ボスを出す。伝説戦では伝説を出す */
 export function spawnBosses(world: World): void {
   if (world.role === 'guest' || world.players.length === 0) return;
   const lg = world.legendary;
@@ -50,10 +51,41 @@ export function spawnBosses(world: World): void {
     }
     return;
   }
-  while (world.nextBoss < world.bossSchedule.length && world.bossSchedule[world.nextBoss]!.tick <= world.tick) {
-    const b = world.bossSchedule[world.nextBoss++]!;
-    spawnBoss(world, b.kind, b.moves, b.interval);
+  const inSection = world.tick - world.sectionStartTick;
+  while (world.nextBoss < world.bossSchedule.length) {
+    const b = world.bossSchedule[world.nextBoss]!;
+    if (b.wave > world.section || (b.wave === world.section && b.afterTicks > inSection)) break;
+    world.nextBoss++;
+    const id = spawnBoss(world, b.kind, b.moves, b.interval);
+    // 出せなかった（敵の上限）中ボスは、次の更新で出し直す
+    if (id === -1 && b.gate) {
+      world.nextBoss--;
+      break;
+    }
+    if (b.gate) world.gateIds.add(id);
   }
+}
+
+/**
+ * 区間の進行（作者の決定。2026年10月）: その区間の中ボス（gate）を倒したら次の区間へ進む。
+ * 雑魚の種類・地面・次の中ボスがまとめて進む。中ボスのいない区間は時間で進む。ソロ・ホストが決める
+ */
+export function advanceSection(world: World): void {
+  if (world.role === 'guest' || world.legendary || world.section >= world.waves.length - 1) return;
+  for (const ev of world.events) if (ev.type === 'enemyKilled') world.gateIds.delete(ev.enemyId);
+  const duration = world.waves[world.section]!.durationTicks;
+  let done: boolean;
+  if (duration !== null) {
+    done = world.tick - world.sectionStartTick >= duration;
+  } else {
+    // この区間の中ボスがすべて出て、すべて倒れた
+    const pending = world.bossSchedule.some((b, i) => b.wave === world.section && b.gate && i >= world.nextBoss);
+    done = !pending && world.gateIds.size === 0;
+  }
+  if (!done) return;
+  world.section++;
+  world.sectionStartTick = world.tick;
+  world.events.push({ type: 'sectionAdvanced', section: world.section });
 }
 
 /** スウォームイベント（ソロ・ホスト）。伝説戦の間は出さない */
@@ -66,11 +98,12 @@ export function spawnSwarms(world: World): void {
     const kind = world.rules.enemies.kinds[kindIndex];
     if (!kind) continue;
     const wave = world.waves[currentWaveIndex(world)]!;
+    const hpScale = enemyHpScale(world);
     const p = world.players[world.rng.int(world.players.length)]!;
     const [ux, uy] = randomUnit(world.rng);
     const add = (x: number, y: number, vx = 0, vy = 0): void => {
       const id = world.nextEnemyId++;
-      const hp = kind.hp * wave.hpMultiplier;
+      const hp = kind.hp * hpScale;
       if (world.enemies.add(id, kindIndex, x, y, hp, kind.moveSpeed, kind.radius, kind.contactDamage * wave.damageMultiplier, vx, vy) === -1) return;
       world.events.push({ type: 'enemySpawned', id, kind: kindIndex, x, y, vx, vy });
     };

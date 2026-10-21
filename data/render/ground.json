@@ -23,43 +23,33 @@
   },
   "waves": [
     {
-      "startSeconds": 0,
       "tile": "meadow"
     },
     {
-      "startSeconds": 120,
       "tile": "cave"
     },
     {
-      "startSeconds": 240,
       "tile": "meadow"
     },
     {
-      "startSeconds": 360,
       "tile": "night_forest"
     },
     {
-      "startSeconds": 480,
       "tile": "wasteland"
     },
     {
-      "startSeconds": 600,
       "tile": "meadow"
     },
     {
-      "startSeconds": 720,
       "tile": "beach"
     },
     {
-      "startSeconds": 840,
       "tile": "meadow"
     },
     {
-      "startSeconds": 960,
       "tile": "cave"
     },
     {
-      "startSeconds": 1020,
       "tile": "elite_hall"
     }
   ]

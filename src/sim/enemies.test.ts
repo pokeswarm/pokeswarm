@@ -82,8 +82,8 @@ describe('時間帯ごとの出現', () => {
         capGlobal: 1000,
         capPerPlayer: 1000,
         waves: [
-          { startSeconds: 0, hpMultiplier: 1, damageMultiplier: 1, kinds: ['a'] },
-          { startSeconds: 2, hpMultiplier: 2, damageMultiplier: 1, kinds: ['b', 'c'] },
+          { durationSeconds: 2, hpMultiplier: 1, damageMultiplier: 1, kinds: ['a'] },
+          { hpMultiplier: 2, damageMultiplier: 1, kinds: ['b', 'c'] },
         ],
       },
       move: { range: 1 },
@@ -96,7 +96,8 @@ describe('時間帯ごとの出現', () => {
       for (let i = from; i < e.count; i++) out.add(e.kind[i]!);
       return out;
     };
-    for (let t = 0; t < 60; t++) sim.step([]);
+    // 区間は、2秒たった更新の終わりに進む
+    for (let t = 0; t < 61; t++) sim.step([]);
     expect(kindsAt(0)).toEqual(new Set([0]));
     const before = sim.world.enemies.count;
     for (let t = 0; t < 60; t++) sim.step([]);
@@ -105,6 +106,19 @@ describe('時間帯ごとの出現', () => {
     expect(sim.world.enemies.maxHp[0]).toBe(20);
     expect(sim.world.enemies.maxHp[sim.world.enemies.count - 1]).toBe(40);
   });
+
+  it('雑魚の HP はプレイヤーのレベルで上がる（時間だけでは上がらない）', () => {
+    const rules = testRules({ spawn: { spawnPerSecond: 30, capGlobal: 1000, capPerPlayer: 1000, hpPerLevelPct: 10 }, move: { range: 1 } });
+    rules.enemies.kinds = [{ id: 'test', hp: 10, moveSpeed: 0, radius: 10, contactDamage: 0, types: [0] }];
+    const sim = makeSim(rules);
+    for (let t = 0; t < 90; t++) sim.step([]);
+    expect(sim.world.enemies.maxHp[sim.world.enemies.count - 1]).toBe(10);
+    sim.world.level = 11;
+    const before = sim.world.enemies.count;
+    for (let t = 0; t < 30; t++) sim.step([]);
+    expect(sim.world.enemies.count).toBeGreaterThan(before);
+    expect(sim.world.enemies.maxHp[sim.world.enemies.count - 1]).toBe(20);
+  });
 });
 
 describe('前の時間帯の敵', () => {
@@ -112,8 +126,8 @@ describe('前の時間帯の敵', () => {
     const rules = testRules({
       spawn: {
         waves: [
-          { startSeconds: 0, hpMultiplier: 1, damageMultiplier: 1, kinds: ['a'] },
-          { startSeconds: 1, hpMultiplier: 1, damageMultiplier: 1, kinds: ['b'] },
+          { durationSeconds: 1, hpMultiplier: 1, damageMultiplier: 1, kinds: ['a'] },
+          { hpMultiplier: 1, damageMultiplier: 1, kinds: ['b'] },
         ],
       },
       move: { range: 1 },

@@ -179,6 +179,12 @@ export interface LegendaryWarningEvent {
   readonly kind: number;
 }
 
+/** 次の区間へ進んだ（中ボスを倒した、または区間の時間がたった） */
+export interface SectionAdvancedEvent {
+  readonly type: 'sectionAdvanced';
+  readonly section: number;
+}
+
 /** ホスト: 道具を落とした（ゲストへ送る） */
 export interface ItemSpawnedEvent {
   readonly type: 'itemSpawned';
@@ -241,6 +247,7 @@ export type SimEvent =
   | RunEndedEvent
   | PlayerLeftEvent
   | SwarmStartedEvent
+  | SectionAdvancedEvent
   | ItemSpawnedEvent
   | ItemRequestedEvent
   | ItemCollectedEvent

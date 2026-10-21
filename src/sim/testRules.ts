@@ -86,7 +86,8 @@ export function testRules(
       separation: { strength: 0.5, maxNeighbors: 6 },
       spatialCellSize: 64,
       retireOldWaveKinds: true,
-      waves: [{ startSeconds: 0, hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] }],
+      hpPerLevelPct: 0,
+      waves: [{ hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] }],
       ...overrides.spawn,
     },
     status: {

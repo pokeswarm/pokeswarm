@@ -23,9 +23,9 @@ function stageRules(stage: Partial<SimRules['stage']> = {}): SimRules {
     stage: {
       durationSeconds: 100,
       bosses: [
-        { atSeconds: 1, kind: 'mid', moves: [], required: false },
-        { atSeconds: 2, kind: 'e4a', moves: ['circle'], moveIntervalSeconds: 1, required: true },
-        { atSeconds: 2, kind: 'e4b', moves: [], required: true },
+        { wave: 0, afterSeconds: 1, gate: false, kind: 'mid', moves: [], required: false },
+        { wave: 0, afterSeconds: 2, gate: false, kind: 'e4a', moves: ['circle'], moveIntervalSeconds: 1, required: true },
+        { wave: 0, afterSeconds: 2, gate: false, kind: 'e4b', moves: [], required: true },
       ],
       moves: [CIRCLE, NOVA, DASH],
       ...stage,
@@ -74,10 +74,10 @@ describe('中ボス・ボスの出現', () => {
   });
 
   it('前の時間帯の種類でも、中ボスは離れすぎても消さない', () => {
-    const rules = stageRules({ bosses: [{ atSeconds: 1, kind: 'mid', moves: [], required: false }] });
+    const rules = stageRules({ bosses: [{ wave: 1, afterSeconds: 0.5, gate: false, kind: 'mid', moves: [], required: false }] });
     rules.spawn.waves = [
-      { startSeconds: 0, hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] },
-      { startSeconds: 0.5, hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] },
+      { durationSeconds: 0.5, hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] },
+      { hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] },
     ];
     const { sim, p } = solo(rules);
     run(sim, 31);
@@ -96,8 +96,64 @@ describe('中ボス・ボスの出現', () => {
   });
 });
 
+describe('区間の進行', () => {
+  function gateRules() {
+    const rules = stageRules({
+      bosses: [
+        { wave: 0, afterSeconds: 1, gate: true, kind: 'mid', moves: [], required: false },
+        { wave: 1, afterSeconds: 1, gate: true, kind: 'mid', moves: [], required: false },
+      ],
+    });
+    rules.spawn.waves = [
+      { hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] },
+      { hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] },
+      { durationSeconds: 1, hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] },
+      { hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] },
+    ];
+    return rules;
+  }
+
+  it('中ボスを倒すまでは次の区間へ進まず、倒すと進む。次の中ボスは区間が始まってから数える', () => {
+    const { sim } = solo(gateRules());
+    run(sim, 31);
+    expect(sim.world.gateIds.size).toBe(1);
+    run(sim, 300);
+    expect(sim.world.section).toBe(0);
+    killKind(sim, 1);
+    expect(sim.world.section).toBe(1);
+    expect(sim.world.events.map((e) => e.type)).toContain('sectionAdvanced');
+    // 2体目は区間1が始まって1秒後
+    run(sim, 29);
+    expect(sim.world.gateIds.size).toBe(0);
+    run(sim, 2);
+    expect(sim.world.gateIds.size).toBe(1);
+  });
+
+  it('中ボスのいない区間は時間で進み、最後の区間からは進まない', () => {
+    const { sim } = solo(gateRules());
+    run(sim, 31);
+    killKind(sim, 1);
+    run(sim, 31);
+    killKind(sim, 1);
+    expect(sim.world.section).toBe(2);
+    run(sim, 31);
+    expect(sim.world.section).toBe(3);
+    run(sim, 300);
+    expect(sim.world.section).toBe(3);
+  });
+
+  it('ゲストはホストの区間に合わせる', () => {
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules: gateRules(), role: 'guest' });
+    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
+    sim.step([{ type: 'setSection', section: 2 }]);
+    expect(sim.world.section).toBe(2);
+    run(sim, 300);
+    expect(sim.world.section).toBe(2);
+  });
+});
+
 describe('範囲技', () => {
-  const only = (moves: string[]) => stageRules({ bosses: [{ atSeconds: 0, kind: 'e4a', moves, moveIntervalSeconds: 1, required: false }] });
+  const only = (moves: string[]) => stageRules({ bosses: [{ wave: 0, afterSeconds: 0, gate: false, kind: 'e4a', moves, moveIntervalSeconds: 1, required: false }] });
 
   it('円: 足元に予告し、動かなければ当たる。予告の間に外へ出れば当たらない', () => {
     const hit = solo(only(['circle']), 200);
@@ -168,7 +224,7 @@ describe('ランの進行と終わり', () => {
 
   it('雑魚の経験値に時間帯の倍率を掛ける', () => {
     const rules = stageRules({ bosses: [] });
-    rules.spawn.waves = [{ startSeconds: 0, hpMultiplier: 1, damageMultiplier: 1, xpMultiplier: 3, kinds: ['test'] }];
+    rules.spawn.waves = [{ hpMultiplier: 1, damageMultiplier: 1, xpMultiplier: 3, kinds: ['test'] }];
     const { sim } = solo(rules);
     sim.world.enemies.add(1, 0, 300, 0, 10, 0, 10);
     sim.step([{ type: 'damageEnemy', id: 1, amount: 50, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);

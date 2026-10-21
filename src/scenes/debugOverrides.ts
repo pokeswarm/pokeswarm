@@ -54,8 +54,14 @@ export function parseLevelParam(search: string): number | null {
   return Number.isInteger(v) && v > 1 ? v : null;
 }
 
-/** 確認用: ?time=880 で、ランの途中（秒）から始める（中ボス・ボスの確認用）。無ければ null */
+/** 確認用: ?time=880 で、ランの途中の時刻（秒）から始める（制限時間・スウォームの確認用）。無ければ null */
 export function parseTimeParam(search: string): number | null {
   const v = Number(new URLSearchParams(search).get('time'));
   return Number.isFinite(v) && v > 0 ? v : null;
+}
+
+/** 確認用: ?section=3 で、その区間（data/game/spawn.json の waves の番号）から始める。無ければ null */
+export function parseSectionParam(search: string): number | null {
+  const v = Number(new URLSearchParams(search).get('section'));
+  return Number.isInteger(v) && v > 0 ? v : null;
 }

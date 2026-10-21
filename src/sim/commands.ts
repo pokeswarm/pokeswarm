@@ -201,6 +201,12 @@ export interface RevivePlayerCommand {
   readonly revives: number;
 }
 
+/** ゲスト: ホストが決めた区間 */
+export interface SetSectionCommand {
+  readonly type: 'setSection';
+  readonly section: number;
+}
+
 /** ゲスト: ホストが落とした道具 */
 export interface SpawnItemCommand {
   readonly type: 'spawnItem';
@@ -265,6 +271,7 @@ export type InputCommand =
   | RemovePlayerCommand
   | RevivePlayerCommand
   | LegendaryWarningCommand
+  | SetSectionCommand
   | SpawnItemCommand
   | RequestItemCommand
   | CollectItemCommand;

@@ -137,6 +137,9 @@ export class SyncSession {
         case 'runEnded':
           if (host) out.push({ t: 'end', o: ev.outcome, lg: ev.legendary });
           break;
+        case 'sectionAdvanced':
+          if (host) out.push({ t: 'sa', s: ev.section });
+          break;
         case 'itemSpawned':
           if (host) itemSpawns.push(ev.id, ITEM_KINDS.indexOf(ev.kind), round2(ev.x), round2(ev.y));
           break;
@@ -321,6 +324,9 @@ export class SyncSession {
           break;
         case 'end':
           if (guest) cmds.push({ type: 'endRun', outcome: m.o, legendary: m.lg });
+          break;
+        case 'sa':
+          if (guest) cmds.push({ type: 'setSection', section: m.s });
           break;
         case 'is':
           if (guest) for (let k = 0; k + 3 < m.e.length; k += 4) cmds.push({ type: 'spawnItem', id: m.e[k]!, kind: ITEM_KINDS[m.e[k + 1]!]!, x: m.e[k + 2]!, y: m.e[k + 3]! });

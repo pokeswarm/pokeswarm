@@ -13,9 +13,10 @@
   },
   "spatialCellSize": 64,
   "retireOldWaveKinds": true,
+  "hpPerLevelPct": 6,
+  "fillPerSecond": 20,
   "waves": [
     {
-      "startSeconds": 0,
       "spawnPerSecond": 1,
       "minimum": 15,
       "capPerPlayer": 60,
@@ -30,11 +31,10 @@
       ]
     },
     {
-      "startSeconds": 120,
       "spawnPerSecond": 2,
       "minimum": 30,
       "capPerPlayer": 90,
-      "hpMultiplier": 1.2,
+      "hpMultiplier": 1,
       "damageMultiplier": 1.15,
       "xpMultiplier": 1.3,
       "kinds": [
@@ -46,11 +46,10 @@
       ]
     },
     {
-      "startSeconds": 240,
       "spawnPerSecond": 3,
       "minimum": 45,
       "capPerPlayer": 130,
-      "hpMultiplier": 1.45,
+      "hpMultiplier": 1.05,
       "damageMultiplier": 1.3,
       "xpMultiplier": 1.6,
       "kinds": [
@@ -61,11 +60,10 @@
       ]
     },
     {
-      "startSeconds": 360,
       "spawnPerSecond": 4,
       "minimum": 60,
       "capPerPlayer": 170,
-      "hpMultiplier": 1.7,
+      "hpMultiplier": 1.1,
       "damageMultiplier": 1.45,
       "xpMultiplier": 1.9,
       "kinds": [
@@ -76,11 +74,10 @@
       ]
     },
     {
-      "startSeconds": 480,
       "spawnPerSecond": 5,
       "minimum": 80,
       "capPerPlayer": 220,
-      "hpMultiplier": 2,
+      "hpMultiplier": 1.15,
       "damageMultiplier": 1.6,
       "xpMultiplier": 2.2,
       "kinds": [
@@ -92,11 +89,10 @@
       ]
     },
     {
-      "startSeconds": 600,
       "spawnPerSecond": 6,
       "minimum": 100,
       "capPerPlayer": 270,
-      "hpMultiplier": 2.3,
+      "hpMultiplier": 1.2,
       "damageMultiplier": 1.75,
       "xpMultiplier": 2.5,
       "kinds": [
@@ -106,11 +102,10 @@
       ]
     },
     {
-      "startSeconds": 720,
       "spawnPerSecond": 8,
       "minimum": 130,
       "capPerPlayer": 330,
-      "hpMultiplier": 2.6,
+      "hpMultiplier": 1.25,
       "damageMultiplier": 1.9,
       "xpMultiplier": 2.8,
       "kinds": [
@@ -122,11 +117,10 @@
       ]
     },
     {
-      "startSeconds": 840,
       "spawnPerSecond": 10,
       "minimum": 160,
       "capPerPlayer": 400,
-      "hpMultiplier": 2.9,
+      "hpMultiplier": 1.3,
       "damageMultiplier": 2.05,
       "xpMultiplier": 3.1,
       "kinds": [
@@ -137,11 +131,11 @@
       ]
     },
     {
-      "startSeconds": 960,
+      "durationSeconds": 45,
       "spawnPerSecond": 12,
       "minimum": 200,
       "capPerPlayer": 450,
-      "hpMultiplier": 3.2,
+      "hpMultiplier": 1.35,
       "damageMultiplier": 2.2,
       "xpMultiplier": 3.4,
       "kinds": [
@@ -152,12 +146,11 @@
       ]
     },
     {
-      "startSeconds": 1020,
       "allowBossSpecies": true,
       "spawnPerSecond": 15,
       "minimum": 250,
       "capPerPlayer": 500,
-      "hpMultiplier": 3.5,
+      "hpMultiplier": 1.5,
       "damageMultiplier": 2.4,
       "xpMultiplier": 3.7,
       "kinds": [
@@ -176,6 +169,5 @@
         "aerodactyl"
       ]
     }
-  ],
-  "fillPerSecond": 20
+  ]
 }

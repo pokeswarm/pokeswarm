@@ -111,9 +111,10 @@ export interface World {
   readonly stats: { kills: number };
   /** 状態異常の種類（番号は data/game/status.json の並び） */
   readonly statusKinds: readonly StatusKind[];
-  /** 時間帯ごとに出す敵の種類（rules.spawn.waves を更新回数と種類の番号に直したもの） */
+  /** 区間（時間帯）ごとに出す敵の種類（rules.spawn.waves を種類の番号に直したもの） */
   readonly waves: readonly {
-    readonly startTick: number;
+    /** 中ボスのいない区間の長さ（更新回数）。中ボスを倒して進む区間は null */
+    readonly durationTicks: number | null;
     readonly hpMultiplier: number;
     readonly damageMultiplier: number;
     readonly xpMultiplier: number;
@@ -130,7 +131,12 @@ export interface World {
   readonly reviveGrace: Map<PlayerId, number>;
   /** ランの結果。決まったらシミュレーションは進まない */
   outcome: RunOutcome | null;
-  /** 中ボス・ボスを出す予定（更新回数の順）。nextBoss は次に出す予定の番号 */
+  /** 今の区間（waves の番号）と、始まった更新回数。中ボス（gate）を倒すと次へ進む（ソロ・ホストが決める） */
+  section: number;
+  sectionStartTick: number;
+  /** 出ていて、まだ倒していない、区間を進める中ボスの番号 */
+  readonly gateIds: Set<number>;
+  /** 中ボス・ボスを出す予定（区間・時間の順）。nextBoss は次に出す予定の番号 */
   readonly bossSchedule: readonly BossEntry[];
   nextBoss: number;
   /** 出ている、範囲技を使う敵（ボス・伝説）と、次の技までの残り・次に使う技（ソロ・ホスト） */
@@ -180,6 +186,9 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     outcome: null,
     reviveTouch: new Map(),
     reviveGrace: new Map(),
+    section: 0,
+    sectionStartTick: 0,
+    gateIds: new Set(),
     bossSchedule: buildBossSchedule(rules, tickRate),
     nextBoss: 0,
     bosses: [],
@@ -202,7 +211,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     events: [],
     stats: { kills: 0 },
     waves: rules.spawn.waves.map((w) => ({
-      startTick: Math.round(w.startSeconds * tickRate),
+      durationTicks: w.durationSeconds ? Math.round(w.durationSeconds * tickRate) : null,
       hpMultiplier: w.hpMultiplier,
       damageMultiplier: w.damageMultiplier,
       xpMultiplier: w.xpMultiplier ?? 1,
@@ -229,7 +238,11 @@ function kindIndexOf(rules: SimRules, id: string): number {
 
 /** 中ボス・ボスを出す予定の1つ */
 export interface BossEntry {
-  readonly tick: number;
+  /** 区間の番号と、区間が始まってから出すまでの更新回数 */
+  readonly wave: number;
+  readonly afterTicks: number;
+  /** 倒すと次の区間へ */
+  readonly gate: boolean;
   readonly kind: number;
   /** 使う範囲技（stage.moves の番号）を順に使う */
   readonly moves: readonly number[];
@@ -242,16 +255,18 @@ export function moveIndexOfStage(rules: SimRules, id: string): number {
   return i;
 }
 
-/** 中ボス・ボスを出す予定（stage.bosses） */
+/** 中ボス・ボスを出す予定（stage.bosses）。区間・時間の順 */
 function buildBossSchedule(rules: SimRules, tickRate: number): BossEntry[] {
   return rules.stage.bosses
     .map((b) => ({
-      tick: Math.round(b.atSeconds * tickRate),
+      wave: b.wave,
+      afterTicks: Math.round(b.afterSeconds * tickRate),
+      gate: b.gate,
       kind: kindIndexOf(rules, b.kind),
       moves: b.moves.map((id) => moveIndexOfStage(rules, id)),
       interval: Math.round((b.moveIntervalSeconds ?? 4) * tickRate),
     }))
-    .sort((a, b) => a.tick - b.tick);
+    .sort((a, b) => a.wave - b.wave || a.afterTicks - b.afterTicks);
 }
 
 /** スウォームイベントの予定（atSeconds から everySeconds ごと、untilSeconds まで） */
@@ -284,9 +299,26 @@ export function findEnemyIndex(world: World, id: number): number {
   return -1;
 }
 
-/** 今の時間帯の番号 */
-export function currentWaveIndex(world: World, tick = world.tick): number {
-  let i = 0;
-  while (i + 1 < world.waves.length && world.waves[i + 1]!.startTick <= tick) i++;
-  return i;
+/** 今の区間（時間帯）の番号 */
+export function currentWaveIndex(world: World): number {
+  return world.section;
+}
+
+/**
+ * 次の区間に進むまでの目安の更新回数（スプライトの先読み用）。中ボスで進む区間は中ボスが出るまで、
+ * 時間で進む区間は残り時間。最後の区間は null
+ */
+export function ticksUntilNextSection(world: World): number | null {
+  if (world.section >= world.waves.length - 1) return null;
+  const inSection = world.tick - world.sectionStartTick;
+  const duration = world.waves[world.section]!.durationTicks;
+  if (duration !== null) return Math.max(0, duration - inSection);
+  const gate = world.bossSchedule.find((b) => b.wave === world.section && b.gate);
+  return gate ? Math.max(0, gate.afterTicks - inSection) : null;
+}
+
+/** 雑魚の HP の倍率: 区間の倍率 × プレイヤーのレベル（全員で共有）による倍率 */
+export function enemyHpScale(world: World): number {
+  const wave = world.waves[world.section]!;
+  return wave.hpMultiplier * (1 + (world.rules.spawn.hpPerLevelPct * (world.level - 1)) / 100);
 }

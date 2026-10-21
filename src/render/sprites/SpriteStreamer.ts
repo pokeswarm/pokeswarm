@@ -1,6 +1,6 @@
 import type Phaser from 'phaser';
 import type { SpriteAnims } from '../../data/schema';
-import { currentWaveIndex, type World } from '../../sim/world';
+import { currentWaveIndex, ticksUntilNextSection, type World } from '../../sim/world';
 import { animKey, atlasKey } from './PokemonSprite';
 import { loadPokemonAtRuntime } from './runtimeLoad';
 
@@ -33,7 +33,8 @@ export class SpriteStreamer {
     const now = currentWaveIndex(world);
     world.waves[now]?.kinds.forEach(add);
     const next = world.waves[now + 1];
-    if (next && next.startTick - world.tick <= this.lookaheadTicks) next.kinds.forEach(add);
+    const left = ticksUntilNextSection(world);
+    if (next && left !== null && left <= this.lookaheadTicks) next.kinds.forEach(add);
     const e = world.enemies;
     for (let i = 0; i < e.count; i++) add(e.kind[i]!);
 

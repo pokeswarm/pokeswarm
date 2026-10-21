@@ -152,6 +152,13 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
           world.events.push({ type: 'legendaryWarning', kind: cmd.kind });
         }
         break;
+      case 'setSection':
+        if (world.role === 'guest' && cmd.section > world.section) {
+          world.section = Math.min(cmd.section, world.waves.length - 1);
+          world.sectionStartTick = world.tick;
+          world.events.push({ type: 'sectionAdvanced', section: world.section });
+        }
+        break;
       case 'spawnItem':
         if (world.role === 'guest') spawnItem(world, cmd.id, cmd.kind, cmd.x, cmd.y);
         break;

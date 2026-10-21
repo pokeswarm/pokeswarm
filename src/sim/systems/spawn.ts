@@ -1,8 +1,8 @@
 import { randomUnit } from '../math';
-import { currentWaveIndex, enemyCap, type World } from '../world';
+import { currentWaveIndex, enemyCap, enemyHpScale, type World } from '../world';
 
 /**
- * プレイヤーの周囲（画面外）に雑魚敵を出す。種類・HP の倍率・出現数は今の時間帯で決まる。
+ * プレイヤーの周囲（画面外）に雑魚敵を出す。種類・出現数は今の区間、HP は区間とプレイヤーのレベルで決まる。
  * 時間帯の出現数で出し続け、最低数（人数分）より少なければ補充の速さを足す。上限に達していたら出さない。
  */
 export function spawnEnemies(world: World): void {
@@ -15,6 +15,7 @@ export function spawnEnemies(world: World): void {
   const fill = enemies.count < wave.minimum * players.length ? (s.fillPerSecond ?? 0) : 0;
   world.spawnAccumulator += (wave.spawnPerSecond + fill) * world.dt;
   const cap = enemyCap(world);
+  const hpScale = enemyHpScale(world);
   while (world.spawnAccumulator >= 1) {
     if (enemies.count >= cap) {
       // 空きができても一度にまとめて出さないよう、たまった分は捨てる
@@ -30,7 +31,7 @@ export function spawnEnemies(world: World): void {
     const id = world.nextEnemyId++;
     const x = p.x + ux * dist;
     const y = p.y + uy * dist;
-    enemies.add(id, kindIndex, x, y, kind.hp * wave.hpMultiplier, kind.moveSpeed, kind.radius, kind.contactDamage * wave.damageMultiplier);
+    enemies.add(id, kindIndex, x, y, kind.hp * hpScale, kind.moveSpeed, kind.radius, kind.contactDamage * wave.damageMultiplier);
     world.events.push({ type: 'enemySpawned', id, kind: kindIndex, x, y });
   }
 }

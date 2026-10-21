@@ -216,8 +216,5 @@ export class EffectRenderer {
         onComplete: () => img.destroy(),
       });
     }
-    if (impact.shake && impact.shake.intensity > 0 && impact.shake.durationMs > 0) {
-      this.scene.cameras.main.shake(impact.shake.durationMs, impact.shake.intensity);
-    }
   }
 }

@@ -299,9 +299,9 @@
   "itemDesc.silk-scarf": "ノーマルの技 +15%",
   "itemDesc.moon-stone": "ノーマルの技の範囲 +10%",
   "itemDesc.metronome": "技の弾の速さ +10%",
-  "candy.big": "+{levels}",
-  "candy.tier.1": "ちょっと",
-  "candy.tier.3": "たくさん！",
-  "candy.tier.5": "大当たり！！",
+  "candy.big": "レベル +{levels}",
+  "candy.tier.1": "GOTCHA!",
+  "candy.tier.3": "GOTCHA!!!",
+  "candy.tier.5": "GOTCHA!!!!!",
   "levelUp.titleMore": "レベルアップ！ Lv {level}（あと {more} 回）"
 }

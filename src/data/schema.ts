@@ -690,8 +690,7 @@ export const effectRecipeSchema = z.object({
       flash: z
         .object({ color: colorString, radius: z.number().positive(), durationMs: z.number().positive(), alpha: z.number().min(0).max(1) })
         .optional(),
-      /** 画面の揺れ。intensity が 0 なら揺らさない */
-      shake: z.object({ durationMs: z.number().nonnegative(), intensity: z.number().nonnegative() }).optional(),
+      // 画面を揺らす演出は使わない（具合が悪くなる人がいたため。作者の決定 2026年10月21日）
     })
     .optional(),
 });

@@ -536,7 +536,6 @@ export class RunScene extends Phaser.Scene {
         this.tweens.killTweensOf(this.announceText);
         this.announceText.setText(t('run.danger')).setColor('#ff5252').setAlpha(1);
         this.tweens.add({ targets: this.announceText, alpha: 0.2, duration: 250, yoyo: true, repeat: 5, onComplete: () => this.announceText.setAlpha(0) });
-        this.cameras.main.shake(600, 0.006);
       } else if (ev.type === 'swarmStarted') {
         const s = w.rules.stage.swarms[ev.swarm];
         if (s) this.announce(tMaybe(`swarm.${s.pattern}`, { name: localName(generated.pokemon[s.kind.replace(/^swarm-/, '')]?.names, getLocale(), s.kind) }), '#ffcc80');
@@ -644,19 +643,20 @@ export class RunScene extends Phaser.Scene {
   }
 
   /**
-   * ふしぎなアメ: 当たったレベルの数を、箱のすぐ上に大きく出す（作者の指摘: 何レベル分の当たりか分かりづらい）。
-   * 当たりが大きいほど文字が大きく、色が派手で、「ちょっと／たくさん／大当たり」の言葉を添える
+   * ふしぎなアメ: 当たりを箱のすぐ上に大きく出す（作者の指摘: 何レベル分の当たりか分かりづらい）。
+   * 「GOTCHA!」「GOTCHA!!!」「GOTCHA!!!!!」（! の数 = 上がるレベル）をレアリティの色で出し、下に「レベル +N」を添える
    */
   private showCandyLevels(x: number, y: number, levels: number): void {
     const tier = candyTier(levels);
     const style = { fontFamily: 'monospace', fontStyle: 'bold', stroke: '#000000', align: 'center' };
+    // 「GOTCHA!」の ! の数とレアリティの色（青 RARE・紫 EPIC・橙 LEGENDARY）で当たりの大きさを表す（作者の決定。2026年10月21日）
     const big = this.add
-      .text(x, y - 34, t('candy.big', { levels }), { ...style, fontSize: `${tier.fontSize}px`, color: tier.color, strokeThickness: Math.round(tier.fontSize / 7) })
+      .text(x, y - 40, tMaybe(`candy.tier.${tier.levels}`), { ...style, fontSize: `${tier.fontSize}px`, color: tier.color, strokeThickness: Math.round(tier.fontSize / 6) })
       .setOrigin(0.5, 1)
       .setDepth(1.7)
       .setScale(0.2);
     const label = this.add
-      .text(x, y - 34 - tier.fontSize, tMaybe(`candy.tier.${tier.levels}`), { ...style, fontSize: '16px', color: tier.color, strokeThickness: 4 })
+      .text(x, y - 22, t('candy.big', { levels }), { ...style, fontSize: '16px', color: '#ffffff', strokeThickness: 4 })
       .setOrigin(0.5, 1)
       .setDepth(1.7)
       .setAlpha(0);

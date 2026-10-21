@@ -299,9 +299,9 @@
   "itemDesc.silk-scarf": "Normal moves +15%",
   "itemDesc.moon-stone": "Normal move area +10%",
   "itemDesc.metronome": "Projectile speed +10%",
-  "candy.big": "+{levels}",
-  "candy.tier.1": "A little",
-  "candy.tier.3": "A lot!",
-  "candy.tier.5": "JACKPOT!!",
+  "candy.big": "Level +{levels}",
+  "candy.tier.1": "GOTCHA!",
+  "candy.tier.3": "GOTCHA!!!",
+  "candy.tier.5": "GOTCHA!!!!!",
   "levelUp.titleMore": "Level up! Lv {level} ({more} more)"
 }

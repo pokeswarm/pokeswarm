@@ -4,7 +4,7 @@
   "spawnDistanceMax": 820,
   "relocateDistance": 1100,
   "relocateSideSpread": 600,
-  "capGlobal": 600,
+  "capGlobal": 800,
   "capPerPlayer": 400,
   "separation": {
     "strength": 1,
@@ -31,9 +31,9 @@
       ]
     },
     {
-      "spawnPerSecond": 2,
-      "minimum": 30,
-      "capPerPlayer": 90,
+      "spawnPerSecond": 3,
+      "minimum": 40,
+      "capPerPlayer": 120,
       "hpMultiplier": 1,
       "damageMultiplier": 1.15,
       "xpMultiplier": 1.3,
@@ -46,9 +46,9 @@
       ]
     },
     {
-      "spawnPerSecond": 3,
-      "minimum": 45,
-      "capPerPlayer": 130,
+      "spawnPerSecond": 5,
+      "minimum": 70,
+      "capPerPlayer": 180,
       "hpMultiplier": 1.05,
       "damageMultiplier": 1.3,
       "xpMultiplier": 1.6,
@@ -60,9 +60,9 @@
       ]
     },
     {
-      "spawnPerSecond": 4,
-      "minimum": 60,
-      "capPerPlayer": 170,
+      "spawnPerSecond": 7,
+      "minimum": 100,
+      "capPerPlayer": 240,
       "hpMultiplier": 1.1,
       "damageMultiplier": 1.45,
       "xpMultiplier": 1.9,
@@ -74,9 +74,9 @@
       ]
     },
     {
-      "spawnPerSecond": 5,
-      "minimum": 80,
-      "capPerPlayer": 220,
+      "spawnPerSecond": 9,
+      "minimum": 140,
+      "capPerPlayer": 300,
       "hpMultiplier": 1.15,
       "damageMultiplier": 1.6,
       "xpMultiplier": 2.2,
@@ -89,9 +89,9 @@
       ]
     },
     {
-      "spawnPerSecond": 6,
-      "minimum": 100,
-      "capPerPlayer": 270,
+      "spawnPerSecond": 11,
+      "minimum": 180,
+      "capPerPlayer": 360,
       "hpMultiplier": 1.2,
       "damageMultiplier": 1.75,
       "xpMultiplier": 2.5,
@@ -102,9 +102,9 @@
       ]
     },
     {
-      "spawnPerSecond": 8,
-      "minimum": 130,
-      "capPerPlayer": 330,
+      "spawnPerSecond": 13,
+      "minimum": 230,
+      "capPerPlayer": 420,
       "hpMultiplier": 1.25,
       "damageMultiplier": 1.9,
       "xpMultiplier": 2.8,
@@ -117,9 +117,9 @@
       ]
     },
     {
-      "spawnPerSecond": 10,
-      "minimum": 160,
-      "capPerPlayer": 400,
+      "spawnPerSecond": 15,
+      "minimum": 280,
+      "capPerPlayer": 480,
       "hpMultiplier": 1.3,
       "damageMultiplier": 2.05,
       "xpMultiplier": 3.1,
@@ -132,9 +132,9 @@
     },
     {
       "durationSeconds": 45,
-      "spawnPerSecond": 12,
-      "minimum": 200,
-      "capPerPlayer": 450,
+      "spawnPerSecond": 17,
+      "minimum": 330,
+      "capPerPlayer": 520,
       "hpMultiplier": 1.35,
       "damageMultiplier": 2.2,
       "xpMultiplier": 3.4,
@@ -147,9 +147,9 @@
     },
     {
       "allowBossSpecies": true,
-      "spawnPerSecond": 15,
-      "minimum": 250,
-      "capPerPlayer": 500,
+      "spawnPerSecond": 20,
+      "minimum": 400,
+      "capPerPlayer": 600,
       "hpMultiplier": 1.5,
       "damageMultiplier": 2.4,
       "xpMultiplier": 3.7,

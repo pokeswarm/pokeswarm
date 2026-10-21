@@ -43,6 +43,9 @@ function simulateRun(pokemon: string): void {
   const killsByMinute: number[] = [];
   const evolutions: string[] = [];
   const sections: string[] = [];
+  // 区間ごとの、画面にいる敵の数の平均（群れの圧力の目安）
+  const enemySum: number[] = [];
+  const enemyTicks: number[] = [];
   const fmt = (s: number): string => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
   let bossSeenAt = -1;
   let dir = '';
@@ -71,6 +74,8 @@ function simulateRun(pokemon: string): void {
     }
     sim.step(cmds);
     steps++;
+    enemySum[w.section] = (enemySum[w.section] ?? 0) + w.enemies.count;
+    enemyTicks[w.section] = (enemyTicks[w.section] ?? 0) + 1;
     for (const ev of w.events) {
       if (ev.type === 'bossAppeared' && w.rules.enemies.kinds[ev.kind]!.rank === 'boss') bossSeenAt = elapsedSeconds(w);
       if (ev.type === 'sectionAdvanced') sections.push(fmt(elapsedSeconds(w)));
@@ -91,6 +96,7 @@ function simulateRun(pokemon: string): void {
   console.log(`${name} 分ごとのレベル ${byMinute.map((l, i) => `${i}:${l}`).join(' ')}`);
   console.log(`${name} 四天王の残り ${w.requiredLeft.size}  伝説 ${w.legendary ? `${w.rules.enemies.kinds[w.legendary.kind]!.id} ${w.legendary.result}` : '-'}`);
   console.log(`${name} 区間が進んだ時刻 ${sections.join(' ') || '-'}`);
+  console.log(`${name} 区間ごとの敵の数（平均） ${enemySum.map((n, i) => `${i}:${Math.round(n / enemyTicks[i]!)}`).join(' ')}`);
   console.log(`${name} 進化 ${evolutions.join(' → ') || '-'}`);
   console.log(`${name} 分ごとの撃破数 ${killsByMinute.map((k, i) => `${i}:${k}`).join(' ')}`);
   console.log(`${name} 技 ${p.moves.map((m) => `${w.rules.moves[m.move]!.key}:${m.level}`).join(' ')}  持ち物 ${p.items.length}  パッシブ ${p.passives.length}`);

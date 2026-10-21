@@ -237,6 +237,7 @@ export class RunScene extends Phaser.Scene {
       spriteRender.enemyAnimation,
       0,
       (kind) => rules.enemies.kinds[kind]?.spriteScale ?? 1,
+      (kind) => enemyLayer(rules, kind),
     );
     this.hazardView = this.add.graphics().setDepth(0.5);
     this.measureFrameTime();
@@ -836,3 +837,11 @@ export class RunScene extends Phaser.Scene {
   }
 }
 
+
+/** 重なったときの表示の順（作者の決定）: ボス（中ボス・伝説も）2 > スウォーム（ビリリダマなど）1 > 雑魚 0 */
+function enemyLayer(rules: { enemies: { kinds: readonly { id: string; rank?: string }[] }; stage: { swarms: readonly { kind: string }[] } }, kind: number): number {
+  const k = rules.enemies.kinds[kind];
+  if (!k) return 0;
+  if ((k.rank ?? 'normal') !== 'normal') return 2;
+  return rules.stage.swarms.some((s) => s.kind === k.id) ? 1 : 0;
+}

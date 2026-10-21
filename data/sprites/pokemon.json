@@ -429,6 +429,13 @@
       ]
     },
     {
+      "key": "voltorb",
+      "dex": 100,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
       "key": "exeggutor",
       "dex": 103,
       "uses": [

@@ -290,4 +290,23 @@ describe('スウォームイベント', () => {
     expect(e.count).toBe(12);
     for (let i = 0; i < e.count; i++) expect(Math.hypot(e.x[i]!, e.y[i]!)).toBeCloseTo(400 - 30 / 30, 0);
   });
+  it('じばく: 近づいたら止まって範囲を予告し、落ちると中のプレイヤーにダメージを与えて、いなくなる', () => {
+    const BOOM: BossMove = { id: 'boom', effect: 'test', shape: 'circle', target: 'self', telegraphSeconds: 0.5, radius: 90, damage: 30, count: 1, spread: 0, selfDestruct: true };
+    const rules = stageRules({
+      bosses: [],
+      moves: [CIRCLE, NOVA, DASH, BOOM],
+      swarms: [{ atSeconds: 0, everySeconds: 100, untilSeconds: 0, kind: 'ring', pattern: 'bomber', count: 1, triggerRange: 100, move: 'boom' }],
+    });
+    rules.enemies.kinds[6]!.moveSpeed = 600;
+    const { sim, p } = solo(rules);
+    const hp = p.hp;
+    const types = run(sim, 60);
+    expect(types).not.toContain('swarmStarted');
+    expect(types).toContain('hazardTelegraphed');
+    expect(types).toContain('hazardStruck');
+    expect(types).toContain('enemyRetired');
+    expect(sim.world.enemies.count).toBe(0);
+    expect(p.hp).toBeLessThan(hp);
+    expect(sim.world.stats.kills).toBe(0);
+  });
 });

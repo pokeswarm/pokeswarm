@@ -2221,6 +2221,32 @@
     ],
     "evolvesTo": []
   },
+  "voltorb": {
+    "dex": 100,
+    "names": {
+      "ja": "ビリリダマ",
+      "en": "Voltorb"
+    },
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 30,
+      "defense": 50,
+      "specialAttack": 55,
+      "specialDefense": 55,
+      "speed": 100
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "electrode",
+        "trigger": "level",
+        "level": 30
+      }
+    ]
+  },
   "vulpix": {
     "dex": 37,
     "names": {

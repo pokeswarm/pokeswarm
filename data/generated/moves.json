@@ -335,6 +335,14 @@
     "type": "ground",
     "damageClass": "physical"
   },
+  "self-destruct": {
+    "names": {
+      "ja": "じばく",
+      "en": "Self-Destruct"
+    },
+    "type": "normal",
+    "damageClass": "physical"
+  },
   "shadow-ball": {
     "names": {
       "ja": "シャドーボール",

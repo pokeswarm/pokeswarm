@@ -28,6 +28,8 @@ export class EnemySprites {
     private readonly depth: number,
     /** 種類ごとの大きさの倍率（中ボス・ボスを大きく描く） */
     private readonly scaleOfKind: (kind: number) => number = () => 1,
+    /** 種類ごとの、重なったときに手前に出す順（大きいほど手前。depth に 0.1 ずつ足す） */
+    private readonly layerOfKind: (kind: number) => number = () => 0,
   ) {}
 
   /** 描いた数を返す */
@@ -54,6 +56,7 @@ export class EnemySprites {
         const sprite = this.free.pop() ?? this.scene.add.sprite(0, 0, atlasKey(manifest.key)).setDepth(this.depth);
         // 使い回すスプライトは前の種類の大きさのままなので、毎回合わせる
         sprite.setScale(this.scale * this.scaleOfKind(e.kind[i]!));
+        sprite.setDepth(this.depth + this.layerOfKind(e.kind[i]!) * 0.1);
         slot = { sprite, dir: 0, seen: false };
         this.slots.set(id, slot);
         sprite.setVisible(true);

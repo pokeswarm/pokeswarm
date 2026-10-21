@@ -180,6 +180,17 @@
       "damage": 35,
       "count": 5,
       "spread": 240
+    },
+    {
+      "id": "self-destruct",
+      "move": "self-destruct",
+      "effect": "explosion",
+      "shape": "circle",
+      "target": "self",
+      "telegraphSeconds": 1,
+      "radius": 95,
+      "damage": 30,
+      "selfDestruct": true
     }
   ],
   "legendary": {
@@ -213,13 +224,14 @@
       "speed": 300
     },
     {
-      "atSeconds": 150,
-      "everySeconds": 150,
-      "untilSeconds": 1000,
-      "kind": "swarm-exeggutor",
-      "pattern": "encircle",
-      "count": 18,
-      "radius": 520
+      "atSeconds": 45,
+      "everySeconds": 20,
+      "untilSeconds": 1180,
+      "kind": "swarm-voltorb",
+      "pattern": "bomber",
+      "count": 1,
+      "triggerRange": 110,
+      "move": "self-destruct"
     }
   ],
   "bossRules": {

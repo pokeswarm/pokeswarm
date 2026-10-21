@@ -153,6 +153,10 @@ if (stageConfig.legendary) {
 }
 for (const s of stageConfig.swarms) {
   check(enemiesConfig.kinds.some((k) => k.id === s.kind), `data/game/stage.json のスウォーム "${s.kind}" が data/game/enemies.json にありません`);
+  if (s.pattern === 'bomber') {
+    const move = stageConfig.moves.find((m) => m.id === s.move);
+    check(!!s.triggerRange && !!move?.selfDestruct, `data/game/stage.json のスウォーム "${s.kind}" は bomber なので triggerRange と、selfDestruct の範囲技 move が必要です`);
+  }
 }
 for (const [key, def] of Object.entries(movesConfig.moves)) {
   check(!!generated.moves[key], `data/game/moves.json の "${key}" が data/generated/moves.json にありません（data/pokeapi/targets.json に足して npm run pokeapi）`);

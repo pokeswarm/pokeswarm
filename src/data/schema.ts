@@ -231,6 +231,8 @@ export const bossMoveSchema = z.object({
   /** 狙ったプレイヤーの位置からのばらつき（2つ目以降の範囲） */
   spread: z.number().nonnegative().default(0),
   dashSpeed: z.number().positive().optional(),
+  /** じばく: 予告した敵（ビリリダマ）は止まり、落ちたときにいなくなる */
+  selfDestruct: z.boolean().optional(),
 });
 export type BossMove = z.infer<typeof bossMoveSchema>;
 
@@ -238,17 +240,22 @@ export type BossMove = z.infer<typeof bossMoveSchema>;
  * スウォームイベント（作者の決定。2026年10月）: 冗長なプレイにならないよう、気を付けないといけない群れを定期的に出す。
  * - rush: 画面の外から、まっすぐ高速で横切る群れ（count 体が spacing の間隔で並ぶ。プレイヤーを追わない）
  * - encircle: プレイヤーの周り（radius）にぐるりと出て、ゆっくり囲んでくる群れ
+ * - bomber: 画面の外から count 体が転がってきて、プレイヤーに triggerRange まで近づくと、その場で
+ *   範囲技 move（じばく）を予告して爆発する（作者の決定。ビリリダマ。プレイヤーより速いので自然と追いつかれる）
  */
 export const swarmSchema = z.object({
   atSeconds: z.number().nonnegative(),
   everySeconds: z.number().positive(),
   untilSeconds: z.number().positive(),
   kind: z.string().min(1),
-  pattern: z.enum(['rush', 'encircle']),
+  pattern: z.enum(['rush', 'encircle', 'bomber']),
   count: z.number().int().positive(),
   spacing: z.number().positive().optional(),
   speed: z.number().positive().optional(),
   radius: z.number().positive().optional(),
+  /** bomber: 爆発を始める距離と、使う範囲技（moves の id） */
+  triggerRange: z.number().positive().optional(),
+  move: z.string().optional(),
 });
 export type SwarmConfig = z.infer<typeof swarmSchema>;
 

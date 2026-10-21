@@ -92,7 +92,8 @@
     "gloom",
     "kadabra",
     "rhyhorn",
-    "staryu"
+    "staryu",
+    "voltorb"
   ],
   "moves": [
     "ember",
@@ -151,7 +152,8 @@
     "explosion",
     "psycho-boost",
     "extreme-speed",
-    "rock-wrecker"
+    "rock-wrecker",
+    "self-destruct"
   ],
   "items": [
     "x-attack",

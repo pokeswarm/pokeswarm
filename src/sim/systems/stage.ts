@@ -1,6 +1,6 @@
 import type { BossMove } from '../../data/schema';
 import { randomUnit } from '../math';
-import { currentWaveIndex, enemyHpScale, findEnemyIndex, type LegendaryResult, type World } from '../world';
+import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World } from '../world';
 import { hurtPlayer } from './health';
 
 /**
@@ -106,6 +106,7 @@ export function spawnSwarms(world: World): void {
       const hp = kind.hp * hpScale;
       if (world.enemies.add(id, kindIndex, x, y, hp, kind.moveSpeed, kind.radius, kind.contactDamage * wave.damageMultiplier, vx, vy) === -1) return;
       world.events.push({ type: 'enemySpawned', id, kind: kindIndex, x, y, vx, vy });
+      if (s.pattern === 'bomber') world.bombers.set(id, swarm);
     };
     if (s.pattern === 'rush') {
       // 画面の外（ux, uy の向き）から、プレイヤーのいる場所を通り抜ける向きにまっすぐ進む。横に並べて群れにする
@@ -119,6 +120,15 @@ export function spawnSwarms(world: World): void {
         // 横方向（-uy, ux）に並べ、後ろの列は少し遠くから
         add(p.x + ux * (dist + back) - uy * side, p.y + uy * (dist + back) + ux * side, -ux * speed, -uy * speed);
       }
+    } else if (s.pattern === 'bomber') {
+      // 画面の外から転がってくる（ふつうに追ってくる。プレイヤーより速い）
+      const dist = world.rules.spawn.spawnDistanceMin;
+      for (let k = 0; k < s.count; k++) {
+        const [vx, vy] = k === 0 ? [ux, uy] : randomUnit(world.rng);
+        add(p.x + vx * dist, p.y + vy * dist);
+      }
+      // 知らせは出さない（作者の決定。いつの間にか転がってくる）
+      continue;
     } else {
       // プレイヤーの周りにぐるりと出す
       const radius = s.radius ?? world.rules.spawn.spawnDistanceMin;
@@ -129,6 +139,28 @@ export function spawnSwarms(world: World): void {
       }
     }
     world.events.push({ type: 'swarmStarted', swarm });
+  }
+}
+
+/**
+ * じばく（ソロ・ホスト）: 転がってきた敵がプレイヤーに近づいたら、止まってその場に範囲を予告する。
+ * 予告の間に倒しても爆発は止まらない（誘爆）。落ちたら敵はいなくなる（撃破には数えない）
+ */
+export function armBombers(world: World): void {
+  if (world.role === 'guest') return;
+  for (const [id, swarm] of world.bombers) {
+    const i = findEnemyIndex(world, id);
+    if (i === -1 || world.enemies.hp[i]! <= 0) {
+      world.bombers.delete(id);
+      continue;
+    }
+    const s = world.rules.stage.swarms[swarm]!;
+    const x = world.enemies.x[i]!;
+    const y = world.enemies.y[i]!;
+    const target = nearestPlayer(world, x, y);
+    if (!target || (target.x - x) ** 2 + (target.y - y) ** 2 > (s.triggerRange ?? 0) ** 2) continue;
+    world.bombers.delete(id);
+    addHazard(world, moveIndexOfStage(world.rules, s.move!), x, y, 0, 0, id);
   }
 }
 
@@ -189,6 +221,14 @@ export function bossAttacks(world: World): void {
       dirY: hz.dirY,
       length: hz.length,
     });
+    // じばく: 爆発した敵はいなくなる（ホストが決めてゲストへ送る）
+    if (move?.selfDestruct && hz.dasher !== -1 && world.role !== 'guest') {
+      const i = findEnemyIndex(world, hz.dasher);
+      if (i !== -1) {
+        world.enemies.hp[i] = 0;
+        world.events.push({ type: 'enemyRetired', id: hz.dasher });
+      }
+    }
     // 突進: 線に沿って進む（ノックバックの仕組みで動かす。ホストが動かし、位置はゲストへ送る）
     if (hz.dasher !== -1 && move?.dashSpeed && world.role !== 'guest') {
       const i = findEnemyIndex(world, hz.dasher);
@@ -220,6 +260,15 @@ export function addHazard(world: World, moveIdx: number, x: number, y: number, d
   const ticks = Math.round(move.telegraphSeconds / world.dt);
   const length = move.shape === 'line' ? (move.length ?? 400) : 0;
   world.hazards.push({ move: moveIdx, shape: move.shape, x, y, radius: move.radius, dirX, dirY, length, dasher, damage: move.damage, ticksLeft: ticks, totalTicks: ticks });
+  // じばく: 予告した敵はその場で止まる（ゲストも同じ知らせで止める）
+  if (move.selfDestruct && dasher !== -1) {
+    const i = findEnemyIndex(world, dasher);
+    if (i !== -1) {
+      world.enemies.speed[i] = 0;
+      world.enemies.vx[i] = 0;
+      world.enemies.vy[i] = 0;
+    }
+  }
   world.events.push({ type: 'hazardTelegraphed', move: moveIdx, x, y, dirX, dirY, dasher });
 }
 

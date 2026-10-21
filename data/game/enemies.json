@@ -403,15 +403,15 @@
       "xp": 1
     },
     {
-      "id": "swarm-exeggutor",
-      "species": "exeggutor",
-      "sprite": "enemy/exeggutor",
-      "hp": 90,
-      "moveSpeed": 28,
-      "radius": 16,
-      "contactDamage": 12,
-      "xp": 4,
-      "spriteScale": 1.3
+      "id": "swarm-voltorb",
+      "species": "voltorb",
+      "sprite": "enemy/voltorb",
+      "hp": 10,
+      "moveSpeed": 220,
+      "radius": 12,
+      "contactDamage": 8,
+      "xp": 3,
+      "spriteScale": 1.2
     },
     {
       "id": "midboss-onix",

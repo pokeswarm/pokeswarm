@@ -1,7 +1,7 @@
 import type Phaser from 'phaser';
-import type { IconConfig } from '../data/schema';
+import type { IconConfig, ItemIcons } from '../data/schema';
 import type { SimRules } from '../sim/rules';
-import { iconColor, iconPixels, starPixels, type IconTier } from './iconPixels';
+import { iconColor, iconPixels, itemIconPixels, starPixels, type IconTier } from './iconPixels';
 
 /** レベルの表示のひし形（済んだもの: 段階ごとの色、まだのもの） */
 export function pipKey(on: boolean, tier: IconTier): string {
@@ -33,7 +33,7 @@ function addTexture(scene: Phaser.Scene, key: string, width: number, height: num
  * 技・持ち物のアイコンと、レベルのひし形のテクスチャを作る（一度だけ）。
  * 技は出し方の絵柄をタイプの色で塗り、枠で タイプの技・派生技・固有技 を分ける
  */
-export function ensureIconTextures(scene: Phaser.Scene, data: IconConfig, rules: SimRules): void {
+export function ensureIconTextures(scene: Phaser.Scene, data: IconConfig, rules: SimRules, items?: ItemIcons): void {
   const n = data.size;
   rules.moves.forEach((m, i) => {
     const type = rules.types.names[m.type] ?? 'normal';
@@ -41,7 +41,9 @@ export function ensureIconTextures(scene: Phaser.Scene, data: IconConfig, rules:
   });
   rules.items.forEach((it, i) => {
     const def = data.items[it.key] ?? { glyph: 'orb', color: '#9e9e9e' };
-    addTexture(scene, itemIconKey(rules, i), n, n, iconPixels(data, def.glyph, iconColor(data, def.color), 'base'));
+    const sprite = items?.items[it.key];
+    // 公式のアイテム画像を縮めたドット絵（背景はタイプのアイテムならタイプの色）。無ければ自作の絵柄
+    addTexture(scene, itemIconKey(rules, i), n, n, sprite ? itemIconPixels(data, sprite, iconColor(data, def.color)) : iconPixels(data, def.glyph, iconColor(data, def.color), 'base'));
   });
   for (const tier of ['base', 'derived', 'unique'] as const) {
     const s = starPixels(data, true, tier);

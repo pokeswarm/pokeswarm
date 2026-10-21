@@ -1207,6 +1207,21 @@ export type ObstacleConfig = z.infer<typeof obstacleConfigSchema>;
  * 持ち物・パッシブは絵柄と色（"type:fire" でタイプの色）。stars はレベルの表示（作者の決定: 小さなひし形を、アイコンの下に最大8個並べる）。
  * pipColors は、レベルの済んだひし形の色を段階ごとに変える（タイプの技 → 派生技 → 固有技。派生するとレベルは1からやり直し、色が変わる）
  */
+/**
+ * 持ち物のアイコンのドット絵（npm run item-icons で PokeAPI の公式のアイテム画像から作る。作者の決定 2026年10月21日）。
+ * rows は1文字が1ドット（. は透明）、palette はその色。credit はクレジットに出す権利の表記
+ */
+export const itemIconsSchema = z.object({
+  size: z.number().int().positive(),
+  source: z.string(),
+  credit: z.string(),
+  items: z.record(
+    z.string(),
+    z.object({ palette: z.record(z.string().length(1), z.string().regex(/^#[0-9a-fA-F]{6}$/)), rows: z.array(z.string()) }),
+  ),
+});
+export type ItemIcons = z.infer<typeof itemIconsSchema>;
+
 export const iconConfigSchema = z.object({
   size: z.number().int().positive(),
   dot: z.number().positive(),

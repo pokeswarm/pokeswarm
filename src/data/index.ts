@@ -7,6 +7,7 @@ import itemSpritesJson from '../../data/render/items.json';
 import obstacleSpritesJson from '../../data/render/obstacles.json';
 import obstaclesJson from '../../data/game/obstacles.json';
 import iconsJson from '../../data/render/icons.json';
+import itemIconsJson from '../../data/render/item-icons.json';
 import moveBalanceJson from '../../data/game/move-balance.json';
 import enemiesJson from '../../data/game/enemies.json';
 import spawnJson from '../../data/game/spawn.json';
@@ -69,6 +70,7 @@ import {
   pixelSpritesSchema,
   obstacleConfigSchema,
   iconConfigSchema,
+  itemIconsSchema,
   MOVE_PATTERNS,
   moveBalanceSchema,
 } from './schema';
@@ -92,6 +94,7 @@ export const obstacleSprites = load('render/obstacles.json', pixelSpritesSchema,
 export const obstacleConfig = load('game/obstacles.json', obstacleConfigSchema, obstaclesJson);
 /** 技・持ち物・パッシブのアイコン（自作のドット絵） */
 export const iconConfig = load('render/icons.json', iconConfigSchema, iconsJson);
+export const itemIcons = load('render/item-icons.json', itemIconsSchema, itemIconsJson);
 /** 技の強さをそろえる目安（段階ごとの総合の強さ） */
 export const moveBalanceConfig = load('game/move-balance.json', moveBalanceSchema, moveBalanceJson);
 export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enemiesJson);
@@ -145,7 +148,7 @@ for (const wave of spawnConfig.waves) {
 }
 // アイコン: 技の出し方・持ち物・パッシブ・タイプごとに絵柄と色がある
 for (const p of MOVE_PATTERNS) check(!!iconConfig.glyphs[iconConfig.moves[p] ?? ''], `data/render/icons.json に出し方 "${p}" の絵柄がありません`);
-for (const k of Object.keys(itemsConfig.items)) check(!!iconConfig.glyphs[iconConfig.items[k]?.glyph ?? ''], `data/render/icons.json に持ち物 "${k}" のアイコンがありません`);
+for (const k of Object.keys(itemsConfig.items)) check(!!itemIcons.items[k], `data/render/item-icons.json に持ち物 "${k}" のアイコンがありません（npm run item-icons）`);
 for (const k of Object.keys(movesConfig.moves)) check(!!iconConfig.typeColors[generated.moves[k]!.type], `data/render/icons.json にタイプ "${generated.moves[k]!.type}" の色がありません`);
 // 障害物: 区間の数は spawn.json と同じ。見た目の種類はドット絵がある
 check(obstacleConfig.sections.length === spawnConfig.waves.length, `data/game/obstacles.json の sections（${obstacleConfig.sections.length}）と data/game/spawn.json の waves（${spawnConfig.waves.length}）の数をそろえてください`);

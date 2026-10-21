@@ -1,4 +1,4 @@
-import type { IconConfig } from '../data/schema';
+import type { IconConfig, ItemIcons } from '../data/schema';
 
 /** アイコンの枠: タイプの技・派生技・固有技（持ち物・パッシブは base） */
 export type IconTier = 'base' | 'derived' | 'unique';
@@ -59,6 +59,34 @@ export function iconPixels(data: IconConfig, glyph: string, color: string, tier:
       for (const [x, y] of [[k, 1], [k, n - 2], [1, k], [n - 2, k]] as const) {
         if ((rows[y]?.[x] ?? '.') === '.') put(x, y, glow);
       }
+    }
+  }
+  return out;
+}
+
+/**
+ * 持ち物のアイコン（size × size）の RGBA: 角を丸めた四角を背景の色で塗り、公式のアイテム画像を縮めたドット絵を真ん中に重ね、枠を付ける
+ */
+export function itemIconPixels(data: IconConfig, sprite: ItemIcons['items'][string], background: string): Uint8ClampedArray {
+  const n = data.size;
+  const out = new Uint8ClampedArray(n * n * 4);
+  const bg = rgb(background);
+  const black: [number, number, number] = [0, 0, 0];
+  const frame = rgb(data.frame.base);
+  const h = sprite.rows.length;
+  const w = sprite.rows[0]?.length ?? 0;
+  const ox = Math.floor((n - w) / 2);
+  const oy = Math.floor((n - h) / 2);
+  for (let y = 0; y < n; y++) {
+    for (let x = 0; x < n; x++) {
+      const ex = Math.min(x, n - 1 - x);
+      const ey = Math.min(y, n - 1 - y);
+      if (ex + ey < 1) continue;
+      const i = (y * n + x) * 4;
+      const border = ex === 0 || ey === 0 || ex + ey === 1;
+      const ch = sprite.rows[y - oy]?.[x - ox] ?? '.';
+      const c = border ? frame : ch !== '.' && sprite.palette[ch] ? rgb(sprite.palette[ch]!) : mix(bg, black, y < n / 2 ? 0.35 : 0.5);
+      out.set([c[0], c[1], c[2], 255], i);
     }
   }
   return out;

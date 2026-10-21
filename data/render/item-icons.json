@@ -1,0 +1,1025 @@
+{
+  "size": 14,
+  "source": "https://github.com/PokeAPI/sprites (sprites/items)",
+  "credit": "Item images © Nintendo / Creatures Inc. / GAME FREAK inc. / The Pokémon Company (via PokeAPI/sprites)",
+  "items": {
+    "x-attack": {
+      "rows": [
+        ".......aaab...",
+        ".......cddda..",
+        ".....bceeffda.",
+        "...ggcdeffehcb",
+        "..gihehfffhhda",
+        ".gihhefchhhhda",
+        "bgheecdcgijhca",
+        "bbihefchhjec..",
+        "ijefhheijjca..",
+        "ieffeihjjjb...",
+        "gefehiihiig...",
+        "gjhhjigjig....",
+        ".bgiigbgi.....",
+        "..bbbgbb......"
+      ],
+      "palette": {
+        "a": "#6f6565",
+        "b": "#653d3d",
+        "c": "#9d797d",
+        "d": "#b99fa0",
+        "e": "#df9499",
+        "f": "#f1cbce",
+        "g": "#8e4546",
+        "h": "#cd7a7d",
+        "i": "#a85254",
+        "j": "#bf6365"
+      }
+    },
+    "x-sp-atk": {
+      "rows": [
+        ".......abac...",
+        ".......bddda..",
+        ".....cbdeffdc.",
+        "...gcbdhffehbc",
+        "..gihedeffhhda",
+        ".gihhefbjhhhda",
+        "cgheebdjgihhja",
+        "ccghefjjhieb..",
+        "iiefdjegihja..",
+        "ieffeihiiic...",
+        "geffhiihigg...",
+        "gjhhiigigg....",
+        ".cgiigcgg.....",
+        "..ccggcc......"
+      ],
+      "palette": {
+        "a": "#6f6f66",
+        "b": "#8d8d77",
+        "c": "#5d5d3b",
+        "d": "#b8b89a",
+        "e": "#d2d293",
+        "f": "#eeeeca",
+        "g": "#82823f",
+        "h": "#bdbd70",
+        "i": "#a0a04f",
+        "j": "#aaaa78"
+      }
+    },
+    "x-defense": {
+      "rows": [
+        ".......aaab...",
+        ".......cddda..",
+        ".....bcdeffda.",
+        "...gghdeffeicb",
+        "..gjiedfffiida",
+        ".gjiiefchiiidc",
+        "bgieehdhgjjiha",
+        "bbjiefhhiiec..",
+        "jjefdhegiiha..",
+        "jeffejijjjb...",
+        "gefeijjijjg...",
+        "ghiijggijg....",
+        ".bggggbgj.....",
+        "..bbbgbb......"
+      ],
+      "palette": {
+        "a": "#63636e",
+        "b": "#404067",
+        "c": "#7c7b88",
+        "d": "#9c9abd",
+        "e": "#9994e0",
+        "f": "#cecbf1",
+        "g": "#4a4894",
+        "h": "#7c76b1",
+        "i": "#7975d0",
+        "j": "#5a59b1"
+      }
+    },
+    "hp-up": {
+      "rows": [
+        "...abcccba....",
+        "...bcdddcb....",
+        "...bcccccb....",
+        "...beeeeeb....",
+        "..afgggggaa...",
+        "..ahhfffffa...",
+        "..gddhffhhg...",
+        "..giiijiiig...",
+        "..giijjjiig...",
+        "..giijjjjig...",
+        "..giijjjidg...",
+        "..ahijjjdha...",
+        "..afhhhhffa...",
+        "...aaaaaaa...."
+      ],
+      "palette": {
+        "a": "#5e4b39",
+        "b": "#559752",
+        "c": "#7bd27b",
+        "d": "#bcdea4",
+        "e": "#56b556",
+        "f": "#a17439",
+        "g": "#747f62",
+        "h": "#c0a162",
+        "i": "#d7eae2",
+        "j": "#a8d1f2"
+      }
+    },
+    "x-speed": {
+      "rows": [
+        ".......aaab...",
+        ".......cddda..",
+        ".....badeffdb.",
+        "...ghcdiffeiab",
+        "..gjiedeffiida",
+        ".hjiiefcciiida",
+        "bhieecdchjiica",
+        "bhgiefccijec..",
+        "jjefdiegjica..",
+        "geffejijjjh...",
+        "gefeijjiggg...",
+        "gjiijjhjgh....",
+        ".bgjjghgg.....",
+        "..hhhhbh......"
+      ],
+      "palette": {
+        "a": "#6a7474",
+        "b": "#405353",
+        "c": "#7a9f9f",
+        "d": "#9ab8b8",
+        "e": "#94d3d3",
+        "f": "#cdefef",
+        "g": "#448989",
+        "h": "#377070",
+        "i": "#70bdbd",
+        "j": "#51a1a1"
+      }
+    },
+    "dire-hit": {
+      "rows": [
+        ".......aabb...",
+        ".......ccccb..",
+        ".....badeffcb.",
+        "...gghcdffedab",
+        "..iijedfffjjcb",
+        ".gijjdfahjjjda",
+        "ggjedhdhgijdcb",
+        "ggijefhhjhea..",
+        "ihefddeihjhb..",
+        "ieffeijihig...",
+        "aefejhijiig...",
+        "ihjjhighig....",
+        ".giiiigii.....",
+        "..gggggg......"
+      ],
+      "palette": {
+        "a": "#8b7a66",
+        "b": "#655e5b",
+        "c": "#b7a494",
+        "d": "#d3ae71",
+        "e": "#eac477",
+        "f": "#f6dfb9",
+        "g": "#7b5223",
+        "h": "#be954c",
+        "i": "#aa7a2f",
+        "j": "#d8a950"
+      }
+    },
+    "pp-max": {
+      "rows": [
+        "...abbbbba....",
+        "...cdddddc....",
+        "...ceeeeec....",
+        "...feeeecf....",
+        "..gfcffffag...",
+        "..accfffffa...",
+        "..hidcffcbh...",
+        "..hjjjjjjjh...",
+        "..hjjiiijjh...",
+        "..hjjjjjjjh...",
+        "..hjjjjjjjh...",
+        "..ajjjjjjia...",
+        "..ghiiiiihg...",
+        "...ggggggg...."
+      ],
+      "palette": {
+        "a": "#667147",
+        "b": "#bab872",
+        "c": "#afbb3d",
+        "d": "#f5f29f",
+        "e": "#ead34c",
+        "f": "#7c9f33",
+        "g": "#435c35",
+        "h": "#807973",
+        "i": "#c4b1b3",
+        "j": "#ecd4e0"
+      }
+    },
+    "wide-lens": {
+      "rows": [
+        ".....abaccc...",
+        ".....dedfffg..",
+        "...addhfiiifg.",
+        "...defhijjjif.",
+        "..cbfhijjjihf.",
+        "..cbfhijjiihg.",
+        "..cddfhffhhfg.",
+        "..abedfffffg..",
+        ".abebaagggg...",
+        ".beebacccc....",
+        "cbeba.........",
+        "cgdaa.........",
+        "ghhfc.........",
+        "gggg.........."
+      ],
+      "palette": {
+        "a": "#5e3f33",
+        "b": "#954c2d",
+        "c": "#323232",
+        "d": "#ad7452",
+        "e": "#c86434",
+        "f": "#a8a19f",
+        "g": "#6b6968",
+        "h": "#cecfcf",
+        "i": "#51a0b4",
+        "j": "#2ecdf8"
+      }
+    },
+    "light-clay": {
+      "rows": [
+        "..............",
+        "...abbbbac....",
+        "..adeffghac...",
+        ".ahiijjigbac..",
+        "cbfjjjjjfehdac",
+        "adgijjifeeehbc",
+        "begeffeehhheha",
+        "ahheehhefijiea",
+        "adeigegfijjiea",
+        "cbgjjijjjjjgda",
+        ".cbefjfifehbc.",
+        "..abdeeedbac..",
+        "...caaaaacc...",
+        ".............."
+      ],
+      "palette": {
+        "a": "#586c3f",
+        "b": "#728d4d",
+        "c": "#404736",
+        "d": "#8ab255",
+        "e": "#a9d56a",
+        "f": "#c4e88e",
+        "g": "#b9e17e",
+        "h": "#9ac75f",
+        "i": "#ceeea0",
+        "j": "#ddf5c1"
+      }
+    },
+    "quick-claw": {
+      "rows": [
+        ".......abcb...",
+        "......bcdedc..",
+        ".....bdfffedb.",
+        "....bdggfehhi.",
+        "...bdfgfehjji.",
+        "...dggfhhjiib.",
+        "..bfgfhjiba...",
+        ".acgfejib.....",
+        ".cefhji.......",
+        "adgejb........",
+        "bdfdb.........",
+        "cedi..........",
+        "ddb...........",
+        "cc............"
+      ],
+      "palette": {
+        "a": "#313131",
+        "b": "#675b3f",
+        "c": "#827562",
+        "d": "#b9a380",
+        "e": "#e6c892",
+        "f": "#f3ddc3",
+        "g": "#fdefe7",
+        "h": "#d8b367",
+        "i": "#81663e",
+        "j": "#ba8f4d"
+      }
+    },
+    "metronome": {
+      "rows": [
+        "....abbc......",
+        "...defgcd.....",
+        "...deehba.....",
+        "...abbbgba....",
+        "..daffbghc....",
+        "..daffehgcd...",
+        "..deffehgba...",
+        ".ddeffehghad..",
+        ".ddbifebhhba..",
+        ".abfjjfbfghc..",
+        ".bjjjjjjjiha..",
+        ".biiiiiiigca..",
+        ".biiiiiiiga...",
+        ".abbbbbbbcd..."
+      ],
+      "palette": {
+        "a": "#466165",
+        "b": "#62888e",
+        "c": "#497182",
+        "d": "#353e3a",
+        "e": "#568367",
+        "f": "#97baae",
+        "g": "#6cabc8",
+        "h": "#5f9eaf",
+        "i": "#98cbe7",
+        "j": "#a7dbec"
+      }
+    },
+    "dowsing-machine": {
+      "rows": [
+        ".....aba......",
+        ".cdeaffgb.....",
+        "cbbdhbbbbggba.",
+        "abgcehhdbfffgc",
+        "aggidbbdhgggbc",
+        "abaiabfieabbci",
+        "..iiagfiecccc.",
+        "....iaaeecbbc.",
+        ".....chjicbhi.",
+        ".....agjicjji.",
+        ".....aghichji.",
+        "......aa.aghi.",
+        ".........abbi.",
+        "..........cc.."
+      ],
+      "palette": {
+        "a": "#676d6a",
+        "b": "#7d8685",
+        "c": "#555655",
+        "d": "#79703f",
+        "e": "#6b5f28",
+        "f": "#91c4cd",
+        "g": "#8e9fa1",
+        "h": "#887264",
+        "i": "#4b3a31",
+        "j": "#8c353f"
+      }
+    },
+    "lucky-egg": {
+      "rows": [
+        ".....abccb....",
+        ".....cdeedb...",
+        "....beeeefdb..",
+        "...bghheeefib.",
+        "..bdehheeeegc.",
+        ".aceeeeeeeegb.",
+        ".bdeeeeeeefgb.",
+        ".ceeeeeeefgib.",
+        ".ceeeeeeegdib.",
+        ".cfeeeeefdiib.",
+        ".bcjfjgggidib.",
+        "..bcddiiidib..",
+        "...bbiiidbb...",
+        "....abbbba...."
+      ],
+      "palette": {
+        "a": "#313131",
+        "b": "#686c6f",
+        "c": "#899095",
+        "d": "#b0b9c0",
+        "e": "#deeff7",
+        "f": "#dae9f1",
+        "g": "#c2cdd5",
+        "h": "#ecf6fb",
+        "i": "#a3aab2",
+        "j": "#d1dee6"
+      }
+    },
+    "silk-scarf": {
+      "rows": [
+        "......abccccd.",
+        ".....cefgeegec",
+        "....dehieegggc",
+        "...cefibeffged",
+        "..dehfbbfhfgba",
+        "..efhgbfhfggc.",
+        ".bhhibgjhggic.",
+        "dcddabjhgghfd.",
+        "...adgjiihhb..",
+        "...dbhjhjjfd..",
+        "...cijjjjhea..",
+        "..abjjjhfic...",
+        "..cghffgbc....",
+        ".addddcc......"
+      ],
+      "palette": {
+        "a": "#5e6763",
+        "b": "#b0bcba",
+        "c": "#949f9c",
+        "d": "#808785",
+        "e": "#c4d0cf",
+        "f": "#e6f3f3",
+        "g": "#d4dede",
+        "h": "#ebf7f7",
+        "i": "#e1ebeb",
+        "j": "#f3fcfc"
+      }
+    },
+    "charcoal": {
+      "rows": [
+        "........aba...",
+        ".......cdeef..",
+        "......dgehhgb.",
+        ".....cbhhegffd",
+        "....bffhhegbdc",
+        "...cehehegbbdc",
+        "..cghehggdbfd.",
+        ".cfehhggbbdi..",
+        "icadeefgbdi...",
+        "cdaadbbfdc....",
+        "iddccdgji.....",
+        "cjjaacdi......",
+        ".cjcaji.......",
+        "..cccj........"
+      ],
+      "palette": {
+        "a": "#4b4b4b",
+        "b": "#5c5c5c",
+        "c": "#404040",
+        "d": "#515151",
+        "e": "#818181",
+        "f": "#666666",
+        "g": "#727272",
+        "h": "#949494",
+        "i": "#373737",
+        "j": "#464646"
+      }
+    },
+    "mystic-water": {
+      "rows": [
+        ".....aaaa.....",
+        ".........a....",
+        "...aa.....a...",
+        "...aa..bb.a...",
+        "...aabb...c...",
+        "....a.....ab..",
+        "....d....a..b.",
+        "...de....a..b.",
+        "..dffe..a...b.",
+        ".geffeg.a...b.",
+        ".efhheg..cbb..",
+        ".efhheg...b...",
+        ".dehfd........",
+        "..dee........."
+      ],
+      "palette": {
+        "a": "#4a0000",
+        "b": "#4a4a00",
+        "c": "#4a2b00",
+        "d": "#5c6168",
+        "e": "#7d858e",
+        "f": "#bfc6e3",
+        "g": "#313131",
+        "h": "#7281de"
+      }
+    },
+    "miracle-seed": {
+      "rows": [
+        "......abbbbbbc",
+        ".....cbdeeefgc",
+        "....cdehihefgc",
+        "...cfhiihfgggc",
+        ".cdeiihefjjjjb",
+        "abeiihfjgjjjgb",
+        "cdhiheejjjjjba",
+        "beiihhefjjjgc.",
+        "beihhiefjjjba.",
+        "cfeeihejjgbc..",
+        "bggfefjgfd....",
+        "bbbgjggfdc....",
+        ".cbggeddc.....",
+        "..cbcdca......"
+      ],
+      "palette": {
+        "a": "#313131",
+        "b": "#93933a",
+        "c": "#747441",
+        "d": "#b0b075",
+        "e": "#eeeea3",
+        "f": "#dbdb6e",
+        "g": "#c6c63c",
+        "h": "#f7f7ce",
+        "i": "#ffffed",
+        "j": "#d8d846"
+      }
+    },
+    "magnet": {
+      "rows": [
+        ".....abbbbb...",
+        "....bbccccba..",
+        "...acccccccba.",
+        "..dcccbbbbcccb",
+        ".deecbaaaacccb",
+        "feeefaaggbccca",
+        "feefdaagacccbg",
+        "dffddgghiibaag",
+        "dffdggjiiijaag",
+        "ddfd.ghiijaag.",
+        ".ad..gjhhjag..",
+        ".....gjhjjg...",
+        "......jhjg....",
+        ".......aj....."
+      ],
+      "palette": {
+        "a": "#4b574d",
+        "b": "#6b796c",
+        "c": "#97a495",
+        "d": "#6d4744",
+        "e": "#e8938c",
+        "f": "#a05855",
+        "g": "#383a3d",
+        "h": "#6264b0",
+        "i": "#9098f2",
+        "j": "#464877"
+      }
+    },
+    "never-melt-ice": {
+      "rows": [
+        "....aa........",
+        "....bb........",
+        "...acb........",
+        "...bdbe.......",
+        "...fdfe.......",
+        "..egdghe..hh..",
+        ".ehcdijbfhcb..",
+        "eabdcijggfdbe.",
+        "acdcggidgidca.",
+        "bddcdggdgjggh.",
+        "bgjccigiiijjh.",
+        "aijgiigjiiajh.",
+        "ehhbjjjjgjehe.",
+        "..ehhhhhaae..."
+      ],
+      "palette": {
+        "a": "#678798",
+        "b": "#8ba5b1",
+        "c": "#c7dde4",
+        "d": "#e5f7fb",
+        "e": "#354751",
+        "f": "#9cb5c1",
+        "g": "#a9cfe1",
+        "h": "#556d7a",
+        "i": "#8dbbd4",
+        "j": "#75a8c6"
+      }
+    },
+    "black-belt": {
+      "rows": [
+        "abb......cd...",
+        "bcd.....efeg..",
+        "heh...aibeje..",
+        "geg..aiiaifgd.",
+        ".ejfacba.hfe..",
+        ".efgaad.dieh..",
+        ".....adiiia...",
+        "....eeheha....",
+        "..hffgda...h..",
+        "..efg.....efc.",
+        "..hgd....fjjg.",
+        "..bha...hfjf..",
+        "...aicbggid...",
+        "....abbba....."
+      ],
+      "palette": {
+        "a": "#3a373a",
+        "b": "#3e3a3e",
+        "c": "#423d42",
+        "d": "#313131",
+        "e": "#585158",
+        "f": "#675f67",
+        "g": "#504a50",
+        "h": "#4a444a",
+        "i": "#453f45",
+        "j": "#7e757e"
+      }
+    },
+    "poison-barb": {
+      "rows": [
+        "...........ab.",
+        "..........acda",
+        ".........bcdef",
+        "........bgdea.",
+        ".......acdba..",
+        "......bcdea...",
+        ".ha..bgdea....",
+        "ije.acdba.....",
+        "ijjbcdea......",
+        "ijggdea.......",
+        "jggjha........",
+        "jggjjhif......",
+        "jggjhiif......",
+        "ahiifff......."
+      ],
+      "palette": {
+        "a": "#726f72",
+        "b": "#9f9d9f",
+        "c": "#c8c8c8",
+        "d": "#c4c2c4",
+        "e": "#959395",
+        "f": "#514751",
+        "g": "#edd0ed",
+        "h": "#9f809f",
+        "i": "#8c6a8c",
+        "j": "#c8a1c8"
+      }
+    },
+    "soft-sand": {
+      "rows": [
+        "..............",
+        ".......abbaa..",
+        "......cdeecfb.",
+        ".....fgggggdfb",
+        "....afcdgggecb",
+        "..abfddcdddcfa",
+        ".affbcgeccccb.",
+        ".afhhhcecbbb..",
+        ".hiiiihcba....",
+        "jiiiiihfaa....",
+        "jiiiihjb......",
+        ".jhhjj........",
+        "..............",
+        ".............."
+      ],
+      "palette": {
+        "a": "#4c3c4c",
+        "b": "#714d6e",
+        "c": "#a56fa1",
+        "d": "#c188c1",
+        "e": "#d096d0",
+        "f": "#8b5d89",
+        "g": "#e4aae4",
+        "h": "#ae936e",
+        "i": "#ecdeb1",
+        "j": "#786e53"
+      }
+    },
+    "sharp-beak": {
+      "rows": [
+        ".........aa...",
+        "........bcde..",
+        ".......bffdg..",
+        "......bcfccbh.",
+        ".....bcfcfiid.",
+        "....acfffijdg.",
+        "...bcffijbbge.",
+        "...dffijahage.",
+        "..dffidehbbe..",
+        "..dficghhab...",
+        ".afcb.hhaah...",
+        "hdfb..hbah....",
+        "dcb..ggh......",
+        "gb....e......."
+      ],
+      "palette": {
+        "a": "#ae8c3e",
+        "b": "#9b7730",
+        "c": "#dabd56",
+        "d": "#bca15c",
+        "e": "#3c342c",
+        "f": "#f4da6b",
+        "g": "#846d36",
+        "h": "#765625",
+        "i": "#fde995",
+        "j": "#e5d397"
+      }
+    },
+    "twisted-spoon": {
+      "rows": [
+        "............a.",
+        "...........bcd",
+        ".....edaaafcce",
+        ".....bcdeedgah",
+        "....hbgh......",
+        "....fij.......",
+        "..edbij.......",
+        ".jdgdbj.......",
+        ".eggbij.......",
+        "jgficbh.......",
+        "aficcd........",
+        "jbiidh........",
+        ".dehh.........",
+        ".............."
+      ],
+      "palette": {
+        "a": "#656e6e",
+        "b": "#9caaaa",
+        "c": "#d4e2e2",
+        "d": "#738080",
+        "e": "#6b7676",
+        "f": "#8a9999",
+        "g": "#7a8e8e",
+        "h": "#434a4a",
+        "i": "#b2c3c3",
+        "j": "#545e5e"
+      }
+    },
+    "hard-stone": {
+      "rows": [
+        "...abbbbba....",
+        "...cdddddb....",
+        "..efddddfbg...",
+        "ebcfdddfcbbhg.",
+        "afffddfbbbbbe.",
+        "hcffdfcaaaahi.",
+        "gbcffcbaaahei.",
+        "gaabccbaaheei.",
+        "gahhbcbaheeei.",
+        "ghegebbheeeei.",
+        "igggiehgggiij.",
+        "..jgiiiiiij...",
+        "...iiiiiij....",
+        "...jjjjjjj...."
+      ],
+      "palette": {
+        "a": "#7b7474",
+        "b": "#979091",
+        "c": "#b5adaf",
+        "d": "#f7efef",
+        "e": "#655d5d",
+        "f": "#dbd2d5",
+        "g": "#585252",
+        "h": "#736b6c",
+        "i": "#4d4646",
+        "j": "#3e3b3b"
+      }
+    },
+    "spell-tag": {
+      "rows": [
+        "......aab.....",
+        "......acda....",
+        "......aefcdda.",
+        "......adeeeea.",
+        ".....bdfeeeea.",
+        ".....cffeecca.",
+        "....dgghhffab.",
+        "...aeiihhfgdb.",
+        "..dgiiiiiggd..",
+        ".dgjjjiiigdb..",
+        "cgjjjjjgffa...",
+        "cfgijjjjgc....",
+        "..bcgjifd.....",
+        "....efeb......"
+      ],
+      "palette": {
+        "a": "#515151",
+        "b": "#373737",
+        "c": "#6e6e6e",
+        "d": "#646464",
+        "e": "#7a7676",
+        "f": "#918888",
+        "g": "#aaa7a7",
+        "h": "#bb7171",
+        "i": "#c8bfbf",
+        "j": "#dfdfdf"
+      }
+    },
+    "dragon-fang": {
+      "rows": [
+        "...........a..",
+        "..........bcd.",
+        "..........bef.",
+        ".........dbea.",
+        "........gbhbg.",
+        ".......dfehbf.",
+        "...ddfiehhead.",
+        "..accbhhhhbg..",
+        "afjiiehbibf...",
+        "acijjbebjag...",
+        "jjjiifbig.....",
+        "ficfjjifd.....",
+        "gajifgd.......",
+        ".ggddd........"
+      ],
+      "palette": {
+        "a": "#776e69",
+        "b": "#c2b5af",
+        "c": "#a39b97",
+        "d": "#494341",
+        "e": "#e2d9d4",
+        "f": "#8d7f79",
+        "g": "#675e5a",
+        "h": "#f8f2ee",
+        "i": "#b5a69e",
+        "j": "#a09088"
+      }
+    },
+    "fire-stone": {
+      "rows": [
+        ".....abaacda..",
+        "....aceeeffcg.",
+        "...cffebbeheg.",
+        "..aefffbbhhea.",
+        ".cffffeihheea.",
+        ".dfffeiihheea.",
+        "gdfeiiihehbea.",
+        "gdeiihhhfebba.",
+        "ceiihhihebag..",
+        "abiiiiijjbag..",
+        "cfeijjjjbbg...",
+        "cfbijjjbba....",
+        "aaabbbaag.....",
+        ".aggaagg......"
+      ],
+      "palette": {
+        "a": "#7f7f4b",
+        "b": "#b2a946",
+        "c": "#9a9a73",
+        "d": "#b6b090",
+        "e": "#e1d46f",
+        "f": "#faf3b8",
+        "g": "#565635",
+        "h": "#f2e33b",
+        "i": "#f5a936",
+        "j": "#ddc918"
+      }
+    },
+    "water-stone": {
+      "rows": [
+        ".....abcddbbb.",
+        "....ddceefghdd",
+        "...bceeeeeehid",
+        "...bfeeeeecjjb",
+        "..dcfeeefcijjb",
+        "..cfgggffcjjjd",
+        ".acfgggffhjjdb",
+        "adfgggghijjjd.",
+        "adfggghiijjd..",
+        "dcfghihijjd...",
+        "bhffhihjjd....",
+        "bjhcijjdd.....",
+        "bdiiidba......",
+        "bbdddda......."
+      ],
+      "palette": {
+        "a": "#313131",
+        "b": "#444177",
+        "c": "#8d95c7",
+        "d": "#605b99",
+        "e": "#d9dafd",
+        "f": "#b1baf6",
+        "g": "#988bf7",
+        "h": "#7c7ede",
+        "i": "#6b6ad6",
+        "j": "#5958c0"
+      }
+    },
+    "thunder-stone": {
+      "rows": [
+        "......abbbbc..",
+        ".....bdefffec.",
+        "....dgghcffiib",
+        "...bggghfeieib",
+        "..dggggiiejeib",
+        ".ahggheiijjehf",
+        ".bhghjjjjjeihf",
+        "ceecejjjjefeca",
+        "fhebfefeefccb.",
+        "fecceeiifccb..",
+        "fecfeeeiiifb..",
+        "fififffiifb...",
+        ".biiffiifb....",
+        "..bbbbbca....."
+      ],
+      "palette": {
+        "a": "#2d522d",
+        "b": "#507650",
+        "c": "#51954e",
+        "d": "#949894",
+        "e": "#86c574",
+        "f": "#66a55f",
+        "g": "#ebf5eb",
+        "h": "#adddab",
+        "i": "#71b870",
+        "j": "#b3da72"
+      }
+    },
+    "leaf-stone": {
+      "rows": [
+        "......abcad...",
+        ".....aefffg...",
+        "...abechhbbd..",
+        "..afegccgcfad.",
+        ".dbcccccccbig.",
+        ".abjchcggcfig.",
+        "abeghhcghbied.",
+        "eibjhhcjcfiea.",
+        "afiejchfiifea.",
+        "afifcefiifgaa.",
+        "cbbbiiiieaad..",
+        "aceefifecad...",
+        "..dajaajad....",
+        "...dddddd....."
+      ],
+      "palette": {
+        "a": "#5a6646",
+        "b": "#849a6e",
+        "c": "#608457",
+        "d": "#414c35",
+        "e": "#7a8f60",
+        "f": "#93a879",
+        "g": "#5d7a50",
+        "h": "#648e60",
+        "i": "#b0c291",
+        "j": "#587847"
+      }
+    },
+    "moon-stone": {
+      "rows": [
+        "........aabcdd",
+        "......adbbefcd",
+        "....dghhcigghg",
+        "....ehjjbbcigd",
+        "...gffhhbgeeed",
+        "..begggbgiffed",
+        ".beifhhgifhhg.",
+        "dcgeffegifjja.",
+        "dgbgicccehhh..",
+        "bcbgieeeeca...",
+        "chgifhheb.....",
+        "geihhheb......",
+        ".abgcga.......",
+        ".............."
+      ],
+      "palette": {
+        "a": "#313131",
+        "b": "#57695d",
+        "c": "#6b7f72",
+        "d": "#47534b",
+        "e": "#788d7f",
+        "f": "#809988",
+        "g": "#627769",
+        "h": "#8fa697",
+        "i": "#6f8877",
+        "j": "#b1c9b9"
+      }
+    },
+    "linking-cord": {
+      "rows": [
+        ".a............",
+        ".bc...........",
+        ".cd...........",
+        ".ef........ba.",
+        ".ge.......fcb.",
+        "..efc.....fcg.",
+        "..dhgdcdfieg..",
+        ".fiffgfjed....",
+        ".dgcg.gdef....",
+        ".hdff.fejd....",
+        "..ffdciehi....",
+        "...ejgcfi.....",
+        "...geei.......",
+        ".............."
+      ],
+      "palette": {
+        "a": "#999897",
+        "b": "#59595a",
+        "c": "#404143",
+        "d": "#3b3b3d",
+        "e": "#343539",
+        "f": "#38393b",
+        "g": "#242528",
+        "h": "#343435",
+        "i": "#2e2e31",
+        "j": "#19191b"
+      }
+    },
+    "light-ball": {
+      "rows": [
+        "...aabbbbaa...",
+        "..acddddefba..",
+        ".afgehiiheefa.",
+        "acgggfjjiheeba",
+        "adeggfjjidhefa",
+        "bdhffeeffiiheb",
+        "bdijjeggfjjidb",
+        "bdijjfggfjjidb",
+        "behiiffffiiheb",
+        "afehdidjidhefa",
+        "abeehidjiheeba",
+        ".afeehiiheefa.",
+        "..abfeddefba..",
+        "...aabbbbaa..."
+      ],
+      "palette": {
+        "a": "#575745",
+        "b": "#8a8a60",
+        "c": "#8a8846",
+        "d": "#c7c649",
+        "e": "#e3e366",
+        "f": "#caca6f",
+        "g": "#faf8b3",
+        "h": "#cfcd33",
+        "i": "#acac14",
+        "j": "#969607"
+      }
+    }
+  }
+}

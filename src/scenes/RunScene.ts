@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { effectRecipes, generated, groundConfig, iconConfig, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig } from '../data';
+import { effectRecipes, generated, groundConfig, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig } from '../data';
 import { buildSimRules, localName, permanentModifiers, playableLoadout } from '../data/simRules';
 import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
@@ -262,7 +262,7 @@ export class RunScene extends Phaser.Scene {
     this.measureFrameTime();
     // ゲストの選択はホストが確定するので、要望としてホストへ送る
     const guest = role === 'guest';
-    ensureIconTextures(this, iconConfig, rules);
+    ensureIconTextures(this, iconConfig, rules, itemIcons);
     this.levelUpPanel = new LevelUpPanel({
       iconUrl: (key) => iconDataUrl(this, key),
       choose: (index) => (guest ? this.sync?.requestUpgrade('c', index) : this.uiCommands.push({ type: 'chooseUpgrade', playerId: this.localId, index })),

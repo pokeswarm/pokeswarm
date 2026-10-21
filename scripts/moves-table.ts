@@ -13,6 +13,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { moveStatsAt, moveStrength } from '../src/data/moveStrength.ts';
+import type { MoveDefData } from '../src/data/schema.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (path: string): any => JSON.parse(readFileSync(join(ROOT, path), 'utf8'));
@@ -60,35 +62,13 @@ const moveName = (k: string): string => genMoves[k]?.names.ja ?? k;
 const itemName = (k: string): string => genItems[k]?.names.ja ?? k;
 const pokeName = (k: string): string => genPokemon[k]?.names.ja ?? k;
 
-/** レベル L の性能（基本 + レベル2以降の足し算） */
-function statsAt(def: MoveDef, level: number): Stats {
-  const out: Stats = { ...def.base };
-  for (let l = 0; l < level - 1 && l < def.levels.length; l++) {
-    for (const [k, v] of Object.entries(def.levels[l]!)) {
-      const cur = out[k];
-      if (cur === 'infinite') continue;
-      out[k] = round((cur as number) + (v as number));
-    }
-  }
-  return out;
-}
-
 function round(v: number): number {
   return Math.round(v * 1000) / 1000;
 }
 
-/** 1体の敵に当て続けたときの1秒あたりのダメージ（目安） */
-function dps(def: MoveDef, s: Stats): number {
-  const power = s.power as number;
-  const count = s.count as number;
-  const cd = s.cooldownSeconds as number;
-  const interval = s.hitIntervalSeconds as number;
-  const duration = s.durationSeconds as number;
-  const hits = interval > 0 ? Math.max(1, Math.floor(duration / interval)) : 1;
-  // 周りを回るものは、1体に同時に当たるのはおおむね1つ
-  const perTarget = def.pattern === 'orbit' ? 1 : count;
-  return (power * perTarget * hits) / cd;
-}
+// 強さの目安の計算は、派生の決まりのテストと同じもの（src/data/moveStrength.ts）
+const statsAt = (def: MoveDef, level: number): Stats => moveStatsAt(def as unknown as MoveDefData, level);
+const dps = (def: MoveDef, s: Stats): number => moveStrength(def as unknown as MoveDefData, s);
 
 /** 系統ごとに、進化の途中で持つタイプをすべて集める */
 function lineTypes(line: string): Set<string> {

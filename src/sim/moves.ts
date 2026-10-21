@@ -20,6 +20,10 @@ export interface MoveStats {
   statusSeconds: number;
   spreadDegrees: number;
   lifestealPct: number;
+  /** この技だけの急所の確率（%） */
+  critChancePct: number;
+  /** 雑魚を一撃で倒す確率（0〜1） */
+  instakillChance: number;
 }
 
 /** シミュレーションが使う技の定義 */
@@ -67,6 +71,8 @@ export function resolveMoveLevels(def: MoveDefData, statusIndexOf: (id: string) 
     statusSeconds: b.statusSeconds,
     spreadDegrees: b.spreadDegrees,
     lifestealPct: b.lifestealPct,
+    critChancePct: b.critChancePct,
+    instakillChance: b.instakillChance,
   };
   const out = [cur];
   for (const delta of def.levels) {
@@ -76,6 +82,7 @@ export function resolveMoveLevels(def: MoveDefData, statusIndexOf: (id: string) 
       next[k] = Math.max(MIN[k] ?? 0, next[k] + v);
     }
     next.statusChance = Math.min(1, next.statusChance);
+    next.instakillChance = Math.min(1, next.instakillChance);
     out.push(next);
     cur = next;
   }

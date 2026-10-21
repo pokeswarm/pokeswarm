@@ -17,6 +17,9 @@ import { applyHitEffect } from './commands';
 import { healPlayer } from './health';
 import { breakOnDamage, damageTakenMultiplier } from './status';
 
+/** 一撃で倒すときのダメージ（どの雑魚の HP より大きい） */
+const INSTAKILL_DAMAGE = 1e9;
+
 /** 技のレベルの性能（レベルは 1〜最大に収める） */
 export function moveStatsOf(world: World, pm: { move: number; level: number }): MoveStats {
   const levels = world.rules.moves[pm.move]!.levels;
@@ -227,11 +230,15 @@ function fireOrbit(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   }
 }
 
-/** beam: 一番近い敵（いなければ向いている方向）へ直線を出す。count 2 以上は少しずつ角度をずらす */
+/**
+ * beam: 一番近い敵（いなければ向いている方向）へ直線を出す。count 2 以上は少しずつ角度をずらす。
+ * spreadDegrees があれば、その角度の中に等間隔に並べる（じわれ: 360 で四方へ）
+ */
 function fireBeam(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const [ax, ay] = aim(world, p, st.range);
+  const step = st.spreadDegrees > 0 ? st.spreadDegrees / st.count : 12;
   for (let k = 0; k < st.count; k++) {
-    const offset = ((k - (st.count - 1) / 2) * 12 * Math.PI) / 180;
+    const offset = ((k - (st.count - 1) / 2) * step * Math.PI) / 180;
     const a = Math.atan2(ay, ax) + offset;
     const dx = Math.cos(a);
     const dy = Math.sin(a);
@@ -381,12 +388,16 @@ export function moveProjectiles(world: World): void {
       const fx = rollHitEffect(world, st, kx, ky);
       applyHitEffect(world, j, fx, ownerId);
       const kind = world.rules.enemies.kinds[e.kind[j]!];
-      // 急所（クリティカットなど）の判定は、当てたプレイヤーのブラウザの乱数で行う
-      const crit = !!owner && owner.mods.critChancePct > 0 && world.rng.next() * 100 < owner.mods.critChancePct;
-      const amount =
-        pr.damage[i]! *
-        typeMultiplier(world.rules.types, world.rules.combat.typeMultipliers, def.type, owner?.types ?? [], kind?.types ?? []) *
-        (crit ? world.rules.combat.critMultiplier : 1);
+      // 急所（クリティカットなど・技ごとの急所）の判定は、当てたプレイヤーのブラウザの乱数で行う
+      const critPct = (owner?.mods.critChancePct ?? 0) + st.critChancePct;
+      const crit = critPct > 0 && world.rng.next() * 100 < critPct;
+      // 一撃（じわれ）: 雑魚だけ。当てたプレイヤーのブラウザの乱数で決め、倒しきる量を送る
+      const instakill = st.instakillChance > 0 && (kind?.rank ?? 'normal') === 'normal' && world.rng.next() < st.instakillChance;
+      const amount = instakill
+        ? INSTAKILL_DAMAGE
+        : pr.damage[i]! *
+          typeMultiplier(world.rules.types, world.rules.combat.typeMultipliers, def.type, owner?.types ?? [], kind?.types ?? []) *
+          (crit ? world.rules.combat.critMultiplier : 1);
       // 吸収（ギガドレインなど）: 与えたダメージの一部を回復する
       if (st.lifestealPct > 0) healPlayer(world, ownerId, (amount * st.lifestealPct) / 100);
       if (world.role === 'guest') {

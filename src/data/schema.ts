@@ -408,6 +408,10 @@ export const moveStatsSchema = z.object({
   spreadDegrees: z.number().min(0).max(360).default(0),
   /** 与えたダメージのうち回復する割合（%）。HP は区切り3で作るので、今は効果なし */
   lifestealPct: z.number().nonnegative().default(0),
+  /** この技だけの急所の確率（%。持ち物・パッシブの急所に足す。はっぱカッター・ストーンエッジなど） */
+  critChancePct: z.number().nonnegative().default(0),
+  /** 雑魚を一撃で倒す確率（0〜1。じわれ。中ボス・ボス・伝説には効かない） */
+  instakillChance: z.number().min(0).max(1).default(0),
 });
 export type MoveStatsData = z.infer<typeof moveStatsSchema>;
 
@@ -430,6 +434,8 @@ export const moveLevelDeltaSchema = z
     statusSeconds: z.number(),
     spreadDegrees: z.number(),
     lifestealPct: z.number(),
+    critChancePct: z.number(),
+    instakillChance: z.number(),
   })
   .partial();
 export type MoveLevelDelta = z.infer<typeof moveLevelDeltaSchema>;

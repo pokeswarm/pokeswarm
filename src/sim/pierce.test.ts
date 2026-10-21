@@ -42,3 +42,30 @@ describe('貫通可能数', () => {
     expect(damaged).toBe(2);
   });
 });
+
+describe('技ごとの急所と一撃', () => {
+  it('技の急所の確率が 100% なら、持ち物が無くても急所（1.5倍）になる', () => {
+    const rules = testRules({ move: { pierce: 1, cooldownSeconds: 100, power: 10, critChancePct: 100 } });
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    sim.addPlayer({ id: 1, x: 100, y: 0, radius: 12, moveSpeed: 150 });
+    sim.world.enemies.add(1, 0, 300, 0, 1000, 0, 10);
+    for (let t = 0; t < 40; t++) sim.step([]);
+    expect(1000 - sim.world.enemies.hp[0]!).toBe(10 * rules.combat.critMultiplier);
+  });
+
+  it('一撃: 雑魚は倒れ、中ボスには効かない', () => {
+    const rules = testRules({
+      move: { pierce: 2, cooldownSeconds: 100, power: 10, instakillChance: 1 },
+      extraKinds: [{ id: 'mid', rank: 'midboss', hp: 1000, moveSpeed: 0, radius: 10, contactDamage: 0, xp: 0, types: [0] }],
+    });
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    sim.addPlayer({ id: 1, x: 100, y: 0, radius: 12, moveSpeed: 150 });
+    sim.world.enemies.add(1, 0, 300, 0, 1000, 0, 10);
+    sim.world.enemies.add(2, 1, 340, 0, 1000, 0, 10);
+    for (let t = 0; t < 40; t++) sim.step([]);
+    const e = sim.world.enemies;
+    expect(Array.from(e.id.subarray(0, e.count))).toEqual([2]);
+    expect(e.hp[0]).toBe(990);
+    expect(sim.world.stats.kills).toBe(1);
+  });
+});

@@ -15,7 +15,7 @@ describe('技のレベルごとの性能', () => {
     effect: 'x',
     base: {
       power: 10, cooldownSeconds: 0.3, count: 1, intervalSeconds: 0, speed: 100, size: 5, range: 100, durationSeconds: 1,
-      pierce: 'infinite' as const, hitIntervalSeconds: 0, knockback: 0, knockbackSeconds: 0, statusId: 'burn', statusChance: 0.9, statusSeconds: 1, spreadDegrees: 0, lifestealPct: 0,
+      pierce: 'infinite' as const, hitIntervalSeconds: 0, knockback: 0, knockbackSeconds: 0, statusId: 'burn', statusChance: 0.9, statusSeconds: 1, spreadDegrees: 0, lifestealPct: 0, critChancePct: 0, instakillChance: 0,
     },
     levels: [{ power: 5 }, { count: 1, cooldownSeconds: -0.5 }, { statusChance: 0.5 }],
   };

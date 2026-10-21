@@ -1,13 +1,13 @@
 {
   "pokemon": {
     "charmander": { "sprite": "charmander", "startingMoves": ["ember"] },
-    "bulbasaur": { "sprite": "bulbasaur", "startingMoves": ["vine-whip"] },
+    "bulbasaur": { "sprite": "bulbasaur", "startingMoves": ["leech-seed"] },
     "squirtle": { "sprite": "squirtle", "startingMoves": ["water-gun"] },
     "onix": { "sprite": "onix", "startingMoves": ["rock-throw"] },
-    "staryu": { "sprite": "staryu", "startingMoves": ["water-gun"], "unlock": "starmie" },
-    "pikachu": { "sprite": "pikachu", "startingMoves": ["thunder-shock"], "unlock": "raichu" },
-    "oddish": { "sprite": "oddish", "startingMoves": ["razor-leaf"], "unlock": "vileplume" },
-    "koffing": { "sprite": "koffing", "startingMoves": ["poison-sting"], "unlock": "weezing" },
+    "staryu": { "sprite": "staryu", "startingMoves": ["bubble"], "unlock": "starmie" },
+    "pikachu": { "sprite": "pikachu", "startingMoves": ["spark"], "unlock": "raichu" },
+    "oddish": { "sprite": "oddish", "startingMoves": ["vine-whip"], "unlock": "vileplume" },
+    "koffing": { "sprite": "koffing", "startingMoves": ["smog"], "unlock": "weezing" },
     "abra": { "sprite": "abra", "startingMoves": ["confusion"], "unlock": "alakazam" },
     "growlithe": { "sprite": "growlithe", "startingMoves": ["fire-fang"], "unlock": "arcanine" },
     "rhyhorn": { "sprite": "rhyhorn", "startingMoves": ["magnitude"], "unlock": "rhydon" }

@@ -422,24 +422,12 @@
     "leech-seed": {
       "extends": "grass.base"
     },
-    "solar-beam": {
-      "extends": "grass.base",
-      "impact": {
-        "shake": {
-          "durationMs": 80,
-          "intensity": 0.003
-        }
-      }
-    },
     "petal-dance": {
       "extends": "grass.base",
       "projectile": {
         "glowScale": 1.05,
         "coreScale": 0.2
       }
-    },
-    "giga-drain": {
-      "extends": "grass.base"
     },
     "frenzy-plant": {
       "extends": "grass.base",
@@ -979,30 +967,11 @@
     "thunder-shock": {
       "extends": "electric.base"
     },
-    "thunder-punch": {
-      "extends": "electric.base",
-      "projectile": {
-        "glowScale": 1.1,
-        "coreScale": 0.3
-      }
-    },
     "thunderbolt": {
       "extends": "electric.base",
       "projectile": {
         "glowScale": 2.8,
         "coreScale": 0.9
-      }
-    },
-    "thunder": {
-      "extends": "electric.base",
-      "impact": {
-        "flash": {
-          "radius": 60
-        },
-        "shake": {
-          "durationMs": 100,
-          "intensity": 0.004
-        }
       }
     },
     "rock-throw": {
@@ -1048,13 +1017,6 @@
       "projectile": {
         "coreColor": "#fafafa",
         "glowScale": 1.6
-      }
-    },
-    "sand-tomb": {
-      "extends": "ground.base",
-      "projectile": {
-        "glowScale": 1.1,
-        "coreScale": 0.3
       }
     },
     "confusion": {
@@ -1129,13 +1091,6 @@
         }
       }
     },
-    "petal-blizzard": {
-      "extends": "grass.base",
-      "projectile": {
-        "glowColor": "#f48fb1",
-        "glowScale": 1.8
-      }
-    },
     "explosion": {
       "extends": "fire.base",
       "impact": {
@@ -1148,8 +1103,49 @@
         }
       }
     },
-    "psycho-boost": {
-      "extends": "psychic.base",
+    "extreme-speed": {
+      "extends": "normal.base",
+      "projectile": {
+        "glowColor": "#ffe082",
+        "glowScale": 2.6
+      }
+    },
+    "smog": {
+      "extends": "poison.base",
+      "projectile": {
+        "glowColor": "#9575cd",
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      }
+    },
+    "sludge-wave": {
+      "extends": "poison.base",
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "seed-bomb": {
+      "extends": "grass.base",
+      "projectile": {
+        "glowScale": 1.3,
+        "coreScale": 0.6
+      }
+    },
+    "spark": {
+      "extends": "electric.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      }
+    },
+    "wild-charge": {
+      "extends": "electric.base",
       "projectile": {
         "glowScale": 1.2,
         "coreScale": 0.4
@@ -1164,19 +1160,15 @@
         }
       }
     },
-    "extreme-speed": {
-      "extends": "normal.base",
+    "bone-rush": {
+      "extends": "ground.base",
       "projectile": {
-        "glowColor": "#ffe082",
-        "glowScale": 2.6
+        "coreColor": "#fafafa",
+        "glowScale": 1.6
       }
     },
-    "rock-wrecker": {
-      "extends": "rock.base",
-      "projectile": {
-        "glowScale": 2,
-        "coreScale": 1
-      },
+    "fissure": {
+      "extends": "ground.base",
       "impact": {
         "flash": {
           "radius": 60

@@ -22,6 +22,8 @@ export const TEST_MOVE: MoveStats = {
   statusSeconds: 0,
   spreadDegrees: 0,
   lifestealPct: 0,
+  critChancePct: 0,
+  instakillChance: 0,
 };
 
 /** テスト用のタイプ: 0 ノーマル、1 ほのお、2 くさ、3 みず（ほのお → くさ がばつぐん、など） */

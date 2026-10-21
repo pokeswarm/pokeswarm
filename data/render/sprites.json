@@ -19,16 +19,6 @@
   "hitOutline": {
     "dot": 2,
     "alpha": 0.95,
-    "dark": 0.35,
-    "moves": [
-      "ember",
-      "fire-fang",
-      "flamethrower",
-      "fire-spin",
-      "flare-blitz",
-      "blast-burn",
-      "gust",
-      "air-slash"
-    ]
+    "dark": 0.35
   }
 }

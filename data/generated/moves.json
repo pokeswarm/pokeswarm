@@ -39,6 +39,14 @@
     "type": "normal",
     "damageClass": "physical"
   },
+  "bone-rush": {
+    "names": {
+      "ja": "ボーンラッシュ",
+      "en": "Bone Rush"
+    },
+    "type": "ground",
+    "damageClass": "physical"
+  },
   "bonemerang": {
     "names": {
       "ja": "ホネブーメラン",
@@ -126,6 +134,14 @@
     },
     "type": "fire",
     "damageClass": "special"
+  },
+  "fissure": {
+    "names": {
+      "ja": "じわれ",
+      "en": "Fissure"
+    },
+    "type": "ground",
+    "damageClass": "physical"
   },
   "flamethrower": {
     "names": {
@@ -335,6 +351,14 @@
     "type": "ground",
     "damageClass": "physical"
   },
+  "seed-bomb": {
+    "names": {
+      "ja": "タネばくだん",
+      "en": "Seed Bomb"
+    },
+    "type": "grass",
+    "damageClass": "physical"
+  },
   "self-destruct": {
     "names": {
       "ja": "じばく",
@@ -367,6 +391,22 @@
     "type": "poison",
     "damageClass": "special"
   },
+  "sludge-wave": {
+    "names": {
+      "ja": "ヘドロウェーブ",
+      "en": "Sludge Wave"
+    },
+    "type": "poison",
+    "damageClass": "special"
+  },
+  "smog": {
+    "names": {
+      "ja": "スモッグ",
+      "en": "Smog"
+    },
+    "type": "poison",
+    "damageClass": "special"
+  },
   "solar-beam": {
     "names": {
       "ja": "ソーラービーム",
@@ -374,6 +414,14 @@
     },
     "type": "grass",
     "damageClass": "special"
+  },
+  "spark": {
+    "names": {
+      "ja": "スパーク",
+      "en": "Spark"
+    },
+    "type": "electric",
+    "damageClass": "physical"
   },
   "stone-edge": {
     "names": {
@@ -462,5 +510,13 @@
     },
     "type": "water",
     "damageClass": "special"
+  },
+  "wild-charge": {
+    "names": {
+      "ja": "ワイルドボルト",
+      "en": "Wild Charge"
+    },
+    "type": "electric",
+    "damageClass": "physical"
   }
 }

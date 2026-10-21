@@ -153,7 +153,14 @@
     "psycho-boost",
     "extreme-speed",
     "rock-wrecker",
-    "self-destruct"
+    "self-destruct",
+    "spark",
+    "wild-charge",
+    "smog",
+    "sludge-wave",
+    "seed-bomb",
+    "bone-rush",
+    "fissure"
   ],
   "items": [
     "x-attack",

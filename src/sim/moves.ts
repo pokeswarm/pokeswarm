@@ -26,6 +26,8 @@ export interface MoveStats {
   instakillChance: number;
   /** 近接の扇形の角度（度）。0 なら円 */
   arcDegrees: number;
+  /** 状態異常の敵へのダメージを何 % 上げるか */
+  statusBonusPct: number;
 }
 
 /** シミュレーションが使う技の定義 */
@@ -78,6 +80,7 @@ export function resolveMoveLevels(def: MoveDefData, statusIndexOf: (id: string) 
     critChancePct: b.critChancePct,
     instakillChance: b.instakillChance,
     arcDegrees: b.arcDegrees,
+    statusBonusPct: b.statusBonusPct,
   };
   const out = [cur];
   for (const delta of def.levels) {

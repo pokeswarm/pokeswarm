@@ -28,8 +28,10 @@ export function moveMaxLevel(def: MoveDefData): number {
 export function moveStrength(def: MoveDefData, s: MoveStatsAt): number {
   const interval = s.hitIntervalSeconds as number;
   const hits = interval > 0 ? Math.max(1, Math.floor((s.durationSeconds as number) / interval)) : 1;
-  // 周りを回るものは、1体に同時に当たるのはおおむね1つ
-  const perTarget = def.pattern === 'orbit' ? 1 : (s.count as number);
+  // ゆびをふるは、出る技が毎回変わるので数えない
+  if (def.pattern === 'metronome') return NaN;
+  // 周りを回るもの・画面じゅうの敵の足元に置くものは、1体に同時に当たるのはおおむね1つ
+  const perTarget = def.pattern === 'orbit' || def.pattern === 'screen' ? 1 : (s.count as number);
   return ((s.power as number) * perTarget * hits) / (s.cooldownSeconds as number);
 }
 

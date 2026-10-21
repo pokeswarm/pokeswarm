@@ -18,6 +18,10 @@
     "hard-stone": { "maxLevel": 5, "perLevel": { "typePowerPct": { "rock": 15 } } },
     "soft-sand": { "maxLevel": 5, "perLevel": { "typePowerPct": { "ground": 15 } } },
     "twisted-spoon": { "maxLevel": 5, "perLevel": { "typePowerPct": { "psychic": 15 } } },
-    "light-ball": { "maxLevel": 1, "perLevel": {}, "lines": ["pikachu"], "powerMultiplier": 2 }
+    "light-ball": { "maxLevel": 1, "perLevel": {}, "lines": ["pikachu"], "powerMultiplier": 2 },
+    "never-melt-ice": { "maxLevel": 5, "perLevel": { "typePowerPct": { "ice": 15 } } },
+    "black-belt": { "maxLevel": 5, "perLevel": { "typePowerPct": { "fighting": 15 } } },
+    "spell-tag": { "maxLevel": 5, "perLevel": { "typePowerPct": { "ghost": 15 } } },
+    "dragon-fang": { "maxLevel": 5, "perLevel": { "typePowerPct": { "dragon": 15 } } }
   }
 }

@@ -141,6 +141,12 @@ export function useMoves(world: World): void {
         case 'nova':
           fireNova(world, p, pm, st);
           break;
+        case 'screen':
+          fireScreen(world, p, pm, st);
+          break;
+        case 'metronome':
+          fireMetronome(world, p);
+          break;
       }
     }
   }
@@ -295,6 +301,49 @@ function fireGround(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
   }
 }
 
+/** screen: range の中の近い敵 count 体の足元に、同時に当たり判定を置く（画面じゅうの敵へ） */
+function fireScreen(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const { enemies: e, enemyHash, scratch } = world;
+  const n = enemyHash.queryRect(p.x - st.range, p.y - st.range, p.x + st.range, p.y + st.range, scratch);
+  const found: { i: number; d2: number }[] = [];
+  // ハッシュの衝突で同じ敵が2回入っていることがある
+  const seen = new Set<number>();
+  for (let k = 0; k < n; k++) {
+    const i = scratch[k]!;
+    if (e.hp[i]! <= 0 || seen.has(i)) continue;
+    seen.add(i);
+    const d2 = (e.x[i]! - p.x) ** 2 + (e.y[i]! - p.y) ** 2;
+    if (d2 <= st.range * st.range) found.push({ i, d2 });
+  }
+  // 近い順（同じ距離なら id の小さい順。ハッシュの並び順に左右されないように）
+  found.sort((a, b) => a.d2 - b.d2 || e.id[a.i]! - e.id[b.i]!);
+  for (const { i } of found.slice(0, st.count)) {
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]! });
+  }
+}
+
+/** 一度に出し終える出し方（ゆびをふるで選ぶ技。連射の出し方は、出し続ける状態を持てないので選ばない） */
+const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen']);
+
+/** metronome（ゆびをふる）: ほかの技からランダムに1つを、その技の最大レベルで出す */
+function fireMetronome(world: World, p: Player): void {
+  const pool: number[] = [];
+  world.rules.moves.forEach((m, i) => {
+    if (ONE_SHOT_PATTERNS.has(m.pattern)) pool.push(i);
+  });
+  if (pool.length === 0) return;
+  const move = pool[world.rng.int(pool.length)]!;
+  const def = world.rules.moves[move]!;
+  const pm: PlayerMove = { move, level: def.levels.length, cooldown: 0, burstLeft: 0, burstTimer: 0 };
+  const st = moveStatsOf(world, pm);
+  if (def.pattern === 'melee') fireMelee(world, p, pm, st);
+  else if (def.pattern === 'orbit') fireOrbit(world, p, pm, st);
+  else if (def.pattern === 'beam') fireBeam(world, p, pm, st);
+  else if (def.pattern === 'ground') fireGround(world, p, pm, st);
+  else if (def.pattern === 'nova') fireNova(world, p, pm, st);
+  else fireScreen(world, p, pm, st);
+}
+
 /** nova: 自分を中心に、大きさ size から range まで広がる輪 */
 function fireNova(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const sc = scaledMoveStats(world, p, pm, st);
@@ -433,11 +482,14 @@ export function moveProjectiles(world: World): void {
       const crit = critPct > 0 && world.rng.next() * 100 < critPct;
       // 一撃（じわれ）: 雑魚だけ。当てたプレイヤーのブラウザの乱数で決め、倒しきる量を送る
       const instakill = st.instakillChance > 0 && (kind?.rank ?? 'normal') === 'normal' && world.rng.next() < st.instakillChance;
+      // たたりめ: 状態異常の敵へのダメージを上げる
+      const statusBonus = st.statusBonusPct > 0 && e.hasAnyStatus(j) ? 1 + st.statusBonusPct / 100 : 1;
       const amount = instakill
         ? INSTAKILL_DAMAGE
         : pr.damage[i]! *
           typeMultiplier(world.rules.types, world.rules.combat.typeMultipliers, def.type, owner?.types ?? [], kind?.types ?? []) *
-          (crit ? world.rules.combat.critMultiplier : 1);
+          (crit ? world.rules.combat.critMultiplier : 1) *
+          statusBonus;
       // 吸収（ギガドレインなど）: 与えたダメージの一部を回復する
       if (st.lifestealPct > 0) healPlayer(world, ownerId, (amount * st.lifestealPct) / 100);
       if (world.role === 'guest') {

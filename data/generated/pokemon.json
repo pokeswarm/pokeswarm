@@ -537,6 +537,32 @@
     ],
     "evolvesTo": []
   },
+  "dratini": {
+    "dex": 147,
+    "names": {
+      "ja": "ミニリュウ",
+      "en": "Dratini"
+    },
+    "types": [
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 41,
+      "attack": 64,
+      "defense": 45,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 50
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "dragonair",
+        "trigger": "level",
+        "level": 30
+      }
+    ]
+  },
   "drowzee": {
     "dex": 96,
     "names": {
@@ -1278,6 +1304,32 @@
       {
         "to": "machamp",
         "trigger": "trade"
+      }
+    ]
+  },
+  "machop": {
+    "dex": 66,
+    "names": {
+      "ja": "ワンリキー",
+      "en": "Machop"
+    },
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 80,
+      "defense": 50,
+      "specialAttack": 35,
+      "specialDefense": 35,
+      "speed": 35
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "machoke",
+        "trigger": "level",
+        "level": 28
       }
     ]
   },

@@ -1,4 +1,10 @@
 {
+  "black-belt": {
+    "names": {
+      "ja": "くろおび",
+      "en": "Black Belt"
+    }
+  },
   "calcium": {
     "names": {
       "ja": "リゾチウム",
@@ -27,6 +33,12 @@
     "names": {
       "ja": "ダウジングマシン",
       "en": "Dowsing Machine"
+    }
+  },
+  "dragon-fang": {
+    "names": {
+      "ja": "りゅうのキバ",
+      "en": "Dragon Fang"
     }
   },
   "fire-stone": {
@@ -101,6 +113,12 @@
       "en": "Mystic Water"
     }
   },
+  "never-melt-ice": {
+    "names": {
+      "ja": "とけないこおり",
+      "en": "Never-Melt Ice"
+    }
+  },
   "poison-barb": {
     "names": {
       "ja": "どくバリ",
@@ -141,6 +159,12 @@
     "names": {
       "ja": "やわらかいすな",
       "en": "Soft Sand"
+    }
+  },
+  "spell-tag": {
+    "names": {
+      "ja": "のろいのおふだ",
+      "en": "Spell Tag"
     }
   },
   "thunder-stone": {

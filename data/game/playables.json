@@ -10,7 +10,16 @@
     "koffing": { "sprite": "koffing", "startingMoves": ["smog"], "unlock": "weezing" },
     "abra": { "sprite": "abra", "startingMoves": ["confusion"], "unlock": "alakazam" },
     "growlithe": { "sprite": "growlithe", "startingMoves": ["fire-fang"], "unlock": "arcanine" },
-    "rhyhorn": { "sprite": "rhyhorn", "startingMoves": ["magnitude"], "unlock": "rhydon" }
+    "rhyhorn": { "sprite": "rhyhorn", "startingMoves": ["magnitude"], "unlock": "rhydon" },
+    "lapras": { "sprite": "lapras", "startingMoves": ["powder-snow"] },
+    "machop": { "sprite": "machop", "startingMoves": ["karate-chop"], "unlock": "machamp" },
+    "gastly": { "sprite": "gastly", "startingMoves": ["night-shade"], "unlock": "gengar" },
+    "dratini": { "sprite": "dratini", "startingMoves": ["dragon-tail"], "unlock": "dragonite" },
+    "mewtwo": { "sprite": "mewtwo", "startingMoves": ["confusion"] },
+    "mew": { "sprite": "mew", "startingMoves": ["swift"] },
+    "articuno": { "sprite": "articuno", "startingMoves": ["powder-snow"] },
+    "zapdos": { "sprite": "zapdos", "startingMoves": ["thunder-shock"] },
+    "moltres": { "sprite": "moltres", "startingMoves": ["fire-fang"] }
   },
   "default": "charmander"
 }

@@ -1178,6 +1178,422 @@
           "intensity": 0.004
         }
       }
+    },
+    "ice.base": {
+      "projectile": {
+        "coreColor": "#ffffff",
+        "coreScale": 0.8,
+        "glowColor": "#81d4fa",
+        "glowScale": 2.4,
+        "glowAlpha": 0.85
+      },
+      "impact": {
+        "burst": {
+          "count": 12,
+          "colors": [
+            "#ffffff",
+            "#e1f5fe",
+            "#81d4fa",
+            "#0288d1"
+          ],
+          "lifespanMs": [
+            200,
+            400
+          ],
+          "speed": [
+            60,
+            200
+          ],
+          "scale": [
+            0.55,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#b3e5fc",
+          "radius": 22,
+          "durationMs": 140,
+          "alpha": 0.6
+        },
+        "shake": {
+          "durationMs": 40,
+          "intensity": 0.0012
+        }
+      }
+    },
+    "fighting.base": {
+      "projectile": {
+        "coreColor": "#fff3e0",
+        "coreScale": 0.8,
+        "glowColor": "#ff8a65",
+        "glowScale": 2.4,
+        "glowAlpha": 0.85
+      },
+      "impact": {
+        "burst": {
+          "count": 12,
+          "colors": [
+            "#ffffff",
+            "#ffccbc",
+            "#ff7043",
+            "#bf360c"
+          ],
+          "lifespanMs": [
+            200,
+            400
+          ],
+          "speed": [
+            60,
+            200
+          ],
+          "scale": [
+            0.55,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#ffab91",
+          "radius": 22,
+          "durationMs": 140,
+          "alpha": 0.6
+        },
+        "shake": {
+          "durationMs": 40,
+          "intensity": 0.0012
+        }
+      }
+    },
+    "ghost.base": {
+      "projectile": {
+        "coreColor": "#ede7f6",
+        "coreScale": 0.8,
+        "glowColor": "#7e57c2",
+        "glowScale": 2.4,
+        "glowAlpha": 0.85
+      },
+      "impact": {
+        "burst": {
+          "count": 12,
+          "colors": [
+            "#d1c4e9",
+            "#9575cd",
+            "#5e35b1",
+            "#311b92"
+          ],
+          "lifespanMs": [
+            200,
+            400
+          ],
+          "speed": [
+            60,
+            200
+          ],
+          "scale": [
+            0.55,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#b39ddb",
+          "radius": 22,
+          "durationMs": 140,
+          "alpha": 0.6
+        },
+        "shake": {
+          "durationMs": 40,
+          "intensity": 0.0012
+        }
+      }
+    },
+    "dragon.base": {
+      "projectile": {
+        "coreColor": "#e8eaf6",
+        "coreScale": 0.8,
+        "glowColor": "#5c6bc0",
+        "glowScale": 2.4,
+        "glowAlpha": 0.85
+      },
+      "impact": {
+        "burst": {
+          "count": 12,
+          "colors": [
+            "#ffffff",
+            "#9fa8da",
+            "#3f51b5",
+            "#1a237e"
+          ],
+          "lifespanMs": [
+            200,
+            400
+          ],
+          "speed": [
+            60,
+            200
+          ],
+          "scale": [
+            0.55,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#9fa8da",
+          "radius": 22,
+          "durationMs": 140,
+          "alpha": 0.6
+        },
+        "shake": {
+          "durationMs": 40,
+          "intensity": 0.0012
+        }
+      }
+    },
+    "powder-snow": {
+      "extends": "ice.base"
+    },
+    "blizzard-aura": {
+      "extends": "ice.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      }
+    },
+    "sheer-cold": {
+      "extends": "ice.base",
+      "projectile": {
+        "glowScale": 1.3,
+        "coreScale": 0.5
+      },
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "freeze-dry": {
+      "extends": "ice.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      }
+    },
+    "aurora-beam": {
+      "extends": "ice.base",
+      "projectile": {
+        "glowColor": "#80cbc4"
+      }
+    },
+    "ice-beam": {
+      "extends": "ice.base",
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "karate-chop": {
+      "extends": "fighting.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      }
+    },
+    "cross-chop": {
+      "extends": "fighting.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      }
+    },
+    "dynamic-punch": {
+      "extends": "fighting.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      },
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "double-kick": {
+      "extends": "fighting.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      }
+    },
+    "rolling-kick": {
+      "extends": "fighting.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      }
+    },
+    "aura-sphere": {
+      "extends": "fighting.base",
+      "projectile": {
+        "glowColor": "#64b5f6",
+        "glowScale": 2.8
+      }
+    },
+    "night-shade": {
+      "extends": "ghost.base"
+    },
+    "shadow-ball": {
+      "extends": "ghost.base",
+      "projectile": {
+        "glowScale": 2.8,
+        "coreScale": 0.9
+      }
+    },
+    "hex": {
+      "extends": "ghost.base",
+      "projectile": {
+        "glowScale": 1.3,
+        "coreScale": 0.5
+      },
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "dragon-tail": {
+      "extends": "dragon.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      }
+    },
+    "dragon-rush": {
+      "extends": "dragon.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      },
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "outrage": {
+      "extends": "dragon.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      }
+    },
+    "dragon-rage": {
+      "extends": "dragon.base"
+    },
+    "dragon-pulse": {
+      "extends": "dragon.base",
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "psystrike": {
+      "extends": "psychic.base",
+      "projectile": {
+        "glowScale": 1.3,
+        "coreScale": 0.5
+      },
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "zap-cannon": {
+      "extends": "electric.base",
+      "projectile": {
+        "glowScale": 3,
+        "coreScale": 1
+      },
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "sky-attack": {
+      "extends": "fire.base",
+      "impact": {
+        "flash": {
+          "radius": 60
+        },
+        "shake": {
+          "durationMs": 100,
+          "intensity": 0.004
+        }
+      }
+    },
+    "metronome": {
+      "extends": "normal.base"
     }
   }
 }

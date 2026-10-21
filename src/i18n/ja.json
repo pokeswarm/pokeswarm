@@ -275,5 +275,11 @@
   "itemDesc.hard-stone": "いわの技 +15%",
   "itemDesc.soft-sand": "じめんの技 +15%",
   "itemDesc.twisted-spoon": "エスパーの技 +15%",
-  "itemDesc.light-ball": "ピカチュウが持つと技の威力が2倍（なくならない）"
+  "itemDesc.light-ball": "ピカチュウが持つと技の威力が2倍（なくならない）",
+  "pattern.screen": "画面じゅうの敵へ",
+  "pattern.metronome": "ほかの技からランダム",
+  "itemDesc.never-melt-ice": "こおりの技 +15%",
+  "itemDesc.black-belt": "かくとうの技 +15%",
+  "itemDesc.spell-tag": "ゴーストの技 +15%",
+  "itemDesc.dragon-fang": "ドラゴンの技 +15%"
 }

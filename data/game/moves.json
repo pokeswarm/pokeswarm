@@ -2260,6 +2260,1142 @@
           "power": 1
         }
       ]
+    },
+    "powder-snow": {
+      "pattern": "facing",
+      "effect": "powder-snow",
+      "base": {
+        "power": 6,
+        "cooldownSeconds": 1,
+        "count": 3,
+        "intervalSeconds": 0.03,
+        "speed": 320,
+        "size": 7,
+        "range": 240,
+        "durationSeconds": 0.75,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockback": 60,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0.12,
+        "statusSeconds": 1.5,
+        "spreadDegrees": 40,
+        "lifestealPct": 0,
+        "statusId": "freeze"
+      },
+      "levels": [
+        {
+          "power": 2
+        },
+        {
+          "count": 1
+        },
+        {
+          "power": 2
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "count": 1
+        },
+        {
+          "power": 2
+        },
+        {
+          "power": 3
+        }
+      ]
+    },
+    "blizzard": {
+      "pattern": "melee",
+      "effect": "blizzard-aura",
+      "base": {
+        "power": 102,
+        "cooldownSeconds": 3,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 70,
+        "range": 40,
+        "durationSeconds": 1.5,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.4,
+        "knockback": 80,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0.25,
+        "statusSeconds": 1.5,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "statusId": "freeze",
+        "arcDegrees": 360
+      },
+      "levels": [
+        {
+          "power": 20
+        },
+        {
+          "size": 8
+        },
+        {
+          "power": 20
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 8
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 30
+        }
+      ]
+    },
+    "sheer-cold": {
+      "pattern": "screen",
+      "effect": "sheer-cold",
+      "base": {
+        "power": 1163,
+        "cooldownSeconds": 5,
+        "count": 30,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 30,
+        "range": 650,
+        "durationSeconds": 0.3,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0.8,
+        "statusSeconds": 2,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "statusId": "freeze",
+        "instakillChance": 0.2
+      },
+      "levels": [
+        {
+          "power": 143
+        },
+        {
+          "count": 5
+        },
+        {
+          "power": 143
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "count": 5
+        },
+        {
+          "power": 143
+        },
+        {
+          "power": 214
+        }
+      ]
+    },
+    "freeze-dry": {
+      "pattern": "melee",
+      "effect": "freeze-dry",
+      "base": {
+        "power": 136,
+        "cooldownSeconds": 3.5,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 100,
+        "range": 60,
+        "durationSeconds": 2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.3,
+        "knockback": 120,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0.35,
+        "statusSeconds": 1.5,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "statusId": "freeze",
+        "arcDegrees": 360
+      },
+      "levels": [
+        {
+          "power": 15
+        },
+        {
+          "size": 10
+        },
+        {
+          "power": 15
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 10
+        },
+        {
+          "power": 15
+        },
+        {
+          "power": 26
+        }
+      ]
+    },
+    "aurora-beam": {
+      "pattern": "beam",
+      "effect": "aurora-beam",
+      "base": {
+        "power": 9,
+        "cooldownSeconds": 1.5,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 6,
+        "range": 420,
+        "durationSeconds": 0.3,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.15,
+        "knockback": 60,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0.3,
+        "statusSeconds": 2,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "statusId": "paralysis"
+      },
+      "levels": [
+        {
+          "power": 2
+        },
+        {
+          "size": 2
+        },
+        {
+          "power": 2
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 2
+        },
+        {
+          "power": 2
+        },
+        {
+          "power": 3
+        }
+      ]
+    },
+    "ice-beam": {
+      "pattern": "beam",
+      "effect": "ice-beam",
+      "base": {
+        "power": 28,
+        "cooldownSeconds": 1.8,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 12,
+        "range": 480,
+        "durationSeconds": 0.35,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.15,
+        "knockback": 120,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0.25,
+        "statusSeconds": 1.5,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "statusId": "freeze"
+      },
+      "levels": [
+        {
+          "power": 5
+        },
+        {
+          "size": 3
+        },
+        {
+          "power": 5
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 3
+        },
+        {
+          "power": 5
+        },
+        {
+          "power": 8
+        }
+      ]
+    },
+    "karate-chop": {
+      "pattern": "melee",
+      "effect": "karate-chop",
+      "base": {
+        "power": 14,
+        "cooldownSeconds": 1.2,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 40,
+        "range": 10,
+        "durationSeconds": 0.15,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 220,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 80,
+        "critChancePct": 20
+      },
+      "levels": [
+        {
+          "power": 3
+        },
+        {
+          "size": 4
+        },
+        {
+          "power": 3
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 4
+        },
+        {
+          "power": 3
+        },
+        {
+          "power": 5
+        }
+      ],
+      "body": {
+        "lungeDistance": 10,
+        "afterimages": 0
+      }
+    },
+    "cross-chop": {
+      "pattern": "melee",
+      "effect": "cross-chop",
+      "base": {
+        "power": 56,
+        "cooldownSeconds": 1.8,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 54,
+        "range": 20,
+        "durationSeconds": 0.18,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 300,
+        "knockbackSeconds": 0.12,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 100,
+        "critChancePct": 30
+      },
+      "levels": [
+        {
+          "power": 10
+        },
+        {
+          "size": 5
+        },
+        {
+          "power": 10
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 5
+        },
+        {
+          "power": 10
+        },
+        {
+          "power": 15
+        }
+      ],
+      "body": {
+        "lungeDistance": 14,
+        "afterimages": 0
+      }
+    },
+    "dynamic-punch": {
+      "pattern": "melee",
+      "effect": "dynamic-punch",
+      "base": {
+        "power": 169,
+        "cooldownSeconds": 2.4,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 70,
+        "range": 30,
+        "durationSeconds": 0.22,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 500,
+        "knockbackSeconds": 0.15,
+        "statusChance": 1,
+        "statusSeconds": 0.8,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 110,
+        "statusId": "flinch"
+      },
+      "levels": [
+        {
+          "power": 19
+        },
+        {
+          "size": 6
+        },
+        {
+          "power": 19
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 6
+        },
+        {
+          "power": 19
+        },
+        {
+          "power": 28
+        }
+      ],
+      "body": {
+        "lungeDistance": 18,
+        "afterimages": 0
+      }
+    },
+    "double-kick": {
+      "pattern": "melee",
+      "effect": "double-kick",
+      "base": {
+        "power": 10,
+        "cooldownSeconds": 1.2,
+        "count": 2,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 36,
+        "range": 10,
+        "durationSeconds": 0.15,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 200,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 70
+      },
+      "levels": [
+        {
+          "power": 2
+        },
+        {
+          "size": 4
+        },
+        {
+          "power": 2
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 4
+        },
+        {
+          "power": 2
+        },
+        {
+          "power": 3
+        }
+      ],
+      "body": {
+        "lungeDistance": 8,
+        "afterimages": 0
+      }
+    },
+    "rolling-kick": {
+      "pattern": "melee",
+      "effect": "rolling-kick",
+      "base": {
+        "power": 75,
+        "cooldownSeconds": 1.8,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 50,
+        "range": 30,
+        "durationSeconds": 0.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 320,
+        "knockbackSeconds": 0.12,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 360
+      },
+      "levels": [
+        {
+          "power": 14
+        },
+        {
+          "size": 6
+        },
+        {
+          "power": 14
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 6
+        },
+        {
+          "power": 14
+        },
+        {
+          "power": 21
+        }
+      ]
+    },
+    "night-shade": {
+      "pattern": "homing",
+      "effect": "night-shade",
+      "base": {
+        "power": 10,
+        "cooldownSeconds": 1,
+        "count": 1,
+        "intervalSeconds": 0.12,
+        "speed": 360,
+        "size": 8,
+        "range": 450,
+        "durationSeconds": 2,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockback": 60,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "power": 2
+        },
+        {
+          "count": 1
+        },
+        {
+          "power": 2
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "count": 1
+        },
+        {
+          "power": 2
+        },
+        {
+          "power": 3
+        }
+      ]
+    },
+    "shadow-ball": {
+      "pattern": "homing",
+      "effect": "shadow-ball",
+      "base": {
+        "power": 108,
+        "cooldownSeconds": 1.4,
+        "count": 1,
+        "intervalSeconds": 0.15,
+        "speed": 340,
+        "size": 14,
+        "range": 460,
+        "durationSeconds": 2,
+        "pierce": 2,
+        "hitIntervalSeconds": 0,
+        "knockback": 160,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0.4,
+        "statusSeconds": 3,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "statusId": "defenseDown"
+      },
+      "levels": [
+        {
+          "power": 1
+        },
+        {
+          "count": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "count": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        }
+      ]
+    },
+    "hex": {
+      "pattern": "screen",
+      "effect": "hex",
+      "base": {
+        "power": 928,
+        "cooldownSeconds": 3,
+        "count": 15,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 26,
+        "range": 600,
+        "durationSeconds": 0.3,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "statusBonusPct": 100
+      },
+      "levels": [
+        {
+          "power": 107
+        },
+        {
+          "count": 3
+        },
+        {
+          "power": 107
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "count": 3
+        },
+        {
+          "power": 107
+        },
+        {
+          "power": 161
+        }
+      ]
+    },
+    "dragon-tail": {
+      "pattern": "melee",
+      "effect": "dragon-tail",
+      "base": {
+        "power": 14,
+        "cooldownSeconds": 1.4,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 46,
+        "range": 10,
+        "durationSeconds": 0.18,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 380,
+        "knockbackSeconds": 0.12,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 120
+      },
+      "levels": [
+        {
+          "power": 3
+        },
+        {
+          "size": 4
+        },
+        {
+          "power": 3
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 4
+        },
+        {
+          "power": 3
+        },
+        {
+          "power": 5
+        }
+      ],
+      "body": {
+        "lungeDistance": 10,
+        "afterimages": 0
+      }
+    },
+    "dragon-rush": {
+      "pattern": "melee",
+      "effect": "dragon-rush",
+      "base": {
+        "power": 57,
+        "cooldownSeconds": 2.2,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 60,
+        "range": 30,
+        "durationSeconds": 0.22,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 450,
+        "knockbackSeconds": 0.14,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 360
+      },
+      "levels": [
+        {
+          "power": 11
+        },
+        {
+          "size": 6
+        },
+        {
+          "power": 11
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 6
+        },
+        {
+          "power": 11
+        },
+        {
+          "power": 16
+        }
+      ],
+      "body": {
+        "lungeDistance": 20,
+        "afterimages": 0
+      }
+    },
+    "outrage": {
+      "pattern": "melee",
+      "effect": "outrage",
+      "base": {
+        "power": 30,
+        "cooldownSeconds": 4,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 70,
+        "range": 40,
+        "durationSeconds": 2.5,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.3,
+        "knockback": 300,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 360
+      },
+      "levels": [
+        {
+          "power": 4
+        },
+        {
+          "size": 6
+        },
+        {
+          "power": 4
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 6
+        },
+        {
+          "power": 4
+        },
+        {
+          "power": 5
+        }
+      ],
+      "body": {
+        "lungeDistance": 14,
+        "afterimages": 0
+      }
+    },
+    "dragon-rage": {
+      "pattern": "nearest",
+      "effect": "dragon-rage",
+      "base": {
+        "power": 10,
+        "cooldownSeconds": 1.1,
+        "count": 1,
+        "intervalSeconds": 0.12,
+        "speed": 420,
+        "size": 8,
+        "range": 420,
+        "durationSeconds": 1.2,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockback": 100,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "power": 2
+        },
+        {
+          "count": 1
+        },
+        {
+          "power": 2
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "count": 1
+        },
+        {
+          "power": 2
+        },
+        {
+          "power": 3
+        }
+      ]
+    },
+    "dragon-pulse": {
+      "pattern": "beam",
+      "effect": "dragon-pulse",
+      "base": {
+        "power": 63,
+        "cooldownSeconds": 1.8,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 14,
+        "range": 460,
+        "durationSeconds": 0.35,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.15,
+        "knockback": 200,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "power": 12
+        },
+        {
+          "size": 3
+        },
+        {
+          "power": 12
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 3
+        },
+        {
+          "power": 12
+        },
+        {
+          "power": 17
+        }
+      ]
+    },
+    "psystrike": {
+      "pattern": "screen",
+      "effect": "psystrike",
+      "base": {
+        "power": 548,
+        "cooldownSeconds": 3,
+        "count": 20,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 60,
+        "range": 650,
+        "durationSeconds": 0.3,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 300,
+        "knockbackSeconds": 0.12,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "power": 63
+        },
+        {
+          "count": 4
+        },
+        {
+          "power": 63
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "count": 4
+        },
+        {
+          "power": 63
+        },
+        {
+          "power": 95
+        }
+      ]
+    },
+    "zap-cannon": {
+      "pattern": "homing",
+      "effect": "zap-cannon",
+      "base": {
+        "power": 474,
+        "cooldownSeconds": 2,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 300,
+        "size": 22,
+        "range": 500,
+        "durationSeconds": 2.5,
+        "pierce": 3,
+        "hitIntervalSeconds": 0,
+        "knockback": 300,
+        "knockbackSeconds": 0.08,
+        "statusChance": 1,
+        "statusSeconds": 2.5,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "statusId": "paralysis"
+      },
+      "levels": [
+        {
+          "power": 1
+        },
+        {
+          "count": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "count": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        }
+      ]
+    },
+    "sky-attack": {
+      "pattern": "beam",
+      "effect": "sky-attack",
+      "base": {
+        "power": 384,
+        "cooldownSeconds": 2.6,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 30,
+        "range": 700,
+        "durationSeconds": 0.35,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.2,
+        "knockback": 400,
+        "knockbackSeconds": 0.12,
+        "statusChance": 0.4,
+        "statusSeconds": 3,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "statusId": "burn"
+      },
+      "levels": [
+        {
+          "power": 43
+        },
+        {
+          "size": 4
+        },
+        {
+          "power": 43
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 4
+        },
+        {
+          "power": 43
+        },
+        {
+          "power": 65
+        }
+      ],
+      "body": {
+        "lungeDistance": 30,
+        "afterimages": 4
+      }
+    },
+    "aura-sphere": {
+      "pattern": "homing",
+      "effect": "aura-sphere",
+      "base": {
+        "power": 49,
+        "cooldownSeconds": 1.2,
+        "count": 2,
+        "intervalSeconds": 0.12,
+        "speed": 420,
+        "size": 12,
+        "range": 480,
+        "durationSeconds": 2,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockback": 160,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "power": 1
+        },
+        {
+          "count": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "count": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        }
+      ]
+    },
+    "metronome": {
+      "pattern": "metronome",
+      "effect": "metronome",
+      "base": {
+        "power": 1,
+        "cooldownSeconds": 1.6,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 8,
+        "range": 400,
+        "durationSeconds": 1,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockback": 100,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "cooldownSeconds": -0.1
+        },
+        {
+          "cooldownSeconds": -0.1
+        },
+        {
+          "cooldownSeconds": -0.1
+        },
+        {
+          "cooldownSeconds": -0.1
+        },
+        {
+          "cooldownSeconds": -0.1
+        },
+        {
+          "cooldownSeconds": -0.1
+        },
+        {
+          "cooldownSeconds": -0.2
+        }
+      ]
     }
   }
 }

@@ -93,7 +93,9 @@
     "kadabra",
     "rhyhorn",
     "staryu",
-    "voltorb"
+    "voltorb",
+    "machop",
+    "dratini"
   ],
   "moves": [
     "ember",
@@ -160,7 +162,28 @@
     "sludge-wave",
     "seed-bomb",
     "bone-rush",
-    "fissure"
+    "fissure",
+    "powder-snow",
+    "sheer-cold",
+    "aurora-beam",
+    "ice-beam",
+    "karate-chop",
+    "cross-chop",
+    "dynamic-punch",
+    "double-kick",
+    "rolling-kick",
+    "night-shade",
+    "hex",
+    "dragon-tail",
+    "dragon-rush",
+    "outrage",
+    "dragon-rage",
+    "dragon-pulse",
+    "freeze-dry",
+    "zap-cannon",
+    "sky-attack",
+    "aura-sphere",
+    "metronome"
   ],
   "items": [
     "x-attack",
@@ -193,6 +216,10 @@
     "hard-stone",
     "soft-sand",
     "twisted-spoon",
-    "light-ball"
+    "light-ball",
+    "never-melt-ice",
+    "black-belt",
+    "spell-tag",
+    "dragon-fang"
   ]
 }

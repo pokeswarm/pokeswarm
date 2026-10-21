@@ -15,7 +15,15 @@
     { "from": "poison-sting", "item": "x-attack", "to": "sludge-bomb" },
     { "from": "bonemerang", "item": "x-speed", "to": "bone-rush" },
     { "from": "gust", "item": "x-speed", "to": "air-slash" },
-    { "from": "tackle", "item": "x-defense", "to": "body-slam" }
+    { "from": "tackle", "item": "x-defense", "to": "body-slam" },
+    { "from": "powder-snow", "item": "x-defense", "to": "blizzard" },
+    { "from": "aurora-beam", "item": "x-attack", "to": "ice-beam" },
+    { "from": "karate-chop", "item": "x-attack", "to": "cross-chop" },
+    { "from": "double-kick", "item": "x-defense", "to": "rolling-kick" },
+    { "from": "night-shade", "item": "x-attack", "to": "shadow-ball" },
+    { "from": "dragon-tail", "item": "x-defense", "to": "dragon-rush" },
+    { "from": "dragon-rage", "item": "x-attack", "to": "dragon-pulse" },
+    { "from": "swift", "item": "x-attack", "to": "aura-sphere" }
   ],
   "unique": [
     { "from": "flamethrower", "item": "charcoal", "to": "blast-burn", "line": "charmander" },
@@ -28,6 +36,15 @@
     { "from": "rock-slide", "item": "hard-stone", "to": "stone-edge", "line": "onix" },
     { "from": "earthquake", "item": "soft-sand", "to": "fissure", "line": "rhyhorn" },
     { "from": "psychic", "item": "twisted-spoon", "to": "future-sight", "line": "abra" },
-    { "from": "quick-attack", "item": "light-ball", "to": "volt-tackle", "line": "pikachu", "minLevel": 51 }
+    { "from": "quick-attack", "item": "light-ball", "to": "volt-tackle", "line": "pikachu", "minLevel": 51 },
+    { "from": "blizzard", "item": "never-melt-ice", "to": "sheer-cold", "line": "lapras" },
+    { "from": "blizzard", "item": "never-melt-ice", "to": "freeze-dry", "line": "articuno" },
+    { "from": "cross-chop", "item": "black-belt", "to": "dynamic-punch", "line": "machop" },
+    { "from": "shadow-ball", "item": "spell-tag", "to": "hex", "line": "gastly" },
+    { "from": "dragon-rush", "item": "dragon-fang", "to": "outrage", "line": "dratini" },
+    { "from": "psychic", "item": "twisted-spoon", "to": "psystrike", "line": "mewtwo" },
+    { "from": "thunderbolt", "item": "magnet", "to": "zap-cannon", "line": "zapdos" },
+    { "from": "flare-blitz", "item": "sharp-beak", "to": "sky-attack", "line": "moltres" },
+    { "from": "aura-sphere", "item": "twisted-spoon", "to": "metronome", "line": "mew" }
   ]
 }

@@ -302,17 +302,26 @@
       ]
     },
     {
+      "key": "machop",
+      "dex": 66,
+      "uses": [
+        "full"
+      ]
+    },
+    {
       "key": "machoke",
       "dex": 67,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "machamp",
       "dex": 68,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -396,21 +405,24 @@
       "key": "gastly",
       "dex": 92,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "haunter",
       "dex": 93,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "gengar",
       "dex": 94,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -576,7 +588,8 @@
       "key": "lapras",
       "dex": 131,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -597,49 +610,63 @@
       "key": "articuno",
       "dex": 144,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "zapdos",
       "dex": 145,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "moltres",
       "dex": 146,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
+      ]
+    },
+    {
+      "key": "dratini",
+      "dex": 147,
+      "uses": [
+        "full"
       ]
     },
     {
       "key": "dragonair",
       "dex": 148,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "dragonite",
       "dex": 149,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "mewtwo",
       "dex": 150,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "mew",
       "dex": 151,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     }
   ]

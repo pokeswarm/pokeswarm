@@ -91,3 +91,45 @@ describe('扇形の当たり判定（自分の体で攻撃する技）', () => {
     expect(hpOf(3)).toBe(1000);
   });
 });
+
+describe('画面じゅうの敵へ・たたりめ・ゆびをふる', () => {
+  it('screen: 範囲の中の近い敵 count 体の足元に同時に当たり判定を置く', () => {
+    const rules = testRules({ move: { range: 600, count: 2, size: 10, cooldownSeconds: 100, power: 10, pierce: Infinity, durationSeconds: 0.2 } });
+    rules.moves[0] = { ...rules.moves[0]!, pattern: 'screen' };
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150 });
+    sim.world.enemies.add(1, 0, 100, 0, 1000, 0, 10);
+    sim.world.enemies.add(2, 0, -200, 0, 1000, 0, 10);
+    sim.world.enemies.add(3, 0, 0, 400, 1000, 0, 10); // 3番目に近いので当たらない
+    for (let t = 0; t < 3; t++) sim.step([]);
+    const e = sim.world.enemies;
+    const hpOf = (id: number): number => e.hp[Array.from(e.id.subarray(0, e.count)).indexOf(id)]!;
+    expect([hpOf(1), hpOf(2), hpOf(3)]).toEqual([990, 990, 1000]);
+  });
+
+  it('たたりめ: 状態異常の敵へのダメージが上がる', () => {
+    const rules = testRules({ move: { range: 600, count: 2, size: 10, cooldownSeconds: 100, power: 10, pierce: Infinity, durationSeconds: 0.2, statusBonusPct: 100 } });
+    rules.moves[0] = { ...rules.moves[0]!, pattern: 'screen' };
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150 });
+    sim.world.enemies.add(1, 0, 100, 0, 1000, 0, 10);
+    sim.world.enemies.add(2, 0, -100, 0, 1000, 0, 10);
+    sim.world.enemies.statusTicks[1 * sim.world.enemies.statusCount] = 300; // 2体目だけ状態異常
+    for (let t = 0; t < 3; t++) sim.step([]);
+    const e = sim.world.enemies;
+    const hpOf = (id: number): number => e.hp[Array.from(e.id.subarray(0, e.count)).indexOf(id)]!;
+    expect(hpOf(1)).toBe(990);
+    expect(hpOf(2)).toBeLessThan(990);
+  });
+
+  it('ゆびをふる: ほかの技のどれかを出す', () => {
+    const rules = testRules({ move: { range: 600, size: 30, cooldownSeconds: 100, power: 10, pierce: Infinity, durationSeconds: 0.5 } });
+    rules.moves[0] = { ...rules.moves[0]!, pattern: 'nova' };
+    rules.moves.push({ ...rules.moves[0]!, key: 'metronome', pattern: 'metronome' });
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150, moves: [{ move: 1, level: 1 }] });
+    sim.step([]);
+    expect(sim.world.projectiles.count).toBeGreaterThan(0);
+    expect(sim.world.projectiles.move[0]).toBe(0);
+  });
+});

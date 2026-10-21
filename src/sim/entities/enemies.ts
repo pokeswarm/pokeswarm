@@ -79,6 +79,13 @@ export class EnemyStore {
   }
 
   /** index の敵を消し、末尾の敵をそこへ移す */
+  /** 何かの状態異常にかかっているか */
+  hasAnyStatus(i: number): boolean {
+    const n = this.statusCount;
+    for (let k = i * n; k < (i + 1) * n; k++) if (this.statusTicks[k]! > 0) return true;
+    return false;
+  }
+
   removeAt(i: number): void {
     const last = --this.count;
     if (i === last) return;

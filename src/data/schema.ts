@@ -369,8 +369,10 @@ export type CombatConfig = z.infer<typeof combatConfigSchema>;
  * - ground: 一番近い敵の位置（いなければ前方）に、地面に残る当たり判定を置く（count 2 以上は周りに散らす）
  * - nova: 自分を中心に、size から range まで広がる輪
  * - homing: 一番近い敵を追いかける発射体
+ * - screen: range の中の近い敵 count 体の足元に、同時に当たり判定を置く（画面じゅうの敵へ。ぜったいれいど・たたりめ など）
+ * - metronome: 使うたびに、ほかの技からランダムに1つを、その技の最大レベルで出す（ゆびをふる。ミュウ）
  */
-export const MOVE_PATTERNS = ['nearest', 'facing', 'melee', 'orbit', 'beam', 'boomerang', 'ground', 'nova', 'homing'] as const;
+export const MOVE_PATTERNS = ['nearest', 'facing', 'melee', 'orbit', 'beam', 'boomerang', 'ground', 'nova', 'homing', 'screen', 'metronome'] as const;
 export type MovePattern = (typeof MOVE_PATTERNS)[number];
 
 const pierceValue = z.union([z.number().int().positive(), z.literal('infinite')]);
@@ -417,6 +419,8 @@ export const moveStatsSchema = z.object({
    * 扇の半径は range + size。360 で自分の周り全部（たいあたり → のしかかり は扇が全方向に広がる）
    */
   arcDegrees: z.number().min(0).max(360).default(0),
+  /** 状態異常の敵へのダメージを何 % 上げるか（たたりめ） */
+  statusBonusPct: z.number().nonnegative().default(0),
 });
 export type MoveStatsData = z.infer<typeof moveStatsSchema>;
 
@@ -442,6 +446,7 @@ export const moveLevelDeltaSchema = z
     critChancePct: z.number(),
     instakillChance: z.number(),
     arcDegrees: z.number(),
+    statusBonusPct: z.number(),
   })
   .partial();
 export type MoveLevelDelta = z.infer<typeof moveLevelDeltaSchema>;

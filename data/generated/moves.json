@@ -15,6 +15,22 @@
     "type": "rock",
     "damageClass": "special"
   },
+  "aura-sphere": {
+    "names": {
+      "ja": "はどうだん",
+      "en": "Aura Sphere"
+    },
+    "type": "fighting",
+    "damageClass": "special"
+  },
+  "aurora-beam": {
+    "names": {
+      "ja": "オーロラビーム",
+      "en": "Aurora Beam"
+    },
+    "type": "ice",
+    "damageClass": "special"
+  },
   "blast-burn": {
     "names": {
       "ja": "ブラストバーン",
@@ -71,6 +87,22 @@
     "type": "psychic",
     "damageClass": "special"
   },
+  "cross-chop": {
+    "names": {
+      "ja": "クロスチョップ",
+      "en": "Cross Chop"
+    },
+    "type": "fighting",
+    "damageClass": "physical"
+  },
+  "double-kick": {
+    "names": {
+      "ja": "にどげり",
+      "en": "Double Kick"
+    },
+    "type": "fighting",
+    "damageClass": "physical"
+  },
   "draco-meteor": {
     "names": {
       "ja": "りゅうせいぐん",
@@ -78,6 +110,46 @@
     },
     "type": "dragon",
     "damageClass": "special"
+  },
+  "dragon-pulse": {
+    "names": {
+      "ja": "りゅうのはどう",
+      "en": "Dragon Pulse"
+    },
+    "type": "dragon",
+    "damageClass": "special"
+  },
+  "dragon-rage": {
+    "names": {
+      "ja": "りゅうのいかり",
+      "en": "Dragon Rage"
+    },
+    "type": "dragon",
+    "damageClass": "special"
+  },
+  "dragon-rush": {
+    "names": {
+      "ja": "ドラゴンダイブ",
+      "en": "Dragon Rush"
+    },
+    "type": "dragon",
+    "damageClass": "physical"
+  },
+  "dragon-tail": {
+    "names": {
+      "ja": "ドラゴンテール",
+      "en": "Dragon Tail"
+    },
+    "type": "dragon",
+    "damageClass": "physical"
+  },
+  "dynamic-punch": {
+    "names": {
+      "ja": "ばくれつパンチ",
+      "en": "Dynamic Punch"
+    },
+    "type": "fighting",
+    "damageClass": "physical"
   },
   "earthquake": {
     "names": {
@@ -159,6 +231,14 @@
     "type": "fire",
     "damageClass": "physical"
   },
+  "freeze-dry": {
+    "names": {
+      "ja": "フリーズドライ",
+      "en": "Freeze-Dry"
+    },
+    "type": "ice",
+    "damageClass": "special"
+  },
   "frenzy-plant": {
     "names": {
       "ja": "ハードプラント",
@@ -189,6 +269,14 @@
       "en": "Gust"
     },
     "type": "flying",
+    "damageClass": "special"
+  },
+  "hex": {
+    "names": {
+      "ja": "たたりめ",
+      "en": "Hex"
+    },
+    "type": "ghost",
     "damageClass": "special"
   },
   "hurricane": {
@@ -223,6 +311,22 @@
     "type": "normal",
     "damageClass": "special"
   },
+  "ice-beam": {
+    "names": {
+      "ja": "れいとうビーム",
+      "en": "Ice Beam"
+    },
+    "type": "ice",
+    "damageClass": "special"
+  },
+  "karate-chop": {
+    "names": {
+      "ja": "からてチョップ",
+      "en": "Karate Chop"
+    },
+    "type": "fighting",
+    "damageClass": "physical"
+  },
   "leech-seed": {
     "names": {
       "ja": "やどりぎのタネ",
@@ -237,6 +341,30 @@
       "en": "Magnitude"
     },
     "type": "ground",
+    "damageClass": "physical"
+  },
+  "metronome": {
+    "names": {
+      "ja": "ゆびをふる",
+      "en": "Metronome"
+    },
+    "type": "normal",
+    "damageClass": "status"
+  },
+  "night-shade": {
+    "names": {
+      "ja": "ナイトヘッド",
+      "en": "Night Shade"
+    },
+    "type": "ghost",
+    "damageClass": "special"
+  },
+  "outrage": {
+    "names": {
+      "ja": "げきりん",
+      "en": "Outrage"
+    },
+    "type": "dragon",
     "damageClass": "physical"
   },
   "petal-blizzard": {
@@ -262,6 +390,14 @@
     },
     "type": "poison",
     "damageClass": "physical"
+  },
+  "powder-snow": {
+    "names": {
+      "ja": "こなゆき",
+      "en": "Powder Snow"
+    },
+    "type": "ice",
+    "damageClass": "special"
   },
   "psybeam": {
     "names": {
@@ -343,6 +479,14 @@
     "type": "rock",
     "damageClass": "physical"
   },
+  "rolling-kick": {
+    "names": {
+      "ja": "まわしげり",
+      "en": "Rolling Kick"
+    },
+    "type": "fighting",
+    "damageClass": "physical"
+  },
   "sand-tomb": {
     "names": {
       "ja": "すなじごく",
@@ -374,6 +518,22 @@
     },
     "type": "ghost",
     "damageClass": "special"
+  },
+  "sheer-cold": {
+    "names": {
+      "ja": "ぜったいれいど",
+      "en": "Sheer Cold"
+    },
+    "type": "ice",
+    "damageClass": "special"
+  },
+  "sky-attack": {
+    "names": {
+      "ja": "ゴッドバード",
+      "en": "Sky Attack"
+    },
+    "type": "flying",
+    "damageClass": "physical"
   },
   "sleep-powder": {
     "names": {
@@ -518,5 +678,13 @@
     },
     "type": "electric",
     "damageClass": "physical"
+  },
+  "zap-cannon": {
+    "names": {
+      "ja": "でんじほう",
+      "en": "Zap Cannon"
+    },
+    "type": "electric",
+    "damageClass": "special"
   }
 }

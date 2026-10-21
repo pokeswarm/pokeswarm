@@ -1,0 +1,37 @@
+{
+  "bpm": 104,
+  "stepsPerBeat": 4,
+  "channels": {
+    "lead": {
+      "wave": "square",
+      "duty": 0.25,
+      "volume": 0.22
+    },
+    "harmony": {
+      "wave": "square",
+      "duty": 0.125,
+      "volume": 0.09
+    },
+    "bass": {
+      "wave": "triangle",
+      "duty": 0.5,
+      "volume": 0.32
+    },
+    "drums": {
+      "wave": "noise",
+      "duty": 0.5,
+      "volume": 0.14
+    }
+  },
+  "patterns": {
+    "A": {
+      "lead": "E5 - - - G5 - - - C6 - - - - - - - B5 - - - - - A5 - G5 - - - - - - - A5 - - - C6 - - - E6 - - - D6 - C6 - B5 - - - - - - - G5 - - - - - - - A5 - - - F5 - - - A5 - - - C6 - - - G5 - - - E5 - - - C5 - - - E5 - - - F5 - - - E5 - - - D5 - - - F5 - A5 - G5 - - - - - - - . . . . . . . .",
+      "harmony": "C4 - E4 - G4 - E4 - C4 - E4 - G4 - E4 - G4 - B4 - D4 - B4 - G4 - B4 - D4 - B4 - A4 - C4 - E4 - C4 - A4 - C4 - E4 - C4 - E4 - G4 - B4 - G4 - E4 - G4 - B4 - G4 - F4 - A4 - C4 - A4 - F4 - A4 - C4 - A4 - C4 - E4 - G4 - E4 - C4 - E4 - G4 - E4 - D4 - F4 - A4 - F4 - D4 - F4 - A4 - F4 - G4 - B4 - D4 - B4 - G4 - B4 - D4 - B4 -",
+      "bass": "C2 - - - - - - - C2 - - - - - - - G2 - - - - - - - G2 - - - - - - - A2 - - - - - - - A2 - - - - - - - E2 - - - - - - - E2 - - - - - - - F2 - - - - - - - F2 - - - - - - - C2 - - - - - - - C2 - - - - - - - D2 - - - - - - - D2 - - - - - - - G2 - - - - - - - G2 - - - - - - -",
+      "drums": "k . . . h . . . k . . . h . . . k . . . h . . . k . . . h . . . k . . . h . . . k . . . h . . . k . . . h . . . k . . . h . . . k . . . h . . . k . . . h . . . k . . . h . . . k . . . h . . . k . . . h . . . k . . . h . . . k . . . h . . . k . . . h . h h"
+    }
+  },
+  "order": [
+    "A"
+  ]
+}

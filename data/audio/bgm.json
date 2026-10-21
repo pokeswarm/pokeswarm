@@ -12,39 +12,39 @@
       "score": "route"
     },
     "forest": {
-      "file": "audio/bgm/forest.ogg",
       "volume": 0.7,
-      "credit": ""
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "forest"
     },
     "cave": {
-      "file": "audio/bgm/cave.ogg",
       "volume": 0.7,
-      "credit": ""
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "cave"
     },
     "sea": {
-      "file": "audio/bgm/sea.ogg",
       "volume": 0.7,
-      "credit": ""
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "sea"
     },
     "victory-road": {
-      "file": "audio/bgm/victory-road.ogg",
       "volume": 0.7,
-      "credit": ""
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "victory-road"
     },
     "elite-four": {
-      "file": "audio/bgm/elite-four.ogg",
       "volume": 0.7,
-      "credit": ""
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "elite-four"
     },
     "legendary": {
-      "file": "audio/bgm/legendary.ogg",
       "volume": 0.7,
-      "credit": ""
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "legendary"
     },
     "result": {
-      "file": "audio/bgm/result.ogg",
       "volume": 0.7,
-      "credit": ""
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "result"
     }
   },
   "scenes": {

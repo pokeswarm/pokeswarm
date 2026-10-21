@@ -23,7 +23,6 @@ export interface SimRules {
   leveling: SimLeveling;
   /** 持ち物・パッシブ。番号は並び順 */
   items: SimUpgradeDef[];
-  passives: SimUpgradeDef[];
   /** 派生と固有技 */
   derivations: SimDerivation[];
   /** ポケモンの種類（プレイヤーの種族値・進化）。番号は並び順 */

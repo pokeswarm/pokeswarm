@@ -15,7 +15,6 @@ import movesJson from '../../data/game/moves.json';
 import playablesJson from '../../data/game/playables.json';
 import levelingJson from '../../data/game/leveling.json';
 import itemsJson from '../../data/game/items.json';
-import passivesJson from '../../data/game/passives.json';
 import derivationsJson from '../../data/game/derivations.json';
 import statsJson from '../../data/game/stats.json';
 import stageJson from '../../data/game/stage.json';
@@ -42,7 +41,6 @@ import {
   derivationsConfigSchema,
   itemsConfigSchema,
   levelingConfigSchema,
-  passivesConfigSchema,
   enemiesConfigSchema,
   generatedItemsSchema,
   generatedMovesSchema,
@@ -103,7 +101,6 @@ export const movesConfig = load('game/moves.json', movesConfigSchema, movesJson)
 export const playablesConfig = load('game/playables.json', playablesConfigSchema, playablesJson);
 export const levelingConfig = load('game/leveling.json', levelingConfigSchema, levelingJson);
 export const itemsConfig = load('game/items.json', itemsConfigSchema, itemsJson);
-export const passivesConfig = load('game/passives.json', passivesConfigSchema, passivesJson);
 export const derivationsConfig = load('game/derivations.json', derivationsConfigSchema, derivationsJson);
 export const statsConfig = load('game/stats.json', statsConfigSchema, statsJson);
 export const stageConfig = load('game/stage.json', stageConfigSchema, stageJson);
@@ -149,7 +146,6 @@ for (const wave of spawnConfig.waves) {
 // アイコン: 技の出し方・持ち物・パッシブ・タイプごとに絵柄と色がある
 for (const p of MOVE_PATTERNS) check(!!iconConfig.glyphs[iconConfig.moves[p] ?? ''], `data/render/icons.json に出し方 "${p}" の絵柄がありません`);
 for (const k of Object.keys(itemsConfig.items)) check(!!iconConfig.glyphs[iconConfig.items[k]?.glyph ?? ''], `data/render/icons.json に持ち物 "${k}" のアイコンがありません`);
-for (const k of Object.keys(passivesConfig.passives)) check(!!iconConfig.glyphs[iconConfig.passives[k]?.glyph ?? ''], `data/render/icons.json にパッシブ "${k}" のアイコンがありません`);
 for (const k of Object.keys(movesConfig.moves)) check(!!iconConfig.typeColors[generated.moves[k]!.type], `data/render/icons.json にタイプ "${generated.moves[k]!.type}" の色がありません`);
 // 障害物: 区間の数は spawn.json と同じ。見た目の種類はドット絵がある
 check(obstacleConfig.sections.length === spawnConfig.waves.length, `data/game/obstacles.json の sections（${obstacleConfig.sections.length}）と data/game/spawn.json の waves（${spawnConfig.waves.length}）の数をそろえてください`);
@@ -230,8 +226,8 @@ for (const [key, p] of Object.entries(playablesConfig.pokemon)) {
   }
 }
 check(!!playablesConfig.pokemon[playablesConfig.default], `data/game/playables.json の default "${playablesConfig.default}" がありません`);
-for (const key of [...Object.keys(itemsConfig.items), ...Object.keys(passivesConfig.passives)]) {
-  check(!!generated.items[key], `持ち物・パッシブ "${key}" が data/generated/items.json にありません（data/pokeapi/targets.json に足して npm run pokeapi）`);
+for (const key of Object.keys(itemsConfig.items)) {
+  check(!!generated.items[key], `持ち物 "${key}" が data/generated/items.json にありません（data/pokeapi/targets.json に足して npm run pokeapi）`);
 }
 for (const d of [...derivationsConfig.derivations, ...derivationsConfig.unique]) {
   check(!!movesConfig.moves[d.from] && !!movesConfig.moves[d.to], `data/game/derivations.json の "${d.from} → ${d.to}" の技が data/game/moves.json にありません`);

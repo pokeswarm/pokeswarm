@@ -83,6 +83,12 @@
       "en": "Light Ball"
     }
   },
+  "light-clay": {
+    "names": {
+      "ja": "ひかりのねんど",
+      "en": "Light Clay"
+    }
+  },
   "linking-cord": {
     "names": {
       "ja": " つながりのヒモ",
@@ -105,6 +111,12 @@
     "names": {
       "ja": "きせきのタネ",
       "en": "Miracle Seed"
+    }
+  },
+  "moon-stone": {
+    "names": {
+      "ja": "つきのいし",
+      "en": "Moon Stone"
     }
   },
   "mystic-water": {
@@ -131,6 +143,12 @@
       "en": "Potion"
     }
   },
+  "pp-max": {
+    "names": {
+      "ja": "ポイントマックス",
+      "en": "PP Max"
+    }
+  },
   "pp-up": {
     "names": {
       "ja": "ポイントアップ",
@@ -143,6 +161,12 @@
       "en": "Protein"
     }
   },
+  "quick-claw": {
+    "names": {
+      "ja": "せんせいのツメ",
+      "en": "Quick Claw"
+    }
+  },
   "rare-candy": {
     "names": {
       "ja": "ふしぎなアメ",
@@ -153,6 +177,12 @@
     "names": {
       "ja": "するどいくちばし",
       "en": "Sharp Beak"
+    }
+  },
+  "silk-scarf": {
+    "names": {
+      "ja": "シルクのスカーフ",
+      "en": "Silk Scarf"
     }
   },
   "soft-sand": {
@@ -201,6 +231,12 @@
     "names": {
       "ja": "ディフェンダー",
       "en": "X Defense"
+    }
+  },
+  "x-sp-atk": {
+    "names": {
+      "ja": "スペシャルアップ",
+      "en": "X Sp. Atk"
     }
   },
   "x-speed": {

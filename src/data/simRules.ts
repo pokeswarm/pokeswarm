@@ -10,7 +10,6 @@ import {
   itemsConfig,
   levelingConfig,
   movesConfig,
-  passivesConfig,
   pickupConfig,
   playablesConfig,
   obstacleConfig,
@@ -49,10 +48,11 @@ export function buildSimRules(): SimRules {
   });
   const moveIndex = (key: string): number => moves.findIndex((m) => m.key === key);
   const upgrades = (
-    defs: Record<string, { maxLevel: number; consumable: boolean; perLevel: Parameters<typeof resolveModifiers>[0]; lines?: string[]; powerMultiplier?: number }>,
+    defs: Record<string, { category: "stat" | "type" | "evolution"; maxLevel: number; consumable: boolean; perLevel: Parameters<typeof resolveModifiers>[0]; lines?: string[]; powerMultiplier?: number }>,
   ): SimUpgradeDef[] =>
     Object.entries(defs).map(([key, d]) => ({
       key,
+      category: d.category,
       maxLevel: d.maxLevel,
       consumable: d.consumable,
       perLevel: resolveModifiers(d.perLevel, types.names),
@@ -92,7 +92,6 @@ export function buildSimRules(): SimRules {
     types,
     leveling: { ...levelingConfig, xpToNext: buildXpTable(levelingConfig) },
     items,
-    passives: upgrades(passivesConfig.passives),
     derivations,
     species,
     stats: statsConfig,

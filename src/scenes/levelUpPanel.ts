@@ -3,7 +3,7 @@ import { localName } from '../data/simRules';
 import { getLocale, t, tMaybe } from '../i18n';
 import type { Player } from '../sim/entities/player';
 import { derivationCompletedBy } from '../sim/systems/leveling';
-import { itemIconKey, moveIconKey, passiveIconKey } from '../render/Icons';
+import { itemIconKey, moveIconKey } from '../render/Icons';
 import type { UpgradeOffer, World } from '../sim/world';
 
 /** カード1枚の表示用の文章 */
@@ -12,7 +12,7 @@ export interface OfferText {
   name: string;
   /** レベルの変化（NEW / Lv 1 → 2） */
   level: string;
-  /** 短い説明（技はタイプと出し方、持ち物・パッシブは効果） */
+  /** 短い説明（技はタイプと出し方、持ち物は効果） */
   detail: string;
   /** 派生・固有技そのもののカード */
   special: boolean;
@@ -74,22 +74,6 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
         kind: t('upgrade.kind.itemUp'),
         name: itemName(key),
         level: t('levelUp.levelChange', { from: it.level, to: it.level + 1 }),
-        detail: tMaybe(`itemDesc.${key}`),
-      };
-    }
-    case 'passiveNew': {
-      const key = r.passives[offer.passive]!.key;
-      return { ...base, icon: passiveIconKey(r, offer.passive), kind: t('upgrade.kind.passiveNew'), name: itemName(key), level: t('levelUp.new'), detail: tMaybe(`itemDesc.${key}`) };
-    }
-    case 'passiveUp': {
-      const ps = p.passives[offer.slot]!;
-      const key = r.passives[ps.passive]!.key;
-      return {
-        ...base,
-        icon: passiveIconKey(r, ps.passive),
-        kind: t('upgrade.kind.passiveUp'),
-        name: itemName(key),
-        level: t('levelUp.levelChange', { from: ps.level, to: ps.level + 1 }),
         detail: tMaybe(`itemDesc.${key}`),
       };
     }

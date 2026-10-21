@@ -39,9 +39,8 @@ export interface Player {
   types: number[];
   /** 覚えている技（最大 combat.maxMoveSlots） */
   moves: PlayerMove[];
-  /** 持っている持ち物（最大 leveling.maxItemSlots）とパッシブ。番号は SimRules.items / passives の並び */
+  /** 持っている持ち物（最大 leveling.maxItemSlots）。番号は SimRules.items の並び */
   items: { item: number; level: number }[];
-  passives: { passive: number; level: number }[];
   /** 系統（playables.json のキー。固有技の判定に使う） */
   line: string;
   /** 持ち物・パッシブの効果の合計（変わるたびに作り直す） */
@@ -113,7 +112,6 @@ export function createPlayer(init: PlayerInit): Player {
     types: init.types ?? [],
     moves: (init.moves ?? []).map((m) => ({ move: m.move, level: m.level, cooldown: 0, burstLeft: 0, burstTimer: 0 })),
     items: [],
-    passives: [],
     line: init.line ?? '',
     mods: init.mods,
     baseMoveSpeed: init.moveSpeed,

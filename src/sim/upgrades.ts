@@ -1,6 +1,6 @@
 import type { LevelingConfig, ModifierData } from '../data/schema';
 
-/** 持ち物・パッシブの効果の合計（% はそのまま足し合わせた値。タイプごとの項目はタイプの番号で引く） */
+/** 持ち物の効果の合計（% はそのまま足し合わせた値。タイプごとの項目はタイプの番号で引く） */
 export interface Modifiers {
   powerPct: number;
   physicalPowerPct: number;
@@ -18,12 +18,17 @@ export interface Modifiers {
   moveSpeedPct: number;
   pickupRangePct: number;
   xpPct: number;
+  /** 技の数に足す数 */
+  amountBonus: number;
+  durationPct: number;
 }
 
-/** シミュレーションが使う持ち物・パッシブの定義 */
+/** シミュレーションが使う持ち物の定義 */
 export interface SimUpgradeDef {
   /** PokeAPI の持ち物の名前 */
   readonly key: string;
+  /** stat・type・evolution（07_content_draft.md 21.2） */
+  readonly category: "stat" | "type" | "evolution";
   readonly maxLevel: number;
   /** 進化・派生に使うとなくなる */
   readonly consumable: boolean;
@@ -71,6 +76,8 @@ export function emptyModifiers(typeCount: number): Modifiers {
     moveSpeedPct: 0,
     pickupRangePct: 0,
     xpPct: 0,
+    amountBonus: 0,
+    durationPct: 0,
   };
 }
 

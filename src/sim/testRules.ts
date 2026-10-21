@@ -48,7 +48,6 @@ export function testRules(
     pickups?: Partial<SimRules['pickups']>;
     leveling?: Partial<Omit<SimRules['leveling'], 'xpToNext'>>;
     items?: SimUpgradeDef[];
-    passives?: SimUpgradeDef[];
     derivations?: SimRules['derivations'];
     species?: SimSpecies[];
     stats?: Partial<SimRules['stats']>;
@@ -76,6 +75,7 @@ export function testRules(
     initialRerolls: 1,
     resumeInvincibleSeconds: 1,
     maxItemSlots: 4,
+    moveOfferWeight: 2,
     ...overrides.leveling,
   };
   return {
@@ -128,7 +128,6 @@ export function testRules(
     types: TYPES,
     leveling: { ...leveling, xpToNext: buildXpTable(leveling) },
     items: overrides.items ?? [],
-    passives: overrides.passives ?? [],
     derivations: overrides.derivations ?? [],
     // 種族値がすべて 80（ランクの倍率 1）のポケモン。ステータスの倍率が 1 になり、ほかのテストの数値に影響しない
     species: overrides.species ?? [{ key: 'test', types: [0], baseStats: { hp: 80, attack: 80, defense: 80, specialAttack: 80, specialDefense: 80, speed: 80 }, evolutions: [] }],

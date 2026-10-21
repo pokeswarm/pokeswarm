@@ -162,10 +162,6 @@ export function banKey(p: Player, offer: UpgradeOffer): string | null {
       return `item:${offer.item}`;
     case 'itemUp':
       return `item:${p.items[offer.slot]?.item}`;
-    case 'passiveNew':
-      return `passive:${offer.passive}`;
-    case 'passiveUp':
-      return `passive:${p.passives[offer.slot]?.passive}`;
     default:
       return null;
   }
@@ -203,21 +199,21 @@ function isBaseMove(world: World, move: number): boolean {
 /**
  * 候補を作る（01_game_design.md 3.2・3.3、4.2）。
  * - 派生・固有技の条件（元の技が最大レベル ＋ 材料の持ち物）がそろっていれば必ず出す
- * - 残りは、技（自分のタイプとノーマル。枠が空いていれば新しい技、覚えている技の強化）・持ち物・パッシブから選ぶ
+ * - 残りは、技（自分のタイプとノーマル。枠が空いていれば新しい技、覚えている技の強化）・持ち物から選ぶ
  */
 /**
- * 持ち物がこのプレイヤーの候補に出るか。タイプの持ち物（もくたん・石など）は、自分のタイプのものか、
- * 今の姿の進化に使うものだけ出す（遊べるポケモンが増えて、関係ない持ち物で候補が薄まらないように）
+ * 持ち物がこのプレイヤーの候補に出るか（作者の決定。07_content_draft.md 21）。
+ * タイプのアイテム（もくたん など）は、自分のタイプとノーマルのものだけ出す。ステータスのアイテムと進化の道具は、だれにでも出る
+ * （進化の石は、ほかのポケモンの固有技の隠れた材料にもなる）。でんきだま など系統の決まったものは、その系統だけ
  */
 function itemFitsPlayer(world: World, p: Player, item: number): boolean {
-  const lines = world.rules.items[item]!.lines;
-  if (lines && !lines.includes(p.line)) return false;
-  const def = world.rules.items[item]!.perLevel;
+  const def = world.rules.items[item]!;
+  if (def.lines && !def.lines.includes(p.line)) return false;
+  if (def.category !== 'type') return true;
+  const normal = world.rules.types.names.indexOf('normal');
   const types: number[] = [];
-  def.typePowerPct.forEach((v, t) => v && types.push(t));
-  def.typeAreaPct.forEach((v, t) => v && types.push(t));
-  if (types.length === 0 || types.some((t) => p.types.includes(t))) return true;
-  return world.rules.species[p.species]?.evolutions.some((e) => e.trigger !== 'level' && e.item === item) ?? false;
+  def.perLevel.typePowerPct.forEach((v, t) => v && types.push(t));
+  return types.some((t) => t === normal || p.types.includes(t));
 }
 
 export function makeOffers(world: World, p: Player): UpgradeOffer[] {
@@ -257,11 +253,6 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
       pool.push({ kind: 'itemNew', item });
     });
   }
-  rules.passives.forEach((def, passive) => {
-    const owned = p.passives.findIndex((x) => x.passive === passive);
-    if (owned === -1) pool.push({ kind: 'passiveNew', passive });
-    else if (p.passives[owned]!.level < def.maxLevel) pool.push({ kind: 'passiveUp', slot: owned });
-  });
 
   // 除外したものは出さない
   for (let k = pool.length - 1; k >= 0; k--) {
@@ -270,8 +261,13 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
   }
   // 必ず出すものを先に、残りは乱数で選ぶ（シード付きの乱数なので再現できる）
   const out = guaranteed.slice(0, count);
+  // 技は持ち物の2倍の重みで選ぶ（作者の決定。07_content_draft.md 21）
+  const weightOf = (o: UpgradeOffer): number => (o.kind === 'moveNew' || o.kind === 'moveUp' ? rules.leveling.moveOfferWeight : 1);
   while (out.length < count && pool.length > 0) {
-    out.push(pool.splice(world.rng.int(pool.length), 1)[0]!);
+    let r = world.rng.next() * pool.reduce((sum, o) => sum + weightOf(o), 0);
+    let k = 0;
+    while (k < pool.length - 1 && r >= weightOf(pool[k]!)) r -= weightOf(pool[k++]!);
+    out.push(pool.splice(k, 1)[0]!);
   }
   return out;
 }
@@ -290,12 +286,6 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
     case 'itemUp':
       p.items[offer.slot]!.level++;
       break;
-    case 'passiveNew':
-      p.passives.push({ passive: offer.passive, level: 1 });
-      break;
-    case 'passiveUp':
-      p.passives[offer.slot]!.level++;
-      break;
     case 'derive': {
       p.moves[offer.slot] = { move: offer.to, level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0 };
       // 進化の石などは使うとなくなる（持ち物の枠が空く）
@@ -310,14 +300,13 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
 }
 
 /**
- * ステータスを作り直す: 種族値のランク・レベル（01_game_design.md 5.1）と、持ち物・パッシブの効果を合わせる。
+ * ステータスを作り直す: 種族値のランク・レベル（01_game_design.md 5.1）と、持ち物の効果を合わせる。
  * 最大HPが増えた分は今の HP にも足す。
  */
 export function recomputeModifiers(world: World, p: Player): void {
   const mods = emptyModifiers(world.rules.types.names.length);
   if (p.permanent) addModifiers(mods, p.permanent, 1);
   for (const it of p.items) addModifiers(mods, world.rules.items[it.item]!.perLevel, it.level);
-  for (const ps of p.passives) addModifiers(mods, world.rules.passives[ps.passive]!.perLevel, ps.level);
   p.mods = mods;
   const sp = world.rules.species[p.species];
   const d = sp ? deriveStats(world.rules.stats, sp, world.level) : null;

@@ -1,19 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import { Simulation } from './simulation';
 import { addXp, applyOffer, derivationCompletedBy, makeOffers } from './systems/leveling';
+import { playerMoveStats } from './systems/attack';
 import { testMove, testRules } from './testRules';
 import { emptyModifiers, type SimUpgradeDef } from './upgrades';
 
 const FIRE = 1;
 
-function upgrade(key: string, maxLevel: number, consumable: boolean, mods: Partial<ReturnType<typeof emptyModifiers>>): SimUpgradeDef {
-  return { key, maxLevel, consumable, perLevel: { ...emptyModifiers(4), ...mods } };
+function upgrade(
+  key: string,
+  maxLevel: number,
+  consumable: boolean,
+  mods: Partial<ReturnType<typeof emptyModifiers>>,
+  category: SimUpgradeDef['category'] = 'stat',
+): SimUpgradeDef {
+  return { key, category, maxLevel, consumable, perLevel: { ...emptyModifiers(4), ...mods } };
 }
 
 /**
  * 技: 0 テスト用（ノーマル）、1 ひのこ役（ほのお・最大レベル1）、2 派生先、3 固有技
  * 持ち物: 0 プラスパワー役（威力 +10%）、1 石（消える）
- * パッシブ: 0 移動速度 +10%
  */
 function rules(overrides: Parameters<typeof testRules>[0] = {}) {
   return testRules({
@@ -23,7 +29,6 @@ function rules(overrides: Parameters<typeof testRules>[0] = {}) {
       testMove('blast-burn', 'nearest', { range: 1 }, FIRE),
     ],
     items: [upgrade('x-attack', 5, false, { powerPct: 10 }), upgrade('fire-stone', 1, true, {})],
-    passives: [upgrade('carbos', 5, false, { moveSpeedPct: 10 })],
     derivations: [
       { from: 1, item: 0, to: 2, line: null },
       { from: 2, item: 1, to: 3, line: 'charmander' },
@@ -149,20 +154,53 @@ describe('候補', () => {
     for (let k = 0; k < 40 && !seen; k++) seen = makeOffers(sim.world, p).some((o) => o.kind === 'itemNew' && o.item === 0);
     expect(seen).toBe(true);
   });
-  it('タイプの持ち物は、自分のタイプのものだけ候補に出る', () => {
+  it('タイプのアイテムは、自分のタイプとノーマルのものだけ候補に出る（ほかの持ち物はだれにでも出る）', () => {
     const WATER = 2;
-    const r = rules({ items: [upgrade('charcoal', 5, false, {}), upgrade('mystic-water', 5, false, {})] });
+    const NORMAL = 0;
+    const r = rules({
+      items: [
+        upgrade('charcoal', 5, false, {}, 'type'),
+        upgrade('mystic-water', 5, false, {}, 'type'),
+        upgrade('silk-scarf', 5, false, {}, 'type'),
+        upgrade('water-stone', 1, true, {}, 'evolution'),
+      ],
+    });
     r.items[0]!.perLevel.typePowerPct[FIRE] = 15;
     r.items[1]!.perLevel.typePowerPct[WATER] = 15;
+    r.items[2]!.perLevel.typePowerPct[NORMAL] = 15;
     const sim = new Simulation({ tickRate: 30, seed: 5, rules: r });
     const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100, types: [FIRE], moves: [] });
     const seen = new Set<number>();
     for (let k = 0; k < 40; k++) for (const o of makeOffers(sim.world, p)) if (o.kind === 'itemNew') seen.add(o.item);
-    expect([...seen]).toEqual([0]);
+    expect([...seen].sort()).toEqual([0, 2, 3]);
+  });
+
+  it('技は持ち物の2倍の重みで選ばれる', () => {
+    const r = rules({ items: [upgrade('a', 5, false, {})], leveling: { offerCount: 1 } });
+    const sim = new Simulation({ tickRate: 30, seed: 9, rules: r });
+    // 候補: 新しい技（ノーマルのテスト用の技）1つ・持ち物1つ
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100, types: [2], moves: [] });
+    let moves = 0;
+    const N = 3000;
+    for (let k = 0; k < N; k++) if (makeOffers(sim.world, p)[0]!.kind === 'moveNew') moves++;
+    expect(moves / N).toBeCloseTo(2 / 3, 1);
   });
 });
 
-describe('持ち物・パッシブの効果', () => {
+describe('持ち物の効果', () => {
+  it('ポイントマックスで技の数が増え、ひかりのねんどで持続が延びる', () => {
+    const r = rules({ items: [upgrade('pp-max', 2, false, { amountBonus: 1 }), upgrade('light-clay', 5, false, { durationPct: 10 })] });
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules: r });
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100 });
+    const before = playerMoveStats(sim.world, p, p.moves[0]!);
+    applyOffer(sim.world, p, { kind: 'itemNew', item: 0 });
+    applyOffer(sim.world, p, { kind: 'itemUp', slot: 0 });
+    applyOffer(sim.world, p, { kind: 'itemNew', item: 1 });
+    const after = playerMoveStats(sim.world, p, p.moves[0]!);
+    expect(after.count).toBe(before.count + 2);
+    expect(after.durationSeconds).toBeCloseTo(before.durationSeconds * 1.1);
+  });
+
   it('プラスパワー Lv2 で技のダメージ +20%', () => {
     const r = rules();
     r.moves[0]!.levels[0]!.cooldownSeconds = 100;
@@ -175,11 +213,6 @@ describe('持ち物・パッシブの効果', () => {
     expect(100 - sim.world.enemies.hp[0]!).toBeCloseTo(12);
   });
 
-  it('パッシブで移動速度が上がる', () => {
-    const { sim, p } = makeSim();
-    applyOffer(sim.world, p, { kind: 'passiveNew', passive: 0 });
-    expect(p.moveSpeed).toBeCloseTo(110);
-  });
 });
 
 describe('「進化できる！」の判定（このカードを取ると派生の条件がそろうか）', () => {
@@ -188,7 +221,6 @@ describe('「進化できる！」の判定（このカードを取ると派生�
     // テスト用の技は最大レベル1なので、ひのこ役（番号1）は最初から最大
     expect(derivationCompletedBy(sim.world, p, { kind: 'itemNew', item: 0 })).toMatchObject({ from: 1, to: 2 });
     expect(derivationCompletedBy(sim.world, p, { kind: 'itemNew', item: 1 })).toBeNull();
-    expect(derivationCompletedBy(sim.world, p, { kind: 'passiveNew', passive: 0 })).toBeNull();
   });
 
   it('派生先をもう持っていれば出さない', () => {

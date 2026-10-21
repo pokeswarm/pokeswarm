@@ -40,13 +40,23 @@ export function moveStatsOf(world: World, pm: { move: number; level: number }): 
   return levels[Math.max(1, Math.min(pm.level, levels.length)) - 1]!;
 }
 
-/** 持ち物・パッシブの効果を掛けた、その技の威力・大きさ・速さ・クールダウン */
+/**
+ * 持ち物の効果のうち、技の数と持続を変えるもの（ポイントマックス・ひかりのねんど）を足した、その技のレベルの性能
+ */
+export function playerMoveStats(world: World, p: Player, pm: { move: number; level: number }): MoveStats {
+  const st = moveStatsOf(world, pm);
+  const m = p.mods;
+  if (m.amountBonus === 0 && m.durationPct === 0) return st;
+  return { ...st, count: st.count + m.amountBonus, durationSeconds: st.durationSeconds * Math.max(0.1, 1 + m.durationPct / 100) };
+}
+
+/** 持ち物の効果を掛けた、その技の威力・大きさ・速さ・クールダウン */
 export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: MoveStats) {
   const def = world.rules.moves[pm.move]!;
   const m = p.mods;
   const classPct = def.damageClass === 'physical' ? m.physicalPowerPct : m.specialPowerPct;
   return {
-    // ポケモンのステータス（物理・特殊の威力。種族値のランクとレベル）と、持ち物・パッシブの効果を掛ける
+    // ポケモンのステータス（物理・特殊の威力。種族値のランクとレベル）と、持ち物の効果を掛ける
     power:
       st.power *
       (def.damageClass === 'physical' ? p.physicalPower : p.specialPower) *
@@ -106,7 +116,7 @@ export function useMoves(world: World): void {
     for (const pm of p.moves) {
       const def = world.rules.moves[pm.move];
       if (!def) continue;
-      const st = moveStatsOf(world, pm);
+      const st = playerMoveStats(world, p, pm);
       pm.cooldown -= world.dt;
       if (pm.burstLeft > 0) {
         fireBurst(world, p, pm, st);
@@ -365,7 +375,7 @@ function fireMetronome(world: World, p: Player): void {
   const move = pool[world.rng.int(pool.length)]!;
   const def = world.rules.moves[move]!;
   const pm: PlayerMove = { move, level: def.levels.length, cooldown: 0, burstLeft: 0, burstTimer: 0 };
-  const st = moveStatsOf(world, pm);
+  const st = playerMoveStats(world, p, pm);
   const fire: Record<string, (w: World, p: Player, pm: PlayerMove, st: MoveStats) => void> = {
     melee: fireMelee,
     orbit: fireOrbit,

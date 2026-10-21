@@ -75,10 +75,10 @@ describe('HP とダメージ', () => {
   });
 
   it('たべのこしで回復する（最大HPまで）', () => {
-    const rules = testRules({ passives: [{ key: 'leftovers', maxLevel: 5, consumable: false, perLevel: { ...emptyModifiers(4), regenPerSecond: 3 } }] });
+    const rules = testRules({ items: [{ key: 'leftovers', category: 'stat', maxLevel: 5, consumable: false, perLevel: { ...emptyModifiers(4), regenPerSecond: 3 } }] });
     const sim = new Simulation({ tickRate: 30, seed: 1, rules });
     const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
-    applyOffer(sim.world, p, { kind: 'passiveNew', passive: 0 });
+    applyOffer(sim.world, p, { kind: 'itemNew', item: 0 });
     p.hp = 50;
     for (let t = 0; t < 30; t++) sim.step([]);
     expect(p.hp).toBeCloseTo(53);
@@ -105,8 +105,8 @@ describe('進化', () => {
     const strong = st(100, 100, 100, 100, 100, 100);
     return testRules({
       items: [
-        { key: 'fire-stone', maxLevel: 1, consumable: true, perLevel: emptyModifiers(4) },
-        { key: 'linking-cord', maxLevel: 1, consumable: true, perLevel: emptyModifiers(4) },
+        { key: 'fire-stone', category: 'evolution', maxLevel: 1, consumable: true, perLevel: emptyModifiers(4) },
+        { key: 'linking-cord', category: 'evolution', maxLevel: 1, consumable: true, perLevel: emptyModifiers(4) },
       ],
       species: [
         { key: 'charmander', types: [1], baseStats: base, evolutions: [{ to: 1, trigger: 'level', level: 16 }] },

@@ -201,7 +201,7 @@ describe('3人以上の協力プレイ', () => {
     const { host, guests } = runGroup(3, 1500, 3);
     expect(host.level).toBeGreaterThan(1);
     expect(host.levelUp).toBeNull();
-    const loadout = (w: World) => w.players.map((p) => ({ id: p.id, moves: p.moves.map((m) => [m.move, m.level]), items: p.items, passives: p.passives, rerolls: p.rerolls }));
+    const loadout = (w: World) => w.players.map((p) => ({ id: p.id, moves: p.moves.map((m) => [m.move, m.level]), items: p.items, rerolls: p.rerolls }));
     for (const g of guests) {
       expect(g.levelUp).toBeNull();
       expect(loadout(g)).toEqual(loadout(host));

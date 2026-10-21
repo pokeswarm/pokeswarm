@@ -899,9 +899,6 @@ export class RunScene extends Phaser.Scene {
       }),
       t('debug.items', {
         items: local.items.map((it) => localName(generated.items[world.rules.items[it.item]!.key]?.names, getLocale(), '') + ' Lv' + it.level).join(' / '),
-      }),
-      t('debug.passives', {
-        passives: local.passives.map((ps) => localName(generated.items[world.rules.passives[ps.passive]!.key]?.names, getLocale(), '') + ' Lv' + ps.level).join(' / '),
       })] : []),
       ...(this.showDebug ? debugLines : []),
     ];

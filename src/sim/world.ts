@@ -24,8 +24,6 @@ export type UpgradeOffer =
   | { readonly kind: 'moveUp'; readonly slot: number }
   | { readonly kind: 'itemNew'; readonly item: number }
   | { readonly kind: 'itemUp'; readonly slot: number }
-  | { readonly kind: 'passiveNew'; readonly passive: number }
-  | { readonly kind: 'passiveUp'; readonly slot: number }
   /** 派生・固有技: slot の技を to に置き換える（材料の持ち物が消える持ち物ならなくなる） */
   | { readonly kind: 'derive'; readonly slot: number; readonly to: number; readonly item: number; readonly unique: boolean };
 

@@ -83,7 +83,7 @@ describe('候補の除外（BAN）', () => {
   it('除外すると回数を1つ使い、その候補だけ引き直し、そのランでは二度と出ない', () => {
     const rules = testRules({
       leveling: { offerCount: 3 },
-      passives: ['a', 'b', 'c', 'd', 'e'].map((key) => ({ key, maxLevel: 5, consumable: false, perLevel: emptyModifiers(4) })),
+      items: ['a', 'b', 'c', 'd', 'e'].map((key) => ({ key, category: 'stat' as const, maxLevel: 5, consumable: false, perLevel: emptyModifiers(4) })),
     });
     const sim = new Simulation({ tickRate: 30, seed: 3, rules });
     const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, bans: 1 });

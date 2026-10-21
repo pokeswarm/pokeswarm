@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import type { Player } from '../sim/entities/player';
 import type { World } from '../sim/world';
 import type { IconTier } from './iconPixels';
-import { itemIconKey, moveIconKey, moveTier, passiveIconKey, pipKey } from './Icons';
+import { itemIconKey, moveIconKey, moveTier, pipKey } from './Icons';
 
 /** アイコンの表示の倍率・横の間隔・行の間隔 */
 const ICON_SCALE = 4;
@@ -31,7 +31,6 @@ export class HudIcons {
     const rows: { key: string; level: number; max: number; tier: IconTier }[][] = [
       p.moves.map((m) => ({ key: moveIconKey(r, m.move), level: m.level, max: r.moves[m.move]!.levels.length, tier: moveTier(r, m.move) })),
       p.items.map((it) => ({ key: itemIconKey(r, it.item), level: it.level, max: r.items[it.item]!.maxLevel, tier: 'base' as const })),
-      p.passives.map((ps) => ({ key: passiveIconKey(r, ps.passive), level: ps.level, max: r.passives[ps.passive]!.maxLevel, tier: 'base' as const })),
     ];
     const key = JSON.stringify(rows);
     if (key === this.shownKey) return;

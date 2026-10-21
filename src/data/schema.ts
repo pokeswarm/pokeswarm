@@ -861,11 +861,13 @@ export const levelingConfigSchema = z.object({
   resumeInvincibleSeconds: z.number().nonnegative(),
   /** 持ち物の枠 */
   maxItemSlots: z.number().int().positive(),
+  /** 候補を選ぶときの技の重み（持ち物を1とする） */
+  moveOfferWeight: z.number().positive(),
 });
 export type LevelingConfig = z.infer<typeof levelingConfigSchema>;
 
 /**
- * 持ち物・パッシブの効果（1段階あたり）。% の項目は足し合わせてから掛ける。
+ * 持ち物の効果（1段階あたり）。% の項目は足し合わせてから掛ける。
  * typePowerPct・typeAreaPct はタイプ（PokeAPI のキー）ごと。
  */
 export const modifierSchema = z
@@ -886,11 +888,17 @@ export const modifierSchema = z
     moveSpeedPct: z.number(),
     pickupRangePct: z.number(),
     xpPct: z.number(),
+    /** 技の数（発射数・落雷の数など）に足す数（ポイントマックス） */
+    amountBonus: z.number(),
+    /** 技の持続の時間 */
+    durationPct: z.number(),
   })
   .partial();
 export type ModifierData = z.infer<typeof modifierSchema>;
 
 const upgradeDefSchema = z.object({
+  /** 種類（07_content_draft.md 21.2）: stat = ステータスのアイテム、type = タイプのアイテム（自分のタイプとノーマルだけ候補に出る）、evolution = 進化の道具など */
+  category: z.enum(["stat", "type", "evolution"]),
   maxLevel: z.number().int().positive(),
   /** 進化・派生に使うとなくなる（進化の石・つながりのヒモ） */
   consumable: z.boolean().default(false),
@@ -904,9 +912,6 @@ const upgradeDefSchema = z.object({
 /** 持ち物。キーは PokeAPI の持ち物の名前 */
 export const itemsConfigSchema = z.object({ items: z.record(z.string(), upgradeDefSchema) });
 export type ItemsConfig = z.infer<typeof itemsConfigSchema>;
-/** パッシブ（枠を使わない強化）。キーは PokeAPI の持ち物の名前（名前を借りる） */
-export const passivesConfigSchema = z.object({ passives: z.record(z.string(), upgradeDefSchema) });
-export type PassivesConfig = z.infer<typeof passivesConfigSchema>;
 
 /**
  * フレンドリィショップ（永続強化。01_game_design.md 8.3）。少し有利になる程度にとどめる。
@@ -1123,7 +1128,6 @@ export const iconConfigSchema = z.object({
   stars: z.object({ on: z.array(z.string()).min(1), off: z.array(z.string()).min(1) }),
   moves: z.record(z.string(), z.string()),
   items: z.record(z.string(), z.object({ glyph: z.string(), color: z.string() })),
-  passives: z.record(z.string(), z.object({ glyph: z.string(), color: z.string() })),
 });
 export type IconConfig = z.infer<typeof iconConfigSchema>;
 

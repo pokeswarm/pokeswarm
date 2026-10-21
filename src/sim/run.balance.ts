@@ -13,9 +13,9 @@ import { elapsedSeconds, type UpgradeOffer } from './world';
  * - 倒れない（経験値の量を測るため。生き残れるかはバランス調整で別に見る）
  * - 一番近い敵へ向かって歩く（向いている方向に撃つ技・近接の技も当たり、玉も拾える）。倒れないので積極的に戦う人に近い
  * - 経験値の玉が上限近くまでたまったら（新しい経験値は一番古い玉にまとめられる）、一番大きな玉を拾いに行く
- * - レベルアップでは 派生・固有技 > 技の強化 > 新しい技 > 持ち物 > パッシブ の順で選ぶ
+ * - レベルアップでは 派生・固有技 > 技の強化 > 新しい技 > 持ち物 の順で選ぶ
  */
-const OFFER_PRIORITY: Record<UpgradeOffer['kind'], number> = { derive: 0, moveUp: 1, moveNew: 2, itemNew: 3, itemUp: 4, passiveNew: 5, passiveUp: 6 };
+const OFFER_PRIORITY: Record<UpgradeOffer['kind'], number> = { derive: 0, moveUp: 1, moveNew: 2, itemNew: 3, itemUp: 4 };
 /** 向きを変える間隔（毎回変えると細かく揺れるだけになる） */
 const RETARGET_SECONDS = 0.3;
 /** 打ち切る時間（ランは20分で終わる。伝説戦があればその分長くなる） */
@@ -99,7 +99,7 @@ function simulateRun(pokemon: string): void {
   console.log(`${name} 区間ごとの敵の数（平均） ${enemySum.map((n, i) => `${i}:${Math.round(n / enemyTicks[i]!)}`).join(' ')}`);
   console.log(`${name} 進化 ${evolutions.join(' → ') || '-'}`);
   console.log(`${name} 分ごとの撃破数 ${killsByMinute.map((k, i) => `${i}:${k}`).join(' ')}`);
-  console.log(`${name} 技 ${p.moves.map((m) => `${w.rules.moves[m.move]!.key}:${m.level}`).join(' ')}  持ち物 ${p.items.length}  パッシブ ${p.passives.length}`);
+  console.log(`${name} 技 ${p.moves.map((m) => `${w.rules.moves[m.move]!.key}:${m.level}`).join(' ')}  持ち物 ${p.items.map((it) => `${w.rules.items[it.item]!.key}:${it.level}`).join(' ')}`);
 }
 
 /** 一番近い敵への向き（8方向）。敵がいなければ止まる */

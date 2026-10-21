@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { generated, playablesConfig, spriteRender, unlocksConfig } from '../data';
+import { generated, playablesConfig, spriteRender, unlocksConfig, uiConfig } from '../data';
 import { isPlayableUnlocked } from '../meta/progress';
 import { session } from '../meta/session';
 import { localName } from '../data/simRules';
@@ -35,25 +35,25 @@ export class SelectScene extends Phaser.Scene {
     const layout = (): void => {
       this.children.removeAll(true);
       const { width, height } = this.scale;
-      this.add.text(width / 2, height * 0.12, t('select.title'), { fontFamily: 'sans-serif', fontSize: '36px', fontStyle: 'bold', color: '#ffffff' }).setOrigin(0.5);
-      this.add.text(width / 2, height * 0.12 + 44, t('select.hint'), { fontFamily: 'sans-serif', fontSize: '16px', color: '#b0bec5' }).setOrigin(0.5);
+      this.add.text(width / 2, height * 0.12, t('select.title'), { fontFamily: uiConfig.font.family, fontSize: '32px', color: '#ffffff' }).setOrigin(0.5);
+      this.add.text(width / 2, height * 0.12 + 44, t('select.hint'), { fontFamily: uiConfig.font.family, fontSize: '16px', color: '#b0bec5' }).setOrigin(0.5);
       const gap = width * 0.02;
       const cardW = (width - gap * (keys.length + 1)) / keys.length;
       const cardH = height * 0.6;
       const top = height * 0.25;
       keys.forEach((key, i) => {
         const x = gap + i * (cardW + gap);
-        const card = this.add.rectangle(x + cardW / 2, top + cardH / 2, cardW, cardH, 0x162416).setStrokeStyle(2, 0x4a7a4a).setInteractive({ useHandCursor: true });
-        card.on('pointerover', () => card.setStrokeStyle(3, 0xffb300));
-        card.on('pointerout', () => card.setStrokeStyle(2, 0x4a7a4a));
+        const card = this.add.rectangle(x + cardW / 2, top + cardH / 2, cardW, cardH, 0x000000).setStrokeStyle(4, 0xf8f8f8).setInteractive({ useHandCursor: true });
+        card.on('pointerover', () => card.setStrokeStyle(4, 0xf8d030));
+        card.on('pointerout', () => card.setStrokeStyle(4, 0xf8f8f8));
         card.on('pointerdown', () => choose(i));
         const g = generated.pokemon[key];
         const types = (g?.types ?? []).map((ty) => localName(generated.types[ty]?.names, getLocale(), ty)).join(' / ');
         const move = playablesConfig.pokemon[key]!.startingMoves[0] ?? '';
-        const style = { fontFamily: 'sans-serif', color: '#ffffff', align: 'center' as const };
-        this.add.text(x + cardW / 2, top + 18, `${i + 1}`, { ...style, fontSize: '18px', color: '#b0bec5' }).setOrigin(0.5, 0);
+        const style = { fontFamily: uiConfig.font.family, color: '#ffffff', align: 'center' as const };
+        this.add.text(x + cardW / 2, top + 18, `${i + 1}`, { ...style, fontSize: '16px', color: '#b0bec5' }).setOrigin(0.5, 0);
         this.add.text(x + cardW / 2, top + cardH * 0.62, localName(g?.names, getLocale(), key), { ...style, fontSize: `${Math.round(Math.min(cardW / 8, 34))}px`, fontStyle: 'bold' }).setOrigin(0.5);
-        this.add.text(x + cardW / 2, top + cardH * 0.62 + 40, types, { ...style, fontSize: '18px', color: '#cfd8dc' }).setOrigin(0.5);
+        this.add.text(x + cardW / 2, top + cardH * 0.62 + 40, types, { ...style, fontSize: '16px', color: '#cfd8dc' }).setOrigin(0.5);
         this.add
           .text(x + cardW / 2, top + cardH * 0.62 + 72, t('select.startingMove', { move: localName(generated.moves[move]?.names, getLocale(), move) }), { ...style, fontSize: '16px', color: '#cfd8dc' })
           .setOrigin(0.5);

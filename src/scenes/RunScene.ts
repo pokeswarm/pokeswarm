@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { effectRecipes, generated, groundConfig, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig } from '../data';
+import { effectRecipes, generated, groundConfig, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig } from '../data';
 import { buildSimRules, localName, permanentModifiers, playableLoadout } from '../data/simRules';
 import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
@@ -19,7 +19,8 @@ import { ensureIconTextures, iconDataUrl } from '../render/Icons';
 import { GroundTiles, preloadGroundTiles } from '../render/GroundTiles';
 import { KeyboardInput } from '../render/KeyboardInput';
 import { PlayerView } from '../render/PlayerView';
-import { PooledCircles } from '../render/PooledCircles';
+import { PooledCircles, PooledSprites } from '../render/PooledCircles';
+import { px } from '../render/pixelUi';
 import { preloadPokemonAtlas, registerPokemonAnimations } from '../render/sprites/PokemonSprite';
 import { EnemySprites } from '../render/sprites/EnemySprites';
 import { SpriteStreamer } from '../render/sprites/SpriteStreamer';
@@ -72,7 +73,7 @@ export class RunScene extends Phaser.Scene {
   private keyboard!: KeyboardInput;
   private playerViews = new Map<PlayerId, PlayerView>();
   private enemyView!: PooledCircles;
-  private gemView!: PooledCircles;
+  private gemView!: PooledSprites;
   /** 敵をスプライトで描く（読み込み済みの種類だけ。まだの種類は円で描く） */
   private enemySpriteView!: EnemySprites;
   private streamer!: SpriteStreamer;
@@ -85,7 +86,15 @@ export class RunScene extends Phaser.Scene {
   /** 技ごとの縁取りの色（明るい線・暗い線）。描かない技は null */
   private shapeColors: ({ fill: number; edge: number } | null)[] = [];
   private ground!: GroundTiles;
+  /** F3 の詳しい表示（ふだんは出さない） */
   private hud!: Phaser.GameObjects.Text;
+  /** 画面上部: 経験値のバー（中にレベル）・コイン（作者の決定。2026年10月22日） */
+  private topBar!: Phaser.GameObjects.Graphics;
+  private levelText!: Phaser.GameObjects.Text;
+  private coinIcon!: Phaser.GameObjects.Image;
+  private coinText!: Phaser.GameObjects.Text;
+  /** 倒れているときの案内（真ん中の下） */
+  private downText!: Phaser.GameObjects.Text;
   /** 持っている技・持ち物・パッシブのアイコンとレベルの星 */
   private hudIcons!: HudIcons;
   private lastSent: { dx: Axis; dy: Axis } = { dx: 0, dy: 0 };
@@ -239,7 +248,7 @@ export class RunScene extends Phaser.Scene {
     this.keyboard = new KeyboardInput(this);
     this.ground = new GroundTiles(this, groundConfig, currentWaveIndex(this.sim.world));
     this.enemyView = new PooledCircles(this, 0);
-    this.gemView = new PooledCircles(this, -1);
+    this.gemView = new PooledSprites(this, -1, itemSprites.dot);
     this.itemView = this.add.graphics().setDepth(0.4);
     ensurePixelTextures(this, itemSprites);
     // 障害物は敵（0〜0.2）より上、予告の範囲（0.5）より下
@@ -285,15 +294,19 @@ export class RunScene extends Phaser.Scene {
       addSpriteGallery(this, this.playerSprite, spriteRender, local.x, local.y - 200);
     }
     this.hud = this.add
-      .text(8, 8, '', { fontFamily: 'monospace', fontSize: '14px', color: '#ffffff', backgroundColor: '#00000080' })
+      .text(8, 8, '', px(8, '#ffffff', { backgroundColor: '#000000a0', lineSpacing: 4 }))
       .setScrollFactor(0)
       .setDepth(1000);
     this.hudIcons = new HudIcons(this);
-    const center = { fontFamily: 'sans-serif', color: '#ffffff', stroke: '#000000', strokeThickness: 4 };
-    this.timerText = this.add.text(0, 10, '', { ...center, fontSize: '28px', fontStyle: 'bold' }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1000);
+    this.topBar = this.add.graphics().setScrollFactor(0).setDepth(1000);
+    this.levelText = this.add.text(0, 0, '', px(16, uiConfig.expBar.text, { outline: true })).setOrigin(0, 0.5).setScrollFactor(0).setDepth(1001);
+    this.coinIcon = this.add.image(0, 0, pixelTextureKey('coin')).setOrigin(1, 0.5).setScale(2).setScrollFactor(0).setDepth(1001);
+    this.coinText = this.add.text(0, 0, '', px(16, uiConfig.coin.color, { outline: true })).setOrigin(1, 0.5).setScrollFactor(0).setDepth(1001);
+    this.timerText = this.add.text(0, 10, '', px(24, uiConfig.timer.color, { outline: true })).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1000);
     this.bossBar = this.add.graphics().setScrollFactor(0).setDepth(1000);
-    this.bossName = this.add.text(0, 50, '', { ...center, fontSize: '16px' }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1000);
-    this.announceText = this.add.text(0, 0, '', { ...center, fontSize: '40px', fontStyle: 'bold', align: 'center' }).setOrigin(0.5).setScrollFactor(0).setDepth(1001);
+    this.bossName = this.add.text(0, 50, '', px(16, '#ffffff', { outline: true })).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1000).setVisible(false);
+    this.announceText = this.add.text(0, 0, '', px(32, '#ffffff', { outline: true, align: 'center', lineSpacing: 8 })).setOrigin(0.5).setScrollFactor(0).setDepth(1001);
+    this.downText = this.add.text(0, 0, '', px(16, '#ffffff', { outline: true, align: 'center' })).setOrigin(0.5).setScrollFactor(0).setDepth(1001);
     this.input.keyboard?.on('keydown-F3', () => {
       this.showDebug = !this.showDebug;
     });
@@ -648,7 +661,7 @@ export class RunScene extends Phaser.Scene {
    */
   private showCandyLevels(x: number, y: number, levels: number): void {
     const tier = candyTier(levels);
-    const style = { fontFamily: 'monospace', fontStyle: 'bold', stroke: '#000000', align: 'center' };
+    const style = { fontFamily: uiConfig.font.family, stroke: '#000000', align: 'center' };
     // 「GOTCHA!」の ! の数とレアリティの色（青 RARE・紫 EPIC・橙 LEGENDARY）で当たりの大きさを表す（作者の決定。2026年10月21日）
     const big = this.add
       .text(x, y - 40, tMaybe(`candy.tier.${tier.levels}`), { ...style, fontSize: `${tier.fontSize}px`, color: tier.color, strokeThickness: Math.round(tier.fontSize / 6) })
@@ -692,23 +705,48 @@ export class RunScene extends Phaser.Scene {
   }
 
 
-  /** 経過時間と、中ボス・ボスの HP のバー */
+  /**
+   * 画面上部（作者の決定。2026年10月22日）: いちばん上に経験値のバー（中にレベル）、その下の真ん中に経過時間（分母は出さない）、
+   * 右にもらえるコイン、左に技・持ち物のアイコン。数字以外の文字は出さない。中ボス・ボスは HP のバーだけ
+   */
   private drawTopCenter(): void {
     const w = this.sim.world;
     const cam = this.cameras.main;
     const cx = cam.width / 2;
     const now = elapsedSeconds(w);
     const limit = w.rules.stage.durationSeconds;
-    this.placeUi(this.timerText, cx, 10);
+    const eb = uiConfig.expBar;
+    const barH = eb.height;
+    const top = barH + 8;
+    // 経験値のバー
+    const g = this.topBar;
+    g.clear();
+    this.placeUi(g, 0, 0);
+    const need = w.rules.leveling.xpToNext[w.level] ?? 0;
+    const xpRatio = need > 0 ? Math.min(1, w.xpIntoLevel / need) : 1;
+    g.fillStyle(hexColor(eb.border)).fillRect(0, 0, cam.width, barH);
+    g.fillStyle(hexColor(eb.back)).fillRect(2, 2, cam.width - 4, barH - 4);
+    g.fillStyle(hexColor(eb.fill)).fillRect(2, 2, Math.round((cam.width - 4) * xpRatio), barH - 4);
+    this.levelText.setText(`Lv${w.level}`);
+    this.placeUi(this.levelText, 8, barH / 2);
+    // 経過時間（伝説戦の間は、逃げられるまでの残り時間を赤で）
+    const lg = w.legendary;
+    const legendLeft = lg && lg.endTick > 0 ? Math.max(0, (lg.endTick - w.tick) * w.dt) : null;
+    this.timerText.setText(formatTime(legendLeft ?? Math.min(now, limit))).setColor(legendLeft !== null ? '#ff5252' : uiConfig.timer.color);
+    this.placeUi(this.timerText, cx, top);
+    // コイン（もらえる見込みがあるときだけ）
+    const coins = this.recorder.liveCoins(w);
+    this.coinText.setText(String(coins)).setVisible(coins > 0);
+    this.coinIcon.setVisible(coins > 0);
+    this.placeUi(this.coinText, cam.width - 8, top + 12);
+    this.placeUi(this.coinIcon, cam.width - 16 - this.coinText.width, top + 12);
+    this.coinIcon.setScale(2 / cam.zoom);
     this.placeUi(this.bossName, cx, 50);
     this.placeUi(this.bossBar, 0, 0);
     this.placeUi(this.announceText, cx, cam.height * 0.3);
-    this.placeUi(this.hud, 8, 8);
-    this.placeUi(this.hudIcons.container, 8, 8 + this.hud.height + 8);
-    // 伝説戦の間は、逃げられるまでの残り時間
-    const lg = w.legendary;
-    const legendLeft = lg && lg.endTick > 0 ? Math.max(0, (lg.endTick - w.tick) * w.dt) : null;
-    this.timerText.setText(legendLeft !== null ? t('run.legendTime', { time: formatTime(legendLeft) }) : t('run.timer', { time: formatTime(Math.min(now, limit)), limit: formatTime(limit) }));
+    this.placeUi(this.downText, cx, cam.height * 0.7);
+    this.placeUi(this.hudIcons.container, 8, top);
+    this.placeUi(this.hud, 8, top + this.hudIcons.container.getBounds().height + 8);
     this.bossBar.clear();
     const i = this.bossId === null ? -1 : findEnemyIndex(w, this.bossId);
     if (i === -1 || w.enemies.hp[i]! <= 0) {
@@ -718,8 +756,10 @@ export class RunScene extends Phaser.Scene {
     const kind = w.rules.enemies.kinds[w.enemies.kind[i]!]!;
     const barW = Math.min(480, cam.width * 0.6);
     const ratio = Math.max(0, w.enemies.hp[i]! / w.enemies.maxHp[i]!);
-    this.bossBar.fillStyle(0x000000, 0.6).fillRect(cx - barW / 2 - 2, 70, barW + 4, 14);
-    this.bossBar.fillStyle(kind.rank === 'boss' ? 0xff7043 : 0xffca28).fillRect(cx - barW / 2, 72, barW * ratio, 10);
+    const by = top + uiConfig.timer.size + 12;
+    this.bossBar.fillStyle(hexColor(eb.border)).fillRect(Math.round(cx - barW / 2 - 2), by, Math.round(barW + 4), 12);
+    this.bossBar.fillStyle(hexColor(eb.back)).fillRect(Math.round(cx - barW / 2), by + 2, Math.round(barW), 8);
+    this.bossBar.fillStyle(kind.rank === 'boss' ? 0xf85838 : 0xf8c830).fillRect(Math.round(cx - barW / 2), by + 2, Math.round(barW * ratio), 8);
     this.bossName.setText(localName(generated.pokemon[kind.species ?? kind.id]?.names, getLocale(), kind.id));
   }
 
@@ -837,13 +877,11 @@ export class RunScene extends Phaser.Scene {
     const enemyColor = hexColor(placeholderRender.enemyColor);
     const e = world.enemies;
     const gems = world.gems;
-    const gemColor = hexColor(placeholderRender.gemColor);
-    const bigGemColor = hexColor(placeholderRender.bigGemColor);
     this.gemView.update(
       gems,
       alpha,
       view,
-      (i) => (gems.value[i]! >= world.rules.pickups.bigGemValue ? bigGemColor : gemColor),
+      (i) => pixelTextureKey(gems.value[i]! >= world.rules.pickups.bigGemValue ? 'gem-big' : 'gem'),
       // 拾ってホストの確定を待っている玉は、自分の画面では消して見せる
       (i) => gems.pending[i] === 0,
     );
@@ -901,6 +939,8 @@ export class RunScene extends Phaser.Scene {
       t('debug.tick', { tick: world.tick }),
       t('debug.position', { x: Math.round(local.x), y: Math.round(local.y) }),
     ];
+    // 倒れているときの案内だけは、ふだんも出す（真ん中の下）
+    this.downText.setText(local.down ? t(this.coop ? 'run.downCoop' : 'debug.down', { revives: world.revives }) : '');
     const lines = [
       `${t('debug.controls')}　${t('run.debugToggle')}`,
       t('debug.player', {
@@ -909,7 +949,6 @@ export class RunScene extends Phaser.Scene {
         maxHp: Math.round(local.maxHp),
         revives: world.revives,
       }),
-      ...(local.down ? [t(this.coop ? 'run.downCoop' : 'debug.down', { revives: world.revives })] : []),
       t('debug.level', { level: world.level, xp: Math.floor(world.xpIntoLevel), need: world.rules.leveling.xpToNext[world.level] ?? 0, rerolls: local.rerolls }),
       // 技・持ち物・パッシブはアイコンで出す（文字は F3 の詳しい表示のときだけ）
       ...(this.showDebug ? [t('debug.moves', {
@@ -943,7 +982,8 @@ export class RunScene extends Phaser.Scene {
         }),
       );
     }
-    this.hud.setText(lines);
+    // 左上の文字は F3 の詳しい表示のときだけ（作者の決定: 左上の UI はほかの場所へ移した）
+    this.hud.setText(lines).setVisible(this.showDebug);
     this.hudIcons.update(world, local);
   }
 }

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import { bgmConfig } from '../data';
+import { bgmConfig, uiConfig } from '../data';
+import { drawWindow, pixelButton, px } from '../render/pixelUi';
 import { audio } from '../audio';
 import { t } from '../i18n';
 import type { RunOutcome } from '../sim/world';
@@ -61,35 +62,52 @@ export class ResultScene extends Phaser.Scene {
       leaving = true;
       this.scene.start('title');
     };
+    // 真っ黒な背景に白い枠の窓を置き、ドットの文字で結果を出す（作者の決定。2026年10月22日）
     const layout = (): void => {
       this.children.removeAll(true);
+      this.cameras.main.setBackgroundColor('#000000');
       const { width, height } = this.scale;
       const clear = summary.outcome === 'clear';
-      this.add
-        .text(width / 2, height * 0.2, t(`run.${summary.outcome}`), { fontFamily: 'sans-serif', fontSize: '56px', fontStyle: 'bold', color: clear ? '#ffe082' : '#ef9a9a' })
-        .setOrigin(0.5);
-      const lines = [
-        t('result.pokemon', { name: summary.pokemonName }),
-        t('result.time', { time: formatTime(summary.seconds) }),
-        t('result.level', { level: summary.level }),
-        t('result.kills', { kills: summary.kills }),
-        t('result.coins', { coins: summary.coins }),
-        t('result.moves', { moves: summary.moves.join(' / ') }),
+      const boxW = Math.min(width - 32, 720);
+      const x0 = (width - boxW) / 2;
+      const g = this.add.graphics();
+      // 見出し
+      drawWindow(g, x0, 24, boxW, 72, 'dark');
+      this.add.text(width / 2, 60, t(`run.${summary.outcome}`), px(32, clear ? '#f8d030' : '#f87878')).setOrigin(0.5);
+      // 結果（左に項目、右に値）
+      const rows: [string, string][] = [
+        [t('result.label.pokemon'), summary.pokemonName],
+        [t('result.label.time'), formatTime(summary.seconds)],
+        [t('result.label.level'), String(summary.level)],
+        [t('result.label.kills'), String(summary.kills)],
+        [t('result.label.coins'), String(summary.coins)],
+      ];
+      const lineH = 32;
+      const listTop = 24 + 72 + 16;
+      const extra: string[] = [
         ...(summary.legendary ? [t(`result.legendary.${summary.legendary.result}`, { name: summary.legendary.name })] : []),
-        ...(summary.newAchievements.length ? ['', t('result.newAchievements', { list: summary.newAchievements.join(' / ') })] : []),
+        ...(summary.newAchievements.length ? [t('result.newAchievements', { list: summary.newAchievements.join(' / ') })] : []),
         ...(summary.newUnlocks.length ? [t('result.newUnlocks', { list: summary.newUnlocks.join(' / ') })] : []),
       ];
-      this.add
-        .text(width / 2, height * 0.33, lines, { fontFamily: 'sans-serif', fontSize: '22px', color: '#ffffff', align: 'center', lineSpacing: 10, wordWrap: { width: width * 0.9 } })
-        .setOrigin(0.5, 0);
+      const movesText = summary.moves.join('\n');
+      const listH = 24 + rows.length * lineH + 8 + summary.moves.length * 24 + (extra.length ? 16 + extra.length * 24 : 0) + 16;
+      drawWindow(g, x0, listTop, boxW, listH, 'dark');
+      const text = uiConfig.dark.text;
+      rows.forEach(([label, value], i) => {
+        const y = listTop + 24 + i * lineH;
+        this.add.text(x0 + 32, y, label, px(16, text));
+        this.add.text(x0 + boxW - 32, y, value, px(16, text)).setOrigin(1, 0);
+      });
+      const movesTop = listTop + 24 + rows.length * lineH + 8;
+      this.add.text(x0 + 32, movesTop, movesText, px(16, '#a8d8f8', { lineSpacing: 8 }));
+      if (extra.length) this.add.text(x0 + 32, movesTop + summary.moves.length * 24 + 16, extra.join('\n'), px(16, '#f8d030', { lineSpacing: 8, wordWrap: { width: boxW - 64 } }));
+      // ボタン
       const buttons: [string, () => void][] = [...(retry ? ([[t('result.retry'), again]] as [string, () => void][]) : []), [t('result.toTitle'), toTitle]];
+      const by = Math.min(height - 40, listTop + listH + 48);
+      const bw = Math.min(280, (boxW - 16) / buttons.length);
       buttons.forEach(([label, onClick], i) => {
-        const x = width / 2 + (i - (buttons.length - 1) / 2) * Math.min(320, width * 0.4);
-        const bg = this.add.rectangle(x, height * 0.8, Math.min(280, width * 0.36), 56, 0x162416).setStrokeStyle(2, 0x4a7a4a).setInteractive({ useHandCursor: true });
-        bg.on('pointerover', () => bg.setStrokeStyle(3, 0xffb300));
-        bg.on('pointerout', () => bg.setStrokeStyle(2, 0x4a7a4a));
-        bg.on('pointerdown', onClick);
-        this.add.text(x, height * 0.8, label, { fontFamily: 'sans-serif', fontSize: '20px', color: '#ffffff' }).setOrigin(0.5);
+        const x = width / 2 + (i - (buttons.length - 1) / 2) * (bw + 16);
+        pixelButton(this, x, by, bw, 48, label, onClick, { kind: 'dark' });
       });
     };
     layout();

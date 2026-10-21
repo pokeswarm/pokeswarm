@@ -1,0 +1,35 @@
+{
+  "font": {
+    "family": "'PixelLatin', 'PixelJP', monospace",
+    "faces": [
+      { "family": "PixelLatin", "file": "fonts/PressStart2P-Regular.ttf" },
+      { "family": "PixelJP", "file": "fonts/misaki_gothic_2nd.ttf" }
+    ],
+    "credits": [
+      "Press Start 2P © CodeMan38 (SIL Open Font License 1.1)",
+      "美咲フォント（美咲ゴシック第2）© 門真なむ (Num Kadoma) — フリーソフトウェア https://littlelimit.net/misaki.htm"
+    ]
+  },
+  "window": {
+    "fill": "#f8f8f8",
+    "border": "#383848",
+    "inner": "#a8b8c8",
+    "text": "#383848",
+    "shadow": "#d0d0d8",
+    "cursor": "#383848"
+  },
+  "dark": {
+    "fill": "#000000",
+    "border": "#f8f8f8",
+    "text": "#f8f8f8"
+  },
+  "expBar": {
+    "height": 20,
+    "back": "#283038",
+    "fill": "#40a8f8",
+    "border": "#f8f8f8",
+    "text": "#f8f8f8"
+  },
+  "timer": { "size": 24, "color": "#f8f8f8" },
+  "coin": { "size": 16, "color": "#f8e070" }
+}

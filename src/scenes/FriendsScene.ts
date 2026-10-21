@@ -4,8 +4,9 @@ import { t, type MessageKey } from '../i18n';
 import { formatTag, NICKNAME_MAX } from '../meta/nickname';
 import { session } from '../meta/session';
 
-const BUTTON = 'padding:8px 14px;border-radius:8px;cursor:pointer;font:inherit;border:2px solid #4a7a4a;background:#162416;color:#fff';
-const INPUT = 'flex:1;min-width:0;padding:8px;font:inherit;border-radius:6px;border:1px solid #4a7a4a;background:#0b140b;color:#fff';
+// 原作をまねた白い窓のボタン（作者の決定。2026年10月22日。src/render/pixelUi.ts の windowCss と同じ見た目）
+const BUTTON = 'padding:8px 14px;cursor:pointer;font:inherit;font-size:16px;background:#f8f8f8;color:#383848;border:4px solid #383848;border-radius:6px;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #a8b8c8';
+const INPUT = 'flex:1;min-width:0;padding:8px;font:inherit;border-radius:6px;border:4px solid #383848;background:#f8f8f8;color:#383848';
 
 /**
  * フレンドの画面（DOM。見た目の作り込みはフェーズ4）。Google でログインした人だけが使える。
@@ -29,7 +30,7 @@ export class FriendsScene extends Phaser.Scene {
     this.message = null;
     this.root = document.createElement('div');
     this.root.style.cssText =
-      'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(720px,92vw);max-height:90vh;overflow:auto;padding:24px;background:rgba(8,14,8,0.94);color:#fff;font:16px/1.6 sans-serif;border-radius:14px;z-index:20;box-sizing:border-box';
+      'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(720px,92vw);max-height:90vh;overflow:auto;padding:24px;background:#000;color:#f8f8f8;border:4px solid #f8f8f8;box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px #f8f8f8;font-family:inherit;font-size:16px;line-height:1.6;border-radius:6px;z-index:20;box-sizing:border-box';
     document.body.appendChild(this.root);
     const unsubscribe = [session.onStatus(() => this.render())];
     let offSocial: (() => void) | null = null;
@@ -110,7 +111,7 @@ export class FriendsScene extends Phaser.Scene {
     } else {
       // 自分のニックネーム
       const me = section('friends.me');
-      if (social.profile) me.append(text(formatTag(social.profile.nickname, social.profile.tag), 'font-size:20px;font-weight:bold'));
+      if (social.profile) me.append(text(formatTag(social.profile.nickname, social.profile.tag), 'font-size:24px;font-weight:bold'));
       else me.append(text(t('friends.needNickname'), 'opacity:0.85'));
       const nick = document.createElement('input');
       nick.style.cssText = INPUT;
@@ -174,7 +175,7 @@ export class FriendsScene extends Phaser.Scene {
       const list = section('friends.list');
       if (social.friends.length === 0) list.append(text(t('friends.none'), 'opacity:0.75'));
       for (const f of social.friends) {
-        const state = text(t(f.presence ? `friends.presence.${f.presence}` : 'friends.offline'), `width:9em;font-size:14px;${f.presence ? 'color:#81c784' : 'opacity:0.6'}`);
+        const state = text(t(f.presence ? `friends.presence.${f.presence}` : 'friends.offline'), `width:9em;font-size:16px;${f.presence ? 'color:#81c784' : 'opacity:0.6'}`);
         list.append(
           row(
             text(formatTag(f.nickname, f.tag), 'flex:1'),

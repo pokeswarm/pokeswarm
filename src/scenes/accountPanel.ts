@@ -2,8 +2,10 @@ import { t } from '../i18n';
 import type { SaveData } from '../meta/saveData';
 import { formatTag } from '../meta/nickname';
 import { session } from '../meta/session';
+import { windowCss } from '../render/pixelUi';
 
-const BUTTON = 'padding:8px 16px;border-radius:8px;cursor:pointer;font:inherit;border:1px solid #4a7a4a;background:#162416;color:#fff';
+/** ドット調のボタン（原作をまねた白い窓。作者の決定 2026年10月22日） */
+const BUTTON = `${windowCss('light')};padding:8px 16px;cursor:pointer;font:inherit;font-size:16px`;
 
 /** 記録の短いまとめ（タイトル画面と、データを選ぶ画面に出す） */
 function summary(d: Readonly<SaveData>): string {
@@ -26,20 +28,8 @@ export class AccountPanel {
 
   constructor() {
     this.root = document.createElement('div');
-    Object.assign(this.root.style, {
-      position: 'fixed',
-      left: '50%',
-      bottom: '24px',
-      transform: 'translateX(-50%)',
-      padding: '12px 18px',
-      background: 'rgba(8,14,8,0.85)',
-      color: '#fff',
-      font: '15px/1.6 sans-serif',
-      borderRadius: '10px',
-      textAlign: 'center',
-      zIndex: '20',
-      maxWidth: '90vw',
-    });
+    // 右下に小さく（メニューのボタンに重ならないように）。黒い窓
+    this.root.style.cssText = `${windowCss('dark')};position:fixed;right:8px;bottom:8px;padding:12px 16px;font-size:16px;line-height:1.6;text-align:left;z-index:20;max-width:min(420px, 90vw)`;
     document.body.appendChild(this.root);
     this.unsubscribe.push(session.onStatus(() => this.render()), session.store.onChange(() => this.render()));
     this.render();
@@ -56,12 +46,12 @@ export class AccountPanel {
     const profile = session.social?.profile;
     if (profile) status.textContent += `　${formatTag(profile.nickname, profile.tag)}`;
     const record = document.createElement('div');
-    record.style.cssText = 'opacity:0.8;font-size:14px';
+    record.style.cssText = 'opacity:0.85;font-size:16px';
     record.textContent = summary(session.store.current);
     const children: HTMLElement[] = [status, record];
     if (session.error) {
       const err = document.createElement('div');
-      err.style.cssText = 'color:#ef9a9a;font-size:13px';
+      err.style.cssText = 'color:#f87878;font-size:16px';
       err.textContent = t('account.error', { message: session.error === 'save-read-failed' ? t('account.loadFailed') : session.error });
       children.push(err);
     }
@@ -98,11 +88,11 @@ function chooseSave(guest: Readonly<SaveData>, google: Readonly<SaveData>): Prom
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.style.cssText =
-      'position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:30;color:#fff;font:16px/1.6 sans-serif';
+      'position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:30;color:#fff;font-family:inherit;font-size:16px;line-height:1.6';
     const box = document.createElement('div');
-    box.style.cssText = 'background:#0f1a0f;border:2px solid #4a7a4a;border-radius:14px;padding:24px;max-width:720px;width:90vw;text-align:center';
+    box.style.cssText = `${windowCss('dark')};padding:24px;max-width:720px;width:90vw;text-align:center`;
     const title = document.createElement('div');
-    title.style.cssText = 'font-size:22px;font-weight:bold';
+    title.style.cssText = 'font-size:24px';
     title.textContent = t('account.chooseTitle');
     const hint = document.createElement('div');
     hint.style.cssText = 'opacity:0.8;margin-bottom:16px';
@@ -113,7 +103,7 @@ function chooseSave(guest: Readonly<SaveData>, google: Readonly<SaveData>): Prom
       const b = document.createElement('button');
       b.style.cssText = BUTTON + ';flex:1;padding:16px;text-align:left;line-height:1.7';
       const name = document.createElement('div');
-      name.style.cssText = 'font-weight:bold;font-size:18px';
+      name.style.cssText = 'font-size:16px';
       name.textContent = label;
       const when = document.createElement('div');
       when.textContent = t('account.updatedAt', { date: new Date(d.updatedAt).toLocaleString() });

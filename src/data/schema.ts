@@ -41,6 +41,25 @@ export const placeholderRenderSchema = z.object({
 });
 export type PlaceholderRenderConfig = z.infer<typeof placeholderRenderSchema>;
 
+/**
+ * ドット調の画面の見た目（作者の決定。2026年10月22日）: 文字のフォント（英数字 Press Start 2P・日本語 美咲ゴシック第2）と、
+ * 原作をまねた白い窓・黒い窓、画面上部の経験値のバー・経過時間・コイン
+ */
+export const uiConfigSchema = z.object({
+  font: z.object({
+    family: z.string(),
+    faces: z.array(z.object({ family: z.string(), file: z.string() })),
+    /** クレジットに出すフォントの権利表記 */
+    credits: z.array(z.string()),
+  }),
+  window: z.object({ fill: colorString, border: colorString, inner: colorString, text: colorString, shadow: colorString, cursor: colorString }),
+  dark: z.object({ fill: colorString, border: colorString, text: colorString }),
+  expBar: z.object({ height: z.number().int().positive(), back: colorString, fill: colorString, border: colorString, text: colorString }),
+  timer: z.object({ size: z.number().int().positive(), color: colorString }),
+  coin: z.object({ size: z.number().int().positive(), color: colorString }),
+});
+export type UiConfig = z.infer<typeof uiConfigSchema>;
+
 /** マップの地面（繰り返しタイル）。時間帯（Wave）ごとに使うタイルをデータで切り替える */
 export const groundConfigSchema = z
   .object({

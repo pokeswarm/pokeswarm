@@ -1,3 +1,4 @@
+import { loadPixelFonts } from './render/pixelUi';
 import Phaser from 'phaser';
 import { placeholderRender, playablesConfig } from './data';
 import { migrateOldDiscoveries } from './meta/discoveries';
@@ -24,6 +25,8 @@ import { installAudioUnlock } from './audio';
  */
 async function start(): Promise<void> {
   installAudioUnlock();
+  // ドットのフォントを先に読み込む（作者の決定。読み込む前の文字は、ふつうのフォントで描かれてしまう）
+  await loadPixelFonts().catch((e: unknown) => console.warn('フォントを読み込めませんでした', e));
   // ログインとセーブデータの読み込みは待たずに始める（タイトル画面に状態を出す）
   const sessionReady = session.start().then(() => {
     migrateOldDiscoveries(session.store);

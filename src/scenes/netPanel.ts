@@ -17,7 +17,7 @@ export class NetPanel {
       padding: '16px 20px',
       background: 'rgba(0,0,0,0.85)',
       color: '#fff',
-      font: '14px/1.6 sans-serif',
+      fontFamily: 'inherit', fontSize: '16px', lineHeight: '1.6',
       borderRadius: '8px',
       zIndex: '10',
     });

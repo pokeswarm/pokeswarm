@@ -5,6 +5,7 @@ import { getLocale, t, tMaybe } from '../i18n';
 import type { Player } from '../sim/entities/player';
 import { derivationCompletedBy } from '../sim/systems/leveling';
 import { itemIconKey, moveIconKey } from '../render/Icons';
+import { windowCss } from '../render/pixelUi';
 import type { Modifiers } from '../sim/upgrades';
 import type { UpgradeOffer, World } from '../sim/world';
 
@@ -128,7 +129,8 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
         kind: t('upgrade.kind.moveUp'),
         name: moveName(world, pm.move),
         level: t('levelUp.levelChange', { from: pm.level, to: pm.level + 1 }),
-        detail: moveDetail(world, pm.move),
+        // 強化は増えるものだけ（説明はできるだけ短く。作者の決定）
+        detail: '',
         gains: moveGains(world, pm.move, pm.level),
       };
     }
@@ -197,9 +199,9 @@ export class LevelUpPanel {
       top: '50%',
       transform: 'translateY(-50%)',
       padding: '20px 2vw',
-      background: 'rgba(8,14,8,0.88)',
+      background: 'rgba(0,0,0,0.55)',
       color: '#fff',
-      font: '16px/1.5 sans-serif',
+      font: '16px/1.5 inherit',
       zIndex: '20',
       display: 'none',
       boxSizing: 'border-box',
@@ -215,34 +217,32 @@ export class LevelUpPanel {
     if (key === this.shownKey) return;
     this.shownKey = key;
 
+    // 原作をまねた白い窓（作者の決定。2026年10月22日）。説明はできるだけ短く: アイコン・名前・レベル・増えるもの
     const header = document.createElement('div');
-    header.style.cssText = 'display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px';
+    header.style.cssText = `${windowCss('light')};display:flex;justify-content:space-between;align-items:center;padding:12px 20px;margin-bottom:12px;font-size:24px`;
     const title = document.createElement('div');
-    title.style.cssText = 'font-size:26px;font-weight:bold';
-    // ふしぎなアメなどで続けて上がるときは、あと何回選ぶかも出す
     title.textContent = more > 0 ? t('levelUp.titleMore', { level, more }) : t('levelUp.title', { level });
     const timer = document.createElement('div');
-    timer.style.cssText = 'opacity:0.85';
-    timer.textContent = `${t('levelUp.timeLeft', { seconds: secondsLeft })}　${t(this.banning ? 'levelUp.banHint' : 'levelUp.hint')}`;
+    timer.style.cssText = 'font-size:24px';
+    timer.textContent = String(secondsLeft);
     header.append(title, timer);
 
     const row = document.createElement('div');
-    row.style.cssText = 'display:flex;gap:2vw;align-items:stretch';
+    row.style.cssText = 'display:flex;gap:16px;align-items:stretch';
     offers.forEach((o, i) => {
       const card = document.createElement('button');
-      // 除外のモードでは、除外できるカードを赤く、できないカードを薄くする
-      const border = this.banning ? (o.special ? '#4a7a4a' : '#ef5350') : o.special ? '#ffb300' : o.evolvable ? '#4fc3f7' : '#4a7a4a';
-      const bg = this.banning && !o.special ? '#3a1414' : o.special ? '#3d2a08' : '#162416';
-      card.style.cssText = `flex:1 1 0;min-width:0;min-height:30vh;padding:18px;border-radius:14px;border:2px solid ${border};background:${bg};color:#fff;font:inherit;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:8px;overflow:hidden`;
-      const top = document.createElement('div');
-      top.style.cssText = 'display:flex;justify-content:space-between;gap:8px;font-size:14px;opacity:0.85';
-      const kind = document.createElement('span');
-      kind.textContent = `${i + 1}. ${o.kind}`;
-      const lv = document.createElement('span');
-      lv.textContent = o.level;
-      top.append(kind, lv);
+      // 派生・固有技は金色の枠、「おや……？」は青い枠。除外のモードでは、除外できるカードを赤い枠に
+      const accent = this.banning ? (o.special ? undefined : '#e04040') : o.special ? '#d8a020' : o.evolvable ? '#3890e8' : undefined;
+      card.style.cssText = `${windowCss('light', accent)};flex:1 1 0;min-width:0;min-height:26vh;padding:16px 18px 16px 34px;font:inherit;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:10px;overflow:hidden;position:relative`;
+      // ▶ のカーソル（上に乗ったとき）
+      const cursor = document.createElement('span');
+      cursor.textContent = '▶';
+      cursor.style.cssText = 'position:absolute;left:12px;top:22px;font-size:16px;visibility:hidden';
+      card.onmouseenter = () => (cursor.style.visibility = 'visible');
+      card.onmouseleave = () => (cursor.style.visibility = 'hidden');
       const name = document.createElement('div');
-      name.style.cssText = 'font-size:clamp(20px,2.4vw,30px);font-weight:bold;line-height:1.2;overflow-wrap:anywhere;display:flex;align-items:center;gap:10px';
+      // ドットがにじまないよう、文字は 8 の倍数の大きさ。狭い画面では名前を 16 にする
+      name.style.cssText = `display:flex;align-items:center;gap:12px;font-size:${window.innerWidth >= 1100 ? 24 : 16}px;line-height:1.2;overflow-wrap:anywhere`;
       const icon = document.createElement('img');
       icon.src = this.handlers.iconUrl(o.icon);
       icon.alt = '';
@@ -250,24 +250,27 @@ export class LevelUpPanel {
       const nameText = document.createElement('span');
       nameText.textContent = o.name;
       name.append(icon, nameText);
-      const detail = document.createElement('div');
-      detail.style.cssText = 'font-size:clamp(14px,1.3vw,17px);opacity:0.9;overflow-wrap:anywhere';
-      detail.textContent = o.detail;
-      card.append(top, name, detail);
-      // 取ると増えるもの（強くなった感が分かるように。作者の指摘）
+      const lv = document.createElement('div');
+      lv.style.cssText = 'font-size:16px';
+      lv.textContent = `${i + 1}　${o.level}`;
+      card.append(cursor, lv, name);
+      if (o.detail) {
+        const detail = document.createElement('div');
+        detail.style.cssText = 'font-size:16px;line-height:1.5;overflow-wrap:anywhere';
+        detail.textContent = o.detail;
+        card.append(detail);
+      }
+      // 取ると増えるもの（強くなった感が分かるように）
       if (o.gains.length) {
-        const gains = document.createElement('ul');
-        gains.style.cssText = 'margin:0;padding-left:1.1em;font-size:clamp(14px,1.3vw,17px);font-weight:bold;color:#a5d6a7;line-height:1.5';
-        for (const g of o.gains) {
-          const li = document.createElement('li');
-          li.textContent = g;
-          gains.append(li);
-        }
+        const gains = document.createElement('div');
+        gains.style.cssText = 'font-size:16px;line-height:1.6;color:#208838';
+        gains.textContent = o.gains.join('\n');
+        gains.style.whiteSpace = 'pre-line';
         card.append(gains);
       }
       if (o.evolvable) {
         const badge = document.createElement('div');
-        badge.style.cssText = 'margin-top:auto;align-self:flex-start;padding:2px 10px;border-radius:10px;background:#0277bd;font-weight:bold;font-size:14px';
+        badge.style.cssText = 'margin-top:auto;align-self:flex-start;padding:4px 10px;background:#3890e8;color:#f8f8f8;font-size:16px';
         badge.textContent = t('levelUp.evolvable');
         card.append(badge);
       }
@@ -277,7 +280,7 @@ export class LevelUpPanel {
     });
 
     const footer = document.createElement('div');
-    footer.style.cssText = 'display:flex;gap:2vw;margin-top:14px';
+    footer.style.cssText = 'display:flex;gap:16px;margin-top:12px';
     const reroll = document.createElement('button');
     reroll.textContent = t('levelUp.reroll', { count: rerolls });
     reroll.disabled = rerolls <= 0;
@@ -289,8 +292,7 @@ export class LevelUpPanel {
     ban.textContent = t('levelUp.ban', { count: bans });
     ban.disabled = bans <= 0;
     ban.onclick = () => this.toggleBan();
-    for (const b of [reroll, skip, ban]) b.style.cssText = 'flex:1;padding:10px;border-radius:8px;cursor:pointer;font:inherit';
-    if (this.banning) ban.style.outline = '3px solid #ef5350';
+    for (const b of [reroll, skip, ban]) b.style.cssText = `${windowCss('light', b === ban && this.banning ? '#e04040' : undefined)};flex:1;padding:10px;cursor:pointer;font:inherit;font-size:16px;${b.disabled ? 'opacity:0.45;cursor:default' : ''}`;
     footer.append(reroll, skip, ban);
 
     this.root.replaceChildren(header, row, footer);

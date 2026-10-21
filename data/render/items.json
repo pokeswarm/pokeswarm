@@ -109,6 +109,39 @@
       ".koooooYYoooonk.",
       ".knnnnnnnnnnnnk.",
       "..kkkkkkkkkkkk.."
+    ],
+    "gem": [
+      "...k...",
+      "..kbk..",
+      ".kwbBk.",
+      "kwbbbBk",
+      "kbbbbBk",
+      "kbbbBBk",
+      ".kbBBk.",
+      "..kBk..",
+      "...k..."
+    ],
+    "gem-big": [
+      "....k....",
+      "...kyk...",
+      "..kwyYk..",
+      ".kwyyyYk.",
+      "kwyyyyyYk",
+      "kyyyyyYYk",
+      ".kyyyYYk.",
+      "..kyYYk..",
+      "...kYk...",
+      "....k...."
+    ],
+    "coin": [
+      "..kkkk..",
+      ".kyyyYk.",
+      "kyywyyYk",
+      "kywyyyYk",
+      "kyyyyyYk",
+      "kyyyyYYk",
+      ".kYYYYk.",
+      "..kkkk.."
     ]
   },
   "candyBurst": [

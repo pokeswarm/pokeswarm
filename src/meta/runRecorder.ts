@@ -108,6 +108,16 @@ export class RunRecorder {
     });
   }
 
+  /** ラン中の、ここまでにもらえるコインの見込み（画面上部に出す。終わったときの計算と同じ。クリアと伝説は含めない） */
+  liveCoins(world: World): number {
+    if (!this.shop) return 0;
+    const greed = permanentBonus(this.store.current, this.shop).coinPct;
+    return Math.floor(
+      coinsForRun(this.shop, { seconds: elapsedSeconds(world), kills: this.runKills, midbosses: this.runMidbosses, bosses: this.runBosses, clear: false, legendaryWon: false }) *
+        (1 + greed / 100),
+    );
+  }
+
   /** ラン終了時: 残りを足し、回数・クリア・最高記録を記録する */
   finish(world: World): void {
     if (this.finished) return;

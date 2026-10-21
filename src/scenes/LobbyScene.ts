@@ -19,7 +19,8 @@ export interface LobbySceneData {
   simulateP2PFailure?: boolean;
 }
 
-const BUTTON = 'padding:10px 18px;border-radius:8px;cursor:pointer;font:inherit;border:2px solid #4a7a4a;background:#162416;color:#fff';
+// 原作をまねた白い窓のボタン（作者の決定。2026年10月22日。src/render/pixelUi.ts の windowCss と同じ見た目）
+const BUTTON = 'padding:10px 18px;cursor:pointer;font:inherit;font-size:16px;background:#f8f8f8;color:#383848;border:4px solid #383848;border-radius:6px;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #a8b8c8';
 
 /**
  * 協力プレイの待合室（DOM。見た目の作り込みはフェーズ4）。
@@ -50,7 +51,7 @@ export class LobbyScene extends Phaser.Scene {
   create(): void {
     this.root = document.createElement('div');
     this.root.style.cssText =
-      'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,92vw);padding:24px;background:rgba(8,14,8,0.92);color:#fff;font:16px/1.6 sans-serif;border-radius:14px;z-index:20;box-sizing:border-box';
+      'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,92vw);padding:24px;background:#000;color:#f8f8f8;border:4px solid #f8f8f8;box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px #f8f8f8;font-family:inherit;font-size:16px;line-height:1.6;border-radius:6px;z-index:20;box-sizing:border-box';
     document.body.appendChild(this.root);
     const onKey = (ev: KeyboardEvent): void => this.onKey(ev);
     window.addEventListener('keydown', onKey);
@@ -183,7 +184,7 @@ export class LobbyScene extends Phaser.Scene {
         row.style.cssText = 'display:flex;gap:8px;margin:6px 0 16px';
         const input = document.createElement('input');
         Object.assign(input, { value: url.toString(), readOnly: true });
-        input.style.cssText = 'flex:1;font:14px monospace;padding:6px';
+        input.style.cssText = 'flex:1;font-family:inherit;font-size:16px;padding:6px';
         const copy = document.createElement('button');
         copy.style.cssText = BUTTON;
         copy.textContent = t('net.copy');
@@ -197,12 +198,12 @@ export class LobbyScene extends Phaser.Scene {
       for (let id = 1; id <= networkConfig.maxPlayers; id++) {
         const m = room.memberList.find((x) => x.id === id);
         const cell = document.createElement('div');
-        cell.style.cssText = `padding:10px 12px;border-radius:10px;border:2px solid ${id === room.localId ? '#ffb300' : '#4a7a4a'};background:#162416;min-height:52px`;
+        cell.style.cssText = `padding:10px 12px;border-radius:6px;border:2px solid ${id === room.localId ? '#ffb300' : '#f8f8f8'};background:#000000;min-height:52px`;
         const name = document.createElement('div');
         name.style.fontWeight = 'bold';
         name.textContent = t('lobby.player', { n: id }) + (id === 1 ? t('lobby.host') : '') + (id === room.localId ? t('lobby.you') : '');
         const state = document.createElement('div');
-        state.style.cssText = 'font-size:14px;opacity:0.85';
+        state.style.cssText = 'font-size:16px;opacity:0.85';
         state.textContent = !m ? t('lobby.empty') : !m.connected ? t('lobby.connecting') : m.pokemon ? this.pokemonName(m.pokemon) : t('lobby.choosing');
         cell.append(name, state);
         list.append(cell);
@@ -278,7 +279,7 @@ export class LobbyScene extends Phaser.Scene {
     children.push(footer);
     if (room?.role === 'host' && !room.canStart) {
       const note = document.createElement('div');
-      note.style.cssText = 'font-size:13px;opacity:0.75;margin-top:8px';
+      note.style.cssText = 'font-size:16px;opacity:0.75;margin-top:8px';
       note.textContent = t('lobby.waitAll');
       children.push(note);
     }

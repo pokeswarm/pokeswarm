@@ -2,6 +2,7 @@ import type { z } from 'zod';
 import simulationJson from '../../data/game/simulation.json';
 import playerJson from '../../data/game/player.json';
 import placeholderJson from '../../data/render/placeholder.json';
+import uiJson from '../../data/render/ui.json';
 import groundJson from '../../data/render/ground.json';
 import itemSpritesJson from '../../data/render/items.json';
 import obstacleSpritesJson from '../../data/render/obstacles.json';
@@ -52,6 +53,7 @@ import {
   networkConfigSchema,
   pickupConfigSchema,
   placeholderRenderSchema,
+  uiConfigSchema,
   playablesConfigSchema,
   playerConfigSchema,
   simulationConfigSchema,
@@ -86,6 +88,7 @@ function load<T extends z.ZodType>(name: string, schema: T, raw: unknown): z.inf
 export const simulationConfig = load('game/simulation.json', simulationConfigSchema, simulationJson);
 export const playerConfig = load('game/player.json', playerConfigSchema, playerJson);
 export const placeholderRender = load('render/placeholder.json', placeholderRenderSchema, placeholderJson);
+export const uiConfig = load('render/ui.json', uiConfigSchema, uiJson);
 export const groundConfig = load('render/ground.json', groundConfigSchema, groundJson);
 /** 自作のドット絵（道具・アメの箱） */
 export const itemSprites = load('render/items.json', pixelSpritesSchema, itemSpritesJson);

@@ -12,6 +12,8 @@ import { ResultScene } from './scenes/ResultScene';
 import { RunScene, type RunSceneData } from './scenes/RunScene';
 import { SelectScene } from './scenes/SelectScene';
 import { TitleScene } from './scenes/TitleScene';
+import { SettingsScene } from './scenes/SettingsScene';
+import { installAudioUnlock } from './audio';
 
 /**
  * 入り口:
@@ -21,6 +23,7 @@ import { TitleScene } from './scenes/TitleScene';
  *   ?host で部屋を作る（&relay で中継から始める、&p2pfail で直接接続をわざと失敗させる）
  */
 async function start(): Promise<void> {
+  installAudioUnlock();
   // ログインとセーブデータの読み込みは待たずに始める（タイトル画面に状態を出す）
   const sessionReady = session.start().then(() => {
     migrateOldDiscoveries(session.store);
@@ -65,6 +68,7 @@ async function start(): Promise<void> {
   game.scene.add('friends', FriendsScene, false);
   game.scene.add('achievements', AchievementsScene, false);
   game.scene.add('shop', ShopScene, false);
+  game.scene.add('settings', SettingsScene, false);
 
   // フレンドからの招待: ラン中でなければ、今の画面を閉じて待合室へ移る
   const running = (): boolean => game.scene.isActive('run');

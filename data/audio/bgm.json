@@ -1,0 +1,69 @@
+{
+  "fadeSeconds": 0.8,
+  "tracks": {
+    "title": {
+      "file": "audio/bgm/title.ogg",
+      "volume": 0.7,
+      "credit": ""
+    },
+    "route": {
+      "file": "audio/bgm/route.ogg",
+      "volume": 0.7,
+      "credit": ""
+    },
+    "forest": {
+      "file": "audio/bgm/forest.ogg",
+      "volume": 0.7,
+      "credit": ""
+    },
+    "cave": {
+      "file": "audio/bgm/cave.ogg",
+      "volume": 0.7,
+      "credit": ""
+    },
+    "sea": {
+      "file": "audio/bgm/sea.ogg",
+      "volume": 0.7,
+      "credit": ""
+    },
+    "victory-road": {
+      "file": "audio/bgm/victory-road.ogg",
+      "volume": 0.7,
+      "credit": ""
+    },
+    "elite-four": {
+      "file": "audio/bgm/elite-four.ogg",
+      "volume": 0.7,
+      "credit": ""
+    },
+    "legendary": {
+      "file": "audio/bgm/legendary.ogg",
+      "volume": 0.7,
+      "credit": ""
+    },
+    "result": {
+      "file": "audio/bgm/result.ogg",
+      "volume": 0.7,
+      "credit": ""
+    }
+  },
+  "scenes": {
+    "title": "title",
+    "result": "result"
+  },
+  "run": {
+    "sections": [
+      "route",
+      "cave",
+      "route",
+      "forest",
+      "route",
+      "route",
+      "sea",
+      "route",
+      "victory-road",
+      "elite-four"
+    ],
+    "legendary": "legendary"
+  }
+}

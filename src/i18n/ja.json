@@ -281,5 +281,15 @@
   "itemDesc.never-melt-ice": "こおりの技 +15%",
   "itemDesc.black-belt": "かくとうの技 +15%",
   "itemDesc.spell-tag": "ゴーストの技 +15%",
-  "itemDesc.dragon-fang": "ドラゴンの技 +15%"
+  "itemDesc.dragon-fang": "ドラゴンの技 +15%",
+  "title.settings": "O キーで 設定（音量）",
+  "settings.title": "設定",
+  "settings.master": "全体の音量",
+  "settings.bgm": "BGM",
+  "settings.sfx": "効果音",
+  "settings.muted": "音を消す（ラン中は M キー）",
+  "settings.test": "効果音を試す",
+  "settings.back": "もどる",
+  "audio.muted": "音を消しました（M で戻す）",
+  "audio.unmuted": "音を戻しました"
 }

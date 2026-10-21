@@ -3,6 +3,8 @@ import { firebaseOptionsFromEnv } from '../firebase/config';
 import { t } from '../i18n';
 import { AccountPanel } from './accountPanel';
 import { session } from '../meta/session';
+import { audio } from '../audio';
+import { bgmConfig } from '../data';
 
 /** タイトル画面（見た目の作り込みはフェーズ4）。Enter かクリックでポケモン選択へ、C で協力プレイの部屋を作る。下にログインの状態と記録を出す */
 export class TitleScene extends Phaser.Scene {
@@ -25,6 +27,7 @@ export class TitleScene extends Phaser.Scene {
       if (firebaseOptionsFromEnv()) this.add.text(width / 2, height * 0.7 + 74, t('title.friends'), { fontFamily: 'sans-serif', fontSize: '18px', color: '#cfd8dc' }).setOrigin(0.5);
       this.add.text(width / 2, height * 0.7 + 104, t('title.achievements'), { fontFamily: 'sans-serif', fontSize: '18px', color: '#cfd8dc' }).setOrigin(0.5);
       this.add.text(width / 2, height * 0.7 + 134, t('title.shop'), { fontFamily: 'sans-serif', fontSize: '18px', color: '#cfd8dc' }).setOrigin(0.5);
+      this.add.text(width / 2, height * 0.7 + 164, t('title.settings'), { fontFamily: 'sans-serif', fontSize: '18px', color: '#cfd8dc' }).setOrigin(0.5);
     };
     layout();
     this.scale.on('resize', layout);
@@ -43,6 +46,8 @@ export class TitleScene extends Phaser.Scene {
     if (firebaseOptionsFromEnv()) this.input.keyboard?.once('keydown-F', () => this.scene.start('friends'));
     this.input.keyboard?.once('keydown-A', () => this.scene.start('achievements'));
     this.input.keyboard?.once('keydown-S', () => this.scene.start('shop'));
+    this.input.keyboard?.once('keydown-O', () => this.scene.start('settings'));
+    audio.bgm.play(bgmConfig.scenes.title);
     session.setPresence('menu');
   }
 }

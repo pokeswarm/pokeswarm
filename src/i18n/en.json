@@ -281,5 +281,15 @@
   "itemDesc.never-melt-ice": "Ice moves +15%",
   "itemDesc.black-belt": "Fighting moves +15%",
   "itemDesc.spell-tag": "Ghost moves +15%",
-  "itemDesc.dragon-fang": "Dragon moves +15%"
+  "itemDesc.dragon-fang": "Dragon moves +15%",
+  "title.settings": "Press O for settings (volume)",
+  "settings.title": "Settings",
+  "settings.master": "Master volume",
+  "settings.bgm": "Music",
+  "settings.sfx": "Sound effects",
+  "settings.muted": "Mute (M during a run)",
+  "settings.test": "Test sound",
+  "settings.back": "Back",
+  "audio.muted": "Sound off (M to turn on)",
+  "audio.unmuted": "Sound on"
 }

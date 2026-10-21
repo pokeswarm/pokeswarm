@@ -9,6 +9,8 @@ import type { Room, RoomPlayer } from '../net/room';
 import { SyncSession } from '../net/sync';
 import { hexColor } from '../render/color';
 import { EffectRenderer } from '../render/effects/EffectRenderer';
+import { audio } from '../audio';
+import { RunSounds } from '../audio/runSounds';
 import { HitOutlines } from '../render/effects/HitOutlines';
 import { GroundTiles, preloadGroundTiles } from '../render/GroundTiles';
 import { KeyboardInput } from '../render/KeyboardInput';
@@ -74,6 +76,7 @@ export class RunScene extends Phaser.Scene {
   private frameMs = 0;
   private statusColors: number[] = [];
   private effects!: EffectRenderer;
+  private sounds!: RunSounds;
   private hitOutlines!: HitOutlines;
   /** 技ごとの縁取りの色（明るい線・暗い線）。描かない技は null */
   private outlineColors: ({ light: number; dark: number } | null)[] = [];
@@ -279,6 +282,12 @@ export class RunScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-F3', () => {
       this.showDebug = !this.showDebug;
     });
+    // M で音を消す・戻す（音量は タイトルの O の設定）
+    this.input.keyboard?.on('keydown-M', () => {
+      audio.settings.update({ muted: !audio.settings.current.muted });
+      this.announce(t(audio.settings.current.muted ? 'audio.muted' : 'audio.unmuted'), '#cfd8dc');
+    });
+    this.sounds = new RunSounds(this.localId);
     this.applyZoom();
     this.scale.on('resize', this.applyZoom, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.scale.off('resize', this.applyZoom, this));
@@ -597,12 +606,14 @@ export class RunScene extends Phaser.Scene {
       loop: true,
       callback: () => {
         this.announceText.setText(t('candy.rolling', { name, levels: choices[k++ % choices.length]! }));
+        audio.sfx.play('candy.roll');
       },
     });
     this.time.delayedCall(Math.max(0, reveal - 100), () => {
       timer.remove();
       this.announceText.setText(t('candy.result', { name, levels })).setColor('#ffe082');
       this.cameras.main.flash(250, 255, 255, 255);
+      audio.sfx.play('candy.hit');
       this.tweens.add({ targets: this.announceText, alpha: 0, delay: 1500, duration: 600 });
     });
   }
@@ -653,7 +664,10 @@ export class RunScene extends Phaser.Scene {
         if (ev.type === 'projectileHit') this.effects.playImpact(this.sim.world.rules.moves[ev.move]!.effect, ev.x, ev.y);
         if (ev.type === 'evolved') this.onEvolved(ev.playerId, ev.to);
       }
-      if (visible) this.onSimEvents();
+      if (visible) {
+        this.onSimEvents();
+        this.sounds.onEvents(this.sim.world);
+      }
       this.sendNet();
     }
   }

@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { bgmConfig } from '../data';
+import { audio } from '../audio';
 import { t } from '../i18n';
 import type { RunOutcome } from '../sim/world';
 import type { RunSceneData } from './RunScene';
@@ -46,6 +48,7 @@ export class ResultScene extends Phaser.Scene {
   }
 
   create(): void {
+    audio.bgm.play(bgmConfig.scenes.result);
     const { summary, retry } = this.params;
     let leaving = false;
     const again = (): void => {

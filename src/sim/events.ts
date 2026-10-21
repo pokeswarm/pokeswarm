@@ -179,6 +179,13 @@ export interface LegendaryWarningEvent {
   readonly kind: number;
 }
 
+/** 技を使った（効果音のため） */
+export interface MoveUsedEvent {
+  readonly type: 'moveUsed';
+  readonly playerId: PlayerId;
+  readonly move: number;
+}
+
 /** 自分の体で攻撃する技を使った（見た目: 体を前後させる・残像） */
 export interface BodyAttackEvent {
   readonly type: 'bodyAttack';
@@ -259,6 +266,7 @@ export type SimEvent =
   | SwarmStartedEvent
   | SectionAdvancedEvent
   | BodyAttackEvent
+  | MoveUsedEvent
   | ItemSpawnedEvent
   | ItemRequestedEvent
   | ItemCollectedEvent

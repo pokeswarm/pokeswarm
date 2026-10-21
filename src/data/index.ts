@@ -25,6 +25,8 @@ import networkJson from '../../data/game/network.json';
 import statusJson from '../../data/game/status.json';
 import pickupsJson from '../../data/game/pickups.json';
 import effectRecipesJson from '../../data/effects/recipes.json';
+import sfxJson from '../../data/audio/sfx.json';
+import bgmJson from '../../data/audio/bgm.json';
 import generatedPokemonJson from '../../data/generated/pokemon.json';
 import generatedMovesJson from '../../data/generated/moves.json';
 import generatedItemsJson from '../../data/generated/items.json';
@@ -58,6 +60,8 @@ import {
   shopConfigSchema,
   statsConfigSchema,
   statusConfigSchema,
+  sfxConfigSchema,
+  bgmConfigSchema,
 } from './schema';
 
 function load<T extends z.ZodType>(name: string, schema: T, raw: unknown): z.infer<T> {
@@ -92,6 +96,8 @@ export const pickupConfig = load('game/pickups.json', pickupConfigSchema, pickup
 export const spriteRender = load('render/sprites.json', spriteRenderSchema, spriteRenderJson);
 export const effectRecipes = resolveEffectRecipes(effectRecipesJson);
 export const networkConfig = load('game/network.json', networkConfigSchema, networkJson);
+export const sfxConfig = load('audio/sfx.json', sfxConfigSchema, sfxJson);
+export const bgmConfig = load('audio/bgm.json', bgmConfigSchema, bgmJson);
 
 /** PokeAPI から生成したデータ（npm run pokeapi） */
 export const generated = {
@@ -112,6 +118,11 @@ for (const wave of spawnConfig.waves) {
       `data/game/spawn.json の waves にある敵 "${kind}" が data/game/enemies.json にありません`,
     );
   }
+}
+// BGM: 区間ごとの曲は区間の数と同じ。曲の名前は tracks にあるもの
+check(bgmConfig.run.sections.length === spawnConfig.waves.length, `data/audio/bgm.json の run.sections（${bgmConfig.run.sections.length}）と data/game/spawn.json の waves（${spawnConfig.waves.length}）の数をそろえてください`);
+for (const id of [...bgmConfig.run.sections, bgmConfig.run.legendary, bgmConfig.scenes.title, bgmConfig.scenes.result]) {
+  check(id === null || !!bgmConfig.tracks[id], `data/audio/bgm.json の曲 "${id}" が tracks にありません`);
 }
 check(
   groundConfig.waves.length === spawnConfig.waves.length,

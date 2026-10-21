@@ -117,6 +117,7 @@ export function useMoves(world: World): void {
         continue;
       }
       pm.cooldown = scaledMoveStats(world, p, pm, st).cooldownSeconds;
+      world.events.push({ type: 'moveUsed', playerId: p.id, move: pm.move });
       switch (def.pattern) {
         case 'nearest':
         case 'facing':

@@ -959,3 +959,61 @@ export const statsConfigSchema = z
   })
   .refine((s) => s.rankMultipliers.length === s.rankThresholds.length + 1, { message: 'rankMultipliers は rankThresholds より1つ多くする' });
 export type StatsConfig = z.infer<typeof statsConfigSchema>;
+
+// ---- 音（効果音・BGM。作者の決定: 効果音はコードで鳴らす 8bit 音、BGM は作者が用意したファイル） ----
+
+/** 効果音の1つの音の部品。from → to へ音の高さを動かしながら、duration 秒鳴らす */
+export const sfxPartSchema = z.object({
+  /** square（矩形波。duty で音色）・triangle（三角波）・sawtooth（のこぎり波）・noise（雑音。from は雑音を削る周波数） */
+  wave: z.enum(['square', 'triangle', 'sawtooth', 'noise']),
+  from: z.number().positive(),
+  to: z.number().positive().optional(),
+  duration: z.number().positive(),
+  /** 鳴らし始めを遅らせる秒数（和音・アルペジオ） */
+  delay: z.number().nonnegative().default(0),
+  volume: z.number().min(0).max(1).default(0.5),
+  /** 矩形波の幅（0.125・0.25・0.5。ファミコンの音色） */
+  duty: z.number().min(0.05).max(0.5).default(0.5),
+});
+export type SfxPart = z.infer<typeof sfxPartSchema>;
+
+export const sfxConfigSchema = z.object({
+  /** 全体の音量（設定の音量に掛ける） */
+  volume: z.number().min(0).max(1),
+  /** 同時に鳴らす音の上限（たくさん倒しても音が割れないように） */
+  maxVoices: z.number().int().positive(),
+  sounds: z.record(
+    z.string(),
+    z.object({
+      /** 同じ音を続けて鳴らすまでの最短の間隔（ミリ秒） */
+      minIntervalMs: z.number().nonnegative().default(0),
+      parts: z.array(sfxPartSchema).min(1),
+    }),
+  ),
+});
+export type SfxConfig = z.infer<typeof sfxConfigSchema>;
+
+/**
+ * BGM（作者が用意した音声ファイル。public/ からのパス）。ファイルが無い曲は鳴らさない（エラーにしない）。
+ * scenes は画面ごと、run.sections は区間（data/game/spawn.json の waves）ごとの曲。null は無音
+ */
+export const bgmConfigSchema = z.object({
+  /** 曲が変わるときに、前の曲を小さくして次の曲を大きくする秒数 */
+  fadeSeconds: z.number().nonnegative(),
+  tracks: z.record(
+    z.string(),
+    z.object({
+      file: z.string(),
+      volume: z.number().min(0).max(1).default(1),
+      /** 出典と利用条件（クレジットに出す） */
+      credit: z.string().default(''),
+    }),
+  ),
+  scenes: z.object({ title: z.string().nullable(), result: z.string().nullable() }),
+  run: z.object({
+    sections: z.array(z.string().nullable()),
+    /** 伝説戦 */
+    legendary: z.string().nullable(),
+  }),
+});
+export type BgmConfig = z.infer<typeof bgmConfigSchema>;

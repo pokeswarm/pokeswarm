@@ -9,6 +9,7 @@ import type { Room, RoomPlayer } from '../net/room';
 import { SyncSession } from '../net/sync';
 import { hexColor } from '../render/color';
 import { EffectRenderer } from '../render/effects/EffectRenderer';
+import { HitOutlines } from '../render/effects/HitOutlines';
 import { GroundTiles, preloadGroundTiles } from '../render/GroundTiles';
 import { KeyboardInput } from '../render/KeyboardInput';
 import { PlayerView } from '../render/PlayerView';
@@ -73,6 +74,9 @@ export class RunScene extends Phaser.Scene {
   private frameMs = 0;
   private statusColors: number[] = [];
   private effects!: EffectRenderer;
+  private hitOutlines!: HitOutlines;
+  /** 技ごとの縁取りの色（明るい線・暗い線）。描かない技は null */
+  private outlineColors: ({ light: number; dark: number } | null)[] = [];
   private ground!: GroundTiles;
   private hud!: Phaser.GameObjects.Text;
   private lastSent: { dx: Axis; dy: Axis } = { dx: 0, dy: 0 };
@@ -252,6 +256,13 @@ export class RunScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.levelUpPanel.hide());
     this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));
     this.effects = new EffectRenderer(this, effectRecipes, 2, spriteRender.effectPixel);
+    const outline = spriteRender.hitOutline;
+    this.hitOutlines = new HitOutlines(this, 2.5, outline.dot, outline.alpha);
+    this.outlineColors = rules.moves.map((m) => {
+      if (outline.moves && !outline.moves.includes(m.key)) return null;
+      const light = hexColor(effectRecipes[m.effect]?.projectile?.glowColor ?? '#ffffff');
+      return { light, dark: scaleColor(light, outline.dark) };
+    });
     const local = this.sim.world.players.find((p) => p.id === this.localId)!;
     if (this.playerSprite && new URLSearchParams(window.location.search).has('gallery')) {
       addSpriteGallery(this, this.playerSprite, spriteRender, local.x, local.y - 200);
@@ -765,6 +776,13 @@ export class RunScene extends Phaser.Scene {
       timeMs,
       (i) => (pr.shape[i] === SHAPE_LINE ? { length: pr.length[i]!, dirX: pr.dirX[i]!, dirY: pr.dirY[i]! } : null),
     );
+    this.hitOutlines.draw(
+      pr,
+      alpha,
+      (i) => this.outlineColors[pr.move[i]!] ?? null,
+      (i) => (pr.shape[i] === SHAPE_LINE ? { length: pr.length[i]!, dirX: pr.dirX[i]!, dirY: pr.dirY[i]! } : null),
+      view,
+    );
 
     this.drawHazards(world.hazards);
     this.drawItems(timeMs);
@@ -844,4 +862,12 @@ function enemyLayer(rules: { enemies: { kinds: readonly { id: string; rank?: str
   if (!k) return 0;
   if ((k.rank ?? 'normal') !== 'normal') return 2;
   return rules.stage.swarms.some((s) => s.kind === k.id) ? 1 : 0;
+}
+
+/** 色の明るさを factor 倍にする（縁取りの暗い線） */
+function scaleColor(color: number, factor: number): number {
+  const r = Math.round(((color >> 16) & 0xff) * factor);
+  const g = Math.round(((color >> 8) & 0xff) * factor);
+  const b = Math.round((color & 0xff) * factor);
+  return (r << 16) | (g << 8) | b;
 }

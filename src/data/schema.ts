@@ -567,6 +567,16 @@ export const spriteRenderSchema = z.object({
     colorSteps: z.number().int().min(2),
     alphaSteps: z.number().int().min(2),
   }),
+  /**
+   * 技の当たり判定の形の縁取り（作者の指摘。2026年10月）。dot は1ドットのワールドの長さ（スプライトの拡大率と同じ）、
+   * dark は外側の暗い線の明るさ（レシピの光の色に掛ける）。moves を書くとその技だけ（試すとき）、省略で全部
+   */
+  hitOutline: z.object({
+    dot: z.number().positive(),
+    alpha: z.number().min(0).max(1),
+    dark: z.number().min(0).max(1),
+    moves: z.array(z.string()).optional(),
+  }),
 });
 export type SpriteRenderConfig = z.infer<typeof spriteRenderSchema>;
 

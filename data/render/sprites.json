@@ -15,5 +15,20 @@
   "camera": {
     "viewHeight": 720,
     "zoomStep": 0.5
+  },
+  "hitOutline": {
+    "dot": 2,
+    "alpha": 0.95,
+    "dark": 0.35,
+    "moves": [
+      "ember",
+      "fire-fang",
+      "flamethrower",
+      "fire-spin",
+      "flare-blitz",
+      "blast-burn",
+      "gust",
+      "air-slash"
+    ]
   }
 }

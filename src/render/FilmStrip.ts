@@ -11,12 +11,12 @@ export type FilmEntry = { texture: string; scale: number } | { make: (scene: Pha
 export class FilmStrip {
   private readonly root: Phaser.GameObjects.Container;
   private readonly cells: { box: Phaser.GameObjects.Container; content: Phaser.GameObjects.GameObject | null }[] = [];
-  private next = 0;
   private length = 0;
 
   constructor(
     private readonly scene: Phaser.Scene,
-    private readonly entries: FilmEntry[],
+    /** 次のコマの中身（無ければ空のコマ） */
+    private readonly next: () => FilmEntry | null,
     private readonly opts: {
       /** 帯の傾き（度） */
       angle: number;
@@ -75,8 +75,8 @@ export class FilmStrip {
   private fill(cell: { box: Phaser.GameObjects.Container; content: Phaser.GameObjects.GameObject | null }): void {
     cell.content?.destroy();
     cell.content = null;
-    if (this.entries.length === 0) return;
-    const e = this.entries[this.next++ % this.entries.length]!;
+    const e = this.next();
+    if (!e) return;
     const obj = 'texture' in e ? this.scene.add.image(0, 0, e.texture).setScale(e.scale) : e.make(this.scene);
     obj.setPosition(0, 0);
     cell.box.add(obj);

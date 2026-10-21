@@ -57,6 +57,21 @@ export const uiConfigSchema = z.object({
   expBar: z.object({ height: z.number().int().positive(), back: colorString, fill: colorString, border: colorString, text: colorString }),
   timer: z.object({ size: z.number().int().positive(), color: colorString }),
   coin: z.object({ size: z.number().int().positive(), color: colorString }),
+  /**
+   * タイトル画面の背景のフィルムの帯（作者の案 2026年10月22日）: コマの幅・帯の高さ・不透明度、ポケモンと持ち物のアイコンの倍率、
+   * 何コマに1つ持ち物を入れるか（itemEvery）、帯ごとの傾き（度）・画面の真ん中からのずれ・流れる速さ（px/秒。マイナスで逆向き）
+   */
+  titleFilm: z.object({
+    cell: z.number().positive(),
+    height: z.number().positive(),
+    alpha: z.number().min(0).max(1),
+    pokemonScale: z.number().positive(),
+    /** この大きさ（px）のコマの絵のポケモンを pokemonScale 倍で描く。絵が大きいポケモンはそのぶん小さく */
+    pokemonFrame: z.number().positive(),
+    itemScale: z.number().positive(),
+    itemEvery: z.number().int().positive(),
+    strips: z.array(z.object({ angle: z.number(), offset: z.number(), speed: z.number() })).min(1),
+  }),
 });
 export type UiConfig = z.infer<typeof uiConfigSchema>;
 

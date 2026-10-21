@@ -2,8 +2,14 @@
   "font": {
     "family": "'PixelLatin', 'PixelJP', monospace",
     "faces": [
-      { "family": "PixelLatin", "file": "fonts/PressStart2P-Regular.ttf" },
-      { "family": "PixelJP", "file": "fonts/misaki_gothic_2nd.ttf" }
+      {
+        "family": "PixelLatin",
+        "file": "fonts/PressStart2P-Regular.ttf"
+      },
+      {
+        "family": "PixelJP",
+        "file": "fonts/misaki_gothic_2nd.ttf"
+      }
     ],
     "credits": [
       "Press Start 2P © CodeMan38 (SIL Open Font License 1.1)",
@@ -30,6 +36,53 @@
     "border": "#f8f8f8",
     "text": "#f8f8f8"
   },
-  "timer": { "size": 24, "color": "#f8f8f8" },
-  "coin": { "size": 16, "color": "#f8e070" }
+  "timer": {
+    "size": 24,
+    "color": "#f8f8f8"
+  },
+  "coin": {
+    "size": 16,
+    "color": "#f8e070"
+  },
+  "titleFilm": {
+    "cell": 88,
+    "height": 112,
+    "alpha": 0.88,
+    "pokemonScale": 2.5,
+    "pokemonFrame": 64,
+    "itemScale": 4,
+    "itemEvery": 3,
+    "strips": [
+      {
+        "angle": -12,
+        "offset": -260,
+        "speed": -48
+      },
+      {
+        "angle": 14,
+        "offset": -140,
+        "speed": 62
+      },
+      {
+        "angle": -16,
+        "offset": 40,
+        "speed": -70
+      },
+      {
+        "angle": 12,
+        "offset": 150,
+        "speed": 44
+      },
+      {
+        "angle": -10,
+        "offset": 300,
+        "speed": -56
+      },
+      {
+        "angle": 30,
+        "offset": 0,
+        "speed": 38
+      }
+    ]
+  }
 }

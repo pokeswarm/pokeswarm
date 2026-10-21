@@ -4,13 +4,12 @@ import { t } from '../i18n';
 import { AccountPanel } from './accountPanel';
 import { session } from '../meta/session';
 import { audio } from '../audio';
-import { bgmConfig, groundConfig, iconConfig, itemIcons, playablesConfig, spriteRender, uiConfig, unlocksConfig } from '../data';
+import { bgmConfig, generated, groundConfig, iconConfig, itemIcons, playablesConfig, spriteRender, uiConfig } from '../data';
 import { buildSimRules } from '../data/simRules';
 import type { SpriteAnims } from '../data/schema';
-import { isPlayableUnlocked } from '../meta/progress';
 import { FilmStrip, type FilmEntry } from '../render/FilmStrip';
 import { GroundTiles, preloadGroundTiles } from '../render/GroundTiles';
-import { ensureIconTextures, itemIconKey, moveIconKey } from '../render/Icons';
+import { ensureIconTextures, itemIconKey } from '../render/Icons';
 import { drawWindow, pixelButton, px } from '../render/pixelUi';
 import { directionIndex, PokemonSpriteView } from '../render/sprites/PokemonSprite';
 import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
@@ -30,30 +29,38 @@ export class TitleScene extends Phaser.Scene {
   }
 
   /**
-   * 背景: ゲームのマップ（ゆっくり流れる）と、映写機のフィルムのように交差して流れる2本の帯（作者の案 2026年10月22日）。
-   * 帯には、遊べるポケモン（歩く姿）と技・持ち物のアイコンが順に流れる。ポケモンは読み込めてから帯に加える
+   * 背景: ゲームのマップ（ゆっくり流れる）と、映写機のフィルムのように交差して流れるたくさんの帯（作者の案 2026年10月22日）。
+   * 帯には、実装予定の遊べるポケモンすべて（進化の途中・進化先も。流れる向きへ歩く姿）と、持ち物のアイコンが流れる。
+   * ポケモンは読み込めたものから帯に加わる（読み込みを待たずに始める）
    */
   private createBackdrop(): { update: (deltaMs: number) => void; layout: () => void } {
     const ground = new GroundTiles(this, groundConfig, 0);
     const shade = this.add.rectangle(0, 0, 10, 10, 0x000000, 0.35).setOrigin(0).setDepth(-500);
+    const film = uiConfig.titleFilm;
     const rules = buildSimRules();
     ensureIconTextures(this, iconConfig, rules, itemIcons);
-    const moves: FilmEntry[] = rules.moves.map((_, i) => ({ texture: moveIconKey(rules, i), scale: 4 }));
-    const items: FilmEntry[] = rules.items.map((_, i) => ({ texture: itemIconKey(rules, i), scale: 4 }));
-    const pokemon: FilmEntry[] = [];
-    // 2本の帯: 右上がりで左へ、右下がりで右へ流れる（交差する）
-    const strip = (entries: FilmEntry[], angle: number, speed: number): FilmStrip =>
-      new FilmStrip(this, entries, { angle, speed, offset: 0, cell: 96, height: 120, depth: -100, alpha: 0.9 });
-    // 技・持ち物とポケモンを交互に並べる（ポケモンが読み込めるまではアイコンだけ）
-    const mix = (icons: FilmEntry[], start: number): FilmEntry[] => {
-      const out: FilmEntry[] = [];
-      icons.forEach((e, k) => {
-        if (pokemon.length && k % 2 === 0) out.push(pokemon[(start + k / 2) % pokemon.length]!);
-        out.push(e);
-      });
-      return out;
-    };
-    let strips = [strip(mix(moves, 0), -14, -60), strip(mix(items, 1), 14, 60)];
+    const items = rules.items.map((_, i) => itemIconKey(rules, i));
+    const pokemon: SpriteAnims[] = [];
+    // 帯ごとに、ポケモンと持ち物を順にずらして出す（同じ並びが重ならないように）
+    const strips = film.strips.map((cfg, k) => {
+      let n = k * 5;
+      const next = (): FilmEntry | null => {
+        n++;
+        if (pokemon.length === 0 || n % film.itemEvery === 0) return { texture: items[(n * 7 + k) % items.length]!, scale: film.itemScale };
+        const m = pokemon[(n * 3 + k * 11) % pokemon.length]!;
+        const dirX = cfg.speed < 0 ? -1 : 1;
+        return {
+          make: (scene) => {
+            const v = new PokemonSpriteView(scene, m, film.pokemonScale);
+            v.play(spriteRender.walkAnimation, directionIndex(dirX, 0));
+            // 大きなポケモン（コマの絵が大きい）は小さく、小さなポケモンは大きく描いて、だいたい同じ大きさでコマに収める
+            v.sprite.setScale(Math.max(1, Math.round(((film.pokemonScale * film.pokemonFrame) / Math.max(1, v.sprite.height)) * 2) / 2));
+            return v.sprite;
+          },
+        };
+      };
+      return new FilmStrip(this, next, { ...cfg, cell: film.cell, height: film.height, depth: -100 + k, alpha: film.alpha });
+    });
     let camX = 0;
     let camY = 0;
     const layout = (): void => {
@@ -61,33 +68,26 @@ export class TitleScene extends Phaser.Scene {
       for (const st of strips) st.layout();
     };
     layout();
-    // 遊べるポケモンを読み込み、帯を作り直す
-    const keys = Object.keys(playablesConfig.pokemon).filter((k) => isPlayableUnlocked(session.store.current, unlocksConfig, k, playablesConfig.pokemon[k]!.unlock));
-    void Promise.all(keys.map((k) => loadPokemonAtRuntime(this, playablesConfig.pokemon[k]!.sprite).then((r) => r?.manifest ?? null))).then((list) => {
-      if (!this.sys.isActive()) return;
-      for (const m of list.filter((x): x is SpriteAnims => x !== null)) {
-        for (const dirX of [-1, 1]) {
-          // 帯の流れる向きへ歩く
-          pokemon.push({
-            make: (scene) => {
-              const v = new PokemonSpriteView(scene, m, spriteRender.playerScale * 1.5);
-              v.play(spriteRender.walkAnimation, directionIndex(dirX, 0));
-              return v.sprite;
-            },
-          });
-        }
+    // 遊べるポケモンと、その進化の途中・進化先（進化しない遊べるポケモンは、その姿だけ）
+    const keys = new Set<string>();
+    for (const [key, p] of Object.entries(playablesConfig.pokemon)) {
+      const stack = [key];
+      while (stack.length) {
+        const k = stack.pop()!;
+        if (keys.has(k) || !generated.pokemon[k]) continue;
+        keys.add(k);
+        if (p.evolves !== false) for (const e of generated.pokemon[k]!.evolvesTo) stack.push(e.to);
       }
-      // 左へ流れる帯は左向き、右へ流れる帯は右向きのポケモン
-      const left = pokemon.filter((_, i) => i % 2 === 0);
-      const right = pokemon.filter((_, i) => i % 2 === 1);
-      for (const st of strips) st.destroy();
-      pokemon.length = 0;
-      pokemon.push(...left);
-      const a = mix(moves, 0);
-      pokemon.length = 0;
-      pokemon.push(...right);
-      const b = mix(items, 1);
-      strips = [strip(a, -14, -60), strip(b, 14, 60)];
+    }
+    // 全部読み込めたら、帯のコマを入れ直す（それまでは、流れてきたコマから順にポケモンが加わる）
+    void Promise.all(
+      [...keys].map((k) =>
+        loadPokemonAtRuntime(this, k).then((r) => {
+          if (r && this.sys.isActive()) pokemon.push(r.manifest);
+        }),
+      ),
+    ).then(() => {
+      if (this.sys.isActive()) layout();
     });
     return {
       layout,

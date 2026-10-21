@@ -1,0 +1,45 @@
+{
+  "bpm": 136,
+  "stepsPerBeat": 4,
+  "channels": {
+    "lead": {
+      "wave": "square",
+      "duty": 0.25,
+      "volume": 0.22
+    },
+    "harmony": {
+      "wave": "square",
+      "duty": 0.125,
+      "volume": 0.09
+    },
+    "bass": {
+      "wave": "triangle",
+      "duty": 0.5,
+      "volume": 0.32
+    },
+    "drums": {
+      "wave": "noise",
+      "duty": 0.5,
+      "volume": 0.14
+    }
+  },
+  "patterns": {
+    "A": {
+      "lead": "D5 - G5 - B5 - - - A5 - G5 - A5 - B5 - G5 - - - E5 - - - - - D5 - E5 - G5 - E5 - - - C5 - E5 - G5 - - - A5 - G5 - F#5 - - - - - - - D5 - E5 - F#5 - A5 - B5 - - - D6 - - - B5 - A5 - G5 - B5 - A5 - - - G5 - - - E5 - - - G5 - A5 - G5 - E5 - C5 - E5 - A5 - - - F#5 - D5 - G5 - - - - - - - . . D5 - E5 - F#5 -",
+      "harmony": "G4 - B4 - D4 - B4 - G4 - B4 - D4 - B4 - E4 - G4 - B4 - G4 - E4 - G4 - B4 - G4 - C4 - E4 - G4 - E4 - C4 - E4 - G4 - E4 - D4 - F#4 - A4 - F#4 - D4 - F#4 - A4 - F#4 - G4 - B4 - D4 - B4 - G4 - B4 - D4 - B4 - E4 - G4 - B4 - G4 - E4 - G4 - B4 - G4 - C4 - E4 - G4 - E4 - D4 - F#4 - A4 - F#4 - G4 - B4 - D4 - B4 - G4 - B4 - D4 - B4 -",
+      "bass": "G2 . G3 . G2 . G3 . G2 . G3 . G2 . G3 . E2 . E3 . E2 . E3 . E2 . E3 . E2 . E3 . C2 . C3 . C2 . C3 . C2 . C3 . C2 . C3 . D2 . D3 . D2 . D3 . D2 . D3 . D2 . D3 . G2 . G3 . G2 . G3 . G2 . G3 . G2 . G3 . E2 . E3 . E2 . E3 . E2 . E3 . E2 . E3 . C2 . C3 . C2 . C3 . D2 . D3 . D2 . D3 . G2 . G3 . G2 . G3 . G2 . G3 . G2 . G3 .",
+      "drums": "k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . s . k s . s s s s s"
+    },
+    "B": {
+      "lead": "G5 - - - E5 - C5 - E5 - G5 - C6 - - - A5 - - - F#5 - D5 - F#5 - A5 - D6 - - - B5 - - - A5 - - - F#5 - - - D5 - - - E5 - - - - - G5 - B5 - - - - - - - C6 - - - B5 - A5 - G5 - - - E5 - - - F#5 - - - G5 - A5 - - - D5 - E5 - F#5 - G5 - - - B5 - - - D6 - - - B5 - - - G5 - - - - - - - . . . . . . . .",
+      "harmony": "C4 - E4 - G4 - E4 - C4 - E4 - G4 - E4 - D4 - F#4 - A4 - F#4 - D4 - F#4 - A4 - F#4 - B4 - D4 - F#4 - D4 - B4 - D4 - F#4 - D4 - E4 - G4 - B4 - G4 - E4 - G4 - B4 - G4 - C4 - E4 - G4 - E4 - C4 - E4 - G4 - E4 - D4 - F#4 - A4 - F#4 - D4 - F#4 - A4 - F#4 - G4 - B4 - D4 - B4 - G4 - B4 - D4 - B4 - G4 - B4 - D4 - B4 - G4 - B4 - D4 - B4 -",
+      "bass": "C2 . C3 . C2 . C3 . C2 . C3 . C2 . C3 . D2 . D3 . D2 . D3 . D2 . D3 . D2 . D3 . B2 . B3 . B2 . B3 . B2 . B3 . B2 . B3 . E2 . E3 . E2 . E3 . E2 . E3 . E2 . E3 . C2 . C3 . C2 . C3 . C2 . C3 . C2 . C3 . D2 . D3 . D2 . D3 . D2 . D3 . D2 . D3 . G2 . G3 . G2 . G3 . G2 . G3 . G2 . G3 . G2 . G3 . G2 . G3 . G2 . G3 . G2 . G3 .",
+      "drums": "k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . s . k s . s s s s s"
+    }
+  },
+  "order": [
+    "A",
+    "A",
+    "B"
+  ]
+}

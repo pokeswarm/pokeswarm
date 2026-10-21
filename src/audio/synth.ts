@@ -1,4 +1,5 @@
 import type { SfxConfig, SfxPart } from '../data/schema';
+import { pulseWave } from './music';
 
 /**
  * 8bit 風の効果音をコードで鳴らす（作者の決定: 効果音はファイルを使わない）。
@@ -9,7 +10,6 @@ export class Synth {
   private ctx: AudioContext | null = null;
   private out: GainNode | null = null;
   private noise: AudioBuffer | null = null;
-  private readonly pulses = new Map<number, PeriodicWave>();
   private readonly lastPlayed = new Map<string, number>();
   private voices = 0;
 
@@ -26,6 +26,11 @@ export class Synth {
     this.ctx = new Ctx();
     this.out = this.ctx.createGain();
     this.out.connect(this.ctx.destination);
+  }
+
+  /** BGM（楽譜の曲）も同じ音の出口で鳴らす。音を鳴らせるようになる前は null */
+  output(): { ctx: AudioContext; destination: AudioNode } | null {
+    return this.ctx ? { ctx: this.ctx, destination: this.ctx.destination } : null;
   }
 
   setVolume(volume: number): void {
@@ -77,7 +82,7 @@ export class Synth {
       source = src;
     } else {
       const osc = ctx.createOscillator();
-      if (part.wave === 'square') osc.setPeriodicWave(this.pulse(ctx, part.duty));
+      if (part.wave === 'square') osc.setPeriodicWave(pulseWave(ctx, part.duty));
       else osc.type = part.wave;
       osc.frequency.setValueAtTime(part.from * ratio, t0);
       if (part.to) osc.frequency.exponentialRampToValueAtTime(part.to * ratio, t1);
@@ -88,20 +93,6 @@ export class Synth {
     source.stop(t1 + 0.02);
     source.onended = () => gain.disconnect();
     return t1;
-  }
-
-  /** 幅 duty の矩形波（ファミコンの 12.5%・25%・50% の音色） */
-  private pulse(ctx: AudioContext, duty: number): PeriodicWave {
-    let wave = this.pulses.get(duty);
-    if (!wave) {
-      const n = 64;
-      const real = new Float32Array(n);
-      const imag = new Float32Array(n);
-      for (let k = 1; k < n; k++) real[k] = (2 / (k * Math.PI)) * Math.sin(k * Math.PI * duty);
-      wave = ctx.createPeriodicWave(real, imag);
-      this.pulses.set(duty, wave);
-    }
-    return wave;
   }
 
   private noiseBuffer(ctx: AudioContext): AudioBuffer {

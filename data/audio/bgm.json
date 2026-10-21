@@ -2,14 +2,14 @@
   "fadeSeconds": 0.8,
   "tracks": {
     "title": {
-      "file": "audio/bgm/title.ogg",
       "volume": 0.7,
-      "credit": ""
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "title"
     },
     "route": {
-      "file": "audio/bgm/route.ogg",
       "volume": 0.7,
-      "credit": ""
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "route"
     },
     "forest": {
       "file": "audio/bgm/forest.ogg",

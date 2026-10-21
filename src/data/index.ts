@@ -62,6 +62,7 @@ import {
   statusConfigSchema,
   sfxConfigSchema,
   bgmConfigSchema,
+  musicScoreSchema,
 } from './schema';
 
 function load<T extends z.ZodType>(name: string, schema: T, raw: unknown): z.infer<T> {
@@ -98,6 +99,13 @@ export const effectRecipes = resolveEffectRecipes(effectRecipesJson);
 export const networkConfig = load('game/network.json', networkConfigSchema, networkJson);
 export const sfxConfig = load('audio/sfx.json', sfxConfigSchema, sfxJson);
 export const bgmConfig = load('audio/bgm.json', bgmConfigSchema, bgmJson);
+/** コードで鳴らす 8bit の曲（data/audio/music/<名前>.json） */
+export const musicScores = Object.fromEntries(
+  Object.entries(import.meta.glob('../../data/audio/music/*.json', { eager: true, import: 'default' })).map(([path, raw]) => {
+    const name = path.replace(/^.*\/|\.json$/g, '');
+    return [name, load(`audio/music/${name}.json`, musicScoreSchema, raw)];
+  }),
+);
 
 /** PokeAPI から生成したデータ（npm run pokeapi） */
 export const generated = {
@@ -118,6 +126,11 @@ for (const wave of spawnConfig.waves) {
       `data/game/spawn.json の waves にある敵 "${kind}" が data/game/enemies.json にありません`,
     );
   }
+}
+// BGM: 曲はファイルか楽譜のどちらかを持つ。楽譜は data/audio/music にあるもの
+for (const [id, track] of Object.entries(bgmConfig.tracks)) {
+  check(!!track.file || !!track.score, `data/audio/bgm.json の曲 "${id}" は file か score を書いてください`);
+  check(!track.score || !!musicScores[track.score], `data/audio/bgm.json の曲 "${id}" の楽譜 "${track.score}" が data/audio/music にありません`);
 }
 // BGM: 区間ごとの曲は区間の数と同じ。曲の名前は tracks にあるもの
 check(bgmConfig.run.sections.length === spawnConfig.waves.length, `data/audio/bgm.json の run.sections（${bgmConfig.run.sections.length}）と data/game/spawn.json の waves（${spawnConfig.waves.length}）の数をそろえてください`);

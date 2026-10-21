@@ -1003,7 +1003,10 @@ export const bgmConfigSchema = z.object({
   tracks: z.record(
     z.string(),
     z.object({
-      file: z.string(),
+      /** 作者が用意したファイル（public/ からのパス）。score より先に使う */
+      file: z.string().optional(),
+      /** コードで鳴らす曲（data/audio/music/<score>.json）。ファイルが無いときに使う */
+      score: z.string().optional(),
       volume: z.number().min(0).max(1).default(1),
       /** 出典と利用条件（クレジットに出す） */
       credit: z.string().default(''),
@@ -1017,3 +1020,24 @@ export const bgmConfigSchema = z.object({
   }),
 });
 export type BgmConfig = z.infer<typeof bgmConfigSchema>;
+
+/**
+ * コードで鳴らす 8bit の曲（楽譜）。1つの記号が1ステップ（stepsPerBeat で1拍を分ける）。
+ * 音符は C4・F#5・Bb3 のように書き、"-" で前の音を伸ばし、"." で休む。drums は k（バスドラム）・s（スネア）・h（ハイハット）・"."。
+ * patterns をつないだ順（order）で1曲になり、最後まで行ったら最初に戻る（ループ）
+ */
+export const musicScoreSchema = z.object({
+  bpm: z.number().positive(),
+  stepsPerBeat: z.number().int().positive(),
+  channels: z.record(
+    z.string(),
+    z.object({
+      wave: z.enum(['square', 'triangle', 'sawtooth', 'noise']),
+      duty: z.number().min(0.05).max(0.5).default(0.5),
+      volume: z.number().min(0).max(1),
+    }),
+  ),
+  patterns: z.record(z.string(), z.record(z.string(), z.string())),
+  order: z.array(z.string()).min(1),
+});
+export type MusicScore = z.infer<typeof musicScoreSchema>;

@@ -119,16 +119,7 @@ function users(k: string): string {
   return lines.filter((l) => l.types.has(type)).map((l) => pokeName(l.key)).join('・') || '—';
 }
 
-function kindOf(k: string): string {
-  const u = uniqueFrom.get(k);
-  if (u) return `固有技（${moveName(u.from)} ＋ ${itemName(u.item)}）`;
-  const d = derivedFrom.get(k);
-  if (d) return `派生技（${moveName(d.from)} ＋ ${itemName(d.item)}）`;
-  return 'タイプの技';
-}
-
 const fmt = (v: number | string | undefined): string => (v === 'infinite' ? '∞' : v === undefined ? '—' : typeof v === 'string' ? v : String(round(v)));
-const pair = (a: number | string | undefined, b: number | string | undefined): string => (fmt(a) === fmt(b) ? fmt(a) : `${fmt(a)} → ${fmt(b)}`);
 
 const keys = Object.keys(moves).sort((a, b) => {
   const ta = TYPE_ORDER.indexOf(genMoves[a]?.type ?? '');
@@ -142,10 +133,54 @@ out.push('# 08. 技の一覧表（自動で作る資料）');
 out.push('');
 out.push('`npm run moves-table` で `data/game/moves.json` などから作る。**手で直さない**（直すのはデータ。直したら作り直す）。');
 out.push('');
-out.push('- 数値は「レベル1 → 最大レベル」。変わらないものは1つだけ書く。');
+out.push('- 最初に派生のつながり（タイプの技 → 派生技 → 固有技）、次に強さの順の早見表、最後に派生の前後を並べた数値の表。');
 out.push('- **強さの目安**: 1体の敵に当て続けたときの1秒あたりのダメージ（威力 × 数 × 1回で当たる回数 ÷ 再使用）。ポケモンのステータス・タイプ一致・相性・持ち物は掛けていない。周りを回る・地面に残る・ビームは持続の間ずっと当たり続けたとして数えるので、多めに出る。');
 out.push('- **大きさ**は当たり判定の半径、**距離**は狙える距離・前に出る距離・回る半径・ビームの長さ（出し方による）。');
 out.push('');
+/** 派生のつながり: タイプの技（根）から、派生技・固有技までの道すじ */
+interface Step {
+  move: string;
+  /** この技になるための材料（根は null） */
+  via: Derivation | null;
+}
+const roots = keys.filter((k) => !derivedFrom.has(k) && !uniqueFrom.has(k));
+function paths(k: string, via: Derivation | null): Step[][] {
+  const next = derivesTo(k);
+  if (next.length === 0) return [[{ move: k, via }]];
+  return next.flatMap((d) => paths(d.to, d).map((p) => [{ move: k, via }, ...p]));
+}
+/** 根から、たどれる技を順に（根 → 派生技 → その固有技 → 次の派生技 …） */
+function chainMoves(k: string, via: Derivation | null): Step[] {
+  return [{ move: k, via }, ...derivesTo(k).flatMap((d) => chainMoves(d.to, d))];
+}
+const strength = (k: string): string => {
+  const def = moves[k]!;
+  return `${dps(def, statsAt(def, 1)).toFixed(1)} → ${dps(def, statsAt(def, def.levels.length + 1)).toFixed(1)}`;
+};
+const cell = (s: Step | undefined): string => (s ? `**${moveName(s.move)}**<br>${strength(s.move)}` : '');
+const material = (s: Step | undefined): string => (s?.via ? `＋${itemName(s.via.item)}${s.via.line ? `<br>（${pokeName(s.via.line)}だけ）` : ''}` : '');
+
+out.push('## 派生のつながり');
+out.push('');
+out.push('左から タイプの技 → 派生技 → 固有技。各技の下の数は強さの目安（Lv1 → 最大）。1つの技から2つに分かれるものは行を分け、2行目からは元の技を空けている。');
+out.push('');
+let rootType = '';
+for (const root of roots) {
+  const type = genMoves[root]?.type ?? '';
+  if (type !== rootType) {
+    rootType = type;
+    out.push(`### ${genTypes[type]?.names.ja ?? type}`);
+    out.push('');
+    out.push('| タイプの技 | 材料 | 派生技 | 材料 | 固有技 |');
+    out.push('|---|---|---|---|---|');
+  }
+  paths(root, null).forEach((p, row) => {
+    out.push(`| ${row === 0 ? cell(p[0]) : '〃'} | ${material(p[1])} | ${cell(p[1])} | ${material(p[2])} | ${cell(p[2])} |`);
+  });
+  const nextRoot = roots[roots.indexOf(root) + 1];
+  if (!nextRoot || (genMoves[nextRoot]?.type ?? '') !== type) out.push('');
+}
+
 out.push('## 早見表（強さの目安の順）');
 out.push('');
 out.push('| 技 | タイプ | 種類 | 出し方 | Lv1 | 最大 |');
@@ -163,32 +198,37 @@ for (const { k, def, d1, dm } of summary) {
 }
 out.push('');
 
-let currentType = '';
-for (const k of keys) {
-  const def = moves[k]!;
-  const g = genMoves[k];
-  const type = g?.type ?? '';
-  if (type !== currentType) {
-    currentType = type;
-    out.push(`## ${genTypes[type]?.names.ja ?? type}`);
+out.push('## 系統ごとの数値（派生の前後を並べる）');
+out.push('');
+out.push('タイプの技ごとに、その技と派生先を上から順に並べる。1つの技につき Lv1 と最大の2行。');
+out.push('');
+rootType = '';
+for (const root of roots) {
+  const type = genMoves[root]?.type ?? '';
+  if (type !== rootType) {
+    rootType = type;
+    out.push(`### ${genTypes[type]?.names.ja ?? type}`);
     out.push('');
   }
-  const max = def.levels.length + 1;
-  const a = statsAt(def, 1);
-  const b = statsAt(def, max);
-  out.push(`### ${moveName(k)}（${k}）`);
+  out.push(`#### ${moveName(root)} から`);
   out.push('');
-  out.push(`- ${kindOf(k)}・${ja[`pattern.${def.pattern}`] ?? def.pattern}・${g?.damageClass === 'physical' ? '物理' : '特殊'}・最大 Lv${max}`);
-  const next = derivesTo(k);
-  if (next.length) out.push(`- 派生先: ${next.map((d) => `${moveName(d.to)}（＋${itemName(d.item)}${d.line ? `・${pokeName(d.line)}だけ` : ''}）`).join('、')}`);
-  out.push(`- 使える系統: ${users(k)}`);
+  out.push('| 段階 | 技 | Lv | 強さの目安 | 威力 | 再使用（秒） | 数 | 大きさ | 距離 | 持続（秒） | 貫通 | 当たり直し（秒） | ノックバック | 状態異常 |');
+  out.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|');
+  for (const s of chainMoves(root, null)) {
+    const def = moves[s.move]!;
+    const max = def.levels.length + 1;
+    const stage = uniqueFrom.has(s.move) ? '固有' : derivedFrom.has(s.move) ? '派生' : 'タイプ';
+    const name = `**${moveName(s.move)}**${s.via ? `<br>（${moveName(s.via.from)} ＋${itemName(s.via.item)}${s.via.line ? `・${pokeName(s.via.line)}だけ` : ''}）` : ''}<br>${ja[`pattern.${def.pattern}`] ?? def.pattern}・${genMoves[s.move]?.damageClass === 'physical' ? '物理' : '特殊'}`;
+    for (const [i, level] of [1, max].entries()) {
+      const st = statsAt(def, level);
+      const status = st.statusId ? `${STATUS[st.statusId as string] ?? st.statusId} ${Math.round((st.statusChance as number) * 100)}%` : '—';
+      out.push(
+        `| ${i === 0 ? stage : ''} | ${i === 0 ? name : ''} | ${level} | ${dps(def, st).toFixed(1)} | ${fmt(st.power)} | ${fmt(st.cooldownSeconds)} | ${fmt(st.count)} | ${fmt(st.size)} | ${fmt(st.range)} | ${fmt(st.durationSeconds)} | ${fmt(st.pierce)} | ${fmt(st.hitIntervalSeconds)} | ${fmt(st.knockback)} | ${status} |`,
+      );
+    }
+  }
   out.push('');
-  out.push('| 強さの目安 | 威力 | 再使用（秒） | 数 | 大きさ | 距離 | 持続（秒） | 貫通 | 当たり直し（秒） | ノックバック | 状態異常 |');
-  out.push('|---|---|---|---|---|---|---|---|---|---|---|');
-  const status = a.statusId ? `${STATUS[a.statusId as string] ?? a.statusId} ${pair(Math.round((a.statusChance as number) * 100), Math.round((b.statusChance as number) * 100))}%` : '—';
-  out.push(
-    `| ${pair(dps(def, a).toFixed(1), dps(def, b).toFixed(1))} | ${pair(a.power, b.power)} | ${pair(a.cooldownSeconds, b.cooldownSeconds)} | ${pair(a.count, b.count)} | ${pair(a.size, b.size)} | ${pair(a.range, b.range)} | ${pair(a.durationSeconds, b.durationSeconds)} | ${pair(a.pierce, b.pierce)} | ${pair(a.hitIntervalSeconds, b.hitIntervalSeconds)} | ${pair(a.knockback, b.knockback)} | ${status} |`,
-  );
+  out.push(`使える系統: ${users(root)}`);
   out.push('');
 }
 

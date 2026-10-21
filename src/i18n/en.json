@@ -291,5 +291,13 @@
   "settings.test": "Test sound",
   "settings.back": "Back",
   "audio.muted": "Sound off (M to turn on)",
-  "audio.unmuted": "Sound on"
+  "audio.unmuted": "Sound on",
+  "pattern.whip": "Long sideways sweep",
+  "pattern.lob": "Thrown in an arc",
+  "pattern.strike": "Strikes random enemies",
+  "pattern.chain": "Jumps between enemies",
+  "pattern.bounce": "Bounces off screen edges",
+  "pattern.trail": "Left along your path",
+  "pattern.cross": "Fires in fixed directions",
+  "pattern.scatter": "Placed around you"
 }

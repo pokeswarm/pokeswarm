@@ -25,13 +25,16 @@ export function moveMaxLevel(def: MoveDefData): number {
   return def.levels.length + 1;
 }
 
+/** 当たり判定が別々の場所に出る出し方 */
+const SPREAD_PATTERNS = new Set(['orbit', 'screen', 'cross', 'strike', 'scatter', 'chain', 'whip', 'trail', 'lob', 'bounce']);
+
 export function moveStrength(def: MoveDefData, s: MoveStatsAt): number {
   const interval = s.hitIntervalSeconds as number;
   const hits = interval > 0 ? Math.max(1, Math.floor((s.durationSeconds as number) / interval)) : 1;
   // ゆびをふるは、出る技が毎回変わるので数えない
   if (def.pattern === 'metronome') return NaN;
-  // 周りを回るもの・画面じゅうの敵の足元に置くものは、1体に同時に当たるのはおおむね1つ
-  const perTarget = def.pattern === 'orbit' || def.pattern === 'screen' ? 1 : (s.count as number);
+  // 当たり判定が別々の場所に出るもの（周回・画面じゅう・十字・落雷・水たまり・連鎖・横なぎ・足あと・放物線・跳ね返り）は、1体に同時に当たるのはおおむね1つ
+  const perTarget = SPREAD_PATTERNS.has(def.pattern) ? 1 : (s.count as number);
   return ((s.power as number) * perTarget * hits) / (s.cooldownSeconds as number);
 }
 
@@ -66,6 +69,9 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
     case 'facing':
     case 'homing':
     case 'boomerang':
+    case 'cross':
+    case 'lob':
+    case 'bounce':
       area = 2 * size * Math.min(num('speed') * num('durationSeconds'), range || Infinity) * (def.pattern === 'boomerang' ? 2 : 1);
       break;
     case 'melee': {
@@ -74,7 +80,12 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
       break;
     }
     case 'beam':
+    case 'whip':
       area = range * 2 * size;
+      break;
+    case 'chain':
+      // 1本の線は、だいたい跳ぶ距離（range の半分）の長さ
+      area = range * 0.5 * 2 * size;
       break;
     case 'nova':
       area = Math.PI * range * range;

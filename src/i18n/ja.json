@@ -291,5 +291,13 @@
   "settings.test": "効果音を試す",
   "settings.back": "もどる",
   "audio.muted": "音を消しました（M で戻す）",
-  "audio.unmuted": "音を戻しました"
+  "audio.unmuted": "音を戻しました",
+  "pattern.whip": "左右に長く払う",
+  "pattern.lob": "放り投げて落とす",
+  "pattern.strike": "ランダムな敵に落ちる",
+  "pattern.chain": "敵から敵へ飛び移る",
+  "pattern.bounce": "画面の端で跳ね返る",
+  "pattern.trail": "歩いた跡に残る",
+  "pattern.cross": "決まった方向へ撃つ",
+  "pattern.scatter": "まわりに置く"
 }

@@ -3,6 +3,8 @@ import {
   MOTION_BOOMERANG,
   MOTION_FOLLOW,
   MOTION_HOMING,
+  MOTION_LOB,
+  MOTION_BOUNCE,
   MOTION_LINEAR,
   MOTION_ORBIT,
   SHAPE_CIRCLE,
@@ -111,7 +113,7 @@ export function useMoves(world: World): void {
         continue;
       }
       if (pm.cooldown > 0) continue;
-      const needsTarget = def.pattern === 'nearest' || def.pattern === 'homing';
+      const needsTarget = def.pattern === 'nearest' || def.pattern === 'homing' || def.pattern === 'chain';
       // 射程内に敵がいなければ待つ
       if (needsTarget && nearestEnemy(world, p.x, p.y, st.range) === -1) {
         pm.cooldown = 0;
@@ -148,6 +150,30 @@ export function useMoves(world: World): void {
           break;
         case 'metronome':
           fireMetronome(world, p);
+          break;
+        case 'whip':
+          fireWhip(world, p, pm, st);
+          break;
+        case 'lob':
+          fireLob(world, p, pm, st);
+          break;
+        case 'strike':
+          fireStrike(world, p, pm, st);
+          break;
+        case 'chain':
+          fireChain(world, p, pm, st);
+          break;
+        case 'bounce':
+          fireBounce(world, p, pm, st);
+          break;
+        case 'trail':
+          fireTrail(world, p, pm, st);
+          break;
+        case 'cross':
+          fireCross(world, p, pm, st);
+          break;
+        case 'scatter':
+          fireScatter(world, p, pm, st);
           break;
       }
     }
@@ -327,7 +353,7 @@ function fireScreen(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
 }
 
 /** 一度に出し終える出し方（ゆびをふるで選ぶ技。連射の出し方は、出し続ける状態を持てないので選ばない） */
-const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen']);
+const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter']);
 
 /** metronome（ゆびをふる）: ほかの技からランダムに1つを、その技の最大レベルで出す */
 function fireMetronome(world: World, p: Player): void {
@@ -340,12 +366,142 @@ function fireMetronome(world: World, p: Player): void {
   const def = world.rules.moves[move]!;
   const pm: PlayerMove = { move, level: def.levels.length, cooldown: 0, burstLeft: 0, burstTimer: 0 };
   const st = moveStatsOf(world, pm);
-  if (def.pattern === 'melee') fireMelee(world, p, pm, st);
-  else if (def.pattern === 'orbit') fireOrbit(world, p, pm, st);
-  else if (def.pattern === 'beam') fireBeam(world, p, pm, st);
-  else if (def.pattern === 'ground') fireGround(world, p, pm, st);
-  else if (def.pattern === 'nova') fireNova(world, p, pm, st);
-  else fireScreen(world, p, pm, st);
+  const fire: Record<string, (w: World, p: Player, pm: PlayerMove, st: MoveStats) => void> = {
+    melee: fireMelee,
+    orbit: fireOrbit,
+    beam: fireBeam,
+    ground: fireGround,
+    nova: fireNova,
+    screen: fireScreen,
+    whip: fireWhip,
+    lob: fireLob,
+    strike: fireStrike,
+    chain: fireChain,
+    bounce: fireBounce,
+    cross: fireCross,
+    scatter: fireScatter,
+  };
+  fire[def.pattern]?.(world, p, pm, st);
+}
+
+/** whip（横なぎ）: 左右へ長い直線で払う。向いている側（左右）から、count 2 で反対側、3・4 で上下も */
+function fireWhip(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const side = p.facingX < 0 ? -1 : 1;
+  const dirs: [number, number][] = [
+    [side, 0],
+    [-side, 0],
+    [0, -1],
+    [0, 1],
+  ];
+  const body = world.rules.moves[pm.move]!.body;
+  if (body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: side, dirY: 0, distance: body.lungeDistance, afterimages: body.afterimages });
+  for (const [dx, dy] of dirs.slice(0, Math.max(1, Math.min(4, st.count)))) {
+    const length = rayLengthToObstacle(world, p.x, p.y, dx, dy, st.range);
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, shape: SHAPE_LINE, length, dirX: dx, dirY: dy, vx: dx, vy: dy });
+  }
+}
+
+/** lob（放物線）: 向いている側の斜め上へ投げ、重さで弧を描いて落ちる */
+function fireLob(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const speed = scaledMoveStats(world, p, pm, st).speed;
+  const side = p.facingX < 0 ? -1 : p.facingX > 0 ? 1 : world.rng.next() < 0.5 ? -1 : 1;
+  for (let k = 0; k < st.count; k++) {
+    // 数が多いときは、左右・高さをばらつかせる
+    const sx = (k % 2 === 0 ? side : -side) * (0.25 + world.rng.next() * 0.35);
+    const vy = -(0.85 + world.rng.next() * 0.3);
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LOB, x: p.x, y: p.y, vx: sx * speed, vy: vy * speed, angularSpeed: speed * 2.2 });
+  }
+}
+
+/** range の中にいる敵（同じ敵は1回だけ） */
+function enemiesInRange(world: World, x: number, y: number, range: number): number[] {
+  const { enemies: e, enemyHash, scratch } = world;
+  const n = enemyHash.queryRect(x - range, y - range, x + range, y + range, scratch);
+  const out: number[] = [];
+  const seen = new Set<number>();
+  for (let k = 0; k < n; k++) {
+    const i = scratch[k]!;
+    if (e.hp[i]! <= 0 || seen.has(i)) continue;
+    seen.add(i);
+    if ((e.x[i]! - x) ** 2 + (e.y[i]! - y) ** 2 <= range * range) out.push(i);
+  }
+  // ハッシュの並び順に左右されないように、id の順にそろえてから乱数で選ぶ
+  return out.sort((a, b) => e.id[a]! - e.id[b]!);
+}
+
+/** strike（落雷）: range の中のランダムな敵 count 体の足元に、同時に当たり判定を置く */
+function fireStrike(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const e = world.enemies;
+  const pool = enemiesInRange(world, p.x, p.y, st.range);
+  for (let k = 0; k < st.count && pool.length > 0; k++) {
+    const i = pool.splice(world.rng.int(pool.length), 1)[0]!;
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]! });
+  }
+}
+
+/** chain（連鎖）: 一番近い敵から、近くの敵へ count 回飛び移る線（1回に range の半分まで跳ぶ） */
+function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const e = world.enemies;
+  let x = p.x;
+  let y = p.y;
+  let reach = st.range;
+  const used = new Set<number>();
+  for (let k = 0; k < st.count; k++) {
+    let best = -1;
+    let bestD2 = reach * reach;
+    for (const i of enemiesInRange(world, x, y, reach)) {
+      if (used.has(i)) continue;
+      const d2 = (e.x[i]! - x) ** 2 + (e.y[i]! - y) ** 2;
+      if (d2 < bestD2) {
+        bestD2 = d2;
+        best = i;
+      }
+    }
+    if (best === -1) break;
+    used.add(best);
+    const len = Math.sqrt(bestD2) || 1;
+    const dx = (e.x[best]! - x) / len;
+    const dy = (e.y[best]! - y) / len;
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, shape: SHAPE_LINE, length: len, dirX: dx, dirY: dy });
+    x = e.x[best]!;
+    y = e.y[best]!;
+    reach = st.range * 0.5;
+  }
+}
+
+/** bounce（跳ね返り）: ランダムな方向へ飛び、自分のまわりの枠の端で跳ね返る */
+function fireBounce(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const speed = scaledMoveStats(world, p, pm, st).speed;
+  for (let k = 0; k < st.count; k++) {
+    const a = world.rng.next() * Math.PI * 2;
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_BOUNCE, x: p.x, y: p.y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, ox: st.range, oy: st.range * 0.56 });
+  }
+}
+
+/** trail（足あと）: 歩いていると、足元にしばらく残る当たり判定を置く */
+function fireTrail(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  if (p.x === p.prevX && p.y === p.prevY) return;
+  world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x, y: p.y });
+}
+
+/** cross（十字）: 向いている方向から等しい角度で count 方向へ同時に撃つ */
+function fireCross(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  const start = Math.atan2(fy, fx);
+  const speed = scaledMoveStats(world, p, pm, st).speed;
+  for (let k = 0; k < st.count; k++) {
+    const a = start + (k / st.count) * Math.PI * 2;
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x, y: p.y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed });
+  }
+}
+
+/** scatter（水たまり）: 自分の周り range の中のランダムな場所に、しばらく残る当たり判定を置く */
+function fireScatter(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  for (let k = 0; k < st.count; k++) {
+    const a = world.rng.next() * Math.PI * 2;
+    const r = st.range * (0.3 + world.rng.next() * 0.7);
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x + Math.cos(a) * r, y: p.y + Math.sin(a) * r });
+  }
 }
 
 /** nova: 自分を中心に、大きさ size から range まで広がる輪 */
@@ -399,6 +555,18 @@ export function moveProjectiles(world: World): void {
       const k = 1 - 2 * (1 - pr.life[i]! / pr.maxLife[i]!);
       pr.x[i]! += pr.ox[i]! * k * world.dt;
       pr.y[i]! += pr.oy[i]! * k * world.dt;
+    } else if (motion === MOTION_LOB) {
+      pr.vy[i]! += pr.angularSpeed[i]! * world.dt;
+      pr.x[i]! += pr.vx[i]! * world.dt;
+      pr.y[i]! += pr.vy[i]! * world.dt;
+    } else if (motion === MOTION_BOUNCE) {
+      pr.x[i]! += pr.vx[i]! * world.dt;
+      pr.y[i]! += pr.vy[i]! * world.dt;
+      // 持ち主のまわりの枠の端で跳ね返る（持ち主がいなければ、そのまま飛ぶ）
+      if (owner) {
+        if ((pr.x[i]! > owner.x + pr.ox[i]! && pr.vx[i]! > 0) || (pr.x[i]! < owner.x - pr.ox[i]! && pr.vx[i]! < 0)) pr.vx[i] = -pr.vx[i]!;
+        if ((pr.y[i]! > owner.y + pr.oy[i]! && pr.vy[i]! > 0) || (pr.y[i]! < owner.y - pr.oy[i]! && pr.vy[i]! < 0)) pr.vy[i] = -pr.vy[i]!;
+      }
     } else if (motion === MOTION_HOMING) {
       const t = nearestEnemy(world, pr.x[i]!, pr.y[i]!, 300);
       if (t !== -1) {
@@ -429,7 +597,7 @@ export function moveProjectiles(world: World): void {
       continue;
     }
     // 障害物は技も遮る（飛んでいく技は当たると消える）
-    if ((motion === MOTION_LINEAR || motion === MOTION_HOMING || motion === MOTION_BOOMERANG) && insideObstacle(world, pr.x[i]!, pr.y[i]!)) {
+    if ((motion === MOTION_HOMING || motion === MOTION_BOOMERANG || motion === MOTION_LOB || motion === MOTION_BOUNCE || (motion === MOTION_LINEAR && (pr.vx[i] !== 0 || pr.vy[i] !== 0))) && insideObstacle(world, pr.x[i]!, pr.y[i]!)) {
       world.events.push({ type: 'projectileHit', x: pr.x[i]!, y: pr.y[i]!, owner: pr.owner[i]!, move: pr.move[i]! });
       pr.removeAt(i);
       continue;

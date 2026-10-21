@@ -379,3 +379,8 @@ pokeswarm/
 - 押し合いの後で、プレイヤー（自分のブラウザで動かす人）と敵を障害物の外へ押し出す（`blockByObstacles`）。飛ぶ技は障害物の中に入ったら消える。ビームは出すときに障害物の手前までの長さにする。
 - 描画は `ObstacleView`（画面に見えるマスだけ画像を割り当てて使い回す。depth 0.3 = 敵より上、予告の範囲より下）。
 - `npm run balance`: 20系統すべてクリア。
+
+### 13.9 技の型（07 18章。2026年10月21日）
+- 出し方に whip・lob・strike・chain・bounce・trail・cross・scatter を足した（`src/sim/systems/attack.ts`）。当たり判定の動きに MOTION_LOB（angularSpeed を下向きの加速度に使う）と MOTION_BOUNCE（ox・oy を、持ち主のまわりの枠の半分の幅に使う）を足した。
+- 横なぎ・連鎖は直線（SHAPE_LINE）、落雷・水たまり・足あとは動かない円。飛ぶもの（放物線・跳ね返り・十字など）は障害物に当たると消える。
+- 強さの目安（単体・群れ）、アイコンの絵柄、出し方の名前（翻訳ファイル）も足した。テストで型ごとの動きを確かめる（`src/sim/patterns.test.ts`）。

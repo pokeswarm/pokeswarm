@@ -371,8 +371,37 @@ export type CombatConfig = z.infer<typeof combatConfigSchema>;
  * - homing: 一番近い敵を追いかける発射体
  * - screen: range の中の近い敵 count 体の足元に、同時に当たり判定を置く（画面じゅうの敵へ。ぜったいれいど・たたりめ など）
  * - metronome: 使うたびに、ほかの技からランダムに1つを、その技の最大レベルで出す（ゆびをふる。ミュウ）
+ * 技の「型」（作者の決定。07_content_draft.md 18章。ヴァンパイアサバイバーズの武器のように、技ごとに長所と短所をはっきりさせる）:
+ * - whip（横なぎ）: 左右へとても長い直線で払う（向いている側から。count 2 で反対側、3・4 で上下も）
+ * - lob（放物線）: 上へ投げ、重さで弧を描いて落ちる（貫通。近くの敵に当てにくい）
+ * - strike（落雷）: range の中のランダムな敵 count 体の足元に、同時に当たり判定を置く
+ * - chain（連鎖）: 一番近い敵から、近くの敵へ count 回飛び移る線（range の半分まで跳ぶ）
+ * - bounce（跳ね返り）: ランダムな方向へ飛び、自分の周りの画面くらいの範囲（range × 0.56 の高さ）の端で跳ね返る
+ * - trail（足あと）: 歩いていると、自分の足元にしばらく残る当たり判定を置く（止まっていると出ない）
+ * - cross（十字）: 向いている方向から等しい角度で count 方向へ同時に撃つ（4 で十字、8 で全方向）
+ * - scatter（水たまり）: 自分の周り range の中のランダムな場所に、しばらく残る当たり判定を置く
  */
-export const MOVE_PATTERNS = ['nearest', 'facing', 'melee', 'orbit', 'beam', 'boomerang', 'ground', 'nova', 'homing', 'screen', 'metronome'] as const;
+export const MOVE_PATTERNS = [
+  'nearest',
+  'facing',
+  'melee',
+  'orbit',
+  'beam',
+  'boomerang',
+  'ground',
+  'nova',
+  'homing',
+  'screen',
+  'metronome',
+  'whip',
+  'lob',
+  'strike',
+  'chain',
+  'bounce',
+  'trail',
+  'cross',
+  'scatter',
+] as const;
 export type MovePattern = (typeof MOVE_PATTERNS)[number];
 
 const pierceValue = z.union([z.number().int().positive(), z.literal('infinite')]);

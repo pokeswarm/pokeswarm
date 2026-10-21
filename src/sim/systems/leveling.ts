@@ -37,13 +37,9 @@ export function openLevelUpIfPending(world: World): void {
     world.pendingLevelUps = 0;
     return;
   }
+  // 全員分の候補をホストが作る（同じアイテムがほかの人の候補に出ていてもよい。作者の決定で重複を防ぐ決まりは廃止）
   const offers = new Map<PlayerId, UpgradeOffer[]>();
-  const offeredItems = new Set<number>();
-  for (const p of world.players) {
-    const list = makeOffers(world, p, offeredItems);
-    for (const o of list) if (o.kind === 'itemNew') offeredItems.add(o.item);
-    offers.set(p.id, list);
-  }
+  for (const p of world.players) offers.set(p.id, makeOffers(world, p));
   world.levelUp = {
     level: world.level - world.pendingLevelUps + 1,
     offers,
@@ -149,10 +145,7 @@ export function rerollUpgrades(world: World, playerId: PlayerId): void {
   const p = world.players.find((x) => x.id === playerId);
   if (!lu || !p || lu.done.has(playerId) || p.rerolls <= 0) return;
   p.rerolls--;
-  // ほかの人に出ている持ち物は出さない
-  const others = new Set<number>();
-  for (const [id, list] of lu.offers) if (id !== playerId) for (const o of list) if (o.kind === 'itemNew') others.add(o.item);
-  lu.offers.set(playerId, makeOffers(world, p, others));
+  lu.offers.set(playerId, makeOffers(world, p));
 }
 
 /**
@@ -193,11 +186,9 @@ export function banUpgrade(world: World, playerId: PlayerId, index: number): voi
   if (!key) return;
   p.bans--;
   p.banned.add(key);
-  // 代わり: 今の候補・ほかの人に出ている持ち物と重ならないもの
-  const others = new Set<number>();
-  for (const [id, l] of lu.offers) if (id !== playerId) for (const o of l) if (o.kind === 'itemNew') others.add(o.item);
+  // 代わり: 今の候補と重ならないもの
   const same = (a: UpgradeOffer, b: UpgradeOffer): boolean => JSON.stringify(a) === JSON.stringify(b);
-  const replacement = makeOffers(world, p, others).find((o) => !list.some((x) => same(x, o)));
+  const replacement = makeOffers(world, p).find((o) => !list.some((x) => same(x, o)));
   const next = [...list];
   if (replacement) next[index] = replacement;
   else next.splice(index, 1);
@@ -212,7 +203,7 @@ function isBaseMove(world: World, move: number): boolean {
 /**
  * 候補を作る（01_game_design.md 3.2・3.3、4.2）。
  * - 派生・固有技の条件（元の技が最大レベル ＋ 材料の持ち物）がそろっていれば必ず出す
- * - 残りは、技（自分のタイプとノーマル。枠が空いていれば新しい技、覚えている技の強化）・持ち物（同じ回でほかの人の候補に出ているものは出さない）・パッシブから選ぶ
+ * - 残りは、技（自分のタイプとノーマル。枠が空いていれば新しい技、覚えている技の強化）・持ち物・パッシブから選ぶ
  */
 /**
  * 持ち物がこのプレイヤーの候補に出るか。タイプの持ち物（もくたん・石など）は、自分のタイプのものか、
@@ -229,7 +220,7 @@ function itemFitsPlayer(world: World, p: Player, item: number): boolean {
   return world.rules.species[p.species]?.evolutions.some((e) => e.trigger !== 'level' && e.item === item) ?? false;
 }
 
-export function makeOffers(world: World, p: Player, excludeItems: ReadonlySet<number> = new Set()): UpgradeOffer[] {
+export function makeOffers(world: World, p: Player): UpgradeOffer[] {
   const rules = world.rules;
   const count = rules.leveling.offerCount;
   const guaranteed: UpgradeOffer[] = [];
@@ -262,8 +253,6 @@ export function makeOffers(world: World, p: Player, excludeItems: ReadonlySet<nu
     rules.items.forEach((_, item) => {
       // 自分がすでに持っている持ち物は「強化」で出す（ほかの人が持っていても出る。作者の決定で「誰かが持っていれば出さない」は廃止）
       if (p.items.some((it) => it.item === item)) return;
-      // 同じ回で、ほかの人の候補に出ている持ち物も出さない
-      if (excludeItems.has(item)) return;
       if (!itemFitsPlayer(world, p, item)) return;
       pool.push({ kind: 'itemNew', item });
     });

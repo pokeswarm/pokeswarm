@@ -10,6 +10,10 @@ export const MOTION_ORBIT = 2;
 export const MOTION_BOOMERANG = 3;
 /** 一番近い敵を追いかける */
 export const MOTION_HOMING = 4;
+/** 放物線: 速さに重さ（angularSpeed を下向きの加速度に使う）を足して落ちる */
+export const MOTION_LOB = 5;
+/** 跳ね返り: 持ち主のまわりの枠（横 ox・縦 oy の半分の幅）の端で跳ね返る */
+export const MOTION_BOUNCE = 6;
 
 /** 当たり判定の形: 円（半径 radius） */
 export const SHAPE_CIRCLE = 0;

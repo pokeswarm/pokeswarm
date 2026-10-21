@@ -5,7 +5,7 @@
     "squirtle": { "sprite": "squirtle", "startingMoves": ["water-gun"] },
     "onix": { "sprite": "onix", "startingMoves": ["rock-throw"] },
     "staryu": { "sprite": "staryu", "startingMoves": ["bubble"], "unlock": "starmie" },
-    "pikachu": { "sprite": "pikachu", "startingMoves": ["spark"], "unlock": "raichu" },
+    "pikachu": { "sprite": "pikachu", "startingMoves": ["spark"], "unlock": "raichu", "evolves": false },
     "oddish": { "sprite": "oddish", "startingMoves": ["vine-whip"], "unlock": "vileplume" },
     "koffing": { "sprite": "koffing", "startingMoves": ["smog"], "unlock": "weezing" },
     "abra": { "sprite": "abra", "startingMoves": ["confusion"], "unlock": "alakazam" },

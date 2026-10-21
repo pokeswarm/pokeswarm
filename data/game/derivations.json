@@ -25,9 +25,9 @@
     { "from": "seed-bomb", "item": "miracle-seed", "to": "frenzy-plant", "line": "bulbasaur" },
     { "from": "razor-leaf", "item": "miracle-seed", "to": "petal-dance", "line": "oddish" },
     { "from": "sludge-wave", "item": "poison-barb", "to": "explosion", "line": "koffing" },
-    { "from": "wild-charge", "item": "magnet", "to": "volt-tackle", "line": "pikachu" },
     { "from": "rock-slide", "item": "hard-stone", "to": "stone-edge", "line": "onix" },
     { "from": "earthquake", "item": "soft-sand", "to": "fissure", "line": "rhyhorn" },
-    { "from": "psychic", "item": "twisted-spoon", "to": "future-sight", "line": "abra" }
+    { "from": "psychic", "item": "twisted-spoon", "to": "future-sight", "line": "abra" },
+    { "from": "quick-attack", "item": "light-ball", "to": "volt-tackle", "line": "pikachu", "minLevel": 51 }
   ]
 }

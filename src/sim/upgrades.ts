@@ -29,6 +29,10 @@ export interface SimUpgradeDef {
   readonly consumable: boolean;
   /** 1段階あたりの効果 */
   readonly perLevel: Modifiers;
+  /** この系統だけが持てる（無ければだれでも） */
+  readonly lines?: readonly string[];
+  /** 持っているあいだ、技の威力に掛ける倍率 */
+  readonly powerMultiplier?: number;
 }
 
 export interface SimDerivation {
@@ -39,6 +43,8 @@ export interface SimDerivation {
   readonly to: number;
   /** 固有技なら系統（playables.json のキー）。派生技なら null */
   readonly line: string | null;
+  /** このレベル以上でないと覚えられない */
+  readonly minLevel?: number;
 }
 
 /** シミュレーションが使うレベルアップの定義 */

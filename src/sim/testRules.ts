@@ -24,6 +24,7 @@ export const TEST_MOVE: MoveStats = {
   lifestealPct: 0,
   critChancePct: 0,
   instakillChance: 0,
+  arcDegrees: 0,
 };
 
 /** テスト用のタイプ: 0 ノーマル、1 ほのお、2 くさ、3 みず（ほのお → くさ がばつぐん、など） */
@@ -64,6 +65,7 @@ export function testRules(
     damageClass: 'special',
     levels: [{ ...TEST_MOVE, ...overrides.move }],
     effect: 'test',
+    body: null,
   };
   const leveling = {
     maxLevel: 100,
@@ -154,5 +156,5 @@ export function testRules(
 
 /** テスト用: 指定の出し方・性能の技を作る */
 export function testMove(key: string, pattern: SimMoveDef['pattern'], stats: Partial<MoveStats>, type = 0): SimMoveDef {
-  return { key, pattern, type, damageClass: 'special', levels: [{ ...TEST_MOVE, ...stats }], effect: 'test' };
+  return { key, pattern, type, damageClass: 'special', levels: [{ ...TEST_MOVE, ...stats }], effect: 'test', body: null };
 }

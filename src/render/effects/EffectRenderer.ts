@@ -116,6 +116,8 @@ export class EffectRenderer {
     timeMs: number,
     /** 直線の当たり判定（ビーム）なら長さと向き。円なら null */
     lineOf: (index: number) => { length: number; dirX: number; dirY: number } | null = () => null,
+    /** 扇形の当たり判定なら向きと片側の開き（ラジアン）。円なら null */
+    sectorOf: (index: number) => { dirX: number; dirY: number; half: number } | null = () => null,
   ): void {
     // 軌跡のパーティクルを出す数は、レシピごとの間隔で決める
     const trailCounts = new Map<string, number>();
@@ -135,9 +137,20 @@ export class EffectRenderer {
       const recipe = this.recipe(recipeId);
       const body = recipe.projectile;
       const trail = recipe.trail;
-      const x = src.prevX[i]! + (src.x[i]! - src.prevX[i]!) * alpha;
-      const y = src.prevY[i]! + (src.y[i]! - src.prevY[i]!) * alpha;
-      const r = src.radius[i]!;
+      let x = src.prevX[i]! + (src.x[i]! - src.prevX[i]!) * alpha;
+      let y = src.prevY[i]! + (src.y[i]! - src.prevY[i]!) * alpha;
+      let r = src.radius[i]!;
+      const sector = sectorOf(i);
+      if (sector) {
+        // 扇形: 自分の周り全部なら輪の上に薄く、前方の扇なら扇の真ん中に置く
+        if (sector.half < Math.PI) {
+          x += sector.dirX * r * 0.55;
+          y += sector.dirY * r * 0.55;
+          r *= Math.min(0.5, Math.sin(Math.min(sector.half, Math.PI / 2)) * 0.6 + 0.15);
+        } else {
+          r *= 0.8;
+        }
+      }
       if (trail) {
         const em = this.emitter(this.trailEmitters, recipeId, trail, this.depth - 0.5);
         const n = trailCountOf(recipeId, trail);

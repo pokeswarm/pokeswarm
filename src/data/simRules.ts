@@ -43,16 +43,26 @@ export function buildSimRules(): SimRules {
       damageClass: g.damageClass === 'physical' ? 'physical' : 'special',
       levels: resolveMoveLevels(def, statusIndexOf),
       effect: def.effect,
+      body: def.body ?? null,
     };
   });
   const moveIndex = (key: string): number => moves.findIndex((m) => m.key === key);
-  const upgrades = (defs: Record<string, { maxLevel: number; consumable: boolean; perLevel: Parameters<typeof resolveModifiers>[0] }>): SimUpgradeDef[] =>
-    Object.entries(defs).map(([key, d]) => ({ key, maxLevel: d.maxLevel, consumable: d.consumable, perLevel: resolveModifiers(d.perLevel, types.names) }));
+  const upgrades = (
+    defs: Record<string, { maxLevel: number; consumable: boolean; perLevel: Parameters<typeof resolveModifiers>[0]; lines?: string[]; powerMultiplier?: number }>,
+  ): SimUpgradeDef[] =>
+    Object.entries(defs).map(([key, d]) => ({
+      key,
+      maxLevel: d.maxLevel,
+      consumable: d.consumable,
+      perLevel: resolveModifiers(d.perLevel, types.names),
+      ...(d.lines ? { lines: d.lines } : {}),
+      ...(d.powerMultiplier ? { powerMultiplier: d.powerMultiplier } : {}),
+    }));
   const items = upgrades(itemsConfig.items);
   const itemIndex = (key: string): number => items.findIndex((i) => i.key === key);
   const derivations = [
     ...derivationsConfig.derivations.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: null })),
-    ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: d.line })),
+    ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: d.line, ...(d.minLevel ? { minLevel: d.minLevel } : {}) })),
   ];
   // ポケモンの種類: PokeAPI から生成したすべて。進化先・進化の道具が無いものは進化の一覧から外す
   const speciesKeys = Object.keys(generated.pokemon);
@@ -60,6 +70,8 @@ export function buildSimRules(): SimRules {
   const species: SimSpecies[] = speciesKeys.map((key) => {
     const g = generated.pokemon[key]!;
     const evolutions: SimEvolution[] = [];
+    // 進化しない遊べるポケモン（ピカチュウ）
+    if (playablesConfig.pokemon[key]?.evolves === false) return { key, types: g.types.map(typeIndex), baseStats: g.baseStats, evolutions };
     for (const e of g.evolvesTo) {
       const to = speciesKeys.indexOf(e.to);
       if (to === -1) continue;

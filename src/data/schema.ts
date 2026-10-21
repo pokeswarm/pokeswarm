@@ -412,6 +412,11 @@ export const moveStatsSchema = z.object({
   critChancePct: z.number().nonnegative().default(0),
   /** 雑魚を一撃で倒す確率（0〜1。じわれ。中ボス・ボス・伝説には効かない） */
   instakillChance: z.number().min(0).max(1).default(0),
+  /**
+   * 近接（melee）の当たり判定を、自分を中心にした扇形にする角度（度）。0 なら今までどおり前に置く円。
+   * 扇の半径は range + size。360 で自分の周り全部（たいあたり → のしかかり は扇が全方向に広がる）
+   */
+  arcDegrees: z.number().min(0).max(360).default(0),
 });
 export type MoveStatsData = z.infer<typeof moveStatsSchema>;
 
@@ -436,6 +441,7 @@ export const moveLevelDeltaSchema = z
     lifestealPct: z.number(),
     critChancePct: z.number(),
     instakillChance: z.number(),
+    arcDegrees: z.number(),
   })
   .partial();
 export type MoveLevelDelta = z.infer<typeof moveLevelDeltaSchema>;
@@ -448,6 +454,11 @@ export const moveDefSchema = z.object({
   base: moveStatsSchema,
   /** レベル2以降で足す量。最大レベルは levels の数 + 1 */
   levels: z.array(moveLevelDeltaSchema),
+  /**
+   * 自分の体で攻撃する技（たいあたり・でんこうせっか など）の見た目: 使うたびに、向いている方向へ一瞬
+   * lungeDistance だけ体を出して戻す。afterimages があれば、その数の残像を前方に残す（でんこうせっか）
+   */
+  body: z.object({ lungeDistance: z.number().positive(), afterimages: z.number().int().nonnegative().default(0) }).optional(),
 });
 export type MoveDefData = z.infer<typeof moveDefSchema>;
 
@@ -464,6 +475,8 @@ export const playablesConfigSchema = z.object({
       sprite: z.string(),
       /** 最初に覚えている技 */
       startingMoves: z.array(z.string()).min(1),
+      /** false なら進化しない（ピカチュウ: 原作へのオマージュで、ライチュウにならずボルテッカーを覚える） */
+      evolves: z.boolean().default(true),
       /**
        * 解放の名前（data/game/unlocks.json の pokemon）。省略時はこのキー。
        * 解放したポケモンは進化前の姿から始めるので、ヒトデマンはスターミーの解放で遊べるようになる
@@ -848,6 +861,10 @@ const upgradeDefSchema = z.object({
   /** 進化・派生に使うとなくなる（進化の石・つながりのヒモ） */
   consumable: z.boolean().default(false),
   perLevel: modifierSchema,
+  /** この系統（data/game/playables.json のキー）だけが持てる（でんきだま = ピカチュウ） */
+  lines: z.array(z.string()).optional(),
+  /** 持っているあいだ、技の威力に掛ける倍率（でんきだま 2） */
+  powerMultiplier: z.number().positive().optional(),
 });
 
 /** 持ち物。キーは PokeAPI の持ち物の名前 */
@@ -898,6 +915,8 @@ export const derivationsConfigSchema = z.object({
       to: z.string(),
       /** 系統（data/game/playables.json のキー） */
       line: z.string(),
+      /** このレベル以上でないと覚えられない（ボルテッカー: レベル50を超える） */
+      minLevel: z.number().int().positive().optional(),
     }),
   ),
 });

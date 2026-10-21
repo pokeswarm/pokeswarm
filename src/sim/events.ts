@@ -179,6 +179,16 @@ export interface LegendaryWarningEvent {
   readonly kind: number;
 }
 
+/** 自分の体で攻撃する技を使った（見た目: 体を前後させる・残像） */
+export interface BodyAttackEvent {
+  readonly type: 'bodyAttack';
+  readonly playerId: PlayerId;
+  readonly dirX: number;
+  readonly dirY: number;
+  readonly distance: number;
+  readonly afterimages: number;
+}
+
 /** 次の区間へ進んだ（中ボスを倒した、または区間の時間がたった） */
 export interface SectionAdvancedEvent {
   readonly type: 'sectionAdvanced';
@@ -248,6 +258,7 @@ export type SimEvent =
   | PlayerLeftEvent
   | SwarmStartedEvent
   | SectionAdvancedEvent
+  | BodyAttackEvent
   | ItemSpawnedEvent
   | ItemRequestedEvent
   | ItemCollectedEvent

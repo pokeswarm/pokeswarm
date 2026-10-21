@@ -6,6 +6,7 @@ import {
   MOTION_ORBIT,
   SHAPE_CIRCLE,
   SHAPE_LINE,
+  SHAPE_SECTOR,
   type ProjectileSpawn,
 } from '../entities/projectiles';
 import type { Player, PlayerMove } from '../entities/player';
@@ -16,6 +17,16 @@ import type { World } from '../world';
 import { applyHitEffect } from './commands';
 import { healPlayer } from './health';
 import { breakOnDamage, damageTakenMultiplier } from './status';
+
+/** 持ち物の威力の倍率（でんきだま: その系統が持っているときだけ） */
+function heldPowerMultiplier(world: World, p: Player): number {
+  let m = 1;
+  for (const it of p.items) {
+    const def = world.rules.items[it.item]!;
+    if (def.powerMultiplier && (!def.lines || def.lines.includes(p.line))) m *= def.powerMultiplier;
+  }
+  return m;
+}
 
 /** 一撃で倒すときのダメージ（どの雑魚の HP より大きい） */
 const INSTAKILL_DAMAGE = 1e9;
@@ -36,7 +47,8 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
     power:
       st.power *
       (def.damageClass === 'physical' ? p.physicalPower : p.specialPower) *
-      Math.max(0, 1 + (m.powerPct + classPct + (m.typePowerPct[def.type] ?? 0)) / 100),
+      Math.max(0, 1 + (m.powerPct + classPct + (m.typePowerPct[def.type] ?? 0)) / 100) *
+      heldPowerMultiplier(world, p),
     size: st.size * Math.max(0.1, 1 + (m.areaPct + (m.typeAreaPct[def.type] ?? 0)) / 100),
     speed: st.speed * Math.max(0.1, 1 + m.projectileSpeedPct / 100),
     cooldownSeconds: st.cooldownSeconds * Math.max(0.2, 1 + m.cooldownPct / 100),
@@ -198,6 +210,19 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
 /** melee: 向いている方向 → 反対側 → 左 → 右 の順に当たり判定を出す（持ち主に付いていく。range 0 なら自分の周り） */
 function fireMelee(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  const body = world.rules.moves[pm.move]!.body;
+  if (body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: fx, dirY: fy, distance: body.lungeDistance, afterimages: body.afterimages });
+  if (st.arcDegrees > 0) {
+    // 扇形: 自分を中心に、向いている方向へ（360 度なら自分の周り全部。数が2以上なら反対側にも）
+    const sc = scaledMoveStats(world, p, pm, st);
+    const half = Math.min(Math.PI, (st.arcDegrees * Math.PI) / 360);
+    const n = half >= Math.PI ? 1 : Math.min(st.count, 2);
+    for (let k = 0; k < n; k++) {
+      const s = k === 0 ? 1 : -1;
+      world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: st.range + sc.size, shape: SHAPE_SECTOR, length: half, dirX: fx * s, dirY: fy * s, vx: fx * s, vy: fy * s });
+    }
+    return;
+  }
   const dirs: [number, number][] = [
     [fx, fy],
     [-fx, -fy],
@@ -236,6 +261,8 @@ function fireOrbit(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
  */
 function fireBeam(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const [ax, ay] = aim(world, p, st.range);
+  const body = world.rules.moves[pm.move]!.body;
+  if (body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: ax, dirY: ay, distance: body.lungeDistance, afterimages: body.afterimages });
   const step = st.spreadDegrees > 0 ? st.spreadDegrees / st.count : 12;
   for (let k = 0; k < st.count; k++) {
     const offset = ((k - (st.count - 1) / 2) * step * Math.PI) / 180;
@@ -275,6 +302,17 @@ function fireNova(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
   for (let k = 0; k < st.count; k++) {
     world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, growth, life: st.durationSeconds * (1 + k * 0.6) });
   }
+}
+
+/** 扇の中心から (dx, dy) にある半径 r の敵が、向き (fx, fy)・片側の開き half の扇の角度に入るか（距離は別に確かめる） */
+function inSector(dx: number, dy: number, r: number, fx: number, fy: number, half: number): boolean {
+  if (half >= Math.PI) return true;
+  const d = Math.sqrt(dx * dx + dy * dy);
+  if (d <= r) return true;
+  const cos = (dx * fx + dy * fy) / d;
+  const angle = Math.acos(Math.max(-1, Math.min(1, cos)));
+  // 敵の大きさの分だけ、角度の判定をゆるめる
+  return angle <= half + Math.asin(Math.min(1, r / d));
 }
 
 /** 点 (px, py) と、始点 (x, y)・向き (dx, dy)・長さ len の線分との距離の2乗 */
@@ -354,7 +392,9 @@ export function moveProjectiles(world: World): void {
       const d2 = line
         ? segmentDistance2(e.x[j]!, e.y[j]!, x, y, pr.dirX[i]!, pr.dirY[i]!, len)
         : (e.x[j]! - x) * (e.x[j]! - x) + (e.y[j]! - y) * (e.y[j]! - y);
-      if (d2 <= r * r) hitScratch[hits++] = j;
+      if (d2 > r * r) continue;
+      if (pr.shape[i] === SHAPE_SECTOR && !inSector(e.x[j]! - x, e.y[j]! - y, e.radius[j]!, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!)) continue;
+      hitScratch[hits++] = j;
     }
     if (hits === 0) continue;
     // 同じ更新で複数に重なったら id の小さい順に当てる（ハッシュの並び順に左右されないように）

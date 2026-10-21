@@ -58,8 +58,8 @@
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 400,
-        "size": 28,
-        "range": 30,
+        "size": 36,
+        "range": 10,
         "durationSeconds": 0.15,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -69,7 +69,8 @@
         "statusSeconds": 3,
         "spreadDegrees": 0,
         "lifestealPct": 0,
-        "statusId": "burn"
+        "statusId": "burn",
+        "arcDegrees": 70
       },
       "levels": [
         {
@@ -93,7 +94,11 @@
         {
           "power": 6
         }
-      ]
+      ],
+      "body": {
+        "lungeDistance": 10,
+        "afterimages": 0
+      }
     },
     "gust": {
       "pattern": "facing",
@@ -478,8 +483,8 @@
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 400,
-        "size": 26,
-        "range": 28,
+        "size": 40,
+        "range": 20,
         "durationSeconds": 0.14,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -488,7 +493,8 @@
         "statusChance": 0,
         "statusSeconds": 0,
         "spreadDegrees": 0,
-        "lifestealPct": 0
+        "lifestealPct": 0,
+        "arcDegrees": 90
       },
       "levels": [
         {
@@ -513,10 +519,14 @@
         {
           "power": 6
         }
-      ]
+      ],
+      "body": {
+        "lungeDistance": 10,
+        "afterimages": 0
+      }
     },
     "quick-attack": {
-      "pattern": "nearest",
+      "pattern": "melee",
       "effect": "quick-attack",
       "base": {
         "power": 8,
@@ -524,17 +534,18 @@
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 900,
-        "size": 10,
-        "range": 220,
-        "durationSeconds": 0.25,
-        "pierce": 2,
+        "size": 50,
+        "range": 60,
+        "durationSeconds": 0.15,
+        "pierce": "infinite",
         "hitIntervalSeconds": 0,
         "knockback": 140,
         "knockbackSeconds": 0.08,
         "statusChance": 0,
         "statusSeconds": 0,
         "spreadDegrees": 0,
-        "lifestealPct": 0
+        "lifestealPct": 0,
+        "arcDegrees": 40
       },
       "levels": [
         {
@@ -544,13 +555,13 @@
           "cooldownSeconds": -0.1
         },
         {
-          "pierce": 1
+          "size": 8
         },
         {
           "power": 3
         },
         {
-          "count": 1
+          "range": 10
         },
         {
           "cooldownSeconds": -0.1
@@ -558,7 +569,11 @@
         {
           "power": 4
         }
-      ]
+      ],
+      "body": {
+        "lungeDistance": 30,
+        "afterimages": 3
+      }
     },
     "swift": {
       "pattern": "homing",
@@ -709,8 +724,8 @@
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 400,
-        "size": 52,
-        "range": 46,
+        "size": 56,
+        "range": 20,
         "durationSeconds": 0.25,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -720,7 +735,8 @@
         "statusSeconds": 3,
         "spreadDegrees": 0,
         "lifestealPct": 0,
-        "statusId": "burn"
+        "statusId": "burn",
+        "arcDegrees": 100
       },
       "levels": [
         {
@@ -744,7 +760,11 @@
         {
           "count": 1
         }
-      ]
+      ],
+      "body": {
+        "lungeDistance": 18,
+        "afterimages": 0
+      }
     },
     "air-slash": {
       "pattern": "facing",
@@ -978,7 +998,7 @@
       ]
     },
     "body-slam": {
-      "pattern": "nova",
+      "pattern": "melee",
       "effect": "body-slam",
       "base": {
         "power": 64,
@@ -986,9 +1006,9 @@
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 400,
-        "size": 20,
-        "range": 110,
-        "durationSeconds": 0.3,
+        "size": 50,
+        "range": 60,
+        "durationSeconds": 0.25,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
         "knockback": 380,
@@ -997,7 +1017,8 @@
         "statusSeconds": 2,
         "spreadDegrees": 0,
         "lifestealPct": 0,
-        "statusId": "paralysis"
+        "statusId": "paralysis",
+        "arcDegrees": 360
       },
       "levels": [
         {
@@ -1765,7 +1786,7 @@
       "pattern": "beam",
       "effect": "volt-tackle",
       "base": {
-        "power": 352,
+        "power": 390,
         "cooldownSeconds": 2.6,
         "count": 1,
         "intervalSeconds": 0.1,
@@ -1785,13 +1806,13 @@
       },
       "levels": [
         {
-          "power": 18
+          "power": 19
         },
         {
           "size": 4
         },
         {
-          "power": 18
+          "power": 19
         },
         {
           "cooldownSeconds": -0.3
@@ -1800,13 +1821,17 @@
           "size": 6
         },
         {
-          "power": 23
+          "power": 26
         },
         {
           "cooldownSeconds": -0.3,
-          "power": 23
+          "power": 26
         }
-      ]
+      ],
+      "body": {
+        "lungeDistance": 30,
+        "afterimages": 4
+      }
     },
     "explosion": {
       "pattern": "nova",
@@ -2048,8 +2073,8 @@
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 400,
-        "size": 26,
-        "range": 34,
+        "size": 40,
+        "range": 10,
         "durationSeconds": 0.2,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -2059,7 +2084,8 @@
         "statusSeconds": 2,
         "spreadDegrees": 0,
         "lifestealPct": 0,
-        "statusId": "paralysis"
+        "statusId": "paralysis",
+        "arcDegrees": 80
       },
       "levels": [
         {
@@ -2085,7 +2111,11 @@
         {
           "count": 1
         }
-      ]
+      ],
+      "body": {
+        "lungeDistance": 12,
+        "afterimages": 0
+      }
     },
     "wild-charge": {
       "pattern": "melee",
@@ -2096,8 +2126,8 @@
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 400,
-        "size": 46,
-        "range": 52,
+        "size": 50,
+        "range": 20,
         "durationSeconds": 0.25,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -2107,7 +2137,8 @@
         "statusSeconds": 2,
         "spreadDegrees": 0,
         "lifestealPct": 0,
-        "statusId": "paralysis"
+        "statusId": "paralysis",
+        "arcDegrees": 100
       },
       "levels": [
         {
@@ -2132,7 +2163,11 @@
         {
           "count": 1
         }
-      ]
+      ],
+      "body": {
+        "lungeDistance": 18,
+        "afterimages": 0
+      }
     },
     "fissure": {
       "pattern": "beam",

@@ -199,3 +199,39 @@ describe('「進化できる！」の判定（このカードを取ると派生�
     expect(derivationCompletedBy(sim.world, p, { kind: 'itemNew', item: 0 })).toBeNull();
   });
 });
+
+describe('でんきだまとボルテッカー（ピカチュウ）', () => {
+  function pikachuRules() {
+    const r = rules({
+      items: [upgrade('x-attack', 5, false, { powerPct: 10 }), { ...upgrade('light-ball', 1, false, {}), lines: ['pikachu'], powerMultiplier: 2 }],
+      derivations: [{ from: 1, item: 1, to: 3, line: 'pikachu', minLevel: 51 }],
+    });
+    r.moves[1] = { ...r.moves[1]!, levels: [r.moves[1]!.levels[0]!] };
+    return r;
+  }
+
+  it('でんきだまはピカチュウの候補にだけ出る', () => {
+    const r = pikachuRules();
+    const seen = (line: string): boolean => {
+      const sim = new Simulation({ tickRate: 30, seed: 5, rules: r });
+      const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100, types: [FIRE], moves: [], line });
+      for (let k = 0; k < 40; k++) if (makeOffers(sim.world, p).some((o) => o.kind === 'itemNew' && o.item === 1)) return true;
+      return false;
+    };
+    expect(seen('pikachu')).toBe(true);
+    expect(seen('charmander')).toBe(false);
+  });
+
+  it('レベル51になるまでは、条件がそろってもボルテッカーは出ない', () => {
+    const sim = new Simulation({ tickRate: 30, seed: 5, rules: pikachuRules() });
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100, types: [FIRE], moves: [{ move: 1, level: 1 }], line: 'pikachu' });
+    p.items.push({ item: 1, level: 1 });
+    sim.world.level = 50;
+    expect(makeOffers(sim.world, p).some((o) => o.kind === 'derive')).toBe(false);
+    sim.world.level = 51;
+    expect(makeOffers(sim.world, p)[0]).toMatchObject({ kind: 'derive', to: 3 });
+    // でんきだまはなくならない
+    applyOffer(sim.world, p, makeOffers(sim.world, p)[0]!);
+    expect(p.items.map((it) => it.item)).toEqual([1]);
+  });
+});

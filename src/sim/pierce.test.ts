@@ -69,3 +69,25 @@ describe('技ごとの急所と一撃', () => {
     expect(sim.world.stats.kills).toBe(1);
   });
 });
+
+describe('扇形の当たり判定（自分の体で攻撃する技）', () => {
+  it('向いている方向の扇の中の敵にだけ当たり、後ろには当たらない', () => {
+    const rules = testRules({ move: { range: 20, size: 40, arcDegrees: 90, cooldownSeconds: 100, power: 10, pierce: Infinity, durationSeconds: 0.2 } });
+    rules.moves[0] = { ...rules.moves[0]!, pattern: 'melee', body: { lungeDistance: 10, afterimages: 0 } };
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150 });
+    p.facingX = 1;
+    p.facingY = 0;
+    sim.world.enemies.add(1, 0, 40, 0, 1000, 0, 10); // 前
+    sim.world.enemies.add(2, 0, -40, 0, 1000, 0, 10); // 後ろ
+    sim.world.enemies.add(3, 0, 0, 55, 1000, 0, 10); // 真横（扇の外）
+    sim.step([]);
+    expect(sim.world.events.some((e) => e.type === 'bodyAttack')).toBe(true);
+    for (let t = 0; t < 5; t++) sim.step([]);
+    const e = sim.world.enemies;
+    const hpOf = (id: number): number => e.hp[Array.from(e.id.subarray(0, e.count)).indexOf(id)]!;
+    expect(hpOf(1)).toBe(990);
+    expect(hpOf(2)).toBe(1000);
+    expect(hpOf(3)).toBe(1000);
+  });
+});

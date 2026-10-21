@@ -24,6 +24,8 @@ export interface MoveStats {
   critChancePct: number;
   /** 雑魚を一撃で倒す確率（0〜1） */
   instakillChance: number;
+  /** 近接の扇形の角度（度）。0 なら円 */
+  arcDegrees: number;
 }
 
 /** シミュレーションが使う技の定義 */
@@ -39,6 +41,8 @@ export interface SimMoveDef {
   readonly levels: readonly MoveStats[];
   /** 見た目のレシピ（シミュレーションは使わない） */
   readonly effect: string;
+  /** 自分の体で攻撃する技の見た目（使ったときに知らせる）。無ければ null */
+  readonly body: { readonly lungeDistance: number; readonly afterimages: number } | null;
 }
 
 /** 最小値で止める項目（足し続けても壊れないように） */
@@ -73,6 +77,7 @@ export function resolveMoveLevels(def: MoveDefData, statusIndexOf: (id: string) 
     lifestealPct: b.lifestealPct,
     critChancePct: b.critChancePct,
     instakillChance: b.instakillChance,
+    arcDegrees: b.arcDegrees,
   };
   const out = [cur];
   for (const delta of def.levels) {

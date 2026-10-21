@@ -20,7 +20,7 @@ import { SpriteStreamer } from '../render/sprites/SpriteStreamer';
 import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
 import { addSpriteGallery } from '../render/sprites/SpriteGallery';
 import type { Axis, InputCommand, PlayerId } from '../sim/commands';
-import { SHAPE_LINE } from '../sim/entities/projectiles';
+import { SHAPE_LINE, SHAPE_SECTOR } from '../sim/entities/projectiles';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole } from '../sim/world';
@@ -492,6 +492,8 @@ export class RunScene extends Phaser.Scene {
         if (it.kind === 'rare-candy') this.playCandy(it.levels);
         else if (it.kind === 'magnet') this.announce(t('item.magnet'), '#ef9a9a');
         else if (it.by === this.localId) this.announce(localName(generated.items.potion?.names, getLocale(), ''), '#ce93d8');
+      } else if (ev.type === 'bodyAttack') {
+        this.playerViews.get(ev.playerId)?.lunge(ev.dirX, ev.dirY, ev.distance, ev.afterimages);
       } else if (ev.type === 'playerLeft') {
         this.playerViews.get(ev.playerId)?.container.destroy();
         this.playerViews.delete(ev.playerId);
@@ -775,6 +777,7 @@ export class RunScene extends Phaser.Scene {
       deltaMs,
       timeMs,
       (i) => (pr.shape[i] === SHAPE_LINE ? { length: pr.length[i]!, dirX: pr.dirX[i]!, dirY: pr.dirY[i]! } : null),
+      (i) => (pr.shape[i] === SHAPE_SECTOR ? { dirX: pr.dirX[i]!, dirY: pr.dirY[i]!, half: pr.length[i]! } : null),
     );
     this.hitOutlines.draw(
       pr,
@@ -782,6 +785,7 @@ export class RunScene extends Phaser.Scene {
       (i) => this.outlineColors[pr.move[i]!] ?? null,
       (i) => (pr.shape[i] === SHAPE_LINE ? { length: pr.length[i]!, dirX: pr.dirX[i]!, dirY: pr.dirY[i]! } : null),
       view,
+      (i) => (pr.shape[i] === SHAPE_SECTOR ? { dirX: pr.dirX[i]!, dirY: pr.dirY[i]!, half: pr.length[i]! } : null),
     );
 
     this.drawHazards(world.hazards);

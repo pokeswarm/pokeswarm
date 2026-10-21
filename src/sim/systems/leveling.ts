@@ -219,6 +219,8 @@ function isBaseMove(world: World, move: number): boolean {
  * 今の姿の進化に使うものだけ出す（遊べるポケモンが増えて、関係ない持ち物で候補が薄まらないように）
  */
 function itemFitsPlayer(world: World, p: Player, item: number): boolean {
+  const lines = world.rules.items[item]!.lines;
+  if (lines && !lines.includes(p.line)) return false;
   const def = world.rules.items[item]!.perLevel;
   const types: number[] = [];
   def.typePowerPct.forEach((v, t) => v && types.push(t));
@@ -236,6 +238,7 @@ export function makeOffers(world: World, p: Player, excludeItems: ReadonlySet<nu
     for (const d of rules.derivations) {
       if (d.from !== pm.move || !p.items.some((it) => it.item === d.item)) continue;
       if (d.line !== null && d.line !== p.line) continue;
+      if (d.minLevel && world.level < d.minLevel) continue;
       if (p.moves.some((m) => m.move === d.to)) continue;
       guaranteed.push({ kind: 'derive', slot, to: d.to, item: d.item, unique: d.line !== null });
     }
@@ -351,6 +354,7 @@ export function derivationCompletedBy(world: World, p: Player, offer: UpgradeOff
   const notYet = (d: SimDerivation): boolean => !p.moves.some((m) => m.move === d.to);
   for (const d of rules.derivations) {
     if (!lineOk(d) || !notYet(d)) continue;
+    if (d.minLevel && world.level < d.minLevel) continue;
     const hasItem = p.items.some((it) => it.item === d.item);
     const fromAtMax = p.moves.some((m) => m.move === d.from && m.level >= maxOf(d.from));
     switch (offer.kind) {

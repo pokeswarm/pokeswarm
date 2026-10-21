@@ -1,7 +1,7 @@
 import type Phaser from 'phaser';
 import type { CircleSource } from '../PooledCircles';
 
-/** 縁取りの線の形: 円（length 0）か、両端の丸い直線（ビーム） */
+/** 縁取りの線の形: 円（length 0）か、両端の丸い直線（ビーム）か、扇形（half: 片側の開き。ラジアン） */
 interface OutlineShape {
   x: number;
   y: number;
@@ -9,6 +9,7 @@ interface OutlineShape {
   length: number;
   dirX: number;
   dirY: number;
+  half: number | null;
 }
 
 /**
@@ -41,6 +42,7 @@ export class HitOutlines {
     colorOf: (index: number) => { light: number; dark: number } | null,
     lineOf: (index: number) => { length: number; dirX: number; dirY: number } | null,
     view: { left: number; top: number; right: number; bottom: number },
+    sectorOf: (index: number) => { dirX: number; dirY: number; half: number } | null = () => null,
   ): void {
     const g = this.g;
     g.clear();
@@ -50,7 +52,16 @@ export class HitOutlines {
       const x = src.prevX[i]! + (src.x[i]! - src.prevX[i]!) * alpha;
       const y = src.prevY[i]! + (src.y[i]! - src.prevY[i]!) * alpha;
       const line = lineOf(i);
-      const shape: OutlineShape = { x, y, radius: src.radius[i]!, length: line?.length ?? 0, dirX: line?.dirX ?? 1, dirY: line?.dirY ?? 0 };
+      const sector = sectorOf(i);
+      const shape: OutlineShape = {
+        x,
+        y,
+        radius: src.radius[i]!,
+        length: line?.length ?? 0,
+        dirX: sector?.dirX ?? line?.dirX ?? 1,
+        dirY: sector?.dirY ?? line?.dirY ?? 0,
+        half: sector && sector.half < Math.PI ? sector.half : null,
+      };
       const reach = shape.radius + shape.length + this.dot * 2;
       if (x + reach < view.left || x - reach > view.right || y + reach < view.top || y - reach > view.bottom) continue;
       // 外側の暗い線 → 内側の明るい線の順（明るい線を上に）
@@ -80,6 +91,18 @@ export class HitOutlines {
     // 両端の半円（円なら一周）
     const arcSteps = Math.max(8, Math.ceil((Math.PI * r) / step));
     const base = Math.atan2(s.dirY, s.dirX);
+    if (s.half !== null) {
+      // 扇形: 弧と、中心から弧の両端への2本の線
+      const n = Math.max(4, Math.ceil((2 * s.half * r) / step));
+      for (let k = 0; k <= n; k++) {
+        const a = base - s.half + (k / n) * 2 * s.half;
+        plot(s.x + Math.cos(a) * r, s.y + Math.sin(a) * r);
+      }
+      for (const a of [base - s.half, base + s.half]) {
+        for (let t = 0; t <= r; t += step) plot(s.x + Math.cos(a) * t, s.y + Math.sin(a) * t);
+      }
+      return;
+    }
     if (s.length <= 0) {
       for (let k = 0; k < arcSteps * 2; k++) {
         const a = (k / (arcSteps * 2)) * Math.PI * 2;

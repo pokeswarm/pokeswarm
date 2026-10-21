@@ -15,6 +15,8 @@ export const MOTION_HOMING = 4;
 export const SHAPE_CIRCLE = 0;
 /** 直線（始点 x, y から向き dir に長さ length、太さ radius） */
 export const SHAPE_LINE = 1;
+/** 扇形（中心 x, y から向き dir に半径 radius、開き length（片側の角度・ラジアン）。π 以上で円全体） */
+export const SHAPE_SECTOR = 2;
 
 export interface ProjectileSpawn {
   owner: PlayerId;

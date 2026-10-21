@@ -6,6 +6,8 @@ import { directionIndex, PokemonSpriteView } from './sprites/PokemonSprite';
 
 const HP_BAR_WIDTH = 36;
 const HP_BAR_HEIGHT = 4;
+/** 体を前後させる動きの長さ（ミリ秒） */
+const LUNGE_MS = 140;
 
 /**
  * プレイヤーの表示。位置は前回と今回の更新の間を補間する。
@@ -18,6 +20,10 @@ export class PlayerView {
   private pokemon: PokemonSpriteView | null = null;
   private readonly radius: number;
   private readonly hpBar: Phaser.GameObjects.Graphics;
+  /** 自分の体で攻撃する技の、体を前後させる動き（始まった時刻・向き・距離） */
+  private lungeStart = -1;
+  private lungeX = 0;
+  private lungeY = 0;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -47,12 +53,41 @@ export class PlayerView {
     this.container.addAt(this.pokemon.sprite, 0);
   }
 
+  /**
+   * 自分の体で攻撃する技を使った: 向いている方向へ一瞬体を出して戻す。afterimages があれば前方に残像を残す
+   * （でんこうせっか）。見た目だけで、位置（当たり判定）は動かさない
+   */
+  lunge(dirX: number, dirY: number, distance: number, afterimages: number): void {
+    this.lungeStart = this.scene.time.now;
+    this.lungeX = dirX * distance;
+    this.lungeY = dirY * distance;
+    const sprite = this.pokemon?.sprite;
+    if (!sprite || afterimages <= 0) return;
+    for (let k = 1; k <= afterimages; k++) {
+      const t = k / afterimages;
+      const ghost = this.scene.add
+        .image(this.container.x + this.lungeX * 1.6 * t, this.container.y + this.lungeY * 1.6 * t, sprite.texture.key, sprite.frame.name)
+        .setScale(sprite.scaleX, sprite.scaleY)
+        .setFlipX(sprite.flipX)
+        .setTint(0xfff8e1)
+        .setAlpha(0.55 * (1 - t * 0.5))
+        .setDepth(this.container.depth - 0.01);
+      this.scene.tweens.add({ targets: ghost, alpha: 0, duration: 260, delay: k * 25, onComplete: () => ghost.destroy() });
+    }
+  }
+
   /** reviveRatio: 倒れているとき、味方が触れて復活するまでの進み具合（0〜1。触れていなければ 0） */
   update(player: Player, alpha: number, reviveRatio = 0): void {
     this.container.setPosition(
       player.prevX + (player.x - player.prevX) * alpha,
       player.prevY + (player.y - player.prevY) * alpha,
     );
+    if (this.pokemon) {
+      // 体を前後させる（行って戻る。LUNGE_MS で1往復）
+      const t = this.lungeStart < 0 ? 1 : (this.scene.time.now - this.lungeStart) / LUNGE_MS;
+      const k = t >= 1 ? 0 : Math.sin(Math.PI * t);
+      this.pokemon.sprite.setPosition(this.lungeX * k, this.lungeY * k);
+    }
     if (this.pokemon) {
       const moving = player.inputX !== 0 || player.inputY !== 0;
       const anim = moving ? this.spriteStyle.walkAnimation : this.spriteStyle.idleAnimation;

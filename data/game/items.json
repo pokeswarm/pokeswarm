@@ -17,6 +17,7 @@
     "magnet": { "maxLevel": 5, "perLevel": { "typePowerPct": { "electric": 15 } } },
     "hard-stone": { "maxLevel": 5, "perLevel": { "typePowerPct": { "rock": 15 } } },
     "soft-sand": { "maxLevel": 5, "perLevel": { "typePowerPct": { "ground": 15 } } },
-    "twisted-spoon": { "maxLevel": 5, "perLevel": { "typePowerPct": { "psychic": 15 } } }
+    "twisted-spoon": { "maxLevel": 5, "perLevel": { "typePowerPct": { "psychic": 15 } } },
+    "light-ball": { "maxLevel": 1, "perLevel": {}, "lines": ["pikachu"], "powerMultiplier": 2 }
   }
 }

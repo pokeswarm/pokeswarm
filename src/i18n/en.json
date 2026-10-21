@@ -274,5 +274,6 @@
   "itemDesc.magnet": "Electric moves +15%",
   "itemDesc.hard-stone": "Rock moves +15%",
   "itemDesc.soft-sand": "Ground moves +15%",
-  "itemDesc.twisted-spoon": "Psychic moves +15%"
+  "itemDesc.twisted-spoon": "Psychic moves +15%",
+  "itemDesc.light-ball": "Doubles move power when held by Pikachu (not consumed)"
 }

@@ -42,23 +42,21 @@ describe('技の強さのそろえ方（作者の決定。07 16.2）', () => {
   });
 });
 
-/** 07 22章の作り直しが済んだ進化（作り直すたびに足す） */
-const REWORKED = ['hydro-pump', 'hydro-cannon'];
-
 describe('進化しても見た目の量が減らない（作者の決定。07 22.3）', () => {
-  it('進化した技の Lv1 は、元の技の最大より 大きさ・射程・貫通 が下がらず、同じ出し方なら 数・持続 も下がらない', () => {
+  it('進化した技の Lv1 は、元の技の最大より射程が下がらず、同じ出し方なら 大きさ・貫通・数・持続 も下がらず再使用も延びない', () => {
     for (const d of [...derivationsConfig.derivations, ...derivationsConfig.unique]) {
-      if (!REWORKED.includes(d.to)) continue;
+      if (exempt(d.to) || exempt(d.from)) continue;
       const fromDef = movesConfig.moves[d.from]!;
       const toDef = movesConfig.moves[d.to]!;
       const a = moveStatsAt(fromDef, moveMaxLevel(fromDef));
       const b = moveStatsAt(toDef, 1);
       const num = (v: unknown): number => (v === 'infinite' ? Infinity : (v as number));
       const label = `${d.from} → ${d.to}`;
-      expect(num(b.size), `${label} の大きさ`).toBeGreaterThanOrEqual(num(a.size));
       expect(num(b.range), `${label} の射程`).toBeGreaterThanOrEqual(num(a.range));
-      expect(num(b.pierce), `${label} の貫通`).toBeGreaterThanOrEqual(num(a.pierce));
+      // 出し方が変わるもの（連射 → 流れ など）は、大きさ・数の意味が違うので比べない
       if (fromDef.pattern === toDef.pattern) {
+        expect(num(b.size), `${label} の大きさ`).toBeGreaterThanOrEqual(num(a.size));
+        expect(num(b.pierce), `${label} の貫通`).toBeGreaterThanOrEqual(num(a.pierce));
         expect(num(b.count), `${label} の数`).toBeGreaterThanOrEqual(num(a.count));
         expect(num(b.durationSeconds), `${label} の持続`).toBeGreaterThanOrEqual(num(a.durationSeconds));
         expect(num(b.cooldownSeconds), `${label} の再使用`).toBeLessThanOrEqual(num(a.cooldownSeconds));

@@ -60,6 +60,12 @@ export interface ProjectileSpawn {
   dirY: number;
   /** 半径が1秒に広がる量（nova） */
   growth: number;
+  /** 効き方の部品から出たもの（1）・遅れて弾ける印（2）。0 は技そのもの。0 のものだけが効き方を起こす（07 22.4） */
+  stage?: number;
+  /** 印（stage 2）が弾けるときに使う、技の効き方の番号 */
+  fxIndex?: number;
+  /** ノックバックの強さの上書き（ワールド単位/秒。マイナスで引き寄せる）。無ければ技の値 */
+  knockback?: number;
 }
 
 /**
@@ -101,6 +107,12 @@ export class ProjectileStore {
   readonly hitTicks: Uint32Array;
   /** これまでに記録した数（書き込み位置にも使う） */
   readonly hitCount: Uint32Array;
+  /** 効き方の部品（07 22.4）: 段階・印の効き方の番号・繰り返しの残り秒数・当たったときの効き方を起こしたか・ノックバックの上書き（NaN なら技の値） */
+  readonly stage: Uint8Array;
+  readonly fxIndex: Uint8Array;
+  readonly fxTimer: Float64Array;
+  readonly hitFired: Uint8Array;
+  readonly knockback: Float64Array;
 
   constructor(
     readonly capacity: number,
@@ -135,6 +147,11 @@ export class ProjectileStore {
     this.hitIds = new Uint32Array(capacity * hitMemory);
     this.hitTicks = new Uint32Array(capacity * hitMemory);
     this.hitCount = new Uint32Array(capacity);
+    this.stage = new Uint8Array(capacity);
+    this.fxIndex = new Uint8Array(capacity);
+    this.fxTimer = new Float64Array(capacity);
+    this.hitFired = new Uint8Array(capacity);
+    this.knockback = new Float64Array(capacity);
   }
 
   add(p: ProjectileSpawn): number {
@@ -165,6 +182,11 @@ export class ProjectileStore {
     this.growth[i] = p.growth;
     this.maxLife[i] = p.life;
     this.hitCount[i] = 0;
+    this.stage[i] = p.stage ?? 0;
+    this.fxIndex[i] = p.fxIndex ?? 0;
+    this.fxTimer[i] = 0;
+    this.hitFired[i] = 0;
+    this.knockback[i] = p.knockback ?? NaN;
     return i;
   }
 
@@ -198,6 +220,11 @@ export class ProjectileStore {
     this.growth[i] = this.growth[last]!;
     this.maxLife[i] = this.maxLife[last]!;
     this.hitCount[i] = this.hitCount[last]!;
+    this.stage[i] = this.stage[last]!;
+    this.fxIndex[i] = this.fxIndex[last]!;
+    this.fxTimer[i] = this.fxTimer[last]!;
+    this.hitFired[i] = this.hitFired[last]!;
+    this.knockback[i] = this.knockback[last]!;
     const m = this.hitMemory;
     this.hitIds.copyWithin(i * m, last * m, (last + 1) * m);
     this.hitTicks.copyWithin(i * m, last * m, (last + 1) * m);

@@ -19,6 +19,7 @@ import { axisToUnit } from '../math';
 import { typeMultiplier, type MoveStats } from '../moves';
 import type { World } from '../world';
 import { applyHitEffect } from './commands';
+import { fireDelayedExplosion, fireEffects, type FxSource } from './moveEffects';
 import { healPlayer } from './health';
 import { breakOnDamage, damageTakenMultiplier } from './status';
 
@@ -190,6 +191,11 @@ export function useMoves(world: World): void {
           fireStream(world, p, pm, st);
           break;
       }
+      if (def.effects.some((fx) => fx.trigger === 'cast')) {
+        const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+        const sc = scaledMoveStats(world, p, pm, st);
+        fireEffects(world, 'cast', { owner: p.id, move: pm.move, level: pm.level, damage: sc.power, size: sc.size, x: p.x, y: p.y, dirX: fx, dirY: fy, length: 0 });
+      }
     }
   }
 }
@@ -210,7 +216,8 @@ function base(world: World, p: Player, pm: PlayerMove, st: MoveStats): Omit<Proj
     ox: 0,
     oy: 0,
     angle: 0,
-    angularSpeed: 0,
+    // 飛ぶ弾が曲がる速さ（ほかの動き方は、それぞれ上書きする）
+    angularSpeed: world.rules.moves[pm.move]!.curve,
     orbitRadius: 0,
     shape: SHAPE_CIRCLE,
     length: 0,
@@ -330,7 +337,6 @@ function fireBeam(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
 function fireStream(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const [fx, fy] = axisToUnit(p.facingX, p.facingY);
   const sc = scaledMoveStats(world, p, pm, st);
-  const blast = world.rules.moves[pm.move]!.endBlast;
   for (let k = 0; k < st.count; k++) {
     const offset = ((k - (st.count - 1) / 2) * st.spreadDegrees * Math.PI) / 180;
     const a = Math.atan2(fy, fx) + offset;
@@ -350,7 +356,6 @@ function fireStream(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
       angularSpeed: (st.speed * Math.PI) / 180,
       orbitRadius: st.range,
       life: sc.cooldownSeconds + world.dt,
-      ox: blast ? blast.everySeconds : 0,
     });
   }
 }
@@ -594,6 +599,15 @@ export function moveProjectiles(world: World): void {
     const owner = world.players.find((p) => p.id === pr.owner[i]);
     const motion = pr.motion[i]!;
     if (motion === MOTION_LINEAR) {
+      // 曲がる弾（angularSpeed）は速度の向きを回す。広がる輪（growth）は半径を広げる
+      if (pr.angularSpeed[i] !== 0) {
+        const c = Math.cos(pr.angularSpeed[i]! * world.dt);
+        const s = Math.sin(pr.angularSpeed[i]! * world.dt);
+        const vx = pr.vx[i]!;
+        pr.vx[i] = vx * c - pr.vy[i]! * s;
+        pr.vy[i] = vx * s + pr.vy[i]! * c;
+      }
+      pr.radius[i]! += pr.growth[i]! * world.dt;
       pr.x[i]! += pr.vx[i]! * world.dt;
       pr.y[i]! += pr.vy[i]! * world.dt;
     } else if (motion === MOTION_BOOMERANG) {
@@ -641,13 +655,16 @@ export function moveProjectiles(world: World): void {
     }
     pr.life[i]! -= world.dt;
     if (pr.life[i]! <= 0) {
-      pr.removeAt(i);
+      expire(world, i);
       continue;
     }
+    // 遅れて弾ける印は当たらない
+    if (pr.stage[i] === 2) continue;
+    tickEveryEffects(world, i);
     // 障害物は技も遮る（飛んでいく技は当たると消える）
     if ((motion === MOTION_HOMING || motion === MOTION_BOOMERANG || motion === MOTION_LOB || motion === MOTION_BOUNCE || (motion === MOTION_LINEAR && (pr.vx[i] !== 0 || pr.vy[i] !== 0))) && insideObstacle(world, pr.x[i]!, pr.y[i]!)) {
       world.events.push({ type: 'projectileHit', x: pr.x[i]!, y: pr.y[i]!, owner: pr.owner[i]!, move: pr.move[i]! });
-      pr.removeAt(i);
+      expire(world, i);
       continue;
     }
     const x = pr.x[i]!;
@@ -684,6 +701,8 @@ export function moveProjectiles(world: World): void {
     let hitAny = false;
     let hitX = x;
     let hitY = y;
+    let firstX = NaN;
+    let firstY = NaN;
     for (let k = 0; k < candidates.length && pr.pierceLeft[i]! > 0; k++) {
       const j = candidates[k]!;
       // ハッシュの衝突で同じ敵が2回入っていることがある
@@ -691,6 +710,10 @@ export function moveProjectiles(world: World): void {
       pr.recordHit(i, e.id[j]!, world.tick);
       pr.pierceLeft[i]!--;
       hitAny = true;
+      if (Number.isNaN(firstX)) {
+        firstX = e.x[j]!;
+        firstY = e.y[j]!;
+      }
       if (line) {
         hitX = e.x[j]!;
         hitY = e.y[j]!;
@@ -700,7 +723,7 @@ export function moveProjectiles(world: World): void {
       const kx = line ? pr.dirX[i]! : e.x[j]! - x || pr.vx[i]!;
       const ky = line ? pr.dirY[i]! : e.y[j]! - y || pr.vy[i]!;
       // 効果（ノックバック・状態異常）は当てたプレイヤーの画面ですぐ付け、相手へは命中と一緒に送る
-      const fx = rollHitEffect(world, st, kx, ky);
+      const fx = rollHitEffect(world, st, kx, ky, pr.knockback[i]!);
       applyHitEffect(world, j, fx, ownerId);
       const kind = world.rules.enemies.kinds[e.kind[j]!];
       // 急所（クリティカットなど・技ごとの急所）の判定は、当てたプレイヤーのブラウザの乱数で行う
@@ -731,7 +754,12 @@ export function moveProjectiles(world: World): void {
       }
     }
     if (hitAny) world.events.push({ type: 'projectileHit', x: hitX, y: hitY, owner: ownerId, move: pr.move[i]! });
-    if (pr.pierceLeft[i]! <= 0) pr.removeAt(i);
+    // hit の効き方は、その当たり判定が初めて敵に当たったときに1回だけ（当たった敵の位置で）
+    if (hitAny && pr.stage[i] === 0 && pr.hitFired[i] === 0) {
+      pr.hitFired[i] = 1;
+      fireEffects(world, 'hit', fxSourceOf(world, i, firstX, firstY));
+    }
+    if (pr.pierceLeft[i]! <= 0) expire(world, i);
   }
 }
 
@@ -770,62 +798,61 @@ function stepStream(world: World, i: number, owner: Player): void {
   pr.dirX[i] = Math.cos(a);
   pr.dirY[i] = Math.sin(a);
   pr.length[i] = rayLengthToObstacle(world, owner.x, owner.y, pr.dirX[i]!, pr.dirY[i]!, pr.orbitRadius[i]!);
-  const blast = world.rules.moves[pr.move[i]!]!.endBlast;
-  if (!blast) return;
-  pr.ox[i]! -= world.dt;
-  if (pr.ox[i]! > 0) return;
-  pr.ox[i]! += blast.everySeconds;
-  // 流れが最初に当たる敵（いなければ流れの先）で爆発し、水たまりなどを残す（同じ技の当たり判定として出す。見た目のレシピも同じ）
-  const along = firstEnemyAlong(world, owner.x, owner.y, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!, pr.radius[i]!);
-  const ex = owner.x + pr.dirX[i]! * along;
-  const ey = owner.y + pr.dirY[i]! * along;
-  const common = {
-    owner: pr.owner[i]!,
-    move: pr.move[i]!,
-    level: pr.level[i]!,
-    motion: MOTION_LINEAR,
-    x: ex,
-    y: ey,
-    vx: 0,
-    vy: 0,
-    ox: 0,
-    oy: 0,
-    angle: 0,
-    angularSpeed: 0,
-    orbitRadius: 0,
-    pierce: Infinity,
-    shape: SHAPE_CIRCLE,
-    length: 0,
-    dirX: 0,
-    dirY: 0,
-    growth: 0,
-  };
-  world.projectiles.add({ ...common, damage: pr.damage[i]! * blast.powerMultiplier, radius: pr.radius[i]! * blast.sizeMultiplier, life: 0.2, hitIntervalTicks: 0 });
-  if (blast.puddle) {
-    const pd = blast.puddle;
-    world.projectiles.add({
-      ...common,
-      damage: pr.damage[i]! * pd.powerMultiplier,
-      radius: pr.radius[i]! * pd.sizeMultiplier,
-      life: pd.durationSeconds,
-      hitIntervalTicks: Math.round(pd.hitIntervalSeconds / world.dt),
-    });
+}
+
+/** 当たり判定 i を元にした、効き方の元（位置は (x, y)） */
+function fxSourceOf(world: World, i: number, x: number, y: number): FxSource {
+  const pr = world.projectiles;
+  const vlen = Math.sqrt(pr.vx[i]! * pr.vx[i]! + pr.vy[i]! * pr.vy[i]!);
+  const line = pr.shape[i] === SHAPE_LINE;
+  const dirX = line || vlen === 0 ? pr.dirX[i]! || 1 : pr.vx[i]! / vlen;
+  const dirY = line || vlen === 0 ? pr.dirY[i]! : pr.vy[i]! / vlen;
+  return { owner: pr.owner[i]!, move: pr.move[i]!, level: pr.level[i]!, damage: pr.damage[i]!, size: pr.radius[i]!, x, y, dirX, dirY, length: line ? pr.length[i]! : 0 };
+}
+
+/** 当たり判定 i を消す。技そのもの（段階 0）なら end の効き方、印（段階 2）なら遅れた爆発を起こす */
+function expire(world: World, i: number): void {
+  const pr = world.projectiles;
+  if (pr.stage[i] === 0) fireEffects(world, 'end', fxSourceOf(world, i, pr.x[i]!, pr.y[i]!));
+  else if (pr.stage[i] === 2) fireDelayedExplosion(world, pr.fxIndex[i]!, fxSourceOf(world, i, pr.x[i]!, pr.y[i]!));
+  pr.removeAt(i);
+}
+
+/** every の効き方: 残っている間、決まった間隔で起こす。流れは、流れが最初に当たる敵（いなければ流れの先）で */
+function tickEveryEffects(world: World, i: number): void {
+  const pr = world.projectiles;
+  if (pr.stage[i] !== 0) return;
+  const every = world.rules.moves[pr.move[i]!]!.effects.find((fx) => fx.trigger === 'every');
+  if (!every) return;
+  pr.fxTimer[i]! += world.dt;
+  const period = every.everySeconds ?? 0.5;
+  if (pr.fxTimer[i]! < period) return;
+  pr.fxTimer[i]! -= period;
+  let x = pr.x[i]!;
+  let y = pr.y[i]!;
+  if (pr.motion[i] === MOTION_STREAM) {
+    const along = firstEnemyAlong(world, x, y, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!, pr.radius[i]!);
+    x += pr.dirX[i]! * along;
+    y += pr.dirY[i]! * along;
   }
-  world.events.push({ type: 'projectileHit', x: ex, y: ey, owner: pr.owner[i]!, move: pr.move[i]! });
+  const src = fxSourceOf(world, i, x, y);
+  fireEffects(world, 'every', { ...src, length: pr.motion[i] === MOTION_STREAM ? 0 : src.length });
 }
 
 /**
  * 命中の効果を決める。ノックバックは (dirX, dirY) の向き。
  * 状態異常が付くかの判定は、当てたプレイヤーのブラウザの乱数で行う（03_network.md 3.2）。
  */
-function rollHitEffect(world: World, st: MoveStats, dirX: number, dirY: number): HitEffect {
+function rollHitEffect(world: World, st: MoveStats, dirX: number, dirY: number, knockback = NaN): HitEffect {
   let kbx = 0;
   let kby = 0;
   let kbTicks = 0;
-  if (st.knockback > 0 && st.knockbackSeconds > 0) {
+  // 効き方の部品のノックバックの上書き（マイナスなら中心へ引き寄せる）
+  const kb = Number.isNaN(knockback) ? st.knockback : knockback;
+  if (kb !== 0 && st.knockbackSeconds > 0) {
     const len = Math.sqrt(dirX * dirX + dirY * dirY) || 1;
-    kbx = (dirX / len) * st.knockback;
-    kby = (dirY / len) * st.knockback;
+    kbx = (dirX / len) * kb;
+    kby = (dirY / len) * kb;
     kbTicks = Math.round(st.knockbackSeconds / world.dt);
   }
   let status = -1;

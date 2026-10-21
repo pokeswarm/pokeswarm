@@ -489,6 +489,51 @@ export const moveLevelDeltaSchema = z
   .partial();
 export type MoveLevelDelta = z.infer<typeof moveLevelDeltaSchema>;
 
+const fxSize = { sizeMultiplier: z.number().positive(), powerMultiplier: z.number().nonnegative() };
+/**
+ * 技の「効き方」（07_content_draft.md 22.4）。trigger で起こるときを決め、部品を組み合わせる。
+ * - trigger: cast（技を使ったとき。自分の位置・向いている方向）、hit（当たり判定が初めて敵に当たったとき。当たった敵の位置）、
+ *   end（当たり判定が消えたとき・落ちたとき。その位置）、every（当たり判定が残っている間 everySeconds ごと。その位置。
+ *   流れ stream は流れが最初に当たる敵の位置）
+ * - 大きさ・威力は、もとの当たり判定の大きさ（半径）・威力に掛ける倍率
+ */
+export const moveEffectSchema = z.object({
+  trigger: z.enum(['cast', 'hit', 'end', 'every']),
+  everySeconds: z.number().positive().optional(),
+  /** 起こる確率（0〜1。省略で必ず） */
+  chance: z.number().min(0).max(1).optional(),
+  /** 爆発: その場で弾ける円。delaySeconds があれば、印を置いて少し後に弾ける。pull は中心へ引き寄せる強さ */
+  explode: z.object({ ...fxSize, delaySeconds: z.number().positive().optional(), pull: z.number().positive().optional() }).optional(),
+  /** 残る範囲（炎・水たまり・毒）。直線の当たり判定なら alongSpacing ごとに線に沿って並べる */
+  puddle: z
+    .object({ ...fxSize, durationSeconds: z.number().positive(), hitIntervalSeconds: z.number().positive(), alongSpacing: z.number().positive().optional() })
+    .optional(),
+  /** 分裂: 小さな弾が飛び散る（spreadDegrees は向きを中心にした広がり。360 で全方向） */
+  split: z
+    .object({
+      ...fxSize,
+      count: z.number().int().positive(),
+      speed: z.number().positive(),
+      durationSeconds: z.number().positive(),
+      spreadDegrees: z.number().positive().default(360),
+      boomerang: z.boolean().default(false),
+    })
+    .optional(),
+  /** 連鎖: その場から近くの敵へ count 回飛び移る */
+  chain: z.object({ ...fxSize, count: z.number().int().positive(), range: z.number().positive() }).optional(),
+  /** 周回: 自分の周りを回る当たり判定（speed は 度/秒） */
+  orbit: z
+    .object({ ...fxSize, count: z.number().int().positive(), radius: z.number().positive(), speed: z.number(), durationSeconds: z.number().positive(), hitIntervalSeconds: z.number().positive() })
+    .optional(),
+  /** 突き出す: その場から count 方向へ、しばらく残る直線 */
+  spikes: z
+    .object({ ...fxSize, count: z.number().int().positive(), length: z.number().positive(), durationSeconds: z.number().positive(), hitIntervalSeconds: z.number().positive() })
+    .optional(),
+  /** 波: その場から radius まで広がる輪 */
+  wave: z.object({ powerMultiplier: z.number().nonnegative(), radius: z.number().positive(), durationSeconds: z.number().positive() }).optional(),
+});
+export type MoveEffect = z.infer<typeof moveEffectSchema>;
+
 export const moveDefSchema = z.object({
   pattern: z.enum(MOVE_PATTERNS),
   /** 見た目のレシピ（data/effects/recipes.json のキー） */
@@ -502,25 +547,10 @@ export const moveDefSchema = z.object({
    * lungeDistance だけ体を出して戻す。afterimages があれば、その数の残像を前方に残す（でんこうせっか）
    */
   body: z.object({ lungeDistance: z.number().positive(), afterimages: z.number().int().nonnegative().default(0) }).optional(),
-  /**
-   * 「効き方」の部品（07_content_draft.md 22.4）: 流れの先（stream の行き着いた所）で、everySeconds ごとに爆発する。
-   * 爆発の半径・威力は技の大きさ・威力の倍率。puddle があれば、爆発した場所に水たまりなどの範囲がしばらく残る
-   */
-  endBlast: z
-    .object({
-      everySeconds: z.number().positive(),
-      sizeMultiplier: z.number().positive(),
-      powerMultiplier: z.number().positive(),
-      puddle: z
-        .object({
-          sizeMultiplier: z.number().positive(),
-          powerMultiplier: z.number().positive(),
-          durationSeconds: z.number().positive(),
-          hitIntervalSeconds: z.number().positive(),
-        })
-        .optional(),
-    })
-    .optional(),
+  /** 「効き方」の部品（07_content_draft.md 22.4）。進化するたびに増やす */
+  effects: z.array(moveEffectSchema).optional(),
+  /** 飛ぶ弾が曲がる速さ（度/秒）。十字・向いている方向の弾が渦を巻くように回る（ふぶき・エアスラッシュ） */
+  curve: z.number().optional(),
 });
 export type MoveDefData = z.infer<typeof moveDefSchema>;
 

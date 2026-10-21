@@ -106,7 +106,7 @@ describe('進化で増える効き方（作者の決定。07 22章）', () => {
     rules.moves[0] = {
       ...rules.moves[0]!,
       pattern: 'stream',
-      endBlast: { everySeconds: 0.5, sizeMultiplier: 3, powerMultiplier: 3, puddle: { sizeMultiplier: 2, powerMultiplier: 0.5, durationSeconds: 2, hitIntervalSeconds: 0.5 } },
+      effects: [{ trigger: 'every', everySeconds: 0.5, explode: { sizeMultiplier: 3, powerMultiplier: 3 }, puddle: { sizeMultiplier: 2, powerMultiplier: 0.5, durationSeconds: 2, hitIntervalSeconds: 0.5 } }],
     };
     const sim = new Simulation({ tickRate: 30, seed: 3, rules });
     const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
@@ -120,5 +120,74 @@ describe('進化で増える効き方（作者の決定。07 22章）', () => {
     expect(puddles.length).toBe(1);
     expect(pr.x[puddles[0]!]!).toBeCloseTo(300, 0);
     expect(pr.radius[puddles[0]!]!).toBeCloseTo(20);
+  });
+});
+
+describe('効き方の部品（07 22.4）', () => {
+  /** 技0 に効き方を付けて進める */
+  function withEffects(pattern: SimMoveDef['pattern'], stats: Record<string, number>, effects: SimMoveDef['effects'], enemies: [number, number][], ticks: number, curve = 0) {
+    const rules = testRules({ move: { power: 10, cooldownSeconds: 100, pierce: Infinity, durationSeconds: 0.5, ...stats } });
+    rules.moves[0] = { ...rules.moves[0]!, pattern, effects, curve };
+    const sim = new Simulation({ tickRate: 30, seed: 3, rules });
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
+    p.facingX = 1;
+    p.facingY = 0;
+    enemies.forEach(([x, y], k) => sim.world.enemies.add(k + 1, 0, x, y, 1000, 0, 10));
+    for (let t = 0; t < ticks; t++) sim.step([]);
+    return sim;
+  }
+  const stageCount = (sim: Simulation, stage: number) => {
+    let n = 0;
+    for (let i = 0; i < sim.world.projectiles.count; i++) if (sim.world.projectiles.stage[i] === stage) n++;
+    return n;
+  };
+
+  it('分裂: 当たると小さな弾が飛び散る', () => {
+    const sim = withEffects('facing', { speed: 600, size: 6, count: 1, range: 400, durationSeconds: 1 }, [{ trigger: 'hit', split: { sizeMultiplier: 0.5, powerMultiplier: 0.5, count: 5, speed: 200, durationSeconds: 1, spreadDegrees: 360, boomerang: false } }], [[100, 0]], 8);
+    expect(stageCount(sim, 1)).toBe(5);
+  });
+
+  it('連鎖: 当たった敵から近くの敵へ飛び移る', () => {
+    const sim = withEffects('facing', { speed: 600, size: 6, count: 1, range: 400, durationSeconds: 1 }, [{ trigger: 'hit', chain: { sizeMultiplier: 1, powerMultiplier: 1, count: 2, range: 200 } }], [[100, 0], [100, 120], [100, 240]], 8);
+    const e = sim.world.enemies;
+    // 弾の通り道にいない 2体にも当たる
+    expect(1000 - e.hp[1]!).toBeGreaterThan(0);
+    expect(1000 - e.hp[2]!).toBeGreaterThan(0);
+  });
+
+  it('周回・突き出す・波: 技を使ったときに出る', () => {
+    const sim = withEffects(
+      'melee',
+      { size: 20, count: 1, range: 0 },
+      [{ trigger: 'cast', orbit: { sizeMultiplier: 0.5, powerMultiplier: 1, count: 3, radius: 60, speed: 360, durationSeconds: 1, hitIntervalSeconds: 0.2 }, spikes: { sizeMultiplier: 0.5, powerMultiplier: 1, count: 4, length: 200, durationSeconds: 1, hitIntervalSeconds: 0.3 }, wave: { powerMultiplier: 1, radius: 200, durationSeconds: 0.5 } }],
+      [[0, 150]],
+      2,
+    );
+    expect(stageCount(sim, 1)).toBe(3 + 4 + 1);
+    // 下へ突き出した線が当たる
+    expect(1000 - sim.world.enemies.hp[0]!).toBeGreaterThan(0);
+  });
+
+  it('遅れて弾ける印: 印は当たらず、少し後に弾ける', () => {
+    const sim = withEffects('strike', { size: 20, count: 1, range: 300, durationSeconds: 0.1 }, [{ trigger: 'end', explode: { sizeMultiplier: 2, powerMultiplier: 5, delaySeconds: 0.5 } }], [[100, 0]], 6);
+    const hpAfterStrike = sim.world.enemies.hp[0]!;
+    expect(stageCount(sim, 2)).toBe(1);
+    for (let t = 0; t < 20; t++) sim.step([]);
+    expect(sim.world.enemies.hp[0]!).toBeLessThan(hpAfterStrike - 40);
+  });
+
+  it('引き寄せ: 爆発の中心へ敵を引き寄せる', () => {
+    const sim = withEffects('strike', { size: 20, count: 1, range: 300, durationSeconds: 0.1, knockbackSeconds: 0.2 }, [{ trigger: 'end', explode: { sizeMultiplier: 5, powerMultiplier: 0, pull: 300 } }], [[100, 0], [160, 0]], 12);
+    // 2体目（中心から右にいる）は中心（1体目の位置）のほうへ動く
+    expect(sim.world.enemies.x[1]!).toBeLessThan(160);
+  });
+
+  it('曲がる弾: 十字の弾が渦を巻くように回る', () => {
+    const sim = withEffects('cross', { speed: 300, size: 6, count: 4, range: 400, durationSeconds: 2 }, [], [], 10, Math.PI);
+    const pr = sim.world.projectiles;
+    // 右へ撃った弾は、まっすぐなら y = 0 のまま。曲がると下へずれる
+    let moved = false;
+    for (let i = 0; i < pr.count; i++) if (pr.x[i]! > 50 && Math.abs(pr.y[i]!) > 10) moved = true;
+    expect(moved).toBe(true);
   });
 });

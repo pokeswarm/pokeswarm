@@ -1,4 +1,4 @@
-import type { CombatConfig, MoveDefData, MovePattern } from '../data/schema';
+import type { CombatConfig, MoveDefData, MovePattern, MoveEffect } from '../data/schema';
 
 /** シミュレーションが使う技の性能（レベルを反映済み。貫通無限は Infinity） */
 export interface MoveStats {
@@ -45,15 +45,10 @@ export interface SimMoveDef {
   readonly effect: string;
   /** 自分の体で攻撃する技の見た目（使ったときに知らせる）。無ければ null */
   readonly body: { readonly lungeDistance: number; readonly afterimages: number } | null;
-  /** 流れの先の爆発・水たまり（07 22.4 の効き方の部品）。無ければ null */
-  readonly endBlast: EndBlast | null;
-}
-
-export interface EndBlast {
-  readonly everySeconds: number;
-  readonly sizeMultiplier: number;
-  readonly powerMultiplier: number;
-  readonly puddle?: { readonly sizeMultiplier: number; readonly powerMultiplier: number; readonly durationSeconds: number; readonly hitIntervalSeconds: number };
+  /** 効き方の部品（07 22.4）。無ければ空 */
+  readonly effects: readonly MoveEffect[];
+  /** 飛ぶ弾が曲がる速さ（ラジアン/秒）。0 なら まっすぐ */
+  readonly curve: number;
 }
 
 /** 最小値で止める項目（足し続けても壊れないように） */

@@ -57,6 +57,13 @@
       "damageTakenMultiplier": 1,
       "healsAttacker": true,
       "color": "#9ccc65"
+    },
+    {
+      "id": "soaked",
+      "damagePerSecond": 0,
+      "speedMultiplier": 0.6,
+      "damageTakenMultiplier": 1,
+      "color": "#4fc3f7"
     }
   ]
 }

@@ -7,6 +7,7 @@ import itemSpritesJson from '../../data/render/items.json';
 import obstacleSpritesJson from '../../data/render/obstacles.json';
 import obstaclesJson from '../../data/game/obstacles.json';
 import iconsJson from '../../data/render/icons.json';
+import moveBalanceJson from '../../data/game/move-balance.json';
 import enemiesJson from '../../data/game/enemies.json';
 import spawnJson from '../../data/game/spawn.json';
 import combatJson from '../../data/game/combat.json';
@@ -71,6 +72,7 @@ import {
   obstacleConfigSchema,
   iconConfigSchema,
   MOVE_PATTERNS,
+  moveBalanceSchema,
 } from './schema';
 
 function load<T extends z.ZodType>(name: string, schema: T, raw: unknown): z.infer<T> {
@@ -92,6 +94,8 @@ export const obstacleSprites = load('render/obstacles.json', pixelSpritesSchema,
 export const obstacleConfig = load('game/obstacles.json', obstacleConfigSchema, obstaclesJson);
 /** 技・持ち物・パッシブのアイコン（自作のドット絵） */
 export const iconConfig = load('render/icons.json', iconConfigSchema, iconsJson);
+/** 技の強さをそろえる目安（段階ごとの総合の強さ） */
+export const moveBalanceConfig = load('game/move-balance.json', moveBalanceSchema, moveBalanceJson);
 export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enemiesJson);
 export const spawnConfig = load('game/spawn.json', spawnConfigSchema, spawnJson);
 export const combatConfig = load('game/combat.json', combatConfigSchema, combatJson);

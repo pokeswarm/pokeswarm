@@ -1,0 +1,9 @@
+{
+  "tiers": {
+    "base": { "max": 80, "firstRatio": 0.25 },
+    "derived": { "max": 240, "firstRatio": 0.385 },
+    "unique": { "max": 600, "firstRatio": 0.46 }
+  },
+  "tolerancePct": 25,
+  "exempt": ["sleep-powder", "metronome"]
+}

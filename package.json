@@ -13,7 +13,8 @@
     "balance": "vitest run --mode balance --silent=false",
     "sprites": "node scripts/fetch-sprites.ts",
     "pokeapi": "node scripts/fetch-pokeapi.ts",
-    "moves-table": "node scripts/moves-table.ts"
+    "moves-table": "node scripts/moves-table.ts",
+    "balance-moves": "node scripts/balance-moves.ts"
   },
   "dependencies": {
     "firebase": "^13.0.0",

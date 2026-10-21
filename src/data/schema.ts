@@ -1097,3 +1097,19 @@ export const iconConfigSchema = z.object({
   passives: z.record(z.string(), z.object({ glyph: z.string(), color: z.string() })),
 });
 export type IconConfig = z.infer<typeof iconConfigSchema>;
+
+/**
+ * 技の強さをそろえる目安（作者の決定。07_content_draft.md 16.2）。最大レベルの総合の強さ（√(単体 × 群れ)）を段階ごとの max にそろえ、
+ * Lv1 は max × firstRatio。tolerancePct の幅を許す。exempt は帯の外（ねむりごな・ゆびをふる）。
+ * 数値をそろえるのは npm run balance-moves（威力だけを変える）
+ */
+export const moveBalanceSchema = z.object({
+  tiers: z.object({
+    base: z.object({ max: z.number().positive(), firstRatio: z.number().positive().max(1) }),
+    derived: z.object({ max: z.number().positive(), firstRatio: z.number().positive().max(1) }),
+    unique: z.object({ max: z.number().positive(), firstRatio: z.number().positive().max(1) }),
+  }),
+  tolerancePct: z.number().nonnegative(),
+  exempt: z.array(z.string()),
+});
+export type MoveBalanceConfig = z.infer<typeof moveBalanceSchema>;

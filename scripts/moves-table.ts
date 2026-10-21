@@ -13,7 +13,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { moveCrowdStrength, moveStatsAt, moveStrength } from '../src/data/moveStrength.ts';
+import { moveCrowdStrength, moveStatsAt, moveStrength, moveTotalStrength } from '../src/data/moveStrength.ts';
 import type { MoveDefData } from '../src/data/schema.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -70,6 +70,7 @@ function round(v: number): number {
 const statsAt = (def: MoveDef, level: number): Stats => moveStatsAt(def as unknown as MoveDefData, level);
 const dps = (def: MoveDef, s: Stats): number => moveStrength(def as unknown as MoveDefData, s);
 const crowd = (def: MoveDef, s: Stats): number => moveCrowdStrength(def as unknown as MoveDefData, s);
+const totalOf = (def: MoveDef, s: Stats): number => moveTotalStrength(def as unknown as MoveDefData, s);
 
 /** 系統ごとに、進化の途中で持つタイプをすべて集める */
 function lineTypes(line: string): Set<string> {
@@ -117,7 +118,8 @@ out.push('');
 out.push('- 最初に派生のつながり（タイプの技 → 派生技 → 固有技）、次に強さの順の早見表、最後に派生の前後を並べた数値の表。');
 out.push('- **強さの目安（単体）**: 1体の敵に当て続けたときの1秒あたりのダメージ（威力 × 数 × 1回で当たる回数 ÷ 再使用）。ボスへの強さ。');
 out.push('- **強さの目安（群れ）**: 群れの中で、1秒あたりに与えるダメージの合計の見込み。技の範囲（飛ぶ技は通り道、扇・円・線の広さ）に敵が何体入るかを、敵1体あたり 5000 の広さとして見積もる（1回の技で40体まで）。雑魚への強さ。');
-out.push('- どちらも、ポケモンのステータス・タイプ一致・相性・持ち物は掛けていない。');
+out.push('- **総合** = √(単体 × 群れ)。段階ごとに最大レベルの総合をそろえている（タイプの技 80・派生技 240・固有技 600。`data/game/move-balance.json`、`npm run balance-moves`）。');
+out.push('- どれも、ポケモンのステータス・タイプ一致・相性・持ち物は掛けていない。');
 out.push('- **大きさ**は当たり判定の半径、**距離**は狙える距離・前に出る距離・回る半径・ビームの長さ（出し方による）。');
 out.push('');
 /** 派生のつながり: タイプの技（根）から、派生技・固有技までの道すじ */
@@ -140,7 +142,7 @@ const strength = (k: string): string => {
   const def = moves[k]!;
   const a = statsAt(def, 1);
   const b = statsAt(def, def.levels.length + 1);
-  return `単体 ${dps(def, a).toFixed(0)} → ${dps(def, b).toFixed(0)}<br>群れ ${crowd(def, a).toFixed(0)} → ${crowd(def, b).toFixed(0)}`;
+  return `総合 ${totalOf(def, a).toFixed(0)} → ${totalOf(def, b).toFixed(0)}<br>単体 ${dps(def, a).toFixed(0)} → ${dps(def, b).toFixed(0)}<br>群れ ${crowd(def, a).toFixed(0)} → ${crowd(def, b).toFixed(0)}`;
 };
 const cell = (s: Step | undefined): string => (s ? `**${moveName(s.move)}**<br>${strength(s.move)}` : '');
 const material = (s: Step | undefined): string => (s?.via ? `＋${itemName(s.via.item)}${s.via.line ? `<br>（${pokeName(s.via.line)}だけ）` : ''}` : '');

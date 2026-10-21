@@ -90,3 +90,13 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
   const perCast = Math.min(CROWD_MAX_PER_CAST, num('count') * targets);
   return (num('power') * hits * perCast) / num('cooldownSeconds');
 }
+
+/** 総合の強さの目安 = √(単体 × 群れ)（作者の決定。単体だけ・群れだけが強い技は中くらいになる） */
+export function moveTotalStrength(def: MoveDefData, s: MoveStatsAt): number {
+  return Math.sqrt(moveStrength(def, s) * moveCrowdStrength(def, s));
+}
+
+/** Lv1 と最大レベルの総合の強さ */
+export function moveTotalRange(def: MoveDefData): { first: number; max: number } {
+  return { first: moveTotalStrength(def, moveStatsAt(def, 1)), max: moveTotalStrength(def, moveStatsAt(def, moveMaxLevel(def))) };
+}

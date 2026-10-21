@@ -6,6 +6,7 @@ import groundJson from '../../data/render/ground.json';
 import itemSpritesJson from '../../data/render/items.json';
 import obstacleSpritesJson from '../../data/render/obstacles.json';
 import obstaclesJson from '../../data/game/obstacles.json';
+import iconsJson from '../../data/render/icons.json';
 import enemiesJson from '../../data/game/enemies.json';
 import spawnJson from '../../data/game/spawn.json';
 import combatJson from '../../data/game/combat.json';
@@ -68,6 +69,8 @@ import {
   musicScoreSchema,
   pixelSpritesSchema,
   obstacleConfigSchema,
+  iconConfigSchema,
+  MOVE_PATTERNS,
 } from './schema';
 
 function load<T extends z.ZodType>(name: string, schema: T, raw: unknown): z.infer<T> {
@@ -87,6 +90,8 @@ export const itemSprites = load('render/items.json', pixelSpritesSchema, itemSpr
 /** 障害物のドット絵（自作）と、置き方 */
 export const obstacleSprites = load('render/obstacles.json', pixelSpritesSchema, obstacleSpritesJson);
 export const obstacleConfig = load('game/obstacles.json', obstacleConfigSchema, obstaclesJson);
+/** 技・持ち物・パッシブのアイコン（自作のドット絵） */
+export const iconConfig = load('render/icons.json', iconConfigSchema, iconsJson);
 export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enemiesJson);
 export const spawnConfig = load('game/spawn.json', spawnConfigSchema, spawnJson);
 export const combatConfig = load('game/combat.json', combatConfigSchema, combatJson);
@@ -137,6 +142,11 @@ for (const wave of spawnConfig.waves) {
     );
   }
 }
+// アイコン: 技の出し方・持ち物・パッシブ・タイプごとに絵柄と色がある
+for (const p of MOVE_PATTERNS) check(!!iconConfig.glyphs[iconConfig.moves[p] ?? ''], `data/render/icons.json に出し方 "${p}" の絵柄がありません`);
+for (const k of Object.keys(itemsConfig.items)) check(!!iconConfig.glyphs[iconConfig.items[k]?.glyph ?? ''], `data/render/icons.json に持ち物 "${k}" のアイコンがありません`);
+for (const k of Object.keys(passivesConfig.passives)) check(!!iconConfig.glyphs[iconConfig.passives[k]?.glyph ?? ''], `data/render/icons.json にパッシブ "${k}" のアイコンがありません`);
+for (const k of Object.keys(movesConfig.moves)) check(!!iconConfig.typeColors[generated.moves[k]!.type], `data/render/icons.json にタイプ "${generated.moves[k]!.type}" の色がありません`);
 // 障害物: 区間の数は spawn.json と同じ。見た目の種類はドット絵がある
 check(obstacleConfig.sections.length === spawnConfig.waves.length, `data/game/obstacles.json の sections（${obstacleConfig.sections.length}）と data/game/spawn.json の waves（${spawnConfig.waves.length}）の数をそろえてください`);
 for (const kinds of obstacleConfig.sections) for (const k of kinds) check(!!obstacleSprites.sprites[k], `data/game/obstacles.json の "${k}" のドット絵が data/render/obstacles.json にありません`);

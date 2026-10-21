@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { effectRecipes, generated, groundConfig, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig } from '../data';
+import { effectRecipes, generated, groundConfig, iconConfig, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig } from '../data';
 import { buildSimRules, localName, permanentModifiers, playableLoadout } from '../data/simRules';
 import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
@@ -14,6 +14,8 @@ import { RunSounds } from '../audio/runSounds';
 import { HitOutlines } from '../render/effects/HitOutlines';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
 import { ObstacleView } from '../render/ObstacleView';
+import { HudIcons } from '../render/HudIcons';
+import { ensureIconTextures, iconDataUrl } from '../render/Icons';
 import { GroundTiles, preloadGroundTiles } from '../render/GroundTiles';
 import { KeyboardInput } from '../render/KeyboardInput';
 import { PlayerView } from '../render/PlayerView';
@@ -84,6 +86,8 @@ export class RunScene extends Phaser.Scene {
   private outlineColors: ({ light: number; dark: number } | null)[] = [];
   private ground!: GroundTiles;
   private hud!: Phaser.GameObjects.Text;
+  /** 持っている技・持ち物・パッシブのアイコンとレベルの星 */
+  private hudIcons!: HudIcons;
   private lastSent: { dx: Axis; dy: Axis } = { dx: 0, dy: 0 };
   private lastSteps = 0;
   /** シミュレーション1回あたりの処理時間（移動平均, ms） */
@@ -258,7 +262,9 @@ export class RunScene extends Phaser.Scene {
     this.measureFrameTime();
     // ゲストの選択はホストが確定するので、要望としてホストへ送る
     const guest = role === 'guest';
+    ensureIconTextures(this, iconConfig, rules);
     this.levelUpPanel = new LevelUpPanel({
+      iconUrl: (key) => iconDataUrl(this, key),
       choose: (index) => (guest ? this.sync?.requestUpgrade('c', index) : this.uiCommands.push({ type: 'chooseUpgrade', playerId: this.localId, index })),
       reroll: () => (guest ? this.sync?.requestUpgrade('r') : this.uiCommands.push({ type: 'rerollUpgrades', playerId: this.localId })),
       skip: () => (guest ? this.sync?.requestUpgrade('s') : this.uiCommands.push({ type: 'skipUpgrade', playerId: this.localId })),
@@ -282,6 +288,7 @@ export class RunScene extends Phaser.Scene {
       .text(8, 8, '', { fontFamily: 'monospace', fontSize: '14px', color: '#ffffff', backgroundColor: '#00000080' })
       .setScrollFactor(0)
       .setDepth(1000);
+    this.hudIcons = new HudIcons(this);
     const center = { fontFamily: 'sans-serif', color: '#ffffff', stroke: '#000000', strokeThickness: 4 };
     this.timerText = this.add.text(0, 10, '', { ...center, fontSize: '28px', fontStyle: 'bold' }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1000);
     this.bossBar = this.add.graphics().setScrollFactor(0).setDepth(1000);
@@ -673,6 +680,7 @@ export class RunScene extends Phaser.Scene {
     this.placeUi(this.bossBar, 0, 0);
     this.placeUi(this.announceText, cx, cam.height * 0.3);
     this.placeUi(this.hud, 8, 8);
+    this.placeUi(this.hudIcons.container, 8, 8 + this.hud.height + 8);
     // 伝説戦の間は、逃げられるまでの残り時間
     const lg = w.legendary;
     const legendLeft = lg && lg.endTick > 0 ? Math.max(0, (lg.endTick - w.tick) * w.dt) : null;
@@ -879,7 +887,8 @@ export class RunScene extends Phaser.Scene {
       }),
       ...(local.down ? [t(this.coop ? 'run.downCoop' : 'debug.down', { revives: world.revives })] : []),
       t('debug.level', { level: world.level, xp: Math.floor(world.xpIntoLevel), need: world.rules.leveling.xpToNext[world.level] ?? 0, rerolls: local.rerolls }),
-      t('debug.moves', {
+      // 技・持ち物・パッシブはアイコンで出す（文字は F3 の詳しい表示のときだけ）
+      ...(this.showDebug ? [t('debug.moves', {
         moves: local.moves
           .map((m) => {
             const def = world.rules.moves[m.move]!;
@@ -893,7 +902,7 @@ export class RunScene extends Phaser.Scene {
       }),
       t('debug.passives', {
         passives: local.passives.map((ps) => localName(generated.items[world.rules.passives[ps.passive]!.key]?.names, getLocale(), '') + ' Lv' + ps.level).join(' / '),
-      }),
+      })] : []),
       ...(this.showDebug ? debugLines : []),
     ];
     if (this.coop && this.sync) {
@@ -914,6 +923,7 @@ export class RunScene extends Phaser.Scene {
       );
     }
     this.hud.setText(lines);
+    this.hudIcons.update(world, local);
   }
 }
 

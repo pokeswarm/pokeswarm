@@ -1076,3 +1076,22 @@ export const obstacleConfigSchema = z.object({
   sections: z.array(z.array(z.string()).min(1)),
 });
 export type ObstacleConfig = z.infer<typeof obstacleConfigSchema>;
+
+/**
+ * 技・持ち物・パッシブのアイコン（自作のドット絵。作者の決定: プレイ画面は文字ではなくアイコンで出す）。
+ * glyphs は白い絵柄（"#" 明るい部分・"+" ふち・"." 透明）。技は出し方ごとの絵柄をタイプの色で、枠で タイプの技・派生技・固有技 を分ける。
+ * 持ち物・パッシブは絵柄と色（"type:fire" でタイプの色）。stars はレベルの表示（★☆）
+ */
+export const iconConfigSchema = z.object({
+  size: z.number().int().positive(),
+  dot: z.number().positive(),
+  frame: z.object({ base: z.string(), derived: z.string(), unique: z.string() }),
+  starColors: z.object({ on: z.string(), off: z.string() }),
+  typeColors: z.record(z.string(), z.string().regex(/^#[0-9a-fA-F]{6}$/)),
+  glyphs: z.record(z.string(), z.array(z.string())),
+  stars: z.object({ on: z.array(z.string()).min(1), off: z.array(z.string()).min(1) }),
+  moves: z.record(z.string(), z.string()),
+  items: z.record(z.string(), z.object({ glyph: z.string(), color: z.string() })),
+  passives: z.record(z.string(), z.object({ glyph: z.string(), color: z.string() })),
+});
+export type IconConfig = z.infer<typeof iconConfigSchema>;

@@ -3,6 +3,7 @@ import { localName } from '../data/simRules';
 import { getLocale, t, tMaybe } from '../i18n';
 import type { Player } from '../sim/entities/player';
 import { derivationCompletedBy } from '../sim/systems/leveling';
+import { itemIconKey, moveIconKey, passiveIconKey } from '../render/Icons';
 import type { UpgradeOffer, World } from '../sim/world';
 
 /** カード1枚の表示用の文章 */
@@ -17,6 +18,8 @@ export interface OfferText {
   special: boolean;
   /** 「おや……？」を出す（以前に達成した派生で、このカードを取ると条件がそろう） */
   evolvable: boolean;
+  /** アイコンのテクスチャのキー */
+  icon: string;
 }
 
 function moveName(world: World, move: number): string {
@@ -46,11 +49,12 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
   const base = { special: false, evolvable };
   switch (offer.kind) {
     case 'moveNew':
-      return { ...base, kind: t('upgrade.kind.moveNew'), name: moveName(world, offer.move), level: t('levelUp.new'), detail: moveDetail(world, offer.move) };
+      return { ...base, icon: moveIconKey(r, offer.move), kind: t('upgrade.kind.moveNew'), name: moveName(world, offer.move), level: t('levelUp.new'), detail: moveDetail(world, offer.move) };
     case 'moveUp': {
       const pm = p.moves[offer.slot]!;
       return {
         ...base,
+        icon: moveIconKey(r, pm.move),
         kind: t('upgrade.kind.moveUp'),
         name: moveName(world, pm.move),
         level: t('levelUp.levelChange', { from: pm.level, to: pm.level + 1 }),
@@ -59,13 +63,14 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
     }
     case 'itemNew': {
       const key = r.items[offer.item]!.key;
-      return { ...base, kind: t('upgrade.kind.itemNew'), name: itemName(key), level: t('levelUp.new'), detail: tMaybe(`itemDesc.${key}`) };
+      return { ...base, icon: itemIconKey(r, offer.item), kind: t('upgrade.kind.itemNew'), name: itemName(key), level: t('levelUp.new'), detail: tMaybe(`itemDesc.${key}`) };
     }
     case 'itemUp': {
       const it = p.items[offer.slot]!;
       const key = r.items[it.item]!.key;
       return {
         ...base,
+        icon: itemIconKey(r, it.item),
         kind: t('upgrade.kind.itemUp'),
         name: itemName(key),
         level: t('levelUp.levelChange', { from: it.level, to: it.level + 1 }),
@@ -74,13 +79,14 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
     }
     case 'passiveNew': {
       const key = r.passives[offer.passive]!.key;
-      return { ...base, kind: t('upgrade.kind.passiveNew'), name: itemName(key), level: t('levelUp.new'), detail: tMaybe(`itemDesc.${key}`) };
+      return { ...base, icon: passiveIconKey(r, offer.passive), kind: t('upgrade.kind.passiveNew'), name: itemName(key), level: t('levelUp.new'), detail: tMaybe(`itemDesc.${key}`) };
     }
     case 'passiveUp': {
       const ps = p.passives[offer.slot]!;
       const key = r.passives[ps.passive]!.key;
       return {
         ...base,
+        icon: passiveIconKey(r, ps.passive),
         kind: t('upgrade.kind.passiveUp'),
         name: itemName(key),
         level: t('levelUp.levelChange', { from: ps.level, to: ps.level + 1 }),
@@ -89,6 +95,7 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
     }
     case 'derive':
       return {
+        icon: moveIconKey(r, offer.to),
         kind: t(offer.unique ? 'upgrade.kind.unique' : 'upgrade.kind.derive'),
         name: moveName(world, offer.to),
         level: t('levelUp.new'),
@@ -114,7 +121,14 @@ export class LevelUpPanel {
   private last: { level: number; offers: OfferText[]; rerolls: number; secondsLeft: number; bans: number } | null = null;
 
   constructor(
-    private readonly handlers: { choose: (index: number) => void; reroll: () => void; skip: () => void; ban: (index: number) => void },
+    private readonly handlers: {
+      choose: (index: number) => void;
+      reroll: () => void;
+      skip: () => void;
+      ban: (index: number) => void;
+      /** アイコンの画像の URL */
+      iconUrl: (key: string) => string;
+    },
   ) {
     this.root = document.createElement('div');
     Object.assign(this.root.style, {
@@ -168,8 +182,14 @@ export class LevelUpPanel {
       lv.textContent = o.level;
       top.append(kind, lv);
       const name = document.createElement('div');
-      name.style.cssText = 'font-size:clamp(20px,2.4vw,30px);font-weight:bold;line-height:1.2;overflow-wrap:anywhere';
-      name.textContent = o.name;
+      name.style.cssText = 'font-size:clamp(20px,2.4vw,30px);font-weight:bold;line-height:1.2;overflow-wrap:anywhere;display:flex;align-items:center;gap:10px';
+      const icon = document.createElement('img');
+      icon.src = this.handlers.iconUrl(o.icon);
+      icon.alt = '';
+      icon.style.cssText = 'width:48px;height:48px;image-rendering:pixelated;flex:none';
+      const nameText = document.createElement('span');
+      nameText.textContent = o.name;
+      name.append(icon, nameText);
       const detail = document.createElement('div');
       detail.style.cssText = 'font-size:clamp(14px,1.3vw,17px);opacity:0.9;overflow-wrap:anywhere';
       detail.textContent = o.detail;

@@ -1,5 +1,6 @@
 import type { CombatConfig, EnemyKind, PickupConfig, SpawnConfig, StageConfig, StatsConfig, StatusConfig } from '../data/schema';
 import type { SimSpecies } from './species';
+import type { ObstacleRules } from './obstacles';
 import type { SimMoveDef, TypeChart } from './moves';
 import type { SimDerivation, SimLeveling, SimUpgradeDef } from './upgrades';
 
@@ -30,4 +31,6 @@ export interface SimRules {
   stats: StatsConfig;
   /** ランの長さ・中ボス・ボス */
   stage: StageConfig;
+  /** マップの障害物 */
+  obstacles: ObstacleRules;
 }

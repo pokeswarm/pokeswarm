@@ -4,6 +4,8 @@ import playerJson from '../../data/game/player.json';
 import placeholderJson from '../../data/render/placeholder.json';
 import groundJson from '../../data/render/ground.json';
 import itemSpritesJson from '../../data/render/items.json';
+import obstacleSpritesJson from '../../data/render/obstacles.json';
+import obstaclesJson from '../../data/game/obstacles.json';
 import enemiesJson from '../../data/game/enemies.json';
 import spawnJson from '../../data/game/spawn.json';
 import combatJson from '../../data/game/combat.json';
@@ -65,6 +67,7 @@ import {
   bgmConfigSchema,
   musicScoreSchema,
   pixelSpritesSchema,
+  obstacleConfigSchema,
 } from './schema';
 
 function load<T extends z.ZodType>(name: string, schema: T, raw: unknown): z.infer<T> {
@@ -81,6 +84,9 @@ export const placeholderRender = load('render/placeholder.json', placeholderRend
 export const groundConfig = load('render/ground.json', groundConfigSchema, groundJson);
 /** 自作のドット絵（道具・アメの箱） */
 export const itemSprites = load('render/items.json', pixelSpritesSchema, itemSpritesJson);
+/** 障害物のドット絵（自作）と、置き方 */
+export const obstacleSprites = load('render/obstacles.json', pixelSpritesSchema, obstacleSpritesJson);
+export const obstacleConfig = load('game/obstacles.json', obstacleConfigSchema, obstaclesJson);
 export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enemiesJson);
 export const spawnConfig = load('game/spawn.json', spawnConfigSchema, spawnJson);
 export const combatConfig = load('game/combat.json', combatConfigSchema, combatJson);
@@ -131,6 +137,11 @@ for (const wave of spawnConfig.waves) {
     );
   }
 }
+// 障害物: 区間の数は spawn.json と同じ。見た目の種類はドット絵がある
+check(obstacleConfig.sections.length === spawnConfig.waves.length, `data/game/obstacles.json の sections（${obstacleConfig.sections.length}）と data/game/spawn.json の waves（${spawnConfig.waves.length}）の数をそろえてください`);
+for (const kinds of obstacleConfig.sections) for (const k of kinds) check(!!obstacleSprites.sprites[k], `data/game/obstacles.json の "${k}" のドット絵が data/render/obstacles.json にありません`);
+check(obstacleConfig.margin * 2 < obstacleConfig.cellSize, 'data/game/obstacles.json の margin は cellSize の半分より小さくする');
+check(!!itemSprites.candyBurst, 'data/render/items.json に candyBurst がありません');
 // 道具のドット絵: マップの道具ごとと、アメの箱
 for (const name of ['potion', 'magnet', 'rare-candy', 'candy-box', 'candy-box-open']) {
   check(!!itemSprites.sprites[name], `data/render/items.json に "${name}" のドット絵がありません`);

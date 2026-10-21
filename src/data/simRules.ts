@@ -13,6 +13,7 @@ import {
   passivesConfig,
   pickupConfig,
   playablesConfig,
+  obstacleConfig,
   shopConfig,
   spawnConfig,
   stageConfig,
@@ -96,6 +97,7 @@ export function buildSimRules(): SimRules {
     species,
     stats: statsConfig,
     stage: stageConfig,
+    obstacles: obstacleConfig,
   };
 }
 

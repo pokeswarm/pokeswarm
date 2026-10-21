@@ -1,3 +1,4 @@
+import { insideObstacle, rayLengthToObstacle } from '../obstacles';
 import {
   MOTION_BOOMERANG,
   MOTION_FOLLOW,
@@ -276,7 +277,9 @@ function fireBeam(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
     const a = Math.atan2(ay, ax) + offset;
     const dx = Math.cos(a);
     const dy = Math.sin(a);
-    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, shape: SHAPE_LINE, length: st.range, dirX: dx, dirY: dy, vx: dx, vy: dy });
+    // 障害物は技も遮る（ビームは障害物の手前まで）
+    const length = rayLengthToObstacle(world, p.x, p.y, dx, dy, st.range);
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, shape: SHAPE_LINE, length, dirX: dx, dirY: dy, vx: dx, vy: dy });
   }
 }
 
@@ -422,6 +425,12 @@ export function moveProjectiles(world: World): void {
     }
     pr.life[i]! -= world.dt;
     if (pr.life[i]! <= 0) {
+      pr.removeAt(i);
+      continue;
+    }
+    // 障害物は技も遮る（飛んでいく技は当たると消える）
+    if ((motion === MOTION_LINEAR || motion === MOTION_HOMING || motion === MOTION_BOOMERANG) && insideObstacle(world, pr.x[i]!, pr.y[i]!)) {
+      world.events.push({ type: 'projectileHit', x: pr.x[i]!, y: pr.y[i]!, owner: pr.owner[i]!, move: pr.move[i]! });
       pr.removeAt(i);
       continue;
     }

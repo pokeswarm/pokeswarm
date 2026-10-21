@@ -1,0 +1,45 @@
+{
+  "cellSize": 720,
+  "chance": 0.6,
+  "margin": 120,
+  "radius": 22,
+  "safeRadius": 260,
+  "sections": [
+    [
+      "tree",
+      "rock"
+    ],
+    [
+      "stalagmite",
+      "rock"
+    ],
+    [
+      "tree",
+      "rock"
+    ],
+    [
+      "dark-tree"
+    ],
+    [
+      "red-rock"
+    ],
+    [
+      "tree",
+      "rock"
+    ],
+    [
+      "beach-rock"
+    ],
+    [
+      "tree",
+      "rock"
+    ],
+    [
+      "stalagmite",
+      "rock"
+    ],
+    [
+      "pillar"
+    ]
+  ]
+}

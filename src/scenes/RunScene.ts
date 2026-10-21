@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { effectRecipes, generated, groundConfig, itemSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig } from '../data';
+import { effectRecipes, generated, groundConfig, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig } from '../data';
 import { buildSimRules, localName, permanentModifiers, playableLoadout } from '../data/simRules';
 import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
@@ -13,6 +13,7 @@ import { audio } from '../audio';
 import { RunSounds } from '../audio/runSounds';
 import { HitOutlines } from '../render/effects/HitOutlines';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
+import { ObstacleView } from '../render/ObstacleView';
 import { GroundTiles, preloadGroundTiles } from '../render/GroundTiles';
 import { KeyboardInput } from '../render/KeyboardInput';
 import { PlayerView } from '../render/PlayerView';
@@ -111,6 +112,8 @@ export class RunScene extends Phaser.Scene {
   /** マップに落ちている道具（きずぐすり・マグネット・ふしぎなアメ）の影と、道具ごとのドット絵 */
   private itemView!: Phaser.GameObjects.Graphics;
   private readonly itemImages = new Map<number, Phaser.GameObjects.Image>();
+  /** マップの障害物 */
+  private obstacleView!: ObstacleView;
   /** 画面上の真ん中: 経過時間、中ボス・ボスの HP、お知らせ */
   private timerText!: Phaser.GameObjects.Text;
   private bossBar!: Phaser.GameObjects.Graphics;
@@ -235,6 +238,8 @@ export class RunScene extends Phaser.Scene {
     this.gemView = new PooledCircles(this, -1);
     this.itemView = this.add.graphics().setDepth(0.4);
     ensurePixelTextures(this, itemSprites);
+    // 障害物は敵（0〜0.2）より上、予告の範囲（0.5）より下
+    this.obstacleView = new ObstacleView(this, obstacleSprites, 0.3);
     this.streamer = new SpriteStreamer(
       this,
       rules.enemies.kinds.map((k) => k.sprite),
@@ -632,7 +637,7 @@ export class RunScene extends Phaser.Scene {
    * ふしぎなアメ: 箱からアメがあふれ出る（作者の決定: 上がるレベルが多いほどたくさん出る。+1 ちょっと・+3 たくさん・+5 大量）
    */
   private burstCandies(x: number, y: number, levels: number): void {
-    const table = itemSprites.candyBurst;
+    const table = itemSprites.candyBurst ?? [{ levels: 1, count: 4 }];
     const count = (table.find((c) => c.levels === levels) ?? table.reduce((a, b) => (Math.abs(b.levels - levels) < Math.abs(a.levels - levels) ? b : a))).count;
     for (let i = 0; i < count; i++) {
       const candy = this.add.image(x, y - 8, pixelTextureKey('rare-candy')).setScale(itemSprites.dot).setDepth(1.6);
@@ -842,6 +847,7 @@ export class RunScene extends Phaser.Scene {
 
     this.drawHazards(world.hazards);
     this.drawItems(timeMs);
+    this.obstacleView.update(world, view);
     this.drawTopCenter();
 
     const lu = world.levelUp;

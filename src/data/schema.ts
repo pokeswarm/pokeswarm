@@ -1049,9 +1049,10 @@ export type MusicScore = z.infer<typeof musicScoreSchema>;
 export const pixelSpritesSchema = z
   .object({
     dot: z.number().positive(),
-    palette: z.record(z.string().length(1), z.string().regex(/^#[0-9a-fA-F]{6}$/)),
+    /** #rrggbb（#rrggbbaa で半透明。影など） */
+    palette: z.record(z.string().length(1), z.string().regex(/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/)),
     sprites: z.record(z.string(), z.array(z.string()).min(1)),
-    candyBurst: z.array(z.object({ levels: z.number().int().positive(), count: z.number().int().positive() })).min(1),
+    candyBurst: z.array(z.object({ levels: z.number().int().positive(), count: z.number().int().positive() })).min(1).optional(),
   })
   .superRefine((d, ctx) => {
     for (const [name, rows] of Object.entries(d.sprites)) {
@@ -1060,3 +1061,18 @@ export const pixelSpritesSchema = z
     }
   });
 export type PixelSpritesConfig = z.infer<typeof pixelSpritesSchema>;
+
+/**
+ * マップの障害物（作者の決定: 通り抜けられない。プレイヤーも敵も技も遮る。少なく置いて、まっすぐ進むだけの単調なプレイを崩す）。
+ * 地面を cellSize のマスに区切り、マスごとに chance で1つ置く。sections は区間（spawn.json の waves）ごとの見た目の種類
+ * （data/render/obstacles.json のドット絵のキー）。場所は区間によらず同じで、見た目だけが変わる
+ */
+export const obstacleConfigSchema = z.object({
+  cellSize: z.number().positive(),
+  chance: z.number().min(0).max(1),
+  margin: z.number().nonnegative(),
+  radius: z.number().positive(),
+  safeRadius: z.number().nonnegative(),
+  sections: z.array(z.array(z.string()).min(1)),
+});
+export type ObstacleConfig = z.infer<typeof obstacleConfigSchema>;

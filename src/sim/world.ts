@@ -1,4 +1,5 @@
 import type { PlayerId } from './commands';
+import type { Obstacle } from './obstacles';
 import { EnemyStore } from './entities/enemies';
 import { GemStore } from './entities/gems';
 import type { Player } from './entities/player';
@@ -153,6 +154,8 @@ export interface World {
   nextSwarm: number;
   /** 予告中の範囲 */
   readonly hazards: Hazard[];
+  /** マップの障害物（マスごと。シードから計算したものを覚えておく） */
+  readonly obstacleCache: Map<number, Obstacle | null>;
   /** 転がってきている、まだ爆発を始めていない敵（ビリリダマ）→ スウォームの番号（ソロ・ホスト） */
   readonly bombers: Map<number, number>;
   /** 近傍検索の作業用（更新中にメモリを確保しないため） */
@@ -201,6 +204,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     swarmSchedule: buildSwarmSchedule(rules, tickRate),
     nextSwarm: 0,
     hazards: [],
+    obstacleCache: new Map(),
     bombers: new Map(),
     level: 1,
     xpIntoLevel: 0,

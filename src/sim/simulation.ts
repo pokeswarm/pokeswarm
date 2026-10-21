@@ -13,6 +13,7 @@ import { openLevelUpIfPending, recomputeModifiers, stepLevelUp } from './systems
 import { emptyModifiers } from './upgrades';
 import { checkEvolutionAll } from './systems/evolution';
 import { contactDamage, regenerate, touchRevive } from './systems/health';
+import { blockByObstacles } from './obstacles';
 import { advanceSection, armBombers, bossAttacks, checkRunEnd, spawnBosses, spawnSwarms } from './systems/stage';
 import { createWorld, type SimRole, type World } from './world';
 
@@ -75,6 +76,7 @@ export class Simulation {
     moveEnemies(w);
     rebuildEnemyHash(w);
     separateEnemies(w);
+    blockByObstacles(w);
     tickStatuses(w);
     contactDamage(w);
     regenerate(w);

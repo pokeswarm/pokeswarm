@@ -152,6 +152,8 @@ export function testRules(
       endDelaySeconds: 1,
       ...overrides.stage,
     },
+    // 既定では障害物を置かない
+    obstacles: { cellSize: 500, chance: 0, margin: 50, radius: 20, safeRadius: 0, sections: [['test']] },
   };
 }
 

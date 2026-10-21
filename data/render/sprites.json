@@ -21,6 +21,7 @@
     "edge": 3,
     "fillAlpha": 0.45,
     "edgeAlpha": 0.9,
-    "edgeLighten": 0.45
+    "edgeLighten": 0.45,
+    "sectorBand": 0.3
   }
 }

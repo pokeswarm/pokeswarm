@@ -691,6 +691,8 @@ export const spriteRenderSchema = z.object({
     fillAlpha: z.number().min(0).max(1),
     edgeAlpha: z.number().min(0).max(1),
     edgeLighten: z.number().min(0).max(1),
+    /** 近接の扇形は、弧の近くの帯だけを描く。帯の太さ（半径に対する割合。作者の指摘 2026年10月22日） */
+    sectorBand: z.number().gt(0).max(1).default(0.3),
     moves: z.array(z.string()).optional(),
   }),
 });

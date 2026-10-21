@@ -10,6 +10,8 @@ interface HitShape {
   dirX: number;
   dirY: number;
   half: number | null;
+  /** 扇形（近接）なら true。弧の近くの帯だけを描く（360° なら輪） */
+  sector: boolean;
 }
 
 /**
@@ -25,7 +27,7 @@ export class HitShapes {
   constructor(
     scene: Phaser.Scene,
     depth: number,
-    private readonly cfg: { pixel: number; edge: number; fillAlpha: number; edgeAlpha: number },
+    private readonly cfg: { pixel: number; edge: number; fillAlpha: number; edgeAlpha: number; sectorBand: number },
   ) {
     this.layer = scene.add.layer().setDepth(depth);
     this.g = scene.add.graphics();
@@ -65,6 +67,7 @@ export class HitShapes {
         dirX: sector?.dirX ?? line?.dirX ?? 1,
         dirY: sector?.dirY ?? line?.dirY ?? 0,
         half: sector && sector.half < Math.PI ? sector.half : null,
+        sector: sector !== null,
       };
       const reach = s.radius + s.length + this.cfg.edge;
       if (x + reach < view.left || x - reach > view.right || y + reach < view.top || y - reach > view.bottom) continue;
@@ -72,7 +75,13 @@ export class HitShapes {
       g.fillStyle(color.fill, this.cfg.fillAlpha);
       g.fillPath();
       g.lineStyle(this.cfg.edge, color.edge, this.cfg.edgeAlpha);
-      g.strokePath();
+      if (s.sector && s.half === null) {
+        // 輪（360° の近接）は、内と外の円を別々に引く（つなぎ目の線を出さない）
+        g.strokeCircle(s.x, s.y, s.radius);
+        g.strokeCircle(s.x, s.y, s.radius * (1 - this.cfg.sectorBand));
+      } else {
+        g.strokePath();
+      }
     }
   }
 
@@ -81,6 +90,27 @@ export class HitShapes {
     const g = this.g;
     const base = Math.atan2(s.dirY, s.dirX);
     g.beginPath();
+    if (s.sector) {
+      // 近接の扇形は、弧の近くの帯（バームクーヘン型）だけ。当たり判定は扇形全体のまま（作者の指摘: 扇形の塗りが目にうるさい）
+      const inner = s.radius * (1 - this.cfg.sectorBand);
+      const a0 = s.half !== null ? base - s.half : 0;
+      const a1 = s.half !== null ? base + s.half : Math.PI * 2;
+      // 外の弧を行き、内の弧を戻る（点を並べて道筋にする）
+      const steps = Math.max(8, Math.ceil(((a1 - a0) * s.radius) / 8));
+      for (let k = 0; k <= steps; k++) {
+        const a = a0 + ((a1 - a0) * k) / steps;
+        const px = s.x + Math.cos(a) * s.radius;
+        const py = s.y + Math.sin(a) * s.radius;
+        if (k === 0) g.moveTo(px, py);
+        else g.lineTo(px, py);
+      }
+      for (let k = steps; k >= 0; k--) {
+        const a = a0 + ((a1 - a0) * k) / steps;
+        g.lineTo(s.x + Math.cos(a) * inner, s.y + Math.sin(a) * inner);
+      }
+      g.closePath();
+      return;
+    }
     if (s.half !== null) {
       // 扇形: 中心 → 弧 → 中心
       g.moveTo(s.x, s.y);

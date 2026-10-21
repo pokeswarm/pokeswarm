@@ -61,7 +61,6 @@
   "itemDesc.thunder-stone": "Electric move area +10%",
   "itemDesc.linking-cord": "A mysterious cord (consumed when used)",
   "itemDesc.hp-up": "Max HP +20%",
-  "itemDesc.pp-up": "Cooldown −8%",
   "itemDesc.dowsing-machine": "XP gem pickup range +20%",
   "itemDesc.wide-lens": "Move area +10%",
   "itemDesc.lucky-egg": "XP +8%",
@@ -296,7 +295,8 @@
   "itemDesc.x-sp-atk": "Special move power +10%",
   "itemDesc.pp-max": "Move amount +1 (projectiles, strikes, etc.)",
   "itemDesc.light-clay": "Move duration +10%",
-  "itemDesc.quick-claw": "Projectile speed +10%",
+  "itemDesc.quick-claw": "Cooldown −8%",
   "itemDesc.silk-scarf": "Normal moves +15%",
-  "itemDesc.moon-stone": "Normal move area +10%"
+  "itemDesc.moon-stone": "Normal move area +10%",
+  "itemDesc.quick-powder": "Projectile speed +10%"
 }

@@ -61,7 +61,6 @@
   "itemDesc.thunder-stone": "でんきの技の範囲 +10%",
   "itemDesc.linking-cord": "ふしぎなひも（使うとなくなる）",
   "itemDesc.hp-up": "最大HP +20%",
-  "itemDesc.pp-up": "クールダウン −8%",
   "itemDesc.dowsing-machine": "経験値の玉の取得範囲 +20%",
   "itemDesc.wide-lens": "技の範囲 +10%",
   "itemDesc.lucky-egg": "経験値 +8%",
@@ -296,7 +295,8 @@
   "itemDesc.x-sp-atk": "特殊の技の威力 +10%",
   "itemDesc.pp-max": "技の数 +1（発射数・落雷の数など）",
   "itemDesc.light-clay": "技の持続 +10%",
-  "itemDesc.quick-claw": "技の弾の速さ +10%",
+  "itemDesc.quick-claw": "クールダウン −8%",
   "itemDesc.silk-scarf": "ノーマルの技 +15%",
-  "itemDesc.moon-stone": "ノーマルの技の範囲 +10%"
+  "itemDesc.moon-stone": "ノーマルの技の範囲 +10%",
+  "itemDesc.quick-powder": "技の弾の速さ +10%"
 }

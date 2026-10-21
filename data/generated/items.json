@@ -149,12 +149,6 @@
       "en": "PP Max"
     }
   },
-  "pp-up": {
-    "names": {
-      "ja": "ポイントアップ",
-      "en": "PP Up"
-    }
-  },
   "protein": {
     "names": {
       "ja": "タウリン",
@@ -165,6 +159,12 @@
     "names": {
       "ja": "せんせいのツメ",
       "en": "Quick Claw"
+    }
+  },
+  "quick-powder": {
+    "names": {
+      "ja": "スピードパウダー",
+      "en": "Quick Powder"
     }
   },
   "rare-candy": {

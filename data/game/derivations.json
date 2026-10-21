@@ -29,7 +29,7 @@
     { "from": "flamethrower", "item": "fire-stone", "to": "blast-burn", "line": "charmander" },
     { "from": "quick-attack", "item": "x-speed", "to": "extreme-speed", "line": "growlithe" },
     { "from": "hydro-pump", "item": "water-stone", "to": "hydro-cannon", "line": "squirtle" },
-    { "from": "surf", "item": "quick-powder", "to": "rapid-spin", "line": "staryu" },
+    { "from": "surf", "item": "metronome", "to": "rapid-spin", "line": "staryu" },
     { "from": "seed-bomb", "item": "leaf-stone", "to": "frenzy-plant", "line": "bulbasaur" },
     { "from": "razor-leaf", "item": "wide-lens", "to": "petal-dance", "line": "oddish" },
     { "from": "sludge-wave", "item": "hp-up", "to": "explosion", "line": "koffing" },

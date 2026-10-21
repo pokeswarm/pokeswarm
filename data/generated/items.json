@@ -107,6 +107,12 @@
       "en": "Magnet"
     }
   },
+  "metronome": {
+    "names": {
+      "ja": "メトロノーム",
+      "en": "Metronome"
+    }
+  },
   "miracle-seed": {
     "names": {
       "ja": "きせきのタネ",
@@ -159,12 +165,6 @@
     "names": {
       "ja": "せんせいのツメ",
       "en": "Quick Claw"
-    }
-  },
-  "quick-powder": {
-    "names": {
-      "ja": "スピードパウダー",
-      "en": "Quick Powder"
     }
   },
   "rare-candy": {

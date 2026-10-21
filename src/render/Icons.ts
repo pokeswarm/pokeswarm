@@ -3,8 +3,16 @@ import type { IconConfig } from '../data/schema';
 import type { SimRules } from '../sim/rules';
 import { iconColor, iconPixels, starPixels, type IconTier } from './iconPixels';
 
-export const STAR_ON = 'icon:star-on';
-export const STAR_OFF = 'icon:star-off';
+/** レベルの表示のひし形（済んだもの: 段階ごとの色、まだのもの） */
+export function pipKey(on: boolean, tier: IconTier): string {
+  return on ? `icon:pip-${tier}` : 'icon:pip-off';
+}
+
+/** 技の段階（タイプの技・派生技・固有技） */
+export function moveTier(rules: SimRules, move: number): IconTier {
+  const d = rules.derivations.find((x) => x.to === move);
+  return !d ? 'base' : d.line === null ? 'derived' : 'unique';
+}
 
 export function moveIconKey(rules: SimRules, move: number): string {
   return `icon:move:${rules.moves[move]!.key}`;
@@ -25,16 +33,14 @@ function addTexture(scene: Phaser.Scene, key: string, width: number, height: num
 }
 
 /**
- * 技・持ち物・パッシブのアイコンと星のテクスチャを作る（一度だけ）。
+ * 技・持ち物・パッシブのアイコンと、レベルのひし形のテクスチャを作る（一度だけ）。
  * 技は出し方の絵柄をタイプの色で塗り、枠で タイプの技・派生技・固有技 を分ける
  */
 export function ensureIconTextures(scene: Phaser.Scene, data: IconConfig, rules: SimRules): void {
   const n = data.size;
-  const derivedTo = new Map<number, IconTier>();
-  for (const d of rules.derivations) derivedTo.set(d.to, d.line === null ? 'derived' : 'unique');
   rules.moves.forEach((m, i) => {
     const type = rules.types.names[m.type] ?? 'normal';
-    addTexture(scene, moveIconKey(rules, i), n, n, iconPixels(data, data.moves[m.pattern] ?? 'nearest', data.typeColors[type] ?? '#888888', derivedTo.get(i) ?? 'base'));
+    addTexture(scene, moveIconKey(rules, i), n, n, iconPixels(data, data.moves[m.pattern] ?? 'nearest', data.typeColors[type] ?? '#888888', moveTier(rules, i)));
   });
   rules.items.forEach((it, i) => {
     const def = data.items[it.key] ?? { glyph: 'orb', color: '#9e9e9e' };
@@ -44,10 +50,12 @@ export function ensureIconTextures(scene: Phaser.Scene, data: IconConfig, rules:
     const def = data.passives[ps.key] ?? { glyph: 'orb', color: '#9e9e9e' };
     addTexture(scene, passiveIconKey(rules, i), n, n, iconPixels(data, def.glyph, iconColor(data, def.color), 'base'));
   });
-  for (const [key, on] of [[STAR_ON, true], [STAR_OFF, false]] as const) {
-    const s = starPixels(data, on);
-    addTexture(scene, key, s.width, s.height, s.pixels);
+  for (const tier of ['base', 'derived', 'unique'] as const) {
+    const s = starPixels(data, true, tier);
+    addTexture(scene, pipKey(true, tier), s.width, s.height, s.pixels);
   }
+  const off = starPixels(data, false);
+  addTexture(scene, pipKey(false, 'base'), off.width, off.height, off.pixels);
 }
 
 /** DOM（レベルアップの画面）で使う画像の URL */

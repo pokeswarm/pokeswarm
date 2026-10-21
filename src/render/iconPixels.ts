@@ -64,10 +64,10 @@ export function iconPixels(data: IconConfig, glyph: string, color: string, tier:
   return out;
 }
 
-/** 星（レベルの表示）の RGBA */
-export function starPixels(data: IconConfig, on: boolean): { width: number; height: number; pixels: Uint8ClampedArray } {
+/** レベルの表示のひし形の RGBA（済んだものは段階ごとの色、まだのものは暗い枠だけ） */
+export function starPixels(data: IconConfig, on: boolean, tier: IconTier = 'base'): { width: number; height: number; pixels: Uint8ClampedArray } {
   const rows = on ? data.stars.on : data.stars.off;
-  const color = rgb(on ? data.starColors.on : data.starColors.off);
+  const color = rgb(on ? data.pipColors[tier] : data.starColors.off);
   const h = rows.length;
   const w = rows[0]!.length;
   const pixels = new Uint8ClampedArray(w * h * 4);

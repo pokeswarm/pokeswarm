@@ -303,5 +303,6 @@
   "candy.tier.1": "GOTCHA!",
   "candy.tier.3": "GOTCHA!!!",
   "candy.tier.5": "GOTCHA!!!!!",
-  "levelUp.titleMore": "レベルアップ！ Lv {level}（あと {more} 回）"
+  "levelUp.titleMore": "レベルアップ！ Lv {level}（あと {more} 回）",
+  "pattern.stream": "前へ流れを出し続ける"
 }

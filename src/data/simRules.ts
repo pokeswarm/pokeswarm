@@ -45,6 +45,7 @@ export function buildSimRules(): SimRules {
       levels: resolveMoveLevels(def, statusIndexOf),
       effect: def.effect,
       body: def.body ?? null,
+      endBlast: def.endBlast ?? null,
     };
   });
   const moveIndex = (key: string): number => moves.findIndex((m) => m.key === key);

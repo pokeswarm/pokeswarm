@@ -303,5 +303,6 @@
   "candy.tier.1": "GOTCHA!",
   "candy.tier.3": "GOTCHA!!!",
   "candy.tier.5": "GOTCHA!!!!!",
-  "levelUp.titleMore": "Level up! Lv {level} ({more} more)"
+  "levelUp.titleMore": "Level up! Lv {level} ({more} more)",
+  "pattern.stream": "Continuous stream ahead"
 }

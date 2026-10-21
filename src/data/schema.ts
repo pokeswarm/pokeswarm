@@ -409,6 +409,7 @@ export const MOVE_PATTERNS = [
   'trail',
   'cross',
   'scatter',
+  'stream',
 ] as const;
 export type MovePattern = (typeof MOVE_PATTERNS)[number];
 
@@ -501,6 +502,25 @@ export const moveDefSchema = z.object({
    * lungeDistance だけ体を出して戻す。afterimages があれば、その数の残像を前方に残す（でんこうせっか）
    */
   body: z.object({ lungeDistance: z.number().positive(), afterimages: z.number().int().nonnegative().default(0) }).optional(),
+  /**
+   * 「効き方」の部品（07_content_draft.md 22.4）: 流れの先（stream の行き着いた所）で、everySeconds ごとに爆発する。
+   * 爆発の半径・威力は技の大きさ・威力の倍率。puddle があれば、爆発した場所に水たまりなどの範囲がしばらく残る
+   */
+  endBlast: z
+    .object({
+      everySeconds: z.number().positive(),
+      sizeMultiplier: z.number().positive(),
+      powerMultiplier: z.number().positive(),
+      puddle: z
+        .object({
+          sizeMultiplier: z.number().positive(),
+          powerMultiplier: z.number().positive(),
+          durationSeconds: z.number().positive(),
+          hitIntervalSeconds: z.number().positive(),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 export type MoveDefData = z.infer<typeof moveDefSchema>;
 

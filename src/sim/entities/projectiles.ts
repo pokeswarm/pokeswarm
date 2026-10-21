@@ -14,6 +14,12 @@ export const MOTION_HOMING = 4;
 export const MOTION_LOB = 5;
 /** 跳ね返り: 持ち主のまわりの枠（横 ox・縦 oy の半分の幅）の端で跳ね返る */
 export const MOTION_BOUNCE = 6;
+/**
+ * 出し続ける流れ（stream）: 持ち主の位置から、向いている方向（から angle だけずらした向き）へ伸びる直線。
+ * 向きは angularSpeed（ラジアン/秒）の速さで向いている方向へ回り、長さは障害物の手前まで（最大 orbitRadius）。
+ * ox は流れの先の爆発までの残り秒数
+ */
+export const MOTION_STREAM = 7;
 
 /** 当たり判定の形: 円（半径 radius） */
 export const SHAPE_CIRCLE = 0;

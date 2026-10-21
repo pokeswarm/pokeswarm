@@ -85,3 +85,40 @@ describe('技の型（作者の決定。07 18章）', () => {
     for (let i = 0; i < pr.count; i++) expect(Math.hypot(pr.x[i]!, pr.y[i]!)).toBeLessThanOrEqual(200);
   });
 });
+
+describe('進化で増える効き方（作者の決定。07 22章）', () => {
+  it('出し続ける流れ: 向いている方向へ伸び、向きを変えると回ってついてくる。次に使うまで途切れない', () => {
+    const { hit, sim } = run('stream', { range: 300, size: 10, count: 1, cooldownSeconds: 1, hitIntervalSeconds: 0.2, speed: 360 }, [[200, 0], [0, 200]], 10);
+    expect(hit[0]).toBeGreaterThan(0);
+    expect(hit[1]).toBe(0);
+    const p = sim.world.players[0]!;
+    // 下を向くと、流れが下へ回る（1秒に 360°）
+    sim.step([{ type: 'move', playerId: 1, dx: 0, dy: 1 }]);
+    for (let t = 0; t < 12; t++) sim.step([]);
+    const pr = sim.world.projectiles;
+    expect(pr.count).toBe(1);
+    expect(pr.dirY[0]!).toBeGreaterThan(0.9);
+    expect(p.y).toBeGreaterThan(0);
+  });
+
+  it('流れの先の爆発: 流れの先で弾け、水たまりが残る', () => {
+    const rules = testRules({ move: { power: 10, cooldownSeconds: 1, pierce: Infinity, range: 300, size: 10, count: 1, hitIntervalSeconds: 0.2, speed: 360 } });
+    rules.moves[0] = {
+      ...rules.moves[0]!,
+      pattern: 'stream',
+      endBlast: { everySeconds: 0.5, sizeMultiplier: 3, powerMultiplier: 3, puddle: { sizeMultiplier: 2, powerMultiplier: 0.5, durationSeconds: 2, hitIntervalSeconds: 0.5 } },
+    };
+    const sim = new Simulation({ tickRate: 30, seed: 3, rules });
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
+    p.facingX = 1;
+    p.facingY = 0;
+    for (let t = 0; t < 20; t++) sim.step([]);
+    const pr = sim.world.projectiles;
+    // 流れ1本・爆発（短い）・水たまり
+    const puddles = [];
+    for (let i = 0; i < pr.count; i++) if (pr.shape[i] === 0 && pr.life[i]! > 1) puddles.push(i);
+    expect(puddles.length).toBe(1);
+    expect(pr.x[puddles[0]!]!).toBeCloseTo(300, 0);
+    expect(pr.radius[puddles[0]!]!).toBeCloseTo(20);
+  });
+});

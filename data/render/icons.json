@@ -737,7 +737,8 @@
     "bounce": "bounce",
     "trail": "trail",
     "cross": "cross",
-    "scatter": "scatter"
+    "scatter": "scatter",
+    "stream": "beam"
   },
   "items": {
     "x-attack": {

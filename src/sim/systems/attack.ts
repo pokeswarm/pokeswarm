@@ -5,6 +5,7 @@ import {
   MOTION_HOMING,
   MOTION_LOB,
   MOTION_BOUNCE,
+  MOTION_STREAM,
   MOTION_LINEAR,
   MOTION_ORBIT,
   SHAPE_CIRCLE,
@@ -185,6 +186,9 @@ export function useMoves(world: World): void {
         case 'scatter':
           fireScatter(world, p, pm, st);
           break;
+        case 'stream':
+          fireStream(world, p, pm, st);
+          break;
       }
     }
   }
@@ -316,6 +320,38 @@ function fireBeam(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
     // 障害物は技も遮る（ビームは障害物の手前まで）
     const length = rayLengthToObstacle(world, p.x, p.y, dx, dy, st.range);
     world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, shape: SHAPE_LINE, length, dirX: dx, dirY: dy, vx: dx, vy: dy });
+  }
+}
+
+/**
+ * stream: 向いている方向へ、太い流れを出し続ける（07 22.5 ハイドロポンプ）。弾ではなく持ち主に付いていく直線で、
+ * 次に使うまで消えない（再使用の時間だけ残るので、途切れずに出し続けて見える）。count 2 以上は spreadDegrees ずつ広げて並べる
+ */
+function fireStream(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  const sc = scaledMoveStats(world, p, pm, st);
+  const blast = world.rules.moves[pm.move]!.endBlast;
+  for (let k = 0; k < st.count; k++) {
+    const offset = ((k - (st.count - 1) / 2) * st.spreadDegrees * Math.PI) / 180;
+    const a = Math.atan2(fy, fx) + offset;
+    const dx = Math.cos(a);
+    const dy = Math.sin(a);
+    world.projectiles.add({
+      ...base(world, p, pm, st),
+      motion: MOTION_STREAM,
+      x: p.x,
+      y: p.y,
+      shape: SHAPE_LINE,
+      length: rayLengthToObstacle(world, p.x, p.y, dx, dy, st.range),
+      dirX: dx,
+      dirY: dy,
+      angle: offset,
+      // 向きを変える速さ（ラジアン/秒）は speed を度/秒として使う
+      angularSpeed: (st.speed * Math.PI) / 180,
+      orbitRadius: st.range,
+      life: sc.cooldownSeconds + world.dt,
+      ox: blast ? blast.everySeconds : 0,
+    });
   }
 }
 
@@ -600,6 +636,8 @@ export function moveProjectiles(world: World): void {
       pr.angle[i]! += pr.angularSpeed[i]! * world.dt;
       pr.x[i] = owner.x + Math.cos(pr.angle[i]!) * pr.orbitRadius[i]!;
       pr.y[i] = owner.y + Math.sin(pr.angle[i]!) * pr.orbitRadius[i]!;
+    } else if (motion === MOTION_STREAM) {
+      stepStream(world, i, owner);
     }
     pr.life[i]! -= world.dt;
     if (pr.life[i]! <= 0) {
@@ -695,6 +733,85 @@ export function moveProjectiles(world: World): void {
     if (hitAny) world.events.push({ type: 'projectileHit', x: hitX, y: hitY, owner: ownerId, move: pr.move[i]! });
     if (pr.pierceLeft[i]! <= 0) pr.removeAt(i);
   }
+}
+
+/** 直線（始点・向き・長さ・太さ）に最初に触れる敵までの距離。いなければ長さ */
+function firstEnemyAlong(world: World, x: number, y: number, dx: number, dy: number, len: number, width: number): number {
+  const { enemies: e, enemyHash, scratch } = world;
+  const ex = x + dx * len;
+  const ey = y + dy * len;
+  const n = enemyHash.queryRect(Math.min(x, ex) - width, Math.min(y, ey) - width, Math.max(x, ex) + width, Math.max(y, ey) + width, scratch);
+  let best = len;
+  for (let k = 0; k < n; k++) {
+    const j = scratch[k]!;
+    if (e.hp[j]! <= 0) continue;
+    const t = (e.x[j]! - x) * dx + (e.y[j]! - y) * dy;
+    if (t < 0 || t >= best) continue;
+    const r = width + e.radius[j]!;
+    if (segmentDistance2(e.x[j]!, e.y[j]!, x, y, dx, dy, len) <= r * r) best = t;
+  }
+  return best;
+}
+
+/** 出し続ける流れの1回分: 持ち主に付いていき、向いている方向へ回り、障害物の手前まで伸び、流れの先で爆発する */
+function stepStream(world: World, i: number, owner: Player): void {
+  const pr = world.projectiles;
+  pr.x[i] = owner.x;
+  pr.y[i] = owner.y;
+  const [fx, fy] = axisToUnit(owner.facingX, owner.facingY);
+  const want = Math.atan2(fy, fx) + pr.angle[i]!;
+  const cur = Math.atan2(pr.dirY[i]!, pr.dirX[i]!);
+  // 近いほうの回り方で、決まった速さまで向きを変える
+  let diff = want - cur;
+  while (diff > Math.PI) diff -= Math.PI * 2;
+  while (diff < -Math.PI) diff += Math.PI * 2;
+  const turn = pr.angularSpeed[i]! * world.dt;
+  const a = cur + Math.max(-turn, Math.min(turn, diff));
+  pr.dirX[i] = Math.cos(a);
+  pr.dirY[i] = Math.sin(a);
+  pr.length[i] = rayLengthToObstacle(world, owner.x, owner.y, pr.dirX[i]!, pr.dirY[i]!, pr.orbitRadius[i]!);
+  const blast = world.rules.moves[pr.move[i]!]!.endBlast;
+  if (!blast) return;
+  pr.ox[i]! -= world.dt;
+  if (pr.ox[i]! > 0) return;
+  pr.ox[i]! += blast.everySeconds;
+  // 流れが最初に当たる敵（いなければ流れの先）で爆発し、水たまりなどを残す（同じ技の当たり判定として出す。見た目のレシピも同じ）
+  const along = firstEnemyAlong(world, owner.x, owner.y, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!, pr.radius[i]!);
+  const ex = owner.x + pr.dirX[i]! * along;
+  const ey = owner.y + pr.dirY[i]! * along;
+  const common = {
+    owner: pr.owner[i]!,
+    move: pr.move[i]!,
+    level: pr.level[i]!,
+    motion: MOTION_LINEAR,
+    x: ex,
+    y: ey,
+    vx: 0,
+    vy: 0,
+    ox: 0,
+    oy: 0,
+    angle: 0,
+    angularSpeed: 0,
+    orbitRadius: 0,
+    pierce: Infinity,
+    shape: SHAPE_CIRCLE,
+    length: 0,
+    dirX: 0,
+    dirY: 0,
+    growth: 0,
+  };
+  world.projectiles.add({ ...common, damage: pr.damage[i]! * blast.powerMultiplier, radius: pr.radius[i]! * blast.sizeMultiplier, life: 0.2, hitIntervalTicks: 0 });
+  if (blast.puddle) {
+    const pd = blast.puddle;
+    world.projectiles.add({
+      ...common,
+      damage: pr.damage[i]! * pd.powerMultiplier,
+      radius: pr.radius[i]! * pd.sizeMultiplier,
+      life: pd.durationSeconds,
+      hitIntervalTicks: Math.round(pd.hitIntervalSeconds / world.dt),
+    });
+  }
+  world.events.push({ type: 'projectileHit', x: ex, y: ey, owner: pr.owner[i]!, move: pr.move[i]! });
 }
 
 /**

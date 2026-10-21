@@ -26,7 +26,7 @@ export function moveMaxLevel(def: MoveDefData): number {
 }
 
 /** 当たり判定が別々の場所に出る出し方 */
-const SPREAD_PATTERNS = new Set(['orbit', 'screen', 'cross', 'strike', 'scatter', 'chain', 'whip', 'trail', 'lob', 'bounce']);
+const SPREAD_PATTERNS = new Set(['orbit', 'screen', 'cross', 'strike', 'scatter', 'chain', 'whip', 'trail', 'lob', 'bounce', 'stream']);
 
 export function moveStrength(def: MoveDefData, s: MoveStatsAt): number {
   const interval = s.hitIntervalSeconds as number;
@@ -81,6 +81,7 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
     }
     case 'beam':
     case 'whip':
+    case 'stream':
       area = range * 2 * size;
       break;
     case 'chain':

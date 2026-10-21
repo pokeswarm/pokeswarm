@@ -45,6 +45,15 @@ export interface SimMoveDef {
   readonly effect: string;
   /** 自分の体で攻撃する技の見た目（使ったときに知らせる）。無ければ null */
   readonly body: { readonly lungeDistance: number; readonly afterimages: number } | null;
+  /** 流れの先の爆発・水たまり（07 22.4 の効き方の部品）。無ければ null */
+  readonly endBlast: EndBlast | null;
+}
+
+export interface EndBlast {
+  readonly everySeconds: number;
+  readonly sizeMultiplier: number;
+  readonly powerMultiplier: number;
+  readonly puddle?: { readonly sizeMultiplier: number; readonly powerMultiplier: number; readonly durationSeconds: number; readonly hitIntervalSeconds: number };
 }
 
 /** 最小値で止める項目（足し続けても壊れないように） */

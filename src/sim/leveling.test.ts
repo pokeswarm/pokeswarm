@@ -141,13 +141,13 @@ describe('候補', () => {
     expect(makeOffers(other.sim.world, other.p).some((o) => o.kind === 'derive')).toBe(false);
   });
 
-  it('協力プレイ: ほかのプレイヤーが持っている持ち物は出ない', () => {
+  it('協力プレイ: ほかのプレイヤーが持っている持ち物も候補に出る（作者の決定で廃止した決まり）', () => {
     const { sim, p } = makeSim('charmander', []);
     const q = sim.addPlayer({ id: 2, x: 0, y: 0, radius: 12, moveSpeed: 100, moves: [] });
     q.items.push({ item: 0, level: 1 });
-    for (let k = 0; k < 30; k++) {
-      for (const o of makeOffers(sim.world, p)) if (o.kind === 'itemNew') expect(o.item).not.toBe(0);
-    }
+    let seen = false;
+    for (let k = 0; k < 40 && !seen; k++) seen = makeOffers(sim.world, p).some((o) => o.kind === 'itemNew' && o.item === 0);
+    expect(seen).toBe(true);
   });
   it('タイプの持ち物は、自分のタイプのものだけ候補に出る', () => {
     const WATER = 2;

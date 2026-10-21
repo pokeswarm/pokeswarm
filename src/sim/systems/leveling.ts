@@ -212,7 +212,7 @@ function isBaseMove(world: World, move: number): boolean {
 /**
  * 候補を作る（01_game_design.md 3.2・3.3、4.2）。
  * - 派生・固有技の条件（元の技が最大レベル ＋ 材料の持ち物）がそろっていれば必ず出す
- * - 残りは、技（自分のタイプとノーマル。枠が空いていれば新しい技、覚えている技の強化）・持ち物（誰かが持っているものは出さない）・パッシブから選ぶ
+ * - 残りは、技（自分のタイプとノーマル。枠が空いていれば新しい技、覚えている技の強化）・持ち物（同じ回でほかの人の候補に出ているものは出さない）・パッシブから選ぶ
  */
 /**
  * 持ち物がこのプレイヤーの候補に出るか。タイプの持ち物（もくたん・石など）は、自分のタイプのものか、
@@ -260,8 +260,8 @@ export function makeOffers(world: World, p: Player, excludeItems: ReadonlySet<nu
   });
   if (p.items.length < rules.leveling.maxItemSlots) {
     rules.items.forEach((_, item) => {
-      // 協力プレイ: 誰かがすでに持っている持ち物は候補に出さない
-      if (world.players.some((q) => q.items.some((it) => it.item === item))) return;
+      // 自分がすでに持っている持ち物は「強化」で出す（ほかの人が持っていても出る。作者の決定で「誰かが持っていれば出さない」は廃止）
+      if (p.items.some((it) => it.item === item)) return;
       // 同じ回で、ほかの人の候補に出ている持ち物も出さない
       if (excludeItems.has(item)) return;
       if (!itemFitsPlayer(world, p, item)) return;

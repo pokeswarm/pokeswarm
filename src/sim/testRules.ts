@@ -94,6 +94,7 @@ export function testRules(
       spatialCellSize: 64,
       retireOldWaveKinds: true,
       hpPerLevelPct: 0,
+      hpPerTwoGymsPct: 0,
       perExtraPlayer: { spawnPct: 0, hpPct: 0, xpSharePct: 0 },
       waves: [{ hpMultiplier: 1, damageMultiplier: 1, kinds: ['test'] }],
       ...overrides.spawn,

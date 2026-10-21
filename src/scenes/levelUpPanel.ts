@@ -1,9 +1,11 @@
 import { generated } from '../data';
+import { moveTotalStrength } from '../data/moveStrength';
 import { localName } from '../data/simRules';
 import { getLocale, t, tMaybe } from '../i18n';
 import type { Player } from '../sim/entities/player';
 import { derivationCompletedBy } from '../sim/systems/leveling';
 import { itemIconKey, moveIconKey } from '../render/Icons';
+import type { Modifiers } from '../sim/upgrades';
 import type { UpgradeOffer, World } from '../sim/world';
 
 /** カード1枚の表示用の文章 */
@@ -20,6 +22,74 @@ export interface OfferText {
   evolvable: boolean;
   /** アイコンのテクスチャのキー */
   icon: string;
+  /** このカードを取ると増えるもの（強化: 前のレベルとの差。新しい持ち物: 効果） */
+  gains: string[];
+}
+
+/** 数を「+3」「−0.1」のように符号付きで（小数は2桁まで） */
+function signed(v: number): string {
+  const r = Math.round(v * 100) / 100;
+  return r >= 0 ? `+${r}` : `−${Math.abs(r)}`;
+}
+
+/** 技のレベルが上がると変わる項目（見た目で分かるもの）。小さいほどよいものは sign -1 */
+const MOVE_GAINS: { key: 'count' | 'size' | 'range' | 'pierce' | 'durationSeconds' | 'speed' | 'knockback' | 'statusChance' | 'cooldownSeconds' | 'hitIntervalSeconds'; sign: 1 | -1; scale?: number }[] = [
+  { key: 'count', sign: 1 },
+  { key: 'size', sign: 1 },
+  { key: 'range', sign: 1 },
+  { key: 'pierce', sign: 1 },
+  { key: 'durationSeconds', sign: 1 },
+  { key: 'speed', sign: 1 },
+  { key: 'knockback', sign: 1 },
+  { key: 'statusChance', sign: 1, scale: 100 },
+  { key: 'cooldownSeconds', sign: -1 },
+  { key: 'hitIntervalSeconds', sign: -1 },
+];
+
+/** 技をレベル level から level + 1 に上げたときに増えるもの。最後に総合の強さの伸び（%） */
+function moveGains(world: World, move: number, level: number): string[] {
+  const def = world.rules.moves[move]!;
+  const a = def.levels[level - 1];
+  const b = def.levels[level];
+  if (!a || !b) return [];
+  const out: string[] = [];
+  for (const g of MOVE_GAINS) {
+    const d = (b[g.key] - a[g.key]) * (g.scale ?? 1);
+    // 良くなったものだけ（数が増えて1発の威力が下がるなどは、総合の強さで見せる）
+    if (!Number.isFinite(d) || d * g.sign <= 0) continue;
+    out.push(t(`gain.${g.key}`, { v: signed(d) }));
+  }
+  const pa = { pattern: def.pattern } as Parameters<typeof moveTotalStrength>[0];
+  const sa = moveTotalStrength(pa, a as unknown as Record<string, number>);
+  const sb = moveTotalStrength(pa, b as unknown as Record<string, number>);
+  if (Number.isFinite(sa) && sa > 0 && sb > sa) out.push(t('gain.strength', { v: Math.round(((sb - sa) / sa) * 100) }));
+  return out;
+}
+
+/** 持ち物の効果を、レベル level の値で1行ずつ（next があれば「今 → 次」） */
+function itemGains(world: World, item: number, level: number, next: number | null): string[] {
+  const def = world.rules.items[item]!;
+  const per = def.perLevel;
+  const out: string[] = [];
+  const pct = (v: number): string => `${signed(v)}%`;
+  const line = (label: string, v: number, fmt: (v: number) => string): void => {
+    if (v === 0) return;
+    out.push(`${label} ${fmt(v * level)}${next !== null ? ` → ${fmt(v * next)}` : ''}`);
+  };
+  for (const [k, v] of Object.entries(per) as [keyof Modifiers, number | number[]][]) {
+    if (Array.isArray(v)) {
+      // タイプごとの効果
+      v.forEach((x, type) => {
+        if (!x) return;
+        const typeKey = world.rules.types.names[type] ?? '';
+        line(t(`mod.${k}`, { type: localName(generated.types[typeKey]?.names, getLocale(), typeKey) }), x, pct);
+      });
+      continue;
+    }
+    line(t(`mod.${k}`), v, k.endsWith('Pct') ? pct : signed);
+  }
+  if (def.powerMultiplier) out.push(t('mod.powerMultiplier', { v: def.powerMultiplier }));
+  return out;
 }
 
 function moveName(world: World, move: number): string {
@@ -46,7 +116,7 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
   const r = world.rules;
   const completes = derivationCompletedBy(world, p, offer);
   const evolvable = completes !== null && discovered.has(r.moves[completes.to]!.key);
-  const base = { special: false, evolvable };
+  const base = { special: false, evolvable, gains: [] as string[] };
   switch (offer.kind) {
     case 'moveNew':
       return { ...base, icon: moveIconKey(r, offer.move), kind: t('upgrade.kind.moveNew'), name: moveName(world, offer.move), level: t('levelUp.new'), detail: moveDetail(world, offer.move) };
@@ -59,11 +129,14 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
         name: moveName(world, pm.move),
         level: t('levelUp.levelChange', { from: pm.level, to: pm.level + 1 }),
         detail: moveDetail(world, pm.move),
+        gains: moveGains(world, pm.move, pm.level),
       };
     }
     case 'itemNew': {
       const key = r.items[offer.item]!.key;
-      return { ...base, icon: itemIconKey(r, offer.item), kind: t('upgrade.kind.itemNew'), name: itemName(key), level: t('levelUp.new'), detail: tMaybe(`itemDesc.${key}`) };
+      // 効果はカードの増えるものの欄に出す（説明は効果が無い持ち物だけ。つながりのヒモなど）
+      const gains = itemGains(world, offer.item, 1, null);
+      return { ...base, icon: itemIconKey(r, offer.item), kind: t('upgrade.kind.itemNew'), name: itemName(key), level: t('levelUp.new'), detail: gains.length ? '' : tMaybe(`itemDesc.${key}`), gains };
     }
     case 'itemUp': {
       const it = p.items[offer.slot]!;
@@ -74,7 +147,8 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
         kind: t('upgrade.kind.itemUp'),
         name: itemName(key),
         level: t('levelUp.levelChange', { from: it.level, to: it.level + 1 }),
-        detail: tMaybe(`itemDesc.${key}`),
+        detail: '',
+        gains: itemGains(world, it.item, it.level, it.level + 1),
       };
     }
     case 'derive':
@@ -86,6 +160,7 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
         detail: moveDetail(world, offer.to),
         special: true,
         evolvable: false,
+        gains: [],
       };
   }
 }
@@ -179,6 +254,17 @@ export class LevelUpPanel {
       detail.style.cssText = 'font-size:clamp(14px,1.3vw,17px);opacity:0.9;overflow-wrap:anywhere';
       detail.textContent = o.detail;
       card.append(top, name, detail);
+      // 取ると増えるもの（強くなった感が分かるように。作者の指摘）
+      if (o.gains.length) {
+        const gains = document.createElement('ul');
+        gains.style.cssText = 'margin:0;padding-left:1.1em;font-size:clamp(14px,1.3vw,17px);font-weight:bold;color:#a5d6a7;line-height:1.5';
+        for (const g of o.gains) {
+          const li = document.createElement('li');
+          li.textContent = g;
+          gains.append(li);
+        }
+        card.append(gains);
+      }
       if (o.evolvable) {
         const badge = document.createElement('div');
         badge.style.cssText = 'margin-top:auto;align-self:flex-start;padding:2px 10px;border-radius:10px;background:#0277bd;font-weight:bold;font-size:14px';

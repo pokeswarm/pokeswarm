@@ -326,5 +326,8 @@ export function ticksUntilNextSection(world: World): number | null {
 export function enemyHpScale(world: World): number {
   const wave = world.waves[world.section]!;
   const extra = Math.max(0, world.players.length - 1);
-  return wave.hpMultiplier * (1 + (world.rules.spawn.hpPerLevelPct * (world.level - 1)) / 100) * (1 + (world.rules.spawn.perExtraPlayer.hpPct * extra) / 100);
+  // 倒したジムリーダーの数（区間は中ボスを倒すと進む。四天王の区間は数えない）
+  const gyms = Math.min(world.section, world.rules.stage.bosses.filter((b) => b.gate).length);
+  const gymScale = 1 + (world.rules.spawn.hpPerTwoGymsPct * Math.floor(gyms / 2)) / 100;
+  return gymScale * wave.hpMultiplier * (1 + (world.rules.spawn.hpPerLevelPct * (world.level - 1)) / 100) * (1 + (world.rules.spawn.perExtraPlayer.hpPct * extra) / 100);
 }

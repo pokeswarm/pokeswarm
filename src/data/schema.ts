@@ -124,6 +124,8 @@ export const spawnConfigSchema = z
      * 序盤は最初の技の一撃で倒せる HP にし、強くなった分だけ固くする（時間がたっただけでは固くならない）
      */
     hpPerLevelPct: z.number().nonnegative(),
+    /** ジムリーダー（区間の中ボス）を2人倒すごとに、雑魚の HP を何 % 上げるか（作者の指摘「ちょっと余裕すぎる」。2026年10月21日） */
+    hpPerTwoGymsPct: z.number().nonnegative().default(0),
     /**
      * 協力プレイで、2人目以降1人につき（作者の指摘「人数に応じた難易度調整が簡単すぎる」。2026年10月21日）:
      * - spawnPct: 出現の速さを何 % 上げるか（上限は capPerPlayer × 人数で増えるので、速さも合わせないと画面が埋まらない）

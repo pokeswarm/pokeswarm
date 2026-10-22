@@ -153,7 +153,7 @@ export class PokemonPicker {
     const text = document.createElement('div');
     text.style.cssText = 'display:flex;flex-direction:column;gap:4px;min-width:0;overflow-wrap:anywhere';
     const name = document.createElement('div');
-    name.style.fontSize = '20px';
+    name.style.cssText = 'font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
     const lines: string[] = [];
     if (unlocked) {
       const g = generated.pokemon[key];
@@ -167,12 +167,16 @@ export class PokemonPicker {
       const id = playablesConfig.pokemon[key]!.unlock ?? key;
       const a = achievementsConfig.achievements.find((x) => x.reward?.pokemon === id);
       const cond = a ? achievementCondition(a) : '';
-      lines.push(cond ? t('select.unlockHint', { condition: cond }) : t('select.notUnlocked'));
+      // 解放済みと同じく名前の下に2行（マウスを動かしても欄の高さが変わらないように）
+      lines.push(t('select.notUnlocked'), cond ? t('select.unlockHint', { condition: cond }) : '');
     }
     text.append(name);
     for (const l of lines) {
+      // 1行に収める（折り返すと欄の高さが変わる）。収まらない分は … にして、マウスを乗せると全文
       const d = document.createElement('div');
-      d.textContent = l;
+      d.style.cssText = 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+      d.textContent = l || ' ';
+      d.title = l;
       text.append(d);
     }
     this.detail.replaceChildren(icon, text);

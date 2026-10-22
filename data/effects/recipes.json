@@ -389,13 +389,6 @@
     "hydro-pump": {
       "extends": "water.base"
     },
-    "surf": {
-      "extends": "water.base",
-      "projectile": {
-        "glowScale": 1.05,
-        "coreScale": 0.3
-      }
-    },
     "hydro-cannon": {
       "extends": "water.base",
       "impact": {}
@@ -1065,8 +1058,10 @@
     "rapid-spin": {
       "extends": "water.base",
       "projectile": {
-        "glowScale": 1.8,
-        "coreScale": 0.8
+        "glowScale": 1.2,
+        "coreScale": 0.5,
+        "glowColor": "#80deea",
+        "shapeAlpha": 0.55
       }
     },
     "volt-tackle": {
@@ -1512,6 +1507,28 @@
     },
     "metronome": {
       "extends": "normal.base"
+    },
+    "bubble-beam": {
+      "extends": "water.base",
+      "projectile": {
+        "shapeAlpha": 0.6
+      }
+    },
+    "whirlpool": {
+      "extends": "water.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.3,
+        "glowColor": "#1e88e5"
+      }
+    },
+    "water-spout": {
+      "extends": "water.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.35,
+        "glowColor": "#039be5"
+      }
     }
   }
 }

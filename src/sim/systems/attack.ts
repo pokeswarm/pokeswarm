@@ -193,6 +193,9 @@ export function useMoves(world: World): void {
         case 'eruption':
           fireEruption(world, p, pm, st);
           break;
+        case 'spin':
+          fireSpin(world, p, pm, st);
+          break;
       }
       if (def.effects.some((fx) => fx.trigger === 'cast')) {
         const [fx, fy] = axisToUnit(p.facingX, p.facingY);
@@ -407,7 +410,7 @@ function fireScreen(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
 }
 
 /** 一度に出し終える出し方（ゆびをふるで選ぶ技。連射の出し方は、出し続ける状態を持てないので選ばない） */
-const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter', 'eruption']);
+const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter', 'eruption', 'spin']);
 
 /** metronome（ゆびをふる）: ほかの技からランダムに1つを、その技の最大レベルで出す */
 function fireMetronome(world: World, p: Player): void {
@@ -435,6 +438,7 @@ function fireMetronome(world: World, p: Player): void {
     cross: fireCross,
     scatter: fireScatter,
     eruption: fireEruption,
+    spin: fireSpin,
   };
   fire[def.pattern]?.(world, p, pm, st);
 }
@@ -563,7 +567,9 @@ function fireScatter(world: World, p: Player, pm: PlayerMove, st: MoveStats): vo
   for (let k = 0; k < st.count; k++) {
     const a = world.rng.next() * Math.PI * 2;
     const r = st.range * (0.3 + world.rng.next() * 0.7);
-    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x + Math.cos(a) * r, y: p.y + Math.sin(a) * r });
+    // speed があれば、置いた場所からランダムな向きへゆっくり動く（しおふき）
+    const b = world.rng.next() * Math.PI * 2;
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x + Math.cos(a) * r, y: p.y + Math.sin(a) * r, vx: Math.cos(b) * st.speed, vy: Math.sin(b) * st.speed });
   }
 }
 
@@ -589,6 +595,26 @@ function fireEruption(world: World, p: Player, pm: PlayerMove, st: MoveStats): v
       if (wait <= 0) world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, radius });
       else world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, radius, life: wait, stage: 3, armLife: st.durationSeconds });
     }
+  }
+}
+
+/**
+ * spin（回転）: 自分のまわりに、開き arcDegrees の扇形を count 枚、等しい角度で出す。使うたびに arcDegrees ずつ時計回りへずらす
+ * （画面は y が下なので、角度を足すと時計回り）。再使用が短いほど速く回って見える（こうそくスピン。作者の決定 2026年10月23日）
+ */
+function fireSpin(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const sc = scaledMoveStats(world, p, pm, st);
+  const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  const step = (Math.max(1, st.arcDegrees) * Math.PI) / 180;
+  const start = Math.atan2(fy, fx) + (pm.spinStep ?? 0) * step;
+  pm.spinStep = ((pm.spinStep ?? 0) + 1) % 360;
+  const half = Math.min(Math.PI, step / 2);
+  const n = Math.max(1, st.count);
+  for (let k = 0; k < n; k++) {
+    const a = start + (k / n) * Math.PI * 2;
+    const dx = Math.cos(a);
+    const dy = Math.sin(a);
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: st.range + sc.size, shape: SHAPE_SECTOR, length: half, dirX: dx, dirY: dy, vx: dx, vy: dy });
   }
 }
 

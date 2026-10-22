@@ -11,6 +11,8 @@ export interface PlayerMove {
   /** まとめて出す分の残り数と、次を出すまでの時間（秒） */
   burstLeft: number;
   burstTimer: number;
+  /** spin（回転）: 使った回数（扇形を出す向きを、回数ごとに時計回りへずらす） */
+  spinStep?: number;
 }
 
 export interface Player {

@@ -26,7 +26,7 @@ export function moveMaxLevel(def: MoveDefData): number {
 }
 
 /** 当たり判定が別々の場所に出る出し方 */
-const SPREAD_PATTERNS = new Set(['orbit', 'screen', 'cross', 'strike', 'scatter', 'chain', 'whip', 'trail', 'lob', 'bounce', 'stream', 'eruption']);
+const SPREAD_PATTERNS = new Set(['orbit', 'screen', 'cross', 'strike', 'scatter', 'chain', 'whip', 'trail', 'lob', 'bounce', 'stream', 'eruption', 'spin']);
 
 export function moveStrength(def: MoveDefData, s: MoveStatsAt): number {
   const interval = s.hitIntervalSeconds as number;
@@ -75,6 +75,10 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
     case 'lob':
     case 'bounce':
       area = 2 * size * Math.min(num('speed') * num('durationSeconds'), range || Infinity) * (def.pattern === 'boomerang' ? 2 : 1);
+      break;
+    case 'spin':
+      // 開き arcDegrees の扇形（1枚）
+      area = (Math.min(num('arcDegrees'), 360) / 360) * Math.PI * (range + size) ** 2;
       break;
     case 'melee': {
       const arc = num('arcDegrees');

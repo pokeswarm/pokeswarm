@@ -119,6 +119,18 @@
     "type": "water",
     "damageClass": "special"
   },
+  "bubble-beam": {
+    "names": {
+      "ja": "バブルこうせん",
+      "en": "Bubble Beam",
+      "fr": "Bulles d’O",
+      "de": "Blubbstrahl",
+      "es": "Rayo Burbuja",
+      "it": "Bollaraggio"
+    },
+    "type": "water",
+    "damageClass": "special"
+  },
   "confusion": {
     "names": {
       "ja": "ねんりき",
@@ -1003,6 +1015,30 @@
       "de": "Aquaknarre",
       "es": "Pistola Agua",
       "it": "Pistolacqua"
+    },
+    "type": "water",
+    "damageClass": "special"
+  },
+  "water-spout": {
+    "names": {
+      "ja": "しおふき",
+      "en": "Water Spout",
+      "fr": "Giclédo",
+      "de": "Fontränen",
+      "es": "Salpicar",
+      "it": "Zampillo"
+    },
+    "type": "water",
+    "damageClass": "special"
+  },
+  "whirlpool": {
+    "names": {
+      "ja": "うずしお",
+      "en": "Whirlpool",
+      "fr": "Siphon",
+      "de": "Whirlpool",
+      "es": "Torbellino",
+      "it": "Mulinello"
     },
     "type": "water",
     "damageClass": "special"

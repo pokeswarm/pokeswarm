@@ -425,5 +425,6 @@
   "shop.colName": "Potenziamento",
   "shop.colRank": "Grado",
   "shop.colEffect": "Effetto",
-  "pattern.eruption": "Si espande in 8 direzioni intorno a te"
+  "pattern.eruption": "Si espande in 8 direzioni intorno a te",
+  "pattern.spin": "Ruota intorno a te"
 }

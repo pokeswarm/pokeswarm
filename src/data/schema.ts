@@ -522,6 +522,8 @@ export type CombatConfig = z.infer<typeof combatConfigSchema>;
  * - trail（足あと）: 歩いていると、自分の足元にしばらく残る当たり判定を置く（止まっていると出ない）
  * - cross（十字）: 向いている方向から等しい角度で count 方向へ同時に撃つ（4 で十字、8 で全方向）
  * - scatter（水たまり）: 自分の周り range の中のランダムな場所に、しばらく残る当たり判定を置く
+ * - spin（回転）: 自分のまわりに開き arcDegrees の扇形を、使うたびに時計回りへ arcDegrees ずつずらして出す（count 枚を等しい角度で。
+ *   2 枚は向かい合わせ、3 枚は正三角形と逆三角形の向きが交互になる）。再使用が短いほど速く回る（こうそくスピン。作者の決定 2026年10月23日）
  * - eruption（爆炎の柱）: 自分を中心に count 方向へ、円の柱を stages 段に分けて、interval ごとに外へ向かって順に出す。
  *   いちばん外の段が range の距離。外の段ほど半径が sizeGrowth の割合ずつ大きい（ブラストバーン。作者の決定 2026年10月23日）
  */
@@ -547,6 +549,7 @@ export const MOVE_PATTERNS = [
   'scatter',
   'stream',
   'eruption',
+  'spin',
 ] as const;
 export type MovePattern = (typeof MOVE_PATTERNS)[number];
 

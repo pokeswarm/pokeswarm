@@ -425,5 +425,6 @@
   "shop.colName": "Amélioration",
   "shop.colRank": "Rang",
   "shop.colEffect": "Effet",
-  "pattern.eruption": "Se propage dans 8 directions autour de vous"
+  "pattern.eruption": "Se propage dans 8 directions autour de vous",
+  "pattern.spin": "Tourne autour de vous"
 }

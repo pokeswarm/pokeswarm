@@ -53,6 +53,19 @@ describe('技の型（作者の決定。07 18章）', () => {
     expect(pr.radius[outer[0]!]!).toBeGreaterThan(pr.radius[inner[0]!]!);
   });
 
+  it('回転: 使うたびに扇形が時計回りへ開きの分ずれ、3枚は正三角形と逆三角形が交互になる', () => {
+    const { sim } = run('spin', { size: 60, range: 0, count: 3, arcDegrees: 60, durationSeconds: 0.05, cooldownSeconds: 0.1 }, [], 1);
+    const pr = sim.world.projectiles;
+    const angles = (): number[] =>
+      Array.from({ length: pr.count }, (_, i) => Math.round(((Math.atan2(pr.dirY[i]!, pr.dirX[i]!) * 180) / Math.PI + 360) % 360)).sort((a, b) => a - b);
+    // 右向き: 0°・120°・240°（正三角形）
+    expect(angles()).toEqual([0, 120, 240]);
+    // 前の扇形が消え、次を使うまで進める
+    for (let t = 0; t < 4; t++) sim.step([]);
+    // 次は 60° 時計回り（y が下なので角度が増える）: 60°・180°・300°（逆三角形）
+    expect(angles()).toEqual([60, 180, 300]);
+  });
+
   it('放物線: 上へ投げて落ちてくる（すぐ横の敵には当たりにくく、落ちる先に当たる）', () => {
     const { sim } = run('lob', { speed: 400, size: 6, count: 1, durationSeconds: 2 }, [], 6);
     const pr = sim.world.projectiles;

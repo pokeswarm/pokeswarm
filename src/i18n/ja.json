@@ -446,5 +446,6 @@
   "shop.colName": "強化",
   "shop.colRank": "ランク",
   "shop.colEffect": "効果",
-  "pattern.eruption": "自分を中心に八方へ広がる"
+  "pattern.eruption": "自分を中心に八方へ広がる",
+  "pattern.spin": "自分のまわりを回る"
 }

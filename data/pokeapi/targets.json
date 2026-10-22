@@ -183,7 +183,10 @@
     "zap-cannon",
     "sky-attack",
     "aura-sphere",
-    "metronome"
+    "metronome",
+    "bubble-beam",
+    "whirlpool",
+    "water-spout"
   ],
   "items": [
     "x-attack",

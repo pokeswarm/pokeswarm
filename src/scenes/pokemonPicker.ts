@@ -64,11 +64,12 @@ export class PokemonPicker {
     this.element.style.cssText = `display:flex;flex-direction:column;gap:${compact() ? 6 : 12}px;min-width:0`;
     const size = compact() ? uiConfig.picker.cellCompact : uiConfig.picker.cell;
     const grid = document.createElement('div');
-    grid.style.cssText = `display:grid;grid-template-columns:repeat(auto-fill,${size + 8}px);gap:6px;justify-content:center`;
+    // マスは横だけ列の幅いっぱいに広げる（一覧の左右の端を、下の詳しい欄の端とそろえる。高さは変えない）
+    grid.style.cssText = `display:grid;grid-template-columns:repeat(auto-fill,minmax(${size + 8}px,1fr));gap:6px`;
     for (const key of this.keys) {
       const unlocked = isPokemonUnlocked(key);
       const cell = document.createElement('div');
-      cell.style.cssText = `${windowCss('light')};${unlocked ? '' : `background:${uiConfig.picker.lockedFill};box-shadow:none;`}padding:0;width:${size + 8}px;height:${size + 8}px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;cursor:${unlocked ? 'pointer' : 'default'};border-width:4px`;
+      cell.style.cssText = `${windowCss('light')};${unlocked ? '' : `background:${uiConfig.picker.lockedFill};box-shadow:none;`}padding:0;width:100%;height:${size + 8}px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;cursor:${unlocked ? 'pointer' : 'default'};border-width:4px`;
       cell.append(pokemonIconImage(key, size - 8, !unlocked));
       cell.onpointerenter = () => {
         this.hovered = key;

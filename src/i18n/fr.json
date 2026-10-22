@@ -184,7 +184,7 @@
   "achievement.first-legendary.desc": "Vaincre le Pokémon légendaire qui apparaît après une réussite",
   "shop.title": "Boutique Pokémon",
   "shop.coins": "Pièces {coins}",
-  "shop.level": "Rang {level} / {max}",
+  "shop.level": "{level} / {max}",
   "shop.buy": "Acheter ({cost})",
   "shop.maxed": "Max",
   "shop.refund": "Rembourser (réinitialiser les améliorations et récupérer les pièces)",
@@ -421,5 +421,8 @@
   "footer.short": "Jeu de fan non officiel. Seul site officiel : {url}",
   "account.statusShort.guest": "Vous jouez en invité",
   "account.statusShort.offline": "Hors ligne",
-  "account.statusShort.error": "Connexion impossible"
+  "account.statusShort.error": "Connexion impossible",
+  "shop.colName": "Amélioration",
+  "shop.colRank": "Rang",
+  "shop.colEffect": "Effet"
 }

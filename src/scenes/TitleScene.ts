@@ -144,6 +144,9 @@ export class TitleScene extends Phaser.Scene {
       items[i]!.go();
     };
     const showCursor = (): void => buttons.forEach((b, i) => (b.list[2] as Phaser.GameObjects.Text).setVisible(i === selected));
+    // 下の帯: 非公式の注意書きとクレジット（作者の決定）。ログインの窓はメニューの右にそろえて置く（layout）
+    const footer = new TitleFooter();
+    const account = new AccountPanel();
     const layout = (): void => {
       // メニューとタイトルだけを作り直す（背景のマップとフィルムは残す）
       ui?.destroy();
@@ -152,19 +155,24 @@ export class TitleScene extends Phaser.Scene {
       const { width, height } = this.scale;
       // 画面の高さが低い（横向きのスマホ）ときは、ロゴを小さくし、メニューを2列にする（ボタンは指で押せる高さ 44 以上）
       const compact = compactScreen(height);
-      const logoW = Math.min(width - 32, 640);
+      // 配置の決まり（作者の指摘 2026年10月22日: 窓がばらばらの基準で置かれていた）: ロゴの幅を「枠」にし、
+      // その中で、左にメニュー、右にログインの窓を同じ幅で左右対称に置く。上の端もそろえる。真ん中はピカチュウが歩く
+      const frameW = Math.min(width - 32, uiConfig.titleLayout.frameWidth);
+      const frameX = (width - frameW) / 2;
+      const logoW = frameW;
       const logoH = compact ? 64 : 104;
       const logoY = compact ? 8 : height * 0.08;
       const g = this.add.graphics();
-      drawWindow(g, (width - logoW) / 2, logoY, logoW, logoH, 'dark');
+      drawWindow(g, frameX, logoY, logoW, logoH, 'dark');
       ui.add([g, this.add.text(width / 2, logoY + logoH / 2, t('title.name'), px(compact || width < 640 ? 32 : 48, '#f8d030', { outline: true })).setOrigin(0.5)]);
-      // メニュー。真ん中はピカチュウが歩くので、左に寄せる（右下のログインの窓と重ならないように）
+      // メニュー（左の列）。低い画面では2列
       const cols = compact ? 2 : 1;
-      const bw = compact ? Math.min(180, (width / 2 - 24) / 2) : Math.min(width - 32, 360);
-      const bh = compact || height < 700 ? 44 : 48;
       const gap = compact ? 6 : height < 700 ? 6 : 8;
+      const blockW = Math.min(uiConfig.titleLayout.blockWidth, (frameW - uiConfig.titleLayout.centerGap) / 2);
+      const bw = (blockW - (cols - 1) * gap) / cols;
+      const bh = compact || height < 700 ? 44 : 48;
       const top = logoY + logoH + (compact ? 10 : height < 700 ? 16 : 32);
-      const left = Math.min(width / 2 - (cols * bw + (cols - 1) * gap) / 2, Math.max(16, width * 0.2 - bw / 2));
+      const left = frameX;
       buttons = items.map((it, i) => {
         const col = i % cols;
         const row = Math.floor(i / cols);
@@ -175,12 +183,11 @@ export class TitleScene extends Phaser.Scene {
       });
       ui.add(buttons);
       showCursor();
+      // ログインの窓（右の列）: メニューと同じ幅・同じ上の端。ボタンの高さもメニューにそろえる
+      account.place({ left: frameX + frameW - blockW, top, width: blockW, bottom: footer.height + gap, buttonHeight: bh });
     };
     layout();
     this.scale.on('resize', layout);
-    // 下の帯: 非公式の注意書きとクレジット（作者の決定）。ログインの窓はその上に置く
-    const footer = new TitleFooter();
-    const account = new AccountPanel(footer.height);
     const onKey = (ev: KeyboardEvent): void => {
       if (ev.repeat || leaving) return;
       if (ev.key === 'ArrowDown') {

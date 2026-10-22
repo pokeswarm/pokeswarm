@@ -90,5 +90,10 @@
       "ally": "#58e0f8",
       "allyDown": "#f87878"
     }
+  },
+  "titleLayout": {
+    "frameWidth": 760,
+    "blockWidth": 340,
+    "centerGap": 96
   }
 }

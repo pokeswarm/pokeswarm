@@ -4,6 +4,7 @@ import { t } from '../i18n';
 import { achievementCondition, achievementName, achievementReward } from '../meta/achievementText';
 import { progressOf } from '../meta/progress';
 import { session } from '../meta/session';
+import { compactScreen } from '../render/pixelUi';
 
 // 原作をまねた白い窓のボタン（作者の決定。2026年10月22日。src/render/pixelUi.ts の windowCss と同じ見た目）
 const BUTTON = 'min-height:44px;padding:8px 14px;cursor:pointer;font:inherit;font-size:16px;background:#f8f8f8;color:#383848;border:4px solid #383848;border-radius:6px;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #a8b8c8';
@@ -22,6 +23,9 @@ export class AchievementsScene extends Phaser.Scene {
     const root = document.createElement('div');
     root.style.cssText =
       'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(1040px,96vw);height:min(90vh,900px);display:flex;flex-direction:column;padding:16px 20px;background:#000;color:#f8f8f8;border:4px solid #f8f8f8;box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px #f8f8f8;font-family:inherit;font-size:16px;line-height:1.6;border-radius:6px;z-index:20;box-sizing:border-box';
+    // 低い画面（横向きのスマホ）では余白・文字・ボタンをつめる（ショップと同じ）
+    const compact = compactScreen();
+    if (compact) root.style.cssText += ';padding:8px 12px;height:96vh';
     document.body.appendChild(root);
     const columns = 'grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr) minmax(0,1.1fr)';
     const render = (): void => {
@@ -29,15 +33,15 @@ export class AchievementsScene extends Phaser.Scene {
       const list = achievementsConfig.achievements;
       const done = list.filter((a) => save.achievements.includes(a.id)).length;
       const head = document.createElement('div');
-      head.style.cssText = 'display:flex;align-items:center;gap:16px;margin-bottom:10px;flex:none';
+      head.style.cssText = `display:flex;align-items:center;gap:16px;margin-bottom:${compact ? 4 : 10}px;flex:none`;
       const h = document.createElement('div');
-      h.style.cssText = 'font-size:24px;font-weight:bold';
+      h.style.cssText = `font-size:${compact ? 20 : 24}px;font-weight:bold`;
       h.textContent = t('achievements.title');
       const count = document.createElement('div');
       count.style.flex = '1';
       count.textContent = t('achievements.count', { done, total: list.length });
       const back = document.createElement('button');
-      back.style.cssText = BUTTON;
+      back.style.cssText = BUTTON + (compact ? ';min-height:36px;padding:2px 10px' : '');
       back.textContent = t('achievements.back');
       back.onclick = () => this.scene.start('title');
       head.append(h, count, back);

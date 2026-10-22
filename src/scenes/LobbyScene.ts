@@ -189,12 +189,13 @@ export class LobbyScene extends Phaser.Scene {
         if (compactScreen()) hint.style.display = 'none';
         hint.textContent = t('lobby.joinHint', { max: networkConfig.maxPlayers });
         const row = document.createElement('div');
-        row.style.cssText = 'display:flex;gap:8px;margin:0 0 10px';
+        row.style.cssText = `display:flex;gap:8px;margin:${compactScreen() ? 0 : '0 0 10px'}`;
         const input = document.createElement('input');
         Object.assign(input, { value: url.toString(), readOnly: true });
         input.style.cssText = 'flex:1;font-family:inherit;font-size:16px;padding:6px';
         const copy = document.createElement('button');
-        copy.style.cssText = BUTTON;
+        // 低い画面では列の幅いっぱい（左の列の部品はすべて同じ幅にそろえる）
+        copy.style.cssText = BUTTON + (compactScreen() ? ';width:100%' : '');
         copy.textContent = t('net.copy');
         copy.onclick = () => void navigator.clipboard.writeText(url.toString()).then(() => (copy.textContent = t('net.copied')));
         // 低い画面では URL の欄を出さず、コピーのボタンだけ（幅が足りない）
@@ -207,7 +208,7 @@ export class LobbyScene extends Phaser.Scene {
       // 上の4つの枠: ホスト・ゲスト・ゲスト・ゲスト。選んだポケモンのアイコンを出す
       const slots = document.createElement('div');
       // 低い画面では 2×2（左の列に収める）
-      slots.style.cssText = `display:grid;grid-template-columns:repeat(${compactScreen() ? 2 : networkConfig.maxPlayers},1fr);gap:${compactScreen() ? 4 : 8}px;margin-bottom:${compactScreen() ? 6 : 10}px`;
+      slots.style.cssText = `display:grid;grid-template-columns:repeat(${compactScreen() ? 2 : networkConfig.maxPlayers},1fr);gap:${compactScreen() ? 4 : 8}px;margin-bottom:${compactScreen() ? 0 : 10}px`;
       for (let id = 1; id <= networkConfig.maxPlayers; id++) {
         const m = room.memberList.find((x) => x.id === id);
         const cell = document.createElement('div');
@@ -294,19 +295,32 @@ export class LobbyScene extends Phaser.Scene {
     leave.textContent = t('lobby.leave');
     leave.onclick = () => this.scene.start('title');
     footer.append(leave);
+    // ボタンの並べ方の決まり: PC は右寄せで同じ幅、低い画面は列の幅を2等分して列の一番下に置く
+    const buttonsInFooter = [...footer.querySelectorAll('button')];
+    if (compactScreen()) {
+      footer.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:auto';
+      for (const c of [...footer.children]) {
+        if (c instanceof HTMLButtonElement) c.style.width = '100%';
+        else if (c.textContent) (c as HTMLElement).style.gridColumn = '1 / -1';
+        else c.remove();
+      }
+      if (buttonsInFooter.length === 1) buttonsInFooter[0]!.style.gridColumn = '1 / -1';
+    } else {
+      for (const b of buttonsInFooter) b.style.minWidth = '12em';
+    }
     children.push(footer);
     // 低い画面（横向きのスマホ）では縦が足りないので2列にする: 左に部屋の情報・4人の枠・ボタン、右にポケモンの一覧
     const picker = this.picker?.element;
     if (compactScreen() && picker && children.includes(picker)) {
       const left = document.createElement('div');
-      left.style.cssText = 'flex:0 0 40%;min-width:0;display:flex;flex-direction:column';
+      left.style.cssText = 'flex:0 0 40%;min-width:0;display:flex;flex-direction:column;gap:6px';
       left.append(...children.filter((c) => c !== picker));
       const right = document.createElement('div');
       right.style.cssText = 'flex:1;min-width:0';
       picker.style.marginBottom = '0';
       right.append(picker);
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;gap:12px;align-items:flex-start';
+      row.style.cssText = 'display:flex;gap:12px;align-items:stretch';
       row.append(left, right);
       this.root.replaceChildren(row);
       return;

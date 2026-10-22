@@ -184,7 +184,7 @@
   "achievement.first-legendary.desc": "Sconfiggi il Pokémon leggendario che appare dopo aver superato la partita",
   "shop.title": "Pokémon Market",
   "shop.coins": "Monete {coins}",
-  "shop.level": "Grado {level} / {max}",
+  "shop.level": "{level} / {max}",
   "shop.buy": "Compra ({cost})",
   "shop.maxed": "Max",
   "shop.refund": "Rimborso (azzera i potenziamenti e restituisce le monete)",
@@ -421,5 +421,8 @@
   "footer.short": "Fan game non ufficiale. Unico sito ufficiale: {url}",
   "account.statusShort.guest": "Stai giocando come ospite",
   "account.statusShort.offline": "Offline",
-  "account.statusShort.error": "Connessione non riuscita"
+  "account.statusShort.error": "Connessione non riuscita",
+  "shop.colName": "Potenziamento",
+  "shop.colRank": "Grado",
+  "shop.colEffect": "Effetto"
 }

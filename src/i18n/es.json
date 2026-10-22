@@ -184,7 +184,7 @@
   "achievement.first-legendary.desc": "Derrota al Pokémon legendario que aparece tras superar la partida",
   "shop.title": "Tienda Pokémon",
   "shop.coins": "Monedas {coins}",
-  "shop.level": "Rango {level} / {max}",
+  "shop.level": "{level} / {max}",
   "shop.buy": "Comprar ({cost})",
   "shop.maxed": "Máx.",
   "shop.refund": "Reembolsar (reinicia las mejoras y devuelve las monedas)",
@@ -421,5 +421,8 @@
   "footer.short": "Juego de fans no oficial. Único sitio oficial: {url}",
   "account.statusShort.guest": "Juegas como invitado",
   "account.statusShort.offline": "Sin conexión",
-  "account.statusShort.error": "No se pudo conectar"
+  "account.statusShort.error": "No se pudo conectar",
+  "shop.colName": "Mejora",
+  "shop.colRank": "Rango",
+  "shop.colEffect": "Efecto"
 }

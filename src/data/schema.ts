@@ -90,6 +90,11 @@ export const uiConfigSchema = z.object({
     maxPassers: z.number().int().positive(),
     keepAway: z.number().nonnegative(),
   }),
+  /**
+   * タイトル画面の配置（作者の指摘 2026年10月22日）: ロゴの幅（frameWidth まで）を枠にし、左にメニュー、右にログインの窓を同じ幅（blockWidth まで）で
+   * 左右対称に置く。centerGap は真ん中に空ける幅の最小（ピカチュウが歩く）
+   */
+  titleLayout: z.object({ frameWidth: z.number().positive(), blockWidth: z.number().positive(), centerGap: z.number().nonnegative() }),
   /** ポケモンの一覧（ソロの選択・待合室。作者の案 2026年10月22日）: 1マスの大きさ（低い画面では compact）・まだ解放していないマスの色と黒塗りの色 */
   picker: z.object({
     cell: z.number().int().positive(),

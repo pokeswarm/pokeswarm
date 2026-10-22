@@ -184,7 +184,7 @@
   "achievement.first-legendary.desc": "Besiege das legendäre Pokémon, das nach dem Schaffen erscheint",
   "shop.title": "Pokémon-Supermarkt",
   "shop.coins": "Münzen {coins}",
-  "shop.level": "Rang {level} / {max}",
+  "shop.level": "{level} / {max}",
   "shop.buy": "Kaufen ({cost})",
   "shop.maxed": "Max",
   "shop.refund": "Erstatten (alle Verbesserungen zurücksetzen und Münzen zurückerhalten)",
@@ -421,5 +421,8 @@
   "footer.short": "Inoffizielles Fanspiel. Einzige offizielle Website: {url}",
   "account.statusShort.guest": "Du spielst als Gast",
   "account.statusShort.offline": "Offline",
-  "account.statusShort.error": "Keine Verbindung"
+  "account.statusShort.error": "Keine Verbindung",
+  "shop.colName": "Verbesserung",
+  "shop.colRank": "Rang",
+  "shop.colEffect": "Wirkung"
 }

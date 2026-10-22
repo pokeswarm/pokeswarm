@@ -27,14 +27,25 @@ export class AccountPanel {
   private readonly unsubscribe: (() => void)[] = [];
   private busy = false;
 
-  /** bottom: 画面の下からの位置（タイトル画面の下の帯の上に置く） */
-  constructor(bottom = 0) {
+  /** ボタンの高さ（タイトルのメニューのボタンにそろえる） */
+  private buttonHeight = 44;
+
+  constructor() {
     this.root = document.createElement('div');
-    // 右下に小さく（メニューのボタンに重ならないように）。黒い窓
-    this.root.style.cssText = `${windowCss('dark')};position:fixed;right:8px;bottom:${bottom + 8}px;padding:${compactScreen() ? '6px 10px' : '12px 16px'};font-size:16px;line-height:1.5;text-align:left;z-index:20;overflow-wrap:anywhere;box-sizing:border-box;max-width:min(420px, ${compactScreen() ? '46vw' : '90vw'})`;
+    // 黒い窓。置く場所はタイトル画面が決める（place）
+    this.root.style.cssText = `${windowCss('dark')};position:fixed;padding:${compactScreen() ? '6px 10px' : '12px 16px'};font-size:16px;line-height:1.5;text-align:left;z-index:20;overflow-wrap:anywhere;overflow:auto;box-sizing:border-box;display:flex;flex-direction:column;gap:6px`;
     document.body.appendChild(this.root);
     this.unsubscribe.push(session.onStatus(() => this.render()), session.store.onChange(() => this.render()));
     this.render();
+  }
+
+  /** タイトル画面の配置にそろえて置く（left・top・width は画面の px、bottom は画面の下から空ける高さ） */
+  place(r: { left: number; top: number; width: number; bottom: number; buttonHeight: number }): void {
+    Object.assign(this.root.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, maxHeight: `calc(100vh - ${r.top + r.bottom}px)` });
+    if (r.buttonHeight !== this.buttonHeight) {
+      this.buttonHeight = r.buttonHeight;
+      this.render();
+    }
   }
 
   destroy(): void {
@@ -60,7 +71,9 @@ export class AccountPanel {
     }
     if (session.status === 'guest' || session.status === 'google') {
       const button = document.createElement('button');
-      button.style.cssText = BUTTON + ';margin-top:8px';
+      // ボタンは窓の幅いっぱいで縦に並べ、高さはメニューのボタンにそろえる
+      const fitted = `${windowCss('light')};width:100%;height:${this.buttonHeight}px;padding:0 12px;cursor:pointer;font:inherit;font-size:16px;flex:none`;
+      button.style.cssText = fitted;
       button.textContent = t(session.status === 'guest' ? 'account.signIn' : 'account.signOut');
       button.disabled = this.busy;
       // タイトル画面のクリックで始まらないように止める
@@ -77,16 +90,14 @@ export class AccountPanel {
       if (session.status === 'guest') {
         // ゲストは、メールアドレスなしで別のブラウザへデータを移せる（引き継ぎコード）
         const transfer = document.createElement('button');
-        transfer.style.cssText = BUTTON + ';margin-top:8px;margin-left:8px';
+        transfer.style.cssText = fitted;
         transfer.textContent = t('transfer.open');
         transfer.onpointerdown = (ev) => ev.stopPropagation();
         transfer.onclick = (ev) => {
           ev.stopPropagation();
           openTransferPanel();
         };
-        const row = document.createElement('div');
-        row.append(button, transfer);
-        children.push(row);
+        children.push(button, transfer);
       } else {
         children.push(button);
       }

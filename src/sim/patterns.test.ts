@@ -27,6 +27,12 @@ describe('技の型（作者の決定。07 18章）', () => {
     expect(hit[2]).toBe(0);
   });
 
+  it('横なぎ: 数が 5 以上なら斜めにも払う（4 では斜めに当たらない）', () => {
+    const diag: [number, number][] = [[110, -110], [110, 110], [-110, -110], [-110, 110]];
+    expect(run('whip', { range: 200, size: 10, count: 4 }, diag, 3).hit.every((h) => h === 0)).toBe(true);
+    expect(run('whip', { range: 200, size: 10, count: 8 }, diag, 3).hit.every((h) => h > 0)).toBe(true);
+  });
+
   it('放物線: 上へ投げて落ちてくる（すぐ横の敵には当たりにくく、落ちる先に当たる）', () => {
     const { sim } = run('lob', { speed: 400, size: 6, count: 1, durationSeconds: 2 }, [], 6);
     const pr = sim.world.projectiles;

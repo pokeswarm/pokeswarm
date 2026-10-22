@@ -435,18 +435,26 @@ function fireMetronome(world: World, p: Player): void {
   fire[def.pattern]?.(world, p, pm, st);
 }
 
-/** whip（横なぎ）: 左右へ長い直線で払う。向いている側（左右）から、count 2 で反対側、3・4 で上下も */
+/**
+ * whip（横なぎ）: 左右へ長い直線で払う。向いている側（左右）から、count 2 で反対側、3・4 で上下も。
+ * 5〜8 は斜め（向いている側の上・下、反対側の上・下）も（作者の指摘 2026年10月23日: ポイントマックスで 5 以上にしても4方向のままだった）
+ */
 function fireWhip(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const side = p.facingX < 0 ? -1 : 1;
+  const d = Math.SQRT1_2;
   const dirs: [number, number][] = [
     [side, 0],
     [-side, 0],
     [0, -1],
     [0, 1],
+    [side * d, -d],
+    [side * d, d],
+    [-side * d, -d],
+    [-side * d, d],
   ];
   const body = world.rules.moves[pm.move]!.body;
   if (body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: side, dirY: 0, distance: body.lungeDistance, afterimages: body.afterimages });
-  for (const [dx, dy] of dirs.slice(0, Math.max(1, Math.min(4, st.count)))) {
+  for (const [dx, dy] of dirs.slice(0, Math.max(1, Math.min(dirs.length, st.count)))) {
     const length = rayLengthToObstacle(world, p.x, p.y, dx, dy, st.range);
     world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, shape: SHAPE_LINE, length, dirX: dx, dirY: dy, vx: dx, vy: dy });
   }

@@ -312,6 +312,8 @@ export class RunScene extends Phaser.Scene {
       depths.enemies,
       (kind) => rules.enemies.kinds[kind]?.spriteScale ?? 1,
       (kind) => enemyLayer(rules, kind),
+      // 中ボス・ボス・伝説は技より手前（作者の決定 2026年10月23日）
+      (kind) => ((rules.enemies.kinds[kind]?.rank ?? 'normal') !== 'normal' ? depths.bosses : null),
     );
     this.hazardView = this.add.graphics().setDepth(depths.hazards);
     this.measureFrameTime();

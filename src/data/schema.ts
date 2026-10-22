@@ -514,7 +514,7 @@ export type CombatConfig = z.infer<typeof combatConfigSchema>;
  * - screen: range の中の近い敵 count 体の足元に、同時に当たり判定を置く（画面じゅうの敵へ。ぜったいれいど・たたりめ など）
  * - metronome: 使うたびに、ほかの技からランダムに1つを、その技の最大レベルで出す（ゆびをふる。ミュウ）
  * 技の「型」（作者の決定。07_content_draft.md 18章。ヴァンパイアサバイバーズの武器のように、技ごとに長所と短所をはっきりさせる）:
- * - whip（横なぎ）: 左右へとても長い直線で払う（向いている側から。count 2 で反対側、3・4 で上下も）
+ * - whip（横なぎ）: 左右へとても長い直線で払う（向いている側から。count 2 で反対側、3・4 で上下も、5〜8 で斜めも）
  * - lob（放物線）: 上へ投げ、重さで弧を描いて落ちる（貫通。近くの敵に当てにくい）
  * - strike（落雷）: range の中のランダムな敵 count 体の足元に、同時に当たり判定を置く
  * - chain（連鎖）: 一番近い敵から、近くの敵へ count 回飛び移る線（range の半分まで跳ぶ）
@@ -847,8 +847,8 @@ export const spriteRenderSchema = z.object({
    * pixel は角ばったドットにするフィルターの大きさ、fillAlpha は塗りの不透明度。moves を書くとその技だけ（試すとき）、省略で全部
    */
   /**
-   * 重なりの順（大きいほど手前。作者の決定 2026年10月22日: プレイヤー ＞ 技 ＞ ボス ＞ 雑魚 ＞ アイテム）。
-   * 敵は種類ごとに enemies + 0.1 × 層（群れ 1・中ボスとボス 2）。技は hitShapes（範囲の塗り）と effects（光。軌跡は -0.5、当たりのはじけは +1）。
+   * 重なりの順（大きいほど手前。作者の決定 2026年10月22日、23日に変更: プレイヤー ＞ ボス ＞ 技 ＞ 雑魚 ＞ アイテム）。
+   * 敵は種類ごとに enemies + 0.1 × 層（群れ 1）。中ボス・ボス・伝説は bosses（技より手前）。技は hitShapes（範囲の塗り）と effects（光。軌跡は -0.5、当たりのはじけは +1）。
    * candy はふしぎなアメの箱と当たりの演出（プレイヤーより手前）
    */
   depths: z.object({
@@ -856,6 +856,7 @@ export const spriteRenderSchema = z.object({
     gems: z.number(),
     items: z.number(),
     enemies: z.number(),
+    bosses: z.number(),
     hazards: z.number(),
     hitShapes: z.number(),
     effects: z.number(),

@@ -4,12 +4,9 @@ import { t } from '../i18n';
 import { AccountPanel } from './accountPanel';
 import { session } from '../meta/session';
 import { audio } from '../audio';
-import { bgmConfig, generated, groundConfig, iconConfig, itemIcons, playablesConfig, spriteRender, uiConfig } from '../data';
-import { buildSimRules } from '../data/simRules';
+import { bgmConfig, generated, groundConfig, playablesConfig, spriteRender, uiConfig } from '../data';
 import type { SpriteAnims } from '../data/schema';
-import { FilmStrip, type FilmEntry } from '../render/FilmStrip';
 import { GroundTiles, preloadGroundTiles } from '../render/GroundTiles';
-import { ensureIconTextures, itemIconKey } from '../render/Icons';
 import { drawWindow, pixelButton, px } from '../render/pixelUi';
 import { directionIndex, PokemonSpriteView } from '../render/sprites/PokemonSprite';
 import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
@@ -29,46 +26,35 @@ export class TitleScene extends Phaser.Scene {
   }
 
   /**
-   * 背景: ゲームのマップ（ゆっくり流れる）と、映写機のフィルムのように交差して流れるたくさんの帯（作者の案 2026年10月22日）。
-   * 帯には、実装予定の遊べるポケモンすべて（進化の途中・進化先も。流れる向きへ歩く姿）と、持ち物のアイコンが流れる。
-   * ポケモンは読み込めたものから帯に加わる（読み込みを待たずに始める）
+   * 背景（作者の決定 2026年10月22日）: ゲーム画面と同じように、真ん中でピカチュウが歩き、マップが流れる。
+   * ほかの遊べるポケモン（進化の途中・進化先も）が、ときどき画面の端から現れて横切っていく（ピカチュウには近づかない）。
+   * ポケモンは読み込めたものから現れる（読み込みを待たずに始める）
    */
   private createBackdrop(): { update: (deltaMs: number) => void; layout: () => void } {
+    const cfg = uiConfig.titleWalk;
     const ground = new GroundTiles(this, groundConfig, 0);
-    const shade = this.add.rectangle(0, 0, 10, 10, 0x000000, 0.35).setOrigin(0).setDepth(-500);
-    const film = uiConfig.titleFilm;
-    const rules = buildSimRules();
-    ensureIconTextures(this, iconConfig, rules, itemIcons);
-    const items = rules.items.map((_, i) => itemIconKey(rules, i));
-    const pokemon: SpriteAnims[] = [];
-    // 帯ごとに、ポケモンと持ち物を順にずらして出す（同じ並びが重ならないように）
-    const strips = film.strips.map((cfg, k) => {
-      let n = k * 5;
-      const next = (): FilmEntry | null => {
-        n++;
-        if (pokemon.length === 0 || n % film.itemEvery === 0) return { texture: items[(n * 7 + k) % items.length]!, scale: film.itemScale };
-        const m = pokemon[(n * 3 + k * 11) % pokemon.length]!;
-        const dirX = cfg.speed < 0 ? -1 : 1;
-        return {
-          make: (scene) => {
-            const v = new PokemonSpriteView(scene, m, film.pokemonScale);
-            v.play(spriteRender.walkAnimation, directionIndex(dirX, 0));
-            // 大きなポケモン（コマの絵が大きい）は小さく、小さなポケモンは大きく描いて、だいたい同じ大きさでコマに収める
-            v.sprite.setScale(Math.max(1, Math.round(((film.pokemonScale * film.pokemonFrame) / Math.max(1, v.sprite.height)) * 2) / 2));
-            return v.sprite;
-          },
-        };
-      };
-      return new FilmStrip(this, next, { ...cfg, cell: film.cell, height: film.height, depth: -100 + k, alpha: film.alpha });
-    });
+    const shade = this.add.rectangle(0, 0, 10, 10, 0x000000, cfg.shade).setOrigin(0).setDepth(-500);
+    let lead: PokemonSpriteView | null = null;
+    const others: SpriteAnims[] = [];
+    const passers: { view: PokemonSpriteView; vx: number; vy: number }[] = [];
     let camX = 0;
-    let camY = 0;
+    let untilNext = 0;
+    const rand = (r: readonly [number, number]): number => r[0] + Math.random() * (r[1] - r[0]);
+    const leadPos = (): { x: number; y: number } => ({ x: this.scale.width / 2, y: this.scale.height * 0.62 });
     const layout = (): void => {
       shade.setSize(this.scale.width, this.scale.height);
-      for (const st of strips) st.layout();
+      const p = leadPos();
+      lead?.sprite.setPosition(p.x, p.y);
     };
-    layout();
-    // 遊べるポケモンと、その進化の途中・進化先（進化しない遊べるポケモンは、その姿だけ）
+    // 真ん中で歩くポケモン（右へ歩く。マップは左へ流れる）
+    void loadPokemonAtRuntime(this, cfg.lead).then((r) => {
+      if (!r || !this.sys.isActive()) return;
+      lead = new PokemonSpriteView(this, r.manifest, cfg.scale);
+      lead.sprite.setDepth(-50);
+      lead.play(spriteRender.walkAnimation, directionIndex(1, 0));
+      layout();
+    });
+    // 通り過ぎるポケモン: 遊べるポケモンと、その進化の途中・進化先（進化しない遊べるポケモンは、その姿だけ）
     const keys = new Set<string>();
     for (const [key, p] of Object.entries(playablesConfig.pokemon)) {
       const stack = [key];
@@ -79,24 +65,52 @@ export class TitleScene extends Phaser.Scene {
         if (p.evolves !== false) for (const e of generated.pokemon[k]!.evolvesTo) stack.push(e.to);
       }
     }
-    // 全部読み込めたら、帯のコマを入れ直す（それまでは、流れてきたコマから順にポケモンが加わる）
-    void Promise.all(
-      [...keys].map((k) =>
-        loadPokemonAtRuntime(this, k).then((r) => {
-          if (r && this.sys.isActive()) pokemon.push(r.manifest);
-        }),
-      ),
-    ).then(() => {
-      if (this.sys.isActive()) layout();
-    });
+    keys.delete(cfg.lead);
+    for (const k of keys) {
+      void loadPokemonAtRuntime(this, k).then((r) => {
+        if (r && this.sys.isActive()) others.push(r.manifest);
+      });
+    }
+    /** 画面の端から、真ん中のポケモンに近づかない向きで横切るポケモンを1体出す */
+    const spawnPasser = (): void => {
+      if (others.length === 0 || passers.length >= cfg.maxPassers) return;
+      const { width, height } = this.scale;
+      const m = others[Math.floor(Math.random() * others.length)]!;
+      const center = leadPos();
+      // 横に歩く（右向き・左向き）。真ん中のポケモンの上か下を、keepAway より離れて通る
+      const dir = Math.random() < 0.5 ? -1 : 1;
+      const above = Math.random() < 0.5;
+      const y = above ? rand([48, Math.max(48, center.y - cfg.keepAway)]) : rand([Math.min(height - 24, center.y + cfg.keepAway), height - 24]);
+      const view = new PokemonSpriteView(this, m, cfg.scale);
+      view.sprite.setPosition(dir > 0 ? -64 : width + 64, y).setDepth(-100 + y / 10000);
+      view.play(spriteRender.walkAnimation, directionIndex(dir, 0));
+      // 右へ歩くポケモンはピカチュウより速く歩いて追い越す（足踏みのまま後ろへ流されないように）
+      passers.push({ view, vx: dir > 0 ? cfg.walkSpeed + rand(cfg.passerSpeed) : -rand(cfg.passerSpeed), vy: 0 });
+    };
+    layout();
     return {
       layout,
       update: (deltaMs) => {
-        // マップはゆっくり斜めに流す（カメラを動かすと上のメニューも動くので、模様だけずらす）
-        camX += (deltaMs / 1000) * 24;
-        camY += (deltaMs / 1000) * 12;
-        ground.update({ scrollX: camX, scrollY: camY } as Phaser.Cameras.Scene2D.Camera, 0, deltaMs);
-        for (const st of strips) st.update(deltaMs);
+        const dt = deltaMs / 1000;
+        // マップは歩く速さで左へ流れる（カメラを動かすと上のメニューも動くので、模様だけずらす）
+        camX += cfg.walkSpeed * dt;
+        ground.update({ scrollX: camX, scrollY: 0 } as Phaser.Cameras.Scene2D.Camera, 0, deltaMs);
+        untilNext -= dt;
+        if (untilNext <= 0) {
+          spawnPasser();
+          untilNext = rand(cfg.passerEverySeconds);
+        }
+        // 通り過ぎるポケモンは、自分の歩く速さに、マップの流れを足して動く。画面の外へ出たら消す
+        const { width } = this.scale;
+        for (let i = passers.length - 1; i >= 0; i--) {
+          const p = passers[i]!;
+          p.view.sprite.x += (p.vx - cfg.walkSpeed) * dt;
+          p.view.sprite.y += p.vy * dt;
+          if (p.view.sprite.x < -96 || p.view.sprite.x > width + 96) {
+            p.view.sprite.destroy();
+            passers.splice(i, 1);
+          }
+        }
       },
     };
   }
@@ -145,7 +159,8 @@ export class TitleScene extends Phaser.Scene {
       const bh = height < 700 ? 40 : 48;
       const gap = height < 700 ? 6 : 8;
       const top = height * 0.08 + 136 + (height < 700 ? 16 : 32);
-      const mx = width >= 1100 ? width / 2 : Math.min(width / 2, 16 + bw / 2);
+      // 真ん中はピカチュウが歩くので、メニューは左に寄せる
+      const mx = Math.min(width / 2, Math.max(16 + bw / 2, width * 0.2));
       buttons = items.map((it, i) =>
         pixelButton(this, mx, top + bh / 2 + i * (bh + gap), bw, bh, it.label, () => go(i)).on('pointerover', () => {
           selected = i;

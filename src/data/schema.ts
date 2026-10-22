@@ -58,19 +58,19 @@ export const uiConfigSchema = z.object({
   timer: z.object({ size: z.number().int().positive(), color: colorString }),
   coin: z.object({ size: z.number().int().positive(), color: colorString }),
   /**
-   * タイトル画面の背景のフィルムの帯（作者の案 2026年10月22日）: コマの幅・帯の高さ・不透明度、ポケモンと持ち物のアイコンの倍率、
-   * 何コマに1つ持ち物を入れるか（itemEvery）、帯ごとの傾き（度）・画面の真ん中からのずれ・流れる速さ（px/秒。マイナスで逆向き）
+   * タイトル画面の背景（作者の決定 2026年10月22日）: 真ん中を lead のポケモンが右へ歩き、マップが walkSpeed（px/秒）で流れる。
+   * ほかの遊べるポケモン（進化の途中・進化先も）が passerEverySeconds の間隔で画面の端から現れ、passerSpeed で横切っていく
+   * （真ん中のポケモンには近づかない。keepAway px より近くを通らない）。shade はマップを暗くする割合
    */
-  titleFilm: z.object({
-    cell: z.number().positive(),
-    height: z.number().positive(),
-    alpha: z.number().min(0).max(1),
-    pokemonScale: z.number().positive(),
-    /** この大きさ（px）のコマの絵のポケモンを pokemonScale 倍で描く。絵が大きいポケモンはそのぶん小さく */
-    pokemonFrame: z.number().positive(),
-    itemScale: z.number().positive(),
-    itemEvery: z.number().int().positive(),
-    strips: z.array(z.object({ angle: z.number(), offset: z.number(), speed: z.number() })).min(1),
+  titleWalk: z.object({
+    lead: z.string(),
+    scale: z.number().positive(),
+    walkSpeed: z.number().positive(),
+    shade: z.number().min(0).max(1),
+    passerEverySeconds: z.tuple([z.number().positive(), z.number().positive()]),
+    passerSpeed: z.tuple([z.number().positive(), z.number().positive()]),
+    maxPassers: z.number().int().positive(),
+    keepAway: z.number().nonnegative(),
   }),
 });
 export type UiConfig = z.infer<typeof uiConfigSchema>;

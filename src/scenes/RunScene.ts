@@ -529,13 +529,19 @@ export class RunScene extends Phaser.Scene {
   }
 
   /**
-   * 画面に見えるワールドの高さをおおよそ一定にする（大きな画面で見え過ぎると、画面の外から出るはずの敵が見えてしまう）。
-   * ドット絵が崩れにくいよう、拡大率は決まった刻みにする
+   * 見える範囲をそろえる（作者の決定。07 25.3 の B 案）: 見えるワールドの縦の広さを、どの端末でも viewHeight にする
+   * （拡大率は 画面の高さ ÷ viewHeight。丸めない）。横は端末の比率に合わせて広げるが、maxAspect（16:9）まで。
+   * それより横長の画面は、カメラの描く範囲を真ん中に狭め、左右を黒い帯にする（背景の色が黒）
    */
   private applyZoom(): void {
     const c = spriteRender.camera;
-    const zoom = Math.max(1, Math.round(this.scale.height / c.viewHeight / c.zoomStep) * c.zoomStep);
-    this.cameras.main.setZoom(zoom);
+    const { width, height } = this.scale;
+    const zoom = height / c.viewHeight;
+    const maxW = Math.round(height * c.maxAspect);
+    const cam = this.cameras.main;
+    if (width > maxW) cam.setViewport(Math.round((width - maxW) / 2), 0, maxW, height);
+    else cam.setViewport(0, 0, width, height);
+    cam.setZoom(zoom);
   }
 
   /**

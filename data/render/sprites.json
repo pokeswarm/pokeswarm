@@ -14,7 +14,7 @@
   },
   "camera": {
     "viewHeight": 720,
-    "zoomStep": 0.5
+    "maxAspect": 1.7778
   },
   "hitShape": {
     "pixel": 4,

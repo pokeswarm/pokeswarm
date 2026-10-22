@@ -43,7 +43,25 @@ export class GroundTiles {
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => scene.scale.off(Phaser.Scale.Events.RESIZE, onResize));
   }
 
+  /**
+   * カメラの描く範囲をちょうど覆うように、大きさと位置を合わせる（拡大率が 1 未満でも隙間ができないように。
+   * 画面に固定した物は、カメラの真ん中を基準に拡大されるので、その分を戻す）
+   */
+  private fit(camera: Phaser.Cameras.Scene2D.Camera): void {
+    const z = camera.zoom || 1;
+    const w = Math.ceil(camera.width / z) + 2;
+    const h = Math.ceil(camera.height / z) + 2;
+    const x = (camera.width / 2) * (1 - 1 / z) - 1;
+    const y = (camera.height / 2) * (1 - 1 / z) - 1;
+    for (const s of this.sprites) {
+      if (s.width !== w || s.height !== h) s.setSize(w, h);
+      s.setPosition(x, y);
+    }
+  }
+
   update(camera: Phaser.Cameras.Scene2D.Camera, wave: number, deltaMs: number): void {
+    // タイトル画面は本物のカメラではなく、模様の位置だけを渡す（そのときは画面の大きさのまま）
+    if (camera instanceof Phaser.Cameras.Scene2D.BaseCamera) this.fit(camera);
     const wanted = groundTileAt(this.ground, wave);
     if (wanted !== this.current) this.switchTo(wanted);
     if (this.fade < 1) {

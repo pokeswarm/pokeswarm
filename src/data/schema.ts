@@ -770,10 +770,10 @@ export const spriteRenderSchema = z.object({
    * 色と透明度を colorSteps・alphaSteps 段階に減らす。size 0 で使わない
    */
   /**
-   * 画面に見えるワールドの高さをおおよそ viewHeight にそろえる（大きな画面で見え過ぎて、敵が画面の中に出ないように）。
-   * 拡大率はドット絵が崩れにくいよう zoomStep 刻み（1 未満にはしない）
+   * 見える範囲（作者の決定 2026年10月22日。07 25.3 の B 案）: 見えるワールドの縦の広さを、どの端末でも viewHeight にそろえる。
+   * 横は端末の比率に合わせて広げるが、maxAspect（横 ÷ 縦。16:9）まで。それより横長の画面は、左右を黒い帯にする
    */
-  camera: z.object({ viewHeight: z.number().positive(), zoomStep: z.number().positive() }),
+  camera: z.object({ viewHeight: z.number().positive(), maxAspect: z.number().positive() }),
   effectPixel: z.object({
     size: z.number().int().nonnegative(),
     colorSteps: z.number().int().min(2),

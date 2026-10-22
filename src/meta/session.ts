@@ -1,4 +1,4 @@
-import type { Account, SaveChooser } from '../firebase/account';
+import type { Account, SaveChooser, TransferConfirm } from '../firebase/account';
 import type { PresenceState, Social } from '../firebase/social';
 import { firebaseOptionsFromEnv } from '../firebase/config';
 import { achievementsConfig, shopConfig, unlocksConfig } from '../data';
@@ -97,6 +97,30 @@ class Session {
       console.warn('[account] Google ログインに失敗しました', err);
       this.fail(err);
       this.setStatus(this.account.kind, false);
+    }
+  }
+
+  /** 引き継ぎコードを発行する（ゲストだけ）。できなければ null */
+  async issueTransferCode(): Promise<{ code: string; expireAt: number } | null> {
+    if (!this.account || this.statusValue !== 'guest') return null;
+    try {
+      return await this.account.issueTransferCode();
+    } catch (err) {
+      console.warn('[transfer] 引き継ぎコードを発行できませんでした', err);
+      return null;
+    }
+  }
+
+  /** 引き継ぎコードでデータを受け取る（ゲストだけ）。受け取ったら実績を確かめ直す */
+  async redeemTransferCode(code: string, confirm: TransferConfirm): Promise<'ok' | 'notFound' | 'cancelled' | 'failed'> {
+    if (!this.account || this.statusValue !== 'guest') return 'failed';
+    try {
+      const result = await this.account.redeemTransferCode(code, confirm);
+      if (result === 'ok') this.checkProgress();
+      return result;
+    } catch (err) {
+      console.warn('[transfer] 引き継ぎコードで受け取れませんでした', err);
+      return 'failed';
     }
   }
 

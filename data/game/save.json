@@ -1,3 +1,4 @@
 {
-  "autosaveSeconds": 180
+  "autosaveSeconds": 180,
+  "transferHours": 24
 }

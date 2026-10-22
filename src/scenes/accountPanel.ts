@@ -3,12 +3,13 @@ import type { SaveData } from '../meta/saveData';
 import { formatTag } from '../meta/nickname';
 import { session } from '../meta/session';
 import { windowCss } from '../render/pixelUi';
+import { openTransferPanel } from './transferPanel';
 
 /** ドット調のボタン（原作をまねた白い窓。作者の決定 2026年10月22日） */
 const BUTTON = `${windowCss('light')};min-height:44px;padding:8px 16px;cursor:pointer;font:inherit;font-size:16px`;
 
 /** 記録の短いまとめ（タイトル画面と、データを選ぶ画面に出す） */
-function summary(d: Readonly<SaveData>): string {
+export function saveSummary(d: Readonly<SaveData>): string {
   return t('account.record', {
     runs: d.stats.runs ?? 0,
     clears: d.stats.clears ?? 0,
@@ -48,7 +49,7 @@ export class AccountPanel {
     if (profile) status.textContent += `　${formatTag(profile.nickname, profile.tag)}`;
     const record = document.createElement('div');
     record.style.cssText = 'opacity:0.85;font-size:16px';
-    record.textContent = summary(session.store.current);
+    record.textContent = saveSummary(session.store.current);
     const children: HTMLElement[] = [status, record];
     if (session.error) {
       const err = document.createElement('div');
@@ -72,7 +73,22 @@ export class AccountPanel {
         // 先に、Google から何が届き、ゲームでどう扱うかを見せる（作者の決定 2026年10月22日）
         confirmSignIn(() => void this.run(() => session.signInWithGoogle(chooseSave)));
       };
-      children.push(button);
+      if (session.status === 'guest') {
+        // ゲストは、メールアドレスなしで別のブラウザへデータを移せる（引き継ぎコード）
+        const transfer = document.createElement('button');
+        transfer.style.cssText = BUTTON + ';margin-top:8px;margin-left:8px';
+        transfer.textContent = t('transfer.open');
+        transfer.onpointerdown = (ev) => ev.stopPropagation();
+        transfer.onclick = (ev) => {
+          ev.stopPropagation();
+          openTransferPanel();
+        };
+        const row = document.createElement('div');
+        row.append(button, transfer);
+        children.push(row);
+      } else {
+        children.push(button);
+      }
     }
     this.root.replaceChildren(...children);
   }
@@ -162,7 +178,7 @@ function chooseSave(guest: Readonly<SaveData>, google: Readonly<SaveData>): Prom
       const when = document.createElement('div');
       when.textContent = t('account.updatedAt', { date: new Date(d.updatedAt).toLocaleString() });
       const rec = document.createElement('div');
-      rec.textContent = summary(d);
+      rec.textContent = saveSummary(d);
       b.append(name, when, rec);
       b.onclick = () => {
         overlay.remove();

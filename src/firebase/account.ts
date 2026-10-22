@@ -11,14 +11,16 @@ import {
   type OAuthCredential,
   type User,
 } from 'firebase/auth';
-import { doc, getDoc, getFirestore, setDoc, type Firestore } from 'firebase/firestore';
+import { Timestamp, deleteDoc, doc, getDoc, getFirestore, runTransaction, setDoc, type Firestore } from 'firebase/firestore';
 import { parseSave, type SaveData } from '../meta/saveData';
+import { newTransferCode } from '../meta/transferCode';
+import { saveConfig } from '../data';
 import type { SaveBackend, SaveStore } from '../meta/saveStore';
 import { firebaseApp } from './app';
 
 /** Firestore の saves/{uid} に保存する（本人だけが読み書きできる。firestore.rules） */
 class FirestoreSaves implements SaveBackend {
-  constructor(private readonly db: Firestore) {}
+  constructor(readonly db: Firestore) {}
 
   async read(uid: string): Promise<SaveData | null> {
     const snap = await getDoc(doc(this.db, 'saves', uid));
@@ -37,6 +39,9 @@ export type AccountKind = 'guest' | 'google';
 
 /** セーブデータを読み込めなかったときのエラー（画面では翻訳した文章を出す） */
 export const SAVE_READ_FAILED = 'save-read-failed';
+
+/** 引き継ぎコードで受け取るデータを見せて、今のデータを置き換えてよいかを本人に確かめる */
+export type TransferConfirm = (incoming: Readonly<SaveData>, current: Readonly<SaveData>) => Promise<boolean>;
 
 /** ゲストのデータと Google のデータが両方あるとき、どちらを残すかを本人に選んでもらう */
 export type SaveChooser = (guest: Readonly<SaveData>, google: Readonly<SaveData>) => Promise<'guest' | 'google'>;
@@ -116,6 +121,49 @@ export class Account {
     await guestUser.delete().catch(() => undefined);
   }
 
+  /**
+   * 引き継ぎコードを発行する（ゲストだけ。作者の決定 2026年10月22日）。今のデータを transfers/{コード} に写し、24時間で使えなくなる。
+   * 元のブラウザのデータはそのまま残る。前に発行したコードは、使われていなければ消す
+   */
+  async issueTransferCode(): Promise<{ code: string; expireAt: number }> {
+    const user = this.auth.currentUser;
+    if (!user?.isAnonymous) throw new Error('guest only');
+    await this.store.flush();
+    if (this.issuedCode) await deleteTransfer(this.saves.db, this.issuedCode);
+    const code = newTransferCode();
+    const expireAt = Date.now() + saveConfig.transferHours * 60 * 60 * 1000;
+    await setDoc(doc(this.saves.db, 'transfers', code), { from: user.uid, data: structuredClone(this.store.current), expireAt: Timestamp.fromMillis(expireAt) });
+    this.issuedCode = code;
+    return { code, expireAt };
+  }
+
+  private issuedCode: string | null = null;
+
+  /**
+   * 引き継ぎコードでデータを受け取る（ゲストだけ）。コードは1回だけ使える（受け取ったら消す）。
+   * 見つからない・期限切れ・使用済みは 'notFound'、本人がやめたら 'cancelled'
+   */
+  async redeemTransferCode(code: string, confirm: TransferConfirm): Promise<'ok' | 'notFound' | 'cancelled'> {
+    const user = this.auth.currentUser;
+    if (!user?.isAnonymous) throw new Error('guest only');
+    const ref = doc(this.saves.db, 'transfers', code);
+    const first = await getDoc(ref).catch(() => null);
+    const preview = first?.exists() ? parseSave(first.data().data) : null;
+    if (!preview) return 'notFound';
+    if (!(await confirm(preview, this.store.current))) return 'cancelled';
+    // 確かめている間にほかの人が使っていないか、読み直してから消す（1回きり）
+    const data = await runTransaction(this.saves.db, async (tx) => {
+      const snap = await tx.get(ref);
+      const d = snap.exists() ? parseSave(snap.data().data) : null;
+      if (d) tx.delete(ref);
+      return d;
+    }).catch(() => null);
+    if (!data) return 'notFound';
+    this.store.replace(data);
+    await this.store.flush();
+    return 'ok';
+  }
+
   /** ログアウトして、新しいゲストで始める */
   async signOut(): Promise<void> {
     await this.store.flush();
@@ -128,4 +176,9 @@ export class Account {
       this.busy = false;
     }
   }
+}
+
+/** 引き継ぎコードを消す（もう無い・期限切れでも気にしない） */
+async function deleteTransfer(db: Firestore, code: string): Promise<void> {
+  await deleteDoc(doc(db, 'transfers', code)).catch(() => undefined);
 }

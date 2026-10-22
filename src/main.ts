@@ -68,6 +68,9 @@ async function start(): Promise<void> {
     backgroundColor: placeholderRender.backgroundColor,
     // ドット絵向け（ニアレストネイバー）の拡大
     pixelArt: true,
+    // ゲームの描く面の上のクリックだけを拾う。ページ全体のクリックを拾うと、ゲームの上に重ねた窓（DOM）のボタンを押したときに、
+    // 真下にあるゲームのボタン（タイトルのメニューなど）まで押されてしまった（2026年10月22日）
+    input: { windowEvents: false },
     scale: {
       mode: Phaser.Scale.RESIZE,
       width: '100%',

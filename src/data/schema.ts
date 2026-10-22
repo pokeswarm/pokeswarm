@@ -323,6 +323,8 @@ export interface UnlocksConfig {
 export const saveConfigSchema = z.object({
   /** ラン中に Firestore へ保存する間隔（書き込み回数を抑えるため、まとめて保存する） */
   autosaveSeconds: z.number().positive(),
+  /** 引き継ぎコードの有効期限（時間。作者の決定 2026年10月22日: 24時間）。firestore.rules の上限（25時間）より短くする */
+  transferHours: z.number().positive().max(24),
 });
 export type SaveConfig = z.infer<typeof saveConfigSchema>;
 

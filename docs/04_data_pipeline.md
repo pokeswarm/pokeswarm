@@ -113,6 +113,7 @@ SpriteCollab ─┘                         └─▶ スプライトアトラ�
 - 公式の画像は使わず、円と線だけから計算で 32×32 ドットの絵を作る（`node scripts/make-brand-icon.ts`）。光は左上から（赤に明るい筋、白の右下に影）。拡大はニアレストネイバー。
 - 出力: `public/icons/favicon-32.png`・`favicon-64.png`（地は透明。`index.html` で読む）、`public/icons/icon-180/192/512.png`（ホーム画面。暗い地 #201c38）、`assets/brand/profile-1024.png`（SNS。暗い地。丸く切り抜かれても収まるよう、まわりを5ドット分空ける）・`logo-400-transparent.png`。
 - SNS のヘッダー（作者の依頼・確定 2026年10月22日）: `assets/brand/header-1500x500.png`（`node scripts/make-brand-header.ts`）。プレイ画面と同じ草原の地面（`public/map/kanto/meadow.png`）と木・岩（自作のドット絵）に、プレイアブルのポケモン（SpriteCollab の待機の下向きの1コマ目）を2段に並べる。拡大はプレイ画面と同じ2倍。ポケモンのドット絵を使うので、SNS のプロフィールなどにも SpriteCollab のクレジット（CC BY-NC 4.0）を書いておく。
+- リンクを貼ったときの画像（OGP。作者の依頼 2026年10月23日）: `public/og-image.png`（1200×630。ヘッダーと同じスクリプトで作る）。上の真ん中にタイトル画面と同じ黒い窓を置き、ロゴのアイコンと「PokéSwarm」の文字（ゲームのフォントはスクリプトで使えないので、5×7 ドットの自作の文字。黄色に暗い縁）を入れ、下にポケモンを2段に並べる。`index.html` に OGP と X のカード（`summary_large_image`）の情報を入れた（SNS で読まれるので説明文は英語。画像の URL は https://pokeswarm.org/og-image.png）。
 
 ## 6. 音楽・効果音
 

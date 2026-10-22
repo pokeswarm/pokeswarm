@@ -28,8 +28,8 @@ export function pokemonIconImage(key: string, size: number, silhouette = false):
     void loadPokemonIcon(def.sprite, uiConfig.picker.silhouette).then((icon) => {
       if (!icon) return;
       img.src = silhouette ? icon.silhouetteUrl : icon.url;
-      // ドットがにじまないよう、マスに収まるいちばん大きい整数倍で描く
-      const s = Math.max(1, Math.floor(size / Math.max(icon.width, icon.height)));
+      // どのポケモンも、長い辺がマスいっぱいになる同じ大きさにそろえる（作者の依頼 2026年10月22日。整数倍だと大きさがばらついた）
+      const s = size / Math.max(icon.width, icon.height);
       img.style.width = `${icon.width * s}px`;
       img.style.height = `${icon.height * s}px`;
       img.style.margin = `${(size - icon.height * s) / 2}px ${(size - icon.width * s) / 2}px`;

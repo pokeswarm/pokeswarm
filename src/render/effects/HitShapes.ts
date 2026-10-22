@@ -28,7 +28,7 @@ export class HitShapes {
   constructor(
     scene: Phaser.Scene,
     depth: number,
-    private readonly cfg: { pixel: number; fillAlpha: number; sectorBand: number },
+    private readonly cfg: { pixel: number; fillAlpha: number; sectorBand: number; sectorFullBelowDegrees: number },
   ) {
     this.layer = scene.add.layer().setDepth(depth);
     this.g = scene.add.graphics();
@@ -40,13 +40,13 @@ export class HitShapes {
   }
 
   /**
-   * 毎フレーム描き直す。colorOf は当たり判定ごとの塗りの色（null なら描かない）。
+   * 毎フレーム描き直す。colorOf は当たり判定ごとの塗りの色と濃さ（null なら描かない）。
    * view の外の当たり判定は描かない
    */
   draw(
     src: CircleSource,
     alpha: number,
-    colorOf: (index: number) => number | null,
+    colorOf: (index: number) => { color: number; alpha: number } | null,
     lineOf: (index: number) => { length: number; dirX: number; dirY: number } | null,
     view: { left: number; top: number; right: number; bottom: number },
     sectorOf: (index: number) => { dirX: number; dirY: number; half: number } | null = () => null,
@@ -68,12 +68,13 @@ export class HitShapes {
         dirX: sector?.dirX ?? line?.dirX ?? 1,
         dirY: sector?.dirY ?? line?.dirY ?? 0,
         half: sector && sector.half < Math.PI ? sector.half : null,
-        sector: sector !== null,
+        // 細い扇形（細長い炎）は帯にせず全体を塗る
+        sector: sector !== null && !(sector.half * 2 < (this.cfg.sectorFullBelowDegrees * Math.PI) / 180),
       };
       const reach = s.radius + s.length;
       if (x + reach < view.left || x - reach > view.right || y + reach < view.top || y - reach > view.bottom) continue;
       this.path(s);
-      g.fillStyle(color, this.cfg.fillAlpha);
+      g.fillStyle(color.color, color.alpha);
       g.fillPath();
     }
   }

@@ -10,7 +10,8 @@
         "pulse": {
           "amount": 0.2,
           "periodMs": 140
-        }
+        },
+        "shapeAlpha": 0.65
       },
       "trail": {
         "intervalMs": 12,
@@ -353,7 +354,11 @@
       "extends": "fire.base"
     },
     "flamethrower": {
-      "extends": "fire.base"
+      "extends": "fire.base",
+      "projectile": {
+        "glowColor": "#ffa726",
+        "shapeAlpha": 0.7
+      }
     },
     "flare-blitz": {
       "extends": "fire.base",
@@ -367,7 +372,9 @@
       "impact": {},
       "projectile": {
         "glowScale": 1.2,
-        "coreScale": 0.5
+        "coreScale": 0.5,
+        "glowColor": "#ffa726",
+        "shapeAlpha": 0.7
       }
     },
     "gust": {

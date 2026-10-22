@@ -19,7 +19,8 @@
   "hitShape": {
     "pixel": 4,
     "fillAlpha": 0.45,
-    "sectorBand": 0.3
+    "sectorBand": 0.3,
+    "sectorFullBelowDegrees": 60
   },
   "depths": {
     "obstacles": 0,

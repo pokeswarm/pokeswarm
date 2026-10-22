@@ -160,7 +160,19 @@ export class EffectRenderer {
       if (trail) {
         const em = this.emitter(this.trailEmitters, recipeId, trail, this.depth - 0.5);
         const n = trailCountOf(recipeId, trail);
-        for (let k = 0; k < n; k++) em.emitParticleAt(x + scatter(trail.spread), y + scatter(trail.spread), 1);
+        if (sector && sector.half < Math.PI) {
+          // 扇形（かえんほうしゃなど）は、扇の中のあちこちから出す（根元だけだと、炎が噴き出して見えない。作者の指摘 2026年10月23日）。
+          // 広いほど多く出す
+          const base = Math.atan2(sector.dirY, sector.dirX);
+          const many = n * Math.min(8, Math.max(1, Math.round((r * sector.half) / 40)));
+          for (let k = 0; k < many; k++) {
+            const a = base + (Math.random() * 2 - 1) * sector.half;
+            const d = Math.sqrt(Math.random()) * r;
+            em.emitParticleAt(x + Math.cos(a) * d, y + Math.sin(a) * d, 1);
+          }
+        } else {
+          for (let k = 0; k < n; k++) em.emitParticleAt(x + scatter(trail.spread), y + scatter(trail.spread), 1);
+        }
       }
       // 範囲そのもの（光の色）は HitShapes が平らに塗る。ここでは発射体の芯だけを、当たり判定の内側に小さく描く。扇形は芯を出さない
       if (!body || sector) continue;

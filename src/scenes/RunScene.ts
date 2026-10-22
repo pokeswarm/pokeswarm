@@ -92,7 +92,7 @@ export class RunScene extends Phaser.Scene {
   private sounds!: RunSounds;
   private hitShapes!: HitShapes;
   /** 技ごとの縁取りの色（明るい線・暗い線）。描かない技は null */
-  private shapeColors: (number | null)[] = [];
+  private shapeColors: ({ color: number; alpha: number } | null)[] = [];
   private ground!: GroundTiles;
   /** F3 の詳しい表示（ふだんは出さない） */
   private hud!: Phaser.GameObjects.Text;
@@ -334,7 +334,8 @@ export class RunScene extends Phaser.Scene {
     this.hitShapes = new HitShapes(this, depths.hitShapes, shape);
     this.shapeColors = rules.moves.map((m) => {
       if (shape.moves && !shape.moves.includes(m.key)) return null;
-      return hexColor(effectRecipes[m.effect]?.projectile?.glowColor ?? '#ffffff');
+      const body = effectRecipes[m.effect]?.projectile;
+      return { color: hexColor(body?.glowColor ?? '#ffffff'), alpha: body?.shapeAlpha ?? shape.fillAlpha };
     });
     const local = this.sim.world.players.find((p) => p.id === this.localId)!;
     if (this.playerSprite && new URLSearchParams(window.location.search).has('gallery')) {

@@ -868,6 +868,8 @@ export const spriteRenderSchema = z.object({
     fillAlpha: z.number().min(0).max(1),
     /** 近接の扇形は、弧の近くの帯だけを描く。帯の太さ（半径に対する割合。作者の指摘 2026年10月22日） */
     sectorBand: z.number().gt(0).max(1).default(0.3),
+    /** 開きがこれより狭い扇形は、帯ではなく全体を塗る（かえんほうしゃのような細長い炎。作者の指摘 2026年10月23日） */
+    sectorFullBelowDegrees: z.number().nonnegative().default(60),
     moves: z.array(z.string()).optional(),
   }),
 });
@@ -906,6 +908,8 @@ export const effectRecipeSchema = z.object({
       glowColor: colorString,
       glowScale: z.number().nonnegative(),
       glowAlpha: z.number().min(0).max(1),
+      /** 範囲の塗りの濃さ（省略で sprites.json の hitShape.fillAlpha）。暖色を草の上に薄く重ねると茶色く濁るので、炎の噴射は濃くする */
+      shapeAlpha: z.number().min(0).max(1).optional(),
       /** 光の明滅 */
       pulse: z.object({ amount: z.number().nonnegative(), periodMs: z.number().positive() }).optional(),
     })

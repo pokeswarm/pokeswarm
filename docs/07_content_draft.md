@@ -1166,7 +1166,7 @@
 ### 26.1 作者の決定と実装
 - 【決定】タイトルのメニューを **ソロ / マルチ** にする（実装済み。英語は SOLO / MULTI）。
 - 【決定】スマホのブラウザは全画面にならないので、**Safari・Chrome の「ホーム画面に追加」で全画面にしてもらう**。ゲームの中に全画面のボタンは置かない。
-  - ホーム画面から開いたときに全画面・横向きになるよう、`public/manifest.webmanifest`（`display: fullscreen`・`orientation: landscape`）と、Safari 向けの設定（`apple-mobile-web-app-capable` など）を `index.html` に入れた。アイコンは自作のふしぎなアメのドット絵（`node scripts/make-app-icon.ts` で `public/icons/` に作る。公式の画像は使わない）。
+  - ホーム画面から開いたときに全画面・横向きになるよう、`public/manifest.webmanifest`（`display: fullscreen`・`orientation: landscape`）と、Safari 向けの設定（`apple-mobile-web-app-capable` など）を `index.html` に入れた。アイコンは、はじめは自作のふしぎなアメのドット絵だった。2026年10月22日にロゴのアイコン（`docs/04_data_pipeline.md` 5.4）に差し替えた。
 - 【決定】**設定画面に言語の切り替え**（日本語・English）を入れる（実装済み）。押すとすぐ切り替わり、ブラウザに保存して次に開いたときも同じ言語になる。選んでいなければ、ブラウザの言語（日本語でなければ英語）。
 
 ### 26.2 ほかの言語（調べたこと。【要決定】）

@@ -8,6 +8,7 @@ import { getLocale, t, tMaybe } from '../i18n';
 import type { Room, RoomPlayer } from '../net/room';
 import { SyncSession } from '../net/sync';
 import { hexColor } from '../render/color';
+import { EdgeArrows, type EdgeTarget } from '../render/EdgeArrows';
 import { EffectRenderer } from '../render/effects/EffectRenderer';
 import { audio } from '../audio';
 import { RunSounds } from '../audio/runSounds';
@@ -106,6 +107,8 @@ export class RunScene extends Phaser.Scene {
   private hudIcons!: HudIcons;
   /** アイコンにマウスを乗せたときの詳細カード（PC だけ） */
   private hudCard!: HudCard;
+  /** 画面の外の大事なものの方向を示す矢印 */
+  private edgeArrows!: EdgeArrows;
   /** アイコンの列の上端（画面の y） */
   private hudTop = 0;
   private lastSent: { dx: Axis; dy: Axis } = { dx: 0, dy: 0 };
@@ -293,6 +296,7 @@ export class RunScene extends Phaser.Scene {
     this.gemView = new PooledSprites(this, depths.gems, itemSprites.dot);
     this.itemView = this.add.graphics().setDepth(depths.items);
     ensurePixelTextures(this, itemSprites);
+    this.edgeArrows = new EdgeArrows(this, uiConfig.edgeArrows, (obj, x, y) => this.placeUi(obj, x, y));
     // 障害物は地面の飾りなので、アイテムより奥
     this.obstacleView = new ObstacleView(this, obstacleSprites, depths.obstacles);
     this.streamer = new SpriteStreamer(
@@ -600,6 +604,31 @@ export class RunScene extends Phaser.Scene {
     const z = cam.zoom;
     obj.setScale(1 / z);
     obj.setPosition(cam.width / 2 + (x - cam.width / 2) / z, cam.height / 2 + (y - cam.height / 2) / z);
+  }
+
+  /**
+   * 画面の端に矢印で方向を出すもの（作者の依頼 2026年10月22日）: ボス・中ボス・伝説、落ちているふしぎなアメ、ほかのプレイヤー。
+   * 倒れている味方は色を変えて点滅させる（助けに行けるように）
+   */
+  private edgeTargets(): EdgeTarget[] {
+    const w = this.sim.world;
+    const c = uiConfig.edgeArrows.colors;
+    const out: EdgeTarget[] = [];
+    const e = w.enemies;
+    for (let i = 0; i < e.count; i++) {
+      const rank = w.rules.enemies.kinds[e.kind[i]!]?.rank ?? 'normal';
+      if (rank === 'normal') continue;
+      out.push({ x: e.x[i]!, y: e.y[i]!, color: c[rank], icon: { texture: 'edge-boss', tint: true } });
+    }
+    for (const it of w.items) {
+      if (it.kind === 'rare-candy' && !it.pending) out.push({ x: it.x, y: it.y, color: c.candy, icon: { texture: 'rare-candy', tint: false } });
+    }
+    const blink = Math.floor(this.time.now / 400) % 2 === 0;
+    for (const p of w.players) {
+      if (p.id === this.localId) continue;
+      out.push({ x: p.x, y: p.y, color: p.down && blink ? c.allyDown : c.ally, icon: { text: `${p.id}P` } });
+    }
+    return out;
   }
 
   /** 画面の真ん中に、しばらくお知らせを出す */
@@ -1040,6 +1069,8 @@ export class RunScene extends Phaser.Scene {
     this.drawItems(timeMs);
     this.obstacleView.update(world, view);
     this.drawTopCenter();
+    if (world.outcome || (world.levelUp && !world.levelUp.done.has(this.localId))) this.edgeArrows.hide();
+    else this.edgeArrows.update(this.edgeTargets(), this.cameras.main);
 
     const lu = world.levelUp;
     if (lu && !lu.done.has(this.localId) && !world.outcome) {

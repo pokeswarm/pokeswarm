@@ -330,7 +330,6 @@
   "achievement.cond.defeat": "Defeat {name} {count} times",
   "achievement.reward.pokemon": "{name} becomes playable",
   "achievement.reward.pokemonLater": "Unlocks {name} (playable later)",
-  "achievements.reward": "Reward: {reward}",
   "achievements.secret": "???",
   "achievement.reward.item": "{name} now appears",
   "achievement.reward.coins": "{coins} coins",
@@ -436,5 +435,8 @@
   "transfer.confirmNote": "The current data in this browser will be replaced by the received data. This cannot be undone.",
   "transfer.replace": "Receive and replace",
   "transfer.copy": "Copy code",
-  "transfer.copied": "Copied"
+  "transfer.copied": "Copied",
+  "achievements.colName": "Achievement",
+  "achievements.colCondition": "Condition",
+  "achievements.colReward": "Reward"
 }

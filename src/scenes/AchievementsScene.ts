@@ -18,61 +18,72 @@ export class AchievementsScene extends Phaser.Scene {
   }
 
   create(): void {
+    // 作者の依頼（2026年10月22日）: 1行に1つの実績（名前・条件・報酬を横に並べる）。行が増えるので、見出しと戻るボタンは上に固定し、一覧だけを動かす
     const root = document.createElement('div');
     root.style.cssText =
-      'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,92vw);max-height:90vh;overflow:auto;padding:24px;background:#000;color:#f8f8f8;border:4px solid #f8f8f8;box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px #f8f8f8;font-family:inherit;font-size:16px;line-height:1.6;border-radius:6px;z-index:20;box-sizing:border-box';
+      'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(1040px,96vw);height:min(90vh,900px);display:flex;flex-direction:column;padding:16px 20px;background:#000;color:#f8f8f8;border:4px solid #f8f8f8;box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px #f8f8f8;font-family:inherit;font-size:16px;line-height:1.6;border-radius:6px;z-index:20;box-sizing:border-box';
     document.body.appendChild(root);
+    const columns = 'grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr) minmax(0,1.1fr)';
     const render = (): void => {
       const save = session.store.current;
       const list = achievementsConfig.achievements;
       const done = list.filter((a) => save.achievements.includes(a.id)).length;
-      const title = document.createElement('div');
-      title.style.cssText = 'display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px';
+      const head = document.createElement('div');
+      head.style.cssText = 'display:flex;align-items:center;gap:16px;margin-bottom:10px;flex:none';
       const h = document.createElement('div');
       h.style.cssText = 'font-size:24px;font-weight:bold';
       h.textContent = t('achievements.title');
       const count = document.createElement('div');
+      count.style.flex = '1';
       count.textContent = t('achievements.count', { done, total: list.length });
-      title.append(h, count);
+      const back = document.createElement('button');
+      back.style.cssText = BUTTON;
+      back.textContent = t('achievements.back');
+      back.onclick = () => this.scene.start('title');
+      head.append(h, count, back);
+
+      // 列の見出し
+      const labels = document.createElement('div');
+      labels.style.cssText = `display:grid;${columns};gap:12px;padding:0 12px 6px;opacity:0.7;flex:none;border-bottom:2px solid #f8f8f8`;
+      for (const key of ['achievements.colName', 'achievements.colCondition', 'achievements.colReward'] as const) {
+        const l = document.createElement('div');
+        l.textContent = t(key);
+        labels.append(l);
+      }
 
       // 作者の決定（2026年10月22日）: 達成の条件は見せ、何の実績か（名前）と報酬は達成するまで伏せる。裏実績は条件も伏せる
-      const grid = document.createElement('div');
-      grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px';
+      const rows = document.createElement('div');
+      rows.style.cssText = 'flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:4px;padding-top:6px';
       for (const a of list) {
         const achieved = save.achievements.includes(a.id);
         const secret = a.hidden && !achieved;
-        const cell = document.createElement('div');
-        cell.style.cssText = `padding:10px 12px;border-radius:6px;border:2px solid ${achieved ? '#f8d030' : '#f8f8f8'};background:${achieved ? '#3d2a08' : '#000000'};${achieved ? '' : 'opacity:0.85'}`;
+        const row = document.createElement('div');
+        row.style.cssText = `display:grid;${columns};gap:12px;align-items:center;padding:6px 12px;border-radius:6px;border:2px solid ${achieved ? '#f8d030' : '#585868'};background:${achieved ? '#3d2a08' : '#000000'};overflow-wrap:anywhere`;
         const name = document.createElement('div');
         name.textContent = achieved ? achievementName(a.id) : t('achievements.secret');
-        if (achieved) name.style.color = '#f8d030';
+        name.style.color = achieved ? '#f8d030' : '#a0a0a8';
         const cond = document.createElement('div');
         cond.textContent = secret ? t('achievements.hiddenDesc') : achievementCondition(a);
-        cell.append(name, cond);
         const p = progressOf(save.stats, a.condition);
         if (!achieved && !secret && p && p.target > 1) {
-          const prog = document.createElement('div');
-          prog.style.cssText = 'opacity:0.75';
+          const prog = document.createElement('span');
+          prog.style.cssText = 'opacity:0.7;margin-left:8px;white-space:nowrap';
           prog.textContent = t('achievements.progress', { current: Math.floor(p.current), target: p.target });
-          cell.append(prog);
+          cond.append(prog);
         }
         // 報酬: 達成するまで「？？？」（報酬があるかどうかも分からないように、まだのものはすべて出す）
         const playable = !!a.reward?.pokemon && Object.entries(playablesConfig.pokemon).some(([k, pl]) => (pl.unlock ?? k) === a.reward!.pokemon);
-        const reward = achieved ? achievementReward(a, playable) : t('achievements.secret');
-        if (reward) {
-          const r = document.createElement('div');
-          r.style.cssText = `color:${achieved ? '#a8e8a0' : '#a0a0a8'}`;
-          r.textContent = t('achievements.reward', { reward });
-          cell.append(r);
-        }
-        grid.append(cell);
+        const reward = document.createElement('div');
+        reward.style.color = achieved ? '#a8e8a0' : '#a0a0a8';
+        reward.textContent = (achieved ? achievementReward(a, playable) : t('achievements.secret')) ?? '';
+        row.append(name, cond, reward);
+        rows.append(row);
       }
-
-      const back = document.createElement('button');
-      back.style.cssText = BUTTON + ';margin-top:16px';
-      back.textContent = t('achievements.back');
-      back.onclick = () => this.scene.start('title');
-      root.replaceChildren(title, grid, back);
+      const scroll = root.querySelector<HTMLDivElement>('[data-rows]')?.scrollTop ?? 0;
+      rows.dataset.rows = '1';
+      root.replaceChildren(head, labels, rows);
+      // 記録が変わって描き直しても、読んでいた場所のまま
+      rows.scrollTop = scroll;
     };
     render();
     const off = session.store.onChange(render);

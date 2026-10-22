@@ -309,7 +309,6 @@
   "achievement.cond.defeat": "Derrota a {name} {count} veces",
   "achievement.reward.pokemon": "{name} pasa a ser jugable",
   "achievement.reward.pokemonLater": "Desbloquea a {name} (jugable más adelante)",
-  "achievements.reward": "Recompensa: {reward}",
   "achievements.secret": "???",
   "achievement.reward.item": "{name} ya puede aparecer",
   "achievement.reward.coins": "{coins} monedas",
@@ -415,5 +414,8 @@
   "transfer.confirmNote": "Los datos actuales de este navegador se sustituirán por los recibidos. No se puede deshacer.",
   "transfer.replace": "Recibir y sustituir",
   "transfer.copy": "Copiar código",
-  "transfer.copied": "Copiado"
+  "transfer.copied": "Copiado",
+  "achievements.colName": "Logro",
+  "achievements.colCondition": "Condición",
+  "achievements.colReward": "Recompensa"
 }

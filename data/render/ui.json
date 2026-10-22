@@ -74,5 +74,20 @@
     "lockedFill": "#a8b8c8",
     "silhouette": "#383848",
     "selected": "#f8d030"
+  },
+  "edgeArrows": {
+    "dot": 4,
+    "marginSide": 28,
+    "marginTop": 72,
+    "marginBottom": 28,
+    "iconGap": 32,
+    "colors": {
+      "boss": "#f85838",
+      "midboss": "#f8c830",
+      "legendary": "#c060f8",
+      "candy": "#42a5f5",
+      "ally": "#58e0f8",
+      "allyDown": "#f87878"
+    }
   }
 }

@@ -66,6 +66,18 @@ export const uiConfigSchema = z.object({
   donate: z.object({ url: z.string() }),
   /** スマホのジョイスティック（作者の決定 2026年10月22日）: 輪の半径・つまみの半径・止まったままの遊び（px） */
   joystick: z.object({ radius: z.number().positive(), knob: z.number().positive(), deadzone: z.number().nonnegative() }),
+  /**
+   * 画面の外にいる大事なもの（ボス・中ボス・伝説・ふしぎなアメ・味方）の方向を、画面の端に矢印で出す（作者の依頼 2026年10月22日）。
+   * dot は矢印のドットの大きさ、margin* は画面の端からの距離（上は HUD をよけて広め）、iconGap は矢印から目印までの距離（px）
+   */
+  edgeArrows: z.object({
+    dot: z.number().positive(),
+    marginSide: z.number().nonnegative(),
+    marginTop: z.number().nonnegative(),
+    marginBottom: z.number().nonnegative(),
+    iconGap: z.number().nonnegative(),
+    colors: z.object({ boss: z.string(), midboss: z.string(), legendary: z.string(), candy: z.string(), ally: z.string(), allyDown: z.string() }),
+  }),
   titleWalk: z.object({
     lead: z.string(),
     scale: z.number().positive(),

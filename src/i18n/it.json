@@ -309,7 +309,6 @@
   "achievement.cond.defeat": "Sconfiggi {name} {count} volte",
   "achievement.reward.pokemon": "{name} diventa giocabile",
   "achievement.reward.pokemonLater": "Sblocca {name} (giocabile più avanti)",
-  "achievements.reward": "Ricompensa: {reward}",
   "achievements.secret": "???",
   "achievement.reward.item": "{name} ora può comparire",
   "achievement.reward.coins": "{coins} monete",
@@ -415,5 +414,8 @@
   "transfer.confirmNote": "I dati attuali di questo browser verranno sostituiti da quelli ricevuti. L'operazione non si può annullare.",
   "transfer.replace": "Ricevi e sostituisci",
   "transfer.copy": "Copia codice",
-  "transfer.copied": "Copiato"
+  "transfer.copied": "Copiato",
+  "achievements.colName": "Obiettivo",
+  "achievements.colCondition": "Condizione",
+  "achievements.colReward": "Ricompensa"
 }

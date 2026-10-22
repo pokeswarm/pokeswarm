@@ -330,7 +330,6 @@
   "achievement.cond.defeat": "{name}を {count}回 倒す",
   "achievement.reward.pokemon": "{name}が 使えるようになる",
   "achievement.reward.pokemonLater": "{name}を解放（遊べるのは もう少し先）",
-  "achievements.reward": "報酬　{reward}",
   "achievements.secret": "？？？",
   "achievement.reward.item": "{name}が 出るようになる",
   "achievement.reward.coins": "コイン {coins}",
@@ -436,5 +435,8 @@
   "transfer.confirmNote": "このブラウザのいまのデータは、受け取ったデータで置き換わり、元に戻せません。",
   "transfer.replace": "受け取って置き換える",
   "transfer.copy": "コードをコピー",
-  "transfer.copied": "コピーしました"
+  "transfer.copied": "コピーしました",
+  "achievements.colName": "実績",
+  "achievements.colCondition": "条件",
+  "achievements.colReward": "報酬"
 }

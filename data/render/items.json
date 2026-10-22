@@ -142,6 +142,39 @@
       "kyyyyYYk",
       ".kYYYYk.",
       "..kkkk.."
+    ],
+    "edge-arrow": [
+      "k.......",
+      "kk......",
+      "kwk.....",
+      "kwwk....",
+      "kwwwk...",
+      "kwwwwk..",
+      "kwwwk...",
+      "kwwk....",
+      "kwk.....",
+      "kk......",
+      "k......."
+    ],
+    "edge-arrow-diag": [
+      "........k",
+      ".......kk",
+      "......kwk",
+      ".....kwwk",
+      "....kwwwk",
+      "...kwwwwk",
+      "..kwwwwwk",
+      ".kwwwwwwk",
+      "kkkkkkkkk"
+    ],
+    "edge-boss": [
+      ".kkkkk.",
+      "kwwwwwk",
+      "kkwwwkk",
+      "kkwwwkk",
+      "kwwkwwk",
+      ".kwwwk.",
+      ".kkkkk."
     ]
   },
   "candyBurst": [

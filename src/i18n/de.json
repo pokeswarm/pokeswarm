@@ -309,7 +309,6 @@
   "achievement.cond.defeat": "Besiege {name} {count}-mal",
   "achievement.reward.pokemon": "{name} wird spielbar",
   "achievement.reward.pokemonLater": "Schaltet {name} frei (später spielbar)",
-  "achievements.reward": "Belohnung: {reward}",
   "achievements.secret": "???",
   "achievement.reward.item": "{name} kann jetzt erscheinen",
   "achievement.reward.coins": "{coins} Münzen",
@@ -415,5 +414,8 @@
   "transfer.confirmNote": "Die aktuellen Daten in diesem Browser werden durch die empfangenen Daten ersetzt. Das lässt sich nicht rückgängig machen.",
   "transfer.replace": "Empfangen und ersetzen",
   "transfer.copy": "Code kopieren",
-  "transfer.copied": "Kopiert"
+  "transfer.copied": "Kopiert",
+  "achievements.colName": "Erfolg",
+  "achievements.colCondition": "Bedingung",
+  "achievements.colReward": "Belohnung"
 }

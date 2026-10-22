@@ -65,7 +65,12 @@ export class AccountPanel {
       button.onpointerdown = (ev) => ev.stopPropagation();
       button.onclick = (ev) => {
         ev.stopPropagation();
-        void this.run(() => (session.status === 'guest' ? session.signInWithGoogle(chooseSave) : session.signOut()));
+        if (session.status === 'google') {
+          void this.run(() => session.signOut());
+          return;
+        }
+        // 先に、Google から何が届き、ゲームでどう扱うかを見せる（作者の決定 2026年10月22日）
+        confirmSignIn(() => void this.run(() => session.signInWithGoogle(chooseSave)));
       };
       children.push(button);
     }
@@ -82,6 +87,54 @@ export class AccountPanel {
       this.render();
     }
   }
+}
+
+/**
+ * Google でログインする前の説明（作者の決定 2026年10月22日）。Google の画面には「名前・メールアドレス・プロフィール写真を共有」と出るが、
+ * これはログインの仕組み（Firebase）の決まりで外せない。ゲームでは使わず、保存も表示もしないことを先に伝え、ログインするかを選んでもらう。
+ * 「ログインする」を押したときにそのまま Google の窓を開く（ブラウザは、押した操作の中でないと窓を開かせないため）
+ */
+function confirmSignIn(go: () => void): void {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:30;padding:16px;box-sizing:border-box';
+  const box = document.createElement('div');
+  box.style.cssText = `${windowCss('dark')};padding:20px 24px;width:min(640px,92vw);max-height:90vh;overflow:auto;font-size:16px;line-height:1.7;box-sizing:border-box;display:flex;flex-direction:column;gap:12px`;
+  const title = document.createElement('div');
+  title.style.fontSize = '24px';
+  title.textContent = t('account.signInTitle');
+  const body = document.createElement('div');
+  body.style.cssText = 'white-space:pre-line;overflow-wrap:anywhere';
+  body.textContent = t('account.signInBody');
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap';
+  const close = (): void => {
+    overlay.remove();
+    window.removeEventListener('keydown', onKey);
+  };
+  const onKey = (ev: KeyboardEvent): void => {
+    if (ev.key === 'Escape') close();
+  };
+  window.addEventListener('keydown', onKey);
+  const ok = document.createElement('button');
+  ok.style.cssText = BUTTON;
+  ok.textContent = t('account.signInGo');
+  ok.onclick = () => {
+    close();
+    go();
+  };
+  const cancel = document.createElement('button');
+  cancel.style.cssText = BUTTON;
+  cancel.textContent = t('account.signInCancel');
+  cancel.onclick = close;
+  // タイトル画面のクリックで先へ進まないように止める
+  overlay.onpointerdown = (ev) => {
+    ev.stopPropagation();
+    if (ev.target === overlay) close();
+  };
+  row.append(ok, cancel);
+  box.append(title, body, row);
+  overlay.append(box);
+  document.body.append(overlay);
 }
 
 /** ゲストのデータと Google のデータが両方あるとき、どちらを残すかを選ぶ画面 */

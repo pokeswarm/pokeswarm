@@ -407,5 +407,9 @@
   "guard.framed": "This page has embedded PokéSwarm into another site without permission.\nPokéSwarm is a free, ad-free fan game that is only distributed on its official site.\nPlease play on the official site ({url}).",
   "guard.unofficial": "This address is not the official PokéSwarm site (it is an unauthorized copy).\nPokéSwarm is a free, ad-free fan game that is only distributed on its official site.\nPlease play on the official site ({url}).",
   "guard.open": "Open the official site",
-  "footer.official": "The only official site is {url}. If you are playing anywhere else, such as a page with ads, it is an unauthorized copy."
+  "footer.official": "The only official site is {url}. If you are playing anywhere else, such as a page with ads, it is an unauthorized copy.",
+  "account.signInTitle": "Sign in with Google",
+  "account.signInBody": "Signing in saves your progress on the server so you can continue on other PCs and browsers. It also unlocks friends and co-op play.\n\nGoogle will say it shares your name, email address and profile picture. This is required by the sign-in system (Firebase) and cannot be turned off.\n- Your email address, name and picture are not used in the game and are not stored in your save data.\n- Other players cannot see them (friends only see the nickname you choose).\n- Your email address is kept as a sign-in record in a place only the administrator can see (Firebase).\n\nYou can keep playing as a guest without signing in.",
+  "account.signInGo": "Sign in with Google",
+  "account.signInCancel": "Cancel"
 }

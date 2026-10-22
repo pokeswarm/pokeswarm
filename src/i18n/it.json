@@ -386,5 +386,9 @@
   "guard.framed": "Questa pagina ha incorporato PokéSwarm in un altro sito senza permesso.\nPokéSwarm è un fan game gratuito e senza pubblicità, distribuito solo sul sito ufficiale.\nGioca sul sito ufficiale ({url}).",
   "guard.unofficial": "Questo indirizzo non è il sito ufficiale di PokéSwarm (è una copia non autorizzata).\nPokéSwarm è un fan game gratuito e senza pubblicità, distribuito solo sul sito ufficiale.\nGioca sul sito ufficiale ({url}).",
   "guard.open": "Apri il sito ufficiale",
-  "footer.official": "L'unico sito ufficiale è {url}. Se stai giocando altrove, ad esempio su una pagina con pubblicità, si tratta di una copia non autorizzata."
+  "footer.official": "L'unico sito ufficiale è {url}. Se stai giocando altrove, ad esempio su una pagina con pubblicità, si tratta di una copia non autorizzata.",
+  "account.signInTitle": "Accedi con Google",
+  "account.signInBody": "Accedendo, i tuoi progressi vengono salvati sul server così puoi continuare su altri PC e browser. Si sbloccano anche gli amici e il multigiocatore.\n\nGoogle indicherà che condivide nome, indirizzo email e foto del profilo. È richiesto dal sistema di accesso (Firebase) e non si può disattivare.\n- Email, nome e foto non vengono usati nel gioco né salvati nei tuoi dati.\n- Gli altri giocatori non possono vederli (gli amici vedono solo il soprannome che scegli).\n- La tua email resta come registro di accesso in un luogo visibile solo all'amministratore (Firebase).\n\nPuoi continuare a giocare come ospite senza accedere.",
+  "account.signInGo": "Accedi con Google",
+  "account.signInCancel": "Annulla"
 }

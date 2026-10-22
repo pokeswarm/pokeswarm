@@ -55,13 +55,16 @@ async function get<T>(path: string): Promise<T> {
   return JSON.parse(text) as T;
 }
 
-/** 日本語（かな）・英語の名前。かなが無ければ漢字まじりの日本語を使う */
-function names(list: LocalizedName[], key: string): { ja: string; en: string } {
+/**
+ * 日本語（かな）・英語・フランス語・ドイツ語・スペイン語・イタリア語の名前（作者の決定 2026年10月22日: 言語を増やす）。
+ * かなが無ければ漢字まじりの日本語を使う。ヨーロッパの言語の名前が無ければ英語を使う
+ */
+function names(list: LocalizedName[], key: string): { ja: string; en: string; fr: string; de: string; es: string; it: string } {
   const by = (lang: string) => list.find((n) => n.language.name === lang)?.name;
   const ja = by('ja-hrkt') ?? by('ja');
   const en = by('en');
   if (!ja || !en) throw new Error(`${key}: 日本語か英語の名前がありません`);
-  return { ja, en };
+  return { ja, en, fr: by('fr') ?? en, de: by('de') ?? en, es: by('es') ?? en, it: by('it') ?? en };
 }
 
 function sortObject<T>(obj: Record<string, T>): Record<string, T> {

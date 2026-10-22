@@ -2,7 +2,11 @@
   "bug": {
     "names": {
       "ja": "むし",
-      "en": "Bug"
+      "en": "Bug",
+      "fr": "Insecte",
+      "de": "Käfer",
+      "es": "Bicho",
+      "it": "Coleottero"
     },
     "doubleDamageTo": [
       "dark",
@@ -23,7 +27,11 @@
   "dark": {
     "names": {
       "ja": "あく",
-      "en": "Dark"
+      "en": "Dark",
+      "fr": "Ténèbres",
+      "de": "Unlicht",
+      "es": "Siniestro",
+      "it": "Buio"
     },
     "doubleDamageTo": [
       "ghost",
@@ -39,7 +47,11 @@
   "dragon": {
     "names": {
       "ja": "ドラゴン",
-      "en": "Dragon"
+      "en": "Dragon",
+      "fr": "Dragon",
+      "de": "Drache",
+      "es": "Dragón",
+      "it": "Drago"
     },
     "doubleDamageTo": [
       "dragon"
@@ -54,7 +66,11 @@
   "electric": {
     "names": {
       "ja": "でんき",
-      "en": "Electric"
+      "en": "Electric",
+      "fr": "Électrik",
+      "de": "Elektro",
+      "es": "Eléctrico",
+      "it": "Elettro"
     },
     "doubleDamageTo": [
       "flying",
@@ -72,7 +88,11 @@
   "fairy": {
     "names": {
       "ja": "フェアリー",
-      "en": "Fairy"
+      "en": "Fairy",
+      "fr": "Fée",
+      "de": "Fee",
+      "es": "Hada",
+      "it": "Folletto"
     },
     "doubleDamageTo": [
       "dark",
@@ -89,7 +109,11 @@
   "fighting": {
     "names": {
       "ja": "かくとう",
-      "en": "Fighting"
+      "en": "Fighting",
+      "fr": "Combat",
+      "de": "Kampf",
+      "es": "Lucha",
+      "it": "Lotta"
     },
     "doubleDamageTo": [
       "dark",
@@ -112,7 +136,11 @@
   "fire": {
     "names": {
       "ja": "ほのお",
-      "en": "Fire"
+      "en": "Fire",
+      "fr": "Feu",
+      "de": "Feuer",
+      "es": "Fuego",
+      "it": "Fuoco"
     },
     "doubleDamageTo": [
       "bug",
@@ -131,7 +159,11 @@
   "flying": {
     "names": {
       "ja": "ひこう",
-      "en": "Flying"
+      "en": "Flying",
+      "fr": "Vol",
+      "de": "Flug",
+      "es": "Volador",
+      "it": "Volante"
     },
     "doubleDamageTo": [
       "bug",
@@ -148,7 +180,11 @@
   "ghost": {
     "names": {
       "ja": "ゴースト",
-      "en": "Ghost"
+      "en": "Ghost",
+      "fr": "Spectre",
+      "de": "Geist",
+      "es": "Fantasma",
+      "it": "Spettro"
     },
     "doubleDamageTo": [
       "ghost",
@@ -164,7 +200,11 @@
   "grass": {
     "names": {
       "ja": "くさ",
-      "en": "Grass"
+      "en": "Grass",
+      "fr": "Plante",
+      "de": "Pflanze",
+      "es": "Planta",
+      "it": "Erba"
     },
     "doubleDamageTo": [
       "ground",
@@ -185,7 +225,11 @@
   "ground": {
     "names": {
       "ja": "じめん",
-      "en": "Ground"
+      "en": "Ground",
+      "fr": "Sol",
+      "de": "Boden",
+      "es": "Tierra",
+      "it": "Terra"
     },
     "doubleDamageTo": [
       "electric",
@@ -205,7 +249,11 @@
   "ice": {
     "names": {
       "ja": "こおり",
-      "en": "Ice"
+      "en": "Ice",
+      "fr": "Glace",
+      "de": "Eis",
+      "es": "Hielo",
+      "it": "Ghiaccio"
     },
     "doubleDamageTo": [
       "dragon",
@@ -224,7 +272,11 @@
   "normal": {
     "names": {
       "ja": "ノーマル",
-      "en": "Normal"
+      "en": "Normal",
+      "fr": "Normal",
+      "de": "Normal",
+      "es": "Normal",
+      "it": "Normale"
     },
     "doubleDamageTo": [],
     "halfDamageTo": [
@@ -238,7 +290,11 @@
   "poison": {
     "names": {
       "ja": "どく",
-      "en": "Poison"
+      "en": "Poison",
+      "fr": "Poison",
+      "de": "Gift",
+      "es": "Veneno",
+      "it": "Veleno"
     },
     "doubleDamageTo": [
       "fairy",
@@ -257,7 +313,11 @@
   "psychic": {
     "names": {
       "ja": "エスパー",
-      "en": "Psychic"
+      "en": "Psychic",
+      "fr": "Psy",
+      "de": "Psycho",
+      "es": "Psíquico",
+      "it": "Psico"
     },
     "doubleDamageTo": [
       "fighting",
@@ -274,7 +334,11 @@
   "rock": {
     "names": {
       "ja": "いわ",
-      "en": "Rock"
+      "en": "Rock",
+      "fr": "Roche",
+      "de": "Gestein",
+      "es": "Roca",
+      "it": "Roccia"
     },
     "doubleDamageTo": [
       "bug",
@@ -292,7 +356,11 @@
   "steel": {
     "names": {
       "ja": "はがね",
-      "en": "Steel"
+      "en": "Steel",
+      "fr": "Acier",
+      "de": "Stahl",
+      "es": "Acero",
+      "it": "Acciaio"
     },
     "doubleDamageTo": [
       "fairy",
@@ -310,7 +378,11 @@
   "water": {
     "names": {
       "ja": "みず",
-      "en": "Water"
+      "en": "Water",
+      "fr": "Eau",
+      "de": "Wasser",
+      "es": "Agua",
+      "it": "Acqua"
     },
     "doubleDamageTo": [
       "fire",

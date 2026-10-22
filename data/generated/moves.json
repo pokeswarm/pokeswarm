@@ -2,7 +2,11 @@
   "air-slash": {
     "names": {
       "ja": "エアスラッシュ",
-      "en": "Air Slash"
+      "en": "Air Slash",
+      "fr": "Lame d’Air",
+      "de": "Luftschnitt",
+      "es": "Tajo Aéreo",
+      "it": "Eterelama"
     },
     "type": "flying",
     "damageClass": "special"
@@ -10,7 +14,11 @@
   "ancient-power": {
     "names": {
       "ja": "げんしのちから",
-      "en": "Ancient Power"
+      "en": "Ancient Power",
+      "fr": "Pouvoir Antique",
+      "de": "Antik-Kraft",
+      "es": "Poder Pasado",
+      "it": "Forzantica"
     },
     "type": "rock",
     "damageClass": "special"
@@ -18,7 +26,11 @@
   "aura-sphere": {
     "names": {
       "ja": "はどうだん",
-      "en": "Aura Sphere"
+      "en": "Aura Sphere",
+      "fr": "Aurasphère",
+      "de": "Aurasphäre",
+      "es": "Esfera Aural",
+      "it": "Forzasfera"
     },
     "type": "fighting",
     "damageClass": "special"
@@ -26,7 +38,11 @@
   "aurora-beam": {
     "names": {
       "ja": "オーロラビーム",
-      "en": "Aurora Beam"
+      "en": "Aurora Beam",
+      "fr": "Onde Boréale",
+      "de": "Aurorastrahl",
+      "es": "Rayo Aurora",
+      "it": "Raggiaurora"
     },
     "type": "ice",
     "damageClass": "special"
@@ -34,7 +50,11 @@
   "blast-burn": {
     "names": {
       "ja": "ブラストバーン",
-      "en": "Blast Burn"
+      "en": "Blast Burn",
+      "fr": "Rafale Feu",
+      "de": "Lohekanonade",
+      "es": "Anillo Ígneo",
+      "it": "Incendio"
     },
     "type": "fire",
     "damageClass": "special"
@@ -42,7 +62,11 @@
   "blizzard": {
     "names": {
       "ja": "ふぶき",
-      "en": "Blizzard"
+      "en": "Blizzard",
+      "fr": "Blizzard",
+      "de": "Blizzard",
+      "es": "Ventisca",
+      "it": "Bora"
     },
     "type": "ice",
     "damageClass": "special"
@@ -50,7 +74,11 @@
   "body-slam": {
     "names": {
       "ja": "のしかかり",
-      "en": "Body Slam"
+      "en": "Body Slam",
+      "fr": "Plaquage",
+      "de": "Bodyslam",
+      "es": "Golpe Cuerpo",
+      "it": "Corposcontro"
     },
     "type": "normal",
     "damageClass": "physical"
@@ -58,7 +86,11 @@
   "bone-rush": {
     "names": {
       "ja": "ボーンラッシュ",
-      "en": "Bone Rush"
+      "en": "Bone Rush",
+      "fr": "Charge Os",
+      "de": "Knochenhatz",
+      "es": "Ataque Óseo",
+      "it": "Ossoraffica"
     },
     "type": "ground",
     "damageClass": "physical"
@@ -66,7 +98,11 @@
   "bonemerang": {
     "names": {
       "ja": "ホネブーメラン",
-      "en": "Bonemerang"
+      "en": "Bonemerang",
+      "fr": "Osmerang",
+      "de": "Knochmerang",
+      "es": "Huesomerang",
+      "it": "Ossomerang"
     },
     "type": "ground",
     "damageClass": "physical"
@@ -74,7 +110,11 @@
   "bubble": {
     "names": {
       "ja": "あわ",
-      "en": "Bubble"
+      "en": "Bubble",
+      "fr": "Écume",
+      "de": "Blubber",
+      "es": "Burbuja",
+      "it": "Bolla"
     },
     "type": "water",
     "damageClass": "special"
@@ -82,7 +122,11 @@
   "confusion": {
     "names": {
       "ja": "ねんりき",
-      "en": "Confusion"
+      "en": "Confusion",
+      "fr": "Choc Mental",
+      "de": "Konfusion",
+      "es": "Confusión",
+      "it": "Confusione"
     },
     "type": "psychic",
     "damageClass": "special"
@@ -90,7 +134,11 @@
   "cross-chop": {
     "names": {
       "ja": "クロスチョップ",
-      "en": "Cross Chop"
+      "en": "Cross Chop",
+      "fr": "Coup Croix",
+      "de": "Kreuzhieb",
+      "es": "Tajo Cruzado",
+      "it": "Incrocolpo"
     },
     "type": "fighting",
     "damageClass": "physical"
@@ -98,7 +146,11 @@
   "double-kick": {
     "names": {
       "ja": "にどげり",
-      "en": "Double Kick"
+      "en": "Double Kick",
+      "fr": "Double Pied",
+      "de": "Doppelkick",
+      "es": "Doble Patada",
+      "it": "Doppiocalcio"
     },
     "type": "fighting",
     "damageClass": "physical"
@@ -106,7 +158,11 @@
   "draco-meteor": {
     "names": {
       "ja": "りゅうせいぐん",
-      "en": "Draco Meteor"
+      "en": "Draco Meteor",
+      "fr": "Draco-Météore",
+      "de": "Draco Meteor",
+      "es": "Cometa Draco",
+      "it": "Dragobolide"
     },
     "type": "dragon",
     "damageClass": "special"
@@ -114,7 +170,11 @@
   "dragon-pulse": {
     "names": {
       "ja": "りゅうのはどう",
-      "en": "Dragon Pulse"
+      "en": "Dragon Pulse",
+      "fr": "Draco-Choc",
+      "de": "Drachenpuls",
+      "es": "Pulso Dragón",
+      "it": "Dragopulsar"
     },
     "type": "dragon",
     "damageClass": "special"
@@ -122,7 +182,11 @@
   "dragon-rage": {
     "names": {
       "ja": "りゅうのいかり",
-      "en": "Dragon Rage"
+      "en": "Dragon Rage",
+      "fr": "Draco-Rage",
+      "de": "Drachenwut",
+      "es": "Furia Dragón",
+      "it": "Ira di Drago"
     },
     "type": "dragon",
     "damageClass": "special"
@@ -130,7 +194,11 @@
   "dragon-rush": {
     "names": {
       "ja": "ドラゴンダイブ",
-      "en": "Dragon Rush"
+      "en": "Dragon Rush",
+      "fr": "Draco-Charge",
+      "de": "Drachenstoß",
+      "es": "Carga Dragón",
+      "it": "Dragofuria"
     },
     "type": "dragon",
     "damageClass": "physical"
@@ -138,7 +206,11 @@
   "dragon-tail": {
     "names": {
       "ja": "ドラゴンテール",
-      "en": "Dragon Tail"
+      "en": "Dragon Tail",
+      "fr": "Draco-Queue",
+      "de": "Drachenrute",
+      "es": "Cola Dragón",
+      "it": "Codadrago"
     },
     "type": "dragon",
     "damageClass": "physical"
@@ -146,7 +218,11 @@
   "dynamic-punch": {
     "names": {
       "ja": "ばくれつパンチ",
-      "en": "Dynamic Punch"
+      "en": "Dynamic Punch",
+      "fr": "Dynamo-Poing",
+      "de": "Wuchtschlag",
+      "es": "Puño Dinámico",
+      "it": "Dinamipugno"
     },
     "type": "fighting",
     "damageClass": "physical"
@@ -154,7 +230,11 @@
   "earthquake": {
     "names": {
       "ja": "じしん",
-      "en": "Earthquake"
+      "en": "Earthquake",
+      "fr": "Séisme",
+      "de": "Erdbeben",
+      "es": "Terremoto",
+      "it": "Terremoto"
     },
     "type": "ground",
     "damageClass": "physical"
@@ -162,7 +242,11 @@
   "ember": {
     "names": {
       "ja": "ひのこ",
-      "en": "Ember"
+      "en": "Ember",
+      "fr": "Flammèche",
+      "de": "Glut",
+      "es": "Ascuas",
+      "it": "Braciere"
     },
     "type": "fire",
     "damageClass": "special"
@@ -170,7 +254,11 @@
   "explosion": {
     "names": {
       "ja": "だいばくはつ",
-      "en": "Explosion"
+      "en": "Explosion",
+      "fr": "Explosion",
+      "de": "Explosion",
+      "es": "Explosión",
+      "it": "Esplosione"
     },
     "type": "normal",
     "damageClass": "physical"
@@ -178,7 +266,11 @@
   "extreme-speed": {
     "names": {
       "ja": "しんそく",
-      "en": "Extreme Speed"
+      "en": "Extreme Speed",
+      "fr": "Vitesse Extrême",
+      "de": "Turbotempo",
+      "es": "Velocidad Extrema",
+      "it": "Extrarapido"
     },
     "type": "normal",
     "damageClass": "physical"
@@ -186,7 +278,11 @@
   "fire-blast": {
     "names": {
       "ja": "だいもんじ",
-      "en": "Fire Blast"
+      "en": "Fire Blast",
+      "fr": "Déflagration",
+      "de": "Feuersturm",
+      "es": "Llamarada",
+      "it": "Fuocobomba"
     },
     "type": "fire",
     "damageClass": "special"
@@ -194,7 +290,11 @@
   "fire-fang": {
     "names": {
       "ja": "ほのおのキバ",
-      "en": "Fire Fang"
+      "en": "Fire Fang",
+      "fr": "Crocs Feu",
+      "de": "Feuerzahn",
+      "es": "Colmillo Ígneo",
+      "it": "Rogodenti"
     },
     "type": "fire",
     "damageClass": "physical"
@@ -202,7 +302,11 @@
   "fire-spin": {
     "names": {
       "ja": "ほのおのうず",
-      "en": "Fire Spin"
+      "en": "Fire Spin",
+      "fr": "Danse Flammes",
+      "de": "Feuerwirbel",
+      "es": "Giro Fuego",
+      "it": "Turbofuoco"
     },
     "type": "fire",
     "damageClass": "special"
@@ -210,7 +314,11 @@
   "fissure": {
     "names": {
       "ja": "じわれ",
-      "en": "Fissure"
+      "en": "Fissure",
+      "fr": "Abîme",
+      "de": "Geofissur",
+      "es": "Fisura",
+      "it": "Abisso"
     },
     "type": "ground",
     "damageClass": "physical"
@@ -218,7 +326,11 @@
   "flamethrower": {
     "names": {
       "ja": "かえんほうしゃ",
-      "en": "Flamethrower"
+      "en": "Flamethrower",
+      "fr": "Lance-Flammes",
+      "de": "Flammenwurf",
+      "es": "Lanzallamas",
+      "it": "Lanciafiamme"
     },
     "type": "fire",
     "damageClass": "special"
@@ -226,7 +338,11 @@
   "flare-blitz": {
     "names": {
       "ja": "フレアドライブ",
-      "en": "Flare Blitz"
+      "en": "Flare Blitz",
+      "fr": "Boutefeu",
+      "de": "Flammenblitz",
+      "es": "Envite Ígneo",
+      "it": "Fuococarica"
     },
     "type": "fire",
     "damageClass": "physical"
@@ -234,7 +350,11 @@
   "freeze-dry": {
     "names": {
       "ja": "フリーズドライ",
-      "en": "Freeze-Dry"
+      "en": "Freeze-Dry",
+      "fr": "Lyophilisation",
+      "de": "Gefriertrockner",
+      "es": "Liofilización",
+      "it": "Liofilizzazione"
     },
     "type": "ice",
     "damageClass": "special"
@@ -242,7 +362,11 @@
   "frenzy-plant": {
     "names": {
       "ja": "ハードプラント",
-      "en": "Frenzy Plant"
+      "en": "Frenzy Plant",
+      "fr": "Végé-Attaque",
+      "de": "Flora-Statue",
+      "es": "Planta Feroz",
+      "it": "Radicalbero"
     },
     "type": "grass",
     "damageClass": "special"
@@ -250,7 +374,11 @@
   "future-sight": {
     "names": {
       "ja": "みらいよち",
-      "en": "Future Sight"
+      "en": "Future Sight",
+      "fr": "Prescience",
+      "de": "Seher",
+      "es": "Premonición",
+      "it": "Divinazione"
     },
     "type": "psychic",
     "damageClass": "special"
@@ -258,7 +386,11 @@
   "giga-drain": {
     "names": {
       "ja": "ギガドレイン",
-      "en": "Giga Drain"
+      "en": "Giga Drain",
+      "fr": "Giga-Sangsue",
+      "de": "Gigasauger",
+      "es": "Gigadrenado",
+      "it": "Gigassorbimento"
     },
     "type": "grass",
     "damageClass": "special"
@@ -266,7 +398,11 @@
   "gust": {
     "names": {
       "ja": "かぜおこし",
-      "en": "Gust"
+      "en": "Gust",
+      "fr": "Tornade",
+      "de": "Windstoß",
+      "es": "Tornado",
+      "it": "Raffica"
     },
     "type": "flying",
     "damageClass": "special"
@@ -274,7 +410,11 @@
   "hex": {
     "names": {
       "ja": "たたりめ",
-      "en": "Hex"
+      "en": "Hex",
+      "fr": "Châtiment",
+      "de": "Bürde",
+      "es": "Infortunio",
+      "it": "Sciagura"
     },
     "type": "ghost",
     "damageClass": "special"
@@ -282,7 +422,11 @@
   "hurricane": {
     "names": {
       "ja": "ぼうふう",
-      "en": "Hurricane"
+      "en": "Hurricane",
+      "fr": "Vent Violent",
+      "de": "Orkan",
+      "es": "Vendaval",
+      "it": "Tifone"
     },
     "type": "flying",
     "damageClass": "special"
@@ -290,7 +434,11 @@
   "hydro-cannon": {
     "names": {
       "ja": "ハイドロカノン",
-      "en": "Hydro Cannon"
+      "en": "Hydro Cannon",
+      "fr": "Hydroblast",
+      "de": "Aquahaubitze",
+      "es": "Hidrocañón",
+      "it": "Idrocannone"
     },
     "type": "water",
     "damageClass": "special"
@@ -298,7 +446,11 @@
   "hydro-pump": {
     "names": {
       "ja": "ハイドロポンプ",
-      "en": "Hydro Pump"
+      "en": "Hydro Pump",
+      "fr": "Hydrocanon",
+      "de": "Hydropumpe",
+      "es": "Hidrobomba",
+      "it": "Idropompa"
     },
     "type": "water",
     "damageClass": "special"
@@ -306,7 +458,11 @@
   "hyper-beam": {
     "names": {
       "ja": "はかいこうせん",
-      "en": "Hyper Beam"
+      "en": "Hyper Beam",
+      "fr": "Ultralaser",
+      "de": "Hyperstrahl",
+      "es": "Hiperrayo",
+      "it": "Iper Raggio"
     },
     "type": "normal",
     "damageClass": "special"
@@ -314,7 +470,11 @@
   "ice-beam": {
     "names": {
       "ja": "れいとうビーム",
-      "en": "Ice Beam"
+      "en": "Ice Beam",
+      "fr": "Laser Glace",
+      "de": "Eisstrahl",
+      "es": "Rayo Hielo",
+      "it": "Geloraggio"
     },
     "type": "ice",
     "damageClass": "special"
@@ -322,7 +482,11 @@
   "karate-chop": {
     "names": {
       "ja": "からてチョップ",
-      "en": "Karate Chop"
+      "en": "Karate Chop",
+      "fr": "Poing Karaté",
+      "de": "Karateschlag",
+      "es": "Golpe Kárate",
+      "it": "Colpokarate"
     },
     "type": "fighting",
     "damageClass": "physical"
@@ -330,7 +494,11 @@
   "leech-seed": {
     "names": {
       "ja": "やどりぎのタネ",
-      "en": "Leech Seed"
+      "en": "Leech Seed",
+      "fr": "Vampigraine",
+      "de": "Egelsamen",
+      "es": "Drenadoras",
+      "it": "Parassiseme"
     },
     "type": "grass",
     "damageClass": "status"
@@ -338,7 +506,11 @@
   "magnitude": {
     "names": {
       "ja": "マグニチュード",
-      "en": "Magnitude"
+      "en": "Magnitude",
+      "fr": "Ampleur",
+      "de": "Intensität",
+      "es": "Magnitud",
+      "it": "Magnitudo"
     },
     "type": "ground",
     "damageClass": "physical"
@@ -346,7 +518,11 @@
   "metronome": {
     "names": {
       "ja": "ゆびをふる",
-      "en": "Metronome"
+      "en": "Metronome",
+      "fr": "Métronome",
+      "de": "Metronom",
+      "es": "Metrónomo",
+      "it": "Metronomo"
     },
     "type": "normal",
     "damageClass": "status"
@@ -354,7 +530,11 @@
   "night-shade": {
     "names": {
       "ja": "ナイトヘッド",
-      "en": "Night Shade"
+      "en": "Night Shade",
+      "fr": "Ombre Nocturne",
+      "de": "Nachtnebel",
+      "es": "Tinieblas",
+      "it": "Ombra Notturna"
     },
     "type": "ghost",
     "damageClass": "special"
@@ -362,7 +542,11 @@
   "outrage": {
     "names": {
       "ja": "げきりん",
-      "en": "Outrage"
+      "en": "Outrage",
+      "fr": "Colère",
+      "de": "Wutanfall",
+      "es": "Enfado",
+      "it": "Oltraggio"
     },
     "type": "dragon",
     "damageClass": "physical"
@@ -370,7 +554,11 @@
   "petal-blizzard": {
     "names": {
       "ja": "はなふぶき",
-      "en": "Petal Blizzard"
+      "en": "Petal Blizzard",
+      "fr": "Tempête Florale",
+      "de": "Blütenwirbel",
+      "es": "Tormenta Floral",
+      "it": "Fiortempesta"
     },
     "type": "grass",
     "damageClass": "physical"
@@ -378,7 +566,11 @@
   "petal-dance": {
     "names": {
       "ja": "はなびらのまい",
-      "en": "Petal Dance"
+      "en": "Petal Dance",
+      "fr": "Danse Fleurs",
+      "de": "Blättertanz",
+      "es": "Danza Pétalo",
+      "it": "Petalodanza"
     },
     "type": "grass",
     "damageClass": "special"
@@ -386,7 +578,11 @@
   "poison-sting": {
     "names": {
       "ja": "どくばり",
-      "en": "Poison Sting"
+      "en": "Poison Sting",
+      "fr": "Dard-Venin",
+      "de": "Giftstachel",
+      "es": "Picotazo Veneno",
+      "it": "Velenospina"
     },
     "type": "poison",
     "damageClass": "physical"
@@ -394,7 +590,11 @@
   "powder-snow": {
     "names": {
       "ja": "こなゆき",
-      "en": "Powder Snow"
+      "en": "Powder Snow",
+      "fr": "Poudreuse",
+      "de": "Pulverschnee",
+      "es": "Nieve Polvo",
+      "it": "Polneve"
     },
     "type": "ice",
     "damageClass": "special"
@@ -402,7 +602,11 @@
   "psybeam": {
     "names": {
       "ja": "サイケこうせん",
-      "en": "Psybeam"
+      "en": "Psybeam",
+      "fr": "Rafale Psy",
+      "de": "Psystrahl",
+      "es": "Psicorrayo",
+      "it": "Psicoraggio"
     },
     "type": "psychic",
     "damageClass": "special"
@@ -410,7 +614,11 @@
   "psychic": {
     "names": {
       "ja": "サイコキネシス",
-      "en": "Psychic"
+      "en": "Psychic",
+      "fr": "Psyko",
+      "de": "Psychokinese",
+      "es": "Psíquico",
+      "it": "Psichico"
     },
     "type": "psychic",
     "damageClass": "special"
@@ -418,7 +626,11 @@
   "psycho-boost": {
     "names": {
       "ja": "サイコブースト",
-      "en": "Psycho Boost"
+      "en": "Psycho Boost",
+      "fr": "Psycho-Boost",
+      "de": "Psyschub",
+      "es": "Psicoataque",
+      "it": "Psicoslancio"
     },
     "type": "psychic",
     "damageClass": "special"
@@ -426,7 +638,11 @@
   "psystrike": {
     "names": {
       "ja": "サイコブレイク",
-      "en": "Psystrike"
+      "en": "Psystrike",
+      "fr": "Frappe Psy",
+      "de": "Psychostoß",
+      "es": "Onda Mental",
+      "it": "Psicobotta"
     },
     "type": "psychic",
     "damageClass": "special"
@@ -434,7 +650,11 @@
   "quick-attack": {
     "names": {
       "ja": "でんこうせっか",
-      "en": "Quick Attack"
+      "en": "Quick Attack",
+      "fr": "Vive-Attaque",
+      "de": "Ruckzuckhieb",
+      "es": "Ataque Rápido",
+      "it": "Attacco Rapido"
     },
     "type": "normal",
     "damageClass": "physical"
@@ -442,7 +662,11 @@
   "rapid-spin": {
     "names": {
       "ja": "こうそくスピン",
-      "en": "Rapid Spin"
+      "en": "Rapid Spin",
+      "fr": "Tour Rapide",
+      "de": "Turbodreher",
+      "es": "Giro Rápido",
+      "it": "Rapigiro"
     },
     "type": "normal",
     "damageClass": "physical"
@@ -450,7 +674,11 @@
   "razor-leaf": {
     "names": {
       "ja": "はっぱカッター",
-      "en": "Razor Leaf"
+      "en": "Razor Leaf",
+      "fr": "Tranch’Herbe",
+      "de": "Rasierblatt",
+      "es": "Hoja Afilada",
+      "it": "Foglielama"
     },
     "type": "grass",
     "damageClass": "physical"
@@ -458,7 +686,11 @@
   "rock-slide": {
     "names": {
       "ja": "いわなだれ",
-      "en": "Rock Slide"
+      "en": "Rock Slide",
+      "fr": "Éboulement",
+      "de": "Steinhagel",
+      "es": "Avalancha",
+      "it": "Frana"
     },
     "type": "rock",
     "damageClass": "physical"
@@ -466,7 +698,11 @@
   "rock-throw": {
     "names": {
       "ja": "いわおとし",
-      "en": "Rock Throw"
+      "en": "Rock Throw",
+      "fr": "Jet-Pierres",
+      "de": "Steinwurf",
+      "es": "Lanzarrocas",
+      "it": "Sassata"
     },
     "type": "rock",
     "damageClass": "physical"
@@ -474,7 +710,11 @@
   "rock-wrecker": {
     "names": {
       "ja": "がんせきほう",
-      "en": "Rock Wrecker"
+      "en": "Rock Wrecker",
+      "fr": "Roc-Boulet",
+      "de": "Felswerfer",
+      "es": "Romperrocas",
+      "it": "Devastomasso"
     },
     "type": "rock",
     "damageClass": "physical"
@@ -482,7 +722,11 @@
   "rolling-kick": {
     "names": {
       "ja": "まわしげり",
-      "en": "Rolling Kick"
+      "en": "Rolling Kick",
+      "fr": "Mawashi Geri",
+      "de": "Fegekick",
+      "es": "Patada Giro",
+      "it": "Calciorullo"
     },
     "type": "fighting",
     "damageClass": "physical"
@@ -490,7 +734,11 @@
   "sand-tomb": {
     "names": {
       "ja": "すなじごく",
-      "en": "Sand Tomb"
+      "en": "Sand Tomb",
+      "fr": "Tourbi-Sable",
+      "de": "Sandgrab",
+      "es": "Bucle Arena",
+      "it": "Sabbiotomba"
     },
     "type": "ground",
     "damageClass": "physical"
@@ -498,7 +746,11 @@
   "seed-bomb": {
     "names": {
       "ja": "タネばくだん",
-      "en": "Seed Bomb"
+      "en": "Seed Bomb",
+      "fr": "Canon Graine",
+      "de": "Samenbomben",
+      "es": "Bomba Germen",
+      "it": "Semebomba"
     },
     "type": "grass",
     "damageClass": "physical"
@@ -506,7 +758,11 @@
   "self-destruct": {
     "names": {
       "ja": "じばく",
-      "en": "Self-Destruct"
+      "en": "Self-Destruct",
+      "fr": "Destruction",
+      "de": "Finale",
+      "es": "Autodestrucción",
+      "it": "Autodistruzione"
     },
     "type": "normal",
     "damageClass": "physical"
@@ -514,7 +770,11 @@
   "shadow-ball": {
     "names": {
       "ja": "シャドーボール",
-      "en": "Shadow Ball"
+      "en": "Shadow Ball",
+      "fr": "Ball’Ombre",
+      "de": "Spukball",
+      "es": "Bola Sombra",
+      "it": "Palla Ombra"
     },
     "type": "ghost",
     "damageClass": "special"
@@ -522,7 +782,11 @@
   "sheer-cold": {
     "names": {
       "ja": "ぜったいれいど",
-      "en": "Sheer Cold"
+      "en": "Sheer Cold",
+      "fr": "Glaciation",
+      "de": "Eiseskälte",
+      "es": "Frío Polar",
+      "it": "Purogelo"
     },
     "type": "ice",
     "damageClass": "special"
@@ -530,7 +794,11 @@
   "sky-attack": {
     "names": {
       "ja": "ゴッドバード",
-      "en": "Sky Attack"
+      "en": "Sky Attack",
+      "fr": "Piqué",
+      "de": "Himmelsfeger",
+      "es": "Ataque Aéreo",
+      "it": "Aeroattacco"
     },
     "type": "flying",
     "damageClass": "physical"
@@ -538,7 +806,11 @@
   "sleep-powder": {
     "names": {
       "ja": "ねむりごな",
-      "en": "Sleep Powder"
+      "en": "Sleep Powder",
+      "fr": "Poudre Dodo",
+      "de": "Schlafpuder",
+      "es": "Somnífero",
+      "it": "Sonnifero"
     },
     "type": "grass",
     "damageClass": "status"
@@ -546,7 +818,11 @@
   "sludge-bomb": {
     "names": {
       "ja": "ヘドロばくだん",
-      "en": "Sludge Bomb"
+      "en": "Sludge Bomb",
+      "fr": "Bombe Beurk",
+      "de": "Matschbombe",
+      "es": "Bomba Lodo",
+      "it": "Fangobomba"
     },
     "type": "poison",
     "damageClass": "special"
@@ -554,7 +830,11 @@
   "sludge-wave": {
     "names": {
       "ja": "ヘドロウェーブ",
-      "en": "Sludge Wave"
+      "en": "Sludge Wave",
+      "fr": "Cradovague",
+      "de": "Schlammwoge",
+      "es": "Onda Tóxica",
+      "it": "Fangonda"
     },
     "type": "poison",
     "damageClass": "special"
@@ -562,7 +842,11 @@
   "smog": {
     "names": {
       "ja": "スモッグ",
-      "en": "Smog"
+      "en": "Smog",
+      "fr": "Purédpois",
+      "de": "Smog",
+      "es": "Polución",
+      "it": "Smog"
     },
     "type": "poison",
     "damageClass": "special"
@@ -570,7 +854,11 @@
   "solar-beam": {
     "names": {
       "ja": "ソーラービーム",
-      "en": "Solar Beam"
+      "en": "Solar Beam",
+      "fr": "Lance-Soleil",
+      "de": "Solarstrahl",
+      "es": "Rayo Solar",
+      "it": "Solarraggio"
     },
     "type": "grass",
     "damageClass": "special"
@@ -578,7 +866,11 @@
   "spark": {
     "names": {
       "ja": "スパーク",
-      "en": "Spark"
+      "en": "Spark",
+      "fr": "Étincelle",
+      "de": "Funkensprung",
+      "es": "Chispa",
+      "it": "Scintilla"
     },
     "type": "electric",
     "damageClass": "physical"
@@ -586,7 +878,11 @@
   "stone-edge": {
     "names": {
       "ja": "ストーンエッジ",
-      "en": "Stone Edge"
+      "en": "Stone Edge",
+      "fr": "Lame de Roc",
+      "de": "Steinkante",
+      "es": "Roca Afilada",
+      "it": "Pietrataglio"
     },
     "type": "rock",
     "damageClass": "physical"
@@ -594,7 +890,11 @@
   "surf": {
     "names": {
       "ja": "なみのり",
-      "en": "Surf"
+      "en": "Surf",
+      "fr": "Surf",
+      "de": "Surfer",
+      "es": "Surf",
+      "it": "Surf"
     },
     "type": "water",
     "damageClass": "special"
@@ -602,7 +902,11 @@
   "swift": {
     "names": {
       "ja": "スピードスター",
-      "en": "Swift"
+      "en": "Swift",
+      "fr": "Météores",
+      "de": "Sternschauer",
+      "es": "Meteoros",
+      "it": "Comete"
     },
     "type": "normal",
     "damageClass": "special"
@@ -610,7 +914,11 @@
   "tackle": {
     "names": {
       "ja": "たいあたり",
-      "en": "Tackle"
+      "en": "Tackle",
+      "fr": "Charge",
+      "de": "Tackle",
+      "es": "Placaje",
+      "it": "Azione"
     },
     "type": "normal",
     "damageClass": "physical"
@@ -618,7 +926,11 @@
   "thunder": {
     "names": {
       "ja": "かみなり",
-      "en": "Thunder"
+      "en": "Thunder",
+      "fr": "Fatal-Foudre",
+      "de": "Donner",
+      "es": "Trueno",
+      "it": "Tuono"
     },
     "type": "electric",
     "damageClass": "special"
@@ -626,7 +938,11 @@
   "thunder-punch": {
     "names": {
       "ja": "かみなりパンチ",
-      "en": "Thunder Punch"
+      "en": "Thunder Punch",
+      "fr": "Poing Éclair",
+      "de": "Donnerschlag",
+      "es": "Puño Trueno",
+      "it": "Tuonopugno"
     },
     "type": "electric",
     "damageClass": "physical"
@@ -634,7 +950,11 @@
   "thunder-shock": {
     "names": {
       "ja": "でんきショック",
-      "en": "Thunder Shock"
+      "en": "Thunder Shock",
+      "fr": "Éclair",
+      "de": "Donnerschock",
+      "es": "Impactrueno",
+      "it": "Tuonoshock"
     },
     "type": "electric",
     "damageClass": "special"
@@ -642,7 +962,11 @@
   "thunderbolt": {
     "names": {
       "ja": "１０まんボルト",
-      "en": "Thunderbolt"
+      "en": "Thunderbolt",
+      "fr": "Tonnerre",
+      "de": "Donnerblitz",
+      "es": "Rayo",
+      "it": "Fulmine"
     },
     "type": "electric",
     "damageClass": "special"
@@ -650,7 +974,11 @@
   "vine-whip": {
     "names": {
       "ja": "つるのムチ",
-      "en": "Vine Whip"
+      "en": "Vine Whip",
+      "fr": "Fouet Lianes",
+      "de": "Rankenhieb",
+      "es": "Látigo Cepa",
+      "it": "Frustata"
     },
     "type": "grass",
     "damageClass": "physical"
@@ -658,7 +986,11 @@
   "volt-tackle": {
     "names": {
       "ja": "ボルテッカー",
-      "en": "Volt Tackle"
+      "en": "Volt Tackle",
+      "fr": "Électacle",
+      "de": "Volttackle",
+      "es": "Placaje Eléctrico",
+      "it": "Locomovolt"
     },
     "type": "electric",
     "damageClass": "physical"
@@ -666,7 +998,11 @@
   "water-gun": {
     "names": {
       "ja": "みずでっぽう",
-      "en": "Water Gun"
+      "en": "Water Gun",
+      "fr": "Pistolet à O",
+      "de": "Aquaknarre",
+      "es": "Pistola Agua",
+      "it": "Pistolacqua"
     },
     "type": "water",
     "damageClass": "special"
@@ -674,7 +1010,11 @@
   "wild-charge": {
     "names": {
       "ja": "ワイルドボルト",
-      "en": "Wild Charge"
+      "en": "Wild Charge",
+      "fr": "Éclair Fou",
+      "de": "Stromstoß",
+      "es": "Voltio Cruel",
+      "it": "Sprizzalampo"
     },
     "type": "electric",
     "damageClass": "physical"
@@ -682,7 +1022,11 @@
   "zap-cannon": {
     "names": {
       "ja": "でんじほう",
-      "en": "Zap Cannon"
+      "en": "Zap Cannon",
+      "fr": "Élecanon",
+      "de": "Blitzkanone",
+      "es": "Electrocañón",
+      "it": "Falcecannone"
     },
     "type": "electric",
     "damageClass": "special"

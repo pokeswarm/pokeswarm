@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { firebaseOptionsFromEnv } from '../firebase/config';
 import { t } from '../i18n';
 import { AccountPanel } from './accountPanel';
+import { TitleFooter } from './creditsPanel';
 import { session } from '../meta/session';
 import { audio } from '../audio';
 import { bgmConfig, generated, groundConfig, playablesConfig, spriteRender, uiConfig } from '../data';
@@ -148,17 +149,11 @@ export class TitleScene extends Phaser.Scene {
       // 画面の高さが低い（横向きのスマホ）ときは、ロゴを小さくし、メニューを2列にする（ボタンは指で押せる高さ 44 以上）
       const compact = height < 520;
       const logoW = Math.min(width - 32, 640);
-      const logoH = compact ? 64 : 136;
+      const logoH = compact ? 64 : 104;
       const logoY = compact ? 8 : height * 0.08;
       const g = this.add.graphics();
       drawWindow(g, (width - logoW) / 2, logoY, logoW, logoH, 'dark');
-      ui.add([g, this.add.text(width / 2, logoY + (compact ? 32 : 52), t('title.name'), px(compact || width < 640 ? 32 : 48, '#f8d030', { outline: true })).setOrigin(0.5)]);
-      if (!compact) {
-        const sub = this.add.text(width / 2, logoY + 108, t('title.subtitle'), px(16, uiConfig.dark.text)).setOrigin(0.5);
-        // 英語など、窓に収まらない長さなら小さい字にする
-        if (sub.width > logoW - 24) sub.setFontSize(8);
-        ui.add(sub);
-      }
+      ui.add([g, this.add.text(width / 2, logoY + logoH / 2, t('title.name'), px(compact || width < 640 ? 32 : 48, '#f8d030', { outline: true })).setOrigin(0.5)]);
       // メニュー。真ん中はピカチュウが歩くので、左に寄せる（右下のログインの窓と重ならないように）
       const cols = compact ? 2 : 1;
       const bw = compact ? Math.min(180, (width / 2 - 24) / 2) : Math.min(width - 32, 360);
@@ -179,7 +174,9 @@ export class TitleScene extends Phaser.Scene {
     };
     layout();
     this.scale.on('resize', layout);
-    const account = new AccountPanel();
+    // 下の帯: 非公式の注意書きとクレジット（作者の決定）。ログインの窓はその上に置く
+    const footer = new TitleFooter();
+    const account = new AccountPanel(footer.height);
     const onKey = (ev: KeyboardEvent): void => {
       if (ev.repeat || leaving) return;
       if (ev.key === 'ArrowDown') {
@@ -202,6 +199,7 @@ export class TitleScene extends Phaser.Scene {
       this.scale.off('resize', layout);
       window.removeEventListener('keydown', onKey);
       account.destroy();
+      footer.destroy();
     });
     audio.bgm.play(bgmConfig.scenes.title);
     session.setPresence('menu');

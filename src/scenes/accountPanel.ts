@@ -26,10 +26,11 @@ export class AccountPanel {
   private readonly unsubscribe: (() => void)[] = [];
   private busy = false;
 
-  constructor() {
+  /** bottom: 画面の下からの位置（タイトル画面の下の帯の上に置く） */
+  constructor(bottom = 0) {
     this.root = document.createElement('div');
     // 右下に小さく（メニューのボタンに重ならないように）。黒い窓
-    this.root.style.cssText = `${windowCss('dark')};position:fixed;right:8px;bottom:8px;padding:12px 16px;font-size:16px;line-height:1.6;text-align:left;z-index:20;overflow-wrap:anywhere;box-sizing:border-box;max-width:min(420px, ${window.innerHeight < 520 ? '46vw' : '90vw'})`;
+    this.root.style.cssText = `${windowCss('dark')};position:fixed;right:8px;bottom:${bottom + 8}px;padding:12px 16px;font-size:16px;line-height:1.6;text-align:left;z-index:20;overflow-wrap:anywhere;box-sizing:border-box;max-width:min(420px, ${window.innerHeight < 520 ? '46vw' : '90vw'})`;
     document.body.appendChild(this.root);
     this.unsubscribe.push(session.onStatus(() => this.render()), session.store.onChange(() => this.render()));
     this.render();

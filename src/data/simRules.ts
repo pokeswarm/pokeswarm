@@ -1,3 +1,4 @@
+import type { Locale } from '../i18n';
 import type { ModifierData } from './schema';
 import { buildTypeChart, resolveMoveLevels, type SimMoveDef } from '../sim/moves';
 import { addModifiers, buildXpTable, emptyModifiers, resolveModifiers, type Modifiers, type SimUpgradeDef } from '../sim/upgrades';
@@ -149,6 +150,6 @@ export function mergeModifiers(rules: SimRules, base: Modifiers | null, extra: M
 }
 
 /** PokeAPI 由来の名前を、今の言語で取り出す */
-export function localName(names: LocalizedNames | undefined, locale: 'ja' | 'en', fallback: string): string {
-  return names ? names[locale] : fallback;
+export function localName(names: LocalizedNames | undefined, locale: Locale, fallback: string): string {
+  return names ? (names[locale] ?? names.en) : fallback;
 }

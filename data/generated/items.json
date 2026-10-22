@@ -2,247 +2,411 @@
   "black-belt": {
     "names": {
       "ja": "くろおび",
-      "en": "Black Belt"
+      "en": "Black Belt",
+      "fr": "Ceinture Noire",
+      "de": "Schwarzgurt",
+      "es": "Cinturón Negro",
+      "it": "Cinturanera"
     }
   },
   "calcium": {
     "names": {
       "ja": "リゾチウム",
-      "en": "Calcium"
+      "en": "Calcium",
+      "fr": "Calcium",
+      "de": "Kalzium",
+      "es": "Calcio",
+      "it": "Calcio"
     }
   },
   "carbos": {
     "names": {
       "ja": "インドメタシン",
-      "en": "Carbos"
+      "en": "Carbos",
+      "fr": "Carbone",
+      "de": "Carbon",
+      "es": "Carburante",
+      "it": "Carburante"
     }
   },
   "charcoal": {
     "names": {
       "ja": "もくたん",
-      "en": "Charcoal"
+      "en": "Charcoal",
+      "fr": "Charbon",
+      "de": "Holzkohle",
+      "es": "Carbón",
+      "it": "Carbonella"
     }
   },
   "dire-hit": {
     "names": {
       "ja": "クリティカット",
-      "en": "Dire Hit"
+      "en": "Dire Hit",
+      "fr": "Muscle +",
+      "de": "X-Volltreffer",
+      "es": "Crítico X",
+      "it": "Supercolpo"
     }
   },
   "dowsing-machine": {
     "names": {
       "ja": "ダウジングマシン",
-      "en": "Dowsing Machine"
+      "en": "Dowsing Machine",
+      "fr": "Cherch’Objet",
+      "de": "Itemradar",
+      "es": "Zahorí",
+      "it": "Ricerca strum."
     }
   },
   "dragon-fang": {
     "names": {
       "ja": "りゅうのキバ",
-      "en": "Dragon Fang"
+      "en": "Dragon Fang",
+      "fr": "Croc Dragon",
+      "de": "Drachenzahn",
+      "es": "Colmillo de Dragón",
+      "it": "Dentedidrago"
     }
   },
   "fire-stone": {
     "names": {
       "ja": "ほのおのいし",
-      "en": "Fire Stone"
+      "en": "Fire Stone",
+      "fr": "Pierre Feu",
+      "de": "Feuerstein",
+      "es": "Piedra Fuego",
+      "it": "Pietrafocaia"
     }
   },
   "hard-stone": {
     "names": {
       "ja": "かたいいし",
-      "en": "Hard Stone"
+      "en": "Hard Stone",
+      "fr": "Pierre Dure",
+      "de": "Granitstein",
+      "es": "Piedra Dura",
+      "it": "Pietradura"
     }
   },
   "hp-up": {
     "names": {
       "ja": "マックスアップ",
-      "en": "HP Up"
+      "en": "HP Up",
+      "fr": "PV Plus",
+      "de": "KP-Plus",
+      "es": "Más PS",
+      "it": "PS-Su"
     }
   },
   "iron": {
     "names": {
       "ja": "ブロムヘキシン",
-      "en": "Iron"
+      "en": "Iron",
+      "fr": "Fer",
+      "de": "Eisen",
+      "es": "Hierro",
+      "it": "Ferro"
     }
   },
   "leaf-stone": {
     "names": {
       "ja": "リーフのいし",
-      "en": "Leaf Stone"
+      "en": "Leaf Stone",
+      "fr": "Pierre Plante",
+      "de": "Blattstein",
+      "es": "Piedra Hoja",
+      "it": "Pietrafoglia"
     }
   },
   "leftovers": {
     "names": {
       "ja": "たべのこし",
-      "en": "Leftovers"
+      "en": "Leftovers",
+      "fr": "Restes",
+      "de": "Überreste",
+      "es": "Restos",
+      "it": "Avanzi"
     }
   },
   "light-ball": {
     "names": {
       "ja": "でんきだま",
-      "en": "Light Ball"
+      "en": "Light Ball",
+      "fr": "Balle Lumière",
+      "de": "Kugelblitz",
+      "es": "Bola Luminosa",
+      "it": "Elettropalla"
     }
   },
   "light-clay": {
     "names": {
       "ja": "ひかりのねんど",
-      "en": "Light Clay"
+      "en": "Light Clay",
+      "fr": "Lumargile",
+      "de": "Lichtlehm",
+      "es": "Refleluz",
+      "it": "Creta Luce"
     }
   },
   "linking-cord": {
     "names": {
       "ja": " つながりのヒモ",
-      "en": "Linking Cord"
+      "en": "Linking Cord",
+      "fr": "Fil de Liaison",
+      "de": "Verbindungsschnur",
+      "es": "Cordón Unión",
+      "it": "Filo dell’unione"
     }
   },
   "lucky-egg": {
     "names": {
       "ja": "しあわせタマゴ",
-      "en": "Lucky Egg"
+      "en": "Lucky Egg",
+      "fr": "Œuf Chance",
+      "de": "Glücks-Ei",
+      "es": "Huevo Suerte",
+      "it": "Fortunuovo"
     }
   },
   "magnet": {
     "names": {
       "ja": "じしゃく",
-      "en": "Magnet"
+      "en": "Magnet",
+      "fr": "Aimant",
+      "de": "Magnet",
+      "es": "Imán",
+      "it": "Calamita"
     }
   },
   "metronome": {
     "names": {
       "ja": "メトロノーム",
-      "en": "Metronome"
+      "en": "Metronome",
+      "fr": "Métronome",
+      "de": "Metronom",
+      "es": "Metrónomo",
+      "it": "Plessimetro"
     }
   },
   "miracle-seed": {
     "names": {
       "ja": "きせきのタネ",
-      "en": "Miracle Seed"
+      "en": "Miracle Seed",
+      "fr": "Graine Miracle",
+      "de": "Wundersaat",
+      "es": "Semilla Milagro",
+      "it": "Miracolseme"
     }
   },
   "moon-stone": {
     "names": {
       "ja": "つきのいし",
-      "en": "Moon Stone"
+      "en": "Moon Stone",
+      "fr": "Pierre Lune",
+      "de": "Mondstein",
+      "es": "Piedra Lunar",
+      "it": "Pietralunare"
     }
   },
   "mystic-water": {
     "names": {
       "ja": "しんぴのしずく",
-      "en": "Mystic Water"
+      "en": "Mystic Water",
+      "fr": "Eau Mystique",
+      "de": "Zauberwasser",
+      "es": "Agua Mística",
+      "it": "Acqua Magica"
     }
   },
   "never-melt-ice": {
     "names": {
       "ja": "とけないこおり",
-      "en": "Never-Melt Ice"
+      "en": "Never-Melt Ice",
+      "fr": "Glace Éternelle",
+      "de": "Ewiges Eis",
+      "es": "Hielo Perpetuo",
+      "it": "Gelomai"
     }
   },
   "poison-barb": {
     "names": {
       "ja": "どくバリ",
-      "en": "Poison Barb"
+      "en": "Poison Barb",
+      "fr": "Pic Venin",
+      "de": "Giftstich",
+      "es": "Flecha Venenosa",
+      "it": "Velenaculeo"
     }
   },
   "potion": {
     "names": {
       "ja": "キズぐすり",
-      "en": "Potion"
+      "en": "Potion",
+      "fr": "Potion",
+      "de": "Trank",
+      "es": "Poción",
+      "it": "Pozione"
     }
   },
   "pp-max": {
     "names": {
       "ja": "ポイントマックス",
-      "en": "PP Max"
+      "en": "PP Max",
+      "fr": "PP Max",
+      "de": "AP-Top",
+      "es": "PP Máximos",
+      "it": "PP-Max"
     }
   },
   "protein": {
     "names": {
       "ja": "タウリン",
-      "en": "Protein"
+      "en": "Protein",
+      "fr": "Protéine",
+      "de": "Protein",
+      "es": "Proteína",
+      "it": "Proteina"
     }
   },
   "quick-claw": {
     "names": {
       "ja": "せんせいのツメ",
-      "en": "Quick Claw"
+      "en": "Quick Claw",
+      "fr": "Vive Griffe",
+      "de": "Flinkklaue",
+      "es": "Garra Rápida",
+      "it": "Rapidartigli"
     }
   },
   "rare-candy": {
     "names": {
       "ja": "ふしぎなアメ",
-      "en": "Rare Candy"
+      "en": "Rare Candy",
+      "fr": "Super Bonbon",
+      "de": "Sonderbonbon",
+      "es": "Caramelo Raro",
+      "it": "Caramella rara"
     }
   },
   "sharp-beak": {
     "names": {
       "ja": "するどいくちばし",
-      "en": "Sharp Beak"
+      "en": "Sharp Beak",
+      "fr": "Bec Pointu",
+      "de": "Spitzer Schnabel",
+      "es": "Pico Afilado",
+      "it": "Beccaffilato"
     }
   },
   "silk-scarf": {
     "names": {
       "ja": "シルクのスカーフ",
-      "en": "Silk Scarf"
+      "en": "Silk Scarf",
+      "fr": "Mouchoir Soie",
+      "de": "Seidenschal",
+      "es": "Pañuelo de Seda",
+      "it": "Sciarpa Seta"
     }
   },
   "soft-sand": {
     "names": {
       "ja": "やわらかいすな",
-      "en": "Soft Sand"
+      "en": "Soft Sand",
+      "fr": "Sable Doux",
+      "de": "Pudersand",
+      "es": "Arena Fina",
+      "it": "Sabbia Soffice"
     }
   },
   "spell-tag": {
     "names": {
       "ja": "のろいのおふだ",
-      "en": "Spell Tag"
+      "en": "Spell Tag",
+      "fr": "Rune Sort",
+      "de": "Bannsticker",
+      "es": "Hechizo",
+      "it": "Spettrotarga"
     }
   },
   "thunder-stone": {
     "names": {
       "ja": "かみなりのいし",
-      "en": "Thunder Stone"
+      "en": "Thunder Stone",
+      "fr": "Pierre Foudre",
+      "de": "Donnerstein",
+      "es": "Piedra Trueno",
+      "it": "Pietratuono"
     }
   },
   "twisted-spoon": {
     "names": {
       "ja": "まがったスプーン",
-      "en": "Twisted Spoon"
+      "en": "Twisted Spoon",
+      "fr": "Cuillère Tordue",
+      "de": "Krummlöffel",
+      "es": "Cuchara Torcida",
+      "it": "Cucchiaio Torto"
     }
   },
   "water-stone": {
     "names": {
       "ja": "みずのいし",
-      "en": "Water Stone"
+      "en": "Water Stone",
+      "fr": "Pierre Eau",
+      "de": "Wasserstein",
+      "es": "Piedra Agua",
+      "it": "Pietraidrica"
     }
   },
   "wide-lens": {
     "names": {
       "ja": "こうかくレンズ",
-      "en": "Wide Lens"
+      "en": "Wide Lens",
+      "fr": "Loupe",
+      "de": "Großlinse",
+      "es": "Lupa",
+      "it": "Grandelente"
     }
   },
   "x-attack": {
     "names": {
       "ja": "プラスパワー",
-      "en": "X Attack"
+      "en": "X Attack",
+      "fr": "Attaque +",
+      "de": "X-Angriff",
+      "es": "Ataque X",
+      "it": "Attacco X"
     }
   },
   "x-defense": {
     "names": {
       "ja": "ディフェンダー",
-      "en": "X Defense"
+      "en": "X Defense",
+      "fr": "Défense +",
+      "de": "X-Verteidigung",
+      "es": "Defensa X",
+      "it": "Difesa X"
     }
   },
   "x-sp-atk": {
     "names": {
       "ja": "スペシャルアップ",
-      "en": "X Sp. Atk"
+      "en": "X Sp. Atk",
+      "fr": "Atq. Spé. +",
+      "de": "X-Sp.-Ang.",
+      "es": "At. Especial X",
+      "it": "Att. Speciale X"
     }
   },
   "x-speed": {
     "names": {
       "ja": "スピーダー",
-      "en": "X Speed"
+      "en": "X Speed",
+      "fr": "Vitesse +",
+      "de": "X-Initiative",
+      "es": "Velocidad X",
+      "it": "Velocità X"
     }
   }
 }

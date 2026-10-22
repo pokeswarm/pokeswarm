@@ -975,7 +975,15 @@ export const pokeapiTargetsSchema = z.object({
   items: z.array(z.string()),
 });
 
-const localizedNames = z.object({ ja: z.string().min(1), en: z.string().min(1) });
+/** 名前（PokeAPI の各言語）。ヨーロッパの言語は、無ければ英語を使う */
+const localizedNames = z.object({
+  ja: z.string().min(1),
+  en: z.string().min(1),
+  fr: z.string().min(1).optional(),
+  de: z.string().min(1).optional(),
+  es: z.string().min(1).optional(),
+  it: z.string().min(1).optional(),
+});
 export type LocalizedNames = z.infer<typeof localizedNames>;
 
 export const generatedPokemonEntrySchema = z.object({

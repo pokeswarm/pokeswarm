@@ -106,7 +106,7 @@ function itemName(key: string): string {
 function moveDetail(world: World, move: number): string {
   const def = world.rules.moves[move]!;
   const typeKey = world.rules.types.names[def.type] ?? '';
-  return `${localName(generated.types[typeKey]?.names, getLocale(), typeKey)}・${tMaybe(`pattern.${def.pattern}`)}`;
+  return t('upgrade.detail', { type: localName(generated.types[typeKey]?.names, getLocale(), typeKey), pattern: tMaybe(`pattern.${def.pattern}`) });
 }
 
 /**

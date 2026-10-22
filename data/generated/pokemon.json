@@ -3,7 +3,11 @@
     "dex": 63,
     "names": {
       "ja": "ケーシィ",
-      "en": "Abra"
+      "en": "Abra",
+      "fr": "Abra",
+      "de": "Abra",
+      "es": "Abra",
+      "it": "Abra"
     },
     "types": [
       "psychic"
@@ -29,7 +33,11 @@
     "dex": 142,
     "names": {
       "ja": "プテラ",
-      "en": "Aerodactyl"
+      "en": "Aerodactyl",
+      "fr": "Ptéra",
+      "de": "Aerodactyl",
+      "es": "Aerodactyl",
+      "it": "Aerodactyl"
     },
     "types": [
       "rock",
@@ -50,7 +58,11 @@
     "dex": 65,
     "names": {
       "ja": "フーディン",
-      "en": "Alakazam"
+      "en": "Alakazam",
+      "fr": "Alakazam",
+      "de": "Simsala",
+      "es": "Alakazam",
+      "it": "Alakazam"
     },
     "types": [
       "psychic"
@@ -73,7 +85,11 @@
     "dex": 24,
     "names": {
       "ja": "アーボック",
-      "en": "Arbok"
+      "en": "Arbok",
+      "fr": "Arbok",
+      "de": "Arbok",
+      "es": "Arbok",
+      "it": "Arbok"
     },
     "types": [
       "poison"
@@ -95,7 +111,11 @@
     "dex": 59,
     "names": {
       "ja": "ウインディ",
-      "en": "Arcanine"
+      "en": "Arcanine",
+      "fr": "Arcanin",
+      "de": "Arkani",
+      "es": "Arcanine",
+      "it": "Arcanine"
     },
     "types": [
       "fire"
@@ -117,7 +137,11 @@
     "dex": 144,
     "names": {
       "ja": "フリーザー",
-      "en": "Articuno"
+      "en": "Articuno",
+      "fr": "Artikodin",
+      "de": "Arktos",
+      "es": "Articuno",
+      "it": "Articuno"
     },
     "types": [
       "ice",
@@ -138,7 +162,11 @@
     "dex": 15,
     "names": {
       "ja": "スピアー",
-      "en": "Beedrill"
+      "en": "Beedrill",
+      "fr": "Dardargnan",
+      "de": "Bibor",
+      "es": "Beedrill",
+      "it": "Beedrill"
     },
     "types": [
       "bug",
@@ -162,7 +190,11 @@
     "dex": 69,
     "names": {
       "ja": "マダツボミ",
-      "en": "Bellsprout"
+      "en": "Bellsprout",
+      "fr": "Chétiflor",
+      "de": "Knofensa",
+      "es": "Bellsprout",
+      "it": "Bellsprout"
     },
     "types": [
       "grass",
@@ -189,7 +221,11 @@
     "dex": 9,
     "names": {
       "ja": "カメックス",
-      "en": "Blastoise"
+      "en": "Blastoise",
+      "fr": "Tortank",
+      "de": "Turtok",
+      "es": "Blastoise",
+      "it": "Blastoise"
     },
     "types": [
       "water"
@@ -212,7 +248,11 @@
     "dex": 1,
     "names": {
       "ja": "フシギダネ",
-      "en": "Bulbasaur"
+      "en": "Bulbasaur",
+      "fr": "Bulbizarre",
+      "de": "Bisasam",
+      "es": "Bulbasaur",
+      "it": "Bulbasaur"
     },
     "types": [
       "grass",
@@ -239,7 +279,11 @@
     "dex": 10,
     "names": {
       "ja": "キャタピー",
-      "en": "Caterpie"
+      "en": "Caterpie",
+      "fr": "Chenipan",
+      "de": "Raupy",
+      "es": "Caterpie",
+      "it": "Caterpie"
     },
     "types": [
       "bug"
@@ -265,7 +309,11 @@
     "dex": 113,
     "names": {
       "ja": "ラッキー",
-      "en": "Chansey"
+      "en": "Chansey",
+      "fr": "Leveinard",
+      "de": "Chaneira",
+      "es": "Chansey",
+      "it": "Chansey"
     },
     "types": [
       "normal"
@@ -292,7 +340,11 @@
     "dex": 6,
     "names": {
       "ja": "リザードン",
-      "en": "Charizard"
+      "en": "Charizard",
+      "fr": "Dracaufeu",
+      "de": "Glurak",
+      "es": "Charizard",
+      "it": "Charizard"
     },
     "types": [
       "fire",
@@ -316,7 +368,11 @@
     "dex": 4,
     "names": {
       "ja": "ヒトカゲ",
-      "en": "Charmander"
+      "en": "Charmander",
+      "fr": "Salamèche",
+      "de": "Glumanda",
+      "es": "Charmander",
+      "it": "Charmander"
     },
     "types": [
       "fire"
@@ -342,7 +398,11 @@
     "dex": 5,
     "names": {
       "ja": "リザード",
-      "en": "Charmeleon"
+      "en": "Charmeleon",
+      "fr": "Reptincel",
+      "de": "Glutexo",
+      "es": "Charmeleon",
+      "it": "Charmeleon"
     },
     "types": [
       "fire"
@@ -370,7 +430,11 @@
     "dex": 91,
     "names": {
       "ja": "パルシェン",
-      "en": "Cloyster"
+      "en": "Cloyster",
+      "fr": "Crustabri",
+      "de": "Austos",
+      "es": "Cloyster",
+      "it": "Cloyster"
     },
     "types": [
       "water",
@@ -393,7 +457,11 @@
     "dex": 104,
     "names": {
       "ja": "カラカラ",
-      "en": "Cubone"
+      "en": "Cubone",
+      "fr": "Osselait",
+      "de": "Tragosso",
+      "es": "Cubone",
+      "it": "Cubone"
     },
     "types": [
       "ground"
@@ -419,7 +487,11 @@
     "dex": 87,
     "names": {
       "ja": "ジュゴン",
-      "en": "Dewgong"
+      "en": "Dewgong",
+      "fr": "Lamantine",
+      "de": "Jugong",
+      "es": "Dewgong",
+      "it": "Dewgong"
     },
     "types": [
       "water",
@@ -442,7 +514,11 @@
     "dex": 132,
     "names": {
       "ja": "メタモン",
-      "en": "Ditto"
+      "en": "Ditto",
+      "fr": "Métamorph",
+      "de": "Ditto",
+      "es": "Ditto",
+      "it": "Ditto"
     },
     "types": [
       "normal"
@@ -462,7 +538,11 @@
     "dex": 84,
     "names": {
       "ja": "ドードー",
-      "en": "Doduo"
+      "en": "Doduo",
+      "fr": "Doduo",
+      "de": "Dodu",
+      "es": "Doduo",
+      "it": "Doduo"
     },
     "types": [
       "normal",
@@ -489,7 +569,11 @@
     "dex": 148,
     "names": {
       "ja": "ハクリュー",
-      "en": "Dragonair"
+      "en": "Dragonair",
+      "fr": "Draco",
+      "de": "Dragonir",
+      "es": "Dragonair",
+      "it": "Dragonair"
     },
     "types": [
       "dragon"
@@ -517,7 +601,11 @@
     "dex": 149,
     "names": {
       "ja": "カイリュー",
-      "en": "Dragonite"
+      "en": "Dragonite",
+      "fr": "Dracolosse",
+      "de": "Dragoran",
+      "es": "Dragonite",
+      "it": "Dragonite"
     },
     "types": [
       "dragon",
@@ -541,7 +629,11 @@
     "dex": 147,
     "names": {
       "ja": "ミニリュウ",
-      "en": "Dratini"
+      "en": "Dratini",
+      "fr": "Minidraco",
+      "de": "Dratini",
+      "es": "Dratini",
+      "it": "Dratini"
     },
     "types": [
       "dragon"
@@ -567,7 +659,11 @@
     "dex": 96,
     "names": {
       "ja": "スリープ",
-      "en": "Drowzee"
+      "en": "Drowzee",
+      "fr": "Soporifik",
+      "de": "Traumato",
+      "es": "Drowzee",
+      "it": "Drowzee"
     },
     "types": [
       "psychic"
@@ -593,7 +689,11 @@
     "dex": 133,
     "names": {
       "ja": "イーブイ",
-      "en": "Eevee"
+      "en": "Eevee",
+      "fr": "Évoli",
+      "de": "Evoli",
+      "es": "Eevee",
+      "it": "Eevee"
     },
     "types": [
       "normal"
@@ -649,7 +749,11 @@
     "dex": 23,
     "names": {
       "ja": "アーボ",
-      "en": "Ekans"
+      "en": "Ekans",
+      "fr": "Abo",
+      "de": "Rettan",
+      "es": "Ekans",
+      "it": "Ekans"
     },
     "types": [
       "poison"
@@ -675,7 +779,11 @@
     "dex": 103,
     "names": {
       "ja": "ナッシー",
-      "en": "Exeggutor"
+      "en": "Exeggutor",
+      "fr": "Noadkoko",
+      "de": "Kokowei",
+      "es": "Exeggutor",
+      "it": "Exeggutor"
     },
     "types": [
       "grass",
@@ -698,7 +806,11 @@
     "dex": 22,
     "names": {
       "ja": "オニドリル",
-      "en": "Fearow"
+      "en": "Fearow",
+      "fr": "Rapasdepic",
+      "de": "Ibitak",
+      "es": "Fearow",
+      "it": "Fearow"
     },
     "types": [
       "normal",
@@ -721,7 +833,11 @@
     "dex": 136,
     "names": {
       "ja": "ブースター",
-      "en": "Flareon"
+      "en": "Flareon",
+      "fr": "Pyroli",
+      "de": "Flamara",
+      "es": "Flareon",
+      "it": "Flareon"
     },
     "types": [
       "fire"
@@ -743,7 +859,11 @@
     "dex": 92,
     "names": {
       "ja": "ゴース",
-      "en": "Gastly"
+      "en": "Gastly",
+      "fr": "Fantominus",
+      "de": "Nebulak",
+      "es": "Gastly",
+      "it": "Gastly"
     },
     "types": [
       "ghost",
@@ -770,7 +890,11 @@
     "dex": 94,
     "names": {
       "ja": "ゲンガー",
-      "en": "Gengar"
+      "en": "Gengar",
+      "fr": "Ectoplasma",
+      "de": "Gengar",
+      "es": "Gengar",
+      "it": "Gengar"
     },
     "types": [
       "ghost",
@@ -794,7 +918,11 @@
     "dex": 74,
     "names": {
       "ja": "イシツブテ",
-      "en": "Geodude"
+      "en": "Geodude",
+      "fr": "Racaillou",
+      "de": "Kleinstein",
+      "es": "Geodude",
+      "it": "Geodude"
     },
     "types": [
       "rock",
@@ -821,7 +949,11 @@
     "dex": 44,
     "names": {
       "ja": "クサイハナ",
-      "en": "Gloom"
+      "en": "Gloom",
+      "fr": "Ortide",
+      "de": "Duflor",
+      "es": "Gloom",
+      "it": "Gloom"
     },
     "types": [
       "grass",
@@ -855,7 +987,11 @@
     "dex": 42,
     "names": {
       "ja": "ゴルバット",
-      "en": "Golbat"
+      "en": "Golbat",
+      "fr": "Nosferalto",
+      "de": "Golbat",
+      "es": "Golbat",
+      "it": "Golbat"
     },
     "types": [
       "poison",
@@ -883,7 +1019,11 @@
     "dex": 75,
     "names": {
       "ja": "ゴローン",
-      "en": "Graveler"
+      "en": "Graveler",
+      "fr": "Gravalanch",
+      "de": "Georok",
+      "es": "Graveler",
+      "it": "Graveler"
     },
     "types": [
       "rock",
@@ -911,7 +1051,11 @@
     "dex": 88,
     "names": {
       "ja": "ベトベター",
-      "en": "Grimer"
+      "en": "Grimer",
+      "fr": "Tadmorv",
+      "de": "Sleima",
+      "es": "Grimer",
+      "it": "Grimer"
     },
     "types": [
       "poison"
@@ -937,7 +1081,11 @@
     "dex": 58,
     "names": {
       "ja": "ガーディ",
-      "en": "Growlithe"
+      "en": "Growlithe",
+      "fr": "Caninos",
+      "de": "Fukano",
+      "es": "Growlithe",
+      "it": "Growlithe"
     },
     "types": [
       "fire"
@@ -963,7 +1111,11 @@
     "dex": 130,
     "names": {
       "ja": "ギャラドス",
-      "en": "Gyarados"
+      "en": "Gyarados",
+      "fr": "Léviator",
+      "de": "Garados",
+      "es": "Gyarados",
+      "it": "Gyarados"
     },
     "types": [
       "water",
@@ -986,7 +1138,11 @@
     "dex": 93,
     "names": {
       "ja": "ゴースト",
-      "en": "Haunter"
+      "en": "Haunter",
+      "fr": "Spectrum",
+      "de": "Alpollo",
+      "es": "Haunter",
+      "it": "Haunter"
     },
     "types": [
       "ghost",
@@ -1014,7 +1170,11 @@
     "dex": 107,
     "names": {
       "ja": "エビワラー",
-      "en": "Hitmonchan"
+      "en": "Hitmonchan",
+      "fr": "Tygnon",
+      "de": "Nockchan",
+      "es": "Hitmonchan",
+      "it": "Hitmonchan"
     },
     "types": [
       "fighting"
@@ -1036,7 +1196,11 @@
     "dex": 106,
     "names": {
       "ja": "サワムラー",
-      "en": "Hitmonlee"
+      "en": "Hitmonlee",
+      "fr": "Kicklee",
+      "de": "Kicklee",
+      "es": "Hitmonlee",
+      "it": "Hitmonlee"
     },
     "types": [
       "fighting"
@@ -1058,7 +1222,11 @@
     "dex": 116,
     "names": {
       "ja": "タッツー",
-      "en": "Horsea"
+      "en": "Horsea",
+      "fr": "Hypotrempe",
+      "de": "Seeper",
+      "es": "Horsea",
+      "it": "Horsea"
     },
     "types": [
       "water"
@@ -1084,7 +1252,11 @@
     "dex": 2,
     "names": {
       "ja": "フシギソウ",
-      "en": "Ivysaur"
+      "en": "Ivysaur",
+      "fr": "Herbizarre",
+      "de": "Bisaknosp",
+      "es": "Ivysaur",
+      "it": "Ivysaur"
     },
     "types": [
       "grass",
@@ -1113,7 +1285,11 @@
     "dex": 135,
     "names": {
       "ja": "サンダース",
-      "en": "Jolteon"
+      "en": "Jolteon",
+      "fr": "Voltali",
+      "de": "Blitza",
+      "es": "Jolteon",
+      "it": "Jolteon"
     },
     "types": [
       "electric"
@@ -1135,7 +1311,11 @@
     "dex": 124,
     "names": {
       "ja": "ルージュラ",
-      "en": "Jynx"
+      "en": "Jynx",
+      "fr": "Lippoutou",
+      "de": "Rossana",
+      "es": "Jynx",
+      "it": "Jynx"
     },
     "types": [
       "ice",
@@ -1158,7 +1338,11 @@
     "dex": 64,
     "names": {
       "ja": "ユンゲラー",
-      "en": "Kadabra"
+      "en": "Kadabra",
+      "fr": "Kadabra",
+      "de": "Kadabra",
+      "es": "Kadabra",
+      "it": "Kadabra"
     },
     "types": [
       "psychic"
@@ -1185,7 +1369,11 @@
     "dex": 14,
     "names": {
       "ja": "コクーン",
-      "en": "Kakuna"
+      "en": "Kakuna",
+      "fr": "Coconfort",
+      "de": "Kokuna",
+      "es": "Kakuna",
+      "it": "Kakuna"
     },
     "types": [
       "bug",
@@ -1214,7 +1402,11 @@
     "dex": 109,
     "names": {
       "ja": "ドガース",
-      "en": "Koffing"
+      "en": "Koffing",
+      "fr": "Smogo",
+      "de": "Smogon",
+      "es": "Koffing",
+      "it": "Koffing"
     },
     "types": [
       "poison"
@@ -1240,7 +1432,11 @@
     "dex": 131,
     "names": {
       "ja": "ラプラス",
-      "en": "Lapras"
+      "en": "Lapras",
+      "fr": "Lokhlass",
+      "de": "Lapras",
+      "es": "Lapras",
+      "it": "Lapras"
     },
     "types": [
       "water",
@@ -1261,7 +1457,11 @@
     "dex": 68,
     "names": {
       "ja": "カイリキー",
-      "en": "Machamp"
+      "en": "Machamp",
+      "fr": "Mackogneur",
+      "de": "Machomei",
+      "es": "Machamp",
+      "it": "Machamp"
     },
     "types": [
       "fighting"
@@ -1284,7 +1484,11 @@
     "dex": 67,
     "names": {
       "ja": "ゴーリキー",
-      "en": "Machoke"
+      "en": "Machoke",
+      "fr": "Machopeur",
+      "de": "Maschock",
+      "es": "Machoke",
+      "it": "Machoke"
     },
     "types": [
       "fighting"
@@ -1311,7 +1515,11 @@
     "dex": 66,
     "names": {
       "ja": "ワンリキー",
-      "en": "Machop"
+      "en": "Machop",
+      "fr": "Machoc",
+      "de": "Machollo",
+      "es": "Machop",
+      "it": "Machop"
     },
     "types": [
       "fighting"
@@ -1337,7 +1545,11 @@
     "dex": 129,
     "names": {
       "ja": "コイキング",
-      "en": "Magikarp"
+      "en": "Magikarp",
+      "fr": "Magicarpe",
+      "de": "Karpador",
+      "es": "Magikarp",
+      "it": "Magikarp"
     },
     "types": [
       "water"
@@ -1363,7 +1575,11 @@
     "dex": 56,
     "names": {
       "ja": "マンキー",
-      "en": "Mankey"
+      "en": "Mankey",
+      "fr": "Férosinge",
+      "de": "Menki",
+      "es": "Mankey",
+      "it": "Mankey"
     },
     "types": [
       "fighting"
@@ -1389,7 +1605,11 @@
     "dex": 105,
     "names": {
       "ja": "ガラガラ",
-      "en": "Marowak"
+      "en": "Marowak",
+      "fr": "Ossatueur",
+      "de": "Knogga",
+      "es": "Marowak",
+      "it": "Marowak"
     },
     "types": [
       "ground"
@@ -1411,7 +1631,11 @@
     "dex": 52,
     "names": {
       "ja": "ニャース",
-      "en": "Meowth"
+      "en": "Meowth",
+      "fr": "Miaouss",
+      "de": "Mauzi",
+      "es": "Meowth",
+      "it": "Meowth"
     },
     "types": [
       "normal"
@@ -1442,7 +1666,11 @@
     "dex": 11,
     "names": {
       "ja": "トランセル",
-      "en": "Metapod"
+      "en": "Metapod",
+      "fr": "Chrysacier",
+      "de": "Safcon",
+      "es": "Metapod",
+      "it": "Metapod"
     },
     "types": [
       "bug"
@@ -1470,7 +1698,11 @@
     "dex": 151,
     "names": {
       "ja": "ミュウ",
-      "en": "Mew"
+      "en": "Mew",
+      "fr": "Mew",
+      "de": "Mew",
+      "es": "Mew",
+      "it": "Mew"
     },
     "types": [
       "psychic"
@@ -1490,7 +1722,11 @@
     "dex": 150,
     "names": {
       "ja": "ミュウツー",
-      "en": "Mewtwo"
+      "en": "Mewtwo",
+      "fr": "Mewtwo",
+      "de": "Mewtu",
+      "es": "Mewtwo",
+      "it": "Mewtwo"
     },
     "types": [
       "psychic"
@@ -1510,7 +1746,11 @@
     "dex": 146,
     "names": {
       "ja": "ファイヤー",
-      "en": "Moltres"
+      "en": "Moltres",
+      "fr": "Sulfura",
+      "de": "Lavados",
+      "es": "Moltres",
+      "it": "Moltres"
     },
     "types": [
       "fire",
@@ -1531,7 +1771,11 @@
     "dex": 30,
     "names": {
       "ja": "ニドリーナ",
-      "en": "Nidorina"
+      "en": "Nidorina",
+      "fr": "Nidorina",
+      "de": "Nidorina",
+      "es": "Nidorina",
+      "it": "Nidorina"
     },
     "types": [
       "poison"
@@ -1559,7 +1803,11 @@
     "dex": 33,
     "names": {
       "ja": "ニドリーノ",
-      "en": "Nidorino"
+      "en": "Nidorino",
+      "fr": "Nidorino",
+      "de": "Nidorino",
+      "es": "Nidorino",
+      "it": "Nidorino"
     },
     "types": [
       "poison"
@@ -1587,7 +1835,11 @@
     "dex": 43,
     "names": {
       "ja": "ナゾノクサ",
-      "en": "Oddish"
+      "en": "Oddish",
+      "fr": "Mystherbe",
+      "de": "Myrapla",
+      "es": "Oddish",
+      "it": "Oddish"
     },
     "types": [
       "grass",
@@ -1614,7 +1866,11 @@
     "dex": 95,
     "names": {
       "ja": "イワーク",
-      "en": "Onix"
+      "en": "Onix",
+      "fr": "Onix",
+      "de": "Onix",
+      "es": "Onix",
+      "it": "Onix"
     },
     "types": [
       "rock",
@@ -1640,7 +1896,11 @@
     "dex": 46,
     "names": {
       "ja": "パラス",
-      "en": "Paras"
+      "en": "Paras",
+      "fr": "Paras",
+      "de": "Paras",
+      "es": "Paras",
+      "it": "Paras"
     },
     "types": [
       "bug",
@@ -1667,7 +1927,11 @@
     "dex": 17,
     "names": {
       "ja": "ピジョン",
-      "en": "Pidgeotto"
+      "en": "Pidgeotto",
+      "fr": "Roucoups",
+      "de": "Tauboga",
+      "es": "Pidgeotto",
+      "it": "Pidgeotto"
     },
     "types": [
       "normal",
@@ -1696,7 +1960,11 @@
     "dex": 16,
     "names": {
       "ja": "ポッポ",
-      "en": "Pidgey"
+      "en": "Pidgey",
+      "fr": "Roucool",
+      "de": "Taubsi",
+      "es": "Pidgey",
+      "it": "Pidgey"
     },
     "types": [
       "normal",
@@ -1723,7 +1991,11 @@
     "dex": 25,
     "names": {
       "ja": "ピカチュウ",
-      "en": "Pikachu"
+      "en": "Pikachu",
+      "fr": "Pikachu",
+      "de": "Pikachu",
+      "es": "Pikachu",
+      "it": "Pikachu"
     },
     "types": [
       "electric"
@@ -1751,7 +2023,11 @@
     "dex": 77,
     "names": {
       "ja": "ポニータ",
-      "en": "Ponyta"
+      "en": "Ponyta",
+      "fr": "Ponyta",
+      "de": "Ponita",
+      "es": "Ponyta",
+      "it": "Ponyta"
     },
     "types": [
       "fire"
@@ -1777,7 +2053,11 @@
     "dex": 26,
     "names": {
       "ja": "ライチュウ",
-      "en": "Raichu"
+      "en": "Raichu",
+      "fr": "Raichu",
+      "de": "Raichu",
+      "es": "Raichu",
+      "it": "Raichu"
     },
     "types": [
       "electric"
@@ -1800,7 +2080,11 @@
     "dex": 20,
     "names": {
       "ja": "ラッタ",
-      "en": "Raticate"
+      "en": "Raticate",
+      "fr": "Rattatac",
+      "de": "Rattikarl",
+      "es": "Raticate",
+      "it": "Raticate"
     },
     "types": [
       "normal"
@@ -1822,7 +2106,11 @@
     "dex": 19,
     "names": {
       "ja": "コラッタ",
-      "en": "Rattata"
+      "en": "Rattata",
+      "fr": "Rattata",
+      "de": "Rattfratz",
+      "es": "Rattata",
+      "it": "Rattata"
     },
     "types": [
       "normal"
@@ -1848,7 +2136,11 @@
     "dex": 112,
     "names": {
       "ja": "サイドン",
-      "en": "Rhydon"
+      "en": "Rhydon",
+      "fr": "Rhinoféros",
+      "de": "Rizeros",
+      "es": "Rhydon",
+      "it": "Rhydon"
     },
     "types": [
       "ground",
@@ -1876,7 +2168,11 @@
     "dex": 111,
     "names": {
       "ja": "サイホーン",
-      "en": "Rhyhorn"
+      "en": "Rhyhorn",
+      "fr": "Rhinocorne",
+      "de": "Rihorn",
+      "es": "Rhyhorn",
+      "it": "Rhyhorn"
     },
     "types": [
       "ground",
@@ -1903,7 +2199,11 @@
     "dex": 123,
     "names": {
       "ja": "ストライク",
-      "en": "Scyther"
+      "en": "Scyther",
+      "fr": "Insécateur",
+      "de": "Sichlor",
+      "es": "Scyther",
+      "it": "Scyther"
     },
     "types": [
       "bug",
@@ -1934,7 +2234,11 @@
     "dex": 86,
     "names": {
       "ja": "パウワウ",
-      "en": "Seel"
+      "en": "Seel",
+      "fr": "Otaria",
+      "de": "Jurob",
+      "es": "Seel",
+      "it": "Seel"
     },
     "types": [
       "water"
@@ -1960,7 +2264,11 @@
     "dex": 80,
     "names": {
       "ja": "ヤドラン",
-      "en": "Slowbro"
+      "en": "Slowbro",
+      "fr": "Flagadoss",
+      "de": "Lahmus",
+      "es": "Slowbro",
+      "it": "Slowbro"
     },
     "types": [
       "water",
@@ -1983,7 +2291,11 @@
     "dex": 21,
     "names": {
       "ja": "オニスズメ",
-      "en": "Spearow"
+      "en": "Spearow",
+      "fr": "Piafabec",
+      "de": "Habitak",
+      "es": "Spearow",
+      "it": "Spearow"
     },
     "types": [
       "normal",
@@ -2010,7 +2322,11 @@
     "dex": 7,
     "names": {
       "ja": "ゼニガメ",
-      "en": "Squirtle"
+      "en": "Squirtle",
+      "fr": "Carapuce",
+      "de": "Schiggy",
+      "es": "Squirtle",
+      "it": "Squirtle"
     },
     "types": [
       "water"
@@ -2036,7 +2352,11 @@
     "dex": 121,
     "names": {
       "ja": "スターミー",
-      "en": "Starmie"
+      "en": "Starmie",
+      "fr": "Staross",
+      "de": "Starmie",
+      "es": "Starmie",
+      "it": "Starmie"
     },
     "types": [
       "water",
@@ -2059,7 +2379,11 @@
     "dex": 120,
     "names": {
       "ja": "ヒトデマン",
-      "en": "Staryu"
+      "en": "Staryu",
+      "fr": "Stari",
+      "de": "Sterndu",
+      "es": "Staryu",
+      "it": "Staryu"
     },
     "types": [
       "water"
@@ -2085,7 +2409,11 @@
     "dex": 114,
     "names": {
       "ja": "モンジャラ",
-      "en": "Tangela"
+      "en": "Tangela",
+      "fr": "Saquedeneu",
+      "de": "Tangela",
+      "es": "Tangela",
+      "it": "Tangela"
     },
     "types": [
       "grass"
@@ -2110,7 +2438,11 @@
     "dex": 128,
     "names": {
       "ja": "ケンタロス",
-      "en": "Tauros"
+      "en": "Tauros",
+      "fr": "Tauros",
+      "de": "Tauros",
+      "es": "Tauros",
+      "it": "Tauros"
     },
     "types": [
       "normal"
@@ -2130,7 +2462,11 @@
     "dex": 72,
     "names": {
       "ja": "メノクラゲ",
-      "en": "Tentacool"
+      "en": "Tentacool",
+      "fr": "Tentacool",
+      "de": "Tentacha",
+      "es": "Tentacool",
+      "it": "Tentacool"
     },
     "types": [
       "water",
@@ -2157,7 +2493,11 @@
     "dex": 134,
     "names": {
       "ja": "シャワーズ",
-      "en": "Vaporeon"
+      "en": "Vaporeon",
+      "fr": "Aquali",
+      "de": "Aquana",
+      "es": "Vaporeon",
+      "it": "Vaporeon"
     },
     "types": [
       "water"
@@ -2179,7 +2519,11 @@
     "dex": 49,
     "names": {
       "ja": "モルフォン",
-      "en": "Venomoth"
+      "en": "Venomoth",
+      "fr": "Aéromite",
+      "de": "Omot",
+      "es": "Venomoth",
+      "it": "Venomoth"
     },
     "types": [
       "bug",
@@ -2202,7 +2546,11 @@
     "dex": 48,
     "names": {
       "ja": "コンパン",
-      "en": "Venonat"
+      "en": "Venonat",
+      "fr": "Mimitoss",
+      "de": "Bluzuk",
+      "es": "Venonat",
+      "it": "Venonat"
     },
     "types": [
       "bug",
@@ -2229,7 +2577,11 @@
     "dex": 3,
     "names": {
       "ja": "フシギバナ",
-      "en": "Venusaur"
+      "en": "Venusaur",
+      "fr": "Florizarre",
+      "de": "Bisaflor",
+      "es": "Venusaur",
+      "it": "Venusaur"
     },
     "types": [
       "grass",
@@ -2253,7 +2605,11 @@
     "dex": 45,
     "names": {
       "ja": "ラフレシア",
-      "en": "Vileplume"
+      "en": "Vileplume",
+      "fr": "Rafflesia",
+      "de": "Giflor",
+      "es": "Vileplume",
+      "it": "Vileplume"
     },
     "types": [
       "grass",
@@ -2277,7 +2633,11 @@
     "dex": 100,
     "names": {
       "ja": "ビリリダマ",
-      "en": "Voltorb"
+      "en": "Voltorb",
+      "fr": "Voltorbe",
+      "de": "Voltobal",
+      "es": "Voltorb",
+      "it": "Voltorb"
     },
     "types": [
       "electric"
@@ -2303,7 +2663,11 @@
     "dex": 37,
     "names": {
       "ja": "ロコン",
-      "en": "Vulpix"
+      "en": "Vulpix",
+      "fr": "Goupix",
+      "de": "Vulpix",
+      "es": "Vulpix",
+      "it": "Vulpix"
     },
     "types": [
       "fire"
@@ -2329,7 +2693,11 @@
     "dex": 8,
     "names": {
       "ja": "カメール",
-      "en": "Wartortle"
+      "en": "Wartortle",
+      "fr": "Carabaffe",
+      "de": "Schillok",
+      "es": "Wartortle",
+      "it": "Wartortle"
     },
     "types": [
       "water"
@@ -2357,7 +2725,11 @@
     "dex": 13,
     "names": {
       "ja": "ビードル",
-      "en": "Weedle"
+      "en": "Weedle",
+      "fr": "Aspicot",
+      "de": "Hornliu",
+      "es": "Weedle",
+      "it": "Weedle"
     },
     "types": [
       "bug",
@@ -2384,7 +2756,11 @@
     "dex": 110,
     "names": {
       "ja": "マタドガス",
-      "en": "Weezing"
+      "en": "Weezing",
+      "fr": "Smogogo",
+      "de": "Smogmog",
+      "es": "Weezing",
+      "it": "Weezing"
     },
     "types": [
       "poison"
@@ -2406,7 +2782,11 @@
     "dex": 145,
     "names": {
       "ja": "サンダー",
-      "en": "Zapdos"
+      "en": "Zapdos",
+      "fr": "Électhor",
+      "de": "Zapdos",
+      "es": "Zapdos",
+      "it": "Zapdos"
     },
     "types": [
       "electric",
@@ -2427,7 +2807,11 @@
     "dex": 41,
     "names": {
       "ja": "ズバット",
-      "en": "Zubat"
+      "en": "Zubat",
+      "fr": "Nosferapti",
+      "de": "Zubat",
+      "es": "Zubat",
+      "it": "Zubat"
     },
     "types": [
       "poison",

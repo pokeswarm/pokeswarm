@@ -2,10 +2,13 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>PokéSwarm</title>
     <style>
-      html, body { margin: 0; height: 100%; background: #111; overflow: hidden; }
+      html, body { margin: 0; height: 100%; background: #000; overflow: hidden; overscroll-behavior: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+      /* スマホ: ゲームの画面では、指の操作で拡大・スクロールしない（一覧の画面は指でスクロールできるように、canvas だけ） */
+      canvas { touch-action: none; }
+      input, textarea { -webkit-user-select: text; user-select: text; }
       #game { width: 100%; height: 100%; }
     </style>
   </head>

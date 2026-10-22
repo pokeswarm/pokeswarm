@@ -59,5 +59,10 @@
     ],
     "maxPassers": 10,
     "keepAway": 120
+  },
+  "joystick": {
+    "radius": 56,
+    "knob": 24,
+    "deadzone": 12
   }
 }

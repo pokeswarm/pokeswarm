@@ -18,6 +18,8 @@ import { HudIcons } from '../render/HudIcons';
 import { ensureIconTextures, iconDataUrl } from '../render/Icons';
 import { GroundTiles, preloadGroundTiles } from '../render/GroundTiles';
 import { KeyboardInput } from '../render/KeyboardInput';
+import { orientationGuard } from '../render/OrientationGuard';
+import { isTouchDevice, TouchJoystick } from '../render/TouchJoystick';
 import { PlayerView } from '../render/PlayerView';
 import { PooledCircles, PooledSprites } from '../render/PooledCircles';
 import { px } from '../render/pixelUi';
@@ -73,6 +75,8 @@ export class RunScene extends Phaser.Scene {
   private sim!: Simulation;
   private clock!: FixedStepClock;
   private keyboard!: KeyboardInput;
+  /** スマホのジョイスティック（タッチの端末だけ） */
+  private joystick: TouchJoystick | null = null;
   private playerViews = new Map<PlayerId, PlayerView>();
   private enemyView!: PooledCircles;
   private gemView!: PooledSprites;
@@ -268,6 +272,14 @@ export class RunScene extends Phaser.Scene {
 
     this.clock = new FixedStepClock(simulationConfig.tickRate, simulationConfig.maxTicksPerFrame);
     this.keyboard = new KeyboardInput(this);
+    if (isTouchDevice()) {
+      const stick = new TouchJoystick(this.game.canvas);
+      this.joystick = stick;
+      this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+        stick.destroy();
+        this.joystick = null;
+      });
+    }
     this.ground = new GroundTiles(this, groundConfig, currentWaveIndex(this.sim.world));
     this.enemyView = new PooledCircles(this, 0);
     this.gemView = new PooledSprites(this, -1, itemSprites.dot);
@@ -416,7 +428,9 @@ export class RunScene extends Phaser.Scene {
 
   override update(time: number, delta: number): void {
     this.lastFrameAt = performance.now();
-    const steps = this.clock.advance(delta);
+    // スマホが縦向きの間は、ソロのランを止める（協力プレイは止められない）
+    const paused = !this.coop && (orientationGuard?.blocked ?? false);
+    const steps = paused ? 0 : this.clock.advance(delta);
     this.runSteps(steps, true);
     this.lastSteps = steps;
     // 止まっている間（レベルアップの選択・ランの終わり）は前回と今回の位置の間を補間しない（補間の割合だけが毎フレーム変わり、画面全体が震えて見えた）
@@ -896,7 +910,9 @@ export class RunScene extends Phaser.Scene {
   /** ローカルの入力を、変化があったときだけコマンドにする */
   private collectCommands(): InputCommand[] {
     const out = this.uiCommands.splice(0);
-    const { dx, dy } = this.keyboard.read();
+    // キーボードを優先し、押していなければジョイスティック
+    const key = this.keyboard.read();
+    const { dx, dy } = key.dx || key.dy || !this.joystick ? key : this.joystick.read();
     if (dx === this.lastSent.dx && dy === this.lastSent.dy) return out;
     this.lastSent = { dx, dy };
     return [...out, { type: 'move', playerId: this.localId, dx, dy }];

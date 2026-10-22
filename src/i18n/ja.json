@@ -358,5 +358,6 @@
   "achievement.linking-cord.desc": "協力プレイで1回遊ぶ、または1ランで中ボスを8体倒す",
   "achievement.raichu-5.name": "でんきの あいぼう",
   "achievement.raichu-5.desc": "ライチュウ（中ボス）を5回倒す",
-  "result.rewards": "報酬: {list}"
+  "result.rewards": "報酬: {list}",
+  "orientation.rotate": "よこむきに して あそんでね"
 }

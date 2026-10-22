@@ -358,5 +358,6 @@
   "achievement.linking-cord.desc": "Play co-op once, or defeat 8 mid-bosses in one run",
   "achievement.raichu-5.name": "Electric Partner",
   "achievement.raichu-5.desc": "Defeat Raichu (mid-boss) 5 times",
-  "result.rewards": "Rewards: {list}"
+  "result.rewards": "Rewards: {list}",
+  "orientation.rotate": "Please rotate your device to landscape"
 }

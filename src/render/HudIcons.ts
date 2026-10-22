@@ -21,6 +21,10 @@ const PIPS_PER_ROW = 8;
 export class HudIcons {
   readonly container: Phaser.GameObjects.Container;
   private shownKey = '';
+  /** アイコンの場所（入れ物の中の座標。マウスを乗せたときの詳細カードに使う） */
+  private cells: { kind: 'move' | 'item'; slot: number; x: number; y: number; size: number }[] = [];
+  /** アイコンの列の高さ */
+  height = 0;
 
   constructor(private readonly scene: Phaser.Scene) {
     this.container = scene.add.container(0, 0).setScrollFactor(0).setDepth(1000);
@@ -36,15 +40,17 @@ export class HudIcons {
     if (key === this.shownKey) return;
     this.shownKey = key;
     this.container.removeAll(true);
+    this.cells = [];
     let y = 0;
-    for (const row of rows) {
-      if (row.length === 0) continue;
+    rows.forEach((row, r) => {
+      if (row.length === 0) return;
       let rowHeight = 0;
       row.forEach((cell, i) => {
         const x = i * cellWidth();
         const icon = this.scene.add.image(x, y, cell.key).setOrigin(0, 0).setScale(iconScale());
         this.container.add(icon);
         const size = icon.displayWidth;
+        this.cells.push({ kind: r === 0 ? 'move' : 'item', slot: i, x, y, size });
         // ひし形: 最大レベルの数だけ、アイコンの幅に収まるよう中央に並べる
         const pip = this.scene.textures.get(pipKey(false, 'base')).getSourceImage().width * PIP_SCALE;
         const step = Math.min(pip + 1, size / Math.min(cell.max, PIPS_PER_ROW));
@@ -57,6 +63,13 @@ export class HudIcons {
         rowHeight = Math.max(rowHeight, size + 3 + Math.ceil(cell.max / PIPS_PER_ROW) * (pip + 1));
       });
       y += rowHeight + ROW_GAP;
-    }
+    });
+    this.height = y;
+  }
+
+  /** 入れ物の中の座標 (x, y) にあるアイコン（無ければ null） */
+  hit(x: number, y: number): { kind: 'move' | 'item'; slot: number } | null {
+    const c = this.cells.find((c) => x >= c.x && x < c.x + c.size && y >= c.y && y < c.y + c.size);
+    return c ? { kind: c.kind, slot: c.slot } : null;
   }
 }

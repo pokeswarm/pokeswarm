@@ -389,5 +389,8 @@
   "donate.body": "PokéSwarm is an unofficial, non-commercial fan game made entirely by one person.\nI keep it free and ad-free so that anyone can play.\nYour support goes toward the server costs (such as co-op play) and the development of future updates.\nIf you enjoy the game, a tip on Ko-fi would mean a lot to me.",
   "donate.noAdvantage": "Donations never give any in-game advantage, and there is nothing exclusive to donors.",
   "donate.open": "Support on Ko-fi",
-  "donate.notReady": "Coming soon"
+  "donate.notReady": "Coming soon",
+  "hudCard.level": "Lv {level} / {max}",
+  "hudCard.nextLevel": "Next level:",
+  "hudCard.maxLevel": "Max level"
 }

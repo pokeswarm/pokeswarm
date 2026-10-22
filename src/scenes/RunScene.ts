@@ -15,7 +15,8 @@ import { HitShapes } from '../render/effects/HitShapes';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
 import { ObstacleView } from '../render/ObstacleView';
 import { HudIcons } from '../render/HudIcons';
-import { ensureIconTextures, iconDataUrl } from '../render/Icons';
+import { ensureIconTextures, iconDataUrl, itemIconKey, moveIconKey } from '../render/Icons';
+import { HudCard } from './hudCard';
 import { GroundTiles, preloadGroundTiles } from '../render/GroundTiles';
 import { KeyboardInput } from '../render/KeyboardInput';
 import { orientationGuard } from '../render/OrientationGuard';
@@ -103,6 +104,10 @@ export class RunScene extends Phaser.Scene {
   private downText!: Phaser.GameObjects.Text;
   /** 持っている技・持ち物・パッシブのアイコンとレベルの星 */
   private hudIcons!: HudIcons;
+  /** アイコンにマウスを乗せたときの詳細カード（PC だけ） */
+  private hudCard!: HudCard;
+  /** アイコンの列の上端（画面の y） */
+  private hudTop = 0;
   private lastSent: { dx: Axis; dy: Axis } = { dx: 0, dy: 0 };
   private lastSteps = 0;
   /** シミュレーション1回あたりの処理時間（移動平均, ms） */
@@ -332,6 +337,9 @@ export class RunScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(1000);
     this.hudIcons = new HudIcons(this);
+    const card = new HudCard((key) => iconDataUrl(this, key));
+    this.hudCard = card;
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => card.destroy());
     this.topBar = this.add.graphics().setScrollFactor(0).setDepth(1000);
     this.levelText = this.add.text(0, 0, '', px(16, uiConfig.expBar.text, { outline: true })).setOrigin(0, 0.5).setScrollFactor(0).setDepth(1001);
     this.coinIcon = this.add.image(0, 0, pixelTextureKey('coin')).setOrigin(1, 0.5).setScale(2).setScrollFactor(0).setDepth(1001);
@@ -804,6 +812,7 @@ export class RunScene extends Phaser.Scene {
     this.placeUi(this.announceText, cx, cam.height * 0.3);
     this.placeUi(this.downText, cx, cam.height * 0.7);
     this.placeUi(this.hudIcons.container, 8, top);
+    this.hudTop = top;
     this.placeUi(this.hud, 8, top + this.hudIcons.container.getBounds().height + 8);
     this.bossBar.clear();
     const i = this.bossId === null ? -1 : findEnemyIndex(w, this.bossId);
@@ -905,6 +914,33 @@ export class RunScene extends Phaser.Scene {
       this.game.events.off(Phaser.Core.Events.PRE_STEP, onPre);
       this.game.events.off(Phaser.Core.Events.POST_RENDER, onPost);
     });
+  }
+
+  /**
+   * 技・持ち物のアイコンにマウスを乗せたら、詳細カードを出す（作者の案。PC だけ。タッチでは出さない）。
+   * カードはアイコンの列のすぐ下の決まった場所に出す。レベルアップの選択中・ランの終わりは出さない
+   */
+  private updateHudCard(): void {
+    const w = this.sim.world;
+    const local = w.players.find((p) => p.id === this.localId);
+    const ptr = this.input.activePointer;
+    if (!local || w.levelUp || w.outcome || ptr.wasTouch) {
+      this.hudCard.hide();
+      return;
+    }
+    const cam = this.cameras.main;
+    const target = this.hudIcons.hit(ptr.x - cam.x - 8, ptr.y - cam.y - this.hudTop);
+    const iconKey = !target
+      ? null
+      : target.kind === 'move'
+        ? local.moves[target.slot]
+          ? moveIconKey(w.rules, local.moves[target.slot]!.move)
+          : null
+        : local.items[target.slot]
+          ? itemIconKey(w.rules, local.items[target.slot]!.item)
+          : null;
+    const rect = this.game.canvas.getBoundingClientRect();
+    this.hudCard.show(w, local, target, iconKey, rect.left + cam.x + 8, rect.top + cam.y + this.hudTop + this.hudIcons.height + 4);
   }
 
   /** ローカルの入力を、変化があったときだけコマンドにする */
@@ -1045,6 +1081,7 @@ export class RunScene extends Phaser.Scene {
     // 左上の文字は F3 の詳しい表示のときだけ（作者の決定: 左上の UI はほかの場所へ移した）
     this.hud.setText(lines).setVisible(this.showDebug);
     this.hudIcons.update(world, local);
+    this.updateHudCard();
   }
 }
 

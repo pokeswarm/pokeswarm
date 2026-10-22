@@ -49,7 +49,7 @@ const MOVE_GAINS: { key: 'count' | 'size' | 'range' | 'pierce' | 'durationSecond
 ];
 
 /** 技をレベル level から level + 1 に上げたときに増えるもの。最後に総合の強さの伸び（%） */
-function moveGains(world: World, move: number, level: number): string[] {
+export function moveGains(world: World, move: number, level: number): string[] {
   const def = world.rules.moves[move]!;
   const a = def.levels[level - 1];
   const b = def.levels[level];
@@ -69,7 +69,7 @@ function moveGains(world: World, move: number, level: number): string[] {
 }
 
 /** 持ち物の効果を、レベル level の値で1行ずつ（next があれば「今 → 次」） */
-function itemGains(world: World, item: number, level: number, next: number | null): string[] {
+export function itemGains(world: World, item: number, level: number, next: number | null): string[] {
   const def = world.rules.items[item]!;
   const per = def.perLevel;
   const out: string[] = [];
@@ -94,16 +94,16 @@ function itemGains(world: World, item: number, level: number, next: number | nul
   return out;
 }
 
-function moveName(world: World, move: number): string {
+export function moveName(world: World, move: number): string {
   const key = world.rules.moves[move]!.key;
   return localName(generated.moves[key]?.names, getLocale(), key);
 }
 
-function itemName(key: string): string {
+export function itemName(key: string): string {
   return localName(generated.items[key]?.names, getLocale(), key);
 }
 
-function moveDetail(world: World, move: number): string {
+export function moveDetail(world: World, move: number): string {
   const def = world.rules.moves[move]!;
   const typeKey = world.rules.types.names[def.type] ?? '';
   return t('upgrade.detail', { type: localName(generated.types[typeKey]?.names, getLocale(), typeKey), pattern: tMaybe(`pattern.${def.pattern}`) });

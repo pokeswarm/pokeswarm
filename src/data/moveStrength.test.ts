@@ -43,7 +43,7 @@ describe('技の強さのそろえ方（作者の決定。07 16.2）', () => {
 });
 
 describe('進化しても見た目の量が減らない（作者の決定。07 22.3）', () => {
-  it('進化した技の Lv1 は、元の技の最大より射程が下がらず、同じ出し方なら 大きさ・貫通・数・持続 も下がらず再使用も延びない', () => {
+  it('同じ出し方に進化するとき、進化した技の Lv1 は、元の技の最大より 射程・大きさ・貫通・数・持続 が下がらず再使用も延びない', () => {
     for (const d of [...derivationsConfig.derivations, ...derivationsConfig.unique]) {
       if (exempt(d.to) || exempt(d.from)) continue;
       const fromDef = movesConfig.moves[d.from]!;
@@ -52,9 +52,10 @@ describe('進化しても見た目の量が減らない（作者の決定。07 2
       const b = moveStatsAt(toDef, 1);
       const num = (v: unknown): number => (v === 'infinite' ? Infinity : (v as number));
       const label = `${d.from} → ${d.to}`;
-      expect(num(b.range), `${label} の射程`).toBeGreaterThanOrEqual(num(a.range));
-      // 出し方が変わるもの（連射 → 流れ など）は、大きさ・数の意味が違うので比べない
+      // 出し方が変わるもの（連射 → 流れ、ひのこ → かえんほうしゃ など）は、射程・大きさ・数の意味が違うので比べない
+      // （作者の決定 2026年10月23日: 射程も同じ出し方のときだけ。ばらまく弾の射程に、前へ噴き出す炎の長さをそろえると長すぎた）
       if (fromDef.pattern === toDef.pattern) {
+        expect(num(b.range), `${label} の射程`).toBeGreaterThanOrEqual(num(a.range));
         expect(num(b.size), `${label} の大きさ`).toBeGreaterThanOrEqual(num(a.size));
         expect(num(b.pierce), `${label} の貫通`).toBeGreaterThanOrEqual(num(a.pierce));
         expect(num(b.count), `${label} の数`).toBeGreaterThanOrEqual(num(a.count));

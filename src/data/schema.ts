@@ -814,6 +814,22 @@ export const spriteRenderSchema = z.object({
    * 技の当たり判定の形（作者の指摘。2026年10月21日）。グラデーションではなく、当たり判定の形を平らに塗る（外周の線は引かない。2026年10月22日）。
    * pixel は角ばったドットにするフィルターの大きさ、fillAlpha は塗りの不透明度。moves を書くとその技だけ（試すとき）、省略で全部
    */
+  /**
+   * 重なりの順（大きいほど手前。作者の決定 2026年10月22日: プレイヤー ＞ 技 ＞ ボス ＞ 雑魚 ＞ アイテム）。
+   * 敵は種類ごとに enemies + 0.1 × 層（群れ 1・中ボスとボス 2）。技は hitShapes（範囲の塗り）と effects（光。軌跡は -0.5、当たりのはじけは +1）。
+   * candy はふしぎなアメの箱と当たりの演出（プレイヤーより手前）
+   */
+  depths: z.object({
+    obstacles: z.number(),
+    gems: z.number(),
+    items: z.number(),
+    enemies: z.number(),
+    hazards: z.number(),
+    hitShapes: z.number(),
+    effects: z.number(),
+    players: z.number(),
+    candy: z.number(),
+  }),
   hitShape: z.object({
     pixel: z.number().int().nonnegative(),
     fillAlpha: z.number().min(0).max(1),

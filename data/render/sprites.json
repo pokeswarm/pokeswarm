@@ -20,5 +20,16 @@
     "pixel": 4,
     "fillAlpha": 0.45,
     "sectorBand": 0.3
+  },
+  "depths": {
+    "obstacles": 0,
+    "gems": 1,
+    "items": 1.5,
+    "enemies": 2,
+    "hazards": 2.5,
+    "hitShapes": 3,
+    "effects": 4,
+    "players": 6,
+    "candy": 7
   }
 }

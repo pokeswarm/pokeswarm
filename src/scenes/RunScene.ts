@@ -243,7 +243,8 @@ export class RunScene extends Phaser.Scene {
       }
       const sprite = id === this.localId ? this.playerSprite : (this.coop?.sprites.get(pokemon) ?? null);
       const view = new PlayerView(this, p, placeholderRender, spriteRender, sprite, true);
-      view.container.setDepth(id === this.localId ? 1.1 : 1);
+      // 自分をほかのプレイヤーより手前に
+      view.container.setDepth(spriteRender.depths.players + (id === this.localId ? 0.1 : 0));
       // 相手のプレイヤーは少し透かして見分ける
       if (p.remote) view.container.setAlpha(0.7);
       this.playerViews.set(id, view);
@@ -286,12 +287,14 @@ export class RunScene extends Phaser.Scene {
       });
     }
     this.ground = new GroundTiles(this, groundConfig, currentWaveIndex(this.sim.world));
-    this.enemyView = new PooledCircles(this, 0);
-    this.gemView = new PooledSprites(this, -1, itemSprites.dot);
-    this.itemView = this.add.graphics().setDepth(0.4);
+    // 重なりの順は data/render/sprites.json の depths（プレイヤー ＞ 技 ＞ ボス ＞ 雑魚 ＞ アイテム）
+    const depths = spriteRender.depths;
+    this.enemyView = new PooledCircles(this, depths.enemies);
+    this.gemView = new PooledSprites(this, depths.gems, itemSprites.dot);
+    this.itemView = this.add.graphics().setDepth(depths.items);
     ensurePixelTextures(this, itemSprites);
-    // 障害物は敵（0〜0.2）より上、予告の範囲（0.5）より下
-    this.obstacleView = new ObstacleView(this, obstacleSprites, 0.3);
+    // 障害物は地面の飾りなので、アイテムより奥
+    this.obstacleView = new ObstacleView(this, obstacleSprites, depths.obstacles);
     this.streamer = new SpriteStreamer(
       this,
       rules.enemies.kinds.map((k) => k.sprite),
@@ -302,11 +305,11 @@ export class RunScene extends Phaser.Scene {
       (kind) => this.streamer.manifestOf(kind),
       spriteRender.enemyScale,
       spriteRender.enemyAnimation,
-      0,
+      depths.enemies,
       (kind) => rules.enemies.kinds[kind]?.spriteScale ?? 1,
       (kind) => enemyLayer(rules, kind),
     );
-    this.hazardView = this.add.graphics().setDepth(0.5);
+    this.hazardView = this.add.graphics().setDepth(depths.hazards);
     this.measureFrameTime();
     // ゲストの選択はホストが確定するので、要望としてホストへ送る
     const guest = role === 'guest';
@@ -320,9 +323,9 @@ export class RunScene extends Phaser.Scene {
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.levelUpPanel.hide());
     this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));
-    this.effects = new EffectRenderer(this, effectRecipes, 2, spriteRender.effectPixel);
+    this.effects = new EffectRenderer(this, effectRecipes, depths.effects, spriteRender.effectPixel);
     const shape = spriteRender.hitShape;
-    this.hitShapes = new HitShapes(this, 1.9, shape);
+    this.hitShapes = new HitShapes(this, depths.hitShapes, shape);
     this.shapeColors = rules.moves.map((m) => {
       if (shape.moves && !shape.moves.includes(m.key)) return null;
       return hexColor(effectRecipes[m.effect]?.projectile?.glowColor ?? '#ffffff');
@@ -359,7 +362,17 @@ export class RunScene extends Phaser.Scene {
     this.sounds = new RunSounds(this.localId);
     this.applyZoom();
     this.scale.on('resize', this.applyZoom, this);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.scale.off('resize', this.applyZoom, this));
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.scale.off('resize', this.applyZoom, this);
+      // ほかの画面は画面いっぱいに描く
+      const parent = this.game.canvas.parentElement;
+      if (parent) {
+        parent.style.width = '';
+        parent.style.margin = '';
+        this.scale.getParentBounds();
+        this.scale.refresh();
+      }
+    });
     // 時計を作った後で始める
     if (this.coop) this.keepRunningWhenHidden();
     this.setupSaving();
@@ -552,17 +565,30 @@ export class RunScene extends Phaser.Scene {
   /**
    * 見える範囲をそろえる（作者の決定。07 25.3 の B 案）: 見えるワールドの縦の広さを、どの端末でも viewHeight にする
    * （拡大率は 画面の高さ ÷ viewHeight。丸めない）。横は端末の比率に合わせて広げるが、maxAspect（16:9）まで。
-   * それより横長の画面は、カメラの描く範囲を真ん中に狭め、左右を黒い帯にする（背景の色が黒）
+   * それより横長の画面は、ゲームの描く面（canvas の親）の幅を 16:9 に縮めて真ん中に置き、左右を黒い帯にする（ページの背景が黒）。
+   * カメラの描く範囲をずらして帯を作ると、フィルターを掛けた技の光と範囲だけが帯の幅だけ左にずれた（2026年10月22日）ため、カメラはずらさない
    */
   private applyZoom(): void {
     const c = spriteRender.camera;
+    const parent = this.game.canvas.parentElement;
+    if (parent) {
+      const w = Math.min(window.innerWidth, Math.round(window.innerHeight * c.maxAspect));
+      if (parent.style.width !== `${w}px`) {
+        parent.style.width = `${w}px`;
+        parent.style.margin = '0 auto';
+        // canvas の大きさを親に合わせる（変わったら resize でもう一度ここに来る）。resize の処理の途中で大きさを変えると、
+        // 外側の処理が元の大きさで上書きしたので、次のフレームで行う
+        requestAnimationFrame(() => {
+          if (!this.sys.isActive()) return;
+          this.scale.getParentBounds();
+          this.scale.refresh();
+        });
+      }
+    }
     const { width, height } = this.scale;
-    const zoom = height / c.viewHeight;
-    const maxW = Math.round(height * c.maxAspect);
     const cam = this.cameras.main;
-    if (width > maxW) cam.setViewport(Math.round((width - maxW) / 2), 0, maxW, height);
-    else cam.setViewport(0, 0, width, height);
-    cam.setZoom(zoom);
+    cam.setViewport(0, 0, width, height);
+    cam.setZoom(height / c.viewHeight);
   }
 
   /**
@@ -667,7 +693,7 @@ export class RunScene extends Phaser.Scene {
       seen.add(it.id);
       let img = this.itemImages.get(it.id);
       if (!img) {
-        img = this.add.image(it.x, it.y, pixelTextureKey(it.kind)).setScale(itemSprites.dot).setDepth(0.45);
+        img = this.add.image(it.x, it.y, pixelTextureKey(it.kind)).setScale(itemSprites.dot).setDepth(spriteRender.depths.items + 0.05);
         this.itemImages.set(it.id, img);
       }
       // ふわふわ上下させて目立たせる。足元に影
@@ -695,7 +721,7 @@ export class RunScene extends Phaser.Scene {
     const me = this.sim.world.players.find((p) => p.id === this.localId);
     const bx = me?.x ?? 0;
     const by = (me?.y ?? 0) - 56;
-    const box = this.add.image(bx, by, pixelTextureKey('candy-box')).setScale(itemSprites.dot * 1.5).setDepth(1.5);
+    const box = this.add.image(bx, by, pixelTextureKey('candy-box')).setScale(itemSprites.dot * 1.5).setDepth(spriteRender.depths.candy);
     const shake = this.tweens.add({ targets: box, angle: { from: -10, to: 10 }, duration: 90, yoyo: true, repeat: -1 });
     let k = 0;
     const timer = this.time.addEvent({
@@ -731,12 +757,12 @@ export class RunScene extends Phaser.Scene {
     const big = this.add
       .text(x, y - 40, tMaybe(`candy.tier.${tier.levels}`), { ...style, fontSize: `${tier.fontSize}px`, color: tier.color, strokeThickness: Math.round(tier.fontSize / 6) })
       .setOrigin(0.5, 1)
-      .setDepth(1.7)
+      .setDepth(spriteRender.depths.candy + 0.2)
       .setScale(0.2);
     const label = this.add
       .text(x, y - 22, t('candy.big', { levels }), { ...style, fontSize: '16px', color: '#ffffff', strokeThickness: 4 })
       .setOrigin(0.5, 1)
-      .setDepth(1.7)
+      .setDepth(spriteRender.depths.candy + 0.2)
       .setAlpha(0);
     this.tweens.add({ targets: big, scale: 1, duration: 260, ease: 'Back.easeOut' });
     this.tweens.add({ targets: label, alpha: 1, delay: 180, duration: 200 });
@@ -749,7 +775,7 @@ export class RunScene extends Phaser.Scene {
   private burstCandies(x: number, y: number, levels: number): void {
     const count = candyTier(levels).count;
     for (let i = 0; i < count; i++) {
-      const candy = this.add.image(x, y - 8, pixelTextureKey('rare-candy')).setScale(itemSprites.dot).setDepth(1.6);
+      const candy = this.add.image(x, y - 8, pixelTextureKey('rare-candy')).setScale(itemSprites.dot).setDepth(spriteRender.depths.candy + 0.1);
       // 上へ扇形に飛び出し、落ちながら消える
       const a = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * (count > 10 ? 1.4 : 0.9);
       const speed = 60 + Math.random() * (count > 10 ? 140 : 80);

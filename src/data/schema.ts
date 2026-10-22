@@ -811,16 +811,12 @@ export const spriteRenderSchema = z.object({
     alphaSteps: z.number().int().min(2),
   }),
   /**
-   * 技の当たり判定の形（作者の指摘。2026年10月21日）。グラデーションではなく、当たり判定の形を平らに塗り、外周に明るい線を引く。
-   * pixel は角ばったドットにするフィルターの大きさ、edge は線の太さ（ワールドの長さ）、fillAlpha・edgeAlpha は不透明度、
-   * edgeLighten は線の色をレシピの光の色から白へどれだけ寄せるか。moves を書くとその技だけ（試すとき）、省略で全部
+   * 技の当たり判定の形（作者の指摘。2026年10月21日）。グラデーションではなく、当たり判定の形を平らに塗る（外周の線は引かない。2026年10月22日）。
+   * pixel は角ばったドットにするフィルターの大きさ、fillAlpha は塗りの不透明度。moves を書くとその技だけ（試すとき）、省略で全部
    */
   hitShape: z.object({
     pixel: z.number().int().nonnegative(),
-    edge: z.number().positive(),
     fillAlpha: z.number().min(0).max(1),
-    edgeAlpha: z.number().min(0).max(1),
-    edgeLighten: z.number().min(0).max(1),
     /** 近接の扇形は、弧の近くの帯だけを描く。帯の太さ（半径に対する割合。作者の指摘 2026年10月22日） */
     sectorBand: z.number().gt(0).max(1).default(0.3),
     moves: z.array(z.string()).optional(),

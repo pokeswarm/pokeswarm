@@ -91,7 +91,7 @@ export class RunScene extends Phaser.Scene {
   private sounds!: RunSounds;
   private hitShapes!: HitShapes;
   /** 技ごとの縁取りの色（明るい線・暗い線）。描かない技は null */
-  private shapeColors: ({ fill: number; edge: number } | null)[] = [];
+  private shapeColors: (number | null)[] = [];
   private ground!: GroundTiles;
   /** F3 の詳しい表示（ふだんは出さない） */
   private hud!: Phaser.GameObjects.Text;
@@ -325,8 +325,7 @@ export class RunScene extends Phaser.Scene {
     this.hitShapes = new HitShapes(this, 1.9, shape);
     this.shapeColors = rules.moves.map((m) => {
       if (shape.moves && !shape.moves.includes(m.key)) return null;
-      const fill = hexColor(effectRecipes[m.effect]?.projectile?.glowColor ?? '#ffffff');
-      return { fill, edge: lighten(fill, shape.edgeLighten) };
+      return hexColor(effectRecipes[m.effect]?.projectile?.glowColor ?? '#ffffff');
     });
     const local = this.sim.world.players.find((p) => p.id === this.localId)!;
     if (this.playerSprite && new URLSearchParams(window.location.search).has('gallery')) {
@@ -1100,8 +1099,3 @@ function candyTier(levels: number): { levels: number; count: number; color: stri
   return table.find((c) => c.levels === levels) ?? table.reduce((a, b) => (Math.abs(b.levels - levels) < Math.abs(a.levels - levels) ? b : a));
 }
 
-/** 色を白へ amount の割合だけ寄せる（当たり判定の外周の明るい線） */
-function lighten(color: number, amount: number): number {
-  const mix = (c: number): number => Math.round(c + (255 - c) * amount);
-  return (mix((color >> 16) & 0xff) << 16) | (mix((color >> 8) & 0xff) << 8) | mix(color & 0xff);
-}

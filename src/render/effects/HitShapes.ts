@@ -17,7 +17,8 @@ interface HitShape {
 /**
  * 技の当たり判定の形を、そのままの大きさで平らに塗る（作者の指摘。2026年10月21日）。
  * - 外へ向かって薄くなるグラデーションでは範囲を表さない（端がどこか分からず、縁取りをすると薄い端が囲まれて見づらかった）
- * - 当たり判定の内側を、レシピの光の色で薄く一色に塗り、外周に明るい線を1本引く。黒い（暗い）縁取りは使わない
+ * - 当たり判定の内側を、レシピの光の色で薄く一色に塗るだけ。外周の線（輪郭）は引かない（作者の指摘 2026年10月22日:
+ *   輪郭でかえって見づらかった。グラデーションをやめたので、塗りの端がそのまま当たり判定の端になる）
  * - ポケモンのドット絵に合わせて、角ばったドットにするフィルターを掛ける
  */
 export class HitShapes {
@@ -27,7 +28,7 @@ export class HitShapes {
   constructor(
     scene: Phaser.Scene,
     depth: number,
-    private readonly cfg: { pixel: number; edge: number; fillAlpha: number; edgeAlpha: number; sectorBand: number },
+    private readonly cfg: { pixel: number; fillAlpha: number; sectorBand: number },
   ) {
     this.layer = scene.add.layer().setDepth(depth);
     this.g = scene.add.graphics();
@@ -39,13 +40,13 @@ export class HitShapes {
   }
 
   /**
-   * 毎フレーム描き直す。colorOf は当たり判定ごとの 塗りの色・線の色（null なら描かない）。
+   * 毎フレーム描き直す。colorOf は当たり判定ごとの塗りの色（null なら描かない）。
    * view の外の当たり判定は描かない
    */
   draw(
     src: CircleSource,
     alpha: number,
-    colorOf: (index: number) => { fill: number; edge: number } | null,
+    colorOf: (index: number) => number | null,
     lineOf: (index: number) => { length: number; dirX: number; dirY: number } | null,
     view: { left: number; top: number; right: number; bottom: number },
     sectorOf: (index: number) => { dirX: number; dirY: number; half: number } | null = () => null,
@@ -54,7 +55,7 @@ export class HitShapes {
     g.clear();
     for (let i = 0; i < src.count; i++) {
       const color = colorOf(i);
-      if (!color) continue;
+      if (color === null) continue;
       const x = src.prevX[i]! + (src.x[i]! - src.prevX[i]!) * alpha;
       const y = src.prevY[i]! + (src.y[i]! - src.prevY[i]!) * alpha;
       const line = lineOf(i);
@@ -69,19 +70,11 @@ export class HitShapes {
         half: sector && sector.half < Math.PI ? sector.half : null,
         sector: sector !== null,
       };
-      const reach = s.radius + s.length + this.cfg.edge;
+      const reach = s.radius + s.length;
       if (x + reach < view.left || x - reach > view.right || y + reach < view.top || y - reach > view.bottom) continue;
       this.path(s);
-      g.fillStyle(color.fill, this.cfg.fillAlpha);
+      g.fillStyle(color, this.cfg.fillAlpha);
       g.fillPath();
-      g.lineStyle(this.cfg.edge, color.edge, this.cfg.edgeAlpha);
-      if (s.sector && s.half === null) {
-        // 輪（360° の近接）は、内と外の円を別々に引く（つなぎ目の線を出さない）
-        g.strokeCircle(s.x, s.y, s.radius);
-        g.strokeCircle(s.x, s.y, s.radius * (1 - this.cfg.sectorBand));
-      } else {
-        g.strokePath();
-      }
     }
   }
 

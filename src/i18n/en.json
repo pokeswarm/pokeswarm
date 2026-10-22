@@ -359,5 +359,8 @@
   "achievement.raichu-5.name": "Electric Partner",
   "achievement.raichu-5.desc": "Defeat Raichu (mid-boss) 5 times",
   "result.rewards": "Rewards: {list}",
-  "orientation.rotate": "Please rotate your device to landscape"
+  "orientation.rotate": "Please rotate your device to landscape",
+  "levelUp.rerollTouch": "Reroll ({count} left)",
+  "levelUp.skipTouch": "Skip (+1 reroll)",
+  "levelUp.banTouch": "Banish ({count} left)"
 }

@@ -70,12 +70,16 @@ export class ResultScene extends Phaser.Scene {
       this.cameras.main.setBackgroundColor('#000000');
       const { width, height } = this.scale;
       const clear = summary.outcome === 'clear';
-      const boxW = Math.min(width - 32, 720);
+      // 画面の高さが低い（横向きのスマホ）ときは、見出しを小さくし、技を右に並べて1画面に収める
+      const compact = height < 520;
+      const boxW = Math.min(width - 32, compact ? 760 : 720);
       const x0 = (width - boxW) / 2;
       const g = this.add.graphics();
       // 見出し
-      drawWindow(g, x0, 24, boxW, 72, 'dark');
-      this.add.text(width / 2, 60, t(`run.${summary.outcome}`), px(32, clear ? '#f8d030' : '#f87878')).setOrigin(0.5);
+      const headY = compact ? 8 : 24;
+      const headH = compact ? 44 : 72;
+      drawWindow(g, x0, headY, boxW, headH, 'dark');
+      this.add.text(width / 2, headY + headH / 2, t(`run.${summary.outcome}`), px(compact ? 24 : 32, clear ? '#f8d030' : '#f87878')).setOrigin(0.5);
       // 結果（左に項目、右に値）
       const rows: [string, string][] = [
         [t('result.label.pokemon'), summary.pokemonName],
@@ -84,8 +88,9 @@ export class ResultScene extends Phaser.Scene {
         [t('result.label.kills'), String(summary.kills)],
         [t('result.label.coins'), String(summary.coins)],
       ];
-      const lineH = 32;
-      const listTop = 24 + 72 + 16;
+      const lineH = compact ? 24 : 32;
+      const listTop = headY + headH + (compact ? 8 : 16);
+      const pad = compact ? 14 : 24;
       const extra: string[] = [
         ...(summary.legendary ? [t(`result.legendary.${summary.legendary.result}`, { name: summary.legendary.name })] : []),
         ...(summary.newAchievements.length ? [t('result.newAchievements', { list: summary.newAchievements.join(' / ') })] : []),
@@ -93,24 +98,28 @@ export class ResultScene extends Phaser.Scene {
         ...(summary.rewards?.length ? [t('result.rewards', { list: summary.rewards.join(' / ') })] : []),
       ];
       const movesText = summary.moves.join('\n');
-      const listH = 24 + rows.length * lineH + 8 + summary.moves.length * 24 + (extra.length ? 16 + extra.length * 24 : 0) + 16;
+      // 狭いときは、項目と値を左半分、技を右半分に並べる
+      const movesBelow = compact ? 0 : 8 + summary.moves.length * 24;
+      const body = Math.max(rows.length * lineH, compact ? summary.moves.length * 24 : 0);
+      const listH = pad + body + movesBelow + (extra.length ? 12 + extra.length * 24 : 0) + pad;
       drawWindow(g, x0, listTop, boxW, listH, 'dark');
       const text = uiConfig.dark.text;
       rows.forEach(([label, value], i) => {
-        const y = listTop + 24 + i * lineH;
+        const y = listTop + pad + i * lineH;
         this.add.text(x0 + 32, y, label, px(16, text));
-        this.add.text(x0 + boxW - 32, y, value, px(16, text)).setOrigin(1, 0);
+        this.add.text(compact ? x0 + boxW / 2 - 16 : x0 + boxW - 32, y, value, px(16, text)).setOrigin(1, 0);
       });
-      const movesTop = listTop + 24 + rows.length * lineH + 8;
-      this.add.text(x0 + 32, movesTop, movesText, px(16, '#a8d8f8', { lineSpacing: 8 }));
-      if (extra.length) this.add.text(x0 + 32, movesTop + summary.moves.length * 24 + 16, extra.join('\n'), px(16, '#f8d030', { lineSpacing: 8, wordWrap: { width: boxW - 64 } }));
+      const movesTop = compact ? listTop + pad : listTop + pad + rows.length * lineH + 8;
+      this.add.text(compact ? x0 + boxW / 2 + 16 : x0 + 32, movesTop, movesText, px(16, '#a8d8f8', { lineSpacing: 8 }));
+      const extraTop = listTop + pad + body + movesBelow + 12;
+      if (extra.length) this.add.text(x0 + 32, extraTop, extra.join('\n'), px(16, '#f8d030', { lineSpacing: 8, wordWrap: { width: boxW - 64 } }));
       // ボタン
       const buttons: [string, () => void][] = [...(retry ? ([[t('result.retry'), again]] as [string, () => void][]) : []), [t('result.toTitle'), toTitle]];
-      const by = Math.min(height - 40, listTop + listH + 48);
+      const by = Math.min(height - 30, listTop + listH + (compact ? 32 : 48));
       const bw = Math.min(280, (boxW - 16) / buttons.length);
       buttons.forEach(([label, onClick], i) => {
         const x = width / 2 + (i - (buttons.length - 1) / 2) * (bw + 16);
-        pixelButton(this, x, by, bw, 48, label, onClick, { kind: 'dark' });
+        pixelButton(this, x, by, bw, compact ? 44 : 48, label, onClick, { kind: 'dark' });
       });
     };
     layout();

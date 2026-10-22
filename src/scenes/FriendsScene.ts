@@ -5,7 +5,7 @@ import { formatTag, NICKNAME_MAX } from '../meta/nickname';
 import { session } from '../meta/session';
 
 // 原作をまねた白い窓のボタン（作者の決定。2026年10月22日。src/render/pixelUi.ts の windowCss と同じ見た目）
-const BUTTON = 'padding:8px 14px;cursor:pointer;font:inherit;font-size:16px;background:#f8f8f8;color:#383848;border:4px solid #383848;border-radius:6px;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #a8b8c8';
+const BUTTON = 'min-height:44px;padding:8px 14px;cursor:pointer;font:inherit;font-size:16px;background:#f8f8f8;color:#383848;border:4px solid #383848;border-radius:6px;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #a8b8c8';
 const INPUT = 'flex:1;min-width:0;padding:8px;font:inherit;border-radius:6px;border:4px solid #383848;background:#f8f8f8;color:#383848';
 
 /**

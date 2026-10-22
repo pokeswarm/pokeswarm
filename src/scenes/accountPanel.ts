@@ -5,7 +5,7 @@ import { session } from '../meta/session';
 import { windowCss } from '../render/pixelUi';
 
 /** ドット調のボタン（原作をまねた白い窓。作者の決定 2026年10月22日） */
-const BUTTON = `${windowCss('light')};padding:8px 16px;cursor:pointer;font:inherit;font-size:16px`;
+const BUTTON = `${windowCss('light')};min-height:44px;padding:8px 16px;cursor:pointer;font:inherit;font-size:16px`;
 
 /** 記録の短いまとめ（タイトル画面と、データを選ぶ画面に出す） */
 function summary(d: Readonly<SaveData>): string {
@@ -29,7 +29,7 @@ export class AccountPanel {
   constructor() {
     this.root = document.createElement('div');
     // 右下に小さく（メニューのボタンに重ならないように）。黒い窓
-    this.root.style.cssText = `${windowCss('dark')};position:fixed;right:8px;bottom:8px;padding:12px 16px;font-size:16px;line-height:1.6;text-align:left;z-index:20;max-width:min(420px, 90vw)`;
+    this.root.style.cssText = `${windowCss('dark')};position:fixed;right:8px;bottom:8px;padding:12px 16px;font-size:16px;line-height:1.6;text-align:left;z-index:20;overflow-wrap:anywhere;box-sizing:border-box;max-width:min(420px, ${window.innerHeight < 520 ? '46vw' : '90vw'})`;
     document.body.appendChild(this.root);
     this.unsubscribe.push(session.onStatus(() => this.render()), session.store.onChange(() => this.render()));
     this.render();

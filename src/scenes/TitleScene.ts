@@ -145,28 +145,30 @@ export class TitleScene extends Phaser.Scene {
       ui = this.add.container(0, 0).setDepth(10);
       backdrop.layout();
       const { width, height } = this.scale;
-      // ロゴ: 黒い窓に大きなドットの文字
+      // 画面の高さが低い（横向きのスマホ）ときは、ロゴを小さくし、メニューを2列にする（ボタンは指で押せる高さ 44 以上）
+      const compact = height < 520;
       const logoW = Math.min(width - 32, 640);
+      const logoH = compact ? 64 : 136;
+      const logoY = compact ? 8 : height * 0.08;
       const g = this.add.graphics();
-      drawWindow(g, (width - logoW) / 2, height * 0.08, logoW, 136, 'dark');
-      ui.add([
-        g,
-        this.add.text(width / 2, height * 0.08 + 52, t('title.name'), px(width >= 640 ? 48 : 32, '#f8d030', { outline: true })).setOrigin(0.5),
-        this.add.text(width / 2, height * 0.08 + 108, t('title.subtitle'), px(16, uiConfig.dark.text)).setOrigin(0.5),
-      ]);
-      // メニュー。狭い画面では左に寄せる（右下のログインの窓と重ならないように）
-      const bw = Math.min(width - 32, 360);
-      const bh = height < 700 ? 40 : 48;
-      const gap = height < 700 ? 6 : 8;
-      const top = height * 0.08 + 136 + (height < 700 ? 16 : 32);
-      // 真ん中はピカチュウが歩くので、メニューは左に寄せる
-      const mx = Math.min(width / 2, Math.max(16 + bw / 2, width * 0.2));
-      buttons = items.map((it, i) =>
-        pixelButton(this, mx, top + bh / 2 + i * (bh + gap), bw, bh, it.label, () => go(i)).on('pointerover', () => {
+      drawWindow(g, (width - logoW) / 2, logoY, logoW, logoH, 'dark');
+      ui.add([g, this.add.text(width / 2, logoY + (compact ? 32 : 52), t('title.name'), px(compact || width < 640 ? 32 : 48, '#f8d030', { outline: true })).setOrigin(0.5)]);
+      if (!compact) ui.add(this.add.text(width / 2, logoY + 108, t('title.subtitle'), px(16, uiConfig.dark.text)).setOrigin(0.5));
+      // メニュー。真ん中はピカチュウが歩くので、左に寄せる（右下のログインの窓と重ならないように）
+      const cols = compact ? 2 : 1;
+      const bw = compact ? Math.min(180, (width / 2 - 24) / 2) : Math.min(width - 32, 360);
+      const bh = compact || height < 700 ? 44 : 48;
+      const gap = compact ? 6 : height < 700 ? 6 : 8;
+      const top = logoY + logoH + (compact ? 10 : height < 700 ? 16 : 32);
+      const left = Math.min(width / 2 - (cols * bw + (cols - 1) * gap) / 2, Math.max(16, width * 0.2 - bw / 2));
+      buttons = items.map((it, i) => {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        return pixelButton(this, left + bw / 2 + col * (bw + gap), top + bh / 2 + row * (bh + gap), bw, bh, it.label, () => go(i)).on('pointerover', () => {
           selected = i;
           showCursor();
-        }),
-      );
+        });
+      });
       ui.add(buttons);
       showCursor();
     };

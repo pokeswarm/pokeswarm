@@ -359,5 +359,8 @@
   "achievement.raichu-5.name": "でんきの あいぼう",
   "achievement.raichu-5.desc": "ライチュウ（中ボス）を5回倒す",
   "result.rewards": "報酬: {list}",
-  "orientation.rotate": "よこむきに して あそんでね"
+  "orientation.rotate": "よこむきに して あそんでね",
+  "levelUp.rerollTouch": "リロール のこり {count}",
+  "levelUp.skipTouch": "見送る（リロール +1）",
+  "levelUp.banTouch": "除外 のこり {count}"
 }

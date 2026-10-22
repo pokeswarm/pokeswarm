@@ -6,6 +6,7 @@ import type { Player } from '../sim/entities/player';
 import { derivationCompletedBy } from '../sim/systems/leveling';
 import { itemIconKey, moveIconKey } from '../render/Icons';
 import { windowCss } from '../render/pixelUi';
+import { isTouchDevice } from '../render/TouchJoystick';
 import type { Modifiers } from '../sim/upgrades';
 import type { UpgradeOffer, World } from '../sim/world';
 
@@ -219,7 +220,11 @@ export class LevelUpPanel {
 
     // 原作をまねた白い窓（作者の決定。2026年10月22日）。説明はできるだけ短く: アイコン・名前・レベル・増えるもの
     const header = document.createElement('div');
-    header.style.cssText = `${windowCss('light')};display:flex;justify-content:space-between;align-items:center;padding:12px 20px;margin-bottom:12px;font-size:24px`;
+    // 画面の高さが低い（横向きのスマホ）ときは、つめて表示する（作者の決定: 指で押せる大きさは保つ）
+    const compact = window.innerHeight < 520;
+    const touch = isTouchDevice();
+    this.root.style.padding = compact ? '6px 2vw' : '20px 2vw';
+    header.style.cssText = `${windowCss('light')};display:flex;justify-content:space-between;align-items:center;padding:${compact ? '6px 14px' : '12px 20px'};margin-bottom:${compact ? 6 : 12}px;font-size:${compact ? 16 : 24}px`;
     const title = document.createElement('div');
     title.textContent = more > 0 ? t('levelUp.titleMore', { level, more }) : t('levelUp.title', { level });
     const timer = document.createElement('div');
@@ -228,12 +233,12 @@ export class LevelUpPanel {
     header.append(title, timer);
 
     const row = document.createElement('div');
-    row.style.cssText = 'display:flex;gap:16px;align-items:stretch';
+    row.style.cssText = `display:flex;gap:${compact ? 8 : 16}px;align-items:stretch`;
     offers.forEach((o, i) => {
       const card = document.createElement('button');
       // 派生・固有技は金色の枠、「おや……？」は青い枠。除外のモードでは、除外できるカードを赤い枠に
       const accent = this.banning ? (o.special ? undefined : '#e04040') : o.special ? '#d8a020' : o.evolvable ? '#3890e8' : undefined;
-      card.style.cssText = `${windowCss('light', accent)};flex:1 1 0;min-width:0;min-height:26vh;padding:16px 18px 16px 34px;font:inherit;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:10px;overflow:hidden;position:relative`;
+      card.style.cssText = `${windowCss('light', accent)};flex:1 1 0;min-width:0;min-height:${compact ? 'auto' : '26vh'};padding:${compact ? '8px 10px 8px 28px' : '16px 18px 16px 34px'};font:inherit;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:${compact ? 6 : 10}px;overflow:hidden;position:relative`;
       // ▶ のカーソル（上に乗ったとき）
       const cursor = document.createElement('span');
       cursor.textContent = '▶';
@@ -280,19 +285,20 @@ export class LevelUpPanel {
     });
 
     const footer = document.createElement('div');
-    footer.style.cssText = 'display:flex;gap:16px;margin-top:12px';
+    footer.style.cssText = `display:flex;gap:${compact ? 8 : 16}px;margin-top:${compact ? 6 : 12}px`;
     const reroll = document.createElement('button');
-    reroll.textContent = t('levelUp.reroll', { count: rerolls });
+    // タッチの端末では、キーの案内（R・X・B）を出さない
+    reroll.textContent = t(touch ? 'levelUp.rerollTouch' : 'levelUp.reroll', { count: rerolls });
     reroll.disabled = rerolls <= 0;
     reroll.onclick = () => this.handlers.reroll();
     const skip = document.createElement('button');
-    skip.textContent = t('levelUp.skip');
+    skip.textContent = t(touch ? 'levelUp.skipTouch' : 'levelUp.skip');
     skip.onclick = () => this.handlers.skip();
     const ban = document.createElement('button');
-    ban.textContent = t('levelUp.ban', { count: bans });
+    ban.textContent = t(touch ? 'levelUp.banTouch' : 'levelUp.ban', { count: bans });
     ban.disabled = bans <= 0;
     ban.onclick = () => this.toggleBan();
-    for (const b of [reroll, skip, ban]) b.style.cssText = `${windowCss('light', b === ban && this.banning ? '#e04040' : undefined)};flex:1;padding:10px;cursor:pointer;font:inherit;font-size:16px;${b.disabled ? 'opacity:0.45;cursor:default' : ''}`;
+    for (const b of [reroll, skip, ban]) b.style.cssText = `${windowCss('light', b === ban && this.banning ? '#e04040' : undefined)};flex:1;min-height:44px;padding:${compact ? 6 : 10}px;cursor:pointer;font:inherit;font-size:16px;${b.disabled ? 'opacity:0.45;cursor:default' : ''}`;
     footer.append(reroll, skip, ban);
 
     this.root.replaceChildren(header, row, footer);

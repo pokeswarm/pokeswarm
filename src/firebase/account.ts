@@ -106,10 +106,24 @@ export class Account {
     }
   }
 
-  /** すでに Google のアカウントがあった: そちらへログインし、残すデータを選ぶ。ゲストのアカウントは消す */
+  /** すでに Google のアカウントがあった: ゲストのアカウントを消してから、そちらへログインし、残すデータを選ぶ */
   private async switchToExisting(guestUser: User, credential: OAuthCredential, choose: SaveChooser): Promise<void> {
     const guestData = structuredClone(this.store.current) as SaveData;
-    const googleUser = (await signInWithCredential(this.auth, credential)).user;
+    // 使わなくなったゲストのアカウントは、Google に切り替える「前」に消す（セーブデータは残るが、本人だけが読めるので誰も読めない）。
+    // Firebase の delete は、消したあとに「今ログインしている人」をログアウトさせる。切り替えた後に消していたため、
+    // Google のログインまで消え、Firestore に書けず（セーブが巻き戻る）、次に開くとゲストに戻っていた（作者の指摘 2026年10月23日）
+    await guestUser.delete().catch(() => undefined);
+    let googleUser: User;
+    try {
+      googleUser = (await signInWithCredential(this.auth, credential)).user;
+    } catch (err) {
+      // 切り替えに失敗したら、ログインしていないままにせず、新しいゲストでいまのデータを続ける
+      const guest = (await signInAnonymously(this.auth)).user;
+      await this.store.switchUser(guest.uid, this.saves);
+      this.store.replace(guestData);
+      await this.store.flush();
+      throw err;
+    }
     const googleData = await this.saves.read(googleUser.uid);
     const keep = googleData ? await choose(guestData, googleData) : 'guest';
     await this.store.switchUser(googleUser.uid, this.saves);
@@ -117,8 +131,6 @@ export class Account {
       this.store.replace(guestData);
       await this.store.flush();
     }
-    // 使わなくなったゲストのアカウント（セーブデータは残るが、本人だけが読めるので誰も読めない）
-    await guestUser.delete().catch(() => undefined);
   }
 
   /**

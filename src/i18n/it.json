@@ -377,5 +377,9 @@
   "select.unlockHint": "Per sbloccare: {condition}",
   "select.notUnlocked": "Non ancora sbloccato",
   "lobby.slotHost": "HOST",
-  "lobby.slotGuest": "OSPITE"
+  "lobby.slotGuest": "OSPITE",
+  "region.title": "Scegli una mappa",
+  "region.hint": "Clicca o usa le frecce per scegliere. Invio per confermare.",
+  "region.playables": "{n} giocabili",
+  "region.comingSoon": "Prossimamente"
 }

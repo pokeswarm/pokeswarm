@@ -1,0 +1,62 @@
+{
+  "regions": [
+    {
+      "id": "kanto",
+      "available": true,
+      "playables": [
+        "charmander",
+        "bulbasaur",
+        "squirtle",
+        "onix",
+        "staryu",
+        "pikachu",
+        "oddish",
+        "koffing",
+        "abra",
+        "growlithe",
+        "rhyhorn",
+        "lapras",
+        "machop",
+        "gastly",
+        "dratini",
+        "mewtwo",
+        "mew",
+        "articuno",
+        "zapdos",
+        "moltres"
+      ]
+    },
+    {
+      "id": "johto",
+      "available": false
+    },
+    {
+      "id": "hoenn",
+      "available": false
+    },
+    {
+      "id": "sinnoh",
+      "available": false
+    },
+    {
+      "id": "unova",
+      "available": false
+    },
+    {
+      "id": "kalos",
+      "available": false
+    },
+    {
+      "id": "alola",
+      "available": false
+    },
+    {
+      "id": "galar",
+      "available": false
+    },
+    {
+      "id": "paldea",
+      "available": false
+    }
+  ]
+}

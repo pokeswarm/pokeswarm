@@ -15,6 +15,7 @@ import spawnJson from '../../data/game/spawn.json';
 import combatJson from '../../data/game/combat.json';
 import movesJson from '../../data/game/moves.json';
 import playablesJson from '../../data/game/playables.json';
+import regionsJson from '../../data/game/regions.json';
 import levelingJson from '../../data/game/leveling.json';
 import itemsJson from '../../data/game/items.json';
 import derivationsJson from '../../data/game/derivations.json';
@@ -36,6 +37,7 @@ import generatedPokemonJson from '../../data/generated/pokemon.json';
 import generatedMovesJson from '../../data/generated/moves.json';
 import generatedItemsJson from '../../data/generated/items.json';
 import generatedTypesJson from '../../data/generated/types.json';
+import generatedRegionsJson from '../../data/generated/regions.json';
 import type { UnlocksConfig } from './schema';
 import { resolveEffectRecipes } from './effects';
 import {
@@ -47,6 +49,8 @@ import {
   generatedItemsSchema,
   generatedMovesSchema,
   generatedPokemonSchema,
+  generatedRegionsSchema,
+  regionsConfigSchema,
   generatedTypesSchema,
   groundConfigSchema,
   movesConfigSchema,
@@ -104,6 +108,7 @@ export const spawnConfig = load('game/spawn.json', spawnConfigSchema, spawnJson)
 export const combatConfig = load('game/combat.json', combatConfigSchema, combatJson);
 export const movesConfig = load('game/moves.json', movesConfigSchema, movesJson);
 export const playablesConfig = load('game/playables.json', playablesConfigSchema, playablesJson);
+export const regionsConfig = load('game/regions.json', regionsConfigSchema, regionsJson);
 export const levelingConfig = load('game/leveling.json', levelingConfigSchema, levelingJson);
 export const itemsConfig = load('game/items.json', itemsConfigSchema, itemsJson);
 export const derivationsConfig = load('game/derivations.json', derivationsConfigSchema, derivationsJson);
@@ -138,11 +143,18 @@ export const generated = {
   moves: load('generated/moves.json', generatedMovesSchema, generatedMovesJson),
   items: load('generated/items.json', generatedItemsSchema, generatedItemsJson),
   types: load('generated/types.json', generatedTypesSchema, generatedTypesJson),
+  regions: load('generated/regions.json', generatedRegionsSchema, generatedRegionsJson),
 };
 
 // ---- ファイルをまたぐ参照の検証 ----
 function check(ok: boolean, message: string): void {
   if (!ok) throw new Error(message);
+}
+check(regionsConfig.regions.some((r) => r.available), 'data/game/regions.json に遊べる地方（available: true）が1つも無いです');
+for (const r of regionsConfig.regions) {
+  check(!!generated.regions[r.id], `data/game/regions.json の地方 "${r.id}" が data/generated/regions.json にありません（data/pokeapi/targets.json の regions に足して npm run pokeapi）`);
+  check(!r.available || r.playables.length > 0, `data/game/regions.json の地方 "${r.id}" は遊べるのに playables が空です`);
+  for (const p of r.playables) check(!!playablesConfig.pokemon[p], `data/game/regions.json の地方 "${r.id}" のプレイアブル "${p}" が playables.json にありません`);
 }
 for (const wave of spawnConfig.waves) {
   for (const kind of wave.kinds) {

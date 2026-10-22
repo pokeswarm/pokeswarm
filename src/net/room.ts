@@ -23,7 +23,7 @@ import type { Transport } from './transport';
 
 /**
  * 協力プレイの部屋（最大 maxPlayers 人）。Realtime Database の rooms/<部屋ID> に次を置く:
- *   host, seed, createdAt … ホストが作る
+ *   host, seed, region, createdAt … ホストが作る（region は遊ぶ地方）
  *   members/<番号>       … { uid, pokemon }。番号はプレイヤーの番号（ホストは1、ゲストは2〜）。切断すると消える
  *   started              … ホストが開始したときの参加者（[{ id, pokemon }]）。開始後は入れない
  *   peers/<ゲストの番号>  … ホストとそのゲストの WebRTC の接続情報（offer・answer・candidates・mode）
@@ -129,6 +129,8 @@ export class Room {
     readonly role: 'host' | 'guest',
     readonly roomId: string,
     readonly seed: number,
+    /** 遊ぶ地方（ホストがマップの選択で決める） */
+    readonly region: string,
     readonly localId: PlayerId,
     private readonly options: RoomOptions,
   ) {}
@@ -138,13 +140,13 @@ export class Room {
   }
 
   /** 部屋を作る（ホスト） */
-  static async create(config: NetworkConfig, options: RoomOptions = {}): Promise<Room> {
+  static async create(config: NetworkConfig, region: string, options: RoomOptions = {}): Promise<Room> {
     const { db, uid } = await connectFirebase();
     const roomId = randomRoomId();
     const seed = randomSeed();
-    const room = new Room(db, config, 'host', roomId, seed, 1, options);
+    const room = new Room(db, config, 'host', roomId, seed, region, 1, options);
     await onDisconnect(ref(db, room.base)).remove();
-    await set(ref(db, room.base), { host: uid, seed, createdAt: serverTimestamp(), members: { 1: { uid, pokemon: '' } } });
+    await set(ref(db, room.base), { host: uid, seed, region, createdAt: serverTimestamp(), members: { 1: { uid, pokemon: '' } } });
     room.members.set(1, { pokemon: null, upgrades: {}, achievements: [] });
     room.watchMembers();
     return room;
@@ -156,7 +158,7 @@ export class Room {
     const base = `rooms/${roomId}`;
     const snap = await get(ref(db, base));
     if (!snap.exists()) throw new RoomError('notFound');
-    const data = snap.val() as { seed: number; started?: unknown };
+    const data = snap.val() as { seed: number; region?: string; started?: unknown };
     if (data.started) throw new RoomError('started');
     let slot = 0;
     const result = await runTransaction(ref(db, `${base}/members`), (current: Record<string, unknown> | null) => {
@@ -179,7 +181,7 @@ export class Room {
       await remove(ref(db, `${base}/members/${slot}`));
       throw new RoomError('notFound');
     }
-    const room = new Room(db, config, 'guest', roomId, data.seed, slot, options);
+    const room = new Room(db, config, 'guest', roomId, data.seed, data.region ?? '', slot, options);
     await onDisconnect(ref(db, `${base}/members/${slot}`)).remove();
     await onDisconnect(ref(db, `${base}/peers/${slot}`)).remove();
     await onDisconnect(ref(db, `${base}/relay/${slot}`)).remove();

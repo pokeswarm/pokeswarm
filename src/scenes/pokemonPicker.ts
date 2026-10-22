@@ -8,6 +8,8 @@ import { windowCss } from '../render/pixelUi';
 import { loadPokemonIcon } from '../render/pokemonIcons';
 
 export interface PokemonPickerOptions {
+  /** 並べるポケモン（地方のプレイアブル。data/game/regions.json） */
+  playables: readonly string[];
   /** 解放済みのポケモンを選んだとき（クリック・矢印キー） */
   onSelect(key: string): void;
   /** 決める（ダブルクリック・Enter）。無ければ選ぶだけ */
@@ -43,12 +45,12 @@ export function isPokemonUnlocked(key: string): boolean {
 
 /**
  * ポケモンの一覧（作者の案 2026年10月22日）。ソロのポケモン選択と協力プレイの待合室で使う。
- * プレイアブルのポケモンを全部アイコンで並べ、まだ解放していないものは黒塗りにする（名前は「？？？」、解放の条件だけ見せる）。
+ * 選んだ地方のプレイアブルのポケモンを全部アイコンで並べ、まだ解放していないものは黒塗りにする（名前は「？？？」、解放の条件だけ見せる）。
  * 下に、マウスを乗せている（無ければ選んでいる）ポケモンの詳しい情報を出す
  */
 export class PokemonPicker {
   readonly element: HTMLDivElement;
-  private readonly keys = Object.keys(playablesConfig.pokemon);
+  private readonly keys: string[];
   private readonly cells = new Map<string, HTMLDivElement>();
   private readonly detail: HTMLDivElement;
   private selected: string | null = null;
@@ -57,6 +59,7 @@ export class PokemonPicker {
   private hovered: string | null = null;
 
   constructor(private readonly opts: PokemonPickerOptions) {
+    this.keys = [...opts.playables];
     this.element = document.createElement('div');
     this.element.style.cssText = 'display:flex;flex-direction:column;gap:12px;min-width:0';
     const size = compact() ? uiConfig.picker.cellCompact : uiConfig.picker.cell;

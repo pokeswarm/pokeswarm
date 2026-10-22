@@ -125,8 +125,8 @@ export class TitleScene extends Phaser.Scene {
     let ui: Phaser.GameObjects.Container | null = null;
     const coop = !!firebaseOptionsFromEnv();
     const items: { label: string; key: string | null; go: () => void; stay?: boolean }[] = [
-      { label: t('title.menu.start'), key: null, go: () => this.scene.start('select') },
-      ...(coop ? [{ label: t('title.menu.coop'), key: 'C', go: () => this.scene.start('lobby', { mode: 'host' }) }] : []),
+      { label: t('title.menu.start'), key: null, go: () => this.scene.start('region', { next: 'solo' }) },
+      ...(coop ? [{ label: t('title.menu.coop'), key: 'C', go: () => this.scene.start('region', { next: 'coop' }) }] : []),
       ...(coop ? [{ label: t('title.menu.friends'), key: 'F', go: () => this.scene.start('friends') }] : []),
       { label: t('title.menu.achievements'), key: 'A', go: () => this.scene.start('achievements') },
       { label: t('title.menu.shop'), key: 'S', go: () => this.scene.start('shop') },

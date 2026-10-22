@@ -398,5 +398,9 @@
   "select.unlockHint": "解放の条件: {condition}",
   "select.notUnlocked": "まだ解放していません",
   "lobby.slotHost": "ホスト",
-  "lobby.slotGuest": "ゲスト"
+  "lobby.slotGuest": "ゲスト",
+  "region.title": "マップを えらぶ",
+  "region.hint": "クリックか矢印キーで選び、Enter で決める",
+  "region.playables": "プレイアブル {n}",
+  "region.comingSoon": "Coming soon"
 }

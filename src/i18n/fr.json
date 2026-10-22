@@ -377,5 +377,9 @@
   "select.unlockHint": "Pour débloquer : {condition}",
   "select.notUnlocked": "Pas encore débloqué",
   "lobby.slotHost": "HÔTE",
-  "lobby.slotGuest": "INVITÉ"
+  "lobby.slotGuest": "INVITÉ",
+  "region.title": "Choisissez une carte",
+  "region.hint": "Cliquez ou utilisez les flèches pour choisir. Entrée pour valider.",
+  "region.playables": "{n} jouables",
+  "region.comingSoon": "Bientôt disponible"
 }

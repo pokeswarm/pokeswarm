@@ -227,5 +227,16 @@
     "quick-claw",
     "silk-scarf",
     "moon-stone"
+  ],
+  "regions": [
+    "kanto",
+    "johto",
+    "hoenn",
+    "sinnoh",
+    "unova",
+    "kalos",
+    "alola",
+    "galar",
+    "paldea"
   ]
 }

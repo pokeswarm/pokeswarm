@@ -29,7 +29,7 @@ SpriteCollab ─┘                         └─▶ スプライトアトラ�
 | タイプ名（各言語） | 多言語表示 |
 
 - 取得結果はローカルにキャッシュし、PokeAPI に何度も問い合わせない。PokeAPI が公開している静的データ（リポジトリ）を使う方法も検討する。
-- 【実装済み】`npm run pokeapi`（`scripts/fetch-pokeapi.ts`）。対象は `data/pokeapi/targets.json`、出力は `data/generated/`（pokemon・moves・items・types。コミットする）。名前は日本語（かな）と英語。進化の条件は赤・緑の条件を優先する。
+- 【実装済み】`npm run pokeapi`（`scripts/fetch-pokeapi.ts`）。対象は `data/pokeapi/targets.json`、出力は `data/generated/`（pokemon・moves・items・types・regions。コミットする）。地方は名前だけ（マップの選択で使う）。名前は日本語（かな）と英語。進化の条件は赤・緑の条件を優先する。
 - 技の**性能**（威力・効果）は本家の数値をそのまま使わず、サバイバー系の技として手書きで定義する。PokeAPI からは名前だけを使う。
 
 ## 3. SpriteCollab から取得するもの

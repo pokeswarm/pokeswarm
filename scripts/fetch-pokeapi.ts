@@ -3,8 +3,8 @@
  *
  *   npm run pokeapi
  *
- * 入力: data/pokeapi/targets.json（取得するポケモン・技・持ち物のキー。タイプは全部）
- * 出力: data/generated/pokemon.json・moves.json・items.json・types.json（コミットする。ビルドに通信を使わないため）
+ * 入力: data/pokeapi/targets.json（取得するポケモン・技・持ち物・地方のキー。タイプは全部）
+ * 出力: data/generated/pokemon.json・moves.json・items.json・types.json・regions.json（コミットする。ビルドに通信を使わないため）
  *
  * 取得した応答は scripts/.cache/pokeapi/ に保存し、再取得しない（PokeAPI に何度も問い合わせない）。
  * 出力はキーの順に並べ、何度実行しても同じ内容になるようにする。
@@ -18,6 +18,7 @@ import {
   generatedItemsSchema,
   generatedMovesSchema,
   generatedPokemonSchema,
+  generatedRegionsSchema,
   generatedTypesSchema,
   pokeapiTargetsSchema,
   type GeneratedPokemon,
@@ -165,6 +166,13 @@ async function main(): Promise<void> {
     items[key] = { names: names(it.names, key) };
   }
 
+  // 地方（名前だけ）
+  const regions: Record<string, unknown> = {};
+  for (const key of targets.regions) {
+    const r = await get<{ names: LocalizedName[] }>(`region/${key}`);
+    regions[key] = { names: names(r.names, key) };
+  }
+
   // タイプと相性（今の世代の相性表）
   const typeList = await get<{ results: NamedRef[] }>('type?limit=100');
   const types: Record<string, unknown> = {};
@@ -188,6 +196,7 @@ async function main(): Promise<void> {
     'moves.json': generatedMovesSchema.parse(sortObject(moves)),
     'items.json': generatedItemsSchema.parse(sortObject(items)),
     'types.json': generatedTypesSchema.parse(sortObject(types)),
+    'regions.json': generatedRegionsSchema.parse(sortObject(regions)),
   };
   await mkdir(OUT_DIR, { recursive: true });
   for (const [file, data] of Object.entries(outputs)) {

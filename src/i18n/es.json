@@ -377,5 +377,9 @@
   "select.unlockHint": "Para desbloquear: {condition}",
   "select.notUnlocked": "Aún no desbloqueado",
   "lobby.slotHost": "ANFITRIÓN",
-  "lobby.slotGuest": "INVITADO"
+  "lobby.slotGuest": "INVITADO",
+  "region.title": "Elige un mapa",
+  "region.hint": "Haz clic o usa las flechas para elegir. Intro para confirmar.",
+  "region.playables": "{n} jugables",
+  "region.comingSoon": "Próximamente"
 }

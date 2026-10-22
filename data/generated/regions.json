@@ -1,0 +1,92 @@
+{
+  "alola": {
+    "names": {
+      "ja": "アローラ",
+      "en": "Alola",
+      "fr": "Alola",
+      "de": "Alola",
+      "es": "Alola",
+      "it": "Alola"
+    }
+  },
+  "galar": {
+    "names": {
+      "ja": "ガラル",
+      "en": "Galar",
+      "fr": "Galar",
+      "de": "Galar",
+      "es": "Galar",
+      "it": "Galar"
+    }
+  },
+  "hoenn": {
+    "names": {
+      "ja": "ホウエン",
+      "en": "Hoenn",
+      "fr": "Hoenn",
+      "de": "Hoenn",
+      "es": "Hoenn",
+      "it": "Hoenn"
+    }
+  },
+  "johto": {
+    "names": {
+      "ja": "ジョウト",
+      "en": "Johto",
+      "fr": "Johto",
+      "de": "Johto",
+      "es": "Johto",
+      "it": "Johto"
+    }
+  },
+  "kalos": {
+    "names": {
+      "ja": "カロス",
+      "en": "Kalos",
+      "fr": "Kalos",
+      "de": "Kalos",
+      "es": "Kalos",
+      "it": "Kalos"
+    }
+  },
+  "kanto": {
+    "names": {
+      "ja": "カントー",
+      "en": "Kanto",
+      "fr": "Kanto",
+      "de": "Kanto",
+      "es": "Kanto",
+      "it": "Kanto"
+    }
+  },
+  "paldea": {
+    "names": {
+      "ja": "パルデア",
+      "en": "Paldea",
+      "fr": "Paldea",
+      "de": "Paldea",
+      "es": "Paldea",
+      "it": "Paldea"
+    }
+  },
+  "sinnoh": {
+    "names": {
+      "ja": "シンオウ",
+      "en": "Sinnoh",
+      "fr": "Sinnoh",
+      "de": "Sinnoh",
+      "es": "Sinnoh",
+      "it": "Sinnoh"
+    }
+  },
+  "unova": {
+    "names": {
+      "ja": "イッシュ",
+      "en": "Unova",
+      "fr": "Unys",
+      "de": "Einall",
+      "es": "Unova",
+      "it": "Unima"
+    }
+  }
+}

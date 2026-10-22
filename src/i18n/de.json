@@ -377,5 +377,9 @@
   "select.unlockHint": "Freischalten: {condition}",
   "select.notUnlocked": "Noch nicht freigeschaltet",
   "lobby.slotHost": "HOST",
-  "lobby.slotGuest": "GAST"
+  "lobby.slotGuest": "GAST",
+  "region.title": "Karte wählen",
+  "region.hint": "Mit Klick oder Pfeiltasten wählen. Enter zum Bestätigen.",
+  "region.playables": "{n} spielbar",
+  "region.comingSoon": "Demnächst"
 }

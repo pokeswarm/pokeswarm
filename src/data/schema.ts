@@ -672,6 +672,25 @@ export const movesConfigSchema = z.object({ moves: z.record(z.string(), moveDefS
 export type MovesConfig = z.infer<typeof movesConfigSchema>;
 
 /** プレイアブルのポケモン。キーは PokeAPI のポケモンの名前 */
+/**
+ * 地方（マップの選択。作者の案 2026年10月22日）: 遊ぶ前に地方を選び、地方ごとにプレイアブルと出てくるポケモンを変える。
+ * 並びはマップの選択の順。available が false の地方は「Coming soon」で選べない
+ */
+export const regionsConfigSchema = z.object({
+  regions: z
+    .array(
+      z.object({
+        /** PokeAPI の地方のキー（名前は data/generated/regions.json） */
+        id: z.string(),
+        available: z.boolean(),
+        /** この地方で選べるプレイアブル（playables.json のキー）。遊べる地方だけ */
+        playables: z.array(z.string()).default([]),
+      }),
+    )
+    .min(1),
+});
+export type RegionsConfig = z.infer<typeof regionsConfigSchema>;
+
 export const playablesConfigSchema = z.object({
   pokemon: z.record(
     z.string(),
@@ -983,6 +1002,8 @@ export const pokeapiTargetsSchema = z.object({
   pokemon: z.array(z.string()),
   moves: z.array(z.string()),
   items: z.array(z.string()),
+  /** 地方（名前だけ。マップの選択で使う） */
+  regions: z.array(z.string()),
 });
 
 /** 名前（PokeAPI の各言語）。ヨーロッパの言語は、無ければ英語を使う */
@@ -1034,6 +1055,7 @@ export type GeneratedMove = z.infer<typeof generatedMoveEntrySchema>;
 export const generatedMovesSchema = z.record(z.string(), generatedMoveEntrySchema);
 
 export const generatedItemsSchema = z.record(z.string(), z.object({ names: localizedNames }));
+export const generatedRegionsSchema = z.record(z.string(), z.object({ names: localizedNames }));
 
 export const generatedTypeEntrySchema = z.object({
   names: localizedNames,

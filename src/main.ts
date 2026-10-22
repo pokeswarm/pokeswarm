@@ -13,6 +13,7 @@ import { LobbyScene, type LobbySceneData } from './scenes/LobbyScene';
 import { ResultScene } from './scenes/ResultScene';
 import { RunScene, type RunSceneData } from './scenes/RunScene';
 import { SelectScene } from './scenes/SelectScene';
+import { RegionScene } from './scenes/RegionScene';
 import { TitleScene } from './scenes/TitleScene';
 import { SettingsScene } from './scenes/SettingsScene';
 import { installAudioUnlock } from './audio';
@@ -69,6 +70,7 @@ async function start(): Promise<void> {
   // 開発中だけ、ブラウザの開発者ツールから画面を確かめられるようにする（公開版には入らない）
   if (import.meta.env.DEV) (window as unknown as { game?: Phaser.Game }).game = game;
   game.scene.add('title', TitleScene, !lobby && !run);
+  game.scene.add('region', RegionScene, false);
   game.scene.add('select', SelectScene, false);
   game.scene.add('lobby', LobbyScene, !!lobby, lobby ?? undefined);
   game.scene.add('run', RunScene, !!run, run ?? undefined);

@@ -398,5 +398,9 @@
   "select.unlockHint": "To unlock: {condition}",
   "select.notUnlocked": "Not unlocked yet",
   "lobby.slotHost": "HOST",
-  "lobby.slotGuest": "GUEST"
+  "lobby.slotGuest": "GUEST",
+  "region.title": "Choose a map",
+  "region.hint": "Click or use the arrow keys to choose. Press Enter to confirm.",
+  "region.playables": "{n} playable",
+  "region.comingSoon": "Coming soon"
 }

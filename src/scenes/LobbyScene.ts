@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { generated, networkConfig, playablesConfig, uiConfig } from '../data';
+import { generated, networkConfig, playablesConfig, regionsConfig, uiConfig } from '../data';
 import { localName } from '../data/simRules';
 import type { SpriteAnims } from '../data/schema';
 import { getLocale, t, type MessageKey } from '../i18n';
@@ -9,11 +9,14 @@ import { formatTag } from '../meta/nickname';
 import { session } from '../meta/session';
 import type { RunSceneData } from './RunScene';
 import { pokemonIconImage, PokemonPicker } from './pokemonPicker';
+import { defaultRegion } from './RegionScene';
 
 export interface LobbySceneData {
   /** host: 部屋を作る、join: roomId の部屋に入る */
   mode: 'host' | 'join';
   roomId?: string;
+  /** host: マップの選択で選んだ地方。ゲストは部屋に書いてある地方を使う */
+  region?: string;
   /** 確認用: 直接接続を試さず中継で始める・直接接続をわざと失敗させる */
   forceRelay?: boolean;
   simulateP2PFailure?: boolean;
@@ -97,7 +100,7 @@ export class LobbyScene extends Phaser.Scene {
     try {
       const { Room } = await import('../net/room');
       const options = { forceRelay: this.params.forceRelay, simulateP2PFailure: this.params.simulateP2PFailure };
-      const room = this.params.mode === 'host' ? await Room.create(networkConfig, options) : await Room.join(networkConfig, this.params.roomId ?? '', options);
+      const room = this.params.mode === 'host' ? await Room.create(networkConfig, this.params.region ?? defaultRegion(), options) : await Room.join(networkConfig, this.params.roomId ?? '', options);
       if (!this.sys.isActive()) {
         void room.leave();
         return;
@@ -162,7 +165,7 @@ export class LobbyScene extends Phaser.Scene {
     title.style.cssText = 'display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:6px';
     const titleText = document.createElement('span');
     titleText.style.cssText = 'font-size:24px;font-weight:bold';
-    titleText.textContent = t('lobby.title');
+    titleText.textContent = this.room ? `${t('lobby.title')} - ${localName(generated.regions[this.room.region]?.names, getLocale(), this.room.region)}` : t('lobby.title');
     title.append(titleText);
     const children: HTMLElement[] = [title];
 
@@ -217,7 +220,8 @@ export class LobbyScene extends Phaser.Scene {
 
       // 真ん中: ポケモンの一覧（選ぶとすぐ自分の枠に出る）
       const mine = room.memberList.find((m) => m.id === room.localId)?.pokemon ?? null;
-      this.picker ??= new PokemonPicker({ onSelect: (key) => void this.room?.choosePokemon(key) });
+      const region = regionsConfig.regions.find((r) => r.id === room.region && r.available) ?? regionsConfig.regions.find((r) => r.id === defaultRegion())!;
+      this.picker ??= new PokemonPicker({ playables: region.playables, onSelect: (key) => void this.room?.choosePokemon(key) });
       this.picker.setSelected(mine);
       this.picker.element.style.marginBottom = '10px';
       children.push(this.picker.element);

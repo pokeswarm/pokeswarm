@@ -426,5 +426,10 @@
   "shop.colRank": "Rang",
   "shop.colEffect": "Wirkung",
   "pattern.eruption": "Breitet sich in 8 Richtungen um dich aus",
-  "pattern.spin": "Dreht sich um dich"
+  "pattern.spin": "Dreht sich um dich",
+  "upgrade.kind.fallback": "Bonus",
+  "upgrade.heal.name": "Heilung",
+  "upgrade.heal.gain": "{pct} % KP wiederherstellen",
+  "upgrade.coins.name": "Münzen",
+  "upgrade.coins.gain": "Münzen +{coins}"
 }

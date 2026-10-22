@@ -25,7 +25,10 @@ export type UpgradeOffer =
   | { readonly kind: 'itemNew'; readonly item: number }
   | { readonly kind: 'itemUp'; readonly slot: number }
   /** 派生・固有技: slot の技を to に置き換える（材料の持ち物が消える持ち物ならなくなる） */
-  | { readonly kind: 'derive'; readonly slot: number; readonly to: number; readonly item: number; readonly unique: boolean };
+  | { readonly kind: 'derive'; readonly slot: number; readonly to: number; readonly item: number; readonly unique: boolean }
+  /** 候補が1つも無いときだけ出す: HP の回復・コイン（leveling.json の fallback） */
+  | { readonly kind: 'heal' }
+  | { readonly kind: 'coins' };
 
 /** レベルアップの選択の状態 */
 export interface LevelUpState {

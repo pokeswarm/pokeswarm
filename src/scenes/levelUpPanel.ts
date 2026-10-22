@@ -1,4 +1,5 @@
 import { generated } from '../data';
+import { pixelTextureKey } from '../render/PixelArt';
 import { moveTotalStrength } from '../data/moveStrength';
 import { localName } from '../data/simRules';
 import { getLocale, t, tMaybe } from '../i18n';
@@ -154,6 +155,10 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
         gains: itemGains(world, it.item, it.level, it.level + 1),
       };
     }
+    case 'heal':
+      return { ...base, icon: pixelTextureKey('potion'), kind: t('upgrade.kind.fallback'), name: t('upgrade.heal.name'), level: '', detail: '', gains: [t('upgrade.heal.gain', { pct: r.leveling.fallback.healPct })] };
+    case 'coins':
+      return { ...base, icon: pixelTextureKey('coin'), kind: t('upgrade.kind.fallback'), name: t('upgrade.coins.name'), level: '', detail: '', gains: [t('upgrade.coins.gain', { coins: r.leveling.fallback.coins })] };
     case 'derive':
       return {
         icon: moveIconKey(r, offer.to),

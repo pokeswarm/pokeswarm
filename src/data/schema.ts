@@ -1142,6 +1142,11 @@ export const levelingConfigSchema = z.object({
   maxItemSlots: z.number().int().positive(),
   /** 候補を選ぶときの技の重み（持ち物を1とする） */
   moveOfferWeight: z.number().positive(),
+  /**
+   * 候補が1つも無いとき（技も持ち物も強化しきった・枠が埋まった）に出すもの（作者の決定 2026年10月23日）:
+   * 最大HP の healPct % 回復、またはコインを coins 枚
+   */
+  fallback: z.object({ healPct: z.number().positive(), coins: z.number().int().positive() }),
 });
 export type LevelingConfig = z.infer<typeof levelingConfigSchema>;
 

@@ -447,5 +447,10 @@
   "shop.colRank": "Rank",
   "shop.colEffect": "Effect",
   "pattern.eruption": "Spreads out in 8 directions around you",
-  "pattern.spin": "Spins around you"
+  "pattern.spin": "Spins around you",
+  "upgrade.kind.fallback": "Bonus",
+  "upgrade.heal.name": "Heal",
+  "upgrade.heal.gain": "Restore {pct}% HP",
+  "upgrade.coins.name": "Coins",
+  "upgrade.coins.gain": "Coins +{coins}"
 }

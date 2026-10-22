@@ -271,6 +271,8 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
     while (k < pool.length - 1 && r >= weightOf(pool[k]!)) r -= weightOf(pool[k++]!);
     out.push(pool.splice(k, 1)[0]!);
   }
+  // 何も無いとき（技も持ち物も強化しきった・枠が埋まって組み合わせが合わない）は、回復かコインを選べる（作者の決定 2026年10月23日）
+  if (out.length === 0) return [{ kind: 'heal' }, { kind: 'coins' }];
   return out;
 }
 
@@ -287,6 +289,12 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
       break;
     case 'itemUp':
       p.items[offer.slot]!.level++;
+      break;
+    case 'heal':
+      p.hp = Math.min(p.maxHp, p.hp + (p.maxHp * world.rules.leveling.fallback.healPct) / 100);
+      break;
+    case 'coins':
+      p.bonusCoins = (p.bonusCoins ?? 0) + world.rules.leveling.fallback.coins;
       break;
     case 'derive': {
       p.moves[offer.slot] = { move: offer.to, level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0 };

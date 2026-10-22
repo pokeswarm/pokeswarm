@@ -75,6 +75,8 @@ export interface Player {
   readonly unlockedItems: ReadonlySet<number> | null;
   /** 持ち物の枠の追加（実績の報酬） */
   readonly extraItemSlots: number;
+  /** レベルアップの「コイン」で、このランの間にもらったコイン（ラン終了時に足す） */
+  bonusCoins?: number;
   /** ふしぎなアメの +3・+5 の重みに足す（実績の報酬） */
   readonly candyWeight: number;
   readonly banned: Set<string>;

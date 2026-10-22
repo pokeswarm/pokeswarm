@@ -175,6 +175,21 @@ describe('候補', () => {
     expect([...seen].sort()).toEqual([0, 2, 3]);
   });
 
+  it('候補が1つも無いときは、回復とコインを選べる（回復は最大HP の割合、コインはランの終わりに足す分）', () => {
+    const r = rules({ items: [] });
+    const sim = new Simulation({ tickRate: 30, seed: 2, rules: r });
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100, types: [2], moves: [] });
+    // 技を全部持って最大にする（新しい技も強化も出ない）
+    p.moves = r.moves.map((m, move) => ({ move, level: m.levels.length, cooldown: 0, burstLeft: 0, burstTimer: 0 }));
+    expect(makeOffers(sim.world, p)).toEqual([{ kind: 'heal' }, { kind: 'coins' }]);
+    p.maxHp = 100;
+    p.hp = 50;
+    applyOffer(sim.world, p, { kind: 'heal' });
+    expect(p.hp).toBe(70);
+    applyOffer(sim.world, p, { kind: 'coins' });
+    expect(p.bonusCoins).toBe(20);
+  });
+
   it('技は持ち物の2倍の重みで選ばれる', () => {
     const r = rules({ items: [upgrade('a', 5, false, {})], leveling: { offerCount: 1 } });
     const sim = new Simulation({ tickRate: 30, seed: 9, rules: r });

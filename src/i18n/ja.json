@@ -447,5 +447,10 @@
   "shop.colRank": "ランク",
   "shop.colEffect": "効果",
   "pattern.eruption": "自分を中心に八方へ広がる",
-  "pattern.spin": "自分のまわりを回る"
+  "pattern.spin": "自分のまわりを回る",
+  "upgrade.kind.fallback": "ボーナス",
+  "upgrade.heal.name": "回復",
+  "upgrade.heal.gain": "HP を {pct}% 回復",
+  "upgrade.coins.name": "コイン",
+  "upgrade.coins.gain": "コイン +{coins}"
 }

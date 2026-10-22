@@ -426,5 +426,10 @@
   "shop.colRank": "Rang",
   "shop.colEffect": "Effet",
   "pattern.eruption": "Se propage dans 8 directions autour de vous",
-  "pattern.spin": "Tourne autour de vous"
+  "pattern.spin": "Tourne autour de vous",
+  "upgrade.kind.fallback": "Bonus",
+  "upgrade.heal.name": "Soin",
+  "upgrade.heal.gain": "Rend {pct} % des PV",
+  "upgrade.coins.name": "Pièces",
+  "upgrade.coins.gain": "Pièces +{coins}"
 }

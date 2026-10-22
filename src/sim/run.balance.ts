@@ -15,7 +15,7 @@ import { elapsedSeconds, type UpgradeOffer } from './world';
  * - 経験値の玉が上限近くまでたまったら（新しい経験値は一番古い玉にまとめられる）、一番大きな玉を拾いに行く
  * - レベルアップでは 派生・固有技 > 技の強化 > 新しい技 > 持ち物 の順で選ぶ
  */
-const OFFER_PRIORITY: Record<UpgradeOffer['kind'], number> = { derive: 0, moveUp: 1, moveNew: 2, itemNew: 3, itemUp: 4 };
+const OFFER_PRIORITY: Record<UpgradeOffer['kind'], number> = { derive: 0, moveUp: 1, moveNew: 2, itemNew: 3, itemUp: 4, heal: 5, coins: 6 };
 /** 向きを変える間隔（毎回変えると細かく揺れるだけになる） */
 const RETARGET_SECONDS = 0.3;
 /** 打ち切る時間（ランは20分で終わる。伝説戦があればその分長くなる） */

@@ -426,5 +426,10 @@
   "shop.colRank": "Rango",
   "shop.colEffect": "Efecto",
   "pattern.eruption": "Se extiende en 8 direcciones a tu alrededor",
-  "pattern.spin": "Gira a tu alrededor"
+  "pattern.spin": "Gira a tu alrededor",
+  "upgrade.kind.fallback": "Bonificación",
+  "upgrade.heal.name": "Curar",
+  "upgrade.heal.gain": "Recupera un {pct} % de PS",
+  "upgrade.coins.name": "Monedas",
+  "upgrade.coins.gain": "Monedas +{coins}"
 }

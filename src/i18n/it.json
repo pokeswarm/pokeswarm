@@ -426,5 +426,10 @@
   "shop.colRank": "Grado",
   "shop.colEffect": "Effetto",
   "pattern.eruption": "Si espande in 8 direzioni intorno a te",
-  "pattern.spin": "Ruota intorno a te"
+  "pattern.spin": "Ruota intorno a te",
+  "upgrade.kind.fallback": "Bonus",
+  "upgrade.heal.name": "Cura",
+  "upgrade.heal.gain": "Recupera il {pct}% dei PS",
+  "upgrade.coins.name": "Monete",
+  "upgrade.coins.gain": "Monete +{coins}"
 }

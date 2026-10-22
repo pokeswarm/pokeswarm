@@ -6,5 +6,6 @@
   "initialRerolls": 1,
   "resumeInvincibleSeconds": 1.0,
   "maxItemSlots": 6,
-  "moveOfferWeight": 2
+  "moveOfferWeight": 2,
+  "fallback": { "healPct": 20, "coins": 20 }
 }

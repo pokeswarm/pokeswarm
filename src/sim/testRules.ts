@@ -71,6 +71,7 @@ export function testRules(
     curve: 0,
   };
   const leveling = {
+    fallback: { healPct: 20, coins: 20 },
     maxLevel: 100,
     xpCurve: { base: 5, exponent: 1.3 },
     offerCount: 3,

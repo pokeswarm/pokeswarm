@@ -115,7 +115,12 @@ export class RunRecorder {
     return Math.floor(
       coinsForRun(this.shop, { seconds: elapsedSeconds(world), kills: this.runKills, midbosses: this.runMidbosses, bosses: this.runBosses, clear: false, legendaryWon: false }) *
         (1 + greed / 100),
-    );
+    ) + this.bonusCoins(world);
+  }
+
+  /** レベルアップの「コイン」でもらった分（自分の分だけ） */
+  private bonusCoins(world: World): number {
+    return world.players.find((p) => p.id === world.localPlayerId)?.bonusCoins ?? 0;
   }
 
   /** ラン終了時: 残りを足し、回数・クリア・最高記録を記録する */
@@ -145,8 +150,8 @@ export class RunRecorder {
           legendaryWon: this.runLegendary > 0,
           }) *
             (1 + greed / 100),
-        )
-      : 0;
+        ) + this.bonusCoins(world)
+      : this.bonusCoins(world);
     this.store.update((d) => {
       d.coins += this.coinsEarned;
       if (this.coinsEarned > 0) d.stats.coinsEarned = (d.stats.coinsEarned ?? 0) + this.coinsEarned;

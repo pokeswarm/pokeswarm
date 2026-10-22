@@ -19,6 +19,8 @@ export interface RunSummary {
   /** このランで新しく達成した実績・解放したポケモン（名前） */
   newAchievements: string[];
   newUnlocks: string[];
+  /** このランで達成した実績の報酬（持ち物・コイン・バフ。解放したポケモンは newUnlocks） */
+  rewards?: string[];
   /** このランでもらったコイン */
   coins: number;
   /** 伝説戦の結果（伝説の名前と、won 倒した・lost 全員倒れた・timeUp 逃げられた） */
@@ -88,6 +90,7 @@ export class ResultScene extends Phaser.Scene {
         ...(summary.legendary ? [t(`result.legendary.${summary.legendary.result}`, { name: summary.legendary.name })] : []),
         ...(summary.newAchievements.length ? [t('result.newAchievements', { list: summary.newAchievements.join(' / ') })] : []),
         ...(summary.newUnlocks.length ? [t('result.newUnlocks', { list: summary.newUnlocks.join(' / ') })] : []),
+        ...(summary.rewards?.length ? [t('result.rewards', { list: summary.rewards.join(' / ') })] : []),
       ];
       const movesText = summary.moves.join('\n');
       const listH = 24 + rows.length * lineH + 8 + summary.moves.length * 24 + (extra.length ? 16 + extra.length * 24 : 0) + 16;

@@ -69,6 +69,12 @@ export interface Player {
   readonly permanent: Modifiers | null;
   /** 候補の除外（BAN）の残り回数と、除外したもの（"move:番号" など。そのランでは二度と候補に出ない） */
   bans: number;
+  /** 候補に出る持ち物（SimRules.items の番号）。null ならすべて（実績の報酬。07 24章） */
+  readonly unlockedItems: ReadonlySet<number> | null;
+  /** 持ち物の枠の追加（実績の報酬） */
+  readonly extraItemSlots: number;
+  /** ふしぎなアメの +3・+5 の重みに足す（実績の報酬） */
+  readonly candyWeight: number;
   readonly banned: Set<string>;
 }
 
@@ -92,6 +98,9 @@ export interface PlayerInit {
   permanent?: Modifiers | null;
   /** 候補の除外の回数 */
   bans?: number;
+  unlockedItems?: ReadonlySet<number> | null;
+  extraItemSlots?: number;
+  candyWeight?: number;
 }
 
 export function createPlayer(init: PlayerInit): Player {
@@ -130,6 +139,9 @@ export function createPlayer(init: PlayerInit): Player {
     down: false,
     permanent: init.permanent ?? null,
     bans: init.bans ?? 0,
+    unlockedItems: init.unlockedItems ?? null,
+    extraItemSlots: init.extraItemSlots ?? 0,
+    candyWeight: init.candyWeight ?? 0,
     banned: new Set(),
   };
 }

@@ -102,7 +102,7 @@ export class LobbyScene extends Phaser.Scene {
       this.room = room;
       this.message = null;
       // 自分の強化のレベルを知らせる（ほかの人の画面でも同じ強さで動かすため）
-      void room.setUpgrades(session.store.current.upgrades);
+      void room.setUpgrades(session.store.current.upgrades, session.store.current.achievements);
       room.onChange = () => this.render();
       room.onStart = (players) => this.startRun(players);
       room.onLeave = (id) => {

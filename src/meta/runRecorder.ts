@@ -13,8 +13,8 @@ import { coinsForRun, permanentBonus } from './shop';
  * 記録の名前（data/game/achievements.json の条件で使う）:
  *   kills, defeated.<ポケモン>, bossDefeated.<ポケモン>（中ボス・ボス・伝説として出たもの）, midbossKills, bossKills, legendaryKills, evolutions, evolvedTo.<ポケモン>,
  *   derivations, derived.<技>, uniqueMoves, playSeconds,
- *   runs, runs.<ポケモン>, clears, clears.<ポケモン>, clears.solo, clears.coop,
- *   bestKills, bestLevel, longestSeconds（最高記録）
+ *   runs, runs.<ポケモン>, runs.coop, clears, clears.<ポケモン>, clears.solo, clears.coop,
+ *   bestKills, bestLevel, longestSeconds, bestMidbosses（最高記録）
  * 協力プレイ（03_network.md 3.6）: 雑魚はとどめを刺した人だけ、中ボス・ボスは参加者全員に数える。
  */
 export class RunRecorder {
@@ -123,6 +123,7 @@ export class RunRecorder {
     if (this.finished) return;
     const clear = world.outcome === 'clear';
     this.count('runs');
+    if (world.role !== 'solo') this.count('runs.coop');
     this.count(`runs.${this.pokemon}`);
     if (clear) {
       this.count('clears');
@@ -150,6 +151,7 @@ export class RunRecorder {
       d.coins += this.coinsEarned;
       if (this.coinsEarned > 0) d.stats.coinsEarned = (d.stats.coinsEarned ?? 0) + this.coinsEarned;
       maxStat(d, 'bestKills', this.runKills);
+      maxStat(d, 'bestMidbosses', this.runMidbosses);
       maxStat(d, 'bestLevel', world.level);
       maxStat(d, 'longestSeconds', Math.floor(elapsedSeconds(world)));
     });

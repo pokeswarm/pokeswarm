@@ -1,3 +1,4 @@
+import type { ModifierData } from './schema';
 import { buildTypeChart, resolveMoveLevels, type SimMoveDef } from '../sim/moves';
 import { addModifiers, buildXpTable, emptyModifiers, resolveModifiers, type Modifiers, type SimUpgradeDef } from '../sim/upgrades';
 import type { SimEvolution, SimSpecies } from '../sim/species';
@@ -135,6 +136,15 @@ export function permanentModifiers(rules: SimRules, levels: Readonly<Record<stri
     out ??= emptyModifiers(rules.types.names.length);
     addModifiers(out, resolveModifiers(def.perLevel, rules.types.names), level);
   }
+  return out;
+}
+
+/** 永続の効果に、持ち物と同じ形の効果（実績のバフなど）を足す。どちらも無ければ null */
+export function mergeModifiers(rules: SimRules, base: Modifiers | null, extra: ModifierData): Modifiers | null {
+  const hasExtra = Object.values(extra).some((v) => typeof v === 'number' ? v !== 0 : v && Object.keys(v).length > 0);
+  if (!hasExtra) return base;
+  const out = base ?? emptyModifiers(rules.types.names.length);
+  addModifiers(out, resolveModifiers(extra, rules.types.names), 1);
   return out;
 }
 

@@ -36,8 +36,27 @@ export function achievementCondition(a: Achievement): string {
   return own;
 }
 
-/** 報酬（無ければ null） */
+/** 報酬（無ければ null）。ポケモン・持ち物・コイン・特殊なバフ */
 export function achievementReward(a: Achievement, playable: boolean): string | null {
-  if (a.reward?.pokemon) return t(playable ? 'achievement.reward.pokemon' : 'achievement.reward.pokemonLater', { name: pokemonName(a.reward.pokemon) });
+  const r = a.reward;
+  if (!r) return null;
+  if (r.pokemon) return t(playable ? 'achievement.reward.pokemon' : 'achievement.reward.pokemonLater', { name: pokemonName(r.pokemon) });
+  if (r.item) return t('achievement.reward.item', { name: localName(generated.items[r.item]?.names, getLocale(), r.item) });
+  if (r.coins) return t('achievement.reward.coins', { coins: r.coins });
+  const b = r.buff;
+  if (!b) return null;
+  if (b.startMoveLevel) return t('achievement.reward.startMoveLevel', { name: pokemonName(b.startMoveLevel.line), level: b.startMoveLevel.level });
+  if (b.coopXpPct) return t('achievement.reward.coopXp', { pct: b.coopXpPct });
+  if (b.candyWeight) return t('achievement.reward.candy');
+  if (b.itemSlots) return t('achievement.reward.itemSlots', { n: b.itemSlots });
+  if (b.startStatItem) return t('achievement.reward.startItem');
+  if (b.mods?.xpPct) return t('achievement.reward.xp', { pct: b.mods.xpPct });
+  if (b.mods?.pickupRangePct) return t('achievement.reward.pickup', { pct: b.mods.pickupRangePct });
   return null;
+}
+
+/** 達成した実績の報酬を、id から（ラン中のお知らせ・結果画面） */
+export function achievementRewardById(id: string): string | null {
+  const a = find(id);
+  return a ? achievementReward(a, true) : null;
 }

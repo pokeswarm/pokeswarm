@@ -208,6 +208,8 @@ function isBaseMove(world: World, move: number): boolean {
  */
 function itemFitsPlayer(world: World, p: Player, item: number): boolean {
   const def = world.rules.items[item]!;
+  // まだ解放していない持ち物は出さない（実績で解放する。作者の決定 07 24章）
+  if (p.unlockedItems && !p.unlockedItems.has(item)) return false;
   if (def.lines && !def.lines.includes(p.line)) return false;
   if (def.category !== 'type') return true;
   const normal = world.rules.types.names.indexOf('normal');
@@ -245,7 +247,7 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
   p.items.forEach((it, slot) => {
     if (it.level < rules.items[it.item]!.maxLevel) pool.push({ kind: 'itemUp', slot });
   });
-  if (p.items.length < rules.leveling.maxItemSlots) {
+  if (p.items.length < rules.leveling.maxItemSlots + p.extraItemSlots) {
     rules.items.forEach((_, item) => {
       // 自分がすでに持っている持ち物は「強化」で出す（ほかの人が持っていても出る。作者の決定で「誰かが持っていれば出さない」は廃止）
       if (p.items.some((it) => it.item === item)) return;

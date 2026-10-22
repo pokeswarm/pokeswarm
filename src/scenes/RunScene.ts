@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { achievementsConfig, effectRecipes, generated, groundConfig, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig } from '../data';
-import { buildSimRules, localName, permanentModifiers, playableLoadout } from '../data/simRules';
+import { buildSimRules, localName, mergeModifiers, permanentModifiers, playableLoadout } from '../data/simRules';
 import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
 import type { SpriteAnims } from '../data/schema';
@@ -32,9 +32,10 @@ import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole } from '../sim/world';
 import { applyDebugOverrides, parseLevelParam, parseMovesParam, parseSectionParam, parseTimeParam } from './debugOverrides';
-import { addXp } from '../sim/systems/leveling';
+import { addXp, applyOffer } from '../sim/systems/leveling';
+import { achievementPerks } from '../meta/achievementPerks';
 import { addDiscovery } from '../meta/discoveries';
-import { achievementName } from '../meta/achievementText';
+import { achievementName, achievementRewardById } from '../meta/achievementText';
 import { RunRecorder } from '../meta/runRecorder';
 import { session } from '../meta/session';
 import { LevelUpPanel, offerText } from './levelUpPanel';
@@ -187,11 +188,23 @@ export class RunScene extends Phaser.Scene {
       role,
       localPlayerId: this.localId,
     });
-    const roster: RoomPlayer[] = this.coop?.players ?? [{ id: HOST_PLAYER_ID, pokemon: this.pokemon, upgrades: session.store.current.upgrades }];
+    const roster: RoomPlayer[] = this.coop?.players ?? [{ id: HOST_PLAYER_ID, pokemon: this.pokemon, upgrades: session.store.current.upgrades, achievements: session.store.current.achievements }];
+    // 実績の報酬（07 23・24章）: 各自の達成した実績から、解放した持ち物・特殊なバフを計算する。協力プレイの経験値は部屋の全員に
+    const perksOf = new Map(roster.map((r) => [r.id, achievementPerks(achievementsConfig, r.achievements)]));
+    const coopXpPct = role === 'solo' ? 0 : Math.max(0, ...[...perksOf.values()].map((x) => x.coopXpPct));
     // 確認用の ?moves= はソロのときだけ
     const debugMoves = this.coop ? null : parseMovesParam(rules, window.location.search);
     for (const { id, pokemon, upgrades } of roster) {
       const loadout = playableLoadout(rules, pokemon);
+      const perks = perksOf.get(id)!;
+      // 最初の技のレベル（クリアの実績の報酬）
+      const startLevel = perks.startMoveLevel[loadout.line] ?? 1;
+      const startMoves = loadout.moves.map((m) => ({ ...m, level: Math.max(m.level, Math.min(startLevel, rules.moves[m.move]!.levels.length)) }));
+      // 永続の効果: ショップ ＋ 実績のバフ ＋ 協力プレイの経験値
+      const permanent = mergeModifiers(rules, permanentModifiers(rules, permanentBonus({ ...emptySave(), upgrades: { ...upgrades } }, shopConfig).levels), {
+        ...perks.mods,
+        xpPct: (perks.mods.xpPct ?? 0) + coopXpPct,
+      });
       // フレンドリィショップの強化（01_game_design.md 8.3）。協力プレイでは各自の強化を待合室で受け取っている
       const bonus = permanentBonus({ ...emptySave(), upgrades: { ...upgrades } }, shopConfig);
       this.sim.world.revives += bonus.revives;
@@ -204,13 +217,21 @@ export class RunScene extends Phaser.Scene {
         remote: id !== this.localId,
         pickupRange: playerConfig.pickupRange,
         types: loadout.types,
-        moves: debugMoves ?? loadout.moves,
+        moves: debugMoves ?? startMoves,
         line: loadout.line,
         species: loadout.species,
         rerolls: rules.leveling.initialRerolls + bonus.rerolls,
-        permanent: permanentModifiers(rules, bonus.levels),
+        permanent,
         bans: bonus.bans,
+        unlockedItems: new Set(rules.items.flatMap((it, i) => (perks.items.has(it.key) ? [i] : []))),
+        extraItemSlots: perks.itemSlots,
+        candyWeight: perks.candyWeight,
       });
+      // 伝説を倒した実績の報酬: 解放したステータスのアイテムを1つ持って始める（共有の乱数なので、どのブラウザでも同じ）
+      if (perks.startStatItem) {
+        const pool = rules.items.flatMap((it, i) => (it.category === 'stat' && p.unlockedItems?.has(i) ? [i] : []));
+        if (pool.length) applyOffer(this.sim.world, p, { kind: 'itemNew', item: pool[this.sim.world.rng.int(pool.length)]! });
+      }
       const sprite = id === this.localId ? this.playerSprite : (this.coop?.sprites.get(pokemon) ?? null);
       const view = new PlayerView(this, p, placeholderRender, spriteRender, sprite, true);
       view.container.setDepth(id === this.localId ? 1.1 : 1);
@@ -458,7 +479,16 @@ export class RunScene extends Phaser.Scene {
     this.newAchievements.push(...found.achievements);
     this.newUnlocks.push(...found.unlocks);
     if (found.achievements.length && !this.sim.world.outcome) {
-      this.announce(found.achievements.map((id) => t('run.achievement', { name: achievementName(id) })).join('\n'), '#a5d6a7');
+      // 実績の名前と報酬（作者の決定: 報酬は達成したときに分かる）
+      this.announce(
+        found.achievements
+          .map((id) => {
+            const reward = achievementRewardById(id);
+            return t('run.achievement', { name: achievementName(id) }) + (reward ? `\n${reward}` : '');
+          })
+          .join('\n'),
+        '#a5d6a7',
+      );
     }
   }
 
@@ -480,6 +510,12 @@ export class RunScene extends Phaser.Scene {
         // ポケモンの解放の実績は「新しく解放したポケモン」の欄に出すので、実績の欄には重ねて出さない
         newAchievements: this.newAchievements.filter((id) => !achievementsConfig.achievements.find((x) => x.id === id)?.reward?.pokemon).map((id) => achievementName(id)),
         newUnlocks: this.newUnlocks.map((key) => localName(generated.pokemon[key]?.names, getLocale(), key)),
+        // 達成した実績の報酬（持ち物・コイン・バフ。解放したポケモンは newUnlocks に出す）
+        rewards: this.newAchievements.flatMap((id) => {
+          if (achievementsConfig.achievements.find((x) => x.id === id)?.reward?.pokemon) return [];
+          const reward = achievementRewardById(id);
+          return reward ? [reward] : [];
+        }),
         coins: this.recorder.coinsEarned,
         legendary: this.legendaryResult?.result
           ? { name: this.enemyName(this.legendaryResult.kind), result: this.legendaryResult.result }

@@ -32,6 +32,8 @@ export function applyProgress(save: SaveData, achievements: AchievementsConfig, 
     if (save.achievements.includes(a.id) || !meets(save.stats, a.condition)) continue;
     save.achievements.push(a.id);
     newAchievements.push(a.id);
+    // 報酬のコイン（作者の決定 07 23章）
+    if (a.reward?.coins) save.coins += a.reward.coins;
   }
   const newUnlocks: string[] = [];
   for (const u of unlocks.unlocks) {

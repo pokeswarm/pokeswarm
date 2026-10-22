@@ -229,14 +229,71 @@ export const statConditionSchema: z.ZodType<StatCondition> = z.lazy(() =>
 );
 
 /**
+ * 持ち物の効果（1段階あたり）。% の項目は足し合わせてから掛ける。
+ * typePowerPct・typeAreaPct はタイプ（PokeAPI のキー）ごと。
+ */
+export const modifierSchema = z
+  .object({
+    powerPct: z.number(),
+    physicalPowerPct: z.number(),
+    specialPowerPct: z.number(),
+    typePowerPct: z.record(z.string(), z.number()),
+    areaPct: z.number(),
+    typeAreaPct: z.record(z.string(), z.number()),
+    cooldownPct: z.number(),
+    projectileSpeedPct: z.number(),
+    critChancePct: z.number(),
+    damageTakenPct: z.number(),
+    defensePct: z.number(),
+    maxHpPct: z.number(),
+    regenPerSecond: z.number(),
+    moveSpeedPct: z.number(),
+    pickupRangePct: z.number(),
+    xpPct: z.number(),
+    /** 技の数（発射数・落雷の数など）に足す数（ポイントマックス） */
+    amountBonus: z.number(),
+    /** 技の持続の時間 */
+    durationPct: z.number(),
+  })
+  .partial();
+export type ModifierData = z.infer<typeof modifierSchema>;
+
+/**
  * 実績（ポケモンの解放も実績に統合した。作者の決定 2026年10月22日）。
  * - 名前と説明は翻訳ファイルの achievement.<id>.name・desc。reward.pokemon の実績は、無ければ決まった文から作る
  * - reward: 達成したときにもらえるもの（pokemon = そのポケモンを解放する）。一覧では、達成するまで名前と報酬を伏せ、条件だけ見せる
  * - hidden は達成するまで条件も隠す（裏実績）。initialPokemon は最初から使えるポケモン
  */
-export const achievementRewardSchema = z.object({ pokemon: z.string().min(1).optional() });
+export const achievementRewardSchema = z.object({
+  /** そのポケモンを解放する */
+  pokemon: z.string().min(1).optional(),
+  /** その持ち物が候補に出るようになる（作者の決定 07 24章） */
+  item: z.string().min(1).optional(),
+  /** コインをもらう */
+  coins: z.number().int().positive().optional(),
+  /** 特殊なバフ（ショップでは買えない、小さな永続の効果。07 23章） */
+  buff: z
+    .object({
+      /** その系統の最初の技を、このレベルで始める */
+      startMoveLevel: z.object({ line: z.string(), level: z.number().int().min(2) }).optional(),
+      /** 協力プレイで、部屋の全員の経験値 +% */
+      coopXpPct: z.number().positive().optional(),
+      /** ふしぎなアメの +3・+5 の重みに足す */
+      candyWeight: z.number().positive().optional(),
+      /** 持ち物の枠を増やす */
+      itemSlots: z.number().int().positive().optional(),
+      /** 持ち物と同じ形の効果 */
+      mods: modifierSchema.optional(),
+      /** 解放したステータスのアイテムを1つ（ランダム）持って始める */
+      startStatItem: z.boolean().optional(),
+    })
+    .optional(),
+});
+export type AchievementReward = z.infer<typeof achievementRewardSchema>;
 export const achievementsConfigSchema = z.object({
   initialPokemon: z.array(z.string().min(1)).min(1),
+  /** 最初から候補に出る持ち物（ほかは実績で解放する） */
+  initialItems: z.array(z.string().min(1)).min(1),
   achievements: z.array(
     z.object({ id: z.string().min(1), condition: statConditionSchema, hidden: z.boolean().default(false), reward: achievementRewardSchema.optional() }),
   ),
@@ -989,35 +1046,7 @@ export const levelingConfigSchema = z.object({
 });
 export type LevelingConfig = z.infer<typeof levelingConfigSchema>;
 
-/**
- * 持ち物の効果（1段階あたり）。% の項目は足し合わせてから掛ける。
- * typePowerPct・typeAreaPct はタイプ（PokeAPI のキー）ごと。
- */
-export const modifierSchema = z
-  .object({
-    powerPct: z.number(),
-    physicalPowerPct: z.number(),
-    specialPowerPct: z.number(),
-    typePowerPct: z.record(z.string(), z.number()),
-    areaPct: z.number(),
-    typeAreaPct: z.record(z.string(), z.number()),
-    cooldownPct: z.number(),
-    projectileSpeedPct: z.number(),
-    critChancePct: z.number(),
-    damageTakenPct: z.number(),
-    defensePct: z.number(),
-    maxHpPct: z.number(),
-    regenPerSecond: z.number(),
-    moveSpeedPct: z.number(),
-    pickupRangePct: z.number(),
-    xpPct: z.number(),
-    /** 技の数（発射数・落雷の数など）に足す数（ポイントマックス） */
-    amountBonus: z.number(),
-    /** 技の持続の時間 */
-    durationPct: z.number(),
-  })
-  .partial();
-export type ModifierData = z.infer<typeof modifierSchema>;
+
 
 const upgradeDefSchema = z.object({
   /** 種類（07_content_draft.md 21.2）: stat = ステータスのアイテム、type = タイプのアイテム（自分のタイプとノーマルだけ候補に出る）、evolution = 進化の道具など */

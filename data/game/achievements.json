@@ -4,12 +4,37 @@
     "bulbasaur",
     "squirtle"
   ],
+  "initialItems": [
+    "x-attack",
+    "x-sp-atk",
+    "x-defense",
+    "hp-up",
+    "x-speed",
+    "dire-hit",
+    "silk-scarf",
+    "charcoal",
+    "mystic-water",
+    "miracle-seed",
+    "magnet",
+    "never-melt-ice",
+    "black-belt",
+    "poison-barb",
+    "soft-sand",
+    "sharp-beak",
+    "twisted-spoon",
+    "hard-stone",
+    "spell-tag",
+    "dragon-fang"
+  ],
   "achievements": [
     {
       "id": "first-run",
       "condition": {
         "stat": "runs",
         "atLeast": 1
+      },
+      "reward": {
+        "item": "dowsing-machine"
       }
     },
     {
@@ -17,6 +42,9 @@
       "condition": {
         "stat": "clears",
         "atLeast": 1
+      },
+      "reward": {
+        "item": "lucky-egg"
       }
     },
     {
@@ -24,6 +52,14 @@
       "condition": {
         "stat": "clears.charmander",
         "atLeast": 1
+      },
+      "reward": {
+        "buff": {
+          "startMoveLevel": {
+            "line": "charmander",
+            "level": 2
+          }
+        }
       }
     },
     {
@@ -31,6 +67,14 @@
       "condition": {
         "stat": "clears.bulbasaur",
         "atLeast": 1
+      },
+      "reward": {
+        "buff": {
+          "startMoveLevel": {
+            "line": "bulbasaur",
+            "level": 2
+          }
+        }
       }
     },
     {
@@ -38,6 +82,14 @@
       "condition": {
         "stat": "clears.squirtle",
         "atLeast": 1
+      },
+      "reward": {
+        "buff": {
+          "startMoveLevel": {
+            "line": "squirtle",
+            "level": 2
+          }
+        }
       }
     },
     {
@@ -45,6 +97,11 @@
       "condition": {
         "stat": "clears.coop",
         "atLeast": 1
+      },
+      "reward": {
+        "buff": {
+          "coopXpPct": 10
+        }
       }
     },
     {
@@ -52,6 +109,9 @@
       "condition": {
         "stat": "kills",
         "atLeast": 1000
+      },
+      "reward": {
+        "item": "quick-claw"
       }
     },
     {
@@ -59,6 +119,9 @@
       "condition": {
         "stat": "kills",
         "atLeast": 10000
+      },
+      "reward": {
+        "item": "metronome"
       }
     },
     {
@@ -66,6 +129,9 @@
       "condition": {
         "stat": "midbossKills",
         "atLeast": 1
+      },
+      "reward": {
+        "item": "wide-lens"
       }
     },
     {
@@ -73,6 +139,9 @@
       "condition": {
         "stat": "bossKills",
         "atLeast": 1
+      },
+      "reward": {
+        "item": "light-clay"
       }
     },
     {
@@ -80,6 +149,9 @@
       "condition": {
         "stat": "derivations",
         "atLeast": 1
+      },
+      "reward": {
+        "item": "pp-max"
       }
     },
     {
@@ -87,6 +159,9 @@
       "condition": {
         "stat": "uniqueMoves",
         "atLeast": 1
+      },
+      "reward": {
+        "coins": 1000
       }
     },
     {
@@ -106,6 +181,11 @@
             "atLeast": 1
           }
         ]
+      },
+      "reward": {
+        "buff": {
+          "candyWeight": 5
+        }
       }
     },
     {
@@ -125,6 +205,11 @@
             "atLeast": 1
           }
         ]
+      },
+      "reward": {
+        "buff": {
+          "itemSlots": 1
+        }
       }
     },
     {
@@ -133,6 +218,13 @@
       "condition": {
         "stat": "bestLevel",
         "atLeast": 70
+      },
+      "reward": {
+        "buff": {
+          "mods": {
+            "xpPct": 5
+          }
+        }
       }
     },
     {
@@ -141,6 +233,13 @@
       "condition": {
         "stat": "bestKills",
         "atLeast": 5000
+      },
+      "reward": {
+        "buff": {
+          "mods": {
+            "pickupRangePct": 20
+          }
+        }
       }
     },
     {
@@ -149,6 +248,89 @@
       "condition": {
         "stat": "legendaryKills",
         "atLeast": 1
+      },
+      "reward": {
+        "buff": {
+          "startStatItem": true
+        }
+      }
+    },
+    {
+      "id": "derive-flamethrower",
+      "condition": {
+        "stat": "derived.flamethrower",
+        "atLeast": 1
+      },
+      "reward": {
+        "item": "fire-stone"
+      }
+    },
+    {
+      "id": "derive-seed-bomb",
+      "condition": {
+        "stat": "derived.seed-bomb",
+        "atLeast": 1
+      },
+      "reward": {
+        "item": "leaf-stone"
+      }
+    },
+    {
+      "id": "derive-hydro-pump",
+      "condition": {
+        "stat": "derived.hydro-pump",
+        "atLeast": 1
+      },
+      "reward": {
+        "item": "water-stone"
+      }
+    },
+    {
+      "id": "derive-thunderbolt",
+      "condition": {
+        "stat": "derived.thunderbolt",
+        "atLeast": 1
+      },
+      "reward": {
+        "item": "thunder-stone"
+      }
+    },
+    {
+      "id": "derive-rock-slide",
+      "condition": {
+        "stat": "derived.rock-slide",
+        "atLeast": 1
+      },
+      "reward": {
+        "item": "moon-stone"
+      }
+    },
+    {
+      "id": "linking-cord",
+      "condition": {
+        "any": [
+          {
+            "stat": "runs.coop",
+            "atLeast": 1
+          },
+          {
+            "stat": "bestMidbosses",
+            "atLeast": 8
+          }
+        ]
+      },
+      "reward": {
+        "item": "linking-cord"
+      }
+    },
+    {
+      "id": "raichu-5",
+      "condition": {
+        "stat": "bossDefeated.raichu",
+        "atLeast": 5
+      },
+      "reward": {
+        "item": "light-ball"
       }
     },
     {

@@ -58,12 +58,13 @@ export function confirmItem(world: World, id: number, by: PlayerId): void {
   const k = world.items.findIndex((x) => x.id === id);
   if (k === -1) return;
   const it = world.items[k]!;
-  const levels = it.kind === 'rare-candy' ? rollCandy(world) : 0;
+  const levels = it.kind === 'rare-candy' ? rollCandy(world, world.players.find((p) => p.id === by)?.candyWeight ?? 0) : 0;
   applyItem(world, id, by, it.kind, levels);
 }
 
-function rollCandy(world: World): number {
-  const table = world.rules.pickups.items['rare-candy'].levels;
+/** アメの当たりを引く。bonus は、拾った人の +2 以上の当たりの重みに足す（実績の報酬） */
+function rollCandy(world: World, bonus: number): number {
+  const table = world.rules.pickups.items['rare-candy'].levels.map((x) => ({ ...x, weight: x.weight + (x.levels > 1 ? bonus : 0) }));
   const total = table.reduce((s, x) => s + x.weight, 0);
   let r = world.rng.next() * total;
   for (const x of table) {

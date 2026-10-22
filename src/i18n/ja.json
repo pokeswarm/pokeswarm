@@ -383,5 +383,11 @@
   "settings.language.de": "Deutsch",
   "settings.language.es": "Español",
   "settings.language.it": "Italiano",
-  "upgrade.detail": "{type}・{pattern}"
+  "upgrade.detail": "{type}・{pattern}",
+  "title.menu.donate": "きふ",
+  "donate.title": "PokéSwarm を応援する",
+  "donate.body": "PokéSwarm は、わたし1人で作っている非公式・非営利のファンゲームです。\n無料・広告なしで、だれでも遊べるように続けています。\nいただいたご支援は、協力プレイなどのサーバーの維持費と、これからのアップデートの開発に大切に使わせていただきます。\n楽しんでいただけたら、Ko-fi から応援していただけるととてもうれしいです。",
+  "donate.noAdvantage": "寄付をしても、ゲームの中で有利になることや、寄付した人だけのものは一切ありません。",
+  "donate.open": "Ko-fi で応援する",
+  "donate.notReady": "準備中"
 }

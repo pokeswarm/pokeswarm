@@ -62,6 +62,8 @@ export const uiConfigSchema = z.object({
    * ほかの遊べるポケモン（進化の途中・進化先も）が passerEverySeconds の間隔で画面の端から現れ、passerSpeed で横切っていく
    * （真ん中のポケモンには近づかない。keepAway px より近くを通らない）。shade はマップを暗くする割合
    */
+  /** 寄付（Ko-fi）のページの URL（作者の決定 2026年10月22日）。空なら寄付の窓のボタンは「準備中」 */
+  donate: z.object({ url: z.string() }),
   /** スマホのジョイスティック（作者の決定 2026年10月22日）: 輪の半径・つまみの半径・止まったままの遊び（px） */
   joystick: z.object({ radius: z.number().positive(), knob: z.number().positive(), deadzone: z.number().nonnegative() }),
   titleWalk: z.object({

@@ -105,7 +105,7 @@
 - [ ] `pokeswarm.org` の取得と Cloudflare への設定
 - [ ] Firebase の承認済みドメイン・セキュリティルール・予算アラート
 - [ ] 法的表記・クレジット・プライバシー・データ削除（クレジットには、ポケモンのドット絵の作者一覧 `public/sprites/credits.json`、持ち物のアイコンの権利表記 `data/render/item-icons.json` の `credit`、フォントの権利表記 `data/render/ui.json` の `font.credits` を出す）
-- [ ] Ko-fi の寄付の呼びかけ
+- [x] Ko-fi の寄付の呼びかけ（タイトルのメニューの「きふ」。Ko-fi のページの URL を `data/render/ui.json` の `donate.url` に入れる）
 - [ ] 一般公開
 
 ## 3. 未決定事項

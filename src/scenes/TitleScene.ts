@@ -3,6 +3,7 @@ import { firebaseOptionsFromEnv } from '../firebase/config';
 import { t } from '../i18n';
 import { AccountPanel } from './accountPanel';
 import { TitleFooter } from './creditsPanel';
+import { openDonatePanel } from './donatePanel';
 import { session } from '../meta/session';
 import { audio } from '../audio';
 import { bgmConfig, generated, groundConfig, playablesConfig, spriteRender, uiConfig } from '../data';
@@ -123,20 +124,23 @@ export class TitleScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off(Phaser.Scenes.Events.UPDATE, onUpdate));
     let ui: Phaser.GameObjects.Container | null = null;
     const coop = !!firebaseOptionsFromEnv();
-    const items: { label: string; key: string | null; go: () => void }[] = [
+    const items: { label: string; key: string | null; go: () => void; stay?: boolean }[] = [
       { label: t('title.menu.start'), key: null, go: () => this.scene.start('select') },
       ...(coop ? [{ label: t('title.menu.coop'), key: 'C', go: () => this.scene.start('lobby', { mode: 'host' }) }] : []),
       ...(coop ? [{ label: t('title.menu.friends'), key: 'F', go: () => this.scene.start('friends') }] : []),
       { label: t('title.menu.achievements'), key: 'A', go: () => this.scene.start('achievements') },
       { label: t('title.menu.shop'), key: 'S', go: () => this.scene.start('shop') },
       { label: t('title.menu.settings'), key: 'O', go: () => this.scene.start('settings') },
+      // 寄付の窓（作者の決定）。画面は移らないので、選んでもタイトルのまま
+      { label: t('title.menu.donate'), key: null, go: () => openDonatePanel(), stay: true },
     ];
     let selected = 0;
     let buttons: Phaser.GameObjects.Container[] = [];
     let leaving = false;
     const go = (i: number): void => {
       if (leaving) return;
-      leaving = true;
+      // 寄付のように窓を開くだけの項目は、タイトルに残る
+      if (!items[i]!.stay) leaving = true;
       items[i]!.go();
     };
     const showCursor = (): void => buttons.forEach((b, i) => (b.list[2] as Phaser.GameObjects.Text).setVisible(i === selected));

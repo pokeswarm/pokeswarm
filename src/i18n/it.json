@@ -362,5 +362,11 @@
   "credits.fonts": "Caratteri",
   "credits.music": "Musica ed effetti sonori",
   "credits.close": "Chiudi",
-  "upgrade.detail": "{type} · {pattern}"
+  "upgrade.detail": "{type} · {pattern}",
+  "title.menu.donate": "DONA",
+  "donate.title": "Sostieni PokéSwarm",
+  "donate.body": "PokéSwarm è un fan game non ufficiale e senza scopo di lucro, realizzato interamente da una sola persona.\nLo mantengo gratuito e senza pubblicità perché chiunque possa giocarci.\nIl tuo sostegno va alle spese del server (ad esempio per il multigiocatore) e allo sviluppo dei prossimi aggiornamenti.\nSe il gioco ti piace, un piccolo contributo su Ko-fi mi renderebbe davvero felice.",
+  "donate.noAdvantage": "Le donazioni non danno alcun vantaggio nel gioco e non c'è nulla riservato a chi dona.",
+  "donate.open": "Sostieni su Ko-fi",
+  "donate.notReady": "Prossimamente"
 }

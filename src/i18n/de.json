@@ -362,5 +362,11 @@
   "credits.fonts": "Schriften",
   "credits.music": "Musik und Soundeffekte",
   "credits.close": "Schließen",
-  "upgrade.detail": "{type} · {pattern}"
+  "upgrade.detail": "{type} · {pattern}",
+  "title.menu.donate": "SPENDEN",
+  "donate.title": "PokéSwarm unterstützen",
+  "donate.body": "PokéSwarm ist ein inoffizielles, nicht kommerzielles Fanspiel, das komplett von einer einzigen Person entwickelt wird.\nIch halte es kostenlos und werbefrei, damit alle es spielen können.\nDeine Unterstützung fließt in die Serverkosten (z. B. für den Mehrspieler) und in die Entwicklung künftiger Updates.\nWenn dir das Spiel gefällt, würde ich mich sehr über eine Unterstützung auf Ko-fi freuen.",
+  "donate.noAdvantage": "Spenden bringen keinerlei Vorteile im Spiel, und es gibt nichts, das nur Spendern vorbehalten ist.",
+  "donate.open": "Auf Ko-fi unterstützen",
+  "donate.notReady": "Bald verfügbar"
 }

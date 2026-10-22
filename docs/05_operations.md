@@ -38,8 +38,21 @@
 
 ## 3. 寄付（Ko-fi）
 
-- オプション画面に Ko-fi での寄付の呼びかけを置く。
-- 呼びかけ文に「寄付はサーバー代・ドメイン代に使い、ゲーム内の有利には一切ならない」と明記する。
+- 【決定】（作者。2026年10月22日）タイトルのメニューに「きふ（DONATE）」を置き、寄付の窓（`src/scenes/donatePanel.ts`）から Ko-fi のページを別のタブで開く。Ko-fi のページの URL は `data/render/ui.json` の `donate.url`（空のうちはボタンが「準備中」）。
+- 呼びかけ文: 完全に1人で作っていること、寄付は**サーバーの維持費とアップデートの開発**に使うこと、**寄付はゲーム内の有利に一切ならず、寄付した人だけのものも無い**こと（ゲームの中の文は6つの言語。翻訳ファイルの `donate.*`）。
+
+### 3.1 Ko-fi の紹介欄の文（作者が Ko-fi に貼る）
+日本語:
+> PokéSwarm は、わたし1人で作っている非公式・非営利のポケモンのファンゲーム（ブラウザで遊べるサバイバー系・最大4人の協力プレイ）です。無料・広告なしで、だれでも遊べるように続けています。
+> いただいたご支援は、協力プレイなどのサーバーの維持費と、これからのアップデートの開発に大切に使わせていただきます。
+> 寄付をしても、ゲームの中で有利になることや、寄付した人だけのものは一切ありません。楽しんでいただけたら、応援していただけるととてもうれしいです。
+> ※任天堂・クリーチャーズ・ゲームフリーク・株式会社ポケモンとは関係ありません。
+
+English:
+> PokéSwarm is an unofficial, non-commercial Pokémon fan game (a browser survivor-like with up to 4-player co-op), made entirely by one person. I keep it free and ad-free so that anyone can play.
+> Your support goes toward the server costs (such as co-op play) and the development of future updates.
+> Donations never give any in-game advantage, and there is nothing exclusive to donors. If you enjoy the game, a tip here would mean a lot to me.
+> PokéSwarm is not affiliated with Nintendo, Creatures, GAME FREAK or The Pokémon Company.
 - プレイ中に呼びかけを繰り返し表示しない。
 
 ## 4. 法的表記・プライバシー

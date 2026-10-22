@@ -64,5 +64,8 @@
     "radius": 56,
     "knob": 24,
     "deadzone": 12
+  },
+  "donate": {
+    "url": ""
   }
 }

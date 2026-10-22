@@ -9,7 +9,7 @@
 | コード | GitHub 組織 `pokeswarm` / リポジトリ `pokeswarm` |
 | 配信 | Cloudflare Workers の静的アセット配信（Workers Builds の GitHub 連携。main へのプッシュで自動公開。設定は `wrangler.jsonc`） |
 | 開発中のアドレス | Cloudflare Workers の無料アドレス https://pokeswarm.pokeswarm-dev.workers.dev/ |
-| 本番のアドレス | `pokeswarm.org`（Cloudflare で取得） |
+| 本番のアドレス | https://pokeswarm.org/ （Cloudflare で取得。2026年10月22日に取得し、Workers のカスタムドメインに設定済み） |
 
 - 【決定】ドメインは一般公開の前に取得する。公開後にアドレスを変えると、ログイン状態やブラウザ内のデータが引き継がれず、広まったリンクも切れるため。
 - プルリクエストごとのプレビュー公開を使い、本番に出す前に確認する。
@@ -77,3 +77,20 @@ English:
 
 - 権利者から申し入れがあった場合は、速やかに該当部分を公開停止する。
 - ゲームの仕組みとキャラクターのデータ・素材を分離しておくことで、必要な部分だけを差し替え・停止できるようにする。
+
+## 7. 無断の埋め込み・複製への対策（作者の相談 2026年10月22日）
+
+無料・広告なしのブラウザゲームは、海賊サイトに埋め込まれたり、ファイルを丸ごとコピーされたりして、広告付きのページで配られることがある。完全には防げないので、何重かに対策する。
+
+| | 対策 | 場所 |
+|---|---|---|
+| A | ほかのサイトの枠（iframe）の中では表示させない（`Content-Security-Policy: frame-ancestors 'self'`・`X-Frame-Options: SAMEORIGIN`） | `public/_headers`（Cloudflare の静的アセット配信が読む） |
+| B | それでも枠の中で開かれたら、ゲームを始めずに「無断で埋め込まれています。公式サイトで遊んでください」と出す | `src/render/siteGuard.ts` |
+| C | 公式以外のアドレスで動いたら、ゲームを始めずに「公式サイトではありません（無断の複製）」と出す。公式のアドレスは `data/site.json`（`pokeswarm.org`・`www`・開発用の `*.pokeswarm-dev.workers.dev`・`localhost`）。開発中（`npm run dev`）は確かめない | `src/render/siteGuard.ts`・`src/meta/officialSite.ts` |
+| D | Firebase を公式のアドレスからしか使えないようにする（作者が設定済み 2026年10月22日）。コピー先では協力プレイ・ログイン・セーブが動かない | Firebase の承認済みドメイン、Google Cloud の Browser key のウェブサイトの制限 |
+| E | タイトルの下に「公式サイトは https://pokeswarm.org だけ。広告の付いたページなどで遊んでいる場合は無断転載」と出す | `src/scenes/creditsPanel.ts` |
+
+- 公式のアドレスを足すとき（新しいドメイン・別の配信先）は、`data/site.json` と、D の2か所（Firebase の承認済みドメイン・Browser key の制限）をそろえて直す。どれかが漏れると、そのアドレスでゲームが止まるかログインが失敗する。
+- Browser key の制限には、ログインの画面が使う `https://<プロジェクトID>.firebaseapp.com/*` と開発用の `http://localhost:5173/*` も入れる。
+- ブラウザに残るデータ（ゲストの記録）はアドレスごとなので、workers.dev で遊んだ記録は pokeswarm.org には引き継がれない（Google でログインした記録はサーバーにあるので引き継がれる）。
+

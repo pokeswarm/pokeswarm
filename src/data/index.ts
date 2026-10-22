@@ -16,6 +16,7 @@ import combatJson from '../../data/game/combat.json';
 import movesJson from '../../data/game/moves.json';
 import playablesJson from '../../data/game/playables.json';
 import regionsJson from '../../data/game/regions.json';
+import siteJson from '../../data/site.json';
 import levelingJson from '../../data/game/leveling.json';
 import itemsJson from '../../data/game/items.json';
 import derivationsJson from '../../data/game/derivations.json';
@@ -51,6 +52,7 @@ import {
   generatedPokemonSchema,
   generatedRegionsSchema,
   regionsConfigSchema,
+  siteConfigSchema,
   generatedTypesSchema,
   groundConfigSchema,
   movesConfigSchema,
@@ -108,6 +110,7 @@ export const spawnConfig = load('game/spawn.json', spawnConfigSchema, spawnJson)
 export const combatConfig = load('game/combat.json', combatConfigSchema, combatJson);
 export const movesConfig = load('game/moves.json', movesConfigSchema, movesJson);
 export const playablesConfig = load('game/playables.json', playablesConfigSchema, playablesJson);
+export const siteConfig = load('site.json', siteConfigSchema, siteJson);
 export const regionsConfig = load('game/regions.json', regionsConfigSchema, regionsJson);
 export const levelingConfig = load('game/leveling.json', levelingConfigSchema, levelingJson);
 export const itemsConfig = load('game/items.json', itemsConfigSchema, itemsJson);

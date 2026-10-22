@@ -673,6 +673,17 @@ export type MovesConfig = z.infer<typeof movesConfigSchema>;
 
 /** プレイアブルのポケモン。キーは PokeAPI のポケモンの名前 */
 /**
+ * 公式サイト（作者の相談 2026年10月22日。広告付きのページへの埋め込み・丸ごとコピーへの対策）。
+ * officialUrl はタイトルの下と注意の画面に出す公式のアドレス。公開版は、allowedHosts のどれか、
+ * または allowedHostSuffixes のどれかで終わるアドレス（Cloudflare の開発用アドレスと、その版ごとのプレビュー）でだけ動く
+ */
+export const siteConfigSchema = z.object({
+  officialUrl: z.string().url(),
+  allowedHosts: z.array(z.string()).min(1),
+  allowedHostSuffixes: z.array(z.string()).default([]),
+});
+
+/**
  * 地方（マップの選択。作者の案 2026年10月22日）: 遊ぶ前に地方を選び、地方ごとにプレイアブルと出てくるポケモンを変える。
  * 並びはマップの選択の順。available が false の地方は「Coming soon」で選べない
  */

@@ -402,5 +402,10 @@
   "region.title": "Choose a map",
   "region.hint": "Click or use the arrow keys to choose. Press Enter to confirm.",
   "region.playables": "{n} playable",
-  "region.comingSoon": "Coming soon"
+  "region.comingSoon": "Coming soon",
+  "guard.title": "PokéSwarm",
+  "guard.framed": "This page has embedded PokéSwarm into another site without permission.\nPokéSwarm is a free, ad-free fan game that is only distributed on its official site.\nPlease play on the official site ({url}).",
+  "guard.unofficial": "This address is not the official PokéSwarm site (it is an unauthorized copy).\nPokéSwarm is a free, ad-free fan game that is only distributed on its official site.\nPlease play on the official site ({url}).",
+  "guard.open": "Open the official site",
+  "footer.official": "The only official site is {url}. If you are playing anywhere else, such as a page with ads, it is an unauthorized copy."
 }

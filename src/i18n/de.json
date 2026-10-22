@@ -381,5 +381,10 @@
   "region.title": "Karte wählen",
   "region.hint": "Mit Klick oder Pfeiltasten wählen. Enter zum Bestätigen.",
   "region.playables": "{n} spielbar",
-  "region.comingSoon": "Demnächst"
+  "region.comingSoon": "Demnächst",
+  "guard.title": "PokéSwarm",
+  "guard.framed": "Diese Seite hat PokéSwarm ohne Erlaubnis in eine andere Website eingebettet.\nPokéSwarm ist ein kostenloses, werbefreies Fanspiel, das nur auf der offiziellen Website angeboten wird.\nBitte spiele auf der offiziellen Website ({url}).",
+  "guard.unofficial": "Diese Adresse ist nicht die offizielle PokéSwarm-Website (es handelt sich um eine unerlaubte Kopie).\nPokéSwarm ist ein kostenloses, werbefreies Fanspiel, das nur auf der offiziellen Website angeboten wird.\nBitte spiele auf der offiziellen Website ({url}).",
+  "guard.open": "Offizielle Website öffnen",
+  "footer.official": "Die einzige offizielle Website ist {url}. Wenn du woanders spielst, etwa auf einer Seite mit Werbung, ist das eine unerlaubte Kopie."
 }

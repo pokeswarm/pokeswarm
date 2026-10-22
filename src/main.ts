@@ -1,5 +1,6 @@
 import { loadPixelFonts } from './render/pixelUi';
 import { startOrientationGuard } from './render/OrientationGuard';
+import { checkSite, showSiteGuard } from './render/siteGuard';
 import Phaser from 'phaser';
 import { placeholderRender, playablesConfig } from './data';
 import { migrateOldDiscoveries } from './meta/discoveries';
@@ -29,6 +30,12 @@ async function start(): Promise<void> {
   installAudioUnlock();
   // ドットのフォントを先に読み込む（作者の決定。読み込む前の文字は、ふつうのフォントで描かれてしまう）
   await loadPixelFonts().catch((e: unknown) => console.warn('フォントを読み込めませんでした', e));
+  // 公式のページ以外（ほかのサイトへの埋め込み・丸ごとコピー）では、ゲームを始めずに公式サイトを案内する
+  const problem = checkSite();
+  if (problem) {
+    showSiteGuard(problem);
+    return;
+  }
   // スマホは横向きだけ（縦向きのときは案内を出す）
   startOrientationGuard();
   // ログインとセーブデータの読み込みは待たずに始める（タイトル画面に状態を出す）

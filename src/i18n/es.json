@@ -381,5 +381,10 @@
   "region.title": "Elige un mapa",
   "region.hint": "Haz clic o usa las flechas para elegir. Intro para confirmar.",
   "region.playables": "{n} jugables",
-  "region.comingSoon": "Próximamente"
+  "region.comingSoon": "Próximamente",
+  "guard.title": "PokéSwarm",
+  "guard.framed": "Esta página ha insertado PokéSwarm en otro sitio sin permiso.\nPokéSwarm es un juego de fans gratuito y sin anuncios que solo se distribuye en su sitio oficial.\nJuega en el sitio oficial ({url}).",
+  "guard.unofficial": "Esta dirección no es el sitio oficial de PokéSwarm (es una copia no autorizada).\nPokéSwarm es un juego de fans gratuito y sin anuncios que solo se distribuye en su sitio oficial.\nJuega en el sitio oficial ({url}).",
+  "guard.open": "Abrir el sitio oficial",
+  "footer.official": "El único sitio oficial es {url}. Si juegas en otro lugar, como una página con anuncios, es una copia no autorizada."
 }

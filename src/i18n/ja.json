@@ -402,5 +402,10 @@
   "region.title": "マップを えらぶ",
   "region.hint": "クリックか矢印キーで選び、Enter で決める",
   "region.playables": "プレイアブル {n}",
-  "region.comingSoon": "Coming soon"
+  "region.comingSoon": "Coming soon",
+  "guard.title": "PokéSwarm",
+  "guard.framed": "このページは、PokéSwarm をほかのサイトに無断で埋め込んでいます。\nPokéSwarm は無料・広告なしのファンゲームで、公式サイトでしか配っていません。\n公式サイト（{url}）で遊んでください。",
+  "guard.unofficial": "このアドレスは PokéSwarm の公式サイトではありません（無断で複製されたものです）。\nPokéSwarm は無料・広告なしのファンゲームで、公式サイトでしか配っていません。\n公式サイト（{url}）で遊んでください。",
+  "guard.open": "公式サイトを開く",
+  "footer.official": "公式サイトは {url} だけです。広告の付いたページなど、ほかの場所で遊んでいる場合は無断転載です。"
 }

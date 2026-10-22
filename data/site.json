@@ -1,0 +1,12 @@
+{
+  "officialUrl": "https://pokeswarm.org",
+  "allowedHosts": [
+    "pokeswarm.org",
+    "www.pokeswarm.org",
+    "localhost",
+    "127.0.0.1"
+  ],
+  "allowedHostSuffixes": [
+    "pokeswarm-dev.workers.dev"
+  ]
+}

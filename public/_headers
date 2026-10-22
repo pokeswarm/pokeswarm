@@ -1,0 +1,5 @@
+# Cloudflare Workers の静的アセット配信のヘッダー（docs/05_operations.md 7章）。
+# ほかのサイトの枠（iframe）の中では表示させない（広告付きのページへの埋め込み対策）
+/*
+  Content-Security-Policy: frame-ancestors 'self'
+  X-Frame-Options: SAMEORIGIN

@@ -1,4 +1,4 @@
-import { bgmConfig, itemIcons, uiConfig } from '../data';
+import { bgmConfig, itemIcons, uiConfig, siteConfig } from '../data';
 import { t } from '../i18n';
 import { windowCss } from '../render/pixelUi';
 
@@ -24,6 +24,11 @@ export class TitleFooter {
     const notice = document.createElement('div');
     notice.style.cssText = 'flex:1;min-width:0;overflow-wrap:anywhere';
     notice.textContent = t('footer.notice');
+    // 公式サイトのアドレス（広告の付いたページなどで遊んでいる人に、無断転載だと分かるように）
+    const official = document.createElement('div');
+    official.style.cssText = `color:${uiConfig.picker.selected}`;
+    official.textContent = t('footer.official', { url: siteConfig.officialUrl });
+    notice.append(official);
     const button = document.createElement('button');
     button.style.cssText = `${windowCss('light')};min-height:44px;padding:6px 12px;cursor:pointer;font:inherit;font-size:16px;flex:none`;
     button.textContent = t('footer.credits');

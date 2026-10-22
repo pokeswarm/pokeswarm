@@ -318,8 +318,8 @@
   "mod.amountBonus": "技の数",
   "mod.durationPct": "技の持続",
   "mod.powerMultiplier": "技の威力 ×{v}（なくならない）",
-  "title.menu.start": "はじめる",
-  "title.menu.coop": "きょうりょくプレイ",
+  "title.menu.start": "ソロ",
+  "title.menu.coop": "マルチ",
   "title.menu.friends": "フレンド",
   "title.menu.achievements": "じっせき",
   "title.menu.shop": "ショップ",
@@ -362,5 +362,8 @@
   "orientation.rotate": "よこむきに して あそんでね",
   "levelUp.rerollTouch": "リロール のこり {count}",
   "levelUp.skipTouch": "見送る（リロール +1）",
-  "levelUp.banTouch": "除外 のこり {count}"
+  "levelUp.banTouch": "除外 のこり {count}",
+  "settings.language": "言語",
+  "settings.language.ja": "日本語",
+  "settings.language.en": "English"
 }

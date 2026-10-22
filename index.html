@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>PokéSwarm</title>
+    <!-- スマホはホーム画面に追加すると全画面で遊べる（作者の決定。ゲームの中に全画面のボタンは置かない） -->
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="PokéSwarm" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="apple-touch-icon" href="icons/icon-180.png" />
     <style>
       html, body { margin: 0; height: 100%; background: #000; overflow: hidden; overscroll-behavior: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
       /* スマホ: ゲームの画面では、指の操作で拡大・スクロールしない（一覧の画面は指でスクロールできるように、canvas だけ） */

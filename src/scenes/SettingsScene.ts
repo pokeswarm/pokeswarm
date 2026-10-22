@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { audio } from '../audio';
-import { t } from '../i18n';
+import { getLocale, LOCALES, setLocale, t } from '../i18n';
 
 // 原作をまねた白い窓のボタン（作者の決定。2026年10月22日。src/render/pixelUi.ts の windowCss と同じ見た目）
 const BUTTON = 'min-height:44px;padding:8px 14px;cursor:pointer;font:inherit;font-size:16px;background:#f8f8f8;color:#383848;border:4px solid #383848;border-radius:6px;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #a8b8c8';
@@ -59,6 +59,29 @@ export class SettingsScene extends Phaser.Scene {
     muteText.textContent = t('settings.muted');
     mute.append(box, muteText);
     root.append(mute);
+
+    // 言語（作者の決定 2026年10月22日）: 押すとすぐに切り替え、この画面を作り直す
+    const lang = document.createElement('div');
+    lang.style.cssText = 'display:flex;align-items:center;gap:10px;flex-wrap:wrap';
+    const langLabel = document.createElement('span');
+    langLabel.style.cssText = 'width:8em';
+    langLabel.textContent = t('settings.language');
+    lang.append(langLabel);
+    for (const locale of LOCALES) {
+      const b = document.createElement('button');
+      const selected = locale === getLocale();
+      b.style.cssText = BUTTON + (selected ? ';border-color:#d8a020;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #d8a020' : '');
+      // 言語の名前は、その言語自身の書き方で（どの言語を選んでいても読めるように）
+      b.textContent = t(`settings.language.${locale}`);
+      b.onclick = () => {
+        if (locale === getLocale()) return;
+        setLocale(locale);
+        audio.sfx.play('ui.select');
+        this.scene.restart();
+      };
+      lang.append(b);
+    }
+    root.append(lang);
 
     const buttons = document.createElement('div');
     buttons.style.cssText = 'display:flex;gap:10px;justify-content:flex-end';

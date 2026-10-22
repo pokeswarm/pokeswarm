@@ -153,7 +153,12 @@ export class TitleScene extends Phaser.Scene {
       const g = this.add.graphics();
       drawWindow(g, (width - logoW) / 2, logoY, logoW, logoH, 'dark');
       ui.add([g, this.add.text(width / 2, logoY + (compact ? 32 : 52), t('title.name'), px(compact || width < 640 ? 32 : 48, '#f8d030', { outline: true })).setOrigin(0.5)]);
-      if (!compact) ui.add(this.add.text(width / 2, logoY + 108, t('title.subtitle'), px(16, uiConfig.dark.text)).setOrigin(0.5));
+      if (!compact) {
+        const sub = this.add.text(width / 2, logoY + 108, t('title.subtitle'), px(16, uiConfig.dark.text)).setOrigin(0.5);
+        // 英語など、窓に収まらない長さなら小さい字にする
+        if (sub.width > logoW - 24) sub.setFontSize(8);
+        ui.add(sub);
+      }
       // メニュー。真ん中はピカチュウが歩くので、左に寄せる（右下のログインの窓と重ならないように）
       const cols = compact ? 2 : 1;
       const bw = compact ? Math.min(180, (width / 2 - 24) / 2) : Math.min(width - 32, 360);

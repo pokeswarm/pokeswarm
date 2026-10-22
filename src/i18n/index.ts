@@ -7,9 +7,21 @@ export type Locale = 'ja' | 'en';
 
 const messages: Record<Locale, Record<MessageKey, string>> = { ja, en };
 
+/** 設定画面で選んだ言語を覚えておく場所（ブラウザに保存する） */
+const STORAGE_KEY = 'pokeswarm.locale';
+/** 選べる言語（設定画面に並べる順） */
+export const LOCALES: readonly Locale[] = ['ja', 'en'];
+
 let current: Locale = detectLocale();
 
+/** 設定画面で選んだ言語。選んでいなければブラウザの言語（日本語でなければ英語） */
 function detectLocale(): Locale {
+  try {
+    const saved = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
+    if (saved && (LOCALES as readonly string[]).includes(saved)) return saved as Locale;
+  } catch {
+    // 保存できないブラウザ（プライベートモードなど）では、ブラウザの言語を使う
+  }
   const lang = typeof navigator !== 'undefined' ? navigator.language : 'ja';
   return lang.toLowerCase().startsWith('ja') ? 'ja' : 'en';
 }
@@ -18,8 +30,14 @@ export function getLocale(): Locale {
   return current;
 }
 
+/** 言語を変える（設定画面）。次に開いたときも同じ言語になるよう、ブラウザに保存する */
 export function setLocale(locale: Locale): void {
   current = locale;
+  try {
+    localStorage.setItem(STORAGE_KEY, locale);
+  } catch {
+    // 保存できなくても、今の間は切り替わる
+  }
 }
 
 export function t(key: MessageKey, params?: Record<string, string | number>): string {

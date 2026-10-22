@@ -25,6 +25,8 @@ export class HudIcons {
   private cells: { kind: 'move' | 'item'; slot: number; x: number; y: number; size: number }[] = [];
   /** アイコンの列の高さ */
   height = 0;
+  /** 持ち物の列がまだ無くても、あるものとしたときの高さ（詳細カードを技・持ち物で同じ場所に出すため） */
+  fullHeight = 0;
 
   constructor(private readonly scene: Phaser.Scene) {
     this.container = scene.add.container(0, 0).setScrollFactor(0).setDepth(1000);
@@ -42,6 +44,10 @@ export class HudIcons {
     this.container.removeAll(true);
     this.cells = [];
     let y = 0;
+    let moveRowsEnd = 0;
+    const pipSize = this.scene.textures.get(pipKey(false, 'base')).getSourceImage().width * PIP_SCALE;
+    const iconSize = this.scene.textures.get(rows[0]![0]?.key ?? '__MISSING').getSourceImage().width * iconScale();
+    const maxItemLevel = Math.max(1, ...Object.values(r.items).map((d) => d.maxLevel));
     rows.forEach((row, r) => {
       if (row.length === 0) return;
       let rowHeight = 0;
@@ -63,8 +69,11 @@ export class HudIcons {
         rowHeight = Math.max(rowHeight, size + 3 + Math.ceil(cell.max / PIPS_PER_ROW) * (pip + 1));
       });
       y += rowHeight + ROW_GAP;
+      if (r === 0) moveRowsEnd = y;
     });
     this.height = y;
+    // 持ち物の列は、持ち物の有無・種類に関係なく、いちばん高い持ち物の列の高さで数える（カードの位置が動かないように）
+    this.fullHeight = moveRowsEnd + iconSize + 3 + Math.ceil(maxItemLevel / PIPS_PER_ROW) * (pipSize + 1) + ROW_GAP;
   }
 
   /** 入れ物の中の座標 (x, y) にあるアイコン（無ければ null） */

@@ -918,7 +918,7 @@ export class RunScene extends Phaser.Scene {
 
   /**
    * 技・持ち物のアイコンにマウスを乗せたら、詳細カードを出す（作者の案。PC だけ。タッチでは出さない）。
-   * カードはアイコンの列のすぐ下の決まった場所に出す。レベルアップの選択中・ランの終わりは出さない
+   * カードは持ち物の列のすぐ下の決まった場所に出す（技でも持ち物でも同じ場所。持ち物がまだ無くても、その列のぶんを空ける）。レベルアップの選択中・ランの終わりは出さない
    */
   private updateHudCard(): void {
     const w = this.sim.world;
@@ -940,7 +940,7 @@ export class RunScene extends Phaser.Scene {
           ? itemIconKey(w.rules, local.items[target.slot]!.item)
           : null;
     const rect = this.game.canvas.getBoundingClientRect();
-    this.hudCard.show(w, local, target, iconKey, rect.left + cam.x + 8, rect.top + cam.y + this.hudTop + this.hudIcons.height + 4);
+    this.hudCard.show(w, local, target, iconKey, rect.left + cam.x + 8, rect.top + cam.y + this.hudTop + this.hudIcons.fullHeight + 4);
   }
 
   /** ローカルの入力を、変化があったときだけコマンドにする */

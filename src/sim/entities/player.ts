@@ -54,6 +54,10 @@ export interface Player {
   basePickupRange: number;
   /** 残りの無敵時間（更新回数） */
   invincibleTicks: number;
+  /** 範囲技が残した床で遅くなっている割合（%。毎回の更新で決め直す） */
+  zoneSlowPct?: number;
+  /** 燃える床のダメージまでの残り（更新回数） */
+  zoneHurtTicks?: number;
   /** ポケモンの種類（SimRules.species の番号）。進化で変わる */
   species: number;
   hp: number;

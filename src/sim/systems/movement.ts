@@ -29,7 +29,8 @@ export function movePlayers(world: World): void {
     if (p.inputX === 0 && p.inputY === 0) continue;
     // 斜めは 1/√2 倍。定数を使い、環境で結果が変わる Math 関数は使わない
     const scale = p.inputX !== 0 && p.inputY !== 0 ? Math.SQRT1_2 : 1;
-    const step = p.moveSpeed * world.dt * scale;
+    // 凍った床の上は遅くなる（伝説の範囲技が残したもの）
+    const step = p.moveSpeed * world.dt * scale * (1 - (p.zoneSlowPct ?? 0) / 100);
     p.x += p.inputX * step;
     p.y += p.inputY * step;
     p.facingX = p.inputX;

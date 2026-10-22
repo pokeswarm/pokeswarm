@@ -233,7 +233,7 @@ describe('ランの進行と終わり', () => {
 });
 
 describe('伝説の乱入', () => {
-  const legendary = { chance: 1, kinds: ['legend'], moves: ['circle'], moveIntervalSeconds: 1, warningSeconds: 1, timeLimitSeconds: 2 };
+  const legendary = { chance: 1, kinds: ['legend'], moves: ['circle'], moveSets: {}, moveIntervalSeconds: 1, warningSeconds: 1, timeLimitSeconds: 2 };
 
   it('クリアすると「DANGER」の後、雑魚が消えて伝説が出る。倒すとクリア（倒した）', () => {
     const { sim } = solo(stageRules({ legendary }));
@@ -276,6 +276,42 @@ describe('伝説の乱入', () => {
     expect(types).toContain('legendaryWarning');
     expect(sim.world.legendary?.enraged).toBe(true);
     expect(sim.world.bosses[0]!.interval).toBe(15);
+  });
+
+  it('伝説ごとの技: 次々に降る円・外へ広がる輪・後ろへの瞬間移動・遅くなる床', () => {
+    const STAGGER: BossMove = { id: 'stagger', effect: 'test', shape: 'circle', target: 'player', telegraphSeconds: 0.5, radius: 40, damage: 0, count: 3, spread: 100, stagger: 0.5, leaves: { seconds: 2, slowPct: 40, damagePerSecond: 0, color: '#81d4fa' } };
+    const RINGS: BossMove = { id: 'rings', effect: 'test', shape: 'ring', target: 'self', telegraphSeconds: 0.5, radius: 100, damage: 0, count: 1, spread: 0, rings: { count: 3, step: 100, width: 40 }, stagger: 0.3 };
+    const TELE: BossMove = { id: 'tele', effect: 'test', shape: 'circle', target: 'player', telegraphSeconds: 0.5, radius: 60, damage: 0, count: 1, spread: 150, teleport: true };
+    const cfg = { ...legendary, moves: ['circle'], moveSets: { legend: { moves: ['stagger', 'rings', 'tele'], random: false } }, moveIntervalSeconds: 2, timeLimitSeconds: 60 };
+    const { sim, p } = solo(stageRules({ legendary: cfg, moves: [CIRCLE, NOVA, DASH, STAGGER, RINGS, TELE] }));
+    run(sim, 61);
+    killKind(sim, 2);
+    killKind(sim, 3);
+    run(sim, 31);
+    // 1つ目の技（次々に降る円）: 予告の長さが 0.5 秒ずつずれる
+    run(sim, 60);
+    const ticks = sim.world.hazards.map((h) => h.totalTicks).sort((a, b) => a - b);
+    expect(ticks).toEqual([15, 30, 45]);
+    // 落ちると床が残り、上にいると遅くなる
+    run(sim, 16);
+    expect(sim.world.zones.length).toBeGreaterThan(0);
+    expect(p.zoneSlowPct).toBe(40);
+    // 2つ目の技（輪）: 外側ほど大きく、遅れて落ちる
+    run(sim, 60 - 16);
+    const rings = sim.world.hazards.filter((h) => h.shape === 'ring').sort((a, b) => a.radius - b.radius);
+    expect(rings.map((h) => [h.radius, h.innerRadius, h.totalTicks])).toEqual([
+      [100, 60, 15],
+      [200, 160, 24],
+      [300, 260, 33],
+    ]);
+    // 3つ目の技（瞬間移動）: プレイヤーの後ろ（右を向いているので左）に予告し、落ちたらそこへ現れる
+    run(sim, 60);
+    const tele = sim.world.hazards.find((h) => h.dasher !== -1)!;
+    expect(tele.x).toBeCloseTo(-150);
+    run(sim, 16);
+    const e = sim.world.enemies;
+    const i = Array.from(e.kind.subarray(0, e.count)).indexOf(4);
+    expect(e.x[i]).toBeCloseTo(-150);
   });
 
   it('時間内に倒せなければ逃げられるが、クリアのまま', () => {

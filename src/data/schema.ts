@@ -355,6 +355,11 @@ export type SaveConfig = z.infer<typeof saveConfigSchema>;
  * - shape: circle（円。radius が半径）・line（直線。radius が幅の半分、length が長さ）
  * - target: player（一番近いプレイヤーを狙う。円は足元と周りに count 個）・self（自分の周り・自分から向かう直線）
  * - dashSpeed: 直線の技で、落ちたときにボスが線に沿って突進する
+ * 伝説ごとの技（作者の決定 2026年10月23日。案4）のための部品:
+ * - shape: ring（輪。radius が外側の半径、rings.width が太さ）。target: self の rings で、外へ広がる輪を count 本、stagger 秒ずつ遅らせて出す
+ * - stagger: 2つ目以降の範囲を、1つごとにこの秒数だけ遅らせて落とす（次々に降る）
+ * - teleport: 予告の場所（狙ったプレイヤーの後ろ spread の距離）へ、落ちたときにボスが瞬間移動する
+ * - leaves: 落ちた場所に、しばらく残る床を置く（slowPct で上にいるプレイヤーが遅くなる・damagePerSecond で削られる）。直線は線に沿って並べる
  */
 export const bossMoveSchema = z.object({
   id: z.string().min(1),
@@ -362,7 +367,7 @@ export const bossMoveSchema = z.object({
   move: z.string().min(1).optional(),
   /** 範囲に落ちたときの演出（data/effects/recipes.json） */
   effect: z.string().min(1),
-  shape: z.enum(['circle', 'line']).default('circle'),
+  shape: z.enum(['circle', 'line', 'ring']).default('circle'),
   target: z.enum(['player', 'self']).default('player'),
   telegraphSeconds: z.number().positive(),
   radius: z.number().positive(),
@@ -377,6 +382,18 @@ export const bossMoveSchema = z.object({
   chain: z.number().int().nonnegative().optional(),
   /** じばく: 予告した敵（ビリリダマ）は止まり、落ちたときにいなくなる */
   selfDestruct: z.boolean().optional(),
+  stagger: z.number().nonnegative().optional(),
+  rings: z.object({ count: z.number().int().positive(), step: z.number().nonnegative(), width: z.number().positive() }).optional(),
+  teleport: z.boolean().optional(),
+  leaves: z
+    .object({
+      seconds: z.number().positive(),
+      slowPct: z.number().min(0).max(90).default(0),
+      damagePerSecond: z.number().nonnegative().default(0),
+      /** 床の色（#rrggbb） */
+      color: z.string(),
+    })
+    .optional(),
 });
 export type BossMove = z.infer<typeof bossMoveSchema>;
 
@@ -436,6 +453,8 @@ export const stageConfigSchema = z.object({
       /** 候補（rank: legendary）。1匹を選ぶ */
       kinds: z.array(z.string().min(1)).min(1),
       moves: z.array(z.string()).min(1),
+      /** 伝説ごとの技（作者の決定 2026年10月23日。案4）。無い伝説は moves を順に使う。random なら毎回ランダムに選ぶ（ミュウ） */
+      moveSets: z.record(z.string(), z.object({ moves: z.array(z.string()).min(1), random: z.boolean().default(false) })).default({}),
       moveIntervalSeconds: z.number().positive(),
       /** 「DANGER」の表示から出現までの時間 */
       warningSeconds: z.number().nonnegative(),

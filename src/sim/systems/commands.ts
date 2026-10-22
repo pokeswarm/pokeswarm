@@ -125,7 +125,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         break;
       }
       case 'addHazard':
-        if (world.role === 'guest') addHazard(world, cmd.move, cmd.x, cmd.y, cmd.dirX, cmd.dirY, cmd.dasher);
+        if (world.role === 'guest') addHazard(world, cmd.move, cmd.x, cmd.y, cmd.dirX, cmd.dirY, cmd.dasher, undefined, { delay: cmd.delay, radius: cmd.radius, inner: cmd.inner });
         break;
       case 'bossHp': {
         const i = findEnemyIndex(world, cmd.id);

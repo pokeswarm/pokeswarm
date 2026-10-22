@@ -42,12 +42,16 @@ export function spawnBosses(world: World): void {
     if (!lg.spawned && world.tick >= lg.appearTick) {
       lg.spawned = true;
       const cfg = world.rules.stage.legendary!;
-      spawnBoss(
+      // 伝説ごとの技（無ければ共通の技を順に）
+      const set = cfg.moveSets[world.rules.enemies.kinds[lg.kind]?.id ?? ''];
+      const id = spawnBoss(
         world,
         lg.kind,
-        cfg.moves.map((id) => world.rules.stage.moves.findIndex((m) => m.id === id)),
+        (set?.moves ?? cfg.moves).map((m) => world.rules.stage.moves.findIndex((x) => x.id === m)),
         Math.round(cfg.moveIntervalSeconds / world.dt),
       );
+      const boss = world.bosses.find((b) => b.id === id);
+      if (boss && set?.random) boss.random = true;
     }
     if (lg.spawned) enrageLegendary(world);
     return;
@@ -191,7 +195,7 @@ export function bossAttacks(world: World): void {
 
 /** ボス・伝説が技を1つ使う（予告を置く） */
 function useBossMove(world: World, boss: World['bosses'][number], i: number): void {
-  const moveIdx = boss.moves[boss.next++ % boss.moves.length]!;
+  const moveIdx = boss.random ? boss.moves[world.rng.int(boss.moves.length)]! : boss.moves[boss.next++ % boss.moves.length]!;
   const move = world.rules.stage.moves[moveIdx];
   if (!move) return;
   const bx = world.enemies.x[i]!;
@@ -204,20 +208,63 @@ function useBossMove(world: World, boss: World['bosses'][number], i: number): vo
     const dy = target.y - by;
     const len = Math.hypot(dx, dy) || 1;
     addHazard(world, moveIdx, bx, by, dx / len, dy / len, move.dashSpeed ? boss.id : -1);
+  } else if (move.target === 'self' && move.rings) {
+    // 外へ広がる輪（ミュウツー）: 1本ずつ遅らせて、外側ほど遠くに出す
+    for (let k = 0; k < move.rings.count; k++) {
+      const r = move.radius + k * move.rings.step;
+      addHazard(world, moveIdx, bx, by, 0, 0, -1, undefined, { delay: Math.round(((move.stagger ?? 0) * k) / world.dt), radius: r, inner: Math.max(0, r - move.rings.width) });
+    }
   } else if (move.target === 'self') {
     addHazard(world, moveIdx, bx, by, 0, 0, -1);
+  } else if (move.teleport) {
+    // 瞬間移動（ミュウツー）: 狙ったプレイヤーの後ろ（向いている方向の反対）に予告し、落ちたらそこへ現れる
+    const fl = Math.hypot(target.facingX, target.facingY) || 1;
+    const fx = target.facingX / fl || 1;
+    const fy = target.facingY / fl;
+    addHazard(world, moveIdx, target.x - fx * move.spread, target.y - fy * move.spread, 0, 0, boss.id);
   } else {
     for (let c = 0; c < move.count; c++) {
       // 1つ目は足元、2つ目以降はばらつかせる（動かないと当たり、動けば避けられる）
       const [ux, uy] = c === 0 ? [0, 0] : randomUnit(world.rng);
       const dist = c === 0 ? 0 : world.rng.range(move.radius, move.spread + move.radius);
-      addHazard(world, moveIdx, target.x + ux * dist, target.y + uy * dist, 0, 0, -1);
+      addHazard(world, moveIdx, target.x + ux * dist, target.y + uy * dist, 0, 0, -1, undefined, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
     }
+  }
+}
+
+/** 範囲技が残した床: 時間を進め、自分のプレイヤーが上にいれば遅くする・削る（当たったかは自分のブラウザで決める） */
+function tickZones(world: World): void {
+  const me = world.players.find((p) => p.id === world.localPlayerId);
+  let slow = 0;
+  let burn = 0;
+  for (let k = world.zones.length - 1; k >= 0; k--) {
+    const z = world.zones[k]!;
+    if (--z.ticksLeft <= 0) {
+      world.zones.splice(k, 1);
+      continue;
+    }
+    if (!me || me.down || (me.x - z.x) ** 2 + (me.y - z.y) ** 2 > (z.radius + me.radius) ** 2) continue;
+    slow = Math.max(slow, z.slowPct);
+    burn = Math.max(burn, z.damagePerSecond);
+  }
+  if (!me) return;
+  me.zoneSlowPct = slow;
+  if (burn <= 0) {
+    me.zoneHurtTicks = 0;
+    return;
+  }
+  // 燃える地面: 0.5 秒ごとに、その間の分をまとめて受ける
+  const every = Math.round(0.5 / world.dt);
+  me.zoneHurtTicks = (me.zoneHurtTicks ?? 0) + 1;
+  if (me.zoneHurtTicks >= every && me.invincibleTicks <= 0) {
+    me.zoneHurtTicks = 0;
+    hurtPlayer(world, me, burn * 0.5);
   }
 }
 
 /** 予告の時間が来た範囲技を当てる */
 function strikeHazards(world: World): void {
+  tickZones(world);
   const me = world.players.find((p) => p.id === world.localPlayerId);
   for (let h = world.hazards.length - 1; h >= 0; h--) {
     const hz = world.hazards[h]!;
@@ -243,6 +290,23 @@ function strikeHazards(world: World): void {
         world.events.push({ type: 'enemyRetired', id: hz.dasher });
       }
     }
+    // 瞬間移動: ボスが予告の場所へ現れる（ホストが動かし、位置はゲストへ送る）
+    if (move?.teleport && hz.dasher !== -1 && world.role !== 'guest') {
+      const i = findEnemyIndex(world, hz.dasher);
+      if (i !== -1) {
+        world.enemies.x[i] = world.enemies.prevX[i] = hz.x;
+        world.enemies.y[i] = world.enemies.prevY[i] = hz.y;
+      }
+    }
+    // 残る床（凍った床・燃える地面）。直線は線に沿って並べる。どのブラウザでも同じものを作る
+    if (move?.leaves) {
+      const lv = move.leaves;
+      const add = (x: number, y: number): void => {
+        world.zones.push({ x, y, radius: hz.radius, ticksLeft: Math.round(lv.seconds / world.dt), slowPct: lv.slowPct, damagePerSecond: lv.damagePerSecond, color: lv.color });
+      };
+      if (hz.shape === 'line') for (let d = 0; d <= hz.length; d += hz.radius * 1.5) add(hz.x + hz.dirX * d, hz.y + hz.dirY * d);
+      else add(hz.x, hz.y);
+    }
     // 突進: 線に沿って進む（ノックバックの仕組みで動かす。ホストが動かし、位置はゲストへ送る）
     if (hz.dasher !== -1 && move?.dashSpeed && world.role !== 'guest') {
       const i = findEnemyIndex(world, hz.dasher);
@@ -266,12 +330,16 @@ function strikeHazards(world: World): void {
 
 /** 範囲に入っているか（円・直線） */
 export function hazardHits(
-  hz: { shape: 'circle' | 'line'; x: number; y: number; radius: number; dirX: number; dirY: number; length: number },
+  hz: { shape: 'circle' | 'line' | 'ring'; x: number; y: number; radius: number; innerRadius?: number; dirX: number; dirY: number; length: number },
   x: number,
   y: number,
   r: number,
 ): boolean {
   if (hz.shape === 'circle') return (x - hz.x) ** 2 + (y - hz.y) ** 2 <= (hz.radius + r) ** 2;
+  if (hz.shape === 'ring') {
+    const d = Math.hypot(x - hz.x, y - hz.y);
+    return d <= hz.radius + r && d >= (hz.innerRadius ?? 0) - r;
+  }
   const t = Math.max(0, Math.min(hz.length, (x - hz.x) * hz.dirX + (y - hz.y) * hz.dirY));
   const px = hz.x + hz.dirX * t;
   const py = hz.y + hz.dirY * t;
@@ -279,12 +347,24 @@ export function hazardHits(
 }
 
 /** 範囲技の予告を置く（ホストが決め、ゲストには知らせで届く） */
-export function addHazard(world: World, moveIdx: number, x: number, y: number, dirX: number, dirY: number, dasher: number, chainLeft?: number): void {
+export function addHazard(
+  world: World,
+  moveIdx: number,
+  x: number,
+  y: number,
+  dirX: number,
+  dirY: number,
+  dasher: number,
+  chainLeft?: number,
+  /** 予告に足す遅れ（更新回数）・半径の上書き・輪の内側の半径 */
+  extra: { delay?: number; radius?: number; inner?: number } = {},
+): void {
   const move: BossMove | undefined = world.rules.stage.moves[moveIdx];
   if (!move) return;
-  const ticks = Math.round(move.telegraphSeconds / world.dt);
+  const ticks = Math.round(move.telegraphSeconds / world.dt) + (extra.delay ?? 0);
+  const radius = extra.radius || move.radius;
   const length = move.shape === 'line' ? (move.length ?? 400) : 0;
-  world.hazards.push({ move: moveIdx, shape: move.shape, x, y, radius: move.radius, dirX, dirY, length, dasher, damage: move.damage, ticksLeft: ticks, totalTicks: ticks, chainLeft });
+  world.hazards.push({ move: moveIdx, shape: move.shape, x, y, radius, innerRadius: move.shape === 'ring' ? (extra.inner ?? 0) : undefined, dirX, dirY, length, dasher, damage: move.damage, ticksLeft: ticks, totalTicks: ticks, chainLeft });
   // じばく: 予告した敵はその場で止まる（ゲストも同じ知らせで止める）
   if (move.selfDestruct && dasher !== -1) {
     const i = findEnemyIndex(world, dasher);
@@ -294,7 +374,7 @@ export function addHazard(world: World, moveIdx: number, x: number, y: number, d
       world.enemies.vy[i] = 0;
     }
   }
-  world.events.push({ type: 'hazardTelegraphed', move: moveIdx, x, y, dirX, dirY, dasher });
+  world.events.push({ type: 'hazardTelegraphed', move: moveIdx, x, y, dirX, dirY, dasher, delay: extra.delay ?? 0, radius: extra.radius ?? 0, inner: extra.inner ?? 0 });
 }
 
 function nearestPlayer(world: World, x: number, y: number): World['players'][number] | null {
@@ -386,6 +466,7 @@ function startLegendaryOrClear(world: World): void {
   }
   world.bosses.length = 0;
   world.hazards.length = 0;
+  world.zones.length = 0;
   world.events.push({ type: 'legendaryWarning', kind });
 }
 
@@ -399,5 +480,6 @@ export function endRun(world: World, outcome: 'clear' | 'fail' | 'disconnected')
   if (world.outcome) return;
   world.outcome = outcome;
   world.hazards.length = 0;
+  world.zones.length = 0;
   world.events.push({ type: 'runEnded', outcome, legendary: world.legendary ? { kind: world.legendary.kind, result: world.legendary.result } : null });
 }

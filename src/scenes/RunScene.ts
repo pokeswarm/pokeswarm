@@ -664,6 +664,9 @@ export class RunScene extends Phaser.Scene {
         if (ev.shape === 'line') {
           // 直線は、線に沿っていくつか演出を出す
           for (let d = 0; d <= ev.length; d += Math.max(60, ev.length / 6)) this.effects.playImpact(ev.effect, ev.x + ev.dirX * d, ev.y + ev.dirY * d);
+        } else if (ev.shape === 'ring') {
+          // 輪は、輪に沿っていくつか演出を出す
+          for (let k = 0; k < 8; k++) this.effects.playImpact(ev.effect, ev.x + Math.cos((k * Math.PI) / 4) * ev.radius, ev.y + Math.sin((k * Math.PI) / 4) * ev.radius);
         } else {
           this.effects.playImpact(ev.effect, ev.x, ev.y);
         }
@@ -706,9 +709,23 @@ export class RunScene extends Phaser.Scene {
         g.lineStyle(2, 0xff5252, 0.9).strokePoints(band(h.length), true);
         continue;
       }
+      if (h.shape === 'ring') {
+        // 輪: 太い線で描く。落ちるまでの残りは、輪の濃さで見せる
+        const inner = h.innerRadius ?? 0;
+        const mid = (h.radius + inner) / 2;
+        g.lineStyle(h.radius - inner, 0xff1744, 0.12 + 0.18 * progress).strokeCircle(h.x, h.y, mid);
+        g.lineStyle(2, 0xff5252, 0.9).strokeCircle(h.x, h.y, h.radius);
+        g.lineStyle(2, 0xff5252, 0.9).strokeCircle(h.x, h.y, inner);
+        continue;
+      }
       g.fillStyle(0xff1744, 0.12).fillCircle(h.x, h.y, h.radius);
       g.fillStyle(0xff1744, 0.25).fillCircle(h.x, h.y, h.radius * progress);
       g.lineStyle(2, 0xff5252, 0.9).strokeCircle(h.x, h.y, h.radius);
+    }
+    // 範囲技が残した床（凍った床・燃える地面）。消える前は薄くする
+    for (const z of this.sim.world.zones) {
+      const fade = Math.min(1, z.ticksLeft / 30);
+      g.fillStyle(hexColor(z.color), 0.3 * fade).fillCircle(z.x, z.y, z.radius);
     }
   }
 

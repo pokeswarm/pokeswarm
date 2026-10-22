@@ -52,10 +52,25 @@ export type RunOutcome = 'clear' | 'fail' | 'disconnected';
 export type LegendaryResult = 'won' | 'lost' | 'timeUp';
 
 /** ボスの範囲技の予告中の範囲。ticksLeft が 0 になったときに中にいたらダメージを受ける */
+/** 範囲技が残した床 */
+export interface Zone {
+  readonly x: number;
+  readonly y: number;
+  readonly radius: number;
+  ticksLeft: number;
+  /** 上にいると遅くなる割合（%） */
+  readonly slowPct: number;
+  /** 上にいると受けるダメージ（1秒あたり。0.5 秒ごとに分けて受ける） */
+  readonly damagePerSecond: number;
+  readonly color: string;
+}
+
 export interface Hazard {
   /** 技の番号（stage.moves の並び） */
   readonly move: number;
-  readonly shape: 'circle' | 'line';
+  readonly shape: 'circle' | 'line' | 'ring';
+  /** 輪の内側の半径（輪だけ） */
+  readonly innerRadius?: number;
   /** 円の中心・直線の始点 */
   readonly x: number;
   readonly y: number;
@@ -144,7 +159,7 @@ export interface World {
   readonly bossSchedule: readonly BossEntry[];
   nextBoss: number;
   /** 出ている、範囲技を使う敵（ボス・伝説）と、次の技までの残り・次に使う技（ソロ・ホスト） */
-  readonly bosses: { id: number; cooldown: number; interval: number; moves: readonly number[]; next: number }[];
+  readonly bosses: { id: number; cooldown: number; interval: number; moves: readonly number[]; next: number; random?: boolean }[];
   /** クリアに必要で、まだ倒していない敵の種類（四天王）。最初の数は requiredTotal */
   readonly requiredLeft: Set<number>;
   readonly requiredTotal: number;
@@ -165,6 +180,8 @@ export interface World {
   nextSwarm: number;
   /** 予告中の範囲 */
   readonly hazards: Hazard[];
+  /** 範囲技が残した床（凍った床・燃える地面）。どのブラウザでも範囲技から同じものを作る */
+  readonly zones: Zone[];
   /** マップの障害物（マスごと。シードから計算したものを覚えておく） */
   readonly obstacleCache: Map<number, Obstacle | null>;
   /** 転がってきている、まだ爆発を始めていない敵（ビリリダマ）→ スウォームの番号（ソロ・ホスト） */
@@ -215,6 +232,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     swarmSchedule: buildSwarmSchedule(rules, tickRate),
     nextSwarm: 0,
     hazards: [],
+    zones: [],
     obstacleCache: new Map(),
     bombers: new Map(),
     level: 1,

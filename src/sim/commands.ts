@@ -167,6 +167,9 @@ export interface AddHazardCommand {
   readonly dirX: number;
   readonly dirY: number;
   readonly dasher: number;
+  readonly delay: number;
+  readonly radius: number;
+  readonly inner: number;
 }
 
 /** ゲスト: 中ボス・ボスの HP（ホストが集計したもの） */

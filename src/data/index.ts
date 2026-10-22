@@ -227,6 +227,10 @@ if (stageConfig.legendary) {
     check(enemiesConfig.kinds.find((k) => k.id === id)?.rank === 'legendary', `data/game/stage.json の伝説 "${id}" が data/game/enemies.json に rank: "legendary" でありません`);
   }
   for (const id of stageConfig.legendary.moves) check(stageMoveIds.has(id), `data/game/stage.json の伝説の範囲技 "${id}" がありません`);
+  for (const [kind, set] of Object.entries(stageConfig.legendary.moveSets)) {
+    check(stageConfig.legendary.kinds.includes(kind), `data/game/stage.json の伝説ごとの技の "${kind}" が伝説の候補にありません`);
+    for (const id of set.moves) check(stageMoveIds.has(id), `data/game/stage.json の伝説 "${kind}" の範囲技 "${id}" がありません`);
+  }
 }
 for (const s of stageConfig.swarms) {
   check(enemiesConfig.kinds.some((k) => k.id === s.kind), `data/game/stage.json のスウォーム "${s.kind}" が data/game/enemies.json にありません`);

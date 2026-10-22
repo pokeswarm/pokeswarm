@@ -192,6 +192,94 @@
       "radius": 95,
       "damage": 30,
       "selfDestruct": true
+    },
+    {
+      "id": "mewtwo-psywave",
+      "move": "psychic",
+      "effect": "psy",
+      "shape": "ring",
+      "target": "self",
+      "telegraphSeconds": 0.8,
+      "radius": 120,
+      "damage": 40,
+      "rings": {
+        "count": 3,
+        "step": 110,
+        "width": 50
+      },
+      "stagger": 0.35
+    },
+    {
+      "id": "mewtwo-teleport",
+      "effect": "psy",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.9,
+      "radius": 90,
+      "damage": 45,
+      "spread": 150,
+      "teleport": true
+    },
+    {
+      "id": "articuno-blizzard",
+      "move": "blizzard",
+      "effect": "blizzard",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.8,
+      "radius": 70,
+      "damage": 30,
+      "count": 8,
+      "spread": 260,
+      "stagger": 0.15,
+      "leaves": {
+        "seconds": 4,
+        "slowPct": 40,
+        "damagePerSecond": 0,
+        "color": "#81d4fa"
+      }
+    },
+    {
+      "id": "zapdos-thunder",
+      "effect": "thunderbolt",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.5,
+      "radius": 55,
+      "damage": 35,
+      "count": 12,
+      "spread": 380,
+      "stagger": 0.06
+    },
+    {
+      "id": "zapdos-dash",
+      "effect": "beam",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.5,
+      "radius": 30,
+      "length": 600,
+      "damage": 40,
+      "dashSpeed": 1300,
+      "chain": 2
+    },
+    {
+      "id": "moltres-flamedash",
+      "effect": "sky-attack",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.7,
+      "radius": 34,
+      "length": 520,
+      "damage": 40,
+      "dashSpeed": 900,
+      "chain": 1,
+      "leaves": {
+        "seconds": 4,
+        "slowPct": 0,
+        "damagePerSecond": 20,
+        "color": "#ff7043"
+      }
     }
   ],
   "legendary": {
@@ -209,6 +297,58 @@
       "legend-nova",
       "legend-meteor"
     ],
+    "moveSets": {
+      "legend-mewtwo": {
+        "moves": [
+          "mewtwo-psywave",
+          "legend-beam",
+          "mewtwo-teleport",
+          "legend-nova"
+        ],
+        "random": false
+      },
+      "legend-mew": {
+        "moves": [
+          "legend-dash",
+          "legend-beam",
+          "legend-nova",
+          "legend-meteor",
+          "mewtwo-psywave",
+          "mewtwo-teleport",
+          "articuno-blizzard",
+          "zapdos-thunder",
+          "moltres-flamedash"
+        ],
+        "random": true
+      },
+      "legend-articuno": {
+        "moves": [
+          "articuno-blizzard",
+          "legend-beam",
+          "articuno-blizzard",
+          "legend-dash"
+        ],
+        "random": false
+      },
+      "legend-zapdos": {
+        "moves": [
+          "zapdos-thunder",
+          "zapdos-dash",
+          "zapdos-thunder",
+          "legend-beam"
+        ],
+        "random": false
+      },
+      "legend-moltres": {
+        "moves": [
+          "moltres-flamedash",
+          "legend-meteor",
+          "moltres-flamedash",
+          "legend-nova"
+        ],
+        "random": false
+      }
+    },
     "moveIntervalSeconds": 1.6,
     "warningSeconds": 3,
     "timeLimitSeconds": 180,

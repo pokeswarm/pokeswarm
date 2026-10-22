@@ -129,7 +129,7 @@ export class SyncSession {
           if (host) out.push({ t: 'ua', i: ev.playerId, o: ev.offer });
           break;
         case 'hazardTelegraphed':
-          if (host) hazards.push(ev.move, round2(ev.x), round2(ev.y), round2(ev.dirX), round2(ev.dirY), ev.dasher);
+          if (host) hazards.push(ev.move, round2(ev.x), round2(ev.y), round2(ev.dirX), round2(ev.dirY), ev.dasher, ev.delay, round2(ev.radius), round2(ev.inner));
           break;
         case 'legendaryWarning':
           if (host) out.push(ev.enraged ? { t: 'lw', k: ev.kind, r: 1 } : { t: 'lw', k: ev.kind });
@@ -304,8 +304,8 @@ export class SyncSession {
           break;
         case 'hz':
           if (guest) {
-            for (let k = 0; k + 5 < m.e.length; k += 6) {
-              cmds.push({ type: 'addHazard', move: m.e[k]!, x: m.e[k + 1]!, y: m.e[k + 2]!, dirX: m.e[k + 3]!, dirY: m.e[k + 4]!, dasher: m.e[k + 5]! });
+            for (let k = 0; k + 8 < m.e.length; k += 9) {
+              cmds.push({ type: 'addHazard', move: m.e[k]!, x: m.e[k + 1]!, y: m.e[k + 2]!, dirX: m.e[k + 3]!, dirY: m.e[k + 4]!, dasher: m.e[k + 5]!, delay: m.e[k + 6]!, radius: m.e[k + 7]!, inner: m.e[k + 8]! });
             }
           }
           break;

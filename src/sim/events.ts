@@ -152,6 +152,10 @@ export interface HazardTelegraphedEvent {
   readonly dirY: number;
   /** 突進する敵の id（無ければ -1） */
   readonly dasher: number;
+  /** 予告に足す遅れ（更新回数）・範囲の半径の上書き・輪の内側の半径（無ければ 0） */
+  readonly delay: number;
+  readonly radius: number;
+  readonly inner: number;
 }
 
 /** ボスの範囲技が落ちた（演出用） */
@@ -161,7 +165,7 @@ export interface HazardStruckEvent {
   readonly y: number;
   readonly radius: number;
   readonly effect: string;
-  readonly shape: 'circle' | 'line';
+  readonly shape: 'circle' | 'line' | 'ring';
   readonly dirX: number;
   readonly dirY: number;
   readonly length: number;

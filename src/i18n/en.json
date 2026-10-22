@@ -434,5 +434,7 @@
   "transfer.incoming": "Data to receive",
   "transfer.current": "Current data in this browser",
   "transfer.confirmNote": "The current data in this browser will be replaced by the received data. This cannot be undone.",
-  "transfer.replace": "Receive and replace"
+  "transfer.replace": "Receive and replace",
+  "transfer.copy": "Copy code",
+  "transfer.copied": "Copied"
 }

@@ -413,5 +413,7 @@
   "transfer.incoming": "Dati da ricevere",
   "transfer.current": "Dati attuali di questo browser",
   "transfer.confirmNote": "I dati attuali di questo browser verranno sostituiti da quelli ricevuti. L'operazione non si può annullare.",
-  "transfer.replace": "Ricevi e sostituisci"
+  "transfer.replace": "Ricevi e sostituisci",
+  "transfer.copy": "Copia codice",
+  "transfer.copied": "Copiato"
 }

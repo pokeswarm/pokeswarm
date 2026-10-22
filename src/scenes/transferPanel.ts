@@ -60,8 +60,8 @@ export function openTransferPanel(): void {
     const code = div(formatTransferCode(r.code), 'font-size:32px;letter-spacing:2px;user-select:text;-webkit-user-select:text');
     const copy = document.createElement('button');
     copy.style.cssText = BUTTON + ';align-self:flex-start';
-    copy.textContent = t('net.copy');
-    copy.onclick = () => void navigator.clipboard.writeText(formatTransferCode(r.code)).then(() => (copy.textContent = t('net.copied')));
+    copy.textContent = t('transfer.copy');
+    copy.onclick = () => void navigator.clipboard.writeText(formatTransferCode(r.code)).then(() => (copy.textContent = t('transfer.copied')));
     issued.replaceChildren(
       code,
       div(t('transfer.expires', { date: new Date(r.expireAt).toLocaleString(), hours: saveConfig.transferHours })),

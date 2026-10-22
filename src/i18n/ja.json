@@ -434,5 +434,7 @@
   "transfer.incoming": "受け取るデータ",
   "transfer.current": "このブラウザのいまのデータ",
   "transfer.confirmNote": "このブラウザのいまのデータは、受け取ったデータで置き換わり、元に戻せません。",
-  "transfer.replace": "受け取って置き換える"
+  "transfer.replace": "受け取って置き換える",
+  "transfer.copy": "コードをコピー",
+  "transfer.copied": "コピーしました"
 }

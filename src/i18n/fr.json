@@ -413,5 +413,7 @@
   "transfer.incoming": "Données à recevoir",
   "transfer.current": "Données actuelles de ce navigateur",
   "transfer.confirmNote": "Les données actuelles de ce navigateur seront remplacées par les données reçues. Cette action est irréversible.",
-  "transfer.replace": "Recevoir et remplacer"
+  "transfer.replace": "Recevoir et remplacer",
+  "transfer.copy": "Copier le code",
+  "transfer.copied": "Copié"
 }

@@ -413,5 +413,7 @@
   "transfer.incoming": "Zu empfangende Daten",
   "transfer.current": "Aktuelle Daten in diesem Browser",
   "transfer.confirmNote": "Die aktuellen Daten in diesem Browser werden durch die empfangenen Daten ersetzt. Das lässt sich nicht rückgängig machen.",
-  "transfer.replace": "Empfangen und ersetzen"
+  "transfer.replace": "Empfangen und ersetzen",
+  "transfer.copy": "Code kopieren",
+  "transfer.copied": "Kopiert"
 }

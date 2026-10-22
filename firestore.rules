@@ -32,41 +32,7 @@ service cloud.firestore {
       allow get: if signedIn() && resource.data.expireAt > request.time;
       allow create: if signedIn()
         && request.auth.token.firebase.sign_in_provider == 'anonymous'
-        && code.matches('^[A-HJ-NP-Z2-9]{12}
-
-    // 自分のニックネームと4桁。Google でログインした人が読める
-    match /profiles/{uid} {
-      allow read: if isGoogle();
-      allow write: if isGoogle() && isMe(uid) && validNickname(request.resource.data);
-    }
-
-    // タグ（照合用のニックネーム#4桁）→ ユーザー。すでにあるタグは他人が取れない
-    match /tags/{id} {
-      allow read: if isGoogle();
-      allow create: if isGoogle() && request.resource.data.uid == request.auth.uid && validNickname(request.resource.data);
-      allow update: if isGoogle() && resource.data.uid == request.auth.uid && request.resource.data.uid == request.auth.uid;
-      allow delete: if isGoogle() && resource.data.uid == request.auth.uid;
-    }
-
-    match /users/{uid} {
-      // フレンド申請: 送った人が自分の名前で作り、受け取った人が読む・消す
-      match /requests/{from} {
-        allow read, delete: if isGoogle() && isMe(uid);
-        allow create: if isGoogle() && isMe(from) && from != uid && validNickname(request.resource.data);
-      }
-      // フレンド: 本人が読む。承認した人が両方に置く（相手側は、相手からの申請があるときだけ置ける）。どちらからでも消せる
-      match /friends/{friend} {
-        allow read: if isGoogle() && isMe(uid);
-        allow create: if isGoogle() && (
-          (isMe(uid) && exists(/databases/$(database)/documents/users/$(uid)/requests/$(friend)))
-          || (isMe(friend) && exists(/databases/$(database)/documents/users/$(friend)/requests/$(uid)))
-        );
-        allow delete: if isGoogle() && (isMe(uid) || isMe(friend));
-      }
-    }
-  }
-}
-)
+        && code.matches('^[A-HJ-NP-Z2-9]{12}$')
         && request.resource.data.keys().hasOnly(['from', 'data', 'expireAt'])
         && request.resource.data.from == request.auth.uid
         && request.resource.data.data is map

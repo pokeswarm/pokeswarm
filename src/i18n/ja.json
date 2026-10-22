@@ -438,5 +438,9 @@
   "transfer.copied": "コピーしました",
   "achievements.colName": "実績",
   "achievements.colCondition": "条件",
-  "achievements.colReward": "報酬"
+  "achievements.colReward": "報酬",
+  "footer.short": "非公式のファンゲーム　公式サイトは {url} だけです",
+  "account.statusShort.guest": "ゲストで遊んでいます",
+  "account.statusShort.offline": "オフライン",
+  "account.statusShort.error": "接続できませんでした"
 }

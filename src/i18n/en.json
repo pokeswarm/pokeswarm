@@ -438,5 +438,9 @@
   "transfer.copied": "Copied",
   "achievements.colName": "Achievement",
   "achievements.colCondition": "Condition",
-  "achievements.colReward": "Reward"
+  "achievements.colReward": "Reward",
+  "footer.short": "Unofficial fan game. The only official site is {url}",
+  "account.statusShort.guest": "Playing as a guest",
+  "account.statusShort.offline": "Offline",
+  "account.statusShort.error": "Could not connect"
 }

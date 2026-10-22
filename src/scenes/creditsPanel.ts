@@ -1,6 +1,6 @@
 import { bgmConfig, itemIcons, uiConfig, siteConfig } from '../data';
 import { t } from '../i18n';
-import { windowCss } from '../render/pixelUi';
+import { compactScreen, windowCss } from '../render/pixelUi';
 
 /** SpriteCollab の取得結果（public/sprites/credits.json）の1件 */
 interface SpriteCredit {
@@ -22,15 +22,23 @@ export class TitleFooter {
     this.root = document.createElement('div');
     this.root.style.cssText = `position:fixed;left:0;right:0;bottom:0;z-index:19;display:flex;align-items:center;gap:12px;padding:6px 12px;background:rgba(0,0,0,0.75);color:${uiConfig.dark.text};font-size:16px;line-height:1.4;box-sizing:border-box`;
     const notice = document.createElement('div');
-    notice.style.cssText = 'flex:1;min-width:0;overflow-wrap:anywhere';
-    notice.textContent = t('footer.notice');
-    // 公式サイトのアドレス（広告の付いたページなどで遊んでいる人に、無断転載だと分かるように）
-    const official = document.createElement('div');
-    official.style.cssText = `color:${uiConfig.picker.selected}`;
-    official.textContent = t('footer.official', { url: siteConfig.officialUrl });
-    notice.append(official);
+    const compact = compactScreen();
+    if (compact) {
+      // 低い画面（横向きのスマホ）では1行だけ（作者の指摘 2026年10月22日: 帯が画面を覆っていた）。全文はクレジットの窓に出す
+      this.root.style.padding = '4px 8px';
+      notice.style.cssText = 'flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+      notice.textContent = t('footer.short', { url: siteConfig.officialUrl.replace(/^https?:\/\//, '') });
+    } else {
+      notice.style.cssText = 'flex:1;min-width:0;overflow-wrap:anywhere';
+      notice.textContent = t('footer.notice');
+      // 公式サイトのアドレス（広告の付いたページなどで遊んでいる人に、無断転載だと分かるように）
+      const official = document.createElement('div');
+      official.style.cssText = `color:${uiConfig.picker.selected}`;
+      official.textContent = t('footer.official', { url: siteConfig.officialUrl });
+      notice.append(official);
+    }
     const button = document.createElement('button');
-    button.style.cssText = `${windowCss('light')};min-height:44px;padding:6px 12px;cursor:pointer;font:inherit;font-size:16px;flex:none`;
+    button.style.cssText = `${windowCss('light')};min-height:${compact ? 36 : 44}px;padding:${compact ? '2px 10px' : '6px 12px'};cursor:pointer;font:inherit;font-size:16px;flex:none`;
     button.textContent = t('footer.credits');
     // タイトル画面のクリックで先へ進まないように止める
     button.onpointerdown = (ev) => ev.stopPropagation();
@@ -86,7 +94,7 @@ export class TitleFooter {
     head.style.cssText = 'font-size:24px';
     head.textContent = t('credits.title');
     box.append(head);
-    section(t('credits.notice'), [t('credits.noticeBody')]);
+    section(t('credits.notice'), [t('credits.noticeBody'), t('footer.official', { url: siteConfig.officialUrl })]);
     // ポケモンのドット絵: SpriteCollab の作者（重ねて出さない）。公式ゲーム由来の素材の権利の表記
     let authors: string[] = [];
     try {

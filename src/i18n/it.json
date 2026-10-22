@@ -417,5 +417,9 @@
   "transfer.copied": "Copiato",
   "achievements.colName": "Obiettivo",
   "achievements.colCondition": "Condizione",
-  "achievements.colReward": "Ricompensa"
+  "achievements.colReward": "Ricompensa",
+  "footer.short": "Fan game non ufficiale. Unico sito ufficiale: {url}",
+  "account.statusShort.guest": "Stai giocando come ospite",
+  "account.statusShort.offline": "Offline",
+  "account.statusShort.error": "Connessione non riuscita"
 }

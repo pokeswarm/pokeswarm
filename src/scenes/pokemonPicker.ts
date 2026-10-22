@@ -4,7 +4,7 @@ import { getLocale, t } from '../i18n';
 import { achievementCondition } from '../meta/achievementText';
 import { isPlayableUnlocked } from '../meta/progress';
 import { session } from '../meta/session';
-import { windowCss } from '../render/pixelUi';
+import { windowCss, compactScreen } from '../render/pixelUi';
 import { loadPokemonIcon } from '../render/pokemonIcons';
 
 export interface PokemonPickerOptions {
@@ -16,7 +16,7 @@ export interface PokemonPickerOptions {
   onConfirm?(key: string): void;
 }
 
-const compact = (): boolean => window.innerHeight < 520;
+const compact = (): boolean => compactScreen();
 
 /** 一覧で使うアイコンの画像（DOM）。一覧のマス・待合室の枠で使う */
 export function pokemonIconImage(key: string, size: number, silhouette = false): HTMLImageElement {
@@ -61,7 +61,7 @@ export class PokemonPicker {
   constructor(private readonly opts: PokemonPickerOptions) {
     this.keys = [...opts.playables];
     this.element = document.createElement('div');
-    this.element.style.cssText = 'display:flex;flex-direction:column;gap:12px;min-width:0';
+    this.element.style.cssText = `display:flex;flex-direction:column;gap:${compact() ? 6 : 12}px;min-width:0`;
     const size = compact() ? uiConfig.picker.cellCompact : uiConfig.picker.cell;
     const grid = document.createElement('div');
     grid.style.cssText = `display:grid;grid-template-columns:repeat(auto-fill,${size + 8}px);gap:6px;justify-content:center`;
@@ -93,7 +93,7 @@ export class PokemonPicker {
     count.style.cssText = 'text-align:center;opacity:0.85';
     count.textContent = t('select.count', { n: this.keys.filter(isPokemonUnlocked).length, total: this.keys.length });
     this.detail = document.createElement('div');
-    this.detail.style.cssText = `${windowCss('light')};padding:10px 16px;display:flex;align-items:center;gap:16px;min-height:${compact() ? 64 : 96}px;box-sizing:border-box`;
+    this.detail.style.cssText = `${windowCss('light')};padding:${compact() ? '4px 12px' : '10px 16px'};display:flex;align-items:center;gap:16px;min-height:${compact() ? 64 : 96}px;box-sizing:border-box`;
     this.element.append(count, grid, this.detail);
     this.paint();
   }

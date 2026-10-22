@@ -20,22 +20,22 @@ export class ShopScene extends Phaser.Scene {
   create(): void {
     const root = document.createElement('div');
     root.style.cssText =
-      'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,92vw);max-height:90vh;overflow:auto;padding:24px;background:#000;color:#f8f8f8;border:4px solid #f8f8f8;box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px #f8f8f8;font-family:inherit;font-size:16px;line-height:1.6;border-radius:6px;z-index:20;box-sizing:border-box';
+      'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,96vw);max-height:94vh;display:flex;flex-direction:column;padding:16px 20px;background:#000;color:#f8f8f8;border:4px solid #f8f8f8;box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px #f8f8f8;font-family:inherit;font-size:16px;line-height:1.6;border-radius:6px;z-index:20;box-sizing:border-box';
     document.body.appendChild(root);
     const render = (): void => {
       const save = session.store.current;
       const header = document.createElement('div');
-      header.style.cssText = 'display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px';
+      header.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:10px;flex:none;flex-wrap:wrap';
       const title = document.createElement('div');
       title.style.cssText = 'font-size:24px;font-weight:bold';
       title.textContent = t('shop.title');
       const coins = document.createElement('div');
-      coins.style.cssText = 'font-size:24px;color:#ffe082';
+      coins.style.cssText = 'font-size:24px;color:#ffe082;flex:1';
       coins.textContent = t('shop.coins', { coins: save.coins });
       header.append(title, coins);
 
       const list = document.createElement('div');
-      list.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px';
+      list.style.cssText = 'flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;align-content:start';
       for (const def of shopConfig.upgrades) {
         const level = upgradeLevel(save, def.id);
         const cost = nextCost(def, level);
@@ -62,7 +62,7 @@ export class ShopScene extends Phaser.Scene {
       }
 
       const footer = document.createElement('div');
-      footer.style.cssText = 'display:flex;gap:8px;margin-top:16px;flex-wrap:wrap';
+      footer.style.cssText = 'display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;flex:none';
       const refund = document.createElement('button');
       refund.style.cssText = BUTTON;
       refund.textContent = t('shop.refund');
@@ -79,8 +79,13 @@ export class ShopScene extends Phaser.Scene {
       back.style.cssText = BUTTON;
       back.textContent = t('shop.back');
       back.onclick = () => this.scene.start('title');
-      footer.append(refund, back);
+      header.append(back);
+      footer.append(refund);
+      const scroll = root.querySelector<HTMLDivElement>('[data-list]')?.scrollTop ?? 0;
+      list.dataset.list = '1';
       root.replaceChildren(header, list, footer);
+      // 買って描き直しても、見ていた場所のまま
+      list.scrollTop = scroll;
     };
     render();
     const off = session.store.onChange(render);

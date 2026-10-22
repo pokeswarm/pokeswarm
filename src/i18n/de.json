@@ -417,5 +417,9 @@
   "transfer.copied": "Kopiert",
   "achievements.colName": "Erfolg",
   "achievements.colCondition": "Bedingung",
-  "achievements.colReward": "Belohnung"
+  "achievements.colReward": "Belohnung",
+  "footer.short": "Inoffizielles Fanspiel. Einzige offizielle Website: {url}",
+  "account.statusShort.guest": "Du spielst als Gast",
+  "account.statusShort.offline": "Offline",
+  "account.statusShort.error": "Keine Verbindung"
 }

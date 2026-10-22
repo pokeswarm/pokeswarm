@@ -417,5 +417,9 @@
   "transfer.copied": "Copié",
   "achievements.colName": "Succès",
   "achievements.colCondition": "Condition",
-  "achievements.colReward": "Récompense"
+  "achievements.colReward": "Récompense",
+  "footer.short": "Jeu de fan non officiel. Seul site officiel : {url}",
+  "account.statusShort.guest": "Vous jouez en invité",
+  "account.statusShort.offline": "Hors ligne",
+  "account.statusShort.error": "Connexion impossible"
 }

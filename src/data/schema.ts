@@ -46,6 +46,8 @@ export type PlaceholderRenderConfig = z.infer<typeof placeholderRenderSchema>;
  * 原作をまねた白い窓・黒い窓、画面上部の経験値のバー・経過時間・コイン
  */
 export const uiConfigSchema = z.object({
+  /** 画面の高さがこれより低いと、つめた表示にする（横向きのスマホ。作者の決定 2026年10月22日） */
+  compactHeight: z.number().positive(),
   font: z.object({
     family: z.string(),
     faces: z.array(z.object({ family: z.string(), file: z.string() })),

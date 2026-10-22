@@ -1,8 +1,8 @@
-import { t } from '../i18n';
+import { t, tMaybe } from '../i18n';
 import type { SaveData } from '../meta/saveData';
 import { formatTag } from '../meta/nickname';
 import { session } from '../meta/session';
-import { windowCss } from '../render/pixelUi';
+import { windowCss, compactScreen } from '../render/pixelUi';
 import { openTransferPanel } from './transferPanel';
 
 /** ドット調のボタン（原作をまねた白い窓。作者の決定 2026年10月22日） */
@@ -31,7 +31,7 @@ export class AccountPanel {
   constructor(bottom = 0) {
     this.root = document.createElement('div');
     // 右下に小さく（メニューのボタンに重ならないように）。黒い窓
-    this.root.style.cssText = `${windowCss('dark')};position:fixed;right:8px;bottom:${bottom + 8}px;padding:12px 16px;font-size:16px;line-height:1.6;text-align:left;z-index:20;overflow-wrap:anywhere;box-sizing:border-box;max-width:min(420px, ${window.innerHeight < 520 ? '46vw' : '90vw'})`;
+    this.root.style.cssText = `${windowCss('dark')};position:fixed;right:8px;bottom:${bottom + 8}px;padding:${compactScreen() ? '6px 10px' : '12px 16px'};font-size:16px;line-height:1.5;text-align:left;z-index:20;overflow-wrap:anywhere;box-sizing:border-box;max-width:min(420px, ${compactScreen() ? '46vw' : '90vw'})`;
     document.body.appendChild(this.root);
     this.unsubscribe.push(session.onStatus(() => this.render()), session.store.onChange(() => this.render()));
     this.render();
@@ -44,7 +44,8 @@ export class AccountPanel {
 
   private render(): void {
     const status = document.createElement('div');
-    status.textContent = t(`account.status.${session.status}`);
+    // 低い画面では短い文（無ければふつうの文）
+    status.textContent = (compactScreen() && tMaybe(`account.statusShort.${session.status}`)) || t(`account.status.${session.status}`);
     const profile = session.social?.profile;
     if (profile) status.textContent += `　${formatTag(profile.nickname, profile.tag)}`;
     const record = document.createElement('div');

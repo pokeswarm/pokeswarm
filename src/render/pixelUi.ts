@@ -10,6 +10,11 @@ import { hexColor } from './color';
 /** 文字の大きさ（8 の倍数にすると、ドットがにじまない） */
 export type PxSize = 8 | 16 | 24 | 32 | 40 | 48;
 
+/** 高さの低い画面（横向きのスマホなど）か。つめた表示にする（data/render/ui.json の compactHeight） */
+export function compactScreen(height = window.innerHeight): boolean {
+  return height < uiConfig.compactHeight;
+}
+
 /** フォントを読み込む（読み込む前に文字を描くと、ふつうのフォントで描かれてしまう） */
 export async function loadPixelFonts(): Promise<void> {
   const base = import.meta.env.BASE_URL ?? '/';

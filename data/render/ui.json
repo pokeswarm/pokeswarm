@@ -1,4 +1,5 @@
 {
+  "compactHeight": 520,
   "font": {
     "family": "'PixelLatin', 'PixelJP', monospace",
     "faces": [
@@ -70,7 +71,7 @@
   },
   "picker": {
     "cell": 72,
-    "cellCompact": 52,
+    "cellCompact": 44,
     "lockedFill": "#a8b8c8",
     "silhouette": "#383848",
     "selected": "#f8d030"

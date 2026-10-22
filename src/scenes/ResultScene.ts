@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { bgmConfig, uiConfig } from '../data';
-import { drawWindow, pixelButton, px } from '../render/pixelUi';
+import { drawWindow, pixelButton, px, compactScreen } from '../render/pixelUi';
 import { audio } from '../audio';
 import { t } from '../i18n';
 import type { RunOutcome } from '../sim/world';
@@ -71,7 +71,7 @@ export class ResultScene extends Phaser.Scene {
       const { width, height } = this.scale;
       const clear = summary.outcome === 'clear';
       // 画面の高さが低い（横向きのスマホ）ときは、見出しを小さくし、技を右に並べて1画面に収める
-      const compact = height < 520;
+      const compact = compactScreen(height);
       const boxW = Math.min(width - 32, compact ? 760 : 720);
       const x0 = (width - boxW) / 2;
       const g = this.add.graphics();

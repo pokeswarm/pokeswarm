@@ -5,7 +5,7 @@ import { getLocale, t, tMaybe } from '../i18n';
 import type { Player } from '../sim/entities/player';
 import { derivationCompletedBy } from '../sim/systems/leveling';
 import { itemIconKey, moveIconKey } from '../render/Icons';
-import { windowCss } from '../render/pixelUi';
+import { windowCss, compactScreen } from '../render/pixelUi';
 import { isTouchDevice } from '../render/TouchJoystick';
 import type { Modifiers } from '../sim/upgrades';
 import type { UpgradeOffer, World } from '../sim/world';
@@ -221,7 +221,7 @@ export class LevelUpPanel {
     // 原作をまねた白い窓（作者の決定。2026年10月22日）。説明はできるだけ短く: アイコン・名前・レベル・増えるもの
     const header = document.createElement('div');
     // 画面の高さが低い（横向きのスマホ）ときは、つめて表示する（作者の決定: 指で押せる大きさは保つ）
-    const compact = window.innerHeight < 520;
+    const compact = compactScreen();
     const touch = isTouchDevice();
     this.root.style.padding = compact ? '6px 2vw' : '20px 2vw';
     header.style.cssText = `${windowCss('light')};display:flex;justify-content:space-between;align-items:center;padding:${compact ? '6px 14px' : '12px 20px'};margin-bottom:${compact ? 6 : 12}px;font-size:${compact ? 16 : 24}px`;

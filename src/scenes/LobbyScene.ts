@@ -6,6 +6,7 @@ import { getLocale, t, type MessageKey } from '../i18n';
 import type { Room, RoomPlayer } from '../net/room';
 import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
 import { formatTag } from '../meta/nickname';
+import { compactScreen } from '../render/pixelUi';
 import { session } from '../meta/session';
 import type { RunSceneData } from './RunScene';
 import { pokemonIconImage, PokemonPicker } from './pokemonPicker';
@@ -58,6 +59,8 @@ export class LobbyScene extends Phaser.Scene {
     this.root = document.createElement('div');
     this.root.style.cssText =
       'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(960px,96vw);max-height:96vh;overflow:auto;padding:16px 24px;background:#000;color:#f8f8f8;border:4px solid #f8f8f8;box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px #f8f8f8;font-family:inherit;font-size:16px;line-height:1.6;border-radius:6px;z-index:20;box-sizing:border-box';
+    // 低い画面（横向きのスマホ）では余白をつめる
+    if (compactScreen()) this.root.style.cssText += ';padding:8px 12px';
     document.body.appendChild(this.root);
     const onKey = (ev: KeyboardEvent): void => this.onKey(ev);
     window.addEventListener('keydown', onKey);
@@ -164,7 +167,7 @@ export class LobbyScene extends Phaser.Scene {
     const title = document.createElement('div');
     title.style.cssText = 'display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:6px';
     const titleText = document.createElement('span');
-    titleText.style.cssText = 'font-size:24px;font-weight:bold';
+    titleText.style.cssText = `font-size:${compactScreen() ? 20 : 24}px;font-weight:bold`;
     titleText.textContent = this.room ? `${t('lobby.title')} - ${localName(generated.regions[this.room.region]?.names, getLocale(), this.room.region)}` : t('lobby.title');
     title.append(titleText);
     const children: HTMLElement[] = [title];
@@ -183,6 +186,7 @@ export class LobbyScene extends Phaser.Scene {
         // 案内はタイトルの横に（縦に収めるため）
         const hint = document.createElement('span');
         hint.style.opacity = '0.85';
+        if (compactScreen()) hint.style.display = 'none';
         hint.textContent = t('lobby.joinHint', { max: networkConfig.maxPlayers });
         const row = document.createElement('div');
         row.style.cssText = 'display:flex;gap:8px;margin:0 0 10px';
@@ -193,27 +197,33 @@ export class LobbyScene extends Phaser.Scene {
         copy.style.cssText = BUTTON;
         copy.textContent = t('net.copy');
         copy.onclick = () => void navigator.clipboard.writeText(url.toString()).then(() => (copy.textContent = t('net.copied')));
-        row.append(input, copy);
+        // 低い画面では URL の欄を出さず、コピーのボタンだけ（幅が足りない）
+        if (compactScreen()) row.append(copy);
+        else row.append(input, copy);
         title.append(hint);
         children.push(row);
       }
 
       // 上の4つの枠: ホスト・ゲスト・ゲスト・ゲスト。選んだポケモンのアイコンを出す
       const slots = document.createElement('div');
-      slots.style.cssText = `display:grid;grid-template-columns:repeat(${networkConfig.maxPlayers},1fr);gap:8px;margin-bottom:10px`;
+      // 低い画面では 2×2（左の列に収める）
+      slots.style.cssText = `display:grid;grid-template-columns:repeat(${compactScreen() ? 2 : networkConfig.maxPlayers},1fr);gap:${compactScreen() ? 4 : 8}px;margin-bottom:${compactScreen() ? 6 : 10}px`;
       for (let id = 1; id <= networkConfig.maxPlayers; id++) {
         const m = room.memberList.find((x) => x.id === id);
         const cell = document.createElement('div');
-        cell.style.cssText = `padding:6px;border-radius:6px;border:4px solid ${id === room.localId ? uiConfig.picker.selected : '#f8f8f8'};background:#000;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;min-width:0`;
+        const small = compactScreen();
+        cell.style.cssText = `padding:${small ? 2 : 6}px;border-radius:6px;border:4px solid ${id === room.localId ? uiConfig.picker.selected : '#f8f8f8'};background:#000;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;min-width:0`;
         const role = document.createElement('div');
         role.textContent = t(id === 1 ? 'lobby.slotHost' : 'lobby.slotGuest') + (id === room.localId ? t('lobby.you') : '');
         const box = document.createElement('div');
-        box.style.cssText = `width:48px;height:48px;background:${uiConfig.window.fill};border-radius:4px;opacity:${m ? 1 : 0.25}`;
-        if (m?.pokemon) box.append(pokemonIconImage(m.pokemon, 48));
+        box.style.cssText = `width:${small ? 32 : 48}px;height:${small ? 32 : 48}px;background:${uiConfig.window.fill};border-radius:4px;opacity:${m ? 1 : 0.25}`;
+        if (m?.pokemon) box.append(pokemonIconImage(m.pokemon, small ? 32 : 48));
         const state = document.createElement('div');
         state.style.cssText = 'font-size:16px;opacity:0.85;overflow-wrap:anywhere';
         state.textContent = !m ? t('lobby.empty') : !m.connected ? t('lobby.connecting') : m.pokemon ? this.pokemonName(m.pokemon) : t('lobby.choosing');
-        cell.append(role, box, state);
+        // 低い画面では状態の文を出さない（アイコンと枠の明るさで分かる）
+        if (small) cell.append(role, box);
+        else cell.append(role, box, state);
         slots.append(cell);
       }
       children.push(slots);
@@ -264,7 +274,8 @@ export class LobbyScene extends Phaser.Scene {
       // 開始できないときの案内は、ボタンの左に
       const note = document.createElement('div');
       note.style.cssText = 'flex:1;opacity:0.75';
-      if (!room.canStart) note.textContent = t('lobby.waitAll');
+      // 低い画面では出さない（細い列で縦に長くなる。開始のボタンが押せないことで分かる）
+      if (!room.canStart && !compactScreen()) note.textContent = t('lobby.waitAll');
       footer.append(note);
       start.style.cssText = BUTTON;
       start.textContent = t('lobby.start');
@@ -284,6 +295,22 @@ export class LobbyScene extends Phaser.Scene {
     leave.onclick = () => this.scene.start('title');
     footer.append(leave);
     children.push(footer);
+    // 低い画面（横向きのスマホ）では縦が足りないので2列にする: 左に部屋の情報・4人の枠・ボタン、右にポケモンの一覧
+    const picker = this.picker?.element;
+    if (compactScreen() && picker && children.includes(picker)) {
+      const left = document.createElement('div');
+      left.style.cssText = 'flex:0 0 40%;min-width:0;display:flex;flex-direction:column';
+      left.append(...children.filter((c) => c !== picker));
+      const right = document.createElement('div');
+      right.style.cssText = 'flex:1;min-width:0';
+      picker.style.marginBottom = '0';
+      right.append(picker);
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:12px;align-items:flex-start';
+      row.append(left, right);
+      this.root.replaceChildren(row);
+      return;
+    }
     this.root.replaceChildren(...children);
   }
 }

@@ -9,7 +9,7 @@ import { audio } from '../audio';
 import { bgmConfig, generated, groundConfig, playablesConfig, spriteRender, uiConfig } from '../data';
 import type { SpriteAnims } from '../data/schema';
 import { GroundTiles, preloadGroundTiles } from '../render/GroundTiles';
-import { drawWindow, pixelButton, px } from '../render/pixelUi';
+import { drawWindow, pixelButton, px, compactScreen } from '../render/pixelUi';
 import { directionIndex, PokemonSpriteView } from '../render/sprites/PokemonSprite';
 import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
 
@@ -151,7 +151,7 @@ export class TitleScene extends Phaser.Scene {
       backdrop.layout();
       const { width, height } = this.scale;
       // 画面の高さが低い（横向きのスマホ）ときは、ロゴを小さくし、メニューを2列にする（ボタンは指で押せる高さ 44 以上）
-      const compact = height < 520;
+      const compact = compactScreen(height);
       const logoW = Math.min(width - 32, 640);
       const logoH = compact ? 64 : 104;
       const logoY = compact ? 8 : height * 0.08;

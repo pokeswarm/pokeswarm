@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { playablesConfig, regionsConfig } from '../data';
 import { t } from '../i18n';
-import { windowCss } from '../render/pixelUi';
+import { compactScreen, windowCss } from '../render/pixelUi';
 import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
 import { isPokemonUnlocked, PokemonPicker } from './pokemonPicker';
 import type { RunSceneData } from './RunScene';
@@ -27,6 +27,9 @@ export class SelectScene extends Phaser.Scene {
     const root = document.createElement('div');
     root.style.cssText = `position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(960px,96vw);max-height:96vh;overflow:auto;${windowCss('dark')};padding:20px 24px;font-size:16px;line-height:1.6;box-sizing:border-box;z-index:20;display:flex;flex-direction:column;gap:12px`;
     document.body.append(root);
+    // 低い画面（横向きのスマホ）では、案内の文を出さず、余白をつめる
+    const compact = compactScreen();
+    if (compact) root.style.cssText += ';padding:6px 12px;gap:4px;max-height:100vh';
     let starting = false;
     let selected: string | null = null;
     const start = (key: string): void => {
@@ -50,14 +53,15 @@ export class SelectScene extends Phaser.Scene {
       onConfirm: start,
     });
     const title = document.createElement('div');
-    title.style.cssText = 'font-size:24px;text-align:center';
+    title.style.cssText = `font-size:${compact ? 20 : 24}px;text-align:center`;
     title.textContent = t('select.title');
     const hint = document.createElement('div');
     hint.style.cssText = 'text-align:center;opacity:0.75';
     hint.textContent = t('select.hint');
+    if (compact) hint.style.display = 'none';
     const row = document.createElement('div');
     row.style.cssText = 'display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap';
-    const button = `${windowCss('light')};min-height:44px;padding:6px 16px;cursor:pointer;font:inherit;font-size:16px`;
+    const button = `${windowCss('light')};min-height:${compact ? 36 : 44}px;padding:${compact ? '2px 12px' : '6px 16px'};cursor:pointer;font:inherit;font-size:16px`;
     go.style.cssText = `${button};opacity:0.45`;
     go.textContent = t('select.start');
     go.disabled = true;

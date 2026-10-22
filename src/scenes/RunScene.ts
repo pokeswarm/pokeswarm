@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { effectRecipes, generated, groundConfig, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig } from '../data';
+import { achievementsConfig, effectRecipes, generated, groundConfig, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig } from '../data';
 import { buildSimRules, localName, permanentModifiers, playableLoadout } from '../data/simRules';
 import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
@@ -34,6 +34,7 @@ import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard
 import { applyDebugOverrides, parseLevelParam, parseMovesParam, parseSectionParam, parseTimeParam } from './debugOverrides';
 import { addXp } from '../sim/systems/leveling';
 import { addDiscovery } from '../meta/discoveries';
+import { achievementName } from '../meta/achievementText';
 import { RunRecorder } from '../meta/runRecorder';
 import { session } from '../meta/session';
 import { LevelUpPanel, offerText } from './levelUpPanel';
@@ -457,7 +458,7 @@ export class RunScene extends Phaser.Scene {
     this.newAchievements.push(...found.achievements);
     this.newUnlocks.push(...found.unlocks);
     if (found.achievements.length && !this.sim.world.outcome) {
-      this.announce(found.achievements.map((id) => t('run.achievement', { name: tMaybe(`achievement.${id}.name`) })).join('\n'), '#a5d6a7');
+      this.announce(found.achievements.map((id) => t('run.achievement', { name: achievementName(id) })).join('\n'), '#a5d6a7');
     }
   }
 
@@ -476,7 +477,8 @@ export class RunScene extends Phaser.Scene {
           const def = w.rules.moves[m.move]!;
           return `${localName(generated.moves[def.key]?.names, getLocale(), def.key)} Lv${m.level}`;
         }),
-        newAchievements: this.newAchievements.map((id) => tMaybe(`achievement.${id}.name`)),
+        // ポケモンの解放の実績は「新しく解放したポケモン」の欄に出すので、実績の欄には重ねて出さない
+        newAchievements: this.newAchievements.filter((id) => !achievementsConfig.achievements.find((x) => x.id === id)?.reward?.pokemon).map((id) => achievementName(id)),
         newUnlocks: this.newUnlocks.map((key) => localName(generated.pokemon[key]?.names, getLocale(), key)),
         coins: this.recorder.coinsEarned,
         legendary: this.legendaryResult?.result

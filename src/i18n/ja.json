@@ -191,13 +191,8 @@
   "achievement.kills-in-run-5000.desc": "1ランで5000体倒す",
   "achievements.title": "実績",
   "achievements.count": "{done} / {total} 達成",
-  "achievements.hidden": "？？？",
   "achievements.hiddenDesc": "達成すると内容が分かります",
   "achievements.progress": "{current} / {target}",
-  "achievements.unlocks": "解放したポケモン",
-  "achievements.unlockLocked": "未解放（{name}を倒した数 {current} / {target}）",
-  "achievements.unlockNotPlayable": "解放済み（遊べるようになるのは、もう少し先です）",
-  "achievements.unlockPlayable": "解放済み",
   "achievements.back": "タイトルへ（Esc）",
   "result.newAchievements": "新しく達成した実績: {list}",
   "result.newUnlocks": "新しく解放したポケモン: {list}",
@@ -333,5 +328,11 @@
   "result.label.time": "じかん",
   "result.label.level": "レベル",
   "result.label.kills": "たおした かず",
-  "result.label.coins": "コイン"
+  "result.label.coins": "コイン",
+  "achievement.unlock.name": "{name}が なかまに",
+  "achievement.cond.defeat": "{name}を {count}回 倒す",
+  "achievement.reward.pokemon": "{name}が 使えるようになる",
+  "achievement.reward.pokemonLater": "{name}を解放（遊べるのは もう少し先）",
+  "achievements.reward": "報酬　{reward}",
+  "achievements.secret": "？？？"
 }

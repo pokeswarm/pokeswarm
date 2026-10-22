@@ -1,15 +1,15 @@
 import Phaser from 'phaser';
-import { achievementsConfig, generated, playablesConfig, unlocksConfig } from '../data';
-import { localName } from '../data/simRules';
-import { getLocale, t, tMaybe } from '../i18n';
-import { isUnlocked, progressOf } from '../meta/progress';
+import { achievementsConfig, playablesConfig } from '../data';
+import { t } from '../i18n';
+import { achievementCondition, achievementName, achievementReward } from '../meta/achievementText';
+import { progressOf } from '../meta/progress';
 import { session } from '../meta/session';
 
 // 原作をまねた白い窓のボタン（作者の決定。2026年10月22日。src/render/pixelUi.ts の windowCss と同じ見た目）
 const BUTTON = 'padding:8px 14px;cursor:pointer;font:inherit;font-size:16px;background:#f8f8f8;color:#383848;border:4px solid #383848;border-radius:6px;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #a8b8c8';
 
 /**
- * 実績と解放の一覧（DOM。見た目の作り込みはフェーズ4）。裏実績は達成するまで「？？？」。
+ * 実績の一覧（ポケモンの解放も実績に統合した）。条件は見せ、名前と報酬は達成するまで「？？？」。裏実績は条件も伏せる。
  * 1つの記録だけの条件は、進み具合（今の数 / 目標）も出す。
  */
 export class AchievementsScene extends Phaser.Scene {
@@ -35,54 +35,44 @@ export class AchievementsScene extends Phaser.Scene {
       count.textContent = t('achievements.count', { done, total: list.length });
       title.append(h, count);
 
+      // 作者の決定（2026年10月22日）: 達成の条件は見せ、何の実績か（名前）と報酬は達成するまで伏せる。裏実績は条件も伏せる
       const grid = document.createElement('div');
       grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px';
       for (const a of list) {
         const achieved = save.achievements.includes(a.id);
         const secret = a.hidden && !achieved;
         const cell = document.createElement('div');
-        cell.style.cssText = `padding:10px 12px;border-radius:6px;border:2px solid ${achieved ? '#ffb300' : '#f8f8f8'};background:${achieved ? '#3d2a08' : '#000000'};${achieved ? '' : 'opacity:0.8'}`;
+        cell.style.cssText = `padding:10px 12px;border-radius:6px;border:2px solid ${achieved ? '#f8d030' : '#f8f8f8'};background:${achieved ? '#3d2a08' : '#000000'};${achieved ? '' : 'opacity:0.85'}`;
         const name = document.createElement('div');
-        name.style.fontWeight = 'bold';
-        name.textContent = secret ? t('achievements.hidden') : tMaybe(`achievement.${a.id}.name`);
-        const desc = document.createElement('div');
-        desc.style.cssText = 'font-size:16px;opacity:0.85';
-        desc.textContent = secret ? t('achievements.hiddenDesc') : tMaybe(`achievement.${a.id}.desc`);
-        cell.append(name, desc);
+        name.textContent = achieved ? achievementName(a.id) : t('achievements.secret');
+        if (achieved) name.style.color = '#f8d030';
+        const cond = document.createElement('div');
+        cond.textContent = secret ? t('achievements.hiddenDesc') : achievementCondition(a);
+        cell.append(name, cond);
         const p = progressOf(save.stats, a.condition);
         if (!achieved && !secret && p && p.target > 1) {
           const prog = document.createElement('div');
-          prog.style.cssText = 'font-size:16px;opacity:0.75';
+          prog.style.cssText = 'opacity:0.75';
           prog.textContent = t('achievements.progress', { current: Math.floor(p.current), target: p.target });
           cell.append(prog);
         }
-        grid.append(cell);
-      }
-
-      const unlockTitle = document.createElement('div');
-      unlockTitle.style.cssText = 'font-weight:bold;margin:18px 0 6px';
-      unlockTitle.textContent = t('achievements.unlocks');
-      const unlocks = document.createElement('div');
-      for (const u of unlocksConfig.unlocks) {
-        const name = localName(generated.pokemon[u.pokemon]?.names, getLocale(), u.pokemon);
-        const row = document.createElement('div');
-        let state: string;
-        if (isUnlocked(save, unlocksConfig, u.pokemon)) {
-          const playable = Object.entries(playablesConfig.pokemon).some(([k, p]) => (p.unlock ?? k) === u.pokemon);
-          state = t(playable ? 'achievements.unlockPlayable' : 'achievements.unlockNotPlayable');
-        } else {
-          const p = progressOf(save.stats, u.condition);
-          state = p ? t('achievements.unlockLocked', { name, current: Math.floor(p.current), target: p.target }) : '';
+        // 報酬: 達成するまで「？？？」（報酬があるかどうかも分からないように、まだのものはすべて出す）
+        const playable = !!a.reward?.pokemon && Object.entries(playablesConfig.pokemon).some(([k, pl]) => (pl.unlock ?? k) === a.reward!.pokemon);
+        const reward = achieved ? achievementReward(a, playable) : t('achievements.secret');
+        if (reward) {
+          const r = document.createElement('div');
+          r.style.cssText = `color:${achieved ? '#a8e8a0' : '#a0a0a8'}`;
+          r.textContent = t('achievements.reward', { reward });
+          cell.append(r);
         }
-        row.textContent = `${name}　${state}`;
-        unlocks.append(row);
+        grid.append(cell);
       }
 
       const back = document.createElement('button');
       back.style.cssText = BUTTON + ';margin-top:16px';
       back.textContent = t('achievements.back');
       back.onclick = () => this.scene.start('title');
-      root.replaceChildren(title, grid, unlockTitle, unlocks, back);
+      root.replaceChildren(title, grid, back);
     };
     render();
     const off = session.store.onChange(render);

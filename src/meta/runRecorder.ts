@@ -10,7 +10,7 @@ import { coinsForRun, permanentBonus } from './shop';
  * 出来事（撃破・進化・派生など）を observe で数えるだけにして、数分ごと（commit）とラン終了時（finish）に
  * まとめて足す（Firestore の書き込みを増やさない）。足した分は消すので、同じ分を2回足さない。
  *
- * 記録の名前（data/game/achievements.json・unlocks.json の条件で使う）:
+ * 記録の名前（data/game/achievements.json の条件で使う）:
  *   kills, defeated.<ポケモン>, bossDefeated.<ポケモン>（中ボス・ボス・伝説として出たもの）, midbossKills, bossKills, legendaryKills, evolutions, evolvedTo.<ポケモン>,
  *   derivations, derived.<技>, uniqueMoves, playSeconds,
  *   runs, runs.<ポケモン>, clears, clears.<ポケモン>, clears.solo, clears.coop,

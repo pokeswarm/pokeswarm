@@ -2,7 +2,7 @@ import type { AchievementsConfig, StatCondition, UnlocksConfig } from '../data/s
 import type { SaveData } from './saveData';
 
 /**
- * 実績とポケモンの解放の判定（01_game_design.md 8.1・8.2）。条件は data/game/achievements.json・unlocks.json に
+ * 実績とポケモンの解放の判定（01_game_design.md 8.1・8.2）。条件は data/game/achievements.json（解放は reward.pokemon）に
  * 「記録の名前 ≧ 数」の形で書き、all（すべて）・any（どれか）で組み合わせられる。記録の名前は runRecorder.ts を参照。
  */
 export function meets(stats: Readonly<Record<string, number>>, c: StatCondition): boolean {

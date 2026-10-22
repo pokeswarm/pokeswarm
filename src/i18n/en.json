@@ -191,13 +191,8 @@
   "achievement.kills-in-run-5000.desc": "Defeat 5,000 Pokémon in a single run",
   "achievements.title": "Achievements",
   "achievements.count": "{done} / {total} completed",
-  "achievements.hidden": "???",
   "achievements.hiddenDesc": "Revealed when completed",
   "achievements.progress": "{current} / {target}",
-  "achievements.unlocks": "Unlocked Pokémon",
-  "achievements.unlockLocked": "Locked (defeated {name}: {current} / {target})",
-  "achievements.unlockNotPlayable": "Unlocked (playable in a future update)",
-  "achievements.unlockPlayable": "Unlocked",
   "achievements.back": "Back to title (Esc)",
   "result.newAchievements": "New achievements: {list}",
   "result.newUnlocks": "Newly unlocked: {list}",
@@ -333,5 +328,11 @@
   "result.label.time": "TIME",
   "result.label.level": "LEVEL",
   "result.label.kills": "DEFEATED",
-  "result.label.coins": "COINS"
+  "result.label.coins": "COINS",
+  "achievement.unlock.name": "{name} joins you",
+  "achievement.cond.defeat": "Defeat {name} {count} times",
+  "achievement.reward.pokemon": "{name} becomes playable",
+  "achievement.reward.pokemonLater": "Unlocks {name} (playable later)",
+  "achievements.reward": "Reward: {reward}",
+  "achievements.secret": "???"
 }

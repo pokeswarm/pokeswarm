@@ -22,7 +22,6 @@ import statsJson from '../../data/game/stats.json';
 import stageJson from '../../data/game/stage.json';
 import saveJson from '../../data/game/save.json';
 import achievementsJson from '../../data/game/achievements.json';
-import unlocksJson from '../../data/game/unlocks.json';
 import shopJson from '../../data/game/shop.json';
 import ja from '../i18n/ja.json';
 import en from '../i18n/en.json';
@@ -37,6 +36,7 @@ import generatedPokemonJson from '../../data/generated/pokemon.json';
 import generatedMovesJson from '../../data/generated/moves.json';
 import generatedItemsJson from '../../data/generated/items.json';
 import generatedTypesJson from '../../data/generated/types.json';
+import type { UnlocksConfig } from './schema';
 import { resolveEffectRecipes } from './effects';
 import {
   combatConfigSchema,
@@ -62,7 +62,6 @@ import {
   stageConfigSchema,
   saveConfigSchema,
   achievementsConfigSchema,
-  unlocksConfigSchema,
   shopConfigSchema,
   statsConfigSchema,
   statusConfigSchema,
@@ -112,7 +111,11 @@ export const statsConfig = load('game/stats.json', statsConfigSchema, statsJson)
 export const stageConfig = load('game/stage.json', stageConfigSchema, stageJson);
 export const saveConfig = load('game/save.json', saveConfigSchema, saveJson);
 export const achievementsConfig = load('game/achievements.json', achievementsConfigSchema, achievementsJson);
-export const unlocksConfig = load('game/unlocks.json', unlocksConfigSchema, unlocksJson);
+/** ポケモンの解放: 実績の reward.pokemon から作る（作者の決定で、解放は実績に統合した） */
+export const unlocksConfig: UnlocksConfig = {
+  initial: achievementsConfig.initialPokemon,
+  unlocks: achievementsConfig.achievements.flatMap((a) => (a.reward?.pokemon ? [{ pokemon: a.reward.pokemon, condition: a.condition }] : [])),
+};
 export const shopConfig = load('game/shop.json', shopConfigSchema, shopJson);
 export const statusConfig = load('game/status.json', statusConfigSchema, statusJson);
 export const pickupConfig = load('game/pickups.json', pickupConfigSchema, pickupsJson);
@@ -228,7 +231,7 @@ for (const [key, p] of Object.entries(playablesConfig.pokemon)) {
   for (const m of p.startingMoves) check(!!movesConfig.moves[m], `data/game/playables.json の "${key}" の最初の技 "${m}" が data/game/moves.json にありません`);
   if (p.unlock) {
     const u = p.unlock;
-    check(unlocksConfig.unlocks.some((x) => x.pokemon === u), `data/game/playables.json の "${key}" の解放 "${u}" が data/game/unlocks.json にありません`);
+    check(unlocksConfig.unlocks.some((x) => x.pokemon === u), `data/game/playables.json の "${key}" の解放 "${u}" が data/game/achievements.json の reward.pokemon にありません`);
   }
 }
 check(!!playablesConfig.pokemon[playablesConfig.default], `data/game/playables.json の default "${playablesConfig.default}" がありません`);
@@ -248,14 +251,16 @@ check(new Set(achievementsConfig.achievements.map((x) => x.id)).size === achieve
 for (const a of achievementsConfig.achievements) {
   for (const [lang, messages] of [['ja', ja], ['en', en]] as const) {
     const m = messages as Record<string, string>;
+    // ポケモンの解放の実績は、決まった文から名前・説明を作れる
+    if (a.reward?.pokemon) continue;
     check(!!m[`achievement.${a.id}.name`] && !!m[`achievement.${a.id}.desc`], `実績 "${a.id}" の名前・説明が src/i18n/${lang}.json にありません`);
   }
 }
 for (const key of unlocksConfig.initial) {
-  check(!!playablesConfig.pokemon[key], `data/game/unlocks.json の initial "${key}" が data/game/playables.json にありません`);
+  check(!!playablesConfig.pokemon[key], `data/game/achievements.json の initialPokemon "${key}" が data/game/playables.json にありません`);
 }
 for (const u of unlocksConfig.unlocks) {
-  check(!!generated.pokemon[u.pokemon], `data/game/unlocks.json の "${u.pokemon}" が data/generated/pokemon.json にありません`);
+  check(!!generated.pokemon[u.pokemon], `data/game/achievements.json の解放 "${u.pokemon}" が data/generated/pokemon.json にありません`);
 }
 
 // 中ボス・ボス・伝説・スウォームに出るポケモンと、その進化前は、時間帯の雑魚に出さない（作者の決定）

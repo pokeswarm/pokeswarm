@@ -1,4 +1,9 @@
 {
+  "initialPokemon": [
+    "charmander",
+    "bulbasaur",
+    "squirtle"
+  ],
   "achievements": [
     {
       "id": "first-run",
@@ -144,6 +149,176 @@
       "condition": {
         "stat": "legendaryKills",
         "atLeast": 1
+      }
+    },
+    {
+      "id": "unlock-onix",
+      "condition": {
+        "stat": "bossDefeated.onix",
+        "atLeast": 20
+      },
+      "reward": {
+        "pokemon": "onix"
+      }
+    },
+    {
+      "id": "unlock-starmie",
+      "condition": {
+        "stat": "bossDefeated.starmie",
+        "atLeast": 20
+      },
+      "reward": {
+        "pokemon": "starmie"
+      }
+    },
+    {
+      "id": "unlock-raichu",
+      "condition": {
+        "stat": "bossDefeated.raichu",
+        "atLeast": 20
+      },
+      "reward": {
+        "pokemon": "raichu"
+      }
+    },
+    {
+      "id": "unlock-arcanine",
+      "condition": {
+        "stat": "bossDefeated.arcanine",
+        "atLeast": 20
+      },
+      "reward": {
+        "pokemon": "arcanine"
+      }
+    },
+    {
+      "id": "unlock-alakazam",
+      "condition": {
+        "stat": "bossDefeated.alakazam",
+        "atLeast": 20
+      },
+      "reward": {
+        "pokemon": "alakazam"
+      }
+    },
+    {
+      "id": "unlock-weezing",
+      "condition": {
+        "stat": "bossDefeated.weezing",
+        "atLeast": 20
+      },
+      "reward": {
+        "pokemon": "weezing"
+      }
+    },
+    {
+      "id": "unlock-vileplume",
+      "condition": {
+        "stat": "bossDefeated.vileplume",
+        "atLeast": 20
+      },
+      "reward": {
+        "pokemon": "vileplume"
+      }
+    },
+    {
+      "id": "unlock-rhydon",
+      "condition": {
+        "stat": "bossDefeated.rhydon",
+        "atLeast": 20
+      },
+      "reward": {
+        "pokemon": "rhydon"
+      }
+    },
+    {
+      "id": "unlock-lapras",
+      "condition": {
+        "stat": "bossDefeated.lapras",
+        "atLeast": 10
+      },
+      "reward": {
+        "pokemon": "lapras"
+      }
+    },
+    {
+      "id": "unlock-machamp",
+      "condition": {
+        "stat": "bossDefeated.machamp",
+        "atLeast": 10
+      },
+      "reward": {
+        "pokemon": "machamp"
+      }
+    },
+    {
+      "id": "unlock-gengar",
+      "condition": {
+        "stat": "bossDefeated.gengar",
+        "atLeast": 10
+      },
+      "reward": {
+        "pokemon": "gengar"
+      }
+    },
+    {
+      "id": "unlock-dragonite",
+      "condition": {
+        "stat": "bossDefeated.dragonite",
+        "atLeast": 10
+      },
+      "reward": {
+        "pokemon": "dragonite"
+      }
+    },
+    {
+      "id": "unlock-mewtwo",
+      "condition": {
+        "stat": "bossDefeated.mewtwo",
+        "atLeast": 5
+      },
+      "reward": {
+        "pokemon": "mewtwo"
+      }
+    },
+    {
+      "id": "unlock-mew",
+      "condition": {
+        "stat": "bossDefeated.mew",
+        "atLeast": 5
+      },
+      "reward": {
+        "pokemon": "mew"
+      }
+    },
+    {
+      "id": "unlock-articuno",
+      "condition": {
+        "stat": "bossDefeated.articuno",
+        "atLeast": 5
+      },
+      "reward": {
+        "pokemon": "articuno"
+      }
+    },
+    {
+      "id": "unlock-zapdos",
+      "condition": {
+        "stat": "bossDefeated.zapdos",
+        "atLeast": 5
+      },
+      "reward": {
+        "pokemon": "zapdos"
+      }
+    },
+    {
+      "id": "unlock-moltres",
+      "condition": {
+        "stat": "bossDefeated.moltres",
+        "atLeast": 5
+      },
+      "reward": {
+        "pokemon": "moltres"
       }
     }
   ]

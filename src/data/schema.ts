@@ -228,18 +228,26 @@ export const statConditionSchema: z.ZodType<StatCondition> = z.lazy(() =>
   ]),
 );
 
-/** 実績。名前と説明は翻訳ファイルの achievement.<id>.name・desc。hidden は達成するまで中身を隠す（裏実績） */
+/**
+ * 実績（ポケモンの解放も実績に統合した。作者の決定 2026年10月22日）。
+ * - 名前と説明は翻訳ファイルの achievement.<id>.name・desc。reward.pokemon の実績は、無ければ決まった文から作る
+ * - reward: 達成したときにもらえるもの（pokemon = そのポケモンを解放する）。一覧では、達成するまで名前と報酬を伏せ、条件だけ見せる
+ * - hidden は達成するまで条件も隠す（裏実績）。initialPokemon は最初から使えるポケモン
+ */
+export const achievementRewardSchema = z.object({ pokemon: z.string().min(1).optional() });
 export const achievementsConfigSchema = z.object({
-  achievements: z.array(z.object({ id: z.string().min(1), condition: statConditionSchema, hidden: z.boolean().default(false) })),
+  initialPokemon: z.array(z.string().min(1)).min(1),
+  achievements: z.array(
+    z.object({ id: z.string().min(1), condition: statConditionSchema, hidden: z.boolean().default(false), reward: achievementRewardSchema.optional() }),
+  ),
 });
 export type AchievementsConfig = z.infer<typeof achievementsConfigSchema>;
 
-/** ポケモンの解放。initial は最初から使える */
-export const unlocksConfigSchema = z.object({
-  initial: z.array(z.string().min(1)).min(1),
-  unlocks: z.array(z.object({ pokemon: z.string().min(1), condition: statConditionSchema })),
-});
-export type UnlocksConfig = z.infer<typeof unlocksConfigSchema>;
+/** ポケモンの解放（実績の reward.pokemon から作る）。initial は最初から使える */
+export interface UnlocksConfig {
+  initial: readonly string[];
+  unlocks: readonly { pokemon: string; condition: StatCondition }[];
+}
 
 // ---- セーブ ----
 
@@ -606,7 +614,7 @@ export const playablesConfigSchema = z.object({
       /** false なら進化しない（ピカチュウ: 原作へのオマージュで、ライチュウにならずボルテッカーを覚える） */
       evolves: z.boolean().default(true),
       /**
-       * 解放の名前（data/game/unlocks.json の pokemon）。省略時はこのキー。
+       * 解放の名前（data/game/achievements.json の reward.pokemon）。省略時はこのキー。
        * 解放したポケモンは進化前の姿から始めるので、ヒトデマンはスターミーの解放で遊べるようになる
        */
       unlock: z.string().optional(),

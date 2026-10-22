@@ -67,5 +67,12 @@
   },
   "donate": {
     "url": "https://ko-fi.com/pokeswarm"
+  },
+  "picker": {
+    "cell": 72,
+    "cellCompact": 52,
+    "lockedFill": "#a8b8c8",
+    "silhouette": "#383848",
+    "selected": "#f8d030"
   }
 }

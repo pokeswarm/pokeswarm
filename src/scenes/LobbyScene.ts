@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
-import { generated, networkConfig, playablesConfig, unlocksConfig } from '../data';
-import { isPlayableUnlocked } from '../meta/progress';
+import { generated, networkConfig, playablesConfig, uiConfig } from '../data';
 import { localName } from '../data/simRules';
 import type { SpriteAnims } from '../data/schema';
 import { getLocale, t, type MessageKey } from '../i18n';
@@ -9,6 +8,7 @@ import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
 import { formatTag } from '../meta/nickname';
 import { session } from '../meta/session';
 import type { RunSceneData } from './RunScene';
+import { pokemonIconImage, PokemonPicker } from './pokemonPicker';
 
 export interface LobbySceneData {
   /** host: 部屋を作る、join: roomId の部屋に入る */
@@ -25,6 +25,7 @@ const BUTTON = 'min-height:44px;padding:10px 18px;cursor:pointer;font:inherit;fo
 /**
  * 協力プレイの待合室（DOM。見た目の作り込みはフェーズ4）。
  * 参加用 URL を送って最大4人が集まり、各自がポケモンを選ぶ。ホストが開始すると全員のランが始まる。
+ * 上に4つの枠（ホスト・ゲスト・ゲスト・ゲスト）を並べ、選んだポケモンのアイコンを出す。真ん中にソロと同じポケモンの一覧（作者の案 2026年10月22日）
  */
 export class LobbyScene extends Phaser.Scene {
   private params!: LobbySceneData;
@@ -35,6 +36,7 @@ export class LobbyScene extends Phaser.Scene {
   private starting = false;
   /** 招待を送ったフレンド */
   private invited = new Set<string>();
+  private picker: PokemonPicker | null = null;
 
   constructor() {
     super('lobby');
@@ -46,12 +48,13 @@ export class LobbyScene extends Phaser.Scene {
     this.message = null;
     this.starting = false;
     this.invited = new Set();
+    this.picker = null;
   }
 
   create(): void {
     this.root = document.createElement('div');
     this.root.style.cssText =
-      'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,92vw);padding:24px;background:#000;color:#f8f8f8;border:4px solid #f8f8f8;box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px #f8f8f8;font-family:inherit;font-size:16px;line-height:1.6;border-radius:6px;z-index:20;box-sizing:border-box';
+      'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(960px,96vw);max-height:96vh;overflow:auto;padding:16px 24px;background:#000;color:#f8f8f8;border:4px solid #f8f8f8;box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px #f8f8f8;font-family:inherit;font-size:16px;line-height:1.6;border-radius:6px;z-index:20;box-sizing:border-box';
     document.body.appendChild(this.root);
     const onKey = (ev: KeyboardEvent): void => this.onKey(ev);
     window.addEventListener('keydown', onKey);
@@ -136,24 +139,17 @@ export class LobbyScene extends Phaser.Scene {
     this.scene.start('run', data);
   }
 
-  private choose(index: number): void {
-    const key = this.choosable()[index];
-    if (key && this.room) void this.room.choosePokemon(key);
-  }
-
   private onKey(ev: KeyboardEvent): void {
+    const dir: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+    const d = dir[ev.key];
+    if (d) {
+      ev.preventDefault();
+      this.picker?.move(d[0], d[1]);
+      return;
+    }
     if (ev.repeat) return;
-    const n = Number(ev.key);
-    if (n >= 1 && n <= 9) this.choose(n - 1);
-    else if (ev.key === 'Enter' && this.room?.canStart) void this.room.start();
+    if (ev.key === 'Enter' && this.room?.canStart) void this.room.start();
     else if (ev.key === 'Escape') this.scene.start('title');
-  }
-
-  /** 選べるポケモン（解放していて、遊べるもの） */
-  private choosable(): string[] {
-    return Object.keys(playablesConfig.pokemon).filter((k) =>
-      isPlayableUnlocked(session.store.current, unlocksConfig, k, playablesConfig.pokemon[k]!.unlock),
-    );
   }
 
   private pokemonName(key: string): string {
@@ -163,8 +159,11 @@ export class LobbyScene extends Phaser.Scene {
   private render(): void {
     const room = this.room;
     const title = document.createElement('div');
-    title.style.cssText = 'font-size:24px;font-weight:bold;margin-bottom:12px';
-    title.textContent = t('lobby.title');
+    title.style.cssText = 'display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:6px';
+    const titleText = document.createElement('span');
+    titleText.style.cssText = 'font-size:24px;font-weight:bold';
+    titleText.textContent = t('lobby.title');
+    title.append(titleText);
     const children: HTMLElement[] = [title];
 
     if (this.message) {
@@ -178,10 +177,12 @@ export class LobbyScene extends Phaser.Scene {
       if (room.role === 'host') {
         const url = new URL(window.location.href);
         url.search = new URLSearchParams({ join: room.roomId }).toString();
-        const hint = document.createElement('div');
+        // 案内はタイトルの横に（縦に収めるため）
+        const hint = document.createElement('span');
+        hint.style.opacity = '0.85';
         hint.textContent = t('lobby.joinHint', { max: networkConfig.maxPlayers });
         const row = document.createElement('div');
-        row.style.cssText = 'display:flex;gap:8px;margin:6px 0 16px';
+        row.style.cssText = 'display:flex;gap:8px;margin:0 0 10px';
         const input = document.createElement('input');
         Object.assign(input, { value: url.toString(), readOnly: true });
         input.style.cssText = 'flex:1;font-family:inherit;font-size:16px;padding:6px';
@@ -190,39 +191,36 @@ export class LobbyScene extends Phaser.Scene {
         copy.textContent = t('net.copy');
         copy.onclick = () => void navigator.clipboard.writeText(url.toString()).then(() => (copy.textContent = t('net.copied')));
         row.append(input, copy);
-        children.push(hint, row);
+        title.append(hint);
+        children.push(row);
       }
 
-      const list = document.createElement('div');
-      list.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px';
+      // 上の4つの枠: ホスト・ゲスト・ゲスト・ゲスト。選んだポケモンのアイコンを出す
+      const slots = document.createElement('div');
+      slots.style.cssText = `display:grid;grid-template-columns:repeat(${networkConfig.maxPlayers},1fr);gap:8px;margin-bottom:10px`;
       for (let id = 1; id <= networkConfig.maxPlayers; id++) {
         const m = room.memberList.find((x) => x.id === id);
         const cell = document.createElement('div');
-        cell.style.cssText = `padding:10px 12px;border-radius:6px;border:2px solid ${id === room.localId ? '#ffb300' : '#f8f8f8'};background:#000000;min-height:52px`;
-        const name = document.createElement('div');
-        name.style.fontWeight = 'bold';
-        name.textContent = t('lobby.player', { n: id }) + (id === 1 ? t('lobby.host') : '') + (id === room.localId ? t('lobby.you') : '');
+        cell.style.cssText = `padding:6px;border-radius:6px;border:4px solid ${id === room.localId ? uiConfig.picker.selected : '#f8f8f8'};background:#000;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;min-width:0`;
+        const role = document.createElement('div');
+        role.textContent = t(id === 1 ? 'lobby.slotHost' : 'lobby.slotGuest') + (id === room.localId ? t('lobby.you') : '');
+        const box = document.createElement('div');
+        box.style.cssText = `width:48px;height:48px;background:${uiConfig.window.fill};border-radius:4px;opacity:${m ? 1 : 0.25}`;
+        if (m?.pokemon) box.append(pokemonIconImage(m.pokemon, 48));
         const state = document.createElement('div');
-        state.style.cssText = 'font-size:16px;opacity:0.85';
+        state.style.cssText = 'font-size:16px;opacity:0.85;overflow-wrap:anywhere';
         state.textContent = !m ? t('lobby.empty') : !m.connected ? t('lobby.connecting') : m.pokemon ? this.pokemonName(m.pokemon) : t('lobby.choosing');
-        cell.append(name, state);
-        list.append(cell);
+        cell.append(role, box, state);
+        slots.append(cell);
       }
-      children.push(list);
+      children.push(slots);
 
-      const chooseLabel = document.createElement('div');
-      chooseLabel.textContent = t('lobby.choose');
-      const choices = document.createElement('div');
-      choices.style.cssText = 'display:flex;gap:8px;margin:6px 0 16px';
-      const mine = room.memberList.find((m) => m.id === room.localId)?.pokemon;
-      this.choosable().forEach((key, i) => {
-        const b = document.createElement('button');
-        b.style.cssText = BUTTON + `;flex:1;${mine === key ? 'border-color:#ffb300;background:#3d2a08' : ''}`;
-        b.textContent = `${i + 1}. ${this.pokemonName(key)}`;
-        b.onclick = () => this.choose(i);
-        choices.append(b);
-      });
-      children.push(chooseLabel, choices);
+      // 真ん中: ポケモンの一覧（選ぶとすぐ自分の枠に出る）
+      const mine = room.memberList.find((m) => m.id === room.localId)?.pokemon ?? null;
+      this.picker ??= new PokemonPicker({ onSelect: (key) => void this.room?.choosePokemon(key) });
+      this.picker.setSelected(mine);
+      this.picker.element.style.marginBottom = '10px';
+      children.push(this.picker.element);
 
       // ホスト: オンラインのフレンドを招待する（Google でログインしてニックネームを登録しているとき）
       const social = session.social;
@@ -259,7 +257,12 @@ export class LobbyScene extends Phaser.Scene {
     footer.style.cssText = 'display:flex;gap:8px;align-items:center';
     if (room?.role === 'host') {
       const start = document.createElement('button');
-      start.style.cssText = BUTTON + ';flex:1';
+      // 開始できないときの案内は、ボタンの左に
+      const note = document.createElement('div');
+      note.style.cssText = 'flex:1;opacity:0.75';
+      if (!room.canStart) note.textContent = t('lobby.waitAll');
+      footer.append(note);
+      start.style.cssText = BUTTON;
       start.textContent = t('lobby.start');
       start.disabled = !room.canStart;
       if (!room.canStart) start.style.opacity = '0.5';
@@ -277,12 +280,6 @@ export class LobbyScene extends Phaser.Scene {
     leave.onclick = () => this.scene.start('title');
     footer.append(leave);
     children.push(footer);
-    if (room?.role === 'host' && !room.canStart) {
-      const note = document.createElement('div');
-      note.style.cssText = 'font-size:16px;opacity:0.75;margin-top:8px';
-      note.textContent = t('lobby.waitAll');
-      children.push(note);
-    }
     this.root.replaceChildren(...children);
   }
 }

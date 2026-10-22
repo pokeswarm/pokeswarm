@@ -76,6 +76,14 @@ export const uiConfigSchema = z.object({
     maxPassers: z.number().int().positive(),
     keepAway: z.number().nonnegative(),
   }),
+  /** ポケモンの一覧（ソロの選択・待合室。作者の案 2026年10月22日）: 1マスの大きさ（低い画面では compact）・まだ解放していないマスの色と黒塗りの色 */
+  picker: z.object({
+    cell: z.number().int().positive(),
+    cellCompact: z.number().int().positive(),
+    lockedFill: z.string(),
+    silhouette: z.string(),
+    selected: z.string(),
+  }),
 });
 export type UiConfig = z.infer<typeof uiConfigSchema>;
 

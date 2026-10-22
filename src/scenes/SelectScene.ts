@@ -1,90 +1,89 @@
 import Phaser from 'phaser';
-import { generated, playablesConfig, spriteRender, unlocksConfig, uiConfig } from '../data';
-import { isPlayableUnlocked } from '../meta/progress';
-import { session } from '../meta/session';
-import { localName } from '../data/simRules';
-import type { SpriteAnims } from '../data/schema';
-import { getLocale, t } from '../i18n';
-import { PokemonSpriteView } from '../render/sprites/PokemonSprite';
+import { playablesConfig } from '../data';
+import { t } from '../i18n';
+import { windowCss } from '../render/pixelUi';
 import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
+import { isPokemonUnlocked, PokemonPicker } from './pokemonPicker';
 import type { RunSceneData } from './RunScene';
 
 /**
- * ポケモン選択（見た目の作り込みはフェーズ4）。プレイアブルのポケモンをカードで横に並べる。
- * 数字キーかクリックで選ぶとランが始まる。Esc でタイトルへ。
+ * ポケモン選択（ソロ。DOM）。プレイアブルのポケモンを全部アイコンで並べ、まだ解放していないものは黒塗りにする（作者の案 2026年10月22日）。
+ * クリック・矢印キーで選び、ダブルクリック・Enter・「はじめる」でランを始める。Esc でタイトルへ。
  */
 export class SelectScene extends Phaser.Scene {
-  private readonly manifests = new Map<string, SpriteAnims | null>();
-
   constructor() {
     super('select');
   }
 
   create(): void {
-    const keys = Object.keys(playablesConfig.pokemon).filter((k) =>
-      isPlayableUnlocked(session.store.current, unlocksConfig, k, playablesConfig.pokemon[k]!.unlock),
-    );
-    let chosen = false;
-    const choose = (i: number): void => {
-      const key = keys[i];
-      if (!key || chosen) return;
-      chosen = true;
-      const data: RunSceneData = { pokemon: key, playerSprite: this.manifests.get(key) ?? null, coop: null };
-      this.scene.start('run', data);
-    };
-    const layout = (): void => {
-      this.children.removeAll(true);
-      const { width, height } = this.scale;
-      this.add.text(width / 2, height * 0.12, t('select.title'), { fontFamily: uiConfig.font.family, fontSize: '32px', color: '#ffffff' }).setOrigin(0.5);
-      this.add.text(width / 2, height * 0.12 + 44, t('select.hint'), { fontFamily: uiConfig.font.family, fontSize: '16px', color: '#b0bec5' }).setOrigin(0.5);
-      const gap = width * 0.02;
-      const cardW = (width - gap * (keys.length + 1)) / keys.length;
-      const cardH = height * 0.6;
-      const top = height * 0.25;
-      keys.forEach((key, i) => {
-        const x = gap + i * (cardW + gap);
-        const card = this.add.rectangle(x + cardW / 2, top + cardH / 2, cardW, cardH, 0x000000).setStrokeStyle(4, 0xf8f8f8).setInteractive({ useHandCursor: true });
-        card.on('pointerover', () => card.setStrokeStyle(4, 0xf8d030));
-        card.on('pointerout', () => card.setStrokeStyle(4, 0xf8f8f8));
-        card.on('pointerdown', () => choose(i));
-        const g = generated.pokemon[key];
-        const types = (g?.types ?? []).map((ty) => localName(generated.types[ty]?.names, getLocale(), ty)).join(' / ');
-        const move = playablesConfig.pokemon[key]!.startingMoves[0] ?? '';
-        const style = { fontFamily: uiConfig.font.family, color: '#ffffff', align: 'center' as const };
-        this.add.text(x + cardW / 2, top + 18, `${i + 1}`, { ...style, fontSize: '16px', color: '#b0bec5' }).setOrigin(0.5, 0);
-        this.add.text(x + cardW / 2, top + cardH * 0.62, localName(g?.names, getLocale(), key), { ...style, fontSize: `${Math.round(Math.min(cardW / 8, 34))}px`, fontStyle: 'bold' }).setOrigin(0.5);
-        this.add.text(x + cardW / 2, top + cardH * 0.62 + 40, types, { ...style, fontSize: '16px', color: '#cfd8dc' }).setOrigin(0.5);
-        this.add
-          .text(x + cardW / 2, top + cardH * 0.62 + 72, t('select.startingMove', { move: localName(generated.moves[move]?.names, getLocale(), move) }), { ...style, fontSize: '16px', color: '#cfd8dc' })
-          .setOrigin(0.5);
-        const manifest = this.manifests.get(key);
-        if (manifest) {
-          const view = new PokemonSpriteView(this, manifest, spriteRender.playerScale * 2);
-          view.sprite.setPosition(x + cardW / 2, top + cardH * 0.32);
-          view.play(spriteRender.idleAnimation, 0);
-        }
-      });
-    };
-    layout();
-    // スプライトは読み込めたものから表示する（取得していなければ名前だけ）
-    for (const key of keys) {
-      if (this.manifests.has(key)) continue;
+    const root = document.createElement('div');
+    root.style.cssText = `position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(960px,96vw);max-height:96vh;overflow:auto;${windowCss('dark')};padding:20px 24px;font-size:16px;line-height:1.6;box-sizing:border-box;z-index:20;display:flex;flex-direction:column;gap:12px`;
+    document.body.append(root);
+    let starting = false;
+    let selected: string | null = null;
+    const start = (key: string): void => {
+      if (starting) return;
+      starting = true;
+      // 選んだポケモンのスプライトを読んでから始める（取得していなければ仮の円）
       void loadPokemonAtRuntime(this, playablesConfig.pokemon[key]!.sprite).then((loaded) => {
-        this.manifests.set(key, loaded?.manifest ?? null);
-        if (this.sys.isActive()) layout();
+        if (!this.sys.isActive()) return;
+        const data: RunSceneData = { pokemon: key, playerSprite: loaded?.manifest ?? null, coop: null };
+        this.scene.start('run', data);
       });
+    };
+    const go = document.createElement('button');
+    const picker = new PokemonPicker({
+      onSelect: (key) => {
+        selected = key;
+        go.disabled = false;
+        go.style.opacity = '1';
+      },
+      onConfirm: start,
+    });
+    const title = document.createElement('div');
+    title.style.cssText = 'font-size:24px;text-align:center';
+    title.textContent = t('select.title');
+    const hint = document.createElement('div');
+    hint.style.cssText = 'text-align:center;opacity:0.75';
+    hint.textContent = t('select.hint');
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap';
+    const button = `${windowCss('light')};min-height:44px;padding:6px 16px;cursor:pointer;font:inherit;font-size:16px`;
+    go.style.cssText = `${button};opacity:0.45`;
+    go.textContent = t('select.start');
+    go.disabled = true;
+    go.onclick = () => {
+      if (selected) start(selected);
+    };
+    const back = document.createElement('button');
+    back.style.cssText = button;
+    back.textContent = t('select.back');
+    back.onclick = () => this.scene.start('title');
+    row.append(go, back);
+    root.append(title, hint, picker.element, row);
+    // 最初は一覧の先頭の解放済みのポケモンを選んでおく（Enter ですぐ始められる）
+    const first = Object.keys(playablesConfig.pokemon).find(isPokemonUnlocked);
+    if (first) {
+      picker.setSelected(first);
+      selected = first;
+      go.disabled = false;
+      go.style.opacity = '1';
     }
-    this.scale.on('resize', layout);
+
     const onKey = (ev: KeyboardEvent): void => {
-      if (ev.repeat) return;
-      const n = Number(ev.key);
-      if (n >= 1 && n <= keys.length) choose(n - 1);
+      const dir: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+      const d = dir[ev.key];
+      if (d) {
+        ev.preventDefault();
+        picker.move(d[0], d[1]);
+      } else if (ev.repeat) return;
+      else if (ev.key === 'Enter') picker.confirm();
       else if (ev.key === 'Escape') this.scene.start('title');
     };
     window.addEventListener('keydown', onKey);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.scale.off('resize', layout);
       window.removeEventListener('keydown', onKey);
+      root.remove();
     });
   }
 }

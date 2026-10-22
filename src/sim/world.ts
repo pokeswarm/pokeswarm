@@ -68,6 +68,8 @@ export interface Hazard {
   /** 突進する敵（直線の技。落ちたときに線に沿って進む。-1 なら突進しない） */
   readonly dasher: number;
   readonly damage: number;
+  /** 突進のあと、続けて狙い直す残りの回数 */
+  chainLeft?: number;
   ticksLeft: number;
   readonly totalTicks: number;
 }
@@ -149,7 +151,17 @@ export interface World {
   /** クリアが確定した（四天王を全員倒した）。伝説戦の間も true */
   cleared: boolean;
   /** 伝説戦（クリア後の乱入）。始まっていなければ null */
-  legendary: { kind: number; appearTick: number; endTick: number; spawned: boolean; result: LegendaryResult | null } | null;
+  legendary: {
+    kind: number;
+    appearTick: number;
+    endTick: number;
+    spawned: boolean;
+    result: LegendaryResult | null;
+    /** 第2段階に入った */
+    enraged?: boolean;
+    /** 次に手下を呼ぶ更新回数 */
+    nextMinionTick?: number;
+  } | null;
   /** スウォームイベントの予定（更新回数の順）と、次に出す番号 */
   readonly swarmSchedule: readonly { readonly tick: number; readonly swarm: number }[];
   nextSwarm: number;

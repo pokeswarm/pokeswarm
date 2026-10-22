@@ -373,6 +373,8 @@ export const bossMoveSchema = z.object({
   /** 狙ったプレイヤーの位置からのばらつき（2つ目以降の範囲） */
   spread: z.number().nonnegative().default(0),
   dashSpeed: z.number().positive().optional(),
+  /** 突進のあと、続けてもう一度狙い直して突進する回数（伝説。作者の決定 2026年10月23日） */
+  chain: z.number().int().nonnegative().optional(),
   /** じばく: 予告した敵（ビリリダマ）は止まり、落ちたときにいなくなる */
   selfDestruct: z.boolean().optional(),
 });
@@ -439,6 +441,18 @@ export const stageConfigSchema = z.object({
       warningSeconds: z.number().nonnegative(),
       /** この時間で倒せなければ、逃げられて終わる（クリアは確定済み） */
       timeLimitSeconds: z.number().positive(),
+      /** 第2段階（作者の決定 2026年10月23日）: HP が hpRatio を切ったら「DANGER」をもう一度出し、技の間隔を短くし、doubleChance の確率で2つの技を同時に使う */
+      enrage: z.object({ hpRatio: z.number().gt(0).lt(1), moveIntervalSeconds: z.number().positive(), doubleChance: z.number().min(0).max(1) }).optional(),
+      /** 手下（作者の決定 2026年10月23日。数の圧力を戻す）: everySeconds ごとに、伝説にちなんだ雑魚を count 体（第2段階は enragedCount 体）呼ぶ。HP は今の雑魚と同じ伸び方 */
+      minions: z
+        .object({
+          everySeconds: z.number().positive(),
+          count: z.number().int().nonnegative(),
+          enragedCount: z.number().int().nonnegative(),
+          /** 伝説の種類ごとの手下の種類（enemies.json の id） */
+          kinds: z.record(z.string(), z.array(z.string()).min(1)),
+        })
+        .optional(),
     })
     .nullable(),
   swarms: z.array(swarmSchema).default([]),

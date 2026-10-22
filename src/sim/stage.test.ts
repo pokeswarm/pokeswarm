@@ -253,6 +253,36 @@ describe('伝説の乱入', () => {
     expect(sim.world.legendary?.result).toBe('won');
   });
 
+  it('手下を決まった間隔で呼び、HP が半分を切ると第2段階（もう一度「DANGER」・技の間隔が短くなる・手下が増える）', () => {
+    const { sim } = solo(
+      stageRules({
+        legendary: {
+          ...legendary,
+          timeLimitSeconds: 60,
+          enrage: { hpRatio: 0.5, moveIntervalSeconds: 0.5, doubleChance: 0 },
+          minions: { everySeconds: 1, count: 3, enragedCount: 5, kinds: { legend: ['ring'] } },
+        },
+      }),
+    );
+    run(sim, 61);
+    killKind(sim, 2);
+    killKind(sim, 3);
+    // 「DANGER」から1秒で伝説、その1秒後に手下
+    run(sim, 30 + 31);
+    const count = (kind: number): number => Array.from(sim.world.enemies.kind.subarray(0, sim.world.enemies.count)).filter((k) => k === kind).length;
+    expect(count(6)).toBe(3);
+    // HP を半分より下にする
+    const e = sim.world.enemies;
+    const i = Array.from(e.kind.subarray(0, e.count)).indexOf(4);
+    e.hp[i] = e.maxHp[i]! * 0.4;
+    const types = run(sim, 2);
+    expect(types).toContain('legendaryWarning');
+    expect(sim.world.legendary?.enraged).toBe(true);
+    expect(sim.world.bosses[0]!.interval).toBe(15);
+    run(sim, 30);
+    expect(count(6)).toBe(3 + 5);
+  });
+
   it('時間内に倒せなければ逃げられるが、クリアのまま', () => {
     const { sim } = solo(stageRules({ legendary }));
     run(sim, 61);

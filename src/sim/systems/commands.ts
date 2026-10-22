@@ -146,6 +146,10 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         }
         break;
       case 'legendaryWarning':
+        if (cmd.enraged) {
+          if (world.role === 'guest' && world.legendary) world.events.push({ type: 'legendaryWarning', kind: cmd.kind, enraged: true });
+          break;
+        }
         if (world.role === 'guest' && !world.legendary) {
           world.legendary = { kind: cmd.kind, appearTick: 0, endTick: 0, spawned: false, result: null };
           world.cleared = true;

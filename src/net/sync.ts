@@ -132,7 +132,7 @@ export class SyncSession {
           if (host) hazards.push(ev.move, round2(ev.x), round2(ev.y), round2(ev.dirX), round2(ev.dirY), ev.dasher);
           break;
         case 'legendaryWarning':
-          if (host) out.push({ t: 'lw', k: ev.kind });
+          if (host) out.push(ev.enraged ? { t: 'lw', k: ev.kind, r: 1 } : { t: 'lw', k: ev.kind });
           break;
         case 'runEnded':
           if (host) out.push({ t: 'end', o: ev.outcome, lg: ev.legendary });
@@ -320,7 +320,7 @@ export class SyncSession {
           }
           break;
         case 'lw':
-          if (guest) cmds.push({ type: 'legendaryWarning', kind: m.k });
+          if (guest) cmds.push({ type: 'legendaryWarning', kind: m.k, enraged: m.r === 1 });
           break;
         case 'end':
           if (guest) cmds.push({ type: 'endRun', outcome: m.o, legendary: m.lg });

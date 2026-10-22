@@ -142,11 +142,12 @@
       "effect": "beam",
       "shape": "line",
       "target": "player",
-      "telegraphSeconds": 1,
+      "telegraphSeconds": 0.7,
       "radius": 30,
       "length": 500,
       "damage": 40,
-      "dashSpeed": 700
+      "dashSpeed": 900,
+      "chain": 1
     },
     {
       "id": "legend-beam",
@@ -154,7 +155,7 @@
       "effect": "beam",
       "shape": "line",
       "target": "player",
-      "telegraphSeconds": 1.2,
+      "telegraphSeconds": 0.8,
       "radius": 26,
       "length": 900,
       "damage": 45
@@ -165,7 +166,7 @@
       "effect": "psy",
       "shape": "circle",
       "target": "self",
-      "telegraphSeconds": 1.4,
+      "telegraphSeconds": 0.8,
       "radius": 280,
       "damage": 40
     },
@@ -175,7 +176,7 @@
       "effect": "meteor",
       "shape": "circle",
       "target": "player",
-      "telegraphSeconds": 1.4,
+      "telegraphSeconds": 0.7,
       "radius": 80,
       "damage": 35,
       "count": 5,
@@ -208,9 +209,46 @@
       "legend-nova",
       "legend-meteor"
     ],
-    "moveIntervalSeconds": 2.5,
+    "moveIntervalSeconds": 1.6,
     "warningSeconds": 3,
-    "timeLimitSeconds": 180
+    "timeLimitSeconds": 180,
+    "enrage": {
+      "hpRatio": 0.5,
+      "moveIntervalSeconds": 1.1,
+      "doubleChance": 0.35
+    },
+    "minions": {
+      "everySeconds": 6,
+      "count": 10,
+      "enragedCount": 16,
+      "kinds": {
+        "legend-mewtwo": [
+          "drowzee",
+          "jynx",
+          "slowbro"
+        ],
+        "legend-mew": [
+          "ditto",
+          "drowzee",
+          "jynx"
+        ],
+        "legend-articuno": [
+          "jynx",
+          "dewgong",
+          "cloyster",
+          "seel"
+        ],
+        "legend-zapdos": [
+          "doduo",
+          "fearow",
+          "pidgeotto"
+        ],
+        "legend-moltres": [
+          "ponyta",
+          "vulpix"
+        ]
+      }
+    }
   },
   "swarms": [
     {

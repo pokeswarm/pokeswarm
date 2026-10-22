@@ -177,6 +177,8 @@ export interface SwarmStartedEvent {
 export interface LegendaryWarningEvent {
   readonly type: 'legendaryWarning';
   readonly kind: number;
+  /** 第2段階に入った（もう一度「DANGER」を出す） */
+  readonly enraged?: boolean;
 }
 
 /** 技を使った（効果音のため） */

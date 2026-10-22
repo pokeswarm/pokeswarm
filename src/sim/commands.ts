@@ -183,6 +183,8 @@ export interface BossHpCommand {
 /** ゲスト: 伝説の乱入（「DANGER」） */
 export interface LegendaryWarningCommand {
   readonly type: 'legendaryWarning';
+  /** 第2段階に入った */
+  readonly enraged?: boolean;
   readonly kind: number;
 }
 

@@ -1,6 +1,6 @@
 import type { BossMove } from '../../data/schema';
 import { randomUnit } from '../math';
-import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World } from '../world';
+import { currentWaveIndex, enemyCap, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World } from '../world';
 import { hurtPlayer } from './health';
 
 /**
@@ -48,6 +48,11 @@ export function spawnBosses(world: World): void {
         cfg.moves.map((id) => world.rules.stage.moves.findIndex((m) => m.id === id)),
         Math.round(cfg.moveIntervalSeconds / world.dt),
       );
+      if (cfg.minions) lg.nextMinionTick = world.tick + Math.round(cfg.minions.everySeconds / world.dt);
+    }
+    if (lg.spawned) {
+      enrageLegendary(world);
+      spawnMinions(world);
     }
     return;
   }
@@ -179,31 +184,44 @@ export function bossAttacks(world: World): void {
       }
       if (--boss.cooldown > 0) continue;
       boss.cooldown = boss.interval;
-      const moveIdx = boss.moves[boss.next++ % boss.moves.length]!;
-      const move = world.rules.stage.moves[moveIdx];
-      if (!move) continue;
-      const bx = world.enemies.x[i]!;
-      const by = world.enemies.y[i]!;
-      const target = nearestPlayer(world, bx, by);
-      if (!target) continue;
-      if (move.shape === 'line') {
-        // 自分から狙ったプレイヤーへ向かう直線
-        const dx = target.x - bx;
-        const dy = target.y - by;
-        const len = Math.hypot(dx, dy) || 1;
-        addHazard(world, moveIdx, bx, by, dx / len, dy / len, move.dashSpeed ? boss.id : -1);
-      } else if (move.target === 'self') {
-        addHazard(world, moveIdx, bx, by, 0, 0, -1);
-      } else {
-        for (let c = 0; c < move.count; c++) {
-          // 1つ目は足元、2つ目以降はばらつかせる（動かないと当たり、動けば避けられる）
-          const [ux, uy] = c === 0 ? [0, 0] : randomUnit(world.rng);
-          const dist = c === 0 ? 0 : world.rng.range(move.radius, move.spread + move.radius);
-          addHazard(world, moveIdx, target.x + ux * dist, target.y + uy * dist, 0, 0, -1);
-        }
-      }
+      const cfg = world.rules.stage.legendary;
+      const enraged = !!world.legendary?.enraged && world.enemies.kind[i] === world.legendary.kind;
+      const uses = enraged && cfg?.enrage && world.rng.next() < cfg.enrage.doubleChance ? 2 : 1;
+      for (let u = 0; u < uses; u++) useBossMove(world, boss, i);
     }
   }
+  strikeHazards(world);
+}
+
+/** ボス・伝説が技を1つ使う（予告を置く） */
+function useBossMove(world: World, boss: World['bosses'][number], i: number): void {
+  const moveIdx = boss.moves[boss.next++ % boss.moves.length]!;
+  const move = world.rules.stage.moves[moveIdx];
+  if (!move) return;
+  const bx = world.enemies.x[i]!;
+  const by = world.enemies.y[i]!;
+  const target = nearestPlayer(world, bx, by);
+  if (!target) return;
+  if (move.shape === 'line') {
+    // 自分から狙ったプレイヤーへ向かう直線
+    const dx = target.x - bx;
+    const dy = target.y - by;
+    const len = Math.hypot(dx, dy) || 1;
+    addHazard(world, moveIdx, bx, by, dx / len, dy / len, move.dashSpeed ? boss.id : -1);
+  } else if (move.target === 'self') {
+    addHazard(world, moveIdx, bx, by, 0, 0, -1);
+  } else {
+    for (let c = 0; c < move.count; c++) {
+      // 1つ目は足元、2つ目以降はばらつかせる（動かないと当たり、動けば避けられる）
+      const [ux, uy] = c === 0 ? [0, 0] : randomUnit(world.rng);
+      const dist = c === 0 ? 0 : world.rng.range(move.radius, move.spread + move.radius);
+      addHazard(world, moveIdx, target.x + ux * dist, target.y + uy * dist, 0, 0, -1);
+    }
+  }
+}
+
+/** 予告の時間が来た範囲技を当てる */
+function strikeHazards(world: World): void {
   const me = world.players.find((p) => p.id === world.localPlayerId);
   for (let h = world.hazards.length - 1; h >= 0; h--) {
     const hz = world.hazards[h]!;
@@ -232,7 +250,18 @@ export function bossAttacks(world: World): void {
     // 突進: 線に沿って進む（ノックバックの仕組みで動かす。ホストが動かし、位置はゲストへ送る）
     if (hz.dasher !== -1 && move?.dashSpeed && world.role !== 'guest') {
       const i = findEnemyIndex(world, hz.dasher);
-      if (i !== -1) world.enemies.knockBack(i, hz.dirX * move.dashSpeed, hz.dirY * move.dashSpeed, Math.round(hz.length / move.dashSpeed / world.dt));
+      if (i !== -1) {
+        world.enemies.knockBack(i, hz.dirX * move.dashSpeed, hz.dirY * move.dashSpeed, Math.round(hz.length / move.dashSpeed / world.dt));
+        // 続けて狙い直す（突進の先から、そのときのプレイヤーへ。予告はもう一度出る）
+        const left = hz.chainLeft ?? move.chain ?? 0;
+        const target = left > 0 ? nearestPlayer(world, hz.x + hz.dirX * hz.length, hz.y + hz.dirY * hz.length) : null;
+        if (target) {
+          const sx = hz.x + hz.dirX * hz.length;
+          const sy = hz.y + hz.dirY * hz.length;
+          const len = Math.hypot(target.x - sx, target.y - sy) || 1;
+          addHazard(world, hz.move, sx, sy, (target.x - sx) / len, (target.y - sy) / len, hz.dasher, left - 1);
+        }
+      }
     }
     if (!me || me.down || me.invincibleTicks > 0) continue;
     if (hazardHits(hz, me.x, me.y, me.radius)) hurtPlayer(world, me, hz.damage);
@@ -254,12 +283,12 @@ export function hazardHits(
 }
 
 /** 範囲技の予告を置く（ホストが決め、ゲストには知らせで届く） */
-export function addHazard(world: World, moveIdx: number, x: number, y: number, dirX: number, dirY: number, dasher: number): void {
+export function addHazard(world: World, moveIdx: number, x: number, y: number, dirX: number, dirY: number, dasher: number, chainLeft?: number): void {
   const move: BossMove | undefined = world.rules.stage.moves[moveIdx];
   if (!move) return;
   const ticks = Math.round(move.telegraphSeconds / world.dt);
   const length = move.shape === 'line' ? (move.length ?? 400) : 0;
-  world.hazards.push({ move: moveIdx, shape: move.shape, x, y, radius: move.radius, dirX, dirY, length, dasher, damage: move.damage, ticksLeft: ticks, totalTicks: ticks });
+  world.hazards.push({ move: moveIdx, shape: move.shape, x, y, radius: move.radius, dirX, dirY, length, dasher, damage: move.damage, ticksLeft: ticks, totalTicks: ticks, chainLeft });
   // じばく: 予告した敵はその場で止まる（ゲストも同じ知らせで止める）
   if (move.selfDestruct && dasher !== -1) {
     const i = findEnemyIndex(world, dasher);
@@ -284,6 +313,50 @@ function nearestPlayer(world: World, x: number, y: number): World['players'][num
     }
   }
   return out;
+}
+
+/** 伝説の第2段階: HP が決まった割合を切ったら、「DANGER」をもう一度出し、技の間隔を短くする（ソロ・ホスト） */
+function enrageLegendary(world: World): void {
+  const lg = world.legendary;
+  const cfg = world.rules.stage.legendary?.enrage;
+  if (!lg || lg.enraged || !cfg || world.role === 'guest') return;
+  const i = world.enemies.kind.findIndex((k, idx) => idx < world.enemies.count && k === lg.kind && world.enemies.hp[idx]! > 0);
+  if (i === -1 || world.enemies.hp[i]! > world.enemies.maxHp[i]! * cfg.hpRatio) return;
+  lg.enraged = true;
+  const boss = world.bosses.find((b) => b.id === world.enemies.id[i]);
+  if (boss) {
+    boss.interval = Math.round(cfg.moveIntervalSeconds / world.dt);
+    boss.cooldown = Math.min(boss.cooldown, boss.interval);
+  }
+  world.events.push({ type: 'legendaryWarning', kind: lg.kind, enraged: true });
+}
+
+/** 伝説の手下: 決まった間隔で、伝説にちなんだ雑魚をプレイヤーのまわり（画面の外）に呼ぶ（ソロ・ホスト） */
+function spawnMinions(world: World): void {
+  const lg = world.legendary;
+  const cfg = world.rules.stage.legendary?.minions;
+  if (!lg || !cfg || world.role === 'guest' || lg.nextMinionTick === undefined || world.tick < lg.nextMinionTick) return;
+  lg.nextMinionTick = world.tick + Math.round(cfg.everySeconds / world.dt);
+  const ids = cfg.kinds[world.rules.enemies.kinds[lg.kind]?.id ?? ''] ?? [];
+  const kinds = ids.map((id) => world.rules.enemies.kinds.findIndex((k) => k.id === id)).filter((k) => k !== -1);
+  if (kinds.length === 0) return;
+  const s = world.rules.spawn;
+  const wave = world.waves[currentWaveIndex(world)]!;
+  const hpScale = enemyHpScale(world);
+  const n = (lg.enraged ? cfg.enragedCount : cfg.count) * world.players.length;
+  for (let k = 0; k < n; k++) {
+    if (world.enemies.count >= enemyCap(world)) break;
+    const p = world.players[world.rng.int(world.players.length)]!;
+    const [ux, uy] = randomUnit(world.rng);
+    const dist = world.rng.range(s.spawnDistanceMin, s.spawnDistanceMax);
+    const kindIndex = kinds[world.rng.int(kinds.length)]!;
+    const kind = world.rules.enemies.kinds[kindIndex]!;
+    const id = world.nextEnemyId++;
+    const x = p.x + ux * dist;
+    const y = p.y + uy * dist;
+    if (world.enemies.add(id, kindIndex, x, y, kind.hp * hpScale, kind.moveSpeed, kind.radius, kind.contactDamage * wave.damageMultiplier) === -1) break;
+    world.events.push({ type: 'enemySpawned', id, kind: kindIndex, x, y });
+  }
 }
 
 /**

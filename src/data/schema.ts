@@ -522,6 +522,8 @@ export type CombatConfig = z.infer<typeof combatConfigSchema>;
  * - trail（足あと）: 歩いていると、自分の足元にしばらく残る当たり判定を置く（止まっていると出ない）
  * - cross（十字）: 向いている方向から等しい角度で count 方向へ同時に撃つ（4 で十字、8 で全方向）
  * - scatter（水たまり）: 自分の周り range の中のランダムな場所に、しばらく残る当たり判定を置く
+ * - eruption（爆炎の柱）: 自分を中心に count 方向へ、円の柱を stages 段に分けて、interval ごとに外へ向かって順に出す。
+ *   いちばん外の段が range の距離。外の段ほど半径が sizeGrowth の割合ずつ大きい（ブラストバーン。作者の決定 2026年10月23日）
  */
 export const MOVE_PATTERNS = [
   'nearest',
@@ -544,6 +546,7 @@ export const MOVE_PATTERNS = [
   'cross',
   'scatter',
   'stream',
+  'eruption',
 ] as const;
 export type MovePattern = (typeof MOVE_PATTERNS)[number];
 
@@ -681,6 +684,8 @@ export const moveDefSchema = z.object({
    * lungeDistance だけ体を出して戻す。afterimages があれば、その数の残像を前方に残す（でんこうせっか）
    */
   body: z.object({ lungeDistance: z.number().positive(), afterimages: z.number().int().nonnegative().default(0) }).optional(),
+  /** eruption（爆炎の柱）の段の数と、外の段ほど半径を大きくする割合（1段ごと） */
+  eruption: z.object({ stages: z.number().int().positive(), sizeGrowth: z.number().nonnegative() }).optional(),
   /** 「効き方」の部品（07_content_draft.md 22.4）。進化するたびに増やす */
   effects: z.array(moveEffectSchema).optional(),
   /** 飛ぶ弾が曲がる速さ（度/秒）。十字・向いている方向の弾が渦を巻くように回る（ふぶき・エアスラッシュ） */

@@ -424,5 +424,6 @@
   "account.statusShort.error": "No se pudo conectar",
   "shop.colName": "Mejora",
   "shop.colRank": "Rango",
-  "shop.colEffect": "Efecto"
+  "shop.colEffect": "Efecto",
+  "pattern.eruption": "Se extiende en 8 direcciones a tu alrededor"
 }

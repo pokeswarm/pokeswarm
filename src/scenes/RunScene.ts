@@ -1058,11 +1058,13 @@ export class RunScene extends Phaser.Scene {
       timeMs,
       (i) => (pr.shape[i] === SHAPE_LINE ? { length: pr.length[i]!, dirX: pr.dirX[i]!, dirY: pr.dirY[i]! } : null),
       (i) => (pr.shape[i] === SHAPE_SECTOR ? { dirX: pr.dirX[i]!, dirY: pr.dirY[i]!, half: pr.length[i]! } : null),
+      // 出番を待っている当たり判定（爆炎の柱）は、現れるまで描かない
+      (i) => pr.stage[i] === 3,
     );
     this.hitShapes.draw(
       pr,
       alpha,
-      (i) => this.shapeColors[pr.move[i]!] ?? null,
+      (i) => (pr.stage[i] === 3 ? null : (this.shapeColors[pr.move[i]!] ?? null)),
       (i) => (pr.shape[i] === SHAPE_LINE ? { length: pr.length[i]!, dirX: pr.dirX[i]!, dirY: pr.dirY[i]! } : null),
       view,
       (i) => (pr.shape[i] === SHAPE_SECTOR ? { dirX: pr.dirX[i]!, dirY: pr.dirY[i]!, half: pr.length[i]! } : null),

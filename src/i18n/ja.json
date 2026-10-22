@@ -445,5 +445,6 @@
   "account.statusShort.error": "接続できませんでした",
   "shop.colName": "強化",
   "shop.colRank": "ランク",
-  "shop.colEffect": "効果"
+  "shop.colEffect": "効果",
+  "pattern.eruption": "自分を中心に八方へ広がる"
 }

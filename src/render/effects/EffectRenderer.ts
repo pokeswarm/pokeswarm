@@ -134,6 +134,8 @@ export class EffectRenderer {
     lineOf: (index: number) => { length: number; dirX: number; dirY: number } | null = () => null,
     /** 扇形の当たり判定なら向きと片側の開き（ラジアン）。円なら null */
     sectorOf: (index: number) => { dirX: number; dirY: number; half: number } | null = () => null,
+    /** 描かないもの（出番を待っている爆炎の柱など） */
+    hidden: (index: number) => boolean = () => false,
   ): void {
     // 軌跡のパーティクルを出す数は、レシピごとの間隔で決める
     const trailCounts = new Map<string, number>();
@@ -149,6 +151,7 @@ export class EffectRenderer {
     };
     let used = 0;
     for (let i = 0; i < src.count; i++) {
+      if (hidden(i)) continue;
       const recipeId = recipeOf(i);
       const recipe = this.recipe(recipeId);
       const body = recipe.projectile;

@@ -1238,67 +1238,61 @@
     },
     "blast-burn": {
       "key": "blast-burn",
-      "pattern": "melee",
+      "pattern": "eruption",
       "effect": "blast-burn",
       "base": {
-        "power": 22.6,
-        "intervalSeconds": 0.1,
-        "count": 1,
+        "power": 34.9,
+        "intervalSeconds": 0.22,
+        "count": 8,
         "speed": 0,
         "size": 40,
         "range": 600,
-        "durationSeconds": 0.8,
+        "durationSeconds": 0.6,
         "pierce": "infinite",
-        "hitIntervalSeconds": 0.25,
+        "hitIntervalSeconds": 0.3,
         "knockback": 160,
         "knockbackSeconds": 0.1,
         "spreadDegrees": 0,
-        "cooldownSeconds": 1.1,
+        "cooldownSeconds": 1.6,
         "statusId": "burn",
         "statusChance": 0.5,
         "statusSeconds": 4,
-        "lifestealPct": 0,
-        "arcDegrees": 40
+        "lifestealPct": 0
       },
       "levels": [
         {
-          "arcDegrees": 5,
-          "power": 3.8
-        },
-        {
-          "range": 30,
-          "power": 3.8
+          "size": 4,
+          "power": 5.9
         },
         {
           "durationSeconds": 0.2,
-          "power": -4.7
-        },
-        {
-          "arcDegrees": 5,
-          "power": 2.9
-        },
-        {
-          "cooldownSeconds": -0.15,
-          "power": -1.5
+          "power": 5.8
         },
         {
           "range": 40,
-          "power": 2.5
+          "power": 5.9
         },
         {
-          "arcDegrees": 10,
-          "power": 2.5
+          "size": 4,
+          "power": 5.8
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": -0.1
+        },
+        {
+          "size": 6,
+          "power": 5.3
+        },
+        {
+          "range": 40,
+          "power": 5.3
         }
       ],
-      "effects": [
-        {
-          "trigger": "hit",
-          "explode": {
-            "sizeMultiplier": 3,
-            "powerMultiplier": 1
-          }
-        }
-      ]
+      "eruption": {
+        "stages": 3,
+        "sizeGrowth": 0.3
+      }
     },
     "frenzy-plant": {
       "pattern": "scatter",

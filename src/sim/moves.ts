@@ -45,6 +45,8 @@ export interface SimMoveDef {
   readonly effect: string;
   /** 自分の体で攻撃する技の見た目（使ったときに知らせる）。無ければ null */
   readonly body: { readonly lungeDistance: number; readonly afterimages: number } | null;
+  /** eruption（爆炎の柱）の段の数と、外の段ほど半径を大きくする割合。eruption でなければ null */
+  readonly eruption: { readonly stages: number; readonly sizeGrowth: number } | null;
   /** 効き方の部品（07 22.4）。無ければ空 */
   readonly effects: readonly MoveEffect[];
   /** 飛ぶ弾が曲がる速さ（ラジアン/秒）。0 なら まっすぐ */

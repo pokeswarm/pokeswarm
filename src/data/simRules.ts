@@ -47,6 +47,7 @@ export function buildSimRules(): SimRules {
       levels: resolveMoveLevels(def, statusIndexOf),
       effect: def.effect,
       body: def.body ?? null,
+      eruption: def.eruption ?? null,
       effects: def.effects ?? [],
       curve: ((def.curve ?? 0) * Math.PI) / 180,
     };

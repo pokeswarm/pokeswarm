@@ -26,7 +26,7 @@ export function moveMaxLevel(def: MoveDefData): number {
 }
 
 /** 当たり判定が別々の場所に出る出し方 */
-const SPREAD_PATTERNS = new Set(['orbit', 'screen', 'cross', 'strike', 'scatter', 'chain', 'whip', 'trail', 'lob', 'bounce', 'stream']);
+const SPREAD_PATTERNS = new Set(['orbit', 'screen', 'cross', 'strike', 'scatter', 'chain', 'whip', 'trail', 'lob', 'bounce', 'stream', 'eruption']);
 
 export function moveStrength(def: MoveDefData, s: MoveStatsAt): number {
   const interval = s.hitIntervalSeconds as number;
@@ -64,6 +64,8 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
   const interval = num('hitIntervalSeconds');
   const hits = interval > 0 ? Math.max(1, Math.floor(num('durationSeconds') / interval)) : 1;
   let area: number;
+  // 爆炎の柱は、1回の技で 方向の数 × 段の数 の柱が出る
+  let pieces = num('count');
   switch (def.pattern) {
     case 'nearest':
     case 'facing':
@@ -91,6 +93,14 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
     case 'nova':
       area = Math.PI * range * range;
       break;
+    case 'eruption': {
+      const er = def.eruption ?? { stages: 3, sizeGrowth: 0.25 };
+      // 段ごとに半径が大きくなるので、真ん中の段の大きさで数える
+      const r = size * (1 + (er.sizeGrowth * (er.stages - 1)) / 2);
+      area = Math.PI * r * r;
+      pieces *= er.stages;
+      break;
+    }
     case 'orbit':
       // 回りながら当たり直すので、1回に当たるのは当たり判定の近くだけ
       area = 2 * Math.PI * size * size;
@@ -99,7 +109,7 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
       area = Math.PI * size * size;
   }
   const targets = Math.min(pierce, CROWD_MAX_TARGETS, 1 + area / CROWD_AREA_PER_ENEMY);
-  const perCast = Math.min(CROWD_MAX_PER_CAST, num('count') * targets);
+  const perCast = Math.min(CROWD_MAX_PER_CAST, pieces * targets);
   return (num('power') * hits * perCast) / num('cooldownSeconds');
 }
 

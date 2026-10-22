@@ -190,6 +190,9 @@ export function useMoves(world: World): void {
         case 'stream':
           fireStream(world, p, pm, st);
           break;
+        case 'eruption':
+          fireEruption(world, p, pm, st);
+          break;
       }
       if (def.effects.some((fx) => fx.trigger === 'cast')) {
         const [fx, fy] = axisToUnit(p.facingX, p.facingY);
@@ -404,7 +407,7 @@ function fireScreen(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
 }
 
 /** 一度に出し終える出し方（ゆびをふるで選ぶ技。連射の出し方は、出し続ける状態を持てないので選ばない） */
-const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter']);
+const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter', 'eruption']);
 
 /** metronome（ゆびをふる）: ほかの技からランダムに1つを、その技の最大レベルで出す */
 function fireMetronome(world: World, p: Player): void {
@@ -431,6 +434,7 @@ function fireMetronome(world: World, p: Player): void {
     bounce: fireBounce,
     cross: fireCross,
     scatter: fireScatter,
+    eruption: fireEruption,
   };
   fire[def.pattern]?.(world, p, pm, st);
 }
@@ -563,6 +567,31 @@ function fireScatter(world: World, p: Player, pm: PlayerMove, st: MoveStats): vo
   }
 }
 
+/**
+ * eruption（爆炎の柱）: 自分を中心に count 方向へ、円の柱を段に分けて外へ向かって順に出す（ブラストバーン。作者の決定 2026年10月23日）。
+ * 段 k（0 から）は、距離 range × (k + 1) / 段の数、半径 size × (1 + sizeGrowth × k)、interval × k 秒遅れて現れ、duration の間残る。
+ * 遅れて現れる柱は、出番を待つもの（stage 3）として置き、待つ間は見えず当たらない
+ */
+function fireEruption(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const def = world.rules.moves[pm.move]!;
+  const er = def.eruption ?? { stages: 3, sizeGrowth: 0.25 };
+  const sc = scaledMoveStats(world, p, pm, st);
+  const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  const a0 = Math.atan2(fy, fx);
+  for (let k = 0; k < er.stages; k++) {
+    const d = (st.range * (k + 1)) / er.stages;
+    const radius = sc.size * (1 + er.sizeGrowth * k);
+    const wait = st.intervalSeconds * k;
+    for (let j = 0; j < st.count; j++) {
+      const a = a0 + (j / st.count) * Math.PI * 2;
+      const x = p.x + Math.cos(a) * d;
+      const y = p.y + Math.sin(a) * d;
+      if (wait <= 0) world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, radius });
+      else world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, radius, life: wait, stage: 3, armLife: st.durationSeconds });
+    }
+  }
+}
+
 /** nova: 自分を中心に、大きさ size から range まで広がる輪 */
 function fireNova(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const sc = scaledMoveStats(world, p, pm, st);
@@ -604,6 +633,16 @@ export function moveProjectiles(world: World): void {
   for (let i = pr.count - 1; i >= 0; i--) {
     pr.prevX[i] = pr.x[i]!;
     pr.prevY[i] = pr.y[i]!;
+    // 出番を待つもの（stage 3）: 時間が来たら、技そのものとして現れる（見えず当たらないまま待つ）
+    if (pr.stage[i] === 3) {
+      pr.life[i]! -= world.dt;
+      if (pr.life[i]! <= 0) {
+        pr.stage[i] = 0;
+        pr.life[i] = pr.maxLife[i] = pr.armLife[i]!;
+        world.events.push({ type: 'projectileHit', x: pr.x[i]!, y: pr.y[i]!, owner: pr.owner[i]!, move: pr.move[i]! });
+      }
+      continue;
+    }
     const owner = world.players.find((p) => p.id === pr.owner[i]);
     const motion = pr.motion[i]!;
     if (motion === MOTION_LINEAR) {

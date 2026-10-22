@@ -424,5 +424,6 @@
   "account.statusShort.error": "Keine Verbindung",
   "shop.colName": "Verbesserung",
   "shop.colRank": "Rang",
-  "shop.colEffect": "Wirkung"
+  "shop.colEffect": "Wirkung",
+  "pattern.eruption": "Breitet sich in 8 Richtungen um dich aus"
 }

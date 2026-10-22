@@ -445,5 +445,6 @@
   "account.statusShort.error": "Could not connect",
   "shop.colName": "Upgrade",
   "shop.colRank": "Rank",
-  "shop.colEffect": "Effect"
+  "shop.colEffect": "Effect",
+  "pattern.eruption": "Spreads out in 8 directions around you"
 }

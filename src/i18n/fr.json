@@ -424,5 +424,6 @@
   "account.statusShort.error": "Connexion impossible",
   "shop.colName": "Amélioration",
   "shop.colRank": "Rang",
-  "shop.colEffect": "Effet"
+  "shop.colEffect": "Effet",
+  "pattern.eruption": "Se propage dans 8 directions autour de vous"
 }

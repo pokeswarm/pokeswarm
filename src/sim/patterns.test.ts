@@ -33,6 +33,26 @@ describe('技の型（作者の決定。07 18章）', () => {
     expect(run('whip', { range: 200, size: 10, count: 8 }, diag, 3).hit.every((h) => h > 0)).toBe(true);
   });
 
+  it('爆炎の柱: 八方へ三段、内側から順に現れ、外の段ほど遠く大きい', () => {
+    const { sim } = run('eruption', { range: 300, size: 20, count: 8, intervalSeconds: 0.2, durationSeconds: 1 }, [], 1);
+    const pr = sim.world.projectiles;
+    const shown = (): number[] => Array.from({ length: pr.count }, (_, i) => i).filter((i) => pr.stage[i] === 0);
+    // 最初は内側の段（8本）だけが見え、残り 16 本は出番を待つ
+    expect(shown()).toHaveLength(8);
+    expect(pr.count).toBe(24);
+    for (let t = 0; t < 7; t++) sim.step([]);
+    expect(shown()).toHaveLength(16);
+    for (let t = 0; t < 6; t++) sim.step([]);
+    const all = shown();
+    expect(all).toHaveLength(24);
+    const dist = (i: number): number => Math.hypot(pr.x[i]!, pr.y[i]!);
+    const outer = all.filter((i) => dist(i) > 250);
+    const inner = all.filter((i) => dist(i) < 150);
+    expect(outer).toHaveLength(8);
+    expect(inner).toHaveLength(8);
+    expect(pr.radius[outer[0]!]!).toBeGreaterThan(pr.radius[inner[0]!]!);
+  });
+
   it('放物線: 上へ投げて落ちてくる（すぐ横の敵には当たりにくく、落ちる先に当たる）', () => {
     const { sim } = run('lob', { speed: 400, size: 6, count: 1, durationSeconds: 2 }, [], 6);
     const pr = sim.world.projectiles;

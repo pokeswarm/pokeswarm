@@ -60,10 +60,15 @@ export interface ProjectileSpawn {
   dirY: number;
   /** 半径が1秒に広がる量（nova） */
   growth: number;
-  /** 効き方の部品から出たもの（1）・遅れて弾ける印（2）。0 は技そのもの。0 のものだけが効き方を起こす（07 22.4） */
+  /**
+   * 効き方の部品から出たもの（1）・遅れて弾ける印（2）・出番を待つもの（3。life の間は見えず当たらず、尽きたら armLife の長さで技そのもの（0）として現れる）。
+   * 0 は技そのもの。0 のものだけが効き方を起こす（07 22.4）
+   */
   stage?: number;
   /** 印（stage 2）が弾けるときに使う、技の効き方の番号 */
   fxIndex?: number;
+  /** 出番を待つもの（stage 3）が現れてから残る時間（秒） */
+  armLife?: number;
   /** ノックバックの強さの上書き（ワールド単位/秒。マイナスで引き寄せる）。無ければ技の値 */
   knockback?: number;
 }
@@ -102,6 +107,7 @@ export class ProjectileStore {
   readonly growth: Float64Array;
   /** 出したときの残り時間（boomerang の戻りの計算に使う） */
   readonly maxLife: Float64Array;
+  readonly armLife: Float64Array;
   /** 当てた敵の id と当てた更新番号（発射体ごとに hitMemory 個の輪状の記録） */
   readonly hitIds: Uint32Array;
   readonly hitTicks: Uint32Array;
@@ -144,6 +150,7 @@ export class ProjectileStore {
     this.dirY = new Float64Array(capacity);
     this.growth = new Float64Array(capacity);
     this.maxLife = new Float64Array(capacity);
+    this.armLife = new Float64Array(capacity);
     this.hitIds = new Uint32Array(capacity * hitMemory);
     this.hitTicks = new Uint32Array(capacity * hitMemory);
     this.hitCount = new Uint32Array(capacity);
@@ -181,6 +188,7 @@ export class ProjectileStore {
     this.dirY[i] = p.dirY;
     this.growth[i] = p.growth;
     this.maxLife[i] = p.life;
+    this.armLife[i] = p.armLife ?? 0;
     this.hitCount[i] = 0;
     this.stage[i] = p.stage ?? 0;
     this.fxIndex[i] = p.fxIndex ?? 0;
@@ -219,6 +227,7 @@ export class ProjectileStore {
     this.dirY[i] = this.dirY[last]!;
     this.growth[i] = this.growth[last]!;
     this.maxLife[i] = this.maxLife[last]!;
+    this.armLife[i] = this.armLife[last]!;
     this.hitCount[i] = this.hitCount[last]!;
     this.stage[i] = this.stage[last]!;
     this.fxIndex[i] = this.fxIndex[last]!;

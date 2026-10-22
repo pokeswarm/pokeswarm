@@ -1,6 +1,6 @@
 import type { BossMove } from '../../data/schema';
 import { randomUnit } from '../math';
-import { currentWaveIndex, enemyCap, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World } from '../world';
+import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World } from '../world';
 import { hurtPlayer } from './health';
 
 /**
@@ -48,12 +48,8 @@ export function spawnBosses(world: World): void {
         cfg.moves.map((id) => world.rules.stage.moves.findIndex((m) => m.id === id)),
         Math.round(cfg.moveIntervalSeconds / world.dt),
       );
-      if (cfg.minions) lg.nextMinionTick = world.tick + Math.round(cfg.minions.everySeconds / world.dt);
     }
-    if (lg.spawned) {
-      enrageLegendary(world);
-      spawnMinions(world);
-    }
+    if (lg.spawned) enrageLegendary(world);
     return;
   }
   const inSection = world.tick - world.sectionStartTick;
@@ -329,34 +325,6 @@ function enrageLegendary(world: World): void {
     boss.cooldown = Math.min(boss.cooldown, boss.interval);
   }
   world.events.push({ type: 'legendaryWarning', kind: lg.kind, enraged: true });
-}
-
-/** 伝説の手下: 決まった間隔で、伝説にちなんだ雑魚をプレイヤーのまわり（画面の外）に呼ぶ（ソロ・ホスト） */
-function spawnMinions(world: World): void {
-  const lg = world.legendary;
-  const cfg = world.rules.stage.legendary?.minions;
-  if (!lg || !cfg || world.role === 'guest' || lg.nextMinionTick === undefined || world.tick < lg.nextMinionTick) return;
-  lg.nextMinionTick = world.tick + Math.round(cfg.everySeconds / world.dt);
-  const ids = cfg.kinds[world.rules.enemies.kinds[lg.kind]?.id ?? ''] ?? [];
-  const kinds = ids.map((id) => world.rules.enemies.kinds.findIndex((k) => k.id === id)).filter((k) => k !== -1);
-  if (kinds.length === 0) return;
-  const s = world.rules.spawn;
-  const wave = world.waves[currentWaveIndex(world)]!;
-  const hpScale = enemyHpScale(world);
-  const n = (lg.enraged ? cfg.enragedCount : cfg.count) * world.players.length;
-  for (let k = 0; k < n; k++) {
-    if (world.enemies.count >= enemyCap(world)) break;
-    const p = world.players[world.rng.int(world.players.length)]!;
-    const [ux, uy] = randomUnit(world.rng);
-    const dist = world.rng.range(s.spawnDistanceMin, s.spawnDistanceMax);
-    const kindIndex = kinds[world.rng.int(kinds.length)]!;
-    const kind = world.rules.enemies.kinds[kindIndex]!;
-    const id = world.nextEnemyId++;
-    const x = p.x + ux * dist;
-    const y = p.y + uy * dist;
-    if (world.enemies.add(id, kindIndex, x, y, kind.hp * hpScale, kind.moveSpeed, kind.radius, kind.contactDamage * wave.damageMultiplier) === -1) break;
-    world.events.push({ type: 'enemySpawned', id, kind: kindIndex, x, y });
-  }
 }
 
 /**

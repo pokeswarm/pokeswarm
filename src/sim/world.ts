@@ -159,8 +159,6 @@ export interface World {
     result: LegendaryResult | null;
     /** 第2段階に入った */
     enraged?: boolean;
-    /** 次に手下を呼ぶ更新回数 */
-    nextMinionTick?: number;
   } | null;
   /** スウォームイベントの予定（更新回数の順）と、次に出す番号 */
   readonly swarmSchedule: readonly { readonly tick: number; readonly swarm: number }[];

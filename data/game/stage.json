@@ -216,38 +216,6 @@
       "hpRatio": 0.5,
       "moveIntervalSeconds": 1.1,
       "doubleChance": 0.35
-    },
-    "minions": {
-      "everySeconds": 6,
-      "count": 10,
-      "enragedCount": 16,
-      "kinds": {
-        "legend-mewtwo": [
-          "drowzee",
-          "jynx",
-          "slowbro"
-        ],
-        "legend-mew": [
-          "ditto",
-          "drowzee",
-          "jynx"
-        ],
-        "legend-articuno": [
-          "jynx",
-          "dewgong",
-          "cloyster",
-          "seel"
-        ],
-        "legend-zapdos": [
-          "doduo",
-          "fearow",
-          "pidgeotto"
-        ],
-        "legend-moltres": [
-          "ponyta",
-          "vulpix"
-        ]
-      }
     }
   },
   "swarms": [

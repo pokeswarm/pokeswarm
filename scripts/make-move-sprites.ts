@@ -260,12 +260,245 @@ function stream(): SpriteOut {
   return { palette, frameMs: 70, parts: { start: start.map(toRows), middle: middle.map(toRows), end: end.map(toRows) } };
 }
 
+// ---------------- 飛ぶ物（案 A）: 形を式で描く ----------------
+/**
+ * 大きさ size × size のマスに、u・v（−1〜1。u が右、v が下）の式で色を決めて描く（-1 は透明）。
+ * rot だけ回した座標で式を呼ぶので、回転したコマも同じ式から作れる（葉っぱ・花びら）。最後に輪郭を付ける
+ */
+function shape(size: number, fn: (u: number, v: number) => number, rot = 0, edge = 0): Grid {
+  const g = blank(size, size);
+  const c = Math.cos(-rot);
+  const s = Math.sin(-rot);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const px = ((x + 0.5) / size) * 2 - 1;
+      const py = ((y + 0.5) / size) * 2 - 1;
+      const col = fn(px * c - py * s, px * s + py * c);
+      if (col >= 0) g[y]![x] = col;
+    }
+  }
+  return edge >= 0 ? outline(g, edge) : g;
+}
+
+/** 左上から光が当たる丸みの明るさ（−1 暗い 〜 1 明るい） */
+function light(u: number, v: number, r: number): number {
+  return (-u - v) / (Math.SQRT2 * Math.max(0.01, r));
+}
+
+/** ひのこ: 右へ進むゆらめく炎（尾は左。コマごとに尾がゆれる） */
+function ember(): SpriteOut {
+  // 0 輪郭（こげ赤）・1 赤・2 橙・3 黄・4 白
+  const palette = ['#5d1a0e', '#d84315', '#ff9800', '#ffeb3b', '#fffde7'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(16, (u, v) => {
+      // 頭の丸（右寄り）と、左へ細くなる尾
+      const head = Math.hypot(u - 0.25, v) / 0.5;
+      const t = Math.max(0, Math.min(1, (0.3 - u) / 1.25));
+      const wob = Math.sin(t * 5 + f * 2.1) * 0.18 * t;
+      const tail = u < 0.3 && u > -0.95 && Math.abs(v - wob) < 0.5 * (1 - t) + 0.05;
+      if (head > 1 && !tail) return -1;
+      const d = head <= 1 ? head * 0.7 : 0.6 + t * 0.6;
+      return d < 0.35 ? 4 : d < 0.6 ? 3 : d < 0.85 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** みずでっぽう: 右へ進むしずく */
+function waterDrop(): SpriteOut {
+  const palette = ['#0d2b5c', '#0277bd', '#29b6f6', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1].map((f) =>
+    shape(12, (u, v) => {
+      const head = Math.hypot(u - 0.3, v) / 0.55;
+      const t = Math.max(0, Math.min(1, (0.3 - u) / 1.2));
+      const tail = u < 0.3 && u > -0.9 && Math.abs(v) < 0.55 * (1 - t);
+      if (head > 1 && !tail) return -1;
+      // 左上の光の点（コマで少し動く）
+      if (Math.hypot(u - 0.4 + f * 0.08, v + 0.22) < 0.16) return 4;
+      const l = light(u - 0.3, v, 0.55);
+      return l > 0.45 ? 3 : l > -0.3 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 100, parts: { main: frames.map(toRows) } };
+}
+
+/** あわ: うすい膜の泡（コマで少し伸び縮み） */
+function bubble(): SpriteOut {
+  const palette = ['#01579b', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff'];
+  const frames = [0, 1, 2, 1].map((f) =>
+    shape(14, (u, v) => {
+      const sx = 0.85 + f * 0.05;
+      const sy = 0.95 - f * 0.05;
+      const d = Math.hypot(u / sx, v / sy);
+      if (d > 1) return -1;
+      if (Math.hypot(u + 0.35, v + 0.4) < 0.18) return 4;
+      if (d > 0.82) return 1;
+      if (d > 0.68 && u + v < -0.2) return 2;
+      // 中は透明。右下に うすい照り返し
+      return d > 0.55 && u + v > 0.5 ? 3 : -1;
+      // 中が透明なので輪郭は付けない（ふちの濃い色が輪郭の代わり）
+    }, 0, -1),
+  );
+  return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
+}
+
+/** 葉っぱ（はっぱカッター）・花びら（はなびらのまい）: 線に並べる。コマで回る */
+function leafLine(kind: 'leaf' | 'petal'): SpriteOut {
+  const palette =
+    kind === 'leaf' ? ['#1b3d14', '#33691e', '#558b2f', '#8bc34a', '#c5e1a5'] : ['#6a1b3a', '#c2185b', '#f06292', '#f8bbd0', '#ffffff'];
+  const one = (rot: number): Grid =>
+    shape(12, (u, v) => {
+      // 葉: 先のとがった細長い形。花びら: 丸く先に切れ込み
+      const inside = kind === 'leaf' ? (u / 0.95) ** 2 + (v / (0.42 * (1 - Math.abs(u) * 0.35))) ** 2 < 1 : (u / 0.8) ** 2 + (v / 0.55) ** 2 < 1 && !(u > 0.55 && Math.abs(v) < 0.12);
+      if (!inside) return -1;
+      if (kind === 'leaf' && Math.abs(v) < 0.08 && u > -0.85) return 1;
+      const l = light(u, v, 0.8);
+      return l > 0.4 ? 4 : l > -0.1 ? 3 : 2;
+    }, rot);
+  const frames = [0, 1, 2, 3].map((f) => {
+    // 途中の部品: 幅 12 に葉を1枚（回る角度は場所ごとにずらさず、コマで回す）
+    return one((f * Math.PI) / 4 + 0.4);
+  });
+  const rows = frames.map(toRows);
+  return { palette, frameMs: 70, parts: { start: rows, middle: rows, end: rows } };
+}
+
+/** いわおとし・いわなだれ（岩）・ストーンエッジ（とがった石） */
+function rock(kind: 'rock' | 'stone'): SpriteOut {
+  const palette = kind === 'rock' ? ['#2b211b', '#5d4037', '#8d6e63', '#a1887f', '#d7ccc8'] : ['#1c2833', '#37474f', '#607d8b', '#90a4ae', '#eceff1'];
+  const r = rng(kind === 'rock' ? 99 : 123);
+  // ごつごつ: 角度ごとの半径をばらつかせる。石は 4 つの尖り
+  const radii = Array.from({ length: 12 }, () => 0.72 + r() * 0.25);
+  const g = shape(16, (u, v) => {
+    const a = Math.atan2(v, u);
+    const d = Math.hypot(u, v);
+    let rr: number;
+    if (kind === 'rock') {
+      const k = ((a + Math.PI) / (Math.PI * 2)) * 12;
+      const i = Math.floor(k) % 12;
+      rr = radii[i]! + (radii[(i + 1) % 12]! - radii[i]!) * (k - Math.floor(k));
+    } else {
+      // とがった石の破片: 横に長いひし形（先が鋭い）
+      rr = 1 / (Math.abs(Math.cos(a)) / 0.95 + Math.abs(Math.sin(a)) / 0.42);
+    }
+    if (d > rr) return -1;
+    // ひび
+    if (kind === 'rock' && Math.abs(u * 0.6 - v - 0.1) < 0.07 && d < rr * 0.8) return 1;
+    // 石は面ごとに色を分ける
+    // 石は面ごとに色を分ける（上の面が明るい。真ん中に稜線）
+    if (kind === 'stone') return Math.abs(v) < 0.06 ? 4 : v < 0 ? (u < 0 ? 3 : 4) : u < 0 ? 1 : 2;
+    const l = light(u, v, rr);
+    return l > 0.5 ? 4 : l > 0.05 ? 3 : l > -0.45 ? 2 : 1;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
+/** ホネブーメラン・ボーンラッシュ: 骨（回して飛ばす） */
+function bone(): SpriteOut {
+  const palette = ['#3e2f1c', '#a1887f', '#d7ccc8', '#efebe9', '#ffffff'];
+  const g = shape(16, (u, v) => {
+    const knob = [[-0.7, -0.22], [-0.7, 0.22], [0.7, -0.22], [0.7, 0.22]].some(([x, y]) => Math.hypot(u - x!, v - y!) < 0.24);
+    const shaft = Math.abs(u) < 0.72 && Math.abs(v) < 0.14;
+    if (!knob && !shaft) return -1;
+    return v < -0.05 ? 4 : v < 0.1 ? 3 : 2;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
+/** スピードスター: 星（回す。コマで中が瞬く） */
+function star(): SpriteOut {
+  const palette = ['#7a4a00', '#ff9800', '#ffd54f', '#fff59d', '#ffffff'];
+  const frames = [0, 1].map((f) =>
+    shape(14, (u, v) => {
+      // 五角の星: 角の向きからのずれで半径を内側 0.42・外側 0.98 の間で変える（とがった形）
+      const a = Math.atan2(v, u) + Math.PI / 2;
+      const d = Math.hypot(u, v);
+      const seg = (Math.PI * 2) / 5;
+      const off = Math.abs((((a % seg) + seg) % seg) - seg / 2) / (seg / 2);
+      const rr = 0.42 + 0.56 * off ** 1.4;
+      if (d > rr) return -1;
+      if (d < 0.18 + f * 0.1) return 4;
+      return d < rr * 0.55 ? 3 : 2;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/** どくばり: 右を向いた細い針（先が紫） */
+function needle(): SpriteOut {
+  const palette = ['#2a1033', '#6a1b9a', '#ab47bc', '#cfd8dc', '#ffffff'];
+  const g = shape(14, (u, v) => {
+    if (u < -0.95 || u > 0.98) return -1;
+    // 根元が太く、先が鋭い
+    const w = 0.3 * (1 - (u + 0.95) / 1.93) + 0.04;
+    if (Math.abs(v) > w) return -1;
+    if (u > 0.45) return 2;
+    return v < 0 ? 4 : 3;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
+/** ヘドロばくだん: 紫のぶよぶよした泥の玉（コマでふちが揺れ、泡が浮く） */
+function sludge(): SpriteOut {
+  const palette = ['#2a0d33', '#7b1fa2', '#ab47bc', '#ce93d8', '#f3e5f5'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(16, (u, v) => {
+      const a = Math.atan2(v, u);
+      const rr = 0.78 + Math.sin(a * 5 + f * 2) * 0.08 + Math.sin(a * 3 - f) * 0.05;
+      const d = Math.hypot(u, v);
+      if (d > rr) return -1;
+      // 泡
+      if (Math.hypot(u - 0.25 + f * 0.05, v + 0.15 - f * 0.12) < 0.13) return 4;
+      if (Math.hypot(u + 0.3, v - 0.25 + f * 0.08) < 0.09) return 3;
+      const l = light(u, v, rr);
+      return l > 0.45 ? 3 : l > -0.3 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
+}
+
+/** シャドーボール（黒紫の玉に渦）・はどうだん（青い玉に波の輪）。コマで模様が回る */
+function orb(kind: 'shadow' | 'aura'): SpriteOut {
+  const palette = kind === 'shadow' ? ['#0b0410', '#1a0b24', '#4a148c', '#7e57c2', '#d1c4e9'] : ['#06264d', '#0d47a1', '#1e88e5', '#64b5f6', '#e3f2fd'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(16, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.9) return -1;
+      const a = Math.atan2(v, u) + (f * Math.PI) / 2;
+      if (kind === 'shadow') {
+        // 渦の筋
+        const swirl = Math.sin(a * 2 + d * 7);
+        if (d < 0.25) return 1;
+        return swirl > 0.55 ? 4 : swirl > 0 ? 3 : d > 0.75 ? 2 : 1;
+      }
+      // はどうだん: 中が明るく、外へ広がる波の輪
+      const ring = Math.sin(d * 14 - f * 1.6 + Math.sin(a * 3) * 0.6);
+      if (d < 0.3) return 4;
+      return ring > 0.4 ? 3 : d > 0.75 ? 1 : 2;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
 const out = {
   credit: '自作（scripts/make-move-sprites.ts で計算して描いた。公式の素材は使っていない）',
   sprites: {
     'frenzy-plant': roots(),
     'root-line': rootLine(),
     'water-stream': stream(),
+    ember: ember(),
+    'water-drop': waterDrop(),
+    bubble: bubble(),
+    'leaf-line': leafLine('leaf'),
+    'petal-line': leafLine('petal'),
+    rock: rock('rock'),
+    stone: rock('stone'),
+    bone: bone(),
+    star: star(),
+    needle: needle(),
+    sludge: sludge(),
+    'shadow-orb': orb('shadow'),
+    'aura-orb': orb('aura'),
   } as Record<string, SpriteOut>,
 };
 writeFileSync(join(ROOT, 'data/render/move-sprites.json'), JSON.stringify(out, null, 2) + '\n');

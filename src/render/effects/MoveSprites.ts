@@ -83,13 +83,19 @@ export class MoveSprites {
       const x = pr.prevX[i]! + (pr.x[i]! - pr.prevX[i]!) * alpha;
       const y = pr.prevY[i]! + (pr.y[i]! - pr.prevY[i]!) * alpha;
       const elapsed = pr.maxLife[i]! - pr.life[i]!;
-      const a = Math.min(1, pr.life[i]! / FADE_SECONDS);
+      // 短い技（はっぱカッターなど 0.2 秒ほど）は、出ている時間の最後の 3 割だけで薄くする
+      const a = Math.min(1, pr.life[i]! / Math.min(FADE_SECONDS, pr.maxLife[i]! * 0.3));
       const r = pr.radius[i]! * spec.size;
       if (spec.fit === 'circle') {
         const rows = sp.parts.main?.[0];
         if (!rows) continue;
         const s = (r * 2) / rows[0]!.length;
-        put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x, y, 0, s, s, a);
+        // 向き: 進む向き（絵は右向きに描く）か、回し続けるか
+        const vx = pr.x[i]! - pr.prevX[i]!;
+        const vy = pr.y[i]! - pr.prevY[i]!;
+        const rot =
+          spec.rotate === 'velocity' ? (vx !== 0 || vy !== 0 ? Math.atan2(vy, vx) : Math.atan2(pr.dirY[i]!, pr.dirX[i]!)) : spec.rotate === 'spin' ? (elapsed * spec.spinDegPerSec * Math.PI) / 180 : 0;
+        put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x, y, rot, s, s, a);
         continue;
       }
       // 線: 始まり → 途中を並べる → 終わり（太さは当たり判定の直径）
@@ -109,9 +115,11 @@ export class MoveSprites {
       const at = (d: number): [number, number] => [x + dx * d, y + dy * d];
       const midFrame = this.frameOf(spec.id, 'middle', elapsed);
       // 途中: 始まりの後ろから終わりの手前まで並べる（最後の1枚は終わりの下に少し重なってよい）
-      for (let d = startLen; d < len - endLen; d += tileLen) {
+      const midCount = sp.parts.middle!.length;
+      for (let d = startLen, k = 0; d < len - endLen; d += tileLen, k++) {
         const [px, py] = at(d + tileLen / 2);
-        put(frameKey(spec.id, 'middle', midFrame), px, py, rot, s, s, a);
+        const f = spec.varyTiles ? (midFrame + k * 3 + i) % midCount : midFrame;
+        put(frameKey(spec.id, 'middle', f), px, py, rot, s, s, a);
       }
       const [sx, sy] = at(Math.min(startLen, len) / 2);
       put(frameKey(spec.id, 'start', this.frameOf(spec.id, 'start', elapsed)), sx, sy, rot, s, s, a);

@@ -980,7 +980,18 @@ const particleSchema = z.object({
 export type EffectParticle = z.infer<typeof particleSchema>;
 
 /** 技のドット絵の指定。growSeconds があれば、線を根元から先へその秒数で伸ばして見せる */
-const moveSpriteSpec = z.object({ id: z.string(), fit: z.enum(['circle', 'line']), size: z.number().positive().default(1), growSeconds: z.number().positive().optional() });
+const moveSpriteSpec = z.object({
+  id: z.string(),
+  fit: z.enum(['circle', 'line']),
+  size: z.number().positive().default(1),
+  growSeconds: z.number().positive().optional(),
+  /** circle の絵の向き: none（そのまま）・velocity（進む向きに向ける。絵は右向きに描く）・spin（回し続ける） */
+  rotate: z.enum(['none', 'velocity', 'spin']).default('none'),
+  /** spin の回る速さ（度/秒） */
+  spinDegPerSec: z.number().default(720),
+  /** line の途中の部品を、1枚ずつ違うコマで描く（はっぱカッター・はなびらのまい: 1枚ずつ向きが違って舞って見える。水流のように つなぎ目が大事な絵では使わない） */
+  varyTiles: z.boolean().default(false),
+});
 
 export const effectRecipeSchema = z.object({
   /** 発射体の本体: 芯と光の2枚重ね */

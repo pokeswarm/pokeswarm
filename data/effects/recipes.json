@@ -84,6 +84,12 @@
         "burst": {
           "count": 10
         }
+      },
+      "sprite": {
+        "id": "ember",
+        "fit": "circle",
+        "size": 2.2,
+        "rotate": "velocity"
       }
     },
     "water.base": {
@@ -158,7 +164,13 @@
       }
     },
     "water-gun": {
-      "extends": "water.base"
+      "extends": "water.base",
+      "sprite": {
+        "id": "water-drop",
+        "fit": "circle",
+        "size": 3.2,
+        "rotate": "velocity"
+      }
     },
     "grass.base": {
       "projectile": {
@@ -384,7 +396,12 @@
       "extends": "flying.base"
     },
     "bubble": {
-      "extends": "water.base"
+      "extends": "water.base",
+      "sprite": {
+        "id": "bubble",
+        "fit": "circle",
+        "size": 1.6
+      }
     },
     "hydro-pump": {
       "extends": "water.base",
@@ -404,7 +421,13 @@
       }
     },
     "razor-leaf": {
-      "extends": "grass.base"
+      "extends": "grass.base",
+      "sprite": {
+        "id": "leaf-line",
+        "fit": "line",
+        "size": 0.8,
+        "varyTiles": true
+      }
     },
     "leech-seed": {
       "extends": "grass.base"
@@ -414,6 +437,12 @@
       "projectile": {
         "glowScale": 1.05,
         "coreScale": 0.2
+      },
+      "sprite": {
+        "id": "petal-line",
+        "fit": "line",
+        "size": 0.8,
+        "varyTiles": true
       }
     },
     "frenzy-plant": {
@@ -474,7 +503,13 @@
       }
     },
     "poison-sting": {
-      "extends": "poison.base"
+      "extends": "poison.base",
+      "sprite": {
+        "id": "needle",
+        "fit": "circle",
+        "size": 1.6,
+        "rotate": "velocity"
+      }
     },
     "sleep-powder": {
       "extends": "poison.base",
@@ -502,13 +537,25 @@
       "projectile": {
         "glowScale": 1.15,
         "coreScale": 0.35
+      },
+      "sprite": {
+        "id": "sludge",
+        "fit": "circle",
+        "size": 1.8
       }
     },
     "quick-attack": {
       "extends": "normal.base"
     },
     "swift": {
-      "extends": "normal.base"
+      "extends": "normal.base",
+      "sprite": {
+        "id": "star",
+        "fit": "circle",
+        "size": 3,
+        "rotate": "spin",
+        "spinDegPerSec": 540
+      }
     },
     "body-slam": {
       "extends": "normal.base",
@@ -1008,6 +1055,13 @@
       "projectile": {
         "glowScale": 1.2,
         "coreScale": 0.6
+      },
+      "sprite": {
+        "id": "rock",
+        "fit": "circle",
+        "size": 1.6,
+        "rotate": "spin",
+        "spinDegPerSec": 360
       }
     },
     "rock-slide": {
@@ -1020,6 +1074,13 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "rock",
+        "fit": "circle",
+        "size": 1.5,
+        "rotate": "spin",
+        "spinDegPerSec": 300
       }
     },
     "magnitude": {
@@ -1038,6 +1099,13 @@
       "projectile": {
         "coreColor": "#fafafa",
         "glowScale": 1.6
+      },
+      "sprite": {
+        "id": "bone",
+        "fit": "circle",
+        "size": 2.4,
+        "rotate": "spin",
+        "spinDegPerSec": 900
       }
     },
     "confusion": {
@@ -1079,6 +1147,13 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "stone",
+        "fit": "circle",
+        "size": 1.4,
+        "rotate": "spin",
+        "spinDegPerSec": 540
       }
     },
     "rapid-spin": {
@@ -1172,6 +1247,13 @@
       "projectile": {
         "coreColor": "#fafafa",
         "glowScale": 1.6
+      },
+      "sprite": {
+        "id": "bone",
+        "fit": "circle",
+        "size": 2.2,
+        "rotate": "spin",
+        "spinDegPerSec": 1080
       }
     },
     "fissure": {
@@ -1450,6 +1532,11 @@
       "projectile": {
         "glowColor": "#64b5f6",
         "glowScale": 2.8
+      },
+      "sprite": {
+        "id": "aura-orb",
+        "fit": "circle",
+        "size": 3
       }
     },
     "night-shade": {
@@ -1460,6 +1547,11 @@
       "projectile": {
         "glowScale": 2.8,
         "coreScale": 0.9
+      },
+      "sprite": {
+        "id": "shadow-orb",
+        "fit": "circle",
+        "size": 2.6
       }
     },
     "hex": {

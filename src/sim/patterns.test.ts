@@ -150,8 +150,13 @@ describe('技の型（作者の決定。07 18章）', () => {
 });
 
 describe('進化で増える効き方（作者の決定。07 22章）', () => {
-  it('出し続ける流れ: 向いている方向へ伸び、向きを変えると回ってついてくる。次に使うまで途切れない', () => {
-    const { hit, sim } = run('stream', { range: 300, size: 10, count: 1, cooldownSeconds: 1, hitIntervalSeconds: 0.2, speed: 360 }, [[200, 0], [0, 200]], 10);
+  it('出し続ける流れ: 持続の間だけ出る（持続が再使用以上なら途切れない）', () => {
+    const short = run('stream', { range: 300, size: 10, count: 1, cooldownSeconds: 3, durationSeconds: 0.3, hitIntervalSeconds: 0.2, speed: 360 }, [], 15).sim;
+    expect(short.world.projectiles.count).toBe(0);
+  });
+
+  it('出し続ける流れ: 向いている方向へ伸び、向きを変えると回ってついてくる', () => {
+    const { hit, sim } = run('stream', { range: 300, size: 10, count: 1, cooldownSeconds: 1, durationSeconds: 1, hitIntervalSeconds: 0.2, speed: 360 }, [[200, 0], [0, 200]], 10);
     expect(hit[0]).toBeGreaterThan(0);
     expect(hit[1]).toBe(0);
     const p = sim.world.players[0]!;

@@ -165,7 +165,7 @@ export function useMoves(world: World): void {
           fireScreen(world, p, pm, st);
           break;
         case 'metronome':
-          fireMetronome(world, p);
+          fireMetronome(world, p, pm);
           break;
         case 'whip':
           fireWhip(world, p, pm, st);
@@ -378,7 +378,8 @@ function fireStream(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
       // 向きを変える速さ（ラジアン/秒）は speed を度/秒として使う
       angularSpeed: (st.speed * Math.PI) / 180,
       orbitRadius: st.range,
-      life: sc.cooldownSeconds + world.dt,
+      // 出ている時間は持続（再使用より長ければ再使用まで）。前は再使用までずっと出していて、ハイドロポンプの「持続 1 秒・再使用 3 秒」（作者の決定）が効いていなかった
+      life: Math.min(st.durationSeconds, sc.cooldownSeconds) + world.dt,
     });
   }
 }
@@ -427,19 +428,32 @@ function fireScreen(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
 }
 
 /** 一度に出し終える出し方（ゆびをふるで選ぶ技。連射の出し方は、出し続ける状態を持てないので選ばない） */
+/** 続けて撃つ出し方（ゆびをふる・ものまね では一度にまとめて撃つ） */
+const BURST_PATTERNS = new Set(['nearest', 'facing', 'homing', 'boomerang']);
 const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter', 'eruption', 'spin', 'sweep', 'spiral']);
 
 /** metronome（ゆびをふる）: ほかの技からランダムに1つを、その技の最大レベルで出す */
-function fireMetronome(world: World, p: Player): void {
-  const pool: number[] = [];
-  world.rules.moves.forEach((m, i) => {
-    if (ONE_SHOT_PATTERNS.has(m.pattern)) pool.push(i);
+function fireMetronome(world: World, p: Player, self?: PlayerMove): void {
+  // 選ぶ技: ものまね は遊べるポケモンの最初の技、ゆびをふる は固有技（作者の決定 2026年10月23日）。
+  // 続けて撃つ技（ひのこ・スピードスター など）は一度にまとめて撃ち、出し続ける技・回復は選ばない
+  const own = self ? world.rules.moves[self.move]! : null;
+  const pool = (own && own.randomPool.length > 0 ? own.randomPool : world.rules.moves.map((_, i) => i)).filter((i) => {
+    const pat = world.rules.moves[i]!.pattern;
+    return ONE_SHOT_PATTERNS.has(pat) || BURST_PATTERNS.has(pat);
   });
   if (pool.length === 0) return;
   const move = pool[world.rng.int(pool.length)]!;
   const def = world.rules.moves[move]!;
-  const pm: PlayerMove = { move, level: def.levels.length, cooldown: 0, burstLeft: 0, burstTimer: 0 };
+  // ものまね は自分のレベルの割合で（最大なら選んだ技も最大）、ゆびをふる は最大レベルで出す
+  const max = def.levels.length;
+  const level = own && self && own.randomScaled ? Math.max(1, Math.round((self.level / own.levels.length) * max)) : max;
+  const pm: PlayerMove = { move, level, cooldown: 0, burstLeft: 0, burstTimer: 0 };
   const st = playerMoveStats(world, p, pm);
+  if (BURST_PATTERNS.has(def.pattern)) {
+    pm.burstLeft = st.count;
+    fireBurst(world, p, pm, { ...st, intervalSeconds: 0 });
+    return;
+  }
   const fire: Record<string, (w: World, p: Player, pm: PlayerMove, st: MoveStats) => void> = {
     melee: fireMelee,
     orbit: fireOrbit,

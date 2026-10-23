@@ -761,6 +761,11 @@ export const moveDefSchema = z.object({
    * 値は帯の厚さで、届く距離いっぱいに対する割合。近接（扇形・自分の周り）と広がる輪（nova）で使う
    */
   sweep: z.number().gt(0).max(1).optional(),
+  /**
+   * metronome（ランダムな技）で選ぶ技の集まり: starting（遊べるポケモンの最初の技。ものまね）・unique（固有技。ゆびをふる）。
+   * 作者の決定 2026年10月23日
+   */
+  randomPool: z.enum(['starting', 'unique']).optional(),
   /** 当たったときの状態異常を、この中からランダムに選ぶ（トライアタック: やけど・こおり・まひ）。statusChance で付くかどうかを決める */
   randomStatuses: z.array(z.string()).optional(),
   /** 跳ね返る技（bounce）を出す向き: 向いている方向から何度ずらすか（まっすぐだと、向かいの壁との間で同じ線を往復するだけになる） */
@@ -819,6 +824,8 @@ export const playablesConfigSchema = z.object({
       moveTypes: z.array(z.string()).optional(),
       /** 新しい技を覚えない（プリン: 最初の2つだけで戦う） */
       fixedMoves: z.boolean().default(false),
+      /** どのタイプの技も覚えられる（ミュウ） */
+      allMoveTypes: z.boolean().default(false),
       /**
        * 解放の名前（data/game/achievements.json の reward.pokemon）。省略時はこのキー。
        * 解放したポケモンは進化前の姿から始めるので、ヒトデマンはスターミーの解放で遊べるようになる
@@ -1038,7 +1045,15 @@ export const effectRecipeSchema = z.object({
   chargeGlow: z.object({ color: colorString, seconds: z.number().positive(), radius: z.number().positive(), alpha: z.number().min(0).max(1) }).optional(),
   /** 技が出た瞬間に、画面全体をうっすら光らせる（とっておき）。目に優しいよう薄く短く */
   screenFlash: z.object({ color: colorString, alpha: z.number().min(0).max(0.5), durationMs: z.number().positive() }).optional(),
-  burstFlash: z.object({ colors: z.array(colorString).min(1), periodMs: z.number().positive(), alpha: z.number().min(0).max(1) }).optional(),
+  burstFlash: z
+    .object({
+      colors: z.array(colorString).min(1),
+      periodMs: z.number().positive(),
+      alpha: z.number().min(0).max(1),
+      /** 技そのものの線（はかいこうせんのレーザー）も光らせる */
+      lines: z.boolean().default(false),
+    })
+    .optional(),
   /** 発射体の軌跡に出すパーティクル */
   trail: particleSchema.extend({ intervalMs: z.number().positive() }).optional(),
   /** 命中時 */

@@ -20,8 +20,9 @@
     "slowpoke": { "sprite": "slowpoke", "startingMoves": ["slack-off"] },
     "snorlax": { "sprite": "snorlax", "startingMoves": ["tackle"] },
     "eevee": { "sprite": "eevee", "startingMoves": ["tackle"] },
+    "doduo": { "sprite": "doduo", "startingMoves": ["swift"] },
     "mewtwo": { "sprite": "mewtwo", "startingMoves": ["confusion"] },
-    "mew": { "sprite": "mew", "startingMoves": ["swift"] },
+    "mew": { "sprite": "mew", "startingMoves": ["mimic"], "allMoveTypes": true },
     "articuno": { "sprite": "articuno", "startingMoves": ["powder-snow"] },
     "zapdos": { "sprite": "zapdos", "startingMoves": ["thunder-shock"] },
     "moltres": { "sprite": "moltres", "startingMoves": ["fire-fang"] }

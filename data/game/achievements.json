@@ -365,6 +365,16 @@
       }
     },
     {
+      "id": "unlock-doduo",
+      "condition": {
+        "stat": "defeated.doduo",
+        "atLeast": 1000
+      },
+      "reward": {
+        "pokemon": "doduo"
+      }
+    },
+    {
       "id": "unlock-arcanine",
       "condition": {
         "stat": "bossDefeated.arcanine",

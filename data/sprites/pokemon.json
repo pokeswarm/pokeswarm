@@ -399,7 +399,15 @@
       "key": "doduo",
       "dex": 84,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
+      ]
+    },
+    {
+      "key": "dodrio",
+      "dex": 85,
+      "uses": [
+        "full"
       ]
     },
     {

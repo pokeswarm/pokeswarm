@@ -100,7 +100,8 @@
     "wigglytuff",
     "psyduck",
     "slowpoke",
-    "snorlax"
+    "snorlax",
+    "dodrio"
   ],
   "moves": [
     "ember",
@@ -189,6 +190,7 @@
     "sky-attack",
     "aura-sphere",
     "tri-attack",
+    "mimic",
     "metronome",
     "bubble-beam",
     "whirlpool",

@@ -63,6 +63,10 @@ export interface SimMoveDef {
   readonly bounceAngle: number;
   /** 当たったときの状態異常を、この中からランダムに選ぶ（状態異常の番号。空なら技の状態異常） */
   readonly randomStatuses: readonly number[];
+  /** metronome で選ぶ技の番号の一覧（ものまね: 最初の技、ゆびをふる: 固有技）。空なら一度に出せる技すべて */
+  readonly randomPool: readonly number[];
+  /** 選んだ技を自分のレベルの割合で出す（ものまね）。false なら最大レベル（ゆびをふる） */
+  readonly randomScaled: boolean;
 }
 
 /** 最小値で止める項目（足し続けても壊れないように） */

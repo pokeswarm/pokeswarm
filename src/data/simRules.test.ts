@@ -27,6 +27,24 @@ describe('data/ から組み立てたシミュレーションの定義', () => {
     expect(rules.types.chart[i('normal')]![i('ghost')]).toBe(0);
   });
 
+  it('ものまね は遊べるポケモンの最初の技、ゆびをふる は固有技から選ぶ（作者の決定 2026年10月23日）', () => {
+    const keysOf = (key: string) => rules.moves.find((m) => m.key === key)!.randomPool.map((i) => rules.moves[i]!.key);
+    const mimic = keysOf('mimic');
+    expect(mimic).toContain('ember');
+    expect(mimic).toContain('tackle');
+    expect(mimic).not.toContain('blast-burn');
+    expect(mimic).not.toContain('mimic');
+    const metronome = keysOf('metronome');
+    expect(metronome).toContain('blast-burn');
+    expect(metronome).toContain('volt-tackle');
+    expect(metronome).not.toContain('ember');
+    expect(metronome).not.toContain('metronome');
+  });
+
+  it('ミュウはどのタイプの技も覚えられる', () => {
+    expect(playableLoadout(rules, 'mew').moveTypes).toHaveLength(rules.types.names.length);
+  });
+
   it('御三家の最初の技とタイプ', () => {
     for (const key of Object.keys(playablesConfig.pokemon)) {
       const l = playableLoadout(rules, key);

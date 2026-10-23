@@ -534,6 +534,33 @@
     "preEvolutions": [],
     "evolvesTo": []
   },
+  "dodrio": {
+    "dex": 85,
+    "names": {
+      "ja": "ドードリオ",
+      "en": "Dodrio",
+      "fr": "Dodrio",
+      "de": "Dodri",
+      "es": "Dodrio",
+      "it": "Dodrio"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 110,
+      "defense": 70,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 110
+    },
+    "preEvolutions": [
+      "doduo"
+    ],
+    "evolvesTo": []
+  },
   "doduo": {
     "dex": 84,
     "names": {

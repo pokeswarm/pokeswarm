@@ -727,7 +727,11 @@ export class RunScene extends Phaser.Scene {
 
   /** 色を切り替えて光らせる円（10まんボルトの自分の周り・かみなりの落雷） */
   private flashing(i: number, pr: World['projectiles']): boolean {
-    return pr.stage[i] !== 3 && pr.shape[i] === SHAPE_CIRCLE && this.flashMoves.has(pr.move[i]!);
+    if (pr.stage[i] === 3) return false;
+    const f = this.flashMoves.get(pr.move[i]!);
+    if (!f) return false;
+    // はかいこうせん: 技そのものの線も光らせる
+    return pr.shape[i] === SHAPE_CIRCLE || (f.lines && pr.stage[i] === 0 && pr.shape[i] === SHAPE_LINE);
   }
 
   /** とっておき: 技が出た瞬間に、画面全体をうっすら光らせる（目に優しいよう薄く短く。作者の決定で画面は揺らさない） */

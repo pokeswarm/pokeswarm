@@ -23,8 +23,7 @@
     { "from": "double-kick", "item": "black-belt", "to": "rolling-kick" },
     { "from": "night-shade", "item": "spell-tag", "to": "shadow-ball" },
     { "from": "dragon-tail", "item": "dragon-fang", "to": "dragon-rush" },
-    { "from": "dragon-rage", "item": "dragon-fang", "to": "dragon-pulse" },
-    { "from": "swift", "item": "silk-scarf", "to": "tri-attack" }
+    { "from": "dragon-rage", "item": "dragon-fang", "to": "dragon-pulse" }
   ],
   "unique": [
     { "from": "flamethrower", "item": "fire-stone", "to": "blast-burn", "line": "charmander" },
@@ -42,11 +41,12 @@
     { "from": "blizzard", "item": "pp-max", "to": "freeze-dry", "line": "articuno" },
     { "from": "cross-chop", "item": "dire-hit", "to": "dynamic-punch", "line": "machop" },
     { "from": "shadow-ball", "item": "light-clay", "to": "hex", "line": "gastly" },
-    { "from": "dragon-rush", "item": "x-attack", "to": "outrage", "line": "dratini" },
+    { "from": "dragon-rush", "item": "x-attack", "to": "hyper-beam", "line": "dratini" },
     { "from": "psychic", "item": "x-sp-atk", "to": "psystrike", "line": "mewtwo" },
     { "from": "thunderbolt", "item": "thunder-stone", "to": "zap-cannon", "line": "zapdos" },
     { "from": "flare-blitz", "item": "fire-stone", "to": "sky-attack", "line": "moltres" },
-    { "from": "tri-attack", "item": "moon-stone", "to": "metronome", "line": "mew" },
+    { "from": "mimic", "item": "moon-stone", "to": "metronome", "line": "mew" },
+    { "from": "swift", "item": "sharp-beak", "to": "tri-attack", "line": "doduo" },
     { "from": "thunderbolt", "item": "pp-max", "to": "thunder", "line": "pikachu", "forms": ["raichu"] },
     { "from": "pound", "item": "x-attack", "to": "double-slap", "line": "jigglypuff" },
     { "from": "sing", "item": "silk-scarf", "to": "hyper-voice", "line": "jigglypuff" },

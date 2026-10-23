@@ -568,7 +568,27 @@
     },
     "hyper-beam": {
       "extends": "normal.base",
-      "impact": {}
+      "impact": {},
+      "sprite": {
+        "id": "hyper-beam",
+        "fit": "line",
+        "size": 1.1
+      },
+      "chargeGlow": {
+        "color": "#ffffff",
+        "seconds": 1,
+        "radius": 80,
+        "alpha": 1
+      },
+      "burstFlash": {
+        "colors": [
+          "#ffffff",
+          "#111111"
+        ],
+        "periodMs": 50,
+        "alpha": 0.5,
+        "lines": true
+      }
     },
     "evolution": {
       "impact": {

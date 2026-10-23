@@ -599,6 +599,18 @@
     "type": "normal",
     "damageClass": "status"
   },
+  "mimic": {
+    "names": {
+      "ja": "ものまね",
+      "en": "Mimic",
+      "fr": "Copie",
+      "de": "Mimikry",
+      "es": "Mimético",
+      "it": "Mimica"
+    },
+    "type": "normal",
+    "damageClass": "status"
+  },
   "night-shade": {
     "names": {
       "ja": "ナイトヘッド",

@@ -510,6 +510,48 @@ function triOrb(): SpriteOut {
   return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
 }
 
+/**
+ * はかいこうせん: 白と黒が入れ替わりながらチカチカするレーザー（作者の決定 2026年10月23日）。
+ * 偶数のコマは白い芯に黒いふち、奇数のコマは黒い芯に白いふち。始まりは丸い光、終わりは広がる光
+ */
+function hyperBeam(): SpriteOut {
+  const H = 12;
+  const TILE = 8;
+  // 0 黒・1 濃い灰・2 灰・3 明るい灰・4 白
+  const palette = ['#0a0a0a', '#3a3a3a', '#8a8a8a', '#d6d6d6', '#ffffff'];
+  const mid = (H - 1) / 2;
+  const tone = (d: number, inv: boolean): number => {
+    const c = d < 0.45 ? 4 : d < 0.7 ? 3 : d < 0.88 ? 2 : 0;
+    return inv ? 4 - c : c;
+  };
+  const start: Grid[] = [];
+  const middle: Grid[] = [];
+  const end: Grid[] = [];
+  for (let f = 0; f < 4; f++) {
+    const inv = f % 2 === 1;
+    const m = blank(TILE, H);
+    for (let x = 0; x < TILE; x++) for (let y = 0; y < H; y++) set(m, x, y, tone(Math.abs(y - mid) / (H / 2), inv));
+    middle.push(m);
+    // 始まり: 丸く光る口
+    const s = blank(TILE, H);
+    for (let x = 0; x < TILE; x++) for (let y = 0; y < H; y++) {
+      const d = Math.hypot((x - (TILE - 1)) / TILE, (y - mid) / (H / 2));
+      if (x >= TILE - 2 || d < 1) set(s, x, y, tone(Math.min(1, Math.abs(y - mid) / (H / 2) + (TILE - 1 - x) * 0.06), inv));
+    }
+    start.push(s);
+    // 終わり: 先で広がって消える光
+    const EW = 10;
+    const e = blank(EW, H);
+    for (let x = 0; x < EW; x++) for (let y = 0; y < H; y++) {
+      const half = 1 - x / EW;
+      const d = Math.abs(y - mid) / (H / 2);
+      if (d < half + 0.15 && (x < 6 || (x + y + f) % 2 === 0)) set(e, x, y, tone(d / Math.max(0.2, half + 0.15), inv));
+    }
+    end.push(e);
+  }
+  return { palette, frameMs: 50, parts: { start: start.map(toRows), middle: middle.map(toRows), end: end.map(toRows) } };
+}
+
 const out = {
   credit: '自作（scripts/make-move-sprites.ts で計算して描いた。公式の素材は使っていない）',
   sprites: {
@@ -524,6 +566,7 @@ const out = {
     leaf: single(leafLine('leaf')),
     petal: single(leafLine('petal')),
     'tri-orb': triOrb(),
+    'hyper-beam': hyperBeam(),
     rock: rock('rock'),
     stone: rock('stone'),
     bone: bone(),

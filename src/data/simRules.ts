@@ -53,9 +53,22 @@ export function buildSimRules(): SimRules {
       sweep: def.sweep ?? 0,
       bounceAngle: ((def.bounceAngle ?? 0) * Math.PI) / 180,
       randomStatuses: (def.randomStatuses ?? []).map(statusIndexOf),
+      // 選ぶ技の集まりは、全部の技が並んでから番号に直す（下）
+      randomPool: [] as number[],
+      // ものまね（最初の技から選ぶ）は自分のレベルの割合で、ゆびをふる（固有技から選ぶ）は最大レベルで出す
+      randomScaled: def.randomPool === 'starting',
     };
   });
   const moveIndex = (key: string): number => moves.findIndex((m) => m.key === key);
+  // ものまね: 遊べるポケモンの最初の技、ゆびをふる: 固有技（自分たち ランダムな技 は除く）
+  const startingKeys = [...new Set(Object.values(playablesConfig.pokemon).flatMap((p) => p.startingMoves))];
+  const uniqueKeys = derivationsConfig.unique.map((d) => d.to);
+  moves.forEach((m, k) => {
+    const pool = movesConfig.moves[m.key]?.randomPool;
+    if (!pool) return;
+    const keys = pool === 'starting' ? startingKeys : uniqueKeys;
+    moves[k] = { ...m, randomPool: keys.map(moveIndex).filter((i) => i !== -1 && moves[i]!.pattern !== 'metronome') };
+  });
   const upgrades = (
     defs: Record<string, { category: "stat" | "type" | "evolution"; maxLevel: number; consumable: boolean; perLevel: Parameters<typeof resolveModifiers>[0]; lines?: string[]; powerMultiplier?: number }>,
   ): SimUpgradeDef[] =>
@@ -148,7 +161,7 @@ export function playableLoadout(
   const species = generated.pokemon[pokemon] ?? generated.pokemon[playablesConfig.default]!;
   return {
     types: (p.types ?? species.types).map((t) => rules.types.names.indexOf(t)),
-    moveTypes: (p.moveTypes ?? []).map((t) => rules.types.names.indexOf(t)),
+    moveTypes: p.allMoveTypes ? rules.types.names.map((_, i) => i) : (p.moveTypes ?? []).map((t) => rules.types.names.indexOf(t)),
     fixedMoves: p.fixedMoves,
     moves: p.startingMoves.map((m) => ({ move: moveIndexOf(rules, m), level: 1 })),
     // 系統はプレイアブルのキー（固有技の判定。進化しても変わらない）

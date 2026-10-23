@@ -66,13 +66,13 @@ export class MoveSprites {
   /** 毎フレーム描き直す。specOf は当たり判定ごとのドット絵の指定（無ければ描かない） */
   draw(pr: ProjectileStore, alpha: number, specOf: (i: number) => SpriteSpec | null): void {
     let used = 0;
-    const put = (key: string, x: number, y: number, rot: number, sx: number, sy: number, a: number): void => {
+    const put = (key: string, x: number, y: number, rot: number, sx: number, sy: number, a: number, originX = 0.5): void => {
       let img = this.images[used];
       if (!img) {
         img = this.scene.add.image(0, 0, key).setDepth(this.depth);
         this.images.push(img);
       }
-      img.setTexture(key).setPosition(x, y).setRotation(rot).setScale(sx, sy).setAlpha(a).setVisible(true);
+      img.setTexture(key).setOrigin(originX, 0.5).setPosition(x, y).setRotation(rot).setScale(sx, sy).setAlpha(a).setVisible(true);
       used++;
     };
     for (let i = 0; i < pr.count; i++) {
@@ -96,6 +96,15 @@ export class MoveSprites {
         const rot =
           spec.rotate === 'velocity' ? (vx !== 0 || vy !== 0 ? Math.atan2(vy, vx) : Math.atan2(pr.dirY[i]!, pr.dirX[i]!)) : spec.rotate === 'spin' ? (elapsed * spec.spinDegPerSec * Math.PI) / 180 : 0;
         put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x, y, rot, s, s, a);
+        continue;
+      }
+      if (spec.fit === 'cone') {
+        // 扇形（かえんほうしゃ・バブルこうせん）: 1枚の絵（右向き）の左端を根元に置き、長さを扇の半径、幅を扇の先の幅に合わせて引き伸ばす
+        const rows = sp.parts.main?.[0];
+        if (!rows) continue;
+        const reach = pr.radius[i]!;
+        const width = Math.max(24, 2 * reach * Math.tan(Math.min(1.2, pr.length[i]!)) * spec.size);
+        put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x, y, Math.atan2(pr.dirY[i]!, pr.dirX[i]!), reach / rows[0]!.length, width / rows.length, a, 0);
         continue;
       }
       // 線: 始まり → 途中を並べる → 終わり（太さは当たり判定の直径）

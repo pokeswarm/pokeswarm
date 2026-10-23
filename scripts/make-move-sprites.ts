@@ -552,6 +552,194 @@ function hyperBeam(): SpriteOut {
   return { palette, frameMs: 50, parts: { start: start.map(toRows), middle: middle.map(toRows), end: end.map(toRows) } };
 }
 
+// ---------------- 線の技（案 B） ----------------
+/** 線の部品（始まり・途中・終わり）を、同じ作り方でまとめて作る。col(gx, y, f, part) が色（-1 透明） */
+function lineParts(H: number, widths: { start: number; middle: number; end: number }, frames: number, col: (x: number, y: number, f: number, part: 'start' | 'middle' | 'end') => number, edge = 0): Record<string, string[][]> {
+  const out: Record<string, string[][]> = { start: [], middle: [], end: [] };
+  for (const part of ['start', 'middle', 'end'] as const) {
+    for (let f = 0; f < frames; f++) {
+      const g = blank(widths[part], H);
+      for (let x = 0; x < widths[part]; x++) for (let y = 0; y < H; y++) {
+        const c = col(x, y, f, part);
+        if (c >= 0) g[y]![x] = c;
+      }
+      out[part]!.push(toRows(edge >= 0 ? outline(g, edge) : g));
+    }
+  }
+  return out;
+}
+
+/**
+ * 10まんボルト・でんきショック: ギザギザの稲妻。途中の部品は、端で真ん中の高さに戻るジグザグ（並べるとつながる）。
+ * コマごとにジグザグの形を変えて、ちらつかせる
+ */
+function lightning(): SpriteOut {
+  const H = 12;
+  const TILE = 8;
+  // 0 輪郭（こい紺）・1 黄・2 うすい黄・3 白
+  const palette = ['#1a1440', '#fdd835', '#fff59d', '#ffffff'];
+  const mid = Math.floor(H / 2);
+  const r = rng(555);
+  // コマごとのジグザグ: 幅 TILE の中で 2 回折れる（端は真ん中）
+  const paths = Array.from({ length: 4 }, () => {
+    const a = mid + Math.round((r() - 0.5) * 7);
+    const b = mid + Math.round((r() - 0.5) * 7);
+    return (x: number): number => {
+      const pts = [[0, mid], [3, a], [5, b], [TILE, mid]] as const;
+      for (let k = 0; k < 3; k++) {
+        const [x0, y0] = pts[k]!;
+        const [x1, y1] = pts[k + 1]!;
+        if (x >= x0 && x <= x1) return y0 + ((y1 - y0) * (x - x0)) / (x1 - x0);
+      }
+      return mid;
+    };
+  });
+  const parts = lineParts(H, { start: 4, middle: TILE, end: 4 }, 4, (x, y, f, part) => {
+    if (part !== 'middle') {
+      // 始まり・終わり: 小さな火花
+      const d = Math.hypot(x - (part === 'start' ? 3 : 0), y - mid);
+      return d < 1.2 ? 3 : d < 2.2 ? 2 : (x + y + f) % 3 === 0 && d < 3.5 ? 1 : -1;
+    }
+    const py = paths[f]!(x);
+    const prev = paths[f]!(Math.max(0, x - 1));
+    const lo = Math.min(py, prev) - 0.6;
+    const hi = Math.max(py, prev) + 0.6;
+    if (y >= lo && y <= hi) return 3;
+    if (y >= lo - 1 && y <= hi + 1) return 2;
+    return -1;
+  });
+  return { palette, frameMs: 40, parts };
+}
+
+/** れいとうビーム: 水色の光線に、ふちから氷の結晶がとげのように出る。コマで きらめきが流れる */
+function iceBeam(): SpriteOut {
+  const H = 14;
+  const TILE = 8;
+  const palette = ['#0b2a45', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff'];
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 6, middle: TILE, end: 8 }, 4, (x, y, f, part) => {
+    const d = Math.abs(y - mid);
+    const taper = part === 'start' ? 0.5 + x / 12 : part === 'end' ? 1 - x / 10 : 1;
+    const half = 3.2 * taper;
+    // 結晶のとげ（途中の部品の決まった位置）
+    // 上は x=1〜3、下は x=5〜7 に斜めの結晶（上下交互）
+    const up = y < mid;
+    const k = up ? x - 1 : x - 5;
+    if (part === 'middle' && k >= 0 && k <= 2 && d >= half && d < half + 3 - k) return k === 0 ? 4 : 3;
+    if (d > half) return -1;
+    if ((x + f * 2) % TILE === 0 && d < 1.5) return 4;
+    return d < half * 0.4 ? 4 : d < half * 0.75 ? 3 : 2;
+  });
+  return { palette, frameMs: 70, parts };
+}
+
+/** オーロラビーム: 虹色の帯（色の段がコマごとに上へずれていく） */
+function auroraBeam(): SpriteOut {
+  const H = 12;
+  const TILE = 8;
+  const palette = ['#2a1a40', '#ff8a80', '#ffd180', '#ffff8d', '#b9f6ca', '#80d8ff', '#ea80fc'];
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 4, middle: TILE, end: 6 }, 6, (x, y, f, part) => {
+    const taper = part === 'start' ? 0.6 + x / 10 : part === 'end' ? 1 - x / 8 : 1;
+    const wave = Math.sin(((x + f) / TILE) * Math.PI * 2) * 0.6;
+    const d = Math.abs(y - mid - wave);
+    if (d > 4.6 * taper) return -1;
+    return 1 + ((Math.floor(y - wave) + f + 60) % 6);
+  });
+  return { palette, frameMs: 80, parts };
+}
+
+/** サイケこうせん: ピンクと紫の輪が連なって進む（輪の位置がコマで前へ動く） */
+function psyBeam(): SpriteOut {
+  const H = 14;
+  const TILE = 8;
+  const palette = ['#2a0f2e', '#8e24aa', '#ce93d8', '#f48fb1', '#fce4ec'];
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 4, middle: TILE, end: 6 }, 4, (x, y, f, part) => {
+    const d = Math.abs(y - mid);
+    if (part === 'start') return d < 2 + x * 0.5 ? (d < 1 ? 4 : 3) : -1;
+    if (part === 'end') return d < 3 - x * 0.4 ? (d < 1.2 ? 4 : 2) : -1;
+    // 細い芯と、たての楕円の輪
+    if (d < 1) return 4;
+    const ringX = (f * 2) % TILE;
+    const dx = Math.min(Math.abs(x - ringX), TILE - Math.abs(x - ringX));
+    const e = (dx / 1.6) ** 2 + (d / 6) ** 2;
+    if (e < 1 && e > 0.45) return dx < 0.8 ? 3 : 1;
+    return d < 2 ? 2 : -1;
+  });
+  return { palette, frameMs: 70, parts };
+}
+
+/** りゅうのはどう: 青紫の太い波動に、うろこのような模様がうねって流れる */
+function dragonPulse(): SpriteOut {
+  const H = 14;
+  const TILE = 8;
+  const palette = ['#0e0a2b', '#311b92', '#5e35b1', '#7c4dff', '#b388ff', '#e8eaf6'];
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 6, middle: TILE, end: 8 }, 4, (x, y, f, part) => {
+    const taper = part === 'start' ? 0.4 + x / 8 : part === 'end' ? 1 - x / 9 : 1;
+    const wave = Math.sin(((x + f * 2) / TILE) * Math.PI * 2) * 1.2;
+    const d = Math.abs(y - mid - wave);
+    const half = 4.8 * taper;
+    if (d > half) return -1;
+    if (d < half * 0.25) return 5;
+    // うろこ: 斜めの筋
+    const scale = (x + f * 2 + Math.round(y * 0.7) + 64) % 4 === 0;
+    return scale ? 4 : d < half * 0.6 ? 3 : d < half * 0.85 ? 2 : 1;
+  });
+  return { palette, frameMs: 80, parts };
+}
+
+/**
+ * かえんほうしゃ・バブルこうせん: 扇形に引き伸ばす1枚の絵（右向き。左端が口）。
+ * 炎は先へ行くほど広がる舌のような形がゆらめき、泡は大小の泡が散らばる
+ */
+function cone(kind: 'flame' | 'bubble'): SpriteOut {
+  const W = 32;
+  const H = 16;
+  const palette = kind === 'flame' ? ['#4a0e05', '#c62828', '#ef6c00', '#ffb300', '#fff176', '#ffffff'] : ['#01395e', '#0288d1', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff'];
+  const frames: Grid[] = [];
+  for (let f = 0; f < 4; f++) {
+    const g = blank(W, H);
+    const r = rng(kind === 'flame' ? 300 + f : 400 + f);
+    if (kind === 'flame') {
+      for (let x = 0; x < W; x++) {
+        const t = x / (W - 1);
+        // 先へ行くほど広がり、ふちがゆらめく
+        const half = (H / 2) * (0.2 + 0.8 * t) + Math.sin(x * 0.7 + f * 1.7) * 1.2 * t;
+        for (let y = 0; y < H; y++) {
+          const d = Math.abs(y - (H - 1) / 2) / Math.max(0.5, half);
+          if (d > 1) continue;
+          // 根元ほど白く熱い。ちらつく点
+          // 先の 2 割は、ちぎれて消えていく
+          if (t > 0.8 && r() < (t - 0.8) * 4.5) continue;
+          const heat = (1 - t) * 0.7 + (1 - d) * 0.6 + (r() - 0.5) * 0.2;
+          g[y]![x] = heat > 1.05 ? 5 : heat > 0.85 ? 4 : heat > 0.65 ? 3 : heat > 0.4 ? 2 : 1;
+        }
+      }
+      frames.push(outline(g, 0));
+    } else {
+      // 泡: 扇形の中に大小の泡を散らす（先ほど大きい）
+      for (let k = 0; k < 22; k++) {
+        const t = r();
+        const cx = 2 + t * (W - 4);
+        const half = (H / 2) * (0.2 + 0.8 * t);
+        const cy = (H - 1) / 2 + (r() * 2 - 1) * (half - 1) + Math.sin(f + k) * 0.6;
+        const rad = 0.8 + t * 1.8 + r() * 0.6;
+        for (let y = Math.floor(cy - rad); y <= Math.ceil(cy + rad); y++) for (let x = Math.floor(cx - rad); x <= Math.ceil(cx + rad); x++) {
+          const d = Math.hypot(x - cx, y - cy) / rad;
+          if (d > 1 || y < 0 || y >= H || x < 0 || x >= W) continue;
+          if (d > 0.7) g[y]![x] = 2;
+          else if (x < cx && y < cy) g[y]![x] = 5;
+          else if (g[y]![x]! < 0) g[y]![x] = 4;
+        }
+      }
+      frames.push(g);
+    }
+  }
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
 const out = {
   credit: '自作（scripts/make-move-sprites.ts で計算して描いた。公式の素材は使っていない）',
   sprites: {
@@ -567,6 +755,13 @@ const out = {
     petal: single(leafLine('petal')),
     'tri-orb': triOrb(),
     'hyper-beam': hyperBeam(),
+    lightning: lightning(),
+    'ice-beam': iceBeam(),
+    'aurora-beam': auroraBeam(),
+    psybeam: psyBeam(),
+    'dragon-pulse': dragonPulse(),
+    'flame-cone': cone('flame'),
+    'bubble-cone': cone('bubble'),
     rock: rock('rock'),
     stone: rock('stone'),
     bone: bone(),

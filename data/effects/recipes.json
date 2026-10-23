@@ -370,6 +370,11 @@
       "projectile": {
         "glowColor": "#ffa726",
         "shapeAlpha": 0.7
+      },
+      "sprite": {
+        "id": "flame-cone",
+        "fit": "cone",
+        "size": 1
       }
     },
     "flare-blitz": {
@@ -1030,7 +1035,12 @@
       }
     },
     "thunder-shock": {
-      "extends": "electric.base"
+      "extends": "electric.base",
+      "sprite": {
+        "id": "lightning",
+        "fit": "line",
+        "size": 2
+      }
     },
     "thunderbolt": {
       "extends": "electric.base",
@@ -1046,6 +1056,16 @@
         ],
         "periodMs": 60,
         "alpha": 0.4
+      },
+      "sprite": {
+        "id": "lightning",
+        "fit": "line",
+        "size": 2.4
+      },
+      "effectLineSprite": {
+        "id": "lightning",
+        "fit": "line",
+        "size": 2
       }
     },
     "thunder": {
@@ -1070,6 +1090,11 @@
         ],
         "periodMs": 50,
         "alpha": 0.45
+      },
+      "effectLineSprite": {
+        "id": "lightning",
+        "fit": "line",
+        "size": 2
       }
     },
     "rock-throw": {
@@ -1137,6 +1162,11 @@
       "extends": "psychic.base",
       "projectile": {
         "glowColor": "#ce93d8"
+      },
+      "sprite": {
+        "id": "psybeam",
+        "fit": "line",
+        "size": 2.2
       }
     },
     "psychic": {
@@ -1499,6 +1529,11 @@
       "extends": "ice.base",
       "projectile": {
         "glowColor": "#80cbc4"
+      },
+      "sprite": {
+        "id": "aurora-beam",
+        "fit": "line",
+        "size": 2
       }
     },
     "ice-beam": {
@@ -1507,6 +1542,11 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "ice-beam",
+        "fit": "line",
+        "size": 1.4
       }
     },
     "karate-chop": {
@@ -1623,6 +1663,11 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "dragon-pulse",
+        "fit": "line",
+        "size": 1.3
       }
     },
     "psystrike": {
@@ -1670,6 +1715,11 @@
       "extends": "water.base",
       "projectile": {
         "shapeAlpha": 0.6
+      },
+      "sprite": {
+        "id": "bubble-cone",
+        "fit": "cone",
+        "size": 1
       }
     },
     "whirlpool": {

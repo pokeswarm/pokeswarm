@@ -1,4 +1,4 @@
-import { achievementsConfig, generated, playablesConfig, uiConfig, unlocksConfig } from '../data';
+import { achievementsConfig, generated, playablesConfig, shopConfig, uiConfig, unlocksConfig } from '../data';
 import { localName } from '../data/simRules';
 import { getLocale, t } from '../i18n';
 import { achievementCondition } from '../meta/achievementText';
@@ -168,8 +168,10 @@ export class PokemonPicker {
       const id = playablesConfig.pokemon[key]!.unlock ?? key;
       const a = achievementsConfig.achievements.find((x) => x.reward?.pokemon === id);
       const cond = a ? achievementCondition(a) : '';
+      // コインで買えるポケモンは値段を出す
+      const sale = shopConfig.pokemon.find((p) => p.key === key);
       // 解放済みと同じく名前の下に2行（マウスを動かしても欄の高さが変わらないように）
-      lines.push(t('select.notUnlocked'), cond ? t('select.unlockHint', { condition: cond }) : '');
+      lines.push(t('select.notUnlocked'), sale ? t('select.buyHint', { cost: sale.cost }) : cond ? t('select.unlockHint', { condition: cond }) : '');
     }
     text.append(name);
     for (const l of lines) {

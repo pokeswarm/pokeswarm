@@ -100,6 +100,19 @@ export function buildSimRules(): SimRules {
     }
     return { key, types: g.types.map(typeIndex), baseStats: g.baseStats, evolutions };
   });
+  // 遊べるポケモンのタイプの指定（プリン: ノーマルだけ）。進化した姿にも当てはめる
+  for (const [key, pl] of Object.entries(playablesConfig.pokemon)) {
+    if (!pl.types) continue;
+    const forced = pl.types.map(typeIndex);
+    const stack = [key];
+    while (stack.length) {
+      const k = stack.pop()!;
+      const s = species.find((x) => x.key === k);
+      if (!s) continue;
+      species[species.indexOf(s)] = { ...s, types: forced };
+      for (const e of generated.pokemon[k]?.evolvesTo ?? []) stack.push(e.to);
+    }
+  }
   return {
     enemies: { kinds: enemiesConfig.kinds.map((k) => ({ ...k, types: generated.pokemon[k.species ?? k.id]!.types.map(typeIndex) })) },
     spawn: spawnConfig,
@@ -129,11 +142,13 @@ export function moveIndexOf(rules: SimRules, key: string): number {
 export function playableLoadout(
   rules: SimRules,
   pokemon: string,
-): { types: number[]; moves: { move: number; level: number }[]; line: string; species: number } {
+): { types: number[]; moves: { move: number; level: number }[]; line: string; species: number; moveTypes: number[]; fixedMoves: boolean } {
   const p = playablesConfig.pokemon[pokemon] ?? playablesConfig.pokemon[playablesConfig.default]!;
   const species = generated.pokemon[pokemon] ?? generated.pokemon[playablesConfig.default]!;
   return {
-    types: species.types.map((t) => rules.types.names.indexOf(t)),
+    types: (p.types ?? species.types).map((t) => rules.types.names.indexOf(t)),
+    moveTypes: (p.moveTypes ?? []).map((t) => rules.types.names.indexOf(t)),
+    fixedMoves: p.fixedMoves,
     moves: p.startingMoves.map((m) => ({ move: moveIndexOf(rules, m), level: 1 })),
     // 系統はプレイアブルのキー（固有技の判定。進化しても変わらない）
     line: playablesConfig.pokemon[pokemon] ? pokemon : playablesConfig.default,

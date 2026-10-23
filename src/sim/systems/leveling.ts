@@ -218,7 +218,7 @@ function itemFitsPlayer(world: World, p: Player, item: number): boolean {
   const normal = world.rules.types.names.indexOf('normal');
   const types: number[] = [];
   def.perLevel.typePowerPct.forEach((v, t) => v && types.push(t));
-  return types.some((t) => t === normal || p.types.includes(t));
+  return types.some((t) => t === normal || p.types.includes(t) || p.moveTypes.includes(t));
 }
 
 export function makeOffers(world: World, p: Player): UpgradeOffer[] {
@@ -242,10 +242,11 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
   p.moves.forEach((pm, slot) => {
     if (pm.level < rules.moves[pm.move]!.levels.length) pool.push({ kind: 'moveUp', slot });
   });
-  if (p.moves.length < rules.combat.maxMoveSlots) {
+  // 技を覚えないポケモン（プリン）は、新しい技を候補に出さない
+  if (p.moves.length < rules.combat.maxMoveSlots && !p.fixedMoves) {
     rules.moves.forEach((m, move) => {
       if (!isBaseMove(world, move) || p.moves.some((pm) => pm.move === move)) return;
-      if (m.type === normal || p.types.includes(m.type)) pool.push({ kind: 'moveNew', move });
+      if (m.type === normal || p.types.includes(m.type) || p.moveTypes.includes(m.type)) pool.push({ kind: 'moveNew', move });
     });
   }
   p.items.forEach((it, slot) => {

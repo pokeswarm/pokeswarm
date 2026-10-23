@@ -452,5 +452,12 @@
   "upgrade.heal.name": "回復",
   "upgrade.heal.gain": "HP を {pct}% 回復",
   "upgrade.coins.name": "コイン",
-  "upgrade.coins.gain": "コイン +{coins}"
+  "upgrade.coins.gain": "コイン +{coins}",
+  "pattern.heal": "自分を回復する",
+  "pattern.sweep": "前を行って戻ってなぎ払う",
+  "itemDesc.everstone": "イーブイが持つと進化しなくなる代わりに、威力・最大HP +10%・移動速度 +5%（進化の石とは一緒に持てない）",
+  "shop.pokemonSection": "ポケモン",
+  "shop.pokemonDesc": "なかまにする（ポケモンを えらぶ で使える）",
+  "shop.owned": "なかま",
+  "select.buyHint": "フレンドリィショップで {cost} コインで なかまにできる"
 }

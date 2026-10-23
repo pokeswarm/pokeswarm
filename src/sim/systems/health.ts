@@ -28,7 +28,9 @@ export function contactDamage(world: World): void {
 
 /** ダメージを受ける（防御・受けるダメージの倍率を掛ける）。HP が無くなったら復活するか倒れる */
 export function hurtPlayer(world: World, p: Player, raw: number): void {
-  const amount = ((raw * 100) / (100 + p.defense)) * Math.max(0, 1 + p.mods.damageTakenPct / 100);
+  // ドわすれの守り: 決まった間、受けるダメージを減らす
+  const guard = p.guardUntilTick !== undefined && world.tick < p.guardUntilTick ? 1 - (p.guardPct ?? 0) / 100 : 1;
+  const amount = ((raw * 100) / (100 + p.defense)) * Math.max(0, 1 + p.mods.damageTakenPct / 100) * guard;
   p.hp -= amount;
   p.invincibleTicks = Math.round(world.rules.stats.hurtInvincibleSeconds / world.dt);
   world.events.push({ type: 'playerDamaged', playerId: p.id, amount });

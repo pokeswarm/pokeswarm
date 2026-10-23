@@ -1,0 +1,86 @@
+{
+  "key": "psyduck",
+  "dex": 54,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Idle": {
+      "source": "Idle",
+      "frameWidth": 24,
+      "frameHeight": 40,
+      "durations": [
+        16,
+        20,
+        16,
+        20
+      ],
+      "frameKeyPrefix": "Idle"
+    },
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 24,
+      "frameHeight": 40,
+      "durations": [
+        8,
+        12,
+        8,
+        12
+      ],
+      "frameKeyPrefix": "Walk"
+    },
+    "Attack": {
+      "source": "Attack",
+      "frameWidth": 72,
+      "frameHeight": 72,
+      "durations": [
+        4,
+        2,
+        4,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        4
+      ],
+      "frameKeyPrefix": "Attack"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 40,
+      "frameHeight": 56,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    },
+    "Faint": {
+      "source": "Hurt",
+      "frameWidth": 40,
+      "frameHeight": 56,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    }
+  },
+  "missing": [
+    {
+      "animation": "Faint",
+      "usedInstead": "Hurt"
+    }
+  ]
+}

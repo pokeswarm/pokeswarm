@@ -6,6 +6,7 @@ import {
   MOTION_LOB,
   MOTION_BOUNCE,
   MOTION_STREAM,
+  MOTION_SWEEP,
   MOTION_LINEAR,
   MOTION_ORBIT,
   SHAPE_CIRCLE,
@@ -63,7 +64,9 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
       st.power *
       (def.damageClass === 'physical' ? p.physicalPower : p.specialPower) *
       Math.max(0, 1 + (m.powerPct + classPct + (m.typePowerPct[def.type] ?? 0)) / 100) *
-      heldPowerMultiplier(world, p),
+      heldPowerMultiplier(world, p) *
+      // とっておき: 覚えているほかの技が多いほど強い
+      (1 + (st.perMovePowerPct * Math.max(0, p.moves.length - 1)) / 100),
     size: st.size * Math.max(0.1, 1 + (m.areaPct + (m.typeAreaPct[def.type] ?? 0)) / 100),
     speed: st.speed * Math.max(0.1, 1 + m.projectileSpeedPct / 100),
     cooldownSeconds: st.cooldownSeconds * Math.max(0.2, 1 + m.cooldownPct / 100),
@@ -195,6 +198,12 @@ export function useMoves(world: World): void {
           break;
         case 'spin':
           fireSpin(world, p, pm, st);
+          break;
+        case 'heal':
+          fireHeal(world, p, pm, st);
+          break;
+        case 'sweep':
+          fireSweep(world, p, pm, st);
           break;
       }
       if (def.effects.some((fx) => fx.trigger === 'cast')) {
@@ -414,7 +423,7 @@ function fireScreen(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
 }
 
 /** 一度に出し終える出し方（ゆびをふるで選ぶ技。連射の出し方は、出し続ける状態を持てないので選ばない） */
-const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter', 'eruption', 'spin']);
+const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter', 'eruption', 'spin', 'sweep']);
 
 /** metronome（ゆびをふる）: ほかの技からランダムに1つを、その技の最大レベルで出す */
 function fireMetronome(world: World, p: Player): void {
@@ -443,6 +452,7 @@ function fireMetronome(world: World, p: Player): void {
     scatter: fireScatter,
     eruption: fireEruption,
     spin: fireSpin,
+    sweep: fireSweep,
   };
   fire[def.pattern]?.(world, p, pm, st);
 }
@@ -623,6 +633,44 @@ function fireSpin(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
   }
 }
 
+/**
+ * heal（回復）: 最大 HP の healPct % を回復し、guardPct があれば duration の間、受けるダメージを減らす（なまける・ドわすれ）。
+ * 見た目だけの円（当たらない。stage 2）を自分に付けて出す
+ */
+function fireHeal(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  healPlayer(world, p.id, (p.maxHp * st.healPct) / 100);
+  if (st.guardPct > 0) {
+    p.guardPct = st.guardPct;
+    p.guardUntilTick = world.tick + Math.round(st.durationSeconds / world.dt);
+  }
+  world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, damage: 0, stage: 2, fxIndex: -1 });
+}
+
+/** sweep（往復するなぎ払い）: 向いている方向を中心に、細い扇形を spreadDegrees の幅で行って戻る（おうふくビンタ） */
+function fireSweep(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const sc = scaledMoveStats(world, p, pm, st);
+  const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  const def = world.rules.moves[pm.move]!;
+  if (def.body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: fx, dirY: fy, distance: def.body.lungeDistance, afterimages: def.body.afterimages });
+  const half = Math.min(Math.PI, (st.arcDegrees * Math.PI) / 360);
+  const amp = (Math.min(360, st.spreadDegrees) * Math.PI) / 360;
+  world.projectiles.add({
+    ...base(world, p, pm, st),
+    motion: MOTION_SWEEP,
+    x: p.x,
+    y: p.y,
+    radius: st.range + sc.size,
+    shape: SHAPE_SECTOR,
+    length: half,
+    angle: Math.atan2(fy, fx),
+    angularSpeed: amp,
+    dirX: Math.cos(Math.atan2(fy, fx) - amp),
+    dirY: Math.sin(Math.atan2(fy, fx) - amp),
+    // 行きと戻りの両方で当たる
+    hitIntervalTicks: Math.max(1, Math.round(st.durationSeconds / 2 / world.dt)),
+  });
+}
+
 /** nova: 自分を中心に、大きさ size から range まで広がる輪 */
 function fireNova(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const sc = scaledMoveStats(world, p, pm, st);
@@ -739,6 +787,15 @@ export function moveProjectiles(world: World): void {
       pr.y[i] = owner.y + Math.sin(pr.angle[i]!) * pr.orbitRadius[i]!;
     } else if (motion === MOTION_STREAM) {
       stepStream(world, i, owner);
+    } else if (motion === MOTION_SWEEP) {
+      // 前半に片側の端からもう片側の端へ、後半に戻る
+      pr.x[i] = owner.x;
+      pr.y[i] = owner.y;
+      const t = 1 - pr.life[i]! / pr.maxLife[i]!;
+      const s = t < 0.5 ? t * 2 : 2 - t * 2;
+      const a = pr.angle[i]! - pr.angularSpeed[i]! + 2 * pr.angularSpeed[i]! * s;
+      pr.dirX[i] = Math.cos(a);
+      pr.dirY[i] = Math.sin(a);
     }
     pr.life[i]! -= world.dt;
     if (pr.life[i]! <= 0) {

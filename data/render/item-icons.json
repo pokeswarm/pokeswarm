@@ -1020,6 +1020,36 @@
         "i": "#acac14",
         "j": "#969607"
       }
+    },
+    "everstone": {
+      "rows": [
+        "..............",
+        "....aaaabbc...",
+        "...deffgehbi..",
+        "..agffgeejdbi.",
+        ".ajfggejjjhaci",
+        "bjfgeeeegedbbc",
+        "dffgggejjjdaai",
+        "afgeeejjjhaaai",
+        "afgjjeejjhdaci",
+        "bggggjjhddaci.",
+        "cdjjjhhddabi..",
+        ".cahhddabci...",
+        "..cbciiici....",
+        ".............."
+      ],
+      "palette": {
+        "a": "#78939f",
+        "b": "#6b8390",
+        "c": "#586e79",
+        "d": "#849fad",
+        "e": "#b5ced6",
+        "f": "#d2eaf3",
+        "g": "#bfd8e0",
+        "h": "#97b1bf",
+        "i": "#48555c",
+        "j": "#acc5cf"
+      }
     }
   }
 }

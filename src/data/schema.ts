@@ -547,6 +547,10 @@ export type CombatConfig = z.infer<typeof combatConfigSchema>;
  * - scatter（水たまり）: 自分の周り range の中のランダムな場所に、しばらく残る当たり判定を置く
  * - spin（回転）: 自分のまわりに開き arcDegrees の扇形を、使うたびに時計回りへ arcDegrees ずつずらして出す（count 枚を等しい角度で。
  *   2 枚は向かい合わせ、3 枚は正三角形と逆三角形の向きが交互になる）。再使用が短いほど速く回る（こうそくスピン。作者の決定 2026年10月23日）
+ * - heal（回復）: 攻撃しない。使うたびに最大 HP の healPct % を回復し、guardPct があれば duration の間、受けるダメージを減らす
+ *   （なまける・ドわすれ。作者の決定 2026年10月23日）。自分の周りに size の円を見た目だけ出す
+ * - sweep（往復するなぎ払い）: 向いている方向を中心に、開き arcDegrees の細い扇形を、spreadDegrees の幅で行って戻る
+ *   （おうふくビンタ）。行きと戻りの両方で当たる（当たり直しの間隔は duration の半分）
  * - eruption（爆炎の柱）: 自分を中心に count 方向へ、円の柱を stages 段に分けて、interval ごとに外へ向かって順に出す。
  *   いちばん外の段が range の距離。外の段ほど半径が sizeGrowth の割合ずつ大きい（ブラストバーン。作者の決定 2026年10月23日）
  */
@@ -573,6 +577,8 @@ export const MOVE_PATTERNS = [
   'stream',
   'eruption',
   'spin',
+  'heal',
+  'sweep',
 ] as const;
 export type MovePattern = (typeof MOVE_PATTERNS)[number];
 
@@ -622,6 +628,12 @@ export const moveStatsSchema = z.object({
   arcDegrees: z.number().min(0).max(360).default(0),
   /** 状態異常の敵へのダメージを何 % 上げるか（たたりめ） */
   statusBonusPct: z.number().nonnegative().default(0),
+  /** heal（回復）: 使うたびに最大 HP の何 % を回復するか（なまける・ドわすれ） */
+  healPct: z.number().nonnegative().default(0),
+  /** heal（回復）: 使ってから duration の間、受けるダメージを何 % 減らすか（ドわすれ） */
+  guardPct: z.number().min(0).max(100).default(0),
+  /** 自分が覚えているほかの技 1つにつき、威力を何 % 上げるか（とっておき） */
+  perMovePowerPct: z.number().nonnegative().default(0),
 });
 export type MoveStatsData = z.infer<typeof moveStatsSchema>;
 
@@ -648,6 +660,9 @@ export const moveLevelDeltaSchema = z
     instakillChance: z.number(),
     arcDegrees: z.number(),
     statusBonusPct: z.number(),
+    healPct: z.number(),
+    guardPct: z.number(),
+    perMovePowerPct: z.number(),
   })
   .partial();
 export type MoveLevelDelta = z.infer<typeof moveLevelDeltaSchema>;
@@ -779,8 +794,14 @@ export const playablesConfigSchema = z.object({
       sprite: z.string(),
       /** 最初に覚えている技 */
       startingMoves: z.array(z.string()).min(1),
-      /** false なら進化しない（ピカチュウ: 原作へのオマージュで、ライチュウにならずボルテッカーを覚える） */
+      /** false なら進化しない（コダック） */
       evolves: z.boolean().default(true),
+      /** タイプを決める（進化した姿も同じ。プリン: ノーマルだけ）。省略時は PokeAPI のタイプ */
+      types: z.array(z.string()).optional(),
+      /** 自分のタイプのほかに、候補に出る技のタイプ（コダック: エスパー） */
+      moveTypes: z.array(z.string()).optional(),
+      /** 新しい技を覚えない（プリン: 最初の2つだけで戦う） */
+      fixedMoves: z.boolean().default(false),
       /**
        * 解放の名前（data/game/achievements.json の reward.pokemon）。省略時はこのキー。
        * 解放したポケモンは進化前の姿から始めるので、ヒトデマンはスターミーの解放で遊べるようになる
@@ -975,6 +996,8 @@ export const effectRecipeSchema = z.object({
    */
   /** 落雷の見た目: 当たり判定が出てから seconds の間、上から稲妻を落とす（かみなり）。height は稲妻の長さ、width は太さ */
   bolt: z.object({ color: colorString, glowColor: colorString, height: z.number().positive(), width: z.number().positive(), seconds: z.number().positive() }).optional(),
+  /** 技が出た瞬間に、画面全体をうっすら光らせる（とっておき）。目に優しいよう薄く短く */
+  screenFlash: z.object({ color: colorString, alpha: z.number().min(0).max(0.5), durationMs: z.number().positive() }).optional(),
   burstFlash: z.object({ colors: z.array(colorString).min(1), periodMs: z.number().positive(), alpha: z.number().min(0).max(1) }).optional(),
   /** 発射体の軌跡に出すパーティクル */
   trail: particleSchema.extend({ intervalMs: z.number().positive() }).optional(),
@@ -1253,6 +1276,8 @@ export const shopConfigSchema = z.object({
       amount: z.number().positive().optional(),
     }),
   ),
+  /** コインで買えるポケモン（作者の決定 2026年10月23日）。key は data/game/playables.json のキー。買うと解放される（払い戻しの対象外） */
+  pokemon: z.array(z.object({ key: z.string(), cost: z.number().int().positive() })).default([]),
   /** 前の版の強化（今は無いもの）の基本の費用。起動時に、使ったコインを全額返して消す */
   legacyBaseCosts: z.record(z.string(), z.number().int().positive()).default({}),
 });
@@ -1486,5 +1511,7 @@ export const moveBalanceSchema = z.object({
   }),
   tolerancePct: z.number().nonnegative(),
   exempt: z.array(z.string()),
+  /** 段階を決める技（派生のつながりから決まる段階の代わり。プリンの はたく・うたう は最初から覚える技だが、派生技の強さにする） */
+  tierOverrides: z.record(z.string(), z.enum(['base', 'derived', 'unique'])).default({}),
 });
 export type MoveBalanceConfig = z.infer<typeof moveBalanceSchema>;

@@ -431,5 +431,12 @@
   "upgrade.heal.name": "Cura",
   "upgrade.heal.gain": "Recupera il {pct}% dei PS",
   "upgrade.coins.name": "Monete",
-  "upgrade.coins.gain": "Monete +{coins}"
+  "upgrade.coins.gain": "Monete +{coins}",
+  "pattern.heal": "Ti cura",
+  "pattern.sweep": "Spazza avanti e indietro davanti a te",
+  "itemDesc.everstone": "Se tenuta da Eevee: non si evolve, ma potenza e PS max +10%, velocità +5% (non insieme alle pietre evolutive)",
+  "shop.pokemonSection": "Pokémon",
+  "shop.pokemonDesc": "Si unisce alla squadra (sceglilo nella selezione dei Pokémon)",
+  "shop.owned": "In squadra",
+  "select.buyHint": "Può unirsi per {cost} monete al Pokémon Market"
 }

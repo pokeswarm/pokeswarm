@@ -19,6 +19,12 @@
     "metronome",
     "hydro-pump",
     "hydro-cannon",
-    "volt-tackle"
-  ]
+    "volt-tackle",
+    "slack-off",
+    "amnesia"
+  ],
+  "tierOverrides": {
+    "pound": "derived",
+    "sing": "derived"
+  }
 }

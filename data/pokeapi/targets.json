@@ -95,7 +95,12 @@
     "staryu",
     "voltorb",
     "machop",
-    "dratini"
+    "dratini",
+    "jigglypuff",
+    "wigglytuff",
+    "psyduck",
+    "slowpoke",
+    "snorlax"
   ],
   "moves": [
     "ember",
@@ -186,7 +191,15 @@
     "metronome",
     "bubble-beam",
     "whirlpool",
-    "water-spout"
+    "water-spout",
+    "pound",
+    "double-slap",
+    "sing",
+    "hyper-voice",
+    "slack-off",
+    "amnesia",
+    "last-resort",
+    "giga-impact"
   ],
   "items": [
     "x-attack",
@@ -229,7 +242,8 @@
     "light-clay",
     "quick-claw",
     "silk-scarf",
-    "moon-stone"
+    "moon-stone",
+    "everstone"
   ],
   "regions": [
     "kanto",

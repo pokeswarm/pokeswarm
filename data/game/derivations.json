@@ -47,6 +47,11 @@
     { "from": "thunderbolt", "item": "thunder-stone", "to": "zap-cannon", "line": "zapdos" },
     { "from": "flare-blitz", "item": "fire-stone", "to": "sky-attack", "line": "moltres" },
     { "from": "aura-sphere", "item": "moon-stone", "to": "metronome", "line": "mew" },
-    { "from": "thunderbolt", "item": "pp-max", "to": "thunder", "line": "pikachu", "forms": ["raichu"] }
+    { "from": "thunderbolt", "item": "pp-max", "to": "thunder", "line": "pikachu", "forms": ["raichu"] },
+    { "from": "pound", "item": "x-attack", "to": "double-slap", "line": "jigglypuff" },
+    { "from": "sing", "item": "silk-scarf", "to": "hyper-voice", "line": "jigglypuff" },
+    { "from": "slack-off", "item": "x-defense", "to": "amnesia", "line": "slowpoke" },
+    { "from": "swift", "item": "everstone", "to": "last-resort", "line": "eevee", "forms": ["eevee"] },
+    { "from": "body-slam", "item": "hp-up", "to": "giga-impact", "line": "snorlax" }
   ]
 }

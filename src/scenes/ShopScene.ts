@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
-import { shopConfig } from '../data';
-import { t, tMaybe } from '../i18n';
+import { generated, playablesConfig, shopConfig } from '../data';
+import { localName } from '../data/simRules';
+import { getLocale, t, tMaybe } from '../i18n';
 import { session } from '../meta/session';
 import { compactScreen } from '../render/pixelUi';
-import { buyUpgrade, nextCost, refundAll, upgradeLevel } from '../meta/shop';
+import { buyPokemon, buyUpgrade, nextCost, refundAll, upgradeLevel } from '../meta/shop';
 
 // 原作をまねた白い窓のボタン（作者の決定。2026年10月22日。src/render/pixelUi.ts の windowCss と同じ見た目）
 const BUTTON = 'min-height:44px;padding:8px 14px;cursor:pointer;font:inherit;font-size:16px;background:#f8f8f8;color:#383848;border:4px solid #383848;border-radius:6px;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #a8b8c8';
@@ -50,6 +51,41 @@ export class ShopScene extends Phaser.Scene {
       }
       const list = document.createElement('div');
       list.style.cssText = 'flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:4px;padding-top:6px';
+      // コインで買えるポケモン（作者の決定 2026年10月23日）。強化の上に、見出しを付けて並べる
+      if (shopConfig.pokemon.length > 0) {
+        const heading = document.createElement('div');
+        heading.style.cssText = 'padding:2px 12px;opacity:0.7';
+        heading.textContent = t('shop.pokemonSection');
+        list.append(heading);
+      }
+      for (const item of shopConfig.pokemon) {
+        const unlockName = playablesConfig.pokemon[item.key]?.unlock ?? item.key;
+        const owned = save.unlocked.includes(unlockName);
+        const row = document.createElement('div');
+        row.style.cssText = `display:grid;${columns};gap:12px;align-items:center;padding:4px 12px;border-radius:6px;border:2px solid ${owned ? '#f8d030' : '#585868'};background:${owned ? '#3d2a08' : '#000000'};overflow-wrap:anywhere`;
+        const name = document.createElement('div');
+        name.textContent = localName(generated.pokemon[item.key]?.names, getLocale(), item.key);
+        if (owned) name.style.color = '#f8d030';
+        const state = document.createElement('div');
+        state.textContent = owned ? t('shop.owned') : '';
+        const desc = document.createElement('div');
+        desc.style.opacity = '0.85';
+        desc.textContent = t('shop.pokemonDesc');
+        const buy = document.createElement('button');
+        buy.style.cssText = BUTTON + ';width:100%;min-height:36px;padding:2px 8px';
+        buy.textContent = owned ? t('shop.owned') : t('shop.buy', { cost: item.cost });
+        buy.disabled = owned || save.coins < item.cost;
+        if (buy.disabled) buy.style.opacity = '0.5';
+        buy.onclick = () => session.store.update((d) => void buyPokemon(d, shopConfig, item.key, unlockName));
+        row.append(name, state, desc, buy);
+        list.append(row);
+      }
+      if (shopConfig.pokemon.length > 0) {
+        const heading = document.createElement('div');
+        heading.style.cssText = 'padding:8px 12px 2px;opacity:0.7';
+        heading.textContent = t('shop.title');
+        list.append(heading);
+      }
       for (const def of shopConfig.upgrades) {
         const level = upgradeLevel(save, def.id);
         const cost = nextCost(def, level);

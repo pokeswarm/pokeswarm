@@ -30,7 +30,8 @@ describe('data/ から組み立てたシミュレーションの定義', () => {
   it('御三家の最初の技とタイプ', () => {
     for (const key of Object.keys(playablesConfig.pokemon)) {
       const l = playableLoadout(rules, key);
-      expect(l.types.map((t) => rules.types.names[t])).toEqual(generated.pokemon[key]!.types);
+      // タイプの指定（プリン: ノーマルだけ）があれば、それ
+      expect(l.types.map((t) => rules.types.names[t])).toEqual(playablesConfig.pokemon[key]!.types ?? generated.pokemon[key]!.types);
       expect(l.moves.map((m) => rules.moves[m.move]!.key)).toEqual(playablesConfig.pokemon[key]!.startingMoves);
     }
   });

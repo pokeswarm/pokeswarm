@@ -20,6 +20,11 @@ export const MOTION_BOUNCE = 6;
  * ox は流れの先の爆発までの残り秒数
  */
 export const MOTION_STREAM = 7;
+/**
+ * 往復するなぎ払い（sweep）: 持ち主に付いていき、扇形の向きを angle を中心に ±angularSpeed（ラジアン）の幅で
+ * 残り時間の前半に行き、後半に戻る
+ */
+export const MOTION_SWEEP = 8;
 
 /** 当たり判定の形: 円（半径 radius） */
 export const SHAPE_CIRCLE = 0;

@@ -1,0 +1,84 @@
+{
+  "key": "eevee",
+  "dex": 133,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Idle": {
+      "source": "Idle",
+      "frameWidth": 24,
+      "frameHeight": 32,
+      "durations": [
+        16,
+        16
+      ],
+      "frameKeyPrefix": "Idle"
+    },
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 40,
+      "frameHeight": 48,
+      "durations": [
+        4,
+        4,
+        4,
+        4,
+        6,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Walk"
+    },
+    "Attack": {
+      "source": "Attack",
+      "frameWidth": 64,
+      "frameHeight": 72,
+      "durations": [
+        4,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        4,
+        4,
+        4
+      ],
+      "frameKeyPrefix": "Attack"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    },
+    "Faint": {
+      "source": "Faint",
+      "frameWidth": 40,
+      "frameHeight": 32,
+      "durations": [
+        8,
+        12,
+        4,
+        10
+      ],
+      "frameKeyPrefix": "Faint"
+    }
+  },
+  "missing": []
+}

@@ -20,6 +20,20 @@ function run(pattern: SimMoveDef['pattern'], stats: Record<string, number>, enem
 }
 
 describe('技の型（作者の決定。07 18章）', () => {
+  it('回復（heal）: 最大 HP の割合を回復し、守りの間は受けるダメージが減る', () => {
+    const { sim } = run('heal', { power: 0, healPct: 20, guardPct: 50, durationSeconds: 2 }, [], 0);
+    const p = sim.world.players[0]!;
+    p.hp = p.maxHp / 2;
+    sim.step([]);
+    expect(p.hp).toBeCloseTo(p.maxHp * 0.7);
+    expect(p.guardUntilTick).toBeGreaterThan(sim.world.tick);
+  });
+
+  it('往復するなぎ払い（sweep）: 行きと戻りで同じ敵に2回当たる', () => {
+    const { hit } = run('sweep', { range: 60, size: 20, arcDegrees: 40, spreadDegrees: 180, durationSeconds: 0.4 }, [[60, 0]], 14);
+    expect(hit[0]).toBe(20);
+  });
+
   it('横なぎ: 左右に長く当たり、上下には当たらない', () => {
     const { hit } = run('whip', { range: 200, size: 10, count: 2 }, [[150, 0], [-150, 0], [0, 150]], 3);
     expect(hit[0]).toBeGreaterThan(0);

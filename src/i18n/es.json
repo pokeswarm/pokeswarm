@@ -431,5 +431,12 @@
   "upgrade.heal.name": "Curar",
   "upgrade.heal.gain": "Recupera un {pct} % de PS",
   "upgrade.coins.name": "Monedas",
-  "upgrade.coins.gain": "Monedas +{coins}"
+  "upgrade.coins.gain": "Monedas +{coins}",
+  "pattern.heal": "Te cura",
+  "pattern.sweep": "Barre de ida y vuelta por delante",
+  "itemDesc.everstone": "Si lo lleva Eevee: no evoluciona, pero potencia y PS máx. +10 %, velocidad +5 % (no se puede llevar con piedras evolutivas)",
+  "shop.pokemonSection": "Pokémon",
+  "shop.pokemonDesc": "Se une al equipo (elígelo en la selección de Pokémon)",
+  "shop.owned": "En el equipo",
+  "select.buyHint": "Se puede unir por {cost} monedas en la Tienda Pokémon"
 }

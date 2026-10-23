@@ -115,6 +115,28 @@
       "grants": "bans"
     }
   ],
+  "pokemon": [
+    {
+      "key": "psyduck",
+      "cost": 2000
+    },
+    {
+      "key": "jigglypuff",
+      "cost": 3000
+    },
+    {
+      "key": "slowpoke",
+      "cost": 3000
+    },
+    {
+      "key": "snorlax",
+      "cost": 10000
+    },
+    {
+      "key": "eevee",
+      "cost": 15000
+    }
+  ],
   "legacyBaseCosts": {
     "max-hp": 100,
     "attack": 150,

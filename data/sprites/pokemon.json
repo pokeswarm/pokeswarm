@@ -191,6 +191,20 @@
       ]
     },
     {
+      "key": "jigglypuff",
+      "dex": 39,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "wigglytuff",
+      "dex": 40,
+      "uses": [
+        "full"
+      ]
+    },
+    {
       "key": "zubat",
       "dex": 41,
       "uses": [
@@ -253,6 +267,13 @@
       "dex": 52,
       "uses": [
         "enemy"
+      ]
+    },
+    {
+      "key": "psyduck",
+      "dex": 54,
+      "uses": [
+        "full"
       ]
     },
     {
@@ -360,10 +381,18 @@
       ]
     },
     {
+      "key": "slowpoke",
+      "dex": 79,
+      "uses": [
+        "full"
+      ]
+    },
+    {
       "key": "slowbro",
       "dex": 80,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -600,10 +629,45 @@
       ]
     },
     {
+      "key": "eevee",
+      "dex": 133,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "vaporeon",
+      "dex": 134,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "jolteon",
+      "dex": 135,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "flareon",
+      "dex": 136,
+      "uses": [
+        "full"
+      ]
+    },
+    {
       "key": "aerodactyl",
       "dex": 142,
       "uses": [
         "enemy"
+      ]
+    },
+    {
+      "key": "snorlax",
+      "dex": 143,
+      "uses": [
+        "full"
       ]
     },
     {

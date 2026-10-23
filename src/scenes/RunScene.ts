@@ -89,6 +89,8 @@ export class RunScene extends Phaser.Scene {
   /** 落雷の稲妻を描く技（かみなり）と、その絵 */
   private boltMoves = new Map<number, NonNullable<EffectRecipe['bolt']>>();
   private boltView: Phaser.GameObjects.Graphics | null = null;
+  /** 画面をうっすら光らせた当たり判定の通し番号（同じものでは1回だけ） */
+  private flashedSerials = new Set<number>();
   private enemyView!: PooledCircles;
   private gemView!: PooledSprites;
   /** 敵をスプライトで描く（読み込み済みの種類だけ。まだの種類は円で描く） */
@@ -173,6 +175,7 @@ export class RunScene extends Phaser.Scene {
     this.playerViews = new Map();
     this.ghostImages = [];
     this.boltView = null;
+    this.flashedSerials = new Set();
     this.inbox = [];
     this.uiCommands = [];
     this.lastSent = { dx: 0, dy: 0 };
@@ -243,6 +246,8 @@ export class RunScene extends Phaser.Scene {
         remote: id !== this.localId,
         pickupRange: playerConfig.pickupRange,
         types: loadout.types,
+        moveTypes: loadout.moveTypes,
+        fixedMoves: loadout.fixedMoves,
         moves: debugMoves ?? startMoves,
         line: loadout.line,
         species: loadout.species,
@@ -705,6 +710,26 @@ export class RunScene extends Phaser.Scene {
   /** 色を切り替えて光らせる円（10まんボルトの自分の周り・かみなりの落雷） */
   private flashing(i: number, pr: World['projectiles']): boolean {
     return pr.stage[i] !== 3 && pr.shape[i] === SHAPE_CIRCLE && this.flashMoves.has(pr.move[i]!);
+  }
+
+  /** とっておき: 技が出た瞬間に、画面全体をうっすら光らせる（目に優しいよう薄く短く。作者の決定で画面は揺らさない） */
+  private drawScreenFlashes(world: World): void {
+    const pr = world.projectiles;
+    const alive = new Set<number>();
+    for (let i = 0; i < pr.count; i++) {
+      if (pr.stage[i] !== 0) continue;
+      const serial = pr.serial[i]!;
+      alive.add(serial);
+      if (this.flashedSerials.has(serial)) continue;
+      const f = this.effects.screenFlash(world.rules.moves[pr.move[i]!]!.effect);
+      if (!f) continue;
+      this.flashedSerials.add(serial);
+      const cam = this.cameras.main;
+      // 拡大・縮小しても画面を覆うように、画面の中心に大きく置く
+      const rect = this.add.rectangle(cam.width / 2, cam.height / 2, cam.width * 4, cam.height * 4, hexColor(f.color), f.alpha).setScrollFactor(0).setDepth(spriteRender.depths.candy + 1);
+      this.tweens.add({ targets: rect, alpha: 0, duration: f.durationMs, onComplete: () => rect.destroy() });
+    }
+    for (const s of this.flashedSerials) if (!alive.has(s)) this.flashedSerials.delete(s);
   }
 
   /** 落雷（かみなり）: 当たり判定が出てからしばらく、上からジグザグの稲妻を落とす。形は毎フレーム変えて、ちらつかせる */
@@ -1183,6 +1208,7 @@ export class RunScene extends Phaser.Scene {
     );
     this.drawGhosts(world, alpha);
     this.drawBolts(world);
+    this.drawScreenFlashes(world);
     this.hitShapes.draw(
       pr,
       alpha,

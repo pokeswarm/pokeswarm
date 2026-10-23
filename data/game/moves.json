@@ -4387,6 +4387,412 @@
           "power": -0.4
         }
       ]
+    },
+    "pound": {
+      "pattern": "melee",
+      "effect": "pound",
+      "base": {
+        "power": 76.2,
+        "cooldownSeconds": 1,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 40,
+        "range": 12,
+        "durationSeconds": 0.15,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 220,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 100
+      },
+      "levels": [
+        {
+          "power": 17.3
+        },
+        {
+          "size": 4,
+          "power": 14.7
+        },
+        {
+          "power": 16.9
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": -4.3
+        },
+        {
+          "size": 4,
+          "power": 11
+        },
+        {
+          "power": 14
+        },
+        {
+          "power": 14.1
+        }
+      ],
+      "body": {
+        "lungeDistance": 14,
+        "afterimages": 0
+      }
+    },
+    "double-slap": {
+      "pattern": "sweep",
+      "effect": "double-slap",
+      "base": {
+        "power": 133.6,
+        "cooldownSeconds": 0.9,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 50,
+        "range": 30,
+        "durationSeconds": 0.4,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 160,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 180,
+        "lifestealPct": 0,
+        "arcDegrees": 40
+      },
+      "levels": [
+        {
+          "power": 22.4
+        },
+        {
+          "size": 6,
+          "power": 13.3
+        },
+        {
+          "power": 21.2
+        },
+        {
+          "cooldownSeconds": -0.1,
+          "power": -2.2
+        },
+        {
+          "spreadDegrees": 60,
+          "power": 0.7
+        },
+        {
+          "power": 17.2
+        },
+        {
+          "size": 6,
+          "power": 5.6
+        }
+      ],
+      "body": {
+        "lungeDistance": 10,
+        "afterimages": 0
+      }
+    },
+    "sing": {
+      "pattern": "nova",
+      "effect": "sing",
+      "sweep": 0.35,
+      "base": {
+        "power": 51.7,
+        "cooldownSeconds": 2.5,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 16,
+        "range": 200,
+        "durationSeconds": 0.9,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0.6,
+        "statusSeconds": 3,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "statusId": "sleep"
+      },
+      "levels": [
+        {
+          "power": 11.7
+        },
+        {
+          "range": 20,
+          "power": 11.8
+        },
+        {
+          "statusChance": 0.1,
+          "power": 11.8
+        },
+        {
+          "cooldownSeconds": -0.3,
+          "power": -0.1
+        },
+        {
+          "range": 20,
+          "power": 10.4
+        },
+        {
+          "power": 10.4
+        },
+        {
+          "statusSeconds": 1,
+          "power": 10.4
+        }
+      ]
+    },
+    "hyper-voice": {
+      "pattern": "melee",
+      "effect": "hyper-voice",
+      "base": {
+        "power": 31.5,
+        "cooldownSeconds": 2,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 170,
+        "range": 0,
+        "durationSeconds": 1.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.3,
+        "knockback": 100,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "statusBonusPct": 50
+      },
+      "levels": [
+        {
+          "power": 5.3
+        },
+        {
+          "size": 15,
+          "power": 4.4
+        },
+        {
+          "power": 5.2
+        },
+        {
+          "cooldownSeconds": -0.2
+        },
+        {
+          "size": 15,
+          "power": 4.7
+        },
+        {
+          "power": 4.6
+        },
+        {
+          "statusBonusPct": 50,
+          "power": 4.7
+        }
+      ]
+    },
+    "slack-off": {
+      "pattern": "heal",
+      "effect": "slack-off",
+      "base": {
+        "power": 0,
+        "cooldownSeconds": 4,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 40,
+        "range": 0,
+        "durationSeconds": 0.6,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "healPct": 4
+      },
+      "levels": [
+        {
+          "healPct": 1
+        },
+        {
+          "cooldownSeconds": -0.3
+        },
+        {
+          "healPct": 1
+        },
+        {
+          "cooldownSeconds": -0.3
+        },
+        {
+          "healPct": 1
+        },
+        {
+          "healPct": 1
+        },
+        {
+          "cooldownSeconds": -0.4
+        }
+      ]
+    },
+    "amnesia": {
+      "pattern": "heal",
+      "effect": "amnesia",
+      "base": {
+        "power": 0,
+        "cooldownSeconds": 6,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 52,
+        "range": 0,
+        "durationSeconds": 3,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "healPct": 8,
+        "guardPct": 30
+      },
+      "levels": [
+        {
+          "healPct": 1
+        },
+        {
+          "guardPct": 5
+        },
+        {
+          "healPct": 1
+        },
+        {
+          "cooldownSeconds": -0.5
+        },
+        {
+          "guardPct": 5
+        },
+        {
+          "healPct": 1
+        },
+        {
+          "durationSeconds": 1
+        }
+      ]
+    },
+    "last-resort": {
+      "pattern": "nova",
+      "effect": "last-resort",
+      "sweep": 0.3,
+      "base": {
+        "power": 216,
+        "cooldownSeconds": 3.5,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 20,
+        "range": 320,
+        "durationSeconds": 0.6,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 300,
+        "knockbackSeconds": 0.12,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "perMovePowerPct": 15
+      },
+      "levels": [
+        {
+          "power": 36.2
+        },
+        {
+          "range": 30,
+          "power": 36.3
+        },
+        {
+          "power": 36.2
+        },
+        {
+          "cooldownSeconds": -0.4,
+          "power": -5
+        },
+        {
+          "range": 30,
+          "power": 32
+        },
+        {
+          "power": 32.1
+        },
+        {
+          "perMovePowerPct": 5,
+          "power": 32.1
+        }
+      ]
+    },
+    "giga-impact": {
+      "pattern": "melee",
+      "effect": "giga-impact",
+      "sweep": 0.45,
+      "base": {
+        "power": 67.9,
+        "cooldownSeconds": 1.1,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 80,
+        "range": 100,
+        "durationSeconds": 0.35,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 600,
+        "knockbackSeconds": 0.2,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 360
+      },
+      "levels": [
+        {
+          "power": 11.4
+        },
+        {
+          "range": 15,
+          "power": 11.4
+        },
+        {
+          "power": 11.3
+        },
+        {
+          "range": 10,
+          "power": 11.4
+        },
+        {
+          "range": 15,
+          "power": 11.4
+        },
+        {
+          "power": 11.4
+        },
+        {
+          "power": 11.4
+        }
+      ],
+      "body": {
+        "lungeDistance": 30,
+        "afterimages": 0
+      }
     }
   }
 }

@@ -303,3 +303,25 @@ describe('でんきだまとボルテッカー（ピカチュウ）', () => {
     expect(p.items.map((it) => it.item)).toEqual([1]);
   });
 });
+
+describe('遊べるポケモンの設定（作者の決定 2026年10月23日）', () => {
+  const WATER = 3;
+  const offeredMoves = (init: { moveTypes?: number[]; fixedMoves?: boolean }): Set<number> => {
+    const r = rules({ extraMoves: [testMove('ember', 'nearest', { range: 1 }, FIRE), testMove('flamethrower', 'nearest', { range: 1 }, FIRE), testMove('blast-burn', 'nearest', { range: 1 }, FIRE), testMove('water-gun', 'nearest', { range: 1 }, WATER)] });
+    const sim = new Simulation({ tickRate: 30, seed: 5, rules: r });
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100, types: [FIRE], moves: [{ move: 1, level: 1 }], line: 'x', ...init });
+    const seen = new Set<number>();
+    for (let k = 0; k < 60; k++) for (const o of makeOffers(sim.world, p)) if (o.kind === 'moveNew') seen.add(o.move);
+    return seen;
+  };
+
+  it('追加の技のタイプ（コダック: エスパー）の技も候補に出る', () => {
+    expect(offeredMoves({}).has(4)).toBe(false);
+    expect(offeredMoves({ moveTypes: [WATER] }).has(4)).toBe(true);
+  });
+
+  it('技を覚えないポケモン（プリン）には、新しい技を候補に出さない', () => {
+    expect(offeredMoves({}).size).toBeGreaterThan(0);
+    expect(offeredMoves({ fixedMoves: true }).size).toBe(0);
+  });
+});

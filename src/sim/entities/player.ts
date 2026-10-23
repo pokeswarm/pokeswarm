@@ -83,6 +83,13 @@ export interface Player {
   bonusCoins?: number;
   /** ふしぎなアメの +3・+5 の重みに足す（実績の報酬） */
   readonly candyWeight: number;
+  /** 自分のタイプのほかに、候補に出る技のタイプ（コダック: エスパー） */
+  readonly moveTypes: readonly number[];
+  /** 新しい技を覚えない（プリン: 最初の2つだけ） */
+  readonly fixedMoves: boolean;
+  /** ドわすれ: この更新の回数まで、受けるダメージを guardPct % 減らす */
+  guardUntilTick?: number;
+  guardPct?: number;
   readonly banned: Set<string>;
 }
 
@@ -109,6 +116,8 @@ export interface PlayerInit {
   unlockedItems?: ReadonlySet<number> | null;
   extraItemSlots?: number;
   candyWeight?: number;
+  moveTypes?: number[];
+  fixedMoves?: boolean;
 }
 
 export function createPlayer(init: PlayerInit): Player {
@@ -150,6 +159,8 @@ export function createPlayer(init: PlayerInit): Player {
     unlockedItems: init.unlockedItems ?? null,
     extraItemSlots: init.extraItemSlots ?? 0,
     candyWeight: init.candyWeight ?? 0,
+    moveTypes: init.moveTypes ?? [],
+    fixedMoves: init.fixedMoves ?? false,
     banned: new Set(),
   };
 }

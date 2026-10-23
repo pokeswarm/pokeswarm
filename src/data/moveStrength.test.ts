@@ -3,7 +3,8 @@ import { derivationsConfig, moveBalanceConfig, movesConfig } from '.';
 import { moveMaxLevel, moveStatsAt, moveTotalRange, moveTotalStrength } from './moveStrength';
 
 const tierOf = (key: string): 'base' | 'derived' | 'unique' =>
-  derivationsConfig.unique.some((d) => d.to === key) ? 'unique' : derivationsConfig.derivations.some((d) => d.to === key) ? 'derived' : 'base';
+  moveBalanceConfig.tierOverrides[key] ??
+  (derivationsConfig.unique.some((d) => d.to === key) ? 'unique' : derivationsConfig.derivations.some((d) => d.to === key) ? 'derived' : 'base');
 const exempt = (key: string): boolean => moveBalanceConfig.exempt.includes(key);
 
 describe('技の強さのそろえ方（作者の決定。07 16.2）', () => {

@@ -431,5 +431,12 @@
   "upgrade.heal.name": "Soin",
   "upgrade.heal.gain": "Rend {pct} % des PV",
   "upgrade.coins.name": "Pièces",
-  "upgrade.coins.gain": "Pièces +{coins}"
+  "upgrade.coins.gain": "Pièces +{coins}",
+  "pattern.heal": "Vous soigne",
+  "pattern.sweep": "Balaie devant vous en aller-retour",
+  "itemDesc.everstone": "Tenue par Évoli : empêche l'évolution, mais puissance et PV max +10 %, vitesse +5 % (incompatible avec les pierres d'évolution)",
+  "shop.pokemonSection": "Pokémon",
+  "shop.pokemonDesc": "Rejoint l'équipe (à choisir sur l'écran de sélection)",
+  "shop.owned": "Dans l’équipe",
+  "select.buyHint": "Peut rejoindre pour {cost} pièces à la Boutique Pokémon"
 }

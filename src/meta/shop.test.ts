@@ -6,7 +6,7 @@ import { testRules } from '../sim/testRules';
 import { emptyModifiers } from '../sim/upgrades';
 import { banUpgrade } from '../sim/systems/leveling';
 import { emptySave } from './saveData';
-import { buyUpgrade, coinsForRun, nextCost, permanentBonus, refundAll, refundLegacy } from './shop';
+import { buyPokemon, buyUpgrade, coinsForRun, nextCost, permanentBonus, refundAll, refundLegacy } from './shop';
 
 const shop: ShopConfig = {
   coins: { perSecondsSurvived: 30, perKills: 100, midboss: 10, boss: 20, clear: 100, legendary: 150 },
@@ -16,6 +16,7 @@ const shop: ShopConfig = {
     { id: 'ban', maxLevel: 5, baseCost: 200, grants: 'bans' },
     { id: 'greed', maxLevel: 5, baseCost: 200, grants: 'coinPct', amount: 10 },
   ],
+  pokemon: [{ key: 'eevee', cost: 500 }],
   legacyBaseCosts: { attack: 150 },
 };
 
@@ -105,5 +106,20 @@ describe('候補の除外（BAN）', () => {
       sim.step([{ type: 'rerollUpgrades', playerId: 1 }]);
       expect(sim.world.levelUp!.offers.get(1)!).not.toContainEqual(target);
     }
+  });
+});
+
+describe('ポケモンを買う（作者の決定 2026年10月23日）', () => {
+  it('コインを払って解放済みに足す。2回は買えず、足りなければ買えない', () => {
+    const save = emptySave();
+    save.coins = 400;
+    expect(buyPokemon(save, shop, 'eevee', 'eevee')).toBe(false);
+    save.coins = 700;
+    expect(buyPokemon(save, shop, 'eevee', 'eevee')).toBe(true);
+    expect(save.coins).toBe(200);
+    expect(save.unlocked).toContain('eevee');
+    save.coins = 1000;
+    expect(buyPokemon(save, shop, 'eevee', 'eevee')).toBe(false);
+    expect(buyPokemon(save, shop, 'snorlax', 'snorlax')).toBe(false);
   });
 });

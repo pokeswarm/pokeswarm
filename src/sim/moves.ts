@@ -28,6 +28,12 @@ export interface MoveStats {
   arcDegrees: number;
   /** 状態異常の敵へのダメージを何 % 上げるか */
   statusBonusPct: number;
+  /** 使うたびに最大 HP の何 % を回復するか */
+  healPct: number;
+  /** 使ってから duration の間、受けるダメージを何 % 減らすか */
+  guardPct: number;
+  /** 覚えているほかの技 1つにつき、威力を何 % 上げるか */
+  perMovePowerPct: number;
 }
 
 /** シミュレーションが使う技の定義 */
@@ -91,6 +97,9 @@ export function resolveMoveLevels(def: MoveDefData, statusIndexOf: (id: string) 
     instakillChance: b.instakillChance,
     arcDegrees: b.arcDegrees,
     statusBonusPct: b.statusBonusPct,
+    healPct: b.healPct,
+    guardPct: b.guardPct,
+    perMovePowerPct: b.perMovePowerPct,
   };
   const out = [cur];
   for (const delta of def.levels) {

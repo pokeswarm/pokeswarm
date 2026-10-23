@@ -26,7 +26,8 @@ const balance = JSON.parse(readFileSync(path('data/game/move-balance.json'), 'ut
 
 type Tier = keyof MoveBalanceConfig['tiers'];
 const tierOf = (key: string): Tier =>
-  derivations.unique.some((d) => d.to === key) ? 'unique' : derivations.derivations.some((d) => d.to === key) ? 'derived' : 'base';
+  balance.tierOverrides?.[key] ??
+  (derivations.unique.some((d) => d.to === key) ? 'unique' : derivations.derivations.some((d) => d.to === key) ? 'derived' : 'base');
 
 const total = (def: MoveDefData, level: number): number => moveTotalStrength(def, moveStatsAt(def, level));
 const first = (def: MoveDefData): number => total(def, 1);

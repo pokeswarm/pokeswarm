@@ -452,5 +452,12 @@
   "upgrade.heal.name": "Heal",
   "upgrade.heal.gain": "Restore {pct}% HP",
   "upgrade.coins.name": "Coins",
-  "upgrade.coins.gain": "Coins +{coins}"
+  "upgrade.coins.gain": "Coins +{coins}",
+  "pattern.heal": "Heals you",
+  "pattern.sweep": "Sweeps back and forth ahead",
+  "itemDesc.everstone": "Held by Eevee: stops evolution, but power and max HP +10%, move speed +5% (cannot be held with evolution stones)",
+  "shop.pokemonSection": "Pokémon",
+  "shop.pokemonDesc": "Join your team (choose it on the Pokémon select screen)",
+  "shop.owned": "Joined",
+  "select.buyHint": "Can join for {cost} coins at the Poké Mart"
 }

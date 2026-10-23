@@ -1281,6 +1281,39 @@
       }
     ]
   },
+  "jigglypuff": {
+    "dex": 39,
+    "names": {
+      "ja": "プリン",
+      "en": "Jigglypuff",
+      "fr": "Rondoudou",
+      "de": "Pummeluff",
+      "es": "Jigglypuff",
+      "it": "Jigglypuff"
+    },
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 115,
+      "attack": 45,
+      "defense": 20,
+      "specialAttack": 45,
+      "specialDefense": 25,
+      "speed": 20
+    },
+    "preEvolutions": [
+      "igglybuff"
+    ],
+    "evolvesTo": [
+      {
+        "to": "wigglytuff",
+        "trigger": "item",
+        "item": "moon-stone"
+      }
+    ]
+  },
   "jolteon": {
     "dex": 135,
     "names": {
@@ -2049,6 +2082,36 @@
       }
     ]
   },
+  "psyduck": {
+    "dex": 54,
+    "names": {
+      "ja": "コダック",
+      "en": "Psyduck",
+      "fr": "Psykokwak",
+      "de": "Enton",
+      "es": "Psyduck",
+      "it": "Psyduck"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 52,
+      "defense": 48,
+      "specialAttack": 65,
+      "specialDefense": 50,
+      "speed": 55
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "golduck",
+        "trigger": "level",
+        "level": 33
+      }
+    ]
+  },
   "raichu": {
     "dex": 26,
     "names": {
@@ -2284,6 +2347,67 @@
     },
     "preEvolutions": [
       "slowpoke"
+    ],
+    "evolvesTo": []
+  },
+  "slowpoke": {
+    "dex": 79,
+    "names": {
+      "ja": "ヤドン",
+      "en": "Slowpoke",
+      "fr": "Ramoloss",
+      "de": "Flegmon",
+      "es": "Slowpoke",
+      "it": "Slowpoke"
+    },
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 65,
+      "defense": 65,
+      "specialAttack": 40,
+      "specialDefense": 40,
+      "speed": 15
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "slowbro",
+        "trigger": "level",
+        "level": 37
+      },
+      {
+        "to": "slowking",
+        "trigger": "trade"
+      }
+    ]
+  },
+  "snorlax": {
+    "dex": 143,
+    "names": {
+      "ja": "カビゴン",
+      "en": "Snorlax",
+      "fr": "Ronflex",
+      "de": "Relaxo",
+      "es": "Snorlax",
+      "it": "Snorlax"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 160,
+      "attack": 110,
+      "defense": 65,
+      "specialAttack": 65,
+      "specialDefense": 110,
+      "speed": 30
+    },
+    "preEvolutions": [
+      "munchlax"
     ],
     "evolvesTo": []
   },
@@ -2775,6 +2899,34 @@
     },
     "preEvolutions": [
       "koffing"
+    ],
+    "evolvesTo": []
+  },
+  "wigglytuff": {
+    "dex": 40,
+    "names": {
+      "ja": "プクリン",
+      "en": "Wigglytuff",
+      "fr": "Grodoudou",
+      "de": "Knuddeluff",
+      "es": "Wigglytuff",
+      "it": "Wigglytuff"
+    },
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 140,
+      "attack": 70,
+      "defense": 45,
+      "specialAttack": 85,
+      "specialDefense": 50,
+      "speed": 45
+    },
+    "preEvolutions": [
+      "igglybuff",
+      "jigglypuff"
     ],
     "evolvesTo": []
   },

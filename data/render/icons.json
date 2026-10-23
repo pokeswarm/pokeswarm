@@ -776,7 +776,9 @@
     "scatter": "scatter",
     "stream": "beam",
     "eruption": "eruption",
-    "spin": "spin"
+    "spin": "spin",
+    "heal": "nova",
+    "sweep": "whip"
   },
   "items": {
     "x-attack": {

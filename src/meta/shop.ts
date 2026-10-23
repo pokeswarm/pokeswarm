@@ -50,6 +50,18 @@ export function buyUpgrade(save: SaveData, cfg: ShopConfig, id: string): boolean
   return true;
 }
 
+/**
+ * ポケモンを買う（解放の名前をセーブの解放済みに足す）。もう解放している・コインが足りない・売っていないなら false。
+ * unlockName は playables.json の unlock（省略時はキー）
+ */
+export function buyPokemon(save: SaveData, cfg: ShopConfig, key: string, unlockName: string): boolean {
+  const item = cfg.pokemon.find((p) => p.key === key);
+  if (!item || save.unlocked.includes(unlockName) || save.coins < item.cost) return false;
+  save.coins -= item.cost;
+  save.unlocked.push(unlockName);
+  return true;
+}
+
 /** すべての強化を戻し、使ったコインを全額返す。返したコインの数 */
 export function refundAll(save: SaveData, cfg: ShopConfig): number {
   let total = 0;

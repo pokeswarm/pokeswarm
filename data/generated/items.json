@@ -69,6 +69,16 @@
       "it": "Dentedidrago"
     }
   },
+  "everstone": {
+    "names": {
+      "ja": "かわらずのいし",
+      "en": "Everstone",
+      "fr": "Pierre Stase",
+      "de": "Ewigstein",
+      "es": "Piedra Eterna",
+      "it": "Pietrastante"
+    }
+  },
   "fire-stone": {
     "names": {
       "ja": "ほのおのいし",

@@ -1574,6 +1574,161 @@
         "coreScale": 0.35,
         "glowColor": "#039be5"
       }
+    },
+    "pound": {
+      "extends": "normal.base"
+    },
+    "double-slap": {
+      "extends": "normal.base",
+      "impact": {
+        "flash": {
+          "radius": 40
+        }
+      }
+    },
+    "sing": {
+      "extends": "normal.base",
+      "burstFlash": {
+        "colors": [
+          "#f8bbd0",
+          "#e1bee7",
+          "#ffffff"
+        ],
+        "periodMs": 150,
+        "alpha": 0.3
+      }
+    },
+    "hyper-voice": {
+      "extends": "normal.base",
+      "burstFlash": {
+        "colors": [
+          "#f48fb1",
+          "#ffffff",
+          "#f8bbd0"
+        ],
+        "periodMs": 100,
+        "alpha": 0.28
+      }
+    },
+    "slack-off": {
+      "extends": "normal.base",
+      "burstFlash": {
+        "colors": [
+          "#a5d6a7",
+          "#e8f5e9"
+        ],
+        "periodMs": 200,
+        "alpha": 0.35
+      }
+    },
+    "amnesia": {
+      "extends": "normal.base",
+      "burstFlash": {
+        "colors": [
+          "#90caf9",
+          "#e3f2fd"
+        ],
+        "periodMs": 250,
+        "alpha": 0.3
+      }
+    },
+    "last-resort": {
+      "extends": "normal.base",
+      "burstFlash": {
+        "colors": [
+          "#ff8a80",
+          "#ffd180",
+          "#ffff8d",
+          "#b9f6ca",
+          "#80d8ff",
+          "#ea80fc"
+        ],
+        "periodMs": 60,
+        "alpha": 0.45
+      },
+      "screenFlash": {
+        "color": "#fffde7",
+        "alpha": 0.35,
+        "durationMs": 300
+      },
+      "impact": {
+        "burst": {
+          "count": 20,
+          "colors": [
+            "#ff8a80",
+            "#ffd180",
+            "#ffff8d",
+            "#b9f6ca",
+            "#80d8ff",
+            "#ea80fc",
+            "#ffffff"
+          ],
+          "lifespanMs": [
+            250,
+            500
+          ],
+          "speed": [
+            80,
+            260
+          ],
+          "scale": [
+            1,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 4,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#fffde7",
+          "radius": 70,
+          "durationMs": 140,
+          "alpha": 0.7
+        }
+      },
+      "trail": {
+        "intervalMs": 40,
+        "colors": [
+          "#ff8a80",
+          "#ffd180",
+          "#ffff8d",
+          "#b9f6ca",
+          "#80d8ff",
+          "#ea80fc",
+          "#ffffff"
+        ],
+        "lifespanMs": [
+          250,
+          450
+        ],
+        "speed": [
+          20,
+          90
+        ],
+        "scale": [
+          0.7,
+          0
+        ],
+        "alpha": [
+          1,
+          0
+        ],
+        "gravityY": 0,
+        "spread": 6,
+        "blend": "add"
+      }
+    },
+    "giga-impact": {
+      "extends": "normal.base",
+      "impact": {
+        "flash": {
+          "radius": 120
+        }
+      }
     }
   }
 }

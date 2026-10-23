@@ -11,6 +11,18 @@
     "type": "flying",
     "damageClass": "special"
   },
+  "amnesia": {
+    "names": {
+      "ja": "ドわすれ",
+      "en": "Amnesia",
+      "fr": "Amnésie",
+      "de": "Amnesie",
+      "es": "Amnesia",
+      "it": "Amnesia"
+    },
+    "type": "psychic",
+    "damageClass": "status"
+  },
   "ancient-power": {
     "names": {
       "ja": "げんしのちから",
@@ -165,6 +177,18 @@
       "it": "Doppiocalcio"
     },
     "type": "fighting",
+    "damageClass": "physical"
+  },
+  "double-slap": {
+    "names": {
+      "ja": "おうふくビンタ",
+      "en": "Double Slap",
+      "fr": "Torgnoles",
+      "de": "Duplexhieb",
+      "es": "Doble Bofetón",
+      "it": "Doppiasberla"
+    },
+    "type": "normal",
     "damageClass": "physical"
   },
   "draco-meteor": {
@@ -407,6 +431,18 @@
     "type": "grass",
     "damageClass": "special"
   },
+  "giga-impact": {
+    "names": {
+      "ja": "ギガインパクト",
+      "en": "Giga Impact",
+      "fr": "Giga Impact",
+      "de": "Gigastoß",
+      "es": "Gigaimpacto",
+      "it": "Gigaimpatto"
+    },
+    "type": "normal",
+    "damageClass": "physical"
+  },
   "gust": {
     "names": {
       "ja": "かぜおこし",
@@ -479,6 +515,18 @@
     "type": "normal",
     "damageClass": "special"
   },
+  "hyper-voice": {
+    "names": {
+      "ja": "ハイパーボイス",
+      "en": "Hyper Voice",
+      "fr": "Mégaphone",
+      "de": "Schallwelle",
+      "es": "Vozarrón",
+      "it": "Granvoce"
+    },
+    "type": "normal",
+    "damageClass": "special"
+  },
   "ice-beam": {
     "names": {
       "ja": "れいとうビーム",
@@ -501,6 +549,18 @@
       "it": "Colpokarate"
     },
     "type": "fighting",
+    "damageClass": "physical"
+  },
+  "last-resort": {
+    "names": {
+      "ja": "とっておき",
+      "en": "Last Resort",
+      "fr": "Dernier Recours",
+      "de": "Zuflucht",
+      "es": "Última Baza",
+      "it": "Ultimascelta"
+    },
+    "type": "normal",
     "damageClass": "physical"
   },
   "leech-seed": {
@@ -597,6 +657,18 @@
       "it": "Velenospina"
     },
     "type": "poison",
+    "damageClass": "physical"
+  },
+  "pound": {
+    "names": {
+      "ja": "はたく",
+      "en": "Pound",
+      "fr": "Écras’Face",
+      "de": "Klaps",
+      "es": "Destructor",
+      "it": "Botta"
+    },
+    "type": "normal",
     "damageClass": "physical"
   },
   "powder-snow": {
@@ -803,6 +875,18 @@
     "type": "ice",
     "damageClass": "special"
   },
+  "sing": {
+    "names": {
+      "ja": "うたう",
+      "en": "Sing",
+      "fr": "Berceuse",
+      "de": "Gesang",
+      "es": "Canto",
+      "it": "Canto"
+    },
+    "type": "normal",
+    "damageClass": "status"
+  },
   "sky-attack": {
     "names": {
       "ja": "ゴッドバード",
@@ -814,6 +898,18 @@
     },
     "type": "flying",
     "damageClass": "physical"
+  },
+  "slack-off": {
+    "names": {
+      "ja": "なまける",
+      "en": "Slack Off",
+      "fr": "Paresse",
+      "de": "Tagedieb",
+      "es": "Relajo",
+      "it": "Pigro"
+    },
+    "type": "normal",
+    "damageClass": "status"
   },
   "sleep-powder": {
     "names": {

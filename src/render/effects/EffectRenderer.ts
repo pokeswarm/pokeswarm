@@ -103,6 +103,11 @@ export class EffectRenderer {
     return obj;
   }
 
+  /** 技が出た瞬間に画面をうっすら光らせる見た目（無ければ null） */
+  screenFlash(id: string): EffectRecipe['screenFlash'] | null {
+    return this.recipe(id).screenFlash ?? null;
+  }
+
   /** 落雷の見た目（無ければ null） */
   bolt(id: string): EffectRecipe['bolt'] | null {
     return this.recipe(id).bolt ?? null;
@@ -190,6 +195,12 @@ export class EffectRenderer {
             const a = base + (Math.random() * 2 - 1) * sector.half;
             const d = Math.sqrt(Math.random()) * r;
             em.emitParticleAt(x + Math.cos(a) * d, y + Math.sin(a) * d, 1);
+          }
+        } else if (hollow(i) && !sector) {
+          // 中が空いた輪（とっておき・うたう）は、輪の縁から出す
+          for (let k = 0; k < n * 4; k++) {
+            const a = Math.random() * Math.PI * 2;
+            em.emitParticleAt(x + Math.cos(a) * r, y + Math.sin(a) * r, 1);
           }
         } else if (line && line.length > 0) {
           // 線（通った道に残る範囲など）は、線のあちこちから出す。長いほど多く出す

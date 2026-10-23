@@ -97,6 +97,12 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
     case 'nova':
       area = Math.PI * range * range;
       break;
+    case 'sweep':
+      area = (Math.min(num('spreadDegrees') + num('arcDegrees'), 360) / 360) * Math.PI * (range + size) ** 2;
+      break;
+    case 'heal':
+      area = 0;
+      break;
     case 'eruption': {
       const er = def.eruption ?? { stages: 3, sizeGrowth: 0.25 };
       // 段ごとに半径が大きくなるので、真ん中の段の大きさで数える

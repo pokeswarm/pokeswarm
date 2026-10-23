@@ -4745,8 +4745,8 @@
       "effect": "giga-impact",
       "sweep": 0.45,
       "base": {
-        "power": 67.9,
-        "cooldownSeconds": 1.1,
+        "power": 197.5,
+        "cooldownSeconds": 3.2,
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 0,
@@ -4765,28 +4765,28 @@
       },
       "levels": [
         {
-          "power": 11.4
+          "power": 33.1
         },
         {
           "range": 15,
-          "power": 11.4
+          "power": 33.1
         },
         {
-          "power": 11.3
+          "power": 33.1
         },
         {
-          "range": 10,
-          "power": 11.4
+          "cooldownSeconds": -0.4,
+          "power": -8.1
         },
         {
           "range": 15,
-          "power": 11.4
+          "power": 29
         },
         {
-          "power": 11.4
+          "power": 29
         },
         {
-          "power": 11.4
+          "power": 29
         }
       ],
       "body": {

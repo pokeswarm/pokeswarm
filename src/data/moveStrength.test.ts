@@ -61,7 +61,8 @@ describe('進化しても見た目の量が減らない（作者の決定。07 2
         expect(num(b.pierce), `${label} の貫通`).toBeGreaterThanOrEqual(num(a.pierce));
         expect(num(b.count), `${label} の数`).toBeGreaterThanOrEqual(num(a.count));
         expect(num(b.durationSeconds), `${label} の持続`).toBeGreaterThanOrEqual(num(a.durationSeconds));
-        expect(num(b.cooldownSeconds), `${label} の再使用`).toBeLessThanOrEqual(num(a.cooldownSeconds));
+        // 重い一撃（ギガインパクト）は、威力が高い代わりに再使用が長くてよい（作者の決定 2026年10月23日）
+        if (!moveBalanceConfig.heavyHitters.includes(d.to)) expect(num(b.cooldownSeconds), `${label} の再使用`).toBeLessThanOrEqual(num(a.cooldownSeconds));
       }
     }
   });

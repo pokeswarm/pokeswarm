@@ -23,6 +23,9 @@
     "slack-off",
     "amnesia"
   ],
+  "heavyHitters": [
+    "giga-impact"
+  ],
   "tierOverrides": {
     "pound": "derived",
     "sing": "derived"

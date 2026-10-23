@@ -1512,6 +1512,8 @@ export const moveBalanceSchema = z.object({
   tolerancePct: z.number().nonnegative(),
   exempt: z.array(z.string()),
   /** 段階を決める技（派生のつながりから決まる段階の代わり。プリンの はたく・うたう は最初から覚える技だが、派生技の強さにする） */
+  /** 「重い一撃」の技: 同じ出し方の進化でも、再使用が元の技より長くてよい（威力が高い代わりに再使用が長い。ギガインパクト） */
+  heavyHitters: z.array(z.string()).default([]),
   tierOverrides: z.record(z.string(), z.enum(['base', 'derived', 'unique'])).default({}),
 });
 export type MoveBalanceConfig = z.infer<typeof moveBalanceSchema>;

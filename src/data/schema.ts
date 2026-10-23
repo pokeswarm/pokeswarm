@@ -967,6 +967,9 @@ const particleSchema = z.object({
 
 export type EffectParticle = z.infer<typeof particleSchema>;
 
+/** 技のドット絵の指定。growSeconds があれば、線を根元から先へその秒数で伸ばして見せる */
+const moveSpriteSpec = z.object({ id: z.string(), fit: z.enum(['circle', 'line']), size: z.number().positive().default(1), growSeconds: z.number().positive().optional() });
+
 export const effectRecipeSchema = z.object({
   /** 発射体の本体: 芯と光の2枚重ね */
   projectile: z
@@ -996,6 +999,13 @@ export const effectRecipeSchema = z.object({
    */
   /** 落雷の見た目: 当たり判定が出てから seconds の間、上から稲妻を落とす（かみなり）。height は稲妻の長さ、width は太さ */
   bolt: z.object({ color: colorString, glowColor: colorString, height: z.number().positive(), width: z.number().positive(), seconds: z.number().positive() }).optional(),
+  /**
+   * 技のドット絵（data/render/move-sprites.json の id）を、光の芯の代わりに描く。circle は当たり判定の円に合わせて1枚、
+   * line は線の長さに合わせて 始まり・途中・終わり を並べる。size は当たり判定の大きさに掛ける倍率
+   */
+  sprite: moveSpriteSpec.optional(),
+  /** 効き方から出た線（ハードプラントの突き出す根）を、光の線の代わりにこのドット絵で描く */
+  effectLineSprite: moveSpriteSpec.optional(),
   /** 技を出す seconds 秒前から、持ち主の体を光らせる（ためる。ギガインパクト）。radius は光の半径、alpha は出す直前の濃さ */
   chargeGlow: z.object({ color: colorString, seconds: z.number().positive(), radius: z.number().positive(), alpha: z.number().min(0).max(1) }).optional(),
   /** 技が出た瞬間に、画面全体をうっすら光らせる（とっておき）。目に優しいよう薄く短く */
@@ -1485,6 +1495,25 @@ export const itemIconsSchema = z.object({
   ),
 });
 export type ItemIcons = z.infer<typeof itemIconsSchema>;
+
+/**
+ * 技のドット絵（自作。npm run move-sprites で計算して作る。作者の案 2026年10月23日）。
+ * palette の番号（0〜9）で1文字1ドット（. は透明）。parts は部品（main・start・middle・end）ごとのコマの並び。
+ * frameMs ごとに次のコマへ進み、loopFrom があれば最後まで行ったらそのコマから繰り返す
+ */
+export const moveSpritesSchema = z.object({
+  credit: z.string(),
+  sprites: z.record(
+    z.string(),
+    z.object({
+      palette: z.array(z.string().regex(/^#[0-9a-fA-F]{6}$/)).min(1).max(10),
+      frameMs: z.number().positive(),
+      loopFrom: z.number().int().nonnegative().optional(),
+      parts: z.record(z.string(), z.array(z.array(z.string()).min(1)).min(1)),
+    }),
+  ),
+});
+export type MoveSpritesData = z.infer<typeof moveSpritesSchema>;
 
 export const iconConfigSchema = z.object({
   size: z.number().int().positive(),

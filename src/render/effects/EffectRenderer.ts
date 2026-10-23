@@ -113,6 +113,16 @@ export class EffectRenderer {
     return this.recipe(id).screenFlash ?? null;
   }
 
+  /** 効き方から出た線のドット絵の指定（無ければ null） */
+  effectLineSprite(id: string): EffectRecipe['effectLineSprite'] | null {
+    return this.recipe(id).effectLineSprite ?? null;
+  }
+
+  /** 技のドット絵の指定（無ければ null） */
+  sprite(id: string): EffectRecipe['sprite'] | null {
+    return this.recipe(id).sprite ?? null;
+  }
+
   /** 落雷の見た目（無ければ null） */
   bolt(id: string): EffectRecipe['bolt'] | null {
     return this.recipe(id).bolt ?? null;
@@ -163,6 +173,8 @@ export class EffectRenderer {
     hidden: (index: number) => boolean = () => false,
     /** 外へ進む攻撃の帯（中が空いている）なら true。真ん中に芯を描かない */
     hollow: (index: number) => boolean = () => false,
+    /** 技そのもの（効き方から出たものでない） */
+    isMain: (index: number) => boolean = () => true,
   ): void {
     // 軌跡のパーティクルを出す数は、レシピごとの間隔で決める
     const trailCounts = new Map<string, number>();
@@ -220,7 +232,8 @@ export class EffectRenderer {
       }
       // 範囲そのもの（光の色）は HitShapes が平らに塗る。ここでは発射体の芯だけを、当たり判定の内側に小さく描く。扇形は芯を出さない
       // 持ち主の残像として飛ぶもの（ゴッドバード）は、芯の代わりに RunScene が姿を描く
-      if (!body || sector || hollow(i) || (recipe.ownerGhost && !line)) continue;
+      // ドット絵で描く技（ハードプラント・ハイドロポンプ）も芯を描かない（MoveSprites が描く）
+      if (!body || sector || hollow(i) || (recipe.ownerGhost && !line) || (recipe.sprite && isMain(i)) || (recipe.effectLineSprite && line && !isMain(i))) continue;
       const pulse = body.pulse ? 1 + Math.sin((timeMs / body.pulse.periodMs) * Math.PI * 2) * body.pulse.amount : 1;
       let core = this.cores[used];
       if (!core) {

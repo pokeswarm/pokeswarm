@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { achievementsConfig, effectRecipes, generated, groundConfig, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig } from '../data';
+import { achievementsConfig, effectRecipes, moveSprites, generated, groundConfig, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig } from '../data';
 import { buildSimRules, localName, mergeModifiers, permanentModifiers, playableLoadout } from '../data/simRules';
 import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
@@ -12,6 +12,7 @@ import { EdgeArrows, type EdgeTarget } from '../render/EdgeArrows';
 import { EffectRenderer } from '../render/effects/EffectRenderer';
 import { audio } from '../audio';
 import { RunSounds } from '../audio/runSounds';
+import { MoveSprites } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
 import { ObstacleView } from '../render/ObstacleView';
@@ -89,6 +90,8 @@ export class RunScene extends Phaser.Scene {
   /** 落雷の稲妻を描く技（かみなり）と、その絵 */
   private boltMoves = new Map<number, NonNullable<EffectRecipe['bolt']>>();
   private boltView: Phaser.GameObjects.Graphics | null = null;
+  /** 技のドット絵 */
+  private moveSprites: MoveSprites | null = null;
   /** 画面をうっすら光らせた当たり判定の通し番号（同じものでは1回だけ） */
   private flashedSerials = new Set<number>();
   private enemyView!: PooledCircles;
@@ -349,6 +352,8 @@ export class RunScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.levelUpPanel.hide());
     this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));
     this.effects = new EffectRenderer(this, effectRecipes, depths.effects, spriteRender.effectPixel);
+    // 技のドット絵は光の演出の少し下（光の粒が上に重なる）
+    this.moveSprites = new MoveSprites(this, moveSprites, depths.effects - 0.1);
     const shape = spriteRender.hitShape;
     this.hitShapes = new HitShapes(this, depths.hitShapes, shape);
     this.shapeColors = rules.moves.map((m) => {
@@ -1222,7 +1227,16 @@ export class RunScene extends Phaser.Scene {
       (i) => pr.stage[i] === 3,
       // 外へ進む帯と、通った道に残る範囲には芯を描かない（道が光の線に見えてしまう）
       (i) => pr.band[i]! > 0 || (pr.stage[i] === 1 && pr.shape[i] === SHAPE_LINE && this.pathMoves.has(pr.move[i]!)) || this.flashing(i, pr),
+      (i) => pr.stage[i] === 0,
     );
+    // 技のドット絵（技そのものだけ。効き方から出たものは今までどおり）
+    this.moveSprites?.draw(pr, alpha, (i) => {
+      const effect = world.rules.moves[pr.move[i]!]!.effect;
+      if (pr.stage[i] === 0) return this.effects.sprite(effect) ?? null;
+      // 効き方から出た線（ハードプラントの突き出す根）
+      if (pr.stage[i] === 1 && pr.shape[i] === SHAPE_LINE) return this.effects.effectLineSprite(effect) ?? null;
+      return null;
+    });
     this.drawGhosts(world, alpha);
     this.drawBolts(world);
     this.drawScreenFlashes(world);

@@ -15,7 +15,8 @@
     "pokeapi": "node scripts/fetch-pokeapi.ts",
     "moves-table": "node scripts/moves-table.ts",
     "balance-moves": "node scripts/balance-moves.ts",
-    "item-icons": "node scripts/fetch-item-icons.ts"
+    "item-icons": "node scripts/fetch-item-icons.ts",
+    "move-sprites": "node scripts/make-move-sprites.ts"
   },
   "dependencies": {
     "firebase": "^13.0.0",

@@ -9,6 +9,7 @@ import obstacleSpritesJson from '../../data/render/obstacles.json';
 import obstaclesJson from '../../data/game/obstacles.json';
 import iconsJson from '../../data/render/icons.json';
 import itemIconsJson from '../../data/render/item-icons.json';
+import moveSpritesJson from '../../data/render/move-sprites.json';
 import moveBalanceJson from '../../data/game/move-balance.json';
 import enemiesJson from '../../data/game/enemies.json';
 import spawnJson from '../../data/game/spawn.json';
@@ -78,6 +79,7 @@ import {
   obstacleConfigSchema,
   iconConfigSchema,
   itemIconsSchema,
+  moveSpritesSchema,
   MOVE_PATTERNS,
   moveBalanceSchema,
 } from './schema';
@@ -103,6 +105,8 @@ export const obstacleConfig = load('game/obstacles.json', obstacleConfigSchema, 
 /** 技・持ち物・パッシブのアイコン（自作のドット絵） */
 export const iconConfig = load('render/icons.json', iconConfigSchema, iconsJson);
 export const itemIcons = load('render/item-icons.json', itemIconsSchema, itemIconsJson);
+/** 技のドット絵（自作。npm run move-sprites） */
+export const moveSprites = load('render/move-sprites.json', moveSpritesSchema, moveSpritesJson);
 /** 技の強さをそろえる目安（段階ごとの総合の強さ） */
 export const moveBalanceConfig = load('game/move-balance.json', moveBalanceSchema, moveBalanceJson);
 export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enemiesJson);
@@ -242,6 +246,7 @@ for (const s of stageConfig.swarms) {
 for (const [key, def] of Object.entries(movesConfig.moves)) {
   check(!!generated.moves[key], `data/game/moves.json の "${key}" が data/generated/moves.json にありません（data/pokeapi/targets.json に足して npm run pokeapi）`);
   check(!!effectRecipes[def.effect], `data/game/moves.json の "${key}" の effect "${def.effect}" のレシピがありません`);
+  for (const sp of [effectRecipes[def.effect]?.sprite, effectRecipes[def.effect]?.effectLineSprite]) if (sp) check(!!moveSprites.sprites[sp.id], `data/effects/recipes.json の "${def.effect}" のドット絵 "${sp.id}" が data/render/move-sprites.json にありません（npm run move-sprites）`);
   const status = def.base.statusId;
   check(!status || statusConfig.kinds.some((k) => k.id === status), `data/game/moves.json の "${key}" の statusId "${status}" が data/game/status.json にありません`);
 }

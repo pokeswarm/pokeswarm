@@ -86,6 +86,9 @@ export class RunScene extends Phaser.Scene {
   private pathMoves = new Set<number>();
   /** 効き方から出た円を光らせる技（10まんボルト）。技の番号 → 色の切り替え */
   private flashMoves = new Map<number, NonNullable<EffectRecipe['burstFlash']>>();
+  /** 落雷の稲妻を描く技（かみなり）と、その絵 */
+  private boltMoves = new Map<number, NonNullable<EffectRecipe['bolt']>>();
+  private boltView: Phaser.GameObjects.Graphics | null = null;
   private enemyView!: PooledCircles;
   private gemView!: PooledSprites;
   /** 敵をスプライトで描く（読み込み済みの種類だけ。まだの種類は円で描く） */
@@ -169,6 +172,7 @@ export class RunScene extends Phaser.Scene {
     this.runData = data;
     this.playerViews = new Map();
     this.ghostImages = [];
+    this.boltView = null;
     this.inbox = [];
     this.uiCommands = [];
     this.lastSent = { dx: 0, dy: 0 };
@@ -198,6 +202,7 @@ export class RunScene extends Phaser.Scene {
     if (this.playerSprite) registerPokemonAnimations(this, this.playerSprite);
     const rules = applyDebugOverrides(buildSimRules(), window.location.search);
     this.pathMoves = new Set(rules.moves.flatMap((m, k) => (m.effects.some((fx) => fx.puddle?.path) ? [k] : [])));
+    this.boltMoves = new Map(rules.moves.flatMap((m, k) => { const b = effectRecipes[m.effect]?.bolt; return b ? [[k, b] as const] : []; }));
     this.flashMoves = new Map(rules.moves.flatMap((m, k) => { const f = effectRecipes[m.effect]?.burstFlash; return f ? [[k, f] as const] : []; }));
     // 技は確認用に URL で指定できる（?moves=ember:8,fire-spin:3）。協力プレイでは参加用 URL に引き継ぐので2人とも同じになる
     const role: SimRole = this.coop?.room.role ?? 'solo';
@@ -697,9 +702,37 @@ export class RunScene extends Phaser.Scene {
     }
   }
 
-  /** 効き方から出た円で、色を切り替えて光らせるもの（10まんボルトの自分の周り） */
+  /** 色を切り替えて光らせる円（10まんボルトの自分の周り・かみなりの落雷） */
   private flashing(i: number, pr: World['projectiles']): boolean {
-    return pr.stage[i] === 1 && pr.shape[i] === SHAPE_CIRCLE && this.flashMoves.has(pr.move[i]!);
+    return pr.stage[i] !== 3 && pr.shape[i] === SHAPE_CIRCLE && this.flashMoves.has(pr.move[i]!);
+  }
+
+  /** 落雷（かみなり）: 当たり判定が出てからしばらく、上からジグザグの稲妻を落とす。形は毎フレーム変えて、ちらつかせる */
+  private drawBolts(world: World): void {
+    if (!this.boltView) this.boltView = this.add.graphics().setDepth(spriteRender.depths.effects + 0.3);
+    const g = this.boltView;
+    g.clear();
+    const pr = world.projectiles;
+    for (let i = 0; i < pr.count; i++) {
+      if (pr.stage[i] !== 0) continue;
+      const b = this.boltMoves.get(pr.move[i]!);
+      if (!b || pr.maxLife[i]! - pr.life[i]! > b.seconds) continue;
+      const x = pr.x[i]!;
+      const y = pr.y[i]!;
+      const steps = 7;
+      const pts: [number, number][] = [];
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        const jitter = k === 0 || k === steps ? 0 : (Math.random() * 2 - 1) * b.width * 4;
+        pts.push([x + jitter, y - b.height * (1 - t)]);
+      }
+      for (const [w, color, a] of [[b.width * 3, b.glowColor, 0.5], [b.width, b.color, 1]] as const) {
+        g.lineStyle(w, hexColor(color), a).beginPath();
+        g.moveTo(pts[0]![0], pts[0]![1]);
+        for (const [px, py] of pts.slice(1)) g.lineTo(px, py);
+        g.strokePath();
+      }
+    }
   }
 
   /**
@@ -1149,6 +1182,7 @@ export class RunScene extends Phaser.Scene {
       (i) => pr.band[i]! > 0 || (pr.stage[i] === 1 && pr.shape[i] === SHAPE_LINE && this.pathMoves.has(pr.move[i]!)) || this.flashing(i, pr),
     );
     this.drawGhosts(world, alpha);
+    this.drawBolts(world);
     this.hitShapes.draw(
       pr,
       alpha,

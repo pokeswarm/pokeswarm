@@ -808,6 +808,8 @@ export function moveProjectiles(world: World): void {
         hitX = e.x[j]!;
         hitY = e.y[j]!;
       }
+      // 当たった敵ごとの効き方（かみなり: 落雷を受けた敵から電気が連鎖する）。見た目もそろうように、どのブラウザでも起こす
+      if (pr.stage[i] === 0 && def.effects.some((fx) => fx.trigger === 'eachHit')) fireEffects(world, 'eachHit', fxSourceOf(world, i, e.x[j]!, e.y[j]!));
       if (!local) continue;
       // ノックバックの向き: 直線は線の向き、それ以外は当たり判定から敵へ（重なっていれば進む向き）
       const kx = line ? pr.dirX[i]! : e.x[j]! - x || pr.vx[i]!;

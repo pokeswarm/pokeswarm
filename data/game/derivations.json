@@ -46,6 +46,7 @@
     { "from": "psychic", "item": "x-sp-atk", "to": "psystrike", "line": "mewtwo" },
     { "from": "thunderbolt", "item": "thunder-stone", "to": "zap-cannon", "line": "zapdos" },
     { "from": "flare-blitz", "item": "fire-stone", "to": "sky-attack", "line": "moltres" },
-    { "from": "aura-sphere", "item": "moon-stone", "to": "metronome", "line": "mew" }
+    { "from": "aura-sphere", "item": "moon-stone", "to": "metronome", "line": "mew" },
+    { "from": "thunderbolt", "item": "pp-max", "to": "thunder", "line": "pikachu", "forms": ["raichu"] }
   ]
 }

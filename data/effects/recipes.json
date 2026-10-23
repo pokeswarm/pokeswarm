@@ -986,6 +986,30 @@
         "alpha": 0.4
       }
     },
+    "thunder": {
+      "extends": "electric.base",
+      "impact": {
+        "flash": {
+          "radius": 70
+        }
+      },
+      "bolt": {
+        "color": "#fffde7",
+        "glowColor": "#ffeb3b",
+        "height": 280,
+        "width": 4,
+        "seconds": 0.15
+      },
+      "burstFlash": {
+        "colors": [
+          "#fff176",
+          "#ffffff",
+          "#212121"
+        ],
+        "periodMs": 50,
+        "alpha": 0.45
+      }
+    },
     "rock-throw": {
       "extends": "rock.base",
       "projectile": {

@@ -54,6 +54,8 @@ export interface SimDerivation {
   readonly line: string | null;
   /** このレベル以上でないと覚えられない */
   readonly minLevel?: number;
+  /** 今の姿がこのどれかのときだけ覚えられる（種類の番号） */
+  readonly forms?: readonly number[];
 }
 
 /** シミュレーションが使うレベルアップの定義 */

@@ -231,6 +231,7 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
       if (d.from !== pm.move || !p.items.some((it) => it.item === d.item)) continue;
       if (d.line !== null && d.line !== p.line) continue;
       if (d.minLevel && world.level < d.minLevel) continue;
+      if (d.forms && !d.forms.includes(p.species)) continue;
       if (p.moves.some((m) => m.move === d.to)) continue;
       guaranteed.push({ kind: 'derive', slot, to: d.to, item: d.item, unique: d.line !== null });
     }
@@ -346,6 +347,7 @@ export function derivationCompletedBy(world: World, p: Player, offer: UpgradeOff
   for (const d of rules.derivations) {
     if (!lineOk(d) || !notYet(d)) continue;
     if (d.minLevel && world.level < d.minLevel) continue;
+    if (d.forms && !d.forms.includes(p.species)) continue;
     const hasItem = p.items.some((it) => it.item === d.item);
     const fromAtMax = p.moves.some((m) => m.move === d.from && m.level >= maxOf(d.from));
     switch (offer.kind) {

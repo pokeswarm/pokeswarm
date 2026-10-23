@@ -659,9 +659,10 @@ const fxSize = { sizeMultiplier: z.number().positive(), powerMultiplier: z.numbe
  *   end（当たり判定が消えたとき・落ちたとき。その位置）、every（当たり判定が残っている間 everySeconds ごと。その位置。
  *   流れ stream は流れが最初に当たる敵の位置）
  * - 大きさ・威力は、もとの当たり判定の大きさ（半径）・威力に掛ける倍率
+ * - eachHit: 当たった敵ごとに（その敵の位置で）起こす（かみなり: 落雷を受けた敵それぞれから電気が連鎖する）
  */
 export const moveEffectSchema = z.object({
-  trigger: z.enum(['cast', 'hit', 'end', 'every']),
+  trigger: z.enum(['cast', 'hit', 'end', 'every', 'eachHit']),
   everySeconds: z.number().positive().optional(),
   /** 起こる確率（0〜1。省略で必ず） */
   chance: z.number().min(0).max(1).optional(),
@@ -972,6 +973,8 @@ export const effectRecipeSchema = z.object({
    * 効き方から出た円の範囲（10まんボルトの自分の周りの電気）を、色を切り替えて光らせる。
    * colors を periodMs ごとに順に使い、塗りの濃さは alpha
    */
+  /** 落雷の見た目: 当たり判定が出てから seconds の間、上から稲妻を落とす（かみなり）。height は稲妻の長さ、width は太さ */
+  bolt: z.object({ color: colorString, glowColor: colorString, height: z.number().positive(), width: z.number().positive(), seconds: z.number().positive() }).optional(),
   burstFlash: z.object({ colors: z.array(colorString).min(1), periodMs: z.number().positive(), alpha: z.number().min(0).max(1) }).optional(),
   /** 発射体の軌跡に出すパーティクル */
   trail: particleSchema.extend({ intervalMs: z.number().positive() }).optional(),
@@ -1267,6 +1270,8 @@ export const derivationsConfigSchema = z.object({
       line: z.string(),
       /** このレベル以上でないと覚えられない（ボルテッカー: レベル50を超える） */
       minLevel: z.number().int().positive().optional(),
+      /** 今の姿がこのどれかのときだけ覚えられる（かみなり = ライチュウ。PokeAPI のポケモンの名前） */
+      forms: z.array(z.string()).optional(),
     }),
   ),
 });

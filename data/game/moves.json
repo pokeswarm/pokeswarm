@@ -3992,6 +3992,67 @@
         }
       ]
     },
+    "thunder": {
+      "pattern": "scatter",
+      "effect": "thunder",
+      "base": {
+        "power": 114.6,
+        "cooldownSeconds": 1.5,
+        "count": 4,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 60,
+        "range": 380,
+        "durationSeconds": 0.3,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 80,
+        "knockbackSeconds": 0.06,
+        "statusId": "paralysis",
+        "statusChance": 0.3,
+        "statusSeconds": 2,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "power": 19.2
+        },
+        {
+          "count": 1,
+          "power": 3.1
+        },
+        {
+          "power": 17.2
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 0.1
+        },
+        {
+          "size": 8,
+          "power": 0.8
+        },
+        {
+          "power": 14.2
+        },
+        {
+          "count": 2,
+          "power": -14.3
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "eachHit",
+          "chain": {
+            "sizeMultiplier": 0.12,
+            "powerMultiplier": 0.5,
+            "count": 2,
+            "range": 200
+          }
+        }
+      ]
+    },
     "sky-attack": {
       "key": "sky-attack",
       "pattern": "boomerang",

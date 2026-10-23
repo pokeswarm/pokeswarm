@@ -103,6 +103,11 @@ export class EffectRenderer {
     return obj;
   }
 
+  /** 落雷の見た目（無ければ null） */
+  bolt(id: string): EffectRecipe['bolt'] | null {
+    return this.recipe(id).bolt ?? null;
+  }
+
   /** 効き方から出た円を光らせる色（無ければ null） */
   burstFlash(id: string): EffectRecipe['burstFlash'] | null {
     return this.recipe(id).burstFlash ?? null;

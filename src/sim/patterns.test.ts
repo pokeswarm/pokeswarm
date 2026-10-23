@@ -209,6 +209,13 @@ describe('効き方の部品（07 22.4）', () => {
     expect(pr.length[lines[0]!]!).toBeCloseTo(300, -1);
   });
 
+  it('当たった敵ごと（eachHit）: 落雷を受けた敵それぞれから連鎖が出る', () => {
+    const chain = { sizeMultiplier: 1, powerMultiplier: 1, count: 1, range: 300 };
+    const sim = withEffects('strike', { size: 40, count: 1, range: 150, durationSeconds: 0.3 }, [{ trigger: 'eachHit', chain }], [[100, 0], [110, 0], [300, 0]], 2);
+    // 落雷に入った2体から、それぞれ1本ずつ連鎖が出る
+    expect(stageCount(sim, 1)).toBe(2);
+  });
+
   it('連鎖: 当たった敵から近くの敵へ飛び移る', () => {
     const sim = withEffects('facing', { speed: 600, size: 6, count: 1, range: 400, durationSeconds: 1 }, [{ trigger: 'hit', chain: { sizeMultiplier: 1, powerMultiplier: 1, count: 2, range: 200 } }], [[100, 0], [100, 120], [100, 240]], 8);
     const e = sim.world.enemies;

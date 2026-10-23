@@ -1117,6 +1117,12 @@
         "flash": {
           "radius": 120
         }
+      },
+      "chargeGlow": {
+        "color": "#ff7043",
+        "seconds": 0.6,
+        "radius": 70,
+        "alpha": 1
       }
     },
     "extreme-speed": {

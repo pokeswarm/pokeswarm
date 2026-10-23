@@ -1129,7 +1129,12 @@
       }
     },
     "magnitude": {
-      "extends": "ground.base"
+      "extends": "ground.base",
+      "sprite": {
+        "id": "quake-crack",
+        "fit": "ring",
+        "size": 1
+      }
     },
     "earthquake": {
       "extends": "ground.base",
@@ -1137,6 +1142,11 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "quake-crack",
+        "fit": "ring",
+        "size": 1
       }
     },
     "bonemerang": {
@@ -1256,6 +1266,12 @@
         "glowColor": "#6a1b9a",
         "glowScale": 1.1,
         "coreScale": 0.3
+      },
+      "sprite": {
+        "id": "poison-cloud",
+        "fit": "circle",
+        "size": 0.95,
+        "alpha": 0.55
       }
     },
     "sludge-wave": {
@@ -1264,6 +1280,12 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "poison-cloud",
+        "fit": "circle",
+        "size": 0.95,
+        "alpha": 0.55
       }
     },
     "seed-bomb": {
@@ -1312,6 +1334,18 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "fissure",
+        "fit": "line",
+        "size": 1.3,
+        "growSeconds": 0.15
+      },
+      "effectLineSprite": {
+        "id": "fissure",
+        "fit": "line",
+        "size": 1,
+        "growSeconds": 0.3
       }
     },
     "ice.base": {
@@ -1495,13 +1529,27 @@
       }
     },
     "powder-snow": {
-      "extends": "ice.base"
+      "extends": "ice.base",
+      "sprite": {
+        "id": "snowflake",
+        "fit": "circle",
+        "size": 2.6,
+        "rotate": "spin",
+        "spinDegPerSec": 300
+      }
     },
     "blizzard-aura": {
       "extends": "ice.base",
       "projectile": {
         "glowScale": 1.1,
         "coreScale": 0.3
+      },
+      "sprite": {
+        "id": "snowflake",
+        "fit": "circle",
+        "size": 2.4,
+        "rotate": "spin",
+        "spinDegPerSec": 240
       }
     },
     "sheer-cold": {

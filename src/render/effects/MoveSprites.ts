@@ -84,7 +84,7 @@ export class MoveSprites {
       const y = pr.prevY[i]! + (pr.y[i]! - pr.prevY[i]!) * alpha;
       const elapsed = pr.maxLife[i]! - pr.life[i]!;
       // 短い技（はっぱカッターなど 0.2 秒ほど）は、出ている時間の最後の 3 割だけで薄くする
-      const a = Math.min(1, pr.life[i]! / Math.min(FADE_SECONDS, pr.maxLife[i]! * 0.3));
+      const a = Math.min(1, pr.life[i]! / Math.min(FADE_SECONDS, pr.maxLife[i]! * 0.3)) * spec.alpha;
       const r = pr.radius[i]! * spec.size;
       if (spec.fit === 'circle') {
         const rows = sp.parts.main?.[0];
@@ -96,6 +96,24 @@ export class MoveSprites {
         const rot =
           spec.rotate === 'velocity' ? (vx !== 0 || vy !== 0 ? Math.atan2(vy, vx) : Math.atan2(pr.dirY[i]!, pr.dirX[i]!)) : spec.rotate === 'spin' ? (elapsed * spec.spinDegPerSec * Math.PI) / 180 : 0;
         put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x, y, rot, s, s, a);
+        continue;
+      }
+      if (spec.fit === 'ring') {
+        // 輪（じしん）: 帯の真ん中の円に沿って、途中の部品を接する向きに並べる（太さは帯の厚さ）
+        const rows = sp.parts.middle?.[0];
+        if (!rows) continue;
+        const outer = pr.radius[i]!;
+        const band = (pr.band[i]! > 0 ? pr.band[i]! : outer * 0.3) * spec.size;
+        const rc = Math.max(1, outer - band / 2);
+        // 少なくとも 16 枚並べて、角ばった多角形に見えないようにする
+        const n = Math.max(16, Math.round((Math.PI * 2 * rc) / ((rows[0]!.length * band) / rows.length)));
+        const sx = (Math.PI * 2 * rc) / n / rows[0]!.length;
+        const sy = band / rows.length;
+        const frame = frameKey(spec.id, 'middle', this.frameOf(spec.id, 'middle', elapsed));
+        for (let k = 0; k < n; k++) {
+          const ang = (k / n) * Math.PI * 2;
+          put(frame, x + Math.cos(ang) * rc, y + Math.sin(ang) * rc, ang + Math.PI / 2, sx, sy, a);
+        }
         continue;
       }
       if (spec.fit === 'cone') {

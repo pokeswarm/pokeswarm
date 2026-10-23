@@ -996,9 +996,14 @@ export type EffectParticle = z.infer<typeof particleSchema>;
 /** 技のドット絵の指定。growSeconds があれば、線を根元から先へその秒数で伸ばして見せる */
 const moveSpriteSpec = z.object({
   id: z.string(),
-  /** circle（円に合わせて1枚）・line（線に 始まり・途中・終わり を並べる）・cone（扇形に1枚を引き伸ばす。かえんほうしゃ） */
-  fit: z.enum(['circle', 'line', 'cone']),
+  /**
+   * circle（円に合わせて1枚）・line（線に 始まり・途中・終わり を並べる）・cone（扇形に1枚を引き伸ばす。かえんほうしゃ）・
+   * ring（外へ進む帯の輪に沿って、途中の部品を並べる。じしんの地割れ）
+   */
+  fit: z.enum(['circle', 'line', 'cone', 'ring']),
   size: z.number().positive().default(1),
+  /** 絵の濃さ（煙など、下が少し透けてほしいもの） */
+  alpha: z.number().min(0).max(1).default(1),
   growSeconds: z.number().positive().optional(),
   /** circle の絵の向き: none（そのまま）・velocity（進む向きに向ける。絵は右向きに描く）・spin（回し続ける） */
   rotate: z.enum(['none', 'velocity', 'spin']).default('none'),

@@ -740,6 +740,112 @@ function cone(kind: 'flame' | 'bubble'): SpriteOut {
   return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- 地面・範囲（案 C） ----------------
+/**
+ * じしん・マグニチュード: 輪に沿って並べる、割れた地面の帯（横 = 輪の向き、縦 = 外へ向かう向き）。
+ * 土の帯の真ん中をギザギザの割れ目が走り、ふちに石くれ。並べてもつながるよう、割れ目は端で真ん中に戻す
+ */
+function quakeCrack(): SpriteOut {
+  const W = 12;
+  const H = 8;
+  // 0 輪郭・1 割れ目（こげ茶）・2 土の暗い所・3 土・4 土の明るい所・5 石くれ
+  // 土と石（丸太に見えないよう、明るい土に暗い割れ目だけを入れる）
+  const palette = ['#2a1d14', '#24170f', '#7b6352', '#9c8470', '#b8a38e', '#d7ccc8'];
+  const mid = Math.floor((H - 1) / 2);
+  const frames: Grid[] = [];
+  for (let f = 0; f < 2; f++) {
+    const g = blank(W, H);
+    const r = rng(910 + f);
+    for (let x = 0; x < W; x++) {
+      // 割れ目の高さ: 端で真ん中、間で上下に折れる
+      const crack = mid + Math.round(Math.sin((x / W) * Math.PI * 2) * 1.6 + (x === 3 || x === 8 ? (f ? 1 : -1) : 0));
+      for (let y = 1; y < H - 1; y++) {
+        const d = Math.abs(y - crack);
+        g[y]![x] = d === 0 ? 1 : d === 1 ? 2 : y < mid ? 4 : 3;
+      }
+      // 石くれ: ふちから飛び出す
+      if (r() < 0.35) g[r() < 0.5 ? 0 : H - 1]![x] = 5;
+    }
+    frames.push(outline(g, 0));
+  }
+  return { palette, frameMs: 90, parts: { middle: frames.map(toRows) } };
+}
+
+/** じわれ: 地面が裂けた暗い割れ目（始まり・途中・終わり）。コマでふちの岩が少し崩れる */
+function fissure(): SpriteOut {
+  const H = 12;
+  const TILE = 10;
+  // 0 輪郭・1 深い割れ目・2 割れ目の中・3 岩のふち・4 岩の明るい所
+  const palette = ['#0c0705', '#120a06', '#3e2723', '#6d4c41', '#a1887f'];
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 6, middle: TILE, end: 8 }, 3, (x, y, f, part) => {
+    const taper = part === 'start' ? 0.35 + x / 9 : part === 'end' ? 1 - x / 8 : 1;
+    // ふちのギザギザ（上下で違う形。周期は TILE なので並べてもつながる）
+    const jag = (x2: number, k: number): number => Math.round(Math.sin(((x2 + k) / TILE) * Math.PI * 2 * 2) * 0.8 + Math.sin(((x2 * 3 + k + f) / TILE) * Math.PI * 2) * 0.5);
+    const top = mid - 3.5 * taper + jag(x, 0);
+    const bottom = mid + 3.5 * taper + jag(x, 4);
+    if (y < top - 1.5 || y > bottom + 1.5) return -1;
+    if (y < top || y > bottom) return y < mid ? 4 : 3;
+    const d = Math.abs(y - mid) / Math.max(0.5, 3.5 * taper);
+    return d < 0.5 ? 1 : 2;
+  });
+  return { palette, frameMs: 140, parts };
+}
+
+/** ふぶき・こなゆき: 六つの枝の雪の結晶（回して飛ばす） */
+function snowflake(): SpriteOut {
+  const palette = ['#0d3550', '#81d4fa', '#e1f5fe', '#ffffff'];
+  const g = shape(13, (u, v) => {
+    const d = Math.hypot(u, v);
+    if (d > 0.95) return -1;
+    const a = Math.atan2(v, u);
+    const seg = Math.PI / 3;
+    const off = Math.abs((((a % seg) + seg) % seg) - seg / 2);
+    // 枝: 角度のずれが小さい所（中心へ近いほど太い）
+    const arm = Math.abs(Math.sin(seg / 2 - off)) * d;
+    if (arm < 0.11) return d < 0.3 ? 3 : 2;
+    // 枝の小枝
+    if (d > 0.45 && d < 0.65 && arm < 0.24) return 1;
+    return d < 0.18 ? 3 : -1;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
+/** スモッグ・ヘドロウェーブ: 毒の煙のかたまり（ふくらんだ雲がゆっくり渦を巻く） */
+function poisonCloud(): SpriteOut {
+  const palette = ['#1f0a26', '#4a148c', '#7b1fa2', '#9c27b0', '#ce93d8', '#e1bee7'];
+  const frames: Grid[] = [];
+  for (let f = 0; f < 4; f++) {
+    const r = rng(77);
+    // 雲のかたまり: 円の中に小さな円（もくもく）を並べる。コマで回す
+    const puffs = Array.from({ length: 9 }, (_, k) => {
+      const a = (k / 9) * Math.PI * 2 + (f * Math.PI) / 8;
+      const rr = 0.45 + r() * 0.2;
+      return [Math.cos(a) * rr, Math.sin(a) * rr, 0.32 + r() * 0.12] as const;
+    });
+    const g = shape(24, (u, v) => {
+      let inside = Math.hypot(u, v) < 0.5;
+      let lit = false;
+      for (const [cx, cy, pr] of puffs) {
+        const d = Math.hypot(u - cx, v - cy);
+        if (d < pr) {
+          inside = true;
+          // 膨らみの左上だけを明るく（丸く見せる）
+          if (Math.hypot(u - cx + pr * 0.35, v - cy + pr * 0.35) < pr * 0.35) lit = true;
+        }
+      }
+      if (!inside) return -1;
+      if (lit) return 4;
+      const l = light(u, v, 0.9);
+      // 渦の筋
+      const swirl = Math.sin(Math.atan2(v, u) * 2 + Math.hypot(u, v) * 6 - f * 1.2);
+      return swirl > 0.9 ? 3 : l > 0.35 ? 3 : l > -0.35 ? 2 : 1;
+    });
+    frames.push(g);
+  }
+  return { palette, frameMs: 180, parts: { main: frames.map(toRows) } };
+}
+
 const out = {
   credit: '自作（scripts/make-move-sprites.ts で計算して描いた。公式の素材は使っていない）',
   sprites: {
@@ -762,6 +868,10 @@ const out = {
     'dragon-pulse': dragonPulse(),
     'flame-cone': cone('flame'),
     'bubble-cone': cone('bubble'),
+    'quake-crack': quakeCrack(),
+    fissure: fissure(),
+    snowflake: snowflake(),
+    'poison-cloud': poisonCloud(),
     rock: rock('rock'),
     stone: rock('stone'),
     bone: bone(),

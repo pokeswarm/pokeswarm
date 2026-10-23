@@ -1269,6 +1269,11 @@ export class RunScene extends Phaser.Scene {
     this.moveSprites?.draw(pr, alpha, (i) => {
       const effect = world.rules.moves[pr.move[i]!]!.effect;
       if (pr.stage[i] === 0) return this.effects.sprite(effect) ?? null;
+      // 効き方から出た外へ進む輪（じしんの続く揺れ）も、輪の絵の技なら同じ絵
+      if (pr.stage[i] === 1 && pr.band[i]! > 0) {
+        const sp = this.effects.sprite(effect);
+        if (sp?.fit === 'ring') return sp;
+      }
       // 効き方から出た線（ハードプラントの突き出す根）
       if (pr.stage[i] === 1 && pr.shape[i] === SHAPE_LINE) return this.effects.effectLineSprite(effect) ?? null;
       return null;

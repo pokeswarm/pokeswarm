@@ -98,6 +98,15 @@ export class MoveSprites {
         put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x, y, rot, s, s, a);
         continue;
       }
+      if (spec.fit === 'front') {
+        // 扇形の先（ほのおのキバ・フレアドライブ）: 向きの先、半径の 6 割の所に、扇の半径に合わせた1枚（右向きの絵）
+        const rows = sp.parts.main?.[0];
+        if (!rows) continue;
+        const reach = pr.radius[i]!;
+        const s = (reach * spec.size) / rows[0]!.length;
+        put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x + pr.dirX[i]! * reach * 0.6, y + pr.dirY[i]! * reach * 0.6, Math.atan2(pr.dirY[i]!, pr.dirX[i]!), s, s, a);
+        continue;
+      }
       if (spec.fit === 'ring') {
         // 輪（じしん）: 帯の真ん中の円に沿って、途中の部品を接する向きに並べる（太さは帯の厚さ）
         const rows = sp.parts.middle?.[0];

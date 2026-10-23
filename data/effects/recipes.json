@@ -363,7 +363,12 @@
       }
     },
     "fire-fang": {
-      "extends": "fire.base"
+      "extends": "fire.base",
+      "sprite": {
+        "id": "fang-bite",
+        "fit": "front",
+        "size": 1.2
+      }
     },
     "flamethrower": {
       "extends": "fire.base",
@@ -382,6 +387,11 @@
       "projectile": {
         "glowScale": 1.2,
         "coreScale": 0.4
+      },
+      "sprite": {
+        "id": "flame-crash",
+        "fit": "front",
+        "size": 1.1
       }
     },
     "blast-burn": {
@@ -1258,6 +1268,12 @@
       "projectile": {
         "glowColor": "#ffe082",
         "glowScale": 2.6
+      },
+      "ownerGhost": {
+        "tint": "#ffe0b2",
+        "alpha": 0.85,
+        "afterimages": 4,
+        "spacingTicks": 1
       }
     },
     "smog": {
@@ -1691,6 +1707,12 @@
         "flash": {
           "radius": 60
         }
+      },
+      "ownerGhost": {
+        "tint": "#d1c4e9",
+        "alpha": 0.85,
+        "afterimages": 4,
+        "spacingTicks": 1
       }
     },
     "outrage": {

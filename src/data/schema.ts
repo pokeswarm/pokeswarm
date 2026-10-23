@@ -998,9 +998,10 @@ const moveSpriteSpec = z.object({
   id: z.string(),
   /**
    * circle（円に合わせて1枚）・line（線に 始まり・途中・終わり を並べる）・cone（扇形に1枚を引き伸ばす。かえんほうしゃ）・
-   * ring（外へ進む帯の輪に沿って、途中の部品を並べる。じしんの地割れ）
+   * ring（外へ進む帯の輪に沿って、途中の部品を並べる。じしんの地割れ）・
+   * front（扇形の向きの先に1枚を置く。大きさは扇の半径。ほのおのキバの牙・フレアドライブの炎）
    */
-  fit: z.enum(['circle', 'line', 'cone', 'ring']),
+  fit: z.enum(['circle', 'line', 'cone', 'ring', 'front']),
   size: z.number().positive().default(1),
   /** 絵の濃さ（煙など、下が少し透けてほしいもの） */
   alpha: z.number().min(0).max(1).default(1),

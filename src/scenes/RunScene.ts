@@ -842,11 +842,21 @@ export class RunScene extends Phaser.Scene {
       if (!ghost) continue;
       const frame = this.playerViews.get(pr.owner[i]!)?.ghostFrame();
       if (!frame) continue;
-      const x = pr.prevX[i]! + (pr.x[i]! - pr.prevX[i]!) * alpha;
-      const y = pr.prevY[i]! + (pr.y[i]! - pr.prevY[i]!) * alpha;
+      let x = pr.prevX[i]! + (pr.x[i]! - pr.prevX[i]!) * alpha;
+      let y = pr.prevY[i]! + (pr.y[i]! - pr.prevY[i]!) * alpha;
       // 1回の更新で進む量。後ろの残像は、それを spacingTicks 回ぶんずつ戻した所に置く
-      const stepX = pr.x[i]! - pr.prevX[i]!;
-      const stepY = pr.y[i]! - pr.prevY[i]!;
+      let stepX = pr.x[i]! - pr.prevX[i]!;
+      let stepY = pr.y[i]! - pr.prevY[i]!;
+      if (pr.shape[i] === SHAPE_LINE) {
+        // 線の技（しんそく・ドラゴンダイブ）: 残像が線の根元から先へ、出ている時間の前半で走り抜ける
+        const t = Math.min(1, (pr.maxLife[i]! - pr.life[i]!) / Math.max(world.dt, pr.maxLife[i]! * 0.5));
+        const len = pr.length[i]!;
+        x = pr.x[i]! + pr.dirX[i]! * len * t;
+        y = pr.y[i]! + pr.dirY[i]! * len * t;
+        // 残像の間隔: 線の長さの 1 割ずつ（根元より後ろには置かない）
+        stepX = pr.dirX[i]! * Math.min(len * 0.1, len * t / Math.max(1, ghost.afterimages * ghost.spacingTicks));
+        stepY = pr.dirY[i]! * Math.min(len * 0.1, len * t / Math.max(1, ghost.afterimages * ghost.spacingTicks));
+      }
       for (let k = 0; k <= ghost.afterimages; k++) {
         let img = this.ghostImages[used];
         if (!img) {

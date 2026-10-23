@@ -2296,7 +2296,8 @@
           "count": 1,
           "power": 2.4
         }
-      ]
+      ],
+      "chainHopSeconds": 0.08
     },
     "seed-bomb": {
       "pattern": "scatter",

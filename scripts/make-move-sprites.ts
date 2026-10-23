@@ -846,6 +846,64 @@ function poisonCloud(): SpriteOut {
   return { palette, frameMs: 180, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- 体で当たる技（案 D） ----------------
+/**
+ * ほのおのキバ: 右を向いて上下のあごが閉じる牙（3コマで 開く → 半分 → 閉じる）。牙のまわりに炎のふち
+ */
+function fangBite(): SpriteOut {
+  const S = 16;
+  // 0 輪郭・1 赤（炎のふち）・2 橙（あご）・3 牙の影・4 牙
+  const palette = ['#3b0d06', '#e53935', '#ff7043', '#cfc4bd', '#ffffff'];
+  const frames: Grid[] = [];
+  // 牙の先と先のすき間（開く → 半分 → 噛み合う）
+  for (const gap of [6, 3, -1]) {
+    const g = blank(S, S);
+    const mid = (S - 1) / 2;
+    const tip = (S - gap) / 2 - 1;
+    // 上あご・下あご（横長の弧）
+    for (let x = 2; x < S - 2; x++) {
+      const arch = Math.round(Math.abs(x - mid) / 3);
+      g[1 + arch]![x] = 2;
+      g[2 + arch]![x] = 2;
+      g[S - 2 - arch]![x] = 2;
+      g[S - 3 - arch]![x] = 2;
+    }
+    // 牙: 上あごから下向き、下あごから上向きの三角を 2 本ずつ（左右にずらして噛み合う）
+    const fang = (cx: number, down: boolean): void => {
+      for (let k = 0; k <= tip - 2; k++) {
+        const y = down ? 3 + k : S - 4 - k;
+        const half = Math.max(0, 1.6 - (k / Math.max(1, tip - 2)) * 1.6);
+        for (let x = Math.round(cx - half); x <= Math.round(cx + half); x++) if (y >= 0 && y < S) g[y]![x] = x < cx ? 3 : 4;
+      }
+    };
+    fang(5, true);
+    fang(10, true);
+    fang(7, false);
+    fang(12, false);
+    frames.push(outline(outline(g, 1), 0));
+  }
+  return { palette, frameMs: 50, parts: { main: frames.map(toRows) } };
+}
+
+/** フレアドライブ: 右へ突っ込む炎の弧（三日月形の炎。コマで炎の先がゆらめく） */
+function flameCrash(): SpriteOut {
+  const palette = ['#4a0e05', '#c62828', '#ef6c00', '#ffb300', '#fff176', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(20, (u, v) => {
+      const d = Math.hypot(u + 0.35, v);
+      const a = Math.atan2(v, u + 0.35);
+      if (Math.abs(a) > 1.25) return -1;
+      // 外側のふちはゆらめく炎の舌
+      const outer = 0.95 + Math.sin(a * 7 + f * 2.1) * 0.08;
+      const inner = 0.55 + Math.abs(a) * 0.15;
+      if (d > outer || d < inner) return -1;
+      const k = (d - inner) / (outer - inner);
+      return k > 0.85 ? 1 : k > 0.6 ? 2 : k > 0.35 ? 3 : k > 0.15 ? 4 : 5;
+    }),
+  );
+  return { palette, frameMs: 60, parts: { main: frames.map(toRows) } };
+}
+
 const out = {
   credit: '自作（scripts/make-move-sprites.ts で計算して描いた。公式の素材は使っていない）',
   sprites: {
@@ -872,6 +930,8 @@ const out = {
     fissure: fissure(),
     snowflake: snowflake(),
     'poison-cloud': poisonCloud(),
+    'fang-bite': fangBite(),
+    'flame-crash': flameCrash(),
     rock: rock('rock'),
     stone: rock('stone'),
     bone: bone(),

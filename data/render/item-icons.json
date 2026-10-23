@@ -273,6 +273,66 @@
         "j": "#ddf5c1"
       }
     },
+    "zoom-lens": {
+      "rows": [
+        "....abccbddd..",
+        "...dceeefffd..",
+        "..ceeeeffbba..",
+        ".dfeeeffghgbd.",
+        "adfbfffbhgeebd",
+        "dbiiiffbhgeffd",
+        "dbiiicfbjjfbbd",
+        "dbiiicfbjhjda.",
+        "abciicfbjhhja.",
+        ".dbbbbdajjhhja",
+        "..adddaagghhja",
+        "........jgjjbd",
+        "........dccbd.",
+        "........dccd.."
+      ],
+      "palette": {
+        "a": "#443d33",
+        "b": "#92843d",
+        "c": "#949667",
+        "d": "#6e6a38",
+        "e": "#e1d172",
+        "f": "#b8b03f",
+        "g": "#ba6b56",
+        "h": "#c14342",
+        "i": "#8d9fb0",
+        "j": "#9f4c41"
+      }
+    },
+    "razor-claw": {
+      "rows": [
+        "...abbbccc....",
+        "...deeebbfc...",
+        "..ageghdddfc..",
+        "ahgegdiddddfc.",
+        "beegbdddddddfc",
+        "beehddddddddia",
+        "fggiifabbiddda",
+        "cbgdfcjbhbidda",
+        "jagdaj.agdbdia",
+        ".cfhaj.cbgdiac",
+        "..ciaj.jbehfc.",
+        "...faj..abac..",
+        "...ccj...jj...",
+        ".............."
+      ],
+      "palette": {
+        "a": "#6b6f72",
+        "b": "#92979b",
+        "c": "#505356",
+        "d": "#9ca5ad",
+        "e": "#ecefef",
+        "f": "#7c8389",
+        "g": "#c0c9cd",
+        "h": "#a5adb2",
+        "i": "#969fa6",
+        "j": "#333333"
+      }
+    },
     "quick-claw": {
       "rows": [
         ".......abcb...",

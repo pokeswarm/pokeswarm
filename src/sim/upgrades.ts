@@ -21,6 +21,10 @@ export interface Modifiers {
   /** 技の数に足す数 */
   amountBonus: number;
   durationPct: number;
+  /** 技の射程 */
+  rangePct: number;
+  /** 技の貫通に足す数 */
+  pierceBonus: number;
 }
 
 /** シミュレーションが使う持ち物の定義 */
@@ -84,6 +88,8 @@ export function emptyModifiers(typeCount: number): Modifiers {
     xpPct: 0,
     amountBonus: 0,
     durationPct: 0,
+    rangePct: 0,
+    pierceBonus: 0,
   };
 }
 

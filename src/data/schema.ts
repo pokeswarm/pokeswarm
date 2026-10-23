@@ -285,6 +285,10 @@ export const modifierSchema = z
     amountBonus: z.number(),
     /** 技の持続の時間 */
     durationPct: z.number(),
+    /** 技の射程（届く距離。ズームレンズ） */
+    rangePct: z.number(),
+    /** 技の貫通（何体まで当たるか）に足す数（するどいツメ。何体でも当たる技はそのまま） */
+    pierceBonus: z.number(),
   })
   .partial();
 export type ModifierData = z.infer<typeof modifierSchema>;

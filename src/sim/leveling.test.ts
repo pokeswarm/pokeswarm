@@ -216,6 +216,19 @@ describe('持ち物の効果', () => {
     expect(after.durationSeconds).toBeCloseTo(before.durationSeconds * 1.1);
   });
 
+  it('ズームレンズで射程が延び、するどいツメで貫通が増える（何体でも当たる技はそのまま）', () => {
+    const r = rules({ items: [upgrade('zoom-lens', 5, false, { rangePct: 10 }), upgrade('razor-claw', 2, false, { pierceBonus: 1 })] });
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules: r });
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100 });
+    const before = playerMoveStats(sim.world, p, p.moves[0]!);
+    applyOffer(sim.world, p, { kind: 'itemNew', item: 0 });
+    applyOffer(sim.world, p, { kind: 'itemNew', item: 1 });
+    applyOffer(sim.world, p, { kind: 'itemUp', slot: 1 });
+    const after = playerMoveStats(sim.world, p, p.moves[0]!);
+    expect(after.range).toBeCloseTo(before.range * 1.1);
+    expect(after.pierce).toBe(before.pierce + 2);
+  });
+
   it('プラスパワー Lv2 で技のダメージ +20%', () => {
     const r = rules();
     r.moves[0]!.levels[0]!.cooldownSeconds = 100;

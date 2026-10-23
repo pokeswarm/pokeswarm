@@ -45,13 +45,19 @@ export function moveStatsOf(world: World, pm: { move: number; level: number }): 
 }
 
 /**
- * 持ち物の効果のうち、技の数と持続を変えるもの（ポイントマックス・ひかりのねんど）を足した、その技のレベルの性能
+ * 持ち物の効果のうち、技の数・持続・射程・貫通を変えるもの（ポイントマックス・ひかりのねんど・ズームレンズ・するどいツメ）を足した、その技のレベルの性能
  */
 export function playerMoveStats(world: World, p: Player, pm: { move: number; level: number }): MoveStats {
   const st = moveStatsOf(world, pm);
   const m = p.mods;
-  if (m.amountBonus === 0 && m.durationPct === 0) return st;
-  return { ...st, count: st.count + m.amountBonus, durationSeconds: st.durationSeconds * Math.max(0.1, 1 + m.durationPct / 100) };
+  if (m.amountBonus === 0 && m.durationPct === 0 && m.rangePct === 0 && m.pierceBonus === 0) return st;
+  return {
+    ...st,
+    count: st.count + m.amountBonus,
+    durationSeconds: st.durationSeconds * Math.max(0.1, 1 + m.durationPct / 100),
+    range: st.range * Math.max(0.1, 1 + m.rangePct / 100),
+    pierce: st.pierce + m.pierceBonus,
+  };
 }
 
 /** 持ち物の効果を掛けた、その技の威力・大きさ・速さ・クールダウン */

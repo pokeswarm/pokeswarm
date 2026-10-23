@@ -299,6 +299,16 @@
       "it": "Caramella rara"
     }
   },
+  "razor-claw": {
+    "names": {
+      "ja": "するどいツメ",
+      "en": "Razor Claw",
+      "fr": "Griffe Rasoir",
+      "de": "Scharfklaue",
+      "es": "Garra Afilada",
+      "it": "Affilartigli"
+    }
+  },
   "sharp-beak": {
     "names": {
       "ja": "するどいくちばし",
@@ -417,6 +427,16 @@
       "de": "X-Initiative",
       "es": "Velocidad X",
       "it": "Velocità X"
+    }
+  },
+  "zoom-lens": {
+    "names": {
+      "ja": "フォーカスレンズ",
+      "en": "Zoom Lens",
+      "fr": "Lentille Zoom",
+      "de": "Zoomlinse",
+      "es": "Telescopio",
+      "it": "Zoomlente"
     }
   }
 }

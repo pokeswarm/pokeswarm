@@ -996,6 +996,8 @@ export const effectRecipeSchema = z.object({
    */
   /** 落雷の見た目: 当たり判定が出てから seconds の間、上から稲妻を落とす（かみなり）。height は稲妻の長さ、width は太さ */
   bolt: z.object({ color: colorString, glowColor: colorString, height: z.number().positive(), width: z.number().positive(), seconds: z.number().positive() }).optional(),
+  /** 技を出す seconds 秒前から、持ち主の体を光らせる（ためる。ギガインパクト）。radius は光の半径、alpha は出す直前の濃さ */
+  chargeGlow: z.object({ color: colorString, seconds: z.number().positive(), radius: z.number().positive(), alpha: z.number().min(0).max(1) }).optional(),
   /** 技が出た瞬間に、画面全体をうっすら光らせる（とっておき）。目に優しいよう薄く短く */
   screenFlash: z.object({ color: colorString, alpha: z.number().min(0).max(0.5), durationMs: z.number().positive() }).optional(),
   burstFlash: z.object({ colors: z.array(colorString).min(1), periodMs: z.number().positive(), alpha: z.number().min(0).max(1) }).optional(),

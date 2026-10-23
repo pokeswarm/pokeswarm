@@ -707,6 +707,19 @@ export class RunScene extends Phaser.Scene {
     }
   }
 
+  /** ためる光: 再使用の残りが決まった秒数を切った技があれば、その光（いちばん出す直前のもの） */
+  private chargeOf(world: World, p: World['players'][number]): { color: number; radius: number; alpha: number; t: number } | null {
+    if (p.down) return null;
+    let best: { color: number; radius: number; alpha: number; t: number } | null = null;
+    for (const pm of p.moves) {
+      const c = this.effects.chargeGlow(world.rules.moves[pm.move]!.effect);
+      if (!c || pm.cooldown <= 0 || pm.cooldown > c.seconds) continue;
+      const t = 1 - pm.cooldown / c.seconds;
+      if (!best || t > best.t) best = { color: hexColor(c.color), radius: c.radius, alpha: c.alpha, t };
+    }
+    return best;
+  }
+
   /** 色を切り替えて光らせる円（10まんボルトの自分の周り・かみなりの落雷） */
   private flashing(i: number, pr: World['projectiles']): boolean {
     return pr.stage[i] !== 3 && pr.shape[i] === SHAPE_CIRCLE && this.flashMoves.has(pr.move[i]!);
@@ -1157,7 +1170,11 @@ export class RunScene extends Phaser.Scene {
   private draw(alpha: number, deltaMs: number, timeMs: number): void {
     const world = this.sim.world;
     const reviveNeed = Math.round(world.rules.stats.revive.touchSeconds / world.dt);
-    for (const p of world.players) this.playerViews.get(p.id)?.update(p, alpha, (world.reviveTouch.get(p.id) ?? 0) / reviveNeed);
+    for (const p of world.players) {
+      const view = this.playerViews.get(p.id);
+      view?.update(p, alpha, (world.reviveTouch.get(p.id) ?? 0) / reviveNeed);
+      view?.setCharge(this.chargeOf(world, p));
+    }
     const local = world.players.find((p) => p.id === this.localId);
     const localView = this.playerViews.get(this.localId);
     if (!local || !localView) return;

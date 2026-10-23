@@ -20,6 +20,10 @@ export class PlayerView {
   private pokemon: PokemonSpriteView | null = null;
   private readonly radius: number;
   private readonly hpBar: Phaser.GameObjects.Graphics;
+  /** ためる光（ギガインパクトを出す前に体を光らせる） */
+  private readonly charge: Phaser.GameObjects.Graphics;
+  /** ためる光で、体の形をその色で光らせる重ね絵（スプライトがあるときだけ。使うときに作る） */
+  private chargeBody: Phaser.GameObjects.Image | null = null;
   /** 自分の体で攻撃する技の、体を前後させる動き（始まった時刻・向き・距離） */
   private lungeStart = -1;
   private lungeX = 0;
@@ -36,13 +40,14 @@ export class PlayerView {
   ) {
     this.radius = player.radius;
     this.hpBar = scene.add.graphics();
+    this.charge = scene.add.graphics().setBlendMode(Phaser.BlendModes.ADD);
     if (manifest) {
       this.pokemon = new PokemonSpriteView(scene, manifest, spriteStyle.playerScale);
-      this.container = scene.add.container(player.x, player.y, [this.pokemon.sprite, this.hpBar]);
+      this.container = scene.add.container(player.x, player.y, [this.charge, this.pokemon.sprite, this.hpBar]);
     } else {
       const body = scene.add.circle(0, 0, player.radius, hexColor(style.playerColor));
       this.facing = scene.add.circle(0, 0, Math.max(2, player.radius / 4), hexColor(style.playerFacingColor));
-      this.container = scene.add.container(player.x, player.y, [body, this.facing, this.hpBar]);
+      this.container = scene.add.container(player.x, player.y, [this.charge, body, this.facing, this.hpBar]);
     }
   }
 
@@ -73,6 +78,39 @@ export class PlayerView {
         .setAlpha(0.55 * (1 - t * 0.5))
         .setDepth(this.container.depth - 0.01);
       this.scene.tweens.add({ targets: ghost, alpha: 0, duration: 260, delay: k * 25, onComplete: () => ghost.destroy() });
+    }
+  }
+
+  /**
+   * ためる光: t（0〜1。1 で出す直前）に合わせて、体の後ろの光を濃く大きくし、細かく明滅させる。null なら消す
+   */
+  setCharge(glow: { color: number; radius: number; alpha: number; t: number } | null): void {
+    const g = this.charge;
+    g.clear();
+    const sprite = this.pokemon?.sprite;
+    if (!glow || !sprite) {
+      this.chargeBody?.setVisible(false);
+      if (!glow) return;
+    }
+    const flicker = 0.85 + 0.15 * Math.sin(this.scene.time.now / 30);
+    if (sprite) {
+      if (!this.chargeBody) {
+        this.chargeBody = this.scene.add.image(0, 0, sprite.texture.key, sprite.frame.name).setTintMode(Phaser.TintModes.FILL).setBlendMode(Phaser.BlendModes.ADD);
+        this.container.addAt(this.chargeBody, this.container.getIndex(sprite) + 1);
+      }
+      this.chargeBody
+        .setTexture(sprite.texture.key, sprite.frame.name)
+        .setPosition(sprite.x, sprite.y)
+        .setScale(sprite.scaleX, sprite.scaleY)
+        .setFlipX(sprite.flipX)
+        .setOrigin(sprite.originX, sprite.originY)
+        .setTint(glow.color)
+        .setAlpha(0.9 * glow.t * flicker)
+        .setVisible(true);
+    }
+    for (let k = 3; k >= 1; k--) {
+      g.fillStyle(glow.color, glow.alpha * glow.t * flicker * (k === 1 ? 1 : 0.45 / k));
+      g.fillCircle(0, 0, glow.radius * (0.5 + 0.5 * glow.t) * (k / 2));
     }
   }
 

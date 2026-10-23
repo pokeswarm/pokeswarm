@@ -103,6 +103,11 @@ export class EffectRenderer {
     return obj;
   }
 
+  /** ためる光の見た目（無ければ null） */
+  chargeGlow(id: string): EffectRecipe['chargeGlow'] | null {
+    return this.recipe(id).chargeGlow ?? null;
+  }
+
   /** 技が出た瞬間に画面をうっすら光らせる見た目（無ければ null） */
   screenFlash(id: string): EffectRecipe['screenFlash'] | null {
     return this.recipe(id).screenFlash ?? null;

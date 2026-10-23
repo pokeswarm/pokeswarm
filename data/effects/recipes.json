@@ -1728,6 +1728,12 @@
         "flash": {
           "radius": 120
         }
+      },
+      "chargeGlow": {
+        "color": "#ffcc80",
+        "seconds": 0.35,
+        "radius": 60,
+        "alpha": 1
       }
     }
   }

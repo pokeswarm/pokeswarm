@@ -1,6 +1,6 @@
 import type { BossMove } from '../../data/schema';
 import { randomUnit } from '../math';
-import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World } from '../world';
+import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World, type BossEntry } from '../world';
 import { hurtPlayer } from './health';
 
 /**
@@ -18,7 +18,7 @@ export function isBossKind(world: World, kind: number): boolean {
 }
 
 /** ボス・伝説を出す。HP は参加人数に応じて上げる（2.2）。出せなければ -1 */
-function spawnBoss(world: World, kindIndex: number, moves: readonly number[], interval: number): number {
+function spawnBoss(world: World, kindIndex: number, moves: readonly number[], interval: number, enrage: BossEntry['enrage'] = null): number {
   const rules = world.rules.stage.bossRules;
   const kind = world.rules.enemies.kinds[kindIndex]!;
   const p = world.players[world.rng.int(world.players.length)]!;
@@ -30,7 +30,7 @@ function spawnBoss(world: World, kindIndex: number, moves: readonly number[], in
   if (world.enemies.add(id, kindIndex, x, y, hp, kind.moveSpeed, kind.radius, kind.contactDamage) === -1) return -1;
   world.events.push({ type: 'enemySpawned', id, kind: kindIndex, x, y });
   world.events.push({ type: 'bossAppeared', id, kind: kindIndex });
-  if (moves.length > 0) world.bosses.push({ id, cooldown: interval, interval, moves, next: 0 });
+  if (moves.length > 0) world.bosses.push({ id, cooldown: interval, interval, moves, next: 0, ...(enrage ? { enrage } : {}) });
   return id;
 }
 
@@ -61,7 +61,7 @@ export function spawnBosses(world: World): void {
     const b = world.bossSchedule[world.nextBoss]!;
     if (b.wave > world.section || (b.wave === world.section && b.afterTicks > inSection)) break;
     world.nextBoss++;
-    const id = spawnBoss(world, b.kind, b.moves, b.interval);
+    const id = spawnBoss(world, b.kind, b.moves, b.interval, b.enrage);
     // 出せなかった（敵の上限）中ボスは、次の更新で出し直す
     if (id === -1 && b.gate) {
       world.nextBoss--;
@@ -182,15 +182,28 @@ export function bossAttacks(world: World): void {
         world.bosses.splice(b, 1);
         continue;
       }
+      enrageBoss(world, boss, i);
       if (--boss.cooldown > 0) continue;
       boss.cooldown = boss.interval;
       const cfg = world.rules.stage.legendary;
       const enraged = !!world.legendary?.enraged && world.enemies.kind[i] === world.legendary.kind;
-      const uses = enraged && cfg?.enrage && world.rng.next() < cfg.enrage.doubleChance ? 2 : 1;
+      // 2つ同時に使う確率: 伝説の第2段階、または四天王の第2段階
+      const double = enraged && cfg?.enrage ? cfg.enrage.doubleChance : boss.enraged && boss.enrage ? boss.enrage.doubleChance : 0;
+      const uses = double > 0 && world.rng.next() < double ? 2 : 1;
       for (let u = 0; u < uses; u++) useBossMove(world, boss, i);
     }
   }
   strikeHazards(world);
+}
+
+/** 四天王の第2段階: HP が決まった割合を切ったら「DANGER」を出し、技の間隔を短くする（ソロ・ホスト） */
+function enrageBoss(world: World, boss: World['bosses'][number], i: number): void {
+  if (!boss.enrage || boss.enraged || world.role === 'guest') return;
+  if (world.enemies.hp[i]! > world.enemies.maxHp[i]! * boss.enrage.hpRatio) return;
+  boss.enraged = true;
+  boss.interval = boss.enrage.interval;
+  boss.cooldown = Math.min(boss.cooldown, boss.interval);
+  world.events.push({ type: 'legendaryWarning', kind: world.enemies.kind[i]!, enraged: true });
 }
 
 /** ボス・伝説が技を1つ使う（予告を置く） */

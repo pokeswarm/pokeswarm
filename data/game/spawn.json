@@ -164,13 +164,45 @@
         "dewgong",
         "cloyster",
         "slowbro",
-        "jynx",
+        "jynx"
+      ]
+    },
+    {
+      "allowBossSpecies": true,
+      "spawnPerSecond": 20,
+      "minimum": 400,
+      "capPerPlayer": 600,
+      "hpMultiplier": 1.65,
+      "damageMultiplier": 2.65,
+      "xpMultiplier": 4,
+      "kinds": [
         "onix",
         "hitmonlee",
-        "hitmonchan",
-        "golbat",
+        "hitmonchan"
+      ]
+    },
+    {
+      "allowBossSpecies": true,
+      "spawnPerSecond": 20,
+      "minimum": 400,
+      "capPerPlayer": 600,
+      "hpMultiplier": 1.8,
+      "damageMultiplier": 2.9,
+      "xpMultiplier": 4.3,
+      "kinds": [
         "haunter",
-        "arbok",
+        "arbok"
+      ]
+    },
+    {
+      "allowBossSpecies": true,
+      "spawnPerSecond": 20,
+      "minimum": 400,
+      "capPerPlayer": 600,
+      "hpMultiplier": 2,
+      "damageMultiplier": 3.2,
+      "xpMultiplier": 4.6,
+      "kinds": [
         "gyarados",
         "dragonair",
         "aerodactyl"

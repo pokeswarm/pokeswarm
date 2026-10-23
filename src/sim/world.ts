@@ -159,7 +159,17 @@ export interface World {
   readonly bossSchedule: readonly BossEntry[];
   nextBoss: number;
   /** 出ている、範囲技を使う敵（ボス・伝説）と、次の技までの残り・次に使う技（ソロ・ホスト） */
-  readonly bosses: { id: number; cooldown: number; interval: number; moves: readonly number[]; next: number; random?: boolean }[];
+  readonly bosses: {
+    id: number;
+    cooldown: number;
+    interval: number;
+    moves: readonly number[];
+    next: number;
+    random?: boolean;
+    /** 第2段階（四天王） */
+    enrage?: BossEntry['enrage'];
+    enraged?: boolean;
+  }[];
   /** クリアに必要で、まだ倒していない敵の種類（四天王）。最初の数は requiredTotal */
   readonly requiredLeft: Set<number>;
   readonly requiredTotal: number;
@@ -283,6 +293,8 @@ export interface BossEntry {
   /** 使う範囲技（stage.moves の番号）を順に使う */
   readonly moves: readonly number[];
   readonly interval: number;
+  /** 第2段階（HP の割合・技の間隔の更新回数・2つ同時に使う確率）。無ければ null */
+  readonly enrage: { readonly hpRatio: number; readonly interval: number; readonly doubleChance: number } | null;
 }
 
 export function moveIndexOfStage(rules: SimRules, id: string): number {
@@ -301,6 +313,7 @@ function buildBossSchedule(rules: SimRules, tickRate: number): BossEntry[] {
       kind: kindIndexOf(rules, b.kind),
       moves: b.moves.map((id) => moveIndexOfStage(rules, id)),
       interval: Math.round((b.moveIntervalSeconds ?? 4) * tickRate),
+      enrage: b.enrage ? { hpRatio: b.enrage.hpRatio, interval: Math.round(b.enrage.moveIntervalSeconds * tickRate), doubleChance: b.enrage.doubleChance } : null,
     }))
     .sort((a, b) => a.wave - b.wave || a.afterTicks - b.afterTicks);
 }

@@ -167,6 +167,22 @@ describe('範囲技', () => {
     expect(dodge.p.hp).toBe(100);
   });
 
+  it('四天王の第2段階: HP が半分を切ると「DANGER」を出し、技の間隔が短くなる', () => {
+    const rules = stageRules({ bosses: [{ wave: 0, afterSeconds: 0, gate: false, kind: 'e4a', moves: ['circle'], moveIntervalSeconds: 3, required: true, enrage: { hpRatio: 0.5, moveIntervalSeconds: 1, doubleChance: 0 } }] });
+    const { sim } = solo(rules);
+    run(sim, 2);
+    const boss = sim.world.bosses[0]!;
+    expect(boss.interval).toBe(90);
+    const e = sim.world.enemies;
+    const i = Array.from(e.kind.subarray(0, e.count)).indexOf(2);
+    sim.step([{ type: 'damageEnemy', id: e.id[i]!, amount: 600, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);
+    // 第2段階はダメージを受けたその更新の中で始まる
+    const types = [...sim.world.events.map((ev) => ev.type), ...run(sim, 2)];
+    expect(types).toContain('legendaryWarning');
+    expect(boss.enraged).toBe(true);
+    expect(boss.interval).toBe(30);
+  });
+
   it('自分の周り: ボスの位置を中心に落ちる', () => {
     const { sim, p } = solo(only(['nova']));
     run(sim, 31);

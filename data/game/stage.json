@@ -1,5 +1,5 @@
 {
-  "durationSeconds": 1200,
+  "durationSeconds": 1500,
   "bosses": [
     {
       "wave": 0,
@@ -51,43 +51,69 @@
     },
     {
       "wave": 9,
-      "afterSeconds": 0,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
       "kind": "boss-lapras",
       "moves": [
-        "blizzard"
+        "blizzard",
+        "articuno-blizzard"
       ],
-      "moveIntervalSeconds": 3.5,
-      "required": true
+      "moveIntervalSeconds": 2.8
     },
     {
-      "wave": 9,
-      "afterSeconds": 30,
+      "wave": 10,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
       "kind": "boss-machamp",
       "moves": [
+        "earthquake",
+        "legend-dash",
         "earthquake"
       ],
-      "moveIntervalSeconds": 4,
-      "required": true
+      "moveIntervalSeconds": 2.4,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.7,
+        "doubleChance": 0.2
+      }
     },
     {
-      "wave": 9,
-      "afterSeconds": 60,
+      "wave": 11,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
       "kind": "boss-gengar",
       "moves": [
-        "shadow-ball"
+        "shadow-ball",
+        "mewtwo-teleport",
+        "mewtwo-psywave"
       ],
-      "moveIntervalSeconds": 3,
-      "required": true
+      "moveIntervalSeconds": 2,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.4,
+        "doubleChance": 0.3
+      }
     },
     {
-      "wave": 9,
-      "afterSeconds": 90,
+      "wave": 12,
+      "afterSeconds": 40,
+      "required": true,
       "kind": "boss-dragonite",
       "moves": [
-        "draco-meteor"
+        "draco-meteor",
+        "legend-beam",
+        "zapdos-dash",
+        "legend-nova"
       ],
-      "moveIntervalSeconds": 4.5,
-      "required": true
+      "moveIntervalSeconds": 1.8,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.15,
+        "doubleChance": 0.4
+      }
     }
   ],
   "moves": [

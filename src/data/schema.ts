@@ -445,6 +445,11 @@ export const stageConfigSchema = z.object({
       moveIntervalSeconds: z.number().positive().optional(),
       /** 倒すとクリアに必要（四天王） */
       required: z.boolean().default(false),
+      /**
+       * 第2段階（四天王。作者の決定 2026年10月24日）: HP が hpRatio を切ったら「DANGER」を出し、技の間隔を moveIntervalSeconds にし、
+       * doubleChance の確率で2つの技を同時に使う
+       */
+      enrage: z.object({ hpRatio: z.number().gt(0).lt(1), moveIntervalSeconds: z.number().positive(), doubleChance: z.number().min(0).max(1) }).optional(),
     }),
   ),
   /** 範囲技の定義 */

@@ -546,6 +546,7 @@ function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   let y = p.y;
   let reach = st.range;
   const used = new Set<number>();
+  const hop = world.rules.moves[pm.move]!.chainHopSeconds;
   for (let k = 0; k < st.count; k++) {
     let best = -1;
     let bestD2 = reach * reach;
@@ -562,7 +563,9 @@ function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     const len = Math.sqrt(bestD2) || 1;
     const dx = (e.x[best]! - x) / len;
     const dy = (e.y[best]! - y) / len;
-    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, shape: SHAPE_LINE, length: len, dirX: dx, dirY: dy });
+    // 2回目からは、跳ぶごとに少し遅れて現れる（出番を待つもの stage 3。待つ間は見えず当たらない）
+    const wait = hop * k;
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, shape: SHAPE_LINE, length: len, dirX: dx, dirY: dy, ...(wait > 0 ? { life: wait, stage: 3, armLife: st.durationSeconds } : {}) });
     x = e.x[best]!;
     y = e.y[best]!;
     reach = st.range * 0.5;

@@ -123,6 +123,11 @@ export class EffectRenderer {
     return this.recipe(id).sprite ?? null;
   }
 
+  /** 稲妻の線の見た目（無ければ null） */
+  lightningLine(id: string): EffectRecipe['lightningLine'] | null {
+    return this.recipe(id).lightningLine ?? null;
+  }
+
   /** 落雷の見た目（無ければ null） */
   bolt(id: string): EffectRecipe['bolt'] | null {
     return this.recipe(id).bolt ?? null;

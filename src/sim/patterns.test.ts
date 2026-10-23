@@ -106,6 +106,22 @@ describe('技の型（作者の決定。07 18章）', () => {
     expect(hit[3]).toBe(0);
   });
 
+  it('連鎖（chainHopSeconds）: 敵から敵へ、1回跳ぶごとに遅れて当たる', () => {
+    const rules = testRules({ move: { power: 10, cooldownSeconds: 100, pierce: Infinity, durationSeconds: 0.2, range: 300, size: 4, count: 3 } });
+    rules.moves[0] = { ...rules.moves[0]!, pattern: 'chain', chainHopSeconds: 0.2 };
+    const sim = new Simulation({ tickRate: 30, seed: 3, rules });
+    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
+    [[100, 0], [180, 0], [260, 0]].forEach(([x, y], k) => sim.world.enemies.add(k + 1, 0, x!, y!, 1000, 0, 10));
+    const hit = (): number[] => [1, 2, 3].map((id) => 1000 - sim.world.enemies.hp[Array.from(sim.world.enemies.id.subarray(0, 3)).indexOf(id)]!);
+    sim.step([]);
+    sim.step([]);
+    // すぐ当たるのは1体目だけ。2体目・3体目は 0.2 秒・0.4 秒遅れて当たる
+    expect(hit()[0]).toBeGreaterThan(0);
+    expect(hit()[2]).toBe(0);
+    for (let t = 0; t < 15; t++) sim.step([]);
+    expect(hit().every((h) => h > 0)).toBe(true);
+  });
+
   it('連鎖: 一番近い敵から近くの敵へ飛び移る', () => {
     const { hit } = run('chain', { range: 300, size: 4, count: 3 }, [[100, 0], [180, 0], [260, 0], [900, 0]], 2);
     expect(hit.slice(0, 3).every((h) => h > 0)).toBe(true);

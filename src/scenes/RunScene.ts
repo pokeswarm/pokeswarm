@@ -90,6 +90,8 @@ export class RunScene extends Phaser.Scene {
   /** 落雷の稲妻を描く技（かみなり）と、その絵 */
   private boltMoves = new Map<number, NonNullable<EffectRecipe['bolt']>>();
   private boltView: Phaser.GameObjects.Graphics | null = null;
+  /** 稲妻の線で描く技 */
+  private lightningMoves = new Set<number>();
   /** 技のドット絵 */
   private moveSprites: MoveSprites | null = null;
   /** 画面をうっすら光らせた当たり判定の通し番号（同じものでは1回だけ） */
@@ -208,6 +210,7 @@ export class RunScene extends Phaser.Scene {
     if (this.playerSprite) registerPokemonAnimations(this, this.playerSprite);
     const rules = applyDebugOverrides(buildSimRules(), window.location.search);
     this.pathMoves = new Set(rules.moves.flatMap((m, k) => (m.effects.some((fx) => fx.puddle?.path) ? [k] : [])));
+    this.lightningMoves = new Set(rules.moves.flatMap((m, k) => (effectRecipes[m.effect]?.lightningLine ? [k] : [])));
     this.boltMoves = new Map(rules.moves.flatMap((m, k) => { const b = effectRecipes[m.effect]?.bolt; return b ? [[k, b] as const] : []; }));
     this.flashMoves = new Map(rules.moves.flatMap((m, k) => { const f = effectRecipes[m.effect]?.burstFlash; return f ? [[k, f] as const] : []; }));
     // 技は確認用に URL で指定できる（?moves=ember:8,fire-spin:3）。協力プレイでは参加用 URL に引き継ぐので2人とも同じになる
@@ -725,6 +728,11 @@ export class RunScene extends Phaser.Scene {
     return best;
   }
 
+  /** 稲妻の線（芯・範囲の塗りを描かない） */
+  private isLightning(world: World, i: number): boolean {
+    return world.projectiles.shape[i] === SHAPE_LINE && this.lightningMoves.has(world.projectiles.move[i]!);
+  }
+
   /** 色を切り替えて光らせる円（10まんボルトの自分の周り・かみなりの落雷） */
   private flashing(i: number, pr: World['projectiles']): boolean {
     if (pr.stage[i] === 3) return false;
@@ -760,6 +768,28 @@ export class RunScene extends Phaser.Scene {
     const g = this.boltView;
     g.clear();
     const pr = world.projectiles;
+    // 稲妻の線: 端から端まで1本のジグザグ（毎フレーム形を変えて、ちらつかせる）
+    for (let i = 0; i < pr.count; i++) {
+      if (pr.shape[i] !== SHAPE_LINE || pr.stage[i] === 2 || pr.stage[i] === 3) continue;
+      const ln = this.effects.lightningLine(world.rules.moves[pr.move[i]!]!.effect);
+      if (!ln) continue;
+      const len = pr.length[i]!;
+      const dx = pr.dirX[i]!;
+      const dy = pr.dirY[i]!;
+      const steps = Math.max(2, Math.round(len / 16));
+      const pts: [number, number][] = [];
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        const off = k === 0 || k === steps ? 0 : (Math.random() * 2 - 1) * ln.width * ln.jitter;
+        pts.push([pr.x[i]! + dx * len * t - dy * off, pr.y[i]! + dy * len * t + dx * off]);
+      }
+      for (const [w, color, a] of [[ln.width * 3, ln.glowColor, 0.45], [ln.width, ln.color, 1]] as const) {
+        g.lineStyle(w, hexColor(color), a).beginPath();
+        g.moveTo(pts[0]![0], pts[0]![1]);
+        for (const [px, py] of pts.slice(1)) g.lineTo(px, py);
+        g.strokePath();
+      }
+    }
     for (let i = 0; i < pr.count; i++) {
       if (pr.stage[i] !== 0) continue;
       const b = this.boltMoves.get(pr.move[i]!);
@@ -788,6 +818,8 @@ export class RunScene extends Phaser.Scene {
    */
   private shapeColorOf(pr: World['projectiles'], i: number, timeMs: number): { color: number; alpha: number } | null {
     if (pr.stage[i] === 3) return null;
+    // 稲妻の線は、ジグザグの稲妻だけを見せる（範囲を塗ると管のように見える）
+    if (this.lightningMoves.has(pr.move[i]!) && pr.shape[i] === SHAPE_LINE) return null;
     const base = this.shapeColors[pr.move[i]!] ?? null;
     if (this.flashing(i, pr)) {
       const f = this.flashMoves.get(pr.move[i]!)!;
@@ -1230,7 +1262,7 @@ export class RunScene extends Phaser.Scene {
       // 出番を待っている当たり判定（爆炎の柱）は、現れるまで描かない
       (i) => pr.stage[i] === 3,
       // 外へ進む帯と、通った道に残る範囲には芯を描かない（道が光の線に見えてしまう）
-      (i) => pr.band[i]! > 0 || (pr.stage[i] === 1 && pr.shape[i] === SHAPE_LINE && this.pathMoves.has(pr.move[i]!)) || this.flashing(i, pr),
+      (i) => pr.band[i]! > 0 || (pr.stage[i] === 1 && pr.shape[i] === SHAPE_LINE && this.pathMoves.has(pr.move[i]!)) || this.flashing(i, pr) || this.isLightning(world, i),
       (i) => pr.stage[i] === 0,
     );
     // 技のドット絵（技そのものだけ。効き方から出たものは今までどおり）

@@ -768,6 +768,8 @@ export const moveDefSchema = z.object({
   randomPool: z.enum(['starting', 'unique']).optional(),
   /** 当たったときの状態異常を、この中からランダムに選ぶ（トライアタック: やけど・こおり・まひ）。statusChance で付くかどうかを決める */
   randomStatuses: z.array(z.string()).optional(),
+  /** chain（連鎖）: 1回跳ぶごとに遅らせる秒数（10まんボルト: 敵から敵へ跳んでいくのが見える。0 なら全部同時） */
+  chainHopSeconds: z.number().nonnegative().optional(),
   /** 跳ね返る技（bounce）を出す向き: 向いている方向から何度ずらすか（まっすぐだと、向かいの壁との間で同じ線を往復するだけになる） */
   bounceAngle: z.number().optional(),
 });
@@ -1042,6 +1044,11 @@ export const effectRecipeSchema = z.object({
   sprite: moveSpriteSpec.optional(),
   /** 効き方から出た線（ハードプラントの突き出す根）を、光の線の代わりにこのドット絵で描く */
   effectLineSprite: moveSpriteSpec.optional(),
+  /**
+   * 稲妻の線（10まんボルト・でんきショック・かみなりの連鎖）: 線の端から端まで1本のジグザグを、毎フレーム形を変えて描く
+   * （同じ形の絵を並べると鎖のように見えた。作者の指摘 2026年10月24日）。jitter は折れ目のずれ（太さの何倍か）
+   */
+  lightningLine: z.object({ color: colorString, glowColor: colorString, width: z.number().positive(), jitter: z.number().nonnegative().default(3) }).optional(),
   /** 技を出す seconds 秒前から、持ち主の体を光らせる（ためる。ギガインパクト）。radius は光の半径、alpha は出す直前の濃さ */
   chargeGlow: z.object({ color: colorString, seconds: z.number().positive(), radius: z.number().positive(), alpha: z.number().min(0).max(1) }).optional(),
   /** 技が出た瞬間に、画面全体をうっすら光らせる（とっておき）。目に優しいよう薄く短く */

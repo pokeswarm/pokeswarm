@@ -1386,7 +1386,8 @@
           "count": 2,
           "power": -0.3
         }
-      ]
+      ],
+      "chainHopSeconds": 0.05
     },
     "thunderbolt": {
       "pattern": "chain",
@@ -1460,7 +1461,8 @@
             "range": 200
           }
         }
-      ]
+      ],
+      "chainHopSeconds": 0.05
     },
     "rock-throw": {
       "pattern": "lob",

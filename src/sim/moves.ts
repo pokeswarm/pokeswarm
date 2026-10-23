@@ -67,6 +67,8 @@ export interface SimMoveDef {
   readonly randomPool: readonly number[];
   /** 選んだ技を自分のレベルの割合で出す（ものまね）。false なら最大レベル（ゆびをふる） */
   readonly randomScaled: boolean;
+  /** 連鎖で1回跳ぶごとに遅らせる秒数 */
+  readonly chainHopSeconds: number;
 }
 
 /** 最小値で止める項目（足し続けても壊れないように） */

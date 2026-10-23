@@ -1036,10 +1036,11 @@
     },
     "thunder-shock": {
       "extends": "electric.base",
-      "sprite": {
-        "id": "lightning",
-        "fit": "line",
-        "size": 2
+      "lightningLine": {
+        "color": "#fffde7",
+        "glowColor": "#ffeb3b",
+        "width": 2,
+        "jitter": 3
       }
     },
     "thunderbolt": {
@@ -1057,15 +1058,11 @@
         "periodMs": 60,
         "alpha": 0.4
       },
-      "sprite": {
-        "id": "lightning",
-        "fit": "line",
-        "size": 2.4
-      },
-      "effectLineSprite": {
-        "id": "lightning",
-        "fit": "line",
-        "size": 2
+      "lightningLine": {
+        "color": "#fffde7",
+        "glowColor": "#ffeb3b",
+        "width": 3,
+        "jitter": 3
       }
     },
     "thunder": {
@@ -1091,10 +1088,11 @@
         "periodMs": 50,
         "alpha": 0.45
       },
-      "effectLineSprite": {
-        "id": "lightning",
-        "fit": "line",
-        "size": 2
+      "lightningLine": {
+        "color": "#fffde7",
+        "glowColor": "#ffeb3b",
+        "width": 3,
+        "jitter": 3
       }
     },
     "rock-throw": {

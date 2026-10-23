@@ -50,6 +50,7 @@ export function buildSimRules(): SimRules {
       eruption: def.eruption ?? null,
       effects: def.effects ?? [],
       curve: ((def.curve ?? 0) * Math.PI) / 180,
+      push: def.push ?? false,
     };
   });
   const moveIndex = (key: string): number => moves.findIndex((m) => m.key === key);

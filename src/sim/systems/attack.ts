@@ -796,7 +796,13 @@ export function moveProjectiles(world: World): void {
       const kx = line ? pr.dirX[i]! : e.x[j]! - x || pr.vx[i]!;
       const ky = line ? pr.dirY[i]! : e.y[j]! - y || pr.vy[i]!;
       // 効果（ノックバック・状態異常）は当てたプレイヤーの画面ですぐ付け、相手へは命中と一緒に送る
-      const fx = rollHitEffect(world, st, kx, ky, pr.knockback[i]!);
+      // 押し出す輪: 輪が広がる速さで、輪が消えるまで外へ運ぶ（縁に押されて動いていくように）
+      const pushing = def.push && pr.growth[i]! > 0 && pr.life[i]! > 0;
+      const rolled = rollHitEffect(world, st, kx, ky, pr.knockback[i]!);
+      const len = Math.sqrt(kx * kx + ky * ky) || 1;
+      const fx = pushing
+        ? { ...rolled, kbx: (kx / len) * pr.growth[i]!, kby: (ky / len) * pr.growth[i]!, kbTicks: Math.max(1, Math.round(pr.life[i]! / world.dt)) }
+        : rolled;
       applyHitEffect(world, j, fx, ownerId);
       const kind = world.rules.enemies.kinds[e.kind[j]!];
       // 急所（クリティカットなど・技ごとの急所）の判定は、当てたプレイヤーのブラウザの乱数で行う

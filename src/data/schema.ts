@@ -716,6 +716,8 @@ export const moveDefSchema = z.object({
   effects: z.array(moveEffectSchema).optional(),
   /** 飛ぶ弾が曲がる速さ（度/秒）。十字・向いている方向の弾が渦を巻くように回る（ふぶき・エアスラッシュ） */
   curve: z.number().optional(),
+  /** 広がる輪（nova）で、当たった敵を輪の外側へ押し出し、輪が広がりきるまで縁と一緒に運ぶ（のしかかり・じしん） */
+  push: z.boolean().optional(),
 });
 export type MoveDefData = z.infer<typeof moveDefSchema>;
 

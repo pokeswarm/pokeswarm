@@ -770,6 +770,11 @@ export const moveDefSchema = z.object({
   randomStatuses: z.array(z.string()).optional(),
   /** chain（連鎖）: 1回跳ぶごとに遅らせる秒数（10まんボルト: 敵から敵へ跳んでいくのが見える。0 なら全部同時） */
   chainHopSeconds: z.number().nonnegative().optional(),
+  /**
+   * この技を候補に出す系統（data/game/playables.json のキー）。省略ならタイプが合えばだれでも。
+   * ノーマルの技を、原作で覚えるポケモンたちに絞る（作者の決定 2026年10月24日。どのタイプの技も覚えるミュウは別）
+   */
+  learners: z.array(z.string()).optional(),
   /** 跳ね返る技（bounce）を出す向き: 向いている方向から何度ずらすか（まっすぐだと、向かいの壁との間で同じ線を往復するだけになる） */
   bounceAngle: z.number().optional(),
 });

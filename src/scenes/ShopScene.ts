@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { generated, playablesConfig, shopConfig } from '../data';
 import { localName } from '../data/simRules';
+import { pokemonIconImage } from './pokemonPicker';
 import { getLocale, t, tMaybe } from '../i18n';
 import { session } from '../meta/session';
 import { compactScreen } from '../render/pixelUi';
@@ -63,14 +64,20 @@ export class ShopScene extends Phaser.Scene {
         const owned = save.unlocked.includes(unlockName);
         const row = document.createElement('div');
         row.style.cssText = `display:grid;${columns};gap:12px;align-items:center;padding:4px 12px;border-radius:6px;border:2px solid ${owned ? '#f8d030' : '#585868'};background:${owned ? '#3d2a08' : '#000000'};overflow-wrap:anywhere`;
+        // 買うまでは、シルエットと値段だけ（作者の決定 2026年10月24日）。買ったら名前と姿
         const name = document.createElement('div');
-        name.textContent = localName(generated.pokemon[item.key]?.names, getLocale(), item.key);
-        if (owned) name.style.color = '#f8d030';
+        name.style.cssText = 'display:flex;align-items:center;gap:8px';
+        const icon = pokemonIconImage(item.key, compact ? 28 : 36, !owned);
+        icon.style.flex = 'none';
+        const label = document.createElement('span');
+        label.textContent = owned ? localName(generated.pokemon[item.key]?.names, getLocale(), item.key) : t('achievements.secret');
+        if (owned) label.style.color = '#f8d030';
+        name.append(icon, label);
         const state = document.createElement('div');
         state.textContent = owned ? t('shop.owned') : '';
         const desc = document.createElement('div');
         desc.style.opacity = '0.85';
-        desc.textContent = t('shop.pokemonDesc');
+        desc.textContent = owned ? t('shop.pokemonDesc') : '';
         const buy = document.createElement('button');
         buy.style.cssText = BUTTON + ';width:100%;min-height:36px;padding:2px 8px';
         buy.textContent = owned ? t('shop.owned') : t('shop.buy', { cost: item.cost });

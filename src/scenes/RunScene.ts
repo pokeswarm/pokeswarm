@@ -254,6 +254,7 @@ export class RunScene extends Phaser.Scene {
         types: loadout.types,
         moveTypes: loadout.moveTypes,
         fixedMoves: loadout.fixedMoves,
+        learnsAll: loadout.learnsAll,
         moves: debugMoves ?? startMoves,
         line: loadout.line,
         species: loadout.species,

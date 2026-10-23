@@ -246,6 +246,7 @@ for (const s of stageConfig.swarms) {
 for (const [key, def] of Object.entries(movesConfig.moves)) {
   check(!!generated.moves[key], `data/game/moves.json の "${key}" が data/generated/moves.json にありません（data/pokeapi/targets.json に足して npm run pokeapi）`);
   check(!!effectRecipes[def.effect], `data/game/moves.json の "${key}" の effect "${def.effect}" のレシピがありません`);
+  for (const l of def.learners ?? []) check(!!playablesConfig.pokemon[l], `data/game/moves.json の "${key}" の learners "${l}" が data/game/playables.json にありません`);
   for (const sp of [effectRecipes[def.effect]?.sprite, effectRecipes[def.effect]?.effectLineSprite]) if (sp) check(!!moveSprites.sprites[sp.id], `data/effects/recipes.json の "${def.effect}" のドット絵 "${sp.id}" が data/render/move-sprites.json にありません（npm run move-sprites）`);
   const status = def.base.statusId;
   check(!status || statusConfig.kinds.some((k) => k.id === status), `data/game/moves.json の "${key}" の statusId "${status}" が data/game/status.json にありません`);

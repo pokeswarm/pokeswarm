@@ -246,6 +246,8 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
   if (p.moves.length < rules.combat.maxMoveSlots && !p.fixedMoves) {
     rules.moves.forEach((m, move) => {
       if (!isBaseMove(world, move) || p.moves.some((pm) => pm.move === move)) return;
+      // 覚えられる系統が決まっている技（ノーマルの技・各ポケモン専用の技）は、その系統だけ（ミュウは何でも）
+      if (m.learners && !p.learnsAll && !m.learners.includes(p.line)) return;
       if (m.type === normal || p.types.includes(m.type) || p.moveTypes.includes(m.type)) pool.push({ kind: 'moveNew', move });
     });
   }

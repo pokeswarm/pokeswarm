@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { generated, movesConfig, playablesConfig } from './index';
+import { derivationsConfig, generated, movesConfig, playablesConfig } from './index';
 import { buildSimRules, playableLoadout } from './simRules';
 
 describe('data/ から組み立てたシミュレーションの定義', () => {
@@ -43,6 +43,38 @@ describe('data/ から組み立てたシミュレーションの定義', () => {
 
   it('ミュウはどのタイプの技も覚えられる', () => {
     expect(playableLoadout(rules, 'mew').moveTypes).toHaveLength(rules.types.names.length);
+  });
+
+  it('どの遊べるポケモンも、自分の固有技の元になる技を覚えられる（覚えられる系統を絞っても、固有技にたどり着ける）', () => {
+    const all = [...derivationsConfig.derivations.map((d) => ({ ...d, line: null as string | null })), ...derivationsConfig.unique];
+    // 元をたどって、派生でない技（最初に覚える技）にする
+    const baseOf = (key: string): string => {
+      const d = all.find((x) => x.to === key);
+      return d ? baseOf(d.from) : key;
+    };
+    // 進化した姿のタイプも含める
+    const typesOf = (line: string): Set<string> => {
+      const out = new Set<string>();
+      const stack = [line];
+      while (stack.length) {
+        const k = stack.pop()!;
+        const forced = playablesConfig.pokemon[line]!.types;
+        for (const t of forced ?? generated.pokemon[k]?.types ?? []) out.add(t);
+        if (playablesConfig.pokemon[line]!.evolves !== false) for (const e of generated.pokemon[k]?.evolvesTo ?? []) stack.push(e.to);
+      }
+      return out;
+    };
+    for (const u of derivationsConfig.unique) {
+      const pl = playablesConfig.pokemon[u.line]!;
+      const base = baseOf(u.from);
+      const def = movesConfig.moves[base]!;
+      const type = generated.moves[base]!.type;
+      const ok =
+        pl.startingMoves.includes(base) ||
+        pl.allMoveTypes ||
+        (def.learners ? def.learners.includes(u.line) : type === 'normal' || typesOf(u.line).has(type) || (pl.moveTypes ?? []).includes(type));
+      expect(ok, `${u.line} が ${u.to} の元 ${base} を覚えられない`).toBe(true);
+    }
   });
 
   it('御三家の最初の技とタイプ', () => {

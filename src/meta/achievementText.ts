@@ -2,6 +2,7 @@ import { achievementsConfig, generated } from '../data';
 import { localName } from '../data/simRules';
 import type { AchievementsConfig } from '../data/schema';
 import { getLocale, t, tMaybe } from '../i18n';
+import { progressOf } from './progress';
 
 type Achievement = AchievementsConfig['achievements'][number];
 
@@ -34,6 +35,18 @@ export function achievementCondition(a: Achievement): string {
     if (m) return t('achievement.cond.defeat', { name: pokemonName(m[1]!), count: a.condition.atLeast });
   }
   return own;
+}
+
+/**
+ * 見せてよい達成の条件（作者の決定 2026年10月24日）: ポケモンを解放する実績は、条件の数の半分を超えるまで「？？？」にする
+ * （「〇〇を 20回 倒す」で、黒塗りにしたポケモンが分かってしまうため）。達成したもの・半分を超えたものは、そのまま見せる
+ */
+export function visibleAchievementCondition(a: Achievement, stats: Readonly<Record<string, number>>, achieved: boolean): string {
+  if (!achieved && a.reward?.pokemon) {
+    const p = progressOf(stats, a.condition);
+    if (!p || p.current * 2 <= p.target) return t('achievements.secret');
+  }
+  return achievementCondition(a);
 }
 
 /** 報酬（無ければ null）。ポケモン・持ち物・コイン・特殊なバフ */

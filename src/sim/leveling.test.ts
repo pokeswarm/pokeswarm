@@ -325,3 +325,18 @@ describe('遊べるポケモンの設定（作者の決定 2026年10月23日）'
     expect(offeredMoves({ fixedMoves: true }).size).toBe(0);
   });
 });
+
+describe('覚えられる系統（learners。作者の決定 2026年10月24日）', () => {
+  it('系統が決まっている技は、その系統と、何でも覚えるポケモンだけの候補に出る', () => {
+    const offered = (line: string, learnsAll = false): boolean => {
+      const r = rules({ extraMoves: [testMove('ember', 'nearest', { range: 1 }, FIRE), testMove('flamethrower', 'nearest', { range: 1 }, FIRE), testMove('blast-burn', 'nearest', { range: 1 }, FIRE), { ...testMove('sing', 'nearest', { range: 1 }, 0), learners: ['jigglypuff'] }] });
+      const sim = new Simulation({ tickRate: 30, seed: 5, rules: r });
+      const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100, types: [FIRE], moves: [{ move: 1, level: 1 }], line, learnsAll });
+      for (let k = 0; k < 60; k++) if (makeOffers(sim.world, p).some((o) => o.kind === 'moveNew' && o.move === 4)) return true;
+      return false;
+    };
+    expect(offered('jigglypuff')).toBe(true);
+    expect(offered('charmander')).toBe(false);
+    expect(offered('mew', true)).toBe(true);
+  });
+});

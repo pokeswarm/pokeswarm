@@ -375,6 +375,16 @@
       }
     },
     {
+      "id": "unlock-slowpoke",
+      "condition": {
+        "stat": "defeated.slowbro",
+        "atLeast": 1000
+      },
+      "reward": {
+        "pokemon": "slowpoke"
+      }
+    },
+    {
       "id": "unlock-arcanine",
       "condition": {
         "stat": "bossDefeated.arcanine",

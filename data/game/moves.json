@@ -529,6 +529,18 @@
     "tackle": {
       "pattern": "melee",
       "effect": "tackle",
+      "learners": [
+        "bulbasaur",
+        "squirtle",
+        "onix",
+        "staryu",
+        "koffing",
+        "rhyhorn",
+        "lapras",
+        "slowpoke",
+        "snorlax",
+        "eevee"
+      ],
       "sweep": 0.45,
       "base": {
         "power": 25.6,
@@ -584,6 +596,12 @@
     "quick-attack": {
       "pattern": "melee",
       "effect": "quick-attack",
+      "learners": [
+        "pikachu",
+        "growlithe",
+        "eevee",
+        "doduo"
+      ],
       "base": {
         "power": 10.3,
         "cooldownSeconds": 0.7,
@@ -638,6 +656,19 @@
     "swift": {
       "pattern": "homing",
       "effect": "swift",
+      "learners": [
+        "charmander",
+        "staryu",
+        "pikachu",
+        "abra",
+        "dratini",
+        "eevee",
+        "doduo",
+        "articuno",
+        "zapdos",
+        "moltres",
+        "mewtwo"
+      ],
       "base": {
         "power": 12,
         "cooldownSeconds": 1.2,
@@ -4115,6 +4146,9 @@
     "mimic": {
       "pattern": "metronome",
       "effect": "metronome",
+      "learners": [
+        "mew"
+      ],
       "randomPool": "starting",
       "base": {
         "power": 1,
@@ -4369,6 +4403,9 @@
     "pound": {
       "pattern": "melee",
       "effect": "pound",
+      "learners": [
+        "jigglypuff"
+      ],
       "base": {
         "power": 76.2,
         "cooldownSeconds": 1,
@@ -4476,6 +4513,10 @@
     "sing": {
       "pattern": "nova",
       "effect": "sing",
+      "learners": [
+        "jigglypuff",
+        "lapras"
+      ],
       "sweep": 0.35,
       "base": {
         "power": 51.7,
@@ -4577,6 +4618,9 @@
     "slack-off": {
       "pattern": "heal",
       "effect": "slack-off",
+      "learners": [
+        "slowpoke"
+      ],
       "base": {
         "power": 0,
         "cooldownSeconds": 4,

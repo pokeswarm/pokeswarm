@@ -58,6 +58,7 @@ export function buildSimRules(): SimRules {
       // ものまね（最初の技から選ぶ）は自分のレベルの割合で、ゆびをふる（固有技から選ぶ）は最大レベルで出す
       randomScaled: def.randomPool === 'starting',
       chainHopSeconds: def.chainHopSeconds ?? 0,
+      learners: def.learners ?? null,
     };
   });
   const moveIndex = (key: string): number => moves.findIndex((m) => m.key === key);
@@ -157,13 +158,14 @@ export function moveIndexOf(rules: SimRules, key: string): number {
 export function playableLoadout(
   rules: SimRules,
   pokemon: string,
-): { types: number[]; moves: { move: number; level: number }[]; line: string; species: number; moveTypes: number[]; fixedMoves: boolean } {
+): { types: number[]; moves: { move: number; level: number }[]; line: string; species: number; moveTypes: number[]; fixedMoves: boolean; learnsAll: boolean } {
   const p = playablesConfig.pokemon[pokemon] ?? playablesConfig.pokemon[playablesConfig.default]!;
   const species = generated.pokemon[pokemon] ?? generated.pokemon[playablesConfig.default]!;
   return {
     types: (p.types ?? species.types).map((t) => rules.types.names.indexOf(t)),
     moveTypes: p.allMoveTypes ? rules.types.names.map((_, i) => i) : (p.moveTypes ?? []).map((t) => rules.types.names.indexOf(t)),
     fixedMoves: p.fixedMoves,
+    learnsAll: p.allMoveTypes,
     moves: p.startingMoves.map((m) => ({ move: moveIndexOf(rules, m), level: 1 })),
     // 系統はプレイアブルのキー（固有技の判定。進化しても変わらない）
     line: playablesConfig.pokemon[pokemon] ? pokemon : playablesConfig.default,

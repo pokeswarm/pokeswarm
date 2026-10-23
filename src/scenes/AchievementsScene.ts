@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { achievementsConfig, playablesConfig } from '../data';
 import { t } from '../i18n';
-import { achievementCondition, achievementName, achievementReward } from '../meta/achievementText';
+import { visibleAchievementCondition, achievementName, achievementReward } from '../meta/achievementText';
 import { progressOf } from '../meta/progress';
 import { session } from '../meta/session';
 import { compactScreen } from '../render/pixelUi';
@@ -67,7 +67,7 @@ export class AchievementsScene extends Phaser.Scene {
         name.textContent = achieved ? achievementName(a.id) : t('achievements.secret');
         name.style.color = achieved ? '#f8d030' : '#a0a0a8';
         const cond = document.createElement('div');
-        cond.textContent = secret ? t('achievements.hiddenDesc') : achievementCondition(a);
+        cond.textContent = secret ? t('achievements.hiddenDesc') : visibleAchievementCondition(a, save.stats, achieved);
         const p = progressOf(save.stats, a.condition);
         if (!achieved && !secret && p && p.target > 1) {
           const prog = document.createElement('span');

@@ -69,6 +69,8 @@ export interface SimMoveDef {
   readonly randomScaled: boolean;
   /** 連鎖で1回跳ぶごとに遅らせる秒数 */
   readonly chainHopSeconds: number;
+  /** この技を候補に出す系統。null ならタイプが合えばだれでも */
+  readonly learners: readonly string[] | null;
 }
 
 /** 最小値で止める項目（足し続けても壊れないように） */

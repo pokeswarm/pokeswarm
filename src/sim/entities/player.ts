@@ -87,6 +87,8 @@ export interface Player {
   readonly moveTypes: readonly number[];
   /** 新しい技を覚えない（プリン: 最初の2つだけ） */
   readonly fixedMoves: boolean;
+  /** どの技も覚えられる（ミュウ。技の learners に関係なく候補に出る） */
+  readonly learnsAll: boolean;
   /** ドわすれ: この更新の回数まで、受けるダメージを guardPct % 減らす */
   guardUntilTick?: number;
   guardPct?: number;
@@ -118,6 +120,7 @@ export interface PlayerInit {
   candyWeight?: number;
   moveTypes?: number[];
   fixedMoves?: boolean;
+  learnsAll?: boolean;
 }
 
 export function createPlayer(init: PlayerInit): Player {
@@ -161,6 +164,7 @@ export function createPlayer(init: PlayerInit): Player {
     candyWeight: init.candyWeight ?? 0,
     moveTypes: init.moveTypes ?? [],
     fixedMoves: init.fixedMoves ?? false,
+    learnsAll: init.learnsAll ?? false,
     banned: new Set(),
   };
 }

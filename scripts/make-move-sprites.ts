@@ -904,6 +904,152 @@ function flameCrash(): SpriteOut {
   return { palette, frameMs: 60, parts: { main: frames.map(toRows) } };
 }
 
+/** 右を向いた三日月形（ぶつかった衝撃・電気・手刀の弧の元）。thick は厚さ、col(k, a, f) は 0（内）〜1（外）と角度から色 */
+function crescent(size: number, frames: number, thick: number, col: (k: number, a: number, f: number) => number, wobble = 0): Grid[] {
+  return Array.from({ length: frames }, (_, f) =>
+    shape(size, (u, v) => {
+      const d = Math.hypot(u + 0.4, v);
+      const a = Math.atan2(v, u + 0.4);
+      if (Math.abs(a) > 1.2) return -1;
+      const outer = 1.0 + Math.sin(a * 6 + f * 2) * wobble;
+      const inner = outer - thick * (1 - Math.abs(a) / 1.6);
+      if (d > outer || d < inner) return -1;
+      return col((d - inner) / (outer - inner), a, f);
+    }),
+  );
+}
+
+/** たいあたり・はたく の衝撃: 白い三日月に砂ぼこりの粒 */
+function impactCrescent(): SpriteOut {
+  const palette = ['#3a3a3a', '#9e9e9e', '#e0e0e0', '#ffffff', '#c8b7a6'];
+  const frames = crescent(18, 3, 0.45, (k, a, f) => ((Math.round(a * 9) + f) % 5 === 0 && k > 0.6 ? 4 : k > 0.75 ? 2 : 3), 0.05);
+  return { palette, frameMs: 60, parts: { main: frames.map(toRows) } };
+}
+
+/** でんこうせっか: 右へ走る速さの筋（白い横線が流れる）と、先の光 */
+function speedStreak(): SpriteOut {
+  const palette = ['#2c3e50', '#b0bec5', '#eceff1', '#ffffff'];
+  const frames: Grid[] = [];
+  for (let f = 0; f < 3; f++) {
+    const g = blank(20, 12);
+    const rows = [1, 3, 5, 6, 8, 10];
+    rows.forEach((y, k) => {
+      const len = 6 + ((k * 5 + f * 3) % 9);
+      const end = 17 - ((k * 3 + f * 2) % 4);
+      for (let x = end - len; x <= end; x++) if (x >= 0) g[y]![x] = x > end - 3 ? 3 : x > end - len / 2 ? 2 : 1;
+    });
+    for (const [dx, dy] of [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]] as const) g[5 + dy]![18 + dx] = 3;
+    frames.push(g);
+  }
+  return { palette, frameMs: 50, parts: { main: frames.map(toRows) } };
+}
+
+/** スパーク・ワイルドボルト: 黄色い電気の三日月に、ギザギザの火花 */
+function sparkArc(): SpriteOut {
+  const palette = ['#1a1440', '#f9a825', '#fdd835', '#fff59d', '#ffffff'];
+  const frames = crescent(18, 3, 0.35, (k, a, f) => {
+    const zig = Math.abs(((a * 10 + f * 3) % 2) - 1);
+    return Math.abs(k - zig) < 0.25 ? 4 : k > 0.7 ? 1 : k > 0.4 ? 2 : 3;
+  }, 0.1);
+  return { palette, frameMs: 40, parts: { main: frames.map(toRows) } };
+}
+
+/** からてチョップ: 白い手刀の弧（細い三日月）。クロスチョップは2本が交わる X */
+function chop(kind: 'single' | 'cross'): SpriteOut {
+  const palette = ['#1c2833', '#90caf9', '#e3f2fd', '#ffffff'];
+  const one = (rot: number): Grid =>
+    shape(18, (u, v) => {
+      const d = Math.hypot(u + 0.6, v);
+      const a = Math.atan2(v, u + 0.6);
+      if (Math.abs(a) > 1.0) return -1;
+      const outer = 1.25;
+      const inner = outer - 0.28 * (1 - Math.abs(a));
+      if (d > outer || d < inner) return -1;
+      const k = (d - inner) / (outer - inner);
+      return k > 0.6 ? 1 : k > 0.25 ? 2 : 3;
+    }, rot);
+  const merge = (a: Grid, b: Grid): Grid => a.map((row, y) => row.map((c, x) => (c >= 0 ? c : b[y]![x]!)));
+  // X: 斜めの細い手刀を2本（真ん中が太く、両端がとがる）
+  const slash = (sign: number): Grid =>
+    shape(18, (u, v) => {
+      const along = (u + sign * v) / Math.SQRT2;
+      const across = Math.abs((u - sign * v) / Math.SQRT2);
+      const w = 0.16 * (1 - Math.abs(along) / 0.95);
+      if (Math.abs(along) > 0.95 || across > w) return -1;
+      return across < w * 0.35 ? 3 : across < w * 0.7 ? 2 : 1;
+    });
+  const g = kind === 'single' ? one(0) : merge(slash(1), slash(-1));
+  return { palette, frameMs: 1000, parts: { main: [toRows(outline(g, 0))] } };
+}
+
+/** ばくれつパンチ: 右を向いたこぶしと、まわりに飛び散る光の線 */
+function fist(): SpriteOut {
+  const palette = ['#2b1b10', '#ef6c00', '#ffb74d', '#ffe0b2', '#ffffff', '#fff176'];
+  const frames = [0, 1].map((f) =>
+    shape(24, (u, v) => {
+      // こぶし: 右のふちは指の関節のでこぼこ（4つの丸）、指の間に筋、下に親指
+      // 関節は前へ大きくふくらませ、関節と関節の間はくぼませる
+      const knuckles = false;
+      // 右のふちを波打たせる（関節4つ）
+      const edge = 0.24 + 0.14 * Math.abs(Math.cos((Math.PI * (v + 0.44)) / 0.22));
+      const body = u > -0.3 && u < edge && Math.abs(v) < 0.44;
+      const thumb = u > -0.2 && u < 0.25 && v > 0.22 && v < 0.42;
+      const wrist = u < -0.3 && u > -0.7 && Math.abs(v) < 0.3;
+      if (body || knuckles || thumb) {
+        if (thumb && v < 0.26) return 1;
+        if (u > 0.12 && [-0.2, 0, 0.2].some((ly) => Math.abs(v - ly) < 0.04) && !thumb) return 1;
+        return u + v < -0.25 ? 4 : 3;
+      }
+      if (wrist) return 2;
+      // 光の線（右側に放射状）
+      const a = Math.atan2(v, u - 0.2);
+      const d = Math.hypot(u - 0.2, v);
+      if (u > 0.4 && d > 0.55 && d < 0.95 && Math.abs(Math.sin(a * 4 + f)) < 0.18) return 5;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** はたく・おうふくビンタ: 右を向いた ひらいた手のひら（肌色）と、うしろの動きの線 */
+function palm(): SpriteOut {
+  const palette = ['#3e2723', '#d7a37a', '#f2c9a0', '#ffe8d1', '#ffffff'];
+  const g = shape(18, (u, v) => {
+    // 手のひら（楕円）と、右へのびる4本の指・上の親指
+    const hand = ((u + 0.05) / 0.38) ** 2 + (v / 0.42) ** 2 < 1;
+    const finger = [-0.27, -0.09, 0.09, 0.27].some((fy) => u > 0.1 && u < 0.75 - Math.abs(fy) * 0.5 && Math.abs(v - fy) < 0.075);
+    const thumb = u > -0.15 && u < 0.3 && Math.abs(v + 0.5 + (u - 0.05) * 0.4) < 0.08;
+    if (hand || finger || thumb) return u + v < -0.15 ? 3 : 2;
+    // 動きの線（左側）
+    if (u < -0.5 && [-0.3, 0, 0.3].some((ly) => Math.abs(v - ly) < 0.05)) return 4;
+    return -1;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(outline(g, 0))] } };
+}
+
+/** のしかかり（白い砂ぼこりの衝撃波）・ギガインパクト（橙と白のエネルギーの衝撃波）: 輪に沿って並べる帯 */
+function shockRing(kind: 'dust' | 'giga'): SpriteOut {
+  const W = 10;
+  const H = 8;
+  const palette = kind === 'dust' ? ['#4e4e4e', '#9e9e9e', '#d7ccc8', '#f5f5f5', '#ffffff'] : ['#3b1400', '#e65100', '#ff9800', '#ffe082', '#ffffff'];
+  const frames: Grid[] = [];
+  for (let f = 0; f < 3; f++) {
+    const g = blank(W, H);
+    const r = rng(kind === 'dust' ? 600 + f : 700 + f);
+    for (let x = 0; x < W; x++) {
+      // 外側（下）ほど明るく、内側（上）へもくもく薄れる。並べてつながるよう、ふちは周期 W
+      const top = 1 + Math.round(1 + Math.sin(((x + f * 3) / W) * Math.PI * 2) * 1.2);
+      for (let y = top; y < H; y++) {
+        const k = (y - top) / (H - top);
+        g[y]![x] = k > 0.75 ? 4 : k > 0.45 ? 3 : k > 0.2 ? 2 : 1;
+        if (kind === 'giga' && r() < 0.12) g[y]![x] = 4;
+      }
+    }
+    frames.push(g);
+  }
+  return { palette, frameMs: 70, parts: { middle: frames.map(toRows) } };
+}
+
 const out = {
   credit: '自作（scripts/make-move-sprites.ts で計算して描いた。公式の素材は使っていない）',
   sprites: {
@@ -932,6 +1078,15 @@ const out = {
     'poison-cloud': poisonCloud(),
     'fang-bite': fangBite(),
     'flame-crash': flameCrash(),
+    'impact-crescent': impactCrescent(),
+    'speed-streak': speedStreak(),
+    'spark-arc': sparkArc(),
+    chop: chop('single'),
+    'cross-chop': chop('cross'),
+    fist: fist(),
+    palm: palm(),
+    'dust-ring': shockRing('dust'),
+    'giga-ring': shockRing('giga'),
     rock: rock('rock'),
     stone: rock('stone'),
     bone: bone(),

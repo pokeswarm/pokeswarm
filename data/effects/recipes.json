@@ -264,7 +264,12 @@
       }
     },
     "tackle": {
-      "extends": "normal.base"
+      "extends": "normal.base",
+      "sprite": {
+        "id": "impact-crescent",
+        "fit": "front",
+        "size": 1
+      }
     },
     "fire-spin": {
       "extends": "fire.base",
@@ -562,7 +567,12 @@
       }
     },
     "quick-attack": {
-      "extends": "normal.base"
+      "extends": "normal.base",
+      "sprite": {
+        "id": "speed-streak",
+        "fit": "front",
+        "size": 1
+      }
     },
     "swift": {
       "extends": "normal.base",
@@ -579,6 +589,11 @@
       "projectile": {
         "glowScale": 1.05,
         "coreScale": 0.3
+      },
+      "sprite": {
+        "id": "dust-ring",
+        "fit": "ring",
+        "size": 1
       }
     },
     "hyper-beam": {
@@ -1316,6 +1331,11 @@
       "projectile": {
         "glowScale": 1.1,
         "coreScale": 0.3
+      },
+      "sprite": {
+        "id": "spark-arc",
+        "fit": "front",
+        "size": 1.1
       }
     },
     "wild-charge": {
@@ -1328,6 +1348,11 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "spark-arc",
+        "fit": "front",
+        "size": 1.1
       }
     },
     "bone-rush": {
@@ -1616,6 +1641,11 @@
       "projectile": {
         "glowScale": 1.1,
         "coreScale": 0.3
+      },
+      "sprite": {
+        "id": "chop",
+        "fit": "front",
+        "size": 1
       }
     },
     "cross-chop": {
@@ -1623,6 +1653,11 @@
       "projectile": {
         "glowScale": 1.1,
         "coreScale": 0.3
+      },
+      "sprite": {
+        "id": "cross-chop",
+        "fit": "front",
+        "size": 1
       }
     },
     "dynamic-punch": {
@@ -1635,6 +1670,11 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "fist",
+        "fit": "front",
+        "size": 0.9
       }
     },
     "double-kick": {
@@ -1642,6 +1682,12 @@
       "projectile": {
         "glowScale": 1.1,
         "coreScale": 0.3
+      },
+      "ownerGhost": {
+        "tint": "#ffffff",
+        "alpha": 0.8,
+        "afterimages": 3,
+        "spacingTicks": 1
       }
     },
     "rolling-kick": {
@@ -1649,6 +1695,12 @@
       "projectile": {
         "glowScale": 1.1,
         "coreScale": 0.3
+      },
+      "ownerGhost": {
+        "tint": "#ffffff",
+        "alpha": 0.8,
+        "afterimages": 3,
+        "spacingTicks": 1
       }
     },
     "aura-sphere": {
@@ -1695,6 +1747,12 @@
       "projectile": {
         "glowScale": 1.1,
         "coreScale": 0.3
+      },
+      "ownerGhost": {
+        "tint": "#b3e5fc",
+        "alpha": 0.8,
+        "afterimages": 3,
+        "spacingTicks": 1
       }
     },
     "dragon-rush": {
@@ -1807,7 +1865,12 @@
       }
     },
     "pound": {
-      "extends": "normal.base"
+      "extends": "normal.base",
+      "sprite": {
+        "id": "palm",
+        "fit": "front",
+        "size": 0.9
+      }
     },
     "double-slap": {
       "extends": "normal.base",
@@ -1815,6 +1878,11 @@
         "flash": {
           "radius": 40
         }
+      },
+      "sprite": {
+        "id": "palm",
+        "fit": "front",
+        "size": 0.8
       }
     },
     "sing": {
@@ -1965,6 +2033,11 @@
         "seconds": 0.35,
         "radius": 60,
         "alpha": 1
+      },
+      "sprite": {
+        "id": "giga-ring",
+        "fit": "ring",
+        "size": 1
       }
     },
     "tri-attack": {

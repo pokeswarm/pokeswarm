@@ -21,6 +21,8 @@
     "snorlax": { "sprite": "snorlax", "startingMoves": ["tackle"] },
     "eevee": { "sprite": "eevee", "startingMoves": ["tackle"] },
     "doduo": { "sprite": "doduo", "startingMoves": ["swift"] },
+    "scyther": { "sprite": "scyther", "startingMoves": ["scratch"] },
+    "magnemite": { "sprite": "magnemite", "startingMoves": ["thunder-shock"] },
     "mewtwo": { "sprite": "mewtwo", "startingMoves": ["confusion"] },
     "mew": { "sprite": "mew", "startingMoves": ["mimic"], "allMoveTypes": true },
     "articuno": { "sprite": "articuno", "startingMoves": ["powder-snow"] },

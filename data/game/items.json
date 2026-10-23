@@ -16,6 +16,7 @@
     "dowsing-machine": { "category": "stat", "maxLevel": 5, "perLevel": { "pickupRangePct": 20 } },
     "lucky-egg": { "category": "stat", "maxLevel": 5, "perLevel": { "xpPct": 8 } },
     "silk-scarf": { "category": "type", "maxLevel": 5, "perLevel": { "typePowerPct": { "normal": 15 } } },
+    "silver-powder": { "category": "type", "maxLevel": 5, "perLevel": { "typePowerPct": { "bug": 15 } } },
     "charcoal": { "category": "type", "maxLevel": 5, "perLevel": { "typePowerPct": { "fire": 15 } } },
     "mystic-water": { "category": "type", "maxLevel": 5, "perLevel": { "typePowerPct": { "water": 15 } } },
     "miracle-seed": { "category": "type", "maxLevel": 5, "perLevel": { "typePowerPct": { "grass": 15 } } },

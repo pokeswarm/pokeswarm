@@ -2049,6 +2049,141 @@
         "rotate": "spin",
         "spinDegPerSec": 600
       }
+    },
+    "bug.base": {
+      "projectile": {
+        "coreColor": "#f9fbe7",
+        "coreScale": 0.4,
+        "glowColor": "#9ccc65",
+        "glowScale": 1.1,
+        "glowAlpha": 0.7
+      },
+      "impact": {
+        "burst": {
+          "count": 8,
+          "colors": [
+            "#f0f4c3",
+            "#aed581",
+            "#689f38"
+          ],
+          "lifespanMs": [
+            200,
+            380
+          ],
+          "speed": [
+            50,
+            170
+          ],
+          "scale": [
+            0.5,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 40,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#c5e1a5",
+          "radius": 24,
+          "durationMs": 120,
+          "alpha": 0.5
+        }
+      }
+    },
+    "steel.base": {
+      "projectile": {
+        "coreColor": "#ffffff",
+        "coreScale": 0.4,
+        "glowColor": "#b0bec5",
+        "glowScale": 1.1,
+        "glowAlpha": 0.7
+      },
+      "impact": {
+        "burst": {
+          "count": 8,
+          "colors": [
+            "#ffffff",
+            "#cfd8dc",
+            "#78909c"
+          ],
+          "lifespanMs": [
+            200,
+            380
+          ],
+          "speed": [
+            50,
+            170
+          ],
+          "scale": [
+            0.5,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 40,
+          "spread": 2,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#eceff1",
+          "radius": 24,
+          "durationMs": 120,
+          "alpha": 0.5
+        }
+      }
+    },
+    "scratch": {
+      "extends": "normal.base",
+      "sprite": {
+        "id": "claw",
+        "fit": "front",
+        "size": 1
+      }
+    },
+    "slash": {
+      "extends": "normal.base",
+      "sprite": {
+        "id": "claw-big",
+        "fit": "front",
+        "size": 1.1
+      }
+    },
+    "fury-cutter": {
+      "extends": "bug.base",
+      "sprite": {
+        "id": "fury-slash",
+        "fit": "front",
+        "size": 1.1
+      }
+    },
+    "x-scissor": {
+      "extends": "bug.base",
+      "sprite": {
+        "id": "x-scissor",
+        "fit": "circle",
+        "size": 2.6,
+        "rotate": "velocity"
+      }
+    },
+    "flash-cannon": {
+      "extends": "steel.base",
+      "sprite": {
+        "id": "steel-beam",
+        "fit": "line",
+        "size": 1.4
+      },
+      "chargeGlow": {
+        "color": "#e0f7fa",
+        "seconds": 0.4,
+        "radius": 50,
+        "alpha": 0.9
+      }
     }
   }
 }

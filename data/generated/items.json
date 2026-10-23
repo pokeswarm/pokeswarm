@@ -329,6 +329,16 @@
       "it": "Sciarpa Seta"
     }
   },
+  "silver-powder": {
+    "names": {
+      "ja": "ぎんのこな",
+      "en": "Silver Powder",
+      "fr": "Poudre Argentée",
+      "de": "Silberstaub",
+      "es": "Polvo Plata",
+      "it": "Argenpolvere"
+    }
+  },
   "soft-sand": {
     "names": {
       "ja": "やわらかいすな",

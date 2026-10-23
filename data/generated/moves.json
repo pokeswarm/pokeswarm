@@ -383,6 +383,18 @@
     "type": "fire",
     "damageClass": "physical"
   },
+  "flash-cannon": {
+    "names": {
+      "ja": "ラスターカノン",
+      "en": "Flash Cannon",
+      "fr": "Luminocanon",
+      "de": "Lichtkanone",
+      "es": "Cañón Resplandor",
+      "it": "Cannonflash"
+    },
+    "type": "steel",
+    "damageClass": "special"
+  },
   "freeze-dry": {
     "names": {
       "ja": "フリーズドライ",
@@ -406,6 +418,18 @@
     },
     "type": "grass",
     "damageClass": "special"
+  },
+  "fury-cutter": {
+    "names": {
+      "ja": "れんぞくぎり",
+      "en": "Fury Cutter",
+      "fr": "Taillade",
+      "de": "Zornklinge",
+      "es": "Corte Furia",
+      "it": "Tagliofuria"
+    },
+    "type": "bug",
+    "damageClass": "physical"
   },
   "future-sight": {
     "names": {
@@ -839,6 +863,18 @@
     "type": "ground",
     "damageClass": "physical"
   },
+  "scratch": {
+    "names": {
+      "ja": "ひっかく",
+      "en": "Scratch",
+      "fr": "Griffe",
+      "de": "Kratzer",
+      "es": "Arañazo",
+      "it": "Graffio"
+    },
+    "type": "normal",
+    "damageClass": "physical"
+  },
   "seed-bomb": {
     "names": {
       "ja": "タネばくだん",
@@ -922,6 +958,18 @@
     },
     "type": "normal",
     "damageClass": "status"
+  },
+  "slash": {
+    "names": {
+      "ja": "きりさく",
+      "en": "Slash",
+      "fr": "Tranche",
+      "de": "Schlitzer",
+      "es": "Cuchillada",
+      "it": "Lacerazione"
+    },
+    "type": "normal",
+    "damageClass": "physical"
   },
   "sleep-powder": {
     "names": {
@@ -1173,6 +1221,18 @@
       "it": "Sprizzalampo"
     },
     "type": "electric",
+    "damageClass": "physical"
+  },
+  "x-scissor": {
+    "names": {
+      "ja": "シザークロス",
+      "en": "X-Scissor",
+      "fr": "Plaie Croix",
+      "de": "Kreuzschere",
+      "es": "Tijera X",
+      "it": "Forbice X"
+    },
+    "type": "bug",
     "damageClass": "physical"
   },
   "zap-cannon": {

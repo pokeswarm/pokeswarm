@@ -15,7 +15,11 @@
   "retireOldWaveKinds": true,
   "hpPerLevelPct": 6,
   "hpPerTwoGymsPct": 15,
-  "perExtraPlayer": { "spawnPct": 100, "hpPct": 20, "xpSharePct": 75 },
+  "perExtraPlayer": {
+    "spawnPct": 100,
+    "hpPct": 20,
+    "xpSharePct": 75
+  },
   "fillPerSecond": 20,
   "waves": [
     {
@@ -58,7 +62,8 @@
         "mankey",
         "meowth",
         "bellsprout",
-        "venonat"
+        "venonat",
+        "magnemite"
       ]
     },
     {

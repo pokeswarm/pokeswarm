@@ -244,6 +244,37 @@
         }
       ]
     },
+    "move.bug": {
+      "minIntervalMs": 60,
+      "parts": [
+        {
+          "wave": "square",
+          "from": 900,
+          "to": 1400,
+          "duration": 0.06,
+          "volume": 0.12
+        },
+        {
+          "wave": "square",
+          "from": 1100,
+          "to": 700,
+          "duration": 0.05,
+          "volume": 0.1
+        }
+      ]
+    },
+    "move.steel": {
+      "minIntervalMs": 60,
+      "parts": [
+        {
+          "wave": "triangle",
+          "from": 2000,
+          "to": 1600,
+          "duration": 0.14,
+          "volume": 0.22
+        }
+      ]
+    },
     "hit": {
       "minIntervalMs": 35,
       "parts": [

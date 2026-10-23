@@ -81,6 +81,14 @@
       "contactDamage": 6
     },
     {
+      "id": "magnemite",
+      "sprite": "enemy/magnemite",
+      "hp": 7,
+      "moveSpeed": 50,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
       "id": "vulpix",
       "sprite": "enemy/vulpix",
       "hp": 7,

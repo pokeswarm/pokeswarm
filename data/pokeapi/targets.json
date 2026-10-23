@@ -101,7 +101,9 @@
     "psyduck",
     "slowpoke",
     "snorlax",
-    "dodrio"
+    "dodrio",
+    "magnemite",
+    "magneton"
   ],
   "moves": [
     "ember",
@@ -202,7 +204,12 @@
     "slack-off",
     "amnesia",
     "last-resort",
-    "giga-impact"
+    "giga-impact",
+    "scratch",
+    "slash",
+    "fury-cutter",
+    "x-scissor",
+    "flash-cannon"
   ],
   "items": [
     "x-attack",
@@ -248,7 +255,8 @@
     "moon-stone",
     "everstone",
     "zoom-lens",
-    "razor-claw"
+    "razor-claw",
+    "silver-powder"
   ],
   "regions": [
     "kanto",

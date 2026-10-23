@@ -1631,6 +1631,69 @@
       }
     ]
   },
+  "magnemite": {
+    "dex": 81,
+    "names": {
+      "ja": "コイル",
+      "en": "Magnemite",
+      "fr": "Magnéti",
+      "de": "Magnetilo",
+      "es": "Magnemite",
+      "it": "Magnemite"
+    },
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 25,
+      "attack": 35,
+      "defense": 70,
+      "specialAttack": 95,
+      "specialDefense": 55,
+      "speed": 45
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "magneton",
+        "trigger": "level",
+        "level": 30
+      }
+    ]
+  },
+  "magneton": {
+    "dex": 82,
+    "names": {
+      "ja": "レアコイル",
+      "en": "Magneton",
+      "fr": "Magnéton",
+      "de": "Magneton",
+      "es": "Magneton",
+      "it": "Magneton"
+    },
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 60,
+      "defense": 95,
+      "specialAttack": 120,
+      "specialDefense": 70,
+      "speed": 70
+    },
+    "preEvolutions": [
+      "magnemite"
+    ],
+    "evolvesTo": [
+      {
+        "to": "magnezone",
+        "trigger": "other"
+      }
+    ]
+  },
   "mankey": {
     "dex": 56,
     "names": {

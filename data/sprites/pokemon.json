@@ -396,6 +396,21 @@
       ]
     },
     {
+      "key": "magnemite",
+      "dex": 81,
+      "uses": [
+        "enemy",
+        "full"
+      ]
+    },
+    {
+      "key": "magneton",
+      "dex": 82,
+      "uses": [
+        "full"
+      ]
+    },
+    {
       "key": "doduo",
       "dex": 84,
       "uses": [
@@ -590,7 +605,8 @@
       "key": "scyther",
       "dex": 123,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {

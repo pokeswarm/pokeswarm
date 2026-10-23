@@ -1050,6 +1050,62 @@ function shockRing(kind: 'dust' | 'giga'): SpriteOut {
   return { palette, frameMs: 70, parts: { middle: frames.map(toRows) } };
 }
 
+/** ひっかく（白い3本の爪あと）・きりさく（大きく赤みのある3本）: 右を向いた、斜めに走る爪の筋 */
+function claw(kind: 'small' | 'big'): SpriteOut {
+  const palette = kind === 'small' ? ['#2c2c2c', '#bdbdbd', '#eeeeee', '#ffffff'] : ['#3b0a0a', '#e57373', '#ffcdd2', '#ffffff'];
+  const g = shape(kind === 'small' ? 16 : 20, (u, v) => {
+    // 3本の筋: 右上から左下へ、少し曲がる
+    for (const off of [-0.5, 0, 0.5]) {
+      const along = (u - v) / Math.SQRT2;
+      const across = (u + v) / Math.SQRT2 - off - along * along * 0.25;
+      const w = (kind === 'small' ? 0.09 : 0.11) * (1 - Math.abs(along) / 0.85);
+      if (Math.abs(along) < 0.85 && Math.abs(across) < w) return Math.abs(across) < w * 0.4 ? 3 : 2;
+    }
+    return -1;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(outline(g, 0))] } };
+}
+
+/** れんぞくぎり: 黄緑の鎌の三日月（2コマで向きが入れ替わる） */
+function furySlash(): SpriteOut {
+  const palette = ['#1b3d14', '#7cb342', '#c5e1a5', '#f1f8e9'];
+  const frames = crescent(18, 2, 0.32, (k) => (k > 0.65 ? 1 : k > 0.3 ? 2 : 3), 0.03);
+  return { palette, frameMs: 70, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/** シザークロス: 黄緑の鎌が X に交わる（進む向きに向ける） */
+function xScissor(): SpriteOut {
+  const palette = ['#1b3d14', '#689f38', '#aed581', '#f1f8e9'];
+  const slash = (sign: number): Grid =>
+    shape(18, (u, v) => {
+      const along = (u + sign * v) / Math.SQRT2;
+      const across = (u - sign * v) / Math.SQRT2 - along * along * 0.15 * sign;
+      const w = 0.17 * (1 - Math.abs(along) / 0.95);
+      if (Math.abs(along) > 0.95 || Math.abs(across) > w) return -1;
+      return Math.abs(across) < w * 0.35 ? 3 : Math.abs(across) < w * 0.7 ? 2 : 1;
+    });
+  const a = slash(1);
+  const b = slash(-1);
+  const g = a.map((row, y) => row.map((c, x) => (c >= 0 ? c : b[y]![x]!)));
+  return { palette, frameMs: 1000, parts: { main: [toRows(outline(g, 0))] } };
+}
+
+/** ラスターカノン: 銀色の鋼の光線（ふちが青白く、真ん中に光の筋が流れる） */
+function steelBeam(): SpriteOut {
+  const H = 12;
+  const TILE = 8;
+  const palette = ['#1c2833', '#78909c', '#b0bec5', '#e0f7fa', '#ffffff'];
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 6, middle: TILE, end: 8 }, 4, (x, y, f, part) => {
+    const taper = part === 'start' ? 0.4 + x / 8 : part === 'end' ? 1 - x / 9 : 1;
+    const d = Math.abs(y - mid) / (4.6 * taper);
+    if (d > 1) return -1;
+    if (d < 0.3 && (x + f * 2) % TILE < 3) return 4;
+    return d < 0.35 ? 3 : d < 0.7 ? 2 : 1;
+  });
+  return { palette, frameMs: 60, parts };
+}
+
 const out = {
   credit: '自作（scripts/make-move-sprites.ts で計算して描いた。公式の素材は使っていない）',
   sprites: {
@@ -1087,6 +1143,11 @@ const out = {
     palm: palm(),
     'dust-ring': shockRing('dust'),
     'giga-ring': shockRing('giga'),
+    claw: claw('small'),
+    'claw-big': claw('big'),
+    'fury-slash': furySlash(),
+    'x-scissor': xScissor(),
+    'steel-beam': steelBeam(),
     rock: rock('rock'),
     stone: rock('stone'),
     bone: bone(),

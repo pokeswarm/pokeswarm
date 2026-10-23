@@ -1079,6 +1079,18 @@
     "type": "electric",
     "damageClass": "special"
   },
+  "tri-attack": {
+    "names": {
+      "ja": "トライアタック",
+      "en": "Tri Attack",
+      "fr": "Triplattaque",
+      "de": "Triplette",
+      "es": "Triataque",
+      "it": "Tripletta"
+    },
+    "type": "normal",
+    "damageClass": "special"
+  },
   "vine-whip": {
     "names": {
       "ja": "つるのムチ",

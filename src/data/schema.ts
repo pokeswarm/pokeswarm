@@ -549,6 +549,8 @@ export type CombatConfig = z.infer<typeof combatConfigSchema>;
  *   2 枚は向かい合わせ、3 枚は正三角形と逆三角形の向きが交互になる）。再使用が短いほど速く回る（こうそくスピン。作者の決定 2026年10月23日）
  * - heal（回復）: 攻撃しない。使うたびに最大 HP の healPct % を回復し、guardPct があれば duration の間、受けるダメージを減らす
  *   （なまける・ドわすれ。作者の決定 2026年10月23日）。自分の周りに size の円を見た目だけ出す
+ * - spiral（うず）: 自分を中心に count 個を等しい角度に並べ、curve（度/秒）で回りながら、duration の間に range まで広がる
+ *   （はなびらのまい。作者の決定 2026年10月23日）
  * - sweep（往復するなぎ払い）: 向いている方向を中心に、開き arcDegrees の細い扇形を、spreadDegrees の幅で行って戻る
  *   （おうふくビンタ）。行きと戻りの両方で当たる（当たり直しの間隔は duration の半分）
  * - eruption（爆炎の柱）: 自分を中心に count 方向へ、円の柱を stages 段に分けて、interval ごとに外へ向かって順に出す。
@@ -579,6 +581,7 @@ export const MOVE_PATTERNS = [
   'spin',
   'heal',
   'sweep',
+  'spiral',
 ] as const;
 export type MovePattern = (typeof MOVE_PATTERNS)[number];
 
@@ -758,6 +761,8 @@ export const moveDefSchema = z.object({
    * 値は帯の厚さで、届く距離いっぱいに対する割合。近接（扇形・自分の周り）と広がる輪（nova）で使う
    */
   sweep: z.number().gt(0).max(1).optional(),
+  /** 当たったときの状態異常を、この中からランダムに選ぶ（トライアタック: やけど・こおり・まひ）。statusChance で付くかどうかを決める */
+  randomStatuses: z.array(z.string()).optional(),
   /** 跳ね返る技（bounce）を出す向き: 向いている方向から何度ずらすか（まっすぐだと、向かいの壁との間で同じ線を往復するだけになる） */
   bounceAngle: z.number().optional(),
 });

@@ -52,6 +52,7 @@ export function buildSimRules(): SimRules {
       curve: ((def.curve ?? 0) * Math.PI) / 180,
       sweep: def.sweep ?? 0,
       bounceAngle: ((def.bounceAngle ?? 0) * Math.PI) / 180,
+      randomStatuses: (def.randomStatuses ?? []).map(statusIndexOf),
     };
   });
   const moveIndex = (key: string): number => moves.findIndex((m) => m.key === key);

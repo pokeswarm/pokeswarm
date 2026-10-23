@@ -24,7 +24,7 @@
     { "from": "night-shade", "item": "spell-tag", "to": "shadow-ball" },
     { "from": "dragon-tail", "item": "dragon-fang", "to": "dragon-rush" },
     { "from": "dragon-rage", "item": "dragon-fang", "to": "dragon-pulse" },
-    { "from": "swift", "item": "silk-scarf", "to": "aura-sphere" }
+    { "from": "swift", "item": "silk-scarf", "to": "tri-attack" }
   ],
   "unique": [
     { "from": "flamethrower", "item": "fire-stone", "to": "blast-burn", "line": "charmander" },
@@ -46,7 +46,7 @@
     { "from": "psychic", "item": "x-sp-atk", "to": "psystrike", "line": "mewtwo" },
     { "from": "thunderbolt", "item": "thunder-stone", "to": "zap-cannon", "line": "zapdos" },
     { "from": "flare-blitz", "item": "fire-stone", "to": "sky-attack", "line": "moltres" },
-    { "from": "aura-sphere", "item": "moon-stone", "to": "metronome", "line": "mew" },
+    { "from": "tri-attack", "item": "moon-stone", "to": "metronome", "line": "mew" },
     { "from": "thunderbolt", "item": "pp-max", "to": "thunder", "line": "pikachu", "forms": ["raichu"] },
     { "from": "pound", "item": "x-attack", "to": "double-slap", "line": "jigglypuff" },
     { "from": "sing", "item": "silk-scarf", "to": "hyper-voice", "line": "jigglypuff" },

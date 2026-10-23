@@ -61,6 +61,8 @@ export interface SimMoveDef {
   readonly sweep: number;
   /** 跳ね返る技を出す向きのずれ（ラジアン） */
   readonly bounceAngle: number;
+  /** 当たったときの状態異常を、この中からランダムに選ぶ（状態異常の番号。空なら技の状態異常） */
+  readonly randomStatuses: readonly number[];
 }
 
 /** 最小値で止める項目（足し続けても壊れないように） */

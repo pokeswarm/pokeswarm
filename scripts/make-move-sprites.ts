@@ -480,6 +480,36 @@ function orb(kind: 'shadow' | 'aura'): SpriteOut {
   return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
 }
 
+/** 線用の絵（葉・花びら）の途中の部品を、1枚の絵（main）として使う（放射状に飛ばす・うずで回す） */
+function single(sp: SpriteOut): SpriteOut {
+  return { ...sp, parts: { main: sp.parts.middle! } };
+}
+
+/** トライアタック: 三角の3つの角が ほのお（赤）・こおり（水色）・でんき（黄）の玉。回して飛ばす */
+function triOrb(): SpriteOut {
+  const palette = ['#1a1a2e', '#e53935', '#ff8a65', '#29b6f6', '#b3e5fc', '#fdd835', '#fff59d', '#ffffff'];
+  const corners = [0, 1, 2].map((k) => [Math.cos(-Math.PI / 2 + (k * Math.PI * 2) / 3) * 0.6, Math.sin(-Math.PI / 2 + (k * Math.PI * 2) / 3) * 0.6] as const);
+  const g = shape(16, (u, v) => {
+    for (let k = 0; k < 3; k++) {
+      const [cx, cy] = corners[k]!;
+      const d = Math.hypot(u - cx, v - cy);
+      if (d < 0.36) return d < 0.15 ? 7 : [2, 4, 6][k]! - (d > 0.26 ? 1 : 0);
+    }
+    // 角をつなぐ白い三角の線
+    const inTri = corners.every(([cx, cy], k) => {
+      const [nx, ny] = corners[(k + 1) % 3]!;
+      return (nx - cx) * (v - cy) - (ny - cy) * (u - cx) >= -0.02;
+    });
+    const nearEdge = corners.some(([cx, cy], k) => {
+      const [nx, ny] = corners[(k + 1) % 3]!;
+      const len = Math.hypot(nx - cx, ny - cy);
+      return Math.abs((nx - cx) * (cy - v) - (cx - u) * (ny - cy)) / len < 0.07;
+    });
+    return inTri && nearEdge ? 7 : -1;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
 const out = {
   credit: '自作（scripts/make-move-sprites.ts で計算して描いた。公式の素材は使っていない）',
   sprites: {
@@ -491,6 +521,9 @@ const out = {
     bubble: bubble(),
     'leaf-line': leafLine('leaf'),
     'petal-line': leafLine('petal'),
+    leaf: single(leafLine('leaf')),
+    petal: single(leafLine('petal')),
+    'tri-orb': triOrb(),
     rock: rock('rock'),
     stone: rock('stone'),
     bone: bone(),

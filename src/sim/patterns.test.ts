@@ -20,6 +20,16 @@ function run(pattern: SimMoveDef['pattern'], stats: Record<string, number>, enem
 }
 
 describe('技の型（作者の決定。07 18章）', () => {
+  it('うず（spiral）: 自分のまわりを回りながら外へ広がる', () => {
+    const { sim } = run('spiral', { range: 300, size: 10, count: 4, durationSeconds: 1 }, [], 1);
+    const pr = sim.world.projectiles;
+    const a0 = Math.atan2(pr.y[0]!, pr.x[0]!);
+    const r0 = Math.hypot(pr.x[0]!, pr.y[0]!);
+    for (let t = 0; t < 15; t++) sim.step([]);
+    expect(Math.hypot(pr.x[0]!, pr.y[0]!)).toBeGreaterThan(r0 + 100);
+    expect(Math.abs(Math.atan2(pr.y[0]!, pr.x[0]!) - a0)).toBeGreaterThan(0.5);
+  });
+
   it('回復（heal）: 最大 HP の割合を回復し、守りの間は受けるダメージが減る', () => {
     const { sim } = run('heal', { power: 0, healPct: 20, guardPct: 50, durationSeconds: 2 }, [], 0);
     const p = sim.world.players[0]!;

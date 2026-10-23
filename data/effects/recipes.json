@@ -423,10 +423,11 @@
     "razor-leaf": {
       "extends": "grass.base",
       "sprite": {
-        "id": "leaf-line",
-        "fit": "line",
-        "size": 0.8,
-        "varyTiles": true
+        "id": "leaf",
+        "fit": "circle",
+        "size": 1.8,
+        "rotate": "spin",
+        "spinDegPerSec": 900
       }
     },
     "leech-seed": {
@@ -439,10 +440,11 @@
         "coreScale": 0.2
       },
       "sprite": {
-        "id": "petal-line",
-        "fit": "line",
-        "size": 0.8,
-        "varyTiles": true
+        "id": "petal",
+        "fit": "circle",
+        "size": 1.5,
+        "rotate": "spin",
+        "spinDegPerSec": 540
       }
     },
     "frenzy-plant": {
@@ -1825,6 +1827,16 @@
         "seconds": 0.35,
         "radius": 60,
         "alpha": 1
+      }
+    },
+    "tri-attack": {
+      "extends": "normal.base",
+      "sprite": {
+        "id": "tri-orb",
+        "fit": "circle",
+        "size": 3.2,
+        "rotate": "spin",
+        "spinDegPerSec": 600
       }
     }
   }

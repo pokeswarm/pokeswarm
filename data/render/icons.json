@@ -778,7 +778,8 @@
     "eruption": "eruption",
     "spin": "spin",
     "heal": "nova",
-    "sweep": "whip"
+    "sweep": "whip",
+    "spiral": "orbit"
   },
   "items": {
     "x-attack": {

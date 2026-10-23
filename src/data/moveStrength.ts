@@ -97,6 +97,9 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
     case 'nova':
       area = Math.PI * range * range;
       break;
+    case 'spiral':
+      area = Math.PI * range * range * 0.5;
+      break;
     case 'sweep':
       area = (Math.min(num('spreadDegrees') + num('arcDegrees'), 360) / 360) * Math.PI * (range + size) ** 2;
       break;

@@ -7,6 +7,7 @@ import {
   MOTION_BOUNCE,
   MOTION_STREAM,
   MOTION_SWEEP,
+  MOTION_SPIRAL,
   MOTION_LINEAR,
   MOTION_ORBIT,
   SHAPE_CIRCLE,
@@ -204,6 +205,9 @@ export function useMoves(world: World): void {
           break;
         case 'sweep':
           fireSweep(world, p, pm, st);
+          break;
+        case 'spiral':
+          fireSpiral(world, p, pm, st);
           break;
       }
       if (def.effects.some((fx) => fx.trigger === 'cast')) {
@@ -423,7 +427,7 @@ function fireScreen(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
 }
 
 /** 一度に出し終える出し方（ゆびをふるで選ぶ技。連射の出し方は、出し続ける状態を持てないので選ばない） */
-const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter', 'eruption', 'spin', 'sweep']);
+const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter', 'eruption', 'spin', 'sweep', 'spiral']);
 
 /** metronome（ゆびをふる）: ほかの技からランダムに1つを、その技の最大レベルで出す */
 function fireMetronome(world: World, p: Player): void {
@@ -453,6 +457,7 @@ function fireMetronome(world: World, p: Player): void {
     eruption: fireEruption,
     spin: fireSpin,
     sweep: fireSweep,
+    spiral: fireSpiral,
   };
   fire[def.pattern]?.(world, p, pm, st);
 }
@@ -646,6 +651,28 @@ function fireHeal(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
   world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, damage: 0, stage: 2, fxIndex: -1 });
 }
 
+/** spiral（うず）: 自分を中心に count 個を等しい角度に並べ、回りながら duration の間に range まで広がる（はなびらのまい） */
+function fireSpiral(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  const a0 = Math.atan2(fy, fx);
+  const n = Math.max(1, st.count);
+  // 回る速さは技の curve（度/秒）。無ければ 1 秒で半周
+  const turn = world.rules.moves[pm.move]!.curve || Math.PI;
+  for (let k = 0; k < n; k++) {
+    const a = a0 + (k / n) * Math.PI * 2;
+    world.projectiles.add({
+      ...base(world, p, pm, st),
+      motion: MOTION_SPIRAL,
+      x: p.x + Math.cos(a) * 16,
+      y: p.y + Math.sin(a) * 16,
+      angle: a,
+      angularSpeed: turn,
+      orbitRadius: 16,
+      ox: Math.max(0, st.range - 16) / st.durationSeconds,
+    });
+  }
+}
+
 /** sweep（往復するなぎ払い）: 向いている方向を中心に、細い扇形を spreadDegrees の幅で行って戻る（おうふくビンタ） */
 function fireSweep(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const sc = scaledMoveStats(world, p, pm, st);
@@ -781,6 +808,11 @@ export function moveProjectiles(world: World): void {
       pr.x[i] = owner.x + pr.ox[i]!;
       pr.y[i] = owner.y + pr.oy[i]!;
       pr.radius[i]! += pr.growth[i]! * world.dt;
+    } else if (motion === MOTION_SPIRAL) {
+      pr.angle[i]! += pr.angularSpeed[i]! * world.dt;
+      pr.orbitRadius[i]! += pr.ox[i]! * world.dt;
+      pr.x[i] = owner.x + Math.cos(pr.angle[i]!) * pr.orbitRadius[i]!;
+      pr.y[i] = owner.y + Math.sin(pr.angle[i]!) * pr.orbitRadius[i]!;
     } else if (motion === MOTION_ORBIT) {
       pr.angle[i]! += pr.angularSpeed[i]! * world.dt;
       pr.x[i] = owner.x + Math.cos(pr.angle[i]!) * pr.orbitRadius[i]!;
@@ -872,7 +904,7 @@ export function moveProjectiles(world: World): void {
       const kx = line ? pr.dirX[i]! : e.x[j]! - x || pr.vx[i]!;
       const ky = line ? pr.dirY[i]! : e.y[j]! - y || pr.vy[i]!;
       // 効果（ノックバック・状態異常）は当てたプレイヤーの画面ですぐ付け、相手へは命中と一緒に送る
-      const fx = rollHitEffect(world, st, kx, ky, pr.knockback[i]!);
+      const fx = rollHitEffect(world, st, kx, ky, pr.knockback[i]!, def.randomStatuses);
       applyHitEffect(world, j, fx, ownerId);
       const kind = world.rules.enemies.kinds[e.kind[j]!];
       // 急所（クリティカットなど・技ごとの急所）の判定は、当てたプレイヤーのブラウザの乱数で行う
@@ -992,7 +1024,7 @@ function tickEveryEffects(world: World, i: number): void {
  * 命中の効果を決める。ノックバックは (dirX, dirY) の向き。
  * 状態異常が付くかの判定は、当てたプレイヤーのブラウザの乱数で行う（03_network.md 3.2）。
  */
-function rollHitEffect(world: World, st: MoveStats, dirX: number, dirY: number, knockback = NaN): HitEffect {
+function rollHitEffect(world: World, st: MoveStats, dirX: number, dirY: number, knockback = NaN, randomStatuses: readonly number[] = []): HitEffect {
   let kbx = 0;
   let kby = 0;
   let kbTicks = 0;
@@ -1006,8 +1038,9 @@ function rollHitEffect(world: World, st: MoveStats, dirX: number, dirY: number, 
   }
   let status = -1;
   let statusTicks = 0;
-  if (st.status >= 0 && st.statusChance > 0 && world.rng.next() < st.statusChance) {
-    status = st.status;
+  if ((st.status >= 0 || randomStatuses.length > 0) && st.statusChance > 0 && world.rng.next() < st.statusChance) {
+    // トライアタック: やけど・こおり・まひ のどれか
+    status = randomStatuses.length > 0 ? randomStatuses[world.rng.int(randomStatuses.length)]! : st.status;
     statusTicks = Math.round(st.statusSeconds / world.dt);
   }
   return { kbx, kby, kbTicks, status, statusTicks };

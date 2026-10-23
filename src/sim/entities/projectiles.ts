@@ -25,6 +25,8 @@ export const MOTION_STREAM = 7;
  * 残り時間の前半に行き、後半に戻る
  */
 export const MOTION_SWEEP = 8;
+/** うず（spiral）: 持ち主のまわりを angularSpeed で回りながら、半径 orbitRadius を毎秒 ox ずつ広げる */
+export const MOTION_SPIRAL = 9;
 
 /** 当たり判定の形: 円（半径 radius） */
 export const SHAPE_CIRCLE = 0;

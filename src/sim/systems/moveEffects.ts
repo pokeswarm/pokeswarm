@@ -218,13 +218,17 @@ function applyEffect(world: World, fx: MoveEffect, index: number, src: FxSource)
   }
   if (fx.spikes) {
     const sk = fx.spikes;
+    const base = sk.length + sk.lengthPerLevel * Math.max(0, src.level - 1);
     for (let k = 0; k < sk.count; k++) {
-      const a = angle0 + (k / sk.count) * Math.PI * 2;
+      // ばらばらの向き・長さは共有の乱数ではなく、時刻と位置から決める（どのブラウザでも同じ形になる）
+      const rand = (salt: number): number => hash01(world.seed, world.tick, Math.floor(src.x) * 7919 + Math.floor(src.y), 1000 + k * 7 + salt);
+      const a = sk.randomAngles ? angle0 + ((k + rand(1) * 0.8 - 0.4) / sk.count) * Math.PI * 2 : angle0 + (k / sk.count) * Math.PI * 2;
+      const len = base * (1 - sk.lengthJitter * rand(2));
       const dx = Math.cos(a);
       const dy = Math.sin(a);
       spawn(world, src, {
         shape: SHAPE_LINE,
-        length: rayLengthToObstacle(world, src.x, src.y, dx, dy, sk.length),
+        length: rayLengthToObstacle(world, src.x, src.y, dx, dy, len),
         dirX: dx,
         dirY: dy,
         damage: src.damage * sk.powerMultiplier,

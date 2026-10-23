@@ -469,7 +469,7 @@
       "effectLineSprite": {
         "id": "root-line",
         "fit": "line",
-        "size": 1.4,
+        "size": 1.3,
         "growSeconds": 0.25
       }
     },

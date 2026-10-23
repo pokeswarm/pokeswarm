@@ -1260,19 +1260,17 @@
           "power": 1.2
         },
         {
-          "size": 4,
-          "power": 1.2
+          "power": 2
         },
         {
           "durationSeconds": 0.5
         },
         {
           "count": 1,
-          "power": 0.8
+          "power": 0.7
         },
         {
-          "size": 5,
-          "power": 0.6
+          "power": 1.7
         },
         {
           "cooldownSeconds": -0.2,
@@ -1297,12 +1295,15 @@
         {
           "trigger": "end",
           "spikes": {
-            "sizeMultiplier": 0.5,
+            "sizeMultiplier": 0.32,
             "powerMultiplier": 0.6,
-            "count": 4,
+            "count": 5,
             "length": 220,
             "durationSeconds": 1.2,
-            "hitIntervalSeconds": 0.4
+            "hitIntervalSeconds": 0.4,
+            "lengthPerLevel": 30,
+            "randomAngles": true,
+            "lengthJitter": 0.35
           }
         }
       ]

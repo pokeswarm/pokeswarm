@@ -242,7 +242,7 @@ describe('効き方の部品（07 22.4）', () => {
     const sim = withEffects(
       'melee',
       { size: 20, count: 1, range: 0 },
-      [{ trigger: 'cast', orbit: { sizeMultiplier: 0.5, powerMultiplier: 1, count: 3, radius: 60, speed: 360, durationSeconds: 1, hitIntervalSeconds: 0.2 }, spikes: { sizeMultiplier: 0.5, powerMultiplier: 1, count: 4, length: 200, durationSeconds: 1, hitIntervalSeconds: 0.3 }, wave: { powerMultiplier: 1, radius: 200, durationSeconds: 0.5 } }],
+      [{ trigger: 'cast', orbit: { sizeMultiplier: 0.5, powerMultiplier: 1, count: 3, radius: 60, speed: 360, durationSeconds: 1, hitIntervalSeconds: 0.2 }, spikes: { sizeMultiplier: 0.5, powerMultiplier: 1, count: 4, length: 200, durationSeconds: 1, hitIntervalSeconds: 0.3, lengthPerLevel: 0, randomAngles: false, lengthJitter: 0 }, wave: { powerMultiplier: 1, radius: 200, durationSeconds: 0.5 } }],
       [[0, 150]],
       2,
     );
@@ -272,5 +272,25 @@ describe('効き方の部品（07 22.4）', () => {
     let moved = false;
     for (let i = 0; i < pr.count; i++) if (pr.x[i]! > 50 && Math.abs(pr.y[i]!) > 10) moved = true;
     expect(moved).toBe(true);
+  });
+});
+
+describe('突き出す（spikes）の伸び方（作者の決定 2026年10月23日）', () => {
+  it('レベルが上がるほど長くなり、ばらばらの向きにできる', () => {
+    const spikesAt = (level: number, randomAngles: boolean) => {
+      const rules = testRules({ move: { power: 10, cooldownSeconds: 100, pierce: Infinity, durationSeconds: 0.5, size: 20, count: 1, range: 0 } });
+      const lv = rules.moves[0]!.levels[0]!;
+      rules.moves[0] = { ...rules.moves[0]!, pattern: 'melee', levels: Array.from({ length: 8 }, () => lv), effects: [{ trigger: 'cast', spikes: { sizeMultiplier: 0.5, powerMultiplier: 1, count: 4, length: 200, durationSeconds: 1, hitIntervalSeconds: 0.3, lengthPerLevel: 30, randomAngles, lengthJitter: 0 } }] };
+      const sim = new Simulation({ tickRate: 30, seed: 3, rules });
+      sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, moves: [{ move: 0, level }] });
+      sim.step([]);
+      const pr = sim.world.projectiles;
+      return Array.from({ length: pr.count }, (_, i) => i).filter((i) => pr.stage[i] === 1).map((i) => ({ len: pr.length[i]!, a: Math.atan2(pr.dirY[i]!, pr.dirX[i]!) }));
+    };
+    expect(spikesAt(1, false)[0]!.len).toBeCloseTo(200);
+    expect(spikesAt(8, false)[0]!.len).toBeCloseTo(410);
+    // ばらばらの向き: 十字（90° ごと）からずれる
+    const angles = spikesAt(1, true).map((s) => s.a);
+    expect(angles.some((a) => Math.abs(((a / (Math.PI / 2)) % 1 + 1) % 1) > 0.05 && Math.abs(((a / (Math.PI / 2)) % 1 + 1) % 1) < 0.95)).toBe(true);
   });
 });

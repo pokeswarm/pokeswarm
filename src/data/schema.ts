@@ -715,7 +715,19 @@ export const moveEffectSchema = z.object({
     .optional(),
   /** 突き出す: その場から count 方向へ、しばらく残る直線 */
   spikes: z
-    .object({ ...fxSize, count: z.number().int().positive(), length: z.number().positive(), durationSeconds: z.number().positive(), hitIntervalSeconds: z.number().positive() })
+    .object({
+      ...fxSize,
+      count: z.number().int().positive(),
+      length: z.number().positive(),
+      durationSeconds: z.number().positive(),
+      hitIntervalSeconds: z.number().positive(),
+      /** レベルが1上がるごとに伸ばす長さ（ハードプラント: 強化で根が遠くまで伸びる。作者の決定 2026年10月23日） */
+      lengthPerLevel: z.number().nonnegative().default(0),
+      /** 向きをばらばらにする（等しい角度に並べず、その場ごとにランダム。ハードプラントの根） */
+      randomAngles: z.boolean().default(false),
+      /** 長さのばらつき（0〜1。1本ごとに 1 − この割合 〜 1 倍） */
+      lengthJitter: z.number().min(0).max(1).default(0),
+    })
     .optional(),
   /** 波: その場から radius まで広がる輪 */
   wave: z.object({ powerMultiplier: z.number().nonnegative(), radius: z.number().positive(), durationSeconds: z.number().positive() }).optional(),

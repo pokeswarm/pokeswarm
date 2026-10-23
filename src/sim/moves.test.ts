@@ -160,17 +160,19 @@ describe('技の出し方（区切り2で追加）', () => {
     expect(damageTaken(sim, 1)).toBe(10);
   });
 
-  it('nova の押し出し（push）: 当たった敵が、輪の縁と一緒に外へ運ばれる', () => {
-    const stats = { cooldownSeconds: 100, size: 10, range: 310, durationSeconds: 0.5, pierce: Infinity, knockback: 0 };
-    const startX = (push: boolean): number => {
-      const sim = simWith({ ...testMove('n', 'nova', stats), push });
-      const p = sim.world.players[0]!;
-      sim.world.enemies.add(1, 0, p.x + 60, p.y, 1000, 0, 10);
-      for (let t = 0; t < 20; t++) sim.step([]);
-      return sim.world.enemies.x[0]! - p.x;
-    };
-    expect(startX(false)).toBeCloseTo(60);
-    expect(startX(true)).toBeGreaterThan(250);
+  it('nova の外へ進む帯（sweep）: 帯が通り過ぎた内側には当たらない', () => {
+    const def = { ...testMove('n', 'nova', { cooldownSeconds: 100, size: 10, range: 300, durationSeconds: 0.5, pierce: Infinity, knockback: 0 }), sweep: 0.2 };
+    const sim = simWith(def);
+    const p = sim.world.players[0]!;
+    sim.world.enemies.add(1, 0, p.x + 200, p.y, 100, 0, 10);
+    sim.step([]);
+    expect(damageTaken(sim, 1)).toBe(0);
+    for (let t = 0; t < 10; t++) sim.step([]);
+    expect(damageTaken(sim, 1)).toBe(10);
+    // 帯が外へ進んだ後で、真ん中の近くに来た敵には当たらない
+    sim.world.enemies.add(2, 0, p.x + 40, p.y, 100, 0, 10);
+    for (let t = 0; t < 10; t++) sim.step([]);
+    expect(damageTaken(sim, 2)).toBe(0);
   });
 
   it('ground: 敵の位置に残り、当たり直しの間隔ごとに当たる', () => {

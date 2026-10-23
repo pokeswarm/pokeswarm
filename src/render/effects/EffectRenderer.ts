@@ -136,6 +136,8 @@ export class EffectRenderer {
     sectorOf: (index: number) => { dirX: number; dirY: number; half: number } | null = () => null,
     /** 描かないもの（出番を待っている爆炎の柱など） */
     hidden: (index: number) => boolean = () => false,
+    /** 外へ進む攻撃の帯（中が空いている）なら true。真ん中に芯を描かない */
+    hollow: (index: number) => boolean = () => false,
   ): void {
     // 軌跡のパーティクルを出す数は、レシピごとの間隔で決める
     const trailCounts = new Map<string, number>();
@@ -178,7 +180,7 @@ export class EffectRenderer {
         }
       }
       // 範囲そのもの（光の色）は HitShapes が平らに塗る。ここでは発射体の芯だけを、当たり判定の内側に小さく描く。扇形は芯を出さない
-      if (!body || sector) continue;
+      if (!body || sector || hollow(i)) continue;
       const pulse = body.pulse ? 1 + Math.sin((timeMs / body.pulse.periodMs) * Math.PI * 2) * body.pulse.amount : 1;
       let core = this.cores[used];
       if (!core) {

@@ -12,6 +12,8 @@ interface HitShape {
   half: number | null;
   /** 扇形（近接）なら true。弧の近くの帯だけを描く（360° なら輪） */
   sector: boolean;
+  /** 外へ進む攻撃の帯の厚さ（0 なら無し）。あれば、その帯だけを描く（当たり判定と同じ） */
+  band: number;
 }
 
 /**
@@ -50,6 +52,7 @@ export class HitShapes {
     lineOf: (index: number) => { length: number; dirX: number; dirY: number } | null,
     view: { left: number; top: number; right: number; bottom: number },
     sectorOf: (index: number) => { dirX: number; dirY: number; half: number } | null = () => null,
+    bandOf: (index: number) => number = () => 0,
   ): void {
     const g = this.g;
     g.clear();
@@ -70,6 +73,7 @@ export class HitShapes {
         half: sector && sector.half < Math.PI ? sector.half : null,
         // 細い扇形（細長い炎）は帯にせず全体を塗る
         sector: sector !== null && !(sector.half * 2 < (this.cfg.sectorFullBelowDegrees * Math.PI) / 180),
+        band: bandOf(i),
       };
       const reach = s.radius + s.length;
       if (x + reach < view.left || x - reach > view.right || y + reach < view.top || y - reach > view.bottom) continue;
@@ -84,9 +88,9 @@ export class HitShapes {
     const g = this.g;
     const base = Math.atan2(s.dirY, s.dirX);
     g.beginPath();
-    if (s.sector) {
+    if (s.sector || (s.band > 0 && s.length <= 0)) {
       // 近接の扇形は、弧の近くの帯（バームクーヘン型）だけ。当たり判定は扇形全体のまま（作者の指摘: 扇形の塗りが目にうるさい）
-      const inner = s.radius * (1 - this.cfg.sectorBand);
+      const inner = s.band > 0 ? Math.max(0, s.radius - s.band) : s.radius * (1 - this.cfg.sectorBand);
       const a0 = s.half !== null ? base - s.half : 0;
       const a1 = s.half !== null ? base + s.half : Math.PI * 2;
       // 外の弧を行き、内の弧を戻る（点を並べて道筋にする）

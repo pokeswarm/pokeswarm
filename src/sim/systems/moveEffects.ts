@@ -9,6 +9,7 @@ import {
   type ProjectileSpawn,
 } from '../entities/projectiles';
 import { hash01 } from '../math';
+import { reachBand } from './attack';
 import { rayLengthToObstacle } from '../obstacles';
 import type { World } from '../world';
 
@@ -174,12 +175,15 @@ function applyEffect(world: World, fx: MoveEffect, index: number, src: FxSource)
   }
   if (fx.wave) {
     const wv = fx.wave;
+    const waveBand = reachBand(world, src.move, wv.radius);
     spawn(world, src, {
       // 持ち主の位置から出す波は持ち主に付いていく（ox・oy は 0）。それ以外はその場で広がる
       motion: src.length === 0 && world.players.some((p) => p.id === src.owner && p.x === src.x && p.y === src.y) ? MOTION_FOLLOW : MOTION_LINEAR,
       damage: src.damage * wv.powerMultiplier,
-      radius: src.size,
-      growth: Math.max(0, (wv.radius - src.size) / wv.durationSeconds),
+      // 外へ進む技（じしん）の波は、中が空いた帯として広がる
+      radius: waveBand > 0 ? waveBand : src.size,
+      band: waveBand,
+      growth: Math.max(0, (wv.radius - (waveBand > 0 ? waveBand : src.size)) / wv.durationSeconds),
       life: wv.durationSeconds,
     });
   }

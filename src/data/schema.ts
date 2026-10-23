@@ -716,8 +716,11 @@ export const moveDefSchema = z.object({
   effects: z.array(moveEffectSchema).optional(),
   /** 飛ぶ弾が曲がる速さ（度/秒）。十字・向いている方向の弾が渦を巻くように回る（ふぶき・エアスラッシュ） */
   curve: z.number().optional(),
-  /** 広がる輪（nova）で、当たった敵を輪の外側へ押し出し、輪が広がりきるまで縁と一緒に運ぶ（のしかかり・じしん） */
-  push: z.boolean().optional(),
+  /**
+   * 外へ進む攻撃（たいあたり・のしかかり・じしん）: 当たり判定を、中心から外へ進む帯にする（内側は当たらない）。
+   * 値は帯の厚さで、届く距離いっぱいに対する割合。近接（扇形・自分の周り）と広がる輪（nova）で使う
+   */
+  sweep: z.number().gt(0).max(1).optional(),
 });
 export type MoveDefData = z.infer<typeof moveDefSchema>;
 

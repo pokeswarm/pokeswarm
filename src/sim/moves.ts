@@ -51,8 +51,8 @@ export interface SimMoveDef {
   readonly effects: readonly MoveEffect[];
   /** 飛ぶ弾が曲がる速さ（ラジアン/秒）。0 なら まっすぐ */
   readonly curve: number;
-  /** 広がる輪で、当たった敵を輪の縁と一緒に外へ運ぶ */
-  readonly push: boolean;
+  /** 外へ進む帯の厚さ（届く距離に対する割合）。0 なら中まで全部当たる */
+  readonly sweep: number;
 }
 
 /** 最小値で止める項目（足し続けても壊れないように） */

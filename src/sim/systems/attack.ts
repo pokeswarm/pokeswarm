@@ -278,9 +278,13 @@ function fireMelee(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     const sc = scaledMoveStats(world, p, pm, st);
     const half = Math.min(Math.PI, (st.arcDegrees * Math.PI) / 360);
     const n = half >= Math.PI ? 1 : Math.min(st.count, 2);
+    // 外へ進む攻撃: 厚さ band の帯が、中心から届く距離まで持続の間に進む
+    const reach = st.range + sc.size;
+    const band = reachBand(world, pm.move, reach);
+    const growth = band > 0 ? (reach - band) / st.durationSeconds : 0;
     for (let k = 0; k < n; k++) {
       const s = k === 0 ? 1 : -1;
-      world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: st.range + sc.size, shape: SHAPE_SECTOR, length: half, dirX: fx * s, dirY: fy * s, vx: fx * s, vy: fy * s });
+      world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: band > 0 ? band : reach, band, growth, shape: SHAPE_SECTOR, length: half, dirX: fx * s, dirY: fy * s, vx: fx * s, vy: fy * s });
     }
     return;
   }
@@ -621,10 +625,19 @@ function fireSpin(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
 /** nova: 自分を中心に、大きさ size から range まで広がる輪 */
 function fireNova(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const sc = scaledMoveStats(world, p, pm, st);
-  const growth = Math.max(0, (st.range - sc.size) / st.durationSeconds);
+  // 外へ進む攻撃なら、中が空いた帯（厚さ band）として広がる
+  const band = reachBand(world, pm.move, st.range);
+  const start = band > 0 ? band : sc.size;
+  const growth = Math.max(0, (st.range - start) / st.durationSeconds);
   for (let k = 0; k < st.count; k++) {
-    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, growth, life: st.durationSeconds * (1 + k * 0.6) });
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: start, band, growth, life: st.durationSeconds * (1 + k * 0.6) });
   }
+}
+
+/** 外へ進む攻撃（sweep）の帯の厚さ。届く距離 reach に対する割合から。外へ進まない技は 0 */
+export function reachBand(world: World, move: number, reach: number): number {
+  const sweep = world.rules.moves[move]?.sweep ?? 0;
+  return sweep > 0 ? Math.max(1, reach * sweep) : 0;
 }
 
 /** 扇の中心から (dx, dy) にある半径 r の敵が、向き (fx, fy)・片側の開き half の扇の角度に入るか（距離は別に確かめる） */
@@ -758,6 +771,9 @@ export function moveProjectiles(world: World): void {
         ? segmentDistance2(e.x[j]!, e.y[j]!, x, y, pr.dirX[i]!, pr.dirY[i]!, len)
         : (e.x[j]! - x) * (e.x[j]! - x) + (e.y[j]! - y) * (e.y[j]! - y);
       if (d2 > r * r) continue;
+      // 外へ進む帯: 帯より内側にいる敵には当たらない（もう通り過ぎた）
+      const inner = pr.band[i]! > 0 ? pr.radius[i]! - pr.band[i]! - e.radius[j]! : 0;
+      if (inner > 0 && d2 < inner * inner) continue;
       if (pr.shape[i] === SHAPE_SECTOR && !inSector(e.x[j]! - x, e.y[j]! - y, e.radius[j]!, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!)) continue;
       hitScratch[hits++] = j;
     }
@@ -796,13 +812,7 @@ export function moveProjectiles(world: World): void {
       const kx = line ? pr.dirX[i]! : e.x[j]! - x || pr.vx[i]!;
       const ky = line ? pr.dirY[i]! : e.y[j]! - y || pr.vy[i]!;
       // 効果（ノックバック・状態異常）は当てたプレイヤーの画面ですぐ付け、相手へは命中と一緒に送る
-      // 押し出す輪: 輪が広がる速さで、輪が消えるまで外へ運ぶ（縁に押されて動いていくように）
-      const pushing = def.push && pr.growth[i]! > 0 && pr.life[i]! > 0;
-      const rolled = rollHitEffect(world, st, kx, ky, pr.knockback[i]!);
-      const len = Math.sqrt(kx * kx + ky * ky) || 1;
-      const fx = pushing
-        ? { ...rolled, kbx: (kx / len) * pr.growth[i]!, kby: (ky / len) * pr.growth[i]!, kbTicks: Math.max(1, Math.round(pr.life[i]! / world.dt)) }
-        : rolled;
+      const fx = rollHitEffect(world, st, kx, ky, pr.knockback[i]!);
       applyHitEffect(world, j, fx, ownerId);
       const kind = world.rules.enemies.kinds[e.kind[j]!];
       // 急所（クリティカットなど・技ごとの急所）の判定は、当てたプレイヤーのブラウザの乱数で行う

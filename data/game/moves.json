@@ -544,6 +544,7 @@
     "tackle": {
       "pattern": "melee",
       "effect": "tackle",
+      "sweep": 0.45,
       "base": {
         "power": 25.6,
         "cooldownSeconds": 1.6,
@@ -552,7 +553,7 @@
         "speed": 400,
         "size": 40,
         "range": 20,
-        "durationSeconds": 0.14,
+        "durationSeconds": 0.2,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
         "knockback": 320,
@@ -1114,18 +1115,18 @@
       ]
     },
     "body-slam": {
-      "pattern": "nova",
+      "pattern": "melee",
       "effect": "body-slam",
-      "push": true,
+      "sweep": 0.45,
       "base": {
         "power": 62.7,
         "cooldownSeconds": 1.4,
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 400,
-        "size": 16,
-        "range": 72,
-        "durationSeconds": 0.25,
+        "size": 52,
+        "range": 20,
+        "durationSeconds": 0.24,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
         "knockback": 400,
@@ -1611,7 +1612,7 @@
     "magnitude": {
       "pattern": "nova",
       "effect": "magnitude",
-      "push": true,
+      "sweep": 0.3,
       "base": {
         "power": 12.1,
         "cooldownSeconds": 2.2,
@@ -1661,7 +1662,7 @@
     "earthquake": {
       "pattern": "nova",
       "effect": "earthquake",
-      "push": true,
+      "sweep": 0.3,
       "base": {
         "power": 39.3,
         "cooldownSeconds": 1.9,

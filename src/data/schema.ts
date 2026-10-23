@@ -730,6 +730,8 @@ export const moveDefSchema = z.object({
    * 値は帯の厚さで、届く距離いっぱいに対する割合。近接（扇形・自分の周り）と広がる輪（nova）で使う
    */
   sweep: z.number().gt(0).max(1).optional(),
+  /** 跳ね返る技（bounce）を出す向き: 向いている方向から何度ずらすか（まっすぐだと、向かいの壁との間で同じ線を往復するだけになる） */
+  bounceAngle: z.number().optional(),
 });
 export type MoveDefData = z.infer<typeof moveDefSchema>;
 
@@ -966,6 +968,11 @@ export const effectRecipeSchema = z.object({
   ownerGhost: z
     .object({ tint: colorString, alpha: z.number().min(0).max(1), afterimages: z.number().int().nonnegative(), spacingTicks: z.number().positive() })
     .optional(),
+  /**
+   * 効き方から出た円の範囲（10まんボルトの自分の周りの電気）を、色を切り替えて光らせる。
+   * colors を periodMs ごとに順に使い、塗りの濃さは alpha
+   */
+  burstFlash: z.object({ colors: z.array(colorString).min(1), periodMs: z.number().positive(), alpha: z.number().min(0).max(1) }).optional(),
   /** 発射体の軌跡に出すパーティクル */
   trail: particleSchema.extend({ intervalMs: z.number().positive() }).optional(),
   /** 命中時 */
@@ -1207,6 +1214,10 @@ const upgradeDefSchema = z.object({
   lines: z.array(z.string()).optional(),
   /** 持っているあいだ、技の威力に掛ける倍率（でんきだま 2） */
   powerMultiplier: z.number().positive().optional(),
+  /** 今の姿がこのどれかのときだけ持てる（でんきだま = 進化していないピカチュウ。PokeAPI のポケモンの名前） */
+  forms: z.array(z.string()).optional(),
+  /** 一緒に持てない持ち物（でんきだま と かみなりのいし: ライチュウに進化するか、ピカチュウのまま強くするかを選ぶ） */
+  excludes: z.array(z.string()).optional(),
 });
 
 /** 持ち物。キーは PokeAPI の持ち物の名前 */

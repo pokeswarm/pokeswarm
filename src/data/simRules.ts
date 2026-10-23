@@ -51,6 +51,7 @@ export function buildSimRules(): SimRules {
       effects: def.effects ?? [],
       curve: ((def.curve ?? 0) * Math.PI) / 180,
       sweep: def.sweep ?? 0,
+      bounceAngle: ((def.bounceAngle ?? 0) * Math.PI) / 180,
     };
   });
   const moveIndex = (key: string): number => moves.findIndex((m) => m.key === key);
@@ -67,6 +68,16 @@ export function buildSimRules(): SimRules {
       ...(d.powerMultiplier ? { powerMultiplier: d.powerMultiplier } : {}),
     }));
   const items = upgrades(itemsConfig.items);
+  // 今の姿だけ・一緒に持てない（番号に直す。持ち物の番号は上で決まる）
+  items.forEach((it, k) => {
+    const d = itemsConfig.items[it.key]!;
+    const speciesKeys = Object.keys(generated.pokemon);
+    items[k] = {
+      ...it,
+      ...(d.forms ? { forms: d.forms.map((f) => speciesKeys.indexOf(f)) } : {}),
+      ...(d.excludes ? { excludes: d.excludes.map((x) => items.findIndex((i) => i.key === x)) } : {}),
+    };
+  });
   const itemIndex = (key: string): number => items.findIndex((i) => i.key === key);
   const derivations = [
     ...derivationsConfig.derivations.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: null })),
@@ -78,7 +89,7 @@ export function buildSimRules(): SimRules {
   const species: SimSpecies[] = speciesKeys.map((key) => {
     const g = generated.pokemon[key]!;
     const evolutions: SimEvolution[] = [];
-    // 進化しない遊べるポケモン（ピカチュウ）
+    // 進化しない遊べるポケモン
     if (playablesConfig.pokemon[key]?.evolves === false) return { key, types: g.types.map(typeIndex), baseStats: g.baseStats, evolutions };
     for (const e of g.evolvesTo) {
       const to = speciesKeys.indexOf(e.to);

@@ -70,6 +70,7 @@ export function testRules(
     effects: [],
     curve: 0,
     sweep: 0,
+    bounceAngle: 0,
   };
   const leveling = {
     fallback: { healPct: 20, coins: 20 },
@@ -167,5 +168,5 @@ export function testRules(
 /** テスト用: 指定の出し方・性能の技を作る */
 export function testMove(key: string, pattern: SimMoveDef['pattern'], stats: Partial<MoveStats>, type = 0): SimMoveDef {
   return { key, pattern, type, damageClass: 'special', levels: [{ ...TEST_MOVE, ...stats }], effect: 'test', body: null,
-    eruption: null, effects: [], curve: 0, sweep: 0 };
+    eruption: null, effects: [], curve: 0, sweep: 0, bounceAngle: 0 };
 }

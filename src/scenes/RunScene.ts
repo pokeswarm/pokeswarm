@@ -3,7 +3,7 @@ import { achievementsConfig, effectRecipes, generated, groundConfig, iconConfig,
 import { buildSimRules, localName, mergeModifiers, permanentModifiers, playableLoadout } from '../data/simRules';
 import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
-import type { SpriteAnims } from '../data/schema';
+import type { EffectRecipe, SpriteAnims } from '../data/schema';
 import { getLocale, t, tMaybe } from '../i18n';
 import type { Room, RoomPlayer } from '../net/room';
 import { SyncSession } from '../net/sync';
@@ -31,7 +31,7 @@ import { SpriteStreamer } from '../render/sprites/SpriteStreamer';
 import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
 import { addSpriteGallery } from '../render/sprites/SpriteGallery';
 import type { Axis, InputCommand, PlayerId } from '../sim/commands';
-import { SHAPE_LINE, SHAPE_SECTOR } from '../sim/entities/projectiles';
+import { SHAPE_CIRCLE, SHAPE_LINE, SHAPE_SECTOR } from '../sim/entities/projectiles';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World } from '../sim/world';
@@ -84,6 +84,8 @@ export class RunScene extends Phaser.Scene {
   private ghostImages: Phaser.GameObjects.Image[] = [];
   /** 通った道を残る範囲にする技（芯を描かない） */
   private pathMoves = new Set<number>();
+  /** 効き方から出た円を光らせる技（10まんボルト）。技の番号 → 色の切り替え */
+  private flashMoves = new Map<number, NonNullable<EffectRecipe['burstFlash']>>();
   private enemyView!: PooledCircles;
   private gemView!: PooledSprites;
   /** 敵をスプライトで描く（読み込み済みの種類だけ。まだの種類は円で描く） */
@@ -196,6 +198,7 @@ export class RunScene extends Phaser.Scene {
     if (this.playerSprite) registerPokemonAnimations(this, this.playerSprite);
     const rules = applyDebugOverrides(buildSimRules(), window.location.search);
     this.pathMoves = new Set(rules.moves.flatMap((m, k) => (m.effects.some((fx) => fx.puddle?.path) ? [k] : [])));
+    this.flashMoves = new Map(rules.moves.flatMap((m, k) => { const f = effectRecipes[m.effect]?.burstFlash; return f ? [[k, f] as const] : []; }));
     // 技は確認用に URL で指定できる（?moves=ember:8,fire-spin:3）。協力プレイでは参加用 URL に引き継ぐので2人とも同じになる
     const role: SimRole = this.coop?.room.role ?? 'solo';
     this.localId = this.coop?.room.localId ?? HOST_PLAYER_ID;
@@ -694,6 +697,28 @@ export class RunScene extends Phaser.Scene {
     }
   }
 
+  /** 効き方から出た円で、色を切り替えて光らせるもの（10まんボルトの自分の周り） */
+  private flashing(i: number, pr: World['projectiles']): boolean {
+    return pr.stage[i] === 1 && pr.shape[i] === SHAPE_CIRCLE && this.flashMoves.has(pr.move[i]!);
+  }
+
+  /**
+   * 範囲の塗りの色。通った道に残る範囲は、残り時間に合わせて薄くして消していく。
+   * 光らせる円は、決まった色を順に切り替える
+   */
+  private shapeColorOf(pr: World['projectiles'], i: number, timeMs: number): { color: number; alpha: number } | null {
+    if (pr.stage[i] === 3) return null;
+    const base = this.shapeColors[pr.move[i]!] ?? null;
+    if (this.flashing(i, pr)) {
+      const f = this.flashMoves.get(pr.move[i]!)!;
+      return { color: hexColor(f.colors[Math.floor(timeMs / f.periodMs) % f.colors.length]!), alpha: f.alpha };
+    }
+    if (base && pr.stage[i] === 1 && pr.shape[i] === SHAPE_LINE && this.pathMoves.has(pr.move[i]!) && pr.maxLife[i]! > 0) {
+      return { color: base.color, alpha: base.alpha * Math.min(1, pr.life[i]! / pr.maxLife[i]!) };
+    }
+    return base;
+  }
+
   /** 持ち主の残像として飛ぶ技（ゴッドバード）: 発射体の位置に、持ち主のポケモンの姿を薄く描き、後ろに残像を連ねる */
   private drawGhosts(world: World, alpha: number): void {
     const pr = world.projectiles;
@@ -1121,13 +1146,13 @@ export class RunScene extends Phaser.Scene {
       // 出番を待っている当たり判定（爆炎の柱）は、現れるまで描かない
       (i) => pr.stage[i] === 3,
       // 外へ進む帯と、通った道に残る範囲には芯を描かない（道が光の線に見えてしまう）
-      (i) => pr.band[i]! > 0 || (pr.stage[i] === 1 && pr.shape[i] === SHAPE_LINE && this.pathMoves.has(pr.move[i]!)),
+      (i) => pr.band[i]! > 0 || (pr.stage[i] === 1 && pr.shape[i] === SHAPE_LINE && this.pathMoves.has(pr.move[i]!)) || this.flashing(i, pr),
     );
     this.drawGhosts(world, alpha);
     this.hitShapes.draw(
       pr,
       alpha,
-      (i) => (pr.stage[i] === 3 ? null : (this.shapeColors[pr.move[i]!] ?? null)),
+      (i) => this.shapeColorOf(pr, i, timeMs),
       (i) => (pr.shape[i] === SHAPE_LINE ? { length: pr.length[i]!, dirX: pr.dirX[i]!, dirY: pr.dirY[i]! } : null),
       view,
       (i) => (pr.shape[i] === SHAPE_SECTOR ? { dirX: pr.dirX[i]!, dirY: pr.dirY[i]!, half: pr.length[i]! } : null),

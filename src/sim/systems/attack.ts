@@ -28,7 +28,7 @@ function heldPowerMultiplier(world: World, p: Player): number {
   let m = 1;
   for (const it of p.items) {
     const def = world.rules.items[it.item]!;
-    if (def.powerMultiplier && (!def.lines || def.lines.includes(p.line))) m *= def.powerMultiplier;
+    if (def.powerMultiplier && (!def.lines || def.lines.includes(p.line)) && (!def.forms || def.forms.includes(p.species))) m *= def.powerMultiplier;
   }
   return m;
 }
@@ -544,7 +544,8 @@ function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
 function fireBounce(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const speed = scaledMoveStats(world, p, pm, st).speed;
   for (let k = 0; k < st.count; k++) {
-    const a = world.rng.next() * Math.PI * 2;
+    const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+    const a = Math.atan2(fy, fx) + world.rules.moves[pm.move]!.bounceAngle + (k / st.count) * Math.PI * 2;
     world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_BOUNCE, x: p.x, y: p.y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, ox: st.range, oy: st.range * 0.56 });
   }
 }
@@ -747,8 +748,8 @@ export function moveProjectiles(world: World): void {
     // 遅れて弾ける印は当たらない
     if (pr.stage[i] === 2) continue;
     tickEveryEffects(world, i);
-    // 障害物は技も遮る（飛んでいく技は当たると消える）
-    if ((motion === MOTION_HOMING || motion === MOTION_BOOMERANG || motion === MOTION_LOB || motion === MOTION_BOUNCE || (motion === MOTION_LINEAR && (pr.vx[i] !== 0 || pr.vy[i] !== 0))) && insideObstacle(world, pr.x[i]!, pr.y[i]!)) {
+    // 障害物は技も遮る（飛んでいく技は当たると消える）。跳ね返る技（ボルテッカー）は枠の端で跳ね返り続けるので、障害物は通り抜ける
+    if ((motion === MOTION_HOMING || motion === MOTION_BOOMERANG || motion === MOTION_LOB || (motion === MOTION_LINEAR && (pr.vx[i] !== 0 || pr.vy[i] !== 0))) && insideObstacle(world, pr.x[i]!, pr.y[i]!)) {
       world.events.push({ type: 'projectileHit', x: pr.x[i]!, y: pr.y[i]!, owner: pr.owner[i]!, move: pr.move[i]! });
       expire(world, i);
       continue;

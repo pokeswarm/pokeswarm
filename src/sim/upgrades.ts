@@ -38,6 +38,10 @@ export interface SimUpgradeDef {
   readonly lines?: readonly string[];
   /** 持っているあいだ、技の威力に掛ける倍率 */
   readonly powerMultiplier?: number;
+  /** 今の姿がこのどれかのときだけ持てる（種類の番号） */
+  readonly forms?: readonly number[];
+  /** 一緒に持てない持ち物（持ち物の番号） */
+  readonly excludes?: readonly number[];
 }
 
 export interface SimDerivation {

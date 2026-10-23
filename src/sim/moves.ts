@@ -53,6 +53,8 @@ export interface SimMoveDef {
   readonly curve: number;
   /** 外へ進む帯の厚さ（届く距離に対する割合）。0 なら中まで全部当たる */
   readonly sweep: number;
+  /** 跳ね返る技を出す向きのずれ（ラジアン） */
+  readonly bounceAngle: number;
 }
 
 /** 最小値で止める項目（足し続けても壊れないように） */

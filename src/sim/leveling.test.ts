@@ -269,6 +269,27 @@ describe('でんきだまとボルテッカー（ピカチュウ）', () => {
     expect(seen('charmander')).toBe(false);
   });
 
+  it('でんきだまとかみなりのいしは片方だけ。でんきだまは進化していない姿だけ', () => {
+    const r = pikachuRules();
+    r.items = [r.items[0]!, { ...r.items[1]!, forms: [0], excludes: [2] }, upgrade('thunder-stone', 1, true, {}, 'evolution')];
+    const offered = (held: number[], species = 0): Set<number> => {
+      const sim = new Simulation({ tickRate: 30, seed: 5, rules: r });
+      const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100, types: [FIRE], moves: [], line: 'pikachu' });
+      p.species = species;
+      p.items = held.map((item) => ({ item, level: 1 }));
+      const seen = new Set<number>();
+      for (let k = 0; k < 60; k++) for (const o of makeOffers(sim.world, p)) if (o.kind === 'itemNew') seen.add(o.item);
+      return seen;
+    };
+    expect(offered([]).has(1)).toBe(true);
+    expect(offered([]).has(2)).toBe(true);
+    // でんきだまを持っていれば、かみなりのいしは出ない（その逆も）
+    expect(offered([1]).has(2)).toBe(false);
+    expect(offered([2]).has(1)).toBe(false);
+    // 進化した後（別の姿）には、でんきだまは出ない
+    expect(offered([], 1).has(1)).toBe(false);
+  });
+
   it('レベル51になるまでは、条件がそろってもボルテッカーは出ない', () => {
     const sim = new Simulation({ tickRate: 30, seed: 5, rules: pikachuRules() });
     const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100, types: [FIRE], moves: [{ move: 1, level: 1 }], line: 'pikachu' });

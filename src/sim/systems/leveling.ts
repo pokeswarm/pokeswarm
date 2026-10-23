@@ -211,6 +211,9 @@ function itemFitsPlayer(world: World, p: Player, item: number): boolean {
   // まだ解放していない持ち物は出さない（実績で解放する。作者の決定 07 24章）
   if (p.unlockedItems && !p.unlockedItems.has(item)) return false;
   if (def.lines && !def.lines.includes(p.line)) return false;
+  if (def.forms && !def.forms.includes(p.species)) return false;
+  // 一緒に持てない持ち物（でんきだま と かみなりのいし）は、どちらか片方だけ
+  if (p.items.some((it) => def.excludes?.includes(it.item) || world.rules.items[it.item]?.excludes?.includes(item))) return false;
   if (def.category !== 'type') return true;
   const normal = world.rules.types.names.indexOf('normal');
   const types: number[] = [];

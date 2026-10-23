@@ -975,6 +975,15 @@
       "projectile": {
         "glowScale": 2.8,
         "coreScale": 0.9
+      },
+      "burstFlash": {
+        "colors": [
+          "#ffeb3b",
+          "#212121",
+          "#ffffff"
+        ],
+        "periodMs": 60,
+        "alpha": 0.4
       }
     },
     "rock-throw": {
@@ -1070,6 +1079,12 @@
         "flash": {
           "radius": 60
         }
+      },
+      "ownerGhost": {
+        "tint": "#fff176",
+        "alpha": 0.8,
+        "afterimages": 4,
+        "spacingTicks": 1
       }
     },
     "explosion": {

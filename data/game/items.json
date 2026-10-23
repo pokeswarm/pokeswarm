@@ -33,6 +33,6 @@
     "leaf-stone": { "category": "evolution", "maxLevel": 1, "consumable": true, "perLevel": { "typeAreaPct": { "grass": 10 } } },
     "moon-stone": { "category": "evolution", "maxLevel": 1, "consumable": true, "perLevel": { "typeAreaPct": { "normal": 10 } } },
     "linking-cord": { "category": "evolution", "maxLevel": 1, "consumable": true, "perLevel": {} },
-    "light-ball": { "category": "evolution", "maxLevel": 1, "perLevel": {}, "lines": ["pikachu"], "powerMultiplier": 2 }
+    "light-ball": { "category": "evolution", "maxLevel": 1, "perLevel": {}, "lines": ["pikachu"], "powerMultiplier": 2, "forms": ["pikachu"], "excludes": ["thunder-stone"] }
   }
 }

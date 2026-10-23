@@ -1482,6 +1482,15 @@
       ],
       "effects": [
         {
+          "trigger": "cast",
+          "puddle": {
+            "sizeMultiplier": 25,
+            "powerMultiplier": 0.5,
+            "durationSeconds": 0.4,
+            "hitIntervalSeconds": 0.2
+          }
+        },
+        {
           "trigger": "hit",
           "chance": 0.5,
           "chain": {
@@ -2148,21 +2157,22 @@
       ]
     },
     "volt-tackle": {
-      "pattern": "beam",
+      "pattern": "bounce",
       "effect": "volt-tackle",
+      "bounceAngle": 35,
       "base": {
-        "power": 234.1,
+        "power": 187.3,
         "cooldownSeconds": 2.6,
         "count": 1,
         "intervalSeconds": 0.1,
-        "speed": 400,
+        "speed": 1100,
         "size": 30,
-        "range": 700,
-        "durationSeconds": 0.35,
+        "range": 420,
+        "durationSeconds": 2.4,
         "pierce": "infinite",
-        "hitIntervalSeconds": 0.2,
-        "knockback": 400,
-        "knockbackSeconds": 0.12,
+        "hitIntervalSeconds": 0.25,
+        "knockback": 200,
+        "knockbackSeconds": 0.1,
         "statusChance": 0.6,
         "statusSeconds": 2,
         "spreadDegrees": 0,
@@ -2171,29 +2181,29 @@
       },
       "levels": [
         {
-          "power": 39.2
+          "power": 31.4
         },
         {
           "size": 4,
-          "power": 22.2
+          "power": 17.8
         },
         {
-          "power": 37.1
+          "power": 29.7
         },
         {
           "cooldownSeconds": -0.3,
-          "power": -5.6
+          "power": -4.5
         },
         {
           "size": 6,
-          "power": 7.1
+          "power": 5.7
         },
         {
-          "power": 30.5
+          "power": 24.4
         },
         {
           "cooldownSeconds": -0.3,
-          "power": -21
+          "power": -16.8
         }
       ],
       "body": {
@@ -2202,13 +2212,14 @@
       },
       "effects": [
         {
-          "trigger": "end",
+          "trigger": "every",
+          "everySeconds": 0.03,
           "puddle": {
-            "sizeMultiplier": 0.7,
-            "powerMultiplier": 0.3,
-            "durationSeconds": 2,
+            "sizeMultiplier": 0.8,
+            "powerMultiplier": 0.15,
+            "durationSeconds": 1.2,
             "hitIntervalSeconds": 0.4,
-            "alongSpacing": 50
+            "path": true
           }
         }
       ]

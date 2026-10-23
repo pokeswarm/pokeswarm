@@ -4,6 +4,8 @@ import { t } from '../i18n';
 import { compactScreen, windowCss } from '../render/pixelUi';
 import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
 import { isPokemonUnlocked, PokemonPicker } from './pokemonPicker';
+import { LoadoutOptionsPanel } from './loadoutOptionsPanel';
+import { shinySpriteKey } from '../meta/loadoutOptions';
 import type { RunSceneData } from './RunScene';
 import type { RegionSceneData } from './RegionScene';
 
@@ -32,13 +34,18 @@ export class SelectScene extends Phaser.Scene {
     if (compact) root.style.cssText += ';padding:6px 12px;gap:4px;max-height:100vh';
     let starting = false;
     let selected: string | null = null;
+    // 最初の持ち物・色違い（そのポケモンでクリアした・色違いを解放したときだけ出る）
+    const options = new LoadoutOptionsPanel(() => undefined);
     const start = (key: string): void => {
       if (starting) return;
       starting = true;
       // 選んだポケモンのスプライトを読んでから始める（取得していなければ仮の円）
-      void loadPokemonAtRuntime(this, playablesConfig.pokemon[key]!.sprite).then((loaded) => {
+      options.setPokemon(key);
+      const { startItem, shiny } = options.options;
+      const sprite = playablesConfig.pokemon[key]!.sprite;
+      void loadPokemonAtRuntime(this, shiny ? shinySpriteKey(sprite) : sprite).then((loaded) => {
         if (!this.sys.isActive()) return;
-        const data: RunSceneData = { pokemon: key, playerSprite: loaded?.manifest ?? null, coop: null };
+        const data: RunSceneData = { pokemon: key, playerSprite: loaded?.manifest ?? null, coop: null, startItem, shiny };
         this.scene.start('run', data);
       });
     };
@@ -47,6 +54,7 @@ export class SelectScene extends Phaser.Scene {
       playables: region.playables,
       onSelect: (key) => {
         selected = key;
+        options.setPokemon(key);
         go.disabled = false;
         go.style.opacity = '1';
       },
@@ -73,12 +81,13 @@ export class SelectScene extends Phaser.Scene {
     backButton.textContent = t('select.back');
     backButton.onclick = back;
     row.append(go, backButton);
-    root.append(title, hint, picker.element, row);
+    root.append(title, hint, picker.element, options.element, row);
     // 最初は一覧の先頭の解放済みのポケモンを選んでおく（Enter ですぐ始められる）
     const first = region.playables.find(isPokemonUnlocked);
     if (first) {
       picker.setSelected(first);
       selected = first;
+      options.setPokemon(first);
       go.disabled = false;
       go.style.opacity = '1';
     }

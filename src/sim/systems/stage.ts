@@ -462,7 +462,9 @@ function startLegendaryOrClear(world: World): void {
     endRun(world, 'clear');
     return;
   }
-  const id = cfg.kinds[world.rng.int(cfg.kinds.length)]!;
+  // 条件つきの候補（色違いの御三家）も同じ重みで選ぶ
+  const pool = [...cfg.kinds, ...world.legendaryExtras];
+  const id = pool[world.rng.int(pool.length)]!;
   const kind = world.rules.enemies.kinds.findIndex((k) => k.id === id);
   if (kind === -1) {
     endRun(world, 'clear');

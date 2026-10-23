@@ -306,6 +306,52 @@
         "damagePerSecond": 20,
         "color": "#ff7043"
       }
+    },
+    {
+      "id": "shiny-blast-burn",
+      "move": "blast-burn",
+      "effect": "blast-burn",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.9,
+      "radius": 95,
+      "damage": 42,
+      "count": 5,
+      "spread": 230,
+      "stagger": 0.12,
+      "leaves": {
+        "seconds": 3,
+        "slowPct": 0,
+        "damagePerSecond": 20,
+        "color": "#ff7043"
+      }
+    },
+    {
+      "id": "shiny-frenzy-plant",
+      "move": "frenzy-plant",
+      "effect": "frenzy-plant",
+      "shape": "ring",
+      "target": "self",
+      "telegraphSeconds": 0.9,
+      "radius": 140,
+      "damage": 40,
+      "rings": {
+        "count": 3,
+        "step": 120,
+        "width": 60
+      },
+      "stagger": 0.3
+    },
+    {
+      "id": "shiny-hydro-cannon",
+      "move": "hydro-cannon",
+      "effect": "hydro-cannon",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 1,
+      "radius": 42,
+      "length": 1000,
+      "damage": 48
     }
   ],
   "legendary": {
@@ -373,6 +419,33 @@
           "legend-nova"
         ],
         "random": false
+      },
+      "shiny-charizard": {
+        "moves": [
+          "shiny-blast-burn",
+          "moltres-flamedash",
+          "shiny-blast-burn",
+          "legend-nova"
+        ],
+        "random": false
+      },
+      "shiny-venusaur": {
+        "moves": [
+          "shiny-frenzy-plant",
+          "earthquake",
+          "shiny-frenzy-plant",
+          "legend-beam"
+        ],
+        "random": false
+      },
+      "shiny-blastoise": {
+        "moves": [
+          "shiny-hydro-cannon",
+          "legend-dash",
+          "shiny-hydro-cannon",
+          "legend-nova"
+        ],
+        "random": false
       }
     },
     "moveIntervalSeconds": 1.6,
@@ -382,7 +455,21 @@
       "hpRatio": 0.5,
       "moveIntervalSeconds": 1.1,
       "doubleChance": 0.35
-    }
+    },
+    "extraKinds": [
+      {
+        "kind": "shiny-charizard",
+        "achievement": "clear-charmander"
+      },
+      {
+        "kind": "shiny-venusaur",
+        "achievement": "clear-bulbasaur"
+      },
+      {
+        "kind": "shiny-blastoise",
+        "achievement": "clear-squirtle"
+      }
+    ]
   },
   "swarms": [
     {

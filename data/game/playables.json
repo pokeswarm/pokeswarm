@@ -8,7 +8,7 @@
     "pikachu": { "sprite": "pikachu", "startingMoves": ["spark"], "unlock": "raichu" },
     "oddish": { "sprite": "oddish", "startingMoves": ["vine-whip"], "unlock": "vileplume" },
     "koffing": { "sprite": "koffing", "startingMoves": ["smog"], "unlock": "weezing" },
-    "abra": { "sprite": "abra", "startingMoves": ["confusion"], "unlock": "alakazam" },
+    "abra": { "sprite": "abra", "startingMoves": ["confusion"] },
     "growlithe": { "sprite": "growlithe", "startingMoves": ["fire-fang"], "unlock": "arcanine" },
     "rhyhorn": { "sprite": "rhyhorn", "startingMoves": ["magnitude"], "unlock": "rhydon" },
     "lapras": { "sprite": "lapras", "startingMoves": ["powder-snow"] },

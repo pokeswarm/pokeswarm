@@ -16,6 +16,18 @@ export function progressOf(stats: Readonly<Record<string, number>>, c: StatCondi
   return 'stat' in c ? { current: Math.min(stats[c.stat] ?? 0, c.atLeast), target: c.atLeast } : null;
 }
 
+/** 数え直す記録のもと: 遊べるポケモンのキーと、固有技（derivations.json の unique の先） */
+export interface DerivedStatSources {
+  readonly playables: readonly string[];
+  readonly uniqueMoves: readonly string[];
+}
+
+/** ほかの記録から数え直す記録（クリアしたポケモンの種類・出した固有技の種類）。前のセーブデータでも正しい数になる */
+export function refreshDerivedStats(stats: Record<string, number>, src: DerivedStatSources): void {
+  stats.distinctClears = src.playables.filter((k) => (stats[`clears.${k}`] ?? 0) > 0).length;
+  stats.uniqueKinds = src.uniqueMoves.filter((m) => (stats[`derived.${m}`] ?? 0) > 0).length;
+}
+
 export function isUnlocked(save: Readonly<SaveData>, unlocks: UnlocksConfig, pokemon: string): boolean {
   return unlocks.initial.includes(pokemon) || save.unlocked.includes(pokemon);
 }

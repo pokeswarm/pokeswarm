@@ -207,15 +207,24 @@ function isBaseMove(world: World, move: number): boolean {
  * （進化の石は、ほかのポケモンの固有技の隠れた材料にもなる）。でんきだま など系統の決まったものは、その系統だけ
  */
 function itemFitsPlayer(world: World, p: Player, item: number): boolean {
-  const def = world.rules.items[item]!;
+  return itemFits(world.rules, p, item);
+}
+
+/** 持ち物が候補に出るか（プレイヤーの形だけで判定する。ラン開始時の持ち物を選ぶ画面でも使う） */
+export function itemFits(
+  rules: World['rules'],
+  p: Pick<Player, 'unlockedItems' | 'line' | 'species' | 'items' | 'types' | 'moveTypes'>,
+  item: number,
+): boolean {
+  const def = rules.items[item]!;
   // まだ解放していない持ち物は出さない（実績で解放する。作者の決定 07 24章）
   if (p.unlockedItems && !p.unlockedItems.has(item)) return false;
   if (def.lines && !def.lines.includes(p.line)) return false;
   if (def.forms && !def.forms.includes(p.species)) return false;
   // 一緒に持てない持ち物（でんきだま と かみなりのいし）は、どちらか片方だけ
-  if (p.items.some((it) => def.excludes?.includes(it.item) || world.rules.items[it.item]?.excludes?.includes(item))) return false;
+  if (p.items.some((it) => def.excludes?.includes(it.item) || rules.items[it.item]?.excludes?.includes(item))) return false;
   if (def.category !== 'type') return true;
-  const normal = world.rules.types.names.indexOf('normal');
+  const normal = rules.types.names.indexOf('normal');
   const types: number[] = [];
   def.perLevel.typePowerPct.forEach((v, t) => v && types.push(t));
   return types.some((t) => t === normal || p.types.includes(t) || p.moveTypes.includes(t));

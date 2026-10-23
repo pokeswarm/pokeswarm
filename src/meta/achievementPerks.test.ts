@@ -6,16 +6,17 @@ import { testRules } from '../sim/testRules';
 import { emptyModifiers } from '../sim/upgrades';
 import { achievementPerks } from './achievementPerks';
 import { applyProgress } from './progress';
+import { startItemChoices } from './loadoutOptions';
 import { emptySave } from './saveData';
 
 /** 実績の報酬（作者の決定。07 23・24章） */
 describe('実績の報酬', () => {
-  it('最初はタイプのアイテムと基本のステータスだけ。派生の実績で進化の石が解放される', () => {
+  it('最初はタイプのアイテムと基本のステータスだけ。石で進化するポケモンの実績で進化の石が解放される', () => {
     const start = achievementPerks(achievementsConfig, []);
     expect(start.items.has('charcoal')).toBe(true);
     expect(start.items.has('fire-stone')).toBe(false);
     expect(start.items.has('lucky-egg')).toBe(false);
-    const after = achievementPerks(achievementsConfig, ['derive-flamethrower', 'first-clear']);
+    const after = achievementPerks(achievementsConfig, ['stone-fire', 'first-clear']);
     expect(after.items.has('fire-stone')).toBe(true);
     expect(after.items.has('lucky-egg')).toBe(true);
   });
@@ -46,5 +47,24 @@ describe('実績の報酬', () => {
     const wide = sim.addPlayer({ id: 2, x: 0, y: 0, radius: 12, moveSpeed: 0, moves: [], extraItemSlots: 1 });
     for (let i = 0; i < 6; i++) applyOffer(sim.world, wide, { kind: 'itemNew', item: i });
     expect(makeOffers(sim.world, wide).some((o) => o.kind === 'itemNew')).toBe(true);
+  });
+
+  it('色違いの御三家を倒すと、その系統を色違いで遊べる', () => {
+    const save = emptySave();
+    save.stats = { 'bossDefeated.charizard': 1 };
+    applyProgress(save, achievementsConfig, unlocksConfig);
+    expect(achievementPerks(achievementsConfig, save.achievements).shiny.has('charmander')).toBe(true);
+    expect(achievementPerks(achievementsConfig, save.achievements).shiny.has('squirtle')).toBe(false);
+  });
+
+  it('最初の持ち物の候補は、解放済みで、そのポケモンの候補に出るものだけ', () => {
+    const save = emptySave();
+    const fire = startItemChoices(save, 'charmander');
+    expect(fire).toContain('charcoal');
+    expect(fire).not.toContain('mystic-water');
+    expect(fire).not.toContain('fire-stone');
+    save.achievements = ['stone-thunder', 'pikachu-light-ball'];
+    expect(startItemChoices(save, 'pikachu')).toEqual(expect.arrayContaining(['thunder-stone', 'light-ball']));
+    expect(startItemChoices(save, 'charmander')).not.toContain('light-ball');
   });
 });

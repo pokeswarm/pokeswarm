@@ -1,0 +1,86 @@
+{
+  "key": "venusaur-shiny",
+  "dex": 3,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Idle": {
+      "source": "Idle",
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "durations": [
+        30,
+        16,
+        12,
+        16
+      ],
+      "frameKeyPrefix": "Idle"
+    },
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "durations": [
+        8,
+        16,
+        8,
+        16
+      ],
+      "frameKeyPrefix": "Walk"
+    },
+    "Attack": {
+      "source": "Attack",
+      "frameWidth": 72,
+      "frameHeight": 72,
+      "durations": [
+        4,
+        2,
+        4,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        4
+      ],
+      "frameKeyPrefix": "Attack"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    },
+    "Faint": {
+      "source": "Hurt",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    }
+  },
+  "missing": [
+    {
+      "animation": "Faint",
+      "usedInstead": "Hurt"
+    }
+  ]
+}

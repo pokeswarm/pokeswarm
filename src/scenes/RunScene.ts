@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { achievementsConfig, effectRecipes, moveSprites, generated, groundConfig, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig } from '../data';
+import { achievementsConfig, derivedStatSources, playablesConfig, effectRecipes, moveSprites, generated, groundConfig, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig } from '../data';
 import { buildSimRules, localName, mergeModifiers, permanentModifiers, playableLoadout } from '../data/simRules';
 import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
@@ -37,7 +37,8 @@ import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World } from '../sim/world';
 import { applyDebugOverrides, parseLevelParam, parseMovesParam, parseSectionParam, parseTimeParam } from './debugOverrides';
-import { addXp, applyOffer } from '../sim/systems/leveling';
+import { addXp, applyOffer, itemFits } from '../sim/systems/leveling';
+import { shinySpriteKey } from '../meta/loadoutOptions';
 import { achievementPerks } from '../meta/achievementPerks';
 import { addDiscovery } from '../meta/discoveries';
 import { achievementName, achievementRewardById } from '../meta/achievementText';
@@ -56,7 +57,7 @@ export interface CoopRun {
   room: Room;
   /** 参加者とポケモン（番号の順） */
   players: RoomPlayer[];
-  /** ポケモンごとのスプライト（待合室で読み込んだもの） */
+  /** スプライトのキー（色違いは <キー>-shiny）ごとのスプライト（待合室で読み込んだもの） */
   sprites: Map<string, SpriteAnims | null>;
 }
 
@@ -67,6 +68,9 @@ export interface RunSceneData {
   playerSprite: SpriteAnims | null;
   /** 協力プレイ。ソロなら null */
   coop: CoopRun | null;
+  /** ソロ: 最初に持っていく持ち物（無ければ null）と、色違いで遊ぶか。協力プレイでは players の各自の値を使う */
+  startItem?: string | null;
+  shiny?: boolean;
 }
 
 /**
@@ -133,6 +137,11 @@ export class RunScene extends Phaser.Scene {
   private simMs = 0;
   private playerSprite: SpriteAnims | null = null;
   private pokemon = '';
+  /** ソロの、最初の持ち物と色違い */
+  private startItem: string | null = null;
+  private shiny = false;
+  /** 色違いで遊んでいるプレイヤー（進化したときの見た目に使う） */
+  private shinyPlayers = new Set<PlayerId>();
   private coop: CoopRun | null = null;
   private panel: NetPanel | null = null;
   private sync: SyncSession | null = null;
@@ -196,6 +205,9 @@ export class RunScene extends Phaser.Scene {
     this.showDebug = new URLSearchParams(window.location.search).has('debug');
     this.playerSprite = data.playerSprite;
     this.pokemon = data.pokemon;
+    this.startItem = data.startItem ?? null;
+    this.shiny = !!data.shiny;
+    this.shinyPlayers = new Set();
     this.coop = data.coop;
     this.panel = null;
   }
@@ -223,13 +235,19 @@ export class RunScene extends Phaser.Scene {
       role,
       localPlayerId: this.localId,
     });
-    const roster: RoomPlayer[] = this.coop?.players ?? [{ id: HOST_PLAYER_ID, pokemon: this.pokemon, upgrades: session.store.current.upgrades, achievements: session.store.current.achievements }];
+    const roster: RoomPlayer[] = this.coop?.players ?? [
+      { id: HOST_PLAYER_ID, pokemon: this.pokemon, upgrades: session.store.current.upgrades, achievements: session.store.current.achievements, startItem: this.startItem, shiny: this.shiny },
+    ];
+    // 伝説戦の条件つきの候補（色違いの御三家）: 参加者のだれかが実績を達成していれば足す（どのブラウザでも同じ一覧）
+    for (const x of rules.stage.legendary?.extraKinds ?? []) {
+      if (roster.some((r) => r.achievements.includes(x.achievement))) this.sim.world.legendaryExtras.push(x.kind);
+    }
     // 実績の報酬（07 23・24章）: 各自の達成した実績から、解放した持ち物・特殊なバフを計算する。協力プレイの経験値は部屋の全員に
     const perksOf = new Map(roster.map((r) => [r.id, achievementPerks(achievementsConfig, r.achievements)]));
     const coopXpPct = role === 'solo' ? 0 : Math.max(0, ...[...perksOf.values()].map((x) => x.coopXpPct));
     // 確認用の ?moves= はソロのときだけ
     const debugMoves = this.coop ? null : parseMovesParam(rules, window.location.search);
-    for (const { id, pokemon, upgrades } of roster) {
+    for (const { id, pokemon, upgrades, startItem, shiny } of roster) {
       const loadout = playableLoadout(rules, pokemon);
       const perks = perksOf.get(id)!;
       // 最初の技のレベル（クリアの実績の報酬）
@@ -265,12 +283,12 @@ export class RunScene extends Phaser.Scene {
         extraItemSlots: perks.itemSlots,
         candyWeight: perks.candyWeight,
       });
-      // 伝説を倒した実績の報酬: 解放したステータスのアイテムを1つ持って始める（共有の乱数なので、どのブラウザでも同じ）
-      if (perks.startStatItem) {
-        const pool = rules.items.flatMap((it, i) => (it.category === 'stat' && p.unlockedItems?.has(i) ? [i] : []));
-        if (pool.length) applyOffer(this.sim.world, p, { kind: 'itemNew', item: pool[this.sim.world.rng.int(pool.length)]! });
-      }
-      const sprite = id === this.localId ? this.playerSprite : (this.coop?.sprites.get(pokemon) ?? null);
+      // 最初の持ち物（作者の決定 2026年10月24日: そのポケモンでクリアすると選べる）。候補に出ないもの（解放していない・タイプが合わない）は持たない
+      const start = startItem ? rules.items.findIndex((it) => it.key === startItem) : -1;
+      if (start >= 0 && itemFits(rules, p, start)) applyOffer(this.sim.world, p, { kind: 'itemNew', item: start });
+      if (shiny) this.shinyPlayers.add(id);
+      const spriteKey = playablesConfig.pokemon[pokemon]?.sprite ?? pokemon;
+      const sprite = id === this.localId ? this.playerSprite : (this.coop?.sprites.get(shiny ? shinySpriteKey(spriteKey) : spriteKey) ?? null);
       const view = new PlayerView(this, p, placeholderRender, spriteRender, sprite, true);
       // 自分をほかのプレイヤーより手前に
       view.container.setDepth(spriteRender.depths.players + (id === this.localId ? 0.1 : 0));
@@ -502,7 +520,7 @@ export class RunScene extends Phaser.Scene {
    * タブが裏に回ったら、ブラウザへの一時保存と Firestore への書き込みをしておく
    */
   private setupSaving(): void {
-    this.recorder = new RunRecorder(session.store, this.pokemon, shopConfig);
+    this.recorder = new RunRecorder(session.store, this.pokemon, shopConfig, derivedStatSources);
     const autosave = this.time.addEvent({
       delay: saveConfig.autosaveSeconds * 1000,
       loop: true,
@@ -535,7 +553,10 @@ export class RunScene extends Phaser.Scene {
 
   private enemyName(kind: number): string {
     const k = this.sim.world.rules.enemies.kinds[kind];
-    return k ? localName(generated.pokemon[k.species ?? k.id]?.names, getLocale(), k.id) : '';
+    if (!k) return '';
+    const name = localName(generated.pokemon[k.species ?? k.id]?.names, getLocale(), k.id);
+    // 色違い（色違いの御三家）は「色違いの〇〇」
+    return k.shiny ? t('run.shinyName', { name }) : name;
   }
 
   /** このランで新しく達成した実績・解放したポケモン（結果画面に出す） */
@@ -675,7 +696,7 @@ export class RunScene extends Phaser.Scene {
       if (ev.type === 'bossAppeared') {
         const kind = w.rules.enemies.kinds[ev.kind]!;
         this.bossId = ev.id;
-        const name = localName(generated.pokemon[kind.species ?? kind.id]?.names, getLocale(), kind.id);
+        const name = this.enemyName(ev.kind);
         this.announce(t(kind.rank === 'boss' ? 'run.bossAppeared' : 'run.midbossAppeared', { name }), kind.rank === 'boss' ? '#ff8a65' : '#ffe082');
       } else if (ev.type === 'itemCollected') {
         const it = ev;
@@ -1092,7 +1113,7 @@ export class RunScene extends Phaser.Scene {
     this.bossBar.fillStyle(hexColor(eb.border)).fillRect(Math.round(cx - barW / 2 - 2), by, Math.round(barW + 4), 12);
     this.bossBar.fillStyle(hexColor(eb.back)).fillRect(Math.round(cx - barW / 2), by + 2, Math.round(barW), 8);
     this.bossBar.fillStyle(kind.rank === 'boss' ? 0xf85838 : 0xf8c830).fillRect(Math.round(cx - barW / 2), by + 2, Math.round(barW * ratio), 8);
-    this.bossName.setText(localName(generated.pokemon[kind.species ?? kind.id]?.names, getLocale(), kind.id));
+    this.bossName.setText(this.enemyName(w.enemies.kind[i]!));
   }
 
   private runSteps(steps: number, visible: boolean): void {
@@ -1159,7 +1180,7 @@ export class RunScene extends Phaser.Scene {
     this.effects.playImpact('evolution', p.x, p.y);
     const key = this.sim.world.rules.species[species]?.key;
     if (!key) return;
-    void loadPokemonAtRuntime(this, key).then((loaded) => {
+    void loadPokemonAtRuntime(this, this.shinyPlayers.has(playerId) ? shinySpriteKey(key) : key).then((loaded) => {
       if (loaded) view.setSprite(loaded.manifest);
     });
   }

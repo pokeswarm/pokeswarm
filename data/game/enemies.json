@@ -582,6 +582,45 @@
       "spriteScale": 2.6
     },
     {
+      "id": "shiny-charizard",
+      "species": "charizard",
+      "rank": "legendary",
+      "sprite": "enemy/charizard-shiny",
+      "hp": 36000,
+      "moveSpeed": 165,
+      "radius": 40,
+      "contactDamage": 36,
+      "xp": 0,
+      "spriteScale": 2.6,
+      "shiny": true
+    },
+    {
+      "id": "shiny-venusaur",
+      "species": "venusaur",
+      "rank": "legendary",
+      "sprite": "enemy/venusaur-shiny",
+      "hp": 36000,
+      "moveSpeed": 130,
+      "radius": 40,
+      "contactDamage": 36,
+      "xp": 0,
+      "spriteScale": 2.6,
+      "shiny": true
+    },
+    {
+      "id": "shiny-blastoise",
+      "species": "blastoise",
+      "rank": "legendary",
+      "sprite": "enemy/blastoise-shiny",
+      "hp": 36000,
+      "moveSpeed": 140,
+      "radius": 40,
+      "contactDamage": 36,
+      "xp": 0,
+      "spriteScale": 2.6,
+      "shiny": true
+    },
+    {
       "id": "midboss-vileplume",
       "species": "vileplume",
       "rank": "midboss",

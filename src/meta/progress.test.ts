@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { AchievementsConfig, UnlocksConfig } from '../data/schema';
-import { applyProgress, isPlayableUnlocked, isUnlocked, meets, progressOf } from './progress';
+import { applyProgress, isPlayableUnlocked, isUnlocked, meets, progressOf, refreshDerivedStats } from './progress';
 import { emptySave } from './saveData';
 
 const achievements: AchievementsConfig = {
   initialPokemon: ['charmander'],
   initialItems: ['x-attack'],
+  startItem: { clears: 1 },
   achievements: [
     { id: 'a', hidden: false, condition: { stat: 'kills', atLeast: 10 } },
     { id: 'b', hidden: true, condition: { all: [{ stat: 'x', atLeast: 1 }, { stat: 'y', atLeast: 1 }] } },
@@ -36,5 +37,12 @@ describe('実績と解放', () => {
     save.unlocked.push('starmie');
     expect(isPlayableUnlocked(save, unlocks, 'staryu', 'starmie')).toBe(true);
     expect(isPlayableUnlocked(emptySave(), unlocks, 'staryu', 'starmie')).toBe(false);
+  });
+
+  it('クリアしたポケモンの種類・出した固有技の種類は、ほかの記録から数え直す', () => {
+    const stats: Record<string, number> = { 'clears.charmander': 2, 'clears.squirtle': 1, 'clears.solo': 3, 'derived.blast-burn': 1, 'derived.flamethrower': 4 };
+    refreshDerivedStats(stats, { playables: ['charmander', 'squirtle', 'bulbasaur'], uniqueMoves: ['blast-burn', 'hydro-cannon'] });
+    expect(stats.distinctClears).toBe(2);
+    expect(stats.uniqueKinds).toBe(1);
   });
 });

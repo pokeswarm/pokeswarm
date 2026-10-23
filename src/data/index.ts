@@ -128,6 +128,11 @@ export const unlocksConfig: UnlocksConfig = {
   initial: achievementsConfig.initialPokemon,
   unlocks: achievementsConfig.achievements.flatMap((a) => (a.reward?.pokemon ? [{ pokemon: a.reward.pokemon, condition: a.condition }] : [])),
 };
+/** 数え直す記録（クリアしたポケモンの種類・出した固有技の種類）のもと */
+export const derivedStatSources = {
+  playables: Object.keys(playablesConfig.pokemon),
+  uniqueMoves: [...new Set(derivationsConfig.unique.map((d) => d.to))],
+};
 export const shopConfig = load('game/shop.json', shopConfigSchema, shopJson);
 export const statusConfig = load('game/status.json', statusConfigSchema, statusJson);
 export const pickupConfig = load('game/pickups.json', pickupConfigSchema, pickupsJson);
@@ -231,8 +236,14 @@ if (stageConfig.legendary) {
     check(enemiesConfig.kinds.find((k) => k.id === id)?.rank === 'legendary', `data/game/stage.json の伝説 "${id}" が data/game/enemies.json に rank: "legendary" でありません`);
   }
   for (const id of stageConfig.legendary.moves) check(stageMoveIds.has(id), `data/game/stage.json の伝説の範囲技 "${id}" がありません`);
+  // 条件つきの候補（色違いの御三家）: 伝説の敵で、条件の実績があること
+  for (const x of stageConfig.legendary.extraKinds) {
+    check(enemiesConfig.kinds.find((k) => k.id === x.kind)?.rank === 'legendary', `data/game/stage.json の伝説の条件つきの候補 "${x.kind}" が data/game/enemies.json に rank: "legendary" でありません`);
+    check(achievementsConfig.achievements.some((a) => a.id === x.achievement), `data/game/stage.json の伝説 "${x.kind}" の条件の実績 "${x.achievement}" がありません`);
+  }
+  const legendaryKinds = [...stageConfig.legendary.kinds, ...stageConfig.legendary.extraKinds.map((x) => x.kind)];
   for (const [kind, set] of Object.entries(stageConfig.legendary.moveSets)) {
-    check(stageConfig.legendary.kinds.includes(kind), `data/game/stage.json の伝説ごとの技の "${kind}" が伝説の候補にありません`);
+    check(legendaryKinds.includes(kind), `data/game/stage.json の伝説ごとの技の "${kind}" が伝説の候補にありません`);
     for (const id of set.moves) check(stageMoveIds.has(id), `data/game/stage.json の伝説 "${kind}" の範囲技 "${id}" がありません`);
   }
 }

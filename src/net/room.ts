@@ -38,6 +38,10 @@ export interface RoomPlayer {
   readonly upgrades: Readonly<Record<string, number>>;
   /** 達成した実績の id（実績の報酬: 解放した持ち物・特殊なバフを、ほかの人の画面でも同じにするため） */
   readonly achievements: readonly string[];
+  /** 最初に持っていく持ち物（そのポケモンでクリアしていれば選べる。無ければ null） */
+  readonly startItem: string | null;
+  /** 色違いで遊ぶ（見た目だけ） */
+  readonly shiny: boolean;
 }
 
 export interface RoomMember {
@@ -45,6 +49,8 @@ export interface RoomMember {
   readonly pokemon: string | null;
   readonly upgrades: Readonly<Record<string, number>>;
   readonly achievements: readonly string[];
+  readonly startItem: string | null;
+  readonly shiny: boolean;
   /** ホストとの通信がつながったか（ホスト自身は常に true） */
   readonly connected: boolean;
 }
@@ -53,6 +59,27 @@ export class RoomError extends Error {
   constructor(readonly code: 'notFound' | 'full' | 'started' | 'closed') {
     super(code);
   }
+}
+
+/** 部屋の参加者の、Realtime Database に置いた形（無いものは残らない） */
+interface RawMember {
+  pokemon?: string;
+  upgrades?: Record<string, number>;
+  achievements?: string[];
+  startItem?: string;
+  shiny?: boolean;
+}
+
+interface MemberData {
+  pokemon: string | null;
+  upgrades: Record<string, number>;
+  achievements: string[];
+  startItem: string | null;
+  shiny: boolean;
+}
+
+function parseMember(v: RawMember): MemberData {
+  return { pokemon: v.pokemon || null, upgrades: v.upgrades ?? {}, achievements: v.achievements ?? [], startItem: v.startItem || null, shiny: !!v.shiny };
 }
 
 const ROOM_ID_CHARS = 'abcdefghjkmnpqrstuvwxyz23456789';
@@ -115,7 +142,7 @@ export class Room {
   onStart: ((players: RoomPlayer[]) => void) | null = null;
   /** ある参加者が抜けた（ゲストから見たホストの切断を含む） */
   onLeave: ((id: PlayerId) => void) | null = null;
-  private readonly members = new Map<PlayerId, { pokemon: string | null; upgrades: Record<string, number>; achievements: string[] }>();
+  private readonly members = new Map<PlayerId, MemberData>();
   private readonly subs = new Subscriptions();
   private readonly peerSubs = new Map<PlayerId, Subscriptions>();
   private startedPlayers: RoomPlayer[] | null = null;
@@ -147,7 +174,7 @@ export class Room {
     const room = new Room(db, config, 'host', roomId, seed, region, 1, options);
     await onDisconnect(ref(db, room.base)).remove();
     await set(ref(db, room.base), { host: uid, seed, region, createdAt: serverTimestamp(), members: { 1: { uid, pokemon: '' } } });
-    room.members.set(1, { pokemon: null, upgrades: {}, achievements: [] });
+    room.members.set(1, parseMember({}));
     room.watchMembers();
     return room;
   }
@@ -195,7 +222,7 @@ export class Room {
   get memberList(): RoomMember[] {
     return [...this.members.entries()]
       .sort(([a], [b]) => a - b)
-      .map(([id, m]) => ({ id, pokemon: m.pokemon, upgrades: m.upgrades, achievements: m.achievements, connected: id === this.localId || this.connectedTo(id) }));
+      .map(([id, m]) => ({ id, ...m, connected: id === this.localId || this.connectedTo(id) }));
   }
 
   private connectedTo(id: PlayerId): boolean {
@@ -207,6 +234,14 @@ export class Room {
   /** 自分のポケモンを選ぶ（待合室） */
   async choosePokemon(pokemon: string): Promise<void> {
     await set(ref(this.db, `${this.base}/members/${this.localId}/pokemon`), pokemon);
+  }
+
+  /** 最初に持っていく持ち物と色違いを知らせる（待合室） */
+  async setLoadoutOptions(startItem: string | null, shiny: boolean): Promise<void> {
+    await Promise.all([
+      set(ref(this.db, `${this.base}/members/${this.localId}/startItem`), startItem),
+      set(ref(this.db, `${this.base}/members/${this.localId}/shiny`), shiny),
+    ]);
   }
 
   /** 自分の強化のレベルと達成した実績を知らせる（待合室に入ったとき） */
@@ -225,7 +260,7 @@ export class Room {
   /** ホスト: 開始する。開始後は誰も入れない */
   async start(): Promise<void> {
     if (!this.canStart) return;
-    const players = this.memberList.map((m) => ({ id: m.id, pokemon: m.pokemon!, upgrades: m.upgrades, achievements: m.achievements }));
+    const players: RoomPlayer[] = this.memberList.map((m) => ({ id: m.id, pokemon: m.pokemon!, upgrades: m.upgrades, achievements: m.achievements, startItem: m.startItem, shiny: m.shiny }));
     await set(ref(this.db, `${this.base}/started`), players);
   }
 
@@ -254,18 +289,17 @@ export class Room {
     this.subs.add(
       onChildAdded(membersRef, (snap) => {
         const id = Number(snap.key);
-        const v = snap.val() as { pokemon?: string; upgrades?: Record<string, number>; achievements?: string[] };
-        this.members.set(id, { pokemon: v.pokemon || null, upgrades: v.upgrades ?? {}, achievements: v.achievements ?? [] });
+        this.members.set(id, parseMember(snap.val() as RawMember));
         if (this.role === 'host' && id !== 1 && !this.startedPlayers) void this.connectAsHost(id);
         this.changed();
       }),
     );
     this.subs.add(
       onValue(membersRef, (snap) => {
-        const all = (snap.val() ?? {}) as Record<string, { pokemon?: string; upgrades?: Record<string, number>; achievements?: string[] }>;
+        const all = (snap.val() ?? {}) as Record<string, RawMember>;
         for (const [key, v] of Object.entries(all)) {
           const id = Number(key);
-          if (this.members.has(id)) this.members.set(id, { pokemon: v.pokemon || null, upgrades: v.upgrades ?? {}, achievements: v.achievements ?? [] });
+          if (this.members.has(id)) this.members.set(id, parseMember(v));
         }
         this.changed();
       }),
@@ -281,8 +315,8 @@ export class Room {
     this.subs.add(
       onValue(ref(this.db, `${this.base}/started`), (snap) => {
         if (!snap.exists() || this.startedPlayers) return;
-        // 空の配列は Realtime Database に残らないので、実績が無い人は achievements を空にそろえる
-        this.startedPlayers = (snap.val() as RoomPlayer[]).map((p) => ({ ...p, upgrades: p.upgrades ?? {}, achievements: p.achievements ?? [] }));
+        // 空の配列・null は Realtime Database に残らないので、無いものはそろえる
+        this.startedPlayers = (snap.val() as RoomPlayer[]).map((p) => ({ ...p, upgrades: p.upgrades ?? {}, achievements: p.achievements ?? [], startItem: p.startItem ?? null, shiny: !!p.shiny }));
         this.onStart?.(this.startedPlayers);
       }),
     );

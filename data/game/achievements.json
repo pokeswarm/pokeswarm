@@ -30,6 +30,9 @@
     "spell-tag",
     "dragon-fang"
   ],
+  "startItem": {
+    "clears": 1
+  },
   "achievements": [
     {
       "id": "first-run",
@@ -109,20 +112,20 @@
       }
     },
     {
-      "id": "kills-1000",
+      "id": "gyms-4",
       "condition": {
-        "stat": "kills",
-        "atLeast": 1000
+        "stat": "bestMidbosses",
+        "atLeast": 4
       },
       "reward": {
         "item": "quick-claw"
       }
     },
     {
-      "id": "kills-10000",
+      "id": "reach-elite-four",
       "condition": {
-        "stat": "kills",
-        "atLeast": 10000
+        "stat": "bestMidbosses",
+        "atLeast": 8
       },
       "reward": {
         "item": "metronome"
@@ -193,19 +196,19 @@
       }
     },
     {
-      "id": "all-starters-final",
+      "id": "all-starters-clear",
       "condition": {
         "all": [
           {
-            "stat": "evolvedTo.charizard",
+            "stat": "clears.charmander",
             "atLeast": 1
           },
           {
-            "stat": "evolvedTo.venusaur",
+            "stat": "clears.bulbasaur",
             "atLeast": 1
           },
           {
-            "stat": "evolvedTo.blastoise",
+            "stat": "clears.squirtle",
             "atLeast": 1
           }
         ]
@@ -254,49 +257,57 @@
         "atLeast": 1
       },
       "reward": {
-        "buff": {
-          "startStatItem": true
-        }
+        "coins": 2000
       }
     },
     {
-      "id": "derive-flamethrower",
+      "id": "stone-fire",
       "condition": {
-        "stat": "derived.flamethrower",
-        "atLeast": 1
+        "stat": "bestLevel.growlithe",
+        "atLeast": 30
       },
       "reward": {
         "item": "fire-stone"
       }
     },
     {
-      "id": "derive-seed-bomb",
+      "id": "stone-leaf",
       "condition": {
-        "stat": "derived.seed-bomb",
-        "atLeast": 1
+        "stat": "bestLevel.oddish",
+        "atLeast": 30
       },
       "reward": {
         "item": "leaf-stone"
       }
     },
     {
-      "id": "derive-hydro-pump",
+      "id": "stone-water",
       "condition": {
-        "stat": "derived.hydro-pump",
-        "atLeast": 1
+        "stat": "bestLevel.staryu",
+        "atLeast": 30
       },
       "reward": {
         "item": "water-stone"
       }
     },
     {
-      "id": "derive-thunderbolt",
+      "id": "stone-thunder",
       "condition": {
-        "stat": "derived.thunderbolt",
-        "atLeast": 1
+        "stat": "bestLevel.pikachu",
+        "atLeast": 30
       },
       "reward": {
         "item": "thunder-stone"
+      }
+    },
+    {
+      "id": "pikachu-light-ball",
+      "condition": {
+        "stat": "bestLevel.pikachu",
+        "atLeast": 30
+      },
+      "reward": {
+        "item": "light-ball"
       }
     },
     {
@@ -328,43 +339,73 @@
       }
     },
     {
-      "id": "raichu-5",
+      "id": "unlock-raichu",
       "condition": {
         "stat": "bossDefeated.raichu",
-        "atLeast": 5
+        "atLeast": 2
       },
       "reward": {
-        "item": "light-ball"
-      }
-    },
-    {
-      "id": "unlock-onix",
-      "condition": {
-        "stat": "bossDefeated.onix",
-        "atLeast": 20
-      },
-      "reward": {
-        "pokemon": "onix"
+        "pokemon": "raichu"
       }
     },
     {
       "id": "unlock-starmie",
       "condition": {
         "stat": "bossDefeated.starmie",
-        "atLeast": 20
+        "atLeast": 3
       },
       "reward": {
         "pokemon": "starmie"
       }
     },
     {
-      "id": "unlock-raichu",
+      "id": "unlock-arcanine",
       "condition": {
-        "stat": "bossDefeated.raichu",
-        "atLeast": 20
+        "stat": "bossDefeated.arcanine",
+        "atLeast": 3
       },
       "reward": {
-        "pokemon": "raichu"
+        "pokemon": "arcanine"
+      }
+    },
+    {
+      "id": "unlock-vileplume",
+      "condition": {
+        "stat": "bossDefeated.vileplume",
+        "atLeast": 4
+      },
+      "reward": {
+        "pokemon": "vileplume"
+      }
+    },
+    {
+      "id": "unlock-onix",
+      "condition": {
+        "stat": "bossDefeated.onix",
+        "atLeast": 5
+      },
+      "reward": {
+        "pokemon": "onix"
+      }
+    },
+    {
+      "id": "unlock-weezing",
+      "condition": {
+        "stat": "bossDefeated.weezing",
+        "atLeast": 5
+      },
+      "reward": {
+        "pokemon": "weezing"
+      }
+    },
+    {
+      "id": "unlock-rhydon",
+      "condition": {
+        "stat": "bossDefeated.rhydon",
+        "atLeast": 6
+      },
+      "reward": {
+        "pokemon": "rhydon"
       }
     },
     {
@@ -390,8 +431,8 @@
     {
       "id": "unlock-scyther",
       "condition": {
-        "stat": "defeated.scyther",
-        "atLeast": 300
+        "stat": "bestMidbosses",
+        "atLeast": 5
       },
       "reward": {
         "pokemon": "scyther"
@@ -400,68 +441,18 @@
     {
       "id": "unlock-magnemite",
       "condition": {
-        "stat": "defeated.magnemite",
-        "atLeast": 1000
+        "stat": "reached.pikachu",
+        "atLeast": 3
       },
       "reward": {
         "pokemon": "magnemite"
       }
     },
     {
-      "id": "unlock-arcanine",
-      "condition": {
-        "stat": "bossDefeated.arcanine",
-        "atLeast": 20
-      },
-      "reward": {
-        "pokemon": "arcanine"
-      }
-    },
-    {
-      "id": "unlock-alakazam",
-      "condition": {
-        "stat": "bossDefeated.alakazam",
-        "atLeast": 20
-      },
-      "reward": {
-        "pokemon": "alakazam"
-      }
-    },
-    {
-      "id": "unlock-weezing",
-      "condition": {
-        "stat": "bossDefeated.weezing",
-        "atLeast": 20
-      },
-      "reward": {
-        "pokemon": "weezing"
-      }
-    },
-    {
-      "id": "unlock-vileplume",
-      "condition": {
-        "stat": "bossDefeated.vileplume",
-        "atLeast": 20
-      },
-      "reward": {
-        "pokemon": "vileplume"
-      }
-    },
-    {
-      "id": "unlock-rhydon",
-      "condition": {
-        "stat": "bossDefeated.rhydon",
-        "atLeast": 20
-      },
-      "reward": {
-        "pokemon": "rhydon"
-      }
-    },
-    {
       "id": "unlock-lapras",
       "condition": {
         "stat": "bossDefeated.lapras",
-        "atLeast": 10
+        "atLeast": 1
       },
       "reward": {
         "pokemon": "lapras"
@@ -471,7 +462,7 @@
       "id": "unlock-machamp",
       "condition": {
         "stat": "bossDefeated.machamp",
-        "atLeast": 10
+        "atLeast": 1
       },
       "reward": {
         "pokemon": "machamp"
@@ -481,7 +472,7 @@
       "id": "unlock-gengar",
       "condition": {
         "stat": "bossDefeated.gengar",
-        "atLeast": 10
+        "atLeast": 1
       },
       "reward": {
         "pokemon": "gengar"
@@ -490,18 +481,40 @@
     {
       "id": "unlock-dragonite",
       "condition": {
-        "stat": "bossDefeated.dragonite",
-        "atLeast": 10
+        "stat": "distinctClears",
+        "atLeast": 3
       },
       "reward": {
         "pokemon": "dragonite"
       }
     },
     {
+      "id": "unlock-eevee",
+      "condition": {
+        "all": [
+          {
+            "stat": "reached.charmander",
+            "atLeast": 10
+          },
+          {
+            "stat": "reached.bulbasaur",
+            "atLeast": 10
+          },
+          {
+            "stat": "reached.squirtle",
+            "atLeast": 10
+          }
+        ]
+      },
+      "reward": {
+        "pokemon": "eevee"
+      }
+    },
+    {
       "id": "unlock-mewtwo",
       "condition": {
         "stat": "bossDefeated.mewtwo",
-        "atLeast": 5
+        "atLeast": 1
       },
       "reward": {
         "pokemon": "mewtwo"
@@ -510,7 +523,7 @@
     {
       "id": "unlock-mew",
       "condition": {
-        "stat": "bossDefeated.mew",
+        "stat": "uniqueKinds",
         "atLeast": 5
       },
       "reward": {
@@ -521,7 +534,7 @@
       "id": "unlock-articuno",
       "condition": {
         "stat": "bossDefeated.articuno",
-        "atLeast": 5
+        "atLeast": 1
       },
       "reward": {
         "pokemon": "articuno"
@@ -531,7 +544,7 @@
       "id": "unlock-zapdos",
       "condition": {
         "stat": "bossDefeated.zapdos",
-        "atLeast": 5
+        "atLeast": 1
       },
       "reward": {
         "pokemon": "zapdos"
@@ -541,10 +554,40 @@
       "id": "unlock-moltres",
       "condition": {
         "stat": "bossDefeated.moltres",
-        "atLeast": 5
+        "atLeast": 1
       },
       "reward": {
         "pokemon": "moltres"
+      }
+    },
+    {
+      "id": "shiny-charmander",
+      "condition": {
+        "stat": "bossDefeated.charizard",
+        "atLeast": 1
+      },
+      "reward": {
+        "shiny": "charmander"
+      }
+    },
+    {
+      "id": "shiny-bulbasaur",
+      "condition": {
+        "stat": "bossDefeated.venusaur",
+        "atLeast": 1
+      },
+      "reward": {
+        "shiny": "bulbasaur"
+      }
+    },
+    {
+      "id": "shiny-squirtle",
+      "condition": {
+        "stat": "bossDefeated.blastoise",
+        "atLeast": 1
+      },
+      "reward": {
+        "shiny": "squirtle"
       }
     }
   ]

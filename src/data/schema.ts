@@ -145,6 +145,8 @@ export const enemyKindSchema = z.object({
   drop: z.enum(['potion', 'magnet', 'rare-candy']).optional(),
   /** スプライトの大きさの倍率（省略時は 1。中ボス・ボスを大きく描く） */
   spriteScale: z.number().positive().optional(),
+  /** 色違い（名前を「色違いの〇〇」にする。作者の決定 2026年10月24日: 色違いの御三家） */
+  shiny: z.boolean().optional(),
 });
 export type EnemyKind = z.infer<typeof enemyKindSchema>;
 
@@ -319,16 +321,18 @@ export const achievementRewardSchema = z.object({
       itemSlots: z.number().int().positive().optional(),
       /** 持ち物と同じ形の効果 */
       mods: modifierSchema.optional(),
-      /** 解放したステータスのアイテムを1つ（ランダム）持って始める */
-      startStatItem: z.boolean().optional(),
     })
     .optional(),
+  /** その系統を色違いで遊べるようにする（data/game/playables.json のキー。見た目だけ。作者の決定 2026年10月24日） */
+  shiny: z.string().min(1).optional(),
 });
 export type AchievementReward = z.infer<typeof achievementRewardSchema>;
 export const achievementsConfigSchema = z.object({
   initialPokemon: z.array(z.string().min(1)).min(1),
   /** 最初から候補に出る持ち物（ほかは実績で解放する） */
   initialItems: z.array(z.string().min(1)).min(1),
+  /** 最初の持ち物（作者の決定 2026年10月24日）: そのポケモンで clears 回クリアすると、ラン開始時に解放済みの持ち物を1つ選んで持っていける */
+  startItem: z.object({ clears: z.number().int().positive() }),
   achievements: z.array(
     z.object({ id: z.string().min(1), condition: statConditionSchema, hidden: z.boolean().default(false), reward: achievementRewardSchema.optional() }),
   ),
@@ -471,6 +475,10 @@ export const stageConfigSchema = z.object({
       timeLimitSeconds: z.number().positive(),
       /** 第2段階（作者の決定 2026年10月23日）: HP が hpRatio を切ったら「DANGER」をもう一度出し、技の間隔を短くし、doubleChance の確率で2つの技を同時に使う */
       enrage: z.object({ hpRatio: z.number().gt(0).lt(1), moveIntervalSeconds: z.number().positive(), doubleChance: z.number().min(0).max(1) }).optional(),
+      /**
+       * 条件つきの候補（作者の決定 2026年10月24日: 色違いの御三家）。ランの参加者のだれかが achievement を達成していれば、kinds に足す
+       */
+      extraKinds: z.array(z.object({ kind: z.string().min(1), achievement: z.string().min(1) })).default([]),
     })
     .nullable(),
   swarms: z.array(swarmSchema).default([]),

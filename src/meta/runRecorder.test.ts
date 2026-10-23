@@ -53,6 +53,21 @@ describe('ランの記録', () => {
     expect(s.bestKills).toBe(4);
   });
 
+  it('そのポケモンで倒した中ボスの数の最高・届いたレベルの最高を記録し、クリアした種類を数え直す', () => {
+    const { store, sim, rec, kill } = setup();
+    kill(1, 1);
+    kill(1, 1);
+    sim.world.outcome = 'clear';
+    const rec2 = new RunRecorder(store, 'charmander', null, { playables: ['charmander', 'squirtle'], uniqueMoves: ['blast-burn'] });
+    rec.finish(sim.world);
+    rec2.finish(sim.world);
+    const s = store.current.stats;
+    expect(s['reached.charmander']).toBe(2);
+    expect(s['bestLevel.charmander']).toBe(sim.world.level);
+    expect(s.distinctClears).toBe(1);
+    expect(s.uniqueKinds).toBe(0);
+  });
+
   it('協力プレイ: 雑魚はとどめを刺した人だけ、中ボス・ボスは全員に数える', () => {
     const { store, sim, rec, kill } = setup('guest', 2);
     kill(0, 1); // ホストが倒した雑魚: 数えない

@@ -8,8 +8,24 @@
       ]
     },
     {
+      "key": "bulbasaur-shiny",
+      "dex": 1,
+      "form": "0000/0001",
+      "uses": [
+        "full"
+      ]
+    },
+    {
       "key": "ivysaur",
       "dex": 2,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "ivysaur-shiny",
+      "dex": 2,
+      "form": "0000/0001",
       "uses": [
         "full"
       ]
@@ -22,8 +38,25 @@
       ]
     },
     {
+      "key": "venusaur-shiny",
+      "dex": 3,
+      "form": "0000/0001",
+      "uses": [
+        "enemy",
+        "full"
+      ]
+    },
+    {
       "key": "charmander",
       "dex": 4,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "charmander-shiny",
+      "dex": 4,
+      "form": "0000/0001",
       "uses": [
         "full"
       ]
@@ -36,6 +69,14 @@
       ]
     },
     {
+      "key": "charmeleon-shiny",
+      "dex": 5,
+      "form": "0000/0001",
+      "uses": [
+        "full"
+      ]
+    },
+    {
       "key": "charizard",
       "dex": 6,
       "uses": [
@@ -43,8 +84,25 @@
       ]
     },
     {
+      "key": "charizard-shiny",
+      "dex": 6,
+      "form": "0000/0001",
+      "uses": [
+        "enemy",
+        "full"
+      ]
+    },
+    {
       "key": "squirtle",
       "dex": 7,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "squirtle-shiny",
+      "dex": 7,
+      "form": "0000/0001",
       "uses": [
         "full"
       ]
@@ -57,9 +115,26 @@
       ]
     },
     {
+      "key": "wartortle-shiny",
+      "dex": 8,
+      "form": "0000/0001",
+      "uses": [
+        "full"
+      ]
+    },
+    {
       "key": "blastoise",
       "dex": 9,
       "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "blastoise-shiny",
+      "dex": 9,
+      "form": "0000/0001",
+      "uses": [
+        "enemy",
         "full"
       ]
     },

@@ -4,6 +4,7 @@ import { addStat, maxStat } from './saveData';
 import type { SaveStore } from './saveStore';
 import type { ShopConfig } from '../data/schema';
 import { coinsForRun, permanentBonus } from './shop';
+import { refreshDerivedStats, type DerivedStatSources } from './progress';
 
 /**
  * ラン中の記録をセーブデータに足す（01_game_design.md 8.2）。
@@ -14,7 +15,9 @@ import { coinsForRun, permanentBonus } from './shop';
  *   kills, defeated.<ポケモン>, bossDefeated.<ポケモン>（中ボス・ボス・伝説として出たもの）, midbossKills, bossKills, legendaryKills, evolutions, evolvedTo.<ポケモン>,
  *   derivations, derived.<技>, uniqueMoves, playSeconds,
  *   runs, runs.<ポケモン>, runs.coop, clears, clears.<ポケモン>, clears.solo, clears.coop,
- *   bestKills, bestLevel, longestSeconds, bestMidbosses（最高記録）
+ *   bestKills, bestLevel, longestSeconds, bestMidbosses（最高記録）,
+ *   reached.<ポケモン>（そのポケモンで1回のランに倒した中ボス・四天王の数の最高）, bestLevel.<ポケモン>（そのポケモンで届いた最高レベル）,
+ *   distinctClears（クリアしたポケモンの種類の数）, uniqueKinds（出した固有技の種類の数）。最後の2つは足すのではなく、ほかの記録から数え直す
  * 協力プレイ（03_network.md 3.6）: 雑魚はとどめを刺した人だけ、中ボス・ボスは参加者全員に数える。
  */
 export class RunRecorder {
@@ -36,6 +39,8 @@ export class RunRecorder {
     private readonly pokemon: string,
     /** コインの入り方（省略するとコインは入らない。テスト用） */
     private readonly shop: ShopConfig | null = null,
+    /** 数え直す記録（distinctClears・uniqueKinds）のもと。省略すると数えない */
+    private readonly derived: DerivedStatSources | null = null,
   ) {}
 
   private count(key: string, n = 1): void {
@@ -158,6 +163,9 @@ export class RunRecorder {
       maxStat(d, 'bestKills', this.runKills);
       maxStat(d, 'bestMidbosses', this.runMidbosses);
       maxStat(d, 'bestLevel', world.level);
+      maxStat(d, `reached.${this.pokemon}`, this.runMidbosses + this.runBosses);
+      maxStat(d, `bestLevel.${this.pokemon}`, world.level);
+      if (this.derived) refreshDerivedStats(d.stats, this.derived);
       maxStat(d, 'longestSeconds', Math.floor(elapsedSeconds(world)));
     });
   }

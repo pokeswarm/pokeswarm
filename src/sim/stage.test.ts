@@ -249,7 +249,7 @@ describe('ランの進行と終わり', () => {
 });
 
 describe('伝説の乱入', () => {
-  const legendary = { chance: 1, kinds: ['legend'], moves: ['circle'], moveSets: {}, moveIntervalSeconds: 1, warningSeconds: 1, timeLimitSeconds: 2 };
+  const legendary = { chance: 1, kinds: ['legend'], moves: ['circle'], moveSets: {}, moveIntervalSeconds: 1, warningSeconds: 1, timeLimitSeconds: 2, extraKinds: [] };
 
   it('クリアすると「DANGER」の後、雑魚が消えて伝説が出る。倒すとクリア（倒した）', () => {
     const { sim } = solo(stageRules({ legendary }));
@@ -274,7 +274,7 @@ describe('伝説の乱入', () => {
       stageRules({
         legendary: {
           ...legendary,
-          timeLimitSeconds: 60,
+          timeLimitSeconds: 60, extraKinds: [],
           enrage: { hpRatio: 0.5, moveIntervalSeconds: 0.5, doubleChance: 0 },
         },
       }),
@@ -298,7 +298,7 @@ describe('伝説の乱入', () => {
     const STAGGER: BossMove = { id: 'stagger', effect: 'test', shape: 'circle', target: 'player', telegraphSeconds: 0.5, radius: 40, damage: 0, count: 3, spread: 100, stagger: 0.5, leaves: { seconds: 2, slowPct: 40, damagePerSecond: 0, color: '#81d4fa' } };
     const RINGS: BossMove = { id: 'rings', effect: 'test', shape: 'ring', target: 'self', telegraphSeconds: 0.5, radius: 100, damage: 0, count: 1, spread: 0, rings: { count: 3, step: 100, width: 40 }, stagger: 0.3 };
     const TELE: BossMove = { id: 'tele', effect: 'test', shape: 'circle', target: 'player', telegraphSeconds: 0.5, radius: 60, damage: 0, count: 1, spread: 150, teleport: true };
-    const cfg = { ...legendary, moves: ['circle'], moveSets: { legend: { moves: ['stagger', 'rings', 'tele'], random: false } }, moveIntervalSeconds: 2, timeLimitSeconds: 60 };
+    const cfg = { ...legendary, moves: ['circle'], moveSets: { legend: { moves: ['stagger', 'rings', 'tele'], random: false } }, moveIntervalSeconds: 2, timeLimitSeconds: 60, extraKinds: [] };
     const { sim, p } = solo(stageRules({ legendary: cfg, moves: [CIRCLE, NOVA, DASH, STAGGER, RINGS, TELE] }));
     run(sim, 61);
     killKind(sim, 2);

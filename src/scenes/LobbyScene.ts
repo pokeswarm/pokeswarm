@@ -5,6 +5,8 @@ import type { SpriteAnims } from '../data/schema';
 import { getLocale, t, type MessageKey } from '../i18n';
 import type { Room, RoomPlayer } from '../net/room';
 import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
+import { shinySpriteKey } from '../meta/loadoutOptions';
+import { LoadoutOptionsPanel } from './loadoutOptionsPanel';
 import { formatTag } from '../meta/nickname';
 import { compactScreen } from '../render/pixelUi';
 import { session } from '../meta/session';
@@ -41,6 +43,8 @@ export class LobbyScene extends Phaser.Scene {
   /** 招待を送ったフレンド */
   private invited = new Set<string>();
   private picker: PokemonPicker | null = null;
+  /** 最初の持ち物・色違い */
+  private options: LoadoutOptionsPanel | null = null;
 
   constructor() {
     super('lobby');
@@ -53,6 +57,7 @@ export class LobbyScene extends Phaser.Scene {
     this.starting = false;
     this.invited = new Set();
     this.picker = null;
+    this.options = null;
   }
 
   create(): void {
@@ -74,9 +79,9 @@ export class LobbyScene extends Phaser.Scene {
         this.room.onStart = null;
       }
     });
-    // 全員のポケモンのスプライトを読んでおく（ランの画面でほかの人のポケモンを描くため）
-    for (const [key, p] of Object.entries(playablesConfig.pokemon)) {
-      void loadPokemonAtRuntime(this, p.sprite).then((loaded) => this.sprites.set(key, loaded?.manifest ?? null));
+    // 全員のポケモンのスプライトを読んでおく（ランの画面でほかの人のポケモンを描くため。色違いは開始するときに読む）
+    for (const p of Object.values(playablesConfig.pokemon)) {
+      void loadPokemonAtRuntime(this, p.sprite).then((loaded) => this.sprites.set(p.sprite, loaded?.manifest ?? null));
     }
     session.setPresence('lobby');
     // フレンドのオンライン状態が変わったら、招待の一覧を作り直す
@@ -137,12 +142,21 @@ export class LobbyScene extends Phaser.Scene {
     const me = players.find((p) => p.id === room.localId);
     if (!me) return;
     this.starting = true;
-    const data: RunSceneData = {
-      pokemon: me.pokemon,
-      playerSprite: this.sprites.get(me.pokemon) ?? null,
-      coop: { room, players, sprites: new Map(this.sprites) },
+    const spriteOf = (p: RoomPlayer): string => {
+      const key = playablesConfig.pokemon[p.pokemon]?.sprite ?? p.pokemon;
+      return p.shiny ? shinySpriteKey(key) : key;
     };
-    this.scene.start('run', data);
+    // 色違いのスプライトを読んでから始める
+    const shiny = [...new Set(players.filter((p) => p.shiny).map(spriteOf))].filter((k) => !this.sprites.has(k));
+    void Promise.all(shiny.map((k) => loadPokemonAtRuntime(this, k).then((loaded) => this.sprites.set(k, loaded?.manifest ?? null)))).then(() => {
+      if (!this.sys.isActive()) return;
+      const data: RunSceneData = {
+        pokemon: me.pokemon,
+        playerSprite: this.sprites.get(spriteOf(me)) ?? null,
+        coop: { room, players, sprites: new Map(this.sprites) },
+      };
+      this.scene.start('run', data);
+    });
   }
 
   private onKey(ev: KeyboardEvent): void {
@@ -232,10 +246,18 @@ export class LobbyScene extends Phaser.Scene {
       // 真ん中: ポケモンの一覧（選ぶとすぐ自分の枠に出る）
       const mine = room.memberList.find((m) => m.id === room.localId)?.pokemon ?? null;
       const region = regionsConfig.regions.find((r) => r.id === room.region && r.available) ?? regionsConfig.regions.find((r) => r.id === defaultRegion())!;
-      this.picker ??= new PokemonPicker({ playables: region.playables, onSelect: (key) => void this.room?.choosePokemon(key) });
+      this.options ??= new LoadoutOptionsPanel((o) => void this.room?.setLoadoutOptions(o.startItem, o.shiny));
+      this.picker ??= new PokemonPicker({
+        playables: region.playables,
+        onSelect: (key) => {
+          void this.room?.choosePokemon(key);
+          this.options?.setPokemon(key);
+        },
+      });
       this.picker.setSelected(mine);
+      this.options.setPokemon(mine);
       this.picker.element.style.marginBottom = '10px';
-      children.push(this.picker.element);
+      children.push(this.picker.element, this.options.element);
 
       // ホスト: オンラインのフレンドを招待する（Google でログインしてニックネームを登録しているとき）
       const social = session.social;

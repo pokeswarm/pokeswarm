@@ -17,8 +17,8 @@ export interface AchievementPerks {
   readonly itemSlots: number;
   /** 持ち物と同じ形の効果（足し合わせたもの） */
   readonly mods: ModifierData;
-  /** 解放したステータスのアイテムを1つ（ランダム）持って始める */
-  readonly startStatItem: boolean;
+  /** 色違いで遊べる系統（playables.json のキー） */
+  readonly shiny: ReadonlySet<string>;
 }
 
 export function achievementPerks(cfg: AchievementsConfig, achieved: readonly string[]): AchievementPerks {
@@ -28,19 +28,19 @@ export function achievementPerks(cfg: AchievementsConfig, achieved: readonly str
   let coopXpPct = 0;
   let candyWeight = 0;
   let itemSlots = 0;
-  let startStatItem = false;
+  const shiny = new Set<string>();
   for (const a of cfg.achievements) {
     if (!achieved.includes(a.id) || !a.reward) continue;
     const r = a.reward;
     if (r.item) items.add(r.item);
+    if (r.shiny) shiny.add(r.shiny);
     const b = r.buff;
     if (!b) continue;
     if (b.startMoveLevel) startMoveLevel[b.startMoveLevel.line] = Math.max(startMoveLevel[b.startMoveLevel.line] ?? 1, b.startMoveLevel.level);
     coopXpPct += b.coopXpPct ?? 0;
     candyWeight += b.candyWeight ?? 0;
     itemSlots += b.itemSlots ?? 0;
-    if (b.startStatItem) startStatItem = true;
     for (const [k, v] of Object.entries(b.mods ?? {})) if (typeof v === 'number') mods[k] = (mods[k] ?? 0) + v;
   }
-  return { items, startMoveLevel, coopXpPct, candyWeight, itemSlots, mods: mods as ModifierData, startStatItem };
+  return { items, startMoveLevel, coopXpPct, candyWeight, itemSlots, mods: mods as ModifierData, shiny };
 }

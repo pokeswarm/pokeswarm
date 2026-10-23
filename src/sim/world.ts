@@ -185,6 +185,8 @@ export interface World {
     /** 第2段階に入った */
     enraged?: boolean;
   } | null;
+  /** 伝説戦の条件つきの候補（stage.json の legendary.extraKinds のうち、参加者のだれかが実績を達成しているもの）。ランを始める前に入れる */
+  readonly legendaryExtras: string[];
   /** スウォームイベントの予定（更新回数の順）と、次に出す番号 */
   readonly swarmSchedule: readonly { readonly tick: number; readonly swarm: number }[];
   nextSwarm: number;
@@ -239,6 +241,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     requiredTotal: rules.stage.bosses.filter((b) => b.required).length,
     cleared: false,
     legendary: null,
+    legendaryExtras: [],
     swarmSchedule: buildSwarmSchedule(rules, tickRate),
     nextSwarm: 0,
     hazards: [],

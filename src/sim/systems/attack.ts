@@ -896,7 +896,7 @@ function fxSourceOf(world: World, i: number, x: number, y: number): FxSource {
   const line = pr.shape[i] === SHAPE_LINE;
   const dirX = line || vlen === 0 ? pr.dirX[i]! || 1 : pr.vx[i]! / vlen;
   const dirY = line || vlen === 0 ? pr.dirY[i]! : pr.vy[i]! / vlen;
-  return { owner: pr.owner[i]!, move: pr.move[i]!, level: pr.level[i]!, damage: pr.damage[i]!, size: pr.radius[i]!, x, y, dirX, dirY, length: line ? pr.length[i]! : 0 };
+  return { owner: pr.owner[i]!, move: pr.move[i]!, level: pr.level[i]!, damage: pr.damage[i]!, size: pr.radius[i]!, x, y, dirX, dirY, length: line ? pr.length[i]! : 0, serial: pr.serial[i]! };
 }
 
 /** 当たり判定 i を消す。技そのもの（段階 0）なら end の効き方、印（段階 2）なら遅れた爆発を起こす */

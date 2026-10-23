@@ -32,6 +32,8 @@ export interface FxSource {
   dirX: number;
   dirY: number;
   length: number;
+  /** 元の当たり判定の通し番号（通った道を伸ばすため。技を使ったときなど、元が無ければ省略） */
+  serial?: number;
 }
 
 /** 段階 0 の当たり判定・技を使ったときに、trigger の効き方を起こす */
@@ -76,6 +78,63 @@ function spawn(world: World, src: FxSource, over: Partial<ProjectileSpawn>): voi
   });
 }
 
+/**
+ * 通った道を残る範囲にする（円を並べず、道そのものを当たり判定にする。作者の要望 2026年10月23日）。
+ * - 直線の元（ビーム）: その線を1本
+ * - 動く元（every で呼ぶ）: 元が通った道を線でつなぐ。まっすぐ進んでいる間は1本を伸ばし、曲がったら次の線を足す。
+ *   引き返して、すでに残した道の上を通るとき（ブーメランの戻り）は足さない
+ */
+function pathPuddle(world: World, src: FxSource, base: Partial<ProjectileSpawn>): void {
+  if (src.length > 0) {
+    spawn(world, src, { ...base, shape: SHAPE_LINE, length: src.length });
+    return;
+  }
+  const pr = world.projectiles;
+  const serial = src.serial ?? 0;
+  let j = -1;
+  if (serial !== 0) {
+    for (let k = 0; k < pr.count; k++) {
+      if (pr.link[k] === serial) {
+        j = k;
+        break;
+      }
+    }
+  }
+  if (j === -1) {
+    spawn(world, src, { ...base, shape: SHAPE_LINE, length: 0, link: serial });
+    return;
+  }
+  const life = base.life ?? 0;
+  const ex = pr.x[j]! + pr.dirX[j]! * pr.length[j]!;
+  const ey = pr.y[j]! + pr.dirY[j]! * pr.length[j]!;
+  const dx = src.x - ex;
+  const dy = src.y - ey;
+  const d = Math.sqrt(dx * dx + dy * dy);
+  if (d < 1) return;
+  const along = dx * pr.dirX[j]! + dy * pr.dirY[j]!;
+  const side = Math.abs(dx * pr.dirY[j]! - dy * pr.dirX[j]!);
+  // まっすぐ先へ進んでいれば、線を伸ばす（残る時間は、最後に伸ばしたときから数え直す）
+  if (pr.length[j] === 0 || (along > 0 && side <= pr.radius[j]! * 0.25)) {
+    if (pr.length[j] === 0) {
+      pr.dirX[j] = dx / d;
+      pr.dirY[j] = dy / d;
+      pr.length[j] = d;
+    } else {
+      pr.length[j]! += along;
+    }
+    pr.life[j] = pr.maxLife[j] = Math.max(pr.life[j]!, life);
+    return;
+  }
+  // 引き返して、すでに残した道の上にいる（ブーメランの戻り）
+  const t = Math.max(0, Math.min(pr.length[j]!, (src.x - pr.x[j]!) * pr.dirX[j]! + (src.y - pr.y[j]!) * pr.dirY[j]!));
+  const cx = pr.x[j]! + pr.dirX[j]! * t - src.x;
+  const cy = pr.y[j]! + pr.dirY[j]! * t - src.y;
+  if (cx * cx + cy * cy <= (pr.radius[j]! * 0.5) ** 2) return;
+  // 曲がった: 前の線の先から、次の線を足す
+  pr.link[j] = 0;
+  spawn(world, { ...src, x: ex, y: ey }, { ...base, shape: SHAPE_LINE, length: d, dirX: dx / d, dirY: dy / d, link: serial });
+}
+
 /** 遅れて弾ける印が消えたときに、その爆発を起こす */
 export function fireDelayedExplosion(world: World, index: number, src: FxSource): void {
   const fx = world.rules.moves[src.move]?.effects[index];
@@ -109,7 +168,9 @@ function applyEffect(world: World, fx: MoveEffect, index: number, src: FxSource)
   if (fx.puddle) {
     const pd = fx.puddle;
     const base = { damage: src.damage * pd.powerMultiplier, radius: src.size * pd.sizeMultiplier, life: pd.durationSeconds, hitIntervalTicks: ticks(pd.hitIntervalSeconds) };
-    if (pd.alongSpacing && src.length > 0) {
+    if (pd.path) {
+      pathPuddle(world, src, base);
+    } else if (pd.alongSpacing && src.length > 0) {
       for (let d = 0; d <= src.length; d += pd.alongSpacing) spawn(world, src, { ...base, x: src.x + src.dirX * d, y: src.y + src.dirY * d });
     } else {
       spawn(world, src, base);

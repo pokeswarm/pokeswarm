@@ -103,6 +103,11 @@ export class EffectRenderer {
     return obj;
   }
 
+  /** 持ち主の残像として飛ぶ技の見た目（無ければ null） */
+  ownerGhost(id: string): EffectRecipe['ownerGhost'] | null {
+    return this.recipe(id).ownerGhost ?? null;
+  }
+
   private recipe(id: string): EffectRecipe {
     const r = this.recipes[id];
     if (!r) throw new Error(`エフェクトのレシピ ${id} がありません`);
@@ -162,6 +167,7 @@ export class EffectRenderer {
       let y = src.prevY[i]! + (src.y[i]! - src.prevY[i]!) * alpha;
       const r = src.radius[i]!;
       const sector = sectorOf(i);
+      const line = lineOf(i);
       if (trail) {
         const em = this.emitter(this.trailEmitters, recipeId, trail, this.depth - 0.5);
         const n = trailCountOf(recipeId, trail);
@@ -175,12 +181,20 @@ export class EffectRenderer {
             const d = Math.sqrt(Math.random()) * r;
             em.emitParticleAt(x + Math.cos(a) * d, y + Math.sin(a) * d, 1);
           }
+        } else if (line && line.length > 0) {
+          // 線（通った道に残る範囲など）は、線のあちこちから出す。長いほど多く出す
+          const many = n * Math.min(8, Math.max(1, Math.round(line.length / 60)));
+          for (let k = 0; k < many; k++) {
+            const d = Math.random() * line.length;
+            em.emitParticleAt(x + line.dirX * d + scatter(trail.spread), y + line.dirY * d + scatter(trail.spread), 1);
+          }
         } else {
           for (let k = 0; k < n; k++) em.emitParticleAt(x + scatter(trail.spread), y + scatter(trail.spread), 1);
         }
       }
       // 範囲そのもの（光の色）は HitShapes が平らに塗る。ここでは発射体の芯だけを、当たり判定の内側に小さく描く。扇形は芯を出さない
-      if (!body || sector || hollow(i)) continue;
+      // 持ち主の残像として飛ぶもの（ゴッドバード）は、芯の代わりに RunScene が姿を描く
+      if (!body || sector || hollow(i) || (recipe.ownerGhost && !line)) continue;
       const pulse = body.pulse ? 1 + Math.sin((timeMs / body.pulse.periodMs) * Math.PI * 2) * body.pulse.amount : 1;
       let core = this.cores[used];
       if (!core) {
@@ -190,7 +204,6 @@ export class EffectRenderer {
       // 芯の直径は当たり判定の直径 × coreScale × CORE_RATIO（当たり判定からはみ出さない）
       const unit = (r * 2) / GLOW_SIZE;
       const size = Math.min(1, body.coreScale * CORE_RATIO * pulse);
-      const line = lineOf(i);
       if (line) {
         // ビーム: 芯の円を線の長さに引き伸ばし、向きに合わせて回す
         const cx = x + (line.dirX * line.length) / 2;

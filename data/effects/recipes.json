@@ -1499,6 +1499,12 @@
     },
     "sky-attack": {
       "extends": "fire.base",
+      "ownerGhost": {
+        "tint": "#ffcc80",
+        "alpha": 0.75,
+        "afterimages": 3,
+        "spacingTicks": 2
+      },
       "impact": {
         "flash": {
           "radius": 60

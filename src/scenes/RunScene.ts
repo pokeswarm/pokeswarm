@@ -34,7 +34,7 @@ import type { Axis, InputCommand, PlayerId } from '../sim/commands';
 import { SHAPE_LINE, SHAPE_SECTOR } from '../sim/entities/projectiles';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
-import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole } from '../sim/world';
+import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World } from '../sim/world';
 import { applyDebugOverrides, parseLevelParam, parseMovesParam, parseSectionParam, parseTimeParam } from './debugOverrides';
 import { addXp, applyOffer } from '../sim/systems/leveling';
 import { achievementPerks } from '../meta/achievementPerks';
@@ -80,6 +80,10 @@ export class RunScene extends Phaser.Scene {
   /** スマホのジョイスティック（タッチの端末だけ） */
   private joystick: TouchJoystick | null = null;
   private playerViews = new Map<PlayerId, PlayerView>();
+  /** 持ち主の残像として飛ぶ技（ゴッドバード）の絵 */
+  private ghostImages: Phaser.GameObjects.Image[] = [];
+  /** 通った道を残る範囲にする技（芯を描かない） */
+  private pathMoves = new Set<number>();
   private enemyView!: PooledCircles;
   private gemView!: PooledSprites;
   /** 敵をスプライトで描く（読み込み済みの種類だけ。まだの種類は円で描く） */
@@ -162,6 +166,7 @@ export class RunScene extends Phaser.Scene {
     // 結果画面から「もう一度」で同じシーンを始め直すので、前のランの状態を残さない
     this.runData = data;
     this.playerViews = new Map();
+    this.ghostImages = [];
     this.inbox = [];
     this.uiCommands = [];
     this.lastSent = { dx: 0, dy: 0 };
@@ -190,6 +195,7 @@ export class RunScene extends Phaser.Scene {
   create(): void {
     if (this.playerSprite) registerPokemonAnimations(this, this.playerSprite);
     const rules = applyDebugOverrides(buildSimRules(), window.location.search);
+    this.pathMoves = new Set(rules.moves.flatMap((m, k) => (m.effects.some((fx) => fx.puddle?.path) ? [k] : [])));
     // 技は確認用に URL で指定できる（?moves=ember:8,fire-spin:3）。協力プレイでは参加用 URL に引き継ぐので2人とも同じになる
     const role: SimRole = this.coop?.room.role ?? 'solo';
     this.localId = this.coop?.room.localId ?? HOST_PLAYER_ID;
@@ -688,6 +694,43 @@ export class RunScene extends Phaser.Scene {
     }
   }
 
+  /** 持ち主の残像として飛ぶ技（ゴッドバード）: 発射体の位置に、持ち主のポケモンの姿を薄く描き、後ろに残像を連ねる */
+  private drawGhosts(world: World, alpha: number): void {
+    const pr = world.projectiles;
+    const depth = spriteRender.depths.effects + 0.2;
+    let used = 0;
+    for (let i = 0; i < pr.count; i++) {
+      if (pr.stage[i] !== 0) continue;
+      const ghost = this.effects.ownerGhost(world.rules.moves[pr.move[i]!]!.effect);
+      if (!ghost) continue;
+      const frame = this.playerViews.get(pr.owner[i]!)?.ghostFrame();
+      if (!frame) continue;
+      const x = pr.prevX[i]! + (pr.x[i]! - pr.prevX[i]!) * alpha;
+      const y = pr.prevY[i]! + (pr.y[i]! - pr.prevY[i]!) * alpha;
+      // 1回の更新で進む量。後ろの残像は、それを spacingTicks 回ぶんずつ戻した所に置く
+      const stepX = pr.x[i]! - pr.prevX[i]!;
+      const stepY = pr.y[i]! - pr.prevY[i]!;
+      for (let k = 0; k <= ghost.afterimages; k++) {
+        let img = this.ghostImages[used];
+        if (!img) {
+          img = this.add.image(0, 0, frame.key, frame.frame);
+          this.ghostImages.push(img);
+        }
+        img
+          .setTexture(frame.key, frame.frame)
+          .setPosition(x - stepX * ghost.spacingTicks * k, y - stepY * ghost.spacingTicks * k)
+          .setScale(frame.scaleX, frame.scaleY)
+          .setFlipX(frame.flipX)
+          .setTint(hexColor(ghost.tint))
+          .setAlpha(ghost.alpha * (1 - k / (ghost.afterimages + 1)))
+          .setDepth(depth - k * 0.001)
+          .setVisible(true);
+        used++;
+      }
+    }
+    for (let k = used; k < this.ghostImages.length; k++) this.ghostImages[k]!.setVisible(false);
+  }
+
   /** ボスの範囲技の予告: 範囲の円と、落ちるまでの残りを内側から広がる円で見せる */
   private drawHazards(hazards: readonly Hazard[]): void {
     const g = this.hazardView;
@@ -1077,8 +1120,10 @@ export class RunScene extends Phaser.Scene {
       (i) => (pr.shape[i] === SHAPE_SECTOR ? { dirX: pr.dirX[i]!, dirY: pr.dirY[i]!, half: pr.length[i]! } : null),
       // 出番を待っている当たり判定（爆炎の柱）は、現れるまで描かない
       (i) => pr.stage[i] === 3,
-      (i) => pr.band[i]! > 0,
+      // 外へ進む帯と、通った道に残る範囲には芯を描かない（道が光の線に見えてしまう）
+      (i) => pr.band[i]! > 0 || (pr.stage[i] === 1 && pr.shape[i] === SHAPE_LINE && this.pathMoves.has(pr.move[i]!)),
     );
+    this.drawGhosts(world, alpha);
     this.hitShapes.draw(
       pr,
       alpha,

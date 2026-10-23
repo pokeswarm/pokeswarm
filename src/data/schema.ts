@@ -667,9 +667,18 @@ export const moveEffectSchema = z.object({
   chance: z.number().min(0).max(1).optional(),
   /** 爆発: その場で弾ける円。delaySeconds があれば、印を置いて少し後に弾ける。pull は中心へ引き寄せる強さ */
   explode: z.object({ ...fxSize, delaySeconds: z.number().positive().optional(), pull: z.number().positive().optional() }).optional(),
-  /** 残る範囲（炎・水たまり・毒）。直線の当たり判定なら alongSpacing ごとに線に沿って並べる */
+  /**
+   * 残る範囲（炎・水たまり・毒）。直線の当たり判定なら alongSpacing ごとに線に沿って並べる。
+   * path なら円を置かず、通った道そのものを範囲にする（ビームは線1本。every で呼ぶ動く技は、通った道を線でつなぐ）
+   */
   puddle: z
-    .object({ ...fxSize, durationSeconds: z.number().positive(), hitIntervalSeconds: z.number().positive(), alongSpacing: z.number().positive().optional() })
+    .object({
+      ...fxSize,
+      durationSeconds: z.number().positive(),
+      hitIntervalSeconds: z.number().positive(),
+      alongSpacing: z.number().positive().optional(),
+      path: z.boolean().optional(),
+    })
     .optional(),
   /** 分裂: 小さな弾が飛び散る（spreadDegrees は向きを中心にした広がり。360 で全方向） */
   split: z
@@ -949,6 +958,13 @@ export const effectRecipeSchema = z.object({
       /** 光の明滅 */
       pulse: z.object({ amount: z.number().nonnegative(), periodMs: z.number().positive() }).optional(),
     })
+    .optional(),
+  /**
+   * 持ち主の残像として飛ぶ（ゴッドバード）: 発射体の芯の代わりに、持ち主のポケモンの姿を薄く描く。
+   * afterimages は後ろに連ねる残像の数、spacingTicks はその間隔（更新回数ぶんの移動）
+   */
+  ownerGhost: z
+    .object({ tint: colorString, alpha: z.number().min(0).max(1), afterimages: z.number().int().nonnegative(), spacingTicks: z.number().positive() })
     .optional(),
   /** 発射体の軌跡に出すパーティクル */
   trail: particleSchema.extend({ intervalMs: z.number().positive() }).optional(),

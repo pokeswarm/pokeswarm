@@ -186,6 +186,29 @@ describe('効き方の部品（07 22.4）', () => {
     expect(stageCount(sim, 1)).toBe(5);
   });
 
+  it('通った道（path）: ブーメランが通った道が、行きも戻りも線1本の範囲になる', () => {
+    const puddle = { sizeMultiplier: 1, powerMultiplier: 0.5, durationSeconds: 3, hitIntervalSeconds: 0.5, path: true };
+    const sim = withEffects('boomerang', { speed: 600, size: 10, count: 1, range: 400, durationSeconds: 1 }, [{ trigger: 'every', everySeconds: 0.05, puddle }], [], 40);
+    const pr = sim.world.projectiles;
+    const lines = Array.from({ length: pr.count }, (_, i) => i).filter((i) => pr.stage[i] === 1);
+    expect(lines.length).toBe(1);
+    const i = lines[0]!;
+    expect(pr.shape[i]).toBe(1);
+    expect(pr.dirX[i]!).toBeCloseTo(1);
+    // 1秒で減速して戻るので、行きの距離は 600 × 1 / 4 = 150 くらい
+    expect(pr.length[i]!).toBeGreaterThan(120);
+    expect(pr.length[i]!).toBeLessThan(160);
+  });
+
+  it('通った道（path）: ビームは線そのものを1本残す', () => {
+    const puddle = { sizeMultiplier: 1, powerMultiplier: 0.5, durationSeconds: 3, hitIntervalSeconds: 0.5, path: true };
+    const sim = withEffects('beam', { size: 10, count: 1, range: 300, durationSeconds: 0.2 }, [{ trigger: 'end', puddle }], [], 12);
+    const pr = sim.world.projectiles;
+    const lines = Array.from({ length: pr.count }, (_, i) => i).filter((i) => pr.stage[i] === 1);
+    expect(lines.length).toBe(1);
+    expect(pr.length[lines[0]!]!).toBeCloseTo(300, -1);
+  });
+
   it('連鎖: 当たった敵から近くの敵へ飛び移る', () => {
     const sim = withEffects('facing', { speed: 600, size: 6, count: 1, range: 400, durationSeconds: 1 }, [{ trigger: 'hit', chain: { sizeMultiplier: 1, powerMultiplier: 1, count: 2, range: 200 } }], [[100, 0], [100, 120], [100, 240]], 8);
     const e = sim.world.enemies;

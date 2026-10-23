@@ -76,6 +76,12 @@ export class PlayerView {
     }
   }
 
+  /** 残像に使う、今のドット絵の絵（スプライトが無ければ null） */
+  ghostFrame(): { key: string; frame: string | number; scaleX: number; scaleY: number; flipX: boolean } | null {
+    const s = this.pokemon?.sprite;
+    return s ? { key: s.texture.key, frame: s.frame.name, scaleX: s.scaleX, scaleY: s.scaleY, flipX: s.flipX } : null;
+  }
+
   /** reviveRatio: 倒れているとき、味方が触れて復活するまでの進み具合（0〜1。触れていなければ 0） */
   update(player: Player, alpha: number, reviveRatio = 0): void {
     this.container.setPosition(

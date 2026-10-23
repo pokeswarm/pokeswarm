@@ -3085,7 +3085,7 @@
             "powerMultiplier": 0.2,
             "durationSeconds": 2,
             "hitIntervalSeconds": 0.5,
-            "alongSpacing": 40
+            "path": true
           }
         }
       ]
@@ -4040,12 +4040,13 @@
       "effects": [
         {
           "trigger": "every",
-          "everySeconds": 0.15,
+          "everySeconds": 0.05,
           "puddle": {
-            "sizeMultiplier": 1.1,
+            "sizeMultiplier": 1,
             "powerMultiplier": 0.25,
             "durationSeconds": 2,
-            "hitIntervalSeconds": 0.4
+            "hitIntervalSeconds": 0.4,
+            "path": true
           }
         }
       ]

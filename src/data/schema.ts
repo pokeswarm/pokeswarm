@@ -745,6 +745,8 @@ export const moveEffectSchema = z.object({
       spreadDegrees: z.number().positive().default(360),
       boomerang: z.boolean().default(false),
       jitter: z.number().min(0).max(1).optional(),
+      /** 向きを、もとの向きからこの角度（度）ずらす（シザークロス: 45° で X 字に） */
+      angleOffsetDegrees: z.number().optional(),
       lob: z.boolean().optional(),
       snake: snakeSchema.optional(),
       /** レベルが1上がるごとに延ばす持続（秒。ハードプラント: 強化で根が遠くまで伸びる） */

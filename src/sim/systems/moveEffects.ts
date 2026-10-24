@@ -189,7 +189,7 @@ function applyEffect(world: World, fx: MoveEffect, index: number, src: FxSource)
       const step = spread >= Math.PI * 2 ? (Math.PI * 2) / sp.count : sp.count === 1 ? 0 : spread / (sp.count - 1);
       const a0 = spread >= Math.PI * 2 ? angle0 + (k / sp.count) * Math.PI * 2 : angle0 + (sp.count === 1 ? 0 : (k / (sp.count - 1) - 0.5) * spread);
       const jitter = sp.jitter ?? 0;
-      const a = a0 + (rand(k, 1) - 0.5) * step * jitter;
+      const a = a0 + ((sp.angleOffsetDegrees ?? 0) * Math.PI) / 180 + (rand(k, 1) - 0.5) * step * jitter;
       const speed = sp.speed * (1 - 0.5 * jitter * rand(k, 2));
       const vx = Math.cos(a) * speed;
       const vy = Math.sin(a) * speed;

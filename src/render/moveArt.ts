@@ -1015,23 +1015,6 @@ function furySlash(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
 }
 
-/** シザークロス: 黄緑の鎌が X に交わる（進む向きに向ける） */
-function xScissor(): SpriteOut {
-  const palette = ['#1b3d14', '#689f38', '#aed581', '#f1f8e9'];
-  const slash = (sign: number): Grid =>
-    shape(18, (u, v) => {
-      const along = (u + sign * v) / Math.SQRT2;
-      const across = (u - sign * v) / Math.SQRT2 - along * along * 0.15 * sign;
-      const w = 0.17 * (1 - Math.abs(along) / 0.95);
-      if (Math.abs(along) > 0.95 || Math.abs(across) > w) return -1;
-      return Math.abs(across) < w * 0.35 ? 3 : Math.abs(across) < w * 0.7 ? 2 : 1;
-    });
-  const a = slash(1);
-  const b = slash(-1);
-  const g = a.map((row, y) => row.map((c, x) => (c >= 0 ? c : b[y]![x]!)));
-  return { palette, frameMs: 1000, parts: { main: [toRows(outline(g, 0))] } };
-}
-
 /** ラスターカノン: 銀色の鋼の光線（ふちが青白く、真ん中に光の筋が流れる） */
 function steelBeam(): SpriteOut {
   const H = 12;
@@ -2027,8 +2010,7 @@ function karateChop(): SpriteOut {
  * クロスチョップ: 前方に大きく交わる2本の手刀（X）。刃は少しふくらんだ斜めの線で、真ん中が太く両端がとがる。
  * 2本は上下に鏡写しで、交わる所に光がはじける。コマ 0 で刃が走り、1・2 で光が瞬く（loopFrom 1）
  */
-function crossChop(): SpriteOut {
-  const palette = ['#0d1b2a', '#1e5aa8', '#64b5f6', '#bbdefb', '#ffffff', '#fff59d'];
+function crossChop(palette = ['#0d1b2a', '#1e5aa8', '#64b5f6', '#bbdefb', '#ffffff', '#fff59d']): SpriteOut {
   // 右上から左下への刃（v を返すと、もう1本）。左下から伸びていく
   const blade = (u: number, v: number, grow: number): number => {
     const c = Math.SQRT1_2;
@@ -2392,7 +2374,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     claw: () => claw('small'),
     'claw-big': () => claw('big'),
     'fury-slash': () => furySlash(),
-    'x-scissor': () => xScissor(),
+    'x-scissor': () => crossChop(['#10240a', '#33691e', '#7cb342', '#c5e1a5', '#ffffff', '#f0f4c3']),
     'steel-beam': () => steelBeam(),
     rock: () => rock('rock'),
     stone: () => rock('stone'),

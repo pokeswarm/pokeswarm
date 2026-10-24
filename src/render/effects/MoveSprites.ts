@@ -207,8 +207,9 @@ export class MoveSprites {
       const elapsed = pr.maxLife[i]! - pr.life[i]!;
       const snake =
         pr.motion[i] === MOTION_SNAKE ? { ox: pr.ox[i]!, oy: pr.oy[i]!, vx: pr.vx[i]!, vy: pr.vy[i]!, amp: pr.orbitRadius[i]!, omega: pr.angularSpeed[i]!, t: elapsed } : undefined;
-      for (const spec of Array.isArray(got) ? (got as readonly SpriteSpec[]) : [got as SpriteSpec]) items.push({
-        spec,
+      for (const one of Array.isArray(got) ? (got as readonly SpriteSpec[]) : [got as SpriteSpec]) items.push({
+        // 絵を選ぶ技（ばくれつパンチ）は、出した順の通し番号で選ぶ
+        spec: one.variants?.length ? { ...one, id: one.variants[pr.serial[i]! % one.variants.length]! } : one,
         x: pr.prevX[i]! + (pr.x[i]! - pr.prevX[i]!) * alpha,
         y: pr.prevY[i]! + (pr.y[i]! - pr.prevY[i]!) * alpha,
         radius: pr.radius[i]!,

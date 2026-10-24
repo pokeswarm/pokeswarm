@@ -60,6 +60,8 @@ export interface SimDerivation {
   readonly minLevel?: number;
   /** 今の姿がこのどれかのときだけ覚えられる（種類の番号） */
   readonly forms?: readonly number[];
+  /** ほかにも最大レベルで持っていないといけない技（進化すると消費される） */
+  readonly withMoves?: readonly number[];
 }
 
 /** シミュレーションが使うレベルアップの定義 */

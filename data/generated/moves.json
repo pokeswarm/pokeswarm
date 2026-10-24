@@ -347,6 +347,18 @@
     "type": "fire",
     "damageClass": "physical"
   },
+  "fire-punch": {
+    "names": {
+      "ja": "ほのおのパンチ",
+      "en": "Fire Punch",
+      "fr": "Poing Feu",
+      "de": "Feuerschlag",
+      "es": "Puño Fuego",
+      "it": "Fuocopugno"
+    },
+    "type": "fire",
+    "damageClass": "physical"
+  },
   "fire-spin": {
     "names": {
       "ja": "ほのおのうず",
@@ -406,6 +418,18 @@
     },
     "type": "steel",
     "damageClass": "special"
+  },
+  "focus-punch": {
+    "names": {
+      "ja": "きあいパンチ",
+      "en": "Focus Punch",
+      "fr": "Mitra-Poing",
+      "de": "Power-Punch",
+      "es": "Puño Certero",
+      "it": "Centripugno"
+    },
+    "type": "fighting",
+    "damageClass": "physical"
   },
   "freeze-dry": {
     "names": {
@@ -610,6 +634,18 @@
     },
     "type": "grass",
     "damageClass": "status"
+  },
+  "mach-punch": {
+    "names": {
+      "ja": "マッハパンチ",
+      "en": "Mach Punch",
+      "fr": "Mach Punch",
+      "de": "Tempohieb",
+      "es": "Ultrapuño",
+      "it": "Pugnorapido"
+    },
+    "type": "fighting",
+    "damageClass": "physical"
   },
   "magnitude": {
     "names": {

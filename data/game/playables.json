@@ -12,7 +12,7 @@
     "growlithe": { "sprite": "growlithe", "startingMoves": ["fire-fang"], "unlock": "arcanine" },
     "rhyhorn": { "sprite": "rhyhorn", "startingMoves": ["magnitude"], "unlock": "rhydon" },
     "lapras": { "sprite": "lapras", "startingMoves": ["powder-snow"] },
-    "machop": { "sprite": "machop", "startingMoves": ["karate-chop"], "unlock": "machamp" },
+    "machop": { "sprite": "machop", "startingMoves": ["mach-punch"], "unlock": "machamp", "fixedMoves": true, "itemMoves": [{ "item": "fire-stone", "move": "fire-punch" }, { "item": "thunder-stone", "move": "thunder-punch" }] },
     "gastly": { "sprite": "gastly", "startingMoves": ["night-shade"], "unlock": "gengar" },
     "dratini": { "sprite": "dratini", "startingMoves": ["dragon-tail"], "unlock": "dragonite" },
     "psyduck": { "sprite": "psyduck", "startingMoves": ["confusion"], "evolves": false, "moveTypes": ["psychic"] },

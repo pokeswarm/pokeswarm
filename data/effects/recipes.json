@@ -2219,7 +2219,12 @@
         "id": "fist",
         "fit": "circle",
         "size": 1.5,
-        "rotate": "velocity"
+        "rotate": "velocity",
+        "variants": [
+          "fist",
+          "fist-fire",
+          "fist-thunder"
+        ]
       }
     },
     "double-kick": {
@@ -2890,6 +2895,111 @@
     },
     "conversion": {
       "extends": "normal.base"
+    },
+    "mach-punch": {
+      "extends": "fighting.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      },
+      "sprite": {
+        "id": "fist-mach",
+        "fit": "circle",
+        "size": 1.6,
+        "rotate": "velocity"
+      }
+    },
+    "focus-punch": {
+      "extends": "fighting.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      },
+      "impact": {
+        "flash": {
+          "radius": 50
+        }
+      },
+      "chargeGlow": {
+        "color": "#ff9800",
+        "seconds": 0.5,
+        "radius": 50,
+        "alpha": 0.9
+      },
+      "sprite": {
+        "id": "fist-focus",
+        "fit": "front",
+        "size": 1.1
+      }
+    },
+    "fire-punch": {
+      "extends": "fire.base",
+      "impact": {
+        "burst": {
+          "count": 6
+        },
+        "flash": {
+          "radius": 20,
+          "alpha": 0.25
+        }
+      },
+      "sprite": {
+        "id": "fist-fire",
+        "fit": "circle",
+        "size": 1.5
+      },
+      "linger": {
+        "spread": 0,
+        "blend": "add",
+        "colors": [
+          "#ffee58",
+          "#ff7043",
+          "#d84315"
+        ],
+        "lifespanMs": [
+          500,
+          900
+        ],
+        "speed": [
+          4,
+          16
+        ],
+        "scale": [
+          0.24,
+          0
+        ],
+        "alpha": [
+          0.95,
+          0
+        ],
+        "gravityY": -45,
+        "perSecond": 7,
+        "fillAlpha": 0.36,
+        "maxPerSecond": 24
+      }
+    },
+    "thunder-punch": {
+      "extends": "electric.base",
+      "impact": {
+        "burst": {
+          "count": 6
+        },
+        "flash": {
+          "radius": 20,
+          "alpha": 0.25
+        }
+      },
+      "sprite": {
+        "id": "fist-thunder",
+        "fit": "circle",
+        "size": 1.6
+      },
+      "lightningLine": {
+        "color": "#fffde7",
+        "glowColor": "#ffeb3b",
+        "width": 2.5,
+        "jitter": 3
+      }
     }
   }
 }

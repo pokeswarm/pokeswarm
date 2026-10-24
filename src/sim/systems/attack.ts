@@ -128,6 +128,8 @@ export function useMoves(world: World): void {
   for (const p of world.players) {
     // 倒れている間は技を使わない
     if (p.down) continue;
+    // 順番に出す技（ワンリキーのパンチ）の、次に出せるまでの秒数
+    if (p.groupTimers) for (const g of Object.keys(p.groupTimers)) p.groupTimers[g]! -= world.dt;
     for (const pm of p.moves) {
       const def = world.rules.moves[pm.move];
       // いつも効く技（かくばる・テクスチャー）は使わない（効果は持ち物と同じく、いつも足されている）
@@ -146,6 +148,22 @@ export function useMoves(world: World): void {
         continue;
       }
       // 出した技が消えるまで次を出さない技（ボルテッカー）は、再使用を少なくとも持続の長さにする
+      // 順番に出す技（ワンリキーのパンチ）: 自分の番で、前の技から間が空いたときだけ出す。
+      // 間は出した技の再使用 ÷ 順番に出す技の数（それぞれの技は、だいたい自分の再使用ごとに1回出る）
+      if (def.group) {
+        const members = p.moves.filter((m) => world.rules.moves[m.move]?.group === def.group);
+        if (members.length > 1) {
+          const timers = (p.groupTimers ??= {});
+          const cursor = (p.groupCursor ??= {});
+          const k = (cursor[def.group] ?? 0) % members.length;
+          if (members[k] !== pm || (timers[def.group] ?? 0) > 0) {
+            pm.cooldown = 0;
+            continue;
+          }
+          cursor[def.group] = k + 1;
+          timers[def.group] = scaledMoveStats(world, p, pm, st).cooldownSeconds / members.length;
+        }
+      }
       // 消えてから数える技（こなゆき・ふぶき）は、持続の分を足す
       pm.cooldown = Math.max(scaledMoveStats(world, p, pm, st).cooldownSeconds, def.waitForEnd ? st.durationSeconds : 0) + (def.restAfterEnd ? st.durationSeconds : 0);
       world.events.push({ type: 'moveUsed', playerId: p.id, move: pm.move });
@@ -341,7 +359,8 @@ function fireBarrageHit(world: World, p: Player, pm: PlayerMove, st: MoveStats):
   const [fx, fy] = axisToUnit(p.facingX, p.facingY);
   const center = pm.aimAngle ?? Math.atan2(fy, fx);
   const speed0 = scaledMoveStats(world, p, pm, st).speed;
-  const width = world.rules.moves[pm.move]!.barrageWidth;
+  const bdef = world.rules.moves[pm.move]!;
+  const width = bdef.barrageWidth ? bdef.barrageWidth + (bdef.barrageWidthPerLevel ?? 0) * Math.max(0, pm.level - 1) : 0;
   if (width) {
     // 長方形: 自分を通る横の辺のランダムな所から、向きへまっすぐ。奥行き range まで届いたら消える
     const dx = Math.cos(center);

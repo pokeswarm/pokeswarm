@@ -2061,41 +2061,100 @@ function crossChop(): SpriteOut {
   return { palette, frameMs: 80, loopFrom: 1, parts: { main: frames.map(toRows) } };
 }
 
+type PunchKind = 'plain' | 'mach' | 'focus' | 'fire' | 'thunder';
+
 /**
- * ばくれつパンチ: 右へ突き出したこぶし（横から見た姿）。4つの関節のでこぼこと指の筋、前に巻いた親指、赤い手首のバンド、
- * 後ろに速さの線。コマ 1 でこぶしの先に衝撃の光
+ * こぶし（右へ突き出した横からの姿）: 4つの関節のでこぼこと指の筋、前に巻いた親指、赤い手首のバンド。種類ごとにまわりを飾る
+ * （作者の決定 2026年10月25日。ワンリキーのパンチ）:
+ * plain（ばくれつパンチ）= 後ろに速さの線・先に衝撃の光、mach（マッハパンチ）= 長い速さの筋と白い残像、focus（きあいパンチ）= 橙の気のふち取り、
+ * fire（ほのおのパンチ）= 後ろへなびく炎、thunder（かみなりパンチ）= まわりに走る稲妻
  */
-function punch(): SpriteOut {
-  // 0 輪郭・1 バンドの暗い所・2 バンド・3 肌の影・4 肌・5 肌の明るい所・6 速さの線・7 衝撃
-  const palette = ['#2b1408', '#a31515', '#e53935', '#d8875c', '#f5bd8f', '#ffe3c8', '#ffffff', '#fff176'];
-  const frames = [0, 1].map((f) =>
-    shape(24, (u, v) => {
-      // 衝撃の光（こぶしの先）
-      if (f === 1) {
-        const a = Math.atan2(v, u - 0.82);
-        const r = Math.hypot(u - 0.82, v);
-        if (u > 0.68 && r < 0.12 + 0.12 * Math.abs(Math.cos(a * 3)) ** 4) return 7;
-      }
+function punch(kind: PunchKind = 'plain'): SpriteOut {
+  // 0 輪郭・1 バンドの暗い所・2 バンド・3 肌の影・4 肌・5 肌の明るい所・6 白・7〜9 飾りの色（種類ごと。9 は先の衝撃の光にも使う）
+  const deco: Record<PunchKind, string[]> = {
+    plain: ['#ffb300', '#ffe082', '#fff176'],
+    mach: ['#b3e5fc', '#e1f5fe', '#ffffff'],
+    focus: ['#ff6d00', '#ffab40', '#ffe0b2'],
+    fire: ['#d84315', '#ff9800', '#ffeb3b'],
+    thunder: ['#f9a825', '#ffeb3b', '#fffde7'],
+  };
+  const palette = ['#2b1408', '#a31515', '#e53935', '#d8875c', '#f5bd8f', '#ffe3c8', '#ffffff', ...deco[kind]];
+  const frames = [0, 1, 2].map((f) => {
+    const r = rng(1700 + f);
+    const sparks = Array.from({ length: 3 }, () => ({ a: r() * Math.PI * 2, len: 0.25 + r() * 0.15 }));
+    return shape(24, (u, v) => {
       const knuckle = [-0.29, -0.1, 0.09, 0.27].some((ky) => Math.hypot(u - 0.52, v - ky) < 0.11);
       const body = inRoundRect(u, v, 0.2, -0.02, 0.36, 0.38, 0.12) || knuckle;
       const thumb = inRoundRect(u, v, 0.2, 0.3, 0.26, 0.09, 0.08);
-      if (thumb) return v > 0.34 ? 3 : 4;
-      if (body) {
-        // 指の筋
-        if (u > 0.22 && [-0.2, -0.01, 0.18].some((ly) => Math.abs(v - ly) < 0.025)) return 3;
-        if (v < -0.22 && u > -0.05) return 5;
-        return v > 0.18 ? 3 : 4;
+      const band = inRoundRect(u, v, -0.27, -0.02, 0.12, 0.3, 0.05);
+      const arm = u < -0.39 && u > -0.62 && Math.abs(v + 0.02) < 0.22;
+      const fist = body || thumb || band || arm;
+      if (fist) {
+        if (thumb) return v > 0.34 ? 3 : 4;
+        if (body) {
+          if (u > 0.22 && [-0.2, -0.01, 0.18].some((ly) => Math.abs(v - ly) < 0.025)) return 3;
+          if (v < -0.22 && u > -0.05) return 5;
+          return v > 0.18 ? 3 : 4;
+        }
+        if (band) return v > 0.12 ? 1 : 2;
+        return v > 0.08 ? 3 : 4;
       }
-      // 手首のバンドと腕
-      if (inRoundRect(u, v, -0.27, -0.02, 0.12, 0.3, 0.05)) return v > 0.12 ? 1 : 2;
-      if (u < -0.39 && u > -0.62 && Math.abs(v + 0.02) < 0.22) return v > 0.08 ? 3 : 4;
-      // 速さの線（後ろ）
+      // こぶしのまわり（輪郭のすぐ外）までの近さ
+      const near = Math.max(0, 1 - Math.min(Math.hypot(u - 0.3, (v + 0.02) * 1.15) - 0.42, 1) / 0.2);
+      if (kind === 'focus') {
+        // 気のふち取り: こぶしのまわりを2重に囲む
+        const d = Math.hypot((u - 0.15) / 0.82, (v + 0.02) / 0.62);
+        if (d > 0.82 && d < 0.95 && (Math.floor(Math.atan2(v, u) * 6 + f * 2) % 3 !== 0)) return d < 0.88 ? 8 : 7;
+        if (d >= 0.95 && d < 1.02 && f !== 1) return 9;
+      }
+      if (kind === 'fire') {
+        // 後ろ（左）へなびく炎の舌（3本）
+        for (const [k, oy] of [[0, -0.28], [1, 0], [2, 0.26]] as const) {
+          const t = (-0.15 - u) / 0.8;
+          if (t < 0 || t > 1) continue;
+          const wob = Math.sin(t * 7 + f * 2 + k * 2) * 0.06 * t;
+          const w = 0.14 * (1 - t) + 0.02;
+          const d = Math.abs(v - oy * (1 + t * 0.5) - wob);
+          if (d < w) return d < w * 0.4 ? 9 : t < 0.5 ? 8 : 7;
+        }
+        if (near > 0.6 && hash(Math.floor(u * 20), Math.floor(v * 20), 1710 + f) < 0.3) return 8;
+      }
+      if (kind === 'thunder') {
+        // まわりに走る短い稲妻（こぶしの外へ、折れ線で）
+        for (const sp of sparks) {
+          const ca = Math.cos(sp.a);
+          const sa = Math.sin(sp.a);
+          const x0 = 0.25 + ca * 0.45;
+          const y0 = sa * 0.42;
+          const along = (u - x0) * ca + (v - y0) * sa;
+          if (along < 0 || along > sp.len) continue;
+          const side = -(u - x0) * sa + (v - y0) * ca;
+          const zig = (Math.abs(((along / 0.08) % 2) - 1) - 0.5) * 0.06;
+          if (Math.abs(side - zig) < 0.03) return 9;
+          if (Math.abs(side - zig) < 0.06) return 8;
+        }
+      }
+      if (kind === 'mach') {
+        // 長い速さの筋と、少しずれた白い残像のふち
+        for (const [ly, len] of [[-0.34, 0.5], [-0.12, 0.7], [0.1, 0.62], [0.3, 0.45]] as const) {
+          if (Math.abs(v - ly) < 0.03 && u < -0.66 + 0.2 && u > -0.66 - len + f * 0.05) return 9;
+        }
+        const ghost = inRoundRect(u + 0.18, v, 0.2, -0.02, 0.36, 0.38, 0.12);
+        if (ghost) return 7;
+        return -1;
+      }
+      // 速さの線（後ろ）と、先の衝撃の光
       for (const [ly, len] of [[-0.3, 0.25], [0, 0.32], [0.26, 0.22]] as const) {
-        if (Math.abs(v - ly) < 0.035 && u < -0.68 && u > -0.68 - len - f * 0.08) return 6;
+        if (Math.abs(v - ly) < 0.035 && u < -0.68 && u > -0.68 - len - (f % 2) * 0.08) return kind === 'fire' ? 8 : 6;
+      }
+      if (f === 1 || kind === 'focus') {
+        const a = Math.atan2(v, u - 0.82);
+        const rr = Math.hypot(u - 0.82, v);
+        if (u > 0.68 && rr < 0.12 + 0.12 * Math.abs(Math.cos(a * 3)) ** 4) return 9;
       }
       return -1;
-    }),
-  );
+    });
+  });
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
@@ -2317,7 +2376,11 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'spark-arc': () => sparkArc(),
     chop: () => karateChop(),
     'cross-chop': () => crossChop(),
-    fist: () => punch(),
+    fist: () => punch('plain'),
+    'fist-mach': () => punch('mach'),
+    'fist-focus': () => punch('focus'),
+    'fist-fire': () => punch('fire'),
+    'fist-thunder': () => punch('thunder'),
     kick: () => kick(),
     'kick-arc': () => kickArc(),
     'tail-swipe': () => tailSwipe(),

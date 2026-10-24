@@ -712,6 +712,9 @@ export class RunScene extends Phaser.Scene {
         else if (it.by === this.localId) this.announce(localName(generated.items.potion?.names, getLocale(), ''), '#ce93d8');
       } else if (ev.type === 'bodyAttack') {
         this.playerViews.get(ev.playerId)?.lunge(ev.dirX, ev.dirY, ev.distance, ev.afterimages);
+      } else if (ev.type === 'moveTaught' && ev.playerId === this.localId) {
+        // 持ち物で技を覚えた（ワンリキー）
+        this.announce(t('run.moveTaught', { name: localName(generated.moves[w.rules.moves[ev.move]!.key]?.names, getLocale(), w.rules.moves[ev.move]!.key) }), '#ffcc80');
       } else if (ev.type === 'moveUsed') {
         // 使った瞬間の絵（しおふき: 真上へ噴き上がる潮）
         const cs = this.effects.castSprite(w.rules.moves[ev.move]!.effect);

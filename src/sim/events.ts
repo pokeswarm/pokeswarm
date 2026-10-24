@@ -106,6 +106,13 @@ export interface UpgradeChosenEvent {
   readonly offer: UpgradeOffer;
 }
 
+/** 持ち物を持って技を覚えた（ワンリキーの ほのおのパンチ・かみなりパンチ） */
+export interface MoveTaughtEvent {
+  readonly type: 'moveTaught';
+  readonly playerId: PlayerId;
+  readonly move: number;
+}
+
 /** プレイヤーがダメージを受けた（自分のブラウザで判定） */
 export interface PlayerDamagedEvent {
   readonly type: 'playerDamaged';
@@ -261,6 +268,7 @@ export type SimEvent =
   | PickupRequestedEvent
   | LevelUpEvent
   | UpgradeChosenEvent
+  | MoveTaughtEvent
   | PlayerDamagedEvent
   | PlayerRevivedEvent
   | PlayerDownEvent

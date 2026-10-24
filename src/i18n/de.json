@@ -425,6 +425,7 @@
   "pattern.pulse": "Ein Ring, der sich um dich ausdehnt und zusammenzieht",
   "pattern.weather": "Fällt eine Weile auf den ganzen Bildschirm",
   "pattern.barrage": "Entfesselt eine Schlagserie",
+  "run.moveTaught": "{name} erlernt!",
   "itemDesc.everstone": "Von Evoli getragen: keine Entwicklung, aber Stärke und max. KP +10 %, Tempo +5 % (nicht zusammen mit Entwicklungssteinen)",
   "shop.pokemonSection": "Pokémon",
   "shop.pokemonDesc": "Ins Team holen (in der Pokémon-Auswahl wählbar)",

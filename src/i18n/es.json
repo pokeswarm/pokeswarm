@@ -425,6 +425,7 @@
   "pattern.pulse": "Un anillo que se expande y se contrae a tu alrededor",
   "pattern.weather": "Cae por toda la pantalla durante un rato",
   "pattern.barrage": "Desata una ráfaga de golpes",
+  "run.moveTaught": "¡Aprendió {name}!",
   "itemDesc.everstone": "Si lo lleva Eevee: no evoluciona, pero potencia y PS máx. +10 %, velocidad +5 % (no se puede llevar con piedras evolutivas)",
   "shop.pokemonSection": "Pokémon",
   "shop.pokemonDesc": "Se une al equipo (elígelo en la selección de Pokémon)",

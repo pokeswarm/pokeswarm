@@ -242,6 +242,8 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
       if (d.minLevel && world.level < d.minLevel) continue;
       if (d.forms && !d.forms.includes(p.species)) continue;
       if (p.moves.some((m) => m.move === d.to)) continue;
+      // ほかにも最大レベルで持っていないといけない技（ばくれつパンチ）
+      if (d.withMoves && !d.withMoves.every((w) => p.moves.some((m) => m.move === w && m.level >= rules.moves[w]!.levels.length))) continue;
       guaranteed.push({ kind: 'derive', slot, to: d.to, item: d.item, unique: d.line !== null });
     }
   });
@@ -254,7 +256,7 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
   // 技を覚えないポケモン（プリン）は、新しい技を候補に出さない
   if (p.moves.length < rules.combat.maxMoveSlots && !p.fixedMoves) {
     rules.moves.forEach((m, move) => {
-      if (!isBaseMove(world, move) || p.moves.some((pm) => pm.move === move)) return;
+      if (!isBaseMove(world, move) || m.teachOnly || p.moves.some((pm) => pm.move === move)) return;
       // 覚えられる系統が決まっている技（ノーマルの技・各ポケモン専用の技）は、その系統だけ（ミュウは何でも）
       if (m.learners && !p.learnsAll && !m.learners.includes(p.line)) return;
       if (m.type === normal || p.types.includes(m.type) || p.moveTypes.includes(m.type)) pool.push({ kind: 'moveNew', move });
@@ -314,15 +316,32 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
       break;
     case 'derive': {
       p.moves[offer.slot] = { move: offer.to, level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0 };
+      // ほかの技も使って進化する技（ばくれつパンチ）: 使った技はなくなり、持ち物で覚え直さない
+      const d = world.rules.derivations.find((x) => x.to === offer.to && x.withMoves);
+      if (d?.withMoves) {
+        p.moves = p.moves.filter((m) => !d.withMoves!.includes(m.move));
+        p.consumedMoves = [...(p.consumedMoves ?? []), ...d.withMoves];
+      }
       // 進化の石などは使うとなくなる（持ち物の枠が空く）
       if (offer.item !== -1 && world.rules.items[offer.item]!.consumable) p.items = p.items.filter((it) => it.item !== offer.item);
       break;
     }
   }
   world.events.push({ type: 'upgradeChosen', playerId: p.id, offer });
+  teachItemMoves(world, p);
   recomputeModifiers(world, p);
   // 石を取ったら進化することがある（イーブイなど）
   checkEvolution(world, p);
+}
+
+/** 持つと技を覚える持ち物（ワンリキーの ほのおのいし・かみなりのいし）: 持っていて、まだ覚えておらず消費もしていなければ覚える */
+function teachItemMoves(world: World, p: Player): void {
+  for (const im of world.rules.itemMoves ?? []) {
+    if (im.line !== p.line || !p.items.some((it) => it.item === im.item)) continue;
+    if (p.moves.some((m) => m.move === im.move) || p.consumedMoves?.includes(im.move)) continue;
+    p.moves.push({ move: im.move, level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0 });
+    world.events.push({ type: 'moveTaught', playerId: p.id, move: im.move });
+  }
 }
 
 /**
@@ -367,6 +386,14 @@ export function derivationCompletedBy(world: World, p: Player, offer: UpgradeOff
     if (d.forms && !d.forms.includes(p.species)) continue;
     const hasItem = p.items.some((it) => it.item === d.item);
     const fromAtMax = p.moves.some((m) => m.move === d.from && m.level >= maxOf(d.from));
+    // ほかにも最大で持っていないといけない技（ばくれつパンチ）: この候補で最大になる技も数える
+    const atMaxAfter = (move: number): boolean =>
+      p.moves.some((m, slot) => m.move === move && (m.level >= maxOf(move) || (offer.kind === 'moveUp' && offer.slot === slot && m.level + 1 >= maxOf(move))));
+    if (d.withMoves) {
+      if (!atMaxAfter(d.from) || !d.withMoves.every(atMaxAfter)) continue;
+      if (offer.kind === 'moveUp' && [d.from, ...d.withMoves].includes(p.moves[offer.slot]!.move) && p.moves[offer.slot]!.level + 1 >= maxOf(p.moves[offer.slot]!.move)) return d;
+      continue;
+    }
     switch (offer.kind) {
       case 'itemNew':
         if (offer.item === d.item && fromAtMax) return d;

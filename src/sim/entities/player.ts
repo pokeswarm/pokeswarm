@@ -95,6 +95,11 @@ export interface Player {
   guardUntilTick?: number;
   guardPct?: number;
   readonly banned: Set<string>;
+  /** 進化で消費された技（持ち物で覚え直さない） */
+  consumedMoves?: number[];
+  /** 順番に出す技（group）ごとの、次に出せるまでの秒数と、次に出す番 */
+  groupTimers?: Record<string, number>;
+  groupCursor?: Record<string, number>;
 }
 
 export interface PlayerInit {

@@ -856,10 +856,19 @@ export const moveDefSchema = z.object({
    * 拳をまっすぐ乱打する（ばくれつパンチ: 自分の真横から当たる。作者の決定 2026年10月25日）。省略なら扇形の中のランダムな場所
    */
   barrageWidth: z.number().positive().optional(),
+  /** レベルが1上がるごとに広げる横幅（ばくれつパンチ: 強化で出る範囲が広がる） */
+  barrageWidthPerLevel: z.number().nonnegative().optional(),
   /** 向きを、使うたびにランダムに選ぶ（にどげり・まわしげり: 近くのランダムな向きへ。barrage・sweep で使う） */
   randomAim: z.boolean().optional(),
   /** 再使用を、出した技が消えてから数える（こなゆき・ふぶき: 雪が止んでから cooldown の間はダメージが起きない。作者の決定 2026年10月25日） */
   restAfterEnd: z.boolean().optional(),
+  /** 候補に出さない（持ち物を持つと覚える技。ほのおのパンチ・かみなりパンチ） */
+  teachOnly: z.boolean().optional(),
+  /**
+   * 同じ group の技は、同時に出さず順番に出す（ワンリキーのパンチ。作者の決定 2026年10月25日）。
+   * 1つ出すと、次の技はその技の再使用 ÷ group の技の数 の後に出せる
+   */
+  group: z.string().optional(),
   /** 飛ぶ弾（cross・nearest など）を蛇行させる（ヘドロウェーブ・りゅうのいかり） */
   snake: snakeSchema.optional(),
   /**
@@ -921,6 +930,8 @@ export const playablesConfigSchema = z.object({
       moveTypes: z.array(z.string()).optional(),
       /** 新しい技を覚えない（プリン: 最初の2つだけで戦う） */
       fixedMoves: z.boolean().default(false),
+      /** 持つと技を覚える持ち物（ワンリキー: ほのおのいし → ほのおのパンチ、かみなりのいし → かみなりパンチ）。消費された技は覚え直さない */
+      itemMoves: z.array(z.object({ item: z.string(), move: z.string() })).default([]),
       /** どのタイプの技も覚えられる（ミュウ） */
       allMoveTypes: z.boolean().default(false),
       /**
@@ -1121,6 +1132,8 @@ const moveSpriteSpec = z.object({
   shake: z.number().nonnegative().default(0),
   /** snake: 先から後ろへ描く道の長さ（ワールドの単位）。0 なら出した場所から全部 */
   tail: z.number().nonnegative().default(0),
+  /** 当たり判定ごとに、この中から絵を順に選ぶ（ばくれつパンチ: ふつう・炎・電気のこぶし）。省略なら id だけ */
+  variants: z.array(z.string()).optional(),
 });
 
 export const effectRecipeSchema = z.object({
@@ -1515,6 +1528,11 @@ export const derivationsConfigSchema = z.object({
       minLevel: z.number().int().positive().optional(),
       /** 今の姿がこのどれかのときだけ覚えられる（かみなり = ライチュウ。PokeAPI のポケモンの名前） */
       forms: z.array(z.string()).optional(),
+      /**
+       * ほかにも最大レベルで持っていないといけない技。進化するとき、これらの技は消費されて（なくなって）新しい技に入る
+       * （ばくれつパンチ: きあいパンチ・ほのおのパンチ・かみなりパンチ が全部最大。作者の決定 2026年10月25日）
+       */
+      withMoves: z.array(z.string()).optional(),
     }),
   ),
 });

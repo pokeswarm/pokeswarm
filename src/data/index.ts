@@ -261,7 +261,7 @@ for (const [key, def] of Object.entries(movesConfig.moves)) {
   check(!!generated.moves[key], `data/game/moves.json の "${key}" が data/generated/moves.json にありません（data/pokeapi/targets.json に足して npm run pokeapi）`);
   check(!!effectRecipes[def.effect], `data/game/moves.json の "${key}" の effect "${def.effect}" のレシピがありません`);
   for (const l of def.learners ?? []) check(!!playablesConfig.pokemon[l], `data/game/moves.json の "${key}" の learners "${l}" が data/game/playables.json にありません`);
-  for (const sp of (['sprite', 'effectLineSprite', 'effectSprite', 'pathSprite', 'edgeSprite', 'castSprite', 'hitSprite'] as const).map((k) => effectRecipes[def.effect]?.[k])) if (sp) check(!!moveSprites.sprites[sp.id], `data/effects/recipes.json の "${def.effect}" のドット絵 "${sp.id}" が data/render/move-sprites.json にありません（npm run move-sprites）`);
+  for (const sp of (['sprite', 'effectLineSprite', 'effectSprite', 'pathSprite', 'edgeSprite', 'castSprite', 'hitSprite'] as const).flatMap((k) => { const sp = effectRecipes[def.effect]?.[k]; return sp ? [sp, ...(sp.variants ?? []).map((id) => ({ ...sp, id }))] : []; })) if (sp) check(!!moveSprites.sprites[sp.id], `data/effects/recipes.json の "${def.effect}" のドット絵 "${sp.id}" が data/render/move-sprites.json にありません（npm run move-sprites）`);
   const status = def.base.statusId;
   check(!status || statusConfig.kinds.some((k) => k.id === status), `data/game/moves.json の "${key}" の statusId "${status}" が data/game/status.json にありません`);
 }
@@ -280,7 +280,8 @@ for (const key of Object.keys(itemsConfig.items)) {
 for (const d of [...derivationsConfig.derivations, ...derivationsConfig.unique]) {
   check(!!movesConfig.moves[d.from] && !!movesConfig.moves[d.to], `data/game/derivations.json の "${d.from} → ${d.to}" の技が data/game/moves.json にありません`);
   if (d.item !== undefined) check(!!itemsConfig.items[d.item], `data/game/derivations.json の材料 "${d.item}" が data/game/items.json にありません`);
-  else check(derivationsConfig.unique.some((u) => u === d && u.minLevel), `data/game/derivations.json の "${d.from} → ${d.to}" は材料が無いので、固有技でレベル（minLevel）の条件が必要です`);
+  else check(derivationsConfig.unique.some((u) => u === d && (u.minLevel || u.withMoves?.length)), `data/game/derivations.json の "${d.from} → ${d.to}" は材料が無いので、固有技でレベル（minLevel）か、ほかの技（withMoves）の条件が必要です`);
+  for (const w of ('withMoves' in d ? d.withMoves : undefined) ?? []) check(!!movesConfig.moves[w], `data/game/derivations.json の "${d.from} → ${d.to}" の withMoves "${w}" が data/game/moves.json にありません`);
 }
 // いつも効く技（passive）: レベルごとの効果の数は、最大レベルと同じ
 for (const [key, m] of Object.entries(movesConfig.moves)) {

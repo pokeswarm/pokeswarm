@@ -25,6 +25,8 @@ export interface SimRules {
   items: SimUpgradeDef[];
   /** 派生と固有技 */
   derivations: SimDerivation[];
+  /** 持つと技を覚える持ち物（系統ごと。ワンリキーのほのおのパンチ・かみなりパンチ） */
+  itemMoves?: { readonly line: string; readonly item: number; readonly move: number }[];
   /** ポケモンの種類（プレイヤーの種族値・進化）。番号は並び順 */
   species: SimSpecies[];
   stats: StatsConfig;

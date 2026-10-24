@@ -20,11 +20,10 @@
     { "from": "tackle", "item": "silk-scarf", "to": "body-slam" },
     { "from": "powder-snow", "item": "never-melt-ice", "to": "blizzard" },
     { "from": "aurora-beam", "item": "never-melt-ice", "to": "ice-beam" },
-    { "from": "karate-chop", "item": "black-belt", "to": "cross-chop" },
-    { "from": "double-kick", "item": "black-belt", "to": "rolling-kick" },
     { "from": "night-shade", "item": "spell-tag", "to": "shadow-ball" },
     { "from": "dragon-tail", "item": "dragon-fang", "to": "dragon-rush" },
-    { "from": "dragon-rage", "item": "dragon-fang", "to": "dragon-pulse" }
+    { "from": "dragon-rage", "item": "dragon-fang", "to": "dragon-pulse" },
+    { "from": "mach-punch", "item": "dire-hit", "to": "focus-punch" }
   ],
   "unique": [
     { "from": "flamethrower", "item": "fire-stone", "to": "blast-burn", "line": "charmander" },
@@ -40,7 +39,7 @@
     { "from": "quick-attack", "item": "light-ball", "to": "volt-tackle", "line": "pikachu", "minLevel": 51 },
     { "from": "blizzard", "item": "water-stone", "to": "sheer-cold", "line": "lapras" },
     { "from": "blizzard", "item": "pp-max", "to": "freeze-dry", "line": "articuno" },
-    { "from": "cross-chop", "item": "dire-hit", "to": "dynamic-punch", "line": "machop" },
+    { "from": "focus-punch", "to": "dynamic-punch", "line": "machop", "withMoves": ["fire-punch", "thunder-punch"] },
     { "from": "shadow-ball", "item": "light-clay", "to": "hex", "line": "gastly" },
     { "from": "dragon-pulse", "item": "x-attack", "to": "hyper-beam", "line": "dratini" },
     { "from": "psychic", "item": "x-sp-atk", "to": "psystrike", "line": "mewtwo" },

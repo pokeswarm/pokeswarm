@@ -1,5 +1,5 @@
 {
-  "note": "今は使わない技の定義（作者の決定 2026年10月23日。ゲームは読み込まない）。使うときは data/game/moves.json に戻し、派生と見た目を付ける。はどうだん = ルカリオの固有技の候補、げきりん = カイリューの固有技を はかいこうせん にしたため。ホネブーメラン・ボーンラッシュ = カラカラ・ガラガラ（とルカリオ）の技なので、そのポケモンを入れるまでしまう（作者の決定 2026年10月25日）",
+  "note": "今は使わない技の定義（作者の決定 2026年10月23日。ゲームは読み込まない）。使うときは data/game/moves.json に戻し、派生と見た目を付ける。はどうだん = ルカリオの固有技の候補、げきりん = カイリューの固有技を はかいこうせん にしたため。ホネブーメラン・ボーンラッシュ = カラカラ・ガラガラ（とルカリオ）の技なので、そのポケモンを入れるまでしまう（作者の決定 2026年10月25日）。からてチョップ・クロスチョップ・にどげり・まわしげり = かくとうの技を選び直したため（作者の決定 2026年10月25日。蹴りの技は破棄）",
   "moves": {
     "aura-sphere": {
       "pattern": "homing",
@@ -245,6 +245,226 @@
           }
         }
       ]
+    },
+    "karate-chop": {
+      "pattern": "sweep",
+      "effect": "karate-chop",
+      "sweepOnce": true,
+      "base": {
+        "power": 17.6,
+        "cooldownSeconds": 1.2,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 40,
+        "range": 12,
+        "durationSeconds": 0.25,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 220,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 140,
+        "lifestealPct": 0,
+        "arcDegrees": 40,
+        "critChancePct": 20
+      },
+      "levels": [
+        {
+          "power": 7.6
+        },
+        {
+          "size": 4,
+          "power": 6.4
+        },
+        {
+          "power": 7.3
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 1.6
+        },
+        {
+          "size": 4,
+          "power": 4.7
+        },
+        {
+          "power": 6.2
+        },
+        {
+          "power": 6.1
+        }
+      ],
+      "body": {
+        "lungeDistance": 10,
+        "afterimages": 0
+      }
+    },
+    "cross-chop": {
+      "pattern": "melee",
+      "effect": "cross-chop",
+      "base": {
+        "power": 63.4,
+        "cooldownSeconds": 1.05,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 70,
+        "range": 10,
+        "durationSeconds": 0.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 220,
+        "knockbackSeconds": 0.1,
+        "spreadDegrees": 0,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "critChancePct": 30,
+        "lifestealPct": 0,
+        "arcDegrees": 120
+      },
+      "levels": [
+        {
+          "power": 14.5
+        },
+        {
+          "size": 5,
+          "power": 11.2
+        },
+        {
+          "power": 14
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": -2.8
+        },
+        {
+          "size": 5,
+          "power": 8.1
+        },
+        {
+          "power": 11.6
+        },
+        {
+          "power": 11.5
+        }
+      ],
+      "body": {
+        "lungeDistance": 14,
+        "afterimages": 0
+      }
+    },
+    "double-kick": {
+      "pattern": "barrage",
+      "effect": "double-kick",
+      "randomAim": true,
+      "base": {
+        "power": 14.9,
+        "cooldownSeconds": 1.2,
+        "count": 2,
+        "intervalSeconds": 0.15,
+        "speed": 220,
+        "size": 22,
+        "range": 45,
+        "durationSeconds": 0.18,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 280,
+        "knockbackSeconds": 0.1,
+        "spreadDegrees": 0,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 30
+      },
+      "levels": [
+        {
+          "size": 3,
+          "power": 5.6
+        },
+        {
+          "power": 6.2
+        },
+        {
+          "size": 3,
+          "power": 5.1
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 1.2
+        },
+        {
+          "size": 3,
+          "power": 3.9
+        },
+        {
+          "power": 5
+        },
+        {
+          "range": 10,
+          "power": 5
+        }
+      ],
+      "body": {
+        "lungeDistance": 8,
+        "afterimages": 0
+      }
+    },
+    "rolling-kick": {
+      "pattern": "sweep",
+      "effect": "rolling-kick",
+      "randomAim": true,
+      "base": {
+        "power": 59.6,
+        "cooldownSeconds": 1.2,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 50,
+        "range": 30,
+        "durationSeconds": 0.4,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 200,
+        "knockbackSeconds": 0.1,
+        "spreadDegrees": 180,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 40
+      },
+      "levels": [
+        {
+          "power": 13.6
+        },
+        {
+          "size": 6,
+          "power": 9.2
+        },
+        {
+          "power": 12.9
+        },
+        {
+          "cooldownSeconds": -0.1,
+          "power": 3.9
+        },
+        {
+          "spreadDegrees": 60,
+          "power": 2.1
+        },
+        {
+          "power": 10.8
+        },
+        {
+          "size": 6,
+          "power": 4.4
+        }
+      ],
+      "body": {
+        "lungeDistance": 8,
+        "afterimages": 0
+      }
     }
   }
 }

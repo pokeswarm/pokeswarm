@@ -212,7 +212,10 @@
     "x-scissor",
     "flash-cannon",
     "sharpen",
-    "conversion"
+    "conversion",
+    "mach-punch",
+    "focus-punch",
+    "fire-punch"
   ],
   "items": [
     "x-attack",

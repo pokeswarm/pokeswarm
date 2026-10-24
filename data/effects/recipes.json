@@ -217,7 +217,12 @@
       }
     },
     "vine-whip": {
-      "extends": "grass.base"
+      "extends": "grass.base",
+      "sprite": {
+        "id": "vine-line",
+        "fit": "line",
+        "size": 1
+      }
     },
     "normal.base": {
       "projectile": {
@@ -419,13 +424,31 @@
         "fit": "circle",
         "size": 1.15,
         "seconds": 0.55
+      },
+      "sprite": {
+        "id": "burst-fire",
+        "fit": "circle",
+        "size": 1.1
       }
     },
     "gust": {
-      "extends": "flying.base"
+      "extends": "flying.base",
+      "sprite": {
+        "id": "gust-swirl",
+        "fit": "circle",
+        "size": 2.6,
+        "rotate": "spin",
+        "spinDegPerSec": 900
+      }
     },
     "air-slash": {
-      "extends": "flying.base"
+      "extends": "flying.base",
+      "sprite": {
+        "id": "air-blade",
+        "fit": "circle",
+        "size": 2,
+        "rotate": "velocity"
+      }
     },
     "bubble": {
       "extends": "water.base",
@@ -469,7 +492,12 @@
       }
     },
     "leech-seed": {
-      "extends": "grass.base"
+      "extends": "grass.base",
+      "sprite": {
+        "id": "leech-seed",
+        "fit": "circle",
+        "size": 1
+      }
     },
     "petal-dance": {
       "extends": "grass.base",
@@ -576,6 +604,12 @@
         "flash": {
           "color": "#f5f0fa"
         }
+      },
+      "sprite": {
+        "id": "sleep-cloud",
+        "fit": "circle",
+        "size": 0.95,
+        "alpha": 0.6
       }
     },
     "sludge-bomb": {
@@ -1255,7 +1289,12 @@
       }
     },
     "confusion": {
-      "extends": "psychic.base"
+      "extends": "psychic.base",
+      "sprite": {
+        "id": "burst-psy",
+        "fit": "circle",
+        "size": 1.1
+      }
     },
     "psybeam": {
       "extends": "psychic.base",
@@ -1274,6 +1313,11 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "burst-psy",
+        "fit": "circle",
+        "size": 1.1
       }
     },
     "future-sight": {
@@ -1286,6 +1330,11 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "burst-psy",
+        "fit": "circle",
+        "size": 1.15
       }
     },
     "stone-edge": {
@@ -1348,6 +1397,11 @@
         "fit": "circle",
         "size": 1.1,
         "seconds": 0.5
+      },
+      "sprite": {
+        "id": "burst-fire",
+        "fit": "circle",
+        "size": 1
       }
     },
     "extreme-speed": {
@@ -1396,6 +1450,11 @@
       "projectile": {
         "glowScale": 1.3,
         "coreScale": 0.6
+      },
+      "sprite": {
+        "id": "seed-bomb",
+        "fit": "circle",
+        "size": 0.8
       }
     },
     "spark": {
@@ -1675,6 +1734,11 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "burst-ice",
+        "fit": "circle",
+        "size": 1.1
       }
     },
     "freeze-dry": {
@@ -1682,6 +1746,12 @@
       "projectile": {
         "glowScale": 1.1,
         "coreScale": 0.3
+      },
+      "sprite": {
+        "id": "ice-shard",
+        "fit": "circle",
+        "size": 2.4,
+        "rotate": "velocity"
       }
     },
     "aurora-beam": {
@@ -1788,7 +1858,12 @@
       }
     },
     "night-shade": {
-      "extends": "ghost.base"
+      "extends": "ghost.base",
+      "sprite": {
+        "id": "shadow-orb",
+        "fit": "circle",
+        "size": 2.6
+      }
     },
     "shadow-ball": {
       "extends": "ghost.base",
@@ -1812,6 +1887,11 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "burst-shadow",
+        "fit": "circle",
+        "size": 1.1
       }
     },
     "dragon-tail": {
@@ -1853,7 +1933,13 @@
       }
     },
     "dragon-rage": {
-      "extends": "dragon.base"
+      "extends": "dragon.base",
+      "sprite": {
+        "id": "dragon-flame",
+        "fit": "circle",
+        "size": 2.2,
+        "rotate": "velocity"
+      }
     },
     "dragon-pulse": {
       "extends": "dragon.base",
@@ -1878,6 +1964,11 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "burst-psy",
+        "fit": "circle",
+        "size": 1.1
       }
     },
     "zap-cannon": {
@@ -1890,6 +1981,11 @@
         "flash": {
           "radius": 60
         }
+      },
+      "sprite": {
+        "id": "zap-orb",
+        "fit": "circle",
+        "size": 1.6
       }
     },
     "sky-attack": {

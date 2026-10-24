@@ -1273,6 +1273,149 @@ function streak(kind: StreakKind): SpriteOut {
   return { palette: palettes[kind], frameMs: 60, parts };
 }
 
+// ---------------- 残りの技（案 G） ----------------
+/** かぜおこし: 小さなつむじ風（白い渦の筋が2本。回して使う） */
+function gustSwirl(): SpriteOut {
+  const palette = ['#37474f', '#b0bec5', '#eceff1', '#ffffff'];
+  const g = shape(14, (u, v) => {
+    const d = Math.hypot(u, v);
+    if (d > 0.95 || d < 0.15) return -1;
+    const arm = Math.sin(2 * Math.atan2(v, u) + d * 6);
+    return arm > 0.55 ? (d < 0.5 ? 3 : 2) : arm > 0.2 ? 1 : -1;
+  }, 0, -1);
+  return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
+/** エアスラッシュ: 空気の刃（水色がかった白い三日月。右へ進む） */
+function airBlade(): SpriteOut {
+  const palette = ['#263238', '#80deea', '#e0f7fa', '#ffffff'];
+  const frames = crescent(16, 2, 0.4, (k, _a, f) => (k > 0.7 ? 1 : (k > 0.35) !== (f === 1) ? 2 : 3), 0.03);
+  return { palette, frameMs: 60, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/** フリーズドライ: とがった氷のかけら（右へ進む。左上が光る） */
+function iceShard(): SpriteOut {
+  const palette = ['#0d3550', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const g = shape(14, (u, v) => {
+    // 右へとがったひし形（後ろは少し太い）
+    const w = u > 0 ? 0.42 * (1 - u / 0.95) : 0.42 * (1 + u / 0.75);
+    if (u > 0.95 || u < -0.75 || Math.abs(v) > w) return -1;
+    return v < -w * 0.3 ? 3 : v < w * 0.3 ? 2 : 1;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
+/** つるのムチ: 緑のつる（ふしのある線。start・middle・end。先は細く丸まる） */
+function vineLine(): SpriteOut {
+  const palette = ['#1b3d14', '#2e7d32', '#66bb6a', '#a5d6a7'];
+  const H = 10;
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 4, middle: 10, end: 8 }, 2, (x, y, f, part) => {
+    // 途中の部品の幅でちょうど1周する波（並べるとつながる）
+    const wave = Math.sin(((x + f * 5) / 10) * Math.PI * 2) * 1.2;
+    const taper = part === 'end' ? 1 - x / 9 : 1;
+    const dy = Math.abs(y - mid - wave * (part === 'middle' ? 1 : 0.5));
+    if (dy > 2.2 * taper + 0.3) return -1;
+    // ふし（数マスごとに明るい点）と、小さな葉
+    if (part === 'middle' && x % 10 === 4 && y < mid - 1 && y > mid - 4) return 2;
+    return dy < 0.8 ? 3 : 2;
+  }, 0);
+  return { palette, frameMs: 90, parts };
+}
+
+/** やどりぎのタネ: 真ん中のタネから、つるが巻きながら伸びる（コマで伸びて止まる） */
+function leechSeed(): SpriteOut {
+  const palette = ['#2e1b0e', '#6d4c41', '#a1887f', '#2e7d32', '#81c784'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(26, (u, v) => {
+      const d = Math.hypot(u, v);
+      // タネ（茶色の楕円）
+      const seed = Math.hypot(u / 0.22, v / 0.3);
+      if (seed < 1) return Math.hypot(u + 0.06, v + 0.1) < 0.1 ? 2 : 1;
+      // つる: 4本、渦を巻きながら外へ（コマで長くなる）
+      const reach = 0.35 + f * 0.18;
+      if (d > reach) return -1;
+      const a = Math.atan2(v, u);
+      const arm = Math.sin(4 * a - d * 7);
+      return arm > 0.8 ? 4 : arm > 0.55 ? 3 : -1;
+    }),
+  );
+  return { palette, frameMs: 120, loopFrom: 3, parts: { main: frames.map(toRows) } };
+}
+
+/** タネばくだん: 大きなタネのさや（緑の丸に白い筋。少しふくらんで脈打つ） */
+function seedBomb(): SpriteOut {
+  const palette = ['#1b3d14', '#33691e', '#7cb342', '#c5e1a5', '#f1f8e9'];
+  const frames = [0, 1].map((f) =>
+    shape(16, (u, v) => {
+      const r = 0.82 + f * 0.08;
+      const d = Math.hypot(u, v) / r;
+      if (d > 1) return -1;
+      if (Math.hypot(u + 0.3, v + 0.3) < 0.18) return 4;
+      // さやの筋（縦）
+      if (Math.abs(Math.sin(u * 5)) < 0.18 && d < 0.85) return 3;
+      const l = light(u, v, r);
+      return l > 0.4 ? 3 : l > -0.3 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 200, parts: { main: frames.map(toRows) } };
+}
+
+/** ねむりごな: 青緑の粉のもや（ゆっくり渦を巻き、きらきら光る粒） */
+function sleepCloud(): SpriteOut {
+  const palette = ['#0b2b2b', '#00897b', '#4db6ac', '#b2dfdb', '#ffffff'];
+  const frames: Grid[] = [];
+  for (let f = 0; f < 4; f++) {
+    const r = rng(19);
+    const puffs = Array.from({ length: 8 }, (_, k) => {
+      const a = (k / 8) * Math.PI * 2 + (f * Math.PI) / 10;
+      const rr = 0.45 + r() * 0.2;
+      return [Math.cos(a) * rr, Math.sin(a) * rr, 0.3 + r() * 0.12] as const;
+    });
+    const sparkles = Array.from({ length: 6 }, () => [r() * 1.6 - 0.8, r() * 1.6 - 0.8] as const);
+    frames.push(
+      shape(24, (u, v) => {
+        let inside = Math.hypot(u, v) < 0.45;
+        for (const [cx, cy, pr] of puffs) if (Math.hypot(u - cx, v - cy) < pr) inside = true;
+        if (!inside) return -1;
+        // きらきら（コマごとに光る粒が変わる）
+        for (const [k, [sx, sy]] of sparkles.entries()) if ((k + f) % 3 === 0 && Math.hypot(u - sx, v - sy) < 0.07) return 4;
+        const swirl = Math.sin(Math.atan2(v, u) * 2 + Math.hypot(u, v) * 6 - f * 1.2);
+        const l = light(u, v, 0.9);
+        return swirl > 0.85 ? 3 : l > 0.3 ? 3 : l > -0.4 ? 2 : 1;
+      }),
+    );
+  }
+  return { palette, frameMs: 200, parts: { main: frames.map(toRows) } };
+}
+
+/** でんじほう: ぱちぱち光る電気の玉（中が白く、外に小さな稲妻が走る） */
+function zapOrb(): SpriteOut {
+  const palette = ['#3e2f00', '#f9a825', '#ffeb3b', '#fff59d', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(18, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      if (d < 0.3) return 4;
+      if (d < 0.55) return d < 0.42 ? 3 : 2;
+      // 外の稲妻: コマごとに違う向きへ
+      for (let k = 0; k < 4; k++) {
+        const base = (k / 4) * Math.PI * 2 + f * 0.9;
+        const da = Math.atan2(Math.sin(a - base - Math.sin(d * 18) * 0.25), Math.cos(a - base - Math.sin(d * 18) * 0.25));
+        if (d < 0.95 && Math.abs(da) * d < 0.06) return 3;
+      }
+      return d < 0.6 ? 1 : -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** りゅうのいかり: 青紫の竜の炎（ひのこと同じ形で色だけ違う） */
+function dragonFlame(): SpriteOut {
+  const sp = ember();
+  return { ...sp, palette: ['#1a0b3d', '#4527a0', '#7c4dff', '#b39ddb', '#ede7f6'] };
+}
+
 const out = {
   credit: '自作（scripts/make-move-sprites.ts で計算して描いた。公式の素材は使っていない）',
   sprites: {
@@ -1335,6 +1478,15 @@ const out = {
     'streak-white': streak('white'),
     'streak-electric': streak('electric'),
     'streak-fire': streak('fire'),
+    'gust-swirl': gustSwirl(),
+    'air-blade': airBlade(),
+    'ice-shard': iceShard(),
+    'vine-line': vineLine(),
+    'leech-seed': leechSeed(),
+    'seed-bomb': seedBomb(),
+    'sleep-cloud': sleepCloud(),
+    'zap-orb': zapOrb(),
+    'dragon-flame': dragonFlame(),
   } as Record<string, SpriteOut>,
 };
 writeFileSync(join(ROOT, 'data/render/move-sprites.json'), JSON.stringify(out, null, 2) + '\n');

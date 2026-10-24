@@ -81,7 +81,18 @@ export class SelectScene extends Phaser.Scene {
     backButton.textContent = t('select.back');
     backButton.onclick = back;
     row.append(go, backButton);
-    root.append(title, hint, picker.element, options.element, row);
+    // 低い画面（横向きのスマホ）では2列にする: 左に一覧、右に詳しい欄・最初の持ち物・ボタン（縦に並べると収まらず、ボタンが画面の外に出ていた）
+    if (compact) {
+      const right = document.createElement('div');
+      right.style.cssText = 'display:flex;flex-direction:column;gap:6px;min-width:0';
+      row.style.justifyContent = 'stretch';
+      for (const b of [go, backButton]) b.style.flex = '1 1 0';
+      right.append(picker.detailElement, options.element, row);
+      const body = document.createElement('div');
+      body.style.cssText = 'display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:10px;align-items:start';
+      body.append(picker.element, right);
+      root.append(title, body);
+    } else root.append(title, hint, picker.element, options.element, row);
     // 最初は一覧の先頭の解放済みのポケモンを選んでおく（Enter ですぐ始められる）
     const first = region.playables.find(isPokemonUnlocked);
     if (first) {
@@ -103,7 +114,13 @@ export class SelectScene extends Phaser.Scene {
       else if (ev.key === 'Escape') back();
     };
     window.addEventListener('keydown', onKey);
+    // 画面の向きが変わって、低い画面かどうかが変わったら作り直す（並べ方が違うため）
+    const onResize = (): void => {
+      if (compactScreen() !== compact && !starting) this.scene.restart(data);
+    };
+    window.addEventListener('resize', onResize);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      window.removeEventListener('resize', onResize);
       window.removeEventListener('keydown', onKey);
       root.remove();
     });

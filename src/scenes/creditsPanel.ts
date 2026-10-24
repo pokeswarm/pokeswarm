@@ -20,6 +20,16 @@ export class TitleFooter {
 
   constructor() {
     this.root = document.createElement('div');
+    document.body.append(this.root);
+    this.layout();
+  }
+
+  /**
+   * 中身を作り直す（画面の高さが変わったとき。縦向きで開いてから横向きにすると、低い画面なのに全文のままで、
+   * メニューのボタンに重なっていた。作者の指摘 2026年10月24日）
+   */
+  layout(): void {
+    this.root.replaceChildren();
     this.root.style.cssText = `position:fixed;left:0;right:0;bottom:0;z-index:19;display:flex;align-items:center;gap:12px;padding:6px 12px;background:rgba(0,0,0,0.75);color:${uiConfig.dark.text};font-size:16px;line-height:1.4;box-sizing:border-box`;
     const notice = document.createElement('div');
     const compact = compactScreen();
@@ -47,7 +57,6 @@ export class TitleFooter {
       void this.openCredits();
     };
     this.root.append(notice, button);
-    document.body.append(this.root);
   }
 
   /** 下の帯の高さ（ログインの窓をその上に置くため） */

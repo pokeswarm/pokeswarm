@@ -183,6 +183,8 @@ export class TitleScene extends Phaser.Scene {
       });
       ui.add(buttons);
       showCursor();
+      // 下の帯も、画面の高さに合わせて作り直す（低い画面では1行）
+      footer.layout();
       // ログインの窓（右の列）: メニューと同じ幅・同じ上の端。ボタンの高さもメニューにそろえる
       account.place({ left: frameX + frameW - blockW, top, width: blockW, bottom: footer.height + gap, buttonHeight: bh });
     };

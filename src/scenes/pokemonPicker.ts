@@ -53,6 +53,11 @@ export class PokemonPicker {
   private readonly keys: string[];
   private readonly cells = new Map<string, HTMLDivElement>();
   private readonly detail: HTMLDivElement;
+
+  /** 下の詳しい欄（低い画面では、呼ぶ側が一覧の横へ移す） */
+  get detailElement(): HTMLDivElement {
+    return this.detail;
+  }
   private selected: string | null = null;
   /** 矢印キーで動かしている場所（解放していないマスにも止まる） */
   private cursor = 0;

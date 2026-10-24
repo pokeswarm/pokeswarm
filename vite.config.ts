@@ -1,6 +1,11 @@
+import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vite';
 
+/** バージョン（package.json。タイトル画面に出す。0.<フェーズ>.<修正>、カントーが完成したら 1.0.0。06_roadmap.md） */
+const version = (JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string }).version;
+
 export default defineConfig(({ mode }) => ({
+  define: { __APP_VERSION__: JSON.stringify(version) },
   // Cloudflare Workers の静的アセット配信はルートで配信するので base は既定のまま
   build: {
     target: 'es2022',

@@ -1193,24 +1193,23 @@ function waterSpout(): SpriteOut {
   return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
 }
 
-/** ほのおのうず: 曲がった尾を引いて回る炎（右へ進み、尾は左下へ巻く。進む向きに向ける） */
+/**
+ * ほのおのうず: 自分のまわりを回る火の玉（進む向きに向ける）。尾は後ろへ短くまっすぐ（作者の指摘 2026年10月24日:
+ * 渦を巻く長い尾が、光の演出の残り火の軌跡とずれていた。回る軌跡は残り火に任せ、絵は火の玉そのものにする）
+ */
 function flameSwirl(): SpriteOut {
   const palette = ['#4e1206', '#d84315', '#ff9800', '#ffeb3b', '#fffde7'];
   const frames = [0, 1, 2].map((f) =>
-    shape(20, (u, v) => {
-      const head = Math.hypot(u - 0.45, v + 0.05) / 0.38;
-      // 尾: 頭から、下にある中心のまわりを左回りに半周して巻く（だんだん細く）
-      const cx = 0.25;
-      const cy = 0.5;
-      const ra = Math.hypot(u - cx, v - cy);
-      const ang = Math.atan2(v - cy, u - cx);
-      let t = (-Math.PI / 2 + 0.35 - ang) / Math.PI;
-      if (t < 0) t += 2;
-      const wob = Math.sin(t * 7 + f * 2.2) * 0.04;
-      const tail = t > 0 && t < 1 && Math.abs(ra - 0.6 - wob) < 0.22 * (1 - t) + 0.04;
+    shape(18, (u, v) => {
+      // 火の玉（右寄りの丸）
+      const head = Math.hypot(u - 0.3, v) / 0.55;
+      // 短い尾: 左へ細くなる炎の舌（コマでゆらめく）
+      const t = Math.max(0, Math.min(1, (0.1 - u) / 0.95));
+      const wob = Math.sin(t * 6 + f * 2.1) * 0.08 * t;
+      const tail = u < 0.1 && u > -0.85 && Math.abs(v - wob) < 0.42 * (1 - t) + 0.03;
       if (head > 1 && !tail) return -1;
-      const dd = head <= 1 ? head * 0.7 : 0.55 + t * 0.6;
-      return dd < 0.3 ? 4 : dd < 0.55 ? 3 : dd < 0.85 ? 2 : 1;
+      const d = head <= 1 ? head * 0.75 : 0.5 + t * 0.45;
+      return d < 0.3 ? 4 : d < 0.55 ? 3 : d < 0.8 ? 2 : 1;
     }),
   );
   return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };

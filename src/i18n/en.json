@@ -479,5 +479,6 @@
   "select.startItemNone": "None",
   "select.startItemLocked": "Clear with this Pokémon to choose one",
   "select.shiny": "Shiny",
-  "run.shinyName": "Shiny {name}"
+  "run.shinyName": "Shiny {name}",
+  "title.version": "BETA  v{version}"
 }

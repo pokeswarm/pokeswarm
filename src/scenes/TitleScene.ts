@@ -165,6 +165,8 @@ export class TitleScene extends Phaser.Scene {
       const g = this.add.graphics();
       drawWindow(g, frameX, logoY, logoW, logoH, 'dark');
       ui.add([g, this.add.text(width / 2, logoY + logoH / 2, t('title.name'), px(compact || width < 640 ? 32 : 48, '#f8d030', { outline: true })).setOrigin(0.5)]);
+      // ベータ版であることとバージョン（作者の依頼 2026年10月24日。カントーが完成したら 1.0.0）。ロゴの窓の右下
+      ui.add(this.add.text(frameX + logoW - 12, logoY + logoH - 8, t('title.version', { version: __APP_VERSION__ }), px(compact ? 8 : 16, '#f8f8f8')).setOrigin(1, 1));
       // メニュー（左の列）。低い画面では2列
       const cols = compact ? 2 : 1;
       const gap = compact ? 6 : height < 700 ? 6 : 8;

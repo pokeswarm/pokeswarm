@@ -458,5 +458,6 @@
   "select.startItemNone": "Nessuno",
   "select.startItemLocked": "Completa con questo Pokémon per sceglierne uno",
   "select.shiny": "Cromatico",
-  "run.shinyName": "{name} cromatico"
+  "run.shinyName": "{name} cromatico",
+  "title.version": "BETA  v{version}"
 }

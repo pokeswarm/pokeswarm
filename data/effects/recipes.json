@@ -277,7 +277,13 @@
         "glowScale": 1.6,
         "coreScale": 0.7
       },
-      "impact": {}
+      "impact": {},
+      "sprite": {
+        "id": "flame-swirl",
+        "fit": "circle",
+        "size": 1.9,
+        "rotate": "velocity"
+      }
     },
     "poison.base": {
       "projectile": {
@@ -1854,6 +1860,14 @@
         "glowScale": 1.05,
         "coreScale": 0.3,
         "glowColor": "#1e88e5"
+      },
+      "sprite": {
+        "id": "whirlpool",
+        "fit": "circle",
+        "size": 1,
+        "rotate": "spin",
+        "spinDegPerSec": -120,
+        "alpha": 0.85
       }
     },
     "water-spout": {
@@ -1862,6 +1876,12 @@
         "glowScale": 1.05,
         "coreScale": 0.35,
         "glowColor": "#039be5"
+      },
+      "sprite": {
+        "id": "water-spout",
+        "fit": "circle",
+        "size": 1,
+        "alpha": 0.9
       }
     },
     "pound": {

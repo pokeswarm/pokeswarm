@@ -1106,6 +1106,77 @@ function steelBeam(): SpriteOut {
   return { palette, frameMs: 60, parts };
 }
 
+// ---------------- 渦の技（案 E） ----------------
+/** うずしお: 上から見た渦（2本の腕が中心へ巻き込む。中心は暗い目、ふちに白い泡）。コマで回る */
+function whirlpool(): SpriteOut {
+  // 0 輪郭（濃い紺）・1 紺・2 青・3 水色・4 泡の白
+  const palette = ['#0a1f44', '#0d47a1', '#1e88e5', '#64b5f6', '#e3f2fd'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(30, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.97) return -1;
+      const a = Math.atan2(v, u);
+      // 腕: 角度と距離の対数で巻く（外ほどゆるい）
+      const arm = Math.sin(2 * a + Math.log(d + 0.05) * 5.5 - (f * Math.PI) / 2);
+      if (d < 0.14) return 0;
+      if (d > 0.84) return arm > 0.2 ? 4 : 3;
+      if (arm > 0.75) return 4;
+      if (arm > 0.2) return 3;
+      return d < 0.35 ? 1 : 2;
+    }, 0, -1),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/** しおふき: 上から見た噴き上がる水（真ん中の白い水柱、まわりに広がる波の輪と、飛び散るしぶき）。コマで輪が外へ広がる */
+function waterSpout(): SpriteOut {
+  const palette = ['#0a2a5c', '#0277bd', '#29b6f6', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    const r = rng(31 + f);
+    const drops = Array.from({ length: 7 }, () => {
+      const a = r() * Math.PI * 2;
+      const rr = 0.55 + r() * 0.35;
+      return [Math.cos(a) * rr, Math.sin(a) * rr, 0.07 + r() * 0.05] as const;
+    });
+    return shape(28, (u, v) => {
+      const d = Math.hypot(u, v);
+      // 真ん中の水柱（上から見て丸く、光る）
+      if (d < 0.26) return Math.hypot(u + 0.08, v + 0.08) < 0.12 ? 4 : 3;
+      if (d < 0.32) return 2;
+      // 外へ広がる波の輪（コマで半径が増える）
+      const ring = 0.45 + f * 0.11;
+      if (Math.abs(d - ring) < 0.06) return 3;
+      if (Math.abs(d - ring) < 0.1 && d < 0.95) return 2;
+      for (const [cx, cy, pr] of drops) if (Math.hypot(u - cx, v - cy) < pr) return 4;
+      return d < ring - 0.1 ? 1 : -1;
+    });
+  });
+  return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
+}
+
+/** ほのおのうず: 曲がった尾を引いて回る炎（右へ進み、尾は左下へ巻く。進む向きに向ける） */
+function flameSwirl(): SpriteOut {
+  const palette = ['#4e1206', '#d84315', '#ff9800', '#ffeb3b', '#fffde7'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(20, (u, v) => {
+      const head = Math.hypot(u - 0.45, v + 0.05) / 0.38;
+      // 尾: 頭から、下にある中心のまわりを左回りに半周して巻く（だんだん細く）
+      const cx = 0.25;
+      const cy = 0.5;
+      const ra = Math.hypot(u - cx, v - cy);
+      const ang = Math.atan2(v - cy, u - cx);
+      let t = (-Math.PI / 2 + 0.35 - ang) / Math.PI;
+      if (t < 0) t += 2;
+      const wob = Math.sin(t * 7 + f * 2.2) * 0.04;
+      const tail = t > 0 && t < 1 && Math.abs(ra - 0.6 - wob) < 0.22 * (1 - t) + 0.04;
+      if (head > 1 && !tail) return -1;
+      const dd = head <= 1 ? head * 0.7 : 0.55 + t * 0.6;
+      return dd < 0.3 ? 4 : dd < 0.55 ? 3 : dd < 0.85 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
 const out = {
   credit: '自作（scripts/make-move-sprites.ts で計算して描いた。公式の素材は使っていない）',
   sprites: {
@@ -1156,6 +1227,9 @@ const out = {
     sludge: sludge(),
     'shadow-orb': orb('shadow'),
     'aura-orb': orb('aura'),
+    whirlpool: whirlpool(),
+    'water-spout': waterSpout(),
+    'flame-swirl': flameSwirl(),
   } as Record<string, SpriteOut>,
 };
 writeFileSync(join(ROOT, 'data/render/move-sprites.json'), JSON.stringify(out, null, 2) + '\n');

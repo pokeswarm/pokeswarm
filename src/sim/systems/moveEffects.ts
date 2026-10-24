@@ -252,6 +252,25 @@ function applyEffect(world: World, fx: MoveEffect, index: number, src: FxSource)
       });
     }
   }
+  if (fx.cluster) {
+    const cl = fx.cluster;
+    for (let k = 0; k < cl.count; k++) {
+      // 置く場所は共有の乱数ではなく、時刻と位置から決める（どのブラウザでも同じ形になる）
+      const rand = (salt: number): number => hash01(world.seed, world.tick, Math.floor(src.x) * 7919 + Math.floor(src.y), 3000 + k * 7 + salt);
+      const a = rand(1) * Math.PI * 2;
+      const r = cl.radius * Math.sqrt(rand(2));
+      spawn(world, src, {
+        x: src.x + Math.cos(a) * r,
+        y: src.y + Math.sin(a) * r,
+        damage: src.damage * cl.powerMultiplier,
+        // 大きさも少しばらつかせる（0.7〜1.3 倍）
+        radius: src.size * cl.sizeMultiplier * (0.7 + 0.6 * rand(3)),
+        life: cl.durationSeconds,
+        hitIntervalTicks: ticks(cl.hitIntervalSeconds),
+      });
+    }
+  }
+  if (fx.crack) crack(world, fx.crack, src);
   if (fx.wave) {
     const wv = fx.wave;
     const waveBand = reachBand(world, src.move, wv.radius);
@@ -265,6 +284,45 @@ function applyEffect(world: World, fx: MoveEffect, index: number, src: FxSource)
       growth: Math.max(0, (wv.radius - (waveBand > 0 ? waveBand : src.size)) / wv.durationSeconds),
       life: wv.durationSeconds,
     });
+  }
+}
+
+/**
+ * 伸びる亀裂の部品: count 本の亀裂を等しい角度（その場ごとにずらす）で外へ伸ばす。1本は長さ segment の線を steps 本つなぎ、
+ * つなぐたびに最初の向きから ±turnDegrees の中で向きを選び直す。k 本目の線は segmentSeconds × k 秒遅れて現れる（出番を待つもの stage 3。
+ * 現れると効き方から出たもの stage 1 になる）。向きは共有の乱数ではなく時刻と位置から決める
+ */
+function crack(world: World, ck: NonNullable<MoveEffect['crack']>, src: FxSource): void {
+  const rand = (salt: number): number => hash01(world.seed, world.tick, Math.floor(src.x) * 7919 + Math.floor(src.y), 4000 + salt);
+  const turn = (ck.turnDegrees * Math.PI) / 180;
+  const start = rand(0) * Math.PI * 2;
+  const hit = Math.max(1, Math.round(ck.hitIntervalSeconds / world.dt));
+  for (let c = 0; c < ck.count; c++) {
+    const base = start + (c / ck.count) * Math.PI * 2;
+    let x = src.x;
+    let y = src.y;
+    for (let k = 0; k < ck.steps; k++) {
+      const a = base + (rand(10 + c * 50 + k) * 2 - 1) * turn;
+      const dx = Math.cos(a);
+      const dy = Math.sin(a);
+      const len = rayLengthToObstacle(world, x, y, dx, dy, ck.segment);
+      if (len <= 1) break;
+      const wait = ck.segmentSeconds * k;
+      spawn(world, src, {
+        x,
+        y,
+        shape: SHAPE_LINE,
+        length: len,
+        dirX: dx,
+        dirY: dy,
+        damage: src.damage * ck.powerMultiplier,
+        radius: src.size * ck.sizeMultiplier,
+        hitIntervalTicks: hit,
+        ...(wait > 0 ? { life: wait, stage: 3, armLife: Math.max(0.1, ck.durationSeconds - wait), armStage: 1 } : { life: ck.durationSeconds }),
+      });
+      x += dx * len;
+      y += dy * len;
+    }
   }
 }
 

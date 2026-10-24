@@ -1495,8 +1495,12 @@
         "coreScale": 0.7
       },
       "impact": {
+        "burst": {
+          "count": 6
+        },
         "flash": {
-          "radius": 60
+          "radius": 30,
+          "alpha": 0.3
         }
       },
       "sprite": {
@@ -1532,16 +1536,11 @@
         "fillAlpha": 0.22,
         "maxPerSecond": 24
       },
-      "pathSprite": {
-        "id": "fissure",
-        "fit": "line",
-        "size": 1.4
-      },
-      "effectLineSprite": {
-        "id": "rock-spike",
-        "fit": "line",
-        "size": 1,
-        "growSeconds": 0.12
+      "effectSprite": {
+        "id": "rock-spire",
+        "fit": "circle",
+        "size": 1.15,
+        "originY": 0.85
       }
     },
     "rapid-spin": {
@@ -1569,7 +1568,13 @@
         "tint": "#fff176",
         "alpha": 0.8,
         "afterimages": 4,
-        "spacingTicks": 1
+        "spacingTicks": 1,
+        "colors": [
+          "#ffeb3b",
+          "#212121",
+          "#ffffff"
+        ],
+        "periodMs": 60
       },
       "linger": {
         "spread": 0,
@@ -1808,10 +1813,9 @@
         "shake": 2
       },
       "effectLineSprite": {
-        "id": "fissure",
+        "id": "crack-line",
         "fit": "line",
-        "size": 1,
-        "growSeconds": 0.3
+        "size": 1
       }
     },
     "ice.base": {

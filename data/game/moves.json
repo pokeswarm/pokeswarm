@@ -1250,7 +1250,7 @@
       "pattern": "scatter",
       "effect": "frenzy-plant",
       "base": {
-        "power": 20.6,
+        "power": 25.4,
         "intervalSeconds": 0.1,
         "count": 7,
         "speed": 0,
@@ -1262,7 +1262,7 @@
         "knockback": 0,
         "knockbackSeconds": 0.06,
         "spreadDegrees": 0,
-        "cooldownSeconds": 2.6,
+        "cooldownSeconds": 3.2,
         "statusChance": 0,
         "statusSeconds": 0,
         "lifestealPct": 0
@@ -1270,28 +1270,28 @@
       "levels": [
         {
           "count": 1,
-          "power": 1.9
+          "power": 2.3
         },
         {
-          "power": 3.3
+          "power": 4
         },
         {
           "durationSeconds": 0.5
         },
         {
           "count": 1,
-          "power": 1.2
+          "power": 1.6
         },
         {
-          "power": 2.7
+          "power": 3.3
         },
         {
           "cooldownSeconds": -0.2,
-          "power": 0.3
+          "power": 0.8
         },
         {
           "count": 1,
-          "power": 0.8
+          "power": 1.1
         }
       ],
       "effects": [
@@ -1981,9 +1981,9 @@
       "pattern": "nearest",
       "effect": "stone-edge",
       "base": {
-        "power": 147.2,
+        "power": 151.8,
         "intervalSeconds": 0.25,
-        "count": 3,
+        "count": 1,
         "speed": 300,
         "size": 16,
         "range": 450,
@@ -1993,7 +1993,7 @@
         "knockback": 160,
         "knockbackSeconds": 0.1,
         "spreadDegrees": 0,
-        "cooldownSeconds": 1.6,
+        "cooldownSeconds": 0.55,
         "statusChance": 0,
         "statusSeconds": 0,
         "critChancePct": 25,
@@ -2001,31 +2001,31 @@
       },
       "levels": [
         {
-          "count": 1,
-          "power": -18.3
+          "cooldownSeconds": -0.04,
+          "power": 12.6
         },
         {
           "size": 2,
-          "power": 18.5
+          "power": 23.6
         },
         {
-          "power": 18.5
+          "power": 23.6
         },
         {
-          "cooldownSeconds": -0.15,
-          "power": 1.3
+          "cooldownSeconds": -0.04,
+          "power": 5.1
         },
         {
-          "count": 1,
-          "power": -20
+          "cooldownSeconds": -0.04,
+          "power": 1.5
         },
         {
           "size": 2,
-          "power": 13.4
+          "power": 19.9
         },
         {
-          "count": 1,
-          "power": -15.6
+          "cooldownSeconds": -0.04,
+          "power": -4.1
         }
       ],
       "effects": [
@@ -2042,16 +2042,13 @@
         },
         {
           "trigger": "hit",
-          "spikes": {
-            "sizeMultiplier": 0.5,
+          "cluster": {
+            "sizeMultiplier": 1.4,
             "powerMultiplier": 0.3,
-            "count": 8,
-            "length": 110,
-            "durationSeconds": 1.5,
-            "hitIntervalSeconds": 0.4,
-            "randomAngles": true,
-            "lengthJitter": 0.45,
-            "lengthPerLevel": 6
+            "count": 7,
+            "radius": 55,
+            "durationSeconds": 1.6,
+            "hitIntervalSeconds": 0.4
           }
         }
       ]
@@ -2489,6 +2486,17 @@
       ],
       "effects": [
         {
+          "trigger": "every",
+          "everySeconds": 0.05,
+          "puddle": {
+            "sizeMultiplier": 0.8,
+            "powerMultiplier": 0.08,
+            "durationSeconds": 1.5,
+            "hitIntervalSeconds": 0.5,
+            "path": true
+          }
+        },
+        {
           "trigger": "end",
           "explode": {
             "sizeMultiplier": 2,
@@ -2677,16 +2685,16 @@
       "effects": [
         {
           "trigger": "spawn",
-          "spikes": {
-            "sizeMultiplier": 0.25,
-            "powerMultiplier": 0.5,
-            "count": 2,
-            "length": 200,
+          "crack": {
+            "sizeMultiplier": 0.12,
+            "powerMultiplier": 0.4,
+            "count": 3,
+            "steps": 5,
+            "segment": 40,
+            "turnDegrees": 40,
+            "segmentSeconds": 0.06,
             "durationSeconds": 2,
-            "hitIntervalSeconds": 0.5,
-            "lengthPerLevel": 15,
-            "randomAngles": true,
-            "lengthJitter": 0.3
+            "hitIntervalSeconds": 0.5
           }
         }
       ]
@@ -2695,7 +2703,7 @@
       "pattern": "weather",
       "effect": "powder-snow",
       "base": {
-        "power": 5.4,
+        "power": 2.7,
         "intervalSeconds": 0.1,
         "count": 1,
         "speed": 0,
@@ -2716,31 +2724,31 @@
       "levels": [
         {
           "durationSeconds": 0.5,
-          "power": 2.3
+          "power": 1.2
         },
         {
           "size": 20,
-          "power": 2.3
+          "power": 1.2
         },
         {
           "statusChance": 0.03,
-          "power": 2.3
+          "power": 1.2
         },
         {
           "cooldownSeconds": -0.5,
-          "power": 1.1
+          "power": 0.6
         },
         {
           "durationSeconds": 0.5,
-          "power": -0.5
+          "power": -0.2
         },
         {
           "size": 20,
-          "power": 1.7
+          "power": 0.9
         },
         {
           "cooldownSeconds": -0.5,
-          "power": 0.3
+          "power": 0.2
         }
       ]
     },
@@ -2748,7 +2756,7 @@
       "pattern": "weather",
       "effect": "blizzard-aura",
       "base": {
-        "power": 12.9,
+        "power": 6.5,
         "intervalSeconds": 0.1,
         "count": 1,
         "speed": 0,
@@ -2769,19 +2777,19 @@
       "levels": [
         {
           "durationSeconds": 0.5,
-          "power": 1.2
+          "power": 0.6
         },
         {
           "size": 20,
-          "power": 2.6
+          "power": 1.3
         },
         {
           "statusChance": 0.03,
-          "power": 2.6
+          "power": 1.3
         },
         {
           "cooldownSeconds": -0.5,
-          "power": 0.5
+          "power": 0.3
         },
         {
           "durationSeconds": 0.5,
@@ -2789,11 +2797,11 @@
         },
         {
           "size": 20,
-          "power": 2.1
+          "power": 1.1
         },
         {
           "cooldownSeconds": -0.5,
-          "power": -0.5
+          "power": -0.2
         }
       ]
     },

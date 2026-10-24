@@ -86,7 +86,7 @@ export interface ProjectileSpawn {
   /** 通った道の当たり判定: 道を伸ばしている元の当たり判定の通し番号（0 なら無し） */
   link?: number;
   /**
-   * 効き方の部品から出たもの（1）・遅れて弾ける印（2）・出番を待つもの（3。life の間は見えず当たらず、尽きたら armLife の長さで技そのもの（0）として現れる）。
+   * 効き方の部品から出たもの（1）・遅れて弾ける印（2）・出番を待つもの（3。life の間は見えず当たらず、尽きたら armLife の長さで armStage の段階（技そのもの 0・効き方から出たもの 1）として現れる）。
    * 0 は技そのもの。0 のものだけが効き方を起こす（07 22.4）
    */
   stage?: number;
@@ -96,6 +96,8 @@ export interface ProjectileSpawn {
   linger?: boolean;
   /** 出番を待つもの（stage 3）が現れてから残る時間（秒） */
   armLife?: number;
+  /** 出番を待つもの（stage 3）が現れたときの段階（省略で 0 = 技そのもの。効き方から出たものは 1） */
+  armStage?: number;
   /** ノックバックの強さの上書き（ワールド単位/秒。マイナスで引き寄せる）。無ければ技の値 */
   knockback?: number;
 }
@@ -140,6 +142,7 @@ export class ProjectileStore {
   /** 出したときの残り時間（boomerang の戻りの計算に使う） */
   readonly maxLife: Float64Array;
   readonly armLife: Float64Array;
+  readonly armStage: Uint8Array;
   /** 当てた敵の id と当てた更新番号（発射体ごとに hitMemory 個の輪状の記録） */
   readonly hitIds: Uint32Array;
   readonly hitTicks: Uint32Array;
@@ -188,6 +191,7 @@ export class ProjectileStore {
     this.link = new Uint32Array(capacity);
     this.maxLife = new Float64Array(capacity);
     this.armLife = new Float64Array(capacity);
+    this.armStage = new Uint8Array(capacity);
     this.hitIds = new Uint32Array(capacity * hitMemory);
     this.hitTicks = new Uint32Array(capacity * hitMemory);
     this.hitCount = new Uint32Array(capacity);
@@ -230,6 +234,7 @@ export class ProjectileStore {
     this.link[i] = p.link ?? 0;
     this.maxLife[i] = p.life;
     this.armLife[i] = p.armLife ?? 0;
+    this.armStage[i] = p.armStage ?? 0;
     this.hitCount[i] = 0;
     this.stage[i] = p.stage ?? 0;
     this.fxIndex[i] = p.fxIndex ?? 0;
@@ -273,6 +278,7 @@ export class ProjectileStore {
     this.link[i] = this.link[last]!;
     this.maxLife[i] = this.maxLife[last]!;
     this.armLife[i] = this.armLife[last]!;
+    this.armStage[i] = this.armStage[last]!;
     this.hitCount[i] = this.hitCount[last]!;
     this.stage[i] = this.stage[last]!;
     this.fxIndex[i] = this.fxIndex[last]!;

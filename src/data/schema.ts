@@ -772,6 +772,26 @@ export const moveEffectSchema = z.object({
       lengthJitter: z.number().min(0).max(1).default(0),
     })
     .optional(),
+  /** 岩の群れ: その場のまわり radius の中のランダムな場所に、count 個の残る当たり判定を置く（ストーンエッジの突き出す岩。作者の指摘 2026年10月25日） */
+  cluster: z
+    .object({ ...fxSize, count: z.number().int().positive(), radius: z.number().nonnegative(), durationSeconds: z.number().positive(), hitIntervalSeconds: z.number().positive() })
+    .optional(),
+  /**
+   * 伸びる亀裂: その場から count 本の亀裂が外へ伸びる。1本は長さ segment の線を steps 本つないだもので、つなぐたびに向きを
+   * 最初の向きから turnDegrees までの中でランダムに選び直し、segmentSeconds ごとに1本ずつ伸びる（じわれ。作者の案 2026年10月25日）
+   */
+  crack: z
+    .object({
+      ...fxSize,
+      count: z.number().int().positive(),
+      steps: z.number().int().positive(),
+      segment: z.number().positive(),
+      turnDegrees: z.number().nonnegative(),
+      segmentSeconds: z.number().nonnegative(),
+      durationSeconds: z.number().positive(),
+      hitIntervalSeconds: z.number().positive(),
+    })
+    .optional(),
   /** 波: その場から radius まで広がる輪 */
   wave: z.object({ powerMultiplier: z.number().nonnegative(), radius: z.number().positive(), durationSeconds: z.number().positive() }).optional(),
 });
@@ -1112,7 +1132,15 @@ export const effectRecipeSchema = z.object({
    * afterimages は後ろに連ねる残像の数、spacingTicks はその間隔（更新回数ぶんの移動）
    */
   ownerGhost: z
-    .object({ tint: colorString, alpha: z.number().min(0).max(1), afterimages: z.number().int().nonnegative(), spacingTicks: z.number().positive() })
+    .object({
+      tint: colorString,
+      alpha: z.number().min(0).max(1),
+      afterimages: z.number().int().nonnegative(),
+      spacingTicks: z.number().positive(),
+      /** 色を periodMs ごとに順に切り替える（ボルテッカー: 10まんボルトのような黒・白・黄。作者の指摘 2026年10月25日）。省略なら tint のまま */
+      colors: z.array(colorString).min(1).optional(),
+      periodMs: z.number().positive().default(60),
+    })
     .optional(),
   /**
    * 効き方から出た円の範囲（10まんボルトの自分の周りの電気）を、色を切り替えて光らせる。

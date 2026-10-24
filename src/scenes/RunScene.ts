@@ -934,7 +934,7 @@ export class RunScene extends Phaser.Scene {
           .setPosition(x - stepX * ghost.spacingTicks * k, y - stepY * ghost.spacingTicks * k)
           .setScale(frame.scaleX, frame.scaleY)
           .setFlipX(frame.flipX)
-          .setTint(hexColor(ghost.tint))
+          .setTint(hexColor(ghost.colors ? ghost.colors[(Math.floor(performance.now() / ghost.periodMs) + k) % ghost.colors.length]! : ghost.tint))
           .setAlpha(ghost.alpha * (1 - k / (ghost.afterimages + 1)))
           .setDepth(depth - k * 0.001)
           .setVisible(true);

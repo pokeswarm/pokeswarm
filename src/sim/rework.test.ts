@@ -168,4 +168,30 @@ describe('作者の感想で見直した技（2026年10月25日）', () => {
     const pr2 = sim2.world.projectiles;
     expect(Array.from({ length: pr2.count }, (_, i) => i).filter((i) => pr2.stage[i] === 1 && pr2.motion[i] === MOTION_SNAKE)).toHaveLength(2);
   });
+
+  it('岩の群れ（cluster）: 当たった所のまわりに、動かない残る当たり判定を count 個置く', () => {
+    const rocks: MoveEffect = { trigger: 'cast', cluster: { sizeMultiplier: 1, powerMultiplier: 0.5, count: 5, radius: 50, durationSeconds: 1, hitIntervalSeconds: 0.4 } };
+    const sim = setup('nova', { range: 50, size: 10, durationSeconds: 0.2 }, [], { effects: [rocks] });
+    sim.step([]);
+    const pr = sim.world.projectiles;
+    const kids = Array.from({ length: pr.count }, (_, i) => i).filter((i) => pr.stage[i] === 1);
+    expect(kids).toHaveLength(5);
+    for (const i of kids) expect(Math.hypot(pr.x[i]!, pr.y[i]!)).toBeLessThanOrEqual(50);
+  });
+
+  it('伸びる亀裂（crack）: 線をつないで外へ伸び、遅れて現れる線は効き方から出たもの（stage 1）として現れる', () => {
+    const cracks: MoveEffect = { trigger: 'cast', crack: { sizeMultiplier: 0.5, powerMultiplier: 0.5, count: 3, steps: 4, segment: 30, turnDegrees: 40, segmentSeconds: 0.1, durationSeconds: 1, hitIntervalSeconds: 0.5 } };
+    const sim = setup('nova', { range: 50, size: 10, durationSeconds: 0.2 }, [], { effects: [cracks] });
+    sim.step([]);
+    const pr = sim.world.projectiles;
+    const of = (st: number): number[] => Array.from({ length: pr.count }, (_, i) => i).filter((i) => pr.stage[i] === st);
+    expect(of(1)).toHaveLength(3);
+    expect(of(3)).toHaveLength(9);
+    steps(sim, 12);
+    expect(of(3)).toHaveLength(0);
+    expect(of(0).filter((i) => pr.shape[i] === 1)).toHaveLength(0);
+    // つないだ線の先は、どれも出した所から遠ざかる
+    const far = Math.max(...of(1).map((i) => Math.hypot(pr.x[i]! + pr.dirX[i]! * pr.length[i]!, pr.y[i]! + pr.dirY[i]! * pr.length[i]!)));
+    expect(far).toBeGreaterThan(80);
+  });
 });

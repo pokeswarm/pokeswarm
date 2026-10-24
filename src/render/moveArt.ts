@@ -808,27 +808,6 @@ function quakeCrack(): SpriteOut {
   return { palette, frameMs: 90, parts: { middle: frames.map(toRows) } };
 }
 
-/** じわれ: 地面が裂けた暗い割れ目（始まり・途中・終わり）。コマでふちの岩が少し崩れる */
-function fissure(): SpriteOut {
-  const H = 12;
-  const TILE = 10;
-  // 0 輪郭・1 深い割れ目・2 割れ目の中・3 岩のふち・4 岩の明るい所
-  const palette = ['#0c0705', '#120a06', '#3e2723', '#6d4c41', '#a1887f'];
-  const mid = (H - 1) / 2;
-  const parts = lineParts(H, { start: 6, middle: TILE, end: 8 }, 3, (x, y, f, part) => {
-    const taper = part === 'start' ? 0.35 + x / 9 : part === 'end' ? 1 - x / 8 : 1;
-    // ふちのギザギザ（上下で違う形。周期は TILE なので並べてもつながる）
-    const jag = (x2: number, k: number): number => Math.round(Math.sin(((x2 + k) / TILE) * Math.PI * 2 * 2) * 0.8 + Math.sin(((x2 * 3 + k + f) / TILE) * Math.PI * 2) * 0.5);
-    const top = mid - 3.5 * taper + jag(x, 0);
-    const bottom = mid + 3.5 * taper + jag(x, 4);
-    if (y < top - 1.5 || y > bottom + 1.5) return -1;
-    if (y < top || y > bottom) return y < mid ? 4 : 3;
-    const d = Math.abs(y - mid) / Math.max(0.5, 3.5 * taper);
-    return d < 0.5 ? 1 : 2;
-  });
-  return { palette, frameMs: 140, parts };
-}
-
 /** ふぶき・こなゆき: 六つの枝の雪の結晶（回して飛ばす） */
 function snowflake(): SpriteOut {
   const palette = ['#0d3550', '#81d4fa', '#e1f5fe', '#ffffff'];
@@ -1943,26 +1922,6 @@ function quakeZone(): SpriteOut {
   return { palette, frameMs: 90, loopFrom: 3, parts: { main: [make(0.35, 0), make(0.7, 1), make(1, 2), make(1, 3), make(1, 4)] } };
 }
 
-/**
- * ストーンエッジ: 地面から外へ突き出した、とがった岩（線に合わせる。始まり = 根元の岩くず、途中 = 岩の胴、終わり = 鋭い先）。
- * 上の面を明るく、下の面を暗く塗り分けて、角ばった岩に見せる
- */
-function rockSpike(): SpriteOut {
-  const H = 12;
-  const palette = ['#1c1a17', '#4e4a44', '#7d756b', '#a89f93', '#e0d9cf', '#6d4c41'];
-  const mid = (H - 1) / 2;
-  const parts = lineParts(H, { start: 6, middle: 8, end: 12 }, 1, (x, y, _f, part) => {
-    const half = part === 'start' ? 4.6 - x * 0.12 : part === 'middle' ? 3.9 - x * 0.06 : 3.4 * (1 - x / 11.5);
-    if (part === 'start' && Math.abs(y - mid) > half && Math.abs(y - mid) < half + 1.5 && hash(Math.floor(x), Math.floor(y), 1100) < 0.5) return 5;
-    if (Math.abs(y - mid) > half) return -1;
-    // 稜線（真ん中のやや上）で面を分ける
-    const k = (y - mid) / Math.max(0.5, half);
-    if (Math.abs(k + 0.15) < 0.12) return 4;
-    return k < -0.15 ? 3 : k < 0.45 ? 2 : 1;
-  });
-  return { palette, frameMs: 1000, parts };
-}
-
 /** ストーンエッジ: 地面を走る亀裂の先（はじける岩くずと土ぼこり。上から見た円）。コマで岩くずが跳ねる */
 function crackHead(): SpriteOut {
   const palette = ['#1c1a17', '#4e4a44', '#7d756b', '#a89f93', '#e0d9cf', '#cbb79a'];
@@ -2043,6 +2002,72 @@ function iceNeedle(): SpriteOut {
   return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
 }
 
+/**
+ * ストーンエッジ: 地面から突き出した、茶色いごつごつの岩の柱（横から見た姿。根元が絵の下の方 y = 21。作者の指摘 2026年10月25日:
+ * 細いとげではなく、尖った岩肌）。大きな岩と、横に小さな岩。左の面が明るく、ひびが入る。根元に土ぼこり。
+ * コマ 0 で地面から出かけ、1 で伸びきる（loopFrom 1）
+ */
+function rockSpire(): SpriteOut {
+  const W = 18;
+  const H = 24;
+  const gy = 21;
+  // 0 輪郭・1 ひび・2 暗い面・3 岩・4 明るい面・5 光の当たるふち・6 土ぼこり
+  const palette = ['#24160e', '#3e2a1e', '#7a5238', '#a0704e', '#c4936a', '#e0b88e', '#c8ac8a'];
+  // 岩: [根元の左, 根元の右, 先の x, 高さ, 稜線の根元の x]
+  const rocks = [
+    [2, 13, 8.5, 19, 7],
+    [11, 17, 15.5, 10, 14],
+  ] as const;
+  const make = (grow: number): string[] => {
+    const g = fill(blank(W, H), (x, y) => {
+      for (const [l, r, tx, ht, ridge] of rocks) {
+        const top = gy - ht * grow;
+        if (y < top || y > gy) continue;
+        const t = (gy - y) / (gy - top);
+        // ごつごつのふち（高さごとに少し出入り）
+        const jag = (hash(Math.floor(y * 0.7), Math.floor(l), 1300) - 0.5) * 1.6 * (1 - t);
+        const xl = l + (tx - l) * t + jag;
+        const xr = r + (tx - r) * t - jag * 0.6;
+        if (x < xl || x > xr) continue;
+        const xm = ridge + (tx - ridge) * t;
+        // ひび（斜めの折れ線）
+        if (Math.abs(x - xm - Math.sin(y * 0.9) * 1.2 - 1.5) < 0.35 && t > 0.15 && t < 0.8) return 1;
+        if (x < xm) return x < xl + 1 && t < 0.9 ? 5 : 4;
+        return x > xr - 1.2 ? 2 : 3;
+      }
+      // 根元の土ぼこり
+      const ex = (x - 9) / 9;
+      const ey = (y - gy - 0.5) / 2;
+      if (ex * ex + ey * ey <= 1 && hash(Math.floor(x), Math.floor(y), 1310) < 0.92) return 6;
+      return -1;
+    });
+    return toRows(outline(g, 0));
+  };
+  return { palette, frameMs: 70, loopFrom: 1, parts: { main: [make(0.45), make(1)] } };
+}
+
+/**
+ * じわれ: 地面を走る黒い亀裂（じしんの揺れの絵の割れ目と同じ色。線に合わせる。作者の案 2026年10月25日）。
+ * 並べてもつながるよう、ぎざぎざの周期は途中の部品の幅。始まり・終わりは細くなる
+ */
+function crackLine(): SpriteOut {
+  const H = 8;
+  const TILE = 8;
+  const palette = ['#2a1d14', '#1a110b', '#5d4a3a'];
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 4, middle: TILE, end: 6 }, 1, (x, y, _f, part) => {
+    const taper = part === 'start' ? 0.4 + (x / 4) * 0.6 : part === 'end' ? 1 - x / 6 : 1;
+    // 折れ線（三角の波）でぎざぎざにする（なめらかな波だと、這う虫のように見える）
+    const ph = ((part === 'middle' ? x : x * 1.3) / TILE + 0.25) % 1;
+    const cy = mid + (Math.abs(ph * 2 - 1) * 2 - 1) * 1.5;
+    const d = Math.abs(y - cy);
+    if (d < 0.9 * taper) return 1;
+    if (d < 1.8 * taper) return 2;
+    return -1;
+  }, 0);
+  return { palette, frameMs: 1000, parts };
+}
+
 /** 自作の絵であることの表記（data/render/move-sprites.json の credit） */
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
@@ -2068,7 +2093,6 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'flame-cone': () => cone('flame'),
     'bubble-cone': () => cone('bubble'),
     'quake-crack': () => quakeCrack(),
-    fissure: () => fissure(),
     snowflake: () => snowflake(),
     'poison-cloud': () => poisonCloud(),
     'fang-bite': () => fangBite(),
@@ -2130,7 +2154,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'electric-ring': () => electricRing(),
     'electric-crackle': () => electricCrackle(),
     'quake-zone': () => quakeZone(),
-    'rock-spike': () => rockSpike(),
+    'rock-spire': () => rockSpire(),
+    'crack-line': () => crackLine(),
     'crack-head': () => crackHead(),
     'ice-statue': () => iceStatue(),
     'ice-needle': () => iceNeedle(),

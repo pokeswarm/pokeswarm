@@ -882,9 +882,10 @@ export function moveProjectiles(world: World): void {
     if (pr.stage[i] === 3) {
       pr.life[i]! -= world.dt;
       if (pr.life[i]! <= 0) {
-        pr.stage[i] = 0;
+        pr.stage[i] = pr.armStage[i]!;
         pr.life[i] = pr.maxLife[i] = pr.armLife[i]!;
-        world.events.push({ type: 'projectileHit', x: pr.x[i]!, y: pr.y[i]!, owner: pr.owner[i]!, move: pr.move[i]! });
+        // 効き方から出た、遅れて伸びる亀裂（じわれ）は、1本ずつ光らせない
+        if (pr.stage[i] === 0) world.events.push({ type: 'projectileHit', x: pr.x[i]!, y: pr.y[i]!, owner: pr.owner[i]!, move: pr.move[i]! });
         fireSpawnEffects(world, i, i + 1);
       }
       continue;

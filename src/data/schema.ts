@@ -1630,6 +1630,8 @@ export const iconConfigSchema = z.object({
   stars: z.object({ on: z.array(z.string()).min(1), off: z.array(z.string()).min(1) }),
   moves: z.record(z.string(), z.string()),
   items: z.record(z.string(), z.object({ glyph: z.string(), color: z.string() })),
+  /** タイトルのメニューのアイコン（# の所を文字の色で塗る。作者の依頼 2026年10月24日: 言語を選ぶ設定に、文字が読めなくてもたどり着けるように） */
+  menuGlyphs: z.record(z.string(), z.array(z.string())),
 });
 export type IconConfig = z.infer<typeof iconConfigSchema>;
 

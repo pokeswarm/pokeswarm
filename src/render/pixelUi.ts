@@ -75,7 +75,7 @@ export function pixelButton(
   h: number,
   label: string,
   onClick: () => void,
-  opts: { kind?: 'light' | 'dark'; size?: PxSize; depth?: number } = {},
+  opts: { kind?: 'light' | 'dark'; size?: PxSize; depth?: number; /** 文字の左に置くアイコン（文字の色で塗る。テクスチャのキーを色から作る） */ icon?: (color: string) => string } = {},
 ): Phaser.GameObjects.Container {
   const kind = opts.kind ?? 'light';
   const color = kind === 'light' ? uiConfig.window.text : uiConfig.dark.text;
@@ -84,7 +84,18 @@ export function pixelButton(
   const size = opts.size ?? 16;
   const text = scene.add.text(size * 0.75, 0, label, px(size, color)).setOrigin(0.5);
   const cursor = scene.add.text(-w / 2 + 12, 0, '▶', px(size, color)).setOrigin(0, 0.5).setVisible(false);
-  const box = scene.add.container(Math.round(x), Math.round(y), [g, text, cursor]).setSize(w, h).setDepth(opts.depth ?? 0);
+  const parts: Phaser.GameObjects.GameObject[] = [g, text, cursor];
+  if (opts.icon) {
+    // アイコンはカーソルの右。文字はアイコンの右に左寄せ（メニューの頭がそろう）
+    const iconLeft = -w / 2 + 12 + size + 6;
+    const icon = scene.add.image(iconLeft, 0, opts.icon(color)).setOrigin(0, 0.5);
+    icon.setScale(Math.max(1, Math.round((size * 1.5) / icon.height)));
+    text.setOrigin(0, 0.5).setX(iconLeft + icon.displayWidth + 8);
+    // 長い言葉（フランス語・ドイツ語など）で右の端からはみ出すときは、文字を一段小さくする（ドットの字は半端な倍率にしない）
+    if (size > 8 && text.x + text.width > w / 2 - 6) text.setStyle(px(size === 16 ? 8 : 16, color));
+    parts.push(icon);
+  }
+  const box = scene.add.container(Math.round(x), Math.round(y), parts).setSize(w, h).setDepth(opts.depth ?? 0);
   box.setInteractive({ useHandCursor: true });
   box.on('pointerover', () => cursor.setVisible(true));
   box.on('pointerout', () => cursor.setVisible(false));

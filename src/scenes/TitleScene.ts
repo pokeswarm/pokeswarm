@@ -6,8 +6,9 @@ import { TitleFooter } from './creditsPanel';
 import { openDonatePanel } from './donatePanel';
 import { session } from '../meta/session';
 import { audio } from '../audio';
-import { bgmConfig, generated, groundConfig, playablesConfig, spriteRender, uiConfig } from '../data';
+import { bgmConfig, generated, iconConfig, groundConfig, playablesConfig, spriteRender, uiConfig } from '../data';
 import type { SpriteAnims } from '../data/schema';
+import { menuIconKey } from '../render/Icons';
 import { GroundTiles, preloadGroundTiles } from '../render/GroundTiles';
 import { drawWindow, pixelButton, px, compactScreen } from '../render/pixelUi';
 import { directionIndex, PokemonSpriteView } from '../render/sprites/PokemonSprite';
@@ -124,15 +125,16 @@ export class TitleScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off(Phaser.Scenes.Events.UPDATE, onUpdate));
     let ui: Phaser.GameObjects.Container | null = null;
     const coop = !!firebaseOptionsFromEnv();
-    const items: { label: string; key: string | null; go: () => void; stay?: boolean }[] = [
-      { label: t('title.menu.start'), key: null, go: () => this.scene.start('region', { next: 'solo' }) },
-      ...(coop ? [{ label: t('title.menu.coop'), key: 'C', go: () => this.scene.start('region', { next: 'coop' }) }] : []),
-      ...(coop ? [{ label: t('title.menu.friends'), key: 'F', go: () => this.scene.start('friends') }] : []),
-      { label: t('title.menu.achievements'), key: 'A', go: () => this.scene.start('achievements') },
-      { label: t('title.menu.shop'), key: 'S', go: () => this.scene.start('shop') },
-      { label: t('title.menu.settings'), key: 'O', go: () => this.scene.start('settings') },
+    // アイコン（作者の依頼 2026年10月24日: 読めない言語のときも、歯車から設定の言語にたどり着けるように）
+    const items: { icon: string; label: string; key: string | null; go: () => void; stay?: boolean }[] = [
+      { icon: 'start', label: t('title.menu.start'), key: null, go: () => this.scene.start('region', { next: 'solo' }) },
+      ...(coop ? [{ icon: 'coop', label: t('title.menu.coop'), key: 'C', go: () => this.scene.start('region', { next: 'coop' }) }] : []),
+      ...(coop ? [{ icon: 'friends', label: t('title.menu.friends'), key: 'F', go: () => this.scene.start('friends') }] : []),
+      { icon: 'achievements', label: t('title.menu.achievements'), key: 'A', go: () => this.scene.start('achievements') },
+      { icon: 'shop', label: t('title.menu.shop'), key: 'S', go: () => this.scene.start('shop') },
+      { icon: 'settings', label: t('title.menu.settings'), key: 'O', go: () => this.scene.start('settings') },
       // 寄付の窓（作者の決定）。画面は移らないので、選んでもタイトルのまま
-      { label: t('title.menu.donate'), key: null, go: () => openDonatePanel(), stay: true },
+      { icon: 'donate', label: t('title.menu.donate'), key: null, go: () => openDonatePanel(), stay: true },
     ];
     let selected = 0;
     let buttons: Phaser.GameObjects.Container[] = [];
@@ -178,7 +180,7 @@ export class TitleScene extends Phaser.Scene {
       buttons = items.map((it, i) => {
         const col = i % cols;
         const row = Math.floor(i / cols);
-        return pixelButton(this, left + bw / 2 + col * (bw + gap), top + bh / 2 + row * (bh + gap), bw, bh, it.label, () => go(i)).on('pointerover', () => {
+        return pixelButton(this, left + bw / 2 + col * (bw + gap), top + bh / 2 + row * (bh + gap), bw, bh, it.label, () => go(i), { icon: (c) => menuIconKey(this, iconConfig, it.icon, c) }).on('pointerover', () => {
           selected = i;
           showCursor();
         });

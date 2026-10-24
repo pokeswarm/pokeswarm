@@ -131,6 +131,10 @@
     {
       "key": "snorlax",
       "cost": 10000
+    },
+    {
+      "key": "porygon",
+      "cost": 9999
     }
   ],
   "legacyBaseCosts": {

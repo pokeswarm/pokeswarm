@@ -480,5 +480,6 @@
   "select.startItemLocked": "このポケモンで クリアすると 選べる",
   "select.shiny": "色違い",
   "run.shinyName": "色違いの{name}",
-  "title.version": "BETA  v{version}"
+  "title.version": "BETA  v{version}",
+  "pattern.passive": "いつも効く"
 }

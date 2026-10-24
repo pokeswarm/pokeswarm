@@ -1344,6 +1344,18 @@
     "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0136"
   },
   {
+    "key": "porygon",
+    "dex": 137,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0137"
+  },
+  {
     "key": "aerodactyl",
     "dex": 142,
     "authors": [

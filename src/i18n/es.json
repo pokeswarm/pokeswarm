@@ -459,5 +459,6 @@
   "select.startItemLocked": "Completa con este Pokémon para elegir uno",
   "select.shiny": "Variocolor",
   "run.shinyName": "{name} variocolor",
-  "title.version": "BETA  v{version}"
+  "title.version": "BETA  v{version}",
+  "pattern.passive": "Siempre activo"
 }

@@ -103,7 +103,8 @@
     "snorlax",
     "dodrio",
     "magnemite",
-    "magneton"
+    "magneton",
+    "porygon"
   ],
   "moves": [
     "ember",
@@ -209,7 +210,9 @@
     "slash",
     "fury-cutter",
     "x-scissor",
-    "flash-cannon"
+    "flash-cannon",
+    "sharpen",
+    "conversion"
   ],
   "items": [
     "x-attack",

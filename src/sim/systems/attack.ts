@@ -127,7 +127,8 @@ export function useMoves(world: World): void {
     if (p.down) continue;
     for (const pm of p.moves) {
       const def = world.rules.moves[pm.move];
-      if (!def) continue;
+      // いつも効く技（かくばる・テクスチャー）は使わない（効果は持ち物と同じく、いつも足されている）
+      if (!def || def.pattern === 'passive') continue;
       const st = playerMoveStats(world, p, pm);
       pm.cooldown -= world.dt;
       if (pm.burstLeft > 0) {

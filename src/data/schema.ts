@@ -565,6 +565,7 @@ export type CombatConfig = z.infer<typeof combatConfigSchema>;
  * - scatter（水たまり）: 自分の周り range の中のランダムな場所に、しばらく残る当たり判定を置く
  * - spin（回転）: 自分のまわりに開き arcDegrees の扇形を、使うたびに時計回りへ arcDegrees ずつずらして出す（count 枚を等しい角度で。
  *   2 枚は向かい合わせ、3 枚は正三角形と逆三角形の向きが交互になる）。再使用が短いほど速く回る（こうそくスピン。作者の決定 2026年10月23日）
+ * - passive（いつも効く）: 攻撃しない。レベルごとに、持ち物と同じ形の効果を足す（技の passive。ポリゴンの かくばる・テクスチャー）
  * - heal（回復）: 攻撃しない。使うたびに最大 HP の healPct % を回復し、guardPct があれば duration の間、受けるダメージを減らす
  *   （なまける・ドわすれ。作者の決定 2026年10月23日）。自分の周りに size の円を見た目だけ出す
  * - spiral（うず）: 自分を中心に count 個を等しい角度に並べ、curve（度/秒）で回りながら、duration の間に range まで広がる
@@ -598,6 +599,7 @@ export const MOVE_PATTERNS = [
   'eruption',
   'spin',
   'heal',
+  'passive',
   'sweep',
   'spiral',
 ] as const;
@@ -795,6 +797,11 @@ export const moveDefSchema = z.object({
   learners: z.array(z.string()).optional(),
   /** 跳ね返る技（bounce）を出す向き: 向いている方向から何度ずらすか（まっすぐだと、向かいの壁との間で同じ線を往復するだけになる） */
   bounceAngle: z.number().optional(),
+  /**
+   * passive（いつも効く技）: レベルごとに足す効果（持ち物と同じ形）。[0] がレベル1で、レベル L ではここまでの合計が効く。
+   * 数は最大レベル（levels の数 + 1）と同じ（作者の決定 2026年10月24日: ポリゴンの かくばる・テクスチャー）
+   */
+  passive: z.array(modifierSchema).optional(),
 });
 export type MoveDefData = z.infer<typeof moveDefSchema>;
 
@@ -1397,7 +1404,8 @@ export const derivationsConfigSchema = z.object({
   unique: z.array(
     z.object({
       from: z.string(),
-      item: z.string(),
+      /** 材料の持ち物。省略すると持ち物はいらない（ポリゴン: レベル42で、スピードスターが最大ならトライアタックへ） */
+      item: z.string().optional(),
       to: z.string(),
       /** 系統（data/game/playables.json のキー） */
       line: z.string(),

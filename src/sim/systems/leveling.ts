@@ -237,7 +237,7 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
   p.moves.forEach((pm, slot) => {
     if (pm.level < rules.moves[pm.move]!.levels.length) return;
     for (const d of rules.derivations) {
-      if (d.from !== pm.move || !p.items.some((it) => it.item === d.item)) continue;
+      if (d.from !== pm.move || (d.item !== -1 && !p.items.some((it) => it.item === d.item))) continue;
       if (d.line !== null && d.line !== p.line) continue;
       if (d.minLevel && world.level < d.minLevel) continue;
       if (d.forms && !d.forms.includes(p.species)) continue;
@@ -315,7 +315,7 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
     case 'derive': {
       p.moves[offer.slot] = { move: offer.to, level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0 };
       // 進化の石などは使うとなくなる（持ち物の枠が空く）
-      if (world.rules.items[offer.item]!.consumable) p.items = p.items.filter((it) => it.item !== offer.item);
+      if (offer.item !== -1 && world.rules.items[offer.item]!.consumable) p.items = p.items.filter((it) => it.item !== offer.item);
       break;
     }
   }
@@ -333,6 +333,11 @@ export function recomputeModifiers(world: World, p: Player): void {
   const mods = emptyModifiers(world.rules.types.names.length);
   if (p.permanent) addModifiers(mods, p.permanent, 1);
   for (const it of p.items) addModifiers(mods, world.rules.items[it.item]!.perLevel, it.level);
+  // いつも効く技（かくばる・テクスチャー）: そのレベルまでの効果
+  for (const pm of p.moves) {
+    const passive = world.rules.moves[pm.move]?.passive[pm.level - 1];
+    if (passive) addModifiers(mods, passive, 1);
+  }
   p.mods = mods;
   const sp = world.rules.species[p.species];
   const d = sp ? deriveStats(world.rules.stats, sp, world.level) : null;

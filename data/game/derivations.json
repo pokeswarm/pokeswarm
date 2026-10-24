@@ -49,6 +49,7 @@
     { "from": "flare-blitz", "item": "fire-stone", "to": "sky-attack", "line": "moltres" },
     { "from": "mimic", "item": "moon-stone", "to": "metronome", "line": "mew" },
     { "from": "swift", "item": "sharp-beak", "to": "tri-attack", "line": "doduo" },
+    { "from": "swift", "to": "tri-attack", "line": "porygon", "minLevel": 42 },
     { "from": "thunderbolt", "item": "pp-max", "to": "thunder", "line": "pikachu", "forms": ["raichu"] },
     { "from": "pound", "item": "x-attack", "to": "double-slap", "line": "jigglypuff" },
     { "from": "sing", "item": "silk-scarf", "to": "hyper-voice", "line": "jigglypuff" },

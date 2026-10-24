@@ -59,6 +59,13 @@ export function buildSimRules(): SimRules {
       randomScaled: def.randomPool === 'starting',
       chainHopSeconds: def.chainHopSeconds ?? 0,
       learners: def.learners ?? null,
+      // いつも効く技: レベルごとの効果を、そのレベルまでの合計にしておく
+      passive: (def.passive ?? []).reduce<Modifiers[]>((acc, mods) => {
+        const sum = emptyModifiers(types.names.length);
+        if (acc.length > 0) addModifiers(sum, acc[acc.length - 1]!, 1);
+        addModifiers(sum, resolveModifiers(mods, types.names), 1);
+        return [...acc, sum];
+      }, []),
     };
   });
   const moveIndex = (key: string): number => moves.findIndex((m) => m.key === key);
@@ -97,7 +104,7 @@ export function buildSimRules(): SimRules {
   const itemIndex = (key: string): number => items.findIndex((i) => i.key === key);
   const derivations = [
     ...derivationsConfig.derivations.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: null })),
-    ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: d.line, ...(d.minLevel ? { minLevel: d.minLevel } : {}), ...(d.forms ? { forms: d.forms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}) })),
+    ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: d.item ? itemIndex(d.item) : -1, to: moveIndex(d.to), line: d.line, ...(d.minLevel ? { minLevel: d.minLevel } : {}), ...(d.forms ? { forms: d.forms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}) })),
   ];
   // ポケモンの種類: PokeAPI から生成したすべて。進化先・進化の道具が無いものは進化の一覧から外す
   const speciesKeys = Object.keys(generated.pokemon);

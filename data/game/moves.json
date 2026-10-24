@@ -667,7 +667,8 @@
         "articuno",
         "zapdos",
         "moltres",
-        "mewtwo"
+        "mewtwo",
+        "porygon"
       ],
       "base": {
         "power": 12,
@@ -5081,6 +5082,127 @@
         {
           "size": 3,
           "power": 1.5
+        }
+      ]
+    },
+    "sharpen": {
+      "pattern": "passive",
+      "effect": "sharpen",
+      "learners": [
+        "porygon"
+      ],
+      "base": {
+        "power": 0,
+        "cooldownSeconds": 99,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 1,
+        "range": 0,
+        "durationSeconds": 0.1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "passive": [
+        {
+          "powerPct": 6
+        },
+        {
+          "powerPct": 6
+        },
+        {
+          "powerPct": 6
+        },
+        {
+          "powerPct": 6
+        },
+        {
+          "powerPct": 6
+        },
+        {
+          "powerPct": 6
+        },
+        {
+          "powerPct": 6
+        },
+        {
+          "powerPct": 6
+        }
+      ]
+    },
+    "conversion": {
+      "pattern": "passive",
+      "effect": "conversion",
+      "learners": [
+        "porygon"
+      ],
+      "base": {
+        "power": 0,
+        "cooldownSeconds": 99,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 1,
+        "range": 0,
+        "durationSeconds": 0.1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "passive": [
+        {
+          "cooldownPct": -5
+        },
+        {
+          "amountBonus": 1
+        },
+        {
+          "pierceBonus": 1
+        },
+        {
+          "projectileSpeedPct": 15,
+          "rangePct": 10
+        },
+        {
+          "cooldownPct": -5
+        },
+        {
+          "areaPct": 10
+        },
+        {
+          "amountBonus": 1
+        },
+        {
+          "critChancePct": 10
         }
       ]
     }

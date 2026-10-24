@@ -34,10 +34,14 @@ interface Names {
 }
 interface Derivation {
   from: string;
-  item: string;
+  /** 材料の持ち物（無ければ、レベルの条件だけ） */
+  item?: string;
   to: string;
   line?: string;
+  minLevel?: number;
 }
+/** 派生の材料の表記（持ち物、無ければレベル） */
+const via = (d: Derivation): string => (d.item ? `＋${itemName(d.item)}` : `Lv${d.minLevel ?? "?"}`);
 type Stats = Record<string, number | string | undefined>;
 interface MoveDef {
   pattern: string;
@@ -145,7 +149,7 @@ const strength = (k: string): string => {
   return `総合 ${totalOf(def, a).toFixed(0)} → ${totalOf(def, b).toFixed(0)}<br>単体 ${dps(def, a).toFixed(0)} → ${dps(def, b).toFixed(0)}<br>群れ ${crowd(def, a).toFixed(0)} → ${crowd(def, b).toFixed(0)}`;
 };
 const cell = (s: Step | undefined): string => (s ? `**${moveName(s.move)}**<br>${strength(s.move)}` : '');
-const material = (s: Step | undefined): string => (s?.via ? `＋${itemName(s.via.item)}${s.via.line ? `<br>（${pokeName(s.via.line)}だけ）` : ''}` : '');
+const material = (s: Step | undefined): string => (s?.via ? `${via(s.via)}${s.via.line ? `<br>（${pokeName(s.via.line)}だけ）` : ''}` : '');
 
 out.push('## 派生のつながり');
 out.push('');
@@ -205,7 +209,7 @@ for (const root of roots) {
     const def = moves[s.move]!;
     const max = def.levels.length + 1;
     const stage = uniqueFrom.has(s.move) ? '固有' : derivedFrom.has(s.move) ? '派生' : 'タイプ';
-    const name = `**${moveName(s.move)}**${s.via ? `<br>（${moveName(s.via.from)} ＋${itemName(s.via.item)}${s.via.line ? `・${pokeName(s.via.line)}だけ` : ''}）` : ''}<br>${ja[`pattern.${def.pattern}`] ?? def.pattern}・${genMoves[s.move]?.damageClass === 'physical' ? '物理' : '特殊'}`;
+    const name = `**${moveName(s.move)}**${s.via ? `<br>（${moveName(s.via.from)} ${via(s.via)}${s.via.line ? `・${pokeName(s.via.line)}だけ` : ''}）` : ''}<br>${ja[`pattern.${def.pattern}`] ?? def.pattern}・${genMoves[s.move]?.damageClass === 'physical' ? '物理' : '特殊'}`;
     for (const [i, level] of [1, max].entries()) {
       const st = statsAt(def, level);
       const status = st.statusId ? `${STATUS[st.statusId as string] ?? st.statusId} ${Math.round((st.statusChance as number) * 100)}%` : '—';

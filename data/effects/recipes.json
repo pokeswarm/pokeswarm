@@ -2675,6 +2675,12 @@
         "size": 1.2,
         "seconds": 0.4
       }
+    },
+    "sharpen": {
+      "extends": "normal.base"
+    },
+    "conversion": {
+      "extends": "normal.base"
     }
   }
 }

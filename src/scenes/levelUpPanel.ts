@@ -52,6 +52,12 @@ const MOVE_GAINS: { key: 'count' | 'size' | 'range' | 'pierce' | 'durationSecond
 /** 技をレベル level から level + 1 に上げたときに増えるもの。最後に総合の強さの伸び（%） */
 export function moveGains(world: World, move: number, level: number): string[] {
   const def = world.rules.moves[move]!;
+  // いつも効く技（かくばる・テクスチャー）: 次のレベルで足される効果
+  if (def.passive.length > 0) {
+    const a = def.passive[level - 1];
+    const b = def.passive[level];
+    return a && b ? modifierLines(world, modifierDiff(a, b)) : [];
+  }
   const a = def.levels[level - 1];
   const b = def.levels[level];
   if (!a || !b) return [];
@@ -92,6 +98,32 @@ export function itemGains(world: World, item: number, level: number, next: numbe
     line(t(`mod.${k}`), v, k.endsWith('Pct') ? pct : signed);
   }
   if (def.powerMultiplier) out.push(t('mod.powerMultiplier', { v: def.powerMultiplier }));
+  return out;
+}
+
+/** 効果の差（b − a） */
+function modifierDiff(a: Modifiers, b: Modifiers): Modifiers {
+  const out = { ...b } as Record<string, number | number[]>;
+  for (const [k, v] of Object.entries(b) as [string, number | number[]][]) {
+    const av = (a as unknown as Record<string, number | number[]>)[k];
+    out[k] = Array.isArray(v) ? v.map((x, i) => x - ((av as number[] | undefined)?.[i] ?? 0)) : v - ((av as number | undefined) ?? 0);
+  }
+  return out as unknown as Modifiers;
+}
+
+/** 持ち物と同じ形の効果を、0 でないものだけ1行ずつ */
+function modifierLines(world: World, mods: Modifiers): string[] {
+  const out: string[] = [];
+  const pct = (v: number): string => `${signed(v)}%`;
+  for (const [k, v] of Object.entries(mods) as [keyof Modifiers, number | number[]][]) {
+    if (Array.isArray(v)) {
+      v.forEach((x, type) => {
+        if (!x) return;
+        const typeKey = world.rules.types.names[type] ?? '';
+        out.push(`${t(`mod.${k}`, { type: localName(generated.types[typeKey]?.names, getLocale(), typeKey) })} ${pct(x)}`);
+      });
+    } else if (v) out.push(`${t(`mod.${k}`)} ${k.endsWith('Pct') ? pct(v) : signed(v)}`);
+  }
   return out;
 }
 

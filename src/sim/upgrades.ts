@@ -51,7 +51,7 @@ export interface SimUpgradeDef {
 export interface SimDerivation {
   /** 技の番号 */
   readonly from: number;
-  /** 持ち物の番号 */
+  /** 持ち物の番号（-1 なら持ち物はいらない） */
   readonly item: number;
   readonly to: number;
   /** 固有技なら系統（playables.json のキー）。派生技なら null */

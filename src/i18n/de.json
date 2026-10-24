@@ -459,5 +459,6 @@
   "select.startItemLocked": "Schließe mit diesem Pokémon ab, um eins zu wählen",
   "select.shiny": "Schillernd",
   "run.shinyName": "Schillerndes {name}",
-  "title.version": "BETA  v{version}"
+  "title.version": "BETA  v{version}",
+  "pattern.passive": "Immer aktiv"
 }

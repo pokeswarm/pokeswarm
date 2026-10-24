@@ -279,7 +279,13 @@ for (const key of Object.keys(itemsConfig.items)) {
 }
 for (const d of [...derivationsConfig.derivations, ...derivationsConfig.unique]) {
   check(!!movesConfig.moves[d.from] && !!movesConfig.moves[d.to], `data/game/derivations.json の "${d.from} → ${d.to}" の技が data/game/moves.json にありません`);
-  check(!!itemsConfig.items[d.item], `data/game/derivations.json の材料 "${d.item}" が data/game/items.json にありません`);
+  if (d.item !== undefined) check(!!itemsConfig.items[d.item], `data/game/derivations.json の材料 "${d.item}" が data/game/items.json にありません`);
+  else check(derivationsConfig.unique.some((u) => u === d && u.minLevel), `data/game/derivations.json の "${d.from} → ${d.to}" は材料が無いので、固有技でレベル（minLevel）の条件が必要です`);
+}
+// いつも効く技（passive）: レベルごとの効果の数は、最大レベルと同じ
+for (const [key, m] of Object.entries(movesConfig.moves)) {
+  if (m.pattern === 'passive') check((m.passive?.length ?? 0) === m.levels.length + 1, `data/game/moves.json の "${key}" はいつも効く技なので、passive の数を最大レベル（${m.levels.length + 1}）にしてください`);
+  else check(!m.passive, `data/game/moves.json の "${key}" の passive は、pattern が passive の技だけに書けます`);
 }
 for (const u of derivationsConfig.unique) {
   check(!!playablesConfig.pokemon[u.line], `data/game/derivations.json の固有技 "${u.to}" の系統 "${u.line}" が data/game/playables.json にありません`);

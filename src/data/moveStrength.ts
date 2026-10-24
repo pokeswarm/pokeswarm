@@ -104,6 +104,7 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
       area = (Math.min(num('spreadDegrees') + num('arcDegrees'), 360) / 360) * Math.PI * (range + size) ** 2;
       break;
     case 'heal':
+    case 'passive':
       area = 0;
       break;
     case 'eruption': {

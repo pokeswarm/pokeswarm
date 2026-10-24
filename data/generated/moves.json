@@ -155,6 +155,18 @@
     "type": "psychic",
     "damageClass": "special"
   },
+  "conversion": {
+    "names": {
+      "ja": "テクスチャー",
+      "en": "Conversion",
+      "fr": "Conversion",
+      "de": "Umwandlung",
+      "es": "Conversión",
+      "it": "Conversione"
+    },
+    "type": "normal",
+    "damageClass": "status"
+  },
   "cross-chop": {
     "names": {
       "ja": "クロスチョップ",
@@ -910,6 +922,18 @@
     },
     "type": "ghost",
     "damageClass": "special"
+  },
+  "sharpen": {
+    "names": {
+      "ja": "かくばる",
+      "en": "Sharpen",
+      "fr": "Affûtage",
+      "de": "Schärfer",
+      "es": "Afilar",
+      "it": "Affilatore"
+    },
+    "type": "normal",
+    "damageClass": "status"
   },
   "sheer-cold": {
     "names": {

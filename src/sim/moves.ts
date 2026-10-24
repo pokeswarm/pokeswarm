@@ -1,4 +1,5 @@
 import type { CombatConfig, MoveDefData, MovePattern, MoveEffect } from '../data/schema';
+import type { Modifiers } from './upgrades';
 
 /** シミュレーションが使う技の性能（レベルを反映済み。貫通無限は Infinity） */
 export interface MoveStats {
@@ -71,6 +72,8 @@ export interface SimMoveDef {
   readonly chainHopSeconds: number;
   /** この技を候補に出す系統。null ならタイプが合えばだれでも */
   readonly learners: readonly string[] | null;
+  /** いつも効く技（passive）: レベルごとの効果の合計（[0] がレベル1）。ほかの技は空 */
+  readonly passive: readonly Modifiers[];
 }
 
 /** 最小値で止める項目（足し続けても壊れないように） */

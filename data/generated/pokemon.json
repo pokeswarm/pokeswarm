@@ -2172,6 +2172,35 @@
       }
     ]
   },
+  "porygon": {
+    "dex": 137,
+    "names": {
+      "ja": "ポリゴン",
+      "en": "Porygon",
+      "fr": "Porygon",
+      "de": "Porygon",
+      "es": "Porygon",
+      "it": "Porygon"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 60,
+      "defense": 70,
+      "specialAttack": 85,
+      "specialDefense": 75,
+      "speed": 40
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "porygon2",
+        "trigger": "trade"
+      }
+    ]
+  },
   "psyduck": {
     "dex": 54,
     "names": {

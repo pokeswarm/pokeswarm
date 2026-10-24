@@ -756,6 +756,13 @@
       ]
     },
     {
+      "key": "porygon",
+      "dex": 137,
+      "uses": [
+        "full"
+      ]
+    },
+    {
       "key": "aerodactyl",
       "dex": 142,
       "uses": [

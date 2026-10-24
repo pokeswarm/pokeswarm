@@ -105,8 +105,9 @@
 - [x] 技の手触りの見直しと、技のドット絵（今いるプレイアブル全員の技を、作者が技の見本帳で遊んで調整し終えた。2026年10月25日。`07` 37〜44章）
 
 ### フェーズ5: 公開準備
-- [ ] `pokeswarm.org` の取得と Cloudflare への設定
-- [ ] Firebase の承認済みドメイン・セキュリティルール・予算アラート
+- [x] `pokeswarm.org` の取得と Cloudflare への設定（作者 2026年10月25日に完了を報告）
+- [x] Firebase のセキュリティの登録・セキュリティルール（作者 2026年10月25日に完了を報告。作者が強固なルールを入れた）
+- [ ] Firebase の予算アラート（設定したかは未確認）
 - [x] 権利者向けの連絡先: X のアカウント https://x.com/PokeSwarmDev（作者の決定 2026年10月25日。`data/site.json` の `contactUrl`。クレジットの窓に出す）
 - [ ] 法的表記・クレジット・プライバシー・データ削除（クレジットには、ポケモンのドット絵の作者一覧 `public/sprites/credits.json`、持ち物のアイコンの権利表記 `data/render/item-icons.json` の `credit`、フォントの権利表記 `data/render/ui.json` の `font.credits` を出す）
 - [x] Ko-fi の寄付の呼びかけ（タイトルのメニューの「きふ」。https://ko-fi.com/pokeswarm）

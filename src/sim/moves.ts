@@ -82,6 +82,8 @@ export interface SimMoveDef {
   readonly scatterJitter?: { readonly countMin: number; readonly sizeMin: number; readonly sizeMax: number };
   /** sweep（なぎ払い）を片道だけにする（はたく） */
   readonly sweepOnce?: boolean;
+  /** 連打を長方形にするときの横幅（ばくれつパンチ） */
+  readonly barrageWidth?: number;
   /** 向きを使うたびにランダムに選ぶ（にどげり・まわしげり） */
   readonly randomAim?: boolean;
   /** 再使用を、出した技が消えてから数える（こなゆき・ふぶき） */

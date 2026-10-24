@@ -232,4 +232,20 @@ describe('作者の感想で見直した技（2026年10月25日）', () => {
     sim.step([]);
     expect(sim.world.players[0]!.moves[0]!.cooldown).toBeCloseTo(7);
   });
+
+  it('長方形の連打（barrageWidth）: 自分を通る横の辺から、向いている方向へまっすぐ拳を出す（真横の敵にも当たる）', () => {
+    const sim = setup('barrage', { count: 30, intervalSeconds: 0.01, range: 100, size: 10, speed: 400, durationSeconds: 1 }, [[5, 60], [5, -60], [-40, 0]], { barrageWidth: 140 });
+    sim.step([]);
+    const pr = sim.world.projectiles;
+    for (let i = 0; i < pr.count; i++) {
+      expect(pr.vy[i]).toBe(0);
+      expect(pr.vx[i]!).toBeGreaterThan(0);
+      expect(Math.abs(pr.y[i]!)).toBeLessThanOrEqual(70);
+    }
+    steps(sim, 10);
+    const [left, right, behind] = damage(sim, 3);
+    expect(left).toBeGreaterThan(0);
+    expect(right).toBeGreaterThan(0);
+    expect(behind).toBe(0);
+  });
 });

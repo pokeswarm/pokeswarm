@@ -340,9 +340,19 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
 function fireBarrageHit(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const [fx, fy] = axisToUnit(p.facingX, p.facingY);
   const center = pm.aimAngle ?? Math.atan2(fy, fx);
+  const speed0 = scaledMoveStats(world, p, pm, st).speed;
+  const width = world.rules.moves[pm.move]!.barrageWidth;
+  if (width) {
+    // 長方形: 自分を通る横の辺のランダムな所から、向きへまっすぐ。奥行き range まで届いたら消える
+    const dx = Math.cos(center);
+    const dy = Math.sin(center);
+    const off = (world.rng.next() - 0.5) * width;
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x - dy * off, y: p.y + dx * off, vx: dx * speed0, vy: dy * speed0, life: st.range / Math.max(1, speed0) });
+    return;
+  }
   const a = center + (world.rng.next() - 0.5) * ((Math.min(360, st.arcDegrees) * Math.PI) / 180);
   const d = st.range * (0.3 + 0.7 * world.rng.next());
-  const speed = scaledMoveStats(world, p, pm, st).speed;
+  const speed = speed0;
   world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x + Math.cos(a) * d, y: p.y + Math.sin(a) * d, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed });
 }
 

@@ -3146,13 +3146,13 @@
       "pattern": "barrage",
       "effect": "dynamic-punch",
       "base": {
-        "power": 80.7,
+        "power": 82.2,
         "cooldownSeconds": 1.2,
         "count": 14,
         "intervalSeconds": 0.035,
-        "speed": 260,
-        "size": 18,
-        "range": 80,
+        "speed": 420,
+        "size": 16,
+        "range": 110,
         "durationSeconds": 0.18,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -3162,19 +3162,18 @@
         "statusId": "flinch",
         "statusChance": 0.15,
         "statusSeconds": 0.8,
-        "lifestealPct": 0,
-        "arcDegrees": 110
+        "lifestealPct": 0
       },
       "levels": [
         {
-          "power": 13.5
+          "power": 13.7
         },
         {
           "count": 2,
-          "power": 6.6
+          "power": 6.7
         },
         {
-          "power": 12.6
+          "power": 12.9
         },
         {
           "cooldownSeconds": -0.15,
@@ -3186,17 +3185,18 @@
         },
         {
           "size": 3,
-          "power": 6.8
+          "power": 7.1
         },
         {
           "count": 2,
-          "power": 3.4
+          "power": 3.5
         }
       ],
       "body": {
         "lungeDistance": 12,
         "afterimages": 0
-      }
+      },
+      "barrageWidth": 140
     },
     "double-kick": {
       "pattern": "barrage",

@@ -64,6 +64,7 @@ export function buildSimRules(): SimRules {
       ...(def.scatterJitter ? { scatterJitter: def.scatterJitter } : {}),
       sweepOnce: def.sweepOnce,
       randomAim: def.randomAim,
+      ...(def.barrageWidth ? { barrageWidth: def.barrageWidth } : {}),
       restAfterEnd: def.restAfterEnd,
       ...(def.snake ? { snake: def.snake } : {}),
       // いつも効く技: レベルごとの効果を、そのレベルまでの合計にしておく

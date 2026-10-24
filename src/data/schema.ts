@@ -851,6 +851,11 @@ export const moveDefSchema = z.object({
   scatterJitter: z.object({ countMin: z.number().int().positive(), sizeMin: z.number().positive(), sizeMax: z.number().positive() }).optional(),
   /** sweep（なぎ払い）を片道だけにする（はたく: 1回払う。おうふくビンタは行って戻る） */
   sweepOnce: z.boolean().optional(),
+  /**
+   * barrage（連打）を長方形にする: 自分を通り向きに直角な、横幅 barrageWidth の辺から、向いている方向へ range の奥行きまで
+   * 拳をまっすぐ乱打する（ばくれつパンチ: 自分の真横から当たる。作者の決定 2026年10月25日）。省略なら扇形の中のランダムな場所
+   */
+  barrageWidth: z.number().positive().optional(),
   /** 向きを、使うたびにランダムに選ぶ（にどげり・まわしげり: 近くのランダムな向きへ。barrage・sweep で使う） */
   randomAim: z.boolean().optional(),
   /** 再使用を、出した技が消えてから数える（こなゆき・ふぶき: 雪が止んでから cooldown の間はダメージが起きない。作者の決定 2026年10月25日） */

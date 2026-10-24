@@ -1626,6 +1626,423 @@ function rainbowStars(): SpriteOut {
   return { palette, frameMs: 60, parts: { middle: frames.map(toRows) } };
 }
 
+// ---------------- 作者の感想で見直した技（2026年10月25日） ----------------
+/** なめらかな雲の模様（0〜1）。論理の座標 x, y を格子の大きさ cell で区切り、格子点の乱数をなめらかにつなぐ */
+function noise(x: number, y: number, cell: number, seed: number): number {
+  const gx = x / cell;
+  const gy = y / cell;
+  const x0 = Math.floor(gx);
+  const y0 = Math.floor(gy);
+  const sx = (gx - x0) ** 2 * (3 - 2 * (gx - x0));
+  const sy = (gy - y0) ** 2 * (3 - 2 * (gy - y0));
+  const h = (i: number, j: number): number => hash(x0 + i, y0 + j, seed);
+  const top = h(0, 0) + (h(1, 0) - h(0, 0)) * sx;
+  const bottom = h(0, 1) + (h(1, 1) - h(0, 1)) * sx;
+  return top + (bottom - top) * sy;
+}
+
+/**
+ * ブラストバーン: 地面のくぼみから噴き上がる炎の柱（横から見た姿。根元が絵の下の方 y = 34 にある。レシピの originY で
+ * 根元を当たり判定の中心に合わせる）。コマ 0 でくぼみが赤く光り、1〜3 で炎が噴き上がり、3・4 でゆらめき続ける（loopFrom 3）。
+ * 柱の芯は白く、上と外ほど赤い。ふちはぎざぎざで、上に火の粉が舞う
+ */
+function fireGeyser(): SpriteOut {
+  const W = 24;
+  const H = 40;
+  const cx = (W - 1) / 2;
+  const gy = 34;
+  // 0 輪郭・1 濃い赤・2 赤橙・3 橙・4 黄・5 白・6 こげた地面・7 くぼみのふち
+  const palette = ['#2e0a04', '#b71c1c', '#e64a19', '#ff9800', '#ffeb3b', '#fffde7', '#3e2723', '#8d6e63'];
+  const heights = [3, 15, 27, 32, 30];
+  const frames = heights.map((ht, f) => {
+    const r = rng(600 + f);
+    const embers = Array.from({ length: f === 0 ? 0 : 3 + f * 2 }, () => [cx + (r() - 0.5) * 18, gy - ht * (0.45 + r() * 0.6) - 2, r()] as const);
+    const g = fill(blank(W, H), (x, y) => {
+      const up = gy - y;
+      if (up >= -1 && up <= ht) {
+        const t = Math.max(0, up) / Math.max(1, ht);
+        // 幅: 根元は広く、少し上で細くなり、上の方でふくらんでから先が尖る
+        let half = 7 - 2.6 * Math.min(1, t * 2.2) + 2.4 * Math.sin(Math.PI * Math.min(1, t * 1.1)) * (f >= 2 ? 1 : 0.5);
+        if (t > 0.78) half *= ((1 - t) / 0.22) ** 0.8;
+        // ゆらめき（縦の波で左右にずらす）と、ぎざぎざのふち
+        const sway = Math.sin(up * 0.42 + f * 1.9) * (0.4 + t * 1.8);
+        const jag = (noise(x, y - f * 3, 2.2, 610 + f) - 0.5) * (1.2 + t * 2.2);
+        const d = Math.abs(x - cx - sway) / Math.max(0.3, half + jag);
+        if (d <= 1) {
+          // 芯ほど明るく、上と外ほど赤い。根元は特に熱い
+          const heat = (1 - d) * (1.05 - t * 0.8) + Math.max(0, 1 - up / 7) * 0.25 + (noise(x, y + f * 4, 3, 620 + f) - 0.5) * 0.25;
+          return heat > 0.72 ? 5 : heat > 0.5 ? 4 : heat > 0.3 ? 3 : heat > 0.13 ? 2 : 1;
+        }
+      }
+      // 地面のくぼみ（楕円）。ふちは土、中はこげて赤く光る割れ目
+      const ex = (x - cx) / 10.5;
+      const ey = (y - gy) / 3.4;
+      const ed = ex * ex + ey * ey;
+      if (ed <= 1) {
+        if (ed > 0.6) return 7;
+        return hash(Math.floor(x * 1.5), Math.floor(y * 1.5), 630) < (f === 0 ? 0.45 : 0.25) ? (f === 0 ? 4 : 3) : 6;
+      }
+      for (const [ex2, ey2, s] of embers) if (Math.abs(x - ex2) + Math.abs(y - ey2) < 0.9) return s > 0.5 ? 4 : 3;
+      return -1;
+    });
+    return toRows(outline(g, 0));
+  });
+  return { palette, frameMs: 90, loopFrom: 3, parts: { main: [0, 1, 2, 3, 4].map((i) => frames[i]!) } };
+}
+
+/**
+ * だいばくはつ: 広がる爆発の火の玉（上から見た円）。5コマで、白い芯 → 黄と橙のうねる炎 → 赤と黒い煙へ移る。
+ * ふちは雲のようにもこもこさせ、丸い円に見えないようにする
+ */
+function explosionCore(): SpriteOut {
+  // 0 輪郭（こげ茶）・1 煙の暗い所・2 煙・3 濃い赤・4 赤橙・5 橙・6 黄・7 白
+  const palette = ['#1a0b06', '#2d1b14', '#5d4037', '#b71c1c', '#e64a19', '#ff9800', '#ffeb3b', '#fffde7'];
+  const frames = [0, 1, 2, 3, 4].map((f) => {
+    const p = f / 4;
+    return shape(40, (u, v) => {
+      const d = Math.hypot(u, v);
+      const n = noise(u * 20, v * 20, 3.2, 700 + f);
+      const n2 = noise(u * 20 + 50, v * 20, 1.6, 710 + f);
+      // もこもこのふち
+      if (d > 0.86 + (n - 0.5) * 0.22) return -1;
+      // 熱さ: 真ん中ほど熱く、時間とともに冷めて煙になる
+      const heat = (1 - d) * (1.35 - p * 1.1) + (n - 0.5) * 0.55 + (n2 - 0.5) * 0.25 + 0.15 - p * 0.15;
+      if (heat > 0.95) return 7;
+      if (heat > 0.75) return 6;
+      if (heat > 0.55) return 5;
+      if (heat > 0.38) return 4;
+      if (heat > 0.24) return 3;
+      return heat > 0.08 ? 2 : 1;
+    });
+  });
+  return { palette, frameMs: 100, loopFrom: 4, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * だいばくはつの端: 広がる爆発のふちに並べる、外へ噴き出す炎の舌と、飛び散る岩くず（輪に沿って並べる帯。下が外）。
+ * 並べてもつながるよう、炎の高さは幅 W の周期。コマで炎の舌が伸び縮みする（レシピの varyTiles で1枚ずつ違うコマにする）
+ */
+function blastEdge(): SpriteOut {
+  const W = 12;
+  const H = 14;
+  // 0 輪郭・1 煙・2 濃い赤・3 赤橙・4 橙・5 黄・6 白・7 岩くず
+  const palette = ['#1a0b06', '#3e2723', '#b71c1c', '#e64a19', '#ff9800', '#ffeb3b', '#fffde7', '#6d4c41'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    const g = fill(blank(W, H), (x, yy) => {
+      // 下が外なので、上下を返して描く
+      const y = H - 1 - yy;
+      const ph = (x / W) * Math.PI * 2;
+      // 炎の舌の先の高さ（上が外。小さいほど外へ伸びる）
+      const tip = 6 - 3.2 * Math.max(0, Math.sin(ph * 2 + f * 1.3)) - 1.8 * Math.max(0, Math.sin(ph * 3 - f * 2.1 + 1)) + (noise(Math.cos(ph) * 3 + 3, Math.sin(ph) * 3 + f * 5, 2, 720) - 0.5) * 1.5;
+      if (y < tip) {
+        // 舌の先より外: 飛び散る岩くず
+        const rx = Math.floor(x + 0.5);
+        const ry = Math.floor(y + 0.5);
+        return hash(rx, ry, 730 + f) < 0.05 && y > 0.5 ? 7 : -1;
+      }
+      const k = (y - tip) / (H - tip);
+      // 内側（下）へ行くほど煙になって薄れる（下の方は抜く）
+      if (k > 0.8 && noise(x, y, 2, 740 + f) < (k - 0.8) * 4) return -1;
+      return k < 0.12 ? 6 : k < 0.28 ? 5 : k < 0.45 ? 4 : k < 0.6 ? 3 : k < 0.72 ? 2 : 1;
+    });
+    return toRows(outline(g, 0));
+  });
+  return { palette, frameMs: 70, parts: { middle: frames } };
+}
+
+/**
+ * しおふき: 使ったポケモンから真上へ噴き上がる潮（横から見た姿。根元が絵の下の方 y = 37）。
+ * コマ 0 で根元の水しぶき、1・2 で高く噴き上がり、先が冠のように開き、3 で崩れてしずくになる
+ */
+function waterColumn(): SpriteOut {
+  const W = 16;
+  const H = 40;
+  const cx = (W - 1) / 2;
+  const gy = 37;
+  const palette = ['#0a2a5c', '#0277bd', '#29b6f6', '#b3e5fc', '#ffffff'];
+  const heights = [8, 26, 34, 30];
+  const frames = heights.map((ht, f) => {
+    const r = rng(800 + f);
+    const drops = Array.from({ length: f === 0 ? 3 : 6 + f * 2 }, () => [cx + (r() - 0.5) * (f === 3 ? 15 : 12), gy - ht + (r() - 0.3) * (f === 3 ? 18 : 7), r()] as const);
+    const g = fill(blank(W, H), (x, y) => {
+      const up = gy - y;
+      // 崩れるコマは、柱の上の方が途切れ途切れ
+      const broken = f === 3 && up > 12 && noise(x, y, 2.5, 810) < 0.5;
+      if (up >= 0 && up <= ht && !broken) {
+        const t = up / ht;
+        // 柱: 細く、先で冠のように開く
+        const half = 2.4 + (t > 0.82 && f > 0 ? (t - 0.82) * 22 : 0) + (up < 3 ? 2.2 - up * 0.7 : 0);
+        const sway = Math.sin(up * 0.5 + f * 2) * 0.5;
+        const dx = x - cx - sway;
+        if (Math.abs(dx) <= half) {
+          // 左を明るく（光の筋）、右を濃く
+          const k = dx / half;
+          return k < -0.45 ? 4 : k < 0.1 ? 3 : k < 0.6 ? 2 : 1;
+        }
+      }
+      // 根元の水の輪
+      const ex = (x - cx) / 6.5;
+      const ey = (y - gy) / 1.8;
+      if (Math.abs(ex * ex + ey * ey - 0.75) < 0.3) return 3;
+      for (const [dx2, dy2, s] of drops) if (Math.hypot(x - dx2, y - dy2) < 0.8 + s * 0.4) return s > 0.6 ? 4 : 3;
+      return -1;
+    });
+    return toRows(outline(g, 0));
+  });
+  return { palette, frameMs: 110, loopFrom: 3, parts: { main: frames } };
+}
+
+/**
+ * ヘドロウェーブ: 蛇行しながら進む毒のヘドロ（通った道に並べる 途中 と、先の 終わり）。途中はぶよぶよの帯に泡、
+ * 終わりは丸いヘドロの頭。コマで泡が動く
+ */
+function sludgeTrail(): SpriteOut {
+  const H = 10;
+  const TILE = 8;
+  const palette = ['#2a0d33', '#7b1fa2', '#ab47bc', '#ce93d8', '#f3e5f5'];
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 4, middle: TILE, end: 12 }, 3, (x, y, f, part) => {
+    if (part === 'end') {
+      // 頭: 右寄りの丸いかたまりと、左へつながる首
+      const d = Math.hypot(x - 7, y - mid) / 4.4;
+      const neck = x < 7 && Math.abs(y - mid) < 3 - (7 - x) * 0.1;
+      if (d > 1 && !neck) return -1;
+      if (Math.hypot(x - 8 + f * 0.4, y - mid + 1.6) < 1) return 4;
+      return d < 0.45 ? 3 : y < mid - 0.5 ? 3 : y > mid + 1.5 ? 1 : 2;
+    }
+    // 帯: 端で同じ太さになるよう、太さの揺れは幅 TILE の周期
+    const half = 3 + Math.sin(((x + f * 2) / TILE) * Math.PI * 2) * 0.7;
+    if (Math.abs(y - mid) > half) return -1;
+    if (hash(Math.floor(x + f * 3), Math.floor(y), 820) < 0.07) return 4;
+    return y < mid - half * 0.35 ? 3 : y > mid + half * 0.5 ? 1 : 2;
+  });
+  return { palette, frameMs: 90, parts };
+}
+
+/**
+ * スパーク・ワイルドボルト: 広がって縮む電気の輪に並べる、ジグザグの稲妻（横 = 輪の向き）。端は真ん中の高さに戻すので、
+ * 並べると1本の輪につながる。コマごとに折れ方を変え、ふちから小さな火花が飛ぶ
+ */
+function electricRing(): SpriteOut {
+  const W = 12;
+  const H = 10;
+  // 0 輪郭・1 濃い黄・2 黄・3 うすい黄・4 白
+  const palette = ['#1a1440', '#f9a825', '#fdd835', '#fff59d', '#ffffff'];
+  const mid = (H - 1) / 2;
+  const frames = [0, 1, 2, 3].map((f) => {
+    const r = rng(900 + f);
+    const pts: [number, number][] = [[0, mid]];
+    for (let k = 1; k < 5; k++) pts.push([(k * W) / 5 + (r() - 0.5) * 0.8, mid + (k % 2 === 0 ? 1 : -1) * (1.5 + r() * 2.2)]);
+    pts.push([W, mid]);
+    const yAt = (x: number): number => {
+      for (let k = 0; k < pts.length - 1; k++) {
+        const [x0, y0] = pts[k]!;
+        const [x1, y1] = pts[k + 1]!;
+        if (x >= x0 && x <= x1) return y0 + ((y1 - y0) * (x - x0)) / Math.max(0.01, x1 - x0);
+      }
+      return mid;
+    };
+    const spark = Math.floor(r() * W);
+    const sparkUp = r() < 0.5;
+    const g = fill(blank(W, H), (x, y) => {
+      const a = yAt(x);
+      const b = yAt(Math.max(0, x - 1));
+      const lo = Math.min(a, b) - 0.45;
+      const hi = Math.max(a, b) + 0.45;
+      if (y >= lo && y <= hi) return 4;
+      if (y >= lo - 0.75 && y <= hi + 0.75) return 2;
+      // 小さな火花: 稲妻から斜めに短く
+      const sy = sparkUp ? lo - (x - spark) : hi + (x - spark);
+      if (x > spark && x < spark + 2.5 && Math.abs(y - sy) < 0.5) return 3;
+      return -1;
+    });
+    return toRows(outline(g, 0));
+  });
+  return { palette, frameMs: 45, parts: { middle: frames } };
+}
+
+/**
+ * 10まんボルト: 自分のまわりで ばちばちとはじける電気（上から見た円）。真ん中から外へ、枝分かれするぎざぎざの稲妻が
+ * ばらばらの長さで伸びる（丸い形に見えないように）。コマごとに形を変えて、ちらつかせる
+ */
+function electricCrackle(): SpriteOut {
+  const S = 40;
+  const c = (S - 1) / 2;
+  const palette = ['#1a1440', '#f9a825', '#fdd835', '#fff59d', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    const r = rng(950 + f);
+    const g = blank(S, S);
+    // 稲妻: まっすぐな短い線を、行きたい向きの左右へ交互に鋭く折りながらつなぐ（丸くうねらせない）
+    const bolt = (x: number, y: number, a0: number, len: number, depth: number): void => {
+      let px = x;
+      let py = y;
+      const seg = depth === 0 ? 4.5 : 3;
+      const steps = Math.max(2, Math.round(len / seg));
+      for (let k = 0; k < steps; k++) {
+        const a = a0 + (k % 2 === 0 ? 1 : -1) * (0.3 + r() * 0.4);
+        const nx = px + Math.cos(a) * seg;
+        const ny = py + Math.sin(a) * seg;
+        // 粗い絵（k = 1）でも途切れないよう、細かさに関係なく線の上を細かく打つ
+        const steps2 = Math.max(2, Math.ceil(seg * Math.max(1, K) * 1.5));
+        for (let q = 0; q <= steps2; q++) set(g, px + ((nx - px) * q) / steps2, py + ((ny - py) * q) / steps2, depth === 0 ? 4 : 3);
+        px = nx;
+        py = ny;
+        // 枝分かれ（短くまっすぐ）
+        if (depth === 0 && k > 0 && r() < 0.3) bolt(px, py, a0 + (r() < 0.5 ? -1 : 1) * (0.7 + r() * 0.4), len * 0.3, 1);
+      }
+    };
+    const n = 5 + Math.floor(r() * 2);
+    for (let k = 0; k < n; k++) bolt(c, c, (k / n) * Math.PI * 2 + (r() - 0.5) * 0.8, 9 + r() * 10, 0);
+    // 真ん中の光
+    for (let dy = -1.5; dy <= 1.5; dy += 0.5) for (let dx = -1.5; dx <= 1.5; dx += 0.5) if (Math.hypot(dx, dy) < 1.6) set(g, c + dx, c + dy, 4);
+    // 稲妻のまわりに黄色の光（輪郭の内側）
+    const glow = g.map((row) => row.slice());
+    for (let y = 0; y < g.length; y++) {
+      for (let x = 0; x < g[0]!.length; x++) {
+        if (g[y]![x]! >= 0) continue;
+        if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => (g[y + dy!]?.[x + dx!] ?? -1) >= 3)) glow[y]![x] = 2;
+      }
+    }
+    return toRows(outline(glow, 0));
+  });
+  return { palette, frameMs: 45, parts: { main: frames } };
+}
+
+/**
+ * マグニチュード・じしん: ぐらぐら揺れる地面（上から見た円）。土のかたまりに、真ん中から割れ目が走り、ふちに石くれと砂ぼこり。
+ * コマ 0〜2 で割れ目が伸び、3・4 で砂ぼこりが舞う（loopFrom 3）。描く位置はレシピの shake で揺らす
+ */
+function quakeZone(): SpriteOut {
+  // 0 輪郭・1 割れ目・2 土の暗い所・3 土・4 土の明るい所・5 石くれ・6 砂ぼこり
+  const palette = ['#2a1d14', '#1a110b', '#6d5644', '#8d7560', '#ad957c', '#d7ccc8', '#cbb79a'];
+  const r = rng(1010);
+  const cracks = Array.from({ length: 7 }, (_, k) => ({ a: (k / 7) * Math.PI * 2 + (r() - 0.5) * 0.6, len: 0.55 + r() * 0.35, wob: r() * 10 }));
+  const make = (grow: number, f: number): string[] =>
+    toRows(
+      shape(32, (u, v) => {
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        const edge = 0.74 + (noise(Math.cos(a) * 6 + 6, Math.sin(a) * 6 + 6, 1.4, 1020) - 0.5) * 0.22;
+        if (d > edge) {
+          // ふちの外の砂ぼこり
+          if (f >= 3 && d < edge + 0.2 && noise(u * 16, v * 16 - f * 2, 1.5, 1030 + f) > 0.68) return 6;
+          return -1;
+        }
+        for (const ck of cracks) {
+          const da = Math.atan2(Math.sin(a - ck.a), Math.cos(a - ck.a));
+          const along = d / (ck.len * grow);
+          if (along > 1) continue;
+          const zig = Math.sin(d * 18 + ck.wob) * 0.05;
+          if (Math.abs(da * d - zig) < 0.045 * (1.2 - along)) return 1;
+        }
+        if (d > edge - 0.1 && hash(Math.floor((u + 1) * 12), Math.floor((v + 1) * 12), 1040) < 0.3) return 5;
+        const l = light(u, v, edge) + (noise(u * 16, v * 16, 2, 1050) - 0.5) * 0.8;
+        return l > 0.35 ? 4 : l > -0.3 ? 3 : 2;
+      }),
+    );
+  return { palette, frameMs: 90, loopFrom: 3, parts: { main: [make(0.35, 0), make(0.7, 1), make(1, 2), make(1, 3), make(1, 4)] } };
+}
+
+/**
+ * ストーンエッジ: 地面から外へ突き出した、とがった岩（線に合わせる。始まり = 根元の岩くず、途中 = 岩の胴、終わり = 鋭い先）。
+ * 上の面を明るく、下の面を暗く塗り分けて、角ばった岩に見せる
+ */
+function rockSpike(): SpriteOut {
+  const H = 12;
+  const palette = ['#1c1a17', '#4e4a44', '#7d756b', '#a89f93', '#e0d9cf', '#6d4c41'];
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 6, middle: 8, end: 12 }, 1, (x, y, _f, part) => {
+    const half = part === 'start' ? 4.6 - x * 0.12 : part === 'middle' ? 3.9 - x * 0.06 : 3.4 * (1 - x / 11.5);
+    if (part === 'start' && Math.abs(y - mid) > half && Math.abs(y - mid) < half + 1.5 && hash(Math.floor(x), Math.floor(y), 1100) < 0.5) return 5;
+    if (Math.abs(y - mid) > half) return -1;
+    // 稜線（真ん中のやや上）で面を分ける
+    const k = (y - mid) / Math.max(0.5, half);
+    if (Math.abs(k + 0.15) < 0.12) return 4;
+    return k < -0.15 ? 3 : k < 0.45 ? 2 : 1;
+  });
+  return { palette, frameMs: 1000, parts };
+}
+
+/** ストーンエッジ: 地面を走る亀裂の先（はじける岩くずと土ぼこり。上から見た円）。コマで岩くずが跳ねる */
+function crackHead(): SpriteOut {
+  const palette = ['#1c1a17', '#4e4a44', '#7d756b', '#a89f93', '#e0d9cf', '#cbb79a'];
+  const frames = [0, 1, 2].map((f) => {
+    const r = rng(1150 + f);
+    const chips = Array.from({ length: 6 }, () => [(r() - 0.5) * 1.4, (r() - 0.5) * 1.4, 0.12 + r() * 0.1] as const);
+    return toRows(
+      shape(16, (u, v) => {
+        for (const [cx, cy, s] of chips) {
+          const d = Math.abs(u - cx) + Math.abs(v - cy);
+          if (d < s) return u - cx + v - cy < 0 ? 4 : 2;
+        }
+        const d = Math.hypot(u, v);
+        if (d < 0.5 + (noise(u * 8, v * 8, 1.5, 1160 + f) - 0.5) * 0.4) return d < 0.25 ? 1 : 5;
+        return -1;
+      }),
+    );
+  });
+  return { palette, frameMs: 80, parts: { main: frames } };
+}
+
+/**
+ * ぜったいれいど: 凍りついた敵の氷の像（横から見た姿。根元が絵の下の方 y = 25）。角ばった氷の柱の中に、凍った影が見える。
+ * コマ 0 で足元から凍り、1・2 で光がきらめき、3 でひびが入る（loopFrom 3）
+ */
+function iceStatue(): SpriteOut {
+  const W = 20;
+  const H = 28;
+  const cx = (W - 1) / 2;
+  const gy = 25;
+  // 0 輪郭・1 凍った影・2 濃い水色・3 水色・4 うすい水色・5 白
+  const palette = ['#0d3550', '#5b8fbf', '#4fc3f7', '#81d4fa', '#e1f5fe', '#ffffff'];
+  const make = (grow: number, f: number): string[] => {
+    const g = fill(blank(W, H), (x, y) => {
+      const up = gy - y;
+      const top = 21 * grow;
+      // 足元の霜（楕円）
+      const ex = (x - cx) / 8.5;
+      const ey = (y - gy) / 2.2;
+      if (up < 0) return ex * ex + ey * ey <= 1 ? (hash(Math.floor(x), Math.floor(y), 1200) < 0.3 ? 5 : 4) : -1;
+      if (up > top + 3) return -1;
+      // 柱: 六角の柱を横から見た形（左右の面と、とがった頭）
+      const half = 6.5 - Math.max(0, up - top) * 2.2;
+      const dx = x - cx;
+      if (Math.abs(dx) > half) return -1;
+      // ひび（最後のコマ）
+      if (f === 3 && Math.abs(dx - (up - 10) * 0.3 - (Math.floor(up / 3) % 2 === 0 ? 0.8 : -0.8)) < 0.5 && up > 3 && up < 20) return 5;
+      // 中の凍った影（体と頭と耳。どのポケモンにも見えるよう、ぼんやりした形）
+      const body = (dx / 4.4) ** 2 + ((up - 7) / 4) ** 2 < 1;
+      const head = Math.hypot(dx, up - 13) < 2.8;
+      const ears = Math.abs(Math.abs(dx) - 1.8) < 0.7 && up > 14.5 && up < 17;
+      if ((body || head || ears) && up < top) return 1;
+      // きらめき
+      if (f > 0 && Math.hypot(dx + 3 - f, up - 15 + f * 2) < 0.9) return 5;
+      // 面の塗り分け: 左の面が明るい
+      return dx < -half * 0.35 ? 4 : dx < half * 0.3 ? 3 : 2;
+    });
+    return toRows(outline(g, 0));
+  };
+  return { palette, frameMs: 160, loopFrom: 3, parts: { main: [make(0.45, 0), make(1, 1), make(1, 2), make(1, 3)] } };
+}
+
+/** フリーズドライ: 細長い氷の結晶の針（右へ進む）。真ん中に小さな枝が2本ずつ出る（雪の結晶の腕のように） */
+function iceNeedle(): SpriteOut {
+  const palette = ['#0d3550', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const g = shape(18, (u, v) => {
+    // 針: 先が鋭く、後ろも細い
+    const w = u > -0.1 ? 0.13 * (1 - (u + 0.1) / 1.05) : 0.13 * (1 + (u + 0.1) / 0.85);
+    if (u < -0.95 || u > 0.95) return -1;
+    if (Math.abs(v) <= w + 0.02) return v < -0.02 ? 3 : 2;
+    // 小さな枝: 後ろへ斜めに
+    for (const bx of [-0.35, 0.15]) {
+      const along = bx - u;
+      if (along > 0 && along < 0.3 && Math.abs(Math.abs(v) - along * 0.9) < 0.06) return 2;
+    }
+    return -1;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
 /** 自作の絵であることの表記（data/render/move-sprites.json の credit） */
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
@@ -1705,6 +2122,18 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'heal-rise': () => healRise(),
     'amnesia-swirl': () => amnesiaSwirl(),
     'rainbow-stars': () => rainbowStars(),
+    'fire-geyser': () => fireGeyser(),
+    'explosion-core': () => explosionCore(),
+    'blast-edge': () => blastEdge(),
+    'water-column': () => waterColumn(),
+    'sludge-trail': () => sludgeTrail(),
+    'electric-ring': () => electricRing(),
+    'electric-crackle': () => electricCrackle(),
+    'quake-zone': () => quakeZone(),
+    'rock-spike': () => rockSpike(),
+    'crack-head': () => crackHead(),
+    'ice-statue': () => iceStatue(),
+    'ice-needle': () => iceNeedle(),
 };
 
 /** 絵の名前の一覧 */

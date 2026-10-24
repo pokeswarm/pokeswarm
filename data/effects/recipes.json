@@ -412,12 +412,20 @@
     },
     "blast-burn": {
       "extends": "fire.base",
-      "impact": {},
+      "impact": {
+        "burst": {
+          "count": 4
+        },
+        "flash": {
+          "radius": 14,
+          "alpha": 0.5
+        }
+      },
       "projectile": {
         "glowScale": 1.2,
         "coreScale": 0.5,
         "glowColor": "#ffa726",
-        "shapeAlpha": 0.7
+        "shapeAlpha": 0.3
       },
       "strike": {
         "id": "burst-fire",
@@ -426,9 +434,10 @@
         "seconds": 0.55
       },
       "sprite": {
-        "id": "burst-fire",
+        "id": "fire-geyser",
         "fit": "circle",
-        "size": 1.1
+        "size": 1,
+        "originY": 0.86
       },
       "linger": {
         "spread": 0,
@@ -458,6 +467,19 @@
         "perSecond": 7,
         "fillAlpha": 0.36,
         "maxPerSecond": 24
+      },
+      "effectSprite": {
+        "id": "ember",
+        "fit": "circle",
+        "size": 2.4,
+        "rotate": "velocity"
+      },
+      "trail": {
+        "intervalMs": 30,
+        "scale": [
+          0.25,
+          0
+        ]
       }
     },
     "gust": {
@@ -620,17 +642,16 @@
         "fit": "circle",
         "size": 1
       },
-      "effectLineSprite": {
-        "id": "root-line",
-        "fit": "line",
-        "size": 1.3,
-        "growSeconds": 0.25
-      },
       "strike": {
         "id": "root-line",
         "fit": "ring",
         "size": 1,
         "seconds": 0.7
+      },
+      "effectSprite": {
+        "id": "root-line",
+        "fit": "snake",
+        "size": 0.9
       }
     },
     "poison-sting": {
@@ -678,7 +699,9 @@
       "sprite": {
         "id": "sludge",
         "fit": "circle",
-        "size": 1.8
+        "size": 1.25,
+        "rotate": "spin",
+        "spinDegPerSec": 200
       },
       "linger": {
         "spread": 0,
@@ -1302,6 +1325,11 @@
         "fit": "circle",
         "size": 1.2,
         "seconds": 0.4
+      },
+      "effectSprite": {
+        "id": "electric-crackle",
+        "fit": "circle",
+        "size": 1.35
       }
     },
     "thunder": {
@@ -1366,41 +1394,21 @@
         "rotate": "spin",
         "spinDegPerSec": 300
       },
-      "linger": {
-        "spread": 0,
-        "blend": "add",
-        "colors": [
-          "#efebe9",
-          "#a1887f"
-        ],
-        "lifespanMs": [
-          500,
-          900
-        ],
-        "speed": [
-          2,
-          10
-        ],
-        "scale": [
-          0.3,
-          0
-        ],
-        "alpha": [
-          0.55,
-          0
-        ],
-        "gravityY": -12,
-        "perSecond": 3,
-        "fillAlpha": 0.22,
-        "maxPerSecond": 24
+      "effectSprite": {
+        "id": "rock",
+        "fit": "circle",
+        "size": 1.5,
+        "rotate": "spin",
+        "spinDegPerSec": 420
       }
     },
     "magnitude": {
       "extends": "ground.base",
       "sprite": {
-        "id": "quake-crack",
-        "fit": "ring",
-        "size": 1
+        "id": "quake-zone",
+        "fit": "circle",
+        "size": 1.05,
+        "shake": 2
       }
     },
     "earthquake": {
@@ -1411,9 +1419,10 @@
         }
       },
       "sprite": {
-        "id": "quake-crack",
-        "fit": "ring",
-        "size": 1
+        "id": "quake-zone",
+        "fit": "circle",
+        "size": 1.05,
+        "shake": 3
       }
     },
     "bonemerang": {
@@ -1491,11 +1500,9 @@
         }
       },
       "sprite": {
-        "id": "stone",
+        "id": "crack-head",
         "fit": "circle",
-        "size": 1.4,
-        "rotate": "spin",
-        "spinDegPerSec": 540
+        "size": 1.8
       },
       "linger": {
         "spread": 0,
@@ -1524,6 +1531,17 @@
         "perSecond": 3,
         "fillAlpha": 0.22,
         "maxPerSecond": 24
+      },
+      "pathSprite": {
+        "id": "fissure",
+        "fit": "line",
+        "size": 1.4
+      },
+      "effectLineSprite": {
+        "id": "rock-spike",
+        "fit": "line",
+        "size": 1,
+        "growSeconds": 0.12
       }
     },
     "rapid-spin": {
@@ -1603,7 +1621,7 @@
         "seconds": 0.5
       },
       "sprite": {
-        "id": "burst-fire",
+        "id": "explosion-core",
         "fit": "circle",
         "size": 1
       },
@@ -1635,6 +1653,12 @@
         "perSecond": 7,
         "fillAlpha": 0.36,
         "maxPerSecond": 24
+      },
+      "edgeSprite": {
+        "id": "blast-edge",
+        "fit": "ring",
+        "size": 1,
+        "varyTiles": true
       }
     },
     "extreme-speed": {
@@ -1672,10 +1696,39 @@
         }
       },
       "sprite": {
-        "id": "poison-cloud",
-        "fit": "circle",
-        "size": 0.95,
-        "alpha": 0.55
+        "id": "sludge-trail",
+        "fit": "snake",
+        "size": 0.8,
+        "tail": 120
+      },
+      "linger": {
+        "spread": 0,
+        "blend": "add",
+        "colors": [
+          "#f3e5f5",
+          "#ba68c8",
+          "#6a1b9a"
+        ],
+        "lifespanMs": [
+          500,
+          900
+        ],
+        "speed": [
+          2,
+          8
+        ],
+        "scale": [
+          0.3,
+          0
+        ],
+        "alpha": [
+          0.85,
+          0
+        ],
+        "gravityY": -22,
+        "perSecond": 5,
+        "fillAlpha": 0.32,
+        "maxPerSecond": 24
       }
     },
     "seed-bomb": {
@@ -1697,9 +1750,10 @@
         "coreScale": 0.3
       },
       "sprite": {
-        "id": "spark-arc",
-        "fit": "front",
-        "size": 1.1
+        "id": "electric-ring",
+        "fit": "ring",
+        "size": 1,
+        "varyTiles": true
       }
     },
     "wild-charge": {
@@ -1714,9 +1768,16 @@
         }
       },
       "sprite": {
-        "id": "spark-arc",
-        "fit": "front",
-        "size": 1.1
+        "id": "electric-ring",
+        "fit": "ring",
+        "size": 1,
+        "varyTiles": true
+      },
+      "lightningLine": {
+        "color": "#fffde7",
+        "glowColor": "#ffeb3b",
+        "width": 2.5,
+        "jitter": 3
       }
     },
     "bone-rush": {
@@ -1741,10 +1802,10 @@
         }
       },
       "sprite": {
-        "id": "fissure",
-        "fit": "line",
-        "size": 1.3,
-        "growSeconds": 0.15
+        "id": "quake-zone",
+        "fit": "circle",
+        "size": 1,
+        "shake": 2
       },
       "effectLineSprite": {
         "id": "fissure",
@@ -1935,12 +1996,44 @@
     },
     "powder-snow": {
       "extends": "ice.base",
-      "sprite": {
-        "id": "snowflake",
-        "fit": "circle",
-        "size": 2.6,
-        "rotate": "spin",
-        "spinDegPerSec": 300
+      "hideShape": true,
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      },
+      "weather": {
+        "colors": [
+          "#ffffff",
+          "#e1f5fe"
+        ],
+        "lifespanMs": [
+          1600,
+          2400
+        ],
+        "speed": [
+          55,
+          95
+        ],
+        "scale": [
+          0.2,
+          0.12
+        ],
+        "alpha": [
+          0.95,
+          0.5
+        ],
+        "gravityY": 0,
+        "blend": "add",
+        "perSecond": 90,
+        "angle": 10,
+        "tint": {
+          "color": "#e1f5fe",
+          "alpha": 0.05
+        }
       }
     },
     "blizzard-aura": {
@@ -1949,12 +2042,44 @@
         "glowScale": 1.1,
         "coreScale": 0.3
       },
-      "sprite": {
-        "id": "snowflake",
-        "fit": "circle",
-        "size": 2.4,
-        "rotate": "spin",
-        "spinDegPerSec": 240
+      "hideShape": true,
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      },
+      "weather": {
+        "colors": [
+          "#ffffff",
+          "#b3e5fc"
+        ],
+        "lifespanMs": [
+          1000,
+          1600
+        ],
+        "speed": [
+          170,
+          260
+        ],
+        "scale": [
+          0.32,
+          0.16
+        ],
+        "alpha": [
+          1,
+          0.55
+        ],
+        "gravityY": 0,
+        "blend": "add",
+        "perSecond": 260,
+        "angle": 38,
+        "tint": {
+          "color": "#b3e5fc",
+          "alpha": 0.1
+        }
       }
     },
     "sheer-cold": {
@@ -1972,6 +2097,14 @@
         "id": "burst-ice",
         "fit": "circle",
         "size": 1.1
+      },
+      "hitSprite": {
+        "id": "ice-statue",
+        "fit": "circle",
+        "size": 1,
+        "originY": 0.91,
+        "seconds": 1.6,
+        "radius": 16
       }
     },
     "freeze-dry": {
@@ -1981,7 +2114,7 @@
         "coreScale": 0.3
       },
       "sprite": {
-        "id": "ice-shard",
+        "id": "ice-needle",
         "fit": "circle",
         "size": 2.4,
         "rotate": "velocity"
@@ -2336,10 +2469,46 @@
         "glowColor": "#039be5"
       },
       "sprite": {
-        "id": "water-spout",
+        "id": "water-drop",
+        "fit": "circle",
+        "size": 1.2,
+        "rotate": "velocity"
+      },
+      "castSprite": {
+        "id": "water-column",
         "fit": "circle",
         "size": 1,
-        "alpha": 0.9
+        "originY": 0.94,
+        "seconds": 0.45,
+        "radius": 28
+      },
+      "linger": {
+        "spread": 0,
+        "blend": "add",
+        "colors": [
+          "#ffffff",
+          "#4fc3f7"
+        ],
+        "lifespanMs": [
+          350,
+          650
+        ],
+        "speed": [
+          0,
+          4
+        ],
+        "scale": [
+          0.26,
+          0
+        ],
+        "alpha": [
+          1,
+          0
+        ],
+        "gravityY": 0,
+        "perSecond": 9,
+        "fillAlpha": 0.24,
+        "maxPerSecond": 24
       }
     },
     "pound": {

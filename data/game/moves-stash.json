@@ -1,5 +1,5 @@
 {
-  "note": "今は使わない技の定義（作者の決定 2026年10月23日。ゲームは読み込まない）。使うときは data/game/moves.json に戻し、派生と見た目を付ける。はどうだん = ルカリオの固有技の候補、げきりん = カイリューの固有技を はかいこうせん にしたため",
+  "note": "今は使わない技の定義（作者の決定 2026年10月23日。ゲームは読み込まない）。使うときは data/game/moves.json に戻し、派生と見た目を付ける。はどうだん = ルカリオの固有技の候補、げきりん = カイリューの固有技を はかいこうせん にしたため。ホネブーメラン・ボーンラッシュ = カラカラ・ガラガラ（とルカリオ）の技なので、そのポケモンを入れるまでしまう（作者の決定 2026年10月25日）",
   "moves": {
     "aura-sphere": {
       "pattern": "homing",
@@ -132,6 +132,116 @@
             "speed": 420,
             "durationSeconds": 1.3,
             "hitIntervalSeconds": 0.25
+          }
+        }
+      ]
+    },
+    "bonemerang": {
+      "pattern": "boomerang",
+      "effect": "bonemerang",
+      "base": {
+        "power": 8,
+        "cooldownSeconds": 1.6,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 10,
+        "range": 380,
+        "durationSeconds": 1.4,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.5,
+        "knockback": 120,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "count": 1,
+          "power": -2.3
+        },
+        {
+          "power": 1.7
+        },
+        {
+          "size": 3,
+          "power": 0.8
+        },
+        {
+          "count": 1,
+          "power": -1.7
+        },
+        {
+          "power": 1
+        },
+        {
+          "cooldownSeconds": -0.2
+        },
+        {
+          "count": 1,
+          "power": -1.2
+        }
+      ]
+    },
+    "bone-rush": {
+      "pattern": "boomerang",
+      "effect": "bone-rush",
+      "base": {
+        "power": 7.3,
+        "cooldownSeconds": 1.4,
+        "count": 4,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 13,
+        "range": 380,
+        "durationSeconds": 1.4,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.5,
+        "knockback": 120,
+        "knockbackSeconds": 0.08,
+        "spreadDegrees": 0,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "power": 1.6
+        },
+        {
+          "count": 1,
+          "power": -0.4
+        },
+        {
+          "size": 3,
+          "power": 0.5
+        },
+        {
+          "power": 1.2
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": -0.4
+        },
+        {
+          "count": 1,
+          "power": -0.8
+        },
+        {
+          "power": 0.9
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "hit",
+          "split": {
+            "sizeMultiplier": 0.7,
+            "powerMultiplier": 0.5,
+            "count": 3,
+            "speed": 300,
+            "durationSeconds": 0.5
           }
         }
       ]

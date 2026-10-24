@@ -16,7 +16,6 @@
     { "from": "confusion", "item": "twisted-spoon", "to": "psychic" },
     { "from": "thunder-shock", "item": "magnet", "to": "thunderbolt" },
     { "from": "poison-sting", "item": "poison-barb", "to": "sludge-bomb" },
-    { "from": "bonemerang", "item": "soft-sand", "to": "bone-rush" },
     { "from": "gust", "item": "sharp-beak", "to": "air-slash" },
     { "from": "tackle", "item": "silk-scarf", "to": "body-slam" },
     { "from": "powder-snow", "item": "never-melt-ice", "to": "blizzard" },

@@ -1,0 +1,171 @@
+import { describe, expect, it } from 'vitest';
+import type { MoveEffect } from '../data/schema';
+import { MOTION_LOB, MOTION_SNAKE } from './entities/projectiles';
+import type { SimMoveDef } from './moves';
+import { Simulation } from './simulation';
+import { testRules } from './testRules';
+
+/**
+ * 作者の感想で見直した技（2026年10月25日）の出し方。1つの技だけを持つプレイヤーと、動かない敵で数回進める。
+ * extra は技の定義に足す項目（落とす場所・蛇行・効き方など）
+ */
+function setup(pattern: SimMoveDef['pattern'], stats: Record<string, number>, enemies: [number, number][], extra: Partial<SimMoveDef> = {}): Simulation {
+  const rules = testRules({ move: { power: 10, cooldownSeconds: 100, pierce: Infinity, durationSeconds: 0.5, ...stats } });
+  rules.moves[0] = { ...rules.moves[0]!, pattern, ...extra };
+  const sim = new Simulation({ tickRate: 30, seed: 3, rules });
+  const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 200 });
+  p.facingX = 1;
+  p.facingY = 0;
+  enemies.forEach(([x, y], k) => sim.world.enemies.add(k + 1, 0, x, y, 1000, 0, 10));
+  return sim;
+}
+
+/** 敵ごとの受けたダメージ（置いた順） */
+function damage(sim: Simulation, n: number): number[] {
+  const e = sim.world.enemies;
+  const ids = Array.from(e.id.subarray(0, e.count));
+  return Array.from({ length: n }, (_, k) => 1000 - e.hp[ids.indexOf(k + 1)]!);
+}
+
+const steps = (sim: Simulation, n: number): void => {
+  for (let t = 0; t < n; t++) sim.step([]);
+};
+
+describe('作者の感想で見直した技（2026年10月25日）', () => {
+  it('広がって縮む輪（pulse）: range まで広がってから縮み、広がるときと縮むときに同じ敵へ当たる', () => {
+    const sim = setup('pulse', { range: 100, size: 16, durationSeconds: 0.6, hitIntervalSeconds: 0.3 }, [[70, 0]]);
+    sim.step([]);
+    const pr = sim.world.projectiles;
+    const r0 = pr.radius[0]!;
+    steps(sim, 8);
+    const mid = pr.radius[0]!;
+    steps(sim, 8);
+    expect(mid).toBeGreaterThan(90);
+    expect(pr.radius[0]!).toBeLessThan(mid - 30);
+    expect(r0).toBeLessThan(40);
+    expect(damage(sim, 1)[0]).toBe(20);
+  });
+
+  it('天気（weather）: 画面くらいの範囲の敵すべてに、当たり直しの間隔ごとに当たる', () => {
+    const sim = setup('weather', { size: 500, durationSeconds: 1, hitIntervalSeconds: 0.25 }, [[400, 0], [-300, 200], [700, 0]]);
+    steps(sim, 31);
+    const [a, b, far] = damage(sim, 3);
+    expect(a).toBe(40);
+    expect(b).toBe(40);
+    expect(far).toBe(0);
+  });
+
+  it('横なぎ: 2本目は interval だけ遅れて反対側を払う', () => {
+    const sim = setup('whip', { range: 200, size: 10, count: 2, intervalSeconds: 0.2 }, [[150, 0], [-150, 0]]);
+    steps(sim, 2);
+    expect(damage(sim, 2)).toEqual([10, 0]);
+    steps(sim, 6);
+    expect(damage(sim, 2)).toEqual([10, 10]);
+  });
+
+  it('放物線で狙った場所へ（lobTarget）: 真上寄りに投げ上げ、持続の秒数でちょうど狙った敵の所に落ちる', () => {
+    const sim = setup('lob', { range: 400, size: 10, speed: 400, durationSeconds: 1, pierce: Infinity }, [[200, 100]], { lobTarget: 'nearest' });
+    sim.step([]);
+    const pr = sim.world.projectiles;
+    expect(pr.motion[0]).toBe(MOTION_LOB);
+    // 最初は上へ向かう
+    expect(pr.vy[0]!).toBeLessThan(0);
+    let last: [number, number] = [0, 0];
+    for (let t = 0; t < 40 && pr.count > 0; t++) {
+      last = [pr.x[0]!, pr.y[0]!];
+      sim.step([]);
+    }
+    expect(Math.hypot(last[0] - 200, last[1] - 100)).toBeLessThan(15);
+  });
+
+  it('蛇行（snake）: 決まった方向へ進みながら、横へ揺れる', () => {
+    const sim = setup('cross', { count: 1, speed: 200, size: 8, durationSeconds: 1 }, [], { snake: { amplitude: 20, wavelength: 100 } });
+    sim.step([]);
+    const pr = sim.world.projectiles;
+    expect(pr.motion[0]).toBe(MOTION_SNAKE);
+    let maxSide = 0;
+    for (let t = 0; t < 15; t++) {
+      sim.step([]);
+      maxSide = Math.max(maxSide, Math.abs(pr.y[0]!));
+    }
+    expect(pr.x[0]!).toBeGreaterThan(90);
+    expect(maxSide).toBeGreaterThan(15);
+    expect(maxSide).toBeLessThan(25);
+  });
+
+  it('出した技が消えるまで次を出さない（waitForEnd）: 再使用は少なくとも持続の長さ', () => {
+    const sim = setup('bounce', { cooldownSeconds: 0.5, durationSeconds: 2, speed: 300, range: 300 }, [], { waitForEnd: true });
+    sim.step([]);
+    expect(sim.world.players[0]!.moves[0]!.cooldown).toBeGreaterThanOrEqual(2 - 1e-9);
+  });
+
+  it('跳ね返る技は spreadDegrees があれば向きがランダムになる', () => {
+    const angles = new Set<number>();
+    for (const seed of [1, 2, 3]) {
+      const rules = testRules({ move: { power: 10, cooldownSeconds: 100, durationSeconds: 1, speed: 300, range: 300, spreadDegrees: 360 } });
+      rules.moves[0] = { ...rules.moves[0]!, pattern: 'bounce' };
+      const sim = new Simulation({ tickRate: 30, seed, rules });
+      sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 200 });
+      sim.step([]);
+      angles.add(Math.round(Math.atan2(sim.world.projectiles.vy[0]!, sim.world.projectiles.vx[0]!) * 100));
+    }
+    expect(angles.size).toBeGreaterThan(1);
+  });
+
+  it('片道のなぎ払い（sweepOnce）: 同じ敵には1回だけ当たる', () => {
+    const sim = setup('sweep', { range: 60, size: 20, arcDegrees: 40, spreadDegrees: 180, durationSeconds: 0.4 }, [[60, 0]], { sweepOnce: true });
+    steps(sim, 14);
+    expect(damage(sim, 1)[0]).toBe(10);
+  });
+
+  it('置く数と大きさのばらつき（scatterJitter）: 数は countMin〜count、半径は size × sizeMin〜sizeMax', () => {
+    const counts = new Set<number>();
+    for (const seed of [1, 2, 3, 4, 5, 6]) {
+      const rules = testRules({ move: { power: 10, cooldownSeconds: 100, durationSeconds: 1, size: 40, range: 200, count: 4 } });
+      rules.moves[0] = { ...rules.moves[0]!, pattern: 'scatter', scatterJitter: { countMin: 1, sizeMin: 0.5, sizeMax: 1.5 } };
+      const sim = new Simulation({ tickRate: 30, seed, rules });
+      sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 200 });
+      sim.step([]);
+      const pr = sim.world.projectiles;
+      counts.add(pr.count);
+      for (let i = 0; i < pr.count; i++) {
+        expect(pr.radius[i]!).toBeGreaterThanOrEqual(20);
+        expect(pr.radius[i]!).toBeLessThanOrEqual(60);
+      }
+    }
+    for (const c of counts) expect(c).toBeGreaterThanOrEqual(1);
+    for (const c of counts) expect(c).toBeLessThanOrEqual(4);
+    expect(counts.size).toBeGreaterThan(1);
+  });
+
+  it('現れたとき（spawn）の効き方: 遅れて現れる爆炎の柱は、現れたときに火の粉を出す', () => {
+    const sparks: MoveEffect = { trigger: 'spawn', split: { sizeMultiplier: 0.2, powerMultiplier: 0.3, count: 3, speed: 200, durationSeconds: 0.4, spreadDegrees: 360, boomerang: false, jitter: 1 } };
+    const sim = setup('eruption', { range: 300, size: 20, count: 8, intervalSeconds: 0.2, durationSeconds: 1 }, [], { effects: [sparks] });
+    sim.step([]);
+    const pr = sim.world.projectiles;
+    const fx = (): number => Array.from({ length: pr.count }, (_, i) => i).filter((i) => pr.stage[i] === 1).length;
+    // 内側の段の 8 本から 3 つずつ
+    expect(fx()).toBe(24);
+    steps(sim, 7);
+    // 2段目の 8 本が現れて、さらに 24（最初の火の粉は 0.4 秒で消える）
+    expect(fx()).toBeGreaterThanOrEqual(24);
+  });
+
+  it('分裂の部品: lob なら放り上げて落ち、snake なら蛇行して進む', () => {
+    const lob: MoveEffect = { trigger: 'cast', split: { sizeMultiplier: 0.5, powerMultiplier: 0.5, count: 3, speed: 300, durationSeconds: 0.7, spreadDegrees: 360, boomerang: false, lob: true } };
+    const sim = setup('nova', { range: 50, size: 10, durationSeconds: 0.2 }, [], { effects: [lob] });
+    sim.step([]);
+    const pr = sim.world.projectiles;
+    const kids = Array.from({ length: pr.count }, (_, i) => i).filter((i) => pr.stage[i] === 1);
+    expect(kids).toHaveLength(3);
+    for (const i of kids) {
+      expect(pr.motion[i]).toBe(MOTION_LOB);
+      expect(pr.vy[i]!).toBeLessThan(0);
+    }
+    const snake: MoveEffect = { trigger: 'cast', split: { sizeMultiplier: 0.5, powerMultiplier: 0.5, count: 2, speed: 200, durationSeconds: 1, spreadDegrees: 360, boomerang: false, snake: { amplitude: 10, wavelength: 80 } } };
+    const sim2 = setup('nova', { range: 50, size: 10, durationSeconds: 0.2 }, [], { effects: [snake] });
+    sim2.step([]);
+    const pr2 = sim2.world.projectiles;
+    expect(Array.from({ length: pr2.count }, (_, i) => i).filter((i) => pr2.stage[i] === 1 && pr2.motion[i] === MOTION_SNAKE)).toHaveLength(2);
+  });
+});

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import type { EffectRecipe, MoveSpritesData } from '../../data/schema';
-import type { ProjectileStore } from '../../sim/entities/projectiles';
+import { MOTION_SNAKE, snakeOffset, type ProjectileStore } from '../../sim/entities/projectiles';
 import { drawMoveArt, type SpriteOut } from '../moveArt';
 
 export type SpriteSpec = NonNullable<EffectRecipe['sprite']>;
@@ -24,6 +24,8 @@ export interface SpriteItem {
   readonly alpha: number;
   /** varyTiles のずらし */
   readonly seed: number;
+  /** 蛇行して進むもの（snake）: 出した場所・速度・振れ幅・角速度・出てからの秒数（通った道を描く） */
+  readonly snake?: { readonly ox: number; readonly oy: number; readonly vx: number; readonly vy: number; readonly amp: number; readonly omega: number; readonly t: number };
 }
 
 /** テクスチャの名前（絵・細かさの段・部品・コマごと） */
@@ -196,14 +198,16 @@ export class MoveSprites {
     return from + ((k - from) % (n - from));
   }
 
-  /** 毎フレーム描き直す。specOf は当たり判定ごとのドット絵の指定（無ければ描かない） */
-  draw(pr: ProjectileStore, alpha: number, specOf: (i: number) => SpriteSpec | null): void {
+  /** 毎フレーム描き直す。specOf は当たり判定ごとのドット絵の指定（無ければ描かない。重ねて描くものは配列） */
+  draw(pr: ProjectileStore, alpha: number, specOf: (i: number) => SpriteSpec | readonly SpriteSpec[] | null): void {
     const items: SpriteItem[] = [];
     for (let i = 0; i < pr.count; i++) {
-      const spec = specOf(i);
-      if (!spec) continue;
+      const got = specOf(i);
+      if (!got) continue;
       const elapsed = pr.maxLife[i]! - pr.life[i]!;
-      items.push({
+      const snake =
+        pr.motion[i] === MOTION_SNAKE ? { ox: pr.ox[i]!, oy: pr.oy[i]!, vx: pr.vx[i]!, vy: pr.vy[i]!, amp: pr.orbitRadius[i]!, omega: pr.angularSpeed[i]!, t: elapsed } : undefined;
+      for (const spec of Array.isArray(got) ? (got as readonly SpriteSpec[]) : [got as SpriteSpec]) items.push({
         spec,
         x: pr.prevX[i]! + (pr.x[i]! - pr.prevX[i]!) * alpha,
         y: pr.prevY[i]! + (pr.y[i]! - pr.prevY[i]!) * alpha,
@@ -218,6 +222,7 @@ export class MoveSprites {
         // 短い技（はっぱカッターなど 0.2 秒ほど）は、出ている時間の最後の 3 割だけで薄くする
         alpha: Math.min(1, pr.life[i]! / Math.min(FADE_SECONDS, pr.maxLife[i]! * 0.3)),
         seed: i,
+        ...(snake ? { snake } : {}),
       });
     }
     this.drawItems(items);
@@ -240,7 +245,10 @@ export class MoveSprites {
       const spec = it.spec;
       const base = this.data.sprites[spec.id];
       if (!base) continue;
-      const { x, y, elapsed } = it;
+      const { elapsed } = it;
+      // 揺れる地面: 描く位置を毎フレーム少しずらす（見た目だけなので Math.random でよい）
+      const x = it.x + (spec.shake > 0 ? (Math.random() * 2 - 1) * spec.shake : 0);
+      const y = it.y + (spec.shake > 0 ? (Math.random() * 2 - 1) * spec.shake : 0);
       const a = it.alpha * spec.alpha;
       const r = it.radius * spec.size;
       // 1ドットが dot になるマス数: 円・扇は横の長さ、線は太さ、輪は帯の厚さで決める
@@ -253,6 +261,8 @@ export class MoveSprites {
             ? [mainRows?.[0]?.length ?? 1, (it.radius * spec.size) / this.dot]
             : spec.fit === 'cone'
               ? [mainRows?.[0]?.length ?? 1, it.radius / this.dot]
+              : spec.fit === 'snake'
+                ? [midRows?.length ?? 1, (r * 2) / this.dot]
               : spec.fit === 'ring'
                 ? [midRows?.length ?? 1, ((it.band > 0 ? it.band : it.radius * 0.3) * spec.size) / this.dot]
                 : [midRows?.length ?? 1, (r * 2) / this.dot];
@@ -267,7 +277,13 @@ export class MoveSprites {
         // 向き: 進む向き（絵は右向きに描く）か、回し続けるか
         const rot =
           spec.rotate === 'velocity' ? (it.vx !== 0 || it.vy !== 0 ? Math.atan2(it.vy, it.vx) : Math.atan2(it.dirY, it.dirX)) : spec.rotate === 'spin' ? (elapsed * spec.spinDegPerSec * Math.PI) / 180 : 0;
-        put(fk('main', this.frameOf(spec.id, 'main', elapsed)), x, y, rot, s, s, a);
+        // 地面から噴き上がる絵は、根元（originY）を当たり判定の中心に合わせる（回す絵は真ん中のまま）
+        const oy = rot === 0 ? (spec.originY - 0.5) * rows.length * s : 0;
+        put(fk('main', this.frameOf(spec.id, 'main', elapsed)), x, y - oy, rot, s, s, a);
+        continue;
+      }
+      if (spec.fit === 'snake') {
+        this.drawSnake(it, sp, fk, r, a, put);
         continue;
       }
       if (spec.fit === 'front') {
@@ -290,9 +306,12 @@ export class MoveSprites {
         const n = Math.max(16, Math.round((Math.PI * 2 * rc) / ((rows[0]!.length * band) / rows.length)));
         const sx = (Math.PI * 2 * rc) / n / rows[0]!.length;
         const sy = band / rows.length;
-        const frame = fk('middle', this.frameOf(spec.id, 'middle', elapsed));
+        const midFrame = this.frameOf(spec.id, 'middle', elapsed);
+        const midCount = sp.parts.middle!.length;
         for (let k = 0; k < n; k++) {
           const ang = (k / n) * Math.PI * 2;
+          // varyTiles: 1枚ずつ違うコマ（だいばくはつの端の炎が、そろわずに揺れる）
+          const frame = fk('middle', spec.varyTiles ? (midFrame + k * 3 + it.seed) % midCount : midFrame);
           put(frame, x + Math.cos(ang) * rc, y + Math.sin(ang) * rc, spec.upright ? 0 : ang + Math.PI / 2, spec.upright ? sy : sx, sy, a);
         }
         continue;
@@ -335,6 +354,60 @@ export class MoveSprites {
       put(fk('end', this.frameOf(spec.id, 'end', elapsed)), ex, ey, rot, s, s, a);
     }
     for (let k = used; k < this.images.length; k++) this.images[k]!.setVisible(false);
+  }
+
+  /**
+   * 蛇行して進むもの: 出した場所から今の位置までの道（tail があれば先から tail の長さまで）に、途中の部品を道の向きに並べ、
+   * 先に終わりの部品を置く。太さは当たり判定の直径
+   */
+  private drawSnake(
+    it: SpriteItem,
+    sp: SpriteOut,
+    fk: (part: string, frame: number) => string,
+    r: number,
+    a: number,
+    put: (key: string, x: number, y: number, rot: number, sx: number, sy: number, a: number) => void,
+  ): void {
+    const sn = it.snake;
+    const middle = sp.parts.middle?.[0];
+    const end = sp.parts.end?.[0];
+    if (!sn || !middle || !end) return;
+    const s = (r * 2) / middle.length;
+    const tileLen = Math.max(1, middle[0]!.length * s);
+    const endLen = end[0]!.length * s;
+    // 道を細かく区切った点（出した場所 → 今の位置）
+    const n = Math.max(8, Math.ceil(sn.t * 60));
+    const pts: [number, number][] = [];
+    for (let k = 0; k <= n; k++) {
+      const [dx, dy] = snakeOffset(sn.vx, sn.vy, sn.amp, sn.omega, (sn.t * k) / n);
+      pts.push([sn.ox + dx, sn.oy + dy]);
+    }
+    // 先から後ろへ d だけ戻った点と、その所の進む向き
+    const lens: number[] = [0];
+    for (let k = n; k > 0; k--) lens.push(lens[lens.length - 1]! + Math.hypot(pts[k]![0] - pts[k - 1]![0], pts[k]![1] - pts[k - 1]![1]));
+    const total = lens[lens.length - 1]!;
+    const at = (d: number): [number, number, number] => {
+      let j = 1;
+      while (j < lens.length - 1 && lens[j]! < d) j++;
+      const k1 = n - (j - 1);
+      const k0 = n - j;
+      const seg = lens[j]! - lens[j - 1]! || 1;
+      const t = Math.max(0, Math.min(1, (d - lens[j - 1]!) / seg));
+      const [x1, y1] = pts[k1]!;
+      const [x0, y0] = pts[k0]!;
+      return [x1 + (x0 - x1) * t, y1 + (y0 - y1) * t, Math.atan2(y1 - y0, x1 - x0)];
+    };
+    const limit = it.spec.tail > 0 ? Math.min(total, it.spec.tail) : total;
+    const midCount = sp.parts.middle!.length;
+    const midFrame = this.frameOf(it.spec.id, 'middle', it.elapsed);
+    for (let d = endLen, k = 0; d < limit; d += tileLen, k++) {
+      const [px, py, rot] = at(Math.min(limit, d + tileLen / 2));
+      // 後ろほど薄くする（尾を引く）
+      const fade = it.spec.tail > 0 ? 1 - (d / limit) * 0.6 : 1;
+      put(fk('middle', it.spec.varyTiles ? (midFrame + k * 3 + it.seed) % midCount : midFrame), px, py, rot, s, s, a * fade);
+    }
+    const [hx, hy, hr] = at(Math.min(total, endLen / 2));
+    put(fk('end', this.frameOf(it.spec.id, 'end', it.elapsed)), hx, hy, hr, s, s, a);
   }
 
   destroy(): void {

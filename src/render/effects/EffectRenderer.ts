@@ -78,6 +78,10 @@ export class EffectRenderer {
   private readonly trailBudgets = new Map<string, number>();
   /** 残る範囲の控えめな粒（レシピごと） */
   private readonly lingerEmitters = new Map<string, Phaser.GameObjects.Particles.ParticleEmitter>();
+  /** 天気の粒（レシピごと）・出す数の端数・画面の色づけ */
+  private readonly weatherEmitters = new Map<string, Phaser.GameObjects.Particles.ParticleEmitter>();
+  private readonly weatherBudget = new Map<string, number>();
+  private weatherTint: Phaser.GameObjects.Rectangle | null = null;
   /** 演出をまとめる入れ物（まとめてドット絵風のフィルターを掛ける） */
   private readonly layer: Phaser.GameObjects.Layer;
   /** 角ばったドットにするフィルター（大きさはカメラの拡大率に合わせて変える） */
@@ -136,6 +140,32 @@ export class EffectRenderer {
     return this.recipe(id).sprite ?? null;
   }
 
+  /** 技そのものに重ねるもう1枚の絵・効き方から出た円の絵・通った道の絵・使った瞬間の絵・当たった所の絵（無ければ null） */
+  edgeSprite(id: string): EffectRecipe['edgeSprite'] | null {
+    return this.recipe(id).edgeSprite ?? null;
+  }
+
+  effectSprite(id: string): EffectRecipe['effectSprite'] | null {
+    return this.recipe(id).effectSprite ?? null;
+  }
+
+  pathSprite(id: string): EffectRecipe['pathSprite'] | null {
+    return this.recipe(id).pathSprite ?? null;
+  }
+
+  castSprite(id: string): EffectRecipe['castSprite'] | null {
+    return this.recipe(id).castSprite ?? null;
+  }
+
+  hitSprite(id: string): EffectRecipe['hitSprite'] | null {
+    return this.recipe(id).hitSprite ?? null;
+  }
+
+  /** 範囲を塗らない技か（天気） */
+  hideShape(id: string): boolean {
+    return this.recipe(id).hideShape;
+  }
+
   /** 稲妻の線の見た目（無ければ null） */
   lightningLine(id: string): EffectRecipe['lightningLine'] | null {
     return this.recipe(id).lightningLine ?? null;
@@ -179,6 +209,46 @@ export class EffectRenderer {
         em.emitParticleAt(it.x + lx + Math.cos(a) * d, it.y + ly + Math.sin(a) * d, 1);
       }
     }
+  }
+
+  /**
+   * 天気（こなゆき・ふぶき）: 出ている技のレシピごとに、画面（view）じゅうに粒を降らせ、画面を薄く色づける（毎フレーム）。
+   * 粒は画面の上の外から、真下から angle 度傾いた向きへ落とす。見た目だけなので乱数はシード付きでなくてよい
+   */
+  drawWeather(active: ReadonlySet<string>, view: { x: number; y: number; width: number; height: number }, deltaMs: number): void {
+    let tint: { color: string; alpha: number } | null = null;
+    for (const id of active) {
+      const w = this.recipes[id]?.weather;
+      if (!w) continue;
+      if (w.tint && (!tint || w.tint.alpha > tint.alpha)) tint = w.tint;
+      let em = this.weatherEmitters.get(id);
+      if (!em) {
+        // 向き（Phaser の角度は 90 が真下）を真下から angle 度傾ける
+        em = this.add(this.scene.add.particles(0, 0, GLOW_TEXTURE, { ...emitterConfig({ ...w, spread: 0 }), angle: { min: 84 + w.angle, max: 96 + w.angle } }).setDepth(this.depth + 0.4));
+        this.weatherEmitters.set(id, em);
+      }
+      const expected = (w.perSecond * deltaMs) / 1000 + (this.weatherBudget.get(id) ?? 0);
+      const n = Math.floor(expected);
+      this.weatherBudget.set(id, expected - n);
+      // 傾いて落ちる分だけ、出す場所を風上へ広げる（画面の端まで降るように）。画面を縦に横切る間に横へ進む量
+      const travel = -Math.tan((w.angle * Math.PI) / 180) * view.height;
+      for (let k = 0; k < n; k++) {
+        const x = view.x - Math.max(0, travel) + Math.random() * (view.width + Math.abs(travel));
+        const y = view.y + (Math.random() * 1.1 - 0.15) * view.height;
+        em.emitParticleAt(x, y, 1);
+      }
+    }
+    // 画面を薄く色づける（出ている間だけ。消えるときは少しずつ）
+    if (!this.weatherTint) {
+      this.weatherTint = this.scene.add.rectangle(0, 0, 1, 1, 0xffffff, 1).setScrollFactor(0).setDepth(this.depth + 0.45).setAlpha(0);
+    }
+    const cam = this.scene.cameras.main;
+    const want = tint ? tint.alpha : 0;
+    const cur = this.weatherTint.alpha;
+    const next = cur + (want - cur) * Math.min(1, deltaMs / 400);
+    if (tint) this.weatherTint.setFillStyle(hexColor(tint.color), 1);
+    // 拡大・縮小しても画面を覆うように、画面の中心に大きく置く
+    this.weatherTint.setPosition(cam.width / 2, cam.height / 2).setSize(cam.width * 4, cam.height * 4).setAlpha(next < 0.002 ? 0 : next).setVisible(next >= 0.002);
   }
 
   /** 持ち主の残像として飛ぶ技の見た目（無ければ null） */
@@ -284,7 +354,7 @@ export class EffectRenderer {
       // 範囲そのもの（光の色）は HitShapes が平らに塗る。ここでは発射体の芯だけを、当たり判定の内側に小さく描く。扇形は芯を出さない
       // 持ち主の残像として飛ぶもの（ゴッドバード）は、芯の代わりに RunScene が姿を描く
       // ドット絵で描く技（ハードプラント・ハイドロポンプ）も芯を描かない（MoveSprites が描く）
-      if (!body || sector || hollow(i) || (recipe.ownerGhost && !line) || (recipe.sprite && isMain(i)) || (recipe.effectLineSprite && line && !isMain(i))) continue;
+      if (!body || sector || hollow(i) || recipe.hideShape || (recipe.ownerGhost && !line) || (recipe.sprite && isMain(i)) || (recipe.effectLineSprite && line && !isMain(i)) || (recipe.effectSprite && !line && !isMain(i))) continue;
       const pulse = body.pulse ? 1 + Math.sin((timeMs / body.pulse.periodMs) * Math.PI * 2) * body.pulse.amount : 1;
       let core = this.cores[used];
       if (!core) {

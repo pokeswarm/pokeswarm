@@ -95,6 +95,7 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
       area = range * 0.5 * 2 * size;
       break;
     case 'nova':
+    case 'pulse':
       area = Math.PI * range * range;
       break;
     case 'spiral':

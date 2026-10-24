@@ -59,6 +59,11 @@ export function buildSimRules(): SimRules {
       randomScaled: def.randomPool === 'starting',
       chainHopSeconds: def.chainHopSeconds ?? 0,
       learners: def.learners ?? null,
+      waitForEnd: def.waitForEnd,
+      ...(def.lobTarget ? { lobTarget: def.lobTarget } : {}),
+      ...(def.scatterJitter ? { scatterJitter: def.scatterJitter } : {}),
+      sweepOnce: def.sweepOnce,
+      ...(def.snake ? { snake: def.snake } : {}),
       // いつも効く技: レベルごとの効果を、そのレベルまでの合計にしておく
       passive: (def.passive ?? []).reduce<Modifiers[]>((acc, mods) => {
         const sum = emptyModifiers(types.names.length);

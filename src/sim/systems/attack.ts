@@ -10,9 +10,12 @@ import {
   MOTION_SPIRAL,
   MOTION_LINEAR,
   MOTION_ORBIT,
+  MOTION_PULSE,
+  MOTION_SNAKE,
   SHAPE_CIRCLE,
   SHAPE_LINE,
   SHAPE_SECTOR,
+  snakeOffset,
   type ProjectileSpawn,
 } from '../entities/projectiles';
 import type { Player, PlayerMove } from '../entities/player';
@@ -142,8 +145,10 @@ export function useMoves(world: World): void {
         pm.cooldown = 0;
         continue;
       }
-      pm.cooldown = scaledMoveStats(world, p, pm, st).cooldownSeconds;
+      // 出した技が消えるまで次を出さない技（ボルテッカー）は、再使用を少なくとも持続の長さにする
+      pm.cooldown = Math.max(scaledMoveStats(world, p, pm, st).cooldownSeconds, def.waitForEnd ? st.durationSeconds : 0);
       world.events.push({ type: 'moveUsed', playerId: p.id, move: pm.move });
+      const from = world.projectiles.count;
       switch (def.pattern) {
         case 'nearest':
         case 'facing':
@@ -216,13 +221,31 @@ export function useMoves(world: World): void {
         case 'spiral':
           fireSpiral(world, p, pm, st);
           break;
+        case 'pulse':
+          firePulse(world, p, pm, st);
+          break;
+        case 'weather':
+          fireWeather(world, p, pm, st);
+          break;
       }
+      // ゆびをふる・ものまね は、選んだ技の分を fireMetronome の中で起こす
+      if (def.pattern !== 'metronome') fireSpawnEffects(world, from, world.projectiles.count);
       if (def.effects.some((fx) => fx.trigger === 'cast')) {
         const [fx, fy] = axisToUnit(p.facingX, p.facingY);
         const sc = scaledMoveStats(world, p, pm, st);
         fireEffects(world, 'cast', { owner: p.id, move: pm.move, level: pm.level, damage: sc.power, size: sc.size, x: p.x, y: p.y, dirX: fx, dirY: fy, length: 0 });
       }
     }
+  }
+}
+
+/** 出したばかりの技そのもの（index from〜to − 1）の spawn の効き方を起こす。遅れて現れるもの（stage 3）は、現れたときに起こす */
+function fireSpawnEffects(world: World, from: number, to: number): void {
+  const pr = world.projectiles;
+  for (let i = from; i < to; i++) {
+    if (pr.stage[i] !== 0) continue;
+    if (!world.rules.moves[pr.move[i]!]!.effects.some((fx) => fx.trigger === 'spawn')) return;
+    fireEffects(world, 'spawn', fxSourceOf(world, i, pr.x[i]!, pr.y[i]!));
   }
 }
 
@@ -437,7 +460,7 @@ function fireScreen(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
 /** 一度に出し終える出し方（ゆびをふるで選ぶ技。連射の出し方は、出し続ける状態を持てないので選ばない） */
 /** 続けて撃つ出し方（ゆびをふる・ものまね では一度にまとめて撃つ） */
 const BURST_PATTERNS = new Set(['nearest', 'facing', 'homing', 'boomerang']);
-const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter', 'eruption', 'spin', 'sweep', 'spiral']);
+const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter', 'eruption', 'spin', 'sweep', 'spiral', 'pulse', 'weather']);
 
 /** metronome（ゆびをふる）: ほかの技からランダムに1つを、その技の最大レベルで出す */
 function fireMetronome(world: World, p: Player, self?: PlayerMove): void {
@@ -479,8 +502,12 @@ function fireMetronome(world: World, p: Player, self?: PlayerMove): void {
     spin: fireSpin,
     sweep: fireSweep,
     spiral: fireSpiral,
+    pulse: firePulse,
+    weather: fireWeather,
   };
+  const from = world.projectiles.count;
   fire[def.pattern]?.(world, p, pm, st);
+  fireSpawnEffects(world, from, world.projectiles.count);
 }
 
 /**
@@ -502,15 +529,45 @@ function fireWhip(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
   ];
   const body = world.rules.moves[pm.move]!.body;
   if (body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: side, dirY: 0, distance: body.lungeDistance, afterimages: body.afterimages });
-  for (const [dx, dy] of dirs.slice(0, Math.max(1, Math.min(dirs.length, st.count)))) {
+  // 2本目からは interval ずつ遅らせる（同時に払わず、左 → 右と順に。作者の指摘 2026年10月25日）。遅れる分は出番を待つもの（stage 3）
+  dirs.slice(0, Math.max(1, Math.min(dirs.length, st.count))).forEach(([dx, dy], k) => {
     const length = rayLengthToObstacle(world, p.x, p.y, dx, dy, st.range);
-    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, shape: SHAPE_LINE, length, dirX: dx, dirY: dy, vx: dx, vy: dy });
-  }
+    const wait = st.intervalSeconds * k;
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, shape: SHAPE_LINE, length, dirX: dx, dirY: dy, vx: dx, vy: dy, ...(wait > 0 ? { life: wait, stage: 3, armLife: st.durationSeconds } : {}) });
+  });
 }
 
-/** lob（放物線）: 向いている側の斜め上へ投げ、重さで弧を描いて落ちる */
+/**
+ * lob（放物線）: 向いている側の斜め上へ投げ、重さで弧を描いて落ちる。
+ * 落とす場所が決まっている技（lobTarget）は、真上寄りに speed で投げ上げ、持続の秒数でちょうどその場所に落ちるよう重さを決める
+ */
 function fireLob(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const speed = scaledMoveStats(world, p, pm, st).speed;
+  const target = world.rules.moves[pm.move]!.lobTarget;
+  if (target) {
+    const T = st.durationSeconds;
+    const t0 = target === 'nearest' ? nearestEnemy(world, p.x, p.y, st.range) : -1;
+    for (let k = 0; k < st.count; k++) {
+      let dx: number;
+      let dy: number;
+      if (t0 !== -1 && k === 0) {
+        dx = world.enemies.x[t0]! - p.x;
+        dy = world.enemies.y[t0]! - p.y;
+      } else {
+        // 自分の周り range の中（近すぎない所）のランダムな場所
+        const a = world.rng.next() * Math.PI * 2;
+        const r = st.range * (0.25 + 0.75 * Math.sqrt(world.rng.next()));
+        dx = Math.cos(a) * r;
+        dy = Math.sin(a) * r;
+      }
+      const vy = -speed * (0.85 + world.rng.next() * 0.3);
+      // 落ちる場所 = 投げた場所 + v × T + 重さ × dt² × n(n+1)/2（更新 n 回ぶん。速さを先に変えてから動かすので、式どおりの T²/2 より少し多い）
+      const n = Math.max(1, Math.round(T / world.dt));
+      const gravity = (dy - vy * n * world.dt) / ((world.dt * world.dt * n * (n + 1)) / 2);
+      world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LOB, x: p.x, y: p.y, vx: dx / T, vy, angularSpeed: gravity });
+    }
+    return;
+  }
   const side = p.facingX < 0 ? -1 : p.facingX > 0 ? 1 : world.rng.next() < 0.5 ? -1 : 1;
   for (let k = 0; k < st.count; k++) {
     // 数が多いときは、左右・高さをばらつかせる
@@ -584,7 +641,9 @@ function fireBounce(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
   const speed = scaledMoveStats(world, p, pm, st).speed;
   for (let k = 0; k < st.count; k++) {
     const [fx, fy] = axisToUnit(p.facingX, p.facingY);
-    const a = Math.atan2(fy, fx) + world.rules.moves[pm.move]!.bounceAngle + (k / st.count) * Math.PI * 2;
+    // spreadDegrees があれば、その幅でランダムにずらす（ボルテッカー: 毎回違う向きへ駆け出す。作者の指摘 2026年10月25日）
+    const jitter = st.spreadDegrees > 0 ? ((world.rng.next() - 0.5) * st.spreadDegrees * Math.PI) / 180 : 0;
+    const a = Math.atan2(fy, fx) + world.rules.moves[pm.move]!.bounceAngle + jitter + (k / st.count) * Math.PI * 2;
     world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_BOUNCE, x: p.x, y: p.y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, ox: st.range, oy: st.range * 0.56 });
   }
 }
@@ -600,20 +659,36 @@ function fireCross(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   const [fx, fy] = axisToUnit(p.facingX, p.facingY);
   const start = Math.atan2(fy, fx);
   const speed = scaledMoveStats(world, p, pm, st).speed;
+  const snake = world.rules.moves[pm.move]!.snake;
   for (let k = 0; k < st.count; k++) {
     const a = start + (k / st.count) * Math.PI * 2;
-    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x, y: p.y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed });
+    const vx = Math.cos(a) * speed;
+    const vy = Math.sin(a) * speed;
+    // 蛇行する弾（ヘドロウェーブ）: 出した場所を ox・oy に覚え、時間から位置を決める。隣どうしで揺れの向きを逆にする
+    if (snake) {
+      const omega = (Math.PI * 2 * speed) / snake.wavelength;
+      world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_SNAKE, x: p.x, y: p.y, vx, vy, ox: p.x, oy: p.y, orbitRadius: snake.amplitude * (k % 2 === 0 ? 1 : -1), angularSpeed: omega });
+      continue;
+    }
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x, y: p.y, vx, vy });
   }
 }
 
-/** scatter（水たまり）: 自分の周り range の中のランダムな場所に、しばらく残る当たり判定を置く */
+/**
+ * scatter（水たまり）: 自分の周り range の中のランダムな場所に、しばらく残る当たり判定を置く。
+ * scatterJitter があれば、数と大きさも使うたびにランダムにする（マグニチュード）
+ */
 function fireScatter(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
-  for (let k = 0; k < st.count; k++) {
+  const jit = world.rules.moves[pm.move]!.scatterJitter;
+  const b0 = base(world, p, pm, st);
+  const count = jit ? Math.min(st.count, jit.countMin) + world.rng.int(Math.max(1, st.count - Math.min(st.count, jit.countMin) + 1)) : st.count;
+  for (let k = 0; k < count; k++) {
     const a = world.rng.next() * Math.PI * 2;
     const r = st.range * (0.3 + world.rng.next() * 0.7);
-    // speed があれば、置いた場所からランダムな向きへゆっくり動く（しおふき）
+    // speed があれば、置いた場所からランダムな向きへゆっくり動く
     const b = world.rng.next() * Math.PI * 2;
-    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x + Math.cos(a) * r, y: p.y + Math.sin(a) * r, vx: Math.cos(b) * st.speed, vy: Math.sin(b) * st.speed });
+    const radius = jit ? b0.radius * (jit.sizeMin + world.rng.next() * (jit.sizeMax - jit.sizeMin)) : b0.radius;
+    world.projectiles.add({ ...b0, radius, motion: MOTION_LINEAR, x: p.x + Math.cos(a) * r, y: p.y + Math.sin(a) * r, vx: Math.cos(b) * st.speed, vy: Math.sin(b) * st.speed });
   }
 }
 
@@ -717,9 +792,40 @@ function fireSweep(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     angularSpeed: amp,
     dirX: Math.cos(Math.atan2(fy, fx) - amp),
     dirY: Math.sin(Math.atan2(fy, fx) - amp),
-    // 行きと戻りの両方で当たる
-    hitIntervalTicks: Math.max(1, Math.round(st.durationSeconds / 2 / world.dt)),
+    // 行きと戻りの両方で当たる。片道だけ（はたく）は orbitRadius 1 の印を付け、同じ敵には1回
+    ...(def.sweepOnce ? { orbitRadius: 1, hitIntervalTicks: 0 } : { hitIntervalTicks: Math.max(1, Math.round(st.durationSeconds / 2 / world.dt)) }),
   });
+}
+
+/**
+ * pulse（広がって縮む輪）: 自分を中心に、厚さ size の輪が range まで広がってから縮む（スパーク・ワイルドボルト。作者の決定 2026年10月25日）。
+ * count 2 以上は interval ごとに続けて出す（遅れる輪は出番を待つもの stage 3）
+ */
+function firePulse(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const band = scaledMoveStats(world, p, pm, st).size;
+  const outer = Math.max(band + 1, st.range);
+  for (let k = 0; k < Math.max(1, st.count); k++) {
+    const wait = st.intervalSeconds * k;
+    world.projectiles.add({
+      ...base(world, p, pm, st),
+      motion: MOTION_PULSE,
+      x: p.x,
+      y: p.y,
+      radius: band,
+      band,
+      ox: band,
+      orbitRadius: outer,
+      ...(wait > 0 ? { life: wait, stage: 3, armLife: st.durationSeconds } : {}),
+    });
+  }
+}
+
+/**
+ * weather（天気）: duration の間、自分の周り半径 size（画面くらい）の敵すべてに、当たり直しの間隔ごとに当たる
+ * （こなゆき・ふぶき。作者の決定 2026年10月25日）。持ち主に付いていく大きな円で、見た目は画面に降る雪（範囲は塗らない）
+ */
+function fireWeather(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y });
 }
 
 /** nova: 自分を中心に、大きさ size から range まで広がる輪 */
@@ -779,6 +885,7 @@ export function moveProjectiles(world: World): void {
         pr.stage[i] = 0;
         pr.life[i] = pr.maxLife[i] = pr.armLife[i]!;
         world.events.push({ type: 'projectileHit', x: pr.x[i]!, y: pr.y[i]!, owner: pr.owner[i]!, move: pr.move[i]! });
+        fireSpawnEffects(world, i, i + 1);
       }
       continue;
     }
@@ -813,6 +920,10 @@ export function moveProjectiles(world: World): void {
         if ((pr.x[i]! > owner.x + pr.ox[i]! && pr.vx[i]! > 0) || (pr.x[i]! < owner.x - pr.ox[i]! && pr.vx[i]! < 0)) pr.vx[i] = -pr.vx[i]!;
         if ((pr.y[i]! > owner.y + pr.oy[i]! && pr.vy[i]! > 0) || (pr.y[i]! < owner.y - pr.oy[i]! && pr.vy[i]! < 0)) pr.vy[i] = -pr.vy[i]!;
       }
+    } else if (motion === MOTION_SNAKE) {
+      const [dx, dy] = snakeOffset(pr.vx[i]!, pr.vy[i]!, pr.orbitRadius[i]!, pr.angularSpeed[i]!, pr.maxLife[i]! - pr.life[i]! + world.dt);
+      pr.x[i] = pr.ox[i]! + dx;
+      pr.y[i] = pr.oy[i]! + dy;
     } else if (motion === MOTION_HOMING) {
       const t = nearestEnemy(world, pr.x[i]!, pr.y[i]!, 300);
       if (t !== -1) {
@@ -843,12 +954,17 @@ export function moveProjectiles(world: World): void {
       pr.y[i] = owner.y + Math.sin(pr.angle[i]!) * pr.orbitRadius[i]!;
     } else if (motion === MOTION_STREAM) {
       stepStream(world, i, owner);
+    } else if (motion === MOTION_PULSE) {
+      pr.x[i] = owner.x;
+      pr.y[i] = owner.y;
+      const t = Math.min(1, (pr.maxLife[i]! - pr.life[i]! + world.dt) / pr.maxLife[i]!);
+      pr.radius[i] = pr.ox[i]! + (pr.orbitRadius[i]! - pr.ox[i]!) * Math.sin(Math.PI * t);
     } else if (motion === MOTION_SWEEP) {
-      // 前半に片側の端からもう片側の端へ、後半に戻る
+      // 前半に片側の端からもう片側の端へ、後半に戻る（片道だけのもの orbitRadius 1 は、全体で片側の端からもう片側の端へ）
       pr.x[i] = owner.x;
       pr.y[i] = owner.y;
       const t = 1 - pr.life[i]! / pr.maxLife[i]!;
-      const s = t < 0.5 ? t * 2 : 2 - t * 2;
+      const s = pr.orbitRadius[i] === 1 ? t : t < 0.5 ? t * 2 : 2 - t * 2;
       const a = pr.angle[i]! - pr.angularSpeed[i]! + 2 * pr.angularSpeed[i]! * s;
       pr.dirX[i] = Math.cos(a);
       pr.dirY[i] = Math.sin(a);
@@ -862,7 +978,7 @@ export function moveProjectiles(world: World): void {
     if (pr.stage[i] === 2) continue;
     tickEveryEffects(world, i);
     // 障害物は技も遮る（飛んでいく技は当たると消える）。跳ね返る技（ボルテッカー）は枠の端で跳ね返り続けるので、障害物は通り抜ける
-    if ((motion === MOTION_HOMING || motion === MOTION_BOOMERANG || motion === MOTION_LOB || (motion === MOTION_LINEAR && (pr.vx[i] !== 0 || pr.vy[i] !== 0))) && insideObstacle(world, pr.x[i]!, pr.y[i]!)) {
+    if ((motion === MOTION_HOMING || motion === MOTION_BOOMERANG || motion === MOTION_LOB || motion === MOTION_SNAKE || (motion === MOTION_LINEAR && (pr.vx[i] !== 0 || pr.vy[i] !== 0))) && insideObstacle(world, pr.x[i]!, pr.y[i]!)) {
       world.events.push({ type: 'projectileHit', x: pr.x[i]!, y: pr.y[i]!, owner: pr.owner[i]!, move: pr.move[i]! });
       expire(world, i);
       continue;

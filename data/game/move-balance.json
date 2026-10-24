@@ -27,7 +27,8 @@
     "conversion"
   ],
   "heavyHitters": [
-    "giga-impact"
+    "giga-impact",
+    "frenzy-plant"
   ],
   "tierOverrides": {
     "pound": "derived",

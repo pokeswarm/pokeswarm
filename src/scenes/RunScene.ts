@@ -12,7 +12,7 @@ import { EdgeArrows, type EdgeTarget } from '../render/EdgeArrows';
 import { EffectRenderer } from '../render/effects/EffectRenderer';
 import { audio } from '../audio';
 import { RunSounds } from '../audio/runSounds';
-import { MoveSprites, type SpriteItem } from '../render/effects/MoveSprites';
+import { MoveSprites, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
 import { ObstacleView } from '../render/ObstacleView';
@@ -712,6 +712,15 @@ export class RunScene extends Phaser.Scene {
         else if (it.by === this.localId) this.announce(localName(generated.items.potion?.names, getLocale(), ''), '#ce93d8');
       } else if (ev.type === 'bodyAttack') {
         this.playerViews.get(ev.playerId)?.lunge(ev.dirX, ev.dirY, ev.distance, ev.afterimages);
+      } else if (ev.type === 'moveUsed') {
+        // 使った瞬間の絵（しおふき: 真上へ噴き上がる潮）
+        const cs = this.effects.castSprite(w.rules.moves[ev.move]!.effect);
+        const p = cs ? w.players.find((q) => q.id === ev.playerId) : undefined;
+        if (cs && p) this.addStrike(cs, p.x, p.y, cs.radius, cs.seconds);
+      } else if (ev.type === 'projectileHit') {
+        // 当たった所の絵（ぜったいれいど: 氷の像）
+        const hs = this.effects.hitSprite(w.rules.moves[ev.move]!.effect);
+        if (hs) this.addStrike(hs, ev.x, ev.y, hs.radius, hs.seconds);
       } else if (ev.type === 'playerLeft') {
         this.playerViews.get(ev.playerId)?.container.destroy();
         this.playerViews.delete(ev.playerId);
@@ -754,6 +763,15 @@ export class RunScene extends Phaser.Scene {
         this.resultAt = performance.now() + stageConfig.endDelaySeconds * 1000;
       }
     }
+  }
+
+  /** その場に決まった秒数だけ出す絵（使った瞬間の絵・当たった所の絵）。ボスの技が落ちた所の絵と同じ置き場に入れる */
+  private addStrike(spec: SpriteSpec, x: number, y: number, radius: number, seconds: number): void {
+    this.strikes.push({
+      item: { spec, x, y, radius, band: 0, dirX: 1, dirY: 0, length: 0, vx: 0, vy: 0, seed: this.strikes.length },
+      start: this.time.now / 1000,
+      seconds,
+    });
   }
 
   /** ためる光: 再使用の残りが決まった秒数を切った技があれば、その光（いちばん出す直前のもの） */
@@ -859,6 +877,8 @@ export class RunScene extends Phaser.Scene {
    */
   private shapeColorOf(pr: World['projectiles'], i: number, timeMs: number): { color: number; alpha: number } | null {
     if (pr.stage[i] === 3) return null;
+    // 範囲を塗らない技（天気: 画面じゅうに降る雪で見せる）
+    if (this.effects.hideShape(this.sim.world.rules.moves[pr.move[i]!]!.effect)) return null;
     // 稲妻の線は、ジグザグの稲妻だけを見せる（範囲を塗ると管のように見える）
     if (this.lightningMoves.has(pr.move[i]!) && pr.shape[i] === SHAPE_LINE) return null;
     let base = this.shapeColors[pr.move[i]!] ?? null;
@@ -1340,7 +1360,12 @@ export class RunScene extends Phaser.Scene {
     // 技のドット絵（技そのものだけ。効き方から出たものは今までどおり）
     this.moveSprites?.draw(pr, alpha, (i) => {
       const effect = world.rules.moves[pr.move[i]!]!.effect;
-      if (pr.stage[i] === 0) return this.effects.sprite(effect) ?? null;
+      if (pr.stage[i] === 0) {
+        // 技そのものの絵と、重ねるもう1枚（だいばくはつの端の炎）
+        const main = this.effects.sprite(effect);
+        const edge = this.effects.edgeSprite(effect);
+        return main && edge ? [main, edge] : (main ?? edge ?? null);
+      }
       // 回復の技（なまける・ドわすれ）の見た目だけの円（遅れて弾ける印と同じ stage 2）
       if (pr.stage[i] === 2 && world.rules.moves[pr.move[i]!]!.pattern === 'heal') return this.effects.sprite(effect) ?? null;
       // 効き方から出た外へ進む輪（じしんの続く揺れ）も、輪の絵の技なら同じ絵
@@ -1348,8 +1373,13 @@ export class RunScene extends Phaser.Scene {
         const sp = this.effects.sprite(effect);
         if (sp?.fit === 'ring') return sp;
       }
-      // 効き方から出た線（ハードプラントの突き出す根）
-      if (pr.stage[i] === 1 && pr.shape[i] === SHAPE_LINE) return this.effects.effectLineSprite(effect) ?? null;
+      // 効き方から出た線: 通った道に残る範囲（ストーンエッジの岩の亀裂）と、突き出す線（じわれの亀裂・ストーンエッジの岩）
+      if (pr.stage[i] === 1 && pr.shape[i] === SHAPE_LINE) {
+        if (pr.linger[i] === 1 && this.pathMoves.has(pr.move[i]!)) return this.effects.pathSprite(effect) ?? null;
+        return this.effects.effectLineSprite(effect) ?? null;
+      }
+      // 効き方から出た円・飛ぶもの（ブラストバーンの火の粉・ハードプラントの根・10まんボルトの周りの電気）
+      if (pr.stage[i] === 1 && pr.band[i] === 0) return this.effects.effectSprite(effect) ?? null;
       return null;
     });
     // ボスの範囲技が落ちた所の絵: 出てからの時間でコマを進め、最後の 3 割で薄くする
@@ -1361,6 +1391,14 @@ export class RunScene extends Phaser.Scene {
         return { ...s.item, elapsed, alpha: Math.min(1, (s.seconds - elapsed) / (s.seconds * 0.3)) };
       }),
     );
+    // 天気（こなゆき・ふぶき）: 出ている間、画面じゅうに雪を降らせる
+    const weathers = new Set<string>();
+    for (let i = 0; i < pr.count; i++) {
+      if (pr.stage[i] !== 0) continue;
+      const effect = world.rules.moves[pr.move[i]!]!.effect;
+      if (effectRecipes[effect]?.weather) weathers.add(effect);
+    }
+    this.effects.drawWeather(weathers, this.cameras.main.worldView, deltaMs);
     this.drawGhosts(world, alpha);
     this.drawBolts(world);
     this.drawScreenFlashes(world);

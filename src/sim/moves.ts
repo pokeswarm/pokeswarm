@@ -74,6 +74,16 @@ export interface SimMoveDef {
   readonly learners: readonly string[] | null;
   /** いつも効く技（passive）: レベルごとの効果の合計（[0] がレベル1）。ほかの技は空 */
   readonly passive: readonly Modifiers[];
+  /** 出した技が消えるまで次を出さない（ボルテッカー）。省略なら false */
+  readonly waitForEnd?: boolean;
+  /** lob（放物線）の落とす場所（しおふき・ヘドロばくだん）。省略なら向いている側へ放る */
+  readonly lobTarget?: 'random' | 'nearest';
+  /** scatter（置く）の数と大きさのばらつき（マグニチュード） */
+  readonly scatterJitter?: { readonly countMin: number; readonly sizeMin: number; readonly sizeMax: number };
+  /** sweep（なぎ払い）を片道だけにする（はたく） */
+  readonly sweepOnce?: boolean;
+  /** 飛ぶ弾を蛇行させる（ヘドロウェーブ）。振れ幅と波長（ワールドの単位） */
+  readonly snake?: { readonly amplitude: number; readonly wavelength: number };
 }
 
 /** 最小値で止める項目（足し続けても壊れないように） */

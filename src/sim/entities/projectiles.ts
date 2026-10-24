@@ -27,6 +27,20 @@ export const MOTION_STREAM = 7;
 export const MOTION_SWEEP = 8;
 /** うず（spiral）: 持ち主のまわりを angularSpeed で回りながら、半径 orbitRadius を毎秒 ox ずつ広げる */
 export const MOTION_SPIRAL = 9;
+/**
+ * 蛇行（snake）: 出した場所 (ox, oy) から速度 (vx, vy) で進みながら、進む向きの横へ 振れ幅 orbitRadius・角速度 angularSpeed（ラジアン/秒）で揺れる。
+ * 位置は出てからの時間で決まる（描画も同じ式で、通った道を描く）
+ */
+export const MOTION_SNAKE = 10;
+/** 広がって縮む輪（pulse）: 持ち主に付いていき、半径を ox から orbitRadius まで、残り時間の前半で広げ、後半で縮める */
+export const MOTION_PULSE = 11;
+
+/** 蛇行の、出てから t 秒の位置（出した場所からのずれ）。描画でも使う */
+export function snakeOffset(vx: number, vy: number, amplitude: number, omega: number, t: number): [number, number] {
+  const sp = Math.sqrt(vx * vx + vy * vy) || 1;
+  const side = amplitude * Math.sin(omega * t);
+  return [vx * t - (vy / sp) * side, vy * t + (vx / sp) * side];
+}
 
 /** 当たり判定の形: 円（半径 radius） */
 export const SHAPE_CIRCLE = 0;

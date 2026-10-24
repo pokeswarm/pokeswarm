@@ -574,6 +574,10 @@ export type CombatConfig = z.infer<typeof combatConfigSchema>;
  *   （おうふくビンタ）。行きと戻りの両方で当たる（当たり直しの間隔は duration の半分）
  * - eruption（爆炎の柱）: 自分を中心に count 方向へ、円の柱を stages 段に分けて、interval ごとに外へ向かって順に出す。
  *   いちばん外の段が range の距離。外の段ほど半径が sizeGrowth の割合ずつ大きい（ブラストバーン。作者の決定 2026年10月23日）
+ * - pulse（広がって縮む輪）: 自分を中心に、厚さ size の輪が range まで広がってから縮む（duration の間）。count 2 以上は interval ごとに続けて出す
+ *   （スパーク・ワイルドボルト。作者の決定 2026年10月25日）
+ * - weather（天気）: duration の間、自分の周り半径 size（画面くらい）の敵すべてに、当たり直しの間隔ごとに当たる（こなゆき・ふぶき。
+ *   作者の決定 2026年10月25日）。範囲は塗らず、画面に雪を降らせて見せる
  */
 export const MOVE_PATTERNS = [
   'nearest',
@@ -602,6 +606,8 @@ export const MOVE_PATTERNS = [
   'passive',
   'sweep',
   'spiral',
+  'pulse',
+  'weather',
 ] as const;
 export type MovePattern = (typeof MOVE_PATTERNS)[number];
 
@@ -691,16 +697,18 @@ export const moveLevelDeltaSchema = z
 export type MoveLevelDelta = z.infer<typeof moveLevelDeltaSchema>;
 
 const fxSize = { sizeMultiplier: z.number().positive(), powerMultiplier: z.number().nonnegative() };
+/** 蛇行: 進む向きに対して横へ、振れ幅 amplitude・波長 wavelength（どちらもワールドの単位）で揺れながら進む */
+const snakeSchema = z.object({ amplitude: z.number().positive(), wavelength: z.number().positive() });
 /**
  * 技の「効き方」（07_content_draft.md 22.4）。trigger で起こるときを決め、部品を組み合わせる。
  * - trigger: cast（技を使ったとき。自分の位置・向いている方向）、hit（当たり判定が初めて敵に当たったとき。当たった敵の位置）、
  *   end（当たり判定が消えたとき・落ちたとき。その位置）、every（当たり判定が残っている間 everySeconds ごと。その位置。
- *   流れ stream は流れが最初に当たる敵の位置）
+ *   流れ stream は流れが最初に当たる敵の位置）、spawn（当たり判定が現れたとき。その位置。遅れて現れる爆炎の柱は現れたとき）
  * - 大きさ・威力は、もとの当たり判定の大きさ（半径）・威力に掛ける倍率
  * - eachHit: 当たった敵ごとに（その敵の位置で）起こす（かみなり: 落雷を受けた敵それぞれから電気が連鎖する）
  */
 export const moveEffectSchema = z.object({
-  trigger: z.enum(['cast', 'hit', 'end', 'every', 'eachHit']),
+  trigger: z.enum(['cast', 'hit', 'end', 'every', 'eachHit', 'spawn']),
   everySeconds: z.number().positive().optional(),
   /** 起こる確率（0〜1。省略で必ず） */
   chance: z.number().min(0).max(1).optional(),
@@ -719,7 +727,12 @@ export const moveEffectSchema = z.object({
       path: z.boolean().optional(),
     })
     .optional(),
-  /** 分裂: 小さな弾が飛び散る（spreadDegrees は向きを中心にした広がり。360 で全方向） */
+  /**
+   * 分裂: 小さな弾が飛び散る（spreadDegrees は向きを中心にした広がり。360 で全方向）。
+   * jitter（0〜1）で向きと速さをばらつかせる（その場ごとに決まる。ブラストバーンの火の粉）。
+   * lob なら上へ放り上げて重さで落とす（いわなだれ: 当たると小さな岩が飛び散る）。snake なら蛇行して進む（ハードプラントの根）。
+   * pierce・hitIntervalSeconds を省くと、3体まで・同じ敵には1回
+   */
   split: z
     .object({
       ...fxSize,
@@ -728,6 +741,13 @@ export const moveEffectSchema = z.object({
       durationSeconds: z.number().positive(),
       spreadDegrees: z.number().positive().default(360),
       boomerang: z.boolean().default(false),
+      jitter: z.number().min(0).max(1).optional(),
+      lob: z.boolean().optional(),
+      snake: snakeSchema.optional(),
+      /** レベルが1上がるごとに延ばす持続（秒。ハードプラント: 強化で根が遠くまで伸びる） */
+      durationPerLevel: z.number().nonnegative().optional(),
+      pierce: pierceValue.optional(),
+      hitIntervalSeconds: z.number().positive().optional(),
     })
     .optional(),
   /** 連鎖: その場から近くの敵へ count 回飛び移る */
@@ -795,8 +815,21 @@ export const moveDefSchema = z.object({
    * ノーマルの技を、原作で覚えるポケモンたちに絞る（作者の決定 2026年10月24日。どのタイプの技も覚えるミュウは別）
    */
   learners: z.array(z.string()).optional(),
-  /** 跳ね返る技（bounce）を出す向き: 向いている方向から何度ずらすか（まっすぐだと、向かいの壁との間で同じ線を往復するだけになる） */
+  /** 跳ね返る技（bounce）を出す向き: 向いている方向から何度ずらすか（まっすぐだと、向かいの壁との間で同じ線を往復するだけになる）。spreadDegrees があれば、その幅でランダムにずらす */
   bounceAngle: z.number().optional(),
+  /** 出した技が消えるまで、次を出さない（再使用は少なくとも持続の長さ。ボルテッカー: 次のピカチュウが重ならない。作者の決定 2026年10月25日） */
+  waitForEnd: z.boolean().optional(),
+  /**
+   * lob（放物線）の落とす場所: random（自分の周り range の中のランダムな場所）・nearest（一番近い敵。いなければランダム）。
+   * どちらも真上寄りに投げ上げ、持続の秒数でちょうどその場所に落ちる（しおふき・ヘドロばくだん）。省略なら向いている側へ放る
+   */
+  lobTarget: z.enum(['random', 'nearest']).optional(),
+  /** scatter（置く）の数と大きさを、使うたびにランダムにする: 数は countMin〜count、半径は size × sizeMin〜sizeMax（マグニチュード） */
+  scatterJitter: z.object({ countMin: z.number().int().positive(), sizeMin: z.number().positive(), sizeMax: z.number().positive() }).optional(),
+  /** sweep（なぎ払い）を片道だけにする（はたく: 1回払う。おうふくビンタは行って戻る） */
+  sweepOnce: z.boolean().optional(),
+  /** 飛ぶ弾（cross）を蛇行させる（ヘドロウェーブ） */
+  snake: snakeSchema.optional(),
   /**
    * passive（いつも効く技）: レベルごとに足す効果（持ち物と同じ形）。[0] がレベル1で、レベル L ではここまでの合計が効く。
    * 数は最大レベル（levels の数 + 1）と同じ（作者の決定 2026年10月24日: ポリゴンの かくばる・テクスチャー）
@@ -1034,9 +1067,10 @@ const moveSpriteSpec = z.object({
   /**
    * circle（円に合わせて1枚）・line（線に 始まり・途中・終わり を並べる）・cone（扇形に1枚を引き伸ばす。かえんほうしゃ）・
    * ring（外へ進む帯の輪に沿って、途中の部品を並べる。じしんの地割れ）・
-   * front（扇形の向きの先に1枚を置く。大きさは扇の半径。ほのおのキバの牙・フレアドライブの炎）
+   * front（扇形の向きの先に1枚を置く。大きさは扇の半径。ほのおのキバの牙・フレアドライブの炎）・
+   * snake（蛇行して進むものの通った道に 途中 を並べ、先に 終わり を置く。太さは当たり判定の直径。ヘドロウェーブ・ハードプラントの根）
    */
-  fit: z.enum(['circle', 'line', 'cone', 'ring', 'front']),
+  fit: z.enum(['circle', 'line', 'cone', 'ring', 'front', 'snake']),
   size: z.number().positive().default(1),
   /** 絵の濃さ（煙など、下が少し透けてほしいもの） */
   alpha: z.number().min(0).max(1).default(1),
@@ -1045,10 +1079,16 @@ const moveSpriteSpec = z.object({
   rotate: z.enum(['none', 'velocity', 'spin']).default('none'),
   /** spin の回る速さ（度/秒） */
   spinDegPerSec: z.number().default(720),
-  /** line の途中の部品を、1枚ずつ違うコマで描く（はっぱカッター・はなびらのまい: 1枚ずつ向きが違って舞って見える。水流のように つなぎ目が大事な絵では使わない） */
+  /** line・ring・snake の途中の部品を、1枚ずつ違うコマで描く（はっぱカッター・はなびらのまい: 1枚ずつ向きが違って舞って見える。水流のように つなぎ目が大事な絵では使わない） */
   varyTiles: z.boolean().default(false),
   /** ring の部品を輪の向きに回さず、いつも立てて置く（うたうの音符: 回すと輪の上側で逆さになる） */
   upright: z.boolean().default(false),
+  /** circle の絵の、当たり判定の中心に合わせる高さ（0 = 絵の上端、1 = 下端）。地面から噴き上がる絵は、根元を中心に合わせる（ブラストバーン） */
+  originY: z.number().min(0).max(1).default(0.5),
+  /** 描く位置を毎フレーム、この大きさ（ワールドの単位）までランダムにずらす（揺れる地面。画面は揺らさない） */
+  shake: z.number().nonnegative().default(0),
+  /** snake: 先から後ろへ描く道の長さ（ワールドの単位）。0 なら出した場所から全部 */
+  tail: z.number().nonnegative().default(0),
 });
 
 export const effectRecipeSchema = z.object({
@@ -1087,6 +1127,26 @@ export const effectRecipeSchema = z.object({
   sprite: moveSpriteSpec.optional(),
   /** 効き方から出た線（ハードプラントの突き出す根）を、光の線の代わりにこのドット絵で描く */
   effectLineSprite: moveSpriteSpec.optional(),
+  /** 効き方から出た円・飛ぶもの（ブラストバーンの火の粉・ハードプラントの根・10まんボルトの周りの電気）を、このドット絵で描く */
+  effectSprite: moveSpriteSpec.optional(),
+  /** 通った道に残る範囲（ストーンエッジの岩の亀裂）を、このドット絵で描く（線に合わせる） */
+  pathSprite: moveSpriteSpec.optional(),
+  /** 技そのものに、もう1枚重ねる絵（だいばくはつ: 広がる爆発の端に、派手な炎の帯を輪に沿って並べる） */
+  edgeSprite: moveSpriteSpec.optional(),
+  /** 技を使った瞬間に、使ったポケモンの位置に seconds の間出す絵（しおふき: 真上へ噴き上がる潮）。radius はワールドの単位 */
+  castSprite: moveSpriteSpec.extend({ seconds: z.number().positive(), radius: z.number().positive() }).optional(),
+  /** 技が敵に当たった所に seconds の間出す絵（ぜったいれいど: 氷の像）。radius はワールドの単位 */
+  hitSprite: moveSpriteSpec.extend({ seconds: z.number().positive(), radius: z.number().positive() }).optional(),
+  /** 当たり判定の範囲を塗らない（天気: 画面全体なので、降る雪だけで見せる） */
+  hideShape: z.boolean().default(false),
+  /**
+   * 天気（こなゆき・ふぶき）: 技が出ている間、画面じゅうに粒を降らせる。perSecond は 1 秒に出す数、angle は真下から何度傾けるか
+   * （風で流れる）。tint は画面を薄く色づける色と濃さ
+   */
+  weather: particleSchema
+    .omit({ spread: true })
+    .extend({ perSecond: z.number().positive(), angle: z.number(), tint: z.object({ color: colorString, alpha: z.number().min(0).max(0.3) }).optional() })
+    .optional(),
   /**
    * ボス・伝説の範囲技が落ちたときのドット絵（作者の案 2026年10月24日。案 F）。落ちた範囲（円・輪・直線）に合わせて seconds の間出す。
    * 予告の赤い範囲はそのまま（避けやすさのため）

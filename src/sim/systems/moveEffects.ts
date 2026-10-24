@@ -3,7 +3,9 @@ import {
   MOTION_BOOMERANG,
   MOTION_FOLLOW,
   MOTION_LINEAR,
+  MOTION_LOB,
   MOTION_ORBIT,
+  MOTION_SNAKE,
   SHAPE_CIRCLE,
   SHAPE_LINE,
   type ProjectileSpawn,
@@ -179,22 +181,34 @@ function applyEffect(world: World, fx: MoveEffect, index: number, src: FxSource)
   if (fx.split) {
     const sp = fx.split;
     const spread = (Math.min(360, sp.spreadDegrees) * Math.PI) / 180;
+    // ばらつきは共有の乱数ではなく、時刻と位置から決める（どのブラウザでも同じ形になる）
+    const rand = (k: number, salt: number): number => hash01(world.seed, world.tick, Math.floor(src.x) * 7919 + Math.floor(src.y), 2000 + k * 7 + salt);
+    const pierce = sp.pierce === undefined ? 3 : sp.pierce === 'infinite' ? Infinity : sp.pierce;
     for (let k = 0; k < sp.count; k++) {
       // 360° なら等しい角度で一周、それ以外は向きを中心に広げる
-      const a = spread >= Math.PI * 2 ? angle0 + (k / sp.count) * Math.PI * 2 : angle0 + (sp.count === 1 ? 0 : (k / (sp.count - 1) - 0.5) * spread);
-      const vx = Math.cos(a) * sp.speed;
-      const vy = Math.sin(a) * sp.speed;
-      spawn(world, src, {
-        motion: sp.boomerang ? MOTION_BOOMERANG : MOTION_LINEAR,
-        vx,
-        vy,
-        ox: vx,
-        oy: vy,
+      const step = spread >= Math.PI * 2 ? (Math.PI * 2) / sp.count : sp.count === 1 ? 0 : spread / (sp.count - 1);
+      const a0 = spread >= Math.PI * 2 ? angle0 + (k / sp.count) * Math.PI * 2 : angle0 + (sp.count === 1 ? 0 : (k / (sp.count - 1) - 0.5) * spread);
+      const jitter = sp.jitter ?? 0;
+      const a = a0 + (rand(k, 1) - 0.5) * step * jitter;
+      const speed = sp.speed * (1 - 0.5 * jitter * rand(k, 2));
+      const vx = Math.cos(a) * speed;
+      const vy = Math.sin(a) * speed;
+      const common = {
         damage: src.damage * sp.powerMultiplier,
         radius: src.size * sp.sizeMultiplier,
-        life: sp.durationSeconds,
-        pierce: 3,
-      });
+        life: sp.durationSeconds + (sp.durationPerLevel ?? 0) * Math.max(0, src.level - 1),
+        pierce,
+        ...(sp.hitIntervalSeconds ? { hitIntervalTicks: ticks(sp.hitIntervalSeconds) } : {}),
+      };
+      if (sp.lob) {
+        // 上へ放り上げ、重さで落とす（横へは向きの cos の分だけ。いわなだれの小さな岩）
+        spawn(world, src, { ...common, motion: MOTION_LOB, vx: Math.cos(a) * speed * 0.5, vy: -speed * (0.7 + 0.3 * rand(k, 3)), angularSpeed: speed * 2.6 });
+      } else if (sp.snake) {
+        // 蛇行して進む（ハードプラントの根）。隣どうしで揺れの向きを逆にする
+        spawn(world, src, { ...common, motion: MOTION_SNAKE, vx, vy, ox: src.x, oy: src.y, orbitRadius: sp.snake.amplitude * (k % 2 === 0 ? 1 : -1), angularSpeed: (Math.PI * 2 * speed) / sp.snake.wavelength });
+      } else {
+        spawn(world, src, { ...common, motion: sp.boomerang ? MOTION_BOOMERANG : MOTION_LINEAR, vx, vy, ox: vx, oy: vy });
+      }
     }
   }
   if (fx.chain) chain(world, fx.chain, src);

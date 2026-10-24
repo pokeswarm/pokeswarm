@@ -63,6 +63,8 @@ export interface Zone {
   /** 上にいると受けるダメージ（1秒あたり。0.5 秒ごとに分けて受ける） */
   readonly damagePerSecond: number;
   readonly color: string;
+  /** 残した技の演出（data/effects/recipes.json。控えめな演出を残す） */
+  readonly effect: string;
 }
 
 export interface Hazard {

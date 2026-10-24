@@ -76,6 +76,8 @@ export class EffectRenderer {
   private readonly burstEmitters = new Map<string, Phaser.GameObjects.Particles.ParticleEmitter>();
   /** 軌跡のパーティクルを出す間隔の端数（レシピごと） */
   private readonly trailBudgets = new Map<string, number>();
+  /** 残る範囲の控えめな粒（レシピごと） */
+  private readonly lingerEmitters = new Map<string, Phaser.GameObjects.Particles.ParticleEmitter>();
   /** 演出をまとめる入れ物（まとめてドット絵風のフィルターを掛ける） */
   private readonly layer: Phaser.GameObjects.Layer;
   /** 角ばったドットにするフィルター（大きさはカメラの拡大率に合わせて変える） */
@@ -149,6 +151,36 @@ export class EffectRenderer {
     return this.recipe(id).burstFlash ?? null;
   }
 
+  /** 技が落ちた後に残る範囲の見た目（無ければ null） */
+  linger(id: string): EffectRecipe['linger'] | null {
+    return this.recipes[id]?.linger ?? null;
+  }
+
+  /**
+   * 残る範囲（効き方の puddle・ボスの技が残す床）から、控えめな粒を出す（毎フレーム）。
+   * 出す数は広さに比例させ、端数は確率で出す（見た目だけなので、乱数はシード付きでなくてよい）
+   */
+  drawLinger(items: readonly { recipeId: string; x: number; y: number; radius: number; line: { length: number; dirX: number; dirY: number } | null }[], deltaMs: number): void {
+    for (const it of items) {
+      const lg = this.recipes[it.recipeId]?.linger;
+      if (!lg) continue;
+      const area = it.line ? it.radius * 2 * it.line.length + Math.PI * it.radius * it.radius : Math.PI * it.radius * it.radius;
+      const expected = (Math.min(lg.maxPerSecond, (lg.perSecond * area) / 10000) * deltaMs) / 1000;
+      const n = Math.floor(expected) + (Math.random() < expected % 1 ? 1 : 0);
+      if (n === 0) continue;
+      const em = this.emitter(this.lingerEmitters, it.recipeId, lg, this.depth - 0.6);
+      for (let k = 0; k < n; k++) {
+        // 範囲の中のあちこち（円は面積が一様になるよう、半径は平方根で）
+        const a = Math.random() * Math.PI * 2;
+        const d = Math.sqrt(Math.random()) * it.radius;
+        const along = it.line ? Math.random() * it.line.length : 0;
+        const lx = it.line ? it.line.dirX * along : 0;
+        const ly = it.line ? it.line.dirY * along : 0;
+        em.emitParticleAt(it.x + lx + Math.cos(a) * d, it.y + ly + Math.sin(a) * d, 1);
+      }
+    }
+  }
+
   /** 持ち主の残像として飛ぶ技の見た目（無ければ null） */
   ownerGhost(id: string): EffectRecipe['ownerGhost'] | null {
     return this.recipe(id).ownerGhost ?? null;
@@ -191,6 +223,8 @@ export class EffectRenderer {
     hollow: (index: number) => boolean = () => false,
     /** 技そのもの（効き方から出たものでない） */
     isMain: (index: number) => boolean = () => true,
+    /** 技が落ちた後に残る範囲。レシピに linger があれば、軌跡の粒と芯を出さない（drawLinger が控えめな粒を出す） */
+    lingering: (index: number) => boolean = () => false,
   ): void {
     // 軌跡のパーティクルを出す数は、レシピごとの間隔で決める
     const trailCounts = new Map<string, number>();
@@ -216,6 +250,7 @@ export class EffectRenderer {
       const r = src.radius[i]!;
       const sector = sectorOf(i);
       const line = lineOf(i);
+      if (recipe.linger && lingering(i)) continue;
       if (trail) {
         const em = this.emitter(this.trailEmitters, recipeId, trail, this.depth - 0.5);
         const n = trailCountOf(recipeId, trail);

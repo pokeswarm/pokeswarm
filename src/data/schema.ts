@@ -1103,6 +1103,12 @@ export const effectRecipeSchema = z.object({
     .optional(),
   /** 発射体の軌跡に出すパーティクル */
   trail: particleSchema.extend({ intervalMs: z.number().positive() }).optional(),
+  /**
+   * 技が落ちた後に残る範囲（効き方の puddle・ボスの技が残す床）の見た目（作者の案 2026年10月24日）。
+   * 範囲の塗りは fillAlpha の濃さにうすくし、範囲の中のあちこちから控えめな粒を出す（水面のきらめき・残る火種など）。
+   * perSecond は 100×100 の広さあたり 1 秒に出す数（1つの範囲で maxPerSecond まで。広い範囲で多くなりすぎないように）。残る範囲では軌跡の粒（trail）と芯は出さない
+   */
+  linger: particleSchema.extend({ perSecond: z.number().positive(), maxPerSecond: z.number().positive().default(20), fillAlpha: z.number().min(0).max(1) }).optional(),
   /** 命中時 */
   impact: z
     .object({

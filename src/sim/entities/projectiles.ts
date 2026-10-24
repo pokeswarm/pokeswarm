@@ -78,6 +78,8 @@ export interface ProjectileSpawn {
   stage?: number;
   /** 印（stage 2）が弾けるときに使う、技の効き方の番号 */
   fxIndex?: number;
+  /** 技が落ちた後に残る範囲（効き方の puddle）。見た目だけに使う（控えめな演出を残す） */
+  linger?: boolean;
   /** 出番を待つもの（stage 3）が現れてから残る時間（秒） */
   armLife?: number;
   /** ノックバックの強さの上書き（ワールド単位/秒。マイナスで引き寄せる）。無ければ技の値 */
@@ -135,6 +137,8 @@ export class ProjectileStore {
   readonly fxTimer: Float64Array;
   readonly hitFired: Uint8Array;
   readonly knockback: Float64Array;
+  /** 残る範囲（1）。見た目だけに使う */
+  readonly linger: Uint8Array;
 
   constructor(
     readonly capacity: number,
@@ -178,6 +182,7 @@ export class ProjectileStore {
     this.fxTimer = new Float64Array(capacity);
     this.hitFired = new Uint8Array(capacity);
     this.knockback = new Float64Array(capacity);
+    this.linger = new Uint8Array(capacity);
   }
 
   add(p: ProjectileSpawn): number {
@@ -217,6 +222,7 @@ export class ProjectileStore {
     this.fxTimer[i] = 0;
     this.hitFired[i] = 0;
     this.knockback[i] = p.knockback ?? NaN;
+    this.linger[i] = p.linger ? 1 : 0;
     return i;
   }
 
@@ -259,6 +265,7 @@ export class ProjectileStore {
     this.fxTimer[i] = this.fxTimer[last]!;
     this.hitFired[i] = this.hitFired[last]!;
     this.knockback[i] = this.knockback[last]!;
+    this.linger[i] = this.linger[last]!;
     const m = this.hitMemory;
     this.hitIds.copyWithin(i * m, last * m, (last + 1) * m);
     this.hitTicks.copyWithin(i * m, last * m, (last + 1) * m);

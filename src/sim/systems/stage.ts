@@ -316,7 +316,7 @@ function strikeHazards(world: World): void {
     if (move?.leaves) {
       const lv = move.leaves;
       const add = (x: number, y: number): void => {
-        world.zones.push({ x, y, radius: hz.radius, ticksLeft: Math.round(lv.seconds / world.dt), slowPct: lv.slowPct, damagePerSecond: lv.damagePerSecond, color: lv.color });
+        world.zones.push({ x, y, radius: hz.radius, ticksLeft: Math.round(lv.seconds / world.dt), slowPct: lv.slowPct, damagePerSecond: lv.damagePerSecond, color: lv.color, effect: move.effect });
       };
       if (hz.shape === 'line') for (let d = 0; d <= hz.length; d += hz.radius * 1.5) add(hz.x + hz.dirX * d, hz.y + hz.dirY * d);
       else add(hz.x, hz.y);

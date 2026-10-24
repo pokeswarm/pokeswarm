@@ -861,7 +861,12 @@ export class RunScene extends Phaser.Scene {
     if (pr.stage[i] === 3) return null;
     // 稲妻の線は、ジグザグの稲妻だけを見せる（範囲を塗ると管のように見える）
     if (this.lightningMoves.has(pr.move[i]!) && pr.shape[i] === SHAPE_LINE) return null;
-    const base = this.shapeColors[pr.move[i]!] ?? null;
+    let base = this.shapeColors[pr.move[i]!] ?? null;
+    // 残る範囲は、塗りをうすくする（控えめな粒で見せる）
+    if (base && pr.linger[i] === 1) {
+      const lg = this.effects.linger(this.sim.world.rules.moves[pr.move[i]!]!.effect);
+      if (lg) base = { color: base.color, alpha: lg.fillAlpha };
+    }
     if (this.flashing(i, pr)) {
       const f = this.flashMoves.get(pr.move[i]!)!;
       return { color: hexColor(f.colors[Math.floor(timeMs / f.periodMs) % f.colors.length]!), alpha: f.alpha };
@@ -956,7 +961,8 @@ export class RunScene extends Phaser.Scene {
     // 範囲技が残した床（凍った床・燃える地面）。消える前は薄くする
     for (const z of this.sim.world.zones) {
       const fade = Math.min(1, z.ticksLeft / 30);
-      g.fillStyle(hexColor(z.color), 0.3 * fade).fillCircle(z.x, z.y, z.radius);
+      // 控えめな粒を出す技は、塗りをうすくする
+      g.fillStyle(hexColor(z.color), (this.effects.linger(z.effect)?.fillAlpha ?? 0.3) * fade).fillCircle(z.x, z.y, z.radius);
     }
   }
 
@@ -1315,7 +1321,22 @@ export class RunScene extends Phaser.Scene {
       // 外へ進む帯と、通った道に残る範囲には芯を描かない（道が光の線に見えてしまう）
       (i) => pr.band[i]! > 0 || (pr.stage[i] === 1 && pr.shape[i] === SHAPE_LINE && this.pathMoves.has(pr.move[i]!)) || this.flashing(i, pr) || this.isLightning(world, i),
       (i) => pr.stage[i] === 0,
+      (i) => pr.linger[i] === 1,
     );
+    // 技が落ちた後に残る範囲（効き方の puddle・ボスの技が残す床）から、控えめな粒を出す（作者の案 2026年10月24日）
+    const lingerItems: Parameters<EffectRenderer['drawLinger']>[0][number][] = [];
+    for (let i = 0; i < pr.count; i++) {
+      if (pr.linger[i] !== 1) continue;
+      lingerItems.push({
+        recipeId: world.rules.moves[pr.move[i]!]!.effect,
+        x: pr.x[i]!,
+        y: pr.y[i]!,
+        radius: pr.radius[i]!,
+        line: pr.shape[i] === SHAPE_LINE ? { length: pr.length[i]!, dirX: pr.dirX[i]!, dirY: pr.dirY[i]! } : null,
+      });
+    }
+    for (const z of world.zones) lingerItems.push({ recipeId: z.effect, x: z.x, y: z.y, radius: z.radius, line: null });
+    this.effects.drawLinger(lingerItems, deltaMs);
     // 技のドット絵（技そのものだけ。効き方から出たものは今までどおり）
     this.moveSprites?.draw(pr, alpha, (i) => {
       const effect = world.rules.moves[pr.move[i]!]!.effect;

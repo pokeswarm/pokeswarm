@@ -167,7 +167,7 @@ function applyEffect(world: World, fx: MoveEffect, index: number, src: FxSource)
   }
   if (fx.puddle) {
     const pd = fx.puddle;
-    const base = { damage: src.damage * pd.powerMultiplier, radius: src.size * pd.sizeMultiplier, life: pd.durationSeconds, hitIntervalTicks: ticks(pd.hitIntervalSeconds) };
+    const base = { damage: src.damage * pd.powerMultiplier, radius: src.size * pd.sizeMultiplier, life: pd.durationSeconds, hitIntervalTicks: ticks(pd.hitIntervalSeconds), linger: true };
     if (pd.path) {
       pathPuddle(world, src, base);
     } else if (pd.alongSpacing && src.length > 0) {

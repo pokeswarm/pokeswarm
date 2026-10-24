@@ -1341,6 +1341,8 @@ export class RunScene extends Phaser.Scene {
     this.moveSprites?.draw(pr, alpha, (i) => {
       const effect = world.rules.moves[pr.move[i]!]!.effect;
       if (pr.stage[i] === 0) return this.effects.sprite(effect) ?? null;
+      // 回復の技（なまける・ドわすれ）の見た目だけの円（遅れて弾ける印と同じ stage 2）
+      if (pr.stage[i] === 2 && world.rules.moves[pr.move[i]!]!.pattern === 'heal') return this.effects.sprite(effect) ?? null;
       // 効き方から出た外へ進む輪（じしんの続く揺れ）も、輪の絵の技なら同じ絵
       if (pr.stage[i] === 1 && pr.band[i]! > 0) {
         const sp = this.effects.sprite(effect);

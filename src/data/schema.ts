@@ -1047,6 +1047,8 @@ const moveSpriteSpec = z.object({
   spinDegPerSec: z.number().default(720),
   /** line の途中の部品を、1枚ずつ違うコマで描く（はっぱカッター・はなびらのまい: 1枚ずつ向きが違って舞って見える。水流のように つなぎ目が大事な絵では使わない） */
   varyTiles: z.boolean().default(false),
+  /** ring の部品を輪の向きに回さず、いつも立てて置く（うたうの音符: 回すと輪の上側で逆さになる） */
+  upright: z.boolean().default(false),
 });
 
 export const effectRecipeSchema = z.object({

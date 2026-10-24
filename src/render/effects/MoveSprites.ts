@@ -293,7 +293,7 @@ export class MoveSprites {
         const frame = fk('middle', this.frameOf(spec.id, 'middle', elapsed));
         for (let k = 0; k < n; k++) {
           const ang = (k / n) * Math.PI * 2;
-          put(frame, x + Math.cos(ang) * rc, y + Math.sin(ang) * rc, ang + Math.PI / 2, sx, sy, a);
+          put(frame, x + Math.cos(ang) * rc, y + Math.sin(ang) * rc, spec.upright ? 0 : ang + Math.PI / 2, spec.upright ? sy : sx, sy, a);
         }
         continue;
       }

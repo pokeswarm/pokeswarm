@@ -1454,6 +1454,178 @@ function dragonFlame(): SpriteOut {
   return { ...sp, palette: ['#1a0b3d', '#4527a0', '#7c4dff', '#b39ddb', '#ede7f6'] };
 }
 
+// ---------------- 光の演出だけだった技（作者の依頼 2026年10月24日） ----------------
+/** 五角の星の中か（論理の座標。中心 cx, cy・外の半径 R）。中ほど 1 に近い値、外は -1 */
+function starDepth(x: number, y: number, cx: number, cy: number, R: number, turn = 0): number {
+  const a = Math.atan2(y - cy, x - cx) + Math.PI / 2 + turn;
+  const d = Math.hypot(x - cx, y - cy) / R;
+  const seg = (Math.PI * 2) / 5;
+  const off = Math.abs((((a % seg) + seg) % seg) - seg / 2) / (seg / 2);
+  const rr = 0.42 + 0.56 * off ** 1.4;
+  return d > rr ? -1 : 1 - d / rr;
+}
+
+/**
+ * こうそくスピン: 扇形（右向き、左端が自分）を回転の向き（下）へなぎ払う水の筋。
+ * 筋は自分を中心にした弧で、回る向きの先（下）ほど明るく、後ろ（上）はしぶきになって消える。コマで筋が先へ流れる
+ */
+function spinSpray(): SpriteOut {
+  const W = 24;
+  const H = 24;
+  const palette = ['#01395e', '#0288d1', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    fill(blank(W, H), (x, y) => {
+      const t = x / (W - 1);
+      const s = (y - (H - 1) / 2) / ((H - 1) / 2);
+      if (t < 0.12 || t > 0.98 || Math.abs(s) > t * 0.98) return -1;
+      // 扇の中の向き（−1 後ろ 〜 1 先）
+      const side = s / Math.max(0.05, t);
+      for (const [k, rad] of [0.45, 0.68, 0.9].entries()) {
+        // 先ほど太く、後ろへ細くなる。弧は先へ行くほど外へふくらむ（なぎ払う刃の形）
+        const w = 0.012 + (side + 1) * 0.022;
+        const dist = Math.abs(t - rad + (1 - side * side) * 0.06);
+        if (dist > w) continue;
+        // 後ろへ行くほど途切れる（コマで途切れる所が先へ流れる）
+        const n = hash(Math.floor(side * 8 - f * 2), k, 900);
+        if (side < -0.2 && n < (-0.2 - side) * 1.2) return -1;
+        const c = dist / w;
+        return side < -0.3 ? 2 : c < 0.4 ? 4 : c < 0.75 ? 3 : 2;
+      }
+      // 先のふちに散るしぶき
+      if (side > 0.75 && t > 0.4 && hash(Math.floor(x), Math.floor(y), 910 + f) < 0.12) return 3;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * うたう: 外へ広がる輪に並べる音符（横 = 輪の向き、縦 = 外へ向かう向き。下が外）。
+ * 1枚に8分音符が1つ。コマで上下にはずむ
+ */
+function noteRing(): SpriteOut {
+  const W = 12;
+  const H = 12;
+  // 0 輪郭（濃い紫）・1 桃・2 うす桃・3 白
+  const palette = ['#4a148c', '#ec407a', '#f8bbd0', '#ffffff'];
+  const frames = [0, 1, 2, 1].map((f) => {
+    const bob = (f - 1) * 0.8;
+    const g = fill(blank(W, H), (x, y) => {
+      const yy = y - bob;
+      // 玉（少し傾いた楕円）
+      const hx = x - 4.5;
+      const hy = yy - 8;
+      if (((hx + hy * 0.4) / 2.1) ** 2 + (hy / 1.5) ** 2 < 1) return hx + hy < -1 ? 2 : 1;
+      // 棒
+      if (Math.abs(x - 6.3) < 0.6 && yy > 2 && yy < 8) return 1;
+      // 旗
+      if (x > 6.3 && x < 9.2 && yy > 2 + (x - 6.3) * 0.6 && yy < 4.2 + (x - 6.3) * 0.9) return 2;
+      return -1;
+    });
+    return outline(g, 0);
+  });
+  return { palette, frameMs: 120, parts: { middle: frames.map(toRows) } };
+}
+
+/** ハイパーボイス: 自分を中心に、何重にも外へ広がる音の波（途切れた輪。コマで外へ進み、4コマで1つぶん進んでつながる） */
+function soundWaves(): SpriteOut {
+  const palette = ['#880e4f', '#ec407a', '#f8bbd0', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(40, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.98 || d < 0.12) return -1;
+      const a = Math.atan2(v, u);
+      const ph = (d - f * 0.0625) / 0.25;
+      const k = ph - Math.round(ph);
+      // 外のふちで切れかけた輪は描かない（点々が残る）
+      if (Math.abs(k) > 0.11 || Math.round(ph) * 0.25 + f * 0.0625 > 0.92) return -1;
+      // 輪を6つに区切った「)))」の形（輪ごとに区切りをずらす）
+      const ring = Math.round(ph);
+      const seg = (((a / (Math.PI * 2)) * 6 + ring * 0.5) % 1 + 1) % 1;
+      if (seg < 0.14) return -1;
+      // 芯は明るく、ふちは桃色（草の上で白く沈まないように）。真ん中に近い輪ほど白い
+      if (Math.abs(k) < 0.04) return d < 0.45 ? 3 : 2;
+      return 1;
+    }, 0, -1),
+  );
+  return { palette, frameMs: 75, parts: { main: frames.map(toRows) } };
+}
+
+/** なまける: 体のまわりから立ちのぼる緑の十字と光の粒（コマで上へ流れ、4コマでつながる） */
+function healRise(): SpriteOut {
+  const palette = ['#1b5e20', '#43a047', '#a5d6a7', '#ffffff'];
+  const r = rng(77);
+  const motes = Array.from({ length: 7 }, (_, k) => ({ x: -0.75 + (k / 6) * 1.5 + (r() - 0.5) * 0.15, ph: r(), plus: k % 2 === 0 }));
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(28, (u, v) => {
+      for (const m of motes) {
+        const p = (m.ph + f / 4) % 1;
+        const my = 0.8 - p * 1.6;
+        const sz = 0.16 * Math.sin(p * Math.PI) + 0.04;
+        if (m.plus) {
+          const dx = Math.abs(u - m.x);
+          const dy = Math.abs(v - my);
+          if ((dx < sz && dy < sz * 0.36) || (dy < sz && dx < sz * 0.36)) return dx < sz * 0.36 && dy < sz * 0.36 ? 3 : 2;
+        } else if (Math.hypot(u - m.x, v - my) < sz * 0.45) return 3;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
+}
+
+/** ドわすれ: 頭の上をぐるぐる回る3つの「？」と、軌道に沿って光る粒（コマで 1/3 周ずつ回ってつながる） */
+function amnesiaSwirl(): SpriteOut {
+  const palette = ['#0d2b5c', '#42a5f5', '#bbdefb', '#ffffff'];
+  // 「？」の形（5 × 7）
+  const Q = ['.###.', '#...#', '....#', '...#.', '..#..', '.....', '..#..'];
+  const S = 32;
+  const frames = [0, 1, 2, 3].map((f) => {
+    const g = fill(blank(S, S), (x, y) => {
+      const u = (x - (S - 1) / 2) / (S / 2);
+      const v = (y - (S - 1) / 2) / (S / 2);
+      for (let k = 0; k < 3; k++) {
+        const a = ((k + f / 4) / 3) * Math.PI * 2;
+        // 上から見た楕円の軌道（頭の上を回る）
+        const cx = (S - 1) / 2 + Math.cos(a) * S * 0.32 - 2;
+        const cy = (S - 1) / 2 + Math.sin(a) * S * 0.16 - S * 0.18 - 3;
+        const qx = Math.floor(x - cx);
+        const qy = Math.floor(y - cy);
+        if (Q[qy]?.[qx] === '#') return Math.sin(a) > 0 ? 3 : 2;
+      }
+      // 軌道に沿って光る小さな粒（コマで回る）
+      for (let k = 0; k < 6; k++) {
+        const a = ((k + f / 4 + 0.5) / 6) * Math.PI * 2;
+        if (Math.hypot(u - Math.cos(a) * 0.62, v - Math.sin(a) * 0.32 + 0.36) < 0.035) return 2;
+      }
+      return -1;
+    });
+    return outline(g, 0);
+  });
+  return { palette, frameMs: 140, parts: { main: frames.map(toRows) } };
+}
+
+/** とっておき: 外へ広がる輪に並べる、虹色の星（1枚に大小2つ。コマで色が順に変わる） */
+function rainbowStars(): SpriteOut {
+  const W = 14;
+  const H = 12;
+  // 0 輪郭・1〜6 虹の色・7 白
+  const palette = ['#3a1d4a', '#ff5252', '#ffab40', '#ffee58', '#69f0ae', '#40c4ff', '#e040fb', '#ffffff'];
+  const frames = [0, 1, 2, 3, 4, 5].map((f) => {
+    const g = fill(blank(W, H), (x, y) => {
+      const big = starDepth(x, y, 4.5, 6.5, 4.4, f * 0.25);
+      if (big >= 0) return big > 0.6 ? 7 : 1 + (f % 6);
+      const small = starDepth(x, y, 11, 3.5, 2.6, -f * 0.3);
+      if (small >= 0) return small > 0.6 ? 7 : 1 + ((f + 3) % 6);
+      // きらめく点
+      if (hash(Math.floor(x), Math.floor(y), 950 + f) < 0.04) return 7;
+      return -1;
+    });
+    return outline(g, 0);
+  });
+  return { palette, frameMs: 60, parts: { middle: frames.map(toRows) } };
+}
+
 /** 自作の絵であることの表記（data/render/move-sprites.json の credit） */
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
@@ -1527,6 +1699,12 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'sleep-cloud': () => sleepCloud(),
     'zap-orb': () => zapOrb(),
     'dragon-flame': () => dragonFlame(),
+    'spin-spray': () => spinSpray(),
+    'note-ring': () => noteRing(),
+    'sound-waves': () => soundWaves(),
+    'heal-rise': () => healRise(),
+    'amnesia-swirl': () => amnesiaSwirl(),
+    'rainbow-stars': () => rainbowStars(),
 };
 
 /** 絵の名前の一覧 */

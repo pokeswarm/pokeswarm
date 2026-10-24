@@ -236,12 +236,15 @@ if (stageConfig.legendary) {
     check(enemiesConfig.kinds.find((k) => k.id === id)?.rank === 'legendary', `data/game/stage.json の伝説 "${id}" が data/game/enemies.json に rank: "legendary" でありません`);
   }
   for (const id of stageConfig.legendary.moves) check(stageMoveIds.has(id), `data/game/stage.json の伝説の範囲技 "${id}" がありません`);
-  // 条件つきの候補（色違いの御三家）: 伝説の敵で、条件の実績があること
-  for (const x of stageConfig.legendary.extraKinds) {
-    check(enemiesConfig.kinds.find((k) => k.id === x.kind)?.rank === 'legendary', `data/game/stage.json の伝説の条件つきの候補 "${x.kind}" が data/game/enemies.json に rank: "legendary" でありません`);
-    check(achievementsConfig.achievements.some((a) => a.id === x.achievement), `data/game/stage.json の伝説 "${x.kind}" の条件の実績 "${x.achievement}" がありません`);
+  // 相性で選ぶ候補（色違いの御三家）: 伝説の敵で、条件の実績があること
+  const counter = stageConfig.legendary.counter;
+  for (const id of counter?.kinds ?? []) {
+    check(enemiesConfig.kinds.find((k) => k.id === id)?.rank === 'legendary', `data/game/stage.json の伝説の相性で選ぶ候補 "${id}" が data/game/enemies.json に rank: "legendary" でありません`);
   }
-  const legendaryKinds = [...stageConfig.legendary.kinds, ...stageConfig.legendary.extraKinds.map((x) => x.kind)];
+  for (const id of counter?.achievements ?? []) {
+    check(achievementsConfig.achievements.some((a) => a.id === id), `data/game/stage.json の伝説の相性で選ぶ候補の条件の実績 "${id}" がありません`);
+  }
+  const legendaryKinds = [...stageConfig.legendary.kinds, ...(counter?.kinds ?? [])];
   for (const [kind, set] of Object.entries(stageConfig.legendary.moveSets)) {
     check(legendaryKinds.includes(kind), `data/game/stage.json の伝説ごとの技の "${kind}" が伝説の候補にありません`);
     for (const id of set.moves) check(stageMoveIds.has(id), `data/game/stage.json の伝説 "${kind}" の範囲技 "${id}" がありません`);

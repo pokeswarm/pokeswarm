@@ -238,10 +238,9 @@ export class RunScene extends Phaser.Scene {
     const roster: RoomPlayer[] = this.coop?.players ?? [
       { id: HOST_PLAYER_ID, pokemon: this.pokemon, upgrades: session.store.current.upgrades, achievements: session.store.current.achievements, startItem: this.startItem, shiny: this.shiny },
     ];
-    // 伝説戦の条件つきの候補（色違いの御三家）: 参加者のだれかが実績を達成していれば足す（どのブラウザでも同じ一覧）
-    for (const x of rules.stage.legendary?.extraKinds ?? []) {
-      if (roster.some((r) => r.achievements.includes(x.achievement))) this.sim.world.legendaryExtras.push(x.kind);
-    }
+    // 伝説戦の相性で選ぶ候補（色違いの御三家）: 参加者のだれかが条件の実績を達成していれば足す（どのブラウザでも同じ）
+    const counter = rules.stage.legendary?.counter;
+    this.sim.world.legendaryCounter = !!counter && roster.some((r) => counter.achievements.some((a) => r.achievements.includes(a)));
     // 実績の報酬（07 23・24章）: 各自の達成した実績から、解放した持ち物・特殊なバフを計算する。協力プレイの経験値は部屋の全員に
     const perksOf = new Map(roster.map((r) => [r.id, achievementPerks(achievementsConfig, r.achievements)]));
     const coopXpPct = role === 'solo' ? 0 : Math.max(0, ...[...perksOf.values()].map((x) => x.coopXpPct));

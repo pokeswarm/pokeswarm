@@ -434,5 +434,5 @@ pokeswarm/
 
 - 記録（`src/meta/runRecorder.ts`）: `reached.<ポケモン>`・`bestLevel.<ポケモン>` を最高記録として足した。`distinctClears`・`uniqueKinds` は `refreshDerivedStats`（`src/meta/progress.ts`）がラン終了時に `clears.<ポケモン>`・`derived.<技>` から数え直す。
 - 最初の持ち物（`src/meta/loadoutOptions.ts`・`src/scenes/loadoutOptionsPanel.ts`）: 条件は `achievements.json` の `startItem.clears`。候補はレベルアップと同じ判定（`itemFits`。解放済み・系統・タイプ・一緒に持てない物）。前回選んだものはポケモンごとにブラウザに覚える。ランの始めに `itemNew` として持たせる（RunScene でもう一度 `itemFits` を確かめる）。
-- 色違い: 実績の報酬 `reward.shiny`（系統のキー）。スプライトのキーは `<キー>-shiny`（進化しても `-shiny` を付けて読む）。敵の `shiny: true` は名前を「色違いの〇〇」にする。伝説戦の条件つきの候補は `stage.json` の `legendary.extraKinds`（参加者のだれかが実績を達成していれば `world.legendaryExtras` に入れ、`kinds` と同じ重みで選ぶ）。
+- 色違い: 実績の報酬 `reward.shiny`（系統のキー）。スプライトのキーは `<キー>-shiny`（進化しても `-shiny` を付けて読む）。敵の `shiny: true` は名前を「色違いの〇〇」にする。伝説戦の相性で選ぶ候補は `stage.json` の `legendary.counter`（参加者のだれかが条件の実績のどれかを達成していれば `world.legendaryCounter`。伝説戦を始めるときに `counterPick` が、プレイヤーごとの「向こうのタイプがこちらに効く倍率 ÷ こちらのタイプが向こうに効く倍率」の合計が一番大きい1体を選び、`kinds` と同じ重みで足す）。
 - 協力プレイ: 待合室の参加者に `startItem`・`shiny` を足した（`members/<番号>/startItem`・`shiny`。開始時の `started` にも入れる）。色違いのスプライトは開始するときに読み込む。

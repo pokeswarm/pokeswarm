@@ -476,9 +476,10 @@ export const stageConfigSchema = z.object({
       /** 第2段階（作者の決定 2026年10月23日）: HP が hpRatio を切ったら「DANGER」をもう一度出し、技の間隔を短くし、doubleChance の確率で2つの技を同時に使う */
       enrage: z.object({ hpRatio: z.number().gt(0).lt(1), moveIntervalSeconds: z.number().positive(), doubleChance: z.number().min(0).max(1) }).optional(),
       /**
-       * 条件つきの候補（作者の決定 2026年10月24日: 色違いの御三家）。ランの参加者のだれかが achievement を達成していれば、kinds に足す
+       * 相性で選ぶ候補（作者の決定 2026年10月24日: 色違いの御三家）。ランの参加者のだれかが achievements のどれかを達成していれば、
+       * kinds のうち、参加者のポケモンに一番不利な1体（こちらの技が通りにくく、向こうの技がよく効く）を候補に足す
        */
-      extraKinds: z.array(z.object({ kind: z.string().min(1), achievement: z.string().min(1) })).default([]),
+      counter: z.object({ kinds: z.array(z.string().min(1)).min(1), achievements: z.array(z.string().min(1)).min(1) }).optional(),
     })
     .nullable(),
   swarms: z.array(swarmSchema).default([]),

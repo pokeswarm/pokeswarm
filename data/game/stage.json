@@ -456,20 +456,18 @@
       "moveIntervalSeconds": 1.1,
       "doubleChance": 0.35
     },
-    "extraKinds": [
-      {
-        "kind": "shiny-charizard",
-        "achievement": "clear-charmander"
-      },
-      {
-        "kind": "shiny-venusaur",
-        "achievement": "clear-bulbasaur"
-      },
-      {
-        "kind": "shiny-blastoise",
-        "achievement": "clear-squirtle"
-      }
-    ]
+    "counter": {
+      "kinds": [
+        "shiny-charizard",
+        "shiny-venusaur",
+        "shiny-blastoise"
+      ],
+      "achievements": [
+        "clear-charmander",
+        "clear-bulbasaur",
+        "clear-squirtle"
+      ]
+    }
   },
   "swarms": [
     {

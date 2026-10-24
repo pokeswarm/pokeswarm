@@ -455,6 +455,33 @@ export function checkRunEnd(world: World): void {
   if (world.requiredTotal > 0 && world.tick >= Math.round(world.rules.stage.durationSeconds / world.dt)) endRun(world, 'fail');
 }
 
+/**
+ * 参加者のポケモンに一番不利な敵（作者の決定 2026年10月24日: 弱点を突かれると強敵の感じが薄れる。ふだん選ばれにくいノーマルの技が活きる）。
+ * プレイヤーごとに「向こうのタイプの技がこちらに効く倍率 ÷ こちらのタイプの技が向こうに効く倍率（タイプの平均）」を足し、一番大きいもの。同じなら先のもの
+ */
+export function counterPick(world: World, ids: readonly string[]): string {
+  const chart = world.rules.types.chart;
+  const eff = (atk: number, def: readonly number[]): number => def.reduce((m, d) => m * (chart[atk]?.[d] ?? 1), 1);
+  let best = ids[0]!;
+  let bestScore = -Infinity;
+  for (const id of ids) {
+    const kind = world.rules.enemies.kinds.find((k) => k.id === id);
+    if (!kind) continue;
+    let score = 0;
+    for (const p of world.players) {
+      if (p.types.length === 0) continue;
+      const offense = p.types.reduce((sum, t) => sum + eff(t, kind.types), 0) / p.types.length;
+      const defense = Math.max(...kind.types.map((t) => eff(t, p.types)));
+      score += defense / Math.max(offense, 0.125);
+    }
+    if (score > bestScore) {
+      best = id;
+      bestScore = score;
+    }
+  }
+  return best;
+}
+
 /** クリア: 確率で伝説戦を始める。始めないならランを終える */
 function startLegendaryOrClear(world: World): void {
   const cfg = world.rules.stage.legendary;
@@ -462,8 +489,9 @@ function startLegendaryOrClear(world: World): void {
     endRun(world, 'clear');
     return;
   }
-  // 条件つきの候補（色違いの御三家）も同じ重みで選ぶ
-  const pool = [...cfg.kinds, ...world.legendaryExtras];
+  // 相性で選ぶ候補（色違いの御三家）は、参加者に一番不利な1体を、ほかの伝説と同じ重みで足す
+  const pool = [...cfg.kinds];
+  if (world.legendaryCounter && cfg.counter) pool.push(counterPick(world, cfg.counter.kinds));
   const id = pool[world.rng.int(pool.length)]!;
   const kind = world.rules.enemies.kinds.findIndex((k) => k.id === id);
   if (kind === -1) {

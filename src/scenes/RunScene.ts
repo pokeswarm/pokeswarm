@@ -377,8 +377,8 @@ export class RunScene extends Phaser.Scene {
     this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));
     this.effects = new EffectRenderer(this, effectRecipes, depths.effects, spriteRender.effectPixel);
     // 技のドット絵は光の演出の少し下（光の粒が上に重なる）
-    this.moveSprites = new MoveSprites(this, moveSprites, depths.effects - 0.1);
-    this.strikeSprites = new MoveSprites(this, moveSprites, depths.effects - 0.05);
+    this.moveSprites = new MoveSprites(this, moveSprites, depths.effects - 0.1, spriteRender.dot);
+    this.strikeSprites = new MoveSprites(this, moveSprites, depths.effects - 0.05, spriteRender.dot);
     this.strikes = [];
     const shape = spriteRender.hitShape;
     this.hitShapes = new HitShapes(this, depths.hitShapes, shape);
@@ -649,6 +649,9 @@ export class RunScene extends Phaser.Scene {
     const cam = this.cameras.main;
     cam.setViewport(0, 0, width, height);
     cam.setZoom(height / c.viewHeight);
+    // 光の演出・当たり判定の塗りの1ドットも、拡大率に合わせてワールドの dot にそろえる
+    this.effects?.setZoom(cam.zoom);
+    this.hitShapes?.setZoom(cam.zoom);
   }
 
   /**

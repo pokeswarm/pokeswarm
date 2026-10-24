@@ -78,6 +78,9 @@ export class EffectRenderer {
   private readonly trailBudgets = new Map<string, number>();
   /** 演出をまとめる入れ物（まとめてドット絵風のフィルターを掛ける） */
   private readonly layer: Phaser.GameObjects.Layer;
+  /** 角ばったドットにするフィルター（大きさはカメラの拡大率に合わせて変える） */
+  private blocky: Phaser.Filters.Blocky | null = null;
+  private readonly pixelSize: number;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -85,6 +88,7 @@ export class EffectRenderer {
     private readonly depth: number,
     pixel: { size: number; colorSteps: number; alphaSteps: number } = { size: 0, colorSteps: 2, alphaSteps: 2 },
   ) {
+    this.pixelSize = pixel.size;
     ensureGlowTexture(scene);
     ensureCoreTexture(scene);
     // 演出は光なので、まとめた絵を背景に足し合わせる（中で加算した色が、透明の上で暗く濁らないように）
@@ -93,9 +97,16 @@ export class EffectRenderer {
     if (pixel.size > 0 && scene.renderer.type === Phaser.WEBGL) {
       this.layer.enableFilters();
       const f = this.layer.filters!.internal;
-      f.addBlocky({ size: pixel.size });
+      this.blocky = f.addBlocky({ size: pixel.size });
       f.addQuantize({ steps: [pixel.colorSteps, pixel.colorSteps, pixel.colorSteps, pixel.alphaSteps] });
     }
+  }
+
+  /** カメラの拡大率が変わったとき: 1ドットをワールドの pixel.size にする（画面のマスで、少なくとも 1） */
+  setZoom(zoom: number): void {
+    if (!this.blocky) return;
+    const n = Math.max(1, Math.round(this.pixelSize * zoom));
+    this.blocky.size = { x: n, y: n };
   }
 
   private add<T extends Phaser.GameObjects.GameObject>(obj: T): T {

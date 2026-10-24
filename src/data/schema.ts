@@ -946,8 +946,13 @@ export const spriteRenderSchema = z.object({
   /** 確認用の一覧表示（?gallery）の間隔 */
   gallerySpacing: z.number().positive(),
   /**
+   * 1ドットの大きさ（ワールドの単位。作者の決定 2026年10月24日: ポケモン・マップ・技の絵・光の演出・当たり判定の塗りを、すべて 2 にそろえる）。
+   * 技のドット絵は、この細かさになるマス数で描き直す
+   */
+  dot: z.number().positive(),
+  /**
    * 技の演出をドット絵に合わせる（WebGL のときだけ）。演出をまとめて描いた後で、
-   * size（ワールドの長さ。スプライトの拡大率と同じにすると1ドットがそろう）ごとの四角に区切り、
+   * size（ワールドの長さ。画面ではカメラの拡大率を掛けた大きさ。dot と同じにすると1ドットがそろう）ごとの四角に区切り、
    * 色と透明度を colorSteps・alphaSteps 段階に減らす。size 0 で使わない
    */
   /**
@@ -956,13 +961,13 @@ export const spriteRenderSchema = z.object({
    */
   camera: z.object({ viewHeight: z.number().positive(), maxAspect: z.number().positive() }),
   effectPixel: z.object({
-    size: z.number().int().nonnegative(),
+    size: z.number().nonnegative(),
     colorSteps: z.number().int().min(2),
     alphaSteps: z.number().int().min(2),
   }),
   /**
    * 技の当たり判定の形（作者の指摘。2026年10月21日）。グラデーションではなく、当たり判定の形を平らに塗る（外周の線は引かない。2026年10月22日）。
-   * pixel は角ばったドットにするフィルターの大きさ、fillAlpha は塗りの不透明度。moves を書くとその技だけ（試すとき）、省略で全部
+   * pixel は角ばったドットにするフィルターの大きさ（ワールドの長さ。画面ではカメラの拡大率を掛ける）、fillAlpha は塗りの不透明度。moves を書くとその技だけ（試すとき）、省略で全部
    */
   /**
    * 重なりの順（大きいほど手前。作者の決定 2026年10月22日、23日に変更: プレイヤー ＞ ボス ＞ 技 ＞ 雑魚 ＞ アイテム）。

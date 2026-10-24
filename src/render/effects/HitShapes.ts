@@ -37,8 +37,18 @@ export class HitShapes {
     this.layer.add(this.g);
     if (cfg.pixel > 0 && scene.renderer.type === Phaser.WEBGL) {
       this.layer.enableFilters();
-      this.layer.filters!.internal.addBlocky({ size: cfg.pixel });
+      this.blocky = this.layer.filters!.internal.addBlocky({ size: cfg.pixel });
     }
+  }
+
+  /** 角ばったドットにするフィルター（大きさはカメラの拡大率に合わせて変える） */
+  private blocky: Phaser.Filters.Blocky | null = null;
+
+  /** カメラの拡大率が変わったとき: 1ドットをワールドの pixel にする（画面のマスで、少なくとも 1） */
+  setZoom(zoom: number): void {
+    if (!this.blocky) return;
+    const n = Math.max(1, Math.round(this.cfg.pixel * zoom));
+    this.blocky.size = { x: n, y: n };
   }
 
   /**

@@ -7,8 +7,9 @@
   "enemyScale": 2,
   "enemyAnimation": "Walk",
   "enemyPreloadSeconds": 15,
+  "dot": 2,
   "effectPixel": {
-    "size": 4,
+    "size": 2,
     "colorSteps": 6,
     "alphaSteps": 4
   },
@@ -17,7 +18,7 @@
     "maxAspect": 1.7778
   },
   "hitShape": {
-    "pixel": 4,
+    "pixel": 2,
     "fillAlpha": 0.45,
     "sectorBand": 0.3,
     "sectorFullBelowDegrees": 60

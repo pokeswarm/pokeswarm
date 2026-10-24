@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { EffectRecipe, MoveSpritesData } from '../../data/schema';
 import type { ProjectileStore } from '../../sim/entities/projectiles';
+import { drawMoveArt, type SpriteOut } from '../moveArt';
 
 export type SpriteSpec = NonNullable<EffectRecipe['sprite']>;
 
@@ -25,9 +26,50 @@ export interface SpriteItem {
   readonly seed: number;
 }
 
-/** テクスチャの名前（絵・部品・コマごと） */
-function frameKey(id: string, part: string, frame: number): string {
-  return `msprite:${id}:${part}:${frame}`;
+/** テクスチャの名前（絵・細かさの段・部品・コマごと） */
+function frameKey(id: string, step: number, part: string, frame: number): string {
+  return `msprite:${id}:${step}:${part}:${frame}`;
+}
+
+/** 細かさの段: 段 n の細かさは 2^(n / STEPS_PER_DOUBLE)（約 12% 刻み） */
+const STEPS_PER_DOUBLE = 6;
+/** 描き直す絵の一辺の上限（実際のマス数。大きな範囲の技でも重くなりすぎないように） */
+const MAX_SIDE = 320;
+/** 1フレームに描き直しに使う時間の目安（ミリ秒。少なくとも1つは描く） */
+const BUDGET_MS = 4;
+
+/**
+ * 描き直した絵の置き場（どの MoveSprites からも同じ。テクスチャはゲーム全体で共有される）。
+ * 段ごとの絵（描き終えたもの）と、描くのを待っている段
+ */
+const ready = new Map<string, SpriteOut>();
+const queued = new Set<string>();
+const queue: { id: string; step: number }[] = [];
+/** 別の処理で描き終えて、テクスチャにするのを待っている絵 */
+const arrived: { id: string; step: number; sp: SpriteOut | null }[] = [];
+/**
+ * 描き直しを頼む別の処理（Web Worker）。使えなければ null（ゲームの処理の中で、決まった時間の分だけ描く）。
+ * まだ作っていなければ undefined
+ */
+let worker: Worker | null | undefined;
+
+function artWorker(): Worker | null {
+  if (worker !== undefined) return worker;
+  try {
+    worker = new Worker(new URL('../moveArtWorker.ts', import.meta.url), { type: 'module' });
+    worker.onmessage = (e: MessageEvent<{ id: string; step: number; sp: SpriteOut | null }>) => void arrived.push(e.data);
+    worker.onerror = () => {
+      // 動かなければ、ゲームの処理の中で描く（頼んだものは描き直す）
+      worker = null;
+      for (const key of queued) {
+        const [id, step] = key.split(':');
+        queue.push({ id: id!, step: Number(step) });
+      }
+    };
+  } catch {
+    worker = null;
+  }
+  return worker;
 }
 
 /** 消える前に薄くしていく時間（秒） */
@@ -49,12 +91,22 @@ export class MoveSprites {
     private readonly scene: Phaser.Scene,
     private readonly data: MoveSpritesData,
     private readonly depth: number,
+    /**
+     * 1ドットの大きさ（ワールドの単位。作者の決定 2026年10月24日: ポケモン・マップと同じ 2）。
+     * 絵はこの細かさになるよう、当たり判定の大きさに合わせたマス数で描き直す
+     */
+    private readonly dot: number,
   ) {
-    for (const [id, sp] of Object.entries(data.sprites)) {
-      for (const [part, frames] of Object.entries(sp.parts)) {
-        frames.forEach((rows, k) => this.addTexture(frameKey(id, part, k), rows, sp.palette));
-      }
+    // 基準の細かさ（段 0）は data/render/move-sprites.json の絵をそのまま使う
+    for (const [id, sp] of Object.entries(data.sprites)) this.store(id, 0, sp as SpriteOut);
+  }
+
+  /** 描いた絵をテクスチャにして置き場に入れる */
+  private store(id: string, step: number, sp: SpriteOut): void {
+    for (const [part, frames] of Object.entries(sp.parts)) {
+      frames.forEach((rows, k) => this.addTexture(frameKey(id, step, part, k), rows, sp.palette));
     }
+    ready.set(`${id}:${step}`, sp);
   }
 
   private addTexture(key: string, rows: readonly string[], palette: readonly string[]): void {
@@ -63,15 +115,75 @@ export class MoveSprites {
     const h = rows.length;
     const tex = this.scene.textures.createCanvas(key, w, h);
     if (!tex) return;
+    // 1マスずつ塗ると大きな絵で遅いので、画素の配列にまとめて書く
+    const rgb = palette.map((hex) => [1, 3, 5].map((k) => parseInt(hex.slice(k, k + 2), 16)));
     const ctx = tex.getContext();
-    rows.forEach((row, y) =>
-      [...row].forEach((ch, x) => {
-        if (ch === '.') return;
-        ctx.fillStyle = palette[Number(ch)] ?? '#ff00ff';
-        ctx.fillRect(x, y, 1, 1);
-      }),
-    );
+    const img = ctx.createImageData(w, h);
+    rows.forEach((row, y) => {
+      for (let x = 0; x < w; x++) {
+        const ch = row.charCodeAt(x) - 48;
+        if (ch < 0 || ch > 9) continue;
+        const c = rgb[ch] ?? [255, 0, 255];
+        img.data.set([c[0]!, c[1]!, c[2]!, 255], (y * w + x) * 4);
+      }
+    });
+    ctx.putImageData(img, 0, 0);
     tex.refresh();
+  }
+
+  /** 別の処理で描き終えた絵をテクスチャにし、別の処理が使えなければ、待っている段を決まった時間の分だけ描く（少なくとも1つ） */
+  private pump(): void {
+    const start = performance.now();
+    while (arrived.length > 0) {
+      const { id, step, sp } = arrived.shift()!;
+      queued.delete(`${id}:${step}`);
+      if (sp) this.store(id, step, sp);
+      if (performance.now() - start > BUDGET_MS) return;
+    }
+    while (queue.length > 0) {
+      const { id, step } = queue.shift()!;
+      const sp = drawMoveArt(id, 2 ** (step / STEPS_PER_DOUBLE));
+      queued.delete(`${id}:${step}`);
+      if (sp) this.store(id, step, sp);
+      if (performance.now() - start > BUDGET_MS) break;
+    }
+  }
+
+  /**
+   * 絵 id を、基準の大きさ base（基準の絵のマス数）の向きに desired マスで描きたいときの絵と段。
+   * その段がまだ無ければ描くのを頼み、それまでは描き終えた一番近い段を使う
+   */
+  private pick(id: string, base: number, desired: number): { sp: SpriteOut; step: number } | null {
+    const maxStep = Math.floor(Math.log2(MAX_SIDE / Math.max(1, this.biggestSide(id))) * STEPS_PER_DOUBLE);
+    const want = Math.min(maxStep, Math.round(Math.log2(Math.max(1e-3, desired / Math.max(1, base))) * STEPS_PER_DOUBLE));
+    const key = `${id}:${want}`;
+    const hit = ready.get(key);
+    if (hit) return { sp: hit, step: want };
+    if (!queued.has(key)) {
+      queued.add(key);
+      const w = artWorker();
+      if (w) w.postMessage({ id, step: want, k: 2 ** (want / STEPS_PER_DOUBLE) });
+      else queue.push({ id, step: want });
+    }
+    for (let d = 1; d < 64; d++) {
+      for (const step of [want - d, want + d]) {
+        const sp = ready.get(`${id}:${step}`);
+        if (sp) return { sp, step };
+      }
+    }
+    return null;
+  }
+
+  /** 基準の絵の、部品の中で一番長い辺 */
+  private biggestSide(id: string): number {
+    const sp = this.data.sprites[id];
+    if (!sp) return 1;
+    let m = 1;
+    for (const frames of Object.values(sp.parts)) {
+      const rows = frames[0];
+      if (rows) m = Math.max(m, rows.length, rows[0]!.length);
+    }
+    return m;
   }
 
   /** 部品の、今のコマの番号（出てからの秒数で進める） */
@@ -123,13 +235,31 @@ export class MoveSprites {
       img.setTexture(key).setOrigin(originX, 0.5).setPosition(x, y).setRotation(rot).setScale(sx, sy).setAlpha(a).setVisible(true);
       used++;
     };
+    this.pump();
     for (const it of items) {
       const spec = it.spec;
-      const sp = this.data.sprites[spec.id];
-      if (!sp) continue;
+      const base = this.data.sprites[spec.id];
+      if (!base) continue;
       const { x, y, elapsed } = it;
       const a = it.alpha * spec.alpha;
       const r = it.radius * spec.size;
+      // 1ドットが dot になるマス数: 円・扇は横の長さ、線は太さ、輪は帯の厚さで決める
+      const mainRows = base.parts.main?.[0];
+      const midRows = base.parts.middle?.[0];
+      const [baseLen, desired] =
+        spec.fit === 'circle'
+          ? [mainRows?.[0]?.length ?? 1, (r * 2) / this.dot]
+          : spec.fit === 'front'
+            ? [mainRows?.[0]?.length ?? 1, (it.radius * spec.size) / this.dot]
+            : spec.fit === 'cone'
+              ? [mainRows?.[0]?.length ?? 1, it.radius / this.dot]
+              : spec.fit === 'ring'
+                ? [midRows?.length ?? 1, ((it.band > 0 ? it.band : it.radius * 0.3) * spec.size) / this.dot]
+                : [midRows?.length ?? 1, (r * 2) / this.dot];
+      const picked = this.pick(spec.id, baseLen, desired);
+      if (!picked) continue;
+      const { sp, step } = picked;
+      const fk = (part: string, frame: number): string => frameKey(spec.id, step, part, frame);
       if (spec.fit === 'circle') {
         const rows = sp.parts.main?.[0];
         if (!rows) continue;
@@ -137,7 +267,7 @@ export class MoveSprites {
         // 向き: 進む向き（絵は右向きに描く）か、回し続けるか
         const rot =
           spec.rotate === 'velocity' ? (it.vx !== 0 || it.vy !== 0 ? Math.atan2(it.vy, it.vx) : Math.atan2(it.dirY, it.dirX)) : spec.rotate === 'spin' ? (elapsed * spec.spinDegPerSec * Math.PI) / 180 : 0;
-        put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x, y, rot, s, s, a);
+        put(fk('main', this.frameOf(spec.id, 'main', elapsed)), x, y, rot, s, s, a);
         continue;
       }
       if (spec.fit === 'front') {
@@ -146,7 +276,7 @@ export class MoveSprites {
         if (!rows) continue;
         const reach = it.radius;
         const s = (reach * spec.size) / rows[0]!.length;
-        put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x + it.dirX * reach * 0.6, y + it.dirY * reach * 0.6, Math.atan2(it.dirY, it.dirX), s, s, a);
+        put(fk('main', this.frameOf(spec.id, 'main', elapsed)), x + it.dirX * reach * 0.6, y + it.dirY * reach * 0.6, Math.atan2(it.dirY, it.dirX), s, s, a);
         continue;
       }
       if (spec.fit === 'ring') {
@@ -160,7 +290,7 @@ export class MoveSprites {
         const n = Math.max(16, Math.round((Math.PI * 2 * rc) / ((rows[0]!.length * band) / rows.length)));
         const sx = (Math.PI * 2 * rc) / n / rows[0]!.length;
         const sy = band / rows.length;
-        const frame = frameKey(spec.id, 'middle', this.frameOf(spec.id, 'middle', elapsed));
+        const frame = fk('middle', this.frameOf(spec.id, 'middle', elapsed));
         for (let k = 0; k < n; k++) {
           const ang = (k / n) * Math.PI * 2;
           put(frame, x + Math.cos(ang) * rc, y + Math.sin(ang) * rc, ang + Math.PI / 2, sx, sy, a);
@@ -173,7 +303,7 @@ export class MoveSprites {
         if (!rows) continue;
         const reach = it.radius;
         const width = Math.max(24, 2 * reach * Math.tan(Math.min(1.2, it.length)) * spec.size);
-        put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x, y, Math.atan2(it.dirY, it.dirX), reach / rows[0]!.length, width / rows.length, a, 0);
+        put(fk('main', this.frameOf(spec.id, 'main', elapsed)), x, y, Math.atan2(it.dirY, it.dirX), reach / rows[0]!.length, width / rows.length, a, 0);
         continue;
       }
       // 線: 始まり → 途中を並べる → 終わり（太さは当たり判定の直径）
@@ -197,12 +327,12 @@ export class MoveSprites {
       for (let d = startLen, k = 0; d < len - endLen; d += tileLen, k++) {
         const [px, py] = at(d + tileLen / 2);
         const fr = spec.varyTiles ? (midFrame + k * 3 + it.seed) % midCount : midFrame;
-        put(frameKey(spec.id, 'middle', fr), px, py, rot, s, s, a);
+        put(fk('middle', fr), px, py, rot, s, s, a);
       }
       const [sx, sy] = at(Math.min(startLen, len) / 2);
-      put(frameKey(spec.id, 'start', this.frameOf(spec.id, 'start', elapsed)), sx, sy, rot, s, s, a);
+      put(fk('start', this.frameOf(spec.id, 'start', elapsed)), sx, sy, rot, s, s, a);
       const [ex, ey] = at(Math.max(startLen, len - endLen / 2));
-      put(frameKey(spec.id, 'end', this.frameOf(spec.id, 'end', elapsed)), ex, ey, rot, s, s, a);
+      put(fk('end', this.frameOf(spec.id, 'end', elapsed)), ex, ey, rot, s, s, a);
     }
     for (let k = used; k < this.images.length; k++) this.images[k]!.setVisible(false);
   }

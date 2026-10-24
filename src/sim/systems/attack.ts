@@ -146,7 +146,8 @@ export function useMoves(world: World): void {
         continue;
       }
       // 出した技が消えるまで次を出さない技（ボルテッカー）は、再使用を少なくとも持続の長さにする
-      pm.cooldown = Math.max(scaledMoveStats(world, p, pm, st).cooldownSeconds, def.waitForEnd ? st.durationSeconds : 0);
+      // 消えてから数える技（こなゆき・ふぶき）は、持続の分を足す
+      pm.cooldown = Math.max(scaledMoveStats(world, p, pm, st).cooldownSeconds, def.waitForEnd ? st.durationSeconds : 0) + (def.restAfterEnd ? st.durationSeconds : 0);
       world.events.push({ type: 'moveUsed', playerId: p.id, move: pm.move });
       const from = world.projectiles.count;
       switch (def.pattern) {
@@ -154,8 +155,16 @@ export function useMoves(world: World): void {
         case 'facing':
         case 'homing':
         case 'boomerang':
+        case 'barrage':
           pm.burstLeft = st.count;
           pm.burstTimer = 0;
+          // 向きをランダムに選ぶ技（にどげり）は、使うたびに1つの向きを選び、連撃はその向きへ
+          pm.aimAngle = def.randomAim ? world.rng.next() * Math.PI * 2 : undefined;
+          if (def.pattern === 'barrage' && def.body) {
+            const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+            const a = pm.aimAngle ?? Math.atan2(fy, fx);
+            world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: Math.cos(a), dirY: Math.sin(a), distance: def.body.lungeDistance, afterimages: def.body.afterimages });
+          }
           fireBurst(world, p, pm, st);
           break;
         case 'melee':
@@ -276,11 +285,17 @@ function base(world: World, p: Player, pm: PlayerMove, st: MoveStats): Omit<Proj
   };
 }
 
-/** nearest・facing・homing・boomerang: 間隔が来た分だけ1発ずつ飛ばす */
+/** nearest・facing・homing・boomerang・barrage: 間隔が来た分だけ1発ずつ飛ばす */
 function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const def = world.rules.moves[pm.move]!;
   pm.burstTimer -= pm.burstTimer > 0 ? world.dt : 0;
   while (pm.burstLeft > 0 && pm.burstTimer <= 0) {
+    if (def.pattern === 'barrage') {
+      fireBarrageHit(world, p, pm, st);
+      pm.burstLeft--;
+      pm.burstTimer += st.intervalSeconds;
+      continue;
+    }
     let dir: [number, number];
     if (def.pattern === 'nearest' || def.pattern === 'homing') {
       const t = nearestEnemy(world, p.x, p.y, st.range);
@@ -294,6 +309,13 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     }
     const [dx, dy] = spread(world, dir[0], dir[1], st.spreadDegrees);
     const speed = scaledMoveStats(world, p, pm, st).speed;
+    // 蛇行する弾（りゅうのいかり）: 出した場所から、同じ揺れ方で続けて飛ぶので、つながった炎に見える
+    if (def.snake && def.pattern !== 'homing' && def.pattern !== 'boomerang') {
+      world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_SNAKE, x: p.x, y: p.y, vx: dx * speed, vy: dy * speed, ox: p.x, oy: p.y, orbitRadius: def.snake.amplitude, angularSpeed: (Math.PI * 2 * speed) / def.snake.wavelength });
+      pm.burstLeft--;
+      pm.burstTimer += st.intervalSeconds;
+      continue;
+    }
     const motion = def.pattern === 'homing' ? MOTION_HOMING : def.pattern === 'boomerang' ? MOTION_BOOMERANG : MOTION_LINEAR;
     // boomerang は出したときの速度を ox・oy に覚えておき、時間とともに減速・反転させる
     world.projectiles.add({
@@ -309,6 +331,19 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     pm.burstLeft--;
     pm.burstTimer += st.intervalSeconds;
   }
+}
+
+/**
+ * barrage（連打）の1発: 向き（ランダムに選んだ向き、無ければ向いている方向）を中心にした開き arcDegrees・距離 range の中の
+ * ランダムな場所に、外へ押し出す小さな当たり判定を出す（拳・蹴り。進む向きへ speed で少し進んで消える）
+ */
+function fireBarrageHit(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  const center = pm.aimAngle ?? Math.atan2(fy, fx);
+  const a = center + (world.rng.next() - 0.5) * ((Math.min(360, st.arcDegrees) * Math.PI) / 180);
+  const d = st.range * (0.3 + 0.7 * world.rng.next());
+  const speed = scaledMoveStats(world, p, pm, st).speed;
+  world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x + Math.cos(a) * d, y: p.y + Math.sin(a) * d, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed });
 }
 
 /** melee: 向いている方向 → 反対側 → 左 → 右 の順に当たり判定を出す（持ち主に付いていく。range 0 なら自分の周り） */
@@ -459,7 +494,7 @@ function fireScreen(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
 
 /** 一度に出し終える出し方（ゆびをふるで選ぶ技。連射の出し方は、出し続ける状態を持てないので選ばない） */
 /** 続けて撃つ出し方（ゆびをふる・ものまね では一度にまとめて撃つ） */
-const BURST_PATTERNS = new Set(['nearest', 'facing', 'homing', 'boomerang']);
+const BURST_PATTERNS = new Set(['nearest', 'facing', 'homing', 'boomerang', 'barrage']);
 const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter', 'eruption', 'spin', 'sweep', 'spiral', 'pulse', 'weather']);
 
 /** metronome（ゆびをふる）: ほかの技からランダムに1つを、その技の最大レベルで出す */
@@ -775,8 +810,9 @@ function fireSpiral(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
 /** sweep（往復するなぎ払い）: 向いている方向を中心に、細い扇形を spreadDegrees の幅で行って戻る（おうふくビンタ） */
 function fireSweep(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const sc = scaledMoveStats(world, p, pm, st);
-  const [fx, fy] = axisToUnit(p.facingX, p.facingY);
   const def = world.rules.moves[pm.move]!;
+  // 向きをランダムに選ぶ技（まわしげり）は、近くのランダムな向きへ払う
+  const [fx, fy] = def.randomAim ? ((r: number): [number, number] => [Math.cos(r), Math.sin(r)])(world.rng.next() * Math.PI * 2) : axisToUnit(p.facingX, p.facingY);
   if (def.body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: fx, dirY: fy, distance: def.body.lungeDistance, afterimages: def.body.afterimages });
   const half = Math.min(Math.PI, (st.arcDegrees * Math.PI) / 360);
   const amp = (Math.min(360, st.spreadDegrees) * Math.PI) / 360;

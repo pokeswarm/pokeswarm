@@ -194,4 +194,42 @@ describe('作者の感想で見直した技（2026年10月25日）', () => {
     const far = Math.max(...of(1).map((i) => Math.hypot(pr.x[i]! + pr.dirX[i]! * pr.length[i]!, pr.y[i]! + pr.dirY[i]! * pr.length[i]!)));
     expect(far).toBeGreaterThan(80);
   });
+
+  it('連打（barrage）: 向いている方向の開きと距離の中に、外へ押し出す当たり判定を interval ごとに count 発出す', () => {
+    const sim = setup('barrage', { count: 6, intervalSeconds: 0.03, range: 80, arcDegrees: 90, size: 10, speed: 200, durationSeconds: 0.2 }, []);
+    sim.step([]);
+    const pr = sim.world.projectiles;
+    expect(pr.count).toBeLessThan(6);
+    steps(sim, 5);
+    expect(pr.count).toBe(6);
+    for (let i = 0; i < pr.count; i++) {
+      // 右（向いている方向）の ±45° の中で、外へ進む
+      expect(Math.abs(Math.atan2(pr.vy[i]!, pr.vx[i]!))).toBeLessThanOrEqual(Math.PI / 4 + 1e-9);
+      expect(Math.hypot(pr.x[i]!, pr.y[i]!)).toBeLessThan(80 + 200 * 0.25);
+    }
+  });
+
+  it('向きをランダムに選ぶ（randomAim）: 連打は1回ごとに1つの向きを選び、その向きへ出す', () => {
+    const angles = new Set<number>();
+    for (const seed of [1, 2, 3]) {
+      const rules = testRules({ move: { power: 10, cooldownSeconds: 100, count: 2, intervalSeconds: 0.1, range: 40, arcDegrees: 1, size: 10, speed: 200, durationSeconds: 0.3 } });
+      rules.moves[0] = { ...rules.moves[0]!, pattern: 'barrage', randomAim: true };
+      const sim = new Simulation({ tickRate: 30, seed, rules });
+      sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 200 });
+      steps(sim, 5);
+      const pr = sim.world.projectiles;
+      expect(pr.count).toBe(2);
+      const a0 = Math.atan2(pr.vy[0]!, pr.vx[0]!);
+      const a1 = Math.atan2(pr.vy[1]!, pr.vx[1]!);
+      expect(Math.abs(a0 - a1)).toBeLessThan(0.05);
+      angles.add(Math.round(a0 * 10));
+    }
+    expect(angles.size).toBeGreaterThan(1);
+  });
+
+  it('消えてから数える再使用（restAfterEnd）: 次に出るのは 持続 + 再使用 の後', () => {
+    const sim = setup('weather', { size: 300, durationSeconds: 2, cooldownSeconds: 5, hitIntervalSeconds: 0.5 }, [], { restAfterEnd: true });
+    sim.step([]);
+    expect(sim.world.players[0]!.moves[0]!.cooldown).toBeCloseTo(7);
+  });
 });

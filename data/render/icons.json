@@ -818,7 +818,8 @@
     "spiral": "orbit",
     "passive": "plus",
     "pulse": "pulse",
-    "weather": "weather"
+    "weather": "weather",
+    "barrage": "melee"
   },
   "items": {
     "x-attack": {

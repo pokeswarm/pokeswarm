@@ -42,7 +42,7 @@
     { "from": "blizzard", "item": "pp-max", "to": "freeze-dry", "line": "articuno" },
     { "from": "cross-chop", "item": "dire-hit", "to": "dynamic-punch", "line": "machop" },
     { "from": "shadow-ball", "item": "light-clay", "to": "hex", "line": "gastly" },
-    { "from": "dragon-rush", "item": "x-attack", "to": "hyper-beam", "line": "dratini" },
+    { "from": "dragon-pulse", "item": "x-attack", "to": "hyper-beam", "line": "dratini" },
     { "from": "psychic", "item": "x-sp-atk", "to": "psystrike", "line": "mewtwo" },
     { "from": "thunderbolt", "item": "thunder-stone", "to": "zap-cannon", "line": "zapdos" },
     { "from": "flare-blitz", "item": "fire-stone", "to": "sky-attack", "line": "moltres" },

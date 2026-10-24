@@ -578,6 +578,8 @@ export type CombatConfig = z.infer<typeof combatConfigSchema>;
  *   （スパーク・ワイルドボルト。作者の決定 2026年10月25日）
  * - weather（天気）: duration の間、自分の周り半径 size（画面くらい）の敵すべてに、当たり直しの間隔ごとに当たる（こなゆき・ふぶき。
  *   作者の決定 2026年10月25日）。範囲は塗らず、画面に雪を降らせて見せる
+ * - barrage（連打）: 向いている方向を中心にした開き arcDegrees・距離 range の中のランダムな場所に、外へ押し出す小さな当たり判定（拳・蹴り）を
+ *   count 発、interval ごとに出す（ばくれつパンチ: ゴムゴムのガトリングのように。にどげり: 近くのランダムな向きへ2連撃。作者の決定 2026年10月25日）
  */
 export const MOVE_PATTERNS = [
   'nearest',
@@ -608,6 +610,7 @@ export const MOVE_PATTERNS = [
   'spiral',
   'pulse',
   'weather',
+  'barrage',
 ] as const;
 export type MovePattern = (typeof MOVE_PATTERNS)[number];
 
@@ -848,7 +851,11 @@ export const moveDefSchema = z.object({
   scatterJitter: z.object({ countMin: z.number().int().positive(), sizeMin: z.number().positive(), sizeMax: z.number().positive() }).optional(),
   /** sweep（なぎ払い）を片道だけにする（はたく: 1回払う。おうふくビンタは行って戻る） */
   sweepOnce: z.boolean().optional(),
-  /** 飛ぶ弾（cross）を蛇行させる（ヘドロウェーブ） */
+  /** 向きを、使うたびにランダムに選ぶ（にどげり・まわしげり: 近くのランダムな向きへ。barrage・sweep で使う） */
+  randomAim: z.boolean().optional(),
+  /** 再使用を、出した技が消えてから数える（こなゆき・ふぶき: 雪が止んでから cooldown の間はダメージが起きない。作者の決定 2026年10月25日） */
+  restAfterEnd: z.boolean().optional(),
+  /** 飛ぶ弾（cross・nearest など）を蛇行させる（ヘドロウェーブ・りゅうのいかり） */
   snake: snakeSchema.optional(),
   /**
    * passive（いつも効く技）: レベルごとに足す効果（持ち物と同じ形）。[0] がレベル1で、レベル L ではここまでの合計が効く。

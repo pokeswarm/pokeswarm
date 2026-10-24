@@ -445,6 +445,7 @@
   "pattern.sweepOnce": "Sweeps once ahead",
   "pattern.pulse": "A ring that expands and shrinks around you",
   "pattern.weather": "Falls across the whole screen for a while",
+  "pattern.barrage": "Unleashes a flurry of blows",
   "itemDesc.everstone": "Held by Eevee: stops evolution, but power and max HP +10%, move speed +5% (cannot be held with evolution stones)",
   "shop.pokemonSection": "Pokémon",
   "shop.pokemonDesc": "Join your team (choose it on the Pokémon select screen)",

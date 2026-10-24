@@ -13,6 +13,8 @@ export interface PlayerMove {
   burstTimer: number;
   /** spin（回転）: 使った回数（扇形を出す向きを、回数ごとに時計回りへずらす） */
   spinStep?: number;
+  /** 向きをランダムに選ぶ技（にどげり・まわしげり）が、今回選んだ向き（ラジアン） */
+  aimAngle?: number;
 }
 
 export interface Player {

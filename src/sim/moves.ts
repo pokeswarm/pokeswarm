@@ -82,7 +82,11 @@ export interface SimMoveDef {
   readonly scatterJitter?: { readonly countMin: number; readonly sizeMin: number; readonly sizeMax: number };
   /** sweep（なぎ払い）を片道だけにする（はたく） */
   readonly sweepOnce?: boolean;
-  /** 飛ぶ弾を蛇行させる（ヘドロウェーブ）。振れ幅と波長（ワールドの単位） */
+  /** 向きを使うたびにランダムに選ぶ（にどげり・まわしげり） */
+  readonly randomAim?: boolean;
+  /** 再使用を、出した技が消えてから数える（こなゆき・ふぶき） */
+  readonly restAfterEnd?: boolean;
+  /** 飛ぶ弾を蛇行させる（ヘドロウェーブ・りゅうのいかり）。振れ幅と波長（ワールドの単位） */
   readonly snake?: { readonly amplitude: number; readonly wavelength: number };
 }
 

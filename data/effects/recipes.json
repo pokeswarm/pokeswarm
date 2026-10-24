@@ -2197,7 +2197,7 @@
       "sprite": {
         "id": "cross-chop",
         "fit": "front",
-        "size": 1
+        "size": 1.3
       }
     },
     "dynamic-punch": {
@@ -2207,14 +2207,19 @@
         "coreScale": 0.3
       },
       "impact": {
+        "burst": {
+          "count": 4
+        },
         "flash": {
-          "radius": 60
+          "radius": 24,
+          "alpha": 0.5
         }
       },
       "sprite": {
         "id": "fist",
-        "fit": "front",
-        "size": 0.9
+        "fit": "circle",
+        "size": 1.5,
+        "rotate": "velocity"
       }
     },
     "double-kick": {
@@ -2223,11 +2228,11 @@
         "glowScale": 1.1,
         "coreScale": 0.3
       },
-      "ownerGhost": {
-        "tint": "#ffffff",
-        "alpha": 0.8,
-        "afterimages": 3,
-        "spacingTicks": 1
+      "sprite": {
+        "id": "kick",
+        "fit": "circle",
+        "size": 1.4,
+        "rotate": "velocity"
       }
     },
     "rolling-kick": {
@@ -2236,11 +2241,10 @@
         "glowScale": 1.1,
         "coreScale": 0.3
       },
-      "ownerGhost": {
-        "tint": "#ffffff",
-        "alpha": 0.8,
-        "afterimages": 3,
-        "spacingTicks": 1
+      "sprite": {
+        "id": "kick-arc",
+        "fit": "front",
+        "size": 1
       }
     },
     "aura-sphere": {
@@ -2298,11 +2302,10 @@
         "glowScale": 1.1,
         "coreScale": 0.3
       },
-      "ownerGhost": {
-        "tint": "#b3e5fc",
-        "alpha": 0.8,
-        "afterimages": 3,
-        "spacingTicks": 1
+      "sprite": {
+        "id": "tail-swipe",
+        "fit": "front",
+        "size": 1.1
       }
     },
     "dragon-rush": {
@@ -2316,11 +2319,11 @@
           "radius": 60
         }
       },
-      "ownerGhost": {
-        "tint": "#d1c4e9",
-        "alpha": 0.85,
-        "afterimages": 4,
-        "spacingTicks": 1
+      "sprite": {
+        "id": "dragon-shock",
+        "fit": "ring",
+        "size": 1,
+        "varyTiles": true
       }
     },
     "outrage": {
@@ -2335,7 +2338,7 @@
       "sprite": {
         "id": "dragon-flame",
         "fit": "circle",
-        "size": 2.2,
+        "size": 2.4,
         "rotate": "velocity"
       }
     },
@@ -2347,9 +2350,10 @@
         }
       },
       "sprite": {
-        "id": "dragon-pulse",
-        "fit": "line",
-        "size": 1.3
+        "id": "dragon-ring",
+        "fit": "circle",
+        "size": 1,
+        "rotate": "velocity"
       }
     },
     "psystrike": {

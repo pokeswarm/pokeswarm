@@ -705,25 +705,6 @@ function psyBeam(): SpriteOut {
   return { palette, frameMs: 70, parts };
 }
 
-/** りゅうのはどう: 青紫の太い波動に、うろこのような模様がうねって流れる */
-function dragonPulse(): SpriteOut {
-  const H = 14;
-  const TILE = 8;
-  const palette = ['#0e0a2b', '#311b92', '#5e35b1', '#7c4dff', '#b388ff', '#e8eaf6'];
-  const mid = (H - 1) / 2;
-  const parts = lineParts(H, { start: 6, middle: TILE, end: 8 }, 4, (x, y, f, part) => {
-    const taper = part === 'start' ? 0.4 + x / 8 : part === 'end' ? 1 - x / 9 : 1;
-    const wave = Math.sin(((x + f * 2) / TILE) * Math.PI * 2) * 1.2;
-    const d = Math.abs(y - mid - wave);
-    const half = 4.8 * taper;
-    if (d > half) return -1;
-    if (d < half * 0.25) return 5;
-    // うろこ: 斜めの筋
-    const scale = (Math.floor(x + 0.5) + f * 2 + Math.round(y * 0.7) + 64) % 4 === 0;
-    return scale ? 4 : d < half * 0.6 ? 3 : d < half * 0.85 ? 2 : 1;
-  });
-  return { palette, frameMs: 80, parts };
-}
 
 /**
  * かえんほうしゃ・バブルこうせん: 扇形に引き伸ばす1枚の絵（右向き。左端が口）。
@@ -972,63 +953,6 @@ function sparkArc(): SpriteOut {
     return Math.abs(k - zig) < 0.25 ? 4 : k > 0.7 ? 1 : k > 0.4 ? 2 : 3;
   }, 0.1);
   return { palette, frameMs: 40, parts: { main: frames.map(toRows) } };
-}
-
-/** からてチョップ: 白い手刀の弧（細い三日月）。クロスチョップは2本が交わる X */
-function chop(kind: 'single' | 'cross'): SpriteOut {
-  const palette = ['#1c2833', '#90caf9', '#e3f2fd', '#ffffff'];
-  const one = (rot: number): Grid =>
-    shape(18, (u, v) => {
-      const d = Math.hypot(u + 0.6, v);
-      const a = Math.atan2(v, u + 0.6);
-      if (Math.abs(a) > 1.0) return -1;
-      const outer = 1.25;
-      const inner = outer - 0.28 * (1 - Math.abs(a));
-      if (d > outer || d < inner) return -1;
-      const k = (d - inner) / (outer - inner);
-      return k > 0.6 ? 1 : k > 0.25 ? 2 : 3;
-    }, rot);
-  const merge = (a: Grid, b: Grid): Grid => a.map((row, y) => row.map((c, x) => (c >= 0 ? c : b[y]![x]!)));
-  // X: 斜めの細い手刀を2本（真ん中が太く、両端がとがる）
-  const slash = (sign: number): Grid =>
-    shape(18, (u, v) => {
-      const along = (u + sign * v) / Math.SQRT2;
-      const across = Math.abs((u - sign * v) / Math.SQRT2);
-      const w = 0.16 * (1 - Math.abs(along) / 0.95);
-      if (Math.abs(along) > 0.95 || across > w) return -1;
-      return across < w * 0.35 ? 3 : across < w * 0.7 ? 2 : 1;
-    });
-  const g = kind === 'single' ? one(0) : merge(slash(1), slash(-1));
-  return { palette, frameMs: 1000, parts: { main: [toRows(outline(g, 0))] } };
-}
-
-/** ばくれつパンチ: 右を向いたこぶしと、まわりに飛び散る光の線 */
-function fist(): SpriteOut {
-  const palette = ['#2b1b10', '#ef6c00', '#ffb74d', '#ffe0b2', '#ffffff', '#fff176'];
-  const frames = [0, 1].map((f) =>
-    shape(24, (u, v) => {
-      // こぶし: 右のふちは指の関節のでこぼこ（4つの丸）、指の間に筋、下に親指
-      // 関節は前へ大きくふくらませ、関節と関節の間はくぼませる
-      const knuckles = false;
-      // 右のふちを波打たせる（関節4つ）
-      const edge = 0.24 + 0.14 * Math.abs(Math.cos((Math.PI * (v + 0.44)) / 0.22));
-      const body = u > -0.3 && u < edge && Math.abs(v) < 0.44;
-      const thumb = u > -0.2 && u < 0.25 && v > 0.22 && v < 0.42;
-      const wrist = u < -0.3 && u > -0.7 && Math.abs(v) < 0.3;
-      if (body || knuckles || thumb) {
-        if (thumb && v < 0.26) return 1;
-        if (u > 0.12 && [-0.2, 0, 0.2].some((ly) => Math.abs(v - ly) < 0.04) && !thumb) return 1;
-        return u + v < -0.25 ? 4 : 3;
-      }
-      if (wrist) return 2;
-      // 光の線（右側に放射状）
-      const a = Math.atan2(v, u - 0.2);
-      const d = Math.hypot(u - 0.2, v);
-      if (u > 0.4 && d > 0.55 && d < 0.95 && Math.abs(Math.sin(a * 4 + f)) < 0.18) return 5;
-      return -1;
-    }),
-  );
-  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
 }
 
 /** はたく・おうふくビンタ: 右を向いた ひらいた手のひら（肌色）と、うしろの動きの線 */
@@ -1425,12 +1349,6 @@ function zapOrb(): SpriteOut {
     }),
   );
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
-}
-
-/** りゅうのいかり: 青紫の竜の炎（ひのこと同じ形で色だけ違う） */
-function dragonFlame(): SpriteOut {
-  const sp = ember();
-  return { ...sp, palette: ['#1a0b3d', '#4527a0', '#7c4dff', '#b39ddb', '#ede7f6'] };
 }
 
 // ---------------- 光の演出だけだった技（作者の依頼 2026年10月24日） ----------------
@@ -2068,6 +1986,304 @@ function crackLine(): SpriteOut {
   return { palette, frameMs: 1000, parts };
 }
 
+// ---------------- かくとう・ドラゴンの技（作者の依頼 2026年10月25日: 絵の作りこみから） ----------------
+/** 角を丸めた四角の中か（論理の u・v。中心 cx, cy・半分の幅 hw, hh・角の丸み r） */
+function inRoundRect(u: number, v: number, cx: number, cy: number, hw: number, hh: number, r: number): boolean {
+  const dx = Math.max(0, Math.abs(u - cx) - (hw - r));
+  const dy = Math.max(0, Math.abs(v - cy) - (hh - r));
+  return dx * dx + dy * dy <= r * r;
+}
+
+/**
+ * からてチョップ: 縦に走る手刀の刃（右へふくらむ三日月。前へなぎ払う向きに置く）。真ん中が太く両端がとがり、
+ * 芯は白、ふちは青。後ろ（左）に速さの線。コマで刃の光が流れる
+ */
+function karateChop(): SpriteOut {
+  // 0 輪郭・1 濃い青・2 青・3 うすい青・4 白・5 速さの線
+  const palette = ['#0d1b2a', '#1e5aa8', '#64b5f6', '#bbdefb', '#ffffff', '#e3f2fd'];
+  const frames = [0, 1].map((f) =>
+    shape(24, (u, v) => {
+      // 刃: 中心 (-1.1, 0)・半径 1.55 の円の弧に沿った帯
+      const d = Math.hypot(u + 1.1, v) - 1.55;
+      const half = 0.17 * Math.max(0, 1 - (Math.abs(v) / 0.95) ** 1.6);
+      if (Math.abs(v) < 0.95 && Math.abs(d + half * 0.3) < half) {
+        const k = (d + half * 0.3) / half;
+        // 光の筋がコマで上下へ流れる
+        if (Math.abs(v - (f ? 0.35 : -0.35)) < 0.08 && k > -0.4) return 4;
+        return k > 0.55 ? 1 : k > 0.1 ? 2 : k > -0.5 ? 3 : 4;
+      }
+      // 速さの線（刃の後ろ）
+      for (const [ly, len] of [[-0.45, 0.35], [-0.1, 0.5], [0.3, 0.4]] as const) {
+        const x0 = -0.2 - Math.abs(ly) * 0.2 - (f ? 0.05 : 0);
+        if (Math.abs(v - ly) < 0.035 && u < x0 && u > x0 - len) return 5;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * クロスチョップ: 前方に大きく交わる2本の手刀（X）。刃は少しふくらんだ斜めの線で、真ん中が太く両端がとがる。
+ * 2本は上下に鏡写しで、交わる所に光がはじける。コマ 0 で刃が走り、1・2 で光が瞬く（loopFrom 1）
+ */
+function crossChop(): SpriteOut {
+  const palette = ['#0d1b2a', '#1e5aa8', '#64b5f6', '#bbdefb', '#ffffff', '#fff59d'];
+  // 右上から左下への刃（v を返すと、もう1本）。左下から伸びていく
+  const blade = (u: number, v: number, grow: number): number => {
+    const c = Math.SQRT1_2;
+    const x = (u - v) * c;
+    const y = (u + v) * c;
+    if (x < 0.95 - 1.9 * grow) return -1;
+    // 外（右下）へ少しふくらむ
+    const d = y - 0.12 * (1 - x * x);
+    const half = 0.15 * Math.max(0, 1 - (Math.abs(x) / 0.95) ** 1.5);
+    if (Math.abs(x) > 0.95 || Math.abs(d) > half) return -1;
+    const k = Math.abs(d) / half;
+    return k > 0.75 ? 1 : k > 0.45 ? 2 : k > 0.2 ? 3 : 4;
+  };
+  const frames = [0.55, 1, 1].map((grow, f) =>
+    shape(36, (u, v) => {
+      // 交わった所の光（とげのある星）
+      if (f > 0) {
+        const a = Math.atan2(v, u);
+        const r = Math.hypot(u, v);
+        const spike = 0.12 + 0.16 * Math.abs(Math.cos(a * 2 + (f === 2 ? Math.PI / 2 : 0))) ** 6;
+        if (r < spike) return r < 0.07 ? 4 : 5;
+      }
+      const a = blade(u, v, grow);
+      const b = blade(u, -v, grow);
+      if (a < 0) return b;
+      if (b < 0) return a;
+      return Math.max(a, b);
+    }),
+  );
+  return { palette, frameMs: 80, loopFrom: 1, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * ばくれつパンチ: 右へ突き出したこぶし（横から見た姿）。4つの関節のでこぼこと指の筋、前に巻いた親指、赤い手首のバンド、
+ * 後ろに速さの線。コマ 1 でこぶしの先に衝撃の光
+ */
+function punch(): SpriteOut {
+  // 0 輪郭・1 バンドの暗い所・2 バンド・3 肌の影・4 肌・5 肌の明るい所・6 速さの線・7 衝撃
+  const palette = ['#2b1408', '#a31515', '#e53935', '#d8875c', '#f5bd8f', '#ffe3c8', '#ffffff', '#fff176'];
+  const frames = [0, 1].map((f) =>
+    shape(24, (u, v) => {
+      // 衝撃の光（こぶしの先）
+      if (f === 1) {
+        const a = Math.atan2(v, u - 0.82);
+        const r = Math.hypot(u - 0.82, v);
+        if (u > 0.68 && r < 0.12 + 0.12 * Math.abs(Math.cos(a * 3)) ** 4) return 7;
+      }
+      const knuckle = [-0.29, -0.1, 0.09, 0.27].some((ky) => Math.hypot(u - 0.52, v - ky) < 0.11);
+      const body = inRoundRect(u, v, 0.2, -0.02, 0.36, 0.38, 0.12) || knuckle;
+      const thumb = inRoundRect(u, v, 0.2, 0.3, 0.26, 0.09, 0.08);
+      if (thumb) return v > 0.34 ? 3 : 4;
+      if (body) {
+        // 指の筋
+        if (u > 0.22 && [-0.2, -0.01, 0.18].some((ly) => Math.abs(v - ly) < 0.025)) return 3;
+        if (v < -0.22 && u > -0.05) return 5;
+        return v > 0.18 ? 3 : 4;
+      }
+      // 手首のバンドと腕
+      if (inRoundRect(u, v, -0.27, -0.02, 0.12, 0.3, 0.05)) return v > 0.12 ? 1 : 2;
+      if (u < -0.39 && u > -0.62 && Math.abs(v + 0.02) < 0.22) return v > 0.08 ? 3 : 4;
+      // 速さの線（後ろ）
+      for (const [ly, len] of [[-0.3, 0.25], [0, 0.32], [0.26, 0.22]] as const) {
+        if (Math.abs(v - ly) < 0.035 && u < -0.68 && u > -0.68 - len - f * 0.08) return 6;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * にどげり: 右へ突き出した蹴り（横から見た足）。すねから足の甲、つま先は丸く、足の裏は濃い色。つま先に衝撃の光、
+ * 後ろに速さの弧。コマ 1 で光が大きくなる
+ */
+function kick(): SpriteOut {
+  // 0 輪郭・1 足の裏・2 影・3 足・4 明るい所・5 速さの線・6 衝撃
+  const palette = ['#2b1408', '#7a3b1e', '#c98a5e', '#f0bf93', '#ffe3c8', '#ffffff', '#fff176'];
+  const frames = [0, 1].map((f) =>
+    shape(24, (u, v) => {
+      const toe = Math.hypot(u - 0.82, v - 0.02);
+      if (toe < 0.1 + f * 0.06 + 0.08 * Math.abs(Math.cos(Math.atan2(v - 0.02, u - 0.82) * 3)) ** 4) return 6;
+      // すね（左上から足首へ）
+      const t = Math.max(0, Math.min(1, ((u + 0.85) * 0.62 + (v + 0.75) * 0.78) / 1.02));
+      const sx = -0.85 + 0.62 * t;
+      const sy = -0.75 + 0.78 * t;
+      const shin = Math.hypot(u - sx, v - sy) < 0.17 && t < 0.98;
+      // 足: つま先が丸い横長の形
+      const foot = inRoundRect(u, v, 0.22, 0.04, 0.46, 0.17, 0.15) || Math.hypot(u - 0.56, v + 0.01) < 0.15;
+      if (foot) {
+        if (v > 0.13) return 1;
+        return v < -0.06 ? 4 : 3;
+      }
+      if (shin) return u + v < -1.05 ? 4 : u - v > -0.35 ? 2 : 3;
+      // 速さの弧（すねの後ろ）
+      const r = Math.hypot(u + 0.2, v + 0.15);
+      if (u < -0.15 && v > -0.2 && Math.abs(r - 0.62 - f * 0.05) < 0.035) return 5;
+      if (u < -0.3 && v > 0 && Math.abs(r - 0.82 - f * 0.05) < 0.03) return 5;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * まわしげり: なぎ払う蹴りの残像（右へふくらむ大きな弧。先＝上ほど太く明るく、後ろ＝下ほど細く途切れる）と、
+ * 弧の先ではじける衝撃の光
+ */
+function kickArc(): SpriteOut {
+  // 0 輪郭・1 濃い橙・2 橙・3 うすい橙・4 白・5 衝撃
+  const palette = ['#2b1408', '#e65100', '#ffb74d', '#ffe0b2', '#ffffff', '#fff176'];
+  const frames = [0, 1].map((f) =>
+    shape(28, (u, v) => {
+      // 弧の先（右上）の衝撃の光
+      const sx = 0.32;
+      const sy = -0.72;
+      const a = Math.atan2(v - sy, u - sx);
+      if (Math.hypot(u - sx, v - sy) < 0.1 + f * 0.04 + 0.1 * Math.abs(Math.cos(a * 3)) ** 4) return 5;
+      // 弧: 中心 (-0.9, 0)・半径 1.35 の円に沿った帯
+      const d = Math.hypot(u + 0.9, v) - 1.35;
+      const t = (v + 0.75) / 1.6;
+      if (t < 0 || t > 1) return -1;
+      const half = 0.04 + 0.16 * (1 - t);
+      if (Math.abs(d + half * 0.2) > half) return -1;
+      if (t > 0.55 && hash(Math.floor(v * 12), f, 1400) < (t - 0.55) * 1.6) return -1;
+      const k = (d + half * 0.2) / half;
+      return k > 0.6 ? 1 : k > 0.15 ? 2 : k > -0.4 ? 3 : 4;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * ドラゴンテール: 前方をなぎ払う竜のしっぽ（左下から右へ弧を描き、先はひれ）。上の面が明るく、腹側に節。
+ * 後ろに速さの弧。コマでしっぽが少ししなる
+ */
+function tailSwipe(): SpriteOut {
+  // 0 輪郭・1 腹側の暗い青・2 青・3 うすい青・4 白い光・5 ひれの紫・6 速さの線
+  const palette = ['#120a2e', '#283593', '#5c6bc0', '#9fa8da', '#e8eaf6', '#9575cd', '#ffffff'];
+  const frames = [0, 1].map((f) => {
+    const p0 = [-0.95, 0.7] as const;
+    const p1 = [-0.1, 0.55 - f * 0.08] as const;
+    const p2 = [0.68, -0.15 + f * 0.05] as const;
+    const at = (t: number): [number, number] => [
+      (1 - t) ** 2 * p0[0] + 2 * (1 - t) * t * p1[0] + t * t * p2[0],
+      (1 - t) ** 2 * p0[1] + 2 * (1 - t) * t * p1[1] + t * t * p2[1],
+    ];
+    const pts = Array.from({ length: 41 }, (_, i) => at(i / 40));
+    return toRows(
+      shape(28, (u, v) => {
+        // しっぽの中心線（2次のベジエ曲線）への一番近い点
+        let best = 9;
+        let bt = 0;
+        pts.forEach(([x, y], i) => {
+          const d = Math.hypot(u - x, v - y);
+          if (d < best) {
+            best = d;
+            bt = i / 40;
+          }
+        });
+        const half = 0.2 * (1 - bt) + 0.05;
+        if (best < half && bt < 0.98) {
+          // 節（腹側の横線）と、上下の塗り分け（上が明るい）
+          if (Math.abs(((bt * 9) % 1) - 0.5) < 0.06 && bt < 0.85) return 1;
+          const side = (v - at(bt)[1]) / half;
+          return side < -0.45 ? 4 : side < 0.15 ? 3 : side < 0.6 ? 2 : 1;
+        }
+        // 先のひれ（三角）
+        const tx = u - p2[0];
+        const ty = v - p2[1];
+        if (tx > -0.12 && tx < 0.28 && Math.abs(ty) < 0.22 * (1 - (tx + 0.12) / 0.4)) return ty < 0 ? 5 : 2;
+        // 速さの弧（しっぽの上）
+        if (best > half + 0.08 && best < half + 0.13 && v < at(bt)[1] && bt > 0.2 && bt < 0.85 && (bt * 10 + f) % 2 < 1.3) return 6;
+        return -1;
+      }),
+    );
+  });
+  return { palette, frameMs: 80, parts: { main: frames } };
+}
+
+/**
+ * りゅうのいかり: 右へ飛ぶ紫の竜の炎（頭は丸く、後ろへ3本の炎の舌がゆらめく。芯は桃色に白く光る）。
+ * 続けて飛ばすと1本につながった炎に見える。4コマでゆらめく
+ */
+function dragonFire(): SpriteOut {
+  // 0 輪郭・1 濃い紫・2 紫・3 うすい紫・4 桃・5 白
+  const palette = ['#14062e', '#4527a0', '#7c4dff', '#b388ff', '#ea80fc', '#fce4ff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(18, (u, v) => {
+      const head = Math.hypot(u - 0.3, v) / 0.48;
+      // 炎の舌: 頭から後ろへ、上・真ん中・下の3本
+      let tongue = 9;
+      for (const [k, off] of [[0, -0.22], [1, 0], [2, 0.22]] as const) {
+        const t = (0.3 - u) / 1.15;
+        const len = k === 1 ? 1 : 0.7;
+        if (t < 0 || t > len) continue;
+        const wob = Math.sin(t * 6 + f * 1.6 + k * 2) * 0.1 * t;
+        const w = 0.2 * (1 - t / len) + 0.02;
+        const d = Math.abs(v - off * (1 - t * 0.3) - wob) / w;
+        if (d < 1) tongue = Math.min(tongue, d * 0.5 + t * 0.6);
+      }
+      if (head > 1 && tongue > 1) return -1;
+      const heat = head <= 1 ? head * 0.8 : 0.45 + tongue * 0.6;
+      return heat < 0.3 ? 5 : heat < 0.5 ? 4 : heat < 0.7 ? 3 : heat < 0.9 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * りゅうのはどう: 進む向きに立てて並ぶ、竜の気の輪（縦長の楕円の輪。右へ進む）。手前（右）の弧が明るく、奥（左）は暗い。
+ * コマで輪の光が回る
+ */
+function dragonRing(): SpriteOut {
+  // 0 輪郭・1 濃い紫・2 紫・3 青緑・4 うすい青緑・5 白
+  const palette = ['#120a2e', '#4527a0', '#7e57c2', '#26c6da', '#b2ebf2', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(24, (u, v) => {
+      const e = Math.hypot(u / 0.34, v / 0.92);
+      if (Math.abs(e - 0.84) > 0.15) return -1;
+      const a = Math.atan2(v / 0.92, u / 0.34);
+      // 手前（右）ほど明るい。光の点がコマで回る
+      const front = Math.cos(a);
+      if (Math.abs(Math.sin(a - (f * Math.PI * 2) / 3)) < 0.18 && front > -0.2) return 5;
+      const k = Math.abs(e - 0.84) / 0.15;
+      if (k > 0.7) return front > 0 ? 2 : 1;
+      return front > 0.3 ? 4 : front > -0.3 ? 3 : 2;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * ドラゴンダイブ: 体当たりで広がる竜の気の衝撃波（輪に沿って並べる帯。下が外）。外のふちに白と青緑の炎の舌、
+ * 内側へ紫に薄れる。並べてもつながるよう、舌の高さは幅 W の周期
+ */
+function dragonShock(): SpriteOut {
+  const W = 12;
+  const H = 10;
+  // 0 輪郭・1 濃い紫・2 紫・3 うすい紫・4 青緑・5 うすい青緑・6 白
+  const palette = ['#120a2e', '#311b92', '#5e35b1', '#9575cd', '#26c6da', '#b2ebf2', '#ffffff'];
+  const frames = [0, 1, 2].map((f) => {
+    const g = fill(blank(W, H), (x, yy) => {
+      const y = H - 1 - yy;
+      const ph = (x / W) * Math.PI * 2;
+      const tip = 3.5 - 2.2 * Math.max(0, Math.sin(ph * 2 + f * 1.4)) - 1.2 * Math.max(0, Math.sin(ph * 3 - f * 2 + 1));
+      if (y < tip) return -1;
+      const k = (y - tip) / (H - tip);
+      if (k > 0.75 && noise(Math.cos(ph) * 3 + 3, Math.sin(ph) * 3 + y, 1.5, 1500 + f) < (k - 0.75) * 4) return -1;
+      return k < 0.12 ? 6 : k < 0.25 ? 5 : k < 0.4 ? 4 : k < 0.58 ? 3 : k < 0.75 ? 2 : 1;
+    });
+    return toRows(outline(g, 0));
+  });
+  return { palette, frameMs: 70, parts: { middle: frames } };
+}
+
 /** 自作の絵であることの表記（data/render/move-sprites.json の credit） */
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
@@ -2089,7 +2305,6 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'ice-beam': () => iceBeam(),
     'aurora-beam': () => auroraBeam(),
     psybeam: () => psyBeam(),
-    'dragon-pulse': () => dragonPulse(),
     'flame-cone': () => cone('flame'),
     'bubble-cone': () => cone('bubble'),
     'quake-crack': () => quakeCrack(),
@@ -2100,9 +2315,14 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'impact-crescent': () => impactCrescent(),
     'speed-streak': () => speedStreak(),
     'spark-arc': () => sparkArc(),
-    chop: () => chop('single'),
-    'cross-chop': () => chop('cross'),
-    fist: () => fist(),
+    chop: () => karateChop(),
+    'cross-chop': () => crossChop(),
+    fist: () => punch(),
+    kick: () => kick(),
+    'kick-arc': () => kickArc(),
+    'tail-swipe': () => tailSwipe(),
+    'dragon-ring': () => dragonRing(),
+    'dragon-shock': () => dragonShock(),
     palm: () => palm(),
     'dust-ring': () => shockRing('dust'),
     'giga-ring': () => shockRing('giga'),
@@ -2139,7 +2359,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'seed-bomb': () => seedBomb(),
     'sleep-cloud': () => sleepCloud(),
     'zap-orb': () => zapOrb(),
-    'dragon-flame': () => dragonFlame(),
+    'dragon-flame': () => dragonFire(),
     'spin-spray': () => spinSpray(),
     'note-ring': () => noteRing(),
     'sound-waves': () => soundWaves(),

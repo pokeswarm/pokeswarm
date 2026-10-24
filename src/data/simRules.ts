@@ -63,6 +63,8 @@ export function buildSimRules(): SimRules {
       ...(def.lobTarget ? { lobTarget: def.lobTarget } : {}),
       ...(def.scatterJitter ? { scatterJitter: def.scatterJitter } : {}),
       sweepOnce: def.sweepOnce,
+      randomAim: def.randomAim,
+      restAfterEnd: def.restAfterEnd,
       ...(def.snake ? { snake: def.snake } : {}),
       // いつも効く技: レベルごとの効果を、そのレベルまでの合計にしておく
       passive: (def.passive ?? []).reduce<Modifiers[]>((acc, mods) => {

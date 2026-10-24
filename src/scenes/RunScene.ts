@@ -12,7 +12,7 @@ import { EdgeArrows, type EdgeTarget } from '../render/EdgeArrows';
 import { EffectRenderer } from '../render/effects/EffectRenderer';
 import { audio } from '../audio';
 import { RunSounds } from '../audio/runSounds';
-import { MoveSprites } from '../render/effects/MoveSprites';
+import { MoveSprites, type SpriteItem } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
 import { ObstacleView } from '../render/ObstacleView';
@@ -98,6 +98,9 @@ export class RunScene extends Phaser.Scene {
   private lightningMoves = new Set<number>();
   /** 技のドット絵 */
   private moveSprites: MoveSprites | null = null;
+  /** ボスの範囲技が落ちたときのドット絵（案 F） */
+  private strikeSprites: MoveSprites | null = null;
+  private strikes: { item: Omit<SpriteItem, 'elapsed' | 'alpha'>; start: number; seconds: number }[] = [];
   /** 画面をうっすら光らせた当たり判定の通し番号（同じものでは1回だけ） */
   private flashedSerials = new Set<number>();
   private enemyView!: PooledCircles;
@@ -375,6 +378,8 @@ export class RunScene extends Phaser.Scene {
     this.effects = new EffectRenderer(this, effectRecipes, depths.effects, spriteRender.effectPixel);
     // 技のドット絵は光の演出の少し下（光の粒が上に重なる）
     this.moveSprites = new MoveSprites(this, moveSprites, depths.effects - 0.1);
+    this.strikeSprites = new MoveSprites(this, moveSprites, depths.effects - 0.05);
+    this.strikes = [];
     const shape = spriteRender.hitShape;
     this.hitShapes = new HitShapes(this, depths.hitShapes, shape);
     this.shapeColors = rules.moves.map((m) => {
@@ -709,7 +714,19 @@ export class RunScene extends Phaser.Scene {
         this.playerViews.delete(ev.playerId);
         this.announce(t('net.playerLeft', { n: ev.playerId }), '#ef9a9a');
       } else if (ev.type === 'hazardStruck') {
-        if (ev.shape === 'line') {
+        // 落ちた範囲に合わせたドット絵（案 F）
+        const strike = effectRecipes[ev.effect]?.strike;
+        if (strike) {
+          this.strikes.push({
+            item: { spec: strike, x: ev.x, y: ev.y, radius: ev.radius, band: ev.shape === 'ring' ? ev.radius - ev.innerRadius : 0, dirX: ev.dirX, dirY: ev.dirY, length: ev.length, vx: 0, vy: 0, seed: this.strikes.length },
+            start: this.time.now / 1000,
+            seconds: strike.seconds,
+          });
+        }
+        if (strike) {
+          // 絵があるときは、光の演出は1つだけ（重ねると絵が白く飛ぶ）。直線は真ん中
+          this.effects.playImpact(ev.effect, ev.x + (ev.dirX * ev.length) / 2, ev.y + (ev.dirY * ev.length) / 2);
+        } else if (ev.shape === 'line') {
           // 直線は、線に沿っていくつか演出を出す
           for (let d = 0; d <= ev.length; d += Math.max(60, ev.length / 6)) this.effects.playImpact(ev.effect, ev.x + ev.dirX * d, ev.y + ev.dirY * d);
         } else if (ev.shape === 'ring') {
@@ -1309,6 +1326,15 @@ export class RunScene extends Phaser.Scene {
       if (pr.stage[i] === 1 && pr.shape[i] === SHAPE_LINE) return this.effects.effectLineSprite(effect) ?? null;
       return null;
     });
+    // ボスの範囲技が落ちた所の絵: 出てからの時間でコマを進め、最後の 3 割で薄くする
+    const now = this.time.now / 1000;
+    this.strikes = this.strikes.filter((s) => now - s.start < s.seconds);
+    this.strikeSprites?.drawItems(
+      this.strikes.map((s) => {
+        const elapsed = now - s.start;
+        return { ...s.item, elapsed, alpha: Math.min(1, (s.seconds - elapsed) / (s.seconds * 0.3)) };
+      }),
+    );
     this.drawGhosts(world, alpha);
     this.drawBolts(world);
     this.drawScreenFlashes(world);

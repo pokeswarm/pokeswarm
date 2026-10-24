@@ -291,6 +291,7 @@ function strikeHazards(world: World): void {
       radius: hz.radius,
       effect: move?.effect ?? '',
       shape: hz.shape,
+      innerRadius: hz.innerRadius ?? 0,
       dirX: hz.dirX,
       dirY: hz.dirY,
       length: hz.length,

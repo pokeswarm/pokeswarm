@@ -166,6 +166,8 @@ export interface HazardStruckEvent {
   readonly radius: number;
   readonly effect: string;
   readonly shape: 'circle' | 'line' | 'ring';
+  /** 輪の内側の半径（輪でなければ 0） */
+  readonly innerRadius: number;
   readonly dirX: number;
   readonly dirY: number;
   readonly length: number;

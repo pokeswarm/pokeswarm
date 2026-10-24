@@ -165,7 +165,7 @@
     },
     {
       "id": "legend-dash",
-      "effect": "beam",
+      "effect": "legend-dash",
       "shape": "line",
       "target": "player",
       "telegraphSeconds": 0.7,
@@ -279,7 +279,7 @@
     },
     {
       "id": "zapdos-dash",
-      "effect": "beam",
+      "effect": "zapdos-dash",
       "shape": "line",
       "target": "player",
       "telegraphSeconds": 0.5,

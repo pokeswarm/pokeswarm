@@ -436,3 +436,4 @@ pokeswarm/
 - 最初の持ち物（`src/meta/loadoutOptions.ts`・`src/scenes/loadoutOptionsPanel.ts`）: 条件は `achievements.json` の `startItem.clears`。候補はレベルアップと同じ判定（`itemFits`。解放済み・系統・タイプ・一緒に持てない物）。前回選んだものはポケモンごとにブラウザに覚える。ランの始めに `itemNew` として持たせる（RunScene でもう一度 `itemFits` を確かめる）。
 - 色違い: 実績の報酬 `reward.shiny`（系統のキー）。スプライトのキーは `<キー>-shiny`（進化しても `-shiny` を付けて読む）。敵の `shiny: true` は名前を「色違いの〇〇」にする。伝説戦の相性で選ぶ候補は `stage.json` の `legendary.counter`（参加者のだれかが条件の実績のどれかを達成していれば `world.legendaryCounter`。伝説戦を始めるときに `counterPick` が、プレイヤーごとの「向こうのタイプがこちらに効く倍率 ÷ こちらのタイプが向こうに効く倍率」の合計が一番大きい1体を選び、`kinds` と同じ重みで足す）。
 - 協力プレイ: 待合室の参加者に `startItem`・`shiny` を足した（`members/<番号>/startItem`・`shiny`。開始時の `started` にも入れる）。色違いのスプライトは開始するときに読み込む。
+- ボスの技が落ちたときの絵（案 F）: `hazardStruck` に輪の内側の半径を足し、RunScene が `strike` のある演出なら、別の `MoveSprites`（`drawItems`。当たり判定でなく位置と大きさを渡して描く）で seconds の間出す。`MoveSprites.draw` も `drawItems` を使う形にした。

@@ -2,7 +2,28 @@ import Phaser from 'phaser';
 import type { EffectRecipe, MoveSpritesData } from '../../data/schema';
 import type { ProjectileStore } from '../../sim/entities/projectiles';
 
-type SpriteSpec = NonNullable<EffectRecipe['sprite']>;
+export type SpriteSpec = NonNullable<EffectRecipe['sprite']>;
+
+/** 描く1枚（または1組）の位置と大きさ。radius は円の半径・線の太さの半分・扇の半径、length は線の長さ（扇では開きの角度） */
+export interface SpriteItem {
+  readonly spec: SpriteSpec;
+  readonly x: number;
+  readonly y: number;
+  readonly radius: number;
+  /** 輪の帯の厚さ（0 なら半径の 3 割） */
+  readonly band: number;
+  readonly dirX: number;
+  readonly dirY: number;
+  readonly length: number;
+  /** 前のフレームからの動き（velocity の向き） */
+  readonly vx: number;
+  readonly vy: number;
+  /** 出てからの秒数（コマを進める） */
+  readonly elapsed: number;
+  readonly alpha: number;
+  /** varyTiles のずらし */
+  readonly seed: number;
+}
 
 /** テクスチャの名前（絵・部品・コマごと） */
 function frameKey(id: string, part: string, frame: number): string {
@@ -65,6 +86,33 @@ export class MoveSprites {
 
   /** 毎フレーム描き直す。specOf は当たり判定ごとのドット絵の指定（無ければ描かない） */
   draw(pr: ProjectileStore, alpha: number, specOf: (i: number) => SpriteSpec | null): void {
+    const items: SpriteItem[] = [];
+    for (let i = 0; i < pr.count; i++) {
+      const spec = specOf(i);
+      if (!spec) continue;
+      const elapsed = pr.maxLife[i]! - pr.life[i]!;
+      items.push({
+        spec,
+        x: pr.prevX[i]! + (pr.x[i]! - pr.prevX[i]!) * alpha,
+        y: pr.prevY[i]! + (pr.y[i]! - pr.prevY[i]!) * alpha,
+        radius: pr.radius[i]!,
+        band: pr.band[i]!,
+        dirX: pr.dirX[i]!,
+        dirY: pr.dirY[i]!,
+        length: pr.length[i]!,
+        vx: pr.x[i]! - pr.prevX[i]!,
+        vy: pr.y[i]! - pr.prevY[i]!,
+        elapsed,
+        // 短い技（はっぱカッターなど 0.2 秒ほど）は、出ている時間の最後の 3 割だけで薄くする
+        alpha: Math.min(1, pr.life[i]! / Math.min(FADE_SECONDS, pr.maxLife[i]! * 0.3)),
+        seed: i,
+      });
+    }
+    this.drawItems(items);
+  }
+
+  /** 位置と大きさを指定して描く（当たり判定のほか、ボスの技が落ちた所の絵にも使う） */
+  drawItems(items: readonly SpriteItem[]): void {
     let used = 0;
     const put = (key: string, x: number, y: number, rot: number, sx: number, sy: number, a: number, originX = 0.5): void => {
       let img = this.images[used];
@@ -75,26 +123,20 @@ export class MoveSprites {
       img.setTexture(key).setOrigin(originX, 0.5).setPosition(x, y).setRotation(rot).setScale(sx, sy).setAlpha(a).setVisible(true);
       used++;
     };
-    for (let i = 0; i < pr.count; i++) {
-      const spec = specOf(i);
-      if (!spec) continue;
+    for (const it of items) {
+      const spec = it.spec;
       const sp = this.data.sprites[spec.id];
       if (!sp) continue;
-      const x = pr.prevX[i]! + (pr.x[i]! - pr.prevX[i]!) * alpha;
-      const y = pr.prevY[i]! + (pr.y[i]! - pr.prevY[i]!) * alpha;
-      const elapsed = pr.maxLife[i]! - pr.life[i]!;
-      // 短い技（はっぱカッターなど 0.2 秒ほど）は、出ている時間の最後の 3 割だけで薄くする
-      const a = Math.min(1, pr.life[i]! / Math.min(FADE_SECONDS, pr.maxLife[i]! * 0.3)) * spec.alpha;
-      const r = pr.radius[i]! * spec.size;
+      const { x, y, elapsed } = it;
+      const a = it.alpha * spec.alpha;
+      const r = it.radius * spec.size;
       if (spec.fit === 'circle') {
         const rows = sp.parts.main?.[0];
         if (!rows) continue;
         const s = (r * 2) / rows[0]!.length;
         // 向き: 進む向き（絵は右向きに描く）か、回し続けるか
-        const vx = pr.x[i]! - pr.prevX[i]!;
-        const vy = pr.y[i]! - pr.prevY[i]!;
         const rot =
-          spec.rotate === 'velocity' ? (vx !== 0 || vy !== 0 ? Math.atan2(vy, vx) : Math.atan2(pr.dirY[i]!, pr.dirX[i]!)) : spec.rotate === 'spin' ? (elapsed * spec.spinDegPerSec * Math.PI) / 180 : 0;
+          spec.rotate === 'velocity' ? (it.vx !== 0 || it.vy !== 0 ? Math.atan2(it.vy, it.vx) : Math.atan2(it.dirY, it.dirX)) : spec.rotate === 'spin' ? (elapsed * spec.spinDegPerSec * Math.PI) / 180 : 0;
         put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x, y, rot, s, s, a);
         continue;
       }
@@ -102,17 +144,17 @@ export class MoveSprites {
         // 扇形の先（ほのおのキバ・フレアドライブ）: 向きの先、半径の 6 割の所に、扇の半径に合わせた1枚（右向きの絵）
         const rows = sp.parts.main?.[0];
         if (!rows) continue;
-        const reach = pr.radius[i]!;
+        const reach = it.radius;
         const s = (reach * spec.size) / rows[0]!.length;
-        put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x + pr.dirX[i]! * reach * 0.6, y + pr.dirY[i]! * reach * 0.6, Math.atan2(pr.dirY[i]!, pr.dirX[i]!), s, s, a);
+        put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x + it.dirX * reach * 0.6, y + it.dirY * reach * 0.6, Math.atan2(it.dirY, it.dirX), s, s, a);
         continue;
       }
       if (spec.fit === 'ring') {
         // 輪（じしん）: 帯の真ん中の円に沿って、途中の部品を接する向きに並べる（太さは帯の厚さ）
         const rows = sp.parts.middle?.[0];
         if (!rows) continue;
-        const outer = pr.radius[i]!;
-        const band = (pr.band[i]! > 0 ? pr.band[i]! : outer * 0.3) * spec.size;
+        const outer = it.radius;
+        const band = (it.band > 0 ? it.band : outer * 0.3) * spec.size;
         const rc = Math.max(1, outer - band / 2);
         // 少なくとも 16 枚並べて、角ばった多角形に見えないようにする
         const n = Math.max(16, Math.round((Math.PI * 2 * rc) / ((rows[0]!.length * band) / rows.length)));
@@ -129,9 +171,9 @@ export class MoveSprites {
         // 扇形（かえんほうしゃ・バブルこうせん）: 1枚の絵（右向き）の左端を根元に置き、長さを扇の半径、幅を扇の先の幅に合わせて引き伸ばす
         const rows = sp.parts.main?.[0];
         if (!rows) continue;
-        const reach = pr.radius[i]!;
-        const width = Math.max(24, 2 * reach * Math.tan(Math.min(1.2, pr.length[i]!)) * spec.size);
-        put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x, y, Math.atan2(pr.dirY[i]!, pr.dirX[i]!), reach / rows[0]!.length, width / rows.length, a, 0);
+        const reach = it.radius;
+        const width = Math.max(24, 2 * reach * Math.tan(Math.min(1.2, it.length)) * spec.size);
+        put(frameKey(spec.id, 'main', this.frameOf(spec.id, 'main', elapsed)), x, y, Math.atan2(it.dirY, it.dirX), reach / rows[0]!.length, width / rows.length, a, 0);
         continue;
       }
       // 線: 始まり → 途中を並べる → 終わり（太さは当たり判定の直径）
@@ -140,11 +182,11 @@ export class MoveSprites {
       const end = sp.parts.end?.[0];
       if (!start || !middle || !end) continue;
       const s = (r * 2) / middle.length;
-      const dx = pr.dirX[i]!;
-      const dy = pr.dirY[i]!;
+      const dx = it.dirX;
+      const dy = it.dirY;
       const rot = Math.atan2(dy, dx);
       // 伸びていく線（突き出す根）: 根元から先へ growSeconds で伸ばす
-      const len = pr.length[i]! * (spec.growSeconds ? Math.min(1, elapsed / spec.growSeconds) : 1);
+      const len = it.length * (spec.growSeconds ? Math.min(1, elapsed / spec.growSeconds) : 1);
       const startLen = start[0]!.length * s;
       const endLen = end[0]!.length * s;
       const tileLen = middle[0]!.length * s;
@@ -154,8 +196,8 @@ export class MoveSprites {
       const midCount = sp.parts.middle!.length;
       for (let d = startLen, k = 0; d < len - endLen; d += tileLen, k++) {
         const [px, py] = at(d + tileLen / 2);
-        const f = spec.varyTiles ? (midFrame + k * 3 + i) % midCount : midFrame;
-        put(frameKey(spec.id, 'middle', f), px, py, rot, s, s, a);
+        const fr = spec.varyTiles ? (midFrame + k * 3 + it.seed) % midCount : midFrame;
+        put(frameKey(spec.id, 'middle', fr), px, py, rot, s, s, a);
       }
       const [sx, sy] = at(Math.min(startLen, len) / 2);
       put(frameKey(spec.id, 'start', this.frameOf(spec.id, 'start', elapsed)), sx, sy, rot, s, s, a);

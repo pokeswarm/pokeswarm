@@ -1177,6 +1177,102 @@ function flameSwirl(): SpriteOut {
   return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- ボスの技が落ちたときの絵（案 F） ----------------
+type BurstKind = 'ice' | 'meteor' | 'psy' | 'shadow' | 'fire' | 'thunder';
+
+/**
+ * 落ちた所ではじける絵（5コマ。最後のコマで止めて薄くする）: 真ん中の光が縮み、輪とかけらが外へ広がる。
+ * ice（氷のとげ）・meteor（岩と炎）・psy（二重の輪）・shadow（影のもや）・fire（炎のかたまり）・thunder（稲妻が放射状に）
+ */
+function burst(kind: BurstKind): SpriteOut {
+  const palettes: Record<BurstKind, string[]> = {
+    ice: ['#0d3550', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff'],
+    meteor: ['#3e1a08', '#8d4a1f', '#ff7043', '#ffca28', '#fff8e1'],
+    psy: ['#4a0e3a', '#ad1457', '#f06292', '#f8bbd0', '#ffffff'],
+    shadow: ['#120a1f', '#311b5c', '#5e35b1', '#9575cd', '#d1c4e9'],
+    fire: ['#4e1206', '#d84315', '#ff9800', '#ffeb3b', '#fffde7'],
+    thunder: ['#3e2f00', '#f9a825', '#ffeb3b', '#fff59d', '#ffffff'],
+  };
+  const r = rng(kind.length * 17 + 3);
+  const shards = Array.from({ length: kind === 'fire' || kind === 'meteor' ? 11 : 8 }, (_, k) => ({
+    a: (k / (kind === 'fire' || kind === 'meteor' ? 11 : 8)) * Math.PI * 2 + (r() - 0.5) * 0.5,
+    speed: 0.7 + r() * 0.35,
+    size: kind === 'fire' || kind === 'meteor' || kind === 'shadow' ? 0.13 + r() * 0.07 : 0.09 + r() * 0.06,
+  }));
+  const frames = [0, 1, 2, 3, 4].map((f) => {
+    const p = f / 4;
+    return shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 真ん中の光（縮む）
+      const core = 0.5 * (1 - p) + 0.05;
+      if (d < core * 0.55) return 4;
+      if (d < core) return 3;
+      // 広がる輪（氷・エスパー・稲妻だけ。炎・岩・影は かけらだけにする）
+      const ring = 0.3 + 0.62 * p;
+      const hasRing = kind === 'ice' || kind === 'psy' || kind === 'thunder';
+      const ringW = kind === 'psy' ? 0.06 : 0.05 * (1 - p) + 0.02;
+      if (hasRing && Math.abs(d - ring) < ringW) return kind === 'psy' ? 3 : 2;
+      if (kind === 'psy' && Math.abs(d - ring * 0.62) < 0.045) return 2;
+      // かけら
+      for (const s of shards) {
+        const dist = 0.2 + s.speed * 0.7 * p;
+        const da = Math.atan2(Math.sin(a - s.a), Math.cos(a - s.a));
+        if (kind === 'ice') {
+          // 外を向いたとげ: 先ほど細い
+          const along = d - dist;
+          if (along > -0.34 && along < 0.06 && Math.abs(da) * d < 0.42 * (0.06 - along)) return along > -0.1 ? 4 : 3;
+          continue;
+        }
+        if (kind === 'thunder') {
+          // 中心から外へ、ぎざぎざに伸びる稲妻
+          const zig = Math.sin(d * 22 + s.a * 5) * 0.035;
+          if (d < dist + 0.1 && d > core && Math.abs(da * d - zig) < 0.03) return d > dist ? 4 : 3;
+          continue;
+        }
+        if (kind === 'psy') continue;
+        const cx = Math.cos(s.a) * dist;
+        const cy = Math.sin(s.a) * dist;
+        const sz = s.size * (1 - p * 0.4);
+        const dd = Math.hypot(u - cx, v - cy);
+        if (dd < sz) {
+          if (kind === 'meteor') return dd < sz * 0.5 ? 1 : 0;
+          return dd < sz * 0.5 ? 3 : 2;
+        }
+        // 炎・影は、かけらの後ろに尾
+        if ((kind === 'fire' || kind === 'shadow' || kind === 'meteor') && Math.abs(da) * d < sz * 0.6 && d < dist && d > dist - 0.35) return kind === 'meteor' ? 2 : 1;
+      }
+      return -1;
+    });
+  });
+  return { palette: palettes[kind], frameMs: 80, loopFrom: 4, parts: { main: frames.map(toRows) } };
+}
+
+type StreakKind = 'white' | 'electric' | 'fire';
+
+/** 突進の筋（直線の範囲に沿って、右へ流れる風の筋。start・middle・end） */
+function streak(kind: StreakKind): SpriteOut {
+  const palettes: Record<StreakKind, string[]> = {
+    white: ['#37474f', '#90a4ae', '#cfd8dc', '#ffffff'],
+    electric: ['#3e2f00', '#f9a825', '#fff176', '#ffffff'],
+    fire: ['#4e1206', '#e64a19', '#ffb74d', '#fff8e1'],
+  };
+  const H = 12;
+  const TILE = 12;
+  const lanes = [2, 5, 8, 10];
+  const parts = lineParts(H, { start: 6, middle: TILE, end: 8 }, 3, (x, y, f, part) => {
+    const taper = part === 'start' ? x / 6 : part === 'end' ? 1 - x / 8 : 1;
+    for (const [k, lane] of lanes.entries()) {
+      if (Math.abs(y - lane) > (k === 1 || k === 2 ? 0.8 : 0.4)) continue;
+      // ずれながら流れる破線
+      const phase = (x + f * 4 + k * 5) % TILE;
+      if (phase < TILE * (0.35 + taper * 0.45)) return k === 1 || k === 2 ? 3 : 2;
+    }
+    return -1;
+  });
+  return { palette: palettes[kind], frameMs: 60, parts };
+}
+
 const out = {
   credit: '自作（scripts/make-move-sprites.ts で計算して描いた。公式の素材は使っていない）',
   sprites: {
@@ -1230,6 +1326,15 @@ const out = {
     whirlpool: whirlpool(),
     'water-spout': waterSpout(),
     'flame-swirl': flameSwirl(),
+    'burst-ice': burst('ice'),
+    'burst-meteor': burst('meteor'),
+    'burst-psy': burst('psy'),
+    'burst-shadow': burst('shadow'),
+    'burst-fire': burst('fire'),
+    'burst-thunder': burst('thunder'),
+    'streak-white': streak('white'),
+    'streak-electric': streak('electric'),
+    'streak-fire': streak('fire'),
   } as Record<string, SpriteOut>,
 };
 writeFileSync(join(ROOT, 'data/render/move-sprites.json'), JSON.stringify(out, null, 2) + '\n');

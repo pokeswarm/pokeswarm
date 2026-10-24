@@ -1074,6 +1074,11 @@ export const effectRecipeSchema = z.object({
   /** 効き方から出た線（ハードプラントの突き出す根）を、光の線の代わりにこのドット絵で描く */
   effectLineSprite: moveSpriteSpec.optional(),
   /**
+   * ボス・伝説の範囲技が落ちたときのドット絵（作者の案 2026年10月24日。案 F）。落ちた範囲（円・輪・直線）に合わせて seconds の間出す。
+   * 予告の赤い範囲はそのまま（避けやすさのため）
+   */
+  strike: moveSpriteSpec.extend({ seconds: z.number().positive() }).optional(),
+  /**
    * 稲妻の線（10まんボルト・でんきショック・かみなりの連鎖）: 線の端から端まで1本のジグザグを、毎フレーム形を変えて描く
    * （同じ形の絵を並べると鎖のように見えた。作者の指摘 2026年10月24日）。jitter は折れ目のずれ（太さの何倍か）
    */

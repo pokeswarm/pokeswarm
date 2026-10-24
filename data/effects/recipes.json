@@ -413,6 +413,12 @@
         "coreScale": 0.5,
         "glowColor": "#ffa726",
         "shapeAlpha": 0.7
+      },
+      "strike": {
+        "id": "burst-fire",
+        "fit": "circle",
+        "size": 1.15,
+        "seconds": 0.55
       }
     },
     "gust": {
@@ -444,6 +450,12 @@
         "id": "water-stream",
         "fit": "line",
         "size": 1.1
+      },
+      "strike": {
+        "id": "water-stream",
+        "fit": "line",
+        "size": 1,
+        "seconds": 0.5
       }
     },
     "razor-leaf": {
@@ -528,6 +540,12 @@
         "fit": "line",
         "size": 1.3,
         "growSeconds": 0.25
+      },
+      "strike": {
+        "id": "root-line",
+        "fit": "ring",
+        "size": 1,
+        "seconds": 0.7
       }
     },
     "poison-sting": {
@@ -698,6 +716,12 @@
           "durationMs": 300,
           "alpha": 0.8
         }
+      },
+      "strike": {
+        "id": "burst-ice",
+        "fit": "circle",
+        "size": 1.15,
+        "seconds": 0.5
       }
     },
     "quake": {
@@ -735,6 +759,12 @@
           "durationMs": 300,
           "alpha": 0.8
         }
+      },
+      "strike": {
+        "id": "quake-crack",
+        "fit": "ring",
+        "size": 1,
+        "seconds": 0.7
       }
     },
     "shadow": {
@@ -772,6 +802,12 @@
           "durationMs": 300,
           "alpha": 0.8
         }
+      },
+      "strike": {
+        "id": "burst-shadow",
+        "fit": "circle",
+        "size": 1.15,
+        "seconds": 0.5
       }
     },
     "meteor": {
@@ -809,6 +845,12 @@
           "durationMs": 300,
           "alpha": 0.8
         }
+      },
+      "strike": {
+        "id": "burst-meteor",
+        "fit": "circle",
+        "size": 1.2,
+        "seconds": 0.5
       }
     },
     "psy": {
@@ -846,6 +888,12 @@
           "durationMs": 300,
           "alpha": 0.8
         }
+      },
+      "strike": {
+        "id": "burst-psy",
+        "fit": "circle",
+        "size": 1.05,
+        "seconds": 0.5
       }
     },
     "beam": {
@@ -883,6 +931,12 @@
           "durationMs": 300,
           "alpha": 0.8
         }
+      },
+      "strike": {
+        "id": "hyper-beam",
+        "fit": "line",
+        "size": 1,
+        "seconds": 0.45
       }
     },
     "electric.base": {
@@ -1094,6 +1148,12 @@
         "glowColor": "#ffeb3b",
         "width": 3,
         "jitter": 3
+      },
+      "strike": {
+        "id": "burst-thunder",
+        "fit": "circle",
+        "size": 1.2,
+        "seconds": 0.4
       }
     },
     "thunder": {
@@ -1282,6 +1342,12 @@
         "seconds": 0.6,
         "radius": 70,
         "alpha": 1
+      },
+      "strike": {
+        "id": "burst-fire",
+        "fit": "circle",
+        "size": 1.1,
+        "seconds": 0.5
       }
     },
     "extreme-speed": {
@@ -1838,6 +1904,12 @@
         "flash": {
           "radius": 60
         }
+      },
+      "strike": {
+        "id": "streak-fire",
+        "fit": "line",
+        "size": 1.2,
+        "seconds": 0.45
       }
     },
     "metronome": {
@@ -2203,6 +2275,24 @@
         "seconds": 0.4,
         "radius": 50,
         "alpha": 0.9
+      }
+    },
+    "legend-dash": {
+      "extends": "beam",
+      "strike": {
+        "id": "streak-white",
+        "fit": "line",
+        "size": 1.2,
+        "seconds": 0.4
+      }
+    },
+    "zapdos-dash": {
+      "extends": "beam",
+      "strike": {
+        "id": "streak-electric",
+        "fit": "line",
+        "size": 1.2,
+        "seconds": 0.4
       }
     }
   }

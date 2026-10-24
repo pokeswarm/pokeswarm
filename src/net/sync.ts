@@ -35,6 +35,14 @@ export class SyncSession {
   /** 直近の往復時間（ms） */
   rttMs: number | null = null;
   private lastPingAt = -Infinity;
+  /**
+   * 最後に受け取った、プレイヤーごとの位置と、敵の位置の補正の更新回数。位置と補正は順番を待たないチャンネルで届くので、
+   * これより古いものが後から届いたら捨てる
+   */
+  private readonly lastPlayerTick = new Map<PlayerId, number>();
+  private lastCorrectionTick = -Infinity;
+  /** 自分の位置に付ける通し番号（ゲストの更新回数はホストに合わせて戻ることがあるので、更新回数とは別に数える） */
+  private sendSeq = 0;
 
   constructor(
     rate: SyncRate,
@@ -78,6 +86,7 @@ export class SyncSession {
         h: round2(local.hp),
         m: round2(local.maxHp),
         dn: local.down ? 1 : 0,
+        k: ++this.sendSeq,
       });
     }
 
@@ -224,6 +233,11 @@ export class SyncSession {
         case 'p':
           // 自分の分（中継で戻ってきたもの）は無視する
           if (m.i === world.localPlayerId) break;
+          // 古い位置が後から届いたら捨てる
+          if (m.k !== undefined) {
+            if (m.k < (this.lastPlayerTick.get(m.i) ?? -Infinity)) break;
+            this.lastPlayerTick.set(m.i, m.k);
+          }
           cmds.push({
             type: 'remotePlayer',
             playerId: m.i,
@@ -286,7 +300,11 @@ export class SyncSession {
           if (host) for (let k = 0; k + 1 < m.e.length; k += 2) if (m.e[k + 1] === from) cmds.push({ type: 'requestPickup', id: m.e[k]!, by: from });
           break;
         case 'c':
-          if (guest) cmds.push({ type: 'correctEnemies', data: m.e, tick: m.k });
+          // 古い補正が後から届いたら捨てる
+          if (guest && m.k > this.lastCorrectionTick) {
+            this.lastCorrectionTick = m.k;
+            cmds.push({ type: 'correctEnemies', data: m.e, tick: m.k });
+          }
           break;
         case 'lu':
           if (guest) cmds.push({ type: 'levelUpState', state: m.s, rerolls: m.r });

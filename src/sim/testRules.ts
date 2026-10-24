@@ -170,7 +170,7 @@ export function testRules(
     },
     // 既定では障害物を置かない
     obstacles: { cellSize: 500, chance: 0, margin: 50, radius: 20, safeRadius: 0, sections: [['test']] },
-    netSmoothing: { playerBlend: 0.35, predictTicks: 8, enemyBlend: 0.15, snapDistance: 240 },
+    netSmoothing: { playerBlend: 0.35, predictTicks: 8, enemyBlend: 0.15, snapDistance: 240, predictKillSeconds: 1.5 },
   };
 }
 

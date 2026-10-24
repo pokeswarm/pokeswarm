@@ -387,6 +387,8 @@ export class Room {
 
     const pc = new RTCPeerConnection({ iceServers: this.config.iceServers });
     const channel = pc.createDataChannel('game', { ordered: true });
+    // 落ちてもよいもの（位置・補正）用: 順番を待たず、送り直さない（03_network.md 6.4）
+    const fast = pc.createDataChannel('fast', { ordered: false, maxRetransmits: 0 });
     pc.onicecandidate = (ev) => {
       if (ev.candidate) void push(ref(db, `${peer}/candidates/host`), ev.candidate.toJSON());
     };
@@ -413,7 +415,10 @@ export class Room {
       return relay();
     }
     await set(ref(db, `${peer}/mode`), 'p2p');
-    this.addTransport(slot, new PeerTransport(pc, channel));
+    const transport = new PeerTransport(pc, channel);
+    if (fast.readyState === 'open') transport.attachFast(fast);
+    else fast.onopen = () => transport.attachFast(fast);
+    this.addTransport(slot, transport);
   }
 
   /** ゲスト: ホストとつなぐ（ホストが中継に切り替えたら合わせる） */
@@ -435,9 +440,21 @@ export class Room {
       subs.clear();
       this.addTransport(1, t);
     };
+    // ホストが作る2本のチャンネル: game（確実に届く）と fast（落ちてもよいもの）。fast は開いたら使う
+    let transport: PeerTransport | null = null;
+    let fast: RTCDataChannel | null = null;
     pc.ondatachannel = (ev) => {
       const channel = ev.channel;
-      channel.onopen = () => finish(new PeerTransport(pc, channel));
+      if (channel.label === 'fast') {
+        fast = channel;
+        channel.onopen = () => transport?.attachFast(channel);
+        return;
+      }
+      channel.onopen = () => {
+        transport = new PeerTransport(pc, channel);
+        if (fast?.readyState === 'open') transport.attachFast(fast);
+        finish(transport);
+      };
     };
     subs.add(
       onValue(ref(db, `${peer}/mode`), (m) => {

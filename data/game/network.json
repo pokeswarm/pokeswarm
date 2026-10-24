@@ -7,7 +7,7 @@
   "p2pTimeoutMs": 10000,
   "p2p": {
     "playerStateIntervalTicks": 1,
-    "correctionIntervalTicks": 30
+    "correctionIntervalTicks": 10
   },
   "relay": {
     "playerStateIntervalTicks": 3,
@@ -16,7 +16,7 @@
   },
   "guestSpawnOffsetX": 60,
   "maxPlayers": 4,
-  "smoothing": { "playerBlend": 0.35, "predictTicks": 8, "enemyBlend": 0.15, "snapDistance": 240 },
+  "smoothing": { "playerBlend": 0.35, "predictTicks": 8, "enemyBlend": 0.15, "snapDistance": 240, "predictKillSeconds": 1.5 },
   "pingIntervalMs": 1000,
   "silenceTimeoutSeconds": 10
 }

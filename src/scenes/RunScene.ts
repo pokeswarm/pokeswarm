@@ -1327,7 +1327,7 @@ export class RunScene extends Phaser.Scene {
         alpha,
         view,
         (i) => this.statusTint(i) ?? enemyColor,
-        (i) => this.streamer.manifestOf(e.kind[i]!) === null,
+        (i) => e.hp[i]! > 0 && this.streamer.manifestOf(e.kind[i]!) === null,
       );
     const sprites = this.streamer.stats();
     const pr = world.projectiles;

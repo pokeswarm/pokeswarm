@@ -33,6 +33,12 @@ export class EnemyStore {
   readonly statusTicks: Uint16Array;
   /** 状態異常を付けたプレイヤー（継続ダメージで倒したときのとどめに使う） */
   readonly statusBy: Uint16Array;
+  /**
+   * ゲストが自分の攻撃で倒したと見込んで、先に消して見せている敵の、ホストの撃破の知らせを待つ残りの更新回数（0 なら待っていない）。
+   * 待っている間は HP 0 のまま入れ物に残し（撃破の知らせで、ふつうに倒れる）、知らせが来なければ savedHp に戻して見せ直す
+   */
+  readonly ghostTicks: Uint16Array;
+  readonly savedHp: Float64Array;
 
   constructor(
     readonly capacity: number,
@@ -60,6 +66,8 @@ export class EnemyStore {
     this.kbTicks = new Uint16Array(capacity);
     this.statusTicks = new Uint16Array(capacity * statusCount);
     this.statusBy = new Uint16Array(capacity * statusCount);
+    this.ghostTicks = new Uint16Array(capacity);
+    this.savedHp = new Float64Array(capacity);
   }
 
   /** 追加して index を返す。満杯なら -1 */
@@ -81,6 +89,7 @@ export class EnemyStore {
     this.kbVx[i] = this.kbVy[i] = 0;
     this.kbTicks[i] = 0;
     this.statusTicks.fill(0, i * this.statusCount, (i + 1) * this.statusCount);
+    this.ghostTicks[i] = 0;
     return i;
   }
 
@@ -114,15 +123,26 @@ export class EnemyStore {
     this.kbVx[i] = this.kbVx[last]!;
     this.kbVy[i] = this.kbVy[last]!;
     this.kbTicks[i] = this.kbTicks[last]!;
+    this.ghostTicks[i] = this.ghostTicks[last]!;
+    this.savedHp[i] = this.savedHp[last]!;
     const n = this.statusCount;
     this.statusTicks.copyWithin(i * n, last * n, (last + 1) * n);
     this.statusBy.copyWithin(i * n, last * n, (last + 1) * n);
   }
 
-  /** HP が 0 以下の敵をまとめて取り除く（順番は決まった手順で変わるので再現できる） */
+  /** HP が 0 以下の敵をまとめて取り除く（順番は決まった手順で変わるので再現できる）。撃破の知らせを待っている敵（ゲスト）は残す */
   removeDead(): void {
     for (let i = this.count - 1; i >= 0; i--) {
-      if (this.hp[i]! <= 0) this.removeAt(i);
+      if (this.hp[i]! <= 0 && this.ghostTicks[i] === 0) this.removeAt(i);
+    }
+  }
+
+  /** ゲスト: 先に消して見せた敵の待ち時間を減らし、撃破の知らせが来ないまま時間が切れたら見せ直す */
+  stepGhosts(): void {
+    for (let i = 0; i < this.count; i++) {
+      if (this.ghostTicks[i] === 0) continue;
+      this.ghostTicks[i]!--;
+      if (this.ghostTicks[i] === 0 && this.hp[i]! <= 0) this.hp[i] = Math.max(1, this.savedHp[i]!);
     }
   }
 

@@ -1276,6 +1276,11 @@ export const netSmoothingSchema = z.object({
   predictTicks: z.number().int().nonnegative(),
   enemyBlend: z.number().gt(0).max(1),
   snapDistance: z.number().positive(),
+  /**
+   * ゲストが自分の攻撃で雑魚を倒したと見込んだら、ホストの撃破の知らせを待たずに先に消して見せる（作者の依頼 2026年10月25日）。
+   * この秒数のうちに知らせが来なければ（見込みが外れた）、見せ直す
+   */
+  predictKillSeconds: z.number().positive(),
 });
 export type NetSmoothing = z.infer<typeof netSmoothingSchema>;
 

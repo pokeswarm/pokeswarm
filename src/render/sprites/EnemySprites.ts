@@ -45,6 +45,8 @@ export class EnemySprites {
     for (const slot of this.slots.values()) slot.seen = false;
     let drawn = 0;
     for (let i = 0; i < e.count; i++) {
+      // 先に消して見せている敵（ゲストが倒したと見込んだもの）は描かない
+      if (e.hp[i]! <= 0) continue;
       const manifest = this.manifestOf(e.kind[i]!);
       if (!manifest) continue;
       const x = e.prevX[i]! + (e.x[i]! - e.prevX[i]!) * alpha;

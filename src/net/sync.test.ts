@@ -208,3 +208,17 @@ describe('3人以上の協力プレイ', () => {
     }
   });
 });
+
+describe('順番を待たないチャンネル（03_network.md 6.4）', () => {
+  it('位置と補正は、古いものが後から届いたら捨てる', () => {
+    const g = makePeer('guest', 2, 2);
+    const w = g.sim.world;
+    const p = (k: number, x: number) => ({ t: 'p' as const, i: 1, x, y: 0, fx: 0, fy: 1, ix: 0, iy: 0, h: 10, m: 10, dn: 0, k });
+    expect(g.session.incoming(w, [p(5, 100)], 1)).toHaveLength(1);
+    expect(g.session.incoming(w, [p(3, 50)], 1)).toHaveLength(0);
+    expect(g.session.incoming(w, [p(6, 120)], 1)).toHaveLength(1);
+    const c = (k: number) => ({ t: 'c' as const, e: [], k });
+    expect(g.session.incoming(w, [c(30)], 1)).toHaveLength(1);
+    expect(g.session.incoming(w, [c(20)], 1)).toHaveLength(0);
+  });
+});

@@ -95,6 +95,7 @@ export class Simulation {
     tickCandies(w);
     checkEvolutionAll(w);
     if (!w.outcome) openLevelUpIfPending(w);
+    if (w.role === 'guest') w.enemies.stepGhosts();
     w.enemies.removeDead();
     w.tick++;
   }

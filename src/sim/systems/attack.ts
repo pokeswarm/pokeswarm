@@ -1130,6 +1130,15 @@ export function moveProjectiles(world: World): void {
       if (st.lifestealPct > 0) healPlayer(world, ownerId, (amount * st.lifestealPct) / 100);
       if (world.role === 'guest') {
         world.events.push({ type: 'damageDealt', enemyId: e.id[j]!, amount, by: ownerId, ...fx });
+        // 雑魚は自分の画面でも HP を減らし、倒したと見込んだら撃破の知らせを待たずに先に消して見せる（HP はホストが決める）
+        if ((kind?.rank ?? 'normal') === 'normal') {
+          const before = e.hp[j]!;
+          e.hp[j]! -= amount * damageTakenMultiplier(world, j);
+          if (e.hp[j]! <= 0) {
+            e.savedHp[j] = before;
+            e.ghostTicks[j] = Math.max(1, Math.round(world.rules.netSmoothing.predictKillSeconds / world.dt));
+          }
+        }
         continue;
       }
       if (world.role === 'host') world.events.push({ type: 'enemyAffected', enemyId: e.id[j]!, by: ownerId, ...fx });

@@ -1,6 +1,6 @@
 import type { InputCommand } from '../commands';
 import type { HitEffect } from '../events';
-import { currentWaveIndex, findEnemyIndex, findPlayer, type World } from '../world';
+import { currentWaveIndex, enemyHpScale, findEnemyIndex, findPlayer, type World } from '../world';
 import { breakOnDamage, damageTakenMultiplier } from './status';
 import { confirmPickup } from './gems';
 import { addXp, applyOffer, banUpgrade, chooseUpgrade, mirrorLevelUp, rerollUpgrades, skipUpgrade } from './leveling';
@@ -43,7 +43,8 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         // 接触ダメージは自分の今の時間帯の倍率で（自分が受けるダメージは自分のブラウザで判定するため）
         const wave = world.waves[currentWaveIndex(world)]!;
         const boss = (kind.rank ?? 'normal') !== 'normal';
-        e.add(cmd.id, cmd.kind, cmd.x, cmd.y, kind.hp, kind.moveSpeed, kind.radius, kind.contactDamage * (boss ? 1 : wave.damageMultiplier), cmd.vx ?? 0, cmd.vy ?? 0);
+        // HP はホストと同じく人数で増やす（ゲストが倒したと見込むときに、ホストとそろうように）
+        e.add(cmd.id, cmd.kind, cmd.x, cmd.y, kind.hp * (boss ? 1 : enemyHpScale(world)), kind.moveSpeed, kind.radius, kind.contactDamage * (boss ? 1 : wave.damageMultiplier), cmd.vx ?? 0, cmd.vy ?? 0);
         if (boss) world.events.push({ type: 'bossAppeared', id: cmd.id, kind: cmd.kind });
         break;
       }
@@ -69,15 +70,20 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
       }
       case 'killEnemy': {
         const i = findEnemyIndex(world, cmd.id);
-        if (i === -1 || e.hp[i]! <= 0) break;
+        // 先に消して見せていた敵（ghostTicks）は、ここで本当に倒れる
+        if (i === -1 || (e.hp[i]! <= 0 && e.ghostTicks[i] === 0)) break;
         e.hp[i] = 0;
+        e.ghostTicks[i] = 0;
         world.events.push({ type: 'enemyKilled', enemyId: cmd.id, kind: e.kind[i]!, by: cmd.by });
         world.stats.kills++;
         break;
       }
       case 'retireEnemy': {
         const i = findEnemyIndex(world, cmd.id);
-        if (i !== -1) e.hp[i] = 0;
+        if (i !== -1) {
+          e.hp[i] = 0;
+          e.ghostTicks[i] = 0;
+        }
         break;
       }
       case 'spawnGem':

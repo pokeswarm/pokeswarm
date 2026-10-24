@@ -353,6 +353,8 @@
   "footer.credits": "クレジット",
   "credits.title": "クレジット",
   "credits.notice": "注意書き",
+  "credits.contact": "連絡先",
+  "credits.contactBody": "削除の申し入れ・不具合のご連絡は X（旧 Twitter）へ",
   "credits.noticeBody": "このゲームは、ファンが作った非公式・非営利のゲームです。任天堂・クリーチャーズ・ゲームフリーク・株式会社ポケモンとは関係ありません。ポケモン・ポケットモンスター・Pokémon は任天堂・クリーチャーズ・ゲームフリークの商標です。権利者から削除の申し入れがあれば、すぐに対応します。",
   "credits.sprites": "ポケモンのドット絵",
   "credits.spritesBody": "PMDCollab / SpriteCollab（CC BY-NC 4.0）https://sprites.pmdcollab.org/ 。ポケモン不思議のダンジョン由来の素材（CHUNSOFT）の権利は、任天堂・クリーチャーズ・ゲームフリーク・株式会社ポケモン・スパイク・チュンソフトに帰属します。",

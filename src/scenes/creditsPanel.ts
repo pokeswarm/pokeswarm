@@ -104,6 +104,16 @@ export class TitleFooter {
     head.textContent = t('credits.title');
     box.append(head);
     section(t('credits.notice'), [t('credits.noticeBody'), t('footer.official', { url: siteConfig.officialUrl })]);
+    // 連絡先（権利者からの削除の申し入れ・不具合の連絡）
+    section(t('credits.contact'), [t('credits.contactBody')]);
+    // 連絡先のアドレス（押すと開く）
+    const contact = document.createElement('a');
+    contact.href = siteConfig.contactUrl;
+    contact.target = '_blank';
+    contact.rel = 'noopener';
+    contact.textContent = siteConfig.contactUrl;
+    contact.style.cssText = 'color:#90caf9;overflow-wrap:anywhere';
+    box.append(contact);
     // ポケモンのドット絵: SpriteCollab の作者（重ねて出さない）。公式ゲーム由来の素材の権利の表記
     let authors: string[] = [];
     try {

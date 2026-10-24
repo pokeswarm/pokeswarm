@@ -895,6 +895,8 @@ export const siteConfigSchema = z.object({
   officialUrl: z.string().url(),
   allowedHosts: z.array(z.string()).min(1),
   allowedHostSuffixes: z.array(z.string()).default([]),
+  /** 連絡先（権利者からの削除の申し入れ・不具合の連絡。作者の決定 2026年10月25日: X のアカウント）。クレジットの窓に出す */
+  contactUrl: z.string().url(),
 });
 
 /**

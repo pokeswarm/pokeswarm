@@ -1618,6 +1618,11 @@ export const derivationsConfigSchema = z.object({
       withMoves: z.array(z.string()).optional(),
       /** 進化するとき、持っていれば消費する（なくなる）技。持っていなくても進化できる（ばくれつパンチ: ほのおのパンチ・かみなりパンチ） */
       consumes: z.array(z.string()).optional(),
+      /**
+       * 材料にした技（元の技・withMoves・consumes で消費した技）の強化分（レベル − 1）を、すべて新しい技のレベルに足す（最大まで）。
+       * ばくれつパンチ: きあいパンチ・ほのおのパンチ・かみなりパンチ の強化を受け継ぐ（作者の決定 2026年10月25日）
+       */
+      inheritLevels: z.boolean().optional(),
     }),
   ),
 });

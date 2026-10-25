@@ -76,6 +76,8 @@ describe('ワンリキーのパンチ', () => {
     expect(offer).toMatchObject({ kind: 'derive', item: -1, unique: true });
     applyOffer(sim.world, p, offer);
     expect(p.moves.map((m) => m.move)).toEqual([move('dynamic-punch')]);
+    // 材料の強化分（きあいパンチ 最大 − 1、ほのお・かみなりのパンチ Lv1 は 0）を受け継ぐ
+    expect(p.moves[0]!.level).toBe(max('focus-punch'));
     // 石を持ったまま次の持ち物を取っても、消費したパンチは戻らない
     applyOffer(sim.world, p, { kind: 'itemUp', slot: p.items.findIndex((it) => it.item === item('dire-hit')) });
     expect(p.moves.map((m) => m.move)).toEqual([move('dynamic-punch')]);
@@ -97,5 +99,20 @@ describe('ワンリキーのパンチ', () => {
     // きあいパンチを出してから pauseSeconds の間は、マッハパンチが出ない
     const pause = Math.round(rules.moves[move('focus-punch')]!.chargeMove!.pauseSeconds * 30);
     for (const f of focusAt) expect(machAt.some((m) => m > f && m < f + pause)).toBe(false);
+  });
+
+  it('ばくれつパンチは、材料にした3つのパンチの強化分をすべて受け継ぐ（最大 Lv16 まで）', () => {
+    const { rules, sim, p, item, move } = setup();
+    applyOffer(sim.world, p, { kind: 'itemNew', item: item('fire-stone') });
+    applyOffer(sim.world, p, { kind: 'itemNew', item: item('thunder-stone') });
+    const max = (key: string) => rules.moves[move(key)]!.levels.length;
+    expect(max('dynamic-punch')).toBe(16);
+    p.moves[0] = { move: move('focus-punch'), level: max('focus-punch'), cooldown: 0, burstLeft: 0, burstTimer: 0 };
+    p.moves[1]!.level = 3;
+    p.moves[2]!.level = 2;
+    p.species = rules.species.findIndex((s) => s.key === 'machamp');
+    applyOffer(sim.world, p, { kind: 'derive', slot: 0, to: move('dynamic-punch'), item: -1, unique: true });
+    expect(p.moves).toHaveLength(1);
+    expect(p.moves[0]!.level).toBe(1 + (max('focus-punch') - 1) + 2 + 1);
   });
 });

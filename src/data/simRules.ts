@@ -122,7 +122,7 @@ export function buildSimRules(): SimRules {
   const itemIndex = (key: string): number => items.findIndex((i) => i.key === key);
   const derivations = [
     ...derivationsConfig.derivations.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: null })),
-    ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: d.item ? itemIndex(d.item) : -1, to: moveIndex(d.to), line: d.line, ...(d.minLevel ? { minLevel: d.minLevel } : {}), ...(d.forms ? { forms: d.forms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}), ...(d.withMoves ? { withMoves: d.withMoves.map(moveIndex) } : {}), ...(d.consumes ? { consumes: d.consumes.map(moveIndex) } : {}) })),
+    ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: d.item ? itemIndex(d.item) : -1, to: moveIndex(d.to), line: d.line, ...(d.minLevel ? { minLevel: d.minLevel } : {}), ...(d.forms ? { forms: d.forms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}), ...(d.withMoves ? { withMoves: d.withMoves.map(moveIndex) } : {}), ...(d.consumes ? { consumes: d.consumes.map(moveIndex) } : {}), ...(d.inheritLevels ? { inheritLevels: true } : {}) })),
   ];
   const itemMoves = Object.entries(playablesConfig.pokemon).flatMap(([line, p]) => p.itemMoves.map((im) => ({ line, item: itemIndex(im.item), move: moveIndex(im.move) })));
   // ポケモンの種類: PokeAPI から生成したすべて。進化先・進化の道具が無いものは進化の一覧から外す

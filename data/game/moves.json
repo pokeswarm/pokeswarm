@@ -2304,7 +2304,9 @@
       "effects": [
         {
           "trigger": "spawn",
-          "forms": ["arcanine"],
+          "forms": [
+            "arcanine"
+          ],
           "puddle": {
             "sizeMultiplier": 1.8,
             "powerMultiplier": 0.12,
@@ -3070,37 +3072,107 @@
         {
           "count": 1,
           "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
           "power": 0.2
         },
         {
           "count": 1,
           "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
           "power": 0.3
         },
         {
           "count": 1,
           "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
           "power": 0.4
         },
         {
           "count": 1,
           "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
           "power": 0.5
         },
         {
           "count": 1,
           "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
           "power": 0.5
         },
         {
           "count": 1,
           "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
           "power": 0.4
         },
         {
           "count": 1,
           "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
           "power": 0.5
+        },
+        {
+          "count": 1,
+          "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
+          "power": 0.3
+        },
+        {
+          "count": 1,
+          "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
+          "power": 0.3
+        },
+        {
+          "count": 1,
+          "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
+          "power": 0.3
+        },
+        {
+          "count": 1,
+          "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
+          "power": 0.3
+        },
+        {
+          "count": 1,
+          "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
+          "power": 0.3
+        },
+        {
+          "count": 1,
+          "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
+          "power": 0.3
+        },
+        {
+          "count": 1,
+          "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
+          "power": 0.3
+        },
+        {
+          "count": 1,
+          "range": 8,
+          "size": 1,
+          "intervalSeconds": -0.001,
+          "power": 0.3
         }
       ],
       "body": {

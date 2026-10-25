@@ -343,12 +343,19 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
       break;
     case 'derive': {
       // 元の技は進化で使ったので、もう候補に出さない
-      p.consumedMoves = [...(p.consumedMoves ?? []), p.moves[offer.slot]!.move];
-      p.moves[offer.slot] = { move: offer.to, level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0 };
+      const fromMove = p.moves[offer.slot]!;
+      p.consumedMoves = [...(p.consumedMoves ?? []), fromMove.move];
       // ほかの技も使って進化する技（ばくれつパンチ）: 使った技はなくなり、持ち物で覚え直さない
       // 持っていれば消費する技（ばくれつパンチ: ほのおのパンチ・かみなりパンチ）も同じ
-      const d = world.rules.derivations.find((x) => x.to === offer.to && (x.withMoves || x.consumes));
+      const d = world.rules.derivations.find((x) => x.to === offer.to && (x.withMoves || x.consumes || x.inheritLevels));
       const used = [...(d?.withMoves ?? []), ...(d?.consumes ?? [])];
+      // 材料にした技の強化分を受け継ぐ（ばくれつパンチ。最大まで）
+      let level = 1;
+      if (d?.inheritLevels) {
+        const gained = (fromMove.level - 1) + p.moves.filter((m) => used.includes(m.move)).reduce((s, m) => s + m.level - 1, 0);
+        level = Math.min(world.rules.moves[offer.to]!.levels.length, 1 + gained);
+      }
+      p.moves[offer.slot] = { move: offer.to, level, cooldown: 0, burstLeft: 0, burstTimer: 0 };
       if (used.length) {
         p.moves = p.moves.filter((m) => !used.includes(m.move));
         p.consumedMoves = [...(p.consumedMoves ?? []), ...used];

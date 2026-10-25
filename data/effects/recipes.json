@@ -393,8 +393,8 @@
         "shapeAlpha": 0.7
       },
       "sprite": {
-        "id": "flame-cone",
-        "fit": "cone",
+        "id": "streak-fire",
+        "fit": "line",
         "size": 1
       }
     },

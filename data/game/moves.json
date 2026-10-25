@@ -717,57 +717,55 @@
       ]
     },
     "flamethrower": {
-      "key": "flamethrower",
-      "pattern": "melee",
+      "pattern": "stream",
       "effect": "flamethrower",
       "base": {
-        "power": 33.6,
+        "power": 12.5,
         "intervalSeconds": 0.1,
         "count": 1,
-        "speed": 0,
-        "size": 30,
-        "range": 250,
-        "durationSeconds": 0.6,
+        "speed": 300,
+        "size": 18,
+        "range": 220,
+        "durationSeconds": 1.3,
         "pierce": "infinite",
         "hitIntervalSeconds": 0.2,
-        "knockback": 60,
+        "knockback": 40,
         "knockbackSeconds": 0.06,
-        "spreadDegrees": 0,
+        "spreadDegrees": 14,
         "cooldownSeconds": 1.3,
         "statusId": "burn",
         "statusChance": 0.25,
         "statusSeconds": 3,
-        "lifestealPct": 0,
-        "arcDegrees": 16
+        "lifestealPct": 0
       },
       "levels": [
         {
           "range": 20,
-          "power": 5.8
+          "power": 2.4
         },
         {
-          "arcDegrees": 3,
-          "power": 4.4
+          "count": 1,
+          "power": -2.4
         },
         {
-          "durationSeconds": 0.2,
-          "power": -18.5
-        },
-        {
-          "range": 20,
-          "power": 2.1
-        },
-        {
-          "cooldownSeconds": -0.15,
-          "power": -0.3
-        },
-        {
-          "arcDegrees": 3,
-          "power": 1.2
+          "size": 2,
+          "power": 1.5
         },
         {
           "range": 20,
-          "power": 1.3
+          "power": 1.4
+        },
+        {
+          "count": 1,
+          "power": -1.3
+        },
+        {
+          "size": 2,
+          "power": 1
+        },
+        {
+          "range": 20,
+          "power": 1
         }
       ]
     },
@@ -1743,8 +1741,8 @@
         "lifestealPct": 0,
         "count": 2,
         "speed": 0,
-        "size": 26,
-        "range": 520,
+        "size": 22,
+        "range": 380,
         "durationSeconds": 0.25,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -1760,7 +1758,7 @@
           "power": 2.7
         },
         {
-          "size": 4,
+          "size": 3,
           "power": 4.7
         },
         {
@@ -1776,7 +1774,7 @@
           "power": 1
         },
         {
-          "size": 4,
+          "size": 3,
           "power": 2.3
         },
         {
@@ -1844,8 +1842,8 @@
         "intervalSeconds": 0.1,
         "count": 7,
         "speed": 0,
-        "size": 34,
-        "range": 520,
+        "size": 28,
+        "range": 380,
         "durationSeconds": 0.25,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -1863,7 +1861,7 @@
           "power": 5
         },
         {
-          "size": 4,
+          "size": 3,
           "power": 4.9
         },
         {
@@ -1879,7 +1877,7 @@
           "power": 2.9
         },
         {
-          "size": 4,
+          "size": 3,
           "power": 2.6
         },
         {
@@ -1891,7 +1889,7 @@
         {
           "trigger": "end",
           "explode": {
-            "sizeMultiplier": 2.2,
+            "sizeMultiplier": 1.6,
             "powerMultiplier": 0.3,
             "pull": 260
           }

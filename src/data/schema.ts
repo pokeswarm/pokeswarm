@@ -1836,6 +1836,8 @@ export const iconConfigSchema = z.object({
   glyphs: z.record(z.string(), z.array(z.string())),
   stars: z.object({ on: z.array(z.string()).min(1), off: z.array(z.string()).min(1) }),
   moves: z.record(z.string(), z.string()),
+  /** 技ごとの絵柄（技の名前・効果から選ぶ。作者の依頼 2026年10月25日）。無い技は出し方（moves）の絵柄 */
+  moveGlyphs: z.record(z.string(), z.string()).default({}),
   items: z.record(z.string(), z.object({ glyph: z.string(), color: z.string() })),
   /** タイトルのメニューのアイコン（# の所を文字の色で塗る。作者の依頼 2026年10月24日: 言語を選ぶ設定に、文字が読めなくてもたどり着けるように） */
   menuGlyphs: z.record(z.string(), z.array(z.string())),

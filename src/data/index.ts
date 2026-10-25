@@ -182,6 +182,7 @@ for (const wave of spawnConfig.waves) {
 }
 // アイコン: 技の出し方・持ち物・パッシブ・タイプごとに絵柄と色がある
 for (const p of MOVE_PATTERNS) check(!!iconConfig.glyphs[iconConfig.moves[p] ?? ''], `data/render/icons.json に出し方 "${p}" の絵柄がありません`);
+for (const [move, glyph] of Object.entries(iconConfig.moveGlyphs)) check(!!iconConfig.glyphs[glyph], `data/render/icons.json の技 "${move}" の絵柄 "${glyph}" がありません`);
 for (const k of Object.keys(itemsConfig.items)) check(!!itemIcons.items[k], `data/render/item-icons.json に持ち物 "${k}" のアイコンがありません（npm run item-icons）`);
 for (const k of Object.keys(movesConfig.moves)) check(!!iconConfig.typeColors[generated.moves[k]!.type], `data/render/icons.json にタイプ "${generated.moves[k]!.type}" の色がありません`);
 // 障害物: 区間の数は spawn.json と同じ。見た目の種類はドット絵がある

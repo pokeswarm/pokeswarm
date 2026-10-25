@@ -37,7 +37,7 @@ export function ensureIconTextures(scene: Phaser.Scene, data: IconConfig, rules:
   const n = data.size;
   rules.moves.forEach((m, i) => {
     const type = rules.types.names[m.type] ?? 'normal';
-    addTexture(scene, moveIconKey(rules, i), n, n, iconPixels(data, data.moves[m.pattern] ?? 'nearest', data.typeColors[type] ?? '#888888', moveTier(rules, i)));
+    addTexture(scene, moveIconKey(rules, i), n, n, iconPixels(data, data.moveGlyphs[m.key] ?? data.moves[m.pattern] ?? 'nearest', data.typeColors[type] ?? '#888888', moveTier(rules, i)));
   });
   rules.items.forEach((it, i) => {
     const def = data.items[it.key] ?? { glyph: 'orb', color: '#9e9e9e' };

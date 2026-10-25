@@ -399,6 +399,7 @@
   "region.hint": "Click or use the arrow keys to choose. Press Enter to confirm.",
   "region.playables": "{n} playable",
   "region.comingSoon": "Coming soon",
+  "region.unlock.johto": "🔒 Defeat the legendary Mew to unlock",
   "guard.title": "PokéSwarm",
   "guard.framed": "This page has embedded PokéSwarm into another site without permission.\nPokéSwarm is a free, ad-free fan game that is only distributed on its official site.\nPlease play on the official site ({url}).",
   "guard.unofficial": "This address is not the official PokéSwarm site (it is an unauthorized copy).\nPokéSwarm is a free, ad-free fan game that is only distributed on its official site.\nPlease play on the official site ({url}).",

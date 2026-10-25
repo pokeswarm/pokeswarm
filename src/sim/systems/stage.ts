@@ -48,7 +48,7 @@ export function spawnBosses(world: World): void {
         world,
         lg.kind,
         (set?.moves ?? cfg.moves).map((m) => world.rules.stage.moves.findIndex((x) => x.id === m)),
-        Math.round(cfg.moveIntervalSeconds / world.dt),
+        Math.round((set?.moveIntervalSeconds ?? cfg.moveIntervalSeconds) / world.dt),
       );
       const boss = world.bosses.find((b) => b.id === id);
       if (boss && set?.random) boss.random = true;
@@ -437,7 +437,8 @@ function enrageLegendary(world: World): void {
   lg.enraged = true;
   const boss = world.bosses.find((b) => b.id === world.enemies.id[i]);
   if (boss) {
-    boss.interval = Math.round(cfg.moveIntervalSeconds / world.dt);
+    const set = world.rules.stage.legendary!.moveSets[world.rules.enemies.kinds[lg.kind]?.id ?? ''];
+    boss.interval = Math.round((set?.enrageMoveIntervalSeconds ?? cfg.moveIntervalSeconds) / world.dt);
     boss.cooldown = Math.min(boss.cooldown, boss.interval);
   }
   world.events.push({ type: 'legendaryWarning', kind: lg.kind, enraged: true });

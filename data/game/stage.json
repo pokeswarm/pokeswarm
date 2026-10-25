@@ -381,17 +381,19 @@
       },
       "legend-mew": {
         "moves": [
-          "legend-dash",
-          "legend-beam",
-          "legend-nova",
-          "legend-meteor",
           "mewtwo-psywave",
           "mewtwo-teleport",
           "articuno-blizzard",
           "zapdos-thunder",
-          "moltres-flamedash"
+          "zapdos-dash",
+          "moltres-flamedash",
+          "shiny-blast-burn",
+          "shiny-frenzy-plant",
+          "shiny-hydro-cannon"
         ],
-        "random": true
+        "random": true,
+        "moveIntervalSeconds": 0.9,
+        "enrageMoveIntervalSeconds": 0.6
       },
       "legend-articuno": {
         "moves": [

@@ -378,6 +378,7 @@
   "region.hint": "Haz clic o usa las flechas para elegir. Intro para confirmar.",
   "region.playables": "{n} jugables",
   "region.comingSoon": "Próximamente",
+  "region.unlock.johto": "🔒 Derrota a Mew legendario para desbloquear",
   "guard.title": "PokéSwarm",
   "guard.framed": "Esta página ha insertado PokéSwarm en otro sitio sin permiso.\nPokéSwarm es un juego de fans gratuito y sin anuncios que solo se distribuye en su sitio oficial.\nJuega en el sitio oficial ({url}).",
   "guard.unofficial": "Esta dirección no es el sitio oficial de PokéSwarm (es una copia no autorizada).\nPokéSwarm es un juego de fans gratuito y sin anuncios que solo se distribuye en su sitio oficial.\nJuega en el sitio oficial ({url}).",

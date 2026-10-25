@@ -37,7 +37,8 @@
     },
     {
       "id": "johto",
-      "available": false
+      "available": false,
+      "unlock": { "stat": "bossDefeated.mew", "atLeast": 1 }
     },
     {
       "id": "hoenn",

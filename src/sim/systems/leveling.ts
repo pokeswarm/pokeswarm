@@ -324,7 +324,7 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
       // ほかの技も使って進化する技（ばくれつパンチ）: 使った技はなくなり、持ち物で覚え直さない
       // 持っていれば消費する技（ばくれつパンチ: ほのおのパンチ・かみなりパンチ）も同じ
       const d = world.rules.derivations.find((x) => x.to === offer.to && (x.withMoves || x.consumes));
-      const used = [...(d?.withMoves ?? []), ...(d?.consumes ?? [])];
+      const used = [...(d?.keepMoves ? [] : (d?.withMoves ?? [])), ...(d?.consumes ?? [])];
       if (used.length) {
         p.moves = p.moves.filter((m) => !used.includes(m.move));
         p.consumedMoves = [...(p.consumedMoves ?? []), ...used];
@@ -398,6 +398,11 @@ export function derivationCompletedBy(world: World, p: Player, offer: UpgradeOff
       p.moves.some((m, slot) => m.move === move && (m.level >= maxOf(move) || (offer.kind === 'moveUp' && offer.slot === slot && m.level + 1 >= maxOf(move))));
     if (d.withMoves) {
       if (!atMaxAfter(d.from) || !d.withMoves.every(atMaxAfter)) continue;
+      // 持ち物もいる（とっておき: かわらずのいし）: この候補で持ち物がそろうときも進化する
+      if (d.item !== -1 && !hasItem) {
+        if (offer.kind === 'itemNew' && offer.item === d.item) return d;
+        continue;
+      }
       if (offer.kind === 'moveUp' && [d.from, ...d.withMoves].includes(p.moves[offer.slot]!.move) && p.moves[offer.slot]!.level + 1 >= maxOf(p.moves[offer.slot]!.move)) return d;
       continue;
     }

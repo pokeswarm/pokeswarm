@@ -162,7 +162,11 @@ export const generated = {
 function check(ok: boolean, message: string): void {
   if (!ok) throw new Error(message);
 }
-check(regionsConfig.regions.some((r) => r.available), 'data/game/regions.json に遊べる地方（available: true）が1つも無いです');
+check(regionsConfig.regions.some((r) => r.available && !r.unlock), 'data/game/regions.json に最初から遊べる地方（available: true で unlock なし）が1つも無いです');
+for (const r of regionsConfig.regions) {
+  if (!r.unlock) continue;
+  for (const [lang, messages] of [['ja', ja], ['en', en]] as const) check(!!(messages as Record<string, string>)[`region.unlock.${r.id}`], `地方 "${r.id}" の解放の案内 region.unlock.${r.id} が src/i18n/${lang}.json にありません`);
+}
 for (const r of regionsConfig.regions) {
   check(!!generated.regions[r.id], `data/game/regions.json の地方 "${r.id}" が data/generated/regions.json にありません（data/pokeapi/targets.json の regions に足して npm run pokeapi）`);
   check(!r.available || r.playables.length > 0, `data/game/regions.json の地方 "${r.id}" は遊べるのに playables が空です`);

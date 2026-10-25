@@ -1,7 +1,9 @@
 import Phaser from 'phaser';
 import { generated, regionsConfig, uiConfig } from '../data';
 import { localName } from '../data/simRules';
-import { getLocale, t } from '../i18n';
+import { getLocale, t, tMaybe } from '../i18n';
+import { meets } from '../meta/progress';
+import { session } from '../meta/session';
 import { compactScreen, windowCss } from '../render/pixelUi';
 import type { LobbySceneData } from './LobbyScene';
 import { pokemonIconImage } from './pokemonPicker';
@@ -12,9 +14,16 @@ export interface RegionSceneData {
   next: 'solo' | 'coop';
 }
 
+type Region = (typeof regionsConfig.regions)[number];
+
+/** 遊べる地方か（作ってあり、解放の条件があれば満たしている） */
+export function regionPlayable(r: Region, stats: Readonly<Record<string, number>> = session.store.current.stats): boolean {
+  return r.available && (!r.unlock || meets(stats, r.unlock));
+}
+
 /** 最初に選んでおく地方（並びの先頭の遊べる地方） */
 export function defaultRegion(): string {
-  return regionsConfig.regions.find((r) => r.available)!.id;
+  return regionsConfig.regions.find((r) => r.available && !r.unlock)!.id;
 }
 
 /**
@@ -36,7 +45,8 @@ export class RegionScene extends Phaser.Scene {
     const compact = compactScreen();
     if (compact) root.style.cssText += ';padding:6px 12px;gap:4px;max-height:100vh';
     const go = (id: string): void => {
-      if (!regions.find((r) => r.id === id)?.available) return;
+      const r = regions.find((x) => x.id === id);
+      if (!r || !regionPlayable(r)) return;
       if (data.next === 'coop') this.scene.start('lobby', { mode: 'host', region: id } satisfies LobbySceneData);
       else this.scene.start('select', { region: id } satisfies SelectSceneData);
     };
@@ -49,15 +59,16 @@ export class RegionScene extends Phaser.Scene {
     if (compact) hint.style.display = 'none';
     const grid = document.createElement('div');
     grid.style.cssText = `display:grid;grid-template-columns:repeat(3,1fr);gap:${compact ? 6 : 10}px`;
-    let cursor = Math.max(0, regions.findIndex((r) => r.available));
+    let cursor = Math.max(0, regions.findIndex((r) => regionPlayable(r)));
     const cards = regions.map((r, i) => {
       const card = document.createElement('div');
-      card.style.cssText = `${windowCss('light')};${r.available ? 'cursor:pointer' : `background:${uiConfig.picker.lockedFill};box-shadow:none;cursor:default`};padding:${compact ? '4px 8px' : '10px 12px'};min-height:${compact ? 56 : 110}px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center`;
+      const playable = regionPlayable(r);
+      card.style.cssText = `${windowCss('light')};${playable ? 'cursor:pointer' : `background:${uiConfig.picker.lockedFill};box-shadow:none;cursor:default`};padding:${compact ? '4px 8px' : '10px 12px'};min-height:${compact ? 56 : 110}px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center`;
       const name = document.createElement('div');
       name.style.fontSize = '20px';
       name.textContent = localName(generated.regions[r.id]?.names, getLocale(), r.id);
       card.append(name);
-      if (r.available) {
+      if (playable) {
         // 最初から選べるポケモンを3匹まで見せる
         const icons = document.createElement('div');
         icons.style.cssText = 'display:flex;gap:4px';
@@ -68,8 +79,15 @@ export class RegionScene extends Phaser.Scene {
       } else {
         const soon = document.createElement('div');
         soon.style.opacity = '0.8';
-        soon.textContent = t('region.comingSoon');
+        soon.textContent = r.available ? '' : t('region.comingSoon');
         card.append(soon);
+        // 解放の条件（作ってない地方にも、先に条件を見せる）
+        if (r.unlock && !meets(session.store.current.stats, r.unlock)) {
+          const lock = document.createElement('div');
+          lock.style.cssText = 'opacity:0.8;font-size:14px';
+          lock.textContent = tMaybe(`region.unlock.${r.id}`);
+          card.append(lock);
+        }
       }
       card.onpointerenter = () => {
         cursor = i;
@@ -82,7 +100,7 @@ export class RegionScene extends Phaser.Scene {
     const paint = (): void => {
       cards.forEach((c, i) => {
         c.style.borderColor = i === cursor ? uiConfig.picker.selected : uiConfig.window.border;
-        c.style.outline = i === cursor && regions[i]!.available ? `3px solid ${uiConfig.picker.selected}` : '';
+        c.style.outline = i === cursor && regionPlayable(regions[i]!) ? `3px solid ${uiConfig.picker.selected}` : '';
       });
     };
     paint();

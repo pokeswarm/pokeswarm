@@ -467,7 +467,20 @@ export const stageConfigSchema = z.object({
       kinds: z.array(z.string().min(1)).min(1),
       moves: z.array(z.string()).min(1),
       /** 伝説ごとの技（作者の決定 2026年10月23日。案4）。無い伝説は moves を順に使う。random なら毎回ランダムに選ぶ（ミュウ） */
-      moveSets: z.record(z.string(), z.object({ moves: z.array(z.string()).min(1), random: z.boolean().default(false) })).default({}),
+      /**
+       * 伝説ごとの技。moveIntervalSeconds・enrageMoveIntervalSeconds はその伝説だけの技の間隔（ミュウ: ゆびをふる のように固有技を乱射する。作者の決定 2026年10月25日）
+       */
+      moveSets: z
+        .record(
+          z.string(),
+          z.object({
+            moves: z.array(z.string()).min(1),
+            random: z.boolean().default(false),
+            moveIntervalSeconds: z.number().positive().optional(),
+            enrageMoveIntervalSeconds: z.number().positive().optional(),
+          }),
+        )
+        .default({}),
       moveIntervalSeconds: z.number().positive(),
       /** 「DANGER」の表示から出現までの時間 */
       warningSeconds: z.number().nonnegative(),
@@ -929,6 +942,8 @@ export const regionsConfigSchema = z.object({
         available: z.boolean(),
         /** この地方で選べるプレイアブル（playables.json のキー）。遊べる地方だけ */
         playables: z.array(z.string()).default([]),
+        /** 解放の条件（記録の数。作者の決定 2026年10月25日: ジョウトは伝説のミュウを倒す）。案内は翻訳ファイルの region.unlock.<id> */
+        unlock: z.lazy(() => statConditionSchema).optional(),
       }),
     )
     .min(1),
@@ -1572,6 +1587,8 @@ export const derivationsConfigSchema = z.object({
       withMoves: z.array(z.string()).optional(),
       /** 進化するとき、持っていれば消費する（なくなる）技。持っていなくても進化できる（ばくれつパンチ: ほのおのパンチ・かみなりパンチ） */
       consumes: z.array(z.string()).optional(),
+      /** withMoves の技を消費しない（とっておき: のしかかり・でんこうせっか が最大でも、進化した後も持ったまま。作者の決定 2026年10月25日） */
+      keepMoves: z.boolean().optional(),
     }),
   ),
 });

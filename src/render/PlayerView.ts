@@ -3,6 +3,8 @@ import type { PlaceholderRenderConfig, SpriteAnims, SpriteRenderConfig } from '.
 import type { Player } from '../sim/entities/player';
 import { hexColor } from './color';
 import { directionIndex, PokemonSpriteView } from './sprites/PokemonSprite';
+import { t } from '../i18n';
+import { px } from './pixelUi';
 
 const HP_BAR_WIDTH = 36;
 const HP_BAR_HEIGHT = 4;
@@ -28,6 +30,8 @@ export class PlayerView {
   private lungeStart = -1;
   private lungeX = 0;
   private lungeY = 0;
+  /** ねむる（カビゴン）で眠っている間に、頭の上に出す Z の文字 */
+  private readonly zzz: Phaser.GameObjects.Text;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -49,6 +53,8 @@ export class PlayerView {
       this.facing = scene.add.circle(0, 0, Math.max(2, player.radius / 4), hexColor(style.playerFacingColor));
       this.container = scene.add.container(player.x, player.y, [this.charge, body, this.facing, this.hpBar]);
     }
+    this.zzz = scene.add.text(this.radius * 0.6, -this.radius * 2.2, t('run.sleepZ'), px(8, '#e1f5fe', { outline: true })).setOrigin(0, 1).setVisible(false);
+    this.container.add(this.zzz);
   }
 
   /** 進化などで見た目を差し替える */
@@ -134,10 +140,20 @@ export class PlayerView {
     }
     if (this.pokemon) {
       const moving = player.inputX !== 0 || player.inputY !== 0;
-      const anim = moving ? this.spriteStyle.walkAnimation : this.spriteStyle.idleAnimation;
-      this.pokemon.play(anim, directionIndex(player.facingX, player.facingY));
+      // ねむる（カビゴン）: 眠っている間は寝ている動き（下向きだけの絵なので向きは下）。起きる動きの間は立っている
+      const asleep = player.sleep?.asleep ?? false;
+      const waking = (player.sleep?.wakeTicks ?? 0) > 0;
+      if (asleep) this.pokemon.play('Sleep', 0);
+      else this.pokemon.play(moving && !waking ? this.spriteStyle.walkAnimation : this.spriteStyle.idleAnimation, directionIndex(player.facingX, player.facingY));
       // 倒れていたら暗く、無敵時間の間は点滅
       this.pokemon.sprite.setAlpha(player.down ? 0.35 : player.invincibleTicks > 0 && Math.floor(player.invincibleTicks / 3) % 2 === 0 ? 0.4 : 1);
+    }
+    // 眠っている間は Z が上へゆらゆら
+    const sleeping = player.sleep?.asleep ?? false;
+    this.zzz.setVisible(sleeping);
+    if (sleeping) {
+      const k = (this.scene.time.now % 1500) / 1500;
+      this.zzz.setPosition(this.radius * 0.6 + Math.sin(k * Math.PI * 2) * 3, -this.radius * 2.2 - k * 8).setAlpha(1 - k * 0.6);
     }
     if (this.facing) {
       const len = Math.hypot(player.facingX, player.facingY) || 1;

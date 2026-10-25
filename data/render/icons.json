@@ -819,7 +819,8 @@
     "passive": "plus",
     "pulse": "pulse",
     "weather": "weather",
-    "barrage": "melee"
+    "barrage": "melee",
+    "rest": "clock"
   },
   "items": {
     "x-attack": {

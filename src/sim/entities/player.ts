@@ -15,6 +15,9 @@ export interface PlayerMove {
   spinStep?: number;
   /** 向きをランダムに選ぶ技（にどげり・まわしげり）が、今回選んだ向き（ラジアン） */
   aimAngle?: number;
+  /** ためている間に出す技（きあいパンチのマッハパンチ）の状態と、止めておく残りの秒数 */
+  sub?: PlayerMove;
+  subPause?: number;
 }
 
 export interface Player {
@@ -95,6 +98,8 @@ export interface Player {
   guardUntilTick?: number;
   guardPct?: number;
   readonly banned: Set<string>;
+  /** ねむる（カビゴン）: 歩いていない更新の回数・眠っているか・起きる動きの残りの更新回数 */
+  sleep?: { stillTicks: number; asleep: boolean; wakeTicks: number };
   /** 進化で消費された技（持ち物で覚え直さない） */
   consumedMoves?: number[];
   /** 順番に出す技（group）ごとの、次に出せるまでの秒数と、次に出す番 */

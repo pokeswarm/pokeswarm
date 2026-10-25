@@ -851,6 +851,18 @@
     "type": "grass",
     "damageClass": "physical"
   },
+  "rest": {
+    "names": {
+      "ja": "ねむる",
+      "en": "Rest",
+      "fr": "Repos",
+      "de": "Erholung",
+      "es": "Descanso",
+      "it": "Riposo"
+    },
+    "type": "psychic",
+    "damageClass": "status"
+  },
   "rock-slide": {
     "names": {
       "ja": "いわなだれ",

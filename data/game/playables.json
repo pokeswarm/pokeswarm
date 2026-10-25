@@ -18,7 +18,7 @@
     "psyduck": { "sprite": "psyduck", "startingMoves": ["confusion"], "evolves": false, "moveTypes": ["psychic"] },
     "jigglypuff": { "sprite": "jigglypuff", "startingMoves": ["pound", "sing"], "types": ["normal"], "fixedMoves": true },
     "slowpoke": { "sprite": "slowpoke", "startingMoves": ["slack-off"] },
-    "snorlax": { "sprite": "snorlax", "startingMoves": ["tackle"] },
+    "snorlax": { "sprite": "snorlax", "startingMoves": ["tackle", "rest"], "fixedMoves": true },
     "eevee": { "sprite": "eevee", "startingMoves": ["tackle"] },
     "doduo": { "sprite": "doduo", "startingMoves": ["swift"] },
     "porygon": { "sprite": "porygon", "startingMoves": ["swift", "sharpen", "conversion"], "fixedMoves": true },

@@ -111,8 +111,15 @@ export class FriendsScene extends Phaser.Scene {
     } else {
       // 自分のニックネーム
       const me = section('friends.me');
-      if (social.profile) me.append(text(formatTag(social.profile.nickname, social.profile.tag), 'font-size:24px;font-weight:bold'));
-      else me.append(text(t('friends.needNickname'), 'opacity:0.85'));
+      if (social.profile) {
+        // 自分のタグと、ワンクリックでコピーするボタン（相手に送るため）
+        const tag = formatTag(social.profile.nickname, social.profile.tag);
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;gap:12px;align-items:center;flex-wrap:wrap';
+        const copy = button(t('friends.copyTag'), () => void navigator.clipboard.writeText(tag).then(() => (copy.textContent = t('friends.copied'))));
+        row.append(text(tag, 'font-size:24px;font-weight:bold'), copy);
+        me.append(row);
+      } else me.append(text(t('friends.needNickname'), 'opacity:0.85'));
       const nick = document.createElement('input');
       nick.style.cssText = INPUT;
       nick.placeholder = t('friends.nicknamePlaceholder', { max: NICKNAME_MAX });

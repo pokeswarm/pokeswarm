@@ -215,7 +215,8 @@
     "conversion",
     "mach-punch",
     "focus-punch",
-    "fire-punch"
+    "fire-punch",
+    "rest"
   ],
   "items": [
     "x-attack",

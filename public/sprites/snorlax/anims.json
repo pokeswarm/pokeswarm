@@ -76,6 +76,16 @@
         8
       ],
       "frameKeyPrefix": "Hurt"
+    },
+    "Sleep": {
+      "source": "Sleep",
+      "frameWidth": 40,
+      "frameHeight": 24,
+      "durations": [
+        30,
+        35
+      ],
+      "frameKeyPrefix": "Sleep"
     }
   },
   "missing": [

@@ -39,7 +39,7 @@
     { "from": "quick-attack", "item": "light-ball", "to": "volt-tackle", "line": "pikachu", "minLevel": 51 },
     { "from": "blizzard", "item": "water-stone", "to": "sheer-cold", "line": "lapras" },
     { "from": "blizzard", "item": "pp-max", "to": "freeze-dry", "line": "articuno" },
-    { "from": "focus-punch", "to": "dynamic-punch", "line": "machop", "withMoves": ["fire-punch", "thunder-punch"] },
+    { "from": "focus-punch", "to": "dynamic-punch", "line": "machop", "forms": ["machamp"], "consumes": ["fire-punch", "thunder-punch"] },
     { "from": "shadow-ball", "item": "light-clay", "to": "hex", "line": "gastly" },
     { "from": "dragon-pulse", "item": "x-attack", "to": "hyper-beam", "line": "dratini" },
     { "from": "psychic", "item": "x-sp-atk", "to": "psystrike", "line": "mewtwo" },

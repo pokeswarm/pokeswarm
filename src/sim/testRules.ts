@@ -164,7 +164,7 @@ export function testRules(
       moves: [],
       legendary: null,
       swarms: [],
-      bossRules: { knockbackMultiplier: 0, stopStatusMultiplier: 0.25, hpPerExtraPlayerPct: 50, spawnDistance: 300 },
+      bossRules: { knockbackMultiplier: 0, stopStatusMultiplier: 0.25, hpPerExtraPlayerPct: 50, hazardActiveSeconds: 0, hazardDamageScalesWithLevel: false, spawnDistance: 300 },
       endDelaySeconds: 1,
       ...overrides.stage,
     },

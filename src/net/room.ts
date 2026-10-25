@@ -53,6 +53,8 @@ export interface RoomMember {
   readonly shiny: boolean;
   /** ホストとの通信がつながったか（ホスト自身は常に true） */
   readonly connected: boolean;
+  /** 準備OK（ゲストが押す。ホストは常に true） */
+  readonly ready: boolean;
 }
 
 export class RoomError extends Error {
@@ -68,6 +70,7 @@ interface RawMember {
   achievements?: string[];
   startItem?: string;
   shiny?: boolean;
+  ready?: boolean;
 }
 
 interface MemberData {
@@ -76,10 +79,11 @@ interface MemberData {
   achievements: string[];
   startItem: string | null;
   shiny: boolean;
+  ready: boolean;
 }
 
 function parseMember(v: RawMember): MemberData {
-  return { pokemon: v.pokemon || null, upgrades: v.upgrades ?? {}, achievements: v.achievements ?? [], startItem: v.startItem || null, shiny: !!v.shiny };
+  return { pokemon: v.pokemon || null, upgrades: v.upgrades ?? {}, achievements: v.achievements ?? [], startItem: v.startItem || null, shiny: !!v.shiny, ready: !!v.ready };
 }
 
 const ROOM_ID_CHARS = 'abcdefghjkmnpqrstuvwxyz23456789';
@@ -222,7 +226,7 @@ export class Room {
   get memberList(): RoomMember[] {
     return [...this.members.entries()]
       .sort(([a], [b]) => a - b)
-      .map(([id, m]) => ({ id, ...m, connected: id === this.localId || this.connectedTo(id) }));
+      .map(([id, m]) => ({ id, ...m, connected: id === this.localId || this.connectedTo(id), ready: id === 1 || m.ready }));
   }
 
   private connectedTo(id: PlayerId): boolean {
@@ -231,9 +235,15 @@ export class Room {
     return this.transports.has(id);
   }
 
-  /** 自分のポケモンを選ぶ（待合室） */
+  /** 自分のポケモンを選ぶ（待合室）。選び直したら準備OKは取り消す */
   async choosePokemon(pokemon: string): Promise<void> {
     await set(ref(this.db, `${this.base}/members/${this.localId}/pokemon`), pokemon);
+    if (this.role === 'guest') await this.setReady(false);
+  }
+
+  /** ゲスト: 準備OK を切り替える（待合室） */
+  async setReady(ready: boolean): Promise<void> {
+    await set(ref(this.db, `${this.base}/members/${this.localId}/ready`), ready);
   }
 
   /** 最初に持っていく持ち物と色違いを知らせる（待合室） */
@@ -252,9 +262,9 @@ export class Room {
     ]);
   }
 
-  /** ホスト: 全員がポケモンを選び、通信がつながっていれば開始できる */
+  /** ホスト: 全員がポケモンを選び、通信がつながり、ゲストが準備OKなら開始できる */
   get canStart(): boolean {
-    return this.role === 'host' && this.memberList.every((m) => m.pokemon && m.connected);
+    return this.role === 'host' && this.memberList.every((m) => m.pokemon && m.connected && m.ready);
   }
 
   /** ホスト: 開始する。開始後は誰も入れない */

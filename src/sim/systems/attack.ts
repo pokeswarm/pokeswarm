@@ -113,6 +113,20 @@ function aim(world: World, p: Player, range: number): [number, number] {
   return [dx / d, dy / d];
 }
 
+/** 届く範囲で HP の一番高い敵への向き（ゴッドバード: ボスを狙う）。いなければ null（同じ HP なら id の小さい方） */
+function aimStrongest(world: World, p: Player, range: number): [number, number] | null {
+  const e = world.enemies;
+  let best = -1;
+  for (const i of enemiesInRange(world, p.x, p.y, range)) {
+    if (best === -1 || e.hp[i]! > e.hp[best]!) best = i;
+  }
+  if (best === -1) return null;
+  const dx = e.x[best]! - p.x;
+  const dy = e.y[best]! - p.y;
+  const d = Math.sqrt(dx * dx + dy * dy) || 1;
+  return [dx / d, dy / d];
+}
+
 /** 向きを spreadDegrees の範囲でばらつかせる（見た目と自分の命中だけに関わるので三角関数を使ってよい） */
 function spread(world: World, dx: number, dy: number, degrees: number): [number, number] {
   if (degrees <= 0) return [dx, dy];
@@ -128,13 +142,21 @@ export function useMoves(world: World): void {
   for (const p of world.players) {
     // 倒れている間は技を使わない
     if (p.down) continue;
+    // ねむる（カビゴン）: 眠っている間と起きる動きの間は、ほかの技を出さない
+    if (stepRest(world, p)) continue;
     // 順番に出す技（ワンリキーのパンチ）の、次に出せるまでの秒数
     if (p.groupTimers) for (const g of Object.keys(p.groupTimers)) p.groupTimers[g]! -= world.dt;
     for (const pm of p.moves) {
       const def = world.rules.moves[pm.move];
       // いつも効く技（かくばる・テクスチャー）は使わない（効果は持ち物と同じく、いつも足されている）
-      if (!def || def.pattern === 'passive') continue;
+      if (!def || def.pattern === 'passive' || def.pattern === 'rest') continue;
       const st = playerMoveStats(world, p, pm);
+      // ためている間に出す技（きあいパンチのマッハパンチ）。この技を出している間（pauseSeconds）は止める
+      if (def.chargeMove) {
+        pm.subPause = Math.max(0, (pm.subPause ?? 0) - world.dt);
+        pm.sub ??= { move: def.chargeMove.move, level: world.rules.moves[def.chargeMove.move]!.levels.length, cooldown: 0, burstLeft: 0, burstTimer: 0 };
+        if (pm.subPause <= 0) runSubMove(world, p, pm.sub);
+      }
       pm.cooldown -= world.dt;
       if (pm.burstLeft > 0) {
         fireBurst(world, p, pm, st);
@@ -167,6 +189,7 @@ export function useMoves(world: World): void {
       // 消えてから数える技（こなゆき・ふぶき）は、持続の分を足す
       pm.cooldown = Math.max(scaledMoveStats(world, p, pm, st).cooldownSeconds, def.waitForEnd ? st.durationSeconds : 0) + (def.restAfterEnd ? st.durationSeconds : 0);
       world.events.push({ type: 'moveUsed', playerId: p.id, move: pm.move });
+      if (def.chargeMove) pm.subPause = def.chargeMove.pauseSeconds;
       const from = world.projectiles.count;
       switch (def.pattern) {
         case 'nearest':
@@ -266,6 +289,41 @@ export function useMoves(world: World): void {
   }
 }
 
+/**
+ * ねむる（カビゴン）の1回分: 歩いていない時間が duration 続くと眠り、眠っている間は毎秒 最大 HP の healPct % を回復する。
+ * 動くと起き、interval 秒の起きる動き（その間は動けない。movePlayers が止める）を挟む。
+ * 眠っている間・起きる動きの間なら true（ほかの技を出さない）
+ */
+function stepRest(world: World, p: Player): boolean {
+  const pm = p.moves.find((m) => world.rules.moves[m.move]?.pattern === 'rest');
+  if (!pm) return false;
+  const st = moveStatsOf(world, pm);
+  const s = (p.sleep ??= { stillTicks: 0, asleep: false, wakeTicks: 0 });
+  const moving = p.inputX !== 0 || p.inputY !== 0;
+  if (s.wakeTicks > 0) {
+    s.wakeTicks--;
+    return true;
+  }
+  if (s.asleep) {
+    if (moving) {
+      s.asleep = false;
+      s.stillTicks = 0;
+      s.wakeTicks = Math.round(st.intervalSeconds / world.dt);
+      world.events.push({ type: 'restChanged', playerId: p.id, asleep: false });
+      return true;
+    }
+    healPlayer(world, p.id, (p.maxHp * st.healPct * world.dt) / 100);
+    return true;
+  }
+  s.stillTicks = moving ? 0 : s.stillTicks + 1;
+  if (s.stillTicks >= Math.round(st.durationSeconds / world.dt)) {
+    s.asleep = true;
+    world.events.push({ type: 'restChanged', playerId: p.id, asleep: true });
+    return true;
+  }
+  return false;
+}
+
 /** 出したばかりの技そのもの（index from〜to − 1）の spawn の効き方を起こす。遅れて現れるもの（stage 3）は、現れたときに起こす */
 function fireSpawnEffects(world: World, from: number, to: number): void {
   const pr = world.projectiles;
@@ -274,6 +332,32 @@ function fireSpawnEffects(world: World, from: number, to: number): void {
     if (!world.rules.moves[pr.move[i]!]!.effects.some((fx) => fx.trigger === 'spawn')) return;
     fireEffects(world, 'spawn', fxSourceOf(world, i, pr.x[i]!, pr.y[i]!));
   }
+}
+
+/** ためている間に出す技（きあいパンチのマッハパンチ）を、ふつうの技と同じく再使用ごとに出す（続けて撃つ技は間隔ごとに） */
+function runSubMove(world: World, p: Player, sub: PlayerMove): void {
+  const def = world.rules.moves[sub.move]!;
+  const st = playerMoveStats(world, p, sub);
+  sub.cooldown -= world.dt;
+  if (sub.burstLeft > 0) {
+    fireBurst(world, p, sub, st);
+    return;
+  }
+  if (sub.cooldown > 0) return;
+  const needsTarget = def.pattern === 'nearest' || def.pattern === 'homing' || def.pattern === 'chain';
+  if (needsTarget && nearestEnemy(world, p.x, p.y, st.range) === -1) {
+    sub.cooldown = 0;
+    return;
+  }
+  sub.cooldown = scaledMoveStats(world, p, sub, st).cooldownSeconds;
+  world.events.push({ type: 'moveUsed', playerId: p.id, move: sub.move });
+  if (BURST_PATTERNS.has(def.pattern)) {
+    sub.burstLeft = st.count;
+    sub.burstTimer = 0;
+    fireBurst(world, p, sub, st);
+    return;
+  }
+  ONE_SHOT_FIRE[def.pattern]?.(world, p, sub, st);
 }
 
 function base(world: World, p: Player, pm: PlayerMove, st: MoveStats): Omit<ProjectileSpawn, 'motion' | 'x' | 'y'> {
@@ -432,8 +516,9 @@ function fireOrbit(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
  * spreadDegrees があれば、その角度の中に等間隔に並べる（じわれ: 360 で四方へ）
  */
 function fireBeam(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
-  const [ax, ay] = aim(world, p, st.range);
-  const body = world.rules.moves[pm.move]!.body;
+  const def = world.rules.moves[pm.move]!;
+  const [ax, ay] = (def.aimStrongest ? aimStrongest(world, p, st.range) : null) ?? aim(world, p, st.range);
+  const body = def.body;
   if (body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: ax, dirY: ay, distance: body.lungeDistance, afterimages: body.afterimages });
   const step = st.spreadDegrees > 0 ? st.spreadDegrees / st.count : 12;
   for (let k = 0; k < st.count; k++) {
@@ -548,31 +633,33 @@ function fireMetronome(world: World, p: Player, self?: PlayerMove): void {
     fireBurst(world, p, pm, { ...st, intervalSeconds: 0 });
     return;
   }
-  const fire: Record<string, (w: World, p: Player, pm: PlayerMove, st: MoveStats) => void> = {
-    melee: fireMelee,
-    orbit: fireOrbit,
-    beam: fireBeam,
-    ground: fireGround,
-    nova: fireNova,
-    screen: fireScreen,
-    whip: fireWhip,
-    lob: fireLob,
-    strike: fireStrike,
-    chain: fireChain,
-    bounce: fireBounce,
-    cross: fireCross,
-    scatter: fireScatter,
-    eruption: fireEruption,
-    spin: fireSpin,
-    sweep: fireSweep,
-    spiral: fireSpiral,
-    pulse: firePulse,
-    weather: fireWeather,
-  };
   const from = world.projectiles.count;
-  fire[def.pattern]?.(world, p, pm, st);
+  ONE_SHOT_FIRE[def.pattern]?.(world, p, pm, st);
   fireSpawnEffects(world, from, world.projectiles.count);
 }
+
+/** 一度に出し終える出し方ごとの出す関数（ゆびをふる・ものまね・ためている間に出す技で使う） */
+const ONE_SHOT_FIRE: Record<string, (w: World, p: Player, pm: PlayerMove, st: MoveStats) => void> = {
+  melee: fireMelee,
+  orbit: fireOrbit,
+  beam: fireBeam,
+  ground: fireGround,
+  nova: fireNova,
+  screen: fireScreen,
+  whip: fireWhip,
+  lob: fireLob,
+  strike: fireStrike,
+  chain: fireChain,
+  bounce: fireBounce,
+  cross: fireCross,
+  scatter: fireScatter,
+  eruption: fireEruption,
+  spin: fireSpin,
+  sweep: fireSweep,
+  spiral: fireSpiral,
+  pulse: firePulse,
+  weather: fireWeather,
+};
 
 /**
  * whip（横なぎ）: 左右へ長い直線で払う。向いている側（左右）から、count 2 で反対側、3・4 で上下も。

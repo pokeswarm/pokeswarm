@@ -1163,15 +1163,6 @@
         {
           "power": 7.8
         }
-      ],
-      "effects": [
-        {
-          "trigger": "hit",
-          "explode": {
-            "sizeMultiplier": 1.6,
-            "powerMultiplier": 0.5
-          }
-        }
       ]
     },
     "blast-burn": {
@@ -3773,7 +3764,8 @@
             "path": true
           }
         }
-      ]
+      ],
+      "aimStrongest": true
     },
     "tri-attack": {
       "pattern": "homing",
@@ -5035,6 +5027,10 @@
       "body": {
         "lungeDistance": 18,
         "afterimages": 0
+      },
+      "chargeMove": {
+        "move": "mach-punch",
+        "pauseSeconds": 0.6
       }
     },
     "fire-punch": {
@@ -5162,6 +5158,34 @@
           }
         }
       ]
+    },
+    "rest": {
+      "pattern": "rest",
+      "effect": "rest",
+      "learners": [
+        "snorlax"
+      ],
+      "teachOnly": true,
+      "base": {
+        "power": 0,
+        "cooldownSeconds": 1,
+        "count": 1,
+        "intervalSeconds": 0.5,
+        "speed": 0,
+        "size": 1,
+        "range": 0,
+        "durationSeconds": 3,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "healPct": 1
+      },
+      "levels": []
     }
   }
 }

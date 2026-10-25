@@ -217,7 +217,7 @@ export class LevelUpPanel {
   /** 除外のモード（次に選んだ候補を除外する） */
   private banning = false;
   /** 最後に出した内容（除外のモードの切り替えで作り直すため） */
-  private last: { level: number; offers: OfferText[]; rerolls: number; secondsLeft: number; bans: number; more: number } | null = null;
+  private last: { level: number; offers: OfferText[]; rerolls: number; secondsLeft: number; bans: number; more: number; fallback: boolean } | null = null;
 
   constructor(
     private readonly handlers: {
@@ -225,6 +225,8 @@ export class LevelUpPanel {
       reroll: () => void;
       skip: () => void;
       ban: (index: number) => void;
+      /** 回復とコインしか出ないとき: これからずっと自動で選ぶ（heal = ずっと回復・coins = ずっとコイン・alternate = 交互に） */
+      auto: (mode: 'heal' | 'coins' | 'alternate') => void;
       /** アイコンの画像の URL */
       iconUrl: (key: string) => string;
     },
@@ -248,10 +250,10 @@ export class LevelUpPanel {
   }
 
   /** 毎フレーム呼ぶ。内容が変わったときだけ作り直す */
-  show(level: number, offers: OfferText[], rerolls: number, secondsLeft: number, bans = 0, more = 0): void {
-    this.last = { level, offers, rerolls, secondsLeft, bans, more };
+  show(level: number, offers: OfferText[], rerolls: number, secondsLeft: number, bans = 0, more = 0, fallback = false): void {
+    this.last = { level, offers, rerolls, secondsLeft, bans, more, fallback };
     if (bans <= 0) this.banning = false;
-    const key = JSON.stringify([level, offers, rerolls, secondsLeft, bans, more, this.banning]);
+    const key = JSON.stringify([level, offers, rerolls, secondsLeft, bans, more, this.banning, fallback]);
     if (key === this.shownKey) return;
     this.shownKey = key;
 
@@ -338,7 +340,21 @@ export class LevelUpPanel {
     for (const b of [reroll, skip, ban]) b.style.cssText = `${windowCss('light', b === ban && this.banning ? '#e04040' : undefined)};flex:1;min-height:44px;padding:${compact ? 6 : 10}px;cursor:pointer;font:inherit;font-size:16px;${b.disabled ? 'opacity:0.45;cursor:default' : ''}`;
     footer.append(reroll, skip, ban);
 
-    this.root.replaceChildren(header, row, footer);
+    // 回復とコインしか出ないとき（技も持ち物も強化しきった）: これからずっと自動で選ぶボタン。押すと以後は選ぶ画面を出さない
+    const parts: HTMLElement[] = [header, row, footer];
+    if (fallback) {
+      const auto = document.createElement('div');
+      auto.style.cssText = `display:flex;gap:${compact ? 8 : 16}px;margin-top:${compact ? 6 : 12}px`;
+      for (const mode of ['heal', 'coins', 'alternate'] as const) {
+        const b = document.createElement('button');
+        b.textContent = t(`levelUp.auto.${mode}`);
+        b.style.cssText = `${windowCss('light', '#208838')};flex:1;min-height:44px;padding:${compact ? 6 : 10}px;cursor:pointer;font:inherit;font-size:16px`;
+        b.onclick = () => this.handlers.auto(mode);
+        auto.append(b);
+      }
+      parts.push(auto);
+    }
+    this.root.replaceChildren(...parts);
     this.root.style.display = 'block';
     if (!this.onKey) {
       this.onKey = (ev) => {
@@ -372,7 +388,7 @@ export class LevelUpPanel {
     if (!this.last || this.last.bans <= 0) return;
     this.banning = !this.banning;
     const l = this.last;
-    this.show(l.level, l.offers, l.rerolls, l.secondsLeft, l.bans, l.more);
+    this.show(l.level, l.offers, l.rerolls, l.secondsLeft, l.bans, l.more, l.fallback);
   }
 
   hide(): void {

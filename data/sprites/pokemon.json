@@ -774,6 +774,9 @@
       "dex": 143,
       "uses": [
         "full"
+      ],
+      "extraAnimations": [
+        "Sleep"
       ]
     },
     {

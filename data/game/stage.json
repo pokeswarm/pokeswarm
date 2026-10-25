@@ -494,7 +494,9 @@
   "bossRules": {
     "knockbackMultiplier": 0,
     "stopStatusMultiplier": 0.25,
-    "hpPerExtraPlayerPct": 60,
+    "hpPerExtraPlayerPct": 90,
+    "hazardActiveSeconds": 0.4,
+    "hazardDamageScalesWithLevel": true,
     "spawnDistance": 380
   },
   "endDelaySeconds": 2.5

@@ -281,8 +281,21 @@ function strikeHazards(world: World): void {
   const me = world.players.find((p) => p.id === world.localPlayerId);
   for (let h = world.hazards.length - 1; h >= 0; h--) {
     const hz = world.hazards[h]!;
+    // 落ちた後: 残っている間に触れると当たる（1つの範囲技で1回）。時間が来たら消す
+    if (hz.activeTicks !== undefined) {
+      if (--hz.activeTicks <= 0) {
+        world.hazards.splice(h, 1);
+        continue;
+      }
+      if (me && !me.down && me.invincibleTicks <= 0 && !hz.hitLocal && hazardHits(hz, me.x, me.y, me.radius)) {
+        hz.hitLocal = true;
+        hurtPlayer(world, me, hazardDamage(world, hz.damage));
+      }
+      continue;
+    }
     if (--hz.ticksLeft > 0) continue;
-    world.hazards.splice(h, 1);
+    // 落ちた: 予告を消し、少しの間は当たる範囲として残す（描画は予告として描かない）
+    hz.activeTicks = Math.max(1, Math.round(world.rules.stage.bossRules.hazardActiveSeconds / world.dt));
     const move = world.rules.stage.moves[hz.move];
     world.events.push({
       type: 'hazardStruck',
@@ -338,8 +351,17 @@ function strikeHazards(world: World): void {
       }
     }
     if (!me || me.down || me.invincibleTicks > 0) continue;
-    if (hazardHits(hz, me.x, me.y, me.radius)) hurtPlayer(world, me, hz.damage);
+    if (hazardHits(hz, me.x, me.y, me.radius)) {
+      hz.hitLocal = true;
+      hurtPlayer(world, me, hazardDamage(world, hz.damage));
+    }
   }
+}
+
+/** 範囲技の威力: プレイヤーの最大 HP がレベルで伸びるのに合わせて上げる（後半でも痛いように） */
+function hazardDamage(world: World, damage: number): number {
+  if (!world.rules.stage.bossRules.hazardDamageScalesWithLevel) return damage;
+  return damage * (1 + (world.rules.stats.perLevelPct.maxHp * (world.level - 1)) / 100);
 }
 
 /** 範囲に入っているか（円・直線） */

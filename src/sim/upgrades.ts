@@ -46,6 +46,8 @@ export interface SimUpgradeDef {
   readonly forms?: readonly number[];
   /** 一緒に持てない持ち物（持ち物の番号） */
   readonly excludes?: readonly number[];
+  /** 今の姿がこの持ち物で進化できるときだけ候補に出す（つながりのヒモ） */
+  readonly onlyWhenEvolves?: boolean;
 }
 
 export interface SimDerivation {
@@ -62,6 +64,8 @@ export interface SimDerivation {
   readonly forms?: readonly number[];
   /** ほかにも最大レベルで持っていないといけない技（進化すると消費される） */
   readonly withMoves?: readonly number[];
+  /** 進化するとき、持っていれば消費する技 */
+  readonly consumes?: readonly number[];
 }
 
 /** シミュレーションが使うレベルアップの定義 */

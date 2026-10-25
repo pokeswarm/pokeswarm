@@ -82,6 +82,10 @@ export interface SimMoveDef {
   readonly scatterJitter?: { readonly countMin: number; readonly sizeMin: number; readonly sizeMax: number };
   /** sweep（なぎ払い）を片道だけにする（はたく） */
   readonly sweepOnce?: boolean;
+  /** 届く範囲で HP の一番高い敵を狙う（ゴッドバード） */
+  readonly aimStrongest?: boolean;
+  /** ためている間に出す技（技の番号・最大レベルで出す）と、この技を出してから止めておく秒数（きあいパンチ） */
+  readonly chargeMove?: { readonly move: number; readonly pauseSeconds: number };
   /** 候補に出さない（持ち物を持つと覚える技） */
   readonly teachOnly?: boolean;
   /** 同じ group の技は順番に出す（ワンリキーのパンチ） */

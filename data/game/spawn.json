@@ -17,7 +17,7 @@
   "hpPerTwoGymsPct": 15,
   "perExtraPlayer": {
     "spawnPct": 100,
-    "hpPct": 20,
+    "hpPct": 35,
     "xpSharePct": 75
   },
   "fillPerSecond": 20,

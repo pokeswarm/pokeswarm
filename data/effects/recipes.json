@@ -3020,6 +3020,9 @@
         "width": 2.5,
         "jitter": 3
       }
+    },
+    "rest": {
+      "extends": "normal.base"
     }
   }
 }

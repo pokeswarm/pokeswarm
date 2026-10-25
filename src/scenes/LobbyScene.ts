@@ -169,6 +169,11 @@ export class LobbyScene extends Phaser.Scene {
     }
     if (ev.repeat) return;
     if (ev.key === 'Enter' && this.room?.canStart) void this.room.start();
+    // ゲスト: Enter で準備OK を切り替える（ポケモンを選んでから）
+    else if (ev.key === 'Enter' && this.room?.role === 'guest') {
+      const me = this.room.memberList.find((m) => m.id === this.room!.localId);
+      if (me?.pokemon) void this.room.setReady(!me.ready);
+    }
     else if (ev.key === 'Escape') this.scene.start('title');
   }
 
@@ -236,6 +241,13 @@ export class LobbyScene extends Phaser.Scene {
         const state = document.createElement('div');
         state.style.cssText = 'font-size:16px;opacity:0.85;overflow-wrap:anywhere';
         state.textContent = !m ? t('lobby.empty') : !m.connected ? t('lobby.connecting') : m.pokemon ? this.pokemonName(m.pokemon) : t('lobby.choosing');
+        // ゲストの準備OK
+        if (m && id !== 1 && m.ready) {
+          const ok = document.createElement('div');
+          ok.style.cssText = `font-size:16px;color:${uiConfig.picker.selected}`;
+          ok.textContent = t('lobby.readyMark');
+          state.append(document.createElement('br'), ok);
+        }
         // 低い画面では状態の文を出さない（アイコンと枠の明るさで分かる）
         if (small) cell.append(role, box);
         else cell.append(role, box, state);
@@ -311,6 +323,14 @@ export class LobbyScene extends Phaser.Scene {
       wait.style.flex = '1';
       wait.textContent = t('lobby.waitStart');
       footer.append(wait);
+      // ゲスト: 準備OK（ポケモンを選んでから押せる。もう一度押すと取り消す）
+      const me = room.memberList.find((m) => m.id === room.localId);
+      const ready = document.createElement('button');
+      ready.style.cssText = BUTTON + (me?.pokemon ? '' : ';opacity:0.5');
+      ready.textContent = t(me?.ready ? 'lobby.unready' : 'lobby.ready');
+      ready.disabled = !me?.pokemon;
+      ready.onclick = () => void room.setReady(!me?.ready);
+      footer.append(ready);
     }
     const leave = document.createElement('button');
     leave.style.cssText = BUTTON;

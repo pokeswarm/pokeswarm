@@ -490,6 +490,13 @@ export const stageConfigSchema = z.object({
     stopStatusMultiplier: z.number().min(0),
     /** 2人目以降の1人あたりの HP の増加（%） */
     hpPerExtraPlayerPct: z.number().min(0),
+    /**
+     * 範囲技が落ちた後も、この秒数は範囲に触れると当たる（作者の指摘 2026年10月25日: はかいこうせんの光に触れても当たらなかった。
+     * 落ちた瞬間だけだった）。1つの範囲技で当たるのは1回
+     */
+    hazardActiveSeconds: z.number().nonnegative(),
+    /** 範囲技の威力を、プレイヤーの最大 HP の伸び（stats の perLevelPct.maxHp）に合わせてレベルで上げるか（後半でも痛いように） */
+    hazardDamageScalesWithLevel: z.boolean(),
     /** プレイヤーからこの距離に出す */
     spawnDistance: z.number().positive(),
   }),
@@ -580,6 +587,8 @@ export type CombatConfig = z.infer<typeof combatConfigSchema>;
  *   作者の決定 2026年10月25日）。範囲は塗らず、画面に雪を降らせて見せる
  * - barrage（連打）: 向いている方向を中心にした開き arcDegrees・距離 range の中のランダムな場所に、外へ押し出す小さな当たり判定（拳・蹴り）を
  *   count 発、interval ごとに出す（ばくれつパンチ: ゴムゴムのガトリングのように。にどげり: 近くのランダムな向きへ2連撃。作者の決定 2026年10月25日）
+ * - rest（ねむる）: 攻撃しない。歩いていない時間が duration 続くと眠り、眠っている間は毎秒 最大 HP の healPct % を回復するが、ほかの技は出ない。
+ *   動くと起き、interval 秒の起きる動き（その間は動けず、技も出ない）を挟む（カビゴン。作者の決定 2026年10月25日）
  */
 export const MOVE_PATTERNS = [
   'nearest',
@@ -611,6 +620,7 @@ export const MOVE_PATTERNS = [
   'pulse',
   'weather',
   'barrage',
+  'rest',
 ] as const;
 export type MovePattern = (typeof MOVE_PATTERNS)[number];
 
@@ -864,6 +874,13 @@ export const moveDefSchema = z.object({
   randomAim: z.boolean().optional(),
   /** 再使用を、出した技が消えてから数える（こなゆき・ふぶき: 雪が止んでから cooldown の間はダメージが起きない。作者の決定 2026年10月25日） */
   restAfterEnd: z.boolean().optional(),
+  /** 狙う敵: 一番近い敵ではなく、届く範囲で HP の一番高い敵（ゴッドバード: ボスへ。作者の決定 2026年10月25日）。beam で使う */
+  aimStrongest: z.boolean().optional(),
+  /**
+   * ためている間に出す技（moves.json のキー。最大レベルで出す）と、この技を出してから止めておく秒数
+   * （きあいパンチ: ためている間はマッハパンチが出て、きあいパンチを出している間は止まる。作者の決定 2026年10月25日）
+   */
+  chargeMove: z.object({ move: z.string(), pauseSeconds: z.number().nonnegative() }).optional(),
   /** 候補に出さない（持ち物を持つと覚える技。ほのおのパンチ・かみなりパンチ） */
   teachOnly: z.boolean().optional(),
   /**
@@ -972,6 +989,8 @@ export const spritePokemonListSchema = z.object({
        * - enemy: 雑魚用。enemyAnimations の動作だけ。public/sprites/enemy/<key>/
        */
       uses: z.array(z.enum(['full', 'enemy'])).min(1).default(['full']),
+      /** full のときに、pipeline の動作のほかに取り込む動作（カビゴン: 寝ている Sleep。作者の決定 2026年10月25日） */
+      extraAnimations: z.array(z.string()).default([]),
     }),
   ),
 });
@@ -1483,6 +1502,8 @@ const upgradeDefSchema = z.object({
   forms: z.array(z.string()).optional(),
   /** 一緒に持てない持ち物（でんきだま と かみなりのいし: ライチュウに進化するか、ピカチュウのまま強くするかを選ぶ） */
   excludes: z.array(z.string()).optional(),
+  /** 今の姿がこの持ち物で進化できるときだけ候補に出す（つながりのヒモ: ゴーリキーになってから。作者の決定 2026年10月25日） */
+  onlyWhenEvolves: z.boolean().optional(),
 });
 
 /** 持ち物。キーは PokeAPI の持ち物の名前 */
@@ -1542,6 +1563,8 @@ export const derivationsConfigSchema = z.object({
        * （ばくれつパンチ: きあいパンチ・ほのおのパンチ・かみなりパンチ が全部最大。作者の決定 2026年10月25日）
        */
       withMoves: z.array(z.string()).optional(),
+      /** 進化するとき、持っていれば消費する（なくなる）技。持っていなくても進化できる（ばくれつパンチ: ほのおのパンチ・かみなりパンチ） */
+      consumes: z.array(z.string()).optional(),
     }),
   ),
 });

@@ -113,6 +113,13 @@ export interface MoveTaughtEvent {
   readonly move: number;
 }
 
+/** ねむる（カビゴン）で眠った・起きた（効果音と見た目に使う） */
+export interface RestChangedEvent {
+  readonly type: 'restChanged';
+  readonly playerId: PlayerId;
+  readonly asleep: boolean;
+}
+
 /** プレイヤーがダメージを受けた（自分のブラウザで判定） */
 export interface PlayerDamagedEvent {
   readonly type: 'playerDamaged';
@@ -269,6 +276,7 @@ export type SimEvent =
   | LevelUpEvent
   | UpgradeChosenEvent
   | MoveTaughtEvent
+  | RestChangedEvent
   | PlayerDamagedEvent
   | PlayerRevivedEvent
   | PlayerDownEvent

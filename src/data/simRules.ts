@@ -64,6 +64,7 @@ export function buildSimRules(): SimRules {
       ...(def.scatterJitter ? { scatterJitter: def.scatterJitter } : {}),
       sweepOnce: def.sweepOnce,
       teachOnly: def.teachOnly,
+      aimStrongest: def.aimStrongest,
       ...(def.group ? { group: def.group } : {}),
       randomAim: def.randomAim,
       ...(def.barrageWidth ? { barrageWidth: def.barrageWidth, barrageWidthPerLevel: def.barrageWidthPerLevel ?? 0 } : {}),
@@ -88,8 +89,13 @@ export function buildSimRules(): SimRules {
     const keys = pool === 'starting' ? startingKeys : uniqueKeys;
     moves[k] = { ...m, randomPool: keys.map(moveIndex).filter((i) => i !== -1 && moves[i]!.pattern !== 'metronome') };
   });
+  // ためている間に出す技（きあいパンチのマッハパンチ）
+  moves.forEach((m, k) => {
+    const cm = movesConfig.moves[m.key]?.chargeMove;
+    if (cm) moves[k] = { ...m, chargeMove: { move: moveIndex(cm.move), pauseSeconds: cm.pauseSeconds } };
+  });
   const upgrades = (
-    defs: Record<string, { category: "stat" | "type" | "evolution"; maxLevel: number; consumable: boolean; perLevel: Parameters<typeof resolveModifiers>[0]; lines?: string[]; powerMultiplier?: number }>,
+    defs: Record<string, { category: "stat" | "type" | "evolution"; maxLevel: number; consumable: boolean; perLevel: Parameters<typeof resolveModifiers>[0]; lines?: string[]; powerMultiplier?: number; onlyWhenEvolves?: boolean }>,
   ): SimUpgradeDef[] =>
     Object.entries(defs).map(([key, d]) => ({
       key,
@@ -99,6 +105,7 @@ export function buildSimRules(): SimRules {
       perLevel: resolveModifiers(d.perLevel, types.names),
       ...(d.lines ? { lines: d.lines } : {}),
       ...(d.powerMultiplier ? { powerMultiplier: d.powerMultiplier } : {}),
+      ...(d.onlyWhenEvolves ? { onlyWhenEvolves: true } : {}),
     }));
   const items = upgrades(itemsConfig.items);
   // 今の姿だけ・一緒に持てない（番号に直す。持ち物の番号は上で決まる）
@@ -114,7 +121,7 @@ export function buildSimRules(): SimRules {
   const itemIndex = (key: string): number => items.findIndex((i) => i.key === key);
   const derivations = [
     ...derivationsConfig.derivations.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: null })),
-    ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: d.item ? itemIndex(d.item) : -1, to: moveIndex(d.to), line: d.line, ...(d.minLevel ? { minLevel: d.minLevel } : {}), ...(d.forms ? { forms: d.forms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}), ...(d.withMoves ? { withMoves: d.withMoves.map(moveIndex) } : {}) })),
+    ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: d.item ? itemIndex(d.item) : -1, to: moveIndex(d.to), line: d.line, ...(d.minLevel ? { minLevel: d.minLevel } : {}), ...(d.forms ? { forms: d.forms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}), ...(d.withMoves ? { withMoves: d.withMoves.map(moveIndex) } : {}), ...(d.consumes ? { consumes: d.consumes.map(moveIndex) } : {}) })),
   ];
   const itemMoves = Object.entries(playablesConfig.pokemon).flatMap(([line, p]) => p.itemMoves.map((im) => ({ line, item: itemIndex(im.item), move: moveIndex(im.move) })));
   // ポケモンの種類: PokeAPI から生成したすべて。進化先・進化の道具が無いものは進化の一覧から外す

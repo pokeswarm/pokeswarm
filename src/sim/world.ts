@@ -89,6 +89,10 @@ export interface Hazard {
   chainLeft?: number;
   ticksLeft: number;
   readonly totalTicks: number;
+  /** 落ちた後、まだ当たる残りの更新回数（落ちる前は使わない） */
+  activeTicks?: number;
+  /** 落ちた後: 自分のプレイヤーにもう当たったか */
+  hitLocal?: boolean;
 }
 
 /** シミュレーションの全状態 */

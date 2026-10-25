@@ -221,6 +221,8 @@ export function itemFits(
   if (p.unlockedItems && !p.unlockedItems.has(item)) return false;
   if (def.lines && !def.lines.includes(p.line)) return false;
   if (def.forms && !def.forms.includes(p.species)) return false;
+  // 今の姿がこの持ち物で進化できるときだけ（つながりのヒモ: ゴーリキーになってから）
+  if (def.onlyWhenEvolves && !rules.species[p.species]?.evolutions.some((e) => e.trigger !== 'level' && e.item === item)) return false;
   // 一緒に持てない持ち物（でんきだま と かみなりのいし）は、どちらか片方だけ
   if (p.items.some((it) => def.excludes?.includes(it.item) || rules.items[it.item]?.excludes?.includes(item))) return false;
   if (def.category !== 'type') return true;
@@ -256,7 +258,8 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
   // 技を覚えないポケモン（プリン）は、新しい技を候補に出さない
   if (p.moves.length < rules.combat.maxMoveSlots && !p.fixedMoves) {
     rules.moves.forEach((m, move) => {
-      if (!isBaseMove(world, move) || m.teachOnly || p.moves.some((pm) => pm.move === move)) return;
+      // 進化で使った技（派生・固有技の元の技）は、もう候補に出さない（作者の指摘 2026年10月25日）
+      if (!isBaseMove(world, move) || m.teachOnly || p.moves.some((pm) => pm.move === move) || p.consumedMoves?.includes(move)) return;
       // 覚えられる系統が決まっている技（ノーマルの技・各ポケモン専用の技）は、その系統だけ（ミュウは何でも）
       if (m.learners && !p.learnsAll && !m.learners.includes(p.line)) return;
       if (m.type === normal || p.types.includes(m.type) || p.moveTypes.includes(m.type)) pool.push({ kind: 'moveNew', move });
@@ -315,12 +318,16 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
       p.bonusCoins = (p.bonusCoins ?? 0) + world.rules.leveling.fallback.coins;
       break;
     case 'derive': {
+      // 元の技は進化で使ったので、もう候補に出さない
+      p.consumedMoves = [...(p.consumedMoves ?? []), p.moves[offer.slot]!.move];
       p.moves[offer.slot] = { move: offer.to, level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0 };
       // ほかの技も使って進化する技（ばくれつパンチ）: 使った技はなくなり、持ち物で覚え直さない
-      const d = world.rules.derivations.find((x) => x.to === offer.to && x.withMoves);
-      if (d?.withMoves) {
-        p.moves = p.moves.filter((m) => !d.withMoves!.includes(m.move));
-        p.consumedMoves = [...(p.consumedMoves ?? []), ...d.withMoves];
+      // 持っていれば消費する技（ばくれつパンチ: ほのおのパンチ・かみなりパンチ）も同じ
+      const d = world.rules.derivations.find((x) => x.to === offer.to && (x.withMoves || x.consumes));
+      const used = [...(d?.withMoves ?? []), ...(d?.consumes ?? [])];
+      if (used.length) {
+        p.moves = p.moves.filter((m) => !used.includes(m.move));
+        p.consumedMoves = [...(p.consumedMoves ?? []), ...used];
       }
       // 進化の石などは使うとなくなる（持ち物の枠が空く）
       if (offer.item !== -1 && world.rules.items[offer.item]!.consumable) p.items = p.items.filter((it) => it.item !== offer.item);

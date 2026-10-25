@@ -372,6 +372,10 @@ export class RunScene extends Phaser.Scene {
       reroll: () => (guest ? this.sync?.requestUpgrade('r') : this.uiCommands.push({ type: 'rerollUpgrades', playerId: this.localId })),
       skip: () => (guest ? this.sync?.requestUpgrade('s') : this.uiCommands.push({ type: 'skipUpgrade', playerId: this.localId })),
       ban: (index) => (guest ? this.sync?.requestUpgrade('b', index) : this.uiCommands.push({ type: 'banUpgrade', playerId: this.localId, index })),
+      auto: (mode) => {
+        this.autoFallback = mode;
+        this.autoNext = mode === 'coins' ? 'coins' : 'heal';
+      },
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.levelUpPanel.hide());
     this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));
@@ -483,6 +487,11 @@ export class RunScene extends Phaser.Scene {
     };
     this.netStartedAt = performance.now();
   }
+
+  /** 回復とコインしか出ないときの自動選択（null なら選ぶ画面を出す）・次に選ぶもの・最後に頼んだレベルアップの回 */
+  private autoFallback: 'heal' | 'coins' | 'alternate' | null = null;
+  private autoNext: 'heal' | 'coins' = 'heal';
+  private autoRequestedLevel = -1;
 
   /** 相手ごとの、最後に通信が届いた時刻 */
   private lastHeard = new Map<PlayerId, number>();
@@ -952,6 +961,8 @@ export class RunScene extends Phaser.Scene {
     const g = this.hazardView;
     g.clear();
     for (const h of hazards) {
+      // 落ちた後に少し当たる時間（activeTicks）は、予告を描かない（落ちた所の絵が出ている）
+      if (h.activeTicks !== undefined) continue;
       const progress = 1 - h.ticksLeft / h.totalTicks;
       if (h.shape === 'line') {
         // 直線: 幅 radius*2 の帯。落ちるまでの残りは、始点から伸びる帯で見せる
@@ -1424,8 +1435,23 @@ export class RunScene extends Phaser.Scene {
 
     const lu = world.levelUp;
     if (lu && !lu.done.has(this.localId) && !world.outcome) {
-      const offers = (lu.offers.get(this.localId) ?? []).map((o) => offerText(world, local, o, new Set(session.store.current.discoveries)));
-      this.levelUpPanel.show(lu.level, offers, local.rerolls, Math.ceil(lu.ticksLeft * world.dt), local.bans, Math.max(0, world.level - lu.level));
+      const raw = lu.offers.get(this.localId) ?? [];
+      // 回復とコインしか出ないとき: 自動で選ぶ設定なら、画面を出さずに選ぶ（同じ回は1回だけ頼む）
+      const fallback = raw.length > 0 && raw.every((o) => o.kind === 'heal' || o.kind === 'coins');
+      if (fallback && this.autoFallback) {
+        if (this.autoRequestedLevel !== lu.level) {
+          this.autoRequestedLevel = lu.level;
+          const want = this.autoNext;
+          if (this.autoFallback === 'alternate') this.autoNext = want === 'heal' ? 'coins' : 'heal';
+          const index = Math.max(0, raw.findIndex((o) => o.kind === want));
+          if (this.sim.world.role === 'guest') this.sync?.requestUpgrade('c', index);
+          else this.uiCommands.push({ type: 'chooseUpgrade', playerId: this.localId, index });
+        }
+        this.levelUpPanel.hide();
+      } else {
+        const offers = raw.map((o) => offerText(world, local, o, new Set(session.store.current.discoveries)));
+        this.levelUpPanel.show(lu.level, offers, local.rerolls, Math.ceil(lu.ticksLeft * world.dt), local.bans, Math.max(0, world.level - lu.level), fallback);
+      }
     } else {
       this.levelUpPanel.hide();
     }

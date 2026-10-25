@@ -106,6 +106,7 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
       break;
     case 'heal':
     case 'passive':
+    case 'rest':
       area = 0;
       break;
     case 'eruption': {

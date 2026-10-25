@@ -10,15 +10,15 @@
   "upgrades": [
     {
       "id": "might",
-      "maxLevel": 5,
-      "baseCost": 200,
+      "maxLevel": 10,
+      "baseCost": 300,
       "perLevel": {
         "powerPct": 5
       }
     },
     {
       "id": "armor",
-      "maxLevel": 3,
+      "maxLevel": 6,
       "baseCost": 600,
       "perLevel": {
         "damageTakenPct": -3
@@ -26,31 +26,31 @@
     },
     {
       "id": "max-health",
-      "maxLevel": 3,
-      "baseCost": 200,
+      "maxLevel": 6,
+      "baseCost": 300,
       "perLevel": {
         "maxHpPct": 10
       }
     },
     {
       "id": "haste",
-      "maxLevel": 2,
-      "baseCost": 900,
+      "maxLevel": 4,
+      "baseCost": 1000,
       "perLevel": {
         "cooldownPct": -2.5
       }
     },
     {
       "id": "area",
-      "maxLevel": 2,
-      "baseCost": 300,
+      "maxLevel": 4,
+      "baseCost": 400,
       "perLevel": {
         "areaPct": 5
       }
     },
     {
       "id": "projectile-speed",
-      "maxLevel": 2,
+      "maxLevel": 4,
       "baseCost": 300,
       "perLevel": {
         "projectileSpeedPct": 10
@@ -58,7 +58,7 @@
     },
     {
       "id": "move-speed",
-      "maxLevel": 2,
+      "maxLevel": 4,
       "baseCost": 300,
       "perLevel": {
         "moveSpeedPct": 5
@@ -66,7 +66,7 @@
     },
     {
       "id": "magnet",
-      "maxLevel": 2,
+      "maxLevel": 4,
       "baseCost": 300,
       "perLevel": {
         "pickupRangePct": 25
@@ -74,7 +74,7 @@
     },
     {
       "id": "luck",
-      "maxLevel": 3,
+      "maxLevel": 6,
       "baseCost": 600,
       "perLevel": {
         "critChancePct": 3
@@ -82,7 +82,7 @@
     },
     {
       "id": "growth",
-      "maxLevel": 5,
+      "maxLevel": 8,
       "baseCost": 900,
       "perLevel": {
         "xpPct": 3
@@ -90,32 +90,36 @@
     },
     {
       "id": "greed",
-      "maxLevel": 5,
+      "maxLevel": 10,
       "baseCost": 200,
       "grants": "coinPct",
       "amount": 10
     },
     {
       "id": "revival",
-      "maxLevel": 1,
+      "maxLevel": 2,
       "baseCost": 10000,
       "grants": "revives"
     },
     {
       "id": "reroll-plus",
-      "maxLevel": 2,
-      "baseCost": 5000,
+      "maxLevel": 5,
+      "baseCost": 2000,
       "grants": "rerolls",
       "amount": 2
     },
     {
       "id": "banish",
-      "maxLevel": 3,
+      "maxLevel": 5,
       "baseCost": 200,
       "grants": "bans"
     }
   ],
   "pokemon": [
+    {
+      "key": "slowpoke",
+      "cost": 500
+    },
     {
       "key": "psyduck",
       "cost": 2000
@@ -137,6 +141,11 @@
       "cost": 9999
     }
   ],
+  "startingCoins": 500,
+  "repriced": {
+    "tag": "2026-10-25",
+    "baseCosts": { "might": 200, "max-health": 200, "haste": 900, "area": 300, "reroll-plus": 5000 }
+  },
   "legacyBaseCosts": {
     "max-hp": 100,
     "attack": 150,

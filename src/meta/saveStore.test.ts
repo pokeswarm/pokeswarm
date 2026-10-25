@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { shopConfig } from '../data';
 import { addStat, emptySave, parseSave, type SaveData } from './saveData';
 import { SaveStore, type LocalStorageLike, type SaveBackend } from './saveStore';
 
@@ -100,6 +101,7 @@ describe('セーブデータ', () => {
     a.update((d) => (d.coins = 9));
     const b = new SaveStore(backend, local, now);
     await b.switchUser('u2');
-    expect(b.current.coins).toBe(0);
+    // 新しいアカウントとして始まる（最初のコインは shop.json の startingCoins）
+    expect(b.current.coins).toBe(shopConfig.startingCoins);
   });
 });

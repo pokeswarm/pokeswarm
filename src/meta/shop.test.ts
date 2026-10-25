@@ -17,6 +17,7 @@ const shop: ShopConfig = {
     { id: 'greed', maxLevel: 5, baseCost: 200, grants: 'coinPct', amount: 10 },
   ],
   pokemon: [{ key: 'eevee', cost: 500 }],
+  startingCoins: 0,
   legacyBaseCosts: { attack: 150 },
 };
 
@@ -68,6 +69,22 @@ describe('フレンドリィショップ', () => {
     expect(refundLegacy(save, shop)).toBe(150 + 300);
     expect(save.coins).toBe(450);
     expect(save.upgrades).toEqual({ 'max-hp': 1 });
+  });
+
+  it('値段を変えた強化は、前の値段で1回だけ全額返してレベルを戻す（買い直した分は返さない）', () => {
+    const cfg: ShopConfig = { ...shop, repriced: { tag: 't1', baseCosts: { 'max-hp': 50 } } };
+    const save = emptySave();
+    save.upgrades = { 'max-hp': 2, ban: 1 };
+    expect(refundLegacy(save, cfg)).toBe(50 + 100);
+    expect(save.upgrades).toEqual({ ban: 1 });
+    save.upgrades['max-hp'] = 1;
+    expect(refundLegacy(save, cfg)).toBe(0);
+    expect(save.upgrades).toEqual({ ban: 1, 'max-hp': 1 });
+  });
+
+  it('新しいアカウントは shop.json の startingCoins を持って始まる', () => {
+    expect(shopConfig.startingCoins).toBe(500);
+    expect(emptySave(0, shopConfig.startingCoins).coins).toBe(500);
   });
 
   it('永続強化の効果は、持ち物・パッシブと一緒にステータスに足す', () => {

@@ -107,6 +107,16 @@ export function permanentBonus(save: Readonly<SaveData>, cfg: ShopConfig): Perma
 /** 前の版の強化（今の一覧に無いもの）を戻し、使ったコインを全額返す。返したコインの数 */
 export function refundLegacy(save: SaveData, cfg: ShopConfig): number {
   let total = 0;
+  // 値段を変えた強化は、前の値段で返してレベルを戻す（tag ごとに1回だけ）
+  const rp = cfg.repriced;
+  if (rp && !save.stats[`shopRepriced.${rp.tag}`]) {
+    for (const [id, base] of Object.entries(rp.baseCosts)) {
+      const level = save.upgrades[id] ?? 0;
+      for (let l = 1; l <= level; l++) total += base * l;
+      delete save.upgrades[id];
+    }
+    save.stats[`shopRepriced.${rp.tag}`] = 1;
+  }
   for (const [id, level] of Object.entries(save.upgrades)) {
     if (cfg.upgrades.some((u) => u.id === id)) continue;
     const base = cfg.legacyBaseCosts[id] ?? 0;

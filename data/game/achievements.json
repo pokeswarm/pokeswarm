@@ -419,16 +419,6 @@
       }
     },
     {
-      "id": "unlock-slowpoke",
-      "condition": {
-        "stat": "defeated.slowbro",
-        "atLeast": 1000
-      },
-      "reward": {
-        "pokemon": "slowpoke"
-      }
-    },
-    {
       "id": "unlock-scyther",
       "condition": {
         "stat": "bestMidbosses",

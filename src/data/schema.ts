@@ -1538,6 +1538,13 @@ export const shopConfigSchema = z.object({
   ),
   /** コインで買えるポケモン（作者の決定 2026年10月23日）。key は data/game/playables.json のキー。買うと解放される（払い戻しの対象外） */
   pokemon: z.array(z.object({ key: z.string(), cost: z.number().int().positive() })).default([]),
+  /** 新しいアカウントが最初に持っているコイン（作者の決定 2026年10月25日: 500） */
+  startingCoins: z.number().int().nonnegative().default(0),
+  /**
+   * 値段を変えた強化の、前の基本の費用。起動時に1回だけ（tag ごと。記録 shopRepriced.<tag> で覚える）、
+   * 前の値段で使ったコインを全額返してレベルを 0 に戻す（新しい値段で払い戻すと多すぎ・少なすぎになるため）
+   */
+  repriced: z.object({ tag: z.string().min(1), baseCosts: z.record(z.string(), z.number().int().positive()) }).optional(),
   /** 前の版の強化（今は無いもの）の基本の費用。起動時に、使ったコインを全額返して消す */
   legacyBaseCosts: z.record(z.string(), z.number().int().positive()).default({}),
 });

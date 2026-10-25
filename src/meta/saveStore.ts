@@ -1,3 +1,4 @@
+import { shopConfig } from '../data';
 import { emptySave, parseSave, type SaveData } from './saveData';
 
 /** セーブデータの保存先（Firestore。テストでは置き換える） */
@@ -33,7 +34,7 @@ export class SaveStore {
     private readonly local: LocalStorageLike | null,
     private readonly now: () => number = Date.now,
   ) {
-    this.data = this.readLocal(null) ?? emptySave(now());
+    this.data = this.readLocal(null) ?? emptySave(now(), shopConfig.startingCoins);
   }
 
   get current(): Readonly<SaveData> {
@@ -78,7 +79,7 @@ export class SaveStore {
       this.data = local;
       this.dirty = !!this.backend;
     } else {
-      this.data = remote ?? emptySave(this.now());
+      this.data = remote ?? emptySave(this.now(), shopConfig.startingCoins);
       this.dirty = false;
     }
     this.writeLocal();
@@ -89,7 +90,7 @@ export class SaveStore {
   /** ログアウトなどで、ユーザーを持たない状態にする（ブラウザだけに保存する） */
   detach(): void {
     this.uid = null;
-    this.data = emptySave(this.now());
+    this.data = emptySave(this.now(), shopConfig.startingCoins);
     this.dirty = false;
     this.emit();
   }

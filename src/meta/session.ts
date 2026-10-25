@@ -34,7 +34,8 @@ class Session {
   /** 前の版のショップの強化（今は無いもの）を払い戻す（起動時に1回） */
   refundLegacyUpgrades(): number {
     const found = refundLegacy(structuredClone(this.store.current) as Parameters<typeof refundLegacy>[0], shopConfig);
-    if (found > 0) this.store.update((d) => void refundLegacy(d, shopConfig));
+    const tag = shopConfig.repriced?.tag;
+    if (found > 0 || (tag && !this.store.current.stats[`shopRepriced.${tag}`])) this.store.update((d) => void refundLegacy(d, shopConfig));
     return found;
   }
 

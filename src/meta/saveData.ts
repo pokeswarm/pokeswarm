@@ -24,8 +24,9 @@ export const saveDataSchema = z.object({
 });
 export type SaveData = z.infer<typeof saveDataSchema>;
 
-export function emptySave(now = 0): SaveData {
-  return { version: 1, updatedAt: now, coins: 0, upgrades: {}, unlocked: [], stats: {}, achievements: [], discoveries: [] };
+/** coins は新しいアカウントのコイン（shop.json の startingCoins） */
+export function emptySave(now = 0, coins = 0): SaveData {
+  return { version: 1, updatedAt: now, coins, upgrades: {}, unlocked: [], stats: {}, achievements: [], discoveries: [] };
 }
 
 /** 読み込んだ値をセーブデータにする。形が違えば null（壊れたデータで上書きしないため、呼び出し側で扱いを決める） */

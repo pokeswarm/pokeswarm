@@ -4,7 +4,7 @@ import { currentWaveIndex, type World } from '../world';
 import { speedMultiplier } from './status';
 
 /**
- * 雑魚敵の移動。一番近いプレイヤーへまっすぐ向かう。
+ * 敵の移動。一番近い（倒れていない）プレイヤーへまっすぐ向かう。
  * 一番近いプレイヤーからも離れすぎた敵は、そのプレイヤーの進行方向側へ移し替える。
  */
 export function moveEnemies(world: World): void {
@@ -15,6 +15,9 @@ export function moveEnemies(world: World): void {
   // 前の時間帯の種類を消すのはホスト（ソロ）だけ。ゲストはホストから知らせを受けて消す
   const retire = s.retireOldWaveKinds && world.role !== 'guest';
   const waveKinds = world.waves[currentWaveIndex(world)]!.kinds;
+  // 倒れているプレイヤーは追わない（全員倒れていれば全員から選ぶ）。協力プレイで、色違いの伝説などが倒れた人をずっと追い続けた（作者の報告 2026年10月26日）
+  const alive = players.filter((p) => !p.down);
+  const chase = alive.length > 0 ? alive : players;
   for (let i = 0; i < e.count; i++) {
     e.prevX[i] = e.x[i]!;
     e.prevY[i] = e.y[i]!;
@@ -44,9 +47,9 @@ export function moveEnemies(world: World): void {
       continue;
     }
 
-    let target: Player = players[0]!;
+    let target: Player = chase[0]!;
     let best = Infinity;
-    for (const p of players) {
+    for (const p of chase) {
       const dx = p.x - x;
       const dy = p.y - y;
       const d2 = dx * dx + dy * dy;

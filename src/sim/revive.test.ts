@@ -60,3 +60,14 @@ describe('触れて復活（協力プレイ）', () => {
     expect(sim.world.revives).toBe(1);
   });
 });
+
+describe('倒れたプレイヤーを追わない（協力プレイ）', () => {
+  it('敵は倒れたプレイヤーより遠くても、倒れていないプレイヤーへ向かう（色違いの伝説が倒れた人を追い続けた不具合）', () => {
+    const { sim } = coop('host', 0, 100);
+    // 倒れたプレイヤー2（x=100）の方が近く（30）、倒れていないプレイヤー1（x=0）は遠い（70）。前は右（倒れた人）へ進んだ
+    sim.world.enemies.add(50, 0, 70, 0, 1e6, 60, 10);
+    const x0 = sim.world.enemies.x[0]!;
+    for (let t = 0; t < 10; t++) sim.step([]);
+    expect(sim.world.enemies.x[0]!).toBeLessThan(x0);
+  });
+});

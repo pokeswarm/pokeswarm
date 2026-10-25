@@ -156,6 +156,8 @@ export class ProjectileStore {
   readonly knockback: Float64Array;
   /** 残る範囲（1）。見た目だけに使う */
   readonly linger: Uint8Array;
+  /** ポイントマックスで増えた分（効き方 = 2段目以降の技を起こさない。作者の決定 2026年10月25日） */
+  readonly noFx: Uint8Array;
 
   constructor(
     readonly capacity: number,
@@ -201,6 +203,7 @@ export class ProjectileStore {
     this.hitFired = new Uint8Array(capacity);
     this.knockback = new Float64Array(capacity);
     this.linger = new Uint8Array(capacity);
+    this.noFx = new Uint8Array(capacity);
   }
 
   add(p: ProjectileSpawn): number {
@@ -242,6 +245,7 @@ export class ProjectileStore {
     this.hitFired[i] = 0;
     this.knockback[i] = p.knockback ?? NaN;
     this.linger[i] = p.linger ? 1 : 0;
+    this.noFx[i] = 0;
     return i;
   }
 
@@ -286,6 +290,7 @@ export class ProjectileStore {
     this.hitFired[i] = this.hitFired[last]!;
     this.knockback[i] = this.knockback[last]!;
     this.linger[i] = this.linger[last]!;
+    this.noFx[i] = this.noFx[last]!;
     const m = this.hitMemory;
     this.hitIds.copyWithin(i * m, last * m, (last + 1) * m);
     this.hitTicks.copyWithin(i * m, last * m, (last + 1) * m);

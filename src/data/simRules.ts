@@ -61,6 +61,8 @@ export function buildSimRules(): SimRules {
       chainMinHop: def.chainMinHop ?? 0,
       learners: def.learners ?? null,
       waitForEnd: def.waitForEnd,
+      ...(def.hpCost ? { hpCost: def.hpCost } : {}),
+      rangeBonusScale: def.rangeBonusScale ?? 1,
       ...(def.lobTarget ? { lobTarget: def.lobTarget } : {}),
       ...(def.scatterJitter ? { scatterJitter: def.scatterJitter } : {}),
       sweepOnce: def.sweepOnce,

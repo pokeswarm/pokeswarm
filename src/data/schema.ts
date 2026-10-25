@@ -872,6 +872,12 @@ export const moveDefSchema = z.object({
   /** 出した技が消えるまで、次を出さない（再使用は少なくとも持続の長さ。ボルテッカー: 次のピカチュウが重ならない。作者の決定 2026年10月25日） */
   waitForEnd: z.boolean().optional(),
   /**
+   * 使うたびに自分の HP を使う技（だいばくはつ。作者の決定 2026年10月25日）: 最大 HP の pct % を使い、HP が minHp 以下なら出さない（たまるまで待つ）
+   */
+  hpCost: z.object({ pct: z.number().positive(), minHp: z.number().nonnegative() }).optional(),
+  /** 射程の強化（ズームレンズ）の効き方の倍率（ねんりき: 0.5 で半分だけ伸びる）。省略で 1 */
+  rangeBonusScale: z.number().nonnegative().optional(),
+  /**
    * lob（放物線）の落とす場所: random（自分の周り range の中のランダムな場所）・nearest（一番近い敵。いなければランダム）。
    * どちらも真上寄りに投げ上げ、持続の秒数でちょうどその場所に落ちる（しおふき・ヘドロばくだん）。省略なら向いている側へ放る
    */

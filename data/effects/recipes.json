@@ -1615,7 +1615,7 @@
       },
       "chargeGlow": {
         "color": "#ff7043",
-        "seconds": 0.6,
+        "seconds": 2,
         "radius": 70,
         "alpha": 1
       },

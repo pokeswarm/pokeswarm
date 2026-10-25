@@ -53,14 +53,35 @@ export function moveStatsOf(world: World, pm: { move: number; level: number }): 
 export function playerMoveStats(world: World, p: Player, pm: { move: number; level: number }): MoveStats {
   const st = moveStatsOf(world, pm);
   const m = p.mods;
-  if (m.amountBonus === 0 && m.durationPct === 0 && m.rangePct === 0 && m.pierceBonus === 0) return st;
+  const def = world.rules.moves[pm.move]!;
+  // 自分を中心に円状に広がる技（だいばくはつ など）は、半径（range）を射程の強化ではなく範囲の強化で広げる（作者の決定 2026年10月25日）
+  const selfRadius = SELF_RADIUS_PATTERNS.has(def.pattern);
+  const areaPct = m.areaPct + (m.typeAreaPct[def.type] ?? 0);
+  if (m.amountBonus === 0 && m.durationPct === 0 && m.rangePct === 0 && m.pierceBonus === 0 && !(selfRadius && areaPct !== 0)) return st;
+  const rangePct = selfRadius ? areaPct : m.rangePct * (def.rangeBonusScale ?? 1);
   return {
     ...st,
     count: st.count + m.amountBonus,
     durationSeconds: st.durationSeconds * Math.max(0.1, 1 + m.durationPct / 100),
-    range: st.range * Math.max(0.1, 1 + m.rangePct / 100),
+    range: st.range * Math.max(0.1, 1 + rangePct / 100),
     pierce: st.pierce + m.pierceBonus,
   };
+}
+
+/** 自分を中心に円状に広がる出し方（半径は範囲の強化で広がり、射程の強化は効かない） */
+const SELF_RADIUS_PATTERNS = new Set(['nova', 'pulse', 'spin', 'screen', 'eruption']);
+
+/**
+ * ポイントマックスで増えた分の当たり判定（index from 以降、出した数のうち後ろの分）に印を付け、2段目以降の技（効き方）を起こさない
+ * （みらいよち: 落雷は増えても、後から来る爆発は増やさない。作者の決定 2026年10月25日）
+ */
+function markBonusShots(world: World, p: Player, pm: PlayerMove, st: MoveStats, from: number): void {
+  const bonus = p.mods.amountBonus;
+  if (bonus <= 0 || st.count <= 0 || world.rules.moves[pm.move]!.effects.length === 0) return;
+  const pr = world.projectiles;
+  const added = pr.count - from;
+  const keep = Math.floor((added * Math.max(0, st.count - bonus)) / st.count);
+  for (let i = from + keep; i < pr.count; i++) pr.noFx[i] = 1;
 }
 
 /** 持ち物の効果を掛けた、その技の威力・大きさ・速さ・クールダウン */
@@ -186,6 +207,14 @@ export function useMoves(world: World): void {
           timers[def.group] = scaledMoveStats(world, p, pm, st).cooldownSeconds / members.length;
         }
       }
+      // HP を使う技（だいばくはつ）: HP が足りなければ出さずに待つ。HP は本人のブラウザで減らす（ほかの人の分は本人の画面から届く）
+      if (def.hpCost) {
+        if (p.hp <= def.hpCost.minHp) {
+          pm.cooldown = 0;
+          continue;
+        }
+        if (p.id === world.localPlayerId) p.hp = Math.max(1, p.hp - (p.maxHp * def.hpCost.pct) / 100);
+      }
       // 消えてから数える技（こなゆき・ふぶき）は、持続の分を足す
       pm.cooldown = Math.max(scaledMoveStats(world, p, pm, st).cooldownSeconds, def.waitForEnd ? st.durationSeconds : 0) + (def.restAfterEnd ? st.durationSeconds : 0);
       world.events.push({ type: 'moveUsed', playerId: p.id, move: pm.move });
@@ -278,6 +307,8 @@ export function useMoves(world: World): void {
           fireWeather(world, p, pm, st);
           break;
       }
+      // 続けて撃つ技（burst）は fireBurst の中で印を付ける
+      if (!BURST_PATTERNS.has(def.pattern)) markBonusShots(world, p, pm, st, from);
       // ゆびをふる・ものまね は、選んだ技の分を fireMetronome の中で起こす
       if (def.pattern !== 'metronome') fireSpawnEffects(world, from, world.projectiles.count);
       if (def.effects.some((fx) => fx.trigger === 'cast')) {
@@ -328,7 +359,7 @@ function stepRest(world: World, p: Player): boolean {
 function fireSpawnEffects(world: World, from: number, to: number): void {
   const pr = world.projectiles;
   for (let i = from; i < to; i++) {
-    if (pr.stage[i] !== 0) continue;
+    if (pr.stage[i] !== 0 || pr.noFx[i]) continue;
     if (!world.rules.moves[pr.move[i]!]!.effects.some((fx) => fx.trigger === 'spawn')) return;
     fireEffects(world, 'spawn', fxSourceOf(world, i, pr.x[i]!, pr.y[i]!));
   }
@@ -392,8 +423,13 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   const def = world.rules.moves[pm.move]!;
   pm.burstTimer -= pm.burstTimer > 0 ? world.dt : 0;
   while (pm.burstLeft > 0 && pm.burstTimer <= 0) {
+    // ポイントマックスで増えた分（後ろの発）は、2段目以降の技を起こさない
+    const shot = st.count - pm.burstLeft;
+    const before = world.projectiles.count;
+    const bonusShot = shot >= st.count - p.mods.amountBonus && def.effects.length > 0;
     if (def.pattern === 'barrage') {
       fireBarrageHit(world, p, pm, st);
+      if (bonusShot) for (let k = before; k < world.projectiles.count; k++) world.projectiles.noFx[k] = 1;
       pm.burstLeft--;
       pm.burstTimer += st.intervalSeconds;
       continue;
@@ -414,6 +450,7 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     // 蛇行する弾（りゅうのいかり）: 出した場所から、同じ揺れ方で続けて飛ぶので、つながった炎に見える
     if (def.snake && def.pattern !== 'homing' && def.pattern !== 'boomerang') {
       world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_SNAKE, x: p.x, y: p.y, vx: dx * speed, vy: dy * speed, ox: p.x, oy: p.y, orbitRadius: def.snake.amplitude, angularSpeed: (Math.PI * 2 * speed) / def.snake.wavelength });
+      if (bonusShot) for (let k = before; k < world.projectiles.count; k++) world.projectiles.noFx[k] = 1;
       pm.burstLeft--;
       pm.burstTimer += st.intervalSeconds;
       continue;
@@ -430,6 +467,7 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
       ox: dx * speed,
       oy: dy * speed,
     });
+    if (bonusShot) for (let k = before; k < world.projectiles.count; k++) world.projectiles.noFx[k] = 1;
     pm.burstLeft--;
     pm.burstTimer += st.intervalSeconds;
   }
@@ -1203,7 +1241,7 @@ export function moveProjectiles(world: World): void {
         hitY = e.y[j]!;
       }
       // 当たった敵ごとの効き方（かみなり: 落雷を受けた敵から電気が連鎖する）。見た目もそろうように、どのブラウザでも起こす
-      if (pr.stage[i] === 0 && def.effects.some((fx) => fx.trigger === 'eachHit')) fireEffects(world, 'eachHit', fxSourceOf(world, i, e.x[j]!, e.y[j]!));
+      if (pr.stage[i] === 0 && !pr.noFx[i] && def.effects.some((fx) => fx.trigger === 'eachHit')) fireEffects(world, 'eachHit', fxSourceOf(world, i, e.x[j]!, e.y[j]!));
       if (!local) continue;
       // ノックバックの向き: 直線は線の向き、それ以外は当たり判定から敵へ（重なっていれば進む向き）
       const kx = line ? pr.dirX[i]! : e.x[j]! - x || pr.vx[i]!;
@@ -1250,7 +1288,7 @@ export function moveProjectiles(world: World): void {
     }
     if (hitAny) world.events.push({ type: 'projectileHit', x: hitX, y: hitY, owner: ownerId, move: pr.move[i]! });
     // hit の効き方は、その当たり判定が初めて敵に当たったときに1回だけ（当たった敵の位置で）
-    if (hitAny && pr.stage[i] === 0 && pr.hitFired[i] === 0) {
+    if (hitAny && pr.stage[i] === 0 && pr.hitFired[i] === 0 && !pr.noFx[i]) {
       pr.hitFired[i] = 1;
       fireEffects(world, 'hit', fxSourceOf(world, i, firstX, firstY));
     }
@@ -1308,7 +1346,7 @@ function fxSourceOf(world: World, i: number, x: number, y: number): FxSource {
 /** 当たり判定 i を消す。技そのもの（段階 0）なら end の効き方、印（段階 2）なら遅れた爆発を起こす */
 function expire(world: World, i: number): void {
   const pr = world.projectiles;
-  if (pr.stage[i] === 0) fireEffects(world, 'end', fxSourceOf(world, i, pr.x[i]!, pr.y[i]!));
+  if (pr.stage[i] === 0 && !pr.noFx[i]) fireEffects(world, 'end', fxSourceOf(world, i, pr.x[i]!, pr.y[i]!));
   else if (pr.stage[i] === 2) fireDelayedExplosion(world, pr.fxIndex[i]!, fxSourceOf(world, i, pr.x[i]!, pr.y[i]!));
   pr.removeAt(i);
 }
@@ -1316,7 +1354,7 @@ function expire(world: World, i: number): void {
 /** every の効き方: 残っている間、決まった間隔で起こす。流れは、流れが最初に当たる敵（いなければ流れの先）で */
 function tickEveryEffects(world: World, i: number): void {
   const pr = world.projectiles;
-  if (pr.stage[i] !== 0) return;
+  if (pr.stage[i] !== 0 || pr.noFx[i]) return;
   const every = world.rules.moves[pr.move[i]!]!.effects.find((fx) => fx.trigger === 'every');
   if (!every) return;
   pr.fxTimer[i]! += world.dt;

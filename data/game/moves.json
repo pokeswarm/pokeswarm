@@ -1732,6 +1732,7 @@
     },
     "confusion": {
       "pattern": "strike",
+      "rangeBonusScale": 0.5,
       "effect": "confusion",
       "base": {
         "power": 16.6,
@@ -1742,7 +1743,7 @@
         "count": 2,
         "speed": 0,
         "size": 22,
-        "range": 380,
+        "range": 300,
         "durationSeconds": 0.25,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -2190,8 +2191,8 @@
       "pattern": "nova",
       "effect": "explosion",
       "base": {
-        "power": 308.6,
-        "cooldownSeconds": 5,
+        "power": 771.5,
+        "cooldownSeconds": 8,
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 400,
@@ -2209,42 +2210,35 @@
       },
       "levels": [
         {
-          "power": 51.7
+          "power": 129.3
         },
         {
           "range": 30,
-          "power": 51.8
+          "power": 129.5
         },
         {
-          "power": 51.7
+          "power": 129.3
         },
         {
           "cooldownSeconds": -0.5,
-          "power": 0.2
+          "power": 0.5
         },
         {
           "range": 30,
-          "power": 46.6
+          "power": 116.5
         },
         {
-          "power": 46.6
+          "power": 116.5
         },
         {
           "cooldownSeconds": -0.5,
-          "power": -20.5
+          "power": -51.2
         }
       ],
-      "effects": [
-        {
-          "trigger": "end",
-          "puddle": {
-            "sizeMultiplier": 0.8,
-            "powerMultiplier": 0.15,
-            "durationSeconds": 3,
-            "hitIntervalSeconds": 0.5
-          }
-        }
-      ]
+      "hpCost": {
+        "pct": 10,
+        "minHp": 50
+      }
     },
     "extreme-speed": {
       "pattern": "chain",

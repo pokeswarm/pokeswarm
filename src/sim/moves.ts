@@ -78,6 +78,10 @@ export interface SimMoveDef {
   readonly passive: readonly Modifiers[];
   /** 出した技が消えるまで次を出さない（ボルテッカー）。省略なら false */
   readonly waitForEnd?: boolean;
+  /** 使うたびに最大 HP の pct % を使い、HP が minHp 以下なら出さない（だいばくはつ） */
+  readonly hpCost?: { readonly pct: number; readonly minHp: number };
+  /** 射程の強化の効き方の倍率（ねんりき 0.5） */
+  readonly rangeBonusScale?: number;
   /** lob（放物線）の落とす場所（しおふき・ヘドロばくだん）。省略なら向いている側へ放る */
   readonly lobTarget?: 'random' | 'nearest';
   /** scatter（置く）の数と大きさのばらつき（マグニチュード） */

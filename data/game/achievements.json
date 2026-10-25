@@ -524,7 +524,7 @@
       "id": "unlock-mew",
       "condition": {
         "stat": "uniqueKinds",
-        "atLeast": 5
+        "atLeast": 20
       },
       "reward": {
         "pokemon": "mew"

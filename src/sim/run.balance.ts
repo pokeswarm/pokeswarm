@@ -56,6 +56,9 @@ function simulateRun(pokemon: string): void {
   const lifeSum: number[] = [];
   const lifeCount: number[] = [];
   const hpScaleAt: number[] = [];
+  // 中ボス・ボス・伝説が出てから倒されるまでの秒数
+  const bossAt = new Map<number, number>();
+  const bossTimes: string[] = [];
   const fmt = (s: number): string => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
   let bossSeenAt = -1;
   let dir = '';
@@ -101,6 +104,11 @@ function simulateRun(pokemon: string): void {
         }
       }
       if (ev.type === 'bossAppeared' && w.rules.enemies.kinds[ev.kind]!.rank === 'boss') bossSeenAt = elapsedSeconds(w);
+      if (ev.type === 'bossAppeared') bossAt.set(ev.kind, w.tick);
+      if (ev.type === 'enemyKilled' && bossAt.has(ev.kind)) {
+        bossTimes.push(`${w.rules.enemies.kinds[ev.kind]!.id.replace(/^(midboss|boss|legend)-/, '')} ${Math.round((w.tick - bossAt.get(ev.kind)!) / tickRate)}`);
+        bossAt.delete(ev.kind);
+      }
       if (ev.type === 'sectionAdvanced') sections.push(fmt(elapsedSeconds(w)));
       if (ev.type === 'evolved') evolutions.push(`${Math.floor(elapsedSeconds(w) / 60)}分 ${w.rules.species[ev.to]!.key}`);
     }
@@ -122,6 +130,7 @@ function simulateRun(pokemon: string): void {
   console.log(`${name} 区間ごとの敵の数（平均） ${enemySum.map((n, i) => `${i}:${Math.round(n / enemyTicks[i]!)}`).join(' ')}`);
   console.log(`${name} 区間ごとの雑魚の HP の倍率（区間の終わり） ${hpScaleAt.map((v, i) => `${i}:${v.toFixed(1)}`).join(' ')}`);
   console.log(`${name} 区間ごとの雑魚が近くに来てから倒されるまで（秒） ${lifeSum.map((v, i) => `${i}:${(v / lifeCount[i]!).toFixed(1)}`).join(' ')}`);
+  console.log(`${name} ボスを倒すまで（秒） ${bossTimes.join(' / ') || '-'}`);
   console.log(`${name} 進化 ${evolutions.join(' → ') || '-'}`);
   console.log(`${name} 分ごとの撃破数 ${killsByMinute.map((k, i) => `${i}:${k}`).join(' ')}`);
   console.log(`${name} 技 ${p.moves.map((m) => `${w.rules.moves[m.move]!.key}:${m.level}`).join(' ')}  持ち物 ${p.items.map((it) => `${w.rules.items[it.item]!.key}:${it.level}`).join(' ')}`);

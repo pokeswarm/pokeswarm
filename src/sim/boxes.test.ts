@@ -11,6 +11,8 @@ import { MOTION_LINEAR, SHAPE_CIRCLE } from './entities/projectiles';
  */
 function setup() {
   const rules = buildSimRules();
+  // 本番のデータでは止めている（max 0。協力プレイの不具合の調査中）ので、テストでは出す
+  (rules as { pickups: typeof rules.pickups }).pickups = { ...rules.pickups, boxes: { ...rules.pickups.boxes!, max: 3 } };
   const sim = new Simulation({ tickRate: 30, seed: 1, rules });
   const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, moves: [] });
   return { rules, sim, p };
@@ -24,6 +26,14 @@ function shoot(sim: Simulation, x: number, y: number): void {
 }
 
 describe('マップの箱', () => {
+  it('本番のデータでは出さない（協力プレイで不具合があるため止めている。2026年10月25日）', () => {
+    const rules = buildSimRules();
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, moves: [] });
+    for (let t = 0; t < 120 * 30; t++) sim.step([]);
+    expect(sim.world.boxes).toHaveLength(0);
+  });
+
   it('しばらくすると、プレイヤーの周りに出る', () => {
     const { rules, sim } = setup();
     const cfg = rules.pickups.boxes!;

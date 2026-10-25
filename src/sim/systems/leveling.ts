@@ -344,7 +344,7 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
       // ほかの技も使って進化する技（ばくれつパンチ）: 使った技はなくなり、持ち物で覚え直さない
       // 持っていれば消費する技（ばくれつパンチ: ほのおのパンチ・かみなりパンチ）も同じ
       const d = world.rules.derivations.find((x) => x.to === offer.to && (x.withMoves || x.consumes));
-      const used = [...(d?.keepMoves ? [] : (d?.withMoves ?? [])), ...(d?.consumes ?? [])];
+      const used = [...(d?.withMoves ?? []), ...(d?.consumes ?? [])];
       if (used.length) {
         p.moves = p.moves.filter((m) => !used.includes(m.move));
         p.consumedMoves = [...(p.consumedMoves ?? []), ...used];

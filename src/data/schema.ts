@@ -1618,8 +1618,6 @@ export const derivationsConfigSchema = z.object({
       withMoves: z.array(z.string()).optional(),
       /** 進化するとき、持っていれば消費する（なくなる）技。持っていなくても進化できる（ばくれつパンチ: ほのおのパンチ・かみなりパンチ） */
       consumes: z.array(z.string()).optional(),
-      /** withMoves の技を消費しない（とっておき: のしかかり・でんこうせっか が最大でも、進化した後も持ったまま。作者の決定 2026年10月25日） */
-      keepMoves: z.boolean().optional(),
     }),
   ),
 });

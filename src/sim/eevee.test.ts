@@ -5,7 +5,7 @@ import { applyOffer, derivationCompletedBy, makeOffers } from './systems/levelin
 
 /**
  * イーブイの とっておき（作者の決定 2026年10月25日）: かわらずのいし ＋ スピードスター・のしかかり・でんこうせっか が全部最大（Lv8）。
- * のしかかり・でんこうせっか は消費しない（進化した後も持ったまま）
+ * 進化すると のしかかり・でんこうせっか は消費される（なくなる。作者の決定 2026年10月25日）
  */
 function setup() {
   const rules = buildSimRules();
@@ -41,11 +41,12 @@ describe('イーブイの とっておき', () => {
     expect(derivationCompletedBy(s.sim.world, s.p, { kind: 'itemNew', item: s.everstone })?.to).toBe(s.move('last-resort'));
   });
 
-  it('進化しても のしかかり・でんこうせっか は持ったまま', () => {
+  it('進化すると のしかかり・でんこうせっか は消費され、もう候補に出ない', () => {
     const s = setup();
     s.p.items = [{ item: s.everstone, level: 1 }];
     s.p.moves = [s.maxed('swift'), s.maxed('body-slam'), s.maxed('quick-attack')];
     applyOffer(s.sim.world, s.p, { kind: 'derive', slot: 0, to: s.move('last-resort'), item: s.everstone, unique: true });
-    expect(s.p.moves.map((m) => m.move)).toEqual([s.move('last-resort'), s.move('body-slam'), s.move('quick-attack')]);
+    expect(s.p.moves.map((m) => m.move)).toEqual([s.move('last-resort')]);
+    expect(s.p.consumedMoves).toEqual(expect.arrayContaining([s.move('body-slam'), s.move('quick-attack')]));
   });
 });

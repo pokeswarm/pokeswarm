@@ -66,8 +66,6 @@ export interface SimDerivation {
   readonly withMoves?: readonly number[];
   /** 進化するとき、持っていれば消費する技 */
   readonly consumes?: readonly number[];
-  /** withMoves の技を消費しない（とっておき） */
-  readonly keepMoves?: boolean;
 }
 
 /** シミュレーションが使うレベルアップの定義 */

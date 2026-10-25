@@ -54,6 +54,7 @@ export function openLevelUpIfPending(world: World): void {
   const offers = new Map<PlayerId, UpgradeOffer[]>();
   for (const p of world.players) offers.set(p.id, overMax ? [{ kind: 'heal' }, { kind: 'coins' }] : makeOffers(world, p));
   world.levelUp = {
+    serial: ++world.levelUpSerial,
     level: overMax ? world.level : world.level - normal + 1,
     offers,
     done: new Set(),
@@ -102,6 +103,7 @@ export function levelUpSnapshot(world: World): LevelUpSnapshot | null {
   const lu = world.levelUp;
   if (!lu) return null;
   return {
+    serial: lu.serial,
     level: lu.level,
     ticksLeft: lu.ticksLeft,
     offers: [...lu.offers.entries()],
@@ -120,8 +122,10 @@ export function mirrorLevelUp(world: World, s: LevelUpSnapshot | null): void {
     }
     return;
   }
-  const opening = !world.levelUp;
+  // 新しい回（最大レベルの後は、閉じずに次の回へ続くことがある）
+  const opening = !world.levelUp || world.levelUp.serial !== s.serial;
   world.levelUp = {
+    serial: s.serial,
     level: s.level,
     ticksLeft: s.ticksLeft,
     offers: new Map(s.offers.map(([id, list]) => [id, [...list]])),

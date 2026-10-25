@@ -220,7 +220,7 @@ export class RunScene extends Phaser.Scene {
     // 回復とコインの自動選択はランごと（前のランの設定を引き継がない）
     this.autoFallback = null;
     this.autoNext = 'heal';
-    this.autoRequestedLevel = -1;
+    this.autoRequested = -1;
     this.settingsOpen = false;
     this.showDebug = new URLSearchParams(window.location.search).has('debug');
     this.playerSprite = data.playerSprite;
@@ -518,10 +518,10 @@ export class RunScene extends Phaser.Scene {
     this.netStartedAt = performance.now();
   }
 
-  /** 回復とコインしか出ないときの自動選択（null なら選ぶ画面を出す）・次に選ぶもの・最後に頼んだレベルアップの回 */
+  /** 回復とコインしか出ないときの自動選択（null なら選ぶ画面を出す）・次に選ぶもの・最後に頼んだレベルアップの回（通し番号） */
   private autoFallback: 'heal' | 'coins' | 'alternate' | null = null;
   private autoNext: 'heal' | 'coins' = 'heal';
-  private autoRequestedLevel = -1;
+  private autoRequested = -1;
 
   /** Esc・ポーズの画面のボタン: ソロとホストは止める・再開する（ホストは全員へ送る）。ゲストは設定の画面を開く・閉じる */
   private togglePause(): void {
@@ -1558,8 +1558,9 @@ export class RunScene extends Phaser.Scene {
       // 回復とコインしか出ないとき: 自動で選ぶ設定なら、画面を出さずに選ぶ（同じ回は1回だけ頼む）
       const fallback = raw.length > 0 && raw.every((o) => o.kind === 'heal' || o.kind === 'coins');
       if (fallback && this.autoFallback) {
-        if (this.autoRequestedLevel !== lu.level) {
-          this.autoRequestedLevel = lu.level;
+        // 回は通し番号で区別する（最大レベルの後はレベルが同じまま続くので、レベルでは区別できない）
+        if (this.autoRequested !== lu.serial) {
+          this.autoRequested = lu.serial;
           const want = this.autoNext;
           if (this.autoFallback === 'alternate') this.autoNext = want === 'heal' ? 'coins' : 'heal';
           const index = Math.max(0, raw.findIndex((o) => o.kind === want));
@@ -1569,7 +1570,7 @@ export class RunScene extends Phaser.Scene {
         this.levelUpPanel.hide();
       } else {
         const offers = raw.map((o) => offerText(world, local, o, new Set(session.store.current.discoveries)));
-        this.levelUpPanel.show(lu.level, offers, local.rerolls, Math.ceil(lu.ticksLeft * world.dt), local.bans, Math.max(0, world.level - lu.level), fallback);
+        this.levelUpPanel.show(lu.level, offers, local.rerolls, Math.ceil(lu.ticksLeft * world.dt), local.bans, Math.max(0, world.level - lu.level), fallback, lu.serial);
       }
     } else {
       this.levelUpPanel.hide();

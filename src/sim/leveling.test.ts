@@ -116,9 +116,12 @@ describe('経験値とレベル', () => {
     sim.step([]);
     expect(w.levelUp!.overMax).toBe(true);
     expect(w.levelUp!.offers.get(1)!.map((o) => o.kind)).toEqual(['heal', 'coins']);
+    const first = w.levelUp!.serial;
     sim.step([{ type: 'chooseUpgrade', playerId: 1, index: 1 }]);
     sim.step([]);
     expect(w.levelUp!.overMax).toBe(true);
+    // レベルは同じでも別の回（自動選択はこの通し番号で回を区別する。同じ番号だと2回目を選ばず、時間切れまで待たされた）
+    expect(w.levelUp!.serial).toBe(first + 1);
     sim.step([{ type: 'chooseUpgrade', playerId: 1, index: 0 }]);
     sim.step([]);
     expect(w.levelUp).toBeNull();

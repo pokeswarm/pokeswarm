@@ -32,6 +32,8 @@ export type UpgradeOffer =
 
 /** レベルアップの選択の状態 */
 export interface LevelUpState {
+  /** レベルアップの回の通し番号（最大レベルの後は level が同じまま続くので、回の区別に使う） */
+  readonly serial: number;
   /** 上がった後のレベル */
   readonly level: number;
   /** プレイヤーごとの候補 */
@@ -142,6 +144,8 @@ export interface World {
   pendingLevelUps: number;
   /** そのうち、最大レベルの後に経験値がたまった回（回復かコインを選ぶ） */
   maxLevelUps: number;
+  /** 最後に開いたレベルアップの回の通し番号 */
+  levelUpSerial: number;
   /** レベルアップの選択中（ゲームは止まっている）。null なら選択中でない */
   levelUp: LevelUpState | null;
   /** ポーズ中（ゲームは止まっている。ソロは自分、協力プレイはホストが決める） */
@@ -282,6 +286,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     xpIntoLevel: 0,
     pendingLevelUps: 0,
     maxLevelUps: 0,
+    levelUpSerial: 0,
     levelUp: null,
     paused: false,
     projectiles: new ProjectileStore(rules.combat.maxProjectiles, rules.combat.hitMemory),

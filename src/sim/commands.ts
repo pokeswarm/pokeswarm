@@ -133,6 +133,7 @@ export interface SkipUpgradeCommand {
 
 /** レベルアップの選択の状態（ホストが作って全員へ送る。null なら選択中でない） */
 export interface LevelUpSnapshot {
+  readonly serial: number;
   readonly level: number;
   readonly ticksLeft: number;
   readonly offers: readonly (readonly [PlayerId, readonly UpgradeOffer[]])[];

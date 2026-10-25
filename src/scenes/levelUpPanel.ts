@@ -217,7 +217,7 @@ export class LevelUpPanel {
   /** 除外のモード（次に選んだ候補を除外する） */
   private banning = false;
   /** 最後に出した内容（除外のモードの切り替えで作り直すため） */
-  private last: { level: number; offers: OfferText[]; rerolls: number; secondsLeft: number; bans: number; more: number; fallback: boolean } | null = null;
+  private last: { level: number; offers: OfferText[]; rerolls: number; secondsLeft: number; bans: number; more: number; fallback: boolean; serial: number } | null = null;
 
   constructor(
     private readonly handlers: {
@@ -250,10 +250,11 @@ export class LevelUpPanel {
   }
 
   /** 毎フレーム呼ぶ。内容が変わったときだけ作り直す */
-  show(level: number, offers: OfferText[], rerolls: number, secondsLeft: number, bans = 0, more = 0, fallback = false): void {
-    this.last = { level, offers, rerolls, secondsLeft, bans, more, fallback };
+  show(level: number, offers: OfferText[], rerolls: number, secondsLeft: number, bans = 0, more = 0, fallback = false, serial = 0): void {
+    this.last = { level, offers, rerolls, secondsLeft, bans, more, fallback, serial };
     if (bans <= 0) this.banning = false;
-    const key = JSON.stringify([level, offers, rerolls, secondsLeft, bans, more, this.banning, fallback]);
+    // 回の通し番号も入れる（最大レベルの後は、同じ中身の回が続けて開く）
+    const key = JSON.stringify([serial, level, offers, rerolls, secondsLeft, bans, more, this.banning, fallback]);
     if (key === this.shownKey) return;
     this.shownKey = key;
 
@@ -388,7 +389,7 @@ export class LevelUpPanel {
     if (!this.last || this.last.bans <= 0) return;
     this.banning = !this.banning;
     const l = this.last;
-    this.show(l.level, l.offers, l.rerolls, l.secondsLeft, l.bans, l.more, l.fallback);
+    this.show(l.level, l.offers, l.rerolls, l.secondsLeft, l.bans, l.more, l.fallback, l.serial);
   }
 
   hide(): void {

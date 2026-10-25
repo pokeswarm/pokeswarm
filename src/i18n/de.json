@@ -46,6 +46,8 @@
   "itemDesc.wide-lens": "Reichweite der Attacken +5 %",
   "itemDesc.lucky-egg": "EP +8 %",
   "levelUp.evolvable": "Nanu?",
+  "levelUp.waitingOthers": "Warte auf die Wahl der anderen Spieler …",
+  "levelUp.resuming": "Gleich geht es weiter …",
   "levelUp.auto.heal": "Immer heilen",
   "levelUp.auto.coins": "Immer Münzen",
   "levelUp.auto.alternate": "Heilen und Münzen abwechselnd",

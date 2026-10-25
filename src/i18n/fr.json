@@ -46,6 +46,8 @@
   "itemDesc.wide-lens": "Zone des capacités +5 %",
   "itemDesc.lucky-egg": "Exp. +8 %",
   "levelUp.evolvable": "Hein ?",
+  "levelUp.waitingOthers": "En attente du choix des autres joueurs…",
+  "levelUp.resuming": "Reprise…",
   "levelUp.auto.heal": "Toujours soigner",
   "levelUp.auto.coins": "Toujours des pièces",
   "levelUp.auto.alternate": "Alterner soin et pièces",

@@ -83,6 +83,7 @@ export function testRules(
   };
   const leveling = {
     fallback: { healPct: 20, coins: 20 },
+    coopResumeDelaySeconds: 0,
     maxLevel: 100,
     xpCurve: { base: 5, exponent: 1.3 },
     offerCount: 3,

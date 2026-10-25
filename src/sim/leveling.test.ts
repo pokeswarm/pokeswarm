@@ -125,6 +125,23 @@ describe('経験値とレベル', () => {
     expect(w.pendingLevelUps).toBe(0);
     expect(w.maxLevelUps).toBe(0);
   });
+
+  it('協力プレイで全員が選び終えたら、少しだけ間を取ってから再開する', () => {
+    const sim = new Simulation({ tickRate: 30, seed: 5, rules: rules({ leveling: { coopResumeDelaySeconds: 0.5 } }) });
+    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100, types: [FIRE], moves: [{ move: 1, level: 1 }], line: 'charmander' });
+    sim.addPlayer({ id: 2, x: 0, y: 0, radius: 12, moveSpeed: 100, types: [FIRE], moves: [{ move: 1, level: 1 }], line: 'charmander' });
+    addXp(sim.world, 5);
+    sim.step([]);
+    sim.step([{ type: 'chooseUpgrade', playerId: 1, index: 0 }]);
+    sim.step([{ type: 'chooseUpgrade', playerId: 2, index: 0 }]);
+    let ticks = 0;
+    while (sim.world.levelUp && ticks < 100) {
+      sim.step([]);
+      ticks++;
+    }
+    expect(ticks).toBeGreaterThanOrEqual(14);
+    expect(ticks).toBeLessThanOrEqual(17);
+  });
 });
 
 describe('候補', () => {

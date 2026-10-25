@@ -46,6 +46,8 @@
   "itemDesc.wide-lens": "Área de los movimientos +5 %",
   "itemDesc.lucky-egg": "Exp. +8 %",
   "levelUp.evolvable": "¿Y esto?",
+  "levelUp.waitingOthers": "Esperando a que elijan los demás jugadores…",
+  "levelUp.resuming": "Reanudando…",
   "levelUp.auto.heal": "Siempre curar",
   "levelUp.auto.coins": "Siempre monedas",
   "levelUp.auto.alternate": "Alternar curar y monedas",

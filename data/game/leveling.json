@@ -5,6 +5,7 @@
   "choiceSeconds": 15,
   "initialRerolls": 1,
   "resumeInvincibleSeconds": 1.0,
+  "coopResumeDelaySeconds": 0.6,
   "maxItemSlots": 6,
   "moveOfferWeight": 2,
   "fallback": { "healPct": 20, "coins": 20 }

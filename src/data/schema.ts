@@ -1488,6 +1488,8 @@ export const levelingConfigSchema = z.object({
   initialRerolls: z.number().int().nonnegative(),
   /** 再開したときの無敵時間（秒） */
   resumeInvincibleSeconds: z.number().nonnegative(),
+  /** 協力プレイで全員が選び終えてから再開するまでの間（秒。作者の決定 2026年10月25日: ほんの少しだけ間を取る） */
+  coopResumeDelaySeconds: z.number().nonnegative().default(0),
   /** 持ち物の枠 */
   maxItemSlots: z.number().int().positive(),
   /** 候補を選ぶときの技の重み（持ち物を1とする） */

@@ -65,6 +65,8 @@
   "itemDesc.wide-lens": "技の範囲 +5%",
   "itemDesc.lucky-egg": "経験値 +8%",
   "levelUp.evolvable": "おや……？",
+  "levelUp.waitingOthers": "ほかのプレイヤーの選択を待っています……",
+  "levelUp.resuming": "まもなく再開します",
   "levelUp.auto.heal": "ずっと回復",
   "levelUp.auto.coins": "ずっとコイン",
   "levelUp.auto.alternate": "回復とコインを交互に",

@@ -74,6 +74,11 @@ export function stepLevelUp(world: World): void {
   }
   const allDone = world.players.every((p) => lu.done.has(p.id));
   if (!allDone && lu.ticksLeft > 0) return;
+  // 協力プレイで全員が選び終えたら、ほんの少しだけ間を取ってから再開する（時間切れはすぐ）
+  if (allDone && world.players.length > 1) {
+    lu.closingTicks ??= Math.round(world.rules.leveling.coopResumeDelaySeconds / world.dt);
+    if (lu.closingTicks-- > 0) return;
+  }
   // 時間切れは「見送る」と同じ扱い（リロール権 +1）
   for (const p of world.players) if (!lu.done.has(p.id)) p.rerolls++;
   if (lu.overMax) world.maxLevelUps--;

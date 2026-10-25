@@ -46,6 +46,8 @@
   "itemDesc.wide-lens": "Area delle mosse +5%",
   "itemDesc.lucky-egg": "Esp. +8%",
   "levelUp.evolvable": "Eh?",
+  "levelUp.waitingOthers": "In attesa della scelta degli altri giocatori…",
+  "levelUp.resuming": "Si riprende…",
   "levelUp.auto.heal": "Sempre cura",
   "levelUp.auto.coins": "Sempre monete",
   "levelUp.auto.alternate": "Alterna cura e monete",

@@ -42,6 +42,8 @@ export interface LevelUpState {
   ticksLeft: number;
   /** 最大レベルの後の回（候補は回復とコインだけ） */
   readonly overMax?: boolean;
+  /** 協力プレイで全員が選び終えた後、再開するまでの残り（更新回数） */
+  closingTicks?: number;
 }
 
 /** マップに落ちる道具の種類 */

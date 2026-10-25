@@ -161,6 +161,8 @@ export class RunScene extends Phaser.Scene {
   /** ポーズの画面（Esc）と、ゲストが止めずに開いている設定の画面 */
   private pausePanel!: PausePanel;
   private settingsOpen = false;
+  /** 協力プレイのレベルアップで、ほかの人の選択を待っている間の表示 */
+  private waitingOverlay: HTMLDivElement | null = null;
   /** ラン中の記録（撃破数など）をセーブデータに足す */
   private recorder!: RunRecorder;
   private runRecorded = false;
@@ -428,6 +430,11 @@ export class RunScene extends Phaser.Scene {
     // Esc でポーズ（作者の決定 2026年10月25日）: ソロとホストは全員のゲームを止める。ホスト以外は止めずに設定の画面だけ。
     // レベルアップの選択中（Esc は除外のモードをやめるのに使う）とランの終わりには使わない
     this.pausePanel = new PausePanel(() => this.togglePause());
+    // 協力プレイで自分が選び終えた後: 画面を少しだけ暗くして、ほかの人を待っていることを出す
+    this.waitingOverlay = document.createElement('div');
+    this.waitingOverlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.3);display:none;align-items:center;justify-content:center;pointer-events:none;z-index:15;color:#f8f8f8;font-size:22px;text-shadow:0 2px 0 #000';
+    document.body.append(this.waitingOverlay);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.waitingOverlay?.remove());
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.pausePanel.destroy());
     this.input.keyboard?.on('keydown-ESC', () => this.togglePause());
     // M で音を消す・戻す（音量は タイトルの O の設定）
@@ -1483,6 +1490,15 @@ export class RunScene extends Phaser.Scene {
       }
     } else {
       this.levelUpPanel.hide();
+    }
+    // 協力プレイのレベルアップ: 自分は選び終えて、ほかの人を待っている（全員が選んだら、再開までの短い間）
+    const waiting = !!lu && lu.done.has(this.localId) && world.players.length > 1 && !world.outcome;
+    if (this.waitingOverlay) {
+      this.waitingOverlay.style.display = waiting ? 'flex' : 'none';
+      if (waiting) {
+        const text = world.players.every((pl) => lu.done.has(pl.id)) ? t('levelUp.resuming') : t('levelUp.waitingOthers');
+        if (this.waitingOverlay.textContent !== text) this.waitingOverlay.textContent = text;
+      }
     }
     // ポーズの画面: 止まっていれば（ゲストにはホストが止めたことを）出す。ゲストは止めずに設定だけを開ける
     const guestView = world.role === 'guest';

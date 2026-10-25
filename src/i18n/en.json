@@ -65,6 +65,8 @@
   "itemDesc.wide-lens": "Move area +5%",
   "itemDesc.lucky-egg": "XP +8%",
   "levelUp.evolvable": "What?",
+  "levelUp.waitingOthers": "Waiting for other players to choose…",
+  "levelUp.resuming": "Resuming…",
   "levelUp.auto.heal": "Always heal",
   "levelUp.auto.coins": "Always coins",
   "levelUp.auto.alternate": "Alternate heal and coins",

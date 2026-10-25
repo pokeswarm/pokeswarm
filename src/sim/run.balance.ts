@@ -3,7 +3,7 @@ import { playerConfig, playablesConfig, simulationConfig } from '../data';
 import { buildSimRules, playableLoadout } from '../data/simRules';
 import type { Axis, InputCommand } from './commands';
 import { Simulation } from './simulation';
-import { elapsedSeconds, type UpgradeOffer } from './world';
+import { elapsedSeconds, enemyHpScale, type UpgradeOffer } from './world';
 
 /**
  * 1ランをシミュレーションだけで速く回して、レベルの上がり方を確かめる（npm run balance。01_game_design.md 3.1）。
@@ -20,6 +20,8 @@ const OFFER_PRIORITY: Record<UpgradeOffer['kind'], number> = { derive: 0, moveUp
 const RETARGET_SECONDS = 0.3;
 /** 打ち切る時間（ランは20分で終わる。伝説戦があればその分長くなる） */
 const LIMIT_SECONDS = 25 * 60;
+/** 固さを測るときの「近く」の距離 */
+const NEAR = 250;
 
 function simulateRun(pokemon: string): void {
   const rules = buildSimRules();
@@ -49,6 +51,11 @@ function simulateRun(pokemon: string): void {
   // 区間ごとの、画面にいる敵の数の平均（群れの圧力の目安）
   const enemySum: number[] = [];
   const enemyTicks: number[] = [];
+  // 区間ごとの、雑魚がプレイヤーの近く（NEAR）に来てから倒されるまでの平均の秒数（固さの目安。歩いてくる時間は数えない）と HP の倍率
+  const bornAt = new Map<number, number>();
+  const lifeSum: number[] = [];
+  const lifeCount: number[] = [];
+  const hpScaleAt: number[] = [];
   const fmt = (s: number): string => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
   let bossSeenAt = -1;
   let dir = '';
@@ -79,7 +86,20 @@ function simulateRun(pokemon: string): void {
     steps++;
     enemySum[w.section] = (enemySum[w.section] ?? 0) + w.enemies.count;
     enemyTicks[w.section] = (enemyTicks[w.section] ?? 0) + 1;
+    hpScaleAt[w.section] = enemyHpScale(w);
+    for (let i = 0; i < w.enemies.count; i++) {
+      if (bornAt.has(w.enemies.id[i]!)) continue;
+      if ((w.enemies.x[i]! - p.x) ** 2 + (w.enemies.y[i]! - p.y) ** 2 < NEAR * NEAR) bornAt.set(w.enemies.id[i]!, w.tick);
+    }
     for (const ev of w.events) {
+      if (ev.type === 'enemyKilled') {
+        const born = bornAt.get(ev.enemyId);
+        bornAt.delete(ev.enemyId);
+        if (born !== undefined && (w.rules.enemies.kinds[ev.kind]!.rank ?? 'normal') === 'normal') {
+          lifeSum[w.section] = (lifeSum[w.section] ?? 0) + (w.tick - born) / tickRate;
+          lifeCount[w.section] = (lifeCount[w.section] ?? 0) + 1;
+        }
+      }
       if (ev.type === 'bossAppeared' && w.rules.enemies.kinds[ev.kind]!.rank === 'boss') bossSeenAt = elapsedSeconds(w);
       if (ev.type === 'sectionAdvanced') sections.push(fmt(elapsedSeconds(w)));
       if (ev.type === 'evolved') evolutions.push(`${Math.floor(elapsedSeconds(w) / 60)}分 ${w.rules.species[ev.to]!.key}`);
@@ -100,6 +120,8 @@ function simulateRun(pokemon: string): void {
   console.log(`${name} 四天王の残り ${w.requiredLeft.size}  伝説 ${w.legendary ? `${w.rules.enemies.kinds[w.legendary.kind]!.id} ${w.legendary.result}` : '-'}`);
   console.log(`${name} 区間が進んだ時刻 ${sections.join(' ') || '-'}`);
   console.log(`${name} 区間ごとの敵の数（平均） ${enemySum.map((n, i) => `${i}:${Math.round(n / enemyTicks[i]!)}`).join(' ')}`);
+  console.log(`${name} 区間ごとの雑魚の HP の倍率（区間の終わり） ${hpScaleAt.map((v, i) => `${i}:${v.toFixed(1)}`).join(' ')}`);
+  console.log(`${name} 区間ごとの雑魚が近くに来てから倒されるまで（秒） ${lifeSum.map((v, i) => `${i}:${(v / lifeCount[i]!).toFixed(1)}`).join(' ')}`);
   console.log(`${name} 進化 ${evolutions.join(' → ') || '-'}`);
   console.log(`${name} 分ごとの撃破数 ${killsByMinute.map((k, i) => `${i}:${k}`).join(' ')}`);
   console.log(`${name} 技 ${p.moves.map((m) => `${w.rules.moves[m.move]!.key}:${m.level}`).join(' ')}  持ち物 ${p.items.map((it) => `${w.rules.items[it.item]!.key}:${it.level}`).join(' ')}`);

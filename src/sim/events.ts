@@ -137,6 +137,13 @@ export interface BoxRemovedEvent {
   readonly opened: boolean;
 }
 
+/** ゲスト: 自分の攻撃が箱に当たった（ホストへ伝える。key は攻撃の区別） */
+export interface BoxHitRequestedEvent {
+  readonly type: 'boxHitRequested';
+  readonly id: number;
+  readonly key: number;
+}
+
 /** マップの箱に攻撃が当たった（見た目だけ。ソロ・ホスト） */
 export interface BoxHitEvent {
   readonly type: 'boxHit';
@@ -309,6 +316,7 @@ export type SimEvent =
   | BoxSpawnedEvent
   | BoxRemovedEvent
   | BoxHitEvent
+  | BoxHitRequestedEvent
   | PauseChangedEvent
   | PlayerDamagedEvent
   | PlayerRevivedEvent

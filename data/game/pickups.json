@@ -44,7 +44,7 @@
     }
   },
   "boxes": {
-    "max": 0,
+    "max": 3,
     "hits": 3,
     "radius": 14,
     "spawnSeconds": 25,

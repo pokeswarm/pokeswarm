@@ -7,7 +7,7 @@ import { addXp, applyOffer, banUpgrade, chooseUpgrade, mirrorLevelUp, rerollUpgr
 import { addHazard, endRun } from './stage';
 import { applyRevive } from './health';
 import { applyItem, confirmItem, spawnItem } from './items';
-import { addBox, removeBox } from './boxes';
+import { addBox, registerBoxHit, removeBox } from './boxes';
 
 export function applyCommands(world: World, commands: readonly InputCommand[]): void {
   const e = world.enemies;
@@ -148,6 +148,9 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
       }
       case 'spawnBox':
         if (world.role === 'guest') addBox(world, cmd.id, cmd.x, cmd.y);
+        break;
+      case 'hitBox':
+        registerBoxHit(world, cmd.id, cmd.key);
         break;
       case 'removeBox':
         if (world.role === 'guest') removeBox(world, cmd.id, cmd.opened);

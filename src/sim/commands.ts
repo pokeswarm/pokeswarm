@@ -200,6 +200,13 @@ export interface SpawnBoxCommand {
   readonly y: number;
 }
 
+/** ホスト: ゲストの攻撃が箱に当たった */
+export interface HitBoxCommand {
+  readonly type: 'hitBox';
+  readonly id: number;
+  readonly key: number;
+}
+
 export interface RemoveBoxCommand {
   readonly type: 'removeBox';
   readonly id: number;
@@ -297,6 +304,7 @@ export type InputCommand =
   | SetPauseCommand
   | SpawnBoxCommand
   | RemoveBoxCommand
+  | HitBoxCommand
   | RemovePlayerCommand
   | RevivePlayerCommand
   | LegendaryWarningCommand

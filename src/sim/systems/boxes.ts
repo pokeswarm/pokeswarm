@@ -4,12 +4,18 @@ import { spawnItem } from './items';
 
 /**
  * マップの箱（作者の決定 2026年10月25日）: 攻撃を決まった回数当てると開き、一時的な強化（プラスパワーなど）を落とす。
- * 出す・当たったかの判定・開けるのはソロ・ホスト（ほかの人の技も、ホストの画面にある当たり判定で数える）。
- * ゲストは、ホストから届く出現と開いた知らせに合わせる
+ * 出す・開けるのはソロ・ホスト。ゲストは、ホストから届く出現と開いた知らせに合わせる。
+ * 当たったかは、敵へのダメージと同じく**当てた人のブラウザ**で判定する（ゲストはホストへ伝える）。
+ * 前はホストの画面にある当たり判定で全員分を数えていたが、ほかの人の技はホストの画面では見た目だけの写しで、
+ * 狙いや落ちる場所が本人の画面とずれるため、ゲストが当てても開かない・当てていないのに開くことがあった（2026年10月26日）
  */
 export function stepBoxes(world: World): void {
   const cfg = world.rules.pickups.boxes;
-  if (!cfg || world.role === 'guest' || world.players.length === 0) return;
+  if (!cfg || world.players.length === 0) return;
+  if (world.role === 'guest') {
+    hitBoxes(world, cfg.radius);
+    return;
+  }
   despawnFarBoxes(world, cfg.despawnDistance);
   if (--world.boxTimer <= 0) {
     world.boxTimer = Math.round(cfg.spawnSeconds / world.dt);
@@ -46,31 +52,50 @@ function despawnFarBoxes(world: World, distance: number): void {
   }
 }
 
-/** 技の当たり判定（技そのもの・効き方）が重なった箱を数え、決まった回数で開ける */
+/** 自分の技の当たり判定（技そのもの・効き方）が重なった箱を数える。ゲストはホストへ伝え、ホスト（ソロ）は数えて決まった回数で開ける */
 function hitBoxes(world: World, radius: number): void {
   if (world.boxes.length === 0) return;
   const pr = world.projectiles;
   for (const b of [...world.boxes]) {
     for (let i = 0; i < pr.count; i++) {
-      // 予告の印（2）・出番を待つもの（3）は当たらない
-      if (pr.stage[i]! >= 2) continue;
+      // 予告の印（2）・出番を待つもの（3）は当たらない。ほかの人の技（見た目だけの写し）は数えない
+      if (pr.stage[i]! >= 2 || pr.owner[i] !== world.localPlayerId) continue;
       const r = pr.radius[i]! + radius;
       const line = pr.shape[i] === SHAPE_LINE;
       const d2 = line ? segmentDistance2(b.x, b.y, pr.x[i]!, pr.y[i]!, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!) : (b.x - pr.x[i]!) ** 2 + (b.y - pr.y[i]!) ** 2;
       if (d2 > r * r) continue;
-      const serial = pr.serial[i]!;
-      if (b.hits.includes(serial)) continue;
-      b.hits.push(serial);
-      if (b.hits.length > 32) b.hits.shift();
-      b.hp--;
-      world.events.push({ type: 'boxHit', id: b.id });
-      if (b.hp <= 0) {
-        removeBox(world, b.id, true);
-        spawnItem(world, world.nextItemId++, 'buff', b.x, b.y);
-        break;
+      // 同じ攻撃は1回だけ数える（攻撃は持ち主と、持ち主のブラウザでの通し番号で区別する）
+      const key = hitKey(pr.owner[i]!, pr.serial[i]!);
+      if (b.hits.includes(key)) continue;
+      if (world.role === 'guest') {
+        b.hits.push(key);
+        if (b.hits.length > 32) b.hits.shift();
+        world.events.push({ type: 'boxHitRequested', id: b.id, key });
+        continue;
       }
+      if (registerBoxHit(world, b.id, key)) break;
     }
   }
+}
+
+/** 攻撃の区別（持ち主 × 通し番号）。ブラウザごとに通し番号が別なので、持ち主を混ぜる */
+function hitKey(owner: number, serial: number): number {
+  return owner * 0x1000000 + (serial & 0xffffff);
+}
+
+/** ホスト（ソロ）: 箱への当たりを1回数える。開いたら true */
+export function registerBoxHit(world: World, id: number, key: number): boolean {
+  if (world.role === 'guest') return false;
+  const b = world.boxes.find((x) => x.id === id);
+  if (!b || b.hits.includes(key)) return false;
+  b.hits.push(key);
+  if (b.hits.length > 32) b.hits.shift();
+  b.hp--;
+  world.events.push({ type: 'boxHit', id: b.id });
+  if (b.hp > 0) return false;
+  removeBox(world, b.id, true);
+  spawnItem(world, world.nextItemId++, 'buff', b.x, b.y);
+  return true;
 }
 
 /** 点と線分（start から dir の向きへ length）の距離の2乗 */

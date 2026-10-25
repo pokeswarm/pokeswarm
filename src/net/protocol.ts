@@ -67,6 +67,8 @@ export type NetMessage =
   /** マップの箱（ホスト→ゲスト）: 出た [id, x, y, ...]・なくなった [id, 開いたら1, ...] */
   | { t: 'bs'; e: number[] }
   | { t: 'br'; e: number[] }
+  /** 箱への当たり（ゲスト→ホスト）: [箱の id, 攻撃の区別, ...] */
+  | { t: 'bx'; e: number[] }
   | { t: 'ping'; s: number }
   | { t: 'pong'; s: number };
 

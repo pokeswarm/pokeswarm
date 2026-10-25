@@ -13,15 +13,24 @@ import type { UpgradeOffer, World } from '../world';
 export function addXp(world: World, amount: number): void {
   const cfg = world.rules.leveling;
   world.xp += amount;
-  if (world.level >= cfg.maxLevel) return;
   world.xpIntoLevel += amount;
+  // 最大レベルの後も経験値を数え、たまるたびに回復かコインを選ぶ（表記は MAX のまま。作者の決定 2026年10月25日）
+  if (world.level >= cfg.maxLevel) {
+    const need = cfg.xpToNext[cfg.maxLevel]!;
+    while (world.xpIntoLevel >= need) {
+      world.xpIntoLevel -= need;
+      world.pendingLevelUps++;
+      world.maxLevelUps++;
+      world.events.push({ type: 'levelUp', level: world.level });
+    }
+    return;
+  }
   while (world.level < cfg.maxLevel && world.xpIntoLevel >= cfg.xpToNext[world.level]!) {
     world.xpIntoLevel -= cfg.xpToNext[world.level]!;
     world.level++;
     world.pendingLevelUps++;
     world.events.push({ type: 'levelUp', level: world.level });
   }
-  if (world.level >= cfg.maxLevel) world.xpIntoLevel = 0;
   // レベルでステータスが伸びる
   for (const p of world.players) recomputeModifiers(world, p);
 }
@@ -35,16 +44,21 @@ export function openLevelUpIfPending(world: World): void {
   if (world.levelUp || world.pendingLevelUps === 0) return;
   if (world.role === 'guest') {
     world.pendingLevelUps = 0;
+    world.maxLevelUps = 0;
     return;
   }
   // 全員分の候補をホストが作る（同じアイテムがほかの人の候補に出ていてもよい。作者の決定で重複を防ぐ決まりは廃止）
+  // 先にレベルが上がった回を選び、最大レベルの後の回（回復とコインだけ）はその後
+  const normal = world.pendingLevelUps - world.maxLevelUps;
+  const overMax = normal <= 0;
   const offers = new Map<PlayerId, UpgradeOffer[]>();
-  for (const p of world.players) offers.set(p.id, makeOffers(world, p));
+  for (const p of world.players) offers.set(p.id, overMax ? [{ kind: 'heal' }, { kind: 'coins' }] : makeOffers(world, p));
   world.levelUp = {
-    level: world.level - world.pendingLevelUps + 1,
+    level: overMax ? world.level : world.level - normal + 1,
     offers,
     done: new Set(),
     ticksLeft: Math.round(world.rules.leveling.choiceSeconds / world.dt),
+    ...(overMax ? { overMax } : {}),
   };
 }
 
@@ -62,6 +76,7 @@ export function stepLevelUp(world: World): void {
   if (!allDone && lu.ticksLeft > 0) return;
   // 時間切れは「見送る」と同じ扱い（リロール権 +1）
   for (const p of world.players) if (!lu.done.has(p.id)) p.rerolls++;
+  if (lu.overMax) world.maxLevelUps--;
   world.levelUp = null;
   world.pendingLevelUps--;
   if (world.pendingLevelUps > 0) {

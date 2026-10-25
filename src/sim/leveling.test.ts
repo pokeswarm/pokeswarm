@@ -101,6 +101,30 @@ describe('経験値とレベル', () => {
     expect(p.rerolls).toBe(before - 1);
     expect(sim.world.levelUp!.offers.get(1)!.length).toBe(3);
   });
+
+  it('最大レベルの後も経験値を数え、たまるたびに回復かコインを選ぶ（レベルは最大のまま）', () => {
+    const { sim } = makeSim();
+    const w = sim.world;
+    const cfg = w.rules.leveling;
+    w.level = cfg.maxLevel;
+    const need = cfg.xpToNext[cfg.maxLevel]!;
+    expect(need).toBeGreaterThan(0);
+    addXp(w, need * 2 + 1);
+    expect(w.level).toBe(cfg.maxLevel);
+    expect(w.xpIntoLevel).toBe(1);
+    expect(w.pendingLevelUps).toBe(2);
+    sim.step([]);
+    expect(w.levelUp!.overMax).toBe(true);
+    expect(w.levelUp!.offers.get(1)!.map((o) => o.kind)).toEqual(['heal', 'coins']);
+    sim.step([{ type: 'chooseUpgrade', playerId: 1, index: 1 }]);
+    sim.step([]);
+    expect(w.levelUp!.overMax).toBe(true);
+    sim.step([{ type: 'chooseUpgrade', playerId: 1, index: 0 }]);
+    sim.step([]);
+    expect(w.levelUp).toBeNull();
+    expect(w.pendingLevelUps).toBe(0);
+    expect(w.maxLevelUps).toBe(0);
+  });
 });
 
 describe('候補', () => {

@@ -40,6 +40,8 @@ export interface LevelUpState {
   readonly done: Set<PlayerId>;
   /** 時間切れまでの残り（更新回数） */
   ticksLeft: number;
+  /** 最大レベルの後の回（候補は回復とコインだけ） */
+  readonly overMax?: boolean;
 }
 
 /** マップに落ちる道具の種類 */
@@ -121,8 +123,10 @@ export interface World {
   /** 全員で共有するレベルと、次のレベルまでに貯めた経験値 */
   level: number;
   xpIntoLevel: number;
-  /** 選択を待っているレベルアップの数 */
+  /** 選択を待っているレベルアップの数（maxLevelUps も含む） */
   pendingLevelUps: number;
+  /** そのうち、最大レベルの後に経験値がたまった回（回復かコインを選ぶ） */
+  maxLevelUps: number;
   /** レベルアップの選択中（ゲームは止まっている）。null なら選択中でない */
   levelUp: LevelUpState | null;
   /** ポーズ中（ゲームは止まっている。ソロは自分、協力プレイはホストが決める） */
@@ -259,6 +263,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     level: 1,
     xpIntoLevel: 0,
     pendingLevelUps: 0,
+    maxLevelUps: 0,
     levelUp: null,
     paused: false,
     projectiles: new ProjectileStore(rules.combat.maxProjectiles, rules.combat.hitMemory),

@@ -439,6 +439,7 @@
   "pattern.rest": "Dort et se soigne à l'arrêt",
   "run.moveTaught": "{name} appris !",
   "run.sleepZ": "Z z z",
+  "run.levelMax": "N. MAX",
   "pause.title.paused": "Pause",
   "pause.title.hostPaused": "L'hôte a mis le jeu en pause",
   "pause.title.settings": "Paramètres",

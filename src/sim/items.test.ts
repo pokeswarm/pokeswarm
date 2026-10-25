@@ -34,8 +34,10 @@ describe('マップに落ちる道具', () => {
   });
 
   it('マグネット: 拾うと、遠くの玉もすべて一気に吸い寄せる', () => {
-    // レベルアップの選択で止まらないよう、レベルは上がらないようにする
-    const sim = new Simulation({ tickRate: 30, seed: 1, rules: rules(0, 1, 1) });
+    // レベルアップの選択で止まらないよう、レベルは上がらないようにする（最大レベルの後の回復・コインの回も来ないように）
+    const r = rules(0, 1, 1);
+    (r.leveling.xpToNext as number[])[1] = 1e9;
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules: r });
     const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, pickupRange: 0 });
     for (let k = 0; k < 5; k++) sim.world.gems.add(100 + k, 1500 + k * 100, 800, 1, 6);
     kill(sim, 0, 300);

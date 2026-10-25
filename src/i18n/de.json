@@ -439,6 +439,7 @@
   "pattern.rest": "Schläft und heilt sich im Stillstand",
   "run.moveTaught": "{name} erlernt!",
   "run.sleepZ": "Z z z",
+  "run.levelMax": "Lv. MAX",
   "pause.title.paused": "Pause",
   "pause.title.hostPaused": "Der Host hat das Spiel pausiert",
   "pause.title.settings": "Einstellungen",

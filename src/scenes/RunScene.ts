@@ -209,6 +209,11 @@ export class RunScene extends Phaser.Scene {
     this.newAchievements = [];
     this.newUnlocks = [];
     this.legendaryResult = null;
+    // 回復とコインの自動選択はランごと（前のランの設定を引き継がない）
+    this.autoFallback = null;
+    this.autoNext = 'heal';
+    this.autoRequestedLevel = -1;
+    this.settingsOpen = false;
     this.showDebug = new URLSearchParams(window.location.search).has('debug');
     this.playerSprite = data.playerSprite;
     this.pokemon = data.pokemon;
@@ -310,6 +315,7 @@ export class RunScene extends Phaser.Scene {
       for (let l = 1; l < Math.min(startLevel, w.rules.leveling.maxLevel); l++) need += w.rules.leveling.xpToNext[l]!;
       addXp(w, need);
       w.pendingLevelUps = 0;
+      w.maxLevelUps = 0;
       w.events.length = 0;
     }
     // 確認用: ?time=880 で、ランの途中の時刻から始める（それより前のスウォームは出さない）。
@@ -1161,7 +1167,7 @@ export class RunScene extends Phaser.Scene {
     g.fillStyle(hexColor(eb.border)).fillRect(0, 0, cam.width, barH);
     g.fillStyle(hexColor(eb.back)).fillRect(2, 2, cam.width - 4, barH - 4);
     g.fillStyle(hexColor(eb.fill)).fillRect(2, 2, Math.round((cam.width - 4) * xpRatio), barH - 4);
-    this.levelText.setText(`Lv${w.level}`);
+    this.levelText.setText(w.level >= w.rules.leveling.maxLevel ? t('run.levelMax') : `Lv${w.level}`);
     this.placeUi(this.levelText, 8, barH / 2);
     // 経過時間（伝説戦の間は、逃げられるまでの残り時間を赤で）
     const lg = w.legendary;

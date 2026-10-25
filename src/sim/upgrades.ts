@@ -133,6 +133,7 @@ export function addModifiers(acc: Modifiers, mods: Modifiers, times: number): vo
 /** レベルごとの必要経験値の表 */
 export function buildXpTable(cfg: LevelingConfig): number[] {
   const table = [0];
-  for (let level = 1; level < cfg.maxLevel; level++) table.push(Math.round(cfg.xpCurve.base * Math.pow(level, cfg.xpCurve.exponent)));
+  // [maxLevel] は最大レベルの後も経験値を数えるときの1回分（そのたびに回復かコインを選ぶ。作者の決定 2026年10月25日）
+  for (let level = 1; level <= cfg.maxLevel; level++) table.push(Math.round(cfg.xpCurve.base * Math.pow(level, cfg.xpCurve.exponent)));
   return table;
 }

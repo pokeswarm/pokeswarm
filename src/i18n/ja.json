@@ -460,6 +460,7 @@
   "pattern.rest": "止まっていると眠って回復する",
   "run.moveTaught": "{name} を おぼえた！",
   "run.sleepZ": "Z z z",
+  "run.levelMax": "LvMAX",
   "pause.title.paused": "ポーズ",
   "pause.title.hostPaused": "ホストがポーズしています",
   "pause.title.settings": "設定",

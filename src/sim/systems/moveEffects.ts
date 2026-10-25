@@ -44,6 +44,11 @@ export function fireEffects(world: World, trigger: MoveEffect['trigger'], src: F
   if (!effects || effects.length === 0) return;
   effects.forEach((fx, index) => {
     if (fx.trigger !== trigger) return;
+    // 姿が決まっている効き方（しんそく: ウィンディのときだけ炎）
+    if (fx.forms) {
+      const p = world.players.find((pl) => pl.id === src.owner);
+      if (!p || !fx.forms.includes(world.rules.species[p.species]?.key ?? '')) return;
+    }
     // 確率は共有の乱数ではなく、時刻と位置から決める（どのブラウザでも同じ見た目になる）
     if (fx.chance !== undefined && fx.chance < 1 && hash01(world.seed, world.tick, Math.floor(src.x) * 7919 + Math.floor(src.y), index) >= fx.chance) return;
     applyEffect(world, fx, index, src);

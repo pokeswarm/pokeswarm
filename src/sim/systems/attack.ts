@@ -762,9 +762,13 @@ function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   let reach = st.range;
   const used = new Set<number>();
   const hop = world.rules.moves[pm.move]!.chainHopSeconds;
+  const minHop2 = world.rules.moves[pm.move]!.chainMinHop ** 2;
   for (let k = 0; k < st.count; k++) {
+    // 一番近い敵へ。chainMinHop があれば、それより離れた敵の中で一番近い敵（いなければ一番近い敵。しんそく: 広く倒す）
     let best = -1;
     let bestD2 = reach * reach;
+    let far = -1;
+    let farD2 = reach * reach;
     for (const i of enemiesInRange(world, x, y, reach)) {
       if (used.has(i)) continue;
       const d2 = (e.x[i]! - x) ** 2 + (e.y[i]! - y) ** 2;
@@ -772,6 +776,14 @@ function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
         bestD2 = d2;
         best = i;
       }
+      if (k > 0 && d2 >= minHop2 && d2 < farD2) {
+        farD2 = d2;
+        far = i;
+      }
+    }
+    if (minHop2 > 0 && far !== -1) {
+      best = far;
+      bestD2 = farD2;
     }
     if (best === -1) break;
     used.add(best);

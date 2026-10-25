@@ -58,6 +58,7 @@ export function buildSimRules(): SimRules {
       // ものまね（最初の技から選ぶ）は自分のレベルの割合で、ゆびをふる（固有技から選ぶ）は最大レベルで出す
       randomScaled: def.randomPool === 'starting',
       chainHopSeconds: def.chainHopSeconds ?? 0,
+      chainMinHop: def.chainMinHop ?? 0,
       learners: def.learners ?? null,
       waitForEnd: def.waitForEnd,
       ...(def.lobTarget ? { lobTarget: def.lobTarget } : {}),

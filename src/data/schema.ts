@@ -735,6 +735,8 @@ const snakeSchema = z.object({ amplitude: z.number().positive(), wavelength: z.n
  */
 export const moveEffectSchema = z.object({
   trigger: z.enum(['cast', 'hit', 'end', 'every', 'eachHit', 'spawn']),
+  /** 今の姿がこのどれかのときだけ起こる（しんそく: ウィンディなら残像が炎をまとう。作者の案 2026年10月25日。PokeAPI のポケモンの名前） */
+  forms: z.array(z.string()).optional(),
   everySeconds: z.number().positive().optional(),
   /** 起こる確率（0〜1。省略で必ず） */
   chance: z.number().min(0).max(1).optional(),
@@ -858,6 +860,8 @@ export const moveDefSchema = z.object({
   randomStatuses: z.array(z.string()).optional(),
   /** chain（連鎖）: 1回跳ぶごとに遅らせる秒数（10まんボルト: 敵から敵へ跳んでいくのが見える。0 なら全部同時） */
   chainHopSeconds: z.number().nonnegative().optional(),
+  /** chain（連鎖）: 次に跳ぶ敵は、今の場所からこの距離より離れた敵を選ぶ（いなければ一番近い敵。しんそく: 広く倒す。作者の案 2026年10月25日） */
+  chainMinHop: z.number().nonnegative().optional(),
   /**
    * この技を候補に出す系統（data/game/playables.json のキー）。省略ならタイプが合えばだれでも。
    * ノーマルの技を、原作で覚えるポケモンたちに絞る（作者の決定 2026年10月24日。どのタイプの技も覚えるミュウは別）

@@ -1677,6 +1677,12 @@
         "alpha": 0.85,
         "afterimages": 4,
         "spacingTicks": 1
+      },
+      "effectSprite": {
+        "id": "ember",
+        "fit": "circle",
+        "size": 2.2,
+        "rotate": "velocity"
       }
     },
     "smog": {

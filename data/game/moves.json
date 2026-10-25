@@ -2299,7 +2299,21 @@
           "power": 2.4
         }
       ],
-      "chainHopSeconds": 0.08
+      "chainHopSeconds": 0.08,
+      "chainMinHop": 70,
+      "effects": [
+        {
+          "trigger": "spawn",
+          "forms": ["arcanine"],
+          "puddle": {
+            "sizeMultiplier": 1.8,
+            "powerMultiplier": 0.12,
+            "durationSeconds": 0.8,
+            "hitIntervalSeconds": 0.25,
+            "alongSpacing": 36
+          }
+        }
+      ]
     },
     "seed-bomb": {
       "pattern": "scatter",

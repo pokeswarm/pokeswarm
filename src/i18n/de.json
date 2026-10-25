@@ -233,6 +233,7 @@
   "shop.banish.name": "Verbannen",
   "shop.banish.desc": "+1 Verbannung pro Rang zu Rundenbeginn (B im Levelaufstieg)",
   "item.magnet": "Magnet! Alle EP werden angezogen",
+  "item.buff": "{name}! {seconds} s lang verstärkt",
   "candy.rolling": "{name}! Level +{levels}...",
   "candy.result": "{name}! Level +{levels}!",
   "itemDesc.magnet": "Elektro-Attacken +15 %",

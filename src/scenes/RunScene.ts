@@ -176,6 +176,9 @@ export class RunScene extends Phaser.Scene {
   /** マップに落ちている道具（きずぐすり・マグネット・ふしぎなアメ）の影と、道具ごとのドット絵 */
   private itemView!: Phaser.GameObjects.Graphics;
   private readonly itemImages = new Map<number, Phaser.GameObjects.Image>();
+  /** マップの箱の絵（箱の id → 絵）と、右上の一時的な強化のアイコン */
+  private readonly boxImages = new Map<number, Phaser.GameObjects.Image>();
+  private buffIcons: { icon: Phaser.GameObjects.Image; text: Phaser.GameObjects.Text }[] = [];
   /** マップの障害物 */
   private obstacleView!: ObstacleView;
   /** 画面上の真ん中: 経過時間、中ボス・ボスの HP、お知らせ */
@@ -756,9 +759,16 @@ export class RunScene extends Phaser.Scene {
         this.bossId = ev.id;
         const name = this.enemyName(ev.kind);
         this.announce(t(kind.rank === 'boss' ? 'run.bossAppeared' : 'run.midbossAppeared', { name }), kind.rank === 'boss' ? '#ff8a65' : '#ffe082');
+      } else if (ev.type === 'boxHit' || ev.type === 'boxRemoved') {
+        this.onBoxEvent(ev);
       } else if (ev.type === 'itemCollected') {
         const it = ev;
         if (it.kind === 'rare-candy') this.playCandy(it.levels);
+        else if (it.kind === 'buff') {
+          // 箱の一時的な強化: 拾った人に、道具の名前と効いている時間
+          const def = w.rules.pickups.items.buff?.buffs[it.levels];
+          if (def && it.by === this.localId) this.announce(t('item.buff', { name: localName(generated.items[def.item]?.names, getLocale(), def.item), seconds: def.seconds }), '#ffe082');
+        }
         else if (it.kind === 'magnet') this.announce(t('item.magnet'), '#ef9a9a');
         else if (it.by === this.localId) this.announce(localName(generated.items.potion?.names, getLocale(), ''), '#ce93d8');
       } else if (ev.type === 'bodyAttack') {
@@ -1069,6 +1079,64 @@ export class RunScene extends Phaser.Scene {
     }
   }
 
+  /** マップの箱（攻撃を当てると開いて、一時的な強化を落とす） */
+  private drawBoxes(): void {
+    const seen = new Set<number>();
+    for (const b of this.sim.world.boxes) {
+      seen.add(b.id);
+      if (this.boxImages.has(b.id)) continue;
+      this.boxImages.set(b.id, this.add.image(b.x, b.y, pixelTextureKey('buff-box')).setScale(itemSprites.dot * 1.25).setDepth(spriteRender.depths.items));
+    }
+    for (const [id, img] of this.boxImages) {
+      if (seen.has(id)) continue;
+      img.destroy();
+      this.boxImages.delete(id);
+    }
+  }
+
+  /** 箱に攻撃が当たった（揺らす）・開いた（ふたが飛んで消える） */
+  private onBoxEvent(ev: { type: 'boxHit'; id: number } | { type: 'boxRemoved'; id: number; x: number; y: number; opened: boolean }): void {
+    if (ev.type === 'boxHit') {
+      const img = this.boxImages.get(ev.id);
+      if (img) this.tweens.add({ targets: img, angle: { from: -12, to: 0 }, duration: 160, ease: 'Back.Out' });
+      return;
+    }
+    if (!ev.opened) return;
+    const open = this.add.image(ev.x, ev.y, pixelTextureKey('buff-box-open')).setScale(itemSprites.dot * 1.25).setDepth(spriteRender.depths.items);
+    this.tweens.add({ targets: open, alpha: 0, y: ev.y - 10, duration: 700, delay: 250, onComplete: () => open.destroy() });
+    this.effects.playImpact('evolution', ev.x, ev.y);
+  }
+
+  /** 右上（コインの下）に、自分の一時的な強化のアイコンと残りの秒数 */
+  private drawBuffIcons(cam: Phaser.Cameras.Scene2D.Camera, top: number): void {
+    const w = this.sim.world;
+    const me = w.players.find((p) => p.id === this.localId);
+    const buffs = me?.buffs ?? [];
+    while (this.buffIcons.length < buffs.length) {
+      this.buffIcons.push({
+        icon: this.add.image(0, 0, '__DEFAULT').setOrigin(1, 0.5).setScrollFactor(0).setDepth(1001),
+        text: this.add.text(0, 0, '', px(16, '#ffffff', { outline: true })).setOrigin(1, 0.5).setScrollFactor(0).setDepth(1001),
+      });
+    }
+    this.buffIcons.forEach((v, k) => {
+      const b = buffs[k];
+      const def = b ? w.rules.pickups.items.buff?.buffs[b.index] : undefined;
+      v.icon.setVisible(!!def);
+      v.text.setVisible(!!def);
+      if (!b || !def) return;
+      const key = `icon:item:${def.item}`;
+      if (v.icon.texture.key !== key && this.textures.exists(key)) v.icon.setTexture(key);
+      // 残りが少ないと点滅
+      const left = b.ticksLeft * w.dt;
+      v.icon.setAlpha(left < 3 && Math.floor(left * 4) % 2 === 0 ? 0.35 : 1);
+      v.text.setText(`${Math.ceil(left)}`);
+      const y = top + 40 + k * 32;
+      this.placeUi(v.text, cam.width - 8, y);
+      this.placeUi(v.icon, cam.width - 14 - v.text.width, y);
+      v.icon.setScale(2 / cam.zoom);
+    });
+  }
+
   /**
    * ふしぎなアメの抽選の演出: 「+1 / +3 / +5」を回してから、当たった数を出す（シミュレーションは演出の時間の後に上げる）。
    * 連続でレベルアップの選択が出る
@@ -1194,6 +1262,7 @@ export class RunScene extends Phaser.Scene {
     this.placeUi(this.coinText, cam.width - 8, top + 12);
     this.placeUi(this.coinIcon, cam.width - 16 - this.coinText.width, top + 12);
     this.coinIcon.setScale(2 / cam.zoom);
+    this.drawBuffIcons(cam, top);
     this.placeUi(this.bossName, cx, 50);
     this.placeUi(this.bossBar, 0, 0);
     this.placeUi(this.announceText, cx, cam.height * 0.3);
@@ -1477,6 +1546,7 @@ export class RunScene extends Phaser.Scene {
 
     this.drawHazards(world.hazards);
     this.drawItems(timeMs);
+    this.drawBoxes();
     this.obstacleView.update(world, view);
     this.drawTopCenter();
     if (world.outcome || (world.levelUp && !world.levelUp.done.has(this.localId))) this.edgeArrows.hide();

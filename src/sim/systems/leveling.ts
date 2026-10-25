@@ -1,7 +1,7 @@
 import type { LevelUpSnapshot, PlayerId } from '../commands';
 import type { Player } from '../entities/player';
 import { deriveStats } from '../species';
-import { addModifiers, emptyModifiers } from '../upgrades';
+import { addModifiers, emptyModifiers, resolveModifiers } from '../upgrades';
 import { checkEvolution } from './evolution';
 import type { SimDerivation } from '../upgrades';
 import type { UpgradeOffer, World } from '../world';
@@ -379,6 +379,11 @@ export function recomputeModifiers(world: World, p: Player): void {
   const mods = emptyModifiers(world.rules.types.names.length);
   if (p.permanent) addModifiers(mods, p.permanent, 1);
   for (const it of p.items) addModifiers(mods, world.rules.items[it.item]!.perLevel, it.level);
+  // 箱の一時的な強化
+  for (const b of p.buffs ?? []) {
+    const def = world.rules.pickups.items.buff?.buffs[b.index];
+    if (def) addModifiers(mods, resolveModifiers(def.mods, world.rules.types.names), 1);
+  }
   // いつも効く技（かくばる・テクスチャー）: そのレベルまでの効果
   for (const pm of p.moves) {
     const passive = world.rules.moves[pm.move]?.passive[pm.level - 1];

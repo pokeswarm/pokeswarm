@@ -1403,7 +1403,32 @@ export const pickupConfigSchema = z.object({
       holdSeconds: z.number().nonnegative(),
       levels: z.array(z.object({ levels: z.number().int().positive(), weight: z.number().positive() })).min(1),
     }),
+    /**
+     * 箱を開けると出る一時的な強化（作者の決定 2026年10月25日）。拾うと buffs から重みで1つ選び、seconds のあいだ mods が効く。
+     * item は名前とアイコンに使う原作の道具（プラスパワーなど、原作でも戦闘の間だけ効く道具）
+     */
+    buff: z
+      .object({
+        buffs: z.array(z.object({ item: z.string(), seconds: z.number().positive(), mods: modifierSchema, weight: z.number().positive() })).min(1),
+      })
+      .optional(),
   }),
+  /**
+   * マップの箱（作者の決定 2026年10月25日）: 攻撃を hits 回当てると開き、一時的な強化（items.buff）を落とす。
+   * ソロ・ホストが、だれかの周り distanceMin〜distanceMax に spawnSeconds ごとに出す（同時に max 個まで）。全員から despawnDistance より離れたら消す
+   */
+  boxes: z
+    .object({
+      max: z.number().int().nonnegative(),
+      hits: z.number().int().positive(),
+      radius: z.number().positive(),
+      spawnSeconds: z.number().positive(),
+      firstSpawnSeconds: z.number().nonnegative(),
+      distanceMin: z.number().nonnegative(),
+      distanceMax: z.number().positive(),
+      despawnDistance: z.number().positive(),
+    })
+    .optional(),
 });
 export type PickupConfig = z.infer<typeof pickupConfigSchema>;
 

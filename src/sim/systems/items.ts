@@ -1,7 +1,7 @@
 import type { PlayerId } from '../commands';
 import { findEnemyIndex, type ItemKind, type World } from '../world';
 import { healPlayer } from './health';
-import { addXp } from './leveling';
+import { addXp, recomputeModifiers } from './leveling';
 
 /**
  * マップに落ちる道具（作者の提案。2026年10月）:
@@ -10,7 +10,7 @@ import { addXp } from './leveling';
  * - ふしぎなアメ: 中ボスが落とす。拾うと 1・3・5 レベルのどれかを抽選し、少し待ってから確定でレベルアップする
  * 落とすのと、拾ったかの確定（アメの抽選も）はソロ・ホスト。触れたかは自分のブラウザで判定する（経験値の玉と同じ）。
  */
-export const ITEM_KINDS: readonly ItemKind[] = ['potion', 'magnet', 'rare-candy'];
+export const ITEM_KINDS: readonly ItemKind[] = ['potion', 'magnet', 'rare-candy', 'buff'];
 
 /** 倒した敵の場所に道具を落とす（雑魚はまれに、中ボスは決まった道具）。倒れた敵が取り除かれる前に呼ぶ */
 export function dropItems(world: World): void {
@@ -58,8 +58,17 @@ export function confirmItem(world: World, id: number, by: PlayerId): void {
   const k = world.items.findIndex((x) => x.id === id);
   if (k === -1) return;
   const it = world.items[k]!;
-  const levels = it.kind === 'rare-candy' ? rollCandy(world, world.players.find((p) => p.id === by)?.candyWeight ?? 0) : 0;
+  // アメはレベルの数、箱の強化はどの強化か（items.buff.buffs の番号）を抽選する
+  const levels = it.kind === 'rare-candy' ? rollCandy(world, world.players.find((p) => p.id === by)?.candyWeight ?? 0) : it.kind === 'buff' ? rollBuff(world) : 0;
   applyItem(world, id, by, it.kind, levels);
+}
+
+/** 箱の強化を、重みで1つ選ぶ（番号） */
+function rollBuff(world: World): number {
+  const buffs = world.rules.pickups.items.buff?.buffs ?? [];
+  let r = world.rng.next() * buffs.reduce((s, b) => s + b.weight, 0);
+  for (let k = 0; k < buffs.length; k++) if ((r -= buffs[k]!.weight) < 0) return k;
+  return Math.max(0, buffs.length - 1);
 }
 
 /** アメの当たりを引く。bonus は、拾った人の +2 以上の当たりの重みに足す（実績の報酬） */
@@ -86,6 +95,18 @@ export function applyItem(world: World, id: number, by: PlayerId, kind: ItemKind
     // すべての玉を、速く吸い寄せる（2 = マグネット）
     const g = world.gems;
     for (let i = 0; i < g.count; i++) if (!g.pending[i]) g.attracted[i] = 2;
+  } else if (kind === 'buff') {
+    // 箱の強化: 拾った人に、決まった時間だけ効く（同じ強化を重ねて拾ったら時間を延ばす）
+    const p = world.players.find((x) => x.id === by);
+    const def = cfg.buff?.buffs[levels];
+    if (p && def) {
+      const ticks = Math.round(def.seconds / world.dt);
+      const buffs = (p.buffs ??= []);
+      const cur = buffs.find((b) => b.index === levels);
+      if (cur) cur.ticksLeft = Math.max(cur.ticksLeft, ticks);
+      else buffs.push({ index: levels, ticksLeft: ticks, totalTicks: ticks });
+      recomputeModifiers(world, p);
+    }
   } else {
     world.candies.push({ levels, ticksLeft: Math.round((cfg['rare-candy'].revealSeconds + cfg['rare-candy'].holdSeconds) / world.dt), by });
   }

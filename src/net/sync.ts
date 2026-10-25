@@ -104,6 +104,8 @@ export class SyncSession {
     const itemSpawns: number[] = [];
     const itemRequests: number[] = [];
     const itemCollects: number[] = [];
+    const boxSpawns: number[] = [];
+    const boxRemoves: number[] = [];
     for (const ev of world.events) {
       switch (ev.type) {
         case 'enemySpawned':
@@ -167,6 +169,12 @@ export class SyncSession {
         case 'pauseChanged':
           if (host) out.push({ t: 'pz', on: ev.paused ? 1 : 0 });
           break;
+        case 'boxSpawned':
+          if (host) boxSpawns.push(ev.id, ev.x, ev.y);
+          break;
+        case 'boxRemoved':
+          if (host) boxRemoves.push(ev.id, ev.opened ? 1 : 0);
+          break;
         default:
           break;
       }
@@ -185,6 +193,8 @@ export class SyncSession {
     if (itemSpawns.length) out.push({ t: 'is', e: itemSpawns });
     if (itemRequests.length) out.push({ t: 'iq', e: itemRequests });
     if (itemCollects.length) out.push({ t: 'ic', e: itemCollects });
+    if (boxSpawns.length) out.push({ t: 'bs', e: boxSpawns });
+    if (boxRemoves.length) out.push({ t: 'br', e: boxRemoves });
 
     if (host) {
       // レベルアップの選択の状態は、変わったときだけ送る（残り時間はゲストが自分で減らす）
@@ -370,6 +380,12 @@ export class SyncSession {
           break;
         case 'pz':
           if (guest) cmds.push({ type: 'setPause', paused: m.on === 1 });
+          break;
+        case 'bs':
+          if (guest) for (let k = 0; k + 2 < m.e.length; k += 3) cmds.push({ type: 'spawnBox', id: m.e[k]!, x: m.e[k + 1]!, y: m.e[k + 2]! });
+          break;
+        case 'br':
+          if (guest) for (let k = 0; k + 1 < m.e.length; k += 2) cmds.push({ type: 'removeBox', id: m.e[k]!, opened: m.e[k + 1] === 1 });
           break;
         case 'ping':
           this.replies.push({ t: 'pong', s: m.s });

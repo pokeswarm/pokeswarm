@@ -190,7 +190,7 @@ for (const kinds of obstacleConfig.sections) for (const k of kinds) check(!!obst
 check(obstacleConfig.margin * 2 < obstacleConfig.cellSize, 'data/game/obstacles.json の margin は cellSize の半分より小さくする');
 check(!!itemSprites.candyBurst, 'data/render/items.json に candyBurst がありません');
 // 道具のドット絵: マップの道具ごとと、アメの箱
-for (const name of ['potion', 'magnet', 'rare-candy', 'candy-box', 'candy-box-open']) {
+for (const name of ['potion', 'magnet', 'rare-candy', 'candy-box', 'candy-box-open', 'buff', 'buff-box', 'buff-box-open']) {
   check(!!itemSprites.sprites[name], `data/render/items.json に "${name}" のドット絵がありません`);
 }
 // BGM: 曲はファイルか楽譜のどちらかを持つ。楽譜は data/audio/music にあるもの

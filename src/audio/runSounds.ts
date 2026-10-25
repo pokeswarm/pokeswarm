@@ -53,6 +53,10 @@ export class RunSounds {
         case 'itemCollected':
           if (ev.kind === 'potion' && ev.by === this.localId) audio.sfx.play('item.potion');
           else if (ev.kind === 'magnet') audio.sfx.play('item.magnet');
+          else if (ev.kind === 'buff' && ev.by === this.localId) audio.sfx.play('levelUp');
+          break;
+        case 'boxRemoved':
+          if (ev.opened) audio.sfx.play('candy.hit');
           break;
         case 'bossAppeared':
           audio.sfx.play('boss.appear');

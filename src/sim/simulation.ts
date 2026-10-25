@@ -1,3 +1,4 @@
+import { stepBoxes, tickBuffs } from './systems/boxes';
 import type { InputCommand, PlayerId } from './commands';
 import { createPlayer, type Player, type PlayerInit } from './entities/player';
 import type { SimRules } from './rules';
@@ -94,6 +95,8 @@ export class Simulation {
     moveGems(w);
     collectGems(w);
     collectItems(w);
+    stepBoxes(w);
+    tickBuffs(w, (p) => recomputeModifiers(w, p));
     tickCandies(w);
     checkEvolutionAll(w);
     if (!w.outcome) openLevelUpIfPending(w);

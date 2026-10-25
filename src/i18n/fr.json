@@ -233,6 +233,7 @@
   "shop.banish.name": "Bannissement",
   "shop.banish.desc": "+1 bannissement par rang au début d'une partie (B à l'écran de niveau)",
   "item.magnet": "Aimant ! Toute l'Exp. est attirée",
+  "item.buff": "{name} ! Renforcé pendant {seconds} s",
   "candy.rolling": "{name} ! Niveau +{levels}...",
   "candy.result": "{name} ! Niveau +{levels} !",
   "itemDesc.magnet": "Capacités Électrik +15 %",

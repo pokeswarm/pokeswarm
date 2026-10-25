@@ -102,6 +102,8 @@ export interface Player {
   sleep?: { stillTicks: number; asleep: boolean; wakeTicks: number };
   /** 進化で消費された技（持ち物で覚え直さない） */
   consumedMoves?: number[];
+  /** 箱から拾った一時的な強化（index は pickups.json の items.buff.buffs の番号） */
+  buffs?: { index: number; ticksLeft: number; totalTicks: number }[];
   /** 順番に出す技（group）ごとの、次に出せるまでの秒数と、次に出す番 */
   groupTimers?: Record<string, number>;
   groupCursor?: Record<string, number>;

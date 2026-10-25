@@ -32,6 +32,25 @@
           "weight": 10
         }
       ]
+    },
+    "buff": {
+      "buffs": [
+        { "item": "x-attack", "seconds": 15, "mods": { "powerPct": 50 }, "weight": 1 },
+        { "item": "x-speed", "seconds": 15, "mods": { "moveSpeedPct": 40 }, "weight": 1 },
+        { "item": "x-defense", "seconds": 15, "mods": { "damageTakenPct": -50 }, "weight": 1 },
+        { "item": "dire-hit", "seconds": 15, "mods": { "critChancePct": 30 }, "weight": 1 },
+        { "item": "lucky-egg", "seconds": 20, "mods": { "xpPct": 100 }, "weight": 1 }
+      ]
     }
+  },
+  "boxes": {
+    "max": 3,
+    "hits": 3,
+    "radius": 14,
+    "spawnSeconds": 25,
+    "firstSpawnSeconds": 20,
+    "distanceMin": 380,
+    "distanceMax": 700,
+    "despawnDistance": 1600
   }
 }

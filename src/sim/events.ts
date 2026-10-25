@@ -1,5 +1,5 @@
 import type { PlayerId } from './commands';
-import type { UpgradeOffer } from './world';
+import type { ItemKind, UpgradeOffer } from './world';
 
 /** 1回の更新の中で起きた出来事。描画・通信・実績の判定が読む */
 export interface EnemyKilledEvent {
@@ -120,6 +120,29 @@ export interface RestChangedEvent {
   readonly asleep: boolean;
 }
 
+/** マップの箱が出た（ソロ・ホスト。ゲストへ送る） */
+export interface BoxSpawnedEvent {
+  readonly type: 'boxSpawned';
+  readonly id: number;
+  readonly x: number;
+  readonly y: number;
+}
+
+/** マップの箱がなくなった（opened: 攻撃で開いた。false は遠くなって消えた） */
+export interface BoxRemovedEvent {
+  readonly type: 'boxRemoved';
+  readonly id: number;
+  readonly x: number;
+  readonly y: number;
+  readonly opened: boolean;
+}
+
+/** マップの箱に攻撃が当たった（見た目だけ。ソロ・ホスト） */
+export interface BoxHitEvent {
+  readonly type: 'boxHit';
+  readonly id: number;
+}
+
 /** ポーズした・再開した（協力プレイではホストが全員へ送る） */
 export interface PauseChangedEvent {
   readonly type: 'pauseChanged';
@@ -234,7 +257,7 @@ export interface SectionAdvancedEvent {
 export interface ItemSpawnedEvent {
   readonly type: 'itemSpawned';
   readonly id: number;
-  readonly kind: 'potion' | 'magnet' | 'rare-candy';
+  readonly kind: ItemKind;
   readonly x: number;
   readonly y: number;
 }
@@ -251,7 +274,7 @@ export interface ItemCollectedEvent {
   readonly type: 'itemCollected';
   readonly id: number;
   readonly by: PlayerId;
-  readonly kind: 'potion' | 'magnet' | 'rare-candy';
+  readonly kind: ItemKind;
   readonly levels: number;
 }
 
@@ -283,6 +306,9 @@ export type SimEvent =
   | UpgradeChosenEvent
   | MoveTaughtEvent
   | RestChangedEvent
+  | BoxSpawnedEvent
+  | BoxRemovedEvent
+  | BoxHitEvent
   | PauseChangedEvent
   | PlayerDamagedEvent
   | PlayerRevivedEvent

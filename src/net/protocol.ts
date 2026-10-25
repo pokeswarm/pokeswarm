@@ -64,6 +64,9 @@ export type NetMessage =
   /** 往復時間の計測 */
   /** ポーズ（ホスト→ゲスト）: on 1 で止める・0 で再開 */
   | { t: 'pz'; on: number }
+  /** マップの箱（ホスト→ゲスト）: 出た [id, x, y, ...]・なくなった [id, 開いたら1, ...] */
+  | { t: 'bs'; e: number[] }
+  | { t: 'br'; e: number[] }
   | { t: 'ping'; s: number }
   | { t: 'pong'; s: number };
 

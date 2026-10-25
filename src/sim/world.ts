@@ -47,7 +47,16 @@ export interface LevelUpState {
 }
 
 /** マップに落ちる道具の種類 */
-export type ItemKind = 'potion' | 'magnet' | 'rare-candy';
+export type ItemKind = 'potion' | 'magnet' | 'rare-candy' | 'buff';
+
+/** マップの箱（攻撃を当てると開いて、一時的な強化を落とす）。hits は当たった技の当たり判定の通し番号（同じ技で何度も数えない） */
+export interface Box {
+  readonly id: number;
+  readonly x: number;
+  readonly y: number;
+  hp: number;
+  hits: number[];
+}
 
 /** ランの結果（disconnected: ホストとの接続が切れて終わった） */
 export type RunOutcome = 'clear' | 'fail' | 'disconnected';
@@ -118,6 +127,10 @@ export interface World {
   /** マップに落ちている道具（少ないので配列で持つ）。pending は拾ってホストの確定を待っている（ゲスト） */
   readonly items: { id: number; kind: ItemKind; x: number; y: number; pending: boolean }[];
   nextItemId: number;
+  /** マップの箱と、次の箱を出すまでの残り（更新回数。ソロ・ホスト） */
+  boxes: Box[];
+  nextBoxId: number;
+  boxTimer: number;
   /** 拾ったふしぎなアメ: 抽選の演出が終わるまでの残りと、上がるレベルの数 */
   readonly candies: { levels: number; ticksLeft: number; by: PlayerId }[];
   /** 全員で共有する経験値の合計（ホストが確定する） */
@@ -239,6 +252,9 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     nextGemId: 1,
     items: [],
     nextItemId: 1,
+    boxes: [],
+    nextBoxId: 1,
+    boxTimer: Math.round((rules.pickups.boxes?.firstSpawnSeconds ?? 0) * tickRate),
     candies: [],
     xp: 0,
     revives: rules.stats.revive.initialCount,

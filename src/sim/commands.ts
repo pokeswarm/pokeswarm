@@ -191,6 +191,20 @@ export interface LegendaryWarningCommand {
   readonly kind: number;
 }
 
+/** ゲスト: ホストが出したマップの箱・なくなった箱 */
+export interface SpawnBoxCommand {
+  readonly type: 'spawnBox';
+  readonly id: number;
+  readonly x: number;
+  readonly y: number;
+}
+
+export interface RemoveBoxCommand {
+  readonly type: 'removeBox';
+  readonly id: number;
+  readonly opened: boolean;
+}
+
 /** ポーズ: 止める（true）・再開する（false）。ソロは自分、協力プレイはホストが決めて全員へ送る */
 export interface SetPauseCommand {
   readonly type: 'setPause';
@@ -280,6 +294,8 @@ export type InputCommand =
   | BossHpCommand
   | EndRunCommand
   | SetPauseCommand
+  | SpawnBoxCommand
+  | RemoveBoxCommand
   | RemovePlayerCommand
   | RevivePlayerCommand
   | LegendaryWarningCommand

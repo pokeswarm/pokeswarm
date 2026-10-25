@@ -64,6 +64,8 @@ export class Simulation {
     // ランが終わったら進めない（結果画面へ移るまでそのまま見せる）
     if (w.outcome) return;
     applyCommands(w, commands);
+    // ポーズ中は全員のゲームを止める（入力の状態だけ受け付ける。通信は続ける）
+    if (w.paused) return;
     // レベルアップの選択中は全員のゲームを止める（入力の状態と選択だけ受け付ける）
     if (w.levelUp) {
       stepLevelUp(w);

@@ -120,6 +120,12 @@ export interface RestChangedEvent {
   readonly asleep: boolean;
 }
 
+/** ポーズした・再開した（協力プレイではホストが全員へ送る） */
+export interface PauseChangedEvent {
+  readonly type: 'pauseChanged';
+  readonly paused: boolean;
+}
+
 /** プレイヤーがダメージを受けた（自分のブラウザで判定） */
 export interface PlayerDamagedEvent {
   readonly type: 'playerDamaged';
@@ -277,6 +283,7 @@ export type SimEvent =
   | UpgradeChosenEvent
   | MoveTaughtEvent
   | RestChangedEvent
+  | PauseChangedEvent
   | PlayerDamagedEvent
   | PlayerRevivedEvent
   | PlayerDownEvent

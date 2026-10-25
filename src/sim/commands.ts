@@ -191,6 +191,12 @@ export interface LegendaryWarningCommand {
   readonly kind: number;
 }
 
+/** ポーズ: 止める（true）・再開する（false）。ソロは自分、協力プレイはホストが決めて全員へ送る */
+export interface SetPauseCommand {
+  readonly type: 'setPause';
+  readonly paused: boolean;
+}
+
 /** ゲスト: ホストが決めたランの終わり */
 export interface EndRunCommand {
   readonly type: 'endRun';
@@ -273,6 +279,7 @@ export type InputCommand =
   | AddHazardCommand
   | BossHpCommand
   | EndRunCommand
+  | SetPauseCommand
   | RemovePlayerCommand
   | RevivePlayerCommand
   | LegendaryWarningCommand

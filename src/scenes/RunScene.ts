@@ -45,6 +45,7 @@ import { achievementName, achievementRewardById } from '../meta/achievementText'
 import { RunRecorder } from '../meta/runRecorder';
 import { session } from '../meta/session';
 import { LevelUpPanel, offerText } from './levelUpPanel';
+import { PausePanel } from './pausePanel';
 import { NetPanel } from './netPanel';
 import { formatTime, type ResultSceneData } from './ResultScene';
 import { atlasKey } from '../render/sprites/PokemonSprite';
@@ -157,6 +158,9 @@ export class RunScene extends Phaser.Scene {
   /** 最後に描画のタイミングが来た時刻 */
   private lastFrameAt = 0;
   private levelUpPanel!: LevelUpPanel;
+  /** ポーズの画面（Esc）と、ゲストが止めずに開いている設定の画面 */
+  private pausePanel!: PausePanel;
+  private settingsOpen = false;
   /** ラン中の記録（撃破数など）をセーブデータに足す */
   private recorder!: RunRecorder;
   private runRecorded = false;
@@ -415,6 +419,11 @@ export class RunScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-F3', () => {
       this.showDebug = !this.showDebug;
     });
+    // Esc でポーズ（作者の決定 2026年10月25日）: ソロとホストは全員のゲームを止める。ホスト以外は止めずに設定の画面だけ。
+    // レベルアップの選択中（Esc は除外のモードをやめるのに使う）とランの終わりには使わない
+    this.pausePanel = new PausePanel(() => this.togglePause());
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.pausePanel.destroy());
+    this.input.keyboard?.on('keydown-ESC', () => this.togglePause());
     // M で音を消す・戻す（音量は タイトルの O の設定）
     this.input.keyboard?.on('keydown-M', () => {
       audio.settings.update({ muted: !audio.settings.current.muted });
@@ -492,6 +501,20 @@ export class RunScene extends Phaser.Scene {
   private autoFallback: 'heal' | 'coins' | 'alternate' | null = null;
   private autoNext: 'heal' | 'coins' = 'heal';
   private autoRequestedLevel = -1;
+
+  /** Esc・ポーズの画面のボタン: ソロとホストは止める・再開する（ホストは全員へ送る）。ゲストは設定の画面を開く・閉じる */
+  private togglePause(): void {
+    const w = this.sim.world;
+    if (w.outcome) return;
+    if (w.role === 'guest') {
+      // ホストが止めている間は、ゲストは閉じられない
+      if (w.paused) return;
+      this.settingsOpen = !this.settingsOpen;
+      return;
+    }
+    if (w.levelUp) return;
+    this.uiCommands.push({ type: 'setPause', paused: !w.paused });
+  }
 
   /** 相手ごとの、最後に通信が届いた時刻 */
   private lastHeard = new Map<PlayerId, number>();
@@ -1455,6 +1478,11 @@ export class RunScene extends Phaser.Scene {
     } else {
       this.levelUpPanel.hide();
     }
+    // ポーズの画面: 止まっていれば（ゲストにはホストが止めたことを）出す。ゲストは止めずに設定だけを開ける
+    const guestView = world.role === 'guest';
+    if (world.paused) this.pausePanel.show(guestView ? 'hostPaused' : 'paused');
+    else if (this.settingsOpen && guestView) this.pausePanel.show('settings');
+    else this.pausePanel.hide();
 
     const debugLines = [
       t('debug.fps', { fps: this.game.loop.actualFps.toFixed(1), steps: this.lastSteps }),

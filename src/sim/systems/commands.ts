@@ -3,7 +3,7 @@ import type { HitEffect } from '../events';
 import { currentWaveIndex, enemyHpScale, findEnemyIndex, findPlayer, type World } from '../world';
 import { breakOnDamage, damageTakenMultiplier } from './status';
 import { confirmPickup } from './gems';
-import { addXp, applyOffer, banUpgrade, chooseUpgrade, mirrorLevelUp, rerollUpgrades, skipUpgrade } from './leveling';
+import { addXp, applyOffer, banUpgrade, chooseUpgrade, mirrorLevelUp, rerollUpgrades, resumeInvincible, skipUpgrade } from './leveling';
 import { addHazard, endRun } from './stage';
 import { applyRevive } from './health';
 import { applyItem, confirmItem, spawnItem } from './items';
@@ -145,6 +145,13 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         }
         break;
       }
+      case 'setPause':
+        if (world.paused === cmd.paused) break;
+        world.paused = cmd.paused;
+        world.events.push({ type: 'pauseChanged', paused: cmd.paused });
+        // 再開するときは、レベルアップの後と同じく全員にごく短い無敵時間
+        if (!cmd.paused) resumeInvincible(world);
+        break;
       case 'endRun':
         if (world.role === 'guest') {
           if (cmd.legendary) world.legendary = { kind: cmd.legendary.kind, appearTick: 0, endTick: 0, spawned: true, result: cmd.legendary.result };

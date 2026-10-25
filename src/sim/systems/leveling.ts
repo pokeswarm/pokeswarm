@@ -72,7 +72,7 @@ export function stepLevelUp(world: World): void {
 }
 
 /** 再開時に全員へごく短い無敵時間 */
-function resumeInvincible(world: World): void {
+export function resumeInvincible(world: World): void {
   const ticks = Math.round(world.rules.leveling.resumeInvincibleSeconds / world.dt);
   for (const p of world.players) p.invincibleTicks = Math.max(p.invincibleTicks, ticks);
 }

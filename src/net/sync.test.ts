@@ -222,3 +222,31 @@ describe('順番を待たないチャンネル（03_network.md 6.4）', () => {
     expect(g.session.incoming(w, [c(20)], 1)).toHaveLength(0);
   });
 });
+
+describe('ポーズ（作者の決定 2026年10月25日）', () => {
+  it('ポーズ中はゲームが進まず、ホストが止めると全員へ届く', () => {
+    const host = makePeer('host', 1, 2);
+    const guest = makePeer('guest', 2, 2);
+    host.sim.step([{ type: 'setPause', paused: true }]);
+    const tick = host.sim.world.tick;
+    const out = host.session.outgoing(host.sim.world);
+    expect(out).toContainEqual({ t: 'pz', on: 1 });
+    for (let k = 0; k < 10; k++) host.sim.step([]);
+    expect(host.sim.world.tick).toBe(tick);
+    const cmds = guest.session.incoming(guest.sim.world, decode(encode(out)), 1);
+    expect(cmds).toContainEqual({ type: 'setPause', paused: true });
+    guest.sim.step(cmds);
+    expect(guest.sim.world.paused).toBe(true);
+    // 再開
+    host.sim.step([{ type: 'setPause', paused: false }]);
+    expect(host.session.outgoing(host.sim.world)).toContainEqual({ t: 'pz', on: 0 });
+    host.sim.step([]);
+    expect(host.sim.world.tick).toBeGreaterThan(tick);
+  });
+
+  it('ゲストからの setPause の知らせは受け付けない（ゲストは止められない）', () => {
+    const host = makePeer('host', 1, 2);
+    const cmds = host.session.incoming(host.sim.world, [{ t: 'pz', on: 1 }], 2);
+    expect(cmds).toEqual([]);
+  });
+});

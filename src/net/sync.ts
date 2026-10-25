@@ -164,6 +164,9 @@ export class SyncSession {
         case 'playerRevived':
           if (host) out.push({ t: 'rv', i: ev.playerId, n: ev.revives });
           break;
+        case 'pauseChanged':
+          if (host) out.push({ t: 'pz', on: ev.paused ? 1 : 0 });
+          break;
         default:
           break;
       }
@@ -364,6 +367,9 @@ export class SyncSession {
           break;
         case 'rv':
           if (guest) cmds.push({ type: 'revivePlayer', playerId: m.i, revives: m.n });
+          break;
+        case 'pz':
+          if (guest) cmds.push({ type: 'setPause', paused: m.on === 1 });
           break;
         case 'ping':
           this.replies.push({ t: 'pong', s: m.s });

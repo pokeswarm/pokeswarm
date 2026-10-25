@@ -62,6 +62,8 @@ export type NetMessage =
   /** 敵の位置の補正（ホスト→ゲスト）: [id, x, y, ...]。k はホストの更新回数（ゲストの経過時間をそろえる） */
   | { t: 'c'; e: number[]; k: number }
   /** 往復時間の計測 */
+  /** ポーズ（ホスト→ゲスト）: on 1 で止める・0 で再開 */
+  | { t: 'pz'; on: number }
   | { t: 'ping'; s: number }
   | { t: 'pong'; s: number };
 

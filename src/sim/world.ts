@@ -125,6 +125,8 @@ export interface World {
   pendingLevelUps: number;
   /** レベルアップの選択中（ゲームは止まっている）。null なら選択中でない */
   levelUp: LevelUpState | null;
+  /** ポーズ中（ゲームは止まっている。ソロは自分、協力プレイはホストが決める） */
+  paused: boolean;
   /** 敵の空間ハッシュ（毎回作り直す） */
   readonly enemyHash: SpatialHash;
   readonly rng: Rng;
@@ -258,6 +260,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     xpIntoLevel: 0,
     pendingLevelUps: 0,
     levelUp: null,
+    paused: false,
     projectiles: new ProjectileStore(rules.combat.maxProjectiles, rules.combat.hitMemory),
     enemyHash: new SpatialHash(rules.spawn.spatialCellSize, capacity),
     rng: new Rng(seed),

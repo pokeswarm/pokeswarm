@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { compactScreen } from '../render/pixelUi';
 import { audio } from '../audio';
 import { getLocale, LOCALES, setLocale, t } from '../i18n';
+import { appendAudioControls } from './audioControls';
 
 // 原作をまねた白い窓のボタン（作者の決定。2026年10月22日。src/render/pixelUi.ts の windowCss と同じ見た目）
 // 低い画面（横向きのスマホ）では低く・細く
@@ -29,41 +30,7 @@ export class SettingsScene extends Phaser.Scene {
     title.textContent = t('settings.title');
     root.append(title);
 
-    const slider = (label: string, key: 'master' | 'bgm' | 'sfx'): void => {
-      const row = document.createElement('label');
-      row.style.cssText = 'display:grid;grid-template-columns:8em 1fr 3em;align-items:center;gap:10px';
-      const name = document.createElement('span');
-      name.textContent = label;
-      const input = document.createElement('input');
-      input.type = 'range';
-      input.min = '0';
-      input.max = '100';
-      input.value = String(Math.round(audio.settings.current[key] * 100));
-      const value = document.createElement('span');
-      value.textContent = input.value;
-      input.oninput = () => {
-        value.textContent = input.value;
-        audio.settings.update({ [key]: Number(input.value) / 100 });
-      };
-      // 効果音の音量を変えたら、その大きさで鳴らして確かめられるように
-      if (key !== 'bgm') input.onchange = () => audio.sfx.play('levelUp');
-      row.append(name, input, value);
-      root.append(row);
-    };
-    slider(t('settings.master'), 'master');
-    slider(t('settings.bgm'), 'bgm');
-    slider(t('settings.sfx'), 'sfx');
-
-    const mute = document.createElement('label');
-    mute.style.cssText = 'display:flex;align-items:center;gap:8px;cursor:pointer';
-    const box = document.createElement('input');
-    box.type = 'checkbox';
-    box.checked = audio.settings.current.muted;
-    box.onchange = () => audio.settings.update({ muted: box.checked });
-    const muteText = document.createElement('span');
-    muteText.textContent = t('settings.muted');
-    mute.append(box, muteText);
-    root.append(mute);
+    appendAudioControls(root);
 
     // 言語（作者の決定 2026年10月22日）: 押すとすぐに切り替え、この画面を作り直す
     const lang = document.createElement('div');

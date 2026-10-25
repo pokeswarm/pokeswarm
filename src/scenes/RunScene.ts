@@ -46,6 +46,7 @@ import { RunRecorder } from '../meta/runRecorder';
 import { session } from '../meta/session';
 import { LevelUpPanel, offerText } from './levelUpPanel';
 import { PausePanel } from './pausePanel';
+import { EvolutionCutscene } from './evolutionCutscene';
 import { NetPanel } from './netPanel';
 import { formatTime, type ResultSceneData } from './ResultScene';
 import { atlasKey } from '../render/sprites/PokemonSprite';
@@ -161,6 +162,8 @@ export class RunScene extends Phaser.Scene {
   /** ポーズの画面（Esc）と、ゲストが止めずに開いている設定の画面 */
   private pausePanel!: PausePanel;
   private settingsOpen = false;
+  /** 進化の演出（自分が進化したとき。ソロでは演出の間ゲームを止める） */
+  private evolutionCutscene = new EvolutionCutscene();
   /** 協力プレイのレベルアップで、ほかの人の選択を待っている間の表示 */
   private waitingOverlay: HTMLDivElement | null = null;
   /** ラン中の記録（撃破数など）をセーブデータに足す */
@@ -430,6 +433,8 @@ export class RunScene extends Phaser.Scene {
     // Esc でポーズ（作者の決定 2026年10月25日）: ソロとホストは全員のゲームを止める。ホスト以外は止めずに設定の画面だけ。
     // レベルアップの選択中（Esc は除外のモードをやめるのに使う）とランの終わりには使わない
     this.pausePanel = new PausePanel(() => this.togglePause());
+    this.evolutionCutscene = new EvolutionCutscene();
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.evolutionCutscene.destroy());
     // 協力プレイで自分が選び終えた後: 画面を少しだけ暗くして、ほかの人を待っていることを出す
     this.waitingOverlay = document.createElement('div');
     this.waitingOverlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.3);display:none;align-items:center;justify-content:center;pointer-events:none;z-index:15;color:#f8f8f8;font-size:22px;text-shadow:0 2px 0 #000';
@@ -551,7 +556,8 @@ export class RunScene extends Phaser.Scene {
   override update(time: number, delta: number): void {
     this.lastFrameAt = performance.now();
     // スマホが縦向きの間は、ソロのランを止める（協力プレイは止められない）
-    const paused = !this.coop && (orientationGuard?.blocked ?? false);
+    // 自分の進化の演出の間も、ソロは止める
+    const paused = !this.coop && ((orientationGuard?.blocked ?? false) || this.evolutionCutscene.active);
     const steps = paused ? 0 : this.clock.advance(delta);
     this.runSteps(steps, true);
     this.lastSteps = steps;
@@ -1225,7 +1231,7 @@ export class RunScene extends Phaser.Scene {
         }
         if (!visible) continue;
         if (ev.type === 'projectileHit') this.effects.playImpact(this.sim.world.rules.moves[ev.move]!.effect, ev.x, ev.y);
-        if (ev.type === 'evolved') this.onEvolved(ev.playerId, ev.to);
+        if (ev.type === 'evolved') this.onEvolved(ev.playerId, ev.from, ev.to);
       }
       if (visible) {
         this.onSimEvents();
@@ -1268,13 +1274,20 @@ export class RunScene extends Phaser.Scene {
   }
 
   /** 進化したら、光の演出を出して見た目を差し替える（スプライトは途中で読み込む） */
-  private onEvolved(playerId: PlayerId, species: number): void {
+  private onEvolved(playerId: PlayerId, fromSpecies: number, species: number): void {
     const view = this.playerViews.get(playerId);
     const p = this.sim.world.players.find((x) => x.id === playerId);
     if (!view || !p) return;
     this.effects.playImpact('evolution', p.x, p.y);
     const key = this.sim.world.rules.species[species]?.key;
     if (!key) return;
+    // 自分の進化: 進化前・進化後の姿が交互に点滅する演出（作者の決定 2026年10月25日）。協力プレイは止めないので薄く重ねる
+    const fromKey = this.sim.world.rules.species[fromSpecies]?.key;
+    if (playerId === this.localId && fromKey) {
+      const sprite = (k: string): string => (this.shinyPlayers.has(playerId) ? shinySpriteKey(k) : k);
+      const name = (k: string): string => localName(generated.pokemon[k]?.names, getLocale(), k);
+      this.evolutionCutscene.play(sprite(fromKey), sprite(key), name(fromKey), name(key), this.coop ? 0.3 : 0.65);
+    }
     void loadPokemonAtRuntime(this, this.shinyPlayers.has(playerId) ? shinySpriteKey(key) : key).then((loaded) => {
       if (loaded) view.setSprite(loaded.manifest);
     });

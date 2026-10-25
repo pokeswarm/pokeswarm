@@ -1,4 +1,4 @@
-import { achievementsConfig, generated, playablesConfig, shopConfig, uiConfig, unlocksConfig } from '../data';
+import { achievementsConfig, generated, playablesConfig, shopConfig, statsConfig, uiConfig, unlocksConfig } from '../data';
 import { localName } from '../data/simRules';
 import { getLocale, t } from '../i18n';
 import { visibleAchievementCondition } from '../meta/achievementText';
@@ -189,5 +189,38 @@ export class PokemonPicker {
       text.append(d);
     }
     this.detail.replaceChildren(icon, text);
+    // 種族値（作者の決定 2026年10月25日: ポケモンごとの基礎ステータスを見せる）。ゲームでの強さは種族値のランクで決まるので、棒の色をランクで変える
+    const base = generated.pokemon[key]?.baseStats;
+    if (unlocked && base && !compact()) {
+      text.style.flex = '1';
+      this.detail.append(baseStatsElement(base));
+    }
   }
+}
+
+const STAT_KEYS = ['hp', 'attack', 'defense', 'specialAttack', 'specialDefense', 'speed'] as const;
+/** 棒の長さの上限にする種族値 */
+const STAT_BAR_MAX = 150;
+/** ランク（低い → 高い）ごとの棒の色 */
+const RANK_COLORS = ['#e05040', '#e09030', '#d8c030', '#80c040', '#40b070', '#3090e0'];
+
+function baseStatsElement(base: Readonly<Record<(typeof STAT_KEYS)[number], number>>): HTMLDivElement {
+  const box = document.createElement('div');
+  box.style.cssText = 'flex:none;display:grid;grid-template-columns:auto 2.2em 100px;gap:1px 6px;align-items:center;font-size:13px;line-height:1.25';
+  for (const k of STAT_KEYS) {
+    const name = document.createElement('div');
+    name.textContent = t(`select.stat.${k}`);
+    const value = document.createElement('div');
+    value.style.textAlign = 'right';
+    value.textContent = String(base[k]);
+    const bar = document.createElement('div');
+    bar.style.cssText = 'height:7px;background:#d0d8e0;border-radius:2px;overflow:hidden';
+    const fill = document.createElement('div');
+    let rank = 0;
+    while (rank < statsConfig.rankThresholds.length && base[k] >= statsConfig.rankThresholds[rank]!) rank++;
+    fill.style.cssText = `height:100%;width:${Math.min(100, (base[k] / STAT_BAR_MAX) * 100)}%;background:${RANK_COLORS[Math.min(rank, RANK_COLORS.length - 1)]}`;
+    bar.append(fill);
+    box.append(name, value, bar);
+  }
+  return box;
 }

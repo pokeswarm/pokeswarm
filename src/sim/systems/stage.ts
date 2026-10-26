@@ -215,6 +215,19 @@ function enrageBoss(world: World, boss: World['bosses'][number], i: number): voi
 function useBossMove(world: World, boss: World['bosses'][number], i: number): void {
   let moveIdx = boss.random ? boss.moves[world.rng.int(boss.moves.length)]! : boss.moves[boss.next++ % boss.moves.length]!;
   if (moveIdx === -1 && boss.pool && boss.pool.length > 0) moveIdx = boss.pool[world.rng.int(boss.pool.length)]!;
+  const move = world.rules.stage.moves[moveIdx];
+  // 狙う相手の距離の条件（フシギバナのソーラービーム・カメックスのハイドロカノン）: 満たさなければ使わず、少し後にもう一度見る
+  if (move && (move.minTargetDistance !== undefined || move.maxTargetDistance !== undefined)) {
+    const bx = world.enemies.x[i]!;
+    const by = world.enemies.y[i]!;
+    const t = pickPlayer(world, bx, by, move.targetPick ?? 'nearest');
+    const d = t ? Math.hypot(t.x - bx, t.y - by) : Infinity;
+    if ((move.minTargetDistance !== undefined && d <= move.minTargetDistance) || (move.maxTargetDistance !== undefined && d >= move.maxTargetDistance)) {
+      if (!boss.random) boss.next--;
+      boss.cooldown = Math.min(boss.cooldown, Math.max(1, Math.round(0.2 / world.dt)));
+      return;
+    }
+  }
   castBossMove(world, boss.id, i, moveIdx);
 }
 
@@ -402,6 +415,7 @@ function strikeHazards(world: World): void {
         fireCasterMove(world, caster, pm, move.playerMove.level, move.playerMove);
       }
     }
+    if (move?.holdSeconds && hz.dasher !== -1 && world.legendAi?.enemyId === hz.dasher) world.legendAi.holdTicks = Math.round(move.holdSeconds / world.dt);
     // 続けて使う技（ミュウツー: テレポートの直後に自分の周り）。ホストが決める
     if (move?.then && hz.dasher !== -1 && world.role !== 'guest') {
       const i = findEnemyIndex(world, hz.dasher);

@@ -156,45 +156,76 @@ describe('色違いの御三家（プレイヤーと同じ技）', () => {
     expect(blast).toBeGreaterThan(0);
   });
 
-  it('フシギバナ: はなびらのまい・ヘドロばくだんを出し、ソーラービームの予告は狙った人を追う', () => {
-    const { sim } = legend('shiny-venusaur');
+  it('フシギバナ: はなびらのまい・ヘドロばくだんを出し、はなびらのまいの外に出たときだけ、狙った人を追うソーラービームを撃つ', () => {
+    const { sim, i } = legend('shiny-venusaur');
+    const e = sim.world.enemies;
+    const p = sim.world.players[0]!;
     let petal = 0;
     let sludge = 0;
-    let beam = null as null | (typeof sim.world.hazards)[number];
-    for (let t = 0; t < 30 * 5 && !beam; t++) {
-      sim.world.players[0]!.invincibleTicks = 2;
+    const beamOf = () => sim.world.hazards.find((h) => moveId(sim, h.move) === 'venusaur-solar-beam' && h.activeTicks === undefined) ?? null;
+    // 近くにいる間は撃たない
+    for (let t = 0; t < 30 * 4; t++) {
+      p.invincibleTicks = 2;
+      p.x = e.x[i]! + 150;
+      p.y = e.y[i]!;
       sim.step([]);
       petal = Math.max(petal, hostile(sim, 'petal-dance'));
       sludge = Math.max(sludge, hostile(sim, 'sludge-bomb'));
-      beam = sim.world.hazards.find((h) => moveId(sim, h.move) === 'venusaur-solar-beam' && h.activeTicks === undefined) ?? null;
+      expect(beamOf()).toBeNull();
     }
     expect(petal).toBeGreaterThan(0);
     expect(sludge).toBeGreaterThan(0);
+    // 外に出ると撃つ
+    let beam = null as ReturnType<typeof beamOf>;
+    for (let t = 0; t < 30 * 3 && !beam; t++) {
+      p.invincibleTicks = 2;
+      p.x = e.x[i]! + 600;
+      p.y = e.y[i]!;
+      sim.step([]);
+      beam = beamOf();
+    }
     expect(beam).not.toBeNull();
-    const p = sim.world.players[0]!;
     p.y += 300;
     sim.step([]);
     const toP = Math.atan2(p.y - beam!.y, p.x - beam!.x);
     expect(Math.abs(Math.atan2(beam!.dirY, beam!.dirX) - toP)).toBeLessThan(0.05);
   });
 
-  it('カメックス: 離れると甲羅の形で速く追い、ためた後にハイドロカノンを一周に出す', () => {
+  it('カメックス: 甲羅の形で速く追い、触れるまで近づくと止まって少しためてから、ハイドロカノンを高速で一周させる', () => {
     const { sim, i, kind } = legend('shiny-blastoise');
     const e = sim.world.enemies;
-    // 遠くへ離す
-    sim.world.players[0]!.x = e.x[i]! + 600;
+    const p = sim.world.players[0]!;
+    p.x = e.x[i]! + 600;
     for (let t = 0; t < 10; t++) {
-      sim.world.players[0]!.invincibleTicks = 2;
+      p.invincibleTicks = 2;
       sim.step([]);
     }
     expect(sim.world.legendAi?.shell).toBe(true);
     expect(e.speed[i]).toBeGreaterThan(sim.world.rules.enemies.kinds[kind]!.moveSpeed * 2);
-    let cannon = 0;
-    for (let t = 0; t < 30 * 6; t++) {
-      sim.world.players[0]!.invincibleTicks = 2;
+    // 触れるまで待つ（プレイヤーは止まっている）
+    const cannon = sim.world.rules.moves.findIndex((m) => m.key === 'hydro-cannon');
+    const angles: number[] = [];
+    for (let t = 0; t < 30 * 8 && angles.length < 20; t++) {
+      p.invincibleTicks = 2;
       sim.step([]);
-      cannon = Math.max(cannon, hostile(sim, 'hydro-cannon'));
+      const pr = sim.world.projectiles;
+      for (let k = 0; k < pr.count; k++) {
+        if (pr.move[k] === cannon && pr.owner[k]! >= 60000) {
+          angles.push(Math.atan2(pr.dirY[k]!, pr.dirX[k]!));
+          expect(e.speed[i]).toBe(0);
+          break;
+        }
+      }
     }
-    expect(cannon).toBeGreaterThanOrEqual(12);
+    expect(angles.length).toBeGreaterThanOrEqual(10);
+    // 向きが回っている（1更新で 360°/秒 × 1/30 秒 = 12° ずつ）
+    let turned = 0;
+    for (let k = 1; k < angles.length; k++) {
+      let d = angles[k]! - angles[k - 1]!;
+      while (d > Math.PI) d -= Math.PI * 2;
+      while (d < -Math.PI) d += Math.PI * 2;
+      turned += Math.abs(d);
+    }
+    expect(turned).toBeGreaterThan(Math.PI);
   });
 });

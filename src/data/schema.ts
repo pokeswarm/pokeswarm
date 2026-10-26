@@ -402,6 +402,8 @@ export const casterMoveSchema = z.object({
   everySeconds: z.number().positive().optional(),
   count: z.number().int().positive().optional(),
   spreadDegrees: z.number().nonnegative().optional(),
+  /** 流れ（stream）の技を、向いている方向を追わずに、この速さ（度/秒）で回し続ける（カメックス: ハイドロカノンを一周） */
+  sweepDegreesPerSecond: z.number().optional(),
 });
 export type CasterMoveData = z.infer<typeof casterMoveSchema>;
 
@@ -451,6 +453,12 @@ export const bossMoveSchema = z.object({
   rooted: z.boolean().optional(),
   bullets: z.object({ count: z.number().int().positive(), speed: z.number().positive(), seconds: z.number().positive() }).optional(),
   playerMove: z.lazy(() => casterMoveSchema).optional(),
+  /** 狙う相手がこの距離より遠いときだけ使う（フシギバナのソーラービーム: はなびらのまいの外に出たら。作者の指摘 2026年10月27日） */
+  minTargetDistance: z.number().nonnegative().optional(),
+  /** 狙う相手がこの距離より近いときだけ使う（カメックスのハイドロカノン: 触れるまで近づいたら） */
+  maxTargetDistance: z.number().positive().optional(),
+  /** 落ちた後、ボスがこの秒数止まったまま（ため の動きのまま）でいる（カメックス: ハイドロカノンを出している間） */
+  holdSeconds: z.number().positive().optional(),
   leaves: z
     .object({
       seconds: z.number().positive(),
@@ -549,8 +557,8 @@ export const stageConfigSchema = z.object({
             casterPower: z.number().positive().optional(),
             shell: z
               .object({
-                farDistance: z.number().positive(),
-                nearDistance: z.number().positive(),
+                farDistance: z.number().nonnegative(),
+                nearDistance: z.number().nonnegative(),
                 speedMultiplier: z.number().positive(),
                 pose: z.string(),
                 spin: z.boolean().default(false),
@@ -966,6 +974,10 @@ export const moveDefSchema = z.object({
    * 端数はためて、ランの終わりに切り捨てる
    */
   coinGain: z.object({ perUse: z.number().nonnegative(), perLevel: z.number().nonnegative() }).optional(),
+  /** 扇（melee の arcDegrees）: 数が1増えるごとに、扇の角度をこの度数だけ広げる（本数は増やさない。かえんほうしゃ・バブルこうせん。作者の指摘 2026年10月27日） */
+  countWidens: z.number().positive().optional(),
+  /** 扇（melee の arcDegrees）: 出ている間、向いている方向をこの速さ（度/秒）で追う（かえんほうしゃ） */
+  followFacing: z.number().positive().optional(),
   /** 射程の強化（ズームレンズ）の効き方の倍率（ねんりき: 0.5 で半分だけ伸びる）。省略で 1 */
   rangeBonusScale: z.number().nonnegative().optional(),
   /**

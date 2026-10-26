@@ -509,8 +509,11 @@ function fireMelee(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   if (st.arcDegrees > 0) {
     // 扇形: 自分を中心に、向いている方向へ（360 度なら自分の周り全部。数が2以上なら反対側にも）
     const sc = scaledMoveStats(world, p, pm, st);
-    const half = Math.min(Math.PI, (st.arcDegrees * Math.PI) / 360);
-    const n = half >= Math.PI ? 1 : Math.min(st.count, 2);
+    // 数で扇を広げる技（かえんほうしゃ）は、本数を増やさず角度を広げる
+    const widen = world.rules.moves[pm.move]!.countWidens ?? 0;
+    const arc = st.arcDegrees + widen * Math.max(0, st.count - 1);
+    const half = Math.min(Math.PI, (arc * Math.PI) / 360);
+    const n = half >= Math.PI || widen > 0 ? 1 : Math.min(st.count, 2);
     // 外へ進む攻撃: 厚さ band の帯が、中心から届く距離まで持続の間に進む
     const reach = st.range + sc.size;
     const band = reachBand(world, pm.move, reach);
@@ -1150,6 +1153,19 @@ export function moveProjectiles(world: World): void {
       pr.x[i] = owner.x + pr.ox[i]!;
       pr.y[i] = owner.y + pr.oy[i]!;
       pr.radius[i]! += pr.growth[i]! * world.dt;
+      // 向いている方向を追う扇（かえんほうしゃ）
+      const follow = world.rules.moves[pr.move[i]!]!.followFacing;
+      if (follow && pr.shape[i] === SHAPE_SECTOR && pr.stage[i] === 0) {
+        const [fx, fy] = axisToUnit(owner.facingX, owner.facingY);
+        const cur = Math.atan2(pr.dirY[i]!, pr.dirX[i]!);
+        let diff = Math.atan2(fy, fx) - cur;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        const turn = ((follow * Math.PI) / 180) * world.dt;
+        const a = cur + Math.max(-turn, Math.min(turn, diff));
+        pr.dirX[i] = pr.vx[i] = Math.cos(a);
+        pr.dirY[i] = pr.vy[i] = Math.sin(a);
+      }
     } else if (motion === MOTION_SPIRAL) {
       pr.angle[i]! += pr.angularSpeed[i]! * world.dt;
       pr.orbitRadius[i]! += pr.ox[i]! * world.dt;
@@ -1347,7 +1363,7 @@ function hitLocalPlayer(world: World, i: number): void {
  * 術者に、プレイヤーと同じ技を1回出させる（一度に出し終える出し方だけ。続けて撃つ出し方は1発ずつまとめて出す）。
  * count・spreadDegrees は上書き（カメックスのハイドロカノンを一周）
  */
-export function fireCasterMove(world: World, caster: Player, move: number, level: number, over: { count?: number; spreadDegrees?: number } = {}): void {
+export function fireCasterMove(world: World, caster: Player, move: number, level: number, over: { count?: number; spreadDegrees?: number; sweepDegreesPerSecond?: number } = {}): void {
   const def = world.rules.moves[move];
   if (!def) return;
   const pm: PlayerMove = { move, level, cooldown: 0, burstLeft: 0, burstTimer: 0 };
@@ -1361,8 +1377,9 @@ export function fireCasterMove(world: World, caster: Player, move: number, level
       fireBurst(world, caster, pm, st);
     }
   } else if (def.pattern === 'stream') {
-    // 流れ（かえんほうしゃ・ハイドロカノン）: 向いている方向へ出し続ける
+    // 流れ（ハイドロカノン）: 向いている方向へ出し続ける。sweepDegreesPerSecond なら向きを追わずに回し続ける（カメックス）
     fireStream(world, caster, pm, st);
+    if (over.sweepDegreesPerSecond) for (let k = from; k < world.projectiles.count; k++) world.projectiles.ox[k] = (over.sweepDegreesPerSecond * Math.PI) / 180;
   } else {
     ONE_SHOT_FIRE[def.pattern]?.(world, caster, pm, st);
   }
@@ -1407,9 +1424,17 @@ function stepStream(world: World, i: number, owner: Player): void {
   const pr = world.projectiles;
   pr.x[i] = owner.x;
   pr.y[i] = owner.y;
+  const cur = Math.atan2(pr.dirY[i]!, pr.dirX[i]!);
+  // 回し続ける流れ（ox が回る速さ。カメックスのハイドロカノンを一周）
+  if (pr.ox[i] !== 0) {
+    const a = cur + pr.ox[i]! * world.dt;
+    pr.dirX[i] = Math.cos(a);
+    pr.dirY[i] = Math.sin(a);
+    pr.length[i] = rayLengthToObstacle(world, owner.x, owner.y, pr.dirX[i]!, pr.dirY[i]!, pr.orbitRadius[i]!);
+    return;
+  }
   const [fx, fy] = axisToUnit(owner.facingX, owner.facingY);
   const want = Math.atan2(fy, fx) + pr.angle[i]!;
-  const cur = Math.atan2(pr.dirY[i]!, pr.dirX[i]!);
   // 近いほうの回り方で、決まった速さまで向きを変える
   let diff = want - cur;
   while (diff > Math.PI) diff -= Math.PI * 2;

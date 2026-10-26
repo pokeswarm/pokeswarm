@@ -84,6 +84,10 @@ export interface SimMoveDef {
   readonly delayedBlast?: { readonly seconds: number; readonly sizeMultiplier: number; readonly powerMultiplier: number };
   /** 使うたびに、ランのコインを perUse + perLevel × (レベル − 1) 枚増やす（ネコにこばん） */
   readonly coinGain?: { readonly perUse: number; readonly perLevel: number };
+  /** 扇: 数が1増えるごとに扇を広げる度数（本数は増やさない） */
+  readonly countWidens?: number;
+  /** 扇: 出ている間、向いている方向を追う速さ（度/秒） */
+  readonly followFacing?: number;
   /** 射程の強化の効き方の倍率（ねんりき 0.5） */
   readonly rangeBonusScale?: number;
   /** lob（放物線）の落とす場所（しおふき・ヘドロばくだん）。省略なら向いている側へ放る */

@@ -1442,7 +1442,8 @@ export class RunScene extends Phaser.Scene {
     if (!set) return null;
     const id = w.enemies.id[i]!;
     const charging = w.hazards.some((h) => h.dasher === id && h.activeTicks === undefined && w.rules.stage.moves[h.move]?.rooted);
-    if (charging && set.chargePose) return { anim: set.chargePose, spin: false };
+    const holding = w.legendAi?.enemyId === id && !!w.legendAi.holdTicks;
+    if ((charging || holding) && set.chargePose) return { anim: set.chargePose, spin: false };
     if (set.shell && w.legendAi?.enemyId === id && w.legendAi.shell) return { anim: set.shell.pose, spin: set.shell.spin };
     return null;
   }

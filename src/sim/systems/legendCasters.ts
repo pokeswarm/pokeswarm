@@ -39,19 +39,20 @@ export function tickLegendCasters(world: World): void {
     caster.facingX = dx / len > 0.38 ? 1 : dx / len < -0.38 ? -1 : 0;
     caster.facingY = dy / len > 0.38 ? 1 : dy / len < -0.38 ? -1 : 0;
   }
+  // 予告の間止まる技（ため）を待っている間は、技も甲羅も止める
   if (!world.legendAi || world.legendAi.enemyId !== id) {
     world.legendAi = { enemyId: id, timers: (set.casters ?? []).map(() => 0), shellTimers: (set.shell?.moves ?? []).map(() => 0), shell: false };
   }
   const ai = world.legendAi;
-  // 予告の間止まる技（ため）を待っている間は、技も甲羅も止める
-  const charging = world.hazards.some((h) => h.dasher === id && h.activeTicks === undefined && world.rules.stage.moves[h.move]?.rooted);
+  if (ai.holdTicks) ai.holdTicks--;
+  const charging = !!ai.holdTicks || world.hazards.some((h) => h.dasher === id && h.activeTicks === undefined && world.rules.stage.moves[h.move]?.rooted);
   // 甲羅の形（カメックス）: 離れたら甲羅、近づいたら戻る。甲羅の間は速い
   if (set.shell && target) {
     const d = Math.hypot(target.x - caster.x, target.y - caster.y);
     if (!ai.shell && d > set.shell.farDistance) ai.shell = true;
     else if (ai.shell && d < set.shell.nearDistance) ai.shell = false;
     const base = world.rules.enemies.kinds[lg.kind]?.moveSpeed ?? 0;
-    if (!charging) e.speed[i] = ai.shell ? base * set.shell.speedMultiplier : base;
+    e.speed[i] = charging ? 0 : ai.shell ? base * set.shell.speedMultiplier : base;
   }
   if (charging) return;
   const fire = (list: readonly { move: string; level: number; everySeconds?: number; count?: number; spreadDegrees?: number }[], timers: number[]): void => {

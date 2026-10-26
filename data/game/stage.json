@@ -632,6 +632,7 @@
     },
     {
       "id": "venusaur-solar-beam",
+      "minTargetDistance": 380,
       "move": "solar-beam",
       "effect": "solar-beam",
       "shape": "line",
@@ -650,14 +651,15 @@
       "shape": "circle",
       "target": "self",
       "rooted": true,
-      "telegraphSeconds": 1.3,
-      "radius": 90,
+      "maxTargetDistance": 70,
+      "holdSeconds": 1,
+      "telegraphSeconds": 0.4,
+      "radius": 70,
       "damage": 0,
       "playerMove": {
         "move": "hydro-cannon",
         "level": 8,
-        "count": 12,
-        "spreadDegrees": 30
+        "sweepDegreesPerSecond": 360
       }
     }
   ],
@@ -803,8 +805,8 @@
           "venusaur-solar-beam"
         ],
         "random": false,
-        "moveIntervalSeconds": 3.5,
-        "enrageMoveIntervalSeconds": 2.5,
+        "moveIntervalSeconds": 2.5,
+        "enrageMoveIntervalSeconds": 1.8,
         "casters": [
           {
             "move": "petal-dance",
@@ -823,12 +825,12 @@
           "blastoise-hydro-cannon"
         ],
         "random": false,
-        "moveIntervalSeconds": 3.5,
-        "enrageMoveIntervalSeconds": 2.5,
+        "moveIntervalSeconds": 0.5,
+        "enrageMoveIntervalSeconds": 0.4,
         "casterPower": 1.2,
         "shell": {
-          "farDistance": 320,
-          "nearDistance": 160,
+          "farDistance": 0,
+          "nearDistance": 0,
           "speedMultiplier": 4,
           "pose": "Hurt",
           "spin": true,

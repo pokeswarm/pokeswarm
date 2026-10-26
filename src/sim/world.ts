@@ -138,7 +138,7 @@ export interface World {
    * どのブラウザでも同じように動かす（当たったかは自分のプレイヤーで決める）
    */
   casters: Map<number, Player>;
-  legendAi: { enemyId: number; timers: number[]; shellTimers: number[]; shell: boolean } | null;
+  legendAi: { enemyId: number; timers: number[]; shellTimers: number[]; shell: boolean; holdTicks?: number } | null;
   nextBoxId: number;
   boxTimer: number;
   /** 拾ったふしぎなアメ: 抽選の演出が終わるまでの残りと、上がるレベルの数 */

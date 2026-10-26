@@ -51,10 +51,70 @@
       "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
       "score": "johto-route"
     },
+    "johto-cave": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "johto-cave"
+    },
+    "johto-forest": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "johto-forest"
+    },
+    "johto-night-tower": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "johto-night-tower"
+    },
+    "johto-sea": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "johto-sea"
+    },
+    "johto-lighthouse": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "johto-lighthouse"
+    },
+    "johto-lake-of-rage": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "johto-lake-of-rage"
+    },
+    "johto-ice-path": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "johto-ice-path"
+    },
+    "johto-dragons-den": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "johto-dragons-den"
+    },
+    "johto-victory-road": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "johto-victory-road"
+    },
+    "johto-elite-four": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "johto-elite-four"
+    },
     "johto-red": {
       "volume": 0.7,
       "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
       "score": "johto-red"
+    },
+    "johto-beasts": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "johto-beasts"
+    },
+    "johto-legendary-sky": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "johto-legendary-sky"
     }
   },
   "scenes": {

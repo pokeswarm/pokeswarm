@@ -49,6 +49,16 @@ async function start(): Promise<void> {
     session.refundLegacyUpgrades();
   });
   const q = new URLSearchParams(window.location.search);
+  // 開発版だけ: ?restore=50000 で、伝説以外の実績を全部達成にし、コインをその数にする（セーブの読み込みが終わってから。公開版では効かない）
+  if (import.meta.env.DEV && q.has('restore')) {
+    void sessionReady.then(async () => {
+      const { grantDevProgress } = await import('./meta/devGrant');
+      let result = { achievements: 0, unlocked: 0 };
+      session.store.update((d) => void (result = grantDevProgress(d, Number(q.get('restore')) || 50000)));
+      await session.store.flush();
+      console.info('[restore] 実績', result.achievements, '・解放', result.unlocked, '・コイン', session.store.current.coins, '・ユーザー', session.store.userId);
+    });
+  }
   const joinId = q.get('join');
   let lobby: LobbySceneData | null = null;
   let run: RunSceneData | null = null;

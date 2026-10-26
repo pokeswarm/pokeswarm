@@ -9,7 +9,7 @@
 1. **出てくるポケモンを決める**（作者に確認）: ジムリーダー8人の相棒（中ボス）・四天王（大ボス）・伝説・区間ごとの雑魚・プレイアブルの系統。決めたら `07_content_draft.md` に表を作る。
 2. **PokeAPI の名前とデータ**: `data/pokeapi/targets.json` の `pokemon`・`moves`・`items` に足して `npm run pokeapi`。キーは PokeAPI の名前（例: たいりょくのハネは `health-wing`。間違えると 404 で止まる）。取得はキャッシュ（`scripts/.cache/`）されるので何度実行してもよい。
 3. **ドット絵**: `npm run sprites`。雑魚だけのポケモンは歩きだけの軽い画像（`uses: ["enemy"]`）、プレイアブル・ボスは全動作（`uses: ["full"]`）。足りない動作は報告に出る。クレジット（`public/sprites/credits.json`）は自動で作られる。
-4. **区間と雑魚**（`spawn.json` の `waves`）: 区間は「中ボスを倒すと次へ」。雑魚の種類・出現の速さ・最低数・上限・`hpMultiplier`・`damageMultiplier`・`xpMultiplier`。中ボス・ボス・伝説・スウォームに出るポケモンと**その進化前**は雑魚に出せない（読み込み時の検証でエラー。例外は `allowBossSpecies`）。
+4. **区間と雑魚**（`spawn.json` の `waves`）: 区間は「中ボスを倒すと次へ」。雑魚の種類・出現の速さ・最低数・上限・`hpMultiplier`・`damageMultiplier`・`xpMultiplier`。~~中ボス・ボス・伝説・スウォームに出るポケモンと**その進化前**は雑魚に出せない（読み込み時の検証でエラー。例外は `allowBossSpecies`）。~~ → 2026年10月27日にこの縛りは無くした（07 の60章。解放の条件が「ボスを倒す」に変わったので不要）。検証はジョウトの J2 で外す。
 5. **ボス**（`stage.json` の `bosses`・`moves`・`legendary`、`enemies.json` の HP）: 中ボスは `gate: true`（倒すと区間が進む）、四天王は段階的な大ボス（`enrage` で第2段階）。伝説は `legendary.moveSets` で伝説ごとの技と間隔（`moveIntervalSeconds`・`enrageMoveIntervalSeconds`）。
 6. **プレイアブル**（`playables.json`・`regions.json` の `playables`）: 最初の技、`fixedMoves`（技を覚えない）、`itemMoves`（持ち物で技を覚える）、`unlock`（解放の名前）。解放は実績（`achievements.json`）かショップ（`shop.json` の `pokemon`）。
 7. **技と派生**（`moves.json`・`derivations.json`）: 7章の作り方を参照。技を足したら `npm run balance-moves` と `npm run moves-table`（`08` は手で直さない）。

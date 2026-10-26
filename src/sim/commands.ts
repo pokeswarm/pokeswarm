@@ -171,6 +171,8 @@ export interface AddHazardCommand {
   readonly delay: number;
   readonly radius: number;
   readonly inner: number;
+  /** 予告が追いかけるプレイヤー（-1 なら追わない） */
+  readonly follow?: number;
 }
 
 /** ゲスト: 中ボス・ボスの HP（ホストが集計したもの） */

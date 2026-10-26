@@ -147,6 +147,9 @@ export class PlayerView {
       else this.pokemon.play(moving && !waking ? this.spriteStyle.walkAnimation : this.spriteStyle.idleAnimation, directionIndex(player.facingX, player.facingY));
       // 倒れていたら暗く、無敵時間の間は点滅
       this.pokemon.sprite.setAlpha(player.down ? 0.35 : player.invincibleTicks > 0 && Math.floor(player.invincibleTicks / 3) % 2 === 0 ? 0.4 : 1);
+      // 凍っている間（伝説戦のぜったいれいど）は氷の色
+      if (player.frozenTicks) this.pokemon.sprite.setTint(0x80deea);
+      else this.pokemon.sprite.clearTint();
     }
     // 眠っている間は Z が上へゆらゆら
     const sleeping = player.sleep?.asleep ?? false;

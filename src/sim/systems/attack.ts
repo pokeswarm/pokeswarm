@@ -161,8 +161,8 @@ function spread(world: World, dx: number, dy: number, degrees: number): [number,
  */
 export function useMoves(world: World): void {
   for (const p of world.players) {
-    // 倒れている間は技を使わない
-    if (p.down) continue;
+    // 倒れている間・凍っている間（伝説戦のぜったいれいど）は技を使わない
+    if (p.down || p.frozenTicks) continue;
     // ねむる（カビゴン）: 眠っている間と起きる動きの間は、ほかの技を出さない
     if (stepRest(world, p)) continue;
     // 順番に出す技（ワンリキーのパンチ）の、次に出せるまでの秒数

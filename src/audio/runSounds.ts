@@ -55,6 +55,9 @@ export class RunSounds {
           else if (ev.kind === 'magnet') audio.sfx.play('item.magnet');
           else if (ev.kind === 'buff' && ev.by === this.localId) audio.sfx.play('levelUp');
           break;
+        case 'playerFrozen':
+          if (ev.playerId === this.localId) audio.sfx.play('down');
+          break;
         case 'boxRemoved':
           if (ev.opened) audio.sfx.play('candy.hit');
           break;

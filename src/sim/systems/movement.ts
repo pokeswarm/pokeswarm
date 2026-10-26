@@ -29,6 +29,8 @@ export function movePlayers(world: World): void {
     if (p.inputX === 0 && p.inputY === 0) continue;
     // ねむる（カビゴン）の起きる動きの間は動けない（眠っているときに動こうとすると、起きる動きが始まる）
     if (p.sleep && (p.sleep.asleep || p.sleep.wakeTicks > 0)) continue;
+    // 凍っている間（伝説戦のぜったいれいど）は動けない
+    if (p.frozenTicks) continue;
     // 斜めは 1/√2 倍。定数を使い、環境で結果が変わる Math 関数は使わない
     const scale = p.inputX !== 0 && p.inputY !== 0 ? Math.SQRT1_2 : 1;
     // 凍った床の上は遅くなる（伝説の範囲技が残したもの）

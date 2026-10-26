@@ -1,3 +1,4 @@
+import { activeLegendField } from './stage';
 import type { PlayerId } from '../commands';
 import type { Player } from '../entities/player';
 import type { World } from '../world';
@@ -30,7 +31,9 @@ export function contactDamage(world: World): void {
 export function hurtPlayer(world: World, p: Player, raw: number): void {
   // ドわすれの守り: 決まった間、受けるダメージを減らす
   const guard = p.guardUntilTick !== undefined && world.tick < p.guardUntilTick ? 1 - (p.guardPct ?? 0) / 100 : 1;
-  const amount = ((raw * 100) / (100 + p.defense)) * Math.max(0, 1 + p.mods.damageTakenPct / 100) * guard;
+  // にらみつける（ファイヤー）: 伝説戦の間、防御が下がる
+  const defense = p.defense * (activeLegendField(world)?.field.defenseMultiplier ?? 1);
+  const amount = ((raw * 100) / (100 + defense)) * Math.max(0, 1 + p.mods.damageTakenPct / 100) * guard;
   p.hp -= amount;
   p.invincibleTicks = Math.round(world.rules.stats.hurtInvincibleSeconds / world.dt);
   world.events.push({ type: 'playerDamaged', playerId: p.id, amount });
@@ -46,6 +49,14 @@ export function selfDamage(world: World, p: Player, raw: number): void {
   if (amount <= 0) return;
   p.hp -= amount;
   world.events.push({ type: 'playerDamaged', playerId: p.id, amount });
+}
+
+/** 伝説戦のマップの効果のダメージ（ふぶき）: 防御は効かず、無敵時間も付けない。HP が無くなれば倒れる */
+export function fieldDamage(world: World, p: Player, amount: number): void {
+  if (amount <= 0 || p.down) return;
+  p.hp -= amount;
+  world.events.push({ type: 'playerDamaged', playerId: p.id, amount });
+  if (p.hp <= 0) downOrRevive(world, p);
 }
 
 /**

@@ -563,7 +563,7 @@
       "rank": "legendary",
       "sprite": "enemy/zapdos",
       "hp": 33000,
-      "moveSpeed": 170,
+      "moveSpeed": 0,
       "radius": 40,
       "contactDamage": 35,
       "xp": 0,

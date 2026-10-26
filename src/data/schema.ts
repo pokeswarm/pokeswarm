@@ -375,7 +375,34 @@ export type SaveConfig = z.infer<typeof saveConfigSchema>;
  * - stagger: 2つ目以降の範囲を、1つごとにこの秒数だけ遅らせて落とす（次々に降る）
  * - teleport: 予告の場所（狙ったプレイヤーの後ろ spread の距離）へ、落ちたときにボスが瞬間移動する
  * - leaves: 落ちた場所に、しばらく残る床を置く（slowPct で上にいるプレイヤーが遅くなる・damagePerSecond で削られる）。直線は線に沿って並べる
+ * 伝説の強化（作者の案 2026年10月26日）のための部品:
+ * - target: random（だれかの周り spread の中のランダムな場所に count 個）
+ * - targetPick: 狙うプレイヤー（nearest 一番近い・random ランダム・highestHp 一番 HP の多い）
+ * - then: 落ちた直後に、続けて使う技（ミュウツー: テレポートの直後に自分の周り）
+ * - homing: 予告が狙ったプレイヤーを追いかける（必中。ファイヤーのゴッドバード）。rooted: 予告の間、ボスは止まる
+ * - bullets: 自分から count 方向（ランダム）へ、speed で seconds の間まっすぐ飛ぶ玉（サンダーの電気の玉）。触れると1回当たる
  */
+/**
+ * 伝説戦の間ずっと続くマップの効果（作者の案 2026年10月26日）:
+ * - damagePctPerSecond・slowPct: 毎秒、最大 HP の % のダメージ・移動が遅くなる（フリーザーのふぶき）
+ * - freezeBelowHpPct・freezeSeconds: HP がこの % を切ったプレイヤーは凍る（動けず、技も出ない。ぜったいれいど）
+ * - defenseMultiplier: プレイヤーの防御の倍率（ファイヤーのにらみつける）
+ * - overlay: 画面を少し暗く・色を付ける（サンダー・フリーザー）
+ * - lightning: everySeconds ごとに技 move（target: random の範囲）を落とす（サンダーの落雷）
+ * - aura: 伝説の周り radius に入ると、毎秒 damagePerSecond のダメージ（ファイヤーのほのおのうず）
+ */
+export const legendFieldSchema = z.object({
+  damagePctPerSecond: z.number().nonnegative().optional(),
+  slowPct: z.number().min(0).max(90).optional(),
+  freezeBelowHpPct: z.number().min(0).max(100).optional(),
+  freezeSeconds: z.number().positive().optional(),
+  defenseMultiplier: z.number().positive().optional(),
+  overlay: z.object({ color: z.string(), alpha: z.number().min(0).max(1) }).optional(),
+  lightning: z.object({ move: z.string().min(1), everySeconds: z.number().positive() }).optional(),
+  aura: z.object({ radius: z.number().positive(), damagePerSecond: z.number().nonnegative(), color: z.string() }).optional(),
+});
+export type LegendField = z.infer<typeof legendFieldSchema>;
+
 export const bossMoveSchema = z.object({
   id: z.string().min(1),
   /** 技の名前に使う PokeAPI の技のキー（表示しない技は省略） */
@@ -383,7 +410,8 @@ export const bossMoveSchema = z.object({
   /** 範囲に落ちたときの演出（data/effects/recipes.json） */
   effect: z.string().min(1),
   shape: z.enum(['circle', 'line', 'ring']).default('circle'),
-  target: z.enum(['player', 'self']).default('player'),
+  target: z.enum(['player', 'self', 'random']).default('player'),
+  targetPick: z.enum(['nearest', 'random', 'highestHp']).optional(),
   telegraphSeconds: z.number().positive(),
   radius: z.number().positive(),
   length: z.number().positive().optional(),
@@ -400,6 +428,10 @@ export const bossMoveSchema = z.object({
   stagger: z.number().nonnegative().optional(),
   rings: z.object({ count: z.number().int().positive(), step: z.number().nonnegative(), width: z.number().positive() }).optional(),
   teleport: z.boolean().optional(),
+  then: z.string().min(1).optional(),
+  homing: z.boolean().optional(),
+  rooted: z.boolean().optional(),
+  bullets: z.object({ count: z.number().int().positive(), speed: z.number().positive(), seconds: z.number().positive() }).optional(),
   leaves: z
     .object({
       seconds: z.number().positive(),
@@ -485,6 +517,10 @@ export const stageConfigSchema = z.object({
             random: z.boolean().default(false),
             moveIntervalSeconds: z.number().positive().optional(),
             enrageMoveIntervalSeconds: z.number().positive().optional(),
+            /** moves の "*" は、毎回 pool からランダムに選ぶ（ミュウ: テレポートとゆびをふるを交互に。作者の案 2026年10月26日） */
+            pool: z.array(z.string()).optional(),
+            /** 戦いの間ずっと続くマップの効果（伝説の強化。作者の案 2026年10月26日） */
+            field: legendFieldSchema.optional(),
           }),
         )
         .default({}),

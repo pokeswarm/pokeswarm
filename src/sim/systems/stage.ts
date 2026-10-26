@@ -1,7 +1,7 @@
-import type { BossMove } from '../../data/schema';
+import type { BossMove, LegendField } from '../../data/schema';
 import { randomUnit } from '../math';
 import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World, type BossEntry } from '../world';
-import { hurtPlayer } from './health';
+import { hurtPlayer, fieldDamage } from './health';
 
 /**
  * ステージの進行（01_game_design.md 7章。2026年10月の作者の決定）:
@@ -52,6 +52,8 @@ export function spawnBosses(world: World): void {
       );
       const boss = world.bosses.find((b) => b.id === id);
       if (boss && set?.random) boss.random = true;
+      // "*" は毎回 pool からランダムに選ぶ（ミュウ: テレポートとゆびをふるを交互に）
+      if (boss && set?.pool) boss.pool = set.pool.map((m) => world.rules.stage.moves.findIndex((x) => x.id === m)).filter((k) => k >= 0);
     }
     if (lg.spawned) enrageLegendary(world);
     return;
@@ -183,6 +185,7 @@ export function bossAttacks(world: World): void {
         continue;
       }
       enrageBoss(world, boss, i);
+      fieldLightning(world, boss, i);
       if (--boss.cooldown > 0) continue;
       boss.cooldown = boss.interval;
       const cfg = world.rules.stage.legendary;
@@ -208,19 +211,50 @@ function enrageBoss(world: World, boss: World['bosses'][number], i: number): voi
 
 /** ボス・伝説が技を1つ使う（予告を置く） */
 function useBossMove(world: World, boss: World['bosses'][number], i: number): void {
-  const moveIdx = boss.random ? boss.moves[world.rng.int(boss.moves.length)]! : boss.moves[boss.next++ % boss.moves.length]!;
+  let moveIdx = boss.random ? boss.moves[world.rng.int(boss.moves.length)]! : boss.moves[boss.next++ % boss.moves.length]!;
+  if (moveIdx === -1 && boss.pool && boss.pool.length > 0) moveIdx = boss.pool[world.rng.int(boss.pool.length)]!;
+  castBossMove(world, boss.id, i, moveIdx);
+}
+
+/** ボス・伝説が技 moveIdx を、今の場所から使う（予告を置く）。続けて使う技（then）からも呼ぶ */
+function castBossMove(world: World, bossId: number, i: number, moveIdx: number): void {
   const move = world.rules.stage.moves[moveIdx];
   if (!move) return;
   const bx = world.enemies.x[i]!;
   const by = world.enemies.y[i]!;
-  const target = nearestPlayer(world, bx, by);
+  const target = pickPlayer(world, bx, by, move.targetPick ?? 'nearest');
   if (!target) return;
+  // 予告の間は止まる（ファイヤーのゴッドバード。ゲストも予告の知らせで止める）
+  if (move.rooted) world.enemies.speed[i] = 0;
+  if (move.bullets) {
+    // 飛ぶ玉（サンダー）: 自分からランダムな向きへ
+    for (let k = 0; k < move.bullets.count; k++) {
+      const [ux, uy] = randomUnit(world.rng);
+      addHazard(world, moveIdx, bx, by, ux, uy, bossId);
+    }
+    return;
+  }
+  if (move.homing) {
+    // 必中（ファイヤーのゴッドバード）: 予告が狙ったプレイヤーを追いかける
+    addHazard(world, moveIdx, target.x, target.y, 0, 0, bossId, undefined, { follow: target.id });
+    return;
+  }
+  if (move.target === 'random') {
+    // だれかの周りのランダムな場所（サイコブレイク・落雷）。テレポートなら、ボスがそこへ現れる
+    for (let c = 0; c < move.count; c++) {
+      const p = world.players.filter((x) => !x.down)[world.rng.int(Math.max(1, world.players.filter((x) => !x.down).length))] ?? target;
+      const [ux, uy] = randomUnit(world.rng);
+      const dist = world.rng.range(0, move.spread);
+      addHazard(world, moveIdx, p.x + ux * dist, p.y + uy * dist, 0, 0, move.teleport ? bossId : -1, undefined, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
+    }
+    return;
+  }
   if (move.shape === 'line') {
     // 自分から狙ったプレイヤーへ向かう直線
     const dx = target.x - bx;
     const dy = target.y - by;
     const len = Math.hypot(dx, dy) || 1;
-    addHazard(world, moveIdx, bx, by, dx / len, dy / len, move.dashSpeed ? boss.id : -1);
+    addHazard(world, moveIdx, bx, by, dx / len, dy / len, move.dashSpeed || move.rooted ? bossId : -1);
   } else if (move.target === 'self' && move.rings) {
     // 外へ広がる輪（ミュウツー）: 1本ずつ遅らせて、外側ほど遠くに出す
     for (let k = 0; k < move.rings.count; k++) {
@@ -228,13 +262,13 @@ function useBossMove(world: World, boss: World['bosses'][number], i: number): vo
       addHazard(world, moveIdx, bx, by, 0, 0, -1, undefined, { delay: Math.round(((move.stagger ?? 0) * k) / world.dt), radius: r, inner: Math.max(0, r - move.rings.width) });
     }
   } else if (move.target === 'self') {
-    addHazard(world, moveIdx, bx, by, 0, 0, -1);
+    addHazard(world, moveIdx, bx, by, 0, 0, move.rooted ? bossId : -1);
   } else if (move.teleport) {
     // 瞬間移動（ミュウツー）: 狙ったプレイヤーの後ろ（向いている方向の反対）に予告し、落ちたらそこへ現れる
     const fl = Math.hypot(target.facingX, target.facingY) || 1;
     const fx = target.facingX / fl || 1;
     const fy = target.facingY / fl;
-    addHazard(world, moveIdx, target.x - fx * move.spread, target.y - fy * move.spread, 0, 0, boss.id);
+    addHazard(world, moveIdx, target.x - fx * move.spread, target.y - fy * move.spread, 0, 0, bossId);
   } else {
     for (let c = 0; c < move.count; c++) {
       // 1つ目は足元、2つ目以降はばらつかせる（動かないと当たり、動けば避けられる）
@@ -278,6 +312,7 @@ function tickZones(world: World): void {
 /** 予告の時間が来た範囲技を当てる */
 function strikeHazards(world: World): void {
   tickZones(world);
+  tickLegendField(world);
   const me = world.players.find((p) => p.id === world.localPlayerId);
   for (let h = world.hazards.length - 1; h >= 0; h--) {
     const hz = world.hazards[h]!;
@@ -287,16 +322,35 @@ function strikeHazards(world: World): void {
         world.hazards.splice(h, 1);
         continue;
       }
+      // 飛ぶ玉（サンダー）: 向きへまっすぐ進む
+      const bullets = world.rules.stage.moves[hz.move]?.bullets;
+      if (bullets) {
+        hz.x += hz.dirX * bullets.speed * world.dt;
+        hz.y += hz.dirY * bullets.speed * world.dt;
+      }
       if (me && !me.down && me.invincibleTicks <= 0 && !hz.hitLocal && hazardHits(hz, me.x, me.y, me.radius)) {
         hz.hitLocal = true;
         hurtPlayer(world, me, hazardDamage(world, hz.damage));
       }
       continue;
     }
+    // 必中の予告: 狙ったプレイヤーを追いかける（当たったかは狙われた人のブラウザで決めるので、本人の画面では必ず当たる）
+    if (hz.follow !== undefined && hz.follow !== -1) {
+      const p = world.players.find((x) => x.id === hz.follow);
+      if (p && !p.down) {
+        hz.x = p.x;
+        hz.y = p.y;
+      }
+    }
     if (--hz.ticksLeft > 0) continue;
-    // 落ちた: 予告を消し、少しの間は当たる範囲として残す（描画は予告として描かない）
-    hz.activeTicks = Math.max(1, Math.round(world.rules.stage.bossRules.hazardActiveSeconds / world.dt));
     const move = world.rules.stage.moves[hz.move];
+    // 落ちた: 予告を消し、少しの間は当たる範囲として残す（描画は予告として描かない）。飛ぶ玉は飛んでいる間ずっと当たる
+    hz.activeTicks = Math.max(1, Math.round((move?.bullets ? move.bullets.seconds : world.rules.stage.bossRules.hazardActiveSeconds) / world.dt));
+    // 予告の間止まっていたボスは、また動く
+    if (move?.rooted && hz.dasher !== -1) {
+      const i = findEnemyIndex(world, hz.dasher);
+      if (i !== -1) world.enemies.speed[i] = world.rules.enemies.kinds[world.enemies.kind[i]!]?.moveSpeed ?? 0;
+    }
     world.events.push({
       type: 'hazardStruck',
       x: hz.x,
@@ -324,6 +378,11 @@ function strikeHazards(world: World): void {
         world.enemies.x[i] = world.enemies.prevX[i] = hz.x;
         world.enemies.y[i] = world.enemies.prevY[i] = hz.y;
       }
+    }
+    // 続けて使う技（ミュウツー: テレポートの直後に自分の周り）。ホストが決める
+    if (move?.then && hz.dasher !== -1 && world.role !== 'guest') {
+      const i = findEnemyIndex(world, hz.dasher);
+      if (i !== -1) castBossMove(world, hz.dasher, i, moveIndexOfStage(world.rules, move.then));
     }
     // 残る床（凍った床・燃える地面）。直線は線に沿って並べる。どのブラウザでも同じものを作る
     if (move?.leaves) {
@@ -355,6 +414,43 @@ function strikeHazards(world: World): void {
       hz.hitLocal = true;
       hurtPlayer(world, me, hazardDamage(world, hz.damage));
     }
+  }
+}
+
+/**
+ * 伝説戦のマップの効果を、自分のプレイヤーに当てる（どのブラウザでも自分の分だけ）:
+ * ふぶき（毎秒 最大 HP の % ・遅くなる）・ほのおのうず（伝説の近くで削られる）・ぜったいれいど（HP が少ないと凍る）
+ */
+function tickLegendField(world: World): void {
+  const me = world.players.find((p) => p.id === world.localPlayerId);
+  if (!me) return;
+  if (me.frozenTicks) me.frozenTicks--;
+  if (me.freezeCooldown) me.freezeCooldown--;
+  const active = activeLegendField(world);
+  if (!active || me.down) {
+    me.fieldHurtTicks = 0;
+    return;
+  }
+  const f = active.field;
+  if (f.slowPct) me.zoneSlowPct = Math.max(me.zoneSlowPct ?? 0, f.slowPct);
+  // 0.5 秒ごとに、その間の分をまとめて受ける
+  const every = Math.round(0.5 / world.dt);
+  me.fieldHurtTicks = (me.fieldHurtTicks ?? 0) + 1;
+  if (me.fieldHurtTicks >= every) {
+    me.fieldHurtTicks = 0;
+    // ふぶき: 最大 HP の % （防御は効かない。無敵時間も付けない）
+    if (f.damagePctPerSecond) fieldDamage(world, me, (me.maxHp * f.damagePctPerSecond * 0.5) / 100);
+    // ほのおのうず: 伝説の近くにいると削られる（ふつうのダメージ）
+    const e = world.enemies;
+    if (f.aura && !me.down && me.invincibleTicks <= 0 && (me.x - e.x[active.index]!) ** 2 + (me.y - e.y[active.index]!) ** 2 <= (f.aura.radius + me.radius) ** 2) {
+      hurtPlayer(world, me, hazardDamage(world, f.aura.damagePerSecond * 0.5));
+    }
+  }
+  // ぜったいれいど: HP が少ないと凍る（動けず、技も出ない）
+  if (f.freezeBelowHpPct && !me.down && !me.frozenTicks && !me.freezeCooldown && me.hp < (me.maxHp * f.freezeBelowHpPct) / 100) {
+    me.frozenTicks = Math.round((f.freezeSeconds ?? 5) / world.dt);
+    me.freezeCooldown = me.frozenTicks + Math.round(3 / world.dt);
+    world.events.push({ type: 'playerFrozen', playerId: me.id });
   }
 }
 
@@ -392,15 +488,20 @@ export function addHazard(
   dirY: number,
   dasher: number,
   chainLeft?: number,
-  /** 予告に足す遅れ（更新回数）・半径の上書き・輪の内側の半径 */
-  extra: { delay?: number; radius?: number; inner?: number } = {},
+  /** 予告に足す遅れ（更新回数）・半径の上書き・輪の内側の半径・追いかけるプレイヤー */
+  extra: { delay?: number; radius?: number; inner?: number; follow?: number } = {},
 ): void {
   const move: BossMove | undefined = world.rules.stage.moves[moveIdx];
   if (!move) return;
   const ticks = Math.round(move.telegraphSeconds / world.dt) + (extra.delay ?? 0);
   const radius = extra.radius || move.radius;
   const length = move.shape === 'line' ? (move.length ?? 400) : 0;
-  world.hazards.push({ move: moveIdx, shape: move.shape, x, y, radius, innerRadius: move.shape === 'ring' ? (extra.inner ?? 0) : undefined, dirX, dirY, length, dasher, damage: move.damage, ticksLeft: ticks, totalTicks: ticks, chainLeft });
+  world.hazards.push({ move: moveIdx, shape: move.shape, x, y, radius, innerRadius: move.shape === 'ring' ? (extra.inner ?? 0) : undefined, dirX, dirY, length, dasher, damage: move.damage, ticksLeft: ticks, totalTicks: ticks, chainLeft, follow: extra.follow ?? -1 });
+  // 予告の間止まる技（ゲストも同じ知らせで止める）
+  if (move.rooted && dasher !== -1) {
+    const i = findEnemyIndex(world, dasher);
+    if (i !== -1) world.enemies.speed[i] = 0;
+  }
   // じばく: 予告した敵はその場で止まる（ゲストも同じ知らせで止める）
   if (move.selfDestruct && dasher !== -1) {
     const i = findEnemyIndex(world, dasher);
@@ -410,7 +511,45 @@ export function addHazard(
       world.enemies.vy[i] = 0;
     }
   }
-  world.events.push({ type: 'hazardTelegraphed', move: moveIdx, x, y, dirX, dirY, dasher, delay: extra.delay ?? 0, radius: extra.radius ?? 0, inner: extra.inner ?? 0 });
+  world.events.push({ type: 'hazardTelegraphed', move: moveIdx, x, y, dirX, dirY, dasher, delay: extra.delay ?? 0, radius: extra.radius ?? 0, inner: extra.inner ?? 0, follow: extra.follow ?? -1 });
+}
+
+/** 狙うプレイヤー（倒れていない人から）: 一番近い・ランダム・一番 HP の多い */
+function pickPlayer(world: World, x: number, y: number, how: 'nearest' | 'random' | 'highestHp'): World['players'][number] | null {
+  const alive = world.players.filter((p) => !p.down);
+  if (alive.length === 0) return null;
+  if (how === 'random') return alive[world.rng.int(alive.length)]!;
+  if (how === 'highestHp') return alive.reduce((a, b) => (b.hp > a.hp ? b : a));
+  return nearestPlayer(world, x, y);
+}
+
+/** マップの効果の落雷（サンダー）: 決まった間隔で、だれかの周りのランダムな場所に落とす（ソロ・ホスト） */
+function fieldLightning(world: World, boss: World['bosses'][number], i: number): void {
+  const field = legendFieldOf(world, world.enemies.kind[i]!);
+  if (!field?.lightning) return;
+  boss.lightningTimer = (boss.lightningTimer ?? 0) - 1;
+  if (boss.lightningTimer > 0) return;
+  boss.lightningTimer = Math.max(1, Math.round(field.lightning.everySeconds / world.dt));
+  castBossMove(world, boss.id, i, moveIndexOfStage(world.rules, field.lightning.move));
+}
+
+/** その敵の種類（伝説）のマップの効果。無ければ undefined */
+export function legendFieldOf(world: World, kind: number): LegendField | undefined {
+  const id = world.rules.enemies.kinds[kind]?.id ?? '';
+  return world.rules.stage.legendary?.moveSets[id]?.field;
+}
+
+/** 今の伝説戦のマップの効果と、伝説の敵の index（戦っていなければ null） */
+export function activeLegendField(world: World): { field: LegendField; index: number } | null {
+  const lg = world.legendary;
+  if (!lg || lg.result) return null;
+  const e = world.enemies;
+  for (let i = 0; i < e.count; i++) {
+    if (e.kind[i] !== lg.kind || e.hp[i]! <= 0) continue;
+    const field = legendFieldOf(world, lg.kind);
+    return field ? { field, index: i } : null;
+  }
+  return null;
 }
 
 function nearestPlayer(world: World, x: number, y: number): World['players'][number] | null {

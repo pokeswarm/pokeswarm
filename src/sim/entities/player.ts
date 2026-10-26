@@ -61,6 +61,11 @@ export interface Player {
   invincibleTicks: number;
   /** 範囲技が残した床で遅くなっている割合（%。毎回の更新で決め直す） */
   zoneSlowPct?: number;
+  /** 凍っている残り（更新回数。伝説戦のぜったいれいど）と、次に凍るまでの間 */
+  frozenTicks?: number;
+  freezeCooldown?: number;
+  /** 伝説戦のマップの効果（ふぶき・ほのおのうず）で削られるまでの数え */
+  fieldHurtTicks?: number;
   /** 燃える床のダメージまでの残り（更新回数） */
   zoneHurtTicks?: number;
   /** ポケモンの種類（SimRules.species の番号）。進化で変わる */

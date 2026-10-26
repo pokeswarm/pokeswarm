@@ -45,6 +45,7 @@ import { achievementName, achievementRewardById } from '../meta/achievementText'
 import { RunRecorder } from '../meta/runRecorder';
 import { session } from '../meta/session';
 import { LevelUpPanel, offerText } from './levelUpPanel';
+import { activeLegendField } from '../sim/systems/stage';
 import { PausePanel } from './pausePanel';
 import { EvolutionCutscene } from './evolutionCutscene';
 import { NetPanel } from './netPanel';
@@ -162,6 +163,8 @@ export class RunScene extends Phaser.Scene {
   /** ポーズの画面（Esc）と、ゲストが止めずに開いている設定の画面 */
   private pausePanel!: PausePanel;
   private settingsOpen = false;
+  /** 伝説戦のマップの効果で画面に重ねる色（サンダーで暗く・フリーザーで白っぽく） */
+  private fieldOverlay: Phaser.GameObjects.Rectangle | null = null;
   /** 進化の演出（自分が進化したとき。ソロでは演出の間ゲームを止める） */
   private evolutionCutscene = new EvolutionCutscene();
   /** 協力プレイのレベルアップで、ほかの人の選択を待っている間の表示 */
@@ -208,6 +211,7 @@ export class RunScene extends Phaser.Scene {
     this.itemImages.clear();
     this.boxImages.clear();
     this.buffIcons = [];
+    this.fieldOverlay = null;
     this.boltView = null;
     this.flashedSerials = new Set();
     this.inbox = [];
@@ -764,6 +768,8 @@ export class RunScene extends Phaser.Scene {
         this.bossId = ev.id;
         const name = this.enemyName(ev.kind);
         this.announce(t(kind.rank === 'boss' ? 'run.bossAppeared' : 'run.midbossAppeared', { name }), kind.rank === 'boss' ? '#ff8a65' : '#ffe082');
+      } else if (ev.type === 'playerFrozen' && ev.playerId === this.localId) {
+        this.announce(t('run.frozen'), '#80deea');
       } else if (ev.type === 'boxHit' || ev.type === 'boxRemoved') {
         this.onBoxEvent(ev);
       } else if (ev.type === 'itemCollected') {
@@ -1018,6 +1024,13 @@ export class RunScene extends Phaser.Scene {
     const g = this.hazardView;
     g.clear();
     for (const h of hazards) {
+      // 飛ぶ玉（サンダーの電気の玉）: 飛んでいる間は黄色い玉
+      if (h.activeTicks !== undefined && this.sim.world.rules.stage.moves[h.move]?.bullets) {
+        g.fillStyle(0xfff176, 0.35).fillCircle(h.x, h.y, h.radius * 1.6);
+        g.fillStyle(0xffeb3b, 1).fillCircle(h.x, h.y, h.radius);
+        g.fillStyle(0xffffff, 1).fillCircle(h.x, h.y, h.radius * 0.45);
+        continue;
+      }
       // 落ちた後に少し当たる時間（activeTicks）は、予告を描かない（落ちた所の絵が出ている）
       if (h.activeTicks !== undefined) continue;
       const progress = 1 - h.ticksLeft / h.totalTicks;
@@ -1048,6 +1061,15 @@ export class RunScene extends Phaser.Scene {
       g.fillStyle(0xff1744, 0.12).fillCircle(h.x, h.y, h.radius);
       g.fillStyle(0xff1744, 0.25).fillCircle(h.x, h.y, h.radius * progress);
       g.lineStyle(2, 0xff5252, 0.9).strokeCircle(h.x, h.y, h.radius);
+    }
+    // 伝説の周りの炎の輪（ファイヤーのほのおのうず）: 触れると削られる範囲
+    const active = activeLegendField(this.sim.world);
+    if (active?.field.aura) {
+      const e = this.sim.world.enemies;
+      const a = active.field.aura;
+      const pulse = 0.5 + 0.5 * Math.sin(this.time.now / 120);
+      g.fillStyle(hexColor(a.color), 0.22 + 0.12 * pulse).fillCircle(e.x[active.index]!, e.y[active.index]!, a.radius);
+      g.lineStyle(4, hexColor(a.color), 0.95).strokeCircle(e.x[active.index]!, e.y[active.index]!, a.radius);
     }
     // 範囲技が残した床（凍った床・燃える地面）。消える前は薄くする
     for (const z of this.sim.world.zones) {
@@ -1082,6 +1104,19 @@ export class RunScene extends Phaser.Scene {
       img.destroy();
       this.itemImages.delete(id);
     }
+  }
+
+  /** 伝説戦のマップの効果: 画面に色を重ねる（サンダーで暗く・フリーザーで白っぽく） */
+  private drawFieldOverlay(): void {
+    const overlay = activeLegendField(this.sim.world)?.field.overlay;
+    if (!overlay) {
+      this.fieldOverlay?.setVisible(false);
+      return;
+    }
+    const cam = this.cameras.main;
+    this.fieldOverlay ??= this.add.rectangle(0, 0, 10, 10, 0x000000, 1).setOrigin(0, 0).setScrollFactor(0).setDepth(999);
+    this.fieldOverlay.setFillStyle(hexColor(overlay.color), overlay.alpha).setSize(cam.width, cam.height).setVisible(true);
+    this.placeUi(this.fieldOverlay, 0, 0);
   }
 
   /** マップの箱（攻撃を当てると開いて、一時的な強化を落とす） */
@@ -1556,6 +1591,7 @@ export class RunScene extends Phaser.Scene {
     );
 
     this.drawHazards(world.hazards);
+    this.drawFieldOverlay();
     this.drawItems(timeMs);
     this.drawBoxes();
     this.obstacleView.update(world, view);

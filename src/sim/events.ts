@@ -120,6 +120,12 @@ export interface RestChangedEvent {
   readonly asleep: boolean;
 }
 
+/** 自分のプレイヤーが凍った（伝説戦のぜったいれいど。見た目と音） */
+export interface PlayerFrozenEvent {
+  readonly type: 'playerFrozen';
+  readonly playerId: number;
+}
+
 /** マップの箱が出た（ソロ・ホスト。ゲストへ送る） */
 export interface BoxSpawnedEvent {
   readonly type: 'boxSpawned';
@@ -206,6 +212,8 @@ export interface HazardTelegraphedEvent {
   readonly delay: number;
   readonly radius: number;
   readonly inner: number;
+  /** 予告が追いかけるプレイヤー（-1 なら追わない） */
+  readonly follow: number;
 }
 
 /** ボスの範囲技が落ちた（演出用） */
@@ -314,6 +322,7 @@ export type SimEvent =
   | MoveTaughtEvent
   | RestChangedEvent
   | BoxSpawnedEvent
+  | PlayerFrozenEvent
   | BoxRemovedEvent
   | BoxHitEvent
   | BoxHitRequestedEvent

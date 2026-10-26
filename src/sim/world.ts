@@ -88,9 +88,9 @@ export interface Hazard {
   readonly shape: 'circle' | 'line' | 'ring';
   /** 輪の内側の半径（輪だけ） */
   readonly innerRadius?: number;
-  /** 円の中心・直線の始点 */
-  readonly x: number;
-  readonly y: number;
+  /** 円の中心・直線の始点（追いかける予告・飛ぶ玉は動く） */
+  x: number;
+  y: number;
   /** 円の半径・直線の幅の半分 */
   readonly radius: number;
   /** 直線の向き（長さ1）と長さ */
@@ -108,6 +108,8 @@ export interface Hazard {
   activeTicks?: number;
   /** 落ちた後: 自分のプレイヤーにもう当たったか */
   hitLocal?: boolean;
+  /** 予告が追いかけるプレイヤー（必中。-1 なら追わない） */
+  follow?: number;
 }
 
 /** シミュレーションの全状態 */
@@ -197,6 +199,10 @@ export interface World {
     moves: readonly number[];
     next: number;
     random?: boolean;
+    /** moves の -1 は、毎回ここからランダムに選ぶ（ミュウ） */
+    pool?: readonly number[];
+    /** マップの効果の落雷までの残り（更新回数） */
+    lightningTimer?: number;
     /** 第2段階（四天王） */
     enrage?: BossEntry['enrage'];
     enraged?: boolean;

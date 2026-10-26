@@ -450,6 +450,7 @@
   "pattern.rest": "Dorme e si cura stando fermo",
   "run.moveTaught": "Ha imparato {name}!",
   "run.sleepZ": "Z z z",
+  "run.frozen": "Purogelo! Sei congelato!",
   "run.levelMax": "Lv. MAX",
   "pause.title.paused": "Pausa",
   "pause.title.hostPaused": "L'host ha messo in pausa la partita",

@@ -1,6 +1,7 @@
 import { createPlayer, type Player } from '../entities/player';
 import { emptyModifiers } from '../upgrades';
 import type { World } from '../world';
+import type { CasterMoveData } from '../../data/schema';
 import { CASTER_ID_BASE, fireCasterMove, moveStatsOf } from './attack';
 
 /**
@@ -55,7 +56,7 @@ export function tickLegendCasters(world: World): void {
     e.speed[i] = charging ? 0 : ai.shell ? base * set.shell.speedMultiplier : base;
   }
   if (charging) return;
-  const fire = (list: readonly { move: string; level: number; everySeconds?: number; count?: number; spreadDegrees?: number }[], timers: number[]): void => {
+  const fire = (list: readonly CasterMoveData[], timers: number[]): void => {
     list.forEach((c, k) => {
       if ((timers[k] = (timers[k] ?? 0) - 1) > 0) return;
       const move = world.rules.moves.findIndex((m) => m.key === c.move);

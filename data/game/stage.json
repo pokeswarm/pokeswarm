@@ -632,7 +632,7 @@
     },
     {
       "id": "venusaur-solar-beam",
-      "minTargetDistance": 380,
+      "minTargetDistance": 240,
       "move": "solar-beam",
       "effect": "solar-beam",
       "shape": "line",
@@ -810,7 +810,8 @@
         "casters": [
           {
             "move": "petal-dance",
-            "level": 8
+            "level": 8,
+            "orbitRadius": 200
           },
           {
             "move": "sludge-bomb",

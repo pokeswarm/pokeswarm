@@ -411,6 +411,8 @@ export const casterMoveSchema = z.object({
   spreadDegrees: z.number().nonnegative().optional(),
   /** 流れ（stream）の技を、向いている方向を追わずに、この速さ（度/秒）で回し続ける（カメックス: ハイドロカノンを一周） */
   sweepDegreesPerSecond: z.number().optional(),
+  /** うず（spiral）の技を、広げずにこの距離で回し続ける（色違いのフシギバナ: はなびらのまいを距離200で周回） */
+  orbitRadius: z.number().positive().optional(),
 });
 export type CasterMoveData = z.infer<typeof casterMoveSchema>;
 
@@ -631,6 +633,8 @@ export function findReappearingKind(
 // ---- 戦闘の共通設定 ----
 
 export const combatConfigSchema = z.object({
+  /** 光線（beam）: 数が1増えるごとに、幅をこの割合だけ広げる（本数は増やさない。作者の指摘 2026年10月27日） */
+  beamWidthPerExtraCount: z.number().nonnegative().default(0.5),
   /** 発射体・攻撃の当たり判定の数の上限（全プレイヤー合計） */
   maxProjectiles: z.number().int().positive(),
   /**
@@ -829,14 +833,16 @@ const snakeSchema = z.object({ amplitude: z.number().positive(), wavelength: z.n
  * - eachHit: 当たった敵ごとに（その敵の位置で）起こす（かみなり: 落雷を受けた敵それぞれから電気が連鎖する）
  */
 export const moveEffectSchema = z.object({
-  trigger: z.enum(['cast', 'hit', 'end', 'every', 'eachHit', 'spawn']),
+  /** kill は、この技（技そのもの）で敵を倒したとき。その敵の位置（ぜったいれいど: 凍った敵が氷の破片を飛ばす） */
+  trigger: z.enum(['cast', 'hit', 'end', 'every', 'eachHit', 'spawn', 'kill']),
   /** 今の姿がこのどれかのときだけ起こる（しんそく: ウィンディなら残像が炎をまとう。作者の案 2026年10月25日。PokeAPI のポケモンの名前） */
   forms: z.array(z.string()).optional(),
   everySeconds: z.number().positive().optional(),
   /** 起こる確率（0〜1。省略で必ず） */
   chance: z.number().min(0).max(1).optional(),
   /** 爆発: その場で弾ける円。delaySeconds があれば、印を置いて少し後に弾ける。pull は中心へ引き寄せる強さ */
-  explode: z.object({ ...fxSize, delaySeconds: z.number().positive().optional(), pull: z.number().positive().optional() }).optional(),
+  /** asMove なら、その技（moves.json のキー）として弾ける（見た目もタイプもその技。ばくれつパンチの 炎・雷 のスプラッシュ） */
+  explode: z.object({ ...fxSize, delaySeconds: z.number().positive().optional(), pull: z.number().positive().optional(), asMove: z.string().optional() }).optional(),
   /**
    * 残る範囲（炎・水たまり・毒）。直線の当たり判定なら alongSpacing ごとに線に沿って並べる。
    * path なら円を置かず、通った道そのものを範囲にする（ビームは線1本。every で呼ぶ動く技は、通った道を線でつなぐ）
@@ -981,6 +987,10 @@ export const moveDefSchema = z.object({
    * 端数はためて、ランの終わりに切り捨てる
    */
   coinGain: z.object({ perUse: z.number().nonnegative(), perLevel: z.number().nonnegative() }).optional(),
+  /** cross（十字）: 向きを等しい角度に並べず、1発ごとにランダムにする（うたう: 音符がふわふわ散る） */
+  crossRandom: z.boolean().optional(),
+  /** この技に（1秒以上あけて）この回数当たった雑魚は、確定で倒れる（ほろびのうた。ボスには効かない） */
+  perishHits: z.number().int().positive().optional(),
   /** 扇（melee の arcDegrees）: 数が1増えるごとに、扇の角度をこの度数だけ広げる（本数は増やさない。かえんほうしゃ・バブルこうせん。作者の指摘 2026年10月27日） */
   countWidens: z.number().positive().optional(),
   /** 扇（melee の arcDegrees）: 出ている間、向いている方向をこの速さ（度/秒）で追う（かえんほうしゃ） */

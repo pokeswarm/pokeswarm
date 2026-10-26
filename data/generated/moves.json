@@ -431,18 +431,6 @@
     "type": "fighting",
     "damageClass": "physical"
   },
-  "freeze-dry": {
-    "names": {
-      "ja": "フリーズドライ",
-      "en": "Freeze-Dry",
-      "fr": "Lyophilisation",
-      "de": "Gefriertrockner",
-      "es": "Liofilización",
-      "it": "Liofilizzazione"
-    },
-    "type": "ice",
-    "damageClass": "special"
-  },
   "frenzy-plant": {
     "names": {
       "ja": "ハードプラント",
@@ -718,6 +706,18 @@
     },
     "type": "normal",
     "damageClass": "physical"
+  },
+  "perish-song": {
+    "names": {
+      "ja": "ほろびのうた",
+      "en": "Perish Song",
+      "fr": "Requiem",
+      "de": "Abgesang",
+      "es": "Canto Mortal",
+      "it": "Ultimocanto"
+    },
+    "type": "normal",
+    "damageClass": "status"
   },
   "petal-blizzard": {
     "names": {

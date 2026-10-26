@@ -48,6 +48,9 @@ export class EnemyStore {
   readonly markSize: Float64Array;
   readonly markMove: Int16Array;
   readonly markBy: Uint16Array;
+  /** ほろびのうたに当たった回数と、最後に数えた更新番号（1回の技で何度も数えない） */
+  readonly perish: Uint8Array;
+  readonly perishTick: Uint32Array;
 
   constructor(
     readonly capacity: number,
@@ -82,6 +85,8 @@ export class EnemyStore {
     this.markSize = new Float64Array(capacity);
     this.markMove = new Int16Array(capacity);
     this.markBy = new Uint16Array(capacity);
+    this.perish = new Uint8Array(capacity);
+    this.perishTick = new Uint32Array(capacity);
   }
 
   /** 追加して index を返す。満杯なら -1 */
@@ -105,6 +110,7 @@ export class EnemyStore {
     this.statusTicks.fill(0, i * this.statusCount, (i + 1) * this.statusCount);
     this.ghostTicks[i] = 0;
     this.markTicks[i] = 0;
+    this.perish[i] = 0;
     return i;
   }
 
@@ -145,6 +151,8 @@ export class EnemyStore {
     this.markSize[i] = this.markSize[last]!;
     this.markMove[i] = this.markMove[last]!;
     this.markBy[i] = this.markBy[last]!;
+    this.perish[i] = this.perish[last]!;
+    this.perishTick[i] = this.perishTick[last]!;
     const n = this.statusCount;
     this.statusTicks.copyWithin(i * n, last * n, (last + 1) * n);
     this.statusBy.copyWithin(i * n, last * n, (last + 1) * n);

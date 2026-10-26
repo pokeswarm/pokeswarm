@@ -105,6 +105,26 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
   };
 }
 
+/** 当たり判定 i がまだ当たれる（当たり直しの間を待っていない）、(x, y) から range の中の一番近い敵。いなければ -1 */
+function nearestUnhitEnemy(world: World, i: number, range: number): number {
+  const { enemies: e, enemyHash, scratch, projectiles: pr } = world;
+  const x = pr.x[i]!;
+  const y = pr.y[i]!;
+  const n = enemyHash.queryRect(x - range, y - range, x + range, y + range, scratch);
+  let best = -1;
+  let bestD2 = range * range;
+  for (let k = 0; k < n; k++) {
+    const j = scratch[k]!;
+    if (e.hp[j]! <= 0 || pr.isBlocked(i, e.id[j]!, world.tick)) continue;
+    const d2 = (e.x[j]! - x) ** 2 + (e.y[j]! - y) ** 2;
+    if (d2 < bestD2 || (d2 === bestD2 && best !== -1 && e.id[j]! < e.id[best]!)) {
+      bestD2 = d2;
+      best = j;
+    }
+  }
+  return best;
+}
+
 /** 射程内の一番近い敵の index。いなければ -1（同じ距離なら id の小さい方。ハッシュの並び順に左右されないように） */
 function nearestEnemy(world: World, x: number, y: number, range: number): number {
   const { enemies: e, enemyHash, scratch } = world;
@@ -565,16 +585,12 @@ function fireBeam(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
   const [ax, ay] = (def.aimStrongest ? aimStrongest(world, p, st.range) : null) ?? aim(world, p, st.range);
   const body = def.body;
   if (body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: ax, dirY: ay, distance: body.lungeDistance, afterimages: body.afterimages });
-  const step = st.spreadDegrees > 0 ? st.spreadDegrees / st.count : 12;
-  for (let k = 0; k < st.count; k++) {
-    const offset = ((k - (st.count - 1) / 2) * step * Math.PI) / 180;
-    const a = Math.atan2(ay, ax) + offset;
-    const dx = Math.cos(a);
-    const dy = Math.sin(a);
-    // 障害物は技も遮る（ビームは障害物の手前まで）
-    const length = rayLengthToObstacle(world, p.x, p.y, dx, dy, st.range);
-    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, shape: SHAPE_LINE, length, dirX: dx, dirY: dy, vx: dx, vy: dy });
-  }
+  // 数が増えても1本のまま、幅を広げる（作者の指摘 2026年10月27日: 本数を増やすと、残る範囲が1本分だけだった）
+  const widen = 1 + world.rules.combat.beamWidthPerExtraCount * Math.max(0, st.count - 1);
+  const b = base(world, p, pm, st);
+  // 障害物は技も遮る（ビームは障害物の手前まで）
+  const length = rayLengthToObstacle(world, p.x, p.y, ax, ay, st.range);
+  world.projectiles.add({ ...b, radius: b.radius * widen, motion: MOTION_FOLLOW, x: p.x, y: p.y, shape: SHAPE_LINE, length, dirX: ax, dirY: ay, vx: ax, vy: ay });
 }
 
 /**
@@ -869,7 +885,8 @@ function fireCross(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   const speed = scaledMoveStats(world, p, pm, st).speed;
   const snake = world.rules.moves[pm.move]!.snake;
   for (let k = 0; k < st.count; k++) {
-    const a = start + (k / st.count) * Math.PI * 2;
+    // うたう: 音符はランダムな向きへ
+    const a = world.rules.moves[pm.move]!.crossRandom ? world.rng.next() * Math.PI * 2 : start + (k / st.count) * Math.PI * 2;
     const vx = Math.cos(a) * speed;
     const vy = Math.sin(a) * speed;
     // 蛇行する弾（ヘドロウェーブ）: 出した場所を ox・oy に覚え、時間から位置を決める。隣どうしで揺れの向きを逆にする
@@ -1135,7 +1152,8 @@ export function moveProjectiles(world: World): void {
       pr.x[i] = pr.ox[i]! + dx;
       pr.y[i] = pr.oy[i]! + dy;
     } else if (motion === MOTION_HOMING) {
-      const t = nearestEnemy(world, pr.x[i]!, pr.y[i]!, 300);
+      // まだ当たっていない一番近い敵を追う（貫通する弾は、当たった敵の次へ進む。前は当たった敵を追い続けて残っていた）
+      const t = nearestUnhitEnemy(world, i, 300);
       if (t !== -1) {
         const dx = e.x[t]! - pr.x[i]!;
         const dy = e.y[t]! - pr.y[i]!;
@@ -1287,7 +1305,17 @@ export function moveProjectiles(world: World): void {
       const critPct = (owner?.mods.critChancePct ?? 0) + st.critChancePct;
       const crit = critPct > 0 && world.rng.next() * 100 < critPct;
       // 一撃（じわれ）: 雑魚だけ。当てたプレイヤーのブラウザの乱数で決め、倒しきる量を送る
-      const instakill = st.instakillChance > 0 && (kind?.rank ?? 'normal') === 'normal' && world.rng.next() < st.instakillChance;
+      const normalEnemy = (kind?.rank ?? 'normal') === 'normal';
+      // ほろびのうた: 1秒以上あけて決まった回数当たった雑魚は、確定で倒れる（ボスには効かない）
+      let perishKill = false;
+      if (def.perishHits && pr.stage[i] === 0 && normalEnemy) {
+        if (e.perish[j] === 0 || world.tick - e.perishTick[j]! >= Math.round(1 / world.dt)) {
+          e.perish[j] = Math.min(255, e.perish[j]! + 1);
+          e.perishTick[j] = world.tick;
+        }
+        perishKill = e.perish[j]! >= def.perishHits;
+      }
+      const instakill = perishKill || (st.instakillChance > 0 && normalEnemy && world.rng.next() < st.instakillChance);
       // たたりめ: 状態異常の敵へのダメージを上げる
       const statusBonus = st.statusBonusPct > 0 && e.hasAnyStatus(j) ? 1 + st.statusBonusPct / 100 : 1;
       const amount = instakill
@@ -1298,6 +1326,8 @@ export function moveProjectiles(world: World): void {
           statusBonus;
       // 吸収（ギガドレインなど）: 与えたダメージの一部を回復する
       if (st.lifestealPct > 0) healPlayer(world, ownerId, (amount * st.lifestealPct) / 100);
+      // 倒したときの効き方（ぜったいれいど: 凍った敵が氷の破片を飛ばす）。倒せると見込んだら起こす
+      if (pr.stage[i] === 0 && !pr.noFx[i] && e.hp[j]! > 0 && e.hp[j]! - amount * damageTakenMultiplier(world, j) <= 0 && def.effects.some((fx) => fx.trigger === 'kill')) fireEffects(world, 'kill', fxSourceOf(world, i, e.x[j]!, e.y[j]!));
       if (world.role === 'guest') {
         world.events.push({ type: 'damageDealt', enemyId: e.id[j]!, amount, by: ownerId, ...fx });
         // 雑魚は自分の画面でも HP を減らし、倒したと見込んだら撃破の知らせを待たずに先に消して見せる（HP はホストが決める）
@@ -1363,7 +1393,7 @@ function hitLocalPlayer(world: World, i: number): void {
  * 術者に、プレイヤーと同じ技を1回出させる（一度に出し終える出し方だけ。続けて撃つ出し方は1発ずつまとめて出す）。
  * count・spreadDegrees は上書き（カメックスのハイドロカノンを一周）
  */
-export function fireCasterMove(world: World, caster: Player, move: number, level: number, over: { count?: number; spreadDegrees?: number; sweepDegreesPerSecond?: number } = {}): void {
+export function fireCasterMove(world: World, caster: Player, move: number, level: number, over: { count?: number; spreadDegrees?: number; sweepDegreesPerSecond?: number; orbitRadius?: number } = {}): void {
   const def = world.rules.moves[move];
   if (!def) return;
   const pm: PlayerMove = { move, level, cooldown: 0, burstLeft: 0, burstTimer: 0 };
@@ -1382,6 +1412,16 @@ export function fireCasterMove(world: World, caster: Player, move: number, level
     if (over.sweepDegreesPerSecond) for (let k = from; k < world.projectiles.count; k++) world.projectiles.ox[k] = (over.sweepDegreesPerSecond * Math.PI) / 180;
   } else {
     ONE_SHOT_FIRE[def.pattern]?.(world, caster, pm, st);
+    // うずを広げずに、決まった距離で回す（色違いのフシギバナ: はなびらのまい。絵はそのまま）
+    if (over.orbitRadius && def.pattern === 'spiral') {
+      const pr = world.projectiles;
+      for (let k = from; k < pr.count; k++) {
+        pr.orbitRadius[k] = over.orbitRadius;
+        pr.ox[k] = 0;
+        pr.x[k] = caster.x + Math.cos(pr.angle[k]!) * over.orbitRadius;
+        pr.y[k] = caster.y + Math.sin(pr.angle[k]!) * over.orbitRadius;
+      }
+    }
   }
   fireSpawnEffects(world, from, world.projectiles.count);
 }

@@ -84,6 +84,10 @@ export interface SimMoveDef {
   readonly delayedBlast?: { readonly seconds: number; readonly sizeMultiplier: number; readonly powerMultiplier: number };
   /** 使うたびに、ランのコインを perUse + perLevel × (レベル − 1) 枚増やす（ネコにこばん） */
   readonly coinGain?: { readonly perUse: number; readonly perLevel: number };
+  /** cross: 向きを1発ごとにランダムにする（うたう） */
+  readonly crossRandom?: boolean;
+  /** この回数当たった雑魚は確定で倒れる（ほろびのうた） */
+  readonly perishHits?: number;
   /** 扇: 数が1増えるごとに扇を広げる度数（本数は増やさない） */
   readonly countWidens?: number;
   /** 扇: 出ている間、向いている方向を追う速さ（度/秒） */

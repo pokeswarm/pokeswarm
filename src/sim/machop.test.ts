@@ -101,12 +101,13 @@ describe('ワンリキーのパンチ', () => {
     for (const f of focusAt) expect(machAt.some((m) => m > f && m < f + pause)).toBe(false);
   });
 
-  it('ばくれつパンチは、材料にした3つのパンチの強化分をすべて受け継ぐ（最大 Lv16 まで）', () => {
+  it('ばくれつパンチは、材料にした3つのパンチの強化分をすべて受け継ぐ（最大 Lv24 まで）', () => {
     const { rules, sim, p, item, move } = setup();
     applyOffer(sim.world, p, { kind: 'itemNew', item: item('fire-stone') });
     applyOffer(sim.world, p, { kind: 'itemNew', item: item('thunder-stone') });
     const max = (key: string) => rules.moves[move(key)]!.levels.length;
-    expect(max('dynamic-punch')).toBe(16);
+    expect(max('dynamic-punch')).toBe(24);
+    expect(max('focus-punch') + max('fire-punch') + max('thunder-punch')).toBe(24);
     p.moves[0] = { move: move('focus-punch'), level: max('focus-punch'), cooldown: 0, burstLeft: 0, burstTimer: 0 };
     p.moves[1]!.level = 3;
     p.moves[2]!.level = 2;

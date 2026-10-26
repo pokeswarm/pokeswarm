@@ -151,6 +151,9 @@ export function fireDelayedExplosion(world: World, index: number, src: FxSource)
 }
 
 function explode(world: World, ex: NonNullable<MoveEffect['explode']>, src: FxSource): void {
+  // 別の技として弾ける（ばくれつパンチの 炎・雷 のスプラッシュ）: 見た目もタイプもその技
+  const as = ex.asMove ? world.rules.moves.findIndex((m) => m.key === ex.asMove) : -1;
+  if (as !== -1) src = { ...src, move: as };
   spawn(world, src, {
     damage: src.damage * ex.powerMultiplier,
     radius: src.size * ex.sizeMultiplier,

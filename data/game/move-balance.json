@@ -40,7 +40,6 @@
     "frenzy-plant"
   ],
   "tierOverrides": {
-    "pound": "derived",
-    "sing": "derived"
+    "pound": "derived"
   }
 }

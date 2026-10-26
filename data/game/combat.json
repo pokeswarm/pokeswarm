@@ -1,4 +1,5 @@
 {
+  "beamWidthPerExtraCount": 0.5,
   "maxProjectiles": 1024,
   "hitMemory": 32,
   "typeMultipliers": {

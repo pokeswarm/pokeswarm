@@ -2136,6 +2136,12 @@
         "originY": 0.91,
         "seconds": 1.6,
         "radius": 16
+      },
+      "effectSprite": {
+        "id": "ice-shard",
+        "fit": "circle",
+        "size": 2,
+        "rotate": "velocity"
       }
     },
     "freeze-dry": {
@@ -2597,27 +2603,21 @@
       },
       "sprite": {
         "id": "note-ring",
-        "fit": "ring",
-        "size": 0.6,
+        "fit": "circle",
+        "size": 1.8,
         "upright": true
       }
     },
     "hyper-voice": {
       "extends": "normal.base",
-      "burstFlash": {
-        "colors": [
-          "#f48fb1",
-          "#ffffff",
-          "#f8bbd0"
-        ],
-        "periodMs": 100,
-        "alpha": 0.28
+      "projectile": {
+        "glowColor": "#f48fb1",
+        "shapeAlpha": 0.7
       },
       "sprite": {
-        "id": "sound-waves",
-        "fit": "circle",
-        "size": 1,
-        "alpha": 0.85
+        "id": "sound-cone",
+        "fit": "cone",
+        "size": 1
       }
     },
     "slack-off": {
@@ -3002,63 +3002,69 @@
       "sprite": {
         "id": "fist-fire",
         "fit": "circle",
-        "size": 1.5
+        "size": 1.6,
+        "rotate": "velocity"
       },
-      "linger": {
-        "spread": 0,
-        "blend": "add",
-        "colors": [
-          "#ffee58",
-          "#ff7043",
-          "#d84315"
-        ],
-        "lifespanMs": [
-          500,
-          900
-        ],
-        "speed": [
-          4,
-          16
-        ],
-        "scale": [
-          0.24,
-          0
-        ],
-        "alpha": [
-          0.95,
-          0
-        ],
-        "gravityY": -45,
-        "perSecond": 7,
-        "fillAlpha": 0.36,
-        "maxPerSecond": 24
+      "effectSprite": {
+        "id": "burst-fire",
+        "fit": "circle",
+        "size": 1.1
       }
     },
     "thunder-punch": {
       "extends": "electric.base",
       "impact": {
         "burst": {
-          "count": 6
+          "count": 8,
+          "colors": [
+            "#000000",
+            "#ffeb3b",
+            "#ffffff",
+            "#212121"
+          ]
         },
         "flash": {
-          "radius": 20,
-          "alpha": 0.25
+          "radius": 22,
+          "alpha": 0.3
         }
       },
       "sprite": {
         "id": "fist-thunder",
         "fit": "circle",
-        "size": 1.6
+        "size": 1.6,
+        "rotate": "velocity"
       },
-      "lightningLine": {
-        "color": "#fffde7",
-        "glowColor": "#ffeb3b",
-        "width": 2.5,
-        "jitter": 3
+      "effectSprite": {
+        "id": "burst-spark",
+        "fit": "circle",
+        "size": 1.1
       }
     },
     "rest": {
       "extends": "normal.base"
+    },
+    "perish-song": {
+      "extends": "normal.base",
+      "projectile": {
+        "glowColor": "#ff9800",
+        "coreColor": "#ffe0b2"
+      },
+      "impact": {
+        "burst": {
+          "count": 6,
+          "colors": [
+            "#ff9800",
+            "#ffcc80",
+            "#ffffff"
+          ]
+        }
+      },
+      "sprite": {
+        "id": "perish-ring",
+        "fit": "ring",
+        "size": 1,
+        "varyTiles": true
+      }
     }
   }
 }

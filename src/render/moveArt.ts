@@ -709,12 +709,31 @@ function psyBeam(): SpriteOut {
  * かえんほうしゃ・バブルこうせん: 扇形に引き伸ばす1枚の絵（右向き。左端が口）。
  * 炎は先へ行くほど広がる舌のような形がゆらめき、泡は大小の泡が散らばる
  */
-function cone(kind: 'flame' | 'bubble'): SpriteOut {
+function cone(kind: 'flame' | 'bubble' | 'sound'): SpriteOut {
   const W = 32;
   const H = 16;
-  const palette = kind === 'flame' ? ['#4a0e05', '#c62828', '#ef6c00', '#ffb300', '#fff176', '#ffffff'] : ['#01395e', '#0288d1', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff'];
+  const palette =
+    kind === 'flame' ? ['#4a0e05', '#c62828', '#ef6c00', '#ffb300', '#fff176', '#ffffff'] : kind === 'sound' ? ['#880e4f', '#ec407a', '#f8bbd0', '#ffffff', '#fce4ec', '#ffffff'] : ['#01395e', '#0288d1', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff'];
   const frames: Grid[] = [];
   for (let f = 0; f < 4; f++) {
+    if (kind === 'sound') {
+      // 音の波（ハイパーボイス）: 扇の中に、根元から外へ進む「)))」の弧（コマで外へ進み、4コマでつながる）
+      const mid = (H - 1) / 2;
+      const g = fill(blank(W, H), (x, y) => {
+        const t = Math.max(0, Math.min(1, x / (W - 1)));
+        const half = (H / 2) * (0.25 + 0.75 * t);
+        if (Math.abs(y - mid) / Math.max(0.5, half) > 1) return -1;
+        // 端ほど後ろへ反らせて「)」の形にする（根元を中心にした弧は細い扇の中ではほぼまっすぐに見える）
+        const r = x - 0.22 * (y - mid) ** 2;
+        const ph = (r - f * 2) / 8;
+        const k = Math.abs(ph - Math.round(ph));
+        if (k < 0.07) return x < 12 ? 3 : 2;
+        if (k < 0.13) return 1;
+        return -1;
+      });
+      frames.push(outline(g, 0));
+      continue;
+    }
     if (kind === 'flame') {
       const g = fill(blank(W, H), (x, y) => {
         const t = Math.max(0, Math.min(1, x / (W - 1)));
@@ -1101,13 +1120,15 @@ function flameSwirl(): SpriteOut {
 }
 
 // ---------------- ボスの技が落ちたときの絵（案 F） ----------------
-type BurstKind = 'ice' | 'meteor' | 'psy' | 'shadow' | 'fire' | 'thunder';
+type BurstKind = 'ice' | 'meteor' | 'psy' | 'shadow' | 'fire' | 'thunder' | 'spark';
 
 /**
  * 落ちた所ではじける絵（5コマ。最後のコマで止めて薄くする）: 真ん中の光が縮み、輪とかけらが外へ広がる。
- * ice（氷のとげ）・meteor（岩と炎）・psy（二重の輪）・shadow（影のもや）・fire（炎のかたまり）・thunder（稲妻が放射状に）
+ * ice（氷のとげ）・meteor（岩と炎）・psy（二重の輪）・shadow（影のもや）・fire（炎のかたまり）・thunder（稲妻が放射状に）・
+ * spark（thunder と同じ形で 黒・黄・白。かみなりパンチのスプラッシュ）
  */
-function burst(kind: BurstKind): SpriteOut {
+function burst(style: BurstKind): SpriteOut {
+  const kind = style === 'spark' ? 'thunder' : style;
   const palettes: Record<BurstKind, string[]> = {
     ice: ['#0d3550', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff'],
     meteor: ['#3e1a08', '#8d4a1f', '#ff7043', '#ffca28', '#fff8e1'],
@@ -1115,6 +1136,7 @@ function burst(kind: BurstKind): SpriteOut {
     shadow: ['#120a1f', '#311b5c', '#5e35b1', '#9575cd', '#d1c4e9'],
     fire: ['#4e1206', '#d84315', '#ff9800', '#ffeb3b', '#fffde7'],
     thunder: ['#3e2f00', '#f9a825', '#ffeb3b', '#fff59d', '#ffffff'],
+    spark: ['#000000', '#212121', '#ffeb3b', '#fff59d', '#ffffff'],
   };
   const r = rng(kind.length * 17 + 3);
   const shards = Array.from({ length: kind === 'fire' || kind === 'meteor' ? 11 : 8 }, (_, k) => ({
@@ -1168,7 +1190,7 @@ function burst(kind: BurstKind): SpriteOut {
       return -1;
     });
   });
-  return { palette: palettes[kind], frameMs: 80, loopFrom: 4, parts: { main: frames.map(toRows) } };
+  return { palette: palettes[style], frameMs: 80, loopFrom: 4, parts: { main: frames.map(toRows) } };
 }
 
 type StreakKind = 'white' | 'electric' | 'fire';
@@ -1403,7 +1425,34 @@ function noteRing(): SpriteOut {
     });
     return outline(g, 0);
   });
-  return { palette, frameMs: 120, parts: { middle: frames.map(toRows) } };
+  // middle は輪に並べる用、main は1つずつ飛ぶ音符（うたう）用
+  return { palette, frameMs: 120, parts: { main: frames.map(toRows), middle: frames.map(toRows) } };
+}
+
+/** ほろびのうた: 輪に沿って並べる、橙の波動の帯と音符（外側＝下ほど明るい。並べてつながるよう、波の周期は W） */
+function perishRing(): SpriteOut {
+  const W = 12;
+  const H = 10;
+  const palette = ['#3b1400', '#e65100', '#ff9800', '#ffcc80', '#ffffff'];
+  const frames: Grid[] = [];
+  for (let f = 0; f < 3; f++) {
+    const g = fill(blank(W, H), (x, y) => {
+      // 音符（帯の内側に1つ。コマで上下に揺れる）
+      const bob = [0, -0.7, 0][f]!;
+      const hx = x - 3.5;
+      const hy = y - 4.2 - bob;
+      if (((hx + hy * 0.4) / 1.7) ** 2 + (hy / 1.2) ** 2 < 1) return 4;
+      if (Math.abs(x - 5) < 0.55 && y - bob > 0.5 && y - bob < 4.2) return 4;
+      if (x > 5 && x < 7.2 && y - bob > 0.5 + (x - 5) * 0.5 && y - bob < 2 + (x - 5) * 0.7) return 3;
+      // 波動の帯（下側）
+      const top = 6 + Math.sin(((x + f * 4) / W) * Math.PI * 2) * 1.2;
+      if (y < top) return -1;
+      const k = (y - top) / (H - top);
+      return k > 0.7 ? 3 : k > 0.35 ? 2 : 1;
+    });
+    frames.push(outline(g, 0));
+  }
+  return { palette, frameMs: 90, parts: { middle: frames.map(toRows) } };
 }
 
 /** ハイパーボイス: 自分を中心に、何重にも外へ広がる音の波（途切れた輪。コマで外へ進み、4コマで1つぶん進んでつながる） */
@@ -2349,6 +2398,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     psybeam: () => psyBeam(),
     'flame-cone': () => cone('flame'),
     'bubble-cone': () => cone('bubble'),
+    'sound-cone': () => cone('sound'),
     'quake-crack': () => quakeCrack(),
     snowflake: () => snowflake(),
     'poison-cloud': () => poisonCloud(),
@@ -2394,6 +2444,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'burst-shadow': () => burst('shadow'),
     'burst-fire': () => burst('fire'),
     'burst-thunder': () => burst('thunder'),
+    'burst-spark': () => burst('spark'),
     'streak-white': () => streak('white'),
     'streak-electric': () => streak('electric'),
     'streak-fire': () => streak('fire'),
@@ -2409,6 +2460,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'spin-spray': () => spinSpray(),
     'note-ring': () => noteRing(),
     'sound-waves': () => soundWaves(),
+    'perish-ring': () => perishRing(),
     'heal-rise': () => healRise(),
     'amnesia-swirl': () => amnesiaSwirl(),
     'rainbow-stars': () => rainbowStars(),

@@ -1,5 +1,5 @@
 {
-  "note": "今は使わない技の定義（作者の決定 2026年10月23日。ゲームは読み込まない）。使うときは data/game/moves.json に戻し、派生と見た目を付ける。はどうだん = ルカリオの固有技の候補、げきりん = カイリューの固有技を はかいこうせん にしたため。ホネブーメラン・ボーンラッシュ = カラカラ・ガラガラ（とルカリオ）の技なので、そのポケモンを入れるまでしまう（作者の決定 2026年10月25日）。からてチョップ・クロスチョップ・にどげり・まわしげり = かくとうの技を選び直したため（作者の決定 2026年10月25日。蹴りの技は破棄）",
+  "note": "今は使わない技の定義（作者の決定 2026年10月23日。ゲームは読み込まない）。使うときは data/game/moves.json に戻し、派生と見た目を付ける。はどうだん = ルカリオの固有技の候補、げきりん = カイリューの固有技を はかいこうせん にしたため。ホネブーメラン・ボーンラッシュ = カラカラ・ガラガラ（とルカリオ）の技なので、そのポケモンを入れるまでしまう（作者の決定 2026年10月25日）。からてチョップ・クロスチョップ・にどげり・まわしげり = かくとうの技を選び直したため（作者の決定 2026年10月25日。蹴りの技は破棄） フリーズドライ = フリーザーの固有技を ぜったいれいど にしたため（作者の決定 2026年10月27日）。",
   "moves": {
     "aura-sphere": {
       "pattern": "homing",
@@ -465,6 +465,72 @@
         "lungeDistance": 8,
         "afterimages": 0
       }
+    },
+    "freeze-dry": {
+      "pattern": "cross",
+      "effect": "freeze-dry",
+      "base": {
+        "power": 43.6,
+        "intervalSeconds": 0.1,
+        "count": 12,
+        "speed": 420,
+        "size": 23,
+        "range": 420,
+        "durationSeconds": 1,
+        "pierce": 6,
+        "hitIntervalSeconds": 0,
+        "knockback": 120,
+        "knockbackSeconds": 0.08,
+        "spreadDegrees": 0,
+        "cooldownSeconds": 1,
+        "statusId": "freeze",
+        "statusChance": 0.35,
+        "statusSeconds": 1.5,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "size": 2,
+          "power": 7.4
+        },
+        {
+          "pierce": 1,
+          "power": 7.3
+        },
+        {
+          "count": 4,
+          "power": 7.3
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": -3.6
+        },
+        {
+          "size": 2,
+          "power": 6.2
+        },
+        {
+          "pierce": 1,
+          "power": 6.2
+        },
+        {
+          "size": 3,
+          "power": 6.2
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "hit",
+          "split": {
+            "sizeMultiplier": 0.6,
+            "powerMultiplier": 0.5,
+            "count": 4,
+            "speed": 300,
+            "durationSeconds": 0.5
+          }
+        }
+      ],
+      "curve": 90
     }
   }
 }

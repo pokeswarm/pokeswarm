@@ -203,6 +203,11 @@ export class RunScene extends Phaser.Scene {
     this.runData = data;
     this.playerViews = new Map();
     this.ghostImages = [];
+    // 地面の道具・箱の絵と右上の強化のアイコン: 前のランの絵はシーンを閉じたときに壊れているので、持ち越さない
+    // （持ち越すと、2回目以降のランで☆を拾ったときに壊れた絵を触って例外になり、描画が止まった。作者の報告 2026年10月26日）
+    this.itemImages.clear();
+    this.boxImages.clear();
+    this.buffIcons = [];
     this.boltView = null;
     this.flashedSerials = new Set();
     this.inbox = [];

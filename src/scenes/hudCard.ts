@@ -2,7 +2,7 @@ import { t } from '../i18n';
 import { windowCss } from '../render/pixelUi';
 import type { Player } from '../sim/entities/player';
 import type { World } from '../sim/world';
-import { itemGains, itemName, moveDetail, moveGains, moveName } from './levelUpPanel';
+import { damageClassBadge, itemGains, itemName, moveDetail, moveGains, moveName } from './levelUpPanel';
 
 /**
  * プレイ画面の技・持ち物のアイコンにマウスを乗せたときの詳細カード（作者の案 2026年10月22日。PC だけ）。
@@ -31,11 +31,13 @@ export class HudCard {
     let level: string;
     const lines: string[] = [];
     let gains: string[] = [];
+    let damageClass: 'physical' | 'special' | null = null;
     if (target.kind === 'move') {
       const pm = p.moves[target.slot];
       if (!pm) return this.hide();
       const max = r.moves[pm.move]!.levels.length;
       name = moveName(world, pm.move);
+      damageClass = r.moves[pm.move]!.damageClass;
       level = t('hudCard.level', { level: pm.level, max });
       lines.push(moveDetail(world, pm.move));
       if (pm.level < max) {
@@ -52,7 +54,7 @@ export class HudCard {
       level = t('hudCard.level', { level: it.level, max: def.maxLevel });
       gains = itemGains(world, it.item, it.level, it.level < def.maxLevel ? it.level + 1 : null);
     }
-    const key = JSON.stringify([iconKey, name, level, lines, gains, left, top]);
+    const key = JSON.stringify([iconKey, name, damageClass, level, lines, gains, left, top]);
     if (key !== this.shownKey) {
       this.shownKey = key;
       const head = document.createElement('div');
@@ -63,7 +65,11 @@ export class HudCard {
       icon.style.cssText = 'width:48px;height:48px;image-rendering:pixelated;flex:none';
       const title = document.createElement('div');
       const n = document.createElement('div');
-      n.textContent = name;
+      n.style.cssText = 'display:flex;align-items:center;gap:8px';
+      const nt = document.createElement('span');
+      nt.textContent = name;
+      n.append(nt);
+      if (damageClass) n.append(damageClassBadge(damageClass, 13));
       const l = document.createElement('div');
       l.textContent = level;
       title.append(n, l);

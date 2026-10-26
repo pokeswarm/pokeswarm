@@ -4357,10 +4357,10 @@
     "hyper-voice": {
       "pattern": "melee",
       "effect": "hyper-voice",
-      "countWidens": 12,
+      "countWidens": 6,
       "followFacing": 300,
       "base": {
-        "power": 13.5,
+        "power": 17.3,
         "intervalSeconds": 0.1,
         "count": 1,
         "speed": 0,
@@ -4376,21 +4376,21 @@
         "statusChance": 0,
         "statusSeconds": 0,
         "lifestealPct": 0,
-        "arcDegrees": 30,
+        "arcDegrees": 15,
         "statusBonusPct": 50
       },
       "levels": [
         {
           "range": 20,
-          "power": 2.1
+          "power": 3
         },
         {
           "count": 1,
-          "power": -6.3
+          "power": -8.3
         },
         {
-          "arcDegrees": 4,
-          "power": 0.9
+          "arcDegrees": 2,
+          "power": 1.3
         },
         {
           "cooldownSeconds": -0.2,
@@ -4398,17 +4398,18 @@
         },
         {
           "count": 1,
-          "power": -2.6
+          "power": -3.3
         },
         {
           "range": 20,
-          "power": 0.4
+          "power": 0.5
         },
         {
           "statusBonusPct": 50,
-          "power": 0.8
+          "power": 1
         }
-      ]
+      ],
+      "sideways": true
     },
     "slack-off": {
       "pattern": "heal",

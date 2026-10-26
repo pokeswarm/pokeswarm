@@ -190,10 +190,13 @@ export class PokemonPicker {
     }
     this.detail.replaceChildren(icon, text);
     // 種族値（作者の決定 2026年10月25日: ポケモンごとの基礎ステータスを見せる）。ゲームでの強さは種族値のランクで決まるので、棒の色をランクで変える
+    // 解放していないポケモンでも同じ大きさの欄を見えないまま置く（作者の指摘 2026年10月27日: 種族値の有無で欄の大きさが変わり、カーソルを動かすたびに画面がずれた）
     const base = generated.pokemon[key]?.baseStats;
-    if (unlocked && base && !compact()) {
+    if (!compact()) {
       text.style.flex = '1';
-      this.detail.append(baseStatsElement(base));
+      const stats = baseStatsElement(base ?? { hp: 0, attack: 0, defense: 0, specialAttack: 0, specialDefense: 0, speed: 0 });
+      if (!unlocked || !base) stats.style.visibility = 'hidden';
+      this.detail.append(stats);
     }
   }
 }

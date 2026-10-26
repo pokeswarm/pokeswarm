@@ -533,14 +533,18 @@ function fireMelee(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     const widen = world.rules.moves[pm.move]!.countWidens ?? 0;
     const arc = st.arcDegrees + widen * Math.max(0, st.count - 1);
     const half = Math.min(Math.PI, (arc * Math.PI) / 360);
-    const n = half >= Math.PI || widen > 0 ? 1 : Math.min(st.count, 2);
+    const sideways = !!world.rules.moves[pm.move]!.sideways;
+    const n = sideways ? 2 : half >= Math.PI || widen > 0 ? 1 : Math.min(st.count, 2);
     // 外へ進む攻撃: 厚さ band の帯が、中心から届く距離まで持続の間に進む
     const reach = st.range + sc.size;
     const band = reachBand(world, pm.move, reach);
     const growth = band > 0 ? (reach - band) / st.durationSeconds : 0;
     for (let k = 0; k < n; k++) {
       const s = k === 0 ? 1 : -1;
-      world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: band > 0 ? band : reach, band, growth, shape: SHAPE_SECTOR, length: half, dirX: fx * s, dirY: fy * s, vx: fx * s, vy: fy * s });
+      // 左右（ハイパーボイス）: 向いている方向に直角な2つの向き
+      const dx = sideways ? -fy * s : fx * s;
+      const dy = sideways ? fx * s : fy * s;
+      world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: band > 0 ? band : reach, band, growth, shape: SHAPE_SECTOR, length: half, dirX: dx, dirY: dy, vx: dx, vy: dy });
     }
     return;
   }
@@ -1176,7 +1180,9 @@ export function moveProjectiles(world: World): void {
       if (follow && pr.shape[i] === SHAPE_SECTOR && pr.stage[i] === 0) {
         const [fx, fy] = axisToUnit(owner.facingX, owner.facingY);
         const cur = Math.atan2(pr.dirY[i]!, pr.dirX[i]!);
-        let diff = Math.atan2(fy, fx) - cur;
+        // 左右へ出す扇（ハイパーボイス）は、向いている方向に直角な向きのうち、今の向きに近い方を追う
+        const side = world.rules.moves[pr.move[i]!]!.sideways ? (pr.dirX[i]! * -fy + pr.dirY[i]! * fx >= 0 ? 1 : -1) : 0;
+        let diff = (side ? Math.atan2(fx * side, -fy * side) : Math.atan2(fy, fx)) - cur;
         while (diff > Math.PI) diff -= Math.PI * 2;
         while (diff < -Math.PI) diff += Math.PI * 2;
         const turn = ((follow * Math.PI) / 180) * world.dt;

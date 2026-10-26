@@ -65,6 +65,7 @@ export function buildSimRules(): SimRules {
       rangeBonusScale: def.rangeBonusScale ?? 1,
       ...(def.countWidens ? { countWidens: def.countWidens } : {}),
       ...(def.crossRandom ? { crossRandom: true } : {}),
+      ...(def.sideways ? { sideways: true } : {}),
       ...(def.perishHits ? { perishHits: def.perishHits } : {}),
       ...(def.followFacing ? { followFacing: def.followFacing } : {}),
       ...(def.coinGain ? { coinGain: def.coinGain } : {}),

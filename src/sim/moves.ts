@@ -86,6 +86,8 @@ export interface SimMoveDef {
   readonly coinGain?: { readonly perUse: number; readonly perLevel: number };
   /** cross: 向きを1発ごとにランダムにする（うたう） */
   readonly crossRandom?: boolean;
+  /** 扇を左右の両方へ出す（ハイパーボイス） */
+  readonly sideways?: boolean;
   /** この回数当たった雑魚は確定で倒れる（ほろびのうた） */
   readonly perishHits?: number;
   /** 扇: 数が1増えるごとに扇を広げる度数（本数は増やさない） */

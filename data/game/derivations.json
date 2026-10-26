@@ -38,7 +38,7 @@
     { "from": "earthquake", "item": "x-defense", "to": "fissure", "line": "rhyhorn" },
     { "from": "psychic", "item": "quick-claw", "to": "future-sight", "line": "abra" },
     { "from": "quick-attack", "item": "light-ball", "to": "volt-tackle", "line": "pikachu", "minLevel": 51 },
-    { "from": "hyper-voice", "item": "water-stone", "to": "perish-song", "line": "lapras" },
+    { "from": "hyper-voice", "item": "metronome", "to": "perish-song", "line": "lapras" },
     { "from": "blizzard", "item": "light-clay", "to": "sheer-cold", "line": "articuno" },
     { "from": "focus-punch", "to": "dynamic-punch", "line": "machop", "forms": ["machamp"], "consumes": ["fire-punch", "thunder-punch"], "inheritLevels": true },
     { "from": "shadow-ball", "item": "light-clay", "to": "hex", "line": "gastly" },

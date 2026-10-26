@@ -989,6 +989,8 @@ export const moveDefSchema = z.object({
   coinGain: z.object({ perUse: z.number().nonnegative(), perLevel: z.number().nonnegative() }).optional(),
   /** cross（十字）: 向きを等しい角度に並べず、1発ごとにランダムにする（うたう: 音符がふわふわ散る） */
   crossRandom: z.boolean().optional(),
+  /** 扇（melee の arcDegrees）を、向いている方向ではなく左右の両方へ1つずつ出す（ハイパーボイス） */
+  sideways: z.boolean().optional(),
   /** この技に（1秒以上あけて）この回数当たった雑魚は、確定で倒れる（ほろびのうた。ボスには効かない） */
   perishHits: z.number().int().positive().optional(),
   /** 扇（melee の arcDegrees）: 数が1増えるごとに、扇の角度をこの度数だけ広げる（本数は増やさない。かえんほうしゃ・バブルこうせん。作者の指摘 2026年10月27日） */

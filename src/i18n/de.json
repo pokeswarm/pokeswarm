@@ -374,6 +374,8 @@
   "donate.noAdvantage": "Spenden bringen keinerlei Vorteile im Spiel, und es gibt nichts, das nur Spendern vorbehalten ist.",
   "donate.open": "Auf Ko-fi unterstützen",
   "donate.notReady": "Bald verfügbar",
+  "damageClass.physical": "Physisch",
+  "damageClass.special": "Speziell",
   "hudCard.level": "Lv. {level} / {max}",
   "hudCard.nextLevel": "Nächstes Level:",
   "hudCard.maxLevel": "Max. Level",

@@ -27,6 +27,8 @@ export interface OfferText {
   icon: string;
   /** このカードを取ると増えるもの（強化: 前のレベルとの差。新しい持ち物: 効果） */
   gains: string[];
+  /** 技の種類（ぶつり／とくしゅ）。技のカードだけ */
+  damageClass?: 'physical' | 'special';
 }
 
 /** 数を「+3」「−0.1」のように符号付きで（小数は2桁まで） */
@@ -127,6 +129,17 @@ function modifierLines(world: World, mods: Modifiers): string[] {
   return out;
 }
 
+/**
+ * 技の種類（ぶつり／とくしゅ）の札。技名のすぐ右に置く（作者の依頼 2026年10月27日: どちらの攻撃力で強くなるか見えるように）。
+ * 色は ぶつり = 赤橙・とくしゅ = 青
+ */
+export function damageClassBadge(damageClass: 'physical' | 'special', fontPx = 16): HTMLSpanElement {
+  const b = document.createElement('span');
+  b.textContent = t(`damageClass.${damageClass}`);
+  b.style.cssText = `flex:none;display:inline-block;font-size:${fontPx}px;line-height:1.2;padding:1px 6px;border-radius:3px;color:#ffffff;background:${damageClass === 'physical' ? '#d0502c' : '#3a6cc8'};vertical-align:middle;white-space:nowrap`;
+  return b;
+}
+
 export function moveName(world: World, move: number): string {
   const key = world.rules.moves[move]!.key;
   return localName(generated.moves[key]?.names, getLocale(), key);
@@ -154,7 +167,7 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
   const base = { special: false, evolvable, gains: [] as string[] };
   switch (offer.kind) {
     case 'moveNew':
-      return { ...base, icon: moveIconKey(r, offer.move), kind: t('upgrade.kind.moveNew'), name: moveName(world, offer.move), level: t('levelUp.new'), detail: moveDetail(world, offer.move) };
+      return { ...base, icon: moveIconKey(r, offer.move), kind: t('upgrade.kind.moveNew'), name: moveName(world, offer.move), level: t('levelUp.new'), detail: moveDetail(world, offer.move), damageClass: r.moves[offer.move]!.damageClass };
     case 'moveUp': {
       const pm = p.moves[offer.slot]!;
       return {
@@ -162,6 +175,7 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
         icon: moveIconKey(r, pm.move),
         kind: t('upgrade.kind.moveUp'),
         name: moveName(world, pm.move),
+        damageClass: r.moves[pm.move]!.damageClass,
         level: t('levelUp.levelChange', { from: pm.level, to: pm.level + 1 }),
         // 強化は増えるものだけ（説明はできるだけ短く。作者の決定）
         detail: '',
@@ -196,6 +210,7 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
         icon: moveIconKey(r, offer.to),
         kind: t(offer.unique ? 'upgrade.kind.unique' : 'upgrade.kind.derive'),
         name: moveName(world, offer.to),
+        damageClass: r.moves[offer.to]!.damageClass,
         level: t('levelUp.new'),
         detail: moveDetail(world, offer.to),
         special: true,
@@ -295,6 +310,7 @@ export class LevelUpPanel {
       const nameText = document.createElement('span');
       nameText.textContent = o.name;
       name.append(icon, nameText);
+      if (o.damageClass) name.append(damageClassBadge(o.damageClass));
       const lv = document.createElement('div');
       lv.style.cssText = 'font-size:16px';
       lv.textContent = `${i + 1}　${o.level}`;

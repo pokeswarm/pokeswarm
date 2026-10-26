@@ -374,6 +374,8 @@
   "donate.noAdvantage": "Le donazioni non danno alcun vantaggio nel gioco e non c'è nulla riservato a chi dona.",
   "donate.open": "Sostieni su Ko-fi",
   "donate.notReady": "Prossimamente",
+  "damageClass.physical": "Fisico",
+  "damageClass.special": "Speciale",
   "hudCard.level": "Lv. {level} / {max}",
   "hudCard.nextLevel": "Al prossimo livello:",
   "hudCard.maxLevel": "Livello massimo",

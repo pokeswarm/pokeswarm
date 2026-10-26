@@ -395,6 +395,8 @@
   "donate.noAdvantage": "寄付をしても、ゲームの中で有利になることや、寄付した人だけのものは一切ありません。",
   "donate.open": "Ko-fi で応援する",
   "donate.notReady": "準備中",
+  "damageClass.physical": "ぶつり",
+  "damageClass.special": "とくしゅ",
   "hudCard.level": "Lv {level} / {max}",
   "hudCard.nextLevel": "次のレベルで:",
   "hudCard.maxLevel": "最大レベル",

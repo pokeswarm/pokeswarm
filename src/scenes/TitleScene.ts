@@ -218,7 +218,9 @@ export class TitleScene extends Phaser.Scene {
       account.destroy();
       footer.destroy();
     });
-    audio.bgm.play(bgmConfig.scenes.title);
+    // 開発版だけ: ?bgm=johto-route で、タイトル画面の曲をその曲にする（作った曲を聞くため）
+    const devBgm = import.meta.env.DEV ? new URLSearchParams(window.location.search).get('bgm') : null;
+    audio.bgm.play(devBgm && bgmConfig.tracks[devBgm] ? devBgm : bgmConfig.scenes.title);
     session.setPresence('menu');
   }
 }

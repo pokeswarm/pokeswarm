@@ -115,6 +115,8 @@ Output a square image.
 
 試作は **`route`（区間0・最初に聞く曲）と `red`（レッド戦）の2曲**から。方向が決まったら残りを作る。
 
+- 試作した（2026年10月27日）: `data/audio/music/johto-route.json`（ニ長調・144）・`johto-red.json`（ロ短調・168）。曲の名前はカントーと重ならないよう `johto-` を付ける（残りの曲も同じ）。localhost のタイトル画面で `?bgm=johto-route`・`?bgm=johto-red` を付けると聞ける（開発版だけ）。
+
 | 曲 | 区間 | 感じ |
 |---|---|---|
 | `route` | 0 | 明るく軽い、旅立ち。中くらいのテンポ |

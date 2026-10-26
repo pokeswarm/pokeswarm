@@ -1,0 +1,31 @@
+{
+  "key": "enemy/hoothoot",
+  "dex": 163,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 32,
+      "frameHeight": 40,
+      "durations": [
+        10,
+        6,
+        6,
+        6,
+        8
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

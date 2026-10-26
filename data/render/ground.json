@@ -19,47 +19,42 @@
     },
     "elite_hall": {
       "file": "map/kanto/elite_hall.png"
+    },
+    "johto_meadow": {
+      "file": "map/johto/meadow.png"
+    },
+    "johto_cave": {
+      "file": "map/johto/cave.png"
+    },
+    "johto_forest": {
+      "file": "map/johto/forest.png"
+    },
+    "johto_burned": {
+      "file": "map/johto/burned.png"
+    },
+    "johto_beach": {
+      "file": "map/johto/beach.png"
+    },
+    "johto_lighthouse": {
+      "file": "map/johto/lighthouse.png"
+    },
+    "johto_lake_meadow": {
+      "file": "map/johto/lake_meadow.png"
+    },
+    "johto_ice": {
+      "file": "map/johto/ice.png"
+    },
+    "johto_dragon_cave": {
+      "file": "map/johto/dragon_cave.png"
+    },
+    "johto_victory_rock": {
+      "file": "map/johto/victory_rock.png"
+    },
+    "johto_elite_hall": {
+      "file": "map/johto/elite_hall.png"
+    },
+    "johto_snow": {
+      "file": "map/johto/snow.png"
     }
-  },
-  "waves": [
-    {
-      "tile": "meadow"
-    },
-    {
-      "tile": "cave"
-    },
-    {
-      "tile": "meadow"
-    },
-    {
-      "tile": "night_forest"
-    },
-    {
-      "tile": "wasteland"
-    },
-    {
-      "tile": "meadow"
-    },
-    {
-      "tile": "beach"
-    },
-    {
-      "tile": "meadow"
-    },
-    {
-      "tile": "cave"
-    },
-    {
-      "tile": "elite_hall"
-    },
-    {
-      "tile": "elite_hall"
-    },
-    {
-      "tile": "elite_hall"
-    },
-    {
-      "tile": "elite_hall"
-    }
-  ]
+  }
 }

@@ -671,6 +671,655 @@
       "xp": 0,
       "spriteScale": 2.2,
       "drop": "rare-candy"
+    },
+    {
+      "id": "sentret",
+      "sprite": "enemy/sentret",
+      "hp": 7,
+      "moveSpeed": 37,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "ledyba",
+      "sprite": "enemy/ledyba",
+      "hp": 7,
+      "moveSpeed": 49,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "spinarak",
+      "sprite": "enemy/spinarak",
+      "hp": 7,
+      "moveSpeed": 41,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "hoppip",
+      "sprite": "enemy/hoppip",
+      "hp": 7,
+      "moveSpeed": 48,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "weedle",
+      "sprite": "enemy/weedle",
+      "hp": 7,
+      "moveSpeed": 48,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "sandshrew",
+      "sprite": "enemy/sandshrew",
+      "hp": 7,
+      "moveSpeed": 44,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "wooper",
+      "sprite": "enemy/wooper",
+      "hp": 7,
+      "moveSpeed": 35,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "slowpoke",
+      "sprite": "enemy/slowpoke",
+      "hp": 7,
+      "moveSpeed": 35,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "oddish",
+      "sprite": "enemy/oddish",
+      "hp": 7,
+      "moveSpeed": 41,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "pineco",
+      "sprite": "enemy/pineco",
+      "hp": 7,
+      "moveSpeed": 35,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "exeggcute",
+      "sprite": "enemy/exeggcute",
+      "hp": 7,
+      "moveSpeed": 44,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "psyduck",
+      "sprite": "enemy/psyduck",
+      "hp": 7,
+      "moveSpeed": 49,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "hoothoot",
+      "sprite": "enemy/hoothoot",
+      "hp": 7,
+      "moveSpeed": 48,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "yanma",
+      "sprite": "enemy/yanma",
+      "hp": 7,
+      "moveSpeed": 63,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "growlithe",
+      "sprite": "enemy/growlithe",
+      "hp": 7,
+      "moveSpeed": 51,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "stantler",
+      "sprite": "enemy/stantler",
+      "hp": 7,
+      "moveSpeed": 60,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "koffing",
+      "sprite": "enemy/koffing",
+      "hp": 7,
+      "moveSpeed": 42,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "magmar",
+      "sprite": "enemy/magmar",
+      "hp": 7,
+      "moveSpeed": 63,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "krabby",
+      "sprite": "enemy/krabby",
+      "hp": 7,
+      "moveSpeed": 48,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "shuckle",
+      "sprite": "enemy/shuckle",
+      "hp": 7,
+      "moveSpeed": 32,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "mareep",
+      "sprite": "enemy/mareep",
+      "hp": 7,
+      "moveSpeed": 42,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "flaaffy",
+      "sprite": "enemy/flaaffy",
+      "hp": 7,
+      "moveSpeed": 46,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "voltorb",
+      "sprite": "enemy/voltorb",
+      "hp": 7,
+      "moveSpeed": 65,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "jigglypuff",
+      "sprite": "enemy/jigglypuff",
+      "hp": 7,
+      "moveSpeed": 37,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "hoothoot-2",
+      "species": "hoothoot",
+      "sprite": "enemy/hoothoot",
+      "hp": 7,
+      "moveSpeed": 48,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "noctowl",
+      "sprite": "enemy/noctowl",
+      "hp": 7,
+      "moveSpeed": 55,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "gastly",
+      "sprite": "enemy/gastly",
+      "hp": 7,
+      "moveSpeed": 58,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "delibird",
+      "sprite": "enemy/delibird",
+      "hp": 7,
+      "moveSpeed": 56,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "sneasel",
+      "sprite": "enemy/sneasel",
+      "hp": 7,
+      "moveSpeed": 70,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "smoochum",
+      "sprite": "enemy/smoochum",
+      "hp": 7,
+      "moveSpeed": 53,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "swinub",
+      "sprite": "enemy/swinub",
+      "hp": 7,
+      "moveSpeed": 48,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "zubat-2",
+      "species": "zubat",
+      "sprite": "enemy/zubat",
+      "hp": 7,
+      "moveSpeed": 49,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "gligar",
+      "sprite": "enemy/gligar",
+      "hp": 7,
+      "moveSpeed": 60,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "skarmory",
+      "sprite": "enemy/skarmory",
+      "hp": 7,
+      "moveSpeed": 55,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "donphan",
+      "sprite": "enemy/donphan",
+      "hp": 7,
+      "moveSpeed": 48,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "teddiursa",
+      "sprite": "enemy/teddiursa",
+      "hp": 7,
+      "moveSpeed": 44,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "dratini",
+      "sprite": "enemy/dratini",
+      "hp": 7,
+      "moveSpeed": 48,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "sandslash",
+      "sprite": "enemy/sandslash",
+      "hp": 7,
+      "moveSpeed": 53,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "ursaring",
+      "sprite": "enemy/ursaring",
+      "hp": 7,
+      "moveSpeed": 49,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "jynx-2",
+      "species": "jynx",
+      "sprite": "enemy/jynx",
+      "hp": 7,
+      "moveSpeed": 63,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "exeggutor",
+      "sprite": "enemy/exeggutor",
+      "hp": 7,
+      "moveSpeed": 49,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "ariados",
+      "sprite": "enemy/ariados",
+      "hp": 7,
+      "moveSpeed": 44,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "forretress",
+      "sprite": "enemy/forretress",
+      "hp": 7,
+      "moveSpeed": 44,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "muk",
+      "sprite": "enemy/muk",
+      "hp": 7,
+      "moveSpeed": 48,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "hitmontop",
+      "sprite": "enemy/hitmontop",
+      "hp": 7,
+      "moveSpeed": 55,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "onix-2",
+      "species": "onix",
+      "sprite": "enemy/onix",
+      "hp": 7,
+      "moveSpeed": 55,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "umbreon",
+      "sprite": "enemy/umbreon",
+      "hp": 7,
+      "moveSpeed": 53,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "vileplume",
+      "sprite": "enemy/vileplume",
+      "hp": 7,
+      "moveSpeed": 48,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "gengar",
+      "sprite": "enemy/gengar",
+      "hp": 7,
+      "moveSpeed": 69,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "murkrow",
+      "sprite": "enemy/murkrow",
+      "hp": 7,
+      "moveSpeed": 62,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "charizard",
+      "sprite": "enemy/charizard",
+      "hp": 7,
+      "moveSpeed": 65,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "dragonair-2",
+      "species": "dragonair",
+      "sprite": "enemy/dragonair",
+      "hp": 7,
+      "moveSpeed": 55,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "quagsire",
+      "sprite": "enemy/quagsire",
+      "hp": 7,
+      "moveSpeed": 42,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "ursaring-2",
+      "species": "ursaring",
+      "sprite": "enemy/ursaring",
+      "hp": 7,
+      "moveSpeed": 49,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "golduck",
+      "sprite": "enemy/golduck",
+      "hp": 7,
+      "moveSpeed": 60,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "donphan-2",
+      "species": "donphan",
+      "sprite": "enemy/donphan",
+      "hp": 7,
+      "moveSpeed": 48,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "rapidash",
+      "sprite": "enemy/rapidash",
+      "hp": 7,
+      "moveSpeed": 67,
+      "radius": 10,
+      "contactDamage": 6
+    },
+    {
+      "id": "johto-midboss-pidgeotto",
+      "species": "pidgeotto",
+      "rank": "midboss",
+      "sprite": "enemy/pidgeotto",
+      "hp": 600,
+      "moveSpeed": 45,
+      "radius": 30,
+      "contactDamage": 18,
+      "xp": 0,
+      "spriteScale": 2.2,
+      "drop": "rare-candy"
+    },
+    {
+      "id": "johto-midboss-scyther",
+      "species": "scyther",
+      "rank": "midboss",
+      "sprite": "enemy/scyther",
+      "hp": 1050,
+      "moveSpeed": 55,
+      "radius": 26,
+      "contactDamage": 19,
+      "xp": 0,
+      "spriteScale": 2.2,
+      "drop": "rare-candy"
+    },
+    {
+      "id": "johto-midboss-miltank",
+      "species": "miltank",
+      "rank": "midboss",
+      "sprite": "enemy/miltank",
+      "hp": 1650,
+      "moveSpeed": 60,
+      "radius": 24,
+      "contactDamage": 21,
+      "xp": 0,
+      "spriteScale": 2.2,
+      "drop": "rare-candy"
+    },
+    {
+      "id": "johto-midboss-gengar",
+      "species": "gengar",
+      "rank": "midboss",
+      "sprite": "enemy/gengar",
+      "hp": 2700,
+      "moveSpeed": 45,
+      "radius": 26,
+      "contactDamage": 22,
+      "xp": 0,
+      "spriteScale": 2.2,
+      "drop": "rare-candy"
+    },
+    {
+      "id": "johto-midboss-poliwrath",
+      "species": "poliwrath",
+      "rank": "midboss",
+      "sprite": "enemy/poliwrath",
+      "hp": 3900,
+      "moveSpeed": 45,
+      "radius": 28,
+      "contactDamage": 23,
+      "xp": 0,
+      "spriteScale": 2.2,
+      "drop": "rare-candy"
+    },
+    {
+      "id": "johto-midboss-steelix",
+      "species": "steelix",
+      "rank": "midboss",
+      "sprite": "enemy/steelix",
+      "hp": 5400,
+      "moveSpeed": 60,
+      "radius": 24,
+      "contactDamage": 24,
+      "xp": 0,
+      "spriteScale": 2.2,
+      "drop": "rare-candy"
+    },
+    {
+      "id": "johto-midboss-piloswine",
+      "species": "piloswine",
+      "rank": "midboss",
+      "sprite": "enemy/piloswine",
+      "hp": 7200,
+      "moveSpeed": 70,
+      "radius": 28,
+      "contactDamage": 25,
+      "xp": 0,
+      "spriteScale": 2.2,
+      "drop": "rare-candy"
+    },
+    {
+      "id": "johto-midboss-kingdra",
+      "species": "kingdra",
+      "rank": "midboss",
+      "sprite": "enemy/kingdra",
+      "hp": 10500,
+      "moveSpeed": 45,
+      "radius": 32,
+      "contactDamage": 27,
+      "xp": 0,
+      "spriteScale": 2.4,
+      "drop": "rare-candy"
+    },
+    {
+      "id": "johto-boss-xatu",
+      "species": "xatu",
+      "rank": "boss",
+      "sprite": "enemy/xatu",
+      "hp": 19600,
+      "moveSpeed": 60,
+      "radius": 30,
+      "contactDamage": 32,
+      "xp": 300,
+      "spriteScale": 2.6
+    },
+    {
+      "id": "johto-boss-crobat",
+      "species": "crobat",
+      "rank": "boss",
+      "sprite": "enemy/crobat",
+      "hp": 29400,
+      "moveSpeed": 80,
+      "radius": 30,
+      "contactDamage": 34,
+      "xp": 300,
+      "spriteScale": 2.6
+    },
+    {
+      "id": "johto-boss-machamp",
+      "species": "machamp",
+      "rank": "boss",
+      "sprite": "enemy/machamp",
+      "hp": 37800,
+      "moveSpeed": 60,
+      "radius": 34,
+      "contactDamage": 36,
+      "xp": 300,
+      "spriteScale": 2.6
+    },
+    {
+      "id": "johto-boss-houndoom",
+      "species": "houndoom",
+      "rank": "boss",
+      "sprite": "enemy/houndoom",
+      "hp": 44800,
+      "moveSpeed": 75,
+      "radius": 30,
+      "contactDamage": 38,
+      "xp": 300,
+      "spriteScale": 2.6
+    },
+    {
+      "id": "johto-boss-dragonite",
+      "species": "dragonite",
+      "rank": "boss",
+      "sprite": "enemy/dragonite",
+      "hp": 52000,
+      "moveSpeed": 70,
+      "radius": 36,
+      "contactDamage": 40,
+      "xp": 300,
+      "spriteScale": 2.6
+    },
+    {
+      "id": "johto-boss-pikachu",
+      "species": "pikachu",
+      "rank": "boss",
+      "sprite": "enemy/pikachu",
+      "hp": 60000,
+      "moveSpeed": 120,
+      "radius": 26,
+      "contactDamage": 42,
+      "xp": 300,
+      "spriteScale": 2.4
+    },
+    {
+      "id": "swarm-unown",
+      "species": "unown",
+      "sprite": "enemy/unown",
+      "hp": 10,
+      "moveSpeed": 60,
+      "radius": 10,
+      "contactDamage": 8,
+      "xp": 1
     }
   ]
 }

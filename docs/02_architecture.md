@@ -443,3 +443,17 @@ pokeswarm/
 - ボスの技が落ちたときの絵（案 F）: `hazardStruck` に輪の内側の半径を足し、RunScene が `strike` のある演出なら、別の `MoveSprites`（`drawItems`。当たり判定でなく位置と大きさを渡して描く）で seconds の間出す。`MoveSprites.draw` も `drawItems` を使う形にした。
 - 1ドットの大きさをそろえる（2026年10月24日。`04` 5.5）: `MoveSprites` は絵ごとに、当たり判定の大きさから「1ドット＝`dot`」になる細かさの段を選び、無ければ Web Worker（`moveArtWorker.ts`）に描き直しを頼んで、それまでは一番近い段を使う。描き終えた絵は画素の配列にまとめてテクスチャにする（1フレーム 4 ミリ秒まで）。`EffectRenderer`・`HitShapes` の Blocky フィルターの大きさは、`applyZoom` で拡大率に合わせて変える。
 - 横向きのスマホ（2026年10月24日、作者のスマホの画面から）: タイトルの下の注意書きは、画面の大きさが変わるたびに作り直す（縦向きで開いてから横向きにすると全文のままで、メニューに重なっていた）。ポケモン選択は、低い画面では左に一覧・右に詳しい欄と最初の持ち物とボタンの2列にし、低い画面かどうかが変わったら作り直す。
+
+## 16. 地方ごとのステージ（ジョウトの J2。2026年10月27日）
+
+カントーだけを前提にしていた「区間の組」を、地方ごとに持てる形にした。
+
+- **地方のステージ** = `data/regions/<地方>.json`（スキーマ `regionStageSchema`）。区間ごとの中身を1か所に並べる（ストーリーチャートと同じ形）:
+  - `sections[]`: 区間ごとに `wave`（雑魚の種類・出現の速さ・倍率など。前の `spawn.json` の `waves[]` の1つ）・`tile`（地面。`ground.json` の `tiles` の ID）・`bgm`（曲。`bgm.json` の `tracks` の ID か null）・`obstacles`（障害物の見た目）・`night`（夜の区間。画面を暗くする）。
+  - `durationSeconds`（ランの長さ）・`bosses`・`swarms`・`legendary`（伝説戦。無い地方は書かない）・`legendaryBgm`。
+- **地方に関わらない物**は今までのファイルに残す: `spawn.json`（出現の距離・上限・押し合い・人数の補正など。`waves` を外した）、`stage.json`（ボスの範囲技の一覧 `moves`・`bossRules`・`endDelaySeconds`）、`ground.json`（`tileScale`・`fadeSeconds`・`tiles`。ジョウトのタイル ID は `johto_` を付ける）、`bgm.json`（`tracks`・`scenes`）、`obstacles.json`（置き方）。敵の種類 `enemies.json` も全地方で1つ（カントーとジョウトで種族が同じボスは、`johto-` を付けた別の ID）。
+- 読み込み（`src/data/index.ts`）: `regionStage(id)` が、共通の設定と地方のステージを合わせて、今までと同じ形の `spawn`・`stage`・`ground`・`obstacles`・`bgmRun` を返す。シミュレーション（`src/sim/`）は `SimRules` を受け取るだけなので変えていない。`buildSimRules(region)` がその地方の `spawn`・`stage`・`obstacles` を入れる（引数を省くとカントー。テストと自動プレイヤーはカントーのまま）。前の `spawnConfig`・`stageConfig`・`groundConfig`・`obstacleConfig` は、カントーの組として残した（タイトル画面の地面など）。
+- ファイルをまたぐ検証（区間の数・ボスの区間・曲・タイル・障害物の絵）は、地方のステージごとに行う。
+- ランの地方: `RunSceneData.region`。ソロは地方の選択 → ポケモンの選択から、協力プレイは部屋の `region`（ホストが選んだ地方。ゲストも部屋から受け取る）から渡す。
+- 区間6 のように1つの場所の途中で場面が変わる所は、**区間を2つに分ける**（6a は中ボス無しで `durationSeconds` 60秒、6b の頭から 40秒でヤナギ）。区間の頭で地面・曲・雑魚・明るさが切り替わる今の仕組みのまま作れる。
+- 開発版だけ: 地方の選択の URL に `?regions=all` を付けると、ステージのある地方は Coming soon・解放の条件に関わらず選べる（ジョウトを作っている間の確認用）。

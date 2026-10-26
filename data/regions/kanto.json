@@ -1,0 +1,631 @@
+{
+  "durationSeconds": 1500,
+  "sections": [
+    {
+      "tile": "meadow",
+      "bgm": "route",
+      "obstacles": [
+        "tree",
+        "rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 1,
+        "minimum": 15,
+        "capPerPlayer": 60,
+        "hpMultiplier": 1,
+        "damageMultiplier": 1,
+        "xpMultiplier": 1,
+        "kinds": [
+          "rattata",
+          "pidgey",
+          "caterpie",
+          "metapod"
+        ]
+      }
+    },
+    {
+      "tile": "cave",
+      "bgm": "cave",
+      "obstacles": [
+        "stalagmite",
+        "rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 3,
+        "minimum": 40,
+        "capPerPlayer": 120,
+        "hpMultiplier": 1.1,
+        "damageMultiplier": 1.15,
+        "xpMultiplier": 1.3,
+        "kinds": [
+          "pidgey",
+          "spearow",
+          "zubat",
+          "geodude",
+          "paras"
+        ]
+      }
+    },
+    {
+      "tile": "meadow",
+      "bgm": "route",
+      "obstacles": [
+        "tree",
+        "rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 5,
+        "minimum": 70,
+        "capPerPlayer": 180,
+        "hpMultiplier": 1.2,
+        "damageMultiplier": 1.3,
+        "xpMultiplier": 1.6,
+        "kinds": [
+          "mankey",
+          "meowth",
+          "bellsprout",
+          "venonat",
+          "magnemite"
+        ]
+      }
+    },
+    {
+      "tile": "night_forest",
+      "bgm": "forest",
+      "obstacles": [
+        "dark-tree"
+      ],
+      "wave": {
+        "spawnPerSecond": 7,
+        "minimum": 100,
+        "capPerPlayer": 240,
+        "hpMultiplier": 1.55,
+        "damageMultiplier": 1.45,
+        "xpMultiplier": 1.9,
+        "kinds": [
+          "vulpix",
+          "cubone",
+          "drowzee",
+          "ekans"
+        ]
+      }
+    },
+    {
+      "tile": "wasteland",
+      "bgm": "route",
+      "obstacles": [
+        "red-rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 9,
+        "minimum": 140,
+        "capPerPlayer": 300,
+        "hpMultiplier": 1.85,
+        "damageMultiplier": 1.6,
+        "xpMultiplier": 2.2,
+        "kinds": [
+          "doduo",
+          "raticate",
+          "chansey",
+          "tauros",
+          "scyther"
+        ]
+      }
+    },
+    {
+      "tile": "meadow",
+      "bgm": "route",
+      "obstacles": [
+        "tree",
+        "rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 11,
+        "minimum": 180,
+        "capPerPlayer": 360,
+        "hpMultiplier": 2.45,
+        "damageMultiplier": 1.75,
+        "xpMultiplier": 2.5,
+        "kinds": [
+          "pidgeotto",
+          "ditto",
+          "grimer"
+        ]
+      }
+    },
+    {
+      "tile": "beach",
+      "bgm": "sea",
+      "obstacles": [
+        "beach-rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 13,
+        "minimum": 230,
+        "capPerPlayer": 420,
+        "hpMultiplier": 2.9,
+        "damageMultiplier": 1.9,
+        "xpMultiplier": 2.8,
+        "kinds": [
+          "tentacool",
+          "magikarp",
+          "horsea",
+          "seel",
+          "ponyta"
+        ]
+      }
+    },
+    {
+      "tile": "meadow",
+      "bgm": "route",
+      "obstacles": [
+        "tree",
+        "rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 15,
+        "minimum": 280,
+        "capPerPlayer": 480,
+        "hpMultiplier": 3.8,
+        "damageMultiplier": 2.05,
+        "xpMultiplier": 3.1,
+        "kinds": [
+          "fearow",
+          "tangela",
+          "nidorino",
+          "nidorina"
+        ]
+      }
+    },
+    {
+      "tile": "cave",
+      "bgm": "victory-road",
+      "obstacles": [
+        "stalagmite",
+        "rock"
+      ],
+      "wave": {
+        "durationSeconds": 45,
+        "spawnPerSecond": 17,
+        "minimum": 330,
+        "capPerPlayer": 520,
+        "hpMultiplier": 4.4,
+        "damageMultiplier": 2.2,
+        "xpMultiplier": 3.4,
+        "kinds": [
+          "golbat",
+          "graveler",
+          "marowak",
+          "venomoth"
+        ]
+      }
+    },
+    {
+      "tile": "elite_hall",
+      "bgm": "elite-four",
+      "obstacles": [
+        "pillar"
+      ],
+      "wave": {
+        "allowBossSpecies": true,
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 5.6,
+        "damageMultiplier": 2.4,
+        "xpMultiplier": 3.7,
+        "kinds": [
+          "dewgong",
+          "cloyster",
+          "slowbro",
+          "jynx"
+        ]
+      }
+    },
+    {
+      "tile": "elite_hall",
+      "bgm": "elite-four",
+      "obstacles": [
+        "pillar"
+      ],
+      "wave": {
+        "allowBossSpecies": true,
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 7.2,
+        "damageMultiplier": 2.65,
+        "xpMultiplier": 4,
+        "kinds": [
+          "onix",
+          "hitmonlee",
+          "hitmonchan"
+        ]
+      }
+    },
+    {
+      "tile": "elite_hall",
+      "bgm": "elite-four",
+      "obstacles": [
+        "pillar"
+      ],
+      "wave": {
+        "allowBossSpecies": true,
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 9,
+        "damageMultiplier": 2.9,
+        "xpMultiplier": 4.3,
+        "kinds": [
+          "haunter",
+          "arbok"
+        ]
+      }
+    },
+    {
+      "tile": "elite_hall",
+      "bgm": "elite-four",
+      "obstacles": [
+        "pillar"
+      ],
+      "wave": {
+        "allowBossSpecies": true,
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 11.2,
+        "damageMultiplier": 3.2,
+        "xpMultiplier": 4.6,
+        "kinds": [
+          "gyarados",
+          "dragonair",
+          "aerodactyl"
+        ]
+      }
+    }
+  ],
+  "bosses": [
+    {
+      "wave": 0,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "midboss-onix"
+    },
+    {
+      "wave": 1,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "midboss-starmie"
+    },
+    {
+      "wave": 2,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "midboss-raichu"
+    },
+    {
+      "wave": 3,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "midboss-vileplume"
+    },
+    {
+      "wave": 4,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "midboss-weezing"
+    },
+    {
+      "wave": 5,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "midboss-alakazam"
+    },
+    {
+      "wave": 6,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "midboss-arcanine"
+    },
+    {
+      "wave": 7,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "midboss-rhydon"
+    },
+    {
+      "wave": 9,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "kind": "boss-lapras",
+      "moves": [
+        "blizzard",
+        "articuno-blizzard"
+      ],
+      "moveIntervalSeconds": 2.8
+    },
+    {
+      "wave": 10,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "kind": "boss-machamp",
+      "moves": [
+        "earthquake",
+        "legend-dash",
+        "earthquake"
+      ],
+      "moveIntervalSeconds": 2.4,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.7,
+        "doubleChance": 0.2
+      }
+    },
+    {
+      "wave": 11,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "kind": "boss-gengar",
+      "moves": [
+        "shadow-ball",
+        "mewtwo-teleport",
+        "mewtwo-psywave"
+      ],
+      "moveIntervalSeconds": 2,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.4,
+        "doubleChance": 0.3
+      }
+    },
+    {
+      "wave": 12,
+      "afterSeconds": 40,
+      "required": true,
+      "kind": "boss-dragonite",
+      "moves": [
+        "draco-meteor",
+        "legend-beam",
+        "zapdos-dash",
+        "legend-nova"
+      ],
+      "moveIntervalSeconds": 1.8,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.15,
+        "doubleChance": 0.4
+      }
+    }
+  ],
+  "swarms": [
+    {
+      "atSeconds": 75,
+      "everySeconds": 150,
+      "untilSeconds": 1000,
+      "kind": "swarm-beedrill",
+      "pattern": "rush",
+      "count": 25,
+      "spacing": 22,
+      "speed": 300
+    },
+    {
+      "atSeconds": 45,
+      "everySeconds": 20,
+      "untilSeconds": 1180,
+      "kind": "swarm-voltorb",
+      "pattern": "bomber",
+      "count": 1,
+      "triggerRange": 110,
+      "move": "self-destruct"
+    }
+  ],
+  "legendary": {
+    "chance": 0.5,
+    "kinds": [
+      "legend-mewtwo",
+      "legend-mew",
+      "legend-articuno",
+      "legend-zapdos",
+      "legend-moltres"
+    ],
+    "moves": [
+      "legend-dash",
+      "legend-beam",
+      "legend-nova",
+      "legend-meteor"
+    ],
+    "moveSets": {
+      "legend-mewtwo": {
+        "moves": [
+          "mewtwo-warp",
+          "mewtwo-psybeam",
+          "mewtwo-psystrike",
+          "mewtwo-psywave"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.3,
+        "enrageMoveIntervalSeconds": 0.9
+      },
+      "legend-mew": {
+        "moves": [
+          "mew-teleport",
+          "*"
+        ],
+        "pool": [
+          "mew-stone-edge",
+          "mew-volt-tackle",
+          "mew-explosion",
+          "mew-sheer-cold",
+          "mew-extreme-speed",
+          "mew-rock-wrecker",
+          "mew-petal-blizzard",
+          "mew-hex",
+          "mew-psycho-boost",
+          "mew-outrage",
+          "mew-dynamic-punch",
+          "shiny-blast-burn",
+          "shiny-frenzy-plant",
+          "shiny-hydro-cannon",
+          "zapdos-thunder",
+          "articuno-blizzard",
+          "moltres-flamedash",
+          "mewtwo-psystrike",
+          "mewtwo-psybeam"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 0.5,
+        "enrageMoveIntervalSeconds": 0.4
+      },
+      "legend-articuno": {
+        "moves": [
+          "articuno-dash",
+          "articuno-burst",
+          "articuno-blizzard"
+        ],
+        "random": false,
+        "field": {
+          "damagePctPerSecond": 1,
+          "slowPct": 25,
+          "freezeBelowHpPct": 10,
+          "freezeSeconds": 5,
+          "overlay": {
+            "color": "#e1f5fe",
+            "alpha": 0.18
+          },
+          "weather": "blizzard-aura"
+        }
+      },
+      "legend-zapdos": {
+        "moves": [
+          "zapdos-spray",
+          "zapdos-spray",
+          "zapdos-thunder"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 0.7,
+        "enrageMoveIntervalSeconds": 0.5,
+        "field": {
+          "overlay": {
+            "color": "#000000",
+            "alpha": 0.3
+          },
+          "flash": {
+            "color": "#fffde7",
+            "alpha": 0.55,
+            "everySeconds": 2.5
+          },
+          "lightning": {
+            "move": "zapdos-field-bolt",
+            "everySeconds": 0.35
+          }
+        }
+      },
+      "legend-moltres": {
+        "moves": [
+          "moltres-skyattack",
+          "moltres-flamedash"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.8,
+        "enrageMoveIntervalSeconds": 1.2,
+        "field": {
+          "defenseMultiplier": 0.75,
+          "aura": {
+            "radius": 85,
+            "damagePerSecond": 25,
+            "color": "#ff7043"
+          }
+        }
+      },
+      "shiny-charizard": {
+        "moves": [
+          "charizard-dash"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 3,
+        "enrageMoveIntervalSeconds": 2,
+        "casters": [
+          {
+            "move": "flamethrower",
+            "level": 8
+          },
+          {
+            "move": "fire-spin",
+            "level": 8
+          }
+        ],
+        "casterPower": 1.2
+      },
+      "shiny-venusaur": {
+        "moves": [
+          "venusaur-solar-beam"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 2.5,
+        "enrageMoveIntervalSeconds": 1.8,
+        "casters": [
+          {
+            "move": "petal-dance",
+            "level": 8,
+            "orbitRadius": 200
+          },
+          {
+            "move": "sludge-bomb",
+            "level": 8,
+            "everySeconds": 2.5
+          }
+        ],
+        "casterPower": 1.2
+      },
+      "shiny-blastoise": {
+        "moves": [
+          "blastoise-hydro-cannon"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 0.5,
+        "enrageMoveIntervalSeconds": 0.4,
+        "casterPower": 1.2,
+        "shell": {
+          "farDistance": 0,
+          "nearDistance": 0,
+          "speedMultiplier": 4,
+          "pose": "Hurt",
+          "spin": true,
+          "moves": [
+            {
+              "move": "rapid-spin",
+              "level": 8,
+              "everySeconds": 0.4
+            }
+          ]
+        },
+        "chargePose": "Shoot"
+      }
+    },
+    "moveIntervalSeconds": 1.6,
+    "warningSeconds": 3,
+    "timeLimitSeconds": 180,
+    "enrage": {
+      "hpRatio": 0.5,
+      "moveIntervalSeconds": 1.1,
+      "doubleChance": 0.35
+    },
+    "counter": {
+      "kinds": [
+        "shiny-charizard",
+        "shiny-venusaur",
+        "shiny-blastoise"
+      ],
+      "achievements": [
+        "clear-charmander",
+        "clear-bulbasaur",
+        "clear-squirtle"
+      ]
+    }
+  },
+  "legendaryBgm": "legendary"
+}

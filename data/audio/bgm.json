@@ -120,23 +120,5 @@
   "scenes": {
     "title": "title",
     "result": "result"
-  },
-  "run": {
-    "sections": [
-      "route",
-      "cave",
-      "route",
-      "forest",
-      "route",
-      "route",
-      "sea",
-      "route",
-      "victory-road",
-      "elite-four",
-      "elite-four",
-      "elite-four",
-      "elite-four"
-    ],
-    "legendary": "legendary"
   }
 }

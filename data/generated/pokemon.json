@@ -133,6 +133,33 @@
     ],
     "evolvesTo": []
   },
+  "ariados": {
+    "dex": 168,
+    "names": {
+      "ja": "アリアドス",
+      "en": "Ariados",
+      "fr": "Migalos",
+      "de": "Ariados",
+      "es": "Ariados",
+      "it": "Ariados"
+    },
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 90,
+      "defense": 70,
+      "specialAttack": 60,
+      "specialDefense": 70,
+      "speed": 40
+    },
+    "preEvolutions": [
+      "spinarak"
+    ],
+    "evolvesTo": []
+  },
   "articuno": {
     "dex": 144,
     "names": {
@@ -453,6 +480,34 @@
     ],
     "evolvesTo": []
   },
+  "crobat": {
+    "dex": 169,
+    "names": {
+      "ja": "クロバット",
+      "en": "Crobat",
+      "fr": "Nostenfer",
+      "de": "Iksbat",
+      "es": "Crobat",
+      "it": "Crobat"
+    },
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 90,
+      "defense": 80,
+      "specialAttack": 70,
+      "specialDefense": 80,
+      "speed": 130
+    },
+    "preEvolutions": [
+      "zubat",
+      "golbat"
+    ],
+    "evolvesTo": []
+  },
   "cubone": {
     "dex": 104,
     "names": {
@@ -482,6 +537,31 @@
         "level": 28
       }
     ]
+  },
+  "delibird": {
+    "dex": 225,
+    "names": {
+      "ja": "デリバード",
+      "en": "Delibird",
+      "fr": "Cadoizo",
+      "de": "Botogel",
+      "es": "Delibird",
+      "it": "Delibird"
+    },
+    "types": [
+      "ice",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 55,
+      "defense": 45,
+      "specialAttack": 65,
+      "specialDefense": 45,
+      "speed": 75
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
   },
   "dewgong": {
     "dex": 87,
@@ -591,6 +671,32 @@
         "level": 31
       }
     ]
+  },
+  "donphan": {
+    "dex": 232,
+    "names": {
+      "ja": "ドンファン",
+      "en": "Donphan",
+      "fr": "Donphan",
+      "de": "Donphan",
+      "es": "Donphan",
+      "it": "Donphan"
+    },
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 120,
+      "defense": 120,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 50
+    },
+    "preEvolutions": [
+      "phanpy"
+    ],
+    "evolvesTo": []
   },
   "dragonair": {
     "dex": 148,
@@ -802,6 +908,63 @@
       }
     ]
   },
+  "electrode": {
+    "dex": 101,
+    "names": {
+      "ja": "マルマイン",
+      "en": "Electrode",
+      "fr": "Électrode",
+      "de": "Lektrobal",
+      "es": "Electrode",
+      "it": "Electrode"
+    },
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 50,
+      "defense": 70,
+      "specialAttack": 80,
+      "specialDefense": 80,
+      "speed": 150
+    },
+    "preEvolutions": [
+      "voltorb"
+    ],
+    "evolvesTo": []
+  },
+  "exeggcute": {
+    "dex": 102,
+    "names": {
+      "ja": "タマタマ",
+      "en": "Exeggcute",
+      "fr": "Noeunoeuf",
+      "de": "Owei",
+      "es": "Exeggcute",
+      "it": "Exeggcute"
+    },
+    "types": [
+      "grass",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 40,
+      "defense": 80,
+      "specialAttack": 60,
+      "specialDefense": 45,
+      "speed": 40
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "exeggutor",
+        "trigger": "item",
+        "item": "leaf-stone"
+      }
+    ]
+  },
   "exeggutor": {
     "dex": 103,
     "names": {
@@ -856,6 +1019,38 @@
     ],
     "evolvesTo": []
   },
+  "flaaffy": {
+    "dex": 180,
+    "names": {
+      "ja": "モココ",
+      "en": "Flaaffy",
+      "fr": "Lainergie",
+      "de": "Waaty",
+      "es": "Flaaffy",
+      "it": "Flaaffy"
+    },
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 55,
+      "defense": 55,
+      "specialAttack": 80,
+      "specialDefense": 60,
+      "speed": 45
+    },
+    "preEvolutions": [
+      "mareep"
+    ],
+    "evolvesTo": [
+      {
+        "to": "ampharos",
+        "trigger": "level",
+        "level": 30
+      }
+    ]
+  },
   "flareon": {
     "dex": 136,
     "names": {
@@ -879,6 +1074,33 @@
     },
     "preEvolutions": [
       "eevee"
+    ],
+    "evolvesTo": []
+  },
+  "forretress": {
+    "dex": 205,
+    "names": {
+      "ja": "フォレトス",
+      "en": "Forretress",
+      "fr": "Foretress",
+      "de": "Forstellka",
+      "es": "Forretress",
+      "it": "Forretress"
+    },
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 90,
+      "defense": 140,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 40
+    },
+    "preEvolutions": [
+      "pineco"
     ],
     "evolvesTo": []
   },
@@ -972,6 +1194,36 @@
       }
     ]
   },
+  "gligar": {
+    "dex": 207,
+    "names": {
+      "ja": "グライガー",
+      "en": "Gligar",
+      "fr": "Scorplane",
+      "de": "Skorgla",
+      "es": "Gligar",
+      "it": "Gligar"
+    },
+    "types": [
+      "ground",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 75,
+      "defense": 105,
+      "specialAttack": 35,
+      "specialDefense": 65,
+      "speed": 85
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "gliscor",
+        "trigger": "other"
+      }
+    ]
+  },
   "gloom": {
     "dex": 44,
     "names": {
@@ -1041,6 +1293,32 @@
         "trigger": "other"
       }
     ]
+  },
+  "golduck": {
+    "dex": 55,
+    "names": {
+      "ja": "ゴルダック",
+      "en": "Golduck",
+      "fr": "Akwakwak",
+      "de": "Entoron",
+      "es": "Golduck",
+      "it": "Golduck"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 82,
+      "defense": 78,
+      "specialAttack": 95,
+      "specialDefense": 80,
+      "speed": 85
+    },
+    "preEvolutions": [
+      "psyduck"
+    ],
+    "evolvesTo": []
   },
   "graveler": {
     "dex": 75,
@@ -1245,6 +1523,94 @@
     ],
     "evolvesTo": []
   },
+  "hitmontop": {
+    "dex": 237,
+    "names": {
+      "ja": "カポエラー",
+      "en": "Hitmontop",
+      "fr": "Kapoera",
+      "de": "Kapoera",
+      "es": "Hitmontop",
+      "it": "Hitmontop"
+    },
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 95,
+      "defense": 95,
+      "specialAttack": 35,
+      "specialDefense": 110,
+      "speed": 70
+    },
+    "preEvolutions": [
+      "tyrogue"
+    ],
+    "evolvesTo": []
+  },
+  "hoothoot": {
+    "dex": 163,
+    "names": {
+      "ja": "ホーホー",
+      "en": "Hoothoot",
+      "fr": "Hoothoot",
+      "de": "Hoothoot",
+      "es": "Hoothoot",
+      "it": "Hoothoot"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 30,
+      "defense": 30,
+      "specialAttack": 36,
+      "specialDefense": 56,
+      "speed": 50
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "noctowl",
+        "trigger": "level",
+        "level": 20
+      }
+    ]
+  },
+  "hoppip": {
+    "dex": 187,
+    "names": {
+      "ja": "ハネッコ",
+      "en": "Hoppip",
+      "fr": "Granivol",
+      "de": "Hoppspross",
+      "es": "Hoppip",
+      "it": "Hoppip"
+    },
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 35,
+      "defense": 40,
+      "specialAttack": 35,
+      "specialDefense": 55,
+      "speed": 50
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "skiploom",
+        "trigger": "level",
+        "level": 18
+      }
+    ]
+  },
   "horsea": {
     "dex": 116,
     "names": {
@@ -1274,6 +1640,33 @@
         "level": 32
       }
     ]
+  },
+  "houndoom": {
+    "dex": 229,
+    "names": {
+      "ja": "ヘルガー",
+      "en": "Houndoom",
+      "fr": "Démolosse",
+      "de": "Hundemon",
+      "es": "Houndoom",
+      "it": "Houndoom"
+    },
+    "types": [
+      "dark",
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 90,
+      "defense": 50,
+      "specialAttack": 110,
+      "specialDefense": 80,
+      "speed": 95
+    },
+    "preEvolutions": [
+      "houndour"
+    ],
+    "evolvesTo": []
   },
   "ivysaur": {
     "dex": 2,
@@ -1458,6 +1851,34 @@
       }
     ]
   },
+  "kingdra": {
+    "dex": 230,
+    "names": {
+      "ja": "キングドラ",
+      "en": "Kingdra",
+      "fr": "Hyporoi",
+      "de": "Seedraking",
+      "es": "Kingdra",
+      "it": "Kingdra"
+    },
+    "types": [
+      "water",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 95,
+      "defense": 95,
+      "specialAttack": 95,
+      "specialDefense": 95,
+      "speed": 85
+    },
+    "preEvolutions": [
+      "horsea",
+      "seadra"
+    ],
+    "evolvesTo": []
+  },
   "koffing": {
     "dex": 109,
     "names": {
@@ -1488,6 +1909,36 @@
       }
     ]
   },
+  "krabby": {
+    "dex": 98,
+    "names": {
+      "ja": "クラブ",
+      "en": "Krabby",
+      "fr": "Krabby",
+      "de": "Krabby",
+      "es": "Krabby",
+      "it": "Krabby"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 105,
+      "defense": 90,
+      "specialAttack": 25,
+      "specialDefense": 25,
+      "speed": 50
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "kingler",
+        "trigger": "level",
+        "level": 28
+      }
+    ]
+  },
   "lapras": {
     "dex": 131,
     "names": {
@@ -1512,6 +1963,37 @@
     },
     "preEvolutions": [],
     "evolvesTo": []
+  },
+  "ledyba": {
+    "dex": 165,
+    "names": {
+      "ja": "レディバ",
+      "en": "Ledyba",
+      "fr": "Coxy",
+      "de": "Ledyba",
+      "es": "Ledyba",
+      "it": "Ledyba"
+    },
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 20,
+      "defense": 30,
+      "specialAttack": 40,
+      "specialDefense": 80,
+      "speed": 55
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "ledian",
+        "trigger": "level",
+        "level": 18
+      }
+    ]
   },
   "machamp": {
     "dex": 68,
@@ -1631,6 +2113,37 @@
       }
     ]
   },
+  "magmar": {
+    "dex": 126,
+    "names": {
+      "ja": "ブーバー",
+      "en": "Magmar",
+      "fr": "Magmar",
+      "de": "Magmar",
+      "es": "Magmar",
+      "it": "Magmar"
+    },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 95,
+      "defense": 57,
+      "specialAttack": 100,
+      "specialDefense": 85,
+      "speed": 93
+    },
+    "preEvolutions": [
+      "magby"
+    ],
+    "evolvesTo": [
+      {
+        "to": "magmortar",
+        "trigger": "trade"
+      }
+    ]
+  },
   "magnemite": {
     "dex": 81,
     "names": {
@@ -1721,6 +2234,36 @@
         "to": "primeape",
         "trigger": "level",
         "level": 28
+      }
+    ]
+  },
+  "mareep": {
+    "dex": 179,
+    "names": {
+      "ja": "メリープ",
+      "en": "Mareep",
+      "fr": "Wattouat",
+      "de": "Voltilamm",
+      "es": "Mareep",
+      "it": "Mareep"
+    },
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 40,
+      "defense": 40,
+      "specialAttack": 65,
+      "specialDefense": 45,
+      "speed": 35
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "flaaffy",
+        "trigger": "level",
+        "level": 15
       }
     ]
   },
@@ -1865,6 +2408,30 @@
     "preEvolutions": [],
     "evolvesTo": []
   },
+  "miltank": {
+    "dex": 241,
+    "names": {
+      "ja": "ミルタンク",
+      "en": "Miltank",
+      "fr": "Écrémeuh",
+      "de": "Miltank",
+      "es": "Miltank",
+      "it": "Miltank"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 80,
+      "defense": 105,
+      "specialAttack": 40,
+      "specialDefense": 70,
+      "speed": 100
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
+  },
   "moltres": {
     "dex": 146,
     "names": {
@@ -1889,6 +2456,63 @@
     },
     "preEvolutions": [],
     "evolvesTo": []
+  },
+  "muk": {
+    "dex": 89,
+    "names": {
+      "ja": "ベトベトン",
+      "en": "Muk",
+      "fr": "Grotadmorv",
+      "de": "Sleimok",
+      "es": "Muk",
+      "it": "Muk"
+    },
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "attack": 105,
+      "defense": 75,
+      "specialAttack": 65,
+      "specialDefense": 100,
+      "speed": 50
+    },
+    "preEvolutions": [
+      "grimer"
+    ],
+    "evolvesTo": []
+  },
+  "murkrow": {
+    "dex": 198,
+    "names": {
+      "ja": "ヤミカラス",
+      "en": "Murkrow",
+      "fr": "Cornèbre",
+      "de": "Kramurx",
+      "es": "Murkrow",
+      "it": "Murkrow"
+    },
+    "types": [
+      "dark",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 85,
+      "defense": 42,
+      "specialAttack": 85,
+      "specialDefense": 42,
+      "speed": 91
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "honchkrow",
+        "trigger": "item",
+        "item": "dusk-stone"
+      }
+    ]
   },
   "nidorina": {
     "dex": 30,
@@ -1953,6 +2577,33 @@
         "item": "moon-stone"
       }
     ]
+  },
+  "noctowl": {
+    "dex": 164,
+    "names": {
+      "ja": "ヨルノズク",
+      "en": "Noctowl",
+      "fr": "Noarfang",
+      "de": "Noctuh",
+      "es": "Noctowl",
+      "it": "Noctowl"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 50,
+      "defense": 50,
+      "specialAttack": 86,
+      "specialDefense": 96,
+      "speed": 70
+    },
+    "preEvolutions": [
+      "hoothoot"
+    ],
+    "evolvesTo": []
   },
   "oddish": {
     "dex": 43,
@@ -2142,6 +2793,96 @@
       }
     ]
   },
+  "piloswine": {
+    "dex": 221,
+    "names": {
+      "ja": "イノムー",
+      "en": "Piloswine",
+      "fr": "Cochignon",
+      "de": "Keifel",
+      "es": "Piloswine",
+      "it": "Piloswine"
+    },
+    "types": [
+      "ice",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 100,
+      "defense": 80,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 50
+    },
+    "preEvolutions": [
+      "swinub"
+    ],
+    "evolvesTo": [
+      {
+        "to": "mamoswine",
+        "trigger": "other"
+      }
+    ]
+  },
+  "pineco": {
+    "dex": 204,
+    "names": {
+      "ja": "クヌギダマ",
+      "en": "Pineco",
+      "fr": "Pomdepik",
+      "de": "Tannza",
+      "es": "Pineco",
+      "it": "Pineco"
+    },
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 65,
+      "defense": 90,
+      "specialAttack": 35,
+      "specialDefense": 35,
+      "speed": 15
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "forretress",
+        "trigger": "level",
+        "level": 31
+      }
+    ]
+  },
+  "poliwrath": {
+    "dex": 62,
+    "names": {
+      "ja": "ニョロボン",
+      "en": "Poliwrath",
+      "fr": "Tartard",
+      "de": "Quappo",
+      "es": "Poliwrath",
+      "it": "Poliwrath"
+    },
+    "types": [
+      "water",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 95,
+      "defense": 95,
+      "specialAttack": 70,
+      "specialDefense": 90,
+      "speed": 70
+    },
+    "preEvolutions": [
+      "poliwag",
+      "poliwhirl"
+    ],
+    "evolvesTo": []
+  },
   "ponyta": {
     "dex": 77,
     "names": {
@@ -2231,6 +2972,33 @@
       }
     ]
   },
+  "quagsire": {
+    "dex": 195,
+    "names": {
+      "ja": "ヌオー",
+      "en": "Quagsire",
+      "fr": "Maraiste",
+      "de": "Morlord",
+      "es": "Quagsire",
+      "it": "Quagsire"
+    },
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 85,
+      "defense": 85,
+      "specialAttack": 65,
+      "specialDefense": 65,
+      "speed": 35
+    },
+    "preEvolutions": [
+      "wooper"
+    ],
+    "evolvesTo": []
+  },
   "raichu": {
     "dex": 26,
     "names": {
@@ -2255,6 +3023,32 @@
     "preEvolutions": [
       "pichu",
       "pikachu"
+    ],
+    "evolvesTo": []
+  },
+  "rapidash": {
+    "dex": 78,
+    "names": {
+      "ja": "ギャロップ",
+      "en": "Rapidash",
+      "fr": "Galopa",
+      "de": "Gallopa",
+      "es": "Rapidash",
+      "it": "Rapidash"
+    },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 100,
+      "defense": 70,
+      "specialAttack": 80,
+      "specialDefense": 80,
+      "speed": 105
+    },
+    "preEvolutions": [
+      "ponyta"
     ],
     "evolvesTo": []
   },
@@ -2377,6 +3171,62 @@
       }
     ]
   },
+  "sandshrew": {
+    "dex": 27,
+    "names": {
+      "ja": "サンド",
+      "en": "Sandshrew",
+      "fr": "Sabelette",
+      "de": "Sandan",
+      "es": "Sandshrew",
+      "it": "Sandshrew"
+    },
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 75,
+      "defense": 85,
+      "specialAttack": 20,
+      "specialDefense": 30,
+      "speed": 40
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "sandslash",
+        "trigger": "level",
+        "level": 22
+      }
+    ]
+  },
+  "sandslash": {
+    "dex": 28,
+    "names": {
+      "ja": "サンドパン",
+      "en": "Sandslash",
+      "fr": "Sablaireau",
+      "de": "Sandamer",
+      "es": "Sandslash",
+      "it": "Sandslash"
+    },
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 100,
+      "defense": 110,
+      "specialAttack": 45,
+      "specialDefense": 55,
+      "speed": 65
+    },
+    "preEvolutions": [
+      "sandshrew"
+    ],
+    "evolvesTo": []
+  },
   "scyther": {
     "dex": 123,
     "names": {
@@ -2442,6 +3292,86 @@
       }
     ]
   },
+  "sentret": {
+    "dex": 161,
+    "names": {
+      "ja": "オタチ",
+      "en": "Sentret",
+      "fr": "Fouinette",
+      "de": "Wiesor",
+      "es": "Sentret",
+      "it": "Sentret"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 46,
+      "defense": 34,
+      "specialAttack": 35,
+      "specialDefense": 45,
+      "speed": 20
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "furret",
+        "trigger": "level",
+        "level": 15
+      }
+    ]
+  },
+  "shuckle": {
+    "dex": 213,
+    "names": {
+      "ja": "ツボツボ",
+      "en": "Shuckle",
+      "fr": "Caratroc",
+      "de": "Pottrott",
+      "es": "Shuckle",
+      "it": "Shuckle"
+    },
+    "types": [
+      "bug",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 20,
+      "attack": 10,
+      "defense": 230,
+      "specialAttack": 10,
+      "specialDefense": 230,
+      "speed": 5
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
+  },
+  "skarmory": {
+    "dex": 227,
+    "names": {
+      "ja": "エアームド",
+      "en": "Skarmory",
+      "fr": "Airmure",
+      "de": "Panzaeron",
+      "es": "Skarmory",
+      "it": "Skarmory"
+    },
+    "types": [
+      "steel",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 80,
+      "defense": 140,
+      "specialAttack": 40,
+      "specialDefense": 70,
+      "speed": 70
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
+  },
   "slowbro": {
     "dex": 80,
     "names": {
@@ -2504,6 +3434,71 @@
       }
     ]
   },
+  "smoochum": {
+    "dex": 238,
+    "names": {
+      "ja": "ムチュール",
+      "en": "Smoochum",
+      "fr": "Lippouti",
+      "de": "Kussilla",
+      "es": "Smoochum",
+      "it": "Smoochum"
+    },
+    "types": [
+      "ice",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 30,
+      "defense": 15,
+      "specialAttack": 85,
+      "specialDefense": 65,
+      "speed": 65
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "jynx",
+        "trigger": "level",
+        "level": 30
+      }
+    ]
+  },
+  "sneasel": {
+    "dex": 215,
+    "names": {
+      "ja": "ニューラ",
+      "en": "Sneasel",
+      "fr": "Farfuret",
+      "de": "Sniebel",
+      "es": "Sneasel",
+      "it": "Sneasel"
+    },
+    "types": [
+      "dark",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 95,
+      "defense": 55,
+      "specialAttack": 35,
+      "specialDefense": 75,
+      "speed": 115
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "weavile",
+        "trigger": "other"
+      },
+      {
+        "to": "sneasler",
+        "trigger": "other"
+      }
+    ]
+  },
   "snorlax": {
     "dex": 143,
     "names": {
@@ -2561,6 +3556,37 @@
       }
     ]
   },
+  "spinarak": {
+    "dex": 167,
+    "names": {
+      "ja": "イトマル",
+      "en": "Spinarak",
+      "fr": "Mimigal",
+      "de": "Webarak",
+      "es": "Spinarak",
+      "it": "Spinarak"
+    },
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 60,
+      "defense": 40,
+      "specialAttack": 40,
+      "specialDefense": 40,
+      "speed": 30
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "ariados",
+        "trigger": "level",
+        "level": 22
+      }
+    ]
+  },
   "squirtle": {
     "dex": 7,
     "names": {
@@ -2588,6 +3614,35 @@
         "to": "wartortle",
         "trigger": "level",
         "level": 16
+      }
+    ]
+  },
+  "stantler": {
+    "dex": 234,
+    "names": {
+      "ja": "オドシシ",
+      "en": "Stantler",
+      "fr": "Cerfrousse",
+      "de": "Damhirplex",
+      "es": "Stantler",
+      "it": "Stantler"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 73,
+      "attack": 95,
+      "defense": 62,
+      "specialAttack": 85,
+      "specialDefense": 65,
+      "speed": 85
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "wyrdeer",
+        "trigger": "other"
       }
     ]
   },
@@ -2648,6 +3703,90 @@
       }
     ]
   },
+  "steelix": {
+    "dex": 208,
+    "names": {
+      "ja": "ハガネール",
+      "en": "Steelix",
+      "fr": "Steelix",
+      "de": "Stahlos",
+      "es": "Steelix",
+      "it": "Steelix"
+    },
+    "types": [
+      "steel",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 85,
+      "defense": 200,
+      "specialAttack": 55,
+      "specialDefense": 65,
+      "speed": 30
+    },
+    "preEvolutions": [
+      "onix"
+    ],
+    "evolvesTo": []
+  },
+  "sudowoodo": {
+    "dex": 185,
+    "names": {
+      "ja": "ウソッキー",
+      "en": "Sudowoodo",
+      "fr": "Simularbre",
+      "de": "Mogelbaum",
+      "es": "Sudowoodo",
+      "it": "Sudowoodo"
+    },
+    "types": [
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 100,
+      "defense": 115,
+      "specialAttack": 30,
+      "specialDefense": 65,
+      "speed": 30
+    },
+    "preEvolutions": [
+      "bonsly"
+    ],
+    "evolvesTo": []
+  },
+  "swinub": {
+    "dex": 220,
+    "names": {
+      "ja": "ウリムー",
+      "en": "Swinub",
+      "fr": "Marcacrin",
+      "de": "Quiekel",
+      "es": "Swinub",
+      "it": "Swinub"
+    },
+    "types": [
+      "ice",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 50,
+      "defense": 40,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 50
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "piloswine",
+        "trigger": "level",
+        "level": 33
+      }
+    ]
+  },
   "tangela": {
     "dex": 114,
     "names": {
@@ -2701,6 +3840,36 @@
     "preEvolutions": [],
     "evolvesTo": []
   },
+  "teddiursa": {
+    "dex": 216,
+    "names": {
+      "ja": "ヒメグマ",
+      "en": "Teddiursa",
+      "fr": "Teddiursa",
+      "de": "Teddiursa",
+      "es": "Teddiursa",
+      "it": "Teddiursa"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 80,
+      "defense": 50,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 40
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "ursaring",
+        "trigger": "level",
+        "level": 30
+      }
+    ]
+  },
   "tentacool": {
     "dex": 72,
     "names": {
@@ -2729,6 +3898,88 @@
         "to": "tentacruel",
         "trigger": "level",
         "level": 30
+      }
+    ]
+  },
+  "umbreon": {
+    "dex": 197,
+    "names": {
+      "ja": "ブラッキー",
+      "en": "Umbreon",
+      "fr": "Noctali",
+      "de": "Nachtara",
+      "es": "Umbreon",
+      "it": "Umbreon"
+    },
+    "types": [
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 65,
+      "defense": 110,
+      "specialAttack": 60,
+      "specialDefense": 130,
+      "speed": 65
+    },
+    "preEvolutions": [
+      "eevee"
+    ],
+    "evolvesTo": []
+  },
+  "unown": {
+    "dex": 201,
+    "names": {
+      "ja": "アンノーン",
+      "en": "Unown",
+      "fr": "Zarbi",
+      "de": "Icognito",
+      "es": "Unown",
+      "it": "Unown"
+    },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 48,
+      "attack": 72,
+      "defense": 48,
+      "specialAttack": 72,
+      "specialDefense": 48,
+      "speed": 48
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
+  },
+  "ursaring": {
+    "dex": 217,
+    "names": {
+      "ja": "リングマ",
+      "en": "Ursaring",
+      "fr": "Ursaring",
+      "de": "Ursaring",
+      "es": "Ursaring",
+      "it": "Ursaring"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 130,
+      "defense": 75,
+      "specialAttack": 75,
+      "specialDefense": 75,
+      "speed": 55
+    },
+    "preEvolutions": [
+      "teddiursa"
+    ],
+    "evolvesTo": [
+      {
+        "to": "ursaluna",
+        "trigger": "item",
+        "item": "peat-block"
       }
     ]
   },
@@ -3048,6 +4299,99 @@
       "jigglypuff"
     ],
     "evolvesTo": []
+  },
+  "wooper": {
+    "dex": 194,
+    "names": {
+      "ja": "ウパー",
+      "en": "Wooper",
+      "fr": "Axoloto",
+      "de": "Felino",
+      "es": "Wooper",
+      "it": "Wooper"
+    },
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 45,
+      "defense": 45,
+      "specialAttack": 25,
+      "specialDefense": 25,
+      "speed": 15
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "quagsire",
+        "trigger": "level",
+        "level": 20
+      },
+      {
+        "to": "clodsire",
+        "trigger": "level",
+        "level": 20
+      }
+    ]
+  },
+  "xatu": {
+    "dex": 178,
+    "names": {
+      "ja": "ネイティオ",
+      "en": "Xatu",
+      "fr": "Xatu",
+      "de": "Xatu",
+      "es": "Xatu",
+      "it": "Xatu"
+    },
+    "types": [
+      "psychic",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 75,
+      "defense": 70,
+      "specialAttack": 95,
+      "specialDefense": 70,
+      "speed": 95
+    },
+    "preEvolutions": [
+      "natu"
+    ],
+    "evolvesTo": []
+  },
+  "yanma": {
+    "dex": 193,
+    "names": {
+      "ja": "ヤンヤンマ",
+      "en": "Yanma",
+      "fr": "Yanma",
+      "de": "Yanma",
+      "es": "Yanma",
+      "it": "Yanma"
+    },
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 65,
+      "defense": 45,
+      "specialAttack": 75,
+      "specialDefense": 45,
+      "speed": 95
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "yanmega",
+        "trigger": "other"
+      }
+    ]
   },
   "zapdos": {
     "dex": 145,

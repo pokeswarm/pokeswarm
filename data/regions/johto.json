@@ -1,0 +1,553 @@
+{
+  "durationSeconds": 2100,
+  "sections": [
+    {
+      "tile": "johto_meadow",
+      "bgm": "johto-route",
+      "obstacles": [
+        "tree",
+        "rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 1,
+        "minimum": 15,
+        "capPerPlayer": 60,
+        "hpMultiplier": 1.4,
+        "damageMultiplier": 1.2,
+        "xpMultiplier": 1,
+        "kinds": [
+          "sentret",
+          "rattata",
+          "ledyba",
+          "spinarak",
+          "hoppip",
+          "bellsprout",
+          "pidgey",
+          "caterpie",
+          "weedle"
+        ]
+      }
+    },
+    {
+      "tile": "johto_cave",
+      "bgm": "johto-cave",
+      "obstacles": [
+        "stalagmite",
+        "rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 3,
+        "minimum": 40,
+        "capPerPlayer": 120,
+        "hpMultiplier": 1.54,
+        "damageMultiplier": 1.38,
+        "xpMultiplier": 1.3,
+        "kinds": [
+          "geodude",
+          "sandshrew",
+          "wooper",
+          "slowpoke",
+          "zubat",
+          "onix"
+        ]
+      }
+    },
+    {
+      "tile": "johto_forest",
+      "bgm": "johto-forest",
+      "obstacles": [
+        "dark-tree"
+      ],
+      "night": true,
+      "wave": {
+        "spawnPerSecond": 5,
+        "minimum": 70,
+        "capPerPlayer": 180,
+        "hpMultiplier": 1.68,
+        "damageMultiplier": 1.56,
+        "xpMultiplier": 1.6,
+        "kinds": [
+          "paras",
+          "oddish",
+          "pineco",
+          "venonat",
+          "exeggcute",
+          "psyduck",
+          "hoothoot"
+        ]
+      }
+    },
+    {
+      "tile": "johto_burned",
+      "bgm": "johto-night-tower",
+      "obstacles": [
+        "dark-tree",
+        "rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 7,
+        "minimum": 100,
+        "capPerPlayer": 240,
+        "hpMultiplier": 2.17,
+        "damageMultiplier": 1.74,
+        "xpMultiplier": 1.9,
+        "kinds": [
+          "yanma",
+          "vulpix",
+          "growlithe",
+          "stantler",
+          "koffing",
+          "magmar"
+        ]
+      }
+    },
+    {
+      "tile": "johto_beach",
+      "bgm": "johto-sea",
+      "obstacles": [
+        "beach-rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 9,
+        "minimum": 140,
+        "capPerPlayer": 300,
+        "hpMultiplier": 2.59,
+        "damageMultiplier": 1.92,
+        "xpMultiplier": 2.2,
+        "kinds": [
+          "tentacool",
+          "krabby",
+          "seel",
+          "magnemite",
+          "shuckle",
+          "tauros",
+          "pidgeotto"
+        ]
+      }
+    },
+    {
+      "tile": "johto_lighthouse",
+      "bgm": "johto-lighthouse",
+      "obstacles": [
+        "pillar"
+      ],
+      "night": true,
+      "wave": {
+        "spawnPerSecond": 11,
+        "minimum": 180,
+        "capPerPlayer": 360,
+        "hpMultiplier": 3.43,
+        "damageMultiplier": 2.1,
+        "xpMultiplier": 2.5,
+        "kinds": [
+          "mareep",
+          "flaaffy",
+          "voltorb",
+          "jigglypuff",
+          "ditto",
+          "hoothoot-2",
+          "noctowl",
+          "gastly"
+        ]
+      }
+    },
+    {
+      "tile": "johto_lake_meadow",
+      "bgm": "johto-lake-of-rage",
+      "obstacles": [
+        "tree",
+        "rock"
+      ],
+      "wave": {
+        "durationSeconds": 60,
+        "spawnPerSecond": 13,
+        "minimum": 230,
+        "capPerPlayer": 420,
+        "hpMultiplier": 4.06,
+        "damageMultiplier": 2.28,
+        "xpMultiplier": 2.8,
+        "kinds": [
+          "magikarp"
+        ]
+      }
+    },
+    {
+      "tile": "johto_ice",
+      "bgm": "johto-ice-path",
+      "obstacles": [
+        "rock"
+      ],
+      "night": true,
+      "wave": {
+        "spawnPerSecond": 13,
+        "minimum": 230,
+        "capPerPlayer": 420,
+        "hpMultiplier": 4.06,
+        "damageMultiplier": 2.28,
+        "xpMultiplier": 2.8,
+        "kinds": [
+          "delibird",
+          "jynx",
+          "sneasel",
+          "smoochum",
+          "swinub",
+          "zubat-2",
+          "golbat"
+        ]
+      }
+    },
+    {
+      "tile": "johto_dragon_cave",
+      "bgm": "johto-dragons-den",
+      "obstacles": [
+        "stalagmite",
+        "rock"
+      ],
+      "night": true,
+      "wave": {
+        "spawnPerSecond": 15,
+        "minimum": 280,
+        "capPerPlayer": 480,
+        "hpMultiplier": 5.32,
+        "damageMultiplier": 2.46,
+        "xpMultiplier": 3.1,
+        "kinds": [
+          "graveler",
+          "gligar",
+          "skarmory",
+          "donphan",
+          "teddiursa",
+          "dratini",
+          "dragonair"
+        ]
+      }
+    },
+    {
+      "tile": "johto_victory_rock",
+      "bgm": "johto-victory-road",
+      "obstacles": [
+        "stalagmite",
+        "rock"
+      ],
+      "wave": {
+        "durationSeconds": 60,
+        "spawnPerSecond": 17,
+        "minimum": 330,
+        "capPerPlayer": 520,
+        "hpMultiplier": 6.16,
+        "damageMultiplier": 2.64,
+        "xpMultiplier": 3.4,
+        "kinds": [
+          "sandslash",
+          "arbok",
+          "fearow",
+          "ponyta",
+          "ursaring"
+        ]
+      }
+    },
+    {
+      "tile": "johto_elite_hall",
+      "bgm": "johto-elite-four",
+      "obstacles": [
+        "pillar"
+      ],
+      "wave": {
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 7.84,
+        "damageMultiplier": 2.88,
+        "xpMultiplier": 3.7,
+        "kinds": [
+          "jynx-2",
+          "exeggutor",
+          "slowbro"
+        ]
+      }
+    },
+    {
+      "tile": "johto_elite_hall",
+      "bgm": "johto-elite-four",
+      "obstacles": [
+        "pillar"
+      ],
+      "wave": {
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 10.08,
+        "damageMultiplier": 3.18,
+        "xpMultiplier": 4,
+        "kinds": [
+          "ariados",
+          "forretress",
+          "muk",
+          "venomoth"
+        ]
+      }
+    },
+    {
+      "tile": "johto_elite_hall",
+      "bgm": "johto-elite-four",
+      "obstacles": [
+        "pillar"
+      ],
+      "wave": {
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 12.6,
+        "damageMultiplier": 3.48,
+        "xpMultiplier": 4.3,
+        "kinds": [
+          "hitmontop",
+          "hitmonlee",
+          "hitmonchan",
+          "onix-2"
+        ]
+      }
+    },
+    {
+      "tile": "johto_elite_hall",
+      "bgm": "johto-elite-four",
+      "obstacles": [
+        "pillar"
+      ],
+      "wave": {
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 15.68,
+        "damageMultiplier": 3.84,
+        "xpMultiplier": 4.6,
+        "kinds": [
+          "umbreon",
+          "vileplume",
+          "gengar",
+          "murkrow"
+        ]
+      }
+    },
+    {
+      "tile": "johto_elite_hall",
+      "bgm": "johto-elite-four",
+      "obstacles": [
+        "pillar"
+      ],
+      "wave": {
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 18.03,
+        "damageMultiplier": 4.42,
+        "xpMultiplier": 4.6,
+        "kinds": [
+          "gyarados",
+          "charizard",
+          "aerodactyl",
+          "dragonair-2"
+        ]
+      }
+    },
+    {
+      "tile": "johto_snow",
+      "bgm": "johto-red",
+      "obstacles": [
+        "rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 20.38,
+        "damageMultiplier": 4.99,
+        "xpMultiplier": 4.6,
+        "kinds": [
+          "quagsire",
+          "ursaring-2",
+          "golduck",
+          "donphan-2",
+          "rapidash"
+        ]
+      }
+    }
+  ],
+  "bosses": [
+    {
+      "wave": 0,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "johto-midboss-pidgeotto"
+    },
+    {
+      "wave": 1,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "johto-midboss-scyther"
+    },
+    {
+      "wave": 2,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "johto-midboss-miltank"
+    },
+    {
+      "wave": 3,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "johto-midboss-gengar"
+    },
+    {
+      "wave": 4,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "johto-midboss-poliwrath"
+    },
+    {
+      "wave": 5,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "johto-midboss-steelix"
+    },
+    {
+      "wave": 7,
+      "afterSeconds": 40,
+      "gate": true,
+      "kind": "johto-midboss-piloswine"
+    },
+    {
+      "wave": 8,
+      "afterSeconds": 100,
+      "gate": true,
+      "kind": "johto-midboss-kingdra"
+    },
+    {
+      "wave": 10,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "kind": "johto-boss-xatu",
+      "moves": [
+        "mewtwo-psywave",
+        "legend-nova",
+        "mewtwo-teleport"
+      ],
+      "moveIntervalSeconds": 2.6
+    },
+    {
+      "wave": 11,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "kind": "johto-boss-crobat",
+      "moves": [
+        "legend-dash",
+        "shadow-ball",
+        "legend-dash"
+      ],
+      "moveIntervalSeconds": 2.2,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.6,
+        "doubleChance": 0.2
+      }
+    },
+    {
+      "wave": 12,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "kind": "johto-boss-machamp",
+      "moves": [
+        "earthquake",
+        "legend-dash",
+        "earthquake"
+      ],
+      "moveIntervalSeconds": 2.2,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.5,
+        "doubleChance": 0.3
+      }
+    },
+    {
+      "wave": 13,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "kind": "johto-boss-houndoom",
+      "moves": [
+        "moltres-flamedash",
+        "shadow-ball",
+        "charizard-blast-burn"
+      ],
+      "moveIntervalSeconds": 2,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.3,
+        "doubleChance": 0.35
+      }
+    },
+    {
+      "wave": 14,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "kind": "johto-boss-dragonite",
+      "moves": [
+        "draco-meteor",
+        "legend-beam",
+        "zapdos-dash",
+        "legend-nova"
+      ],
+      "moveIntervalSeconds": 1.8,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.1,
+        "doubleChance": 0.4
+      }
+    },
+    {
+      "wave": 15,
+      "afterSeconds": 40,
+      "required": true,
+      "kind": "johto-boss-pikachu",
+      "moves": [
+        "mew-volt-tackle",
+        "zapdos-thunder",
+        "zapdos-dash",
+        "zapdos-field-bolt"
+      ],
+      "moveIntervalSeconds": 1.4,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 0.9,
+        "doubleChance": 0.5
+      }
+    }
+  ],
+  "swarms": [
+    {
+      "atSeconds": 195,
+      "everySeconds": 150,
+      "untilSeconds": 1000,
+      "kind": "swarm-unown",
+      "pattern": "rush",
+      "count": 25,
+      "spacing": 22,
+      "speed": 300
+    },
+    {
+      "atSeconds": 45,
+      "everySeconds": 20,
+      "untilSeconds": 1180,
+      "kind": "swarm-voltorb",
+      "pattern": "bomber",
+      "count": 1,
+      "triggerRange": 110,
+      "move": "self-destruct"
+    }
+  ],
+  "legendaryBgm": "johto-legendary-sky"
+}

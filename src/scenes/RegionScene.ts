@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { generated, regionsConfig, uiConfig } from '../data';
+import { generated, regionsConfig, regionStages, uiConfig } from '../data';
 import { localName } from '../data/simRules';
 import { getLocale, t, tMaybe } from '../i18n';
 import { meets } from '../meta/progress';
@@ -18,7 +18,13 @@ type Region = (typeof regionsConfig.regions)[number];
 
 /** 遊べる地方か（作ってあり、解放の条件があれば満たしている） */
 export function regionPlayable(r: Region, stats: Readonly<Record<string, number>> = session.store.current.stats): boolean {
+  if (devAllRegions() && regionStages[r.id] && r.playables.length > 0) return true;
   return r.available && (!r.unlock || meets(stats, r.unlock));
+}
+
+/** 開発版だけ: ?regions=all で、ステージ（data/regions/<地方>.json）のある地方を Coming soon・解放の条件に関わらず選べる（作っている地方の確認用） */
+export function devAllRegions(): boolean {
+  return import.meta.env.DEV && new URLSearchParams(window.location.search).get('regions') === 'all';
 }
 
 /** 最初に選んでおく地方（並びの先頭の遊べる地方） */

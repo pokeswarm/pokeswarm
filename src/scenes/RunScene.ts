@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { achievementsConfig, derivedStatSources, playablesConfig, effectRecipes, moveSprites, generated, groundConfig, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig } from '../data';
+import { achievementsConfig, derivedStatSources, playablesConfig, effectRecipes, moveSprites, generated, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, regionStage, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig, type RegionStage } from '../data';
 import { buildSimRules, localName, mergeModifiers, permanentModifiers, playableLoadout } from '../data/simRules';
 import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
@@ -67,6 +67,8 @@ export interface CoopRun {
 export interface RunSceneData {
   /** 自分のポケモン（data/game/playables.json のキー） */
   pokemon: string;
+  /** 遊ぶ地方（data/game/regions.json の id。区間・ボスは data/regions/<地方>.json）。省くとカントー */
+  region?: string;
   /** 自分のスプライト。取得していなければ null（仮の円で描く） */
   playerSprite: SpriteAnims | null;
   /** 協力プレイ。ソロなら null */
@@ -116,6 +118,8 @@ export class RunScene extends Phaser.Scene {
   private statusColors: number[] = [];
   private effects!: EffectRenderer;
   private sounds!: RunSounds;
+  /** 遊ぶ地方のステージ（区間ごとの地面・曲・夜） */
+  private stageOfRegion!: RegionStage;
   private hitShapes!: HitShapes;
   /** 技ごとの縁取りの色（明るい線・暗い線）。描かない技は null */
   private shapeColors: ({ color: number; alpha: number } | null)[] = [];
@@ -243,6 +247,7 @@ export class RunScene extends Phaser.Scene {
     this.showDebug = new URLSearchParams(window.location.search).has('debug');
     this.playerSprite = data.playerSprite;
     this.pokemon = data.pokemon;
+    this.stageOfRegion = regionStage(data.coop?.room.region || data.region);
     this.startItem = data.startItem ?? null;
     this.shiny = !!data.shiny;
     this.shinyPlayers = new Set();
@@ -251,14 +256,14 @@ export class RunScene extends Phaser.Scene {
   }
 
   preload(): void {
-    preloadGroundTiles(this, groundConfig);
+    preloadGroundTiles(this, this.stageOfRegion.ground);
     // ポケモン選択の画面で読み込み済みなら読み直さない
     if (this.playerSprite && !this.textures.exists(atlasKey(this.playerSprite.key))) preloadPokemonAtlas(this, this.playerSprite);
   }
 
   create(): void {
     if (this.playerSprite) registerPokemonAnimations(this, this.playerSprite);
-    const rules = applyDebugOverrides(buildSimRules(), window.location.search);
+    const rules = applyDebugOverrides(buildSimRules(this.stageOfRegion.id), window.location.search);
     this.pathMoves = new Set(rules.moves.flatMap((m, k) => (m.effects.some((fx) => fx.puddle?.path) ? [k] : [])));
     this.lightningMoves = new Set(rules.moves.flatMap((m, k) => (effectRecipes[m.effect]?.lightningLine ? [k] : [])));
     this.boltMoves = new Map(rules.moves.flatMap((m, k) => { const b = effectRecipes[m.effect]?.bolt; return b ? [[k, b] as const] : []; }));
@@ -376,7 +381,7 @@ export class RunScene extends Phaser.Scene {
         this.joystick = null;
       });
     }
-    this.ground = new GroundTiles(this, groundConfig, currentWaveIndex(this.sim.world));
+    this.ground = new GroundTiles(this, this.stageOfRegion.ground, currentWaveIndex(this.sim.world), this.stageOfRegion.night);
     // 重なりの順は data/render/sprites.json の depths（プレイヤー ＞ 技 ＞ ボス ＞ 雑魚 ＞ アイテム）
     const depths = spriteRender.depths;
     this.enemyView = new PooledCircles(this, depths.enemies);
@@ -473,7 +478,7 @@ export class RunScene extends Phaser.Scene {
       audio.settings.update({ muted: !audio.settings.current.muted });
       this.announce(t(audio.settings.current.muted ? 'audio.muted' : 'audio.unmuted'), '#cfd8dc');
     });
-    this.sounds = new RunSounds(this.localId);
+    this.sounds = new RunSounds(this.localId, this.stageOfRegion.bgmRun);
     this.applyZoom();
     this.scale.on('resize', this.applyZoom, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {

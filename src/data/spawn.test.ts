@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import spawnJson from '../../data/game/spawn.json';
 import { findReappearingKind, spawnConfigSchema } from './schema';
+import { regionStages } from './index';
 
 describe('時間帯ごとの出現の定義', () => {
-  it('data/game/spawn.json が検証を通る', () => {
-    expect(spawnConfigSchema.safeParse(spawnJson).success).toBe(true);
+  it('data/game/spawn.json と地方のステージ（data/regions/<地方>.json）の区間を合わせると検証を通る', () => {
+    for (const rs of Object.values(regionStages)) expect(spawnConfigSchema.safeParse({ ...spawnJson, waves: rs.spawn.waves }).success).toBe(true);
   });
 
   it('続いた時間帯に同じ種類が出るのはよい', () => {

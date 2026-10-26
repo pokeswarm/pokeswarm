@@ -80,7 +80,8 @@
       "key": "charizard",
       "dex": 6,
       "uses": [
-        "full"
+        "full",
+        "enemy"
       ]
     },
     {
@@ -236,7 +237,8 @@
       "key": "pikachu",
       "dex": 25,
       "uses": [
-        "full"
+        "full",
+        "enemy"
       ]
     },
     {
@@ -272,7 +274,8 @@
       "key": "jigglypuff",
       "dex": 39,
       "uses": [
-        "full"
+        "full",
+        "enemy"
       ]
     },
     {
@@ -352,7 +355,8 @@
       "key": "psyduck",
       "dex": 54,
       "uses": [
-        "full"
+        "full",
+        "enemy"
       ]
     },
     {
@@ -463,7 +467,8 @@
       "key": "slowpoke",
       "dex": 79,
       "uses": [
-        "full"
+        "full",
+        "enemy"
       ]
     },
     {
@@ -811,7 +816,8 @@
       "key": "dratini",
       "dex": 147,
       "uses": [
-        "full"
+        "full",
+        "enemy"
       ]
     },
     {
@@ -844,6 +850,335 @@
       "uses": [
         "enemy",
         "full"
+      ]
+    },
+    {
+      "key": "sentret",
+      "dex": 161,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "ledyba",
+      "dex": 165,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "spinarak",
+      "dex": 167,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "hoppip",
+      "dex": 187,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "sandshrew",
+      "dex": 27,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "wooper",
+      "dex": 194,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "pineco",
+      "dex": 204,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "exeggcute",
+      "dex": 102,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "hoothoot",
+      "dex": 163,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "yanma",
+      "dex": 193,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "stantler",
+      "dex": 234,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "magmar",
+      "dex": 126,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "krabby",
+      "dex": 98,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "shuckle",
+      "dex": 213,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "mareep",
+      "dex": 179,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "flaaffy",
+      "dex": 180,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "noctowl",
+      "dex": 164,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "delibird",
+      "dex": 225,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "sneasel",
+      "dex": 215,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "smoochum",
+      "dex": 238,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "swinub",
+      "dex": 220,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "gligar",
+      "dex": 207,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "skarmory",
+      "dex": 227,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "donphan",
+      "dex": 232,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "teddiursa",
+      "dex": 216,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "sandslash",
+      "dex": 28,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "ursaring",
+      "dex": 217,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "ariados",
+      "dex": 168,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "forretress",
+      "dex": 205,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "muk",
+      "dex": 89,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "hitmontop",
+      "dex": 237,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "umbreon",
+      "dex": 197,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "murkrow",
+      "dex": 198,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "quagsire",
+      "dex": 195,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "golduck",
+      "dex": 55,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "rapidash",
+      "dex": 78,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "miltank",
+      "dex": 241,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "poliwrath",
+      "dex": 62,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "steelix",
+      "dex": 208,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "piloswine",
+      "dex": 221,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "kingdra",
+      "dex": 230,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "xatu",
+      "dex": 178,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "crobat",
+      "dex": 169,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "houndoom",
+      "dex": 229,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "unown",
+      "dex": 201,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "electrode",
+      "dex": 101,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "sudowoodo",
+      "dex": 185,
+      "uses": [
+        "enemy"
       ]
     }
   ]

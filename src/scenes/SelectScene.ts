@@ -7,7 +7,7 @@ import { isPokemonUnlocked, PokemonPicker } from './pokemonPicker';
 import { LoadoutOptionsPanel } from './loadoutOptionsPanel';
 import { shinySpriteKey } from '../meta/loadoutOptions';
 import type { RunSceneData } from './RunScene';
-import type { RegionSceneData } from './RegionScene';
+import { devAllRegions, type RegionSceneData } from './RegionScene';
 
 export interface SelectSceneData {
   /** マップの選択で選んだ地方（data/game/regions.json） */
@@ -24,7 +24,7 @@ export class SelectScene extends Phaser.Scene {
   }
 
   create(data: SelectSceneData): void {
-    const region = regionsConfig.regions.find((r) => r.id === data.region && r.available) ?? regionsConfig.regions.find((r) => r.available)!;
+    const region = regionsConfig.regions.find((r) => r.id === data.region && (r.available || devAllRegions())) ?? regionsConfig.regions.find((r) => r.available)!;
     const back = (): void => void this.scene.start('region', { next: 'solo' } satisfies RegionSceneData);
     const root = document.createElement('div');
     root.style.cssText = `position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(960px,96vw);max-height:96vh;overflow:auto;${windowCss('dark')};padding:20px 24px;font-size:16px;line-height:1.6;box-sizing:border-box;z-index:20;display:flex;flex-direction:column;gap:12px`;
@@ -45,7 +45,7 @@ export class SelectScene extends Phaser.Scene {
       const sprite = playablesConfig.pokemon[key]!.sprite;
       void loadPokemonAtRuntime(this, shiny ? shinySpriteKey(sprite) : sprite).then((loaded) => {
         if (!this.sys.isActive()) return;
-        const data: RunSceneData = { pokemon: key, playerSprite: loaded?.manifest ?? null, coop: null, startItem, shiny };
+        const data: RunSceneData = { pokemon: key, region: region.id, playerSprite: loaded?.manifest ?? null, coop: null, startItem, shiny };
         this.scene.start('run', data);
       });
     };

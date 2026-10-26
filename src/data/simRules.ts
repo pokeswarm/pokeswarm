@@ -15,20 +15,20 @@ import {
   movesConfig,
   pickupConfig,
   playablesConfig,
-  obstacleConfig,
   shopConfig,
-  spawnConfig,
-  stageConfig,
   statsConfig,
   statusConfig,
+  regionStage,
 } from './index';
 import type { LocalizedNames } from './schema';
 
 /**
  * data/ の定義と PokeAPI から生成したデータを組み合わせて、シミュレーションが使う定義一式を作る。
  * 技・タイプは番号（並び順）で指すので、その対応もここで作る。
+ * region は遊ぶ地方（区間・ボス・障害物は data/regions/<地方>.json）。省くとカントー
  */
-export function buildSimRules(): SimRules {
+export function buildSimRules(region?: string): SimRules {
+  const rs = regionStage(region);
   const types = buildTypeChart(generated.types);
   const typeIndex = (key: string): number => {
     const i = types.names.indexOf(key);
@@ -166,7 +166,7 @@ export function buildSimRules(): SimRules {
   }
   return {
     enemies: { kinds: enemiesConfig.kinds.map((k) => ({ ...k, types: generated.pokemon[k.species ?? k.id]!.types.map(typeIndex) })) },
-    spawn: spawnConfig,
+    spawn: rs.spawn,
     status: statusConfig,
     pickups: pickupConfig,
     combat: combatConfig,
@@ -178,8 +178,8 @@ export function buildSimRules(): SimRules {
     itemMoves,
     species,
     stats: statsConfig,
-    stage: stageConfig,
-    obstacles: obstacleConfig,
+    stage: rs.stage,
+    obstacles: rs.obstacles,
     netSmoothing: networkConfig.smoothing,
   };
 }

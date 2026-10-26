@@ -40,7 +40,7 @@ import generatedMovesJson from '../../data/generated/moves.json';
 import generatedItemsJson from '../../data/generated/items.json';
 import generatedTypesJson from '../../data/generated/types.json';
 import generatedRegionsJson from '../../data/generated/regions.json';
-import type { UnlocksConfig } from './schema';
+import type { BgmRun, GroundConfig, ObstacleConfig, SpawnConfig, StageConfig, UnlocksConfig } from './schema';
 import { resolveEffectRecipes } from './effects';
 import {
   combatConfigSchema,
@@ -53,6 +53,7 @@ import {
   generatedPokemonSchema,
   generatedRegionsSchema,
   regionsConfigSchema,
+  regionStageSchema,
   siteConfigSchema,
   generatedTypesSchema,
   groundConfigSchema,
@@ -96,12 +97,10 @@ export const simulationConfig = load('game/simulation.json', simulationConfigSch
 export const playerConfig = load('game/player.json', playerConfigSchema, playerJson);
 export const placeholderRender = load('render/placeholder.json', placeholderRenderSchema, placeholderJson);
 export const uiConfig = load('render/ui.json', uiConfigSchema, uiJson);
-export const groundConfig = load('render/ground.json', groundConfigSchema, groundJson);
 /** 自作のドット絵（道具・アメの箱） */
 export const itemSprites = load('render/items.json', pixelSpritesSchema, itemSpritesJson);
 /** 障害物のドット絵（自作）と、置き方 */
 export const obstacleSprites = load('render/obstacles.json', pixelSpritesSchema, obstacleSpritesJson);
-export const obstacleConfig = load('game/obstacles.json', obstacleConfigSchema, obstaclesJson);
 /** 技・持ち物・パッシブのアイコン（自作のドット絵） */
 export const iconConfig = load('render/icons.json', iconConfigSchema, iconsJson);
 export const itemIcons = load('render/item-icons.json', itemIconsSchema, itemIconsJson);
@@ -110,7 +109,6 @@ export const moveSprites = load('render/move-sprites.json', moveSpritesSchema, m
 /** 技の強さをそろえる目安（段階ごとの総合の強さ） */
 export const moveBalanceConfig = load('game/move-balance.json', moveBalanceSchema, moveBalanceJson);
 export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enemiesJson);
-export const spawnConfig = load('game/spawn.json', spawnConfigSchema, spawnJson);
 export const combatConfig = load('game/combat.json', combatConfigSchema, combatJson);
 export const movesConfig = load('game/moves.json', movesConfigSchema, movesJson);
 export const playablesConfig = load('game/playables.json', playablesConfigSchema, playablesJson);
@@ -120,7 +118,55 @@ export const levelingConfig = load('game/leveling.json', levelingConfigSchema, l
 export const itemsConfig = load('game/items.json', itemsConfigSchema, itemsJson);
 export const derivationsConfig = load('game/derivations.json', derivationsConfigSchema, derivationsJson);
 export const statsConfig = load('game/stats.json', statsConfigSchema, statsJson);
-export const stageConfig = load('game/stage.json', stageConfigSchema, stageJson);
+
+/**
+ * 地方のステージ（data/regions/<地方>.json）を、地方に関わらない設定（spawn.json・stage.json・ground.json・obstacles.json）と
+ * 合わせて、今までと同じ形にしたもの（02 の16章）。シミュレーションには buildSimRules(地方) で渡す
+ */
+export interface RegionStage {
+  readonly id: string;
+  readonly spawn: SpawnConfig;
+  readonly stage: StageConfig;
+  readonly ground: GroundConfig;
+  readonly obstacles: ObstacleConfig;
+  readonly bgmRun: BgmRun;
+  /** 区間ごとの、夜か */
+  readonly night: readonly boolean[];
+}
+export const regionStages: Readonly<Record<string, RegionStage>> = Object.fromEntries(
+  Object.entries(import.meta.glob('../../data/regions/*.json', { eager: true, import: 'default' })).map(([path, raw]) => {
+    const id = path.replace(/^.*\/|\.json$/g, '');
+    const name = `regions/${id}.json`;
+    const file = load(name, regionStageSchema, raw);
+    const stage: RegionStage = {
+      id,
+      spawn: load(`game/spawn.json と ${name}`, spawnConfigSchema, { ...spawnJson, waves: file.sections.map((x) => x.wave) }),
+      stage: load(`game/stage.json と ${name}`, stageConfigSchema, {
+        ...stageJson,
+        durationSeconds: file.durationSeconds,
+        bosses: file.bosses,
+        swarms: file.swarms,
+        // 伝説戦の無い地方は null（stage.json の legendary の決まり）
+        legendary: file.legendary ?? null,
+      }),
+      ground: load(`render/ground.json と ${name}`, groundConfigSchema, { ...groundJson, waves: file.sections.map((x) => ({ tile: x.tile })) }),
+      obstacles: load(`game/obstacles.json と ${name}`, obstacleConfigSchema, { ...obstaclesJson, sections: file.sections.map((x) => x.obstacles) }),
+      bgmRun: { sections: file.sections.map((x) => x.bgm), legendary: file.legendaryBgm },
+      night: file.sections.map((x) => x.night),
+    };
+    return [id, stage];
+  }),
+);
+if (!regionStages.kanto) throw new Error('data/regions/kanto.json がありません');
+/** 地方のステージ。無い地方はカントー */
+export function regionStage(id: string | undefined): RegionStage {
+  return (id && regionStages[id]) || regionStages.kanto!;
+}
+/** カントーの組（タイトル画面の地面・テスト・自動プレイヤー。地方を選ばない所で使う） */
+export const spawnConfig = regionStages.kanto.spawn;
+export const stageConfig = regionStages.kanto.stage;
+export const groundConfig = regionStages.kanto.ground;
+export const obstacleConfig = regionStages.kanto.obstacles;
 export const saveConfig = load('game/save.json', saveConfigSchema, saveJson);
 export const achievementsConfig = load('game/achievements.json', achievementsConfigSchema, achievementsJson);
 /** ポケモンの解放: 実績の reward.pokemon から作る（作者の決定で、解放は実績に統合した） */
@@ -172,23 +218,12 @@ for (const r of regionsConfig.regions) {
   check(!r.available || r.playables.length > 0, `data/game/regions.json の地方 "${r.id}" は遊べるのに playables が空です`);
   for (const p of r.playables) check(!!playablesConfig.pokemon[p], `data/game/regions.json の地方 "${r.id}" のプレイアブル "${p}" が playables.json にありません`);
 }
-for (const wave of spawnConfig.waves) {
-  for (const kind of wave.kinds) {
-    check(
-      enemiesConfig.kinds.some((k) => k.id === kind),
-      `data/game/spawn.json の waves にある敵 "${kind}" が data/game/enemies.json にありません`,
-    );
-  }
-}
 // アイコン: 技の出し方・持ち物・パッシブ・タイプごとに絵柄と色がある
 for (const p of MOVE_PATTERNS) check(!!iconConfig.glyphs[iconConfig.moves[p] ?? ''], `data/render/icons.json に出し方 "${p}" の絵柄がありません`);
 for (const [move, glyph] of Object.entries(iconConfig.moveGlyphs)) check(!!iconConfig.glyphs[glyph], `data/render/icons.json の技 "${move}" の絵柄 "${glyph}" がありません`);
 for (const k of Object.keys(itemsConfig.items)) check(!!itemIcons.items[k], `data/render/item-icons.json に持ち物 "${k}" のアイコンがありません（npm run item-icons）`);
 for (const k of Object.keys(movesConfig.moves)) check(!!iconConfig.typeColors[generated.moves[k]!.type], `data/render/icons.json にタイプ "${generated.moves[k]!.type}" の色がありません`);
-// 障害物: 区間の数は spawn.json と同じ。見た目の種類はドット絵がある
-check(obstacleConfig.sections.length === spawnConfig.waves.length, `data/game/obstacles.json の sections（${obstacleConfig.sections.length}）と data/game/spawn.json の waves（${spawnConfig.waves.length}）の数をそろえてください`);
-for (const kinds of obstacleConfig.sections) for (const k of kinds) check(!!obstacleSprites.sprites[k], `data/game/obstacles.json の "${k}" のドット絵が data/render/obstacles.json にありません`);
-check(obstacleConfig.margin * 2 < obstacleConfig.cellSize, 'data/game/obstacles.json の margin は cellSize の半分より小さくする');
+check(obstaclesJson.margin * 2 < obstaclesJson.cellSize, 'data/game/obstacles.json の margin は cellSize の半分より小さくする');
 check(!!itemSprites.candyBurst, 'data/render/items.json に candyBurst がありません');
 // 道具のドット絵: マップの道具ごとと、アメの箱
 for (const name of ['potion', 'magnet', 'rare-candy', 'candy-box', 'candy-box-open', 'buff', 'buff-box', 'buff-box-open']) {
@@ -199,76 +234,79 @@ for (const [id, track] of Object.entries(bgmConfig.tracks)) {
   check(!!track.file || !!track.score, `data/audio/bgm.json の曲 "${id}" は file か score を書いてください`);
   check(!track.score || !!musicScores[track.score], `data/audio/bgm.json の曲 "${id}" の楽譜 "${track.score}" が data/audio/music にありません`);
 }
-// BGM: 区間ごとの曲は区間の数と同じ。曲の名前は tracks にあるもの
-check(bgmConfig.run.sections.length === spawnConfig.waves.length, `data/audio/bgm.json の run.sections（${bgmConfig.run.sections.length}）と data/game/spawn.json の waves（${spawnConfig.waves.length}）の数をそろえてください`);
-for (const id of [...bgmConfig.run.sections, bgmConfig.run.legendary, bgmConfig.scenes.title, bgmConfig.scenes.result]) {
+for (const id of [bgmConfig.scenes.title, bgmConfig.scenes.result]) {
   check(id === null || !!bgmConfig.tracks[id], `data/audio/bgm.json の曲 "${id}" が tracks にありません`);
 }
-check(
-  groundConfig.waves.length === spawnConfig.waves.length,
-  `data/render/ground.json の waves（${groundConfig.waves.length}）と data/game/spawn.json の waves（${spawnConfig.waves.length}）の数をそろえてください`,
-);
-// 最後の区間以外は、中ボス（gate）か durationSeconds で次へ進めるようにする
-spawnConfig.waves.forEach((w, i) => {
-  if (i === spawnConfig.waves.length - 1) return;
-  const gate = stageConfig.bosses.some((b) => b.wave === i && b.gate);
-  check(gate !== !!w.durationSeconds, `data/game/spawn.json の区間 ${i + 1} は、中ボス（stage.json の gate）か durationSeconds のどちらか1つで次へ進めてください`);
-});
 for (const kind of enemiesConfig.kinds) {
   const species = kind.species ?? kind.id;
   check(!!generated.pokemon[species], `data/game/enemies.json の "${kind.id}" のポケモン "${species}" が data/generated/pokemon.json にありません（data/pokeapi/targets.json に足して npm run pokeapi）`);
 }
-for (const wave of spawnConfig.waves) {
-  for (const id of wave.kinds) {
-    check((enemiesConfig.kinds.find((k) => k.id === id)?.rank ?? 'normal') === 'normal', `data/game/spawn.json の waves の "${id}" は雑魚（rank: normal）ではありません`);
-  }
-}
-const stageMoveIds = new Set(stageConfig.moves.map((m) => m.id));
-for (const m of stageConfig.moves) {
+const stageMoveIds = new Set(regionStages.kanto.stage.moves.map((m) => m.id));
+for (const m of regionStages.kanto.stage.moves) {
   check(!m.move || !!generated.moves[m.move], `data/game/stage.json の範囲技 "${m.id}" の技 "${m.move}" が data/generated/moves.json にありません`);
   check(!!effectRecipes[m.effect], `data/game/stage.json の範囲技 "${m.id}" の effect "${m.effect}" のレシピがありません`);
   check(!m.playerMove || !!movesConfig.moves[m.playerMove.move], `data/game/stage.json の範囲技 "${m.id}" のプレイヤーと同じ技 "${m.playerMove?.move}" が data/game/moves.json にありません`);
   check(!m.then || stageMoveIds.has(m.then), `data/game/stage.json の範囲技 "${m.id}" の then "${m.then}" がありません`);
   check(m.shape !== 'line' || !!m.length, `data/game/stage.json の範囲技 "${m.id}" は直線なので length が必要です`);
 }
-for (const b of stageConfig.bosses) {
-  const rank = enemiesConfig.kinds.find((k) => k.id === b.kind)?.rank;
-  check(rank === 'midboss' || rank === 'boss', `data/game/stage.json の "${b.kind}" が data/game/enemies.json に rank: "midboss" か "boss" でありません`);
-  check(b.wave < spawnConfig.waves.length, `data/game/stage.json の "${b.kind}" の wave ${b.wave} が data/game/spawn.json の waves にありません`);
-  check(!b.gate || b.wave < spawnConfig.waves.length - 1, `data/game/stage.json の "${b.kind}" は最後の区間なので gate にできません`);
-  for (const id of b.moves) check(stageMoveIds.has(id), `data/game/stage.json の "${b.kind}" の範囲技 "${id}" がありません`);
+// 地方のステージごと: 区間の雑魚・地面・曲・障害物・ボス・伝説・スウォーム（02 の16章）
+for (const rs of Object.values(regionStages)) {
+  const file = `data/regions/${rs.id}.json`;
+  const { spawn: spawnConfig, stage: stageConfig } = rs;
+  spawnConfig.waves.forEach((wave, i) => {
+    for (const kind of wave.kinds) {
+      const k = enemiesConfig.kinds.find((x) => x.id === kind);
+      check(!!k, `${file} の区間 ${i + 1} の敵 "${kind}" が data/game/enemies.json にありません`);
+      check((k?.rank ?? 'normal') === 'normal', `${file} の区間 ${i + 1} の "${kind}" は雑魚（rank: normal）ではありません`);
+    }
+    // 最後の区間以外は、中ボス（gate）か durationSeconds で次へ進めるようにする
+    if (i < spawnConfig.waves.length - 1) {
+      const gate = stageConfig.bosses.some((b) => b.wave === i && b.gate);
+      check(gate !== !!wave.durationSeconds, `${file} の区間 ${i + 1} は、中ボス（bosses の gate）か durationSeconds のどちらか1つで次へ進めてください`);
+    }
+  });
+  for (const kinds of rs.obstacles.sections) for (const k of kinds) check(!!obstacleSprites.sprites[k], `${file} の障害物 "${k}" のドット絵が data/render/obstacles.json にありません`);
+  for (const id of [...rs.bgmRun.sections, rs.bgmRun.legendary]) check(id === null || !!bgmConfig.tracks[id], `${file} の曲 "${id}" が data/audio/bgm.json の tracks にありません`);
+  for (const b of stageConfig.bosses) {
+    const rank = enemiesConfig.kinds.find((k) => k.id === b.kind)?.rank;
+    check(rank === 'midboss' || rank === 'boss', `${file} の "${b.kind}" が data/game/enemies.json に rank: "midboss" か "boss" でありません`);
+    check(b.wave < spawnConfig.waves.length, `${file} の "${b.kind}" の wave ${b.wave} が ${file} の waves にありません`);
+    check(!b.gate || b.wave < spawnConfig.waves.length - 1, `${file} の "${b.kind}" は最後の区間なので gate にできません`);
+    for (const id of b.moves) check(stageMoveIds.has(id), `${file} の "${b.kind}" の範囲技 "${id}" がありません`);
+  }
+  if (stageConfig.legendary) {
+    for (const id of stageConfig.legendary.kinds) {
+      check(enemiesConfig.kinds.find((k) => k.id === id)?.rank === 'legendary', `${file} の伝説 "${id}" が data/game/enemies.json に rank: "legendary" でありません`);
+    }
+    for (const id of stageConfig.legendary.moves) check(stageMoveIds.has(id), `${file} の伝説の範囲技 "${id}" がありません`);
+    // 相性で選ぶ候補（色違いの御三家）: 伝説の敵で、条件の実績があること
+    const counter = stageConfig.legendary.counter;
+    for (const id of counter?.kinds ?? []) {
+      check(enemiesConfig.kinds.find((k) => k.id === id)?.rank === 'legendary', `${file} の伝説の相性で選ぶ候補 "${id}" が data/game/enemies.json に rank: "legendary" でありません`);
+    }
+    for (const id of counter?.achievements ?? []) {
+      check(achievementsConfig.achievements.some((a) => a.id === id), `${file} の伝説の相性で選ぶ候補の条件の実績 "${id}" がありません`);
+    }
+    const legendaryKinds = [...stageConfig.legendary.kinds, ...(counter?.kinds ?? [])];
+    for (const [kind, set] of Object.entries(stageConfig.legendary.moveSets)) {
+      check(legendaryKinds.includes(kind), `${file} の伝説ごとの技の "${kind}" が伝説の候補にありません`);
+      // "*" は pool からランダム（ミュウ）
+      for (const id of set.moves) check(stageMoveIds.has(id) || (id === '*' && (set.pool?.length ?? 0) > 0), `${file} の伝説 "${kind}" の範囲技 "${id}" がありません`);
+      for (const id of set.pool ?? []) check(stageMoveIds.has(id), `${file} の伝説 "${kind}" の pool の範囲技 "${id}" がありません`);
+      for (const c of [...(set.casters ?? []), ...(set.shell?.moves ?? [])]) check(!!movesConfig.moves[c.move], `${file} の伝説 "${kind}" のプレイヤーと同じ技 "${c.move}" が data/game/moves.json にありません`);
+      if (set.field?.weather) check(!!effectRecipes[set.field.weather]?.weather, `${file} の伝説 "${kind}" の天気 "${set.field.weather}" が、天気のあるレシピ（data/effects/recipes.json の weather）ではありません`);
+      for (const id of [set.field?.lightning?.move].filter((x): x is string => !!x)) check(stageMoveIds.has(id), `${file} の伝説 "${kind}" の落雷の範囲技 "${id}" がありません`);
+    }
+  }
+  for (const s of stageConfig.swarms) {
+    check(enemiesConfig.kinds.some((k) => k.id === s.kind), `${file} のスウォーム "${s.kind}" が data/game/enemies.json にありません`);
+    if (s.pattern === 'bomber') {
+      const move = stageConfig.moves.find((m) => m.id === s.move);
+      check(!!s.triggerRange && !!move?.selfDestruct, `${file} のスウォーム "${s.kind}" は bomber なので triggerRange と、selfDestruct の範囲技 move が必要です`);
+    }
+  }
 }
-if (stageConfig.legendary) {
-  for (const id of stageConfig.legendary.kinds) {
-    check(enemiesConfig.kinds.find((k) => k.id === id)?.rank === 'legendary', `data/game/stage.json の伝説 "${id}" が data/game/enemies.json に rank: "legendary" でありません`);
-  }
-  for (const id of stageConfig.legendary.moves) check(stageMoveIds.has(id), `data/game/stage.json の伝説の範囲技 "${id}" がありません`);
-  // 相性で選ぶ候補（色違いの御三家）: 伝説の敵で、条件の実績があること
-  const counter = stageConfig.legendary.counter;
-  for (const id of counter?.kinds ?? []) {
-    check(enemiesConfig.kinds.find((k) => k.id === id)?.rank === 'legendary', `data/game/stage.json の伝説の相性で選ぶ候補 "${id}" が data/game/enemies.json に rank: "legendary" でありません`);
-  }
-  for (const id of counter?.achievements ?? []) {
-    check(achievementsConfig.achievements.some((a) => a.id === id), `data/game/stage.json の伝説の相性で選ぶ候補の条件の実績 "${id}" がありません`);
-  }
-  const legendaryKinds = [...stageConfig.legendary.kinds, ...(counter?.kinds ?? [])];
-  for (const [kind, set] of Object.entries(stageConfig.legendary.moveSets)) {
-    check(legendaryKinds.includes(kind), `data/game/stage.json の伝説ごとの技の "${kind}" が伝説の候補にありません`);
-    // "*" は pool からランダム（ミュウ）
-    for (const id of set.moves) check(stageMoveIds.has(id) || (id === '*' && (set.pool?.length ?? 0) > 0), `data/game/stage.json の伝説 "${kind}" の範囲技 "${id}" がありません`);
-    for (const id of set.pool ?? []) check(stageMoveIds.has(id), `data/game/stage.json の伝説 "${kind}" の pool の範囲技 "${id}" がありません`);
-    for (const c of [...(set.casters ?? []), ...(set.shell?.moves ?? [])]) check(!!movesConfig.moves[c.move], `data/game/stage.json の伝説 "${kind}" のプレイヤーと同じ技 "${c.move}" が data/game/moves.json にありません`);
-    if (set.field?.weather) check(!!effectRecipes[set.field.weather]?.weather, `data/game/stage.json の伝説 "${kind}" の天気 "${set.field.weather}" が、天気のあるレシピ（data/effects/recipes.json の weather）ではありません`);
-    for (const id of [set.field?.lightning?.move].filter((x): x is string => !!x)) check(stageMoveIds.has(id), `data/game/stage.json の伝説 "${kind}" の落雷の範囲技 "${id}" がありません`);
-  }
-}
-for (const s of stageConfig.swarms) {
-  check(enemiesConfig.kinds.some((k) => k.id === s.kind), `data/game/stage.json のスウォーム "${s.kind}" が data/game/enemies.json にありません`);
-  if (s.pattern === 'bomber') {
-    const move = stageConfig.moves.find((m) => m.id === s.move);
-    check(!!s.triggerRange && !!move?.selfDestruct, `data/game/stage.json のスウォーム "${s.kind}" は bomber なので triggerRange と、selfDestruct の範囲技 move が必要です`);
-  }
-}
+
 for (const [key, def] of Object.entries(movesConfig.moves)) {
   check(!!generated.moves[key], `data/game/moves.json の "${key}" が data/generated/moves.json にありません（data/pokeapi/targets.json に足して npm run pokeapi）`);
   check(!!effectRecipes[def.effect], `data/game/moves.json の "${key}" の effect "${def.effect}" のレシピがありません`);
@@ -321,24 +359,7 @@ for (const u of unlocksConfig.unlocks) {
   check(!!generated.pokemon[u.pokemon], `data/game/achievements.json の解放 "${u.pokemon}" が data/generated/pokemon.json にありません`);
 }
 
-// 中ボス・ボス・伝説・スウォームに出るポケモンと、その進化前は、時間帯の雑魚に出さない（作者の決定）
-{
-  const reserved = new Map<string, string>();
-  for (const k of enemiesConfig.kinds) {
-    if (!k.rank && !stageConfig.swarms.some((s) => s.kind === k.id)) continue;
-    const species = k.species ?? k.id;
-    reserved.set(species, species);
-    for (const pre of generated.pokemon[species]?.preEvolutions ?? []) reserved.set(pre, species);
-  }
-  spawnConfig.waves.forEach((wave, i) => {
-    if (wave.allowBossSpecies) return;
-    for (const id of wave.kinds) {
-      const species = enemiesConfig.kinds.find((k) => k.id === id)?.species ?? id;
-      const by = reserved.get(species);
-      check(!by, `data/game/spawn.json の時間帯 ${i + 1} の "${id}" は、ボスかスウォームの "${by}"（またはその進化前）なので雑魚に出せません`);
-    }
-  });
-}
+// （前は「ボス・スウォームのポケモンとその進化前は雑魚に出さない」を検証していた。作者の決定で無くした: 07 の60章）
 
 // ショップの強化は、効果（perLevel）か増える回数（grants）のどちらか1つ。名前と説明は翻訳ファイルに
 for (const u of shopConfig.upgrades) {

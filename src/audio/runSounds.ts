@@ -1,6 +1,6 @@
 import type { PlayerId } from '../sim/commands';
 import { currentWaveIndex, type World } from '../sim/world';
-import { bgmConfig } from '../data';
+import type { BgmRun } from '../data/schema';
 import { audio } from '.';
 
 /** 経験値の玉を続けて拾ったとみなす間隔（ミリ秒）と、上げる音の高さの上限（半音） */
@@ -19,7 +19,11 @@ export class RunSounds {
   private section = -1;
   private legendary = false;
 
-  constructor(private readonly localId: PlayerId) {}
+  constructor(
+    private readonly localId: PlayerId,
+    /** その地方のランの曲（data/regions/<地方>.json） */
+    private readonly bgmRun: BgmRun,
+  ) {}
 
   /** 更新のたびに、その更新の出来事を見て鳴らす */
   onEvents(world: World): void {
@@ -102,13 +106,13 @@ export class RunSounds {
   private updateBgm(world: World): void {
     if (world.outcome) return;
     if (this.legendary || world.legendary) {
-      audio.bgm.play(bgmConfig.run.legendary);
+      audio.bgm.play(this.bgmRun.legendary);
       return;
     }
     const section = currentWaveIndex(world);
     if (section === this.section) return;
     this.section = section;
-    audio.bgm.play(bgmConfig.run.sections[section] ?? null);
+    audio.bgm.play(this.bgmRun.sections[section] ?? null);
   }
 
   /** 経験値の玉: 続けて拾うと少しずつ音が上がる */

@@ -1,0 +1,31 @@
+{
+  "key": "enemy/muk",
+  "dex": 89,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 48,
+      "frameHeight": 40,
+      "durations": [
+        10,
+        8,
+        6,
+        10,
+        8
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

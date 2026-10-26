@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import groundJson from '../../data/render/ground.json';
-import { groundConfig, spawnConfig } from './index';
+import { groundConfig, regionStages, spawnConfig } from './index';
 import { groundConfigSchema, groundTileAt } from './schema';
 
 describe('マップの地面の定義', () => {
-  it('data/render/ground.json が検証を通る', () => {
-    expect(groundConfigSchema.safeParse(groundJson).success).toBe(true);
+  it('data/render/ground.json と地方のステージ（data/regions/<地方>.json）の地面を合わせると検証を通る', () => {
+    for (const rs of Object.values(regionStages)) expect(groundConfigSchema.safeParse({ ...groundJson, waves: rs.ground.waves }).success).toBe(true);
   });
 
   it('区間の番号でタイルを選び、区間が足りなければ最後のタイル', () => {

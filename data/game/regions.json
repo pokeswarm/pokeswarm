@@ -39,6 +39,7 @@
     {
       "id": "johto",
       "available": false,
+      "playables": ["charmander", "bulbasaur", "squirtle"],
       "unlock": { "stat": "bossDefeated.mew", "atLeast": 1 }
     },
     {

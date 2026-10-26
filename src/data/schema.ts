@@ -122,6 +122,8 @@ export const groundConfigSchema = z
     fadeSeconds: z.number().nonnegative(),
     /** タイル ID → 画像（public/ からのパス） */
     tiles: z.record(z.string(), z.object({ file: z.string() })),
+    /** 夜の区間に地面へ掛ける色（作者の決定 2026年10月27日: 区間の切り替えで暗くする。ポケモン・技は暗くしない）。切り替えは fadeSeconds かける */
+    nightTint: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#7080b0'),
     /** 区間（data/game/spawn.json の waves と同じ並び・同じ数）ごとのタイル */
     waves: z.array(z.object({ tile: z.string() })).min(1),
   })
@@ -1082,6 +1084,38 @@ export const regionsConfigSchema = z.object({
 });
 export type RegionsConfig = z.infer<typeof regionsConfigSchema>;
 
+/**
+ * 地方のステージ（data/regions/<地方>.json。ジョウトの J2 で地方ごとに分けた。02 の16章）。
+ * 区間ごとに 雑魚（wave）・地面（tile）・曲（bgm）・障害物の見た目（obstacles）・夜か（night）を並べる。
+ * wave・bosses・swarms・legendary の中身は、共通の設定（spawn.json・stage.json）と合わせてから spawnConfigSchema・stageConfigSchema で検証する
+ */
+export const regionStageSchema = z.object({
+  durationSeconds: z.number().positive(),
+  sections: z
+    .array(
+      z.object({
+        /** 地面（data/render/ground.json の tiles の ID） */
+        tile: z.string(),
+        /** 曲（data/audio/bgm.json の tracks の ID）。null は無音 */
+        bgm: z.string().nullable(),
+        /** 障害物の見た目（data/render/obstacles.json のドット絵のキー） */
+        obstacles: z.array(z.string()).min(1),
+        /** 夜の区間（作者の決定 2026年10月27日: 区間の切り替えで画面を暗くする） */
+        night: z.boolean().default(false),
+        /** 雑魚（前の spawn.json の waves の1つ） */
+        wave: z.record(z.string(), z.unknown()),
+      }),
+    )
+    .min(1),
+  bosses: z.array(z.unknown()),
+  swarms: z.array(z.unknown()).default([]),
+  /** 伝説戦（stage.json の legendary の形）。書かなければ伝説戦は無し */
+  legendary: z.unknown().optional(),
+  /** 伝説戦の曲 */
+  legendaryBgm: z.string().nullable().default(null),
+});
+export type RegionStageFile = z.infer<typeof regionStageSchema>;
+
 export const playablesConfigSchema = z.object({
   pokemon: z.record(
     z.string(),
@@ -1824,7 +1858,7 @@ export type SfxConfig = z.infer<typeof sfxConfigSchema>;
 
 /**
  * BGM（作者が用意した音声ファイル。public/ からのパス）。ファイルが無い曲は鳴らさない（エラーにしない）。
- * scenes は画面ごと、run.sections は区間（data/game/spawn.json の waves）ごとの曲。null は無音
+ * scenes は画面ごとの曲。ランの区間ごとの曲は地方のステージ（data/regions/<地方>.json）。null は無音
  */
 export const bgmConfigSchema = z.object({
   /** 曲が変わるときに、前の曲を小さくして次の曲を大きくする秒数 */
@@ -1842,13 +1876,15 @@ export const bgmConfigSchema = z.object({
     }),
   ),
   scenes: z.object({ title: z.string().nullable(), result: z.string().nullable() }),
-  run: z.object({
-    sections: z.array(z.string().nullable()),
-    /** 伝説戦 */
-    legendary: z.string().nullable(),
-  }),
 });
 export type BgmConfig = z.infer<typeof bgmConfigSchema>;
+/** ランの曲（地方のステージ data/regions/<地方>.json の sections[].bgm と legendaryBgm から作る） */
+export interface BgmRun {
+  /** 区間ごとの曲。null は無音 */
+  sections: (string | null)[];
+  /** 伝説戦 */
+  legendary: string | null;
+}
 
 /**
  * コードで鳴らす 8bit の曲（楽譜）。1つの記号が1ステップ（stepsPerBeat で1拍を分ける）。

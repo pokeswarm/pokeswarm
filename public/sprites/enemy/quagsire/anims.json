@@ -1,0 +1,30 @@
+{
+  "key": "enemy/quagsire",
+  "dex": 195,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 48,
+      "frameHeight": 40,
+      "durations": [
+        10,
+        12,
+        10,
+        12
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

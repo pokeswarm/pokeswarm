@@ -554,11 +554,10 @@ function triOrb(): SpriteOut {
  * はかいこうせん: 白と黒が入れ替わりながらチカチカするレーザー（作者の決定 2026年10月23日）。
  * 偶数のコマは白い芯に黒いふち、奇数のコマは黒い芯に白いふち。始まりは丸い光、終わりは広がる光
  */
-function hyperBeam(): SpriteOut {
+function hyperBeam(palette = ['#0a0a0a', '#3a3a3a', '#8a8a8a', '#d6d6d6', '#ffffff'], flicker = true): SpriteOut {
   const H = 12;
   const TILE = 8;
-  // 0 黒・1 濃い灰・2 灰・3 明るい灰・4 白
-  const palette = ['#0a0a0a', '#3a3a3a', '#8a8a8a', '#d6d6d6', '#ffffff'];
+  // 0 黒・1 濃い灰・2 灰・3 明るい灰・4 白（色を変えると色違いの光線。flicker なら1コマおきに明暗を入れかえる）
   const mid = (H - 1) / 2;
   const tone = (d: number, inv: boolean): number => {
     const c = d < 0.45 ? 4 : d < 0.7 ? 3 : d < 0.88 ? 2 : 0;
@@ -568,7 +567,7 @@ function hyperBeam(): SpriteOut {
   const middle: Grid[] = [];
   const end: Grid[] = [];
   for (let f = 0; f < 4; f++) {
-    const inv = f % 2 === 1;
+    const inv = flicker && f % 2 === 1;
     middle.push(fill(blank(TILE, H), (_x, y) => tone(Math.min(1, Math.abs(y - mid) / (H / 2)), inv)));
     // 始まり: 丸く光る口
     start.push(
@@ -2342,6 +2341,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     petal: () => single(leafLine('petal')),
     'tri-orb': () => triOrb(),
     'hyper-beam': () => hyperBeam(),
+    // ソーラービーム（色違いのフシギバナ）: はかいこうせんの形で、内側が白・外側が黄緑。点滅はしない
+    'solar-beam': () => hyperBeam(['#33691e', '#76b82a', '#c6ef5a', '#f4ffc4', '#ffffff'], false),
     lightning: () => lightning(),
     'ice-beam': () => iceBeam(),
     'aurora-beam': () => auroraBeam(),

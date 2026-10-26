@@ -227,6 +227,7 @@ const stageMoveIds = new Set(stageConfig.moves.map((m) => m.id));
 for (const m of stageConfig.moves) {
   check(!m.move || !!generated.moves[m.move], `data/game/stage.json の範囲技 "${m.id}" の技 "${m.move}" が data/generated/moves.json にありません`);
   check(!!effectRecipes[m.effect], `data/game/stage.json の範囲技 "${m.id}" の effect "${m.effect}" のレシピがありません`);
+  check(!m.playerMove || !!movesConfig.moves[m.playerMove.move], `data/game/stage.json の範囲技 "${m.id}" のプレイヤーと同じ技 "${m.playerMove?.move}" が data/game/moves.json にありません`);
   check(!m.then || stageMoveIds.has(m.then), `data/game/stage.json の範囲技 "${m.id}" の then "${m.then}" がありません`);
   check(m.shape !== 'line' || !!m.length, `data/game/stage.json の範囲技 "${m.id}" は直線なので length が必要です`);
 }
@@ -256,6 +257,7 @@ if (stageConfig.legendary) {
     // "*" は pool からランダム（ミュウ）
     for (const id of set.moves) check(stageMoveIds.has(id) || (id === '*' && (set.pool?.length ?? 0) > 0), `data/game/stage.json の伝説 "${kind}" の範囲技 "${id}" がありません`);
     for (const id of set.pool ?? []) check(stageMoveIds.has(id), `data/game/stage.json の伝説 "${kind}" の pool の範囲技 "${id}" がありません`);
+    for (const c of [...(set.casters ?? []), ...(set.shell?.moves ?? [])]) check(!!movesConfig.moves[c.move], `data/game/stage.json の伝説 "${kind}" のプレイヤーと同じ技 "${c.move}" が data/game/moves.json にありません`);
     if (set.field?.weather) check(!!effectRecipes[set.field.weather]?.weather, `data/game/stage.json の伝説 "${kind}" の天気 "${set.field.weather}" が、天気のあるレシピ（data/effects/recipes.json の weather）ではありません`);
     for (const id of [set.field?.lightning?.move].filter((x): x is string => !!x)) check(stageMoveIds.has(id), `data/game/stage.json の伝説 "${kind}" の落雷の範囲技 "${id}" がありません`);
   }

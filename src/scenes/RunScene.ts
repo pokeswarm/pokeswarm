@@ -1433,6 +1433,20 @@ export class RunScene extends Phaser.Scene {
     });
   }
 
+  /** 伝説のふつうと違う動き（カメックスの甲羅でくるくる回る・ためている間の動き）。ふつうなら null */
+  private legendPose(i: number): { anim: string; spin: boolean } | null {
+    const w = this.sim.world;
+    const lg = w.legendary;
+    if (!lg || w.enemies.kind[i] !== lg.kind) return null;
+    const set = w.rules.stage.legendary?.moveSets[w.rules.enemies.kinds[lg.kind]?.id ?? ''];
+    if (!set) return null;
+    const id = w.enemies.id[i]!;
+    const charging = w.hazards.some((h) => h.dasher === id && h.activeTicks === undefined && w.rules.stage.moves[h.move]?.rooted);
+    if (charging && set.chargePose) return { anim: set.chargePose, spin: false };
+    if (set.shell && w.legendAi?.enemyId === id && w.legendAi.shell) return { anim: set.shell.pose, spin: set.shell.spin };
+    return null;
+  }
+
   /** 状態異常の色（data/game/status.json の並びで先にあるものを優先）。かかっていなければ null */
   private statusTint(i: number): number | null {
     const e = this.sim.world.enemies;
@@ -1556,7 +1570,7 @@ export class RunScene extends Phaser.Scene {
     );
     this.streamer.update(world);
     const drawn =
-      this.enemySpriteView.update(e, alpha, view, (i) => this.statusTint(i)) +
+      this.enemySpriteView.update(e, alpha, view, (i) => this.statusTint(i), (i) => this.legendPose(i)) +
       this.enemyView.update(
         e,
         alpha,

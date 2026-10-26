@@ -381,6 +381,7 @@ export type SaveConfig = z.infer<typeof saveConfigSchema>;
  * - then: 落ちた直後に、続けて使う技（ミュウツー: テレポートの直後に自分の周り）
  * - homing: 予告が狙ったプレイヤーを追いかける（必中。ファイヤーのゴッドバード）。rooted: 予告の間、ボスは止まる
  * - bullets: 自分から count 方向（ランダム）へ、speed で seconds の間まっすぐ飛ぶ玉（サンダーの電気の玉）。触れると1回当たる
+ * - playerMove: 落ちたときに、ボスの場所から**プレイヤーと同じ技**を出す（色違いの御三家。作者の依頼 2026年10月27日）。count・spreadDegrees で数と広がりを上書きできる
  */
 /**
  * 伝説戦の間ずっと続くマップの効果（作者の案 2026年10月26日）:
@@ -391,6 +392,19 @@ export type SaveConfig = z.infer<typeof saveConfigSchema>;
  * - lightning: everySeconds ごとに技 move（target: random の範囲）を落とす（サンダーの落雷）
  * - aura: 伝説の周り radius に入ると、毎秒 damagePerSecond のダメージ（ファイヤーのほのおのうず）
  */
+/**
+ * 伝説がプレイヤーと同じ技を使う（作者の依頼 2026年10月27日）: moves.json の技 move を、レベル level で出す。
+ * everySeconds は出す間隔（省略でその技の再使用）。count・spreadDegrees で数と広がりを上書きできる（カメックス: ハイドロカノンを一周）
+ */
+export const casterMoveSchema = z.object({
+  move: z.string().min(1),
+  level: z.number().int().positive(),
+  everySeconds: z.number().positive().optional(),
+  count: z.number().int().positive().optional(),
+  spreadDegrees: z.number().nonnegative().optional(),
+});
+export type CasterMoveData = z.infer<typeof casterMoveSchema>;
+
 export const legendFieldSchema = z.object({
   damagePctPerSecond: z.number().nonnegative().optional(),
   slowPct: z.number().min(0).max(90).optional(),
@@ -436,6 +450,7 @@ export const bossMoveSchema = z.object({
   homing: z.boolean().optional(),
   rooted: z.boolean().optional(),
   bullets: z.object({ count: z.number().int().positive(), speed: z.number().positive(), seconds: z.number().positive() }).optional(),
+  playerMove: z.lazy(() => casterMoveSchema).optional(),
   leaves: z
     .object({
       seconds: z.number().positive(),
@@ -525,6 +540,24 @@ export const stageConfigSchema = z.object({
             pool: z.array(z.string()).optional(),
             /** 戦いの間ずっと続くマップの効果（伝説の強化。作者の案 2026年10月26日） */
             field: legendFieldSchema.optional(),
+            /**
+             * プレイヤーと同じ技を、戦いの間ずっと出す（色違いの御三家。作者の依頼 2026年10月27日）。casterPower はその技の威力の倍率。
+             * shell: 一番近いプレイヤーが farDistance より離れると甲羅の形になり（近づくと nearDistance で戻る）、速さ speedMultiplier 倍で moves を出しながら追う（カメックス）。
+             * pose はそのときの動き（ドット絵の動作の名前）。spin なら向きをくるくる回す。chargePose は予告の間止まる技（rooted）の間の動き
+             */
+            casters: z.array(casterMoveSchema).optional(),
+            casterPower: z.number().positive().optional(),
+            shell: z
+              .object({
+                farDistance: z.number().positive(),
+                nearDistance: z.number().positive(),
+                speedMultiplier: z.number().positive(),
+                pose: z.string(),
+                spin: z.boolean().default(false),
+                moves: z.array(casterMoveSchema).default([]),
+              })
+              .optional(),
+            chargePose: z.string().optional(),
           }),
         )
         .default({}),

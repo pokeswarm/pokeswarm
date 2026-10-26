@@ -1,3 +1,4 @@
+import { tickLegendCasters } from './systems/legendCasters';
 import { stepBoxes, tickBuffs } from './systems/boxes';
 import type { InputCommand, PlayerId } from './commands';
 import { createPlayer, type Player, type PlayerInit } from './entities/player';
@@ -87,6 +88,7 @@ export class Simulation {
     touchRevive(w);
     armBombers(w);
     bossAttacks(w);
+    tickLegendCasters(w);
     useMoves(w);
     moveProjectiles(w);
     dropGems(w);

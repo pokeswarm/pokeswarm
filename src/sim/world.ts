@@ -93,9 +93,9 @@ export interface Hazard {
   y: number;
   /** 円の半径・直線の幅の半分 */
   readonly radius: number;
-  /** 直線の向き（長さ1）と長さ */
-  readonly dirX: number;
-  readonly dirY: number;
+  /** 直線の向き（長さ1）と長さ（追いかける直線は向きが変わる） */
+  dirX: number;
+  dirY: number;
   readonly length: number;
   /** 突進する敵（直線の技。落ちたときに線に沿って進む。-1 なら突進しない） */
   readonly dasher: number;
@@ -133,6 +133,12 @@ export interface World {
   nextItemId: number;
   /** マップの箱と、次の箱を出すまでの残り（更新回数。ソロ・ホスト） */
   boxes: Box[];
+  /**
+   * 伝説がプレイヤーと同じ技を出すための術者（見えないプレイヤー。伝説の敵の id → 術者）と、出す技の残りの時間・甲羅の形か。
+   * どのブラウザでも同じように動かす（当たったかは自分のプレイヤーで決める）
+   */
+  casters: Map<number, Player>;
+  legendAi: { enemyId: number; timers: number[]; shellTimers: number[]; shell: boolean } | null;
   nextBoxId: number;
   boxTimer: number;
   /** 拾ったふしぎなアメ: 抽選の演出が終わるまでの残りと、上がるレベルの数 */
@@ -263,6 +269,8 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     items: [],
     nextItemId: 1,
     boxes: [],
+    casters: new Map(),
+    legendAi: null,
     nextBoxId: 1,
     boxTimer: Math.round((rules.pickups.boxes?.firstSpawnSeconds ?? 0) * tickRate),
     candies: [],

@@ -25,7 +25,8 @@ import { typeMultiplier, type MoveStats } from '../moves';
 import type { World } from '../world';
 import { applyHitEffect } from './commands';
 import { fireDelayedExplosion, fireEffects, type FxSource } from './moveEffects';
-import { healPlayer, selfDamage } from './health';
+import { healPlayer, hurtPlayer, selfDamage } from './health';
+import { hazardDamage } from './stage';
 import { breakOnDamage, damageTakenMultiplier } from './status';
 
 /** 持ち物の威力の倍率（でんきだま: その系統が持っているときだけ） */
@@ -1095,7 +1096,7 @@ export function moveProjectiles(world: World): void {
       }
       continue;
     }
-    const owner = world.players.find((p) => p.id === pr.owner[i]);
+    const owner = world.players.find((p) => p.id === pr.owner[i]) ?? casterOf(world, pr.owner[i]!);
     const motion = pr.motion[i]!;
     if (motion === MOTION_LINEAR) {
       // 曲がる弾（angularSpeed）は速度の向きを回す。広がる輪（growth）は半径を広げる
@@ -1187,6 +1188,11 @@ export function moveProjectiles(world: World): void {
     if ((motion === MOTION_HOMING || motion === MOTION_BOOMERANG || motion === MOTION_LOB || motion === MOTION_SNAKE || (motion === MOTION_LINEAR && (pr.vx[i] !== 0 || pr.vy[i] !== 0))) && insideObstacle(world, pr.x[i]!, pr.y[i]!)) {
       world.events.push({ type: 'projectileHit', x: pr.x[i]!, y: pr.y[i]!, owner: pr.owner[i]!, move: pr.move[i]! });
       expire(world, i);
+      continue;
+    }
+    // 伝説がプレイヤーと同じ技で出したもの（術者）: 敵には当たらず、自分のプレイヤーに当たる（自分のブラウザで決める）
+    if (pr.owner[i]! >= CASTER_ID_BASE) {
+      hitLocalPlayer(world, i);
       continue;
     }
     const x = pr.x[i]!;
@@ -1305,6 +1311,62 @@ export function moveProjectiles(world: World): void {
     }
     if (pr.pierceLeft[i]! <= 0) expire(world, i);
   }
+}
+
+/** 術者（伝説がプレイヤーと同じ技を出すための見えないプレイヤー）の番号はここから（プレイヤーの番号と重ならない） */
+export const CASTER_ID_BASE = 60000;
+
+/** 術者を番号から探す（いなければ undefined） */
+export function casterOf(world: World, id: number): Player | undefined {
+  if (id < CASTER_ID_BASE) return undefined;
+  for (const c of world.casters.values()) if (c.id === id) return c;
+  return undefined;
+}
+
+/** 術者の技 i が、自分のプレイヤーに触れていれば当てる（同じ技は当たり直しの間隔ごと。無敵時間の間は当たらない） */
+function hitLocalPlayer(world: World, i: number): void {
+  const pr = world.projectiles;
+  const me = world.players.find((p) => p.id === world.localPlayerId);
+  if (!me || me.down || me.invincibleTicks > 0) return;
+  const key = 4000000000 + me.id;
+  if (pr.isBlocked(i, key, world.tick)) return;
+  const x = pr.x[i]!;
+  const y = pr.y[i]!;
+  const r = pr.radius[i]! + me.radius;
+  const line = pr.shape[i] === SHAPE_LINE;
+  const d2 = line ? segmentDistance2(me.x, me.y, x, y, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!) : (me.x - x) ** 2 + (me.y - y) ** 2;
+  if (d2 > r * r) return;
+  const inner = pr.band[i]! > 0 ? pr.radius[i]! - pr.band[i]! - me.radius : 0;
+  if (inner > 0 && d2 < inner * inner) return;
+  if (pr.shape[i] === SHAPE_SECTOR && !inSector(me.x - x, me.y - y, me.radius, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!)) return;
+  pr.recordHit(i, key, world.tick);
+  hurtPlayer(world, me, hazardDamage(world, pr.damage[i]!));
+}
+
+/**
+ * 術者に、プレイヤーと同じ技を1回出させる（一度に出し終える出し方だけ。続けて撃つ出し方は1発ずつまとめて出す）。
+ * count・spreadDegrees は上書き（カメックスのハイドロカノンを一周）
+ */
+export function fireCasterMove(world: World, caster: Player, move: number, level: number, over: { count?: number; spreadDegrees?: number } = {}): void {
+  const def = world.rules.moves[move];
+  if (!def) return;
+  const pm: PlayerMove = { move, level, cooldown: 0, burstLeft: 0, burstTimer: 0 };
+  const base0 = moveStatsOf(world, pm);
+  const st: MoveStats = { ...base0, ...(over.count !== undefined ? { count: over.count } : {}), ...(over.spreadDegrees !== undefined ? { spreadDegrees: over.spreadDegrees } : {}) };
+  const from = world.projectiles.count;
+  if (BURST_PATTERNS.has(def.pattern)) {
+    pm.burstLeft = st.count;
+    while (pm.burstLeft > 0) {
+      pm.burstTimer = 0;
+      fireBurst(world, caster, pm, st);
+    }
+  } else if (def.pattern === 'stream') {
+    // 流れ（かえんほうしゃ・ハイドロカノン）: 向いている方向へ出し続ける
+    fireStream(world, caster, pm, st);
+  } else {
+    ONE_SHOT_FIRE[def.pattern]?.(world, caster, pm, st);
+  }
+  fireSpawnEffects(world, from, world.projectiles.count);
 }
 
 /** 遅れて爆発する印（みらいよち）の時間を進め、時間が来たら、その敵の位置で付けたプレイヤーの技として爆発させる */

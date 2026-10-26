@@ -2,6 +2,8 @@ import type { BossMove, LegendField } from '../../data/schema';
 import { randomUnit } from '../math';
 import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World, type BossEntry } from '../world';
 import { hurtPlayer, fieldDamage } from './health';
+import { fireCasterMove } from './attack';
+import { casterFor } from './legendCasters';
 
 /**
  * ステージの進行（01_game_design.md 7章。2026年10月の作者の決定）:
@@ -235,8 +237,11 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number):
     return;
   }
   if (move.homing) {
-    // 必中（ファイヤーのゴッドバード）: 予告が狙ったプレイヤーを追いかける
-    addHazard(world, moveIdx, target.x, target.y, 0, 0, bossId, undefined, { follow: target.id });
+    // 必中（ファイヤーのゴッドバード）: 予告が狙ったプレイヤーを追いかける。直線（フシギバナのソーラービーム）は、ボスから狙った人への向きを追う
+    if (move.shape === 'line') {
+      const len = Math.hypot(target.x - bx, target.y - by) || 1;
+      addHazard(world, moveIdx, bx, by, (target.x - bx) / len, (target.y - by) / len, bossId, undefined, { follow: target.id });
+    } else addHazard(world, moveIdx, target.x, target.y, 0, 0, bossId, undefined, { follow: target.id });
     return;
   }
   if (move.target === 'random') {
@@ -254,7 +259,7 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number):
     const dx = target.x - bx;
     const dy = target.y - by;
     const len = Math.hypot(dx, dy) || 1;
-    addHazard(world, moveIdx, bx, by, dx / len, dy / len, move.dashSpeed || move.rooted ? bossId : -1);
+    addHazard(world, moveIdx, bx, by, dx / len, dy / len, move.dashSpeed || move.rooted || move.playerMove ? bossId : -1);
   } else if (move.target === 'self' && move.rings) {
     // 外へ広がる輪（ミュウツー）: 1本ずつ遅らせて、外側ほど遠くに出す
     for (let k = 0; k < move.rings.count; k++) {
@@ -262,7 +267,7 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number):
       addHazard(world, moveIdx, bx, by, 0, 0, -1, undefined, { delay: Math.round(((move.stagger ?? 0) * k) / world.dt), radius: r, inner: Math.max(0, r - move.rings.width) });
     }
   } else if (move.target === 'self') {
-    addHazard(world, moveIdx, bx, by, 0, 0, move.rooted ? bossId : -1);
+    addHazard(world, moveIdx, bx, by, 0, 0, move.rooted || move.playerMove ? bossId : -1);
   } else if (move.teleport) {
     // 瞬間移動（ミュウツー）: 狙ったプレイヤーの後ろ（向いている方向の反対）に予告し、落ちたらそこへ現れる
     const fl = Math.hypot(target.facingX, target.facingY) || 1;
@@ -338,8 +343,14 @@ function strikeHazards(world: World): void {
     if (hz.follow !== undefined && hz.follow !== -1) {
       const p = world.players.find((x) => x.id === hz.follow);
       if (p && !p.down) {
-        hz.x = p.x;
-        hz.y = p.y;
+        if (hz.shape === 'line') {
+          const len = Math.hypot(p.x - hz.x, p.y - hz.y) || 1;
+          hz.dirX = (p.x - hz.x) / len;
+          hz.dirY = (p.y - hz.y) / len;
+        } else {
+          hz.x = p.x;
+          hz.y = p.y;
+        }
       }
     }
     if (--hz.ticksLeft > 0) continue;
@@ -377,6 +388,18 @@ function strikeHazards(world: World): void {
       if (i !== -1) {
         world.enemies.x[i] = world.enemies.prevX[i] = hz.x;
         world.enemies.y[i] = world.enemies.prevY[i] = hz.y;
+      }
+    }
+    // プレイヤーと同じ技を出す（色違いの御三家のブラストバーン・ハイドロカノン）。どのブラウザでも、ボスの場所から出す
+    if (move?.playerMove && hz.dasher !== -1) {
+      const i = findEnemyIndex(world, hz.dasher);
+      const pm = world.rules.moves.findIndex((m) => m.key === move.playerMove!.move);
+      if (i !== -1 && pm !== -1) {
+        const set = world.rules.stage.legendary?.moveSets[world.rules.enemies.kinds[world.enemies.kind[i]!]?.id ?? ''];
+        const caster = casterFor(world, hz.dasher, set?.casterPower ?? 1);
+        caster.x = caster.prevX = world.enemies.x[i]!;
+        caster.y = caster.prevY = world.enemies.y[i]!;
+        fireCasterMove(world, caster, pm, move.playerMove.level, move.playerMove);
       }
     }
     // 続けて使う技（ミュウツー: テレポートの直後に自分の周り）。ホストが決める
@@ -455,7 +478,7 @@ function tickLegendField(world: World): void {
 }
 
 /** 範囲技の威力: プレイヤーの最大 HP がレベルで伸びるのに合わせて上げる（後半でも痛いように） */
-function hazardDamage(world: World, damage: number): number {
+export function hazardDamage(world: World, damage: number): number {
   if (!world.rules.stage.bossRules.hazardDamageScalesWithLevel) return damage;
   return damage * (1 + (world.rules.stats.perLevelPct.maxHp * (world.level - 1)) / 100);
 }

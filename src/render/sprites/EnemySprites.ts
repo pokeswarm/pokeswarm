@@ -41,6 +41,8 @@ export class EnemySprites {
     view: { left: number; top: number; right: number; bottom: number },
     /** 色を付けるなら色、付けないなら null（状態異常の表示） */
     tintOf: (index: number) => number | null = () => null,
+    /** ふつうと違う動き（ドット絵の動作の名前。spin なら向きをくるくる回す）。ふつうなら null（伝説のカメックスの甲羅・ため） */
+    poseOf: (index: number) => { anim: string; spin: boolean } | null = () => null,
   ): number {
     for (const slot of this.slots.values()) slot.seen = false;
     let drawn = 0;
@@ -72,7 +74,11 @@ export class EnemySprites {
       const dx = e.x[i]! - e.prevX[i]!;
       const dy = e.y[i]! - e.prevY[i]!;
       if (dx !== 0 || dy !== 0) slot.dir = directionFromVector(dx, dy);
-      const key = animKey(manifest.key, this.resolve(manifest), slot.dir);
+      const pose = poseOf(i);
+      const anim = pose && manifest.animations[pose.anim] ? pose.anim : this.resolve(manifest);
+      // くるくる回る（甲羅）: 8 つの向きを速く回す
+      const dir = pose?.spin ? Math.floor(this.scene.time.now / 45) % 8 : slot.dir;
+      const key = animKey(manifest.key, anim, dir);
       if (slot.sprite.anims.currentAnim?.key !== key) {
         const frame = slot.sprite.anims.currentFrame?.index ?? 1;
         slot.sprite.play({ key, startFrame: frame - 1 });

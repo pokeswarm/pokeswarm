@@ -81,6 +81,20 @@
         8
       ],
       "frameKeyPrefix": "Hurt"
+    },
+    "Shoot": {
+      "source": "Shoot",
+      "frameWidth": 48,
+      "frameHeight": 56,
+      "durations": [
+        4,
+        2,
+        6,
+        2,
+        2,
+        4
+      ],
+      "frameKeyPrefix": "Shoot"
     }
   },
   "missing": [

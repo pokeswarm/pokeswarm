@@ -120,3 +120,81 @@ describe('ミュウ', () => {
     expect(others.size).toBeGreaterThanOrEqual(3);
   });
 });
+
+describe('色違いの御三家（プレイヤーと同じ技）', () => {
+  const hostile = (sim: Simulation, key: string): number => {
+    const pr = sim.world.projectiles;
+    const move = sim.world.rules.moves.findIndex((m) => m.key === key);
+    let n = 0;
+    for (let i = 0; i < pr.count; i++) if (pr.move[i] === move && pr.owner[i]! >= 60000) n++;
+    return n;
+  };
+
+  it('リザードン: かえんほうしゃ・ほのおのうずをずっと出し、プレイヤーに当たる（敵には当たらない）', () => {
+    const { sim, p } = legend('shiny-charizard');
+    let flame = 0;
+    let spin = 0;
+    const hp = p.hp;
+    for (let t = 0; t < 30 * 3; t++) {
+      sim.step([]);
+      flame = Math.max(flame, hostile(sim, 'flamethrower'));
+      spin = Math.max(spin, hostile(sim, 'fire-spin'));
+    }
+    expect(flame).toBeGreaterThan(0);
+    expect(spin).toBeGreaterThan(0);
+    expect(p.hp).toBeLessThan(hp);
+  });
+
+  it('リザードン: 突進の後に、プレイヤーと同じブラストバーンを出す', () => {
+    const { sim } = legend('shiny-charizard');
+    let blast = 0;
+    for (let t = 0; t < 30 * 6; t++) {
+      sim.world.players[0]!.invincibleTicks = 2;
+      sim.step([]);
+      blast = Math.max(blast, hostile(sim, 'blast-burn'));
+    }
+    expect(blast).toBeGreaterThan(0);
+  });
+
+  it('フシギバナ: はなびらのまい・ヘドロばくだんを出し、ソーラービームの予告は狙った人を追う', () => {
+    const { sim } = legend('shiny-venusaur');
+    let petal = 0;
+    let sludge = 0;
+    let beam = null as null | (typeof sim.world.hazards)[number];
+    for (let t = 0; t < 30 * 5 && !beam; t++) {
+      sim.world.players[0]!.invincibleTicks = 2;
+      sim.step([]);
+      petal = Math.max(petal, hostile(sim, 'petal-dance'));
+      sludge = Math.max(sludge, hostile(sim, 'sludge-bomb'));
+      beam = sim.world.hazards.find((h) => moveId(sim, h.move) === 'venusaur-solar-beam' && h.activeTicks === undefined) ?? null;
+    }
+    expect(petal).toBeGreaterThan(0);
+    expect(sludge).toBeGreaterThan(0);
+    expect(beam).not.toBeNull();
+    const p = sim.world.players[0]!;
+    p.y += 300;
+    sim.step([]);
+    const toP = Math.atan2(p.y - beam!.y, p.x - beam!.x);
+    expect(Math.abs(Math.atan2(beam!.dirY, beam!.dirX) - toP)).toBeLessThan(0.05);
+  });
+
+  it('カメックス: 離れると甲羅の形で速く追い、ためた後にハイドロカノンを一周に出す', () => {
+    const { sim, i, kind } = legend('shiny-blastoise');
+    const e = sim.world.enemies;
+    // 遠くへ離す
+    sim.world.players[0]!.x = e.x[i]! + 600;
+    for (let t = 0; t < 10; t++) {
+      sim.world.players[0]!.invincibleTicks = 2;
+      sim.step([]);
+    }
+    expect(sim.world.legendAi?.shell).toBe(true);
+    expect(e.speed[i]).toBeGreaterThan(sim.world.rules.enemies.kinds[kind]!.moveSpeed * 2);
+    let cannon = 0;
+    for (let t = 0; t < 30 * 6; t++) {
+      sim.world.players[0]!.invincibleTicks = 2;
+      sim.step([]);
+      cannon = Math.max(cannon, hostile(sim, 'hydro-cannon'));
+    }
+    expect(cannon).toBeGreaterThanOrEqual(12);
+  });
+});

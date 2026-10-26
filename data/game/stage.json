@@ -603,6 +603,62 @@
       "telegraphSeconds": 0.7,
       "radius": 95,
       "damage": 46
+    },
+    {
+      "id": "charizard-dash",
+      "effect": "sky-attack",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.7,
+      "radius": 34,
+      "length": 520,
+      "damage": 40,
+      "dashSpeed": 900,
+      "then": "charizard-blast-burn"
+    },
+    {
+      "id": "charizard-blast-burn",
+      "move": "blast-burn",
+      "effect": "blast-burn",
+      "shape": "circle",
+      "target": "self",
+      "telegraphSeconds": 0.3,
+      "radius": 60,
+      "damage": 0,
+      "playerMove": {
+        "move": "blast-burn",
+        "level": 8
+      }
+    },
+    {
+      "id": "venusaur-solar-beam",
+      "move": "solar-beam",
+      "effect": "solar-beam",
+      "shape": "line",
+      "target": "player",
+      "homing": true,
+      "rooted": true,
+      "telegraphSeconds": 1.8,
+      "radius": 36,
+      "length": 1600,
+      "damage": 80
+    },
+    {
+      "id": "blastoise-hydro-cannon",
+      "move": "hydro-cannon",
+      "effect": "hydro-cannon",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 1.3,
+      "radius": 90,
+      "damage": 0,
+      "playerMove": {
+        "move": "hydro-cannon",
+        "level": 8,
+        "count": 12,
+        "spreadDegrees": 30
+      }
     }
   ],
   "legendary": {
@@ -725,30 +781,66 @@
       },
       "shiny-charizard": {
         "moves": [
-          "shiny-blast-burn",
-          "moltres-flamedash",
-          "shiny-blast-burn",
-          "legend-nova"
+          "charizard-dash"
         ],
-        "random": false
+        "random": false,
+        "moveIntervalSeconds": 3,
+        "enrageMoveIntervalSeconds": 2,
+        "casters": [
+          {
+            "move": "flamethrower",
+            "level": 8
+          },
+          {
+            "move": "fire-spin",
+            "level": 8
+          }
+        ],
+        "casterPower": 1.2
       },
       "shiny-venusaur": {
         "moves": [
-          "shiny-frenzy-plant",
-          "earthquake",
-          "shiny-frenzy-plant",
-          "legend-beam"
+          "venusaur-solar-beam"
         ],
-        "random": false
+        "random": false,
+        "moveIntervalSeconds": 3.5,
+        "enrageMoveIntervalSeconds": 2.5,
+        "casters": [
+          {
+            "move": "petal-dance",
+            "level": 8
+          },
+          {
+            "move": "sludge-bomb",
+            "level": 8,
+            "everySeconds": 2.5
+          }
+        ],
+        "casterPower": 1.2
       },
       "shiny-blastoise": {
         "moves": [
-          "shiny-hydro-cannon",
-          "legend-dash",
-          "shiny-hydro-cannon",
-          "legend-nova"
+          "blastoise-hydro-cannon"
         ],
-        "random": false
+        "random": false,
+        "moveIntervalSeconds": 3.5,
+        "enrageMoveIntervalSeconds": 2.5,
+        "casterPower": 1.2,
+        "shell": {
+          "farDistance": 320,
+          "nearDistance": 160,
+          "speedMultiplier": 4,
+          "pose": "Hurt",
+          "spin": true,
+          "moves": [
+            {
+              "move": "rapid-spin",
+              "level": 8,
+              "everySeconds": 0.4
+            }
+          ]
+        },
+        "chargePose": "Shoot"
       }
     },
     "moveIntervalSeconds": 1.6,

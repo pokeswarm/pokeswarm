@@ -136,6 +136,9 @@
       "uses": [
         "enemy",
         "full"
+      ],
+      "extraAnimations": [
+        "Shoot"
       ]
     },
     {

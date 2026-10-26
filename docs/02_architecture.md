@@ -56,7 +56,8 @@
 
 - 繰り返して並べても継ぎ目が見えないタイル画像（128×128、1ドット＝画面2px でポケモンのドット絵にそろえる）を生成して使う。
 - 時間帯（Wave）ごとに使うタイルは `data/render/ground.json` で指定する（`startSeconds` は `spawn.json` の waves と同じ値。書かなかった時間帯は前のタイルが続く）。切り替えは `fadeSeconds` かけて重ねて変える。描画は `src/render/GroundTiles.ts`。
-- 元画像（`assets/map/<地方>/`）からゲーム用タイルへの変換は `node scripts/process-map-tiles.ts`（縮小・32色に減色・`preview/` に3×3の継ぎ目確認画像）。
+- カントー: 生成AIの元画像（`assets/map/kanto/`）からゲーム用タイルへの変換は `node scripts/process-map-tiles.ts`（縮小・32色に減色・`preview/` に3×3の継ぎ目確認画像）。
+- ジョウト以降: タイルは**計算で描く自作のドット絵**（`npm run map-tiles` = `node scripts/make-map-tiles.ts johto`）。端は左右・上下で必ずつながる（模様は座標を128で折り返して置き、むらは周期のあるノイズ）。乱数はシード付きで、何度実行しても同じ絵。描き方はタイルごとにスクリプトの `TILES` に書く。出力は `public/map/johto/<タイル ID>.png`、確認用の 3×3 は `assets/map/johto/preview/`。
 - 同じ模様の繰り返しが目立たないよう、草・石・花などの小物を別画像で用意し、ランダムに散らす。
 - マップは無限に広がる（プレイヤーの周囲だけ描画する）。
 

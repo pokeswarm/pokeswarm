@@ -1,7 +1,7 @@
 {
   "name": "pokeswarm",
   "private": true,
-  "version": "0.4.62",
+  "version": "0.4.63",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,7 +16,8 @@
     "moves-table": "node scripts/moves-table.ts",
     "balance-moves": "node scripts/balance-moves.ts",
     "item-icons": "node scripts/fetch-item-icons.ts",
-    "move-sprites": "node scripts/make-move-sprites.ts"
+    "move-sprites": "node scripts/make-move-sprites.ts",
+    "map-tiles": "node scripts/make-map-tiles.ts johto"
   },
   "dependencies": {
     "firebase": "^13.0.0",

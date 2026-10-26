@@ -72,46 +72,29 @@
 - **ランの長さ**: カントーは 25分（`stage.json` の `durationSeconds` 1500）で、四天王4人を約8分で倒す。ジョウトは 17:00 から四天王4人＋ワタル＋レッド（3ラウンド）なので、25分のままでは足りない。J5 でランの長さを作者に聞く。
 - PokeAPI の出現データには、のちの世代の出現（ビッパ・コリンクなど）やサファリ・ポケスロンの出現が混ざる。`spawn.json` は手で書くので問題は無いが、自動で候補を作る場合は第2世代までに絞る。
 
-## 4. マップのタイルの発注表（12枚）
+## 4. マップのタイル（12枚。コードで描いた）
 
-元画像は 1254×1254 くらいの正方形 PNG（カントーと同じ）を `assets/map/johto/` に置く。`node scripts/process-map-tiles.ts johto` で 128×128・32色にし、`preview/` の 3×3 で継ぎ目を確かめる。`process-map-tiles.ts` の `NAMES` に下の「ファイル名 → タイル ID」を足す。
+**生成AIではなく Claude がコードで描いた**（07 の63章。`npm run map-tiles` = `scripts/make-map-tiles.ts`）。出力は `public/map/johto/<タイル ID>.png`（128×128）。3×3 の継ぎ目の確認は `assets/map/johto/preview/<タイル ID>.png`、ゲームと同じ2倍の大きさでピカチュウを置いた見本は `preview/sheet-1.png`・`sheet-2.png`。直すときはスクリプトの `TILES` の色・数を変えて作り直す。
 
-| # | タイル ID | ファイル名 | 区間 | 見た目 |
-|---|---|---|---|---|
-| 1 | `meadow` | `johto_meadow_ground.png` | 0 | 明るい黄緑の草原。ところどころに小さな花（白・黄）と土の斑点 |
-| 2 | `cave` | `johto_cave_floor.png` | 1 | 湿った茶灰色の洞くつの床。小石と、浅い水たまりのような暗い青の斑点 |
-| 3 | `forest` | `johto_forest_floor.png` | 2（夜） | 深緑の森の地面。落ち葉・根・苔。夜に暗くするので、少し明るめに作る |
-| 4 | `burned` | `johto_burned_ground.png` | 3 | 焦げた黒茶の地面。灰・炭・ところどころ赤くくすぶる点・焦げた木片 |
-| 5 | `beach` | `johto_beach_ground.png` | 4 | 海に近い砂地。濡れた砂・貝殻・小さな波の泡の筋 |
-| 6 | `lighthouse` | `johto_lighthouse_floor.png` | 5（夜） | 灯台の石の床。灰色の石タイルと金属の格子、さびた茶・金の差し色 |
-| 7 | `lake_meadow` | `johto_lake_meadow_ground.png` | 6a | 生い茂った濃い草原に、水たまりがいくつか。水面は青く光る |
-| 8 | `ice` | `johto_ice_floor.png` | 6b（夜） | 水色〜白の氷の床。ひび割れ・白い霜・つるつるした反射の筋 |
-| 9 | `dragon_cave` | `johto_dragon_cave_floor.png` | 7（夜） | 濃い藍〜紫の岩の洞くつ。青白い鉱物の粒と、細い水路の黒 |
-| 10 | `victory_rock` | `johto_victory_rock_floor.png` | 8 | 険しい灰色〜赤茶の岩肌。大きなひびと段差の影 |
-| 11 | `elite_hall` | `johto_elite_hall_floor.png` | 9〜13 | 金の縁取りの暗い紺の大理石の床。格調高い格子 |
-| 12 | `snow` | `johto_snow_ground.png` | 14 | 一面の雪。浅いくぼみと、凍った岩の灰色の点 |
+| # | タイル ID | 区間 | 見た目 |
+|---|---|---|---|
+| 1 | `meadow` | 0 | 明るい黄緑の草原。ところどころに小さな花（白・黄）と土の斑点 |
+| 2 | `cave` | 1 | 湿った茶灰色の洞くつの床。小石と、浅い水たまりのような暗い青の斑点 |
+| 3 | `forest` | 2（夜） | 深緑の森の地面。落ち葉・根・苔。夜に暗くするので、少し明るめに作る |
+| 4 | `burned` | 3 | 焦げた黒茶の地面。灰・炭・ところどころ赤くくすぶる点・焦げた木片 |
+| 5 | `beach` | 4 | 海に近い砂地。濡れた砂・貝殻・小さな波の泡の筋 |
+| 6 | `lighthouse` | 5（夜） | 灯台の石の床。灰色の石タイルと金属の格子、さびた茶・金の差し色 |
+| 7 | `lake_meadow` | 6a | 生い茂った濃い草原に、水たまりがいくつか。水面は青く光る |
+| 8 | `ice` | 6b（夜） | 水色〜白の氷の床。ひび割れ・白い霜・つるつるした反射の筋 |
+| 9 | `dragon_cave` | 7（夜） | 濃い藍〜紫の岩の洞くつ。青白い鉱物の粒と、細い水路の黒 |
+| 10 | `victory_rock` | 8 | 険しい灰色〜赤茶の岩肌。大きなひびと段差の影 |
+| 11 | `elite_hall` | 9〜13 | 金の縁取りの暗い紺の大理石の床。格調高い格子 |
+| 12 | `snow` | 14 | 一面の雪。浅いくぼみと、凍った岩の灰色の点 |
 
 - 夜の区間（2・5・6b・7）は、ゲームの側で暗くする。タイルは昼の明るさで作る（夜用に別のタイルは作らない）。
 - 区間 9〜13 は、地面を共通の `elite_hall` にする（カントーと同じ）。
 
-### 生成のための指示文（共通の型。`<…>` を表の「見た目」の英語に差し替える）
-
-**画風をそろえるため、カントーのタイル（`assets/map/kanto/grassy_meadow_ground.png` など）を1枚、参考画像として一緒に渡す。** 公式の背景は使わない方針（`00`）なので、指示文に作品名は入れない。
-
-```
-Seamless tileable ground texture for a top-down 2D pixel-art game.
-Match the art style, brightness, palette density and pixel size of the attached reference tile.
-Strict top-down orthographic view looking straight down (no perspective, no horizon, no sky).
-Chunky pixel art on a 128x128 pixel grid, about 32 colors, no dithering, no anti-aliasing.
-Subject: <見た目>.
-Flat, even lighting. No vignette, no large shadows, no border or frame.
-The left edge matches the right edge and the top edge matches the bottom edge, so it tiles with no visible seam.
-No characters, no buildings, no text, no single large object; only small details spread evenly.
-Medium brightness and low contrast so that sprites drawn on top stay easy to read.
-Output a square image.
-```
-
-## 5. BGM の発注表（Claude が楽譜で作る。`04` 6.2。オリジナルの 8bit 曲）
+## 5. BGM（14曲。Claude が楽譜で作った。`04` 6.2。オリジナルの 8bit 曲）
 
 - **全14曲を作った**（2026年10月27日。試作 2曲を作者が聞いて決めた方向で）。楽譜は `data/audio/music/johto-<曲>.json`、`bgm.json` の `tracks` に登録済み（区間への割り当て `run.sections` は J2 で地方ごとにする）。localhost のタイトル画面で `?bgm=johto-cave` などを付けると聞ける（開発版だけ）。
 
@@ -137,6 +120,6 @@ Output a square image.
 ## 6. 次にすること
 
 1. 作者: 【案】の所（時間帯の雑魚・スウォームの数値・曲の共用）を確かめる。
-2. 作者: タイルを生成して `assets/map/johto/` に置く → Claude が変換し、3×3 のプレビューで継ぎ目を一緒に確かめる。
-3. Claude: BGM の試作 2曲（`route`・`red`）を作り、localhost で聞いてもらう。
+2. ~~タイル~~ → 12枚をコードで描いた（4章）。
+3. ~~BGM~~ → 14曲を作った（5章）。
 4. 決まったら J2（データの土台）へ。

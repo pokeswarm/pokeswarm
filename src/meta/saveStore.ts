@@ -20,6 +20,11 @@ const LOCAL_KEY = 'pokeswarm.save';
  * - 変更はすぐブラウザに一時保存する（タブを閉じても・通信が切れても失われない）
  * - Firestore へはまとめて書く（ラン終了時・数分ごと。flush）。変更が無ければ書かない
  * - 読み込み時は Firestore とブラウザの新しい方を使う（前回、Firestore に書く前に閉じた場合）
+ * セーブを消さないための決まり（作者の報告 2026年10月27日: テストのランの後、アカウントのデータが全部リセットされていた）:
+ * - Firestore から読めず、ブラウザの一時保存も無いときの空のデータは「仮」とし、ブラウザにも Firestore にも書かない
+ *   （前は空のデータを自分の一時保存として書き、次に開いたとき「ブラウザの方が新しい」として Firestore を空で上書きしていた）
+ * - ログインする前（ユーザーが決まる前）の変更で、ログインしていた人の一時保存を上書きしない
+ * - 何も進んでいない空のデータが、進み具合のあるデータを上書きしない（古い版で作られた空の一時保存が残っていても）
  */
 export class SaveStore {
   private data: SaveData;
@@ -27,6 +32,8 @@ export class SaveStore {
   /** Firestore にまだ書いていない変更があるか */
   private dirty = false;
   private writing: Promise<void> | null = null;
+  /** 仮のデータ（Firestore から読めず、一時保存も無かった）。ブラウザにも Firestore にも書かない */
+  private provisional = false;
   private readonly listeners = new Set<(data: Readonly<SaveData>) => void>();
 
   constructor(
@@ -75,12 +82,20 @@ export class SaveStore {
         ok = false;
       }
     }
-    if (local && (!remote || local.updatedAt > remote.updatedAt)) {
+    // 空の一時保存（何も進んでいない）は、進み具合のある Firestore のデータより新しくても使わない
+    const localWins = !!local && (!remote || (local.updatedAt > remote.updatedAt && !(isBlankSave(local) && !isBlankSave(remote))));
+    this.provisional = false;
+    if (local && localWins) {
       this.data = local;
       this.dirty = !!this.backend;
-    } else {
+    } else if (remote || ok) {
       this.data = remote ?? emptySave(this.now(), shopConfig.startingCoins);
       this.dirty = false;
+    } else {
+      // Firestore から読めず、一時保存も無い: 仮の空のデータで続けるが、どこにも書かない（Firestore の本当のデータを守る）
+      this.data = emptySave(this.now(), shopConfig.startingCoins);
+      this.dirty = false;
+      this.provisional = true;
     }
     this.writeLocal();
     this.emit();
@@ -115,7 +130,7 @@ export class SaveStore {
   /** Firestore へ書く（変更が無ければ何もしない）。失敗したら変更ありのまま残し、次の機会に書く */
   async flush(): Promise<boolean> {
     if (this.writing) await this.writing;
-    if (!this.dirty || !this.backend || !this.uid) return false;
+    if (!this.dirty || !this.backend || !this.uid || this.provisional) return false;
     const snapshot = structuredClone(this.data);
     this.dirty = false;
     this.writing = this.backend.write(this.uid, snapshot).catch((err: unknown) => {
@@ -129,6 +144,16 @@ export class SaveStore {
 
   private emit(): void {
     for (const fn of this.listeners) fn(this.data);
+  }
+
+  /** ブラウザの一時保存の持ち主（無ければ null） */
+  private storedUid(): string | null {
+    try {
+      const raw = JSON.parse(this.local?.getItem(LOCAL_KEY) ?? 'null') as { uid?: unknown } | null;
+      return typeof raw?.uid === 'string' ? raw.uid : null;
+    } catch {
+      return null;
+    }
   }
 
   private readLocal(uid: string | null): SaveData | null {
@@ -146,12 +171,21 @@ export class SaveStore {
   }
 
   private writeLocal(): void {
+    // 仮のデータは書かない。ログインする前（uid が無い）の変更で、ログインしていた人の一時保存を上書きしない
+    if (this.provisional) return;
+    if (this.uid === null && this.storedUid() !== null) return;
     try {
       this.local?.setItem(LOCAL_KEY, JSON.stringify({ uid: this.uid, data: this.data }));
     } catch {
       // 保存できない環境（プライベートブラウズなど）では、メモリの中だけで続ける
     }
   }
+}
+
+/** 何も進んでいない空のデータか（コイン・実績・解放・強化・記録・見つけた技が、新しいアカウントのまま） */
+export function isBlankSave(d: Readonly<SaveData>): boolean {
+  const progress = Object.keys(d.stats).filter((k) => !k.startsWith('reset.') && !k.startsWith('shopRepriced.'));
+  return d.achievements.length === 0 && d.unlocked.length === 0 && Object.keys(d.upgrades).length === 0 && progress.length === 0 && d.discoveries.length === 0 && d.coins <= shopConfig.startingCoins;
 }
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {

@@ -59,6 +59,8 @@ async function start(): Promise<void> {
       ? { mode: 'join', roomId: joinId }
       : { mode: 'host', forceRelay: q.has('relay'), simulateP2PFailure: q.has('p2pfail') };
   } else if (q.has('pokemon')) {
+    // セーブの読み込みが終わってから始める（読み込みの途中でランの重い読み込みが重なると、読み込みが間に合わないことがあった。作者の報告 2026年10月27日）
+    await sessionReady.catch(() => undefined);
     // 雑魚のスプライトは起動時には読まず、時間帯に合わせて読む（SpriteStreamer）
     const requested = q.get('pokemon') ?? '';
     const pokemon = playablesConfig.pokemon[requested] ? requested : playablesConfig.default;

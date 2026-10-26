@@ -105,3 +105,62 @@ describe('セーブデータ', () => {
     expect(b.current.coins).toBe(shopConfig.startingCoins);
   });
 });
+
+describe('セーブを消さない（作者の報告 2026年10月27日: テストのランの後、アカウントのデータが全部リセットされていた）', () => {
+  function realSave(now: number): SaveData {
+    const d = emptySave(now, 500);
+    d.coins = 12345;
+    d.achievements = ['clear-charmander'];
+    d.unlocked = ['onix'];
+    d.stats = { kills: 999 };
+    return d;
+  }
+
+  it('Firestore から読めず一時保存も無いときの仮の空のデータは、ブラウザにも Firestore にも書かず、次に開いたとき本当のデータに戻る', async () => {
+    const backend = new MemoryBackend();
+    backend.docs.set('u1', realSave(500));
+    const local = new MemoryLocal();
+    const now = clock();
+    const slow = new SaveStore(backend, local, now);
+    const read = backend.read.bind(backend);
+    backend.read = () => new Promise(() => undefined);
+    expect(await slow.switchUser('u1', backend, 10)).toBe(false);
+    slow.update((d) => (d.coins += 1));
+    await slow.flush();
+    expect(backend.writes).toBe(0);
+    // 次に開く（今度は読める）
+    backend.read = read;
+    const next = new SaveStore(backend, local, now);
+    expect(await next.switchUser('u1', backend)).toBe(true);
+    await next.flush();
+    expect(next.current.coins).toBe(12345);
+    expect(backend.docs.get('u1')!.coins).toBe(12345);
+  });
+
+  it('ログインする前の変更で、ログインしていた人の一時保存を上書きしない', async () => {
+    const backend = new MemoryBackend();
+    const local = new MemoryLocal();
+    const now = clock();
+    const a = new SaveStore(backend, local, now);
+    await a.switchUser('u1', backend);
+    a.update((d) => (d.coins = 7777));
+    // 次に開いた直後、ログインが終わる前に何かが変わる
+    const b = new SaveStore(backend, local, now);
+    b.update((d) => (d.stats['reset.x'] = 1));
+    // Firestore に書く前に閉じていた変更（7777）が、ブラウザの一時保存に残っている
+    expect(await b.switchUser('u1', backend)).toBe(true);
+    expect(b.current.coins).toBe(7777);
+  });
+
+  it('何も進んでいない空の一時保存は、新しくても、進み具合のある Firestore のデータを上書きしない', async () => {
+    const backend = new MemoryBackend();
+    backend.docs.set('u1', realSave(500));
+    const local = new MemoryLocal();
+    local.setItem('pokeswarm.save', JSON.stringify({ uid: 'u1', data: emptySave(99999, 500) }));
+    const store = new SaveStore(backend, local, clock());
+    await store.switchUser('u1', backend);
+    await store.flush();
+    expect(store.current.coins).toBe(12345);
+    expect(backend.docs.get('u1')!.coins).toBe(12345);
+  });
+});

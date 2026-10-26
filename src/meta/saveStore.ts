@@ -185,7 +185,7 @@ export class SaveStore {
 /** 何も進んでいない空のデータか（コイン・実績・解放・強化・記録・見つけた技が、新しいアカウントのまま） */
 export function isBlankSave(d: Readonly<SaveData>): boolean {
   const progress = Object.keys(d.stats).filter((k) => !k.startsWith('reset.') && !k.startsWith('shopRepriced.'));
-  return d.achievements.length === 0 && d.unlocked.length === 0 && Object.keys(d.upgrades).length === 0 && progress.length === 0 && d.discoveries.length === 0 && d.coins <= shopConfig.startingCoins;
+  return d.achievements.length === 0 && d.unlocked.length === 0 && Object.keys(d.upgrades).length === 0 && Object.values(d.regionUpgrades).every((u) => Object.keys(u).length === 0) && progress.length === 0 && d.discoveries.length === 0 && d.coins <= shopConfig.startingCoins;
 }
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {

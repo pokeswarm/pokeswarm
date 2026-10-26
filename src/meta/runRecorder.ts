@@ -5,6 +5,7 @@ import type { SaveStore } from './saveStore';
 import type { ShopConfig } from '../data/schema';
 import { coinsForRun, permanentBonus } from './shop';
 import { refreshDerivedStats, type DerivedStatSources } from './progress';
+import { HOME_REGION, regionStatKey } from './regionScope';
 
 /**
  * ラン中の記録をセーブデータに足す（01_game_design.md 8.2）。
@@ -19,6 +20,7 @@ import { refreshDerivedStats, type DerivedStatSources } from './progress';
  *   reached.<ポケモン>（そのポケモンで1回のランに倒した中ボス・四天王の数の最高）, bestLevel.<ポケモン>（そのポケモンで届いた最高レベル）,
  *   distinctClears（クリアしたポケモンの種類の数）, uniqueKinds（出した固有技の種類の数）。最後の2つは足すのではなく、ほかの記録から数え直す
  * 協力プレイ（03_network.md 3.6）: 雑魚はとどめを刺した人だけ、中ボス・ボスは参加者全員に数える。
+ * カントー以外の地方のランは、記録の名前の頭に "<地方>:" を付ける（02 の17章。コインの合計 coinsEarned だけは共通）。
  */
 export class RunRecorder {
   private readonly pending = new Map<string, number>();
@@ -41,10 +43,18 @@ export class RunRecorder {
     private readonly shop: ShopConfig | null = null,
     /** 数え直す記録（distinctClears・uniqueKinds）のもと。省略すると数えない */
     private readonly derived: DerivedStatSources | null = null,
+    /** 遊んでいる地方（記録の名前・永続強化のコインの増加に使う） */
+    private readonly region: string = HOME_REGION,
   ) {}
 
   private count(key: string, n = 1): void {
-    this.pending.set(key, (this.pending.get(key) ?? 0) + n);
+    const k = regionStatKey(this.region, key);
+    this.pending.set(k, (this.pending.get(k) ?? 0) + n);
+  }
+
+  /** 最高記録をその地方の記録に書く */
+  private best(d: Parameters<typeof maxStat>[0], key: string, value: number): void {
+    maxStat(d, regionStatKey(this.region, key), value);
   }
 
   /** 1回の更新の後に呼び、その更新の出来事を数える */
@@ -116,7 +126,7 @@ export class RunRecorder {
   /** ラン中の、ここまでにもらえるコインの見込み（画面上部に出す。終わったときの計算と同じ。クリアと伝説は含めない） */
   liveCoins(world: World): number {
     if (!this.shop) return 0;
-    const greed = permanentBonus(this.store.current, this.shop).coinPct;
+    const greed = permanentBonus(this.store.current, this.shop, this.region).coinPct;
     return Math.floor(
       coinsForRun(this.shop, { seconds: elapsedSeconds(world), kills: this.runKills, midbosses: this.runMidbosses, bosses: this.runBosses, clear: false, legendaryWon: false }) *
         (1 + greed / 100),
@@ -143,7 +153,7 @@ export class RunRecorder {
     this.commit(world);
     this.finished = true;
     // コイン（01_game_design.md 8.3。失敗・切断でも、そこまでの分をもらえる）
-    const greed = this.shop ? permanentBonus(this.store.current, this.shop).coinPct : 0;
+    const greed = this.shop ? permanentBonus(this.store.current, this.shop, this.region).coinPct : 0;
     this.coinsEarned = this.shop
       ? Math.floor(
           coinsForRun(this.shop, {
@@ -160,13 +170,13 @@ export class RunRecorder {
     this.store.update((d) => {
       d.coins += this.coinsEarned;
       if (this.coinsEarned > 0) d.stats.coinsEarned = (d.stats.coinsEarned ?? 0) + this.coinsEarned;
-      maxStat(d, 'bestKills', this.runKills);
-      maxStat(d, 'bestMidbosses', this.runMidbosses);
-      maxStat(d, 'bestLevel', world.level);
-      maxStat(d, `reached.${this.pokemon}`, this.runMidbosses + this.runBosses);
-      maxStat(d, `bestLevel.${this.pokemon}`, world.level);
-      if (this.derived) refreshDerivedStats(d.stats, this.derived);
-      maxStat(d, 'longestSeconds', Math.floor(elapsedSeconds(world)));
+      this.best(d, 'bestKills', this.runKills);
+      this.best(d, 'bestMidbosses', this.runMidbosses);
+      this.best(d, 'bestLevel', world.level);
+      this.best(d, `reached.${this.pokemon}`, this.runMidbosses + this.runBosses);
+      this.best(d, `bestLevel.${this.pokemon}`, world.level);
+      if (this.derived) refreshDerivedStats(d.stats, this.derived, this.region);
+      this.best(d, 'longestSeconds', Math.floor(elapsedSeconds(world)));
     });
   }
 }

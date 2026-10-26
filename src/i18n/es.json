@@ -199,8 +199,8 @@
   "shop.level": "{level} / {max}",
   "shop.buy": "Comprar ({cost})",
   "shop.maxed": "Máx.",
-  "shop.refund": "Reembolsar (reinicia las mejoras y devuelve las monedas)",
-  "shop.refundConfirm": "¿Reiniciar todas las mejoras y recuperar {coins} monedas?",
+  "shop.refund": "Reembolsar (reinicia las mejoras de esta región y de las siguientes, y devuelve las monedas)",
+  "shop.refundConfirm": "¿Reiniciar las mejoras de esta región y de las siguientes y recuperar {coins} monedas?",
   "shop.back": "Volver al título (Esc)",
   "levelUp.ban": "Desterrar (B) quedan {count}",
   "levelUp.banHint": "Pulsa el número de la opción que quieres desterrar (Esc para cancelar)",
@@ -501,5 +501,8 @@
   "select.shiny": "Variocolor",
   "run.shinyName": "{name} variocolor",
   "title.version": "BETA  v{version}",
-  "pattern.passive": "Siempre activo"
+  "pattern.passive": "Siempre activo",
+  "shop.regionTitle": "¿Tienda de qué región?",
+  "shop.unlock.johto": "🔒 Se abre al gastar 50000 monedas en la tienda de Kanto ({current} / {target})",
+  "shop.backRegions": "Volver a las regiones (Esc)"
 }

@@ -199,8 +199,8 @@
   "shop.level": "{level} / {max}",
   "shop.buy": "Compra ({cost})",
   "shop.maxed": "Max",
-  "shop.refund": "Rimborso (azzera i potenziamenti e restituisce le monete)",
-  "shop.refundConfirm": "Azzerare tutti i potenziamenti e recuperare {coins} monete?",
+  "shop.refund": "Rimborso (azzera i potenziamenti di questa regione e delle successive e restituisce le monete)",
+  "shop.refundConfirm": "Azzerare i potenziamenti di questa regione e delle successive e recuperare {coins} monete?",
   "shop.back": "Torna al titolo (Esc)",
   "levelUp.ban": "Bandisci (B) ne restano {count}",
   "levelUp.banHint": "Premi il numero dell'opzione da bandire (Esc per annullare)",
@@ -501,5 +501,8 @@
   "select.shiny": "Cromatico",
   "run.shinyName": "{name} cromatico",
   "title.version": "BETA  v{version}",
-  "pattern.passive": "Sempre attivo"
+  "pattern.passive": "Sempre attivo",
+  "shop.regionTitle": "Negozio di quale regione?",
+  "shop.unlock.johto": "🔒 Si apre dopo aver speso 50000 monete nel negozio di Kanto ({current} / {target})",
+  "shop.backRegions": "Torna alle regioni (Esc)"
 }

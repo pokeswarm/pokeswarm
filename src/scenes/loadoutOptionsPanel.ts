@@ -19,7 +19,11 @@ export class LoadoutOptionsPanel {
   private pokemon: string | null = null;
   private value: LoadoutOptions = { startItem: null, shiny: false };
 
-  constructor(private readonly onChange: (options: LoadoutOptions) => void) {
+  constructor(
+    private readonly onChange: (options: LoadoutOptions) => void,
+    /** 遊ぶ地方（最初の持ち物・色違いは、その地方のクリアと実績で決まる） */
+    private readonly region = 'kanto',
+  ) {
     this.element = document.createElement('div');
     this.element.style.cssText = 'display:flex;gap:16px;align-items:center;flex-wrap:wrap;min-height:36px';
   }
@@ -37,8 +41,8 @@ export class LoadoutOptionsPanel {
       this.value = { startItem: null, shiny: false };
     } else {
       const kept = rememberedOptions(pokemon);
-      const choices = canChooseStartItem(save, pokemon) ? startItemChoices(save, pokemon) : [];
-      this.value = { startItem: kept.startItem && choices.includes(kept.startItem) ? kept.startItem : null, shiny: kept.shiny && canUseShiny(save, pokemon) };
+      const choices = canChooseStartItem(save, pokemon, this.region) ? startItemChoices(save, pokemon, this.region) : [];
+      this.value = { startItem: kept.startItem && choices.includes(kept.startItem) ? kept.startItem : null, shiny: kept.shiny && canUseShiny(save, pokemon, this.region) };
     }
     this.render();
     this.onChange(this.options);
@@ -60,14 +64,14 @@ export class LoadoutOptionsPanel {
     const label = document.createElement('span');
     label.textContent = t('select.startItem');
     item.append(label);
-    if (canChooseStartItem(save, pokemon)) {
+    if (canChooseStartItem(save, pokemon, this.region)) {
       const select = document.createElement('select');
       select.style.cssText = `${windowCss('light')};font:inherit;font-size:16px;padding:2px 8px;min-height:32px`;
       const none = document.createElement('option');
       none.value = '';
       none.textContent = t('select.startItemNone');
       select.append(none);
-      for (const key of startItemChoices(save, pokemon)) {
+      for (const key of startItemChoices(save, pokemon, this.region)) {
         const o = document.createElement('option');
         o.value = key;
         o.textContent = localName(generated.items[key]?.names, getLocale(), key);
@@ -85,7 +89,7 @@ export class LoadoutOptionsPanel {
       item.append(locked);
     }
     this.element.append(item);
-    if (canUseShiny(save, pokemon)) {
+    if (canUseShiny(save, pokemon, this.region)) {
       const shiny = document.createElement('label');
       shiny.style.cssText = 'display:flex;gap:6px;align-items:center;cursor:pointer';
       const box = document.createElement('input');

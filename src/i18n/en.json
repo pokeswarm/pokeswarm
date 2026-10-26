@@ -220,8 +220,8 @@
   "shop.level": "{level} / {max}",
   "shop.buy": "Buy ({cost})",
   "shop.maxed": "Max",
-  "shop.refund": "Refund (reset all upgrades and get your coins back)",
-  "shop.refundConfirm": "Reset all upgrades and refund {coins} coins?",
+  "shop.refund": "Refund (reset upgrades in this region and later regions, and get your coins back)",
+  "shop.refundConfirm": "Reset the upgrades in this region and later regions and get {coins} coins back?",
   "shop.back": "Back to title (Esc)",
   "levelUp.ban": "Banish (B) {count} left",
   "levelUp.banHint": "Press the number of the option to banish (Esc to cancel)",
@@ -522,5 +522,8 @@
   "select.shiny": "Shiny",
   "run.shinyName": "Shiny {name}",
   "title.version": "BETA  v{version}",
-  "pattern.passive": "Always active"
+  "pattern.passive": "Always active",
+  "shop.regionTitle": "Which region's shop?",
+  "shop.unlock.johto": "🔒 Opens after you spend 50000 coins in the Kanto shop ({current} / {target})",
+  "shop.backRegions": "Back to regions (Esc)"
 }

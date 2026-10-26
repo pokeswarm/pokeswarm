@@ -148,7 +148,13 @@
   "startingCoins": 500,
   "repriced": {
     "tag": "2026-10-25",
-    "baseCosts": { "might": 200, "max-health": 200, "haste": 900, "area": 300, "reroll-plus": 5000 }
+    "baseCosts": {
+      "might": 200,
+      "max-health": 200,
+      "haste": 900,
+      "area": 300,
+      "reroll-plus": 5000
+    }
   },
   "legacyBaseCosts": {
     "max-hp": 100,
@@ -163,5 +169,13 @@
     "reroll": 200,
     "ban": 200,
     "recovery": 200
+  },
+  "regions": {
+    "johto": {
+      "unlock": {
+        "stat": "shopSpent",
+        "atLeast": 50000
+      }
+    }
   }
 }

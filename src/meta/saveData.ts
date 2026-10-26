@@ -11,8 +11,10 @@ export const saveDataSchema = z.object({
   updatedAt: z.number().nonnegative(),
   /** コイン（区切り3） */
   coins: z.number().int().nonnegative(),
-  /** 永続強化のレベル（区切り3。キーは強化の id） */
+  /** カントーの永続強化のレベル（区切り3。キーは強化の id） */
   upgrades: z.record(z.string(), z.number().int().nonnegative()),
+  /** カントー以外の地方の永続強化のレベル（地方 → 強化の id → レベル。ジョウトの J3 で足した。前のセーブには無いので空として読む。02 の17章） */
+  regionUpgrades: z.record(z.string(), z.record(z.string(), z.number().int().nonnegative())).default({}),
   /** 解放したポケモン（区切り2） */
   unlocked: z.array(z.string()),
   /** 記録（撃破数などの数。キーは記録の id。区切り2で増やす） */
@@ -26,7 +28,7 @@ export type SaveData = z.infer<typeof saveDataSchema>;
 
 /** coins は新しいアカウントのコイン（shop.json の startingCoins） */
 export function emptySave(now = 0, coins = 0): SaveData {
-  return { version: 1, updatedAt: now, coins, upgrades: {}, unlocked: [], stats: {}, achievements: [], discoveries: [] };
+  return { version: 1, updatedAt: now, coins, upgrades: {}, regionUpgrades: {}, unlocked: [], stats: {}, achievements: [], discoveries: [] };
 }
 
 /** 読み込んだ値をセーブデータにする。形が違えば null（壊れたデータで上書きしないため、呼び出し側で扱いを決める） */

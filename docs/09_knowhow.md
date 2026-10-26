@@ -14,8 +14,9 @@
 6. **プレイアブル**（`playables.json`・`regions.json` の `playables`）: 最初の技、`fixedMoves`（技を覚えない）、`itemMoves`（持ち物で技を覚える）、`unlock`（解放の名前）。解放は実績（`achievements.json`）かショップ（`shop.json` の `pokemon`）。
 7. **技と派生**（`moves.json`・`derivations.json`）: 7章の作り方を参照。技を足したら `npm run balance-moves` と `npm run moves-table`（`08` は手で直さない）。
 8. **見た目**: 技のレシピ（`data/effects/recipes.json`）、技のドット絵（`src/render/moveArt.ts`）、技のアイコンの絵柄（`data/render/icons.json` の `moveGlyphs`。無ければ出し方の絵柄）、地面・障害物。
-9. **文章**: 翻訳ファイル6言語（ja・en・fr・de・es・it）。ポケモン・技・持ち物・タイプ・地方の名前は PokeAPI から出す（翻訳ファイルに書かない）。
-10. **確かめる**: `npx tsc --noEmit`・`npx vitest run`・`npm run balance`・ブラウザ（8章）。作っている間は、地方の選択に `?regions=all`（開発版だけ）でその地方を選べる。`?section=<番号>` でその区間から始められる。地方を `available: true` にするのは最後。
+9. **ショップ・実績**（`02` の17章）: 地方の実績は `achievements.json` に `region` を書く（条件の記録の名前はカントーと同じでよい。判定はその地方の記録だけ）。売るポケモンは `shop.json` の `pokemon` に `region`。ショップの解放の条件は `shop.json` の `regions.<地方>.unlock`、案内の文は `shop.unlock.<地方>`。
+10. **文章**: 翻訳ファイル6言語（ja・en・fr・de・es・it）。ポケモン・技・持ち物・タイプ・地方の名前は PokeAPI から出す（翻訳ファイルに書かない）。
+11. **確かめる**: `npx tsc --noEmit`・`npx vitest run`・`npm run balance`・ブラウザ（8章）。作っている間は、地方の選択に `?regions=all`（開発版だけ）でその地方を選べる。`?section=<番号>` でその区間から始められる。地方を `available: true` にするのは最後。
 
 ## 2. バランス調整の進め方
 

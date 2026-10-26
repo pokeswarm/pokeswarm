@@ -1,8 +1,8 @@
 import type { Account, SaveChooser, TransferConfirm } from '../firebase/account';
 import type { PresenceState, Social } from '../firebase/social';
 import { firebaseOptionsFromEnv } from '../firebase/config';
-import { achievementsConfig, shopConfig, unlocksConfig } from '../data';
-import { refundLegacy } from './shop';
+import { achievementsConfig, playablesConfig, shopConfig, unlocksConfig } from '../data';
+import { backfillShopSpent, refundLegacy } from './shop';
 import { applyProgress, applyResets } from './progress';
 import { SaveStore } from './saveStore';
 
@@ -44,6 +44,13 @@ class Session {
     const tag = shopConfig.repriced?.tag;
     if (found > 0 || (tag && !this.store.current.stats[`shopRepriced.${tag}`])) this.store.update((d) => void refundLegacy(d, shopConfig));
     return found;
+  }
+
+  /** 前のセーブ: ショップで使ったコインの合計（ジョウトのショップの解放に使う）を、今の強化と買ったポケモンから数える（起動時に1回。02 の17章） */
+  backfillShopSpent(): void {
+    const unlockOf = (key: string): string => playablesConfig.pokemon[key]?.unlock ?? key;
+    if (!backfillShopSpent(structuredClone(this.store.current) as Parameters<typeof backfillShopSpent>[0], shopConfig, unlockOf)) return;
+    this.store.update((d) => void backfillShopSpent(d, shopConfig, unlockOf));
   }
 
   /** 記録を足した後に呼ぶ: 新しく満たした実績・解放をセーブデータに足して返す（無ければ変更しない） */

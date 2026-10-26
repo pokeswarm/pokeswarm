@@ -199,8 +199,8 @@
   "shop.level": "{level} / {max}",
   "shop.buy": "Acheter ({cost})",
   "shop.maxed": "Max",
-  "shop.refund": "Rembourser (réinitialiser les améliorations et récupérer les pièces)",
-  "shop.refundConfirm": "Réinitialiser toutes les améliorations et rembourser {coins} pièces ?",
+  "shop.refund": "Rembourser (réinitialiser les améliorations de cette région et des suivantes, et récupérer les pièces)",
+  "shop.refundConfirm": "Réinitialiser les améliorations de cette région et des suivantes, et récupérer {coins} pièces ?",
   "shop.back": "Retour au titre (Échap)",
   "levelUp.ban": "Bannir (B) reste {count}",
   "levelUp.banHint": "Appuyez sur le numéro du choix à bannir (Échap pour annuler)",
@@ -501,5 +501,8 @@
   "select.shiny": "Chromatique",
   "run.shinyName": "{name} chromatique",
   "title.version": "BETA  v{version}",
-  "pattern.passive": "Toujours actif"
+  "pattern.passive": "Toujours actif",
+  "shop.regionTitle": "Boutique de quelle région ?",
+  "shop.unlock.johto": "🔒 S'ouvre après avoir dépensé 50000 pièces dans la boutique de Kanto ({current} / {target})",
+  "shop.backRegions": "Retour aux régions (Échap)"
 }

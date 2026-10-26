@@ -47,6 +47,8 @@ async function start(): Promise<void> {
     session.checkProgress();
     // ショップの強化の一覧を作り直したので、前の版の強化は使ったコインを全額返す
     session.refundLegacyUpgrades();
+    // ジョウトのショップの解放に使う、ショップで使ったコインの合計（前のセーブは今の強化から数える）
+    session.backfillShopSpent();
   });
   const q = new URLSearchParams(window.location.search);
   // 開発版だけ: ?restore=50000 で、伝説以外の実績を全部達成にし、コインをその数にする（セーブの読み込みが終わってから。公開版では効かない）

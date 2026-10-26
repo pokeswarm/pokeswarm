@@ -220,8 +220,8 @@
   "shop.level": "{level} / {max}",
   "shop.buy": "買う（{cost}）",
   "shop.maxed": "最大",
-  "shop.refund": "払い戻し（すべての強化を戻して、使ったコインを返す）",
-  "shop.refundConfirm": "すべての強化を戻して、{coins} コインを返します。よろしいですか？",
+  "shop.refund": "払い戻し（この地方と、後の地方の強化を戻して、使ったコインを返す）",
+  "shop.refundConfirm": "この地方と、後の地方の強化を戻して、{coins} コインを返します。よろしいですか？",
   "shop.back": "タイトルへ（Esc）",
   "levelUp.ban": "除外（B）残り {count}",
   "levelUp.banHint": "除外する候補の番号を押す（Esc でやめる）",
@@ -522,5 +522,8 @@
   "select.shiny": "色違い",
   "run.shinyName": "色違いの{name}",
   "title.version": "BETA  v{version}",
-  "pattern.passive": "いつも効く"
+  "pattern.passive": "いつも効く",
+  "shop.regionTitle": "どの地方の ショップ？",
+  "shop.unlock.johto": "🔒 カントーのショップで 50000 コインを使うと開く（{current} / {target}）",
+  "shop.backRegions": "地方の選択へ（Esc）"
 }

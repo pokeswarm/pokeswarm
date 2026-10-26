@@ -10,6 +10,7 @@ import { LoadoutOptionsPanel } from './loadoutOptionsPanel';
 import { formatTag } from '../meta/nickname';
 import { compactScreen } from '../render/pixelUi';
 import { session } from '../meta/session';
+import { regionUpgradesOf } from '../meta/regionScope';
 import type { RunSceneData } from './RunScene';
 import { pokemonIconImage, PokemonPicker } from './pokemonPicker';
 import { defaultRegion } from './RegionScene';
@@ -116,7 +117,8 @@ export class LobbyScene extends Phaser.Scene {
       this.room = room;
       this.message = null;
       // 自分の強化のレベルを知らせる（ほかの人の画面でも同じ強さで動かすため）
-      void room.setUpgrades(session.store.current.upgrades, session.store.current.achievements);
+      // 部屋の地方の強化（02 の17章）
+      void room.setUpgrades(regionUpgradesOf(session.store.current, room.region || defaultRegion()), session.store.current.achievements);
       room.onChange = () => this.render();
       room.onStart = (players) => this.startRun(players);
       room.onLeave = (id) => {
@@ -258,7 +260,7 @@ export class LobbyScene extends Phaser.Scene {
       // 真ん中: ポケモンの一覧（選ぶとすぐ自分の枠に出る）
       const mine = room.memberList.find((m) => m.id === room.localId)?.pokemon ?? null;
       const region = regionsConfig.regions.find((r) => r.id === room.region && r.available) ?? regionsConfig.regions.find((r) => r.id === defaultRegion())!;
-      this.options ??= new LoadoutOptionsPanel((o) => void this.room?.setLoadoutOptions(o.startItem, o.shiny));
+      this.options ??= new LoadoutOptionsPanel((o) => void this.room?.setLoadoutOptions(o.startItem, o.shiny), this.room?.region || defaultRegion());
       this.picker ??= new PokemonPicker({
         playables: region.playables,
         onSelect: (key) => {

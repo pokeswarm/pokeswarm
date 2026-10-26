@@ -199,8 +199,8 @@
   "shop.level": "{level} / {max}",
   "shop.buy": "Kaufen ({cost})",
   "shop.maxed": "Max",
-  "shop.refund": "Erstatten (alle Verbesserungen zurücksetzen und Münzen zurückerhalten)",
-  "shop.refundConfirm": "Alle Verbesserungen zurücksetzen und {coins} Münzen erstatten?",
+  "shop.refund": "Erstatten (Verbesserungen dieser und späterer Regionen zurücksetzen und Münzen zurückerhalten)",
+  "shop.refundConfirm": "Verbesserungen dieser und späterer Regionen zurücksetzen und {coins} Münzen zurückerhalten?",
   "shop.back": "Zurück zum Titel (Esc)",
   "levelUp.ban": "Verbannen (B) noch {count}",
   "levelUp.banHint": "Drücke die Nummer der Option, die verbannt werden soll (Esc zum Abbrechen)",
@@ -501,5 +501,8 @@
   "select.shiny": "Schillernd",
   "run.shinyName": "Schillerndes {name}",
   "title.version": "BETA  v{version}",
-  "pattern.passive": "Immer aktiv"
+  "pattern.passive": "Immer aktiv",
+  "shop.regionTitle": "Shop welcher Region?",
+  "shop.unlock.johto": "🔒 Öffnet sich, wenn du im Kanto-Shop 50000 Münzen ausgegeben hast ({current} / {target})",
+  "shop.backRegions": "Zurück zu den Regionen (Esc)"
 }

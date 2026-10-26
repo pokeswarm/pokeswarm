@@ -172,7 +172,7 @@ export const achievementsConfig = load('game/achievements.json', achievementsCon
 /** ポケモンの解放: 実績の reward.pokemon から作る（作者の決定で、解放は実績に統合した） */
 export const unlocksConfig: UnlocksConfig = {
   initial: achievementsConfig.initialPokemon,
-  unlocks: achievementsConfig.achievements.flatMap((a) => (a.reward?.pokemon ? [{ pokemon: a.reward.pokemon, condition: a.condition }] : [])),
+  unlocks: achievementsConfig.achievements.flatMap((a) => (a.reward?.pokemon ? [{ pokemon: a.reward.pokemon, condition: a.condition, region: a.region }] : [])),
 };
 /** 数え直す記録（クリアしたポケモンの種類・出した固有技の種類）のもと */
 export const derivedStatSources = {

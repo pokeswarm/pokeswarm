@@ -1,11 +1,13 @@
 import Phaser from 'phaser';
-import { generated, playablesConfig, shopConfig } from '../data';
+import { generated, playablesConfig, regionsConfig, shopConfig } from '../data';
 import { localName } from '../data/simRules';
 import { pokemonIconImage } from './pokemonPicker';
 import { getLocale, t, tMaybe } from '../i18n';
 import { session } from '../meta/session';
 import { compactScreen } from '../render/pixelUi';
-import { buyPokemon, buyUpgrade, nextCost, refundAll, upgradeLevel } from '../meta/shop';
+import { buyPokemon, buyUpgrade, nextCost, refundableCoins, refundAll, shopRegionOpen, upgradeLevel } from '../meta/shop';
+import { progressOf } from '../meta/progress';
+import { regionPlayable } from './RegionScene';
 
 // 原作をまねた白い窓のボタン（作者の決定。2026年10月22日。src/render/pixelUi.ts の windowCss と同じ見た目）
 const BUTTON = 'min-height:44px;padding:8px 14px;cursor:pointer;font:inherit;font-size:16px;background:#f8f8f8;color:#383848;border:4px solid #383848;border-radius:6px;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #a8b8c8';
@@ -13,7 +15,8 @@ const BUTTON = 'min-height:44px;padding:8px 14px;cursor:pointer;font:inherit;fon
 /**
  * フレンドリィショップ（永続強化。DOM。見た目の作り込みはフェーズ4）。
  * 所持コイン・強化ごとのレベルと次の費用・買う・すべての払い戻し。
- * 買ったものはセーブデータに入り、ランの始めに当てはめる。Firestore へは画面を出るときにまとめて書く
+ * 買ったものはセーブデータに入り、ランの始めに当てはめる。Firestore へは画面を出るときにまとめて書く。
+ * 最初に地方を選ぶ（作者の決定 07 の48.4。強化のレベルは地方ごと。02 の17章）
  */
 export class ShopScene extends Phaser.Scene {
   constructor() {
@@ -29,13 +32,64 @@ export class ShopScene extends Phaser.Scene {
     if (compact) root.style.cssText += ';padding:8px 12px;height:96vh';
     const button = BUTTON + (compact ? ';min-height:36px;padding:2px 10px' : '');
     document.body.appendChild(root);
-    const render = (): void => {
+    /** 選んでいる地方（null は地方の選択の画面） */
+    let region: string | null = null;
+    const order = regionsConfig.regions.map((x) => x.id);
+    // 地方を選ぶ・地方の選択へ戻る（null）
+    const chooseRegion = (id: string | null): void => {
+      region = id;
+      render();
+    };
+    const regionName = (id: string): string => localName(generated.regions[id]?.names, getLocale(), id);
+    // 地方の選択（プレイの地方の選択と同じ並び。遊べない地方は Coming soon、開いていないショップは条件を出す）
+    const renderRegions = (): void => {
+      const save = session.store.current;
+      const header = document.createElement('div');
+      header.style.cssText = `display:flex;align-items:center;gap:12px;margin-bottom:${compact ? 4 : 10}px;flex:none;flex-wrap:wrap`;
+      const title = document.createElement('div');
+      title.style.cssText = `font-size:${compact ? 20 : 24}px;font-weight:bold;flex:1`;
+      title.textContent = `${t('shop.title')} ― ${t('shop.regionTitle')}`;
+      const coins = document.createElement('div');
+      coins.style.cssText = `font-size:${compact ? 20 : 24}px;color:#ffe082`;
+      coins.textContent = t('shop.coins', { coins: save.coins });
+      const back = document.createElement('button');
+      back.style.cssText = button;
+      back.textContent = t('shop.back');
+      back.onclick = () => this.scene.start('title');
+      header.append(title, coins, back);
+      const grid = document.createElement('div');
+      grid.style.cssText = 'flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;align-content:start';
+      for (const r of regionsConfig.regions) {
+        const playable = regionPlayable(r);
+        const open = playable && shopRegionOpen(save, shopConfig, r.id);
+        const card = document.createElement('button');
+        card.style.cssText = BUTTON + `;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;min-height:96px;${open ? '' : 'opacity:0.55;cursor:default'}`;
+        const name = document.createElement('div');
+        name.style.cssText = 'font-size:20px;font-weight:bold';
+        name.textContent = regionName(r.id);
+        card.append(name);
+        const note = document.createElement('div');
+        note.style.cssText = 'font-size:14px';
+        const unlock = shopConfig.regions[r.id]?.unlock;
+        if (!playable) note.textContent = r.available ? tMaybe(`region.unlock.${r.id}`) : t('region.comingSoon');
+        else if (!open && unlock) {
+          const p = progressOf(save.stats, unlock);
+          note.textContent = tMaybe(`shop.unlock.${r.id}`, { current: p?.current ?? 0, target: p?.target ?? 0 });
+        }
+        if (note.textContent) card.append(note);
+        card.disabled = !open;
+        card.onclick = () => chooseRegion(r.id);
+        grid.append(card);
+      }
+      root.replaceChildren(header, grid);
+    };
+    const renderShop = (region: string): void => {
       const save = session.store.current;
       const header = document.createElement('div');
       header.style.cssText = `display:flex;align-items:center;gap:12px;margin-bottom:${compact ? 4 : 10}px;flex:none;flex-wrap:wrap`;
       const title = document.createElement('div');
       title.style.cssText = `font-size:${compact ? 20 : 24}px;font-weight:bold`;
-      title.textContent = t('shop.title');
+      title.textContent = `${t('shop.title')} ― ${regionName(region)}`;
       const coins = document.createElement('div');
       coins.style.cssText = `font-size:${compact ? 20 : 24}px;color:#ffe082;flex:1`;
       coins.textContent = t('shop.coins', { coins: save.coins });
@@ -53,13 +107,15 @@ export class ShopScene extends Phaser.Scene {
       const list = document.createElement('div');
       list.style.cssText = 'flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:4px;padding-top:6px';
       // コインで買えるポケモン（作者の決定 2026年10月23日）。強化の上に、見出しを付けて並べる
-      if (shopConfig.pokemon.length > 0) {
+      // その地方のショップで売るポケモン
+      const forSale = shopConfig.pokemon.filter((p) => p.region === region);
+      if (forSale.length > 0) {
         const heading = document.createElement('div');
         heading.style.cssText = 'padding:2px 12px;opacity:0.7';
         heading.textContent = t('shop.pokemonSection');
         list.append(heading);
       }
-      for (const item of shopConfig.pokemon) {
+      for (const item of forSale) {
         const unlockName = playablesConfig.pokemon[item.key]?.unlock ?? item.key;
         const owned = save.unlocked.includes(unlockName);
         const row = document.createElement('div');
@@ -87,14 +143,14 @@ export class ShopScene extends Phaser.Scene {
         row.append(name, state, desc, buy);
         list.append(row);
       }
-      if (shopConfig.pokemon.length > 0) {
+      if (forSale.length > 0) {
         const heading = document.createElement('div');
         heading.style.cssText = 'padding:8px 12px 2px;opacity:0.7';
         heading.textContent = t('shop.title');
         list.append(heading);
       }
       for (const def of shopConfig.upgrades) {
-        const level = upgradeLevel(save, def.id);
+        const level = upgradeLevel(save, def.id, region);
         const cost = nextCost(def, level);
         const maxed = cost === null;
         const row = document.createElement('div');
@@ -112,7 +168,7 @@ export class ShopScene extends Phaser.Scene {
         buy.textContent = maxed ? t('shop.maxed') : t('shop.buy', { cost });
         buy.disabled = maxed || save.coins < cost;
         if (buy.disabled) buy.style.opacity = '0.5';
-        buy.onclick = () => session.store.update((d) => void buyUpgrade(d, shopConfig, def.id));
+        buy.onclick = () => session.store.update((d) => void buyUpgrade(d, shopConfig, def.id, region));
         row.append(name, lv, desc, buy);
         list.append(row);
       }
@@ -122,19 +178,17 @@ export class ShopScene extends Phaser.Scene {
       const refund = document.createElement('button');
       refund.style.cssText = button;
       refund.textContent = t('shop.refund');
-      const spent = shopConfig.upgrades.reduce((sum, d) => {
-        const l = upgradeLevel(save, d.id);
-        return sum + (d.baseCost * l * (l + 1)) / 2;
-      }, 0);
+      // この地方と、後の地方の強化に使っているコイン（作者の決定 07 の48.4: 払い戻しはジョウト以降にも及ぶ）
+      const spent = refundableCoins(save, shopConfig, region, order);
       refund.disabled = spent === 0;
       if (refund.disabled) refund.style.opacity = '0.5';
       refund.onclick = () => {
-        if (window.confirm(t('shop.refundConfirm', { coins: spent }))) session.store.update((d) => void refundAll(d, shopConfig));
+        if (window.confirm(t('shop.refundConfirm', { coins: spent }))) session.store.update((d) => void refundAll(d, shopConfig, region, order));
       };
       const back = document.createElement('button');
       back.style.cssText = button;
-      back.textContent = t('shop.back');
-      back.onclick = () => this.scene.start('title');
+      back.textContent = t('shop.backRegions');
+      back.onclick = () => chooseRegion(null);
       header.append(back);
       footer.append(refund);
       const scroll = root.querySelector<HTMLDivElement>('[data-list]')?.scrollTop ?? 0;
@@ -143,10 +197,13 @@ export class ShopScene extends Phaser.Scene {
       // 買って描き直しても、見ていた場所のまま
       list.scrollTop = scroll;
     };
+    const render = (): void => (region === null ? renderRegions() : renderShop(region));
     render();
     const off = session.store.onChange(render);
     const onKey = (ev: KeyboardEvent): void => {
-      if (ev.key === 'Escape') this.scene.start('title');
+      if (ev.key !== 'Escape') return;
+      if (region === null) this.scene.start('title');
+      else chooseRegion(null);
     };
     window.addEventListener('keydown', onKey);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {

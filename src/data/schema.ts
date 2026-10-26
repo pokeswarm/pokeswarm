@@ -343,7 +343,14 @@ export const achievementsConfigSchema = z.object({
   /** 最初の持ち物（作者の決定 2026年10月24日）: そのポケモンで clears 回クリアすると、ラン開始時に解放済みの持ち物を1つ選んで持っていける */
   startItem: z.object({ clears: z.number().int().positive() }),
   achievements: z.array(
-    z.object({ id: z.string().min(1), condition: statConditionSchema, hidden: z.boolean().default(false), reward: achievementRewardSchema.optional() }),
+    z.object({
+      id: z.string().min(1),
+      /** 実績の地方（02 の17章。省略時はカントー）。条件はその地方のランの記録だけで判定し、報酬もその地方のランだけに効く */
+      region: z.string().default('kanto'),
+      condition: statConditionSchema,
+      hidden: z.boolean().default(false),
+      reward: achievementRewardSchema.optional(),
+    }),
   ),
   /**
    * 全員のセーブから一度だけ取り消すもの（伝説のリワークに合わせたリセットなど。作者の依頼 2026年10月27日）。
@@ -358,7 +365,8 @@ export type AchievementsConfig = z.infer<typeof achievementsConfigSchema>;
 /** ポケモンの解放（実績の reward.pokemon から作る）。initial は最初から使える */
 export interface UnlocksConfig {
   initial: readonly string[];
-  unlocks: readonly { pokemon: string; condition: StatCondition }[];
+  /** region は条件を判定する地方（その地方の記録で見る） */
+  unlocks: readonly { pokemon: string; condition: StatCondition; region: string }[];
 }
 
 // ---- セーブ ----
@@ -1745,7 +1753,12 @@ export const shopConfigSchema = z.object({
     }),
   ),
   /** コインで買えるポケモン（作者の決定 2026年10月23日）。key は data/game/playables.json のキー。買うと解放される（払い戻しの対象外） */
-  pokemon: z.array(z.object({ key: z.string(), cost: z.number().int().positive() })).default([]),
+  pokemon: z.array(z.object({ key: z.string(), cost: z.number().int().positive(), /** 売る地方のショップ（省略時はカントー） */ region: z.string().default('kanto') })).default([]),
+  /**
+   * カントー以外の地方のショップの解放の条件（作者の決定 07 の48.4: ジョウトはカントーのショップで 50000 コイン以上使う）。
+   * 書いていない地方のショップは、その地方が遊べるようになったら開く。強化の種類と値段は全地方で共通（レベルは地方ごと）
+   */
+  regions: z.record(z.string(), z.object({ unlock: z.lazy(() => statConditionSchema) })).default({}),
   /** 新しいアカウントが最初に持っているコイン（作者の決定 2026年10月25日: 500） */
   startingCoins: z.number().int().nonnegative().default(0),
   /**

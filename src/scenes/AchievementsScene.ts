@@ -3,6 +3,7 @@ import { achievementsConfig, playablesConfig } from '../data';
 import { t } from '../i18n';
 import { visibleAchievementCondition, achievementName, achievementReward } from '../meta/achievementText';
 import { progressOf } from '../meta/progress';
+import { regionStats } from '../meta/regionScope';
 import { session } from '../meta/session';
 import { compactScreen } from '../render/pixelUi';
 
@@ -67,8 +68,10 @@ export class AchievementsScene extends Phaser.Scene {
         name.textContent = achieved ? achievementName(a.id) : t('achievements.secret');
         name.style.color = achieved ? '#f8d030' : '#a0a0a8';
         const cond = document.createElement('div');
-        cond.textContent = secret ? t('achievements.hiddenDesc') : visibleAchievementCondition(a, save.stats, achieved);
-        const p = progressOf(save.stats, a.condition);
+        // 条件と進み具合は、その実績の地方の記録で見る（02 の17章）
+        const stats = regionStats(save.stats, a.region);
+        cond.textContent = secret ? t('achievements.hiddenDesc') : visibleAchievementCondition(a, stats, achieved);
+        const p = progressOf(stats, a.condition);
         if (!achieved && !secret && p && p.target > 1) {
           const prog = document.createElement('span');
           prog.style.cssText = 'opacity:0.7;margin-left:8px;white-space:nowrap';

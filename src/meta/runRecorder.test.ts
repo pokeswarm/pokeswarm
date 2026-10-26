@@ -31,6 +31,22 @@ function setup(role: SimRole = 'solo', localId = 1) {
 }
 
 describe('ランの記録', () => {
+  it('ジョウトのランは、記録の名前の頭に johto: を付け、カントーの記録を進めない（コインの合計だけは共通）', () => {
+    const { store, sim, kill } = setup();
+    const rec = new RunRecorder(store, 'charmander', null, null, 'johto');
+    kill(0, 1);
+    rec.observe(sim.world);
+    sim.world.outcome = 'clear';
+    rec.finish(sim.world);
+    const s = store.current.stats;
+    expect(s.kills).toBeUndefined();
+    expect(s.clears).toBeUndefined();
+    expect(s['johto:clears']).toBe(1);
+    expect(s['johto:clears.charmander']).toBe(1);
+    expect(s['johto:bestKills']).toBeDefined();
+    expect(Object.keys(s).every((k) => k.startsWith('johto:') || k === 'coinsEarned')).toBe(true);
+  });
+
   it('途中の記録と終了時の記録を、同じ分を2回足さずにまとめる', () => {
     const { store, sim, rec, kill } = setup();
     for (let k = 0; k < 3; k++) kill(0, 1);

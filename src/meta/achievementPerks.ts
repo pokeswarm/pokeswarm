@@ -21,6 +21,12 @@ export interface AchievementPerks {
   readonly shiny: ReadonlySet<string>;
 }
 
+/** 達成した実績のうち、その地方の実績だけ（報酬はその地方のランだけに効く。02 の17章） */
+export function regionAchieved(cfg: AchievementsConfig, achieved: readonly string[], region: string): string[] {
+  const ids = new Set(cfg.achievements.filter((a) => a.region === region).map((a) => a.id));
+  return achieved.filter((id) => ids.has(id));
+}
+
 export function achievementPerks(cfg: AchievementsConfig, achieved: readonly string[]): AchievementPerks {
   const items = new Set(cfg.initialItems);
   const startMoveLevel: Record<string, number> = {};

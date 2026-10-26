@@ -3,6 +3,7 @@ import { localName } from '../data/simRules';
 import { getLocale, t } from '../i18n';
 import { visibleAchievementCondition } from '../meta/achievementText';
 import { isPlayableUnlocked } from '../meta/progress';
+import { regionStats } from '../meta/regionScope';
 import { session } from '../meta/session';
 import { windowCss, compactScreen } from '../render/pixelUi';
 import { loadPokemonIcon } from '../render/pokemonIcons';
@@ -173,7 +174,7 @@ export class PokemonPicker {
       const id = playablesConfig.pokemon[key]!.unlock ?? key;
       const a = achievementsConfig.achievements.find((x) => x.reward?.pokemon === id);
       // 半分を超えるまでは「？？？」（黒塗りのポケモンが条件の文で分からないように）
-      const cond = a ? visibleAchievementCondition(a, session.store.current.stats, false) : '';
+      const cond = a ? visibleAchievementCondition(a, regionStats(session.store.current.stats, a.region), false) : '';
       // コインで買えるポケモンは値段を出す
       const sale = shopConfig.pokemon.find((p) => p.key === key);
       // 解放済みと同じく名前の下に2行（マウスを動かしても欄の高さが変わらないように）

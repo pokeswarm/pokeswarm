@@ -2,7 +2,8 @@ import { achievementsConfig } from '../data';
 import { buildSimRules, playableLoadout } from '../data/simRules';
 import type { SimRules } from '../sim/rules';
 import { itemFits } from '../sim/systems/leveling';
-import { achievementPerks } from './achievementPerks';
+import { achievementPerks, regionAchieved } from './achievementPerks';
+import { HOME_REGION, regionStats } from './regionScope';
 import type { SaveData } from './saveData';
 
 /**
@@ -16,23 +17,23 @@ export function shinySpriteKey(key: string): string {
   return `${key}-shiny`;
 }
 
-/** そのポケモンで最初の持ち物を選べるか */
-export function canChooseStartItem(save: Readonly<SaveData>, pokemon: string): boolean {
-  return (save.stats[`clears.${pokemon}`] ?? 0) >= achievementsConfig.startItem.clears;
+/** そのポケモンで最初の持ち物を選べるか（その地方でのクリアの回数。省略時はカントー） */
+export function canChooseStartItem(save: Readonly<SaveData>, pokemon: string, region = HOME_REGION): boolean {
+  return (regionStats(save.stats, region)[`clears.${pokemon}`] ?? 0) >= achievementsConfig.startItem.clears;
 }
 
-/** そのポケモンを色違いで遊べるか */
-export function canUseShiny(save: Readonly<SaveData>, pokemon: string): boolean {
-  return achievementPerks(achievementsConfig, save.achievements).shiny.has(pokemon);
+/** そのポケモンを色違いで遊べるか（その地方の実績の報酬） */
+export function canUseShiny(save: Readonly<SaveData>, pokemon: string, region = HOME_REGION): boolean {
+  return achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, save.achievements, region)).shiny.has(pokemon);
 }
 
 let rulesCache: SimRules | null = null;
 
 /** 最初に持っていける持ち物のキー（解放済みで、そのポケモンの候補に出るもの。持ち物の一覧の順） */
-export function startItemChoices(save: Readonly<SaveData>, pokemon: string): string[] {
+export function startItemChoices(save: Readonly<SaveData>, pokemon: string, region = HOME_REGION): string[] {
   rulesCache ??= buildSimRules();
   const rules = rulesCache;
-  const perks = achievementPerks(achievementsConfig, save.achievements);
+  const perks = achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, save.achievements, region));
   const loadout = playableLoadout(rules, pokemon);
   const unlockedItems = new Set(rules.items.flatMap((it, i) => (perks.items.has(it.key) ? [i] : [])));
   const p = { unlockedItems, line: loadout.line, species: loadout.species, items: [], types: loadout.types, moveTypes: loadout.moveTypes };

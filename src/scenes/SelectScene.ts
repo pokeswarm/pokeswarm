@@ -35,7 +35,7 @@ export class SelectScene extends Phaser.Scene {
     let starting = false;
     let selected: string | null = null;
     // 最初の持ち物・色違い（そのポケモンでクリアした・色違いを解放したときだけ出る）
-    const options = new LoadoutOptionsPanel(() => undefined);
+    const options = new LoadoutOptionsPanel(() => undefined, region.id);
     const start = (key: string): void => {
       if (starting) return;
       starting = true;

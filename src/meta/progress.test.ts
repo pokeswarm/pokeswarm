@@ -8,12 +8,12 @@ const achievements: AchievementsConfig = {
   initialItems: ['x-attack'],
   startItem: { clears: 1 },
   achievements: [
-    { id: 'a', hidden: false, condition: { stat: 'kills', atLeast: 10 } },
-    { id: 'b', hidden: true, condition: { all: [{ stat: 'x', atLeast: 1 }, { stat: 'y', atLeast: 1 }] } },
-    { id: 'c', hidden: false, condition: { any: [{ stat: 'x', atLeast: 5 }, { stat: 'z', atLeast: 1 }] } },
+    { id: 'a', region: 'kanto', hidden: false, condition: { stat: 'kills', atLeast: 10 } },
+    { id: 'b', region: 'kanto', hidden: true, condition: { all: [{ stat: 'x', atLeast: 1 }, { stat: 'y', atLeast: 1 }] } },
+    { id: 'c', region: 'kanto', hidden: false, condition: { any: [{ stat: 'x', atLeast: 5 }, { stat: 'z', atLeast: 1 }] } },
   ],
 };
-const unlocks: UnlocksConfig = { initial: ['charmander'], unlocks: [{ pokemon: 'onix', condition: { stat: 'defeated.onix', atLeast: 20 } }] };
+const unlocks: UnlocksConfig = { initial: ['charmander'], unlocks: [{ pokemon: 'onix', condition: { stat: 'defeated.onix', atLeast: 20 }, region: 'kanto' }] };
 
 describe('実績と解放', () => {
   it('条件の組み合わせ（すべて・どれか）', () => {

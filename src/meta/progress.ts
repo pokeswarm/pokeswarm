@@ -1,5 +1,6 @@
 import type { AchievementsConfig, StatCondition, UnlocksConfig } from '../data/schema';
 import type { SaveData } from './saveData';
+import { regionStatKey, regionStats } from './regionScope';
 
 /**
  * 実績とポケモンの解放の判定（01_game_design.md 8.1・8.2）。条件は data/game/achievements.json（解放は reward.pokemon）に
@@ -22,10 +23,14 @@ export interface DerivedStatSources {
   readonly uniqueMoves: readonly string[];
 }
 
-/** ほかの記録から数え直す記録（クリアしたポケモンの種類・出した固有技の種類）。前のセーブデータでも正しい数になる */
-export function refreshDerivedStats(stats: Record<string, number>, src: DerivedStatSources): void {
-  stats.distinctClears = src.playables.filter((k) => (stats[`clears.${k}`] ?? 0) > 0).length;
-  stats.uniqueKinds = src.uniqueMoves.filter((m) => (stats[`derived.${m}`] ?? 0) > 0).length;
+/**
+ * ほかの記録から数え直す記録（クリアしたポケモンの種類・出した固有技の種類）。前のセーブデータでも正しい数になる。
+ * region の記録（02 の17章。省略時はカントー）から数え、その地方の記録に書く
+ */
+export function refreshDerivedStats(stats: Record<string, number>, src: DerivedStatSources, region = 'kanto'): void {
+  const view = regionStats(stats, region);
+  stats[regionStatKey(region, 'distinctClears')] = src.playables.filter((k) => (view[`clears.${k}`] ?? 0) > 0).length;
+  stats[regionStatKey(region, 'uniqueKinds')] = src.uniqueMoves.filter((m) => (view[`derived.${m}`] ?? 0) > 0).length;
 }
 
 export function isUnlocked(save: Readonly<SaveData>, unlocks: UnlocksConfig, pokemon: string): boolean {
@@ -59,7 +64,8 @@ export function applyResets(save: SaveData, resets: AchievementsConfig['resets']
 export function applyProgress(save: SaveData, achievements: AchievementsConfig, unlocks: UnlocksConfig): { achievements: string[]; unlocks: string[] } {
   const newAchievements: string[] = [];
   for (const a of achievements.achievements) {
-    if (save.achievements.includes(a.id) || !meets(save.stats, a.condition)) continue;
+    // その実績の地方のランの記録だけで判定する（02 の17章）
+    if (save.achievements.includes(a.id) || !meets(regionStats(save.stats, a.region), a.condition)) continue;
     save.achievements.push(a.id);
     newAchievements.push(a.id);
     // 報酬のコイン（作者の決定 07 23章）
@@ -67,7 +73,7 @@ export function applyProgress(save: SaveData, achievements: AchievementsConfig, 
   }
   const newUnlocks: string[] = [];
   for (const u of unlocks.unlocks) {
-    if (isUnlocked(save, unlocks, u.pokemon) || !meets(save.stats, u.condition)) continue;
+    if (isUnlocked(save, unlocks, u.pokemon) || !meets(regionStats(save.stats, u.region), u.condition)) continue;
     save.unlocked.push(u.pokemon);
     newUnlocks.push(u.pokemon);
   }

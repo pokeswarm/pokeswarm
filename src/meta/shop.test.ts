@@ -16,7 +16,8 @@ const shop: ShopConfig = {
     { id: 'ban', maxLevel: 5, baseCost: 200, grants: 'bans' },
     { id: 'greed', maxLevel: 5, baseCost: 200, grants: 'coinPct', amount: 10 },
   ],
-  pokemon: [{ key: 'eevee', cost: 500 }],
+  pokemon: [{ key: 'eevee', cost: 500, region: 'kanto' }],
+  regions: { johto: { unlock: { stat: 'shopSpent', atLeast: 1000 } } },
   startingCoins: 0,
   legacyBaseCosts: { attack: 150 },
 };

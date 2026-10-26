@@ -450,6 +450,8 @@
   "pattern.rest": "Dort et se soigne à l'arrêt",
   "run.moveTaught": "{name} appris !",
   "run.sleepZ": "Z z z",
+  "run.godMode": "Test : invincible (dégâts qui auraient été subis {damage}, {times}× PV max) · non enregistré",
+  "run.testMode": "Test : non enregistré",
   "run.frozen": "Glaciation ! Vous êtes gelé !",
   "run.levelMax": "N. MAX",
   "pause.title.paused": "Pause",

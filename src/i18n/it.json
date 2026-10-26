@@ -450,6 +450,8 @@
   "pattern.rest": "Dorme e si cura stando fermo",
   "run.moveTaught": "Ha imparato {name}!",
   "run.sleepZ": "Z z z",
+  "run.godMode": "Test: invincibile (danni che avresti subito {damage}, {times}× PS max) · non salvato",
+  "run.testMode": "Test: non salvato",
   "run.frozen": "Purogelo! Sei congelato!",
   "run.levelMax": "Lv. MAX",
   "pause.title.paused": "Pausa",

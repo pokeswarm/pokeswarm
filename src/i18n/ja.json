@@ -471,6 +471,8 @@
   "pattern.rest": "止まっていると眠って回復する",
   "run.moveTaught": "{name} を おぼえた！",
   "run.sleepZ": "Z z z",
+  "run.godMode": "テスト: 無敵（受けたはずのダメージ {damage}・最大HPの {times} 回分）・記録しない",
+  "run.testMode": "テスト: 記録しない",
   "run.frozen": "ぜったいれいど！ こおってしまった！",
   "run.levelMax": "LvMAX",
   "pause.title.paused": "ポーズ",

@@ -661,6 +661,14 @@ function startLegendaryOrClear(world: World): void {
     endRun(world, 'clear');
     return;
   }
+  startLegendary(world, kind);
+}
+
+/** 伝説戦を始める（「DANGER」の後に kind の伝説が出る）。確認用の ?legend= からも呼ぶ */
+export function startLegendary(world: World, kind: number): void {
+  const cfg = world.rules.stage.legendary;
+  if (!cfg) return;
+  world.cleared = true;
   const appearTick = world.tick + Math.round(cfg.warningSeconds / world.dt);
   world.legendary = { kind, appearTick, endTick: appearTick + Math.round(cfg.timeLimitSeconds / world.dt), spawned: false, result: null };
   // 雑魚はいなくなり、伝説と戦う（2.2）。残っている予告も消す

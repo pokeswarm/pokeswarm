@@ -36,7 +36,7 @@ import { SHAPE_CIRCLE, SHAPE_LINE, SHAPE_SECTOR } from '../sim/entities/projecti
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World } from '../sim/world';
-import { applyDebugOverrides, parseLevelParam, parseMovesParam, parseSectionParam, parseTimeParam } from './debugOverrides';
+import { applyDebugOverrides, parseGodParam, parseLegendParam, parseLevelParam, parseMovesParam, parseSectionParam, parseTimeParam } from './debugOverrides';
 import { addXp, applyOffer, itemFits } from '../sim/systems/leveling';
 import { shinySpriteKey } from '../meta/loadoutOptions';
 import { achievementPerks } from '../meta/achievementPerks';
@@ -45,7 +45,7 @@ import { achievementName, achievementRewardById } from '../meta/achievementText'
 import { RunRecorder } from '../meta/runRecorder';
 import { session } from '../meta/session';
 import { LevelUpPanel, offerText } from './levelUpPanel';
-import { activeLegendField } from '../sim/systems/stage';
+import { activeLegendField, startLegendary } from '../sim/systems/stage';
 import { PausePanel } from './pausePanel';
 import { EvolutionCutscene } from './evolutionCutscene';
 import { NetPanel } from './netPanel';
@@ -163,6 +163,11 @@ export class RunScene extends Phaser.Scene {
   /** ポーズの画面（Esc）と、ゲストが止めずに開いている設定の画面 */
   private pausePanel!: PausePanel;
   private settingsOpen = false;
+  /** テストプレイ: 最初から戦う伝説（無ければ null）・無敵・無敵の間に受けたはずのダメージの合計 */
+  private testLegend: number | null = null;
+  private god = false;
+  private godDamage = 0;
+  private godText: Phaser.GameObjects.Text | null = null;
   /** 伝説戦のマップの効果で画面に重ねる色（サンダーで暗く・フリーザーで白っぽく） */
   private fieldOverlay: Phaser.GameObjects.Rectangle | null = null;
   /** 進化の演出（自分が進化したとき。ソロでは演出の間ゲームを止める） */
@@ -212,6 +217,7 @@ export class RunScene extends Phaser.Scene {
     this.boxImages.clear();
     this.buffIcons = [];
     this.fieldOverlay = null;
+    this.godText = null;
     this.boltView = null;
     this.flashedSerials = new Set();
     this.inbox = [];
@@ -350,6 +356,11 @@ export class RunScene extends Phaser.Scene {
       w.section = Math.min(startSection, w.waves.length - 1);
       while (w.nextBoss < w.bossSchedule.length && w.bossSchedule[w.nextBoss]!.wave < w.section) w.nextBoss++;
     }
+    // テストプレイ（ソロだけ）: ?legend=mewtwo で最初から伝説と戦う。?god で無敵。どちらかを付けたランは記録を保存しない
+    this.testLegend = this.coop ? null : parseLegendParam(this.sim.world.rules, window.location.search);
+    this.god = !this.coop && parseGodParam(window.location.search);
+    this.godDamage = 0;
+    if (this.testLegend !== null) startLegendary(this.sim.world, this.testLegend);
     if (this.coop) this.setupNet(this.coop.room);
 
     this.clock = new FixedStepClock(simulationConfig.tickRate, simulationConfig.maxTicksPerFrame);
@@ -588,6 +599,8 @@ export class RunScene extends Phaser.Scene {
    */
   private setupSaving(): void {
     this.recorder = new RunRecorder(session.store, this.pokemon, shopConfig, derivedStatSources);
+    // テストプレイ（?legend・?god）のランは記録を保存しない（コイン・実績・解放が進まないように）
+    if (this.isTestRun()) return;
     const autosave = this.time.addEvent({
       delay: saveConfig.autosaveSeconds * 1000,
       loop: true,
@@ -610,9 +623,15 @@ export class RunScene extends Phaser.Scene {
   /** ランが終わった: 記録をまとめてセーブデータに足し、保存する */
   private recordRunEnd(): void {
     this.runRecorded = true;
+    if (this.isTestRun()) return;
     this.recorder.finish(this.sim.world);
     this.noteProgress();
     void session.store.flush();
+  }
+
+  /** テストプレイのラン（記録を保存しない） */
+  private isTestRun(): boolean {
+    return this.god || this.testLegend !== null;
   }
 
   /** 伝説戦の結果（結果画面に出す） */
@@ -632,6 +651,7 @@ export class RunScene extends Phaser.Scene {
 
   /** 記録を足した後: 新しく達成した実績を知らせ、結果画面のために覚えておく */
   private noteProgress(): void {
+    if (this.isTestRun()) return;
     const found = session.checkProgress();
     this.newAchievements.push(...found.achievements);
     this.newUnlocks.push(...found.unlocks);
@@ -1106,6 +1126,27 @@ export class RunScene extends Phaser.Scene {
     }
   }
 
+  /** テストプレイの無敵: 受けたダメージを数えて HP を戻す（倒れない・凍らない） */
+  private applyGod(): void {
+    const me = this.sim.world.players.find((p) => p.id === this.localId);
+    if (!me) return;
+    for (const ev of this.sim.world.events) if (ev.type === 'playerDamaged' && ev.playerId === me.id) this.godDamage += ev.amount;
+    me.hp = me.maxHp;
+    me.down = false;
+    me.frozenTicks = 0;
+  }
+
+  /** テストプレイの表示: 無敵であることと、受けたはずのダメージ（最大 HP の何回分か） */
+  private drawGodText(cam: Phaser.Cameras.Scene2D.Camera, y: number): void {
+    if (!this.god && this.testLegend === null) return;
+    const me = this.sim.world.players.find((p) => p.id === this.localId);
+    if (!me) return;
+    this.godText ??= this.add.text(0, 0, '', px(16, '#ffcc80', { outline: true })).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1001);
+    const text = this.god ? t('run.godMode', { damage: Math.round(this.godDamage), times: (this.godDamage / Math.max(1, me.maxHp)).toFixed(1) }) : t('run.testMode');
+    if (this.godText.text !== text) this.godText.setText(text);
+    this.placeUi(this.godText, cam.width / 2, y);
+  }
+
   /** 伝説戦のマップの効果: 画面に色を重ねる（サンダーで暗く・フリーザーで白っぽく） */
   private drawFieldOverlay(): void {
     const overlay = activeLegendField(this.sim.world)?.field.overlay;
@@ -1296,6 +1337,7 @@ export class RunScene extends Phaser.Scene {
     const legendLeft = lg && lg.endTick > 0 ? Math.max(0, (lg.endTick - w.tick) * w.dt) : null;
     this.timerText.setText(formatTime(legendLeft ?? Math.min(now, limit))).setColor(legendLeft !== null ? '#ff5252' : uiConfig.timer.color);
     this.placeUi(this.timerText, cx, top);
+    this.drawGodText(cam, top + 56);
     // コイン（もらえる見込みがあるときだけ）
     const coins = this.recorder.liveCoins(w);
     this.coinText.setText(String(coins)).setVisible(coins > 0);
@@ -1331,6 +1373,7 @@ export class RunScene extends Phaser.Scene {
     for (let i = 0; i < steps; i++) {
       const t0 = performance.now();
       this.sim.step([...this.collectCommands(), ...this.inbox.splice(0)]);
+      if (this.god) this.applyGod();
       this.simMs = this.simMs * 0.95 + (performance.now() - t0) * 0.05;
       // 記録は、タブが裏にあって描画しないときも数える
       this.recorder.observe(this.sim.world);

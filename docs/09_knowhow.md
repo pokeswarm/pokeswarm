@@ -79,6 +79,7 @@
 ## 6. 確かめ方（ブラウザ）
 
 - 確認用の URL: `?pokemon=X&moves=key:lv,key:lv&level=N&spawn=N&time=秒&debug`。
+- **テストプレイ**（作者の依頼 2026年10月26日。ソロだけ）: `?legend=mewtwo`（mewtwo・mew・articuno・zapdos・moltres・charizard（色違い）など）で最初から伝説と戦い、`?god` で無敵になる。無敵の間に受けたはずのダメージの合計と、最大 HP の何回分かを画面の上に出す。どちらかを付けたランは**記録を保存しない**（コイン・実績・解放が進まない）。例: `https://pokeswarm.org/?pokemon=charmander&level=60&moves=blast-burn:8,flare-blitz:8,flamethrower:8,fire-spin:8&legend=mewtwo&god`
 - 開発サーバーではモジュールをその場で読み込める: `await import('/src/sim/systems/boxes.ts')` で関数を呼び、`window.game.scene.getScene('run')` でシーンを触る。
 - 画面が隠れているとき: `sc.scene.pause()` してから `sc.runSteps(n, true)`・`sc.draw(...)` で進める。
 - スクリーンショットは演出に遅れることがある。DOM の変化は `MutationObserver` で回数と時刻を数える方が確か。

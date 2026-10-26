@@ -48,6 +48,23 @@ export function parseMovesParam(rules: SimRules, search: string): { move: number
   return out.slice(0, rules.combat.maxMoveSlots);
 }
 
+/**
+ * テストプレイ（作者の依頼 2026年10月26日）: ?legend=mewtwo で、最初から伝説（enemies.json の legend-<名前>・shiny-<名前>、または id そのもの）と戦う。
+ * 知らない名前なら null
+ */
+export function parseLegendParam(rules: SimRules, search: string): number | null {
+  const v = new URLSearchParams(search).get('legend');
+  if (!v) return null;
+  const kinds = rules.enemies.kinds;
+  const k = kinds.findIndex((x) => (x.id === v || x.id === `legend-${v}` || x.id === `shiny-${v}`) && x.rank === 'legendary');
+  return k === -1 ? null : k;
+}
+
+/** テストプレイ: ?god で自分は無敵（受けたはずのダメージは数えて出す） */
+export function parseGodParam(search: string): boolean {
+  return new URLSearchParams(search).has('god');
+}
+
 /** 確認用: ?level=15 で、そのレベルから始める（進化などの確認用）。無ければ null */
 export function parseLevelParam(search: string): number | null {
   const v = Number(new URLSearchParams(search).get('level'));

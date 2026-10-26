@@ -450,6 +450,8 @@
   "pattern.rest": "Duerme y se cura al quedarse quieto",
   "run.moveTaught": "¡Aprendió {name}!",
   "run.sleepZ": "Z z z",
+  "run.godMode": "Prueba: invencible (daño que habrías recibido {damage}, {times}× PS máx.) · no se guarda",
+  "run.testMode": "Prueba: no se guarda",
   "run.frozen": "¡Frío polar! ¡Te has congelado!",
   "run.levelMax": "Nv. MÁX",
   "pause.title.paused": "Pausa",

@@ -450,6 +450,8 @@
   "pattern.rest": "Schläft und heilt sich im Stillstand",
   "run.moveTaught": "{name} erlernt!",
   "run.sleepZ": "Z z z",
+  "run.godMode": "Test: unverwundbar (erlittener Schaden wäre {damage}, {times}× max. KP) · nicht gespeichert",
+  "run.testMode": "Test: nicht gespeichert",
   "run.frozen": "Eiseskälte! Du bist eingefroren!",
   "run.levelMax": "Lv. MAX",
   "pause.title.paused": "Pause",

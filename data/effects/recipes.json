@@ -1486,6 +1486,11 @@
         "id": "burst-psy",
         "fit": "circle",
         "size": 1.15
+      },
+      "effectSprite": {
+        "id": "burst-psy",
+        "fit": "circle",
+        "size": 1.3
       }
     },
     "stone-edge": {

@@ -1742,8 +1742,8 @@
         "lifestealPct": 0,
         "count": 2,
         "speed": 0,
-        "size": 22,
-        "range": 300,
+        "size": 18,
+        "range": 220,
         "durationSeconds": 0.25,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -1898,72 +1898,59 @@
       ]
     },
     "future-sight": {
-      "pattern": "strike",
+      "pattern": "screen",
       "effect": "future-sight",
+      "delayedBlast": {
+        "seconds": 2,
+        "sizeMultiplier": 2.2,
+        "powerMultiplier": 8
+      },
       "base": {
-        "power": 60.4,
+        "power": 8,
         "intervalSeconds": 0.1,
-        "count": 12,
+        "count": 40,
         "speed": 0,
-        "size": 42,
-        "range": 520,
+        "size": 18,
+        "range": 130,
         "durationSeconds": 0.25,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
-        "knockback": 120,
+        "knockback": 0,
         "knockbackSeconds": 0.08,
         "spreadDegrees": 0,
-        "cooldownSeconds": 1.1,
+        "cooldownSeconds": 2,
         "statusChance": 0,
         "statusSeconds": 0,
         "lifestealPct": 0
       },
       "levels": [
         {
-          "count": 1,
-          "power": 7.3
+          "range": 15,
+          "power": 1.5
         },
         {
-          "size": 4,
-          "power": 6
+          "size": 2,
+          "power": 1.5
         },
         {
-          "count": 1,
-          "power": 6.2
+          "range": 15,
+          "power": 1.5
         },
         {
-          "cooldownSeconds": -0.15,
-          "power": -3.2
+          "cooldownSeconds": -0.2,
+          "power": 1
         },
         {
-          "count": 1,
-          "power": 4.8
+          "range": 15,
+          "power": 1.5
         },
         {
-          "size": 4,
-          "power": 3.2
+          "size": 2,
+          "power": 1.5
         },
         {
-          "count": 2,
-          "power": 5.4
-        }
-      ],
-      "effects": [
-        {
-          "trigger": "end",
-          "explode": {
-            "sizeMultiplier": 2.2,
-            "powerMultiplier": 0.3,
-            "pull": 260
-          }
-        },
-        {
-          "trigger": "end",
-          "explode": {
-            "sizeMultiplier": 3,
-            "powerMultiplier": 2,
-            "delaySeconds": 1
-          }
+          "range": 15,
+          "power": 1.5
         }
       ]
     },
@@ -2237,7 +2224,7 @@
       ],
       "hpCost": {
         "pct": 10,
-        "minHp": 50
+        "minHpPct": 50
       }
     },
     "extreme-speed": {

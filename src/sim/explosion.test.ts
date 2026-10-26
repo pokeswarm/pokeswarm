@@ -5,8 +5,9 @@ import { playerMoveStats } from './systems/attack';
 
 /**
  * 作者の指摘（2026年10月25日）:
- * - だいばくはつは HP を使う大技: 最大 HP の 10% を使い、HP 50 以下では出さない。残る範囲は作らない
- * - ポイントマックスで増えた分は、2段目以降の技（効き方）を起こさない（みらいよち）
+ * - だいばくはつは HP を使う大技: 最大 HP の 10% 相当のダメージを自分が受け（防御・ディフェンダーが効く）、HP が最大の 50% を下回っていれば出さない。残る範囲は作らない
+ * - ポイントマックスで増えた分は、2段目以降の技（効き方）を起こさない（サイコキネシスの終わりの爆発）
+ * - みらいよち（2026年10月26日）: 近くの敵すべてに印を付け、黒く点滅させて2秒後に、その敵の位置で大きく爆発する
  * - 自分を中心に円状に広がる技の半径は、射程の強化ではなく範囲の強化で広がる
  * - ねんりきの射程の強化は半分だけ効く
  */
@@ -19,7 +20,7 @@ function setup(move: string, level = 1) {
 }
 
 describe('だいばくはつ', () => {
-  it('使うたびに最大 HP の 10% を使い、残る範囲は作らない', () => {
+  it('使うたびに最大 HP の 10% 相当のダメージを受け（防御が効く）、残る範囲は作らない', () => {
     const { sim, p, m } = setup('explosion');
     const before = p.hp;
     let used = 0;
@@ -28,26 +29,58 @@ describe('だいばくはつ', () => {
       used = sim.world.events.filter((e) => e.type === 'moveUsed' && e.move === m).length;
     }
     expect(used).toBe(1);
-    expect(p.hp).toBeCloseTo(before - p.maxHp * 0.1);
+    expect(p.hp).toBeCloseTo(before - (p.maxHp * 0.1 * 100) / (100 + p.defense));
     for (let t = 0; t < 30; t++) sim.step([]);
     const pr = sim.world.projectiles;
     for (let i = 0; i < pr.count; i++) expect(pr.stage[i]).not.toBe(1);
   });
 
-  it('HP が 50 以下では出さない', () => {
+  it('HP が最大の 50% を下回っていれば出さない', () => {
     const { sim, p, m } = setup('explosion');
-    p.hp = 50;
+    p.hp = p.maxHp * 0.49;
+    const hp = p.hp;
     for (let t = 0; t < 30; t++) {
       sim.step([]);
       expect(sim.world.events.some((e) => e.type === 'moveUsed' && e.move === m)).toBe(false);
     }
-    expect(p.hp).toBe(50);
+    expect(p.hp).toBe(hp);
+  });
+
+  it('ディフェンダー（受けるダメージ −50%）で、自分が受けるダメージも半分になる', () => {
+    const { sim, p } = setup('explosion');
+    p.mods.damageTakenPct = -50;
+    const before = p.hp;
+    sim.step([]);
+    expect(p.hp).toBeCloseTo(before - (p.maxHp * 0.1 * 100 * 0.5) / (100 + p.defense));
+  });
+});
+
+describe('みらいよち', () => {
+  it('近くの敵すべてに印を付け、2秒後にその敵の位置で爆発する（遠くの敵には付けない）', () => {
+    const { sim, m } = setup('future-sight');
+    const near = [0, 1, 2].map((k) => sim.world.enemies.add(k + 1, 0, 60 + k * 20, 0, 1e9, 0, 10));
+    sim.world.enemies.add(9, 0, 1000, 0, 1e9, 0, 10);
+    sim.step([]);
+    const e = sim.world.enemies;
+    for (let k = 0; k < 3; k++) expect(e.markTicks[k]).toBeGreaterThan(0);
+    expect(e.markTicks[3]).toBe(0);
+    void near;
+    const hp = e.hp[0]!;
+    let blasts = 0;
+    for (let t = 0; t < 2 * 30 + 2; t++) {
+      sim.step([]);
+      const pr = sim.world.projectiles;
+      for (let i = 0; i < pr.count; i++) if (pr.move[i] === m && pr.stage[i] === 1) blasts++;
+    }
+    expect(blasts).toBeGreaterThanOrEqual(3);
+    // 爆発は付けた攻撃の何倍も痛い
+    expect(hp - e.hp[0]!).toBeGreaterThan(8 * 5);
   });
 });
 
 describe('持ち物の効き方', () => {
-  it('ポイントマックスで増えた落雷は、後から来る爆発を起こさない（みらいよち）', () => {
-    const { sim, p, m } = setup('future-sight');
+  it('ポイントマックスで増えた念の当たりは、後から来る爆発を起こさない（サイコキネシス）', () => {
+    const { sim, p, m } = setup('psychic');
     p.mods.amountBonus = 2;
     for (let k = 0; k < 40; k++) sim.world.enemies.add(k + 1, 0, (k % 8) * 40 - 160, Math.floor(k / 8) * 40 - 80, 1e9, 0, 10);
     const st = playerMoveStats(sim.world, p, p.moves[0]!);

@@ -38,6 +38,17 @@ export function hurtPlayer(world: World, p: Player, raw: number): void {
 }
 
 /**
+ * 自分の技で受けるダメージ（だいばくはつ）: 防御・受けるダメージの軽減は敵のダメージと同じく効くが、無敵時間は付けず、倒れない（1 は残す）
+ */
+export function selfDamage(world: World, p: Player, raw: number): void {
+  const guard = p.guardUntilTick !== undefined && world.tick < p.guardUntilTick ? 1 - (p.guardPct ?? 0) / 100 : 1;
+  const amount = Math.min(p.hp - 1, ((raw * 100) / (100 + p.defense)) * Math.max(0, 1 + p.mods.damageTakenPct / 100) * guard);
+  if (amount <= 0) return;
+  p.hp -= amount;
+  world.events.push({ type: 'playerDamaged', playerId: p.id, amount });
+}
+
+/**
  * HP が無くなったとき: 復活可能数（全員で共有）が残っていれば自動で復活する（ソロ）。無ければ倒れる。
  * 協力プレイでは倒れて、味方が触れると復活する（touchRevive）。
  */

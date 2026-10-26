@@ -1341,6 +1341,11 @@ export class RunScene extends Phaser.Scene {
   private statusTint(i: number): number | null {
     const e = this.sim.world.enemies;
     const kinds = this.sim.world.statusKinds;
+    // 遅れて爆発する印（みらいよち）: 黒く点滅（爆発が近いほど速く）
+    if (e.markTicks[i]! > 0) {
+      const period = e.markTicks[i]! > 20 ? 8 : 4;
+      if (Math.floor(e.markTicks[i]! / period) % 2 === 0) return 0x111111;
+    }
     for (let s = 0; s < kinds.length; s++) {
       if (e.hasStatus(i, s)) return this.statusColors[s]!;
     }

@@ -63,6 +63,7 @@ export function buildSimRules(): SimRules {
       waitForEnd: def.waitForEnd,
       ...(def.hpCost ? { hpCost: def.hpCost } : {}),
       rangeBonusScale: def.rangeBonusScale ?? 1,
+      ...(def.delayedBlast ? { delayedBlast: def.delayedBlast } : {}),
       ...(def.lobTarget ? { lobTarget: def.lobTarget } : {}),
       ...(def.scatterJitter ? { scatterJitter: def.scatterJitter } : {}),
       sweepOnce: def.sweepOnce,

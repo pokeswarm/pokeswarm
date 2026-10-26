@@ -25,7 +25,7 @@ import { typeMultiplier, type MoveStats } from '../moves';
 import type { World } from '../world';
 import { applyHitEffect } from './commands';
 import { fireDelayedExplosion, fireEffects, type FxSource } from './moveEffects';
-import { healPlayer } from './health';
+import { healPlayer, selfDamage } from './health';
 import { breakOnDamage, damageTakenMultiplier } from './status';
 
 /** 持ち物の威力の倍率（でんきだま: その系統が持っているときだけ） */
@@ -207,13 +207,14 @@ export function useMoves(world: World): void {
           timers[def.group] = scaledMoveStats(world, p, pm, st).cooldownSeconds / members.length;
         }
       }
-      // HP を使う技（だいばくはつ）: HP が足りなければ出さずに待つ。HP は本人のブラウザで減らす（ほかの人の分は本人の画面から届く）
+      // HP を使う技（だいばくはつ）: HP が最大の minHpPct % を下回っていれば出さずに待つ。最大 HP の pct % 相当のダメージを自分が受ける
+      // （防御・ディフェンダーの軽減が効く）。HP は本人のブラウザで減らす（ほかの人の分は本人の画面から届く）
       if (def.hpCost) {
-        if (p.hp <= def.hpCost.minHp) {
+        if (p.hp < (p.maxHp * def.hpCost.minHpPct) / 100) {
           pm.cooldown = 0;
           continue;
         }
-        if (p.id === world.localPlayerId) p.hp = Math.max(1, p.hp - (p.maxHp * def.hpCost.pct) / 100);
+        if (p.id === world.localPlayerId) selfDamage(world, p, (p.maxHp * def.hpCost.pct) / 100);
       }
       // 消えてから数える技（こなゆき・ふぶき）は、持続の分を足す
       pm.cooldown = Math.max(scaledMoveStats(world, p, pm, st).cooldownSeconds, def.waitForEnd ? st.durationSeconds : 0) + (def.restAfterEnd ? st.durationSeconds : 0);
@@ -1241,6 +1242,14 @@ export function moveProjectiles(world: World): void {
         hitY = e.y[j]!;
       }
       // 当たった敵ごとの効き方（かみなり: 落雷を受けた敵から電気が連鎖する）。見た目もそろうように、どのブラウザでも起こす
+      // 遅れて爆発する印（みらいよち）: どのブラウザでも付け、時間が来たら付けたプレイヤーの技として爆発させる
+      if (pr.stage[i] === 0 && def.delayedBlast && e.markTicks[j] === 0) {
+        e.markTicks[j] = Math.max(1, Math.round(def.delayedBlast.seconds / world.dt));
+        e.markDamage[j] = pr.damage[i]! * def.delayedBlast.powerMultiplier;
+        e.markSize[j] = pr.radius[i]! * def.delayedBlast.sizeMultiplier;
+        e.markMove[j] = pr.move[i]!;
+        e.markBy[j] = ownerId;
+      }
       if (pr.stage[i] === 0 && !pr.noFx[i] && def.effects.some((fx) => fx.trigger === 'eachHit')) fireEffects(world, 'eachHit', fxSourceOf(world, i, e.x[j]!, e.y[j]!));
       if (!local) continue;
       // ノックバックの向き: 直線は線の向き、それ以外は当たり判定から敵へ（重なっていれば進む向き）
@@ -1293,6 +1302,21 @@ export function moveProjectiles(world: World): void {
       fireEffects(world, 'hit', fxSourceOf(world, i, firstX, firstY));
     }
     if (pr.pierceLeft[i]! <= 0) expire(world, i);
+  }
+}
+
+/** 遅れて爆発する印（みらいよち）の時間を進め、時間が来たら、その敵の位置で付けたプレイヤーの技として爆発させる */
+export function tickMarks(world: World): void {
+  const e = world.enemies;
+  for (let i = 0; i < e.count; i++) {
+    if (e.markTicks[i] === 0) continue;
+    if (--e.markTicks[i]! > 0 || e.hp[i]! <= 0) continue;
+    world.projectiles.add({
+      owner: e.markBy[i]!, move: e.markMove[i]!, level: 1, motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]!, vx: 0, vy: 0, ox: 0, oy: 0,
+      angle: 0, angularSpeed: 0, orbitRadius: 0, life: 0.25, damage: e.markDamage[i]!, radius: e.markSize[i]!, pierce: Infinity,
+      hitIntervalTicks: 0, shape: SHAPE_CIRCLE, length: 0, dirX: 0, dirY: 0, growth: 0, stage: 1,
+    });
+    world.events.push({ type: 'projectileHit', x: e.x[i]!, y: e.y[i]!, owner: e.markBy[i]!, move: e.markMove[i]! });
   }
 }
 

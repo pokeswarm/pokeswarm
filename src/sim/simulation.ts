@@ -2,7 +2,7 @@ import { stepBoxes, tickBuffs } from './systems/boxes';
 import type { InputCommand, PlayerId } from './commands';
 import { createPlayer, type Player, type PlayerInit } from './entities/player';
 import type { SimRules } from './rules';
-import { moveProjectiles, useMoves } from './systems/attack';
+import { moveProjectiles, useMoves, tickMarks } from './systems/attack';
 import { applyCommands } from './systems/commands';
 import { moveEnemies, rebuildEnemyHash, separateEnemies } from './systems/enemyMovement';
 import { movePlayers } from './systems/movement';
@@ -81,6 +81,7 @@ export class Simulation {
     separateEnemies(w);
     blockByObstacles(w);
     tickStatuses(w);
+    tickMarks(w);
     contactDamage(w);
     regenerate(w);
     touchRevive(w);

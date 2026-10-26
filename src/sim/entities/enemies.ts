@@ -39,6 +39,15 @@ export class EnemyStore {
    */
   readonly ghostTicks: Uint16Array;
   readonly savedHp: Float64Array;
+  /**
+   * 遅れて爆発する印（みらいよち）: 残りの更新回数（0 なら印なし）・爆発のダメージ・大きさ・技の番号・付けたプレイヤー。
+   * どのブラウザでも同じように数え、時間が来たら付けたプレイヤーの技として爆発させる（ダメージを決めるのは付けたプレイヤーのブラウザ）
+   */
+  readonly markTicks: Uint16Array;
+  readonly markDamage: Float64Array;
+  readonly markSize: Float64Array;
+  readonly markMove: Int16Array;
+  readonly markBy: Uint16Array;
 
   constructor(
     readonly capacity: number,
@@ -68,6 +77,11 @@ export class EnemyStore {
     this.statusBy = new Uint16Array(capacity * statusCount);
     this.ghostTicks = new Uint16Array(capacity);
     this.savedHp = new Float64Array(capacity);
+    this.markTicks = new Uint16Array(capacity);
+    this.markDamage = new Float64Array(capacity);
+    this.markSize = new Float64Array(capacity);
+    this.markMove = new Int16Array(capacity);
+    this.markBy = new Uint16Array(capacity);
   }
 
   /** 追加して index を返す。満杯なら -1 */
@@ -90,6 +104,7 @@ export class EnemyStore {
     this.kbTicks[i] = 0;
     this.statusTicks.fill(0, i * this.statusCount, (i + 1) * this.statusCount);
     this.ghostTicks[i] = 0;
+    this.markTicks[i] = 0;
     return i;
   }
 
@@ -125,6 +140,11 @@ export class EnemyStore {
     this.kbTicks[i] = this.kbTicks[last]!;
     this.ghostTicks[i] = this.ghostTicks[last]!;
     this.savedHp[i] = this.savedHp[last]!;
+    this.markTicks[i] = this.markTicks[last]!;
+    this.markDamage[i] = this.markDamage[last]!;
+    this.markSize[i] = this.markSize[last]!;
+    this.markMove[i] = this.markMove[last]!;
+    this.markBy[i] = this.markBy[last]!;
     const n = this.statusCount;
     this.statusTicks.copyWithin(i * n, last * n, (last + 1) * n);
     this.statusBy.copyWithin(i * n, last * n, (last + 1) * n);

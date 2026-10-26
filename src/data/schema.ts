@@ -872,9 +872,15 @@ export const moveDefSchema = z.object({
   /** 出した技が消えるまで、次を出さない（再使用は少なくとも持続の長さ。ボルテッカー: 次のピカチュウが重ならない。作者の決定 2026年10月25日） */
   waitForEnd: z.boolean().optional(),
   /**
-   * 使うたびに自分の HP を使う技（だいばくはつ。作者の決定 2026年10月25日）: 最大 HP の pct % を使い、HP が minHp 以下なら出さない（たまるまで待つ）
+   * 使うたびに自分の HP を使う技（だいばくはつ。作者の決定 2026年10月25日・26日）: 最大 HP の pct % 相当の**ダメージ**を自分が受ける
+   * （防御・ディフェンダーなどの軽減が効く）。HP が最大 HP の minHpPct % を下回っていれば出さない（たまるまで待つ）
    */
-  hpCost: z.object({ pct: z.number().positive(), minHp: z.number().nonnegative() }).optional(),
+  hpCost: z.object({ pct: z.number().positive(), minHpPct: z.number().min(0).max(100) }).optional(),
+  /**
+   * 当たった敵に印を付け、seconds 後にその敵の位置で爆発させる（みらいよち。作者の決定 2026年10月26日）。
+   * 爆発の大きさ・威力は、当たった攻撃の大きさ・威力に掛ける倍率。印が付いている敵には付け直さない
+   */
+  delayedBlast: z.object({ seconds: z.number().positive(), sizeMultiplier: z.number().positive(), powerMultiplier: z.number().nonnegative() }).optional(),
   /** 射程の強化（ズームレンズ）の効き方の倍率（ねんりき: 0.5 で半分だけ伸びる）。省略で 1 */
   rangeBonusScale: z.number().nonnegative().optional(),
   /**

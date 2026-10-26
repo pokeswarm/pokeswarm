@@ -25,7 +25,7 @@ import { orientationGuard } from '../render/OrientationGuard';
 import { isTouchDevice, TouchJoystick } from '../render/TouchJoystick';
 import { PlayerView } from '../render/PlayerView';
 import { PooledCircles, PooledSprites } from '../render/PooledCircles';
-import { px } from '../render/pixelUi';
+import { compactScreen, px } from '../render/pixelUi';
 import { preloadPokemonAtlas, registerPokemonAnimations } from '../render/sprites/PokemonSprite';
 import { EnemySprites } from '../render/sprites/EnemySprites';
 import { SpriteStreamer } from '../render/sprites/SpriteStreamer';
@@ -430,7 +430,7 @@ export class RunScene extends Phaser.Scene {
     this.levelText = this.add.text(0, 0, '', px(16, uiConfig.expBar.text, { outline: true })).setOrigin(0, 0.5).setScrollFactor(0).setDepth(1001);
     this.coinIcon = this.add.image(0, 0, pixelTextureKey('coin')).setOrigin(1, 0.5).setScale(2).setScrollFactor(0).setDepth(1001);
     this.coinText = this.add.text(0, 0, '', px(16, uiConfig.coin.color, { outline: true })).setOrigin(1, 0.5).setScrollFactor(0).setDepth(1001);
-    this.timerText = this.add.text(0, 10, '', px(24, uiConfig.timer.color, { outline: true })).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1000);
+    this.timerText = this.add.text(0, 10, '', px(compactScreen() ? uiConfig.compactHud.timerSize : 24, uiConfig.timer.color, { outline: true })).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1000);
     this.bossBar = this.add.graphics().setScrollFactor(0).setDepth(1000);
     this.bossName = this.add.text(0, 50, '', px(16, '#ffffff', { outline: true })).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1000).setVisible(false);
     this.announceText = this.add.text(0, 0, '', px(32, '#ffffff', { outline: true, align: 'center', lineSpacing: 8 })).setOrigin(0.5).setScrollFactor(0).setDepth(1001);
@@ -1242,7 +1242,8 @@ export class RunScene extends Phaser.Scene {
     const now = elapsedSeconds(w);
     const limit = w.rules.stage.durationSeconds;
     const eb = uiConfig.expBar;
-    const barH = eb.height;
+    // スマホ（画面の高さが低い）では細く（箱の強化のアイコンと大きさをそろえる）
+    const barH = compactScreen() ? uiConfig.compactHud.expBarHeight : eb.height;
     const top = barH + 8;
     // 経験値のバー
     const g = this.topBar;

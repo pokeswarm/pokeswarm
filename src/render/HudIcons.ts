@@ -1,13 +1,14 @@
 import Phaser from 'phaser';
+import { uiConfig } from '../data';
 import { compactScreen } from './pixelUi';
 import type { Player } from '../sim/entities/player';
 import type { World } from '../sim/world';
 import type { IconTier } from './iconPixels';
 import { itemIconKey, moveIconKey, moveTier, pipKey } from './Icons';
 
-/** アイコンの表示の倍率・横の間隔・行の間隔（画面の高さが低い横向きのスマホでは小さく） */
-const iconScale = (): number => (compactScreen() ? 3 : 4);
-const cellWidth = (): number => (compactScreen() ? 54 : 72);
+/** アイコンの表示の倍率・横の間隔・行の間隔（画面の高さが低い横向きのスマホでは、箱の強化のアイコンと同じ大きさ。ui.json の compactHud） */
+const iconScale = (): number => (compactScreen() ? uiConfig.compactHud.iconScale : 4);
+const cellWidth = (): number => (compactScreen() ? uiConfig.compactHud.cellWidth : 72);
 const ROW_GAP = 6;
 /** レベルのひし形の倍率と、1行に並べる数（技の最大レベル 8 まで1行に収める） */
 const PIP_SCALE = 1;

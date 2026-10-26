@@ -48,6 +48,13 @@ export type PlaceholderRenderConfig = z.infer<typeof placeholderRenderSchema>;
 export const uiConfigSchema = z.object({
   /** 画面の高さがこれより低いと、つめた表示にする（横向きのスマホ。作者の決定 2026年10月22日） */
   compactHeight: z.number().positive(),
+  /**
+   * 画面の高さが低い（横向きのスマホ）ときの上の表示の大きさ（作者の指摘 2026年10月26日: 箱の強化のアイコンと同じ大きさにそろえる）。
+   * iconScale は技・持ち物のアイコン（16 ドット）の倍率、cellWidth はアイコンの横の間隔、expBarHeight は経験値のバーの高さ、timerSize は時間の文字の大きさ
+   */
+  compactHud: z
+    .object({ iconScale: z.number().positive(), cellWidth: z.number().positive(), expBarHeight: z.number().int().positive(), timerSize: z.union([z.literal(8), z.literal(16), z.literal(24), z.literal(32)]) })
+    .default({ iconScale: 2, cellWidth: 38, expBarHeight: 14, timerSize: 16 }),
   font: z.object({
     family: z.string(),
     faces: z.array(z.object({ family: z.string(), file: z.string() })),

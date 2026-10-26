@@ -400,6 +400,10 @@ export const legendFieldSchema = z.object({
   overlay: z.object({ color: z.string(), alpha: z.number().min(0).max(1) }).optional(),
   lightning: z.object({ move: z.string().min(1), everySeconds: z.number().positive() }).optional(),
   aura: z.object({ radius: z.number().positive(), damagePerSecond: z.number().nonnegative(), color: z.string() }).optional(),
+  /** 画面じゅうに降らせる天気（プレイヤーの技のレシピ。フリーザー: ふぶき） */
+  weather: z.string().optional(),
+  /** 暗い空が、ときどき雷の光で明滅する（サンダー。見た目だけ。everySeconds は平均の間隔） */
+  flash: z.object({ color: z.string(), alpha: z.number().min(0).max(1), everySeconds: z.number().positive() }).optional(),
 });
 export type LegendField = z.infer<typeof legendFieldSchema>;
 

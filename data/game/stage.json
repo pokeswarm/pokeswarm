@@ -677,7 +677,8 @@
           "overlay": {
             "color": "#e1f5fe",
             "alpha": 0.18
-          }
+          },
+          "weather": "blizzard-aura"
         }
       },
       "legend-zapdos": {
@@ -693,6 +694,11 @@
           "overlay": {
             "color": "#000000",
             "alpha": 0.3
+          },
+          "flash": {
+            "color": "#fffde7",
+            "alpha": 0.55,
+            "everySeconds": 2.5
           },
           "lightning": {
             "move": "zapdos-field-bolt",

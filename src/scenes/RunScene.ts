@@ -170,6 +170,9 @@ export class RunScene extends Phaser.Scene {
   private godText: Phaser.GameObjects.Text | null = null;
   /** 伝説戦のマップの効果で画面に重ねる色（サンダーで暗く・フリーザーで白っぽく） */
   private fieldOverlay: Phaser.GameObjects.Rectangle | null = null;
+  /** サンダーの空の明滅: 最後に光った時刻・次に光る時刻（ms） */
+  private skyFlashAt = -1e9;
+  private nextSkyFlashAt = 0;
   /** 進化の演出（自分が進化したとき。ソロでは演出の間ゲームを止める） */
   private evolutionCutscene = new EvolutionCutscene();
   /** 協力プレイのレベルアップで、ほかの人の選択を待っている間の表示 */
@@ -1049,6 +1052,8 @@ export class RunScene extends Phaser.Scene {
         g.fillStyle(0xfff176, 0.35).fillCircle(h.x, h.y, h.radius * 1.6);
         g.fillStyle(0xffeb3b, 1).fillCircle(h.x, h.y, h.radius);
         g.fillStyle(0xffffff, 1).fillCircle(h.x, h.y, h.radius * 0.45);
+        // 避けるべきものと分かるよう、赤い縁（ほかの範囲技の予告と同じ色）
+        g.lineStyle(2, 0xff1744, 1).strokeCircle(h.x, h.y, h.radius + 1);
         continue;
       }
       // 落ちた後に少し当たる時間（activeTicks）は、予告を描かない（落ちた所の絵が出ている）
@@ -1156,7 +1161,19 @@ export class RunScene extends Phaser.Scene {
     }
     const cam = this.cameras.main;
     this.fieldOverlay ??= this.add.rectangle(0, 0, 10, 10, 0x000000, 1).setOrigin(0, 0).setScrollFactor(0).setDepth(999);
-    this.fieldOverlay.setFillStyle(hexColor(overlay.color), overlay.alpha).setSize(cam.width, cam.height).setVisible(true);
+    // 暗い空が、ときどき雷の光で明滅する（サンダー。見た目だけなので、乱数はシミュレーションのものを使わない）
+    const flash = activeLegendField(this.sim.world)?.field.flash;
+    const now = this.time.now;
+    if (flash && now >= this.nextSkyFlashAt) {
+      this.skyFlashAt = now;
+      this.nextSkyFlashAt = now + flash.everySeconds * 1000 * (0.4 + Math.random() * 1.2);
+    }
+    const since = now - this.skyFlashAt;
+    // 2回ちらつく光（0〜90ms と 140〜260ms）
+    const lit = flash && (since < 90 || (since > 140 && since < 260));
+    if (lit) this.fieldOverlay.setFillStyle(hexColor(flash.color), flash.alpha);
+    else this.fieldOverlay.setFillStyle(hexColor(overlay.color), overlay.alpha);
+    this.fieldOverlay.setSize(cam.width, cam.height).setVisible(true);
     this.placeUi(this.fieldOverlay, 0, 0);
   }
 
@@ -1619,6 +1636,9 @@ export class RunScene extends Phaser.Scene {
       const effect = world.rules.moves[pr.move[i]!]!.effect;
       if (effectRecipes[effect]?.weather) weathers.add(effect);
     }
+    // 伝説戦のマップの効果の天気（フリーザーのふぶき）: プレイヤーの技と同じ雪を画面じゅうに
+    const fieldWeather = activeLegendField(world)?.field.weather;
+    if (fieldWeather && effectRecipes[fieldWeather]?.weather) weathers.add(fieldWeather);
     this.effects.drawWeather(weathers, this.cameras.main.worldView, deltaMs);
     this.drawGhosts(world, alpha);
     this.drawBolts(world);

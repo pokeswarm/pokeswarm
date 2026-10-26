@@ -256,6 +256,7 @@ if (stageConfig.legendary) {
     // "*" は pool からランダム（ミュウ）
     for (const id of set.moves) check(stageMoveIds.has(id) || (id === '*' && (set.pool?.length ?? 0) > 0), `data/game/stage.json の伝説 "${kind}" の範囲技 "${id}" がありません`);
     for (const id of set.pool ?? []) check(stageMoveIds.has(id), `data/game/stage.json の伝説 "${kind}" の pool の範囲技 "${id}" がありません`);
+    if (set.field?.weather) check(!!effectRecipes[set.field.weather]?.weather, `data/game/stage.json の伝説 "${kind}" の天気 "${set.field.weather}" が、天気のあるレシピ（data/effects/recipes.json の weather）ではありません`);
     for (const id of [set.field?.lightning?.move].filter((x): x is string => !!x)) check(stageMoveIds.has(id), `data/game/stage.json の伝説 "${kind}" の落雷の範囲技 "${id}" がありません`);
   }
 }

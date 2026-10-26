@@ -3,7 +3,7 @@ import type { PresenceState, Social } from '../firebase/social';
 import { firebaseOptionsFromEnv } from '../firebase/config';
 import { achievementsConfig, shopConfig, unlocksConfig } from '../data';
 import { refundLegacy } from './shop';
-import { applyProgress } from './progress';
+import { applyProgress, applyResets } from './progress';
 import { SaveStore } from './saveStore';
 
 export type AccountStatus = 'offline' | 'connecting' | 'guest' | 'google' | 'error';
@@ -30,6 +30,13 @@ class Session {
   /** ニックネーム#タグ・フレンド・招待（Google でログインしているときだけ） */
   private socialValue: Social | null = null;
   private presence: PresenceState = 'menu';
+
+  /** まだ当てていないリセット（伝説を倒した実績と解放など）を当てる（起動時。変えたときだけ保存する） */
+  applyDataResets(): void {
+    const resets = achievementsConfig.resets ?? [];
+    if (resets.every((r) => this.store.current.stats[`reset.${r.tag}`])) return;
+    this.store.update((d) => void applyResets(d, resets));
+  }
 
   /** 前の版のショップの強化（今は無いもの）を払い戻す（起動時に1回） */
   refundLegacyUpgrades(): number {
@@ -71,6 +78,9 @@ class Session {
 
   /** 起動時に1回呼ぶ。ゲストとしてログインし、セーブデータを読み込む（待たずにゲームを始めてよい） */
   async start(): Promise<void> {
+    // セーブが切り替わったら（ログイン・アカウントの切り替え・引き継ぎ）、まだ当てていないリセットを当てる
+    this.store.onChange(() => this.applyDataResets());
+    this.applyDataResets();
     if (!firebaseOptionsFromEnv()) return;
     this.setStatus('connecting');
     try {

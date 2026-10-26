@@ -37,6 +37,24 @@ export function isPlayableUnlocked(save: Readonly<SaveData>, unlocks: UnlocksCon
   return isUnlocked(save, unlocks, unlock ?? key);
 }
 
+/**
+ * まだ当てていないリセット（achievements.json の resets）を当てる: 実績・解放・記録を取り消し、記録 reset.<tag> で覚える。
+ * 変えたら true（作者の依頼 2026年10月27日: 伝説のリワークに合わせて、伝説を倒した実績と解放をリセット）
+ */
+export function applyResets(save: SaveData, resets: AchievementsConfig['resets']): boolean {
+  let changed = false;
+  for (const r of resets ?? []) {
+    const mark = `reset.${r.tag}`;
+    if (save.stats[mark]) continue;
+    save.achievements = save.achievements.filter((a) => !r.achievements.includes(a));
+    save.unlocked = save.unlocked.filter((u) => !r.unlocked.includes(u));
+    for (const k of r.stats) delete save.stats[k];
+    save.stats[mark] = 1;
+    changed = true;
+  }
+  return changed;
+}
+
 /** 新しく条件を満たした実績と解放を、セーブデータに足して返す */
 export function applyProgress(save: SaveData, achievements: AchievementsConfig, unlocks: UnlocksConfig): { achievements: string[]; unlocks: string[] } {
   const newAchievements: string[] = [];

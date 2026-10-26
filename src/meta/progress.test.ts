@@ -46,3 +46,27 @@ describe('実績と解放', () => {
     expect(stats.uniqueKinds).toBe(1);
   });
 });
+
+describe('リセット（伝説のリワーク）', () => {
+  it('まだ当てていないリセットを1回だけ当て、実績・解放・記録を取り消す（コインはそのまま）', async () => {
+    const { applyResets } = await import('./progress');
+    const { emptySave } = await import('./saveData');
+    const { achievementsConfig } = await import('../data');
+    const save = emptySave();
+    save.coins = 2500;
+    save.achievements = ['first-legendary', 'unlock-mewtwo', 'clear-charmander'];
+    save.unlocked = ['mewtwo', 'onix'];
+    save.stats = { legendaryKills: 3, 'bossDefeated.mewtwo': 1, 'bossDefeated.mew': 2, 'bossDefeated.onix': 5, kills: 100 };
+    expect(applyResets(save, achievementsConfig.resets)).toBe(true);
+    expect(save.achievements).toEqual(['clear-charmander']);
+    expect(save.unlocked).toEqual(['onix']);
+    expect(save.stats.legendaryKills).toBeUndefined();
+    expect(save.stats['bossDefeated.mew']).toBeUndefined();
+    expect(save.stats['bossDefeated.onix']).toBe(5);
+    expect(save.coins).toBe(2500);
+    // 2回目は何もしない（リセットの後に倒した分は残る）
+    save.stats['bossDefeated.mewtwo'] = 1;
+    expect(applyResets(save, achievementsConfig.resets)).toBe(false);
+    expect(save.stats['bossDefeated.mewtwo']).toBe(1);
+  });
+});

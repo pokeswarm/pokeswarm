@@ -33,6 +33,38 @@
   "startItem": {
     "clears": 1
   },
+  "resets": [
+    {
+      "tag": "2026-10-27-legends",
+      "achievements": [
+        "first-legendary",
+        "unlock-mewtwo",
+        "unlock-articuno",
+        "unlock-zapdos",
+        "unlock-moltres",
+        "shiny-charmander",
+        "shiny-bulbasaur",
+        "shiny-squirtle"
+      ],
+      "unlocked": [
+        "mewtwo",
+        "articuno",
+        "zapdos",
+        "moltres"
+      ],
+      "stats": [
+        "legendaryKills",
+        "bossDefeated.mewtwo",
+        "bossDefeated.mew",
+        "bossDefeated.articuno",
+        "bossDefeated.zapdos",
+        "bossDefeated.moltres",
+        "bossDefeated.charizard",
+        "bossDefeated.venusaur",
+        "bossDefeated.blastoise"
+      ]
+    }
+  ],
   "achievements": [
     {
       "id": "first-run",

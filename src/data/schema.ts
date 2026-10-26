@@ -343,6 +343,13 @@ export const achievementsConfigSchema = z.object({
   achievements: z.array(
     z.object({ id: z.string().min(1), condition: statConditionSchema, hidden: z.boolean().default(false), reward: achievementRewardSchema.optional() }),
   ),
+  /**
+   * 全員のセーブから一度だけ取り消すもの（伝説のリワークに合わせたリセットなど。作者の依頼 2026年10月27日）。
+   * 起動時に、まだ当てていない tag のものを当て、記録 reset.<tag> で覚える。もらったコインは取り上げない
+   */
+  resets: z
+    .array(z.object({ tag: z.string().min(1), achievements: z.array(z.string()).default([]), unlocked: z.array(z.string()).default([]), stats: z.array(z.string()).default([]) }))
+    .optional(),
 });
 export type AchievementsConfig = z.infer<typeof achievementsConfigSchema>;
 

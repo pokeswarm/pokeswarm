@@ -123,9 +123,9 @@ export class RunRecorder {
     ) + this.bonusCoins(world);
   }
 
-  /** レベルアップの「コイン」でもらった分（自分の分だけ） */
+  /** レベルアップの「コイン」・ネコにこばん でもらった分（自分の分だけ。ネコにこばんの端数は切り捨てる） */
   private bonusCoins(world: World): number {
-    return world.players.find((p) => p.id === world.localPlayerId)?.bonusCoins ?? 0;
+    return Math.floor(world.players.find((p) => p.id === world.localPlayerId)?.bonusCoins ?? 0);
   }
 
   /** ラン終了時: 残りを足し、回数・クリア・最高記録を記録する */

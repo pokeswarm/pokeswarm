@@ -117,6 +117,10 @@
   ],
   "pokemon": [
     {
+      "key": "meowth",
+      "cost": 500
+    },
+    {
       "key": "slowpoke",
       "cost": 500
     },

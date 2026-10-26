@@ -341,7 +341,8 @@
       "key": "meowth",
       "dex": 52,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {

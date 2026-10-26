@@ -216,7 +216,8 @@
     "mach-punch",
     "focus-punch",
     "fire-punch",
-    "rest"
+    "rest",
+    "pay-day"
   ],
   "items": [
     "x-attack",

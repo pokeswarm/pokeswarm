@@ -1,0 +1,82 @@
+{
+  "key": "meowth",
+  "dex": 52,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Idle": {
+      "source": "Idle",
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "durations": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "frameKeyPrefix": "Idle"
+    },
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 24,
+      "frameHeight": 32,
+      "durations": [
+        6,
+        10,
+        6,
+        10
+      ],
+      "frameKeyPrefix": "Walk"
+    },
+    "Attack": {
+      "source": "Attack",
+      "frameWidth": 64,
+      "frameHeight": 80,
+      "durations": [
+        2,
+        4,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Attack"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 40,
+      "frameHeight": 56,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    },
+    "Faint": {
+      "source": "Faint",
+      "frameWidth": 40,
+      "frameHeight": 32,
+      "durations": [
+        8,
+        12,
+        4,
+        10
+      ],
+      "frameKeyPrefix": "Faint"
+    }
+  },
+  "missing": []
+}

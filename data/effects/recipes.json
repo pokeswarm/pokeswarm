@@ -2848,6 +2848,15 @@
         }
       }
     },
+    "pay-day": {
+      "extends": "normal.base",
+      "projectile": {
+        "color": "#ffd54f",
+        "glowColor": "#fff59d",
+        "glowScale": 1.4,
+        "coreScale": 0.6
+      }
+    },
     "scratch": {
       "extends": "normal.base",
       "sprite": {

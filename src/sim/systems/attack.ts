@@ -220,6 +220,8 @@ export function useMoves(world: World): void {
       pm.cooldown = Math.max(scaledMoveStats(world, p, pm, st).cooldownSeconds, def.waitForEnd ? st.durationSeconds : 0) + (def.restAfterEnd ? st.durationSeconds : 0);
       world.events.push({ type: 'moveUsed', playerId: p.id, move: pm.move });
       if (def.chargeMove) pm.subPause = def.chargeMove.pauseSeconds;
+      // ネコにこばん: 使うたびにランのコインが増える（自分の分は自分のブラウザで数える）
+      if (def.coinGain) p.bonusCoins = (p.bonusCoins ?? 0) + def.coinGain.perUse + def.coinGain.perLevel * (pm.level - 1);
       const from = world.projectiles.count;
       switch (def.pattern) {
         case 'nearest':

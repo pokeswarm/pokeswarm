@@ -707,6 +707,18 @@
     "type": "dragon",
     "damageClass": "physical"
   },
+  "pay-day": {
+    "names": {
+      "ja": "ネコにこばん",
+      "en": "Pay Day",
+      "fr": "Jackpot",
+      "de": "Zahltag",
+      "es": "Día de Pago",
+      "it": "Giornopaga"
+    },
+    "type": "normal",
+    "damageClass": "physical"
+  },
   "petal-blizzard": {
     "names": {
       "ja": "はなふぶき",

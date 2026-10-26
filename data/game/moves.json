@@ -668,7 +668,8 @@
         "zapdos",
         "moltres",
         "mewtwo",
-        "porygon"
+        "porygon",
+        "meowth"
       ],
       "base": {
         "power": 12,
@@ -4571,13 +4572,67 @@
         "afterimages": 0
       }
     },
+    "pay-day": {
+      "pattern": "lob",
+      "effect": "pay-day",
+      "lobTarget": "random",
+      "learners": [
+        "meowth"
+      ],
+      "coinGain": {
+        "perUse": 0.2,
+        "perLevel": 0.1
+      },
+      "base": {
+        "power": 1,
+        "intervalSeconds": 0.1,
+        "count": 1,
+        "speed": 360,
+        "size": 5,
+        "range": 140,
+        "durationSeconds": 0.6,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockback": 20,
+        "knockbackSeconds": 0.05,
+        "spreadDegrees": 0,
+        "cooldownSeconds": 1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "power": 0
+        },
+        {
+          "power": 0
+        },
+        {
+          "power": 0
+        },
+        {
+          "power": 0
+        },
+        {
+          "power": 0
+        },
+        {
+          "power": 0
+        },
+        {
+          "power": 0
+        }
+      ]
+    },
     "scratch": {
       "pattern": "melee",
       "effect": "scratch",
       "learners": [
         "charmander",
         "psyduck",
-        "scyther"
+        "scyther",
+        "meowth"
       ],
       "base": {
         "power": 17.3,

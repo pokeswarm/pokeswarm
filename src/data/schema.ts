@@ -881,6 +881,11 @@ export const moveDefSchema = z.object({
    * 爆発の大きさ・威力は、当たった攻撃の大きさ・威力に掛ける倍率。印が付いている敵には付け直さない
    */
   delayedBlast: z.object({ seconds: z.number().positive(), sizeMultiplier: z.number().positive(), powerMultiplier: z.number().nonnegative() }).optional(),
+  /**
+   * 使うたびに、ランの終わりにもらうコインを perUse + perLevel × (レベル − 1) 枚増やす（ネコにこばん。作者の決定 2026年10月26日）。
+   * 端数はためて、ランの終わりに切り捨てる
+   */
+  coinGain: z.object({ perUse: z.number().nonnegative(), perLevel: z.number().nonnegative() }).optional(),
   /** 射程の強化（ズームレンズ）の効き方の倍率（ねんりき: 0.5 で半分だけ伸びる）。省略で 1 */
   rangeBonusScale: z.number().nonnegative().optional(),
   /**

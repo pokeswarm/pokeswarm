@@ -1,6 +1,8 @@
 import { describe, it } from 'vitest';
-import { playerConfig, playablesConfig, simulationConfig } from '../data';
-import { buildSimRules, playableLoadout } from '../data/simRules';
+import { playerConfig, playablesConfig, regionsConfig, shopConfig, simulationConfig } from '../data';
+import { buildSimRules, permanentModifiers, playableLoadout } from '../data/simRules';
+import { permanentBonus } from '../meta/shop';
+import { emptySave } from '../meta/saveData';
 import type { Axis, InputCommand } from './commands';
 import { Simulation } from './simulation';
 import { elapsedSeconds, enemyHpScale, type UpgradeOffer } from './world';
@@ -18,13 +20,23 @@ import { elapsedSeconds, enemyHpScale, type UpgradeOffer } from './world';
 const OFFER_PRIORITY: Record<UpgradeOffer['kind'], number> = { derive: 0, moveUp: 1, moveNew: 2, itemNew: 3, itemUp: 4, heal: 5, coins: 6 };
 /** 向きを変える間隔（毎回変えると細かく揺れるだけになる） */
 const RETARGET_SECONDS = 0.3;
-/** 打ち切る時間（ランは20分で終わる。伝説戦があればその分長くなる） */
-const LIMIT_SECONDS = 25 * 60;
+/** 打ち切る時間の余り（ランの長さの後。伝説戦・レッド戦があればその分長くなる） */
+const EXTRA_SECONDS = 15 * 60;
 /** 固さを測るときの「近く」の距離 */
 const NEAR = 250;
+/**
+ * 地方と永続強化のレベル（環境変数。作者の決定 2026年10月27日: ジョウトは「ジョウトの強化を全部3段階ほど買った状態が丁度よい」）。
+ * 例: BALANCE_REGION=johto BALANCE_UPGRADES=3 npm run balance -- -t "cyndaquil"
+ */
+const REGION = process.env.BALANCE_REGION ?? 'kanto';
+const UPGRADES = Number(process.env.BALANCE_UPGRADES ?? 0);
 
 function simulateRun(pokemon: string): void {
-  const rules = buildSimRules();
+  const rules = buildSimRules(REGION);
+  // 永続強化: 全部 UPGRADES 段階（上限まで）
+  const save = emptySave();
+  for (const def of shopConfig.upgrades) save.upgrades[def.id] = Math.min(UPGRADES, def.maxLevel);
+  const bonus = permanentBonus(save, shopConfig);
   const tickRate = simulationConfig.tickRate;
   const sim = new Simulation({ tickRate, seed: 12345, rules });
   const loadout = playableLoadout(rules, pokemon);
@@ -42,6 +54,9 @@ function simulateRun(pokemon: string): void {
     moves: loadout.moves,
     line: loadout.line,
     species: loadout.species,
+    permanent: permanentModifiers(rules, bonus.levels),
+    rerolls: rules.leveling.initialRerolls + bonus.rerolls,
+    bans: bonus.bans,
   });
   const w = sim.world;
   const byMinute: number[] = [];
@@ -64,7 +79,7 @@ function simulateRun(pokemon: string): void {
   let dir = '';
   const t0 = performance.now();
   let steps = 0;
-  while (!w.outcome && elapsedSeconds(w) < LIMIT_SECONDS) {
+  while (!w.outcome && elapsedSeconds(w) < rules.stage.durationSeconds + EXTRA_SECONDS) {
     const cmds: InputCommand[] = [];
     if (w.levelUp) {
       const offers = w.levelUp.offers.get(1) ?? [];
@@ -171,7 +186,9 @@ function toward(x: number, y: number, tx: number, ty: number): [Axis, Axis] {
 }
 
 describe('1ランのレベルの上がり方', () => {
-  for (const pokemon of Object.keys(playablesConfig.pokemon)) {
+  const region = regionsConfig.regions.find((r) => r.id === REGION);
+  const list = region?.playables?.length ? region.playables.filter((k) => k !== 'egg') : Object.keys(playablesConfig.pokemon);
+  for (const pokemon of list) {
     it(pokemon, () => simulateRun(pokemon), 600_000);
   }
 });

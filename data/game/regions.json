@@ -38,7 +38,7 @@
     },
     {
       "id": "johto",
-      "available": false,
+      "available": true,
       "playables": [
         "cyndaquil",
         "chikorita",

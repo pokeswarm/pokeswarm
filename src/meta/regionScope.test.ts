@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { achievementsConfig, shopConfig } from '../data';
+import { achievementsConfig, shopConfig, unlocksConfig } from '../data';
 import { achievementPerks, regionAchieved } from './achievementPerks';
 import type { AchievementsConfig, UnlocksConfig } from '../data/schema';
-import { applyProgress } from './progress';
+import { applyProgress, isPlayableUnlocked } from './progress';
 import { regionStatKey, regionStats, regionUpgradesOf } from './regionScope';
 import { emptySave, parseSave } from './saveData';
-import { backfillShopSpent, buyUpgrade, permanentBonus, refundAll, refundableCoins, shopRegionOpen, upgradeLevel } from './shop';
+import { backfillShopSpent, buyPokemon, buyUpgrade, permanentBonus, refundAll, refundableCoins, shopRegionOpen, upgradeLevel } from './shop';
 
 const ORDER = ['kanto', 'johto', 'hoenn'];
 const might = shopConfig.upgrades.find((u) => u.id === 'might')!;
@@ -99,6 +99,20 @@ describe('地方ごとの記録・強化・ショップ（02 の17章）', () =>
     expect(applyProgress(save, achievementsConfig, unlocks).achievements).toEqual(['johto-first-derivation', 'johto-reach-elite-four']);
     const items = achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, save.achievements, 'johto')).items;
     expect([items.has('pp-max'), items.has('metronome')]).toEqual([true, true]);
+  });
+
+  it('解放は地方ごと: カントーで解放したポケモンはジョウトでは解放していない。ジョウトのショップの買い物はジョウトの解放（07 の66.1）', () => {
+    const save = emptySave(0, 1_000_000);
+    save.unlocked.push('onix');
+    expect(isPlayableUnlocked(save, unlocksConfig, 'onix', undefined)).toBe(true);
+    expect(isPlayableUnlocked(save, unlocksConfig, 'onix', undefined, 'johto')).toBe(false);
+    save.stats.shopSpent = 50000;
+    expect(buyPokemon(save, shopConfig, 'egg', 'egg')).toBe(true);
+    expect(save.unlocked).toContain('johto:egg');
+    expect(isPlayableUnlocked(save, unlocksConfig, 'egg', undefined, 'johto')).toBe(true);
+    expect(isPlayableUnlocked(save, unlocksConfig, 'egg', undefined)).toBe(false);
+    // 最初から遊べるポケモンはどの地方でも
+    expect(isPlayableUnlocked(save, unlocksConfig, 'cyndaquil', undefined, 'johto')).toBe(true);
   });
 
   it('実績はその地方のランの記録だけで判定する', () => {

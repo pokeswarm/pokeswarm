@@ -1,4 +1,5 @@
 import { achievementsConfig, enemiesConfig } from '../data';
+import { regionUnlockKey } from './regionScope';
 import type { SaveData } from './saveData';
 
 /**
@@ -21,7 +22,7 @@ export function grantDevProgress(save: SaveData, coins: number): { achievements:
     if (isLegend(a) || save.achievements.includes(a.id)) continue;
     save.achievements.push(a.id);
     achievements++;
-    const p = a.reward?.pokemon;
+    const p = a.reward?.pokemon ? regionUnlockKey(a.region, a.reward.pokemon) : undefined;
     if (p && !save.unlocked.includes(p)) {
       save.unlocked.push(p);
       unlocked++;

@@ -1,7 +1,7 @@
 import type { ShopConfig } from '../data/schema';
 import { addStat, type SaveData } from './saveData';
 import { meets } from './progress';
-import { HOME_REGION, mutableRegionUpgrades, regionStatKey, regionUpgradesOf } from './regionScope';
+import { HOME_REGION, mutableRegionUpgrades, regionStatKey, regionUnlockKey, regionUpgradesOf } from './regionScope';
 
 /** 1ランの成果（コインの計算に使う） */
 export interface RunResult {
@@ -81,9 +81,11 @@ export function buyUpgrade(save: SaveData, cfg: ShopConfig, id: string, region =
  */
 export function buyPokemon(save: SaveData, cfg: ShopConfig, key: string, unlockName: string): boolean {
   const item = cfg.pokemon.find((p) => p.key === key);
-  if (!item || save.unlocked.includes(unlockName) || save.coins < item.cost || !shopRegionOpen(save, cfg, item.region)) return false;
+  // 解放はその地方のもの（07 の66.1）
+  const name = regionUnlockKey(item?.region ?? HOME_REGION, unlockName);
+  if (!item || save.unlocked.includes(name) || save.coins < item.cost || !shopRegionOpen(save, cfg, item.region)) return false;
   save.coins -= item.cost;
-  save.unlocked.push(unlockName);
+  save.unlocked.push(name);
   addSpent(save, item.region, item.cost);
   return true;
 }

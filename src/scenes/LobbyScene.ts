@@ -270,6 +270,7 @@ export class LobbyScene extends Phaser.Scene {
       this.options ??= new LoadoutOptionsPanel((o) => void this.room?.setLoadoutOptions(o.startItem, o.shiny), this.room?.region || defaultRegion());
       this.picker ??= new PokemonPicker({
         playables: region.playables,
+        region: region.id,
         onSelect: (key) => {
           void this.room?.choosePokemon(key);
           this.options?.setPokemon(key);

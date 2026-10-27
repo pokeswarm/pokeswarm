@@ -1,6 +1,6 @@
 import type { AchievementsConfig, StatCondition, UnlocksConfig } from '../data/schema';
 import type { SaveData } from './saveData';
-import { regionStatKey, regionStats } from './regionScope';
+import { HOME_REGION, regionStatKey, regionStats, regionUnlockKey } from './regionScope';
 
 /**
  * 実績とポケモンの解放の判定（01_game_design.md 8.1・8.2）。条件は data/game/achievements.json（解放は reward.pokemon）に
@@ -33,13 +33,14 @@ export function refreshDerivedStats(stats: Record<string, number>, src: DerivedS
   stats[regionStatKey(region, 'uniqueKinds')] = src.uniqueMoves.filter((m) => (view[`derived.${m}`] ?? 0) > 0).length;
 }
 
-export function isUnlocked(save: Readonly<SaveData>, unlocks: UnlocksConfig, pokemon: string): boolean {
-  return unlocks.initial.includes(pokemon) || save.unlocked.includes(pokemon);
+/** その地方で解放済みか（最初から遊べるポケモンはどの地方でも。解放は地方ごと。07 の66.1） */
+export function isUnlocked(save: Readonly<SaveData>, unlocks: UnlocksConfig, pokemon: string, region: string = HOME_REGION): boolean {
+  return unlocks.initial.includes(pokemon) || save.unlocked.includes(regionUnlockKey(region, pokemon));
 }
 
-/** 遊べるポケモン（playables.json のキーと、その解放の名前）が解放済みか */
-export function isPlayableUnlocked(save: Readonly<SaveData>, unlocks: UnlocksConfig, key: string, unlock: string | undefined): boolean {
-  return isUnlocked(save, unlocks, unlock ?? key);
+/** 遊べるポケモン（playables.json のキーと、その解放の名前）が、その地方で解放済みか */
+export function isPlayableUnlocked(save: Readonly<SaveData>, unlocks: UnlocksConfig, key: string, unlock: string | undefined, region: string = HOME_REGION): boolean {
+  return isUnlocked(save, unlocks, unlock ?? key, region);
 }
 
 /**
@@ -73,8 +74,8 @@ export function applyProgress(save: SaveData, achievements: AchievementsConfig, 
   }
   const newUnlocks: string[] = [];
   for (const u of unlocks.unlocks) {
-    if (isUnlocked(save, unlocks, u.pokemon) || !meets(regionStats(save.stats, u.region), u.condition)) continue;
-    save.unlocked.push(u.pokemon);
+    if (isUnlocked(save, unlocks, u.pokemon, u.region) || !meets(regionStats(save.stats, u.region), u.condition)) continue;
+    save.unlocked.push(regionUnlockKey(u.region, u.pokemon));
     newUnlocks.push(u.pokemon);
   }
   return { achievements: newAchievements, unlocks: newUnlocks };

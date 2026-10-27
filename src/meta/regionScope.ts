@@ -32,6 +32,14 @@ export function regionStats(stats: Readonly<Record<string, number>>, region: str
   return out;
 }
 
+/**
+ * その地方の解放の名前（セーブの unlocked に入れる名前。07 の66.1: 解放は地方ごと）。カントーはそのまま、ほかの地方は頭に "<地方>:"。
+ * カントーで解放したイワークは、ジョウトでは改めて解放する
+ */
+export function regionUnlockKey(region: string, name: string): string {
+  return statPrefix(region) + name;
+}
+
 /** その地方の永続強化のレベル（強化の id → レベル） */
 export function regionUpgradesOf(save: Readonly<SaveData>, region: string): Readonly<Record<string, number>> {
   return region === HOME_REGION ? save.upgrades : (save.regionUpgrades[region] ?? {});

@@ -9,6 +9,7 @@ import { buyPokemon, buyUpgrade, nextCost, refundableCoins, refundAll, shopRegio
 import { progressOf } from '../meta/progress';
 import { regionPlayable } from './RegionScene';
 import { playableName } from '../meta/hatch';
+import { regionUnlockKey } from '../meta/regionScope';
 
 // 原作をまねた白い窓のボタン（作者の決定。2026年10月22日。src/render/pixelUi.ts の windowCss と同じ見た目）
 const BUTTON = 'min-height:44px;padding:8px 14px;cursor:pointer;font:inherit;font-size:16px;background:#f8f8f8;color:#383848;border:4px solid #383848;border-radius:6px;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #a8b8c8';
@@ -118,7 +119,7 @@ export class ShopScene extends Phaser.Scene {
       }
       for (const item of forSale) {
         const unlockName = playablesConfig.pokemon[item.key]?.unlock ?? item.key;
-        const owned = save.unlocked.includes(unlockName);
+        const owned = save.unlocked.includes(regionUnlockKey(item.region, unlockName));
         const row = document.createElement('div');
         row.style.cssText = `display:grid;${columns};gap:12px;align-items:center;padding:4px 12px;border-radius:6px;border:2px solid ${owned ? '#f8d030' : '#585868'};background:${owned ? '#3d2a08' : '#000000'};overflow-wrap:anywhere`;
         // 買うまでは、シルエットと値段だけ（作者の決定 2026年10月24日）。買ったら名前と姿

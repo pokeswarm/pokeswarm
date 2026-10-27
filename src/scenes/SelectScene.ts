@@ -55,6 +55,7 @@ export class SelectScene extends Phaser.Scene {
     const go = document.createElement('button');
     const picker = new PokemonPicker({
       playables: region.playables,
+      region: region.id,
       onSelect: (key) => {
         selected = key;
         options.setPokemon(key);
@@ -97,7 +98,7 @@ export class SelectScene extends Phaser.Scene {
       root.append(title, body);
     } else root.append(title, hint, picker.element, options.element, row);
     // 最初は一覧の先頭の解放済みのポケモンを選んでおく（Enter ですぐ始められる）
-    const first = region.playables.find(isPokemonUnlocked);
+    const first = region.playables.find((k) => isPokemonUnlocked(k, region.id));
     if (first) {
       picker.setSelected(first);
       selected = first;

@@ -289,6 +289,14 @@ export class MoveSprites {
         const rows = sp.parts.main?.[0];
         if (!rows) continue;
         const s = (r * 2) / rows[0]!.length;
+        if (spec.directional) {
+          // 向きで描き分ける絵（かみくだく の口）: 進む向き（止まっていれば技の向き）で部品を選び、回さずに置く
+          const moving = it.vx !== 0 || it.vy !== 0;
+          const part = directionalPart(moving ? it.vx : it.dirX, moving ? it.vy : it.dirY);
+          const name = sp.parts[part.name] ? part.name : 'main';
+          put(fk(name, this.frameOf(spec.id, name, elapsed)), x, y, 0, part.flip ? -s : s, s, a);
+          continue;
+        }
         // 向き: 進む向き（絵は右向きに描く）か、回し続けるか
         const rot =
           spec.rotate === 'velocity' ? (it.vx !== 0 || it.vy !== 0 ? Math.atan2(it.vy, it.vx) : Math.atan2(it.dirY, it.dirX)) : spec.rotate === 'spin' ? (elapsed * spec.spinDegPerSec * Math.PI) / 180 : 0;

@@ -899,10 +899,11 @@ function fangBite(palette = ['#3b0d06', '#e53935', '#ff7043', '#cfc4bd', '#fffff
 }
 
 /**
- * かみつく（作者の指摘 2026年10月27日: 弧のあごはクワガタに見える。口は台形を閉じる。犬歯を長く）:
+ * かみくだく（作者の指摘 2026年10月27日: 弧のあごはクワガタに見える。口は台形を閉じる。犬歯を長く）:
  * 上あご（カメラに近い。長くて厚い帯）と下あご（遠い。短くて薄い帯）が、上下から平行に近づいて閉じる。
- * 2つの間（口の中）は暗い色の台形で塗り、歯ぐきのふちに歯が並ぶ（両はしの犬歯は長くとがる）。閉じた所で光がはじける。
- * 部品: front（下向き・上向きは同じ）・diag（斜め。同じ口を、口の先の向きへ少し傾ける）・main（横から見た口。歯の列が上下から閉じる）
+ * 歯ぐきのふちに歯が並ぶ（両はしの犬歯は長くとがる。口の中は塗らない）。閉じた所で光がはじける。
+ * 部品: front（下向き・上向きは同じ）・diag（斜め。同じ口を丸ごと回す）・main（横から見た口。歯の列が上下から閉じる）。
+ * かみくだく の絵（作者の参考動画は かみくだく。2026年10月27日）
  */
 function darkJaws(): SpriteOut {
   // 0 輪郭・1 口の中（暗い紫）・2 紫（あご）・3 明るい紫・4 歯の影・5 白（歯・光）
@@ -934,11 +935,15 @@ function darkJaws(): SpriteOut {
   const thin = (col: number, u: number, v: number, fade: number): number =>
     fade === 1 && (col === 2 || col === 1) && hash(Math.floor((u + 1) * 18), Math.floor((v + 1) * 18), 59) < 0.5 ? -1 : col;
 
-  /** 前から見た口（台形）。skew は斜めの傾き（下ほど右へずらす）、squeeze は横幅の縮み */
-  const face = (skew: number, squeeze: number): Grid[] =>
+  /**
+   * 前から見た口（台形）。turn は口全体を回す角度（斜め: 上の歯の列と下の歯の列は平行なまま、どちらも水平でなくなる。作者の指摘 2026年10月27日）
+   */
+  const face = (turn: number): Grid[] =>
     STEPS.map(([gap, flash, fade]) =>
-      shape(36, (u1, v) => {
-        const u = (u1 - v * skew) / squeeze;
+      shape(36, (x, y) => {
+        const u1 = (x * Math.cos(turn) - y * Math.sin(turn)) * 1.18;
+        const v = (x * Math.sin(turn) + y * Math.cos(turn)) * 1.18;
+        const u = u1;
         const fl = flashAt(u, v, 0, 0, flash);
         if (fl >= 0) return fl;
         if (fade === 2) return hash(Math.floor((u1 + 1) * 14), Math.floor((v + 1) * 14), 67) < 0.06 && Math.abs(v) < 0.5 && Math.abs(u) < 0.8 ? 3 : -1;
@@ -964,11 +969,6 @@ function darkJaws(): SpriteOut {
         if (v >= loGum && v <= loBot) {
           const half = lerp(0.5, 0.4, (v - loGum) / (loBot - loGum));
           if (Math.abs(u) <= half) return thin(v > loBot - 0.06 ? 3 : 2, u1, v, fade);
-        }
-        // 口の中: 上の歯ぐき（半幅 0.78）から下の歯ぐき（0.5）までの台形
-        if (v > upGum && v < loGum) {
-          const half = lerp(0.78, 0.5, (v - upGum) / (loGum - upGum));
-          if (Math.abs(u) <= half) return thin(1, u1, v, fade);
         }
         return -1;
       }),
@@ -1001,14 +1001,14 @@ function darkJaws(): SpriteOut {
           const loBot = loGum + 0.22 - Math.max(0, u - 0.3) * 0.35;
           if (v >= loGum && v <= loBot) return thin(v > loBot - 0.06 ? 3 : 2, u, v, fade);
         }
-        // 口の中
-        if (v > upGum && v < gap + 0.08 && u <= 0.74) return thin(1, u, v, fade);
         return -1;
       }),
     );
   const rows = (g: Grid[]): string[][] => g.map((x) => toRows(outline(x, 0)));
-  const front = rows(face(0, 1));
-  return { palette, frameMs: 45, parts: { main: rows(side()), front, back: front, diag: rows(face(0.3, 0.82)), diagBack: rows(face(-0.3, 0.82)) } };
+  const front = rows(face(0));
+  // 斜め前（右下）: 口の向き（上あご → 下あご）を右下へ 35° 回す。上向きと下向きが同じ絵なので、斜め後ろも同じ
+  const diag = rows(face((35 * Math.PI) / 180));
+  return { palette, frameMs: 45, parts: { main: rows(side()), front, back: front, diag, diagBack: diag } };
 }
 
 /** フレアドライブ: 右へ突っ込む炎の弧（三日月形の炎。コマで炎の先がゆらめく） */

@@ -3166,19 +3166,10 @@
     },
     "bite": {
       "extends": "dark.base",
-      "impact": {
-        "flash": {
-          "color": "#f8bbd0",
-          "radius": 20,
-          "durationMs": 120,
-          "alpha": 0.6
-        }
-      },
       "sprite": {
-        "id": "dark-jaws",
+        "id": "dark-fang",
         "fit": "front",
-        "size": 1.35,
-        "directional": true
+        "size": 1.25
       }
     },
     "crunch": {
@@ -3197,10 +3188,10 @@
         }
       },
       "sprite": {
-        "id": "dark-fang",
+        "id": "dark-jaws",
         "fit": "circle",
-        "size": 1.7,
-        "rotate": "velocity"
+        "size": 1.9,
+        "directional": true
       }
     },
     "dark.base": {

@@ -66,6 +66,8 @@ export interface Player {
   /** 時間帯のなつきの進化（イーブイ）で、本人に聞いている進化先の姿（07 の81章）と、キャンセルした区間（その区間の間は聞かない） */
   evolveAsk?: number;
   evolveDeclinedSection?: number;
+  /** あまごい: この更新の回数まで、そのタイプの技の威力を上げる */
+  rain?: { type: number; pct: number; untilTick: number };
   /** 泣くまでの歩いた距離（トゲピー）と、泣いて止まっている残り（更新回数） */
   cryWalked?: number;
   cryTicks?: number;

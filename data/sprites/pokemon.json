@@ -291,14 +291,16 @@
       "key": "zubat",
       "dex": 41,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "golbat",
       "dex": 42,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -669,7 +671,8 @@
       "key": "horsea",
       "dex": 116,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1114,14 +1117,16 @@
       "key": "miltank",
       "dex": 241,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "poliwrath",
       "dex": 62,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1144,7 +1149,8 @@
       "key": "kingdra",
       "dex": 230,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1158,7 +1164,8 @@
       "key": "crobat",
       "dex": 169,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1288,6 +1295,34 @@
     {
       "key": "pidgeot",
       "dex": 18
+    },
+    {
+      "key": "larvitar",
+      "dex": 246
+    },
+    {
+      "key": "pupitar",
+      "dex": 247
+    },
+    {
+      "key": "tyranitar",
+      "dex": 248
+    },
+    {
+      "key": "seadra",
+      "dex": 117
+    },
+    {
+      "key": "poliwag",
+      "dex": 60
+    },
+    {
+      "key": "poliwhirl",
+      "dex": 61
+    },
+    {
+      "key": "politoed",
+      "dex": 186
     }
   ]
 }

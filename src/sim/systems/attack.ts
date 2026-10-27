@@ -95,7 +95,7 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
     power:
       st.power *
       (def.damageClass === 'physical' ? p.physicalPower : p.specialPower) *
-      Math.max(0, 1 + (m.powerPct + classPct + (m.typePowerPct[def.type] ?? 0)) / 100) *
+      Math.max(0, 1 + (m.powerPct + classPct + (m.typePowerPct[def.type] ?? 0) + (p.rain && p.rain.type === def.type && world.tick < p.rain.untilTick ? p.rain.pct : 0)) / 100) *
       heldPowerMultiplier(world, p) *
       // とっておき: 覚えているほかの技が多いほど強い
       (1 + (st.perMovePowerPct * Math.max(0, p.moves.length - 1)) / 100),
@@ -1066,6 +1066,9 @@ function firePulse(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
  * （こなゆき・ふぶき。作者の決定 2026年10月25日）。持ち主に付いていく大きな円で、見た目は画面に降る雪（範囲は塗らない）
  */
 function fireWeather(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  // あまごい: 出ている間、みずの技の威力を上げる
+  const rain = world.rules.moves[pm.move]!.rainBoost;
+  if (rain) p.rain = { type: rain.type, pct: rain.pct, untilTick: world.tick + Math.round(st.durationSeconds / world.dt) };
   world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y });
 }
 
@@ -1310,6 +1313,8 @@ export function moveProjectiles(world: World): void {
         e.markBy[j] = ownerId;
       }
       if (pr.stage[i] === 0 && !pr.noFx[i] && def.effects.some((fx) => fx.trigger === 'eachHit')) fireEffects(world, 'eachHit', fxSourceOf(world, i, e.x[j]!, e.y[j]!));
+      // ころがる: 当たるたびに大きくなる（どのブラウザでも同じように）
+      if (def.growOnHit) pr.radius[i] = Math.min(st.size * def.growOnHit.maxMultiplier, pr.radius[i]! + st.size * def.growOnHit.perHit);
       if (!local) continue;
       // ノックバックの向き: 直線は線の向き、それ以外は当たり判定から敵へ（重なっていれば進む向き）
       const kx = line ? pr.dirX[i]! : e.x[j]! - x || pr.vx[i]!;

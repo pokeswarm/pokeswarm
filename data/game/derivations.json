@@ -39,6 +39,7 @@
     { "from": "horn-attack", "item": "silver-powder", "to": "megahorn", "line": "heracross" },
     { "from": "powder-snow", "item": "hard-stone", "to": "icicle-crash", "line": "swinub" },
     { "from": "whirlwind", "item": "sharp-beak", "to": "hurricane", "line": "pidgey" },
+    { "from": "bite", "item": "poison-barb", "to": "cross-poison", "line": "zubat" },
     { "from": "quick-attack", "item": "x-speed", "to": "extreme-speed", "line": "growlithe" },
     { "from": "hydro-pump", "item": "water-stone", "to": "hydro-cannon", "line": "squirtle" },
     { "from": "swift", "item": "metronome", "to": "rapid-spin", "line": "staryu" },

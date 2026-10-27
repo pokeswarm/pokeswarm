@@ -175,7 +175,14 @@
     "houndour",
     "ampharos",
     "heracross",
-    "pidgeot"
+    "pidgeot",
+    "larvitar",
+    "pupitar",
+    "tyranitar",
+    "seadra",
+    "poliwag",
+    "poliwhirl",
+    "politoed"
   ],
   "moves": [
     "ember",
@@ -306,7 +313,12 @@
     "horn-attack",
     "megahorn",
     "icicle-crash",
-    "whirlwind"
+    "whirlwind",
+    "cross-poison",
+    "rollout",
+    "sandstorm",
+    "twister",
+    "rain-dance"
   ],
   "items": [
     "x-attack",

@@ -6553,6 +6553,302 @@
           "power": -1.4
         }
       ]
+    },
+    "cross-poison": {
+      "pattern": "nearest",
+      "effect": "cross-poison",
+      "base": {
+        "power": 104.1,
+        "cooldownSeconds": 1.1,
+        "count": 1,
+        "intervalSeconds": 0.15,
+        "speed": 460,
+        "size": 34,
+        "range": 600,
+        "durationSeconds": 1.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 200,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.3,
+        "statusSeconds": 4,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "critChancePct": 20,
+        "statusId": "poison"
+      },
+      "levels": [
+        {
+          "power": 17.4
+        },
+        {
+          "size": 4,
+          "power": 10.8
+        },
+        {
+          "power": 16.6
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": -5.9
+        },
+        {
+          "count": 1,
+          "power": -64.3
+        },
+        {
+          "size": 4,
+          "power": 3.4
+        },
+        {
+          "power": 6.8
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "hit",
+          "explode": {
+            "sizeMultiplier": 2.2,
+            "powerMultiplier": 0.6
+          }
+        },
+        {
+          "trigger": "end",
+          "split": {
+            "sizeMultiplier": 0.6,
+            "powerMultiplier": 0.5,
+            "count": 4,
+            "speed": 380,
+            "durationSeconds": 0.5,
+            "spreadDegrees": 360,
+            "boomerang": false,
+            "angleOffsetDegrees": 45,
+            "pierce": "infinite"
+          }
+        }
+      ]
+    },
+    "rollout": {
+      "pattern": "bounce",
+      "effect": "rollout",
+      "bounceAngle": 35,
+      "base": {
+        "power": 39.7,
+        "cooldownSeconds": 2.4,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 420,
+        "size": 20,
+        "range": 420,
+        "durationSeconds": 3.5,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.4,
+        "knockback": 160,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 360,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "size": 2,
+          "power": 4.9
+        },
+        {
+          "durationSeconds": 0.4,
+          "power": 0.8
+        },
+        {
+          "speed": 40,
+          "power": 5.7
+        },
+        {
+          "size": 2,
+          "power": 3.7
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": 0.5
+        },
+        {
+          "durationSeconds": 0.4,
+          "power": -1
+        },
+        {
+          "size": 3,
+          "power": 1.8
+        }
+      ],
+      "body": {
+        "lungeDistance": 30,
+        "afterimages": 4
+      },
+      "waitForEnd": true,
+      "teachOnly": true,
+      "growOnHit": {
+        "perHit": 0.12,
+        "maxMultiplier": 2.5
+      }
+    },
+    "sandstorm": {
+      "pattern": "weather",
+      "effect": "sandstorm",
+      "base": {
+        "power": 12.9,
+        "intervalSeconds": 0.1,
+        "count": 1,
+        "speed": 0,
+        "size": 620,
+        "range": 620,
+        "durationSeconds": 4,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.5,
+        "knockback": 0,
+        "knockbackSeconds": 0,
+        "spreadDegrees": 0,
+        "cooldownSeconds": 5,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "durationSeconds": 0.5,
+          "power": 1.2
+        },
+        {
+          "size": 20,
+          "power": 2.6
+        },
+        {
+          "statusChance": 0.03,
+          "power": 2.6
+        },
+        {
+          "statusChance": 0.02,
+          "power": 2.7
+        },
+        {
+          "durationSeconds": 0.5,
+          "power": 0.1
+        },
+        {
+          "size": 20,
+          "power": 2.4
+        },
+        {
+          "statusChance": 0.02,
+          "power": 2.3
+        }
+      ],
+      "restAfterEnd": true,
+      "teachOnly": true
+    },
+    "twister": {
+      "pattern": "facing",
+      "effect": "twister",
+      "base": {
+        "power": 7.4,
+        "intervalSeconds": 0.1,
+        "statusChance": 0.2,
+        "statusSeconds": 0.5,
+        "lifestealPct": 0,
+        "count": 1,
+        "speed": 220,
+        "size": 30,
+        "range": 420,
+        "durationSeconds": 1.8,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.3,
+        "knockback": 140,
+        "knockbackSeconds": 0.08,
+        "spreadDegrees": 0,
+        "cooldownSeconds": 1.15,
+        "statusId": "flinch"
+      },
+      "levels": [
+        {
+          "size": 4,
+          "power": 1.2
+        },
+        {
+          "durationSeconds": 0.3,
+          "power": -0.1
+        },
+        {
+          "size": 4,
+          "power": 0.9
+        },
+        {
+          "size": 4,
+          "power": 0.8
+        },
+        {
+          "count": 1,
+          "power": -4.5
+        },
+        {
+          "size": 4,
+          "power": 0.4
+        },
+        {
+          "durationSeconds": 0.4,
+          "power": -0.3
+        }
+      ],
+      "teachOnly": true
+    },
+    "rain-dance": {
+      "pattern": "weather",
+      "effect": "rain-dance",
+      "base": {
+        "power": 0,
+        "intervalSeconds": 0.1,
+        "count": 1,
+        "speed": 0,
+        "size": 560,
+        "range": 560,
+        "durationSeconds": 6,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 5,
+        "knockback": 0,
+        "knockbackSeconds": 0,
+        "spreadDegrees": 0,
+        "cooldownSeconds": 10,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "durationSeconds": 0.5
+        },
+        {
+          "cooldownSeconds": -0.5
+        },
+        {
+          "durationSeconds": 0.5
+        },
+        {
+          "cooldownSeconds": -0.5
+        },
+        {
+          "durationSeconds": 0.5
+        },
+        {
+          "cooldownSeconds": -0.5
+        },
+        {
+          "durationSeconds": 1
+        }
+      ],
+      "restAfterEnd": true,
+      "teachOnly": true,
+      "rainBoost": {
+        "type": "water",
+        "pct": 50
+      }
     }
   }
 }

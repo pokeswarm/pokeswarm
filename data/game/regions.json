@@ -39,7 +39,7 @@
     {
       "id": "johto",
       "available": false,
-      "playables": ["cyndaquil", "chikorita", "totodile", "egg", "onix", "scyther", "gastly", "slowpoke", "porygon", "eevee", "houndour", "mareep", "heracross", "swinub", "pidgey"],
+      "playables": ["cyndaquil", "chikorita", "totodile", "egg", "onix", "scyther", "gastly", "slowpoke", "porygon", "eevee", "houndour", "mareep", "heracross", "swinub", "pidgey", "zubat", "miltank", "larvitar", "horsea", "poliwag"],
       "unlock": { "stat": "bossDefeated.mew", "atLeast": 1 }
     },
     {

@@ -2644,6 +2644,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'claw-big': () => claw('big'),
     'fury-slash': () => furySlash(),
     'x-scissor': () => crossChop(['#10240a', '#33691e', '#7cb342', '#c5e1a5', '#ffffff', '#f0f4c3']),
+    // クロスポイズン: 同じ X の刃を毒の紫で
+    'x-poison': () => crossChop(['#1a0624', '#6a1b9a', '#ab47bc', '#e1bee7', '#ffffff', '#f3e5f5']),
     'steel-beam': () => steelBeam(),
     rock: () => rock('rock'),
     stone: () => rock('stone'),

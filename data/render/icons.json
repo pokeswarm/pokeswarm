@@ -1636,7 +1636,12 @@
     "megahorn": "needle",
     "icicle-crash": "snowflake",
     "whirlwind": "wind",
-    "hurricane": "whirl"
+    "hurricane": "whirl",
+    "cross-poison": "xcross",
+    "rollout": "rock",
+    "sandstorm": "cloud",
+    "twister": "whirl",
+    "rain-dance": "droplet"
   },
   "items": {
     "x-attack": {

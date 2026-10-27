@@ -5,6 +5,7 @@ import { Simulation } from './simulation';
 import { answerEvolution, checkEvolution } from './systems/evolution';
 import { makeOffers } from './systems/leveling';
 import { regenerate } from './systems/health';
+import { moveStatsOf, scaledMoveStats } from './systems/attack';
 
 /** ベイビィポケモンとタマゴ（07 の57章・66.4） */
 function setup(pokemon: string) {
@@ -172,5 +173,49 @@ describe('イーブイの昼と夜の進化（07 の81章）', () => {
     checkEvolution(sim.world, p);
     expect(p.evolveAsk).toBeUndefined();
     expect(p.species).toBe(lo.species);
+  });
+});
+
+describe('ジョウトだけのポケモン（07 の80章）', () => {
+  it('ズバットは どくの技を新しく覚えない', () => {
+    const s = setup('zubat');
+    const poison = s.rules.types.names.indexOf('poison');
+    for (let k = 0; k < 30; k++) {
+      for (const o of makeOffers(s.w, s.p)) if (o.kind === 'moveNew') expect(s.rules.moves[o.move]!.type).not.toBe(poison);
+    }
+  });
+
+  it('進化したとき技が空いていれば覚える: バンギラス すなあらし、キングドラ たつまき、ニョロボン ばくれつパンチ、ニョロトノ あまごい', () => {
+    for (const [line, steps, move] of [
+      ['larvitar', ['pupitar', 'tyranitar'], 'sandstorm'],
+      ['horsea', ['seadra', 'kingdra'], 'twister'],
+    ] as const) {
+      const s = setup(line);
+      s.w.level = 60;
+      s.p.items = [{ item: s.rules.items.findIndex((it) => it.key === 'dragon-scale'), level: 1 }];
+      checkEvolution(s.w, s.p);
+      expect(s.p.species).toBe(s.species(steps[steps.length - 1]!));
+      expect(s.keys()).toContain(move);
+    }
+    for (const [item, form, move] of [['water-stone', 'poliwrath', 'dynamic-punch'], ['kings-rock', 'politoed', 'rain-dance']] as const) {
+      const s = setup('poliwag');
+      s.w.level = 30;
+      s.p.items = [{ item: s.rules.items.findIndex((it) => it.key === item), level: 1 }];
+      checkEvolution(s.w, s.p);
+      expect(s.p.species).toBe(s.species(form));
+      expect(s.keys()).toContain(move);
+    }
+  });
+
+  it('あまごい: 降っている間、みずの技の威力が上がる', () => {
+    const s = setup('poliwag');
+    const water = s.rules.types.names.indexOf('water');
+    const pm = s.p.moves[0]!;
+    const st = moveStatsOf(s.w, pm);
+    const dry = scaledMoveStats(s.w, s.p, pm, st).power;
+    s.p.rain = { type: water, pct: 50, untilTick: s.w.tick + 10 };
+    expect(scaledMoveStats(s.w, s.p, pm, st).power).toBeCloseTo(dry * 1.5, 5);
+    s.w.tick += 10;
+    expect(scaledMoveStats(s.w, s.p, pm, st).power).toBeCloseTo(dry, 5);
   });
 });

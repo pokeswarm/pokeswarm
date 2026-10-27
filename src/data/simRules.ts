@@ -73,6 +73,8 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.followFacing ? { followFacing: def.followFacing } : {}),
       ...(def.coinGain ? { coinGain: def.coinGain } : {}),
       ...(def.healZone ? { healZone: true } : {}),
+      ...(def.growOnHit ? { growOnHit: def.growOnHit } : {}),
+      ...(def.rainBoost ? { rainBoost: { type: typeIndex(def.rainBoost.type), pct: def.rainBoost.pct } } : {}),
       ...(def.delayedBlast ? { delayedBlast: def.delayedBlast } : {}),
       ...(def.lobTarget ? { lobTarget: def.lobTarget } : {}),
       ...(def.scatterJitter ? { scatterJitter: def.scatterJitter } : {}),
@@ -184,6 +186,7 @@ export function buildSimRules(region?: string): SimRules {
       formMoves: pl.formMoves.map((f) => ({ form: formIndex(f.form), move: moveIndex(f.move) })),
       becomes: pl.becomes.map((b) => ({ form: formIndex(b.form), line: b.line })),
       fixedForms: pl.fixedForms.map(formIndex),
+      excludeMoveTypes: pl.excludeMoveTypes.map(typeIndex),
       hpCost: pl.formHpCost ? { forms: pl.formHpCost.forms.map(formIndex), move: moveIndex(pl.formHpCost.move), pct: pl.formHpCost.pct, minHpPct: pl.formHpCost.minHpPct } : null,
       cry: pl.cry ? { forms: pl.cry.forms.map(formIndex), everyDistance: pl.cry.everyDistance, seconds: pl.cry.seconds } : null,
     };

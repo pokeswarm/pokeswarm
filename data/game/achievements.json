@@ -854,6 +854,61 @@
       "reward": {
         "pokemon": "pidgey"
       }
+    },
+    {
+      "id": "johto-unlock-zubat",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.crobat",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "zubat"
+      }
+    },
+    {
+      "id": "johto-unlock-miltank",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.miltank",
+        "atLeast": 3
+      },
+      "reward": {
+        "pokemon": "miltank"
+      }
+    },
+    {
+      "id": "johto-unlock-larvitar",
+      "region": "johto",
+      "condition": {
+        "stat": "distinctClears",
+        "atLeast": 3
+      },
+      "reward": {
+        "pokemon": "larvitar"
+      }
+    },
+    {
+      "id": "johto-unlock-horsea",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.kingdra",
+        "atLeast": 6
+      },
+      "reward": {
+        "pokemon": "horsea"
+      }
+    },
+    {
+      "id": "johto-unlock-poliwag",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.poliwrath",
+        "atLeast": 4
+      },
+      "reward": {
+        "pokemon": "poliwag"
+      }
     }
   ]
 }

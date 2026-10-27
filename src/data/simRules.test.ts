@@ -69,8 +69,11 @@ describe('data/ から組み立てたシミュレーションの定義', () => {
       const base = baseOf(u.from);
       const def = movesConfig.moves[base]!;
       const type = generated.moves[base]!.type;
+      // 元の技の途中（派生技）を最初から覚えているなら、それでよい（ズバット: かみつく から始める。07 の80章）
+      const chain: string[] = [];
+      for (let k: string | undefined = u.from; k; k = all.find((x) => x.to === k)?.from) chain.push(k);
       const ok =
-        pl.startingMoves.includes(base) ||
+        chain.some((k) => pl.startingMoves.includes(k)) ||
         pl.allMoveTypes ||
         (def.learners ? def.learners.includes(u.line) : type === 'normal' || typesOf(u.line).has(type) || (pl.moveTypes ?? []).includes(type));
       expect(ok, `${u.line} が ${u.to} の元 ${base} を覚えられない`).toBe(true);

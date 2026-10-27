@@ -288,6 +288,8 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
       if (!isBaseMove(world, move) || m.teachOnly || p.moves.some((pm) => pm.move === move) || p.consumedMoves?.includes(move)) return;
       // 覚えられる系統が決まっている技（ノーマルの技・各ポケモン専用の技）は、その系統だけ（ミュウは何でも）
       if (m.learners && !p.learnsAll && !m.learners.includes(p.line)) return;
+      // 覚えないタイプ（ズバット: どくの技は最初の かみつく → クロスポイズン だけ）
+      if (rules.lines?.[p.line]?.excludeMoveTypes.includes(m.type)) return;
       if (m.type === normal || p.types.includes(m.type) || p.moveTypes.includes(m.type)) pool.push({ kind: 'moveNew', move });
     });
   }

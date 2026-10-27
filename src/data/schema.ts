@@ -1002,6 +1002,10 @@ export const moveDefSchema = z.object({
    * 端数はためて、ランの終わりに切り捨てる
    */
   coinGain: z.object({ perUse: z.number().nonnegative(), perLevel: z.number().nonnegative() }).optional(),
+  /** 当たるたびに大きくなる（ころがる。1回で元の大きさの perHit 倍ずつ、元の maxMultiplier 倍まで。07 の80章） */
+  growOnHit: z.object({ perHit: z.number().positive(), maxMultiplier: z.number().min(1) }).optional(),
+  /** weather: 出ている間（durationSeconds）、そのタイプの技の威力を pct % 上げる（あまごい: 雨の中で みずの技が強くなる） */
+  rainBoost: z.object({ type: z.string(), pct: z.number().positive() }).optional(),
   /** heal: すぐに回復せず、自分を中心にした円（大きさ size）を出している間（durationSeconds）、中にいるプレイヤーを毎秒 最大 HP の healPct % 回復する（つきのひかり。07 の57章） */
   healZone: z.boolean().optional(),
   /** cross（十字）: 向きを等しい角度に並べず、1発ごとにランダムにする（うたう: 音符がふわふわ散る） */
@@ -1153,6 +1157,8 @@ export const playablesConfigSchema = z.object({
        * ピチュー → ピカチュウ、ププリン → プリン（07 の66.4「進化した後の技は、カントーの同じポケモンと同じ決まり」）
        */
       becomes: z.array(z.object({ form: z.string(), line: z.string() })).default([]),
+      /** このタイプの技は新しく覚えない（ズバット: どくの技。07 の80章） */
+      excludeMoveTypes: z.array(z.string()).default([]),
       /** この姿の間は新しい技を覚えない（トゲピー: 進化するまで。07 の57章） */
       fixedForms: z.array(z.string()).default([]),
       /** この姿の間、この技を使うたびに HP を使う（ピチュー: でんきショックで最大 HP の 1%。10% を切ると撃たない） */

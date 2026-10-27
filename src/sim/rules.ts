@@ -20,6 +20,8 @@ export interface SimLineRule {
   readonly formMoves: readonly { readonly form: number; readonly move: number }[];
   readonly becomes: readonly { readonly form: number; readonly line: string }[];
   readonly fixedForms: readonly number[];
+  /** 新しく覚えないタイプ（ズバット: どく） */
+  readonly excludeMoveTypes: readonly number[];
   readonly hpCost: { readonly forms: readonly number[]; readonly move: number; readonly pct: number; readonly minHpPct: number } | null;
   readonly cry: { readonly forms: readonly number[]; readonly everyDistance: number; readonly seconds: number } | null;
 }

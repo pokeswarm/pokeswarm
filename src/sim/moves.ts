@@ -84,6 +84,10 @@ export interface SimMoveDef {
   readonly delayedBlast?: { readonly seconds: number; readonly sizeMultiplier: number; readonly powerMultiplier: number };
   /** 使うたびに、ランのコインを perUse + perLevel × (レベル − 1) 枚増やす（ネコにこばん） */
   readonly coinGain?: { readonly perUse: number; readonly perLevel: number };
+  /** 当たるたびに大きくなる（ころがる） */
+  readonly growOnHit?: { readonly perHit: number; readonly maxMultiplier: number };
+  /** 出ている間、そのタイプ（番号）の技の威力を上げる（あまごい） */
+  readonly rainBoost?: { readonly type: number; readonly pct: number };
   /** 回復の円（つきのひかり）: 出ている間、中のプレイヤーを毎秒 healPct % 回復する */
   readonly healZone?: boolean;
   /** cross: 向きを1発ごとにランダムにする（うたう） */

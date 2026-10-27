@@ -203,6 +203,18 @@
     "type": "fighting",
     "damageClass": "physical"
   },
+  "cross-poison": {
+    "names": {
+      "ja": "クロスポイズン",
+      "en": "Cross Poison",
+      "fr": "Poison Croix",
+      "de": "Giftstreich",
+      "es": "Veneno X",
+      "it": "Velenocroce"
+    },
+    "type": "poison",
+    "damageClass": "physical"
+  },
   "crunch": {
     "names": {
       "ja": "かみくだく",
@@ -995,6 +1007,18 @@
     "type": "normal",
     "damageClass": "physical"
   },
+  "rain-dance": {
+    "names": {
+      "ja": "あまごい",
+      "en": "Rain Dance",
+      "fr": "Danse Pluie",
+      "de": "Regentanz",
+      "es": "Danza Lluvia",
+      "it": "Pioggiadanza"
+    },
+    "type": "water",
+    "damageClass": "status"
+  },
   "rapid-spin": {
     "names": {
       "ja": "こうそくスピン",
@@ -1091,6 +1115,18 @@
     "type": "fighting",
     "damageClass": "physical"
   },
+  "rollout": {
+    "names": {
+      "ja": "ころがる",
+      "en": "Rollout",
+      "fr": "Roulade",
+      "de": "Walzer",
+      "es": "Rodar",
+      "it": "Rotolamento"
+    },
+    "type": "rock",
+    "damageClass": "physical"
+  },
   "sand-tomb": {
     "names": {
       "ja": "すなじごく",
@@ -1102,6 +1138,18 @@
     },
     "type": "ground",
     "damageClass": "physical"
+  },
+  "sandstorm": {
+    "names": {
+      "ja": "すなあらし",
+      "en": "Sandstorm",
+      "fr": "Tempête de Sable",
+      "de": "Sandsturm",
+      "es": "Tormenta de Arena",
+      "it": "Terrempesta"
+    },
+    "type": "rock",
+    "damageClass": "status"
   },
   "scratch": {
     "names": {
@@ -1437,6 +1485,18 @@
       "it": "Tripletta"
     },
     "type": "normal",
+    "damageClass": "special"
+  },
+  "twister": {
+    "names": {
+      "ja": "たつまき",
+      "en": "Twister",
+      "fr": "Ouragan",
+      "de": "Windhose",
+      "es": "Ciclón",
+      "it": "Tornado"
+    },
+    "type": "dragon",
     "damageClass": "special"
   },
   "vine-whip": {

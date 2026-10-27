@@ -138,6 +138,19 @@ describe('作者の感想で見直した技（2026年10月25日）', () => {
     expect(counts.size).toBeGreaterThan(1);
   });
 
+  it('置いてから待つ（scatterDelaySeconds）: 待つ間は出番待ち（stage 3）で、時間が来たら当たり判定になる（つららおとし）', () => {
+    const rules = testRules({ move: { power: 10, cooldownSeconds: 100, durationSeconds: 0.5, size: 20, range: 100, count: 3 } });
+    rules.moves[0] = { ...rules.moves[0]!, pattern: 'scatter', scatterDelaySeconds: 0.5 };
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 200 });
+    sim.step([]);
+    const pr = sim.world.projectiles;
+    expect(pr.count).toBe(3);
+    for (let i = 0; i < pr.count; i++) expect(pr.stage[i]).toBe(3);
+    for (let k = 0; k < 16; k++) sim.step([]);
+    for (let i = 0; i < pr.count; i++) expect(pr.stage[i]).toBe(0);
+  });
+
   it('現れたとき（spawn）の効き方: 遅れて現れる爆炎の柱は、現れたときに火の粉を出す', () => {
     const sparks: MoveEffect = { trigger: 'spawn', split: { sizeMultiplier: 0.2, powerMultiplier: 0.3, count: 3, speed: 200, durationSeconds: 0.4, spreadDegrees: 360, boomerang: false, jitter: 1 } };
     const sim = setup('eruption', { range: 300, size: 20, count: 8, intervalSeconds: 0.2, durationSeconds: 1 }, [], { effects: [sparks] });

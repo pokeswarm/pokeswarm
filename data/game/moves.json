@@ -5898,54 +5898,63 @@
       "teachOnly": true
     },
     "bullet-punch": {
-      "pattern": "nearest",
+      "pattern": "barrage",
       "effect": "bullet-punch",
       "base": {
-        "intervalSeconds": 0.1,
-        "pierce": 2,
+        "intervalSeconds": 0.04,
+        "pierce": "infinite",
         "hitIntervalSeconds": 0,
         "knockbackSeconds": 0.1,
         "spreadDegrees": 0,
         "statusChance": 0,
         "statusSeconds": 0,
         "lifestealPct": 0,
-        "power": 39.2,
-        "cooldownSeconds": 0.6,
-        "count": 1,
-        "speed": 760,
+        "power": 49.3,
+        "cooldownSeconds": 1.6,
+        "count": 8,
+        "speed": 520,
         "size": 14,
-        "range": 200,
-        "durationSeconds": 0.28,
-        "knockback": 220
+        "range": 90,
+        "durationSeconds": 0.25,
+        "knockback": 160
       },
       "levels": [
         {
-          "power": 8.9
+          "count": 1,
+          "power": 7.8
         },
         {
           "size": 2,
-          "power": 9
+          "power": 9.5
         },
         {
-          "power": 8.9
+          "count": 1,
+          "power": 6.5
         },
         {
-          "cooldownSeconds": -0.1,
-          "power": -3.5
+          "cooldownSeconds": -0.15,
+          "power": 2.1
+        },
+        {
+          "count": 1,
+          "power": 5.1
         },
         {
           "size": 2,
-          "power": 7.4
+          "power": 6.9
         },
         {
-          "range": 30,
-          "power": 7.5
-        },
-        {
-          "power": 7.5
+          "count": 2,
+          "power": 0.8
         }
       ],
-      "teachOnly": true
+      "teachOnly": true,
+      "barrageWidth": 90,
+      "barrageWidthPerLevel": 10,
+      "body": {
+        "lungeDistance": 10,
+        "afterimages": 0
+      }
     },
     "recover": {
       "pattern": "heal",
@@ -6384,15 +6393,15 @@
       }
     },
     "icicle-crash": {
-      "pattern": "strike",
+      "pattern": "scatter",
       "effect": "icicle-crash",
       "base": {
-        "power": 109.2,
+        "power": 159.2,
         "intervalSeconds": 0.1,
-        "count": 7,
+        "count": 3,
         "speed": 0,
-        "size": 26,
-        "range": 380,
+        "size": 30,
+        "range": 260,
         "durationSeconds": 0.25,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -6408,43 +6417,34 @@
       "levels": [
         {
           "count": 1,
-          "power": 10.1
+          "power": 1.8
         },
         {
           "size": 3,
-          "power": 12.5
+          "power": 16.5
         },
         {
           "count": 1,
-          "power": 8
+          "power": 1.2
         },
         {
           "cooldownSeconds": -0.15,
-          "power": -3
+          "power": -3.9
         },
         {
           "count": 1,
-          "power": 6
+          "power": 0.8
         },
         {
           "size": 3,
-          "power": 7.4
+          "power": 9
         },
         {
           "count": 2,
-          "power": -1.6
+          "power": -11.4
         }
       ],
-      "effects": [
-        {
-          "trigger": "end",
-          "explode": {
-            "sizeMultiplier": 1.6,
-            "powerMultiplier": 0.3,
-            "pull": 260
-          }
-        }
-      ]
+      "scatterDelaySeconds": 0.45
     },
     "whirlwind": {
       "pattern": "facing",
@@ -6746,18 +6746,18 @@
       "teachOnly": true
     },
     "twister": {
-      "pattern": "facing",
+      "pattern": "scatter",
       "effect": "twister",
       "base": {
-        "power": 7.4,
+        "power": 10,
         "intervalSeconds": 0.1,
         "statusChance": 0.2,
         "statusSeconds": 0.5,
         "lifestealPct": 0,
-        "count": 1,
-        "speed": 220,
+        "count": 2,
+        "speed": 40,
         "size": 30,
-        "range": 420,
+        "range": 240,
         "durationSeconds": 1.8,
         "pierce": "infinite",
         "hitIntervalSeconds": 0.3,
@@ -6770,31 +6770,31 @@
       "levels": [
         {
           "size": 4,
-          "power": 1.2
+          "power": 1.7
         },
         {
           "durationSeconds": 0.3,
-          "power": -0.1
+          "power": 0.2
         },
         {
           "size": 4,
-          "power": 0.9
+          "power": 1.2
         },
         {
           "size": 4,
-          "power": 0.8
+          "power": 1
         },
         {
           "count": 1,
-          "power": -4.5
+          "power": -1.2
         },
         {
           "size": 4,
-          "power": 0.4
+          "power": 0.7
         },
         {
           "durationSeconds": 0.4,
-          "power": -0.3
+          "power": -0.5
         }
       ],
       "teachOnly": true

@@ -47,6 +47,11 @@ function frameKey(id: string, step: number, part: string, frame: number): string
   return `msprite:${id}:${step}:${part}:${frame}`;
 }
 
+/** 基準の細かさの絵（main の最初のコマ）のテクスチャの名前（天気の粒・飛び散る破片に使う。MoveSprites を作った後にある） */
+export function moveSpriteTexture(id: string): string {
+  return frameKey(id, 0, 'main', 0);
+}
+
 /** 細かさの段: 段 n の細かさは 2^(n / STEPS_PER_DOUBLE)（約 12% 刻み） */
 const STEPS_PER_DOUBLE = 6;
 /** 描き直す絵の一辺の上限（実際のマス数。大きな範囲の技でも重くなりすぎないように） */

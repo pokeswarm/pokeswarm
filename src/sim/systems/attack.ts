@@ -914,10 +914,12 @@ function fireCross(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
 
 /**
  * scatter（水たまり）: 自分の周り range の中のランダムな場所に、しばらく残る当たり判定を置く。
- * scatterJitter があれば、数と大きさも使うたびにランダムにする（マグニチュード）
+ * scatterJitter があれば、数と大きさも使うたびにランダムにする（マグニチュード）。
+ * scatterDelaySeconds があれば、出番を待つもの（stage 3）として置き、その秒数後に当たり判定が出る（つららおとし）
  */
 function fireScatter(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const jit = world.rules.moves[pm.move]!.scatterJitter;
+  const wait = world.rules.moves[pm.move]!.scatterDelaySeconds ?? 0;
   const b0 = base(world, p, pm, st);
   const count = jit ? Math.min(st.count, jit.countMin) + world.rng.int(Math.max(1, st.count - Math.min(st.count, jit.countMin) + 1)) : st.count;
   for (let k = 0; k < count; k++) {
@@ -926,7 +928,16 @@ function fireScatter(world: World, p: Player, pm: PlayerMove, st: MoveStats): vo
     // speed があれば、置いた場所からランダムな向きへゆっくり動く
     const b = world.rng.next() * Math.PI * 2;
     const radius = jit ? b0.radius * (jit.sizeMin + world.rng.next() * (jit.sizeMax - jit.sizeMin)) : b0.radius;
-    world.projectiles.add({ ...b0, radius, motion: MOTION_LINEAR, x: p.x + Math.cos(a) * r, y: p.y + Math.sin(a) * r, vx: Math.cos(b) * st.speed, vy: Math.sin(b) * st.speed });
+    world.projectiles.add({
+      ...b0,
+      radius,
+      motion: MOTION_LINEAR,
+      x: p.x + Math.cos(a) * r,
+      y: p.y + Math.sin(a) * r,
+      vx: Math.cos(b) * st.speed,
+      vy: Math.sin(b) * st.speed,
+      ...(wait > 0 ? { life: wait, stage: 3, armLife: st.durationSeconds } : {}),
+    });
   }
 }
 

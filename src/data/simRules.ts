@@ -78,6 +78,7 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.delayedBlast ? { delayedBlast: def.delayedBlast } : {}),
       ...(def.lobTarget ? { lobTarget: def.lobTarget } : {}),
       ...(def.scatterJitter ? { scatterJitter: def.scatterJitter } : {}),
+      ...(def.scatterDelaySeconds ? { scatterDelaySeconds: def.scatterDelaySeconds } : {}),
       sweepOnce: def.sweepOnce,
       teachOnly: def.teachOnly,
       aimStrongest: def.aimStrongest,

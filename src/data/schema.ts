@@ -1027,6 +1027,8 @@ export const moveDefSchema = z.object({
   lobTarget: z.enum(['random', 'nearest']).optional(),
   /** scatter（置く）の数と大きさを、使うたびにランダムにする: 数は countMin〜count、半径は size × sizeMin〜sizeMax（マグニチュード） */
   scatterJitter: z.object({ countMin: z.number().int().positive(), sizeMin: z.number().positive(), sizeMax: z.number().positive() }).optional(),
+  /** scatter（置く）の当たり判定を、置いてからこの秒数待って出す（つららおとし: 空から氷の塊が落ちてくる間） */
+  scatterDelaySeconds: z.number().positive().optional(),
   /** sweep（なぎ払い）を片道だけにする（はたく: 1回払う。おうふくビンタは行って戻る） */
   sweepOnce: z.boolean().optional(),
   /**
@@ -1448,7 +1450,25 @@ export const effectRecipeSchema = z.object({
    */
   weather: particleSchema
     .omit({ spread: true })
-    .extend({ perSecond: z.number().positive(), angle: z.number(), tint: z.object({ color: colorString, alpha: z.number().min(0).max(0.3) }).optional() })
+    .extend({
+      perSecond: z.number().positive(),
+      angle: z.number(),
+      tint: z.object({ color: colorString, alpha: z.number().min(0).max(0.3) }).optional(),
+      /** 粒の絵（技のドット絵の id。白黒で描き、colors で色を付ける。あまごいのしずく・すなあらしの砂粒）。省略なら丸い光 */
+      texture: z.string().optional(),
+    })
+    .optional(),
+  /**
+   * 空から落ちてくる塊（つららおとし）: 当たり判定が出る前の待ち（技の scatterDelaySeconds）の間、絵 id を height 上から
+   * 落とす（大きさは当たり判定の直径 × size）。着いたら shards の絵を count 枚、distance まで seconds で飛び散らせる
+   */
+  fall: z
+    .object({
+      id: z.string(),
+      height: z.number().positive(),
+      size: z.number().positive().default(1),
+      shards: z.object({ id: z.string(), count: z.number().int().positive(), distance: z.number().positive(), seconds: z.number().positive(), size: z.number().positive() }).optional(),
+    })
     .optional(),
   /**
    * ボス・伝説の範囲技が落ちたときのドット絵（作者の案 2026年10月24日。案 F）。落ちた範囲（円・輪・直線）に合わせて seconds の間出す。

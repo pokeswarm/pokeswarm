@@ -12,7 +12,7 @@ import { EdgeArrows, type EdgeTarget } from '../render/EdgeArrows';
 import { EffectRenderer } from '../render/effects/EffectRenderer';
 import { audio } from '../audio';
 import { RunSounds } from '../audio/runSounds';
-import { MoveSprites, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
+import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
 import { ObstacleView } from '../render/ObstacleView';
@@ -102,6 +102,11 @@ export class RunScene extends Phaser.Scene {
   /** 落雷の稲妻を描く技（かみなり）と、その絵 */
   private boltMoves = new Map<number, NonNullable<EffectRecipe['bolt']>>();
   private boltView: Phaser.GameObjects.Graphics | null = null;
+  /** 空から塊が落ちてくる技（つららおとし）と、その絵・落ちている塊の通し番号・塊の影 */
+  private fallMoves = new Map<number, NonNullable<EffectRecipe['fall']>>();
+  private fallSprites: MoveSprites | null = null;
+  private falling = new Map<number, { x: number; y: number; radius: number; move: number }>();
+  private fallShadows: Phaser.GameObjects.Graphics | null = null;
   /** 稲妻の線で描く技 */
   private lightningMoves = new Set<number>();
   /** 技のドット絵 */
@@ -271,6 +276,7 @@ export class RunScene extends Phaser.Scene {
     this.lightningMoves = new Set(rules.moves.flatMap((m, k) => (effectRecipes[m.effect]?.lightningLine ? [k] : [])));
     this.boltMoves = new Map(rules.moves.flatMap((m, k) => { const b = effectRecipes[m.effect]?.bolt; return b ? [[k, b] as const] : []; }));
     this.flashMoves = new Map(rules.moves.flatMap((m, k) => { const f = effectRecipes[m.effect]?.burstFlash; return f ? [[k, f] as const] : []; }));
+    this.fallMoves = new Map(rules.moves.flatMap((m, k) => { const f = effectRecipes[m.effect]?.fall; return f ? [[k, f] as const] : []; }));
     // 技は確認用に URL で指定できる（?moves=ember:8,fire-spin:3）。協力プレイでは参加用 URL に引き継ぐので2人とも同じになる
     const role: SimRole = this.coop?.room.role ?? 'solo';
     this.localId = this.coop?.room.localId ?? HOST_PLAYER_ID;
@@ -433,6 +439,7 @@ export class RunScene extends Phaser.Scene {
     // 技のドット絵は光の演出の少し下（光の粒が上に重なる）
     this.moveSprites = new MoveSprites(this, moveSprites, depths.effects - 0.1, spriteRender.dot);
     this.strikeSprites = new MoveSprites(this, moveSprites, depths.effects - 0.05, spriteRender.dot);
+    this.fallSprites = new MoveSprites(this, moveSprites, depths.effects + 0.25, spriteRender.dot);
     this.strikes = [];
     const shape = spriteRender.hitShape;
     this.hitShapes = new HitShapes(this, depths.hitShapes, shape);
@@ -934,6 +941,66 @@ export class RunScene extends Phaser.Scene {
       this.tweens.add({ targets: rect, alpha: 0, duration: f.durationMs, onComplete: () => rect.destroy() });
     }
     for (const s of this.flashedSerials) if (!alive.has(s)) this.flashedSerials.delete(s);
+  }
+
+  /**
+   * 空から落ちてくる塊（つららおとし。作者の指摘 2026年10月27日）: 当たり判定が出るのを待つ間（stage 3）、塊の絵を上から落とし
+   * （だんだん速く）、落ちる所に影を出す。待ちが終わって当たり判定が出たら、破片を飛び散らせる
+   */
+  private drawFalls(world: World): void {
+    if (this.fallMoves.size === 0) return;
+    if (!this.fallShadows) this.fallShadows = this.add.graphics().setDepth(spriteRender.depths.effects - 0.2);
+    const g = this.fallShadows;
+    g.clear();
+    const pr = world.projectiles;
+    const items: SpriteItem[] = [];
+    const now = new Map<number, { x: number; y: number; radius: number; move: number }>();
+    for (let i = 0; i < pr.count; i++) {
+      const f = this.fallMoves.get(pr.move[i]!);
+      if (!f) continue;
+      const serial = pr.serial[i]!;
+      if (pr.stage[i] !== 3) {
+        // 着いた: 破片を散らす（1回だけ）
+        if (pr.stage[i] === 0 && this.falling.has(serial) && f.shards) this.burstShards(f.shards, pr.x[i]!, pr.y[i]!, pr.radius[i]!);
+        continue;
+      }
+      const t = pr.maxLife[i]! > 0 ? 1 - pr.life[i]! / pr.maxLife[i]! : 1;
+      const x = pr.x[i]!;
+      const y = pr.y[i]!;
+      now.set(serial, { x, y, radius: pr.radius[i]!, move: pr.move[i]! });
+      g.fillStyle(0x000000, 0.12 + 0.18 * t).fillEllipse(x, y, pr.radius[i]! * (0.8 + 0.8 * t), pr.radius[i]! * (0.4 + 0.4 * t));
+      items.push({
+        spec: { id: f.id, fit: 'circle', size: f.size, alpha: 1, rotate: 'none', spinDegPerSec: 0, varyTiles: false, upright: false, directional: false, originY: 1, shake: 0, tail: 0 },
+        x,
+        y: y - f.height * (1 - t * t),
+        radius: pr.radius[i]!,
+        band: 0,
+        dirX: 0,
+        dirY: 1,
+        length: 0,
+        vx: 0,
+        vy: 0,
+        elapsed: 0,
+        alpha: Math.min(1, t * 4),
+        seed: i,
+      });
+    }
+    this.falling = now;
+    this.fallSprites?.drawItems(items);
+  }
+
+  /** 破片を、着いた所から外へ飛び散らせる（見た目だけなので Math.random でよい） */
+  private burstShards(sh: NonNullable<NonNullable<EffectRecipe['fall']>['shards']>, x: number, y: number, radius: number): void {
+    const key = moveSpriteTexture(sh.id);
+    if (!this.textures.exists(key)) return;
+    const w = this.textures.get(key).getSourceImage().width;
+    for (let k = 0; k < sh.count; k++) {
+      const a = (k / sh.count) * Math.PI * 2 + (Math.random() - 0.5) * 0.6;
+      const d = sh.distance * (0.6 + Math.random() * 0.6);
+      const s = (radius * sh.size * (0.6 + Math.random() * 0.6)) / Math.max(1, w);
+      const img = this.add.image(x, y, key).setDepth(spriteRender.depths.effects + 0.2).setScale(s).setRotation(a);
+      this.tweens.add({ targets: img, x: x + Math.cos(a) * d, y: y + Math.sin(a) * d * 0.7, alpha: 0, duration: sh.seconds * 1000, ease: 'Quad.easeOut', onComplete: () => img.destroy() });
+    }
   }
 
   /** 落雷（かみなり）: 当たり判定が出てからしばらく、上からジグザグの稲妻を落とす。形は毎フレーム変えて、ちらつかせる */
@@ -1688,6 +1755,7 @@ export class RunScene extends Phaser.Scene {
     if (fieldWeather && effectRecipes[fieldWeather]?.weather) weathers.add(fieldWeather);
     this.effects.drawWeather(weathers, this.cameras.main.worldView, deltaMs);
     this.drawGhosts(world, alpha);
+    this.drawFalls(world);
     this.drawBolts(world);
     this.drawScreenFlashes(world);
     this.hitShapes.draw(

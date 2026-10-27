@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import type { EffectParticle, EffectRecipe } from '../../data/schema';
 import { hexColor } from '../color';
 import type { CircleSource } from '../PooledCircles';
+import { moveSpriteTexture } from './MoveSprites';
 
 const GLOW_TEXTURE = 'effect-glow';
 const GLOW_SIZE = 64;
@@ -223,18 +224,28 @@ export class EffectRenderer {
       if (w.tint && (!tint || w.tint.alpha > tint.alpha)) tint = w.tint;
       let em = this.weatherEmitters.get(id);
       if (!em) {
-        // 向き（Phaser の角度は 90 が真下）を真下から angle 度傾ける
-        em = this.add(this.scene.add.particles(0, 0, GLOW_TEXTURE, { ...emitterConfig({ ...w, spread: 0 }), angle: { min: 84 + w.angle, max: 96 + w.angle } }).setDepth(this.depth + 0.4));
+        // 向き（Phaser の角度は 90 が真下）を真下から angle 度傾ける。粒の絵（しずく・砂粒）は、落ちる向きに合わせて回す
+        const texture = w.texture ? moveSpriteTexture(w.texture) : GLOW_TEXTURE;
+        const spreadDeg = w.texture ? 3 : 6;
+        const made = this.scene.add
+          .particles(0, 0, texture, { ...emitterConfig({ ...w, spread: 0 }), angle: { min: 90 - spreadDeg + w.angle, max: 90 + spreadDeg + w.angle }, ...(w.texture ? { rotate: w.angle } : {}) })
+          .setDepth(this.depth + 0.4);
+        // ふつうに重ねる粒（砂・雨）は、光を足し合わせる入れ物に入れない（茶色が白っぽく光って、雪に見えた。作者の指摘 2026年10月27日）
+        em = w.blend === 'normal' ? made : this.add(made);
         this.weatherEmitters.set(id, em);
       }
       const expected = (w.perSecond * deltaMs) / 1000 + (this.weatherBudget.get(id) ?? 0);
       const n = Math.floor(expected);
       this.weatherBudget.set(id, expected - n);
-      // 傾いて落ちる分だけ、出す場所を風上へ広げる（画面の端まで降るように）。画面を縦に横切る間に横へ進む量
-      const travel = -Math.tan((w.angle * Math.PI) / 180) * view.height;
+      // 流れる分だけ、出す場所を風上へ広げる（画面の端まで降る・吹くように）。落ちる向き（dx, dy）に、画面を横切るくらい進む
+      const rad = ((90 + w.angle) * Math.PI) / 180;
+      const dx = Math.cos(rad);
+      const dy = Math.sin(rad);
+      const reachX = Math.abs(dx) * view.width * 0.6;
+      const reachY = Math.abs(dy) * view.height * 0.6;
       for (let k = 0; k < n; k++) {
-        const x = view.x - Math.max(0, travel) + Math.random() * (view.width + Math.abs(travel));
-        const y = view.y + (Math.random() * 1.1 - 0.15) * view.height;
+        const x = view.x - (dx > 0 ? reachX : 0) + Math.random() * (view.width + reachX);
+        const y = view.y - (dy > 0 ? reachY : 0) + Math.random() * (view.height + reachY);
         em.emitParticleAt(x, y, 1);
       }
     }

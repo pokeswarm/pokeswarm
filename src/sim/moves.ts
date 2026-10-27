@@ -106,6 +106,8 @@ export interface SimMoveDef {
   readonly lobTarget?: 'random' | 'nearest';
   /** scatter（置く）の数と大きさのばらつき（マグニチュード） */
   readonly scatterJitter?: { readonly countMin: number; readonly sizeMin: number; readonly sizeMax: number };
+  /** scatter（置く）の当たり判定を出すまで待つ秒数（つららおとし） */
+  readonly scatterDelaySeconds?: number;
   /** sweep（なぎ払い）を片道だけにする（はたく） */
   readonly sweepOnce?: boolean;
   /** 届く範囲で HP の一番高い敵を狙う（ゴッドバード） */

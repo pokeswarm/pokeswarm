@@ -2161,6 +2161,101 @@ function iceNeedle(): SpriteOut {
 }
 
 /**
+ * つのでつく: 白い三角錐のツノ（右向き。作者の指摘 2026年10月27日: 針ではなくツノ）。左が丸い底（楕円が少し見える）、右が鋭い先。
+ * 上の面が明るく、下へ向かって灰色の影
+ */
+function horn(): SpriteOut {
+  // 0 輪郭・1 影・2 灰・3 白・4 光・5 底
+  const palette = ['#3b3631', '#8d8a86', '#cfcbc6', '#f2efea', '#ffffff', '#b8ae9f'];
+  const g = shape(16, (u, v) => {
+    // 絵の左 3 割は空ける（底が使ったポケモンの体に隠れないよう、前に出す）
+    if (u > 0.96) return -1;
+    const w = 0.42 * Math.max(0, (0.96 - u) / 1.26);
+    // 底: 左端の縦長の楕円
+    const base = ((u + 0.3) / 0.12) ** 2 + (v / 0.42) ** 2 <= 1;
+    if (u < -0.3 && !base) return -1;
+    if (u >= -0.3 && Math.abs(v) > w) return -1;
+    if (u < -0.24 && base) return 5;
+    const d = v / Math.max(0.02, w);
+    return d < -0.55 ? 4 : d < -0.05 ? 3 : d < 0.55 ? 2 : 1;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
+/**
+ * メガホーン: 大きな槍（ランス）のようなツノ（右向き。作者の指摘 2026年10月27日: より大きく、槍のように）。
+ * 長い円錐の穂先に ねじれた溝、根元に丸い鍔（つば）、後ろに短い柄。先は鋭く光る
+ */
+function megahornLance(): SpriteOut {
+  // 0 輪郭・1 影・2 灰・3 白・4 光・5 溝（虫の緑）・6 鍔
+  const palette = ['#1f2a17', '#7d8a78', '#c9d1c4', '#f1f5ee', '#ffffff', '#7cb342', '#9e9d24'];
+  const frames = [0, 1].map((f) =>
+    shape(32, (u, v) => {
+      if (u > 0.98) return -1;
+      // 柄: 後ろの短い棒
+      if (u < -0.74) return u > -0.92 && Math.abs(v) < 0.08 ? (v < 0 ? 3 : 1) : -1;
+      // 鍔: 穂先の根元の丸い板
+      if (u < -0.6) return Math.abs(v) < 0.42 * Math.sqrt(Math.max(0, 1 - ((u + 0.67) / 0.08) ** 2)) ? (v < -0.12 ? 3 : v < 0.14 ? 6 : 1) : -1;
+      // 穂先: 長い円錐
+      const w = 0.3 * ((0.98 - u) / 1.58);
+      if (Math.abs(v) > w) return -1;
+      const d = v / Math.max(0.01, w);
+      // 先の光（コマでまたたく）
+      if (u > 0.78 && d < 0.2 && f === 1) return 4;
+      // ねじれた溝: 斜めの筋
+      if (((u * 9 + d * 1.2 + 40) % 1.6) < 0.32 && u < 0.75) return 5;
+      return d < -0.5 ? 4 : d < 0 ? 3 : d < 0.55 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * つららおとし: 空から落ちる大きな氷の塊（下向きにとがる。作者の指摘 2026年10月27日）。上はぎざぎざの割れ口、
+ * 下へ細くなって鋭い先。左の面が明るく、真ん中に稜線
+ */
+function iceChunk(): SpriteOut {
+  // 0 輪郭・1 濃い青・2 青・3 水色・4 白
+  const palette = ['#0d3550', '#0277bd', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const g = shape(22, (u, v) => {
+    // 上の割れ口（ぎざぎざ）
+    const top = -0.8 + Math.abs(Math.sin(u * 7.5)) * 0.14;
+    if (v < top || v > 0.97) return -1;
+    // 上 3 割は太く、そこから下の先へ細くなる
+    const w = v < -0.35 ? 0.62 - (v + 0.8) * 0.12 : 0.57 * Math.max(0, (0.97 - v) / 1.32);
+    if (Math.abs(u) > w) return -1;
+    const d = u / Math.max(0.02, w);
+    if (Math.abs(d) < 0.08) return 4;
+    if (v < top + 0.1) return 3;
+    return d < -0.45 ? 3 : d < 0 ? 2 : d < 0.6 ? 2 : 1;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
+/** すなあらしの砂粒: 小さな粒（白黒で描き、天気の色で茶色にする。天気の粒は落ちる向きに回すので、縦長に描くと横に流れて見える） */
+function sandGrain(): SpriteOut {
+  const palette = ['#9e9e9e', '#e0e0e0', '#ffffff'];
+  // 細長い筋（風で流れる砂）。先が明るく、後ろが暗い
+  const g = fill(blank(3, 9), (x, y) => (((x - 1) / 1.5) ** 2 + ((y - 4) / 4.6) ** 2 > 1 ? -1 : y > 5.5 ? 2 : y > 2.5 ? 1 : 0));
+  return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
+/** あまごいの雨: 小さなしずく（ティアドロップ形。上がとがり、下が丸い。白黒で描き、天気の色で水色にする） */
+function rainDrop(): SpriteOut {
+  const palette = ['#9e9e9e', '#e0e0e0', '#ffffff'];
+  const g = blank(4, 8);
+  fill(g, (x, y) => {
+    // 下の丸（中心 y = 5.2、半径 1.6）と、上へ細くなる先
+    const cx = 1.5;
+    const round = Math.hypot(x - cx, y - 5.2) <= 1.75;
+    const tip = y >= 0 && y < 5.2 && Math.abs(x - cx) <= 1.75 * (y / 5.2) ** 1.3;
+    if (!round && !tip) return -1;
+    return x < cx - 0.3 && y > 3.5 ? 2 : x > cx + 0.6 ? 0 : 1;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
+/**
  * ストーンエッジ: 地面から突き出した、茶色いごつごつの岩の柱（横から見た姿。根元が絵の下の方 y = 21。作者の指摘 2026年10月25日:
  * 細いとげではなく、尖った岩肌）。大きな岩と、横に小さな岩。左の面が明るく、ひびが入る。根元に土ぼこり。
  * コマ 0 で地面から出かけ、1 で伸びきる（loopFrom 1）
@@ -2701,6 +2796,11 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'crack-head': () => crackHead(),
     'ice-statue': () => iceStatue(),
     'ice-needle': () => iceNeedle(),
+    horn: () => horn(),
+    'megahorn-lance': () => megahornLance(),
+    'ice-chunk': () => iceChunk(),
+    'sand-grain': () => sandGrain(),
+    'rain-drop': () => rainDrop(),
 };
 
 /** 絵の名前の一覧 */

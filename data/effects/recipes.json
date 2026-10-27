@@ -3424,10 +3424,11 @@
     "horn-attack": {
       "extends": "normal.base",
       "sprite": {
-        "id": "needle",
+        "id": "horn",
         "fit": "front",
-        "size": 1.1
-      }
+        "size": 1.6
+      },
+      "hideShape": true
     },
     "megahorn": {
       "extends": "bug.base",
@@ -3436,10 +3437,11 @@
         "coreScale": 0.4
       },
       "sprite": {
-        "id": "needle",
+        "id": "megahorn-lance",
         "fit": "front",
-        "size": 1.3
-      }
+        "size": 1.8
+      },
+      "hideShape": true
     },
     "icicle-crash": {
       "extends": "ice.base",
@@ -3448,10 +3450,17 @@
           "radius": 50
         }
       },
-      "sprite": {
-        "id": "ice-needle",
-        "fit": "circle",
-        "size": 1.4
+      "fall": {
+        "id": "ice-chunk",
+        "height": 260,
+        "size": 1.5,
+        "shards": {
+          "id": "ice-shard",
+          "count": 8,
+          "distance": 70,
+          "seconds": 0.45,
+          "size": 0.45
+        }
       }
     },
     "whirlwind": {
@@ -3521,34 +3530,34 @@
       },
       "weather": {
         "colors": [
-          "#d7ccc8",
-          "#a1887f",
-          "#8d6e63"
+          "#e0b47c",
+          "#a87a4a"
         ],
         "lifespanMs": [
           900,
-          1500
+          1400
         ],
         "speed": [
-          200,
-          300
+          380,
+          520
         ],
         "scale": [
-          0.28,
-          0.14
+          2.4,
+          2
         ],
         "alpha": [
           1,
-          0.5
+          0.8
         ],
         "gravityY": 0,
         "blend": "normal",
-        "perSecond": 240,
-        "angle": 14,
+        "perSecond": 420,
+        "angle": -84,
         "tint": {
-          "color": "#bcaaa4",
-          "alpha": 0.12
-        }
+          "color": "#b08a60",
+          "alpha": 0.2
+        },
+        "texture": "sand-grain"
       }
     },
     "twister": {
@@ -3574,33 +3583,34 @@
       },
       "weather": {
         "colors": [
-          "#b3e5fc",
-          "#4fc3f7"
+          "#e1f5fe",
+          "#81d4fa"
         ],
         "lifespanMs": [
           500,
           800
         ],
         "speed": [
-          520,
-          700
+          560,
+          720
         ],
         "scale": [
-          0.14,
-          0.08
+          2.6,
+          2.6
         ],
         "alpha": [
-          0.9,
-          0.5
+          1,
+          0.85
         ],
         "gravityY": 0,
-        "blend": "add",
-        "perSecond": 220,
-        "angle": 78,
+        "blend": "normal",
+        "perSecond": 170,
+        "angle": 8,
         "tint": {
           "color": "#0d47a1",
           "alpha": 0.12
-        }
+        },
+        "texture": "rain-drop"
       }
     }
   }

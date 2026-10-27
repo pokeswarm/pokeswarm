@@ -978,12 +978,16 @@ function darkJaws(): SpriteOut {
       }),
     );
   /**
+   * 見下ろす視点なので、上あごはカメラに近くて大きく、下あごは遠くて小さい。口は上の辺が長く下の辺が短い台形に見える
+   * （作者の指摘 2026年10月27日）。下ほど横幅を縮め、下あごは厚みも薄くする。
    * 正面（こちらを向いて かみつく）: 上あごは上が丸い ∩ の帯、下あごは ∪ の帯。内側のふち（口の線）にキバが並び、上下から閉じる。
    * 閉じた真ん中で光がはじけ、火花が全方向へ飛ぶ。後ろ（back）はあごの外側だけが見え、キバと光は見えない（あごの向こうに少し光る）
    */
   const face = (back: boolean): Grid[] =>
     STEPS.map(([open, flash, fade]) =>
-      shape(36, (u, v) => {
+      shape(36, (u1, v) => {
+        // 台形: 上（v = -1）は幅 1.1 倍、下（v = 1）は 0.45 倍
+        const u = u1 / (0.775 - 0.325 * v);
         if (flash > 0 && !back) {
           const d = Math.hypot(u, v);
           if (d < 0.22 * flash) return d < 0.12 * flash ? 5 : 4;
@@ -1002,7 +1006,8 @@ function darkJaws(): SpriteOut {
         // 開き: 上あごを上へ、下あごを下へずらす
         const gap = open * 0.75;
         for (const lower of [false, true]) {
-          const y = lower ? -(v - gap) : v + gap;
+          // 下あごは遠いので薄い（縦を 0.55 倍に）
+          const y = lower ? -(v - gap) / 0.55 : v + gap;
           if (y > 0.02) continue;
           // あごの帯: 外の楕円の内側で、口の線（y = 0）に近い所。外ほど濃い
           const outer = (u / 0.88) ** 2 + ((y - 0.05) / 0.62) ** 2;

@@ -898,6 +898,74 @@ function fangBite(palette = ['#3b0d06', '#e53935', '#ff7043', '#cfc4bd', '#fffff
   return { palette, frameMs: 50, parts: { main: frames.map(toRows) } };
 }
 
+/**
+ * かみつく（作者の参考動画 2026年10月27日）: 右を向いた、紫の大きな上あごと下あご。あごは左の付け根から弧を描いて前へのび、
+ * 内側のふちにピンクから白に光るキバが並ぶ。コマ 0〜2 で上下から閉じ、閉じた所（前）で白い光がはじけて火花が前へ飛ぶ。
+ * コマ 3・4 は閉じたあごが薄れ、紫の筋だけが残る
+ */
+function darkJaws(): SpriteOut {
+  // 0 輪郭・1 濃い紫・2 紫・3 明るい紫・4 ピンク・5 白
+  const palette = ['#16071f', '#3d1060', '#6a1b9a', '#ab47bc', '#f06ce0', '#ffffff'];
+  const hinge = [-1.1, 0] as const;
+  // 閉じたときの上あご（y < 0 の帯。外の楕円の内側で、内の楕円の外側）と、内のふちから下へのびるキバ。下あごは上下を返す
+  const jaw = (u: number, v: number, lower: boolean): number => {
+    const y = lower ? -v : v;
+    if (y > 0.02 || u < -0.45) return -1;
+    const outer = ((u - 0.05) / 0.8) ** 2 + (y / 0.78) ** 2;
+    const inner = ((u - 0.12) / 0.66) ** 2 + (y / 0.5) ** 2;
+    // 後ろ（付け根の側）ほど細くして、上下が別々の弧に見えるようにする
+    const tail = Math.max(0, Math.min(1, (u + 0.45) / 0.35));
+    if (outer <= 1 && inner > 1 + (1 - tail) * 0.6) return outer > 0.82 ? 1 : inner < 1.18 ? 3 : 2;
+    // キバ: 内のふちから軸へ向かう三角（上と下で並びをずらして噛み合う）
+    for (const fx of lower ? [-0.05, 0.2, 0.42, 0.62] : [0.07, 0.31, 0.52, 0.71]) {
+      const top = -0.5 * Math.sqrt(Math.max(0, 1 - ((fx - 0.12) / 0.66) ** 2));
+      const len = 0.26 + fx * 0.12;
+      const k = (y - top) / len;
+      if (k < 0 || k > 1) continue;
+      if (Math.abs(u - fx) <= 0.075 * (1 - k) + 0.01) return k > 0.55 ? 5 : 4;
+    }
+    return -1;
+  };
+  const frames: Grid[] = [];
+  // あごの開き（付け根のまわりの回転）・光・薄れ
+  for (const [open, flash, fade] of [[0.42, 0, 0], [0.2, 0, 0], [0, 1, 0], [0, 0.6, 1], [0, 0, 2]] as const) {
+    frames.push(
+      shape(36, (u, v) => {
+        // 閉じた所の白い光と、前へ飛ぶ火花
+        if (flash > 0) {
+          const d = Math.hypot(u - 0.62, v);
+          if (d < 0.24 * flash) return d < 0.13 * flash ? 5 : 4;
+          for (const [a, len] of [[-0.6, 0.22], [-0.3, 0.3], [0, 0.36], [0.3, 0.3], [0.6, 0.22]] as const) {
+            const along = (u - 0.62) * Math.cos(a) + v * Math.sin(a);
+            const across = -(u - 0.62) * Math.sin(a) + v * Math.cos(a);
+            if (along > 0.18 && along < 0.18 + len * flash && Math.abs(across) < 0.03) return along < 0.3 ? 5 : 4;
+          }
+        }
+        if (fade === 2) {
+          // 紫の筋だけ（あごの外のふちの名残り）
+          const outer = ((u - 0.05) / 0.8) ** 2 + (v / 0.78) ** 2;
+          return Math.abs(outer - 0.9) < 0.05 && Math.abs(v) > 0.25 && u > -0.3 && hash(Math.floor((u + 1) * 12), Math.floor((v + 1) * 12), 61) < 0.6 ? 3 : -1;
+        }
+        for (const lower of [false, true]) {
+          // 開いているときは、付け根のまわりに上あごを上へ、下あごを下へ回す
+          const a = lower ? open : -open;
+          const c = Math.cos(-a);
+          const s = Math.sin(-a);
+          const x = hinge[0] + (u - hinge[0]) * c - (v - hinge[1]) * s;
+          const y = hinge[1] + (u - hinge[0]) * s + (v - hinge[1]) * c;
+          const col = jaw(x, y, lower);
+          if (col < 0) continue;
+          // 薄れるコマは、帯の真ん中を抜いて輪郭だけ
+          if (fade === 1 && (col === 2 || col === 1) && hash(Math.floor((u + 1) * 18), Math.floor((v + 1) * 18), 59) < 0.5) return -1;
+          return col;
+        }
+        return -1;
+      }),
+    );
+  }
+  return { palette, frameMs: 45, parts: { main: frames.map(toRows) } };
+}
+
 /** フレアドライブ: 右へ突っ込む炎の弧（三日月形の炎。コマで炎の先がゆらめく） */
 function flameCrash(): SpriteOut {
   const palette = ['#4a0e05', '#c62828', '#ef6c00', '#ffb300', '#fff176', '#ffffff'];
@@ -2431,6 +2499,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     snowflake: () => snowflake(),
     'poison-cloud': () => poisonCloud(),
     'fang-bite': () => fangBite(),
+    'dark-jaws': () => darkJaws(),
     'dark-fang': () => fangBite(['#0e0a0a', '#3e2723', '#5d4037', '#bdb4ae', '#ffffff']),
     'flame-crash': () => flameCrash(),
     'impact-crescent': () => impactCrescent(),

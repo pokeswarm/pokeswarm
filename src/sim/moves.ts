@@ -112,6 +112,8 @@ export interface SimMoveDef {
   readonly sweepOnce?: boolean;
   /** 届く範囲で HP の一番高い敵を狙う（ゴッドバード） */
   readonly aimStrongest?: boolean;
+  /** beam を向いている方へ出す（メガホーン） */
+  readonly aimFacing?: boolean;
   /** ためている間に出す技（技の番号・最大レベルで出す）と、この技を出してから止めておく秒数（きあいパンチ） */
   readonly chargeMove?: { readonly move: number; readonly pauseSeconds: number };
   /** 候補に出さない（持ち物を持つと覚える技） */

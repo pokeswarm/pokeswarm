@@ -82,6 +82,7 @@ export function buildSimRules(region?: string): SimRules {
       sweepOnce: def.sweepOnce,
       teachOnly: def.teachOnly,
       aimStrongest: def.aimStrongest,
+      aimFacing: def.aimFacing,
       ...(def.group ? { group: def.group } : {}),
       randomAim: def.randomAim,
       ...(def.barrageWidth ? { barrageWidth: def.barrageWidth, barrageWidthPerLevel: def.barrageWidthPerLevel ?? 0 } : {}),

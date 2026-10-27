@@ -281,6 +281,8 @@ export class MoveSprites {
             ? [mainRows?.[0]?.length ?? 1, (it.radius * spec.size) / this.dot]
             : spec.fit === 'cone'
               ? [mainRows?.[0]?.length ?? 1, it.radius / this.dot]
+              : spec.fit === 'thrust'
+                ? [mainRows?.[0]?.length ?? 1, (it.length * spec.size) / this.dot]
               : spec.fit === 'snake'
                 ? [midRows?.length ?? 1, (r * 2) / this.dot]
               : spec.fit === 'ring'
@@ -360,6 +362,18 @@ export class MoveSprites {
         const reach = it.radius;
         const width = Math.max(24, 2 * reach * Math.tan(Math.min(1.2, it.length)) * spec.size);
         put(fk('main', this.frameOf(spec.id, 'main', elapsed)), x, y, Math.atan2(it.dirY, it.dirX), reach / rows[0]!.length, width / rows.length, a, 0);
+        continue;
+      }
+      if (spec.fit === 'thrust') {
+        // 突き出す槍（メガホーン）: 絵の左端（柄）を線の根元に置き、線の長さに合わせた1枚。
+        // 出た直後は長さの 4 割ぶん後ろに引いた所から、growSeconds で前へ押し込む（だんだん遅く）
+        const rows = sp.parts.main?.[0];
+        if (!rows) continue;
+        const len = it.length * spec.size;
+        const s = len / rows[0]!.length;
+        const k = spec.growSeconds ? Math.min(1, elapsed / spec.growSeconds) : 1;
+        const back = (1 - (1 - (1 - k) ** 3)) * len * 0.4;
+        put(fk('main', this.frameOf(spec.id, 'main', elapsed)), x - it.dirX * back, y - it.dirY * back, Math.atan2(it.dirY, it.dirX), s, s, a, 0);
         continue;
       }
       // 線: 始まり → 途中を並べる → 終わり（太さは当たり判定の直径）

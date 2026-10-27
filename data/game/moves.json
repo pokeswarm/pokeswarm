@@ -6335,17 +6335,17 @@
       }
     },
     "megahorn": {
-      "pattern": "melee",
+      "pattern": "beam",
       "effect": "megahorn",
       "base": {
-        "power": 162.4,
-        "cooldownSeconds": 0.8,
+        "power": 167.5,
+        "cooldownSeconds": 0.9,
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 400,
-        "size": 80,
-        "range": 10,
-        "durationSeconds": 0.2,
+        "size": 20,
+        "range": 150,
+        "durationSeconds": 0.25,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
         "knockback": 220,
@@ -6353,44 +6353,43 @@
         "spreadDegrees": 0,
         "statusChance": 0,
         "statusSeconds": 0,
-        "lifestealPct": 0,
-        "arcDegrees": 60
+        "lifestealPct": 0
       },
       "levels": [
         {
-          "size": 8,
-          "power": 19.7
+          "range": 10,
+          "power": 24.6
         },
         {
-          "arcDegrees": 15,
-          "power": 14.2
+          "size": 2,
+          "power": 21.7
         },
         {
-          "size": 8,
-          "power": 14.8
+          "range": 10,
+          "power": 22.5
         },
         {
-          "size": 6,
+          "cooldownSeconds": -0.05,
+          "power": 11.8
+        },
+        {
+          "range": 10,
+          "power": 20.2
+        },
+        {
+          "size": 2,
+          "power": 16.7
+        },
+        {
+          "range": 15,
           "power": 15.9
-        },
-        {
-          "size": 10,
-          "power": 9.4
-        },
-        {
-          "statusChance": 0.1,
-          "power": 21.6
-        },
-        {
-          "arcDegrees": 20,
-          "size": 8,
-          "power": -11.8
         }
       ],
       "body": {
-        "lungeDistance": 90,
-        "afterimages": 4
-      }
+        "lungeDistance": 30,
+        "afterimages": 2
+      },
+      "aimFacing": true
     },
     "icicle-crash": {
       "pattern": "scatter",

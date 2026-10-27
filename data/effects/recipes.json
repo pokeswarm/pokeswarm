@@ -3438,8 +3438,9 @@
       },
       "sprite": {
         "id": "megahorn-lance",
-        "fit": "front",
-        "size": 1.8
+        "fit": "thrust",
+        "size": 1,
+        "growSeconds": 0.08
       },
       "hideShape": true
     },

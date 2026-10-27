@@ -1044,6 +1044,8 @@ export const moveDefSchema = z.object({
   restAfterEnd: z.boolean().optional(),
   /** 狙う敵: 一番近い敵ではなく、届く範囲で HP の一番高い敵（ゴッドバード: ボスへ。作者の決定 2026年10月25日）。beam で使う */
   aimStrongest: z.boolean().optional(),
+  /** beam を、敵を狙わず向いている方へ出す（メガホーン: 前へ槍を突き出す） */
+  aimFacing: z.boolean().optional(),
   /**
    * ためている間に出す技（moves.json のキー。最大レベルで出す）と、この技を出してから止めておく秒数
    * （きあいパンチ: ためている間はマッハパンチが出て、きあいパンチを出している間は止まる。作者の決定 2026年10月25日）
@@ -1358,9 +1360,10 @@ const moveSpriteSpec = z.object({
    * circle（円に合わせて1枚）・line（線に 始まり・途中・終わり を並べる）・cone（扇形に1枚を引き伸ばす。かえんほうしゃ）・
    * ring（外へ進む帯の輪に沿って、途中の部品を並べる。じしんの地割れ）・
    * front（扇形の向きの先に1枚を置く。大きさは扇の半径。ほのおのキバの牙・フレアドライブの炎）・
-   * snake（蛇行して進むものの通った道に 途中 を並べ、先に 終わり を置く。太さは当たり判定の直径。ヘドロウェーブ・ハードプラントの根）
+   * snake（蛇行して進むものの通った道に 途中 を並べ、先に 終わり を置く。太さは当たり判定の直径。ヘドロウェーブ・ハードプラントの根）・
+   * thrust（線の根元に絵の左端を合わせ、線の長さに合わせた1枚。growSeconds の間に後ろから前へ突き出す。メガホーンの槍）
    */
-  fit: z.enum(['circle', 'line', 'cone', 'ring', 'front', 'snake']),
+  fit: z.enum(['circle', 'line', 'cone', 'ring', 'front', 'snake', 'thrust']),
   size: z.number().positive().default(1),
   /** 絵の濃さ（煙など、下が少し透けてほしいもの） */
   alpha: z.number().min(0).max(1).default(1),

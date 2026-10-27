@@ -595,7 +595,7 @@ function fireOrbit(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
  */
 function fireBeam(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const def = world.rules.moves[pm.move]!;
-  const [ax, ay] = (def.aimStrongest ? aimStrongest(world, p, st.range) : null) ?? aim(world, p, st.range);
+  const [ax, ay] = def.aimFacing ? axisToUnit(p.facingX, p.facingY) : ((def.aimStrongest ? aimStrongest(world, p, st.range) : null) ?? aim(world, p, st.range));
   const body = def.body;
   if (body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: ax, dirY: ay, distance: body.lungeDistance, afterimages: body.afterimages });
   // 数が増えても1本のまま、幅を広げる（作者の指摘 2026年10月27日: 本数を増やすと、残る範囲が1本分だけだった）

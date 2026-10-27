@@ -1629,7 +1629,14 @@
     "recover": "heart",
     "dark-pulse": "orb",
     "snarl": "skull",
-    "morning-sun": "heart"
+    "morning-sun": "heart",
+    "thunder-wave": "bolt",
+    "discharge": "flash",
+    "horn-attack": "needle",
+    "megahorn": "needle",
+    "icicle-crash": "snowflake",
+    "whirlwind": "wind",
+    "hurricane": "whirl"
   },
   "items": {
     "x-attack": {

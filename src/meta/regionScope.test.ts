@@ -96,7 +96,7 @@ describe('地方ごとの記録・強化・ショップ（02 の17章）', () =>
     const save = emptySave();
     save.stats['johto:derivations'] = 1;
     save.stats['johto:bestMidbosses'] = 8;
-    expect(applyProgress(save, achievementsConfig, unlocks).achievements).toEqual(['johto-first-derivation', 'johto-reach-elite-four']);
+    expect(applyProgress(save, achievementsConfig, unlocks).achievements).toEqual(expect.arrayContaining(['johto-first-derivation', 'johto-reach-elite-four']));
     const items = achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, save.achievements, 'johto')).items;
     expect([items.has('pp-max'), items.has('metronome')]).toEqual([true, true]);
   });

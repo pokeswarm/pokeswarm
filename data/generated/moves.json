@@ -227,6 +227,18 @@
     "type": "dark",
     "damageClass": "special"
   },
+  "discharge": {
+    "names": {
+      "ja": "ほうでん",
+      "en": "Discharge",
+      "fr": "Coup d’Jus",
+      "de": "Ladungsstoß",
+      "es": "Chispazo",
+      "it": "Scarica"
+    },
+    "type": "electric",
+    "damageClass": "special"
+  },
   "double-kick": {
     "names": {
       "ja": "にどげり",
@@ -587,6 +599,18 @@
     "type": "ghost",
     "damageClass": "special"
   },
+  "horn-attack": {
+    "names": {
+      "ja": "つのでつく",
+      "en": "Horn Attack",
+      "fr": "Koud’Korne",
+      "de": "Hornattacke",
+      "es": "Cornada",
+      "it": "Incornata"
+    },
+    "type": "normal",
+    "damageClass": "physical"
+  },
   "hurricane": {
     "names": {
       "ja": "ぼうふう",
@@ -659,6 +683,18 @@
     "type": "ice",
     "damageClass": "special"
   },
+  "icicle-crash": {
+    "names": {
+      "ja": "つららおとし",
+      "en": "Icicle Crash",
+      "fr": "Chute Glace",
+      "de": "Eiszapfhagel",
+      "es": "Chuzos",
+      "it": "Scagliagelo"
+    },
+    "type": "ice",
+    "damageClass": "physical"
+  },
   "iron-tail": {
     "names": {
       "ja": "アイアンテール",
@@ -729,6 +765,18 @@
       "it": "Magnitudo"
     },
     "type": "ground",
+    "damageClass": "physical"
+  },
+  "megahorn": {
+    "names": {
+      "ja": "メガホーン",
+      "en": "Megahorn",
+      "fr": "Mégacorne",
+      "de": "Vielender",
+      "es": "Megacuerno",
+      "it": "Megacorno"
+    },
+    "type": "bug",
     "damageClass": "physical"
   },
   "metronome": {
@@ -1355,6 +1403,18 @@
     "type": "electric",
     "damageClass": "special"
   },
+  "thunder-wave": {
+    "names": {
+      "ja": "でんじは",
+      "en": "Thunder Wave",
+      "fr": "Cage Éclair",
+      "de": "Donnerwelle",
+      "es": "Onda Trueno",
+      "it": "Tuononda"
+    },
+    "type": "electric",
+    "damageClass": "status"
+  },
   "thunderbolt": {
     "names": {
       "ja": "１０まんボルト",
@@ -1438,6 +1498,18 @@
     },
     "type": "water",
     "damageClass": "special"
+  },
+  "whirlwind": {
+    "names": {
+      "ja": "ふきとばし",
+      "en": "Whirlwind",
+      "fr": "Cyclone",
+      "de": "Wirbelwind",
+      "es": "Remolino",
+      "it": "Turbine"
+    },
+    "type": "normal",
+    "damageClass": "status"
   },
   "wild-charge": {
     "names": {

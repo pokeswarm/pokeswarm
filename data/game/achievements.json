@@ -810,6 +810,50 @@
       "reward": {
         "pokemon": "houndour"
       }
+    },
+    {
+      "id": "johto-unlock-mareep",
+      "region": "johto",
+      "condition": {
+        "stat": "defeated.mareep",
+        "atLeast": 1000
+      },
+      "reward": {
+        "pokemon": "mareep"
+      }
+    },
+    {
+      "id": "johto-unlock-heracross",
+      "region": "johto",
+      "condition": {
+        "stat": "bestMidbosses",
+        "atLeast": 8
+      },
+      "reward": {
+        "pokemon": "heracross"
+      }
+    },
+    {
+      "id": "johto-unlock-swinub",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.piloswine",
+        "atLeast": 5
+      },
+      "reward": {
+        "pokemon": "swinub"
+      }
+    },
+    {
+      "id": "johto-unlock-pidgey",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.pidgeotto",
+        "atLeast": 2
+      },
+      "reward": {
+        "pokemon": "pidgey"
+      }
     }
   ]
 }

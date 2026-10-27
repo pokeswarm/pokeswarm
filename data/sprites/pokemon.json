@@ -181,14 +181,16 @@
       "key": "pidgey",
       "dex": 16,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "pidgeotto",
       "dex": 17,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -954,14 +956,16 @@
       "key": "mareep",
       "dex": 179,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "flaaffy",
       "dex": 180,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -996,7 +1000,8 @@
       "key": "swinub",
       "dex": 220,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1131,7 +1136,8 @@
       "key": "piloswine",
       "dex": 221,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1270,6 +1276,18 @@
     {
       "key": "houndour",
       "dex": 228
+    },
+    {
+      "key": "ampharos",
+      "dex": 181
+    },
+    {
+      "key": "heracross",
+      "dex": 214
+    },
+    {
+      "key": "pidgeot",
+      "dex": 18
     }
   ]
 }

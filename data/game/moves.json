@@ -6148,6 +6148,411 @@
         }
       ],
       "teachOnly": true
+    },
+    "thunder-wave": {
+      "pattern": "chain",
+      "effect": "thunder-wave",
+      "base": {
+        "power": 15.1,
+        "intervalSeconds": 0.1,
+        "statusChance": 0.5,
+        "statusSeconds": 2.5,
+        "lifestealPct": 0,
+        "count": 2,
+        "speed": 0,
+        "size": 6,
+        "range": 400,
+        "durationSeconds": 0.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 60,
+        "knockbackSeconds": 0.06,
+        "spreadDegrees": 0,
+        "cooldownSeconds": 1.3,
+        "statusId": "paralysis"
+      },
+      "levels": [
+        {
+          "count": 1,
+          "power": 2.5
+        },
+        {
+          "range": 30,
+          "power": 5
+        },
+        {
+          "count": 1,
+          "power": 1.5
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 1.3
+        },
+        {
+          "count": 2,
+          "power": -1.4
+        },
+        {
+          "range": 30,
+          "power": 2.9
+        },
+        {
+          "count": 2,
+          "power": -0.8
+        }
+      ],
+      "chainHopSeconds": 0.05
+    },
+    "discharge": {
+      "pattern": "pulse",
+      "effect": "discharge",
+      "base": {
+        "power": 13.9,
+        "cooldownSeconds": 1.1,
+        "count": 3,
+        "intervalSeconds": 0.15,
+        "speed": 0,
+        "size": 22,
+        "range": 220,
+        "durationSeconds": 0.5,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.25,
+        "knockback": 200,
+        "knockbackSeconds": 0.1,
+        "statusId": "paralysis",
+        "statusChance": 0.3,
+        "statusSeconds": 2,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "range": 15,
+          "power": 2.3
+        },
+        {
+          "size": 2,
+          "power": 2.3
+        },
+        {
+          "statusChance": 0.1,
+          "power": 2.3
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": -1.9
+        },
+        {
+          "range": 15,
+          "power": 1.9
+        },
+        {
+          "size": 3,
+          "power": 1.9
+        },
+        {
+          "count": 1,
+          "power": -1.4
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "eachHit",
+          "chance": 0.3,
+          "chain": {
+            "sizeMultiplier": 0.06,
+            "powerMultiplier": 0.5,
+            "count": 2,
+            "range": 180
+          }
+        }
+      ]
+    },
+    "horn-attack": {
+      "pattern": "melee",
+      "effect": "horn-attack",
+      "learners": [
+        "heracross"
+      ],
+      "base": {
+        "power": 18.6,
+        "cooldownSeconds": 1,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 44,
+        "range": 10,
+        "durationSeconds": 0.15,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 160,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 30,
+        "critChancePct": 5
+      },
+      "levels": [
+        {
+          "power": 8
+        },
+        {
+          "size": 3,
+          "power": 7.7
+        },
+        {
+          "power": 8
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": -2.2
+        },
+        {
+          "size": 3,
+          "power": 6
+        },
+        {
+          "power": 6.3
+        },
+        {
+          "power": 6.3
+        }
+      ],
+      "body": {
+        "lungeDistance": 14,
+        "afterimages": 0
+      }
+    },
+    "megahorn": {
+      "pattern": "melee",
+      "effect": "megahorn",
+      "base": {
+        "power": 162.4,
+        "cooldownSeconds": 0.8,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 80,
+        "range": 10,
+        "durationSeconds": 0.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 220,
+        "knockbackSeconds": 0.1,
+        "spreadDegrees": 0,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 60
+      },
+      "levels": [
+        {
+          "size": 8,
+          "power": 19.7
+        },
+        {
+          "arcDegrees": 15,
+          "power": 14.2
+        },
+        {
+          "size": 8,
+          "power": 14.8
+        },
+        {
+          "size": 6,
+          "power": 15.9
+        },
+        {
+          "size": 10,
+          "power": 9.4
+        },
+        {
+          "statusChance": 0.1,
+          "power": 21.6
+        },
+        {
+          "arcDegrees": 20,
+          "size": 8,
+          "power": -11.8
+        }
+      ],
+      "body": {
+        "lungeDistance": 90,
+        "afterimages": 4
+      }
+    },
+    "icicle-crash": {
+      "pattern": "strike",
+      "effect": "icicle-crash",
+      "base": {
+        "power": 109.2,
+        "intervalSeconds": 0.1,
+        "count": 7,
+        "speed": 0,
+        "size": 26,
+        "range": 380,
+        "durationSeconds": 0.25,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 120,
+        "knockbackSeconds": 0.08,
+        "spreadDegrees": 0,
+        "cooldownSeconds": 1.25,
+        "statusChance": 0.3,
+        "statusSeconds": 0.5,
+        "lifestealPct": 0,
+        "statusId": "flinch"
+      },
+      "levels": [
+        {
+          "count": 1,
+          "power": 10.1
+        },
+        {
+          "size": 3,
+          "power": 12.5
+        },
+        {
+          "count": 1,
+          "power": 8
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": -3
+        },
+        {
+          "count": 1,
+          "power": 6
+        },
+        {
+          "size": 3,
+          "power": 7.4
+        },
+        {
+          "count": 2,
+          "power": -1.6
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "end",
+          "explode": {
+            "sizeMultiplier": 1.6,
+            "powerMultiplier": 0.3,
+            "pull": 260
+          }
+        }
+      ]
+    },
+    "whirlwind": {
+      "pattern": "facing",
+      "effect": "whirlwind",
+      "base": {
+        "power": 13.6,
+        "intervalSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0,
+        "count": 1,
+        "speed": 300,
+        "size": 22,
+        "range": 420,
+        "durationSeconds": 1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 520,
+        "knockbackSeconds": 0.08,
+        "spreadDegrees": 0,
+        "cooldownSeconds": 1.3
+      },
+      "levels": [
+        {
+          "size": 3,
+          "power": 5
+        },
+        {
+          "knockback": 60,
+          "power": 5.5
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 2.2
+        },
+        {
+          "size": 3,
+          "power": 3.6
+        },
+        {
+          "knockback": 80,
+          "power": 4.7
+        },
+        {
+          "knockback": 60,
+          "power": 4.7
+        },
+        {
+          "size": 4,
+          "power": 2.5
+        }
+      ],
+      "learners": [
+        "pidgey"
+      ]
+    },
+    "hurricane": {
+      "pattern": "facing",
+      "effect": "hurricane",
+      "base": {
+        "power": 15.2,
+        "intervalSeconds": 0.1,
+        "statusChance": 0.2,
+        "statusSeconds": 0.5,
+        "lifestealPct": 0,
+        "count": 1,
+        "speed": 140,
+        "size": 40,
+        "range": 420,
+        "durationSeconds": 2.6,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.3,
+        "knockback": 140,
+        "knockbackSeconds": 0.08,
+        "spreadDegrees": 0,
+        "cooldownSeconds": 1.15,
+        "statusId": "flinch"
+      },
+      "levels": [
+        {
+          "size": 4,
+          "power": 1.8
+        },
+        {
+          "durationSeconds": 0.3,
+          "power": -0.5
+        },
+        {
+          "size": 4,
+          "power": 1.4
+        },
+        {
+          "size": 4,
+          "power": 1.3
+        },
+        {
+          "count": 1,
+          "power": -8.7
+        },
+        {
+          "size": 4,
+          "power": 0.6
+        },
+        {
+          "durationSeconds": 0.4,
+          "power": -1.4
+        }
+      ]
     }
   }
 }

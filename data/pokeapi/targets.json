@@ -172,7 +172,10 @@
     "porygon2",
     "slowking",
     "espeon",
-    "houndour"
+    "houndour",
+    "ampharos",
+    "heracross",
+    "pidgeot"
   ],
   "moves": [
     "ember",
@@ -297,7 +300,13 @@
     "recover",
     "morning-sun",
     "snarl",
-    "dark-pulse"
+    "dark-pulse",
+    "thunder-wave",
+    "discharge",
+    "horn-attack",
+    "megahorn",
+    "icicle-crash",
+    "whirlwind"
   ],
   "items": [
     "x-attack",

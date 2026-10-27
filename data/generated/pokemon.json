@@ -81,6 +81,33 @@
     ],
     "evolvesTo": []
   },
+  "ampharos": {
+    "dex": 181,
+    "names": {
+      "ja": "デンリュウ",
+      "en": "Ampharos",
+      "fr": "Pharamp",
+      "de": "Ampharos",
+      "es": "Ampharos",
+      "it": "Ampharos"
+    },
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 75,
+      "defense": 85,
+      "specialAttack": 115,
+      "specialDefense": 90,
+      "speed": 55
+    },
+    "preEvolutions": [
+      "mareep",
+      "flaaffy"
+    ],
+    "evolvesTo": []
+  },
   "arbok": {
     "dex": 24,
     "names": {
@@ -1738,6 +1765,31 @@
       }
     ]
   },
+  "heracross": {
+    "dex": 214,
+    "names": {
+      "ja": "ヘラクロス",
+      "en": "Heracross",
+      "fr": "Scarhino",
+      "de": "Skaraborn",
+      "es": "Heracross",
+      "it": "Heracross"
+    },
+    "types": [
+      "bug",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 125,
+      "defense": 75,
+      "specialAttack": 40,
+      "specialDefense": 95,
+      "speed": 85
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
+  },
   "hitmonchan": {
     "dex": 107,
     "names": {
@@ -3082,6 +3134,34 @@
         "trigger": "friendship"
       }
     ]
+  },
+  "pidgeot": {
+    "dex": 18,
+    "names": {
+      "ja": "ピジョット",
+      "en": "Pidgeot",
+      "fr": "Roucarnage",
+      "de": "Tauboss",
+      "es": "Pidgeot",
+      "it": "Pidgeot"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 83,
+      "attack": 80,
+      "defense": 75,
+      "specialAttack": 70,
+      "specialDefense": 70,
+      "speed": 101
+    },
+    "preEvolutions": [
+      "pidgey",
+      "pidgeotto"
+    ],
+    "evolvesTo": []
   },
   "pidgeotto": {
     "dex": 17,

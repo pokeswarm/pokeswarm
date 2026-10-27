@@ -614,6 +614,28 @@
       "reward": {
         "shiny": "squirtle"
       }
+    },
+    {
+      "id": "johto-first-derivation",
+      "region": "johto",
+      "condition": {
+        "stat": "derivations",
+        "atLeast": 1
+      },
+      "reward": {
+        "item": "pp-max"
+      }
+    },
+    {
+      "id": "johto-reach-elite-four",
+      "region": "johto",
+      "condition": {
+        "stat": "bestMidbosses",
+        "atLeast": 8
+      },
+      "reward": {
+        "item": "metronome"
+      }
     }
   ]
 }

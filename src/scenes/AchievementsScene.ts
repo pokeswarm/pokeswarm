@@ -1,11 +1,13 @@
 import Phaser from 'phaser';
-import { achievementsConfig, playablesConfig } from '../data';
-import { t } from '../i18n';
+import { achievementsConfig, generated, playablesConfig, regionsConfig } from '../data';
+import { localName } from '../data/simRules';
+import { getLocale, t } from '../i18n';
 import { visibleAchievementCondition, achievementName, achievementReward } from '../meta/achievementText';
 import { progressOf } from '../meta/progress';
 import { regionStats } from '../meta/regionScope';
 import { session } from '../meta/session';
 import { compactScreen } from '../render/pixelUi';
+import { regionPlayable } from './RegionScene';
 
 // 原作をまねた白い窓のボタン（作者の決定。2026年10月22日。src/render/pixelUi.ts の windowCss と同じ見た目）
 const BUTTON = 'min-height:44px;padding:8px 14px;cursor:pointer;font:inherit;font-size:16px;background:#f8f8f8;color:#383848;border:4px solid #383848;border-radius:6px;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #a8b8c8';
@@ -13,6 +15,7 @@ const BUTTON = 'min-height:44px;padding:8px 14px;cursor:pointer;font:inherit;fon
 /**
  * 実績の一覧（ポケモンの解放も実績に統合した）。条件は見せ、名前と報酬は達成するまで「？？？」。裏実績は条件も伏せる。
  * 1つの記録だけの条件は、進み具合（今の数 / 目標）も出す。
+ * 実績は地方ごと（02 の17章）。上の地方のタブで、その地方の実績だけを見せる（遊べる地方で、実績のある地方だけ。1つならタブを出さない）。
  */
 export class AchievementsScene extends Phaser.Scene {
   constructor() {
@@ -29,9 +32,12 @@ export class AchievementsScene extends Phaser.Scene {
     if (compact) root.style.cssText += ';padding:8px 12px;height:96vh';
     document.body.appendChild(root);
     const columns = 'grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr) minmax(0,1.1fr)';
+    let region = 'kanto';
     const render = (): void => {
       const save = session.store.current;
-      const list = achievementsConfig.achievements;
+      const regions = regionsConfig.regions.filter((r) => regionPlayable(r) && achievementsConfig.achievements.some((a) => a.region === r.id));
+      if (!regions.some((r) => r.id === region)) region = regions[0]?.id ?? 'kanto';
+      const list = achievementsConfig.achievements.filter((a) => a.region === region);
       const done = list.filter((a) => save.achievements.includes(a.id)).length;
       const head = document.createElement('div');
       head.style.cssText = `display:flex;align-items:center;gap:16px;margin-bottom:${compact ? 4 : 10}px;flex:none`;
@@ -46,6 +52,20 @@ export class AchievementsScene extends Phaser.Scene {
       back.textContent = t('achievements.back');
       back.onclick = () => this.scene.start('title');
       head.append(h, count, back);
+
+      // 地方のタブ（選んでいる地方は明るく）
+      const tabs = document.createElement('div');
+      tabs.style.cssText = `display:flex;gap:8px;margin-bottom:${compact ? 4 : 8}px;flex:none`;
+      for (const r of regions) {
+        const tab = document.createElement('button');
+        tab.style.cssText = BUTTON + (compact ? ';min-height:32px;padding:2px 10px' : ';min-height:36px;padding:4px 14px') + (r.id === region ? '' : ';opacity:0.5');
+        tab.textContent = localName(generated.regions[r.id]?.names, getLocale(), r.id);
+        tab.onclick = () => {
+          region = r.id;
+          render();
+        };
+        tabs.append(tab);
+      }
 
       // 列の見出し
       const labels = document.createElement('div');
@@ -88,7 +108,7 @@ export class AchievementsScene extends Phaser.Scene {
       }
       const scroll = root.querySelector<HTMLDivElement>('[data-rows]')?.scrollTop ?? 0;
       rows.dataset.rows = '1';
-      root.replaceChildren(head, labels, rows);
+      root.replaceChildren(...(regions.length > 1 ? [head, tabs] : [head]), labels, rows);
       // 記録が変わって描き直しても、読んでいた場所のまま
       rows.scrollTop = scroll;
     };

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { shopConfig } from '../data';
+import { achievementsConfig, shopConfig } from '../data';
+import { achievementPerks, regionAchieved } from './achievementPerks';
 import type { AchievementsConfig, UnlocksConfig } from '../data/schema';
 import { applyProgress } from './progress';
 import { regionStatKey, regionStats, regionUpgradesOf } from './regionScope';
@@ -82,6 +83,22 @@ describe('地方ごとの記録・強化・ショップ（02 の17章）', () =>
     expect(backfillShopSpent(save, shopConfig, (k) => k)).toBe(true);
     expect(save.stats.shopSpent).toBe(might.baseCost * 3 + (sale?.cost ?? 0));
     expect(backfillShopSpent(save, shopConfig, (k) => k)).toBe(false);
+  });
+
+  it('ジョウトで派生技を作る・ジムリーダー8人で、ジョウトのランにポイントマックス・メトロノームが出る（カントーの実績では出ない。07 の76章）', () => {
+    const unlocks: UnlocksConfig = { initial: [], unlocks: [] };
+    const kantoOnly = emptySave();
+    kantoOnly.stats.derivations = 1;
+    kantoOnly.stats.bestMidbosses = 8;
+    applyProgress(kantoOnly, achievementsConfig, unlocks);
+    const kantoItems = achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, kantoOnly.achievements, 'johto')).items;
+    expect([kantoItems.has('pp-max'), kantoItems.has('metronome')]).toEqual([false, false]);
+    const save = emptySave();
+    save.stats['johto:derivations'] = 1;
+    save.stats['johto:bestMidbosses'] = 8;
+    expect(applyProgress(save, achievementsConfig, unlocks).achievements).toEqual(['johto-first-derivation', 'johto-reach-elite-four']);
+    const items = achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, save.achievements, 'johto')).items;
+    expect([items.has('pp-max'), items.has('metronome')]).toEqual([true, true]);
   });
 
   it('実績はその地方のランの記録だけで判定する', () => {

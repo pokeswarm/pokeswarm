@@ -75,9 +75,9 @@ describe('ベイビィポケモンの決まり', () => {
     expect(s.keys()).toEqual(['pound', 'metronome-baby', 'moonlight']);
   });
 
-  it('ププリン: 進化する前は技を覚える（カントーとの違い。07 の78章）。プリンになると うたう を覚え、カントーのプリンと同じく技を覚えない', () => {
+  it('ププリン: 進化する前は技を覚えない決まりは無い（覚えられる技が はたく だけ。07 の78・79章）。プリンになると うたう を覚え、カントーのプリンと同じく技を覚えない', () => {
     const s = setup('igglybuff');
-    expect(Array.from({ length: 30 }, () => makeOffers(s.w, s.p)).some((offers) => offers.some((o) => o.kind === 'moveNew'))).toBe(true);
+    expect(s.p.fixedMoves).toBe(false);
     s.p.walked = 30000;
     checkEvolution(s.w, s.p);
     expect(s.p.line).toBe('jigglypuff');

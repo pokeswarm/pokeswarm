@@ -671,9 +671,7 @@
         "mewtwo",
         "porygon",
         "meowth",
-        "pichu",
-        "cleffa",
-        "igglybuff"
+        "pichu"
       ],
       "base": {
         "power": 12,
@@ -4305,9 +4303,7 @@
       "effect": "sing",
       "learners": [
         "jigglypuff",
-        "lapras",
-        "cleffa",
-        "igglybuff"
+        "lapras"
       ],
       "base": {
         "power": 12.9,

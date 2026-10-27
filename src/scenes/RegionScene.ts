@@ -6,7 +6,7 @@ import { meets } from '../meta/progress';
 import { session } from '../meta/session';
 import { compactScreen, windowCss } from '../render/pixelUi';
 import type { LobbySceneData } from './LobbyScene';
-import { pokemonIconImage } from './pokemonPicker';
+import { devAllPokemon, pokemonIconImage } from './pokemonPicker';
 import type { SelectSceneData } from './SelectScene';
 
 export interface RegionSceneData {
@@ -19,7 +19,8 @@ type Region = (typeof regionsConfig.regions)[number];
 /** 遊べる地方か（作ってあり、解放の条件があれば満たしている） */
 export function regionPlayable(r: Region, stats: Readonly<Record<string, number>> = session.store.current.stats): boolean {
   if (devAllRegions() && regionStages[r.id] && r.playables.length > 0) return true;
-  return r.available && (!r.unlock || meets(stats, r.unlock));
+  // ?unlock=all（開発版）は、公開している地方の解放の条件も満たしたことにする
+  return r.available && (!r.unlock || devAllPokemon() || meets(stats, r.unlock));
 }
 
 /** 開発版だけ: ?regions=all で、ステージ（data/regions/<地方>.json）のある地方を Coming soon・解放の条件に関わらず選べる（作っている地方の確認用） */

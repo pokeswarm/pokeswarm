@@ -42,8 +42,14 @@ export function pokemonIconImage(key: string, size: number, silhouette = false):
   return img;
 }
 
+/** 開発版だけ: ?unlock=all で、どのポケモンも解放済みとして選べる（セーブは変えない。作者の依頼 2026年10月28日: ジョウトのテスト用） */
+export function devAllPokemon(): boolean {
+  return import.meta.env.DEV && new URLSearchParams(window.location.search).get('unlock') === 'all';
+}
+
 /** 解放済みか（作者の決定: 解放していないポケモンも黒塗りで一覧に出す） */
 export function isPokemonUnlocked(key: string, region?: string): boolean {
+  if (devAllPokemon()) return true;
   return isPlayableUnlocked(session.store.current, unlocksConfig, key, playablesConfig.pokemon[key]?.unlock, region);
 }
 

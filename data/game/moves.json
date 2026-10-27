@@ -4187,7 +4187,9 @@
       "pattern": "sweep",
       "effect": "pound",
       "learners": [
-        "jigglypuff"
+        "jigglypuff",
+        "cleffa",
+        "igglybuff"
       ],
       "sweepOnce": true,
       "base": {
@@ -5741,6 +5743,102 @@
         "lungeDistance": 8,
         "afterimages": 0
       }
+    },
+    "metronome-baby": {
+      "nameOf": "metronome",
+      "pattern": "metronome",
+      "effect": "metronome",
+      "teachOnly": true,
+      "randomPool": "common",
+      "base": {
+        "intervalSeconds": 0.1,
+        "lifestealPct": 0,
+        "spreadDegrees": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockback": 100,
+        "speed": 400,
+        "count": 1,
+        "power": 1,
+        "cooldownSeconds": 3.4,
+        "size": 8,
+        "range": 400,
+        "durationSeconds": 1
+      },
+      "levels": [
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "cooldownSeconds": -0.2
+        }
+      ]
+    },
+    "moonlight": {
+      "pattern": "heal",
+      "effect": "moonlight",
+      "teachOnly": true,
+      "healZone": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "lifestealPct": 0,
+        "spreadDegrees": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "speed": 0,
+        "count": 1,
+        "power": 0,
+        "cooldownSeconds": 8,
+        "size": 90,
+        "range": 0,
+        "durationSeconds": 5,
+        "healPct": 1
+      },
+      "levels": [
+        {
+          "size": 10
+        },
+        {
+          "durationSeconds": 0.5
+        },
+        {
+          "healPct": 0.25
+        },
+        {
+          "size": 10
+        },
+        {
+          "cooldownSeconds": -0.5
+        },
+        {
+          "healPct": 0.25
+        },
+        {
+          "durationSeconds": 1
+        }
+      ]
     }
   }
 }

@@ -1,4 +1,5 @@
 import { loadPixelFonts } from './render/pixelUi';
+import { freshHatchSeed, hatchedPokemon } from './meta/hatch';
 import { startOrientationGuard } from './render/OrientationGuard';
 import { checkSite, showSiteGuard } from './render/siteGuard';
 import Phaser from 'phaser';
@@ -76,13 +77,15 @@ async function start(): Promise<void> {
     await sessionReady.catch(() => undefined);
     // 雑魚のスプライトは起動時には読まず、時間帯に合わせて読む（SpriteStreamer）
     const requested = q.get('pokemon') ?? '';
-    const pokemon = playablesConfig.pokemon[requested] ? requested : playablesConfig.default;
+    const chosen = playablesConfig.pokemon[requested] ? requested : playablesConfig.default;
+    // タマゴならかえるベイビィポケモンを引く
+    const pokemon = hatchedPokemon(chosen, freshHatchSeed());
     // 地方は ?region= か、そのポケモンを遊べる最初の地方（ヒノアラシならジョウト）
-    const region = q.get('region') ?? regionsConfig.regions.find((r) => r.playables?.includes(pokemon))?.id;
+    const region = q.get('region') ?? regionsConfig.regions.find((r) => r.playables?.includes(chosen))?.id;
     // テストプレイ: ?shiny で色違い（見た目だけ）
     const shiny = q.has('shiny');
     const sprite = playablesConfig.pokemon[pokemon]!.sprite;
-    run = { pokemon, region, playerSprite: await loadSpriteManifest(shiny ? shinySpriteKey(sprite) : sprite), coop: null, shiny };
+    run = { pokemon, region, playerSprite: await loadSpriteManifest(shiny ? shinySpriteKey(sprite) : sprite), coop: null, shiny, ...(pokemon !== chosen && { hatchedFrom: chosen }) };
   }
   const game = new Phaser.Game({
     type: Phaser.AUTO,

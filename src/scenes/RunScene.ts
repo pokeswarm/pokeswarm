@@ -77,6 +77,8 @@ export interface RunSceneData {
   /** ソロ: 最初に持っていく持ち物（無ければ null）と、色違いで遊ぶか。協力プレイでは players の各自の値を使う */
   startItem?: string | null;
   shiny?: boolean;
+  /** タマゴからかえった（pokemon はかえったベイビィポケモン、hatchedFrom は選んだタマゴ。最初にかえる演出を見せる。07 の57章） */
+  hatchedFrom?: string;
 }
 
 /**
@@ -468,6 +470,14 @@ export class RunScene extends Phaser.Scene {
     this.pausePanel = new PausePanel(() => this.togglePause());
     this.evolutionCutscene = new EvolutionCutscene();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.evolutionCutscene.destroy());
+    // タマゴからかえった: 最初にかえる演出（07 の57章）。ソロは演出の間ゲームを止め、協力プレイは止めずに薄く重ねる
+    const egg = this.runData.hatchedFrom;
+    if (egg) {
+      const eggSprite = playablesConfig.pokemon[egg]?.sprite ?? egg;
+      const babySprite = playablesConfig.pokemon[this.pokemon]?.sprite ?? this.pokemon;
+      const baby = localName(generated.pokemon[this.pokemon]?.names, getLocale(), this.pokemon);
+      this.evolutionCutscene.playHatch(eggSprite, this.shinyPlayers.has(this.localId) ? shinySpriteKey(babySprite) : babySprite, baby, this.coop ? 0.3 : 0.65);
+    }
     // 協力プレイで自分が選び終えた後: 画面を少しだけ暗くして、ほかの人を待っていることを出す
     this.waitingOverlay = document.createElement('div');
     this.waitingOverlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.3);display:none;align-items:center;justify-content:center;pointer-events:none;z-index:15;color:#f8f8f8;font-size:22px;text-shadow:0 2px 0 #000';
@@ -608,7 +618,7 @@ export class RunScene extends Phaser.Scene {
    * タブが裏に回ったら、ブラウザへの一時保存と Firestore への書き込みをしておく
    */
   private setupSaving(): void {
-    this.recorder = new RunRecorder(session.store, this.pokemon, shopConfig, derivedStatSources, this.stageOfRegion.id);
+    this.recorder = new RunRecorder(session.store, this.pokemon, shopConfig, derivedStatSources, this.stageOfRegion.id, this.runData.hatchedFrom ?? null);
     // テストプレイ（?legend・?god）のランは記録を保存しない（コイン・実績・解放が進まないように）
     if (this.isTestRun()) return;
     const autosave = this.time.addEvent({

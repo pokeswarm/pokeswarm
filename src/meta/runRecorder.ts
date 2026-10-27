@@ -15,7 +15,7 @@ import { HOME_REGION, regionStatKey } from './regionScope';
  * 記録の名前（data/game/achievements.json の条件で使う）:
  *   kills, defeated.<ポケモン>, bossDefeated.<ポケモン>（中ボス・ボス・伝説として出たもの）, midbossKills, bossKills, legendaryKills, evolutions, evolvedTo.<ポケモン>,
  *   derivations, derived.<技>, uniqueMoves, playSeconds,
- *   runs, runs.<ポケモン>, runs.coop, clears, clears.<ポケモン>, clears.solo, clears.coop,
+ *   runs, runs.<ポケモン>, runs.coop, clears, clears.<ポケモン>, clears.solo, clears.coop, eggClears.<タマゴからかえったポケモン>,
  *   bestKills, bestLevel, longestSeconds, bestMidbosses（最高記録）,
  *   reached.<ポケモン>（そのポケモンで1回のランに倒した中ボス・四天王の数の最高）, bestLevel.<ポケモン>（そのポケモンで届いた最高レベル）,
  *   distinctClears（クリアしたポケモンの種類の数）, uniqueKinds（出した固有技の種類の数）。最後の2つは足すのではなく、ほかの記録から数え直す
@@ -45,6 +45,8 @@ export class RunRecorder {
     private readonly derived: DerivedStatSources | null = null,
     /** 遊んでいる地方（記録の名前・永続強化のコインの増加に使う） */
     private readonly region: string = HOME_REGION,
+    /** タマゴからかえったラン（選んだタマゴ）。クリアしたら eggClears.<ポケモン> も数える（ベイビィポケモン4種でクリアの実績。07 の57章） */
+    private readonly hatchedFrom: string | null = null,
   ) {}
 
   private count(key: string, n = 1): void {
@@ -148,6 +150,7 @@ export class RunRecorder {
     if (clear) {
       this.count('clears');
       this.count(`clears.${this.pokemon}`);
+      if (this.hatchedFrom) this.count(`eggClears.${this.pokemon}`);
       this.count(world.role === 'solo' ? 'clears.solo' : 'clears.coop');
     }
     this.commit(world);

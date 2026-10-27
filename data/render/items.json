@@ -17,7 +17,11 @@
     "Y": "#f9a825",
     "o": "#c98a4b",
     "O": "#e0a86a",
-    "n": "#8a5a2b"
+    "n": "#8a5a2b",
+    "e": "#f8f0d8",
+    "E": "#d8c8a0",
+    "c": "#7cc85a",
+    "C": "#3e8e3a"
   },
   "sprites": {
     "potion": [
@@ -229,11 +233,92 @@
       "kwwkwwk",
       ".kwwwk.",
       ".kkkkk."
+    ],
+    "egg": [
+      "................",
+      "......kkkk......",
+      ".....keecek.....",
+      "....keecCeek....",
+      "...keeeeceeek...",
+      "..kewcceeeeeek..",
+      "..kecCceeeeeek..",
+      ".kewcCceecceeek.",
+      ".keeeceeecCceek.",
+      ".keeeeeecCCceek.",
+      "keeeeeeecCCceeek",
+      "keeeeeeeecceeeek",
+      ".keeecceeeeeEEk.",
+      ".keeeCCceeeEEEk.",
+      ".keeeCCceecEEEk.",
+      "..keecceeeCcEk..",
+      "..keeeeeeeCcEk..",
+      "...keeeeeeEEk...",
+      "....keeeeeEk....",
+      ".....kkkkkk....."
+    ],
+    "egg-crack-1": [
+      "................",
+      "......kkkk......",
+      ".....keecek.....",
+      "....keecCeek....",
+      "...keeeeceeek...",
+      "..kewcceeeeeek..",
+      "..kecCceeeeeek..",
+      ".kewcCceecceeek.",
+      ".keeeceeecCceek.",
+      ".keekekekCCceek.",
+      "keekekekcCCceeek",
+      "keeeeeeeecceeeek",
+      ".keeecceeeeeEEk.",
+      ".keeeCCceeeEEEk.",
+      ".keeeCCceecEEEk.",
+      "..keecceeeCcEk..",
+      "..keeeeeeeCcEk..",
+      "...keeeeeeEEk...",
+      "....keeeeeEk....",
+      ".....kkkkkk....."
+    ],
+    "egg-crack-2": [
+      "................",
+      "......kkkk......",
+      ".....keecek.....",
+      "....keecCeek....",
+      "...keeeeceeek...",
+      "..kewcceeeeeek..",
+      "..kecCcekeeeek..",
+      ".kewcCckecceeek.",
+      ".keeeceekcCceek.",
+      ".keekekekCkckek.",
+      "keekekekckCkeeek",
+      "keeeeeeeecceeeek",
+      ".keeecceeeeeEEk.",
+      ".keeeCCceeeEEEk.",
+      ".keeeCCceecEEEk.",
+      "..keecceeeCcEk..",
+      "..keeeeeeeCcEk..",
+      "...keeeeeeEEk...",
+      "....keeeeeEk....",
+      ".....kkkkkk....."
     ]
   },
   "candyBurst": [
-    {"levels": 1, "count": 4, "color": "#42a5f5", "fontSize": 26},
-    {"levels": 3, "count": 14, "color": "#ba68c8", "fontSize": 32},
-    {"levels": 5, "count": 42, "color": "#ff9800", "fontSize": 40}
+    {
+      "levels": 1,
+      "count": 4,
+      "color": "#42a5f5",
+      "fontSize": 26
+    },
+    {
+      "levels": 3,
+      "count": 14,
+      "color": "#ba68c8",
+      "fontSize": 32
+    },
+    {
+      "levels": 5,
+      "count": 42,
+      "color": "#ff9800",
+      "fontSize": 40
+    }
   ]
 }

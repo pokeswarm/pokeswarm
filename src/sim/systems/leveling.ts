@@ -246,7 +246,7 @@ export function itemFits(
   if (def.lines && !def.lines.includes(p.line)) return false;
   if (def.forms && !def.forms.includes(p.species)) return false;
   // 今の姿がこの持ち物で進化できるときだけ（つながりのヒモ: ゴーリキーになってから）
-  if (def.onlyWhenEvolves && !rules.species[p.species]?.evolutions.some((e) => e.trigger !== 'level' && e.item === item)) return false;
+  if (def.onlyWhenEvolves && !rules.species[p.species]?.evolutions.some((e) => (e.trigger === 'item' || e.trigger === 'trade') && e.item === item)) return false;
   // 一緒に持てない持ち物（でんきだま と かみなりのいし）は、どちらか片方だけ
   if (p.items.some((it) => def.excludes?.includes(it.item) || rules.items[it.item]?.excludes?.includes(item))) return false;
   if (def.category !== 'type') return true;
@@ -280,7 +280,9 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
     if (pm.level < rules.moves[pm.move]!.levels.length) pool.push({ kind: 'moveUp', slot });
   });
   // 技を覚えないポケモン（プリン）は、新しい技を候補に出さない
-  if (p.moves.length < rules.combat.maxMoveSlots && !p.fixedMoves) {
+  // トゲピー: 進化するまで新しい技を覚えない（系統の fixedForms）
+  const fixedNow = p.fixedMoves || !!rules.lines?.[p.line]?.fixedForms.includes(p.species);
+  if (p.moves.length < rules.combat.maxMoveSlots && !fixedNow) {
     rules.moves.forEach((m, move) => {
       // 進化で使った技（派生・固有技の元の技）は、もう候補に出さない（作者の指摘 2026年10月25日）
       if (!isBaseMove(world, move) || m.teachOnly || p.moves.some((pm) => pm.move === move) || p.consumedMoves?.includes(move)) return;

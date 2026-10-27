@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { coopHatchSeed, hatchedPokemon, isEgg, playableName } from '../meta/hatch';
 import { generated, networkConfig, playablesConfig, regionsConfig, uiConfig } from '../data';
 import { localName } from '../data/simRules';
 import type { SpriteAnims } from '../data/schema';
@@ -82,6 +83,8 @@ export class LobbyScene extends Phaser.Scene {
     });
     // 全員のポケモンのスプライトを読んでおく（ランの画面でほかの人のポケモンを描くため。色違いは開始するときに読む）
     for (const p of Object.values(playablesConfig.pokemon)) {
+      // タマゴは自作の絵なので読まない（かえるベイビィポケモンの絵を読む）
+      if (p.hatch) continue;
       void loadPokemonAtRuntime(this, p.sprite).then((loaded) => this.sprites.set(p.sprite, loaded?.manifest ?? null));
     }
     session.setPresence('lobby');
@@ -138,9 +141,12 @@ export class LobbyScene extends Phaser.Scene {
     }
   }
 
-  private startRun(players: RoomPlayer[]): void {
+  private startRun(chosen: RoomPlayer[]): void {
     const room = this.room;
     if (!room || this.starting) return;
+    // タマゴを選んだ人は、部屋のシードと人の番号でかえるベイビィポケモンを決める（どのブラウザでも同じ。07 の66.4）
+    const players = chosen.map((p) => ({ ...p, pokemon: hatchedPokemon(p.pokemon, coopHatchSeed(room.seed, p.id)) }));
+    const egg = chosen.find((p) => p.id === room.localId)?.pokemon;
     const me = players.find((p) => p.id === room.localId);
     if (!me) return;
     this.starting = true;
@@ -156,6 +162,7 @@ export class LobbyScene extends Phaser.Scene {
         pokemon: me.pokemon,
         playerSprite: this.sprites.get(spriteOf(me)) ?? null,
         coop: { room, players, sprites: new Map(this.sprites) },
+        ...(egg && isEgg(egg) && { hatchedFrom: egg }),
       };
       this.scene.start('run', data);
     });
@@ -180,7 +187,7 @@ export class LobbyScene extends Phaser.Scene {
   }
 
   private pokemonName(key: string): string {
-    return localName(generated.pokemon[key]?.names, getLocale(), key);
+    return playableName(key);
   }
 
   private render(): void {

@@ -636,6 +636,36 @@
       "reward": {
         "item": "metronome"
       }
+    },
+    {
+      "id": "johto-stone-thunder",
+      "region": "johto",
+      "condition": {
+        "stat": "bestLevel.pichu",
+        "atLeast": 30
+      },
+      "reward": {
+        "item": "thunder-stone"
+      }
+    },
+    {
+      "id": "johto-stone-moon",
+      "region": "johto",
+      "condition": {
+        "any": [
+          {
+            "stat": "bestLevel.cleffa",
+            "atLeast": 30
+          },
+          {
+            "stat": "bestLevel.igglybuff",
+            "atLeast": 30
+          }
+        ]
+      },
+      "reward": {
+        "item": "moon-stone"
+      }
     }
   ]
 }

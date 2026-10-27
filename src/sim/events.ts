@@ -113,6 +113,12 @@ export interface MoveTaughtEvent {
   readonly move: number;
 }
 
+/** 歩きすぎて泣き出した（トゲピー。07 の66.4。見た目と音） */
+export interface CriedEvent {
+  readonly type: 'cried';
+  readonly playerId: PlayerId;
+}
+
 /** ねむる（カビゴン）で眠った・起きた（効果音と見た目に使う） */
 export interface RestChangedEvent {
   readonly type: 'restChanged';
@@ -321,6 +327,7 @@ export type SimEvent =
   | UpgradeChosenEvent
   | MoveTaughtEvent
   | RestChangedEvent
+  | CriedEvent
   | BoxSpawnedEvent
   | PlayerFrozenEvent
   | BoxRemovedEvent

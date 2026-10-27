@@ -160,7 +160,14 @@
     "meganium",
     "totodile",
     "croconaw",
-    "feraligatr"
+    "feraligatr",
+    "pichu",
+    "cleffa",
+    "clefairy",
+    "clefable",
+    "igglybuff",
+    "togepi",
+    "togetic"
   ],
   "moves": [
     "ember",
@@ -278,7 +285,8 @@
     "eruption",
     "synthesis",
     "bite",
-    "crunch"
+    "crunch",
+    "moonlight"
   ],
   "items": [
     "x-attack",

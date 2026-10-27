@@ -1,4 +1,4 @@
-import { spriteRender } from '../data';
+import { itemSprites, spriteRender } from '../data';
 import { loadSpriteManifest, spriteBaseUrl } from './sprites/spriteManifest';
 
 /** ポケモンのアイコン（DOM 用の画像）: 待機の動作の下向きの1コマ目を、透明なところを切り詰めて切り出す */
@@ -77,4 +77,29 @@ async function make(spriteKey: string, silhouetteColor: string): Promise<Pokemon
   octx.fillStyle = silhouetteColor;
   octx.fillRect(0, 0, w, h);
   return { url, silhouetteUrl: out.toDataURL(), width: w, height: h };
+}
+
+/** 自作のドット絵（data/render/items.json）のアイコン。タマゴの一覧のマス・かえる演出で使う */
+export function pixelArtIcon(key: string, silhouetteColor: string, frame = key): PokemonIcon | null {
+  const rows = itemSprites.sprites[frame];
+  if (!rows) return null;
+  const w = rows[0]!.length;
+  const h = rows.length;
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d')!;
+  rows.forEach((row, y) =>
+    [...row].forEach((ch, x) => {
+      const color = itemSprites.palette[ch];
+      if (ch === '.' || !color) return;
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, 1, 1);
+    }),
+  );
+  const url = canvas.toDataURL();
+  ctx.globalCompositeOperation = 'source-in';
+  ctx.fillStyle = silhouetteColor;
+  ctx.fillRect(0, 0, w, h);
+  return { url, silhouetteUrl: canvas.toDataURL(), width: w, height: h };
 }

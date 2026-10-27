@@ -3,11 +3,12 @@ import { localName } from '../data/simRules';
 import type { AchievementsConfig } from '../data/schema';
 import { getLocale, t, tMaybe } from '../i18n';
 import { progressOf } from './progress';
+import { playableName } from './hatch';
 
 type Achievement = AchievementsConfig['achievements'][number];
 
 function pokemonName(key: string): string {
-  return localName(generated.pokemon[key]?.names, getLocale(), key);
+  return playableName(key);
 }
 
 function find(id: string): Achievement | undefined {

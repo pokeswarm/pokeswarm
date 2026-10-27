@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { freshHatchSeed, hatchedPokemon } from '../meta/hatch';
 import { playablesConfig, regionsConfig } from '../data';
 import { t } from '../i18n';
 import { compactScreen, windowCss } from '../render/pixelUi';
@@ -42,10 +43,12 @@ export class SelectScene extends Phaser.Scene {
       // 選んだポケモンのスプライトを読んでから始める（取得していなければ仮の円）
       options.setPokemon(key);
       const { startItem, shiny } = options.options;
-      const sprite = playablesConfig.pokemon[key]!.sprite;
+      // タマゴは、ここでかえるベイビィポケモンを引く（ランの最初に、かえる演出を見せる）
+      const pokemon = hatchedPokemon(key, freshHatchSeed());
+      const sprite = playablesConfig.pokemon[pokemon]!.sprite;
       void loadPokemonAtRuntime(this, shiny ? shinySpriteKey(sprite) : sprite).then((loaded) => {
         if (!this.sys.isActive()) return;
-        const data: RunSceneData = { pokemon: key, region: region.id, playerSprite: loaded?.manifest ?? null, coop: null, startItem, shiny };
+        const data: RunSceneData = { pokemon, region: region.id, playerSprite: loaded?.manifest ?? null, coop: null, startItem, shiny, ...(pokemon !== key && { hatchedFrom: key }) };
         this.scene.start('run', data);
       });
     };

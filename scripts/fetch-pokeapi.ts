@@ -78,6 +78,8 @@ interface EvolutionNode {
     min_level: number | null;
     trigger: NamedRef;
     item: NamedRef | null;
+    min_happiness?: number | null;
+    time_of_day?: string;
     version_group?: NamedRef;
   }[];
   evolves_to: EvolutionNode[];
@@ -116,6 +118,8 @@ function evolutionsOf(chain: EvolutionNode, species: string): GeneratedPokemon['
     if (d.trigger.name === 'level-up' && d.min_level) return { to: child.species.name, trigger: 'level' as const, level: d.min_level };
     if (d.trigger.name === 'use-item' && d.item) return { to: child.species.name, trigger: 'item' as const, item: d.item.name };
     if (d.trigger.name === 'trade') return { to: child.species.name, trigger: 'trade' as const };
+    // なつき（時間帯の条件が無いもの。ピチュー・クロバットなど。ゲームでは「たくさん歩く」。07 の66.2）
+    if (d.trigger.name === 'level-up' && d.min_happiness && !d.time_of_day) return { to: child.species.name, trigger: 'friendship' as const };
     return { to: child.species.name, trigger: 'other' as const };
   });
 }

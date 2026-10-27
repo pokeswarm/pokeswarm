@@ -10,6 +10,20 @@ export interface SimEnemyKind extends EnemyKind {
   readonly types: readonly number[];
 }
 
+/** 遊べるポケモンの系統ごとの決まり（playables.json。ベイビィポケモン: 07 の57章・66.4）。番号は SimRules の並び */
+export interface SimLineRule {
+  readonly fixedMoves: boolean;
+  /** 決めたタイプ（プリン: ノーマルだけ）。無ければ姿のタイプ */
+  readonly types: readonly number[] | null;
+  readonly moveTypes: readonly number[];
+  readonly startingMoves: readonly number[];
+  readonly formMoves: readonly { readonly form: number; readonly move: number }[];
+  readonly becomes: readonly { readonly form: number; readonly line: string }[];
+  readonly fixedForms: readonly number[];
+  readonly hpCost: { readonly forms: readonly number[]; readonly move: number; readonly pct: number; readonly minHpPct: number } | null;
+  readonly cry: { readonly forms: readonly number[]; readonly everyDistance: number; readonly seconds: number } | null;
+}
+
 /** シミュレーションが使う data/ の定義一式（型だけを参照し、読み込みと組み立ては呼び出し側で行う） */
 export interface SimRules {
   enemies: { kinds: SimEnemyKind[] };
@@ -34,6 +48,10 @@ export interface SimRules {
   stage: StageConfig;
   /** マップの障害物 */
   obstacles: ObstacleRules;
+  /** 遊べるポケモンの系統ごとの決まり（キーは playables.json のキー） */
+  lines?: Readonly<Record<string, SimLineRule>>;
+  /** なつきの進化に要る、ランで歩いた距離（data/game/player.json） */
+  friendshipDistance: number;
   /** 協力プレイで届いた位置をなめらかに見せる */
   netSmoothing: NetSmoothing;
 }

@@ -184,7 +184,7 @@ export const unlocksConfig: UnlocksConfig = {
 };
 /** 数え直す記録（クリアしたポケモンの種類・出した固有技の種類）のもと */
 export const derivedStatSources = {
-  playables: Object.keys(playablesConfig.pokemon),
+  playables: Object.keys(playablesConfig.pokemon).filter((k) => !playablesConfig.pokemon[k]!.hatch),
   uniqueMoves: [...new Set(derivationsConfig.unique.map((d) => d.to))],
 };
 export const shopConfig = load('game/shop.json', shopConfigSchema, shopJson);
@@ -211,6 +211,10 @@ export const generated = {
   types: load('generated/types.json', generatedTypesSchema, generatedTypesJson),
   regions: load('generated/regions.json', generatedRegionsSchema, generatedRegionsJson),
 };
+// 原作の名前を借りる技（ベイビィ用の ゆびをふる は、ミュウの ゆびをふる と名前・タイプが同じ別の技。moves.json の nameOf）
+for (const [key, def] of Object.entries(movesConfig.moves)) {
+  if (def.nameOf && generated.moves[def.nameOf] && !generated.moves[key]) generated.moves[key] = generated.moves[def.nameOf]!;
+}
 
 // ---- ファイルをまたぐ参照の検証 ----
 function check(ok: boolean, message: string): void {
@@ -324,6 +328,12 @@ for (const [key, def] of Object.entries(movesConfig.moves)) {
   check(!status || statusConfig.kinds.some((k) => k.id === status), `data/game/moves.json の "${key}" の statusId "${status}" が data/game/status.json にありません`);
 }
 for (const [key, p] of Object.entries(playablesConfig.pokemon)) {
+  if (p.hatch) {
+    for (const b of p.hatch) check(!!playablesConfig.pokemon[b] && !playablesConfig.pokemon[b]!.hatch, `data/game/playables.json のタマゴ "${key}" の "${b}" が playables.json にありません`);
+    check(!!itemSprites.sprites[p.sprite], `data/game/playables.json のタマゴ "${key}" の絵 "${p.sprite}" が data/render/items.json にありません`);
+    continue;
+  }
+  check(p.startingMoves.length > 0, `data/game/playables.json の "${key}" に最初の技がありません`);
   check(!!generated.pokemon[key], `data/game/playables.json の "${key}" が data/generated/pokemon.json にありません`);
   for (const m of p.startingMoves) check(!!movesConfig.moves[m], `data/game/playables.json の "${key}" の最初の技 "${m}" が data/game/moves.json にありません`);
   if (p.unlock) {

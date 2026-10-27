@@ -32,6 +32,8 @@ export class PlayerView {
   private lungeY = 0;
   /** ねむる（カビゴン）で眠っている間に、頭の上に出す Z の文字 */
   private readonly zzz: Phaser.GameObjects.Text;
+  /** 泣いている間（トゲピー。07 の66.4）に、目から落ちるなみだ */
+  private readonly tears: Phaser.GameObjects.Graphics;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -55,6 +57,8 @@ export class PlayerView {
     }
     this.zzz = scene.add.text(this.radius * 0.6, -this.radius * 2.2, t('run.sleepZ'), px(8, '#e1f5fe', { outline: true })).setOrigin(0, 1).setVisible(false);
     this.container.add(this.zzz);
+    this.tears = scene.add.graphics().setVisible(false);
+    this.container.add(this.tears);
   }
 
   /** 進化などで見た目を差し替える */
@@ -143,7 +147,10 @@ export class PlayerView {
       // ねむる（カビゴン）: 眠っている間は寝ている動き（下向きだけの絵なので向きは下）。起きる動きの間は立っている
       const asleep = player.sleep?.asleep ?? false;
       const waking = (player.sleep?.wakeTicks ?? 0) > 0;
+      // 泣いている間（トゲピー）は痛がる動き（自作のなみだを重ねる）
+      const crying = (player.cryTicks ?? 0) > 0;
       if (asleep) this.pokemon.play('Sleep', 0);
+      else if (crying) this.pokemon.play('Hurt', directionIndex(player.facingX, player.facingY));
       else this.pokemon.play(moving && !waking ? this.spriteStyle.walkAnimation : this.spriteStyle.idleAnimation, directionIndex(player.facingX, player.facingY));
       // 倒れていたら暗く、無敵時間の間は点滅
       this.pokemon.sprite.setAlpha(player.down ? 0.35 : player.invincibleTicks > 0 && Math.floor(player.invincibleTicks / 3) % 2 === 0 ? 0.4 : 1);
@@ -157,6 +164,20 @@ export class PlayerView {
     if (sleeping) {
       const k = (this.scene.time.now % 1500) / 1500;
       this.zzz.setPosition(this.radius * 0.6 + Math.sin(k * Math.PI * 2) * 3, -this.radius * 2.2 - k * 8).setAlpha(1 - k * 0.6);
+    }
+    // なみだ: 両目のあたりから、水色の粒が左右へ落ちる（2つずつ、ずらして）
+    const crying = (player.cryTicks ?? 0) > 0;
+    this.tears.setVisible(crying);
+    if (crying) {
+      this.tears.clear();
+      for (let i = 0; i < 4; i++) {
+        const k = ((this.scene.time.now / 600 + i * 0.25) % 1);
+        const side = i % 2 === 0 ? -1 : 1;
+        const x = side * (this.radius * 0.45 + k * 6);
+        const y = -this.radius * 0.9 + k * k * 18;
+        this.tears.fillStyle(0x4fc3f7, 1 - k * 0.6).fillCircle(x, y, 2.2);
+        this.tears.fillStyle(0xffffff, 1 - k).fillCircle(x - 0.6, y - 0.6, 0.8);
+      }
     }
     if (this.facing) {
       const len = Math.hypot(player.facingX, player.facingY) || 1;

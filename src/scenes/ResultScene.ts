@@ -1,5 +1,8 @@
 import Phaser from 'phaser';
-import { bgmConfig, uiConfig } from '../data';
+import { bgmConfig, playablesConfig, uiConfig } from '../data';
+import { freshHatchSeed, hatchedPokemon } from '../meta/hatch';
+import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
+import { shinySpriteKey } from '../meta/loadoutOptions';
 import { drawWindow, pixelButton, px, compactScreen } from '../render/pixelUi';
 import { audio } from '../audio';
 import { t } from '../i18n';
@@ -57,6 +60,15 @@ export class ResultScene extends Phaser.Scene {
     const again = (): void => {
       if (leaving || !retry) return;
       leaving = true;
+      // タマゴからかえったソロのランは、もう一度のたびに引き直す（07 の66.4）
+      if (retry.hatchedFrom && !retry.coop) {
+        const pokemon = hatchedPokemon(retry.hatchedFrom, freshHatchSeed());
+        const sprite = playablesConfig.pokemon[pokemon]!.sprite;
+        void loadPokemonAtRuntime(this, retry.shiny ? shinySpriteKey(sprite) : sprite).then((loaded) => {
+          if (this.sys.isActive()) this.scene.start('run', { ...retry, pokemon, playerSprite: loaded?.manifest ?? null });
+        });
+        return;
+      }
       this.scene.start('run', retry);
     };
     const toTitle = (): void => {

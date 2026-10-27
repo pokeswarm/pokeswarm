@@ -1,4 +1,4 @@
-import { loadPokemonIcon } from '../render/pokemonIcons';
+import { loadPokemonIcon, pixelArtIcon } from '../render/pokemonIcons';
 import { t } from '../i18n';
 
 /** 進化の演出の長さ（秒）: 前半は白いシルエットが入れ替わり、白く光ってから進化後の姿と文を見せる */
@@ -95,6 +95,78 @@ export class EvolutionCutscene {
         this.timers.push(window.setTimeout(() => this.destroy(), (REVEAL_SECONDS + FADE_SECONDS) * 1000));
       };
       this.timers.push(window.setTimeout(blink, 300));
+    });
+  }
+
+  /**
+   * タマゴがかえる演出（07 の57章）: タマゴがだんだん速く左右に揺れ、ひびが2回入り、白く光ってベイビィポケモンが出る。
+   * eggSprite は data/render/items.json の絵（<名前>-crack-1・-crack-2 がひびのコマ）
+   */
+  playHatch(eggSprite: string, babySprite: string, babyName: string, dim: number): void {
+    this.destroy();
+    const total = BLINK_SECONDS + REVEAL_SECONDS + FADE_SECONDS;
+    this.endAt = performance.now() + total * 1000;
+    const root = document.createElement('div');
+    this.root = root;
+    root.style.cssText = `position:fixed;inset:0;z-index:18;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(circle at 50% 45%, rgba(40,90,60,${dim}) 0%, rgba(0,0,0,${dim}) 70%);opacity:0;transition:opacity 0.25s`;
+    const stage = document.createElement('div');
+    stage.style.cssText = 'position:relative;width:220px;height:220px;display:flex;align-items:center;justify-content:center';
+    const img = document.createElement('img');
+    img.alt = '';
+    img.style.cssText = 'image-rendering:pixelated;filter:drop-shadow(0 0 14px rgba(255,255,255,0.8));transform-origin:50% 90%';
+    stage.append(img);
+    const text = document.createElement('div');
+    text.style.cssText = 'position:relative;color:#f8f8f8;font-size:24px;text-shadow:0 2px 0 #000,0 0 12px #000;text-align:center;min-height:1.6em;padding:0 16px';
+    text.textContent = t('hatch.what');
+    const flash = document.createElement('div');
+    flash.style.cssText = 'position:absolute;inset:0;background:#fff;opacity:0;transition:opacity 0.5s';
+    root.append(stage, text, flash);
+    document.body.append(root);
+    this.timers.push(window.setTimeout(() => (root.style.opacity = '1'), 20));
+    const frames = [eggSprite, `${eggSprite}-crack-1`, `${eggSprite}-crack-2`].map((k) => pixelArtIcon(eggSprite, '#ffffff', k));
+    void loadPokemonIcon(babySprite, '#ffffff').then((baby) => {
+      const egg = frames[0];
+      if (this.root !== root || !egg || !baby) return;
+      // タマゴは長い辺が SIZE の 6 割、かえったポケモンは SIZE（小さなタマゴから出てくる）
+      const fit = (icon: { width: number; height: number }, size: number): void => {
+        const k = size / Math.max(icon.width, icon.height);
+        img.style.width = `${icon.width * k}px`;
+        img.style.height = `${icon.height * k}px`;
+      };
+      img.src = egg.url;
+      fit(egg, SIZE * 0.6);
+      // 前半: 左右に揺れる（だんだん速く大きく）。4 割と 7 割でひびが入る
+      const start = performance.now();
+      let side = 1;
+      const wobble = (): void => {
+        if (this.root !== root) return;
+        const k = Math.min(1, (performance.now() - start) / (BLINK_SECONDS * 1000));
+        if (k >= 1) {
+          reveal();
+          return;
+        }
+        const frame = frames[k > 0.7 ? 2 : k > 0.4 ? 1 : 0];
+        if (frame) img.src = frame.url;
+        side = -side;
+        img.style.transform = `rotate(${side * (6 + 14 * k)}deg)`;
+        this.timers.push(window.setTimeout(wobble, BLINK_START_MS + (BLINK_END_MS * 2 - BLINK_START_MS) * Math.sqrt(k)));
+      };
+      const reveal = (): void => {
+        flash.style.transition = 'none';
+        flash.style.opacity = '1';
+        img.src = baby.url;
+        fit(baby, SIZE);
+        img.style.transform = 'scale(1.1)';
+        text.textContent = t('hatch.done', { name: babyName });
+        this.timers.push(window.setTimeout(() => {
+          flash.style.transition = 'opacity 0.6s';
+          flash.style.opacity = '0';
+          img.style.transform = 'scale(1)';
+        }, 30));
+        this.timers.push(window.setTimeout(() => (root.style.opacity = '0'), REVEAL_SECONDS * 1000));
+        this.timers.push(window.setTimeout(() => this.destroy(), (REVEAL_SECONDS + FADE_SECONDS) * 1000));
+      };
+      this.timers.push(window.setTimeout(wobble, 300));
     });
   }
 

@@ -24,7 +24,9 @@ export interface SimSpecies {
 export type SimEvolution =
   | { readonly to: number; readonly trigger: 'level'; readonly level: number }
   | { readonly to: number; readonly trigger: 'item'; readonly item: number }
-  | { readonly to: number; readonly trigger: 'trade'; readonly item: number };
+  | { readonly to: number; readonly trigger: 'trade'; readonly item: number }
+  /** なつき: ランで歩いた距離が SimRules.player の friendshipDistance を超えたら（07 の66.2） */
+  | { readonly to: number; readonly trigger: 'friendship' };
 
 /** 種族値のランクによる倍率（01_game_design.md 5.1） */
 export function rankMultiplier(cfg: StatsConfig, baseStat: number): number {

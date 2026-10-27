@@ -719,6 +719,18 @@
     "type": "normal",
     "damageClass": "status"
   },
+  "moonlight": {
+    "names": {
+      "ja": "つきのひかり",
+      "en": "Moonlight",
+      "fr": "Rayon Lune",
+      "de": "Mondschein",
+      "es": "Luz Lunar",
+      "it": "Lucelunare"
+    },
+    "type": "fairy",
+    "damageClass": "status"
+  },
   "night-shade": {
     "names": {
       "ja": "ナイトヘッド",

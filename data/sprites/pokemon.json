@@ -1216,6 +1216,37 @@
     {
       "key": "feraligatr",
       "dex": 160
+    },
+    {
+      "key": "pichu",
+      "dex": 172
+    },
+    {
+      "key": "cleffa",
+      "dex": 173
+    },
+    {
+      "key": "clefairy",
+      "dex": 35
+    },
+    {
+      "key": "clefable",
+      "dex": 36
+    },
+    {
+      "key": "igglybuff",
+      "dex": 174
+    },
+    {
+      "key": "togepi",
+      "dex": 175,
+      "extraAnimations": [
+        "Hurt"
+      ]
+    },
+    {
+      "key": "togetic",
+      "dex": 176
     }
   ]
 }

@@ -2670,6 +2670,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'perish-ring': () => perishRing(),
     'heal-rise': () => healRise(),
     'sun-rise': () => healRise(['#5d4a00', '#c0ca33', '#fff176', '#ffffff']),
+    // つきのひかり: 同じ形で、月の光の色（淡い黄色と白）
+    'moon-rise': () => healRise(['#4a3a6a', '#f8bbd0', '#fff9c4', '#ffffff']),
     'amnesia-swirl': () => amnesiaSwirl(),
     'rainbow-stars': () => rainbowStars(),
     'fire-geyser': () => fireGeyser(),

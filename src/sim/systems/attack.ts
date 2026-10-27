@@ -237,6 +237,15 @@ export function useMoves(world: World): void {
         }
         if (p.id === world.localPlayerId) selfDamage(world, p, (p.maxHp * def.hpCost.pct) / 100);
       }
+      // その姿の間だけ HP を使う技（ピチュー: でんきショック。07 の57章・66.4）
+      const formCost = world.rules.lines?.[p.line]?.hpCost;
+      if (formCost && formCost.move === pm.move && formCost.forms.includes(p.species)) {
+        if (p.hp < (p.maxHp * formCost.minHpPct) / 100) {
+          pm.cooldown = 0;
+          continue;
+        }
+        if (p.id === world.localPlayerId) selfDamage(world, p, (p.maxHp * formCost.pct) / 100);
+      }
       // 消えてから数える技（こなゆき・ふぶき）は、持続の分を足す
       pm.cooldown = Math.max(scaledMoveStats(world, p, pm, st).cooldownSeconds, def.waitForEnd ? st.durationSeconds : 0) + (def.restAfterEnd ? st.durationSeconds : 0);
       world.events.push({ type: 'moveUsed', playerId: p.id, move: pm.move });
@@ -971,7 +980,9 @@ function fireSpin(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
  * 見た目だけの円（当たらない。stage 2）を自分に付けて出す
  */
 function fireHeal(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
-  healPlayer(world, p.id, (p.maxHp * st.healPct) / 100);
+  // 回復の円（つきのひかり）: 出ている間、中のプレイヤーを毎秒回復する（health.ts の regenerate）
+  if (world.rules.moves[pm.move]!.healZone) world.healZones.push({ x: p.x, y: p.y, radius: st.size, ticks: Math.round(st.durationSeconds / world.dt), pct: st.healPct });
+  else healPlayer(world, p.id, (p.maxHp * st.healPct) / 100);
   if (st.guardPct > 0) {
     p.guardPct = st.guardPct;
     p.guardUntilTick = world.tick + Math.round(st.durationSeconds / world.dt);

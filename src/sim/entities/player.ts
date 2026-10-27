@@ -61,6 +61,11 @@ export interface Player {
   invincibleTicks: number;
   /** 範囲技が残した床で遅くなっている割合（%。毎回の更新で決め直す） */
   zoneSlowPct?: number;
+  /** ランで歩いた距離（ワールドの単位。なつきの進化。07 の66.2）。別のブラウザのプレイヤーは本人から届いた値 */
+  walked: number;
+  /** 泣くまでの歩いた距離（トゲピー）と、泣いて止まっている残り（更新回数） */
+  cryWalked?: number;
+  cryTicks?: number;
   /** 凍っている残り（更新回数。伝説戦のぜったいれいど）と、次に凍るまでの間 */
   frozenTicks?: number;
   freezeCooldown?: number;
@@ -94,9 +99,9 @@ export interface Player {
   /** ふしぎなアメの +3・+5 の重みに足す（実績の報酬） */
   readonly candyWeight: number;
   /** 自分のタイプのほかに、候補に出る技のタイプ（コダック: エスパー） */
-  readonly moveTypes: readonly number[];
-  /** 新しい技を覚えない（プリン: 最初の2つだけ） */
-  readonly fixedMoves: boolean;
+  moveTypes: readonly number[];
+  /** 新しい技を覚えない（プリン: 最初の2つだけ）。ベイビィポケモンは進化で変わる */
+  fixedMoves: boolean;
   /** どの技も覚えられる（ミュウ。技の learners に関係なく候補に出る） */
   readonly learnsAll: boolean;
   /** ドわすれ: この更新の回数まで、受けるダメージを guardPct % 減らす */
@@ -153,6 +158,7 @@ export function createPlayer(init: PlayerInit): Player {
     netX: init.x,
     netY: init.y,
     netAge: 0,
+    walked: 0,
     inputX: 0,
     inputY: 0,
     facingX: 0,

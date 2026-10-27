@@ -391,7 +391,7 @@
     "evolvesTo": [
       {
         "to": "blissey",
-        "trigger": "other"
+        "trigger": "friendship"
       }
     ]
   },
@@ -512,6 +512,94 @@
         "to": "bayleef",
         "trigger": "level",
         "level": 16
+      }
+    ]
+  },
+  "clefable": {
+    "dex": 36,
+    "names": {
+      "ja": "ピクシー",
+      "en": "Clefable",
+      "fr": "Mélodelfe",
+      "de": "Pixi",
+      "es": "Clefable",
+      "it": "Clefable"
+    },
+    "types": [
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 70,
+      "defense": 73,
+      "specialAttack": 95,
+      "specialDefense": 90,
+      "speed": 60
+    },
+    "preEvolutions": [
+      "cleffa",
+      "clefairy"
+    ],
+    "evolvesTo": []
+  },
+  "clefairy": {
+    "dex": 35,
+    "names": {
+      "ja": "ピッピ",
+      "en": "Clefairy",
+      "fr": "Mélofée",
+      "de": "Piepi",
+      "es": "Clefairy",
+      "it": "Clefairy"
+    },
+    "types": [
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 45,
+      "defense": 48,
+      "specialAttack": 60,
+      "specialDefense": 65,
+      "speed": 35
+    },
+    "preEvolutions": [
+      "cleffa"
+    ],
+    "evolvesTo": [
+      {
+        "to": "clefable",
+        "trigger": "item",
+        "item": "moon-stone"
+      }
+    ]
+  },
+  "cleffa": {
+    "dex": 173,
+    "names": {
+      "ja": "ピィ",
+      "en": "Cleffa",
+      "fr": "Mélo",
+      "de": "Pii",
+      "es": "Cleffa",
+      "it": "Cleffa"
+    },
+    "types": [
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 25,
+      "defense": 28,
+      "specialAttack": 45,
+      "specialDefense": 55,
+      "speed": 15
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "clefairy",
+        "trigger": "friendship"
       }
     ]
   },
@@ -1441,7 +1529,7 @@
     "evolvesTo": [
       {
         "to": "crobat",
-        "trigger": "other"
+        "trigger": "friendship"
       }
     ]
   },
@@ -1818,6 +1906,36 @@
       "houndour"
     ],
     "evolvesTo": []
+  },
+  "igglybuff": {
+    "dex": 174,
+    "names": {
+      "ja": "ププリン",
+      "en": "Igglybuff",
+      "fr": "Toudoudou",
+      "de": "Fluffeluff",
+      "es": "Igglybuff",
+      "it": "Igglybuff"
+    },
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 30,
+      "defense": 15,
+      "specialAttack": 40,
+      "specialDefense": 20,
+      "speed": 15
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "jigglypuff",
+        "trigger": "friendship"
+      }
+    ]
   },
   "ivysaur": {
     "dex": 2,
@@ -2872,6 +2990,35 @@
         "to": "parasect",
         "trigger": "level",
         "level": 24
+      }
+    ]
+  },
+  "pichu": {
+    "dex": 172,
+    "names": {
+      "ja": "ピチュー",
+      "en": "Pichu",
+      "fr": "Pichu",
+      "de": "Pichu",
+      "es": "Pichu",
+      "it": "Pichu"
+    },
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 20,
+      "attack": 40,
+      "defense": 15,
+      "specialAttack": 35,
+      "specialDefense": 35,
+      "speed": 60
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "pikachu",
+        "trigger": "friendship"
       }
     ]
   },
@@ -4108,6 +4255,68 @@
         "to": "tentacruel",
         "trigger": "level",
         "level": 30
+      }
+    ]
+  },
+  "togepi": {
+    "dex": 175,
+    "names": {
+      "ja": "トゲピー",
+      "en": "Togepi",
+      "fr": "Togepi",
+      "de": "Togepi",
+      "es": "Togepi",
+      "it": "Togepi"
+    },
+    "types": [
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 20,
+      "defense": 65,
+      "specialAttack": 40,
+      "specialDefense": 65,
+      "speed": 20
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "togetic",
+        "trigger": "friendship"
+      }
+    ]
+  },
+  "togetic": {
+    "dex": 176,
+    "names": {
+      "ja": "トゲチック",
+      "en": "Togetic",
+      "fr": "Togetic",
+      "de": "Togetic",
+      "es": "Togetic",
+      "it": "Togetic"
+    },
+    "types": [
+      "fairy",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 40,
+      "defense": 85,
+      "specialAttack": 80,
+      "specialDefense": 105,
+      "speed": 40
+    },
+    "preEvolutions": [
+      "togepi"
+    ],
+    "evolvesTo": [
+      {
+        "to": "togekiss",
+        "trigger": "item",
+        "item": "shiny-stone"
       }
     ]
   },

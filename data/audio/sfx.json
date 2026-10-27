@@ -879,6 +879,26 @@
           "delay": 0.05
         }
       ]
+    },
+    "move.fairy": {
+      "minIntervalMs": 60,
+      "parts": [
+        {
+          "wave": "triangle",
+          "from": 1400,
+          "to": 1900,
+          "duration": 0.12,
+          "volume": 0.18
+        },
+        {
+          "wave": "triangle",
+          "from": 2100,
+          "to": 2600,
+          "duration": 0.1,
+          "volume": 0.12,
+          "delay": 0.06
+        }
+      ]
     }
   }
 }

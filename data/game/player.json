@@ -3,5 +3,6 @@
   "radius": 12,
   "spawnX": 0,
   "spawnY": 0,
-  "pickupRange": 50
+  "pickupRange": 50,
+  "friendshipDistance": 30000
 }

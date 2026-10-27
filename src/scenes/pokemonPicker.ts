@@ -6,7 +6,7 @@ import { isPlayableUnlocked } from '../meta/progress';
 import { regionStats } from '../meta/regionScope';
 import { session } from '../meta/session';
 import { windowCss, compactScreen } from '../render/pixelUi';
-import { loadPokemonIcon } from '../render/pokemonIcons';
+import { loadPokemonIcon, pixelArtIcon } from '../render/pokemonIcons';
 
 export interface PokemonPickerOptions {
   /** 並べるポケモン（地方のプレイアブル。data/game/regions.json） */
@@ -26,7 +26,8 @@ export function pokemonIconImage(key: string, size: number, silhouette = false):
   img.style.cssText = `width:${size}px;height:${size}px;object-fit:contain;image-rendering:pixelated;display:block`;
   const def = playablesConfig.pokemon[key];
   if (def) {
-    void loadPokemonIcon(def.sprite, uiConfig.picker.silhouette).then((icon) => {
+    // タマゴは自作のドット絵
+    void (def.hatch ? Promise.resolve(pixelArtIcon(def.sprite, uiConfig.picker.silhouette)) : loadPokemonIcon(def.sprite, uiConfig.picker.silhouette)).then((icon) => {
       if (!icon) return;
       img.src = silhouette ? icon.silhouetteUrl : icon.url;
       // どのポケモンも、長い辺がマスいっぱいになる同じ大きさにそろえる（作者の依頼 2026年10月22日。整数倍だと大きさがばらついた）
@@ -162,7 +163,12 @@ export class PokemonPicker {
     const name = document.createElement('div');
     name.style.cssText = 'font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
     const lines: string[] = [];
-    if (unlocked) {
+    const egg = playablesConfig.pokemon[key]!.hatch;
+    if (unlocked && egg) {
+      // タマゴ: 何がうまれるかの候補（07 の57章）
+      name.textContent = t('egg.name');
+      lines.push(t('egg.hint'), t('egg.candidates', { names: egg.map((b) => localName(generated.pokemon[b]?.names, getLocale(), b)).join('・') }));
+    } else if (unlocked) {
       const g = generated.pokemon[key];
       name.textContent = localName(g?.names, getLocale(), key);
       lines.push((g?.types ?? []).map((ty) => localName(generated.types[ty]?.names, getLocale(), ty)).join(' / '));

@@ -143,6 +143,11 @@
     {
       "key": "porygon",
       "cost": 9999
+    },
+    {
+      "key": "egg",
+      "cost": 5000,
+      "region": "johto"
     }
   ],
   "startingCoins": 500,

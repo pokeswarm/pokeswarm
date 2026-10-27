@@ -78,7 +78,8 @@ describe('data/ から組み立てたシミュレーションの定義', () => {
   });
 
   it('御三家の最初の技とタイプ', () => {
-    for (const key of Object.keys(playablesConfig.pokemon)) {
+    // タマゴは選ぶとベイビィポケモンになるので、ポケモンとしての決まりは無い
+    for (const key of Object.keys(playablesConfig.pokemon).filter((k) => !playablesConfig.pokemon[k]!.hatch)) {
       const l = playableLoadout(rules, key);
       // タイプの指定（プリン: ノーマルだけ）があれば、それ
       expect(l.types.map((t) => rules.types.names[t])).toEqual(playablesConfig.pokemon[key]!.types ?? generated.pokemon[key]!.types);

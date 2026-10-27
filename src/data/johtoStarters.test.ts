@@ -14,7 +14,7 @@ describe('ジョウトの御三家（07 の48.3・66.3）', () => {
   ] as const;
 
   it('ジョウトで遊べるのは御三家。最後の姿までプレイヤーのドット絵がある', () => {
-    expect(regionsConfig.regions.find((r) => r.id === 'johto')!.playables).toEqual(chains.map((c) => c[0]));
+    expect(regionsConfig.regions.find((r) => r.id === 'johto')!.playables).toEqual([...chains.map((c) => c[0]), 'egg']);
     for (const k of ['cyndaquil', 'quilava', 'typhlosion', 'chikorita', 'bayleef', 'meganium', 'totodile', 'croconaw', 'feraligatr']) expect(playerSpriteKeys.has(k)).toBe(true);
   });
 

@@ -187,6 +187,8 @@ export interface World {
   readonly reviveTouch: Map<PlayerId, number>;
   /** ホスト: 復活させた直後のプレイヤー（本人からの「倒れている」がまだ届くので、しばらく無視する。残りの更新回数） */
   readonly reviveGrace: Map<PlayerId, number>;
+  /** 回復の円（つきのひかり）。どのブラウザでも出した人の技から作り、中にいる自分のプレイヤーを自分のブラウザで回復する */
+  readonly healZones: { x: number; y: number; radius: number; ticks: number; pct: number }[];
   /** ランの結果。決まったらシミュレーションは進まない */
   outcome: RunOutcome | null;
   /** 今の区間（waves の番号）と、始まった更新回数。中ボス（gate）を倒すと次へ進む（ソロ・ホストが決める） */
@@ -279,6 +281,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     outcome: null,
     reviveTouch: new Map(),
     reviveGrace: new Map(),
+    healZones: [],
     section: 0,
     sectionStartTick: 0,
     gateIds: new Set(),

@@ -23,6 +23,8 @@ const moves: Record<string, MoveDef> = read('data/game/moves.json').moves;
 const derivations: { derivations: Derivation[]; unique: Derivation[] } = read('data/game/derivations.json');
 const playables: Record<string, unknown> = read('data/game/playables.json').pokemon;
 const genMoves: Record<string, { names: Names; type: string; damageClass: string }> = read('data/generated/moves.json');
+// 名前を借りる技（ベイビィ用の ゆびをふる。moves.json の nameOf）
+for (const [k, def] of Object.entries(moves as Record<string, { nameOf?: string }>)) if (def.nameOf && !genMoves[k] && genMoves[def.nameOf]) genMoves[k] = genMoves[def.nameOf]!;
 const genItems: Record<string, { names: Names }> = read('data/generated/items.json');
 const genPokemon: Record<string, { names: Names; types: string[]; evolvesTo: { to: string }[] }> = read('data/generated/pokemon.json');
 const genTypes: Record<string, { names: Names }> = read('data/generated/types.json');

@@ -32,6 +32,8 @@ export interface RemotePlayerCommand {
   readonly hp?: number;
   readonly maxHp?: number;
   readonly down?: boolean;
+  /** 歩いた距離（なつきの進化） */
+  readonly walked?: number;
 }
 
 /** ゲスト: ホストが決めた雑魚敵の出現 */

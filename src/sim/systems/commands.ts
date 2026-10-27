@@ -31,6 +31,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         p.inputX = cmd.inputX;
         p.inputY = cmd.inputY;
         if (cmd.maxHp !== undefined) p.maxHp = cmd.maxHp;
+        if (cmd.walked !== undefined) p.walked = Math.max(p.walked, cmd.walked);
         // 復活させた直後は、本人から「倒れている」がまだ届くので無視する
         if (!world.reviveGrace.has(p.id)) {
           if (cmd.hp !== undefined) p.hp = cmd.hp;

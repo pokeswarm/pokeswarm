@@ -26,6 +26,11 @@ export function movePlayers(world: World): void {
       }
       continue;
     }
+    // 泣いている間（トゲピー）は動けない
+    if (p.cryTicks) {
+      p.cryTicks--;
+      continue;
+    }
     if (p.inputX === 0 && p.inputY === 0) continue;
     // ねむる（カビゴン）の起きる動きの間は動けない（眠っているときに動こうとすると、起きる動きが始まる）
     if (p.sleep && (p.sleep.asleep || p.sleep.wakeTicks > 0)) continue;
@@ -37,6 +42,17 @@ export function movePlayers(world: World): void {
     const step = p.moveSpeed * world.dt * scale * (1 - (p.zoneSlowPct ?? 0) / 100);
     p.x += p.inputX * step;
     p.y += p.inputY * step;
+    p.walked += step;
+    // トゲピー: 歩いた距離 everyDistance ごとに止まって泣く（07 の66.4）
+    const cry = world.rules.lines?.[p.line]?.cry;
+    if (cry && cry.forms.includes(p.species)) {
+      p.cryWalked = (p.cryWalked ?? 0) + step;
+      if (p.cryWalked >= cry.everyDistance) {
+        p.cryWalked -= cry.everyDistance;
+        p.cryTicks = Math.round(cry.seconds / world.dt);
+        world.events.push({ type: 'cried', playerId: p.id });
+      }
+    }
     p.facingX = p.inputX;
     p.facingY = p.inputY;
   }

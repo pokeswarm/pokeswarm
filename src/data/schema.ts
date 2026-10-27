@@ -28,6 +28,8 @@ export const playerConfigSchema = z.object({
   pickupRange: z.number().nonnegative(),
   spawnX: z.number(),
   spawnY: z.number(),
+  /** なつきの進化に要る、ランで歩いた距離（07 の66.2。速さ 180 でずっと歩いて約3分） */
+  friendshipDistance: z.number().positive(),
 });
 export type PlayerConfig = z.infer<typeof playerConfigSchema>;
 
@@ -963,10 +965,11 @@ export const moveDefSchema = z.object({
    */
   sweep: z.number().gt(0).max(1).optional(),
   /**
-   * metronome（ランダムな技）で選ぶ技の集まり: starting（遊べるポケモンの最初の技。ものまね）・unique（固有技。ゆびをふる）。
+   * metronome（ランダムな技）で選ぶ技の集まり: starting（遊べるポケモンの最初の技。ものまね）・unique（固有技。ゆびをふる）・
+   * common（固有技・伝説の技を除く、ふつうの技と派生技。ベイビィ用の ゆびをふる。自分のレベルの割合で出す。07 の66.4）。
    * 作者の決定 2026年10月23日
    */
-  randomPool: z.enum(['starting', 'unique']).optional(),
+  randomPool: z.enum(['starting', 'unique', 'common']).optional(),
   /** 当たったときの状態異常を、この中からランダムに選ぶ（トライアタック: やけど・こおり・まひ）。statusChance で付くかどうかを決める */
   randomStatuses: z.array(z.string()).optional(),
   /** chain（連鎖）: 1回跳ぶごとに遅らせる秒数（10まんボルト: 敵から敵へ跳んでいくのが見える。0 なら全部同時） */
@@ -997,6 +1000,8 @@ export const moveDefSchema = z.object({
    * 端数はためて、ランの終わりに切り捨てる
    */
   coinGain: z.object({ perUse: z.number().nonnegative(), perLevel: z.number().nonnegative() }).optional(),
+  /** heal: すぐに回復せず、自分を中心にした円（大きさ size）を出している間（durationSeconds）、中にいるプレイヤーを毎秒 最大 HP の healPct % 回復する（つきのひかり。07 の57章） */
+  healZone: z.boolean().optional(),
   /** cross（十字）: 向きを等しい角度に並べず、1発ごとにランダムにする（うたう: 音符がふわふわ散る） */
   crossRandom: z.boolean().optional(),
   /** 扇（melee の arcDegrees）を、向いている方向ではなく左右の両方へ1つずつ出す（ハイパーボイス） */
@@ -1038,6 +1043,8 @@ export const moveDefSchema = z.object({
   chargeMove: z.object({ move: z.string(), pauseSeconds: z.number().nonnegative() }).optional(),
   /** 候補に出さない（持ち物を持つと覚える技。ほのおのパンチ・かみなりパンチ） */
   teachOnly: z.boolean().optional(),
+  /** 名前・タイプ・分類を借りる原作の技（PokeAPI の名前）。同じ名前で中身の違う技（ベイビィ用の ゆびをふる。07 の77章） */
+  nameOf: z.string().optional(),
   /**
    * 同じ group の技は、同時に出さず順番に出す（ワンリキーのパンチ。作者の決定 2026年10月25日）。
    * 1つ出すと、次の技はその技の再使用 ÷ group の技の数 の後に出せる
@@ -1130,8 +1137,26 @@ export const playablesConfigSchema = z.object({
     z.object({
       /** スプライトのキー（public/sprites/<key>） */
       sprite: z.string(),
-      /** 最初に覚えている技 */
-      startingMoves: z.array(z.string()).min(1),
+      /** 最初に覚えている技（タマゴは無し） */
+      startingMoves: z.array(z.string()).default([]),
+      /**
+       * タマゴ（07 の57章・66.4）: 選ぶと、ランを始めるときにこの中から1匹がかえる（ソロは選ぶたびに、協力プレイは部屋のシードと人で決める）。
+       * sprite は data/render/items.json の自作の絵
+       */
+      hatch: z.array(z.string()).optional(),
+      /** この姿に進化したら覚える技（技が埋まっていれば覚えない。ピィ: ピッピで ゆびをふる、ピクシーで つきのひかり。07 の57章） */
+      formMoves: z.array(z.object({ form: z.string(), move: z.string() })).default([]),
+      /**
+       * この姿に進化したら、その遊べるポケモンの系統になる（固有技・持ち物・技を覚えない などの決まりを引き継ぎ、最初の技を覚えていなければ覚える）。
+       * ピチュー → ピカチュウ、ププリン → プリン（07 の66.4「進化した後の技は、カントーの同じポケモンと同じ決まり」）
+       */
+      becomes: z.array(z.object({ form: z.string(), line: z.string() })).default([]),
+      /** この姿の間は新しい技を覚えない（トゲピー: 進化するまで。07 の57章） */
+      fixedForms: z.array(z.string()).default([]),
+      /** この姿の間、この技を使うたびに HP を使う（ピチュー: でんきショックで最大 HP の 1%。10% を切ると撃たない） */
+      formHpCost: z.object({ forms: z.array(z.string()), move: z.string(), pct: z.number().positive(), minHpPct: z.number().min(0).max(100) }).optional(),
+      /** この姿の間、歩いた距離 everyDistance ごとに seconds 秒止まって泣く（動けない。技は出る。トゲピー。07 の66.4） */
+      cry: z.object({ forms: z.array(z.string()), everyDistance: z.number().positive(), seconds: z.number().positive() }).optional(),
       /** false なら進化しない（コダック） */
       evolves: z.boolean().default(true),
       /** タイプを決める（進化した姿も同じ。プリン: ノーマルだけ）。省略時は PokeAPI のタイプ */
@@ -1647,7 +1672,7 @@ export const generatedPokemonEntrySchema = z.object({
   evolvesTo: z.array(
     z.object({
       to: z.string(),
-      trigger: z.enum(['level', 'item', 'trade', 'other']),
+      trigger: z.enum(['level', 'item', 'trade', 'friendship', 'other']),
       level: z.number().int().optional(),
       item: z.string().optional(),
     }),

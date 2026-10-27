@@ -3,7 +3,7 @@ import type { ModifierData } from './schema';
 import { buildTypeChart, resolveMoveLevels, type SimMoveDef } from '../sim/moves';
 import { addModifiers, buildXpTable, emptyModifiers, resolveModifiers, type Modifiers, type SimUpgradeDef } from '../sim/upgrades';
 import type { SimEvolution, SimSpecies } from '../sim/species';
-import type { SimRules } from '../sim/rules';
+import type { SimLineRule, SimRules } from '../sim/rules';
 import {
   combatConfig,
   derivationsConfig,
@@ -11,6 +11,7 @@ import {
   generated,
   itemsConfig,
   networkConfig,
+  playerConfig,
   levelingConfig,
   moveBalanceConfig,
   movesConfig,
@@ -58,7 +59,7 @@ export function buildSimRules(region?: string): SimRules {
       // 選ぶ技の集まりは、全部の技が並んでから番号に直す（下）
       randomPool: [] as number[],
       // ものまね（最初の技から選ぶ）は自分のレベルの割合で、ゆびをふる（固有技から選ぶ）は最大レベルで出す
-      randomScaled: def.randomPool === 'starting',
+      randomScaled: def.randomPool === 'starting' || def.randomPool === 'common',
       chainHopSeconds: def.chainHopSeconds ?? 0,
       chainMinHop: def.chainMinHop ?? 0,
       learners: def.learners ?? null,
@@ -71,6 +72,7 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.perishHits ? { perishHits: def.perishHits } : {}),
       ...(def.followFacing ? { followFacing: def.followFacing } : {}),
       ...(def.coinGain ? { coinGain: def.coinGain } : {}),
+      ...(def.healZone ? { healZone: true } : {}),
       ...(def.delayedBlast ? { delayedBlast: def.delayedBlast } : {}),
       ...(def.lobTarget ? { lobTarget: def.lobTarget } : {}),
       ...(def.scatterJitter ? { scatterJitter: def.scatterJitter } : {}),
@@ -95,10 +97,12 @@ export function buildSimRules(region?: string): SimRules {
   // ものまね: 遊べるポケモンの最初の技、ゆびをふる: 固有技（自分たち ランダムな技 は除く）
   const startingKeys = [...new Set(Object.values(playablesConfig.pokemon).flatMap((p) => p.startingMoves))];
   const uniqueKeys = derivationsConfig.unique.map((d) => d.to);
+  // ふつうの技と派生技（固有技・伝説の技は固有技の一覧にある。持ち物で覚えるだけの技も除く）
+  const commonKeys = Object.keys(movesConfig.moves).filter((k) => !uniqueKeys.includes(k) && !movesConfig.moves[k]!.teachOnly);
   moves.forEach((m, k) => {
     const pool = movesConfig.moves[m.key]?.randomPool;
     if (!pool) return;
-    const keys = pool === 'starting' ? startingKeys : uniqueKeys;
+    const keys = pool === 'starting' ? startingKeys : pool === 'common' ? commonKeys : uniqueKeys;
     moves[k] = { ...m, randomPool: keys.map(moveIndex).filter((i) => i !== -1 && moves[i]!.pattern !== 'metronome') };
   });
   // ためている間に出す技（きあいパンチのマッハパンチ）
@@ -150,6 +154,7 @@ export function buildSimRules(region?: string): SimRules {
       if (e.trigger === 'level' && e.level) evolutions.push({ to, trigger: 'level', level: e.level });
       else if (e.trigger === 'item' && e.item && itemIndex(e.item) !== -1) evolutions.push({ to, trigger: 'item', item: itemIndex(e.item) });
       else if (e.trigger === 'trade' && linkingCord !== -1) evolutions.push({ to, trigger: 'trade', item: linkingCord });
+      else if (e.trigger === 'friendship') evolutions.push({ to, trigger: 'friendship' });
     }
     return { key, types: g.types.map(typeIndex), baseStats: g.baseStats, evolutions };
   });
@@ -165,6 +170,23 @@ export function buildSimRules(region?: string): SimRules {
       species[species.indexOf(s)] = { ...s, types: forced };
       for (const e of generated.pokemon[k]?.evolvesTo ?? []) stack.push(e.to);
     }
+  }
+  // 系統ごとの決まり（ベイビィポケモンの進化で変わる決まり。07 の66.4）
+  const formIndex = (k: string): number => speciesKeys.indexOf(k);
+  const lines: Record<string, SimLineRule> = {};
+  for (const [key, pl] of Object.entries(playablesConfig.pokemon)) {
+    if (pl.hatch) continue;
+    lines[key] = {
+      fixedMoves: pl.fixedMoves,
+      types: pl.types ? pl.types.map(typeIndex) : null,
+      moveTypes: pl.allMoveTypes ? types.names.map((_, i) => i) : (pl.moveTypes ?? []).map(typeIndex),
+      startingMoves: pl.startingMoves.map(moveIndex),
+      formMoves: pl.formMoves.map((f) => ({ form: formIndex(f.form), move: moveIndex(f.move) })),
+      becomes: pl.becomes.map((b) => ({ form: formIndex(b.form), line: b.line })),
+      fixedForms: pl.fixedForms.map(formIndex),
+      hpCost: pl.formHpCost ? { forms: pl.formHpCost.forms.map(formIndex), move: moveIndex(pl.formHpCost.move), pct: pl.formHpCost.pct, minHpPct: pl.formHpCost.minHpPct } : null,
+      cry: pl.cry ? { forms: pl.cry.forms.map(formIndex), everyDistance: pl.cry.everyDistance, seconds: pl.cry.seconds } : null,
+    };
   }
   return {
     enemies: { kinds: enemiesConfig.kinds.map((k) => ({ ...k, types: generated.pokemon[k.species ?? k.id]!.types.map(typeIndex) })) },
@@ -183,6 +205,8 @@ export function buildSimRules(region?: string): SimRules {
     stage: rs.stage,
     obstacles: rs.obstacles,
     netSmoothing: networkConfig.smoothing,
+    friendshipDistance: playerConfig.friendshipDistance,
+    lines,
   };
 }
 

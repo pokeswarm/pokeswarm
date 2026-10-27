@@ -148,4 +148,15 @@ export function regenerate(world: World): void {
   for (const p of world.players) {
     if (p.mods.regenPerSecond > 0) healPlayer(world, p.id, p.mods.regenPerSecond * world.dt);
   }
+  // 回復の円（つきのひかり）: 中にいるプレイヤーを毎秒 pct % 回復する（healPlayer は自分のプレイヤーだけ回復する）
+  const zones = world.healZones;
+  for (let k = zones.length - 1; k >= 0; k--) {
+    const z = zones[k]!;
+    for (const p of world.players) {
+      const dx = p.x - z.x;
+      const dy = p.y - z.y;
+      if (dx * dx + dy * dy <= z.radius * z.radius) healPlayer(world, p.id, (p.maxHp * z.pct * world.dt) / 100);
+    }
+    if (--z.ticks <= 0) zones.splice(k, 1);
+  }
 }

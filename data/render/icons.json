@@ -1621,7 +1621,9 @@
     "synthesis": "heart",
     "solar-beam": "beam",
     "bite": "fang",
-    "crunch": "fang"
+    "crunch": "fang",
+    "metronome-baby": "metronome",
+    "moonlight": "heart"
   },
   "items": {
     "x-attack": {

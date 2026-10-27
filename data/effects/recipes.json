@@ -381,9 +381,10 @@
     "fire-fang": {
       "extends": "fire.base",
       "sprite": {
-        "id": "fang-bite",
+        "id": "fang-front-fire",
         "fit": "front",
-        "size": 1.2
+        "size": 1.25,
+        "directional": true
       }
     },
     "flamethrower": {
@@ -3167,9 +3168,10 @@
     "bite": {
       "extends": "dark.base",
       "sprite": {
-        "id": "dark-fang",
+        "id": "fang-front-dark",
         "fit": "front",
-        "size": 1.25
+        "size": 1.25,
+        "directional": true
       }
     },
     "crunch": {

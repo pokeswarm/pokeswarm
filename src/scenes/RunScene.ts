@@ -1418,7 +1418,8 @@ export class RunScene extends Phaser.Scene {
         }
         if (!visible) continue;
         if (ev.type === 'projectileHit') this.effects.playImpact(this.sim.world.rules.moves[ev.move]!.effect, ev.x, ev.y);
-        if (ev.type === 'evolved') this.onEvolved(ev.playerId, ev.from, ev.to);
+        if (ev.type === 'evolved') this.onEvolved(ev.playerId, ev.from, ev.to, ev.asked ?? false);
+        if (ev.type === 'evolveAsk' && ev.playerId === this.localId) this.onEvolveAsk(ev.from, ev.to);
       }
       if (visible) {
         this.onSimEvents();
@@ -1481,7 +1482,20 @@ export class RunScene extends Phaser.Scene {
   }
 
   /** 進化したら、光の演出を出して見た目を差し替える（スプライトは途中で読み込む） */
-  private onEvolved(playerId: PlayerId, fromSpecies: number, species: number): void {
+  /**
+   * 時間帯のなつきの進化（イーブイ）: 「おや……？」の演出を見せ、← → を交互に押せばキャンセル。答えをシミュレーションへ送る（07 の81章）
+   */
+  private onEvolveAsk(fromSpecies: number, species: number): void {
+    const key = (n: number): string => this.sim.world.rules.species[n]?.key ?? '';
+    const sprite = (k: string): string => (this.shinyPlayers.has(this.localId) ? shinySpriteKey(k) : k);
+    const name = (k: string): string => localName(generated.pokemon[k]?.names, getLocale(), k);
+    this.evolutionCutscene.play(sprite(key(fromSpecies)), sprite(key(species)), name(key(fromSpecies)), name(key(species)), this.coop ? 0.3 : 0.65, {
+      presses: uiConfig.evolutionCancelPresses,
+      onEnd: (accept) => this.uiCommands.push({ type: 'answerEvolve', playerId: this.localId, accept }),
+    });
+  }
+
+  private onEvolved(playerId: PlayerId, fromSpecies: number, species: number, asked: boolean): void {
     const view = this.playerViews.get(playerId);
     const p = this.sim.world.players.find((x) => x.id === playerId);
     if (!view || !p) return;
@@ -1490,7 +1504,7 @@ export class RunScene extends Phaser.Scene {
     if (!key) return;
     // 自分の進化: 進化前・進化後の姿が交互に点滅する演出（作者の決定 2026年10月25日）。協力プレイは止めないので薄く重ねる
     const fromKey = this.sim.world.rules.species[fromSpecies]?.key;
-    if (playerId === this.localId && fromKey) {
+    if (playerId === this.localId && fromKey && !asked) {
       const sprite = (k: string): string => (this.shinyPlayers.has(playerId) ? shinySpriteKey(k) : k);
       const name = (k: string): string => localName(generated.pokemon[k]?.names, getLocale(), k);
       this.evolutionCutscene.play(sprite(fromKey), sprite(key), name(fromKey), name(key), this.coop ? 0.3 : 0.65);

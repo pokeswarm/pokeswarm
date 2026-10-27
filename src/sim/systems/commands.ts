@@ -8,6 +8,7 @@ import { addHazard, endRun } from './stage';
 import { applyRevive } from './health';
 import { applyItem, confirmItem, spawnItem } from './items';
 import { addBox, registerBoxHit, removeBox } from './boxes';
+import { answerEvolution, followRemoteSpecies } from './evolution';
 
 export function applyCommands(world: World, commands: readonly InputCommand[]): void {
   const e = world.enemies;
@@ -18,6 +19,11 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         if (!p || p.remote) break;
         p.inputX = cmd.dx;
         p.inputY = cmd.dy;
+        break;
+      }
+      case 'answerEvolve': {
+        const p = findPlayer(world, cmd.playerId);
+        if (p && !p.remote) answerEvolution(world, p, cmd.accept);
         break;
       }
       case 'remotePlayer': {
@@ -32,6 +38,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         p.inputY = cmd.inputY;
         if (cmd.maxHp !== undefined) p.maxHp = cmd.maxHp;
         if (cmd.walked !== undefined) p.walked = Math.max(p.walked, cmd.walked);
+        if (cmd.species !== undefined) followRemoteSpecies(world, p, cmd.species);
         // 復活させた直後は、本人から「倒れている」がまだ届くので無視する
         if (!world.reviveGrace.has(p.id)) {
           if (cmd.hp !== undefined) p.hp = cmd.hp;

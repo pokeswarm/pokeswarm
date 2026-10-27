@@ -19,13 +19,18 @@ export class EvolutionCutscene {
   private root: HTMLDivElement | null = null;
   private endAt = 0;
   private timers: number[] = [];
+  private cleanups: (() => void)[] = [];
 
   /** 演出中か（ソロはこの間ゲームを止める） */
   get active(): boolean {
     return this.root !== null && performance.now() < this.endAt;
   }
 
-  play(fromSprite: string, toSprite: string, fromName: string, toName: string, dim: number): void {
+  /**
+   * cancel があれば、白い点滅の間に ← と → を交互に cancel.presses 回押すとキャンセルできる（イーブイ。07 の81章）。
+   * 終わり（進化する・キャンセル）を cancel.onEnd で知らせる
+   */
+  play(fromSprite: string, toSprite: string, fromName: string, toName: string, dim: number, cancel?: { presses: number; onEnd(accepted: boolean): void }): void {
     this.destroy();
     const total = BLINK_SECONDS + REVEAL_SECONDS + FADE_SECONDS;
     this.endAt = performance.now() + total * 1000;
@@ -44,10 +49,26 @@ export class EvolutionCutscene {
     const text = document.createElement('div');
     text.style.cssText = 'position:relative;color:#f8f8f8;font-size:24px;text-shadow:0 2px 0 #000,0 0 12px #000;text-align:center;min-height:1.6em;padding:0 16px';
     text.textContent = t('evolution.what', { name: fromName });
+    const hint = document.createElement('div');
+    hint.style.cssText = 'position:relative;color:#cfd8dc;font-size:14px;text-shadow:0 2px 0 #000;min-height:1.2em';
+    hint.textContent = cancel ? t('evolution.cancelHint') : '';
     const flash = document.createElement('div');
     flash.style.cssText = 'position:absolute;inset:0;background:#fff;opacity:0;transition:opacity 0.5s';
-    root.append(rays, stage, text, flash);
+    root.append(rays, stage, text, hint, flash);
     ensureKeyframes();
+    // キャンセル: ← と → を交互に押した回数
+    let presses = 0;
+    let last = '';
+    let cancelled = false;
+    if (cancel) {
+      const onKey = (ev: KeyboardEvent): void => {
+        if ((ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight') || ev.key === last || cancelled) return;
+        last = ev.key;
+        presses++;
+      };
+      window.addEventListener('keydown', onKey);
+      this.cleanups.push(() => window.removeEventListener('keydown', onKey));
+    }
     document.body.append(root);
     this.timers.push(window.setTimeout(() => (root.style.opacity = '1'), 20));
 
@@ -67,6 +88,10 @@ export class EvolutionCutscene {
       const blink = (): void => {
         if (this.root !== root) return;
         const k = Math.min(1, (performance.now() - start) / (BLINK_SECONDS * 1000));
+        if (cancel && presses >= cancel.presses) {
+          stop();
+          return;
+        }
         if (k >= 1) {
           reveal();
           return;
@@ -78,8 +103,24 @@ export class EvolutionCutscene {
         rays.style.opacity = String(0.3 + 0.7 * k);
         this.timers.push(window.setTimeout(blink, BLINK_START_MS + (BLINK_END_MS - BLINK_START_MS) * Math.sqrt(k)));
       };
+      // キャンセル: 元の姿に戻って「へんかが とまった！」
+      const stop = (): void => {
+        cancelled = true;
+        img.src = from.url;
+        fit(from);
+        img.style.transform = 'scale(1)';
+        rays.style.opacity = '0';
+        hint.textContent = '';
+        text.textContent = t('evolution.cancelled', { name: fromName });
+        cancel?.onEnd(false);
+        this.endAt = performance.now() + (REVEAL_SECONDS + FADE_SECONDS) * 1000;
+        this.timers.push(window.setTimeout(() => (root.style.opacity = '0'), REVEAL_SECONDS * 1000));
+        this.timers.push(window.setTimeout(() => this.destroy(), (REVEAL_SECONDS + FADE_SECONDS) * 1000));
+      };
       // 後半: 白く光って、進化後の姿と文
       const reveal = (): void => {
+        hint.textContent = '';
+        cancel?.onEnd(true);
         flash.style.transition = 'none';
         flash.style.opacity = '1';
         img.src = to.url;
@@ -173,6 +214,7 @@ export class EvolutionCutscene {
   destroy(): void {
     for (const id of this.timers) clearTimeout(id);
     this.timers = [];
+    for (const f of this.cleanups.splice(0)) f();
     this.root?.remove();
     this.root = null;
     this.endAt = 0;

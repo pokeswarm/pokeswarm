@@ -1070,11 +1070,13 @@
       },
       {
         "to": "espeon",
-        "trigger": "other"
+        "trigger": "friendship",
+        "time": "day"
       },
       {
         "to": "umbreon",
-        "trigger": "other"
+        "trigger": "friendship",
+        "time": "night"
       },
       {
         "to": "leafeon",
@@ -1143,6 +1145,32 @@
     },
     "preEvolutions": [
       "voltorb"
+    ],
+    "evolvesTo": []
+  },
+  "espeon": {
+    "dex": 196,
+    "names": {
+      "ja": "エーフィ",
+      "en": "Espeon",
+      "fr": "Mentali",
+      "de": "Psiana",
+      "es": "Espeon",
+      "it": "Espeon"
+    },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 65,
+      "defense": 60,
+      "specialAttack": 130,
+      "specialDefense": 95,
+      "speed": 110
+    },
+    "preEvolutions": [
+      "eevee"
     ],
     "evolvesTo": []
   },
@@ -1906,6 +1934,37 @@
       "houndour"
     ],
     "evolvesTo": []
+  },
+  "houndour": {
+    "dex": 228,
+    "names": {
+      "ja": "デルビル",
+      "en": "Houndour",
+      "fr": "Malosse",
+      "de": "Hunduster",
+      "es": "Houndour",
+      "it": "Houndour"
+    },
+    "types": [
+      "dark",
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 60,
+      "defense": 30,
+      "specialAttack": 80,
+      "specialDefense": 50,
+      "speed": 65
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "houndoom",
+        "trigger": "level",
+        "level": 24
+      }
+    ]
   },
   "igglybuff": {
     "dex": 174,

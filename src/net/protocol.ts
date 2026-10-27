@@ -10,7 +10,7 @@ export type NetMessage =
    * プレイヤーの状態: 位置・向き・入力・HP・最大HP・倒れているか（1/0）。i はプレイヤーの番号。
    * ゲストの分はホストがほかのゲストへ中継する。k は送り手の通し番号（順番を待たないチャンネルで、古いものが後から届いたら捨てる）
    */
-  | { t: 'p'; i: number; x: number; y: number; fx: number; fy: number; ix: number; iy: number; h: number; m: number; dn: number; k?: number; w?: number }
+  | { t: 'p'; i: number; x: number; y: number; fx: number; fy: number; ix: number; iy: number; h: number; m: number; dn: number; k?: number; w?: number; sp?: number }
   /** レベルアップの選択の状態（ホスト→ゲスト。変わったときだけ） */
   | { t: 'lu'; s: LevelUpSnapshot | null; r: [number, number][] }
   /** ホストが確定した選択（ホスト→ゲスト） */

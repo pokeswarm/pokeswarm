@@ -1163,10 +1163,17 @@ function palm(): SpriteOut {
 }
 
 /** のしかかり（白い砂ぼこりの衝撃波）・ギガインパクト（橙と白のエネルギーの衝撃波）: 輪に沿って並べる帯 */
-function shockRing(kind: 'dust' | 'giga'): SpriteOut {
+function shockRing(kind: 'dust' | 'giga' | 'dark' | 'snarl'): SpriteOut {
   const W = 10;
   const H = 8;
-  const palette = kind === 'dust' ? ['#4e4e4e', '#9e9e9e', '#d7ccc8', '#f5f5f5', '#ffffff'] : ['#3b1400', '#e65100', '#ff9800', '#ffe082', '#ffffff'];
+  // あくのはどう（紫がかった黒い輪）・バークアウト（黒い衝撃波。白い光の粒が少し）
+  const palettes = {
+    dust: ['#4e4e4e', '#9e9e9e', '#d7ccc8', '#f5f5f5', '#ffffff'],
+    giga: ['#3b1400', '#e65100', '#ff9800', '#ffe082', '#ffffff'],
+    dark: ['#0d0614', '#311b47', '#5e35b1', '#9575cd', '#ede7f6'],
+    snarl: ['#000000', '#1a1a1a', '#3a2f3f', '#6d5f73', '#ffffff'],
+  };
+  const palette = palettes[kind];
   const frames: Grid[] = [];
   for (let f = 0; f < 3; f++) {
     frames.push(
@@ -1174,7 +1181,7 @@ function shockRing(kind: 'dust' | 'giga'): SpriteOut {
         // 外側（下）ほど明るく、内側（上）へもくもく薄れる。並べてつながるよう、ふちは周期 W
         const top = 2 + Math.sin(((x + f * 3) / W) * Math.PI * 2) * 1.2 - 0.5;
         if (y < top) return -1;
-        if (kind === 'giga' && hash(Math.floor(x * 2), Math.floor(y * 2), 700 + f) < 0.12) return 4;
+        if ((kind === 'giga' || kind === 'snarl') && hash(Math.floor(x * 2), Math.floor(y * 2), 700 + f) < 0.12) return 4;
         const k = (y - top) / (H - top);
         return k > 0.75 ? 4 : k > 0.45 ? 3 : k > 0.2 ? 2 : 1;
       }),
@@ -2631,6 +2638,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     palm: () => palm(),
     'dust-ring': () => shockRing('dust'),
     'giga-ring': () => shockRing('giga'),
+    'dark-ring': () => shockRing('dark'),
+    'snarl-ring': () => shockRing('snarl'),
     claw: () => claw('small'),
     'claw-big': () => claw('big'),
     'fury-slash': () => furySlash(),

@@ -88,6 +88,7 @@ export class SyncSession {
         dn: local.down ? 1 : 0,
         // 歩いた距離（なつきの進化は本人の歩いた距離で決める）
         w: Math.floor(local.walked),
+        sp: local.species,
         k: ++this.sendSeq,
       });
     }
@@ -271,6 +272,7 @@ export class SyncSession {
             maxHp: m.m,
             down: m.dn === 1,
             ...(m.w !== undefined && { walked: m.w }),
+            ...(m.sp !== undefined && { species: m.sp }),
           });
           // ホスト: ゲストの状態をほかのゲストへ中継する（なりすましを防ぐため、送り手の分だけ）
           if (host && m.i === from) relay.push(m);

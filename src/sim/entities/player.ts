@@ -63,6 +63,9 @@ export interface Player {
   zoneSlowPct?: number;
   /** ランで歩いた距離（ワールドの単位。なつきの進化。07 の66.2）。別のブラウザのプレイヤーは本人から届いた値 */
   walked: number;
+  /** 時間帯のなつきの進化（イーブイ）で、本人に聞いている進化先の姿（07 の81章）と、キャンセルした区間（その区間の間は聞かない） */
+  evolveAsk?: number;
+  evolveDeclinedSection?: number;
   /** 泣くまでの歩いた距離（トゲピー）と、泣いて止まっている残り（更新回数） */
   cryWalked?: number;
   cryTicks?: number;

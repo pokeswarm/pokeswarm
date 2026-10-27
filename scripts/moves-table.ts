@@ -58,6 +58,7 @@ const STATUS: Record<string, string> = {
   paralysis: 'まひ',
   freeze: 'こおり',
   defenseDown: 'ぼうぎょダウン',
+  attackDown: 'こうげきダウン',
   sleep: 'ねむり',
   flinch: 'ひるみ',
   leech: 'やどりぎ',

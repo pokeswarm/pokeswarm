@@ -194,6 +194,16 @@ export interface EvolvedEvent {
   readonly playerId: PlayerId;
   readonly from: number;
   readonly to: number;
+  /** 聞いてから進化した（イーブイ。演出は聞いたときに見せたので、もう出さない） */
+  readonly asked?: boolean;
+}
+
+/** 時間帯のなつきの進化（イーブイ）で、進化してよいか本人に聞く（「おや……？」の演出。← → を交互に押すとキャンセル。07 の81章） */
+export interface EvolveAskEvent {
+  readonly type: 'evolveAsk';
+  readonly playerId: PlayerId;
+  readonly from: number;
+  readonly to: number;
 }
 
 /** 中ボス・ボスが出た */
@@ -328,6 +338,7 @@ export type SimEvent =
   | MoveTaughtEvent
   | RestChangedEvent
   | CriedEvent
+  | EvolveAskEvent
   | BoxSpawnedEvent
   | PlayerFrozenEvent
   | BoxRemovedEvent

@@ -50,6 +50,8 @@ export interface SimRules {
   obstacles: ObstacleRules;
   /** 遊べるポケモンの系統ごとの決まり（キーは playables.json のキー） */
   lines?: Readonly<Record<string, SimLineRule>>;
+  /** 区間ごとの夜（地方のステージ。ジョウト: 2・5・6b・7）。夜のある地方だけ、時間帯のなつきの進化（エーフィ・ブラッキー）をする */
+  nightSections?: readonly boolean[];
   /** なつきの進化に要る、ランで歩いた距離（data/game/player.json） */
   friendshipDistance: number;
   /** 協力プレイで届いた位置をなめらかに見せる */

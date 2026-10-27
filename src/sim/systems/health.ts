@@ -1,3 +1,4 @@
+import { contactDamageMultiplier } from './status';
 import { activeLegendField } from './stage';
 import type { PlayerId } from '../commands';
 import type { Player } from '../entities/player';
@@ -22,7 +23,7 @@ export function contactDamage(world: World): void {
     const dx = e.x[i]! - me.x;
     const dy = e.y[i]! - me.y;
     const r = me.radius + e.radius[i]!;
-    if (dx * dx + dy * dy <= r * r) worst = Math.max(worst, e.damage[i]!);
+    if (dx * dx + dy * dy <= r * r) worst = Math.max(worst, e.damage[i]! * contactDamageMultiplier(world, i));
   }
   if (worst > 0) hurtPlayer(world, me, worst);
 }

@@ -3342,6 +3342,51 @@
         "fit": "circle",
         "size": 1.3
       }
+    },
+    "dark-pulse": {
+      "extends": "dark.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.3
+      },
+      "sprite": {
+        "id": "dark-ring",
+        "fit": "ring",
+        "size": 1
+      }
+    },
+    "snarl": {
+      "extends": "dark.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.3
+      },
+      "screenFlash": {
+        "color": "#1a0f24",
+        "alpha": 0.25,
+        "durationMs": 200
+      },
+      "sprite": {
+        "id": "snarl-ring",
+        "fit": "ring",
+        "size": 1
+      }
+    },
+    "morning-sun": {
+      "extends": "grass.base",
+      "burstFlash": {
+        "colors": [
+          "#fff59d",
+          "#ffe0b2"
+        ],
+        "periodMs": 200,
+        "alpha": 0.35
+      },
+      "sprite": {
+        "id": "sun-rise",
+        "fit": "circle",
+        "size": 1.3
+      }
     }
   }
 }

@@ -123,6 +123,8 @@ function evolutionsOf(chain: EvolutionNode, species: string): GeneratedPokemon['
     if (d.trigger.name === 'trade') return { to: child.species.name, trigger: 'trade' as const };
     // なつき（時間帯の条件が無いもの。ピチュー・クロバットなど。ゲームでは「たくさん歩く」。07 の66.2）
     if (d.trigger.name === 'level-up' && d.min_happiness && !d.time_of_day) return { to: child.species.name, trigger: 'friendship' as const };
+    // なつき ＋ 時間帯（エーフィ = 昼・ブラッキー = 夜。07 の59章・81章）
+    if (d.trigger.name === 'level-up' && d.min_happiness && (d.time_of_day === 'day' || d.time_of_day === 'night')) return { to: child.species.name, trigger: 'friendship' as const, time: d.time_of_day };
     return { to: child.species.name, trigger: 'other' as const };
   });
 }

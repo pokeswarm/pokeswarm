@@ -34,6 +34,7 @@
     { "from": "synthesis", "item": "metronome", "to": "solar-beam", "line": "chikorita" },
     { "from": "scratch", "item": "mystic-water", "to": "bite", "line": "totodile" },
     { "from": "bite", "item": "x-attack", "to": "crunch", "line": "totodile" },
+    { "from": "dark-pulse", "item": "light-clay", "to": "snarl", "line": "houndour" },
     { "from": "quick-attack", "item": "x-speed", "to": "extreme-speed", "line": "growlithe" },
     { "from": "hydro-pump", "item": "water-stone", "to": "hydro-cannon", "line": "squirtle" },
     { "from": "swift", "item": "metronome", "to": "rapid-spin", "line": "staryu" },

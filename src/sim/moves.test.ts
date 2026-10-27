@@ -197,7 +197,7 @@ describe('技の出し方（区切り2で追加）', () => {
 
   it('ねむりはダメージを受けると治る（継続ダメージでは治らない）', () => {
     const r = testRules({ move: { cooldownSeconds: 100, power: 1 } });
-    r.status.kinds.push({ id: 'sleep', damagePerSecond: 0, speedMultiplier: 0, damageTakenMultiplier: 1, breaksOnDamage: true, healsAttacker: false, color: '#000000' });
+    r.status.kinds.push({ id: 'sleep', damagePerSecond: 0, speedMultiplier: 0, damageTakenMultiplier: 1, contactDamageMultiplier: 1, breaksOnDamage: true, healsAttacker: false, color: '#000000' });
     const sim = new Simulation({ tickRate: 30, seed: 1, rules: r });
     sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150 });
     const e = sim.world.enemies;

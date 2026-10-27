@@ -170,7 +170,9 @@
     "togetic",
     "scizor",
     "porygon2",
-    "slowking"
+    "slowking",
+    "espeon",
+    "houndour"
   ],
   "moves": [
     "ember",
@@ -292,7 +294,10 @@
     "moonlight",
     "iron-tail",
     "bullet-punch",
-    "recover"
+    "recover",
+    "morning-sun",
+    "snarl",
+    "dark-pulse"
   ],
   "items": [
     "x-attack",

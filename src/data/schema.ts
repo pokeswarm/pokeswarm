@@ -48,6 +48,8 @@ export type PlaceholderRenderConfig = z.infer<typeof placeholderRenderSchema>;
  * 原作をまねた白い窓・黒い窓、画面上部の経験値のバー・経過時間・コイン
  */
 export const uiConfigSchema = z.object({
+  /** イーブイの進化をキャンセルするのに、演出の間に ← と → を交互に押す回数（07 の81章） */
+  evolutionCancelPresses: z.number().int().positive().default(6),
   /** 画面の高さがこれより低いと、つめた表示にする（横向きのスマホ。作者の決定 2026年10月22日） */
   compactHeight: z.number().positive(),
   /**
@@ -1561,6 +1563,8 @@ export const statusKindSchema = z.object({
   damagePerSecond: z.number().nonnegative(),
   speedMultiplier: z.number().min(0),
   damageTakenMultiplier: z.number().positive(),
+  /** 触れたときのダメージの倍率（こうげきダウン。バークアウト。07 の81章） */
+  contactDamageMultiplier: z.number().positive().default(1),
   /** ダメージを受けると治る（ねむり） */
   breaksOnDamage: z.boolean().default(false),
   /** 継続ダメージの分だけ、付けたプレイヤーが回復する（やどりぎ。HP は区切り3で作るので、今は効果なし） */
@@ -1673,6 +1677,8 @@ export const generatedPokemonEntrySchema = z.object({
     z.object({
       to: z.string(),
       trigger: z.enum(['level', 'item', 'trade', 'friendship', 'other']),
+      /** なつきの進化の時間帯（エーフィ = day・ブラッキー = night）。無ければいつでも */
+      time: z.enum(['day', 'night']).optional(),
       level: z.number().int().optional(),
       item: z.string().optional(),
     }),

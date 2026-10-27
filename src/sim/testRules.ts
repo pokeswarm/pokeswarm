@@ -116,9 +116,9 @@ export function testRules(
     },
     status: {
       kinds: [
-        { id: 'burn', damagePerSecond: 6, speedMultiplier: 1, damageTakenMultiplier: 1, breaksOnDamage: false, healsAttacker: false, color: '#ff0000' },
-        { id: 'freeze', damagePerSecond: 0, speedMultiplier: 0, damageTakenMultiplier: 1, breaksOnDamage: false, healsAttacker: false, color: '#00ffff' },
-        { id: 'defenseDown', damagePerSecond: 0, speedMultiplier: 1, damageTakenMultiplier: 2, breaksOnDamage: false, healsAttacker: false, color: '#888888' },
+        { id: 'burn', damagePerSecond: 6, speedMultiplier: 1, damageTakenMultiplier: 1, contactDamageMultiplier: 1, breaksOnDamage: false, healsAttacker: false, color: '#ff0000' },
+        { id: 'freeze', damagePerSecond: 0, speedMultiplier: 0, damageTakenMultiplier: 1, contactDamageMultiplier: 1, breaksOnDamage: false, healsAttacker: false, color: '#00ffff' },
+        { id: 'defenseDown', damagePerSecond: 0, speedMultiplier: 1, damageTakenMultiplier: 2, contactDamageMultiplier: 1, breaksOnDamage: false, healsAttacker: false, color: '#888888' },
       ],
     },
     pickups: {

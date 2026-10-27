@@ -1,5 +1,6 @@
 {
   "compactHeight": 520,
+  "evolutionCancelPresses": 6,
   "compactHud": { "iconScale": 2, "cellWidth": 38, "expBarHeight": 14, "timerSize": 16 },
   "font": {
     "family": "'PixelLatin', 'PixelJP', monospace",

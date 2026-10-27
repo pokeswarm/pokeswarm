@@ -765,6 +765,51 @@
       "reward": {
         "pokemon": "gengar"
       }
+    },
+    {
+      "id": "johto-first-boss",
+      "region": "johto",
+      "condition": {
+        "stat": "bossKills",
+        "atLeast": 1
+      },
+      "reward": {
+        "item": "light-clay"
+      }
+    },
+    {
+      "id": "johto-unlock-eevee",
+      "region": "johto",
+      "condition": {
+        "all": [
+          {
+            "stat": "reached.cyndaquil",
+            "atLeast": 10
+          },
+          {
+            "stat": "reached.chikorita",
+            "atLeast": 10
+          },
+          {
+            "stat": "reached.totodile",
+            "atLeast": 10
+          }
+        ]
+      },
+      "reward": {
+        "pokemon": "eevee"
+      }
+    },
+    {
+      "id": "johto-unlock-houndour",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.houndoom",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "houndour"
+      }
     }
   ]
 }

@@ -11,6 +11,16 @@ export function speedMultiplier(world: World, i: number): number {
   return m;
 }
 
+/** 状態異常による、触れたときのダメージの倍率（こうげきダウン。かかっているものを掛け合わせる） */
+export function contactDamageMultiplier(world: World, i: number): number {
+  const e = world.enemies;
+  let m = 1;
+  for (let s = 0; s < world.statusKinds.length; s++) {
+    if (e.hasStatus(i, s)) m *= world.statusKinds[s]!.contactDamageMultiplier;
+  }
+  return m;
+}
+
 /** 状態異常による受けるダメージの倍率（かかっているものを掛け合わせる） */
 export function damageTakenMultiplier(world: World, i: number): number {
   const e = world.enemies;

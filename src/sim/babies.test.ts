@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildSimRules, moveIndexOf, playableLoadout } from '../data/simRules';
 import { coopHatchSeed, hatchedPokemon } from '../meta/hatch';
 import { Simulation } from './simulation';
-import { checkEvolution } from './systems/evolution';
+import { answerEvolution, checkEvolution } from './systems/evolution';
 import { makeOffers } from './systems/leveling';
 import { regenerate } from './systems/health';
 
@@ -127,5 +127,50 @@ describe('カントーにもいるポケモンの、ジョウトで進化した�
       expect(s.keys()).toContain(move);
       expect(s.p.items).toEqual([]);
     }
+  });
+});
+
+describe('イーブイの昼と夜の進化（07 の81章）', () => {
+  it('なつきが十分で、夜の区間ならブラッキー・昼ならエーフィに進化してよいか聞く。答えで進化し、技に空きがあれば覚える', () => {
+    const s = setup('eevee');
+    s.p.walked = 30000;
+    s.w.section = 2;
+    checkEvolution(s.w, s.p);
+    expect(s.p.species).toBe(s.species('eevee'));
+    expect(s.p.evolveAsk).toBe(s.species('umbreon'));
+    expect(s.w.events.some((e) => e.type === 'evolveAsk')).toBe(true);
+    answerEvolution(s.w, s.p, true);
+    expect(s.p.species).toBe(s.species('umbreon'));
+    expect(s.keys()).toEqual(['tackle', 'snarl', 'moonlight']);
+
+    const d = setup('eevee');
+    d.p.walked = 30000;
+    checkEvolution(d.w, d.p);
+    answerEvolution(d.w, d.p, true);
+    expect(d.p.species).toBe(d.species('espeon'));
+    expect(d.keys()).toEqual(['tackle', 'psychic', 'morning-sun']);
+  });
+
+  it('キャンセルすると、その区間の間は聞かない。次の区間でまた聞く', () => {
+    const s = setup('eevee');
+    s.p.walked = 30000;
+    checkEvolution(s.w, s.p);
+    answerEvolution(s.w, s.p, false);
+    checkEvolution(s.w, s.p);
+    expect(s.p.evolveAsk).toBeUndefined();
+    s.w.section = 2;
+    checkEvolution(s.w, s.p);
+    expect(s.p.evolveAsk).toBe(s.species('umbreon'));
+  });
+
+  it('カントー（昼夜が無い）では、なつきで エーフィ・ブラッキーにならない', () => {
+    const rules = buildSimRules();
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    const lo = playableLoadout(rules, 'eevee');
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 180, types: lo.types, moves: lo.moves, line: lo.line, species: lo.species });
+    p.walked = 30000;
+    checkEvolution(sim.world, p);
+    expect(p.evolveAsk).toBeUndefined();
+    expect(p.species).toBe(lo.species);
   });
 });

@@ -1626,7 +1626,10 @@
     "moonlight": "heart",
     "iron-tail": "dragon",
     "bullet-punch": "fist",
-    "recover": "heart"
+    "recover": "heart",
+    "dark-pulse": "orb",
+    "snarl": "skull",
+    "morning-sun": "heart"
   },
   "items": {
     "x-attack": {

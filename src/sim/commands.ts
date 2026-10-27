@@ -34,6 +34,8 @@ export interface RemotePlayerCommand {
   readonly down?: boolean;
   /** 歩いた距離（なつきの進化） */
   readonly walked?: number;
+  /** 今の姿（時間帯のなつきの進化は本人が決めるので、ほかのブラウザは届いた姿に合わせる） */
+  readonly species?: number;
 }
 
 /** ゲスト: ホストが決めた雑魚敵の出現 */
@@ -283,8 +285,16 @@ export interface CorrectEnemiesCommand {
   readonly tick?: number;
 }
 
+/** 時間帯のなつきの進化（イーブイ）への本人の答え（07 の81章） */
+export interface AnswerEvolveCommand {
+  readonly type: 'answerEvolve';
+  readonly playerId: PlayerId;
+  readonly accept: boolean;
+}
+
 export type InputCommand =
   | MoveCommand
+  | AnswerEvolveCommand
   | RemotePlayerCommand
   | SpawnEnemyCommand
   | DamageEnemyCommand

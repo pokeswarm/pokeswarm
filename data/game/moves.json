@@ -5993,6 +5993,161 @@
         }
       ],
       "teachOnly": true
+    },
+    "dark-pulse": {
+      "pattern": "nova",
+      "effect": "dark-pulse",
+      "sweep": 0.3,
+      "base": {
+        "intervalSeconds": 0.1,
+        "lifestealPct": 0,
+        "spreadDegrees": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.2,
+        "statusSeconds": 1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "speed": 0,
+        "count": 1,
+        "power": 11.3,
+        "cooldownSeconds": 2.2,
+        "size": 18,
+        "range": 150,
+        "durationSeconds": 0.5,
+        "knockback": 160,
+        "statusId": "flinch"
+      },
+      "levels": [
+        {
+          "range": 15,
+          "power": 3.5
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 3.1
+        },
+        {
+          "range": 15,
+          "power": 3.1
+        },
+        {
+          "statusChance": 0.1,
+          "power": 3.9
+        },
+        {
+          "range": 15,
+          "power": 3.9
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 1.5
+        },
+        {
+          "range": 20,
+          "power": 3.7
+        }
+      ]
+    },
+    "snarl": {
+      "pattern": "nova",
+      "effect": "snarl",
+      "sweep": 0.45,
+      "base": {
+        "intervalSeconds": 0.1,
+        "lifestealPct": 0,
+        "spreadDegrees": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 1,
+        "statusSeconds": 4,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "speed": 0,
+        "count": 1,
+        "power": 117.3,
+        "cooldownSeconds": 1.9,
+        "size": 22,
+        "range": 220,
+        "durationSeconds": 0.5,
+        "knockback": 220,
+        "statusId": "attackDown"
+      },
+      "levels": [
+        {
+          "range": 15,
+          "power": 19.6
+        },
+        {
+          "statusSeconds": 0.5,
+          "power": 19.7
+        },
+        {
+          "range": 15,
+          "power": 19.7
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": -1
+        },
+        {
+          "range": 15,
+          "power": 17.6
+        },
+        {
+          "statusSeconds": 0.5,
+          "power": 17.6
+        },
+        {
+          "range": 20,
+          "power": 17.6
+        }
+      ]
+    },
+    "morning-sun": {
+      "pattern": "heal",
+      "effect": "morning-sun",
+      "base": {
+        "intervalSeconds": 0.1,
+        "lifestealPct": 0,
+        "spreadDegrees": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "power": 0,
+        "cooldownSeconds": 3.6,
+        "count": 1,
+        "speed": 0,
+        "size": 44,
+        "range": 0,
+        "durationSeconds": 0.6,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "healPct": 5
+      },
+      "levels": [
+        {
+          "healPct": 1
+        },
+        {
+          "cooldownSeconds": -0.3
+        },
+        {
+          "healPct": 1
+        },
+        {
+          "cooldownSeconds": -0.3
+        },
+        {
+          "healPct": 1
+        },
+        {
+          "healPct": 1
+        },
+        {
+          "cooldownSeconds": -0.4
+        }
+      ],
+      "teachOnly": true
     }
   }
 }

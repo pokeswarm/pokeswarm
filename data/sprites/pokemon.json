@@ -1073,7 +1073,8 @@
       "key": "umbreon",
       "dex": 197,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1158,7 +1159,8 @@
       "key": "houndoom",
       "dex": 229,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1260,6 +1262,14 @@
     {
       "key": "slowking",
       "dex": 199
+    },
+    {
+      "key": "espeon",
+      "dex": 196
+    },
+    {
+      "key": "houndour",
+      "dex": 228
     }
   ]
 }

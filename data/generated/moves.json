@@ -215,6 +215,18 @@
     "type": "dark",
     "damageClass": "physical"
   },
+  "dark-pulse": {
+    "names": {
+      "ja": "あくのはどう",
+      "en": "Dark Pulse",
+      "fr": "Vibrobscur",
+      "de": "Finsteraura",
+      "es": "Pulso Umbrío",
+      "it": "Neropulsar"
+    },
+    "type": "dark",
+    "damageClass": "special"
+  },
   "double-kick": {
     "names": {
       "ja": "にどげり",
@@ -755,6 +767,18 @@
     "type": "fairy",
     "damageClass": "status"
   },
+  "morning-sun": {
+    "names": {
+      "ja": "あさのひざし",
+      "en": "Morning Sun",
+      "fr": "Aurore",
+      "de": "Morgengrauen",
+      "es": "Sol Matinal",
+      "it": "Mattindoro"
+    },
+    "type": "normal",
+    "damageClass": "status"
+  },
   "night-shade": {
     "names": {
       "ja": "ナイトヘッド",
@@ -1197,6 +1221,18 @@
       "it": "Smog"
     },
     "type": "poison",
+    "damageClass": "special"
+  },
+  "snarl": {
+    "names": {
+      "ja": "バークアウト",
+      "en": "Snarl",
+      "fr": "Aboiement",
+      "de": "Standpauke",
+      "es": "Alarido",
+      "it": "Urlorabbia"
+    },
+    "type": "dark",
     "damageClass": "special"
   },
   "solar-beam": {

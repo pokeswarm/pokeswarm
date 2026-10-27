@@ -154,7 +154,7 @@ export function buildSimRules(region?: string): SimRules {
       if (e.trigger === 'level' && e.level) evolutions.push({ to, trigger: 'level', level: e.level });
       else if (e.trigger === 'item' && e.item && itemIndex(e.item) !== -1) evolutions.push({ to, trigger: 'item', item: itemIndex(e.item) });
       else if (e.trigger === 'trade' && linkingCord !== -1) evolutions.push({ to, trigger: 'trade', item: linkingCord });
-      else if (e.trigger === 'friendship') evolutions.push({ to, trigger: 'friendship' });
+      else if (e.trigger === 'friendship') evolutions.push({ to, trigger: 'friendship', ...(e.time && { time: e.time }) });
     }
     return { key, types: g.types.map(typeIndex), baseStats: g.baseStats, evolutions };
   });
@@ -206,6 +206,7 @@ export function buildSimRules(region?: string): SimRules {
     obstacles: rs.obstacles,
     netSmoothing: networkConfig.smoothing,
     friendshipDistance: playerConfig.friendshipDistance,
+    nightSections: rs.night,
     lines,
   };
 }

@@ -16,18 +16,52 @@ export function checkEvolution(world: World, p: Player): void {
     if (!sp) return;
     const evo = sp.evolutions.find((e) => {
       if (e.trigger === 'level') return world.level >= e.level;
-      if (e.trigger === 'friendship') return p.walked >= world.rules.friendshipDistance;
+      if (e.trigger === 'friendship') return p.walked >= world.rules.friendshipDistance && (!e.time || e.time === timeOfDay(world));
       return p.items.some((it) => it.item === e.item);
     });
     if (!evo) return;
+    // 時間帯のなつきの進化（イーブイ）: 本人のブラウザで聞く（ほかのブラウザは本人から届いた姿に合わせる）。キャンセルした区間の間は聞かない
+    if (evo.trigger === 'friendship' && evo.time) {
+      if (p.remote || p.evolveAsk !== undefined || p.evolveDeclinedSection === world.section) return;
+      p.evolveAsk = evo.to;
+      world.events.push({ type: 'evolveAsk', playerId: p.id, from: p.species, to: evo.to });
+      return;
+    }
     if (evo.trigger === 'item' || evo.trigger === 'trade') p.items = p.items.filter((it) => it.item !== evo.item);
-    const from = p.species;
-    p.species = evo.to;
-    p.types = [...world.rules.species[evo.to]!.types];
-    world.events.push({ type: 'evolved', playerId: p.id, from, to: evo.to });
-    applyForm(world, p);
-    recomputeModifiers(world, p);
+    evolveInto(world, p, evo.to, false);
   }
+}
+
+/** 今の区間の時間帯。夜のある地方（ジョウト）だけ。カントーには昼夜を入れない（07 の66.2）ので、時間帯のなつきの進化はしない */
+function timeOfDay(world: World): 'day' | 'night' | null {
+  const nights = world.rules.nightSections;
+  if (!nights?.some(Boolean)) return null;
+  return nights[world.section] ? 'night' : 'day';
+}
+
+function evolveInto(world: World, p: Player, to: number, asked: boolean): void {
+  const from = p.species;
+  p.species = to;
+  p.types = [...world.rules.species[to]!.types];
+  world.events.push({ type: 'evolved', playerId: p.id, from, to, ...(asked && { asked: true }) });
+  applyForm(world, p);
+  recomputeModifiers(world, p);
+}
+
+/** 聞いた進化への答え（本人のブラウザ）: 進化するか、キャンセルしてその区間の間は聞かない */
+export function answerEvolution(world: World, p: Player, accept: boolean): void {
+  const to = p.evolveAsk;
+  if (to === undefined) return;
+  p.evolveAsk = undefined;
+  if (accept) evolveInto(world, p, to, true);
+  else p.evolveDeclinedSection = world.section;
+}
+
+/** 別のブラウザのプレイヤーの姿（本人から届いた）に合わせる。時間帯のなつきの進化だけ（ほかの進化はどのブラウザでも同じように起きる） */
+export function followRemoteSpecies(world: World, p: Player, species: number): void {
+  if (!p.remote || p.species === species) return;
+  const evo = world.rules.species[p.species]?.evolutions.find((e) => e.to === species && e.trigger === 'friendship' && e.time);
+  if (evo) evolveInto(world, p, species, false);
 }
 
 /**

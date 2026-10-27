@@ -71,7 +71,7 @@
   "levelUp.evolvable": "おや……？",
   "evolution.what": "おや……？ {name}の ようすが……！",
   "evolution.done": "おめでとう！ {from}は {to}に しんかした！",
-  "evolution.cancelHint": "← → を こうごに おすと キャンセル",
+  "evolution.cancelHint": "いどうを たくさん いれると キャンセル",
   "evolution.cancelled": "……あれ？ {name}の へんかが とまった！",
   "egg.name": "タマゴ",
   "egg.hint": "ランの最初に かえる（なにが うまれるかは おたのしみ）",

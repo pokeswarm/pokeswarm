@@ -1483,7 +1483,7 @@ export class RunScene extends Phaser.Scene {
 
   /** 進化したら、光の演出を出して見た目を差し替える（スプライトは途中で読み込む） */
   /**
-   * 時間帯のなつきの進化（イーブイ）: 「おや……？」の演出を見せ、← → を交互に押せばキャンセル。答えをシミュレーションへ送る（07 の81章）
+   * 時間帯のなつきの進化（イーブイ）: 「おや……？」の演出を見せ、移動をたくさん入れればキャンセル。答えをシミュレーションへ送る（07 の81章）
    */
   private onEvolveAsk(fromSpecies: number, species: number): void {
     const key = (n: number): string => this.sim.world.rules.species[n]?.key ?? '';
@@ -1491,6 +1491,7 @@ export class RunScene extends Phaser.Scene {
     const name = (k: string): string => localName(generated.pokemon[k]?.names, getLocale(), k);
     this.evolutionCutscene.play(sprite(key(fromSpecies)), sprite(key(species)), name(key(fromSpecies)), name(key(species)), this.coop ? 0.3 : 0.65, {
       presses: uiConfig.evolutionCancelPresses,
+      readStick: () => this.joystick?.read() ?? { dx: 0, dy: 0 },
       onEnd: (accept) => this.uiCommands.push({ type: 'answerEvolve', playerId: this.localId, accept }),
     });
   }

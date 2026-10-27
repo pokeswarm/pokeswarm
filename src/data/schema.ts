@@ -49,7 +49,7 @@ export type PlaceholderRenderConfig = z.infer<typeof placeholderRenderSchema>;
  */
 export const uiConfigSchema = z.object({
   /** イーブイの進化をキャンセルするのに、演出の間に ← と → を交互に押す回数（07 の81章） */
-  evolutionCancelPresses: z.number().int().positive().default(6),
+  evolutionCancelPresses: z.number().int().positive().default(8),
   /** 画面の高さがこれより低いと、つめた表示にする（横向きのスマホ。作者の決定 2026年10月22日） */
   compactHeight: z.number().positive(),
   /**

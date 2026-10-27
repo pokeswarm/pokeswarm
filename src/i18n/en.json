@@ -71,7 +71,7 @@
   "levelUp.evolvable": "What?",
   "evolution.what": "What? {name} is evolving!",
   "evolution.done": "Congratulations! Your {from} evolved into {to}!",
-  "evolution.cancelHint": "Press ← → alternately to cancel",
+  "evolution.cancelHint": "Move around a lot to cancel",
   "evolution.cancelled": "Huh? {name} stopped evolving!",
   "egg.name": "Egg",
   "egg.hint": "Hatches at the start of the run. Who will it be?",

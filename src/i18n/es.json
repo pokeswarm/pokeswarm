@@ -52,7 +52,7 @@
   "levelUp.evolvable": "¿Y esto?",
   "evolution.what": "¿Eh? ¡{name} está evolucionando!",
   "evolution.done": "¡Enhorabuena! ¡Tu {from} ha evolucionado a {to}!",
-  "evolution.cancelHint": "Pulsa ← → alternando para cancelar",
+  "evolution.cancelHint": "Muévete mucho para cancelar",
   "evolution.cancelled": "¿Eh? ¡{name} ha dejado de evolucionar!",
   "egg.name": "Huevo",
   "egg.hint": "Eclosiona al empezar la partida. ¿Qué saldrá?",

@@ -10,6 +10,10 @@ const SIZE = 200;
 /** 入れ替わる間隔（ms）。だんだん速くなる */
 const BLINK_START_MS = 280;
 const BLINK_END_MS = 35;
+/** キャンセルで数える移動のキー（KeyboardInput と同じ WASD・矢印） */
+const MOVE_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD']);
+/** キャンセルでジョイスティックの向きを読む間隔（ms） */
+const STICK_POLL_MS = 30;
 
 /**
  * 進化の演出（作者の決定 2026年10月25日: レベルアップのカードを選んだ後、進化前・進化後の画像を交互に点滅させて派手に）。
@@ -27,10 +31,17 @@ export class EvolutionCutscene {
   }
 
   /**
-   * cancel があれば、白い点滅の間に ← と → を交互に cancel.presses 回押すとキャンセルできる（イーブイ。07 の81章）。
-   * 終わり（進化する・キャンセル）を cancel.onEnd で知らせる
+   * cancel があれば、白い点滅の間に移動を cancel.presses 回入れるとキャンセルできる（イーブイ。07 の81・82章）。
+   * キーボードはここで数え、ジョイスティックは cancel.readStick で読む。終わり（進化する・キャンセル）を cancel.onEnd で知らせる
    */
-  play(fromSprite: string, toSprite: string, fromName: string, toName: string, dim: number, cancel?: { presses: number; onEnd(accepted: boolean): void }): void {
+  play(
+    fromSprite: string,
+    toSprite: string,
+    fromName: string,
+    toName: string,
+    dim: number,
+    cancel?: { presses: number; readStick(): { dx: number; dy: number }; onEnd(accepted: boolean): void },
+  ): void {
     this.destroy();
     const total = BLINK_SECONDS + REVEAL_SECONDS + FADE_SECONDS;
     this.endAt = performance.now() + total * 1000;
@@ -56,18 +67,27 @@ export class EvolutionCutscene {
     flash.style.cssText = 'position:absolute;inset:0;background:#fff;opacity:0;transition:opacity 0.5s';
     root.append(rays, stage, text, hint, flash);
     ensureKeyframes();
-    // キャンセル: ← と → を交互に押した回数
+    // キャンセル: 移動の入力の回数。キーボードは移動のキーを押すたびに1回（押しっぱなしは増えない）、
+    // ジョイスティックは向きが変わるたびに1回（離してからまた倒しても1回）
     let presses = 0;
-    let last = '';
+    let last = '0,0';
     let cancelled = false;
     if (cancel) {
       const onKey = (ev: KeyboardEvent): void => {
-        if ((ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight') || ev.key === last || cancelled) return;
-        last = ev.key;
-        presses++;
+        if (!ev.repeat && !cancelled && MOVE_KEYS.has(ev.code)) presses++;
       };
       window.addEventListener('keydown', onKey);
-      this.cleanups.push(() => window.removeEventListener('keydown', onKey));
+      const poll = window.setInterval(() => {
+        if (cancelled) return;
+        const { dx, dy } = cancel.readStick();
+        const now = `${dx},${dy}`;
+        if (now !== last && now !== '0,0') presses++;
+        last = now;
+      }, STICK_POLL_MS);
+      this.cleanups.push(() => {
+        window.removeEventListener('keydown', onKey);
+        window.clearInterval(poll);
+      });
     }
     document.body.append(root);
     this.timers.push(window.setTimeout(() => (root.style.opacity = '1'), 20));

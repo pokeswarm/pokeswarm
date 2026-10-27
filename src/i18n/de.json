@@ -52,7 +52,7 @@
   "levelUp.evolvable": "Nanu?",
   "evolution.what": "Nanu? {name} entwickelt sich!",
   "evolution.done": "Glückwunsch! Dein {from} hat sich zu {to} entwickelt!",
-  "evolution.cancelHint": "Drücke abwechselnd ← → zum Abbrechen",
+  "evolution.cancelHint": "Viel bewegen zum Abbrechen",
   "evolution.cancelled": "Hm? {name} hat aufgehört, sich zu entwickeln!",
   "egg.name": "Ei",
   "egg.hint": "Schlüpft zu Beginn des Laufs. Wer wird es sein?",

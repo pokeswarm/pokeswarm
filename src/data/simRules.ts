@@ -65,6 +65,7 @@ export function buildSimRules(region?: string): SimRules {
       learners: def.learners ?? null,
       waitForEnd: def.waitForEnd,
       ...(def.hpCost ? { hpCost: def.hpCost } : {}),
+      ...(def.allyHealPct ? { allyHealPct: def.allyHealPct } : {}),
       rangeBonusScale: def.rangeBonusScale ?? 1,
       ...(def.countWidens ? { countWidens: def.countWidens } : {}),
       ...(def.crossRandom ? { crossRandom: true } : {}),

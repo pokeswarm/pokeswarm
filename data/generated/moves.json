@@ -623,6 +623,18 @@
     "type": "flying",
     "damageClass": "special"
   },
+  "healing-wish": {
+    "names": {
+      "ja": "いやしのねがい",
+      "en": "Healing Wish",
+      "fr": "Vœu Soin",
+      "de": "Heilopfer",
+      "es": "Deseo Cura",
+      "it": "Curardore"
+    },
+    "type": "psychic",
+    "damageClass": "status"
+  },
   "hex": {
     "names": {
       "ja": "たたりめ",
@@ -767,6 +779,18 @@
     "type": "normal",
     "damageClass": "physical"
   },
+  "leaf-storm": {
+    "names": {
+      "ja": "リーフストーム",
+      "en": "Leaf Storm",
+      "fr": "Tempête Verte",
+      "de": "Blättersturm",
+      "es": "Lluevehojas",
+      "it": "Verdebufera"
+    },
+    "type": "grass",
+    "damageClass": "special"
+  },
   "leech-seed": {
     "names": {
       "ja": "やどりぎのタネ",
@@ -790,6 +814,18 @@
     },
     "type": "fighting",
     "damageClass": "physical"
+  },
+  "magical-leaf": {
+    "names": {
+      "ja": "マジカルリーフ",
+      "en": "Magical Leaf",
+      "fr": "Feuille Magik",
+      "de": "Zauberblatt",
+      "es": "Hoja Mágica",
+      "it": "Fogliamagica"
+    },
+    "type": "grass",
+    "damageClass": "special"
   },
   "magnitude": {
     "names": {

@@ -45,6 +45,7 @@
     { "from": "swift", "item": "metronome", "to": "rapid-spin", "line": "staryu" },
     { "from": "seed-bomb", "item": "leaf-stone", "to": "frenzy-plant", "line": "bulbasaur" },
     { "from": "razor-leaf", "item": "wide-lens", "to": "petal-dance", "line": "oddish" },
+    { "from": "magical-leaf", "item": "miracle-seed", "to": "leaf-storm", "line": "celebi" },
     { "from": "sludge-wave", "item": "hp-up", "to": "explosion", "line": "koffing" },
     { "from": "rock-slide", "item": "moon-stone", "to": "stone-edge", "line": "onix" },
     { "from": "earthquake", "item": "x-defense", "to": "fissure", "line": "rhyhorn" },

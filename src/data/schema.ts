@@ -1016,6 +1016,8 @@ export const moveDefSchema = z.object({
    * （防御・ディフェンダーなどの軽減が効く）。HP が最大 HP の minHpPct % を下回っていれば出さない（たまるまで待つ）
    */
   hpCost: z.object({ pct: z.number().positive(), minHpPct: z.number().min(0).max(100) }).optional(),
+  /** heal（回復）: 自分以外のプレイヤー（協力プレイの味方）の HP を、それぞれの最大 HP の pct % 回復する（セレビィの いやしのねがい） */
+  allyHealPct: z.number().positive().optional(),
   /**
    * 当たった敵に印を付け、seconds 後にその敵の位置で爆発させる（みらいよち。作者の決定 2026年10月26日）。
    * 爆発の大きさ・威力は、当たった攻撃の大きさ・威力に掛ける倍率。印が付いている敵には付け直さない

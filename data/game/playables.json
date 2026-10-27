@@ -53,7 +53,7 @@
     "suicune": { "sprite": "suicune", "startingMoves": ["water-gun"] },
     "lugia": { "sprite": "lugia", "startingMoves": ["gust"] },
     "ho-oh": { "sprite": "ho-oh", "startingMoves": ["fire-fang"] },
-    "celebi": { "sprite": "celebi", "startingMoves": ["confusion"] }
+    "celebi": { "sprite": "celebi", "startingMoves": ["magical-leaf", "recover", "healing-wish", "future-sight"] }
   },
   "default": "charmander"
 }

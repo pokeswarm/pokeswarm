@@ -3613,6 +3613,50 @@
         },
         "texture": "rain-drop"
       }
+    },
+    "magical-leaf": {
+      "extends": "grass.base",
+      "projectile": {
+        "glowScale": 1.2,
+        "coreScale": 0.4
+      },
+      "sprite": {
+        "id": "leaf",
+        "fit": "circle",
+        "size": 1.8,
+        "rotate": "spin",
+        "spinDegPerSec": 900
+      }
+    },
+    "leaf-storm": {
+      "extends": "grass.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.2
+      },
+      "sprite": {
+        "id": "leaf",
+        "fit": "circle",
+        "size": 1.6,
+        "rotate": "spin",
+        "spinDegPerSec": 720
+      }
+    },
+    "healing-wish": {
+      "extends": "psychic.base",
+      "burstFlash": {
+        "colors": [
+          "#f8bbd0",
+          "#fff9c4"
+        ],
+        "periodMs": 200,
+        "alpha": 0.35
+      },
+      "sprite": {
+        "id": "heal-rise",
+        "fit": "circle",
+        "size": 1.5
+      }
     }
   }
 }

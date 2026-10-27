@@ -994,6 +994,9 @@ function fireHeal(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
   // 回復の円（つきのひかり）: 出ている間、中のプレイヤーを毎秒回復する（health.ts の regenerate）
   if (world.rules.moves[pm.move]!.healZone) world.healZones.push({ x: p.x, y: p.y, radius: st.size, ticks: Math.round(st.durationSeconds / world.dt), pct: st.healPct });
   else healPlayer(world, p.id, (p.maxHp * st.healPct) / 100);
+  // いやしのねがい: 味方を回復する（HP は本人のブラウザで管理するので、どのブラウザでも自分のプレイヤーだけを回復する）
+  const ally = world.rules.moves[pm.move]!.allyHealPct;
+  if (ally) for (const q of world.players) if (q.id !== p.id) healPlayer(world, q.id, (q.maxHp * ally) / 100);
   if (st.guardPct > 0) {
     p.guardPct = st.guardPct;
     p.guardUntilTick = world.tick + Math.round(st.durationSeconds / world.dt);

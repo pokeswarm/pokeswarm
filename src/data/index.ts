@@ -36,6 +36,7 @@ import effectRecipesJson from '../../data/effects/recipes.json';
 import sfxJson from '../../data/audio/sfx.json';
 import bgmJson from '../../data/audio/bgm.json';
 import generatedPokemonJson from '../../data/generated/pokemon.json';
+import spritePokemonJson from '../../data/sprites/pokemon.json';
 import generatedMovesJson from '../../data/generated/moves.json';
 import generatedItemsJson from '../../data/generated/items.json';
 import generatedTypesJson from '../../data/generated/types.json';
@@ -83,6 +84,7 @@ import {
   moveSpritesSchema,
   MOVE_PATTERNS,
   moveBalanceSchema,
+  spritePokemonListSchema,
 } from './schema';
 
 function load<T extends z.ZodType>(name: string, schema: T, raw: unknown): z.infer<T> {
@@ -112,6 +114,12 @@ export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enem
 export const combatConfig = load('game/combat.json', combatConfigSchema, combatJson);
 export const movesConfig = load('game/moves.json', movesConfigSchema, movesJson);
 export const playablesConfig = load('game/playables.json', playablesConfigSchema, playablesJson);
+/** プレイヤーとして描ける（全動作のドット絵がある）ポケモン。これ以外へは進化しない（雑魚・ボス用だけのハガネールなど） */
+export const playerSpriteKeys: ReadonlySet<string> = new Set(
+  load('sprites/pokemon.json', spritePokemonListSchema, spritePokemonJson)
+    .pokemon.filter((p) => p.uses.includes('full'))
+    .map((p) => p.key),
+);
 export const siteConfig = load('site.json', siteConfigSchema, siteJson);
 export const regionsConfig = load('game/regions.json', regionsConfigSchema, regionsJson);
 export const levelingConfig = load('game/leveling.json', levelingConfigSchema, levelingJson);

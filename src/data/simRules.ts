@@ -15,6 +15,7 @@ import {
   movesConfig,
   pickupConfig,
   playablesConfig,
+  playerSpriteKeys,
   shopConfig,
   statsConfig,
   statusConfig,
@@ -134,7 +135,7 @@ export function buildSimRules(region?: string): SimRules {
     ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: d.item ? itemIndex(d.item) : -1, to: moveIndex(d.to), line: d.line, ...(d.minLevel ? { minLevel: d.minLevel } : {}), ...(d.forms ? { forms: d.forms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}), ...(d.withMoves ? { withMoves: d.withMoves.map(moveIndex) } : {}), ...(d.consumes ? { consumes: d.consumes.map(moveIndex) } : {}), ...(d.inheritLevels ? { inheritLevels: true } : {}) })),
   ];
   const itemMoves = Object.entries(playablesConfig.pokemon).flatMap(([line, p]) => p.itemMoves.map((im) => ({ line, item: itemIndex(im.item), move: moveIndex(im.move) })));
-  // ポケモンの種類: PokeAPI から生成したすべて。進化先・進化の道具が無いものは進化の一覧から外す
+  // ポケモンの種類: PokeAPI から生成したすべて。進化先・進化の道具・進化先のプレイヤーのドット絵が無いものは進化の一覧から外す
   const speciesKeys = Object.keys(generated.pokemon);
   const linkingCord = itemIndex('linking-cord');
   const species: SimSpecies[] = speciesKeys.map((key) => {
@@ -144,7 +145,7 @@ export function buildSimRules(region?: string): SimRules {
     if (playablesConfig.pokemon[key]?.evolves === false) return { key, types: g.types.map(typeIndex), baseStats: g.baseStats, evolutions };
     for (const e of g.evolvesTo) {
       const to = speciesKeys.indexOf(e.to);
-      if (to === -1) continue;
+      if (to === -1 || !playerSpriteKeys.has(e.to)) continue;
       if (e.trigger === 'level' && e.level) evolutions.push({ to, trigger: 'level', level: e.level });
       else if (e.trigger === 'item' && e.item && itemIndex(e.item) !== -1) evolutions.push({ to, trigger: 'item', item: itemIndex(e.item) });
       else if (e.trigger === 'trade' && linkingCord !== -1) evolutions.push({ to, trigger: 'trade', item: linkingCord });

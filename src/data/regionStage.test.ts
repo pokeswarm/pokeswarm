@@ -32,6 +32,14 @@ describe('地方のステージ（data/regions/<地方>.json）', () => {
     expect(johto.stage.legendary).toBeNull();
   });
 
+  it('プレイヤーのドット絵が無いポケモンへは進化しない（ジョウトのボス用に足したハガネールに、カントーのイワークがヒモで進化しない）', () => {
+    const rules = buildSimRules();
+    const onix = rules.species.find((s) => s.key === 'onix')!;
+    expect(onix.evolutions).toEqual([]);
+    const machoke = rules.species.find((s) => s.key === 'machoke')!;
+    expect(machoke.evolutions.length).toBeGreaterThan(0);
+  });
+
   it('buildSimRules(地方) はその地方の区間とボスを使う', () => {
     expect(buildSimRules('johto').spawn.waves).toBe(regionStage('johto').spawn.waves);
     expect(buildSimRules('johto').stage.bosses.some((b) => b.kind === 'johto-midboss-pidgeotto')).toBe(true);

@@ -1,5 +1,15 @@
 import { randomUnit } from '../math';
+import type { Player } from '../entities/player';
 import { currentWaveIndex, enemyCap, enemyHpScale, type World } from '../world';
+
+/**
+ * (x, y) が、どのプレイヤーからも r 以上離れているか（全員の周りの半径 r の円の和集合の外か）。
+ * 協力プレイで、別のプレイヤーの目の前に雑魚が出ないようにする（作者の指摘 2026年10月28日）
+ */
+export function clearOfPlayers(players: readonly Player[], x: number, y: number, r: number): boolean {
+  const r2 = r * r;
+  return players.every((p) => (p.x - x) ** 2 + (p.y - y) ** 2 >= r2);
+}
 
 /**
  * プレイヤーの周囲（画面外）に雑魚敵を出す。種類・出現数は今の区間、HP は区間とプレイヤーのレベルで決まる。
@@ -26,8 +36,13 @@ export function spawnEnemies(world: World): void {
     }
     world.spawnAccumulator -= 1;
     const p = players[rng.int(players.length)]!;
-    const [ux, uy] = randomUnit(rng);
-    const dist = rng.range(s.spawnDistanceMin, s.spawnDistanceMax);
+    let [ux, uy] = randomUnit(rng);
+    let dist = rng.range(s.spawnDistanceMin, s.spawnDistanceMax);
+    // ほかのプレイヤーの近くになったら選び直す（選び直せなければ最後の場所）
+    for (let k = 0; players.length > 1 && k < (s.spawnRetries ?? 0) && !clearOfPlayers(players, p.x + ux * dist, p.y + uy * dist, s.spawnDistanceMin); k++) {
+      [ux, uy] = randomUnit(rng);
+      dist = rng.range(s.spawnDistanceMin, s.spawnDistanceMax);
+    }
     const kindIndex = wave.kinds[rng.int(wave.kinds.length)]!;
     const kind = kinds[kindIndex]!;
     const id = world.nextEnemyId++;

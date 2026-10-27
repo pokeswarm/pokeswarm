@@ -29,7 +29,7 @@ describe('協力プレイの箱（長く回す）', () => {
     const wire: { at: number; from: number; to: number; text: string }[] = [];
     const problems: string[] = [];
     const picked: Record<number, number> = {};
-    const history = new Map<number, { boxes: string; items: string[]; buffs: string[] }>();
+    const history = new Map<number, { boxes: string; items: string[]; buffs: { index: number; ticksLeft: number }[][] }>();
     for (let t = 0; t < 30 * 90; t++) {
       for (const msg of wire.filter((w) => w.at <= t)) {
         const p = peers[msg.to - 1]!;
@@ -64,7 +64,7 @@ describe('協力プレイの箱（長く回す）', () => {
       history.set(t, {
         boxes: hw.boxes.map((b) => b.id).sort().join(','),
         items: hw.items.map((i) => String(i.id)),
-        buffs: hw.players.map((p) => (p.buffs ?? []).map((x) => x.index).sort().join(',')),
+        buffs: hw.players.map((p) => (p.buffs ?? []).map((x) => ({ index: x.index, ticksLeft: x.ticksLeft }))),
       });
       const then = history.get(t - delay);
       if (!then) continue;
@@ -78,8 +78,12 @@ describe('協力プレイの箱（長く回す）', () => {
         const gi = gw.items.filter((i) => !i.pending).map((i) => String(i.id)).sort().join(',');
         if (hi !== gi) problems.push('t' + t + ' items host[' + hi + '] guest' + g.id + '[' + gi + ']');
         gw.players.forEach((q, k) => {
-          const gb2 = (q.buffs ?? []).map((x) => x.index).sort().join(',');
-          if (then.buffs[k] !== gb2) problems.push('t' + t + ' buffs of ' + q.id + ' host[' + then.buffs[k] + '] guest' + g.id + '[' + gb2 + ']');
+          // ゲストはレベルアップで止まる長さがホストと1更新ずれることがあり、強化の残りが1更新だけ違う。切れる直前の1更新の強化は、片方に無くてもよい（2026年10月28日）
+          const hb = then.buffs[k]!;
+          const gb2 = q.buffs ?? [];
+          const missing = (a: typeof hb, b: typeof hb) => a.filter((x) => x.ticksLeft > 1 && !b.some((y) => y.index === x.index)).map((x) => x.index);
+          const diff = [...missing(hb, gb2), ...missing(gb2, hb)];
+          if (diff.length) problems.push('t' + t + ' buffs of ' + q.id + ' host[' + hb.map((x) => x.index).sort().join(',') + '] guest' + g.id + '[' + gb2.map((x) => x.index).sort().join(',') + ']');
         });
       }
     }

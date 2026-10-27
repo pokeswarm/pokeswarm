@@ -1,6 +1,7 @@
 import type { Player } from '../entities/player';
 import { axisToUnit, hash01 } from '../math';
 import { currentWaveIndex, type World } from '../world';
+import { clearOfPlayers } from './spawn';
 import { speedMultiplier } from './status';
 
 /**
@@ -71,11 +72,18 @@ export function moveEnemies(world: World): void {
       // （ホストとゲストで乱数の使い方や更新番号が違っても、同じ場所になる）
       const id = e.id[i]!;
       const n = e.relocations[i]!++;
-      const dist = s.spawnDistanceMin + hash01(world.seed, id, n, 1) * (s.spawnDistanceMax - s.spawnDistanceMin);
-      const side = (hash01(world.seed, id, n, 2) * 2 - 1) * s.relocateSideSpread;
-      // 進行方向 (fx, fy) の先、横方向 (-fy, fx) にばらつかせる
-      e.x[i] = e.prevX[i] = target.x + fx * dist - fy * side;
-      e.y[i] = e.prevY[i] = target.y + fy * dist + fx * side;
+      // 進行方向 (fx, fy) の先、横方向 (-fy, fx) にばらつかせる。ほかのプレイヤーの近くになったら、選び直す回数ごとに別のハッシュで選び直す
+      let nx = 0;
+      let ny = 0;
+      for (let k = 0; k <= (players.length > 1 ? (s.spawnRetries ?? 0) : 0); k++) {
+        const dist = s.spawnDistanceMin + hash01(world.seed, id, n, 1 + k * 2) * (s.spawnDistanceMax - s.spawnDistanceMin);
+        const side = (hash01(world.seed, id, n, 2 + k * 2) * 2 - 1) * s.relocateSideSpread;
+        nx = target.x + fx * dist - fy * side;
+        ny = target.y + fy * dist + fx * side;
+        if (clearOfPlayers(players, nx, ny, s.spawnDistanceMin)) break;
+      }
+      e.x[i] = e.prevX[i] = nx;
+      e.y[i] = e.prevY[i] = ny;
       continue;
     }
     if (best > 0) {

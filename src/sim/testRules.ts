@@ -101,6 +101,7 @@ export function testRules(
       spawnPerSecond: 0,
       spawnDistanceMin: 450,
       spawnDistanceMax: 550,
+      spawnRetries: 8,
       relocateDistance: 900,
       relocateSideSpread: 400,
       capGlobal: 100,

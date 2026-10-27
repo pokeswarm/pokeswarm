@@ -42,3 +42,26 @@ describe('ジムリーダーを倒すごとの雑魚の HP（作者の指摘「�
     expect(scale(9) / scale(0)).toBeCloseTo(1.6);
   });
 });
+
+describe('協力プレイの雑魚の出る場所（作者の指摘 2026年10月28日: 別のプレイヤーの目の前に出て当たった）', () => {
+  it('どのプレイヤーからも spawnDistanceMin 以上離れた場所に出す（全員の円の和集合の外）', () => {
+    const rules = testRules({ spawn: { spawnPerSecond: 30, fillPerSecond: 0, capGlobal: 5000, capPerPlayer: 5000 } });
+    rules.spawn.waves[0] = { ...rules.spawn.waves[0]!, spawnPerSecond: 30 };
+    const s = new Simulation({ tickRate: 30, seed: 3, rules });
+    // 2人目を、1人目の出現の輪（450〜550）のちょうど上に置く
+    s.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, moves: [] });
+    s.addPlayer({ id: 2, x: 500, y: 0, radius: 12, moveSpeed: 0, moves: [] });
+    let spawned = 0;
+    let near = 0;
+    for (let t = 0; t < 300; t++) {
+      s.step([]);
+      for (const ev of s.world.events) {
+        if (ev.type !== 'enemySpawned') continue;
+        spawned++;
+        if (s.world.players.some((p) => Math.hypot(p.x - ev.x, p.y - ev.y) < rules.spawn.spawnDistanceMin)) near++;
+      }
+    }
+    expect(spawned).toBeGreaterThan(100);
+    expect(near).toBe(0);
+  });
+});

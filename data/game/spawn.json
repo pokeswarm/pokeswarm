@@ -4,6 +4,7 @@
   "spawnDistanceMax": 820,
   "relocateDistance": 1100,
   "relocateSideSpread": 600,
+  "spawnRetries": 8,
   "capGlobal": 1600,
   "capPerPlayer": 400,
   "separation": {

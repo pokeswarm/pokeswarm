@@ -181,6 +181,8 @@ export const spawnConfigSchema = z
     relocateDistance: z.number().positive(),
     /** 移し替え先の、進行方向に対する横方向のばらつき */
     relocateSideSpread: z.number().nonnegative(),
+    /** 出す場所・移し替え先が、だれかのプレイヤーから spawnDistanceMin より近いときに選び直す回数（協力プレイで、別のプレイヤーの目の前に出ないように）。省略時は 0 */
+    spawnRetries: z.number().int().nonnegative().optional(),
     /** 全体の上限 */
     capGlobal: z.number().int().positive(),
     /** プレイヤー1人あたりの上限（実際の上限は min(全体, 1人あたり × 人数)） */

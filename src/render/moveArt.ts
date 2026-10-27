@@ -926,11 +926,20 @@ function darkJaws(): SpriteOut {
     }
     return -1;
   };
-  const frames: Grid[] = [];
-  // あごの開き（付け根のまわりの回転）・光・薄れ
-  for (const [open, flash, fade] of [[0.42, 0, 0], [0.2, 0, 0], [0, 1, 0], [0, 0.6, 1], [0, 0, 2]] as const) {
-    frames.push(
-      shape(36, (u, v) => {
+  // コマごとの あごの開き・光・薄れ（0 開く → 1 半分 → 2 閉じて光る → 3 薄れる → 4 筋だけ）
+  const STEPS = [[0.34, 0, 0], [0.17, 0, 0], [0, 1, 0], [0, 0.6, 1], [0, 0, 2]] as const;
+  const thin = (col: number, u: number, v: number, fade: number): number =>
+    fade === 1 && (col === 2 || col === 1) && hash(Math.floor((u + 1) * 18), Math.floor((v + 1) * 18), 59) < 0.5 ? -1 : col;
+  // 横（右向き）。tilt で形を傾けると斜めの絵（口の先が斜め前・斜め後ろを向く。あごは画面の上下にずれて開く。
+  // 傾けた向きに開くと、クワガタのつのに見えるため）
+  const side = (tilt: number): Grid[] =>
+    STEPS.map(([open, flash, fade]) =>
+      shape(36, (u1, v1) => {
+        // 少し小さく描いて、開いたあごが絵の外にはみ出さないようにする
+        const u0 = u1 * 1.12;
+        const v0 = v1 * 1.12;
+        const u = u0 * Math.cos(tilt) + v0 * Math.sin(tilt);
+        const v = -u0 * Math.sin(tilt) + v0 * Math.cos(tilt);
         // 閉じた所の白い光と、前へ飛ぶ火花
         if (flash > 0) {
           const d = Math.hypot(u - 0.62, v);
@@ -947,23 +956,77 @@ function darkJaws(): SpriteOut {
           return Math.abs(outer - 0.9) < 0.05 && Math.abs(v) > 0.25 && u > -0.3 && hash(Math.floor((u + 1) * 12), Math.floor((v + 1) * 12), 61) < 0.6 ? 3 : -1;
         }
         for (const lower of [false, true]) {
-          // 開いているときは、付け根のまわりに上あごを上へ、下あごを下へ回す
-          const a = lower ? open : -open;
-          const c = Math.cos(-a);
-          const s = Math.sin(-a);
-          const x = hinge[0] + (u - hinge[0]) * c - (v - hinge[1]) * s;
-          const y = hinge[1] + (u - hinge[0]) * s + (v - hinge[1]) * c;
+          let x: number;
+          let y: number;
+          if (tilt === 0) {
+            // 横: 付け根のまわりに上あごを上へ、下あごを下へ回す
+            const a = lower ? open : -open;
+            const c = Math.cos(-a);
+            const s = Math.sin(-a);
+            x = hinge[0] + (u - hinge[0]) * c - (v - hinge[1]) * s;
+            y = hinge[1] + (u - hinge[0]) * s + (v - hinge[1]) * c;
+          } else {
+            // 斜め: 画面の上下にずらしてから、形を傾ける
+            const gv = v0 + (lower ? -open : open) * 0.9;
+            x = u0 * Math.cos(tilt) + gv * Math.sin(tilt);
+            y = -u0 * Math.sin(tilt) + gv * Math.cos(tilt);
+          }
           const col = jaw(x, y, lower);
-          if (col < 0) continue;
-          // 薄れるコマは、帯の真ん中を抜いて輪郭だけ
-          if (fade === 1 && (col === 2 || col === 1) && hash(Math.floor((u + 1) * 18), Math.floor((v + 1) * 18), 59) < 0.5) return -1;
-          return col;
+          if (col >= 0) return thin(col, u0, v0, fade);
         }
         return -1;
       }),
     );
-  }
-  return { palette, frameMs: 45, parts: { main: frames.map(toRows) } };
+  /**
+   * 正面（こちらを向いて かみつく）: 上あごは上が丸い ∩ の帯、下あごは ∪ の帯。内側のふち（口の線）にキバが並び、上下から閉じる。
+   * 閉じた真ん中で光がはじけ、火花が全方向へ飛ぶ。後ろ（back）はあごの外側だけが見え、キバと光は見えない（あごの向こうに少し光る）
+   */
+  const face = (back: boolean): Grid[] =>
+    STEPS.map(([open, flash, fade]) =>
+      shape(36, (u, v) => {
+        if (flash > 0 && !back) {
+          const d = Math.hypot(u, v);
+          if (d < 0.22 * flash) return d < 0.12 * flash ? 5 : 4;
+          for (let k = 0; k < 8; k++) {
+            const a = (k / 8) * Math.PI * 2 + 0.2;
+            const along = u * Math.cos(a) + v * Math.sin(a);
+            const across = -u * Math.sin(a) + v * Math.cos(a);
+            if (along > 0.26 && along < 0.26 + 0.3 * flash && Math.abs(across) < 0.03) return along < 0.36 ? 5 : 4;
+          }
+        }
+        if (flash > 0 && back && Math.abs(v) < 0.05 * flash && Math.abs(u) < 0.5) return 4;
+        if (fade === 2) {
+          const d = (u / 0.85) ** 2 + (v / 0.8) ** 2;
+          return Math.abs(d - 0.85) < 0.06 && Math.abs(u) > 0.3 && hash(Math.floor((u + 1) * 12), Math.floor((v + 1) * 12), 63) < 0.6 ? 3 : -1;
+        }
+        // 開き: 上あごを上へ、下あごを下へずらす
+        const gap = open * 0.75;
+        for (const lower of [false, true]) {
+          const y = lower ? -(v - gap) : v + gap;
+          if (y > 0.02) continue;
+          // あごの帯: 外の楕円の内側で、口の線（y = 0）に近い所。外ほど濃い
+          const outer = (u / 0.88) ** 2 + ((y - 0.05) / 0.62) ** 2;
+          const inner = (u / 0.66) ** 2 + ((y + 0.02) / 0.3) ** 2;
+          if (outer <= 1 && (back || inner > 1)) {
+            // 後ろは、あごの外側の丸みを明るい筋で見せる
+            const col = outer > 0.8 ? 1 : back ? (outer < 0.35 ? 3 : 2) : inner < 1.25 ? 3 : 2;
+            return thin(col, u, v, fade);
+          }
+          if (back) continue;
+          // キバ: 口の線の内側から、口の真ん中へ向かう三角（上と下でずらして噛み合う）
+          for (const fx of lower ? [-0.48, -0.16, 0.16, 0.48] : [-0.62, -0.32, 0, 0.32, 0.62]) {
+            const top = -0.3 * Math.sqrt(Math.max(0, 1 - (fx / 0.66) ** 2));
+            const len = Math.max(0.12, -top * 0.9);
+            const k = (y - top) / len;
+            if (k < 0 || k > 1) continue;
+            if (Math.abs(u - fx) <= 0.07 * (1 - k) + 0.01) return k > 0.55 ? 5 : 4;
+          }
+        }
+        return -1;
+      }),
+    );
+  const rows = (g: Grid[]): string[][] => g.map(toRows);
+  return { palette, frameMs: 45, parts: { main: rows(side(0)), diag: rows(side(0.55)), diagBack: rows(side(-0.55)), front: rows(face(false)), back: rows(face(true)) } };
 }
 
 /** フレアドライブ: 右へ突っ込む炎の弧（三日月形の炎。コマで炎の先がゆらめく） */

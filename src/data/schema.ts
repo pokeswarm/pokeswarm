@@ -1338,6 +1338,11 @@ const moveSpriteSpec = z.object({
   varyTiles: z.boolean().default(false),
   /** ring の部品を輪の向きに回さず、いつも立てて置く（うたうの音符: 回すと輪の上側で逆さになる） */
   upright: z.boolean().default(false),
+  /**
+   * front の絵を、向きで描き分ける（回さない。かみつく: 下を向いたとき、横の絵を回すとクワガタのつのに見えた。作者の指摘 2026年10月27日）。
+   * 絵の部品 main = 横（右。左は左右を返す）・front = 正面（下）・back = 後ろ（上）・diag = 斜め前（右下）・diagBack = 斜め後ろ（右上）
+   */
+  directional: z.boolean().default(false),
   /** circle の絵の、当たり判定の中心に合わせる高さ（0 = 絵の上端、1 = 下端）。地面から噴き上がる絵は、根元を中心に合わせる（ブラストバーン） */
   originY: z.number().min(0).max(1).default(0.5),
   /** 描く位置を毎フレーム、この大きさ（ワールドの単位）までランダムにずらす（揺れる地面。画面は揺らさない） */

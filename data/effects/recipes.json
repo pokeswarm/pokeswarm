@@ -3177,7 +3177,8 @@
       "sprite": {
         "id": "dark-jaws",
         "fit": "front",
-        "size": 1.35
+        "size": 1.35,
+        "directional": true
       }
     },
     "crunch": {

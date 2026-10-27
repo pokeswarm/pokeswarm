@@ -29,6 +29,20 @@ export interface SpriteItem {
 }
 
 /** テクスチャの名前（絵・細かさの段・部品・コマごと） */
+/**
+ * 向きで描き分ける絵（fit front の directional）の部品: 向き（画面は y が下）を 8 方向に分け、
+ * 横 main・正面 front（下）・後ろ back（上）・斜め前 diag（右下）・斜め後ろ diagBack（右上）。左側は右側の絵の左右を返す
+ */
+export function directionalPart(dirX: number, dirY: number): { name: 'main' | 'front' | 'back' | 'diag' | 'diagBack'; flip: boolean } {
+  const deg = (Math.atan2(dirY, Math.abs(dirX)) * 180) / Math.PI;
+  const flip = dirX < -1e-6;
+  if (deg > 67.5) return { name: 'front', flip };
+  if (deg < -67.5) return { name: 'back', flip };
+  if (deg > 22.5) return { name: 'diag', flip };
+  if (deg < -22.5) return { name: 'diagBack', flip };
+  return { name: 'main', flip };
+}
+
 function frameKey(id: string, step: number, part: string, frame: number): string {
   return `msprite:${id}:${step}:${part}:${frame}`;
 }
@@ -293,7 +307,16 @@ export class MoveSprites {
         if (!rows) continue;
         const reach = it.radius;
         const s = (reach * spec.size) / rows[0]!.length;
-        put(fk('main', this.frameOf(spec.id, 'main', elapsed)), x + it.dirX * reach * 0.6, y + it.dirY * reach * 0.6, Math.atan2(it.dirY, it.dirX), s, s, a);
+        const px = x + it.dirX * reach * 0.6;
+        const py = y + it.dirY * reach * 0.6;
+        if (spec.directional) {
+          // 向きを 8 方向に分けて、その向きの絵を回さずに置く（左向きは右向きの絵の左右を返す）
+          const part = directionalPart(it.dirX, it.dirY);
+          const name = sp.parts[part.name] ? part.name : 'main';
+          put(fk(name, this.frameOf(spec.id, name, elapsed)), px, py, 0, part.flip ? -s : s, s, a);
+          continue;
+        }
+        put(fk('main', this.frameOf(spec.id, 'main', elapsed)), px, py, Math.atan2(it.dirY, it.dirX), s, s, a);
         continue;
       }
       if (spec.fit === 'ring') {

@@ -600,7 +600,8 @@
         "pikachu",
         "growlithe",
         "eevee",
-        "doduo"
+        "doduo",
+        "pichu"
       ],
       "base": {
         "power": 10.3,
@@ -669,7 +670,10 @@
         "moltres",
         "mewtwo",
         "porygon",
-        "meowth"
+        "meowth",
+        "pichu",
+        "cleffa",
+        "igglybuff"
       ],
       "base": {
         "power": 12,
@@ -4301,7 +4305,9 @@
       "effect": "sing",
       "learners": [
         "jigglypuff",
-        "lapras"
+        "lapras",
+        "cleffa",
+        "igglybuff"
       ],
       "base": {
         "power": 12.9,

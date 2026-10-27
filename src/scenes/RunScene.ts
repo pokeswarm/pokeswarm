@@ -86,6 +86,9 @@ export interface RunSceneData {
  * 入力 → コマンド → 固定間隔でシミュレーションを進める → 補間して描く、の流れを担う。
  * 協力プレイでは、届いたメッセージもコマンドに直して同じ流れに乗せる。
  */
+/** ボスの HP バーを並べる数の上限 */
+const BOSS_BARS_MAX = 4;
+
 export class RunScene extends Phaser.Scene {
   private sim!: Simulation;
   private clock!: FixedStepClock;
@@ -209,7 +212,10 @@ export class RunScene extends Phaser.Scene {
   /** 画面上の真ん中: 経過時間、中ボス・ボスの HP、お知らせ */
   private timerText!: Phaser.GameObjects.Text;
   private bossBar!: Phaser.GameObjects.Graphics;
-  private bossName!: Phaser.GameObjects.Text;
+  /** ボスの名前（HP バーごと。大ボスが何体もいるときは、バーを縦に並べて左に名前） */
+  private readonly bossNames: Phaser.GameObjects.Text[] = [];
+  /** 今並べているボスの HP バーの本数 */
+  private bossRows = 0;
   private announceText!: Phaser.GameObjects.Text;
   /** HP のバーを出している中ボス・ボス（最後に出たもの） */
   private bossId: number | null = null;
@@ -244,6 +250,7 @@ export class RunScene extends Phaser.Scene {
     this.lastHeard = new Map();
     this.hiddenTimer = null;
     this.bossId = null;
+    this.bossRows = 0;
     this.resultAt = null;
     this.runRecorded = false;
     this.newAchievements = [];
@@ -475,7 +482,7 @@ export class RunScene extends Phaser.Scene {
     this.coinText = this.add.text(0, 0, '', px(16, uiConfig.coin.color, { outline: true })).setOrigin(1, 0.5).setScrollFactor(0).setDepth(1001);
     this.timerText = this.add.text(0, 10, '', px(compactScreen() ? uiConfig.compactHud.timerSize : 24, uiConfig.timer.color, { outline: true })).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1000);
     this.bossBar = this.add.graphics().setScrollFactor(0).setDepth(1000);
-    this.bossName = this.add.text(0, 50, '', px(16, '#ffffff', { outline: true })).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1000).setVisible(false);
+    this.bossNames.length = 0;
     this.announceText = this.add.text(0, 0, '', px(32, '#ffffff', { outline: true, align: 'center', lineSpacing: 8 })).setOrigin(0.5).setScrollFactor(0).setDepth(1001);
     this.downText = this.add.text(0, 0, '', px(16, '#ffffff', { outline: true, align: 'center' })).setOrigin(0.5).setScrollFactor(0).setDepth(1001);
     this.input.keyboard?.on('keydown-F3', () => {
@@ -1449,7 +1456,8 @@ export class RunScene extends Phaser.Scene {
     const legendLeft = lg && lg.endTick > 0 ? Math.max(0, (lg.endTick - w.tick) * w.dt) : null;
     this.timerText.setText(formatTime(legendLeft ?? Math.min(now, limit))).setColor(legendLeft !== null ? '#ff5252' : uiConfig.timer.color);
     this.placeUi(this.timerText, cx, top);
-    this.drawGodText(cam, top + 56);
+    // テストの表示は、ボスの HP バーを何本も並べたときはその下へ
+    this.drawGodText(cam, top + 56 + Math.max(0, this.bossRows - 1) * 20);
     // コイン（もらえる見込みがあるときだけ）
     const coins = this.recorder.liveCoins(w);
     this.coinText.setText(String(coins)).setVisible(coins > 0);
@@ -1458,27 +1466,57 @@ export class RunScene extends Phaser.Scene {
     this.placeUi(this.coinIcon, cam.width - 16 - this.coinText.width, top + 12);
     this.coinIcon.setScale(2 / cam.zoom);
     this.drawBuffIcons(cam, top);
-    this.placeUi(this.bossName, cx, 50);
     this.placeUi(this.bossBar, 0, 0);
     this.placeUi(this.announceText, cx, cam.height * 0.3);
     this.placeUi(this.downText, cx, cam.height * 0.7);
     this.placeUi(this.hudIcons.container, 8, top);
     this.hudTop = top;
     this.placeUi(this.hud, 8, top + this.hudIcons.container.getBounds().height + 8);
+    this.drawBossBars(cam, cx, top + uiConfig.timer.size + 12);
+  }
+
+  /**
+   * ボスの HP バー: 最後に出たボスと、同時に戦っている大ボス・伝説（レッド戦のエーフィとカビゴンなど）。
+   * 1体なら今までどおり真ん中に1本、何体もいれば縦に並べ、それぞれの左に名前を出す（作者の依頼 2026年10月27日: だれの体力か分かるように）
+   */
+  private drawBossBars(cam: Phaser.Cameras.Scene2D.Camera, cx: number, top: number): void {
+    const w = this.sim.world;
+    const eb = uiConfig.expBar;
     this.bossBar.clear();
-    const i = this.bossId === null ? -1 : findEnemyIndex(w, this.bossId);
-    if (i === -1 || w.enemies.hp[i]! <= 0) {
-      this.bossName.setText('');
-      return;
+    const list: number[] = [];
+    const add = (id: number): void => {
+      const i = findEnemyIndex(w, id);
+      if (i !== -1 && w.enemies.hp[i]! > 0 && !list.includes(i)) list.push(i);
+    };
+    if (this.bossId !== null) add(this.bossId);
+    for (const b of w.bosses) {
+      const rank = w.rules.enemies.kinds[w.enemies.kind[findEnemyIndex(w, b.id)] ?? -1]?.rank;
+      if (rank === 'boss' || rank === 'legendary') add(b.id);
     }
-    const kind = w.rules.enemies.kinds[w.enemies.kind[i]!]!;
-    const barW = Math.min(480, cam.width * 0.6);
-    const ratio = Math.max(0, w.enemies.hp[i]! / w.enemies.maxHp[i]!);
-    const by = top + uiConfig.timer.size + 12;
-    this.bossBar.fillStyle(hexColor(eb.border)).fillRect(Math.round(cx - barW / 2 - 2), by, Math.round(barW + 4), 12);
-    this.bossBar.fillStyle(hexColor(eb.back)).fillRect(Math.round(cx - barW / 2), by + 2, Math.round(barW), 8);
-    this.bossBar.fillStyle(kind.rank === 'boss' ? 0xf85838 : 0xf8c830).fillRect(Math.round(cx - barW / 2), by + 2, Math.round(barW * ratio), 8);
-    this.bossName.setText(this.enemyName(w.enemies.kind[i]!));
+    const shown = list.slice(0, BOSS_BARS_MAX);
+    this.bossRows = shown.length;
+    const multi = shown.length > 1;
+    const barW = multi ? Math.min(320, cam.width * 0.42) : Math.min(480, cam.width * 0.6);
+    // 何体もいるときは、名前の分だけバーを右へずらす
+    const left = multi ? Math.round(cx - barW / 2 + 60) : Math.round(cx - barW / 2);
+    shown.forEach((i, k) => {
+      const kind = w.rules.enemies.kinds[w.enemies.kind[i]!]!;
+      const ratio = Math.max(0, w.enemies.hp[i]! / w.enemies.maxHp[i]!);
+      const by = top + k * 20;
+      this.bossBar.fillStyle(hexColor(eb.border)).fillRect(left - 2, by, Math.round(barW + 4), 12);
+      this.bossBar.fillStyle(hexColor(eb.back)).fillRect(left, by + 2, Math.round(barW), 8);
+      this.bossBar.fillStyle(kind.rank === 'boss' ? 0xf85838 : 0xf8c830).fillRect(left, by + 2, Math.round(barW * ratio), 8);
+      let label = this.bossNames[k];
+      if (!label) {
+        label = this.add.text(0, 0, '', px(16, '#ffffff', { outline: true })).setOrigin(1, 0.5).setScrollFactor(0).setDepth(1000);
+        this.bossNames.push(label);
+      }
+      const name = this.enemyName(w.enemies.kind[i]!);
+      if (label.text !== name) label.setText(name);
+      label.setVisible(multi);
+      this.placeUi(label, left - 8, by + 6);
+    });
+    for (let k = shown.length; k < this.bossNames.length; k++) this.bossNames[k]!.setVisible(false);
   }
 
   private runSteps(steps: number, visible: boolean): void {

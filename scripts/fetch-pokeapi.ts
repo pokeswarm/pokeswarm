@@ -79,6 +79,7 @@ interface EvolutionNode {
     trigger: NamedRef;
     item: NamedRef | null;
     min_happiness?: number | null;
+    held_item?: NamedRef | null;
     time_of_day?: string;
     version_group?: NamedRef;
   }[];
@@ -117,6 +118,8 @@ function evolutionsOf(chain: EvolutionNode, species: string): GeneratedPokemon['
     if (!d) return { to: child.species.name, trigger: 'other' as const };
     if (d.trigger.name === 'level-up' && d.min_level) return { to: child.species.name, trigger: 'level' as const, level: d.min_level };
     if (d.trigger.name === 'use-item' && d.item) return { to: child.species.name, trigger: 'item' as const, item: d.item.name };
+    // 持ち物を持たせて通信交換（ハガネール・ハッサム・ポリゴン2・キングドラ・ヤドキング・ニョロトノ）: ゲームではその持ち物で進化（07 の66.2）
+    if (d.trigger.name === 'trade' && d.held_item) return { to: child.species.name, trigger: 'item' as const, item: d.held_item.name };
     if (d.trigger.name === 'trade') return { to: child.species.name, trigger: 'trade' as const };
     // なつき（時間帯の条件が無いもの。ピチュー・クロバットなど。ゲームでは「たくさん歩く」。07 の66.2）
     if (d.trigger.name === 'level-up' && d.min_happiness && !d.time_of_day) return { to: child.species.name, trigger: 'friendship' as const };

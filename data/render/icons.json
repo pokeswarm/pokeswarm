@@ -1758,6 +1758,22 @@
       "glyph": "rope",
       "color": "#8d6e63"
     },
+    "kings-rock": {
+      "glyph": "gem",
+      "color": "#ffca28"
+    },
+    "metal-coat": {
+      "glyph": "shield",
+      "color": "#b0bec5"
+    },
+    "up-grade": {
+      "glyph": "gem",
+      "color": "#ef5350"
+    },
+    "dragon-scale": {
+      "glyph": "shield",
+      "color": "#4fc3f7"
+    },
     "light-ball": {
       "glyph": "orb",
       "color": "#ffee58"

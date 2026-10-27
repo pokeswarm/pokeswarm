@@ -2409,7 +2409,8 @@
     "evolvesTo": [
       {
         "to": "magmortar",
-        "trigger": "trade"
+        "trigger": "item",
+        "item": "magmarizer"
       }
     ]
   },
@@ -2958,7 +2959,8 @@
     "evolvesTo": [
       {
         "to": "steelix",
-        "trigger": "trade"
+        "trigger": "item",
+        "item": "metal-coat"
       }
     ]
   },
@@ -3263,7 +3265,8 @@
     "evolvesTo": [
       {
         "to": "porygon2",
-        "trigger": "trade"
+        "trigger": "item",
+        "item": "up-grade"
       }
     ]
   },
@@ -3493,7 +3496,8 @@
     "evolvesTo": [
       {
         "to": "rhyperior",
-        "trigger": "trade"
+        "trigger": "item",
+        "item": "protector"
       }
     ]
   },
@@ -3610,7 +3614,8 @@
     "evolvesTo": [
       {
         "to": "scizor",
-        "trigger": "trade"
+        "trigger": "item",
+        "item": "metal-coat"
       },
       {
         "to": "kleavor",
@@ -3787,7 +3792,8 @@
       },
       {
         "to": "slowking",
-        "trigger": "trade"
+        "trigger": "item",
+        "item": "kings-rock"
       }
     ]
   },

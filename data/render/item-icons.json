@@ -1081,6 +1081,126 @@
         "j": "#19191b"
       }
     },
+    "kings-rock": {
+      "rows": [
+        ".....aa.......",
+        ".....bc.......",
+        "....cdce......",
+        "....fdcgha....",
+        "eaigjdcihci...",
+        "ghghddjagghca.",
+        "hhggjdbieiafc.",
+        "gbgijdce.iigg.",
+        "cdfcddceacaca.",
+        "cdjjdjcecfffg.",
+        "gcjddjbhbfffa.",
+        ".ifddbbbbfhgg.",
+        "..icjbhgfhg...",
+        "...ggaiegi...."
+      ],
+      "palette": {
+        "a": "#7a6f33",
+        "b": "#b9a939",
+        "c": "#968a3c",
+        "d": "#e3d35b",
+        "e": "#3f3624",
+        "f": "#a9992f",
+        "g": "#6b602b",
+        "h": "#8c7e2d",
+        "i": "#574e28",
+        "j": "#cdbd4d"
+      }
+    },
+    "metal-coat": {
+      "rows": [
+        "...abbbcbbd...",
+        "..aeffggfgbd..",
+        ".ceffggffggeh.",
+        ".cgffggffgffa.",
+        ".heefgffffebd.",
+        ".hccgebbbbhdi.",
+        ".jhcechddddji.",
+        ".abchdiiiihbh.",
+        ".hbbaaaaaacai.",
+        ".hccebcccchdi.",
+        ".hccechdddddi.",
+        ".jhcechddddji.",
+        "..ihcahdddji..",
+        "...iiiiiiji..."
+      ],
+      "palette": {
+        "a": "#8f9696",
+        "b": "#acb8b8",
+        "c": "#96a8a8",
+        "d": "#607676",
+        "e": "#cfdada",
+        "f": "#f6fbfb",
+        "g": "#edf6f6",
+        "h": "#728181",
+        "i": "#4a5555",
+        "j": "#556565"
+      }
+    },
+    "up-grade": {
+      "rows": [
+        "..............",
+        ".....abca.....",
+        "....cdefga....",
+        "..bheeffffga..",
+        "cdeiihffffbdbg",
+        "cdheiehdddhdbg",
+        "gbbhiiiiiijcga",
+        "gbbeeejeejjbga",
+        "cddhjjjeejdbbg",
+        "cbddhjjeedbbcg",
+        "..cbbhhddccg..",
+        "....gbdbcg....",
+        ".....acga.....",
+        ".............."
+      ],
+      "palette": {
+        "a": "#434035",
+        "b": "#8b8a74",
+        "c": "#706f62",
+        "d": "#aba889",
+        "e": "#dfd1bb",
+        "f": "#dcba17",
+        "g": "#625e47",
+        "h": "#bdbaa0",
+        "i": "#f5f5d8",
+        "j": "#becab9"
+      }
+    },
+    "dragon-scale": {
+      "rows": [
+        "..............",
+        "..............",
+        "......aababb..",
+        "....acccddddbe",
+        "...acfgdddddda",
+        "..bhifggddddge",
+        ".cjfifgggggghe",
+        "ahifijjjjjjfbe",
+        "bjififfffihce.",
+        "ajijjjjjihbe..",
+        "aihhhhhbba....",
+        "eaeeeeee......",
+        "..............",
+        ".............."
+      ],
+      "palette": {
+        "a": "#5f8795",
+        "b": "#779fa6",
+        "c": "#84b8c4",
+        "d": "#d1eec0",
+        "e": "#4a6979",
+        "f": "#9adcfa",
+        "g": "#aae9de",
+        "h": "#8bcbe5",
+        "i": "#98daf6",
+        "j": "#9ddffe"
+      }
+    },
     "light-ball": {
       "rows": [
         "...aabbbbaa...",

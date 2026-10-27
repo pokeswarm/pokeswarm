@@ -69,6 +69,16 @@
       "it": "Dentedidrago"
     }
   },
+  "dragon-scale": {
+    "names": {
+      "ja": "りゅうのウロコ",
+      "en": "Dragon Scale",
+      "fr": "Écaille Draco",
+      "de": "Drachenschuppe",
+      "es": "Escama Dragón",
+      "it": "Squama Drago"
+    }
+  },
   "everstone": {
     "names": {
       "ja": "かわらずのいし",
@@ -117,6 +127,16 @@
       "de": "Eisen",
       "es": "Hierro",
       "it": "Ferro"
+    }
+  },
+  "kings-rock": {
+    "names": {
+      "ja": "おうじゃのしるし",
+      "en": "King’s Rock",
+      "fr": "Roche Royale",
+      "de": "King-Stein",
+      "es": "Roca del Rey",
+      "it": "Roccia di Re"
     }
   },
   "leaf-stone": {
@@ -187,6 +207,16 @@
       "de": "Magnet",
       "es": "Imán",
       "it": "Calamita"
+    }
+  },
+  "metal-coat": {
+    "names": {
+      "ja": "メタルコート",
+      "en": "Metal Coat",
+      "fr": "Peau Métal",
+      "de": "Metallmantel",
+      "es": "Revest. Metálico",
+      "it": "Metalcoperta"
     }
   },
   "metronome": {
@@ -377,6 +407,16 @@
       "de": "Krummlöffel",
       "es": "Cuchara Torcida",
       "it": "Cucchiaio Torto"
+    }
+  },
+  "up-grade": {
+    "names": {
+      "ja": "アップグレード",
+      "en": "Upgrade",
+      "fr": "Améliorator",
+      "de": "Upgrade",
+      "es": "Mejora",
+      "it": "Upgrade"
     }
   },
   "water-stone": {

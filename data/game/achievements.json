@@ -666,6 +666,72 @@
       "reward": {
         "item": "moon-stone"
       }
+    },
+    {
+      "id": "johto-stone-water",
+      "region": "johto",
+      "condition": {
+        "stat": "bestLevel.poliwag",
+        "atLeast": 30
+      },
+      "reward": {
+        "item": "water-stone"
+      }
+    },
+    {
+      "id": "johto-stone-fire",
+      "region": "johto",
+      "condition": {
+        "stat": "bestLevel.cyndaquil",
+        "atLeast": 30
+      },
+      "reward": {
+        "item": "fire-stone"
+      }
+    },
+    {
+      "id": "johto-kings-rock",
+      "region": "johto",
+      "condition": {
+        "stat": "bestLevel.slowpoke",
+        "atLeast": 30
+      },
+      "reward": {
+        "item": "kings-rock"
+      }
+    },
+    {
+      "id": "johto-metal-coat",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.steelix",
+        "atLeast": 1
+      },
+      "reward": {
+        "item": "metal-coat"
+      }
+    },
+    {
+      "id": "johto-up-grade",
+      "region": "johto",
+      "condition": {
+        "stat": "bestLevel.porygon",
+        "atLeast": 30
+      },
+      "reward": {
+        "item": "up-grade"
+      }
+    },
+    {
+      "id": "johto-dragon-scale",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.kingdra",
+        "atLeast": 1
+      },
+      "reward": {
+        "item": "dragon-scale"
+      }
     }
   ]
 }

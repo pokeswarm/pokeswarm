@@ -2374,5 +2374,41 @@
     ],
     "license": "CC BY-NC 4.0",
     "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0176"
+  },
+  {
+    "key": "scizor",
+    "dex": 212,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0212"
+  },
+  {
+    "key": "porygon2",
+    "dex": 233,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0233"
+  },
+  {
+    "key": "slowking",
+    "dex": 199,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0199"
   }
 ]

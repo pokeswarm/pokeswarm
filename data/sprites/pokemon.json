@@ -1122,7 +1122,8 @@
       "key": "steelix",
       "dex": 208,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1247,6 +1248,18 @@
     {
       "key": "togetic",
       "dex": 176
+    },
+    {
+      "key": "scizor",
+      "dex": 212
+    },
+    {
+      "key": "porygon2",
+      "dex": 233
+    },
+    {
+      "key": "slowking",
+      "dex": 199
     }
   ]
 }

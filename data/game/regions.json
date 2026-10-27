@@ -39,7 +39,7 @@
     {
       "id": "johto",
       "available": false,
-      "playables": ["cyndaquil", "chikorita", "totodile", "egg"],
+      "playables": ["cyndaquil", "chikorita", "totodile", "egg", "onix", "scyther", "gastly", "slowpoke", "porygon"],
       "unlock": { "stat": "bossDefeated.mew", "atLeast": 1 }
     },
     {

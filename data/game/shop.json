@@ -148,6 +148,16 @@
       "key": "egg",
       "cost": 5000,
       "region": "johto"
+    },
+    {
+      "key": "slowpoke",
+      "cost": 1000,
+      "region": "johto"
+    },
+    {
+      "key": "porygon",
+      "cost": 9999,
+      "region": "johto"
     }
   ],
   "startingCoins": 500,

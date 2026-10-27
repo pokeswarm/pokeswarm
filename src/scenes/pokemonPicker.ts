@@ -180,11 +180,11 @@ export class PokemonPicker {
       // 名前は伏せて、解放の条件だけ見せる（実績の一覧と同じ）
       name.textContent = t('select.locked');
       const id = playablesConfig.pokemon[key]!.unlock ?? key;
-      const a = achievementsConfig.achievements.find((x) => x.reward?.pokemon === id);
+      const a = achievementsConfig.achievements.find((x) => x.reward?.pokemon === id && x.region === (this.opts.region ?? 'kanto'));
       // 半分を超えるまでは「？？？」（黒塗りのポケモンが条件の文で分からないように）
       const cond = a ? visibleAchievementCondition(a, regionStats(session.store.current.stats, a.region), false) : '';
       // コインで買えるポケモンは値段を出す
-      const sale = shopConfig.pokemon.find((p) => p.key === key);
+      const sale = shopConfig.pokemon.find((p) => p.key === key && p.region === (this.opts.region ?? 'kanto'));
       // 解放済みと同じく名前の下に2行（マウスを動かしても欄の高さが変わらないように）
       lines.push(t('select.notUnlocked'), sale ? t('select.buyHint', { cost: sale.cost }) : cond ? t('select.unlockHint', { condition: cond }) : '');
     }

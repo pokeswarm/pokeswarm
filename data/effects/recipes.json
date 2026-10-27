@@ -3301,6 +3301,47 @@
         "fit": "circle",
         "size": 1
       }
+    },
+    "iron-tail": {
+      "extends": "steel.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      },
+      "sprite": {
+        "id": "tail-iron",
+        "fit": "front",
+        "size": 1.2
+      }
+    },
+    "bullet-punch": {
+      "extends": "steel.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      },
+      "sprite": {
+        "id": "fist-bullet",
+        "fit": "circle",
+        "size": 1.6,
+        "rotate": "velocity"
+      }
+    },
+    "recover": {
+      "extends": "normal.base",
+      "burstFlash": {
+        "colors": [
+          "#e1f5fe",
+          "#80deea"
+        ],
+        "periodMs": 200,
+        "alpha": 0.35
+      },
+      "sprite": {
+        "id": "heal-rise",
+        "fit": "circle",
+        "size": 1.3
+      }
     }
   }
 }

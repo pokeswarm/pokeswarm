@@ -167,7 +167,10 @@
     "clefable",
     "igglybuff",
     "togepi",
-    "togetic"
+    "togetic",
+    "scizor",
+    "porygon2",
+    "slowking"
   ],
   "moves": [
     "ember",
@@ -286,7 +289,10 @@
     "synthesis",
     "bite",
     "crunch",
-    "moonlight"
+    "moonlight",
+    "iron-tail",
+    "bullet-punch",
+    "recover"
   ],
   "items": [
     "x-attack",

@@ -36,7 +36,8 @@
     "psychic",
     "synthesis",
     "metronome-baby",
-    "moonlight"
+    "moonlight",
+    "recover"
   ],
   "heavyHitters": [
     "giga-impact",
@@ -46,6 +47,8 @@
     "pound": "derived",
     "flame-wheel": "derived",
     "synthesis": "derived",
-    "bite": "derived"
+    "bite": "derived",
+    "iron-tail": "derived",
+    "bullet-punch": "derived"
   }
 }

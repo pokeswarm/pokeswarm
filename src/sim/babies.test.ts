@@ -112,3 +112,20 @@ describe('ベイビィポケモンの決まり', () => {
     expect(s.w.healZones).toHaveLength(0);
   });
 });
+
+describe('カントーにもいるポケモンの、ジョウトで進化した姿（07 の80章）', () => {
+  it('イワーク ＋ メタルコート → ハガネールで アイアンテール、ストライク → ハッサムで バレットパンチ、ポリゴン → ポリゴン2で じこさいせい', () => {
+    for (const [line, item, form, move] of [
+      ['onix', 'metal-coat', 'steelix', 'iron-tail'],
+      ['scyther', 'metal-coat', 'scizor', 'bullet-punch'],
+      ['porygon', 'up-grade', 'porygon2', 'recover'],
+    ] as const) {
+      const s = setup(line);
+      s.p.items = [{ item: s.rules.items.findIndex((it) => it.key === item), level: 1 }];
+      checkEvolution(s.w, s.p);
+      expect(s.p.species).toBe(s.species(form));
+      expect(s.keys()).toContain(move);
+      expect(s.p.items).toEqual([]);
+    }
+  });
+});

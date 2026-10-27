@@ -5841,6 +5841,158 @@
           "durationSeconds": 1
         }
       ]
+    },
+    "iron-tail": {
+      "pattern": "sweep",
+      "effect": "iron-tail",
+      "base": {
+        "power": 60.5,
+        "cooldownSeconds": 1.35,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 60,
+        "range": 30,
+        "durationSeconds": 0.4,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 220,
+        "knockbackSeconds": 0.1,
+        "spreadDegrees": 180,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 50
+      },
+      "levels": [
+        {
+          "power": 13.8
+        },
+        {
+          "size": 6,
+          "power": 9.5
+        },
+        {
+          "power": 13.1
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 0.9
+        },
+        {
+          "spreadDegrees": 60,
+          "power": 1.9
+        },
+        {
+          "power": 10.7
+        },
+        {
+          "size": 6,
+          "power": 4.7
+        }
+      ],
+      "body": {
+        "lungeDistance": 10,
+        "afterimages": 0
+      },
+      "teachOnly": true
+    },
+    "bullet-punch": {
+      "pattern": "nearest",
+      "effect": "bullet-punch",
+      "base": {
+        "intervalSeconds": 0.1,
+        "pierce": 2,
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.1,
+        "spreadDegrees": 0,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0,
+        "power": 39.2,
+        "cooldownSeconds": 0.6,
+        "count": 1,
+        "speed": 760,
+        "size": 14,
+        "range": 200,
+        "durationSeconds": 0.28,
+        "knockback": 220
+      },
+      "levels": [
+        {
+          "power": 8.9
+        },
+        {
+          "size": 2,
+          "power": 9
+        },
+        {
+          "power": 8.9
+        },
+        {
+          "cooldownSeconds": -0.1,
+          "power": -3.5
+        },
+        {
+          "size": 2,
+          "power": 7.4
+        },
+        {
+          "range": 30,
+          "power": 7.5
+        },
+        {
+          "power": 7.5
+        }
+      ],
+      "teachOnly": true
+    },
+    "recover": {
+      "pattern": "heal",
+      "effect": "recover",
+      "base": {
+        "power": 0,
+        "cooldownSeconds": 4,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 40,
+        "range": 0,
+        "durationSeconds": 0.6,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "healPct": 6
+      },
+      "levels": [
+        {
+          "healPct": 1
+        },
+        {
+          "cooldownSeconds": -0.3
+        },
+        {
+          "healPct": 1
+        },
+        {
+          "cooldownSeconds": -0.3
+        },
+        {
+          "healPct": 1
+        },
+        {
+          "healPct": 1
+        },
+        {
+          "cooldownSeconds": -0.4
+        }
+      ],
+      "teachOnly": true
     }
   }
 }

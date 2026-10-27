@@ -141,7 +141,7 @@ export class ShopScene extends Phaser.Scene {
         buy.textContent = owned ? t('shop.owned') : t('shop.buy', { cost: item.cost });
         buy.disabled = owned || save.coins < item.cost;
         if (buy.disabled) buy.style.opacity = '0.5';
-        buy.onclick = () => session.store.update((d) => void buyPokemon(d, shopConfig, item.key, unlockName));
+        buy.onclick = () => session.store.update((d) => void buyPokemon(d, shopConfig, item.key, unlockName, item.region));
         row.append(name, state, desc, buy);
         list.append(row);
       }

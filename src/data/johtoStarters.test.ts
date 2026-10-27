@@ -13,8 +13,8 @@ describe('ジョウトの御三家（07 の48.3・66.3）', () => {
     ['totodile', 'scratch', 'mystic-water', 'bite', 'x-attack', 'crunch'],
   ] as const;
 
-  it('ジョウトで遊べるのは御三家。最後の姿までプレイヤーのドット絵がある', () => {
-    expect(regionsConfig.regions.find((r) => r.id === 'johto')!.playables).toEqual([...chains.map((c) => c[0]), 'egg']);
+  it('ジョウトの最初の3匹は御三家（次にタマゴ）。最後の姿までプレイヤーのドット絵がある', () => {
+    expect(regionsConfig.regions.find((r) => r.id === 'johto')!.playables.slice(0, 4)).toEqual([...chains.map((c) => c[0]), 'egg']);
     for (const k of ['cyndaquil', 'quilava', 'typhlosion', 'chikorita', 'bayleef', 'meganium', 'totodile', 'croconaw', 'feraligatr']) expect(playerSpriteKeys.has(k)).toBe(true);
   });
 

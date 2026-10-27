@@ -155,6 +155,18 @@
     "type": "water",
     "damageClass": "special"
   },
+  "bullet-punch": {
+    "names": {
+      "ja": "バレットパンチ",
+      "en": "Bullet Punch",
+      "fr": "Pisto-Poing",
+      "de": "Patronenhieb",
+      "es": "Puño Bala",
+      "it": "Pugnoscarica"
+    },
+    "type": "steel",
+    "damageClass": "physical"
+  },
   "confusion": {
     "names": {
       "ja": "ねんりき",
@@ -635,6 +647,18 @@
     "type": "ice",
     "damageClass": "special"
   },
+  "iron-tail": {
+    "names": {
+      "ja": "アイアンテール",
+      "en": "Iron Tail",
+      "fr": "Queue de Fer",
+      "de": "Eisenschweif",
+      "es": "Cola Férrea",
+      "it": "Codacciaio"
+    },
+    "type": "steel",
+    "damageClass": "physical"
+  },
   "karate-chop": {
     "names": {
       "ja": "からてチョップ",
@@ -922,6 +946,18 @@
     },
     "type": "grass",
     "damageClass": "physical"
+  },
+  "recover": {
+    "names": {
+      "ja": "じこさいせい",
+      "en": "Recover",
+      "fr": "Soin",
+      "de": "Genesung",
+      "es": "Recuperación",
+      "it": "Ripresa"
+    },
+    "type": "normal",
+    "damageClass": "status"
   },
   "rest": {
     "names": {

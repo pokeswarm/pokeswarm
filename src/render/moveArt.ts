@@ -2293,7 +2293,7 @@ function crossChop(palette = ['#0d1b2a', '#1e5aa8', '#64b5f6', '#bbdefb', '#ffff
   return { palette, frameMs: 80, loopFrom: 1, parts: { main: frames.map(toRows) } };
 }
 
-type PunchKind = 'plain' | 'mach' | 'focus' | 'fire' | 'thunder';
+type PunchKind = 'plain' | 'mach' | 'focus' | 'fire' | 'thunder' | 'bullet';
 
 /**
  * こぶし（右へ突き出した横からの姿）: 4つの関節のでこぼこと指の筋、前に巻いた親指、赤い手首のバンド。種類ごとにまわりを飾る
@@ -2309,8 +2309,10 @@ function punch(kind: PunchKind = 'plain'): SpriteOut {
     focus: ['#ff6d00', '#ffab40', '#ffe0b2'],
     fire: ['#d84315', '#ff9800', '#ffeb3b'],
     thunder: ['#f9a825', '#ffeb3b', '#fffde7'],
+    bullet: ['#90a4ae', '#cfd8dc', '#ffffff'],
   };
-  const palette = ['#2b1408', '#a31515', '#e53935', '#d8875c', '#f5bd8f', '#ffe3c8', '#ffffff', ...deco[kind]];
+  // バレットパンチ（ハッサム）: 赤いはがねのはさみの色（バンドは鋼の灰色）。飾りは マッハパンチ と同じ速さの筋を鋼の色で
+  const palette = kind === 'bullet' ? ['#2b0808', '#37474f', '#78909c', '#8e1b1b', '#d32f2f', '#ef9a9a', '#ffffff', ...deco[kind]] : ['#2b1408', '#a31515', '#e53935', '#d8875c', '#f5bd8f', '#ffe3c8', '#ffffff', ...deco[kind]];
   const frames = [0, 1, 2].map((f) => {
     const r = rng(1700 + f);
     const sparks = Array.from({ length: 3 }, () => ({ a: r() * Math.PI * 2, len: 0.25 + r() * 0.15 }));
@@ -2366,7 +2368,7 @@ function punch(kind: PunchKind = 'plain'): SpriteOut {
           if (Math.abs(side - zig) < 0.06) return 8;
         }
       }
-      if (kind === 'mach') {
+      if (kind === 'mach' || kind === 'bullet') {
         // 長い速さの筋と、少しずれた白い残像のふち
         for (const [ly, len] of [[-0.34, 0.5], [-0.12, 0.7], [0.1, 0.62], [0.3, 0.45]] as const) {
           if (Math.abs(v - ly) < 0.03 && u < -0.66 + 0.2 && u > -0.66 - len + f * 0.05) return 9;
@@ -2455,9 +2457,8 @@ function kickArc(): SpriteOut {
  * ドラゴンテール: 前方をなぎ払う竜のしっぽ（左下から右へ弧を描き、先はひれ）。上の面が明るく、腹側に節。
  * 後ろに速さの弧。コマでしっぽが少ししなる
  */
-function tailSwipe(): SpriteOut {
-  // 0 輪郭・1 腹側の暗い青・2 青・3 うすい青・4 白い光・5 ひれの紫・6 速さの線
-  const palette = ['#120a2e', '#283593', '#5c6bc0', '#9fa8da', '#e8eaf6', '#9575cd', '#ffffff'];
+function tailSwipe(palette = ['#120a2e', '#283593', '#5c6bc0', '#9fa8da', '#e8eaf6', '#9575cd', '#ffffff']): SpriteOut {
+  // 0 輪郭・1 腹側の暗い色・2 しっぽ・3 うすい色・4 白い光・5 ひれ・6 速さの線（アイアンテール は鋼の灰色）
   const frames = [0, 1].map((f) => {
     const p0 = [-0.95, 0.7] as const;
     const p1 = [-0.1, 0.55 - f * 0.08] as const;
@@ -2617,12 +2618,14 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'cross-chop': () => crossChop(),
     fist: () => punch('plain'),
     'fist-mach': () => punch('mach'),
+    'fist-bullet': () => punch('bullet'),
     'fist-focus': () => punch('focus'),
     'fist-fire': () => punch('fire'),
     'fist-thunder': () => punch('thunder'),
     kick: () => kick(),
     'kick-arc': () => kickArc(),
     'tail-swipe': () => tailSwipe(),
+    'tail-iron': () => tailSwipe(['#1c2833', '#455a64', '#90a4ae', '#cfd8dc', '#ffffff', '#b0bec5', '#ffffff']),
     'dragon-ring': () => dragonRing(),
     'dragon-shock': () => dragonShock(),
     palm: () => palm(),

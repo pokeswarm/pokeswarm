@@ -732,6 +732,39 @@
       "reward": {
         "item": "dragon-scale"
       }
+    },
+    {
+      "id": "johto-unlock-onix",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.steelix",
+        "atLeast": 5
+      },
+      "reward": {
+        "pokemon": "onix"
+      }
+    },
+    {
+      "id": "johto-unlock-scyther",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.scyther",
+        "atLeast": 3
+      },
+      "reward": {
+        "pokemon": "scyther"
+      }
+    },
+    {
+      "id": "johto-unlock-gengar",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.gengar",
+        "atLeast": 4
+      },
+      "reward": {
+        "pokemon": "gengar"
+      }
     }
   ]
 }

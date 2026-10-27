@@ -79,8 +79,9 @@ export function buyUpgrade(save: SaveData, cfg: ShopConfig, id: string, region =
  * ポケモンを買う（解放の名前をセーブの解放済みに足す）。もう解放している・コインが足りない・売っていないなら false。
  * unlockName は playables.json の unlock（省略時はキー）
  */
-export function buyPokemon(save: SaveData, cfg: ShopConfig, key: string, unlockName: string): boolean {
-  const item = cfg.pokemon.find((p) => p.key === key);
+export function buyPokemon(save: SaveData, cfg: ShopConfig, key: string, unlockName: string, region: string = HOME_REGION): boolean {
+  // 同じポケモンを地方ごとに売る（ヤドン・ポリゴン）ので、地方で探す
+  const item = cfg.pokemon.find((p) => p.key === key && p.region === region);
   // 解放はその地方のもの（07 の66.1）
   const name = regionUnlockKey(item?.region ?? HOME_REGION, unlockName);
   if (!item || save.unlocked.includes(name) || save.coins < item.cost || !shopRegionOpen(save, cfg, item.region)) return false;

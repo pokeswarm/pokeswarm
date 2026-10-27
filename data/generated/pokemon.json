@@ -3270,6 +3270,38 @@
       }
     ]
   },
+  "porygon2": {
+    "dex": 233,
+    "names": {
+      "ja": "ポリゴン２",
+      "en": "Porygon2",
+      "fr": "Porygon2",
+      "de": "Porygon2",
+      "es": "Porygon2",
+      "it": "Porygon2"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 80,
+      "defense": 90,
+      "specialAttack": 105,
+      "specialDefense": 95,
+      "speed": 60
+    },
+    "preEvolutions": [
+      "porygon"
+    ],
+    "evolvesTo": [
+      {
+        "to": "porygon-z",
+        "trigger": "item",
+        "item": "dubious-disc"
+      }
+    ]
+  },
   "psyduck": {
     "dex": 54,
     "names": {
@@ -3588,6 +3620,33 @@
     ],
     "evolvesTo": []
   },
+  "scizor": {
+    "dex": 212,
+    "names": {
+      "ja": "ハッサム",
+      "en": "Scizor",
+      "fr": "Cizayox",
+      "de": "Scherox",
+      "es": "Scizor",
+      "it": "Scizor"
+    },
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 130,
+      "defense": 100,
+      "specialAttack": 55,
+      "specialDefense": 80,
+      "speed": 65
+    },
+    "preEvolutions": [
+      "scyther"
+    ],
+    "evolvesTo": []
+  },
   "scyther": {
     "dex": 123,
     "names": {
@@ -3754,6 +3813,33 @@
       "defense": 110,
       "specialAttack": 100,
       "specialDefense": 80,
+      "speed": 30
+    },
+    "preEvolutions": [
+      "slowpoke"
+    ],
+    "evolvesTo": []
+  },
+  "slowking": {
+    "dex": 199,
+    "names": {
+      "ja": "ヤドキング",
+      "en": "Slowking",
+      "fr": "Roigada",
+      "de": "Laschoking",
+      "es": "Slowking",
+      "it": "Slowking"
+    },
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 75,
+      "defense": 80,
+      "specialAttack": 100,
+      "specialDefense": 110,
       "speed": 30
     },
     "preEvolutions": [

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { regionStage, regionStages, regionsConfig, spawnConfig } from './index';
+import { achievementsConfig, regionStage, regionStages, regionsConfig, spawnConfig } from './index';
 import { buildSimRules } from './simRules';
 
 describe('地方のステージ（data/regions/<地方>.json）', () => {
@@ -32,10 +32,12 @@ describe('地方のステージ（data/regions/<地方>.json）', () => {
     expect(johto.stage.legendary).toBeNull();
   });
 
-  it('プレイヤーのドット絵が無いポケモンへは進化しない（ジョウトのボス用に足したハガネールに、カントーのイワークがヒモで進化しない）', () => {
+  it('カントーのイワークはヒモでハガネールに進化しない（メタルコートで進化し、メタルコートはジョウトの実績でだけ出る。07 の66.2）', () => {
     const rules = buildSimRules();
     const onix = rules.species.find((s) => s.key === 'onix')!;
-    expect(onix.evolutions).toEqual([]);
+    const metalCoat = rules.items.findIndex((i) => i.key === 'metal-coat');
+    expect(onix.evolutions).toEqual([{ to: rules.species.findIndex((s) => s.key === 'steelix'), trigger: 'item', item: metalCoat }]);
+    expect(achievementsConfig.achievements.filter((a) => a.reward?.item === 'metal-coat').map((a) => a.region)).toEqual(['johto']);
     const machoke = rules.species.find((s) => s.key === 'machoke')!;
     expect(machoke.evolutions.length).toBeGreaterThan(0);
   });

@@ -107,7 +107,7 @@ describe('地方ごとの記録・強化・ショップ（02 の17章）', () =>
     expect(isPlayableUnlocked(save, unlocksConfig, 'onix', undefined)).toBe(true);
     expect(isPlayableUnlocked(save, unlocksConfig, 'onix', undefined, 'johto')).toBe(false);
     save.stats.shopSpent = 50000;
-    expect(buyPokemon(save, shopConfig, 'egg', 'egg')).toBe(true);
+    expect(buyPokemon(save, shopConfig, 'egg', 'egg', 'johto')).toBe(true);
     expect(save.unlocked).toContain('johto:egg');
     expect(isPlayableUnlocked(save, unlocksConfig, 'egg', undefined, 'johto')).toBe(true);
     expect(isPlayableUnlocked(save, unlocksConfig, 'egg', undefined)).toBe(false);

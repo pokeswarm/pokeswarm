@@ -1623,7 +1623,10 @@
     "bite": "fang",
     "crunch": "fang",
     "metronome-baby": "metronome",
-    "moonlight": "heart"
+    "moonlight": "heart",
+    "iron-tail": "dragon",
+    "bullet-punch": "fist",
+    "recover": "heart"
   },
   "items": {
     "x-attack": {

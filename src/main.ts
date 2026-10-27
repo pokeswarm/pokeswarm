@@ -6,6 +6,7 @@ import { placeholderRender, playablesConfig, regionsConfig } from './data';
 import { migrateOldDiscoveries } from './meta/discoveries';
 import { session } from './meta/session';
 import { loadSpriteManifest } from './render/sprites/spriteManifest';
+import { shinySpriteKey } from './meta/loadoutOptions';
 import { AchievementsScene } from './scenes/AchievementsScene';
 import { ShopScene } from './scenes/ShopScene';
 import { FriendsScene } from './scenes/FriendsScene';
@@ -78,7 +79,10 @@ async function start(): Promise<void> {
     const pokemon = playablesConfig.pokemon[requested] ? requested : playablesConfig.default;
     // 地方は ?region= か、そのポケモンを遊べる最初の地方（ヒノアラシならジョウト）
     const region = q.get('region') ?? regionsConfig.regions.find((r) => r.playables?.includes(pokemon))?.id;
-    run = { pokemon, region, playerSprite: await loadSpriteManifest(playablesConfig.pokemon[pokemon]!.sprite), coop: null };
+    // テストプレイ: ?shiny で色違い（見た目だけ）
+    const shiny = q.has('shiny');
+    const sprite = playablesConfig.pokemon[pokemon]!.sprite;
+    run = { pokemon, region, playerSprite: await loadSpriteManifest(shiny ? shinySpriteKey(sprite) : sprite), coop: null, shiny };
   }
   const game = new Phaser.Game({
     type: Phaser.AUTO,

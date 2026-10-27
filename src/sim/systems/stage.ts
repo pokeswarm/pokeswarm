@@ -1,6 +1,6 @@
 import type { BossMove, LegendField } from '../../data/schema';
 import { randomUnit } from '../math';
-import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World, type BossEntry } from '../world';
+import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World, type BossEntry, type WingKind } from '../world';
 import { hurtPlayer, fieldDamage } from './health';
 import { fireCasterMove } from './attack';
 import { casterFor } from './legendCasters';
@@ -36,6 +36,30 @@ function spawnBoss(world: World, kindIndex: number, moves: readonly number[], in
   return id;
 }
 
+/**
+ * 伝説を1体出す。技は伝説ごとの技（無ければ共通の技を順に）。第2段階（HP が半分を切ると技の間隔が短くなり、2つ同時に使うことがある）は
+ * 伝説ごとに数える。出せなければ -1
+ */
+function spawnLegend(world: World, kind: number): number {
+  const cfg = world.rules.stage.legendary!;
+  const set = cfg.moveSets[world.rules.enemies.kinds[kind]?.id ?? ''];
+  const enrage = cfg.enrage
+    ? { hpRatio: cfg.enrage.hpRatio, interval: Math.round((set?.enrageMoveIntervalSeconds ?? cfg.enrage.moveIntervalSeconds) / world.dt), doubleChance: cfg.enrage.doubleChance }
+    : null;
+  const id = spawnBoss(
+    world,
+    kind,
+    (set?.moves ?? cfg.moves).map((m) => world.rules.stage.moves.findIndex((x) => x.id === m)),
+    Math.round((set?.moveIntervalSeconds ?? cfg.moveIntervalSeconds) / world.dt),
+    enrage,
+  );
+  const boss = world.bosses.find((b) => b.id === id);
+  if (boss && set?.random) boss.random = true;
+  // "*" は毎回 pool からランダムに選ぶ（ミュウ: テレポートとゆびをふるを交互に）
+  if (boss && set?.pool) boss.pool = set.pool.map((m) => world.rules.stage.moves.findIndex((x) => x.id === m)).filter((k) => k >= 0);
+  return id;
+}
+
 /** 区間が始まって予定の時間がたったら中ボス・ボスを出す。伝説戦では伝説を出す */
 export function spawnBosses(world: World): void {
   if (world.role === 'guest' || world.players.length === 0) return;
@@ -43,21 +67,9 @@ export function spawnBosses(world: World): void {
   if (lg) {
     if (!lg.spawned && world.tick >= lg.appearTick) {
       lg.spawned = true;
-      const cfg = world.rules.stage.legendary!;
-      // 伝説ごとの技（無ければ共通の技を順に）
-      const set = cfg.moveSets[world.rules.enemies.kinds[lg.kind]?.id ?? ''];
-      const id = spawnBoss(
-        world,
-        lg.kind,
-        (set?.moves ?? cfg.moves).map((m) => world.rules.stage.moves.findIndex((x) => x.id === m)),
-        Math.round((set?.moveIntervalSeconds ?? cfg.moveIntervalSeconds) / world.dt),
-      );
-      const boss = world.bosses.find((b) => b.id === id);
-      if (boss && set?.random) boss.random = true;
-      // "*" は毎回 pool からランダムに選ぶ（ミュウ: テレポートとゆびをふるを交互に）
-      if (boss && set?.pool) boss.pool = set.pool.map((m) => world.rules.stage.moves.findIndex((x) => x.id === m)).filter((k) => k >= 0);
+      // ラウンドの相手は同時に出す（レッド戦のエーフィとカビゴンなど）
+      for (const kind of legendRoundKinds(world, lg.kind)) spawnLegend(world, kind);
     }
-    if (lg.spawned) enrageLegendary(world);
     return;
   }
   const inSection = world.tick - world.sectionStartTick;
@@ -95,6 +107,53 @@ export function advanceSection(world: World): void {
   world.section++;
   world.sectionStartTick = world.tick;
   world.events.push({ type: 'sectionAdvanced', section: world.section });
+}
+
+/**
+ * 伝説の乱入（ジョウトの三犬。作者の決定 2026年10月26日。ソロ・ホスト）: 決まった分ちょうどに、確率でどれかが乱入する（1回のランで1回まで）。
+ * 「DANGER」の後に出て、雑魚はそのまま湧く。制限時間で倒せなければ逃げる。クリアの後（伝説戦）は乱入しない
+ */
+export function stepIntruders(world: World): void {
+  if (world.role === 'guest' || world.players.length === 0) return;
+  const cfg = world.rules.stage.legendary?.intruders;
+  const it = world.intruder;
+  if (it && !it.done) {
+    if (it.id === -1) {
+      if (world.tick < it.appearTick) return;
+      it.id = spawnLegend(world, it.kind);
+      // 出せなかった（敵の上限）なら、次の更新で出し直す
+      return;
+    }
+    const i = findEnemyIndex(world, it.id);
+    if (i === -1 || world.enemies.hp[i]! <= 0) {
+      it.done = true;
+      return;
+    }
+    if (world.tick >= it.endTick) {
+      it.done = true;
+      world.enemies.hp[i] = 0;
+      world.events.push({ type: 'enemyRetired', id: it.id });
+      world.events.push({ type: 'intruderLeft', kind: it.kind });
+    }
+    return;
+  }
+  if (!cfg || it || world.legendary || world.cleared) return;
+  while (world.nextIntruderCheck < cfg.minutes.length && world.tick >= Math.round((cfg.minutes[world.nextIntruderCheck]! * 60) / world.dt)) {
+    world.nextIntruderCheck++;
+    if (world.rng.next() >= cfg.chance) continue;
+    const kind = world.rules.enemies.kinds.findIndex((k) => k.id === cfg.kinds[world.rng.int(cfg.kinds.length)]);
+    if (kind !== -1) startIntruder(world, kind);
+    return;
+  }
+}
+
+/** 伝説を乱入させる（「DANGER」の後に出る）。確認用の ?intruder= からも呼ぶ */
+export function startIntruder(world: World, kind: number): void {
+  const lg = world.rules.stage.legendary;
+  if (!lg) return;
+  const appearTick = world.tick + Math.round(lg.warningSeconds / world.dt);
+  world.intruder = { kind, id: -1, appearTick, endTick: appearTick + Math.round((lg.intruders?.timeLimitSeconds ?? lg.timeLimitSeconds) / world.dt), done: false };
+  world.events.push({ type: 'intruderWarning', kind });
 }
 
 /** スウォームイベント（ソロ・ホスト）。伝説戦の間は出さない */
@@ -190,10 +249,8 @@ export function bossAttacks(world: World): void {
       fieldLightning(world, boss, i);
       if (--boss.cooldown > 0) continue;
       boss.cooldown = boss.interval;
-      const cfg = world.rules.stage.legendary;
-      const enraged = !!world.legendary?.enraged && world.enemies.kind[i] === world.legendary.kind;
-      // 2つ同時に使う確率: 伝説の第2段階、または四天王の第2段階
-      const double = enraged && cfg?.enrage ? cfg.enrage.doubleChance : boss.enraged && boss.enrage ? boss.enrage.doubleChance : 0;
+      // 2つ同時に使う確率: 伝説・四天王の第2段階
+      const double = boss.enraged && boss.enrage ? boss.enrage.doubleChance : 0;
       const uses = double > 0 && world.rng.next() < double ? 2 : 1;
       for (let u = 0; u < uses; u++) useBossMove(world, boss, i);
     }
@@ -415,7 +472,13 @@ function strikeHazards(world: World): void {
         fireCasterMove(world, caster, pm, move.playerMove.level, move.playerMove);
       }
     }
-    if (move?.holdSeconds && hz.dasher !== -1 && world.legendAi?.enemyId === hz.dasher) world.legendAi.holdTicks = Math.round(move.holdSeconds / world.dt);
+    const holder = move?.holdSeconds && hz.dasher !== -1 ? world.legendAis.get(hz.dasher) : undefined;
+    if (holder) holder.holdTicks = Math.round(move!.holdSeconds! / world.dt);
+    // 回復（エーフィの あさのひざし・カビゴンの ねむる）: 使ったボスの HP を戻す（ホストが決め、HP はゲストへ送る）
+    if (move?.healPct && hz.dasher !== -1 && world.role !== 'guest') {
+      const i = findEnemyIndex(world, hz.dasher);
+      if (i !== -1 && world.enemies.hp[i]! > 0) world.enemies.hp[i] = Math.min(world.enemies.maxHp[i]!, world.enemies.hp[i]! + (world.enemies.maxHp[i]! * move.healPct) / 100);
+    }
     // 続けて使う技（ミュウツー: テレポートの直後に自分の周り）。ホストが決める
     if (move?.then && hz.dasher !== -1 && world.role !== 'guest') {
       const i = findEnemyIndex(world, hz.dasher);
@@ -470,6 +533,12 @@ function tickLegendField(world: World): void {
   }
   const f = active.field;
   if (f.slowPct) me.zoneSlowPct = Math.max(me.zoneSlowPct ?? 0, f.slowPct);
+  // 強い風（ルギア）: 一方向へ流す。向きは決まった間隔で変わる（どのブラウザでも同じ向き。黄金角ずつ回す）
+  if (f.wind) {
+    const a = Math.floor(world.tick / Math.max(1, Math.round(f.wind.everySeconds / world.dt))) * 2.399963;
+    me.x += Math.cos(a) * f.wind.speed * world.dt;
+    me.y += Math.sin(a) * f.wind.speed * world.dt;
+  }
   // 0.5 秒ごとに、その間の分をまとめて受ける
   const every = Math.round(0.5 / world.dt);
   me.fieldHurtTicks = (me.fieldHurtTicks ?? 0) + 1;
@@ -576,17 +645,89 @@ export function legendFieldOf(world: World, kind: number): LegendField | undefin
   return world.rules.stage.legendary?.moveSets[id]?.field;
 }
 
-/** 今の伝説戦のマップの効果と、伝説の敵の index（戦っていなければ null） */
+/** マップの効果のある伝説の種類（種類の番号 → 効果）。rules ごとに覚える */
+const fieldKinds = new WeakMap<World['rules'], Map<number, LegendField>>();
+/** 同じ更新の中では、同じ答えを使う（技の威力の計算から何度も呼ばれる） */
+const fieldTick = new WeakMap<World, { tick: number; out: { field: LegendField; index: number } | null }>();
+
+/**
+ * 今出ている伝説のマップの効果と、その伝説の敵の index（無ければ null）。伝説戦の相手のほか、乱入した伝説（三犬）も。
+ * ゲストも同じように決まるよう、出ている敵から探す
+ */
 export function activeLegendField(world: World): { field: LegendField; index: number } | null {
-  const lg = world.legendary;
-  if (!lg || lg.result) return null;
-  const e = world.enemies;
-  for (let i = 0; i < e.count; i++) {
-    if (e.kind[i] !== lg.kind || e.hp[i]! <= 0) continue;
-    const field = legendFieldOf(world, lg.kind);
-    return field ? { field, index: i } : null;
+  if (world.legendary?.result) return null;
+  const cached = fieldTick.get(world);
+  if (cached && cached.tick === world.tick) return cached.out;
+  let kinds = fieldKinds.get(world.rules);
+  if (!kinds) {
+    kinds = new Map();
+    world.rules.enemies.kinds.forEach((k, idx) => {
+      const f = world.rules.stage.legendary?.moveSets[k.id]?.field;
+      if (f && k.rank === 'legendary') kinds!.set(idx, f);
+    });
+    fieldKinds.set(world.rules, kinds);
   }
-  return null;
+  let out: { field: LegendField; index: number } | null = null;
+  if (kinds.size > 0) {
+    const e = world.enemies;
+    for (let i = 0; i < e.count; i++) {
+      if (e.hp[i]! <= 0) continue;
+      const field = kinds.get(e.kind[i]!);
+      if (field) {
+        out = { field, index: i };
+        break;
+      }
+    }
+  }
+  fieldTick.set(world, { tick: world.tick, out });
+  return out;
+}
+
+/** 伝説戦のラウンド（種類の番号）。rules ごとに覚える */
+interface LegendRounds {
+  readonly rounds: readonly { readonly kinds: readonly number[]; readonly stat?: string }[];
+  readonly bonus: readonly { readonly item: WingKind; readonly kinds: readonly number[] }[];
+}
+const roundsCache = new WeakMap<World['rules'], LegendRounds>();
+export function legendRounds(world: World): LegendRounds {
+  let r = roundsCache.get(world.rules);
+  if (!r) {
+    const cfg = world.rules.stage.legendary;
+    const idx = (id: string): number => world.rules.enemies.kinds.findIndex((k) => k.id === id);
+    r = {
+      rounds: (cfg?.rounds ?? []).map((x) => ({ kinds: x.kinds.map(idx), ...(x.stat ? { stat: x.stat } : {}) })),
+      bonus: (cfg?.bonusRounds ?? []).map((x) => ({ item: x.item, kinds: x.kinds.map(idx) })),
+    };
+    roundsCache.set(world.rules, r);
+  }
+  return r;
+}
+
+/** その伝説と同時に戦う相手（ラウンドの相手。ラウンドの無い伝説戦は自分だけ） */
+export function legendRoundKinds(world: World, kind: number): readonly number[] {
+  const r = legendRounds(world);
+  for (const x of r.rounds) if (x.kinds.includes(kind)) return x.kinds;
+  for (const x of r.bonus) if (x.kinds.includes(kind)) return x.kinds;
+  return [kind];
+}
+
+/** このランで戦うラウンドの並び: rounds の後に、拾ったはねの bonusRounds（ルギア・ホウオウ） */
+function roundSequence(world: World): readonly (readonly number[])[] {
+  const r = legendRounds(world);
+  return [...r.rounds.map((x) => x.kinds), ...r.bonus.filter((b) => world.wings.has(b.item)).map((b) => b.kinds)];
+}
+
+/**
+ * 伝説戦の終わり（kind が最後に戦った相手、result が結果）までに倒したラウンドの stat（レッドを倒す）。
+ * 最後のラウンドより先（はねの戦い）まで進んでいれば、そのラウンドは倒している
+ */
+export function legendRoundStats(world: World, kind: number, result: LegendaryResult | null): string[] {
+  const r = legendRounds(world);
+  let at = r.rounds.findIndex((x) => x.kinds.includes(kind));
+  if (at === -1 && r.bonus.some((x) => x.kinds.includes(kind))) at = r.rounds.length;
+  if (at === -1) return [];
+  const won = result === 'won' ? at : at - 1;
+  return r.rounds.slice(0, won + 1).flatMap((x) => (x.stat ? [x.stat] : []));
 }
 
 function nearestPlayer(world: World, x: number, y: number): World['players'][number] | null {
@@ -603,23 +744,6 @@ function nearestPlayer(world: World, x: number, y: number): World['players'][num
   return out;
 }
 
-/** 伝説の第2段階: HP が決まった割合を切ったら、「DANGER」をもう一度出し、技の間隔を短くする（ソロ・ホスト） */
-function enrageLegendary(world: World): void {
-  const lg = world.legendary;
-  const cfg = world.rules.stage.legendary?.enrage;
-  if (!lg || lg.enraged || !cfg || world.role === 'guest') return;
-  const i = world.enemies.kind.findIndex((k, idx) => idx < world.enemies.count && k === lg.kind && world.enemies.hp[idx]! > 0);
-  if (i === -1 || world.enemies.hp[i]! > world.enemies.maxHp[i]! * cfg.hpRatio) return;
-  lg.enraged = true;
-  const boss = world.bosses.find((b) => b.id === world.enemies.id[i]);
-  if (boss) {
-    const set = world.rules.stage.legendary!.moveSets[world.rules.enemies.kinds[lg.kind]?.id ?? ''];
-    boss.interval = Math.round((set?.enrageMoveIntervalSeconds ?? cfg.moveIntervalSeconds) / world.dt);
-    boss.cooldown = Math.min(boss.cooldown, boss.interval);
-  }
-  world.events.push({ type: 'legendaryWarning', kind: lg.kind, enraged: true });
-}
-
 /**
  * ランの進行と終わりを判定する（ソロ・ホスト）。
  * - 四天王（required）を全員倒したらクリア。確率で伝説戦へ（クリアは確定）
@@ -632,8 +756,8 @@ export function checkRunEnd(world: World): void {
   for (const ev of world.events) {
     if (ev.type !== 'enemyKilled') continue;
     world.requiredLeft.delete(ev.kind);
-    if (world.legendary && ev.kind === world.legendary.kind) {
-      finishLegendary(world, 'won');
+    if (world.legendary?.spawned && legendRoundKinds(world, world.legendary.kind).includes(ev.kind) && !roundAlive(world)) {
+      winRound(world);
       return;
     }
   }
@@ -685,6 +809,12 @@ export function counterPick(world: World, ids: readonly string[]): string {
 /** クリア: 確率で伝説戦を始める。始めないならランを終える */
 function startLegendaryOrClear(world: World): void {
   const cfg = world.rules.stage.legendary;
+  // 続けて戦うラウンド（レッド戦）があれば、必ず1つ目から
+  const seq = roundSequence(world);
+  if (cfg && seq.length > 0) {
+    startLegendary(world, seq[0]![0]!, 0);
+    return;
+  }
   if (!cfg || world.rng.next() >= cfg.chance) {
     endRun(world, 'clear');
     return;
@@ -702,12 +832,15 @@ function startLegendaryOrClear(world: World): void {
 }
 
 /** 伝説戦を始める（「DANGER」の後に kind の伝説が出る）。確認用の ?legend= からも呼ぶ */
-export function startLegendary(world: World, kind: number): void {
+export function startLegendary(world: World, kind: number, round = roundIndexOf(world, kind)): void {
   const cfg = world.rules.stage.legendary;
   if (!cfg) return;
   world.cleared = true;
   const appearTick = world.tick + Math.round(cfg.warningSeconds / world.dt);
-  world.legendary = { kind, appearTick, endTick: appearTick + Math.round(cfg.timeLimitSeconds / world.dt), spawned: false, result: null };
+  world.legendary = { kind, appearTick, endTick: appearTick + Math.round(cfg.timeLimitSeconds / world.dt), spawned: false, result: null, round };
+  // 乱入していた伝説（三犬）も、ほかの敵と一緒にいなくなる
+  if (world.intruder) world.intruder.done = true;
+  world.legendAis.clear();
   // 雑魚はいなくなり、伝説と戦う（2.2）。残っている予告も消す
   const e = world.enemies;
   for (let i = 0; i < e.count; i++) {
@@ -719,6 +852,36 @@ export function startLegendary(world: World, kind: number): void {
   world.hazards.length = 0;
   world.zones.length = 0;
   world.events.push({ type: 'legendaryWarning', kind });
+}
+
+/** kind と戦うラウンドの番号（rounds の後に bonusRounds が続く。はねの戦いは、拾ったはねで並べた番号）。無ければ 0 */
+function roundIndexOf(world: World, kind: number): number {
+  const at = roundSequence(world).findIndex((r) => r.includes(kind));
+  return at === -1 ? 0 : at;
+}
+
+/** 今のラウンドの相手が、まだだれか残っているか */
+function roundAlive(world: World): boolean {
+  const lg = world.legendary;
+  if (!lg) return false;
+  const kinds = legendRoundKinds(world, lg.kind);
+  const e = world.enemies;
+  for (let i = 0; i < e.count; i++) if (e.hp[i]! > 0 && kinds.includes(e.kind[i]!)) return true;
+  return false;
+}
+
+/** ラウンドの相手を全員倒した: 次のラウンドがあれば続け、無ければ勝って終わる */
+function winRound(world: World): void {
+  const lg = world.legendary!;
+  const seq = roundSequence(world);
+  // 並びに無い相手（確認用の ?legend= で呼んだルギアなど）は、その1戦で終わる
+  const cur = seq.findIndex((r) => r.includes(lg.kind));
+  const next = cur + 1;
+  if (cur !== -1 && next < seq.length) {
+    startLegendary(world, seq[next]![0]!, next);
+    return;
+  }
+  finishLegendary(world, 'won');
 }
 
 function finishLegendary(world: World, result: LegendaryResult): void {

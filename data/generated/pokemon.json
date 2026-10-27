@@ -391,6 +391,31 @@
       }
     ]
   },
+  "celebi": {
+    "dex": 251,
+    "names": {
+      "ja": "セレビィ",
+      "en": "Celebi",
+      "fr": "Celebi",
+      "de": "Celebi",
+      "es": "Celebi",
+      "it": "Celebi"
+    },
+    "types": [
+      "psychic",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 100,
+      "defense": 100,
+      "specialAttack": 100,
+      "specialDefense": 100,
+      "speed": 100
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
+  },
   "chansey": {
     "dex": 113,
     "names": {
@@ -1175,6 +1200,30 @@
     ],
     "evolvesTo": []
   },
+  "entei": {
+    "dex": 244,
+    "names": {
+      "ja": "エンテイ",
+      "en": "Entei",
+      "fr": "Entei",
+      "de": "Entei",
+      "es": "Entei",
+      "it": "Entei"
+    },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 115,
+      "attack": 115,
+      "defense": 85,
+      "specialAttack": 90,
+      "specialDefense": 75,
+      "speed": 100
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
+  },
   "espeon": {
     "dex": 196,
     "names": {
@@ -1868,6 +1917,31 @@
     ],
     "evolvesTo": []
   },
+  "ho-oh": {
+    "dex": 250,
+    "names": {
+      "ja": "ホウオウ",
+      "en": "Ho-Oh",
+      "fr": "Ho-Oh",
+      "de": "Ho-Oh",
+      "es": "Ho-Oh",
+      "it": "Ho-Oh"
+    },
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 106,
+      "attack": 130,
+      "defense": 90,
+      "specialAttack": 110,
+      "specialDefense": 154,
+      "speed": 90
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
+  },
   "hoothoot": {
     "dex": 163,
     "names": {
@@ -2405,6 +2479,31 @@
         "level": 18
       }
     ]
+  },
+  "lugia": {
+    "dex": 249,
+    "names": {
+      "ja": "ルギア",
+      "en": "Lugia",
+      "fr": "Lugia",
+      "de": "Lugia",
+      "es": "Lugia",
+      "it": "Lugia"
+    },
+    "types": [
+      "psychic",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 106,
+      "attack": 90,
+      "defense": 130,
+      "specialAttack": 90,
+      "specialDefense": 154,
+      "speed": 110
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
   },
   "machamp": {
     "dex": 68,
@@ -3715,6 +3814,30 @@
     ],
     "evolvesTo": []
   },
+  "raikou": {
+    "dex": 243,
+    "names": {
+      "ja": "ライコウ",
+      "en": "Raikou",
+      "fr": "Raikou",
+      "de": "Raikou",
+      "es": "Raikou",
+      "it": "Raikou"
+    },
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 85,
+      "defense": 75,
+      "specialAttack": 115,
+      "specialDefense": 100,
+      "speed": 115
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
+  },
   "rapidash": {
     "dex": 78,
     "names": {
@@ -4532,6 +4655,30 @@
     "preEvolutions": [
       "bonsly"
     ],
+    "evolvesTo": []
+  },
+  "suicune": {
+    "dex": 245,
+    "names": {
+      "ja": "スイクン",
+      "en": "Suicune",
+      "fr": "Suicune",
+      "de": "Suicune",
+      "es": "Suicune",
+      "it": "Suicune"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 75,
+      "defense": 115,
+      "specialAttack": 90,
+      "specialDefense": 115,
+      "speed": 85
+    },
+    "preEvolutions": [],
     "evolvesTo": []
   },
   "swinub": {

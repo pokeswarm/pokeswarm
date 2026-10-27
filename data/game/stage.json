@@ -544,6 +544,243 @@
         "level": 8,
         "sweepDegreesPerSecond": 360
       }
+    },
+    {
+      "id": "red-volt-tackle",
+      "move": "volt-tackle",
+      "effect": "zapdos-dash",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.45,
+      "radius": 30,
+      "length": 620,
+      "damage": 45,
+      "dashSpeed": 1300,
+      "chain": 2
+    },
+    {
+      "id": "espeon-psychic",
+      "move": "psychic",
+      "effect": "psy",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.7,
+      "radius": 80,
+      "damage": 42,
+      "count": 4,
+      "spread": 240,
+      "stagger": 0.12
+    },
+    {
+      "id": "espeon-morning-sun",
+      "move": "morning-sun",
+      "effect": "morning-sun",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 1.2,
+      "radius": 60,
+      "damage": 0,
+      "healPct": 6
+    },
+    {
+      "id": "snorlax-body-slam",
+      "move": "body-slam",
+      "effect": "body-slam",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.8,
+      "radius": 50,
+      "length": 460,
+      "damage": 52,
+      "dashSpeed": 850,
+      "chain": 1
+    },
+    {
+      "id": "snorlax-rest",
+      "move": "rest",
+      "effect": "rest",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 2.5,
+      "radius": 60,
+      "damage": 0,
+      "healPct": 10
+    },
+    {
+      "id": "raikou-dash",
+      "move": "extreme-speed",
+      "effect": "zapdos-dash",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.45,
+      "radius": 30,
+      "length": 620,
+      "damage": 45,
+      "dashSpeed": 1350,
+      "chain": 2
+    },
+    {
+      "id": "raikou-discharge",
+      "move": "discharge",
+      "effect": "discharge",
+      "shape": "ring",
+      "target": "self",
+      "telegraphSeconds": 0.6,
+      "radius": 120,
+      "damage": 40,
+      "rings": {
+        "count": 3,
+        "step": 110,
+        "width": 50
+      },
+      "stagger": 0.25
+    },
+    {
+      "id": "entei-eruption",
+      "move": "eruption",
+      "effect": "eruption",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.9,
+      "radius": 65,
+      "damage": 40,
+      "count": 10,
+      "spread": 380,
+      "stagger": 0.08
+    },
+    {
+      "id": "entei-burst",
+      "move": "sacred-fire",
+      "effect": "blast-burn",
+      "shape": "circle",
+      "target": "self",
+      "telegraphSeconds": 0.9,
+      "radius": 250,
+      "damage": 42
+    },
+    {
+      "id": "suicune-aurora-beam",
+      "move": "aurora-beam",
+      "effect": "aurora-beam",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.7,
+      "radius": 28,
+      "length": 900,
+      "damage": 45
+    },
+    {
+      "id": "suicune-hydro-pump",
+      "move": "hydro-pump",
+      "effect": "hydro-pump",
+      "shape": "line",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 0.9,
+      "radius": 42,
+      "length": 720,
+      "damage": 48
+    },
+    {
+      "id": "suicune-rings",
+      "move": "surf",
+      "effect": "hydro-pump",
+      "shape": "ring",
+      "target": "self",
+      "telegraphSeconds": 0.7,
+      "radius": 130,
+      "damage": 38,
+      "rings": {
+        "count": 3,
+        "step": 120,
+        "width": 55
+      },
+      "stagger": 0.3
+    },
+    {
+      "id": "lugia-aeroblast",
+      "move": "aeroblast",
+      "effect": "beam",
+      "shape": "line",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 1,
+      "radius": 60,
+      "length": 1100,
+      "damage": 55
+    },
+    {
+      "id": "lugia-hurricane",
+      "move": "hurricane",
+      "effect": "hurricane",
+      "shape": "circle",
+      "target": "player",
+      "homing": true,
+      "telegraphSeconds": 1.2,
+      "radius": 95,
+      "damage": 48
+    },
+    {
+      "id": "lugia-hydro-pump",
+      "move": "hydro-pump",
+      "effect": "hydro-pump",
+      "shape": "line",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 0.8,
+      "radius": 44,
+      "length": 760,
+      "damage": 50
+    },
+    {
+      "id": "hooh-sacred-fire",
+      "move": "sacred-fire",
+      "effect": "flare-blitz",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.9,
+      "radius": 85,
+      "damage": 46,
+      "count": 5,
+      "spread": 240,
+      "stagger": 0.12,
+      "leaves": {
+        "seconds": 5,
+        "slowPct": 0,
+        "damagePerSecond": 25,
+        "color": "#ff7043"
+      }
+    },
+    {
+      "id": "hooh-brave-bird",
+      "move": "brave-bird",
+      "effect": "sky-attack",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.7,
+      "radius": 36,
+      "length": 600,
+      "damage": 50,
+      "dashSpeed": 1000,
+      "chain": 1,
+      "leaves": {
+        "seconds": 4,
+        "slowPct": 0,
+        "damagePerSecond": 20,
+        "color": "#ff7043"
+      }
+    },
+    {
+      "id": "hooh-sunny-burst",
+      "move": "sunny-day",
+      "effect": "blast-burn",
+      "shape": "circle",
+      "target": "self",
+      "telegraphSeconds": 1,
+      "radius": 300,
+      "damage": 48
     }
   ],
   "bossRules": {

@@ -51,6 +51,6 @@
     "firstSpawnSeconds": 20,
     "distanceMin": 380,
     "distanceMax": 700,
-    "despawnDistance": 1600
+    "despawnDistance": 1600, "wingChance": 0.01
   }
 }

@@ -1,5 +1,5 @@
 import { SHAPE_LINE } from '../entities/projectiles';
-import type { World } from '../world';
+import type { ItemKind, WingKind, World } from '../world';
 import { spawnItem } from './items';
 
 /**
@@ -94,9 +94,23 @@ export function registerBoxHit(world: World, id: number, key: number): boolean {
   world.events.push({ type: 'boxHit', id: b.id });
   if (b.hp > 0) return false;
   removeBox(world, b.id, true);
-  spawnItem(world, world.nextItemId++, 'buff', b.x, b.y);
+  spawnItem(world, world.nextItemId++, boxDrop(world), b.x, b.y);
   return true;
 }
+
+/**
+ * 箱から出る物: ふつうは一時的な強化。はね（ルギア・ホウオウ戦の権利。作者の決定 2026年10月26日）が出るようになっていれば、
+ * まだ拾っていないはねが、それぞれ wingChance の確率で出る（ソロ・ホスト）
+ */
+function boxDrop(world: World): ItemKind {
+  const chance = world.rules.pickups.boxes?.wingChance ?? 0;
+  for (const w of WINGS) {
+    if (!world.wingsEnabled.has(w) || world.wings.has(w) || world.items.some((it) => it.kind === w)) continue;
+    if (world.rng.next() < chance) return w;
+  }
+  return 'buff';
+}
+const WINGS: readonly WingKind[] = ['silver-wing', 'rainbow-wing'];
 
 /** 点と線分（start から dir の向きへ length）の距離の2乗 */
 function segmentDistance2(px: number, py: number, sx: number, sy: number, dx: number, dy: number, length: number): number {

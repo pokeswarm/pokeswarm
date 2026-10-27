@@ -49,7 +49,9 @@ export interface LevelUpState {
 }
 
 /** マップに落ちる道具の種類 */
-export type ItemKind = 'potion' | 'magnet' | 'rare-candy' | 'buff';
+export type ItemKind = 'potion' | 'magnet' | 'rare-candy' | 'buff' | 'silver-wing' | 'rainbow-wing';
+/** はね（ルギア・ホウオウ戦の権利。箱から出る） */
+export type WingKind = 'silver-wing' | 'rainbow-wing';
 
 /** マップの箱（攻撃を当てると開いて、一時的な強化を落とす）。hits は当たった技の当たり判定の通し番号（同じ技で何度も数えない） */
 export interface Box {
@@ -138,7 +140,8 @@ export interface World {
    * どのブラウザでも同じように動かす（当たったかは自分のプレイヤーで決める）
    */
   casters: Map<number, Player>;
-  legendAi: { enemyId: number; timers: number[]; shellTimers: number[]; shell: boolean; holdTicks?: number } | null;
+  /** プレイヤーと同じ技を使う伝説の動き（伝説の敵 id ごと。レッド戦は同時に何体も出る） */
+  readonly legendAis: Map<number, { timers: number[]; shellTimers: number[]; shell: boolean; holdTicks?: number }>;
   nextBoxId: number;
   boxTimer: number;
   /** 拾ったふしぎなアメ: 抽選の演出が終わるまでの残りと、上がるレベルの数 */
@@ -229,7 +232,16 @@ export interface World {
     result: LegendaryResult | null;
     /** 第2段階に入った */
     enraged?: boolean;
+    /** 続けて戦うラウンドの番号（stage.json の legendary.rounds の後に bonusRounds が続く）。ラウンドの無い伝説戦は 0 */
+    round?: number;
   } | null;
+  /** 伝説の乱入（三犬）: 出ている伝説（出る前は id -1）と逃げる時刻。乱入が終わったら done。次に確かめる乱入の分の番号 */
+  intruder: { kind: number; id: number; appearTick: number; endTick: number; done: boolean } | null;
+  nextIntruderCheck: number;
+  /** はねが箱から出るようになっている（参加者のだれかが実績を達成）。ランを始める前に入れる */
+  wingsEnabled: Set<WingKind>;
+  /** このランで拾ったはね（ルギア・ホウオウ戦の権利） */
+  readonly wings: Set<WingKind>;
   /** 伝説戦に、相性で選ぶ候補（stage.json の legendary.counter。色違いの御三家）を足す（参加者のだれかが条件の実績を達成している）。ランを始める前に入れる */
   legendaryCounter: boolean;
   /** スウォームイベントの予定（更新回数の順）と、次に出す番号 */
@@ -272,7 +284,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     nextItemId: 1,
     boxes: [],
     casters: new Map(),
-    legendAi: null,
+    legendAis: new Map(),
     nextBoxId: 1,
     boxTimer: Math.round((rules.pickups.boxes?.firstSpawnSeconds ?? 0) * tickRate),
     candies: [],
@@ -293,6 +305,10 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     cleared: false,
     legendary: null,
     legendaryCounter: false,
+    intruder: null,
+    nextIntruderCheck: 0,
+    wingsEnabled: new Set(),
+    wings: new Set(),
     swarmSchedule: buildSwarmSchedule(rules, tickRate),
     nextSwarm: 0,
     hazards: [],

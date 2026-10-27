@@ -9,7 +9,8 @@ import type { SaveData } from './saveData';
  * 実績の報酬のコインは足さない（コインは指定の数にそろえる）
  */
 export function grantDevProgress(save: SaveData, coins: number): { achievements: number; unlocked: number } {
-  const legends = new Set(enemiesConfig.kinds.filter((k) => k.rank === 'legendary').map((k) => k.species ?? k.id.replace(/^legend-|^shiny-/, '')));
+  // レッドの手持ち（red-。伝説戦の形で戦うふつうのポケモン）は伝説に数えない
+  const legends = new Set(enemiesConfig.kinds.filter((k) => k.rank === 'legendary' && !k.id.startsWith('red-')).map((k) => k.species ?? k.id.replace(/^legend-|^shiny-/, '')));
   const isLegend = (a: (typeof achievementsConfig.achievements)[number]): boolean => {
     const cond = JSON.stringify(a.condition);
     if (cond.includes('"legendaryKills"')) return true;

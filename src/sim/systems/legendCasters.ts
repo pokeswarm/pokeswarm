@@ -3,6 +3,7 @@ import { emptyModifiers } from '../upgrades';
 import type { World } from '../world';
 import type { CasterMoveData } from '../../data/schema';
 import { CASTER_ID_BASE, fireCasterMove, moveStatsOf } from './attack';
+import { legendRoundKinds } from './stage';
 
 /**
  * 伝説がプレイヤーと同じ技を使う（色違いの御三家。作者の依頼 2026年10月27日）。
@@ -10,20 +11,24 @@ import { CASTER_ID_BASE, fireCasterMove, moveStatsOf } from './attack';
  * どのブラウザでも同じように動かし、当たったかは自分のプレイヤーで決める（attack.ts の hitLocalPlayer）。
  * - casters: 戦いの間ずっと出す技（かえんほうしゃ・ほのおのうず・はなびらのまい・ヘドロばくだん）
  * - shell: プレイヤーが離れると甲羅の形になり、速くなって技（こうそくスピン）を出しながら追う（カメックス）
+ * レッド戦のラウンドのように、同時に出る相手が何体もいれば、それぞれが自分の技を出す
  */
 export function tickLegendCasters(world: World): void {
   const lg = world.legendary;
-  if (!lg || !lg.spawned || lg.result) return;
+  // ゲストは出現を知らせ（敵の出現）で受け取るので、spawned を見ずに、出ている相手から探す
+  if (!lg || lg.result) return;
+  const kinds = legendRoundKinds(world, lg.kind);
   const e = world.enemies;
-  let i = -1;
-  for (let k = 0; k < e.count; k++) {
-    if (e.kind[k] === lg.kind && e.hp[k]! > 0) {
-      i = k;
-      break;
-    }
+  for (let i = 0; i < e.count; i++) {
+    if (e.hp[i]! <= 0 || !kinds.includes(e.kind[i]!)) continue;
+    tickOne(world, i);
   }
-  if (i === -1) return;
-  const set = world.rules.stage.legendary?.moveSets[world.rules.enemies.kinds[lg.kind]?.id ?? ''];
+}
+
+function tickOne(world: World, i: number): void {
+  const e = world.enemies;
+  const kind = e.kind[i]!;
+  const set = world.rules.stage.legendary?.moveSets[world.rules.enemies.kinds[kind]?.id ?? ''];
   if (!set || (!set.casters?.length && !set.shell)) return;
   const id = e.id[i]!;
   const caster = casterFor(world, id, set.casterPower ?? 1);
@@ -41,10 +46,11 @@ export function tickLegendCasters(world: World): void {
     caster.facingY = dy / len > 0.38 ? 1 : dy / len < -0.38 ? -1 : 0;
   }
   // 予告の間止まる技（ため）を待っている間は、技も甲羅も止める
-  if (!world.legendAi || world.legendAi.enemyId !== id) {
-    world.legendAi = { enemyId: id, timers: (set.casters ?? []).map(() => 0), shellTimers: (set.shell?.moves ?? []).map(() => 0), shell: false };
+  let ai = world.legendAis.get(id);
+  if (!ai) {
+    ai = { timers: (set.casters ?? []).map(() => 0), shellTimers: (set.shell?.moves ?? []).map(() => 0), shell: false };
+    world.legendAis.set(id, ai);
   }
-  const ai = world.legendAi;
   if (ai.holdTicks) ai.holdTicks--;
   const charging = !!ai.holdTicks || world.hazards.some((h) => h.dasher === id && h.activeTicks === undefined && world.rules.stage.moves[h.move]?.rooted);
   // 甲羅の形（カメックス）: 離れたら甲羅、近づいたら戻る。甲羅の間は速い
@@ -52,7 +58,7 @@ export function tickLegendCasters(world: World): void {
     const d = Math.hypot(target.x - caster.x, target.y - caster.y);
     if (!ai.shell && d > set.shell.farDistance) ai.shell = true;
     else if (ai.shell && d < set.shell.nearDistance) ai.shell = false;
-    const base = world.rules.enemies.kinds[lg.kind]?.moveSpeed ?? 0;
+    const base = world.rules.enemies.kinds[kind]?.moveSpeed ?? 0;
     e.speed[i] = charging ? 0 : ai.shell ? base * set.shell.speedMultiplier : base;
   }
   if (charging) return;

@@ -149,6 +149,9 @@ export class SyncSession {
         case 'legendaryWarning':
           if (host) out.push(ev.enraged ? { t: 'lw', k: ev.kind, r: 1 } : { t: 'lw', k: ev.kind });
           break;
+        case 'intruderWarning':
+          if (host) out.push({ t: 'lw', k: ev.kind, i: 1 });
+          break;
         case 'runEnded':
           if (host) out.push({ t: 'end', o: ev.outcome, lg: ev.legendary });
           break;
@@ -361,7 +364,7 @@ export class SyncSession {
           }
           break;
         case 'lw':
-          if (guest) cmds.push({ type: 'legendaryWarning', kind: m.k, enraged: m.r === 1 });
+          if (guest) cmds.push({ type: 'legendaryWarning', kind: m.k, enraged: m.r === 1, intruder: m.i === 1 });
           break;
         case 'end':
           if (guest) cmds.push({ type: 'endRun', outcome: m.o, legendary: m.lg });

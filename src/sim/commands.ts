@@ -195,6 +195,8 @@ export interface LegendaryWarningCommand {
   readonly type: 'legendaryWarning';
   /** 第2段階に入った */
   readonly enraged?: boolean;
+  /** 伝説の乱入（三犬）。伝説戦は始めない */
+  readonly intruder?: boolean;
   readonly kind: number;
 }
 

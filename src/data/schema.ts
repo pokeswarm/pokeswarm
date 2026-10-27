@@ -443,6 +443,10 @@ export const legendFieldSchema = z.object({
   weather: z.string().optional(),
   /** 暗い空が、ときどき雷の光で明滅する（サンダー。見た目だけ。everySeconds は平均の間隔） */
   flash: z.object({ color: z.string(), alpha: z.number().min(0).max(1), everySeconds: z.number().positive() }).optional(),
+  /** 強い風（ルギア）: プレイヤーを (dirX, dirY) の向きへ、毎秒 speed だけ流す。向きは everySeconds ごとに変わる */
+  wind: z.object({ speed: z.number().positive(), everySeconds: z.number().positive() }).optional(),
+  /** 日差し・雨（ホウオウ）: プレイヤーの技の威力を、タイプごとに pct % 変える（例: ほのお +50・みず -50） */
+  typePowerPct: z.record(z.string(), z.number()).optional(),
 });
 export type LegendField = z.infer<typeof legendFieldSchema>;
 
@@ -482,6 +486,8 @@ export const bossMoveSchema = z.object({
   maxTargetDistance: z.number().positive().optional(),
   /** 落ちた後、ボスがこの秒数止まったまま（ため の動きのまま）でいる（カメックス: ハイドロカノンを出している間） */
   holdSeconds: z.number().positive().optional(),
+  /** 落ちたとき、使ったボスが最大 HP のこの % だけ回復する（エーフィの あさのひざし・カビゴンの ねむる） */
+  healPct: z.number().positive().optional(),
   leaves: z
     .object({
       seconds: z.number().positive(),
@@ -604,6 +610,24 @@ export const stageConfigSchema = z.object({
        * kinds のうち、参加者のポケモンに一番不利な1体（こちらの技が通りにくく、向こうの技がよく効く）を候補に足す
        */
       counter: z.object({ kinds: z.array(z.string().min(1)).min(1), achievements: z.array(z.string().min(1)).min(1) }).optional(),
+      /**
+       * 続けて戦うラウンド（ジョウトのレッド戦。作者の決定 2026年10月27日）。あれば chance・kinds の代わりに、クリアの後に必ず
+       * 1つ目のラウンドから戦う。ラウンドの相手（kinds）は同時に出て、全員倒すと次のラウンドへ。制限時間はラウンドごと。
+       * 最後のラウンドを倒したら stat を記録に数える（レッドを倒す）。bgm があれば、そのラウンドの間の曲（無ければ legendaryBgm）
+       */
+      rounds: z.array(z.object({ kinds: z.array(z.string().min(1)).min(1), stat: z.string().optional(), bgm: z.string().optional() })).optional(),
+      /**
+       * rounds を全部倒した後、そのランで item（はね）を拾っていれば続けて戦う（ルギア・ホウオウ）。はねは、参加者のだれかが
+       * achievement を達成していると、箱から出るようになる
+       */
+      bonusRounds: z.array(z.object({ item: z.enum(['silver-wing', 'rainbow-wing']), kinds: z.array(z.string().min(1)).min(1), achievement: z.string().min(1), bgm: z.string().optional() })).optional(),
+      /**
+       * 伝説の乱入（ジョウトの三犬。作者の決定 2026年10月26日）: ランの minutes 分ちょうどに、それぞれ chance の確率で kinds のどれかが乱入する
+       * （1回のランで1回まで）。雑魚はそのまま。timeLimitSeconds で倒せなければ逃げる。技は moveSets
+       */
+      intruders: z
+        .object({ minutes: z.array(z.number().positive()).min(1), chance: z.number().min(0).max(1), kinds: z.array(z.string().min(1)).min(1), timeLimitSeconds: z.number().positive() })
+        .optional(),
     })
     .nullable(),
   swarms: z.array(swarmSchema).default([]),
@@ -1138,6 +1162,8 @@ export const regionStageSchema = z.object({
   legendary: z.unknown().optional(),
   /** 伝説戦の曲 */
   legendaryBgm: z.string().nullable().default(null),
+  /** 伝説の乱入（三犬）の間の曲。null なら区間の曲のまま */
+  intruderBgm: z.string().nullable().default(null),
 });
 export type RegionStageFile = z.infer<typeof regionStageSchema>;
 
@@ -1660,6 +1686,8 @@ export const pickupConfigSchema = z.object({
       distanceMin: z.number().nonnegative(),
       distanceMax: z.number().positive(),
       despawnDistance: z.number().positive(),
+      /** はね（ジョウトのルギア・ホウオウ戦の権利）が、出るようになっているとき箱から出る確率（それぞれ） */
+      wingChance: z.number().min(0).max(1).optional(),
     })
     .optional(),
 });
@@ -1962,6 +1990,8 @@ export interface BgmRun {
   sections: (string | null)[];
   /** 伝説戦 */
   legendary: string | null;
+  /** 伝説の乱入（三犬） */
+  intruder: string | null;
 }
 
 /**

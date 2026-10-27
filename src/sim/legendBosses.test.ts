@@ -200,7 +200,7 @@ describe('色違いの御三家（プレイヤーと同じ技）', () => {
       p.invincibleTicks = 2;
       sim.step([]);
     }
-    expect(sim.world.legendAi?.shell).toBe(true);
+    expect([...sim.world.legendAis.values()][0]?.shell).toBe(true);
     expect(e.speed[i]).toBeGreaterThan(sim.world.rules.enemies.kinds[kind]!.moveSpeed * 2);
     // 触れるまで待つ（プレイヤーは止まっている）
     const cannon = sim.world.rules.moves.findIndex((m) => m.key === 'hydro-cannon');

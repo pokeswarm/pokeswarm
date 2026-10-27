@@ -319,6 +319,16 @@
       "it": "Rapidartigli"
     }
   },
+  "rainbow-wing": {
+    "names": {
+      "ja": "にじいろのはね",
+      "en": "Rainbow Wing",
+      "fr": "Arc-en-Ci’Aile",
+      "de": "Buntschwinge",
+      "es": "Ala Arcoíris",
+      "it": "Ala d’Iride"
+    }
+  },
   "rare-candy": {
     "names": {
       "ja": "ふしぎなアメ",
@@ -367,6 +377,16 @@
       "de": "Silberstaub",
       "es": "Polvo Plata",
       "it": "Argenpolvere"
+    }
+  },
+  "silver-wing": {
+    "names": {
+      "ja": "ぎんいろのはね",
+      "en": "Silver Wing",
+      "fr": "Argent’Aile",
+      "de": "Silberflügel",
+      "es": "Ala Plateada",
+      "it": "Aladargento"
     }
   },
   "soft-sand": {

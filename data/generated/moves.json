@@ -1,4 +1,16 @@
 {
+  "aeroblast": {
+    "names": {
+      "ja": "エアロブラスト",
+      "en": "Aeroblast",
+      "fr": "Aéroblast",
+      "de": "Luftstoß",
+      "es": "Aerochorro",
+      "it": "Aerocolpo"
+    },
+    "type": "flying",
+    "damageClass": "special"
+  },
   "air-slash": {
     "names": {
       "ja": "エアスラッシュ",
@@ -129,6 +141,18 @@
       "it": "Ossomerang"
     },
     "type": "ground",
+    "damageClass": "physical"
+  },
+  "brave-bird": {
+    "names": {
+      "ja": "ブレイブバード",
+      "en": "Brave Bird",
+      "fr": "Rapace",
+      "de": "Sturzflug",
+      "es": "Pájaro Osado",
+      "it": "Baldeali"
+    },
+    "type": "flying",
     "damageClass": "physical"
   },
   "bubble": {
@@ -1127,6 +1151,18 @@
     "type": "rock",
     "damageClass": "physical"
   },
+  "sacred-fire": {
+    "names": {
+      "ja": "せいなるほのお",
+      "en": "Sacred Fire",
+      "fr": "Feu Sacré",
+      "de": "Läuterfeuer",
+      "es": "Fuego Sagrado",
+      "it": "Magifuoco"
+    },
+    "type": "fire",
+    "damageClass": "physical"
+  },
   "sand-tomb": {
     "names": {
       "ja": "すなじごく",
@@ -1366,6 +1402,18 @@
     },
     "type": "rock",
     "damageClass": "physical"
+  },
+  "sunny-day": {
+    "names": {
+      "ja": "にほんばれ",
+      "en": "Sunny Day",
+      "fr": "Zénith",
+      "de": "Sonnentag",
+      "es": "Día Soleado",
+      "it": "Giornodisole"
+    },
+    "type": "fire",
+    "damageClass": "status"
   },
   "surf": {
     "names": {

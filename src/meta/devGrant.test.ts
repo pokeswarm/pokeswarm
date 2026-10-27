@@ -15,7 +15,8 @@ describe('開発版の ?restore（進んだ状態に戻す）', () => {
     // ジムリーダーの相棒などは解放
     expect(save.unlocked).toEqual(expect.arrayContaining(['onix', 'starmie', 'dragonite', 'eevee']));
     const legendFree = achievementsConfig.achievements.filter((a) => !save.achievements.includes(a.id));
-    expect(legendFree.length).toBeLessThanOrEqual(9);
+    // カントーの伝説 9・ジョウトの三犬・ルギア・ホウオウ・セレビィ 6
+    expect(legendFree.length).toBeLessThanOrEqual(15);
   });
 
   it('何度開いても同じ（実績は重ならず、コインは減らない）', () => {

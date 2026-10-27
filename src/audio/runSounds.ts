@@ -18,6 +18,10 @@ export class RunSounds {
   private lastGemAt = 0;
   private section = -1;
   private legendary = false;
+  /** 伝説が乱入した（三犬）。出ている間は乱入の曲 */
+  private intruder = false;
+  private intruderAlive = true;
+  private intruderSince = 0;
 
   constructor(
     private readonly localId: PlayerId,
@@ -90,6 +94,11 @@ export class RunSounds {
           audio.sfx.play('danger');
           this.legendary = true;
           break;
+        case 'intruderWarning':
+          audio.sfx.play('danger');
+          this.intruder = true;
+          this.intruderSince = world.tick;
+          break;
         case 'upgradeChosen':
           if (ev.playerId === this.localId) audio.sfx.play('ui.confirm');
           break;
@@ -106,8 +115,19 @@ export class RunSounds {
   private updateBgm(world: World): void {
     if (world.outcome) return;
     if (this.legendary || world.legendary) {
-      audio.bgm.play(this.bgmRun.legendary);
+      // 続けて戦うラウンド（レッド戦）は、ラウンドの曲
+      audio.bgm.play((world.legendary && legendRoundBgm(world, world.legendary.kind)) || this.bgmRun.legendary);
       return;
+    }
+    // 伝説の乱入（三犬）: 乱入した伝説が出ている間は乱入の曲（いなくなったら区間の曲へ戻す）
+    if (this.intruder && this.bgmRun.intruder) {
+      if (world.tick % 15 === 0) this.intruderAlive = intruderPresent(world, this.intruderSince);
+      if (this.intruderAlive) {
+        audio.bgm.play(this.bgmRun.intruder);
+        this.section = -1;
+        return;
+      }
+      this.intruder = false;
     }
     const section = currentWaveIndex(world);
     if (section === this.section) return;
@@ -122,4 +142,22 @@ export class RunSounds {
     this.lastGemAt = now;
     audio.sfx.play('gem', { semitones: this.gemStreak });
   }
+}
+
+/** 乱入する伝説（三犬）が出ているか。知らせ（since）から出てくるまでの「DANGER」の間も true */
+function intruderPresent(world: World, since: number): boolean {
+  const lg = world.rules.stage.legendary;
+  if (world.intruder && !world.intruder.done) return true;
+  if (world.tick - since <= Math.round(((lg?.warningSeconds ?? 0) + 2) / world.dt)) return true;
+  const ids = lg?.intruders?.kinds ?? [];
+  const e = world.enemies;
+  for (let i = 0; i < e.count; i++) if (e.hp[i]! > 0 && ids.includes(world.rules.enemies.kinds[e.kind[i]!]?.id ?? '')) return true;
+  return false;
+}
+
+/** 伝説戦のラウンドの曲（data/regions の legendary.rounds・bonusRounds の bgm）。無ければ null */
+function legendRoundBgm(world: World, kind: number): string | null {
+  const lg = world.rules.stage.legendary;
+  const id = world.rules.enemies.kinds[kind]?.id ?? '';
+  return [...(lg?.rounds ?? []), ...(lg?.bonusRounds ?? [])].find((r) => r.kinds.includes(id))?.bgm ?? null;
 }

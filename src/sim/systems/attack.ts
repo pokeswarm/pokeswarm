@@ -26,7 +26,7 @@ import type { World } from '../world';
 import { applyHitEffect } from './commands';
 import { fireDelayedExplosion, fireEffects, type FxSource } from './moveEffects';
 import { healPlayer, hurtPlayer, selfDamage } from './health';
-import { hazardDamage } from './stage';
+import { activeLegendField, hazardDamage } from './stage';
 import { breakOnDamage, damageTakenMultiplier } from './status';
 
 /** 持ち物の威力の倍率（でんきだま: その系統が持っているときだけ） */
@@ -95,7 +95,7 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
     power:
       st.power *
       (def.damageClass === 'physical' ? p.physicalPower : p.specialPower) *
-      Math.max(0, 1 + (m.powerPct + classPct + (m.typePowerPct[def.type] ?? 0) + (p.rain && p.rain.type === def.type && world.tick < p.rain.untilTick ? p.rain.pct : 0)) / 100) *
+      Math.max(0, 1 + (m.powerPct + classPct + (m.typePowerPct[def.type] ?? 0) + (p.rain && p.rain.type === def.type && world.tick < p.rain.untilTick ? p.rain.pct : 0) + fieldTypePct(world, def.type)) / 100) *
       heldPowerMultiplier(world, p) *
       // とっておき: 覚えているほかの技が多いほど強い
       (1 + (st.perMovePowerPct * Math.max(0, p.moves.length - 1)) / 100),
@@ -1582,4 +1582,11 @@ function rollHitEffect(world: World, st: MoveStats, dirX: number, dirY: number, 
     statusTicks = Math.round(st.statusSeconds / world.dt);
   }
   return { kbx, kby, kbTicks, status, statusTicks };
+}
+
+/** 伝説のマップの効果（ホウオウの日差し）で、タイプ type の技の威力が変わる % */
+function fieldTypePct(world: World, type: number): number {
+  const pct = activeLegendField(world)?.field.typePowerPct;
+  if (!pct) return 0;
+  return pct[world.rules.types.names[type] ?? ''] ?? 0;
 }

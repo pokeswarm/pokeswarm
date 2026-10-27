@@ -34,7 +34,8 @@
       "key": "venusaur",
       "dex": 3,
       "uses": [
-        "full"
+        "full",
+        "enemy"
       ]
     },
     {
@@ -127,7 +128,8 @@
       "key": "blastoise",
       "dex": 9,
       "uses": [
-        "full"
+        "full",
+        "enemy"
       ]
     },
     {
@@ -787,7 +789,8 @@
       "key": "snorlax",
       "dex": 143,
       "uses": [
-        "full"
+        "full",
+        "enemy"
       ],
       "extraAnimations": [
         "Sleep"
@@ -1278,7 +1281,11 @@
     },
     {
       "key": "espeon",
-      "dex": 196
+      "dex": 196,
+      "uses": [
+        "full",
+        "enemy"
+      ]
     },
     {
       "key": "houndour",
@@ -1323,6 +1330,53 @@
     {
       "key": "politoed",
       "dex": 186
+    },
+    {
+      "key": "raikou",
+      "dex": 243,
+      "uses": [
+        "enemy",
+        "full"
+      ]
+    },
+    {
+      "key": "entei",
+      "dex": 244,
+      "uses": [
+        "enemy",
+        "full"
+      ]
+    },
+    {
+      "key": "suicune",
+      "dex": 245,
+      "uses": [
+        "enemy",
+        "full"
+      ]
+    },
+    {
+      "key": "lugia",
+      "dex": 249,
+      "uses": [
+        "enemy",
+        "full"
+      ]
+    },
+    {
+      "key": "ho-oh",
+      "dex": 250,
+      "uses": [
+        "enemy",
+        "full"
+      ]
+    },
+    {
+      "key": "celebi",
+      "dex": 251,
+      "uses": [
+        "full"
+      ]
     }
   ]
 }

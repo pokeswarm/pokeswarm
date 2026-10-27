@@ -182,7 +182,13 @@
     "seadra",
     "poliwag",
     "poliwhirl",
-    "politoed"
+    "politoed",
+    "raikou",
+    "entei",
+    "suicune",
+    "lugia",
+    "ho-oh",
+    "celebi"
   ],
   "moves": [
     "ember",
@@ -318,7 +324,11 @@
     "rollout",
     "sandstorm",
     "twister",
-    "rain-dance"
+    "rain-dance",
+    "aeroblast",
+    "sacred-fire",
+    "brave-bird",
+    "sunny-day"
   ],
   "items": [
     "x-attack",
@@ -369,7 +379,9 @@
     "kings-rock",
     "metal-coat",
     "up-grade",
-    "dragon-scale"
+    "dragon-scale",
+    "silver-wing",
+    "rainbow-wing"
   ],
   "regions": [
     "kanto",

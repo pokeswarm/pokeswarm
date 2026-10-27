@@ -29,7 +29,8 @@ describe('地方のステージ（data/regions/<地方>.json）', () => {
     expect(johto.spawn.waves[6]!.durationSeconds).toBe(60);
     expect(johto.ground.waves[7]!.tile).toBe('johto_ice');
     expect(johto.night.flatMap((n, i) => (n ? [i] : []))).toEqual([2, 5, 7, 8]);
-    expect(johto.stage.legendary).toBeNull();
+    // レッド戦（3ラウンド）・はね・三犬の乱入（07 の85章）
+    expect(johto.stage.legendary?.rounds?.map((r) => r.kinds.length)).toEqual([1, 2, 3]);
   });
 
   it('カントーのイワークはヒモでハガネールに進化しない（メタルコートで進化し、メタルコートはジョウトの実績でだけ出る。07 の66.2）', () => {

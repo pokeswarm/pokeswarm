@@ -177,14 +177,20 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         }
         break;
       case 'legendaryWarning':
+        if (cmd.intruder) {
+          if (world.role === 'guest') world.events.push({ type: 'intruderWarning', kind: cmd.kind });
+          break;
+        }
         if (cmd.enraged) {
           if (world.role === 'guest' && world.legendary) world.events.push({ type: 'legendaryWarning', kind: cmd.kind, enraged: true });
           break;
         }
-        if (world.role === 'guest' && !world.legendary) {
+        if (world.role === 'guest' && (!world.legendary || world.legendary.kind !== cmd.kind)) {
+          // 続けて戦うラウンド（レッド戦）は、次の相手に入れ替える
           world.legendary = { kind: cmd.kind, appearTick: 0, endTick: 0, spawned: false, result: null };
           world.cleared = true;
           world.hazards.length = 0;
+          world.legendAis.clear();
           world.events.push({ type: 'legendaryWarning', kind: cmd.kind });
         }
         break;

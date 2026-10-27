@@ -1320,6 +1320,138 @@
       "radius": 10,
       "contactDamage": 8,
       "xp": 1
+    },
+    {
+      "id": "red-pikachu",
+      "species": "pikachu",
+      "rank": "legendary",
+      "sprite": "enemy/pikachu",
+      "hp": 60000,
+      "moveSpeed": 175,
+      "radius": 26,
+      "contactDamage": 42,
+      "xp": 0,
+      "spriteScale": 2.4
+    },
+    {
+      "id": "red-espeon",
+      "species": "espeon",
+      "rank": "legendary",
+      "sprite": "enemy/espeon",
+      "hp": 40000,
+      "moveSpeed": 170,
+      "radius": 30,
+      "contactDamage": 40,
+      "xp": 0,
+      "spriteScale": 2.4
+    },
+    {
+      "id": "red-snorlax",
+      "species": "snorlax",
+      "rank": "legendary",
+      "sprite": "enemy/snorlax",
+      "hp": 40000,
+      "moveSpeed": 110,
+      "radius": 44,
+      "contactDamage": 50,
+      "xp": 0,
+      "spriteScale": 2.8
+    },
+    {
+      "id": "red-venusaur",
+      "species": "venusaur",
+      "rank": "legendary",
+      "sprite": "enemy/venusaur",
+      "hp": 36000,
+      "moveSpeed": 150,
+      "radius": 40,
+      "contactDamage": 36,
+      "xp": 0,
+      "spriteScale": 2.6
+    },
+    {
+      "id": "red-charizard",
+      "species": "charizard",
+      "rank": "legendary",
+      "sprite": "enemy/charizard",
+      "hp": 36000,
+      "moveSpeed": 165,
+      "radius": 40,
+      "contactDamage": 36,
+      "xp": 0,
+      "spriteScale": 2.6
+    },
+    {
+      "id": "red-blastoise",
+      "species": "blastoise",
+      "rank": "legendary",
+      "sprite": "enemy/blastoise",
+      "hp": 36000,
+      "moveSpeed": 150,
+      "radius": 40,
+      "contactDamage": 36,
+      "xp": 0,
+      "spriteScale": 2.6
+    },
+    {
+      "id": "legend-raikou",
+      "species": "raikou",
+      "rank": "legendary",
+      "sprite": "enemy/raikou",
+      "hp": 44800,
+      "moveSpeed": 175,
+      "radius": 40,
+      "contactDamage": 40,
+      "xp": 0,
+      "spriteScale": 2.6
+    },
+    {
+      "id": "legend-entei",
+      "species": "entei",
+      "rank": "legendary",
+      "sprite": "enemy/entei",
+      "hp": 44800,
+      "moveSpeed": 165,
+      "radius": 40,
+      "contactDamage": 42,
+      "xp": 0,
+      "spriteScale": 2.6
+    },
+    {
+      "id": "legend-suicune",
+      "species": "suicune",
+      "rank": "legendary",
+      "sprite": "enemy/suicune",
+      "hp": 44800,
+      "moveSpeed": 165,
+      "radius": 40,
+      "contactDamage": 40,
+      "xp": 0,
+      "spriteScale": 2.6
+    },
+    {
+      "id": "legend-lugia",
+      "species": "lugia",
+      "rank": "legendary",
+      "sprite": "enemy/lugia",
+      "hp": 60000,
+      "moveSpeed": 160,
+      "radius": 46,
+      "contactDamage": 45,
+      "xp": 0,
+      "spriteScale": 2.8
+    },
+    {
+      "id": "legend-ho-oh",
+      "species": "ho-oh",
+      "rank": "legendary",
+      "sprite": "enemy/ho-oh",
+      "hp": 60000,
+      "moveSpeed": 160,
+      "radius": 46,
+      "contactDamage": 45,
+      "xp": 0,
+      "spriteScale": 2.8
     }
   ]
 }

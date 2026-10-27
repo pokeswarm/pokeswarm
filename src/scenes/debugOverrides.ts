@@ -60,6 +60,19 @@ export function parseLegendParam(rules: SimRules, search: string): number | null
   return k === -1 ? null : k;
 }
 
+/** テストプレイ: ?intruder=raikou で、少し後に伝説（三犬）が乱入する（legend-<名前> または id）。知らない名前なら null */
+export function parseIntruderParam(rules: SimRules, search: string): number | null {
+  const v = new URLSearchParams(search).get('intruder');
+  if (!v) return null;
+  const k = rules.enemies.kinds.findIndex((x) => (x.id === v || x.id === `legend-${v}`) && x.rank === 'legendary');
+  return k === -1 ? null : k;
+}
+
+/** テストプレイ: ?wings で、はね（ぎんいろ・にじいろ）を最初から持っている（レッドに勝つとルギア・ホウオウと戦える） */
+export function parseWingsParam(search: string): boolean {
+  return new URLSearchParams(search).has('wings');
+}
+
 /** テストプレイ: ?god で自分は無敵（受けたはずのダメージは数えて出す） */
 export function parseGodParam(search: string): boolean {
   return new URLSearchParams(search).has('god');

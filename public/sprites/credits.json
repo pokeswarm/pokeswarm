@@ -2562,5 +2562,85 @@
     ],
     "license": "CC BY-NC 4.0",
     "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0186"
+  },
+  {
+    "key": "raikou",
+    "dex": 243,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0243"
+  },
+  {
+    "key": "entei",
+    "dex": 244,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0244"
+  },
+  {
+    "key": "suicune",
+    "dex": 245,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0245"
+  },
+  {
+    "key": "lugia",
+    "dex": 249,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0249"
+  },
+  {
+    "key": "ho-oh",
+    "dex": 250,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0250"
+  },
+  {
+    "key": "celebi",
+    "dex": 251,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      },
+      {
+        "name": "Smalusion",
+        "contact": "https://twitter.com/Smalusion"
+      },
+      {
+        "name": "Emmuffin",
+        "contact": "https://twitter.com/Ernmuffin"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0251"
   }
 ]

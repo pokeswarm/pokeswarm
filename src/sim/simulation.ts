@@ -16,7 +16,7 @@ import { emptyModifiers } from './upgrades';
 import { checkEvolutionAll } from './systems/evolution';
 import { contactDamage, regenerate, touchRevive } from './systems/health';
 import { blockByObstacles } from './obstacles';
-import { advanceSection, armBombers, bossAttacks, checkRunEnd, spawnBosses, spawnSwarms } from './systems/stage';
+import { advanceSection, armBombers, bossAttacks, checkRunEnd, spawnBosses, spawnSwarms, stepIntruders } from './systems/stage';
 import { createWorld, type SimRole, type World } from './world';
 
 export interface SimulationOptions {
@@ -76,6 +76,7 @@ export class Simulation {
     movePlayers(w);
     spawnEnemies(w);
     spawnBosses(w);
+    stepIntruders(w);
     spawnSwarms(w);
     moveEnemies(w);
     rebuildEnemyHash(w);

@@ -909,6 +909,112 @@
       "reward": {
         "pokemon": "poliwag"
       }
+    },
+    {
+      "id": "johto-silver-wing",
+      "region": "johto",
+      "condition": {
+        "all": [
+          {
+            "stat": "eggClears.pichu",
+            "atLeast": 1
+          },
+          {
+            "stat": "eggClears.cleffa",
+            "atLeast": 1
+          },
+          {
+            "stat": "eggClears.igglybuff",
+            "atLeast": 1
+          },
+          {
+            "stat": "eggClears.togepi",
+            "atLeast": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "johto-rainbow-wing",
+      "region": "johto",
+      "condition": {
+        "stat": "redDefeated",
+        "atLeast": 1
+      }
+    },
+    {
+      "id": "johto-unlock-raikou",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.raikou",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "raikou"
+      }
+    },
+    {
+      "id": "johto-unlock-entei",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.entei",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "entei"
+      }
+    },
+    {
+      "id": "johto-unlock-suicune",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.suicune",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "suicune"
+      }
+    },
+    {
+      "id": "johto-unlock-lugia",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.lugia",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "lugia"
+      }
+    },
+    {
+      "id": "johto-unlock-ho-oh",
+      "region": "johto",
+      "condition": {
+        "stat": "bossDefeated.ho-oh",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "ho-oh"
+      }
+    },
+    {
+      "id": "johto-unlock-celebi",
+      "region": "johto",
+      "condition": {
+        "all": [
+          {
+            "stat": "bossDefeated.lugia",
+            "atLeast": 1
+          },
+          {
+            "stat": "bossDefeated.ho-oh",
+            "atLeast": 1
+          }
+        ]
+      },
+      "reward": {
+        "pokemon": "celebi"
+      }
     }
   ]
 }

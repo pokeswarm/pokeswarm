@@ -290,7 +290,7 @@ describe('伝説の乱入', () => {
     e.hp[i] = e.maxHp[i]! * 0.4;
     const types = run(sim, 2);
     expect(types).toContain('legendaryWarning');
-    expect(sim.world.legendary?.enraged).toBe(true);
+    expect(sim.world.bosses[0]!.enraged).toBe(true);
     expect(sim.world.bosses[0]!.interval).toBe(15);
   });
 

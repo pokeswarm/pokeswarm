@@ -36,7 +36,7 @@ import { SHAPE_CIRCLE, SHAPE_LINE, SHAPE_SECTOR } from '../sim/entities/projecti
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World } from '../sim/world';
-import { applyDebugOverrides, parseGodParam, parseLegendParam, parseLevelParam, parseMovesParam, parseSectionParam, parseTimeParam } from './debugOverrides';
+import { applyDebugOverrides, parseGodParam, parseLegendParam, parseIntruderParam, parseWingsParam, parseLevelParam, parseMovesParam, parseSectionParam, parseTimeParam } from './debugOverrides';
 import { addXp, applyOffer, itemFits } from '../sim/systems/leveling';
 import { shinySpriteKey } from '../meta/loadoutOptions';
 import { achievementPerks, regionAchieved } from '../meta/achievementPerks';
@@ -46,7 +46,7 @@ import { achievementName, achievementRewardById } from '../meta/achievementText'
 import { RunRecorder } from '../meta/runRecorder';
 import { session } from '../meta/session';
 import { LevelUpPanel, offerText } from './levelUpPanel';
-import { activeLegendField, startLegendary } from '../sim/systems/stage';
+import { activeLegendField, startIntruder, startLegendary, legendRoundKinds } from '../sim/systems/stage';
 import { PausePanel } from './pausePanel';
 import { EvolutionCutscene } from './evolutionCutscene';
 import { NetPanel } from './netPanel';
@@ -177,6 +177,8 @@ export class RunScene extends Phaser.Scene {
   private settingsOpen = false;
   /** テストプレイ: 最初から戦う伝説（無ければ null）・無敵・無敵の間に受けたはずのダメージの合計 */
   private testLegend: number | null = null;
+  /** ?intruder・?wings を付けたラン（記録を保存しない） */
+  private testRun = false;
   private god = false;
   private godDamage = 0;
   private godText: Phaser.GameObjects.Text | null = null;
@@ -293,6 +295,8 @@ export class RunScene extends Phaser.Scene {
     // 伝説戦の相性で選ぶ候補（色違いの御三家）: 参加者のだれかが条件の実績を達成していれば足す（どのブラウザでも同じ）
     const counter = rules.stage.legendary?.counter;
     this.sim.world.legendaryCounter = !!counter && roster.some((r) => counter.achievements.some((a) => r.achievements.includes(a)));
+    // はね（ルギア・ホウオウ戦の権利）: 参加者のだれかが条件の実績を達成していれば、箱から出るようになる（どのブラウザでも同じ）
+    for (const b of rules.stage.legendary?.bonusRounds ?? []) if (roster.some((r) => r.achievements.includes(b.achievement))) this.sim.world.wingsEnabled.add(b.item);
     // 実績の報酬（07 23・24章）: 各自の達成した実績から、解放した持ち物・特殊なバフを計算する。協力プレイの経験値は部屋の全員に
     // 報酬は、遊ぶ地方の実績のぶんだけ（02 の17章）
     const perksOf = new Map(roster.map((r) => [r.id, achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, r.achievements, this.stageOfRegion.id))]));
@@ -379,6 +383,11 @@ export class RunScene extends Phaser.Scene {
     this.god = !this.coop && parseGodParam(window.location.search);
     this.godDamage = 0;
     if (this.testLegend !== null) startLegendary(this.sim.world, this.testLegend);
+    // テストプレイ（ソロだけ）: ?intruder=raikou で三犬が乱入する。?wings ではねを持っている。どちらも記録を保存しない
+    const testIntruder = this.coop ? null : parseIntruderParam(this.sim.world.rules, window.location.search);
+    if (testIntruder !== null) startIntruder(this.sim.world, testIntruder);
+    if (!this.coop && parseWingsParam(window.location.search)) for (const w of ['silver-wing', 'rainbow-wing'] as const) this.sim.world.wings.add(w);
+    this.testRun = testIntruder !== null || (!this.coop && parseWingsParam(window.location.search));
     if (this.coop) this.setupNet(this.coop.room);
 
     this.clock = new FixedStepClock(simulationConfig.tickRate, simulationConfig.maxTicksPerFrame);
@@ -658,7 +667,7 @@ export class RunScene extends Phaser.Scene {
 
   /** テストプレイのラン（記録を保存しない） */
   private isTestRun(): boolean {
-    return this.god || this.testLegend !== null;
+    return this.god || this.testLegend !== null || this.testRun;
   }
 
   /** 伝説戦の結果（結果画面に出す） */
@@ -828,6 +837,8 @@ export class RunScene extends Phaser.Scene {
           if (def && it.by === this.localId) this.announce(t('item.buff', { name: localName(generated.items[def.item]?.names, getLocale(), def.item), seconds: def.seconds }), '#ffe082');
         }
         else if (it.kind === 'magnet') this.announce(t('item.magnet'), '#ef9a9a');
+        // はね: だれが拾っても全員に知らせる（全員のランでルギア・ホウオウと戦える）
+        else if (it.kind === 'silver-wing' || it.kind === 'rainbow-wing') this.announce(t('run.wingGot', { name: localName(generated.items[it.kind]?.names, getLocale(), it.kind) }), it.kind === 'silver-wing' ? '#e0e0e0' : '#ffcc80');
         else if (it.by === this.localId) this.announce(localName(generated.items.potion?.names, getLocale(), ''), '#ce93d8');
       } else if (ev.type === 'bodyAttack') {
         this.playerViews.get(ev.playerId)?.lunge(ev.dirX, ev.dirY, ev.distance, ev.afterimages);
@@ -869,8 +880,8 @@ export class RunScene extends Phaser.Scene {
         } else {
           this.effects.playImpact(ev.effect, ev.x, ev.y);
         }
-      } else if (ev.type === 'legendaryWarning') {
-        // 伝説の乱入（01_game_design.md 7.1 の「DANGER」）
+      } else if (ev.type === 'legendaryWarning' || ev.type === 'intruderWarning') {
+        // 伝説の乱入（01_game_design.md 7.1 の「DANGER」。三犬の乱入も同じ）
         this.tweens.killTweensOf(this.announceText);
         this.announceText.setText(t('run.danger')).setColor('#ff5252').setAlpha(1);
         this.tweens.add({ targets: this.announceText, alpha: 0.2, duration: 250, yoyo: true, repeat: 5, onComplete: () => this.announceText.setAlpha(0) });
@@ -1522,14 +1533,15 @@ export class RunScene extends Phaser.Scene {
   private legendPose(i: number): { anim: string; spin: boolean } | null {
     const w = this.sim.world;
     const lg = w.legendary;
-    if (!lg || w.enemies.kind[i] !== lg.kind) return null;
-    const set = w.rules.stage.legendary?.moveSets[w.rules.enemies.kinds[lg.kind]?.id ?? ''];
+    if (!lg || !legendRoundKinds(w, lg.kind).includes(w.enemies.kind[i]!)) return null;
+    const set = w.rules.stage.legendary?.moveSets[w.rules.enemies.kinds[w.enemies.kind[i]!]?.id ?? ''];
     if (!set) return null;
     const id = w.enemies.id[i]!;
     const charging = w.hazards.some((h) => h.dasher === id && h.activeTicks === undefined && w.rules.stage.moves[h.move]?.rooted);
-    const holding = w.legendAi?.enemyId === id && !!w.legendAi.holdTicks;
+    const ai = w.legendAis.get(id);
+    const holding = !!ai?.holdTicks;
     if ((charging || holding) && set.chargePose) return { anim: set.chargePose, spin: false };
-    if (set.shell && w.legendAi?.enemyId === id && w.legendAi.shell) return { anim: set.shell.pose, spin: set.shell.spin };
+    if (set.shell && ai?.shell) return { anim: set.shell.pose, spin: set.shell.spin };
     return null;
   }
 

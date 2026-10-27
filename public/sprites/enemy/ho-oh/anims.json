@@ -1,0 +1,31 @@
+{
+  "key": "enemy/ho-oh",
+  "dex": 250,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 72,
+      "frameHeight": 112,
+      "durations": [
+        8,
+        6,
+        8,
+        6,
+        8
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

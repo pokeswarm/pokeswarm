@@ -507,24 +507,6 @@
         "moveIntervalSeconds": 1.1,
         "doubleChance": 0.4
       }
-    },
-    {
-      "wave": 15,
-      "afterSeconds": 40,
-      "required": true,
-      "kind": "johto-boss-pikachu",
-      "moves": [
-        "mew-volt-tackle",
-        "zapdos-thunder",
-        "zapdos-dash",
-        "zapdos-field-bolt"
-      ],
-      "moveIntervalSeconds": 1.4,
-      "enrage": {
-        "hpRatio": 0.5,
-        "moveIntervalSeconds": 0.9,
-        "doubleChance": 0.5
-      }
     }
   ],
   "swarms": [
@@ -549,5 +531,311 @@
       "move": "self-destruct"
     }
   ],
-  "legendaryBgm": "johto-legendary-sky"
+  "legendaryBgm": "johto-legendary-sky",
+  "legendary": {
+    "chance": 1,
+    "kinds": [
+      "red-pikachu"
+    ],
+    "moves": [
+      "legend-dash",
+      "legend-beam",
+      "legend-nova",
+      "legend-meteor"
+    ],
+    "rounds": [
+      {
+        "kinds": [
+          "red-pikachu"
+        ],
+        "bgm": "johto-red"
+      },
+      {
+        "kinds": [
+          "red-espeon",
+          "red-snorlax"
+        ],
+        "bgm": "johto-red"
+      },
+      {
+        "kinds": [
+          "red-venusaur",
+          "red-charizard",
+          "red-blastoise"
+        ],
+        "stat": "redDefeated",
+        "bgm": "johto-red"
+      }
+    ],
+    "bonusRounds": [
+      {
+        "item": "silver-wing",
+        "kinds": [
+          "legend-lugia"
+        ],
+        "achievement": "johto-silver-wing"
+      },
+      {
+        "item": "rainbow-wing",
+        "kinds": [
+          "legend-ho-oh"
+        ],
+        "achievement": "johto-rainbow-wing"
+      }
+    ],
+    "intruders": {
+      "minutes": [
+        5,
+        7,
+        9,
+        11,
+        13,
+        15
+      ],
+      "chance": 0.01,
+      "kinds": [
+        "legend-raikou",
+        "legend-entei",
+        "legend-suicune"
+      ],
+      "timeLimitSeconds": 180
+    },
+    "moveSets": {
+      "red-pikachu": {
+        "moves": [
+          "red-volt-tackle",
+          "zapdos-thunder",
+          "red-volt-tackle",
+          "legend-nova"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.3,
+        "enrageMoveIntervalSeconds": 0.9,
+        "casters": [
+          {
+            "move": "thunderbolt",
+            "level": 8
+          },
+          {
+            "move": "thunder-shock",
+            "level": 8
+          }
+        ],
+        "casterPower": 1.2,
+        "field": {
+          "lightning": {
+            "move": "zapdos-field-bolt",
+            "everySeconds": 1.2
+          }
+        }
+      },
+      "red-espeon": {
+        "moves": [
+          "mewtwo-teleport",
+          "espeon-psychic",
+          "espeon-psychic",
+          "espeon-morning-sun"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.6,
+        "enrageMoveIntervalSeconds": 1.1,
+        "casters": [
+          {
+            "move": "psychic",
+            "level": 8
+          }
+        ],
+        "casterPower": 1.2
+      },
+      "red-snorlax": {
+        "moves": [
+          "snorlax-body-slam",
+          "earthquake",
+          "snorlax-body-slam",
+          "snorlax-rest"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 2,
+        "enrageMoveIntervalSeconds": 1.4,
+        "chargePose": "Sleep"
+      },
+      "red-venusaur": {
+        "moves": [
+          "venusaur-solar-beam"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 2.5,
+        "enrageMoveIntervalSeconds": 1.8,
+        "casters": [
+          {
+            "move": "petal-dance",
+            "level": 8,
+            "orbitRadius": 200
+          },
+          {
+            "move": "sludge-bomb",
+            "level": 8,
+            "everySeconds": 2.5
+          }
+        ],
+        "casterPower": 1.2
+      },
+      "red-charizard": {
+        "moves": [
+          "charizard-dash"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 3,
+        "enrageMoveIntervalSeconds": 2,
+        "casters": [
+          {
+            "move": "flamethrower",
+            "level": 8
+          },
+          {
+            "move": "fire-spin",
+            "level": 8
+          }
+        ],
+        "casterPower": 1.2
+      },
+      "red-blastoise": {
+        "moves": [
+          "blastoise-hydro-cannon"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 0.5,
+        "enrageMoveIntervalSeconds": 0.4,
+        "casterPower": 1.2,
+        "shell": {
+          "farDistance": 0,
+          "nearDistance": 0,
+          "speedMultiplier": 4,
+          "pose": "Hurt",
+          "spin": true,
+          "moves": [
+            {
+              "move": "rapid-spin",
+              "level": 8,
+              "everySeconds": 0.4
+            }
+          ]
+        },
+        "chargePose": "Shoot"
+      },
+      "legend-raikou": {
+        "moves": [
+          "raikou-dash",
+          "zapdos-thunder",
+          "raikou-dash",
+          "raikou-discharge"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.3,
+        "enrageMoveIntervalSeconds": 0.9,
+        "field": {
+          "overlay": {
+            "color": "#000000",
+            "alpha": 0.2
+          },
+          "flash": {
+            "color": "#fffde7",
+            "alpha": 0.45,
+            "everySeconds": 4
+          },
+          "lightning": {
+            "move": "zapdos-field-bolt",
+            "everySeconds": 0.9
+          }
+        }
+      },
+      "legend-entei": {
+        "moves": [
+          "moltres-flamedash",
+          "entei-eruption",
+          "moltres-flamedash",
+          "entei-burst"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.6,
+        "enrageMoveIntervalSeconds": 1.1,
+        "field": {
+          "aura": {
+            "radius": 90,
+            "damagePerSecond": 25,
+            "color": "#ff7043"
+          }
+        }
+      },
+      "legend-suicune": {
+        "moves": [
+          "suicune-aurora-beam",
+          "suicune-hydro-pump",
+          "suicune-rings"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.5,
+        "enrageMoveIntervalSeconds": 1,
+        "field": {
+          "slowPct": 15,
+          "overlay": {
+            "color": "#0d47a1",
+            "alpha": 0.12
+          },
+          "weather": "rain-dance"
+        }
+      },
+      "legend-lugia": {
+        "moves": [
+          "lugia-aeroblast",
+          "lugia-hurricane",
+          "lugia-hydro-pump",
+          "lugia-hurricane"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.5,
+        "enrageMoveIntervalSeconds": 1,
+        "field": {
+          "wind": {
+            "speed": 70,
+            "everySeconds": 4
+          },
+          "overlay": {
+            "color": "#b3e5fc",
+            "alpha": 0.1
+          }
+        }
+      },
+      "legend-ho-oh": {
+        "moves": [
+          "hooh-sacred-fire",
+          "hooh-brave-bird",
+          "hooh-sacred-fire",
+          "hooh-sunny-burst"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.5,
+        "enrageMoveIntervalSeconds": 1,
+        "field": {
+          "typePowerPct": {
+            "fire": 50,
+            "water": -50
+          },
+          "overlay": {
+            "color": "#ffb74d",
+            "alpha": 0.12
+          }
+        }
+      }
+    },
+    "moveIntervalSeconds": 1.6,
+    "warningSeconds": 3,
+    "timeLimitSeconds": 180,
+    "enrage": {
+      "hpRatio": 0.5,
+      "moveIntervalSeconds": 1.1,
+      "doubleChance": 0.35
+    }
+  },
+  "intruderBgm": "johto-beasts"
 }

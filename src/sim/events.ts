@@ -261,6 +261,18 @@ export interface LegendaryWarningEvent {
   readonly enraged?: boolean;
 }
 
+/** 伝説が乱入してくる（三犬。「DANGER」の後に出る） */
+export interface IntruderWarningEvent {
+  readonly type: 'intruderWarning';
+  readonly kind: number;
+}
+
+/** 乱入した伝説が、倒されずに逃げた */
+export interface IntruderLeftEvent {
+  readonly type: 'intruderLeft';
+  readonly kind: number;
+}
+
 /** 技を使った（効果音のため） */
 export interface MoveUsedEvent {
   readonly type: 'moveUsed';
@@ -362,4 +374,6 @@ export type SimEvent =
   | ItemSpawnedEvent
   | ItemRequestedEvent
   | ItemCollectedEvent
-  | LegendaryWarningEvent;
+  | LegendaryWarningEvent
+  | IntruderWarningEvent
+  | IntruderLeftEvent;

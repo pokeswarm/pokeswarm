@@ -1,3 +1,4 @@
+import { legendRoundStats } from '../sim/systems/stage';
 import type { World } from '../sim/world';
 import { elapsedSeconds } from '../sim/world';
 import { addStat, maxStat } from './saveData';
@@ -153,6 +154,8 @@ export class RunRecorder {
       if (this.hatchedFrom) this.count(`eggClears.${this.pokemon}`);
       this.count(world.role === 'solo' ? 'clears.solo' : 'clears.coop');
     }
+    // 続けて戦うラウンドを倒した記録（レッドを倒す。ジョウトの にじいろのはね の実績）
+    if (world.legendary) for (const stat of legendRoundStats(world, world.legendary.kind, world.legendary.result)) this.count(stat);
     this.commit(world);
     this.finished = true;
     // コイン（01_game_design.md 8.3。失敗・切断でも、そこまでの分をもらえる）

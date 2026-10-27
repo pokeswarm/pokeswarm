@@ -159,7 +159,7 @@ export const regionStages: Readonly<Record<string, RegionStage>> = Object.fromEn
       }),
       ground: load(`render/ground.json と ${name}`, groundConfigSchema, { ...groundJson, waves: file.sections.map((x) => ({ tile: x.tile })) }),
       obstacles: load(`game/obstacles.json と ${name}`, obstacleConfigSchema, { ...obstaclesJson, sections: file.sections.map((x) => x.obstacles) }),
-      bgmRun: { sections: file.sections.map((x) => x.bgm), legendary: file.legendaryBgm },
+      bgmRun: { sections: file.sections.map((x) => x.bgm), legendary: file.legendaryBgm, intruder: file.intruderBgm },
       night: file.sections.map((x) => x.night),
     };
     return [id, stage];
@@ -278,7 +278,8 @@ for (const rs of Object.values(regionStages)) {
     }
   });
   for (const kinds of rs.obstacles.sections) for (const k of kinds) check(!!obstacleSprites.sprites[k], `${file} の障害物 "${k}" のドット絵が data/render/obstacles.json にありません`);
-  for (const id of [...rs.bgmRun.sections, rs.bgmRun.legendary]) check(id === null || !!bgmConfig.tracks[id], `${file} の曲 "${id}" が data/audio/bgm.json の tracks にありません`);
+  const roundBgm = [...(rs.stage.legendary?.rounds ?? []), ...(rs.stage.legendary?.bonusRounds ?? [])].flatMap((r) => (r.bgm ? [r.bgm] : []));
+  for (const id of [...rs.bgmRun.sections, rs.bgmRun.legendary, rs.bgmRun.intruder, ...roundBgm]) check(id === null || !!bgmConfig.tracks[id], `${file} の曲 "${id}" が data/audio/bgm.json の tracks にありません`);
   for (const b of stageConfig.bosses) {
     const rank = enemiesConfig.kinds.find((k) => k.id === b.kind)?.rank;
     check(rank === 'midboss' || rank === 'boss', `${file} の "${b.kind}" が data/game/enemies.json に rank: "midboss" か "boss" でありません`);
@@ -299,7 +300,14 @@ for (const rs of Object.values(regionStages)) {
     for (const id of counter?.achievements ?? []) {
       check(achievementsConfig.achievements.some((a) => a.id === id), `${file} の伝説の相性で選ぶ候補の条件の実績 "${id}" がありません`);
     }
-    const legendaryKinds = [...stageConfig.legendary.kinds, ...(counter?.kinds ?? [])];
+    // 続けて戦うラウンド（レッド）・はねの戦い（ルギア・ホウオウ）・乱入（三犬）の相手も、伝説の敵であること
+    const lg = stageConfig.legendary;
+    const roundKinds = [...(lg.rounds ?? []).flatMap((r) => r.kinds), ...(lg.bonusRounds ?? []).flatMap((r) => r.kinds), ...(lg.intruders?.kinds ?? [])];
+    for (const b of lg.bonusRounds ?? []) check(achievementsConfig.achievements.some((a) => a.id === b.achievement), `${file} のはね "${b.item}" の条件の実績 "${b.achievement}" がありません`);
+    for (const id of roundKinds) {
+      check(enemiesConfig.kinds.find((k) => k.id === id)?.rank === 'legendary', `${file} の伝説のラウンド・乱入の "${id}" が data/game/enemies.json に rank: "legendary" でありません`);
+    }
+    const legendaryKinds = [...stageConfig.legendary.kinds, ...(counter?.kinds ?? []), ...roundKinds];
     for (const [kind, set] of Object.entries(stageConfig.legendary.moveSets)) {
       check(legendaryKinds.includes(kind), `${file} の伝説ごとの技の "${kind}" が伝説の候補にありません`);
       // "*" は pool からランダム（ミュウ）

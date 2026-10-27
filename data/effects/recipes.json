@@ -3070,16 +3070,17 @@
     "flame-wheel": {
       "extends": "fire.base",
       "projectile": {
-        "glowScale": 1.4,
-        "coreScale": 0.5
+        "glowScale": 1,
+        "coreScale": 0.3,
+        "shapeAlpha": 0
       },
       "impact": {},
       "sprite": {
         "id": "flame-wheel",
         "fit": "circle",
-        "size": 1.5,
+        "size": 1,
         "rotate": "spin",
-        "spinDegPerSec": 720
+        "spinDegPerSec": 300
       }
     },
     "eruption": {

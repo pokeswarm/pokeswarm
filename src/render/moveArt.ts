@@ -1275,27 +1275,28 @@ function waterSpout(): SpriteOut {
  * 渦を巻く長い尾が、光の演出の残り火の軌跡とずれていた。回る軌跡は残り火に任せ、絵は火の玉そのものにする）
  */
 /**
- * かえんぐるま: 上から見た、燃えて回る車輪（輪と3本のスポーク、輪の外へ炎の舌）。レシピで回して転がって見せ、コマで炎がゆらめく
+ * かえんぐるま: 上から見た、燃えて回る大きな車輪（作者の指摘 2026年10月27日: 自分が車輪の中心）。自分を囲む輪と、輪から内へのびる6本のスポーク、
+ * 輪の外へ炎の舌。真ん中（自分の体）は描かない。レシピで回し、コマで炎がゆらめく
  */
 function flameWheel(): SpriteOut {
   const palette = ['#4e1206', '#d84315', '#ff9800', '#ffeb3b', '#fffde7'];
   const frames = [0, 1, 2].map((f) =>
-    shape(24, (u, v) => {
+    shape(48, (u, v) => {
       const d = Math.hypot(u, v);
       const a = Math.atan2(v, u);
-      // 輪の外の炎の舌（回る向きの後ろへなびく形を、角度の波で）
-      const tongue = 0.82 + Math.max(0, Math.sin(a * 6 + f * 2.1)) * 0.16;
+      // 輪の外の炎の舌（角度の波で。コマでゆらめく）
+      const tongue = 0.86 + Math.max(0, Math.sin(a * 10 + f * 2.1)) * 0.13;
       if (d > tongue) return -1;
-      if (d > 0.8) return d > 0.9 ? 1 : 2;
+      if (d > 0.84) return d > 0.93 ? 1 : 2;
       // 輪（車輪のふち）
-      if (d > 0.6) return d > 0.72 ? 3 : 4;
-      // スポーク3本と軸
-      if (d < 0.18) return 4;
-      for (let k = 0; k < 3; k++) {
-        const sa = (k / 3) * Math.PI * 2;
+      if (d > 0.72) return d > 0.79 ? 3 : 4;
+      // スポーク6本（輪から内へ、自分の体の手前まで）
+      if (d < 0.42) return -1;
+      for (let k = 0; k < 6; k++) {
+        const sa = (k / 6) * Math.PI * 2;
         const along = u * Math.cos(sa) + v * Math.sin(sa);
         const across = -u * Math.sin(sa) + v * Math.cos(sa);
-        if (along > 0 && Math.abs(across) < 0.09) return 2;
+        if (along > 0 && Math.abs(across) < 0.045) return d > 0.6 ? 2 : 3;
       }
       return -1;
     }),

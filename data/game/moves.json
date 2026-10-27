@@ -5395,7 +5395,7 @@
       ]
     },
     "flame-wheel": {
-      "pattern": "orbit",
+      "pattern": "spin",
       "effect": "flame-wheel",
       "base": {
         "intervalSeconds": 0.1,
@@ -5404,46 +5404,46 @@
         "knockbackSeconds": 0.08,
         "statusChance": 0.3,
         "statusSeconds": 3,
-        "power": 22.1,
+        "power": 12.6,
         "cooldownSeconds": 2.6,
         "count": 1,
-        "speed": 240,
-        "size": 26,
-        "range": 84,
+        "speed": 0,
+        "size": 16,
+        "range": 70,
         "durationSeconds": 2.6,
         "pierce": "infinite",
         "hitIntervalSeconds": 0.3,
         "knockback": 140,
-        "statusId": "burn"
+        "statusId": "burn",
+        "arcDegrees": 360
       },
       "levels": [
         {
-          "size": 4,
-          "power": 3.2
+          "size": 3,
+          "power": 2.5
         },
         {
-          "count": 1,
-          "power": -4.1
+          "range": 10,
+          "power": 1.2
         },
         {
-          "durationSeconds": 0.4,
-          "power": -1.6
+          "durationSeconds": 0.3,
+          "power": 0.5
         },
         {
-          "range": 12,
-          "power": 2.7
+          "size": 3,
+          "power": 1.8
         },
         {
-          "count": 1,
-          "power": -2
+          "range": 10,
+          "power": 0.6
         },
         {
-          "size": 5,
-          "power": 0.3
+          "hitIntervalSeconds": -0.05,
+          "power": -1.8
         },
         {
-          "cooldownSeconds": -0.3,
-          "power": -0.6
+          "range": 12
         }
       ]
     },

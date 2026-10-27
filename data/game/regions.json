@@ -39,7 +39,7 @@
     {
       "id": "johto",
       "available": false,
-      "playables": ["charmander", "bulbasaur", "squirtle"],
+      "playables": ["cyndaquil", "chikorita", "totodile"],
       "unlock": { "stat": "bossDefeated.mew", "atLeast": 1 }
     },
     {

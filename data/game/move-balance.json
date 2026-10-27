@@ -33,13 +33,17 @@
     "future-sight",
     "pay-day",
     "confusion",
-    "psychic"
+    "psychic",
+    "synthesis"
   ],
   "heavyHitters": [
     "giga-impact",
     "frenzy-plant"
   ],
   "tierOverrides": {
-    "pound": "derived"
+    "pound": "derived",
+    "flame-wheel": "derived",
+    "synthesis": "derived",
+    "bite": "derived"
   }
 }

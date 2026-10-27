@@ -1180,6 +1180,42 @@
       "uses": [
         "enemy"
       ]
+    },
+    {
+      "key": "cyndaquil",
+      "dex": 155
+    },
+    {
+      "key": "quilava",
+      "dex": 156
+    },
+    {
+      "key": "typhlosion",
+      "dex": 157
+    },
+    {
+      "key": "chikorita",
+      "dex": 152
+    },
+    {
+      "key": "bayleef",
+      "dex": 153
+    },
+    {
+      "key": "meganium",
+      "dex": 154
+    },
+    {
+      "key": "totodile",
+      "dex": 158
+    },
+    {
+      "key": "croconaw",
+      "dex": 159
+    },
+    {
+      "key": "feraligatr",
+      "dex": 160
     }
   ]
 }

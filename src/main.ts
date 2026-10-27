@@ -2,7 +2,7 @@ import { loadPixelFonts } from './render/pixelUi';
 import { startOrientationGuard } from './render/OrientationGuard';
 import { checkSite, showSiteGuard } from './render/siteGuard';
 import Phaser from 'phaser';
-import { placeholderRender, playablesConfig } from './data';
+import { placeholderRender, playablesConfig, regionsConfig } from './data';
 import { migrateOldDiscoveries } from './meta/discoveries';
 import { session } from './meta/session';
 import { loadSpriteManifest } from './render/sprites/spriteManifest';
@@ -76,7 +76,9 @@ async function start(): Promise<void> {
     // 雑魚のスプライトは起動時には読まず、時間帯に合わせて読む（SpriteStreamer）
     const requested = q.get('pokemon') ?? '';
     const pokemon = playablesConfig.pokemon[requested] ? requested : playablesConfig.default;
-    run = { pokemon, playerSprite: await loadSpriteManifest(playablesConfig.pokemon[pokemon]!.sprite), coop: null };
+    // 地方は ?region= か、そのポケモンを遊べる最初の地方（ヒノアラシならジョウト）
+    const region = q.get('region') ?? regionsConfig.regions.find((r) => r.playables?.includes(pokemon))?.id;
+    run = { pokemon, region, playerSprite: await loadSpriteManifest(playablesConfig.pokemon[pokemon]!.sprite), coop: null };
   }
   const game = new Phaser.Game({
     type: Phaser.AUTO,

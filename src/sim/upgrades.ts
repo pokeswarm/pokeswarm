@@ -68,6 +68,13 @@ export interface SimDerivation {
   readonly consumes?: readonly number[];
   /** 材料にした技の強化分（レベル − 1）を新しい技のレベルに足す（ばくれつパンチ） */
   readonly inheritLevels?: boolean;
+  /** 系統だけの技でも、段階は派生技（ジョウトの御三家の かえんぐるま など。move-balance.json の tierOverrides） */
+  readonly derivedTier?: boolean;
+}
+
+/** 固有技の段階か（系統だけの技。ただし derivedTier の技は派生技の段階） */
+export function isUniqueDerivation(d: SimDerivation): boolean {
+  return d.line !== null && !d.derivedTier;
 }
 
 /** シミュレーションが使うレベルアップの定義 */

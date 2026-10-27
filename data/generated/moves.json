@@ -59,6 +59,18 @@
     "type": "ice",
     "damageClass": "special"
   },
+  "bite": {
+    "names": {
+      "ja": "かみつく",
+      "en": "Bite",
+      "fr": "Morsure",
+      "de": "Biss",
+      "es": "Mordisco",
+      "it": "Morso"
+    },
+    "type": "dark",
+    "damageClass": "physical"
+  },
   "blast-burn": {
     "names": {
       "ja": "ブラストバーン",
@@ -177,6 +189,18 @@
       "it": "Incrocolpo"
     },
     "type": "fighting",
+    "damageClass": "physical"
+  },
+  "crunch": {
+    "names": {
+      "ja": "かみくだく",
+      "en": "Crunch",
+      "fr": "Mâchouille",
+      "de": "Knirscher",
+      "es": "Triturar",
+      "it": "Sgranocchio"
+    },
+    "type": "dark",
     "damageClass": "physical"
   },
   "double-kick": {
@@ -299,6 +323,18 @@
     "type": "fire",
     "damageClass": "special"
   },
+  "eruption": {
+    "names": {
+      "ja": "ふんか",
+      "en": "Eruption",
+      "fr": "Éruption",
+      "de": "Eruption",
+      "es": "Estallido",
+      "it": "Eruzione"
+    },
+    "type": "fire",
+    "damageClass": "special"
+  },
   "explosion": {
     "names": {
       "ja": "だいばくはつ",
@@ -381,6 +417,18 @@
       "it": "Abisso"
     },
     "type": "ground",
+    "damageClass": "physical"
+  },
+  "flame-wheel": {
+    "names": {
+      "ja": "かえんぐるま",
+      "en": "Flame Wheel",
+      "fr": "Roue de Feu",
+      "de": "Flammenrad",
+      "es": "Rueda Fuego",
+      "it": "Ruotafuoco"
+    },
+    "type": "fire",
     "damageClass": "physical"
   },
   "flamethrower": {
@@ -1162,6 +1210,18 @@
     },
     "type": "normal",
     "damageClass": "special"
+  },
+  "synthesis": {
+    "names": {
+      "ja": "こうごうせい",
+      "en": "Synthesis",
+      "fr": "Synthèse",
+      "de": "Synthese",
+      "es": "Fotosíntesis",
+      "it": "Sintesi"
+    },
+    "type": "grass",
+    "damageClass": "status"
   },
   "tackle": {
     "names": {

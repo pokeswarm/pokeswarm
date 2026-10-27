@@ -2,7 +2,10 @@
   "initialPokemon": [
     "charmander",
     "bulbasaur",
-    "squirtle"
+    "squirtle",
+    "cyndaquil",
+    "chikorita",
+    "totodile"
   ],
   "initialItems": [
     "zoom-lens",

@@ -859,6 +859,26 @@
           "duty": 0.5
         }
       ]
+    },
+    "move.dark": {
+      "minIntervalMs": 60,
+      "parts": [
+        {
+          "wave": "square",
+          "from": 240,
+          "to": 110,
+          "duration": 0.08,
+          "volume": 0.16
+        },
+        {
+          "wave": "triangle",
+          "from": 150,
+          "to": 90,
+          "duration": 0.12,
+          "volume": 0.22,
+          "delay": 0.05
+        }
+      ]
     }
   }
 }

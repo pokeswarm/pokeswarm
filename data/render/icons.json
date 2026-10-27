@@ -1615,7 +1615,13 @@
     "fire-punch": "fist",
     "thunder-punch": "fist",
     "rest": "zzz",
-    "pay-day": "koban"
+    "pay-day": "koban",
+    "flame-wheel": "whirl",
+    "eruption": "eruption",
+    "synthesis": "heart",
+    "solar-beam": "beam",
+    "bite": "fang",
+    "crunch": "fang"
   },
   "items": {
     "x-attack": {

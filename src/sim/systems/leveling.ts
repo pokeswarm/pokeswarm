@@ -1,7 +1,7 @@
 import type { LevelUpSnapshot, PlayerId } from '../commands';
 import type { Player } from '../entities/player';
 import { deriveStats } from '../species';
-import { addModifiers, emptyModifiers, resolveModifiers } from '../upgrades';
+import { addModifiers, emptyModifiers, isUniqueDerivation, resolveModifiers } from '../upgrades';
 import { checkEvolution } from './evolution';
 import type { SimDerivation } from '../upgrades';
 import type { UpgradeOffer, World } from '../world';
@@ -270,7 +270,7 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
       if (p.moves.some((m) => m.move === d.to)) continue;
       // ほかにも最大レベルで持っていないといけない技（ばくれつパンチ）
       if (d.withMoves && !d.withMoves.every((w) => p.moves.some((m) => m.move === w && m.level >= rules.moves[w]!.levels.length))) continue;
-      guaranteed.push({ kind: 'derive', slot, to: d.to, item: d.item, unique: d.line !== null });
+      guaranteed.push({ kind: 'derive', slot, to: d.to, item: d.item, unique: isUniqueDerivation(d) });
     }
   });
 

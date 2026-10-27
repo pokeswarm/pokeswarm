@@ -863,12 +863,12 @@ function poisonCloud(): SpriteOut {
 
 // ---------------- 体で当たる技（案 D） ----------------
 /**
- * ほのおのキバ: 右を向いて上下のあごが閉じる牙（3コマで 開く → 半分 → 閉じる）。牙のまわりに炎のふち
+ * ほのおのキバ: 右を向いて上下のあごが閉じる牙（3コマで 開く → 半分 → 閉じる）。牙のまわりに炎のふち。
+ * かみつく・かみくだく は同じ形で、あくタイプの色（黒いふち・こげ茶のあご）
  */
-function fangBite(): SpriteOut {
+function fangBite(palette = ['#3b0d06', '#e53935', '#ff7043', '#cfc4bd', '#ffffff']): SpriteOut {
   const S = 16;
-  // 0 輪郭・1 赤（炎のふち）・2 橙（あご）・3 牙の影・4 牙
-  const palette = ['#3b0d06', '#e53935', '#ff7043', '#cfc4bd', '#ffffff'];
+  // 0 輪郭・1 ふち（炎）・2 あご・3 牙の影・4 牙
   const frames: Grid[] = [];
   const mid = (S - 1) / 2;
   // 牙の先と先のすき間（開く → 半分 → 噛み合う）
@@ -1101,6 +1101,35 @@ function waterSpout(): SpriteOut {
  * ほのおのうず: 自分のまわりを回る火の玉（進む向きに向ける）。尾は後ろへ短くまっすぐ（作者の指摘 2026年10月24日:
  * 渦を巻く長い尾が、光の演出の残り火の軌跡とずれていた。回る軌跡は残り火に任せ、絵は火の玉そのものにする）
  */
+/**
+ * かえんぐるま: 上から見た、燃えて回る車輪（輪と3本のスポーク、輪の外へ炎の舌）。レシピで回して転がって見せ、コマで炎がゆらめく
+ */
+function flameWheel(): SpriteOut {
+  const palette = ['#4e1206', '#d84315', '#ff9800', '#ffeb3b', '#fffde7'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(24, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 輪の外の炎の舌（回る向きの後ろへなびく形を、角度の波で）
+      const tongue = 0.82 + Math.max(0, Math.sin(a * 6 + f * 2.1)) * 0.16;
+      if (d > tongue) return -1;
+      if (d > 0.8) return d > 0.9 ? 1 : 2;
+      // 輪（車輪のふち）
+      if (d > 0.6) return d > 0.72 ? 3 : 4;
+      // スポーク3本と軸
+      if (d < 0.18) return 4;
+      for (let k = 0; k < 3; k++) {
+        const sa = (k / 3) * Math.PI * 2;
+        const along = u * Math.cos(sa) + v * Math.sin(sa);
+        const across = -u * Math.sin(sa) + v * Math.cos(sa);
+        if (along > 0 && Math.abs(across) < 0.09) return 2;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
 function flameSwirl(): SpriteOut {
   const palette = ['#4e1206', '#d84315', '#ff9800', '#ffeb3b', '#fffde7'];
   const frames = [0, 1, 2].map((f) =>
@@ -1479,9 +1508,8 @@ function soundWaves(): SpriteOut {
   return { palette, frameMs: 75, parts: { main: frames.map(toRows) } };
 }
 
-/** なまける: 体のまわりから立ちのぼる緑の十字と光の粒（コマで上へ流れ、4コマでつながる） */
-function healRise(): SpriteOut {
-  const palette = ['#1b5e20', '#43a047', '#a5d6a7', '#ffffff'];
+/** なまける: 体のまわりから立ちのぼる緑の十字と光の粒（コマで上へ流れ、4コマでつながる）。こうごうせい は同じ形で日の光の色 */
+function healRise(palette = ['#1b5e20', '#43a047', '#a5d6a7', '#ffffff']): SpriteOut {
   const r = rng(77);
   const motes = Array.from({ length: 7 }, (_, k) => ({ x: -0.75 + (k / 6) * 1.5 + (r() - 0.5) * 0.15, ph: r(), plus: k % 2 === 0 }));
   const frames = [0, 1, 2, 3].map((f) =>
@@ -2403,6 +2431,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     snowflake: () => snowflake(),
     'poison-cloud': () => poisonCloud(),
     'fang-bite': () => fangBite(),
+    'dark-fang': () => fangBite(['#0e0a0a', '#3e2723', '#5d4037', '#bdb4ae', '#ffffff']),
     'flame-crash': () => flameCrash(),
     'impact-crescent': () => impactCrescent(),
     'speed-streak': () => speedStreak(),
@@ -2438,6 +2467,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     whirlpool: () => whirlpool(),
     'water-spout': () => waterSpout(),
     'flame-swirl': () => flameSwirl(),
+    'flame-wheel': () => flameWheel(),
     'burst-ice': () => burst('ice'),
     'burst-meteor': () => burst('meteor'),
     'burst-psy': () => burst('psy'),
@@ -2462,6 +2492,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'sound-waves': () => soundWaves(),
     'perish-ring': () => perishRing(),
     'heal-rise': () => healRise(),
+    'sun-rise': () => healRise(['#5d4a00', '#c0ca33', '#fff176', '#ffffff']),
     'amnesia-swirl': () => amnesiaSwirl(),
     'rainbow-stars': () => rainbowStars(),
     'fire-geyser': () => fireGeyser(),

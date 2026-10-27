@@ -469,7 +469,7 @@
   "pattern.sweepOnce": "前を一度なぎ払う",
   "pattern.pulse": "自分のまわりに広がって縮む輪",
   "pattern.weather": "しばらく画面全体に降らせる",
-  "pattern.barrage": "前へ拳や蹴りを連打する",
+  "pattern.barrage": "前へ連打する",
   "pattern.rest": "止まっていると眠って回復する",
   "run.moveTaught": "{name} を おぼえた！",
   "run.sleepZ": "Z z z",

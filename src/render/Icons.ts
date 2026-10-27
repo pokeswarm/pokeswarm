@@ -1,6 +1,7 @@
 import type Phaser from 'phaser';
 import type { IconConfig, ItemIcons } from '../data/schema';
 import type { SimRules } from '../sim/rules';
+import { isUniqueDerivation } from '../sim/upgrades';
 import { iconColor, iconPixels, itemIconPixels, starPixels, type IconTier } from './iconPixels';
 
 /** レベルの表示のひし形（済んだもの: 段階ごとの色、まだのもの） */
@@ -11,7 +12,7 @@ export function pipKey(on: boolean, tier: IconTier): string {
 /** 技の段階（タイプの技・派生技・固有技） */
 export function moveTier(rules: SimRules, move: number): IconTier {
   const d = rules.derivations.find((x) => x.to === move);
-  return !d ? 'base' : d.line === null ? 'derived' : 'unique';
+  return !d ? 'base' : isUniqueDerivation(d) ? 'unique' : 'derived';
 }
 
 export function moveIconKey(rules: SimRules, move: number): string {

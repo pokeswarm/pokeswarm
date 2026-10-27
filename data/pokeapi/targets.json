@@ -151,7 +151,16 @@
     "houndoom",
     "unown",
     "electrode",
-    "sudowoodo"
+    "sudowoodo",
+    "cyndaquil",
+    "quilava",
+    "typhlosion",
+    "chikorita",
+    "bayleef",
+    "meganium",
+    "totodile",
+    "croconaw",
+    "feraligatr"
   ],
   "moves": [
     "ember",
@@ -264,7 +273,12 @@
     "focus-punch",
     "fire-punch",
     "rest",
-    "pay-day"
+    "pay-day",
+    "flame-wheel",
+    "eruption",
+    "synthesis",
+    "bite",
+    "crunch"
   ],
   "items": [
     "x-attack",

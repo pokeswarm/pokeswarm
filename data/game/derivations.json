@@ -28,6 +28,12 @@
   ],
   "unique": [
     { "from": "flamethrower", "item": "fire-stone", "to": "blast-burn", "line": "charmander" },
+    { "from": "ember", "item": "charcoal", "to": "flame-wheel", "line": "cyndaquil" },
+    { "from": "flame-wheel", "item": "charcoal", "to": "eruption", "line": "cyndaquil" },
+    { "from": "sleep-powder", "item": "miracle-seed", "to": "synthesis", "line": "chikorita" },
+    { "from": "synthesis", "item": "miracle-seed", "to": "solar-beam", "line": "chikorita" },
+    { "from": "scratch", "item": "mystic-water", "to": "bite", "line": "totodile" },
+    { "from": "bite", "item": "mystic-water", "to": "crunch", "line": "totodile" },
     { "from": "quick-attack", "item": "x-speed", "to": "extreme-speed", "line": "growlithe" },
     { "from": "hydro-pump", "item": "water-stone", "to": "hydro-cannon", "line": "squirtle" },
     { "from": "swift", "item": "metronome", "to": "rapid-spin", "line": "staryu" },

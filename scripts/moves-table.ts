@@ -60,7 +60,7 @@ const STATUS: Record<string, string> = {
   flinch: 'ひるみ',
   leech: 'やどりぎ',
 };
-const TYPE_ORDER = ['normal', 'fire', 'water', 'grass', 'electric', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon'];
+const TYPE_ORDER = ['normal', 'fire', 'water', 'grass', 'electric', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
 
 const moveName = (k: string): string => genMoves[k]?.names.ja ?? k;
 const itemName = (k: string): string => genItems[k]?.names.ja ?? k;
@@ -94,6 +94,13 @@ const derivedFrom = new Map<string, Derivation>();
 for (const d of derivations.derivations) derivedFrom.set(d.to, d);
 const uniqueFrom = new Map<string, Derivation>();
 for (const d of derivations.unique) uniqueFrom.set(d.to, d);
+/** 段階の上書き（data/game/move-balance.json の tierOverrides。系統だけの派生技 かえんぐるま など） */
+const tierOverrides: Record<string, string> = read('data/game/move-balance.json').tierOverrides ?? {};
+const stageOf = (k: string): string => {
+  const t = tierOverrides[k];
+  if (t) return t === 'unique' ? '固有' : t === 'derived' ? '派生' : 'タイプ';
+  return uniqueFrom.has(k) ? '固有' : derivedFrom.has(k) ? '派生' : 'タイプ';
+};
 const derivesTo = (k: string): Derivation[] => [...derivations.derivations, ...derivations.unique].filter((d) => d.from === k);
 
 /** 技を使える系統（タイプが合う系統。ノーマルの技は全員。固有技はその系統だけ） */
@@ -184,7 +191,7 @@ const summary = keys
   })
   .sort((a, b) => (b.cm || 0) - (a.cm || 0));
 for (const { k, def, d1, dm, c1, cm } of summary) {
-  const kind = uniqueFrom.has(k) ? '固有' : derivedFrom.has(k) ? '派生' : 'タイプ';
+  const kind = stageOf(k);
   out.push(`| ${moveName(k)} | ${genTypes[genMoves[k]?.type ?? '']?.names.ja ?? ''} | ${kind} | ${ja[`pattern.${def.pattern}`] ?? def.pattern} | ${d1.toFixed(0)} | ${dm.toFixed(0)} | ${c1.toFixed(0)} | ${cm.toFixed(0)} |`);
 }
 out.push('');
@@ -208,7 +215,7 @@ for (const root of roots) {
   for (const s of chainMoves(root, null)) {
     const def = moves[s.move]!;
     const max = def.levels.length + 1;
-    const stage = uniqueFrom.has(s.move) ? '固有' : derivedFrom.has(s.move) ? '派生' : 'タイプ';
+    const stage = stageOf(s.move);
     const name = `**${moveName(s.move)}**${s.via ? `<br>（${moveName(s.via.from)} ${via(s.via)}${s.via.line ? `・${pokeName(s.via.line)}だけ` : ''}）` : ''}<br>${ja[`pattern.${def.pattern}`] ?? def.pattern}・${genMoves[s.move]?.damageClass === 'physical' ? '物理' : '特殊'}`;
     for (const [i, level] of [1, max].entries()) {
       const st = statsAt(def, level);

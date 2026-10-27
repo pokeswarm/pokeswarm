@@ -185,6 +185,38 @@
     "preEvolutions": [],
     "evolvesTo": []
   },
+  "bayleef": {
+    "dex": 153,
+    "names": {
+      "ja": "ベイリーフ",
+      "en": "Bayleef",
+      "fr": "Macronium",
+      "de": "Lorblatt",
+      "es": "Bayleef",
+      "it": "Bayleef"
+    },
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 62,
+      "defense": 80,
+      "specialAttack": 63,
+      "specialDefense": 80,
+      "speed": 60
+    },
+    "preEvolutions": [
+      "chikorita"
+    ],
+    "evolvesTo": [
+      {
+        "to": "meganium",
+        "trigger": "level",
+        "level": 32
+      }
+    ]
+  },
   "beedrill": {
     "dex": 15,
     "names": {
@@ -453,6 +485,36 @@
       }
     ]
   },
+  "chikorita": {
+    "dex": 152,
+    "names": {
+      "ja": "チコリータ",
+      "en": "Chikorita",
+      "fr": "Germignon",
+      "de": "Endivie",
+      "es": "Chikorita",
+      "it": "Chikorita"
+    },
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 49,
+      "defense": 65,
+      "specialAttack": 49,
+      "specialDefense": 65,
+      "speed": 45
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "bayleef",
+        "trigger": "level",
+        "level": 16
+      }
+    ]
+  },
   "cloyster": {
     "dex": 91,
     "names": {
@@ -508,6 +570,38 @@
     ],
     "evolvesTo": []
   },
+  "croconaw": {
+    "dex": 159,
+    "names": {
+      "ja": "アリゲイツ",
+      "en": "Croconaw",
+      "fr": "Crocrodil",
+      "de": "Tyracroc",
+      "es": "Croconaw",
+      "it": "Croconaw"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 80,
+      "defense": 80,
+      "specialAttack": 59,
+      "specialDefense": 63,
+      "speed": 58
+    },
+    "preEvolutions": [
+      "totodile"
+    ],
+    "evolvesTo": [
+      {
+        "to": "feraligatr",
+        "trigger": "level",
+        "level": 30
+      }
+    ]
+  },
   "cubone": {
     "dex": 104,
     "names": {
@@ -535,6 +629,36 @@
         "to": "marowak",
         "trigger": "level",
         "level": 28
+      }
+    ]
+  },
+  "cyndaquil": {
+    "dex": 155,
+    "names": {
+      "ja": "ヒノアラシ",
+      "en": "Cyndaquil",
+      "fr": "Héricendre",
+      "de": "Feurigel",
+      "es": "Cyndaquil",
+      "it": "Cyndaquil"
+    },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 39,
+      "attack": 52,
+      "defense": 43,
+      "specialAttack": 60,
+      "specialDefense": 50,
+      "speed": 65
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "quilava",
+        "trigger": "level",
+        "level": 14
       }
     ]
   },
@@ -1016,6 +1140,33 @@
     },
     "preEvolutions": [
       "spearow"
+    ],
+    "evolvesTo": []
+  },
+  "feraligatr": {
+    "dex": 160,
+    "names": {
+      "ja": "オーダイル",
+      "en": "Feraligatr",
+      "fr": "Aligatueur",
+      "de": "Impergator",
+      "es": "Feraligatr",
+      "it": "Feraligatr"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 105,
+      "defense": 100,
+      "specialAttack": 79,
+      "specialDefense": 83,
+      "speed": 78
+    },
+    "preEvolutions": [
+      "totodile",
+      "croconaw"
     ],
     "evolvesTo": []
   },
@@ -2293,6 +2444,33 @@
     ],
     "evolvesTo": []
   },
+  "meganium": {
+    "dex": 154,
+    "names": {
+      "ja": "メガニウム",
+      "en": "Meganium",
+      "fr": "Méganium",
+      "de": "Meganie",
+      "es": "Meganium",
+      "it": "Meganium"
+    },
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 82,
+      "defense": 100,
+      "specialAttack": 83,
+      "specialDefense": 100,
+      "speed": 80
+    },
+    "preEvolutions": [
+      "chikorita",
+      "bayleef"
+    ],
+    "evolvesTo": []
+  },
   "meowth": {
     "dex": 52,
     "names": {
@@ -2998,6 +3176,38 @@
       "wooper"
     ],
     "evolvesTo": []
+  },
+  "quilava": {
+    "dex": 156,
+    "names": {
+      "ja": "マグマラシ",
+      "en": "Quilava",
+      "fr": "Feurisson",
+      "de": "Igelavar",
+      "es": "Quilava",
+      "it": "Quilava"
+    },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 58,
+      "attack": 64,
+      "defense": 58,
+      "specialAttack": 80,
+      "specialDefense": 65,
+      "speed": 80
+    },
+    "preEvolutions": [
+      "cyndaquil"
+    ],
+    "evolvesTo": [
+      {
+        "to": "typhlosion",
+        "trigger": "level",
+        "level": 36
+      }
+    ]
   },
   "raichu": {
     "dex": 26,
@@ -3900,6 +4110,63 @@
         "level": 30
       }
     ]
+  },
+  "totodile": {
+    "dex": 158,
+    "names": {
+      "ja": "ワニノコ",
+      "en": "Totodile",
+      "fr": "Kaiminus",
+      "de": "Karnimani",
+      "es": "Totodile",
+      "it": "Totodile"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 65,
+      "defense": 64,
+      "specialAttack": 44,
+      "specialDefense": 48,
+      "speed": 43
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "croconaw",
+        "trigger": "level",
+        "level": 18
+      }
+    ]
+  },
+  "typhlosion": {
+    "dex": 157,
+    "names": {
+      "ja": "バクフーン",
+      "en": "Typhlosion",
+      "fr": "Typhlosion",
+      "de": "Tornupto",
+      "es": "Typhlosion",
+      "it": "Typhlosion"
+    },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "attack": 84,
+      "defense": 78,
+      "specialAttack": 109,
+      "specialDefense": 85,
+      "speed": 100
+    },
+    "preEvolutions": [
+      "cyndaquil",
+      "quilava"
+    ],
+    "evolvesTo": []
   },
   "umbreon": {
     "dex": 197,

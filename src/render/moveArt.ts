@@ -922,7 +922,7 @@ function fangBite(palette = ['#3b0d06', '#e53935', '#ff7043', '#cfc4bd', '#fffff
  * 上の列はカメラに近いので広く大きく（両はしに長い犬歯）、下の列は狭く小さい。歯ぐきは上が ∩、下が ∪ に少し反る。上下から閉じ、閉じた所で光る。
  * fire は ほのおのキバ（赤い歯ぐきのふちから炎の舌が立つ）、dark は かみつく（あくの紫）
  */
-function fangFront(kind: 'fire' | 'dark' | 'crunch'): SpriteOut {
+function fangFront(kind: 'fire' | 'dark' | 'crunch', slope = 0, alignInner = false): SpriteOut {
   // 0 輪郭・1 歯ぐき（濃い）・2 歯ぐき（明るい）・3 炎・光・4 歯の影・5 白
   // crunch は かみくだく の下向き・上向き（黒い歯ぐきと白いキバ。光も灰）
   const palette =
@@ -939,8 +939,14 @@ function fangFront(kind: 'fire' | 'dark' | 'crunch'): SpriteOut {
     if (Math.abs(u - x) > half + 0.012) return -1;
     return u < x - half * 0.2 ? 4 : 5;
   };
+  // 斜め（かみくだく。作者の指摘 2026年10月28日）: slope で右ほど下（負なら上）へ縦にずらす（回さない。キバと閉じる向きは画面の縦のまま）。
+  // alignInner なら、下の列（狭い）を中央ではなく左（プレイヤーの側）の端にそろえる
+  const lowShift = alignInner ? -(0.7 - 0.5) : 0;
+  const zoom = slope !== 0 ? 1.12 : 1;
   const frames = STEPS.map(([gap, flash, fade], f) =>
-    shape(32, (u, v) => {
+    shape(32, (x, y) => {
+      const u = x * zoom;
+      const v = (y - x * slope) * zoom;
       // 閉じた所の光と火花
       if (flash > 0) {
         const d = Math.hypot(u, v);
@@ -956,13 +962,13 @@ function fangFront(kind: 'fire' | 'dark' | 'crunch'): SpriteOut {
       if (fade === 2) return hash(Math.floor((u + 1) * 12), Math.floor((v + 1) * 12), 71 + f) < 0.07 && Math.abs(v) < 0.45 && Math.abs(u) < 0.7 ? 3 : -1;
       // 上の列: 歯ぐきのふち（下の線）は ∩ に反り、両はしが下がる
       const upGum = -gap - 0.06 + u * u * 0.18;
-      const loGum = gap + 0.1 - u * u * 0.22;
+      const loGum = gap + 0.1 - (u - lowShift) * (u - lowShift) * 0.22;
       for (const [x, len, w] of [[-0.5, 0.44, 0.13], [0.5, 0.44, 0.13], [-0.25, 0.17, 0.08], [0, 0.17, 0.08], [0.25, 0.17, 0.08]] as const) {
         const c = tooth(u, v, x, upGum, 1, len, w);
         if (c >= 0) return c;
       }
       for (const [x, len, w] of [[-0.34, 0.32, 0.1], [0.34, 0.32, 0.1], [-0.11, 0.12, 0.065], [0.11, 0.12, 0.065]] as const) {
-        const c = tooth(u, v, x, loGum, -1, len, w);
+        const c = tooth(u, v, x + lowShift, loGum, -1, len, w);
         if (c >= 0) return c;
       }
       const cut = (c: number): number => (fade === 1 && c <= 2 && hash(Math.floor((u + 1) * 16), Math.floor((v + 1) * 16), 73) < 0.5 ? -1 : c);
@@ -973,7 +979,7 @@ function fangFront(kind: 'fire' | 'dark' | 'crunch'): SpriteOut {
         if (v < upGum - 0.14 && v >= upGum - 0.14 - h) return cut(v < upGum - 0.14 - h * 0.5 ? 3 : 2);
       }
       // 下の歯ぐき（厚み 0.1・幅 0.5。遠いので小さい）と炎
-      if (Math.abs(u) < 0.5 && v >= loGum && v <= loGum + 0.1) return cut(v > loGum + 0.05 ? 1 : 2);
+      if (Math.abs(u - lowShift) < 0.5 && v >= loGum && v <= loGum + 0.1) return cut(v > loGum + 0.05 ? 1 : 2);
       if (kind === 'fire' && Math.abs(u) < 0.5) {
         const h = 0.08 + Math.max(0, Math.sin(u * 15 + f * 2.7 + 1)) * 0.1;
         if (v > loGum + 0.1 && v <= loGum + 0.1 + h) return cut(v > loGum + 0.1 + h * 0.5 ? 3 : 2);
@@ -985,88 +991,97 @@ function fangFront(kind: 'fire' | 'dark' | 'crunch'): SpriteOut {
 }
 
 /**
- * かみくだく（作者の指摘 2026年10月28日: かみつく の口のほうが自然な台形。作り直す）: 黒い歯ぐきに白いキバだけ。
+ * かみくだく（作者の指摘 2026年10月28日）: 黒いあごに白いキバだけ。
  * - 下向き・上向き（front・back）: かみつく と同じ正面の口（上の列が広く、下の列が狭い台形）を黒と白で。
- * - 横（main。右向き）: 上あごと下あごの帯の先に犬歯。閉じても歯ぐきどうしは当たらず、キバがかみ合う（歯ぐきで押しつぶして見えないように）。
- * - 斜め（diag・diagBack）: 横の口を、上下の歯ぐきが平行のまま斜めになるよう縦にずらす（回さない）。
- *   上あご（長い）と下あご（短い）は、プレイヤーの側（後ろの端）でそろえる。キバは画面の縦にまっすぐ伸び、閉じる向きも画面の縦。
+ * - 斜め（diag・diagBack）: 正面の口を縦にずらして、上下の歯ぐきを平行なまま斜めにする（回さない）。下の列はプレイヤーの側（左）の端にそろえる。
+ *   キバは画面の縦にまっすぐ伸び、閉じる向きも画面の縦。
+ * - 横（main。右向き）: 肉食のけものの頭の骨を横から見た形。後ろ（プレイヤーの側）のあごのつけ根を軸に、上あごと下あごが「<」の形に開いて閉じる。
+ *   上あごは根元が厚く先が細い鼻先で、先が少し下へ曲がる。先に小さな前歯、その後ろに長い犬歯（下向き）、奥に小さな奥歯と大きな裂肉歯。
+ *   下あごは上あごより短く細い。犬歯（上向き）は上の犬歯の少し前に立ち、閉じると上下の犬歯が交差する
  */
 function darkJaws(): SpriteOut {
-  // 0 輪郭・1 歯ぐき（濃い黒）・2 歯ぐき（黒）・3 歯ぐきの照り（暗い灰）・4 歯の影（うすい灰）・5 白（歯）
+  // 0 輪郭・1 あご（濃い黒）・2 あご（黒）・3 あごの照り（暗い灰）・4 歯の影（うすい灰）・5 白（歯）
   const palette = ['#000000', '#0a0a0a', '#2a2a2a', '#5a5a5a', '#d6d6d6', '#ffffff'];
-  // コマごとの 口の開き（上下の歯ぐきのすき間の半分）・光・薄れ（0 開く → 1 半分 → 2 閉じる → 3 薄れる → 4 名残り）
-  const STEPS = [[0.36, 0, 0], [0.22, 0, 0], [0.1, 1, 0], [0.1, 0.6, 1], [0.1, 0, 2]] as const;
-  // とがった歯: (x, 根元の y) から dir（+1 下・-1 上）へ長さ len、根元の半分の幅 w。画面の縦にまっすぐ
-  const tooth = (u: number, v: number, x: number, y0: number, dir: number, len: number, w: number): number => {
-    const k = ((v - y0) * dir) / len;
-    if (k < 0 || k > 1) return -1;
+  // コマごとの あごの開き（度）・火花・薄れ（0 開く → 1 半分 → 2 閉じる → 3 薄れる → 4 名残り）
+  const STEPS = [[54, 0, 0], [28, 0, 0], [3, 1, 0], [3, 0.6, 1], [3, 0, 2]] as const;
+  // あごの長さ（上あご）と、軸（あごのつけ根）の位置
+  const L = 1.2;
+  const HX = -0.62;
+  const HY = 0.02;
+  /** あごの中の位置 (x: 軸から先へ, y: 歯の向きが +) にあるとがった歯。根元 x0・長さ len・根元の半分の幅 w。少し後ろへ反る */
+  const tooth = (x: number, y: number, x0: number, len: number, w: number): number => {
+    if (y < -0.01) return -1;
+    const k = y / len;
+    if (k > 1) return -1;
+    const c = x0 - k * k * w * 0.6;
     const half = w * (1 - k);
-    if (Math.abs(u - x) > half + 0.012) return -1;
-    return u < x - half * 0.2 ? 4 : 5;
-  };
-  // 閉じた所の光（灰。白はキバだけ）
-  const flashAt = (u: number, v: number, cx: number, cy: number, flash: number): number => {
-    if (flash <= 0) return -1;
-    for (let k = 0; k < 8; k++) {
-      const a = (k / 8) * Math.PI * 2 + 0.2;
-      const along = (u - cx) * Math.cos(a) + (v - cy) * Math.sin(a);
-      const across = -(u - cx) * Math.sin(a) + (v - cy) * Math.cos(a);
-      if (along > 0.3 && along < 0.3 + 0.24 * flash && Math.abs(across) < 0.03) return 3;
-    }
-    return -1;
+    if (Math.abs(x - c) > half + 0.01) return -1;
+    return x < c - half * 0.25 ? 4 : 5;
   };
   const thin = (col: number, u: number, v: number, fade: number): number =>
     fade === 1 && col <= 3 && hash(Math.floor((u + 1) * 18), Math.floor((v + 1) * 18), 59) < 0.5 ? -1 : col;
-
-  /**
-   * 横から見た口（右向き）。slope は斜めのときの傾き（前へ行くほど下がる量。0 なら横）。
-   * 形は傾けずに作り、縦にだけずらす（歯と閉じる向きは画面の縦のまま）
-   */
-  const side = (slope: number): Grid[] =>
-    STEPS.map(([gap, flash, fade]) =>
-      shape(36, (x, y) => {
-        const u = x * 1.12;
-        // 縦のずらし: 前（右）ほど下（slope > 0）へ
-        const v = (y - x * slope) * 1.12;
-        const tipX = 0.6;
-        const fl = flashAt(u, v, tipX - 0.05, 0, flash);
-        if (fl >= 0) return fl;
-        if (fade === 2) return hash(Math.floor((u + 1) * 14), Math.floor((v + 1) * 14), 69) < 0.05 && Math.abs(v) < 0.4 && u > -0.5 && u < 0.7 ? 3 : -1;
-        // 後ろの端（プレイヤーの側）は上下とも -0.6 にそろえ、上あごは 0.62、下あごは 0.44 まで（下あごは遠いので短い）
-        if (u < -0.6) return -1;
-        const upGum = -gap - 0.02;
-        const loGum = gap + 0.02;
-        // 歯（歯ぐきより手前）: 先に長い犬歯、後ろへ小さな歯
-        for (const [tx, len, w] of [[0.52, 0.38, 0.1], [0.26, 0.14, 0.06], [0.02, 0.13, 0.06], [-0.22, 0.12, 0.055], [-0.44, 0.11, 0.05]] as const) {
-          const c = tooth(u, v, tx, upGum, 1, len, w);
+  const side = (): Grid[] =>
+    STEPS.map(([deg, flash, fade]) =>
+      shape(36, (u, v) => {
+        const half = (deg / 2) * (Math.PI / 180);
+        // 火花: 犬歯の交わる所から
+        if (flash > 0) {
+          const cx = HX + L * 0.84;
+          for (let k = 0; k < 7; k++) {
+            const an = -1.2 + (k / 6) * 2.4;
+            const along = (u - cx) * Math.cos(an) + (v - HY) * Math.sin(an);
+            const across = -(u - cx) * Math.sin(an) + (v - HY) * Math.cos(an);
+            if (along > 0.3 && along < 0.3 + 0.2 * flash && Math.abs(across) < 0.03) return 3;
+          }
+        }
+        if (fade === 2) return hash(Math.floor((u + 1) * 14), Math.floor((v + 1) * 14), 69) < 0.05 && Math.abs(v) < 0.35 && u > HX && u < HX + L ? 3 : -1;
+        const du = u - HX;
+        const dv = v - HY;
+        // 上あごの中の位置（上へ half だけ回した あご に沿う。y は下（歯の向き）が +）
+        const ux = du * Math.cos(half) - dv * Math.sin(half);
+        const uy = du * Math.sin(half) + dv * Math.cos(half);
+        // 下あごの中の位置（下へ half だけ回す。y は上（歯の向き）が +）
+        const lx = du * Math.cos(half) + dv * Math.sin(half);
+        const ly = du * Math.sin(half) - dv * Math.cos(half);
+        // 歯（あごより手前）。上: 前歯・犬歯・奥歯・裂肉歯。下: 前歯・犬歯・奥歯
+        for (const [x0, len, w] of [[L * 0.97, 0.07, 0.03], [L * 0.8, 0.32, 0.075], [L * 0.62, 0.08, 0.045], [L * 0.5, 0.09, 0.05], [L * 0.36, 0.15, 0.08]] as const) {
+          const c = tooth(ux, uy, x0, len, w);
           if (c >= 0) return c;
         }
-        for (const [tx, len, w] of [[0.36, 0.3, 0.085], [0.12, 0.11, 0.055], [-0.12, 0.1, 0.05], [-0.36, 0.1, 0.05]] as const) {
-          const c = tooth(u, v, tx, loGum, -1, len, w);
+        for (const [x0, len, w] of [[L * 0.86, 0.05, 0.025], [L * 0.76, 0.26, 0.065], [L * 0.58, 0.07, 0.04], [L * 0.44, 0.08, 0.045], [L * 0.3, 0.1, 0.05]] as const) {
+          const c = tooth(lx, ly, x0, len, w);
           if (c >= 0) return c;
         }
-        // 歯ぐき: 同じ厚みの帯（先は丸める）
-        const bar = (from: number, to: number, end: number, light: boolean): number => {
-          if (v < from || v > to || u > end) return -1;
-          const t = (v - from) / (to - from);
-          if (u > end - 0.06 && (t < 0.2 || t > 0.8)) return -1;
-          return thin(light ? (t < 0.3 ? 3 : 2) : t > 0.7 ? 1 : 2, u, v, fade);
-        };
-        const up = bar(upGum - 0.17, upGum, tipX + 0.02, true);
-        if (up >= 0) return up;
-        return bar(loGum, loGum + 0.12, 0.44, false);
+        // 上あご: 根元の厚み 0.2 から先 0.08 へ細る鼻先。先は少し下へ曲がる（y は上が -）
+        if (ux >= 0 && ux <= L) {
+          const t = ux / L;
+          const top = -(0.2 * (1 - t) + 0.08 * t) + Math.max(0, t - 0.85) * 0.4;
+          const bot = Math.max(0, t - 0.9) * 0.4;
+          if (uy >= top && uy <= bot) return thin(uy < top + 0.06 ? 3 : uy > bot - 0.04 ? 1 : 2, u, v, fade);
+        }
+        // 下あご: 上あごより短く（0.9）、根元 0.14 から先 0.06 へ細る
+        const LL = L * 0.9;
+        if (lx >= 0 && lx <= LL) {
+          const t = lx / LL;
+          const depth = 0.14 * (1 - t) + 0.06 * t;
+          if (ly <= 0 && ly >= -depth) return thin(ly > -0.04 ? 1 : 2, u, v, fade);
+        }
+        // あごのつけ根（軸）の丸み
+        if (Math.hypot(du, dv) < 0.08) return thin(2, u, v, fade);
+        return -1;
       }),
     );
   const rows = (g: Grid[]): string[][] => g.map((x) => toRows(outline(x, 0)));
-  // 下向き・上向き: かみつく と同じ正面の口を黒と白で
-  // （かみつく の絵は 32 マス。横・斜めの 36 マスと同じ大きさで描かれるよう、まわりに 2 マスずつ空きを足す）
+  // 下向き・上向き・斜め: かみつく と同じ正面の口を黒と白で（32 マス。横の 36 マスと同じ大きさで描かれるよう、まわりに 2 マスずつ空きを足す）
   const pad = (r: string[]): string[] => {
     const empty = '.'.repeat(r[0]!.length + 4);
     return [empty, empty, ...r.map((row) => `..${row}..`), empty, empty];
   };
-  const front = fangFront('crunch').parts.main!.map(pad);
+  const face = (slope: number): string[][] => fangFront('crunch', slope, slope !== 0).parts.main!.map(pad);
+  const front = face(0);
+  // 斜め前（右下）: 右ほど下がる。斜め後ろ（右上）: 右ほど上がる
   const tilt = Math.tan((30 * Math.PI) / 180);
-  return { palette, frameMs: 45, parts: { main: rows(side(0)), front, back: front, diag: rows(side(tilt)), diagBack: rows(side(-tilt)) } };
+  return { palette, frameMs: 45, parts: { main: rows(side()), front, back: front, diag: face(tilt), diagBack: face(-tilt) } };
 }
 
 /** フレアドライブ: 右へ突っ込む炎の弧（三日月形の炎。コマで炎の先がゆらめく） */

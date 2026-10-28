@@ -102,7 +102,7 @@ English:
 
 - ジャンルは **ヴァンパイアサバイバー系（Survivors-like）・ローグライト**。「ローグライト」「Pokémon / ポケモン」「サバイバー系」「Survivor ライク」で引っかかるようにする。
 - `index.html`: タイトル（英語＋日本語）・説明・キーワード・正規の URL（canonical）、構造化データ（JSON-LD の VideoGame と FAQPage）、スクリプトを動かさない読み手向けの短い説明（`noscript`。ゲームの画面には出ない）。OGP の説明は SNS で読まれるので英語のまま。
-- `public/about.html`: 文字で読める紹介のページ（日本語と英語）。特徴・遊び方・よくある質問・権利の表記。
+- `public/about.html`: 文字で読める紹介のページ（日本語と英語）。Cloudflare では `/about` で配る（`.html` 付きは `/about` へ転送される）ので、正規の URL・サイトマップ・リンクは `/about`。特徴・遊び方・よくある質問・権利の表記。
 - `public/llms.txt`: AI 向けの短い説明（英語）。`public/robots.txt`（すべて許可・サイトマップの場所）と `public/sitemap.xml`（トップと紹介のページ）。
 - **PokéSurvivor** は別の作者の別のゲームなので、名前をキーワードやタイトルには入れない（その名前で人を呼び込むのは、相手と関係があるように見せることになる）。代わりに、よくある質問に「同じゲームですか？ → いいえ、関係ありません」と正直に書き、その名前で調べた人にも見つかるようにした。
 - 中身（遊べるポケモンの数・地方）が変わったら、`about.html`・`llms.txt`・JSON-LD を直し、`sitemap.xml` の lastmod を更新する。

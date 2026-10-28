@@ -3,12 +3,7 @@ import { compactScreen } from '../render/pixelUi';
 import { audio } from '../audio';
 import { getLocale, LOCALES, setLocale, t } from '../i18n';
 import { appendAudioControls } from './audioControls';
-import { displaySettings } from '../render/displaySettings';
-
-// 原作をまねた白い窓のボタン（作者の決定。2026年10月22日。src/render/pixelUi.ts の windowCss と同じ見た目）
-// 低い画面（横向きのスマホ）では低く・細く
-const BUTTON_BASE = 'cursor:pointer;font:inherit;font-size:16px;background:#f8f8f8;color:#383848;border:4px solid #383848;border-radius:6px;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #a8b8c8';
-const buttonCss = (): string => (compactScreen() ? 'min-height:36px;padding:2px 10px;' : 'min-height:44px;padding:8px 14px;') + BUTTON_BASE;
+import { appendDamageNumbersControl, settingsButtonCss as buttonCss } from './displayControls';
 
 /**
  * 設定（DOM）: 全体・BGM・効果音の音量とミュート（07_content_draft.md 14.4）。ブラウザに保存する。
@@ -43,7 +38,7 @@ export class SettingsScene extends Phaser.Scene {
     for (const locale of LOCALES) {
       const b = document.createElement('button');
       const selected = locale === getLocale();
-      b.style.cssText = buttonCss() + (selected ? ';border-color:#d8a020;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #d8a020' : '');
+      b.style.cssText = buttonCss(selected);
       // 言語の名前は、その言語自身の書き方で（どの言語を選んでいても読めるように）
       b.textContent = t(`settings.language.${locale}`);
       b.onclick = () => {
@@ -56,27 +51,8 @@ export class SettingsScene extends Phaser.Scene {
     }
     root.append(lang);
 
-    // ダメージの数字（作者の決定 2026年10月28日: 初めは出さない。07 の102章）
-    const dmg = document.createElement('div');
-    dmg.style.cssText = `display:flex;align-items:center;gap:${compactScreen() ? 6 : 10}px;flex-wrap:wrap`;
-    const dmgLabel = document.createElement('span');
-    dmgLabel.style.cssText = 'width:8em';
-    dmgLabel.textContent = t('settings.damageNumbers');
-    dmg.append(dmgLabel);
-    for (const on of [true, false]) {
-      const b = document.createElement('button');
-      const selected = displaySettings.current.damageNumbers === on;
-      b.style.cssText = buttonCss() + (selected ? ';border-color:#d8a020;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #d8a020' : '');
-      b.textContent = t(on ? 'settings.damageNumbers.on' : 'settings.damageNumbers.off');
-      b.onclick = () => {
-        if (displaySettings.current.damageNumbers === on) return;
-        displaySettings.update({ damageNumbers: on });
-        audio.sfx.play('ui.select');
-        this.scene.restart();
-      };
-      dmg.append(b);
-    }
-    root.append(dmg);
+    // ダメージの数字（ランのポーズの画面と同じもの）
+    appendDamageNumbersControl(root);
 
     const buttons = document.createElement('div');
     buttons.style.cssText = 'display:flex;gap:10px;justify-content:flex-end';

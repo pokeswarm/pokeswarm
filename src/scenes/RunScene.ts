@@ -468,8 +468,8 @@ export class RunScene extends Phaser.Scene {
     this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));
     this.effects = new EffectRenderer(this, effectRecipes, depths.effects, spriteRender.effectPixel);
     // ダメージの数字（設定でオン。07 の102章）: プレイヤーより上・画面の表示より下
-    this.sim.world.damageNumbers = displaySettings.current.damageNumbers;
-    this.damageNumbers = this.sim.world.damageNumbers ? new DamageNumbers(this, spriteRender.depths.candy + 1) : null;
+    this.damageNumbers = null;
+    this.setDamageNumbers(displaySettings.current.damageNumbers);
     // 技のドット絵は光の演出の少し下（光の粒が上に重なる）
     this.moveSprites = new MoveSprites(this, moveSprites, depths.effects - 0.1, spriteRender.dot);
     this.strikeSprites = new MoveSprites(this, moveSprites, depths.effects - 0.05, spriteRender.dot);
@@ -508,7 +508,10 @@ export class RunScene extends Phaser.Scene {
     });
     // Esc でポーズ（作者の決定 2026年10月25日）: ソロとホストは全員のゲームを止める。ホスト以外は止めずに設定の画面だけ。
     // レベルアップの選択中（Esc は除外のモードをやめるのに使う）とランの終わりには使わない
-    this.pausePanel = new PausePanel(() => this.togglePause());
+    this.pausePanel = new PausePanel(
+      () => this.togglePause(),
+      (on) => this.setDamageNumbers(on),
+    );
     this.evolutionCutscene = new EvolutionCutscene();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.evolutionCutscene.destroy());
     // タマゴからかえった: 最初にかえる演出（07 の57章）。ソロは演出の間ゲームを止め、協力プレイは止めずに薄く重ねる
@@ -617,6 +620,13 @@ export class RunScene extends Phaser.Scene {
   private autoRequested = -1;
 
   /** Esc・ポーズの画面のボタン: ソロとホストは止める・再開する（ホストは全員へ送る）。ゲストは設定の画面を開く・閉じる */
+  /** ダメージの数字を出す・出さない（ランの最初と、ポーズの画面で切り替えたとき。07 の102章・110章） */
+  private setDamageNumbers(on: boolean): void {
+    this.sim.world.damageNumbers = on;
+    if (on) this.damageNumbers ??= new DamageNumbers(this, spriteRender.depths.candy + 1);
+    else this.damageNumbers?.clear();
+  }
+
   private togglePause(): void {
     const w = this.sim.world;
     if (w.outcome) return;

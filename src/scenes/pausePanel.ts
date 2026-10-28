@@ -1,6 +1,7 @@
 import { compactScreen, windowCss } from '../render/pixelUi';
 import { t } from '../i18n';
 import { appendAudioControls } from './audioControls';
+import { appendDamageNumbersControl } from './displayControls';
 
 /** ポーズの画面の種類: paused = 自分が止めた（ソロ・ホスト）、hostPaused = ホストが止めた（ゲスト）、settings = 止めずに設定だけ（ゲスト） */
 export type PauseKind = 'paused' | 'hostPaused' | 'settings';
@@ -16,6 +17,8 @@ export class PausePanel {
   constructor(
     /** 閉じるボタン（ソロ・ホストは再開、ゲストは設定を閉じる）。ホストが止めているときのゲストには出さない */
     private readonly onClose: () => void,
+    /** ダメージの数字を切り替えた */
+    private readonly onDamageNumbers: (on: boolean) => void,
   ) {
     this.root = document.createElement('div');
     this.root.style.cssText =
@@ -39,6 +42,8 @@ export class PausePanel {
       this.root.append(note);
     }
     appendAudioControls(this.root);
+    // ダメージの数字の 出す・出さない（ラン中もすぐ切り替える。07 の110章）
+    appendDamageNumbersControl(this.root, this.onDamageNumbers);
     if (kind !== 'hostPaused') {
       const close = document.createElement('button');
       close.style.cssText = `${windowCss('light')};min-height:44px;padding:8px 16px;cursor:pointer;font:inherit;font-size:16px;align-self:flex-end`;

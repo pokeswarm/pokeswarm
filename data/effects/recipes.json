@@ -3701,6 +3701,27 @@
       },
       "hideShape": true
     },
+    "peck": {
+      "extends": "flying.base",
+      "sprite": {
+        "id": "beak",
+        "fit": "front",
+        "size": 1.6
+      },
+      "hideShape": true
+    },
+    "wing-attack": {
+      "extends": "flying.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      },
+      "sprite": {
+        "id": "wing-swipe",
+        "fit": "front",
+        "size": 1.1
+      }
+    },
     "megahorn": {
       "extends": "bug.base",
       "projectile": {

@@ -971,6 +971,18 @@
     "type": "normal",
     "damageClass": "physical"
   },
+  "peck": {
+    "names": {
+      "ja": "つつく",
+      "en": "Peck",
+      "fr": "Picpic",
+      "de": "Pikser",
+      "es": "Picotazo",
+      "it": "Beccata"
+    },
+    "type": "flying",
+    "damageClass": "physical"
+  },
   "perish-song": {
     "names": {
       "ja": "ほろびのうた",
@@ -1701,6 +1713,18 @@
       "it": "Sprizzalampo"
     },
     "type": "electric",
+    "damageClass": "physical"
+  },
+  "wing-attack": {
+    "names": {
+      "ja": "つばさでうつ",
+      "en": "Wing Attack",
+      "fr": "Cru-Ailes",
+      "de": "Flügelschlag",
+      "es": "Ataque Ala",
+      "it": "Attacco d’Ala"
+    },
+    "type": "flying",
     "damageClass": "physical"
   },
   "x-scissor": {

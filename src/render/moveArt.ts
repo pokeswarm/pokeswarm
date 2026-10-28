@@ -2249,9 +2249,8 @@ function iceNeedle(): SpriteOut {
  * つのでつく: 白い三角錐のツノ（右向き。作者の指摘 2026年10月27日: 針ではなくツノ）。左が丸い底（楕円が少し見える）、右が鋭い先。
  * 上の面が明るく、下へ向かって灰色の影
  */
-function horn(): SpriteOut {
+function horn(palette = ['#3b3631', '#8d8a86', '#cfcbc6', '#f2efea', '#ffffff', '#b8ae9f']): SpriteOut {
   // 0 輪郭・1 影・2 灰・3 白・4 光・5 底
-  const palette = ['#3b3631', '#8d8a86', '#cfcbc6', '#f2efea', '#ffffff', '#b8ae9f'];
   const g = shape(16, (u, v) => {
     // 絵の左 3 割は空ける（底が使ったポケモンの体に隠れないよう、前に出す）
     if (u > 0.96) return -1;
@@ -2814,6 +2813,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'kick-arc': () => kickArc(),
     'tail-swipe': () => tailSwipe(),
     'tail-iron': () => tailSwipe(['#1c2833', '#455a64', '#90a4ae', '#cfd8dc', '#ffffff', '#b0bec5', '#ffffff']),
+    // つばさでうつ: ドラゴンテール と同じ弧を、白い羽の色で（07 の116章）
+    'wing-swipe': () => tailSwipe(['#263238', '#78909c', '#cfd8dc', '#eceff1', '#ffffff', '#b3e5fc', '#ffffff']),
     'dragon-ring': () => dragonRing(),
     'dragon-shock': () => dragonShock(),
     palm: () => palm(),
@@ -2886,6 +2887,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'ice-statue': () => iceStatue(),
     'ice-needle': () => iceNeedle(),
     horn: () => horn(),
+    // つつく: つのでつく と同じ形の、黄色いくちばし（07 の116章）
+    beak: () => horn(['#4a2c05', '#c77800', '#ffb300', '#ffe082', '#fffde7', '#8d5a00']),
     'megahorn-lance': () => megahornLance(),
     'ice-chunk': () => iceChunk(),
     'sand-grain': () => sandGrain(),

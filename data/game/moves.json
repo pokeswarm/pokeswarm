@@ -6517,6 +6517,117 @@
         "afterimages": 0
       }
     },
+    "peck": {
+      "pattern": "melee",
+      "effect": "peck",
+      "learners": [
+        "moltres"
+      ],
+      "base": {
+        "power": 18.6,
+        "cooldownSeconds": 1,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 44,
+        "range": 10,
+        "durationSeconds": 0.15,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 160,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 30,
+        "critChancePct": 5
+      },
+      "levels": [
+        {
+          "power": 8
+        },
+        {
+          "size": 3,
+          "power": 7.7
+        },
+        {
+          "power": 8
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": -2.2
+        },
+        {
+          "size": 3,
+          "power": 6
+        },
+        {
+          "power": 6.3
+        },
+        {
+          "power": 6.3
+        }
+      ],
+      "body": {
+        "lungeDistance": 14,
+        "afterimages": 0
+      }
+    },
+    "wing-attack": {
+      "pattern": "sweep",
+      "effect": "wing-attack",
+      "base": {
+        "power": 67.1,
+        "cooldownSeconds": 1.35,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 50,
+        "range": 30,
+        "durationSeconds": 0.4,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 220,
+        "knockbackSeconds": 0.1,
+        "spreadDegrees": 180,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 40
+      },
+      "levels": [
+        {
+          "power": 15.3
+        },
+        {
+          "size": 6,
+          "power": 10.3
+        },
+        {
+          "power": 14.5
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 1
+        },
+        {
+          "spreadDegrees": 60,
+          "power": 2.3
+        },
+        {
+          "power": 11.8
+        },
+        {
+          "size": 6,
+          "power": 4.8
+        }
+      ],
+      "body": {
+        "lungeDistance": 10,
+        "afterimages": 0
+      }
+    },
     "megahorn": {
       "pattern": "beam",
       "effect": "megahorn",

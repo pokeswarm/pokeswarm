@@ -259,6 +259,8 @@
     "ninjask"
   ],
   "moves": [
+    "peck",
+    "wing-attack",
     "muddy-water",
     "lava-plume",
     "agility",

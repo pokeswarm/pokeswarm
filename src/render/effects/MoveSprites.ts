@@ -24,6 +24,8 @@ export interface SpriteItem {
   readonly alpha: number;
   /** varyTiles のずらし */
   readonly seed: number;
+  /** 当たり判定の通し番号（残像の向きの履歴を当たり判定ごとに持つ。無ければ残像を描かない） */
+  readonly serial?: number;
   /** 蛇行して進むもの（snake）: 出した場所・速度・振れ幅・角速度・出てからの秒数（通った道を描く） */
   readonly snake?: { readonly ox: number; readonly oy: number; readonly vx: number; readonly vy: number; readonly amp: number; readonly omega: number; readonly t: number };
 }
@@ -107,6 +109,8 @@ const FADE_SECONDS = 0.35;
  */
 export class MoveSprites {
   private readonly images: Phaser.GameObjects.Image[] = [];
+  /** 残像（afterimages）のための、当たり判定ごとの最近の向き（新しい順。描くフレームごとに足す） */
+  private readonly trails = new Map<number, number[]>();
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -242,6 +246,7 @@ export class MoveSprites {
         // 短い技（はっぱカッターなど 0.2 秒ほど）は、出ている時間の最後の 3 割だけで薄くする
         alpha: Math.min(1, pr.life[i]! / Math.min(FADE_SECONDS, pr.maxLife[i]! * 0.3)),
         seed: i,
+        serial: pr.serial[i]!,
         ...(snake ? { snake } : {}),
       });
     }
@@ -261,6 +266,7 @@ export class MoveSprites {
       used++;
     };
     this.pump();
+    const seen = new Set<number>();
     for (const it of items) {
       const spec = it.spec;
       const base = this.data.sprites[spec.id];
@@ -331,7 +337,22 @@ export class MoveSprites {
           put(fk(name, this.frameOf(spec.id, name, elapsed)), px, py, 0, part.flip ? -s : s, s, a);
           continue;
         }
-        put(fk('main', this.frameOf(spec.id, 'main', elapsed)), px, py, Math.atan2(it.dirY, it.dirX), s, s, a);
+        const rot = Math.atan2(it.dirY, it.dirX);
+        // 残像: 少し前の向きに、薄くした同じ絵を置く（つばさでうつ）
+        if (spec.afterimages > 0 && it.serial !== undefined) {
+          seen.add(it.serial);
+          const hist = this.trails.get(it.serial) ?? [];
+          hist.unshift(rot);
+          hist.length = Math.min(hist.length, spec.afterimages * spec.afterimageGap + 1);
+          this.trails.set(it.serial, hist);
+          const key = fk('main', this.frameOf(spec.id, 'main', elapsed));
+          for (let k = spec.afterimages; k >= 1; k--) {
+            const old = hist[k * spec.afterimageGap];
+            if (old === undefined) continue;
+            put(key, x + Math.cos(old) * reach * 0.6, y + Math.sin(old) * reach * 0.6, old, s, s, a * 0.55 * (1 - k / (spec.afterimages + 1)));
+          }
+        }
+        put(fk('main', this.frameOf(spec.id, 'main', elapsed)), px, py, rot, s, s, a);
         continue;
       }
       if (spec.fit === 'ring') {
@@ -404,6 +425,7 @@ export class MoveSprites {
       const [ex, ey] = at(Math.max(startLen, len - endLen / 2));
       put(fk('end', this.frameOf(spec.id, 'end', elapsed)), ex, ey, rot, s, s, a);
     }
+    for (const key of this.trails.keys()) if (!seen.has(key)) this.trails.delete(key);
     for (let k = used; k < this.images.length; k++) this.images[k]!.setVisible(false);
   }
 

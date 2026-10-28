@@ -2643,6 +2643,49 @@ function kickArc(): SpriteOut {
  * ドラゴンテール: 前方をなぎ払う竜のしっぽ（左下から右へ弧を描き、先はひれ）。上の面が明るく、腹側に節。
  * 後ろに速さの弧。コマでしっぽが少ししなる
  */
+/**
+ * つばさでうつ: 広げた白い翼（右向き。付け根が左、先が右）。風切り羽が扇のように並び、先は水色（作者の依頼 2026年10月28日。07 の117章）。
+ * なぎ払うときは、通った後に残像を残す（レシピの afterimages）
+ */
+function wing(): SpriteOut {
+  // 0 輪郭・1 羽の影・2 うすい灰・3 白・4 光・5 羽先の水色
+  const palette = ['#37474f', '#90a4ae', '#cfd8dc', '#f5f7f8', '#ffffff', '#b3e5fc'];
+  const root = [-0.82, 0.05] as const;
+  // 風切り羽: 付け根から扇のように（上から下へ。上の羽ほど長い）
+  const feathers = Array.from({ length: 6 }, (_, k) => {
+    const a = (-30 + k * 18) * (Math.PI / 180);
+    return { dx: Math.cos(a), dy: Math.sin(a), len: 1.62 - k * 0.15, w: 0.12 };
+  });
+  const g = shape(28, (u, v) => {
+    let got = -1;
+    // 下の羽から順に塗り、上の羽を重ねる
+    for (let k = feathers.length - 1; k >= 0; k--) {
+      const f = feathers[k]!;
+      const px = u - root[0];
+      const py = v - root[1];
+      const along = px * f.dx + py * f.dy;
+      const across = -px * f.dy + py * f.dx;
+      if (along < 0 || along > f.len) continue;
+      // 先がとがった羽（先へ行くほど細く、少し反る）
+      const t = along / f.len;
+      const half = f.w * (t < 0.75 ? 1 : (1 - t) / 0.25) + 0.01;
+      const bend = across - t * t * 0.12;
+      if (Math.abs(bend) > half) continue;
+      const side = bend / half;
+      got = t > 0.82 ? 5 : side < -0.55 ? 4 : side < 0.35 ? 3 : 2;
+      // 羽の下のふちは濃く（1枚ずつ分かれて見えるように）
+      if (side > 0.62) got = 0;
+      else if (side > 0.35 && t > 0.3) got = 1;
+    }
+    // 付け根の覆い羽（丸いかたまり）
+    const cu = (u + 0.58) / 0.36;
+    const cv = (v + 0.12) / 0.26;
+    if (cu * cu + cv * cv <= 1) got = cv < -0.3 ? 4 : cv < 0.4 ? 3 : 2;
+    return got;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(outline(g, 0))] } };
+}
+
 function tailSwipe(palette = ['#120a2e', '#283593', '#5c6bc0', '#9fa8da', '#e8eaf6', '#9575cd', '#ffffff']): SpriteOut {
   // 0 輪郭・1 腹側の暗い色・2 しっぽ・3 うすい色・4 白い光・5 ひれ・6 速さの線（アイアンテール は鋼の灰色）
   const frames = [0, 1].map((f) => {
@@ -2813,8 +2856,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'kick-arc': () => kickArc(),
     'tail-swipe': () => tailSwipe(),
     'tail-iron': () => tailSwipe(['#1c2833', '#455a64', '#90a4ae', '#cfd8dc', '#ffffff', '#b0bec5', '#ffffff']),
-    // つばさでうつ: ドラゴンテール と同じ弧を、白い羽の色で（07 の116章）
-    'wing-swipe': () => tailSwipe(['#263238', '#78909c', '#cfd8dc', '#eceff1', '#ffffff', '#b3e5fc', '#ffffff']),
+    // つばさでうつ: 広げた白い翼（07 の117章）
+    wing: () => wing(),
     'dragon-ring': () => dragonRing(),
     'dragon-shock': () => dragonShock(),
     palm: () => palm(),

@@ -1129,7 +1129,7 @@ export class RunScene extends Phaser.Scene {
       now.set(serial, { x, y, radius: pr.radius[i]!, move: pr.move[i]! });
       g.fillStyle(0x000000, 0.12 + 0.18 * t).fillEllipse(x, y, pr.radius[i]! * (0.8 + 0.8 * t), pr.radius[i]! * (0.4 + 0.4 * t));
       items.push({
-        spec: { id: f.id, fit: 'circle', size: f.size, alpha: 1, rotate: 'none', spinDegPerSec: 0, varyTiles: false, upright: false, directional: false, originY: 1, shake: 0, tail: 0 },
+        spec: { id: f.id, fit: 'circle', size: f.size, alpha: 1, rotate: 'none', spinDegPerSec: 0, varyTiles: false, upright: false, directional: false, originY: 1, shake: 0, tail: 0, afterimages: 0, afterimageGap: 2 },
         x,
         y: y - f.height * (1 - t * t),
         radius: pr.radius[i]!,

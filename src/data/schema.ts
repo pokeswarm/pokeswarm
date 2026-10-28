@@ -1483,6 +1483,9 @@ const moveSpriteSpec = z.object({
   tail: z.number().nonnegative().default(0),
   /** 当たり判定ごとに、この中から絵を順に選ぶ（ばくれつパンチ: ふつう・炎・電気のこぶし）。省略なら id だけ */
   variants: z.array(z.string()).optional(),
+  /** front: 通った後に残す残像の数と、残像の間隔（描くフレームの数）。だんだん薄くする（つばさでうつ。07 の117章） */
+  afterimages: z.number().int().nonnegative().default(0),
+  afterimageGap: z.number().int().positive().default(2),
 });
 
 export const effectRecipeSchema = z.object({

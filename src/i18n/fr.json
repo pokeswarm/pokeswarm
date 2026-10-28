@@ -87,6 +87,7 @@
   "run.crash.solo": "Solo",
   "run.crash.detail": "Avant l’arrêt : {time} · section {section} · {enemies} ennemis · {projectiles} attaques · {players} joueurs · {transport} · images {texture} Mo ({textures}) · {fps} i/s · v{version}",
   "run.crash.net": "Réseau : {buffered} Ko en attente d’envoi (le plus pour un joueur : {maxBuffered} Ko) · envoyé {sent} Ko · reçu {received} Ko",
+  "run.crash.trend": "Évolution des compteurs ({from} → {to}) :",
   "run.crash.close": "Fermer",
   "run.gateTimeUp": "Impossible de vaincre {name}…",
   "run.fail": "Partie perdue...",

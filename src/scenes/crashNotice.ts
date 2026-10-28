@@ -9,7 +9,7 @@ import { formatTime } from './ResultScene';
  */
 export function showCrashNotice(probe: RunProbe, coins: number | null): void {
   const root = document.createElement('div');
-  root.style.cssText = `${windowCss('light')};position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:45;width:min(560px,94vw);padding:12px 16px;font-size:14px;line-height:1.6;box-sizing:border-box;display:flex;flex-direction:column;gap:6px`;
+  root.style.cssText = `${windowCss('light')};position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:45;width:min(560px,94vw);max-height:92vh;overflow:auto;padding:12px 16px;font-size:14px;line-height:1.6;box-sizing:border-box;display:flex;flex-direction:column;gap:6px`;
   const line = (text: string, bold = false): void => {
     const d = document.createElement('div');
     if (bold) d.style.cssText = 'font-size:16px;font-weight:bold';
@@ -37,6 +37,14 @@ export function showCrashNotice(probe: RunProbe, coins: number | null): void {
   // 協力プレイ: 送りきれずにたまっている量と、送受信の量（07 の113章。前の版の記録には無い）
   if (probe.transport && probe.bufferedKB !== undefined)
     line(t('run.crash.net', { buffered: probe.bufferedKB, maxBuffered: probe.maxBufferedKB, sent: probe.sentKB, received: probe.receivedKB }));
+  // 数の移り変わり（最初 → 最後。増えたものを先に。07 の118章）
+  const trend = probe.trend ?? [];
+  if (trend.length >= 2) {
+    const first = trend[0]!;
+    const last = trend[trend.length - 1]!;
+    const keys = Object.keys(last.counts).sort((a, b) => (last.counts[b]! - (first.counts[b] ?? 0)) / Math.max(1, first.counts[b] ?? 0) - (last.counts[a]! - (first.counts[a] ?? 0)) / Math.max(1, first.counts[a] ?? 0));
+    line(t('run.crash.trend', { from: formatTime(first.seconds), to: formatTime(last.seconds) }) + ' ' + keys.map((k) => `${k} ${first.counts[k] ?? '-'}→${last.counts[k]}`).join('・'));
+  }
   const close = document.createElement('button');
   close.style.cssText = `${windowCss('light')};min-height:40px;padding:4px 14px;cursor:pointer;font:inherit;font-size:14px;align-self:flex-end`;
   close.textContent = t('run.crash.close');

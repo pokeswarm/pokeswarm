@@ -264,6 +264,8 @@ export class RunScene extends Phaser.Scene {
     this.bossRows = 0;
     this.resultAt = null;
     this.runRecorded = false;
+    this.probeTrend = [];
+    this.probeTrendAt = 0;
     this.newAchievements = [];
     this.newUnlocks = [];
     this.legendaryResult = null;
@@ -759,9 +761,57 @@ export class RunScene extends Phaser.Scene {
   }
 
   /** ランの途中の様子をブラウザに書く（07 の112章）。closed はページを閉じた・移ったとき（落ちたときは書かれない） */
+  /** 数の移り変わり（30 秒ごと。07 の118章） */
+  private probeTrend: { seconds: number; counts: Record<string, number> }[] = [];
+  private probeTrendAt = 0;
+
+  /** 増え続けていないかを見る数（画面の物・粒・アニメーション・DOM・届いて待っているコマンド など） */
+  private probeCounts(): Record<string, number> {
+    const w = this.sim.world;
+    let particles = 0;
+    let emitters = 0;
+    let objs = 0;
+    // 入れ物（Container・Layer）の中まで数える
+    const walk = (list: readonly Phaser.GameObjects.GameObject[]): void => {
+      for (const o of list) {
+        objs++;
+        if (o instanceof Phaser.GameObjects.Particles.ParticleEmitter) {
+          emitters++;
+          particles += o.getAliveParticleCount() + o.getDeadParticleCount();
+        }
+        if (o instanceof Phaser.GameObjects.Container) walk(o.list);
+        else if (o instanceof Phaser.GameObjects.Layer) walk(o.getChildren());
+      }
+    };
+    walk(this.children.list);
+    return {
+      objs,
+      emitters,
+      particles,
+      tweens: this.tweens.getTweens().length,
+      anims: this.anims.toJSON().anims.length,
+      textures: Object.keys(this.textures.list).length,
+      dom: document.getElementsByTagName('*').length,
+      inbox: this.inbox.length,
+      strikes: this.strikes.length,
+      enemies: w.enemies.count,
+      gems: w.gems.count,
+      projectiles: w.projectiles.count,
+      hazards: w.hazards.length,
+      items: w.items.length,
+      players: this.playerViews.size,
+    };
+  }
+
   private writeProbe(closed: boolean): void {
     const w = this.sim.world;
     if (w.outcome || this.runRecorded) return;
+    const nowSec = Math.floor(elapsedSeconds(w));
+    if (this.probeTrend.length === 0 || nowSec - this.probeTrendAt >= saveConfig.trendSeconds) {
+      this.probeTrendAt = nowSec;
+      this.probeTrend.push({ seconds: nowSec, counts: this.probeCounts() });
+      if (this.probeTrend.length > saveConfig.trendSamples) this.probeTrend.shift();
+    }
     let px = 0;
     let n = 0;
     const seen = new Set<unknown>();
@@ -792,6 +842,7 @@ export class RunScene extends Phaser.Scene {
       textures: n,
       heapMB: heap ? Math.round(heap / 1048576) : null,
       fps: Math.round(this.game.loop.actualFps),
+      trend: this.probeTrend,
       closed,
       snapshot: this.isTestRun() ? null : this.recorder.snapshot(w),
     });

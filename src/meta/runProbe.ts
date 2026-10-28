@@ -30,6 +30,11 @@ export interface RunProbe {
   heapMB: number | null;
   /** 1秒あたりの描画の回数 */
   fps: number;
+  /**
+   * 30 秒ごとの数の移り変わり（古い順。最大 trendSamples 個）。何が増え続けていたかを見る（07 の118章）。
+   * 値は「名前: 数」。名前は RunScene.probeCounts を見る
+   */
+  trend?: { seconds: number; counts: Record<string, number> }[];
   /** ページを閉じた・ほかのページへ移った（pagehide）。落ちたときは false のまま */
   closed: boolean;
   /** ランの記録の写し（テストプレイは null。次に開いたときに「失敗」として終える） */

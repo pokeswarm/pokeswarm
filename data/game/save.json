@@ -1,5 +1,7 @@
 {
   "autosaveSeconds": 180,
   "probeSeconds": 5,
+  "trendSeconds": 30,
+  "trendSamples": 24,
   "transferHours": 24
 }

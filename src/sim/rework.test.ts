@@ -151,6 +151,22 @@ describe('作者の感想で見直した技（2026年10月25日）', () => {
     for (let i = 0; i < pr.count; i++) expect(pr.stage[i]).toBe(0);
   });
 
+  it('ほうでん（chainRadial）: 跳ばずに、自分からまわりの別々の敵へまっすぐ出す', () => {
+    const sim = setup('chain', { range: 200, size: 6, count: 3, durationSeconds: 0.2 }, [[100, 0], [-100, 0], [0, 100], [0, -100], [500, 0]], { chainRadial: true });
+    sim.step([]);
+    const pr = sim.world.projectiles;
+    expect(pr.count).toBe(3);
+    const targets = new Set<string>();
+    for (let i = 0; i < pr.count; i++) {
+      // どれも自分（0, 0）から出て、届く範囲の敵まで
+      expect(pr.x[i]).toBe(0);
+      expect(pr.y[i]).toBe(0);
+      expect(pr.length[i]).toBeCloseTo(100, 0);
+      targets.add(`${Math.round(pr.dirX[i]!)},${Math.round(pr.dirY[i]!)}`);
+    }
+    expect(targets.size).toBe(3);
+  });
+
   it('現れたとき（spawn）の効き方: 遅れて現れる爆炎の柱は、現れたときに火の粉を出す', () => {
     const sparks: MoveEffect = { trigger: 'spawn', split: { sizeMultiplier: 0.2, powerMultiplier: 0.3, count: 3, speed: 200, durationSeconds: 0.4, spreadDegrees: 360, boomerang: false, jitter: 1 } };
     const sim = setup('eruption', { range: 300, size: 20, count: 8, intervalSeconds: 0.2, durationSeconds: 1 }, [], { effects: [sparks] });

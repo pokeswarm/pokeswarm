@@ -837,6 +837,16 @@ function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   const used = new Set<number>();
   const hop = world.rules.moves[pm.move]!.chainHopSeconds;
   const minHop2 = world.rules.moves[pm.move]!.chainMinHop ** 2;
+  if (world.rules.moves[pm.move]!.chainRadial) {
+    // ほうでん: 届く範囲の敵から count 匹をランダムに選び、自分からそれぞれへまっすぐ出す（まわりの全方向へ放電する）
+    const pool = enemiesInRange(world, x, y, reach);
+    for (let k = 0; k < st.count && pool.length > 0; k++) {
+      const i = pool.splice(Math.floor(world.rng.next() * pool.length), 1)[0]!;
+      const len = Math.hypot(e.x[i]! - x, e.y[i]! - y) || 1;
+      world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, shape: SHAPE_LINE, length: len, dirX: (e.x[i]! - x) / len, dirY: (e.y[i]! - y) / len });
+    }
+    return;
+  }
   for (let k = 0; k < st.count; k++) {
     // 一番近い敵へ。chainMinHop があれば、それより離れた敵の中で一番近い敵（いなければ一番近い敵。しんそく: 広く倒す）
     let best = -1;

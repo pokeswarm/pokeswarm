@@ -709,13 +709,32 @@ function psyBeam(): SpriteOut {
  * かえんほうしゃ・バブルこうせん: 扇形に引き伸ばす1枚の絵（右向き。左端が口）。
  * 炎は先へ行くほど広がる舌のような形がゆらめき、泡は大小の泡が散らばる
  */
-function cone(kind: 'flame' | 'bubble' | 'sound'): SpriteOut {
+function cone(kind: 'flame' | 'bubble' | 'sound' | 'electric'): SpriteOut {
   const W = 32;
   const H = 16;
   const palette =
-    kind === 'flame' ? ['#4a0e05', '#c62828', '#ef6c00', '#ffb300', '#fff176', '#ffffff'] : kind === 'sound' ? ['#880e4f', '#ec407a', '#f8bbd0', '#ffffff', '#fce4ec', '#ffffff'] : ['#01395e', '#0288d1', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff'];
+    kind === 'flame' ? ['#4a0e05', '#c62828', '#ef6c00', '#ffb300', '#fff176', '#ffffff'] : kind === 'electric' ? ['#1a1440', '#f9a825', '#fdd835', '#ffffff', '#fff59d', '#ffffff'] : kind === 'sound' ? ['#880e4f', '#ec407a', '#f8bbd0', '#ffffff', '#fce4ec', '#ffffff'] : ['#01395e', '#0288d1', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff'];
   const frames: Grid[] = [];
   for (let f = 0; f < 4; f++) {
+    if (kind === 'electric') {
+      // でんじは: 扇の中を根元から外へ進む、ぎざぎざの電気の弧（コマで外へ進み、4コマでつながる）
+      const mid = (H - 1) / 2;
+      const g = fill(blank(W, H), (x, y) => {
+        const t = Math.max(0, Math.min(1, x / (W - 1)));
+        const half = (H / 2) * (0.25 + 0.75 * t);
+        if (Math.abs(y - mid) / Math.max(0.5, half) > 1) return -1;
+        // 弧を縦の位置ごとに左右へずらして、ぎざぎざにする
+        const zig = (Math.floor(y / 2) % 2 === 0 ? 1 : -1) * 0.5;
+        const r = x - 0.22 * (y - mid) ** 2 + zig;
+        const ph = (r - f * 2) / 8;
+        const k = Math.abs(ph - Math.round(ph));
+        if (k < 0.05) return 3;
+        if (k < 0.1) return 2;
+        return -1;
+      });
+      frames.push(g);
+      continue;
+    }
     if (kind === 'sound') {
       // 音の波（ハイパーボイス）: 扇の中に、根元から外へ進む「)))」の弧（コマで外へ進み、4コマでつながる）
       const mid = (H - 1) / 2;
@@ -2704,6 +2723,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'flame-cone': () => cone('flame'),
     'bubble-cone': () => cone('bubble'),
     'sound-cone': () => cone('sound'),
+    'electric-cone': () => cone('electric'),
     'quake-crack': () => quakeCrack(),
     snowflake: () => snowflake(),
     'poison-cloud': () => poisonCloud(),

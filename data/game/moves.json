@@ -5631,7 +5631,7 @@
         "knockbackSeconds": 0.1,
         "statusChance": 0,
         "statusSeconds": 0,
-        "power": 50.9,
+        "power": 56.6,
         "cooldownSeconds": 0.8,
         "count": 1,
         "speed": 400,
@@ -5641,38 +5641,37 @@
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
         "knockback": 200,
-        "arcDegrees": 110,
+        "arcDegrees": 70,
         "critChancePct": 10
       },
       "levels": [
         {
           "size": 8,
+          "power": 9.9
+        },
+        {
+          "size": 6,
+          "power": 9.8
+        },
+        {
+          "size": 8,
+          "power": 8.2
+        },
+        {
+          "size": 6,
           "power": 8.3
         },
         {
-          "arcDegrees": 15,
-          "power": 8.4
-        },
-        {
           "size": 8,
-          "power": 6.2
-        },
-        {
-          "size": 6,
           "power": 6.6
         },
         {
-          "size": 8,
-          "power": 4.8
-        },
-        {
           "critChancePct": 10,
-          "power": 9.1
+          "power": 10.6
         },
         {
-          "arcDegrees": 15,
-          "size": 6,
-          "power": 0.9
+          "size": 12,
+          "power": 3.2
         }
       ],
       "body": {
@@ -5901,7 +5900,7 @@
       "pattern": "barrage",
       "effect": "bullet-punch",
       "base": {
-        "intervalSeconds": 0.04,
+        "intervalSeconds": 0.025,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
         "knockbackSeconds": 0.1,
@@ -5909,31 +5908,31 @@
         "statusChance": 0,
         "statusSeconds": 0,
         "lifestealPct": 0,
-        "power": 49.3,
+        "power": 40.3,
         "cooldownSeconds": 1.6,
-        "count": 8,
-        "speed": 520,
+        "count": 12,
+        "speed": 900,
         "size": 14,
-        "range": 90,
+        "range": 300,
         "durationSeconds": 0.25,
         "knockback": 160
       },
       "levels": [
         {
           "count": 1,
-          "power": 7.8
+          "power": 7.2
         },
         {
           "size": 2,
-          "power": 9.5
+          "power": 7.9
         },
         {
           "count": 1,
-          "power": 6.5
+          "power": 6.4
         },
         {
           "cooldownSeconds": -0.15,
-          "power": 2.1
+          "power": 1.8
         },
         {
           "count": 1,
@@ -5941,16 +5940,16 @@
         },
         {
           "size": 2,
-          "power": 6.9
+          "power": 6
         },
         {
           "count": 2,
-          "power": 0.8
+          "power": 2.2
         }
       ],
       "teachOnly": true,
-      "barrageWidth": 90,
-      "barrageWidthPerLevel": 10,
+      "barrageWidth": 40,
+      "barrageWidthPerLevel": 4,
       "body": {
         "lungeDistance": 10,
         "afterimages": 0
@@ -6159,75 +6158,76 @@
       "teachOnly": true
     },
     "thunder-wave": {
-      "pattern": "chain",
+      "pattern": "melee",
       "effect": "thunder-wave",
       "base": {
-        "power": 15.1,
+        "power": 6.7,
         "intervalSeconds": 0.1,
-        "statusChance": 0.5,
+        "statusChance": 0.6,
         "statusSeconds": 2.5,
         "lifestealPct": 0,
-        "count": 2,
+        "count": 1,
         "speed": 0,
-        "size": 6,
-        "range": 400,
-        "durationSeconds": 0.2,
+        "size": 20,
+        "range": 200,
+        "durationSeconds": 0.8,
         "pierce": "infinite",
-        "hitIntervalSeconds": 0,
-        "knockback": 60,
+        "hitIntervalSeconds": 0.4,
+        "knockback": 40,
         "knockbackSeconds": 0.06,
         "spreadDegrees": 0,
-        "cooldownSeconds": 1.3,
-        "statusId": "paralysis"
+        "cooldownSeconds": 1.4,
+        "statusId": "paralysis",
+        "arcDegrees": 40
       },
       "levels": [
         {
-          "count": 1,
-          "power": 2.5
+          "range": 20,
+          "power": 2.2
         },
         {
-          "range": 30,
-          "power": 5
+          "statusChance": 0.1,
+          "power": 2.7
         },
         {
           "count": 1,
-          "power": 1.5
+          "power": -4.5
         },
         {
           "cooldownSeconds": -0.15,
-          "power": 1.3
+          "power": 0.5
         },
         {
-          "count": 2,
-          "power": -1.4
+          "range": 20,
+          "power": 0.6
         },
         {
-          "range": 30,
-          "power": 2.9
+          "statusSeconds": 0.5,
+          "power": 1.1
         },
         {
-          "count": 2,
-          "power": -0.8
+          "count": 1,
+          "power": -2.3
         }
       ],
-      "chainHopSeconds": 0.05
+      "countWidens": 10
     },
     "discharge": {
-      "pattern": "pulse",
+      "pattern": "chain",
       "effect": "discharge",
       "base": {
-        "power": 13.9,
-        "cooldownSeconds": 1.1,
-        "count": 3,
-        "intervalSeconds": 0.15,
+        "power": 119.1,
+        "cooldownSeconds": 1.2,
+        "count": 6,
+        "intervalSeconds": 0.1,
         "speed": 0,
-        "size": 22,
-        "range": 220,
-        "durationSeconds": 0.5,
+        "size": 6,
+        "range": 240,
+        "durationSeconds": 0.2,
         "pierce": "infinite",
-        "hitIntervalSeconds": 0.25,
-        "knockback": 200,
-        "knockbackSeconds": 0.1,
+        "hitIntervalSeconds": 0,
+        "knockback": 120,
+        "knockbackSeconds": 0.06,
         "statusId": "paralysis",
         "statusChance": 0.3,
         "statusSeconds": 2,
@@ -6236,32 +6236,32 @@
       },
       "levels": [
         {
-          "range": 15,
-          "power": 2.3
+          "count": 2,
+          "power": 1.4
         },
         {
-          "size": 2,
-          "power": 2.3
+          "range": 20,
+          "power": 16
+        },
+        {
+          "count": 2,
+          "power": 0.9
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": -3.7
+        },
+        {
+          "count": 2,
+          "power": 0.6
         },
         {
           "statusChance": 0.1,
-          "power": 2.3
+          "power": 12.2
         },
         {
-          "cooldownSeconds": -0.2,
-          "power": -1.9
-        },
-        {
-          "range": 15,
-          "power": 1.9
-        },
-        {
-          "size": 3,
-          "power": 1.9
-        },
-        {
-          "count": 1,
-          "power": -1.4
+          "count": 3,
+          "power": -4.5
         }
       ],
       "effects": [
@@ -6275,7 +6275,8 @@
             "range": 180
           }
         }
-      ]
+      ],
+      "chainRadial": true
     },
     "horn-attack": {
       "pattern": "melee",

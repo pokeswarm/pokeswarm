@@ -72,6 +72,8 @@ export interface SimMoveDef {
   readonly chainHopSeconds: number;
   /** chain: 次に跳ぶ敵の、今の場所からの最小の距離（いなければ一番近い敵） */
   readonly chainMinHop: number;
+  /** chain: 跳ばずに、自分から別々の敵へまっすぐ出す（ほうでん） */
+  readonly chainRadial?: boolean;
   /** この技を候補に出す系統。null ならタイプが合えばだれでも */
   readonly learners: readonly string[] | null;
   /** いつも効く技（passive）: レベルごとの効果の合計（[0] がレベル1）。ほかの技は空 */

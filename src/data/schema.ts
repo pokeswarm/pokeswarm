@@ -1006,6 +1006,8 @@ export const moveDefSchema = z.object({
   chainHopSeconds: z.number().nonnegative().optional(),
   /** chain（連鎖）: 次に跳ぶ敵は、今の場所からこの距離より離れた敵を選ぶ（いなければ一番近い敵。しんそく: 広く倒す。作者の案 2026年10月25日） */
   chainMinHop: z.number().nonnegative().optional(),
+  /** chain（連鎖）: 跳ばずに、自分から count 匹の別々の敵へまっすぐ稲妻を出す（ほうでん: まわりへ放電。作者の依頼 2026年10月28日） */
+  chainRadial: z.boolean().optional(),
   /**
    * この技を候補に出す系統（data/game/playables.json のキー）。省略ならタイプが合えばだれでも。
    * ノーマルの技を、原作で覚えるポケモンたちに絞る（作者の決定 2026年10月24日。どのタイプの技も覚えるミュウは別）

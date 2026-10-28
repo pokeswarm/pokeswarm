@@ -3390,35 +3390,36 @@
     },
     "thunder-wave": {
       "extends": "electric.base",
-      "lightningLine": {
-        "color": "#fffde7",
+      "projectile": {
         "glowColor": "#ffeb3b",
-        "width": 2,
-        "jitter": 3
+        "shapeAlpha": 0.6
+      },
+      "sprite": {
+        "id": "electric-cone",
+        "fit": "cone",
+        "size": 1
       }
     },
     "discharge": {
       "extends": "electric.base",
-      "projectile": {
-        "glowScale": 1.2,
-        "coreScale": 0.4
-      },
-      "impact": {
-        "flash": {
-          "radius": 60
-        }
-      },
-      "sprite": {
-        "id": "electric-ring",
-        "fit": "ring",
-        "size": 1,
-        "varyTiles": true
+      "burstFlash": {
+        "colors": [
+          "#ffeb3b",
+          "#ffffff"
+        ],
+        "periodMs": 80,
+        "alpha": 0.25
       },
       "lightningLine": {
         "color": "#fffde7",
         "glowColor": "#ffeb3b",
         "width": 2.5,
-        "jitter": 3
+        "jitter": 4
+      },
+      "effectSprite": {
+        "id": "electric-crackle",
+        "fit": "circle",
+        "size": 1.1
       }
     },
     "horn-attack": {

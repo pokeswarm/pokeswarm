@@ -83,8 +83,8 @@ export class HitShapes {
         dirX: sector?.dirX ?? line?.dirX ?? 1,
         dirY: sector?.dirY ?? line?.dirY ?? 0,
         half: sector && sector.box === undefined && sector.half < Math.PI ? sector.half : null,
-        // 細い扇形（細長い炎）は帯にせず全体を塗る
-        sector: sector !== null && sector.box === undefined && !(sector.half * 2 < (this.cfg.sectorFullBelowDegrees * Math.PI) / 180),
+        // 細い扇形（細長い炎）は帯にせず全体を塗る（ちょうど sectorFullBelowDegrees の でんじは lv8 も全体を塗る）
+        sector: sector !== null && sector.box === undefined && !(sector.half * 2 <= (this.cfg.sectorFullBelowDegrees * Math.PI) / 180 + 1e-6),
         band: bandOf(i),
         box: sector?.box ?? null,
       };

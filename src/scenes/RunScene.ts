@@ -37,7 +37,7 @@ import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World } from '../sim/world';
 import { applyDebugOverrides, parseGodParam, parseLegendParam, parseIntruderParam, parseWingsParam, parseLevelParam, parseMovesParam, parseSectionParam, parseTimeParam } from './debugOverrides';
-import { addXp, applyOffer, itemFits } from '../sim/systems/leveling';
+import { addXp, applyOffer, itemFits, moveMaxLevel } from '../sim/systems/leveling';
 import { shinySpriteKey } from '../meta/loadoutOptions';
 import { achievementPerks, regionAchieved } from '../meta/achievementPerks';
 import { regionUpgradesOf } from '../meta/regionScope';
@@ -1966,7 +1966,7 @@ export class RunScene extends Phaser.Scene {
           .map((m) => {
             const def = world.rules.moves[m.move]!;
             const name = localName(generated.moves[def.key]?.names, getLocale(), def.key);
-            return `${name} Lv${m.level}/${def.levels.length}`;
+            return `${name} Lv${m.level}/${moveMaxLevel(world.rules, m)}`;
           })
           .join(' / '),
       }),

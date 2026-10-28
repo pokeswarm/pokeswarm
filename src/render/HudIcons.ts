@@ -3,6 +3,7 @@ import { uiConfig } from '../data';
 import { compactScreen } from './pixelUi';
 import type { Player } from '../sim/entities/player';
 import type { World } from '../sim/world';
+import { moveMaxLevel } from '../sim/systems/leveling';
 import type { IconTier } from './iconPixels';
 import { itemIconKey, moveIconKey, moveTier, pipKey } from './Icons';
 
@@ -37,7 +38,7 @@ export class HudIcons {
   update(world: World, p: Player): void {
     const r = world.rules;
     const rows: { key: string; level: number; max: number; tier: IconTier }[][] = [
-      p.moves.map((m) => ({ key: moveIconKey(r, m.move), level: m.level, max: r.moves[m.move]!.levels.length, tier: moveTier(r, m.move) })),
+      p.moves.map((m) => ({ key: moveIconKey(r, m.move), level: m.level, max: moveMaxLevel(r, m), tier: moveTier(r, m.move) })),
       p.items.map((it) => ({ key: itemIconKey(r, it.item), level: it.level, max: r.items[it.item]!.maxLevel, tier: 'base' as const })),
     ];
     const key = JSON.stringify(rows);

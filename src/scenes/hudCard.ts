@@ -2,6 +2,7 @@ import { t } from '../i18n';
 import { windowCss } from '../render/pixelUi';
 import type { Player } from '../sim/entities/player';
 import type { World } from '../sim/world';
+import { moveMaxLevel } from '../sim/systems/leveling';
 import { damageClassBadge, itemGains, itemName, moveDetail, moveGains, moveName } from './levelUpPanel';
 
 /**
@@ -35,7 +36,7 @@ export class HudCard {
     if (target.kind === 'move') {
       const pm = p.moves[target.slot];
       if (!pm) return this.hide();
-      const max = r.moves[pm.move]!.levels.length;
+      const max = moveMaxLevel(r, pm);
       name = moveName(world, pm.move);
       damageClass = r.moves[pm.move]!.damageClass;
       level = t('hudCard.level', { level: pm.level, max });

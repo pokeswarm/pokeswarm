@@ -1,5 +1,5 @@
 import type { LevelUpSnapshot, PlayerId } from '../commands';
-import type { Player } from '../entities/player';
+import type { Player, PlayerMove } from '../entities/player';
 import { deriveStats } from '../species';
 import { addModifiers, emptyModifiers, isUniqueDerivation, resolveModifiers } from '../upgrades';
 import { checkEvolution } from './evolution';
@@ -256,12 +256,18 @@ export function itemFits(
   return types.some((t) => t === normal || p.types.includes(t) || p.moveTypes.includes(t));
 }
 
+/** 覚えている技の最大レベル（技ごとの上限があればそれ。ばくれつパンチ。07 の105章） */
+export function moveMaxLevel(rules: World['rules'], pm: PlayerMove): number {
+  const max = rules.moves[pm.move]!.levels.length;
+  return pm.maxLevel ? Math.min(pm.maxLevel, max) : max;
+}
+
 export function makeOffers(world: World, p: Player): UpgradeOffer[] {
   const rules = world.rules;
   const count = rules.leveling.offerCount;
   const guaranteed: UpgradeOffer[] = [];
   p.moves.forEach((pm, slot) => {
-    if (pm.level < rules.moves[pm.move]!.levels.length) return;
+    if (pm.level < moveMaxLevel(rules, pm)) return;
     for (const d of rules.derivations) {
       if (d.from !== pm.move || (d.item !== -1 && !p.items.some((it) => it.item === d.item))) continue;
       if (d.line !== null && d.line !== p.line) continue;
@@ -269,7 +275,7 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
       if (d.forms && !d.forms.includes(p.species)) continue;
       if (p.moves.some((m) => m.move === d.to)) continue;
       // ほかにも最大レベルで持っていないといけない技（ばくれつパンチ）
-      if (d.withMoves && !d.withMoves.every((w) => p.moves.some((m) => m.move === w && m.level >= rules.moves[w]!.levels.length))) continue;
+      if (d.withMoves && !d.withMoves.every((w) => p.moves.some((m) => m.move === w && m.level >= moveMaxLevel(rules, m)))) continue;
       guaranteed.push({ kind: 'derive', slot, to: d.to, item: d.item, unique: isUniqueDerivation(d) });
     }
   });
@@ -277,7 +283,7 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
   const pool: UpgradeOffer[] = [];
   const normal = rules.types.names.indexOf('normal');
   p.moves.forEach((pm, slot) => {
-    if (pm.level < rules.moves[pm.move]!.levels.length) pool.push({ kind: 'moveUp', slot });
+    if (pm.level < moveMaxLevel(rules, pm)) pool.push({ kind: 'moveUp', slot });
   });
   // 技を覚えないポケモン（プリン）は、新しい技を候補に出さない
   // トゲピー: 進化するまで新しい技を覚えない（系統の fixedForms）
@@ -351,15 +357,19 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
       p.consumedMoves = [...(p.consumedMoves ?? []), fromMove.move];
       // ほかの技も使って進化する技（ばくれつパンチ）: 使った技はなくなり、持ち物で覚え直さない
       // 持っていれば消費する技（ばくれつパンチ: ほのおのパンチ・かみなりパンチ）も同じ
-      const d = world.rules.derivations.find((x) => x.to === offer.to && (x.withMoves || x.consumes || x.inheritLevels));
+      const d = world.rules.derivations.find((x) => x.to === offer.to && (x.withMoves || x.consumes || x.inheritLevels || x.levelCap));
       const used = [...(d?.withMoves ?? []), ...(d?.consumes ?? [])];
       // 材料にした技の強化分を受け継ぐ（ばくれつパンチ。最大まで）
+      // 最大レベルを、持っていて消費した技（consumes）の数で決める（ばくれつパンチ: 0 なら Lv8・1つで Lv16・2つで Lv24）
+      const consumedCount = (d?.consumes ?? []).filter((c) => p.moves.some((m) => m.move === c)).length;
+      const cap = d?.levelCap ? d.levelCap.base + d.levelCap.perConsumed * consumedCount : undefined;
+      const maxLevel = Math.min(cap ?? Infinity, world.rules.moves[offer.to]!.levels.length);
       let level = 1;
       if (d?.inheritLevels) {
         const gained = (fromMove.level - 1) + p.moves.filter((m) => used.includes(m.move)).reduce((s, m) => s + m.level - 1, 0);
-        level = Math.min(world.rules.moves[offer.to]!.levels.length, 1 + gained);
+        level = Math.min(maxLevel, 1 + gained);
       }
-      p.moves[offer.slot] = { move: offer.to, level, cooldown: 0, burstLeft: 0, burstTimer: 0 };
+      p.moves[offer.slot] = { move: offer.to, level, cooldown: 0, burstLeft: 0, burstTimer: 0, ...(cap !== undefined && { maxLevel }) };
       if (used.length) {
         p.moves = p.moves.filter((m) => !used.includes(m.move));
         p.consumedMoves = [...(p.consumedMoves ?? []), ...used];
@@ -432,10 +442,10 @@ export function derivationCompletedBy(world: World, p: Player, offer: UpgradeOff
     if (d.minLevel && world.level < d.minLevel) continue;
     if (d.forms && !d.forms.includes(p.species)) continue;
     const hasItem = p.items.some((it) => it.item === d.item);
-    const fromAtMax = p.moves.some((m) => m.move === d.from && m.level >= maxOf(d.from));
+    const fromAtMax = p.moves.some((m) => m.move === d.from && m.level >= moveMaxLevel(rules, m));
     // ほかにも最大で持っていないといけない技（ばくれつパンチ）: この候補で最大になる技も数える
     const atMaxAfter = (move: number): boolean =>
-      p.moves.some((m, slot) => m.move === move && (m.level >= maxOf(move) || (offer.kind === 'moveUp' && offer.slot === slot && m.level + 1 >= maxOf(move))));
+      p.moves.some((m, slot) => m.move === move && (m.level >= moveMaxLevel(rules, m) || (offer.kind === 'moveUp' && offer.slot === slot && m.level + 1 >= moveMaxLevel(rules, m))));
     if (d.withMoves) {
       if (!atMaxAfter(d.from) || !d.withMoves.every(atMaxAfter)) continue;
       // 持ち物もいる（とっておき: かわらずのいし）: この候補で持ち物がそろうときも進化する

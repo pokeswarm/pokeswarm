@@ -1232,7 +1232,7 @@ export const playablesConfigSchema = z.object({
        */
       hatch: z.array(z.string()).optional(),
       /** この姿に進化したら覚える技（技が埋まっていれば覚えない。ピィ: ピッピで ゆびをふる、ピクシーで つきのひかり。07 の57章） */
-      formMoves: z.array(z.object({ form: z.string(), move: z.string() })).default([]),
+      formMoves: z.array(z.object({ form: z.string(), move: z.string(), maxLevel: z.number().int().positive().optional() })).default([]),
       /**
        * この姿に進化したとき、from の技（先にあるものを優先して1つ）を持っていれば to の技に変える（強化の段階は受け継ぐ。元の技はもう候補に出ない）。
        * イーブイ: シャワーズで たいあたり → だくりゅう など（07 の103章）
@@ -1953,6 +1953,8 @@ export const derivationsConfigSchema = z.object({
        * ばくれつパンチ: きあいパンチ・ほのおのパンチ・かみなりパンチ の強化を受け継ぐ（作者の決定 2026年10月25日）
        */
       inheritLevels: z.boolean().optional(),
+      /** 最大レベル = base + perConsumed × 持っていて消費した consumes の数（ばくれつパンチ: 8・16・24。作者の決定 2026年10月28日） */
+      levelCap: z.object({ base: z.number().int().positive(), perConsumed: z.number().int().nonnegative() }).optional(),
     }),
   ),
 });

@@ -145,7 +145,7 @@ export function buildSimRules(region?: string): SimRules {
   const itemIndex = (key: string): number => items.findIndex((i) => i.key === key);
   const derivations = [
     ...derivationsConfig.derivations.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: null })),
-    ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: d.item ? itemIndex(d.item) : -1, to: moveIndex(d.to), line: d.line, ...(d.minLevel ? { minLevel: d.minLevel } : {}), ...(d.forms ? { forms: d.forms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}), ...(d.withMoves ? { withMoves: d.withMoves.map(moveIndex) } : {}), ...(d.consumes ? { consumes: d.consumes.map(moveIndex) } : {}), ...(d.inheritLevels ? { inheritLevels: true } : {}), ...(moveBalanceConfig.tierOverrides[d.to] === 'derived' ? { derivedTier: true } : {}) })),
+    ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: d.item ? itemIndex(d.item) : -1, to: moveIndex(d.to), line: d.line, ...(d.minLevel ? { minLevel: d.minLevel } : {}), ...(d.forms ? { forms: d.forms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}), ...(d.withMoves ? { withMoves: d.withMoves.map(moveIndex) } : {}), ...(d.consumes ? { consumes: d.consumes.map(moveIndex) } : {}), ...(d.inheritLevels ? { inheritLevels: true } : {}), ...(d.levelCap ? { levelCap: d.levelCap } : {}), ...(moveBalanceConfig.tierOverrides[d.to] === 'derived' ? { derivedTier: true } : {}) })),
   ];
   const itemMoves = Object.entries(playablesConfig.pokemon).flatMap(([line, p]) => p.itemMoves.map((im) => ({ line, item: itemIndex(im.item), move: moveIndex(im.move) })));
   // ポケモンの種類: PokeAPI から生成したすべて。進化先・進化の道具・進化先のプレイヤーのドット絵が無いものは進化の一覧から外す
@@ -189,7 +189,7 @@ export function buildSimRules(region?: string): SimRules {
       types: pl.types ? pl.types.map(typeIndex) : null,
       moveTypes: pl.allMoveTypes ? types.names.map((_, i) => i) : (pl.moveTypes ?? []).map(typeIndex),
       startingMoves: pl.startingMoves.map(moveIndex),
-      formMoves: pl.formMoves.map((f) => ({ form: formIndex(f.form), move: moveIndex(f.move) })),
+      formMoves: pl.formMoves.map((f) => ({ form: formIndex(f.form), move: moveIndex(f.move), ...(f.maxLevel && { maxLevel: f.maxLevel }) })),
       formTransforms: pl.formTransforms.map((f) => ({ form: formIndex(f.form), from: f.from.map(moveIndex), to: moveIndex(f.to) })),
       becomes: pl.becomes.map((b) => ({ form: formIndex(b.form), line: b.line })),
       fixedForms: pl.fixedForms.map(formIndex),

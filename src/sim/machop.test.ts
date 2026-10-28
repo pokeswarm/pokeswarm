@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { buildSimRules, moveIndexOf, playableLoadout } from '../data/simRules';
 import { Simulation } from './simulation';
-import { applyOffer, makeOffers } from './systems/leveling';
+import { checkEvolution } from './systems/evolution';
+import { applyOffer, makeOffers, moveMaxLevel } from './systems/leveling';
 
 /**
  * ワンリキーのパンチ（作者の決定 2026年10月25日）: 最初はマッハパンチだけで、ほかの技は覚えない。
@@ -115,5 +116,32 @@ describe('ワンリキーのパンチ', () => {
     applyOffer(sim.world, p, { kind: 'derive', slot: 0, to: move('dynamic-punch'), item: -1, unique: true });
     expect(p.moves).toHaveLength(1);
     expect(p.moves[0]!.level).toBe(1 + (max('focus-punch') - 1) + 2 + 1);
+  });
+
+  it('ばくれつパンチの最大レベルは、消費したパンチの数で決まる（なし Lv8・1つ Lv16・2つ Lv24。07 の105章）', () => {
+    for (const [stones, cap] of [[[], 8], [['fire-stone'], 16], [['fire-stone', 'thunder-stone'], 24]] as const) {
+      const { rules, sim, p, item, move } = setup();
+      for (const st of stones) applyOffer(sim.world, p, { kind: 'itemNew', item: item(st) });
+      p.moves[0] = { move: move('focus-punch'), level: rules.moves[move('focus-punch')]!.levels.length, cooldown: 0, burstLeft: 0, burstTimer: 0 };
+      p.species = rules.species.findIndex((x) => x.key === 'machamp');
+      applyOffer(sim.world, p, { kind: 'derive', slot: 0, to: move('dynamic-punch'), item: -1, unique: true });
+      const dp = p.moves.find((m) => m.move === move('dynamic-punch'))!;
+      expect(moveMaxLevel(rules, dp)).toBe(cap);
+      // 最大まで上げたら、もう強化の候補に出ない
+      dp.level = cap;
+      expect(makeOffers(sim.world, p).some((o) => o.kind === 'moveUp')).toBe(false);
+    }
+  });
+
+  it('ニョロボンが覚える ばくれつパンチ は最大 Lv8', () => {
+    const rules = buildSimRules('johto');
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    const lo = playableLoadout(rules, 'poliwag');
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, types: lo.types, moveTypes: lo.moveTypes, fixedMoves: lo.fixedMoves, moves: lo.moves, line: lo.line, species: lo.species });
+    p.species = rules.species.findIndex((x) => x.key === 'poliwhirl');
+    p.items = [{ item: rules.items.findIndex((it) => it.key === 'water-stone'), level: 1 }];
+    checkEvolution(sim.world, p);
+    const dp = p.moves.find((m) => m.move === moveIndexOf(rules, 'dynamic-punch'))!;
+    expect(moveMaxLevel(rules, dp)).toBe(8);
   });
 });

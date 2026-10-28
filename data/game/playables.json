@@ -38,7 +38,7 @@
     "miltank": { "sprite": "miltank", "startingMoves": ["rollout"] },
     "larvitar": { "sprite": "larvitar", "startingMoves": ["rock-throw"], "formMoves": [{ "form": "tyranitar", "move": "sandstorm" }] },
     "horsea": { "sprite": "horsea", "startingMoves": ["water-gun"], "formMoves": [{ "form": "kingdra", "move": "twister" }] },
-    "poliwag": { "sprite": "poliwag", "startingMoves": ["bubble"], "formMoves": [{ "form": "poliwrath", "move": "dynamic-punch" }, { "form": "politoed", "move": "rain-dance" }] },
+    "poliwag": { "sprite": "poliwag", "startingMoves": ["bubble"], "formMoves": [{ "form": "poliwrath", "move": "dynamic-punch", "maxLevel": 8 }, { "form": "politoed", "move": "rain-dance" }] },
     "houndour": { "sprite": "houndour", "startingMoves": ["ember"], "unlock": "houndour" },
     "porygon": { "sprite": "porygon", "startingMoves": ["swift", "sharpen", "conversion"], "fixedMoves": true, "formMoves": [{ "form": "porygon2", "move": "recover" }] },
     "scyther": { "sprite": "scyther", "startingMoves": ["scratch"], "formMoves": [{ "form": "scizor", "move": "bullet-punch" }] },

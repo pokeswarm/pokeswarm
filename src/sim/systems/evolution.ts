@@ -71,9 +71,9 @@ export function followRemoteSpecies(world: World, p: Player, species: number): v
 function applyForm(world: World, p: Player): void {
   const lines = world.rules.lines;
   if (!lines) return;
-  const learn = (move: number): void => {
+  const learn = (move: number, maxLevel?: number): void => {
     if (move < 0 || p.moves.some((m) => m.move === move) || p.moves.length >= world.rules.combat.maxMoveSlots) return;
-    p.moves.push({ move, level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0 });
+    p.moves.push({ move, level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0, ...(maxLevel && { maxLevel }) });
     world.events.push({ type: 'moveTaught', playerId: p.id, move });
   };
   const become = lines[p.line]?.becomes.find((b) => b.form === p.species && lines[b.line]);
@@ -96,7 +96,7 @@ function applyForm(world: World, p: Player): void {
     p.consumedMoves = [...(p.consumedMoves ?? []), from!];
     world.events.push({ type: 'moveTaught', playerId: p.id, move: f.to });
   }
-  for (const f of lines[p.line]?.formMoves ?? []) if (f.form === p.species) learn(f.move);
+  for (const f of lines[p.line]?.formMoves ?? []) if (f.form === p.species) learn(f.move, f.maxLevel);
 }
 
 export function checkEvolutionAll(world: World): void {

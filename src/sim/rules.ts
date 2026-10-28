@@ -17,7 +17,7 @@ export interface SimLineRule {
   readonly types: readonly number[] | null;
   readonly moveTypes: readonly number[];
   readonly startingMoves: readonly number[];
-  readonly formMoves: readonly { readonly form: number; readonly move: number }[];
+  readonly formMoves: readonly { readonly form: number; readonly move: number; readonly maxLevel?: number }[];
   /** この姿に進化したら、from の技（先にあるものを優先）を to に変える（イーブイ。07 の103章） */
   readonly formTransforms: readonly { readonly form: number; readonly from: readonly number[]; readonly to: number }[];
   readonly becomes: readonly { readonly form: number; readonly line: string }[];

@@ -415,6 +415,8 @@
   "region.playables": "{n} jouables",
   "region.comingSoon": "Bientôt disponible",
   "region.unlock.johto": "🔒 Battez Mew légendaire pour débloquer",
+  "region.unlock.hoenn": "🔒 Obtenez Celebi à Johto pour débloquer",
+  "region.unlockedSoon": "🔓 Débloqué — bientôt disponible",
   "guard.title": "PokéSwarm",
   "guard.framed": "Cette page intègre PokéSwarm dans un autre site sans autorisation.\nPokéSwarm est un jeu de fan gratuit et sans publicité, distribué uniquement sur son site officiel.\nJouez sur le site officiel ({url}).",
   "guard.unofficial": "Cette adresse n'est pas le site officiel de PokéSwarm (c'est une copie non autorisée).\nPokéSwarm est un jeu de fan gratuit et sans publicité, distribué uniquement sur son site officiel.\nJouez sur le site officiel ({url}).",
@@ -523,6 +525,12 @@
   "achievement.johto-unlock-gengar.desc": "Vaincre 4 fois l'Ectoplasma de Mortimer à Johto",
   "achievement.johto-first-boss.name": "Duel à Johto",
   "achievement.johto-first-boss.desc": "Vaincre un membre du Conseil 4 à Johto pour la première fois",
+  "achievement.hoenn-first-derivation.name": "Inspiration de Hoenn",
+  "achievement.hoenn-first-derivation.desc": "Faire évoluer une capacité à Hoenn",
+  "achievement.hoenn-reach-elite-four.name": "Vers Éternara",
+  "achievement.hoenn-reach-elite-four.desc": "Vaincre tous les champions d'arène de Hoenn en une partie et affronter le Conseil 4",
+  "achievement.hoenn-first-boss.name": "Duel à Hoenn",
+  "achievement.hoenn-first-boss.desc": "Vaincre un membre du Conseil 4 à Hoenn pour la première fois",
   "achievement.johto-unlock-eevee.name": "Évoli de Johto",
   "achievement.johto-unlock-eevee.desc": "Atteindre la section 10 avec chacun des trois starters de Johto",
   "achievement.johto-unlock-houndour.name": "Malosse de Johto",
@@ -594,5 +602,6 @@
   "pattern.passive": "Toujours actif",
   "shop.regionTitle": "Boutique de quelle région ?",
   "shop.unlock.johto": "🔒 S'ouvre après avoir dépensé 50000 pièces dans la boutique de Kanto ({current} / {target})",
+  "shop.unlock.hoenn": "🔒 S'ouvre après avoir dépensé 50000 pièces dans la boutique de Johto ({current} / {target})",
   "shop.backRegions": "Retour aux régions (Échap)"
 }

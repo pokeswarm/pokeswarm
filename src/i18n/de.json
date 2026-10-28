@@ -415,6 +415,8 @@
   "region.playables": "{n} spielbar",
   "region.comingSoon": "Demnächst",
   "region.unlock.johto": "🔒 Besiege das legendäre Mew zum Freischalten",
+  "region.unlock.hoenn": "🔒 Erhalte Celebi in Johto zum Freischalten",
+  "region.unlockedSoon": "🔓 Freigeschaltet – demnächst",
   "guard.title": "PokéSwarm",
   "guard.framed": "Diese Seite hat PokéSwarm ohne Erlaubnis in eine andere Website eingebettet.\nPokéSwarm ist ein kostenloses, werbefreies Fanspiel, das nur auf der offiziellen Website angeboten wird.\nBitte spiele auf der offiziellen Website ({url}).",
   "guard.unofficial": "Diese Adresse ist nicht die offizielle PokéSwarm-Website (es handelt sich um eine unerlaubte Kopie).\nPokéSwarm ist ein kostenloses, werbefreies Fanspiel, das nur auf der offiziellen Website angeboten wird.\nBitte spiele auf der offiziellen Website ({url}).",
@@ -523,6 +525,12 @@
   "achievement.johto-unlock-gengar.desc": "Besiege Jens Gengar 4-mal in Johto",
   "achievement.johto-first-boss.name": "Duell in Johto",
   "achievement.johto-first-boss.desc": "Besiege zum ersten Mal ein Mitglied der Top Vier in Johto",
+  "achievement.hoenn-first-derivation.name": "Geistesblitz in Hoenn",
+  "achievement.hoenn-first-derivation.desc": "Entwickle in Hoenn eine Attacke weiter",
+  "achievement.hoenn-reach-elite-four.name": "Nach Prachtpolis",
+  "achievement.hoenn-reach-elite-four.desc": "Besiege alle Arenaleiter von Hoenn in einem Lauf und tritt gegen die Top Vier an",
+  "achievement.hoenn-first-boss.name": "Duell in Hoenn",
+  "achievement.hoenn-first-boss.desc": "Besiege zum ersten Mal ein Mitglied der Top Vier in Hoenn",
   "achievement.johto-unlock-eevee.name": "Evoli aus Johto",
   "achievement.johto-unlock-eevee.desc": "Erreiche Abschnitt 10 mit jedem der drei Starter aus Johto",
   "achievement.johto-unlock-houndour.name": "Hunduster aus Johto",
@@ -594,5 +602,6 @@
   "pattern.passive": "Immer aktiv",
   "shop.regionTitle": "Shop welcher Region?",
   "shop.unlock.johto": "🔒 Öffnet sich, wenn du im Kanto-Shop 50000 Münzen ausgegeben hast ({current} / {target})",
+  "shop.unlock.hoenn": "🔒 Öffnet sich, wenn du im Johto-Shop 50000 Münzen ausgegeben hast ({current} / {target})",
   "shop.backRegions": "Zurück zu den Regionen (Esc)"
 }

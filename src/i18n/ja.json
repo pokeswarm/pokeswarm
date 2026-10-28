@@ -436,6 +436,8 @@
   "region.playables": "プレイアブル {n}",
   "region.comingSoon": "Coming soon",
   "region.unlock.johto": "🔒 伝説のミュウを倒すと解放",
+  "region.unlock.hoenn": "🔒 ジョウトで セレビィを 手に入れると解放",
+  "region.unlockedSoon": "🔓 解放済み・準備中",
   "guard.title": "PokéSwarm",
   "guard.framed": "このページは、PokéSwarm をほかのサイトに無断で埋め込んでいます。\nPokéSwarm は無料・広告なしのファンゲームで、公式サイトでしか配っていません。\n公式サイト（{url}）で遊んでください。",
   "guard.unofficial": "このアドレスは PokéSwarm の公式サイトではありません（無断で複製されたものです）。\nPokéSwarm は無料・広告なしのファンゲームで、公式サイトでしか配っていません。\n公式サイト（{url}）で遊んでください。",
@@ -544,6 +546,12 @@
   "achievement.johto-unlock-gengar.desc": "ジョウトで マツバの ゲンガーを 4回 倒す",
   "achievement.johto-first-boss.name": "ジョウトの していせん",
   "achievement.johto-first-boss.desc": "ジョウトで はじめて 四天王を 倒す",
+  "achievement.hoenn-first-derivation.name": "ホウエンの ひらめき",
+  "achievement.hoenn-first-derivation.desc": "ホウエンで 派生技を完成させる",
+  "achievement.hoenn-reach-elite-four.name": "サイユウシティへ",
+  "achievement.hoenn-reach-elite-four.desc": "ホウエンの1ランで ジムリーダーを全員倒し、四天王に挑む",
+  "achievement.hoenn-first-boss.name": "ホウエンの していせん",
+  "achievement.hoenn-first-boss.desc": "ホウエンで はじめて 四天王を 倒す",
   "achievement.johto-unlock-eevee.name": "ジョウトの イーブイ",
   "achievement.johto-unlock-eevee.desc": "ジョウトの 御三家3匹で それぞれ 区間10まで 進む",
   "achievement.johto-unlock-houndour.name": "ジョウトの デルビル",
@@ -615,5 +623,6 @@
   "pattern.passive": "いつも効く",
   "shop.regionTitle": "どの地方の ショップ？",
   "shop.unlock.johto": "🔒 カントーのショップで 50000 コインを使うと開く（{current} / {target}）",
+  "shop.unlock.hoenn": "🔒 ジョウトのショップで 50000 コインを使うと開く（{current} / {target}）",
   "shop.backRegions": "地方の選択へ（Esc）"
 }

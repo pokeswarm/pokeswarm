@@ -1015,6 +1015,39 @@
       "reward": {
         "pokemon": "celebi"
       }
+    },
+    {
+      "id": "hoenn-first-derivation",
+      "region": "hoenn",
+      "condition": {
+        "stat": "derivations",
+        "atLeast": 1
+      },
+      "reward": {
+        "item": "pp-max"
+      }
+    },
+    {
+      "id": "hoenn-reach-elite-four",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bestMidbosses",
+        "atLeast": 16
+      },
+      "reward": {
+        "item": "metronome"
+      }
+    },
+    {
+      "id": "hoenn-first-boss",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bossKills",
+        "atLeast": 1
+      },
+      "reward": {
+        "item": "light-clay"
+      }
     }
   ]
 }

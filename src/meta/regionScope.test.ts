@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { achievementsConfig, shopConfig, unlocksConfig } from '../data';
+import { achievementsConfig, regionsConfig, shopConfig, unlocksConfig } from '../data';
 import { achievementPerks, regionAchieved } from './achievementPerks';
 import type { AchievementsConfig, UnlocksConfig } from '../data/schema';
-import { applyProgress, isPlayableUnlocked } from './progress';
+import { applyProgress, isPlayableUnlocked, meets } from './progress';
 import { regionStatKey, regionStats, regionUpgradesOf } from './regionScope';
 import { emptySave, parseSave } from './saveData';
 import { backfillShopSpent, buyPokemon, buyUpgrade, permanentBonus, refundAll, refundableCoins, shopRegionOpen, upgradeLevel } from './shop';
@@ -39,6 +39,38 @@ describe('地方ごとの記録・強化・ショップ（02 の17章）', () =>
     expect(shopRegionOpen(save, shopConfig, 'johto')).toBe(true);
     refundAll(save, shopConfig, 'kanto', ORDER);
     expect(shopRegionOpen(save, shopConfig, 'johto')).toBe(true);
+  });
+
+  it('ホウエンのショップは、ジョウトのショップで 50000 コイン使うまで開かない（カントーで使ったぶんは数えない。07 の89.8）', () => {
+    const save = emptySave(0, 10_000_000);
+    save.stats.shopSpent = 50000;
+    expect(shopRegionOpen(save, shopConfig, 'hoenn')).toBe(false);
+    expect(buyUpgrade(save, shopConfig, 'might', 'hoenn')).toBe(false);
+    while ((save.stats['johto:shopSpent'] ?? 0) < 50000) {
+      const id = shopConfig.upgrades.find((u) => upgradeLevel(save, u.id, 'johto') < u.maxLevel)!.id;
+      expect(buyUpgrade(save, shopConfig, id, 'johto')).toBe(true);
+    }
+    expect(shopRegionOpen(save, shopConfig, 'hoenn')).toBe(true);
+    expect(buyUpgrade(save, shopConfig, 'might', 'hoenn')).toBe(true);
+    expect(upgradeLevel(save, 'might', 'johto')).toBeGreaterThan(0);
+    expect(upgradeLevel(save, 'might', 'hoenn')).toBe(1);
+  });
+
+  it('ホウエンの地方は、ジョウトでセレビィを手に入れる（ルギアとホウオウを倒す）と解放の条件を満たす（07 の89.8）', () => {
+    const hoenn = regionsConfig.regions.find((r) => r.id === 'hoenn')!;
+    const celebi = achievementsConfig.achievements.find((a) => a.id === 'johto-unlock-celebi')!;
+    const save = emptySave(0, 0);
+    save.stats['bossDefeated.lugia'] = 1;
+    save.stats['bossDefeated.ho-oh'] = 1;
+    expect(meets(save.stats, hoenn.unlock!)).toBe(false);
+    save.stats['johto:bossDefeated.lugia'] = 1;
+    expect(meets(save.stats, hoenn.unlock!)).toBe(false);
+    save.stats['johto:bossDefeated.ho-oh'] = 1;
+    expect(meets(save.stats, hoenn.unlock!)).toBe(true);
+    // 地方の条件は、セレビィの実績の条件と同じ（どちらかだけを変えない）
+    expect(meets(regionStats(save.stats, 'johto'), celebi.condition)).toBe(true);
+    delete save.stats['johto:bossDefeated.lugia'];
+    expect(meets(regionStats(save.stats, 'johto'), celebi.condition)).toBe(meets(save.stats, hoenn.unlock!));
   });
 
   it('ジョウトの強化はカントーの強化と別。ランにはその地方の強化だけを使う', () => {

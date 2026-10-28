@@ -79,7 +79,19 @@
         "charmander",
         "bulbasaur",
         "squirtle"
-      ]
+      ],
+      "unlock": {
+        "all": [
+          {
+            "stat": "johto:bossDefeated.lugia",
+            "atLeast": 1
+          },
+          {
+            "stat": "johto:bossDefeated.ho-oh",
+            "atLeast": 1
+          }
+        ]
+      }
     },
     {
       "id": "sinnoh",

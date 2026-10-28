@@ -436,6 +436,8 @@
   "region.playables": "{n} playable",
   "region.comingSoon": "Coming soon",
   "region.unlock.johto": "🔒 Defeat the legendary Mew to unlock",
+  "region.unlock.hoenn": "🔒 Obtain Celebi in Johto to unlock",
+  "region.unlockedSoon": "🔓 Unlocked — coming soon",
   "guard.title": "PokéSwarm",
   "guard.framed": "This page has embedded PokéSwarm into another site without permission.\nPokéSwarm is a free, ad-free fan game that is only distributed on its official site.\nPlease play on the official site ({url}).",
   "guard.unofficial": "This address is not the official PokéSwarm site (it is an unauthorized copy).\nPokéSwarm is a free, ad-free fan game that is only distributed on its official site.\nPlease play on the official site ({url}).",
@@ -544,6 +546,12 @@
   "achievement.johto-unlock-gengar.desc": "Defeat Morty's Gengar 4 times in Johto",
   "achievement.johto-first-boss.name": "Johto Showdown",
   "achievement.johto-first-boss.desc": "Defeat an Elite Four member in Johto for the first time",
+  "achievement.hoenn-first-derivation.name": "Hoenn Inspiration",
+  "achievement.hoenn-first-derivation.desc": "Complete a derived move in Hoenn",
+  "achievement.hoenn-reach-elite-four.name": "To Ever Grande City",
+  "achievement.hoenn-reach-elite-four.desc": "Defeat every Hoenn Gym Leader in one run and face the Elite Four",
+  "achievement.hoenn-first-boss.name": "Hoenn Showdown",
+  "achievement.hoenn-first-boss.desc": "Defeat an Elite Four member in Hoenn for the first time",
   "achievement.johto-unlock-eevee.name": "Johto Eevee",
   "achievement.johto-unlock-eevee.desc": "Reach section 10 with each of the three Johto starters",
   "achievement.johto-unlock-houndour.name": "Johto Houndour",
@@ -615,5 +623,6 @@
   "pattern.passive": "Always active",
   "shop.regionTitle": "Which region's shop?",
   "shop.unlock.johto": "🔒 Opens after you spend 50000 coins in the Kanto shop ({current} / {target})",
+  "shop.unlock.hoenn": "🔒 Opens after you spend 50000 coins in the Johto shop ({current} / {target})",
   "shop.backRegions": "Back to regions (Esc)"
 }

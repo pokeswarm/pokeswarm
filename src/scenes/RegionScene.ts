@@ -89,10 +89,13 @@ export class RegionScene extends Phaser.Scene {
         soon.textContent = r.available ? '' : t('region.comingSoon');
         card.append(soon);
         // 解放の条件（作ってない地方にも、先に条件を見せる）
-        if (r.unlock && !meets(session.store.current.stats, r.unlock)) {
+        if (r.unlock) {
           const lock = document.createElement('div');
           lock.style.cssText = 'opacity:0.8;font-size:14px';
-          lock.textContent = tMaybe(`region.unlock.${r.id}`);
+          // 条件を満たしたが作っている途中の地方は「解放済み・準備中」（07 の89.8: セレビィでホウエン）
+          const met = meets(session.store.current.stats, r.unlock);
+          lock.textContent = met ? t('region.unlockedSoon') : tMaybe(`region.unlock.${r.id}`);
+          if (met) soon.remove();
           card.append(lock);
         }
       }

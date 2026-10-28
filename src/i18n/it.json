@@ -415,6 +415,8 @@
   "region.playables": "{n} giocabili",
   "region.comingSoon": "Prossimamente",
   "region.unlock.johto": "🔒 Sconfiggi Mew leggendario per sbloccare",
+  "region.unlock.hoenn": "🔒 Ottieni Celebi a Johto per sbloccare",
+  "region.unlockedSoon": "🔓 Sbloccato — prossimamente",
   "guard.title": "PokéSwarm",
   "guard.framed": "Questa pagina ha incorporato PokéSwarm in un altro sito senza permesso.\nPokéSwarm è un fan game gratuito e senza pubblicità, distribuito solo sul sito ufficiale.\nGioca sul sito ufficiale ({url}).",
   "guard.unofficial": "Questo indirizzo non è il sito ufficiale di PokéSwarm (è una copia non autorizzata).\nPokéSwarm è un fan game gratuito e senza pubblicità, distribuito solo sul sito ufficiale.\nGioca sul sito ufficiale ({url}).",
@@ -523,6 +525,12 @@
   "achievement.johto-unlock-gengar.desc": "Sconfiggi 4 volte il Gengar di Angelo a Johto",
   "achievement.johto-first-boss.name": "Sfida a Johto",
   "achievement.johto-first-boss.desc": "Sconfiggi per la prima volta un membro dei Superquattro a Johto",
+  "achievement.hoenn-first-derivation.name": "Ispirazione a Hoenn",
+  "achievement.hoenn-first-derivation.desc": "Fai evolvere una mossa a Hoenn",
+  "achievement.hoenn-reach-elite-four.name": "Verso Iridopoli",
+  "achievement.hoenn-reach-elite-four.desc": "Sconfiggi tutti i capipalestra di Hoenn in una partita e affronta i Superquattro",
+  "achievement.hoenn-first-boss.name": "Sfida a Hoenn",
+  "achievement.hoenn-first-boss.desc": "Sconfiggi per la prima volta un membro dei Superquattro a Hoenn",
   "achievement.johto-unlock-eevee.name": "Eevee di Johto",
   "achievement.johto-unlock-eevee.desc": "Raggiungi la sezione 10 con ciascuno dei tre iniziali di Johto",
   "achievement.johto-unlock-houndour.name": "Houndour di Johto",
@@ -594,5 +602,6 @@
   "pattern.passive": "Sempre attivo",
   "shop.regionTitle": "Negozio di quale regione?",
   "shop.unlock.johto": "🔒 Si apre dopo aver speso 50000 monete nel negozio di Kanto ({current} / {target})",
+  "shop.unlock.hoenn": "🔒 Si apre dopo aver speso 50000 monete nel negozio di Johto ({current} / {target})",
   "shop.backRegions": "Torna alle regioni (Esc)"
 }

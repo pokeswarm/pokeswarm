@@ -415,6 +415,8 @@
   "region.playables": "{n} jugables",
   "region.comingSoon": "Próximamente",
   "region.unlock.johto": "🔒 Derrota a Mew legendario para desbloquear",
+  "region.unlock.hoenn": "🔒 Consigue a Celebi en Johto para desbloquear",
+  "region.unlockedSoon": "🔓 Desbloqueado — próximamente",
   "guard.title": "PokéSwarm",
   "guard.framed": "Esta página ha insertado PokéSwarm en otro sitio sin permiso.\nPokéSwarm es un juego de fans gratuito y sin anuncios que solo se distribuye en su sitio oficial.\nJuega en el sitio oficial ({url}).",
   "guard.unofficial": "Esta dirección no es el sitio oficial de PokéSwarm (es una copia no autorizada).\nPokéSwarm es un juego de fans gratuito y sin anuncios que solo se distribuye en su sitio oficial.\nJuega en el sitio oficial ({url}).",
@@ -523,6 +525,12 @@
   "achievement.johto-unlock-gengar.desc": "Derrota 4 veces al Gengar de Morti en Johto",
   "achievement.johto-first-boss.name": "Duelo en Johto",
   "achievement.johto-first-boss.desc": "Derrota por primera vez a un miembro del Alto Mando en Johto",
+  "achievement.hoenn-first-derivation.name": "Inspiración en Hoenn",
+  "achievement.hoenn-first-derivation.desc": "Evoluciona un movimiento en Hoenn",
+  "achievement.hoenn-reach-elite-four.name": "Rumbo a Ciudad Colosalia",
+  "achievement.hoenn-reach-elite-four.desc": "Derrota a todos los líderes de gimnasio de Hoenn en una partida y enfréntate al Alto Mando",
+  "achievement.hoenn-first-boss.name": "Duelo en Hoenn",
+  "achievement.hoenn-first-boss.desc": "Derrota por primera vez a un miembro del Alto Mando en Hoenn",
   "achievement.johto-unlock-eevee.name": "Eevee de Johto",
   "achievement.johto-unlock-eevee.desc": "Llega a la sección 10 con cada uno de los tres iniciales de Johto",
   "achievement.johto-unlock-houndour.name": "Houndour de Johto",
@@ -594,5 +602,6 @@
   "pattern.passive": "Siempre activo",
   "shop.regionTitle": "¿Tienda de qué región?",
   "shop.unlock.johto": "🔒 Se abre al gastar 50000 monedas en la tienda de Kanto ({current} / {target})",
+  "shop.unlock.hoenn": "🔒 Se abre al gastar 50000 monedas en la tienda de Johto ({current} / {target})",
   "shop.backRegions": "Volver a las regiones (Esc)"
 }

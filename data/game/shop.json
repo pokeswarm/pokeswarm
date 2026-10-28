@@ -191,6 +191,12 @@
         "stat": "shopSpent",
         "atLeast": 50000
       }
+    },
+    "hoenn": {
+      "unlock": {
+        "stat": "johto:shopSpent",
+        "atLeast": 50000
+      }
     }
   }
 }

@@ -922,7 +922,7 @@ function fangBite(palette = ['#3b0d06', '#e53935', '#ff7043', '#cfc4bd', '#fffff
  * 上の列はカメラに近いので広く大きく（両はしに長い犬歯）、下の列は狭く小さい。歯ぐきは上が ∩、下が ∪ に少し反る。上下から閉じ、閉じた所で光る。
  * fire は ほのおのキバ（赤い歯ぐきのふちから炎の舌が立つ）、dark は かみつく（あくの紫）
  */
-function fangFront(kind: 'fire' | 'dark' | 'crunch', slope = 0, alignInner = false): SpriteOut {
+function fangFace(kind: 'fire' | 'dark' | 'crunch', slope = 0, alignInner = false): SpriteOut {
   // 0 輪郭・1 歯ぐき（濃い）・2 歯ぐき（明るい）・3 炎・光・4 歯の影・5 白
   // crunch は かみくだく の下向き・上向き（黒い歯ぐきと白いキバ。光も灰）
   const palette =
@@ -980,7 +980,7 @@ function fangFront(kind: 'fire' | 'dark' | 'crunch', slope = 0, alignInner = fal
       }
       // 下の歯ぐき（厚み 0.1・幅 0.5。遠いので小さい）と炎
       if (Math.abs(u - lowShift) < 0.5 && v >= loGum && v <= loGum + 0.1) return cut(v > loGum + 0.05 ? 1 : 2);
-      if (kind === 'fire' && Math.abs(u) < 0.5) {
+      if (kind === 'fire' && Math.abs(u - lowShift) < 0.5) {
         const h = 0.08 + Math.max(0, Math.sin(u * 15 + f * 2.7 + 1)) * 0.1;
         if (v > loGum + 0.1 && v <= loGum + 0.1 + h) return cut(v > loGum + 0.1 + h * 0.5 ? 3 : 2);
       }
@@ -988,6 +988,22 @@ function fangFront(kind: 'fire' | 'dark' | 'crunch', slope = 0, alignInner = fal
     }),
   );
   return { palette, frameMs: 45, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/** 斜めの傾き（30度）。歯ぐきは向きに直角: 斜め前（右下）は右ほど上がり、斜め後ろ（右上）は右ほど下がる */
+const FANG_TILT = Math.tan((30 * Math.PI) / 180);
+
+/**
+ * かみつく・ほのおのキバ（作者の指摘 2026年10月28日: かみくだく の斜めを使う）: 横・下向き・上向きは正面の口のまま。
+ * 斜めは正面の口を縦にずらして歯ぐきを向きに直角にし、下の列はプレイヤーの側（左）にそろえる（左向きは左右を返す）
+ */
+function fangFront(kind: 'fire' | 'dark'): SpriteOut {
+  const face = fangFace(kind);
+  const main = face.parts.main!;
+  return {
+    ...face,
+    parts: { main, front: main, back: main, diag: fangFace(kind, -FANG_TILT, true).parts.main!, diagBack: fangFace(kind, FANG_TILT, true).parts.main! },
+  };
 }
 
 /**
@@ -1077,12 +1093,11 @@ function darkJaws(): SpriteOut {
     const empty = '.'.repeat(r[0]!.length + 4);
     return [empty, empty, ...r.map((row) => `..${row}..`), empty, empty];
   };
-  const face = (slope: number): string[][] => fangFront('crunch', slope, slope !== 0).parts.main!.map(pad);
+  const face = (slope: number): string[][] => fangFace('crunch', slope, slope !== 0).parts.main!.map(pad);
   const front = face(0);
-  // 歯ぐきは向きに直角（作者の指摘 2026年10月28日）: 斜め前（右下）は右ほど上がり、斜め後ろ（右上）は右ほど下がる。
-  // どちらも下の列は左（プレイヤーの側）にそろえ、左向きは左右を返す（左上は右上の、左下は右下の左右を返した絵で、下の列が右にそろう）
-  const tilt = Math.tan((30 * Math.PI) / 180);
-  return { palette, frameMs: 45, parts: { main: rows(side()), front, back: front, diag: face(-tilt), diagBack: face(tilt) } };
+  // 歯ぐきは向きに直角（作者の指摘 2026年10月28日。FANG_TILT）。どちらも下の列は左（プレイヤーの側）にそろえ、左向きは左右を返す
+  // （左上は右上の、左下は右下の左右を返した絵で、下の列が右にそろう）
+  return { palette, frameMs: 45, parts: { main: rows(side()), front, back: front, diag: face(-FANG_TILT), diagBack: face(FANG_TILT) } };
 }
 
 /** フレアドライブ: 右へ突っ込む炎の弧（三日月形の炎。コマで炎の先がゆらめく） */

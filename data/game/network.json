@@ -7,8 +7,8 @@
   "p2pTimeoutMs": 10000,
   "p2p": {
     "playerStateIntervalTicks": 1,
-    "correctionIntervalTicks": 10,
-    "batchTicks": 2
+    "correctionIntervalTicks": 30,
+    "batchTicks": 3
   },
   "relay": {
     "playerStateIntervalTicks": 3,

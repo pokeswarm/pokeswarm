@@ -115,6 +115,16 @@
       "volume": 0.7,
       "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
       "score": "johto-legendary-sky"
+    },
+    "hoenn-route": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-route"
+    },
+    "hoenn-rain-route": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-rain-route"
     }
   },
   "scenes": {

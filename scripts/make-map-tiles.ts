@@ -3,7 +3,8 @@
  * 端は左右・上下でつながるように描く（模様は座標を 128 で折り返して置く。むらは周期のあるノイズ）。
  * 乱数はシード付きなので、何度実行しても同じ絵になる。
  *
- *   node scripts/make-map-tiles.ts johto [タイル ID ...]
+ *   node scripts/make-map-tiles.ts <地方（johto・hoenn。省くと johto）> [タイル ID ...]
+ *   npm run map-tiles -- hoenn
  *
  * 出力: public/map/<地方>/<タイル ID>.png（ゲームで使う）・assets/map/<地方>/preview/<タイル ID>.png（3×3 に並べた継ぎ目の確認用）
  */
@@ -128,7 +129,9 @@ function rock(c: Canvas, rand: () => number, x: number, y: number, col: { l: Rgb
   c.stamp(x, y, rand() < 0.5 ? ['.ll.', 'lmmd', 'mmdd', '.kk.'] : ['lm.', 'mdd', '.k.'], col);
 }
 
-const TILES: Record<string, { seed: number; draw: (c: Canvas, rand: () => number) => void; fill: Rgb }> = {
+type TileDef = { seed: number; draw: (c: Canvas, rand: () => number) => void; fill: Rgb };
+
+const JOHTO: Record<string, TileDef> = {
   // 区間0: 明るい黄緑の草原。草の芽・白と黄の小花・土の点
   meadow: {
     seed: 2901,
@@ -427,6 +430,73 @@ const TILES: Record<string, { seed: number; draw: (c: Canvas, rand: () => number
   },
 };
 
+// ホウエン（13_hoenn_story_chart.md 4章）。南の島の地方なので、ジョウトより明るく彩度を高くする
+const HOENN: Record<string, TileDef> = {
+  // 区間0: 明るい南国の草原。白っぽい砂の小道の斑点・赤と黄の花・濃い草の芽
+  route: {
+    seed: 30001,
+    fill: hex('4fb648'),
+    draw(c, rand) {
+      const n = layeredNoise(rand, 4);
+      const sand = layeredNoise(rand, 8);
+      base(c, rand, n, [[0, hex('48ac42')], [0.36, hex('4fb648')], [0.64, hex('58bf4e')]], { pct: 0.12, light: hex('66ca58'), dark: hex('3f9e3c') });
+      const taken: { x: number; y: number }[] = [];
+      const G = { d: hex('2e8030'), m: hex('38903a'), l: hex('8ade66') };
+      for (const p of scatter(rand, 110, 6, taken)) {
+        const tuft = rand() < 0.5 ? ['l...l', 'd.l.d', '.d.d.', '..m..'] : ['.l.l', 'd.d.', '.dm.'];
+        c.stamp(p.x, p.y, tuft, G);
+      }
+      // 砂の斑点: ノイズの高い所を白っぽい砂に。ふちは草と混ざる粒で崩す
+      for (let y = 0; y < TILE; y++) for (let x = 0; x < TILE; x++) {
+        const s = sand(x, y);
+        if (s > 0.68) c.set(x, y, rand() < 0.08 ? hex('d6c48a') : rand() < 0.06 ? hex('fbf4d8') : hex('e8dcaa'));
+        else if (s > 0.64 && rand() < 0.45) c.set(x, y, rand() < 0.5 ? hex('c8c486') : hex('e8dcaa'));
+      }
+      // 赤い花（黄色の芯）と、黄色の小花
+      const F = { r: hex('e8403a'), p: hex('ff8a7a'), y: hex('ffd84a'), s: hex('2e8030') };
+      for (const p of scatter(rand, 16, 10, taken)) c.stamp(p.x, p.y, ['.p.', 'ryr', '.r.', '.s.'], F);
+      for (const p of scatter(rand, 18, 8, taken)) c.stamp(p.x, p.y, rand() < 0.5 ? ['y.', '.y'] : ['.y.', 'yyy'], F);
+      for (const p of scatter(rand, 80, 3, taken)) c.stamp(p.x, p.y, rand() < 0.5 ? ['l', 'd'] : ['.l', 'd.'], G);
+    },
+  },
+  // 区間3b: 赤茶の火山岩。黒い溶岩の固まり・細く赤く光る割れ目・軽石の粒
+  volcano: {
+    seed: 33002,
+    fill: hex('7a4636'),
+    draw(c, rand) {
+      const n = layeredNoise(rand, 4);
+      const basalt = layeredNoise(rand, 8);
+      base(c, rand, n, [[0, hex('5e3328')], [0.36, hex('683a2e')], [0.64, hex('724234')]], { pct: 0.1, light: hex('82503e'), dark: hex('502b22') });
+      // 黒い溶岩が固まった所（ノイズの高い所。ふちは粒で崩す）
+      for (let y = 0; y < TILE; y++) for (let x = 0; x < TILE; x++) {
+        const b = basalt(x, y);
+        if (b > 0.68) c.set(x, y, rand() < 0.22 ? hex('4a3a36') : rand() < 0.1 ? hex('241c1c') : hex('342828'));
+        else if (b > 0.64 && rand() < 0.4) c.set(x, y, hex('3e2c26'));
+      }
+      // 光る割れ目: 暗いふちの中に赤、ところどころ橙
+      for (let i = 0; i < 12; i++) {
+        let x = rand() * TILE, y = rand() * TILE, dir = rand() * Math.PI * 2;
+        const len = 14 + Math.floor(rand() * 18);
+        for (let s = 0; s < len; s++) {
+          c.set(x, y - 1, hex('3a1e18'));
+          c.set(x, y + 1, hex('3a1e18'));
+          c.set(x, y, rand() < 0.25 ? hex('ffa838') : hex('e8462a'));
+          dir += (rand() - 0.5) * 0.8;
+          x += Math.cos(dir); y += Math.sin(dir);
+        }
+      }
+      const taken: { x: number; y: number }[] = [];
+      const R = { l: hex('a86a52'), m: hex('84503e'), d: hex('5a3028'), k: hex('2c1a16') };
+      for (const p of scatter(rand, 16, 10, taken)) rock(c, rand, p.x, p.y, R);
+      // 軽石と炭の粒
+      const S = { a: hex('b88a72'), k: hex('2c1a16'), o: hex('ff8a30') };
+      for (const p of scatter(rand, 46, 4, taken)) c.stamp(p.x, p.y, rand() < 0.1 ? ['o'] : rand() < 0.5 ? ['a', 'k'] : ['k'], S);
+    },
+  },
+};
+
+const REGION_TILES: Record<string, Record<string, TileDef>> = { johto: JOHTO, hoenn: HOENN };
+
 function toPng(px: readonly Rgb[], w: number, h: number): Buffer {
   const png = new PNG({ width: w, height: h });
   px.forEach((p, i) => {
@@ -439,6 +509,8 @@ function toPng(px: readonly Rgb[], w: number, h: number): Buffer {
 }
 
 const region = process.argv[2] ?? 'johto';
+const TILES = REGION_TILES[region];
+if (!TILES) throw new Error(`地方 ${region} のタイルがありません`);
 const ids = process.argv.slice(3).length ? process.argv.slice(3) : Object.keys(TILES);
 const outDir = path.join('public', 'map', region);
 const previewDir = path.join('assets', 'map', region, 'preview');

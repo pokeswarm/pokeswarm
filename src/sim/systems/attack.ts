@@ -14,6 +14,7 @@ import {
   MOTION_SNAKE,
   SHAPE_CIRCLE,
   SHAPE_LINE,
+  SHAPE_BOX,
   SHAPE_SECTOR,
   snakeOffset,
   type ProjectileSpawn,
@@ -535,6 +536,13 @@ function fireMelee(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   const [fx, fy] = axisToUnit(p.facingX, p.facingY);
   const body = world.rules.moves[pm.move]!.body;
   if (body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: fx, dirY: fy, distance: body.lungeDistance, afterimages: body.afterimages });
+  const box = world.rules.moves[pm.move]!.frontBox;
+  if (box) {
+    // キバの技: 自分の前の長方形（奥行き range + size、横幅はその box 倍）。体当たりの技は扇形のまま
+    const reach = st.range + scaledMoveStats(world, p, pm, st).size;
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: reach, shape: SHAPE_BOX, length: (reach * box) / 2, dirX: fx, dirY: fy, vx: fx, vy: fy });
+    return;
+  }
   if (st.arcDegrees > 0) {
     // 扇形: 自分を中心に、向いている方向へ（360 度なら自分の周り全部。数が2以上なら反対側にも）
     const sc = scaledMoveStats(world, p, pm, st);
@@ -1125,6 +1133,13 @@ function inSector(dx: number, dy: number, r: number, fx: number, fy: number, hal
   return angle <= half + Math.asin(Math.min(1, r / d));
 }
 
+/** 根元から (dx, dy) にある半径 r の敵が、向き (fx, fy)・奥行き depth・片側の幅 half の前方の長方形に重なるか（キバの技） */
+export function inBox(dx: number, dy: number, r: number, fx: number, fy: number, depth: number, half: number): boolean {
+  const along = dx * fx + dy * fy;
+  const side = Math.abs(dx * -fy + dy * fx);
+  return along >= -r && along <= depth + r && side <= half + r;
+}
+
 /** 点 (px, py) と、始点 (x, y)・向き (dx, dy)・長さ len の線分との距離の2乗 */
 function segmentDistance2(px: number, py: number, x: number, y: number, dx: number, dy: number, len: number): number {
   const t = Math.max(0, Math.min(len, (px - x) * dx + (py - y) * dy));
@@ -1276,7 +1291,9 @@ export function moveProjectiles(world: World): void {
     const x = pr.x[i]!;
     const y = pr.y[i]!;
     const line = pr.shape[i] === SHAPE_LINE;
-    const reach = pr.radius[i]! + maxEnemyRadius;
+    // 長方形は、根元から一番遠い角まで
+    const box = pr.shape[i] === SHAPE_BOX;
+    const reach = (box ? Math.hypot(pr.radius[i]!, pr.length[i]!) : pr.radius[i]!) + maxEnemyRadius;
     const len = line ? pr.length[i]! : 0;
     const ex = x + pr.dirX[i]! * len;
     const ey = y + pr.dirY[i]! * len;
@@ -1289,12 +1306,15 @@ export function moveProjectiles(world: World): void {
       const r = pr.radius[i]! + e.radius[j]!;
       const d2 = line
         ? segmentDistance2(e.x[j]!, e.y[j]!, x, y, pr.dirX[i]!, pr.dirY[i]!, len)
-        : (e.x[j]! - x) * (e.x[j]! - x) + (e.y[j]! - y) * (e.y[j]! - y);
+        : box
+          ? 0
+          : (e.x[j]! - x) * (e.x[j]! - x) + (e.y[j]! - y) * (e.y[j]! - y);
       if (d2 > r * r) continue;
       // 外へ進む帯: 帯より内側にいる敵には当たらない（もう通り過ぎた）
       const inner = pr.band[i]! > 0 ? pr.radius[i]! - pr.band[i]! - e.radius[j]! : 0;
       if (inner > 0 && d2 < inner * inner) continue;
       if (pr.shape[i] === SHAPE_SECTOR && !inSector(e.x[j]! - x, e.y[j]! - y, e.radius[j]!, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!)) continue;
+      if (pr.shape[i] === SHAPE_BOX && !inBox(e.x[j]! - x, e.y[j]! - y, e.radius[j]!, pr.dirX[i]!, pr.dirY[i]!, pr.radius[i]!, pr.length[i]!)) continue;
       hitScratch[hits++] = j;
     }
     if (hits === 0) continue;
@@ -1426,11 +1446,12 @@ function hitLocalPlayer(world: World, i: number): void {
   const y = pr.y[i]!;
   const r = pr.radius[i]! + me.radius;
   const line = pr.shape[i] === SHAPE_LINE;
-  const d2 = line ? segmentDistance2(me.x, me.y, x, y, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!) : (me.x - x) ** 2 + (me.y - y) ** 2;
+  const d2 = line ? segmentDistance2(me.x, me.y, x, y, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!) : pr.shape[i] === SHAPE_BOX ? 0 : (me.x - x) ** 2 + (me.y - y) ** 2;
   if (d2 > r * r) return;
   const inner = pr.band[i]! > 0 ? pr.radius[i]! - pr.band[i]! - me.radius : 0;
   if (inner > 0 && d2 < inner * inner) return;
   if (pr.shape[i] === SHAPE_SECTOR && !inSector(me.x - x, me.y - y, me.radius, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!)) return;
+  if (pr.shape[i] === SHAPE_BOX && !inBox(me.x - x, me.y - y, me.radius, pr.dirX[i]!, pr.dirY[i]!, pr.radius[i]!, pr.length[i]!)) return;
   pr.recordHit(i, key, world.tick);
   hurtPlayer(world, me, hazardDamage(world, pr.damage[i]!));
 }

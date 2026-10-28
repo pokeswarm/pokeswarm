@@ -14,6 +14,8 @@ interface HitShape {
   sector: boolean;
   /** 外へ進む攻撃の帯の厚さ（0 なら無し）。あれば、その帯だけを描く（当たり判定と同じ） */
   band: number;
+  /** 前方の長方形（キバの技）の片側の幅。null なら長方形ではない（奥行きは radius） */
+  box: number | null;
 }
 
 /**
@@ -61,7 +63,7 @@ export class HitShapes {
     colorOf: (index: number) => { color: number; alpha: number } | null,
     lineOf: (index: number) => { length: number; dirX: number; dirY: number } | null,
     view: { left: number; top: number; right: number; bottom: number },
-    sectorOf: (index: number) => { dirX: number; dirY: number; half: number } | null = () => null,
+    sectorOf: (index: number) => { dirX: number; dirY: number; half: number; box?: number } | null = () => null,
     bandOf: (index: number) => number = () => 0,
   ): void {
     const g = this.g;
@@ -80,10 +82,11 @@ export class HitShapes {
         length: line?.length ?? 0,
         dirX: sector?.dirX ?? line?.dirX ?? 1,
         dirY: sector?.dirY ?? line?.dirY ?? 0,
-        half: sector && sector.half < Math.PI ? sector.half : null,
+        half: sector && sector.box === undefined && sector.half < Math.PI ? sector.half : null,
         // 細い扇形（細長い炎）は帯にせず全体を塗る
-        sector: sector !== null && !(sector.half * 2 < (this.cfg.sectorFullBelowDegrees * Math.PI) / 180),
+        sector: sector !== null && sector.box === undefined && !(sector.half * 2 < (this.cfg.sectorFullBelowDegrees * Math.PI) / 180),
         band: bandOf(i),
+        box: sector?.box ?? null,
       };
       const reach = s.radius + s.length;
       if (x + reach < view.left || x - reach > view.right || y + reach < view.top || y - reach > view.bottom) continue;
@@ -98,6 +101,19 @@ export class HitShapes {
     const g = this.g;
     const base = Math.atan2(s.dirY, s.dirX);
     g.beginPath();
+    if (s.box !== null) {
+      // 前方の長方形: 根元の辺 → 先の辺
+      const nx = -s.dirY * s.box;
+      const ny = s.dirX * s.box;
+      const ex = s.x + s.dirX * s.radius;
+      const ey = s.y + s.dirY * s.radius;
+      g.moveTo(s.x + nx, s.y + ny);
+      g.lineTo(ex + nx, ey + ny);
+      g.lineTo(ex - nx, ey - ny);
+      g.lineTo(s.x - nx, s.y - ny);
+      g.closePath();
+      return;
+    }
     if (s.sector || (s.band > 0 && s.length <= 0)) {
       // 近接の扇形は、弧の近くの帯（バームクーヘン型）だけ。当たり判定は扇形全体のまま（作者の指摘: 扇形の塗りが目にうるさい）
       const inner = s.band > 0 ? Math.max(0, s.radius - s.band) : s.radius * (1 - this.cfg.sectorBand);

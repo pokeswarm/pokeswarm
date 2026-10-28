@@ -383,7 +383,7 @@
       "sprite": {
         "id": "fang-front-fire",
         "fit": "front",
-        "size": 1.25,
+        "size": 1,
         "directional": true
       }
     },
@@ -3273,7 +3273,7 @@
       "sprite": {
         "id": "fang-front-dark",
         "fit": "front",
-        "size": 1.25,
+        "size": 1,
         "directional": true
       }
     },

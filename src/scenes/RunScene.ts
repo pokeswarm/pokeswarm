@@ -32,7 +32,7 @@ import { SpriteStreamer } from '../render/sprites/SpriteStreamer';
 import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
 import { addSpriteGallery } from '../render/sprites/SpriteGallery';
 import type { Axis, InputCommand, PlayerId } from '../sim/commands';
-import { SHAPE_CIRCLE, SHAPE_LINE, SHAPE_SECTOR } from '../sim/entities/projectiles';
+import { SHAPE_BOX, SHAPE_CIRCLE, SHAPE_LINE, SHAPE_SECTOR } from '../sim/entities/projectiles';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World } from '../sim/world';
@@ -1873,7 +1873,12 @@ export class RunScene extends Phaser.Scene {
       (i) => this.shapeColorOf(pr, i, timeMs),
       (i) => (pr.shape[i] === SHAPE_LINE ? { length: pr.length[i]!, dirX: pr.dirX[i]!, dirY: pr.dirY[i]! } : null),
       view,
-      (i) => (pr.shape[i] === SHAPE_SECTOR ? { dirX: pr.dirX[i]!, dirY: pr.dirY[i]!, half: pr.length[i]! } : null),
+      (i) =>
+        pr.shape[i] === SHAPE_SECTOR
+          ? { dirX: pr.dirX[i]!, dirY: pr.dirY[i]!, half: pr.length[i]! }
+          : pr.shape[i] === SHAPE_BOX
+            ? { dirX: pr.dirX[i]!, dirY: pr.dirY[i]!, half: 0, box: pr.length[i]! }
+            : null,
       (i) => pr.band[i]!,
     );
 

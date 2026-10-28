@@ -151,6 +151,16 @@ describe('作者の感想で見直した技（2026年10月25日）', () => {
     for (let i = 0; i < pr.count; i++) expect(pr.stage[i]).toBe(0);
   });
 
+  it('キバの技（frontBox）: 前方の長方形の角には当たり、後ろと横の外には当たらない', () => {
+    // 奥行き 100（range 0 + size 100）、横幅 120（片側 60）。右を向いている
+    const sim = setup('melee', { range: 0, size: 100, durationSeconds: 0.2 }, [[95, 55], [-40, 0], [50, 90]], { frontBox: 1.2 });
+    sim.step([]);
+    const [corner, behind, outside] = damage(sim, 3);
+    expect(corner).toBeGreaterThan(0);
+    expect(behind).toBe(0);
+    expect(outside).toBe(0);
+  });
+
   it('ほうでん（chainRadial）: 跳ばずに、自分からまわりの別々の敵へまっすぐ出す', () => {
     const sim = setup('chain', { range: 200, size: 6, count: 3, durationSeconds: 0.2 }, [[100, 0], [-100, 0], [0, 100], [0, -100], [500, 0]], { chainRadial: true });
     sim.step([]);

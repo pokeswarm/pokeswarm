@@ -102,6 +102,8 @@ export interface SimMoveDef {
   readonly perishHits?: number;
   /** 扇: 数が1増えるごとに扇を広げる度数（本数は増やさない） */
   readonly countWidens?: number;
+  /** melee を前方の長方形にする（キバの技）。奥行きに対する横幅の割合 */
+  readonly frontBox?: number;
   /** 扇: 出ている間、向いている方向を追う速さ（度/秒） */
   readonly followFacing?: number;
   /** 射程の強化の効き方の倍率（ねんりき 0.5） */

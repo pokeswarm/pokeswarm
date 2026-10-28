@@ -48,6 +48,8 @@ export const SHAPE_CIRCLE = 0;
 export const SHAPE_LINE = 1;
 /** 扇形（中心 x, y から向き dir に半径 radius、開き length（片側の角度・ラジアン）。π 以上で円全体） */
 export const SHAPE_SECTOR = 2;
+/** 前方の長方形（x, y から向き dir に奥行き radius、片側の幅 length。キバの技。作者の依頼 2026年10月28日） */
+export const SHAPE_BOX = 3;
 
 export interface ProjectileSpawn {
   owner: PlayerId;

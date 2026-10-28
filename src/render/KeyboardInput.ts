@@ -9,16 +9,20 @@ export class KeyboardInput {
     const kb = scene.input.keyboard;
     if (!kb) throw new Error('キーボード入力が使えません');
     const K = Phaser.Input.Keyboard.KeyCodes;
-    this.keys = kb.addKeys({
-      up: K.UP,
-      down: K.DOWN,
-      left: K.LEFT,
-      right: K.RIGHT,
-      w: K.W,
-      a: K.A,
-      s: K.S,
-      d: K.D,
-    }) as KeyboardInput['keys'];
+    // キーを横取り（capture）しない: 横取りはゲーム全体に残り、ランの後のフレンドの名前の入力などで w・a・s・d が打てなくなった（作者の報告 2026年10月29日）
+    this.keys = kb.addKeys(
+      {
+        up: K.UP,
+        down: K.DOWN,
+        left: K.LEFT,
+        right: K.RIGHT,
+        w: K.W,
+        a: K.A,
+        s: K.S,
+        d: K.D,
+      },
+      false,
+    ) as KeyboardInput['keys'];
   }
 
   read(): { dx: Axis; dy: Axis } {

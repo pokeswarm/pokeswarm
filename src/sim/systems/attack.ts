@@ -62,9 +62,12 @@ export function playerMoveStats(world: World, p: Player, pm: { move: number; lev
   const areaPct = m.areaPct + (m.typeAreaPct[def.type] ?? 0);
   if (m.amountBonus === 0 && m.durationPct === 0 && m.rangePct === 0 && m.pierceBonus === 0 && !(selfRadius && areaPct !== 0)) return st;
   const rangePct = selfRadius ? areaPct : m.rangePct * (def.rangeBonusScale ?? 1);
+  // 太い追従レーザー: 本数は増やさず、増えた分を威力に変える（元の本数 n に +k なら ×(n+k)/n）
+  const toPower = def.bonusCountToPower && st.count > 0 && m.amountBonus !== 0;
   return {
     ...st,
-    count: st.count + m.amountBonus,
+    count: toPower ? st.count : st.count + m.amountBonus,
+    ...(toPower ? { power: (st.power * Math.max(1, st.count + m.amountBonus)) / st.count } : {}),
     durationSeconds: st.durationSeconds * Math.max(0.1, 1 + m.durationPct / 100),
     range: st.range * Math.max(0.1, 1 + rangePct / 100),
     pierce: st.pierce + m.pierceBonus,
@@ -80,7 +83,7 @@ const SELF_RADIUS_PATTERNS = new Set(['nova', 'pulse', 'spin', 'screen', 'erupti
  */
 function markBonusShots(world: World, p: Player, pm: PlayerMove, st: MoveStats, from: number): void {
   const bonus = p.mods.amountBonus;
-  if (bonus <= 0 || st.count <= 0 || world.rules.moves[pm.move]!.effects.length === 0) return;
+  if (bonus <= 0 || st.count <= 0 || world.rules.moves[pm.move]!.effects.length === 0 || world.rules.moves[pm.move]!.bonusCountToPower) return;
   const pr = world.projectiles;
   const added = pr.count - from;
   const keep = Math.floor((added * Math.max(0, st.count - bonus)) / st.count);

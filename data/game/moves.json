@@ -999,7 +999,8 @@
           "hitIntervalSeconds": -0.03,
           "power": 1.4
         }
-      ]
+      ],
+      "bonusCountToPower": true
     },
     "petal-dance": {
       "pattern": "spiral",
@@ -1385,7 +1386,8 @@
             "hitIntervalSeconds": 0.5
           }
         }
-      ]
+      ],
+      "bonusCountToPower": true
     },
     "thunder-shock": {
       "pattern": "chain",
@@ -3625,7 +3627,8 @@
           "durationSeconds": 0.4,
           "power": -5.4
         }
-      ]
+      ],
+      "bonusCountToPower": true
     },
     "psystrike": {
       "pattern": "screen",
@@ -5628,7 +5631,8 @@
           "hitIntervalSeconds": -0.03,
           "power": -2
         }
-      ]
+      ],
+      "bonusCountToPower": true
     },
     "bite": {
       "pattern": "melee",

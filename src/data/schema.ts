@@ -1234,6 +1234,11 @@ export const playablesConfigSchema = z.object({
       /** この姿に進化したら覚える技（技が埋まっていれば覚えない。ピィ: ピッピで ゆびをふる、ピクシーで つきのひかり。07 の57章） */
       formMoves: z.array(z.object({ form: z.string(), move: z.string() })).default([]),
       /**
+       * この姿に進化したとき、from の技（先にあるものを優先して1つ）を持っていれば to の技に変える（強化の段階は受け継ぐ。元の技はもう候補に出ない）。
+       * イーブイ: シャワーズで たいあたり → だくりゅう など（07 の103章）
+       */
+      formTransforms: z.array(z.object({ form: z.string(), from: z.array(z.string()).min(1), to: z.string() })).default([]),
+      /**
        * この姿に進化したら、その遊べるポケモンの系統になる（固有技・持ち物・技を覚えない などの決まりを引き継ぎ、最初の技を覚えていなければ覚える）。
        * ピチュー → ピカチュウ、ププリン → プリン（07 の66.4「進化した後の技は、カントーの同じポケモンと同じ決まり」）
        */
@@ -1426,6 +1431,8 @@ const particleSchema = z.object({
   /** 出現位置のばらつき（半径） */
   spread: z.number().nonnegative(),
   blend: blendMode,
+  /** 中が空いた輪の縁から出すとき、外向きに飛ばす（だくりゅう・ふんえん: 泥水・炎が外へ押し出される） */
+  outward: z.boolean().optional(),
 });
 
 export type EffectParticle = z.infer<typeof particleSchema>;

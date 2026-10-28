@@ -62,6 +62,7 @@ const STATUS: Record<string, string> = {
   sleep: 'ねむり',
   flinch: 'ひるみ',
   leech: 'やどりぎ',
+  soaked: 'みずびたし',
 };
 const TYPE_ORDER = ['normal', 'fire', 'water', 'grass', 'electric', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
 

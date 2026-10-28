@@ -27,7 +27,7 @@
     "jigglypuff": { "sprite": "jigglypuff", "startingMoves": ["pound", "sing"], "types": ["normal"], "fixedMoves": true },
     "slowpoke": { "sprite": "slowpoke", "startingMoves": ["slack-off"] },
     "snorlax": { "sprite": "snorlax", "startingMoves": ["tackle", "rest"], "fixedMoves": true },
-    "eevee": { "sprite": "eevee", "startingMoves": ["tackle"], "formMoves": [{ "form": "espeon", "move": "psychic" }, { "form": "espeon", "move": "morning-sun" }, { "form": "umbreon", "move": "snarl" }, { "form": "umbreon", "move": "moonlight" }] },
+    "eevee": { "sprite": "eevee", "startingMoves": ["tackle"], "formMoves": [{ "form": "espeon", "move": "psychic" }, { "form": "umbreon", "move": "snarl" }], "formTransforms": [{ "form": "vaporeon", "from": ["tackle"], "to": "muddy-water" }, { "form": "flareon", "from": ["tackle"], "to": "lava-plume" }, { "form": "jolteon", "from": ["tackle"], "to": "agility" }, { "form": "espeon", "from": ["tackle", "body-slam"], "to": "morning-sun" }, { "form": "umbreon", "from": ["tackle", "body-slam"], "to": "moonlight" }] },
     "doduo": { "sprite": "doduo", "startingMoves": ["swift"] },
     "meowth": { "sprite": "meowth", "startingMoves": ["pay-day"], "evolves": false, "moveTypes": ["water", "electric"] },
     "mareep": { "sprite": "mareep", "startingMoves": ["thunder-wave"] },

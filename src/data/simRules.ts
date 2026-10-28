@@ -190,6 +190,7 @@ export function buildSimRules(region?: string): SimRules {
       moveTypes: pl.allMoveTypes ? types.names.map((_, i) => i) : (pl.moveTypes ?? []).map(typeIndex),
       startingMoves: pl.startingMoves.map(moveIndex),
       formMoves: pl.formMoves.map((f) => ({ form: formIndex(f.form), move: moveIndex(f.move) })),
+      formTransforms: pl.formTransforms.map((f) => ({ form: formIndex(f.form), from: f.from.map(moveIndex), to: moveIndex(f.to) })),
       becomes: pl.becomes.map((b) => ({ form: formIndex(b.form), line: b.line })),
       fixedForms: pl.fixedForms.map(formIndex),
       excludeMoveTypes: pl.excludeMoveTypes.map(typeIndex),

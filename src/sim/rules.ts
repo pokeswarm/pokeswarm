@@ -18,6 +18,8 @@ export interface SimLineRule {
   readonly moveTypes: readonly number[];
   readonly startingMoves: readonly number[];
   readonly formMoves: readonly { readonly form: number; readonly move: number }[];
+  /** この姿に進化したら、from の技（先にあるものを優先）を to に変える（イーブイ。07 の103章） */
+  readonly formTransforms: readonly { readonly form: number; readonly from: readonly number[]; readonly to: number }[];
   readonly becomes: readonly { readonly form: number; readonly line: string }[];
   readonly fixedForms: readonly number[];
   /** 新しく覚えないタイプ（ズバット: どく） */

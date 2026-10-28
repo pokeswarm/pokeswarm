@@ -11,6 +11,18 @@
     "type": "flying",
     "damageClass": "special"
   },
+  "agility": {
+    "names": {
+      "ja": "こうそくいどう",
+      "en": "Agility",
+      "fr": "Hâte",
+      "de": "Agilität",
+      "es": "Agilidad",
+      "it": "Agilità"
+    },
+    "type": "psychic",
+    "damageClass": "status"
+  },
   "air-slash": {
     "names": {
       "ja": "エアスラッシュ",
@@ -779,6 +791,18 @@
     "type": "normal",
     "damageClass": "physical"
   },
+  "lava-plume": {
+    "names": {
+      "ja": "ふんえん",
+      "en": "Lava Plume",
+      "fr": "Ébullilave",
+      "de": "Flammensturm",
+      "es": "Humareda",
+      "it": "Lavasbuffo"
+    },
+    "type": "fire",
+    "damageClass": "special"
+  },
   "leaf-storm": {
     "names": {
       "ja": "リーフストーム",
@@ -898,6 +922,18 @@
     },
     "type": "normal",
     "damageClass": "status"
+  },
+  "muddy-water": {
+    "names": {
+      "ja": "だくりゅう",
+      "en": "Muddy Water",
+      "fr": "Ocroupi",
+      "de": "Lehmbrühe",
+      "es": "Agua Lodosa",
+      "it": "Fanghiglia"
+    },
+    "type": "water",
+    "damageClass": "special"
   },
   "night-shade": {
     "names": {

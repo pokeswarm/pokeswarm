@@ -85,6 +85,17 @@ function applyForm(world: World, p: Player): void {
     if (to.types) p.types = [...to.types];
     for (const m of to.startingMoves) learn(m);
   }
+  // 進化で技が変わる（イーブイ: シャワーズで たいあたり → だくりゅう など）。強化の段階は受け継ぎ、元の技はもう候補に出さない
+  for (const f of lines[p.line]?.formTransforms ?? []) {
+    if (f.form !== p.species || f.to < 0 || p.moves.some((m) => m.move === f.to)) continue;
+    const from = f.from.find((m) => p.moves.some((x) => x.move === m));
+    const slot = from === undefined ? -1 : p.moves.findIndex((m) => m.move === from);
+    if (slot === -1) continue;
+    const level = Math.min(p.moves[slot]!.level, world.rules.moves[f.to]!.levels.length);
+    p.moves[slot] = { move: f.to, level, cooldown: 0, burstLeft: 0, burstTimer: 0 };
+    p.consumedMoves = [...(p.consumedMoves ?? []), from!];
+    world.events.push({ type: 'moveTaught', playerId: p.id, move: f.to });
+  }
   for (const f of lines[p.line]?.formMoves ?? []) if (f.form === p.species) learn(f.move);
 }
 

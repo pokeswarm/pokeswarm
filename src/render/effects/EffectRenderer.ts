@@ -349,7 +349,13 @@ export class EffectRenderer {
           // 中が空いた輪（とっておき・うたう）は、輪の縁から出す
           for (let k = 0; k < n * 4; k++) {
             const a = Math.random() * Math.PI * 2;
-            em.emitParticleAt(x + Math.cos(a) * r, y + Math.sin(a) * r, 1);
+            const pt = em.emitParticleAt(x + Math.cos(a) * r, y + Math.sin(a) * r, 1);
+            // 外へ押し出す（だくりゅう・ふんえん）
+            if (pt && trail.outward) {
+              const v = trail.speed[0] + Math.random() * (trail.speed[1] - trail.speed[0]);
+              pt.velocityX = Math.cos(a) * v;
+              pt.velocityY = Math.sin(a) * v;
+            }
           }
         } else if (line && line.length > 0) {
           // 線（通った道に残る範囲など）は、線のあちこちから出す。長いほど多く出す

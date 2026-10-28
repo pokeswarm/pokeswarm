@@ -132,7 +132,7 @@ describe('カントーにもいるポケモンの、ジョウトで進化した�
 });
 
 describe('イーブイの昼と夜の進化（07 の81章）', () => {
-  it('なつきが十分で、夜の区間ならブラッキー・昼ならエーフィに進化してよいか聞く。答えで進化し、技に空きがあれば覚える', () => {
+  it('なつきが十分で、夜の区間ならブラッキー・昼ならエーフィに進化してよいか聞く。答えで進化し、たいあたりは あさのひざし・つきのひかり に変わり、空きがあれば サイコキネシス・バークアウト を覚える（07 の103章）', () => {
     const s = setup('eevee');
     s.p.walked = 30000;
     s.w.section = 2;
@@ -142,14 +142,14 @@ describe('イーブイの昼と夜の進化（07 の81章）', () => {
     expect(s.w.events.some((e) => e.type === 'evolveAsk')).toBe(true);
     answerEvolution(s.w, s.p, true);
     expect(s.p.species).toBe(s.species('umbreon'));
-    expect(s.keys()).toEqual(['tackle', 'snarl', 'moonlight']);
+    expect(s.keys()).toEqual(['moonlight', 'snarl']);
 
     const d = setup('eevee');
     d.p.walked = 30000;
     checkEvolution(d.w, d.p);
     answerEvolution(d.w, d.p, true);
     expect(d.p.species).toBe(d.species('espeon'));
-    expect(d.keys()).toEqual(['tackle', 'psychic', 'morning-sun']);
+    expect(d.keys()).toEqual(['morning-sun', 'psychic']);
   });
 
   it('キャンセルすると、その区間の間は聞かない。次の区間でまた聞く', () => {

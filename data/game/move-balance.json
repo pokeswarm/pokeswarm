@@ -24,6 +24,7 @@
     "amnesia",
     "mimic",
     "sharpen",
+    "agility",
     "conversion",
     "powder-snow",
     "blizzard",
@@ -55,6 +56,8 @@
     "bullet-punch": "derived",
     "rollout": "unique",
     "twister": "derived",
-    "sandstorm": "derived"
+    "sandstorm": "derived",
+    "muddy-water": "unique",
+    "lava-plume": "unique"
   }
 }

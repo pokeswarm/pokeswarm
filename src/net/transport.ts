@@ -13,5 +13,7 @@ export interface Transport {
   onClose: (() => void) | null;
   /** 送受信した量（文字数。ほぼバイト数） */
   readonly stats: { sentBytes: number; receivedBytes: number };
+  /** 送ったが、まだ相手へ出ていない量（バイト。直接接続の DataChannel にたまっている分。中継はまとめる前の分） */
+  buffered(): number;
   close(): void;
 }

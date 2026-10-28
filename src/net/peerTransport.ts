@@ -52,6 +52,10 @@ export class PeerTransport implements Transport {
     if (lossy.length) this.write(this.fast!, lossy);
   }
 
+  buffered(): number {
+    return this.channel.bufferedAmount + (this.fast?.bufferedAmount ?? 0);
+  }
+
   private write(channel: RTCDataChannel, messages: NetMessage[]): void {
     const text = encode(messages);
     this.stats.sentBytes += text.length;

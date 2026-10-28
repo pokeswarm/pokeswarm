@@ -42,6 +42,10 @@ export class RelayTransport implements Transport {
     this.buffer.push(...messages);
   }
 
+  buffered(): number {
+    return this.buffer.length === 0 ? 0 : encode(this.buffer).length;
+  }
+
   private flush(): void {
     if (this.buffer.length === 0) return;
     // 最新だけあればよいもの（自分の位置・敵の位置の補正）は最後の1つだけ残す

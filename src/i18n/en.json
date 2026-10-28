@@ -107,6 +107,7 @@
   "run.crash.saved": "Your progress up to that point was saved as a failed run ({coins} coins).",
   "run.crash.solo": "Solo",
   "run.crash.detail": "Just before it ended: {time} · section {section} · {enemies} enemies · {projectiles} attacks · {players} players · {transport} · images {texture}MB ({textures}) · {fps} fps · v{version}",
+  "run.crash.net": "Network: {buffered}KB waiting to be sent (most for one player: {maxBuffered}KB) · sent {sent}KB · received {received}KB",
   "run.crash.close": "Close",
   "run.gateTimeUp": "Couldn't beat {name}…",
   "run.fail": "Run failed...",

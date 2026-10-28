@@ -86,6 +86,7 @@
   "run.crash.saved": "Dein Fortschritt bis dahin wurde als verlorener Lauf gespeichert ({coins} Münzen).",
   "run.crash.solo": "Solo",
   "run.crash.detail": "Vor dem Ende: {time} · Abschnitt {section} · {enemies} Gegner · {projectiles} Attacken · {players} Spieler · {transport} · Bilder {texture} MB ({textures}) · {fps} FPS · v{version}",
+  "run.crash.net": "Netzwerk: {buffered} KB warten auf das Senden (am meisten für einen Spieler: {maxBuffered} KB) · gesendet {sent} KB · empfangen {received} KB",
   "run.crash.close": "Schließen",
   "run.gateTimeUp": "{name} war zu stark …",
   "run.fail": "Gescheitert...",

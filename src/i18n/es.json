@@ -86,6 +86,7 @@
   "run.crash.saved": "Tu progreso hasta ese momento se guardó como una derrota ({coins} monedas).",
   "run.crash.solo": "Solo",
   "run.crash.detail": "Antes de terminar: {time} · sección {section} · {enemies} enemigos · {projectiles} ataques · {players} jugadores · {transport} · imágenes {texture} MB ({textures}) · {fps} fps · v{version}",
+  "run.crash.net": "Red: {buffered} KB esperando a enviarse (lo más para un jugador: {maxBuffered} KB) · enviado {sent} KB · recibido {received} KB",
   "run.crash.close": "Cerrar",
   "run.gateTimeUp": "No pudiste vencer a {name}…",
   "run.fail": "Partida perdida...",

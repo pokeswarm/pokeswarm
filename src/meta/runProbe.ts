@@ -18,6 +18,11 @@ export interface RunProbe {
   /** 協力プレイの人数と、つながり方（直接・中継。ソロは null） */
   players: number;
   transport: 'p2p' | 'relay' | null;
+  /** 協力プレイ: 送ったがまだ相手へ出ていない量（KB。全員の分の合計・一番多い人）と、ここまでの送受信の量（KB）。ソロは 0 */
+  bufferedKB: number;
+  maxBufferedKB: number;
+  sentKB: number;
+  receivedKB: number;
   /** 読み込んでいる絵の量（MB）と枚数 */
   textureMB: number;
   textures: number;

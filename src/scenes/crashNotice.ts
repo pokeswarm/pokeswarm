@@ -34,6 +34,9 @@ export function showCrashNotice(probe: RunProbe, coins: number | null): void {
       version: probe.version,
     }) + (probe.heapMB !== null ? ` ・ JS ${probe.heapMB}MB` : ''),
   );
+  // 協力プレイ: 送りきれずにたまっている量と、送受信の量（07 の113章。前の版の記録には無い）
+  if (probe.transport && probe.bufferedKB !== undefined)
+    line(t('run.crash.net', { buffered: probe.bufferedKB, maxBuffered: probe.maxBufferedKB, sent: probe.sentKB, received: probe.receivedKB }));
   const close = document.createElement('button');
   close.style.cssText = `${windowCss('light')};min-height:40px;padding:4px 14px;cursor:pointer;font:inherit;font-size:14px;align-self:flex-end`;
   close.textContent = t('run.crash.close');

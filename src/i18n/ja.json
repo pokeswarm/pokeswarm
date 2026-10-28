@@ -107,6 +107,7 @@
   "run.crash.saved": "そこまでの記録は失敗として保存しました（コイン {coins}）。",
   "run.crash.solo": "ソロ",
   "run.crash.detail": "終わる直前: {time}・区間 {section}・敵 {enemies} 体・技 {projectiles}・{players}人・{transport}・絵 {texture}MB（{textures} 枚）・{fps} fps・版 {version}",
+  "run.crash.net": "通信: 送りきれずにたまっている {buffered}KB（一番多い相手 {maxBuffered}KB）・送った {sent}KB・受け取った {received}KB",
   "run.crash.close": "閉じる",
   "run.gateTimeUp": "{name} に 勝てなかった…",
   "run.fail": "ラン失敗…",

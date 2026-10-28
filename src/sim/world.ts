@@ -142,6 +142,10 @@ export interface World {
   casters: Map<number, Player>;
   /** プレイヤーと同じ技を使う伝説の動き（伝説の敵 id ごと。レッド戦は同時に何体も出る） */
   readonly legendAis: Map<number, { timers: number[]; shellTimers: number[]; shell: boolean; holdTicks?: number }>;
+  /** 伝説が追うプレイヤー（伝説の敵 id → プレイヤー id）。ホストが決めて知らせ、どのブラウザも同じ人を追う（07 の125章） */
+  readonly legendTargets: Map<number, number>;
+  /** ソロ・ホスト: 伝説ごとの、プレイヤーが直近に与えたダメージ（薄れていく）と、今の相手を追い始めた更新回数 */
+  readonly legendThreat: Map<number, { byPlayer: Map<number, number>; since: number }>;
   nextBoxId: number;
   boxTimer: number;
   /** 拾ったふしぎなアメ: 抽選の演出が終わるまでの残りと、上がるレベルの数 */
@@ -289,6 +293,8 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     boxes: [],
     casters: new Map(),
     legendAis: new Map(),
+    legendTargets: new Map(),
+    legendThreat: new Map(),
     nextBoxId: 1,
     boxTimer: Math.round((rules.pickups.boxes?.firstSpawnSeconds ?? 0) * tickRate),
     candies: [],

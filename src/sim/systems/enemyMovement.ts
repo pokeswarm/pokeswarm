@@ -1,4 +1,5 @@
 import type { Player } from '../entities/player';
+import { legendTargetOf } from './stage';
 import { axisToUnit, hash01 } from '../math';
 import { currentWaveIndex, type World } from '../world';
 import { clearOfPlayers } from './spawn';
@@ -50,13 +51,20 @@ export function moveEnemies(world: World): void {
 
     let target: Player = chase[0]!;
     let best = Infinity;
-    for (const p of chase) {
-      const dx = p.x - x;
-      const dy = p.y - y;
-      const d2 = dx * dx + dy * dy;
-      if (d2 < best) {
-        best = d2;
-        target = p;
+    // 伝説は、ホストが決めた人を追う（直近に一番ダメージを与えた人。07 の125章）
+    const marked = world.legendTargets.size > 0 ? legendTargetOf(world, e.id[i]!) : null;
+    if (marked) {
+      target = marked;
+      best = (marked.x - x) ** 2 + (marked.y - y) ** 2;
+    } else {
+      for (const p of chase) {
+        const dx = p.x - x;
+        const dy = p.y - y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < best) {
+          best = d2;
+          target = p;
+        }
       }
     }
 

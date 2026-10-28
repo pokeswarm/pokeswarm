@@ -685,6 +685,13 @@ export const stageConfigSchema = z.object({
     legendHpMultiplier: z.number().positive().optional(),
     /** 伝説の動く速さの倍率（07 の123章: 2人だと片方が逃げ続け、もう片方が攻撃し放題だった）。省略なら 1 */
     legendSpeedMultiplier: z.number().positive().optional(),
+    /**
+     * 伝説の狙い方（協力プレイ。07 の125章）: 直近に与えたダメージ（毎秒 decayPerSecond の割合に薄れる）が一番多い人を追う。
+     * 今の相手より switchRatio 倍以上多い人がいて、今の相手を holdSeconds 以上追っていれば乗り換える。省略なら一番近い人を追う
+     */
+    legendThreat: z.object({ decayPerSecond: z.number().min(0).max(1), switchRatio: z.number().min(1), holdSeconds: z.number().nonnegative() }).optional(),
+    /** 協力プレイで、伝説の「狙った人の足元に落とす」技を、生きている全員の足元に落とす（07 の125章） */
+    legendHitsAllPlayers: z.boolean().optional(),
     /** タッグバトルのボス1体の HP の倍率（ソロでもクリアできるように。07 の89.5: 2体の合計が1体の 1.4倍）。人数による増加はこの後に掛ける */
     tagHpMultiplier: z.number().positive().optional(),
     /**

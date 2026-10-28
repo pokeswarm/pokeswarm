@@ -236,4 +236,30 @@ describe('色違いの御三家（プレイヤーと同じ技）', () => {
     expect(two.sim.world.enemies.maxHp[two.i]).toBeCloseTo(kind.hp * 10);
     expect(one.sim.world.enemies.speed[one.i]).toBeCloseTo(kind.moveSpeed * 1.15);
   });
+
+  it('協力プレイの伝説は、直近に一番ダメージを与えた人を追い（2秒は乗り換えない）、足元を狙う技は全員の足元に落とす（07 の125章）', () => {
+    const { sim, i } = legend('legend-articuno', 2);
+    const w = sim.world;
+    const id = w.enemies.id[i]!;
+    const hit = (by: number, amount: number) => ({ type: 'damageEnemy', id, amount, by, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }) as const;
+    sim.step([hit(2, 100)]);
+    expect(w.legendTargets.get(id)).toBe(2);
+    expect(w.events.some((ev) => ev.type === 'legendTarget' && ev.playerId === 2)).toBe(true);
+    // すぐに 1 がたくさん当てても、2 秒たつまでは乗り換えない
+    sim.step([hit(1, 1000)]);
+    expect(w.legendTargets.get(id)).toBe(2);
+    for (let t = 0; t < 2 * 30 + 2; t++) sim.step([]);
+    expect(w.legendTargets.get(id)).toBe(1);
+    // 足元に落とす技（ふぶき）は、2 人それぞれの近くに落ちる
+    const blizzard = w.rules.stage.moves.findIndex((m) => m.id === 'articuno-blizzard');
+    const near = new Set<number>();
+    for (let t = 0; t < 30 * 20 && near.size < 2; t++) {
+      sim.step([]);
+      for (const h of w.hazards) {
+        if (h.move !== blizzard) continue;
+        for (const p of w.players) if (Math.hypot(h.x - p.x, h.y - p.y) < 1) near.add(p.id);
+      }
+    }
+    expect([...near].sort()).toEqual([1, 2]);
+  });
 });

@@ -152,6 +152,9 @@ export class SyncSession {
         case 'intruderWarning':
           if (host) out.push({ t: 'lw', k: ev.kind, i: 1 });
           break;
+        case 'legendTarget':
+          if (host) out.push({ t: 'lt', e: ev.enemyId, p: ev.playerId });
+          break;
         case 'runEnded':
           if (host) out.push({ t: 'end', o: ev.outcome, lg: ev.legendary, ...(ev.gateTimeUp !== undefined && { gt: ev.gateTimeUp }) });
           break;
@@ -362,6 +365,9 @@ export class SyncSession {
               cmds.push({ type: 'spawnEnemy', id: m.e[k]!, kind: m.e[k + 1]!, x: m.e[k + 2]!, y: m.e[k + 3]!, vx: m.e[k + 4]!, vy: m.e[k + 5]! });
             }
           }
+          break;
+        case 'lt':
+          if (guest) cmds.push({ type: 'setLegendTarget', enemyId: m.e, playerId: m.p });
           break;
         case 'lw':
           if (guest) cmds.push({ type: 'legendaryWarning', kind: m.k, enraged: m.r === 1, intruder: m.i === 1 });

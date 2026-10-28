@@ -1,4 +1,5 @@
 import type { InputCommand } from '../commands';
+import { noteLegendThreat } from './stage';
 import type { HitEffect } from '../events';
 import { currentWaveIndex, enemyHpScale, findEnemyIndex, findPlayer, type World, enemyMoveSpeed } from '../world';
 import { breakOnDamage, damageTakenMultiplier } from './status';
@@ -57,9 +58,13 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         if (boss) world.events.push({ type: 'bossAppeared', id: cmd.id, kind: cmd.kind });
         break;
       }
+      case 'setLegendTarget':
+        if (world.role === 'guest') world.legendTargets.set(cmd.enemyId, cmd.playerId);
+        break;
       case 'damageEnemy': {
         const i = findEnemyIndex(world, cmd.id);
         if (i === -1 || e.hp[i]! <= 0) break;
+        noteLegendThreat(world, i, cmd.by, cmd.amount);
         applyHitEffect(world, i, cmd, cmd.by);
         world.events.push({ type: 'enemyAffected', enemyId: cmd.id, by: cmd.by, ...pickEffect(cmd) });
         e.hp[i]! -= cmd.amount * damageTakenMultiplier(world, i);

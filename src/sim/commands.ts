@@ -190,6 +190,13 @@ export interface BossHpCommand {
   readonly y?: number;
 }
 
+/** ゲスト: 伝説が追う相手（ホストが決めた。07 の125章） */
+export interface SetLegendTargetCommand {
+  readonly type: 'setLegendTarget';
+  readonly enemyId: number;
+  readonly playerId: number;
+}
+
 /** ゲスト: 伝説の乱入（「DANGER」） */
 export interface LegendaryWarningCommand {
   readonly type: 'legendaryWarning';
@@ -326,6 +333,7 @@ export type InputCommand =
   | RemovePlayerCommand
   | RevivePlayerCommand
   | LegendaryWarningCommand
+  | SetLegendTargetCommand
   | SetSectionCommand
   | SpawnItemCommand
   | RequestItemCommand

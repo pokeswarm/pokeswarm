@@ -346,6 +346,13 @@ export interface PlayerLeftEvent {
   readonly playerId: PlayerId;
 }
 
+/** ホスト: 伝説が追う相手を変えた（ゲストへ送る。07 の125章） */
+export interface LegendTargetEvent {
+  readonly type: 'legendTarget';
+  readonly enemyId: number;
+  readonly playerId: number;
+}
+
 /** ランが終わった */
 export interface RunEndedEvent {
   readonly type: 'runEnded';
@@ -388,6 +395,7 @@ export type SimEvent =
   | HazardTelegraphedEvent
   | HazardStruckEvent
   | RunEndedEvent
+  | LegendTargetEvent
   | PlayerLeftEvent
   | SwarmStartedEvent
   | SectionAdvancedEvent

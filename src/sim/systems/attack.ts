@@ -1,4 +1,5 @@
 import { insideObstacle, rayLengthToObstacle } from '../obstacles';
+import { noteLegendThreat } from './stage';
 import { recomputeModifiers } from './leveling';
 import {
   MOTION_BOOMERANG,
@@ -1429,6 +1430,7 @@ export function moveProjectiles(world: World): void {
         continue;
       }
       if (world.role === 'host') world.events.push({ type: 'enemyAffected', enemyId: e.id[j]!, by: ownerId, ...fx });
+      noteLegendThreat(world, j, ownerId, amount);
       e.hp[j]! -= amount * damageTakenMultiplier(world, j);
       breakOnDamage(world, j);
       if (e.hp[j]! <= 0) {

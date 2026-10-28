@@ -790,6 +790,8 @@
     "legendHpPerExtraPlayerPct": 100,
     "legendHpMultiplier": 5,
     "legendSpeedMultiplier": 1.15,
+    "legendThreat": { "decayPerSecond": 0.6, "switchRatio": 1.25, "holdSeconds": 2 },
+    "legendHitsAllPlayers": true,
     "tagHpMultiplier": 0.7,
     "hazardActiveSeconds": 0.4,
     "hazardDamageScalesWithLevel": true,

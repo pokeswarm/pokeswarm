@@ -25,6 +25,7 @@ export type NetMessage =
   | { t: 'sv'; e: number[] }
   /** 伝説の乱入（ホスト→ゲスト。「DANGER」） */
   | { t: 'lw'; k: number; r?: 1; i?: 1 }
+  | { t: 'lt'; e: number; p: number }
   /** 味方を復活させた（ホスト→ゲスト）: i は復活したプレイヤー、n は残りの復活可能数 */
   | { t: 'rv'; i: number; n: number }
   /** 次の区間へ進んだ（ホスト→ゲスト） */

@@ -67,6 +67,65 @@ function spawnLegend(world: World, kind: number, hpScale = 1): number {
   return id;
 }
 
+/** ソロ・ホスト: 伝説に与えたダメージを数える（追う相手を決める。07 の125章） */
+export function noteLegendThreat(world: World, i: number, by: number, amount: number): void {
+  if (world.role === 'guest' || world.players.length < 2 || !world.rules.stage.bossRules.legendThreat) return;
+  if (world.rules.enemies.kinds[world.enemies.kind[i]!]?.rank !== 'legendary') return;
+  const id = world.enemies.id[i]!;
+  let t = world.legendThreat.get(id);
+  if (!t) {
+    t = { byPlayer: new Map(), since: world.tick };
+    world.legendThreat.set(id, t);
+  }
+  t.byPlayer.set(by, (t.byPlayer.get(by) ?? 0) + amount);
+}
+
+/**
+ * ソロ・ホスト: 伝説の追う相手を決める（07 の125章）。直近のダメージが一番多い人を追い、今の相手より switchRatio 倍以上多い人がいて、
+ * holdSeconds 以上追っていれば乗り換える。今の相手が倒れたら、すぐ次の人へ。変えたらゲストへ知らせる
+ */
+export function stepLegendTargets(world: World): void {
+  const cfg = world.rules.stage.bossRules.legendThreat;
+  if (world.role === 'guest' || !cfg || world.players.length < 2) return;
+  const keep = Math.pow(cfg.decayPerSecond, world.dt);
+  const e = world.enemies;
+  for (const [id, t] of world.legendThreat) {
+    const i = findEnemyIndex(world, id);
+    if (i === -1 || e.hp[i]! <= 0) {
+      world.legendThreat.delete(id);
+      world.legendTargets.delete(id);
+      continue;
+    }
+    for (const [pid, v] of t.byPlayer) t.byPlayer.set(pid, v * keep);
+    const alive = world.players.filter((p) => !p.down);
+    if (alive.length === 0) continue;
+    let top = alive[0]!;
+    for (const p of alive) if ((t.byPlayer.get(p.id) ?? 0) > (t.byPlayer.get(top.id) ?? 0)) top = p;
+    const cur = world.legendTargets.get(id);
+    const curP = cur === undefined ? undefined : alive.find((p) => p.id === cur);
+    const held = world.tick - t.since >= Math.round(cfg.holdSeconds / world.dt);
+    const switchTo =
+      !curP ? ((t.byPlayer.get(top.id) ?? 0) > 0 ? top : undefined) : top.id !== curP.id && held && (t.byPlayer.get(top.id) ?? 0) > (t.byPlayer.get(curP.id) ?? 0) * cfg.switchRatio ? top : undefined;
+    // 今の相手が倒れたら（追う相手がいなくなったら）印を外す（一番近い人を追う）
+    if (cur !== undefined && !curP && !switchTo) {
+      world.legendTargets.delete(id);
+      continue;
+    }
+    if (!switchTo) continue;
+    world.legendTargets.set(id, switchTo.id);
+    t.since = world.tick;
+    world.events.push({ type: 'legendTarget', enemyId: id, playerId: switchTo.id });
+  }
+}
+
+/** 伝説 id が追っているプレイヤー（倒れていれば null）。決まっていなければ null（一番近い人） */
+export function legendTargetOf(world: World, enemyId: number): World['players'][number] | null {
+  const pid = world.legendTargets.get(enemyId);
+  if (pid === undefined) return null;
+  const p = world.players.find((q) => q.id === pid);
+  return p && !p.down ? p : null;
+}
+
 /** 区間が始まって予定の時間がたったら中ボス・ボスを出す。伝説戦では伝説を出す */
 export function spawnBosses(world: World): void {
   if (world.role === 'guest' || world.players.length === 0) return;
@@ -346,7 +405,7 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number):
   if (!move) return;
   const bx = world.enemies.x[i]!;
   const by = world.enemies.y[i]!;
-  const target = pickPlayer(world, bx, by, move.targetPick ?? 'nearest');
+  const target = ((move.targetPick ?? 'nearest') === 'nearest' ? legendTargetOf(world, bossId) : null) ?? pickPlayer(world, bx, by, move.targetPick ?? 'nearest');
   if (!target) return;
   // 予告の間は止まる（ファイヤーのゴッドバード。ゲストも予告の知らせで止める）
   if (move.rooted) world.enemies.speed[i] = 0;
@@ -397,11 +456,16 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number):
     const fy = target.facingY / fl;
     addHazard(world, moveIdx, target.x - fx * move.spread, target.y - fy * move.spread, 0, 0, bossId);
   } else {
-    for (let c = 0; c < move.count; c++) {
-      // 1つ目は足元、2つ目以降はばらつかせる（動かないと当たり、動けば避けられる）
-      const [ux, uy] = c === 0 ? [0, 0] : randomUnit(world.rng);
-      const dist = c === 0 ? 0 : world.rng.range(move.radius, move.spread + move.radius);
-      addHazard(world, moveIdx, target.x + ux * dist, target.y + uy * dist, 0, 0, -1, undefined, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
+    // 協力プレイの伝説は、生きている全員の足元に落とす（逃げる係と攻撃する係に分かれて楽にならないように。07 の125章）
+    const legend = world.rules.enemies.kinds[world.enemies.kind[i]!]?.rank === 'legendary';
+    const targets = legend && world.rules.stage.bossRules.legendHitsAllPlayers && world.players.length > 1 ? world.players.filter((p) => !p.down) : [target];
+    for (const t of targets) {
+      for (let c = 0; c < move.count; c++) {
+        // 1つ目は足元、2つ目以降はばらつかせる（動かないと当たり、動けば避けられる）
+        const [ux, uy] = c === 0 ? [0, 0] : randomUnit(world.rng);
+        const dist = c === 0 ? 0 : world.rng.range(move.radius, move.spread + move.radius);
+        addHazard(world, moveIdx, t.x + ux * dist, t.y + uy * dist, 0, 0, -1, undefined, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
+      }
     }
   }
 }

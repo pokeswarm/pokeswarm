@@ -12,7 +12,7 @@ import { menuIconKey } from '../render/Icons';
 import { GroundTiles, preloadGroundTiles } from '../render/GroundTiles';
 import { drawWindow, pixelButton, px, compactScreen } from '../render/pixelUi';
 import { directionIndex, PokemonSpriteView } from '../render/sprites/PokemonSprite';
-import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
+import { loadPokemonAtRuntime, unloadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
 
 /**
  * タイトル画面（ドット調。作者の決定 2026年10月22日）。各画面へのボタンを並べる。
@@ -69,11 +69,27 @@ export class TitleScene extends Phaser.Scene {
       }
     }
     keys.delete(cfg.lead);
-    for (const k of keys) {
+    // 開くたびに passerKinds 種類だけ選んで読み、タイトルを離れたら解放する（全部読むと絵だけで約 730MB になり、スマホの協力プレイが落ちていた。07 の114章）
+    const pool = [...keys];
+    const picked: string[] = [];
+    while (picked.length < cfg.passerKinds && pool.length > 0) picked.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]!);
+    const loaded = new Map<string, SpriteAnims>();
+    for (const k of picked) {
       void loadPokemonAtRuntime(this, k).then((r) => {
-        if (r && this.sys.isActive()) others.push(r.manifest);
+        if (!r) return;
+        // 読み込みの間にタイトルを離れていたら、すぐ解放する
+        if (!this.sys.isActive()) {
+          unloadPokemonAtRuntime(this, k, r.manifest);
+          return;
+        }
+        loaded.set(k, r.manifest);
+        others.push(r.manifest);
       });
     }
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      for (const [k, m] of loaded) unloadPokemonAtRuntime(this, k, m);
+      loaded.clear();
+    });
     /** 画面の端から、真ん中のポケモンに近づかない向きで横切るポケモンを1体出す */
     const spawnPasser = (): void => {
       if (others.length === 0 || passers.length >= cfg.maxPassers) return;

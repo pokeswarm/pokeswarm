@@ -451,6 +451,9 @@ export class RunScene extends Phaser.Scene {
       rules.enemies.kinds.map((k) => k.sprite),
       Math.round(spriteRender.enemyPreloadSeconds * simulationConfig.tickRate),
     );
+    // 雑魚の絵はランが終わったら解放する（07 の114章）
+    const streamer = this.streamer;
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => streamer.unloadAll());
     this.enemySpriteView = new EnemySprites(
       this,
       (kind) => this.streamer.manifestOf(kind),

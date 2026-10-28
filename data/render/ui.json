@@ -61,7 +61,8 @@
       90
     ],
     "maxPassers": 10,
-    "keepAway": 120
+    "keepAway": 120,
+    "passerKinds": 6
   },
   "joystick": {
     "radius": 56,

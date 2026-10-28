@@ -1,8 +1,7 @@
 import type Phaser from 'phaser';
 import type { SpriteAnims } from '../../data/schema';
 import { currentWaveIndex, ticksUntilNextSection, type World } from '../../sim/world';
-import { animKey, atlasKey } from './PokemonSprite';
-import { loadPokemonAtRuntime } from './runtimeLoad';
+import { loadPokemonAtRuntime, unloadPokemonAtRuntime } from './runtimeLoad';
 
 /**
  * 雑魚敵のスプライトを、時間帯に合わせて読み込み・解放する。
@@ -79,10 +78,12 @@ export class SpriteStreamer {
   private unload(key: string): void {
     const manifest = this.loaded.get(key);
     if (!manifest) return;
-    for (const name of Object.keys(manifest.animations)) {
-      for (let dir = 0; dir < manifest.directions.length; dir++) this.scene.anims.remove(animKey(key, name, dir));
-    }
-    if (this.scene.textures.exists(atlasKey(key))) this.scene.textures.remove(atlasKey(key));
+    unloadPokemonAtRuntime(this.scene, key, manifest);
     this.loaded.delete(key);
+  }
+
+  /** 読み込んだものを全部解放する（ランの終わり。絵はゲーム全体で共有されるので、次の画面に持ち越さない） */
+  unloadAll(): void {
+    for (const key of [...this.loaded.keys()]) this.unload(key);
   }
 }

@@ -100,6 +100,8 @@ export const uiConfigSchema = z.object({
     passerSpeed: z.tuple([z.number().positive(), z.number().positive()]),
     maxPassers: z.number().int().positive(),
     keepAway: z.number().nonnegative(),
+    /** 横切るポケモンの種類の数（タイトルを開くたびにこの数だけ選んで読み、離れたら解放する。全部読むと絵だけで約 730MB になり、スマホが落ちた。07 の114章） */
+    passerKinds: z.number().int().positive(),
   }),
   /**
    * タイトル画面の配置（作者の指摘 2026年10月22日）: ロゴの幅（frameWidth まで）を枠にし、左にメニュー、右にログインの窓を同じ幅（blockWidth まで）で

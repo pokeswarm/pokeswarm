@@ -1,4 +1,4 @@
-import { onChildAdded, push, ref, type Database, type Unsubscribe } from 'firebase/database';
+import { onChildAdded, push, ref, remove, type Database, type Unsubscribe } from 'firebase/database';
 import { decode, encode, type NetMessage } from './protocol';
 import type { Transport } from './transport';
 
@@ -28,6 +28,9 @@ export class RelayTransport implements Transport {
     const inPath = `${base}/${role === 'host' ? 'toHost' : 'toGuest'}`;
     this.unsubscribe = onChildAdded(ref(db, inPath), (snap) => {
       const text = (snap.val() as { m?: string } | null)?.m;
+      // 読んだものはすぐ消す（作者の報告 2026年10月28日: スマホの協力プレイで急にトップに戻された。
+      // 消さないと、ランの間ずっと受け取った分がこのブラウザの Firebase の中に残り、メモリを使い続ける。データベースの量も増え続ける）
+      void remove(snap.ref).catch(() => undefined);
       if (!text) return;
       this.stats.receivedBytes += text.length;
       this.onMessages?.(decode(text));

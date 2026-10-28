@@ -994,20 +994,20 @@ function fangFace(kind: 'fire' | 'dark' | 'crunch', slope = 0, alignInner = fals
 const FANG_TILT = Math.tan((30 * Math.PI) / 180);
 
 /**
- * かみつく・ほのおのキバ（作者の指摘 2026年10月28日: かみくだく の斜めを使う）: 横・下向き・上向きは正面の口のまま。
+ * かみつく・ほのおのキバ（作者の指摘 2026年10月28日: かみくだく の斜めと横を使う）: 下向き・上向きは正面の口、横は かみくだく と同じ肉食のあご（sideJaw）。
  * 斜めは正面の口を縦にずらして歯ぐきを向きに直角にし、下の列はプレイヤーの側（左）にそろえる（左向きは左右を返す）
  */
 function fangFront(kind: 'fire' | 'dark'): SpriteOut {
   const face = fangFace(kind);
-  const main = face.parts.main!;
+  const front = face.parts.main!;
   return {
     ...face,
-    parts: { main, front: main, back: main, diag: fangFace(kind, -FANG_TILT, true).parts.main!, diagBack: fangFace(kind, FANG_TILT, true).parts.main! },
+    parts: { main: sideJaw(kind, 32), front, back: front, diag: fangFace(kind, -FANG_TILT, true).parts.main!, diagBack: fangFace(kind, FANG_TILT, true).parts.main! },
   };
 }
 
 /**
- * かみくだく（作者の指摘 2026年10月28日）: 黒いあごに白いキバだけ。
+ * かみくだく（作者の指摘 2026年10月28日）: 黒いあごに白いキバだけ。横の あご（sideJaw）は かみつく・ほのおのキバ も それぞれの色で使う。
  * - 下向き・上向き（front・back）: かみつく と同じ正面の口（上の列が広く、下の列が狭い台形）を黒と白で。
  * - 斜め（diag・diagBack）: 正面の口を縦にずらして、上下の歯ぐきを平行なまま、向きに直角な斜めにする（回さない）。下の列はプレイヤーの側（左）の端にそろえる。
  *   キバは画面の縦にまっすぐ伸び、閉じる向きも画面の縦。
@@ -1015,9 +1015,8 @@ function fangFront(kind: 'fire' | 'dark'): SpriteOut {
  *   上あごは根元が厚く先が細い鼻先で、先が少し下へ曲がる。先に小さな前歯、その後ろに長い犬歯（下向き）、奥に小さな奥歯と大きな裂肉歯。
  *   下あごは上あごより短く細い。犬歯（上向き）は上の犬歯の少し前に立ち、閉じると上下の犬歯が交差する
  */
-function darkJaws(): SpriteOut {
-  // 0 輪郭・1 あご（濃い黒）・2 あご（黒）・3 あごの照り（暗い灰）・4 歯の影（うすい灰）・5 白（歯）
-  const palette = ['#000000', '#0a0a0a', '#2a2a2a', '#5a5a5a', '#d6d6d6', '#ffffff'];
+function sideJaw(kind: 'fire' | 'dark' | 'crunch', n: number): string[][] {
+  // 色の番号は fangFace と同じ: 0 輪郭・1 あご（濃い）・2 あご・3 あごの照り・火花・炎・4 歯の影・5 白（歯）
   // コマごとの あごの開き（度）・火花・薄れ（0 開く → 1 半分 → 2 閉じる → 3 薄れる → 4 名残り）
   const STEPS = [[54, 0, 0], [28, 0, 0], [3, 1, 0], [3, 0.6, 1], [3, 0, 2]] as const;
   // あごの長さ（上あご）と、軸（あごのつけ根）の位置
@@ -1036,9 +1035,8 @@ function darkJaws(): SpriteOut {
   };
   const thin = (col: number, u: number, v: number, fade: number): number =>
     fade === 1 && col <= 3 && hash(Math.floor((u + 1) * 18), Math.floor((v + 1) * 18), 59) < 0.5 ? -1 : col;
-  const side = (): Grid[] =>
-    STEPS.map(([deg, flash, fade]) =>
-      shape(36, (u, v) => {
+  return STEPS.map(([deg, flash, fade], f) =>
+      shape(n, (u, v) => {
         const half = (deg / 2) * (Math.PI / 180);
         // 火花: 犬歯の交わる所から
         if (flash > 0) {
@@ -1074,6 +1072,11 @@ function darkJaws(): SpriteOut {
           const top = -(0.2 * (1 - t) + 0.08 * t) + Math.max(0, t - 0.85) * 0.4;
           const bot = Math.max(0, t - 0.9) * 0.4;
           if (uy >= top && uy <= bot) return thin(uy < top + 0.06 ? 3 : uy > bot - 0.04 ? 1 : 2, u, v, fade);
+          // ほのおのキバ: 上あごの背から炎の舌が立つ
+          if (kind === 'fire' && t > 0.08 && t < 0.95) {
+            const h = 0.08 + Math.max(0, Math.sin(ux * 14 + f * 2.3)) * 0.12;
+            if (uy < top && uy >= top - h) return thin(uy < top - h * 0.5 ? 3 : 2, u, v, fade);
+          }
         }
         // 下あご: 上あごより短く（0.9）、根元 0.14 から先 0.06 へ細る
         const LL = L * 0.9;
@@ -1081,13 +1084,22 @@ function darkJaws(): SpriteOut {
           const t = lx / LL;
           const depth = 0.14 * (1 - t) + 0.06 * t;
           if (ly <= 0 && ly >= -depth) return thin(ly > -0.04 ? 1 : 2, u, v, fade);
+          if (kind === 'fire' && t > 0.1 && t < 0.92) {
+            const h = 0.06 + Math.max(0, Math.sin(lx * 15 + f * 2.7 + 1)) * 0.09;
+            if (ly < -depth && ly >= -depth - h) return thin(ly < -depth - h * 0.5 ? 3 : 2, u, v, fade);
+          }
         }
         // あごのつけ根（軸）の丸み
         if (Math.hypot(du, dv) < 0.08) return thin(2, u, v, fade);
         return -1;
       }),
-    );
-  const rows = (g: Grid[]): string[][] => g.map((x) => toRows(outline(x, 0)));
+  ).map((g) => toRows(outline(g, 0)));
+}
+
+/** かみくだく: 黒いあごに白いキバだけ（向きごとの絵は sideJaw の上の説明のとおり） */
+function darkJaws(): SpriteOut {
+  // 0 輪郭・1 あご（濃い黒）・2 あご（黒）・3 あごの照り（暗い灰）・4 歯の影（うすい灰）・5 白（歯）
+  const palette = ['#000000', '#0a0a0a', '#2a2a2a', '#5a5a5a', '#d6d6d6', '#ffffff'];
   // 下向き・上向き・斜め: かみつく と同じ正面の口を黒と白で（32 マス。横の 36 マスと同じ大きさで描かれるよう、まわりに 2 マスずつ空きを足す）
   const pad = (r: string[]): string[] => {
     const empty = '.'.repeat(r[0]!.length + 4);
@@ -1097,7 +1109,7 @@ function darkJaws(): SpriteOut {
   const front = face(0);
   // 歯ぐきは向きに直角（作者の指摘 2026年10月28日。FANG_TILT）。どちらも下の列は左（プレイヤーの側）にそろえ、左向きは左右を返す
   // （左上は右上の、左下は右下の左右を返した絵で、下の列が右にそろう）
-  return { palette, frameMs: 45, parts: { main: rows(side()), front, back: front, diag: face(-FANG_TILT), diagBack: face(FANG_TILT) } };
+  return { palette, frameMs: 45, parts: { main: sideJaw('crunch', 36), front, back: front, diag: face(-FANG_TILT), diagBack: face(FANG_TILT) } };
 }
 
 /** フレアドライブ: 右へ突っ込む炎の弧（三日月形の炎。コマで炎の先がゆらめく） */

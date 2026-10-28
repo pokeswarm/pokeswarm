@@ -23,7 +23,11 @@ export class TouchJoystick {
   private readonly onMove: (ev: PointerEvent) => void;
   private readonly onUp: (ev: PointerEvent) => void;
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    /** ここを触ったときは出さない（画面の座標。技・持ち物のアイコンをタップして詳細カードを出すため。07 の111章） */
+    private readonly ignore: (clientX: number, clientY: number) => boolean = () => false,
+  ) {
     const c = uiConfig.joystick;
     this.base = document.createElement('div');
     this.base.style.cssText = `position:fixed;width:${c.radius * 2}px;height:${c.radius * 2}px;margin:-${c.radius}px 0 0 -${c.radius}px;border:4px solid ${uiConfig.window.fill};border-radius:50%;background:rgba(0,0,0,0.25);box-sizing:border-box;pointer-events:none;z-index:15;display:none`;
@@ -32,7 +36,7 @@ export class TouchJoystick {
     document.body.append(this.base, this.knob);
     this.onDown = (ev) => {
       // 画面の左半分のゲームの画面（canvas）を触ったときだけ。DOM の画面の上では出さない
-      if (this.pointer !== null || ev.pointerType === 'mouse' || ev.target !== canvas || ev.clientX > window.innerWidth / 2) return;
+      if (this.pointer !== null || ev.pointerType === 'mouse' || ev.target !== canvas || ev.clientX > window.innerWidth / 2 || this.ignore(ev.clientX, ev.clientY)) return;
       this.pointer = ev.pointerId;
       this.cx = ev.clientX;
       this.cy = ev.clientY;

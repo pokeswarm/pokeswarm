@@ -153,6 +153,8 @@ export class RunScene extends Phaser.Scene {
   private hudIcons!: HudIcons;
   /** アイコンにマウスを乗せたときの詳細カード（PC だけ） */
   private hudCard!: HudCard;
+  /** タッチ: タップして出している詳細カードのアイコン（07 の111章） */
+  private pinnedCard: { kind: 'move' | 'item'; slot: number } | null = null;
   /** 画面の外の大事なものの方向を示す矢印 */
   private edgeArrows!: EdgeArrows;
   /** アイコンの列の上端（画面の y） */
@@ -411,8 +413,19 @@ export class RunScene extends Phaser.Scene {
     this.clock = new FixedStepClock(simulationConfig.tickRate, simulationConfig.maxTicksPerFrame);
     this.keyboard = new KeyboardInput(this);
     if (isTouchDevice()) {
-      const stick = new TouchJoystick(this.game.canvas);
+      // 技・持ち物のアイコンを触ったときはジョイスティックを出さない（タップで詳細カード。07 の111章）
+      const stick = new TouchJoystick(this.game.canvas, (x, y) => this.hudIconAt(x, y) !== null);
       this.joystick = stick;
+      this.pinnedCard = null;
+      // タッチ: アイコンをタップすると詳細カードを出し、同じアイコンかほかの場所をタップすると閉じる
+      const onTap = (ev: PointerEvent): void => {
+        if (ev.pointerType === 'mouse' || ev.target !== this.game.canvas) return;
+        const target = this.hudIconAt(ev.clientX, ev.clientY);
+        const same = target && this.pinnedCard && target.kind === this.pinnedCard.kind && target.slot === this.pinnedCard.slot;
+        this.pinnedCard = same ? null : target;
+      };
+      window.addEventListener('pointerdown', onTap);
+      this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => window.removeEventListener('pointerdown', onTap));
       this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
         stick.destroy();
         this.joystick = null;
@@ -1732,20 +1745,29 @@ export class RunScene extends Phaser.Scene {
     });
   }
 
+  /** 画面の座標 (clientX, clientY) にある技・持ち物のアイコン（無ければ null） */
+  private hudIconAt(clientX: number, clientY: number): { kind: 'move' | 'item'; slot: number } | null {
+    const rect = this.game.canvas.getBoundingClientRect();
+    const cam = this.cameras.main;
+    return this.hudIcons.hit(clientX - rect.left - cam.x - 8, clientY - rect.top - cam.y - this.hudTop);
+  }
+
   /**
-   * 技・持ち物のアイコンにマウスを乗せたら、詳細カードを出す（作者の案。PC だけ。タッチでは出さない）。
+   * 技・持ち物のアイコンにマウスを乗せたら、詳細カードを出す（作者の案）。
+   * タッチ（スマホ）では、タップしたアイコンのカードを、もう一度タップするかほかの場所をタップするまで出す（作者の依頼 2026年10月28日。07 の111章）。
    * カードは持ち物の列のすぐ下の決まった場所に出す（技でも持ち物でも同じ場所。持ち物がまだ無くても、その列のぶんを空ける）。レベルアップの選択中・ランの終わりは出さない
    */
   private updateHudCard(): void {
     const w = this.sim.world;
     const local = w.players.find((p) => p.id === this.localId);
     const ptr = this.input.activePointer;
-    if (!local || w.levelUp || w.outcome || ptr.wasTouch) {
+    if (!local || w.levelUp || w.outcome) {
+      this.pinnedCard = null;
       this.hudCard.hide();
       return;
     }
     const cam = this.cameras.main;
-    const target = this.hudIcons.hit(ptr.x - cam.x - 8, ptr.y - cam.y - this.hudTop);
+    const target = ptr.wasTouch ? this.pinnedCard : this.hudIcons.hit(ptr.x - cam.x - 8, ptr.y - cam.y - this.hudTop);
     const iconKey = !target
       ? null
       : target.kind === 'move'

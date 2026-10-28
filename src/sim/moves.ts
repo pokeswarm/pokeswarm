@@ -83,6 +83,8 @@ export interface SimMoveDef {
   readonly waitForEnd?: boolean;
   /** 使うたびに最大 HP の pct % 相当のダメージを自分が受け、HP が最大 HP の minHpPct % を下回っていれば出さない（だいばくはつ） */
   readonly hpCost?: { readonly pct: number; readonly minHpPct: number };
+  /** 使うたびに、自分を seconds 秒だけ強くする（フレアドライブ。07 の115章） */
+  readonly selfBuff?: { readonly seconds: number; readonly mods: Modifiers };
   /** heal: 味方の HP を最大 HP の pct % 回復する（いやしのねがい） */
   readonly allyHealPct?: number;
   /** 当たった敵に印を付け、seconds 後にその敵の位置で爆発させる（みらいよち） */

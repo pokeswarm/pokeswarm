@@ -121,6 +121,8 @@ export interface Player {
   consumedMoves?: number[];
   /** 箱から拾った一時的な強化（index は pickups.json の items.buff.buffs の番号） */
   buffs?: { index: number; ticksLeft: number; totalTicks: number }[];
+  /** 技で付いた一時的な強化（move は技の番号。フレアドライブ。07 の115章） */
+  moveBuffs?: { move: number; ticksLeft: number }[];
   /** 順番に出す技（group）ごとの、次に出せるまでの秒数と、次に出す番 */
   groupTimers?: Record<string, number>;
   groupCursor?: Record<string, number>;

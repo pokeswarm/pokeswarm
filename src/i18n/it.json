@@ -481,6 +481,7 @@
   "pattern.sweepOnce": "Spazza una volta davanti a te",
   "pattern.pulse": "Un anello che si espande e si restringe intorno a te",
   "pattern.weather": "Cade su tutto lo schermo per un po'",
+  "pattern.aura": "Brucia di continuo la zona intorno a te",
   "pattern.barrage": "Scatena una raffica di colpi",
   "pattern.rest": "Dorme e si cura stando fermo",
   "run.moveTaught": "Ha imparato {name}!",

@@ -481,6 +481,7 @@
   "pattern.sweepOnce": "Fegt einmal vor dir",
   "pattern.pulse": "Ein Ring, der sich um dich ausdehnt und zusammenzieht",
   "pattern.weather": "Fällt eine Weile auf den ganzen Bildschirm",
+  "pattern.aura": "Verbrennt fortlaufend die Umgebung um dich",
   "pattern.barrage": "Entfesselt eine Schlagserie",
   "pattern.rest": "Schläft und heilt sich im Stillstand",
   "run.moveTaught": "{name} erlernt!",

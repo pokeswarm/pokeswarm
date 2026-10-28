@@ -502,6 +502,7 @@
   "pattern.sweepOnce": "Sweeps once ahead",
   "pattern.pulse": "A ring that expands and shrinks around you",
   "pattern.weather": "Falls across the whole screen for a while",
+  "pattern.aura": "Keeps burning the area around you",
   "pattern.barrage": "Unleashes a flurry of blows",
   "pattern.rest": "Sleeps and heals while standing still",
   "run.moveTaught": "Learned {name}!",

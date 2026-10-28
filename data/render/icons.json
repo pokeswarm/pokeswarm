@@ -1521,6 +1521,7 @@
     "passive": "plus",
     "pulse": "pulse",
     "weather": "weather",
+    "aura": "eruption",
     "barrage": "melee",
     "rest": "clock"
   },

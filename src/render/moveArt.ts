@@ -1204,7 +1204,7 @@ function palm(): SpriteOut {
 }
 
 /** のしかかり（白い砂ぼこりの衝撃波）・ギガインパクト（橙と白のエネルギーの衝撃波）: 輪に沿って並べる帯 */
-function shockRing(kind: 'dust' | 'giga' | 'dark' | 'snarl'): SpriteOut {
+function shockRing(kind: 'dust' | 'giga' | 'dark' | 'snarl' | 'mud' | 'lava'): SpriteOut {
   const W = 10;
   const H = 8;
   // あくのはどう（紫がかった黒い輪）・バークアウト（黒い衝撃波。白い光の粒が少し）
@@ -1213,6 +1213,9 @@ function shockRing(kind: 'dust' | 'giga' | 'dark' | 'snarl'): SpriteOut {
     giga: ['#3b1400', '#e65100', '#ff9800', '#ffe082', '#ffffff'],
     dark: ['#0d0614', '#311b47', '#5e35b1', '#9575cd', '#ede7f6'],
     snarl: ['#000000', '#1a1a1a', '#3a2f3f', '#6d5f73', '#ffffff'],
+    // だくりゅう（泥水）・ふんえん（溶岩）: あくのはどう と同じ輪の色違い（07 の103章）
+    mud: ['#2e1f10', '#5d4027', '#8d6e4a', '#b89a72', '#e8dcc4'],
+    lava: ['#3e0800', '#9a1c00', '#e64a19', '#ff9800', '#fff59d'],
   };
   const palette = palettes[kind];
   const frames: Grid[] = [];
@@ -2121,6 +2124,47 @@ function quakeZone(): SpriteOut {
   return { palette, frameMs: 90, loopFrom: 3, parts: { main: [make(0.35, 0), make(0.7, 1), make(1, 2), make(1, 3), make(1, 4)] } };
 }
 
+/**
+ * フレアドライブ: 自分の周りに広がる獄炎の地面（上から見た円。作者の依頼 2026年10月28日。07 の115章）。
+ * 黒く冷えた岩のふちの中で、マグマがうねって流れ、泡がふくらんでは弾ける（6コマでくり返す）
+ */
+function magmaPool(): SpriteOut {
+  // 0 ふち・1 冷えた岩・2 暗い赤・3 赤・4 だいだい・5 黄・6 白く光る所
+  const palette = ['#1a0805', '#4a1a0c', '#8e1b08', '#d84315', '#ff8f00', '#ffd54f', '#fff8e1'];
+  const r = rng(1310);
+  const bubbles = Array.from({ length: 7 }, () => ({ u: (r() - 0.5) * 1.1, v: (r() - 0.5) * 1.1, phase: Math.floor(r() * 6), size: 0.07 + r() * 0.07 }));
+  const make = (f: number): string[] =>
+    toRows(
+      shape(32, (u, v) => {
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        const edge = 0.82 + (noise(Math.cos(a) * 5 + 5, Math.sin(a) * 5 + 5, 1.3, 1320) - 0.5) * 0.16;
+        if (d > edge) return -1;
+        if (d > edge - 0.05) return 0;
+        // ふちは冷えた岩が点々と
+        if (d > edge - 0.14 && noise(u * 14, v * 14, 1.6, 1330) > 0.5) return 1;
+        // 泡: コマごとにふくらみ（白く光る芯）、最後のコマで弾けて輪になる
+        for (const b of bubbles) {
+          const t = (f - b.phase + 6) % 6;
+          if (t > 3) continue;
+          const bd = Math.hypot(u - b.u, v - b.v);
+          const size = b.size * (0.5 + t * 0.35);
+          if (t === 3) {
+            if (Math.abs(bd - size) < 0.035) return 5;
+          } else if (bd < size) return bd < size * 0.45 ? 6 : 5;
+        }
+        // 表面に浮かぶ冷えた岩の板（ゆっくり流れる）。板のすき間から光るマグマがのぞく
+        const crust = noise(u * 4.5 + f * 0.12, v * 4.5 + f * 0.08, 1.4, 1360);
+        if (crust > 0.6) return crust > 0.68 ? 1 : 2;
+        // うねって流れるマグマ（コマで模様が流れる）。中ほど熱く、板の近くは暗い
+        const flow = noise(u * 5 + f * 0.35, v * 5 - f * 0.2, 2, 1340) + (noise(u * 11 - f * 0.5, v * 11, 1.5, 1350) - 0.5) * 0.4;
+        const heat = flow - d * 0.3 - (crust - 0.45) * 0.8;
+        return heat > 0.62 ? 5 : heat > 0.46 ? 4 : heat > 0.28 ? 3 : 2;
+      }),
+    );
+  return { palette, frameMs: 110, parts: { main: [0, 1, 2, 3, 4, 5].map(make) } };
+}
+
 /** ストーンエッジ: 地面を走る亀裂の先（はじける岩くずと土ぼこり。上から見た円）。コマで岩くずが跳ねる */
 function crackHead(): SpriteOut {
   const palette = ['#1c1a17', '#4e4a44', '#7d756b', '#a89f93', '#e0d9cf', '#cbb79a'];
@@ -2777,6 +2821,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'giga-ring': () => shockRing('giga'),
     'dark-ring': () => shockRing('dark'),
     'snarl-ring': () => shockRing('snarl'),
+    'mud-ring': () => shockRing('mud'),
+    'lava-ring': () => shockRing('lava'),
     claw: () => claw('small'),
     'claw-big': () => claw('big'),
     'fury-slash': () => furySlash(),
@@ -2833,6 +2879,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'electric-ring': () => electricRing(),
     'electric-crackle': () => electricCrackle(),
     'quake-zone': () => quakeZone(),
+    'magma-pool': () => magmaPool(),
     'rock-spire': () => rockSpire(),
     'crack-line': () => crackLine(),
     'crack-head': () => crackHead(),

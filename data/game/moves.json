@@ -830,62 +830,69 @@
       ]
     },
     "flare-blitz": {
-      "pattern": "melee",
-      "effect": "flare-blitz",
+      "pattern": "aura",
+      "effect": "flare-blitz-field",
       "base": {
-        "power": 72.5,
-        "cooldownSeconds": 1.2,
+        "power": 26.1,
+        "cooldownSeconds": 7,
         "count": 1,
         "intervalSeconds": 0.1,
-        "speed": 400,
-        "size": 70,
-        "range": 10,
-        "durationSeconds": 0.2,
+        "speed": 0,
+        "size": 72,
+        "range": 0,
+        "durationSeconds": 5,
         "pierce": "infinite",
-        "hitIntervalSeconds": 0,
-        "knockback": 220,
-        "knockbackSeconds": 0.1,
+        "hitIntervalSeconds": 0.4,
+        "knockback": 40,
+        "knockbackSeconds": 0.06,
         "spreadDegrees": 0,
         "statusId": "burn",
-        "statusChance": 0.3,
+        "statusChance": 0.2,
         "statusSeconds": 3,
-        "lifestealPct": 0,
-        "arcDegrees": 120
+        "lifestealPct": 0
       },
       "levels": [
         {
-          "size": 8,
-          "power": 11.6
-        },
-        {
-          "arcDegrees": 15,
-          "power": 12
-        },
-        {
-          "size": 8,
-          "power": 8.8
-        },
-        {
-          "cooldownSeconds": -0.25,
-          "power": -10.6
-        },
-        {
-          "size": 10,
-          "power": 4.1
+          "size": 7,
+          "power": 3.7
         },
         {
           "statusChance": 0.1,
-          "power": 10.5
+          "power": 5.6
         },
         {
-          "arcDegrees": 20,
-          "size": 8,
-          "power": -1.6
+          "size": 7,
+          "power": 2.8
+        },
+        {
+          "cooldownSeconds": -0.5,
+          "power": 2.1
+        },
+        {
+          "size": 7,
+          "power": 1.9
+        },
+        {
+          "statusChance": 0.1,
+          "power": 4.5
+        },
+        {
+          "size": 7,
+          "cooldownSeconds": -0.5,
+          "power": -2.2
         }
       ],
-      "body": {
-        "lungeDistance": 56,
-        "afterimages": 4
+      "hpCost": {
+        "pct": 2,
+        "minHpPct": 10
+      },
+      "selfBuff": {
+        "seconds": 5,
+        "mods": {
+          "physicalPowerPct": 20,
+          "specialPowerPct": 20,
+          "moveSpeedPct": 15
+        }
       }
     },
     "air-slash": {

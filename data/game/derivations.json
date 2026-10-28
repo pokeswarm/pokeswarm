@@ -3,7 +3,7 @@
     { "from": "scratch", "item": "silk-scarf", "to": "slash" },
     { "from": "scratch", "item": "silver-powder", "to": "fury-cutter" },
     { "from": "ember", "item": "charcoal", "to": "flamethrower" },
-    { "from": "fire-fang", "item": "charcoal", "to": "flare-blitz" },
+    { "from": "fire-fang", "item": "x-attack", "to": "flare-blitz", "minLevel": 50 },
     { "from": "water-gun", "item": "mystic-water", "to": "hydro-pump" },
     { "from": "bubble", "item": "mystic-water", "to": "bubble-beam" },
     { "from": "whirlpool", "item": "mystic-water", "to": "water-spout" },

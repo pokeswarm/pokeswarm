@@ -121,11 +121,20 @@ function segmentDistance2(px: number, py: number, sx: number, sy: number, dx: nu
 /** 箱の一時的な強化の残り時間を減らし、切れたら外す */
 export function tickBuffs(world: World, recompute: (p: World['players'][number]) => void): void {
   for (const p of world.players) {
-    if (!p.buffs || p.buffs.length === 0) continue;
     let changed = false;
-    for (const b of p.buffs) if (--b.ticksLeft <= 0) changed = true;
-    if (!changed) continue;
-    p.buffs = p.buffs.filter((b) => b.ticksLeft > 0);
-    recompute(p);
+    if (p.buffs && p.buffs.length > 0) {
+      for (const b of p.buffs) if (--b.ticksLeft <= 0) changed = true;
+      if (changed) p.buffs = p.buffs.filter((b) => b.ticksLeft > 0);
+    }
+    // 技で付いた一時的な強化（フレアドライブ）も同じように切らす
+    if (p.moveBuffs && p.moveBuffs.length > 0) {
+      let ended = false;
+      for (const b of p.moveBuffs) if (--b.ticksLeft <= 0) ended = true;
+      if (ended) {
+        p.moveBuffs = p.moveBuffs.filter((b) => b.ticksLeft > 0);
+        changed = true;
+      }
+    }
+    if (changed) recompute(p);
   }
 }

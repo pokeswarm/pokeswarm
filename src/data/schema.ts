@@ -777,6 +777,7 @@ export type CombatConfig = z.infer<typeof combatConfigSchema>;
  *   いちばん外の段が range の距離。外の段ほど半径が sizeGrowth の割合ずつ大きい（ブラストバーン。作者の決定 2026年10月23日）
  * - pulse（広がって縮む輪）: 自分を中心に、厚さ size の輪が range まで広がってから縮む（duration の間）。count 2 以上は interval ごとに続けて出す
  *   （スパーク・ワイルドボルト。作者の決定 2026年10月25日）
+ * - aura（まとう）: duration の間、自分の周り半径 size の敵に、当たり直しの間隔ごとに当たる（自分についてくる。フレアドライブの獄炎。07 の115章）。
  * - weather（天気）: duration の間、自分の周り半径 size（画面くらい）の敵すべてに、当たり直しの間隔ごとに当たる（こなゆき・ふぶき。
  *   作者の決定 2026年10月25日）。範囲は塗らず、画面に雪を降らせて見せる
  * - barrage（連打）: 向いている方向を中心にした開き arcDegrees・距離 range の中のランダムな場所に、外へ押し出す小さな当たり判定（拳・蹴り）を
@@ -813,6 +814,7 @@ export const MOVE_PATTERNS = [
   'spiral',
   'pulse',
   'weather',
+  'aura',
   'barrage',
   'rest',
 ] as const;
@@ -1062,6 +1064,8 @@ export const moveDefSchema = z.object({
    * （防御・ディフェンダーなどの軽減が効く）。HP が最大 HP の minHpPct % を下回っていれば出さない（たまるまで待つ）
    */
   hpCost: z.object({ pct: z.number().positive(), minHpPct: z.number().min(0).max(100) }).optional(),
+  /** 使うたびに、自分を seconds 秒だけ強くする（使い直すと時間が戻る。重ならない。フレアドライブ: 両方の攻撃力と素早さ。07 の115章） */
+  selfBuff: z.object({ seconds: z.number().positive(), mods: modifierSchema }).optional(),
   /** heal（回復）: 自分以外のプレイヤー（協力プレイの味方）の HP を、それぞれの最大 HP の pct % 回復する（セレビィの いやしのねがい） */
   allyHealPct: z.number().positive().optional(),
   /**
@@ -1934,7 +1938,8 @@ export type ShopConfig = z.infer<typeof shopConfigSchema>;
 
 /** 派生（技 + 持ち物 → 派生技）と固有技（派生技 + 持ち物 → 固有技。その系統だけ） */
 export const derivationsConfigSchema = z.object({
-  derivations: z.array(z.object({ from: z.string(), item: z.string(), to: z.string() })),
+  /** minLevel: このレベル以上でないと候補に出ない（フレアドライブ: 50。07 の115章） */
+  derivations: z.array(z.object({ from: z.string(), item: z.string(), to: z.string(), minLevel: z.number().int().positive().optional() })),
   unique: z.array(
     z.object({
       from: z.string(),

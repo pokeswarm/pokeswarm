@@ -414,6 +414,47 @@
         "size": 1.1
       }
     },
+    "flare-blitz-field": {
+      "extends": "fire.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.3
+      },
+      "linger": {
+        "spread": 0,
+        "blend": "add",
+        "colors": [
+          "#fff59d",
+          "#ff9800",
+          "#d84315"
+        ],
+        "lifespanMs": [
+          500,
+          900
+        ],
+        "speed": [
+          6,
+          20
+        ],
+        "scale": [
+          0.3,
+          0
+        ],
+        "alpha": [
+          0.95,
+          0
+        ],
+        "gravityY": -50,
+        "perSecond": 10,
+        "fillAlpha": 0.3,
+        "maxPerSecond": 30
+      },
+      "sprite": {
+        "id": "magma-pool",
+        "fit": "circle",
+        "size": 1.2
+      }
+    },
     "blast-burn": {
       "extends": "fire.base",
       "impact": {

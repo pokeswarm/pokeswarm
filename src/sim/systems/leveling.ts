@@ -409,6 +409,11 @@ export function recomputeModifiers(world: World, p: Player): void {
     const def = world.rules.pickups.items.buff?.buffs[b.index];
     if (def) addModifiers(mods, resolveModifiers(def.mods, world.rules.types.names), 1);
   }
+  // 技で付いた一時的な強化（フレアドライブ）
+  for (const b of p.moveBuffs ?? []) {
+    const buff = world.rules.moves[b.move]?.selfBuff;
+    if (buff) addModifiers(mods, buff.mods, 1);
+  }
   // いつも効く技（かくばる・テクスチャー）: そのレベルまでの効果
   for (const pm of p.moves) {
     const passive = world.rules.moves[pm.move]?.passive[pm.level - 1];

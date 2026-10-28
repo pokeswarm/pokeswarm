@@ -1,4 +1,5 @@
 import { insideObstacle, rayLengthToObstacle } from '../obstacles';
+import { recomputeModifiers } from './leveling';
 import {
   MOTION_BOOMERANG,
   MOTION_FOLLOW,
@@ -250,6 +251,16 @@ export function useMoves(world: World): void {
       // 消えてから数える技（こなゆき・ふぶき）は、持続の分を足す
       pm.cooldown = Math.max(scaledMoveStats(world, p, pm, st).cooldownSeconds, def.waitForEnd ? st.durationSeconds : 0) + (def.restAfterEnd ? st.durationSeconds : 0);
       world.events.push({ type: 'moveUsed', playerId: p.id, move: pm.move });
+      // 使うと自分が一時的に強くなる技（フレアドライブ）: どのブラウザでも同じように付ける。使い直すと時間が戻る
+      if (def.selfBuff) {
+        const ticks = Math.max(1, Math.round(def.selfBuff.seconds / world.dt));
+        const had = p.moveBuffs?.find((b) => b.move === pm.move);
+        if (had) had.ticksLeft = ticks;
+        else {
+          p.moveBuffs = [...(p.moveBuffs ?? []), { move: pm.move, ticksLeft: ticks }];
+          recomputeModifiers(world, p);
+        }
+      }
       if (def.chargeMove) pm.subPause = def.chargeMove.pauseSeconds;
       // ネコにこばん: 使うたびにランのコインが増える（自分の分は自分のブラウザで数える）
       if (def.coinGain) p.bonusCoins = (p.bonusCoins ?? 0) + def.coinGain.perUse + def.coinGain.perLevel * (pm.level - 1);
@@ -338,6 +349,7 @@ export function useMoves(world: World): void {
           firePulse(world, p, pm, st);
           break;
         case 'weather':
+        case 'aura':
           fireWeather(world, p, pm, st);
           break;
       }
@@ -691,7 +703,7 @@ function fireScreen(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
 /** 一度に出し終える出し方（ゆびをふるで選ぶ技。連射の出し方は、出し続ける状態を持てないので選ばない） */
 /** 続けて撃つ出し方（ゆびをふる・ものまね では一度にまとめて撃つ） */
 const BURST_PATTERNS = new Set(['nearest', 'facing', 'homing', 'boomerang', 'barrage']);
-const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter', 'eruption', 'spin', 'sweep', 'spiral', 'pulse', 'weather']);
+const ONE_SHOT_PATTERNS = new Set(['melee', 'orbit', 'beam', 'ground', 'nova', 'screen', 'whip', 'lob', 'strike', 'chain', 'bounce', 'cross', 'scatter', 'eruption', 'spin', 'sweep', 'spiral', 'pulse', 'weather', 'aura']);
 
 /** metronome（ゆびをふる）: ほかの技からランダムに1つを、その技の最大レベルで出す */
 function fireMetronome(world: World, p: Player, self?: PlayerMove): void {

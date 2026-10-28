@@ -14,8 +14,8 @@ interface HitShape {
   sector: boolean;
   /** 外へ進む攻撃の帯の厚さ（0 なら無し）。あれば、その帯だけを描く（当たり判定と同じ） */
   band: number;
-  /** 前方の長方形（キバの技）の片側の幅。null なら長方形ではない（奥行きは radius） */
-  box: number | null;
+  /** 前方の長方形（キバの技）: 向きに沿った始まり・終わりと片側の幅。null なら長方形ではない */
+  box: { from: number; to: number; half: number } | null;
 }
 
 /**
@@ -63,7 +63,7 @@ export class HitShapes {
     colorOf: (index: number) => { color: number; alpha: number } | null,
     lineOf: (index: number) => { length: number; dirX: number; dirY: number } | null,
     view: { left: number; top: number; right: number; bottom: number },
-    sectorOf: (index: number) => { dirX: number; dirY: number; half: number; box?: number } | null = () => null,
+    sectorOf: (index: number) => { dirX: number; dirY: number; half: number; box?: { from: number; to: number; half: number } } | null = () => null,
     bandOf: (index: number) => number = () => 0,
   ): void {
     const g = this.g;
@@ -103,14 +103,16 @@ export class HitShapes {
     g.beginPath();
     if (s.box !== null) {
       // 前方の長方形: 根元の辺 → 先の辺
-      const nx = -s.dirY * s.box;
-      const ny = s.dirX * s.box;
-      const ex = s.x + s.dirX * s.radius;
-      const ey = s.y + s.dirY * s.radius;
-      g.moveTo(s.x + nx, s.y + ny);
+      const nx = -s.dirY * s.box.half;
+      const ny = s.dirX * s.box.half;
+      const bx = s.x + s.dirX * s.box.from;
+      const by = s.y + s.dirY * s.box.from;
+      const ex = s.x + s.dirX * s.box.to;
+      const ey = s.y + s.dirY * s.box.to;
+      g.moveTo(bx + nx, by + ny);
       g.lineTo(ex + nx, ey + ny);
       g.lineTo(ex - nx, ey - ny);
-      g.lineTo(s.x - nx, s.y - ny);
+      g.lineTo(bx - nx, by - ny);
       g.closePath();
       return;
     }

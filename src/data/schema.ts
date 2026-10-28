@@ -1066,8 +1066,11 @@ export const moveDefSchema = z.object({
   perishHits: z.number().int().positive().optional(),
   /** 扇（melee の arcDegrees）: 数が1増えるごとに、扇の角度をこの度数だけ広げる（本数は増やさない。かえんほうしゃ・バブルこうせん。作者の指摘 2026年10月27日） */
   countWidens: z.number().positive().optional(),
-  /** melee を前方の長方形にする（キバの技: かみつく・ほのおのキバ）。値は奥行きに対する横幅の割合。作者の依頼 2026年10月28日 */
-  frontBox: z.number().positive().optional(),
+  /**
+   * melee を前方の長方形にする（キバの技: かみつく・ほのおのキバ。作者の依頼 2026年10月28日）。
+   * 届く距離（range + size）を 1 として、向きに沿った始まり start と終わり end、片側の横幅 halfWidth。口の絵（fit front）が描かれる所に合わせる
+   */
+  frontBox: z.object({ start: z.number().min(0), end: z.number().positive(), halfWidth: z.number().positive() }).optional(),
   /** 扇（melee の arcDegrees）: 出ている間、向いている方向をこの速さ（度/秒）で追う（かえんほうしゃ） */
   followFacing: z.number().positive().optional(),
   /** 射程の強化（ズームレンズ）の効き方の倍率（ねんりき: 0.5 で半分だけ伸びる）。省略で 1 */

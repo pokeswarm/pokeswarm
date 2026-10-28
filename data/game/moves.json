@@ -57,7 +57,7 @@
       "pattern": "melee",
       "effect": "fire-fang",
       "base": {
-        "power": 20.8,
+        "power": 25.5,
         "cooldownSeconds": 1.4,
         "count": 1,
         "intervalSeconds": 0.1,
@@ -79,37 +79,41 @@
       "levels": [
         {
           "size": 6,
-          "power": 6.7
+          "power": 10.1
         },
         {
-          "power": 8.3
+          "power": 10.6
         },
         {
           "size": 8,
-          "power": 4.1
+          "power": 8.8
         },
         {
           "statusChance": 0.1,
-          "power": 7.5
+          "power": 10.3
         },
         {
           "size": 8,
-          "power": 2.5
+          "power": 7.7
         },
         {
           "cooldownSeconds": -0.2,
-          "power": -1.3
+          "power": -1.9
         },
         {
           "size": 8,
-          "power": 1.1
+          "power": 5.6
         }
       ],
       "body": {
         "lungeDistance": 10,
         "afterimages": 0
       },
-      "frontBox": 1.2
+      "frontBox": {
+        "start": 0.25,
+        "end": 0.95,
+        "halfWidth": 0.35
+      }
     },
     "gust": {
       "pattern": "cross",
@@ -5629,7 +5633,7 @@
         "knockbackSeconds": 0.1,
         "statusChance": 0,
         "statusSeconds": 0,
-        "power": 38.2,
+        "power": 59.1,
         "cooldownSeconds": 0.8,
         "count": 1,
         "speed": 400,
@@ -5645,38 +5649,42 @@
       "levels": [
         {
           "size": 8,
-          "power": 4.9
+          "power": 10.7
         },
         {
           "size": 6,
-          "power": 4.9
+          "power": 10.6
         },
         {
           "size": 8,
-          "power": 3.4
+          "power": 9
         },
         {
           "size": 6,
-          "power": 3.8
+          "power": 9.1
         },
         {
           "size": 8,
-          "power": 2.4
+          "power": 7.5
         },
         {
           "critChancePct": 10,
-          "power": 6.2
+          "power": 11.3
         },
         {
           "size": 12,
-          "power": -0.4
+          "power": 4
         }
       ],
       "body": {
         "lungeDistance": 24,
         "afterimages": 0
       },
-      "frontBox": 1.2
+      "frontBox": {
+        "start": 0.25,
+        "end": 0.95,
+        "halfWidth": 0.35
+      }
     },
     "crunch": {
       "pattern": "barrage",

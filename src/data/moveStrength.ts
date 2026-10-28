@@ -82,7 +82,9 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
       break;
     case 'melee': {
       const arc = num('arcDegrees');
-      area = arc > 0 ? (Math.min(arc, 360) / 360) * Math.PI * (range + size) ** 2 : Math.PI * size * size;
+      // 前方の長方形（キバの技）
+      const box = def.frontBox;
+      area = box ? (range + size) ** 2 * (box.end - box.start) * 2 * box.halfWidth : arc > 0 ? (Math.min(arc, 360) / 360) * Math.PI * (range + size) ** 2 : Math.PI * size * size;
       break;
     }
     case 'beam':

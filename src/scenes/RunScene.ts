@@ -1877,7 +1877,7 @@ export class RunScene extends Phaser.Scene {
         pr.shape[i] === SHAPE_SECTOR
           ? { dirX: pr.dirX[i]!, dirY: pr.dirY[i]!, half: pr.length[i]! }
           : pr.shape[i] === SHAPE_BOX
-            ? { dirX: pr.dirX[i]!, dirY: pr.dirY[i]!, half: 0, box: pr.length[i]! }
+            ? { dirX: pr.dirX[i]!, dirY: pr.dirY[i]!, half: 0, box: boxShape(world, i) }
             : null,
       (i) => pr.band[i]!,
     );
@@ -1990,6 +1990,13 @@ export class RunScene extends Phaser.Scene {
   }
 }
 
+/** 前方の長方形（キバの技）の当たり判定の、向きに沿った始まり・終わりと片側の幅（ワールドの長さ） */
+function boxShape(world: World, i: number): { from: number; to: number; half: number } {
+  const pr = world.projectiles;
+  const box = world.rules.moves[pr.move[i]!]!.frontBox;
+  const reach = pr.radius[i]!;
+  return { from: reach * (box?.start ?? 0), to: reach * (box?.end ?? 1), half: pr.length[i]! };
+}
 
 /** 重なったときの表示の順（作者の決定）: ボス（中ボス・伝説も）2 > スウォーム（ビリリダマなど）1 > 雑魚 0 */
 function enemyLayer(rules: { enemies: { kinds: readonly { id: string; rank?: string }[] }; stage: { swarms: readonly { kind: string }[] } }, kind: number): number {

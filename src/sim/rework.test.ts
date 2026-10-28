@@ -152,13 +152,15 @@ describe('作者の感想で見直した技（2026年10月25日）', () => {
   });
 
   it('キバの技（frontBox）: 前方の長方形の角には当たり、後ろと横の外には当たらない', () => {
-    // 奥行き 100（range 0 + size 100）、横幅 120（片側 60）。右を向いている
-    const sim = setup('melee', { range: 0, size: 100, durationSeconds: 0.2 }, [[95, 55], [-40, 0], [50, 90]], { frontBox: 1.2 });
+    // 届く距離 100（range 0 + size 100）の 0.25〜0.95、片側の幅 35。右を向いている。[根元の手前・先の角・後ろ・横の外]
+    const sim = setup('melee', { range: 0, size: 100, durationSeconds: 0.2 }, [[95, 40], [-40, 0], [50, 60], [5, 0]], { frontBox: { start: 0.25, end: 0.95, halfWidth: 0.35 } });
     sim.step([]);
-    const [corner, behind, outside] = damage(sim, 3);
+    const [corner, behind, outside, near] = damage(sim, 4);
     expect(corner).toBeGreaterThan(0);
     expect(behind).toBe(0);
     expect(outside).toBe(0);
+    // 根元（自分のすぐ前 15 より手前）は口の絵の外なので当たらない
+    expect(near).toBe(0);
   });
 
   it('ほうでん（chainRadial）: 跳ばずに、自分からまわりの別々の敵へまっすぐ出す', () => {

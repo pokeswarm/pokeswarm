@@ -538,9 +538,9 @@ function fireMelee(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   if (body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: fx, dirY: fy, distance: body.lungeDistance, afterimages: body.afterimages });
   const box = world.rules.moves[pm.move]!.frontBox;
   if (box) {
-    // キバの技: 自分の前の長方形（奥行き range + size、横幅はその box 倍）。体当たりの技は扇形のまま
+    // キバの技: 自分の前の長方形（口の絵が描かれる所。届く距離 range + size の start〜end 倍）。体当たりの技は扇形のまま
     const reach = st.range + scaledMoveStats(world, p, pm, st).size;
-    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: reach, shape: SHAPE_BOX, length: (reach * box) / 2, dirX: fx, dirY: fy, vx: fx, vy: fy });
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: reach, shape: SHAPE_BOX, length: reach * box.halfWidth, dirX: fx, dirY: fy, vx: fx, vy: fy });
     return;
   }
   if (st.arcDegrees > 0) {
@@ -1133,11 +1133,11 @@ function inSector(dx: number, dy: number, r: number, fx: number, fy: number, hal
   return angle <= half + Math.asin(Math.min(1, r / d));
 }
 
-/** 根元から (dx, dy) にある半径 r の敵が、向き (fx, fy)・奥行き depth・片側の幅 half の前方の長方形に重なるか（キバの技） */
-export function inBox(dx: number, dy: number, r: number, fx: number, fy: number, depth: number, half: number): boolean {
+/** 根元から (dx, dy) にある半径 r の敵が、向き (fx, fy) に沿って from〜to・片側の幅 half の前方の長方形に重なるか（キバの技） */
+export function inBox(dx: number, dy: number, r: number, fx: number, fy: number, from: number, to: number, half: number): boolean {
   const along = dx * fx + dy * fy;
   const side = Math.abs(dx * -fy + dy * fx);
-  return along >= -r && along <= depth + r && side <= half + r;
+  return along >= from - r && along <= to + r && side <= half + r;
 }
 
 /** 点 (px, py) と、始点 (x, y)・向き (dx, dy)・長さ len の線分との距離の2乗 */
@@ -1293,6 +1293,7 @@ export function moveProjectiles(world: World): void {
     const line = pr.shape[i] === SHAPE_LINE;
     // 長方形は、根元から一番遠い角まで
     const box = pr.shape[i] === SHAPE_BOX;
+    const boxDef = box ? world.rules.moves[pr.move[i]!]!.frontBox : undefined;
     const reach = (box ? Math.hypot(pr.radius[i]!, pr.length[i]!) : pr.radius[i]!) + maxEnemyRadius;
     const len = line ? pr.length[i]! : 0;
     const ex = x + pr.dirX[i]! * len;
@@ -1314,7 +1315,7 @@ export function moveProjectiles(world: World): void {
       const inner = pr.band[i]! > 0 ? pr.radius[i]! - pr.band[i]! - e.radius[j]! : 0;
       if (inner > 0 && d2 < inner * inner) continue;
       if (pr.shape[i] === SHAPE_SECTOR && !inSector(e.x[j]! - x, e.y[j]! - y, e.radius[j]!, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!)) continue;
-      if (pr.shape[i] === SHAPE_BOX && !inBox(e.x[j]! - x, e.y[j]! - y, e.radius[j]!, pr.dirX[i]!, pr.dirY[i]!, pr.radius[i]!, pr.length[i]!)) continue;
+      if (boxDef && !inBox(e.x[j]! - x, e.y[j]! - y, e.radius[j]!, pr.dirX[i]!, pr.dirY[i]!, pr.radius[i]! * boxDef.start, pr.radius[i]! * boxDef.end, pr.length[i]!)) continue;
       hitScratch[hits++] = j;
     }
     if (hits === 0) continue;
@@ -1451,7 +1452,8 @@ function hitLocalPlayer(world: World, i: number): void {
   const inner = pr.band[i]! > 0 ? pr.radius[i]! - pr.band[i]! - me.radius : 0;
   if (inner > 0 && d2 < inner * inner) return;
   if (pr.shape[i] === SHAPE_SECTOR && !inSector(me.x - x, me.y - y, me.radius, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!)) return;
-  if (pr.shape[i] === SHAPE_BOX && !inBox(me.x - x, me.y - y, me.radius, pr.dirX[i]!, pr.dirY[i]!, pr.radius[i]!, pr.length[i]!)) return;
+  const boxDef = pr.shape[i] === SHAPE_BOX ? world.rules.moves[pr.move[i]!]!.frontBox : undefined;
+  if (boxDef && !inBox(me.x - x, me.y - y, me.radius, pr.dirX[i]!, pr.dirY[i]!, pr.radius[i]! * boxDef.start, pr.radius[i]! * boxDef.end, pr.length[i]!)) return;
   pr.recordHit(i, key, world.tick);
   hurtPlayer(world, me, hazardDamage(world, pr.damage[i]!));
 }

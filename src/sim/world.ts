@@ -443,6 +443,13 @@ export function currentWaveIndex(world: World): number {
  * 今の区間の中ボス（gate）を倒す締め切り（更新回数）。区間の最後の中ボスが出る予定の時刻 ＋ 制限時間（07 の106章）。
  * 中ボスのいない区間・制限なし・伝説戦の間は null。ゲストも区間の始まりから同じように数える
  */
+/** 敵の動く速さ（伝説は bossRules.legendSpeedMultiplier を掛ける。ホストとゲストで同じに。07 の123章） */
+export function enemyMoveSpeed(world: World, kindIndex: number): number {
+  const kind = world.rules.enemies.kinds[kindIndex];
+  if (!kind) return 0;
+  return kind.rank === 'legendary' ? kind.moveSpeed * (world.rules.stage.bossRules.legendSpeedMultiplier ?? 1) : kind.moveSpeed;
+}
+
 export function gateDeadlineTick(world: World): number | null {
   const limit = world.rules.stage.bossRules.gateTimeLimitSeconds;
   if (!limit || world.legendary) return null;

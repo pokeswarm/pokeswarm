@@ -1,6 +1,6 @@
 import type { BossMove, LegendField } from '../../data/schema';
 import { randomUnit } from '../math';
-import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World, type BossEntry, type WingKind, gateDeadlineTick } from '../world';
+import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World, type BossEntry, type WingKind, gateDeadlineTick, enemyMoveSpeed } from '../world';
 import { hurtPlayer, fieldDamage } from './health';
 import { fireCasterMove } from './attack';
 import { casterFor } from './legendCasters';
@@ -30,9 +30,11 @@ function spawnBoss(world: World, kindIndex: number, moves: readonly number[], in
   const [ux, uy] = randomUnit(world.rng);
   const x = p.x + ux * rules.spawnDistance;
   const y = p.y + uy * rules.spawnDistance;
-  const hp = kind.hp * (tag ? (rules.tagHpMultiplier ?? 1) : 1) * (1 + (rules.hpPerExtraPlayerPct * (world.players.length - 1)) / 100);
+  // 伝説は人数倍（07 の123章）
+  const perExtra = kind.rank === 'legendary' ? (rules.legendHpPerExtraPlayerPct ?? rules.hpPerExtraPlayerPct) : rules.hpPerExtraPlayerPct;
+  const hp = kind.hp * (tag ? (rules.tagHpMultiplier ?? 1) : 1) * (1 + (perExtra * (world.players.length - 1)) / 100);
   const id = world.nextEnemyId++;
-  if (world.enemies.add(id, kindIndex, x, y, hp, kind.moveSpeed, kind.radius, kind.contactDamage) === -1) return -1;
+  if (world.enemies.add(id, kindIndex, x, y, hp, enemyMoveSpeed(world, kindIndex), kind.radius, kind.contactDamage) === -1) return -1;
   world.events.push({ type: 'enemySpawned', id, kind: kindIndex, x, y });
   world.events.push({ type: 'bossAppeared', id, kind: kindIndex });
   if (moves.length > 0) world.bosses.push({ id, cooldown: interval, interval, moves, next: 0, ...(enrage ? { enrage } : {}) });

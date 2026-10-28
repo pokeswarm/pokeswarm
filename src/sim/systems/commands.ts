@@ -1,6 +1,6 @@
 import type { InputCommand } from '../commands';
 import type { HitEffect } from '../events';
-import { currentWaveIndex, enemyHpScale, findEnemyIndex, findPlayer, type World } from '../world';
+import { currentWaveIndex, enemyHpScale, findEnemyIndex, findPlayer, type World, enemyMoveSpeed } from '../world';
 import { breakOnDamage, damageTakenMultiplier } from './status';
 import { confirmPickup } from './gems';
 import { addXp, applyOffer, banUpgrade, chooseUpgrade, mirrorLevelUp, rerollUpgrades, resumeInvincible, skipUpgrade } from './leveling';
@@ -53,7 +53,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         const wave = world.waves[currentWaveIndex(world)]!;
         const boss = (kind.rank ?? 'normal') !== 'normal';
         // HP はホストと同じく人数で増やす（ゲストが倒したと見込むときに、ホストとそろうように）
-        e.add(cmd.id, cmd.kind, cmd.x, cmd.y, kind.hp * (boss ? 1 : enemyHpScale(world)), kind.moveSpeed, kind.radius, kind.contactDamage * (boss ? 1 : wave.damageMultiplier), cmd.vx ?? 0, cmd.vy ?? 0);
+        e.add(cmd.id, cmd.kind, cmd.x, cmd.y, kind.hp * (boss ? 1 : enemyHpScale(world)), enemyMoveSpeed(world, cmd.kind), kind.radius, kind.contactDamage * (boss ? 1 : wave.damageMultiplier), cmd.vx ?? 0, cmd.vy ?? 0);
         if (boss) world.events.push({ type: 'bossAppeared', id: cmd.id, kind: cmd.kind });
         break;
       }

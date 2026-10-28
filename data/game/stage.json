@@ -787,6 +787,8 @@
     "knockbackMultiplier": 0,
     "stopStatusMultiplier": 0.25,
     "hpPerExtraPlayerPct": 90,
+    "legendHpPerExtraPlayerPct": 100,
+    "legendSpeedMultiplier": 1.15,
     "tagHpMultiplier": 0.7,
     "hazardActiveSeconds": 0.4,
     "hazardDamageScalesWithLevel": true,

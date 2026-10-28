@@ -80,6 +80,7 @@
   "run.tagBossAppeared": "Sono apparsi i boss {a} e {b}!",
   "run.clear": "Partita superata!",
   "run.legendEscaped": "{name} se n’è andato…",
+  "run.gateTimeUp": "Non sei riuscito a battere {name}…",
   "run.fail": "Partita persa...",
   "run.debugToggle": "F3: informazioni di debug",
   "result.retry": "RIPROVA",

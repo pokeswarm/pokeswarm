@@ -101,6 +101,7 @@
   "run.tagBossAppeared": "ボスの {a}と {b}が あらわれた！",
   "run.clear": "ランクリア！",
   "run.legendEscaped": "{name} は 去っていった…",
+  "run.gateTimeUp": "{name} に 勝てなかった…",
   "run.fail": "ラン失敗…",
   "run.debugToggle": "F3: 詳しい情報の表示を切り替え",
   "result.retry": "もういちど",

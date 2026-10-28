@@ -38,7 +38,7 @@ export type NetMessage =
   /** プレイヤーが抜けた（ホスト→ゲスト） */
   | { t: 'rm'; i: number }
   /** ランの終わり（ホスト→ゲスト）。lg は伝説戦の結果 */
-  | { t: 'end'; o: RunOutcome; lg: { kind: number; result: LegendaryResult | null } | null }
+  | { t: 'end'; o: RunOutcome; lg: { kind: number; result: LegendaryResult | null } | null; gt?: number }
   /** 出現（ホスト→ゲスト）: [id, 種類, x, y, ...] */
   | { t: 'sp'; e: number[] }
   /** 撃破の確定（ホスト→ゲスト）: [id, とどめを刺したプレイヤー, ...] */

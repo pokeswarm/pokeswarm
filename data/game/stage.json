@@ -790,7 +790,8 @@
     "tagHpMultiplier": 0.7,
     "hazardActiveSeconds": 0.4,
     "hazardDamageScalesWithLevel": true,
-    "spawnDistance": 380
+    "spawnDistance": 380,
+    "gateTimeLimitSeconds": 180
   },
   "endDelaySeconds": 2.5,
   "legendEscapeDelaySeconds": 3.5

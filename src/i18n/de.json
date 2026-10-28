@@ -80,6 +80,7 @@
   "run.tagBossAppeared": "Die Bosse {a} und {b} erscheinen!",
   "run.clear": "Geschafft!",
   "run.legendEscaped": "{name} ist geflohen …",
+  "run.gateTimeUp": "{name} war zu stark …",
   "run.fail": "Gescheitert...",
   "run.debugToggle": "F3: Debug-Infos",
   "result.retry": "NOCHMAL",

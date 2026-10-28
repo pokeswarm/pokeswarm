@@ -35,7 +35,7 @@ import type { Axis, InputCommand, PlayerId } from '../sim/commands';
 import { SHAPE_BOX, SHAPE_CIRCLE, SHAPE_LINE, SHAPE_SECTOR } from '../sim/entities/projectiles';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
-import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World } from '../sim/world';
+import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World, gateDeadlineTick } from '../sim/world';
 import { applyDebugOverrides, parseGodParam, parseLegendParam, parseIntruderParam, parseWingsParam, parseLevelParam, parseMovesParam, parseSectionParam, parseTimeParam } from './debugOverrides';
 import { addXp, applyOffer, itemFits, moveMaxLevel } from '../sim/systems/leveling';
 import { shinySpriteKey } from '../meta/loadoutOptions';
@@ -951,9 +951,11 @@ export class RunScene extends Phaser.Scene {
         // 伝説戦の時間切れ（作者の依頼 2026年10月28日）: クリアの表示で倒したと思わないよう、「〇〇は 去っていった…」を大きく出してから結果画面へ
         const escaped = ev.legendary?.result === 'timeUp';
         if (escaped) this.announceText.setText(t('run.legendEscaped', { name: this.enemyName(ev.legendary!.kind) })).setColor('#b3e5fc').setAlpha(1);
+        // 中ボスを制限時間で倒せなかった（07 の106章）
+        else if (ev.gateTimeUp !== undefined) this.announceText.setText(t('run.gateTimeUp', { name: this.enemyName(ev.gateTimeUp) })).setColor('#ef9a9a').setAlpha(1);
         else this.announceText.setText(t(`run.${ev.outcome}`)).setColor(clear ? '#ffe082' : '#ef9a9a').setAlpha(1);
         this.legendaryResult = ev.legendary;
-        this.resultAt = performance.now() + (escaped ? (stageConfig.legendEscapeDelaySeconds ?? stageConfig.endDelaySeconds) : stageConfig.endDelaySeconds) * 1000;
+        this.resultAt = performance.now() + (escaped || ev.gateTimeUp !== undefined ? (stageConfig.legendEscapeDelaySeconds ?? stageConfig.endDelaySeconds) : stageConfig.endDelaySeconds) * 1000;
       }
     }
     if (appeared.length > 0) {
@@ -1512,9 +1514,12 @@ export class RunScene extends Phaser.Scene {
     g.fillStyle(hexColor(eb.fill)).fillRect(2, 2, Math.round((cam.width - 4) * xpRatio), barH - 4);
     this.levelText.setText(w.level >= w.rules.leveling.maxLevel ? t('run.levelMax') : `Lv${w.level}`);
     this.placeUi(this.levelText, 8, barH / 2);
-    // 経過時間（伝説戦の間は、逃げられるまでの残り時間を赤で）
+    // 経過時間（伝説戦の間は、逃げられるまでの残り時間を赤で。中ボスが出ている間は、倒す締め切りまでの残り時間を赤で。07 の106章）
     const lg = w.legendary;
-    const legendLeft = lg && lg.endTick > 0 ? Math.max(0, (lg.endTick - w.tick) * w.dt) : null;
+    const gateEnd = gateDeadlineTick(w);
+    const gateLimit = w.rules.stage.bossRules.gateTimeLimitSeconds ?? 0;
+    const gateLeft = gateEnd !== null && !w.outcome && w.tick >= gateEnd - Math.round(gateLimit / w.dt) ? Math.max(0, (gateEnd - w.tick) * w.dt) : null;
+    const legendLeft = lg && lg.endTick > 0 ? Math.max(0, (lg.endTick - w.tick) * w.dt) : gateLeft;
     this.timerText.setText(formatTime(legendLeft ?? Math.min(now, limit))).setColor(legendLeft !== null ? '#ff5252' : uiConfig.timer.color);
     this.placeUi(this.timerText, cx, top);
     // テストの表示は、ボスの HP バーを何本も並べたときはその下へ

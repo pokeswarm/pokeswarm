@@ -153,7 +153,7 @@ export class SyncSession {
           if (host) out.push({ t: 'lw', k: ev.kind, i: 1 });
           break;
         case 'runEnded':
-          if (host) out.push({ t: 'end', o: ev.outcome, lg: ev.legendary });
+          if (host) out.push({ t: 'end', o: ev.outcome, lg: ev.legendary, ...(ev.gateTimeUp !== undefined && { gt: ev.gateTimeUp }) });
           break;
         case 'sectionAdvanced':
           if (host) out.push({ t: 'sa', s: ev.section });
@@ -367,7 +367,7 @@ export class SyncSession {
           if (guest) cmds.push({ type: 'legendaryWarning', kind: m.k, enraged: m.r === 1, intruder: m.i === 1 });
           break;
         case 'end':
-          if (guest) cmds.push({ type: 'endRun', outcome: m.o, legendary: m.lg });
+          if (guest) cmds.push({ type: 'endRun', outcome: m.o, legendary: m.lg, ...(m.gt !== undefined && { gateTimeUp: m.gt }) });
           break;
         case 'sa':
           if (guest) cmds.push({ type: 'setSection', section: m.s });

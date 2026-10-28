@@ -80,6 +80,7 @@
   "run.tagBossAppeared": "¡Aparecieron los jefes {a} y {b}!",
   "run.clear": "¡Partida superada!",
   "run.legendEscaped": "{name} se ha marchado…",
+  "run.gateTimeUp": "No pudiste vencer a {name}…",
   "run.fail": "Partida perdida...",
   "run.debugToggle": "F3: información de depuración",
   "result.retry": "OTRA VEZ",

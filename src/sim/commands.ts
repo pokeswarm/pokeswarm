@@ -233,6 +233,8 @@ export interface EndRunCommand {
   readonly outcome: RunOutcome;
   /** 伝説戦の結果（ゲスト） */
   readonly legendary?: { readonly kind: number; readonly result: LegendaryResult | null } | null;
+  /** 中ボスを制限時間で倒せずに失敗した: その中ボス（敵の種類の番号） */
+  readonly gateTimeUp?: number;
 }
 
 /** ゲスト: ホストが味方を復活させた（revives は残りの復活可能数） */

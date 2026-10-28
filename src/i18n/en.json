@@ -101,6 +101,7 @@
   "run.tagBossAppeared": "The bosses {a} and {b} appeared!",
   "run.clear": "Run clear!",
   "run.legendEscaped": "{name} fled…",
+  "run.gateTimeUp": "Couldn't beat {name}…",
   "run.fail": "Run failed...",
   "run.debugToggle": "F3: toggle debug info",
   "result.retry": "RETRY",

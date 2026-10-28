@@ -1,6 +1,6 @@
 import type { BossMove, LegendField } from '../../data/schema';
 import { randomUnit } from '../math';
-import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World, type BossEntry, type WingKind } from '../world';
+import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World, type BossEntry, type WingKind, gateDeadlineTick } from '../world';
 import { hurtPlayer, fieldDamage } from './health';
 import { fireCasterMove } from './attack';
 import { casterFor } from './legendCasters';
@@ -848,6 +848,13 @@ export function checkRunEnd(world: World): void {
     startLegendaryOrClear(world);
     return;
   }
+  // 中ボスを制限時間で倒せなかった（育たずに逃げ回るランを早く終える。07 の106章）
+  const deadline = gateDeadlineTick(world);
+  if (deadline !== null && world.tick >= deadline && world.gateIds.size > 0) {
+    const i = findEnemyIndex(world, world.gateIds.values().next().value!);
+    endRun(world, 'fail', i === -1 ? undefined : world.enemies.kind[i]!);
+    return;
+  }
   if (world.requiredTotal > 0 && world.tick >= Math.round(world.rules.stage.durationSeconds / world.dt)) endRun(world, 'fail');
 }
 
@@ -962,10 +969,10 @@ function finishLegendary(world: World, result: LegendaryResult): void {
   endRun(world, 'clear');
 }
 
-export function endRun(world: World, outcome: 'clear' | 'fail' | 'disconnected'): void {
+export function endRun(world: World, outcome: 'clear' | 'fail' | 'disconnected', gateTimeUp?: number): void {
   if (world.outcome) return;
   world.outcome = outcome;
   world.hazards.length = 0;
   world.zones.length = 0;
-  world.events.push({ type: 'runEnded', outcome, legendary: world.legendary ? { kind: world.legendary.kind, result: world.legendary.result } : null });
+  world.events.push({ type: 'runEnded', outcome, legendary: world.legendary ? { kind: world.legendary.kind, result: world.legendary.result } : null, ...(gateTimeUp !== undefined && { gateTimeUp }) });
 }

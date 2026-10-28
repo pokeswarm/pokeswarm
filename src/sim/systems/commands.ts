@@ -173,7 +173,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
       case 'endRun':
         if (world.role === 'guest') {
           if (cmd.legendary) world.legendary = { kind: cmd.legendary.kind, appearTick: 0, endTick: 0, spawned: true, result: cmd.legendary.result };
-          endRun(world, cmd.outcome);
+          endRun(world, cmd.outcome, cmd.gateTimeUp);
         }
         break;
       case 'legendaryWarning':

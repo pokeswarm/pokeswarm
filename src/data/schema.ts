@@ -683,6 +683,8 @@ export const stageConfigSchema = z.object({
     hazardDamageScalesWithLevel: z.boolean(),
     /** プレイヤーからこの距離に出す */
     spawnDistance: z.number().positive(),
+    /** 区間を進める中ボス（gate）が出てから、この秒数で倒せなければ失敗（作者の決定 2026年10月28日: 育たずに逃げ回るランを早く終える。07 の106章）。省略で制限なし */
+    gateTimeLimitSeconds: z.number().positive().optional(),
   }),
   /** クリア・失敗が決まってから結果画面に移るまでの時間 */
   endDelaySeconds: z.number().nonnegative(),

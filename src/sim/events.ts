@@ -352,6 +352,8 @@ export interface RunEndedEvent {
   readonly outcome: 'clear' | 'fail' | 'disconnected';
   /** 伝説戦があれば、その伝説（敵の種類の番号）と結果 */
   readonly legendary: { readonly kind: number; readonly result: 'won' | 'lost' | 'timeUp' | null } | null;
+  /** 中ボスを制限時間で倒せずに失敗した: その中ボス（敵の種類の番号。07 の106章） */
+  readonly gateTimeUp?: number;
 }
 
 export type SimEvent =

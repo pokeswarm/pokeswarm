@@ -439,6 +439,18 @@ export function currentWaveIndex(world: World): number {
  * 次の区間に進むまでの目安の更新回数（スプライトの先読み用）。中ボスで進む区間は中ボスが出るまで、
  * 時間で進む区間は残り時間。最後の区間は null
  */
+/**
+ * 今の区間の中ボス（gate）を倒す締め切り（更新回数）。区間の最後の中ボスが出る予定の時刻 ＋ 制限時間（07 の106章）。
+ * 中ボスのいない区間・制限なし・伝説戦の間は null。ゲストも区間の始まりから同じように数える
+ */
+export function gateDeadlineTick(world: World): number | null {
+  const limit = world.rules.stage.bossRules.gateTimeLimitSeconds;
+  if (!limit || world.legendary) return null;
+  let after = -1;
+  for (const b of world.bossSchedule) if (b.wave === world.section && b.gate) after = Math.max(after, b.afterTicks);
+  return after < 0 ? null : world.sectionStartTick + after + Math.round(limit / world.dt);
+}
+
 export function ticksUntilNextSection(world: World): number | null {
   if (world.section >= world.waves.length - 1) return null;
   const inSection = world.tick - world.sectionStartTick;

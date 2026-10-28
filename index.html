@@ -3,13 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>PokéSwarm</title>
+    <title>PokéSwarm – Pokémon Survivors-like Roguelite Browser Game｜ポケモンのサバイバー系ブラウザゲーム</title>
+    <!-- 検索・AI 向けの説明（作者の依頼 2026年10月29日。ジャンル: ヴァンパイアサバイバー系・ローグライト。docs/05_operations.md） -->
+    <meta name="keywords" content="PokéSwarm, Pokémon, ポケモン, survivors-like, Vampire Survivors-like, ヴァンパイアサバイバー系, サバイバー系, サバイバーライク, roguelite, ローグライト, bullet heaven, browser game, ブラウザゲーム, co-op, 協力プレイ, 無料" />
+    <link rel="canonical" href="https://pokeswarm.org/" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
     <!-- リンクを貼ったときの表示（OGP。作者の依頼 2026年10月23日）。画像は scripts/make-brand-header.ts で作る。SNS で読まれるので英語 -->
-    <meta name="description" content="Free, ad-free Pokémon survivors-like browser game made by one person. Co-op up to 4 players. Unofficial non-profit fan game." />
+    <meta name="description" content="Free, ad-free Pokémon survivors-like (Vampire Survivors-like) roguelite browser game made by one person. Co-op up to 4 players on PC and smartphone. Unofficial non-profit fan game." />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="PokéSwarm" />
-    <meta property="og:title" content="PokéSwarm" />
-    <meta property="og:description" content="Free, ad-free Pokémon survivors-like browser game made by one person. Co-op up to 4 players. Unofficial non-profit fan game." />
+    <meta property="og:title" content="PokéSwarm – Pokémon Survivors-like Roguelite Browser Game" />
+    <meta property="og:description" content="Free, ad-free Pokémon survivors-like (Vampire Survivors-like) roguelite browser game made by one person. Co-op up to 4 players on PC and smartphone. Unofficial non-profit fan game." />
     <meta property="og:url" content="https://pokeswarm.org/" />
     <meta property="og:image" content="https://pokeswarm.org/og-image.png" />
     <meta property="og:image:width" content="1200" />
@@ -33,9 +37,17 @@
       input, textarea { -webkit-user-select: text; user-select: text; }
       #game { width: 100%; height: 100%; }
     </style>
+    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"VideoGame","@id":"https://pokeswarm.org/#game","name":"PokéSwarm","alternateName":["PokeSwarm","ポケスウォーム"],"url":"https://pokeswarm.org/","image":"https://pokeswarm.org/og-image.png","description":"A free, ad-free Pokémon-themed survivors-like (Vampire Survivors-like, bullet heaven) roguelite browser game with online co-op for up to 4 players. ポケモンを題材にしたヴァンパイアサバイバー系・ローグライトのブラウザゲーム。","genre":["Survivors-like","Vampire Survivors-like","Bullet heaven","Roguelite","Action","サバイバー系","ローグライト"],"keywords":"Pokémon, survivors-like, Vampire Survivors-like, roguelite, bullet heaven, browser game, co-op, ポケモン, サバイバー系, ヴァンパイアサバイバー系, サバイバーライク, ローグライト, ブラウザゲーム, 協力プレイ","gamePlatform":["Web browser","PC","Smartphone"],"applicationCategory":"Game","operatingSystem":"Any (web browser)","playMode":["SinglePlayer","CoOp","MultiPlayer"],"numberOfPlayers":{"@type":"QuantitativeValue","minValue":1,"maxValue":4},"inLanguage":["ja","en","fr","de","es","it"],"isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD","availability":"https://schema.org/InStock"},"author":{"@type":"Person","name":"PokeSwarmDev","url":"https://x.com/PokeSwarmDev"},"sameAs":["https://x.com/PokeSwarmDev"]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What kind of game is PokéSwarm?","acceptedAnswer":{"@type":"Answer","text":"A Pokémon-themed survivors-like (Vampire Survivors-like) roguelite browser game. Your moves fire automatically while you survive swarms of wild Pokémon, and you pick moves and held items on every level-up."}},{"@type":"Question","name":"Can I play PokéSwarm on a smartphone or with friends?","acceptedAnswer":{"@type":"Answer","text":"Yes. It runs in PC and smartphone browsers (landscape) for free with no ads, and supports online co-op for up to 4 players."}},{"@type":"Question","name":"Is PokéSwarm the same as PokéSurvivor?","acceptedAnswer":{"@type":"Answer","text":"No. PokéSurvivor is a separate fan game by a different creator and is not related to PokéSwarm. Both are Pokémon-themed survivors-like browser games."}},{"@type":"Question","name":"PokéSwarm はどんなゲームですか？","acceptedAnswer":{"@type":"Answer","text":"ポケモンを題材にした、ヴァンパイアサバイバー系（サバイバーライク）のローグライト ブラウザゲームです。無料・広告なしで、PC とスマホで遊べ、最大4人の協力プレイに対応しています。非公式・非営利のファンゲームです。"}}]}]}</script>
   </head>
   <body>
     <div id="game"></div>
+    <!-- スクリプトを動かさない読み手（検索・AI）向けの説明。ゲームの画面には出ない -->
+    <noscript>
+      <h1>PokéSwarm – ポケモンのサバイバー系ローグライト ブラウザゲーム</h1>
+      <p>PokéSwarm は、ポケモンを題材にしたヴァンパイアサバイバー系（Survivors-like / サバイバーライク）のローグライト ブラウザゲームです。無料・広告なし、PC とスマホで遊べて、最大4人の協力プレイに対応。非公式・非営利のファンゲームです。遊ぶには JavaScript を有効にしてください。</p>
+      <p>PokéSwarm is a free, ad-free Pokémon survivors-like (Vampire Survivors-like) roguelite browser game with online co-op for up to 4 players. Please enable JavaScript to play.</p>
+      <p><a href="/about.html">PokéSwarm について / About PokéSwarm</a></p>
+    </noscript>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

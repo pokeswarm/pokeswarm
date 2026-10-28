@@ -1,0 +1,14 @@
+# PokéSwarm
+
+> PokéSwarm is a free, ad-free Pokémon-themed survivors-like (Vampire Survivors-like, bullet heaven) roguelite browser game with online co-op for up to 4 players. It runs in PC and smartphone browsers with no install. It is an unofficial, non-profit fan game, not affiliated with Nintendo, Creatures, GAME FREAK or The Pokémon Company.
+
+- Play: https://pokeswarm.org/
+- About (Japanese and English): https://pokeswarm.org/about.html
+- Genre: survivors-like / Vampire Survivors-like / bullet heaven action with roguelite progression (ポケモンのヴァンパイアサバイバー系・サバイバーライク・ローグライト)
+- Players: single player, or online co-op for 2 to 4 players (room URL or friend invite)
+- Platforms: web browser on PC and smartphone (landscape). Free, no ads, no purchases.
+- Content: 54 playable Pokémon across the Kanto and Johto regions (Hoenn in progress); type matchups, STAB, critical hits, evolution, move evolutions (derived moves), bosses and legendary Pokémon battles; permanent upgrades bought with coins earned in runs.
+- Languages: Japanese, English, French, German, Spanish, Italian
+- Controls: WASD or arrow keys on PC, an on-screen joystick on smartphones; attacks fire automatically.
+- Not the same as PokéSurvivor: PokéSurvivor is a separate fan game by a different creator and is not related to PokéSwarm.
+- Developer contact: https://x.com/PokeSwarmDev

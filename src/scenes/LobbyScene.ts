@@ -15,6 +15,7 @@ import { regionUpgradesOf } from '../meta/regionScope';
 import type { RunSceneData } from './RunScene';
 import { pokemonIconImage, PokemonPicker } from './pokemonPicker';
 import { defaultRegion } from './RegionScene';
+import { holdScreenAwake } from '../render/screenWakeLock';
 
 export interface LobbySceneData {
   /** host: 部屋を作る、join: roomId の部屋に入る */
@@ -63,6 +64,9 @@ export class LobbyScene extends Phaser.Scene {
   }
 
   create(): void {
+    // スマホで画面が消えて通信が止まらないように、この画面の間は画面を点けたままにする（作者の報告 2026年10月28日）
+    const releaseWakeLock = holdScreenAwake();
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, releaseWakeLock);
     this.root = document.createElement('div');
     this.root.style.cssText =
       'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(960px,96vw);max-height:96vh;overflow:auto;padding:16px 24px;background:#000;color:#f8f8f8;border:4px solid #f8f8f8;box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px #f8f8f8;font-family:inherit;font-size:16px;line-height:1.6;border-radius:6px;z-index:20;box-sizing:border-box';

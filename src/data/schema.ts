@@ -1601,6 +1601,10 @@ export const networkConfigSchema = z.object({
    * レベルアップで止まっている間も通信は途切れない
    */
   silenceTimeoutSeconds: z.number().positive(),
+  /** このブラウザのタイマーがこの秒数より空いたら「止まっていた」とみなす（スマホの画面が消えた・アプリを切り替えた）。止まっていた間の無音では相手を切らない */
+  freezeDetectSeconds: z.number().positive(),
+  /** 切断の理由に「このブラウザが止まっていた」を書き添えるのは、止まってからこの秒数の間 */
+  freezeNoteSeconds: z.number().positive(),
   /** ゲストの出現位置（ホストからの横のずれ。プレイヤーの番号ごとにずらす） */
   guestSpawnOffsetX: z.number(),
   /** 部屋の最大人数（ホストを含む） */

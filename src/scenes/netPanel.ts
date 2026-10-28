@@ -24,8 +24,15 @@ export class NetPanel {
     document.body.appendChild(this.root);
   }
 
-  show(key: MessageKey, params?: Record<string, string | number>): void {
+  /** detail: 2行目に出す文（切断の理由など） */
+  show(key: MessageKey, params?: Record<string, string | number>, detail?: string): void {
     this.root.replaceChildren(document.createTextNode(t(key, params)));
+    if (detail) {
+      const d = document.createElement('div');
+      d.style.cssText = 'font-size:13px;opacity:0.85';
+      d.textContent = detail;
+      this.root.append(d);
+    }
     this.root.style.display = 'block';
   }
 

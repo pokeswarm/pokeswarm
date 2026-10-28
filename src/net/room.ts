@@ -138,6 +138,15 @@ export interface RoomOptions {
  * - 待合室: 参加者とポケモンの選択を onChange で知らせる。ホストが start で開始し、全員に onStart が届く
  * - ラン中: transports（ホストは各ゲストとの、ゲストはホストとの通信路）で同期する
  */
+/**
+ * 相手が抜けた理由（作者の報告 2026年10月28日: スマホの協力プレイでよく切れる。どれで切れたかを画面に出して調べる）
+ * - closed: 通信路が閉じた（WebRTC の接続が切れた・相手がページを閉じた）
+ * - left: 部屋の参加者の記録が消えた（相手のブラウザと Realtime Database の接続が切れた・部屋を出た）
+ * - roomGone: 部屋が消えた（ホストのページが閉じた・ホストの回線が切れた）
+ * - silence: 相手から決まった秒数なにも届かない（相手の画面が消えた・アプリを切り替えた・回線が弱い）
+ */
+export type LeaveReason = 'closed' | 'left' | 'roomGone' | 'silence';
+
 export class Room {
   readonly transports = new Map<PlayerId, Transport>();
   /** 参加者が変わった・選択が変わった・通信がつながった */
@@ -145,7 +154,7 @@ export class Room {
   /** ホストが開始した */
   onStart: ((players: RoomPlayer[]) => void) | null = null;
   /** ある参加者が抜けた（ゲストから見たホストの切断を含む） */
-  onLeave: ((id: PlayerId) => void) | null = null;
+  onLeave: ((id: PlayerId, reason: LeaveReason) => void) | null = null;
   private readonly members = new Map<PlayerId, MemberData>();
   private readonly subs = new Subscriptions();
   private readonly peerSubs = new Map<PlayerId, Subscriptions>();
@@ -318,7 +327,7 @@ export class Room {
       onChildRemoved(membersRef, (snap) => {
         const id = Number(snap.key);
         this.members.delete(id);
-        this.dropPeer(id);
+        this.dropPeer(id, 'left');
         this.changed();
       }),
     );
@@ -338,17 +347,17 @@ export class Room {
     this.subs.add(
       onValue(ref(this.db, `${this.base}/host`), (snap) => {
         if (snap.exists()) seen = true;
-        else if (seen && !this.closed) this.dropPeer(1);
+        else if (seen && !this.closed) this.dropPeer(1, 'roomGone');
       }),
     );
   }
 
   /** 相手を切断したものとして外す（なにも届かない時間が続いたときなど） */
   disconnect(id: PlayerId): void {
-    this.dropPeer(id);
+    this.dropPeer(id, 'silence');
   }
 
-  private dropPeer(id: PlayerId): void {
+  private dropPeer(id: PlayerId, reason: LeaveReason): void {
     this.peerSubs.get(id)?.clear();
     this.peerSubs.delete(id);
     const t = this.transports.get(id);
@@ -356,7 +365,8 @@ export class Room {
     this.transports.delete(id);
     t.onClose = null;
     t.close();
-    this.onLeave?.(id);
+    console.info('[net] 切断', id, reason);
+    this.onLeave?.(id, reason);
   }
 
   private addTransport(id: PlayerId, transport: Transport): void {
@@ -369,7 +379,7 @@ export class Room {
     this.pending.set(id, queue);
     transport.onMessages = (messages) => queue.push(messages);
     // 通信路が切れた（相手のブラウザが閉じた・回線が切れた）: その相手が抜けたものとして扱う
-    transport.onClose = () => this.dropPeer(id);
+    transport.onClose = () => this.dropPeer(id, 'closed');
     this.changed();
   }
 

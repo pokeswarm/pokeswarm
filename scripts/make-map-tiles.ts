@@ -493,6 +493,256 @@ const HOENN: Record<string, TileDef> = {
       for (const p of scatter(rand, 46, 4, taken)) c.stamp(p.x, p.y, rand() < 0.1 ? ['o'] : rand() < 0.5 ? ['a', 'k'] : ['k'], S);
     },
   },
+  // 区間1: 灰褐色の花崗岩の床。白い石英の粒・暗い割れ目・陰のある石
+  granite_cave: {
+    seed: 31001,
+    fill: hex('7a6e62'),
+    draw(c, rand) {
+      const n = layeredNoise(rand, 4);
+      base(c, rand, n, [[0, hex('72665b')], [0.38, hex('7a6e62')], [0.64, hex('83766a')]], { pct: 0.16, light: hex('94887a'), dark: hex('62574e') });
+      for (let i = 0; i < 12; i++) wander(c, rand, 10 + Math.floor(rand() * 14), hex('3e3530'), { bend: 0.7, light: hex('968a7e') });
+      const taken: { x: number; y: number }[] = [];
+      const R = { l: hex('a89c8e'), m: hex('8a7e72'), d: hex('5e544a'), k: hex('3a322c') };
+      for (const p of scatter(rand, 20, 10, taken)) rock(c, rand, p.x, p.y, R);
+      // 石英の粒（白とうすい桃）と、黒い雲母の粒
+      const Q = { w: hex('eae6de'), p: hex('d8c4bc'), k: hex('2e2826') };
+      for (const p of scatter(rand, 70, 4, taken)) c.stamp(p.x, p.y, rand() < 0.4 ? ['w'] : rand() < 0.5 ? ['p'] : ['k'], Q);
+    },
+  },
+  // 区間2: 古い発電所の床。くすんだ金属の板・ボルト・黄色と黒の線・切れた配線
+  power_plant: {
+    seed: 32001,
+    fill: hex('6c7478'),
+    draw(c, rand) {
+      const CELL = 32;
+      const plates = [hex('6c7478'), hex('667074'), hex('727a7e'), hex('636b6f')];
+      for (let ty = 0; ty < TILE / CELL; ty++) for (let tx = 0; tx < TILE / CELL; tx++) {
+        const col = plates[Math.floor(rand() * plates.length)]!;
+        const hazard = rand() < 0.12;
+        for (let y = 0; y < CELL; y++) for (let x = 0; x < CELL; x++) {
+          let p = rand() < 0.07 ? (rand() < 0.5 ? hex('7c8488') : hex('5c6468')) : col;
+          // 板の縁: 上と左が明るく、右と下が暗い
+          if (x === 0 || y === 0) p = hex('3a4044');
+          else if (x === 1 || y === 1) p = hex('8c9498');
+          else if (x === CELL - 1 || y === CELL - 1) p = hex('4c5458');
+          // 黄色と黒の斜めの線（危ない所）
+          else if (hazard && y >= 4 && y < 10) p = Math.floor((x + y) / 3) % 2 === 0 ? hex('e0b830') : hex('2a2a2a');
+          // 四隅のボルト
+          if ((x === 4 || x === CELL - 5) && (y === 4 || y === CELL - 5)) p = hex('a8b0b4');
+          if ((x === 5 || x === CELL - 4) && (y === 5 || y === CELL - 4)) p = hex('3a4044');
+          c.set(tx * CELL + x, ty * CELL + y, p);
+        }
+      }
+      // 切れた配線（赤・黄・黒）
+      for (let i = 0; i < 5; i++) wander(c, rand, 14 + Math.floor(rand() * 12), [hex('c83a30'), hex('e0b830'), hex('22262a')][i % 3]!, { bend: 0.6, shade: hex('3a4044') });
+      // さびのしみ
+      const taken: { x: number; y: number }[] = [];
+      const R = { r: hex('8a5a3a'), o: hex('a8703e') };
+      for (const p of scatter(rand, 12, 12, taken)) c.stamp(p.x, p.y, rand() < 0.5 ? ['ro', 'r.'] : ['.r', 'ro', '.r'], R);
+    },
+  },
+  // 区間3a: 灰が積もった草地。灰色の地面から、ところどころ緑がのぞく
+  ash_field: {
+    seed: 33001,
+    fill: hex('9a9894'),
+    draw(c, rand) {
+      const n = layeredNoise(rand, 4);
+      const green = layeredNoise(rand, 8);
+      base(c, rand, n, [[0, hex('92908c')], [0.38, hex('9a9894')], [0.64, hex('a4a29e')]], { pct: 0.14, light: hex('b4b2ae'), dark: hex('85837f') });
+      // 灰から草がのぞく所
+      for (let y = 0; y < TILE; y++) for (let x = 0; x < TILE; x++) {
+        const g = green(x, y);
+        if (g > 0.7) c.set(x, y, rand() < 0.3 ? hex('8a9a74') : hex('6e8a5a'));
+        else if (g > 0.66 && rand() < 0.35) c.set(x, y, hex('8a9480'));
+      }
+      const taken: { x: number; y: number }[] = [];
+      // 灰をかぶった草の芽
+      const G = { d: hex('5a7448'), l: hex('b8bcb0') };
+      for (const p of scatter(rand, 60, 6, taken)) c.stamp(p.x, p.y, rand() < 0.5 ? ['l.l', 'd.d', '.d.'] : ['.l', 'ld', 'd.'], G);
+      // 灰の吹きだまり（白っぽい筋）
+      for (const p of scatter(rand, 10, 20, taken)) {
+        const len = 5 + Math.floor(rand() * 6);
+        for (let i = 0; i < len; i++) { c.set(p.x + i, p.y, hex('c8c6c2')); if (rand() < 0.6) c.set(p.x + i, p.y + 1, hex('86847f')); }
+      }
+      const S = { a: hex('6a6864'), k: hex('4a4844') };
+      for (const p of scatter(rand, 30, 5, taken)) c.stamp(p.x, p.y, rand() < 0.5 ? ['a', 'k'] : ['k'], S);
+    },
+  },
+  // 区間4: 明るい黄土色の砂漠。風の筋（砂紋）と小石
+  desert: {
+    seed: 34001,
+    fill: hex('dcb46e'),
+    draw(c, rand) {
+      const n = layeredNoise(rand, 4);
+      base(c, rand, n, [[0, hex('d4ac66')], [0.38, hex('dcb46e')], [0.64, hex('e4bc78')]], { pct: 0.12, light: hex('ecc888'), dark: hex('c8a05e') });
+      // 砂紋: ゆるく波打つ横の筋（明るい筋の下に影）。端でつながるように周期を TILE に合わせる
+      for (let row = 0; row < 12; row++) {
+        const y0 = row * (TILE / 12) + Math.floor(rand() * 3), phase = rand() * Math.PI * 2, amp = 1.5 + rand() * 1.5;
+        for (let x = 0; x < TILE; x++) {
+          if (rand() < 0.12) continue;
+          const y = y0 + Math.round(Math.sin((x / TILE) * Math.PI * 4 + phase) * amp);
+          c.set(x, y, hex('f0d294'));
+          c.set(x, y + 1, hex('bf965a'));
+        }
+      }
+      const taken: { x: number; y: number }[] = [];
+      const R = { l: hex('c09a70'), m: hex('a07e58'), d: hex('7a5e42'), k: hex('5a4430') };
+      for (const p of scatter(rand, 8, 18, taken)) rock(c, rand, p.x, p.y, R);
+      const S = { a: hex('b08a5a'), k: hex('8a6a46') };
+      for (const p of scatter(rand, 30, 5, taken)) c.stamp(p.x, p.y, rand() < 0.5 ? ['a'] : ['k'], S);
+    },
+  },
+  // 区間5: 背の高い濃い緑の草と、濡れた黒い土。小さな水たまり（雨で暗くするので少し明るめ）
+  rain_grass: {
+    seed: 35001,
+    fill: hex('3e9a44'),
+    draw(c, rand) {
+      const n = layeredNoise(rand, 4);
+      const mud = layeredNoise(rand, 8);
+      base(c, rand, n, [[0, hex('38923e')], [0.38, hex('3e9a44')], [0.64, hex('44a24a')]], { pct: 0.12, light: hex('52b056'), dark: hex('30843a') });
+      for (let y = 0; y < TILE; y++) for (let x = 0; x < TILE; x++) {
+        const m = mud(x, y);
+        if (m > 0.7) c.set(x, y, rand() < 0.1 ? hex('5a4a3a') : hex('46382c'));
+        else if (m > 0.66 && rand() < 0.4) c.set(x, y, hex('3a5a30'));
+      }
+      const taken: { x: number; y: number }[] = [];
+      // 水たまり: 空を映す明るい青、ふちは泥
+      for (const p of scatter(rand, 5, 34, taken)) {
+        const rx = 4 + Math.floor(rand() * 3), ry = 2 + Math.floor(rand() * 2);
+        blob(c, rand, p.x, p.y, rx, ry, (dx, dy) => (dy < 0 && rand() < 0.3 ? hex('b0d4ec') : hex('6a9cc8')), hex('3a3028'));
+      }
+      // 背の高い草むら
+      const G = { d: hex('24702a'), m: hex('2c7c32'), l: hex('78cc6a'), k: hex('1c5a22') };
+      for (const p of scatter(rand, 130, 5, taken)) {
+        const tufts = [['l.l.l', 'dlmld', 'ddmdd', '.kdk.'], ['.l.l', 'ld.d', 'dmdm', '.kk.']];
+        c.stamp(p.x, p.y, tufts[Math.floor(rand() * tufts.length)]!, G);
+      }
+    },
+  },
+  // 区間6: 霊山の石畳と草。苔むした石・白い霧の斑点・小さな花（供え物）
+  pyre: {
+    seed: 36001,
+    fill: hex('5e7a5a'),
+    draw(c, rand) {
+      const n = layeredNoise(rand, 4);
+      const mist = layeredNoise(rand, 4);
+      base(c, rand, n, [[0, hex('587454')], [0.38, hex('5e7a5a')], [0.64, hex('648060')]], { pct: 0.12, light: hex('70906a'), dark: hex('4e6a4c') });
+      const taken: { x: number; y: number }[] = [];
+      // 苔むした敷石: 灰色の四角い石、ふちに苔
+      for (const p of scatter(rand, 14, 24, taken)) {
+        const w = 8 + Math.floor(rand() * 5), h = 6 + Math.floor(rand() * 3);
+        for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+          let col = rand() < 0.1 ? hex('9c9a94') : hex('8a8882');
+          if (y === 0 || x === 0) col = hex('a8a6a0');
+          if (y === h - 1 || x === w - 1) col = hex('5e5c58');
+          if ((x === 0 || y === h - 1) && rand() < 0.5) col = hex('6a8a5a');
+          c.set(p.x + x, p.y + y, col);
+        }
+      }
+      // 霧: うすい白を、ドットを間引いて重ねる
+      for (let y = 0; y < TILE; y++) for (let x = 0; x < TILE; x++) if (mist(x, y) > 0.7 && x % 2 === 0 && y % 2 === 0) c.set(x, y, hex('a8bcae'));
+      // 小さな花（白と紫）
+      const F = { w: hex('f0eef4'), v: hex('a68ad0'), s: hex('3e5a3c') };
+      for (const p of scatter(rand, 14, 10, taken)) c.stamp(p.x, p.y, rand() < 0.5 ? ['.w.', 'wvw', '.s.'] : ['v.', '.s'], F);
+      const G = { d: hex('3e5a3c'), l: hex('7c9a74') };
+      for (const p of scatter(rand, 60, 5, taken)) c.stamp(p.x, p.y, rand() < 0.5 ? ['l.l', 'd.d'] : ['l', 'd'], G);
+    },
+  },
+  // 区間7: 足首くらいの浅い海。透けた水色の下に白い砂、サンゴの欠片と波の光の筋
+  shallows: {
+    seed: 37001,
+    fill: hex('5cc4d4'),
+    draw(c, rand) {
+      const n = layeredNoise(rand, 4);
+      base(c, rand, n, [[0, hex('54bccd')], [0.38, hex('5cc4d4')], [0.64, hex('66ccda')]], { pct: 0.08, light: hex('7ad6e2'), dark: hex('4cb0c4') });
+      const taken: { x: number; y: number }[] = [];
+      // 水の下の白い砂の斑点
+      for (const p of scatter(rand, 6, 30, taken)) {
+        const rx = 6 + Math.floor(rand() * 4), ry = 4 + Math.floor(rand() * 2);
+        blob(c, rand, p.x, p.y, rx, ry, () => (rand() < 0.1 ? hex('b4e8e4') : hex('9adcd8')));
+      }
+      // サンゴの欠片（桃・橙）
+      const K = { p: hex('f08a9a'), o: hex('f4a868'), d: hex('b85a6a') };
+      for (const p of scatter(rand, 12, 12, taken)) c.stamp(p.x, p.y, rand() < 0.5 ? ['p.p', '.p.', '.d.'] : ['o.', 'oo', 'd.'], K);
+      // 波の光の筋: 白い短い波線
+      for (const p of scatter(rand, 18, 14, taken)) {
+        const len = 4 + Math.floor(rand() * 5);
+        for (let i = 0; i < len; i++) c.set(p.x + i, p.y + (i % 4 === 1 || i % 4 === 2 ? -1 : 0), i === 0 || i === len - 1 ? hex('c8f0f4') : hex('ffffff'));
+      }
+    },
+  },
+  // 区間8: 暗い紫がかった岩の洞くつ。段差の影と、ところどころの小石
+  victory_cave: {
+    seed: 38001,
+    fill: hex('5e5466'),
+    draw(c, rand) {
+      const n = layeredNoise(rand, 4);
+      base(c, rand, n, [[0, hex('584e60')], [0.38, hex('5e5466')], [0.64, hex('665c6e')]], { pct: 0.12, light: hex('72687a'), dark: hex('4e4656') });
+      const taken: { x: number; y: number }[] = [];
+      for (const p of scatter(rand, 8, 26, taken)) {
+        const len = 12 + Math.floor(rand() * 12);
+        let yy = p.y;
+        for (let i = 0; i < len; i++) {
+          if (rand() < 0.2) yy += rand() < 0.5 ? -1 : 1;
+          c.set(p.x + i, yy - 1, hex('80768a'));
+          c.set(p.x + i, yy, hex('342e3c'));
+          c.set(p.x + i, yy + 1, hex('443c4c'));
+        }
+      }
+      for (let i = 0; i < 8; i++) wander(c, rand, 10 + Math.floor(rand() * 12), hex('3a3442'), { bend: 0.8, light: hex('766c80') });
+      const R = { l: hex('8a809a'), m: hex('6a6078'), d: hex('4a4258'), k: hex('2e2838') };
+      for (const p of scatter(rand, 20, 9, taken)) rock(c, rand, p.x, p.y, R);
+      const S = { a: hex('7e748a'), k: hex('3a3442') };
+      for (const p of scatter(rand, 40, 4, taken)) c.stamp(p.x, p.y, rand() < 0.5 ? ['a', 'k'] : ['k'], S);
+    },
+  },
+  // 区間9〜13: 白と水色の石の床に金の縁取り（ジョウトの紺とは色を変える）
+  elite_hall: {
+    seed: 39001,
+    fill: hex('a8c2ce'),
+    draw(c, rand) {
+      const n = layeredNoise(rand, 4);
+      base(c, rand, n, [[0, hex('a2bcc8')], [0.38, hex('a8c2ce')], [0.64, hex('b0c8d4')]], { pct: 0.05, light: hex('bcd2dc'), dark: hex('96b2c0') });
+      // 大理石の筋
+      for (let i = 0; i < 10; i++) wander(c, rand, 16 + Math.floor(rand() * 20), hex('8eaabc'), { bend: 0.5 });
+      for (let i = 0; i < 6; i++) wander(c, rand, 10 + Math.floor(rand() * 10), hex('c8dce4'), { bend: 0.4 });
+      // 32ドットの格子に水色の目地、64ドットごとに金の線
+      for (let a = 0; a < TILE; a++) for (let k = 0; k < TILE; k += 32) {
+        c.set(a, k, hex('7aa2b8'));
+        c.set(k, a, hex('7aa2b8'));
+      }
+      for (let a = 0; a < TILE; a++) for (let k = 0; k < TILE; k += 64) {
+        c.set(a, k, hex('c8a04a'));
+        c.set(a, k + 1, hex('8a6a2e'));
+        c.set(k, a, hex('c8a04a'));
+        c.set(k + 1, a, hex('8a6a2e'));
+      }
+      const D = { g: hex('e8c460'), d: hex('8a6a2e'), b: hex('4a90b8') };
+      for (let y = 0; y < TILE; y += 64) for (let x = 0; x < TILE; x += 64) c.stamp(x - 2, y - 2, ['..g..', '.gdg.', 'gdbdg', '.gdg.', '..g..'], D);
+    },
+  },
+  // 区間14: 青灰色の岩と、隕石の欠片が光る床。細い水の流れ
+  meteor_falls: {
+    seed: 40001,
+    fill: hex('5a6878'),
+    draw(c, rand) {
+      const n = layeredNoise(rand, 4);
+      base(c, rand, n, [[0, hex('546272')], [0.38, hex('5a6878')], [0.64, hex('627080')]], { pct: 0.12, light: hex('6e7c8c'), dark: hex('4a5868') });
+      // 細い水の流れ（明るい水色、上に白い光）
+      for (let i = 0; i < 2; i++) wander(c, rand, 70 + Math.floor(rand() * 30), hex('5aa0d0'), { bend: 0.25, width: 2, shade: hex('2e3a4a'), light: hex('c8ecff') });
+      const taken: { x: number; y: number }[] = [];
+      const R = { l: hex('7a8898'), m: hex('5e6c7c'), d: hex('3e4a58'), k: hex('262e3a') };
+      for (const p of scatter(rand, 18, 10, taken)) rock(c, rand, p.x, p.y, R);
+      // 隕石の欠片: 黒い粒の中に、緑と紫に光る点
+      const M = { k: hex('1e2028'), g: hex('8af0b0'), v: hex('c08af0'), w: hex('f0f8ff') };
+      for (const p of scatter(rand, 16, 10, taken)) {
+        const shards = [['.k.', 'kgk', '.k.'], ['kv', 'wk'], ['.k', 'kg', 'k.']];
+        c.stamp(p.x, p.y, shards[Math.floor(rand() * shards.length)]!, M);
+      }
+      const S = { a: hex('7a8898'), k: hex('2e3a48') };
+      for (const p of scatter(rand, 40, 4, taken)) c.stamp(p.x, p.y, rand() < 0.5 ? ['a', 'k'] : ['k'], S);
+    },
+  },
 };
 
 const REGION_TILES: Record<string, Record<string, TileDef>> = { johto: JOHTO, hoenn: HOENN };

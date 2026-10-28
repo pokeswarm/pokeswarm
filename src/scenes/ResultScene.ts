@@ -28,6 +28,8 @@ export interface RunSummary {
   coins: number;
   /** 伝説戦の結果（伝説の名前と、won 倒した・lost 全員倒れた・timeUp 逃げられた） */
   legendary: { name: string; result: 'won' | 'lost' | 'timeUp' } | null;
+  /** 協力プレイで接続が切れた理由（文。切れていなければ無し） */
+  disconnectReason?: string;
 }
 
 export interface ResultSceneData {
@@ -104,6 +106,7 @@ export class ResultScene extends Phaser.Scene {
       const listTop = headY + headH + (compact ? 8 : 16);
       const pad = compact ? 14 : 24;
       const extra: string[] = [
+        ...(summary.disconnectReason ? [summary.disconnectReason] : []),
         ...(summary.legendary ? [t(`result.legendary.${summary.legendary.result}`, { name: summary.legendary.name })] : []),
         ...(summary.newAchievements.length ? [t('result.newAchievements', { list: summary.newAchievements.join(' / ') })] : []),
         ...(summary.newUnlocks.length ? [t('result.newUnlocks', { list: summary.newUnlocks.join(' / ') })] : []),

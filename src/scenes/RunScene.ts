@@ -5,7 +5,7 @@ import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
 import type { EffectRecipe, SpriteAnims } from '../data/schema';
 import { getLocale, t, tMaybe } from '../i18n';
-import type { Room, RoomPlayer } from '../net/room';
+import type { LeaveReason, Room, RoomPlayer } from '../net/room';
 import { SyncSession } from '../net/sync';
 import { hexColor } from '../render/color';
 import { EdgeArrows, type EdgeTarget } from '../render/EdgeArrows';
@@ -52,6 +52,7 @@ import { EvolutionCutscene } from './evolutionCutscene';
 import { NetPanel } from './netPanel';
 import { formatTime, type ResultSceneData } from './ResultScene';
 import { atlasKey } from '../render/sprites/PokemonSprite';
+import { holdScreenAwake } from '../render/screenWakeLock';
 
 /** ソロとホストのプレイヤーの番号（ゲストは部屋でもらった番号 2〜） */
 const HOST_PLAYER_ID: PlayerId = 1;
@@ -279,6 +280,9 @@ export class RunScene extends Phaser.Scene {
   }
 
   create(): void {
+    // スマホで画面が消えて通信が止まらないように、この画面の間は画面を点けたままにする（作者の報告 2026年10月28日）
+    const releaseWakeLock = holdScreenAwake();
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, releaseWakeLock);
     if (this.playerSprite) registerPokemonAnimations(this, this.playerSprite);
     const rules = applyDebugOverrides(buildSimRules(this.stageOfRegion.id), window.location.search);
     this.pathMoves = new Set(rules.moves.flatMap((m, k) => (m.effects.some((fx) => fx.puddle?.path) ? [k] : [])));
@@ -558,8 +562,17 @@ export class RunScene extends Phaser.Scene {
       });
     }
     // なにも届かない時間が続いたら、切断したものとみなす
+    let watchedAt = performance.now();
     const watchdog = setInterval(() => {
       const now = performance.now();
+      // このブラウザ自身がしばらく止まっていた（スマホの画面が消えた・アプリを切り替えた）: 止まっていた間に届かなかったのは相手のせいではないので、待ち直す
+      const gap = (now - watchedAt) / 1000;
+      watchedAt = now;
+      if (gap >= networkConfig.freezeDetectSeconds) {
+        this.lastFreeze = { at: now, seconds: gap };
+        console.info('[net] このブラウザが止まっていた', gap.toFixed(1), '秒');
+        for (const id of this.lastHeard.keys()) this.lastHeard.set(id, now);
+      }
       for (const [id, at] of this.lastHeard) {
         if (now - at > networkConfig.silenceTimeoutSeconds * 1000) {
           this.lastHeard.delete(id);
@@ -568,13 +581,16 @@ export class RunScene extends Phaser.Scene {
       }
     }, 1000);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => clearInterval(watchdog));
-    room.onLeave = (id) => {
+    room.onLeave = (id, reason) => {
+      const why = this.leaveReasonText(reason);
       if (id === HOST_PLAYER_ID) {
         // ホストとの接続が切れたら、ランを終えて（ここまでの記録を保存して）結果画面へ
-        this.panel?.show('net.hostLeft');
+        this.disconnectReason = why;
+        this.panel?.show('net.hostLeft', undefined, why);
         this.inbox.push({ type: 'endRun', outcome: 'disconnected' });
       } else {
         // ホスト: 抜けたプレイヤーを外して続ける（ゲストへも知らせる）
+        this.leaveReasons.set(id, why);
         this.inbox.push({ type: 'removePlayer', playerId: id });
       }
     };
@@ -602,6 +618,22 @@ export class RunScene extends Phaser.Scene {
 
   /** 相手ごとの、最後に通信が届いた時刻 */
   private lastHeard = new Map<PlayerId, number>();
+  /** このブラウザが最後に止まっていた時（画面が消えた・アプリを切り替えたなどでタイマーごと止まった。performance.now）と秒数 */
+  private lastFreeze: { at: number; seconds: number } | null = null;
+  /** 抜けたプレイヤーの切断の理由（文。ホストの知らせに付ける） */
+  private leaveReasons = new Map<PlayerId, string>();
+  /** ゲスト: ホストとの接続が切れた理由（結果画面に出す） */
+  private disconnectReason: string | null = null;
+
+  /**
+   * 切断の理由の文（作者の報告 2026年10月28日: スマホの協力プレイでよく切れる。どれで切れたかを見て対策する）。
+   * 少し前にこのブラウザが止まっていたら、それも書き添える
+   */
+  private leaveReasonText(reason: LeaveReason): string {
+    const f = this.lastFreeze;
+    const text = t(`net.reason.${reason}`, { seconds: networkConfig.silenceTimeoutSeconds });
+    return f && performance.now() - f.at < networkConfig.freezeNoteSeconds * 1000 ? `${text} ${t('net.reason.localFrozen', { seconds: Math.round(f.seconds) })}` : text;
+  }
 
   /** 1回の更新の結果を送る。ホストは各ゲストへ（ほかのゲストの状態の中継を含む）、ゲストはホストへ */
   private sendNet(): void {
@@ -740,6 +772,7 @@ export class RunScene extends Phaser.Scene {
         legendary: this.legendaryResult?.result
           ? { name: this.enemyName(this.legendaryResult.kind), result: this.legendaryResult.result }
           : null,
+        ...(this.disconnectReason ? { disconnectReason: this.disconnectReason } : {}),
       },
       // 協力プレイはもう一度を出さない（部屋を作り直す必要がある）
       retry: this.coop ? null : { ...this.runData },
@@ -864,7 +897,8 @@ export class RunScene extends Phaser.Scene {
       } else if (ev.type === 'playerLeft') {
         this.playerViews.get(ev.playerId)?.container.destroy();
         this.playerViews.delete(ev.playerId);
-        this.announce(t('net.playerLeft', { n: ev.playerId }), '#ef9a9a');
+        const why = this.leaveReasons.get(ev.playerId);
+        this.announce(why ? `${t('net.playerLeft', { n: ev.playerId })}\n${why}` : t('net.playerLeft', { n: ev.playerId }), '#ef9a9a');
       } else if (ev.type === 'hazardStruck') {
         // 落ちた範囲に合わせたドット絵（案 F）
         const strike = effectRecipes[ev.effect]?.strike;

@@ -85,12 +85,8 @@ export class LobbyScene extends Phaser.Scene {
         this.room.onStart = null;
       }
     });
-    // 全員のポケモンのスプライトを読んでおく（ランの画面でほかの人のポケモンを描くため。色違いは開始するときに読む）
-    for (const p of Object.values(playablesConfig.pokemon)) {
-      // タマゴは自作の絵なので読まない（かえるベイビィポケモンの絵を読む）
-      if (p.hatch) continue;
-      void loadPokemonAtRuntime(this, p.sprite).then((loaded) => this.sprites.set(p.sprite, loaded?.manifest ?? null));
-    }
+    // 参加者のポケモンのスプライトは、開始するときに選ばれたものだけ読む（startRun）。
+    // 前は遊べるポケモン全部を待合室で読んでいて、絵だけで約 370MB になり、スマホの協力プレイが 2〜3 分でページごと落ちていた（作者の報告 2026年10月28日。07 の109章）
     session.setPresence('lobby');
     // フレンドのオンライン状態が変わったら、招待の一覧を作り直す
     let offSocial: (() => void) | null = null;
@@ -158,9 +154,9 @@ export class LobbyScene extends Phaser.Scene {
       const key = playablesConfig.pokemon[p.pokemon]?.sprite ?? p.pokemon;
       return p.shiny ? shinySpriteKey(key) : key;
     };
-    // 色違いのスプライトを読んでから始める
-    const shiny = [...new Set(players.filter((p) => p.shiny).map(spriteOf))].filter((k) => !this.sprites.has(k));
-    void Promise.all(shiny.map((k) => loadPokemonAtRuntime(this, k).then((loaded) => this.sprites.set(k, loaded?.manifest ?? null)))).then(() => {
+    // 参加者のポケモン（色違いも）のスプライトを読んでから始める
+    const keys = [...new Set(players.map(spriteOf))].filter((k) => !this.sprites.has(k));
+    void Promise.all(keys.map((k) => loadPokemonAtRuntime(this, k).then((loaded) => this.sprites.set(k, loaded?.manifest ?? null)))).then(() => {
       if (!this.sys.isActive()) return;
       const data: RunSceneData = {
         pokemon: me.pokemon,

@@ -4,6 +4,7 @@ import { testRules } from '../sim/testRules';
 import type { SimRole } from '../sim/world';
 import { RunRecorder } from './runRecorder';
 import { SaveStore } from './saveStore';
+import { shopConfig } from '../data';
 
 /** 番号0が雑魚（ポケモン test）、番号1が中ボス（ポケモン mid） */
 function setup(role: SimRole = 'solo', localId = 1) {
@@ -97,5 +98,34 @@ describe('ランの記録', () => {
     expect(s['bossDefeated.mid']).toBe(1);
     expect(s['bossDefeated.test']).toBeUndefined();
     expect(s.midbossKills).toBe(1);
+  });
+
+  it('途中で落ちたランは、写しから、ふつうの失敗と同じ記録・コインで終える（足し終えた分は2回足さない。07 の112章）', () => {
+    const play = (crash: boolean) => {
+      const { store, sim, kill } = setup();
+      const rec = new RunRecorder(store, 'charmander', shopConfig);
+      const killed = (kind: number) => {
+        kill(kind, 1);
+        rec.observe(sim.world);
+      };
+      for (let k = 0; k < 4; k++) killed(0);
+      killed(1);
+      for (let t = 0; t < 90; t++) sim.step([]);
+      rec.commit(sim.world);
+      killed(0);
+      for (let t = 0; t < 45; t++) sim.step([]);
+      if (crash) return { store, coins: RunRecorder.finishFromSnapshot(store, JSON.parse(JSON.stringify(rec.snapshot(sim.world))), shopConfig, null) };
+      sim.world.outcome = 'fail';
+      rec.finish(sim.world);
+      return { store, coins: rec.coinsEarned };
+    };
+    const normal = play(false);
+    const crashed = play(true);
+    expect(crashed.coins).toBe(normal.coins);
+    expect(crashed.coins).toBeGreaterThan(0);
+    expect(crashed.store.current.coins).toBe(normal.store.current.coins);
+    expect(crashed.store.current.stats).toEqual(normal.store.current.stats);
+    expect(crashed.store.current.stats.kills).toBe(6);
+    expect(crashed.store.current.stats.runs).toBe(1);
   });
 });

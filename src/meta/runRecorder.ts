@@ -23,6 +23,36 @@ import { HOME_REGION, regionStatKey } from './regionScope';
  * 協力プレイ（03_network.md 3.6）: 雑魚はとどめを刺した人だけ、中ボス・ボスは参加者全員に数える。
  * カントー以外の地方のランは、記録の名前の頭に "<地方>:" を付ける（02 の17章。コインの合計 coinsEarned だけは共通）。
  */
+/**
+ * ランの途中の記録の写し（ブラウザに数秒ごとに保存する。07 の112章）。ページが落ちたら、次に開いたときにこれで「失敗」として終える。
+ * まだセーブデータに足していない分（pending）と、足し終えた時間（committedSeconds）を持つので、同じ分を2回足さない
+ */
+export interface RunSnapshot {
+  pokemon: string;
+  region: string;
+  hatchedFrom: string | null;
+  coop: boolean;
+  pending: [string, number][];
+  committedSeconds: number;
+  seconds: number;
+  runKills: number;
+  runMidbosses: number;
+  runBosses: number;
+  runLegendary: number;
+  bonusCoins: number;
+  level: number;
+}
+
+/** ラン終了時に足すための、その時のランの様子 */
+interface FinishInfo {
+  clear: boolean;
+  coop: boolean;
+  seconds: number;
+  level: number;
+  bonusCoins: number;
+  legendStats: string[];
+}
+
 export class RunRecorder {
   private readonly pending = new Map<string, number>();
   private seconds = 0;
@@ -112,8 +142,12 @@ export class RunRecorder {
 
   /** ここまでに数えた分と遊んだ時間をセーブデータに足す（足すものが無ければ何もしない） */
   commit(world: World): void {
+    this.commitSeconds(elapsedSeconds(world));
+  }
+
+  private commitSeconds(elapsed: number): void {
     if (this.finished) return;
-    const seconds = Math.floor(elapsedSeconds(world)) - this.seconds;
+    const seconds = Math.floor(elapsed) - this.seconds;
     if (seconds > 0) {
       this.count('playSeconds', seconds);
       this.seconds += seconds;
@@ -141,29 +175,66 @@ export class RunRecorder {
     return Math.floor(world.players.find((p) => p.id === world.localPlayerId)?.bonusCoins ?? 0);
   }
 
+  /** ランの途中の写し（07 の112章） */
+  snapshot(world: World): RunSnapshot {
+    return {
+      pokemon: this.pokemon,
+      region: this.region,
+      hatchedFrom: this.hatchedFrom,
+      coop: world.role !== 'solo',
+      pending: [...this.pending],
+      committedSeconds: this.seconds,
+      seconds: elapsedSeconds(world),
+      runKills: this.runKills,
+      runMidbosses: this.runMidbosses,
+      runBosses: this.runBosses,
+      runLegendary: this.runLegendary,
+      bonusCoins: this.bonusCoins(world),
+      level: world.level,
+    };
+  }
+
+  /** 写しから、途中で落ちたランを「失敗」として終える（コイン・回数・最高記録を、ふつうの失敗と同じように足す。07 の112章） */
+  static finishFromSnapshot(store: SaveStore, snap: RunSnapshot, shop: ShopConfig | null, derived: DerivedStatSources | null): number {
+    const r = new RunRecorder(store, snap.pokemon, shop, derived, snap.region, snap.hatchedFrom);
+    for (const [k, n] of snap.pending) r.pending.set(k, n);
+    r.seconds = snap.committedSeconds;
+    r.runKills = snap.runKills;
+    r.runMidbosses = snap.runMidbosses;
+    r.runBosses = snap.runBosses;
+    r.runLegendary = snap.runLegendary;
+    r.finishWith({ clear: false, coop: snap.coop, seconds: snap.seconds, level: snap.level, bonusCoins: snap.bonusCoins, legendStats: [] });
+    return r.coinsEarned;
+  }
+
   /** ラン終了時: 残りを足し、回数・クリア・最高記録を記録する */
   finish(world: World): void {
+    // 続けて戦うラウンドを倒した記録（レッドを倒す。ジョウトの にじいろのはね の実績）
+    const legendStats = world.legendary ? legendRoundStats(world, world.legendary.kind, world.legendary.result) : [];
+    this.finishWith({ clear: world.outcome === 'clear', coop: world.role !== 'solo', seconds: elapsedSeconds(world), level: world.level, bonusCoins: this.bonusCoins(world), legendStats });
+  }
+
+  private finishWith(info: FinishInfo): void {
     if (this.finished) return;
-    const clear = world.outcome === 'clear';
+    const clear = info.clear;
     this.count('runs');
-    if (world.role !== 'solo') this.count('runs.coop');
+    if (info.coop) this.count('runs.coop');
     this.count(`runs.${this.pokemon}`);
     if (clear) {
       this.count('clears');
       this.count(`clears.${this.pokemon}`);
       if (this.hatchedFrom) this.count(`eggClears.${this.pokemon}`);
-      this.count(world.role === 'solo' ? 'clears.solo' : 'clears.coop');
+      this.count(info.coop ? 'clears.coop' : 'clears.solo');
     }
-    // 続けて戦うラウンドを倒した記録（レッドを倒す。ジョウトの にじいろのはね の実績）
-    if (world.legendary) for (const stat of legendRoundStats(world, world.legendary.kind, world.legendary.result)) this.count(stat);
-    this.commit(world);
+    for (const stat of info.legendStats) this.count(stat);
+    this.commitSeconds(info.seconds);
     this.finished = true;
     // コイン（01_game_design.md 8.3。失敗・切断でも、そこまでの分をもらえる）
     const greed = this.shop ? permanentBonus(this.store.current, this.shop, this.region).coinPct : 0;
     this.coinsEarned = this.shop
       ? Math.floor(
           coinsForRun(this.shop, {
-          seconds: elapsedSeconds(world),
+          seconds: info.seconds,
           kills: this.runKills,
           midbosses: this.runMidbosses,
           bosses: this.runBosses,
@@ -171,18 +242,18 @@ export class RunRecorder {
           legendaryWon: this.runLegendary > 0,
           }) *
             (1 + greed / 100),
-        ) + this.bonusCoins(world)
-      : this.bonusCoins(world);
+        ) + info.bonusCoins
+      : info.bonusCoins;
     this.store.update((d) => {
       d.coins += this.coinsEarned;
       if (this.coinsEarned > 0) d.stats.coinsEarned = (d.stats.coinsEarned ?? 0) + this.coinsEarned;
       this.best(d, 'bestKills', this.runKills);
       this.best(d, 'bestMidbosses', this.runMidbosses);
-      this.best(d, 'bestLevel', world.level);
+      this.best(d, 'bestLevel', info.level);
       this.best(d, `reached.${this.pokemon}`, this.runMidbosses + this.runBosses);
-      this.best(d, `bestLevel.${this.pokemon}`, world.level);
+      this.best(d, `bestLevel.${this.pokemon}`, info.level);
       if (this.derived) refreshDerivedStats(d.stats, this.derived, this.region);
-      this.best(d, 'longestSeconds', Math.floor(elapsedSeconds(world)));
+      this.best(d, 'longestSeconds', Math.floor(info.seconds));
     });
   }
 }

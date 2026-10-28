@@ -3,11 +3,14 @@ import { freshHatchSeed, hatchedPokemon } from './meta/hatch';
 import { startOrientationGuard } from './render/OrientationGuard';
 import { checkSite, showSiteGuard } from './render/siteGuard';
 import Phaser from 'phaser';
-import { placeholderRender, playablesConfig, regionsConfig } from './data';
+import { derivedStatSources, placeholderRender, playablesConfig, regionsConfig, shopConfig } from './data';
 import { migrateOldDiscoveries } from './meta/discoveries';
 import { session } from './meta/session';
 import { loadSpriteManifest } from './render/sprites/spriteManifest';
 import { shinySpriteKey } from './meta/loadoutOptions';
+import { takeRunProbe } from './meta/runProbe';
+import { RunRecorder } from './meta/runRecorder';
+import { showCrashNotice } from './scenes/crashNotice';
 import { AchievementsScene } from './scenes/AchievementsScene';
 import { ShopScene } from './scenes/ShopScene';
 import { FriendsScene } from './scenes/FriendsScene';
@@ -51,6 +54,17 @@ async function start(): Promise<void> {
     session.refundLegacyUpgrades();
     // ジョウトのショップの解放に使う、ショップで使ったコインの合計（前のセーブは今の強化から数える）
     session.backfillShopSpent();
+    // 前回のランが途中で終わっていた（ページが落ちた・閉じた）: そこまでの記録を失敗として足し、様子を知らせる（07 の112章）
+    const probe = takeRunProbe();
+    if (probe) {
+      console.info('[runProbe] 前回のランは途中で終わりました', probe);
+      const coins = probe.snapshot ? RunRecorder.finishFromSnapshot(session.store, probe.snapshot, shopConfig, derivedStatSources) : null;
+      if (probe.snapshot) {
+        session.checkProgress();
+        void session.store.flush();
+      }
+      showCrashNotice(probe, coins);
+    }
   });
   const q = new URLSearchParams(window.location.search);
   // 開発版だけ: ?restore=50000 で、伝説以外の実績を全部達成にし、コインをその数にする（セーブの読み込みが終わってから。公開版では効かない）

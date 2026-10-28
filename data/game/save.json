@@ -1,4 +1,5 @@
 {
   "autosaveSeconds": 180,
+  "probeSeconds": 5,
   "transferHours": 24
 }

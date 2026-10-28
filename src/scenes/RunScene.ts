@@ -44,6 +44,7 @@ import { regionUpgradesOf } from '../meta/regionScope';
 import { addDiscovery } from '../meta/discoveries';
 import { achievementName, achievementRewardById } from '../meta/achievementText';
 import { RunRecorder } from '../meta/runRecorder';
+import { clearRunProbe, writeRunProbe } from '../meta/runProbe';
 import { session } from '../meta/session';
 import { LevelUpPanel, offerText } from './levelUpPanel';
 import { activeField, activeLegendField, currentWeather, startIntruder, startLegendary, legendRoundKinds } from '../sim/systems/stage';
@@ -712,6 +713,15 @@ export class RunScene extends Phaser.Scene {
    */
   private setupSaving(): void {
     this.recorder = new RunRecorder(session.store, this.pokemon, shopConfig, derivedStatSources, this.stageOfRegion.id, this.runData.hatchedFrom ?? null);
+    // ランの途中の様子をブラウザに書いておく（ページが落ちたら、次に開いたときに知らせて、記録を失敗として終える。07 の112章）
+    const probe = window.setInterval(() => this.writeProbe(false), saveConfig.probeSeconds * 1000);
+    const onPageHide = (): void => this.writeProbe(true);
+    window.addEventListener('pagehide', onPageHide);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      window.clearInterval(probe);
+      window.removeEventListener('pagehide', onPageHide);
+      clearRunProbe();
+    });
     // テストプレイ（?legend・?god）のランは記録を保存しない（コイン・実績・解放が進まないように）
     if (this.isTestRun()) return;
     const autosave = this.time.addEvent({
@@ -719,6 +729,8 @@ export class RunScene extends Phaser.Scene {
       loop: true,
       callback: () => {
         this.recorder.commit(this.sim.world);
+        // 足した分を写しからも外す（落ちたときに同じ分を2回足さない）
+        this.writeProbe(false);
         this.noteProgress();
         void session.store.flush();
       },
@@ -736,10 +748,46 @@ export class RunScene extends Phaser.Scene {
   /** ランが終わった: 記録をまとめてセーブデータに足し、保存する */
   private recordRunEnd(): void {
     this.runRecorded = true;
+    clearRunProbe();
     if (this.isTestRun()) return;
     this.recorder.finish(this.sim.world);
     this.noteProgress();
     void session.store.flush();
+  }
+
+  /** ランの途中の様子をブラウザに書く（07 の112章）。closed はページを閉じた・移ったとき（落ちたときは書かれない） */
+  private writeProbe(closed: boolean): void {
+    const w = this.sim.world;
+    if (w.outcome || this.runRecorded) return;
+    let px = 0;
+    let n = 0;
+    const seen = new Set<unknown>();
+    for (const tex of Object.values(this.textures.list)) {
+      for (const src of tex.source) {
+        if (seen.has(src)) continue;
+        seen.add(src);
+        px += (src.width || 0) * (src.height || 0);
+        n++;
+      }
+    }
+    const transports = this.coop ? [...this.coop.room.transports.values()] : [];
+    const heap = (performance as Performance & { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize;
+    writeRunProbe({
+      at: Date.now(),
+      version: __APP_VERSION__,
+      seconds: Math.floor(elapsedSeconds(w)),
+      section: w.section,
+      enemies: w.enemies.count,
+      projectiles: w.projectiles.count,
+      players: w.players.length,
+      transport: this.coop ? (transports.some((tr) => tr.kind === 'relay') ? 'relay' : 'p2p') : null,
+      textureMB: Math.round((px * 4) / 1048576),
+      textures: n,
+      heapMB: heap ? Math.round(heap / 1048576) : null,
+      fps: Math.round(this.game.loop.actualFps),
+      closed,
+      snapshot: this.isTestRun() ? null : this.recorder.snapshot(w),
+    });
   }
 
   /** テストプレイのラン（記録を保存しない） */

@@ -23,7 +23,7 @@ export function isBossKind(world: World, kind: number): boolean {
  * ボス・伝説を出す。HP は参加人数に応じて上げる（2.2）。タッグのボスは、その前に bossRules.tagHpMultiplier 倍（ソロの補正。07 の89.5）。
  * 出せなければ -1
  */
-function spawnBoss(world: World, kindIndex: number, moves: readonly number[], interval: number, enrage: BossEntry['enrage'] = null, tag = false): number {
+function spawnBoss(world: World, kindIndex: number, moves: readonly number[], interval: number, enrage: BossEntry['enrage'] = null, tag = false, hpScale = 1): number {
   const rules = world.rules.stage.bossRules;
   const kind = world.rules.enemies.kinds[kindIndex]!;
   const p = world.players[world.rng.int(world.players.length)]!;
@@ -32,7 +32,7 @@ function spawnBoss(world: World, kindIndex: number, moves: readonly number[], in
   const y = p.y + uy * rules.spawnDistance;
   // 伝説は人数倍（07 の123章）
   const perExtra = kind.rank === 'legendary' ? (rules.legendHpPerExtraPlayerPct ?? rules.hpPerExtraPlayerPct) : rules.hpPerExtraPlayerPct;
-  const hp = kind.hp * (tag ? (rules.tagHpMultiplier ?? 1) : 1) * (1 + (perExtra * (world.players.length - 1)) / 100);
+  const hp = kind.hp * hpScale * (tag ? (rules.tagHpMultiplier ?? 1) : 1) * (1 + (perExtra * (world.players.length - 1)) / 100);
   const id = world.nextEnemyId++;
   if (world.enemies.add(id, kindIndex, x, y, hp, enemyMoveSpeed(world, kindIndex), kind.radius, kind.contactDamage) === -1) return -1;
   world.events.push({ type: 'enemySpawned', id, kind: kindIndex, x, y });
@@ -45,7 +45,7 @@ function spawnBoss(world: World, kindIndex: number, moves: readonly number[], in
  * 伝説を1体出す。技は伝説ごとの技（無ければ共通の技を順に）。第2段階（HP が半分を切ると技の間隔が短くなり、2つ同時に使うことがある）は
  * 伝説ごとに数える。出せなければ -1
  */
-function spawnLegend(world: World, kind: number): number {
+function spawnLegend(world: World, kind: number, hpScale = 1): number {
   const cfg = world.rules.stage.legendary!;
   const set = cfg.moveSets[world.rules.enemies.kinds[kind]?.id ?? ''];
   const enrage = cfg.enrage
@@ -57,6 +57,8 @@ function spawnLegend(world: World, kind: number): number {
     (set?.moves ?? cfg.moves).map((m) => world.rules.stage.moves.findIndex((x) => x.id === m)),
     Math.round((set?.moveIntervalSeconds ?? cfg.moveIntervalSeconds) / world.dt),
     enrage,
+    false,
+    hpScale,
   );
   const boss = world.bosses.find((b) => b.id === id);
   if (boss && set?.random) boss.random = true;
@@ -73,7 +75,8 @@ export function spawnBosses(world: World): void {
     if (!lg.spawned && world.tick >= lg.appearTick) {
       lg.spawned = true;
       // ラウンドの相手は同時に出す（レッド戦のエーフィとカビゴンなど）
-      for (const kind of legendRoundKinds(world, lg.kind)) spawnLegend(world, kind);
+      // 伝説戦の伝説だけ HP を増やす（乱入の三犬は増やさない。07 の124章）
+      for (const kind of legendRoundKinds(world, lg.kind)) spawnLegend(world, kind, world.rules.stage.bossRules.legendHpMultiplier ?? 1);
     }
     return;
   }

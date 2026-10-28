@@ -681,6 +681,8 @@ export const stageConfigSchema = z.object({
     hpPerExtraPlayerPct: z.number().min(0),
     /** 伝説（rank legendary）だけ、2人目以降の1人あたりの HP の増加（%。100 で人数倍）。省略なら hpPerExtraPlayerPct（07 の123章） */
     legendHpPerExtraPlayerPct: z.number().min(0).optional(),
+    /** 伝説の HP の倍率（人数の増加の前に掛ける。作者の決定 2026年10月29日: 育っていると10秒で倒せてしまい、ボス戦らしくない。1分ほどはギミックと向き合えるように。07 の124章）。省略なら 1 */
+    legendHpMultiplier: z.number().positive().optional(),
     /** 伝説の動く速さの倍率（07 の123章: 2人だと片方が逃げ続け、もう片方が攻撃し放題だった）。省略なら 1 */
     legendSpeedMultiplier: z.number().positive().optional(),
     /** タッグバトルのボス1体の HP の倍率（ソロでもクリアできるように。07 の89.5: 2体の合計が1体の 1.4倍）。人数による増加はこの後に掛ける */

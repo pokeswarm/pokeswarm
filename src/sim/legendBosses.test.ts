@@ -228,12 +228,12 @@ describe('色違いの御三家（プレイヤーと同じ技）', () => {
     }
     expect(turned).toBeGreaterThan(Math.PI);
   });
-  it('伝説の HP は人数倍（2人で 2 倍）、動く速さは 1.15 倍（作者の依頼 2026年10月29日。07 の123章）', () => {
+  it('伝説の HP は 5 倍のうえ人数倍（2人で 10 倍）、動く速さは 1.15 倍（作者の依頼 2026年10月29日。07 の123章・124章）', () => {
     const one = legend('legend-mewtwo', 1);
     const two = legend('legend-mewtwo', 2);
     const kind = one.rules.enemies.kinds[one.kind]!;
-    expect(one.sim.world.enemies.maxHp[one.i]).toBeCloseTo(kind.hp);
-    expect(two.sim.world.enemies.maxHp[two.i]).toBeCloseTo(kind.hp * 2);
+    expect(one.sim.world.enemies.maxHp[one.i]).toBeCloseTo(kind.hp * 5);
+    expect(two.sim.world.enemies.maxHp[two.i]).toBeCloseTo(kind.hp * 10);
     expect(one.sim.world.enemies.speed[one.i]).toBeCloseTo(kind.moveSpeed * 1.15);
   });
 });

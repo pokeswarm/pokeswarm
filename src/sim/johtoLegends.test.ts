@@ -67,7 +67,7 @@ describe('ジョウトの特別な戦い（07 の85章）', () => {
     expect(legendRoundStats(sim.world, sim.world.legendary!.kind, 'won')).toEqual(['redDefeated']);
   });
 
-  it('はねを拾っていれば、レッドに勝った後にルギア → ホウオウ（どちらも HP 60000）', () => {
+  it('はねを拾っていれば、レッドに勝った後にルギア → ホウオウ（どちらも HP 60000 の 5 倍。07 の124章）', () => {
     const sim = johto();
     sim.world.wings.add('silver-wing');
     sim.world.wings.add('rainbow-wing');
@@ -80,7 +80,7 @@ describe('ジョウトの特別な戦い（07 の85章）', () => {
     steps(sim, 100);
     const e = sim.world.enemies;
     const lugia = Array.from(e.kind.subarray(0, e.count)).indexOf(kindOf(sim, 'legend-lugia'));
-    expect(e.maxHp[lugia]).toBe(60000);
+    expect(e.maxHp[lugia]).toBe(60000 * 5);
     killAll(sim, ['legend-lugia']);
     expect(sim.world.legendary?.kind).toBe(kindOf(sim, 'legend-ho-oh'));
     // ホウオウ戦の途中で終わっても、レッドには勝っている

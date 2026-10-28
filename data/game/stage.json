@@ -788,6 +788,7 @@
     "stopStatusMultiplier": 0.25,
     "hpPerExtraPlayerPct": 90,
     "legendHpPerExtraPlayerPct": 100,
+    "legendHpMultiplier": 5,
     "legendSpeedMultiplier": 1.15,
     "tagHpMultiplier": 0.7,
     "hazardActiveSeconds": 0.4,

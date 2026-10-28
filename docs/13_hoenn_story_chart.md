@@ -101,7 +101,8 @@
 
 ジョウトと同じく **Claude がコードで描く**（07 の63章。`npm run map-tiles -- hoenn` = `scripts/make-map-tiles.ts` の `HOENN`）。出力は `public/map/hoenn/<タイル ID>.png`（128×128）、継ぎ目の確認は `assets/map/hoenn/preview/<タイル ID>.png`。南の島の地方なので、ジョウトより明るく彩度の高い色にする。
 
-- **試作2枚を描いた**（2026年10月28日）: `route`・`volcano`。カントー・ジョウトの同じ役のタイルと並べた見本（2×2 に並べて2倍）は `assets/map/hoenn/preview/compare-route.png`（左からカントー `meadow`・ジョウト `meadow`・ホウエン `route`）・`compare-volcano.png`（カントー `wasteland`・ジョウト `burned`・ホウエン `volcano`）。作者の確認待ち。
+- **試作2枚を描いた**（2026年10月28日）: `route`・`volcano`。カントー・ジョウトの同じ役のタイルと並べた見本（2×2 に並べて2倍）は `assets/map/hoenn/preview/compare-route.png`（左からカントー `meadow`・ジョウト `meadow`・ホウエン `route`）・`compare-volcano.png`（カントー `wasteland`・ジョウト `burned`・ホウエン `volcano`）。
+- **12枚を全部描いた**（2026年10月28日。作者が試作の方向で OK）。12枚の一覧は `assets/map/hoenn/preview/sheet-1.png`（route・granite_cave・power_plant・ash_field・volcano・desert）・`sheet-2.png`（rain_grass・pyre・shallows・victory_cave・elite_hall・meteor_falls）。区間への割り当ては H2。
 
 | # | タイル ID | 区間 | 見た目 |
 |---|---|---|---|
@@ -125,7 +126,8 @@
 
 楽譜は `data/audio/music/hoenn-<曲>.json`。ジョウトと同じく、まず2曲を試作して作者に聞いてもらい、方向が決まってから残りを作る。
 
-- **試作2曲を作った**（2026年10月28日）: `hoenn-route`（ハ長調・152。はねるベースと8分の分散和音、1周 約38秒）・`hoenn-rain-route`（ト短調・120。雨粒のような16分の刻みと長い旋律、1周 約48秒）。`bgm.json` に登録済み。localhost のタイトル画面で `?bgm=hoenn-route`・`?bgm=hoenn-rain-route` を付けると聞ける（開発版だけ）。作者の確認待ち。
+- **試作2曲を作った**（2026年10月28日）: `hoenn-route`（ハ長調・152。はねるベースと8分の分散和音、1周 約38秒）・`hoenn-rain-route`（ト短調・120。雨粒のような16分の刻みと長い旋律、1周 約48秒）。`bgm.json` に登録済み。localhost のタイトル画面で `?bgm=hoenn-route`・`?bgm=hoenn-rain-route` を付けると聞ける（開発版だけ）。
+- **15曲を全部作った**（2026年10月28日。作者が試作の方向で OK）。すべて `bgm.json` に登録済みで、`?bgm=hoenn-<曲>` で聞ける。1周は 33秒（`eon`）〜72秒（`pyre`）。区間への割り当ては H2。
 
 | 曲（`hoenn-` を付ける） | 区間 | 感じ | 調・テンポ |
 |---|---|---|---|
@@ -151,6 +153,6 @@
 ## 6. 次にすること
 
 1. ~~作者: 【案】の所を確かめる~~ → 2026年10月28日に「このままで OK」。
-2. タイル: 試作2枚（`route`・`volcano`）を描いた。作者が確かめたら残り10枚を描く。
-3. BGM: 試作2曲（`route`・`rain-route`）を作った。作者が聞いたら残り13曲を作る。
+2. ~~タイル~~ → 12枚を描いた（4章）。
+3. ~~BGM~~ → 15曲を作った（5章）。
 4. 決まったら H2（データの土台）へ。

@@ -609,7 +609,7 @@ const HOENN: Record<string, TileDef> = {
       // 水たまり: 空を映す明るい青、ふちは泥
       for (const p of scatter(rand, 5, 34, taken)) {
         const rx = 4 + Math.floor(rand() * 3), ry = 2 + Math.floor(rand() * 2);
-        blob(c, rand, p.x, p.y, rx, ry, (dx, dy) => (dy < 0 && rand() < 0.3 ? hex('b0d4ec') : hex('6a9cc8')), hex('3a3028'));
+        blob(c, rand, p.x, p.y, rx, ry, (_dx, dy) => (dy < 0 && rand() < 0.3 ? hex('b0d4ec') : hex('6a9cc8')), hex('3a3028'));
       }
       // 背の高い草むら
       const G = { d: hex('24702a'), m: hex('2c7c32'), l: hex('78cc6a'), k: hex('1c5a22') };

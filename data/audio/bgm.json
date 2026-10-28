@@ -125,6 +125,71 @@
       "volume": 0.7,
       "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
       "score": "hoenn-rain-route"
+    },
+    "hoenn-cave": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-cave"
+    },
+    "hoenn-power-plant": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-power-plant"
+    },
+    "hoenn-ash-route": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-ash-route"
+    },
+    "hoenn-volcano": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-volcano"
+    },
+    "hoenn-desert": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-desert"
+    },
+    "hoenn-pyre": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-pyre"
+    },
+    "hoenn-sea": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-sea"
+    },
+    "hoenn-victory-road": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-victory-road"
+    },
+    "hoenn-elite-four": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-elite-four"
+    },
+    "hoenn-steven": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-steven"
+    },
+    "hoenn-eon": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-eon"
+    },
+    "hoenn-legendary-weather": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-legendary-weather"
+    },
+    "hoenn-legendary-sky": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-legendary-sky"
     }
   },
   "scenes": {

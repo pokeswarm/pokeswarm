@@ -199,6 +199,8 @@ export interface World {
   sectionStartTick: number;
   /** 出ていて、まだ倒していない、区間を進める中ボスの番号 */
   readonly gateIds: Set<number>;
+  /** 出ているタッグのボス（敵の番号 → 区間の番号。同じ区間どうしが組。ソロ・ホスト） */
+  readonly tagIds: Map<number, number>;
   /** 中ボス・ボスを出す予定（区間・時間の順）。nextBoss は次に出す予定の番号 */
   readonly bossSchedule: readonly BossEntry[];
   nextBoss: number;
@@ -297,6 +299,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     section: 0,
     sectionStartTick: 0,
     gateIds: new Set(),
+    tagIds: new Map(),
     bossSchedule: buildBossSchedule(rules, tickRate),
     nextBoss: 0,
     bosses: [],
@@ -368,6 +371,8 @@ export interface BossEntry {
   readonly interval: number;
   /** 第2段階（HP の割合・技の間隔の更新回数・2つ同時に使う確率）。無ければ null */
   readonly enrage: { readonly hpRatio: number; readonly interval: number; readonly doubleChance: number } | null;
+  /** タッグバトル（ホウエン）: 同じ区間の tag のボスと組になる */
+  readonly tag: boolean;
 }
 
 export function moveIndexOfStage(rules: SimRules, id: string): number {
@@ -387,6 +392,7 @@ function buildBossSchedule(rules: SimRules, tickRate: number): BossEntry[] {
       moves: b.moves.map((id) => moveIndexOfStage(rules, id)),
       interval: Math.round((b.moveIntervalSeconds ?? 4) * tickRate),
       enrage: b.enrage ? { hpRatio: b.enrage.hpRatio, interval: Math.round(b.enrage.moveIntervalSeconds * tickRate), doubleChance: b.enrage.doubleChance } : null,
+      tag: b.tag ?? false,
     }))
     .sort((a, b) => a.wave - b.wave || a.afterTicks - b.afterTicks);
 }

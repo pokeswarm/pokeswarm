@@ -20,20 +20,18 @@ export class GroundTiles {
   /** 0 のとき sprites[0] だけ、1 のとき sprites[1] だけが見える */
   private front = 0;
   private fade = 1;
-  /** 夜の暗さ（0 = 昼、1 = 夜の色をそのまま掛ける） */
-  private nightLevel: number;
-  private readonly nightColor: Phaser.Display.Color;
+  /** 今、地面に掛けている色（赤・緑・青。白 = そのまま）。夜・天気の色へ fadeSeconds かけて近づける */
+  private readonly tint: [number, number, number];
 
   constructor(
     scene: Phaser.Scene,
     private readonly ground: GroundConfig,
     wave: number,
-    /** 区間ごとの、夜か（地方のステージ。無ければずっと昼） */
-    private readonly night: readonly boolean[] = [],
+    /** 地面に掛ける色（夜の色・ホウエンの天気の色。#rrggbb）。null はそのまま。無ければずっとそのまま */
+    private readonly tintAt: (wave: number) => string | null = () => null,
   ) {
     this.current = groundTileAt(ground, wave);
-    this.nightLevel = this.isNight(wave) ? 1 : 0;
-    this.nightColor = Phaser.Display.Color.HexStringToColor(ground.nightTint);
+    this.tint = this.targetTint(wave);
     const { width, height } = scene.scale;
     this.sprites = [0, 1].map((i) =>
       scene.add
@@ -44,7 +42,7 @@ export class GroundTiles {
         .setTileScale(ground.tileScale)
         .setVisible(i === 0),
     );
-    this.applyNight();
+    this.applyTint();
     const onResize = (size: Phaser.Structs.Size): void => this.sprites.forEach((s) => s.setSize(size.width, size.height));
     scene.scale.on(Phaser.Scale.Events.RESIZE, onResize);
     // ランを始め直したとき（もう一度）に、前のランのタイルへ届き続けないよう外す
@@ -77,25 +75,29 @@ export class GroundTiles {
       this.sprites[this.front]!.setAlpha(this.fade);
       if (this.fade >= 1) this.sprites[1 - this.front]!.setVisible(false);
     }
-    // 夜の区間へ入ったら、地面の切り替えと同じ秒数で暗くする（出たら明るくする）
-    const target = this.isNight(wave) ? 1 : 0;
-    if (this.nightLevel !== target) {
-      const step = this.ground.fadeSeconds > 0 ? deltaMs / 1000 / this.ground.fadeSeconds : 1;
-      this.nightLevel = target > this.nightLevel ? Math.min(target, this.nightLevel + step) : Math.max(target, this.nightLevel - step);
-      this.applyNight();
+    // 夜・天気の区間へ入ったら、地面の切り替えと同じ秒数でその色にする（出たら戻す）
+    const target = this.targetTint(wave);
+    if (target.some((c, k) => c !== this.tint[k])) {
+      const step = this.ground.fadeSeconds > 0 ? (255 * deltaMs) / 1000 / this.ground.fadeSeconds : 255;
+      for (let k = 0; k < 3; k++) {
+        const d = target[k]! - this.tint[k]!;
+        this.tint[k] = Math.abs(d) <= step ? target[k]! : this.tint[k]! + Math.sign(d) * step;
+      }
+      this.applyTint();
     }
     // タイル画像の1ドットが tileScale 倍で描かれるので、ワールドの移動量を tileScale で割って模様をずらす
     for (const s of this.sprites) s.setTilePosition(camera.scrollX / this.ground.tileScale, camera.scrollY / this.ground.tileScale);
   }
 
-  private isNight(wave: number): boolean {
-    return this.night.length > 0 && !!this.night[Math.min(wave, this.night.length - 1)];
+  private targetTint(wave: number): [number, number, number] {
+    const hex = this.tintAt(wave);
+    if (!hex) return [255, 255, 255];
+    const c = Phaser.Display.Color.HexStringToColor(hex);
+    return [c.red, c.green, c.blue];
   }
 
-  /** 白（そのまま）と夜の色の間を nightLevel で混ぜて、地面に掛ける */
-  private applyNight(): void {
-    const mix = (c: number) => Math.round(255 + (c - 255) * this.nightLevel);
-    const tint = Phaser.Display.Color.GetColor(mix(this.nightColor.red), mix(this.nightColor.green), mix(this.nightColor.blue));
+  private applyTint(): void {
+    const tint = Phaser.Display.Color.GetColor(Math.round(this.tint[0]), Math.round(this.tint[1]), Math.round(this.tint[2]));
     for (const s of this.sprites) s.setTint(tint);
   }
 

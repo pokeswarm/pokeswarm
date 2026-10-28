@@ -22,6 +22,7 @@ import {
   statsConfig,
   statusConfig,
   regionStage,
+  weatherConfig,
 } from './index';
 import type { LocalizedNames } from './schema';
 
@@ -214,6 +215,9 @@ export function buildSimRules(region?: string): SimRules {
     netSmoothing: networkConfig.smoothing,
     friendshipDistance: playerConfig.friendshipDistance,
     nightSections: rs.night,
+    ...(rs.weather.some((w) => w.kinds.length > 0)
+      ? { weatherSections: rs.weather.map((w) => ({ kinds: w.kinds, fields: w.kinds.map((k) => weatherConfig.weathers[k]!), everySeconds: w.everySeconds })) }
+      : {}),
     lines,
   };
 }

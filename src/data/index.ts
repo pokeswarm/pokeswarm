@@ -35,6 +35,7 @@ import pickupsJson from '../../data/game/pickups.json';
 import effectRecipesJson from '../../data/effects/recipes.json';
 import sfxJson from '../../data/audio/sfx.json';
 import bgmJson from '../../data/audio/bgm.json';
+import weatherJson from '../../data/game/weather.json';
 import generatedPokemonJson from '../../data/generated/pokemon.json';
 import spritePokemonJson from '../../data/sprites/pokemon.json';
 import generatedMovesJson from '../../data/generated/moves.json';
@@ -69,6 +70,7 @@ import {
   spawnConfigSchema,
   spriteRenderSchema,
   stageConfigSchema,
+  weatherConfigSchema,
   saveConfigSchema,
   achievementsConfigSchema,
   shopConfigSchema,
@@ -140,7 +142,16 @@ export interface RegionStage {
   readonly bgmRun: BgmRun;
   /** 区間ごとの、夜か */
   readonly night: readonly boolean[];
+  /** 区間ごとの天気（data/game/weather.json のキーの並び。巡らせる区間は everySeconds ごとに次へ。ふつうは空） */
+  readonly weather: readonly SectionWeather[];
 }
+export interface SectionWeather {
+  readonly kinds: readonly string[];
+  /** 0 なら巡らせない */
+  readonly everySeconds: number;
+}
+/** 地方の天気の定義（ホウエン。07 の89.2） */
+export const weatherConfig = load('game/weather.json', weatherConfigSchema, weatherJson);
 export const regionStages: Readonly<Record<string, RegionStage>> = Object.fromEntries(
   Object.entries(import.meta.glob('../../data/regions/*.json', { eager: true, import: 'default' })).map(([path, raw]) => {
     const id = path.replace(/^.*\/|\.json$/g, '');
@@ -161,6 +172,9 @@ export const regionStages: Readonly<Record<string, RegionStage>> = Object.fromEn
       obstacles: load(`game/obstacles.json と ${name}`, obstacleConfigSchema, { ...obstaclesJson, sections: file.sections.map((x) => x.obstacles) }),
       bgmRun: { sections: file.sections.map((x) => x.bgm), legendary: file.legendaryBgm, intruder: file.intruderBgm },
       night: file.sections.map((x) => x.night),
+      weather: file.sections.map((x) =>
+        x.weatherCycle ? { kinds: x.weatherCycle.kinds, everySeconds: x.weatherCycle.everySeconds } : { kinds: x.weather ? [x.weather] : [], everySeconds: 0 },
+      ),
     };
     return [id, stage];
   }),
@@ -277,6 +291,18 @@ for (const rs of Object.values(regionStages)) {
       check(gate !== !!wave.durationSeconds, `${file} の区間 ${i + 1} は、中ボス（bosses の gate）か durationSeconds のどちらか1つで次へ進めてください`);
     }
   });
+  // 天気（ホウエン）: weather.json にあり、粒は天気のあるレシピ
+  rs.weather.forEach((w, i) => {
+    for (const id of w.kinds) {
+      const def = weatherConfig.weathers[id];
+      check(!!def, `${file} の区間 ${i + 1} の天気 "${id}" が data/game/weather.json にありません`);
+      if (def?.weather) check(!!effectRecipes[def.weather]?.weather, `data/game/weather.json の "${id}" の粒 "${def.weather}" が、天気のあるレシピ（data/effects/recipes.json の weather）ではありません`);
+    }
+  });
+  // タッグ（ホウエン）: 同じ区間に2体以上
+  for (const b of stageConfig.bosses) {
+    if (b.tag) check(stageConfig.bosses.filter((x) => x.tag && x.wave === b.wave).length >= 2, `${file} の "${b.kind}" は tag なのに、区間 ${b.wave + 1} に組の相手がいません`);
+  }
   for (const kinds of rs.obstacles.sections) for (const k of kinds) check(!!obstacleSprites.sprites[k], `${file} の障害物 "${k}" のドット絵が data/render/obstacles.json にありません`);
   const roundBgm = [...(rs.stage.legendary?.rounds ?? []), ...(rs.stage.legendary?.bonusRounds ?? [])].flatMap((r) => (r.bgm ? [r.bgm] : []));
   for (const id of [...rs.bgmRun.sections, rs.bgmRun.legendary, rs.bgmRun.intruder, ...roundBgm]) check(id === null || !!bgmConfig.tracks[id], `${file} の曲 "${id}" が data/audio/bgm.json の tracks にありません`);

@@ -76,6 +76,8 @@
   "run.timer": "{time} / {limit}",
   "run.midbossAppeared": "¡Apareció un {name} salvaje!",
   "run.bossAppeared": "¡Apareció el jefe {name}!",
+  "run.tagAppeared": "¡Aparecieron un {a} y un {b} salvajes!",
+  "run.tagBossAppeared": "¡Aparecieron los jefes {a} y {b}!",
   "run.clear": "¡Partida superada!",
   "run.legendEscaped": "{name} se ha marchado…",
   "run.fail": "Partida perdida...",

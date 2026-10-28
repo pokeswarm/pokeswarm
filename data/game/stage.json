@@ -787,6 +787,7 @@
     "knockbackMultiplier": 0,
     "stopStatusMultiplier": 0.25,
     "hpPerExtraPlayerPct": 90,
+    "tagHpMultiplier": 0.7,
     "hazardActiveSeconds": 0.4,
     "hazardDamageScalesWithLevel": true,
     "spawnDistance": 380

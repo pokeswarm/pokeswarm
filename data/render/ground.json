@@ -55,6 +55,42 @@
     },
     "johto_snow": {
       "file": "map/johto/snow.png"
+    },
+    "hoenn_route": {
+      "file": "map/hoenn/route.png"
+    },
+    "hoenn_granite_cave": {
+      "file": "map/hoenn/granite_cave.png"
+    },
+    "hoenn_power_plant": {
+      "file": "map/hoenn/power_plant.png"
+    },
+    "hoenn_ash_field": {
+      "file": "map/hoenn/ash_field.png"
+    },
+    "hoenn_volcano": {
+      "file": "map/hoenn/volcano.png"
+    },
+    "hoenn_desert": {
+      "file": "map/hoenn/desert.png"
+    },
+    "hoenn_rain_grass": {
+      "file": "map/hoenn/rain_grass.png"
+    },
+    "hoenn_pyre": {
+      "file": "map/hoenn/pyre.png"
+    },
+    "hoenn_shallows": {
+      "file": "map/hoenn/shallows.png"
+    },
+    "hoenn_victory_cave": {
+      "file": "map/hoenn/victory_cave.png"
+    },
+    "hoenn_elite_hall": {
+      "file": "map/hoenn/elite_hall.png"
+    },
+    "hoenn_meteor_falls": {
+      "file": "map/hoenn/meteor_falls.png"
     }
   }
 }

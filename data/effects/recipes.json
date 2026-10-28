@@ -2026,6 +2026,108 @@
         }
       }
     },
+    "hail-weather": {
+      "extends": "ice.base",
+      "hideShape": true,
+      "weather": {
+        "colors": [
+          "#ffffff",
+          "#cfe8f5"
+        ],
+        "lifespanMs": [
+          700,
+          1000
+        ],
+        "speed": [
+          320,
+          420
+        ],
+        "scale": [
+          0.26,
+          0.2
+        ],
+        "alpha": [
+          1,
+          0.8
+        ],
+        "gravityY": 0,
+        "blend": "normal",
+        "perSecond": 150,
+        "angle": 20,
+        "tint": {
+          "color": "#cfe8f5",
+          "alpha": 0.08
+        }
+      }
+    },
+    "ash-weather": {
+      "extends": "fire.base",
+      "hideShape": true,
+      "weather": {
+        "colors": [
+          "#9e9e9e",
+          "#cfcfcf"
+        ],
+        "lifespanMs": [
+          2400,
+          3400
+        ],
+        "speed": [
+          30,
+          60
+        ],
+        "scale": [
+          0.22,
+          0.14
+        ],
+        "alpha": [
+          0.9,
+          0.5
+        ],
+        "gravityY": 0,
+        "blend": "normal",
+        "perSecond": 70,
+        "angle": 15,
+        "tint": {
+          "color": "#808080",
+          "alpha": 0.06
+        }
+      }
+    },
+    "sun-weather": {
+      "extends": "fire.base",
+      "hideShape": true,
+      "weather": {
+        "colors": [
+          "#fff59d",
+          "#ffe082"
+        ],
+        "lifespanMs": [
+          1400,
+          2200
+        ],
+        "speed": [
+          20,
+          45
+        ],
+        "scale": [
+          0.18,
+          0.08
+        ],
+        "alpha": [
+          0.7,
+          0
+        ],
+        "gravityY": 0,
+        "blend": "add",
+        "perSecond": 40,
+        "angle": -60,
+        "tint": {
+          "color": "#ffd54f",
+          "alpha": 0.08
+        }
+      }
+    },
     "powder-snow": {
       "extends": "ice.base",
       "hideShape": true,

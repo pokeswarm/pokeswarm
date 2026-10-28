@@ -1,4 +1,4 @@
-import type { CombatConfig, EnemyKind, PickupConfig, SpawnConfig, StageConfig, StatsConfig, StatusConfig, NetSmoothing } from '../data/schema';
+import type { CombatConfig, EnemyKind, LegendField, PickupConfig, SpawnConfig, StageConfig, StatsConfig, StatusConfig, NetSmoothing } from '../data/schema';
 import type { SimSpecies } from './species';
 import type { ObstacleRules } from './obstacles';
 import type { SimMoveDef, TypeChart } from './moves';
@@ -54,6 +54,11 @@ export interface SimRules {
   lines?: Readonly<Record<string, SimLineRule>>;
   /** 区間ごとの夜（地方のステージ。ジョウト: 2・5・6b・7）。夜のある地方だけ、時間帯のなつきの進化（エーフィ・ブラッキー）をする */
   nightSections?: readonly boolean[];
+  /**
+   * 区間ごとの天気（ホウエン。07 の89.2）: kinds は weather.json のキー、fields はその中身。everySeconds が 0 でなければ、
+   * 区間の頭から everySeconds ごとに次の天気へ巡らせる（区間7: ひざしがつよい ⇄ あめ）。天気の無い地方は無し
+   */
+  weatherSections?: readonly { readonly kinds: readonly string[]; readonly fields: readonly LegendField[]; readonly everySeconds: number }[];
   /** なつきの進化に要る、ランで歩いた距離（data/game/player.json） */
   friendshipDistance: number;
   /** 協力プレイで届いた位置をなめらかに見せる */

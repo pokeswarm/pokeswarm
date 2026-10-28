@@ -1,0 +1,32 @@
+{
+  "key": "enemy/salamence",
+  "dex": 373,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 56,
+      "frameHeight": 80,
+      "durations": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

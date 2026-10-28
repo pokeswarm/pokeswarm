@@ -1,0 +1,48 @@
+{
+  "weathers": {
+    "sun": {
+      "typePowerPct": {
+        "fire": 50,
+        "water": -50
+      },
+      "weather": "sun-weather",
+      "groundTint": "#fff0c8"
+    },
+    "rain": {
+      "typePowerPct": {
+        "water": 50,
+        "fire": -50
+      },
+      "weather": "rain-dance",
+      "groundTint": "#a0b4d8"
+    },
+    "sandstorm": {
+      "typePowerPct": {
+        "rock": 20
+      },
+      "damagePctPerSecond": 0.25,
+      "immuneTypes": [
+        "rock",
+        "ground",
+        "steel"
+      ],
+      "weather": "sandstorm",
+      "groundTint": "#e8d0a8"
+    },
+    "hail": {
+      "typePowerPct": {
+        "ice": 20
+      },
+      "damagePctPerSecond": 0.25,
+      "immuneTypes": [
+        "ice"
+      ],
+      "weather": "hail-weather",
+      "groundTint": "#d8e8f4"
+    },
+    "ash": {
+      "weather": "ash-weather",
+      "groundTint": "#c8c8c8"
+    }
+  }
+}

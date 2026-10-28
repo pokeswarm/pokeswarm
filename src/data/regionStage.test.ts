@@ -16,7 +16,23 @@ describe('地方のステージ（data/regions/<地方>.json）', () => {
       expect(rs.bgmRun.sections).toHaveLength(n);
       expect(rs.obstacles.sections).toHaveLength(n);
       expect(rs.night).toHaveLength(n);
+      expect(rs.weather).toHaveLength(n);
     }
+  });
+
+  it('ホウエン: 16区間、区間3 は 3a（113番道路・60秒）→ 3b、天気は区間ごと、ボスは全部タッグ（07 の89章・13 の1章）', () => {
+    const hoenn = regionStage('hoenn');
+    expect(hoenn.spawn.waves).toHaveLength(16);
+    expect(hoenn.spawn.waves[3]!.durationSeconds).toBe(60);
+    expect(hoenn.weather.map((w) => w.kinds.join('/'))).toEqual(['', '', '', 'ash', 'sun', 'sandstorm', 'rain', '', 'sun/rain', '', '', '', 'hail', '', 'rain', '']);
+    expect(hoenn.weather[8]!.everySeconds).toBe(30);
+    expect(hoenn.stage.bosses.every((b) => b.tag)).toBe(true);
+    // 区間ごとに2体ずつ。四天王とミクリ（区間 10〜14）はクリアに必要
+    const perWave = new Map<number, number>();
+    for (const b of hoenn.stage.bosses) perWave.set(b.wave, (perWave.get(b.wave) ?? 0) + 1);
+    expect([...perWave.values()].every((n) => n === 2)).toBe(true);
+    expect([...new Set(hoenn.stage.bosses.filter((b) => b.required).map((b) => b.wave))]).toEqual([10, 11, 12, 13, 14]);
+    expect(hoenn.stage.bossRules.tagHpMultiplier).toBe(0.7);
   });
 
   it('ステージのある地方は data/game/regions.json にある', () => {

@@ -457,6 +457,8 @@ pokeswarm/
 - ランの地方: `RunSceneData.region`。ソロは地方の選択 → ポケモンの選択から、協力プレイは部屋の `region`（ホストが選んだ地方。ゲストも部屋から受け取る）から渡す。
 - 区間6 のように1つの場所の途中で場面が変わる所は、**区間を2つに分ける**（6a は中ボス無しで `durationSeconds` 60秒、6b の頭から 40秒でヤナギ）。区間の頭で地面・曲・雑魚・明るさが切り替わる今の仕組みのまま作れる。
 - 開発版だけ: 地方の選択の URL に `?regions=all` を付けると、ステージのある地方は Coming soon・解放の条件に関わらず選べる（ジョウトを作っている間の確認用）。
+- **天気**（ホウエンの H2。07 の89.2・93章）: 区間の `weather`（`data/game/weather.json` のキー。null はふつう）か、区間の中で巡らせる `weatherCycle`（`kinds`・`everySeconds`。区間7 の ひざしがつよい ⇄ あめ）。天気の中身は伝説戦のマップの効果（`legendFieldSchema`）と同じ形で、`typePowerPct`（プレイヤーの技のタイプの威力）・`damagePctPerSecond`（プレイヤーだけを削る。`immuneTypes` のタイプは削られない）・`weather`（天気の粒のレシピ）・`groundTint`（地面の色）。シミュレーションは `SimRules.weatherSections`、今の天気は `currentWeather(world)`（区間と区間の頭の更新回数で決まるので、ゲストにも同じ天気）。効いているマップの効果は `activeField(world)`: 伝説（伝説戦・乱入）のマップの効果があればそちら、無ければ区間の天気。地面の色は `GroundTiles` に「区間 → 色」を渡す（夜の色と同じく `fadeSeconds` かけて変える）。
+- **タッグバトル**（ホウエンの H2。07 の89.5・93章）: ボスの予定の `tag: true`。同じ区間の tag のボスが組（同じ `afterSeconds` で同時に出す）。HP は `stage.json` の `bossRules.tagHpMultiplier`（0.7）倍してから人数の増加を掛ける。gate の中ボスは2体とも倒すと区間が進む（今の仕組みのまま）。片方が倒れると残ったほうはすぐ第2段階（`enrage` があれば。`stepTags`）。突進する技（`dashSpeed`）は、組の相手が突進の予告中・突進中なら使わず待つ。出た知らせは同じ更新のものをまとめ（「AとBが あらわれた！」）、HP のバーは出ている中ボス・ボスを全部並べる。
 
 ## 17. 地方ごとのショップ・実績・記録（ジョウトの J3。2026年10月27日）
 

@@ -1,0 +1,30 @@
+{
+  "key": "enemy/snorunt",
+  "dex": 361,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 24,
+      "frameHeight": 32,
+      "durations": [
+        8,
+        10,
+        8,
+        10
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

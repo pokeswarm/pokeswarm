@@ -46,7 +46,7 @@ import { achievementName, achievementRewardById } from '../meta/achievementText'
 import { RunRecorder } from '../meta/runRecorder';
 import { session } from '../meta/session';
 import { LevelUpPanel, offerText } from './levelUpPanel';
-import { activeLegendField, startIntruder, startLegendary, legendRoundKinds } from '../sim/systems/stage';
+import { activeField, activeLegendField, currentWeather, startIntruder, startLegendary, legendRoundKinds } from '../sim/systems/stage';
 import { PausePanel } from './pausePanel';
 import { EvolutionCutscene } from './evolutionCutscene';
 import { NetPanel } from './netPanel';
@@ -220,6 +220,8 @@ export class RunScene extends Phaser.Scene {
   private announceText!: Phaser.GameObjects.Text;
   /** HP のバーを出している中ボス・ボス（最後に出たもの） */
   private bossId: number | null = null;
+  /** 出た中ボス・ボス（ホウエンのタッグは2体とも HP のバーを出す）。倒れたものは描くときに外す */
+  private bossIds: number[] = [];
   /** 詳しい情報（確認用）を出すか。F3 で切り替える */
   private showDebug = false;
   /** ランが終わって結果画面へ移る時刻（performance.now） */
@@ -251,6 +253,7 @@ export class RunScene extends Phaser.Scene {
     this.lastHeard = new Map();
     this.hiddenTimer = null;
     this.bossId = null;
+    this.bossIds = [];
     this.bossRows = 0;
     this.resultAt = null;
     this.runRecorded = false;
@@ -411,7 +414,11 @@ export class RunScene extends Phaser.Scene {
         this.joystick = null;
       });
     }
-    this.ground = new GroundTiles(this, this.stageOfRegion.ground, currentWaveIndex(this.sim.world), this.stageOfRegion.night);
+    // 地面の色: ホウエンの天気の色、夜の区間は夜の色
+    const night = this.stageOfRegion.night;
+    this.ground = new GroundTiles(this, this.stageOfRegion.ground, currentWaveIndex(this.sim.world), (wave) =>
+      currentWeather(this.sim.world)?.field.groundTint ?? (night[Math.min(wave, night.length - 1)] ? this.stageOfRegion.ground.nightTint : null),
+    );
     // 重なりの順は data/render/sprites.json の depths（プレイヤー ＞ 技 ＞ ボス ＞ 雑魚 ＞ アイテム）
     const depths = spriteRender.depths;
     this.enemyView = new PooledCircles(this, depths.enemies);
@@ -858,12 +865,13 @@ export class RunScene extends Phaser.Scene {
 
   private onSimEvents(): void {
     const w = this.sim.world;
+    // 同じ更新で出たボス（ホウエンのタッグ）は、まとめて知らせる
+    const appeared: number[] = [];
     for (const ev of w.events) {
       if (ev.type === 'bossAppeared') {
-        const kind = w.rules.enemies.kinds[ev.kind]!;
         this.bossId = ev.id;
-        const name = this.enemyName(ev.kind);
-        this.announce(t(kind.rank === 'boss' ? 'run.bossAppeared' : 'run.midbossAppeared', { name }), kind.rank === 'boss' ? '#ff8a65' : '#ffe082');
+        this.bossIds.push(ev.id);
+        appeared.push(ev.kind);
       } else if (ev.type === 'playerFrozen' && ev.playerId === this.localId) {
         this.announce(t('run.frozen'), '#80deea');
       } else if (ev.type === 'boxHit' || ev.type === 'boxRemoved') {
@@ -939,6 +947,14 @@ export class RunScene extends Phaser.Scene {
         this.legendaryResult = ev.legendary;
         this.resultAt = performance.now() + (escaped ? (stageConfig.legendEscapeDelaySeconds ?? stageConfig.endDelaySeconds) : stageConfig.endDelaySeconds) * 1000;
       }
+    }
+    if (appeared.length > 0) {
+      const boss = w.rules.enemies.kinds[appeared[0]!]!.rank === 'boss';
+      const text =
+        appeared.length >= 2
+          ? t(boss ? 'run.tagBossAppeared' : 'run.tagAppeared', { a: this.enemyName(appeared[0]!), b: this.enemyName(appeared[1]!) })
+          : t(boss ? 'run.bossAppeared' : 'run.midbossAppeared', { name: this.enemyName(appeared[0]!) });
+      this.announce(text, boss ? '#ff8a65' : '#ffe082');
     }
   }
 
@@ -1293,7 +1309,7 @@ export class RunScene extends Phaser.Scene {
 
   /** 伝説戦のマップの効果: 画面に色を重ねる（サンダーで暗く・フリーザーで白っぽく） */
   private drawFieldOverlay(): void {
-    const overlay = activeLegendField(this.sim.world)?.field.overlay;
+    const overlay = activeField(this.sim.world)?.field.overlay;
     if (!overlay) {
       this.fieldOverlay?.setVisible(false);
       return;
@@ -1526,6 +1542,12 @@ export class RunScene extends Phaser.Scene {
       if (i !== -1 && w.enemies.hp[i]! > 0 && !list.includes(i)) list.push(i);
     };
     if (this.bossId !== null) add(this.bossId);
+    // タッグの相手（同時に出て、まだ倒れていない中ボス・ボス）
+    this.bossIds = this.bossIds.filter((id) => {
+      const i = findEnemyIndex(w, id);
+      return i !== -1 && w.enemies.hp[i]! > 0;
+    });
+    for (const id of this.bossIds) add(id);
     for (const b of w.bosses) {
       const rank = w.rules.enemies.kinds[w.enemies.kind[findEnemyIndex(w, b.id)] ?? -1]?.rank;
       if (rank === 'boss' || rank === 'legendary') add(b.id);
@@ -1838,7 +1860,7 @@ export class RunScene extends Phaser.Scene {
       if (effectRecipes[effect]?.weather) weathers.add(effect);
     }
     // 伝説戦のマップの効果の天気（フリーザーのふぶき）: プレイヤーの技と同じ雪を画面じゅうに
-    const fieldWeather = activeLegendField(world)?.field.weather;
+    const fieldWeather = activeField(world)?.field.weather;
     if (fieldWeather && effectRecipes[fieldWeather]?.weather) weathers.add(fieldWeather);
     this.effects.drawWeather(weathers, this.cameras.main.worldView, deltaMs);
     this.drawGhosts(world, alpha);

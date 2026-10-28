@@ -1377,6 +1377,482 @@
       "uses": [
         "full"
       ]
+    },
+    {
+      "key": "poochyena",
+      "dex": 261,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "zigzagoon",
+      "dex": 263,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "wurmple",
+      "dex": 265,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "shroomish",
+      "dex": 285,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "taillow",
+      "dex": 276,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "wingull",
+      "dex": 278,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "makuhita",
+      "dex": 296,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "aron",
+      "dex": 304,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "sableye",
+      "dex": 302,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "electrike",
+      "dex": 309,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "plusle",
+      "dex": 311,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "minun",
+      "dex": 312,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "gulpin",
+      "dex": 316,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "spinda",
+      "dex": 327,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "slugma",
+      "dex": 218,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "numel",
+      "dex": 322,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "torkoal",
+      "dex": 324,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "spoink",
+      "dex": 325,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "trapinch",
+      "dex": 328,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "baltoy",
+      "dex": 343,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "cacnea",
+      "dex": 331,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "whismur",
+      "dex": 293,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "loudred",
+      "dex": 294,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "linoone",
+      "dex": 264,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "mightyena",
+      "dex": 262,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "tropius",
+      "dex": 357,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "kecleon",
+      "dex": 352,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "absol",
+      "dex": 359,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "shuppet",
+      "dex": 353,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "duskull",
+      "dex": 355,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "chimecho",
+      "dex": 358,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "tentacruel",
+      "dex": 73,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "pelipper",
+      "dex": 279,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "wailmer",
+      "dex": 320,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "sharpedo",
+      "dex": 319,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "hariyama",
+      "dex": 297,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "lairon",
+      "dex": 305,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "medicham",
+      "dex": 308,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "cacturne",
+      "dex": 332,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "crawdaunt",
+      "dex": 342,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "sealeo",
+      "dex": 364,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "spheal",
+      "dex": 363,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "snorunt",
+      "dex": 361,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "shelgon",
+      "dex": 372,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "bagon",
+      "dex": 371,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "altaria",
+      "dex": 334,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "vibrava",
+      "dex": 329,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "ludicolo",
+      "dex": 272,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "whiscash",
+      "dex": 340,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "solrock",
+      "dex": 338,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "lunatone",
+      "dex": 337,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "barboach",
+      "dex": 339,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "nosepass",
+      "dex": 299,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "meditite",
+      "dex": 307,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "manectric",
+      "dex": 310,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "camerupt",
+      "dex": 323,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "slaking",
+      "dex": 289,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "vigoroth",
+      "dex": 288,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "shiftry",
+      "dex": 275,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "dusclops",
+      "dex": 356,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "banette",
+      "dex": 354,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "walrein",
+      "dex": 365,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "glalie",
+      "dex": 362,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "salamence",
+      "dex": 373,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "flygon",
+      "dex": 330,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "milotic",
+      "dex": 350,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "wailord",
+      "dex": 321,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "ninjask",
+      "dex": 291,
+      "uses": [
+        "enemy"
+      ]
     }
   ]
 }

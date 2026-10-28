@@ -1,0 +1,38 @@
+{
+  "key": "enemy/spoink",
+  "dex": 325,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 32,
+      "frameHeight": 64,
+      "durations": [
+        4,
+        6,
+        4,
+        6,
+        4,
+        4,
+        4,
+        6,
+        4,
+        6,
+        4,
+        4
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

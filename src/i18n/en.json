@@ -97,6 +97,8 @@
   "run.timer": "{time} / {limit}",
   "run.midbossAppeared": "A wild {name} appeared!",
   "run.bossAppeared": "The boss {name} appeared!",
+  "run.tagAppeared": "A wild {a} and {b} appeared!",
+  "run.tagBossAppeared": "The bosses {a} and {b} appeared!",
   "run.clear": "Run clear!",
   "run.legendEscaped": "{name} fled…",
   "run.fail": "Run failed...",

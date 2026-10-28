@@ -74,7 +74,12 @@
     },
     {
       "id": "hoenn",
-      "available": false
+      "available": false,
+      "playables": [
+        "charmander",
+        "bulbasaur",
+        "squirtle"
+      ]
     },
     {
       "id": "sinnoh",

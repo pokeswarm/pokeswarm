@@ -76,6 +76,8 @@
   "run.timer": "{time} / {limit}",
   "run.midbossAppeared": "Ein wildes {name} erscheint!",
   "run.bossAppeared": "Der Boss {name} erscheint!",
+  "run.tagAppeared": "Ein wildes {a} und ein wildes {b} erscheinen!",
+  "run.tagBossAppeared": "Die Bosse {a} und {b} erscheinen!",
   "run.clear": "Geschafft!",
   "run.legendEscaped": "{name} ist geflohen …",
   "run.fail": "Gescheitert...",

@@ -97,6 +97,8 @@
   "run.timer": "{time} / {limit}",
   "run.midbossAppeared": "{name}が あらわれた！",
   "run.bossAppeared": "ボスの {name}が あらわれた！",
+  "run.tagAppeared": "{a}と {b}が あらわれた！",
+  "run.tagBossAppeared": "ボスの {a}と {b}が あらわれた！",
   "run.clear": "ランクリア！",
   "run.legendEscaped": "{name} は 去っていった…",
   "run.fail": "ラン失敗…",

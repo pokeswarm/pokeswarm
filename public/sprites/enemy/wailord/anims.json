@@ -1,0 +1,38 @@
+{
+  "key": "enemy/wailord",
+  "dex": 321,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 72,
+      "frameHeight": 104,
+      "durations": [
+        10,
+        8,
+        6,
+        6,
+        8,
+        8,
+        10,
+        8,
+        6,
+        6,
+        6,
+        8
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

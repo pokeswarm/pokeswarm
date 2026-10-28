@@ -19,15 +19,18 @@ export function isBossKind(world: World, kind: number): boolean {
   return (world.rules.enemies.kinds[kind]?.rank ?? 'normal') !== 'normal';
 }
 
-/** ボス・伝説を出す。HP は参加人数に応じて上げる（2.2）。出せなければ -1 */
-function spawnBoss(world: World, kindIndex: number, moves: readonly number[], interval: number, enrage: BossEntry['enrage'] = null): number {
+/**
+ * ボス・伝説を出す。HP は参加人数に応じて上げる（2.2）。タッグのボスは、その前に bossRules.tagHpMultiplier 倍（ソロの補正。07 の89.5）。
+ * 出せなければ -1
+ */
+function spawnBoss(world: World, kindIndex: number, moves: readonly number[], interval: number, enrage: BossEntry['enrage'] = null, tag = false): number {
   const rules = world.rules.stage.bossRules;
   const kind = world.rules.enemies.kinds[kindIndex]!;
   const p = world.players[world.rng.int(world.players.length)]!;
   const [ux, uy] = randomUnit(world.rng);
   const x = p.x + ux * rules.spawnDistance;
   const y = p.y + uy * rules.spawnDistance;
-  const hp = kind.hp * (1 + (rules.hpPerExtraPlayerPct * (world.players.length - 1)) / 100);
+  const hp = kind.hp * (tag ? (rules.tagHpMultiplier ?? 1) : 1) * (1 + (rules.hpPerExtraPlayerPct * (world.players.length - 1)) / 100);
   const id = world.nextEnemyId++;
   if (world.enemies.add(id, kindIndex, x, y, hp, kind.moveSpeed, kind.radius, kind.contactDamage) === -1) return -1;
   world.events.push({ type: 'enemySpawned', id, kind: kindIndex, x, y });
@@ -77,14 +80,52 @@ export function spawnBosses(world: World): void {
     const b = world.bossSchedule[world.nextBoss]!;
     if (b.wave > world.section || (b.wave === world.section && b.afterTicks > inSection)) break;
     world.nextBoss++;
-    const id = spawnBoss(world, b.kind, b.moves, b.interval, b.enrage);
+    const id = spawnBoss(world, b.kind, b.moves, b.interval, b.enrage, b.tag);
     // 出せなかった（敵の上限）中ボスは、次の更新で出し直す
     if (id === -1 && b.gate) {
       world.nextBoss--;
       break;
     }
     if (b.gate) world.gateIds.add(id);
+    if (b.tag && id !== -1) world.tagIds.set(id, b.wave);
   }
+}
+
+/**
+ * タッグバトル（ホウエン。07 の89.5。ソロ・ホスト）: 組の片方が倒れたら、残ったほうはすぐ第2段階になる
+ * （第2段階の無いボスはそのまま）
+ */
+export function stepTags(world: World): void {
+  if (world.role === 'guest' || world.tagIds.size === 0) return;
+  for (const ev of world.events) {
+    if (ev.type !== 'enemyKilled') continue;
+    const wave = world.tagIds.get(ev.enemyId);
+    if (wave === undefined) continue;
+    world.tagIds.delete(ev.enemyId);
+    for (const [id, w] of world.tagIds) {
+      if (w !== wave) continue;
+      const boss = world.bosses.find((b) => b.id === id);
+      const i = findEnemyIndex(world, id);
+      if (!boss?.enrage || boss.enraged || i === -1) continue;
+      boss.enraged = true;
+      boss.interval = boss.enrage.interval;
+      boss.cooldown = Math.min(boss.cooldown, boss.interval);
+      world.events.push({ type: 'legendaryWarning', kind: world.enemies.kind[i]!, enraged: true });
+    }
+  }
+}
+
+/** タッグの組の相手が突進している（予告中・突進中）か。突進する技は、相手の突進が終わるまで使わない（2体が同時に突っ込まない） */
+function partnerDashing(world: World, bossId: number): boolean {
+  const wave = world.tagIds.get(bossId);
+  if (wave === undefined) return false;
+  for (const [id, w] of world.tagIds) {
+    if (id === bossId || w !== wave) continue;
+    if (world.hazards.some((h) => h.dasher === id && !!world.rules.stage.moves[h.move]?.dashSpeed)) return true;
+    const i = findEnemyIndex(world, id);
+    if (i !== -1 && world.enemies.kbTicks[i]! > 0) return true;
+  }
+  return false;
 }
 
 /**
@@ -273,6 +314,12 @@ function useBossMove(world: World, boss: World['bosses'][number], i: number): vo
   let moveIdx = boss.random ? boss.moves[world.rng.int(boss.moves.length)]! : boss.moves[boss.next++ % boss.moves.length]!;
   if (moveIdx === -1 && boss.pool && boss.pool.length > 0) moveIdx = boss.pool[world.rng.int(boss.pool.length)]!;
   const move = world.rules.stage.moves[moveIdx];
+  // タッグの相手が突進している間は、突進する技を使わず、少し後にもう一度見る
+  if (move?.dashSpeed && partnerDashing(world, boss.id)) {
+    if (!boss.random) boss.next--;
+    boss.cooldown = Math.min(boss.cooldown, Math.max(1, Math.round(0.2 / world.dt)));
+    return;
+  }
   // 狙う相手の距離の条件（フシギバナのソーラービーム・カメックスのハイドロカノン）: 満たさなければ使わず、少し後にもう一度見る
   if (move && (move.minTargetDistance !== undefined || move.maxTargetDistance !== undefined)) {
     const bx = world.enemies.x[i]!;
@@ -526,12 +573,14 @@ function tickLegendField(world: World): void {
   if (!me) return;
   if (me.frozenTicks) me.frozenTicks--;
   if (me.freezeCooldown) me.freezeCooldown--;
-  const active = activeLegendField(world);
+  const active = activeField(world);
   if (!active || me.down) {
     me.fieldHurtTicks = 0;
     return;
   }
   const f = active.field;
+  // 天気で削られないタイプ（すなあらしの いわ・じめん・はがね）
+  const immune = !!f.immuneTypes && me.types.some((t) => f.immuneTypes!.includes(world.rules.types.names[t] ?? ''));
   if (f.slowPct) me.zoneSlowPct = Math.max(me.zoneSlowPct ?? 0, f.slowPct);
   // 強い風（ルギア）: 一方向へ流す。向きは決まった間隔で変わる（どのブラウザでも同じ向き。黄金角ずつ回す）
   if (f.wind) {
@@ -545,10 +594,10 @@ function tickLegendField(world: World): void {
   if (me.fieldHurtTicks >= every) {
     me.fieldHurtTicks = 0;
     // ふぶき: 最大 HP の % （防御は効かない。無敵時間も付けない）
-    if (f.damagePctPerSecond) fieldDamage(world, me, (me.maxHp * f.damagePctPerSecond * 0.5) / 100);
+    if (f.damagePctPerSecond && !immune) fieldDamage(world, me, (me.maxHp * f.damagePctPerSecond * 0.5) / 100);
     // ほのおのうず: 伝説の近くにいると削られる（ふつうのダメージ）
     const e = world.enemies;
-    if (f.aura && !me.down && me.invincibleTicks <= 0 && (me.x - e.x[active.index]!) ** 2 + (me.y - e.y[active.index]!) ** 2 <= (f.aura.radius + me.radius) ** 2) {
+    if (f.aura && active.index >= 0 && !me.down && me.invincibleTicks <= 0 && (me.x - e.x[active.index]!) ** 2 + (me.y - e.y[active.index]!) ** 2 <= (f.aura.radius + me.radius) ** 2) {
       hurtPlayer(world, me, hazardDamage(world, f.aura.damagePerSecond * 0.5));
     }
   }
@@ -681,6 +730,29 @@ export function activeLegendField(world: World): { field: LegendField; index: nu
   }
   fieldTick.set(world, { tick: world.tick, out });
   return out;
+}
+
+/**
+ * 今の区間の天気（ホウエン。07 の89.2）: 区間の天気、巡らせる区間は頭からの秒数で決まる。天気の無い区間・地方は null。
+ * section と sectionStartTick はゲストにも届くので、どのブラウザでも同じ天気になる
+ */
+export function currentWeather(world: World): { id: string; field: LegendField } | null {
+  const w = world.rules.weatherSections?.[Math.min(world.section, (world.rules.weatherSections?.length ?? 1) - 1)];
+  if (!w || w.kinds.length === 0) return null;
+  const at = w.everySeconds > 0 ? Math.floor(((world.tick - world.sectionStartTick) * world.dt) / w.everySeconds) % w.kinds.length : 0;
+  return { id: w.kinds[at]!, field: w.fields[at]! };
+}
+
+/**
+ * 今効いているマップの効果: 伝説（伝説戦・乱入）のマップの効果があればそれ、無ければ区間の天気（index は -1）。
+ * 伝説のマップの効果が天気より優先する（レックウザ: 天気を消す）
+ */
+export function activeField(world: World): { field: LegendField; index: number } | null {
+  const legend = activeLegendField(world);
+  if (legend) return legend;
+  if (world.legendary?.result) return null;
+  const w = currentWeather(world);
+  return w ? { field: w.field, index: -1 } : null;
 }
 
 /** 伝説戦のラウンド（種類の番号）。rules ごとに覚える */

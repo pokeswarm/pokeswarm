@@ -26,7 +26,7 @@ import type { World } from '../world';
 import { applyHitEffect } from './commands';
 import { fireDelayedExplosion, fireEffects, type FxSource } from './moveEffects';
 import { healPlayer, hurtPlayer, selfDamage } from './health';
-import { activeLegendField, hazardDamage } from './stage';
+import { activeField, hazardDamage } from './stage';
 import { breakOnDamage, damageTakenMultiplier } from './status';
 
 /** 持ち物の威力の倍率（でんきだま: その系統が持っているときだけ） */
@@ -1597,9 +1597,9 @@ function rollHitEffect(world: World, st: MoveStats, dirX: number, dirY: number, 
   return { kbx, kby, kbTicks, status, statusTicks };
 }
 
-/** 伝説のマップの効果（ホウオウの日差し）で、タイプ type の技の威力が変わる % */
+/** 伝説のマップの効果（ホウオウの日差し）・区間の天気（ホウエン）で、タイプ type の技の威力が変わる % */
 function fieldTypePct(world: World, type: number): number {
-  const pct = activeLegendField(world)?.field.typePowerPct;
+  const pct = activeField(world)?.field.typePowerPct;
   if (!pct) return 0;
   return pct[world.rules.types.names[type] ?? ''] ?? 0;
 }

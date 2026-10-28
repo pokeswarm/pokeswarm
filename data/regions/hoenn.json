@@ -1,0 +1,700 @@
+{
+  "durationSeconds": 2100,
+  "sections": [
+    {
+      "tile": "hoenn_route",
+      "bgm": "hoenn-route",
+      "obstacles": [
+        "tree",
+        "rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 1,
+        "minimum": 15,
+        "capPerPlayer": 60,
+        "hpMultiplier": 1.4,
+        "damageMultiplier": 1.2,
+        "xpMultiplier": 1,
+        "kinds": [
+          "poochyena",
+          "zigzagoon",
+          "wurmple",
+          "shroomish",
+          "taillow",
+          "wingull"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_granite_cave",
+      "bgm": "hoenn-cave",
+      "obstacles": [
+        "stalagmite",
+        "rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 3,
+        "minimum": 40,
+        "capPerPlayer": 120,
+        "hpMultiplier": 1.54,
+        "damageMultiplier": 1.38,
+        "xpMultiplier": 1.3,
+        "kinds": [
+          "zubat",
+          "makuhita",
+          "aron",
+          "sableye",
+          "abra",
+          "geodude"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_power_plant",
+      "bgm": "hoenn-power-plant",
+      "obstacles": [
+        "pillar",
+        "rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 5,
+        "minimum": 70,
+        "capPerPlayer": 180,
+        "hpMultiplier": 1.68,
+        "damageMultiplier": 1.56,
+        "xpMultiplier": 1.6,
+        "kinds": [
+          "electrike",
+          "plusle",
+          "minun",
+          "gulpin",
+          "magnemite",
+          "oddish"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_ash_field",
+      "bgm": "hoenn-ash-route",
+      "obstacles": [
+        "rock"
+      ],
+      "weather": "ash",
+      "wave": {
+        "durationSeconds": 60,
+        "spawnPerSecond": 7,
+        "minimum": 100,
+        "capPerPlayer": 240,
+        "hpMultiplier": 2.17,
+        "damageMultiplier": 1.74,
+        "xpMultiplier": 1.9,
+        "kinds": [
+          "spinda",
+          "sandshrew",
+          "slugma",
+          "skarmory"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_volcano",
+      "bgm": "hoenn-volcano",
+      "obstacles": [
+        "red-rock",
+        "rock"
+      ],
+      "weather": "sun",
+      "wave": {
+        "spawnPerSecond": 9,
+        "minimum": 140,
+        "capPerPlayer": 300,
+        "hpMultiplier": 2.59,
+        "damageMultiplier": 1.92,
+        "xpMultiplier": 2.2,
+        "kinds": [
+          "numel",
+          "torkoal",
+          "slugma",
+          "koffing",
+          "spoink",
+          "machop"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_desert",
+      "bgm": "hoenn-desert",
+      "obstacles": [
+        "red-rock"
+      ],
+      "weather": "sandstorm",
+      "wave": {
+        "spawnPerSecond": 11,
+        "minimum": 180,
+        "capPerPlayer": 360,
+        "hpMultiplier": 3.43,
+        "damageMultiplier": 2.1,
+        "xpMultiplier": 2.5,
+        "kinds": [
+          "sandshrew-2",
+          "trapinch",
+          "baltoy",
+          "cacnea",
+          "whismur",
+          "loudred"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_rain_grass",
+      "bgm": "hoenn-rain-route",
+      "obstacles": [
+        "tree"
+      ],
+      "weather": "rain",
+      "wave": {
+        "spawnPerSecond": 13,
+        "minimum": 230,
+        "capPerPlayer": 420,
+        "hpMultiplier": 4.06,
+        "damageMultiplier": 2.28,
+        "xpMultiplier": 2.8,
+        "kinds": [
+          "zigzagoon-2",
+          "linoone",
+          "oddish-2",
+          "mightyena",
+          "tropius",
+          "kecleon",
+          "absol"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_pyre",
+      "bgm": "hoenn-pyre",
+      "obstacles": [
+        "dark-tree",
+        "rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 13,
+        "minimum": 230,
+        "capPerPlayer": 420,
+        "hpMultiplier": 4.06,
+        "damageMultiplier": 2.28,
+        "xpMultiplier": 2.8,
+        "kinds": [
+          "shuppet",
+          "duskull",
+          "chimecho",
+          "mightyena",
+          "gloom",
+          "vulpix"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_shallows",
+      "bgm": "hoenn-sea",
+      "obstacles": [
+        "beach-rock"
+      ],
+      "weatherCycle": {
+        "kinds": [
+          "sun",
+          "rain"
+        ],
+        "everySeconds": 30
+      },
+      "wave": {
+        "spawnPerSecond": 15,
+        "minimum": 280,
+        "capPerPlayer": 480,
+        "hpMultiplier": 5.32,
+        "damageMultiplier": 2.46,
+        "xpMultiplier": 3.1,
+        "kinds": [
+          "tentacool",
+          "tentacruel",
+          "wingull-2",
+          "pelipper",
+          "wailmer",
+          "sharpedo"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_victory_cave",
+      "bgm": "hoenn-victory-road",
+      "obstacles": [
+        "stalagmite",
+        "rock"
+      ],
+      "wave": {
+        "durationSeconds": 60,
+        "spawnPerSecond": 17,
+        "minimum": 330,
+        "capPerPlayer": 520,
+        "hpMultiplier": 6.16,
+        "damageMultiplier": 2.64,
+        "xpMultiplier": 3.4,
+        "kinds": [
+          "hariyama",
+          "lairon",
+          "loudred-2",
+          "golbat",
+          "medicham",
+          "sableye-2"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_elite_hall",
+      "bgm": "hoenn-elite-four",
+      "obstacles": [
+        "pillar"
+      ],
+      "wave": {
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 7.84,
+        "damageMultiplier": 2.88,
+        "xpMultiplier": 3.7,
+        "kinds": [
+          "mightyena-2",
+          "cacturne",
+          "crawdaunt"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_elite_hall",
+      "bgm": "hoenn-elite-four",
+      "obstacles": [
+        "pillar"
+      ],
+      "wave": {
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 10.08,
+        "damageMultiplier": 3.18,
+        "xpMultiplier": 4,
+        "kinds": [
+          "sableye-3",
+          "duskull-2",
+          "shuppet-2"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_elite_hall",
+      "bgm": "hoenn-elite-four",
+      "obstacles": [
+        "pillar"
+      ],
+      "weather": "hail",
+      "wave": {
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 12.6,
+        "damageMultiplier": 3.48,
+        "xpMultiplier": 4.3,
+        "kinds": [
+          "sealeo",
+          "spheal",
+          "snorunt"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_elite_hall",
+      "bgm": "hoenn-elite-four",
+      "obstacles": [
+        "pillar"
+      ],
+      "wave": {
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 15.68,
+        "damageMultiplier": 3.84,
+        "xpMultiplier": 4.6,
+        "kinds": [
+          "shelgon",
+          "bagon",
+          "altaria",
+          "vibrava"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_elite_hall",
+      "bgm": "hoenn-elite-four",
+      "obstacles": [
+        "pillar"
+      ],
+      "weather": "rain",
+      "wave": {
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 18.03,
+        "damageMultiplier": 4.42,
+        "xpMultiplier": 4.6,
+        "kinds": [
+          "tentacruel-2",
+          "ludicolo",
+          "whiscash",
+          "gyarados"
+        ]
+      }
+    },
+    {
+      "tile": "hoenn_meteor_falls",
+      "bgm": "hoenn-steven",
+      "obstacles": [
+        "stalagmite",
+        "rock"
+      ],
+      "wave": {
+        "spawnPerSecond": 20,
+        "minimum": 400,
+        "capPerPlayer": 600,
+        "hpMultiplier": 20.38,
+        "damageMultiplier": 4.99,
+        "xpMultiplier": 4.6,
+        "kinds": [
+          "golbat-2",
+          "solrock",
+          "lunatone",
+          "barboach",
+          "whiscash",
+          "bagon-2"
+        ]
+      }
+    }
+  ],
+  "bosses": [
+    {
+      "wave": 0,
+      "afterSeconds": 100,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-nosepass"
+    },
+    {
+      "wave": 0,
+      "afterSeconds": 100,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-geodude"
+    },
+    {
+      "wave": 1,
+      "afterSeconds": 100,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-hariyama"
+    },
+    {
+      "wave": 1,
+      "afterSeconds": 100,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-meditite"
+    },
+    {
+      "wave": 2,
+      "afterSeconds": 100,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-manectric"
+    },
+    {
+      "wave": 2,
+      "afterSeconds": 100,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-magneton"
+    },
+    {
+      "wave": 4,
+      "afterSeconds": 40,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-torkoal"
+    },
+    {
+      "wave": 4,
+      "afterSeconds": 40,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-camerupt"
+    },
+    {
+      "wave": 5,
+      "afterSeconds": 100,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-slaking"
+    },
+    {
+      "wave": 5,
+      "afterSeconds": 100,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-vigoroth"
+    },
+    {
+      "wave": 6,
+      "afterSeconds": 100,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-altaria"
+    },
+    {
+      "wave": 6,
+      "afterSeconds": 100,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-skarmory"
+    },
+    {
+      "wave": 7,
+      "afterSeconds": 100,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-solrock"
+    },
+    {
+      "wave": 7,
+      "afterSeconds": 100,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-lunatone"
+    },
+    {
+      "wave": 8,
+      "afterSeconds": 100,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-kingdra"
+    },
+    {
+      "wave": 8,
+      "afterSeconds": 100,
+      "gate": true,
+      "tag": true,
+      "kind": "hoenn-midboss-crawdaunt"
+    },
+    {
+      "wave": 10,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "tag": true,
+      "kind": "hoenn-boss-absol",
+      "moves": [
+        "legend-dash",
+        "legend-nova"
+      ],
+      "moveIntervalSeconds": 2.6,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.8,
+        "doubleChance": 0.2
+      }
+    },
+    {
+      "wave": 10,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "tag": true,
+      "kind": "hoenn-boss-shiftry",
+      "moves": [
+        "mewtwo-psywave",
+        "legend-nova",
+        "mewtwo-teleport"
+      ],
+      "moveIntervalSeconds": 2.6,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.8,
+        "doubleChance": 0.2
+      }
+    },
+    {
+      "wave": 11,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "tag": true,
+      "kind": "hoenn-boss-dusclops",
+      "moves": [
+        "legend-dash",
+        "shadow-ball"
+      ],
+      "moveIntervalSeconds": 2.2,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.6,
+        "doubleChance": 0.2
+      }
+    },
+    {
+      "wave": 11,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "tag": true,
+      "kind": "hoenn-boss-banette",
+      "moves": [
+        "shadow-ball",
+        "legend-nova"
+      ],
+      "moveIntervalSeconds": 2.2,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.6,
+        "doubleChance": 0.2
+      }
+    },
+    {
+      "wave": 12,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "tag": true,
+      "kind": "hoenn-boss-walrein",
+      "moves": [
+        "legend-dash",
+        "earthquake"
+      ],
+      "moveIntervalSeconds": 2.2,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.5,
+        "doubleChance": 0.3
+      }
+    },
+    {
+      "wave": 12,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "tag": true,
+      "kind": "hoenn-boss-glalie",
+      "moves": [
+        "earthquake",
+        "legend-nova"
+      ],
+      "moveIntervalSeconds": 2.2,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.5,
+        "doubleChance": 0.3
+      }
+    },
+    {
+      "wave": 13,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "tag": true,
+      "kind": "hoenn-boss-salamence",
+      "moves": [
+        "moltres-flamedash",
+        "shadow-ball"
+      ],
+      "moveIntervalSeconds": 2,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.3,
+        "doubleChance": 0.35
+      }
+    },
+    {
+      "wave": 13,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "tag": true,
+      "kind": "hoenn-boss-flygon",
+      "moves": [
+        "shadow-ball",
+        "charizard-blast-burn"
+      ],
+      "moveIntervalSeconds": 2,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.3,
+        "doubleChance": 0.35
+      }
+    },
+    {
+      "wave": 14,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "tag": true,
+      "kind": "hoenn-boss-milotic",
+      "moves": [
+        "draco-meteor",
+        "legend-beam"
+      ],
+      "moveIntervalSeconds": 1.8,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.1,
+        "doubleChance": 0.4
+      }
+    },
+    {
+      "wave": 14,
+      "afterSeconds": 40,
+      "gate": true,
+      "required": true,
+      "tag": true,
+      "kind": "hoenn-boss-wailord",
+      "moves": [
+        "zapdos-dash",
+        "legend-nova"
+      ],
+      "moveIntervalSeconds": 1.8,
+      "enrage": {
+        "hpRatio": 0.5,
+        "moveIntervalSeconds": 1.1,
+        "doubleChance": 0.4
+      }
+    }
+  ],
+  "swarms": [
+    {
+      "atSeconds": 195,
+      "everySeconds": 150,
+      "untilSeconds": 1000,
+      "kind": "swarm-ninjask",
+      "pattern": "rush",
+      "count": 25,
+      "spacing": 22,
+      "speed": 300
+    },
+    {
+      "atSeconds": 45,
+      "everySeconds": 20,
+      "untilSeconds": 1180,
+      "kind": "swarm-voltorb",
+      "pattern": "bomber",
+      "count": 1,
+      "triggerRange": 110,
+      "move": "self-destruct"
+    }
+  ],
+  "legendaryBgm": null,
+  "intruderBgm": null
+}

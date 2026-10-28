@@ -449,8 +449,19 @@ export const legendFieldSchema = z.object({
   wind: z.object({ speed: z.number().positive(), everySeconds: z.number().positive() }).optional(),
   /** 日差し・雨（ホウオウ）: プレイヤーの技の威力を、タイプごとに pct % 変える（例: ほのお +50・みず -50） */
   typePowerPct: z.record(z.string(), z.number()).optional(),
+  /** damagePctPerSecond が効かないプレイヤーのタイプ（ホウエンの天気: すなあらしの いわ・じめん・はがね。07 の89.2） */
+  immuneTypes: z.array(z.string()).optional(),
+  /** 地面に掛ける色（ホウエンの天気。夜の色と同じく区間の切り替えの秒数で変える） */
+  groundTint: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
 });
 export type LegendField = z.infer<typeof legendFieldSchema>;
+
+/**
+ * 地方の天気（ホウエン。作者の決定 07 の89.2）: 昼夜の代わりに区間ごとに決める。中身は伝説戦のマップの効果と同じ形
+ * （タイプの威力・プレイヤーだけを削る・画面の色・天気の粒・地面の色）。伝説戦・乱入の伝説にマップの効果があれば、そちらを優先する
+ */
+export const weatherConfigSchema = z.object({ weathers: z.record(z.string(), legendFieldSchema) });
+export type WeatherConfig = z.infer<typeof weatherConfigSchema>;
 
 export const bossMoveSchema = z.object({
   id: z.string().min(1),
@@ -547,6 +558,11 @@ export const stageConfigSchema = z.object({
       /** 倒すとクリアに必要（四天王） */
       required: z.boolean().default(false),
       /**
+       * タッグバトル（ホウエン。作者の決定 07 の89.5）: 同じ区間の tag のボスと組になる。HP は bossRules.tagHpMultiplier 倍。
+       * 片方が倒れると、残ったほうはすぐ第2段階（enrage）になる。突進する技は、組の相手が突進している間は使わない
+       */
+      tag: z.boolean().optional(),
+      /**
        * 第2段階（四天王。作者の決定 2026年10月24日）: HP が hpRatio を切ったら「DANGER」を出し、技の間隔を moveIntervalSeconds にし、
        * doubleChance の確率で2つの技を同時に使う
        */
@@ -640,6 +656,8 @@ export const stageConfigSchema = z.object({
     stopStatusMultiplier: z.number().min(0),
     /** 2人目以降の1人あたりの HP の増加（%） */
     hpPerExtraPlayerPct: z.number().min(0),
+    /** タッグバトルのボス1体の HP の倍率（ソロでもクリアできるように。07 の89.5: 2体の合計が1体の 1.4倍）。人数による増加はこの後に掛ける */
+    tagHpMultiplier: z.number().positive().optional(),
     /**
      * 範囲技が落ちた後も、この秒数は範囲に触れると当たる（作者の指摘 2026年10月25日: はかいこうせんの光に触れても当たらなかった。
      * 落ちた瞬間だけだった）。1つの範囲技で当たるのは1回
@@ -1159,6 +1177,10 @@ export const regionStageSchema = z.object({
         obstacles: z.array(z.string()).min(1),
         /** 夜の区間（作者の決定 2026年10月27日: 区間の切り替えで画面を暗くする） */
         night: z.boolean().default(false),
+        /** 区間の天気（data/game/weather.json のキー。ホウエン。07 の89.2）。null はふつう */
+        weather: z.string().nullable().default(null),
+        /** 区間の中で天気を巡らせる（ホウエンの区間7: ひざしがつよい ⇄ あめ）。あれば weather の代わり */
+        weatherCycle: z.object({ kinds: z.array(z.string()).min(2), everySeconds: z.number().positive() }).optional(),
         /** 雑魚（前の spawn.json の waves の1つ） */
         wave: z.record(z.string(), z.unknown()),
       }),

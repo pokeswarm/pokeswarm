@@ -791,5 +791,6 @@
     "hazardDamageScalesWithLevel": true,
     "spawnDistance": 380
   },
-  "endDelaySeconds": 2.5
+  "endDelaySeconds": 2.5,
+  "legendEscapeDelaySeconds": 3.5
 }

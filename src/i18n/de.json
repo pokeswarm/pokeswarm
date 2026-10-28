@@ -77,6 +77,7 @@
   "run.midbossAppeared": "Ein wildes {name} erscheint!",
   "run.bossAppeared": "Der Boss {name} erscheint!",
   "run.clear": "Geschafft!",
+  "run.legendEscaped": "{name} ist geflohen …",
   "run.fail": "Gescheitert...",
   "run.debugToggle": "F3: Debug-Infos",
   "result.retry": "NOCHMAL",

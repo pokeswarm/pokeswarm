@@ -98,6 +98,7 @@
   "run.midbossAppeared": "A wild {name} appeared!",
   "run.bossAppeared": "The boss {name} appeared!",
   "run.clear": "Run clear!",
+  "run.legendEscaped": "{name} fled…",
   "run.fail": "Run failed...",
   "run.debugToggle": "F3: toggle debug info",
   "result.retry": "RETRY",

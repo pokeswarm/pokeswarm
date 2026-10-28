@@ -652,6 +652,8 @@ export const stageConfigSchema = z.object({
   }),
   /** クリア・失敗が決まってから結果画面に移るまでの時間 */
   endDelaySeconds: z.number().nonnegative(),
+  /** 伝説戦の時間切れ: 「〇〇は 去っていった…」を出してから結果画面へ移るまでの秒数（省略時は endDelaySeconds） */
+  legendEscapeDelaySeconds: z.number().nonnegative().optional(),
 });
 export type StageConfig = z.infer<typeof stageConfigSchema>;
 

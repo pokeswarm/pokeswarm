@@ -898,9 +898,12 @@ export class RunScene extends Phaser.Scene {
       } else if (ev.type === 'runEnded') {
         const clear = ev.outcome === 'clear';
         this.tweens.killTweensOf(this.announceText);
-        this.announceText.setText(t(`run.${ev.outcome}`)).setColor(clear ? '#ffe082' : '#ef9a9a').setAlpha(1);
+        // 伝説戦の時間切れ（作者の依頼 2026年10月28日）: クリアの表示で倒したと思わないよう、「〇〇は 去っていった…」を大きく出してから結果画面へ
+        const escaped = ev.legendary?.result === 'timeUp';
+        if (escaped) this.announceText.setText(t('run.legendEscaped', { name: this.enemyName(ev.legendary!.kind) })).setColor('#b3e5fc').setAlpha(1);
+        else this.announceText.setText(t(`run.${ev.outcome}`)).setColor(clear ? '#ffe082' : '#ef9a9a').setAlpha(1);
         this.legendaryResult = ev.legendary;
-        this.resultAt = performance.now() + stageConfig.endDelaySeconds * 1000;
+        this.resultAt = performance.now() + (escaped ? (stageConfig.legendEscapeDelaySeconds ?? stageConfig.endDelaySeconds) : stageConfig.endDelaySeconds) * 1000;
       }
     }
   }

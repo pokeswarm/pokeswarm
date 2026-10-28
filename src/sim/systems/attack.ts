@@ -20,9 +20,9 @@ import {
   type ProjectileSpawn,
 } from '../entities/projectiles';
 import type { Player, PlayerMove } from '../entities/player';
-import type { HitEffect } from '../events';
+import { DMG_CRIT, type HitEffect } from '../events';
 import { axisToUnit } from '../math';
-import { typeMultiplier, type MoveStats } from '../moves';
+import { typeFlags, typeMultiplier, type MoveStats } from '../moves';
 import type { World } from '../world';
 import { applyHitEffect } from './commands';
 import { fireDelayedExplosion, fireEffects, type FxSource } from './moveEffects';
@@ -1391,6 +1391,11 @@ export function moveProjectiles(world: World): void {
           typeMultiplier(world.rules.types, world.rules.combat.typeMultipliers, def.type, owner?.types ?? [], kind?.types ?? []) *
           (crit ? world.rules.combat.critMultiplier : 1) *
           statusBonus;
+      // ダメージの数字（設定でオンのときだけ。一撃は出さない）
+      if (world.damageNumbers && !instakill) {
+        const flags = typeFlags(world.rules.types, def.type, owner?.types ?? [], kind?.types ?? []) | (crit ? DMG_CRIT : 0);
+        world.events.push({ type: 'damageNumber', enemyId: e.id[j]!, x: e.x[j]!, y: e.y[j]!, amount: amount * damageTakenMultiplier(world, j), flags });
+      }
       // 吸収（ギガドレインなど）: 与えたダメージの一部を回復する
       if (st.lifestealPct > 0) healPlayer(world, ownerId, (amount * st.lifestealPct) / 100);
       // 倒したときの効き方（ぜったいれいど: 凍った敵が氷の破片を飛ばす）。倒せると見込んだら起こす

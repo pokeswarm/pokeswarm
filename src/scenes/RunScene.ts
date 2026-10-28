@@ -53,6 +53,8 @@ import { NetPanel } from './netPanel';
 import { formatTime, type ResultSceneData } from './ResultScene';
 import { atlasKey } from '../render/sprites/PokemonSprite';
 import { holdScreenAwake } from '../render/screenWakeLock';
+import { DamageNumbers } from '../render/DamageNumbers';
+import { displaySettings } from '../render/displaySettings';
 
 /** ソロとホストのプレイヤーの番号（ゲストは部屋でもらった番号 2〜） */
 const HOST_PLAYER_ID: PlayerId = 1;
@@ -92,6 +94,8 @@ const BOSS_BARS_MAX = 4;
 
 export class RunScene extends Phaser.Scene {
   private sim!: Simulation;
+  /** 自分の攻撃のダメージの数字（設定でオンのときだけ作る） */
+  private damageNumbers: DamageNumbers | null = null;
   private clock!: FixedStepClock;
   private keyboard!: KeyboardInput;
   /** スマホのジョイスティック（タッチの端末だけ） */
@@ -463,6 +467,9 @@ export class RunScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.levelUpPanel.hide());
     this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));
     this.effects = new EffectRenderer(this, effectRecipes, depths.effects, spriteRender.effectPixel);
+    // ダメージの数字（設定でオン。07 の102章）: プレイヤーより上・画面の表示より下
+    this.sim.world.damageNumbers = displaySettings.current.damageNumbers;
+    this.damageNumbers = this.sim.world.damageNumbers ? new DamageNumbers(this, spriteRender.depths.candy + 1) : null;
     // 技のドット絵は光の演出の少し下（光の粒が上に重なる）
     this.moveSprites = new MoveSprites(this, moveSprites, depths.effects - 0.1, spriteRender.dot);
     this.strikeSprites = new MoveSprites(this, moveSprites, depths.effects - 0.05, spriteRender.dot);
@@ -669,6 +676,7 @@ export class RunScene extends Phaser.Scene {
     // 止まっている間（レベルアップの選択・ランの終わり）は前回と今回の位置の間を補間しない（補間の割合だけが毎フレーム変わり、画面全体が震えて見えた）
     const w = this.sim.world;
     this.draw(w.levelUp || w.outcome ? 1 : this.clock.alpha, delta, time);
+    this.damageNumbers?.update(performance.now());
     // タブが裏にあって終わりの知らせを描画で受け取れなかった場合も、結果画面へ移る
     if (this.sim.world.outcome && this.resultAt === null) this.resultAt = performance.now() + stageConfig.endDelaySeconds * 1000;
     if (this.sim.world.outcome && !this.runRecorded) this.recordRunEnd();
@@ -1593,6 +1601,7 @@ export class RunScene extends Phaser.Scene {
         }
         if (!visible) continue;
         if (ev.type === 'projectileHit') this.effects.playImpact(this.sim.world.rules.moves[ev.move]!.effect, ev.x, ev.y);
+        if (ev.type === 'damageNumber') this.damageNumbers?.add(ev, performance.now());
         if (ev.type === 'evolved') this.onEvolved(ev.playerId, ev.from, ev.to, ev.asked ?? false);
         if (ev.type === 'evolveAsk' && ev.playerId === this.localId) this.onEvolveAsk(ev.from, ev.to);
       }

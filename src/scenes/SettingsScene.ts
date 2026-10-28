@@ -3,6 +3,7 @@ import { compactScreen } from '../render/pixelUi';
 import { audio } from '../audio';
 import { getLocale, LOCALES, setLocale, t } from '../i18n';
 import { appendAudioControls } from './audioControls';
+import { displaySettings } from '../render/displaySettings';
 
 // 原作をまねた白い窓のボタン（作者の決定。2026年10月22日。src/render/pixelUi.ts の windowCss と同じ見た目）
 // 低い画面（横向きのスマホ）では低く・細く
@@ -54,6 +55,28 @@ export class SettingsScene extends Phaser.Scene {
       lang.append(b);
     }
     root.append(lang);
+
+    // ダメージの数字（作者の決定 2026年10月28日: 初めは出さない。07 の102章）
+    const dmg = document.createElement('div');
+    dmg.style.cssText = `display:flex;align-items:center;gap:${compactScreen() ? 6 : 10}px;flex-wrap:wrap`;
+    const dmgLabel = document.createElement('span');
+    dmgLabel.style.cssText = 'width:8em';
+    dmgLabel.textContent = t('settings.damageNumbers');
+    dmg.append(dmgLabel);
+    for (const on of [true, false]) {
+      const b = document.createElement('button');
+      const selected = displaySettings.current.damageNumbers === on;
+      b.style.cssText = buttonCss() + (selected ? ';border-color:#d8a020;box-shadow:inset 0 0 0 3px #f8f8f8,inset 0 0 0 5px #d8a020' : '');
+      b.textContent = t(on ? 'settings.damageNumbers.on' : 'settings.damageNumbers.off');
+      b.onclick = () => {
+        if (displaySettings.current.damageNumbers === on) return;
+        displaySettings.update({ damageNumbers: on });
+        audio.sfx.play('ui.select');
+        this.scene.restart();
+      };
+      dmg.append(b);
+    }
+    root.append(dmg);
 
     const buttons = document.createElement('div');
     buttons.style.cssText = 'display:flex;gap:10px;justify-content:flex-end';

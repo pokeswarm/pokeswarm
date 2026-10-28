@@ -114,6 +114,22 @@ export const uiConfigSchema = z.object({
     silhouette: z.string(),
     selected: z.string(),
   }),
+  /**
+   * ダメージの数字（設定でオン。07 の102章）: 色はタイプ相性（ばつぐん・いまひとつ・ふつう）、タイプ一致は少し大きく、きゅうしょは「!」を付けて大きく。
+   * 同じ敵に mergeSeconds 以内に当たった分は1つの数字に足す。同時に出すのは maxActive まで（あふれたら、ばつぐん・きゅうしょを優先して古いふつうの数字と入れ替える）
+   */
+  damageNumbers: z.object({
+    maxActive: z.number().int().positive(),
+    mergeSeconds: z.number().nonnegative(),
+    lifeSeconds: z.number().positive(),
+    risePixels: z.number(),
+    scale: z.number().positive(),
+    stabScale: z.number().positive(),
+    critScale: z.number().positive(),
+    colors: z.object({ normal: z.string(), superEffective: z.string(), notVeryEffective: z.string() }),
+    /** 字のドット（作者の指摘 2026年10月28日: 横に細い字に）。1文字ごとに行の並び（# が点）。どの字も同じ幅・高さ。まわりに1点の黒い縁を付けて描く */
+    glyphs: z.record(z.string().length(1), z.array(z.string()).min(1)),
+  }),
 });
 export type UiConfig = z.infer<typeof uiConfigSchema>;
 

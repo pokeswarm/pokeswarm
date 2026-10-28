@@ -49,6 +49,25 @@ export interface DamageDealtEvent extends HitEffect {
   readonly by: PlayerId;
 }
 
+/** ダメージの数字の印（ビットで重ねる） */
+export const DMG_SUPER = 1;
+export const DMG_NOT_VERY = 2;
+export const DMG_STAB = 4;
+export const DMG_CRIT = 8;
+
+/**
+ * 自分の攻撃が敵に当たったときの、画面に出すダメージの数字（見た目だけ。world.damageNumbers が立っているときだけ出す。07 の102章）。
+ * amount は敵の受けるダメージの倍率まで掛けた量。flags は DMG_SUPER など
+ */
+export interface DamageNumberEvent {
+  readonly type: 'damageNumber';
+  readonly enemyId: number;
+  readonly x: number;
+  readonly y: number;
+  readonly amount: number;
+  readonly flags: number;
+}
+
 /** ホスト: 敵に効果（ノックバック・状態異常）を付けた（ゲストへ送る。by のプレイヤーは自分で付け済み） */
 export interface EnemyAffectedEvent extends HitEffect {
   readonly type: 'enemyAffected';
@@ -340,6 +359,7 @@ export type SimEvent =
   | ProjectileHitEvent
   | EnemySpawnedEvent
   | DamageDealtEvent
+  | DamageNumberEvent
   | EnemyAffectedEvent
   | GemSpawnedEvent
   | GemMergedEvent

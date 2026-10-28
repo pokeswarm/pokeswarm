@@ -1,4 +1,5 @@
 import type { CombatConfig, MoveDefData, MovePattern, MoveEffect } from '../data/schema';
+import { DMG_NOT_VERY, DMG_STAB, DMG_SUPER } from './events';
 import type { Modifiers } from './upgrades';
 
 /** シミュレーションが使う技の性能（レベルを反映済み。貫通無限は Infinity） */
@@ -210,6 +211,14 @@ export function buildTypeChart(
     return row;
   });
   return { names, chart };
+}
+
+/** ダメージの数字の色分けに使う、タイプ相性とタイプ一致の印（DMG_SUPER・DMG_NOT_VERY・DMG_STAB。typeMultiplier と同じ決め方） */
+export function typeFlags(types: TypeChart, moveType: number, attackerTypes: readonly number[], defenderTypes: readonly number[]): number {
+  let raw = 1;
+  const row = types.chart[moveType];
+  if (row) for (const d of defenderTypes) raw *= row[d] ?? 1;
+  return (raw > 1 ? DMG_SUPER : raw < 1 ? DMG_NOT_VERY : 0) | (attackerTypes.includes(moveType) ? DMG_STAB : 0);
 }
 
 /**

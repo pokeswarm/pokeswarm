@@ -169,6 +169,8 @@ export interface World {
   spawnAccumulator: number;
   /** この更新で起きた出来事（更新のたびに空にする） */
   readonly events: SimEvent[];
+  /** 自分の攻撃のダメージの数字の出来事（damageNumber）を出すか（見た目だけの設定。ランの進み方は変わらない） */
+  damageNumbers: boolean;
   readonly stats: { kills: number };
   /** 状態異常の種類（番号は data/game/status.json の並び） */
   readonly statusKinds: readonly StatusKind[];
@@ -331,6 +333,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     nextEnemyId: 1,
     spawnAccumulator: 0,
     events: [],
+    damageNumbers: false,
     stats: { kills: 0 },
     waves: rules.spawn.waves.map((w) => ({
       durationTicks: w.durationSeconds ? Math.round(w.durationSeconds * tickRate) : null,

@@ -380,6 +380,9 @@
     },
     "fire-fang": {
       "extends": "fire.base",
+      "projectile": {
+        "shapeAlpha": 0.25
+      },
       "sprite": {
         "id": "fang-front-fire",
         "fit": "front",
@@ -3270,6 +3273,9 @@
     },
     "bite": {
       "extends": "dark.base",
+      "projectile": {
+        "shapeAlpha": 0.25
+      },
       "sprite": {
         "id": "fang-front-dark",
         "fit": "front",

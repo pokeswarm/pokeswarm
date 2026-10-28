@@ -1,5 +1,5 @@
 import { onChildAdded, push, ref, remove, type Database, type Unsubscribe } from 'firebase/database';
-import { decode, encode, type NetMessage } from './protocol';
+import { decode, encode, latestKey, type NetMessage } from './protocol';
 import type { Transport } from './transport';
 
 /**
@@ -51,9 +51,9 @@ export class RelayTransport implements Transport {
     // 最新だけあればよいもの（自分の位置・敵の位置の補正）は最後の1つだけ残す
     const latest = new Map<string, number>();
     this.buffer.forEach((m, i) => {
-      if (m.t === 'p' || m.t === 'c') latest.set(m.t, i);
+      if (m.t === 'p' || m.t === 'c') latest.set(latestKey(m), i);
     });
-    const batch = this.buffer.filter((m, i) => (m.t !== 'p' && m.t !== 'c') || latest.get(m.t) === i);
+    const batch = this.buffer.filter((m, i) => (m.t !== 'p' && m.t !== 'c') || latest.get(latestKey(m)) === i);
     this.buffer = [];
     const text = encode(batch);
     this.stats.sentBytes += text.length;

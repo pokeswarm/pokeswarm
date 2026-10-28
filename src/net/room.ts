@@ -435,7 +435,7 @@ export class Room {
       return relay();
     }
     await set(ref(db, `${peer}/mode`), 'p2p');
-    const transport = new PeerTransport(pc, channel);
+    const transport = new PeerTransport(pc, channel, this.config.p2p.batchTicks);
     if (fast.readyState === 'open') transport.attachFast(fast);
     else fast.onopen = () => transport.attachFast(fast);
     this.addTransport(slot, transport);
@@ -471,7 +471,7 @@ export class Room {
         return;
       }
       channel.onopen = () => {
-        transport = new PeerTransport(pc, channel);
+        transport = new PeerTransport(pc, channel, this.config.p2p.batchTicks);
         if (fast?.readyState === 'open') transport.attachFast(fast);
         finish(transport);
       };

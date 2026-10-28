@@ -85,3 +85,8 @@ export function decode(text: string): NetMessage[] {
 export function round2(v: number): number {
   return Math.round(v * 100) / 100;
 }
+
+/** 最新だけあればよいメッセージ（位置・補正）の見分け: 位置はプレイヤーごと（ホストはほかのゲストの位置も中継する） */
+export function latestKey(m: NetMessage): string {
+  return m.t === 'p' ? `p:${m.i}` : m.t;
+}

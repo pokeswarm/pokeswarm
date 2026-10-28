@@ -1658,7 +1658,11 @@ export const networkConfigSchema = z.object({
   iceServers: z.array(z.object({ urls: z.union([z.string(), z.array(z.string())]) })),
   /** この時間内に直接つながらなければ Realtime Database の中継に切り替える */
   p2pTimeoutMs: z.number().int().positive(),
-  p2p: syncRateSchema,
+  /**
+   * batchTicks: 直接接続で、この更新回数ぶんをまとめて1回に送る（位置・補正は最新だけ）。
+   * スマホの協力プレイが数分でページごと落ちるので、送る回数を減らす（作者の報告 2026年10月29日。07 の119章）
+   */
+  p2p: syncRateSchema.extend({ batchTicks: z.number().int().positive().default(1) }),
   /** 中継時は送る頻度を下げ、まとめて書き込む（通信量と書き込み回数を抑える） */
   relay: syncRateSchema.extend({ flushIntervalMs: z.number().int().positive() }),
   /** 往復時間を測る間隔（更新回数） */

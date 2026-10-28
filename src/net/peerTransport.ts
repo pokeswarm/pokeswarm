@@ -1,4 +1,4 @@
-import { decode, encode, type NetMessage } from './protocol';
+import { decode, encode, latestKey, type NetMessage } from './protocol';
 import type { Transport } from './transport';
 
 /**
@@ -19,9 +19,15 @@ export class PeerTransport implements Transport {
   readonly stats = { sentBytes: 0, receivedBytes: 0 };
   private fast: RTCDataChannel | null = null;
 
+  /** まとめて送るのを待っているもの（batchTicks 回ぶん） */
+  private pending: NetMessage[] = [];
+  private pendingCalls = 0;
+
   constructor(
     private readonly pc: RTCPeerConnection,
     private readonly channel: RTCDataChannel,
+    /** この回数の send をまとめて1回に送る（1 ならそのつど送る） */
+    private readonly batchTicks = 1,
   ) {
     this.listen(channel);
     channel.onclose = () => this.onClose?.();
@@ -44,7 +50,20 @@ export class PeerTransport implements Transport {
   }
 
   send(messages: NetMessage[]): void {
-    if (messages.length === 0 || this.channel.readyState !== 'open') return;
+    if (this.channel.readyState !== 'open') return;
+    // batchTicks 回ぶんをまとめる。最新だけあればよいもの（自分の位置・敵の位置の補正）は、まとめる間に古いものを捨てる
+    if (this.batchTicks > 1) {
+      this.pending.push(...messages);
+      if (++this.pendingCalls < this.batchTicks) return;
+      this.pendingCalls = 0;
+      const latest = new Map<string, number>();
+      this.pending.forEach((m, i) => {
+        if (m.t === 'p' || m.t === 'c') latest.set(latestKey(m), i);
+      });
+      messages = this.pending.filter((m, i) => (m.t !== 'p' && m.t !== 'c') || latest.get(latestKey(m)) === i);
+      this.pending = [];
+    }
+    if (messages.length === 0) return;
     const fastOpen = this.fast?.readyState === 'open';
     const lossy = fastOpen ? messages.filter((m) => LOSSY.has(m.t)) : [];
     const reliable = fastOpen ? messages.filter((m) => !LOSSY.has(m.t)) : messages;

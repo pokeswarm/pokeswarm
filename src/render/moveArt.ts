@@ -993,7 +993,7 @@ function fangFront(kind: 'fire' | 'dark' | 'crunch', slope = 0, alignInner = fal
 /**
  * かみくだく（作者の指摘 2026年10月28日）: 黒いあごに白いキバだけ。
  * - 下向き・上向き（front・back）: かみつく と同じ正面の口（上の列が広く、下の列が狭い台形）を黒と白で。
- * - 斜め（diag・diagBack）: 正面の口を縦にずらして、上下の歯ぐきを平行なまま斜めにする（回さない）。下の列はプレイヤーの側（左）の端にそろえる。
+ * - 斜め（diag・diagBack）: 正面の口を縦にずらして、上下の歯ぐきを平行なまま、向きに直角な斜めにする（回さない）。下の列はプレイヤーの側（左）の端にそろえる。
  *   キバは画面の縦にまっすぐ伸び、閉じる向きも画面の縦。
  * - 横（main。右向き）: 肉食のけものの頭の骨を横から見た形。後ろ（プレイヤーの側）のあごのつけ根を軸に、上あごと下あごが「<」の形に開いて閉じる。
  *   上あごは根元が厚く先が細い鼻先で、先が少し下へ曲がる。先に小さな前歯、その後ろに長い犬歯（下向き）、奥に小さな奥歯と大きな裂肉歯。
@@ -1079,9 +1079,10 @@ function darkJaws(): SpriteOut {
   };
   const face = (slope: number): string[][] => fangFront('crunch', slope, slope !== 0).parts.main!.map(pad);
   const front = face(0);
-  // 斜め前（右下）: 右ほど下がる。斜め後ろ（右上）: 右ほど上がる
+  // 歯ぐきは向きに直角（作者の指摘 2026年10月28日）: 斜め前（右下）は右ほど上がり、斜め後ろ（右上）は右ほど下がる。
+  // どちらも下の列は左（プレイヤーの側）にそろえ、左向きは左右を返す（左上は右上の、左下は右下の左右を返した絵で、下の列が右にそろう）
   const tilt = Math.tan((30 * Math.PI) / 180);
-  return { palette, frameMs: 45, parts: { main: rows(side()), front, back: front, diag: face(tilt), diagBack: face(-tilt) } };
+  return { palette, frameMs: 45, parts: { main: rows(side()), front, back: front, diag: face(-tilt), diagBack: face(tilt) } };
 }
 
 /** フレアドライブ: 右へ突っ込む炎の弧（三日月形の炎。コマで炎の先がゆらめく） */

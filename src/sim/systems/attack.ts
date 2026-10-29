@@ -89,6 +89,8 @@ function markBonusShots(world: World, p: Player, pm: PlayerMove, st: MoveStats, 
   if (bonus <= 0 || st.count <= 0 || world.rules.moves[pm.move]!.effects.length === 0 || world.rules.moves[pm.move]!.bonusCountToPower) return;
   const pr = world.projectiles;
   const added = pr.count - from;
+  // 数を1本にまとめる出し方（ビームは幅を広げる）は、増えた分の弾が無いので印を付けない（作者の依頼 2026年10月29日: ゴッドバードの残り火が消えていた）
+  if (added < st.count) return;
   const keep = Math.floor((added * Math.max(0, st.count - bonus)) / st.count);
   for (let i = from + keep; i < pr.count; i++) pr.noFx[i] = 1;
 }

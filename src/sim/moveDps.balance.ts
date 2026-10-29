@@ -16,6 +16,7 @@ import type { SimEnemyKind } from './rules';
  * - ボス 1 体: 中ボスの大きさ（半径 28）。右から近づいてくる。雑魚 10・50・200 体: 半径 12、まわりから近づいて群がる（速さはどちらも 60）
  * - 止まったボス（距離 50・150・300）: 動かないボスを右に置き、どこまで離れて戦えるか（届く距離）を見る
  * - 持ち物を持たせて測る: DPS_ITEMS=pp-max:2（持ち物のキー:レベル。カンマ区切り）
+ * - 敵の置き方と乱数を変えて SEEDS の回数だけ測り、平均する（ばらまく技は乱数で、群がる敵は固まり方で 10 倍ほど振れるため）
  * - 雑魚・ボスは自動で出さない。一撃（じわれ・ほろびのうた）は倒れない敵に意味がないので「一撃」と書く
  */
 const SECONDS = 60;
@@ -30,10 +31,11 @@ const SCENES = [
   { key: 'at300', label: '止まったボス 距離300', count: 1, boss: true, still: 300 },
 ] as const;
 const HP = 1e12;
+const SEEDS = [7, 11, 23];
 
 type Row = { key: string; name: string; type: string; tier: string; pattern: string; dps: Record<string, number>; note: string };
 
-function measure(moveKey: string, scene: { count: number; boss: boolean; still?: number }): { dps: number; instakill: boolean } {
+function measure(moveKey: string, scene: { count: number; boss: boolean; still?: number }, seedNo: number): { dps: number; instakill: boolean } {
   const rules = buildSimRules();
   const base = rules.enemies.kinds.find((k) => (k.rank ?? 'normal') === 'normal')!;
   const dummy: SimEnemyKind = { ...base, id: 'dps-dummy', hp: HP, moveSpeed: 60, radius: 12, contactDamage: 0, types: [], rank: 'normal' };
@@ -41,7 +43,7 @@ function measure(moveKey: string, scene: { count: number; boss: boolean; still?:
   rules.enemies.kinds.push(dummy, boss);
   const dummyKind = rules.enemies.kinds.length - 2;
   const bossKind = rules.enemies.kinds.length - 1;
-  const sim = new Simulation({ tickRate: 30, seed: 7, rules });
+  const sim = new Simulation({ tickRate: 30, seed: SEEDS[seedNo]!, rules });
   const w = sim.world;
   // 自動で出るものを止める
   for (const wave of w.waves) Object.assign(wave, { spawnPerSecond: 0, minimum: 0 });
@@ -52,7 +54,7 @@ function measure(moveKey: string, scene: { count: number; boss: boolean; still?:
   const species = rules.species.findIndex((s) => s.key === 'mew');
   const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, types: [], species, moves: [{ move, level: rules.moves[move]!.levels.length }] });
   w.level = 50;
-  p.items = (process.env.DPS_ITEMS?.split(',') ?? []).map((x) => {
+  p.items = (process.env.DPS_ITEMS?.split(',').filter(Boolean) ?? []).map((x) => {
     const [key, level] = x.split(':');
     return { item: rules.items.findIndex((it) => it.key === key), level: Number(level ?? 1) };
   });
@@ -61,7 +63,7 @@ function measure(moveKey: string, scene: { count: number; boss: boolean; still?:
   p.facingX = 1;
   p.facingY = 0;
   // 敵を置く（ボスは右に、雑魚はまわりの輪の中にばらばらに）
-  let seed = 1;
+  let seed = 1 + seedNo;
   const rnd = (): number => ((seed = (seed * 16807) % 2147483647) / 2147483647);
   for (let k = 0; k < scene.count; k++) {
     const a = scene.boss ? 0 : rnd() * Math.PI * 2;
@@ -94,9 +96,13 @@ it('技の DPS（60 秒）', () => {
     const dps: Record<string, number> = {};
     let note = '';
     for (const sc of SCENES) {
-      const r = measure(m.key, sc);
-      dps[sc.key] = r.dps;
-      if (r.instakill) note = '一撃';
+      let sum = 0;
+      for (let n = 0; n < SEEDS.length; n++) {
+        const r = measure(m.key, sc, n);
+        sum += r.dps;
+        if (r.instakill) note = '一撃';
+      }
+      dps[sc.key] = sum / SEEDS.length;
     }
     const name = generated.moves[m.key]?.names.ja ?? m.key;
     const type = generated.types[rules.types.names[m.type] ?? '']?.names.ja ?? '';

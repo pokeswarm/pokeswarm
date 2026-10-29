@@ -4226,6 +4226,369 @@
         "size": 1,
         "growSeconds": 0.08
       }
+    },
+    "arm-thrust": {
+      "extends": "fighting.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      },
+      "sprite": {
+        "id": "palm",
+        "fit": "circle",
+        "size": 1.4,
+        "rotate": "velocity"
+      }
+    },
+    "force-palm": {
+      "extends": "fighting.base",
+      "projectile": {
+        "shapeAlpha": 0.25
+      },
+      "impact": {
+        "flash": {
+          "radius": 30
+        }
+      },
+      "sprite": {
+        "id": "palm",
+        "fit": "front",
+        "size": 1.1
+      }
+    },
+    "superpower": {
+      "extends": "fighting.base",
+      "impact": {
+        "flash": {
+          "radius": 70
+        }
+      },
+      "sprite": {
+        "id": "fist-focus",
+        "fit": "front",
+        "size": 1.3
+      }
+    },
+    "fake-out": {
+      "extends": "normal.base",
+      "impact": {
+        "flash": {
+          "radius": 30
+        }
+      },
+      "sprite": {
+        "id": "palm",
+        "fit": "front",
+        "size": 0.9
+      }
+    },
+    "facade": {
+      "extends": "normal.base",
+      "impact": {
+        "flash": {
+          "radius": 40
+        }
+      },
+      "sprite": {
+        "id": "fist",
+        "fit": "front",
+        "size": 0.9
+      }
+    },
+    "thunder-fang": {
+      "extends": "electric.base",
+      "projectile": {
+        "shapeAlpha": 0.25
+      },
+      "sprite": {
+        "id": "fang-bite",
+        "fit": "front",
+        "size": 1
+      }
+    },
+    "volt-switch": {
+      "extends": "electric.base",
+      "sprite": {
+        "id": "zap-orb",
+        "fit": "circle",
+        "size": 1.6,
+        "rotate": "spin",
+        "spinDegPerSec": 540
+      }
+    },
+    "thrash": {
+      "extends": "normal.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      },
+      "impact": {
+        "burst": {
+          "count": 4
+        }
+      },
+      "sprite": {
+        "id": "fist",
+        "fit": "circle",
+        "size": 1.5,
+        "rotate": "velocity"
+      }
+    },
+    "brave-bird": {
+      "extends": "flying.base",
+      "ownerGhost": {
+        "tint": "#e1f5fe",
+        "alpha": 0.75,
+        "afterimages": 4,
+        "spacingTicks": 1
+      },
+      "impact": {
+        "flash": {
+          "radius": 60
+        }
+      },
+      "chargeGlow": {
+        "color": "#b3e5fc",
+        "seconds": 0.7,
+        "radius": 70,
+        "alpha": 1
+      },
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3,
+        "shapeAlpha": 0.2
+      },
+      "sprite": {
+        "id": "streak-white",
+        "fit": "line",
+        "size": 1,
+        "growSeconds": 0.15
+      }
+    },
+    "sucker-punch": {
+      "extends": "dark.base",
+      "sprite": {
+        "id": "fist",
+        "fit": "circle",
+        "size": 1.3,
+        "rotate": "velocity"
+      }
+    },
+    "night-slash": {
+      "extends": "dark.base",
+      "sprite": {
+        "id": "impact-crescent",
+        "fit": "front",
+        "size": 1.2
+      }
+    },
+    "night-daze": {
+      "extends": "dark.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.3,
+        "shapeAlpha": 0.25
+      },
+      "sprite": {
+        "id": "dark-ring",
+        "fit": "ring",
+        "size": 1
+      }
+    },
+    "phantom-force": {
+      "extends": "ghost.base",
+      "ownerGhost": {
+        "tint": "#b39ddb",
+        "alpha": 0.6,
+        "afterimages": 4,
+        "spacingTicks": 1
+      },
+      "impact": {
+        "flash": {
+          "radius": 60
+        }
+      },
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3,
+        "shapeAlpha": 0.2
+      },
+      "sprite": {
+        "id": "shadow-orb",
+        "fit": "circle",
+        "size": 1.2
+      }
+    },
+    "will-o-wisp": {
+      "extends": "fire.base",
+      "projectile": {
+        "coreColor": "#ede7f6",
+        "glowColor": "#7e57c2"
+      }
+    },
+    "ice-ball": {
+      "extends": "ice.base",
+      "sprite": {
+        "id": "snowflake",
+        "fit": "circle",
+        "size": 1.4,
+        "rotate": "spin",
+        "spinDegPerSec": 540
+      }
+    },
+    "surf": {
+      "extends": "water.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.3,
+        "shapeAlpha": 0.25
+      },
+      "sprite": {
+        "id": "mud-ring",
+        "fit": "ring",
+        "size": 1
+      }
+    },
+    "aqua-tail": {
+      "extends": "water.base",
+      "projectile": {
+        "shapeAlpha": 0.25
+      },
+      "sprite": {
+        "id": "tail-swipe",
+        "fit": "front",
+        "size": 1
+      }
+    },
+    "metal-claw": {
+      "extends": "steel.base",
+      "sprite": {
+        "id": "claw",
+        "fit": "front",
+        "size": 1
+      }
+    },
+    "iron-head": {
+      "extends": "steel.base",
+      "projectile": {
+        "shapeAlpha": 0.25
+      },
+      "impact": {
+        "flash": {
+          "radius": 40
+        }
+      },
+      "sprite": {
+        "id": "impact-crescent",
+        "fit": "front",
+        "size": 1.1
+      }
+    },
+    "meteor-mash": {
+      "extends": "steel.base",
+      "impact": {
+        "flash": {
+          "radius": 50
+        }
+      },
+      "fall": {
+        "id": "ice-chunk",
+        "height": 260,
+        "size": 1.5,
+        "shards": {
+          "id": "ice-shard",
+          "count": 8,
+          "distance": 70,
+          "seconds": 0.45,
+          "size": 0.45
+        }
+      }
+    },
+    "sand-tomb": {
+      "extends": "ground.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.3,
+        "glowColor": "#1e88e5"
+      }
+    },
+    "dragon-breath": {
+      "extends": "dragon.base"
+    },
+    "dragon-claw": {
+      "extends": "dragon.base",
+      "sprite": {
+        "id": "claw-big",
+        "fit": "front",
+        "size": 1.1
+      }
+    },
+    "metal-burst": {
+      "extends": "steel.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.3,
+        "shapeAlpha": 0.25
+      },
+      "sprite": {
+        "id": "giga-ring",
+        "fit": "ring",
+        "size": 1
+      }
+    },
+    "mirror-coat": {
+      "extends": "psychic.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.3,
+        "shapeAlpha": 0.2
+      }
+    },
+    "reflect": {
+      "extends": "psychic.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.3,
+        "shapeAlpha": 0.3
+      }
+    },
+    "magic-coat": {
+      "extends": "psychic.base",
+      "projectile": {
+        "glowScale": 1.3,
+        "coreScale": 0.5
+      },
+      "impact": {
+        "flash": {
+          "radius": 60
+        }
+      },
+      "sprite": {
+        "id": "burst-psy",
+        "fit": "circle",
+        "size": 1.1
+      }
+    },
+    "counter": {
+      "extends": "fighting.base",
+      "sprite": {
+        "id": "fist",
+        "fit": "front",
+        "size": 0.9
+      }
+    },
+    "revenge": {
+      "extends": "fighting.base",
+      "impact": {
+        "flash": {
+          "radius": 50
+        }
+      },
+      "sprite": {
+        "id": "fist-focus",
+        "fit": "front",
+        "size": 1.1
+      }
     }
   }
 }

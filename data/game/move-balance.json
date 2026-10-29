@@ -54,7 +54,9 @@
   ],
   "heavyHitters": [
     "giga-impact",
-    "frenzy-plant"
+    "frenzy-plant",
+    "superpower",
+    "giga-impact-hoenn"
   ],
   "tierOverrides": {
     "pound": "derived",
@@ -75,6 +77,33 @@
     "blaze-kick": "unique",
     "wave-crash": "unique",
     "close-combat-sweep": "base",
-    "close-combat-kick": "base"
+    "close-combat-kick": "base",
+    "force-palm": "derived",
+    "facade": "derived",
+    "thunder-fang": "derived",
+    "double-edge": "derived",
+    "lava-plume-hoenn": "derived",
+    "earth-power": "derived",
+    "slash-hoenn": "derived",
+    "thrash": "derived",
+    "wing-attack-hoenn": "derived",
+    "dragon-pulse-hoenn": "derived",
+    "night-slash": "derived",
+    "future-sight-hoenn": "derived",
+    "shadow-ball-hoenn": "derived",
+    "fire-spin-hoenn": "derived",
+    "ice-ball": "derived",
+    "surf": "derived",
+    "air-slash-hoenn": "derived",
+    "aqua-tail": "derived",
+    "iron-head": "derived",
+    "psychic-hoenn": "derived",
+    "dragon-claw": "derived",
+    "rock-slide-hoenn": "derived",
+    "bubble-beam-hoenn": "derived",
+    "body-slam-hoenn": "derived",
+    "reflect": "derived",
+    "revenge": "derived",
+    "flamethrower-hoenn": "derived"
   }
 }

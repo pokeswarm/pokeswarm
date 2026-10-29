@@ -28,6 +28,26 @@ export interface SimLineRule {
   readonly cry: { readonly forms: readonly number[]; readonly everyDistance: number; readonly seconds: number } | null;
 }
 
+/** 特性の効き方（abilities.json を番号に直したもの。07 の133章） */
+export interface SimAbility {
+  readonly key: string;
+  readonly mods: Modifiers | null;
+  readonly pinch: { readonly hpPct: number; readonly mods: Modifiers } | null;
+  readonly contactStatus?: { readonly status: number; readonly chance: number; readonly seconds: number };
+  readonly natureScale?: number;
+  readonly natureNoDown?: boolean;
+  readonly truant?: { readonly powerMultiplier: number };
+  readonly sectionHealPct?: number;
+  /** タイプの番号 → % */
+  readonly typeDamageTakenPct?: Readonly<Record<number, number>>;
+  readonly killStack?: { readonly perKillPct: number; readonly maxPct: number; readonly seconds: number };
+  readonly weather?: { readonly kinds: readonly string[]; readonly moveSpeedPct: number; readonly regenPctPerSecond: number };
+  readonly trace?: readonly string[];
+  readonly enemySlow?: { readonly radius: number; readonly pct: number; readonly ranks: 'normal' | 'boss' };
+  readonly sturdy?: boolean;
+  readonly intimidateRadius?: number;
+}
+
 /** シミュレーションが使う data/ の定義一式（型だけを参照し、読み込みと組み立ては呼び出し側で行う） */
 export interface SimRules {
   /** 地方（regions.json の id）。技の region と比べて、ほかの地方の技を候補に出さない（07 の130章）。省略はカントー */
@@ -72,7 +92,11 @@ export interface SimRules {
    * 特性（ホウエン。07 の133章）: 系統（playables.json のキー）ごと。特性の無い地方は無し。
    * mods はいつも効く。pinch は HP が最大の hpPct % 以下の間だけ、技の威力に効く
    */
-  abilities?: Readonly<Record<string, { readonly key: string; readonly mods: Modifiers | null; readonly pinch: { readonly hpPct: number; readonly mods: Modifiers } | null }>>;
+  abilities?: {
+    /** 系統ごとの特性のキーと、姿（種類の番号）ごとの特性 */
+    readonly lines: Readonly<Record<string, { readonly key: string; readonly forms: Readonly<Record<number, string>> }>>;
+    readonly defs: Readonly<Record<string, SimAbility>>;
+  };
   /** なつきの進化に要る、ランで歩いた距離（data/game/player.json） */
   friendshipDistance: number;
   /** 協力プレイで届いた位置をなめらかに見せる */

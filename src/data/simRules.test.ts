@@ -47,10 +47,11 @@ describe('data/ から組み立てたシミュレーションの定義', () => {
 
   it('どの遊べるポケモンも、自分の固有技の元になる技を覚えられる（覚えられる系統を絞っても、固有技にたどり着ける）', () => {
     const all = [...derivationsConfig.derivations.map((d) => ({ ...d, line: null as string | null })), ...derivationsConfig.unique];
-    // 元をたどって、派生でない技（最初に覚える技）にする
-    const baseOf = (key: string): string => {
-      const d = all.find((x) => x.to === key);
-      return d ? baseOf(d.from) : key;
+    // 元をたどって、派生でない技（最初に覚える技）にする。同じ技へ別の系統から進化するとき（ホウエンの りゅうのはどう）は、その系統の派生を先に見る
+    const sourceOf = (key: string, line: string) => all.find((x) => x.to === key && x.line === line) ?? all.find((x) => x.to === key && x.line === null) ?? all.find((x) => x.to === key);
+    const baseOf = (key: string, line: string): string => {
+      const d = sourceOf(key, line);
+      return d ? baseOf(d.from, line) : key;
     };
     // 進化した姿のタイプも含める
     const typesOf = (line: string): Set<string> => {
@@ -66,12 +67,12 @@ describe('data/ から組み立てたシミュレーションの定義', () => {
     };
     for (const u of derivationsConfig.unique) {
       const pl = playablesConfig.pokemon[u.line]!;
-      const base = baseOf(u.from);
+      const base = baseOf(u.from, u.line);
       const def = movesConfig.moves[base]!;
       const type = generated.moves[base]!.type;
       // 元の技の途中（派生技）を最初から覚えているなら、それでよい（ズバット: かみつく から始める。07 の80章）
       const chain: string[] = [];
-      for (let k: string | undefined = u.from; k; k = all.find((x) => x.to === k)?.from) chain.push(k);
+      for (let k: string | undefined = u.from; k; k = sourceOf(k, u.line)?.from) chain.push(k);
       const ok =
         chain.some((k) => pl.startingMoves.includes(k)) ||
         pl.allMoveTypes ||

@@ -271,7 +271,7 @@ function itemFitsPlayer(world: World, p: Player, item: number): boolean {
 /** 持ち物が候補に出るか（プレイヤーの形だけで判定する。ラン開始時の持ち物を選ぶ画面でも使う） */
 export function itemFits(
   rules: World['rules'],
-  p: Pick<Player, 'unlockedItems' | 'line' | 'species' | 'items' | 'types' | 'moveTypes'>,
+  p: Pick<Player, 'unlockedItems' | 'line' | 'species' | 'items' | 'types' | 'moveTypes'> & { readonly moves?: readonly { readonly move: number }[] },
   item: number,
 ): boolean {
   const def = rules.items[item]!;
@@ -280,14 +280,15 @@ export function itemFits(
   if (def.lines && !def.lines.includes(p.line)) return false;
   if (def.forms && !def.forms.includes(p.species)) return false;
   // 今の姿がこの持ち物で進化できるときだけ（つながりのヒモ: ゴーリキーになってから）
-  if (def.onlyWhenEvolves && !rules.species[p.species]?.evolutions.some((e) => (e.trigger === 'item' || e.trigger === 'trade') && e.item === item)) return false;
+  if (def.onlyWhenEvolves && !rules.species[p.species]?.evolutions.some((e) => (e.trigger === 'item' || e.trigger === 'trade') && e.item === item) && !rules.derivations.some((d) => d.line === p.line && d.item === item)) return false;
   // 一緒に持てない持ち物（でんきだま と かみなりのいし）は、どちらか片方だけ
   if (p.items.some((it) => def.excludes?.includes(it.item) || rules.items[it.item]?.excludes?.includes(item))) return false;
   if (def.category !== 'type') return true;
   const normal = rules.types.names.indexOf('normal');
   const types: number[] = [];
   def.perLevel.typePowerPct.forEach((v, t) => v && types.push(t));
-  return types.some((t) => t === normal || p.types.includes(t) || p.moveTypes.includes(t));
+  const regionMoveTypes = (p.moves ?? []).flatMap((m) => (rules.moves[m.move]?.region ? [rules.moves[m.move]!.type] : []));
+  return types.some((t) => t === normal || p.types.includes(t) || p.moveTypes.includes(t) || regionMoveTypes.includes(t));
 }
 
 /** 覚えている技の最大レベル（技ごとの上限があればそれ。ばくれつパンチ。07 の105章） */
@@ -331,7 +332,7 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
       if (m.learners && !p.learnsAll && !m.learners.includes(p.line)) return;
       // 覚えないタイプ（ズバット: どくの技は最初の かみつく → クロスポイズン だけ）
       if (rules.lines?.[p.line]?.excludeMoveTypes.includes(m.type)) return;
-      if (m.type === normal || p.types.includes(m.type) || p.moveTypes.includes(m.type)) pool.push({ kind: 'moveNew', move });
+      if (m.type === normal || p.types.includes(m.type) || p.moveTypes.includes(m.type) || (m.region && m.learners?.includes(p.line))) pool.push({ kind: 'moveNew', move });
     });
   }
   p.items.forEach((it, slot) => {
@@ -468,7 +469,8 @@ export function recomputeModifiers(world: World, p: Player): void {
   if (p.maxHp > oldMax && !p.down) p.hp += p.maxHp - oldMax;
   p.hp = Math.min(p.hp, p.maxHp);
   // 性格（ホウエン。07 の89.3）
-  const nf = (stat: NatureStat): number => natureFactor(world.rules, p.nature, stat);
+  const ab = abilityOf(world, p);
+  const nf = (stat: NatureStat): number => natureFactor(world.rules, p.nature, stat, ab?.natureScale ?? 1, ab?.natureNoDown ?? false);
   p.physicalPower = (d?.physicalPower ?? 1) * nf('attack');
   p.specialPower = (d?.specialPower ?? 1) * nf('special-attack');
   p.defense = (d?.defense ?? 0) * Math.max(0, 1 + mods.defensePct / 100) * (sp ? nf(defenseStatOf(sp)) : 1);

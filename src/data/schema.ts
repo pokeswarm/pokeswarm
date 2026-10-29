@@ -1321,6 +1321,8 @@ export const playablesConfigSchema = z.object({
       /** 自分のタイプのほかに、候補に出る技のタイプ（コダック: エスパー） */
       /** 特性（data/game/abilities.json のキー。特性のある地方だけで効く。07 の133章） */
       ability: z.string().optional(),
+      /** 姿ごとの特性（ヤルキモノだけ やるき。PokeAPI のポケモンの名前 → 特性） */
+      formAbilities: z.record(z.string(), z.string()).optional(),
       moveTypes: z.array(z.string()).optional(),
       /** 新しい技を覚えない（プリン: 最初の2つだけで戦う） */
       fixedMoves: z.boolean().default(false),
@@ -1910,6 +1912,17 @@ export const generatedAbilitiesSchema = z.record(z.string(), z.object({ names: l
  * 特性の効き方（data/game/abilities.json。作者の決定 2026年10月29日。07 の133章）。
  * - mods: いつも効く（持ち物と同じ形）
  * - pinch: HP が最大の hpPct % 以下の間だけ、技の威力に mods の powerPct・physicalPowerPct・specialPowerPct・typePowerPct を足す（しんりょく など）
+ * - contactStatus: 触れてきた敵に chance で状態異常（せいでんき・のろわれボディ）
+ * - natureScale: 性格の効き目の倍率（たんじゅん）・natureNoDown: 性格の下がる能力が下がらない（クリアボディ）
+ * - truant: 技が出るのは2回に1回、そのかわり威力 ×powerMultiplier（なまけ）
+ * - sectionHealPct: 区間が変わるたびに HP を回復（しぜんかいふく）
+ * - typeDamageTakenPct: そのタイプの敵から受ける接触ダメージ（あついしぼう）
+ * - killStack: 倒すたびに物理の威力 +perKillPct %（seconds 秒・最大 maxPct %。じしんかじょう）
+ * - weather: その天気の間、移動速度・毎秒の回復（すいすい・うるおいボディ）
+ * - trace: 協力プレイでは一番近い味方の特性を写す。ソロでは pool のどれか（トレース）
+ * - enemySlow: 周り radius の雑魚（normal）か中ボス・ボス（boss）を pct % 遅くする（ありじごく・かげふみ）
+ * - sturdy: 区間ごとに1回、倒れる攻撃を HP 1 で耐える（がんじょう）
+ * - intimidateRadius: この距離の中で倒した敵を数える（いかく。固有技の条件）
  */
 export const abilitiesConfigSchema = z.object({
   abilities: z.record(
@@ -1917,9 +1930,22 @@ export const abilitiesConfigSchema = z.object({
     z.object({
       mods: modifierSchema.optional(),
       pinch: z.object({ hpPct: z.number().positive().max(100), mods: modifierSchema }).optional(),
+      contactStatus: z.object({ status: z.string(), chance: z.number().min(0).max(1), seconds: z.number().positive() }).optional(),
+      natureScale: z.number().nonnegative().optional(),
+      natureNoDown: z.boolean().optional(),
+      truant: z.object({ powerMultiplier: z.number().positive() }).optional(),
+      sectionHealPct: z.number().positive().optional(),
+      typeDamageTakenPct: z.record(z.string(), z.number()).optional(),
+      killStack: z.object({ perKillPct: z.number().positive(), maxPct: z.number().positive(), seconds: z.number().positive() }).optional(),
+      weather: z.object({ kinds: z.array(z.string()), moveSpeedPct: z.number().optional(), regenPctPerSecond: z.number().optional() }).optional(),
+      trace: z.array(z.string()).optional(),
+      enemySlow: z.object({ radius: z.number().positive(), pct: z.number().positive().max(100), ranks: z.enum(['normal', 'boss']) }).optional(),
+      sturdy: z.boolean().optional(),
+      intimidateRadius: z.number().positive().optional(),
     }),
   ),
 });
+export type AbilityDef = AbilitiesConfig['abilities'][string];
 export type AbilitiesConfig = z.infer<typeof abilitiesConfigSchema>;
 
 export const generatedNaturesSchema = z.record(

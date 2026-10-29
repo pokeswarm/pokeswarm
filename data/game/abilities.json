@@ -29,6 +29,112 @@
           }
         }
       }
+    },
+    "guts": {
+      "pinch": {
+        "hpPct": 50,
+        "mods": {
+          "physicalPowerPct": 30
+        }
+      }
+    },
+    "static": {
+      "contactStatus": {
+        "status": "paralysis",
+        "chance": 0.3,
+        "seconds": 2
+      }
+    },
+    "simple": {
+      "natureScale": 2
+    },
+    "truant": {
+      "truant": {
+        "powerMultiplier": 2.2
+      }
+    },
+    "vital-spirit": {},
+    "natural-cure": {
+      "sectionHealPct": 20
+    },
+    "super-luck": {
+      "mods": {
+        "critChancePct": 10
+      }
+    },
+    "cursed-body": {
+      "contactStatus": {
+        "status": "freeze",
+        "chance": 0.3,
+        "seconds": 2
+      }
+    },
+    "thick-fat": {
+      "typeDamageTakenPct": {
+        "fire": -50,
+        "ice": -50
+      }
+    },
+    "moxie": {
+      "killStack": {
+        "perKillPct": 1,
+        "maxPct": 20,
+        "seconds": 10
+      }
+    },
+    "swift-swim": {
+      "weather": {
+        "kinds": [
+          "rain"
+        ],
+        "moveSpeedPct": 50
+      }
+    },
+    "clear-body": {
+      "natureNoDown": true
+    },
+    "trace": {
+      "trace": [
+        "overgrow",
+        "blaze",
+        "torrent"
+      ]
+    },
+    "arena-trap": {
+      "enemySlow": {
+        "radius": 160,
+        "pct": 20,
+        "ranks": "normal"
+      }
+    },
+    "sturdy": {
+      "sturdy": true
+    },
+    "huge-power": {
+      "mods": {
+        "physicalPowerPct": 30
+      }
+    },
+    "shadow-tag": {
+      "enemySlow": {
+        "radius": 200,
+        "pct": 15,
+        "ranks": "boss"
+      }
+    },
+    "hydration": {
+      "weather": {
+        "kinds": [
+          "rain"
+        ],
+        "regenPctPerSecond": 1
+      }
+    },
+    "intimidate": {
+      "mods": {
+        "damageTakenPct": -20
+      },
+      "intimidateRadius": 160
     }
   }
 }

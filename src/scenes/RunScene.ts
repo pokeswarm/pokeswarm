@@ -35,7 +35,7 @@ import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
 import { addSpriteGallery } from '../render/sprites/SpriteGallery';
 import type { Axis, InputCommand, PlayerId } from '../sim/commands';
 import { SHAPE_BOX, SHAPE_CIRCLE, SHAPE_LINE, SHAPE_SECTOR } from '../sim/entities/projectiles';
-import { pinchMods } from '../sim/ability';
+import { abilityOf, pinchMods } from '../sim/ability';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World, gateDeadlineTick } from '../sim/world';
@@ -1525,7 +1525,7 @@ export class RunScene extends Phaser.Scene {
       .filter((p) => p.nature !== undefined)
       .map((p) => {
         const nature = natureLabel(w.rules, p.nature);
-        const ability = abilityName(w.rules, p.line);
+        const ability = abilityName(w, p);
         return t('pause.natureRow', { id: p.id, pokemon: localName(generated.pokemon[w.rules.species[p.species]?.key ?? '']?.names, getLocale(), ''), nature: ability ? t('pause.natureAbility', { nature, ability }) : nature });
       });
   }
@@ -1690,7 +1690,7 @@ export class RunScene extends Phaser.Scene {
     this.placeUi(this.natureText, cam.width - 8, top + 12);
     // 自分の特性（07 の133章）: 性格の下。HP が少なくて効いている間（しんりょく など）は色を変える
     const me = w.players.find((p) => p.id === this.localId);
-    const ability = me ? abilityName(w.rules, me.line) : '';
+    const ability = me ? abilityName(w, me) : '';
     this.abilityText.setText(ability ? t('run.ability', { name: ability }) : '').setVisible(ability !== '');
     this.abilityText.setColor(me && pinchMods(w, me) ? '#ffab40' : '#ffffff');
     this.placeUi(this.abilityText, cam.width - 8, top + (nature ? 36 : 12));
@@ -2208,10 +2208,14 @@ function candyTier(levels: number): { levels: number; count: number; color: stri
 
 
 /** 性格の名前と、上がる・下がる能力（「いじっぱり こうげき↑ とくこう↓」）。性格が無ければ空 */
-/** 系統の特性の名前（特性の無い地方・系統は空。07 の133章） */
-function abilityName(rules: SimRules, line: string): string {
-  const key = rules.abilities?.[line]?.key;
-  return key ? localName(generated.abilities[key]?.names, getLocale(), key) : '';
+/** プレイヤーの特性の名前（特性の無い地方・系統は空。トレースは写した特性も。07 の133章） */
+function abilityName(world: World, p: World['players'][number]): string {
+  const line = world.rules.abilities?.lines[p.line];
+  if (!line) return '';
+  const key = line.forms[p.species] ?? line.key;
+  const name = (k: string): string => localName(generated.abilities[k]?.names, getLocale(), k);
+  const now = abilityOf(world, p)?.key;
+  return now && now !== key ? `${name(key)}（${name(now)}）` : name(key);
 }
 
 function natureLabel(rules: SimRules, nature: number | undefined): string {

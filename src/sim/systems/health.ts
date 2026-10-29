@@ -1,3 +1,5 @@
+import { abilityContactTaken, abilityOf, abilitySturdy } from '../ability';
+import { applyHitEffect } from './commands';
 import { contactDamageMultiplier } from './status';
 import { activeLegendField } from './stage';
 import type { PlayerId } from '../commands';
@@ -17,15 +19,29 @@ export function contactDamage(world: World): void {
   const reach = me.radius + maxR;
   const n = enemyHash.queryRect(me.x - reach, me.y - reach, me.x + reach, me.y + reach, scratch);
   let worst = 0;
+  let worstAt = -1;
   for (let k = 0; k < n; k++) {
     const i = scratch[k]!;
     if (e.hp[i]! <= 0 || e.damage[i]! <= 0) continue;
     const dx = e.x[i]! - me.x;
     const dy = e.y[i]! - me.y;
     const r = me.radius + e.radius[i]!;
-    if (dx * dx + dy * dy <= r * r) worst = Math.max(worst, e.damage[i]! * contactDamageMultiplier(world, i));
+    // あついしぼう: ほのお・こおりタイプの敵からは減る（特性。07 の133章）
+    const dmg = e.damage[i]! * contactDamageMultiplier(world, i) * abilityContactTaken(world, me, i);
+    if (dx * dx + dy * dy <= r * r && dmg > worst) {
+      worst = dmg;
+      worstAt = i;
+    }
   }
-  if (worst > 0) hurtPlayer(world, me, worst);
+  if (worst <= 0) return;
+  hurtPlayer(world, me, worst);
+  // せいでんき・のろわれボディ: 触れてきた敵に状態異常（ゲストはホストへも伝える）
+  const cs = abilityOf(world, me)?.contactStatus;
+  if (cs && worstAt >= 0 && world.rng.next() < cs.chance) {
+    const fx = { kbx: 0, kby: 0, kbTicks: 0, status: cs.status, statusTicks: Math.round(cs.seconds / world.dt) };
+    applyHitEffect(world, worstAt, fx, me.id);
+    if (world.role === 'guest') world.events.push({ type: 'damageDealt', enemyId: e.id[worstAt]!, amount: 0, by: me.id, ...fx });
+  }
 }
 
 /** ダメージを受ける（防御・受けるダメージの倍率を掛ける）。HP が無くなったら復活するか倒れる */
@@ -38,6 +54,8 @@ export function hurtPlayer(world: World, p: Player, raw: number): void {
   p.hp -= amount;
   p.invincibleTicks = Math.round(world.rules.stats.hurtInvincibleSeconds / world.dt);
   world.events.push({ type: 'playerDamaged', playerId: p.id, amount });
+  // がんじょう: 区間ごとに1回、HP 1 で耐える（特性。本人のブラウザ）
+  if (p.hp <= 0 && p.id === world.localPlayerId && abilitySturdy(world, p)) return;
   if (p.hp <= 0) downOrRevive(world, p);
 }
 

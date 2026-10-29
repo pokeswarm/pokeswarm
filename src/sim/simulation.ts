@@ -1,3 +1,4 @@
+import { stepAbilities } from './ability';
 import { tickLegendCasters } from './systems/legendCasters';
 import { stepBoxes, tickBuffs } from './systems/boxes';
 import type { InputCommand, PlayerId } from './commands';
@@ -95,6 +96,7 @@ export class Simulation {
     tickLegendCasters(w);
     useMoves(w);
     moveProjectiles(w);
+    stepAbilities(w);
     dropGems(w);
     dropItems(w);
     checkRunEnd(w);

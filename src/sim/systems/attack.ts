@@ -26,7 +26,7 @@ import { DMG_CRIT, type HitEffect } from '../events';
 import { axisToUnit } from '../math';
 import { typeFlags, typeMultiplier, type MoveStats, type SimMoveDef } from '../moves';
 import type { World } from '../world';
-import { pinchMods } from '../ability';
+import { abilityPowerMultiplier, killStackPct, pinchMods } from '../ability';
 import { bumpRunStat } from '../runStats';
 import type { Modifiers } from '../upgrades';
 import { applyHitEffect } from './commands';
@@ -123,7 +123,8 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
   const m = p.mods;
   // 特性: HP が少ない間だけ威力が上がる（しんりょく など。07 の133章）
   const pinch = pinchMods(world, p);
-  const classPct = (def.damageClass === 'physical' ? m.physicalPowerPct + (pinch?.physicalPowerPct ?? 0) : m.specialPowerPct + (pinch?.specialPowerPct ?? 0)) + (pinch?.powerPct ?? 0);
+  // じしんかじょう: 倒すたびに重なる物理の威力
+  const classPct = (def.damageClass === 'physical' ? m.physicalPowerPct + (pinch?.physicalPowerPct ?? 0) + killStackPct(world, p) : m.specialPowerPct + (pinch?.specialPowerPct ?? 0)) + (pinch?.powerPct ?? 0);
   return {
     // ポケモンのステータス（物理・特殊の威力。種族値のランクとレベル）と、持ち物の効果を掛ける
     power:
@@ -131,6 +132,8 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
       (def.damageClass === 'physical' ? p.physicalPower : p.specialPower) *
       Math.max(0, 1 + (m.powerPct + classPct + typePowerPctOf(world, p, def, pinch)) / 100) *
       heldPowerMultiplier(world, p) *
+      // なまけ: 2回に1回しか出ない分、強い
+      abilityPowerMultiplier(world, p) *
       // とっておき: 覚えているほかの技が多いほど強い
       (1 + (st.perMovePowerPct * Math.max(0, p.moves.length - 1)) / 100),
     size: st.size * Math.max(0.1, 1 + (m.areaPct + typeAreaPctOf(m, def)) / 100),
@@ -302,6 +305,10 @@ export function useMoves(world: World): void {
       }
       // 消えてから数える技（こなゆき・ふぶき）は、持続の分を足す
       pm.cooldown = Math.max(scaledMoveStats(world, p, pm, st).cooldownSeconds, def.waitForEnd ? st.durationSeconds : 0) + (def.restAfterEnd ? st.durationSeconds : 0);
+      if (abilityPowerMultiplier(world, p) !== 1) {
+        pm.truantRest = !pm.truantRest;
+        if (!pm.truantRest) continue;
+      }
       world.events.push({ type: 'moveUsed', playerId: p.id, move: pm.move });
       // 使うと自分が一時的に強くなる技（フレアドライブ）: どのブラウザでも同じように付ける。使い直すと時間が戻る
       if (def.selfBuff) {

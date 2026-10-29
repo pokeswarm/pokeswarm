@@ -18,11 +18,12 @@ export function drawNature(world: World, playerId: number): number | undefined {
 }
 
 /** その能力に掛ける性格の倍率（上がる 1 + naturePct%・下がる 1 − naturePct%・ほかは 1） */
-export function natureFactor(rules: SimRules, nature: number | undefined, stat: NatureStat): number {
+/** scale: 効き目の倍率（たんじゅん: 2）・noDown: 下がる能力が下がらない（クリアボディ。07 の133章） */
+export function natureFactor(rules: SimRules, nature: number | undefined, stat: NatureStat, scale = 1, noDown = false): number {
   const n = nature === undefined ? undefined : rules.natures?.[nature];
   if (!n) return 1;
-  const pct = rules.stats.naturePct / 100;
-  return n.up === stat ? 1 + pct : n.down === stat ? 1 - pct : 1;
+  const pct = (rules.stats.naturePct / 100) * scale;
+  return n.up === stat ? 1 + pct : n.down === stat && !noDown ? 1 - pct : 1;
 }
 
 /** 防御に使う能力（ぼうぎょ と とくぼう の高い方。同じなら ぼうぎょ。species.ts の deriveStats と同じ選び方） */

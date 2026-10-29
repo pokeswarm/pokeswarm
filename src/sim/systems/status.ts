@@ -1,3 +1,4 @@
+import { abilityEnemySlow } from '../ability';
 import type { World } from '../world';
 import { healPlayer } from './health';
 
@@ -8,7 +9,8 @@ export function speedMultiplier(world: World, i: number): number {
   for (let s = 0; s < world.statusKinds.length; s++) {
     if (e.hasStatus(i, s)) m = Math.min(m, world.statusKinds[s]!.speedMultiplier);
   }
-  return m;
+  // 特性（ありじごく・かげふみ）: 近くの敵を遅くする
+  return m * abilityEnemySlow(world, i);
 }
 
 /** 状態異常による、触れたときのダメージの倍率（こうげきダウン。かかっているものを掛け合わせる） */

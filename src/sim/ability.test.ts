@@ -21,7 +21,7 @@ describe('特性', () => {
   it('特性はホウエンのランだけ（カントー・ジョウトには無い）。御三家は しんりょく・もうか・げきりゅう', () => {
     expect(buildSimRules('kanto').abilities).toBeUndefined();
     expect(buildSimRules('johto').abilities).toBeUndefined();
-    const a = buildSimRules('hoenn').abilities!;
+    const a = buildSimRules('hoenn').abilities!.lines;
     expect([a.treecko?.key, a.torchic?.key, a.mudkip?.key]).toEqual(['overgrow', 'blaze', 'torrent']);
   });
 

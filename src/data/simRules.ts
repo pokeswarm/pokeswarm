@@ -247,13 +247,35 @@ export function buildSimRules(region?: string): SimRules {
       : {}),
     ...(rs.abilities
       ? {
-          abilities: Object.fromEntries(
-            Object.entries(playablesConfig.pokemon).flatMap(([line, pl]) => {
-              const a = pl.ability ? abilitiesConfig.abilities[pl.ability] : undefined;
-              if (!pl.ability || !a) return [];
-              return [[line, { key: pl.ability, mods: a.mods ? resolveModifiers(a.mods, types.names) : null, pinch: a.pinch ? { hpPct: a.pinch.hpPct, mods: resolveModifiers(a.pinch.mods, types.names) } : null }]];
-            }),
-          ),
+          abilities: {
+            lines: Object.fromEntries(
+              Object.entries(playablesConfig.pokemon).flatMap(([line, pl]) =>
+                pl.ability ? [[line, { key: pl.ability, forms: Object.fromEntries(Object.entries(pl.formAbilities ?? {}).map(([f, a]) => [formIndex(f), a])) }]] : [],
+              ),
+            ),
+            defs: Object.fromEntries(
+              Object.entries(abilitiesConfig.abilities).map(([key, a]) => [
+                key,
+                {
+                  key,
+                  mods: a.mods ? resolveModifiers(a.mods, types.names) : null,
+                  pinch: a.pinch ? { hpPct: a.pinch.hpPct, mods: resolveModifiers(a.pinch.mods, types.names) } : null,
+                  ...(a.contactStatus ? { contactStatus: { status: statusIndexOf(a.contactStatus.status), chance: a.contactStatus.chance, seconds: a.contactStatus.seconds } } : {}),
+                  ...(a.natureScale !== undefined ? { natureScale: a.natureScale } : {}),
+                  ...(a.natureNoDown ? { natureNoDown: true } : {}),
+                  ...(a.truant ? { truant: a.truant } : {}),
+                  ...(a.sectionHealPct ? { sectionHealPct: a.sectionHealPct } : {}),
+                  ...(a.typeDamageTakenPct ? { typeDamageTakenPct: Object.fromEntries(Object.entries(a.typeDamageTakenPct).map(([t, v]) => [typeIndex(t), v])) } : {}),
+                  ...(a.killStack ? { killStack: a.killStack } : {}),
+                  ...(a.weather ? { weather: { kinds: a.weather.kinds, moveSpeedPct: a.weather.moveSpeedPct ?? 0, regenPctPerSecond: a.weather.regenPctPerSecond ?? 0 } } : {}),
+                  ...(a.trace ? { trace: a.trace } : {}),
+                  ...(a.enemySlow ? { enemySlow: a.enemySlow } : {}),
+                  ...(a.sturdy ? { sturdy: true } : {}),
+                  ...(a.intimidateRadius ? { intimidateRadius: a.intimidateRadius } : {}),
+                },
+              ]),
+            ),
+          },
         }
       : {}),
     ...(rs.natures ? { natures: Object.entries(generated.natures).map(([key, n]) => ({ key, up: n.increased, down: n.decreased })) } : {}),

@@ -20,6 +20,8 @@ export interface PlayerMove {
   subPause?: number;
   /** 一緒に出し続ける技（インファイト）の状態。レベルはこの技と同じ */
   combo?: PlayerMove[];
+  /** なまけ: 次の1回は休む（技が出るのは2回に1回。07 の133章） */
+  truantRest?: boolean;
   /** 溜める技の、出すまでの残りの秒数（溜めていなければ無し。07 の130章） */
   windup?: number;
   /** この技の最大レベル（技の定義より低くするとき。ばくれつパンチ: 消費したパンチの数で 8・16・24。07 の105章） */
@@ -123,6 +125,10 @@ export interface Player {
   sleep?: { stillTicks: number; asleep: boolean; wakeTicks: number };
   /** 性格（SimRules.natures の番号。性格の無い地方は無し。07 の89.3） */
   nature?: number;
+  /** 特性（本人のブラウザ）: がんじょうを使った区間・しぜんかいふくで見た区間・じしんかじょうの重ね（07 の133章） */
+  sturdySection?: number;
+  abilitySection?: number;
+  killStack?: { pct: number; untilTick: number };
   /** ランの記録（本人から届いた値。固有技の条件。runStats.ts） */
   runStats?: Record<string, number>;
   /** 本人のブラウザで数えている記録（自分のプレイヤーだけ） */

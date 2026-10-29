@@ -1,0 +1,997 @@
+{
+ "regions": [
+  {
+   "id": "kanto",
+   "name": "カントー",
+   "available": true,
+   "condition": "最初から",
+   "stat": ""
+  },
+  {
+   "id": "johto",
+   "name": "ジョウト",
+   "available": true,
+   "condition": "伝説のミュウを倒すと解放",
+   "stat": "bossDefeated.mew ≧ 1"
+  },
+  {
+   "id": "hoenn",
+   "name": "ホウエン",
+   "available": false,
+   "condition": "ジョウトで セレビィを 手に入れると解放",
+   "stat": "johto:bossDefeated.lugia ≧ 1 & johto:bossDefeated.ho-oh ≧ 1"
+  }
+ ],
+ "achievements": [
+  {
+   "region": "kanto",
+   "id": "first-run",
+   "name": "はじめの一歩",
+   "hidden": false,
+   "condition": "ランを1回遊ぶ",
+   "stat": "runs ≧ 1",
+   "rewardKind": "持ち物",
+   "reward": "ダウジングマシンが 出るようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "first-clear",
+   "name": "チャンピオンへの道",
+   "hidden": false,
+   "condition": "ランを1回クリアする",
+   "stat": "clears ≧ 1",
+   "rewardKind": "持ち物",
+   "reward": "しあわせタマゴが 出るようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "clear-charmander",
+   "name": "ほのおのきずな",
+   "hidden": false,
+   "condition": "ヒトカゲでクリアする",
+   "stat": "clears.charmander ≧ 1",
+   "rewardKind": "バフ",
+   "reward": "ヒトカゲの 最初の技が Lv2"
+  },
+  {
+   "region": "kanto",
+   "id": "clear-bulbasaur",
+   "name": "くさのきずな",
+   "hidden": false,
+   "condition": "フシギダネでクリアする",
+   "stat": "clears.bulbasaur ≧ 1",
+   "rewardKind": "バフ",
+   "reward": "フシギダネの 最初の技が Lv2"
+  },
+  {
+   "region": "kanto",
+   "id": "clear-squirtle",
+   "name": "みずのきずな",
+   "hidden": false,
+   "condition": "ゼニガメでクリアする",
+   "stat": "clears.squirtle ≧ 1",
+   "rewardKind": "バフ",
+   "reward": "ゼニガメの 最初の技が Lv2"
+  },
+  {
+   "region": "kanto",
+   "id": "clear-coop",
+   "name": "みんなでクリア",
+   "hidden": false,
+   "condition": "協力プレイでクリアする",
+   "stat": "clears.coop ≧ 1",
+   "rewardKind": "バフ",
+   "reward": "協力プレイで 経験値 +10%"
+  },
+  {
+   "region": "kanto",
+   "id": "gyms-4",
+   "name": "バッジ よっつ",
+   "hidden": false,
+   "condition": "1ランで ジムリーダーを4人 倒す",
+   "stat": "bestMidbosses ≧ 4",
+   "rewardKind": "持ち物",
+   "reward": "せんせいのツメが 出るようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "reach-elite-four",
+   "name": "セキエイ高原へ",
+   "hidden": false,
+   "condition": "1ランで ジムリーダーを全員倒し、四天王に挑む",
+   "stat": "bestMidbosses ≧ 8",
+   "rewardKind": "持ち物",
+   "reward": "メトロノームが 出るようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "first-midboss",
+   "name": "ジムに挑戦",
+   "hidden": false,
+   "condition": "中ボスを倒す",
+   "stat": "midbossKills ≧ 1",
+   "rewardKind": "持ち物",
+   "reward": "こうかくレンズが 出るようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "first-boss",
+   "name": "四天王に挑戦",
+   "hidden": false,
+   "condition": "ボスを倒す",
+   "stat": "bossKills ≧ 1",
+   "rewardKind": "持ち物",
+   "reward": "ひかりのねんどが 出るようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "first-derivation",
+   "name": "わざのひらめき",
+   "hidden": false,
+   "condition": "派生技を完成させる",
+   "stat": "derivations ≧ 1",
+   "rewardKind": "持ち物",
+   "reward": "ポイントマックスが 出るようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "first-unique",
+   "name": "きわめた わざ",
+   "hidden": false,
+   "condition": "固有技を完成させる",
+   "stat": "uniqueMoves ≧ 1",
+   "rewardKind": "コイン",
+   "reward": "コイン 1000"
+  },
+  {
+   "region": "kanto",
+   "id": "final-evolution",
+   "name": "さいごの しんか",
+   "hidden": false,
+   "condition": "御三家のどれかを最終進化させる",
+   "stat": "evolvedTo.charizard ≧ 1 | evolvedTo.venusaur ≧ 1 | evolvedTo.blastoise ≧ 1",
+   "rewardKind": "バフ",
+   "reward": "ふしぎなアメの 当たりが 少し良くなる"
+  },
+  {
+   "region": "kanto",
+   "id": "all-starters-clear",
+   "name": "御三家マスター",
+   "hidden": false,
+   "condition": "ヒトカゲ・フシギダネ・ゼニガメの すべてで クリアする",
+   "stat": "clears.charmander ≧ 1 & clears.bulbasaur ≧ 1 & clears.squirtle ≧ 1",
+   "rewardKind": "バフ",
+   "reward": "持ち物の枠 +1"
+  },
+  {
+   "region": "kanto",
+   "id": "level-70",
+   "name": "限界の その先へ",
+   "hidden": true,
+   "condition": "1ランでレベル70に到達する",
+   "stat": "bestLevel ≧ 70",
+   "rewardKind": "バフ",
+   "reward": "経験値 +5%"
+  },
+  {
+   "region": "kanto",
+   "id": "kills-in-run-5000",
+   "name": "ぜんぶ たおす",
+   "hidden": true,
+   "condition": "1ランで5000体倒す",
+   "stat": "bestKills ≧ 5000",
+   "rewardKind": "バフ",
+   "reward": "経験値の玉の 取得範囲 +20%"
+  },
+  {
+   "region": "kanto",
+   "id": "first-legendary",
+   "name": "でんせつとの であい",
+   "hidden": true,
+   "condition": "乱入した伝説のポケモンを倒す",
+   "stat": "legendaryKills ≧ 1",
+   "rewardKind": "コイン",
+   "reward": "コイン 2000"
+  },
+  {
+   "region": "kanto",
+   "id": "stone-fire",
+   "name": "もえる きずな",
+   "hidden": false,
+   "condition": "ガーディで レベル30に 到達する",
+   "stat": "bestLevel.growlithe ≧ 30",
+   "rewardKind": "持ち物",
+   "reward": "ほのおのいしが 出るようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "stone-leaf",
+   "name": "みどりの きずな",
+   "hidden": false,
+   "condition": "ナゾノクサで レベル30に 到達する",
+   "stat": "bestLevel.oddish ≧ 30",
+   "rewardKind": "持ち物",
+   "reward": "リーフのいしが 出るようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "stone-water",
+   "name": "うみの きずな",
+   "hidden": false,
+   "condition": "ヒトデマンで レベル30に 到達する",
+   "stat": "bestLevel.staryu ≧ 30",
+   "rewardKind": "持ち物",
+   "reward": "みずのいしが 出るようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "stone-thunder",
+   "name": "いかずちの きずな",
+   "hidden": false,
+   "condition": "ピカチュウで レベル30に 到達する",
+   "stat": "bestLevel.pikachu ≧ 30",
+   "rewardKind": "持ち物",
+   "reward": "かみなりのいしが 出るようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "pikachu-light-ball",
+   "name": "でんきの あいぼう",
+   "hidden": false,
+   "condition": "ピカチュウで レベル30に 到達する",
+   "stat": "bestLevel.pikachu ≧ 30",
+   "rewardKind": "持ち物",
+   "reward": "でんきだまが 出るようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "derive-rock-slide",
+   "name": "くずれる いわ",
+   "hidden": false,
+   "condition": "いわなだれ に派生する",
+   "stat": "derived.rock-slide ≧ 1",
+   "rewardKind": "持ち物",
+   "reward": "つきのいしが 出るようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "linking-cord",
+   "name": "つながる きずな",
+   "hidden": false,
+   "condition": "協力プレイで1回遊ぶ、または1ランで中ボスを8体倒す",
+   "stat": "runs.coop ≧ 1 | bestMidbosses ≧ 8",
+   "rewardKind": "持ち物",
+   "reward": " つながりのヒモが 出るようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-raichu",
+   "name": "ライチュウが なかまに",
+   "hidden": false,
+   "condition": "ライチュウを 2回 倒す",
+   "stat": "bossDefeated.raichu ≧ 2",
+   "rewardKind": "ポケモン",
+   "reward": "ライチュウが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-starmie",
+   "name": "スターミーが なかまに",
+   "hidden": false,
+   "condition": "スターミーを 3回 倒す",
+   "stat": "bossDefeated.starmie ≧ 3",
+   "rewardKind": "ポケモン",
+   "reward": "スターミーが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-arcanine",
+   "name": "ウインディが なかまに",
+   "hidden": false,
+   "condition": "ウインディを 3回 倒す",
+   "stat": "bossDefeated.arcanine ≧ 3",
+   "rewardKind": "ポケモン",
+   "reward": "ウインディが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-vileplume",
+   "name": "ラフレシアが なかまに",
+   "hidden": false,
+   "condition": "ラフレシアを 4回 倒す",
+   "stat": "bossDefeated.vileplume ≧ 4",
+   "rewardKind": "ポケモン",
+   "reward": "ラフレシアが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-onix",
+   "name": "イワークが なかまに",
+   "hidden": false,
+   "condition": "イワークを 5回 倒す",
+   "stat": "bossDefeated.onix ≧ 5",
+   "rewardKind": "ポケモン",
+   "reward": "イワークが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-weezing",
+   "name": "マタドガスが なかまに",
+   "hidden": false,
+   "condition": "マタドガスを 5回 倒す",
+   "stat": "bossDefeated.weezing ≧ 5",
+   "rewardKind": "ポケモン",
+   "reward": "マタドガスが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-rhydon",
+   "name": "サイドンが なかまに",
+   "hidden": false,
+   "condition": "サイドンを 6回 倒す",
+   "stat": "bossDefeated.rhydon ≧ 6",
+   "rewardKind": "ポケモン",
+   "reward": "サイドンが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-doduo",
+   "name": "ドードーが なかまに",
+   "hidden": false,
+   "condition": "ドードーを 1000回 倒す",
+   "stat": "defeated.doduo ≧ 1000",
+   "rewardKind": "ポケモン",
+   "reward": "ドードーが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-scyther",
+   "name": "ストライクが なかまに",
+   "hidden": false,
+   "condition": "1ランで キョウ（5人目のジムリーダー）まで 倒す",
+   "stat": "bestMidbosses ≧ 5",
+   "rewardKind": "ポケモン",
+   "reward": "ストライクが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-magnemite",
+   "name": "コイルが なかまに",
+   "hidden": false,
+   "condition": "ピカチュウで マチスまで 倒す",
+   "stat": "reached.pikachu ≧ 3",
+   "rewardKind": "ポケモン",
+   "reward": "コイルが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-lapras",
+   "name": "ラプラスが なかまに",
+   "hidden": false,
+   "condition": "ラプラスを 1回 倒す",
+   "stat": "bossDefeated.lapras ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "ラプラスが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-machamp",
+   "name": "カイリキーが なかまに",
+   "hidden": false,
+   "condition": "カイリキーを 1回 倒す",
+   "stat": "bossDefeated.machamp ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "カイリキーが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-gengar",
+   "name": "ゲンガーが なかまに",
+   "hidden": false,
+   "condition": "ゲンガーを 1回 倒す",
+   "stat": "bossDefeated.gengar ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "ゲンガーが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-dragonite",
+   "name": "カイリューが なかまに",
+   "hidden": false,
+   "condition": "3種類の ポケモンで クリアする",
+   "stat": "distinctClears ≧ 3",
+   "rewardKind": "ポケモン",
+   "reward": "カイリューが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-eevee",
+   "name": "イーブイが なかまに",
+   "hidden": false,
+   "condition": "ヒトカゲ・フシギダネ・ゼニガメの すべてで シバまで 倒す",
+   "stat": "reached.charmander ≧ 10 & reached.bulbasaur ≧ 10 & reached.squirtle ≧ 10",
+   "rewardKind": "ポケモン",
+   "reward": "イーブイが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-mewtwo",
+   "name": "ミュウツーが なかまに",
+   "hidden": false,
+   "condition": "ミュウツーを 1回 倒す",
+   "stat": "bossDefeated.mewtwo ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "ミュウツーが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-mew",
+   "name": "ミュウが なかまに",
+   "hidden": false,
+   "condition": "固有技を 20種類 完成させる",
+   "stat": "uniqueKinds ≧ 20",
+   "rewardKind": "ポケモン",
+   "reward": "ミュウが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-articuno",
+   "name": "フリーザーが なかまに",
+   "hidden": false,
+   "condition": "フリーザーを 1回 倒す",
+   "stat": "bossDefeated.articuno ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "フリーザーが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-zapdos",
+   "name": "サンダーが なかまに",
+   "hidden": false,
+   "condition": "サンダーを 1回 倒す",
+   "stat": "bossDefeated.zapdos ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "サンダーが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "unlock-moltres",
+   "name": "ファイヤーが なかまに",
+   "hidden": false,
+   "condition": "ファイヤーを 1回 倒す",
+   "stat": "bossDefeated.moltres ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "ファイヤーが 使えるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "shiny-charmander",
+   "name": "かがやく ほのお",
+   "hidden": false,
+   "condition": "色違いの リザードンを 倒す",
+   "stat": "bossDefeated.charizard ≧ 1",
+   "rewardKind": "色違い",
+   "reward": "ヒトカゲを 色違いで 遊べるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "shiny-bulbasaur",
+   "name": "かがやく みどり",
+   "hidden": false,
+   "condition": "色違いの フシギバナを 倒す",
+   "stat": "bossDefeated.venusaur ≧ 1",
+   "rewardKind": "色違い",
+   "reward": "フシギダネを 色違いで 遊べるようになる"
+  },
+  {
+   "region": "kanto",
+   "id": "shiny-squirtle",
+   "name": "かがやく みず",
+   "hidden": false,
+   "condition": "色違いの カメックスを 倒す",
+   "stat": "bossDefeated.blastoise ≧ 1",
+   "rewardKind": "色違い",
+   "reward": "ゼニガメを 色違いで 遊べるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-first-derivation",
+   "name": "ジョウトの ひらめき",
+   "hidden": false,
+   "condition": "ジョウトで 派生技を完成させる",
+   "stat": "derivations ≧ 1",
+   "rewardKind": "持ち物",
+   "reward": "ポイントマックスが 出るようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-reach-elite-four",
+   "name": "ふたたび セキエイ高原へ",
+   "hidden": false,
+   "condition": "ジョウトの1ランで ジムリーダーを全員倒し、四天王に挑む",
+   "stat": "bestMidbosses ≧ 8",
+   "rewardKind": "持ち物",
+   "reward": "メトロノームが 出るようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-stone-thunder",
+   "name": "ちいさな いかずち",
+   "hidden": false,
+   "condition": "ピチューが かえった ランで レベル30に 到達する",
+   "stat": "bestLevel.pichu ≧ 30",
+   "rewardKind": "持ち物",
+   "reward": "かみなりのいしが 出るようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-stone-moon",
+   "name": "つきの おくりもの",
+   "hidden": false,
+   "condition": "ピィか ププリンが かえった ランで レベル30に 到達する",
+   "stat": "bestLevel.cleffa ≧ 30 | bestLevel.igglybuff ≧ 30",
+   "rewardKind": "持ち物",
+   "reward": "つきのいしが 出るようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-stone-water",
+   "name": "うずまきの きずな",
+   "hidden": false,
+   "condition": "ニョロモで レベル30に 到達する",
+   "stat": "bestLevel.poliwag ≧ 30",
+   "rewardKind": "持ち物",
+   "reward": "みずのいしが 出るようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-stone-fire",
+   "name": "ひのたまの きずな",
+   "hidden": false,
+   "condition": "ヒノアラシで レベル30に 到達する",
+   "stat": "bestLevel.cyndaquil ≧ 30",
+   "rewardKind": "持ち物",
+   "reward": "ほのおのいしが 出るようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-kings-rock",
+   "name": "おうじゃの あかし",
+   "hidden": false,
+   "condition": "ヤドンで レベル30に 到達する",
+   "stat": "bestLevel.slowpoke ≧ 30",
+   "rewardKind": "持ち物",
+   "reward": "おうじゃのしるしが 出るようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-metal-coat",
+   "name": "はがねの ころも",
+   "hidden": false,
+   "condition": "ジョウトで ミカンの ハガネールを 倒す",
+   "stat": "bossDefeated.steelix ≧ 1",
+   "rewardKind": "持ち物",
+   "reward": "メタルコートが 出るようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-up-grade",
+   "name": "あたらしい プログラム",
+   "hidden": false,
+   "condition": "ポリゴンで レベル30に 到達する",
+   "stat": "bestLevel.porygon ≧ 30",
+   "rewardKind": "持ち物",
+   "reward": "アップグレードが 出るようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-dragon-scale",
+   "name": "りゅうの うろこ",
+   "hidden": false,
+   "condition": "ジョウトで イブキの キングドラを 倒す",
+   "stat": "bossDefeated.kingdra ≧ 1",
+   "rewardKind": "持ち物",
+   "reward": "りゅうのウロコが 出るようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-onix",
+   "name": "ジョウトの イワーク",
+   "hidden": false,
+   "condition": "ジョウトで ミカンの ハガネールを 5回 倒す",
+   "stat": "bossDefeated.steelix ≧ 5",
+   "rewardKind": "ポケモン",
+   "reward": "イワークが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-scyther",
+   "name": "ジョウトの ストライク",
+   "hidden": false,
+   "condition": "ジョウトで ツクシの ストライクを 3回 倒す",
+   "stat": "bossDefeated.scyther ≧ 3",
+   "rewardKind": "ポケモン",
+   "reward": "ストライクが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-gengar",
+   "name": "ジョウトの ゴース",
+   "hidden": false,
+   "condition": "ジョウトで マツバの ゲンガーを 4回 倒す",
+   "stat": "bossDefeated.gengar ≧ 4",
+   "rewardKind": "ポケモン",
+   "reward": "ゲンガーが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-first-boss",
+   "name": "ジョウトの していせん",
+   "hidden": false,
+   "condition": "ジョウトで はじめて 四天王を 倒す",
+   "stat": "bossKills ≧ 1",
+   "rewardKind": "持ち物",
+   "reward": "ひかりのねんどが 出るようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-eevee",
+   "name": "ジョウトの イーブイ",
+   "hidden": false,
+   "condition": "ジョウトの 御三家3匹で それぞれ 区間10まで 進む",
+   "stat": "reached.cyndaquil ≧ 10 & reached.chikorita ≧ 10 & reached.totodile ≧ 10",
+   "rewardKind": "ポケモン",
+   "reward": "イーブイが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-houndour",
+   "name": "ジョウトの デルビル",
+   "hidden": false,
+   "condition": "ジョウトで カリンの ヘルガーを 倒す",
+   "stat": "bossDefeated.houndoom ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "デルビルが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-mareep",
+   "name": "ジョウトの メリープ",
+   "hidden": false,
+   "condition": "ジョウトで メリープを 1000匹 倒す",
+   "stat": "defeated.mareep ≧ 1000",
+   "rewardKind": "ポケモン",
+   "reward": "メリープが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-heracross",
+   "name": "ジョウトの ヘラクロス",
+   "hidden": false,
+   "condition": "ジョウトの1ランで ジムリーダーを8人 倒す",
+   "stat": "bestMidbosses ≧ 8",
+   "rewardKind": "ポケモン",
+   "reward": "ヘラクロスが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-swinub",
+   "name": "ジョウトの ウリムー",
+   "hidden": false,
+   "condition": "ジョウトで ヤナギの イノムーを 5回 倒す",
+   "stat": "bossDefeated.piloswine ≧ 5",
+   "rewardKind": "ポケモン",
+   "reward": "ウリムーが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-pidgey",
+   "name": "ジョウトの ポッポ",
+   "hidden": false,
+   "condition": "ジョウトで ハヤトの ピジョンを 2回 倒す",
+   "stat": "bossDefeated.pidgeotto ≧ 2",
+   "rewardKind": "ポケモン",
+   "reward": "ポッポが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-zubat",
+   "name": "ジョウトの ズバット",
+   "hidden": false,
+   "condition": "ジョウトで キョウの クロバットを 倒す",
+   "stat": "bossDefeated.crobat ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "ズバットが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-miltank",
+   "name": "ジョウトの ミルタンク",
+   "hidden": false,
+   "condition": "ジョウトで アカネの ミルタンクを 3回 倒す",
+   "stat": "bossDefeated.miltank ≧ 3",
+   "rewardKind": "ポケモン",
+   "reward": "ミルタンクが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-larvitar",
+   "name": "ジョウトの ヨーギラス",
+   "hidden": false,
+   "condition": "ジョウトを 3種類の ポケモンで クリアする",
+   "stat": "distinctClears ≧ 3",
+   "rewardKind": "ポケモン",
+   "reward": "ヨーギラスが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-horsea",
+   "name": "ジョウトの タッツー",
+   "hidden": false,
+   "condition": "ジョウトで イブキの キングドラを 6回 倒す",
+   "stat": "bossDefeated.kingdra ≧ 6",
+   "rewardKind": "ポケモン",
+   "reward": "タッツーが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-poliwag",
+   "name": "ジョウトの ニョロモ",
+   "hidden": false,
+   "condition": "ジョウトで シジマの ニョロボンを 4回 倒す",
+   "stat": "bossDefeated.poliwrath ≧ 4",
+   "rewardKind": "ポケモン",
+   "reward": "ニョロモが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-silver-wing",
+   "name": "ぎんいろの はね",
+   "hidden": false,
+   "condition": "ピチュー・ピィ・ププリン・トゲピーで それぞれ ジョウトを クリアする（箱から ぎんいろのはねが 出るようになる）",
+   "stat": "eggClears.pichu ≧ 1 & eggClears.cleffa ≧ 1 & eggClears.igglybuff ≧ 1 & eggClears.togepi ≧ 1",
+   "rewardKind": "なし",
+   "reward": ""
+  },
+  {
+   "region": "johto",
+   "id": "johto-rainbow-wing",
+   "name": "にじいろの はね",
+   "hidden": false,
+   "condition": "ジョウトで レッドに 勝つ（箱から にじいろのはねが 出るようになる）",
+   "stat": "redDefeated ≧ 1",
+   "rewardKind": "なし",
+   "reward": ""
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-raikou",
+   "name": "ジョウトの ライコウ",
+   "hidden": false,
+   "condition": "乱入した ライコウを 倒す",
+   "stat": "bossDefeated.raikou ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "ライコウが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-entei",
+   "name": "ジョウトの エンテイ",
+   "hidden": false,
+   "condition": "乱入した エンテイを 倒す",
+   "stat": "bossDefeated.entei ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "エンテイが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-suicune",
+   "name": "ジョウトの スイクン",
+   "hidden": false,
+   "condition": "乱入した スイクンを 倒す",
+   "stat": "bossDefeated.suicune ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "スイクンが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-lugia",
+   "name": "うみの かみ",
+   "hidden": false,
+   "condition": "ぎんいろのはねを 持って レッドに 勝ち、ルギアを 倒す",
+   "stat": "bossDefeated.lugia ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "ルギアが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-ho-oh",
+   "name": "にじいろの ポケモン",
+   "hidden": false,
+   "condition": "にじいろのはねを 持って レッドに 勝ち、ホウオウを 倒す",
+   "stat": "bossDefeated.ho-oh ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "ホウオウが 使えるようになる"
+  },
+  {
+   "region": "johto",
+   "id": "johto-unlock-celebi",
+   "name": "ときわたり",
+   "hidden": false,
+   "condition": "ルギアと ホウオウを 倒す",
+   "stat": "bossDefeated.lugia ≧ 1 & bossDefeated.ho-oh ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "セレビィが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-first-derivation",
+   "name": "ホウエンの ひらめき",
+   "hidden": false,
+   "condition": "ホウエンで 派生技を完成させる",
+   "stat": "derivations ≧ 1",
+   "rewardKind": "持ち物",
+   "reward": "ポイントマックスが 出るようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-reach-elite-four",
+   "name": "サイユウシティへ",
+   "hidden": false,
+   "condition": "ホウエンの1ランで ジムリーダーを全員倒し、四天王に挑む",
+   "stat": "bestMidbosses ≧ 16",
+   "rewardKind": "持ち物",
+   "reward": "メトロノームが 出るようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-first-boss",
+   "name": "ホウエンの していせん",
+   "hidden": false,
+   "condition": "ホウエンで はじめて 四天王を 倒す",
+   "stat": "bossKills ≧ 1",
+   "rewardKind": "持ち物",
+   "reward": "ひかりのねんどが 出るようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-makuhita",
+   "name": "ホウエンの マクノシタ",
+   "hidden": false,
+   "condition": "ホウエンで ハリテヤマ（相棒）を 2回 倒す",
+   "stat": "bossDefeated.hariyama ≧ 2",
+   "rewardKind": "ポケモン",
+   "reward": "マクノシタが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-electrike",
+   "name": "ホウエンの ラクライ",
+   "hidden": false,
+   "condition": "ホウエンで ライボルト（相棒）を 3回 倒す",
+   "stat": "bossDefeated.manectric ≧ 3",
+   "rewardKind": "ポケモン",
+   "reward": "ラクライが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-numel",
+   "name": "ホウエンの ドンメル",
+   "hidden": false,
+   "condition": "ホウエンで バクーダ（相棒）を 3回 倒す",
+   "stat": "bossDefeated.camerupt ≧ 3",
+   "rewardKind": "ポケモン",
+   "reward": "ドンメルが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-slakoth",
+   "name": "ホウエンの ナマケロ",
+   "hidden": false,
+   "condition": "ホウエンで ケッキング（相棒）を 4回 倒す",
+   "stat": "bossDefeated.slaking ≧ 4",
+   "rewardKind": "ポケモン",
+   "reward": "ナマケロが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-swablu",
+   "name": "ホウエンの チルット",
+   "hidden": false,
+   "condition": "ホウエンで チルタリス（相棒）を 4回 倒す",
+   "stat": "bossDefeated.altaria ≧ 4",
+   "rewardKind": "ポケモン",
+   "reward": "チルットが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-absol",
+   "name": "ホウエンの アブソル",
+   "hidden": false,
+   "condition": "ホウエンで アブソル（相棒）を 1回 倒す",
+   "stat": "bossDefeated.absol ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "アブソルが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-shuppet",
+   "name": "ホウエンの カゲボウズ",
+   "hidden": false,
+   "condition": "ホウエンで ジュペッタ（相棒）を 1回 倒す",
+   "stat": "bossDefeated.banette ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "カゲボウズが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-spheal",
+   "name": "ホウエンの タマザラシ",
+   "hidden": false,
+   "condition": "ホウエンで トドゼルガ（相棒）を 1回 倒す",
+   "stat": "bossDefeated.walrein ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "タマザラシが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-bagon",
+   "name": "ホウエンの タツベイ",
+   "hidden": false,
+   "condition": "ホウエンで ボーマンダ（相棒）を 1回 倒す",
+   "stat": "bossDefeated.salamence ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "タツベイが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-feebas",
+   "name": "ホウエンの ヒンバス",
+   "hidden": false,
+   "condition": "ホウエンで ミロカロス（相棒）を 1回 倒す",
+   "stat": "bossDefeated.milotic ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "ヒンバスが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-beldum",
+   "name": "ホウエンの ダンバル",
+   "hidden": false,
+   "condition": "ホウエンを クリアする",
+   "stat": "clears ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "ダンバルが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-ralts",
+   "name": "ホウエンの ラルトス",
+   "hidden": false,
+   "condition": "ホウエンを 3種類の ポケモンで クリアする",
+   "stat": "distinctClears ≧ 3",
+   "rewardKind": "ポケモン",
+   "reward": "ラルトスが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-trapinch",
+   "name": "ホウエンの ナックラー",
+   "hidden": false,
+   "condition": "ホウエンの1ランで ジムリーダーを8組 倒す",
+   "stat": "bestMidbosses ≧ 16",
+   "rewardKind": "ポケモン",
+   "reward": "ナックラーが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-aron",
+   "name": "ホウエンの ココドラ",
+   "hidden": false,
+   "condition": "ホウエンで ココドラを 1000匹 倒す",
+   "stat": "defeated.aron ≧ 1000",
+   "rewardKind": "ポケモン",
+   "reward": "ココドラが 使えるようになる"
+  }
+ ]
+}

@@ -21,7 +21,7 @@ describe('技の強さのそろえ方（作者の決定。07 16.2）', () => {
     const tol = moveBalanceConfig.tolerancePct / 100;
     for (const [key, def] of Object.entries(movesConfig.moves)) {
       if (exempt(key)) continue;
-      const want = moveBalanceConfig.tiers[tierOf(key)].max * (def.region ? (moveBalanceConfig.regionTierScale[def.region] ?? 1) : 1);
+      const want = moveBalanceConfig.tiers[tierOf(key)].max * (def.region && tierOf(key) === 'unique' ? (moveBalanceConfig.regionTierScale[def.region] ?? 1) : 1);
       const got = moveTotalRange(def).max;
       expect(got, key).toBeGreaterThanOrEqual(want * (1 - tol));
       expect(got, key).toBeLessThanOrEqual(want * (1 + tol));

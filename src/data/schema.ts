@@ -2315,7 +2315,7 @@ export const moveBalanceSchema = z.object({
   /** 「重い一撃」の技: 同じ出し方の進化でも、再使用が元の技より長くてよい（威力が高い代わりに再使用が長い。ギガインパクト） */
   heavyHitters: z.array(z.string()).default([]),
   tierOverrides: z.record(z.string(), z.enum(['base', 'derived', 'unique'])).default({}),
-  /** 地方の技（moves.json の region）の帯に掛ける倍率（ホウエン: 敵を強くする分、技も強くする。07 の130章） */
+  /** 地方の固有技（moves.json の region）の帯に掛ける倍率（ホウエン: 作りにくい固有技だけ強くする。タイプの技・派生技は掛けない。07 の134章） */
   regionTierScale: z.record(z.string(), z.number().positive()).default({}),
 });
 export type MoveBalanceConfig = z.infer<typeof moveBalanceSchema>;

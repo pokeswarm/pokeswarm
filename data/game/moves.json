@@ -7311,7 +7311,7 @@
       "effect": "leafage",
       "region": "hoenn",
       "base": {
-        "power": 22.5,
+        "power": 18,
         "cooldownSeconds": 0.9,
         "count": 1,
         "intervalSeconds": 0.08,
@@ -7330,31 +7330,31 @@
       },
       "levels": [
         {
-          "power": 9.6
+          "power": 7.7
         },
         {
           "count": 1,
-          "power": -11.2
+          "power": -9
         },
         {
           "cooldownSeconds": -0.05,
-          "power": 3.4
+          "power": 2.7
         },
         {
           "pierce": 1,
-          "power": -3.9
+          "power": -3.1
         },
         {
           "count": 1,
-          "power": -4.7
+          "power": -3.7
         },
         {
           "size": 2,
-          "power": 2.2
+          "power": 1.7
         },
         {
           "count": 1,
-          "power": -2.9
+          "power": -2.3
         }
       ]
     },
@@ -7581,7 +7581,7 @@
         "afterimages": 0
       },
       "base": {
-        "power": 14.5,
+        "power": 11.6,
         "cooldownSeconds": 0.9,
         "count": 2,
         "intervalSeconds": 0.12,
@@ -7601,31 +7601,31 @@
       },
       "levels": [
         {
-          "power": 6.2
+          "power": 5
         },
         {
           "size": 2,
-          "power": 5.7
+          "power": 4.5
         },
         {
           "cooldownSeconds": -0.06,
-          "power": 3.9
+          "power": 3.2
         },
         {
           "range": 6,
-          "power": 5.7
+          "power": 4.5
         },
         {
           "size": 2,
-          "power": 4.9
+          "power": 3.9
         },
         {
           "cooldownSeconds": -0.06,
-          "power": 2.2
+          "power": 1.8
         },
         {
           "count": 1,
-          "power": -3.7
+          "power": -3
         }
       ]
     },
@@ -7639,7 +7639,7 @@
         "afterimages": 0
       },
       "base": {
-        "power": 52.3,
+        "power": 41.8,
         "cooldownSeconds": 0.9,
         "count": 1,
         "intervalSeconds": 0.1,
@@ -7660,31 +7660,31 @@
       },
       "levels": [
         {
-          "power": 11.9
+          "power": 9.6
         },
         {
           "size": 4,
-          "power": 9.5
-        },
-        {
-          "cooldownSeconds": -0.05,
-          "power": 6.8
-        },
-        {
-          "spreadDegrees": 20,
           "power": 7.6
         },
         {
+          "cooldownSeconds": -0.05,
+          "power": 5.4
+        },
+        {
+          "spreadDegrees": 20,
+          "power": 6.1
+        },
+        {
           "size": 4,
-          "power": 7.4
+          "power": 5.9
         },
         {
           "cooldownSeconds": -0.05,
-          "power": 4
+          "power": 3.2
         },
         {
           "size": 6,
-          "power": 4.6
+          "power": 3.7
         }
       ]
     },
@@ -7801,7 +7801,7 @@
         "statusChance": 0.3,
         "statusSeconds": 3,
         "lifestealPct": 0,
-        "power": 17.7,
+        "power": 14.1,
         "cooldownSeconds": 1,
         "count": 1,
         "speed": 760,
@@ -7813,29 +7813,29 @@
       },
       "levels": [
         {
-          "power": 7.6
+          "power": 6.1
         },
         {
           "size": 2,
-          "power": 7.5
+          "power": 6.1
         },
         {
-          "power": 7.6
+          "power": 6
         },
         {
           "cooldownSeconds": -0.1,
-          "power": 2.8
+          "power": 2.2
         },
         {
           "size": 2,
-          "power": 6.8
+          "power": 5.5
         },
         {
           "range": 30,
-          "power": 6.8
+          "power": 5.5
         },
         {
-          "power": 6.8
+          "power": 5.4
         }
       ],
       "effects": [
@@ -8119,7 +8119,7 @@
         }
       ],
       "base": {
-        "power": 104,
+        "power": 83.2,
         "cooldownSeconds": 0.9,
         "count": 1,
         "intervalSeconds": 0.1,
@@ -8139,31 +8139,31 @@
       },
       "levels": [
         {
-          "power": 23.7
+          "power": 18.9
         },
         {
           "count": 1,
-          "power": -52
+          "power": -41.5
         },
         {
           "cooldownSeconds": -0.05,
-          "power": 7
+          "power": 5.6
         },
         {
           "size": 2,
-          "power": 11.2
+          "power": 8.9
         },
         {
           "count": 1,
-          "power": -23.8
+          "power": -19
         },
         {
           "cooldownSeconds": -0.05,
-          "power": 2.9
+          "power": 2.3
         },
         {
           "count": 1,
-          "power": -13
+          "power": -10.4
         }
       ]
     },
@@ -8235,7 +8235,7 @@
         "mudkip"
       ],
       "base": {
-        "power": 18.7,
+        "power": 15,
         "cooldownSeconds": 1,
         "count": 1,
         "intervalSeconds": 0.1,
@@ -8256,31 +8256,31 @@
       },
       "levels": [
         {
-          "power": 8.1
+          "power": 6.4
         },
         {
           "size": 4,
-          "power": 7.2
-        },
-        {
-          "cooldownSeconds": -0.05,
           "power": 5.8
         },
         {
-          "arcDegrees": 10,
-          "power": 6
-        },
-        {
-          "size": 4,
-          "power": 5.9
-        },
-        {
           "cooldownSeconds": -0.05,
-          "power": 4
+          "power": 4.6
         },
         {
           "arcDegrees": 10,
           "power": 4.8
+        },
+        {
+          "size": 4,
+          "power": 4.8
+        },
+        {
+          "cooldownSeconds": -0.05,
+          "power": 3.2
+        },
+        {
+          "arcDegrees": 10,
+          "power": 3.8
         }
       ]
     },
@@ -8289,7 +8289,7 @@
       "effect": "mud-shot",
       "region": "hoenn",
       "base": {
-        "power": 12.3,
+        "power": 9.8,
         "cooldownSeconds": 0.9,
         "count": 6,
         "intervalSeconds": 0.04,
@@ -8309,15 +8309,15 @@
       },
       "levels": [
         {
-          "power": 2.7
+          "power": 2.2
         },
         {
           "count": 1,
-          "power": 0.3
+          "power": 0.2
         },
         {
           "cooldownSeconds": -0.05,
-          "power": 1.4
+          "power": 1.2
         },
         {
           "count": 1,
@@ -8325,7 +8325,7 @@
         },
         {
           "spreadDegrees": 6,
-          "power": 2
+          "power": 1.6
         },
         {
           "count": 1,
@@ -8333,7 +8333,7 @@
         },
         {
           "count": 1,
-          "power": -0.3
+          "power": -0.2
         }
       ]
     },
@@ -8460,7 +8460,7 @@
         "fire"
       ],
       "base": {
-        "power": 13.1,
+        "power": 10.5,
         "cooldownSeconds": 1.1,
         "count": 1,
         "intervalSeconds": 0.1,
@@ -8481,52 +8481,52 @@
       },
       "levels": [
         {
-          "power": 2.7
+          "power": 2.1
         },
         {
-          "power": 2.6
+          "power": 2.1
         },
         {
-          "power": 2.6
+          "power": 2.1
         },
         {
-          "power": 2.7
-        },
-        {
-          "size": 4,
-          "power": 1.8
-        },
-        {
-          "power": 2.5
-        },
-        {
-          "power": 2.6
-        },
-        {
-          "power": 2.5
-        },
-        {
-          "power": 2.5
+          "power": 2.1
         },
         {
           "size": 4,
-          "power": 1.4
+          "power": 1.5
         },
         {
-          "power": 2.5
+          "power": 2
         },
         {
-          "power": 2.5
+          "power": 2
         },
         {
-          "power": 2.4
+          "power": 2.1
         },
         {
-          "power": 2.5
+          "power": 2
         },
         {
           "size": 4,
-          "power": 1
+          "power": 1.1
+        },
+        {
+          "power": 2
+        },
+        {
+          "power": 2
+        },
+        {
+          "power": 1.9
+        },
+        {
+          "power": 2
+        },
+        {
+          "size": 4,
+          "power": 0.8
         }
       ]
     },
@@ -8545,7 +8545,7 @@
         "afterimages": 2
       },
       "base": {
-        "power": 21.1,
+        "power": 16.9,
         "cooldownSeconds": 1.4,
         "count": 1,
         "intervalSeconds": 0.1,
@@ -8565,52 +8565,52 @@
       },
       "levels": [
         {
-          "power": 4.2
-        },
-        {
-          "power": 4.2
-        },
-        {
-          "power": 4.2
-        },
-        {
-          "power": 4.2
-        },
-        {
-          "range": 8,
-          "power": 3.7
-        },
-        {
-          "power": 4.2
-        },
-        {
-          "power": 4.1
-        },
-        {
-          "power": 4.2
-        },
-        {
-          "power": 4.2
-        },
-        {
-          "range": 8,
           "power": 3.3
         },
         {
-          "power": 4.2
+          "power": 3.4
         },
         {
-          "power": 4.1
+          "power": 3.4
         },
         {
-          "power": 4.1
-        },
-        {
-          "power": 4.1
+          "power": 3.3
         },
         {
           "range": 8,
-          "power": 3.1
+          "power": 3
+        },
+        {
+          "power": 3.3
+        },
+        {
+          "power": 3.3
+        },
+        {
+          "power": 3.4
+        },
+        {
+          "power": 3.3
+        },
+        {
+          "range": 8,
+          "power": 2.7
+        },
+        {
+          "power": 3.3
+        },
+        {
+          "power": 3.3
+        },
+        {
+          "power": 3.3
+        },
+        {
+          "power": 3.3
+        },
+        {
+          "range": 8,
+          "power": 2.5
         }
       ]
     }

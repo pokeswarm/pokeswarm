@@ -250,3 +250,23 @@ describe('ポーズ（作者の決定 2026年10月25日）', () => {
     expect(cmds).toEqual([]);
   });
 });
+
+describe('ボスの位置を送る間隔', () => {
+  it('bossIntervalTicks があれば、補正とは別にその間隔でボスの HP と位置を送る（無ければ補正の 1/3）', () => {
+    const count = (r: { playerStateIntervalTicks: number; correctionIntervalTicks: number; bossIntervalTicks?: number }): number => {
+      const rules = testRules({ extraKinds: [{ id: 'boss', rank: 'boss', hp: 1000, moveSpeed: 0, radius: 20, contactDamage: 0, types: [0] }] });
+      const sim = new Simulation({ tickRate: 30, seed: 7, rules, role: 'host', localPlayerId: 1 });
+      sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150 });
+      sim.world.enemies.add(99, rules.enemies.kinds.length - 1, 200, 0, 1000, 0, 20);
+      const session = new SyncSession(r, 1000, () => 0);
+      let sent = 0;
+      for (let t = 0; t < 30; t++) {
+        sim.step([]);
+        sent += session.outgoing(sim.world).filter((m) => m.t === 'bh').length;
+      }
+      return sent;
+    };
+    expect(count({ playerStateIntervalTicks: 1, correctionIntervalTicks: 30 })).toBe(3);
+    expect(count({ playerStateIntervalTicks: 1, correctionIntervalTicks: 30, bossIntervalTicks: 3 })).toBe(10);
+  });
+});

@@ -1699,6 +1699,11 @@ const syncRateSchema = z.object({
   playerStateIntervalTicks: z.number().int().positive(),
   /** ホストが敵の位置を補正する間隔（更新回数） */
   correctionIntervalTicks: z.number().int().positive(),
+  /**
+   * 中ボス・ボスの HP と位置を送る間隔（更新回数）。無ければ補正の 1/3。補正を毎秒1回に減らした（0.5.33）ときに、ボスの突進が
+   * ゲストで飛んで見えるようになったので、ボスは別に決める（作者の報告 2026年10月30日。ボスは数体なので送る量は小さい）
+   */
+  bossIntervalTicks: z.number().int().positive().optional(),
 });
 
 /**

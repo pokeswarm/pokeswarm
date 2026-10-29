@@ -8,11 +8,13 @@
   "p2p": {
     "playerStateIntervalTicks": 1,
     "correctionIntervalTicks": 30,
+    "bossIntervalTicks": 3,
     "batchTicks": 3
   },
   "relay": {
     "playerStateIntervalTicks": 3,
     "correctionIntervalTicks": 150,
+    "bossIntervalTicks": 6,
     "flushIntervalMs": 100
   },
   "guestSpawnOffsetX": 60,

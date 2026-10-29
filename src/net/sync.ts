@@ -11,6 +11,7 @@ const EFFECT_STRIDE = 7;
 export interface SyncRate {
   playerStateIntervalTicks: number;
   correctionIntervalTicks: number;
+  bossIntervalTicks?: number;
 }
 
 /** ホストが中継する、あるゲストから届いたメッセージ（そのゲスト以外へ送る） */
@@ -234,8 +235,8 @@ export class SyncSession {
         }
         out.push({ t: 'c', e: data, k: world.tick });
       }
-      // 中ボス・ボスの HP は、HP のバーが動いて見えるよう補正より短い間隔で送る
-      if (world.tick % Math.max(1, Math.round(this.rate.correctionIntervalTicks / 3)) === 0) {
+      // 中ボス・ボスの HP と位置は、HP のバーと突進などの動きが飛ばないよう補正より短い間隔で送る
+      if (world.tick % (this.rate.bossIntervalTicks ?? Math.max(1, Math.round(this.rate.correctionIntervalTicks / 3))) === 0) {
         const e = world.enemies;
         const bosses: number[] = [];
         for (let i = 0; i < e.count; i++) {

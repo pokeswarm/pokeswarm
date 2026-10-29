@@ -252,6 +252,8 @@ export interface World {
   readonly wings: Set<WingKind>;
   /** 伝説戦に、相性で選ぶ候補（stage.json の legendary.counter。色違いの御三家）を足す（参加者のだれかが条件の実績を達成している）。ランを始める前に入れる */
   legendaryCounter: boolean;
+  /** 伝説戦の相手を legendary.forceKind の伝説に決める（遊ぶ人の記録が条件をまだ満たしていない）。ランを始める前に入れる */
+  legendaryForce: boolean;
   /** スウォームイベントの予定（更新回数の順）と、次に出す番号 */
   readonly swarmSchedule: readonly { readonly tick: number; readonly swarm: number }[];
   nextSwarm: number;
@@ -316,6 +318,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     cleared: false,
     legendary: null,
     legendaryCounter: false,
+    legendaryForce: false,
     intruder: null,
     nextIntruderCheck: 0,
     wingsEnabled: new Set(),

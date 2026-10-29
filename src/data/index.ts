@@ -342,6 +342,9 @@ for (const rs of Object.values(regionStages)) {
     for (const id of counter?.achievements ?? []) {
       check(achievementsConfig.achievements.some((a) => a.id === id), `${file} の伝説の相性で選ぶ候補の条件の実績 "${id}" がありません`);
     }
+    // 決まった伝説（ミュウ）: 伝説の候補にあること
+    const force = stageConfig.legendary.forceKind;
+    if (force) check(stageConfig.legendary.kinds.includes(force.kind), `${file} の決まった伝説 "${force.kind}" が伝説の候補（kinds）にありません`);
     // 続けて戦うラウンド（レッド）・はねの戦い（ルギア・ホウオウ）・乱入（三犬）の相手も、伝説の敵であること
     const lg = stageConfig.legendary;
     const roundKinds = [...(lg.rounds ?? []).flatMap((r) => r.kinds), ...(lg.bonusRounds ?? []).flatMap((r) => r.kinds), ...(lg.intruders?.kinds ?? [])];

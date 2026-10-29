@@ -269,6 +269,20 @@ describe('伝説の乱入', () => {
     expect(sim.world.legendary?.result).toBe('won');
   });
 
+  it('決まった伝説（forceKind）: legendaryForce の間は、抽選の代わりに必ずその伝説', () => {
+    const legendOf = (force: boolean): number | undefined => {
+      const { sim } = solo(stageRules({ legendary: { ...legendary, kinds: ['e4a', 'legend'], forceKind: { kind: 'legend', until: { stat: 'bossDefeated.legend', atLeast: 1 } } } }));
+      sim.world.legendaryForce = force;
+      run(sim, 61);
+      killKind(sim, 2);
+      killKind(sim, 3);
+      return sim.world.legendary?.kind;
+    };
+    expect(legendOf(true)).toBe(4);
+    // 決めないときは抽選（このシードでは e4a）
+    expect(legendOf(false)).toBe(2);
+  });
+
   it('HP が半分を切ると第2段階（もう一度「DANGER」・技の間隔が短くなる）', () => {
     const { sim } = solo(
       stageRules({

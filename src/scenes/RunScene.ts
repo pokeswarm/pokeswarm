@@ -43,7 +43,8 @@ import { applyDebugOverrides, parseGodParam, parseLegendParam, parseIntruderPara
 import { addXp, applyOffer, itemFits, moveMaxLevel } from '../sim/systems/leveling';
 import { shinySpriteKey } from '../meta/loadoutOptions';
 import { achievementPerks, regionAchieved } from '../meta/achievementPerks';
-import { regionUpgradesOf } from '../meta/regionScope';
+import { regionStats, regionUpgradesOf } from '../meta/regionScope';
+import { meets } from '../meta/progress';
 import { addDiscovery } from '../meta/discoveries';
 import { achievementName, achievementRewardById } from '../meta/achievementText';
 import { RunRecorder } from '../meta/runRecorder';
@@ -325,6 +326,9 @@ export class RunScene extends Phaser.Scene {
     // 伝説戦の相性で選ぶ候補（色違いの御三家）: 参加者のだれかが条件の実績を達成していれば足す（どのブラウザでも同じ）
     const counter = rules.stage.legendary?.counter;
     this.sim.world.legendaryCounter = !!counter && roster.some((r) => counter.achievements.some((a) => r.achievements.includes(a)));
+    // 決まった伝説（ミュウ）: 抽選はソロ・ホストだけなので、このブラウザの記録で決める
+    const force = rules.stage.legendary?.forceKind;
+    this.sim.world.legendaryForce = !!force && !meets(regionStats(session.store.current.stats, this.stageOfRegion.id), force.until);
     // はね（ルギア・ホウオウ戦の権利）: 参加者のだれかが条件の実績を達成していれば、箱から出るようになる（どのブラウザでも同じ）
     for (const b of rules.stage.legendary?.bonusRounds ?? []) if (roster.some((r) => r.achievements.includes(b.achievement))) this.sim.world.wingsEnabled.add(b.item);
     // 実績の報酬（07 23・24章）: 各自の達成した実績から、解放した持ち物・特殊なバフを計算する。協力プレイの経験値は部屋の全員に

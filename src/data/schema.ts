@@ -654,6 +654,11 @@ export const stageConfigSchema = z.object({
        */
       counter: z.object({ kinds: z.array(z.string().min(1)).min(1), achievements: z.array(z.string().min(1)).min(1) }).optional(),
       /**
+       * 決まった伝説（作者の依頼 2026年10月29日: ミュウを倒さないと次の地方へ行けないので）。遊ぶ人（ソロ・ホスト）の記録が until を
+       * 満たすまで、伝説戦の相手は必ず kind（出る確率 chance はそのまま）
+       */
+      forceKind: z.object({ kind: z.string().min(1), until: statConditionSchema }).optional(),
+      /**
        * 続けて戦うラウンド（ジョウトのレッド戦。作者の決定 2026年10月27日）。あれば chance・kinds の代わりに、クリアの後に必ず
        * 1つ目のラウンドから戦う。ラウンドの相手（kinds）は同時に出て、全員倒すと次のラウンドへ。制限時間はラウンドごと。
        * 最後のラウンドを倒したら stat を記録に数える（レッドを倒す）。bgm があれば、そのラウンドの間の曲（無ければ legendaryBgm）

@@ -973,7 +973,8 @@ function startLegendaryOrClear(world: World): void {
   // 相性で選ぶ候補（色違いの御三家）は、参加者に一番不利な1体を、ほかの伝説と同じ重みで足す
   const pool = [...cfg.kinds];
   if (world.legendaryCounter && cfg.counter) pool.push(counterPick(world, cfg.counter.kinds));
-  const id = pool[world.rng.int(pool.length)]!;
+  const drawn = pool[world.rng.int(pool.length)]!;
+  const id = world.legendaryForce && cfg.forceKind ? cfg.forceKind.kind : drawn;
   const kind = world.rules.enemies.kinds.findIndex((k) => k.id === id);
   if (kind === -1) {
     endRun(world, 'clear');

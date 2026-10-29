@@ -614,6 +614,13 @@
       "moveIntervalSeconds": 1.1,
       "doubleChance": 0.35
     },
+    "forceKind": {
+      "kind": "legend-mew",
+      "until": {
+        "stat": "bossDefeated.mew",
+        "atLeast": 1
+      }
+    },
     "counter": {
       "kinds": [
         "shiny-charizard",

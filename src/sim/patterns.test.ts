@@ -261,6 +261,13 @@ describe('効き方の部品（07 22.4）', () => {
     expect(stageCount(sim, 1)).toBe(2);
   });
 
+  it('現れたとき（spawn）: かみなりは、敵に当たらなかった落雷からも連鎖が出る（作者の依頼 2026年10月29日）', () => {
+    const chain = { sizeMultiplier: 1, powerMultiplier: 1, count: 1, range: 1000 };
+    // 落雷は自分から 100 以内に落ち、敵は 500 先にいる（どの落雷にも入らない）
+    const sim = withEffects('scatter', { size: 5, count: 3, range: 100, durationSeconds: 0.3 }, [{ trigger: 'spawn', chain }], [[500, 0]], 2);
+    expect(stageCount(sim, 1)).toBe(3);
+  });
+
   it('連鎖: 当たった敵から近くの敵へ飛び移る', () => {
     const sim = withEffects('facing', { speed: 600, size: 6, count: 1, range: 400, durationSeconds: 1 }, [{ trigger: 'hit', chain: { sizeMultiplier: 1, powerMultiplier: 1, count: 2, range: 200 } }], [[100, 0], [100, 120], [100, 240]], 8);
     const e = sim.world.enemies;

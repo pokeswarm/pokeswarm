@@ -733,6 +733,8 @@ export function findReappearingKind(
 export const combatConfigSchema = z.object({
   /** 光線（beam）: 数が1増えるごとに、幅をこの割合だけ広げる（本数は増やさない。作者の指摘 2026年10月27日） */
   beamWidthPerExtraCount: z.number().nonnegative().default(0.5),
+  /** ポイントマックスの増えた分を威力に変える技（bonusCountToPower）: 1 増えるごとに、1 本分の威力のこの割合を足す（0.5 なら 1 本の技は +2 で 2 倍。07 の128章） */
+  bonusCountPowerRate: z.number().nonnegative().default(0.5),
   /** 発射体・攻撃の当たり判定の数の上限（全プレイヤー合計） */
   maxProjectiles: z.number().int().positive(),
   /**
@@ -930,7 +932,7 @@ const snakeSchema = z.object({ amplitude: z.number().positive(), wavelength: z.n
  *   end（当たり判定が消えたとき・落ちたとき。その位置）、every（当たり判定が残っている間 everySeconds ごと。その位置。
  *   流れ stream は流れが最初に当たる敵の位置）、spawn（当たり判定が現れたとき。その位置。遅れて現れる爆炎の柱は現れたとき）
  * - 大きさ・威力は、もとの当たり判定の大きさ（半径）・威力に掛ける倍率
- * - eachHit: 当たった敵ごとに（その敵の位置で）起こす（かみなり: 落雷を受けた敵それぞれから電気が連鎖する）
+ * - eachHit: 当たった敵ごとに（その敵の位置で）起こす（10まんボルト など）。かみなりは spawn で、落雷それぞれから電気が連鎖する（作者の依頼 2026年10月29日）
  */
 export const moveEffectSchema = z.object({
   /** kill は、この技（技そのもの）で敵を倒したとき。その敵の位置（ぜったいれいど: 凍った敵が氷の破片を飛ばす） */
@@ -1075,7 +1077,7 @@ export const moveDefSchema = z.object({
   bounceAngle: z.number().optional(),
   /** 出した技が消えるまで、次を出さない（再使用は少なくとも持続の長さ。ボルテッカー: 次のピカチュウが重ならない。作者の決定 2026年10月25日） */
   waitForEnd: z.boolean().optional(),
-  /** 技の数を増やす持ち物（ポイントマックス）で本数を増やさず、増えた分を威力に変える（元の本数 n に +k なら威力 ×(n+k)/n）。太い追従レーザー（ハイドロポンプ・ハイドロカノン・はかいこうせん・ソーラービーム。07 の122章） */
+  /** 技の数を増やす持ち物（ポイントマックス）で本数を増やさず、増えた分を威力に変える（元の本数 n に +k なら威力 ×(n + 割合×k)/n。割合は combat.json の bonusCountPowerRate）。太い追従レーザー（ハイドロポンプ・ハイドロカノン・はかいこうせん・ソーラービーム。07 の122章）と、自分を中心に広がる円（だいばくはつ など。重なって同じ所に何度も当たるため。07 の128章） */
   bonusCountToPower: z.boolean().optional(),
   /** lob: 落ちた所でだけ当たる（飛んでいる途中は当たらない。ふんか: 投げた瞬間にすぐそばのボスへ全部当たっていた。07 の126章） */
   landOnly: z.boolean().optional(),

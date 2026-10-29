@@ -2241,7 +2241,8 @@
       "hpCost": {
         "pct": 10,
         "minHpPct": 50
-      }
+      },
+      "bonusCountToPower": true
     },
     "extreme-speed": {
       "pattern": "chain",
@@ -3793,7 +3794,7 @@
       ],
       "effects": [
         {
-          "trigger": "eachHit",
+          "trigger": "spawn",
           "chain": {
             "sizeMultiplier": 0.12,
             "powerMultiplier": 0.5,
@@ -4571,7 +4572,8 @@
           "perMovePowerPct": 5,
           "power": 32.1
         }
-      ]
+      ],
+      "bonusCountToPower": true
     },
     "giga-impact": {
       "pattern": "melee",
@@ -6072,7 +6074,8 @@
           "range": 20,
           "power": 3.7
         }
-      ]
+      ],
+      "bonusCountToPower": true
     },
     "snarl": {
       "pattern": "nova",
@@ -6126,7 +6129,8 @@
           "range": 20,
           "power": 17.6
         }
-      ]
+      ],
+      "bonusCountToPower": true
     },
     "muddy-water": {
       "pattern": "nova",
@@ -6181,7 +6185,8 @@
           "range": 20,
           "power": 17.6
         }
-      ]
+      ],
+      "bonusCountToPower": true
     },
     "lava-plume": {
       "pattern": "nova",
@@ -6236,7 +6241,8 @@
           "range": 20,
           "power": 17.6
         }
-      ]
+      ],
+      "bonusCountToPower": true
     },
     "agility": {
       "pattern": "passive",

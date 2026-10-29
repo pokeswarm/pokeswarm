@@ -141,6 +141,7 @@ export function testRules(
       maxProjectiles: 128,
       hitMemory: 8,
       beamWidthPerExtraCount: 0.5,
+      bonusCountPowerRate: 0.5,
       typeMultipliers: { stab: 1.1, superEffective: 1.2, notVeryEffective: 0.8 },
       maxMoveSlots: 4,
       critMultiplier: 1.5,

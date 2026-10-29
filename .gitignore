@@ -21,3 +21,6 @@ scripts/.cache/
 Thumbs.db
 desktop.ini
 *.log
+
+# 宣伝用の動画（大きいのでリポジトリに入れない）
+promo-out/

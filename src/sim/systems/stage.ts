@@ -966,7 +966,7 @@ function startLegendaryOrClear(world: World): void {
     startLegendary(world, seq[0]![0]!, 0);
     return;
   }
-  if (!cfg || world.rng.next() >= cfg.chance) {
+  if (!cfg || world.rng.next() >= cfg.chance + world.legendaryChanceBonus) {
     endRun(world, 'clear');
     return;
   }

@@ -619,6 +619,10 @@
       "until": {
         "stat": "bossDefeated.mew",
         "atLeast": 1
+      },
+      "chanceUp": {
+        "stat": "clears",
+        "step": 0.1
       }
     },
     "counter": {

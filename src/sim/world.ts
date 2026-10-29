@@ -254,6 +254,8 @@ export interface World {
   legendaryCounter: boolean;
   /** 伝説戦の相手を legendary.forceKind の伝説に決める（遊ぶ人の記録が条件をまだ満たしていない）。ランを始める前に入れる */
   legendaryForce: boolean;
+  /** 伝説戦の起きる確率に足す分（legendary.forceKind.chanceUp。決まった伝説の間だけ）。ランを始める前に入れる */
+  legendaryChanceBonus: number;
   /** スウォームイベントの予定（更新回数の順）と、次に出す番号 */
   readonly swarmSchedule: readonly { readonly tick: number; readonly swarm: number }[];
   nextSwarm: number;
@@ -319,6 +321,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     legendary: null,
     legendaryCounter: false,
     legendaryForce: false,
+    legendaryChanceBonus: 0,
     intruder: null,
     nextIntruderCheck: 0,
     wingsEnabled: new Set(),

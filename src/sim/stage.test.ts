@@ -283,6 +283,15 @@ describe('伝説の乱入', () => {
     expect(legendOf(false)).toBe(2);
   });
 
+  it('決まった伝説の確率の上乗せ: chance 0 でも、上乗せが 1 なら必ず伝説戦', () => {
+    const { sim } = solo(stageRules({ legendary: { ...legendary, chance: 0 } }));
+    sim.world.legendaryChanceBonus = 1;
+    run(sim, 61);
+    killKind(sim, 2);
+    killKind(sim, 3);
+    expect(sim.world.legendary).not.toBeNull();
+  });
+
   it('HP が半分を切ると第2段階（もう一度「DANGER」・技の間隔が短くなる）', () => {
     const { sim } = solo(
       stageRules({

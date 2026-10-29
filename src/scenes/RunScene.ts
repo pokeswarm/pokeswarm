@@ -328,7 +328,10 @@ export class RunScene extends Phaser.Scene {
     this.sim.world.legendaryCounter = !!counter && roster.some((r) => counter.achievements.some((a) => r.achievements.includes(a)));
     // 決まった伝説（ミュウ）: 抽選はソロ・ホストだけなので、このブラウザの記録で決める
     const force = rules.stage.legendary?.forceKind;
-    this.sim.world.legendaryForce = !!force && !meets(regionStats(session.store.current.stats, this.stageOfRegion.id), force.until);
+    const myStats = regionStats(session.store.current.stats, this.stageOfRegion.id);
+    this.sim.world.legendaryForce = !!force && !meets(myStats, force.until);
+    // 会えないほど会いやすく: クリアの回数ごとに、伝説戦の起きる確率を上げる
+    if (this.sim.world.legendaryForce && force?.chanceUp) this.sim.world.legendaryChanceBonus = force.chanceUp.step * (myStats[force.chanceUp.stat] ?? 0);
     // はね（ルギア・ホウオウ戦の権利）: 参加者のだれかが条件の実績を達成していれば、箱から出るようになる（どのブラウザでも同じ）
     for (const b of rules.stage.legendary?.bonusRounds ?? []) if (roster.some((r) => r.achievements.includes(b.achievement))) this.sim.world.wingsEnabled.add(b.item);
     // 実績の報酬（07 23・24章）: 各自の達成した実績から、解放した持ち物・特殊なバフを計算する。協力プレイの経験値は部屋の全員に

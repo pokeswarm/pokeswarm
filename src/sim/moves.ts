@@ -131,6 +131,20 @@ export interface SimMoveDef {
   readonly chargeMove?: { readonly move: number; readonly pauseSeconds: number };
   /** 候補に出さない（持ち物を持つと覚える技） */
   readonly teachOnly?: boolean;
+  /** この地方のランだけで使う技（ほかの地方では候補・ゆびをふるに出さない。07 の130章） */
+  readonly region?: string;
+  /** 今の姿がこのどれか（種類の番号）のときだけ候補に出る（くさのちかい） */
+  readonly learnForms?: readonly number[];
+  /** ランのレベルがこれ以上のときだけ候補に出る（リーフストーム） */
+  readonly learnMinLevel?: number;
+  /** これらの技（番号）を全部覚えているときだけ候補に出る */
+  readonly learnWithMoves?: readonly number[];
+  /** ほかにもこのタイプ（番号）の技として、威力の強化と相性が効く（インファイト・だくりゅう） */
+  readonly extraTypes?: readonly number[];
+  /** 出す前に溜める秒数（リーフブレード・ブレイズキック） */
+  readonly windupSeconds?: number;
+  /** ちかい: 覚えていると威力 +powerPct %、自分か味方が覚えているほかのちかい1種類につき +perOtherPct % */
+  readonly pledge?: { readonly powerPct: number; readonly perOtherPct: number };
   /** 同じ group の技は順番に出す（ワンリキーのパンチ） */
   readonly group?: string;
   /** 連打を長方形にするときの横幅（ばくれつパンチ） */

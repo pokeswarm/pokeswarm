@@ -14,6 +14,9 @@
     }
   },
   "tolerancePct": 25,
+  "regionTierScale": {
+    "hoenn": 1.25
+  },
   "exempt": [
     "sleep-powder",
     "metronome",
@@ -42,7 +45,12 @@
     "morning-sun",
     "rain-dance",
     "healing-wish",
-    "stone-edge"
+    "stone-edge",
+    "swords-dance",
+    "grass-pledge",
+    "bulk-up",
+    "fire-pledge",
+    "water-pledge"
   ],
   "heavyHitters": [
     "giga-impact",
@@ -59,6 +67,12 @@
     "twister": "derived",
     "sandstorm": "derived",
     "muddy-water": "unique",
-    "lava-plume": "unique"
+    "lava-plume": "unique",
+    "low-sweep": "derived",
+    "water-pulse": "derived",
+    "mud-shot": "derived",
+    "leaf-storm-hoenn": "unique",
+    "blaze-kick": "unique",
+    "wave-crash": "unique"
   }
 }

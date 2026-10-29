@@ -61,7 +61,9 @@ const report: string[] = [];
 for (const [key, def] of Object.entries(movesFile.moves)) {
   if (balance.exempt.includes(key)) continue;
   const tier = balance.tiers[tierOf(key)];
-  const out = retuned(def, tier.max * tier.firstRatio, tier.max);
+  // 地方の技（ホウエン）は帯を倍率の分だけ強くする（07 の130章）
+  const scale = def.region ? (balance.regionTierScale?.[def.region] ?? 1) : 1;
+  const out = retuned(def, tier.max * scale * tier.firstRatio, tier.max * scale);
   movesFile.moves[key] = out;
   report.push(`${key.padEnd(16)} ${tierOf(key).padEnd(8)} ${first(def).toFixed(0).padStart(5)} → ${max(def).toFixed(0).padStart(5)}  を  ${first(out).toFixed(0).padStart(4)} → ${max(out).toFixed(0).padStart(4)}`);
 }

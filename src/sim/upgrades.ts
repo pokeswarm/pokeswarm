@@ -66,6 +66,8 @@ export interface SimDerivation {
   readonly withMoves?: readonly number[];
   /** 進化するとき、持っていれば消費する技 */
   readonly consumes?: readonly number[];
+  /** ほかにも覚えていないといけない技（消費しない）。level があればそのレベル以上（リーフブレード・だくりゅう） */
+  readonly needsMoves?: readonly { readonly move: number; readonly level?: number }[];
   /** 材料にした技の強化分（レベル − 1）を新しい技のレベルに足す（ばくれつパンチ） */
   readonly inheritLevels?: boolean;
   /** 最大レベル = base + perConsumed × 消費した consumes の数（ばくれつパンチ。07 の105章） */

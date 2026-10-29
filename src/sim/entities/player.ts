@@ -18,6 +18,8 @@ export interface PlayerMove {
   /** ためている間に出す技（きあいパンチのマッハパンチ）の状態と、止めておく残りの秒数 */
   sub?: PlayerMove;
   subPause?: number;
+  /** 溜める技の、出すまでの残りの秒数（溜めていなければ無し。07 の130章） */
+  windup?: number;
   /** この技の最大レベル（技の定義より低くするとき。ばくれつパンチ: 消費したパンチの数で 8・16・24。07 の105章） */
   maxLevel?: number;
 }

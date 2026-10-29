@@ -69,6 +69,14 @@
     { "from": "swift", "item": "everstone", "to": "last-resort", "line": "eevee", "forms": ["eevee"], "withMoves": ["body-slam", "quick-attack"] },
     { "from": "body-slam", "item": "hp-up", "to": "giga-impact", "line": "snorlax" },
     { "from": "fury-cutter", "item": "razor-claw", "to": "x-scissor", "line": "scyther" },
-    { "from": "thunderbolt", "item": "zoom-lens", "to": "flash-cannon", "line": "magnemite" }
+    { "from": "thunderbolt", "item": "zoom-lens", "to": "flash-cannon", "line": "magnemite" },
+    { "from": "leafage", "to": "leaf-blade", "line": "treecko", "needsMoves": [{ "move": "swords-dance" }] },
+    { "from": "slash", "item": "x-attack", "to": "swords-dance", "line": "treecko" },
+    { "from": "double-kick", "item": "black-belt", "to": "low-sweep", "line": "torchic" },
+    { "from": "low-sweep", "to": "close-combat", "line": "torchic", "needsMoves": [{ "move": "flare-blitz-hoenn" }, { "move": "fire-punch-hoenn" }], "consumes": ["fire-punch-hoenn"] },
+    { "from": "bulk-up", "item": "charcoal", "to": "flare-blitz-hoenn", "line": "torchic" },
+    { "from": "water-gun", "item": "mystic-water", "to": "water-pulse", "line": "mudkip" },
+    { "from": "water-pulse", "to": "muddy-water-hoenn", "line": "mudkip", "needsMoves": [{ "move": "mud-shot", "level": 8 }] },
+    { "from": "mud-slap", "item": "soft-sand", "to": "mud-shot", "line": "mudkip" }
   ]
 }

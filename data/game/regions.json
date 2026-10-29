@@ -76,9 +76,9 @@
       "id": "hoenn",
       "available": false,
       "playables": [
-        "charmander",
-        "bulbasaur",
-        "squirtle"
+        "treecko",
+        "torchic",
+        "mudkip"
       ],
       "unlock": {
         "all": [

@@ -107,6 +107,18 @@
     "type": "fire",
     "damageClass": "special"
   },
+  "blaze-kick": {
+    "names": {
+      "ja": "ブレイズキック",
+      "en": "Blaze Kick",
+      "fr": "Pied Brûleur",
+      "de": "Feuerfeger",
+      "es": "Patada Ígnea",
+      "it": "Calciardente"
+    },
+    "type": "fire",
+    "damageClass": "physical"
+  },
   "blizzard": {
     "names": {
       "ja": "ふぶき",
@@ -191,6 +203,18 @@
     "type": "water",
     "damageClass": "special"
   },
+  "bulk-up": {
+    "names": {
+      "ja": "ビルドアップ",
+      "en": "Bulk Up",
+      "fr": "Gonflette",
+      "de": "Protzer",
+      "es": "Corpulencia",
+      "it": "Granfisico"
+    },
+    "type": "fighting",
+    "damageClass": "status"
+  },
   "bullet-punch": {
     "names": {
       "ja": "バレットパンチ",
@@ -201,6 +225,18 @@
       "it": "Pugnoscarica"
     },
     "type": "steel",
+    "damageClass": "physical"
+  },
+  "close-combat": {
+    "names": {
+      "ja": "インファイト",
+      "en": "Close Combat",
+      "fr": "Close Combat",
+      "de": "Nahkampf",
+      "es": "A Bocajarro",
+      "it": "Zuffa"
+    },
+    "type": "fighting",
     "damageClass": "physical"
   },
   "confusion": {
@@ -467,6 +503,18 @@
     "type": "fire",
     "damageClass": "physical"
   },
+  "fire-pledge": {
+    "names": {
+      "ja": "ほのおのちかい",
+      "en": "Fire Pledge",
+      "fr": "Aire de Feu",
+      "de": "Feuersäulen",
+      "es": "Voto Fuego",
+      "it": "Fiammapatto"
+    },
+    "type": "fire",
+    "damageClass": "special"
+  },
   "fire-punch": {
     "names": {
       "ja": "ほのおのパンチ",
@@ -622,6 +670,18 @@
     },
     "type": "normal",
     "damageClass": "physical"
+  },
+  "grass-pledge": {
+    "names": {
+      "ja": "くさのちかい",
+      "en": "Grass Pledge",
+      "fr": "Aire d’Herbe",
+      "de": "Pflanzensäulen",
+      "es": "Voto Planta",
+      "it": "Erbapatto"
+    },
+    "type": "grass",
+    "damageClass": "special"
   },
   "gust": {
     "names": {
@@ -803,6 +863,18 @@
     "type": "fire",
     "damageClass": "special"
   },
+  "leaf-blade": {
+    "names": {
+      "ja": "リーフブレード",
+      "en": "Leaf Blade",
+      "fr": "Lame Feuille",
+      "de": "Laubklinge",
+      "es": "Hoja Aguda",
+      "it": "Fendifoglia"
+    },
+    "type": "grass",
+    "damageClass": "physical"
+  },
   "leaf-storm": {
     "names": {
       "ja": "リーフストーム",
@@ -815,6 +887,18 @@
     "type": "grass",
     "damageClass": "special"
   },
+  "leafage": {
+    "names": {
+      "ja": "このは",
+      "en": "Leafage",
+      "fr": "Feuillage",
+      "de": "Blattwerk",
+      "es": "Follaje",
+      "it": "Fogliame"
+    },
+    "type": "grass",
+    "damageClass": "physical"
+  },
   "leech-seed": {
     "names": {
       "ja": "やどりぎのタネ",
@@ -826,6 +910,18 @@
     },
     "type": "grass",
     "damageClass": "status"
+  },
+  "low-sweep": {
+    "names": {
+      "ja": "ローキック",
+      "en": "Low Sweep",
+      "fr": "Balayette",
+      "de": "Fußtritt",
+      "es": "Puntapié",
+      "it": "Calciobasso"
+    },
+    "type": "fighting",
+    "damageClass": "physical"
   },
   "mach-punch": {
     "names": {
@@ -922,6 +1018,30 @@
     },
     "type": "normal",
     "damageClass": "status"
+  },
+  "mud-shot": {
+    "names": {
+      "ja": "マッドショット",
+      "en": "Mud Shot",
+      "fr": "Tir de Boue",
+      "de": "Lehmschuss",
+      "es": "Disparo Lodo",
+      "it": "Colpodifango"
+    },
+    "type": "ground",
+    "damageClass": "special"
+  },
+  "mud-slap": {
+    "names": {
+      "ja": "どろかけ",
+      "en": "Mud-Slap",
+      "fr": "Coud’Boue",
+      "de": "Lehmschelle",
+      "es": "Bofetón Lodo",
+      "it": "Fangosberla"
+    },
+    "type": "ground",
+    "damageClass": "special"
   },
   "muddy-water": {
     "names": {
@@ -1523,6 +1643,18 @@
     "type": "normal",
     "damageClass": "special"
   },
+  "swords-dance": {
+    "names": {
+      "ja": "つるぎのまい",
+      "en": "Swords Dance",
+      "fr": "Danse Lames",
+      "de": "Schwerttanz",
+      "es": "Danza Espada",
+      "it": "Danzaspada"
+    },
+    "type": "normal",
+    "damageClass": "status"
+  },
   "synthesis": {
     "names": {
       "ja": "こうごうせい",
@@ -1667,6 +1799,30 @@
     "type": "water",
     "damageClass": "special"
   },
+  "water-pledge": {
+    "names": {
+      "ja": "みずのちかい",
+      "en": "Water Pledge",
+      "fr": "Aire d’Eau",
+      "de": "Wassersäulen",
+      "es": "Voto Agua",
+      "it": "Acquapatto"
+    },
+    "type": "water",
+    "damageClass": "special"
+  },
+  "water-pulse": {
+    "names": {
+      "ja": "みずのはどう",
+      "en": "Water Pulse",
+      "fr": "Vibraqua",
+      "de": "Aquawelle",
+      "es": "Hidropulso",
+      "it": "Idropulsar"
+    },
+    "type": "water",
+    "damageClass": "special"
+  },
   "water-spout": {
     "names": {
       "ja": "しおふき",
@@ -1678,6 +1834,18 @@
     },
     "type": "water",
     "damageClass": "special"
+  },
+  "wave-crash": {
+    "names": {
+      "ja": "ウェーブタックル",
+      "en": "Wave Crash",
+      "fr": "Aquatacle",
+      "de": "Wellentackle",
+      "es": "Envite Acuático",
+      "it": "Ondaschianto"
+    },
+    "type": "water",
+    "damageClass": "physical"
   },
   "whirlpool": {
     "names": {

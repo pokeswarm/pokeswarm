@@ -41,9 +41,15 @@ interface Derivation {
   to: string;
   line?: string;
   minLevel?: number;
+  /** 覚えていないといけない技（リーフブレード: つるぎのまい。07 の130章） */
+  needsMoves?: { move: string; level?: number }[];
 }
-/** 派生の材料の表記（持ち物、無ければレベル） */
-const via = (d: Derivation): string => (d.item ? `＋${itemName(d.item)}${d.minLevel ? `（Lv${d.minLevel} から）` : ""}` : `Lv${d.minLevel ?? "?"}`);
+/** 派生の材料の表記（持ち物、無ければレベル。覚えていないといけない技があれば足す） */
+const via = (d: Derivation): string => {
+  const needs = (d.needsMoves ?? []).map((n) => `${genMoves[n.move]?.names.ja ?? n.move}${n.level ? ` Lv${n.level}` : ""}`).join("・");
+  if (d.item) return `＋${itemName(d.item)}${d.minLevel ? `（Lv${d.minLevel} から）` : ""}${needs ? `（${needs}を覚えている）` : ""}`;
+  return needs ? `${needs}を覚えている` : `Lv${d.minLevel ?? "?"}`;
+};
 type Stats = Record<string, number | string | undefined>;
 interface MoveDef {
   pattern: string;

@@ -4,7 +4,7 @@
  *   npm run move-dps
  *
  * 見分け方（作者の考え 2026年10月29日: 範囲攻撃は雑魚に強く、単体攻撃はボスに強い。どちらにも強すぎる技は調整する）:
- * 同じ段階（タイプの技・派生技・固有技）の中で、ボス1体の DPS と 雑魚200 の DPS がそれぞれ上位何割かを見る。
+ * 同じ段階（タイプの技・派生技・固有技。地方の技 moves.json の region は、帯を強くしてあるので地方ごとに別の組）の中で、ボス1体の DPS と 雑魚200 の DPS がそれぞれ上位何割かを見る。
  * - 両方に強い: どちらも上位 1/4 → 調整の候補
  * - 単体向き・群れ向き: 片方が上位半分で、もう片方が下位半分
  * - 両方に弱い: どちらも下位 1/4
@@ -31,12 +31,23 @@ const reachOf = (r: Row): number => {
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const data = JSON.parse(readFileSync(join(ROOT, 'docs/14_move_dps.json'), 'utf8')) as { seconds: number; rows: Row[] };
 const TIER: Record<string, string> = { base: 'タイプの技', derived: '派生技', unique: '固有技' };
+const movesDefs = JSON.parse(readFileSync(join(ROOT, 'data/game/moves.json'), 'utf8')).moves as Record<string, { region?: string; nameOf?: string }>;
+const regionNames = JSON.parse(readFileSync(join(ROOT, 'data/generated/regions.json'), 'utf8')) as Record<string, { names: Record<string, string> }>;
+/** 順位を付ける組: 段階と地方（地方の技は帯を強くしてあるので、前の地方の技と比べない） */
+const groupOf = (r: Row): string => (movesDefs[r.key]?.region ? `${movesDefs[r.key]!.region}:${r.tier}` : r.tier);
+const TIERS = ['base', 'derived', 'unique'];
+const regions = [...new Set(Object.values(movesDefs).flatMap((d) => (d.region ? [d.region] : [])))];
+const groups = [...TIERS, ...regions.flatMap((rg) => TIERS.map((t) => `${rg}:${t}`))].filter((g) => data.rows.some((r) => groupOf(r) === g));
+const groupTitle = (g: string): string => {
+  const [region, tier] = g.includes(':') ? g.split(':') : ['', g];
+  return region ? `${regionNames[region!]?.names.ja ?? region}の${TIER[tier!]}` : TIER[tier!]!;
+};
 const HUGE = 1e7;
 
 const pct = (list: number[], v: number): number => list.filter((x) => x < v).length / Math.max(1, list.length - 1);
 const out: (Row & { label: string; bossPct: number; swarmPct: number; reach: number })[] = [];
-for (const tier of ['base', 'derived', 'unique']) {
-  const rows = data.rows.filter((r) => r.tier === tier);
+for (const group of groups) {
+  const rows = data.rows.filter((r) => groupOf(r) === group);
   // 桁外れの技は、順位の基準から外す（ほかの技がみな下位に見えてしまう）
   const normal = rows.filter((r) => !Object.values(r.dps).some((v) => v >= HUGE));
   const boss = normal.map((r) => r.dps.boss!);
@@ -64,12 +75,12 @@ const md: string[] = [
   '- 技は最大レベル・持ち物なし。プレイヤーはタイプなしの ミュウ Lv50（タイプ一致なし）で、止まったまま右を向く。敵はタイプなし・倒れない・接触ダメージなし。敵の置き方と乱数を変えて 3 回測った平均。',
   '- ボス1体: 半径 28 の中ボスが右から近づく。雑魚 10・50・200: 半径 12 がまわりから群がる（速さはどちらも 60）。数字は 1 秒あたりのダメージ（状態異常の継続ダメージも含む）。',
   '- 止まったボス 50・150・300: 動かないボスを右のその距離に置いた DPS。**届く距離**は、50 の DPS の 1/4 以上が出る一番遠い距離（0 は止まったボスに当たらない）。',
-  '- 見分け: 同じ段階の中で、ボス1体と雑魚200 の DPS がそれぞれ上位何割か。どちらも上位 1/4 で 150 以上届けば **バランスブレイカー候補**（調整の候補）。どちらかが上位 1/4 でも 50 でしか当たらなければ **ハイリスク・ハイリターン**（近づく危険と引き換え）。桁外れは一撃・連鎖などで、倒れない敵では数字に意味がないもの。',
+  '- 見分け: 同じ段階の中で（地方の技は帯を強くしてあるので、地方ごとに別の節）、ボス1体と雑魚200 の DPS がそれぞれ上位何割か。どちらも上位 1/4 で 150 以上届けば **バランスブレイカー候補**（調整の候補）。どちらかが上位 1/4 でも 50 でしか当たらなければ **ハイリスク・ハイリターン**（近づく危険と引き換え）。桁外れは一撃・連鎖などで、倒れない敵では数字に意味がないもの。',
   '',
 ];
-for (const tier of ['base', 'derived', 'unique']) {
-  md.push(`## ${TIER[tier]}`, '', '| 技 | タイプ | 出し方 | ボス1体 | 雑魚10 | 雑魚50 | 雑魚200 | 止まったボス 50 / 150 / 300 | 届く距離 | 見分け |', '|---|---|---|---:|---:|---:|---:|---:|---:|---|');
-  for (const r of out.filter((x) => x.tier === tier).sort((a, b) => b.dps.boss! - a.dps.boss!)) {
+for (const group of groups) {
+  md.push(`## ${groupTitle(group)}`, '', '| 技 | タイプ | 出し方 | ボス1体 | 雑魚10 | 雑魚50 | 雑魚200 | 止まったボス 50 / 150 / 300 | 届く距離 | 見分け |', '|---|---|---|---:|---:|---:|---:|---:|---:|---|');
+  for (const r of out.filter((x) => groupOf(x) === group).sort((a, b) => b.dps.boss! - a.dps.boss!)) {
     md.push(`| ${r.name} | ${r.type} | ${r.pattern} | ${fmt(r.dps.boss!)} | ${fmt(r.dps.n10!)} | ${fmt(r.dps.n50!)} | ${fmt(r.dps.n200!)} | ${fmt(r.dps.at50!)} / ${fmt(r.dps.at150!)} / ${fmt(r.dps.at300!)} | ${r.reach || '—'} | ${r.label === 'バランスブレイカー候補' ? '**バランスブレイカー候補**' : r.label} |`);
   }
   md.push('');

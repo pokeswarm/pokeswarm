@@ -30,6 +30,8 @@ export interface SimLineRule {
 
 /** シミュレーションが使う data/ の定義一式（型だけを参照し、読み込みと組み立ては呼び出し側で行う） */
 export interface SimRules {
+  /** 地方（regions.json の id）。技の region と比べて、ほかの地方の技を候補に出さない（07 の130章）。省略はカントー */
+  region?: string;
   enemies: { kinds: SimEnemyKind[] };
   spawn: SpawnConfig;
   status: StatusConfig;

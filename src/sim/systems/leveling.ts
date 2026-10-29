@@ -217,6 +217,29 @@ export function banUpgrade(world: World, playerId: PlayerId, index: number): voi
   lu.offers.set(playerId, next);
 }
 
+/**
+ * この派生をこのプレイヤーに使えるか（系統・覚えている技の条件）。
+ * - 系統の派生は、同じ元の技と持ち物の今までの派生の代わりになる（ミズゴロウ: みずでっぽう ＋ しんぴのしずく は ハイドロポンプ でなく みずのはどう。07 の130章）
+ * - needsMoves: ほかにも覚えていないといけない技（消費しない。リーフブレード: つるぎのまい）
+ */
+function derivationUsable(world: World, p: Player, d: SimDerivation): boolean {
+  if (d.line !== null && d.line !== p.line) return false;
+  if (d.line === null && world.rules.derivations.some((x) => x.line === p.line && x.from === d.from && x.item === d.item)) return false;
+  if (d.needsMoves && !d.needsMoves.every((n) => p.moves.some((m) => m.move === n.move && m.level >= (n.level ?? 1)))) return false;
+  return true;
+}
+
+/** 新しく覚える技の候補に、この技を出せるか（地方・姿・ランのレベル・覚えている技の条件。07 の130章） */
+function learnable(world: World, p: Player, move: number): boolean {
+  const m = world.rules.moves[move]!;
+  // ほかの地方の技（ホウエンの御三家の技）は出さない。テストの決まり（地方なし）はカントー
+  if (m.region && m.region !== (world.rules.region ?? 'kanto')) return false;
+  if (m.learnForms && !m.learnForms.includes(p.species)) return false;
+  if (m.learnMinLevel && world.level < m.learnMinLevel) return false;
+  if (m.learnWithMoves && !m.learnWithMoves.every((w) => p.moves.some((pm) => pm.move === w))) return false;
+  return true;
+}
+
 /** 派生していない技（タイプの技）かどうか。派生先・固有技は候補に直接は出さない */
 function isBaseMove(world: World, move: number): boolean {
   return !world.rules.derivations.some((d) => d.to === move);
@@ -272,7 +295,7 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
     if (pm.level < moveMaxLevel(rules, pm)) return;
     for (const d of rules.derivations) {
       if (d.from !== pm.move || (d.item !== -1 && !p.items.some((it) => it.item === d.item))) continue;
-      if (d.line !== null && d.line !== p.line) continue;
+      if (!derivationUsable(world, p, d)) continue;
       if (d.minLevel && world.level < d.minLevel) continue;
       if (d.forms && !d.forms.includes(p.species)) continue;
       if (p.moves.some((m) => m.move === d.to)) continue;
@@ -294,6 +317,7 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
     rules.moves.forEach((m, move) => {
       // 進化で使った技（派生・固有技の元の技）は、もう候補に出さない（作者の指摘 2026年10月25日）
       if (!isBaseMove(world, move) || m.teachOnly || p.moves.some((pm) => pm.move === move) || p.consumedMoves?.includes(move)) return;
+      if (!learnable(world, p, move)) return;
       // 覚えられる系統が決まっている技（ノーマルの技・各ポケモン専用の技）は、その系統だけ（ミュウは何でも）
       if (m.learners && !p.learnsAll && !m.learners.includes(p.line)) return;
       // 覚えないタイプ（ズバット: どくの技は最初の かみつく → クロスポイズン だけ）
@@ -384,6 +408,8 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
   world.events.push({ type: 'upgradeChosen', playerId: p.id, offer });
   teachItemMoves(world, p);
   recomputeModifiers(world, p);
+  // ちかい: 味方のちかいの強さは、覚えている人の種類の数で変わる（07 の130章）
+  if (offer.kind === 'moveNew' && world.rules.moves[offer.move]!.pledge) for (const o of world.players) if (o !== p) recomputeModifiers(world, o);
   // 石を取ったら進化することがある（イーブイなど）
   checkEvolution(world, p);
 }
@@ -421,6 +447,7 @@ export function recomputeModifiers(world: World, p: Player): void {
     const passive = world.rules.moves[pm.move]?.passive[pm.level - 1];
     if (passive) addModifiers(mods, passive, 1);
   }
+  mods.powerPct += pledgePowerPct(world, p);
   p.mods = mods;
   const sp = world.rules.species[p.species];
   const d = sp ? deriveStats(world.rules.stats, sp, world.level) : null;
@@ -438,19 +465,33 @@ export function recomputeModifiers(world: World, p: Player): void {
 }
 
 /**
+ * ちかい（07 の130章）: 自分の覚えているちかいの威力 +powerPct %、自分か味方が覚えているほかの種類のちかい1つにつき +perOtherPct %
+ */
+export function pledgePowerPct(world: World, p: Player): number {
+  const moves = world.rules.moves;
+  const held = new Set<number>();
+  for (const o of world.players) for (const pm of o.moves) if (moves[pm.move]?.pledge) held.add(pm.move);
+  let pct = 0;
+  for (const pm of p.moves) {
+    const pl = moves[pm.move]?.pledge;
+    if (pl) pct += pl.powerPct + pl.perOtherPct * [...held].filter((k) => k !== pm.move).length;
+  }
+  return pct;
+}
+
+/**
  * この候補を取ると、派生（固有技を含む）の条件がそろうなら、その派生を返す（そろわなければ null）。
  * 選択画面で「進化できる！」を出すかの判定に使う（出すのは、以前に達成したことのある派生だけ）。
  */
 export function derivationCompletedBy(world: World, p: Player, offer: UpgradeOffer): SimDerivation | null {
   const rules = world.rules;
   const maxOf = (move: number): number => rules.moves[move]!.levels.length;
-  const lineOk = (d: SimDerivation): boolean => d.line === null || d.line === p.line;
   const notYet = (d: SimDerivation): boolean => !p.moves.some((m) => m.move === d.to);
   for (const d of rules.derivations) {
-    if (!lineOk(d) || !notYet(d)) continue;
+    if (!derivationUsable(world, p, d) || !notYet(d)) continue;
     if (d.minLevel && world.level < d.minLevel) continue;
     if (d.forms && !d.forms.includes(p.species)) continue;
-    const hasItem = p.items.some((it) => it.item === d.item);
+    const hasItem = d.item === -1 || p.items.some((it) => it.item === d.item);
     const fromAtMax = p.moves.some((m) => m.move === d.from && m.level >= moveMaxLevel(rules, m));
     // ほかにも最大で持っていないといけない技（ばくれつパンチ）: この候補で最大になる技も数える
     const atMaxAfter = (move: number): boolean =>

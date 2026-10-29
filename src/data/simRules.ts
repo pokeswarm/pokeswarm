@@ -86,6 +86,12 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.scatterDelaySeconds ? { scatterDelaySeconds: def.scatterDelaySeconds } : {}),
       sweepOnce: def.sweepOnce,
       teachOnly: def.teachOnly,
+      ...(def.region ? { region: def.region } : {}),
+      ...(def.learnForms ? { learnForms: def.learnForms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}),
+      ...(def.learnMinLevel ? { learnMinLevel: def.learnMinLevel } : {}),
+      ...(def.extraTypes ? { extraTypes: def.extraTypes.map(typeIndex) } : {}),
+      ...(def.windupSeconds ? { windupSeconds: def.windupSeconds } : {}),
+      ...(def.pledge ? { pledge: def.pledge } : {}),
       aimStrongest: def.aimStrongest,
       aimFacing: def.aimFacing,
       chainRadial: def.chainRadial,
@@ -105,6 +111,15 @@ export function buildSimRules(region?: string): SimRules {
     };
   });
   const moveIndex = (key: string): number => moves.findIndex((m) => m.key === key);
+  const regionId = rs.id;
+  moves.forEach((m, k) => {
+    const lw = movesConfig.moves[m.key]?.learnWithMoves;
+    if (lw) moves[k] = { ...m, learnWithMoves: lw.map(moveIndex) };
+  });
+  const otherRegion = (key: string): boolean => {
+    const r = movesConfig.moves[key]?.region;
+    return r !== undefined && r !== regionId;
+  };
   // ものまね: 遊べるポケモンの最初の技、ゆびをふる: 固有技（自分たち ランダムな技 は除く）
   const startingKeys = [...new Set(Object.values(playablesConfig.pokemon).flatMap((p) => p.startingMoves))];
   const uniqueKeys = derivationsConfig.unique.map((d) => d.to);
@@ -114,7 +129,7 @@ export function buildSimRules(region?: string): SimRules {
     const pool = movesConfig.moves[m.key]?.randomPool;
     if (!pool) return;
     const keys = pool === 'starting' ? startingKeys : pool === 'common' ? commonKeys : uniqueKeys;
-    moves[k] = { ...m, randomPool: keys.map(moveIndex).filter((i) => i !== -1 && moves[i]!.pattern !== 'metronome') };
+    moves[k] = { ...m, randomPool: keys.filter((key) => !otherRegion(key)).map(moveIndex).filter((i) => i !== -1 && moves[i]!.pattern !== 'metronome') };
   });
   // ためている間に出す技（きあいパンチのマッハパンチ）
   moves.forEach((m, k) => {
@@ -148,7 +163,7 @@ export function buildSimRules(region?: string): SimRules {
   const itemIndex = (key: string): number => items.findIndex((i) => i.key === key);
   const derivations = [
     ...derivationsConfig.derivations.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: null, ...(d.minLevel ? { minLevel: d.minLevel } : {}) })),
-    ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: d.item ? itemIndex(d.item) : -1, to: moveIndex(d.to), line: d.line, ...(d.minLevel ? { minLevel: d.minLevel } : {}), ...(d.forms ? { forms: d.forms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}), ...(d.withMoves ? { withMoves: d.withMoves.map(moveIndex) } : {}), ...(d.consumes ? { consumes: d.consumes.map(moveIndex) } : {}), ...(d.inheritLevels ? { inheritLevels: true } : {}), ...(d.levelCap ? { levelCap: d.levelCap } : {}), ...(moveBalanceConfig.tierOverrides[d.to] === 'derived' ? { derivedTier: true } : {}) })),
+    ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: d.item ? itemIndex(d.item) : -1, to: moveIndex(d.to), line: d.line, ...(d.minLevel ? { minLevel: d.minLevel } : {}), ...(d.forms ? { forms: d.forms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}), ...(d.withMoves ? { withMoves: d.withMoves.map(moveIndex) } : {}), ...(d.consumes ? { consumes: d.consumes.map(moveIndex) } : {}), ...(d.needsMoves ? { needsMoves: d.needsMoves.map((n) => ({ move: moveIndex(n.move), ...(n.level ? { level: n.level } : {}) })) } : {}), ...(d.inheritLevels ? { inheritLevels: true } : {}), ...(d.levelCap ? { levelCap: d.levelCap } : {}), ...(moveBalanceConfig.tierOverrides[d.to] === 'derived' ? { derivedTier: true } : {}) })),
   ];
   const itemMoves = Object.entries(playablesConfig.pokemon).flatMap(([line, p]) => p.itemMoves.map((im) => ({ line, item: itemIndex(im.item), move: moveIndex(im.move) })));
   // ポケモンの種類: PokeAPI から生成したすべて。進化先・進化の道具・進化先のプレイヤーのドット絵が無いものは進化の一覧から外す
@@ -202,6 +217,7 @@ export function buildSimRules(region?: string): SimRules {
     };
   }
   return {
+    region: regionId,
     enemies: { kinds: enemiesConfig.kinds.map((k) => ({ ...k, types: generated.pokemon[k.species ?? k.id]!.types.map(typeIndex) })) },
     spawn: rs.spawn,
     status: statusConfig,

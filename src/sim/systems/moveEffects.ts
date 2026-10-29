@@ -51,7 +51,9 @@ export function fireEffects(world: World, trigger: MoveEffect['trigger'], src: F
     }
     // 確率は共有の乱数ではなく、時刻と位置から決める（どのブラウザでも同じ見た目になる）
     if (fx.chance !== undefined && fx.chance < 1 && hash01(world.seed, world.tick, Math.floor(src.x) * 7919 + Math.floor(src.y), index) >= fx.chance) return;
-    applyEffect(world, fx, index, src);
+    // 線（ビーム・突進）の先から起こす（ウェーブタックル: 着いた所で波。07 の130章）
+    const at = fx.atLineEnd && src.length > 0 ? { ...src, x: src.x + src.dirX * src.length, y: src.y + src.dirY * src.length } : src;
+    applyEffect(world, fx, index, at);
   });
 }
 

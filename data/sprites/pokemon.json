@@ -1379,6 +1379,69 @@
       ]
     },
     {
+      "key": "treecko",
+      "dex": 252,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "grovyle",
+      "dex": 253,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "sceptile",
+      "dex": 254,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "torchic",
+      "dex": 255,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "combusken",
+      "dex": 256,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "blaziken",
+      "dex": 257,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "mudkip",
+      "dex": 258,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "marshtomp",
+      "dex": 259,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "swampert",
+      "dex": 260,
+      "uses": [
+        "full"
+      ]
+    },
+    {
       "key": "poochyena",
       "dex": 261,
       "uses": [

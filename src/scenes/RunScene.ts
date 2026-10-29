@@ -1117,9 +1117,13 @@ export class RunScene extends Phaser.Scene {
     if (p.down) return null;
     let best: { color: number; radius: number; alpha: number; t: number } | null = null;
     for (const pm of p.moves) {
-      const c = this.effects.chargeGlow(world.rules.moves[pm.move]!.effect);
-      if (!c || pm.cooldown <= 0 || pm.cooldown > c.seconds) continue;
-      const t = 1 - pm.cooldown / c.seconds;
+      const def = world.rules.moves[pm.move]!;
+      const c = this.effects.chargeGlow(def.effect);
+      if (!c) continue;
+      // 溜める技（リーフブレード）は溜めている間、ほかは再使用の終わりの c.seconds の間
+      const windup = def.windupSeconds && pm.windup !== undefined;
+      if (!windup && (pm.cooldown <= 0 || pm.cooldown > c.seconds)) continue;
+      const t = windup ? 1 - pm.windup! / def.windupSeconds! : 1 - pm.cooldown / c.seconds;
       if (!best || t > best.t) best = { color: hexColor(c.color), radius: c.radius, alpha: c.alpha, t };
     }
     return best;

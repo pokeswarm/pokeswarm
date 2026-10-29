@@ -1025,6 +1025,8 @@ export const moveEffectSchema = z.object({
       hitIntervalSeconds: z.number().positive(),
     })
     .optional(),
+  /** 線（ビーム・突進）の当たり判定なら、線の先から起こす（ウェーブタックル: 着いた所で波が広がる。07 の130章） */
+  atLineEnd: z.boolean().optional(),
   /** 波: その場から radius まで広がる輪 */
   wave: z.object({ powerMultiplier: z.number().nonnegative(), radius: z.number().positive(), durationSeconds: z.number().positive() }).optional(),
 });
@@ -1156,6 +1158,26 @@ export const moveDefSchema = z.object({
   chargeMove: z.object({ move: z.string(), pauseSeconds: z.number().nonnegative() }).optional(),
   /** 候補に出さない（持ち物を持つと覚える技。ほのおのパンチ・かみなりパンチ） */
   teachOnly: z.boolean().optional(),
+  /**
+   * この地方（regions.json の id）のランだけで使う技（ホウエンの御三家の技。07 の130章）。ほかの地方のランでは候補・ゆびをふる・ものまねに出さない
+   * （ミュウも覚えない）。技の強さの帯は move-balance.json の regionTierScale を掛ける
+   */
+  region: z.string().optional(),
+  /** 今の姿がこのどれかのときだけ候補に出る（くさのちかい: ジュプトルから。PokeAPI のポケモンの名前） */
+  learnForms: z.array(z.string()).optional(),
+  /** ランのレベルがこれ以上のときだけ候補に出る（リーフストーム: Lv50） */
+  learnMinLevel: z.number().int().positive().optional(),
+  /** これらの技を全部覚えているときだけ候補に出る（リーフストーム: くさのちかい） */
+  learnWithMoves: z.array(z.string()).optional(),
+  /** ほかにも、このタイプの技として威力の強化（持ち物・天気・マップ）と相性が効く（インファイト: ほのお。だくりゅう: じめん） */
+  extraTypes: z.array(z.string()).optional(),
+  /** 出す前に溜める秒数（リーフブレード・ブレイズキック）。溜めている間は体が光る（見た目のレシピの chargeGlow） */
+  windupSeconds: z.number().positive().optional(),
+  /**
+   * ちかい（くさのちかい・ほのおのちかい・みずのちかい。07 の130章）: 覚えていると威力 +powerPct %。
+   * 自分か協力プレイの味方が、ほかのちかい（pledge のある別の技）を覚えていれば、1種類につき +perOtherPct %
+   */
+  pledge: z.object({ powerPct: z.number().nonnegative(), perOtherPct: z.number().nonnegative() }).optional(),
   /** 名前・タイプ・分類を借りる原作の技（PokeAPI の名前）。同じ名前で中身の違う技（ベイビィ用の ゆびをふる。07 の77章） */
   nameOf: z.string().optional(),
   /**
@@ -2000,6 +2022,11 @@ export const derivationsConfigSchema = z.object({
       /** 進化するとき、持っていれば消費する（なくなる）技。持っていなくても進化できる（ばくれつパンチ: ほのおのパンチ・かみなりパンチ） */
       consumes: z.array(z.string()).optional(),
       /**
+       * ほかにも覚えていないといけない技（消費しない）。level があればそのレベル以上
+       * （リーフブレード: つるぎのまい。だくりゅう: マッドショット Lv8。07 の130章）
+       */
+      needsMoves: z.array(z.object({ move: z.string(), level: z.number().int().positive().optional() })).optional(),
+      /**
        * 材料にした技（元の技・withMoves・consumes で消費した技）の強化分（レベル − 1）を、すべて新しい技のレベルに足す（最大まで）。
        * ばくれつパンチ: きあいパンチ・ほのおのパンチ・かみなりパンチ の強化を受け継ぐ（作者の決定 2026年10月25日）
        */
@@ -2253,5 +2280,7 @@ export const moveBalanceSchema = z.object({
   /** 「重い一撃」の技: 同じ出し方の進化でも、再使用が元の技より長くてよい（威力が高い代わりに再使用が長い。ギガインパクト） */
   heavyHitters: z.array(z.string()).default([]),
   tierOverrides: z.record(z.string(), z.enum(['base', 'derived', 'unique'])).default({}),
+  /** 地方の技（moves.json の region）の帯に掛ける倍率（ホウエン: 敵を強くする分、技も強くする。07 の130章） */
+  regionTierScale: z.record(z.string(), z.number().positive()).default({}),
 });
 export type MoveBalanceConfig = z.infer<typeof moveBalanceSchema>;

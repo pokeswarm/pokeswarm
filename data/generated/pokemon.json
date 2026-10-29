@@ -530,6 +530,34 @@
     ],
     "evolvesTo": []
   },
+  "blaziken": {
+    "dex": 257,
+    "names": {
+      "ja": "バシャーモ",
+      "en": "Blaziken",
+      "fr": "Braségali",
+      "de": "Lohgock",
+      "es": "Blaziken",
+      "it": "Blaziken"
+    },
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 120,
+      "defense": 70,
+      "specialAttack": 110,
+      "specialDefense": 70,
+      "speed": 80
+    },
+    "preEvolutions": [
+      "torchic",
+      "combusken"
+    ],
+    "evolvesTo": []
+  },
   "bulbasaur": {
     "dex": 1,
     "names": {
@@ -991,6 +1019,39 @@
       "shellder"
     ],
     "evolvesTo": []
+  },
+  "combusken": {
+    "dex": 256,
+    "names": {
+      "ja": "ワカシャモ",
+      "en": "Combusken",
+      "fr": "Galifeu",
+      "de": "Jungglut",
+      "es": "Combusken",
+      "it": "Combusken"
+    },
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 85,
+      "defense": 60,
+      "specialAttack": 85,
+      "specialDefense": 60,
+      "speed": 55
+    },
+    "preEvolutions": [
+      "torchic"
+    ],
+    "evolvesTo": [
+      {
+        "to": "blaziken",
+        "trigger": "level",
+        "level": 36
+      }
+    ]
   },
   "crawdaunt": {
     "dex": 342,
@@ -2205,6 +2266,38 @@
         "to": "muk",
         "trigger": "level",
         "level": 38
+      }
+    ]
+  },
+  "grovyle": {
+    "dex": 253,
+    "names": {
+      "ja": "ジュプトル",
+      "en": "Grovyle",
+      "fr": "Massko",
+      "de": "Reptain",
+      "es": "Grovyle",
+      "it": "Grovyle"
+    },
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 65,
+      "defense": 45,
+      "specialAttack": 85,
+      "specialDefense": 65,
+      "speed": 95
+    },
+    "preEvolutions": [
+      "treecko"
+    ],
+    "evolvesTo": [
+      {
+        "to": "sceptile",
+        "trigger": "level",
+        "level": 36
       }
     ]
   },
@@ -3573,6 +3666,39 @@
     ],
     "evolvesTo": []
   },
+  "marshtomp": {
+    "dex": 259,
+    "names": {
+      "ja": "ヌマクロー",
+      "en": "Marshtomp",
+      "fr": "Flobio",
+      "de": "Moorabbel",
+      "es": "Marshtomp",
+      "it": "Marshtomp"
+    },
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 85,
+      "defense": 70,
+      "specialAttack": 60,
+      "specialDefense": 70,
+      "speed": 50
+    },
+    "preEvolutions": [
+      "mudkip"
+    ],
+    "evolvesTo": [
+      {
+        "to": "swampert",
+        "trigger": "level",
+        "level": 36
+      }
+    ]
+  },
   "medicham": {
     "dex": 308,
     "names": {
@@ -3897,6 +4023,36 @@
     },
     "preEvolutions": [],
     "evolvesTo": []
+  },
+  "mudkip": {
+    "dex": 258,
+    "names": {
+      "ja": "ミズゴロウ",
+      "en": "Mudkip",
+      "fr": "Gobou",
+      "de": "Hydropi",
+      "es": "Mudkip",
+      "it": "Mudkip"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 70,
+      "defense": 50,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 40
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "marshtomp",
+        "trigger": "level",
+        "level": 16
+      }
+    ]
   },
   "muk": {
     "dex": 89,
@@ -5164,6 +5320,33 @@
     ],
     "evolvesTo": []
   },
+  "sceptile": {
+    "dex": 254,
+    "names": {
+      "ja": "ジュカイン",
+      "en": "Sceptile",
+      "fr": "Jungko",
+      "de": "Gewaldro",
+      "es": "Sceptile",
+      "it": "Sceptile"
+    },
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 85,
+      "defense": 65,
+      "specialAttack": 105,
+      "specialDefense": 85,
+      "speed": 120
+    },
+    "preEvolutions": [
+      "treecko",
+      "grovyle"
+    ],
+    "evolvesTo": []
+  },
   "scizor": {
     "dex": 212,
     "names": {
@@ -6187,6 +6370,34 @@
     "preEvolutions": [],
     "evolvesTo": []
   },
+  "swampert": {
+    "dex": 260,
+    "names": {
+      "ja": "ラグラージ",
+      "en": "Swampert",
+      "fr": "Laggron",
+      "de": "Sumpex",
+      "es": "Swampert",
+      "it": "Swampert"
+    },
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 110,
+      "defense": 90,
+      "specialAttack": 85,
+      "specialDefense": 90,
+      "speed": 60
+    },
+    "preEvolutions": [
+      "mudkip",
+      "marshtomp"
+    ],
+    "evolvesTo": []
+  },
   "swinub": {
     "dex": 220,
     "names": {
@@ -6452,6 +6663,36 @@
       }
     ]
   },
+  "torchic": {
+    "dex": 255,
+    "names": {
+      "ja": "アチャモ",
+      "en": "Torchic",
+      "fr": "Poussifeu",
+      "de": "Flemmli",
+      "es": "Torchic",
+      "it": "Torchic"
+    },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 60,
+      "defense": 40,
+      "specialAttack": 70,
+      "specialDefense": 50,
+      "speed": 45
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "combusken",
+        "trigger": "level",
+        "level": 16
+      }
+    ]
+  },
   "torkoal": {
     "dex": 324,
     "names": {
@@ -6533,6 +6774,36 @@
         "to": "vibrava",
         "trigger": "level",
         "level": 35
+      }
+    ]
+  },
+  "treecko": {
+    "dex": 252,
+    "names": {
+      "ja": "キモリ",
+      "en": "Treecko",
+      "fr": "Arcko",
+      "de": "Geckarbor",
+      "es": "Treecko",
+      "it": "Treecko"
+    },
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 45,
+      "defense": 35,
+      "specialAttack": 65,
+      "specialDefense": 55,
+      "speed": 70
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "grovyle",
+        "trigger": "level",
+        "level": 16
       }
     ]
   },

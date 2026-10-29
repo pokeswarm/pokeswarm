@@ -24,7 +24,7 @@ import {
 import type { Player, PlayerMove } from '../entities/player';
 import { DMG_CRIT, type HitEffect } from '../events';
 import { axisToUnit } from '../math';
-import { typeFlags, typeMultiplier, type MoveStats } from '../moves';
+import { typeFlags, typeMultiplier, type MoveStats, type SimMoveDef } from '../moves';
 import type { World } from '../world';
 import { applyHitEffect } from './commands';
 import { fireDelayedExplosion, fireEffects, type FxSource } from './moveEffects';
@@ -62,7 +62,7 @@ export function playerMoveStats(world: World, p: Player, pm: { move: number; lev
   const def = world.rules.moves[pm.move]!;
   // 自分を中心に円状に広がる技（だいばくはつ など）は、半径（range）を射程の強化ではなく範囲の強化で広げる（作者の決定 2026年10月25日）
   const selfRadius = SELF_RADIUS_PATTERNS.has(def.pattern);
-  const areaPct = m.areaPct + (m.typeAreaPct[def.type] ?? 0);
+  const areaPct = m.areaPct + typeAreaPctOf(m, def);
   if (m.amountBonus === 0 && m.durationPct === 0 && m.rangePct === 0 && m.pierceBonus === 0 && !(selfRadius && areaPct !== 0)) return st;
   const rangePct = selfRadius ? areaPct : m.rangePct * (def.rangeBonusScale ?? 1);
   // 太い追従レーザー・円: 本数は増やさず、増えた分を威力に変える（元の本数 n に +k なら ×(n + 割合×k)/n。07 の128章）
@@ -95,6 +95,25 @@ function markBonusShots(world: World, p: Player, pm: PlayerMove, st: MoveStats, 
   for (let i = from + keep; i < pr.count; i++) pr.noFx[i] = 1;
 }
 
+/** 技のタイプ（2つ目のタイプ extraTypes も。インファイト: かくとう と ほのお）の番号 */
+export function moveTypesOf(def: SimMoveDef): readonly number[] {
+  return def.extraTypes ? [def.type, ...def.extraTypes] : [def.type];
+}
+
+/** タイプの範囲の強化（2つ目のタイプの分も足す） */
+function typeAreaPctOf(m: Player['mods'], def: SimMoveDef): number {
+  return moveTypesOf(def).reduce((sum, t) => sum + (m.typeAreaPct[t] ?? 0), 0);
+}
+
+/** タイプの威力の強化: 持ち物・あまごい・マップの効果（2つ目のタイプの分も足す） */
+function typePowerPctOf(world: World, p: Player, def: SimMoveDef): number {
+  let pct = 0;
+  for (const t of moveTypesOf(def)) {
+    pct += (p.mods.typePowerPct[t] ?? 0) + (p.rain && p.rain.type === t && world.tick < p.rain.untilTick ? p.rain.pct : 0) + fieldTypePct(world, t);
+  }
+  return pct;
+}
+
 /** 持ち物の効果を掛けた、その技の威力・大きさ・速さ・クールダウン */
 export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: MoveStats) {
   const def = world.rules.moves[pm.move]!;
@@ -105,11 +124,11 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
     power:
       st.power *
       (def.damageClass === 'physical' ? p.physicalPower : p.specialPower) *
-      Math.max(0, 1 + (m.powerPct + classPct + (m.typePowerPct[def.type] ?? 0) + (p.rain && p.rain.type === def.type && world.tick < p.rain.untilTick ? p.rain.pct : 0) + fieldTypePct(world, def.type)) / 100) *
+      Math.max(0, 1 + (m.powerPct + classPct + typePowerPctOf(world, p, def)) / 100) *
       heldPowerMultiplier(world, p) *
       // とっておき: 覚えているほかの技が多いほど強い
       (1 + (st.perMovePowerPct * Math.max(0, p.moves.length - 1)) / 100),
-    size: st.size * Math.max(0.1, 1 + (m.areaPct + (m.typeAreaPct[def.type] ?? 0)) / 100),
+    size: st.size * Math.max(0.1, 1 + (m.areaPct + typeAreaPctOf(m, def)) / 100),
     speed: st.speed * Math.max(0.1, 1 + m.projectileSpeedPct / 100),
     cooldownSeconds: st.cooldownSeconds * Math.max(0.2, 1 + m.cooldownPct / 100),
   };
@@ -215,6 +234,16 @@ export function useMoves(world: World): void {
         continue;
       }
       if (pm.cooldown > 0) continue;
+      // 溜める技（リーフブレード・ブレイズキック）: windupSeconds 溜めてから出す（溜めている間は体が光る。RunScene.chargeOf）
+      if (def.windupSeconds) {
+        if (pm.windup === undefined) {
+          pm.windup = def.windupSeconds;
+          continue;
+        }
+        pm.windup -= world.dt;
+        if (pm.windup > 0) continue;
+        pm.windup = undefined;
+      }
       const needsTarget = def.pattern === 'nearest' || def.pattern === 'homing' || def.pattern === 'chain';
       // 射程内に敵がいなければ待つ
       if (needsTarget && nearestEnemy(world, p.x, p.y, st.range) === -1) {
@@ -1410,7 +1439,7 @@ export function moveProjectiles(world: World): void {
       const amount = instakill
         ? INSTAKILL_DAMAGE
         : pr.damage[i]! *
-          typeMultiplier(world.rules.types, world.rules.combat.typeMultipliers, def.type, owner?.types ?? [], kind?.types ?? []) *
+          Math.max(...moveTypesOf(def).map((t) => typeMultiplier(world.rules.types, world.rules.combat.typeMultipliers, t, owner?.types ?? [], kind?.types ?? []))) *
           (crit ? world.rules.combat.critMultiplier : 1) *
           statusBonus;
       // ダメージの数字（設定でオンのときだけ。一撃は出さない）

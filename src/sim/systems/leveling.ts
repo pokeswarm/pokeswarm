@@ -249,6 +249,23 @@ function learnable(world: World, p: Player, move: number): boolean {
   return true;
 }
 
+/**
+ * 新しく覚える技の候補に出せるか（枠の空きは見ない）。レベルアップの候補と、技の一覧（docs/16）で使う
+ */
+export function canLearnNewMove(world: World, p: Player, move: number): boolean {
+  const rules = world.rules;
+  const m = rules.moves[move]!;
+  // 進化で使った技（派生・固有技の元の技）は、もう候補に出さない（作者の指摘 2026年10月25日）
+  if (!isBaseMove(world, move) || m.teachOnly || p.moves.some((pm) => pm.move === move) || p.consumedMoves?.includes(move)) return false;
+  if (!learnable(world, p, move)) return false;
+  // 覚えられる系統が決まっている技（ノーマルの技・各ポケモン専用の技）は、その系統だけ（ミュウは何でも）
+  if (m.learners && !p.learnsAll && !m.learners.includes(p.line)) return false;
+  // 覚えないタイプ（ズバット: どくの技は最初の かみつく → クロスポイズン だけ）
+  if (rules.lines?.[p.line]?.excludeMoveTypes.includes(m.type)) return false;
+  const normal = rules.types.names.indexOf('normal');
+  return m.type === normal || p.types.includes(m.type) || p.moveTypes.includes(m.type) || (!!m.region && !!m.learners?.includes(p.line));
+}
+
 /** 派生していない技（タイプの技）かどうか。派生先・固有技は候補に直接は出さない */
 function isBaseMove(world: World, move: number): boolean {
   return !world.rules.derivations.some((d) => d.to === move);
@@ -316,7 +333,6 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
   });
 
   const pool: UpgradeOffer[] = [];
-  const normal = rules.types.names.indexOf('normal');
   p.moves.forEach((pm, slot) => {
     if (pm.level < moveMaxLevel(rules, pm)) pool.push({ kind: 'moveUp', slot });
   });
@@ -324,15 +340,8 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
   // トゲピー: 進化するまで新しい技を覚えない（系統の fixedForms）
   const fixedNow = p.fixedMoves || !!rules.lines?.[p.line]?.fixedForms.includes(p.species);
   if (p.moves.length < rules.combat.maxMoveSlots && !fixedNow) {
-    rules.moves.forEach((m, move) => {
-      // 進化で使った技（派生・固有技の元の技）は、もう候補に出さない（作者の指摘 2026年10月25日）
-      if (!isBaseMove(world, move) || m.teachOnly || p.moves.some((pm) => pm.move === move) || p.consumedMoves?.includes(move)) return;
-      if (!learnable(world, p, move)) return;
-      // 覚えられる系統が決まっている技（ノーマルの技・各ポケモン専用の技）は、その系統だけ（ミュウは何でも）
-      if (m.learners && !p.learnsAll && !m.learners.includes(p.line)) return;
-      // 覚えないタイプ（ズバット: どくの技は最初の かみつく → クロスポイズン だけ）
-      if (rules.lines?.[p.line]?.excludeMoveTypes.includes(m.type)) return;
-      if (m.type === normal || p.types.includes(m.type) || p.moveTypes.includes(m.type) || (m.region && m.learners?.includes(p.line))) pool.push({ kind: 'moveNew', move });
+    rules.moves.forEach((_, move) => {
+      if (canLearnNewMove(world, p, move)) pool.push({ kind: 'moveNew', move });
     });
   }
   p.items.forEach((it, slot) => {

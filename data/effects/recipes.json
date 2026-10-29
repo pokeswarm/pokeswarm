@@ -3965,28 +3965,35 @@
     "leaf-blade": {
       "extends": "grass.base",
       "chargeGlow": {
-        "color": "#b9f6ca",
+        "color": "#ccff90",
         "seconds": 0.45,
         "radius": 64,
         "alpha": 1
       },
-      "ownerGhost": {
-        "tint": "#b9f6ca",
-        "alpha": 0.7,
-        "afterimages": 6,
-        "spacingTicks": 1
+      "castSprite": {
+        "id": "blade-slash",
+        "fit": "line",
+        "size": 1,
+        "seconds": 0.28,
+        "radius": 8,
+        "lineLength": 900
       },
-      "impact": {
-        "flash": {
-          "radius": 160,
-          "color": "#e8f5e9",
-          "alpha": 0.6
-        }
+      "screenFlash": {
+        "color": "#ffffff",
+        "alpha": 0.35,
+        "durationMs": 160
+      },
+      "projectile": {
+        "glowColor": "#ccff90",
+        "glowScale": 1.05,
+        "coreScale": 0.2,
+        "shapeAlpha": 0.18
       },
       "sprite": {
-        "id": "claw-big",
-        "fit": "front",
-        "size": 1.5
+        "id": "blade-ring",
+        "fit": "ring",
+        "size": 1,
+        "alpha": 0.85
       }
     },
     "swords-dance": {
@@ -4030,7 +4037,6 @@
         "rotate": "velocity",
         "variants": [
           "fist-fire",
-          "kick",
           "flame-crash"
         ]
       }
@@ -4051,13 +4057,47 @@
       },
       "impact": {
         "flash": {
-          "radius": 120
+          "radius": 40
         }
       },
+      "linger": {
+        "spread": 0,
+        "blend": "add",
+        "colors": [
+          "#ffcc80",
+          "#ff7043"
+        ],
+        "lifespanMs": [
+          400,
+          700
+        ],
+        "speed": [
+          4,
+          12
+        ],
+        "scale": [
+          0.2,
+          0
+        ],
+        "alpha": [
+          0.7,
+          0
+        ],
+        "gravityY": -40,
+        "perSecond": 4,
+        "fillAlpha": 0.16,
+        "maxPerSecond": 12
+      },
       "sprite": {
-        "id": "streak-fire",
+        "id": "flame-leg",
         "fit": "thrust",
-        "size": 1
+        "size": 1,
+        "growSeconds": 0.1
+      },
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.2,
+        "shapeAlpha": 0.22
       }
     },
     "water-pulse": {
@@ -4115,8 +4155,13 @@
       "sprite": {
         "id": "water-stream",
         "fit": "line",
-        "size": 1.3,
+        "size": 0.8,
         "growSeconds": 0.15
+      },
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3,
+        "shapeAlpha": 0.25
       }
     }
   }

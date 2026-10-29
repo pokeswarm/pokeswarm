@@ -2295,6 +2295,71 @@ function megahornLance(): SpriteOut {
 }
 
 /**
+ * リーフブレード（07 の130章。作者の指摘 2026年10月29日: ひっかく・きりさく の絵は使わない）: 抜刀して画面を横一閃に切る白黒の剣筋。
+ * 細い白い芯に黒いふち、両端は細くとがる。2コマで白と黒が入れ替わる（明滅）
+ */
+function bladeSlash(): SpriteOut {
+  const palette = ['#000000', '#ffffff', '#9e9e9e'];
+  const H = 8;
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 10, middle: 12, end: 10 }, 2, (x, y, f, part) => {
+    const taper = part === 'start' ? x / 10 : part === 'end' ? 1 - x / 10 : 1;
+    const dy = Math.abs(y - mid);
+    if (dy > 0.6 + 2.6 * taper) return -1;
+    const core = dy < 0.4 + 1.2 * taper;
+    return core === (f === 0) ? 1 : 0;
+  }, -1);
+  return { palette, frameMs: 50, parts };
+}
+
+/** リーフブレードの残像: 自分の周りを1周、刃が通り抜けた後の薄い黄緑の筋（輪に沿って並べる） */
+function bladeRing(): SpriteOut {
+  const palette = ['#33691e', '#9ccc65', '#ccff90', '#f1f8e9'];
+  const W = 12;
+  const H = 8;
+  const frames: Grid[] = [];
+  for (let f = 0; f < 2; f++) {
+    frames.push(
+      fill(blank(W, H), (x, y) => {
+        // 輪の向きに流れる筋（外ほど明るい）。並べてつながるよう、筋の長さは周期 W
+        for (const [k, lane] of [1.5, 3.5, 5.5, 6.8].entries()) {
+          if (Math.abs(y - lane) > (k === 2 ? 0.8 : 0.5)) continue;
+          if ((x + f * 4 + k * 3) % W < W * (k === 2 ? 0.8 : 0.55)) return k === 3 ? 3 : k === 2 ? 2 : 1;
+        }
+        return -1;
+      }),
+    );
+  }
+  return { palette, frameMs: 60, parts: { middle: frames.map(toRows) } };
+}
+
+/**
+ * ブレイズキック（作者の指摘 2026年10月29日: 脚っぽくなくてよい。炎をまとった脚らしきもの）: 右へ突き出す、炎に包まれた細長い脚。
+ * 芯は明るい黄白、先は丸く光り、上下のふちから炎の舌が後ろへなびく（2コマでゆらぐ）
+ */
+function flameLeg(): SpriteOut {
+  // 0 輪郭・1 濃い赤・2 だいだい・3 黄・4 黄白
+  const palette = ['#4e1206', '#d84315', '#ff9800', '#ffe082', '#fff8e1'];
+  const frames = [0, 1].map((f) =>
+    shape(32, (u, w) => {
+      if (u > 0.97 || u < -0.97) return -1;
+      // 見た目と当たり判定をそろえる: 長さに対して細い（太さは長さの 2 割ほど）
+      const v = w * 2.2;
+      // 脚の芯: 根元は細く、先へ太くなって丸い先（足先）
+      const tip = Math.hypot(u - 0.72, v) < 0.24;
+      const core = 0.08 + 0.12 * ((u + 0.97) / 1.69);
+      if (tip || (u < 0.72 && Math.abs(v) < core)) return Math.abs(v) < core * 0.45 || Math.hypot(u - 0.76, v) < 0.12 ? 4 : 3;
+      // 炎: 芯のまわりを包み、後ろ（左）ほど外へなびく舌
+      const flick = Math.sin(u * 11 + f * 2.4 + (v > 0 ? 1.3 : 0)) * 0.07;
+      const flame = core + 0.1 + (0.97 - u) * 0.16 + flick;
+      if (Math.abs(v) < flame && u < 0.9) return Math.abs(v) < flame * 0.72 ? 2 : 1;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/**
  * つららおとし: 空から落ちる大きな氷の塊（下向きにとがる。作者の指摘 2026年10月27日）。上はぎざぎざの割れ口、
  * 下へ細くなって鋭い先。左の面が明るく、真ん中に稜線
  */
@@ -2936,6 +3001,9 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'ice-chunk': () => iceChunk(),
     'sand-grain': () => sandGrain(),
     'rain-drop': () => rainDrop(),
+    'blade-slash': () => bladeSlash(),
+    'blade-ring': () => bladeRing(),
+    'flame-leg': () => flameLeg(),
 };
 
 /** 絵の名前の一覧 */

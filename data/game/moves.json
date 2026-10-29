@@ -7359,23 +7359,20 @@
       ]
     },
     "leaf-blade": {
-      "pattern": "melee",
+      "pattern": "nova",
       "effect": "leaf-blade",
       "region": "hoenn",
       "windupSeconds": 0.45,
-      "body": {
-        "lungeDistance": 30,
-        "afterimages": 6
-      },
+      "sweep": 0.35,
       "base": {
-        "power": 200,
+        "power": 138.9,
         "cooldownSeconds": 1.8,
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 0,
-        "size": 120,
-        "range": 30,
-        "durationSeconds": 0.2,
+        "size": 30,
+        "range": 190,
+        "durationSeconds": 0.3,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
         "knockback": 320,
@@ -7384,37 +7381,36 @@
         "statusSeconds": 0,
         "spreadDegrees": 0,
         "lifestealPct": 0,
-        "arcDegrees": 220,
         "critChancePct": 30
       },
       "levels": [
         {
-          "size": 6,
-          "power": 25.5
+          "range": 8,
+          "power": 23.2
         },
         {
           "cooldownSeconds": -0.08,
-          "power": 20.9
+          "power": 15.1
         },
         {
-          "arcDegrees": 20,
-          "power": 20.2
+          "range": 8,
+          "power": 22.2
         },
         {
-          "size": 6,
-          "power": 19.7
+          "size": 4,
+          "power": 22.3
         },
         {
           "cooldownSeconds": -0.08,
-          "power": 14.1
+          "power": 10.9
         },
         {
-          "size": 8,
-          "power": 13.2
+          "range": 10,
+          "power": 21.2
         },
         {
-          "arcDegrees": 30,
-          "power": 8.1
+          "range": 12,
+          "power": 21.2
         }
       ]
     },
@@ -8034,7 +8030,7 @@
       ]
     },
     "blaze-kick": {
-      "pattern": "melee",
+      "pattern": "beam",
       "effect": "blaze-kick",
       "region": "hoenn",
       "learners": [
@@ -8045,33 +8041,18 @@
         "fire-pledge"
       ],
       "windupSeconds": 0.5,
-      "frontBox": {
-        "start": 0,
-        "end": 1,
-        "halfWidth": 0.22
-      },
       "body": {
         "lungeDistance": 34,
         "afterimages": 3
       },
-      "effects": [
-        {
-          "trigger": "cast",
-          "wave": {
-            "powerMultiplier": 0.3,
-            "radius": 160,
-            "durationSeconds": 0.35
-          }
-        }
-      ],
       "base": {
-        "power": 280.1,
+        "power": 369,
         "cooldownSeconds": 2,
         "count": 1,
         "intervalSeconds": 0.1,
-        "speed": 0,
-        "size": 230,
-        "range": 10,
+        "speed": 400,
+        "size": 26,
+        "range": 240,
         "durationSeconds": 0.22,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -8086,32 +8067,45 @@
       },
       "levels": [
         {
-          "size": 10,
-          "power": 35.9
+          "range": 10,
+          "power": 55.6
         },
         {
           "cooldownSeconds": -0.08,
-          "power": 31
+          "power": 41.6
         },
         {
-          "size": 10,
-          "power": 30.7
-        },
-        {
-          "cooldownSeconds": -0.08,
-          "power": 24.7
-        },
-        {
-          "size": 12,
-          "power": 23.5
+          "range": 10,
+          "power": 51.1
         },
         {
           "cooldownSeconds": -0.08,
-          "power": 18.6
+          "power": 33.8
         },
         {
-          "size": 14,
-          "power": 16.5
+          "size": 2,
+          "power": 39
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 25.8
+        },
+        {
+          "range": 14,
+          "power": 38.5
+        }
+      ],
+      "aimFacing": true,
+      "effects": [
+        {
+          "trigger": "spawn",
+          "puddle": {
+            "sizeMultiplier": 1,
+            "powerMultiplier": 0.1,
+            "durationSeconds": 1.6,
+            "hitIntervalSeconds": 0.5,
+            "path": true
+          }
         }
       ]
     },
@@ -8390,13 +8384,13 @@
       "pattern": "beam",
       "effect": "wave-crash",
       "base": {
-        "power": 256.8,
+        "power": 475.4,
         "cooldownSeconds": 2.6,
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 0,
-        "size": 40,
-        "range": 700,
+        "size": 20,
+        "range": 320,
         "durationSeconds": 0.3,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -8412,29 +8406,29 @@
       "levels": [
         {
           "size": 5,
-          "power": 27.2
+          "power": 35.7
         },
         {
-          "power": 40.8
+          "power": 73.4
         },
         {
           "range": 50,
-          "power": 29.3
+          "power": 37.4
         },
         {
           "cooldownSeconds": -0.3,
-          "power": -5.9
+          "power": -10.4
         },
         {
           "size": 5,
-          "power": 16.5
+          "power": 14
         },
         {
-          "power": 33.3
+          "power": 57
         },
         {
           "count": 1,
-          "power": -182.4
+          "power": -312.7
         }
       ],
       "body": {
@@ -8443,12 +8437,10 @@
       },
       "effects": [
         {
-          "trigger": "end",
-          "atLineEnd": true,
-          "wave": {
-            "powerMultiplier": 0.5,
-            "radius": 180,
-            "durationSeconds": 0.5
+          "trigger": "hit",
+          "explode": {
+            "sizeMultiplier": 2.6,
+            "powerMultiplier": 0.35
           }
         }
       ],

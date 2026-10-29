@@ -1040,7 +1040,7 @@ export class RunScene extends Phaser.Scene {
         // 使った瞬間の絵（しおふき: 真上へ噴き上がる潮）
         const cs = this.effects.castSprite(w.rules.moves[ev.move]!.effect);
         const p = cs ? w.players.find((q) => q.id === ev.playerId) : undefined;
-        if (cs && p) this.addStrike(cs, p.x, p.y, cs.radius, cs.seconds);
+        if (cs && p) this.addStrike(cs, cs.lineLength ? p.x - cs.lineLength / 2 : p.x, p.y, cs.radius, cs.seconds, cs.lineLength ?? 0);
       } else if (ev.type === 'projectileHit') {
         // 当たった所の絵（ぜったいれいど: 氷の像）
         const hs = this.effects.hitSprite(w.rules.moves[ev.move]!.effect);
@@ -1104,9 +1104,10 @@ export class RunScene extends Phaser.Scene {
   }
 
   /** その場に決まった秒数だけ出す絵（使った瞬間の絵・当たった所の絵）。ボスの技が落ちた所の絵と同じ置き場に入れる */
-  private addStrike(spec: SpriteSpec, x: number, y: number, radius: number, seconds: number): void {
+  /** length があれば (x, y) から右へその長さの線に並べる（fit line。リーフブレードの剣筋） */
+  private addStrike(spec: SpriteSpec, x: number, y: number, radius: number, seconds: number, length = 0): void {
     this.strikes.push({
-      item: { spec, x, y, radius, band: 0, dirX: 1, dirY: 0, length: 0, vx: 0, vy: 0, seed: this.strikes.length },
+      item: { spec, x, y, radius, band: 0, dirX: 1, dirY: 0, length, vx: 0, vy: 0, seed: this.strikes.length },
       start: this.time.now / 1000,
       seconds,
     });

@@ -1025,8 +1025,6 @@ export const moveEffectSchema = z.object({
       hitIntervalSeconds: z.number().positive(),
     })
     .optional(),
-  /** 線（ビーム・突進）の当たり判定なら、線の先から起こす（ウェーブタックル: 着いた所で波が広がる。07 の130章） */
-  atLineEnd: z.boolean().optional(),
   /** 波: その場から radius まで広がる輪 */
   wave: z.object({ powerMultiplier: z.number().nonnegative(), radius: z.number().positive(), durationSeconds: z.number().positive() }).optional(),
 });
@@ -1585,7 +1583,14 @@ export const effectRecipeSchema = z.object({
   /** 技そのものに、もう1枚重ねる絵（だいばくはつ: 広がる爆発の端に、派手な炎の帯を輪に沿って並べる） */
   edgeSprite: moveSpriteSpec.optional(),
   /** 技を使った瞬間に、使ったポケモンの位置に seconds の間出す絵（しおふき: 真上へ噴き上がる潮）。radius はワールドの単位 */
-  castSprite: moveSpriteSpec.extend({ seconds: z.number().positive(), radius: z.number().positive() }).optional(),
+  castSprite: moveSpriteSpec
+    .extend({
+      seconds: z.number().positive(),
+      radius: z.number().positive(),
+      /** fit line: 使ったポケモンを真ん中にした、この長さ（ワールドの単位）の横の線に並べる（リーフブレード: 画面を横一閃に切る剣筋。太さは radius） */
+      lineLength: z.number().positive().optional(),
+    })
+    .optional(),
   /** 技が敵に当たった所に seconds の間出す絵（ぜったいれいど: 氷の像）。radius はワールドの単位 */
   hitSprite: moveSpriteSpec.extend({ seconds: z.number().positive(), radius: z.number().positive() }).optional(),
   /** 当たり判定の範囲を塗らない（天気: 画面全体なので、降る雪だけで見せる） */

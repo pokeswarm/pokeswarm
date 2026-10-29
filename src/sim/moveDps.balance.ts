@@ -15,6 +15,7 @@ import type { SimEnemyKind } from './rules';
  * - 敵はタイプなし（相性なし）・HP がとても多い（倒れないので数が変わらない）・接触ダメージなし
  * - ボス 1 体: 中ボスの大きさ（半径 28）。右から近づいてくる。雑魚 10・50・200 体: 半径 12、まわりから近づいて群がる（速さはどちらも 60）
  * - 止まったボス（距離 50・150・300）: 動かないボスを右に置き、どこまで離れて戦えるか（届く距離）を見る
+ * - 持ち物を持たせて測る: DPS_ITEMS=pp-max:2（持ち物のキー:レベル。カンマ区切り）
  * - 雑魚・ボスは自動で出さない。一撃（じわれ・ほろびのうた）は倒れない敵に意味がないので「一撃」と書く
  */
 const SECONDS = 60;
@@ -51,6 +52,10 @@ function measure(moveKey: string, scene: { count: number; boss: boolean; still?:
   const species = rules.species.findIndex((s) => s.key === 'mew');
   const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, types: [], species, moves: [{ move, level: rules.moves[move]!.levels.length }] });
   w.level = 50;
+  p.items = (process.env.DPS_ITEMS?.split(',') ?? []).map((x) => {
+    const [key, level] = x.split(':');
+    return { item: rules.items.findIndex((it) => it.key === key), level: Number(level ?? 1) };
+  });
   recomputeModifiers(w, p);
   p.hp = p.maxHp = 1e9;
   p.facingX = 1;

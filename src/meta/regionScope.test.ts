@@ -151,6 +151,7 @@ describe('地方ごとの記録・強化・ショップ（02 の17章）', () =>
     const cfg: AchievementsConfig = {
       initialPokemon: ['charmander'],
       initialItems: ['x-attack'],
+      regionInitialItems: {},
       startItem: { clears: 1 },
       achievements: [
         { id: 'kanto-clear', region: 'kanto', hidden: false, condition: { stat: 'clears', atLeast: 1 } },

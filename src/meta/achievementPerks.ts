@@ -27,8 +27,9 @@ export function regionAchieved(cfg: AchievementsConfig, achieved: readonly strin
   return achieved.filter((id) => ids.has(id));
 }
 
-export function achievementPerks(cfg: AchievementsConfig, achieved: readonly string[]): AchievementPerks {
-  const items = new Set(cfg.initialItems);
+/** region: その地方だけ最初から出る持ち物（regionInitialItems）も足す */
+export function achievementPerks(cfg: AchievementsConfig, achieved: readonly string[], region?: string): AchievementPerks {
+  const items = new Set([...cfg.initialItems, ...(region ? (cfg.regionInitialItems[region] ?? []) : [])]);
   const startMoveLevel: Record<string, number> = {};
   const mods: Record<string, number> = {};
   let coopXpPct = 0;

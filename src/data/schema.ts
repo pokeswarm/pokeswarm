@@ -364,6 +364,8 @@ export const achievementsConfigSchema = z.object({
   initialPokemon: z.array(z.string().min(1)).min(1),
   /** 最初から候補に出る持ち物（ほかは実績で解放する） */
   initialItems: z.array(z.string().min(1)).min(1),
+  /** その地方のランだけ、最初から候補に出る持ち物（ホウエン: 技の材料のメタルコート・つきのいし・きれいなウロコ。07 の134章） */
+  regionInitialItems: z.record(z.string(), z.array(z.string().min(1))).default({}),
   /** 最初の持ち物（作者の決定 2026年10月24日）: そのポケモンで clears 回クリアすると、ラン開始時に解放済みの持ち物を1つ選んで持っていける */
   startItem: z.object({ clears: z.number().int().positive() }),
   achievements: z.array(

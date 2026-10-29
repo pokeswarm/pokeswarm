@@ -3674,5 +3674,217 @@
     ],
     "license": "CC BY-NC 4.0",
     "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0291"
+  },
+  {
+    "key": "slakoth",
+    "dex": 287,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0287"
+  },
+  {
+    "key": "swablu",
+    "dex": 333,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      },
+      {
+        "name": "Emmuffin",
+        "contact": "https://twitter.com/Ernmuffin"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0333"
+  },
+  {
+    "key": "feebas",
+    "dex": 349,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0349"
+  },
+  {
+    "key": "beldum",
+    "dex": 374,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0374"
+  },
+  {
+    "key": "metang",
+    "dex": 375,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0375"
+  },
+  {
+    "key": "metagross",
+    "dex": 376,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0376"
+  },
+  {
+    "key": "ralts",
+    "dex": 280,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      },
+      {
+        "name": "JFain",
+        "contact": null
+      },
+      {
+        "name": "NeroIntruder",
+        "contact": "https://twitter.com/NeroIntruder"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0280"
+  },
+  {
+    "key": "kirlia",
+    "dex": 281,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      },
+      {
+        "name": "JFain",
+        "contact": null
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0281"
+  },
+  {
+    "key": "gardevoir",
+    "dex": 282,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0282"
+  },
+  {
+    "key": "aggron",
+    "dex": 306,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0306"
+  },
+  {
+    "key": "azurill",
+    "dex": 298,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0298"
+  },
+  {
+    "key": "marill",
+    "dex": 183,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      },
+      {
+        "name": "JFain",
+        "contact": null
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0183"
+  },
+  {
+    "key": "azumarill",
+    "dex": 184,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0184"
+  },
+  {
+    "key": "wynaut",
+    "dex": 360,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0360"
+  },
+  {
+    "key": "wobbuffet",
+    "dex": 202,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0202"
+  },
+  {
+    "key": "mawile",
+    "dex": 303,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0303"
   }
 ]

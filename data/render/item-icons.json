@@ -1260,6 +1260,36 @@
         "i": "#48555c",
         "j": "#acc5cf"
       }
+    },
+    "prism-scale": {
+      "rows": [
+        "....aaaaa.....",
+        "....bbbbba....",
+        "...bcdddcbb...",
+        "..bcddedddcb..",
+        ".abeeeeeeddba.",
+        "fgchhhhheedcgf",
+        "fgeiiiihheddbf",
+        "fghjjjjiheedbf",
+        "fgijjjjiheddbf",
+        "fgjjjjjihedcgf",
+        "fgjjjjjihecg..",
+        "fajjjihebbg...",
+        "..agggggaf....",
+        "..fffffff....."
+      ],
+      "palette": {
+        "a": "#555358",
+        "b": "#7b929b",
+        "c": "#99c0cf",
+        "d": "#a1dff7",
+        "e": "#92c5ea",
+        "f": "#313131",
+        "g": "#697083",
+        "h": "#aab0df",
+        "i": "#bc9ed7",
+        "j": "#e383c8"
+      }
     }
   }
 }

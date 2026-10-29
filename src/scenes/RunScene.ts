@@ -329,7 +329,7 @@ export class RunScene extends Phaser.Scene {
     for (const b of rules.stage.legendary?.bonusRounds ?? []) if (roster.some((r) => r.achievements.includes(b.achievement))) this.sim.world.wingsEnabled.add(b.item);
     // 実績の報酬（07 23・24章）: 各自の達成した実績から、解放した持ち物・特殊なバフを計算する。協力プレイの経験値は部屋の全員に
     // 報酬は、遊ぶ地方の実績のぶんだけ（02 の17章）
-    const perksOf = new Map(roster.map((r) => [r.id, achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, r.achievements, this.stageOfRegion.id))]));
+    const perksOf = new Map(roster.map((r) => [r.id, achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, r.achievements, this.stageOfRegion.id), this.stageOfRegion.id)]));
     const coopXpPct = role === 'solo' ? 0 : Math.max(0, ...[...perksOf.values()].map((x) => x.coopXpPct));
     // 確認用の ?moves= はソロのときだけ
     const debugMoves = this.coop ? null : parseMovesParam(rules, window.location.search);

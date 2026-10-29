@@ -1,0 +1,81 @@
+{
+  "key": "marill",
+  "dex": 183,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Idle": {
+      "source": "Idle",
+      "frameWidth": 32,
+      "frameHeight": 40,
+      "durations": [
+        26,
+        16
+      ],
+      "frameKeyPrefix": "Idle"
+    },
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 32,
+      "frameHeight": 40,
+      "durations": [
+        10,
+        8,
+        10,
+        8
+      ],
+      "frameKeyPrefix": "Walk"
+    },
+    "Attack": {
+      "source": "Attack",
+      "frameWidth": 64,
+      "frameHeight": 80,
+      "durations": [
+        2,
+        4,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Attack"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 48,
+      "frameHeight": 56,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    },
+    "Faint": {
+      "source": "Faint",
+      "frameWidth": 32,
+      "frameHeight": 40,
+      "durations": [
+        8,
+        12,
+        4,
+        10
+      ],
+      "frameKeyPrefix": "Faint"
+    }
+  },
+  "missing": []
+}

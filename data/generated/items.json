@@ -299,6 +299,16 @@
       "it": "PP-Max"
     }
   },
+  "prism-scale": {
+    "names": {
+      "ja": "きれいなウロコ",
+      "en": "Prism Scale",
+      "fr": "Bel’Écaille",
+      "de": "Schönschuppe",
+      "es": "Escama Bella",
+      "it": "Squama Bella"
+    }
+  },
   "protein": {
     "names": {
       "ja": "タウリン",

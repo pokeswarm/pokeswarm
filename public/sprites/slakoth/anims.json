@@ -1,0 +1,83 @@
+{
+  "key": "slakoth",
+  "dex": 287,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Idle": {
+      "source": "Idle",
+      "frameWidth": 40,
+      "frameHeight": 32,
+      "durations": [
+        60,
+        8
+      ],
+      "frameKeyPrefix": "Idle"
+    },
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 40,
+      "frameHeight": 32,
+      "durations": [
+        8,
+        10,
+        8,
+        10
+      ],
+      "frameKeyPrefix": "Walk"
+    },
+    "Attack": {
+      "source": "Attack",
+      "frameWidth": 80,
+      "frameHeight": 72,
+      "durations": [
+        2,
+        4,
+        1,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3,
+        2
+      ],
+      "frameKeyPrefix": "Attack"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    },
+    "Faint": {
+      "source": "Hurt",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    }
+  },
+  "missing": [
+    {
+      "animation": "Faint",
+      "usedInstead": "Hurt"
+    }
+  ]
+}

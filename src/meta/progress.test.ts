@@ -6,6 +6,7 @@ import { emptySave } from './saveData';
 const achievements: AchievementsConfig = {
   initialPokemon: ['charmander'],
   initialItems: ['x-attack'],
+  regionInitialItems: {},
   startItem: { clears: 1 },
   achievements: [
     { id: 'a', region: 'kanto', hidden: false, condition: { stat: 'kills', atLeast: 10 } },

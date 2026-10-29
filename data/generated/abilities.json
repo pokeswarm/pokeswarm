@@ -1,4 +1,14 @@
 {
+  "arena-trap": {
+    "names": {
+      "ja": "ありじごく",
+      "en": "Arena Trap",
+      "fr": "Piège Sable",
+      "de": "Ausweglos",
+      "es": "Trampa Arena",
+      "it": "Trappoarena"
+    }
+  },
   "blaze": {
     "names": {
       "ja": "もうか",
@@ -7,6 +17,86 @@
       "de": "Großbrand",
       "es": "Mar Llamas",
       "it": "Aiutofuoco"
+    }
+  },
+  "clear-body": {
+    "names": {
+      "ja": "クリアボディ",
+      "en": "Clear Body",
+      "fr": "Corps Sain",
+      "de": "Neutraltorso",
+      "es": "Cuerpo Puro",
+      "it": "Corpochiaro"
+    }
+  },
+  "cursed-body": {
+    "names": {
+      "ja": "のろわれボディ",
+      "en": "Cursed Body",
+      "fr": "Corps Maudit",
+      "de": "Tastfluch",
+      "es": "Cuerpo Maldito",
+      "it": "Corpofunesto"
+    }
+  },
+  "guts": {
+    "names": {
+      "ja": "こんじょう",
+      "en": "Guts",
+      "fr": "Cran",
+      "de": "Adrenalin",
+      "es": "Agallas",
+      "it": "Dentistretti"
+    }
+  },
+  "huge-power": {
+    "names": {
+      "ja": "ちからもち",
+      "en": "Huge Power",
+      "fr": "Coloforce",
+      "de": "Kraftkoloss",
+      "es": "Potencia",
+      "it": "Macroforza"
+    }
+  },
+  "hydration": {
+    "names": {
+      "ja": "うるおいボディ",
+      "en": "Hydration",
+      "fr": "Hydratation",
+      "de": "Hydration",
+      "es": "Hidratación",
+      "it": "Idratazione"
+    }
+  },
+  "intimidate": {
+    "names": {
+      "ja": "いかく",
+      "en": "Intimidate",
+      "fr": "Intimidation",
+      "de": "Bedroher",
+      "es": "Intimidación",
+      "it": "Prepotenza"
+    }
+  },
+  "moxie": {
+    "names": {
+      "ja": "じしんかじょう",
+      "en": "Moxie",
+      "fr": "Impudence",
+      "de": "Hochmut",
+      "es": "Autoestima",
+      "it": "Arroganza"
+    }
+  },
+  "natural-cure": {
+    "names": {
+      "ja": "しぜんかいふく",
+      "en": "Natural Cure",
+      "fr": "Médic Nature",
+      "de": "Innere Kraft",
+      "es": "Cura Natural",
+      "it": "Alternacura"
     }
   },
   "overgrow": {
@@ -19,6 +109,76 @@
       "it": "Erbaiuto"
     }
   },
+  "shadow-tag": {
+    "names": {
+      "ja": "かげふみ",
+      "en": "Shadow Tag",
+      "fr": "Marque Ombre",
+      "de": "Wegsperre",
+      "es": "Sombra Trampa",
+      "it": "Pedinombra"
+    }
+  },
+  "simple": {
+    "names": {
+      "ja": "たんじゅん",
+      "en": "Simple",
+      "fr": "Simple",
+      "de": "Wankelmut",
+      "es": "Simple",
+      "it": "Disinvoltura"
+    }
+  },
+  "static": {
+    "names": {
+      "ja": "せいでんき",
+      "en": "Static",
+      "fr": "Statik",
+      "de": "Statik",
+      "es": "Electricidad Estática",
+      "it": "Statico"
+    }
+  },
+  "sturdy": {
+    "names": {
+      "ja": "がんじょう",
+      "en": "Sturdy",
+      "fr": "Fermeté",
+      "de": "Robustheit",
+      "es": "Robustez",
+      "it": "Vigore"
+    }
+  },
+  "super-luck": {
+    "names": {
+      "ja": "きょううん",
+      "en": "Super Luck",
+      "fr": "Chanceux",
+      "de": "Glückspilz",
+      "es": "Afortunado",
+      "it": "Supersorte"
+    }
+  },
+  "swift-swim": {
+    "names": {
+      "ja": "すいすい",
+      "en": "Swift Swim",
+      "fr": "Glissade",
+      "de": "Wassertempo",
+      "es": "Nado Rápido",
+      "it": "Nuotovelox"
+    }
+  },
+  "thick-fat": {
+    "names": {
+      "ja": "あついしぼう",
+      "en": "Thick Fat",
+      "fr": "Isograisse",
+      "de": "Speckschicht",
+      "es": "Sebo",
+      "it": "Grassospesso"
+    }
+  },
   "torrent": {
     "names": {
       "ja": "げきりゅう",
@@ -27,6 +187,36 @@
       "de": "Sturzbach",
       "es": "Torrente",
       "it": "Acquaiuto"
+    }
+  },
+  "trace": {
+    "names": {
+      "ja": "トレース",
+      "en": "Trace",
+      "fr": "Calque",
+      "de": "Erfassen",
+      "es": "Calco",
+      "it": "Traccia"
+    }
+  },
+  "truant": {
+    "names": {
+      "ja": "なまけ",
+      "en": "Truant",
+      "fr": "Absentéisme",
+      "de": "Schnarchnase",
+      "es": "Ausente",
+      "it": "Pigrone"
+    }
+  },
+  "vital-spirit": {
+    "names": {
+      "ja": "やるき",
+      "en": "Vital Spirit",
+      "fr": "Esprit Vital",
+      "de": "Munterkeit",
+      "es": "Espíritu Vital",
+      "it": "Spiritovivo"
     }
   }
 }

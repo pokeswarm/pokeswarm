@@ -36,6 +36,13 @@
     "spell-tag",
     "dragon-fang"
   ],
+  "regionInitialItems": {
+    "hoenn": [
+      "metal-coat",
+      "moon-stone",
+      "prism-scale"
+    ]
+  },
   "startItem": {
     "clears": 1
   },

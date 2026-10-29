@@ -1,0 +1,90 @@
+{
+  "key": "banette",
+  "dex": 354,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Idle": {
+      "source": "Idle",
+      "frameWidth": 24,
+      "frameHeight": 56,
+      "durations": [
+        40,
+        1,
+        2,
+        4,
+        4,
+        4,
+        4,
+        2,
+        1
+      ],
+      "frameKeyPrefix": "Idle"
+    },
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 24,
+      "frameHeight": 40,
+      "durations": [
+        8,
+        10,
+        8,
+        10
+      ],
+      "frameKeyPrefix": "Walk"
+    },
+    "Attack": {
+      "source": "Attack",
+      "frameWidth": 72,
+      "frameHeight": 72,
+      "durations": [
+        2,
+        4,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Attack"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 56,
+      "frameHeight": 64,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    },
+    "Faint": {
+      "source": "Hurt",
+      "frameWidth": 56,
+      "frameHeight": 64,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    }
+  },
+  "missing": [
+    {
+      "animation": "Faint",
+      "usedInstead": "Hurt"
+    }
+  ]
+}

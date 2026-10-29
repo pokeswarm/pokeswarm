@@ -117,6 +117,9 @@ function evolutionsOf(chain: EvolutionNode, species: string): GeneratedPokemon['
     // 世代ごとに条件が並ぶことがある。赤・緑の条件があればそれを、無ければ最初の条件を使う
     const details = child.evolution_details;
     const d = details.find((x) => x.version_group?.name === 'red-blue') ?? details[0];
+    // 条件の分からない進化（うつくしさ: ヒンバス）は、ほかの条件の「持ち物を持たせて通信交換」（きれいなウロコ）を使う（07 の134章）
+    const held = details.find((x) => x.trigger.name === 'trade' && x.held_item);
+    if (d && d.trigger.name === 'level-up' && !d.min_level && !d.min_happiness && held) return { to: child.species.name, trigger: 'item' as const, item: held.held_item!.name };
     if (!d) return { to: child.species.name, trigger: 'other' as const };
     if (d.trigger.name === 'level-up' && d.min_level) return { to: child.species.name, trigger: 'level' as const, level: d.min_level };
     if (d.trigger.name === 'use-item' && d.item) return { to: child.species.name, trigger: 'item' as const, item: d.item.name };

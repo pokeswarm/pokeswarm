@@ -78,6 +78,34 @@
     "preEvolutions": [],
     "evolvesTo": []
   },
+  "aggron": {
+    "dex": 306,
+    "names": {
+      "ja": "ボスゴドラ",
+      "en": "Aggron",
+      "fr": "Galeking",
+      "de": "Stolloss",
+      "es": "Aggron",
+      "it": "Aggron"
+    },
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 110,
+      "defense": 180,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 50
+    },
+    "preEvolutions": [
+      "aron",
+      "lairon"
+    ],
+    "evolvesTo": []
+  },
   "alakazam": {
     "dex": 65,
     "names": {
@@ -294,6 +322,64 @@
     "preEvolutions": [],
     "evolvesTo": []
   },
+  "azumarill": {
+    "dex": 184,
+    "names": {
+      "ja": "マリルリ",
+      "en": "Azumarill",
+      "fr": "Azumarill",
+      "de": "Azumarill",
+      "es": "Azumarill",
+      "it": "Azumarill"
+    },
+    "types": [
+      "water",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 50,
+      "defense": 80,
+      "specialAttack": 60,
+      "specialDefense": 80,
+      "speed": 50
+    },
+    "preEvolutions": [
+      "azurill",
+      "marill"
+    ],
+    "evolvesTo": []
+  },
+  "azurill": {
+    "dex": 298,
+    "names": {
+      "ja": "ルリリ",
+      "en": "Azurill",
+      "fr": "Azurill",
+      "de": "Azurill",
+      "es": "Azurill",
+      "it": "Azurill"
+    },
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 20,
+      "defense": 40,
+      "specialAttack": 20,
+      "specialDefense": 40,
+      "speed": 20
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "marill",
+        "trigger": "friendship"
+      }
+    ]
+  },
   "bagon": {
     "dex": 371,
     "names": {
@@ -471,6 +557,37 @@
       "kakuna"
     ],
     "evolvesTo": []
+  },
+  "beldum": {
+    "dex": 374,
+    "names": {
+      "ja": "ダンバル",
+      "en": "Beldum",
+      "fr": "Terhal",
+      "de": "Tanhel",
+      "es": "Beldum",
+      "it": "Beldum"
+    },
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 55,
+      "defense": 80,
+      "specialAttack": 35,
+      "specialDefense": 60,
+      "speed": 30
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "metang",
+        "trigger": "level",
+        "level": 20
+      }
+    ]
   },
   "bellsprout": {
     "dex": 69,
@@ -1825,6 +1942,36 @@
     ],
     "evolvesTo": []
   },
+  "feebas": {
+    "dex": 349,
+    "names": {
+      "ja": "ヒンバス",
+      "en": "Feebas",
+      "fr": "Barpau",
+      "de": "Barschwa",
+      "es": "Feebas",
+      "it": "Feebas"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 20,
+      "attack": 15,
+      "defense": 20,
+      "specialAttack": 10,
+      "specialDefense": 55,
+      "speed": 80
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "milotic",
+        "trigger": "item",
+        "item": "prism-scale"
+      }
+    ]
+  },
   "feraligatr": {
     "dex": 160,
     "names": {
@@ -1962,6 +2109,34 @@
     },
     "preEvolutions": [
       "pineco"
+    ],
+    "evolvesTo": []
+  },
+  "gardevoir": {
+    "dex": 282,
+    "names": {
+      "ja": "サーナイト",
+      "en": "Gardevoir",
+      "fr": "Gardevoir",
+      "de": "Guardevoir",
+      "es": "Gardevoir",
+      "it": "Gardevoir"
+    },
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 68,
+      "attack": 65,
+      "defense": 65,
+      "specialAttack": 125,
+      "specialDefense": 115,
+      "speed": 80
+    },
+    "preEvolutions": [
+      "ralts",
+      "kirlia"
     ],
     "evolvesTo": []
   },
@@ -2989,6 +3164,44 @@
     ],
     "evolvesTo": []
   },
+  "kirlia": {
+    "dex": 281,
+    "names": {
+      "ja": "キルリア",
+      "en": "Kirlia",
+      "fr": "Kirlia",
+      "de": "Kirlia",
+      "es": "Kirlia",
+      "it": "Kirlia"
+    },
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 38,
+      "attack": 35,
+      "defense": 35,
+      "specialAttack": 65,
+      "specialDefense": 55,
+      "speed": 50
+    },
+    "preEvolutions": [
+      "ralts"
+    ],
+    "evolvesTo": [
+      {
+        "to": "gardevoir",
+        "trigger": "level",
+        "level": 30
+      },
+      {
+        "to": "gallade",
+        "trigger": "item",
+        "item": "dawn-stone"
+      }
+    ]
+  },
   "koffing": {
     "dex": 109,
     "names": {
@@ -3640,6 +3853,39 @@
       }
     ]
   },
+  "marill": {
+    "dex": 183,
+    "names": {
+      "ja": "マリル",
+      "en": "Marill",
+      "fr": "Marill",
+      "de": "Marill",
+      "es": "Marill",
+      "it": "Marill"
+    },
+    "types": [
+      "water",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 20,
+      "defense": 50,
+      "specialAttack": 20,
+      "specialDefense": 50,
+      "speed": 40
+    },
+    "preEvolutions": [
+      "azurill"
+    ],
+    "evolvesTo": [
+      {
+        "to": "azumarill",
+        "trigger": "level",
+        "level": 18
+      }
+    ]
+  },
   "marowak": {
     "dex": 105,
     "names": {
@@ -3698,6 +3944,31 @@
         "level": 36
       }
     ]
+  },
+  "mawile": {
+    "dex": 303,
+    "names": {
+      "ja": "クチート",
+      "en": "Mawile",
+      "fr": "Mysdibule",
+      "de": "Flunkifer",
+      "es": "Mawile",
+      "it": "Mawile"
+    },
+    "types": [
+      "steel",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 85,
+      "defense": 85,
+      "specialAttack": 55,
+      "specialDefense": 55,
+      "speed": 50
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
   },
   "medicham": {
     "dex": 308,
@@ -3816,6 +4087,67 @@
         "to": "perrserker",
         "trigger": "level",
         "level": 28
+      }
+    ]
+  },
+  "metagross": {
+    "dex": 376,
+    "names": {
+      "ja": "メタグロス",
+      "en": "Metagross",
+      "fr": "Métalosse",
+      "de": "Metagross",
+      "es": "Metagross",
+      "it": "Metagross"
+    },
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 135,
+      "defense": 130,
+      "specialAttack": 95,
+      "specialDefense": 90,
+      "speed": 70
+    },
+    "preEvolutions": [
+      "beldum",
+      "metang"
+    ],
+    "evolvesTo": []
+  },
+  "metang": {
+    "dex": 375,
+    "names": {
+      "ja": "メタング",
+      "en": "Metang",
+      "fr": "Métang",
+      "de": "Metang",
+      "es": "Metang",
+      "it": "Metang"
+    },
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 75,
+      "defense": 100,
+      "specialAttack": 55,
+      "specialDefense": 80,
+      "speed": 50
+    },
+    "preEvolutions": [
+      "beldum"
+    ],
+    "evolvesTo": [
+      {
+        "to": "metagross",
+        "trigger": "level",
+        "level": 45
       }
     ]
   },
@@ -5065,6 +5397,37 @@
     "preEvolutions": [],
     "evolvesTo": []
   },
+  "ralts": {
+    "dex": 280,
+    "names": {
+      "ja": "ラルトス",
+      "en": "Ralts",
+      "fr": "Tarsal",
+      "de": "Trasla",
+      "es": "Ralts",
+      "it": "Ralts"
+    },
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 28,
+      "attack": 25,
+      "defense": 25,
+      "specialAttack": 45,
+      "specialDefense": 35,
+      "speed": 40
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "kirlia",
+        "trigger": "level",
+        "level": 20
+      }
+    ]
+  },
   "rapidash": {
     "dex": 78,
     "names": {
@@ -5759,6 +6122,36 @@
     ],
     "evolvesTo": []
   },
+  "slakoth": {
+    "dex": 287,
+    "names": {
+      "ja": "ナマケロ",
+      "en": "Slakoth",
+      "fr": "Parecool",
+      "de": "Bummelz",
+      "es": "Slakoth",
+      "it": "Slakoth"
+    },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 60,
+      "defense": 60,
+      "specialAttack": 35,
+      "specialDefense": 35,
+      "speed": 30
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "vigoroth",
+        "trigger": "level",
+        "level": 18
+      }
+    ]
+  },
   "slowbro": {
     "dex": 80,
     "names": {
@@ -6369,6 +6762,37 @@
     },
     "preEvolutions": [],
     "evolvesTo": []
+  },
+  "swablu": {
+    "dex": 333,
+    "names": {
+      "ja": "チルット",
+      "en": "Swablu",
+      "fr": "Tylton",
+      "de": "Wablu",
+      "es": "Swablu",
+      "it": "Swablu"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 40,
+      "defense": 60,
+      "specialAttack": 40,
+      "specialDefense": 75,
+      "speed": 50
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "altaria",
+        "trigger": "level",
+        "level": 35
+      }
+    ]
   },
   "swampert": {
     "dex": 260,
@@ -7523,6 +7947,32 @@
       }
     ]
   },
+  "wobbuffet": {
+    "dex": 202,
+    "names": {
+      "ja": "ソーナンス",
+      "en": "Wobbuffet",
+      "fr": "Qulbutoké",
+      "de": "Woingenau",
+      "es": "Wobbuffet",
+      "it": "Wobbuffet"
+    },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 190,
+      "attack": 33,
+      "defense": 58,
+      "specialAttack": 33,
+      "specialDefense": 58,
+      "speed": 33
+    },
+    "preEvolutions": [
+      "wynaut"
+    ],
+    "evolvesTo": []
+  },
   "wooper": {
     "dex": 194,
     "names": {
@@ -7591,6 +8041,36 @@
         "to": "cascoon",
         "trigger": "level",
         "level": 7
+      }
+    ]
+  },
+  "wynaut": {
+    "dex": 360,
+    "names": {
+      "ja": "ソーナノ",
+      "en": "Wynaut",
+      "fr": "Okéoké",
+      "de": "Isso",
+      "es": "Wynaut",
+      "it": "Wynaut"
+    },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 23,
+      "defense": 48,
+      "specialAttack": 23,
+      "specialDefense": 48,
+      "speed": 23
+    },
+    "preEvolutions": [],
+    "evolvesTo": [
+      {
+        "to": "wobbuffet",
+        "trigger": "level",
+        "level": 15
       }
     ]
   },

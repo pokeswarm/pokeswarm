@@ -1487,14 +1487,16 @@
       "key": "makuhita",
       "dex": 296,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "aron",
       "dex": 304,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1508,7 +1510,8 @@
       "key": "electrike",
       "dex": 309,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1550,7 +1553,8 @@
       "key": "numel",
       "dex": 322,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1571,7 +1575,8 @@
       "key": "trapinch",
       "dex": 328,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1634,14 +1639,16 @@
       "key": "absol",
       "dex": 359,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "shuppet",
       "dex": 353,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1690,14 +1697,16 @@
       "key": "hariyama",
       "dex": 297,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "lairon",
       "dex": 305,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1725,14 +1734,16 @@
       "key": "sealeo",
       "dex": 364,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "spheal",
       "dex": 363,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1746,28 +1757,32 @@
       "key": "shelgon",
       "dex": 372,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "bagon",
       "dex": 371,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "altaria",
       "dex": 334,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "vibrava",
       "dex": 329,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1781,7 +1796,8 @@
       "key": "whiscash",
       "dex": 340,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1802,7 +1818,8 @@
       "key": "barboach",
       "dex": 339,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1823,28 +1840,32 @@
       "key": "manectric",
       "dex": 310,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "camerupt",
       "dex": 323,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "slaking",
       "dex": 289,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "vigoroth",
       "dex": 288,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1865,14 +1886,16 @@
       "key": "banette",
       "dex": 354,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "walrein",
       "dex": 365,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1886,21 +1909,24 @@
       "key": "salamence",
       "dex": 373,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "flygon",
       "dex": 330,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
       "key": "milotic",
       "dex": 350,
       "uses": [
-        "enemy"
+        "enemy",
+        "full"
       ]
     },
     {
@@ -1915,6 +1941,118 @@
       "dex": 291,
       "uses": [
         "enemy"
+      ]
+    },
+    {
+      "key": "slakoth",
+      "dex": 287,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "swablu",
+      "dex": 333,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "feebas",
+      "dex": 349,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "beldum",
+      "dex": 374,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "metang",
+      "dex": 375,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "metagross",
+      "dex": 376,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "ralts",
+      "dex": 280,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "kirlia",
+      "dex": 281,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "gardevoir",
+      "dex": 282,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "aggron",
+      "dex": 306,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "azurill",
+      "dex": 298,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "marill",
+      "dex": 183,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "azumarill",
+      "dex": 184,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "wynaut",
+      "dex": 360,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "wobbuffet",
+      "dex": 202,
+      "uses": [
+        "full"
+      ]
+    },
+    {
+      "key": "mawile",
+      "dex": 303,
+      "uses": [
+        "full"
       ]
     }
   ]

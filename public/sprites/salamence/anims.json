@@ -1,0 +1,94 @@
+{
+  "key": "salamence",
+  "dex": 373,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Idle": {
+      "source": "Idle",
+      "frameWidth": 56,
+      "frameHeight": 56,
+      "durations": [
+        60,
+        10,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        10
+      ],
+      "frameKeyPrefix": "Idle"
+    },
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 56,
+      "frameHeight": 80,
+      "durations": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "frameKeyPrefix": "Walk"
+    },
+    "Attack": {
+      "source": "Attack",
+      "frameWidth": 72,
+      "frameHeight": 80,
+      "durations": [
+        4,
+        6,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Attack"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 72,
+      "frameHeight": 80,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    },
+    "Faint": {
+      "source": "Faint",
+      "frameWidth": 56,
+      "frameHeight": 48,
+      "durations": [
+        8,
+        12,
+        4,
+        10
+      ],
+      "frameKeyPrefix": "Faint"
+    }
+  },
+  "missing": []
+}

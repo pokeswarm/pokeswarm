@@ -24,7 +24,7 @@ export function canChooseStartItem(save: Readonly<SaveData>, pokemon: string, re
 
 /** そのポケモンを色違いで遊べるか（その地方の実績の報酬） */
 export function canUseShiny(save: Readonly<SaveData>, pokemon: string, region = HOME_REGION): boolean {
-  return achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, save.achievements, region)).shiny.has(pokemon);
+  return achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, save.achievements, region), region).shiny.has(pokemon);
 }
 
 let rulesCache: SimRules | null = null;
@@ -33,7 +33,7 @@ let rulesCache: SimRules | null = null;
 export function startItemChoices(save: Readonly<SaveData>, pokemon: string, region = HOME_REGION): string[] {
   rulesCache ??= buildSimRules();
   const rules = rulesCache;
-  const perks = achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, save.achievements, region));
+  const perks = achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, save.achievements, region), region);
   const loadout = playableLoadout(rules, pokemon);
   const unlockedItems = new Set(rules.items.flatMap((it, i) => (perks.items.has(it.key) ? [i] : [])));
   const p = { unlockedItems, line: loadout.line, species: loadout.species, items: [], types: loadout.types, moveTypes: loadout.moveTypes };

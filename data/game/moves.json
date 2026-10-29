@@ -7710,15 +7710,6 @@
             "powerMultiplier": 0.6,
             "asMove": "fire-punch-hoenn"
           }
-        },
-        {
-          "trigger": "eachHit",
-          "chance": 0.04,
-          "explode": {
-            "sizeMultiplier": 3,
-            "powerMultiplier": 0.8,
-            "asMove": "blaze-kick"
-          }
         }
       ],
       "base": {
@@ -7792,6 +7783,10 @@
           "range": 4,
           "power": 1.5
         }
+      ],
+      "comboMoves": [
+        "close-combat-sweep",
+        "close-combat-kick"
       ]
     },
     "fire-punch-hoenn": {
@@ -8452,6 +8447,171 @@
       "learnMinLevel": 50,
       "learnWithMoves": [
         "water-pledge"
+      ]
+    },
+    "close-combat-sweep": {
+      "nameOf": "close-combat",
+      "pattern": "sweep",
+      "effect": "close-combat-sweep",
+      "region": "hoenn",
+      "teachOnly": true,
+      "sweepOnce": true,
+      "extraTypes": [
+        "fire"
+      ],
+      "base": {
+        "power": 13.1,
+        "cooldownSeconds": 1.1,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 60,
+        "range": 36,
+        "durationSeconds": 0.3,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 200,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.2,
+        "statusSeconds": 3,
+        "spreadDegrees": 170,
+        "lifestealPct": 0,
+        "statusId": "burn",
+        "arcDegrees": 40
+      },
+      "levels": [
+        {
+          "power": 2.7
+        },
+        {
+          "power": 2.6
+        },
+        {
+          "power": 2.6
+        },
+        {
+          "power": 2.7
+        },
+        {
+          "size": 4,
+          "power": 1.8
+        },
+        {
+          "power": 2.5
+        },
+        {
+          "power": 2.6
+        },
+        {
+          "power": 2.5
+        },
+        {
+          "power": 2.5
+        },
+        {
+          "size": 4,
+          "power": 1.4
+        },
+        {
+          "power": 2.5
+        },
+        {
+          "power": 2.5
+        },
+        {
+          "power": 2.4
+        },
+        {
+          "power": 2.5
+        },
+        {
+          "size": 4,
+          "power": 1
+        }
+      ]
+    },
+    "close-combat-kick": {
+      "nameOf": "close-combat",
+      "pattern": "beam",
+      "effect": "close-combat-kick",
+      "region": "hoenn",
+      "teachOnly": true,
+      "aimFacing": true,
+      "extraTypes": [
+        "fire"
+      ],
+      "body": {
+        "lungeDistance": 24,
+        "afterimages": 2
+      },
+      "base": {
+        "power": 21.1,
+        "cooldownSeconds": 1.4,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 22,
+        "range": 200,
+        "durationSeconds": 0.22,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 320,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.2,
+        "statusSeconds": 3,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "statusId": "burn"
+      },
+      "levels": [
+        {
+          "power": 4.2
+        },
+        {
+          "power": 4.2
+        },
+        {
+          "power": 4.2
+        },
+        {
+          "power": 4.2
+        },
+        {
+          "range": 8,
+          "power": 3.7
+        },
+        {
+          "power": 4.2
+        },
+        {
+          "power": 4.1
+        },
+        {
+          "power": 4.2
+        },
+        {
+          "power": 4.2
+        },
+        {
+          "range": 8,
+          "power": 3.3
+        },
+        {
+          "power": 4.2
+        },
+        {
+          "power": 4.1
+        },
+        {
+          "power": 4.1
+        },
+        {
+          "power": 4.1
+        },
+        {
+          "range": 8,
+          "power": 3.1
+        }
       ]
     }
   }

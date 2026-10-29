@@ -228,6 +228,14 @@ export function useMoves(world: World): void {
         pm.sub ??= { move: def.chargeMove.move, level: world.rules.moves[def.chargeMove.move]!.levels.length, cooldown: 0, burstLeft: 0, burstTimer: 0 };
         if (pm.subPause <= 0) runSubMove(world, p, pm.sub);
       }
+      // 一緒に出し続ける技（インファイト: 炎蹴りの薙ぎ払い・突き出す蹴り）。それぞれの再使用ごとに、この技のレベルで出す
+      if (def.comboMoves) {
+        pm.combo ??= def.comboMoves.map((move) => ({ move, level: pm.level, cooldown: 0, burstLeft: 0, burstTimer: 0 }));
+        for (const sub of pm.combo) {
+          sub.level = pm.level;
+          runSubMove(world, p, sub);
+        }
+      }
       pm.cooldown -= world.dt;
       if (pm.burstLeft > 0) {
         fireBurst(world, p, pm, st);

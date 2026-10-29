@@ -126,6 +126,18 @@ describe('アチャモ', () => {
     expect(both).toBeGreaterThan(fire);
   });
 
+  it('インファイトは 拳の連打・炎蹴りの薙ぎ払い・突き出す蹴り を休まず出し続ける（07 の132章）', () => {
+    const a = setup('torchic');
+    a.p.moves = [{ move: a.move('close-combat'), level: 16, cooldown: 0, burstLeft: 0, burstTimer: 0 }];
+    for (let k = 0; k < 8; k++) a.sim.world.enemies.add(k + 1, 0, 40 + k * 10, 0, 1e6, 0, 10);
+    const used = new Set<string>();
+    for (let t = 0; t < 90; t++) {
+      a.sim.step([]);
+      for (const e of a.sim.world.events) if (e.type === 'moveUsed') used.add(a.rules.moves[e.move]!.key);
+    }
+    expect([...used].sort()).toEqual(['close-combat', 'close-combat-kick', 'close-combat-sweep']);
+  });
+
   it('ビルドアップ・ほのおのちかいは ワカシャモから。にどげり ＋ くろおび で ローキック', () => {
     const a = setup('torchic');
     expect(a.offersNew('bulk-up')).toBe(false);

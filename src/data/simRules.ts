@@ -131,6 +131,11 @@ export function buildSimRules(region?: string): SimRules {
     const keys = pool === 'starting' ? startingKeys : pool === 'common' ? commonKeys : uniqueKeys;
     moves[k] = { ...m, randomPool: keys.filter((key) => !otherRegion(key)).map(moveIndex).filter((i) => i !== -1 && moves[i]!.pattern !== 'metronome') };
   });
+  // 一緒に出し続ける技（インファイト）
+  moves.forEach((m, k) => {
+    const cm = movesConfig.moves[m.key]?.comboMoves;
+    if (cm) moves[k] = { ...m, comboMoves: cm.map(moveIndex) };
+  });
   // ためている間に出す技（きあいパンチのマッハパンチ）
   moves.forEach((m, k) => {
     const cm = movesConfig.moves[m.key]?.chargeMove;

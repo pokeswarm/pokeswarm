@@ -4036,8 +4036,7 @@
         "size": 1.5,
         "rotate": "velocity",
         "variants": [
-          "fist-fire",
-          "flame-crash"
+          "fist-fire"
         ]
       }
     },
@@ -4143,7 +4142,34 @@
       },
       "impact": {
         "flash": {
-          "radius": 60
+          "radius": 40
+        },
+        "burst": {
+          "count": 8,
+          "colors": [
+            "#e1f5fe",
+            "#4fc3f7",
+            "#0288d1"
+          ],
+          "lifespanMs": [
+            250,
+            450
+          ],
+          "speed": [
+            60,
+            180
+          ],
+          "scale": [
+            0.5,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 200,
+          "spread": 2,
+          "blend": "normal"
         }
       },
       "chargeGlow": {
@@ -4161,7 +4187,44 @@
       "projectile": {
         "glowScale": 1.1,
         "coreScale": 0.3,
-        "shapeAlpha": 0.25
+        "shapeAlpha": 0.15
+      },
+      "effectSprite": {
+        "id": "water-splash",
+        "fit": "circle",
+        "size": 1
+      }
+    },
+    "close-combat-sweep": {
+      "extends": "fire.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.2,
+        "shapeAlpha": 0.2
+      },
+      "sprite": {
+        "id": "flame-leg",
+        "fit": "front",
+        "size": 1
+      }
+    },
+    "close-combat-kick": {
+      "extends": "fire.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.2,
+        "shapeAlpha": 0.2
+      },
+      "impact": {
+        "flash": {
+          "radius": 30
+        }
+      },
+      "sprite": {
+        "id": "flame-leg",
+        "fit": "thrust",
+        "size": 1,
+        "growSeconds": 0.08
       }
     }
   }

@@ -141,6 +141,8 @@ export interface SimMoveDef {
   readonly learnWithMoves?: readonly number[];
   /** ほかにもこのタイプ（番号）の技として、威力の強化と相性が効く（インファイト・だくりゅう） */
   readonly extraTypes?: readonly number[];
+  /** 一緒に出し続ける技の番号（この技と同じレベル。インファイト） */
+  readonly comboMoves?: readonly number[];
   /** 出す前に溜める秒数（リーフブレード・ブレイズキック） */
   readonly windupSeconds?: number;
   /** ちかい: 覚えていると威力 +powerPct %、自分か味方が覚えているほかのちかい1種類につき +perOtherPct % */

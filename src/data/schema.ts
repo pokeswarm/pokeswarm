@@ -1169,6 +1169,11 @@ export const moveDefSchema = z.object({
   learnWithMoves: z.array(z.string()).optional(),
   /** ほかにも、このタイプの技として威力の強化（持ち物・天気・マップ）と相性が効く（インファイト: ほのお。だくりゅう: じめん） */
   extraTypes: z.array(z.string()).optional(),
+  /**
+   * 一緒に出し続ける技（moves.json のキー。この技と同じレベルで、それぞれの再使用ごとに出す）。
+   * インファイト: 拳の連打（本体）・炎蹴りの薙ぎ払い・突き出す蹴り（07 の132章）
+   */
+  comboMoves: z.array(z.string()).optional(),
   /** 出す前に溜める秒数（リーフブレード・ブレイズキック）。溜めている間は体が光る（見た目のレシピの chargeGlow） */
   windupSeconds: z.number().positive().optional(),
   /**

@@ -2312,25 +2312,61 @@ function bladeSlash(): SpriteOut {
   return { palette, frameMs: 50, parts };
 }
 
-/** リーフブレードの残像: 自分の周りを1周、刃が通り抜けた後の薄い黄緑の筋（輪に沿って並べる） */
+/**
+ * リーフブレードの残像: 自分の周りを1周、刃が通り抜けた後の薄い黄緑の筋（輪に沿って並べる）。
+ * 長方形のかたまりに見えないよう、1ドットの細い線を何本か引く（作者の指摘 2026年10月29日）。内側ほど長く明るい
+ */
 function bladeRing(): SpriteOut {
   const palette = ['#33691e', '#9ccc65', '#ccff90', '#f1f8e9'];
-  const W = 12;
+  const W = 16;
   const H = 8;
+  const lanes: [number, number, number][] = [
+    // [高さ, 線の長さの割合, 色]
+    [1, 0.95, 3],
+    [3, 0.7, 2],
+    [5, 0.5, 2],
+    [7, 0.3, 1],
+  ];
   const frames: Grid[] = [];
   for (let f = 0; f < 2; f++) {
     frames.push(
       fill(blank(W, H), (x, y) => {
-        // 輪の向きに流れる筋（外ほど明るい）。並べてつながるよう、筋の長さは周期 W
-        for (const [k, lane] of [1.5, 3.5, 5.5, 6.8].entries()) {
-          if (Math.abs(y - lane) > (k === 2 ? 0.8 : 0.5)) continue;
-          if ((x + f * 4 + k * 3) % W < W * (k === 2 ? 0.8 : 0.55)) return k === 3 ? 3 : k === 2 ? 2 : 1;
+        for (const [k, [lane, len, c]] of lanes.entries()) {
+          // どの細かさでも実際の1マスの太さの線（並べてつながるよう、線の切れ目は周期 W）
+          if (Math.round((y + 0.5) * K - 0.5) !== Math.round((lane + 0.5) * K - 0.5)) continue;
+          if ((x + f * 5 + k * 7) % W < W * len) return c;
         }
         return -1;
       }),
     );
   }
   return { palette, frameMs: 60, parts: { middle: frames.map(toRows) } };
+}
+
+/** ウェーブタックル: 当たった敵から上がる水しぶき（王冠のように外へ散るしずく。2コマで広がる） */
+function waterSplash(): SpriteOut {
+  const palette = ['#0d3550', '#0288d1', '#4fc3f7', '#e1f5fe'];
+  const frames = [0, 1].map((f) =>
+    shape(18, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 真ん中の白い泡
+      if (d < 0.14 - f * 0.06) return 3;
+      // 外へ散る しずく（8方向。コマで外へ）
+      for (let k = 0; k < 8; k++) {
+        const ak = (k / 8) * Math.PI * 2 + 0.2;
+        const r = 0.45 + f * 0.3 + (k % 2) * 0.1;
+        const dx = u - Math.cos(ak) * r;
+        const dy = v - Math.sin(ak) * r;
+        if (Math.hypot(dx, dy) < 0.07 - f * 0.015) return k % 2 ? 2 : 3;
+      }
+      // 輪（水の冠）
+      const ring = 0.38 + f * 0.25;
+      if (Math.abs(d - ring) < 0.04 && Math.sin(a * 6) > -0.3) return 1;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
 }
 
 /**
@@ -3004,6 +3040,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'blade-slash': () => bladeSlash(),
     'blade-ring': () => bladeRing(),
     'flame-leg': () => flameLeg(),
+    'water-splash': () => waterSplash(),
 };
 
 /** 絵の名前の一覧 */

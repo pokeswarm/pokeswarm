@@ -73,6 +73,8 @@
     "mud-shot": "derived",
     "leaf-storm-hoenn": "unique",
     "blaze-kick": "unique",
-    "wave-crash": "unique"
+    "wave-crash": "unique",
+    "close-combat-sweep": "base",
+    "close-combat-kick": "base"
   }
 }

@@ -3,7 +3,7 @@
 > PokéSwarm is a free, ad-free Pokémon-themed survivors-like (Vampire Survivors-like, bullet heaven) roguelite browser game with online co-op for up to 4 players. It runs in PC and smartphone browsers with no install. It is an unofficial, non-profit fan game, not affiliated with Nintendo, Creatures, GAME FREAK or The Pokémon Company.
 
 - Play: https://pokeswarm.org/
-- About (Japanese and English): https://pokeswarm.org/about
+- About: https://pokeswarm.org/about (Japanese: https://pokeswarm.org/ja/about)
 - Genre: survivors-like / Vampire Survivors-like / bullet heaven action with roguelite progression (ポケモンのヴァンパイアサバイバー系・サバイバーライク・ローグライト)
 - Players: single player, or online co-op for 2 to 4 players (room URL or friend invite)
 - Platforms: web browser on PC and smartphone (landscape). Free, no ads, no purchases.

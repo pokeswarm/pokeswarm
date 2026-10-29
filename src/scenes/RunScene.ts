@@ -39,8 +39,8 @@ import { abilityOf, pinchMods } from '../sim/ability';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World, gateDeadlineTick } from '../sim/world';
-import { applyDebugOverrides, parseGodParam, parseLegendParam, parseIntruderParam, parseWingsParam, parseLevelParam, parseMovesParam, parseSectionParam, parseTimeParam } from './debugOverrides';
-import { addXp, applyOffer, itemFits, moveMaxLevel } from '../sim/systems/leveling';
+import { applyDebugOverrides, parseGodParam, parseLegendParam, parseIntruderParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam } from './debugOverrides';
+import { addXp, applyOffer, itemFits, moveMaxLevel, recomputeModifiers } from '../sim/systems/leveling';
 import { shinySpriteKey } from '../meta/loadoutOptions';
 import { achievementPerks, regionAchieved } from '../meta/achievementPerks';
 import { regionStats, regionUpgradesOf } from '../meta/regionScope';
@@ -196,6 +196,8 @@ export class RunScene extends Phaser.Scene {
   private settingsOpen = false;
   /** テストプレイ: 最初から戦う伝説（無ければ null）・無敵・無敵の間に受けたはずのダメージの合計 */
   private testLegend: number | null = null;
+  /** ?legendafter: この更新回数になったら伝説戦を始める（-1 なら始めた後） */
+  private testLegendTick = -1;
   /** ?intruder・?wings を付けたラン（記録を保存しない） */
   private testRun = false;
   private god = false;
@@ -340,6 +342,7 @@ export class RunScene extends Phaser.Scene {
     const coopXpPct = role === 'solo' ? 0 : Math.max(0, ...[...perksOf.values()].map((x) => x.coopXpPct));
     // 確認用の ?moves= はソロのときだけ
     const debugMoves = this.coop ? null : parseMovesParam(rules, window.location.search);
+    const debugItems = this.coop ? null : parseItemsParam(rules, window.location.search);
     for (const { id, pokemon, upgrades, startItem, shiny } of roster) {
       const loadout = playableLoadout(rules, pokemon);
       const perks = perksOf.get(id)!;
@@ -379,6 +382,11 @@ export class RunScene extends Phaser.Scene {
       // 最初の持ち物（作者の決定 2026年10月24日: そのポケモンでクリアすると選べる）。候補に出ないもの（解放していない・タイプが合わない）は持たない
       const start = startItem ? rules.items.findIndex((it) => it.key === startItem) : -1;
       if (start >= 0 && itemFits(rules, p, start)) applyOffer(this.sim.world, p, { kind: 'itemNew', item: start });
+      // 確認用の ?items= もソロのときだけ
+      if (debugItems) {
+        for (const it of debugItems) if (!p.items.some((x) => x.item === it.item)) p.items.push({ ...it });
+        recomputeModifiers(this.sim.world, p);
+      }
       if (shiny) this.shinyPlayers.add(id);
       const spriteKey = playablesConfig.pokemon[pokemon]?.sprite ?? pokemon;
       const sprite = id === this.localId ? this.playerSprite : (this.coop?.sprites.get(shiny ? shinySpriteKey(spriteKey) : spriteKey) ?? null);
@@ -419,7 +427,12 @@ export class RunScene extends Phaser.Scene {
     this.testLegend = this.coop ? null : parseLegendParam(this.sim.world.rules, window.location.search);
     this.god = !this.coop && parseGodParam(window.location.search);
     this.godDamage = 0;
-    if (this.testLegend !== null) startLegendary(this.sim.world, this.testLegend);
+    // ?legendafter=8 で、伝説戦を始めるのを8秒後にする（雑魚の中に「DANGER」。宣伝の動画。作者の依頼 2026年10月30日）
+    const legendAfter = Number(new URLSearchParams(window.location.search).get('legendafter')) || 0;
+    if (this.testLegend !== null) {
+      if (legendAfter > 0) this.testLegendTick = this.sim.world.tick + Math.round(legendAfter * simulationConfig.tickRate);
+      else startLegendary(this.sim.world, this.testLegend);
+    }
     // テストプレイ（ソロだけ）: ?intruder=raikou で三犬が乱入する。?wings ではねを持っている。どちらも記録を保存しない
     const testIntruder = this.coop ? null : parseIntruderParam(this.sim.world.rules, window.location.search);
     if (testIntruder !== null) startIntruder(this.sim.world, testIntruder);
@@ -1777,6 +1790,10 @@ export class RunScene extends Phaser.Scene {
     for (let i = 0; i < steps; i++) {
       const t0 = performance.now();
       this.sim.step([...this.collectCommands(), ...this.inbox.splice(0)]);
+      if (this.testLegendTick >= 0 && this.sim.world.tick >= this.testLegendTick && this.testLegend !== null) {
+        this.testLegendTick = -1;
+        if (!this.sim.world.outcome) startLegendary(this.sim.world, this.testLegend);
+      }
       if (this.god) this.applyGod();
       this.simMs = this.simMs * 0.95 + (performance.now() - t0) * 0.05;
       // 記録は、タブが裏にあって描画しないときも数える

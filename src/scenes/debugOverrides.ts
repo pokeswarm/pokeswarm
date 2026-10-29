@@ -14,15 +14,19 @@ export function applyDebugOverrides(rules: SimRules, search: string): SimRules {
   };
   const cap = num('cap');
   const spawn = num('spawn');
+  // ?spawnx=2 … 雑魚の出る数と上限を、ふだん（時間帯ごとの値）の2倍にする（宣伝の動画。作者の依頼 2026年10月30日）
+  const x = num('spawnx') ?? 1;
   return {
     ...rules,
     spawn: {
       ...rules.spawn,
       ...(cap !== undefined && { capGlobal: Math.floor(cap), capPerPlayer: Math.floor(cap) }),
       ...(spawn !== undefined && { spawnPerSecond: spawn }),
+      ...(x !== 1 && cap === undefined && { capGlobal: Math.floor(rules.spawn.capGlobal * x), capPerPlayer: Math.floor(rules.spawn.capPerPlayer * x), spawnPerSecond: rules.spawn.spawnPerSecond * x }),
       // 時間帯ごとの値より、URL の指定を優先する
       waves: rules.spawn.waves.map((w) => ({
         ...w,
+        ...(x !== 1 && { capPerPlayer: Math.floor((w.capPerPlayer ?? rules.spawn.capPerPlayer) * x), spawnPerSecond: (w.spawnPerSecond ?? rules.spawn.spawnPerSecond) * x }),
         ...(cap !== undefined && { capPerPlayer: Math.floor(cap) }),
         ...(spawn !== undefined && { spawnPerSecond: spawn }),
       })),
@@ -46,6 +50,22 @@ export function parseMovesParam(rules: SimRules, search: string): { move: number
     out.push({ move, level: Math.max(1, Math.min(max, Number(lv) || 1)) });
   }
   return out.slice(0, rules.combat.maxMoveSlots);
+}
+
+/**
+ * 確認用: ?items=pp-max:2,charcoal:3 で持ち物とレベルを指定する（無ければ null）。知らない持ち物は無視し、レベルは 1〜最大に収める
+ */
+export function parseItemsParam(rules: SimRules, search: string): { item: number; level: number }[] | null {
+  const v = new URLSearchParams(search).get('items');
+  if (!v) return null;
+  const out: { item: number; level: number }[] = [];
+  for (const part of v.split(',')) {
+    const [key, lv] = part.split(':');
+    const item = rules.items.findIndex((it) => it.key === key);
+    if (item === -1) continue;
+    out.push({ item, level: Math.max(1, Math.min(rules.items[item]!.maxLevel, Number(lv) || 1)) });
+  }
+  return out;
 }
 
 /**

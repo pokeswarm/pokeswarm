@@ -10020,7 +10020,7 @@
       "rangeBonusScale": 0.5,
       "effect": "confusion",
       "base": {
-        "power": 18,
+        "power": 16.6,
         "intervalSeconds": 0.1,
         "statusChance": 0.2,
         "statusSeconds": 0.4,
@@ -10041,31 +10041,31 @@
       "levels": [
         {
           "count": 1,
-          "power": 3.1
+          "power": 2.7
         },
         {
           "size": 3,
-          "power": 5.5
+          "power": 4.7
         },
         {
           "count": 1,
-          "power": 1.7
+          "power": 1.6
         },
         {
           "cooldownSeconds": -0.15,
-          "power": 1.7
+          "power": 1.5
         },
         {
           "count": 1,
-          "power": 1.1
+          "power": 1
         },
         {
           "size": 3,
-          "power": 3.1
+          "power": 2.3
         },
         {
           "count": 2,
-          "power": -1.8
+          "power": -1.6
         }
       ],
       "learners": [
@@ -10089,7 +10089,7 @@
         "powerMultiplier": 8
       },
       "base": {
-        "power": 29.2,
+        "power": 8,
         "intervalSeconds": 0.1,
         "count": 40,
         "speed": 0,
@@ -10109,31 +10109,31 @@
       "levels": [
         {
           "range": 15,
-          "power": 6.7
+          "power": 1.5
         },
         {
           "size": 2,
-          "power": 6.7
+          "power": 1.5
         },
         {
           "range": 15,
-          "power": 6.6
+          "power": 1.5
         },
         {
           "cooldownSeconds": -0.2,
-          "power": 1.1
+          "power": 1
         },
         {
           "range": 15,
-          "power": 6
+          "power": 1.5
         },
         {
           "size": 2,
-          "power": 6
+          "power": 1.5
         },
         {
           "range": 15,
-          "power": 6
+          "power": 1.5
         }
       ],
       "region": "hoenn",
@@ -11098,7 +11098,7 @@
       "pattern": "strike",
       "effect": "psychic",
       "base": {
-        "power": 35.7,
+        "power": 33.2,
         "intervalSeconds": 0.1,
         "count": 7,
         "speed": 0,
@@ -11118,29 +11118,31 @@
       "levels": [
         {
           "count": 1,
-          "power": 5.4
+          "power": 5
         },
         {
           "size": 3,
-          "power": 5.9
+          "power": 4.9
         },
         {
           "count": 1,
-          "power": 4.2
+          "power": 3.9
         },
         {
-          "cooldownSeconds": -0.15
+          "cooldownSeconds": -0.15,
+          "power": -0.1
         },
         {
           "count": 1,
-          "power": 3.1
+          "power": 2.9
         },
         {
           "size": 3,
-          "power": 3.7
+          "power": 2.6
         },
         {
-          "count": 2
+          "count": 2,
+          "power": 0.1
         }
       ],
       "effects": [
@@ -11165,7 +11167,7 @@
         "powerMultiplier": 8
       },
       "base": {
-        "power": 109.1,
+        "power": 8,
         "intervalSeconds": 0.1,
         "count": 40,
         "speed": 0,
@@ -11185,31 +11187,31 @@
       "levels": [
         {
           "range": 15,
-          "power": 18.3
+          "power": 1.5
         },
         {
           "size": 2,
-          "power": 18.3
+          "power": 1.5
         },
         {
           "range": 15,
-          "power": 18.3
+          "power": 1.5
         },
         {
           "cooldownSeconds": -0.2,
-          "power": 0.1
+          "power": 1
         },
         {
           "range": 15,
-          "power": 16.4
+          "power": 1.5
         },
         {
           "size": 2,
-          "power": 16.5
+          "power": 1.5
         },
         {
           "range": 15,
-          "power": 16.5
+          "power": 1.5
         }
       ],
       "region": "hoenn",

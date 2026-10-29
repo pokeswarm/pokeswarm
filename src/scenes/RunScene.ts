@@ -35,6 +35,7 @@ import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
 import { addSpriteGallery } from '../render/sprites/SpriteGallery';
 import type { Axis, InputCommand, PlayerId } from '../sim/commands';
 import { SHAPE_BOX, SHAPE_CIRCLE, SHAPE_LINE, SHAPE_SECTOR } from '../sim/entities/projectiles';
+import { pinchMods } from '../sim/ability';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World, gateDeadlineTick } from '../sim/world';
@@ -151,6 +152,8 @@ export class RunScene extends Phaser.Scene {
   private coinIcon!: Phaser.GameObjects.Image;
   /** 右上の自分の性格（ホウエン。07 の89.3）。性格の無い地方では出さない */
   private natureText!: Phaser.GameObjects.Text;
+  /** 自分の特性（ホウエン。07 の133章）。HP が少なくて効いている間は色を変える */
+  private abilityText!: Phaser.GameObjects.Text;
   private coinText!: Phaser.GameObjects.Text;
   /** 倒れているときの案内（真ん中の下） */
   private downText!: Phaser.GameObjects.Text;
@@ -522,6 +525,7 @@ export class RunScene extends Phaser.Scene {
     this.coinIcon = this.add.image(0, 0, pixelTextureKey('coin')).setOrigin(1, 0.5).setScale(2).setScrollFactor(0).setDepth(1001);
     this.coinText = this.add.text(0, 0, '', px(16, uiConfig.coin.color, { outline: true })).setOrigin(1, 0.5).setScrollFactor(0).setDepth(1001);
     this.natureText = this.add.text(0, 0, '', px(16, '#ffffff', { outline: true })).setOrigin(1, 0.5).setScrollFactor(0).setDepth(1001);
+    this.abilityText = this.add.text(0, 0, '', px(16, '#ffffff', { outline: true })).setOrigin(1, 0.5).setScrollFactor(0).setDepth(1001);
     this.timerText = this.add.text(0, 10, '', px(compactScreen() ? uiConfig.compactHud.timerSize : 24, uiConfig.timer.color, { outline: true })).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1000);
     this.bossBar = this.add.graphics().setScrollFactor(0).setDepth(1000);
     this.bossNames.length = 0;
@@ -1515,7 +1519,11 @@ export class RunScene extends Phaser.Scene {
     const w = this.sim.world;
     return w.players
       .filter((p) => p.nature !== undefined)
-      .map((p) => t('pause.natureRow', { id: p.id, pokemon: localName(generated.pokemon[w.rules.species[p.species]?.key ?? '']?.names, getLocale(), ''), nature: natureLabel(w.rules, p.nature) }));
+      .map((p) => {
+        const nature = natureLabel(w.rules, p.nature);
+        const ability = abilityName(w.rules, p.line);
+        return t('pause.natureRow', { id: p.id, pokemon: localName(generated.pokemon[w.rules.species[p.species]?.key ?? '']?.names, getLocale(), ''), nature: ability ? t('pause.natureAbility', { nature, ability }) : nature });
+      });
   }
 
   /** 右上（コインの下）に、自分の一時的な強化のアイコンと残りの秒数 */
@@ -1676,7 +1684,13 @@ export class RunScene extends Phaser.Scene {
     const nature = natureLabel(w.rules, w.players.find((p) => p.id === this.localId)?.nature);
     this.natureText.setText(nature).setVisible(nature !== '');
     this.placeUi(this.natureText, cam.width - 8, top + 12);
-    const rightTop = nature ? top + 32 : top;
+    // 自分の特性（07 の133章）: 性格の下。HP が少なくて効いている間（しんりょく など）は色を変える
+    const me = w.players.find((p) => p.id === this.localId);
+    const ability = me ? abilityName(w.rules, me.line) : '';
+    this.abilityText.setText(ability ? t('run.ability', { name: ability }) : '').setVisible(ability !== '');
+    this.abilityText.setColor(me && pinchMods(w, me) ? '#ffab40' : '#ffffff');
+    this.placeUi(this.abilityText, cam.width - 8, top + (nature ? 36 : 12));
+    const rightTop = top + (nature ? 32 : 0) + (ability ? 24 : 0);
     // コイン（もらえる見込みがあるときだけ）
     const coins = this.recorder.liveCoins(w);
     this.coinText.setText(String(coins)).setVisible(coins > 0);
@@ -2190,6 +2204,12 @@ function candyTier(levels: number): { levels: number; count: number; color: stri
 
 
 /** 性格の名前と、上がる・下がる能力（「いじっぱり こうげき↑ とくこう↓」）。性格が無ければ空 */
+/** 系統の特性の名前（特性の無い地方・系統は空。07 の133章） */
+function abilityName(rules: SimRules, line: string): string {
+  const key = rules.abilities?.[line]?.key;
+  return key ? localName(generated.abilities[key]?.names, getLocale(), key) : '';
+}
+
 function natureLabel(rules: SimRules, nature: number | undefined): string {
   const n = nature === undefined ? undefined : rules.natures?.[nature];
   if (!n) return '';

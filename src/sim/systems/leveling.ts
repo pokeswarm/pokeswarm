@@ -3,6 +3,7 @@ import type { Player, PlayerMove } from '../entities/player';
 import { deriveStats } from '../species';
 import type { NatureStat } from '../../data/schema';
 import { defenseStatOf, natureFactor } from '../nature';
+import { abilityOf } from '../ability';
 import { addModifiers, emptyModifiers, isUniqueDerivation, resolveModifiers } from '../upgrades';
 import { checkEvolution } from './evolution';
 import type { SimDerivation } from '../upgrades';
@@ -448,6 +449,9 @@ export function recomputeModifiers(world: World, p: Player): void {
     if (passive) addModifiers(mods, passive, 1);
   }
   mods.powerPct += pledgePowerPct(world, p);
+  // 特性のいつも効く効果（07 の133章）
+  const ability = abilityOf(world, p)?.mods;
+  if (ability) addModifiers(mods, ability, 1);
   p.mods = mods;
   const sp = world.rules.species[p.species];
   const d = sp ? deriveStats(world.rules.stats, sp, world.level) : null;

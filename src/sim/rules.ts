@@ -2,7 +2,7 @@ import type { CombatConfig, EnemyKind, LegendField, NatureStat, PickupConfig, Sp
 import type { SimSpecies } from './species';
 import type { ObstacleRules } from './obstacles';
 import type { SimMoveDef, TypeChart } from './moves';
-import type { SimDerivation, SimLeveling, SimUpgradeDef } from './upgrades';
+import type { Modifiers, SimDerivation, SimLeveling, SimUpgradeDef } from './upgrades';
 
 /** シミュレーションが使う敵の種類（data/game/enemies.json に、PokeAPI のタイプを足したもの） */
 export interface SimEnemyKind extends EnemyKind {
@@ -68,6 +68,11 @@ export interface SimRules {
    * 上がる能力 ×(1 + stats.naturePct%)、下がる能力 ×(1 − stats.naturePct%)。性格の無い地方は無し
    */
   natures?: readonly { readonly key: string; readonly up: NatureStat | null; readonly down: NatureStat | null }[];
+  /**
+   * 特性（ホウエン。07 の133章）: 系統（playables.json のキー）ごと。特性の無い地方は無し。
+   * mods はいつも効く。pinch は HP が最大の hpPct % 以下の間だけ、技の威力に効く
+   */
+  abilities?: Readonly<Record<string, { readonly key: string; readonly mods: Modifiers | null; readonly pinch: { readonly hpPct: number; readonly mods: Modifiers } | null }>>;
   /** なつきの進化に要る、ランで歩いた距離（data/game/player.json） */
   friendshipDistance: number;
   /** 協力プレイで届いた位置をなめらかに見せる */

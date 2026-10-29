@@ -26,6 +26,8 @@ import { DMG_CRIT, type HitEffect } from '../events';
 import { axisToUnit } from '../math';
 import { typeFlags, typeMultiplier, type MoveStats, type SimMoveDef } from '../moves';
 import type { World } from '../world';
+import { pinchMods } from '../ability';
+import type { Modifiers } from '../upgrades';
 import { applyHitEffect } from './commands';
 import { fireDelayedExplosion, fireEffects, type FxSource } from './moveEffects';
 import { healPlayer, hurtPlayer, selfDamage } from './health';
@@ -106,10 +108,10 @@ function typeAreaPctOf(m: Player['mods'], def: SimMoveDef): number {
 }
 
 /** タイプの威力の強化: 持ち物・あまごい・マップの効果（2つ目のタイプの分も足す） */
-function typePowerPctOf(world: World, p: Player, def: SimMoveDef): number {
+function typePowerPctOf(world: World, p: Player, def: SimMoveDef, pinch: Modifiers | null): number {
   let pct = 0;
   for (const t of moveTypesOf(def)) {
-    pct += (p.mods.typePowerPct[t] ?? 0) + (p.rain && p.rain.type === t && world.tick < p.rain.untilTick ? p.rain.pct : 0) + fieldTypePct(world, t);
+    pct += (p.mods.typePowerPct[t] ?? 0) + (pinch?.typePowerPct[t] ?? 0) + (p.rain && p.rain.type === t && world.tick < p.rain.untilTick ? p.rain.pct : 0) + fieldTypePct(world, t);
   }
   return pct;
 }
@@ -118,13 +120,15 @@ function typePowerPctOf(world: World, p: Player, def: SimMoveDef): number {
 export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: MoveStats) {
   const def = world.rules.moves[pm.move]!;
   const m = p.mods;
-  const classPct = def.damageClass === 'physical' ? m.physicalPowerPct : m.specialPowerPct;
+  // 特性: HP が少ない間だけ威力が上がる（しんりょく など。07 の133章）
+  const pinch = pinchMods(world, p);
+  const classPct = (def.damageClass === 'physical' ? m.physicalPowerPct + (pinch?.physicalPowerPct ?? 0) : m.specialPowerPct + (pinch?.specialPowerPct ?? 0)) + (pinch?.powerPct ?? 0);
   return {
     // ポケモンのステータス（物理・特殊の威力。種族値のランクとレベル）と、持ち物の効果を掛ける
     power:
       st.power *
       (def.damageClass === 'physical' ? p.physicalPower : p.specialPower) *
-      Math.max(0, 1 + (m.powerPct + classPct + typePowerPctOf(world, p, def)) / 100) *
+      Math.max(0, 1 + (m.powerPct + classPct + typePowerPctOf(world, p, def, pinch)) / 100) *
       heldPowerMultiplier(world, p) *
       // とっておき: 覚えているほかの技が多いほど強い
       (1 + (st.perMovePowerPct * Math.max(0, p.moves.length - 1)) / 100),

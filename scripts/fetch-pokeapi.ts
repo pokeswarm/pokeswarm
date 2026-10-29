@@ -4,7 +4,7 @@
  *   npm run pokeapi
  *
  * 入力: data/pokeapi/targets.json（取得するポケモン・技・持ち物・地方のキー。タイプは全部）
- * 出力: data/generated/pokemon.json・moves.json・items.json・types.json・regions.json・natures.json（コミットする。ビルドに通信を使わないため）
+ * 出力: data/generated/pokemon.json・moves.json・items.json・types.json・regions.json・natures.json・abilities.json（コミットする。ビルドに通信を使わないため）
  *
  * 取得した応答は scripts/.cache/pokeapi/ に保存し、再取得しない（PokeAPI に何度も問い合わせない）。
  * 出力はキーの順に並べ、何度実行しても同じ内容になるようにする。
@@ -18,6 +18,7 @@ import {
   generatedItemsSchema,
   generatedMovesSchema,
   generatedNaturesSchema,
+  generatedAbilitiesSchema,
   generatedPokemonSchema,
   generatedRegionsSchema,
   generatedTypesSchema,
@@ -209,6 +210,13 @@ async function main(): Promise<void> {
     natures[ref.name] = { names: names(n.names, ref.name), increased: n.increased_stat?.name ?? null, decreased: n.decreased_stat?.name ?? null };
   }
 
+  // 特性（名前だけ。07 の133章）
+  const abilities: Record<string, unknown> = {};
+  for (const key of targets.abilities) {
+    const a = await get<{ names: LocalizedName[] }>(`ability/${key}`);
+    abilities[key] = { names: names(a.names, key) };
+  }
+
   const outputs = {
     'pokemon.json': generatedPokemonSchema.parse(sortObject(pokemon)),
     'moves.json': generatedMovesSchema.parse(sortObject(moves)),
@@ -216,6 +224,7 @@ async function main(): Promise<void> {
     'types.json': generatedTypesSchema.parse(sortObject(types)),
     'regions.json': generatedRegionsSchema.parse(sortObject(regions)),
     'natures.json': generatedNaturesSchema.parse(sortObject(natures)),
+    'abilities.json': generatedAbilitiesSchema.parse(sortObject(abilities)),
   };
   await mkdir(OUT_DIR, { recursive: true });
   for (const [file, data] of Object.entries(outputs)) {

@@ -1,0 +1,32 @@
+{
+  "blaze": {
+    "names": {
+      "ja": "もうか",
+      "en": "Blaze",
+      "fr": "Brasier",
+      "de": "Großbrand",
+      "es": "Mar Llamas",
+      "it": "Aiutofuoco"
+    }
+  },
+  "overgrow": {
+    "names": {
+      "ja": "しんりょく",
+      "en": "Overgrow",
+      "fr": "Engrais",
+      "de": "Notdünger",
+      "es": "Espesura",
+      "it": "Erbaiuto"
+    }
+  },
+  "torrent": {
+    "names": {
+      "ja": "げきりゅう",
+      "en": "Torrent",
+      "fr": "Torrent",
+      "de": "Sturzbach",
+      "es": "Torrente",
+      "it": "Acquaiuto"
+    }
+  }
+}

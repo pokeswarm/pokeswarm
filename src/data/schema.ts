@@ -1274,6 +1274,8 @@ export const regionStageSchema = z.object({
   intruderBgm: z.string().nullable().default(null),
   /** ランを始めるたびに、一人ずつ性格を抽選する（ホウエン。07 の89.3） */
   natures: z.boolean().default(false),
+  /** 特性のある地方（ホウエン。07 の133章）。プレイアブルの ability が効く */
+  abilities: z.boolean().default(false),
 });
 export type RegionStageFile = z.infer<typeof regionStageSchema>;
 
@@ -1315,6 +1317,8 @@ export const playablesConfigSchema = z.object({
       /** タイプを決める（進化した姿も同じ。プリン: ノーマルだけ）。省略時は PokeAPI のタイプ */
       types: z.array(z.string()).optional(),
       /** 自分のタイプのほかに、候補に出る技のタイプ（コダック: エスパー） */
+      /** 特性（data/game/abilities.json のキー。特性のある地方だけで効く。07 の133章） */
+      ability: z.string().optional(),
       moveTypes: z.array(z.string()).optional(),
       /** 新しい技を覚えない（プリン: 最初の2つだけで戦う） */
       fixedMoves: z.boolean().default(false),
@@ -1836,6 +1840,8 @@ export const pokeapiTargetsSchema = z.object({
   items: z.array(z.string()),
   /** 地方（名前だけ。マップの選択で使う） */
   regions: z.array(z.string()),
+  /** 特性（名前だけ。ホウエン。07 の133章） */
+  abilities: z.array(z.string()).default([]),
 });
 
 /** 名前（PokeAPI の各言語）。ヨーロッパの言語は、無ければ英語を使う */
@@ -1895,6 +1901,25 @@ export const generatedRegionsSchema = z.record(z.string(), z.object({ names: loc
 export const natureStatSchema = z.enum(['attack', 'defense', 'special-attack', 'special-defense', 'speed']);
 export type NatureStat = z.infer<typeof natureStatSchema>;
 /** 性格（PokeAPI の nature。全部。ホウエン。07 の89.3）。上がる・下がる能力が無いのは、がんばりや などの変わらない性格 */
+/** 特性（PokeAPI の ability。名前だけ。07 の133章） */
+export const generatedAbilitiesSchema = z.record(z.string(), z.object({ names: localizedNames }));
+
+/**
+ * 特性の効き方（data/game/abilities.json。作者の決定 2026年10月29日。07 の133章）。
+ * - mods: いつも効く（持ち物と同じ形）
+ * - pinch: HP が最大の hpPct % 以下の間だけ、技の威力に mods の powerPct・physicalPowerPct・specialPowerPct・typePowerPct を足す（しんりょく など）
+ */
+export const abilitiesConfigSchema = z.object({
+  abilities: z.record(
+    z.string(),
+    z.object({
+      mods: modifierSchema.optional(),
+      pinch: z.object({ hpPct: z.number().positive().max(100), mods: modifierSchema }).optional(),
+    }),
+  ),
+});
+export type AbilitiesConfig = z.infer<typeof abilitiesConfigSchema>;
+
 export const generatedNaturesSchema = z.record(
   z.string(),
   z.object({ names: localizedNames, increased: natureStatSchema.nullable(), decreased: natureStatSchema.nullable() }),

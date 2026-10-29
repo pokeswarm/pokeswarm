@@ -492,5 +492,10 @@
     "alola",
     "galar",
     "paldea"
+  ],
+  "abilities": [
+    "overgrow",
+    "blaze",
+    "torrent"
   ]
 }

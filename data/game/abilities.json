@@ -1,0 +1,34 @@
+{
+  "abilities": {
+    "overgrow": {
+      "pinch": {
+        "hpPct": 33.4,
+        "mods": {
+          "typePowerPct": {
+            "grass": 50
+          }
+        }
+      }
+    },
+    "blaze": {
+      "pinch": {
+        "hpPct": 33.4,
+        "mods": {
+          "typePowerPct": {
+            "fire": 50
+          }
+        }
+      }
+    },
+    "torrent": {
+      "pinch": {
+        "hpPct": 33.4,
+        "mods": {
+          "typePowerPct": {
+            "water": 50
+          }
+        }
+      }
+    }
+  }
+}

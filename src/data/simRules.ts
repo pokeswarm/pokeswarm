@@ -17,6 +17,7 @@ import {
   movesConfig,
   pickupConfig,
   playablesConfig,
+  abilitiesConfig,
   playerSpriteKeys,
   shopConfig,
   statsConfig,
@@ -243,6 +244,17 @@ export function buildSimRules(region?: string): SimRules {
     nightSections: rs.night,
     ...(rs.weather.some((w) => w.kinds.length > 0)
       ? { weatherSections: rs.weather.map((w) => ({ kinds: w.kinds, fields: w.kinds.map((k) => weatherConfig.weathers[k]!), everySeconds: w.everySeconds })) }
+      : {}),
+    ...(rs.abilities
+      ? {
+          abilities: Object.fromEntries(
+            Object.entries(playablesConfig.pokemon).flatMap(([line, pl]) => {
+              const a = pl.ability ? abilitiesConfig.abilities[pl.ability] : undefined;
+              if (!pl.ability || !a) return [];
+              return [[line, { key: pl.ability, mods: a.mods ? resolveModifiers(a.mods, types.names) : null, pinch: a.pinch ? { hpPct: a.pinch.hpPct, mods: resolveModifiers(a.pinch.mods, types.names) } : null }]];
+            }),
+          ),
+        }
       : {}),
     ...(rs.natures ? { natures: Object.entries(generated.natures).map(([key, n]) => ({ key, up: n.increased, down: n.decreased })) } : {}),
     lines,

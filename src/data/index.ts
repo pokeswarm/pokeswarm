@@ -16,6 +16,7 @@ import spawnJson from '../../data/game/spawn.json';
 import combatJson from '../../data/game/combat.json';
 import movesJson from '../../data/game/moves.json';
 import playablesJson from '../../data/game/playables.json';
+import abilitiesJson from '../../data/game/abilities.json';
 import regionsJson from '../../data/game/regions.json';
 import siteJson from '../../data/site.json';
 import levelingJson from '../../data/game/leveling.json';
@@ -43,11 +44,14 @@ import generatedItemsJson from '../../data/generated/items.json';
 import generatedTypesJson from '../../data/generated/types.json';
 import generatedRegionsJson from '../../data/generated/regions.json';
 import generatedNaturesJson from '../../data/generated/natures.json';
+import generatedAbilitiesJson from '../../data/generated/abilities.json';
 import type { BgmRun, GroundConfig, ObstacleConfig, SpawnConfig, StageConfig, UnlocksConfig } from './schema';
 import { resolveEffectRecipes } from './effects';
 import {
   combatConfigSchema,
   derivationsConfigSchema,
+  abilitiesConfigSchema,
+  generatedAbilitiesSchema,
   itemsConfigSchema,
   levelingConfigSchema,
   enemiesConfigSchema,
@@ -118,6 +122,8 @@ export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enem
 export const combatConfig = load('game/combat.json', combatConfigSchema, combatJson);
 export const movesConfig = load('game/moves.json', movesConfigSchema, movesJson);
 export const playablesConfig = load('game/playables.json', playablesConfigSchema, playablesJson);
+/** 特性の効き方（ホウエン。07 の133章） */
+export const abilitiesConfig = load('game/abilities.json', abilitiesConfigSchema, abilitiesJson);
 /** プレイヤーとして描ける（全動作のドット絵がある）ポケモン。これ以外へは進化しない（雑魚・ボス用だけのハガネールなど） */
 export const playerSpriteKeys: ReadonlySet<string> = new Set(
   load('sprites/pokemon.json', spritePokemonListSchema, spritePokemonJson)
@@ -148,6 +154,8 @@ export interface RegionStage {
   readonly weather: readonly SectionWeather[];
   /** ランを始めるたびに性格を抽選する（ホウエン。07 の89.3） */
   readonly natures: boolean;
+  /** プレイアブルの特性が効く（ホウエン。07 の133章） */
+  readonly abilities: boolean;
 }
 export interface SectionWeather {
   readonly kinds: readonly string[];
@@ -180,6 +188,7 @@ export const regionStages: Readonly<Record<string, RegionStage>> = Object.fromEn
         x.weatherCycle ? { kinds: x.weatherCycle.kinds, everySeconds: x.weatherCycle.everySeconds } : { kinds: x.weather ? [x.weather] : [], everySeconds: 0 },
       ),
       natures: file.natures,
+      abilities: file.abilities,
     };
     return [id, stage];
   }),
@@ -230,6 +239,7 @@ export const generated = {
   types: load('generated/types.json', generatedTypesSchema, generatedTypesJson),
   regions: load('generated/regions.json', generatedRegionsSchema, generatedRegionsJson),
   natures: load('generated/natures.json', generatedNaturesSchema, generatedNaturesJson),
+  abilities: load('generated/abilities.json', generatedAbilitiesSchema, generatedAbilitiesJson),
 };
 // 原作の名前を借りる技（ベイビィ用の ゆびをふる は、ミュウの ゆびをふる と名前・タイプが同じ別の技。moves.json の nameOf）
 for (const [key, def] of Object.entries(movesConfig.moves)) {
@@ -374,6 +384,7 @@ for (const [key, p] of Object.entries(playablesConfig.pokemon)) {
     continue;
   }
   check(p.startingMoves.length > 0, `data/game/playables.json の "${key}" に最初の技がありません`);
+  check(!p.ability || (!!abilitiesConfig.abilities[p.ability] && !!generated.abilities[p.ability]), `data/game/playables.json の "${key}" の特性 "${p.ability}" が data/game/abilities.json か data/generated/abilities.json にありません（data/pokeapi/targets.json の abilities に足して npm run pokeapi）`);
   check(!!generated.pokemon[key], `data/game/playables.json の "${key}" が data/generated/pokemon.json にありません`);
   for (const m of p.startingMoves) check(!!movesConfig.moves[m], `data/game/playables.json の "${key}" の最初の技 "${m}" が data/game/moves.json にありません`);
   if (p.unlock) {

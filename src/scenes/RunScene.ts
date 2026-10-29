@@ -637,11 +637,15 @@ export class RunScene extends Phaser.Scene {
     room.onLeave = (id, reason) => {
       const why = this.leaveReasonText(reason);
       if (id === HOST_PLAYER_ID) {
+        // ランの終わりを受け取った後なら、ホストが先に結果画面へ移って部屋を出ただけ（切断ではない。作者の報告 2026年10月30日）
+        if (this.sim.world.outcome || this.inbox.some((c) => c.type === 'endRun')) return;
         // ホストとの接続が切れたら、ランを終えて（ここまでの記録を保存して）結果画面へ
         this.disconnectReason = why;
         this.panel?.show('net.hostLeft', undefined, why);
         this.inbox.push({ type: 'endRun', outcome: 'disconnected' });
       } else {
+        // ランが終わった後に抜けたゲストは、先に結果画面へ移っただけ
+        if (this.sim.world.outcome) return;
         // ホスト: 抜けたプレイヤーを外して続ける（ゲストへも知らせる）
         this.leaveReasons.set(id, why);
         this.inbox.push({ type: 'removePlayer', playerId: id });

@@ -136,3 +136,20 @@ describe('特性の効き方', () => {
   });
 
 });
+
+describe('どの系統も、固有技と支えの技を最大で持って動かせる', () => {
+  it('18 系統の本線と支えの技を最大にして 20 秒動かしても止まらない', async () => {
+    const { derivationsConfig } = await import('../data');
+    const lines = ['makuhita', 'electrike', 'numel', 'slakoth', 'swablu', 'absol', 'shuppet', 'spheal', 'bagon', 'feebas', 'beldum', 'ralts', 'trapinch', 'aron', 'azurill', 'wynaut', 'barboach', 'mawile'];
+    for (const line of lines) {
+      const t = setup(line);
+      const keys = new Set(derivationsConfig.unique.filter((u) => u.line === line).flatMap((u) => [u.from, u.to]));
+      t.p.moves = [...keys].slice(0, 4).map((k) => ({ move: t.move(k), level: t.rules.moves[t.move(k)]!.levels.length, cooldown: 0, burstLeft: 0, burstTimer: 0 }));
+      for (let k = 0; k < 30; k++) t.sim.world.enemies.add(k + 1, 0, 40 + (k % 6) * 30, -100 + Math.floor(k / 6) * 40, 1e6, 0, 10);
+      expect(() => {
+        for (let k = 0; k < 600; k++) t.sim.step([]);
+      }, line).not.toThrow();
+      expect(t.sim.world.events.length + t.sim.world.projectiles.count, line).toBeGreaterThanOrEqual(0);
+    }
+  });
+});

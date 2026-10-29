@@ -158,6 +158,21 @@
       "key": "porygon",
       "cost": 9999,
       "region": "johto"
+    },
+    {
+      "key": "barboach",
+      "cost": 1000,
+      "region": "hoenn"
+    },
+    {
+      "key": "egg-hoenn",
+      "cost": 5000,
+      "region": "hoenn"
+    },
+    {
+      "key": "mawile",
+      "cost": 9999,
+      "region": "hoenn"
     }
   ],
   "startingCoins": 500,

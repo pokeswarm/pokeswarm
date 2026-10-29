@@ -1058,6 +1058,160 @@
       "reward": {
         "item": "light-clay"
       }
+    },
+    {
+      "id": "hoenn-unlock-makuhita",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bossDefeated.hariyama",
+        "atLeast": 2
+      },
+      "reward": {
+        "pokemon": "makuhita"
+      }
+    },
+    {
+      "id": "hoenn-unlock-electrike",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bossDefeated.manectric",
+        "atLeast": 3
+      },
+      "reward": {
+        "pokemon": "electrike"
+      }
+    },
+    {
+      "id": "hoenn-unlock-numel",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bossDefeated.camerupt",
+        "atLeast": 3
+      },
+      "reward": {
+        "pokemon": "numel"
+      }
+    },
+    {
+      "id": "hoenn-unlock-slakoth",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bossDefeated.slaking",
+        "atLeast": 4
+      },
+      "reward": {
+        "pokemon": "slakoth"
+      }
+    },
+    {
+      "id": "hoenn-unlock-swablu",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bossDefeated.altaria",
+        "atLeast": 4
+      },
+      "reward": {
+        "pokemon": "swablu"
+      }
+    },
+    {
+      "id": "hoenn-unlock-absol",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bossDefeated.absol",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "absol"
+      }
+    },
+    {
+      "id": "hoenn-unlock-shuppet",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bossDefeated.banette",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "shuppet"
+      }
+    },
+    {
+      "id": "hoenn-unlock-spheal",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bossDefeated.walrein",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "spheal"
+      }
+    },
+    {
+      "id": "hoenn-unlock-bagon",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bossDefeated.salamence",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "bagon"
+      }
+    },
+    {
+      "id": "hoenn-unlock-feebas",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bossDefeated.milotic",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "feebas"
+      }
+    },
+    {
+      "id": "hoenn-unlock-beldum",
+      "region": "hoenn",
+      "condition": {
+        "stat": "clears",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "beldum"
+      }
+    },
+    {
+      "id": "hoenn-unlock-ralts",
+      "region": "hoenn",
+      "condition": {
+        "stat": "distinctClears",
+        "atLeast": 3
+      },
+      "reward": {
+        "pokemon": "ralts"
+      }
+    },
+    {
+      "id": "hoenn-unlock-trapinch",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bestMidbosses",
+        "atLeast": 16
+      },
+      "reward": {
+        "pokemon": "trapinch"
+      }
+    },
+    {
+      "id": "hoenn-unlock-aron",
+      "region": "hoenn",
+      "condition": {
+        "stat": "defeated.aron",
+        "atLeast": 1000
+      },
+      "reward": {
+        "pokemon": "aron"
+      }
     }
   ]
 }

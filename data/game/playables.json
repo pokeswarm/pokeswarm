@@ -9,6 +9,7 @@
     "treecko": { "sprite": "treecko", "startingMoves": ["leafage"], "ability": "overgrow" },
     "torchic": { "sprite": "torchic", "startingMoves": ["double-kick"], "moveTypes": ["fighting"], "ability": "blaze" },
     "mudkip": { "sprite": "mudkip", "startingMoves": ["water-gun"], "moveTypes": ["ground"], "ability": "torrent" },
+    "egg-hoenn": { "sprite": "egg", "hatch": ["azurill", "wynaut"] },
     "makuhita": { "sprite": "makuhita", "startingMoves": ["arm-thrust"], "ability": "guts" },
     "electrike": { "sprite": "electrike", "startingMoves": ["spark"], "ability": "static" },
     "numel": { "sprite": "numel", "startingMoves": ["ember"], "ability": "simple" },

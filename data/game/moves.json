@@ -1832,7 +1832,6 @@
           "power": 3.1
         },
         {
-          "durationSeconds": 0.1,
           "power": 4.2
         },
         {
@@ -1987,7 +1986,7 @@
         "knockback": 160,
         "knockbackSeconds": 0.1,
         "spreadDegrees": 0,
-        "cooldownSeconds": 0.55,
+        "cooldownSeconds": 1,
         "statusChance": 0,
         "statusSeconds": 0,
         "critChancePct": 25,
@@ -2038,8 +2037,8 @@
           "trigger": "hit",
           "cluster": {
             "sizeMultiplier": 1.4,
-            "powerMultiplier": 0.3,
-            "count": 7,
+            "powerMultiplier": 0.1,
+            "count": 4,
             "radius": 55,
             "durationSeconds": 1.6,
             "hitIntervalSeconds": 0.4
@@ -5533,7 +5532,8 @@
             "hitIntervalSeconds": 0.4
           }
         }
-      ]
+      ],
+      "landOnly": true
     },
     "synthesis": {
       "pattern": "heal",

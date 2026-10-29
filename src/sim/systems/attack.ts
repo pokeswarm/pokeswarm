@@ -44,6 +44,8 @@ function heldPowerMultiplier(world: World, p: Player): number {
 
 /** 一撃で倒すときのダメージ（どの雑魚の HP より大きい） */
 const INSTAKILL_DAMAGE = 1e9;
+/** 投げる技の landOnly: 落ちる直前のこの秒数だけ当たる */
+const LAND_WINDOW_SECONDS = 0.1;
 
 /** 技のレベルの性能（レベルは 1〜最大に収める） */
 export function moveStatsOf(world: World, pm: { move: number; level: number }): MoveStats {
@@ -1304,6 +1306,8 @@ export function moveProjectiles(world: World): void {
       hitLocalPlayer(world, i);
       continue;
     }
+    // 投げる技で「落ちた所でだけ当たる」もの（landOnly）: 飛んでいる途中は当たらない（07 の126章）
+    if (motion === MOTION_LOB && pr.stage[i] === 0 && pr.life[i]! > LAND_WINDOW_SECONDS && world.rules.moves[pr.move[i]!]!.landOnly) continue;
     const x = pr.x[i]!;
     const y = pr.y[i]!;
     const line = pr.shape[i] === SHAPE_LINE;

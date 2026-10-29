@@ -83,6 +83,8 @@ export interface SimMoveDef {
   readonly waitForEnd?: boolean;
   /** ポイントマックスで増えた本数を威力に変える（太い追従レーザー。07 の122章） */
   readonly bonusCountToPower?: boolean;
+  /** lob: 落ちた所でだけ当たる（07 の126章） */
+  readonly landOnly?: boolean;
   /** 使うたびに最大 HP の pct % 相当のダメージを自分が受け、HP が最大 HP の minHpPct % を下回っていれば出さない（だいばくはつ） */
   readonly hpCost?: { readonly pct: number; readonly minHpPct: number };
   /** 使うたびに、自分を seconds 秒だけ強くする（フレアドライブ。07 の115章） */

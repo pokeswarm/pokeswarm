@@ -66,6 +66,7 @@ export function buildSimRules(region?: string): SimRules {
       learners: def.learners ?? null,
       waitForEnd: def.waitForEnd,
       ...(def.bonusCountToPower ? { bonusCountToPower: true } : {}),
+      ...(def.landOnly ? { landOnly: true } : {}),
       ...(def.hpCost ? { hpCost: def.hpCost } : {}),
       ...(def.selfBuff ? { selfBuff: { seconds: def.selfBuff.seconds, mods: resolveModifiers(def.selfBuff.mods, types.names) } } : {}),
       ...(def.allyHealPct ? { allyHealPct: def.allyHealPct } : {}),

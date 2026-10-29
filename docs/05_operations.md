@@ -101,7 +101,7 @@ English:
 ## 8. 検索・AI 向けの説明（SEO・GEO。作者の依頼 2026年10月29日。版 0.5.36）
 
 - ジャンルは **ヴァンパイアサバイバー系（Survivors-like）・ローグライト**。「ローグライト」「Pokémon / ポケモン」「サバイバー系」「Survivor ライク」で引っかかるようにする。
-- `index.html`: タイトル（英語＋日本語）・説明・キーワード・正規の URL（canonical）、構造化データ（JSON-LD の VideoGame と FAQPage）、スクリプトを動かさない読み手向けの短い説明（`noscript`。ゲームの画面には出ない）。OGP の説明は SNS で読まれるので英語のまま。
+- `index.html`: タイトル（英語だけ。2026年10月30日から）・説明・キーワード・正規の URL（canonical）、構造化データ（JSON-LD の VideoGame と FAQPage）、スクリプトを動かさない読み手向けの短い説明（`noscript`。ゲームの画面には出ない）。OGP の説明は SNS で読まれるので英語のまま。
 - 英語を基本にする（作者の決定 2026年10月30日: 海外向け）。トップ（`index.html`）は `lang="en"`・タイトルと説明文は英語だけ。日本語の検索語は JSON-LD に残す。
 - `public/about.html`: 文字で読める紹介のページ（英語）。Cloudflare では `/about` で配る（`.html` 付きは `/about` へ転送される）ので、正規の URL・サイトマップ・リンクは `/about`。日本語版は `public/ja/about.html`（`/ja/about`）。2つは hreflang（en・ja、x-default は英語）でつなぎ、サイトマップにも両方を載せる。検索結果の説明文はページ（URL）ごとに1つで、見る人のブラウザの言語では変わらないため、言語ごとにページを分けている。特徴・遊び方・よくある質問・権利の表記。
 - `public/llms.txt`: AI 向けの短い説明（英語）。`public/robots.txt`（すべて許可・サイトマップの場所）と `public/sitemap.xml`（トップと紹介のページ）。

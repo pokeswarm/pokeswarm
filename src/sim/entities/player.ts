@@ -117,6 +117,8 @@ export interface Player {
   readonly banned: Set<string>;
   /** ねむる（カビゴン）: 歩いていない更新の回数・眠っているか・起きる動きの残りの更新回数 */
   sleep?: { stillTicks: number; asleep: boolean; wakeTicks: number };
+  /** 性格（SimRules.natures の番号。性格の無い地方は無し。07 の89.3） */
+  nature?: number;
   /** 進化で消費された技（持ち物で覚え直さない） */
   consumedMoves?: number[];
   /** 箱から拾った一時的な強化（index は pickups.json の items.buff.buffs の番号） */

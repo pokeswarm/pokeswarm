@@ -25,6 +25,7 @@
     "defense": 1
   },
   "hurtInvincibleSeconds": 0.6,
+  "naturePct": 10,
   "revive": {
     "initialCount": 1,
     "hpPct": 50,

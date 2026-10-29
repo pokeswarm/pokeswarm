@@ -1,4 +1,4 @@
-import type { CombatConfig, EnemyKind, LegendField, PickupConfig, SpawnConfig, StageConfig, StatsConfig, StatusConfig, NetSmoothing } from '../data/schema';
+import type { CombatConfig, EnemyKind, LegendField, NatureStat, PickupConfig, SpawnConfig, StageConfig, StatsConfig, StatusConfig, NetSmoothing } from '../data/schema';
 import type { SimSpecies } from './species';
 import type { ObstacleRules } from './obstacles';
 import type { SimMoveDef, TypeChart } from './moves';
@@ -61,6 +61,11 @@ export interface SimRules {
    * 区間の頭から everySeconds ごとに次の天気へ巡らせる（区間7: ひざしがつよい ⇄ あめ）。天気の無い地方は無し
    */
   weatherSections?: readonly { readonly kinds: readonly string[]; readonly fields: readonly LegendField[]; readonly everySeconds: number }[];
+  /**
+   * 性格（ホウエン。07 の89.3）: あればランを始めるたびに一人ずつ抽選する（data/generated/natures.json の全部。並びはキーの順）。
+   * 上がる能力 ×(1 + stats.naturePct%)、下がる能力 ×(1 − stats.naturePct%)。性格の無い地方は無し
+   */
+  natures?: readonly { readonly key: string; readonly up: NatureStat | null; readonly down: NatureStat | null }[];
   /** なつきの進化に要る、ランで歩いた距離（data/game/player.json） */
   friendshipDistance: number;
   /** 協力プレイで届いた位置をなめらかに見せる */

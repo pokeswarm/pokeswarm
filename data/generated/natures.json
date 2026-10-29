@@ -1,0 +1,302 @@
+{
+  "adamant": {
+    "names": {
+      "ja": "いじっぱり",
+      "en": "Adamant",
+      "fr": "Rigide",
+      "de": "Hart",
+      "es": "Firme",
+      "it": "Decisa"
+    },
+    "increased": "attack",
+    "decreased": "special-attack"
+  },
+  "bashful": {
+    "names": {
+      "ja": "てれや",
+      "en": "Bashful",
+      "fr": "Pudique",
+      "de": "Zaghaft",
+      "es": "Tímida",
+      "it": "Ritrosa"
+    },
+    "increased": null,
+    "decreased": null
+  },
+  "bold": {
+    "names": {
+      "ja": "ずぶとい",
+      "en": "Bold",
+      "fr": "Assuré",
+      "de": "Kühn",
+      "es": "Osada",
+      "it": "Sicura"
+    },
+    "increased": "defense",
+    "decreased": "attack"
+  },
+  "brave": {
+    "names": {
+      "ja": "ゆうかん",
+      "en": "Brave",
+      "fr": "Brave",
+      "de": "Mutig",
+      "es": "Audaz",
+      "it": "Audace"
+    },
+    "increased": "attack",
+    "decreased": "speed"
+  },
+  "calm": {
+    "names": {
+      "ja": "おだやか",
+      "en": "Calm",
+      "fr": "Calme",
+      "de": "Still",
+      "es": "Serena",
+      "it": "Calma"
+    },
+    "increased": "special-defense",
+    "decreased": "attack"
+  },
+  "careful": {
+    "names": {
+      "ja": "しんちょう",
+      "en": "Careful",
+      "fr": "Prudent",
+      "de": "Sacht",
+      "es": "Cauta",
+      "it": "Cauta"
+    },
+    "increased": "special-defense",
+    "decreased": "special-attack"
+  },
+  "docile": {
+    "names": {
+      "ja": "すなお",
+      "en": "Docile",
+      "fr": "Docile",
+      "de": "Sanft",
+      "es": "Dócil",
+      "it": "Docile"
+    },
+    "increased": null,
+    "decreased": null
+  },
+  "gentle": {
+    "names": {
+      "ja": "おとなしい",
+      "en": "Gentle",
+      "fr": "Gentil",
+      "de": "Zart",
+      "es": "Amable",
+      "it": "Gentile"
+    },
+    "increased": "special-defense",
+    "decreased": "defense"
+  },
+  "hardy": {
+    "names": {
+      "ja": "がんばりや",
+      "en": "Hardy",
+      "fr": "Hardi",
+      "de": "Robust",
+      "es": "Fuerte",
+      "it": "Ardita"
+    },
+    "increased": null,
+    "decreased": null
+  },
+  "hasty": {
+    "names": {
+      "ja": "せっかち",
+      "en": "Hasty",
+      "fr": "Pressé",
+      "de": "Hastig",
+      "es": "Activa",
+      "it": "Lesta"
+    },
+    "increased": "speed",
+    "decreased": "defense"
+  },
+  "impish": {
+    "names": {
+      "ja": "わんぱく",
+      "en": "Impish",
+      "fr": "Malin",
+      "de": "Pfiffig",
+      "es": "Agitada",
+      "it": "Scaltra"
+    },
+    "increased": "defense",
+    "decreased": "special-attack"
+  },
+  "jolly": {
+    "names": {
+      "ja": "ようき",
+      "en": "Jolly",
+      "fr": "Jovial",
+      "de": "Froh",
+      "es": "Alegre",
+      "it": "Allegra"
+    },
+    "increased": "speed",
+    "decreased": "special-attack"
+  },
+  "lax": {
+    "names": {
+      "ja": "のうてんき",
+      "en": "Lax",
+      "fr": "Lâche",
+      "de": "Lasch",
+      "es": "Floja",
+      "it": "Fiacca"
+    },
+    "increased": "defense",
+    "decreased": "special-defense"
+  },
+  "lonely": {
+    "names": {
+      "ja": "さみしがり",
+      "en": "Lonely",
+      "fr": "Solo",
+      "de": "Solo",
+      "es": "Huraña",
+      "it": "Schiva"
+    },
+    "increased": "attack",
+    "decreased": "defense"
+  },
+  "mild": {
+    "names": {
+      "ja": "おっとり",
+      "en": "Mild",
+      "fr": "Doux",
+      "de": "Mild",
+      "es": "Afable",
+      "it": "Mite"
+    },
+    "increased": "special-attack",
+    "decreased": "defense"
+  },
+  "modest": {
+    "names": {
+      "ja": "ひかえめ",
+      "en": "Modest",
+      "fr": "Modeste",
+      "de": "Mäßig",
+      "es": "Modesta",
+      "it": "Modesta"
+    },
+    "increased": "special-attack",
+    "decreased": "attack"
+  },
+  "naive": {
+    "names": {
+      "ja": "むじゃき",
+      "en": "Naive",
+      "fr": "Naïf",
+      "de": "Naiv",
+      "es": "Ingenua",
+      "it": "Ingenua"
+    },
+    "increased": "speed",
+    "decreased": "special-defense"
+  },
+  "naughty": {
+    "names": {
+      "ja": "やんちゃ",
+      "en": "Naughty",
+      "fr": "Mauvais",
+      "de": "Frech",
+      "es": "Pícara",
+      "it": "Birbona"
+    },
+    "increased": "attack",
+    "decreased": "special-defense"
+  },
+  "quiet": {
+    "names": {
+      "ja": "れいせい",
+      "en": "Quiet",
+      "fr": "Discret",
+      "de": "Ruhig",
+      "es": "Mansa",
+      "it": "Quieta"
+    },
+    "increased": "special-attack",
+    "decreased": "speed"
+  },
+  "quirky": {
+    "names": {
+      "ja": "きまぐれ",
+      "en": "Quirky",
+      "fr": "Bizarre",
+      "de": "Kauzig",
+      "es": "Rara",
+      "it": "Furba"
+    },
+    "increased": null,
+    "decreased": null
+  },
+  "rash": {
+    "names": {
+      "ja": "うっかりや",
+      "en": "Rash",
+      "fr": "Foufou",
+      "de": "Hitzig",
+      "es": "Alocada",
+      "it": "Ardente"
+    },
+    "increased": "special-attack",
+    "decreased": "special-defense"
+  },
+  "relaxed": {
+    "names": {
+      "ja": "のんき",
+      "en": "Relaxed",
+      "fr": "Relax",
+      "de": "Locker",
+      "es": "Plácida",
+      "it": "Placida"
+    },
+    "increased": "defense",
+    "decreased": "speed"
+  },
+  "sassy": {
+    "names": {
+      "ja": "なまいき",
+      "en": "Sassy",
+      "fr": "Malpoli",
+      "de": "Forsch",
+      "es": "Grosera",
+      "it": "Vivace"
+    },
+    "increased": "special-defense",
+    "decreased": "speed"
+  },
+  "serious": {
+    "names": {
+      "ja": "まじめ",
+      "en": "Serious",
+      "fr": "Sérieux",
+      "de": "Ernst",
+      "es": "Seria",
+      "it": "Seria"
+    },
+    "increased": null,
+    "decreased": null
+  },
+  "timid": {
+    "names": {
+      "ja": "おくびょう",
+      "en": "Timid",
+      "fr": "Timide",
+      "de": "Scheu",
+      "es": "Miedosa",
+      "it": "Timida"
+    },
+    "increased": "speed",
+    "decreased": "attack"
+  }
+}

@@ -18,6 +18,7 @@ import { contactDamage, regenerate, touchRevive } from './systems/health';
 import { blockByObstacles } from './obstacles';
 import { advanceSection, armBombers, bossAttacks, checkRunEnd, spawnBosses, spawnSwarms, stepIntruders, stepTags, stepLegendTargets } from './systems/stage';
 import { createWorld, type SimRole, type World } from './world';
+import { drawNature } from './nature';
 
 export interface SimulationOptions {
   tickRate: number;
@@ -51,6 +52,7 @@ export class Simulation {
       moves: moves.slice(0, this.world.rules.combat.maxMoveSlots),
       mods: emptyModifiers(this.world.rules.types.names.length),
     });
+    p.nature = drawNature(this.world, p.id);
     // 最初は HP 満タン
     p.hp = 0;
     p.maxHp = 0;

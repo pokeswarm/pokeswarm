@@ -5,6 +5,8 @@ import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
 import type { EffectRecipe, SpriteAnims } from '../data/schema';
 import { getLocale, t, tMaybe } from '../i18n';
+import type { NatureStat } from '../data/schema';
+import type { SimRules } from '../sim/rules';
 import type { LeaveReason, Room, RoomPlayer } from '../net/room';
 import { SyncSession } from '../net/sync';
 import { hexColor } from '../render/color';
@@ -147,6 +149,8 @@ export class RunScene extends Phaser.Scene {
   private topBar!: Phaser.GameObjects.Graphics;
   private levelText!: Phaser.GameObjects.Text;
   private coinIcon!: Phaser.GameObjects.Image;
+  /** 右上の自分の性格（ホウエン。07 の89.3）。性格の無い地方では出さない */
+  private natureText!: Phaser.GameObjects.Text;
   private coinText!: Phaser.GameObjects.Text;
   /** 倒れているときの案内（真ん中の下） */
   private downText!: Phaser.GameObjects.Text;
@@ -517,6 +521,7 @@ export class RunScene extends Phaser.Scene {
     this.levelText = this.add.text(0, 0, '', px(16, uiConfig.expBar.text, { outline: true })).setOrigin(0, 0.5).setScrollFactor(0).setDepth(1001);
     this.coinIcon = this.add.image(0, 0, pixelTextureKey('coin')).setOrigin(1, 0.5).setScale(2).setScrollFactor(0).setDepth(1001);
     this.coinText = this.add.text(0, 0, '', px(16, uiConfig.coin.color, { outline: true })).setOrigin(1, 0.5).setScrollFactor(0).setDepth(1001);
+    this.natureText = this.add.text(0, 0, '', px(16, '#ffffff', { outline: true })).setOrigin(1, 0.5).setScrollFactor(0).setDepth(1001);
     this.timerText = this.add.text(0, 10, '', px(compactScreen() ? uiConfig.compactHud.timerSize : 24, uiConfig.timer.color, { outline: true })).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1000);
     this.bossBar = this.add.graphics().setScrollFactor(0).setDepth(1000);
     this.bossNames.length = 0;
@@ -530,6 +535,7 @@ export class RunScene extends Phaser.Scene {
     this.pausePanel = new PausePanel(
       () => this.togglePause(),
       (on) => this.setDamageNumbers(on),
+      () => this.natureRows(),
     );
     this.evolutionCutscene = new EvolutionCutscene();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.evolutionCutscene.destroy());
@@ -1499,6 +1505,14 @@ export class RunScene extends Phaser.Scene {
     this.effects.playImpact('evolution', ev.x, ev.y);
   }
 
+  /** ポーズの画面の、参加者の性格の一覧（番号の順。性格の無い地方は空。07 の89.3） */
+  private natureRows(): string[] {
+    const w = this.sim.world;
+    return w.players
+      .filter((p) => p.nature !== undefined)
+      .map((p) => t('pause.natureRow', { id: p.id, pokemon: localName(generated.pokemon[w.rules.species[p.species]?.key ?? '']?.names, getLocale(), ''), nature: natureLabel(w.rules, p.nature) }));
+  }
+
   /** 右上（コインの下）に、自分の一時的な強化のアイコンと残りの秒数 */
   private drawBuffIcons(cam: Phaser.Cameras.Scene2D.Camera, top: number): void {
     const w = this.sim.world;
@@ -1653,14 +1667,19 @@ export class RunScene extends Phaser.Scene {
     this.placeUi(this.timerText, cx, top);
     // テストの表示は、ボスの HP バーを何本も並べたときはその下へ
     this.drawGodText(cam, top + 56 + Math.max(0, this.bossRows - 1) * 20);
+    // 自分の性格（ホウエン。07 の89.3）。あればコインと強化のアイコンをその下へずらす
+    const nature = natureLabel(w.rules, w.players.find((p) => p.id === this.localId)?.nature);
+    this.natureText.setText(nature).setVisible(nature !== '');
+    this.placeUi(this.natureText, cam.width - 8, top + 12);
+    const rightTop = nature ? top + 32 : top;
     // コイン（もらえる見込みがあるときだけ）
     const coins = this.recorder.liveCoins(w);
     this.coinText.setText(String(coins)).setVisible(coins > 0);
     this.coinIcon.setVisible(coins > 0);
-    this.placeUi(this.coinText, cam.width - 8, top + 12);
-    this.placeUi(this.coinIcon, cam.width - 16 - this.coinText.width, top + 12);
+    this.placeUi(this.coinText, cam.width - 8, rightTop + 12);
+    this.placeUi(this.coinIcon, cam.width - 16 - this.coinText.width, rightTop + 12);
     this.coinIcon.setScale(2 / cam.zoom);
-    this.drawBuffIcons(cam, top);
+    this.drawBuffIcons(cam, rightTop);
     this.placeUi(this.bossBar, 0, 0);
     this.placeUi(this.announceText, cx, cam.height * 0.3);
     this.placeUi(this.downText, cx, cam.height * 0.7);
@@ -2164,3 +2183,15 @@ function candyTier(levels: number): { levels: number; count: number; color: stri
   return table.find((c) => c.levels === levels) ?? table.reduce((a, b) => (Math.abs(b.levels - levels) < Math.abs(a.levels - levels) ? b : a));
 }
 
+
+/** 性格の名前と、上がる・下がる能力（「いじっぱり こうげき↑ とくこう↓」）。性格が無ければ空 */
+function natureLabel(rules: SimRules, nature: number | undefined): string {
+  const n = nature === undefined ? undefined : rules.natures?.[nature];
+  if (!n) return '';
+  const name = localName(generated.natures[n.key]?.names, getLocale(), n.key);
+  const stat = (s: NatureStat): string => t(`select.stat.${STAT_KEYS[s]}`);
+  return n.up && n.down ? t('run.nature', { name, up: stat(n.up), down: stat(n.down) }) : t('run.natureNeutral', { name });
+}
+
+/** 性格の能力 → 翻訳ファイルの select.stat.<キー> */
+const STAT_KEYS: Record<NatureStat, 'attack' | 'defense' | 'specialAttack' | 'specialDefense' | 'speed'> = { attack: 'attack', defense: 'defense', 'special-attack': 'specialAttack', 'special-defense': 'specialDefense', speed: 'speed' };

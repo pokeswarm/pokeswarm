@@ -1,6 +1,8 @@
 import type { LevelUpSnapshot, PlayerId } from '../commands';
 import type { Player, PlayerMove } from '../entities/player';
 import { deriveStats } from '../species';
+import type { NatureStat } from '../../data/schema';
+import { defenseStatOf, natureFactor } from '../nature';
 import { addModifiers, emptyModifiers, isUniqueDerivation, resolveModifiers } from '../upgrades';
 import { checkEvolution } from './evolution';
 import type { SimDerivation } from '../upgrades';
@@ -426,10 +428,12 @@ export function recomputeModifiers(world: World, p: Player): void {
   p.maxHp = (d?.maxHp ?? 100) * Math.max(0.1, 1 + mods.maxHpPct / 100);
   if (p.maxHp > oldMax && !p.down) p.hp += p.maxHp - oldMax;
   p.hp = Math.min(p.hp, p.maxHp);
-  p.physicalPower = d?.physicalPower ?? 1;
-  p.specialPower = d?.specialPower ?? 1;
-  p.defense = (d?.defense ?? 0) * Math.max(0, 1 + mods.defensePct / 100);
-  p.moveSpeed = p.baseMoveSpeed * (d?.speed ?? 1) * (1 + mods.moveSpeedPct / 100);
+  // 性格（ホウエン。07 の89.3）
+  const nf = (stat: NatureStat): number => natureFactor(world.rules, p.nature, stat);
+  p.physicalPower = (d?.physicalPower ?? 1) * nf('attack');
+  p.specialPower = (d?.specialPower ?? 1) * nf('special-attack');
+  p.defense = (d?.defense ?? 0) * Math.max(0, 1 + mods.defensePct / 100) * (sp ? nf(defenseStatOf(sp)) : 1);
+  p.moveSpeed = p.baseMoveSpeed * (d?.speed ?? 1) * (1 + mods.moveSpeedPct / 100) * nf('speed');
   p.pickupRange = p.basePickupRange * (1 + mods.pickupRangePct / 100);
 }
 

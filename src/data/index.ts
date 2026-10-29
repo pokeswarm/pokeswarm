@@ -42,6 +42,7 @@ import generatedMovesJson from '../../data/generated/moves.json';
 import generatedItemsJson from '../../data/generated/items.json';
 import generatedTypesJson from '../../data/generated/types.json';
 import generatedRegionsJson from '../../data/generated/regions.json';
+import generatedNaturesJson from '../../data/generated/natures.json';
 import type { BgmRun, GroundConfig, ObstacleConfig, SpawnConfig, StageConfig, UnlocksConfig } from './schema';
 import { resolveEffectRecipes } from './effects';
 import {
@@ -54,6 +55,7 @@ import {
   generatedMovesSchema,
   generatedPokemonSchema,
   generatedRegionsSchema,
+  generatedNaturesSchema,
   regionsConfigSchema,
   regionStageSchema,
   siteConfigSchema,
@@ -144,6 +146,8 @@ export interface RegionStage {
   readonly night: readonly boolean[];
   /** 区間ごとの天気（data/game/weather.json のキーの並び。巡らせる区間は everySeconds ごとに次へ。ふつうは空） */
   readonly weather: readonly SectionWeather[];
+  /** ランを始めるたびに性格を抽選する（ホウエン。07 の89.3） */
+  readonly natures: boolean;
 }
 export interface SectionWeather {
   readonly kinds: readonly string[];
@@ -175,6 +179,7 @@ export const regionStages: Readonly<Record<string, RegionStage>> = Object.fromEn
       weather: file.sections.map((x) =>
         x.weatherCycle ? { kinds: x.weatherCycle.kinds, everySeconds: x.weatherCycle.everySeconds } : { kinds: x.weather ? [x.weather] : [], everySeconds: 0 },
       ),
+      natures: file.natures,
     };
     return [id, stage];
   }),
@@ -224,6 +229,7 @@ export const generated = {
   items: load('generated/items.json', generatedItemsSchema, generatedItemsJson),
   types: load('generated/types.json', generatedTypesSchema, generatedTypesJson),
   regions: load('generated/regions.json', generatedRegionsSchema, generatedRegionsJson),
+  natures: load('generated/natures.json', generatedNaturesSchema, generatedNaturesJson),
 };
 // 原作の名前を借りる技（ベイビィ用の ゆびをふる は、ミュウの ゆびをふる と名前・タイプが同じ別の技。moves.json の nameOf）
 for (const [key, def] of Object.entries(movesConfig.moves)) {

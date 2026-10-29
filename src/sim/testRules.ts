@@ -159,6 +159,7 @@ export function testRules(
       base: { maxHp: 100, power: 1, defense: 0 },
       perLevelPct: { maxHp: 0, power: 0, defense: 0 },
       hurtInvincibleSeconds: 0.5,
+      naturePct: 10,
       revive: { initialCount: 0, hpPct: 50, invincibleSeconds: 2, touchSeconds: 1, touchRange: 40 },
       ...overrides.stats,
     },

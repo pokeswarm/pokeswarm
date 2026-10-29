@@ -1247,6 +1247,8 @@ export const regionStageSchema = z.object({
   legendaryBgm: z.string().nullable().default(null),
   /** 伝説の乱入（三犬）の間の曲。null なら区間の曲のまま */
   intruderBgm: z.string().nullable().default(null),
+  /** ランを始めるたびに、一人ずつ性格を抽選する（ホウエン。07 の89.3） */
+  natures: z.boolean().default(false),
 });
 export type RegionStageFile = z.infer<typeof regionStageSchema>;
 
@@ -1857,6 +1859,15 @@ export const generatedMovesSchema = z.record(z.string(), generatedMoveEntrySchem
 export const generatedItemsSchema = z.record(z.string(), z.object({ names: localizedNames }));
 export const generatedRegionsSchema = z.record(z.string(), z.object({ names: localizedNames }));
 
+/** 能力の名前（PokeAPI の stat。性格の上がる・下がる能力） */
+export const natureStatSchema = z.enum(['attack', 'defense', 'special-attack', 'special-defense', 'speed']);
+export type NatureStat = z.infer<typeof natureStatSchema>;
+/** 性格（PokeAPI の nature。全部。ホウエン。07 の89.3）。上がる・下がる能力が無いのは、がんばりや などの変わらない性格 */
+export const generatedNaturesSchema = z.record(
+  z.string(),
+  z.object({ names: localizedNames, increased: natureStatSchema.nullable(), decreased: natureStatSchema.nullable() }),
+);
+
 export const generatedTypeEntrySchema = z.object({
   names: localizedNames,
   /** 攻撃側として、効果ばつぐん・いまひとつ・効果なしになる相手のタイプ */
@@ -2017,6 +2028,8 @@ export const statsConfigSchema = z
     perLevelPct: z.object({ maxHp: z.number(), power: z.number(), defense: z.number() }),
     /** 敵に触れてダメージを受けた後の無敵時間（秒） */
     hurtInvincibleSeconds: z.number().nonnegative(),
+    /** 性格で上がる・下がる能力の割合（%。原作と同じ 10。ホウエン。07 の89.3） */
+    naturePct: z.number().nonnegative().default(10),
     /** 倒れたときの自動復活（ソロ）。復活可能数は全員で共有し、永続強化で増やす */
     /**
      * 復活: 全員で共有する回数の初期値・復活時の HP（最大の %）・無敵時間。

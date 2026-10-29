@@ -19,6 +19,8 @@ export class PausePanel {
     private readonly onClose: () => void,
     /** ダメージの数字を切り替えた */
     private readonly onDamageNumbers: (on: boolean) => void,
+    /** 参加者の性格の一覧（ホウエン。07 の89.3: ほかの人の性格はここで見る）。空なら出さない */
+    private readonly natureRows: () => readonly string[] = () => [],
   ) {
     this.root = document.createElement('div');
     this.root.style.cssText =
@@ -40,6 +42,20 @@ export class PausePanel {
       note.style.opacity = '0.85';
       note.textContent = t('pause.hostPausedNote');
       this.root.append(note);
+    }
+    const natures = this.natureRows();
+    if (natures.length > 0) {
+      const box = document.createElement('div');
+      const head = document.createElement('div');
+      head.style.opacity = '0.75';
+      head.textContent = t('pause.natures');
+      box.append(head);
+      for (const row of natures) {
+        const line = document.createElement('div');
+        line.textContent = row;
+        box.append(line);
+      }
+      this.root.append(box);
     }
     appendAudioControls(this.root);
     // ダメージの数字の 出す・出さない（ラン中もすぐ切り替える。07 の110章）

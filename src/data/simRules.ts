@@ -223,6 +223,7 @@ export function buildSimRules(region?: string): SimRules {
     ...(rs.weather.some((w) => w.kinds.length > 0)
       ? { weatherSections: rs.weather.map((w) => ({ kinds: w.kinds, fields: w.kinds.map((k) => weatherConfig.weathers[k]!), everySeconds: w.everySeconds })) }
       : {}),
+    ...(rs.natures ? { natures: Object.entries(generated.natures).map(([key, n]) => ({ key, up: n.increased, down: n.decreased })) } : {}),
     lines,
   };
 }

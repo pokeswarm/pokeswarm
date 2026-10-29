@@ -1,4 +1,5 @@
 import type { InputCommand } from '../commands';
+import { setRunStat } from '../runStats';
 import { noteLegendThreat } from './stage';
 import type { HitEffect } from '../events';
 import { currentWaveIndex, enemyHpScale, findEnemyIndex, findPlayer, type World, enemyMoveSpeed } from '../world';
@@ -20,6 +21,11 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         if (!p || p.remote) break;
         p.inputX = cmd.dx;
         p.inputY = cmd.dy;
+        break;
+      }
+      case 'runStat': {
+        const p = findPlayer(world, cmd.playerId);
+        if (p) setRunStat(p, cmd.stat, cmd.value);
         break;
       }
       case 'answerEvolve': {

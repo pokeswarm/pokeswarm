@@ -399,7 +399,7 @@ for (const key of Object.keys(itemsConfig.items)) {
 for (const d of [...derivationsConfig.derivations, ...derivationsConfig.unique]) {
   check(!!movesConfig.moves[d.from] && !!movesConfig.moves[d.to], `data/game/derivations.json の "${d.from} → ${d.to}" の技が data/game/moves.json にありません`);
   if (d.item !== undefined) check(!!itemsConfig.items[d.item], `data/game/derivations.json の材料 "${d.item}" が data/game/items.json にありません`);
-  else check(derivationsConfig.unique.some((u) => u === d && (u.minLevel || u.withMoves?.length || u.forms?.length || u.needsMoves?.length)), `data/game/derivations.json の "${d.from} → ${d.to}" は材料が無いので、固有技でレベル（minLevel）か、ほかの技（withMoves・needsMoves）か、姿（forms）の条件が必要です`);
+  else check(derivationsConfig.unique.some((u) => u === d && (u.minLevel || u.withMoves?.length || u.forms?.length || u.needsMoves?.length || u.weather?.length || u.runStat || u.itemLevel)), `data/game/derivations.json の "${d.from} → ${d.to}" は材料が無いので、固有技でレベル（minLevel）か、ほかの技（withMoves・needsMoves）か、姿（forms）の条件が必要です`);
   for (const n of ('needsMoves' in d ? d.needsMoves : undefined) ?? []) check(!!movesConfig.moves[n.move], `data/game/derivations.json の "${d.from} → ${d.to}" の needsMoves "${n.move}" が data/game/moves.json にありません`);
   for (const w of ('withMoves' in d ? d.withMoves : undefined) ?? []) check(!!movesConfig.moves[w], `data/game/derivations.json の "${d.from} → ${d.to}" の withMoves "${w}" が data/game/moves.json にありません`);
 }

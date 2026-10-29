@@ -27,6 +27,7 @@ import { axisToUnit } from '../math';
 import { typeFlags, typeMultiplier, type MoveStats, type SimMoveDef } from '../moves';
 import type { World } from '../world';
 import { pinchMods } from '../ability';
+import { bumpRunStat } from '../runStats';
 import type { Modifiers } from '../upgrades';
 import { applyHitEffect } from './commands';
 import { fireDelayedExplosion, fireEffects, type FxSource } from './moveEffects';
@@ -226,6 +227,8 @@ export function useMoves(world: World): void {
       // いつも効く技（かくばる・テクスチャー）は使わない（効果は持ち物と同じく、いつも足されている）
       if (!def || def.pattern === 'passive' || def.pattern === 'rest') continue;
       const st = playerMoveStats(world, p, pm);
+      // 特性が HP の少なさで効いている（こんじょう など）: ランの記録（固有技の条件。07 の134章）
+      if (pm === p.moves[0] && pinchMods(world, p)) bumpRunStat(world, p, 'pinch');
       // ためている間に出す技（きあいパンチのマッハパンチ）。この技を出している間（pauseSeconds）は止める
       if (def.chargeMove) {
         pm.subPause = Math.max(0, (pm.subPause ?? 0) - world.dt);
@@ -1434,6 +1437,7 @@ export function moveProjectiles(world: World): void {
       // 急所（クリティカットなど・技ごとの急所）の判定は、当てたプレイヤーのブラウザの乱数で行う
       const critPct = (owner?.mods.critChancePct ?? 0) + st.critChancePct;
       const crit = critPct > 0 && world.rng.next() * 100 < critPct;
+      if (crit && local && owner) bumpRunStat(world, owner, 'crits');
       // 一撃（じわれ）: 雑魚だけ。当てたプレイヤーのブラウザの乱数で決め、倒しきる量を送る
       const normalEnemy = (kind?.rank ?? 'normal') === 'normal';
       // ほろびのうた: 1秒以上あけて決まった回数当たった雑魚は、確定で倒れる（ボスには効かない）

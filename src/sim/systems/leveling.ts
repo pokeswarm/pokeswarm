@@ -4,6 +4,7 @@ import { deriveStats } from '../species';
 import type { NatureStat } from '../../data/schema';
 import { defenseStatOf, natureFactor } from '../nature';
 import { abilityOf } from '../ability';
+import { currentWeather } from './stage';
 import { addModifiers, emptyModifiers, isUniqueDerivation, resolveModifiers } from '../upgrades';
 import { checkEvolution } from './evolution';
 import type { SimDerivation } from '../upgrades';
@@ -227,6 +228,13 @@ function derivationUsable(world: World, p: Player, d: SimDerivation): boolean {
   if (d.line !== null && d.line !== p.line) return false;
   if (d.line === null && world.rules.derivations.some((x) => x.line === p.line && x.from === d.from && x.item === d.item)) return false;
   if (d.needsMoves && !d.needsMoves.every((n) => p.moves.some((m) => m.move === n.move && m.level >= (n.level ?? 1)))) return false;
+  // 天気の区間・ランの記録・持ち物の強化の段階（ホウエンの固有技。07 の134章）
+  if (d.weather) {
+    const w = currentWeather(world);
+    if (!w || !d.weather.includes(w.id)) return false;
+  }
+  if (d.runStat && (p.runStats?.[d.runStat.stat] ?? 0) < d.runStat.atLeast) return false;
+  if (d.itemLevel && !p.items.some((it) => it.item === d.itemLevel!.item && it.level >= d.itemLevel!.level)) return false;
   return true;
 }
 

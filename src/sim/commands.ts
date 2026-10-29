@@ -296,6 +296,14 @@ export interface CorrectEnemiesCommand {
   readonly tick?: number;
 }
 
+/** ランの記録（本人のブラウザで数えたもの）を、どのブラウザのプレイヤーにも付ける（07 の134章） */
+export interface RunStatCommand {
+  readonly type: 'runStat';
+  readonly playerId: PlayerId;
+  readonly stat: string;
+  readonly value: number;
+}
+
 /** 時間帯のなつきの進化（イーブイ）への本人の答え（07 の81章） */
 export interface AnswerEvolveCommand {
   readonly type: 'answerEvolve';
@@ -306,6 +314,7 @@ export interface AnswerEvolveCommand {
 export type InputCommand =
   | MoveCommand
   | AnswerEvolveCommand
+  | RunStatCommand
   | RemotePlayerCommand
   | SpawnEnemyCommand
   | DamageEnemyCommand

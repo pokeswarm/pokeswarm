@@ -123,6 +123,10 @@ export interface Player {
   sleep?: { stillTicks: number; asleep: boolean; wakeTicks: number };
   /** 性格（SimRules.natures の番号。性格の無い地方は無し。07 の89.3） */
   nature?: number;
+  /** ランの記録（本人から届いた値。固有技の条件。runStats.ts） */
+  runStats?: Record<string, number>;
+  /** 本人のブラウザで数えている記録（自分のプレイヤーだけ） */
+  localStats?: Record<string, number>;
   /** 進化で消費された技（持ち物で覚え直さない） */
   consumedMoves?: number[];
   /** 箱から拾った一時的な強化（index は pickups.json の items.buff.buffs の番号） */

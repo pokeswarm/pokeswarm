@@ -292,6 +292,14 @@ export interface IntruderLeftEvent {
   readonly kind: number;
 }
 
+/** ランの記録が固有技の条件の数に届いた（本人のブラウザだけ。画面が runStat のコマンドにして送る。07 の134章） */
+export interface RunStatReachedEvent {
+  readonly type: 'runStatReached';
+  readonly playerId: PlayerId;
+  readonly stat: string;
+  readonly value: number;
+}
+
 /** 技を使った（効果音のため） */
 export interface MoveUsedEvent {
   readonly type: 'moveUsed';
@@ -364,6 +372,7 @@ export interface RunEndedEvent {
 }
 
 export type SimEvent =
+  | RunStatReachedEvent
   | EnemyKilledEvent
   | ProjectileHitEvent
   | EnemySpawnedEvent

@@ -2,6 +2,7 @@ import type { BossMove, LegendField } from '../../data/schema';
 import { randomUnit } from '../math';
 import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World, type BossEntry, type WingKind, gateDeadlineTick, enemyMoveSpeed } from '../world';
 import { hurtPlayer, fieldDamage } from './health';
+import { bumpRunStat } from '../runStats';
 import { fireCasterMove } from './attack';
 import { casterFor } from './legendCasters';
 
@@ -522,6 +523,7 @@ function strikeHazards(world: World): void {
       if (me && !me.down && me.invincibleTicks <= 0 && !hz.hitLocal && hazardHits(hz, me.x, me.y, me.radius)) {
         hz.hitLocal = true;
         hurtPlayer(world, me, hazardDamage(world, hz.damage));
+        bumpRunStat(world, me, 'bossAoeHits');
       }
       continue;
     }
@@ -629,6 +631,7 @@ function strikeHazards(world: World): void {
     if (hazardHits(hz, me.x, me.y, me.radius)) {
       hz.hitLocal = true;
       hurtPlayer(world, me, hazardDamage(world, hz.damage));
+      bumpRunStat(world, me, 'bossAoeHits');
     }
   }
 }

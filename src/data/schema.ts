@@ -2063,6 +2063,12 @@ export const derivationsConfigSchema = z.object({
        * （リーフブレード: つるぎのまい。だくりゅう: マッドショット Lv8。07 の130章）
        */
       needsMoves: z.array(z.object({ move: z.string(), level: z.number().int().positive().optional() })).optional(),
+      /** 今の区間の天気がこのどれかのときだけ（weather.json のキー。ドンメル: ひでり。07 の134章） */
+      weather: z.array(z.string()).optional(),
+      /** ランの記録（本人のブラウザで数える。急所に当てた回数 crits など）がこの数以上（07 の134章） */
+      runStat: z.object({ stat: z.string(), atLeast: z.number().positive() }).optional(),
+      /** この持ち物をこのレベル以上で持っている（カゲボウズ: のろいのおふだ が最大。07 の134章） */
+      itemLevel: z.object({ item: z.string(), level: z.number().int().positive() }).optional(),
       /**
        * 材料にした技（元の技・withMoves・consumes で消費した技）の強化分（レベル − 1）を、すべて新しい技のレベルに足す（最大まで）。
        * ばくれつパンチ: きあいパンチ・ほのおのパンチ・かみなりパンチ の強化を受け継ぐ（作者の決定 2026年10月25日）

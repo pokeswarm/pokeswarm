@@ -1035,6 +1035,10 @@ export class RunScene extends Phaser.Scene {
         // はね: だれが拾っても全員に知らせる（全員のランでルギア・ホウオウと戦える）
         else if (it.kind === 'silver-wing' || it.kind === 'rainbow-wing') this.announce(t('run.wingGot', { name: localName(generated.items[it.kind]?.names, getLocale(), it.kind) }), it.kind === 'silver-wing' ? '#e0e0e0' : '#ffcc80');
         else if (it.by === this.localId) this.announce(localName(generated.items.potion?.names, getLocale(), ''), '#ce93d8');
+      } else if (ev.type === 'runStatReached' && ev.playerId === this.localId) {
+        // ランの記録（固有技の条件）: 自分の世界に付け、ゲストはホストへも伝える（07 の134章）
+        this.uiCommands.push({ type: 'runStat', playerId: this.localId, stat: ev.stat, value: ev.value });
+        if (this.sync && w.role === 'guest') this.sync.requestRunStat(ev.stat, ev.value);
       } else if (ev.type === 'bodyAttack') {
         this.playerViews.get(ev.playerId)?.lunge(ev.dirX, ev.dirY, ev.distance, ev.afterimages);
       } else if (ev.type === 'moveTaught' && ev.playerId === this.localId) {

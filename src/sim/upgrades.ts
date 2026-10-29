@@ -68,6 +68,12 @@ export interface SimDerivation {
   readonly consumes?: readonly number[];
   /** ほかにも覚えていないといけない技（消費しない）。level があればそのレベル以上（リーフブレード・だくりゅう） */
   readonly needsMoves?: readonly { readonly move: number; readonly level?: number }[];
+  /** 今の区間の天気がこのどれか（weather.json のキー） */
+  readonly weather?: readonly string[];
+  /** ランの記録がこの数以上（本人から届いた値。runStats.ts） */
+  readonly runStat?: { readonly stat: string; readonly atLeast: number };
+  /** この持ち物（番号）をこのレベル以上で持っている */
+  readonly itemLevel?: { readonly item: number; readonly level: number };
   /** 材料にした技の強化分（レベル − 1）を新しい技のレベルに足す（ばくれつパンチ） */
   readonly inheritLevels?: boolean;
   /** 最大レベル = base + perConsumed × 消費した consumes の数（ばくれつパンチ。07 の105章） */

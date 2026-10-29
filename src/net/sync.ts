@@ -62,6 +62,11 @@ export class SyncSession {
     this.requests.push({ t: 'rq', k: kind, n: index });
   }
 
+  /** ゲスト: ランの記録（固有技の条件）をホストへ伝える */
+  requestRunStat(stat: string, value: number): void {
+    this.requests.push({ t: 'rs', s: stat, v: value });
+  }
+
   /** ホスト: ゲストから届いて、ほかのゲストへ中継するメッセージを取り出す */
   takeForwards(): Forward[] {
     return this.forwards.splice(0);
@@ -348,6 +353,9 @@ export class SyncSession {
             else if (m.k === 'b') cmds.push({ type: 'banUpgrade', playerId: from, index: m.n });
             else cmds.push({ type: 'rerollUpgrades', playerId: from });
           }
+          break;
+        case 'rs':
+          if (host) cmds.push({ type: 'runStat', playerId: from, stat: m.s, value: m.v });
           break;
         case 'hz':
           if (guest) {

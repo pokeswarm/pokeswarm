@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import type { CircleSource } from '../PooledCircles';
+import { addDither, type DitherController } from './DitherFilter';
 
 /** 当たり判定の形: 円（length 0）か、両端の丸い直線（ビーム）か、扇形（half: 片側の開き。ラジアン） */
 interface HitShape {
@@ -40,17 +41,21 @@ export class HitShapes {
     if (cfg.pixel > 0 && scene.renderer.type === Phaser.WEBGL) {
       this.layer.enableFilters();
       this.blocky = this.layer.filters!.internal.addBlocky({ size: cfg.pixel });
+      // 半透明の塗りをディザの不透明ドットにする（作者の依頼 2026年10月31日。Blocky と同じマス目）
+      this.dither = addDither(scene, this.layer.filters!.internal, cfg.pixel);
     }
   }
 
   /** 角ばったドットにするフィルター（大きさはカメラの拡大率に合わせて変える） */
   private blocky: Phaser.Filters.Blocky | null = null;
+  private dither: DitherController | null = null;
 
   /** カメラの拡大率が変わったとき: 1ドットをワールドの pixel にする（画面のマスで、少なくとも 1） */
   setZoom(zoom: number): void {
     if (!this.blocky) return;
     const n = Math.max(1, Math.round(this.cfg.pixel * zoom));
     this.blocky.size = { x: n, y: n };
+    if (this.dither) this.dither.size = { x: n, y: n };
   }
 
   /**

@@ -40,7 +40,7 @@ PokéSwarm（ポケモン題材のサバイバー系ブラウザゲーム、最�
 ## 技術構成
 
 - TypeScript / Vite / Phaser / Firebase（Authentication・Cloud Firestore・Realtime Database）/ WebRTC
-- 配信: Cloudflare Workers の静的アセット配信（設定は `wrangler.jsonc`。GitHub 組織 `pokeswarm` のリポジトリ `pokeswarm` と連携。main に push すると自動で公開される）
+- 配信: Cloudflare Workers の静的アセット配信（設定は `wrangler.jsonc`。GitHub 組織 `pokeswarm` のリポジトリ `pokeswarm` と連携。main に push すると自動で公開される。**ふだんの作業は `dev` ブランチ**で、作者が確認した区切りで main へ merge する＝公開。`06` 1章）
 - 動作環境: PC とスマホのブラウザ
 
 ## 必ず守ること
@@ -59,6 +59,7 @@ PokéSwarm（ポケモン題材のサバイバー系ブラウザゲーム、最�
 
 - `docs/06_roadmap.md` の順に進める。区切りごとに、作者が動作確認できる状態にして報告する。
 - 【要決定】の項目に当たったら、仮実装で先に進めず作者に確認する。
-- 仕様を変えたら: `data/site.json` の `appVersion` を上げ（`06` 1章の決まり）、`docs/07_content_draft.md` に章を足し、関係する `docs/` も直す。
+- **コミットは `dev` ブランチに**（main には直接コミットしない）。main へは、作者が動作確認した区切りで merge する。main に push した時点で本番に出る。merge の前に `npm run typecheck` と `npm test` を通す（GitHub Actions でも回る）。
+- 仕様を変えたら: `docs/07_content_draft.md` に章を足し、関係する `docs/` も直す。**版（`data/site.json` の `appVersion`）は main へ出す直前に上げる**（`06` 1章。コミットごとには上げない）。章の題の版は、その決定が入る公開の版（次に出す版）。
 - テストプレイは Claude の組み込みブラウザの localhost で行う。本番の URL でテスト用のパラメータを試させない。
 - 作者とのやり取りは日本語。

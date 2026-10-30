@@ -1,0 +1,22 @@
+# main・dev への push と PR ごとに、型検査とテストを回す（作者の決定 2026年10月31日。07 の142章）。
+# Cloudflare の公開（main への push）はこれとは別に動くので、ここは「壊れたまま出した」ことに気づくための知らせ。
+name: check
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test

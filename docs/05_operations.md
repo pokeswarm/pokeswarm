@@ -7,7 +7,7 @@
 | 項目 | 内容 |
 |---|---|
 | コード | GitHub 組織 `pokeswarm` / リポジトリ `pokeswarm` |
-| 配信 | Cloudflare Workers の静的アセット配信（Workers Builds の GitHub 連携。main へのプッシュで自動公開。設定は `wrangler.jsonc`） |
+| 配信 | Cloudflare Workers の静的アセット配信（Workers Builds の GitHub 連携。main へのプッシュで自動公開。ふだんの作業は `dev` ブランチで、作者が確認した区切りで main へ merge する（2026年10月31日。`06` 1章）。設定は `wrangler.jsonc`） |
 | 開発中のアドレス | Cloudflare Workers の無料アドレス https://pokeswarm.pokeswarm-dev.workers.dev/ |
 | 本番のアドレス | https://pokeswarm.org/ （Cloudflare で取得。2026年10月22日に取得し、Workers のカスタムドメインに設定済み。`www` も同じ。Cloudflare の「常に HTTPS を使用」をオンにして、http で来た人は https へ移す） |
 

@@ -954,7 +954,10 @@ export const moveEffectSchema = z.object({
   chance: z.number().min(0).max(1).optional(),
   /** 爆発: その場で弾ける円。delaySeconds があれば、印を置いて少し後に弾ける。pull は中心へ引き寄せる強さ */
   /** asMove なら、その技（moves.json のキー）として弾ける（見た目もタイプもその技。ばくれつパンチの 炎・雷 のスプラッシュ） */
-  explode: z.object({ ...fxSize, delaySeconds: z.number().positive().optional(), pull: z.number().positive().optional(), asMove: z.string().optional() }).optional(),
+  /** sweep があれば、円ではなく外へ広がる輪（厚さは大きさ × sweep）として durationSeconds かけて広がる（ふんかの足元の衝撃波。ふんえん と同じ見え方） */
+  explode: z
+    .object({ ...fxSize, delaySeconds: z.number().positive().optional(), pull: z.number().positive().optional(), asMove: z.string().optional(), sweep: z.number().gt(0).max(1).optional(), durationSeconds: z.number().positive().optional() })
+    .optional(),
   /**
    * 残る範囲（炎・水たまり・毒）。直線の当たり判定なら alongSpacing ごとに線に沿って並べる。
    * path なら円を置かず、通った道そのものを範囲にする（ビームは線1本。every で呼ぶ動く技は、通った道を線でつなぐ）
@@ -1126,9 +1129,10 @@ export const moveDefSchema = z.object({
   countWidens: z.number().positive().optional(),
   /**
    * melee を前方の長方形にする（キバの技: かみつく・ほのおのキバ。作者の依頼 2026年10月28日）。
-   * 届く距離（range + size）を 1 として、向きに沿った始まり start と終わり end、片側の横幅 halfWidth。口の絵（fit front）が描かれる所に合わせる
+   * 届く距離（range + size）を 1 として、向きに沿った始まり start と終わり end、片側の横幅 halfWidth。口の絵（fit front）が描かれる所に合わせる。
+   * start が負なら自分の後ろから（ブレイズキック: 自分を含む前の長方形）
    */
-  frontBox: z.object({ start: z.number().min(0), end: z.number().positive(), halfWidth: z.number().positive() }).optional(),
+  frontBox: z.object({ start: z.number().min(-1), end: z.number().positive(), halfWidth: z.number().positive() }).optional(),
   /** 扇（melee の arcDegrees）: 出ている間、向いている方向をこの速さ（度/秒）で追う（かえんほうしゃ） */
   followFacing: z.number().positive().optional(),
   /** 扇（melee の arcDegrees）: 出ている間、向きをこの速さ（度/秒）で回し続ける（ハイパーボイス: 左右の扇がぐるりと回る。07 の141章） */
@@ -1556,6 +1560,8 @@ const moveSpriteSpec = z.object({
   directional: z.boolean().default(false),
   /** circle の絵の、当たり判定の中心に合わせる高さ（0 = 絵の上端、1 = 下端）。地面から噴き上がる絵は、根元を中心に合わせる（ブラストバーン） */
   originY: z.number().min(0).max(1).default(0.5),
+  /** front の絵の真ん中を置く所（届く距離に対する割合。向きの先）。口の絵は 0.6。自分を含む長方形（ブレイズキック）は手前に */
+  along: z.number().default(0.6),
   /** 描く位置を毎フレーム、この大きさ（ワールドの単位）までランダムにずらす（揺れる地面。画面は揺らさない） */
   shake: z.number().nonnegative().default(0),
   /** snake: 先から後ろへ描く道の長さ（ワールドの単位）。0 なら出した場所から全部 */
@@ -1613,6 +1619,8 @@ export const effectRecipeSchema = z.object({
   effectLineSprite: moveSpriteSpec.optional(),
   /** 効き方から出た円・飛ぶもの（ブラストバーンの火の粉・ハードプラントの根・10まんボルトの周りの電気）を、このドット絵で描く */
   effectSprite: moveSpriteSpec.optional(),
+  /** 効き方から出た外へ広がる輪（ふんかの足元の衝撃波。explode の sweep）を、この輪の絵（fit ring）で描く。無ければ技そのものの絵が輪ならそれ */
+  effectRingSprite: moveSpriteSpec.optional(),
   /** 通った道に残る範囲（ストーンエッジの岩の亀裂）を、このドット絵で描く（線に合わせる） */
   pathSprite: moveSpriteSpec.optional(),
   /** 技そのものに、もう1枚重ねる絵（だいばくはつ: 広がる爆発の端に、派手な炎の帯を輪に沿って並べる） */

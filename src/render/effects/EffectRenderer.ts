@@ -150,6 +150,11 @@ export class EffectRenderer {
     return this.recipe(id).effectSprite ?? null;
   }
 
+  /** 効き方から出た外へ広がる輪のドット絵（ふんかの足元の衝撃波。無ければ null） */
+  effectRingSprite(id: string): EffectRecipe['effectRingSprite'] | null {
+    return this.recipe(id).effectRingSprite ?? null;
+  }
+
   pathSprite(id: string): EffectRecipe['pathSprite'] | null {
     return this.recipe(id).pathSprite ?? null;
   }

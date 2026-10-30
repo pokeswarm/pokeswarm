@@ -5517,7 +5517,9 @@
           "trigger": "cast",
           "explode": {
             "sizeMultiplier": 4.5,
-            "powerMultiplier": 1.2
+            "powerMultiplier": 1.2,
+            "sweep": 0.45,
+            "durationSeconds": 0.5
           }
         },
         {
@@ -6199,42 +6201,42 @@
         "hitIntervalSeconds": 0,
         "speed": 0,
         "count": 1,
-        "power": 117.3,
-        "cooldownSeconds": 1.9,
+        "power": 129.7,
+        "cooldownSeconds": 2,
         "size": 22,
-        "range": 220,
+        "range": 165,
         "durationSeconds": 0.5,
         "knockback": 300,
         "statusId": "burn"
       },
       "levels": [
         {
-          "range": 15,
-          "power": 19.6
+          "range": 11,
+          "power": 14.4
         },
         {
           "statusChance": 0.1,
-          "power": 19.7
+          "power": 20.7
         },
         {
-          "range": 15,
-          "power": 19.7
+          "range": 11,
+          "power": 20.7
         },
         {
           "cooldownSeconds": -0.2,
-          "power": -1
+          "power": 0.1
         },
         {
-          "range": 15,
-          "power": 17.6
+          "range": 11,
+          "power": 18.6
         },
         {
           "statusChance": 0.1,
-          "power": 17.6
+          "power": 18.7
         },
         {
-          "range": 20,
-          "power": 17.6
+          "range": 15,
+          "power": 18.6
         }
       ],
       "bonusCountToPower": true
@@ -8024,8 +8026,13 @@
       ]
     },
     "blaze-kick": {
-      "pattern": "beam",
+      "pattern": "melee",
       "effect": "blaze-kick",
+      "frontBox": {
+        "start": -0.25,
+        "end": 0.55,
+        "halfWidth": 0.6
+      },
       "region": "hoenn",
       "learners": [
         "torchic"
@@ -8040,13 +8047,13 @@
         "afterimages": 3
       },
       "base": {
-        "power": 369,
+        "power": 403.8,
         "cooldownSeconds": 2,
         "count": 1,
         "intervalSeconds": 0.1,
-        "speed": 400,
-        "size": 26,
-        "range": 240,
+        "speed": 0,
+        "size": 30,
+        "range": 70,
         "durationSeconds": 0.22,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -8062,34 +8069,33 @@
       "levels": [
         {
           "range": 10,
-          "power": 55.6
+          "power": 38.2
         },
         {
           "cooldownSeconds": -0.08,
-          "power": 41.6
+          "power": 43.2
         },
         {
           "range": 10,
-          "power": 51.1
+          "power": 27.9
         },
         {
           "cooldownSeconds": -0.08,
-          "power": 33.8
+          "power": 33.5
         },
         {
           "size": 2,
-          "power": 39
+          "power": 47.6
         },
         {
           "cooldownSeconds": -0.08,
-          "power": 25.8
+          "power": 26
         },
         {
           "range": 14,
-          "power": 38.5
+          "power": -1.5
         }
       ],
-      "aimFacing": true,
       "effects": [
         {
           "trigger": "spawn",
@@ -9159,42 +9165,42 @@
         "hitIntervalSeconds": 0,
         "speed": 0,
         "count": 1,
-        "power": 39.3,
-        "cooldownSeconds": 1.9,
+        "power": 43.4,
+        "cooldownSeconds": 2,
         "size": 22,
-        "range": 220,
+        "range": 165,
         "durationSeconds": 0.5,
         "knockback": 300,
         "statusId": "burn"
       },
       "levels": [
         {
-          "range": 15,
-          "power": 8.9
+          "range": 11,
+          "power": 7.4
         },
         {
           "statusChance": 0.1,
-          "power": 9
+          "power": 9.4
         },
         {
-          "range": 15,
-          "power": 8.9
+          "range": 11,
+          "power": 9.4
         },
         {
           "cooldownSeconds": -0.2,
-          "power": 1.1
+          "power": 1.5
         },
         {
-          "range": 15,
-          "power": 8
+          "range": 11,
+          "power": 8.5
         },
         {
           "statusChance": 0.1,
-          "power": 8
+          "power": 8.5
         },
         {
-          "range": 20,
-          "power": 8
+          "range": 15,
+          "power": 8.5
         }
       ],
       "bonusCountToPower": true,
@@ -9259,7 +9265,9 @@
           "trigger": "cast",
           "explode": {
             "sizeMultiplier": 4.5,
-            "powerMultiplier": 1.2
+            "powerMultiplier": 1.2,
+            "sweep": 0.45,
+            "durationSeconds": 0.5
           }
         },
         {

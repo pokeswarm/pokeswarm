@@ -763,8 +763,11 @@ function cone(kind: 'flame' | 'bubble' | 'sound' | 'electric'): SpriteOut {
         // 先の 2 割は、ちぎれて消えていく。根元ほど白く熱い。ちらつく点（論理の 1 マスごとに決まる乱数）
         const noise = hash(Math.floor(x), Math.floor(y), 300 + f);
         if (t > 0.8 && noise < (t - 0.8) * 4.5) return -1;
+        // ふちの側は舌に分かれて、すき間から下（敵）が見える（べた塗りで敵が隠れた。作者の指摘 2026年10月31日）
+        if (d > 0.4 && hash(Math.floor(x), Math.floor(y), 310 + f) < (d - 0.4) * 1.2) return -1;
         const heat = (1 - t) * 0.7 + (1 - d) * 0.6 + (hash(Math.floor(x * 2), Math.floor(y * 2), f) - 0.5) * 0.2;
-        return heat > 1.05 ? 5 : heat > 0.85 ? 4 : heat > 0.65 ? 3 : heat > 0.4 ? 2 : 1;
+        // 白は根元の芯だけ、黄も芯の近くだけ（前は半分ほどが黄〜白で、まぶしく下が見えなかった）
+        return heat > 1.15 ? 5 : heat > 0.98 ? 4 : heat > 0.72 ? 3 : heat > 0.45 ? 2 : 1;
       });
       frames.push(outline(g, 0));
     } else {
@@ -1355,16 +1358,26 @@ function flameWheel(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
-function flameSwirl(): SpriteOut {
-  const palette = ['#4e1206', '#d84315', '#ff9800', '#ffeb3b', '#fffde7'];
+/**
+ * 尾を引く火の玉（右へ進む）。ball（ふんかの火の玉）は右寄りの玉に長い尾。
+ * spin（ほのおのうず。作者の指摘 2026年10月31日）は玉をほぼ真ん中に置いて当たり判定の円に重ね、尾は短く、色は少し暗め（白を使わない）
+ */
+function flameSwirl(kind: 'ball' | 'spin' = 'ball'): SpriteOut {
+  const spin = kind === 'spin';
+  const palette = spin ? ['#3e0a03', '#b71c1c', '#e65100', '#ff9800', '#ffd54f'] : ['#4e1206', '#d84315', '#ff9800', '#ffeb3b', '#fffde7'];
+  // 玉の中心と半径、尾の始まりと終わり、尾の付け根の太さ
+  const hx = spin ? 0.12 : 0.3;
+  const hr = spin ? 0.6 : 0.55;
+  const tailFrom = spin ? -0.3 : 0.1;
+  const tailEnd = spin ? -0.97 : -0.85;
+  const tailW = spin ? 0.36 : 0.42;
   const frames = [0, 1, 2].map((f) =>
     shape(18, (u, v) => {
-      // 火の玉（右寄りの丸）
-      const head = Math.hypot(u - 0.3, v) / 0.55;
-      // 短い尾: 左へ細くなる炎の舌（コマでゆらめく）
-      const t = Math.max(0, Math.min(1, (0.1 - u) / 0.95));
+      const head = Math.hypot(u - hx, v) / hr;
+      // 尾: 左へ細くなる炎の舌（コマでゆらめく）
+      const t = Math.max(0, Math.min(1, (tailFrom - u) / (tailFrom - tailEnd)));
       const wob = Math.sin(t * 6 + f * 2.1) * 0.08 * t;
-      const tail = u < 0.1 && u > -0.85 && Math.abs(v - wob) < 0.42 * (1 - t) + 0.03;
+      const tail = u < tailFrom && u > tailEnd && Math.abs(v - wob) < tailW * (1 - t) + 0.03;
       if (head > 1 && !tail) return -1;
       const d = head <= 1 ? head * 0.75 : 0.5 + t * 0.45;
       return d < 0.3 ? 4 : d < 0.55 ? 3 : d < 0.8 ? 2 : 1;
@@ -1865,36 +1878,51 @@ function noise(x: number, y: number, cell: number, seed: number): number {
 /**
  * ブラストバーン: 地面のくぼみから噴き上がる炎の柱（横から見た姿。根元が絵の下の方 y = 34 にある。レシピの originY で
  * 根元を当たり判定の中心に合わせる）。コマ 0 でくぼみが赤く光り、1〜3 で炎が噴き上がり、3・4 でゆらめき続ける（loopFrom 3）。
- * 柱の芯は白く、上と外ほど赤い。ふちはぎざぎざで、上に火の粉が舞う
+ * 柱は円柱（真ん中が明るく、ふちほど暗い）で、その周りを黄色い炎が渦を巻いて上へ昇る（コマで巻き上がる）。先は舌に分かれてちぎれる。
+ * 白はほとんど使わない（白い芯だと 24 本が重なって画面が白く飛んだ。作者の指摘 2026年10月31日）
  */
 function fireGeyser(): SpriteOut {
   const W = 24;
   const H = 40;
   const cx = (W - 1) / 2;
   const gy = 34;
-  // 0 輪郭・1 濃い赤・2 赤橙・3 橙・4 黄・5 白・6 こげた地面・7 くぼみのふち
-  const palette = ['#2e0a04', '#b71c1c', '#e64a19', '#ff9800', '#ffeb3b', '#fffde7', '#3e2723', '#8d6e63'];
+  // 0 輪郭・1 濃い赤・2 赤橙・3 橙・4 黄・5 薄い黄（渦の光る筋だけ）・6 こげた地面・7 くぼみのふち
+  const palette = ['#2e0a04', '#9a1c00', '#e64a19', '#ff9800', '#ffd740', '#fff3c4', '#3e2723', '#8d6e63'];
   const heights = [3, 15, 27, 32, 30];
   const frames = heights.map((ht, f) => {
     const r = rng(600 + f);
-    const embers = Array.from({ length: f === 0 ? 0 : 3 + f * 2 }, () => [cx + (r() - 0.5) * 18, gy - ht * (0.45 + r() * 0.6) - 2, r()] as const);
+    const embers = Array.from({ length: f === 0 ? 0 : 2 + f }, () => [cx + (r() - 0.5) * 18, gy - ht * (0.45 + r() * 0.6) - 2, r()] as const);
     const g = fill(blank(W, H), (x, y) => {
       const up = gy - y;
-      if (up >= -1 && up <= ht) {
+      const column = (): number => {
+        if (up < -1 || up > ht + 4) return -1;
         const t = Math.max(0, up) / Math.max(1, ht);
-        // 幅: 根元は広く、少し上で細くなり、上の方でふくらんでから先が尖る
-        let half = 7 - 2.6 * Math.min(1, t * 2.2) + 2.4 * Math.sin(Math.PI * Math.min(1, t * 1.1)) * (f >= 2 ? 1 : 0.5);
-        if (t > 0.78) half *= ((1 - t) / 0.22) ** 0.8;
-        // ゆらめき（縦の波で左右にずらす）と、ぎざぎざのふち
-        const sway = Math.sin(up * 0.42 + f * 1.9) * (0.4 + t * 1.8);
-        const jag = (noise(x, y - f * 3, 2.2, 610 + f) - 0.5) * (1.2 + t * 2.2);
-        const d = Math.abs(x - cx - sway) / Math.max(0.3, half + jag);
-        if (d <= 1) {
-          // 芯ほど明るく、上と外ほど赤い。根元は特に熱い
-          const heat = (1 - d) * (1.05 - t * 0.8) + Math.max(0, 1 - up / 7) * 0.25 + (noise(x, y + f * 4, 3, 620 + f) - 0.5) * 0.25;
-          return heat > 0.72 ? 5 : heat > 0.5 ? 4 : heat > 0.3 ? 3 : heat > 0.13 ? 2 : 1;
+        // 円柱: 幅はほぼ一定（根元だけ少し広い）。少しゆらめく
+        const half = 6.2 + Math.max(0, 1 - up / 5) * 1.2;
+        const sway = Math.sin(up * 0.35 + f * 1.9) * 0.3 * t;
+        const nx = (x - cx - sway) / half;
+        // 先の 2 割: 舌に分かれて外へ広がり、ちぎれて消える
+        if (t > 0.8) {
+          const k = (t - 0.8) / 0.2;
+          const tongue = 1 + k * 0.5 * Math.abs(Math.sin(x * 1.3 + f * 0.9));
+          if (Math.abs(nx) > tongue) return -1;
+          if (noise(x, y + f * 5, 1.6, 640 + f) < k * 0.9) return -1;
+        } else {
+          const jag = (noise(x, y - f * 3, 2.2, 610 + f) - 0.5) * 0.25;
+          if (Math.abs(nx) > 1 + jag) return -1;
         }
-      }
+        // 円柱の明るさ（真ん中 1、ふち 0）と、周りを巻いて昇る炎の帯（コマで上へ動く）
+        const shade = Math.sqrt(Math.max(0, 1 - Math.min(1, nx * nx)));
+        const ph = up / 7 - nx * 0.45 + f * 0.5;
+        const fr = ph - Math.floor(ph);
+        if (fr < 0.38) {
+          if (shade > 0.9 && Math.abs(fr - 0.19) < 0.06) return 5;
+          return shade > 0.55 ? 4 : 3;
+        }
+        return shade > 0.8 ? 3 : shade > 0.35 ? 2 : 1;
+      };
+      const c = column();
+      if (c >= 0) return c;
       // 地面のくぼみ（楕円）。ふちは土、中はこげて赤く光る割れ目
       const ex = (x - cx) / 10.5;
       const ey = (y - gy) / 3.4;
@@ -2413,6 +2441,7 @@ function waterSplash(): SpriteOut {
  * ブレイズキック（作者の指摘 2026年10月29日: 脚っぽくなくてよい。炎をまとった脚らしきもの）: 右へ突き出す、炎に包まれた細長い脚。
  * 芯は明るい黄白、先は丸く光り、上下のふちから炎の舌が後ろへなびく（2コマでゆらぐ）
  */
+/** 炎をまとった蹴り足（インファイトのなぎ払う蹴り。前はブレイズキックの絵でもあった）: 右へ突き出す脚に、後ろへなびく炎 */
 function flameLeg(): SpriteOut {
   // 0 輪郭・1 濃い赤・2 だいだい・3 黄・4 黄白
   const palette = ['#4e1206', '#d84315', '#ff9800', '#ffe082', '#fff8e1'];
@@ -2433,6 +2462,67 @@ function flameLeg(): SpriteOut {
     }),
   );
   return { palette, frameMs: 90, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/**
+ * ブレイズキック（作者の依頼 2026年10月31日）: 自分を含む前の長方形（fit front。横 32 = 向き、縦 48 = 横幅）。
+ * 左寄り（x ≈ 10 が自分の位置）からバシャーモの脚が右へ蹴り出す: クリーム色の羽毛の太もも、赤い すね、灰色の足と 3 本の爪、すねを包む炎。
+ * その先には、横に寝た円柱の衝撃波（真ん中が明るく、ふちほど暗い）が長方形の幅いっぱいに立ち、周りを炎が渦を巻く。
+ * コマ 0 は脚を出し始めて衝撃波は短く、1 で脚が伸びきって衝撃波が広がり、2・3 で渦が回る
+ */
+function blazeKickWave(): SpriteOut {
+  const W = 32;
+  const H = 48;
+  const cy = (H - 1) / 2;
+  // 0 輪郭・1 濃い赤・2 赤橙・3 橙・4 黄・5 薄い黄・6 羽毛・7 羽毛の影・8 足・9 足の明るい所
+  const palette = ['#2e0a04', '#9a1c00', '#e64a19', '#ff9800', '#ffd740', '#fff3c4', '#f5e6b8', '#c9a96b', '#4a5568', '#8a97a8'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    // 足先の x と、衝撃波の縦の広がり（コマで広がる）
+    const fx = f === 0 ? 15 : 19;
+    const spread = f === 0 ? 12 : f === 1 ? 20 : 24;
+    const tx0 = fx + 4;
+    const tx1 = 31;
+    const g = fill(blank(W, H), (x, y) => {
+      const dy = y - cy;
+      // 太もも（羽毛の楕円）
+      const th = ((x - 9.5) / 4) ** 2 + (dy / 4.6) ** 2;
+      if (th <= 1) return x - 9.5 + dy > 2 ? 7 : 6;
+      // すね（太ももから足先へ）と、足首の羽毛の飾り
+      if (x >= 12 && x < fx && Math.abs(dy) < 2.7) return x < 13.5 ? 6 : dy > 1.4 ? 1 : 2;
+      // 足（丸い先）と 3 本の爪
+      if (x >= fx && x < fx + 3 && Math.abs(dy) < 3.3 - Math.max(0, x - fx - 1) * 0.6) return dy < -0.8 ? 9 : 8;
+      if (x >= fx + 3 && x < fx + 5 && (Math.abs(Math.abs(dy) - 2.4) < 0.6 || Math.abs(dy) < 0.6)) return 0;
+      // すねを包む炎（後ろほど太く、ゆらめく）と、太ももの後ろへなびく舌
+      if (x >= 11 && x < fx + 2) {
+        const flick = Math.sin(x * 1.1 + f * 2.4 + (dy > 0 ? 1.3 : 0)) * 0.6;
+        const flame = 2.7 + 2.6 * (1 - (x - 11) / (fx - 11)) + flick;
+        if (Math.abs(dy) < flame) return Math.abs(dy) < flame * 0.7 ? 3 : 2;
+      }
+      if (x >= 4 && x < 10 && Math.abs(dy) < 1.6 + Math.sin(x * 1.7 + f * 2) * 0.8 && hash(Math.floor(x), Math.floor(y), 50 + f) > 0.3) return x < 6 ? 1 : 2;
+      // 衝撃波の円柱（横に寝ている。x が円柱を横切る向き）
+      if (x >= tx0 && x <= tx1 && Math.abs(dy) <= spread) {
+        const nx = ((x - (tx0 + tx1) / 2) / ((tx1 - tx0) / 2)) * 1.02;
+        if (Math.abs(nx) > 1) return -1;
+        // 端はちぎれる
+        const k = Math.abs(dy) / spread;
+        if (k > 0.82 && noise(x + f * 3, y, 1.6, 660 + f) < (k - 0.82) / 0.18) return -1;
+        const shade = Math.sqrt(Math.max(0, 1 - nx * nx));
+        // 周りを巻く炎の帯（斜めに走り、コマで回る）
+        const ph = dy / 5.5 - nx * 0.5 + f * 0.45;
+        const fr = ph - Math.floor(ph);
+        if (fr < 0.4) {
+          if (shade > 0.92 && Math.abs(fr - 0.2) < 0.07) return 5;
+          return shade > 0.55 ? 4 : 3;
+        }
+        return shade > 0.75 ? 3 : shade > 0.35 ? 2 : 1;
+      }
+      // 足先と衝撃波の間に散る火花
+      if (x >= fx + 2 && x < tx0 + 1 && hash(Math.floor(x), Math.floor(y), 70 + f) > 0.72 && Math.abs(dy) < spread * 0.6) return hash(Math.floor(x), Math.floor(y), 80 + f) > 0.5 ? 4 : 3;
+      return -1;
+    });
+    return toRows(outline(g, 0));
+  });
+  return { palette, frameMs: 55, loopFrom: 2, parts: { main: frames } };
 }
 
 /**
@@ -3026,6 +3116,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     whirlpool: () => whirlpool(),
     'water-spout': () => waterSpout(),
     'flame-swirl': () => flameSwirl(),
+    'fire-spin-ball': () => flameSwirl('spin'),
     'flame-wheel': () => flameWheel(),
     'burst-ice': () => burst('ice'),
     'burst-meteor': () => burst('meteor'),
@@ -3082,6 +3173,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'blade-slash': () => bladeSlash(),
     'blade-ring': () => bladeRing(),
     'flame-leg': () => flameLeg(),
+    'blaze-kick-wave': () => blazeKickWave(),
     'water-splash': () => waterSplash(),
 };
 

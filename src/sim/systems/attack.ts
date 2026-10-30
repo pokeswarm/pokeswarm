@@ -1673,7 +1673,17 @@ function fxSourceOf(world: World, i: number, x: number, y: number): FxSource {
   const line = pr.shape[i] === SHAPE_LINE;
   const dirX = line || vlen === 0 ? pr.dirX[i]! || 1 : pr.vx[i]! / vlen;
   const dirY = line || vlen === 0 ? pr.dirY[i]! : pr.vy[i]! / vlen;
-  return { owner: pr.owner[i]!, move: pr.move[i]!, level: pr.level[i]!, damage: pr.damage[i]!, size: pr.radius[i]!, x, y, dirX, dirY, length: line ? pr.length[i]! : 0, serial: pr.serial[i]! };
+  // 前の長方形（frontBox）は、その形も渡す（ブレイズキックの燃える道を長方形に重ねる）
+  const box = pr.shape[i] === SHAPE_BOX ? boxOf(world, i) : undefined;
+  return { owner: pr.owner[i]!, move: pr.move[i]!, level: pr.level[i]!, damage: pr.damage[i]!, size: pr.radius[i]!, x, y, dirX, dirY, length: line ? pr.length[i]! : 0, serial: pr.serial[i]!, ...(box ? { box } : {}) };
+}
+
+/** 前の長方形（frontBox）の当たり判定 i の形: 根元から向きに沿った始まり・終わり、片側の幅（ワールドの単位） */
+export function boxOf(world: World, i: number): { from: number; to: number; half: number } {
+  const pr = world.projectiles;
+  const box = world.rules.moves[pr.move[i]!]!.frontBox;
+  const reach = pr.radius[i]!;
+  return { from: reach * (box?.start ?? 0), to: reach * (box?.end ?? 1), half: pr.length[i]! };
 }
 
 /** 当たり判定 i を消す。技そのもの（段階 0）なら end の効き方、印（段階 2）なら遅れた爆発を起こす */

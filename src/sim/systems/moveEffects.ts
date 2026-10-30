@@ -36,6 +36,8 @@ export interface FxSource {
   length: number;
   /** 元の当たり判定の通し番号（通った道を伸ばすため。技を使ったときなど、元が無ければ省略） */
   serial?: number;
+  /** 元が前の長方形（frontBox）なら、根元 (x, y) から向きに沿った始まり・終わりと片側の幅（ワールドの単位） */
+  box?: { from: number; to: number; half: number };
 }
 
 /** 段階 0 の当たり判定・技を使ったときに、trigger の効き方を起こす */
@@ -92,6 +94,18 @@ function spawn(world: World, src: FxSource, over: Partial<ProjectileSpawn>): voi
  *   引き返して、すでに残した道の上を通るとき（ブーメランの戻り）は足さない
  */
 function pathPuddle(world: World, src: FxSource, base: Partial<ProjectileSpawn>): void {
+  if (src.box) {
+    // 前の長方形（ブレイズキック）: 長方形に内接する、横向きの太い線（太さは長方形の奥行き）
+    const b = src.box;
+    const depth = b.to - b.from;
+    const cx = src.x + src.dirX * (b.from + depth / 2);
+    const cy = src.y + src.dirY * (b.from + depth / 2);
+    const len = Math.max(0, b.half * 2 - depth);
+    const lx = -src.dirY;
+    const ly = src.dirX;
+    spawn(world, src, { ...base, radius: (depth / 2) * ((base.radius ?? src.size) / src.size), shape: SHAPE_LINE, length: len, x: cx - lx * (len / 2), y: cy - ly * (len / 2), dirX: lx, dirY: ly });
+    return;
+  }
   if (src.length > 0) {
     spawn(world, src, { ...base, shape: SHAPE_LINE, length: src.length });
     return;
@@ -154,10 +168,16 @@ function explode(world: World, ex: NonNullable<MoveEffect['explode']>, src: FxSo
   // 別の技として弾ける（ばくれつパンチの 炎・雷 のスプラッシュ）: 見た目もタイプもその技
   const as = ex.asMove ? world.rules.moves.findIndex((m) => m.key === ex.asMove) : -1;
   if (as !== -1) src = { ...src, move: as };
+  const radius = src.size * ex.sizeMultiplier;
+  // 外へ広がる輪（ふんかの足元）: 厚さ band の帯が、durationSeconds で radius まで広がる（nova の sweep と同じ）
+  const band = ex.sweep ? Math.max(1, radius * ex.sweep) : 0;
+  const life = ex.durationSeconds ?? 0.2;
   spawn(world, src, {
     damage: src.damage * ex.powerMultiplier,
-    radius: src.size * ex.sizeMultiplier,
-    life: 0.2,
+    radius: band > 0 ? band : radius,
+    band,
+    growth: band > 0 ? Math.max(0, (radius - band) / life) : 0,
+    life,
     ...(ex.pull ? { knockback: -ex.pull } : {}),
   });
   world.events.push({ type: 'projectileHit', x: src.x, y: src.y, owner: src.owner, move: src.move });

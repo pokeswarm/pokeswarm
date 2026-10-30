@@ -1197,8 +1197,10 @@ export class RunScene extends Phaser.Scene {
       const def = world.rules.moves[pm.move]!;
       const c = this.effects.chargeGlow(def.effect);
       if (!c) continue;
-      // 溜める技（リーフブレード）は溜めている間、ほかは再使用の終わりの c.seconds の間
+      // 溜める技（リーフブレード・ブレイズキック）は溜めている間だけ、ほかは再使用の終わりの c.seconds の間
+      // （溜める技で再使用の終わりにも光らせると、溜めが2回あるように見えた。作者の指摘 2026年10月31日）
       const windup = def.windupSeconds && pm.windup !== undefined;
+      if (def.windupSeconds && !windup) continue;
       if (!windup && (pm.cooldown <= 0 || pm.cooldown > c.seconds)) continue;
       const t = windup ? 1 - pm.windup! / def.windupSeconds! : 1 - pm.cooldown / c.seconds;
       if (!best || t > best.t) best = { color: hexColor(c.color), radius: c.radius, alpha: c.alpha, t };
@@ -1267,7 +1269,7 @@ export class RunScene extends Phaser.Scene {
       now.set(serial, { x, y, radius: pr.radius[i]!, move: pr.move[i]! });
       g.fillStyle(0x000000, 0.12 + 0.18 * t).fillEllipse(x, y, pr.radius[i]! * (0.8 + 0.8 * t), pr.radius[i]! * (0.4 + 0.4 * t));
       items.push({
-        spec: { id: f.id, fit: 'circle', size: f.size, alpha: 1, rotate: 'none', spinDegPerSec: 0, varyTiles: false, upright: false, directional: false, originY: 1, shake: 0, tail: 0, afterimages: 0, afterimageGap: 2 },
+        spec: { id: f.id, fit: 'circle', size: f.size, alpha: 1, rotate: 'none', spinDegPerSec: 0, varyTiles: false, upright: false, directional: false, originY: 1, along: 0.6, shake: 0, tail: 0, afterimages: 0, afterimageGap: 2 },
         x,
         y: y - f.height * (1 - t * t),
         radius: pr.radius[i]!,
@@ -2096,8 +2098,10 @@ export class RunScene extends Phaser.Scene {
       }
       // 回復の技（なまける・ドわすれ）の見た目だけの円（遅れて弾ける印と同じ stage 2）
       if (pr.stage[i] === 2 && world.rules.moves[pr.move[i]!]!.pattern === 'heal') return this.effects.sprite(effect) ?? null;
-      // 効き方から出た外へ進む輪（じしんの続く揺れ）も、輪の絵の技なら同じ絵
+      // 効き方から出た外へ進む輪（じしんの続く揺れ・ふんかの足元の衝撃波）: 輪の絵があればそれ、無ければ輪の絵の技なら同じ絵
       if (pr.stage[i] === 1 && pr.band[i]! > 0) {
+        const ring = this.effects.effectRingSprite(effect);
+        if (ring) return ring;
         const sp = this.effects.sprite(effect);
         if (sp?.fit === 'ring') return sp;
       }

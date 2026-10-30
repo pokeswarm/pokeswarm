@@ -323,13 +323,13 @@ export class MoveSprites {
         continue;
       }
       if (spec.fit === 'front') {
-        // 扇形の先（ほのおのキバ・フレアドライブ）: 向きの先、半径の 6 割の所に、扇の半径に合わせた1枚（右向きの絵）
+        // 扇形の先（ほのおのキバ・フレアドライブ）: 向きの先、半径の along（ふつう 6 割）の所に、扇の半径に合わせた1枚（右向きの絵）
         const rows = sp.parts.main?.[0];
         if (!rows) continue;
         const reach = it.radius;
         const s = (reach * spec.size) / rows[0]!.length;
-        const px = x + it.dirX * reach * 0.6;
-        const py = y + it.dirY * reach * 0.6;
+        const px = x + it.dirX * reach * spec.along;
+        const py = y + it.dirY * reach * spec.along;
         if (spec.directional) {
           // 向きを 8 方向に分けて、その向きの絵を回さずに置く（左向きは右向きの絵の左右を返す）
           const part = directionalPart(it.dirX, it.dirY);
@@ -349,7 +349,7 @@ export class MoveSprites {
           for (let k = spec.afterimages; k >= 1; k--) {
             const old = hist[k * spec.afterimageGap];
             if (old === undefined) continue;
-            put(key, x + Math.cos(old) * reach * 0.6, y + Math.sin(old) * reach * 0.6, old, s, s, a * 0.55 * (1 - k / (spec.afterimages + 1)));
+            put(key, x + Math.cos(old) * reach * spec.along, y + Math.sin(old) * reach * spec.along, old, s, s, a * 0.55 * (1 - k / (spec.afterimages + 1)));
           }
         }
         put(fk('main', this.frameOf(spec.id, 'main', elapsed)), px, py, rot, s, s, a);

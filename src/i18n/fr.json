@@ -130,6 +130,7 @@
   "lobby.waitAll": "Vous pouvez commencer quand tout le monde a choisi un Pokémon et que les invités sont prêts",
   "lobby.leave": "Quitter (Échap)",
   "net.started": "La partie de cette salle a déjà commencé (impossible de rejoindre en cours)",
+  "net.version": "La version du jeu est différente (la salle est en v{room}, vous en v{mine}). Rechargez la page pour obtenir la dernière version, puis réessayez",
   "net.hostLeft": "Connexion à l'hôte perdue",
   "net.reason.closed": "Raison : la connexion a été fermée (l'autre joueur a fermé la page ou perdu la connexion)",
   "net.reason.left": "Raison : l'autre joueur a perdu la connexion au salon (page fermée ou hors ligne)",

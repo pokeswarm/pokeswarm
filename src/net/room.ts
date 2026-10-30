@@ -23,7 +23,7 @@ import type { Transport } from './transport';
 
 /**
  * 協力プレイの部屋（最大 maxPlayers 人）。Realtime Database の rooms/<部屋ID> に次を置く:
- *   host, seed, region, createdAt … ホストが作る（region は遊ぶ地方）
+ *   host, seed, region, version, createdAt … ホストが作る（region は遊ぶ地方、version はホストのゲームの版。07 の143章）
  *   members/<番号>       … { uid, pokemon }。番号はプレイヤーの番号（ホストは1、ゲストは2〜）。切断すると消える
  *   started              … ホストが開始したときの参加者（[{ id, pokemon }]）。開始後は入れない
  *   peers/<ゲストの番号>  … ホストとそのゲストの WebRTC の接続情報（offer・answer・candidates・mode）
@@ -58,9 +58,23 @@ export interface RoomMember {
 }
 
 export class RoomError extends Error {
-  constructor(readonly code: 'notFound' | 'full' | 'started' | 'closed') {
+  /** version: 部屋（ホスト）の版と自分の版が違う。roomVersion は部屋の版（古いホストで無ければ '?'） */
+  constructor(
+    readonly code: 'notFound' | 'full' | 'started' | 'closed' | 'version',
+    readonly roomVersion?: string,
+  ) {
     super(code);
   }
+}
+
+/**
+ * 部屋の版と自分の版が違うか（作者の決定 2026年10月31日。07 の143章）。
+ * ページを読み直していない人と新しく開いた人が同じ部屋に入ると、シミュレーションの版がずれて静かに結果が食い違うので、入る前に断る。
+ * 部屋に版が無い（この仕組みより前のホスト）ときも違うとみなす。mine が無ければ（テスト）比べない
+ */
+export function roomVersionMismatch(roomVersion: string | undefined, mine: string | undefined): boolean {
+  if (mine === undefined) return false;
+  return roomVersion !== mine;
 }
 
 /** 部屋の参加者の、Realtime Database に置いた形（無いものは残らない） */
@@ -131,6 +145,8 @@ export interface RoomOptions {
   forceRelay?: boolean;
   /** 確認用: 直接接続をわざと失敗させ、中継への自動切り替えを試す */
   simulateP2PFailure?: boolean;
+  /** このゲームの版（`data/site.json` の appVersion）。作るときは部屋に書き、入るときは部屋の版と比べて、違えば入れない。省略なら比べない */
+  version?: string;
 }
 
 /**
@@ -186,7 +202,7 @@ export class Room {
     const seed = randomSeed();
     const room = new Room(db, config, 'host', roomId, seed, region, 1, options);
     await onDisconnect(ref(db, room.base)).remove();
-    await set(ref(db, room.base), { host: uid, seed, region, createdAt: serverTimestamp(), members: { 1: { uid, pokemon: '' } } });
+    await set(ref(db, room.base), { host: uid, seed, region, ...(options.version ? { version: options.version } : {}), createdAt: serverTimestamp(), members: { 1: { uid, pokemon: '' } } });
     room.members.set(1, parseMember({}));
     room.watchMembers();
     return room;
@@ -198,7 +214,8 @@ export class Room {
     const base = `rooms/${roomId}`;
     const snap = await get(ref(db, base));
     if (!snap.exists()) throw new RoomError('notFound');
-    const data = snap.val() as { seed: number; region?: string; started?: unknown };
+    const data = snap.val() as { seed: number; region?: string; version?: string; started?: unknown };
+    if (roomVersionMismatch(data.version, options.version)) throw new RoomError('version', data.version ?? '?');
     if (data.started) throw new RoomError('started');
     let slot = 0;
     const result = await runTransaction(ref(db, `${base}/members`), (current: Record<string, unknown> | null) => {

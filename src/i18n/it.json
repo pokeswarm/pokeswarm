@@ -130,6 +130,7 @@
   "lobby.waitAll": "Puoi iniziare quando tutti hanno scelto un Pokémon e gli ospiti sono pronti",
   "lobby.leave": "Esci (Esc)",
   "net.started": "La partita in questa stanza è già iniziata (non si può entrare a metà)",
+  "net.version": "La versione del gioco non corrisponde (la stanza è alla v{room}, tu alla v{mine}). Ricarica la pagina per avere l’ultima versione, poi entra di nuovo",
   "net.hostLeft": "Connessione con l'host persa",
   "net.reason.closed": "Motivo: la connessione si è chiusa (l'altro giocatore ha chiuso la pagina o ha perso la connessione)",
   "net.reason.left": "Motivo: l'altro giocatore ha perso la connessione alla stanza (pagina chiusa o offline)",

@@ -130,6 +130,7 @@
   "lobby.waitAll": "Puedes empezar cuando todos hayan elegido un Pokémon y los invitados estén listos",
   "lobby.leave": "Salir (Esc)",
   "net.started": "La partida de esta sala ya ha empezado (no se puede entrar a mitad)",
+  "net.version": "La versión del juego no coincide (la sala está en v{room}, tú en v{mine}). Recarga la página para obtener la última versión y vuelve a entrar",
   "net.hostLeft": "Se perdió la conexión con el anfitrión",
   "net.reason.closed": "Motivo: se cerró la conexión (el otro jugador cerró la página o perdió la conexión)",
   "net.reason.left": "Motivo: el otro jugador perdió la conexión con la sala (cerró la página o se desconectó)",

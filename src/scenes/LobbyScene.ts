@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { coopHatchSeed, hatchedPokemon, isEgg, playableName } from '../meta/hatch';
-import { generated, networkConfig, playablesConfig, regionsConfig, uiConfig } from '../data';
+import { generated, networkConfig, playablesConfig, regionsConfig, siteConfig, uiConfig } from '../data';
 import { localName } from '../data/simRules';
 import type { SpriteAnims } from '../data/schema';
 import { getLocale, t, type MessageKey } from '../i18n';
@@ -111,7 +111,7 @@ export class LobbyScene extends Phaser.Scene {
   private async connect(): Promise<void> {
     try {
       const { Room } = await import('../net/room');
-      const options = { forceRelay: this.params.forceRelay, simulateP2PFailure: this.params.simulateP2PFailure };
+      const options = { forceRelay: this.params.forceRelay, simulateP2PFailure: this.params.simulateP2PFailure, version: siteConfig.appVersion };
       const room = this.params.mode === 'host' ? await Room.create(networkConfig, this.params.region ?? defaultRegion(), options) : await Room.join(networkConfig, this.params.roomId ?? '', options);
       if (!this.sys.isActive()) {
         void room.leave();
@@ -136,6 +136,7 @@ export class LobbyScene extends Phaser.Scene {
       if (code === 'notFound') this.message = { key: 'net.notFound' };
       else if (code === 'full') this.message = { key: 'net.full', params: { max: networkConfig.maxPlayers } };
       else if (code === 'started') this.message = { key: 'net.started' };
+      else if (code === 'version') this.message = { key: 'net.version', params: { room: (err as { roomVersion?: string }).roomVersion ?? '?', mine: siteConfig.appVersion } };
       else this.message = { key: 'net.failed', params: { message: err instanceof Error ? err.message : String(err) } };
       this.render();
     }

@@ -130,6 +130,7 @@
   "lobby.waitAll": "Du kannst starten, sobald alle ein Pokémon gewählt haben und die Gäste bereit sind",
   "lobby.leave": "Verlassen (Esc)",
   "net.started": "Die Runde in diesem Raum hat bereits begonnen (späterer Beitritt nicht möglich)",
+  "net.version": "Die Spielversion stimmt nicht überein (der Raum hat v{room}, du hast v{mine}). Lade die Seite neu, um die neueste Version zu erhalten, und tritt dann erneut bei",
   "net.hostLeft": "Verbindung zum Host verloren",
   "net.reason.closed": "Grund: Die Verbindung wurde getrennt (der andere Spieler hat die Seite geschlossen oder die Verbindung verloren)",
   "net.reason.left": "Grund: Der andere Spieler hat die Verbindung zum Raum verloren (Seite geschlossen oder offline)",

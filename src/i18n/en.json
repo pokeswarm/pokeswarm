@@ -151,6 +151,7 @@
   "lobby.waitAll": "You can start once everyone has picked a Pokémon and the guests are ready",
   "lobby.leave": "Leave (Esc)",
   "net.started": "The run in this room has already started (you cannot join midway)",
+  "net.version": "Game version mismatch (the room is v{room}, you are v{mine}). Reload the page to get the latest version, then join again",
   "net.hostLeft": "Lost connection to the host",
   "net.reason.closed": "Reason: the connection closed (the other player closed the page or lost their connection)",
   "net.reason.left": "Reason: the other player lost their connection to the room (closed the page or went offline)",

@@ -344,6 +344,7 @@
   "gain.cooldownSeconds": "Cooldown {v}s",
   "gain.hitIntervalSeconds": "Hit interval {v}s",
   "gain.strength": "Strength +{v}%",
+  "gain.whenHurt": "For {v}s after taking damage",
   "mod.powerPct": "Move power",
   "mod.physicalPowerPct": "Physical move power",
   "mod.specialPowerPct": "Special move power",

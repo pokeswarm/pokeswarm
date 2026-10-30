@@ -1131,6 +1131,13 @@ export const moveDefSchema = z.object({
   frontBox: z.object({ start: z.number().min(0), end: z.number().positive(), halfWidth: z.number().positive() }).optional(),
   /** 扇（melee の arcDegrees）: 出ている間、向いている方向をこの速さ（度/秒）で追う（かえんほうしゃ） */
   followFacing: z.number().positive().optional(),
+  /** 扇（melee の arcDegrees）: 出ている間、向きをこの速さ（度/秒）で回し続ける（ハイパーボイス: 左右の扇がぐるりと回る。07 の141章） */
+  spinDegPerSec: z.number().optional(),
+  /**
+   * passive: いつも効く効果（passive）を、自分がダメージを受けてから seconds 秒の間だけ効かせる（からげんき。07 の141章）。
+   * 受け直すと時間が戻る
+   */
+  hurtBuff: z.object({ seconds: z.number().positive() }).optional(),
   /** 射程の強化（ズームレンズ）の効き方の倍率（ねんりき: 0.5 で半分だけ伸びる）。省略で 1 */
   rangeBonusScale: z.number().nonnegative().optional(),
   /**
@@ -1144,6 +1151,8 @@ export const moveDefSchema = z.object({
   scatterDelaySeconds: z.number().positive().optional(),
   /** sweep（なぎ払い）を片道だけにする（はたく: 1回払う。おうふくビンタは行って戻る） */
   sweepOnce: z.boolean().optional(),
+  /** sweep: 左右の両端から1つずつ、正面へ向かって払い、正面で合わせる（ねこだまし: 両手でパチン。07 の141章）。sweepOnce と使う */
+  sweepClap: z.boolean().optional(),
   /**
    * barrage（連打）を長方形にする: 自分を通り向きに直角な、横幅 barrageWidth の辺から、向いている方向へ range の奥行きまで
    * 拳をまっすぐ乱打する（ばくれつパンチ: 自分の真横から当たる。作者の決定 2026年10月25日）。省略なら扇形の中のランダムな場所
@@ -1617,6 +1626,15 @@ export const effectRecipeSchema = z.object({
       lineLength: z.number().positive().optional(),
     })
     .optional(),
+  /**
+   * ダメージを受けると効く技（からげんき）が効いている間、使ったポケモンの周りに intervalSeconds ごとに出す絵（アセアセの汗）。
+   * 頭の上あたりの左右に出し、seconds の間 外側の上へ飛んで消える。radius・distance はワールドの単位（07 の141章）
+   */
+  buffSprite: moveSpriteSpec
+    .extend({ seconds: z.number().positive(), radius: z.number().positive(), intervalSeconds: z.number().positive(), distance: z.number().nonnegative() })
+    .optional(),
+  /** 技を使ってから seconds 後に、使ったポケモンの向きの distance 先で当たった光（impact）を出す（ねこだまし: 正面で両手を合わせるパチン。07 の141章） */
+  clap: z.object({ seconds: z.number().nonnegative(), distance: z.number().nonnegative() }).optional(),
   /** 技が敵に当たった所に seconds の間出す絵（ぜったいれいど: 氷の像）。radius はワールドの単位 */
   hitSprite: moveSpriteSpec.extend({ seconds: z.number().positive(), radius: z.number().positive() }).optional(),
   /** 当たり判定の範囲を塗らない（天気: 画面全体なので、降る雪だけで見せる） */
@@ -2369,5 +2387,7 @@ export const moveBalanceSchema = z.object({
   tierOverrides: z.record(z.string(), z.enum(['base', 'derived', 'unique'])).default({}),
   /** 地方の固有技（moves.json の region）の帯に掛ける倍率（ホウエン: 作りにくい固有技だけ強くする。タイプの技・派生技は掛けない。07 の134章） */
   regionTierScale: z.record(z.string(), z.number().positive()).default({}),
+  /** 技ごとに帯に掛ける倍率（作者の調整: ギガインパクト（カビゴン）2・うたう と あくび 0.6。07 の141章） */
+  strengthScale: z.record(z.string(), z.number().positive()).default({}),
 });
 export type MoveBalanceConfig = z.infer<typeof moveBalanceSchema>;

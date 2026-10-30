@@ -344,6 +344,7 @@
   "gain.cooldownSeconds": "再使用 {v}秒",
   "gain.hitIntervalSeconds": "当たる間隔 {v}秒",
   "gain.strength": "強さ +{v}%",
+  "gain.whenHurt": "ダメージを受けてから{v}秒の間",
   "mod.powerPct": "技の威力",
   "mod.physicalPowerPct": "物理の技の威力",
   "mod.specialPowerPct": "特殊の技の威力",

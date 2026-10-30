@@ -2755,6 +2755,24 @@
         "upright": true
       }
     },
+    "yawn": {
+      "extends": "normal.base",
+      "burstFlash": {
+        "colors": [
+          "#bbdefb",
+          "#c5cae9",
+          "#ffffff"
+        ],
+        "periodMs": 150,
+        "alpha": 0.3
+      },
+      "sprite": {
+        "id": "z-letter",
+        "fit": "circle",
+        "size": 1.8,
+        "upright": true
+      }
+    },
     "hyper-voice": {
       "extends": "normal.base",
       "projectile": {
@@ -4276,6 +4294,10 @@
           "radius": 30
         }
       },
+      "clap": {
+        "seconds": 0.22,
+        "distance": 32
+      },
       "sprite": {
         "id": "palm",
         "fit": "front",
@@ -4284,15 +4306,14 @@
     },
     "facade": {
       "extends": "normal.base",
-      "impact": {
-        "flash": {
-          "radius": 40
-        }
-      },
-      "sprite": {
-        "id": "fist",
-        "fit": "front",
-        "size": 0.9
+      "buffSprite": {
+        "id": "sweat-drop",
+        "fit": "circle",
+        "size": 1,
+        "seconds": 0.5,
+        "radius": 6,
+        "intervalSeconds": 0.45,
+        "distance": 22
       }
     },
     "thunder-fang": {

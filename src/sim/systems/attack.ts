@@ -1124,6 +1124,30 @@ function fireSweep(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   if (def.body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: fx, dirY: fy, distance: def.body.lungeDistance, afterimages: def.body.afterimages });
   const half = Math.min(Math.PI, (st.arcDegrees * Math.PI) / 360);
   const amp = (Math.min(360, st.spreadDegrees) * Math.PI) / 360;
+  const center = Math.atan2(fy, fx);
+  if (def.sweepClap) {
+    // ねこだまし: 左右の端から1つずつ正面へ払い、正面で合わせる（両手でパチン。07 の141章）。
+    // 片道の払い（orbitRadius 1）は angle − A から angle + A へ動くので、端 ±amp から正面 0 へ動くよう angle と A を半分ずらす。
+    // 片手はそれぞれの側を払うので、威力はそのまま（正面で合わさる所だけ両手が当たる）
+    for (const s of [1, -1]) {
+      world.projectiles.add({
+        ...base(world, p, pm, st),
+        motion: MOTION_SWEEP,
+        x: p.x,
+        y: p.y,
+        radius: st.range + sc.size,
+        shape: SHAPE_SECTOR,
+        length: half,
+        angle: center - (s * amp) / 2,
+        angularSpeed: (s * amp) / 2,
+        dirX: Math.cos(center - s * amp),
+        dirY: Math.sin(center - s * amp),
+        orbitRadius: 1,
+        hitIntervalTicks: 0,
+      });
+    }
+    return;
+  }
   world.projectiles.add({
     ...base(world, p, pm, st),
     motion: MOTION_SWEEP,
@@ -1311,6 +1335,13 @@ export function moveProjectiles(world: World): void {
         while (diff < -Math.PI) diff += Math.PI * 2;
         const turn = ((follow * Math.PI) / 180) * world.dt;
         const a = cur + Math.max(-turn, Math.min(turn, diff));
+        pr.dirX[i] = pr.vx[i] = Math.cos(a);
+        pr.dirY[i] = pr.vy[i] = Math.sin(a);
+      }
+      // 回り続ける扇（ハイパーボイス: 左右の扇が決まった速さでぐるりと回る。07 の141章）
+      const spin = world.rules.moves[pr.move[i]!]!.spinDegPerSec;
+      if (spin && pr.shape[i] === SHAPE_SECTOR && pr.stage[i] === 0) {
+        const a = Math.atan2(pr.dirY[i]!, pr.dirX[i]!) + ((spin * Math.PI) / 180) * world.dt;
         pr.dirX[i] = pr.vx[i] = Math.cos(a);
         pr.dirY[i] = pr.vy[i] = Math.sin(a);
       }

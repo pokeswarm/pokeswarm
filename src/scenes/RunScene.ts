@@ -126,7 +126,10 @@ export class RunScene extends Phaser.Scene {
   private moveSprites: MoveSprites | null = null;
   /** ボスの範囲技が落ちたときのドット絵（案 F） */
   private strikeSprites: MoveSprites | null = null;
-  private strikes: { item: Omit<SpriteItem, 'elapsed' | 'alpha'>; start: number; seconds: number }[] = [];
+  /** drift: 出てから毎秒この分だけ動かす（からげんきの汗が外の上へ飛ぶ） */
+  private strikes: { item: Omit<SpriteItem, 'elapsed' | 'alpha'>; start: number; seconds: number; drift?: { x: number; y: number } }[] = [];
+  /** プレイヤーごとの、前に見た HP と、最後に HP が減った時刻（秒）と、最後に汗を出した時刻（からげんき。07 の141章） */
+  private hurtSeen = new Map<number, { hp: number; hurtAt: number; sweatAt: number }>();
   /** 画面をうっすら光らせた当たり判定の通し番号（同じものでは1回だけ） */
   private flashedSerials = new Set<number>();
   private enemyView!: PooledCircles;
@@ -1073,6 +1076,18 @@ export class RunScene extends Phaser.Scene {
         const cs = this.effects.castSprite(w.rules.moves[ev.move]!.effect);
         const p = cs ? w.players.find((q) => q.id === ev.playerId) : undefined;
         if (cs && p) this.addStrike(cs, cs.lineLength ? p.x - cs.lineLength / 2 : p.x, p.y, cs.radius, cs.seconds, cs.lineLength ?? 0);
+        // 両手を合わせる技（ねこだまし）: 払い終わる頃に、向きの先でパチンと光らせる
+        const effect = w.rules.moves[ev.move]!.effect;
+        const clap = effectRecipes[effect]?.clap;
+        if (clap) {
+          const playerId = ev.playerId;
+          this.time.delayedCall(clap.seconds * 1000, () => {
+            const q = this.sim.world.players.find((pp) => pp.id === playerId);
+            if (!q) return;
+            const len = Math.hypot(q.facingX, q.facingY) || 1;
+            this.effects.playImpact(effect, q.x + (q.facingX / len) * clap.distance, q.y + (q.facingY / len) * clap.distance);
+          });
+        }
       } else if (ev.type === 'projectileHit') {
         // 当たった所の絵（ぜったいれいど: 氷の像）
         const hs = this.effects.hitSprite(w.rules.moves[ev.move]!.effect);
@@ -1137,6 +1152,35 @@ export class RunScene extends Phaser.Scene {
 
   /** その場に決まった秒数だけ出す絵（使った瞬間の絵・当たった所の絵）。ボスの技が落ちた所の絵と同じ置き場に入れる */
   /** length があれば (x, y) から右へその長さの線に並べる（fit line。リーフブレードの剣筋） */
+  /**
+   * ダメージを受けると効く技（からげんき）: HP が減ってから技の秒数の間、頭の左右に汗（アセアセ）を出し続ける。
+   * HP の減りで見るので、味方の分も同じように見える（07 の141章）
+   */
+  private drawHurtBuff(world: World, p: World['players'][number], now: number): void {
+    const seen = this.hurtSeen.get(p.id) ?? { hp: p.hp, hurtAt: -Infinity, sweatAt: -Infinity };
+    if (p.hp < seen.hp - 1e-6) seen.hurtAt = now;
+    seen.hp = p.hp;
+    this.hurtSeen.set(p.id, seen);
+    if (p.down) return;
+    for (const pm of p.moves) {
+      const def = world.rules.moves[pm.move]!;
+      const bs = def.hurtBuffSeconds ? effectRecipes[def.effect]?.buffSprite : undefined;
+      if (!bs || now - seen.hurtAt > def.hurtBuffSeconds! || now - seen.sweatAt < bs.intervalSeconds) continue;
+      seen.sweatAt = now;
+      for (const s of [-1, 1]) {
+        const x = p.x + s * bs.distance * 0.8;
+        const y = p.y - bs.distance;
+        this.strikes.push({
+          item: { spec: bs, x, y, radius: bs.radius, band: 0, dirX: 1, dirY: 0, length: 0, vx: 0, vy: 0, seed: this.strikes.length },
+          start: this.time.now / 1000,
+          seconds: bs.seconds,
+          drift: { x: s * bs.distance * 0.8, y: -bs.distance * 0.6 },
+        });
+      }
+      return;
+    }
+  }
+
   private addStrike(spec: SpriteSpec, x: number, y: number, radius: number, seconds: number, length = 0): void {
     this.strikes.push({
       item: { spec, x, y, radius, band: 0, dirX: 1, dirY: 0, length, vx: 0, vy: 0, seed: this.strikes.length },
@@ -1975,6 +2019,7 @@ export class RunScene extends Phaser.Scene {
       const view = this.playerViews.get(p.id);
       view?.update(p, alpha, (world.reviveTouch.get(p.id) ?? 0) / reviveNeed);
       view?.setCharge(this.chargeOf(world, p));
+      this.drawHurtBuff(world, p, timeMs / 1000);
     }
     const local = world.players.find((p) => p.id === this.localId);
     const localView = this.playerViews.get(this.localId);
@@ -2071,7 +2116,8 @@ export class RunScene extends Phaser.Scene {
     this.strikeSprites?.drawItems(
       this.strikes.map((s) => {
         const elapsed = now - s.start;
-        return { ...s.item, elapsed, alpha: Math.min(1, (s.seconds - elapsed) / (s.seconds * 0.3)) };
+        const moved = s.drift ? { x: s.item.x + s.drift.x * elapsed, y: s.item.y + s.drift.y * elapsed } : {};
+        return { ...s.item, ...moved, elapsed, alpha: Math.min(1, (s.seconds - elapsed) / (s.seconds * 0.3)) };
       }),
     );
     // 天気（こなゆき・ふぶき）: 出ている間、画面じゅうに雪を降らせる

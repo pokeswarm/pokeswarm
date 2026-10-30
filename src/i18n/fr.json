@@ -323,6 +323,7 @@
   "gain.cooldownSeconds": "Recharge {v} s",
   "gain.hitIntervalSeconds": "Intervalle des coups {v} s",
   "gain.strength": "Force +{v} %",
+  "gain.whenHurt": "Pendant {v} s après avoir subi des dégâts",
   "mod.powerPct": "Puissance des capacités",
   "mod.physicalPowerPct": "Puissance physique",
   "mod.specialPowerPct": "Puissance spéciale",

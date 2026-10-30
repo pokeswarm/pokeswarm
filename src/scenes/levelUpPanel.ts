@@ -58,7 +58,9 @@ export function moveGains(world: World, move: number, level: number): string[] {
   if (def.passive.length > 0) {
     const a = def.passive[level - 1];
     const b = def.passive[level];
-    return a && b ? modifierLines(world, modifierDiff(a, b)) : [];
+    const lines = a && b ? modifierLines(world, modifierDiff(a, b)) : [];
+    // ダメージを受けると効く技（からげんき）は、効く間を先に書く
+    return def.hurtBuffSeconds && lines.length > 0 ? [t('gain.whenHurt', { v: def.hurtBuffSeconds }), ...lines] : lines;
   }
   const a = def.levels[level - 1];
   const b = def.levels[level];

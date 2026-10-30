@@ -62,7 +62,8 @@ for (const [key, def] of Object.entries(movesFile.moves)) {
   if (balance.exempt.includes(key)) continue;
   const tier = balance.tiers[tierOf(key)];
   // 地方の固有技（ホウエン）だけ、帯を倍率の分だけ強くする。タイプの技・派生技は前の地方と同じ（敵の HP を増やした意味がなくなるため。07 の134章）
-  const scale = def.region && tierOf(key) === 'unique' ? (balance.regionTierScale?.[def.region] ?? 1) : 1;
+  // 技ごとの倍率（strengthScale: 作者の調整で帯より強く・弱くした技。07 の141章）も掛ける
+  const scale = (def.region && tierOf(key) === 'unique' ? (balance.regionTierScale?.[def.region] ?? 1) : 1) * (balance.strengthScale?.[key] ?? 1);
   const out = retuned(def, tier.max * scale * tier.firstRatio, tier.max * scale);
   movesFile.moves[key] = out;
   report.push(`${key.padEnd(16)} ${tierOf(key).padEnd(8)} ${first(def).toFixed(0).padStart(5)} → ${max(def).toFixed(0).padStart(5)}  を  ${first(out).toFixed(0).padStart(4)} → ${max(out).toFixed(0).padStart(4)}`);

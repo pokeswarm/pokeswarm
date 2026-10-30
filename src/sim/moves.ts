@@ -113,6 +113,10 @@ export interface SimMoveDef {
   readonly frontBox?: { readonly start: number; readonly end: number; readonly halfWidth: number };
   /** 扇: 出ている間、向いている方向を追う速さ（度/秒） */
   readonly followFacing?: number;
+  /** 扇: 出ている間、向きを回し続ける速さ（度/秒。ハイパーボイス） */
+  readonly spinDegPerSec?: number;
+  /** passive の効果を、ダメージを受けてからこの秒数の間だけ効かせる（からげんき） */
+  readonly hurtBuffSeconds?: number;
   /** 射程の強化の効き方の倍率（ねんりき 0.5） */
   readonly rangeBonusScale?: number;
   /** lob（放物線）の落とす場所（しおふき・ヘドロばくだん）。省略なら向いている側へ放る */
@@ -123,6 +127,8 @@ export interface SimMoveDef {
   readonly scatterDelaySeconds?: number;
   /** sweep（なぎ払い）を片道だけにする（はたく） */
   readonly sweepOnce?: boolean;
+  /** sweep: 左右の両端から正面へ払って合わせる（ねこだまし） */
+  readonly sweepClap?: boolean;
   /** 届く範囲で HP の一番高い敵を狙う（ゴッドバード） */
   readonly aimStrongest?: boolean;
   /** beam を向いている方へ出す（メガホーン） */

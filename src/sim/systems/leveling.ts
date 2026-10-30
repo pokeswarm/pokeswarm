@@ -464,6 +464,8 @@ export function recomputeModifiers(world: World, p: Player): void {
   // いつも効く技（かくばる・テクスチャー）: そのレベルまでの効果
   for (const pm of p.moves) {
     const passive = world.rules.moves[pm.move]?.passive[pm.level - 1];
+    // ダメージを受けると効く技（からげんき）は、受けてからの時間の間だけ
+    if (world.rules.moves[pm.move]?.hurtBuffSeconds && !p.moveBuffs?.some((b) => b.move === pm.move)) continue;
     if (passive) addModifiers(mods, passive, 1);
   }
   mods.powerPct += pledgePowerPct(world, p);

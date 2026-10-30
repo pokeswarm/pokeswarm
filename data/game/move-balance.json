@@ -54,7 +54,9 @@
     "confusion-hoenn",
     "future-sight-hoenn",
     "psychic-hoenn",
-    "future-sight-gardevoir"
+    "future-sight-gardevoir",
+    "facade",
+    "giga-impact-hoenn"
   ],
   "heavyHitters": [
     "giga-impact",
@@ -109,5 +111,10 @@
     "reflect": "derived",
     "revenge": "derived",
     "flamethrower-hoenn": "derived"
+  },
+  "strengthScale": {
+    "giga-impact": 2,
+    "sing": 0.6,
+    "yawn": 0.6
   }
 }

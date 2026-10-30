@@ -2,6 +2,7 @@ import { abilityContactTaken, abilityOf, abilitySturdy } from '../ability';
 import { applyHitEffect } from './commands';
 import { contactDamageMultiplier } from './status';
 import { activeLegendField } from './stage';
+import { recomputeModifiers } from './leveling';
 import type { PlayerId } from '../commands';
 import type { Player } from '../entities/player';
 import type { World } from '../world';
@@ -54,9 +55,27 @@ export function hurtPlayer(world: World, p: Player, raw: number): void {
   p.hp -= amount;
   p.invincibleTicks = Math.round(world.rules.stats.hurtInvincibleSeconds / world.dt);
   world.events.push({ type: 'playerDamaged', playerId: p.id, amount });
+  hurtBuffs(world, p);
   // がんじょう: 区間ごとに1回、HP 1 で耐える（特性。本人のブラウザ）
   if (p.hp <= 0 && p.id === world.localPlayerId && abilitySturdy(world, p)) return;
   if (p.hp <= 0) downOrRevive(world, p);
+}
+
+/** ダメージを受けると効く技（からげんき）: 決まった秒数の間、技のいつも効く効果を効かせる（受け直すと時間が戻る。07 の141章） */
+function hurtBuffs(world: World, p: Player): void {
+  let added = false;
+  for (const pm of p.moves) {
+    const seconds = world.rules.moves[pm.move]!.hurtBuffSeconds;
+    if (!seconds) continue;
+    const ticks = Math.max(1, Math.round(seconds / world.dt));
+    const had = p.moveBuffs?.find((b) => b.move === pm.move);
+    if (had) had.ticksLeft = ticks;
+    else {
+      p.moveBuffs = [...(p.moveBuffs ?? []), { move: pm.move, ticksLeft: ticks }];
+      added = true;
+    }
+  }
+  if (added) recomputeModifiers(world, p);
 }
 
 /**

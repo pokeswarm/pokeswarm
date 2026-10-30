@@ -323,6 +323,7 @@
   "gain.cooldownSeconds": "Ricarica {v} s",
   "gain.hitIntervalSeconds": "Intervallo dei colpi {v} s",
   "gain.strength": "Forza +{v}%",
+  "gain.whenHurt": "Per {v} s dopo aver subito danni",
   "mod.powerPct": "Potenza delle mosse",
   "mod.physicalPowerPct": "Potenza fisica",
   "mod.specialPowerPct": "Potenza speciale",

@@ -1683,6 +1683,46 @@ function noteRing(): SpriteOut {
   return { palette, frameMs: 120, parts: { main: frames.map(toRows), middle: frames.map(toRows) } };
 }
 
+/**
+ * あくび: 音符の代わりに飛ぶ「Z」（眠気の印。作者の依頼 2026年10月31日。07 の141章）。
+ * 白〜水色の太い Z に濃い紺の輪郭。コマで上下にはずむ
+ */
+function zLetter(): SpriteOut {
+  const W = 12;
+  const H = 12;
+  // 0 輪郭（濃い紺）・1 水色・2 うす水色・3 白
+  const palette = ['#1a237e', '#64b5f6', '#bbdefb', '#ffffff'];
+  const frames = [0, 1, 2, 1].map((f) => {
+    const bob = (f - 1) * 0.8;
+    const g = fill(blank(W, H), (x, y) => {
+      const yy = y - bob;
+      if (x < 1.5 || x > 9.5 || yy < 1.5 || yy > 9.5) return -1;
+      // 上の横棒・下の横棒・右上から左下への斜めの棒（上ほど白く、下ほど水色）
+      const c = yy < 4 ? 3 : yy < 7 ? 2 : 1;
+      if (yy < 3.2 || yy > 7.8) return c;
+      const diag = 9.5 - ((yy - 3.2) / 4.6) * 8;
+      if (Math.abs(x - diag) < 1.4) return c;
+      return -1;
+    });
+    return outline(g, 0);
+  });
+  return { palette, frameMs: 120, parts: { main: frames.map(toRows), middle: frames.map(toRows) } };
+}
+
+/** からげんき: 頭の横に飛ぶ汗（アセアセ）。上がとがった水色のしずくに、白い光（07 の141章） */
+function sweatDrop(): SpriteOut {
+  // 0 輪郭（濃い青）・1 水色・2 うす水色・3 白
+  const palette = ['#0d47a1', '#42a5f5', '#bbdefb', '#ffffff'];
+  const g = shape(10, (u, v) => {
+    // 下が丸く、上へ細くとがる
+    const w = v > 0.2 ? Math.sqrt(Math.max(0, 1 - ((v - 0.2) / 0.62) ** 2)) * 0.62 : 0.62 * ((v + 0.85) / 1.05);
+    if (v < -0.85 || v > 0.82 || Math.abs(u) > w) return -1;
+    if (u < -0.1 && u > -0.38 && v > 0.05 && v < 0.45) return 3;
+    return u + v < -0.2 ? 2 : 1;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(outline(g, 0))] } };
+}
+
 /** ほろびのうた: 輪に沿って並べる、橙の波動の帯と音符（外側＝下ほど明るい。並べてつながるよう、波の周期は W） */
 function perishRing(): SpriteOut {
   const W = 12;
@@ -3008,6 +3048,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'dragon-flame': () => dragonFire(),
     'spin-spray': () => spinSpray(),
     'note-ring': () => noteRing(),
+    'z-letter': () => zLetter(),
+    'sweat-drop': () => sweatDrop(),
     'sound-waves': () => soundWaves(),
     'perish-ring': () => perishRing(),
     'heal-rise': () => healRise(),

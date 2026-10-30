@@ -34,6 +34,7 @@
     { "from": "sleep-powder", "item": "miracle-seed", "to": "synthesis", "line": "chikorita" },
     { "from": "synthesis", "item": "metronome", "to": "solar-beam", "line": "chikorita" },
     { "from": "scratch", "item": "mystic-water", "to": "bite", "line": "totodile" },
+    { "from": "tackle", "item": "dowsing-machine", "to": "pay-day", "line": "meowth" },
     { "from": "bite", "item": "x-attack", "to": "crunch", "line": "totodile" },
     { "from": "dark-pulse", "item": "light-clay", "to": "snarl", "line": "houndour" },
     { "from": "thunder-wave", "item": "x-sp-atk", "to": "discharge", "line": "mareep" },

@@ -323,6 +323,7 @@
   "gain.cooldownSeconds": "Abklingzeit {v} s",
   "gain.hitIntervalSeconds": "Trefferintervall {v} s",
   "gain.strength": "Stärke +{v} %",
+  "gain.whenHurt": "{v} s lang nach erlittenem Schaden",
   "mod.powerPct": "Attackenstärke",
   "mod.physicalPowerPct": "Physische Stärke",
   "mod.specialPowerPct": "Spezial-Stärke",

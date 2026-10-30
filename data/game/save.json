@@ -1,6 +1,7 @@
 {
   "autosaveSeconds": 180,
   "probeSeconds": 5,
+  "crashNotice": false,
   "trendSeconds": 30,
   "trendSamples": 24,
   "transferHours": 24

@@ -402,6 +402,8 @@ export const saveConfigSchema = z.object({
   autosaveSeconds: z.number().positive(),
   /** ランの途中の様子をブラウザに書く間隔（ページが落ちたときに、次に開いて知らせ・記録を終えるため。07 の112章） */
   probeSeconds: z.number().positive(),
+  /** 前回のランが途中で終わっていたとき、次に開いたときに様子を画面に出す（作者の決定 2026年10月30日: 出さない。記録はどちらでも失敗として足す） */
+  crashNotice: z.boolean().default(false),
   /** 数の移り変わりを残す間隔（秒）と、残す数（07 の118章） */
   trendSeconds: z.number().positive(),
   trendSamples: z.number().int().positive(),

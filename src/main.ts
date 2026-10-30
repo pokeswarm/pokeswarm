@@ -3,7 +3,7 @@ import { freshHatchSeed, hatchedPokemon } from './meta/hatch';
 import { startOrientationGuard } from './render/OrientationGuard';
 import { checkSite, showSiteGuard } from './render/siteGuard';
 import Phaser from 'phaser';
-import { derivedStatSources, placeholderRender, playablesConfig, regionsConfig, shopConfig } from './data';
+import { derivedStatSources, placeholderRender, playablesConfig, regionsConfig, saveConfig, shopConfig } from './data';
 import { migrateOldDiscoveries } from './meta/discoveries';
 import { session } from './meta/session';
 import { loadSpriteManifest } from './render/sprites/spriteManifest';
@@ -63,7 +63,7 @@ async function start(): Promise<void> {
         session.checkProgress();
         void session.store.flush();
       }
-      showCrashNotice(probe, coins);
+      if (saveConfig.crashNotice) showCrashNotice(probe, coins);
     }
   });
   const q = new URLSearchParams(window.location.search);

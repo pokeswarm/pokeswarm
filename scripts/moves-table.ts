@@ -113,17 +113,6 @@ const stageOf = (k: string): string => {
 };
 const derivesTo = (k: string): Derivation[] => [...derivations.derivations, ...derivations.unique].filter((d) => d.from === k);
 
-/** 技を使える系統（タイプが合う系統。ノーマルの技は全員。固有技はその系統だけ） */
-function users(k: string): string {
-  const u = uniqueFrom.get(k);
-  if (u) return pokeName(u.line!);
-  const type = genMoves[k]?.type ?? '';
-  if (type === 'normal') return '全員';
-  return lines.filter((l) => l.types.has(type)).map((l) => pokeName(l.key)).join('・') || '—';
-}
-
-const fmt = (v: number | string | undefined): string => (v === 'infinite' ? '∞' : v === undefined ? '—' : typeof v === 'string' ? v : String(round(v)));
-
 const keys = Object.keys(moves).sort((a, b) => {
   const ta = TYPE_ORDER.indexOf(genMoves[a]?.type ?? '');
   const tb = TYPE_ORDER.indexOf(genMoves[b]?.type ?? '');

@@ -6,7 +6,7 @@
  *   node scripts/make-map-tiles.ts <地方（johto・hoenn。省くと johto）> [タイル ID ...]
  *   npm run map-tiles -- hoenn
  *
- * 出力: public/map/<地方>/<タイル ID>.png（ゲームで使う）・assets/map/<地方>/preview/<タイル ID>.png（3×3 に並べた継ぎ目の確認用）
+ * 出力: public/map/<地方>/<タイル ID>.png（ゲームで使う）・assets/map/<地方>/preview/<タイル ID>.png（リポジトリに入れない。3×3 に並べた継ぎ目の確認用）
  */
 import fs from 'node:fs';
 import path from 'node:path';

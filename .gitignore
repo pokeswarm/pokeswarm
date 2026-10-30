@@ -24,3 +24,6 @@ desktop.ini
 
 # 宣伝用の動画（大きいのでリポジトリに入れない）
 promo-out/
+
+# マップのタイルの継ぎ目の確認用（npm run map-tiles で作り直せる）
+assets/map/*/preview/

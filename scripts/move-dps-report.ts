@@ -86,7 +86,4 @@ for (const group of groups) {
   md.push('');
 }
 writeFileSync(join(ROOT, 'docs/14_move_dps.md'), md.join('\n'));
-const csv = ['key,name,type,tier,tier_ja,pattern,boss,n10,n50,n200,at50,at150,at300,reach,label'];
-for (const r of out) csv.push([r.key, r.name, r.type, r.tier, TIER[r.tier], r.pattern, ...['boss', 'n10', 'n50', 'n200', 'at50', 'at150', 'at300'].map((k) => Math.round(r.dps[k]!)), r.reach, r.label].join(','));
-writeFileSync(join(ROOT, 'docs/14_move_dps.csv'), csv.join('\n') + '\n');
-console.log(`技 ${out.length} 個を docs/14_move_dps.md と .csv に出力しました。バランスブレイカー候補: ${out.filter((r) => r.label === 'バランスブレイカー候補').map((r) => r.name).join('・')} / ハイリスク・ハイリターン: ${out.filter((r) => r.label === 'ハイリスク・ハイリターン').map((r) => r.name).join('・')}`);
+console.log(`技 ${out.length} 個を docs/14_move_dps.md と .json に出力しました。バランスブレイカー候補: ${out.filter((r) => r.label === 'バランスブレイカー候補').map((r) => r.name).join('・')} / ハイリスク・ハイリターン: ${out.filter((r) => r.label === 'ハイリスク・ハイリターン').map((r) => r.name).join('・')}`);

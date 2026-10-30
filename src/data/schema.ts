@@ -1219,6 +1219,11 @@ export type MovesConfig = z.infer<typeof movesConfigSchema>;
  * または allowedHostSuffixes のどれかで終わるアドレス（Cloudflare の開発用アドレスと、その版ごとのプレビュー）でだけ動く
  */
 export const siteConfigSchema = z.object({
+  /**
+   * ゲームの版（タイトル画面に BETA v… と出す。06_roadmap.md 1章）。0.<地方>.<追加>.<修正>: 地方を公開するごとに2つ目、大きめの追加で3つ目、
+   * 小さな修正で4つ目を上げる。npm は4つの数字の版を受け付けないので package.json ではなくここに書く（package.json は先頭の3つに合わせる）
+   */
+  appVersion: z.string().regex(/^\d+\.\d+\.\d+\.\d+$/),
   officialUrl: z.string().url(),
   allowedHosts: z.array(z.string()).min(1),
   allowedHostSuffixes: z.array(z.string()).default([]),

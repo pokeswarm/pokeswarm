@@ -158,7 +158,7 @@ SpriteCollab ─┘                         └─▶ スプライトアトラ�
 - ジョウトの曲（2026年10月27日。試作2曲 johto-route・johto-red を作者が聞いて、この方向で残りを作った）: johto-route（ニ長調・144）、johto-cave（ト短調・100）、johto-forest（ホ短調・104）、johto-night-tower（ハ短調・88）、johto-sea（変ロ長調・116）、johto-lighthouse（ホ長調・112）、johto-lake-of-rage（イ短調・140）、johto-ice-path（嬰ヘ短調・108）、johto-dragons-den（ニ短調・92）、johto-victory-road（ヘ短調・148）、johto-elite-four（嬰ハ短調・156）、johto-red（ロ短調・168）、johto-beasts（ホ短調・176）、johto-legendary-sky（変ホ長調・132）。カントーの曲と名前が重ならないよう `johto-` を付けた。旋律は手で書き、分散和音・ベース・ドラムは和音の進行から作った。
 - 開発版だけ: タイトル画面の URL に `?bgm=<曲の名前>` を付けると、タイトルの曲がその曲になる（例: `http://localhost:5173/?bgm=johto-red`。作った曲を聞くため。公開版では効かない）。
 
-## 7. 実装メモ（フェーズ0 区切り3）
+## 7. 実装メモ（技術検証 2026年10月）
 
 ### 7.1 スプライトの取得・変換（`npm run sprites` → `scripts/fetch-sprites.ts`）
 - 対象は `data/sprites/pokemon.json`（使用するポケモンの一覧）、取得元・取り出す動作・欠けたときの代わりは `data/sprites/pipeline.json` で指定する。

@@ -12,7 +12,7 @@
 4. **区間と雑魚**（地方のステージ `data/regions/<地方>.json` の `sections[]`。`02` の16章。区間ごとに `wave`・`tile`・`bgm`・`obstacles`・`night` を1か所に書く）: 区間は「中ボスを倒すと次へ」（中ボスの無い区間は `wave.durationSeconds`）。1つの場所の途中で場面を変えたいときは区間を2つに分ける。同じ種類を、間を空けて別の区間にまた出すときは別の敵 ID にする（例: `hoothoot-2`。一度いなくなった種類は戻せない検証がある）。雑魚の種類・出現の速さ・最低数・上限・`hpMultiplier`・`damageMultiplier`・`xpMultiplier`。~~中ボス・ボス・伝説・スウォームに出るポケモンと**その進化前**は雑魚に出せない（読み込み時の検証でエラー。例外は `allowBossSpecies`）。~~ → 2026年10月27日にこの縛りは無くした（07 の60章。解放の条件が「ボスを倒す」に変わったので不要）。検証も外した（J2）。
 5. **ボス**（地方のステージの `bosses`・`legendary`・`swarms`、範囲技の一覧は全地方で共通の `stage.json` の `moves`、`enemies.json` の HP。ほかの地方と種族が同じボスは `johto-` などを付けた別の ID）: 中ボスは `gate: true`（倒すと区間が進む）、四天王は段階的な大ボス（`enrage` で第2段階）。伝説は `legendary.moveSets` で伝説ごとの技と間隔（`moveIntervalSeconds`・`enrageMoveIntervalSeconds`）。
 6. **プレイアブル**（`playables.json`・`regions.json` の `playables`）: 最初の技、`fixedMoves`（技を覚えない）、`itemMoves`（持ち物で技を覚える）、`unlock`（解放の名前）。解放は実績（`achievements.json`）かショップ（`shop.json` の `pokemon`）。
-7. **技と派生**（`moves.json`・`derivations.json`）: 7章の作り方を参照。技を足したら `npm run balance-moves` と `npm run moves-table`（`08` は手で直さない）。
+7. **技と派生**（`moves.json`・`derivations.json`）: 7章の作り方を参照。技を足したら `npm run balance-moves` と `npm run moves-table`（`08` の json は手で直さない）。見本帳のページを publish し直す（`docs/pages/README.md`）。
 8. **見た目**: 技のレシピ（`data/effects/recipes.json`）、技のドット絵（`src/render/moveArt.ts`）、技のアイコンの絵柄（`data/render/icons.json` の `moveGlyphs`。無ければ出し方の絵柄）、地面・障害物。
 9. **ショップ・実績**（`02` の17章）: 地方の実績は `achievements.json` に `region` を書く（条件の記録の名前はカントーと同じでよい。判定はその地方の記録だけ）。売るポケモンは `shop.json` の `pokemon` に `region`。ショップの解放の条件は `shop.json` の `regions.<地方>.unlock`、案内の文は `shop.unlock.<地方>`。
 10. **文章**: 翻訳ファイル6言語（ja・en・fr・de・es・it）。ポケモン・技・持ち物・タイプ・地方の名前は PokeAPI から出す（翻訳ファイルに書かない）。

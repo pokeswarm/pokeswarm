@@ -1,10 +1,10 @@
 /**
- * 技の一覧表（作者が数値を見比べて直すための資料）を作る。
+ * 技の見本帳（作者が数値を見比べ、localhost で演出を見て直すための資料）の元データを作る。
  *
  *   npm run moves-table
  *
  * 入力: data/game/moves.json・derivations.json・playables.json、data/generated/（名前・タイプ・進化）
- * 出力: docs/08_moves_table.md（コミットする。技の数値を変えたら作り直す）
+ * 出力: docs/08_moves_table.json（コミットする。技の数値を変えたら作り直し、技の見本帳のページを publish し直す）
  *
  * 「強さの目安」は、1体の敵に当て続けたときの1秒あたりのダメージ（威力 × 数 × 1回で当たる回数 ÷ 再使用の時間）。
  * ポケモンの攻撃・とくこう、タイプ一致・相性、持ち物・パッシブは掛けていない（技どうしを比べるための数）。
@@ -131,114 +131,75 @@ const keys = Object.keys(moves).sort((a, b) => {
   return ta - tb || rank(a) - rank(b) || Object.keys(moves).indexOf(a) - Object.keys(moves).indexOf(b);
 });
 
-const out: string[] = [];
-out.push('# 08. 技の一覧表（自動で作る資料）');
-out.push('');
-out.push('`npm run moves-table` で `data/game/moves.json` などから作る。**手で直さない**（直すのはデータ。直したら作り直す）。');
-out.push('');
-out.push('- 最初に派生のつながり（タイプの技 → 派生技 → 固有技）、次に強さの順の早見表、最後に派生の前後を並べた数値の表。');
-out.push('- **強さの目安（単体）**: 1体の敵に当て続けたときの1秒あたりのダメージ（威力 × 数 × 1回で当たる回数 ÷ 再使用）。ボスへの強さ。');
-out.push('- **強さの目安（群れ）**: 群れの中で、1秒あたりに与えるダメージの合計の見込み。技の範囲（飛ぶ技は通り道、扇・円・線の広さ）に敵が何体入るかを、敵1体あたり 5000 の広さとして見積もる（1回の技で40体まで）。雑魚への強さ。');
-out.push('- **総合** = √(単体 × 群れ)。段階ごとに最大レベルの総合をそろえている（タイプの技 80・派生技 240・固有技 600。`data/game/move-balance.json`、`npm run balance-moves`）。');
-out.push('- どれも、ポケモンのステータス・タイプ一致・相性・持ち物は掛けていない。');
-out.push('- **大きさ**は当たり判定の半径、**距離**は狙える距離・前に出る距離・回る半径・ビームの長さ（出し方による）。');
-out.push('');
-/** 派生のつながり: タイプの技（根）から、派生技・固有技までの道すじ */
-interface Step {
-  move: string;
-  /** この技になるための材料（根は null） */
-  via: Derivation | null;
+// ---- 出力: docs/08_moves_table.json（技の見本帳のページの元データ。作者の決定 2026年10月30日: md の表はやめ、localhost のリンク付きのページにする） ----
+
+const regions: { id: string; playables?: string[] }[] = read('data/game/regions.json').regions;
+const genRegions: Record<string, { names: Names }> = read('data/generated/regions.json');
+const DEV_URL = 'http://localhost:5173/';
+
+/** 技を使える系統のキー（固有技はその系統。learners があればそれ。ほかはタイプが合う系統、ノーマルは全員） */
+function userKeys(k: string): string[] {
+  const u = uniqueFrom.get(k);
+  if (u?.line) return [u.line];
+  const def = moves[k] as unknown as { learners?: string[] };
+  if (def.learners) return def.learners;
+  const type = genMoves[k]?.type ?? '';
+  if (type === 'normal') return lines.map((l) => l.key);
+  return lines.filter((l) => l.types.has(type)).map((l) => l.key);
 }
-const roots = keys.filter((k) => !derivedFrom.has(k) && !uniqueFrom.has(k));
-function paths(k: string, via: Derivation | null): Step[][] {
-  const next = derivesTo(k);
-  if (next.length === 0) return [[{ move: k, via }]];
-  return next.flatMap((d) => paths(d.to, d).map((p) => [{ move: k, via }, ...p]));
+
+/** 演出を見る URL（その技を使える系統で始め、無敵にする）。地方の技はその地方で */
+function demoUrl(k: string): { pokemon: string; region: string; url: string } {
+  const def = moves[k] as unknown as { region?: string };
+  const region = def.region ?? regions.find((r) => r.playables?.some((p) => userKeys(k).includes(p)))?.id ?? 'kanto';
+  const inRegion = regions.find((r) => r.id === region)?.playables ?? [];
+  const pokemon = userKeys(k).find((p) => inRegion.includes(p)) ?? inRegion[0] ?? 'mew';
+  const max = moves[k]!.levels.length + 1;
+  const url = `${DEV_URL}?pokemon=${pokemon}&region=${region}&moves=${k}:${max}&god&level=50`;
+  return { pokemon, region, url };
 }
-/** 根から、たどれる技を順に（根 → 派生技 → その固有技 → 次の派生技 …） */
-function chainMoves(k: string, via: Derivation | null): Step[] {
-  return [{ move: k, via }, ...derivesTo(k).flatMap((d) => chainMoves(d.to, d))];
-}
-const strength = (k: string): string => {
-  const def = moves[k]!;
-  const a = statsAt(def, 1);
-  const b = statsAt(def, def.levels.length + 1);
-  return `総合 ${totalOf(def, a).toFixed(0)} → ${totalOf(def, b).toFixed(0)}<br>単体 ${dps(def, a).toFixed(0)} → ${dps(def, b).toFixed(0)}<br>群れ ${crowd(def, a).toFixed(0)} → ${crowd(def, b).toFixed(0)}`;
+
+const statOf = (def: MoveDef, level: number) => {
+  const st = statsAt(def, level);
+  const num = (v: number | string | undefined): number | string | null => (v === undefined ? null : v);
+  return {
+    strength: { solo: round(dps(def, st)), crowd: round(crowd(def, st)), total: round(totalOf(def, st)) },
+    power: num(st.power), cooldown: num(st.cooldownSeconds), count: num(st.count), size: num(st.size), range: num(st.range),
+    duration: num(st.durationSeconds), pierce: num(st.pierce), hitInterval: num(st.hitIntervalSeconds), knockback: num(st.knockback),
+    status: st.statusId ? { id: st.statusId as string, name: STATUS[st.statusId as string] ?? (st.statusId as string), chance: st.statusChance as number } : null,
+  };
 };
-const cell = (s: Step | undefined): string => (s ? `**${moveName(s.move)}**<br>${strength(s.move)}` : '');
-const material = (s: Step | undefined): string => (s?.via ? `${via(s.via)}${s.via.line ? `<br>（${pokeName(s.via.line)}だけ）` : ''}` : '');
 
-out.push('## 派生のつながり');
-out.push('');
-out.push('左から タイプの技 → 派生技 → 固有技。各技の下の数は強さの目安（単体・群れ。Lv1 → 最大）。1つの技から2つに分かれるものは行を分け、2行目からは元の技を空けている。');
-out.push('');
-let rootType = '';
-for (const root of roots) {
-  const type = genMoves[root]?.type ?? '';
-  if (type !== rootType) {
-    rootType = type;
-    out.push(`### ${genTypes[type]?.names.ja ?? type}`);
-    out.push('');
-    out.push('| タイプの技 | 材料 | 派生技 | 材料 | 固有技 |');
-    out.push('|---|---|---|---|---|');
-  }
-  paths(root, null).forEach((p, row) => {
-    out.push(`| ${row === 0 ? cell(p[0]) : '〃'} | ${material(p[1])} | ${cell(p[1])} | ${material(p[2])} | ${cell(p[2])} |`);
-  });
-  const nextRoot = roots[roots.indexOf(root) + 1];
-  if (!nextRoot || (genMoves[nextRoot]?.type ?? '') !== type) out.push('');
-}
-
-out.push('## 早見表（群れの強さの目安の順）');
-out.push('');
-out.push('| 技 | タイプ | 種類 | 出し方 | 単体 Lv1 | 単体 最大 | 群れ Lv1 | 群れ 最大 |');
-out.push('|---|---|---|---|---|---|---|---|');
-const summary = keys
-  .map((k) => {
-    const def = moves[k]!;
-    const max = def.levels.length + 1;
-    return { k, def, d1: dps(def, statsAt(def, 1)), dm: dps(def, statsAt(def, max)), c1: crowd(def, statsAt(def, 1)), cm: crowd(def, statsAt(def, max)) };
-  })
-  .sort((a, b) => (b.cm || 0) - (a.cm || 0));
-for (const { k, def, d1, dm, c1, cm } of summary) {
-  const kind = stageOf(k);
-  out.push(`| ${moveName(k)} | ${genTypes[genMoves[k]?.type ?? '']?.names.ja ?? ''} | ${kind} | ${ja[`pattern.${def.pattern}`] ?? def.pattern} | ${d1.toFixed(0)} | ${dm.toFixed(0)} | ${c1.toFixed(0)} | ${cm.toFixed(0)} |`);
-}
-out.push('');
-
-out.push('## 系統ごとの数値（派生の前後を並べる）');
-out.push('');
-out.push('タイプの技ごとに、その技と派生先を上から順に並べる。1つの技につき Lv1 と最大の2行。');
-out.push('');
-rootType = '';
-for (const root of roots) {
-  const type = genMoves[root]?.type ?? '';
-  if (type !== rootType) {
-    rootType = type;
-    out.push(`### ${genTypes[type]?.names.ja ?? type}`);
-    out.push('');
-  }
-  out.push(`#### ${moveName(root)} から`);
-  out.push('');
-  out.push('| 段階 | 技 | Lv | 強さの目安 | 威力 | 再使用（秒） | 数 | 大きさ | 距離 | 持続（秒） | 貫通 | 当たり直し（秒） | ノックバック | 状態異常 |');
-  out.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|');
-  for (const s of chainMoves(root, null)) {
-    const def = moves[s.move]!;
-    const max = def.levels.length + 1;
-    const stage = stageOf(s.move);
-    const name = `**${moveName(s.move)}**${s.via ? `<br>（${moveName(s.via.from)} ${via(s.via)}${s.via.line ? `・${pokeName(s.via.line)}だけ` : ''}）` : ''}<br>${ja[`pattern.${def.pattern}`] ?? def.pattern}・${genMoves[s.move]?.damageClass === 'physical' ? '物理' : '特殊'}`;
-    for (const [i, level] of [1, max].entries()) {
-      const st = statsAt(def, level);
-      const status = st.statusId ? `${STATUS[st.statusId as string] ?? st.statusId} ${Math.round((st.statusChance as number) * 100)}%` : '—';
-      out.push(
-        `| ${i === 0 ? stage : ''} | ${i === 0 ? name : ''} | ${level} | ${dps(def, st).toFixed(1)} | ${fmt(st.power)} | ${fmt(st.cooldownSeconds)} | ${fmt(st.count)} | ${fmt(st.size)} | ${fmt(st.range)} | ${fmt(st.durationSeconds)} | ${fmt(st.pierce)} | ${fmt(st.hitIntervalSeconds)} | ${fmt(st.knockback)} | ${status} |`,
-      );
-    }
-  }
-  out.push('');
-  out.push(`使える系統: ${users(root)}`);
-  out.push('');
-}
-
-writeFileSync(join(ROOT, 'docs', '08_moves_table.md'), out.join('\n'));
-console.log(`技 ${keys.length} 個を docs/08_moves_table.md に出力しました。`);
+const rows = keys.map((k) => {
+  const def = moves[k]!;
+  const max = def.levels.length + 1;
+  const from = derivedFrom.get(k) ?? uniqueFrom.get(k) ?? null;
+  const raw = def as unknown as { region?: string; teachOnly?: boolean; learners?: string[] };
+  const demo = demoUrl(k);
+  return {
+    key: k,
+    name: moveName(k),
+    nameEn: genMoves[k]?.names.en ?? k,
+    type: genMoves[k]?.type ?? 'normal',
+    damageClass: genMoves[k]?.damageClass ?? 'special',
+    tier: stageOf(k),
+    pattern: ja[`pattern.${def.pattern}`] ?? def.pattern,
+    patternKey: def.pattern,
+    region: raw.region ?? null,
+    teachOnly: !!raw.teachOnly,
+    maxLevel: max,
+    lv1: statOf(def, 1),
+    max: statOf(def, max),
+    from: from ? { move: from.from, via: via(from), item: from.item ?? null, line: from.line ?? null } : null,
+    to: derivesTo(k).map((d) => d.to),
+    users: userKeys(k),
+    demo,
+  };
+});
+const names = {
+  pokemon: Object.fromEntries([...new Set(rows.flatMap((r) => [...r.users, r.demo.pokemon]))].map((p) => [p, pokeName(p)])),
+  types: Object.fromEntries(TYPE_ORDER.map((t) => [t, genTypes[t]?.names.ja ?? t])),
+  regions: Object.fromEntries(regions.map((r) => [r.id, genRegions[r.id]?.names.ja ?? r.id])),
+};
+writeFileSync(join(ROOT, 'docs', '08_moves_table.json'), JSON.stringify({ generatedAt: new Date().toISOString().slice(0, 10), devUrl: DEV_URL, moves: rows, names }) + '\n');
+console.log(`技 ${keys.length} 個を docs/08_moves_table.json に出力しました。`);

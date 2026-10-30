@@ -1,0 +1,146 @@
+<title>PokéSwarm わざ図鑑</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&family=Noto+Sans+JP:wght@400;600&display=swap">
+<style>
+/* 図鑑の道具: 上に地方・タイプ・検索の絞り込み、その下に1匹1枚のカード（最初の技 → 覚えられる技 → 派生と固有技） */
+:root {
+  --bg: #eef2f7; --panel: #ffffff; --fg: #1b2230; --muted: #5a6479; --line: #d9dfea; --chip: #f1f4f9;
+  --accent: #d6402f; --hl: #fff1b8; --hl-fg: #5a4300;
+  --display: "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", sans-serif;
+  --body: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --t-normal:#9a9a7c; --t-fire:#e5622b; --t-water:#4a86e0; --t-grass:#4fa83d; --t-electric:#d9a400; --t-ice:#3fb5c9;
+  --t-fighting:#b5352c; --t-poison:#9246a8; --t-ground:#b98a3b; --t-flying:#7f8fe0; --t-psychic:#e5527e; --t-bug:#8a9e1d;
+  --t-rock:#a8913f; --t-ghost:#6a55a0; --t-dragon:#5c3fe0; --t-dark:#5c4a40; --t-steel:#7f8fa3; --t-fairy:#d670b8;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11151f; --panel: #1a2030; --fg: #e7ebf4; --muted: #9aa4bc; --line: #2b3348; --chip: #232a3d;
+  --accent: #ff6f5c; --hl: #4a3d10; --hl-fg: #ffe9a3; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11151f; --panel: #1a2030; --fg: #e7ebf4; --muted: #9aa4bc; --line: #2b3348; --chip: #232a3d;
+  --accent: #ff6f5c; --hl: #4a3d10; --hl-fg: #ffe9a3; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 14px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 48px; }
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 18px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: 28px; margin: 0; text-wrap: balance; }
+.lead { color: var(--muted); margin: 6px 0 0; max-width: 70ch; }
+.controls { display: grid; gap: 10px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 8px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+button { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 99px; padding: 3px 11px; }
+button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tbtn { padding: 2px 9px; font-size: 12px; }
+.tbtn[aria-pressed="true"] { background: var(--tc); border-color: var(--tc); color: #fff; }
+input[type=search] { font: inherit; flex: 1 1 260px; min-width: 0; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); }
+.count { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; align-items: start; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px 16px; display: grid; gap: 10px; min-width: 0; }
+.head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.head b { font-family: var(--display); font-weight: 800; font-size: 18px; }
+.reg { font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; padding: 0 8px; }
+.forms { color: var(--muted); font-size: 12px; }
+.sec { display: grid; gap: 5px; }
+.sec > span { font-size: 11px; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+.moves { display: flex; flex-wrap: wrap; gap: 5px; }
+.mv { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 6px; border-radius: 6px; background: var(--chip); font-size: 13px; border-left: 4px solid var(--tc, var(--t-normal)); }
+.mv.start { font-weight: 600; }
+.mv small { color: var(--muted); font-size: 11px; }
+.mv.hit { background: var(--hl); color: var(--hl-fg); }
+.mv.hit small { color: var(--hl-fg); }
+.tag { display: inline-block; font-size: 11px; color: #fff; border-radius: 4px; padding: 0 6px; background: var(--tc); }
+.der { display: grid; gap: 4px; }
+.chain { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 13px; }
+.arrow { color: var(--muted); font-size: 12px; }
+.how { color: var(--muted); font-size: 11.5px; }
+.uni { font-size: 10.5px; color: var(--accent); font-weight: 600; margin-left: 2px; }
+.note { color: var(--muted); font-size: 12px; }
+.empty { padding: 32px; text-align: center; color: var(--muted); background: var(--panel); border-radius: 12px; border: 1px solid var(--line); }
+.foot { color: var(--muted); font-size: 12px; }
+@media (max-width: 420px) { .grid { grid-template-columns: 1fr; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>わざ図鑑</h1>
+    <p class="lead">遊べるポケモンごとの、最初の技・レベルアップで覚えられる技・派生と固有技です。覚えられる技は、ゲームのレベルアップの候補と同じ決まりで調べています。技の名前で探すと、その技を使えるポケモンだけが残ります。</p>
+  </header>
+  <div class="controls">
+    <div class="row" id="regions" role="group" aria-label="地方"></div>
+    <div class="row" id="types" role="group" aria-label="技のタイプ"></div>
+    <div class="row"><input type="search" id="q" placeholder="ポケモンか技の名前で探す（例: ピカチュウ、かえんほうしゃ）"><span class="count" id="count"></span></div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden>合うポケモンがいません。検索の言葉か絞り込みを変えてください。</div>
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+const D = __DATA__;
+const VERSION = "__VERSION__";
+const TYPES = ["normal","fire","water","grass","electric","ice","fighting","poison","ground","flying","psychic","bug","rock","ghost","dragon","dark","steel","fairy"];
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const mvName = (k) => D.moves[k]?.name ?? k;
+const mvType = (k) => D.moves[k]?.type ?? "normal";
+const tc = (t) => `--tc: var(--t-${t})`;
+const state = { region: "all", type: "all", q: "" };
+try { Object.assign(state, JSON.parse(localStorage.getItem("learn-view") || "{}"), { q: "" }); } catch {}
+const save = () => { try { localStorage.setItem("learn-view", JSON.stringify({ region: state.region, type: state.type })); } catch {} };
+
+// 1匹ぶんの技の名前（検索とタイプの絞り込みに使う）
+for (const p of D.pokemon) {
+  const all = new Set([...p.start, ...p.learn.map((l) => l.move), ...p.special.map((s) => s.move), ...p.derives.flatMap((d) => [d.from, d.to])]);
+  p._moves = [...all];
+  p._formName = Object.fromEntries(p.forms.map((f) => [f.key, f.name]));
+}
+
+function chip(k, opts = {}) {
+  const q = state.q.trim();
+  const hit = q && mvName(k).includes(q);
+  return `<span class="mv${opts.start ? " start" : ""}${hit ? " hit" : ""}" style="${tc(mvType(k))}">${esc(mvName(k))}${opts.uni ? '<span class="uni">固有</span>' : ""}${opts.note ? `<small>${esc(opts.note)}</small>` : ""}</span>`;
+}
+function card(p) {
+  const first = p.forms[0]?.key;
+  const typeTags = p.types.map((t) => `<span class="tag" style="${tc(t)}">${esc(D.types[t] ?? t)}</span>`).join(" ");
+  const forms = p.forms.length > 1 ? `<div class="forms">${p.forms.map((f) => esc(f.name)).join(" → ")}</div>` : "";
+  const learn = [...p.learn].sort((a, b) => TYPES.indexOf(mvType(a.move)) - TYPES.indexOf(mvType(b.move)));
+  const learnHtml = learn.length ? learn.map((l) => {
+    const notes = [];
+    if (l.forms[0] !== first) notes.push(`${p._formName[l.forms[0]] ?? l.forms[0]}から`);
+    if (l.withMoves) notes.push(`${l.withMoves.map(mvName).join("・")}を覚えていると`);
+    if (l.minLevel) notes.push(`Lv${l.minLevel}から`);
+    return chip(l.move, { note: notes.join("・") });
+  }).join("") : `<span class="note">${p.fixedMoves ? "新しい技は覚えない" : "なし"}</span>`;
+  const special = p.special.length ? `<div class="sec"><span>姿・持ち物で覚える技</span><div class="moves">${p.special.map((s) => chip(s.move, { note: s.how === "form" ? `${p._formName[s.form] ?? s.form}になると` : `${D.items[s.item] ?? s.item}を持つと` })).join("")}</div></div>` : "";
+  const der = p.derives.length ? `<div class="sec"><span>派生・固有技（元の技が最大レベル ＋ 材料）</span><div class="der">${p.derives.map((d) => {
+    const how = [d.item ? `＋${D.items[d.item] ?? d.item}` : "", d.minLevel ? `Lv${d.minLevel}${d.item ? "から" : ""}` : "", ...d.needs.map((n) => `${mvName(n.move)}${n.level ? ` Lv${n.level}` : ""}を覚えている`)].filter(Boolean).join("・");
+    return `<div class="chain">${chip(d.from)}<span class="arrow">→</span>${chip(d.to, { uni: d.unique })}<span class="how">${esc(how)}</span></div>`;
+  }).join("")}</div></div>` : "";
+  return `<article class="card">
+    <div class="head"><b>${esc(p.name)}</b>${typeTags}<span class="reg">${esc(D.regions[p.region] ?? p.region)}</span></div>
+    ${forms}
+    <div class="sec"><span>最初の技</span><div class="moves">${p.start.map((m) => chip(m, { start: true })).join("") || '<span class="note">なし</span>'}</div></div>
+    <div class="sec"><span>レベルアップで覚えられる技${p.learnsAll ? "（どのタイプの技も覚える）" : ""}</span><div class="moves">${learnHtml}</div></div>
+    ${special}${der}
+  </article>`;
+}
+function render() {
+  const regions = ["all", ...new Set(D.pokemon.map((p) => p.region))];
+  document.getElementById("regions").innerHTML = regions.map((r) => `<button data-r="${r}" aria-pressed="${state.region === r}">${r === "all" ? "すべての地方" : esc(D.regions[r] ?? r)}</button>`).join("");
+  document.getElementById("types").innerHTML = `<button class="tbtn" data-t="all" style="--tc: var(--fg)" aria-pressed="${state.type === "all"}">すべてのタイプ</button>` +
+    TYPES.map((t) => `<button class="tbtn" data-t="${t}" style="${tc(t)}" aria-pressed="${state.type === t}">${esc(D.types[t] ?? t)}</button>`).join("");
+  const q = state.q.trim();
+  const list = D.pokemon.filter((p) =>
+    (state.region === "all" || p.region === state.region) &&
+    (state.type === "all" || p._moves.some((m) => mvType(m) === state.type)) &&
+    (!q || p.name.includes(q) || p.forms.some((f) => f.name.includes(q)) || p._moves.some((m) => mvName(m).includes(q))));
+  document.getElementById("grid").innerHTML = list.map(card).join("");
+  document.getElementById("empty").hidden = list.length > 0;
+  document.getElementById("count").textContent = `${list.length} / ${D.pokemon.length} 匹`;
+}
+document.getElementById("regions").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { state.region = b.dataset.r; save(); render(); } });
+document.getElementById("types").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { state.type = b.dataset.t; save(); render(); } });
+document.getElementById("q").addEventListener("input", (e) => { state.q = e.target.value; render(); });
+document.getElementById("foot").textContent = `版 ${VERSION} のデータ（data/game/playables.json・moves.json・derivations.json）から作成。色は技のタイプ。タマゴはかえるポケモンごとに分けています。`;
+render();
+</script>

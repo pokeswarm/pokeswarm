@@ -1,0 +1,180 @@
+<title>PokéSwarm わざ見本帳</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&family=Noto+Sans+JP:wght@400;600&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+/* 見本帳: 上に絞り込みと並べ方、下に1技1枚のカード（強さ・数値・派生・使える系統・localhost で見るリンク） */
+:root {
+  --bg: #eef2f7; --panel: #ffffff; --fg: #1b2230; --muted: #5a6479; --line: #d9dfea; --chip: #f1f4f9;
+  --accent: #d6402f; --link: #1d5fd1; --link-bg: #e6eefc; --hl: #fff1b8; --hl-fg: #5a4300;
+  --display: "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", sans-serif;
+  --body: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --t-normal:#9a9a7c; --t-fire:#e5622b; --t-water:#4a86e0; --t-grass:#4fa83d; --t-electric:#d9a400; --t-ice:#3fb5c9;
+  --t-fighting:#b5352c; --t-poison:#9246a8; --t-ground:#b98a3b; --t-flying:#7f8fe0; --t-psychic:#e5527e; --t-bug:#8a9e1d;
+  --t-rock:#a8913f; --t-ghost:#6a55a0; --t-dragon:#5c3fe0; --t-dark:#5c4a40; --t-steel:#7f8fa3; --t-fairy:#d670b8;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11151f; --panel: #1a2030; --fg: #e7ebf4; --muted: #9aa4bc; --line: #2b3348; --chip: #232a3d;
+  --accent: #ff6f5c; --link: #8fb4ff; --link-bg: #22304f; --hl: #4a3d10; --hl-fg: #ffe9a3; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11151f; --panel: #1a2030; --fg: #e7ebf4; --muted: #9aa4bc; --line: #2b3348; --chip: #232a3d;
+  --accent: #ff6f5c; --link: #8fb4ff; --link-bg: #22304f; --hl: #4a3d10; --hl-fg: #ffe9a3; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 14px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 48px; }
+.wrap { max-width: 1280px; margin: 0 auto; display: grid; gap: 18px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: 28px; margin: 0; text-wrap: balance; }
+.lead { color: var(--muted); margin: 6px 0 0; max-width: 72ch; }
+.lead code { font-family: var(--mono); font-size: 12px; }
+.controls { display: grid; gap: 8px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 8px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.row .lbl { font-size: 11px; letter-spacing: .06em; color: var(--muted); font-weight: 600; margin-right: 2px; }
+button { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 99px; padding: 3px 11px; }
+button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tbtn { padding: 2px 9px; font-size: 12px; }
+.tbtn[aria-pressed="true"] { background: var(--tc); border-color: var(--tc); color: #fff; }
+input[type=search] { font: inherit; flex: 1 1 240px; min-width: 0; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); }
+label.chk { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); font-size: 13px; }
+.count { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; align-items: start; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px 14px; display: grid; gap: 9px; min-width: 0; border-top: 4px solid var(--tc); }
+.head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.head b { font-family: var(--display); font-weight: 800; font-size: 18px; }
+.head .en { color: var(--muted); font-size: 12px; }
+.tag { display: inline-block; font-size: 11px; color: #fff; border-radius: 4px; padding: 0 6px; background: var(--tc); }
+.pill { font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; padding: 0 8px; }
+.pill.uni { color: var(--accent); border-color: var(--accent); font-weight: 600; }
+.meta { color: var(--muted); font-size: 12px; }
+.str { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.str div { background: var(--chip); border-radius: 6px; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+.str span { display: block; font-size: 10.5px; color: var(--muted); letter-spacing: .04em; }
+.str b { font-size: 14px; font-weight: 600; }
+.str small { color: var(--muted); font-size: 11px; }
+.stats { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.stats b { color: var(--fg); font-weight: 600; }
+.chain { font-size: 12.5px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.chain .mv { background: var(--chip); border-radius: 5px; padding: 1px 7px; border-left: 3px solid var(--tc2, var(--line)); }
+.chain .how { color: var(--muted); font-size: 11.5px; }
+.users { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+.actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+a.demo { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: var(--link-bg); color: var(--link); border-radius: 8px; padding: 6px 12px; font-weight: 600; font-size: 13px; }
+a.demo:hover { filter: brightness(0.95); }
+button.copy { font-size: 12px; padding: 4px 10px; }
+.url { font-family: var(--mono); font-size: 10.5px; color: var(--muted); overflow-wrap: anywhere; }
+.empty { padding: 32px; text-align: center; color: var(--muted); background: var(--panel); border-radius: 12px; border: 1px solid var(--line); }
+.foot { color: var(--muted); font-size: 12px; }
+.hit { background: var(--hl); color: var(--hl-fg); border-radius: 3px; padding: 0 2px; }
+@media (max-width: 420px) { .grid { grid-template-columns: 1fr; } .str { grid-template-columns: 1fr 1fr 1fr; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>わざ見本帳</h1>
+    <p class="lead">PokéSwarm の全部の技。強さの目安・数値・派生のつながり・使えるポケモンと、<b>localhost で演出を見るリンク</b>です。リンクは、このパソコンで <code>npm run dev</code> を動かしているときに開けます（その技を使えるポケモンで、無敵・Lv50 で始まります）。</p>
+  </header>
+  <div class="controls">
+    <div class="row" id="types" role="group" aria-label="タイプ"></div>
+    <div class="row">
+      <span class="lbl">種類</span><span id="tiers" role="group" aria-label="種類" class="row"></span>
+      <span class="lbl" style="margin-left:8px">地方</span><span id="regions" role="group" aria-label="地方" class="row"></span>
+      <span class="lbl" style="margin-left:8px">並べ方</span><span id="sorts" role="group" aria-label="並べ方" class="row"></span>
+    </div>
+    <div class="row">
+      <input type="search" id="q" placeholder="技・ポケモン・出し方で探す（例: かみなり、ピカチュウ、ビーム）">
+      <label class="chk"><input type="checkbox" id="ppmax"> ポイントマックス Lv2 を持つ</label>
+      <label class="chk"><input type="checkbox" id="swarm"> 雑魚を多く出す</label>
+      <span class="count" id="count"></span>
+    </div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden>合う技がありません。検索の言葉か絞り込みを変えてください。</div>
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+const D = __DATA__;
+const VERSION = "__VERSION__";
+const TYPES = ["normal","fire","water","grass","electric","ice","fighting","poison","ground","flying","psychic","bug","rock","ghost","dragon","dark","steel","fairy"];
+const TIERS = ["タイプ","派生","固有"];
+const SORTS = [["type","タイプ順"],["crowd","群れの強さ"],["solo","単体の強さ"],["total","総合"],["name","名前"]];
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const byKey = Object.fromEntries(D.moves.map((m) => [m.key, m]));
+const mvName = (k) => byKey[k]?.name ?? k;
+const tc = (t) => `--tc: var(--t-${t})`;
+const pk = (k) => D.names.pokemon[k] ?? k;
+const state = { type: "all", tier: "all", region: "all", sort: "type", q: "", ppmax: false, swarm: false };
+try { Object.assign(state, JSON.parse(localStorage.getItem("moves-view") || "{}"), { q: "" }); } catch {}
+const save = () => { try { const { q, ...rest } = state; localStorage.setItem("moves-view", JSON.stringify(rest)); } catch {} };
+
+for (const m of D.moves) m._text = [m.name, m.nameEn, m.key, m.pattern, ...m.users.map(pk)].join(" ").toLowerCase();
+const regionOf = (m) => m.region ?? "shared";
+const regionLabel = (r) => r === "all" ? "すべて" : r === "shared" ? "カントー・ジョウト" : (D.names.regions[r] ?? r);
+const regionsPresent = ["all", ...new Set(D.moves.map(regionOf))];
+
+const fmt = (v) => v === null || v === undefined ? "—" : v === "infinite" ? "∞" : typeof v === "number" ? (Math.round(v * 100) / 100).toLocaleString("ja-JP") : String(v);
+const n0 = (v) => Math.round(v).toLocaleString("ja-JP");
+function url(m) {
+  let u = m.demo.url;
+  if (state.ppmax) u += "&items=pp-max:2";
+  if (state.swarm) u += "&spawn=90&cap=500";
+  return u;
+}
+function mark(s) {
+  const q = state.q.trim();
+  if (!q) return esc(s);
+  const i = s.toLowerCase().indexOf(q.toLowerCase());
+  return i < 0 ? esc(s) : esc(s.slice(0, i)) + '<span class="hit">' + esc(s.slice(i, i + q.length)) + "</span>" + esc(s.slice(i + q.length));
+}
+function card(m) {
+  const st = m.max, s1 = m.lv1;
+  const status = st.status ? `${st.status.name} ${Math.round(st.status.chance * 100)}%` : null;
+  const from = m.from ? `<div class="chain"><span class="mv" style="--tc2: var(--t-${byKey[m.from.move]?.type ?? "normal"})">${esc(mvName(m.from.move))}</span><span class="how">${esc(m.from.via)}${m.from.line ? `（${esc(pk(m.from.line))}だけ）` : ""}</span><span class="how">→ この技</span></div>` : "";
+  const to = m.to.length ? `<div class="chain"><span class="how">この技 →</span>${m.to.map((k) => `<span class="mv" style="--tc2: var(--t-${byKey[k]?.type ?? "normal"})">${esc(mvName(k))}</span>`).join("")}</div>` : "";
+  const users = m.users.length >= 20 ? "全員" : m.users.map(pk).join("・");
+  const u = url(m);
+  return `<article class="card" style="${tc(m.type)}">
+    <div class="head"><b>${mark(m.name)}</b><span class="en">${mark(m.nameEn)}</span><span class="tag">${esc(D.names.types[m.type] ?? m.type)}</span><span class="pill${m.tier === "固有" ? " uni" : ""}">${m.tier}</span>${m.region ? `<span class="pill">${esc(regionLabel(m.region))}</span>` : ""}${m.teachOnly ? `<span class="pill">派生でだけ</span>` : ""}</div>
+    <div class="meta">${mark(m.pattern)} · ${m.damageClass === "physical" ? "物理" : "特殊"} · 最大 Lv${m.maxLevel}</div>
+    <div class="str">
+      <div><span>単体（ボス）</span><b>${n0(st.strength.solo)}</b> <small>Lv1 ${n0(s1.strength.solo)}</small></div>
+      <div><span>群れ（雑魚）</span><b>${n0(st.strength.crowd)}</b> <small>Lv1 ${n0(s1.strength.crowd)}</small></div>
+      <div><span>総合</span><b>${n0(st.strength.total)}</b> <small>Lv1 ${n0(s1.strength.total)}</small></div>
+    </div>
+    <div class="stats">
+      <span>威力 <b>${fmt(st.power)}</b></span><span>再使用 <b>${fmt(st.cooldown)}s</b></span><span>数 <b>${fmt(st.count)}</b></span><span>大きさ <b>${fmt(st.size)}</b></span><span>距離 <b>${fmt(st.range)}</b></span>${st.duration ? `<span>持続 <b>${fmt(st.duration)}s</b></span>` : ""}${st.pierce ? `<span>貫通 <b>${fmt(st.pierce)}</b></span>` : ""}${st.hitInterval ? `<span>当たり直し <b>${fmt(st.hitInterval)}s</b></span>` : ""}${st.knockback ? `<span>ノックバック <b>${fmt(st.knockback)}</b></span>` : ""}${status ? `<span>状態異常 <b>${esc(status)}</b></span>` : ""}
+    </div>
+    ${from}${to}
+    <div class="users">使える: ${mark(users)}</div>
+    <div class="actions"><a class="demo" href="${esc(u)}" target="_blank" rel="noopener">▶ localhost で見る（${esc(pk(m.demo.pokemon))}）</a><button class="copy" data-url="${esc(u)}">URL をコピー</button></div>
+  </article>`;
+}
+function render() {
+  document.getElementById("types").innerHTML = `<button class="tbtn" data-t="all" style="--tc: var(--fg)" aria-pressed="${state.type === "all"}">すべてのタイプ</button>` +
+    TYPES.map((t) => `<button class="tbtn" data-t="${t}" style="${tc(t)}" aria-pressed="${state.type === t}">${esc(D.names.types[t] ?? t)}</button>`).join("");
+  document.getElementById("tiers").innerHTML = ["all", ...TIERS].map((t) => `<button class="tbtn" data-tier="${t}" aria-pressed="${state.tier === t}">${t === "all" ? "すべて" : t}</button>`).join("");
+  document.getElementById("regions").innerHTML = regionsPresent.map((r) => `<button class="tbtn" data-region="${r}" aria-pressed="${state.region === r}">${esc(regionLabel(r))}</button>`).join("");
+  document.getElementById("sorts").innerHTML = SORTS.map(([k, l]) => `<button class="tbtn" data-sort="${k}" aria-pressed="${state.sort === k}">${l}</button>`).join("");
+  document.getElementById("ppmax").checked = state.ppmax; document.getElementById("swarm").checked = state.swarm;
+  const q = state.q.trim().toLowerCase();
+  let list = D.moves.filter((m) => (state.type === "all" || m.type === state.type) && (state.tier === "all" || m.tier === state.tier) && (state.region === "all" || regionOf(m) === state.region) && (!q || m._text.includes(q)));
+  const key = { crowd: (m) => -m.max.strength.crowd, solo: (m) => -m.max.strength.solo, total: (m) => -m.max.strength.total }[state.sort];
+  if (key) list = [...list].sort((a, b) => key(a) - key(b));
+  else if (state.sort === "name") list = [...list].sort((a, b) => a.name.localeCompare(b.name, "ja"));
+  document.getElementById("grid").innerHTML = list.map(card).join("");
+  document.getElementById("empty").hidden = list.length > 0;
+  document.getElementById("count").textContent = `${list.length} / ${D.moves.length} 技`;
+}
+const on = (id, attr, prop) => document.getElementById(id).addEventListener("click", (e) => { const b = e.target.closest("button"); if (b && b.dataset[attr] !== undefined) { state[prop] = b.dataset[attr]; save(); render(); } });
+on("types", "t", "type"); on("tiers", "tier", "tier"); on("regions", "region", "region"); on("sorts", "sort", "sort");
+document.getElementById("q").addEventListener("input", (e) => { state.q = e.target.value; render(); });
+for (const id of ["ppmax", "swarm"]) document.getElementById(id).addEventListener("change", (e) => { state[id] = e.target.checked; save(); render(); });
+document.getElementById("grid").addEventListener("click", async (e) => {
+  const b = e.target.closest("button.copy"); if (!b) return;
+  try { await navigator.clipboard.writeText(b.dataset.url); b.textContent = "コピーした"; } catch { b.textContent = b.dataset.url; }
+  setTimeout(() => (b.textContent = "URL をコピー"), 1500);
+});
+document.getElementById("foot").textContent = `版 ${VERSION} のデータ（docs/08_moves_table.json。npm run moves-table、${D.generatedAt}）から作成。強さの目安はポケモンのステータス・タイプ一致・相性・持ち物を掛けていない数（src/data/moveStrength.ts）。`;
+render();
+</script>

@@ -29,10 +29,11 @@ PokéSwarm（ポケモン題材のサバイバー系ブラウザゲーム、最�
 
 | 文書 | 作り方 | 内容 |
 |---|---|---|
-| `docs/08_moves_table.md` | `npm run moves-table` | 技の一覧表（派生のつながり・強さの目安） |
+| `docs/08_moves_table.json` | `npm run moves-table` | 技の見本帳の元データ（強さの目安・数値・派生・使える系統・localhost で演出を見る URL）。技を足したら作り直し、`docs/pages/README.md` の手順で見本帳のページを publish し直す |
 | `docs/14_move_dps.md`・`.json` | `npm run move-dps` | 技の DPS（ボス1体と雑魚 10・50・200）。両方に強い技を探すのに使う |
 | `docs/15_achievements.md`・`.json` | `npm run achievements-table` | 実績と解放の一覧（隠し実績も全部） |
 | `docs/16_learnsets.json` | `npm run learnsets` | ポケモンごとの最初の技・覚えられる技・派生と固有技 |
+| `docs/pages/` | `node scripts/make-doc-page.cjs …` | 上の資料を作者が見るページ（Artifact）のひな型。作り方と公開先の URL は `docs/pages/README.md` |
 
 仕様書の印: 【決定】は変更前に作者へ確認、【初期案】は調整可能な形で実装、【要決定】は実装前に作者へ確認。
 

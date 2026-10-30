@@ -1,0 +1,134 @@
+<title>PokéSwarm 実績一覧</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&family=Noto+Sans+JP:wght@400;600&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+/* 一覧の道具: 上に地方の解放、その下に地方タブ・検索・報酬の種類で絞る表 */
+:root {
+  --bg: #f4f6fb; --panel: #ffffff; --fg: #1d2333; --muted: #5d6680; --line: #dde2ee;
+  --accent: #d6402f; --accent-soft: #fbe4e0; --chip: #eef1f8;
+  --poke: #2f7d4a; --item: #2f5fae; --buff: #8a4fb8; --coin: #a8770a; --shiny: #c2417a;
+  --display: "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", sans-serif;
+  --body: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121522; --panel: #1b2032; --fg: #e8ebf5; --muted: #9aa3bd; --line: #2c3349;
+  --accent: #ff6f5c; --accent-soft: #3a2026; --chip: #252b40;
+  --poke: #6fcf8f; --item: #7fa8f0; --buff: #c69af0; --coin: #e6bb4c; --shiny: #f08ab5; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121522; --panel: #1b2032; --fg: #e8ebf5; --muted: #9aa3bd; --line: #2c3349;
+  --accent: #ff6f5c; --accent-soft: #3a2026; --chip: #252b40;
+  --poke: #6fcf8f; --item: #7fa8f0; --buff: #c69af0; --coin: #e6bb4c; --shiny: #f08ab5; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 14px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 48px; }
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 28px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: 28px; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--display); font-weight: 800; font-size: 18px; margin: 0 0 10px; }
+.lead { color: var(--muted); margin: 6px 0 0; max-width: 65ch; }
+.ball { display: inline-block; width: 22px; height: 22px; border-radius: 50%; vertical-align: -3px; margin-right: 8px;
+  background: linear-gradient(var(--accent) 0 46%, var(--fg) 46% 54%, var(--panel) 54%); border: 2px solid var(--fg); }
+.regions { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.reg { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 4px; min-width: 0; }
+.reg b { font-family: var(--display); font-size: 16px; }
+.reg .cond { overflow-wrap: anywhere; }
+.pill { font-size: 11px; letter-spacing: .04em; padding: 1px 8px; border-radius: 99px; background: var(--chip); color: var(--muted); margin-left: 6px; font-weight: 600; }
+.pill.open { background: var(--accent-soft); color: var(--accent); }
+code, .stat { font-family: var(--mono); font-size: 11.5px; color: var(--muted); overflow-wrap: anywhere; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.tabs, .kinds { display: flex; flex-wrap: wrap; gap: 6px; }
+button { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 99px; padding: 4px 12px; }
+button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.n { font-variant-numeric: tabular-nums; opacity: .7; margin-left: 4px; }
+input[type=search] { font: inherit; flex: 1 1 220px; min-width: 0; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); }
+label.chk { display: flex; gap: 6px; align-items: center; color: var(--muted); }
+.table-box { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; min-width: 640px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 11px; letter-spacing: .06em; color: var(--muted); font-weight: 600; background: var(--chip); position: sticky; top: 0; }
+tr:last-child td { border-bottom: 0; }
+td.name { font-weight: 600; white-space: nowrap; }
+.hid { font-size: 11px; color: var(--accent); margin-left: 6px; font-weight: 600; }
+.kind { display: inline-block; font-size: 11px; font-weight: 600; padding: 0 7px; border-radius: 4px; margin-right: 6px; border: 1px solid currentColor; }
+.k-ポケモン { color: var(--poke); } .k-持ち物 { color: var(--item); } .k-バフ { color: var(--buff); } .k-コイン { color: var(--coin); } .k-色違い { color: var(--shiny); }
+.empty { padding: 24px; color: var(--muted); text-align: center; }
+.foot { color: var(--muted); font-size: 12px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1><span class="ball" aria-hidden="true"></span>実績と解放の一覧</h1>
+    <p class="lead">PokéSwarm のすべての実績の条件と報酬です。ゲームの実績の画面と違い、隠し実績や「？？？」の条件もそのまま載せています。</p>
+  </header>
+
+  <section>
+    <h2>地方の解放</h2>
+    <div class="regions" id="regions"></div>
+  </section>
+
+  <section style="display:grid;gap:12px">
+    <h2 style="margin:0">実績</h2>
+    <div class="bar"><div class="tabs" id="tabs" role="group" aria-label="地方"></div></div>
+    <div class="bar">
+      <div class="kinds" id="kinds" role="group" aria-label="報酬の種類"></div>
+      <input type="search" id="q" placeholder="名前・条件・報酬で探す（例: ミュウ、ポイントマックス）">
+      <label class="chk"><input type="checkbox" id="showStat"> 記録の名前を出す</label>
+    </div>
+    <div class="table-box">
+      <table>
+        <thead><tr><th>実績</th><th>条件</th><th>報酬</th><th class="statcol" hidden>記録</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty" id="empty" hidden>条件に合う実績はありません。検索の言葉か絞り込みを変えてください。</div>
+    </div>
+  </section>
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+const DATA = __DATA__;
+const VERSION = "__VERSION__";
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const regionName = Object.fromEntries(DATA.regions.map((r) => [r.id, r.name]));
+document.getElementById("regions").innerHTML = DATA.regions.map((r) =>
+  `<div class="reg"><b>${esc(r.name)}<span class="pill ${r.available ? "open" : ""}">${r.available ? "公開" : "未公開"}</span></b>
+   <span class="cond">${esc(r.condition)}</span>${r.stat ? `<span class="stat">${esc(r.stat)}</span>` : ""}</div>`).join("");
+
+const state = { region: "kanto", kind: "すべて", q: "", stat: false };
+try { const s = JSON.parse(localStorage.getItem("ach-view") || "{}"); Object.assign(state, s, { q: "" }); } catch {}
+const regionIds = [...new Set(DATA.achievements.map((a) => a.region))];
+const kinds = ["すべて", "ポケモン", "持ち物", "バフ", "色違い", "コイン"];
+function save() { try { localStorage.setItem("ach-view", JSON.stringify({ region: state.region, kind: state.kind, stat: state.stat })); } catch {} }
+
+function renderTabs() {
+  const tabs = [...regionIds, "all"];
+  document.getElementById("tabs").innerHTML = tabs.map((id) => {
+    const n = id === "all" ? DATA.achievements.length : DATA.achievements.filter((a) => a.region === id).length;
+    return `<button data-r="${id}" aria-pressed="${state.region === id}">${id === "all" ? "すべての地方" : esc(regionName[id] || id)}<span class="n">${n}</span></button>`;
+  }).join("");
+  document.getElementById("kinds").innerHTML = kinds.map((k) => `<button data-k="${k}" aria-pressed="${state.kind === k}">${k}</button>`).join("");
+}
+function render() {
+  renderTabs();
+  const q = state.q.trim().toLowerCase();
+  const list = DATA.achievements.filter((a) =>
+    (state.region === "all" || a.region === state.region) &&
+    (state.kind === "すべて" || a.rewardKind === state.kind) &&
+    (!q || [a.name, a.condition, a.reward, a.stat, a.id].some((s) => s.toLowerCase().includes(q))));
+  document.querySelectorAll(".statcol").forEach((el) => (el.hidden = !state.stat));
+  document.getElementById("rows").innerHTML = list.map((a) => `<tr>
+    <td class="name">${esc(a.name)}${a.hidden ? '<span class="hid">隠し</span>' : ""}${state.region === "all" ? `<div class="stat">${esc(regionName[a.region] || a.region)}</div>` : ""}</td>
+    <td>${esc(a.condition)}</td>
+    <td>${a.reward ? `<span class="kind k-${a.rewardKind}">${a.rewardKind}</span>${esc(a.reward)}` : "—"}</td>
+    <td class="statcol"${state.stat ? "" : " hidden"}><code>${esc(a.stat)}</code></td></tr>`).join("");
+  document.getElementById("empty").hidden = list.length > 0;
+  document.getElementById("showStat").checked = state.stat;
+}
+document.getElementById("tabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { state.region = b.dataset.r; save(); render(); } });
+document.getElementById("kinds").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { state.kind = b.dataset.k; save(); render(); } });
+document.getElementById("q").addEventListener("input", (e) => { state.q = e.target.value; render(); });
+document.getElementById("showStat").addEventListener("change", (e) => { state.stat = e.target.checked; save(); render(); });
+document.getElementById("foot").textContent = `版 ${VERSION} のデータ（data/game/achievements.json）から作成。実績 ${DATA.achievements.length} 件。`;
+render();
+</script>

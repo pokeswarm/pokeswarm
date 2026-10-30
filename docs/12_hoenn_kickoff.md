@@ -126,7 +126,7 @@
 - `src/sim/` は Phaser に依存させない。入力コマンドで進める。乱数はシード付き。データは `data/` に置いて型で検証する。文章は翻訳ファイル（6言語）、名前は PokeAPI。
 - 新しい状態（性格・特性・天気・タッグのボス）を足したら、協力プレイでゲストへ送る形も一緒に作る（`src/net/sync.ts`）。当たったかは当てた人のブラウザで判定する。HP は本人のブラウザで管理する。
 - 実績を足したら6言語の名前・説明も足す（無いとテストが全部落ちる）。
-- 技を足したら `npm run balance-moves`（2回回すと落ち着く）と `npm run moves-table`。
+- 技を足したら `npm run balance-moves`（2回回すと落ち着く）と `npm run moves-table`、見本帳のページを publish し直す（`docs/pages/README.md`）。
 - 名前は原作の言葉かゲーム内の用語。凝った言い換えは候補を見せてから。
 - 書式を詰めた JSON を `JSON.stringify` で書き直さない（行を文字列で足す）。スクリプトは Write で `.cjs` に書いて node で実行する（Python は無い）。
 - コミットは pokeswarm-dev（noreply のメール）。prettier は使わない。秘密情報をコミットしない。

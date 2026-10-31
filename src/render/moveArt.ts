@@ -3161,6 +3161,71 @@ function dragonShock(): SpriteOut {
 }
 
 /** 自作の絵であることの表記（data/render/move-sprites.json の credit） */
+/**
+ * したでなめる: 口から前（右）へ伸びる長いベロ（横から見た姿。根元が左）。根元は細く、途中から太くなり、先は丸い。
+ * 真ん中に濃い筋、上に光。コマ 0〜2 で 55% → 80% → 100% まで伸び、伸びきったコマで先からよだれが飛ぶ（loopFrom 2）
+ */
+function tongue(): SpriteOut {
+  const W = 24;
+  const H = 11;
+  // 0 輪郭（濃い赤紫）・1 影と筋・2 ピンク・3 明るいピンク・4 光・5 よだれ
+  const palette = ['#4a0f2e', '#ad1457', '#ec407a', '#f48fb1', '#fce4ec', '#b3e5fc'];
+  const cy = (H - 1) / 2;
+  const frames = [0.55, 0.8, 1].map((len, f) => {
+    const tipR = 3.6;
+    // 先端の x（伸びきったコマは右端の 2 マス半手前。よだれの点を置く）
+    const L = (W - 2.5) * len;
+    const tipCx = L - tipR;
+    const g = fill(blank(W, H), (x, y) => {
+      if (x < 0.5) return -1;
+      // 太さ: 根元 1.2 → 先へ向かってだんだん tipR まで太くなり（スプーンの形）、先は半径 tipR の丸
+      let half: number;
+      let inside: boolean;
+      if (x < tipCx) {
+        half = 1.2 + (tipR - 1.2) * Math.min(1, x / Math.max(1, tipCx * 0.9));
+        inside = Math.abs(y - cy) <= half;
+      } else {
+        half = tipR;
+        inside = Math.hypot(x - tipCx, y - cy) <= tipR;
+      }
+      if (!inside) {
+        // よだれ: 伸びきったコマで、先の少し先に 2 粒
+        if (f === 2 && Math.round(x) === Math.round(L + 1.5) && (Math.round(y) === 1 || Math.round(y) === H - 2)) return 5;
+        return -1;
+      }
+      const d = (y - cy) / Math.max(0.01, half);
+      // 真ん中の筋（根元の近くと先の丸には入れない）
+      if (Math.abs(d) < 0.14 && x > 3 && x < tipCx + 0.5) return 1;
+      if (d < -0.58) return 4;
+      if (d < -0.12) return 3;
+      if (d < 0.5) return 2;
+      return 1;
+    });
+    return toRows(outline(g, 0));
+  });
+  return { palette, frameMs: 45, loopFrom: 2, parts: { main: frames } };
+}
+
+/**
+ * おどろかす: 敵の足元の影（上から見た、横長の黒紫の水たまり。縁が揺れる）。ここから持ち主の幻影（レシピの ownerGhost の rise）が現れる。
+ * 真ん中がいちばん暗く、縁へ向かって紫になる
+ */
+function shadowPool(): SpriteOut {
+  // 0 輪郭・1 真ん中（ほぼ黒）・2 暗い紫・3 縁の紫
+  const palette = ['#06020a', '#120618', '#2a0f45', '#4a148c'];
+  const frames = [0, 1].map((f) =>
+    shape(16, (u, v) => {
+      const a = Math.atan2(v, u);
+      const rr = 0.9 + Math.sin(a * 5 + f * 1.3) * 0.05 + Math.sin(a * 3 - f * 0.7) * 0.03;
+      // 横長（上から見た影）
+      const d = Math.hypot(u, v * 1.9);
+      if (d > rr) return -1;
+      return d > 0.72 ? 3 : d > 0.4 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
+}
+
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
 /** 絵の名前 → 描く関数 */
@@ -3302,6 +3367,9 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'flame-leg': () => flameLeg(),
     'blaze-kick-wave': () => blazeKickWave(),
     'water-splash': () => waterSplash(),
+    // したでなめる の舌・おどろかす の足元の影（07 の147章）
+    tongue: () => tongue(),
+    'shadow-pool': () => shadowPool(),
 };
 
 /** 絵の名前の一覧 */

@@ -4736,6 +4736,48 @@
         "fillAlpha": 0.22,
         "maxPerSecond": 24
       }
+    },
+    "lick": {
+      "extends": "ghost.base",
+      "projectile": {
+        "shapeAlpha": 0.25
+      },
+      "impact": {
+        "flash": {
+          "radius": 24
+        }
+      },
+      "sprite": {
+        "id": "tongue",
+        "fit": "front",
+        "size": 0.9,
+        "along": 0.575
+      }
+    },
+    "astonish": {
+      "extends": "ghost.base",
+      "hideShape": true,
+      "impact": {
+        "flash": {
+          "radius": 12,
+          "alpha": 0.3
+        }
+      },
+      "sprite": {
+        "id": "shadow-pool",
+        "fit": "circle",
+        "size": 1.5
+      },
+      "ownerGhost": {
+        "tint": "#9575cd",
+        "alpha": 0.85,
+        "afterimages": 0,
+        "spacingTicks": 1,
+        "rise": {
+          "seconds": 0.12,
+          "feetOffset": 6
+        }
+      }
     }
   }
 }

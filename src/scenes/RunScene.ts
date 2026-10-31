@@ -1378,7 +1378,10 @@ export class RunScene extends Phaser.Scene {
     return base;
   }
 
-  /** 持ち主の残像として飛ぶ技（ゴッドバード）: 発射体の位置に、持ち主のポケモンの姿を薄く描き、後ろに残像を連ねる */
+  /**
+   * 持ち主の残像として飛ぶ技（ゴッドバード）: 発射体の位置に、持ち主のポケモンの姿を薄く描き、後ろに残像を連ねる。
+   * 地面から出る幻影（おどろかす。rise）は、足元を当たり判定の中心（敵の影）に置いて伸び上がらせる
+   */
   private drawGhosts(world: World, alpha: number): void {
     const pr = world.projectiles;
     const depth = spriteRender.depths.effects + 0.2;
@@ -1404,6 +1407,16 @@ export class RunScene extends Phaser.Scene {
         stepX = pr.dirX[i]! * Math.min(len * 0.1, len * t / Math.max(1, ghost.afterimages * ghost.spacingTicks));
         stepY = pr.dirY[i]! * Math.min(len * 0.1, len * t / Math.max(1, ghost.afterimages * ghost.spacingTicks));
       }
+      // 地面から出る幻影: 出てからの秒数で足元から伸び上がり、消える前の 0.1 秒で薄くなる
+      const rise = ghost.rise;
+      let scaleY = frame.scaleY;
+      let fade = 1;
+      if (rise) {
+        const elapsed = pr.maxLife[i]! - pr.life[i]! + world.dt * alpha;
+        scaleY *= Math.min(1, Math.max(0.05, elapsed / rise.seconds));
+        fade = Math.min(1, pr.life[i]! / 0.1);
+        y += rise.feetOffset;
+      }
       for (let k = 0; k <= ghost.afterimages; k++) {
         let img = this.ghostImages[used];
         if (!img) {
@@ -1412,11 +1425,12 @@ export class RunScene extends Phaser.Scene {
         }
         img
           .setTexture(frame.key, frame.frame)
+          .setOrigin(0.5, rise ? 1 : 0.5)
           .setPosition(x - stepX * ghost.spacingTicks * k, y - stepY * ghost.spacingTicks * k)
-          .setScale(frame.scaleX, frame.scaleY)
+          .setScale(frame.scaleX, scaleY)
           .setFlipX(frame.flipX)
           .setTint(hexColor(ghost.colors ? ghost.colors[(Math.floor(performance.now() / ghost.periodMs) + k) % ghost.colors.length]! : ghost.tint))
-          .setAlpha(ghost.alpha * (1 - k / (ghost.afterimages + 1)))
+          .setAlpha(ghost.alpha * fade * (1 - k / (ghost.afterimages + 1)))
           .setDepth(depth - k * 0.001)
           .setVisible(true);
         used++;

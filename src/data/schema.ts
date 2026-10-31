@@ -1609,6 +1609,11 @@ export const effectRecipeSchema = z.object({
       /** 色を periodMs ごとに順に切り替える（ボルテッカー: 10まんボルトのような黒・白・黄。作者の指摘 2026年10月25日）。省略なら tint のまま */
       colors: z.array(colorString).min(1).optional(),
       periodMs: z.number().positive().default(60),
+      /**
+       * 幻影を地面から出す（おどろかす: 敵の影から持ち主の幻影が現れる。07 の147章）。足元を当たり判定の中心に置き、seconds で伸び上がって、
+       * 消える前の 0.1 秒で薄くなる。feetOffset は足元を中心からこの分だけ下に置く（ワールドの単位。絵の下の余白のぶん）
+       */
+      rise: z.object({ seconds: z.number().positive(), feetOffset: z.number().default(0) }).optional(),
     })
     .optional(),
   /**

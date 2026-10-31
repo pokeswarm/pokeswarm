@@ -83,6 +83,18 @@
     "type": "fighting",
     "damageClass": "physical"
   },
+  "astonish": {
+    "names": {
+      "ja": "おどろかす",
+      "en": "Astonish",
+      "fr": "Étonnement",
+      "de": "Erstauner",
+      "es": "Impresionar",
+      "it": "Sgomento"
+    },
+    "type": "ghost",
+    "damageClass": "physical"
+  },
   "aura-sphere": {
     "names": {
       "ja": "はどうだん",
@@ -1054,6 +1066,18 @@
     },
     "type": "grass",
     "damageClass": "status"
+  },
+  "lick": {
+    "names": {
+      "ja": "したでなめる",
+      "en": "Lick",
+      "fr": "Léchouille",
+      "de": "Schlecker",
+      "es": "Lengüetazo",
+      "it": "Leccata"
+    },
+    "type": "ghost",
+    "damageClass": "physical"
   },
   "low-sweep": {
     "names": {

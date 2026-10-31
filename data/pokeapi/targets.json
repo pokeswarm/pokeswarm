@@ -476,7 +476,9 @@
     "revenge",
     "steel-beam",
     "stealth-rock",
-    "rock-blast"
+    "rock-blast",
+    "lick",
+    "astonish"
   ],
   "items": [
     "x-attack",

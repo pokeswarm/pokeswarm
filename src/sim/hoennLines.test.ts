@@ -104,8 +104,8 @@ describe('固有技の条件', () => {
     expect(count(1)).toBe(1);
     let first = -1;
     for (let i = 0; i < pr.count; i++) if (pr.stage[i] === 0) first = pr.serial[i]!;
-    // intervalSeconds（0.35 秒）後に 2 つ目（通し番号が後のもの）
-    for (let k = 0; k < Math.round(0.35 * 30) + 1; k++) t.sim.step([]);
+    // intervalSeconds（0.5 秒）後に 2 つ目（通し番号が後のもの）
+    for (let k = 0; k < Math.round(def.levels[0]!.intervalSeconds * 30) + 1; k++) t.sim.step([]);
     let later = 0;
     for (let i = 0; i < pr.count; i++) if (pr.stage[i] === 0 && pr.serial[i]! > first) later++;
     expect(later).toBe(1);

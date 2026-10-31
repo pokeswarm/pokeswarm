@@ -29,7 +29,7 @@
     "items": 1.5,
     "enemies": 2,
     "hazards": 4.5,
-    "hitShapes": 3,
+    "hitShapes": -0.5,
     "effects": 4,
     "bosses": 5,
     "players": 6,

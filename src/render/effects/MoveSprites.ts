@@ -256,18 +256,22 @@ export class MoveSprites {
   /** 位置と大きさを指定して描く（当たり判定のほか、ボスの技が落ちた所の絵にも使う） */
   drawItems(items: readonly SpriteItem[]): void {
     let used = 0;
+    // 重なったときは、画面の下（手前）にあるものを手前に描く（ブラストバーンの柱。作者の依頼 2026年10月31日）: y の順に並べ、順に少しずつ深さを上げる
+    let order = 0;
     const put = (key: string, x: number, y: number, rot: number, sx: number, sy: number, a: number, originX = 0.5): void => {
       let img = this.images[used];
       if (!img) {
-        img = this.scene.add.image(0, 0, key).setDepth(this.depth);
+        img = this.scene.add.image(0, 0, key);
         this.images.push(img);
       }
-      img.setTexture(key).setOrigin(originX, 0.5).setPosition(x, y).setRotation(rot).setScale(sx, sy).setAlpha(a).setVisible(true);
+      img.setTexture(key).setOrigin(originX, 0.5).setPosition(x, y).setRotation(rot).setScale(sx, sy).setAlpha(a).setDepth(this.depth + order * 1e-5).setVisible(true);
       used++;
     };
     this.pump();
     const seen = new Set<number>();
-    for (const it of items) {
+    const sorted = items.length > 1 ? [...items].sort((p, q) => p.y - q.y) : items;
+    for (const it of sorted) {
+      order++;
       const spec = it.spec;
       const base = this.data.sprites[spec.id];
       if (!base) continue;

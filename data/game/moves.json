@@ -8029,9 +8029,9 @@
       "pattern": "melee",
       "effect": "blaze-kick",
       "frontBox": {
-        "start": -0.25,
-        "end": 0.55,
-        "halfWidth": 0.6
+        "start": -0.3,
+        "end": 1,
+        "halfWidth": 0.3
       },
       "region": "hoenn",
       "learners": [
@@ -8047,13 +8047,13 @@
         "afterimages": 3
       },
       "base": {
-        "power": 403.8,
+        "power": 383,
         "cooldownSeconds": 2,
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 0,
         "size": 30,
-        "range": 70,
+        "range": 90,
         "durationSeconds": 0.22,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -8069,31 +8069,31 @@
       "levels": [
         {
           "range": 10,
-          "power": 38.2
+          "power": 39.5
         },
         {
           "cooldownSeconds": -0.08,
-          "power": 43.2
+          "power": 41.4
         },
         {
           "range": 10,
-          "power": 27.9
+          "power": 30.4
         },
         {
           "cooldownSeconds": -0.08,
-          "power": 33.5
+          "power": 32.2
         },
         {
           "size": 2,
-          "power": 47.6
+          "power": 46.7
         },
         {
           "cooldownSeconds": -0.08,
-          "power": 26
+          "power": 25.1
         },
         {
           "range": 14,
-          "power": -1.5
+          "power": 4.4
         }
       ],
       "effects": [

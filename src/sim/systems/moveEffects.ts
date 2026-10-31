@@ -95,15 +95,21 @@ function spawn(world: World, src: FxSource, over: Partial<ProjectileSpawn>): voi
  */
 function pathPuddle(world: World, src: FxSource, base: Partial<ProjectileSpawn>): void {
   if (src.box) {
-    // 前の長方形（ブレイズキック）: 長方形に内接する、横向きの太い線（太さは長方形の奥行き）
+    // 前の長方形（ブレイズキック）: 長方形に内接する太い線（長い辺に沿わせ、太さは短い辺）
     const b = src.box;
     const depth = b.to - b.from;
+    const scale = (base.radius ?? src.size) / src.size;
+    if (depth >= b.half * 2) {
+      // 向きに長い: 根元から向きに沿って
+      spawn(world, src, { ...base, radius: b.half * scale, shape: SHAPE_LINE, length: depth - b.half * 2, x: src.x + src.dirX * (b.from + b.half), y: src.y + src.dirY * (b.from + b.half) });
+      return;
+    }
     const cx = src.x + src.dirX * (b.from + depth / 2);
     const cy = src.y + src.dirY * (b.from + depth / 2);
-    const len = Math.max(0, b.half * 2 - depth);
+    const len = b.half * 2 - depth;
     const lx = -src.dirY;
     const ly = src.dirX;
-    spawn(world, src, { ...base, radius: (depth / 2) * ((base.radius ?? src.size) / src.size), shape: SHAPE_LINE, length: len, x: cx - lx * (len / 2), y: cy - ly * (len / 2), dirX: lx, dirY: ly });
+    spawn(world, src, { ...base, radius: (depth / 2) * scale, shape: SHAPE_LINE, length: len, x: cx - lx * (len / 2), y: cy - ly * (len / 2), dirX: lx, dirY: ly });
     return;
   }
   if (src.length > 0) {

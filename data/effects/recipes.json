@@ -4119,8 +4119,8 @@
       "sprite": {
         "id": "blaze-kick-wave",
         "fit": "front",
-        "size": 0.8,
-        "along": 0.15
+        "size": 1.3,
+        "along": 0.35
       },
       "projectile": {
         "glowScale": 1.05,

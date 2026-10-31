@@ -13,11 +13,11 @@ function setup(pokemon: string, move: string, region: string, level = 1) {
 }
 
 describe('ブレイズキック', () => {
-  it('自分を含む前の長方形（届く距離の −0.25〜0.55 倍、片側の幅 0.6 倍）で、溜めてから出す', () => {
+  it('自分を含む前に長い長方形（届く距離の −0.3〜1.0 倍、片側の幅 0.3 倍）で、溜めてから出す', () => {
     const { rules, sim, p } = setup('torchic', 'blaze-kick', 'hoenn');
     const def = rules.moves[moveIndexOf(rules, 'blaze-kick')]!;
     expect(def.pattern).toBe('melee');
-    expect(def.frontBox).toEqual({ start: -0.25, end: 0.55, halfWidth: 0.6 });
+    expect(def.frontBox).toEqual({ start: -0.3, end: 1, halfWidth: 0.3 });
     p.facingX = 1;
     p.facingY = 0;
     // 溜め（0.5 秒）の間は当たり判定が出ない
@@ -26,12 +26,12 @@ describe('ブレイズキック', () => {
     for (let t = 0; t < 8; t++) sim.step([]);
     const pr = sim.world.projectiles;
     expect(pr.count).toBeGreaterThanOrEqual(1);
-    // 届く距離 = range 70 + size 30
-    expect(pr.radius[0]).toBe(100);
-    expect(pr.length[0]).toBeCloseTo(60, 5);
+    // 届く距離 = range 90 + size 30
+    expect(pr.radius[0]).toBe(120);
+    expect(pr.length[0]).toBeCloseTo(36, 5);
   });
 
-  it('燃える道は、長方形に内接する横向きの線（太さは長方形の奥行き）になる', () => {
+  it('燃える道は、長方形に内接する向きに沿った線（太さは長方形の幅）になる', () => {
     const { sim, p } = setup('torchic', 'blaze-kick', 'hoenn');
     p.facingX = 1;
     p.facingY = 0;
@@ -40,12 +40,12 @@ describe('ブレイズキック', () => {
     let line = -1;
     for (let i = 0; i < pr.count; i++) if (pr.shape[i] === SHAPE_LINE && pr.linger[i] === 1) line = i;
     expect(line).not.toBe(-1);
-    // 長方形: 向き x で −25〜55、横 ±60。線は x = 15 を通って縦（y 方向）に走り、半径 40・長さ 120 − 80 = 40
-    expect(pr.radius[line]).toBeCloseTo(40, 5);
-    expect(pr.length[line]).toBeCloseTo(40, 5);
-    expect(pr.x[line]).toBeCloseTo(15, 5);
-    expect(Math.abs(pr.y[line]!)).toBeCloseTo(20, 5);
-    expect(Math.abs(pr.dirY[line]!)).toBeCloseTo(1, 5);
+    // 長方形: 向き x で −36〜120、横 ±36。線は x = 0 から x 方向に走り、半径 36・長さ 156 − 72 = 84
+    expect(pr.radius[line]).toBeCloseTo(36, 5);
+    expect(pr.length[line]).toBeCloseTo(84, 5);
+    expect(pr.x[line]).toBeCloseTo(0, 5);
+    expect(pr.y[line]).toBeCloseTo(0, 5);
+    expect(pr.dirX[line]).toBeCloseTo(1, 5);
   });
 });
 

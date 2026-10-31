@@ -369,7 +369,12 @@ export function useMoves(world: World): void {
           fireLob(world, p, pm, st);
           break;
         case 'strike':
-          fireStrike(world, p, pm, st);
+          if (def.sequential) {
+            // 1つずつ順に置く（ゴーストダイブ: 影が出ては消え、別の所に出る）
+            pm.burstLeft = st.count;
+            pm.burstTimer = 0;
+            fireBurst(world, p, pm, st);
+          } else fireStrike(world, p, pm, st);
           break;
         case 'chain':
           fireChain(world, p, pm, st);
@@ -534,6 +539,14 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     const bonusShot = shot >= st.count - p.mods.amountBonus && def.effects.length > 0;
     if (def.pattern === 'barrage') {
       fireBarrageHit(world, p, pm, st);
+      if (bonusShot) for (let k = before; k < world.projectiles.count; k++) world.projectiles.noFx[k] = 1;
+      pm.burstLeft--;
+      pm.burstTimer += st.intervalSeconds;
+      continue;
+    }
+    if (def.pattern === 'strike') {
+      // 1つずつ置く落雷（sequential。ゴーストダイブ）: 届く範囲に敵がいなければその1つは出ない
+      fireStrike(world, p, pm, { ...st, count: 1 });
       if (bonusShot) for (let k = before; k < world.projectiles.count; k++) world.projectiles.noFx[k] = 1;
       pm.burstLeft--;
       pm.burstTimer += st.intervalSeconds;

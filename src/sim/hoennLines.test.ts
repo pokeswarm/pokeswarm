@@ -52,17 +52,18 @@ describe('固有技の条件', () => {
     expect(t.derives('night-daze')).toBeDefined();
   });
 
-  it('カゲボウズ: のろいのおふだ が最大（持ち物の強化の段階）のときだけ ゴーストダイブ', () => {
+  it('カゲボウズ: ジュペッタの姿 ＋ おどろかす最大 ＋ シャドーボール Lv8 で ゴーストダイブ（作者の決定 2026年11月1日。07 の148章）', () => {
     const t = setup('shuppet');
     t.p.species = t.species('banette');
     t.p.moves = [];
-    t.give('shadow-ball-hoenn', 8);
+    t.give('astonish', 8);
     t.p.moves[0]!.level = moveMaxLevel(t.rules, t.p.moves[0]!);
-    t.give('fire-spin-hoenn', 8);
-    t.p.items.push({ item: t.item('spell-tag'), level: 4 });
+    t.give('shadow-ball-hoenn', 7);
     expect(t.derives('phantom-force')).toBeUndefined();
-    t.p.items[0]!.level = 5;
+    t.p.moves[1]!.level = 8;
     expect(t.derives('phantom-force')).toBeDefined();
+    t.p.species = t.species('shuppet');
+    expect(t.derives('phantom-force')).toBeUndefined();
   });
 
   it('ダンバル: メタルコート（進化の道具）は派生の材料なので、進化しなくても候補に出る', () => {
@@ -74,11 +75,40 @@ describe('固有技の条件', () => {
     expect(seen).toBe(true);
   });
 
-  it('カゲボウズの おにび（ほのお）は、タイプに関わらず ジュペッタで候補に出る', () => {
+  it('カゲボウズの最初の技は したでなめる（おにび・ほのおのうず はしまった）', () => {
     const t = setup('shuppet');
-    t.p.species = t.species('banette');
-    const seen = Array.from({ length: 80 }, () => makeOffers(t.sim.world, t.p)).flat().some((o) => o.kind === 'moveNew' && o.move === t.move('will-o-wisp'));
-    expect(seen).toBe(true);
+    expect(t.p.moves.map((m) => m.move)).toEqual([t.move('lick')]);
+    expect(t.rules.moves.some((m) => m.key === 'will-o-wisp' || m.key === 'fire-spin-hoenn')).toBe(false);
+  });
+
+  it('ゴーストダイブ: 使った瞬間に自分の足元に影の範囲が残り、大きな影が間をあけて1つずつランダムな敵の足元に出る', () => {
+    const t = setup('shuppet');
+    t.p.moves = [];
+    t.give('phantom-force', 1);
+    const def = t.rules.moves[t.move('phantom-force')]!;
+    expect(def.pattern).toBe('strike');
+    expect(def.sequential).toBe(true);
+    t.sim.step([
+      { type: 'spawnEnemy', id: 1, kind: 0, x: 150, y: 0 },
+      { type: 'spawnEnemy', id: 2, kind: 0, x: -150, y: 60 },
+    ]);
+    t.sim.step([]);
+    const pr = t.sim.world.projectiles;
+    const count = (stage: number) => {
+      let n = 0;
+      for (let i = 0; i < pr.count; i++) if (pr.stage[i] === stage) n++;
+      return n;
+    };
+    // 最初の更新で、影 1 つ（stage 0）と足元の範囲（効き方の puddle。stage 1）
+    expect(count(0)).toBe(1);
+    expect(count(1)).toBe(1);
+    let first = -1;
+    for (let i = 0; i < pr.count; i++) if (pr.stage[i] === 0) first = pr.serial[i]!;
+    // intervalSeconds（0.35 秒）後に 2 つ目（通し番号が後のもの）
+    for (let k = 0; k < Math.round(0.35 * 30) + 1; k++) t.sim.step([]);
+    let later = 0;
+    for (let i = 0; i < pr.count; i++) if (pr.stage[i] === 0 && pr.serial[i]! > first) later++;
+    expect(later).toBe(1);
   });
 });
 

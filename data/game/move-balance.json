@@ -58,7 +58,7 @@
     "facade",
     "giga-impact-hoenn"
   ],
-  "heavyHitters": [
+  "heavyHitters": ["phantom-force", 
     "giga-impact",
     "frenzy-plant",
     "superpower",
@@ -97,7 +97,6 @@
     "night-slash": "derived",
     "future-sight-hoenn": "derived",
     "shadow-ball-hoenn": "derived",
-    "fire-spin-hoenn": "derived",
     "ice-ball": "derived",
     "surf": "derived",
     "air-slash-hoenn": "derived",

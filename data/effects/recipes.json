@@ -4429,26 +4429,33 @@
     },
     "phantom-force": {
       "extends": "ghost.base",
-      "ownerGhost": {
-        "tint": "#b39ddb",
-        "alpha": 0.6,
-        "afterimages": 4,
-        "spacingTicks": 1
-      },
+      "hideShape": true,
       "impact": {
         "flash": {
-          "radius": 60
+          "radius": 14,
+          "alpha": 0.3
         }
       },
-      "projectile": {
-        "glowScale": 1.1,
-        "coreScale": 0.3,
-        "shapeAlpha": 0.2
-      },
       "sprite": {
-        "id": "shadow-orb",
+        "id": "shadow-pool",
         "fit": "circle",
-        "size": 1.2
+        "size": 1.5
+      },
+      "lingerSprite": {
+        "id": "shadow-pool",
+        "fit": "circle",
+        "size": 1.5
+      },
+      "ownerGhost": {
+        "tint": "#7e57c2",
+        "alpha": 0.9,
+        "afterimages": 0,
+        "spacingTicks": 1,
+        "rise": {
+          "seconds": 0.15,
+          "feetOffset": 8,
+          "scale": 1.8
+        }
       }
     },
     "will-o-wisp": {

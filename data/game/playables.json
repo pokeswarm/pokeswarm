@@ -16,7 +16,7 @@
     "slakoth": { "sprite": "slakoth", "startingMoves": ["scratch"], "ability": "truant", "formAbilities": { "vigoroth": "vital-spirit" } },
     "swablu": { "sprite": "swablu", "startingMoves": ["peck"], "ability": "natural-cure" },
     "absol": { "sprite": "absol", "startingMoves": ["sucker-punch"], "ability": "super-luck" },
-    "shuppet": { "sprite": "shuppet", "startingMoves": ["night-shade"], "ability": "cursed-body" },
+    "shuppet": { "sprite": "shuppet", "startingMoves": ["lick"], "ability": "cursed-body" },
     "spheal": { "sprite": "spheal", "startingMoves": ["powder-snow"], "ability": "thick-fat" },
     "bagon": { "sprite": "bagon", "startingMoves": ["dragon-rage"], "ability": "moxie" },
     "feebas": { "sprite": "feebas", "startingMoves": ["water-gun"], "fixedForms": ["feebas"], "ability": "swift-swim" },

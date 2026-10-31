@@ -1409,11 +1409,13 @@ export class RunScene extends Phaser.Scene {
       }
       // 地面から出る幻影: 出てからの秒数で足元から伸び上がり、消える前の 0.1 秒で薄くなる
       const rise = ghost.rise;
+      let scaleX = frame.scaleX;
       let scaleY = frame.scaleY;
       let fade = 1;
       if (rise) {
         const elapsed = pr.maxLife[i]! - pr.life[i]! + world.dt * alpha;
-        scaleY *= Math.min(1, Math.max(0.05, elapsed / rise.seconds));
+        scaleX *= rise.scale;
+        scaleY *= rise.scale * Math.min(1, Math.max(0.05, elapsed / rise.seconds));
         fade = Math.min(1, pr.life[i]! / 0.1);
         y += rise.feetOffset;
       }
@@ -1427,7 +1429,7 @@ export class RunScene extends Phaser.Scene {
           .setTexture(frame.key, frame.frame)
           .setOrigin(0.5, rise ? 1 : 0.5)
           .setPosition(x - stepX * ghost.spacingTicks * k, y - stepY * ghost.spacingTicks * k)
-          .setScale(frame.scaleX, scaleY)
+          .setScale(scaleX, scaleY)
           .setFlipX(frame.flipX)
           .setTint(hexColor(ghost.colors ? ghost.colors[(Math.floor(performance.now() / ghost.periodMs) + k) % ghost.colors.length]! : ghost.tint))
           .setAlpha(ghost.alpha * fade * (1 - k / (ghost.afterimages + 1)))

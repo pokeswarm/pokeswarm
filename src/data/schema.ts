@@ -1158,6 +1158,8 @@ export const moveDefSchema = z.object({
   lobTarget: z.enum(['random', 'nearest']).optional(),
   /** scatter（置く）の数と大きさを、使うたびにランダムにする: 数は countMin〜count、半径は size × sizeMin〜sizeMax（マグニチュード） */
   scatterJitter: z.object({ countMin: z.number().int().positive(), sizeMin: z.number().positive(), sizeMax: z.number().positive() }).optional(),
+  /** strike（落雷）: count 個を同時に置かず、intervalSeconds ごとに1つずつ置く（ゴーストダイブ: 大きな影が出ては消え、別の所に出る。07 の148章） */
+  sequential: z.boolean().optional(),
   /** scatter（置く）の当たり判定を、置いてからこの秒数待って出す（つららおとし: 空から氷の塊が落ちてくる間） */
   scatterDelaySeconds: z.number().positive().optional(),
   /** sweep（なぎ払い）を片道だけにする（はたく: 1回払う。おうふくビンタは行って戻る） */
@@ -1613,7 +1615,7 @@ export const effectRecipeSchema = z.object({
        * 幻影を地面から出す（おどろかす: 敵の影から持ち主の幻影が現れる。07 の147章）。足元を当たり判定の中心に置き、seconds で伸び上がって、
        * 消える前の 0.1 秒で薄くなる。feetOffset は足元を中心からこの分だけ下に置く（ワールドの単位。絵の下の余白のぶん）
        */
-      rise: z.object({ seconds: z.number().positive(), feetOffset: z.number().default(0) }).optional(),
+      rise: z.object({ seconds: z.number().positive(), feetOffset: z.number().default(0), /** 幻影の大きさの倍率（ゴーストダイブ: 大きな影） */ scale: z.number().positive().default(1) }).optional(),
     })
     .optional(),
   /**

@@ -115,6 +115,7 @@
   "strengthScale": {
     "giga-impact": 2,
     "sing": 0.6,
-    "yawn": 0.6
+    "yawn": 0.6,
+    "stealth-rock": 0.4
   }
 }

@@ -994,6 +994,11 @@ export const moveEffectSchema = z.object({
       durationPerLevel: z.number().nonnegative().optional(),
       pierce: pierceValue.optional(),
       hitIntervalSeconds: z.number().positive().optional(),
+      /**
+       * 落ちた所に残る範囲: 分裂した弾が消えた（lob なら落ちた）所に、残る当たり判定を置く（ロックブラスト: 飛び散った破片が落ちた所に岩のかけらが残る。07 の146章）。
+       * 大きさ・威力は分裂した弾の大きさ・威力に掛ける倍率。見た目はレシピの lingerSprite
+       */
+      land: z.object({ ...fxSize, durationSeconds: z.number().positive(), hitIntervalSeconds: z.number().positive() }).optional(),
     })
     .optional(),
   /** 連鎖: その場から近くの敵へ count 回飛び移る */
@@ -1621,6 +1626,8 @@ export const effectRecipeSchema = z.object({
   effectLineSprite: moveSpriteSpec.optional(),
   /** 効き方から出た円・飛ぶもの（ブラストバーンの火の粉・ハードプラントの根・10まんボルトの周りの電気）を、このドット絵で描く */
   effectSprite: moveSpriteSpec.optional(),
+  /** 効き方から出た、残る範囲（puddle・split の land）の絵。無ければ effectSprite（ロックブラスト: 飛ぶ破片と、落ちて残るかけらを分ける） */
+  lingerSprite: moveSpriteSpec.optional(),
   /** 効き方から出た外へ広がる輪（ふんかの足元の衝撃波。explode の sweep）を、この輪の絵（fit ring）で描く。無ければ技そのものの絵が輪ならそれ */
   effectRingSprite: moveSpriteSpec.optional(),
   /** 通った道に残る範囲（ストーンエッジの岩の亀裂）を、このドット絵で描く（線に合わせる） */

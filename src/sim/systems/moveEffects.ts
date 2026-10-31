@@ -87,6 +87,13 @@ function spawn(world: World, src: FxSource, over: Partial<ProjectileSpawn>): voi
   });
 }
 
+/** 分裂した弾（split の land）が消えた所に、残る当たり判定を置く（fxIndex は効き方の番号 + 1） */
+export function fireLanding(world: World, fxIndex: number, src: FxSource): void {
+  const land = world.rules.moves[src.move]!.effects[fxIndex - 1]?.split?.land;
+  if (!land) return;
+  spawn(world, src, { damage: src.damage * land.powerMultiplier, radius: src.size * land.sizeMultiplier, life: land.durationSeconds, hitIntervalTicks: Math.max(1, Math.round(land.hitIntervalSeconds / world.dt)), linger: true });
+}
+
 /**
  * 通った道を残る範囲にする（円を並べず、道そのものを当たり判定にする。作者の要望 2026年10月23日）。
  * - 直線の元（ビーム）: その線を1本
@@ -233,6 +240,8 @@ function applyEffect(world: World, fx: MoveEffect, index: number, src: FxSource)
         life: sp.durationSeconds + (sp.durationPerLevel ?? 0) * Math.max(0, src.level - 1),
         pierce,
         ...(sp.hitIntervalSeconds ? { hitIntervalTicks: ticks(sp.hitIntervalSeconds) } : {}),
+        // 落ちた所に範囲を残す弾は、どの効き方から出たかを覚える（消えるときに fireLanding で置く。0 は無し）
+        ...(sp.land ? { fxIndex: index + 1 } : {}),
       };
       if (sp.lob) {
         // 上へ放り上げ、重さで落とす（横へは向きの cos の分だけ。いわなだれの小さな岩）

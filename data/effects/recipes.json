@@ -4626,42 +4626,32 @@
       "extends": "rock.base",
       "projectile": {
         "glowScale": 1.2,
-        "coreScale": 0.6,
-        "glowColor": "#90a4ae"
+        "coreScale": 0.6
       },
       "impact": {
         "flash": {
-          "radius": 40,
-          "color": "#b0bec5"
-        },
-        "burst": {
-          "colors": [
-            "#eceff1",
-            "#90a4ae",
-            "#607d8b",
-            "#37474f"
-          ]
+          "radius": 30
         }
       },
       "sprite": {
-        "id": "stone",
+        "id": "rock-shard",
         "fit": "circle",
-        "size": 1.6,
+        "size": 1.5,
         "rotate": "spin",
         "spinDegPerSec": 300
       },
       "effectSprite": {
         "id": "sharp-rocks",
         "fit": "circle",
-        "size": 1.1,
+        "size": 0.9,
         "originY": 0.8
       },
       "linger": {
         "spread": 0,
         "blend": "add",
         "colors": [
-          "#eceff1",
-          "#90a4ae"
+          "#efebe9",
+          "#a1887f"
         ],
         "lifespanMs": [
           500,
@@ -4704,9 +4694,16 @@
         "spinDegPerSec": 420
       },
       "effectSprite": {
+        "id": "rock-shard",
+        "fit": "circle",
+        "size": 1.6,
+        "rotate": "spin",
+        "spinDegPerSec": 540
+      },
+      "lingerSprite": {
         "id": "rock-rubble",
         "fit": "circle",
-        "size": 1.2,
+        "size": 1.1,
         "originY": 0.7
       },
       "linger": {

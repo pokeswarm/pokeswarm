@@ -2111,7 +2111,7 @@ export class RunScene extends Phaser.Scene {
         return this.effects.effectLineSprite(effect) ?? null;
       }
       // 効き方から出た円・飛ぶもの（ブラストバーンの火の粉・ハードプラントの根・10まんボルトの周りの電気）
-      if (pr.stage[i] === 1 && pr.band[i] === 0) return this.effects.effectSprite(effect) ?? null;
+      if (pr.stage[i] === 1 && pr.band[i] === 0) return (pr.linger[i] === 1 ? this.effects.lingerSprite(effect) : this.effects.effectSprite(effect)) ?? null;
       return null;
     });
     // ボスの範囲技が落ちた所の絵: 出てからの時間でコマを進め、最後の 3 割で薄くする

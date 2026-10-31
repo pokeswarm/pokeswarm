@@ -12345,11 +12345,11 @@
       "lobTarget": "random",
       "landOnly": true,
       "base": {
-        "power": 14.5,
+        "power": 6.5,
         "intervalSeconds": 0.12,
         "count": 2,
         "speed": 480,
-        "size": 18,
+        "size": 12,
         "range": 200,
         "durationSeconds": 0.9,
         "pierce": "infinite",
@@ -12365,26 +12365,27 @@
       "levels": [
         {
           "size": 2,
-          "power": 5.5
-        },
-        {
-          "count": 1,
-          "power": 1.3
-        },
-        {
-          "cooldownSeconds": -0.15,
           "power": 2.4
         },
         {
-          "size": 3,
-          "power": 3.3
+          "count": 1,
+          "power": 0.5
         },
         {
-          "count": 1
+          "cooldownSeconds": -0.15,
+          "power": 1.1
         },
         {
           "size": 3,
-          "power": 2.5
+          "power": 1.3
+        },
+        {
+          "count": 1,
+          "power": 0.1
+        },
+        {
+          "size": 3,
+          "power": 0.9
         },
         {
           "count": 1,
@@ -12395,7 +12396,7 @@
         {
           "trigger": "end",
           "puddle": {
-            "sizeMultiplier": 2,
+            "sizeMultiplier": 1.6,
             "powerMultiplier": 0.5,
             "durationSeconds": 3.5,
             "hitIntervalSeconds": 0.4
@@ -12457,13 +12458,21 @@
       "effects": [
         {
           "trigger": "hit",
-          "cluster": {
-            "sizeMultiplier": 0.9,
-            "powerMultiplier": 0.25,
+          "split": {
+            "sizeMultiplier": 0.5,
+            "powerMultiplier": 0.3,
             "count": 3,
-            "radius": 45,
-            "durationSeconds": 2.5,
-            "hitIntervalSeconds": 0.5
+            "speed": 300,
+            "durationSeconds": 0.5,
+            "jitter": 0.6,
+            "lob": true,
+            "pierce": "infinite",
+            "land": {
+              "sizeMultiplier": 1.8,
+              "powerMultiplier": 0.8,
+              "durationSeconds": 2.5,
+              "hitIntervalSeconds": 0.5
+            }
           }
         }
       ]

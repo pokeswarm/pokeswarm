@@ -29,9 +29,9 @@ describe('ステルスロック', () => {
     expect(pr.motion[1]).toBe(MOTION_LOB);
     const lifeTicks = Math.round(def.levels[0]!.durationSeconds * 30);
     for (let t = 0; t < lifeTicks + 2; t++) sim.step([]);
-    // 落ちた後、残る範囲（効き方から出たもの stage 1）が置かれる。半径は 18 × 2.0
+    // 落ちた後、残る範囲（効き方から出たもの stage 1）が置かれる。半径は 12 × 1.6
     let puddles = 0;
-    for (let i = 0; i < pr.count; i++) if (pr.stage[i] === 1 && pr.linger[i] === 1) { puddles++; expect(pr.radius[i]).toBeCloseTo(18 * 2, 5); }
+    for (let i = 0; i < pr.count; i++) if (pr.stage[i] === 1 && pr.linger[i] === 1) { puddles++; expect(pr.radius[i]).toBeCloseTo(12 * 1.6, 5); }
     expect(puddles).toBeGreaterThanOrEqual(1);
   });
 
@@ -43,7 +43,7 @@ describe('ステルスロック', () => {
 });
 
 describe('ロックブラスト', () => {
-  it('一番近い敵へ一定間隔で岩を撃ち、当たると周りに小さな破片の範囲が 3 つ残る', () => {
+  it('一番近い敵へ一定間隔で岩を撃ち、当たると鋭い破片が 3 つ飛び散り、落ちた所に範囲が残る', () => {
     const { rules, sim } = setup('onix', 'rock-blast', 'johto');
     const def = rules.moves[moveIndexOf(rules, 'rock-blast')]!;
     expect(def.pattern).toBe('nearest');
@@ -51,15 +51,20 @@ describe('ロックブラスト', () => {
     expect(def.levels[0]!.intervalSeconds).toBe(0.25);
     sim.step([{ type: 'spawnEnemy', id: 1, kind: 0, x: 120, y: 0 }]);
     const pr = sim.world.projectiles;
-    let shards = 0;
-    for (let t = 0; t < 30; t++) {
+    let flying = 0;
+    let landed = 0;
+    for (let t = 0; t < 45; t++) {
       sim.step([]);
-      shards = 0;
-      for (let i = 0; i < pr.count; i++) if (pr.stage[i] === 1 && pr.motion[i] === 0 && pr.vx[i] === 0 && pr.vy[i] === 0) shards++;
-      if (shards >= 3) break;
+      for (let i = 0; i < pr.count; i++) {
+        if (pr.stage[i] !== 1) continue;
+        if (pr.motion[i] === MOTION_LOB) flying = Math.max(flying, pr.fxIndex[i]!);
+        if (pr.linger[i] === 1) landed++;
+      }
+      if (landed >= 3) break;
     }
-    expect(shards).toBeGreaterThanOrEqual(3);
-    // 破片の範囲は当たった所から 45 の中
-    for (let i = 0; i < pr.count; i++) if (pr.stage[i] === 1 && pr.motion[i] === 0 && pr.vx[i] === 0 && pr.vy[i] === 0) expect(Math.hypot(pr.x[i]! - 120, pr.y[i]!)).toBeLessThanOrEqual(45 + 16);
+    // 飛び散る破片は効き方 0 から出たもの（fxIndex 1）。落ちた所に残る範囲が 3 つ（半径 15 × 0.5 × 1.8）
+    expect(flying).toBe(1);
+    expect(landed).toBeGreaterThanOrEqual(3);
+    for (let i = 0; i < pr.count; i++) if (pr.stage[i] === 1 && pr.linger[i] === 1) expect(pr.radius[i]).toBeCloseTo(15 * 0.5 * 1.8, 5);
   });
 });

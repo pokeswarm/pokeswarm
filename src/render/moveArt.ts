@@ -2636,21 +2636,21 @@ function rockSpire(): SpriteOut {
 }
 
 /**
- * ステルスロック: 地面に残る、尖った灰色の岩の群れ（横から見た姿。根元が絵の下の方 y = 17）。原作の空中に浮く尖った岩を、地面に突き立てた形。
- * 大きな岩を真ん中に、左右に小さな岩。左の面が明るい。ストーンエッジの岩柱（茶色）と同じ描き方で、色は灰色。
+ * ステルスロック: 地面に残る、尖った茶色い岩の群れ（横から見た姿。根元が絵の下の方 y = 12）。原作の空中に浮く尖った岩を、地面に突き立てた形。
+ * 大きな岩を真ん中に、左右に小さな岩。左の面が明るい。ストーンエッジの岩柱と同じ描き方で小さく（作者の指摘 2026年10月31日: 灰色 → 茶色、小さく）。
  * コマ 0 で地面から出かけ、1 で伸びきる（loopFrom 1）
  */
 function sharpRocks(): SpriteOut {
-  const W = 20;
-  const H = 20;
-  const gy = 17;
+  const W = 14;
+  const H = 14;
+  const gy = 12;
   // 0 輪郭・1 ひび・2 暗い面・3 岩・4 明るい面・5 光の当たるふち・6 土ぼこり
-  const palette = ['#161c22', '#263238', '#546e7a', '#78909c', '#a7b7c0', '#dce3e8', '#b8aa98'];
+  const palette = ['#24160e', '#3e2a1e', '#7a5238', '#a0704e', '#c4936a', '#e0b88e', '#c8ac8a'];
   // 岩: [根元の左, 根元の右, 先の x, 高さ, 稜線の根元の x]
   const rocks = [
-    [6, 14, 10.5, 15, 9.5],
-    [1, 7, 3.5, 8, 3],
-    [13, 19, 16.5, 9, 15.5],
+    [4, 10, 7, 10, 6.5],
+    [0.5, 5, 2.5, 5.5, 2],
+    [9, 13.5, 11.5, 6, 11],
   ] as const;
   const make = (grow: number): string[] => {
     const g = fill(blank(W, H), (x, y) => {
@@ -2668,8 +2668,8 @@ function sharpRocks(): SpriteOut {
         if (x < xm) return x < xl + 0.9 && t < 0.9 ? 5 : 4;
         return x > xr - 1.1 ? 2 : 3;
       }
-      const ex = (x - 10) / 10;
-      const ey = (y - gy - 0.5) / 1.6;
+      const ex = (x - 7) / 7;
+      const ey = (y - gy - 0.5) / 1.3;
       if (ex * ex + ey * ey <= 1 && hash(Math.floor(x), Math.floor(y), 1410) < 0.9) return 6;
       return -1;
     });
@@ -2678,8 +2678,22 @@ function sharpRocks(): SpriteOut {
   return { palette, frameMs: 70, loopFrom: 1, parts: { main: [make(0.5), make(1)] } };
 }
 
+/** ステルスロック・ロックブラスト: 飛ぶ鋭い茶色の岩のかけら（横に長いひし形。先が鋭い。上の面が明るい） */
+function rockShard(): SpriteOut {
+  // 0 輪郭・1 暗い面・2 岩・3 明るい面・4 稜線（上から見ると白っぽく見えたので、明るい色は稜線だけ）
+  const palette = ['#2b211b', '#4e342e', '#6d4c41', '#8d6e63', '#bcaaa4'];
+  const g = shape(16, (u, v) => {
+    const a = Math.atan2(v, u);
+    const d = Math.hypot(u, v);
+    const rr = 1 / (Math.abs(Math.cos(a)) / 0.97 + Math.abs(Math.sin(a)) / 0.34);
+    if (d > rr) return -1;
+    return Math.abs(v) < 0.05 ? 4 : v < 0 ? (u < 0 ? 2 : 3) : u < 0 ? 1 : 2;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
 /**
- * ロックブラスト: 岩が砕けて落ちた破片の山（横から見た姿。根元が絵の下の方）。茶色の岩のかけらが重なり、まわりに小石。
+ * ロックブラスト: 岩が砕けて落ちた破片の山（横から見た姿。根元が絵の下の方）。茶色の鋭いかけら（先の尖ったひし形）が重なり、まわりに小石（作者の指摘 2026年10月31日: もう少し鋭利に）。
  * コマ 0 で破片がはねて少し浮き、1 で落ち着く（loopFrom 1）
  */
 function rockRubble(): SpriteOut {
@@ -2690,10 +2704,10 @@ function rockRubble(): SpriteOut {
   const palette = ['#24160e', '#3e2a1e', '#6d4c41', '#8d6e63', '#bcaaa4', '#a1887f', '#c8ac8a'];
   // かけら: [中心 x, 中心の高さ（地面から）, 横半径, 縦半径, 傾き]
   const chunks = [
-    [10, 3.2, 4.2, 3.0, 0.2],
-    [4.5, 1.8, 3.0, 2.0, -0.5],
-    [15.5, 1.9, 3.2, 2.1, 0.6],
-    [9, 1.4, 2.6, 1.6, 0],
+    [10, 3.4, 4.6, 3.4, 0.35],
+    [4.5, 2.0, 3.4, 2.2, -0.7],
+    [15.5, 2.1, 3.6, 2.4, 0.8],
+    [9, 1.3, 2.8, 1.4, -0.2],
   ] as const;
   const make = (lift: number): string[] => {
     const g = fill(blank(W, H), (x, y) => {
@@ -2703,8 +2717,8 @@ function rockRubble(): SpriteOut {
         const dy = y - cy;
         const u = (dx * Math.cos(rot) - dy * Math.sin(rot)) / rx;
         const v = (dx * Math.sin(rot) + dy * Math.cos(rot)) / ry;
-        // 角のある形（ひし形と円の間）
-        const d = Math.max(Math.hypot(u, v), (Math.abs(u) + Math.abs(v)) * 0.8);
+        // 先の尖ったひし形（横に長く、上下の先が鋭い）
+        const d = Math.abs(u) + Math.abs(v) * 1.15;
         if (d > 1) continue;
         if (Math.abs(u * 0.7 - v + 0.15) < 0.09 && d < 0.75) return 1;
         const l = (-u - v) / Math.SQRT2;
@@ -3271,6 +3285,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'rock-spire': () => rockSpire(),
     'sharp-rocks': () => sharpRocks(),
     'rock-rubble': () => rockRubble(),
+    'rock-shard': () => rockShard(),
     'crack-line': () => crackLine(),
     'crack-head': () => crackHead(),
     'ice-statue': () => iceStatue(),

@@ -30,7 +30,7 @@ import { abilityPowerMultiplier, killStackPct, pinchMods } from '../ability';
 import { bumpRunStat } from '../runStats';
 import type { Modifiers } from '../upgrades';
 import { applyHitEffect } from './commands';
-import { fireDelayedExplosion, fireEffects, type FxSource } from './moveEffects';
+import { fireDelayedExplosion, fireEffects, fireLanding, type FxSource } from './moveEffects';
 import { healPlayer, hurtPlayer, selfDamage } from './health';
 import { activeField, hazardDamage } from './stage';
 import { breakOnDamage, damageTakenMultiplier } from './status';
@@ -1691,6 +1691,7 @@ function expire(world: World, i: number): void {
   const pr = world.projectiles;
   if (pr.stage[i] === 0 && !pr.noFx[i]) fireEffects(world, 'end', fxSourceOf(world, i, pr.x[i]!, pr.y[i]!));
   else if (pr.stage[i] === 2) fireDelayedExplosion(world, pr.fxIndex[i]!, fxSourceOf(world, i, pr.x[i]!, pr.y[i]!));
+  else if (pr.stage[i] === 1 && pr.fxIndex[i]! > 0) fireLanding(world, pr.fxIndex[i]!, fxSourceOf(world, i, pr.x[i]!, pr.y[i]!));
   pr.removeAt(i);
 }
 

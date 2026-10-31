@@ -969,6 +969,8 @@ export const moveEffectSchema = z.object({
       hitIntervalSeconds: z.number().positive(),
       alongSpacing: z.number().positive().optional(),
       path: z.boolean().optional(),
+      /** 持ち主に付いていく（ゴーストダイブ: 使った瞬間に自分の足元に残る影が、自分と一緒に動く。07 の148章） */
+      followOwner: z.boolean().optional(),
     })
     .optional(),
   /**

@@ -10281,7 +10281,8 @@
             "sizeMultiplier": 0.6,
             "powerMultiplier": 0.35,
             "durationSeconds": 1.4,
-            "hitIntervalSeconds": 0.35
+            "hitIntervalSeconds": 0.35,
+            "followOwner": true
           }
         }
       ],

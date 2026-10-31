@@ -110,6 +110,28 @@ describe('固有技の条件', () => {
     for (let i = 0; i < pr.count; i++) if (pr.stage[i] === 0 && pr.serial[i]! > first) later++;
     expect(later).toBe(1);
   });
+
+  it('ゴーストダイブ: 足元の影は自分に付いていく（作者の要望 2026年11月1日）', () => {
+    const t = setup('shuppet');
+    t.p.moves = [];
+    t.give('phantom-force', 1);
+    t.sim.step([{ type: 'spawnEnemy', id: 1, kind: 0, x: 150, y: 0 }]);
+    t.sim.step([]);
+    const pr = t.sim.world.projectiles;
+    let puddle = -1;
+    for (let i = 0; i < pr.count; i++) if (pr.stage[i] === 1 && pr.linger[i] === 1) puddle = i;
+    expect(puddle).not.toBe(-1);
+    const serial = pr.serial[puddle]!;
+    expect(pr.x[puddle]).toBeCloseTo(t.p.x);
+    expect(pr.y[puddle]).toBeCloseTo(t.p.y);
+    // 自分が動いても、影は足元にある
+    t.p.x += 40;
+    t.p.y -= 25;
+    t.sim.step([]);
+    for (let i = 0; i < pr.count; i++) if (pr.serial[i] === serial) puddle = i;
+    expect(pr.x[puddle]).toBeCloseTo(t.p.x);
+    expect(pr.y[puddle]).toBeCloseTo(t.p.y);
+  });
 });
 
 describe('特性の効き方', () => {

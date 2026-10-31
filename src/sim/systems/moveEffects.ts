@@ -215,6 +215,9 @@ function applyEffect(world: World, fx: MoveEffect, index: number, src: FxSource)
       pathPuddle(world, src, base);
     } else if (pd.alongSpacing && src.length > 0) {
       for (let d = 0; d <= src.length; d += pd.alongSpacing) spawn(world, src, { ...base, x: src.x + src.dirX * d, y: src.y + src.dirY * d });
+    } else if (pd.followOwner) {
+      // 持ち主に付いていく範囲（ゴーストダイブの足元の影）: 持ち主の位置から出す。ずれ（ox・oy）は 0
+      spawn(world, src, { ...base, motion: MOTION_FOLLOW, ox: 0, oy: 0 });
     } else {
       spawn(world, src, base);
     }

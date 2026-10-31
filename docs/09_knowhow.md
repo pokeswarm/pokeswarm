@@ -63,7 +63,7 @@
 
 - 技は「出し方（`pattern`）× 効き方（`effects`）× 見た目（レシピ）」の組み合わせ。新しい技は、まず既存の部品で作れないかを考える。
   - 出し方の例: facing・nearest・homing・melee・orbit・beam・stream・lob・strike・chain・bounce・scatter・cross・sweep・spiral・pulse・weather・barrage・screen・nova・eruption・spin・rest。
-  - 効き方の部品: explode・puddle（`path` で通った道）・split（`lob`・`snake`・`jitter`）・chain・orbit・spikes・cluster・crack・wave。起こるとき（trigger）は cast・hit・end・every・eachHit・spawn。
+  - 効き方の部品: explode・puddle（`path` で通った道、`followOwner` で持ち主に付いていく）・split（`lob`・`snake`・`jitter`）・chain・orbit・spikes・cluster・crack・wave。起こるとき（trigger）は cast・hit・end・every・eachHit・spawn。
   - 姿で変わる効き方は `forms`（しんそく: ウィンディなら炎）。
 - 派生（`derivations.json`）の形: 元の技（最大）＋ 持ち物 → 派生技。固有技は系統（`line`）付き。追加の条件は `minLevel`・`forms`・`withMoves`（ほかにも最大で持つ技。進化で消費）・`consumes`（持っていれば消費）・`inheritLevels`（材料の強化分を受け継ぐ）。
 - 消費した技は `consumedMoves` に入り、もう候補に出ない。

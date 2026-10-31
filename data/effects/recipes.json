@@ -4621,6 +4621,122 @@
         "fit": "front",
         "size": 1.1
       }
+    },
+    "stealth-rock": {
+      "extends": "rock.base",
+      "projectile": {
+        "glowScale": 1.2,
+        "coreScale": 0.6,
+        "glowColor": "#90a4ae"
+      },
+      "impact": {
+        "flash": {
+          "radius": 40,
+          "color": "#b0bec5"
+        },
+        "burst": {
+          "colors": [
+            "#eceff1",
+            "#90a4ae",
+            "#607d8b",
+            "#37474f"
+          ]
+        }
+      },
+      "sprite": {
+        "id": "stone",
+        "fit": "circle",
+        "size": 1.6,
+        "rotate": "spin",
+        "spinDegPerSec": 300
+      },
+      "effectSprite": {
+        "id": "sharp-rocks",
+        "fit": "circle",
+        "size": 1.1,
+        "originY": 0.8
+      },
+      "linger": {
+        "spread": 0,
+        "blend": "add",
+        "colors": [
+          "#eceff1",
+          "#90a4ae"
+        ],
+        "lifespanMs": [
+          500,
+          900
+        ],
+        "speed": [
+          2,
+          10
+        ],
+        "scale": [
+          0.3,
+          0
+        ],
+        "alpha": [
+          0.5,
+          0
+        ],
+        "gravityY": -12,
+        "perSecond": 3,
+        "fillAlpha": 0.22,
+        "maxPerSecond": 24
+      }
+    },
+    "rock-blast": {
+      "extends": "rock.base",
+      "projectile": {
+        "glowScale": 1.2,
+        "coreScale": 0.6
+      },
+      "impact": {
+        "flash": {
+          "radius": 45
+        }
+      },
+      "sprite": {
+        "id": "rock",
+        "fit": "circle",
+        "size": 1.5,
+        "rotate": "spin",
+        "spinDegPerSec": 420
+      },
+      "effectSprite": {
+        "id": "rock-rubble",
+        "fit": "circle",
+        "size": 1.2,
+        "originY": 0.7
+      },
+      "linger": {
+        "spread": 0,
+        "blend": "add",
+        "colors": [
+          "#efebe9",
+          "#a1887f"
+        ],
+        "lifespanMs": [
+          500,
+          900
+        ],
+        "speed": [
+          2,
+          10
+        ],
+        "scale": [
+          0.3,
+          0
+        ],
+        "alpha": [
+          0.5,
+          0
+        ],
+        "gravityY": -12,
+        "perSecond": 3,
+        "fillAlpha": 0.22,
+        "maxPerSecond": 24
+      }
     }
   }
 }

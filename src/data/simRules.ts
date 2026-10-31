@@ -47,8 +47,8 @@ export function buildSimRules(region?: string): SimRules {
       key,
       pattern: def.pattern,
       type: typeIndex(g.type),
-      // 原作で変化技（status）のものは、特殊の威力を使う
-      damageClass: g.damageClass === 'physical' ? 'physical' : 'special',
+      // 原作で変化技（status）のものは、特殊の威力を使う（技の定義で変えられる。ステルスロック）
+      damageClass: def.damageClass ?? (g.damageClass === 'physical' ? 'physical' : 'special'),
       levels: resolveMoveLevels(def, statusIndexOf),
       effect: def.effect,
       body: def.body ?? null,

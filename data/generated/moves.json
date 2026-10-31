@@ -1559,6 +1559,18 @@
     "type": "fighting",
     "damageClass": "physical"
   },
+  "rock-blast": {
+    "names": {
+      "ja": "ロックブラスト",
+      "en": "Rock Blast",
+      "fr": "Boule Roc",
+      "de": "Felswurf",
+      "es": "Pedrada",
+      "it": "Cadutamassi"
+    },
+    "type": "rock",
+    "damageClass": "physical"
+  },
   "rock-slide": {
     "names": {
       "ja": "いわなだれ",
@@ -1870,6 +1882,18 @@
     },
     "type": "electric",
     "damageClass": "physical"
+  },
+  "stealth-rock": {
+    "names": {
+      "ja": "ステルスロック",
+      "en": "Stealth Rock",
+      "fr": "Piège de Roc",
+      "de": "Tarnsteine",
+      "es": "Trampa Rocas",
+      "it": "Levitoroccia"
+    },
+    "type": "rock",
+    "damageClass": "status"
   },
   "steel-beam": {
     "names": {

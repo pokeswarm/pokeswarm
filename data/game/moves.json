@@ -12337,6 +12337,136 @@
       ],
       "region": "hoenn",
       "nameOf": "flamethrower"
+    },
+    "stealth-rock": {
+      "pattern": "lob",
+      "damageClass": "physical",
+      "effect": "stealth-rock",
+      "lobTarget": "random",
+      "landOnly": true,
+      "base": {
+        "power": 14.5,
+        "intervalSeconds": 0.12,
+        "count": 2,
+        "speed": 480,
+        "size": 18,
+        "range": 200,
+        "durationSeconds": 0.9,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 100,
+        "knockbackSeconds": 0.08,
+        "spreadDegrees": 0,
+        "cooldownSeconds": 1.6,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "size": 2,
+          "power": 5.5
+        },
+        {
+          "count": 1,
+          "power": 1.3
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 2.4
+        },
+        {
+          "size": 3,
+          "power": 3.3
+        },
+        {
+          "count": 1
+        },
+        {
+          "size": 3,
+          "power": 2.5
+        },
+        {
+          "count": 1,
+          "power": 0.1
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "end",
+          "puddle": {
+            "sizeMultiplier": 2,
+            "powerMultiplier": 0.5,
+            "durationSeconds": 3.5,
+            "hitIntervalSeconds": 0.4
+          }
+        }
+      ]
+    },
+    "rock-blast": {
+      "pattern": "nearest",
+      "effect": "rock-blast",
+      "base": {
+        "power": 49.3,
+        "intervalSeconds": 0.25,
+        "count": 3,
+        "speed": 420,
+        "size": 15,
+        "range": 420,
+        "durationSeconds": 1.4,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockback": 140,
+        "knockbackSeconds": 0.1,
+        "spreadDegrees": 0,
+        "cooldownSeconds": 1.6,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "size": 2,
+          "power": 11.2
+        },
+        {
+          "count": 1,
+          "power": -6.7
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 2.6
+        },
+        {
+          "size": 2,
+          "power": 7.7
+        },
+        {
+          "count": 1,
+          "power": -6.7
+        },
+        {
+          "size": 3,
+          "power": 6.1
+        },
+        {
+          "count": 1,
+          "power": -5.5
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "hit",
+          "cluster": {
+            "sizeMultiplier": 0.9,
+            "powerMultiplier": 0.25,
+            "count": 3,
+            "radius": 45,
+            "durationSeconds": 2.5,
+            "hitIntervalSeconds": 0.5
+          }
+        }
+      ]
     }
   }
 }

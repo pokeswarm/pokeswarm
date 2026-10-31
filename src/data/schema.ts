@@ -1045,6 +1045,8 @@ export type MoveEffect = z.infer<typeof moveEffectSchema>;
 
 export const moveDefSchema = z.object({
   pattern: z.enum(MOVE_PATTERNS),
+  /** 物理・特殊を原作の分類から変える（ステルスロック: 原作は変化技だが、岩を投げるので物理。07 の146章）。省略なら原作どおり（変化技は特殊） */
+  damageClass: z.enum(['physical', 'special']).optional(),
   /** 見た目のレシピ（data/effects/recipes.json のキー） */
   effect: z.string(),
   /** レベル1の性能 */

@@ -1647,7 +1647,9 @@
     "rollout": "rock",
     "sandstorm": "cloud",
     "twister": "whirl",
-    "rain-dance": "droplet"
+    "rain-dance": "droplet",
+    "stealth-rock": "spikes",
+    "rock-blast": "rock"
   },
   "items": {
     "x-attack": {

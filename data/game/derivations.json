@@ -25,7 +25,8 @@
     { "from": "dragon-tail", "item": "dragon-fang", "to": "dragon-rush" },
     { "from": "dragon-rage", "item": "dragon-fang", "to": "dragon-pulse" },
     { "from": "mach-punch", "item": "dire-hit", "to": "focus-punch" },
-    { "from": "sing", "item": "silk-scarf", "to": "hyper-voice" }
+    { "from": "sing", "item": "silk-scarf", "to": "hyper-voice" },
+    { "from": "stealth-rock", "item": "pp-max", "to": "rock-blast" }
   ],
   "unique": [
     { "from": "flamethrower", "item": "fire-stone", "to": "blast-burn", "line": "charmander" },

@@ -10226,7 +10226,7 @@
       "sequential": true,
       "effect": "phantom-force",
       "base": {
-        "power": 278.1,
+        "power": 208.6,
         "intervalSeconds": 0.5,
         "count": 4,
         "speed": 0,
@@ -10247,31 +10247,31 @@
       "levels": [
         {
           "size": 4,
-          "power": 30.9
+          "power": 23.1
         },
         {
           "count": 1,
-          "power": 7.1
+          "power": 5.4
         },
         {
           "cooldownSeconds": -0.2,
-          "power": 10
+          "power": 7.5
         },
         {
           "size": 4,
-          "power": 19.1
+          "power": 14.3
         },
         {
           "count": 1,
-          "power": 1.6
+          "power": 1.2
         },
         {
           "range": 40,
-          "power": 31.6
+          "power": 23.7
         },
         {
           "size": 6,
-          "power": 3.3
+          "power": 2.5
         }
       ],
       "effects": [

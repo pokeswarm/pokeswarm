@@ -2467,8 +2467,8 @@ function flameLeg(): SpriteOut {
 /**
  * ブレイズキック（作者の依頼 2026年10月31日）: 自分を含む前の長方形（fit front。横 32 = 向き、縦 48 = 横幅）。
  * 左寄り（x ≈ 10 が自分の位置）からバシャーモの脚が右へ蹴り出す: クリーム色の羽毛の太もも、赤い すね、灰色の足と 3 本の爪、すねを包む炎。
- * その先には、横に寝た円柱の衝撃波（真ん中が明るく、ふちほど暗い）が長方形の幅いっぱいに立ち、周りを炎が渦を巻く。
- * コマ 0 は脚を出し始めて衝撃波は短く、1 で脚が伸びきって衝撃波が広がり、2・3 で渦が回る
+ * 蹴った足先から炎が四方へ噴き出し、長方形の端まで放射する（作者の参考画像 2026年10月31日）。
+ * コマ 0 は脚を出し始めて炎は短く、1 で脚が伸びきって炎が広がり、2・3 で端まで届いてゆらめく
  */
 function blazeKickWave(): SpriteOut {
   const W = 32;
@@ -2478,10 +2478,8 @@ function blazeKickWave(): SpriteOut {
   const palette = ['#2e0a04', '#9a1c00', '#e64a19', '#ff9800', '#ffd740', '#fff3c4', '#f5e6b8', '#c9a96b', '#4a5568', '#8a97a8'];
   const frames = [0, 1, 2, 3].map((f) => {
     // 足先の x と、衝撃波の縦の広がり（コマで広がる）
-    const fx = f === 0 ? 15 : 19;
-    const spread = f === 0 ? 12 : f === 1 ? 20 : 24;
-    const tx0 = fx + 4;
-    const tx1 = 31;
+    const fx = f === 0 ? 13 : 16;
+    const grow = f === 0 ? 0.45 : f === 1 ? 0.8 : 1;
     const g = fill(blank(W, H), (x, y) => {
       const dy = y - cy;
       // 太もも（羽毛の楕円）
@@ -2499,25 +2497,28 @@ function blazeKickWave(): SpriteOut {
         if (Math.abs(dy) < flame) return Math.abs(dy) < flame * 0.7 ? 3 : 2;
       }
       if (x >= 4 && x < 10 && Math.abs(dy) < 1.6 + Math.sin(x * 1.7 + f * 2) * 0.8 && hash(Math.floor(x), Math.floor(y), 50 + f) > 0.3) return x < 6 ? 1 : 2;
-      // 衝撃波の円柱（横に寝ている。x が円柱を横切る向き）
-      if (x >= tx0 && x <= tx1 && Math.abs(dy) <= spread) {
-        const nx = ((x - (tx0 + tx1) / 2) / ((tx1 - tx0) / 2)) * 1.02;
-        if (Math.abs(nx) > 1) return -1;
-        // 端はちぎれる
-        const k = Math.abs(dy) / spread;
-        if (k > 0.82 && noise(x + f * 3, y, 1.6, 660 + f) < (k - 0.82) / 0.18) return -1;
-        const shade = Math.sqrt(Math.max(0, 1 - nx * nx));
-        // 周りを巻く炎の帯（斜めに走り、コマで回る）
-        const ph = dy / 5.5 - nx * 0.5 + f * 0.45;
-        const fr = ph - Math.floor(ph);
-        if (fr < 0.4) {
-          if (shade > 0.92 && Math.abs(fr - 0.2) < 0.07) return 5;
-          return shade > 0.55 ? 4 : 3;
-        }
-        return shade > 0.75 ? 3 : shade > 0.35 ? 2 : 1;
+      // 足先から放射する炎（作者の参考画像 2026年10月31日: 蹴った足先から炎が四方へ噴き出す）。
+      // 足先を中心にした極座標で、向きごとに長方形の端まで届く長さを求め、コマで伸びる。舌に分かれ、先ほど赤く、根元は黄
+      const ox = x - (fx + 1);
+      const oy = dy;
+      const rr = Math.hypot(ox, oy);
+      if (ox > -3 && rr > 0.5) {
+        const a = Math.atan2(oy, ox);
+        // この向きで長方形の端（右端 x = 31、上下端）に届く距離
+        const toRight = Math.cos(a) > 0.01 ? (31 - (fx + 1)) / Math.cos(a) : 1e9;
+        const toSide = Math.abs(Math.sin(a)) > 0.01 ? (cy - 0.5) / Math.abs(Math.sin(a)) : 1e9;
+        const edge = Math.min(toRight, toSide);
+        // 舌: 向きの波でふちを出し入れし、谷は途中で切れる
+        const wave = 0.84 + 0.16 * Math.sin(a * 7 + f * 1.3) * Math.sin(a * 3 - f * 0.8);
+        const reach = edge * grow * wave;
+        const k = rr / Math.max(1, reach);
+        if (k > 1) return -1;
+        if (k > 0.6 && Math.abs(Math.sin(a * 7 + f * 1.3)) < 0.1) return -1;
+        // 先はちぎれる
+        if (k > 0.75 && noise(x + f * 3, y - f * 2, 1.5, 660 + f) < (k - 0.75) / 0.25) return -1;
+        const heat = (1 - k) + (noise(x, y + f * 4, 2.5, 670 + f) - 0.5) * 0.3;
+        return heat > 0.85 ? 5 : heat > 0.62 ? 4 : heat > 0.4 ? 3 : heat > 0.2 ? 2 : 1;
       }
-      // 足先と衝撃波の間に散る火花
-      if (x >= fx + 2 && x < tx0 + 1 && hash(Math.floor(x), Math.floor(y), 70 + f) > 0.72 && Math.abs(dy) < spread * 0.6) return hash(Math.floor(x), Math.floor(y), 80 + f) > 0.5 ? 4 : 3;
       return -1;
     });
     return toRows(outline(g, 0));

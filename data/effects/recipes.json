@@ -4625,8 +4625,9 @@
     "stealth-rock": {
       "extends": "rock.base",
       "projectile": {
-        "glowScale": 1.2,
-        "coreScale": 0.6
+        "glowScale": 0.6,
+        "coreScale": 0.4,
+        "glowAlpha": 0.3
       },
       "impact": {
         "flash": {
@@ -4678,8 +4679,9 @@
     "rock-blast": {
       "extends": "rock.base",
       "projectile": {
-        "glowScale": 1.2,
-        "coreScale": 0.6
+        "glowScale": 0.8,
+        "coreScale": 0.5,
+        "glowAlpha": 0.4
       },
       "impact": {
         "flash": {

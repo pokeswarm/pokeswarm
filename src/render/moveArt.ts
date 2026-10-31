@@ -2681,11 +2681,11 @@ function sharpRocks(): SpriteOut {
 /** ステルスロック・ロックブラスト: 飛ぶ鋭い茶色の岩のかけら（横に長いひし形。先が鋭い。上の面が明るい） */
 function rockShard(): SpriteOut {
   // 0 輪郭・1 暗い面・2 岩・3 明るい面・4 稜線（上から見ると白っぽく見えたので、明るい色は稜線だけ）
-  const palette = ['#2b211b', '#4e342e', '#6d4c41', '#8d6e63', '#bcaaa4'];
+  const palette = ['#1f1510', '#3e2723', '#5d4037', '#795548', '#8d6e63'];
   const g = shape(16, (u, v) => {
     const a = Math.atan2(v, u);
     const d = Math.hypot(u, v);
-    const rr = 1 / (Math.abs(Math.cos(a)) / 0.97 + Math.abs(Math.sin(a)) / 0.34);
+    const rr = 1 / (Math.abs(Math.cos(a)) / 0.97 + Math.abs(Math.sin(a)) / 0.42);
     if (d > rr) return -1;
     return Math.abs(v) < 0.05 ? 4 : v < 0 ? (u < 0 ? 2 : 3) : u < 0 ? 1 : 2;
   });

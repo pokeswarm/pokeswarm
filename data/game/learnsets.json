@@ -13,6 +13,7 @@
       "slash",
       "dragon-breath",
       "metal-claw",
+      "aerial-ace",
       "flare-blitz",
       "fire-pledge",
       {
@@ -179,6 +180,7 @@
       "quick-attack",
       "swift",
       "slash",
+      "aerial-ace",
       {
         "move": "focus-punch",
         "forms": [
@@ -326,6 +328,7 @@
       "hyper-voice",
       "astonish",
       "air-cutter",
+      "aerial-ace",
       {
         "move": "dragon-rush",
         "forms": [
@@ -378,12 +381,12 @@
       "ember",
       "air-cutter",
       "dragon-pulse",
-      "aerial-ace",
       "outrage",
       "body-slam",
       "flamethrower",
       "dragon-breath",
       "hyper-voice",
+      "aerial-ace",
       "dragon-tail",
       {
         "move": "swift",
@@ -636,6 +639,12 @@
         ]
       },
       {
+        "move": "aerial-ace",
+        "forms": [
+          "togetic"
+        ]
+      },
+      {
         "move": "magical-leaf",
         "forms": [
           "togetic"
@@ -865,6 +874,12 @@
         ]
       },
       {
+        "move": "aerial-ace",
+        "forms": [
+          "dragonite"
+        ]
+      },
+      {
         "move": "air-slash",
         "forms": [
           "dragonite"
@@ -1042,7 +1057,8 @@
       "wing-attack",
       "whirlwind",
       "body-slam",
-      "air-cutter"
+      "air-cutter",
+      "aerial-ace"
     ],
     "meowth": [
       "tackle",
@@ -1082,6 +1098,7 @@
       "fury-cutter",
       "focus-punch",
       "arm-thrust",
+      "aerial-ace",
       "bulk-up"
     ],
     "swinub": [
@@ -1118,6 +1135,7 @@
       "quick-attack",
       "swift",
       "air-cutter",
+      "aerial-ace",
       "air-slash"
     ],
     "zubat": [
@@ -1129,6 +1147,7 @@
       "sludge-bomb",
       "astonish",
       "air-cutter",
+      "aerial-ace",
       "air-slash",
       {
         "move": "quick-attack",
@@ -1256,6 +1275,7 @@
       "slash",
       "fury-cutter",
       "air-cutter",
+      "aerial-ace",
       "air-slash",
       {
         "move": "metal-claw",
@@ -1294,6 +1314,7 @@
       "peck",
       "mirror-coat",
       "air-cutter",
+      "aerial-ace",
       "air-slash"
     ],
     "zapdos": [
@@ -1305,6 +1326,7 @@
       "thunderbolt",
       "thunder-wave",
       "air-cutter",
+      "aerial-ace",
       "wild-charge"
     ],
     "moltres": [
@@ -1318,6 +1340,7 @@
       "flamethrower",
       "fire-spin",
       "air-cutter",
+      "aerial-ace",
       "flare-blitz",
       "air-slash"
     ],
@@ -1363,6 +1386,7 @@
       "swift",
       "hyper-voice",
       "air-cutter",
+      "aerial-ace",
       "air-slash",
       "dragon-rush"
     ],
@@ -1377,6 +1401,7 @@
       "swift",
       "hyper-voice",
       "air-cutter",
+      "aerial-ace",
       "flare-blitz",
       "air-slash"
     ],

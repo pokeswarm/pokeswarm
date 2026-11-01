@@ -11601,7 +11601,7 @@
       "pattern": "sweep",
       "effect": "aqua-tail",
       "base": {
-        "power": 203.3,
+        "power": 180.7,
         "cooldownSeconds": 1.35,
         "count": 1,
         "intervalSeconds": 0.1,
@@ -11621,29 +11621,29 @@
       },
       "levels": [
         {
-          "power": 34.1
+          "power": 30.3
         },
         {
           "size": 6,
-          "power": 20.8
+          "power": 18.5
         },
         {
-          "power": 32.4
+          "power": 28.8
         },
         {
           "cooldownSeconds": -0.15,
-          "power": -3.4
+          "power": -3
         },
         {
           "spreadDegrees": 60,
-          "power": 0.6
+          "power": 0.5
         },
         {
-          "power": 26.3
+          "power": 23.4
         },
         {
           "size": 6,
-          "power": 9.5
+          "power": 8.4
         }
       ],
       "body": {

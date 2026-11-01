@@ -11,6 +11,8 @@ describe('技の強さのそろえ方（作者の決定。07 16.2）', () => {
   it('派生技は Lv1 でも元の技の最大より強く、固有技は派生技の最大より強い（総合の強さで比べる）', () => {
     for (const d of [...derivationsConfig.derivations, ...derivationsConfig.unique]) {
       if (exempt(d.to) || exempt(d.from)) continue;
+      // 一緒に出す技に分かれている固有技（マリルリのアクアテール: なぎ払い ＋ 叩きつけ）は、本体だけでは派生技より弱くてよい（作者の決定 2026年11月1日。07 の149章）
+      if (derivationsConfig.unique.includes(d) && movesConfig.moves[d.to]!.comboMoves) continue;
       const from = moveTotalRange(movesConfig.moves[d.from]!);
       const to = moveTotalRange(movesConfig.moves[d.to]!);
       expect(to.first, `${d.from} → ${d.to}`).toBeGreaterThan(from.max);

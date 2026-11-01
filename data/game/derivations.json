@@ -19,7 +19,7 @@
     { "from": "thunder-shock", "item": "magnet", "to": "thunderbolt" },
     { "from": "poison-sting", "item": "poison-barb", "to": "sludge-bomb" },
     { "from": "gust", "item": "sharp-beak", "to": "air-slash" },
-    { "from": "air-cutter", "item": "sharp-beak", "to": "aerial-ace" },
+    { "from": "air-cutter", "item": "razor-claw", "to": "aerial-ace" },
     { "from": "tackle", "item": "silk-scarf", "to": "body-slam" },
     { "from": "powder-snow", "item": "never-melt-ice", "to": "blizzard" },
     { "from": "aurora-beam", "item": "never-melt-ice", "to": "ice-beam" },

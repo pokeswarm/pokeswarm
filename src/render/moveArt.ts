@@ -2982,6 +2982,40 @@ function kick(): SpriteOut {
 }
 
 /**
+ * にどげり: 蹴りの当たった所ではじける衝撃（脚は描かない。作者の指摘 2026年11月1日）。白い芯から、細い放射の線が 8 本
+ * （長い・短いを交互に）はなれて飛び、間に小さな火花。コマ 0 は短く、コマ 1 で線が外へ伸びて芯が少し縮む
+ */
+function kickImpact(): SpriteOut {
+  // 0 輪郭・1 濃い橙・2 橙・3 黄・4 白
+  const palette = ['#2b1408', '#e65100', '#ff9800', '#fff176', '#ffffff'];
+  const frames = [0, 1].map((f) =>
+    shape(32, (u, v) => {
+      const r = Math.hypot(u, v);
+      if (r < 0.14 - f * 0.03) return 4;
+      if (r < 0.24 - f * 0.04) return 3;
+      // 放射の線: 8 本。芯からはなれて始まり、根元が太く先が細い。コマ 1 で外へ動く
+      for (let j = 0; j < 8; j++) {
+        const th = (j * Math.PI) / 4 + Math.PI / 8;
+        const along = u * Math.cos(th) + v * Math.sin(th);
+        const perp = Math.abs(-u * Math.sin(th) + v * Math.cos(th));
+        const long = j % 2 === 0;
+        const start = 0.3 + f * 0.22;
+        const end = (long ? 0.72 : 0.56) + f * 0.26;
+        if (along >= start && along <= end && perp < 0.035 + 0.05 * (1 - (along - start) / (end - start))) return along < start + 0.12 ? 3 : along < end - 0.14 ? 2 : 1;
+      }
+      // 火花: 線の間の小さな点（コマ 1 で外へ）
+      for (let j = 0; j < 8; j++) {
+        const th = (j * Math.PI) / 4;
+        const d = 0.5 + f * 0.3 + (j % 2) * 0.1;
+        if (Math.hypot(u - Math.cos(th) * d, v - Math.sin(th) * d) < 0.05) return 3;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/**
  * まわしげり: なぎ払う蹴りの残像（右へふくらむ大きな弧。先＝上ほど太く明るく、後ろ＝下ほど細く途切れる）と、
  * 弧の先ではじける衝撃の光
  */
@@ -3615,6 +3649,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'fist-thunder': () => punch('thunder'),
     kick: () => kick(),
     'kick-arc': () => kickArc(),
+    'kick-impact': () => kickImpact(),
     'kick-wave': () => kickWave('plain'),
     'kick-wave-fire': () => kickWave('fire'),
     'low-kick-leg': () => lowKickLeg('plain'),

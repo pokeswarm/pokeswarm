@@ -17,23 +17,28 @@ function setup(move: string, level = 1) {
 }
 
 describe('にどげり', () => {
-  it('前の形のまま: 向いている方へ短い蹴りを 2 連で飛ばす（作者 2026年11月1日「前の 2 連撃でよかった」）', () => {
+  it('前に円 2 個の当たり判定を順に置く（自分から range の 1/2 と 1 の所。持ち主に付いていく。脚の絵は無い）', () => {
     const t = setup('double-kick');
     const def = t.rules.moves[t.m]!;
     expect(def.pattern).toBe('barrage');
+    expect(def.barrageAhead).toBe(true);
     expect(def.levels[0]!.count).toBe(2);
-    expect(def.frontBox).toBeUndefined();
-    t.sim.world.enemies.add(1, 0, 30, 0, 1e6, 0, 10);
+    const range = def.levels[0]!.range;
+    t.sim.world.enemies.add(1, 0, range * 0.75, 0, 1e6, 0, 10);
     const hp0 = t.sim.world.enemies.hp[0]!;
-    let first = 0;
-    for (let k = 0; k < 3 && first === 0; k++) {
-      t.sim.step([]);
-      first = hp0 - t.sim.world.enemies.hp[0]!;
-    }
-    expect(first).toBeGreaterThan(0);
-    for (let k = 0; k < 15; k++) t.sim.step([]);
-    const lost = hp0 - t.sim.world.enemies.hp[0]!;
-    expect(lost).toBeCloseTo(first * 2, 0);
+    t.sim.step([]);
+    const first = t.find((i) => t.pr.move[i] === t.m);
+    expect(first).toHaveLength(1);
+    expect(t.pr.motion[first[0]!]).toBe(MOTION_FOLLOW);
+    expect(t.pr.x[first[0]!]).toBeCloseTo(range / 2, 0);
+    expect(t.pr.y[first[0]!]).toBeCloseTo(0, 0);
+    const dmg1 = hp0 - t.sim.world.enemies.hp[0]!;
+    expect(dmg1).toBeGreaterThan(0);
+    for (let k = 0; k < Math.round(def.levels[0]!.intervalSeconds * 30) + 1; k++) t.sim.step([]);
+    const all = t.find((i) => t.pr.move[i] === t.m);
+    expect(all.some((i) => Math.abs(t.pr.x[i]! - range) < 1)).toBe(true);
+    for (let k = 0; k < 12; k++) t.sim.step([]);
+    expect(hp0 - t.sim.world.enemies.hp[0]!).toBeCloseTo(dmg1 * 2, 0);
   });
 });
 

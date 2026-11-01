@@ -1180,6 +1180,11 @@ export const moveDefSchema = z.object({
   barrageWidth: z.number().positive().optional(),
   /** レベルが1上がるごとに広げる横幅（ばくれつパンチ: 強化で出る範囲が広がる） */
   barrageWidthPerLevel: z.number().nonnegative().optional(),
+  /**
+   * barrage（連打）を、向いている方向へ順に置く: k 発目（1〜count）を自分から range × k / count の所に置き、持ち主に付いていく
+   * （にどげり: 前に円 2 個の当たり判定。脚の絵は描かない。作者の指摘 2026年11月1日）。speed は使わない
+   */
+  barrageAhead: z.boolean().optional(),
   /** 向きを、使うたびにランダムに選ぶ（にどげり・まわしげり: 近くのランダムな向きへ。barrage・sweep で使う） */
   randomAim: z.boolean().optional(),
   /** 再使用を、出した技が消えてから数える（こなゆき・ふぶき: 雪が止んでから cooldown の間はダメージが起きない。作者の決定 2026年10月25日） */

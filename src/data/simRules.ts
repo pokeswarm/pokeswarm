@@ -106,6 +106,7 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.group ? { group: def.group } : {}),
       randomAim: def.randomAim,
       ...(def.barrageWidth ? { barrageWidth: def.barrageWidth, barrageWidthPerLevel: def.barrageWidthPerLevel ?? 0 } : {}),
+      ...(def.barrageAhead ? { barrageAhead: true } : {}),
       restAfterEnd: def.restAfterEnd,
       ...(def.snake ? { snake: def.snake } : {}),
       // いつも効く技: レベルごとの効果を、そのレベルまでの合計にしておく

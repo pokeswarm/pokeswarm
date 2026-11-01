@@ -2424,14 +2424,18 @@
     "double-kick": {
       "extends": "fighting.base",
       "projectile": {
-        "glowScale": 1.1,
+        "glowScale": 1.2,
         "coreScale": 0.3
       },
+      "impact": {
+        "flash": {
+          "radius": 20
+        }
+      },
       "sprite": {
-        "id": "kick",
+        "id": "kick-impact",
         "fit": "circle",
-        "size": 1.4,
-        "rotate": "velocity"
+        "size": 1.7
       }
     },
     "rolling-kick": {

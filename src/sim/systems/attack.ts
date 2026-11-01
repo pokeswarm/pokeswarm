@@ -622,6 +622,14 @@ function fireBarrageHit(world: World, p: Player, pm: PlayerMove, st: MoveStats):
     world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x - dy * off, y: p.y + dx * off, vx: dx * speed0, vy: dy * speed0, life: st.range / Math.max(1, speed0) });
     return;
   }
+  if (bdef.barrageAhead) {
+    // 前へ順に置く（にどげり）: k 発目を自分から range × k / count の所に。持ち主に付いていく
+    const shot = st.count - pm.burstLeft + 1;
+    const ox = Math.cos(center) * ((st.range * shot) / Math.max(1, st.count));
+    const oy = Math.sin(center) * ((st.range * shot) / Math.max(1, st.count));
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x + ox, y: p.y + oy, ox, oy, vx: Math.cos(center), vy: Math.sin(center) });
+    return;
+  }
   const a = center + (world.rng.next() - 0.5) * ((Math.min(360, st.arcDegrees) * Math.PI) / 180);
   const d = st.range * (0.3 + 0.7 * world.rng.next());
   const speed = speed0;

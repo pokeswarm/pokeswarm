@@ -7593,9 +7593,9 @@
         "cooldownSeconds": 0.9,
         "count": 2,
         "intervalSeconds": 0.12,
-        "speed": 200,
+        "speed": 0,
         "size": 18,
-        "range": 44,
+        "range": 64,
         "durationSeconds": 0.18,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -7605,7 +7605,7 @@
         "statusSeconds": 0,
         "spreadDegrees": 0,
         "lifestealPct": 0,
-        "arcDegrees": 40
+        "arcDegrees": 0
       },
       "levels": [
         {
@@ -7635,7 +7635,8 @@
           "count": 1,
           "power": -3
         }
-      ]
+      ],
+      "barrageAhead": true
     },
     "low-sweep": {
       "pattern": "sweep",

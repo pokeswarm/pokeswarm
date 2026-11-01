@@ -164,6 +164,8 @@ export interface SimMoveDef {
   /** 連打を長方形にするときの横幅（ばくれつパンチ） */
   readonly barrageWidth?: number;
   readonly barrageWidthPerLevel?: number;
+  /** 連打を向いている方向へ順に置く（にどげり） */
+  readonly barrageAhead?: boolean;
   /** 向きを使うたびにランダムに選ぶ（にどげり・まわしげり） */
   readonly randomAim?: boolean;
   /** 再使用を、出した技が消えてから数える（こなゆき・ふぶき） */

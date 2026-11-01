@@ -3344,6 +3344,225 @@ function tailSlam(): SpriteOut {
   return { palette, frameMs: 90, loopFrom: 1, parts: { main: frames } };
 }
 
+/**
+ * かくとうの技の描き方（作者の指摘 2026年11月1日。07 の151章）: 手足を大きくして範囲を表すのではなく、
+ * 手足はふつうの大きさで自分の近くに描き、その先に衝撃や気の演出を伸ばして範囲を見せる（ブレイズキックの絵と同じ考え）。
+ * 絵は fit front・along 0.45・size 1.1 で、自分の少し後ろ（−0.1）から届く距離の先（1.0）までの長方形に合わせる。
+ * x = 6 が自分の位置、x = 63 が長方形の先
+ */
+const LIMB_W = 64;
+const LIMB_H = 32;
+const LIMB_PX = 6;
+
+/** 肌の色（0 輪郭・1 影・2 肌・3 明るい所・4 靴底/バンド）。5〜8 は技ごとの飾り */
+const SKIN = ['#2b1408', '#c98a5e', '#f0bf93', '#ffe3c8', '#5d4037'];
+
+/** 足先の衝撃の弧: 中心 (ox, oy) から右へ、半径 step ごとの弧を reach まで。開きは ±spread。近い弧ほど明るい */
+function shockArcs(x: number, y: number, ox: number, oy: number, reach: number, step: number, spread: number, f: number): number {
+  const dx = x - ox;
+  const dy = y - oy;
+  if (dx < 0) return -1;
+  const r = Math.hypot(dx, dy);
+  if (r > reach || r < 1) return -1;
+  if (Math.abs(Math.atan2(dy, dx)) > spread) return -1;
+  const ph = (r + f * 1.5) / step;
+  const k = ph - Math.floor(ph);
+  if (k > 0.26) return -1;
+  // 弧の端ほどちぎれる
+  if (Math.abs(Math.atan2(dy, dx)) > spread * 0.7 && hash(Math.floor(x), Math.floor(y), 1900 + f) < 0.4) return -1;
+  const t = r / reach;
+  return t < 0.35 ? 8 : t < 0.7 ? 7 : k < 0.2 ? 6 : 5;
+}
+
+/**
+ * にどげり・インファイトの蹴り: ふつうの大きさの脚が自分から蹴り出し、足先から衝撃の弧が長方形の先まで広がる。
+ * 4 コマ: 1 発目（脚を伸ばす）→ 引く → 2 発目（少しずらして）→ 弧が先まで届いて薄れる。fire は炎をまとう（インファイト）
+ */
+function kickWave(kind: 'plain' | 'fire'): SpriteOut {
+  const palette = [...SKIN, ...(kind === 'fire' ? ['#bf360c', '#ff5722', '#ffb300', '#fff59d'] : ['#e65100', '#ff9800', '#ffd180', '#ffffff'])];
+  const cy = (LIMB_H - 1) / 2;
+  const frames = [0, 1, 2, 3].map((f) => {
+    const fx = f === 0 || f === 2 ? 24 : 16;
+    const legY = f >= 2 ? 3 : -2;
+    const grow = [0.45, 0.7, 1, 1][f]!;
+    const g = fill(blank(LIMB_W, LIMB_H), (x, y) => {
+      const dy = y - (cy + legY);
+      // 足: 先が丸く、靴底（前）は濃い色。足首で少し上へ曲がる
+      const foot = x >= fx - 1 && x <= fx + 5 && Math.abs(dy) < 3.2 - Math.max(0, x - fx - 3) * 0.9;
+      if (foot) return x > fx + 2 ? 4 : dy < -1 ? 3 : 2;
+      // 太もも（根元は太い）→ すね（細い）
+      if (x >= LIMB_PX - 2 && x < fx) {
+        const t = (x - LIMB_PX) / Math.max(1, fx - LIMB_PX);
+        const half = 3.4 - 1.2 * t;
+        if (Math.abs(dy) < half) {
+          // 炎をまとう（インファイト）: すねのふちがゆらめく
+          return dy < -half * 0.4 ? 3 : dy > half * 0.5 ? 1 : 2;
+        }
+        if (kind === 'fire') {
+          const flick = Math.sin(x * 1.1 + f * 2.4 + (dy > 0 ? 1.3 : 0)) * 0.6;
+          const flame = half + 1.6 + 1.4 * (1 - t) + flick;
+          if (Math.abs(dy) < flame) return Math.abs(dy) < flame * 0.75 ? 6 : 5;
+        }
+      }
+      // 足先からの衝撃の弧（先まで届く）
+      const c = shockArcs(x, y, fx + 5, cy + legY, (LIMB_W - 1 - fx - 5) * grow, 8, 0.7, f);
+      if (c >= 0) return f === 3 && hash(Math.floor(x), Math.floor(y), 1910) < 0.35 ? -1 : c;
+      // 自分の後ろの速さの線
+      if (x < LIMB_PX - 2 && x > LIMB_PX - 6 - (f % 2) * 2 && [-5, 0, 5].some((ly) => Math.abs(dy - ly) < 0.6)) return 7;
+      return -1;
+    });
+    return toRows(outline(g, 0));
+  });
+  return { palette, frameMs: 70, parts: { main: frames } };
+}
+
+/**
+ * ローキック・インファイトの薙ぎ払い: 上から見た、低く払う脚（fit front。なぎ払いの向きに回り、残像が弧を描く）。
+ * 腰（左）から ひざで少し曲がって足先（右）へ。足は横向きで、かかとと丸いつま先。足先に砂ぼこり。fire は炎をまとう
+ */
+function lowKickLeg(kind: 'plain' | 'fire'): SpriteOut {
+  const palette = [...SKIN, ...(kind === 'fire' ? ['#ff9800', '#ffd180'] : ['#d7ccc8', '#efebe9'])];
+  const r = rng(1935);
+  // 脚はふつうの大きさ（絵の左半分）。右半分は足先から前へ散る砂ぼこりで、届く距離を見せる
+  const puffs = Array.from({ length: 22 }, () => ({ u: 0.2 + r() * 0.8, v: -0.95 + r() * 0.9, s: 0.04 + r() * 0.08 }));
+  const frames = [0, 1].map((f) =>
+    shape(32, (u, v) => {
+      // 靴: 足首（0.44, 0.1）から上（画面の縦）へ伸びる靴底の厚い靴。かかとが後ろ（左下）に出て、つま先は丸い
+      const boot = inRoundRect(u, v, 0.18, -0.2, 0.1, 0.24, 0.07) || inRoundRect(u, v, 0.13, 0.0, 0.14, 0.08, 0.05);
+      if (boot) {
+        if (u < 0.11 && v < -0.26) return -1;
+        return u > 0.23 ? 4 : v < -0.34 ? 3 : 2;
+      }
+      // 脚（L 字）: 太もも（腰 −0.9, 0.55 → ひざ −0.15, 0.55）、すね（ひざ → 足首 0.44, 0.12）。太ももは太く、すねは細い
+      for (const [x0, y0, x1, y1, w0, w1] of [[-0.92, 0.42, -0.42, 0.42, 0.16, 0.13], [-0.42, 0.42, 0.08, 0.1, 0.12, 0.09]] as const) {
+        const dx = x1 - x0;
+        const dyy = y1 - y0;
+        const len = Math.hypot(dx, dyy);
+        const t = ((u - x0) * dx + (v - y0) * dyy) / (len * len);
+        if (t < 0 || t > 1) continue;
+        const side = (-(u - x0) * dyy + (v - y0) * dx) / len;
+        const w = w0 + (w1 - w0) * t;
+        if (Math.abs(side) < w) return side < -w * 0.4 ? 3 : side > w * 0.5 ? 1 : 2;
+        if (kind === 'fire' && Math.abs(side) < w + 0.08 + Math.max(0, Math.sin(t * 14 + f * 2.5)) * 0.1) return side < 0 ? 6 : 5;
+      }
+      // ひざの丸み
+      if (Math.hypot(u + 0.42, v - 0.42) < 0.15) return v < 0.38 ? 3 : 2;
+      // 足先から前へ広がる砂ぼこり（扇に散る玉。コマで少し動く）
+      for (const pf of puffs) {
+        const d = Math.hypot(u - pf.u - f * 0.03, v - pf.v + f * 0.02);
+        if (d < pf.s) return d < pf.s * 0.5 ? 6 : 5;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * きあいパンチ: ふつうの大きさのこぶし（手首に赤いバンド）が自分から突き出し、こぶしの先から橙の気の衝撃が長方形の先まで広がる
+ * （作者の指摘 2026年11月1日: 手を大きくせず、拳の先の演出で範囲を見せる）。4 コマで気が先へ伸びて、最後に薄れる
+ */
+function focusPunchWave(): SpriteOut {
+  // 5 濃い橙・6 橙・7 うすい橙・8 白
+  const palette = ['#2b1408', '#c98a5e', '#f0bf93', '#ffe3c8', '#e53935', '#e65100', '#ff9800', '#ffd180', '#fff8e1'];
+  const cy = (LIMB_H - 1) / 2;
+  const frames = [0, 1, 2, 3].map((f) => {
+    const fx = f === 0 ? 18 : 22;
+    const grow = [0.35, 0.7, 1, 1][f]!;
+    const g = fill(blank(LIMB_W, LIMB_H), (x, y) => {
+      const dy = y - cy;
+      // こぶし: 丸みのある四角（4 つの関節のでこぼこ）と前に巻いた親指
+      const knuckle = [-2.6, -0.9, 0.9, 2.6].some((ky) => Math.hypot(x - (fx + 6.5), dy - ky) < 1.2);
+      const body = (x >= fx && x <= fx + 6.5 && Math.abs(dy) < 3.4) || knuckle;
+      if (body) {
+        if (x > fx + 4 && [-1.8, 0, 1.8].some((ly) => Math.abs(dy - ly) < 0.35)) return 1;
+        return dy < -1.8 ? 3 : dy > 1.6 ? 1 : 2;
+      }
+      if (x >= fx + 1 && x <= fx + 4.5 && dy > 3 && dy < 4.6) return 1;
+      // 手首のバンドと腕
+      if (x >= fx - 3 && x < fx && Math.abs(dy) < 3.2) return dy > 1 ? 4 : 4;
+      if (x >= LIMB_PX - 2 && x < fx - 3 && Math.abs(dy) < 2.6) return dy < -1 ? 3 : dy > 1.2 ? 1 : 2;
+      // こぶしの先の気: 先へ行くほど広がる塊（芯は白、外へ橙）。その外に衝撃の弧
+      const x0 = fx + 8;
+      const end = x0 + (LIMB_W - 1 - x0) * grow;
+      if (x >= x0 && x <= end) {
+        const t = (x - x0) / Math.max(1, end - x0);
+        const half = 3 + 9 * Math.pow(t, 0.7) * grow;
+        const k = Math.abs(dy) / half;
+        if (k < 1) {
+          // 先の 2 割はちぎれる。コマで内側の筋が前へ流れる
+          if (t > 0.8 && hash(Math.floor(x), Math.floor(y), 1950 + f) < (t - 0.8) * 4) return -1;
+          const streak = ((x - f * 2 + 64) % 6) < 1.2 && k > 0.3 && k < 0.8;
+          if (f === 3 && hash(Math.floor(x), Math.floor(y), 1960) < 0.3) return -1;
+          return k < 0.3 ? 8 : streak ? 7 : k < 0.65 ? 7 : k < 0.85 ? 6 : 5;
+        }
+      }
+      const c = shockArcs(x, y, x0 - 2, cy, (LIMB_W - 1 - x0) * grow, 6, 0.95, f);
+      if (c >= 0 && Math.abs(dy) > 3) return c;
+      // 自分の後ろの速さの線
+      if (x < LIMB_PX - 2 && x > LIMB_PX - 7 - (f % 2) * 2 && [-6, 0, 6].some((ly) => Math.abs(dy - ly) < 0.6)) return 7;
+      return -1;
+    });
+    return toRows(outline(g, 0));
+  });
+  return { palette, frameMs: 65, loopFrom: 3, parts: { main: frames } };
+}
+
+/**
+ * ばかぢから: 両腕を振り上げて前の地面へ叩きつける（上から見た絵）。2 本の腕が自分から前へ伸び、並んだ 2 つのこぶしが地面を打つ。
+ * 打った所から地割れが走り、砂ぼこりが長方形の先と横へ広がる（4 コマ: 振りかぶり → 叩きつけ（白い光）→ 地割れと砂ぼこり → 広がって薄れる）
+ */
+function smashArms(): SpriteOut {
+  // 5 地割れ・6 砂ぼこり・7 砂ぼこりの明るい所・8 白い光
+  const palette = ['#2b1408', '#c98a5e', '#f0bf93', '#ffe3c8', '#e53935', '#3e2723', '#bcaaa4', '#efebe9', '#ffffff'];
+  const cy = (LIMB_H - 1) / 2;
+  const r = rng(1970);
+  // 地割れ: 打った所から 7 本、折れ線で外へ
+  const cracks = Array.from({ length: 7 }, (_, k) => ({ a: -1.1 + (k / 6) * 2.2 + (r() - 0.5) * 0.3, len: 14 + r() * 16, bend: (r() - 0.5) * 0.5 }));
+  const frames = [0, 1, 2, 3].map((f) => {
+    const fx = f === 0 ? 14 : 24;
+    const grow = [0, 0.3, 0.7, 1][f]!;
+    const g = fill(blank(LIMB_W, LIMB_H), (x, y) => {
+      const dy = y - cy;
+      // 2 つのこぶし（上下に並ぶ）と腕
+      for (const oy of [-5, 5]) {
+        const ky = dy - oy;
+        const knuckle = [-2, -0.5, 1, 2.5].some((kk) => Math.hypot(x - (fx + 5.5), ky - kk) < 1.1);
+        if ((x >= fx && x <= fx + 5.5 && Math.abs(ky) < 3) || knuckle) return ky < -1.4 ? 3 : ky > 1.4 ? 1 : 2;
+        if (x >= fx - 2.5 && x < fx && Math.abs(ky) < 2.8) return 4;
+        // 腕: 自分（真ん中）からこぶしへ斜めに
+        const t = (x - LIMB_PX) / Math.max(1, fx - 2.5 - LIMB_PX);
+        if (t >= 0 && t <= 1 && Math.abs(dy - oy * t) < 2.4) return dy - oy * t < -1 ? 3 : dy - oy * t > 1 ? 1 : 2;
+      }
+      if (f === 0) {
+        // 振りかぶり: こぶしの後ろに速さの線
+        if (x < LIMB_PX && x > LIMB_PX - 5 && [-7, 0, 7].some((ly) => Math.abs(dy - ly) < 0.6)) return 7;
+        return -1;
+      }
+      const ox = fx + 7;
+      const d = Math.hypot(x - ox, dy);
+      // 叩きつけの白い光
+      if (f === 1 && d < 7 + 3 * Math.abs(Math.cos(Math.atan2(dy, x - ox) * 4))) return d < 4 ? 8 : 7;
+      // 地割れ
+      if (f >= 2 && x >= ox - 2) {
+        for (const c of cracks) {
+          const along = (x - ox) * Math.cos(c.a) + dy * Math.sin(c.a);
+          if (along < 0 || along > c.len * grow) continue;
+          const side = -(x - ox) * Math.sin(c.a) + dy * Math.cos(c.a);
+          const zig = (Math.abs(((along / 4) % 2) - 1) - 0.5) * 1.6 + along * c.bend * 0.1;
+          if (Math.abs(side - zig) < 0.7) return 5;
+        }
+      }
+      // 砂ぼこり: 打った所から前と横へ広がる弧（外ほどちぎれる）
+      const c = shockArcs(x, y, ox, cy, (LIMB_W - 1 - ox) * grow, 8, 1.25, f);
+      if (c >= 0) return f === 3 && hash(Math.floor(x), Math.floor(y), 1980) < 0.4 ? -1 : c <= 6 ? 6 : 7;
+      return -1;
+    });
+    return toRows(outline(g, 0));
+  });
+  return { palette, frameMs: 70, loopFrom: 3, parts: { main: frames } };
+}
+
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
 /** 絵の名前 → 描く関数 */
@@ -3398,6 +3617,12 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'fist-thunder': () => punch('thunder'),
     kick: () => kick(),
     'kick-arc': () => kickArc(),
+    'kick-wave': () => kickWave('plain'),
+    'kick-wave-fire': () => kickWave('fire'),
+    'low-kick-leg': () => lowKickLeg('plain'),
+    'low-kick-leg-fire': () => lowKickLeg('fire'),
+    'focus-punch-wave': () => focusPunchWave(),
+    'smash-arms': () => smashArms(),
     'tail-swipe': () => tailSwipe(),
     'tail-iron': () => tailSwipe(['#1c2833', '#455a64', '#90a4ae', '#cfd8dc', '#ffffff', '#b0bec5', '#ffffff']),
     // つばさでうつ: 広げた白い翼（07 の117章）

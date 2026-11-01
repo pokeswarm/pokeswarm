@@ -2424,14 +2424,20 @@
     "double-kick": {
       "extends": "fighting.base",
       "projectile": {
-        "glowScale": 1.1,
-        "coreScale": 0.3
+        "glowScale": 1.05,
+        "coreScale": 0.2,
+        "shapeAlpha": 0.2
+      },
+      "impact": {
+        "flash": {
+          "radius": 24
+        }
       },
       "sprite": {
-        "id": "kick",
-        "fit": "circle",
-        "size": 1.4,
-        "rotate": "velocity"
+        "id": "kick-wave",
+        "fit": "front",
+        "size": 1.1,
+        "along": 0.45
       }
     },
     "rolling-kick": {
@@ -3150,8 +3156,9 @@
     "focus-punch": {
       "extends": "fighting.base",
       "projectile": {
-        "glowScale": 1.1,
-        "coreScale": 0.3
+        "glowScale": 1.05,
+        "coreScale": 0.2,
+        "shapeAlpha": 0.2
       },
       "impact": {
         "flash": {
@@ -3165,9 +3172,10 @@
         "alpha": 0.9
       },
       "sprite": {
-        "id": "fist-focus",
+        "id": "focus-punch-wave",
         "fit": "front",
-        "size": 1.1
+        "size": 1.1,
+        "along": 0.45
       }
     },
     "fire-punch": {
@@ -4036,15 +4044,21 @@
     },
     "low-sweep": {
       "extends": "fighting.base",
+      "projectile": {
+        "shapeAlpha": 0.2
+      },
       "impact": {
         "flash": {
           "radius": 36
         }
       },
       "sprite": {
-        "id": "kick-arc",
+        "id": "low-kick-leg",
         "fit": "front",
-        "size": 1
+        "size": 0.55,
+        "along": 0.28,
+        "afterimages": 3,
+        "afterimageGap": 1
       }
     },
     "close-combat": {
@@ -4241,9 +4255,12 @@
         "shapeAlpha": 0.2
       },
       "sprite": {
-        "id": "flame-leg",
+        "id": "low-kick-leg-fire",
         "fit": "front",
-        "size": 1
+        "size": 0.55,
+        "along": 0.28,
+        "afterimages": 3,
+        "afterimageGap": 1
       }
     },
     "close-combat-kick": {
@@ -4259,10 +4276,10 @@
         }
       },
       "sprite": {
-        "id": "flame-leg",
-        "fit": "thrust",
-        "size": 1,
-        "growSeconds": 0.08
+        "id": "kick-wave-fire",
+        "fit": "front",
+        "size": 1.1,
+        "along": 0.45
       }
     },
     "arm-thrust": {
@@ -4296,15 +4313,32 @@
     },
     "superpower": {
       "extends": "fighting.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.2,
+        "shapeAlpha": 0.2
+      },
+      "chargeGlow": {
+        "color": "#ff7043",
+        "seconds": 0.3,
+        "radius": 60,
+        "alpha": 1
+      },
       "impact": {
         "flash": {
-          "radius": 70
+          "radius": 60
         }
       },
       "sprite": {
-        "id": "fist-focus",
+        "id": "smash-arms",
         "fit": "front",
-        "size": 1.3
+        "size": 0.9,
+        "along": 0.35
+      },
+      "effectRingSprite": {
+        "id": "dust-ring",
+        "fit": "ring",
+        "size": 1
       }
     },
     "fake-out": {

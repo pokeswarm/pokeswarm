@@ -3,6 +3,7 @@
     "charmander": [
       "ember",
       "scratch",
+      "fire-fang",
       "swift",
       "blast-burn",
       "body-slam",
@@ -13,13 +14,37 @@
       "dragon-breath",
       "metal-claw",
       "flare-blitz",
-      "fire-fang",
       "fire-pledge",
-      "wing-attack",
-      "counter",
-      "blaze-kick",
-      "air-cutter",
-      "air-slash"
+      {
+        "move": "wing-attack",
+        "forms": [
+          "charizard"
+        ]
+      },
+      {
+        "move": "counter",
+        "forms": [
+          "charizard"
+        ]
+      },
+      {
+        "move": "blaze-kick",
+        "forms": [
+          "charizard"
+        ]
+      },
+      {
+        "move": "air-cutter",
+        "forms": [
+          "charizard"
+        ]
+      },
+      {
+        "move": "air-slash",
+        "forms": [
+          "charizard"
+        ]
+      }
     ],
     "bulbasaur": [
       "leech-seed",
@@ -35,7 +60,12 @@
       "seed-bomb",
       "leaf-storm",
       "grass-pledge",
-      "sludge-wave"
+      {
+        "move": "sludge-wave",
+        "forms": [
+          "venusaur"
+        ]
+      }
     ],
     "squirtle": [
       "water-gun",
@@ -48,12 +78,28 @@
       "bubble-beam",
       "water-pledge",
       "wave-crash",
-      "fake-out",
-      "yawn",
-      "water-spout"
+      {
+        "move": "fake-out",
+        "forms": [
+          "blastoise"
+        ]
+      },
+      {
+        "move": "yawn",
+        "forms": [
+          "blastoise"
+        ]
+      },
+      {
+        "move": "water-spout",
+        "forms": [
+          "blastoise"
+        ]
+      }
     ],
     "cyndaquil": [
       "ember",
+      "fire-fang",
       "tackle",
       "flame-wheel",
       "eruption",
@@ -63,17 +109,16 @@
       "quick-attack",
       "swift",
       "flare-blitz",
-      "fire-fang",
       "fire-pledge"
     ],
     "chikorita": [
       "sleep-powder",
+      "leech-seed",
       "vine-whip",
       "tackle",
       "synthesis",
       "solar-beam",
       "body-slam",
-      "leech-seed",
       "razor-leaf",
       "magical-leaf",
       "seed-bomb",
@@ -95,6 +140,7 @@
     "treecko": [
       "leafage",
       "scratch",
+      "leech-seed",
       "grass-pledge",
       "leaf-storm",
       "leaf-blade",
@@ -105,8 +151,13 @@
       "swift",
       "magical-leaf",
       "seed-bomb",
-      "fury-cutter",
-      "leech-seed"
+      {
+        "move": "fury-cutter",
+        "forms": [
+          "grovyle",
+          "sceptile"
+        ]
+      }
     ],
     "torchic": [
       "double-kick",
@@ -128,10 +179,17 @@
       "quick-attack",
       "swift",
       "slash",
-      "focus-punch"
+      {
+        "move": "focus-punch",
+        "forms": [
+          "combusken",
+          "blaziken"
+        ]
+      }
     ],
     "mudkip": [
       "water-gun",
+      "rock-throw",
       "magnitude",
       "tackle",
       "mud-slap",
@@ -142,12 +200,28 @@
       "mud-shot",
       "body-slam",
       "hydro-pump",
-      "rock-throw",
       "rock-slide",
       "whirlpool",
-      "earthquake",
-      "sand-tomb",
-      "yawn"
+      {
+        "move": "earthquake",
+        "forms": [
+          "marshtomp",
+          "swampert"
+        ]
+      },
+      {
+        "move": "sand-tomb",
+        "forms": [
+          "marshtomp",
+          "swampert"
+        ]
+      },
+      {
+        "move": "yawn",
+        "forms": [
+          "swampert"
+        ]
+      }
     ],
     "makuhita": [
       "arm-thrust",
@@ -176,8 +250,18 @@
       "thunder-wave",
       "swift",
       "wild-charge",
-      "hyper-voice",
-      "fire-fang"
+      {
+        "move": "hyper-voice",
+        "forms": [
+          "manectric"
+        ]
+      },
+      {
+        "move": "fire-fang",
+        "forms": [
+          "manectric"
+        ]
+      }
     ],
     "numel": [
       "ember",
@@ -193,7 +277,12 @@
       "mud-slap",
       "yawn",
       "flare-blitz",
-      "rock-slide"
+      {
+        "move": "rock-slide",
+        "forms": [
+          "camerupt"
+        ]
+      }
     ],
     "slakoth": [
       "scratch",
@@ -204,9 +293,26 @@
       "body-slam",
       "counter",
       "slack-off",
-      "focus-punch",
-      "hyper-voice",
-      "sucker-punch"
+      {
+        "move": "focus-punch",
+        "forms": [
+          "vigoroth",
+          "slaking"
+        ]
+      },
+      {
+        "move": "hyper-voice",
+        "forms": [
+          "vigoroth",
+          "slaking"
+        ]
+      },
+      {
+        "move": "sucker-punch",
+        "forms": [
+          "slaking"
+        ]
+      }
     ],
     "swablu": [
       "peck",
@@ -220,7 +326,12 @@
       "hyper-voice",
       "astonish",
       "air-cutter",
-      "dragon-rush"
+      {
+        "move": "dragon-rush",
+        "forms": [
+          "altaria"
+        ]
+      }
     ],
     "absol": [
       "sucker-punch",
@@ -255,7 +366,12 @@
       "ice-beam",
       "blizzard",
       "whirlpool",
-      "hydro-pump"
+      {
+        "move": "hydro-pump",
+        "forms": [
+          "walrein"
+        ]
+      }
     ],
     "bagon": [
       "dragon-rage",
@@ -269,9 +385,24 @@
       "dragon-breath",
       "hyper-voice",
       "dragon-tail",
-      "swift",
-      "air-slash",
-      "fire-fang"
+      {
+        "move": "swift",
+        "forms": [
+          "salamence"
+        ]
+      },
+      {
+        "move": "air-slash",
+        "forms": [
+          "salamence"
+        ]
+      },
+      {
+        "move": "fire-fang",
+        "forms": [
+          "salamence"
+        ]
+      }
     ],
     "feebas": [
       "water-gun",
@@ -282,28 +413,55 @@
       "scald",
       "swift",
       "whirlpool",
-      "body-slam",
-      "hydro-pump",
-      "dragon-tail"
+      {
+        "move": "body-slam",
+        "forms": [
+          "milotic"
+        ]
+      },
+      {
+        "move": "hydro-pump",
+        "forms": [
+          "milotic"
+        ]
+      },
+      {
+        "move": "dragon-tail",
+        "forms": [
+          "milotic"
+        ]
+      }
     ],
     "beldum": [
       "metal-claw",
+      "tackle",
       "confusion",
       "iron-head",
       "psychic",
       "meteor-mash",
-      "tackle",
-      "body-slam",
-      "swift"
+      {
+        "move": "body-slam",
+        "forms": [
+          "metang",
+          "metagross"
+        ]
+      },
+      {
+        "move": "swift",
+        "forms": [
+          "metang",
+          "metagross"
+        ]
+      }
     ],
     "ralts": [
       "confusion",
+      "sing",
       "night-shade",
       "psychic",
       "shadow-ball",
       "future-sight-gardevoir",
       "body-slam",
-      "sing",
       "psybeam",
       "swift",
       "hyper-voice",
@@ -312,6 +470,7 @@
     "trapinch": [
       "sand-tomb",
       "magnitude",
+      "dragon-tail",
       "dragon-breath",
       "earth-power",
       "dragon-claw",
@@ -321,26 +480,50 @@
       "rock-slide",
       "mud-slap",
       "astonish",
-      "swift",
-      "dragon-pulse",
-      "dragon-rush",
-      "dragon-tail"
+      {
+        "move": "swift",
+        "forms": [
+          "vibrava",
+          "flygon"
+        ]
+      },
+      {
+        "move": "dragon-pulse",
+        "forms": [
+          "vibrava",
+          "flygon"
+        ]
+      },
+      {
+        "move": "dragon-rush",
+        "forms": [
+          "vibrava",
+          "flygon"
+        ]
+      }
     ],
     "aron": [
       "metal-claw",
       "tackle",
+      "stealth-rock",
       "rock-throw",
       "iron-head",
       "rock-slide",
       "metal-burst",
       "body-slam",
       "mud-slap",
-      "stealth-rock",
-      "rock-blast"
+      {
+        "move": "rock-blast",
+        "forms": [
+          "lairon",
+          "aggron"
+        ]
+      }
     ],
     "azurill": [
       "bubble",
       "water-gun",
+      "sing",
       "tackle",
       "bubble-beam",
       "body-slam",
@@ -348,8 +531,13 @@
       "swift",
       "whirlpool",
       "hyper-voice",
-      "hydro-pump",
-      "sing"
+      {
+        "move": "hydro-pump",
+        "forms": [
+          "marill",
+          "azumarill"
+        ]
+      }
     ],
     "wynaut": [
       "mirror-coat",
@@ -369,8 +557,18 @@
       "earthquake",
       "swift",
       "whirlpool",
-      "body-slam",
-      "sand-tomb"
+      {
+        "move": "body-slam",
+        "forms": [
+          "whiscash"
+        ]
+      },
+      {
+        "move": "sand-tomb",
+        "forms": [
+          "whiscash"
+        ]
+      }
     ],
     "mawile": [
       "metal-claw",
@@ -384,20 +582,32 @@
     ],
     "pichu": [
       "thunder-shock",
+      "spark",
       "quick-attack",
       "swift",
       "body-slam",
       "thunderbolt",
       "thunder-wave",
-      "spark",
       "wild-charge",
-      "double-kick",
-      "fake-out"
+      {
+        "move": "double-kick",
+        "forms": [
+          "pikachu",
+          "raichu"
+        ]
+      },
+      {
+        "move": "fake-out",
+        "forms": [
+          "pikachu",
+          "raichu"
+        ]
+      }
     ],
     "cleffa": [
       "pound",
-      "sing",
       "tackle",
+      "sing",
       "body-slam",
       "psychic",
       "swift",
@@ -413,20 +623,36 @@
     ],
     "togepi": [
       "metronome-baby",
-      "pound",
       "tackle",
+      "pound",
       "body-slam",
       "swift",
       "yawn",
       "hyper-voice",
-      "air-cutter",
-      "magical-leaf",
-      "air-slash"
+      {
+        "move": "air-cutter",
+        "forms": [
+          "togetic"
+        ]
+      },
+      {
+        "move": "magical-leaf",
+        "forms": [
+          "togetic"
+        ]
+      },
+      {
+        "move": "air-slash",
+        "forms": [
+          "togetic"
+        ]
+      }
     ],
     "onix": [
       "rock-throw",
       "magnitude",
       "tackle",
+      "stealth-rock",
       "stone-edge",
       "body-slam",
       "earthquake",
@@ -435,8 +661,12 @@
       "dragon-breath",
       "sand-tomb",
       "rock-blast",
-      "stealth-rock",
-      "fire-fang"
+      {
+        "move": "fire-fang",
+        "forms": [
+          "steelix"
+        ]
+      }
     ],
     "staryu": [
       "bubble",
@@ -467,6 +697,7 @@
     ],
     "oddish": [
       "vine-whip",
+      "leech-seed",
       "poison-sting",
       "petal-dance",
       "razor-leaf",
@@ -475,9 +706,18 @@
       "magical-leaf",
       "seed-bomb",
       "leaf-storm",
-      "body-slam",
-      "leech-seed",
-      "sludge-wave"
+      {
+        "move": "body-slam",
+        "forms": [
+          "vileplume"
+        ]
+      },
+      {
+        "move": "sludge-wave",
+        "forms": [
+          "vileplume"
+        ]
+      }
     ],
     "koffing": [
       "smog",
@@ -487,7 +727,12 @@
       "body-slam",
       "sludge-bomb",
       "sludge-wave",
-      "psybeam"
+      {
+        "move": "psybeam",
+        "forms": [
+          "weezing"
+        ]
+      }
     ],
     "abra": [
       "confusion",
@@ -495,8 +740,20 @@
       "future-sight-alakazam",
       "body-slam",
       "psychic",
-      "psybeam",
-      "night-shade"
+      {
+        "move": "psybeam",
+        "forms": [
+          "kadabra",
+          "alakazam"
+        ]
+      },
+      {
+        "move": "night-shade",
+        "forms": [
+          "kadabra",
+          "alakazam"
+        ]
+      }
     ],
     "growlithe": [
       "fire-fang",
@@ -508,7 +765,12 @@
       "fire-spin",
       "swift",
       "flare-blitz",
-      "hyper-voice"
+      {
+        "move": "hyper-voice",
+        "forms": [
+          "arcanine"
+        ]
+      }
     ],
     "rhyhorn": [
       "magnitude",
@@ -522,7 +784,12 @@
       "rock-slide",
       "mud-slap",
       "rock-blast",
-      "counter"
+      {
+        "move": "counter",
+        "forms": [
+          "rhydon"
+        ]
+      }
     ],
     "lapras": [
       "powder-snow",
@@ -543,8 +810,8 @@
     ],
     "machop": [
       "mach-punch",
-      "dynamic-punch",
       "tackle",
+      "dynamic-punch",
       "body-slam",
       "counter",
       "focus-punch",
@@ -552,17 +819,22 @@
     ],
     "gastly": [
       "night-shade",
+      "smog",
       "poison-sting",
       "lick",
       "hex",
-      "smog",
       "sludge-bomb",
       "shadow-ball",
       "astonish",
       "sucker-punch",
       "dark-pulse",
       "sludge-wave",
-      "body-slam"
+      {
+        "move": "body-slam",
+        "forms": [
+          "gengar"
+        ]
+      }
     ],
     "dratini": [
       "dragon-tail",
@@ -574,10 +846,30 @@
       "dragon-breath",
       "dragon-pulse",
       "dragon-rush",
-      "wing-attack",
-      "whirlwind",
-      "air-cutter",
-      "air-slash"
+      {
+        "move": "wing-attack",
+        "forms": [
+          "dragonite"
+        ]
+      },
+      {
+        "move": "whirlwind",
+        "forms": [
+          "dragonite"
+        ]
+      },
+      {
+        "move": "air-cutter",
+        "forms": [
+          "dragonite"
+        ]
+      },
+      {
+        "move": "air-slash",
+        "forms": [
+          "dragonite"
+        ]
+      }
     ],
     "psyduck": [
       "confusion",
@@ -627,6 +919,7 @@
     "eevee": [
       "tackle",
       "ember",
+      "fire-fang",
       "water-gun",
       "bubble",
       "confusion",
@@ -637,23 +930,109 @@
       "double-kick",
       "body-slam",
       "hyper-voice",
-      "hydro-pump",
-      "bubble-beam",
-      "aurora-beam",
-      "whirlpool",
-      "yawn",
-      "thunderbolt",
-      "thunder-wave",
-      "wild-charge",
-      "flamethrower",
-      "fire-spin",
-      "smog",
-      "flare-blitz",
-      "fire-fang",
-      "psybeam",
-      "psychic",
-      "sucker-punch",
-      "dark-pulse"
+      {
+        "move": "hydro-pump",
+        "forms": [
+          "vaporeon"
+        ]
+      },
+      {
+        "move": "bubble-beam",
+        "forms": [
+          "vaporeon"
+        ]
+      },
+      {
+        "move": "aurora-beam",
+        "forms": [
+          "vaporeon"
+        ]
+      },
+      {
+        "move": "whirlpool",
+        "forms": [
+          "vaporeon"
+        ]
+      },
+      {
+        "move": "yawn",
+        "forms": [
+          "vaporeon",
+          "jolteon",
+          "flareon",
+          "espeon",
+          "umbreon"
+        ]
+      },
+      {
+        "move": "thunderbolt",
+        "forms": [
+          "jolteon"
+        ]
+      },
+      {
+        "move": "thunder-wave",
+        "forms": [
+          "jolteon",
+          "espeon",
+          "umbreon"
+        ]
+      },
+      {
+        "move": "wild-charge",
+        "forms": [
+          "jolteon"
+        ]
+      },
+      {
+        "move": "flamethrower",
+        "forms": [
+          "flareon"
+        ]
+      },
+      {
+        "move": "fire-spin",
+        "forms": [
+          "flareon"
+        ]
+      },
+      {
+        "move": "smog",
+        "forms": [
+          "flareon"
+        ]
+      },
+      {
+        "move": "flare-blitz",
+        "forms": [
+          "flareon"
+        ]
+      },
+      {
+        "move": "psybeam",
+        "forms": [
+          "espeon"
+        ]
+      },
+      {
+        "move": "psychic",
+        "forms": [
+          "espeon",
+          "umbreon"
+        ]
+      },
+      {
+        "move": "sucker-punch",
+        "forms": [
+          "umbreon"
+        ]
+      },
+      {
+        "move": "dark-pulse",
+        "forms": [
+          "umbreon"
+        ]
+      }
     ],
     "doduo": [
       "swift",
@@ -668,11 +1047,11 @@
     "meowth": [
       "tackle",
       "scratch",
+      "sing",
       "quick-attack",
       "swift",
       "pay-day",
       "body-slam",
-      "sing",
       "slash",
       "fake-out",
       "hyper-voice"
@@ -686,7 +1065,12 @@
       "thunderbolt",
       "swift",
       "wild-charge",
-      "dragon-pulse"
+      {
+        "move": "dragon-pulse",
+        "forms": [
+          "ampharos"
+        ]
+      }
     ],
     "heracross": [
       "horn-attack",
@@ -712,8 +1096,18 @@
       "earthquake",
       "mud-slap",
       "sand-tomb",
-      "horn-attack",
-      "peck"
+      {
+        "move": "horn-attack",
+        "forms": [
+          "piloswine"
+        ]
+      },
+      {
+        "move": "peck",
+        "forms": [
+          "piloswine"
+        ]
+      }
     ],
     "pidgey": [
       "whirlwind",
@@ -727,8 +1121,8 @@
       "air-slash"
     ],
     "zubat": [
-      "cross-poison",
       "gust",
+      "cross-poison",
       "wing-attack",
       "whirlwind",
       "swift",
@@ -736,7 +1130,13 @@
       "astonish",
       "air-cutter",
       "air-slash",
-      "quick-attack"
+      {
+        "move": "quick-attack",
+        "forms": [
+          "golbat",
+          "crobat"
+        ]
+      }
     ],
     "miltank": [
       "rollout",
@@ -747,6 +1147,7 @@
       "rock-throw",
       "magnitude",
       "tackle",
+      "stealth-rock",
       "body-slam",
       "earthquake",
       "rock-slide",
@@ -754,8 +1155,12 @@
       "sand-tomb",
       "rock-blast",
       "dark-pulse",
-      "stealth-rock",
-      "fire-fang"
+      {
+        "move": "fire-fang",
+        "forms": [
+          "tyranitar"
+        ]
+      }
     ],
     "horsea": [
       "water-gun",
@@ -766,9 +1171,24 @@
       "dragon-breath",
       "whirlpool",
       "dragon-pulse",
-      "body-slam",
-      "yawn",
-      "wave-crash"
+      {
+        "move": "body-slam",
+        "forms": [
+          "kingdra"
+        ]
+      },
+      {
+        "move": "yawn",
+        "forms": [
+          "kingdra"
+        ]
+      },
+      {
+        "move": "wave-crash",
+        "forms": [
+          "kingdra"
+        ]
+      }
     ],
     "poliwag": [
       "bubble",
@@ -780,12 +1200,30 @@
       "swift",
       "whirlpool",
       "focus-punch",
-      "counter",
-      "bulk-up",
-      "hyper-voice"
+      {
+        "move": "counter",
+        "forms": [
+          "poliwhirl",
+          "poliwrath",
+          "politoed"
+        ]
+      },
+      {
+        "move": "bulk-up",
+        "forms": [
+          "poliwrath"
+        ]
+      },
+      {
+        "move": "hyper-voice",
+        "forms": [
+          "politoed"
+        ]
+      }
     ],
     "houndour": [
       "ember",
+      "fire-fang",
       "dark-pulse",
       "snarl",
       "body-slam",
@@ -795,17 +1233,16 @@
       "swift",
       "hyper-voice",
       "sucker-punch",
-      "flare-blitz",
-      "fire-fang"
+      "flare-blitz"
     ],
     "porygon": [
       "swift",
       "sharpen",
       "conversion",
+      "thunder-shock",
       "tri-attack",
       "tackle",
       "psybeam",
-      "thunder-shock",
       "thunderbolt",
       "thunder-wave",
       "spark"
@@ -820,7 +1257,12 @@
       "fury-cutter",
       "air-cutter",
       "air-slash",
-      "metal-claw"
+      {
+        "move": "metal-claw",
+        "forms": [
+          "scizor"
+        ]
+      }
     ],
     "magnemite": [
       "thunder-shock",
@@ -868,9 +1310,9 @@
     "moltres": [
       "peck",
       "ember",
+      "gust",
       "swift",
       "sky-attack",
-      "gust",
       "wing-attack",
       "whirlwind",
       "flamethrower",
@@ -891,12 +1333,12 @@
     ],
     "entei": [
       "ember",
+      "fire-fang",
       "body-slam",
       "flamethrower",
       "fire-spin",
       "swift",
-      "flare-blitz",
-      "fire-fang"
+      "flare-blitz"
     ],
     "suicune": [
       "water-gun",

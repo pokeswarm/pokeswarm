@@ -3881,6 +3881,46 @@ function steelBeamHeavy(): SpriteOut {
   return { palette: STEEL, frameMs: 55, parts };
 }
 
+// ---------------- カウンター（受けたダメージを返す。07 の156章） ----------------
+/** カウンターの構え: 自分を囲む赤橙の気の輪（立ちのぼる気の舌が 10 本。外ほど薄い）。2 コマでゆらぐ */
+function counterStance(): SpriteOut {
+  const palette = ['#4a1203', '#bf360c', '#ff7043', '#ffab91', '#fff3e0'];
+  const frames = [0, 1].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      if (d < 0.62) return -1;
+      const tongue = 0.78 + 0.18 * Math.max(0, Math.sin(a * 5 + f * 1.3)) + 0.06 * Math.sin(a * 11 - f);
+      if (d > tongue) return -1;
+      if (d > tongue - 0.08) return 3;
+      return d < 0.7 ? 1 : 2;
+    }),
+  );
+  return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
+}
+
+/** カウンターの反撃（hurt で返す衝撃）: 自分から広がる拳の衝撃。白い芯から橙の衝撃の弧が 3 重に広がり、外に砂ぼこり。3 コマ */
+function counterBurst(): SpriteOut {
+  const palette = ['#4a1203', '#bf360c', '#ff7043', '#ffab91', '#ffffff', '#d7ccc8'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      const core = 0.3 - f * 0.08;
+      if (d < core * 0.5) return 4;
+      if (d < core) return 3;
+      for (let k = 0; k < 3; k++) {
+        const r = 0.35 + k * 0.2 + f * 0.15;
+        const gap = ((a * 4 + k + f * 0.7) % 1 + 1) % 1 < 0.25;
+        if (!gap && Math.abs(d - r) < 0.06) return k === 0 ? 3 : k === 1 ? 2 : 1;
+      }
+      if (f >= 1 && d > 0.8 && d < 0.98 && hash(Math.floor((u + 1) * 12), Math.floor((v + 1) * 12), 2601 + f) < 0.25) return 5;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
 /**
  * にどげり: 蹴りの当たった所ではじける衝撃（脚は描かない。作者の指摘 2026年11月1日）。白い芯から、細い放射の線が 8 本
  * （長い・短いを交互に）はなれて飛び、間に小さな火花。コマ 0 は短く、コマ 1 で線が外へ伸びて芯が少し縮む
@@ -4688,6 +4728,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'steel-armor-ring': () => steelArmorRing(),
     'metal-burst-shards': () => metalBurstShards(),
     'steel-beam-heavy': () => steelBeamHeavy(),
+    'counter-stance': () => counterStance(),
+    'counter-burst': () => counterBurst(),
     'rain-drop': () => rainDrop(),
     'blade-slash': () => bladeSlash(),
     'blade-ring': () => bladeRing(),

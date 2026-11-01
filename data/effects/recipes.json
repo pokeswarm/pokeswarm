@@ -4930,10 +4930,29 @@
     },
     "counter": {
       "extends": "fighting.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0.3,
+        "coreScale": 0.1
+      },
+      "impact": {
+        "flash": {
+          "color": "#ffab91",
+          "radius": 44,
+          "durationMs": 140,
+          "alpha": 0.7
+        }
+      },
       "sprite": {
-        "id": "fist",
-        "fit": "front",
-        "size": 0.9
+        "id": "counter-stance",
+        "fit": "circle",
+        "size": 1.15,
+        "alpha": 0.85
+      },
+      "effectSprite": {
+        "id": "counter-burst",
+        "fit": "circle",
+        "size": 1.05
       }
     },
     "revenge": {

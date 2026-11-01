@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildSimRules, moveIndexOf } from '../data/simRules';
 import { MOTION_FOLLOW, SHAPE_BOX } from './entities/projectiles';
 import { Simulation } from './simulation';
+import { hurtPlayer } from './systems/health';
 
 /** かくとうの技の作り直し（作者の指摘 2026年11月1日。07 の151章） */
 function setup(move: string, level = 1) {
@@ -73,5 +74,23 @@ describe('インファイト', () => {
     const kick = rules.moves[moveIndexOf(rules, 'close-combat-kick')]!;
     expect(kick.pattern).toBe('melee');
     expect(kick.frontBox).toBeDefined();
+  });
+});
+
+describe('カウンター（受けたダメージを返す。07 の156章）', () => {
+  it('気の構えをまとい、出ている間に受けたダメージの 2 倍の衝撃を自分から出す', () => {
+    const t = setup('counter');
+    const def = t.rules.moves[t.m]!;
+    expect(def.pattern).toBe('aura');
+    expect(def.effects[0]!.trigger).toBe('hurt');
+    t.sim.step([]);
+    const hp0 = t.p.hp;
+    hurtPlayer(t.sim.world, t.p, 40);
+    const taken = hp0 - t.p.hp;
+    t.sim.step([]);
+    const bursts = t.find((i) => t.pr.move[i] === t.m && t.pr.stage[i] === 1);
+    expect(bursts).toHaveLength(1);
+    expect(t.pr.damage[bursts[0]!]).toBeCloseTo(taken * 2, 3);
+    expect(t.pr.band[bursts[0]!]).toBe(0);
   });
 });

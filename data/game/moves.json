@@ -12119,65 +12119,75 @@
       ]
     },
     "counter": {
-      "pattern": "sweep",
+      "pattern": "aura",
       "effect": "counter",
-      "sweepOnce": true,
       "base": {
-        "power": 16.2,
-        "cooldownSeconds": 1.1,
+        "power": 7,
+        "cooldownSeconds": 2.6,
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 0,
-        "size": 40,
-        "range": 12,
-        "durationSeconds": 0.25,
+        "size": 44,
+        "range": 0,
+        "durationSeconds": 2.5,
         "pierce": "infinite",
-        "hitIntervalSeconds": 0,
-        "knockback": 200,
+        "hitIntervalSeconds": 0.5,
+        "knockback": 160,
         "knockbackSeconds": 0.1,
         "statusChance": 0,
         "statusSeconds": 0,
-        "spreadDegrees": 140,
+        "spreadDegrees": 0,
         "lifestealPct": 0,
-        "arcDegrees": 40
+        "arcDegrees": 0
       },
       "levels": [
         {
-          "power": 6.9
+          "power": 3
         },
         {
           "size": 4,
-          "power": 5.9
+          "power": 2.3
         },
         {
-          "power": 6.7
+          "cooldownSeconds": -0.1,
+          "durationSeconds": -0.1,
+          "power": 6
         },
         {
-          "cooldownSeconds": -0.15,
-          "power": 0.9
+          "durationSeconds": 0.4,
+          "power": -1
         },
         {
           "size": 4,
-          "power": 4.3
+          "power": 1.8
         },
         {
-          "power": 5.6
+          "cooldownSeconds": -0.1,
+          "durationSeconds": -0.1,
+          "power": 1.8
         },
         {
-          "power": 5.6
+          "durationSeconds": 0.4,
+          "power": -1.4
         }
       ],
-      "body": {
-        "lungeDistance": 14,
-        "afterimages": 0
-      },
       "learners": [
         "wynaut"
       ],
       "learnForms": [
         "wobbuffet"
       ],
-      "region": "hoenn"
+      "region": "hoenn",
+      "effects": [
+        {
+          "trigger": "hurt",
+          "explode": {
+            "sizeMultiplier": 2.5,
+            "powerMultiplier": 2,
+            "durationSeconds": 0.25
+          }
+        }
+      ]
     },
     "revenge": {
       "pattern": "melee",

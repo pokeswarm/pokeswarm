@@ -17,18 +17,21 @@ function setup(move: string, level = 1) {
 }
 
 describe('にどげり', () => {
-  it('前の長方形へ、出ている間に 2 回当たる（HP の多い敵が 2 回ダメージを受ける）', () => {
+  it('前の形のまま: 向いている方へ短い蹴りを 2 連で飛ばす（作者 2026年11月1日「前の 2 連撃でよかった」）', () => {
     const t = setup('double-kick');
     const def = t.rules.moves[t.m]!;
-    expect(def.pattern).toBe('melee');
-    expect(def.frontBox).toBeDefined();
-    expect(Math.round(def.levels[0]!.durationSeconds / def.levels[0]!.hitIntervalSeconds)).toBe(2);
-    t.sim.world.enemies.add(1, 0, 40, 0, 1e6, 0, 10);
+    expect(def.pattern).toBe('barrage');
+    expect(def.levels[0]!.count).toBe(2);
+    expect(def.frontBox).toBeUndefined();
+    t.sim.world.enemies.add(1, 0, 30, 0, 1e6, 0, 10);
     const hp0 = t.sim.world.enemies.hp[0]!;
-    t.sim.step([]);
-    const first = hp0 - t.sim.world.enemies.hp[0]!;
+    let first = 0;
+    for (let k = 0; k < 3 && first === 0; k++) {
+      t.sim.step([]);
+      first = hp0 - t.sim.world.enemies.hp[0]!;
+    }
     expect(first).toBeGreaterThan(0);
-    for (let k = 0; k < 12; k++) t.sim.step([]);
+    for (let k = 0; k < 15; k++) t.sim.step([]);
     const lost = hp0 - t.sim.world.enemies.hp[0]!;
     expect(lost).toBeCloseTo(first * 2, 0);
   });
@@ -60,7 +63,7 @@ describe('きあいパンチ・ばかぢから', () => {
 });
 
 describe('インファイト', () => {
-  it('突き出す蹴りは、にどげりと同じ前の長方形になった', () => {
+  it('突き出す蹴りは前の長方形になった', () => {
     const rules = buildSimRules('hoenn');
     const kick = rules.moves[moveIndexOf(rules, 'close-combat-kick')]!;
     expect(kick.pattern).toBe('melee');

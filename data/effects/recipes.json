@@ -4055,9 +4055,9 @@
       "sprite": {
         "id": "low-kick-leg",
         "fit": "front",
-        "size": 0.55,
-        "along": 0.28,
-        "afterimages": 3,
+        "size": 1,
+        "along": 0.5,
+        "afterimages": 4,
         "afterimageGap": 1
       }
     },
@@ -4257,9 +4257,9 @@
       "sprite": {
         "id": "low-kick-leg-fire",
         "fit": "front",
-        "size": 0.55,
-        "along": 0.28,
-        "afterimages": 3,
+        "size": 1,
+        "along": 0.5,
+        "afterimages": 4,
         "afterimageGap": 1
       }
     },

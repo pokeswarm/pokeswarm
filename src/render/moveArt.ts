@@ -3417,45 +3417,43 @@ function kickWave(kind: 'plain' | 'fire'): SpriteOut {
 }
 
 /**
- * ローキック・インファイトの薙ぎ払い: 上から見た、低く払う脚（fit front。なぎ払いの向きに回り、残像が弧を描く）。
- * 腰（左）から ひざで少し曲がって足先（右）へ。足は横向きで、かかとと丸いつま先。足先に砂ぼこり。fire は炎をまとう
+ * ローキック・インファイトの薙ぎ払い（作者の指摘 2026年11月1日: 肌色の脚は、長い棒に見えて不適切）: 脚は描かない。
+ * 自分の足元の暗い靴から、地面すれすれに走る鋭い風の刃（根元が太く先がとがった細い三日月。芯は白、ふちは橙）が届く距離まで伸び、
+ * 刃の下に砂ぼこりが散る。fit front でなぎ払いの向きに回り、残像が弧を描く。fire は炎の刃（インファイト）
  */
 function lowKickLeg(kind: 'plain' | 'fire'): SpriteOut {
-  const palette = [...SKIN, ...(kind === 'fire' ? ['#ff9800', '#ffd180'] : ['#d7ccc8', '#efebe9'])];
-  const r = rng(1935);
-  // 脚はふつうの大きさ（絵の左半分）。右半分は足先から前へ散る砂ぼこりで、届く距離を見せる
-  const puffs = Array.from({ length: 22 }, () => ({ u: 0.2 + r() * 0.8, v: -0.95 + r() * 0.9, s: 0.04 + r() * 0.08 }));
+  // 0 輪郭・1 靴（濃い）・2 靴・3 靴の明るい所・4 刃のふち・5 刃・6 刃の芯（白）・7 砂ぼこり・8 砂ぼこりの明るい所
+  const palette = kind === 'fire' ? ['#2b1408', '#3e2723', '#6d4c41', '#a1887f', '#bf360c', '#ff9800', '#fff59d', '#ff7043', '#ffd180'] : ['#2b1408', '#3e2723', '#6d4c41', '#a1887f', '#e65100', '#ffb74d', '#ffffff', '#d7ccc8', '#efebe9'];
+  const r = rng(1945);
+  const puffs = Array.from({ length: 16 }, () => ({ u: -0.3 + r() * 1.25, v: 0.14 + r() * 0.3, s: 0.035 + r() * 0.06 }));
   const frames = [0, 1].map((f) =>
     shape(32, (u, v) => {
-      // 靴: 足首（0.44, 0.1）から上（画面の縦）へ伸びる靴底の厚い靴。かかとが後ろ（左下）に出て、つま先は丸い
-      const boot = inRoundRect(u, v, 0.18, -0.2, 0.1, 0.24, 0.07) || inRoundRect(u, v, 0.13, 0.0, 0.14, 0.08, 0.05);
-      if (boot) {
-        if (u < 0.11 && v < -0.26) return -1;
-        return u > 0.23 ? 4 : v < -0.34 ? 3 : 2;
+      // 靴: 自分の足元（左）。横向きの小さな靴（かかとは左下、つま先は右）。靴底は濃い
+      if (inRoundRect(u, v, -0.78, 0.02, 0.16, 0.1, 0.05)) return v > 0.07 ? 1 : u > -0.68 ? 3 : 2;
+      if (inRoundRect(u, v, -0.9, -0.06, 0.06, 0.1, 0.03)) return 2;
+      // 風の刃: 靴の先（−0.6）から右端へ。根元が太く先がとがり、少し反る（上へふくらむ三日月）
+      const t = (u + 0.6) / 1.55;
+      if (t >= 0 && t <= 1) {
+        const curve = -0.12 * Math.sin(t * Math.PI);
+        const half = 0.015 + 0.1 * Math.pow(1 - t, 0.6);
+        const d = Math.abs(v - curve);
+        if (d < half) {
+          // コマで芯の筋が先へ流れる
+          const streak = (((u * 9 - f * 1.5) % 1) + 1) % 1 < 0.35;
+          return d < half * 0.4 ? 6 : d < half * 0.75 && streak ? 6 : d < half * 0.8 ? 5 : 4;
+        }
+        // 刃の上側の薄い風の筋
+        if (v < curve && d < half + 0.09 && t > 0.15 && t < 0.9 && (((u * 6 + f) % 1) + 1) % 1 < 0.25) return 4;
       }
-      // 脚（L 字）: 太もも（腰 −0.9, 0.55 → ひざ −0.15, 0.55）、すね（ひざ → 足首 0.44, 0.12）。太ももは太く、すねは細い
-      for (const [x0, y0, x1, y1, w0, w1] of [[-0.92, 0.42, -0.42, 0.42, 0.16, 0.13], [-0.42, 0.42, 0.08, 0.1, 0.12, 0.09]] as const) {
-        const dx = x1 - x0;
-        const dyy = y1 - y0;
-        const len = Math.hypot(dx, dyy);
-        const t = ((u - x0) * dx + (v - y0) * dyy) / (len * len);
-        if (t < 0 || t > 1) continue;
-        const side = (-(u - x0) * dyy + (v - y0) * dx) / len;
-        const w = w0 + (w1 - w0) * t;
-        if (Math.abs(side) < w) return side < -w * 0.4 ? 3 : side > w * 0.5 ? 1 : 2;
-        if (kind === 'fire' && Math.abs(side) < w + 0.08 + Math.max(0, Math.sin(t * 14 + f * 2.5)) * 0.1) return side < 0 ? 6 : 5;
-      }
-      // ひざの丸み
-      if (Math.hypot(u + 0.42, v - 0.42) < 0.15) return v < 0.38 ? 3 : 2;
-      // 足先から前へ広がる砂ぼこり（扇に散る玉。コマで少し動く）
+      // 刃の下に散る砂ぼこり（コマで少し動く）
       for (const pf of puffs) {
         const d = Math.hypot(u - pf.u - f * 0.03, v - pf.v + f * 0.02);
-        if (d < pf.s) return d < pf.s * 0.5 ? 6 : 5;
+        if (d < pf.s) return d < pf.s * 0.5 ? 8 : 7;
       }
       return -1;
     }),
   );
-  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
 }
 
 /**

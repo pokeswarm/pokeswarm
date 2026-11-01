@@ -151,6 +151,8 @@ export interface SimMoveDef {
   readonly extraTypes?: readonly number[];
   /** 一緒に出し続ける技の番号（この技と同じレベル。インファイト） */
   readonly comboMoves?: readonly number[];
+  /** 一緒に出す技の側: 本体より遅れて出し始める秒数（アクアテールの叩きつけ） */
+  readonly comboOffsetSeconds?: number;
   /** 出す前に溜める秒数（リーフブレード・ブレイズキック） */
   readonly windupSeconds?: number;
   /** ちかい: 覚えていると威力 +powerPct %、自分か味方が覚えているほかのちかい1種類につき +perOtherPct % */

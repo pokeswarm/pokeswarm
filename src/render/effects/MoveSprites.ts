@@ -28,6 +28,8 @@ export interface SpriteItem {
   readonly serial?: number;
   /** 蛇行して進むもの（snake）: 出した場所・速度・振れ幅・角速度・出てからの秒数（通った道を描く） */
   readonly snake?: { readonly ox: number; readonly oy: number; readonly vx: number; readonly vy: number; readonly amp: number; readonly omega: number; readonly t: number };
+  /** 前の長方形（frontBox）: 根元からの向きに沿った始まり・終わりと片側の幅（scroll の波を敷く範囲） */
+  readonly box?: { readonly from: number; readonly to: number; readonly half: number };
 }
 
 /** テクスチャの名前（絵・細かさの段・部品・コマごと） */
@@ -222,11 +224,12 @@ export class MoveSprites {
   }
 
   /** 毎フレーム描き直す。specOf は当たり判定ごとのドット絵の指定（無ければ描かない。重ねて描くものは配列） */
-  draw(pr: ProjectileStore, alpha: number, specOf: (i: number) => SpriteSpec | readonly SpriteSpec[] | null): void {
+  draw(pr: ProjectileStore, alpha: number, specOf: (i: number) => SpriteSpec | readonly SpriteSpec[] | null, boxOf?: (i: number) => { from: number; to: number; half: number } | null): void {
     const items: SpriteItem[] = [];
     for (let i = 0; i < pr.count; i++) {
       const got = specOf(i);
       if (!got) continue;
+      const box = boxOf?.(i) ?? undefined;
       const elapsed = pr.maxLife[i]! - pr.life[i]!;
       const snake =
         pr.motion[i] === MOTION_SNAKE ? { ox: pr.ox[i]!, oy: pr.oy[i]!, vx: pr.vx[i]!, vy: pr.vy[i]!, amp: pr.orbitRadius[i]!, omega: pr.angularSpeed[i]!, t: elapsed } : undefined;
@@ -248,6 +251,7 @@ export class MoveSprites {
         seed: i,
         serial: pr.serial[i]!,
         ...(snake ? { snake } : {}),
+        ...(box ? { box } : {}),
       });
     }
     this.drawItems(items);
@@ -284,8 +288,12 @@ export class MoveSprites {
       // 1ドットが dot になるマス数: 円・扇は横の長さ、線は太さ、輪は帯の厚さで決める
       const mainRows = base.parts.main?.[0];
       const midRows = base.parts.middle?.[0];
+      // 波を敷く四角（frontBox が無ければ、半径の正方形）
+      const bx = it.box ?? { from: -it.radius, to: it.radius, half: it.radius };
       const [baseLen, desired] =
-        spec.fit === 'circle'
+        spec.fit === 'scroll'
+          ? [midRows?.length ?? 1, (((bx.to - bx.from) / spec.scrollTiles) * ((midRows?.length ?? 1) / (midRows?.[0]?.length ?? 1))) / this.dot]
+          : spec.fit === 'circle'
           ? [mainRows?.[0]?.length ?? 1, (r * 2) / this.dot]
           : spec.fit === 'front'
             ? [mainRows?.[0]?.length ?? 1, (it.radius * spec.size) / this.dot]
@@ -357,6 +365,36 @@ export class MoveSprites {
           }
         }
         put(fk('main', this.frameOf(spec.id, 'main', elapsed)), px, py, rot, s, s, a);
+        continue;
+      }
+      if (spec.fit === 'scroll') {
+        // 四角の中を向いている方向へ進む波（なみのり・だくりゅう）: 途中の部品を、向きに沿って scrollTiles 枚の周期で並べ、
+        // 横は四角の幅をちょうど割る段に分ける。波は出てからの秒数 × scrollSpeed だけ前へ進み（周期で巻き戻る）、
+        // 四角の後ろの端で現れ、前の端で薄れて消える
+        const rows = sp.parts.middle?.[0];
+        if (!rows) continue;
+        const len = bx.to - bx.from;
+        const width = bx.half * 2;
+        if (len <= 0 || width <= 0) continue;
+        const period = len / spec.scrollTiles;
+        const lanes = Math.max(1, Math.round(width / (period * (rows.length / rows[0]!.length))));
+        const laneH = width / lanes;
+        const sx = period / rows[0]!.length;
+        const sy = laneH / rows.length;
+        const rot = Math.atan2(it.dirY, it.dirX);
+        const phase = (((elapsed * spec.scrollSpeed) % period) + period) % period;
+        const midFrame = this.frameOf(spec.id, 'middle', elapsed);
+        const midCount = sp.parts.middle!.length;
+        for (let k = -1; k <= spec.scrollTiles; k++) {
+          const d = bx.from + k * period + phase;
+          if (d + period / 2 <= bx.from || d - period / 2 >= bx.to) continue;
+          const fade = Math.max(0, Math.min(1, (d - bx.from + period / 2) / period, (bx.to - d + period / 2) / period));
+          for (let j = 0; j < lanes; j++) {
+            const across = -bx.half + (j + 0.5) * laneH;
+            const frame = fk('middle', spec.varyTiles ? (midFrame + j + it.seed) % midCount : midFrame);
+            put(frame, x + it.dirX * d - it.dirY * across, y + it.dirY * d + it.dirX * across, rot, sx, sy, a * fade);
+          }
+        }
         continue;
       }
       if (spec.fit === 'ring') {

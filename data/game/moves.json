@@ -4010,58 +4010,52 @@
       "randomPool": "unique"
     },
     "bubble-beam": {
-      "key": "bubble-beam",
-      "pattern": "melee",
-      "countWidens": 12,
+      "pattern": "beam",
       "effect": "bubble-beam",
       "base": {
-        "power": 33.6,
-        "intervalSeconds": 0.1,
+        "power": 47,
+        "cooldownSeconds": 1.5,
         "count": 1,
-        "speed": 0,
-        "size": 30,
-        "range": 250,
-        "durationSeconds": 0.6,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 7,
+        "range": 420,
+        "durationSeconds": 0.3,
         "pierce": "infinite",
-        "hitIntervalSeconds": 0.2,
+        "hitIntervalSeconds": 0.15,
         "knockback": 60,
-        "knockbackSeconds": 0.06,
-        "spreadDegrees": 0,
-        "cooldownSeconds": 1.3,
-        "statusId": "soaked",
-        "statusChance": 0.25,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0.3,
         "statusSeconds": 2,
+        "spreadDegrees": 0,
         "lifestealPct": 0,
-        "arcDegrees": 16
+        "statusId": "soaked"
       },
       "levels": [
         {
-          "range": 20,
-          "power": 5.8
+          "power": 10.7
         },
         {
-          "arcDegrees": 3,
-          "power": 4.4
+          "size": 2,
+          "power": 6
         },
         {
-          "durationSeconds": 0.2,
-          "power": -18.5
-        },
-        {
-          "range": 20,
-          "power": 2.1
+          "power": 10
         },
         {
           "cooldownSeconds": -0.15,
-          "power": -0.3
+          "power": 1.6
         },
         {
-          "arcDegrees": 3,
-          "power": 1.2
+          "size": 2,
+          "power": 3.8
         },
         {
-          "range": 20,
-          "power": 1.3
+          "range": 40,
+          "power": 5.9
+        },
+        {
+          "power": 8.2
         }
       ]
     },
@@ -6130,60 +6124,64 @@
       "bonusCountToPower": true
     },
     "muddy-water": {
-      "pattern": "nova",
-      "effect": "muddy-water",
-      "teachOnly": true,
-      "sweep": 0.45,
+      "pattern": "melee",
+      "frontBox": {
+        "start": -1,
+        "end": 1,
+        "halfWidth": 1
+      },
+      "bonusCountToPower": true,
       "base": {
-        "intervalSeconds": 0.1,
-        "lifestealPct": 0,
-        "spreadDegrees": 0,
-        "knockbackSeconds": 0.14,
-        "statusChance": 0.3,
-        "statusSeconds": 2,
-        "pierce": "infinite",
-        "hitIntervalSeconds": 0,
-        "speed": 0,
+        "power": 46.5,
+        "cooldownSeconds": 2.2,
         "count": 1,
-        "power": 117.3,
-        "cooldownSeconds": 1.9,
-        "size": 22,
-        "range": 220,
-        "durationSeconds": 0.5,
-        "knockback": 360,
-        "statusId": "soaked"
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 20,
+        "range": 90,
+        "durationSeconds": 1.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.3,
+        "knockback": 140,
+        "knockbackSeconds": 0.1,
+        "statusId": "soaked",
+        "statusChance": 1,
+        "statusSeconds": 2,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
       },
       "levels": [
         {
-          "range": 15,
-          "power": 19.6
+          "range": 10,
+          "power": 3.6
         },
         {
-          "statusChance": 0.1,
-          "power": 19.7
+          "durationSeconds": 0.2,
+          "power": 7.2
         },
         {
-          "range": 15,
-          "power": 19.7
+          "range": 10,
+          "power": 2.6
         },
         {
           "cooldownSeconds": -0.2,
-          "power": -1
+          "power": 0.6
+        },
+        {
+          "range": 10,
+          "power": 1.6
+        },
+        {
+          "statusSeconds": 1,
+          "power": 5.7
         },
         {
           "range": 15,
-          "power": 17.6
-        },
-        {
-          "statusChance": 0.1,
-          "power": 17.6
-        },
-        {
-          "range": 20,
-          "power": 17.6
+          "power": -0.7
         }
       ],
-      "bonusCountToPower": true
+      "effect": "muddy-water",
+      "teachOnly": true
     },
     "lava-plume": {
       "pattern": "nova",
@@ -8113,28 +8111,18 @@
       "pattern": "nearest",
       "effect": "water-pulse",
       "region": "hoenn",
-      "effects": [
-        {
-          "trigger": "hit",
-          "wave": {
-            "powerMultiplier": 0.5,
-            "radius": 70,
-            "durationSeconds": 0.3
-          }
-        }
-      ],
       "base": {
-        "power": 83.2,
-        "cooldownSeconds": 0.9,
-        "count": 1,
-        "intervalSeconds": 0.1,
-        "speed": 560,
-        "size": 14,
-        "range": 420,
-        "durationSeconds": 0.8,
-        "pierce": 1,
+        "power": 5.7,
+        "cooldownSeconds": 1.1,
+        "count": 8,
+        "intervalSeconds": 0.06,
+        "speed": 480,
+        "size": 24,
+        "range": 460,
+        "durationSeconds": 1.2,
+        "pierce": "infinite",
         "hitIntervalSeconds": 0,
-        "knockback": 140,
+        "knockback": 120,
         "knockbackSeconds": 0.08,
         "statusChance": 0.3,
         "statusSeconds": 2,
@@ -8144,88 +8132,91 @@
       },
       "levels": [
         {
-          "power": 18.9
+          "power": 1.3
         },
         {
           "count": 1,
-          "power": -41.5
+          "power": 0.8
         },
         {
-          "cooldownSeconds": -0.05,
-          "power": 5.6
+          "power": 1.2
         },
         {
-          "size": 2,
-          "power": 8.9
-        },
-        {
-          "count": 1,
-          "power": -19
-        },
-        {
-          "cooldownSeconds": -0.05,
-          "power": 2.3
+          "cooldownSeconds": -0.1,
+          "power": 0.3
         },
         {
           "count": 1,
-          "power": -10.4
+          "power": 0.6
+        },
+        {
+          "size": 3,
+          "power": 1
+        },
+        {
+          "count": 1,
+          "power": 0.5
         }
       ]
     },
     "muddy-water-hoenn": {
-      "pattern": "nova",
-      "effect": "muddy-water",
-      "sweep": 0.45,
+      "pattern": "melee",
+      "frontBox": {
+        "start": -1,
+        "end": 1,
+        "halfWidth": 1
+      },
+      "bonusCountToPower": true,
       "base": {
-        "intervalSeconds": 0.1,
-        "lifestealPct": 0,
-        "spreadDegrees": 0,
-        "knockbackSeconds": 0.14,
-        "statusChance": 0.3,
-        "statusSeconds": 2,
-        "pierce": "infinite",
-        "hitIntervalSeconds": 0,
-        "speed": 0,
+        "power": 58.1,
+        "cooldownSeconds": 2.2,
         "count": 1,
-        "power": 146.6,
-        "cooldownSeconds": 1.9,
-        "size": 22,
-        "range": 220,
-        "durationSeconds": 0.5,
-        "knockback": 360,
-        "statusId": "soaked"
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 20,
+        "range": 90,
+        "durationSeconds": 1.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.3,
+        "knockback": 140,
+        "knockbackSeconds": 0.1,
+        "statusId": "soaked",
+        "statusChance": 1,
+        "statusSeconds": 2,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
       },
       "levels": [
         {
-          "range": 15,
-          "power": 24.6
+          "range": 10,
+          "power": 4.5
         },
         {
-          "statusChance": 0.1,
-          "power": 24.5
+          "durationSeconds": 0.2,
+          "power": 9
         },
         {
-          "range": 15,
-          "power": 24.6
+          "range": 10,
+          "power": 3.2
         },
         {
           "cooldownSeconds": -0.2,
-          "power": -1.2
+          "power": 0.8
+        },
+        {
+          "range": 10,
+          "power": 2.1
+        },
+        {
+          "statusSeconds": 1,
+          "power": 7
         },
         {
           "range": 15,
-          "power": 22
-        },
-        {
-          "statusChance": 0.1,
-          "power": 22
-        },
-        {
-          "range": 20,
-          "power": 22
+          "power": -0.8
         }
       ],
-      "bonusCountToPower": true,
+      "effect": "muddy-water",
       "nameOf": "muddy-water",
       "region": "hoenn",
       "extraTypes": [
@@ -8438,10 +8429,11 @@
       },
       "effects": [
         {
-          "trigger": "hit",
+          "trigger": "eachHit",
           "explode": {
-            "sizeMultiplier": 2.6,
-            "powerMultiplier": 0.35
+            "sizeMultiplier": 1.6,
+            "powerMultiplier": 0.3,
+            "pierce": 3
           }
         }
       ],
@@ -10418,59 +10410,68 @@
       "nameOf": "sheer-cold"
     },
     "surf": {
-      "pattern": "nova",
-      "effect": "surf",
-      "sweep": 0.45,
+      "pattern": "melee",
+      "frontBox": {
+        "start": -1,
+        "end": 1,
+        "halfWidth": 1
+      },
+      "bonusCountToPower": true,
       "base": {
+        "power": 14,
+        "cooldownSeconds": 2.2,
+        "count": 1,
         "intervalSeconds": 0.1,
-        "lifestealPct": 0,
-        "spreadDegrees": 0,
-        "knockbackSeconds": 0.14,
+        "speed": 0,
+        "size": 20,
+        "range": 90,
+        "durationSeconds": 1.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.3,
+        "knockback": 140,
+        "knockbackSeconds": 0.1,
+        "statusId": "soaked",
         "statusChance": 0.3,
         "statusSeconds": 2,
-        "pierce": "infinite",
-        "hitIntervalSeconds": 0,
-        "speed": 0,
-        "count": 1,
-        "power": 39.3,
-        "cooldownSeconds": 1.9,
-        "size": 22,
-        "range": 220,
-        "durationSeconds": 0.5,
-        "knockback": 360,
-        "statusId": "soaked"
+        "spreadDegrees": 0,
+        "lifestealPct": 0
       },
       "levels": [
         {
-          "range": 15,
-          "power": 8.9
+          "range": 10,
+          "power": 1.9
         },
         {
           "statusChance": 0.1,
-          "power": 9
+          "power": 2.9
         },
         {
-          "range": 15,
-          "power": 8.9
+          "range": 10,
+          "power": 1.4
         },
         {
           "cooldownSeconds": -0.2,
-          "power": 1.1
+          "power": 0.7
         },
         {
-          "range": 15,
-          "power": 8
+          "range": 10,
+          "power": 0.9
         },
         {
-          "statusChance": 0.1,
-          "power": 8
+          "durationSeconds": 0.3,
+          "power": -2.5
         },
         {
-          "range": 20,
-          "power": 8
+          "range": 15
         }
       ],
-      "bonusCountToPower": true,
+      "effect": "surf",
+      "selfBuff": {
+        "seconds": 1.2,
+        "mods": {
+          "moveSpeedPct": 20
+        }
+      },
       "region": "hoenn"
     },
     "outrage": {
@@ -10662,7 +10663,7 @@
       "pattern": "sweep",
       "effect": "aqua-tail",
       "base": {
-        "power": 60.5,
+        "power": 54.4,
         "cooldownSeconds": 1.35,
         "count": 1,
         "intervalSeconds": 0.1,
@@ -10682,14 +10683,14 @@
       },
       "levels": [
         {
-          "power": 13.8
+          "power": 12.5
         },
         {
           "size": 6,
-          "power": 9.5
+          "power": 8.5
         },
         {
-          "power": 13.1
+          "power": 11.8
         },
         {
           "cooldownSeconds": -0.15,
@@ -10697,76 +10698,80 @@
         },
         {
           "spreadDegrees": 60,
-          "power": 1.9
+          "power": 1.7
         },
         {
-          "power": 10.7
+          "power": 9.5
         },
         {
           "size": 6,
-          "power": 4.7
+          "power": 4.2
         }
       ],
       "body": {
         "lungeDistance": 10,
         "afterimages": 0
       },
-      "region": "hoenn"
+      "region": "hoenn",
+      "comboMoves": [
+        "aqua-tail-slam"
+      ]
     },
     "scald": {
-      "pattern": "stream",
-      "effect": "hydro-pump",
+      "pattern": "melee",
+      "countWidens": 12,
+      "effect": "scald",
+      "region": "hoenn",
       "base": {
-        "power": 80.4,
+        "power": 125.6,
         "intervalSeconds": 0.1,
-        "statusChance": 0.3,
+        "count": 1,
+        "speed": 0,
+        "size": 30,
+        "range": 250,
+        "durationSeconds": 0.6,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.2,
+        "knockback": 60,
+        "knockbackSeconds": 0.06,
+        "spreadDegrees": 0,
+        "cooldownSeconds": 1.3,
+        "statusId": "burn",
+        "statusChance": 1,
         "statusSeconds": 3,
         "lifestealPct": 0,
-        "pierce": "infinite",
-        "speed": 360,
-        "cooldownSeconds": 3,
-        "durationSeconds": 1,
-        "knockbackSeconds": 0.12,
-        "count": 1,
-        "size": 20,
-        "range": 704,
-        "hitIntervalSeconds": 0.2,
-        "knockback": 160,
-        "spreadDegrees": 16,
-        "statusId": "burn"
+        "arcDegrees": 16
       },
       "levels": [
         {
-          "size": 2,
-          "power": 9.7
+          "range": 20,
+          "power": 14.1
         },
         {
-          "range": 30,
-          "power": 11.1
+          "arcDegrees": 3,
+          "power": 10.3
         },
         {
-          "knockback": 30,
-          "power": 12.7
+          "durationSeconds": 0.2,
+          "power": -65.6
         },
         {
-          "size": 2,
-          "power": 8
+          "range": 20,
+          "power": 5
         },
         {
-          "range": 30,
-          "power": 9.9
+          "cooldownSeconds": -0.15,
+          "power": -2.4
         },
         {
-          "size": 3,
-          "power": 4.7
+          "arcDegrees": 3,
+          "power": 2.6
         },
         {
-          "hitIntervalSeconds": -0.03,
-          "power": 11.4
+          "range": 20,
+          "power": 2.9
         }
-      ],
-      "bonusCountToPower": true,
-      "region": "hoenn"
+      ]
     },
     "twister-hoenn": {
       "pattern": "scatter",
@@ -11538,57 +11543,52 @@
       "nameOf": "rock-slide"
     },
     "bubble-beam-hoenn": {
-      "pattern": "melee",
-      "countWidens": 12,
+      "pattern": "beam",
       "effect": "bubble-beam",
       "base": {
-        "power": 33.6,
-        "intervalSeconds": 0.1,
+        "power": 47,
+        "cooldownSeconds": 1.5,
         "count": 1,
-        "speed": 0,
-        "size": 30,
-        "range": 250,
-        "durationSeconds": 0.6,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 7,
+        "range": 420,
+        "durationSeconds": 0.3,
         "pierce": "infinite",
-        "hitIntervalSeconds": 0.2,
+        "hitIntervalSeconds": 0.15,
         "knockback": 60,
-        "knockbackSeconds": 0.06,
-        "spreadDegrees": 0,
-        "cooldownSeconds": 1.3,
-        "statusId": "soaked",
-        "statusChance": 0.25,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0.3,
         "statusSeconds": 2,
+        "spreadDegrees": 0,
         "lifestealPct": 0,
-        "arcDegrees": 16
+        "statusId": "soaked"
       },
       "levels": [
         {
-          "range": 20,
-          "power": 5.8
+          "power": 10.7
         },
         {
-          "arcDegrees": 3,
-          "power": 4.4
+          "size": 2,
+          "power": 6
         },
         {
-          "durationSeconds": 0.2,
-          "power": -18.5
-        },
-        {
-          "range": 20,
-          "power": 2.1
+          "power": 10
         },
         {
           "cooldownSeconds": -0.15,
-          "power": -0.3
+          "power": 1.6
         },
         {
-          "arcDegrees": 3,
-          "power": 1.2
+          "size": 2,
+          "power": 3.8
         },
         {
-          "range": 20,
-          "power": 1.3
+          "range": 40,
+          "power": 5.9
+        },
+        {
+          "power": 8.2
         }
       ],
       "region": "hoenn",
@@ -11598,7 +11598,7 @@
       "pattern": "sweep",
       "effect": "aqua-tail",
       "base": {
-        "power": 225.9,
+        "power": 203.3,
         "cooldownSeconds": 1.35,
         "count": 1,
         "intervalSeconds": 0.1,
@@ -11618,29 +11618,29 @@
       },
       "levels": [
         {
-          "power": 37.9
+          "power": 34.1
         },
         {
           "size": 6,
-          "power": 23.1
+          "power": 20.8
         },
         {
-          "power": 36
+          "power": 32.4
         },
         {
           "cooldownSeconds": -0.15,
-          "power": -3.8
+          "power": -3.4
         },
         {
           "spreadDegrees": 60,
-          "power": 0.7
+          "power": 0.6
         },
         {
-          "power": 29.2
+          "power": 26.3
         },
         {
           "size": 6,
-          "power": 10.5
+          "power": 9.5
         }
       ],
       "body": {
@@ -11648,7 +11648,10 @@
         "afterimages": 0
       },
       "region": "hoenn",
-      "nameOf": "aqua-tail"
+      "nameOf": "aqua-tail",
+      "comboMoves": [
+        "aqua-tail-slam-azumarill"
+      ]
     },
     "tackle-hoenn": {
       "pattern": "melee",
@@ -12485,6 +12488,132 @@
         {
           "cooldownSeconds": -0.05,
           "power": -1.2
+        }
+      ]
+    },
+    "aqua-tail-slam": {
+      "pattern": "melee",
+      "effect": "aqua-tail-slam",
+      "nameOf": "aqua-tail",
+      "teachOnly": true,
+      "comboOffsetSeconds": 0.4,
+      "region": "hoenn",
+      "frontBox": {
+        "start": 0,
+        "end": 1,
+        "halfWidth": 0.3
+      },
+      "body": {
+        "lungeDistance": 16,
+        "afterimages": 0
+      },
+      "base": {
+        "power": 44.4,
+        "cooldownSeconds": 1.35,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 30,
+        "range": 60,
+        "durationSeconds": 0.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 320,
+        "knockbackSeconds": 0.12,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "critChancePct": 15
+      },
+      "levels": [
+        {
+          "power": 10.1
+        },
+        {
+          "size": 4,
+          "power": 8.8
+        },
+        {
+          "power": 9.9
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 0.7
+        },
+        {
+          "range": 6,
+          "power": 6.1
+        },
+        {
+          "power": 8.6
+        },
+        {
+          "size": 4,
+          "power": 6.4
+        }
+      ]
+    },
+    "aqua-tail-slam-azumarill": {
+      "pattern": "melee",
+      "effect": "aqua-tail-slam",
+      "nameOf": "aqua-tail",
+      "teachOnly": true,
+      "comboOffsetSeconds": 0.4,
+      "region": "hoenn",
+      "frontBox": {
+        "start": 0,
+        "end": 1,
+        "halfWidth": 0.3
+      },
+      "body": {
+        "lungeDistance": 16,
+        "afterimages": 0
+      },
+      "base": {
+        "power": 165.8,
+        "cooldownSeconds": 1.35,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 30,
+        "range": 60,
+        "durationSeconds": 0.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 320,
+        "knockbackSeconds": 0.12,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "critChancePct": 15
+      },
+      "levels": [
+        {
+          "power": 27.8
+        },
+        {
+          "size": 4,
+          "power": 23.1
+        },
+        {
+          "power": 27.2
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": -2.9
+        },
+        {
+          "range": 6,
+          "power": 15.6
+        },
+        {
+          "power": 23.4
+        },
+        {
+          "size": 4,
+          "power": 16.9
         }
       ]
     }

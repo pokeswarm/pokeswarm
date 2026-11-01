@@ -709,11 +709,11 @@ function psyBeam(): SpriteOut {
  * かえんほうしゃ・バブルこうせん: 扇形に引き伸ばす1枚の絵（右向き。左端が口）。
  * 炎は先へ行くほど広がる舌のような形がゆらめき、泡は大小の泡が散らばる
  */
-function cone(kind: 'flame' | 'bubble' | 'sound' | 'electric'): SpriteOut {
+function cone(kind: 'flame' | 'bubble' | 'sound' | 'electric' | 'scald'): SpriteOut {
   const W = 32;
   const H = 16;
   const palette =
-    kind === 'flame' ? ['#4a0e05', '#c62828', '#ef6c00', '#ffb300', '#fff176', '#ffffff'] : kind === 'electric' ? ['#1a1440', '#f9a825', '#fdd835', '#ffffff', '#fff59d', '#ffffff'] : kind === 'sound' ? ['#880e4f', '#ec407a', '#f8bbd0', '#ffffff', '#fce4ec', '#ffffff'] : ['#01395e', '#0288d1', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff'];
+    kind === 'flame' ? ['#4a0e05', '#c62828', '#ef6c00', '#ffb300', '#fff176', '#ffffff'] : kind === 'scald' ? ['#5d1a00', '#e64a19', '#ff8a65', '#ffccbc', '#fff3e0', '#ffffff'] : kind === 'electric' ? ['#1a1440', '#f9a825', '#fdd835', '#ffffff', '#fff59d', '#ffffff'] : kind === 'sound' ? ['#880e4f', '#ec407a', '#f8bbd0', '#ffffff', '#fce4ec', '#ffffff'] : ['#01395e', '#0288d1', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff'];
   const frames: Grid[] = [];
   for (let f = 0; f < 4; f++) {
     if (kind === 'electric') {
@@ -3117,9 +3117,8 @@ function dragonFire(): SpriteOut {
  * りゅうのはどう: 進む向きに立てて並ぶ、竜の気の輪（縦長の楕円の輪。右へ進む）。手前（右）の弧が明るく、奥（左）は暗い。
  * コマで輪の光が回る
  */
-function dragonRing(): SpriteOut {
-  // 0 輪郭・1 濃い紫・2 紫・3 青緑・4 うすい青緑・5 白
-  const palette = ['#120a2e', '#4527a0', '#7e57c2', '#26c6da', '#b2ebf2', '#ffffff'];
+function dragonRing(palette = ['#120a2e', '#4527a0', '#7e57c2', '#26c6da', '#b2ebf2', '#ffffff']): SpriteOut {
+  // 0 輪郭・1 濃い紫・2 紫・3 青緑・4 うすい青緑・5 白（みずのはどう は 濃い青・青・水色・うすい水色・白）
   const frames = [0, 1, 2].map((f) =>
     shape(24, (u, v) => {
       const e = Math.hypot(u / 0.34, v / 0.92);
@@ -3226,6 +3225,110 @@ function shadowPool(): SpriteOut {
   return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
 }
 
+/**
+ * バブルこうせん: 近い敵へ飛ぶ泡のレーザー（オーロラビームと同じ線の絵）。大小の泡が芯に沿って並び、コマで前へ流れる。
+ * 始まりは小さな泡、終わりは泡がはじけて散る
+ */
+function bubbleLine(): SpriteOut {
+  const H = 12;
+  const TILE = 10;
+  // 0 輪郭・1 濃い青・2 青・3 水色・4 うすい水色・5 白
+  const palette = ['#01395e', '#0288d1', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff'];
+  const mid = (H - 1) / 2;
+  const r = rng(910);
+  // 途中の泡: 幅 TILE の周期で並ぶ（並べてもつながる）
+  const bubbles = Array.from({ length: 7 }, (_, k) => ({ cx: (k / 7) * TILE + r() * 1.2, cy: mid + (r() - 0.5) * 6, rad: 1 + r() * 1.6 }));
+  const col = (x: number, y: number, f: number, part: 'start' | 'middle' | 'end'): number => {
+    // 細い芯（泡の間をつなぐ水の筋）
+    const core = Math.abs(y - mid) < (part === 'start' ? 0.6 + x * 0.15 : part === 'end' ? Math.max(0, 1 - x * 0.2) : 1);
+    let c = core ? 2 : -1;
+    const shift = f * 2.5;
+    for (const b of bubbles) {
+      // 泡は前（右）へ流れる。始まりは小さく、終わりははじけて輪だけ
+      const scale = part === 'start' ? 0.5 + x * 0.1 : part === 'end' ? 1 + x * 0.12 : 1;
+      let bx = (((b.cx + shift) % TILE) + TILE) % TILE;
+      if (part !== 'middle') bx = b.cx;
+      const d = Math.hypot(x - bx, y - b.cy) / (b.rad * scale);
+      if (d > 1) continue;
+      if (part === 'end') {
+        if (d > 0.6) c = 3;
+        continue;
+      }
+      if (d > 0.72) c = 1;
+      else if (x < bx && y < b.cy && d > 0.3) c = 5;
+      else c = d < 0.5 ? 4 : 3;
+    }
+    return c;
+  };
+  const parts = lineParts(H, { start: 5, middle: TILE, end: 8 }, 4, col);
+  return { palette, frameMs: 80, parts };
+}
+
+/**
+ * なみのり・だくりゅう: 自分を中心にした四角の中を、向いている方向へ繰り返し進む波（fit scroll で並べるタイル。07 の149章）。
+ * タイルの右端が波の先（白い泡）、後ろへ行くほど濃く、いちばん後ろは透けて下が見える。上下の端は波打ち、並べてもつながる（周期 H）
+ */
+function waveTile(kind: 'water' | 'mud'): SpriteOut {
+  const W = 12;
+  const H = 12;
+  // 0 輪郭・1 濃い色・2 中くらい・3 明るい・4 うすい・5 泡（白）
+  const palette = kind === 'water' ? ['#0d2b5c', '#01579b', '#0288d1', '#29b6f6', '#81d4fa', '#ffffff'] : ['#2e1f10', '#4e342e', '#6d4c41', '#8d6e4a', '#b89a72', '#e8dcc4'];
+  const frames: Grid[] = [];
+  for (let f = 0; f < 3; f++) {
+    const g = fill(blank(W, H), (x, y) => {
+      // 波の先の位置（縦に波打つ。周期 H で上下がつながる）
+      const crest = 8.6 + Math.sin(((y + 0.5) / H) * Math.PI * 2 + f * 0.9) * 1.1;
+      const back = crest - x;
+      if (back < -1.2) return -1;
+      if (back < 0) return 5;
+      // 泡の点が、コマごとに少しずれて散る
+      if (back < 1.6) return hash(Math.floor(x), Math.floor(y), 520 + f) < 0.35 ? 5 : 4;
+      if (back < 3.2) return 4;
+      if (back < 5) return hash(Math.floor(x), Math.floor(y), 530 + f) < 0.2 ? 4 : 3;
+      if (back < 6.6) return 2;
+      if (back < 7.6) return 1;
+      return -1;
+    });
+    frames.push(outline(g, 0));
+  }
+  return { palette, frameMs: 90, parts: { middle: frames.map(toRows) } };
+}
+
+/**
+ * アクアテールの叩きつけ（3撃目）: 右へまっすぐ振り下ろすしっぽ（上から見た絵）。1コマ目は振り上げて短く、
+ * 2コマ目で先まで伸びて、先に水しぶきが散る（fit front。07 の149章）
+ */
+function tailSlam(): SpriteOut {
+  // 0 輪郭・1 腹側の暗い色・2 しっぽ・3 うすい色・4 白い光・5 ひれ・6 しぶき（白）
+  const palette = ['#0d2b5c', '#01579b', '#0288d1', '#4fc3f7', '#e1f5fe', '#29b6f6', '#ffffff'];
+  const r = rng(930);
+  const drops = Array.from({ length: 14 }, () => ({ u: 0.55 + r() * 0.45, v: (r() - 0.5) * 1.1, s: 0.03 + r() * 0.05 }));
+  const frames = [0, 1].map((f) => {
+    const tip = f === 0 ? 0.1 : 0.62;
+    return toRows(
+      shape(28, (u, v) => {
+        // しっぽの本体: 左端（根元）から先へ、だんだん細く
+        const t = (u + 0.95) / (tip + 0.95);
+        if (t >= 0 && t <= 1) {
+          const half = 0.22 * (1 - t) + 0.07;
+          if (Math.abs(v) < half) {
+            if (Math.abs(((t * 8) % 1) - 0.5) < 0.07 && t < 0.85) return 1;
+            const side = v / half;
+            return side < -0.45 ? 4 : side < 0.15 ? 3 : side < 0.6 ? 2 : 1;
+          }
+        }
+        // 先のひれ（三角）
+        const tx = u - tip;
+        if (tx > -0.1 && tx < 0.26 && Math.abs(v) < 0.2 * (1 - (tx + 0.1) / 0.36)) return v < 0 ? 5 : 2;
+        // 2コマ目: 先に散るしぶき
+        if (f === 1) for (const d of drops) if (Math.hypot(u - d.u, v - d.v) < d.s) return 6;
+        return -1;
+      }),
+    );
+  });
+  return { palette, frameMs: 90, loopFrom: 1, parts: { main: frames } };
+}
+
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
 /** 絵の名前 → 描く関数 */
@@ -3250,6 +3353,11 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     psybeam: () => psyBeam(),
     'flame-cone': () => cone('flame'),
     'bubble-cone': () => cone('bubble'),
+    'scald-cone': () => cone('scald'),
+    'bubble-line': () => bubbleLine(),
+    'wave-tile': () => waveTile('water'),
+    'wave-tile-mud': () => waveTile('mud'),
+    'tail-slam': () => tailSlam(),
     'sound-cone': () => cone('sound'),
     'electric-cone': () => cone('electric'),
     'quake-crack': () => quakeCrack(),
@@ -3279,6 +3387,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     // つばさでうつ: 広げた白い翼（07 の117章）
     wing: () => wing(),
     'dragon-ring': () => dragonRing(),
+    'water-ring': () => dragonRing(['#0d2b5c', '#01579b', '#0288d1', '#4fc3f7', '#b3e5fc', '#ffffff']),
     'dragon-shock': () => dragonShock(),
     palm: () => palm(),
     'dust-ring': () => shockRing('dust'),

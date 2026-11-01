@@ -2656,12 +2656,12 @@
     "bubble-beam": {
       "extends": "water.base",
       "projectile": {
-        "shapeAlpha": 0.6
+        "shapeAlpha": 0.2
       },
       "sprite": {
-        "id": "bubble-cone",
-        "fit": "cone",
-        "size": 1
+        "id": "bubble-line",
+        "fit": "line",
+        "size": 2
       }
     },
     "whirlpool": {
@@ -3559,7 +3559,8 @@
         "glowScale": 1.05,
         "coreScale": 0.3,
         "coreColor": "#d7ccc8",
-        "glowColor": "#8d6e4a"
+        "glowColor": "#8d6e4a",
+        "shapeAlpha": 0.15
       },
       "trail": {
         "intervalMs": 30,
@@ -3590,9 +3591,11 @@
         "outward": true
       },
       "sprite": {
-        "id": "mud-ring",
-        "fit": "ring",
-        "size": 1
+        "id": "wave-tile-mud",
+        "fit": "scroll",
+        "alpha": 0.9,
+        "scrollSpeed": 170,
+        "scrollTiles": 5
       },
       "impact": {
         "burst": {
@@ -4130,15 +4133,21 @@
     },
     "water-pulse": {
       "extends": "water.base",
-      "projectile": {
-        "glowScale": 1.4,
-        "coreScale": 0.5
+      "impact": {
+        "flash": {
+          "radius": 50
+        }
       },
       "sprite": {
-        "id": "water-drop",
+        "id": "water-ring",
         "fit": "circle",
-        "size": 2.6,
+        "size": 1,
         "rotate": "velocity"
+      },
+      "projectile": {
+        "glowScale": 1.3,
+        "coreScale": 0.3,
+        "shapeAlpha": 0.15
       }
     },
     "mud-slap": {
@@ -4478,14 +4487,14 @@
     "surf": {
       "extends": "water.base",
       "projectile": {
-        "glowScale": 1.05,
-        "coreScale": 0.3,
-        "shapeAlpha": 0.25
+        "shapeAlpha": 0.15
       },
       "sprite": {
-        "id": "mud-ring",
-        "fit": "ring",
-        "size": 1
+        "id": "wave-tile",
+        "fit": "scroll",
+        "alpha": 0.9,
+        "scrollSpeed": 200,
+        "scrollTiles": 5
       }
     },
     "aqua-tail": {
@@ -4784,6 +4793,34 @@
           "seconds": 0.12,
           "feetOffset": 6
         }
+      }
+    },
+    "aqua-tail-slam": {
+      "extends": "water.base",
+      "projectile": {
+        "shapeAlpha": 0.25
+      },
+      "impact": {
+        "flash": {
+          "radius": 30
+        }
+      },
+      "sprite": {
+        "id": "tail-slam",
+        "fit": "front",
+        "size": 1,
+        "along": 0.5
+      }
+    },
+    "scald": {
+      "extends": "water.base",
+      "projectile": {
+        "shapeAlpha": 0.5
+      },
+      "sprite": {
+        "id": "scald-cone",
+        "fit": "cone",
+        "size": 1
       }
     }
   }

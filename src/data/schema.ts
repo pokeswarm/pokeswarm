@@ -956,7 +956,7 @@ export const moveEffectSchema = z.object({
   /** asMove なら、その技（moves.json のキー）として弾ける（見た目もタイプもその技。ばくれつパンチの 炎・雷 のスプラッシュ） */
   /** sweep があれば、円ではなく外へ広がる輪（厚さは大きさ × sweep）として durationSeconds かけて広がる（ふんかの足元の衝撃波。ふんえん と同じ見え方） */
   explode: z
-    .object({ ...fxSize, delaySeconds: z.number().positive().optional(), pull: z.number().positive().optional(), asMove: z.string().optional(), sweep: z.number().gt(0).max(1).optional(), durationSeconds: z.number().positive().optional() })
+    .object({ ...fxSize, delaySeconds: z.number().positive().optional(), pull: z.number().positive().optional(), asMove: z.string().optional(), sweep: z.number().gt(0).max(1).optional(), durationSeconds: z.number().positive().optional(), /** 当たる数の上限（省略で何体でも。ウェーブタックル: 敵ごとのしぶきが密集した群れで連鎖しないように。07 の149章） */ pierce: pierceValue.optional() })
     .optional(),
   /**
    * 残る範囲（炎・水たまり・毒）。直線の当たり判定なら alongSpacing ごとに線に沿って並べる。
@@ -1208,6 +1208,8 @@ export const moveDefSchema = z.object({
    * インファイト: 拳の連打（本体）・炎蹴りの薙ぎ払い・突き出す蹴り（07 の132章）
    */
   comboMoves: z.array(z.string()).optional(),
+  /** 一緒に出す技（comboMoves の側）: 本体より、この秒数だけ遅れて出し始める（アクアテールの叩きつけ: 往復のなぎ払いの後に。07 の149章） */
+  comboOffsetSeconds: z.number().nonnegative().optional(),
   /** 出す前に溜める秒数（リーフブレード・ブレイズキック）。溜めている間は体が光る（見た目のレシピの chargeGlow） */
   windupSeconds: z.number().positive().optional(),
   /**
@@ -1549,9 +1551,11 @@ const moveSpriteSpec = z.object({
    * ring（外へ進む帯の輪に沿って、途中の部品を並べる。じしんの地割れ）・
    * front（扇形の向きの先に1枚を置く。大きさは扇の半径。ほのおのキバの牙・フレアドライブの炎）・
    * snake（蛇行して進むものの通った道に 途中 を並べ、先に 終わり を置く。太さは当たり判定の直径。ヘドロウェーブ・ハードプラントの根）・
-   * thrust（線の根元に絵の左端を合わせ、線の長さに合わせた1枚。growSeconds の間に後ろから前へ突き出す。メガホーンの槍）
+   * thrust（線の根元に絵の左端を合わせ、線の長さに合わせた1枚。growSeconds の間に後ろから前へ突き出す。メガホーンの槍）・
+   * scroll（前の長方形（frontBox）の中に、途中の部品を向きに沿って scrollTiles 枚の周期で敷き、scrollSpeed（ワールドの単位/秒）で向きへ流す。
+   * 横は長方形の幅を割った段に並べ、前後の端では薄くする。なみのり・だくりゅうの波。07 の149章）
    */
-  fit: z.enum(['circle', 'line', 'cone', 'ring', 'front', 'snake', 'thrust']),
+  fit: z.enum(['circle', 'line', 'cone', 'ring', 'front', 'snake', 'thrust', 'scroll']),
   size: z.number().positive().default(1),
   /** 絵の濃さ（煙など、下が少し透けてほしいもの） */
   alpha: z.number().min(0).max(1).default(1),
@@ -1582,6 +1586,9 @@ const moveSpriteSpec = z.object({
   /** front: 通った後に残す残像の数と、残像の間隔（描くフレームの数）。だんだん薄くする（つばさでうつ。07 の117章） */
   afterimages: z.number().int().nonnegative().default(0),
   afterimageGap: z.number().int().positive().default(2),
+  /** scroll: 波が進む速さ（ワールドの単位/秒）と、長方形の長さに並ぶ波の枚数（周期 = 長さ ÷ 枚数） */
+  scrollSpeed: z.number().positive().default(160),
+  scrollTiles: z.number().positive().default(3),
 });
 
 export const effectRecipeSchema = z.object({

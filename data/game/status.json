@@ -5,7 +5,8 @@
       "damagePerSecond": 4,
       "speedMultiplier": 1,
       "damageTakenMultiplier": 1,
-      "color": "#ff7043"
+      "color": "#ff7043",
+      "contactDamageMultiplier": 0.5
     },
     {
       "id": "poison",

@@ -240,7 +240,8 @@ export function useMoves(world: World): void {
       }
       // 一緒に出し続ける技（インファイト: 炎蹴りの薙ぎ払い・突き出す蹴り）。それぞれの再使用ごとに、この技のレベルで出す
       if (def.comboMoves) {
-        pm.combo ??= def.comboMoves.map((move) => ({ move, level: pm.level, cooldown: 0, burstLeft: 0, burstTimer: 0 }));
+        // 遅れて出し始める技（アクアテールの叩きつけ）は、最初の再使用をその秒数から数える
+        pm.combo ??= def.comboMoves.map((move) => ({ move, level: pm.level, cooldown: world.rules.moves[move]?.comboOffsetSeconds ?? 0, burstLeft: 0, burstTimer: 0 }));
         for (const sub of pm.combo) {
           sub.level = pm.level;
           runSubMove(world, p, sub);

@@ -1269,7 +1269,7 @@ export class RunScene extends Phaser.Scene {
       now.set(serial, { x, y, radius: pr.radius[i]!, move: pr.move[i]! });
       g.fillStyle(0x000000, 0.12 + 0.18 * t).fillEllipse(x, y, pr.radius[i]! * (0.8 + 0.8 * t), pr.radius[i]! * (0.4 + 0.4 * t));
       items.push({
-        spec: { id: f.id, fit: 'circle', size: f.size, alpha: 1, rotate: 'none', spinDegPerSec: 0, varyTiles: false, upright: false, directional: false, originY: 1, along: 0.6, shake: 0, tail: 0, afterimages: 0, afterimageGap: 2 },
+        spec: { id: f.id, fit: 'circle', size: f.size, alpha: 1, rotate: 'none', spinDegPerSec: 0, varyTiles: false, upright: false, directional: false, originY: 1, along: 0.6, shake: 0, tail: 0, afterimages: 0, afterimageGap: 2, scrollSpeed: 160, scrollTiles: 3 },
         x,
         y: y - f.height * (1 - t * t),
         radius: pr.radius[i]!,
@@ -2129,7 +2129,7 @@ export class RunScene extends Phaser.Scene {
       // 効き方から出た円・飛ぶもの（ブラストバーンの火の粉・ハードプラントの根・10まんボルトの周りの電気）
       if (pr.stage[i] === 1 && pr.band[i] === 0) return (pr.linger[i] === 1 ? this.effects.lingerSprite(effect) : this.effects.effectSprite(effect)) ?? null;
       return null;
-    });
+    }, (i) => (pr.shape[i] === SHAPE_BOX ? boxShape(world, i) : null));
     // ボスの範囲技が落ちた所の絵: 出てからの時間でコマを進め、最後の 3 割で薄くする
     const now = this.time.now / 1000;
     this.strikes = this.strikes.filter((s) => now - s.start < s.seconds);

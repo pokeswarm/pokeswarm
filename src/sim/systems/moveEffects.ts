@@ -192,6 +192,7 @@ function explode(world: World, ex: NonNullable<MoveEffect['explode']>, src: FxSo
     growth: band > 0 ? Math.max(0, (radius - band) / life) : 0,
     life,
     ...(ex.pull ? { knockback: -ex.pull } : {}),
+    ...(ex.pierce !== undefined ? { pierce: ex.pierce === 'infinite' ? Infinity : ex.pierce } : {}),
   });
   world.events.push({ type: 'projectileHit', x: src.x, y: src.y, owner: src.owner, move: src.move });
 }

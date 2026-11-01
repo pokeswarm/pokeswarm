@@ -58,7 +58,8 @@
     "facade",
     "giga-impact-hoenn"
   ],
-  "heavyHitters": ["phantom-force", 
+  "heavyHitters": [
+    "phantom-force",
     "giga-impact",
     "frenzy-plant",
     "superpower",
@@ -109,13 +110,20 @@
     "body-slam-hoenn": "derived",
     "reflect": "derived",
     "revenge": "derived",
-    "flamethrower-hoenn": "derived"
+    "flamethrower-hoenn": "derived",
+    "aqua-tail-slam": "derived",
+    "aqua-tail-slam-azumarill": "unique"
   },
   "strengthScale": {
     "giga-impact": 2,
     "sing": 0.6,
     "yawn": 0.6,
     "stealth-rock": 0.4,
-    "phantom-force": 0.75
+    "phantom-force": 0.75,
+    "surf": 0.9,
+    "aqua-tail": 0.9,
+    "aqua-tail-azumarill": 0.9,
+    "aqua-tail-slam": 0.5,
+    "aqua-tail-slam-azumarill": 0.5
   }
 }

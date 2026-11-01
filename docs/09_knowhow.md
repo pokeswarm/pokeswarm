@@ -64,8 +64,8 @@
 - 技は「出し方（`pattern`）× 効き方（`effects`）× 見た目（レシピ）」の組み合わせ。新しい技は、まず既存の部品で作れないかを考える。
   - 出し方の例: facing・nearest・homing・melee・orbit・beam・stream・lob・strike・chain・bounce・scatter・cross・sweep・spiral・pulse・weather・barrage・screen・nova・eruption・spin・rest。
   - 効き方の部品: explode・puddle（`path` で通った道、`followOwner` で持ち主に付いていく）・split（`lob`・`snake`・`jitter`）・chain・orbit・spikes・cluster・crack・wave。起こるとき（trigger）は cast・hit・end・every・eachHit・spawn（hit は最初に当たった 1 回、eachHit は当たった敵ごと。ウェーブタックルのしぶき）。
-  - 絵の fit: circle・line・cone・ring・front・snake・thrust・scroll（前の長方形の中を向きへ流れる波。なみのり）。自分を中心にした正方形の技は `frontBox` を −1〜1 にする（07 の149章）。
-  - 一緒に出す技（`comboMoves`）は、出す側に `comboOffsetSeconds` を付けると遅れて出る（アクアテールの叩きつけ）。
+  - 絵の fit: circle・line・cone・ring・front・snake・thrust・scroll（前の長方形の中を向きへ流れる波。なみのり）。自分を中心にした正方形の技は `frontBox` を −1〜1 にする（07 の149章）。`followFacing` は扇にも前の長方形にも効く。
+  - 一緒に出す技（`comboMoves`）は、出す側に `comboOffsetSeconds` を付けると遅れて出る（アクアテールの叩きつけ）。`windupSeconds`（溜め）も効く。
   - 姿で変わる効き方は `forms`（しんそく: ウィンディなら炎）。
 - 派生（`derivations.json`）の形: 元の技（最大）＋ 持ち物 → 派生技。固有技は系統（`line`）付き。追加の条件は `minLevel`・`forms`・`withMoves`（ほかにも最大で持つ技。進化で消費）・`consumes`（持っていれば消費）・`inheritLevels`（材料の強化分を受け継ぐ）。
 - 消費した技は `consumedMoves` に入り、もう候補に出ない。

@@ -713,7 +713,7 @@ function cone(kind: 'flame' | 'bubble' | 'sound' | 'electric' | 'scald'): Sprite
   const W = 32;
   const H = 16;
   const palette =
-    kind === 'flame' ? ['#4a0e05', '#c62828', '#ef6c00', '#ffb300', '#fff176', '#ffffff'] : kind === 'scald' ? ['#5d1a00', '#e64a19', '#ff8a65', '#ffccbc', '#fff3e0', '#ffffff'] : kind === 'electric' ? ['#1a1440', '#f9a825', '#fdd835', '#ffffff', '#fff59d', '#ffffff'] : kind === 'sound' ? ['#880e4f', '#ec407a', '#f8bbd0', '#ffffff', '#fce4ec', '#ffffff'] : ['#01395e', '#0288d1', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff'];
+    kind === 'flame' ? ['#4a0e05', '#c62828', '#ef6c00', '#ffb300', '#fff176', '#ffffff'] : kind === 'scald' ? ['#01395e', '#0288d1', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff', '#cfd8dc', '#eceff1'] : kind === 'electric' ? ['#1a1440', '#f9a825', '#fdd835', '#ffffff', '#fff59d', '#ffffff'] : kind === 'sound' ? ['#880e4f', '#ec407a', '#f8bbd0', '#ffffff', '#fce4ec', '#ffffff'] : ['#01395e', '#0288d1', '#4fc3f7', '#b3e5fc', '#e1f5fe', '#ffffff'];
   const frames: Grid[] = [];
   for (let f = 0; f < 4; f++) {
     if (kind === 'electric') {
@@ -771,7 +771,7 @@ function cone(kind: 'flame' | 'bubble' | 'sound' | 'electric' | 'scald'): Sprite
       });
       frames.push(outline(g, 0));
     } else {
-      // 泡: 扇形の中に大小の泡を散らす（先ほど大きい）
+      // 泡: 扇形の中に大小の泡を散らす（先ほど大きい）。ねっとう は、泡の下に白い湯気（先の方ほど多い。作者の指摘 2026年11月1日: 赤い泡は熱湯に見えない）
       const r = rng(400 + f);
       const bubbles = Array.from({ length: 22 }, (_, k) => {
         const t = r();
@@ -780,9 +780,21 @@ function cone(kind: 'flame' | 'bubble' | 'sound' | 'electric' | 'scald'): Sprite
         const cy = (H - 1) / 2 + (r() * 2 - 1) * (half - 1) + Math.sin(f + k) * 0.6;
         return { cx, cy, rad: 0.8 + t * 1.8 + r() * 0.6 };
       });
+      const steam =
+        kind === 'scald'
+          ? Array.from({ length: 12 }, (_, k) => {
+              const t = 0.35 + r() * 0.65;
+              const half = (H / 2) * (0.2 + 0.8 * t);
+              return { cx: 2 + t * (W - 4) + Math.sin(f * 1.3 + k) * 0.8, cy: (H - 1) / 2 + (r() * 2 - 1) * half * 0.9, rad: 1.6 + t * 2.2 };
+            })
+          : [];
       frames.push(
         fill(blank(W, H), (x, y) => {
           let c = -1;
+          for (const s of steam) {
+            const d = Math.hypot(x - s.cx, y - s.cy) / s.rad;
+            if (d < 1) c = d < 0.6 ? 7 : 6;
+          }
           for (const b of bubbles) {
             const d = Math.hypot(x - b.cx, y - b.cy) / b.rad;
             if (d > 1) continue;

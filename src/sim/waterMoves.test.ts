@@ -34,6 +34,13 @@ describe('なみのり・だくりゅう: 自分を中心にした正方形の�
     t.sim.step([]);
     expect(t.pr.x[i]).toBeCloseTo(t.p.x);
     expect(t.pr.y[i]).toBeCloseTo(t.p.y);
+    // 出た後も、向きを変えると波の向きが付いてくる（followFacing）
+    expect(t.pr.dirY[i]).toBeCloseTo(1);
+    t.p.facingX = 1;
+    t.p.facingY = 0;
+    for (let k = 0; k < 6; k++) t.sim.step([]);
+    expect(t.pr.dirX[i]).toBeCloseTo(1, 1);
+    expect(Math.abs(t.pr.dirY[i]!)).toBeLessThan(0.1);
     // 移動速度の強化（selfBuff）
     expect(t.p.moveBuffs?.some((b) => b.move === t.m)).toBe(true);
     expect(t.p.moveSpeed).toBeCloseTo(before * 1.2);
@@ -77,7 +84,7 @@ describe('バブルこうせん・みずのはどう', () => {
 });
 
 describe('アクアテール: 往復のなぎ払いの後に、前方長方形の叩きつけ', () => {
-  it('叩きつけは 0.4 秒遅れて出る（comboOffsetSeconds）', () => {
+  it('叩きつけは 0.4 秒遅れて溜め始め、0.25 秒溜めてから出る（comboOffsetSeconds ＋ windupSeconds）', () => {
     for (const [key, slamKey] of [
       ['aqua-tail', 'aqua-tail-slam'],
       ['aqua-tail-azumarill', 'aqua-tail-slam-azumarill'],
@@ -89,7 +96,12 @@ describe('アクアテール: 往復のなぎ払いの後に、前方長方形�
       t.sim.step([{ type: 'spawnEnemy', id: 1, kind: 0, x: 60, y: 0 }]);
       expect(t.find((i) => t.pr.move[i] === t.m && t.pr.shape[i] === SHAPE_SECTOR)).toHaveLength(1);
       expect(t.find((i) => t.pr.move[i] === slam)).toHaveLength(0);
+      expect(t.rules.moves[slam]!.windupSeconds).toBe(0.25);
       for (let k = 0; k < Math.round(0.4 * 30) + 1; k++) t.sim.step([]);
+      // 溜めている（体が光る）。まだ出ない
+      expect(t.p.moves[0]!.combo?.[0]?.windup).toBeDefined();
+      expect(t.find((i) => t.pr.move[i] === slam)).toHaveLength(0);
+      for (let k = 0; k < Math.round(0.25 * 30) + 1; k++) t.sim.step([]);
       const boxes = t.find((i) => t.pr.move[i] === slam && t.pr.shape[i] === SHAPE_BOX);
       expect(boxes).toHaveLength(1);
     }

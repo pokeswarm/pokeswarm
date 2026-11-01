@@ -1193,7 +1193,8 @@ export class RunScene extends Phaser.Scene {
   private chargeOf(world: World, p: World['players'][number]): { color: number; radius: number; alpha: number; t: number } | null {
     if (p.down) return null;
     let best: { color: number; radius: number; alpha: number; t: number } | null = null;
-    for (const pm of p.moves) {
+    // 一緒に出す技（アクアテールの叩きつけ）の溜めも光らせる
+    for (const pm of p.moves.flatMap((m) => [m, ...(m.combo ?? [])])) {
       const def = world.rules.moves[pm.move]!;
       const c = this.effects.chargeGlow(def.effect);
       if (!c) continue;

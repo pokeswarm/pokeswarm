@@ -1142,7 +1142,7 @@ export const moveDefSchema = z.object({
    * start が負なら自分の後ろから（ブレイズキック: 自分を含む前の長方形）
    */
   frontBox: z.object({ start: z.number().min(-1), end: z.number().positive(), halfWidth: z.number().positive() }).optional(),
-  /** 扇（melee の arcDegrees）: 出ている間、向いている方向をこの速さ（度/秒）で追う（かえんほうしゃ） */
+  /** 扇（melee の arcDegrees）・前の長方形（frontBox）: 出ている間、向いている方向をこの速さ（度/秒）で追う（かえんほうしゃ・なみのりの波） */
   followFacing: z.number().positive().optional(),
   /** 扇（melee の arcDegrees）: 出ている間、向きをこの速さ（度/秒）で回し続ける（ハイパーボイス: 左右の扇がぐるりと回る。07 の141章） */
   spinDegPerSec: z.number().optional(),

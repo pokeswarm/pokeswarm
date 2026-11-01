@@ -486,6 +486,16 @@ function runSubMove(world: World, p: Player, sub: PlayerMove): void {
     return;
   }
   if (sub.cooldown > 0) return;
+  // 溜める技（アクアテールの叩きつけ）: 本体と同じく windupSeconds 溜めてから出す（溜めている間は体が光る）
+  if (def.windupSeconds) {
+    if (sub.windup === undefined) {
+      sub.windup = def.windupSeconds;
+      return;
+    }
+    sub.windup -= world.dt;
+    if (sub.windup > 0) return;
+    sub.windup = undefined;
+  }
   const needsTarget = def.pattern === 'nearest' || def.pattern === 'homing' || def.pattern === 'chain';
   if (needsTarget && nearestEnemy(world, p.x, p.y, st.range) === -1) {
     sub.cooldown = 0;
@@ -1337,9 +1347,9 @@ export function moveProjectiles(world: World): void {
       pr.x[i] = owner.x + pr.ox[i]!;
       pr.y[i] = owner.y + pr.oy[i]!;
       pr.radius[i]! += pr.growth[i]! * world.dt;
-      // 向いている方向を追う扇（かえんほうしゃ）
+      // 向いている方向を追う扇（かえんほうしゃ）・前の長方形（なみのりの波。07 の149章）
       const follow = world.rules.moves[pr.move[i]!]!.followFacing;
-      if (follow && pr.shape[i] === SHAPE_SECTOR && pr.stage[i] === 0) {
+      if (follow && (pr.shape[i] === SHAPE_SECTOR || pr.shape[i] === SHAPE_BOX) && pr.stage[i] === 0) {
         const [fx, fy] = axisToUnit(owner.facingX, owner.facingY);
         const cur = Math.atan2(pr.dirY[i]!, pr.dirX[i]!);
         // 左右へ出す扇（ハイパーボイス）は、向いている方向に直角な向きのうち、今の向きに近い方を追う

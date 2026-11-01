@@ -4810,6 +4810,12 @@
         "fit": "front",
         "size": 1,
         "along": 0.5
+      },
+      "chargeGlow": {
+        "color": "#4fc3f7",
+        "seconds": 0.25,
+        "radius": 50,
+        "alpha": 1
       }
     },
     "scald": {

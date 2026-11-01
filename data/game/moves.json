@@ -2298,7 +2298,9 @@
             "alongSpacing": 36
           }
         }
-      ]
+      ],
+      "chainReturn": true,
+      "waitForEnd": true
     },
     "seed-bomb": {
       "pattern": "scatter",

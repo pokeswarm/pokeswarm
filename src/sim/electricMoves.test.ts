@@ -61,6 +61,18 @@ describe('ボルトチェンジ: 残像が敵から敵へ飛び、最後は自�
     expect(pm.cooldown + (Math.round(hop * 2 * 30) + 2 + 1) / 30).toBeGreaterThanOrEqual(hop * 2 + def.levels[0]!.durationSeconds - 1e-9);
   });
 
+  it('しんそく も同じく、戻る線が出て、帰ってくるまで次を出さない（作者の依頼 2026年11月1日）', () => {
+    const t = setup('extreme-speed');
+    const def = t.rules.moves[t.m]!;
+    expect(def.chainReturn).toBe(true);
+    expect(def.waitForEnd).toBe(true);
+    t.sim.step([{ type: 'spawnEnemy', id: 1, kind: 0, x: 150, y: 0 }]);
+    t.sim.step([]);
+    const lines = t.find((i) => t.pr.move[i] === t.m && t.pr.shape[i] === SHAPE_LINE);
+    expect(lines).toHaveLength(2);
+    expect(lines.some((i) => t.pr.orbitRadius[i] === -1)).toBe(true);
+  });
+
   it('敵が 1 体なら、その敵へ 1 本と戻る線 1 本', () => {
     const t = setup('volt-switch');
     t.sim.step([{ type: 'spawnEnemy', id: 1, kind: 0, x: 150, y: 0 }]);

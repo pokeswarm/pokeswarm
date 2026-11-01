@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildSimRules, moveIndexOf } from '../data/simRules';
-import { MOTION_BOOMERANG, SHAPE_BOX, SHAPE_LINE, SHAPE_SECTOR } from './entities/projectiles';
+import { MOTION_BOOMERANG, SHAPE_LINE, SHAPE_SECTOR } from './entities/projectiles';
 import { Simulation } from './simulation';
 
 /** ホウエンの技の作り直し（2）ひこう・ドラゴン（作者の指摘 2026年11月1日。07 の153章） */
@@ -17,14 +17,14 @@ function setup(move: string) {
 }
 
 describe('ひこう', () => {
-  it('かぜおこし は前へ吹く扇、つばさでうつ は前の長方形、エアスラッシュ はまっすぐ飛ぶ 1 枚の刃', () => {
-    const g = setup('gust-hoenn');
+  it('エアカッター は前へ吹く扇、つばさでうつ は往復のなぎ払い（ジョウトの技）、つばめがえし はまっすぐ飛ぶ 1 枚の刃', () => {
+    const g = setup('air-cutter');
     g.sim.step([]);
     expect(g.find((i) => g.pr.move[i] === g.m && g.pr.shape[i] === SHAPE_SECTOR)).toHaveLength(1);
-    const w = setup('wing-attack-hoenn');
+    const w = setup('wing-attack');
     w.sim.step([]);
-    expect(w.find((i) => w.pr.move[i] === w.m && w.pr.shape[i] === SHAPE_BOX)).toHaveLength(1);
-    const a = setup('air-slash-hoenn');
+    expect(w.find((i) => w.pr.move[i] === w.m && w.pr.shape[i] === SHAPE_SECTOR)).toHaveLength(1);
+    const a = setup('aerial-ace');
     a.sim.step([]);
     const blades = a.find((i) => a.pr.move[i] === a.m);
     expect(blades).toHaveLength(1);
@@ -53,13 +53,13 @@ describe('ドラゴン', () => {
     expect(c.rules.moves[c.m]!.sweepOnce).toBe(true);
     c.sim.step([]);
     expect(c.find((i) => c.pr.move[i] === c.m && c.pr.shape[i] === SHAPE_SECTOR)).toHaveLength(1);
-    const p = setup('dragon-pulse-hoenn');
+    const p = setup('dragon-pulse');
     p.sim.world.enemies.add(1, 0, 150, 0, 1e6, 0, 10);
     p.sim.step([]);
     expect(p.find((i) => p.pr.move[i] === p.m && p.pr.shape[i] === SHAPE_LINE)).toHaveLength(1);
   });
   it('たつまき はゆっくり前へ進み、0.3 秒ごとに周りを巻き込む。げきりん は周り全部へ乱れ打つ', () => {
-    const t = setup('twister-hoenn');
+    const t = setup('twister');
     const def = t.rules.moves[t.m]!;
     expect(def.pattern).toBe('facing');
     expect(def.effects[0]!.explode?.pull).toBe(180);

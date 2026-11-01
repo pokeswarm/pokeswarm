@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { derivationsConfig, generated, movesConfig, playablesConfig } from './index';
+import { derivationsConfig, generated, learnsetsConfig, movesConfig, playablesConfig } from './index';
 import { buildSimRules, playableLoadout } from './simRules';
 
 describe('data/ から組み立てたシミュレーションの定義', () => {
@@ -74,7 +74,9 @@ describe('data/ から組み立てたシミュレーションの定義', () => {
       // 元の技の途中（派生技）を最初から覚えているなら、それでよい（ズバット: かみつく から始める。07 の80章）
       const chain: string[] = [];
       for (let k: string | undefined = u.from; k; k = sourceOf(k, u.line)?.from) chain.push(k);
+      const inLearnset = (learnsetsConfig.lines[u.line] ?? []).some((e) => (typeof e === 'string' ? e : e.move) === base);
       const ok =
+        inLearnset ||
         chain.some((k) => pl.startingMoves.includes(k)) ||
         pl.allMoveTypes ||
         (def.learners ? def.learners.includes(u.line) : type === 'normal' || typesOf(u.line).has(type) || (pl.moveTypes ?? []).includes(type));

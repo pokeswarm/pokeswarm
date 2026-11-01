@@ -1,4 +1,16 @@
 {
+  "aerial-ace": {
+    "names": {
+      "ja": "つばめがえし",
+      "en": "Aerial Ace",
+      "fr": "Aéropique",
+      "de": "Aero-Ass",
+      "es": "Golpe Aéreo",
+      "it": "Aeroassalto"
+    },
+    "type": "flying",
+    "damageClass": "physical"
+  },
   "aeroblast": {
     "names": {
       "ja": "エアロブラスト",
@@ -22,6 +34,18 @@
     },
     "type": "psychic",
     "damageClass": "status"
+  },
+  "air-cutter": {
+    "names": {
+      "ja": "エアカッター",
+      "en": "Air Cutter",
+      "fr": "Tranch’Air",
+      "de": "Windschnitt",
+      "es": "Aire Afilado",
+      "it": "Aerasoio"
+    },
+    "type": "flying",
+    "damageClass": "special"
   },
   "air-slash": {
     "names": {

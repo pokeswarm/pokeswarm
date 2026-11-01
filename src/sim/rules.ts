@@ -26,6 +26,8 @@ export interface SimLineRule {
   readonly excludeMoveTypes: readonly number[];
   readonly hpCost: { readonly forms: readonly number[]; readonly move: number; readonly pct: number; readonly minHpPct: number } | null;
   readonly cry: { readonly forms: readonly number[]; readonly everyDistance: number; readonly seconds: number } | null;
+  /** 覚える技（learnsets.json。07 の158章）。あれば、レベルアップの候補はこの一覧の技だけ（forms はその姿のときだけ） */
+  readonly learnset?: readonly { readonly move: number; readonly forms?: readonly number[] }[];
 }
 
 /** 特性の効き方（abilities.json を番号に直したもの。07 の133章） */

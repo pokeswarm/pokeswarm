@@ -19,7 +19,7 @@ describe('マグニチュード', () => {
   it('自分から広がる波で、使うたびに強さ（4〜10）を引いて威力と届く距離が変わる', () => {
     const got = new Set<number>();
     for (let seed = 1; seed <= 6; seed++) {
-      const t = setup('magnitude-hoenn', seed);
+      const t = setup('magnitude', seed);
       const def = t.rules.moves[t.m]!;
       expect(def.pattern).toBe('nova');
       expect(def.magnitude).toEqual({ min: 4, max: 10 });
@@ -34,7 +34,7 @@ describe('マグニチュード', () => {
 
 describe('いわなだれ', () => {
   it('向いている方向の扇（100°）の中に、空から大岩が 5 つ降る（置いてから 0.5 秒待つ）', () => {
-    const t = setup('rock-slide-hoenn');
+    const t = setup('rock-slide');
     const def = t.rules.moves[t.m]!;
     expect(def.scatterArc).toBe(100);
     t.sim.step([]);

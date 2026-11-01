@@ -19,7 +19,7 @@ describe('かみなりのキバ', () => {
   it('かみつく・ほのおのキバと同じキバの攻撃（前の長方形。向きで描き分ける口の絵）', () => {
     const rules = buildSimRules('hoenn');
     const fang = rules.moves[moveIndexOf(rules, 'thunder-fang')]!;
-    const fire = rules.moves[moveIndexOf(rules, 'fire-fang-hoenn')]!;
+    const fire = rules.moves[moveIndexOf(rules, 'fire-fang')]!;
     expect(fang.pattern).toBe('melee');
     expect(fang.frontBox).toEqual(fire.frontBox);
     const sprite = (recipesConfig as { recipes: Record<string, { sprite?: { id: string; directional?: boolean } }> }).recipes['thunder-fang']!.sprite!;

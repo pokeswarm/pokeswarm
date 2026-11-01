@@ -7,6 +7,7 @@ import type { SimLineRule, SimRules } from '../sim/rules';
 import {
   combatConfig,
   derivationsConfig,
+  learnsetsConfig,
   enemiesConfig,
   generated,
   itemsConfig,
@@ -229,6 +230,18 @@ export function buildSimRules(region?: string): SimRules {
       excludeMoveTypes: pl.excludeMoveTypes.map(typeIndex),
       hpCost: pl.formHpCost ? { forms: pl.formHpCost.forms.map(formIndex), move: moveIndex(pl.formHpCost.move), pct: pl.formHpCost.pct, minHpPct: pl.formHpCost.minHpPct } : null,
       cry: pl.cry ? { forms: pl.cry.forms.map(formIndex), everyDistance: pl.cry.everyDistance, seconds: pl.cry.seconds } : null,
+      // 系統ごとの覚える技（learnsets.json。無い系統はタイプの決まりのまま）
+      ...(learnsetsConfig.lines[key]
+        ? {
+            learnset: learnsetsConfig.lines[key]!.map((e) => {
+              const mk = typeof e === 'string' ? e : e.move;
+              const mi = moveIndex(mk);
+              if (mi < 0) throw new Error(`learnsets.json: ${key} の技 ${mk} が moves.json にありません`);
+              const forms = typeof e === 'string' ? undefined : e.forms.map((f) => { const i = formIndex(f); if (i < 0) throw new Error(`learnsets.json: ${key} の姿 ${f} がありません`); return i; });
+              return forms ? { move: mi, forms } : { move: mi };
+            }),
+          }
+        : {}),
     };
   }
   return {

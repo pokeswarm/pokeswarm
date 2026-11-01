@@ -54,7 +54,7 @@ describe('リフレクター・サイコキネシス・みらいよち', () => {
     expect(t.p.mods.damageTakenPct).toBe(-30);
   });
   it('サイコキネシスは使った瞬間に引き寄せ（負のノックバック）、念の波が広がる', () => {
-    const t = setup('psychic-hoenn');
+    const t = setup('psychic');
     t.sim.step([]);
     const pull = t.find((i) => t.pr.move[i] === t.m && t.pr.stage[i] === 1);
     expect(pull).toHaveLength(1);
@@ -62,7 +62,7 @@ describe('リフレクター・サイコキネシス・みらいよち', () => {
     expect(t.find((i) => t.pr.move[i] === t.m && t.pr.stage[i] === 0 && t.pr.band[i]! > 0)).toHaveLength(1);
   });
   it('みらいよち（2 つ）は敵の足元に印を置く strike で、1.5 秒後に弾ける', () => {
-    for (const key of ['future-sight-hoenn', 'future-sight-gardevoir']) {
+    for (const key of ['future-sight', 'future-sight-gardevoir']) {
       const t = setup(key);
       const def = t.rules.moves[t.m]!;
       expect(def.pattern).toBe('strike');
@@ -85,7 +85,7 @@ describe('ふいうち・つじぎり・ナイトヘッド・ナイトバース�
     expect(blade).toHaveLength(1);
     expect(n.pr.vx[blade[0]!]).toBeGreaterThan(0);
     expect(n.rules.moves[n.m]!.levels[0]!.critChancePct).toBe(35);
-    const f = setup('night-shade-hoenn');
+    const f = setup('night-shade');
     expect(f.rules.moves[f.m]!.levels[0]!.pierce).toBe(Infinity);
     const d = setup('night-daze');
     expect(d.rules.moves[d.m]!.levels[0]!.status).toBeGreaterThanOrEqual(0);

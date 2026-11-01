@@ -68,7 +68,7 @@ describe('ふんえん', () => {
   it('基礎範囲は 165（前の 220 から 25% 減）、再使用 2.0 秒', () => {
     for (const [key, region] of [
       ['lava-plume', 'kanto'],
-      ['lava-plume-hoenn', 'hoenn'],
+      ['lava-plume', 'hoenn'],
     ] as const) {
       const rules = buildSimRules(region);
       const def = rules.moves[moveIndexOf(rules, key)]!;

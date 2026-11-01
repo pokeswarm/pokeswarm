@@ -1454,50 +1454,88 @@
     "rock-slide": {
       "extends": "rock.base",
       "projectile": {
-        "glowScale": 1.2,
-        "coreScale": 0.6
+        "glowScale": 0.6,
+        "coreScale": 0.2
       },
       "impact": {
         "flash": {
-          "radius": 60
+          "color": "#bcaaa4",
+          "radius": 50,
+          "durationMs": 160,
+          "alpha": 0.6
         }
       },
       "sprite": {
-        "id": "rock",
+        "id": "boulder",
         "fit": "circle",
-        "size": 1.5,
-        "rotate": "spin",
-        "spinDegPerSec": 300
+        "size": 1.7
       },
       "effectSprite": {
-        "id": "rock",
+        "id": "rock-shard",
         "fit": "circle",
-        "size": 1.5,
+        "size": 1.4,
         "rotate": "spin",
-        "spinDegPerSec": 420
+        "spinDegPerSec": 500
+      },
+      "fall": {
+        "id": "boulder",
+        "height": 300,
+        "size": 1.7,
+        "shards": {
+          "id": "rock-shard",
+          "count": 6,
+          "distance": 60,
+          "seconds": 0.4,
+          "size": 0.5
+        }
       }
     },
     "magnitude": {
       "extends": "ground.base",
+      "projectile": {
+        "shapeAlpha": 0.12
+      },
+      "impact": {
+        "flash": {
+          "color": "#d7b98e",
+          "radius": 30,
+          "durationMs": 140,
+          "alpha": 0.6
+        }
+      },
       "sprite": {
-        "id": "quake-zone",
-        "fit": "circle",
-        "size": 1.05,
+        "id": "quake-wave",
+        "fit": "ring",
+        "size": 1,
+        "varyTiles": true,
         "shake": 2
       }
     },
     "earthquake": {
       "extends": "ground.base",
+      "projectile": {
+        "shapeAlpha": 0.12
+      },
       "impact": {
         "flash": {
-          "radius": 60
+          "color": "#bcaaa4",
+          "radius": 40,
+          "durationMs": 160,
+          "alpha": 0.6
         }
       },
       "sprite": {
-        "id": "quake-zone",
-        "fit": "circle",
-        "size": 1.05,
+        "id": "quake-wave-big",
+        "fit": "ring",
+        "size": 1,
+        "varyTiles": true,
         "shake": 3
+      },
+      "effectLineSprite": {
+        "id": "earth-fissure",
+        "fit": "line",
+        "size": 1.2,
+        "growSeconds": 0.25
       }
     },
     "bonemerang": {
@@ -1516,10 +1554,15 @@
     },
     "confusion": {
       "extends": "psychic.base",
+      "projectile": {
+        "shapeAlpha": 0.15
+      },
       "sprite": {
-        "id": "burst-psy",
+        "id": "psy-grip",
         "fit": "circle",
-        "size": 1.1
+        "size": 1.6,
+        "rotate": "spin",
+        "spinDegPerSec": 360
       }
     },
     "psybeam": {
@@ -1535,37 +1578,64 @@
     },
     "psychic": {
       "extends": "psychic.base",
+      "projectile": {
+        "shapeAlpha": 0.12
+      },
       "impact": {
         "flash": {
-          "radius": 60
+          "color": "#f48fb1",
+          "radius": 50,
+          "durationMs": 160,
+          "alpha": 0.6
         }
       },
       "sprite": {
-        "id": "burst-psy",
+        "id": "psy-wave",
+        "fit": "ring",
+        "size": 1,
+        "varyTiles": true
+      },
+      "effectSprite": {
+        "id": "psy-grip",
         "fit": "circle",
-        "size": 1.1
+        "size": 0.9,
+        "alpha": 0.4,
+        "rotate": "spin",
+        "spinDegPerSec": 540
       }
     },
     "future-sight": {
       "extends": "psychic.base",
       "projectile": {
         "glowScale": 1.1,
-        "coreScale": 0.4
+        "coreScale": 0.3
       },
       "impact": {
         "flash": {
-          "radius": 60
+          "color": "#f48fb1",
+          "radius": 60,
+          "durationMs": 160,
+          "alpha": 0.6
         }
       },
       "sprite": {
-        "id": "burst-psy",
+        "id": "psy-grip",
         "fit": "circle",
-        "size": 1.15
+        "size": 1.2,
+        "rotate": "spin",
+        "spinDegPerSec": 360
+      },
+      "hitSprite": {
+        "id": "future-eye",
+        "fit": "circle",
+        "size": 1,
+        "seconds": 1.5,
+        "radius": 22
       },
       "effectSprite": {
-        "id": "burst-psy",
+        "id": "future-burst",
         "fit": "circle",
-        "size": 1.3
+        "size": 1.1
       }
     },
     "stone-edge": {
@@ -2464,22 +2534,44 @@
     },
     "night-shade": {
       "extends": "ghost.base",
+      "projectile": {
+        "glowScale": 1.3,
+        "coreScale": 0.2,
+        "glowColor": "#4a148c"
+      },
       "sprite": {
-        "id": "shadow-orb",
+        "id": "night-face",
         "fit": "circle",
-        "size": 2.6
+        "size": 2.2
       }
     },
     "shadow-ball": {
       "extends": "ghost.base",
       "projectile": {
-        "glowScale": 2.8,
-        "coreScale": 0.9
+        "glowScale": 1.6,
+        "coreScale": 0.2,
+        "glowColor": "#4a148c"
+      },
+      "impact": {
+        "flash": {
+          "color": "#b39ddb",
+          "radius": 40,
+          "durationMs": 140,
+          "alpha": 0.6
+        }
       },
       "sprite": {
-        "id": "shadow-orb",
+        "id": "shadow-sphere",
         "fit": "circle",
-        "size": 2.6
+        "size": 1.5,
+        "rotate": "spin",
+        "spinDegPerSec": 240
+      },
+      "effectSprite": {
+        "id": "shadow-shard",
+        "fit": "circle",
+        "size": 2,
+        "rotate": "velocity"
       }
     },
     "hex": {
@@ -2553,25 +2645,46 @@
     },
     "dragon-rage": {
       "extends": "dragon.base",
+      "projectile": {
+        "glowScale": 1.6,
+        "coreScale": 0.3,
+        "glowColor": "#5e35b1"
+      },
+      "impact": {
+        "flash": {
+          "color": "#b2ebf2",
+          "radius": 60,
+          "durationMs": 160,
+          "alpha": 0.6
+        }
+      },
       "sprite": {
-        "id": "dragon-flame",
+        "id": "rage-orb",
         "fit": "circle",
-        "size": 2.4,
+        "size": 1.8,
         "rotate": "velocity"
+      },
+      "effectSprite": {
+        "id": "rage-burst",
+        "fit": "circle",
+        "size": 1.1
       }
     },
     "dragon-pulse": {
       "extends": "dragon.base",
       "impact": {
         "flash": {
-          "radius": 60
+          "color": "#b2ebf2",
+          "radius": 40,
+          "durationMs": 140,
+          "alpha": 0.6
         }
       },
       "sprite": {
-        "id": "dragon-ring",
-        "fit": "circle",
-        "size": 1,
-        "rotate": "velocity"
+        "id": "dragon-pulse-beam",
+        "fit": "line",
+        "size": 1.3,
+        "growSeconds": 0.1
       }
     },
     "psystrike": {
@@ -3931,12 +4044,23 @@
     },
     "twister": {
       "extends": "dragon.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0.5,
+        "coreScale": 0.1
+      },
       "sprite": {
-        "id": "gust-swirl",
+        "id": "tornado",
         "fit": "circle",
-        "size": 1.7,
+        "size": 1.6,
         "rotate": "spin",
-        "spinDegPerSec": 1100
+        "spinDegPerSec": 540
+      },
+      "effectSprite": {
+        "id": "wind-ripple",
+        "fit": "circle",
+        "size": 1,
+        "alpha": 0.6
       }
     },
     "rain-dance": {
@@ -5180,27 +5304,6 @@
         "size": 1
       }
     },
-    "magnitude-hoenn": {
-      "extends": "ground.base",
-      "projectile": {
-        "shapeAlpha": 0.12
-      },
-      "impact": {
-        "flash": {
-          "color": "#d7b98e",
-          "radius": 30,
-          "durationMs": 140,
-          "alpha": 0.6
-        }
-      },
-      "sprite": {
-        "id": "quake-wave",
-        "fit": "ring",
-        "size": 1,
-        "varyTiles": true,
-        "shake": 2
-      }
-    },
     "earth-power": {
       "extends": "ground.base",
       "projectile": {
@@ -5254,204 +5357,6 @@
         "growSeconds": 0.25
       }
     },
-    "rock-slide-hoenn": {
-      "extends": "rock.base",
-      "projectile": {
-        "glowScale": 0.6,
-        "coreScale": 0.2
-      },
-      "impact": {
-        "flash": {
-          "color": "#bcaaa4",
-          "radius": 50,
-          "durationMs": 160,
-          "alpha": 0.6
-        }
-      },
-      "sprite": {
-        "id": "boulder",
-        "fit": "circle",
-        "size": 1.7
-      },
-      "effectSprite": {
-        "id": "rock-shard",
-        "fit": "circle",
-        "size": 1.4,
-        "rotate": "spin",
-        "spinDegPerSec": 500
-      },
-      "fall": {
-        "id": "boulder",
-        "height": 300,
-        "size": 1.7,
-        "shards": {
-          "id": "rock-shard",
-          "count": 6,
-          "distance": 60,
-          "seconds": 0.4,
-          "size": 0.5
-        }
-      }
-    },
-    "gust-hoenn": {
-      "extends": "flying.base",
-      "projectile": {
-        "shapeAlpha": 0.1
-      },
-      "sprite": {
-        "id": "wind-gust",
-        "fit": "cone",
-        "size": 1,
-        "alpha": 0.9
-      }
-    },
-    "wing-attack-hoenn": {
-      "extends": "flying.base",
-      "projectile": {
-        "shapeAlpha": 0.15
-      },
-      "impact": {
-        "flash": {
-          "color": "#e1f5fe",
-          "radius": 30,
-          "durationMs": 110,
-          "alpha": 0.5
-        }
-      },
-      "sprite": {
-        "id": "wing-slash",
-        "fit": "front",
-        "size": 1.1,
-        "along": 0.5,
-        "afterimages": 2,
-        "afterimageGap": 2
-      }
-    },
-    "air-slash-hoenn": {
-      "extends": "flying.base",
-      "projectile": {
-        "glowScale": 1.2,
-        "coreScale": 0.2
-      },
-      "sprite": {
-        "id": "air-crescent",
-        "fit": "circle",
-        "size": 2.4,
-        "rotate": "velocity"
-      }
-    },
-    "dragon-rage-hoenn": {
-      "extends": "dragon.base",
-      "projectile": {
-        "glowScale": 1.6,
-        "coreScale": 0.3,
-        "glowColor": "#5e35b1"
-      },
-      "impact": {
-        "flash": {
-          "color": "#b2ebf2",
-          "radius": 60,
-          "durationMs": 160,
-          "alpha": 0.6
-        }
-      },
-      "sprite": {
-        "id": "rage-orb",
-        "fit": "circle",
-        "size": 1.8,
-        "rotate": "velocity"
-      },
-      "effectSprite": {
-        "id": "rage-burst",
-        "fit": "circle",
-        "size": 1.1
-      }
-    },
-    "twister-hoenn": {
-      "extends": "dragon.base",
-      "hideShape": true,
-      "projectile": {
-        "glowScale": 0.5,
-        "coreScale": 0.1
-      },
-      "sprite": {
-        "id": "tornado",
-        "fit": "circle",
-        "size": 1.6,
-        "rotate": "spin",
-        "spinDegPerSec": 540
-      },
-      "effectSprite": {
-        "id": "wind-ripple",
-        "fit": "circle",
-        "size": 1,
-        "alpha": 0.6
-      }
-    },
-    "dragon-pulse-hoenn": {
-      "extends": "dragon.base",
-      "impact": {
-        "flash": {
-          "color": "#b2ebf2",
-          "radius": 40,
-          "durationMs": 140,
-          "alpha": 0.6
-        }
-      },
-      "sprite": {
-        "id": "dragon-pulse-beam",
-        "fit": "line",
-        "size": 1.3,
-        "growSeconds": 0.1
-      }
-    },
-    "confusion-hoenn": {
-      "extends": "psychic.base",
-      "projectile": {
-        "shapeAlpha": 0.15
-      },
-      "sprite": {
-        "id": "psy-grip",
-        "fit": "circle",
-        "size": 1.6,
-        "rotate": "spin",
-        "spinDegPerSec": 360
-      }
-    },
-    "future-sight-hoenn": {
-      "extends": "psychic.base",
-      "projectile": {
-        "glowScale": 1.1,
-        "coreScale": 0.3
-      },
-      "impact": {
-        "flash": {
-          "color": "#f48fb1",
-          "radius": 60,
-          "durationMs": 160,
-          "alpha": 0.6
-        }
-      },
-      "sprite": {
-        "id": "psy-grip",
-        "fit": "circle",
-        "size": 1.2,
-        "rotate": "spin",
-        "spinDegPerSec": 360
-      },
-      "hitSprite": {
-        "id": "future-eye",
-        "fit": "circle",
-        "size": 1,
-        "seconds": 1.5,
-        "radius": 22
-      },
-      "effectSprite": {
-        "id": "future-burst",
-        "fit": "circle",
-        "size": 1.1
-      }
-    },
     "future-sight-gardevoir": {
       "extends": "psychic.base",
       "projectile": {
@@ -5494,76 +5399,6 @@
         "spinDegPerSec": 120
       }
     },
-    "psychic-hoenn": {
-      "extends": "psychic.base",
-      "projectile": {
-        "shapeAlpha": 0.12
-      },
-      "impact": {
-        "flash": {
-          "color": "#f48fb1",
-          "radius": 50,
-          "durationMs": 160,
-          "alpha": 0.6
-        }
-      },
-      "sprite": {
-        "id": "psy-wave",
-        "fit": "ring",
-        "size": 1,
-        "varyTiles": true
-      },
-      "effectSprite": {
-        "id": "psy-grip",
-        "fit": "circle",
-        "size": 0.9,
-        "alpha": 0.4,
-        "rotate": "spin",
-        "spinDegPerSec": 540
-      }
-    },
-    "night-shade-hoenn": {
-      "extends": "ghost.base",
-      "projectile": {
-        "glowScale": 1.3,
-        "coreScale": 0.2,
-        "glowColor": "#4a148c"
-      },
-      "sprite": {
-        "id": "night-face",
-        "fit": "circle",
-        "size": 2.2
-      }
-    },
-    "shadow-ball-hoenn": {
-      "extends": "ghost.base",
-      "projectile": {
-        "glowScale": 1.6,
-        "coreScale": 0.2,
-        "glowColor": "#4a148c"
-      },
-      "impact": {
-        "flash": {
-          "color": "#b39ddb",
-          "radius": 40,
-          "durationMs": 140,
-          "alpha": 0.6
-        }
-      },
-      "sprite": {
-        "id": "shadow-sphere",
-        "fit": "circle",
-        "size": 1.5,
-        "rotate": "spin",
-        "spinDegPerSec": 240
-      },
-      "effectSprite": {
-        "id": "shadow-shard",
-        "fit": "circle",
-        "size": 2,
-        "rotate": "velocity"
-      }
-    },
     "steel-beam": {
       "extends": "steel.base",
       "impact": {
@@ -5590,6 +5425,79 @@
         "color": "#e0f7fa",
         "alpha": 0.15,
         "durationMs": 100
+      }
+    },
+    "future-sight-alakazam": {
+      "extends": "psychic.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3
+      },
+      "impact": {
+        "flash": {
+          "color": "#f48fb1",
+          "radius": 60,
+          "durationMs": 160,
+          "alpha": 0.6
+        }
+      },
+      "sprite": {
+        "id": "psy-grip",
+        "fit": "circle",
+        "size": 1.2,
+        "rotate": "spin",
+        "spinDegPerSec": 360
+      },
+      "hitSprite": {
+        "id": "future-eye",
+        "fit": "circle",
+        "size": 1,
+        "seconds": 1.5,
+        "radius": 22
+      },
+      "effectSprite": {
+        "id": "future-burst",
+        "fit": "circle",
+        "size": 1.1
+      }
+    },
+    "air-cutter": {
+      "extends": "flying.base",
+      "projectile": {
+        "shapeAlpha": 0.1
+      },
+      "sprite": {
+        "id": "wind-gust",
+        "fit": "cone",
+        "size": 1,
+        "alpha": 0.9
+      }
+    },
+    "aerial-ace": {
+      "extends": "flying.base",
+      "projectile": {
+        "glowScale": 1.2,
+        "coreScale": 0.2
+      },
+      "sprite": {
+        "id": "air-crescent",
+        "fit": "circle",
+        "size": 2.4,
+        "rotate": "velocity"
+      }
+    },
+    "leaf-storm-celebi": {
+      "extends": "grass.base",
+      "projectile": {
+        "glowScale": 1.05,
+        "coreScale": 0.2
+      },
+      "sprite": {
+        "id": "leaf",
+        "fit": "circle",
+        "size": 1.6,
+        "rotate": "spin",
+        "spinDegPerSec": 720
       }
     }
   }

@@ -22,6 +22,7 @@ import siteJson from '../../data/site.json';
 import levelingJson from '../../data/game/leveling.json';
 import itemsJson from '../../data/game/items.json';
 import derivationsJson from '../../data/game/derivations.json';
+import learnsetsJson from '../../data/game/learnsets.json';
 import statsJson from '../../data/game/stats.json';
 import stageJson from '../../data/game/stage.json';
 import saveJson from '../../data/game/save.json';
@@ -50,6 +51,7 @@ import { resolveEffectRecipes } from './effects';
 import {
   combatConfigSchema,
   derivationsConfigSchema,
+  learnsetsConfigSchema,
   abilitiesConfigSchema,
   generatedAbilitiesSchema,
   itemsConfigSchema,
@@ -135,6 +137,7 @@ export const regionsConfig = load('game/regions.json', regionsConfigSchema, regi
 export const levelingConfig = load('game/leveling.json', levelingConfigSchema, levelingJson);
 export const itemsConfig = load('game/items.json', itemsConfigSchema, itemsJson);
 export const derivationsConfig = load('game/derivations.json', derivationsConfigSchema, derivationsJson);
+export const learnsetsConfig = load('game/learnsets.json', learnsetsConfigSchema, learnsetsJson);
 export const statsConfig = load('game/stats.json', statsConfigSchema, statsJson);
 
 /**

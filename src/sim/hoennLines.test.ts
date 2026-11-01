@@ -27,18 +27,18 @@ describe('固有技の条件', () => {
   it('ドンメル: バクーダの姿 ＋ ふんえん最大 ＋ だいちのちから Lv8 ＋ ひでりの区間で ふんか', () => {
     const t = setup('numel');
     t.p.moves = [];
-    t.give('lava-plume-hoenn', 8);
+    t.give('lava-plume', 8);
     t.give('earth-power', 8);
     t.p.moves[0]!.level = moveMaxLevel(t.rules, t.p.moves[0]!);
-    expect(t.derives('eruption-hoenn')).toBeUndefined();
+    expect(t.derives('eruption')).toBeUndefined();
     t.p.species = t.species('camerupt');
-    expect(t.derives('eruption-hoenn')).toBeUndefined();
+    expect(t.derives('eruption')).toBeUndefined();
     // ひでりの区間を探す
     const sun = t.rules.weatherSections!.findIndex((w) => w.kinds.includes('sun'));
     expect(sun).toBeGreaterThanOrEqual(0);
     t.sim.world.section = sun;
     t.sim.world.sectionStartTick = t.sim.world.tick;
-    expect(t.derives('eruption-hoenn')).toBeDefined();
+    expect(t.derives('eruption')).toBeDefined();
   });
 
   it('アブソル: ランの記録（急所の回数）は本人から届いたコマンドで付き、数に届くと ナイトバースト が出る', () => {
@@ -46,7 +46,7 @@ describe('固有技の条件', () => {
     t.p.moves = [];
     t.give('night-slash', 8);
     t.p.moves[0]!.level = moveMaxLevel(t.rules, t.p.moves[0]!);
-    t.give('future-sight-hoenn', 8);
+    t.give('future-sight', 8);
     expect(t.derives('night-daze')).toBeUndefined();
     t.sim.step([{ type: 'runStat', playerId: 1, stat: 'crits', value: 150 }]);
     expect(t.derives('night-daze')).toBeDefined();
@@ -58,7 +58,7 @@ describe('固有技の条件', () => {
     t.p.moves = [];
     t.give('astonish', 8);
     t.p.moves[0]!.level = moveMaxLevel(t.rules, t.p.moves[0]!);
-    t.give('shadow-ball-hoenn', 7);
+    t.give('shadow-ball', 7);
     expect(t.derives('phantom-force')).toBeUndefined();
     t.p.moves[1]!.level = 8;
     expect(t.derives('phantom-force')).toBeDefined();

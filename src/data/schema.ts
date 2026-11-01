@@ -1338,6 +1338,17 @@ export const regionStageSchema = z.object({
 });
 export type RegionStageFile = z.infer<typeof regionStageSchema>;
 
+/**
+ * 系統ごとの「覚える技」（data/game/learnsets.json。07 の158章）。レベルアップの候補に出る、派生していない技の一覧。
+ * 元は原作（赤緑〜FRLG）のレベル・タマゴ技と、自分のタイプかノーマルのわざマシン・教え技。07 で決めたルートの技は必ず入れる。
+ * forms があれば、その姿（PokeAPI のキー）のときだけ候補に出る。ここに書いた系統は、タイプで覚える決まり・learners・teachOnly を見ない。
+ * 書いていない系統（タマゴ・ミュウ）は前の決まり（タイプ）のまま
+ */
+export const learnsetsConfigSchema = z.object({
+  lines: z.record(z.string(), z.array(z.union([z.string(), z.object({ move: z.string(), forms: z.array(z.string()).min(1) })]))),
+});
+export type LearnsetsConfig = z.infer<typeof learnsetsConfigSchema>;
+
 export const playablesConfigSchema = z.object({
   pokemon: z.record(
     z.string(),

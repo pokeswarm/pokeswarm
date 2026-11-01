@@ -60,11 +60,11 @@ describe('キモリ', () => {
     t.p.species = t.species('grovyle');
     expect(t.offersNew('grass-pledge')).toBe(true);
     t.sim.world.level = 50;
-    expect(t.offersNew('leaf-storm-hoenn')).toBe(false);
+    expect(t.offersNew('leaf-storm')).toBe(false);
     t.learn('grass-pledge');
-    expect(t.offersNew('leaf-storm-hoenn')).toBe(true);
+    expect(t.offersNew('leaf-storm')).toBe(true);
     t.sim.world.level = 49;
-    expect(t.offersNew('leaf-storm-hoenn')).toBe(false);
+    expect(t.offersNew('leaf-storm')).toBe(false);
   });
 
   it('ひっかく → きりさく（シルクのスカーフ）→ つるぎのまい（プラスパワー）。このはが最大でつるぎのまいを覚えていれば リーフブレード（つるぎのまいは残る）', () => {
@@ -103,13 +103,13 @@ describe('アチャモ', () => {
     const a = setup('torchic');
     a.p.moves = [{ move: a.move('low-sweep'), level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0 }];
     a.maxOut('low-sweep');
-    a.learn('flare-blitz-hoenn');
+    a.learn('flare-blitz');
     expect(a.derives('close-combat')).toBeUndefined();
-    a.learn('fire-punch-hoenn');
+    a.learn('fire-punch');
     applyOffer(a.sim.world, a.p, a.derives('close-combat')!);
-    expect(a.p.moves.map((m) => a.rules.moves[m.move]!.key).sort()).toEqual(['close-combat', 'flare-blitz-hoenn']);
+    expect(a.p.moves.map((m) => a.rules.moves[m.move]!.key).sort()).toEqual(['close-combat', 'flare-blitz']);
     expect(moveMaxLevel(a.rules, a.p.moves.find((m) => m.move === a.move('close-combat'))!)).toBe(16);
-    expect(a.offersNew('fire-punch-hoenn')).toBe(false);
+    expect(a.offersNew('fire-punch')).toBe(false);
   });
 
   it('インファイトには ほのお と かくとう の両方の強化が効く', () => {
@@ -157,10 +157,10 @@ describe('ミズゴロウ', () => {
     m.p.moves = [{ move: m.move('water-pulse'), level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0 }];
     m.maxOut('water-pulse');
     m.learn('mud-shot', 7);
-    expect(m.derives('muddy-water-hoenn')).toBeUndefined();
+    expect(m.derives('muddy-water')).toBeUndefined();
     m.p.moves[1]!.level = 8;
-    applyOffer(m.sim.world, m.p, m.derives('muddy-water-hoenn')!);
-    expect(m.p.moves.map((x) => m.rules.moves[x.move]!.key).sort()).toEqual(['mud-shot', 'muddy-water-hoenn']);
+    applyOffer(m.sim.world, m.p, m.derives('muddy-water')!);
+    expect(m.p.moves.map((x) => m.rules.moves[x.move]!.key).sort()).toEqual(['mud-shot', 'muddy-water']);
   });
 });
 

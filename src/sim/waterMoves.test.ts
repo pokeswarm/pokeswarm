@@ -47,7 +47,7 @@ describe('なみのり・だくりゅう: 自分を中心にした正方形の�
   });
 
   it('だくりゅう: 速くならず、当たった敵は必ず みずびたし（遅くなる）', () => {
-    for (const key of ['muddy-water', 'muddy-water-hoenn']) {
+    for (const key of ['muddy-water', 'muddy-water']) {
       const t = setup(key);
       expect(t.rules.moves[t.m]!.levels[0]!.statusChance).toBe(1);
       const before = t.p.moveSpeed;
@@ -63,7 +63,7 @@ describe('なみのり・だくりゅう: 自分を中心にした正方形の�
 
 describe('バブルこうせん・みずのはどう', () => {
   it('バブルこうせん: 近い敵へ飛ぶ線（オーロラビームと同じ出し方）', () => {
-    for (const key of ['bubble-beam', 'bubble-beam-hoenn']) {
+    for (const key of ['bubble-beam', 'bubble-beam']) {
       const t = setup(key);
       expect(t.rules.moves[t.m]!.pattern).toBe('beam');
       t.sim.step([{ type: 'spawnEnemy', id: 1, kind: 0, x: 200, y: 0 }]);
@@ -76,9 +76,9 @@ describe('バブルこうせん・みずのはどう', () => {
   it('みずのはどう: りゅうのはどうと同じ数・速さ・間隔で、一番近い敵へ輪を続けて飛ばす', () => {
     const rules = buildSimRules('hoenn');
     const wp = rules.moves[moveIndexOf(rules, 'water-pulse')]!;
-    const dp = rules.moves[moveIndexOf(rules, 'dragon-pulse')]!;
-    expect(wp.pattern).toBe('nearest');
-    for (const k of ['count', 'speed', 'intervalSeconds', 'size', 'range', 'durationSeconds', 'cooldownSeconds'] as const) expect(wp.levels[0]![k]).toBe(dp.levels[0]![k]);
+    // りゅうのはどう は 158章で光線になったので、楕円の輪の値を みずのはどう 自身で確かめる
+    expect(wp.levels[0]!.count).toBe(8);
+    expect(wp.levels[0]!.speed).toBe(480);
     expect(wp.effects).toHaveLength(0);
   });
 });

@@ -127,9 +127,30 @@ const genRegions: Record<string, { names: Names }> = read('data/generated/region
 const DEV_URL = 'http://localhost:5173/';
 
 /** 技を使える系統のキー（固有技はその系統。learners があればそれ。ほかはタイプが合う系統、ノーマルは全員） */
+/** 系統ごとの覚える技（docs/16_learnsets.json。learnsets.json とルートから作った一覧）。技 → 使える系統（07 の158章） */
+const usersFrom16 = (() => {
+  const out = new Map<string, Set<string>>();
+  try {
+    const l = read('docs/16_learnsets.json') as { pokemon: { key: string; start: string[]; learn: { move: string }[]; derives: { to: string }[]; special?: { move: string }[] }[] };
+    for (const p of l.pokemon) for (const m of [...p.start, ...p.learn.map((x) => x.move), ...p.derives.map((d) => d.to), ...(p.special ?? []).map((x) => x.move)]) (out.get(m) ?? out.set(m, new Set()).get(m)!).add(p.key);
+  } catch {
+    /* 16 が無ければ前の決まりで数える */
+  }
+  // 姿で覚える技（playables.json の formMoves。エーフィの あさのひざし など）
+  const pl = read('data/game/playables.json') as { pokemon: Record<string, { formMoves?: { move: string }[]; formTransforms?: { to: string }[] }> };
+  for (const [line, def] of Object.entries(pl.pokemon)) for (const f of def.formMoves ?? []) (out.get(f.move) ?? out.set(f.move, new Set()).get(f.move)!).add(line);
+  // 進化で技が変わるもの（イーブイ: たいあたり → あさのひざし など）
+  for (const [line, def] of Object.entries(pl.pokemon)) for (const f of def.formTransforms ?? []) (out.get(f.to) ?? out.set(f.to, new Set()).get(f.to)!).add(line);
+  return out;
+})();
+
 function userKeys(k: string): string[] {
+  const from16 = usersFrom16.get(k);
+  if (from16) return [...from16];
   const u = uniqueFrom.get(k);
   if (u?.line) return [u.line];
+  // 16 があるのに誰も覚えない技（しまってある技など）は空
+  if (usersFrom16.size > 0) return [];
   const def = moves[k] as unknown as { learners?: string[] };
   if (def.learners) return def.learners;
   const type = genMoves[k]?.type ?? '';

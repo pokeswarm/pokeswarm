@@ -256,8 +256,15 @@ export function canLearnNewMove(world: World, p: Player, move: number): boolean 
   const rules = world.rules;
   const m = rules.moves[move]!;
   // 進化で使った技（派生・固有技の元の技）は、もう候補に出さない（作者の指摘 2026年10月25日）
-  if (!isBaseMove(world, move) || m.teachOnly || p.moves.some((pm) => pm.move === move) || p.consumedMoves?.includes(move)) return false;
+  if (!isBaseMove(world, move) || (m.teachOnly && !rules.lines?.[p.line]?.learnset) || p.moves.some((pm) => pm.move === move) || p.consumedMoves?.includes(move)) return false;
   if (!learnable(world, p, move)) return false;
+  // 系統ごとの覚える技（learnsets.json。07 の158章）: あればその一覧だけ。learners・teachOnly・タイプは見ない（ミュウは何でも）
+  const learnset = rules.lines?.[p.line]?.learnset;
+  if (learnset && !p.learnsAll) {
+    const entry = learnset.find((e) => e.move === move);
+    if (!entry || (entry.forms && !entry.forms.includes(p.species))) return false;
+    return !rules.lines?.[p.line]?.excludeMoveTypes.includes(m.type);
+  }
   // 覚えられる系統が決まっている技（ノーマルの技・各ポケモン専用の技）は、その系統だけ（ミュウは何でも）
   if (m.learners && !p.learnsAll && !m.learners.includes(p.line)) return false;
   // 覚えないタイプ（ズバット: どくの技は最初の かみつく → クロスポイズン だけ）

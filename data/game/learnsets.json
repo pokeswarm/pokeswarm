@@ -1,0 +1,659 @@
+{
+  "lines": {
+    "charmander": [
+      "ember",
+      "scratch",
+      "fire-fang",
+      "gust",
+      "dragon-rage",
+      "swift",
+      "fire-spin",
+      "metal-claw"
+    ],
+    "bulbasaur": [
+      "leech-seed",
+      "vine-whip",
+      "smog",
+      "poison-sting",
+      "tackle",
+      "sleep-powder",
+      "magical-leaf"
+    ],
+    "squirtle": [
+      "water-gun",
+      "bubble",
+      "whirlpool",
+      "confusion",
+      "tackle",
+      "mirror-coat",
+      "yawn"
+    ],
+    "cyndaquil": [
+      "ember",
+      "fire-fang",
+      "tackle",
+      "quick-attack",
+      "swift"
+    ],
+    "chikorita": [
+      "sleep-powder",
+      "leech-seed",
+      "vine-whip",
+      "tackle",
+      "counter"
+    ],
+    "totodile": [
+      "scratch",
+      "water-gun",
+      "bubble",
+      "whirlpool"
+    ],
+    "treecko": [
+      "leafage",
+      "scratch",
+      "leech-seed",
+      "vine-whip",
+      {
+        "move": "grass-pledge",
+        "forms": [
+          "grovyle",
+          "sceptile"
+        ]
+      },
+      "leaf-storm",
+      "pound",
+      "quick-attack",
+      "swift",
+      "dragon-breath"
+    ],
+    "torchic": [
+      "double-kick",
+      "scratch",
+      "ember",
+      "fire-fang",
+      "peck",
+      "bulk-up",
+      {
+        "move": "fire-pledge",
+        "forms": [
+          "combusken",
+          "blaziken"
+        ]
+      },
+      "blaze-kick",
+      "fire-punch",
+      "counter",
+      "fire-spin",
+      "quick-attack",
+      "swift"
+    ],
+    "mudkip": [
+      "water-gun",
+      "bubble",
+      "whirlpool",
+      "magnitude",
+      "tackle",
+      "mud-slap",
+      {
+        "move": "water-pledge",
+        "forms": [
+          "marshtomp",
+          "swampert"
+        ]
+      },
+      "wave-crash",
+      "mirror-coat"
+    ],
+    "makuhita": [
+      "arm-thrust",
+      "whirlwind",
+      "tackle",
+      "fake-out",
+      "counter",
+      "bulk-up"
+    ],
+    "electrike": [
+      "spark",
+      "thunder-shock",
+      "tackle",
+      "quick-attack",
+      "thunder-wave",
+      "swift"
+    ],
+    "numel": [
+      "ember",
+      "fire-fang",
+      "tackle",
+      "magnitude",
+      "mud-slap"
+    ],
+    "slakoth": [
+      "scratch",
+      "yawn",
+      "counter",
+      "slack-off"
+    ],
+    "swablu": [
+      "peck",
+      "gust",
+      "dragon-tail",
+      "sing",
+      "dragon-rage",
+      "swift",
+      {
+        "move": "dragon-breath",
+        "forms": [
+          "altaria"
+        ]
+      }
+    ],
+    "absol": [
+      "sucker-punch",
+      "scratch",
+      "confusion",
+      "quick-attack",
+      "swift"
+    ],
+    "shuppet": [
+      "lick",
+      "night-shade"
+    ],
+    "spheal": [
+      "powder-snow",
+      "bubble",
+      "whirlpool",
+      "aurora-beam",
+      "water-gun",
+      "yawn"
+    ],
+    "bagon": [
+      "dragon-rage",
+      "ember",
+      "gust",
+      "dragon-tail",
+      "air-cutter",
+      "dragon-breath",
+      {
+        "move": "swift",
+        "forms": [
+          "salamence"
+        ]
+      }
+    ],
+    "feebas": [
+      "water-gun",
+      "bubble",
+      "whirlpool",
+      "tackle",
+      "twister",
+      "swift",
+      "dragon-breath",
+      "mirror-coat"
+    ],
+    "beldum": [
+      "metal-claw",
+      "confusion",
+      {
+        "move": "swift",
+        "forms": [
+          "metang",
+          "metagross"
+        ]
+      }
+    ],
+    "ralts": [
+      "confusion",
+      "night-shade",
+      {
+        "move": "magical-leaf",
+        "forms": [
+          "kirlia",
+          "gardevoir"
+        ]
+      }
+    ],
+    "trapinch": [
+      "sand-tomb",
+      "magnitude",
+      "gust",
+      "dragon-tail",
+      "dragon-rage",
+      "dragon-breath",
+      "quick-attack",
+      "mud-slap",
+      {
+        "move": "swift",
+        "forms": [
+          "vibrava",
+          "flygon"
+        ]
+      }
+    ],
+    "aron": [
+      "metal-claw",
+      "tackle",
+      "stealth-rock",
+      "rock-throw",
+      "mud-slap"
+    ],
+    "azurill": [
+      "bubble",
+      "water-gun",
+      "whirlpool",
+      "sing",
+      "tackle",
+      "swift"
+    ],
+    "wynaut": [
+      "mirror-coat",
+      "confusion",
+      "counter"
+    ],
+    "barboach": [
+      "mud-slap",
+      "bubble",
+      "whirlpool",
+      "spark",
+      "magnitude",
+      "water-gun"
+    ],
+    "mawile": [
+      "metal-claw",
+      "fire-fang"
+    ],
+    "pichu": [
+      "thunder-shock",
+      "spark",
+      "quick-attack",
+      "swift",
+      "thunder-wave"
+    ],
+    "cleffa": [
+      "pound",
+      "sing",
+      "magical-leaf"
+    ],
+    "igglybuff": [
+      "pound",
+      "sing"
+    ],
+    "togepi": [
+      "metronome-baby",
+      "peck",
+      "gust",
+      "swift",
+      "yawn",
+      {
+        "move": "magical-leaf",
+        "forms": [
+          "togetic"
+        ]
+      }
+    ],
+    "onix": [
+      "rock-throw",
+      "magnitude",
+      "tackle",
+      "stealth-rock",
+      "mud-slap",
+      "dragon-breath",
+      "sand-tomb"
+    ],
+    "staryu": [
+      "bubble",
+      "water-gun",
+      "whirlpool",
+      "confusion",
+      "tackle",
+      "aurora-beam",
+      "swift"
+    ],
+    "pikachu": [
+      "spark",
+      "thunder-shock",
+      "quick-attack",
+      "swift",
+      "thunder-wave"
+    ],
+    "oddish": [
+      "vine-whip",
+      "leech-seed",
+      "smog",
+      "poison-sting",
+      "sleep-powder"
+    ],
+    "koffing": [
+      "smog",
+      "poison-sting",
+      "tackle",
+      "psybeam"
+    ],
+    "abra": [
+      "confusion",
+      "swift",
+      {
+        "move": "psybeam",
+        "forms": [
+          "kadabra",
+          "alakazam"
+        ]
+      }
+    ],
+    "growlithe": [
+      "fire-fang",
+      "ember",
+      "quick-attack",
+      "fire-spin",
+      "swift"
+    ],
+    "rhyhorn": [
+      "magnitude",
+      "rock-throw",
+      "tackle",
+      "stealth-rock",
+      "horn-attack",
+      "counter",
+      "mud-slap"
+    ],
+    "lapras": [
+      "powder-snow",
+      "water-gun",
+      "bubble",
+      "whirlpool",
+      "tackle",
+      "aurora-beam",
+      "sing"
+    ],
+    "machop": [
+      "mach-punch",
+      "counter",
+      "bulk-up"
+    ],
+    "gastly": [
+      "night-shade",
+      "smog",
+      "poison-sting",
+      "lick"
+    ],
+    "dratini": [
+      "dragon-tail",
+      "gust",
+      "dragon-rage",
+      "swift",
+      "thunder-wave",
+      "dragon-breath"
+    ],
+    "psyduck": [
+      "confusion",
+      "scratch",
+      "water-gun",
+      "bubble",
+      "whirlpool",
+      "psybeam",
+      "swift"
+    ],
+    "jigglypuff": [
+      "pound",
+      "sing"
+    ],
+    "slowpoke": [
+      "slack-off",
+      "water-gun",
+      "bubble",
+      "whirlpool",
+      "confusion",
+      "tackle",
+      "swift",
+      "yawn"
+    ],
+    "snorlax": [
+      "tackle",
+      "rest",
+      "lick",
+      "yawn"
+    ],
+    "eevee": [
+      "tackle",
+      "ember",
+      "fire-fang",
+      "water-gun",
+      "bubble",
+      "whirlpool",
+      "smog",
+      "spark",
+      "confusion",
+      "thunder-shock",
+      "aurora-beam",
+      "swift",
+      "quick-attack",
+      {
+        "move": "double-kick",
+        "forms": [
+          "jolteon"
+        ]
+      },
+      {
+        "move": "thunder-wave",
+        "forms": [
+          "jolteon"
+        ]
+      },
+      {
+        "move": "fire-spin",
+        "forms": [
+          "flareon"
+        ]
+      },
+      {
+        "move": "psybeam",
+        "forms": [
+          "espeon"
+        ]
+      }
+    ],
+    "doduo": [
+      "swift",
+      "peck",
+      "whirlwind",
+      "gust",
+      "quick-attack"
+    ],
+    "meowth": [
+      "tackle",
+      "scratch",
+      "quick-attack",
+      "swift",
+      "fake-out"
+    ],
+    "mareep": [
+      "thunder-wave",
+      "spark",
+      "thunder-shock",
+      "tackle",
+      "swift"
+    ],
+    "heracross": [
+      "horn-attack",
+      "tackle",
+      "counter",
+      "bulk-up"
+    ],
+    "swinub": [
+      "powder-snow",
+      "magnitude",
+      "tackle",
+      "aurora-beam",
+      "mud-slap",
+      {
+        "move": "horn-attack",
+        "forms": [
+          "piloswine"
+        ]
+      }
+    ],
+    "pidgey": [
+      "whirlwind",
+      "gust",
+      "tackle",
+      "quick-attack",
+      "swift",
+      "air-cutter"
+    ],
+    "zubat": [
+      "whirlwind",
+      "gust",
+      "quick-attack",
+      "swift",
+      "air-cutter"
+    ],
+    "miltank": [
+      "rollout",
+      "tackle"
+    ],
+    "larvitar": [
+      "rock-throw",
+      "magnitude",
+      "stealth-rock",
+      "mud-slap"
+    ],
+    "horsea": [
+      "water-gun",
+      "bubble",
+      "whirlpool",
+      "aurora-beam",
+      "dragon-tail",
+      "dragon-rage",
+      "swift",
+      "dragon-breath"
+    ],
+    "poliwag": [
+      "bubble",
+      "water-gun",
+      "whirlpool",
+      {
+        "move": "counter",
+        "forms": [
+          "poliwhirl",
+          "poliwrath",
+          "politoed"
+        ]
+      },
+      {
+        "move": "bulk-up",
+        "forms": [
+          "poliwrath"
+        ]
+      }
+    ],
+    "houndour": [
+      "ember",
+      "fire-fang",
+      "smog",
+      "dark-pulse",
+      "counter",
+      "fire-spin",
+      "swift"
+    ],
+    "porygon": [
+      "swift",
+      "sharpen",
+      "conversion",
+      "tackle",
+      "psybeam"
+    ],
+    "scyther": [
+      "scratch",
+      "gust",
+      "counter",
+      "quick-attack",
+      "swift",
+      {
+        "move": "metal-claw",
+        "forms": [
+          "scizor"
+        ]
+      }
+    ],
+    "magnemite": [
+      "thunder-shock",
+      "spark",
+      "tackle",
+      "thunder-wave",
+      "swift"
+    ],
+    "mewtwo": [
+      "confusion",
+      "swift"
+    ],
+    "articuno": [
+      "powder-snow",
+      "peck",
+      "whirlwind",
+      "gust",
+      "aurora-beam",
+      "swift"
+    ],
+    "zapdos": [
+      "thunder-shock",
+      "peck",
+      "whirlwind",
+      "spark",
+      "gust",
+      "swift",
+      "thunder-wave"
+    ],
+    "moltres": [
+      "peck",
+      "ember",
+      "fire-fang",
+      "whirlwind",
+      "gust",
+      "swift",
+      "fire-spin"
+    ],
+    "raikou": [
+      "thunder-shock",
+      "spark",
+      "thunder-wave",
+      "quick-attack",
+      "swift"
+    ],
+    "entei": [
+      "ember",
+      "fire-fang",
+      "fire-spin",
+      "swift"
+    ],
+    "suicune": [
+      "water-gun",
+      "bubble",
+      "whirlpool",
+      "gust",
+      "aurora-beam",
+      "swift",
+      "mirror-coat"
+    ],
+    "lugia": [
+      "gust",
+      "whirlwind",
+      "confusion",
+      "swift"
+    ],
+    "ho-oh": [
+      "fire-fang",
+      "ember",
+      "whirlwind",
+      "gust",
+      "swift"
+    ],
+    "celebi": [
+      "magical-leaf",
+      "recover",
+      "healing-wish",
+      "leech-seed",
+      "vine-whip",
+      "confusion",
+      "swift"
+    ]
+  }
+}

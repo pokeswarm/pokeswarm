@@ -1518,12 +1518,13 @@ function airBlade(): SpriteOut {
   const palette = ['#263238', '#80deea', '#e0f7fa', '#ffffff'];
   const blades = crescent(18, 3, 0.4, (k, _a, f) => (k > 0.7 ? 1 : (k > 0.35) !== (f === 1) ? 2 : 3), 0.03);
   const frames = blades.map((g, f) => {
-    const n = g.length;
+    const n = g.length / K;
     return fill(g, (x, y) => {
-      const c = g[y]![x]!;
+      // fill は論理の座標（小数）で呼ぶので、元の絵は get で読む（細かさ K が 1 でないときに落ちていた）
+      const c = get(g, x, y);
       if (c >= 0) return c;
-      const u = (x / (n - 1)) * 2 - 1;
-      const v = (y / (n - 1)) * 2 - 1;
+      const u = ((x + 0.5) / n) * 2 - 1;
+      const v = ((y + 0.5) / n) * 2 - 1;
       if (u < -0.3 && Math.abs(v) < 0.5 && (((v * 3 + f * 0.33) % 1) + 1) % 1 < 0.22 && (((u * 5 + f * 0.5) % 1) + 1) % 1 < 0.55) return 1;
       return -1;
     });
@@ -3319,12 +3320,13 @@ function airCrescent(): SpriteOut {
   const palette = ['#37474f', '#81d4fa', '#e1f5fe', '#ffffff'];
   const blades = crescent(24, 3, 0.34, (k) => (k > 0.72 ? 3 : k > 0.3 ? 2 : 1), 0.02);
   const frames = blades.map((g, f) => {
-    const n = g.length;
+    const n = g.length / K;
     return fill(g, (x, y) => {
-      const c = g[y]![x]!;
+      // fill は論理の座標（小数）で呼ぶので、元の絵は get で読む（細かさ K が 1 でないときに落ちていた）
+      const c = get(g, x, y);
       if (c >= 0) return c;
-      const u = (x / (n - 1)) * 2 - 1;
-      const v = (y / (n - 1)) * 2 - 1;
+      const u = ((x + 0.5) / n) * 2 - 1;
+      const v = ((y + 0.5) / n) * 2 - 1;
       // 後ろ（左）へ流れる風の線
       if (u < -0.2 && Math.abs(v) < 0.55 && ((v * 4 + f * 0.5) % 1 + 1) % 1 < 0.2 && ((u * 6 + f) % 1 + 1) % 1 < 0.6) return 1;
       return -1;

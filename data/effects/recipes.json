@@ -2533,7 +2533,22 @@
       "extends": "dragon.base",
       "projectile": {
         "glowScale": 1.1,
-        "coreScale": 0.3
+        "coreScale": 0.2,
+        "glowColor": "#ab47bc"
+      },
+      "impact": {
+        "flash": {
+          "color": "#ce93d8",
+          "radius": 24,
+          "durationMs": 100,
+          "alpha": 0.5
+        }
+      },
+      "sprite": {
+        "id": "rage-claw",
+        "fit": "circle",
+        "size": 1.4,
+        "rotate": "velocity"
       }
     },
     "dragon-rage": {
@@ -4524,33 +4539,38 @@
     },
     "brave-bird": {
       "extends": "flying.base",
+      "projectile": {
+        "glowScale": 1.6,
+        "coreScale": 0.2,
+        "glowColor": "#64b5f6",
+        "shapeAlpha": 0.1
+      },
       "ownerGhost": {
-        "tint": "#e1f5fe",
-        "alpha": 0.75,
-        "afterimages": 4,
+        "tint": "#e3f2fd",
+        "alpha": 0.85,
+        "afterimages": 5,
         "spacingTicks": 1
       },
       "impact": {
         "flash": {
-          "radius": 60
+          "color": "#b3e5fc",
+          "radius": 50,
+          "durationMs": 140,
+          "alpha": 0.6
         }
       },
       "chargeGlow": {
         "color": "#b3e5fc",
-        "seconds": 0.7,
-        "radius": 70,
-        "alpha": 1
-      },
-      "projectile": {
-        "glowScale": 1.1,
-        "coreScale": 0.3,
-        "shapeAlpha": 0.2
+        "seconds": 0.35,
+        "radius": 60,
+        "alpha": 0.9
       },
       "sprite": {
-        "id": "streak-white",
-        "fit": "line",
-        "size": 1,
-        "growSeconds": 0.15
+        "id": "brave-aura",
+        "fit": "circle",
+        "size": 1.5,
+        "rotate": "velocity",
+        "alpha": 0.75
       }
     },
     "sucker-punch": {
@@ -4729,14 +4749,36 @@
       }
     },
     "dragon-breath": {
-      "extends": "dragon.base"
+      "extends": "dragon.base",
+      "projectile": {
+        "shapeAlpha": 0.15
+      },
+      "sprite": {
+        "id": "dragon-breath-cone",
+        "fit": "cone",
+        "size": 1
+      }
     },
     "dragon-claw": {
       "extends": "dragon.base",
+      "projectile": {
+        "shapeAlpha": 0.15
+      },
+      "impact": {
+        "flash": {
+          "color": "#b2ebf2",
+          "radius": 36,
+          "durationMs": 120,
+          "alpha": 0.6
+        }
+      },
       "sprite": {
-        "id": "claw-big",
+        "id": "dragon-claw-slash",
         "fit": "front",
-        "size": 1.1
+        "size": 1.1,
+        "along": 0.5,
+        "afterimages": 3,
+        "afterimageGap": 1
       }
     },
     "metal-burst": {
@@ -5108,6 +5150,118 @@
           "seconds": 0.4,
           "size": 0.5
         }
+      }
+    },
+    "gust-hoenn": {
+      "extends": "flying.base",
+      "projectile": {
+        "shapeAlpha": 0.1
+      },
+      "sprite": {
+        "id": "wind-gust",
+        "fit": "cone",
+        "size": 1,
+        "alpha": 0.9
+      }
+    },
+    "wing-attack-hoenn": {
+      "extends": "flying.base",
+      "projectile": {
+        "shapeAlpha": 0.15
+      },
+      "impact": {
+        "flash": {
+          "color": "#e1f5fe",
+          "radius": 30,
+          "durationMs": 110,
+          "alpha": 0.5
+        }
+      },
+      "sprite": {
+        "id": "wing-slash",
+        "fit": "front",
+        "size": 1.1,
+        "along": 0.5,
+        "afterimages": 2,
+        "afterimageGap": 2
+      }
+    },
+    "air-slash-hoenn": {
+      "extends": "flying.base",
+      "projectile": {
+        "glowScale": 1.2,
+        "coreScale": 0.2
+      },
+      "sprite": {
+        "id": "air-crescent",
+        "fit": "circle",
+        "size": 2.4,
+        "rotate": "velocity"
+      }
+    },
+    "dragon-rage-hoenn": {
+      "extends": "dragon.base",
+      "projectile": {
+        "glowScale": 1.6,
+        "coreScale": 0.3,
+        "glowColor": "#5e35b1"
+      },
+      "impact": {
+        "flash": {
+          "color": "#b2ebf2",
+          "radius": 60,
+          "durationMs": 160,
+          "alpha": 0.6
+        }
+      },
+      "sprite": {
+        "id": "rage-orb",
+        "fit": "circle",
+        "size": 1.8,
+        "rotate": "velocity"
+      },
+      "effectSprite": {
+        "id": "rage-burst",
+        "fit": "circle",
+        "size": 1.1
+      }
+    },
+    "twister-hoenn": {
+      "extends": "dragon.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0.5,
+        "coreScale": 0.1
+      },
+      "sprite": {
+        "id": "tornado",
+        "fit": "circle",
+        "size": 1.6,
+        "rotate": "spin",
+        "spinDegPerSec": 540
+      },
+      "effectSprite": {
+        "id": "wind-ripple",
+        "fit": "circle",
+        "size": 1,
+        "alpha": 0.6
+      }
+    },
+    "dragon-pulse-hoenn": {
+      "extends": "dragon.base",
+      "impact": {
+        "flash": {
+          "color": "#b2ebf2",
+          "radius": 40,
+          "durationMs": 140,
+          "alpha": 0.6
+        }
+      },
+      "sprite": {
+        "id": "dragon-pulse-beam",
+        "fit": "line",
+        "size": 1.3,
+        "growSeconds": 0.1
       }
     }
   }

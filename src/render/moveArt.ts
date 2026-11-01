@@ -3203,6 +3203,284 @@ function boulder(): SpriteOut {
   return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- ホウエンの技の作り直し（2）ひこう・ドラゴン（07 の153章） ----------------
+/** 横長の絵（W×H）を u・v（−1〜1）の式で描き、輪郭を付ける（fit front の 64×32 など） */
+function wide(W: number, H: number, fn: (u: number, v: number) => number, edge = 0): Grid {
+  return outline(fill(blank(W, H), (x, y) => fn((x / (W - 1)) * 2 - 1, (y / (H - 1)) * 2 - 1)), edge);
+}
+
+/** ひこうの色: 0 輪郭・1 灰・2 うすい灰・3 白・4 光・5 水色 */
+const SKY = ['#37474f', '#90a4ae', '#cfd8dc', '#f5f7f8', '#ffffff', '#b3e5fc'];
+/** ドラゴンの色: 0 輪郭・1 濃い紫・2 紫・3 うすい紫・4 青緑・5 うすい青緑・6 白 */
+const DRAGON = ['#120a2e', '#311b92', '#5e35b1', '#9575cd', '#26c6da', '#b2ebf2', '#ffffff'];
+
+/** かぜおこし: 扇に引き伸ばす風（縦長 32×36）。4 本の白い風の筋が根元から扇に広がりながらうねって先へ流れ、木の葉が 3 枚舞う。4 コマで進む */
+function windGust(): SpriteOut {
+  const W = 32;
+  const H = 36;
+  const palette = [...SKY, '#7cb342', '#aed581'];
+  const r = rng(2301);
+  const leaves = Array.from({ length: 3 }, () => ({ t: r(), s: -0.6 + r() * 1.2 }));
+  const frames = [0, 1, 2, 3].map((f) =>
+    outline(
+      fill(blank(W, H), (x, y) => {
+        const mid = (H - 1) / 2;
+        const t = x / (W - 1);
+        const half = (H / 2) * (0.1 + 0.9 * t);
+        const v = (y - mid) / Math.max(0.5, half);
+        if (Math.abs(v) > 1) return -1;
+        for (const lf of leaves) {
+          const lt = (lf.t + f * 0.2) % 1;
+          if (Math.hypot((t - lt) * W * 0.8, (v - lf.s) * half * 0.9) < 1.7) return lf.s > 0 ? 7 : 6;
+        }
+        // 4 本の筋: 扇の中の高さ −0.75・−0.25・0.25・0.75 を中心に、うねりながら先へ
+        for (let j = 0; j < 4; j++) {
+          const c = -0.75 + j * 0.5 + Math.sin(t * 7 - f * 1.5 + j * 1.7) * 0.12;
+          const d = Math.abs(v - c) * Math.max(1.5, half);
+          if (d < 1.1) return t > 0.8 ? 2 : 4;
+          if (d < 2) return 5;
+        }
+        return -1;
+      }),
+      0,
+    ),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * つばさでうつ: 自分の前で両翼が V 字に開いて打つ風の刃（64×32、右向き）。付け根（左）が太く先がとがり、後ろのふちに風切り羽の切れ込み。
+ * 3 コマで V が開き、先から小さな羽が散る
+ */
+function wingSlash(): SpriteOut {
+  const frames = [0, 1, 2].map((f) => {
+    const open = 0.45 + f * 0.2;
+    const r = rng(2311 + f);
+    const bits = Array.from({ length: 5 }, () => ({ u: 0.4 + r() * 0.55, v: (r() - 0.5) * 1.9 }));
+    return wide(64, 32, (u, v) => {
+      for (const s of [-1, 1]) {
+        // 翼の軸: 付け根 (−0.9, 0) から (0.95, s×open) へ
+        const dx = 1.85;
+        const dy = s * open;
+        const len = Math.hypot(dx, dy);
+        const ax = dx / len;
+        const ay = dy / len;
+        const px = u + 0.9;
+        const py = v;
+        const along = (px * ax + py * ay) / len;
+        const across = (-px * ay + py * ax) * s;
+        if (along < 0 || along > 1) continue;
+        const half = 0.3 * (1 - along) + 0.04;
+        // 後ろ（across < 0 の側）に風切り羽の切れ込み
+        const notch = across < 0 && ((along * 9) % 1) < 0.3 && along > 0.2 ? 0.1 : 0;
+        if (across > -half + notch && across < half * 0.6) {
+          if (along > 0.85) return 5;
+          return across > half * 0.15 ? 4 : across > -half * 0.4 ? 3 : 2;
+        }
+      }
+      if (f === 2) for (const b of bits) if (Math.hypot((u - b.u) * 2, v - b.v) < 0.09) return 3;
+      return -1;
+    });
+  });
+  return { palette: SKY, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** ブレイブバード: 自分の残像をつつむ青白い炎（右向きの涙形。丸い頭が真ん中で残像を包み、尾が左へ流れる）。3 コマで尾がゆらぐ */
+function braveAura(): SpriteOut {
+  const palette = ['#0d47a1', '#1e88e5', '#64b5f6', '#b3e5fc', '#e1f5fe', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(24, (u, v) => {
+      const head = Math.hypot((u - 0.1) / 0.72, v / 0.7);
+      const tail = u < 0.1 ? Math.abs(v) / (0.7 * Math.max(0.05, (u + 1) / 1.1)) : 9;
+      const tongue = Math.sin(u * 7 + f * 2.2) * 0.14 * (u < -0.1 ? 1 : 0);
+      const inside = head < 1 || tail + tongue < 1;
+      if (!inside) return -1;
+      const k = head < 1 ? head : tail + tongue;
+      // 真ん中は薄く（残像が見えるように）、ふちほど濃い青
+      return k < 0.45 ? 5 : k < 0.7 ? 4 : k < 0.88 ? 3 : 2;
+    }),
+  );
+  return { palette, frameMs: 60, parts: { main: frames.map(toRows) } };
+}
+
+/** エアスラッシュ: 飛ぶ空気の刃（右へふくらむ三日月。白い芯、水色のふち）と、後ろに流れる風の線。3 コマでふちがゆらぐ */
+function airCrescent(): SpriteOut {
+  const palette = ['#37474f', '#81d4fa', '#e1f5fe', '#ffffff'];
+  const blades = crescent(24, 3, 0.34, (k) => (k > 0.72 ? 3 : k > 0.3 ? 2 : 1), 0.02);
+  const frames = blades.map((g, f) => {
+    const n = g.length;
+    return fill(g, (x, y) => {
+      const c = g[y]![x]!;
+      if (c >= 0) return c;
+      const u = (x / (n - 1)) * 2 - 1;
+      const v = (y / (n - 1)) * 2 - 1;
+      // 後ろ（左）へ流れる風の線
+      if (u < -0.2 && Math.abs(v) < 0.55 && ((v * 4 + f * 0.5) % 1 + 1) % 1 < 0.2 && ((u * 6 + f) % 1 + 1) % 1 < 0.6) return 1;
+      return -1;
+    });
+  });
+  return { palette, frameMs: 70, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/** りゅうのいかり: ゆっくり飛ぶ大きな青紫の火の玉（右向き。左へ炎の舌が流れる）。3 コマで舌がゆれる */
+function rageOrb(): SpriteOut {
+  const frames = [0, 1, 2].map((f) =>
+    shape(20, (u, v) => {
+      const d = Math.hypot(u - 0.15, v);
+      if (d < 0.25) return 6;
+      if (d < 0.45) return 5;
+      if (d < 0.62) return 4;
+      // 左へ流れる舌
+      if (u < 0 && Math.abs(v) < 0.6 * (1 + u) + 0.05 && Math.abs(v - Math.sin(u * 8 + f * 2) * 0.15) < 0.35 * (1 + u) + 0.05) return (v > 0) === (f % 2 === 0) ? 2 : 3;
+      return d < 0.78 ? 2 : -1;
+    }),
+  );
+  return { palette: DRAGON, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** りゅうのいかりの爆発（当たった所）: 青紫の炎の舌が 10 本、外へ広がる。3 コマで広がって薄れる */
+function rageBurst(): SpriteOut {
+  const r = rng(2321);
+  const tongues = Array.from({ length: 10 }, (_, k) => ({ a: (k / 10) * Math.PI * 2 + (r() - 0.5) * 0.4, len: 0.7 + r() * 0.3 }));
+  const frames = [0, 1, 2].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      const core = 0.35 - f * 0.1;
+      if (d < core * 0.5) return 6;
+      if (d < core) return 5;
+      for (const t of tongues) {
+        const da = Math.atan2(Math.sin(a - t.a), Math.cos(a - t.a));
+        const reach = t.len * (0.5 + f * 0.25);
+        if (d < reach && Math.abs(da) < 0.22 * (1 - d / reach) + 0.03) return d < reach * 0.5 ? 4 : f === 2 ? 1 : d < reach * 0.8 ? 2 : 3;
+      }
+      return -1;
+    }),
+  );
+  return { palette: DRAGON, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** たつまき: 上から見た竜巻（2 本の腕が巻く。中心は暗く、ふちは白い）。レシピの spin で回す */
+function tornado(): SpriteOut {
+  const frames = [0, 1].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.96) return -1;
+      const a = Math.atan2(v, u);
+      if (d < 0.14) return 1;
+      const arm = Math.sin(2 * a + Math.log(d + 0.05) * 5.5 - f * 0.8);
+      if (d > 0.86) return arm > 0.2 ? 6 : 5;
+      if (arm > 0.7) return 6;
+      if (arm > 0.25) return 5;
+      return d < 0.4 ? 2 : arm > -0.4 ? 3 : 2;
+    }),
+  );
+  return { palette: DRAGON, frameMs: 120, parts: { main: frames.map(toRows) } };
+}
+
+/** 風の波紋（たつまきが引き寄せる瞬間）: 白い弧の輪。2 コマで外へ */
+function windRipple(): SpriteOut {
+  const palette = ['#37474f', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1].map((f) =>
+    shape(24, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      const ring = 0.55 + f * 0.3;
+      if (Math.abs(d - ring) < 0.08 && ((a * 3 + f * 1.5) % 1 + 1) % 1 < 0.6) return d < ring ? 2 : 1;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/** りゅうのいぶき: 扇に引き伸ばす竜の息（縦長 32×36）。青緑と紫の帯がうねって先へ流れ、黄色い火花が散る（まひ）。4 コマ */
+function dragonBreathCone(): SpriteOut {
+  const W = 32;
+  const H = 36;
+  const palette = [...DRAGON, '#fff176'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    outline(
+      fill(blank(W, H), (x, y) => {
+        const mid = (H - 1) / 2;
+        const t = x / (W - 1);
+        const half = (H / 2) * (0.1 + 0.9 * t);
+        const v = (y - mid) / Math.max(0.5, half);
+        if (Math.abs(v) > 1 - 0.08 * Math.abs(Math.sin(t * 11 + f))) return -1;
+        if (hash(x, y, 2331 + f) < 0.05 && t > 0.2) return 7;
+        const band = Math.sin(t * 10 - f * 1.6 + v * 2.2);
+        const edge = Math.abs(v) > 0.72;
+        if (band > 0.55) return edge ? 5 : 6;
+        if (band > 0) return edge ? 4 : 5;
+        if (band > -0.55) return edge ? 2 : 3;
+        return edge ? 1 : 2;
+      }),
+      0,
+    ),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** りゅうのはどう（ホウエン）: 紫の光線の中を青緑の輪が先へ走る線（始まり・途中・終わり）。4 コマで輪が進む */
+function dragonPulseBeam(): SpriteOut {
+  const H = 14;
+  const TILE = 10;
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 6, middle: TILE, end: 10 }, 4, (x, y, f, part) => {
+    const taper = part === 'start' ? 0.45 + x / 10 : part === 'end' ? 1.15 - x / 9 : 1;
+    const d = Math.abs(y - mid) / (5.6 * taper);
+    if (d > 1) return -1;
+    // 走る輪: 途中では TILE の周期、終わりでは広がる弧
+    const ph = part === 'middle' ? ((x + f * 2.5) % TILE) : part === 'end' ? (x - f * 1.5 + 20) % 5 : 9;
+    if (ph < 2 && d > 0.25) return d > 0.8 ? 5 : 4;
+    if (part === 'end' && d > 0.85) return 4;
+    return d < 0.3 ? 6 : d < 0.6 ? 3 : 2;
+  });
+  return { palette: DRAGON, frameMs: 60, parts };
+}
+
+/** げきりん: 周りへ乱れ打つ竜の爪あと（右向きの細い 3 本の筋。先がとがる）と、周りに散る赤紫の気の粒。2 コマで筋の反りが入れ替わる */
+function rageClaw(): SpriteOut {
+  const palette = ['#2a0a2e', '#7b1fa2', '#ab47bc', '#ce93d8', '#f3e5f5', '#ff5252'];
+  const frames = [0, 1].map((f) =>
+    shape(24, (u, v) => {
+      for (const off of [-0.5, 0, 0.5]) {
+        const t = (u + 0.9) / 1.8;
+        if (t < 0 || t > 1) continue;
+        const across = v - off - (f === 0 ? 1 : -1) * (t - 0.5) * (t - 0.5) * 0.3;
+        const w = 0.085 * (1 - t) + 0.02;
+        if (Math.abs(across) < w) return Math.abs(across) < w * 0.4 ? 4 : t > 0.7 ? 2 : 3;
+      }
+      return Math.hypot(u, v) < 0.95 && hash(Math.floor((u + 1) * 12), Math.floor((v + 1) * 12), 2341 + f) < 0.08 ? 5 : -1;
+    }),
+  );
+  return { palette, frameMs: 60, parts: { main: frames.map(toRows) } };
+}
+
+/** ドラゴンクロー: 自分の前へ走る 3 本の太い竜の爪の筋（64×32、右向き）。紫の芯に青緑のふち、先から青緑の火花。3 コマで筋が伸びて薄れる */
+function dragonClawSlash(): SpriteOut {
+  const frames = [0, 1, 2].map((f) => {
+    const len = f === 0 ? 0.65 : 1;
+    const r = rng(2351 + f);
+    const sparks = Array.from({ length: 6 }, () => ({ u: 0.5 + r() * 0.45, v: (r() - 0.5) * 1.6 }));
+    return wide(64, 32, (u, v) => {
+      for (const off of [-0.55, 0, 0.55]) {
+        const t = (u + 0.9) / (1.85 * len);
+        if (t < 0 || t > 1) continue;
+        const curve = off * 0.35 * t;
+        const across = v - off - curve;
+        const w = 0.18 * (1 - t * 0.8) + 0.02;
+        if (Math.abs(across) < w) {
+          if (f === 2 && hash(Math.floor((u + 1) * 20), Math.floor((v + 1) * 10), 2352) < 0.35) return -1;
+          return Math.abs(across) < w * 0.35 ? 6 : Math.abs(across) < w * 0.7 ? 3 : t > 0.6 ? 4 : 2;
+        }
+      }
+      if (f >= 1) for (const s of sparks) if (Math.hypot((u - s.u) * 2, v - s.v) < 0.1) return 5;
+      return -1;
+    });
+  });
+  return { palette: DRAGON, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
 /**
  * にどげり: 蹴りの当たった所ではじける衝撃（脚は描かない。作者の指摘 2026年11月1日）。白い芯から、細い放射の線が 8 本
  * （長い・短いを交互に）はなれて飛び、間に小さな火花。コマ 0 は短く、コマ 1 で線が外へ伸びて芯が少し縮む
@@ -3977,6 +4255,18 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'earth-geyser': () => earthGeyser(),
     'earth-fissure': () => earthFissure(),
     'boulder': () => boulder(),
+    'wind-gust': () => windGust(),
+    'wing-slash': () => wingSlash(),
+    'brave-aura': () => braveAura(),
+    'air-crescent': () => airCrescent(),
+    'rage-orb': () => rageOrb(),
+    'rage-burst': () => rageBurst(),
+    'tornado': () => tornado(),
+    'wind-ripple': () => windRipple(),
+    'dragon-breath-cone': () => dragonBreathCone(),
+    'dragon-pulse-beam': () => dragonPulseBeam(),
+    'rage-claw': () => rageClaw(),
+    'dragon-claw-slash': () => dragonClawSlash(),
     'rain-drop': () => rainDrop(),
     'blade-slash': () => bladeSlash(),
     'blade-ring': () => bladeRing(),

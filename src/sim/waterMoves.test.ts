@@ -76,7 +76,7 @@ describe('バブルこうせん・みずのはどう', () => {
   it('みずのはどう: りゅうのはどうと同じ数・速さ・間隔で、一番近い敵へ輪を続けて飛ばす', () => {
     const rules = buildSimRules('hoenn');
     const wp = rules.moves[moveIndexOf(rules, 'water-pulse')]!;
-    const dp = rules.moves[moveIndexOf(rules, 'dragon-pulse-hoenn')]!;
+    const dp = rules.moves[moveIndexOf(rules, 'dragon-pulse')]!;
     expect(wp.pattern).toBe('nearest');
     for (const k of ['count', 'speed', 'intervalSeconds', 'size', 'range', 'durationSeconds', 'cooldownSeconds'] as const) expect(wp.levels[0]![k]).toBe(dp.levels[0]![k]);
     expect(wp.effects).toHaveLength(0);

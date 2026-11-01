@@ -4702,46 +4702,69 @@
     },
     "metal-claw": {
       "extends": "steel.base",
+      "projectile": {
+        "shapeAlpha": 0.15
+      },
+      "impact": {
+        "flash": {
+          "color": "#eceff1",
+          "radius": 26,
+          "durationMs": 110,
+          "alpha": 0.5
+        }
+      },
       "sprite": {
-        "id": "claw",
+        "id": "metal-claw-slash",
         "fit": "front",
-        "size": 1
+        "size": 1.1,
+        "along": 0.5
       }
     },
     "iron-head": {
       "extends": "steel.base",
       "projectile": {
-        "shapeAlpha": 0.25
+        "shapeAlpha": 0.15
       },
       "impact": {
         "flash": {
-          "radius": 40
+          "color": "#eceff1",
+          "radius": 40,
+          "durationMs": 130,
+          "alpha": 0.6
         }
       },
       "sprite": {
-        "id": "impact-crescent",
+        "id": "iron-head-wave",
         "fit": "front",
-        "size": 1.1
+        "size": 1.1,
+        "along": 0.5
       }
     },
     "meteor-mash": {
       "extends": "steel.base",
+      "projectile": {
+        "glowScale": 1.6,
+        "coreScale": 0.2,
+        "glowColor": "#b3e5fc"
+      },
       "impact": {
         "flash": {
-          "radius": 50
+          "color": "#e0f7fa",
+          "radius": 60,
+          "durationMs": 160,
+          "alpha": 0.7
         }
       },
-      "fall": {
-        "id": "ice-chunk",
-        "height": 260,
-        "size": 1.5,
-        "shards": {
-          "id": "ice-shard",
-          "count": 8,
-          "distance": 70,
-          "seconds": 0.45,
-          "size": 0.45
-        }
+      "sprite": {
+        "id": "comet-fist",
+        "fit": "circle",
+        "size": 2.2,
+        "rotate": "velocity"
+      },
+      "effectSprite": {
+        "id": "comet-burst",
+        "fit": "circle",
+        "size": 1.1
       }
     },
     "sand-tomb": {
@@ -4808,13 +4831,28 @@
     },
     "metal-burst": {
       "extends": "steel.base",
+      "hideShape": true,
       "projectile": {
-        "glowScale": 1.05,
-        "coreScale": 0.3,
-        "shapeAlpha": 0.25
+        "glowScale": 0.3,
+        "coreScale": 0.1
+      },
+      "impact": {
+        "flash": {
+          "color": "#eceff1",
+          "radius": 40,
+          "durationMs": 140,
+          "alpha": 0.6
+        }
       },
       "sprite": {
-        "id": "giga-ring",
+        "id": "steel-armor-ring",
+        "fit": "circle",
+        "size": 1.15,
+        "rotate": "spin",
+        "spinDegPerSec": 60
+      },
+      "effectRingSprite": {
+        "id": "metal-burst-shards",
         "fit": "ring",
         "size": 1
       }
@@ -5484,6 +5522,34 @@
         "fit": "circle",
         "size": 2,
         "rotate": "velocity"
+      }
+    },
+    "steel-beam": {
+      "extends": "steel.base",
+      "impact": {
+        "flash": {
+          "color": "#e0f7fa",
+          "radius": 44,
+          "durationMs": 140,
+          "alpha": 0.6
+        }
+      },
+      "sprite": {
+        "id": "steel-beam-heavy",
+        "fit": "line",
+        "size": 1.3,
+        "growSeconds": 0.08
+      },
+      "chargeGlow": {
+        "color": "#e0f7fa",
+        "seconds": 0.35,
+        "radius": 56,
+        "alpha": 0.95
+      },
+      "screenFlash": {
+        "color": "#e0f7fa",
+        "alpha": 0.15,
+        "durationMs": 100
       }
     }
   }

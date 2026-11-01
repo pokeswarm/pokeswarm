@@ -3738,6 +3738,149 @@ function nightDazeRing(): SpriteOut {
   return { palette: DARK, frameMs: 80, parts: { middle: frames.map(toRows) } };
 }
 
+// ---------------- ホウエンの技の作り直し（4）はがね（07 の155章） ----------------
+/** はがねの色: 0 輪郭・1 濃い鋼・2 鋼・3 明るい鋼・4 白・5 青白い光 */
+const STEEL = ['#1c2833', '#546e7a', '#90a4ae', '#cfd8dc', '#ffffff', '#b3e5fc'];
+
+/** 金属のきらめき（十字の光）: 中心 (cx, cy)・大きさ s の中にあるか */
+function glint(u: number, v: number, cx: number, cy: number, s: number): boolean {
+  const dx = Math.abs(u - cx);
+  const dy = Math.abs(v - cy);
+  return (dx < s && dy < s * 0.18) || (dy < s && dx < s * 0.18);
+}
+
+/** メタルクロー: 自分の前へ走る 3 本の銀の爪の筋（64×32、右向き）。鋼のふちに白い芯、先に十字のきらめき。3 コマで伸びてきらめく */
+function metalClawSlash(): SpriteOut {
+  const frames = [0, 1, 2].map((f) => {
+    const len = f === 0 ? 0.6 : 1;
+    return wide(64, 32, (u, v) => {
+      if (f >= 1) for (const [gx, gy] of [[0.75, -0.55], [0.9, 0.05], [0.7, 0.6]] as const) if (glint(u, v, gx, gy, 0.12 + (f === 2 ? 0.06 : 0))) return 4;
+      for (const off of [-0.55, 0, 0.55]) {
+        const t = (u + 0.9) / (1.75 * len);
+        if (t < 0 || t > 1) continue;
+        const across = v - off - off * 0.25 * t;
+        const w = 0.26 * (1 - t * 0.8) + 0.03;
+        if (Math.abs(across) < w) return Math.abs(across) < w * 0.35 ? 4 : Math.abs(across) < w * 0.7 ? 3 : 2;
+      }
+      return -1;
+    });
+  });
+  return { palette: STEEL, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** アイアンヘッド: 鋼の頭で突っ込む衝撃の弧（64×32、右向き）。前へふくらむ銀の三日月の波と、後ろへ流れる速さの線、火花。3 コマ */
+function ironHeadWave(): SpriteOut {
+  const frames = [0, 1, 2].map((f) =>
+    wide(64, 32, (u, v) => {
+      // 三日月: 中心 (−0.3, 0) の楕円の弧。右側だけ
+      const e = Math.hypot((u + 0.3) / 1.2, v / 0.95);
+      const thick = 0.16 + f * 0.03;
+      if (u > -0.3 && Math.abs(e - 0.95) < thick) return Math.abs(e - 0.95) < thick * 0.35 ? 4 : e > 0.95 ? 3 : 2;
+      // 速さの線（左へ）
+      if (u < -0.2 && Math.abs(v) < 0.8 && ((v * 5 + f * 0.33) % 1 + 1) % 1 < 0.14 && ((u * 4 + f * 0.5) % 1 + 1) % 1 < 0.5) return 3;
+      // 火花
+      if (u > 0.2 && hash(Math.floor((u + 1) * 20), Math.floor((v + 1) * 10), 2501 + f) < 0.03) return 5;
+      return -1;
+    }),
+  );
+  return { palette: STEEL, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** コメットパンチ: 鋼のこぶしが彗星になって飛ぶ（右向き。頭が鋼のこぶし、左へ青白い尾）。3 コマで尾がゆらぐ */
+function cometFist(): SpriteOut {
+  const frames = [0, 1, 2].map((f) =>
+    shape(24, (u, v) => {
+      // こぶし: 右の角丸の四角（指の溝 2 本）
+      if (inRoundRect(u, v, 0.45, 0, 0.38, 0.34, 0.14)) {
+        if (Math.abs(v + 0.12) < 0.03 || Math.abs(v - 0.12) < 0.03) return 1;
+        return u > 0.6 ? 3 : 2;
+      }
+      // 尾: 左へ細くなる青白い炎
+      if (u < 0.2) {
+        const wob = Math.sin(u * 8 + f * 2.2) * 0.1;
+        const half = 0.38 * (u + 1) / 1.2 + 0.03;
+        if (Math.abs(v - wob) < half) return Math.abs(v - wob) < half * 0.4 ? 4 : 5;
+      }
+      return -1;
+    }),
+  );
+  return { palette: STEEL, frameMs: 60, parts: { main: frames.map(toRows) } };
+}
+
+/** コメットパンチの爆発: 銀と青白の星形の光（6 本の芒）と飛び散る鋼の火花。4 コマ */
+function cometBurst(): SpriteOut {
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const grow = 0.5 + f * 0.17;
+      const core = 0.3 - f * 0.06;
+      if (d < core * 0.5) return 4;
+      if (d < core) return 5;
+      for (let j = 0; j < 6; j++) {
+        const th = (j * Math.PI) / 3 + Math.PI / 6;
+        const along = u * Math.cos(th) + v * Math.sin(th);
+        const perp = Math.abs(-u * Math.sin(th) + v * Math.cos(th));
+        if (along > 0 && along < grow && perp < 0.1 * (1 - along / grow) + 0.01) return f === 3 ? 2 : along < grow * 0.5 ? 4 : 3;
+      }
+      if (f >= 1 && d < grow + 0.1 && hash(Math.floor((u + 1) * 12), Math.floor((v + 1) * 12), 2511 + f) < 0.06) return 5;
+      return -1;
+    }),
+  );
+  return { palette: STEEL, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** メタルバースト: 自分を囲む鋼の板の輪（8 枚。板ごとにリベットと光）。2 コマで光が動く。レシピの spin でゆっくり回す */
+function steelArmorRing(): SpriteOut {
+  const frames = [0, 1].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      if (d < 0.68 || d > 0.98) return -1;
+      const k = ((a / (Math.PI * 2)) * 8 + 8) % 1;
+      if (k < 0.08 || k > 0.92) return 0;
+      if (Math.abs(k - 0.5) < 0.06 && Math.abs(d - 0.83) < 0.04) return 1;
+      const glintK = ((k + d * 2 + f * 0.5) % 1) < 0.15;
+      return glintK ? 4 : d > 0.92 || d < 0.74 ? 1 : 2;
+    }),
+  );
+  return { palette: STEEL, frameMs: 160, parts: { main: frames.map(toRows) } };
+}
+
+/** 返した衝撃（メタルバーストの hurt）: 鋼の破片が外へ飛ぶ帯（輪に沿って並べる。下が外）。2 コマ */
+function metalBurstShards(): SpriteOut {
+  const W = 12;
+  const H = 10;
+  const frames = [0, 1].map((f) =>
+    fill(blank(W, H), (x, y) => {
+      for (const [cx, cy, s] of [[2, 3 + f, 2.2], [6, 6 + f, 2.6], [10, 2 + f, 2], [8, 8 - f, 1.6]] as const) {
+        if (Math.abs(x - cx) < s * (1 - Math.abs(y - cy) / s) && Math.abs(y - cy) < s) return (x + y + f) % 3 === 0 ? 4 : (x + cx) % 2 === 0 ? 3 : 2;
+      }
+      return -1;
+    }),
+  );
+  return { palette: STEEL, frameMs: 90, parts: { middle: frames.map(toRows) } };
+}
+
+/** てっていこうせん: 太い鋼の光線。白い芯の周りを暗い鋼の輪が回りながら先へ流れ、ふちは青白い。4 コマで輪が進む */
+function steelBeamHeavy(): SpriteOut {
+  const H = 16;
+  const TILE = 10;
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 8, middle: TILE, end: 12 }, 4, (x, y, f, part) => {
+    const taper = part === 'start' ? 0.5 + x / 14 : part === 'end' ? 1.2 - x / 11 : 1;
+    const d = Math.abs(y - mid) / (6.8 * taper);
+    if (d > 1) return -1;
+    // 鋼の輪: 傾いた帯が先へ進む
+    const ph = part === 'middle' ? ((x + f * 2.5 + (y - mid) * 0.4) % TILE + TILE) % TILE : 9;
+    if (ph < 2.2 && d > 0.3 && d < 0.85) return 1;
+    if (d < 0.25) return 4;
+    if (d < 0.55) return 3;
+    if (d < 0.85) return 2;
+    return 5;
+  });
+  return { palette: STEEL, frameMs: 55, parts };
+}
+
 /**
  * にどげり: 蹴りの当たった所ではじける衝撃（脚は描かない。作者の指摘 2026年11月1日）。白い芯から、細い放射の線が 8 本
  * （長い・短いを交互に）はなれて飛び、間に小さな火花。コマ 0 は短く、コマ 1 で線が外へ伸びて芯が少し縮む
@@ -4538,6 +4681,13 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'shadow-ambush': () => shadowAmbush(),
     'night-crescent': () => nightCrescent(),
     'night-daze-ring': () => nightDazeRing(),
+    'metal-claw-slash': () => metalClawSlash(),
+    'iron-head-wave': () => ironHeadWave(),
+    'comet-fist': () => cometFist(),
+    'comet-burst': () => cometBurst(),
+    'steel-armor-ring': () => steelArmorRing(),
+    'metal-burst-shards': () => metalBurstShards(),
+    'steel-beam-heavy': () => steelBeamHeavy(),
     'rain-drop': () => rainDrop(),
     'blade-slash': () => bladeSlash(),
     'blade-ring': () => bladeRing(),

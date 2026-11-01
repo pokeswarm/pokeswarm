@@ -937,12 +937,14 @@ function fangBite(palette = ['#3b0d06', '#e53935', '#ff7043', '#cfc4bd', '#fffff
  * 上の列はカメラに近いので広く大きく（両はしに長い犬歯）、下の列は狭く小さい。歯ぐきは上が ∩、下が ∪ に少し反る。上下から閉じ、閉じた所で光る。
  * fire は ほのおのキバ（赤い歯ぐきのふちから炎の舌が立つ）、dark は かみつく（あくの紫）
  */
-function fangFace(kind: 'fire' | 'dark' | 'crunch', slope = 0, alignInner = false): SpriteOut {
+function fangFace(kind: 'fire' | 'dark' | 'crunch' | 'electric', slope = 0, alignInner = false): SpriteOut {
   // 0 輪郭・1 歯ぐき（濃い）・2 歯ぐき（明るい）・3 炎・光・4 歯の影・5 白
   // crunch は かみくだく の下向き・上向き（黒い歯ぐきと白いキバ。光も灰）
   const palette =
     kind === 'fire'
       ? ['#3b0d06', '#c62828', '#ff7043', '#ffca28', '#f3d6c8', '#ffffff']
+      : kind === 'electric'
+        ? ['#2b2500', '#9e7c00', '#ffca28', '#ffff8d', '#fff3c4', '#ffffff']
       : kind === 'crunch'
         ? ['#000000', '#0a0a0a', '#2a2a2a', '#5a5a5a', '#d6d6d6', '#ffffff']
         : ['#16071f', '#3d1060', '#7b1fa2', '#ce93d8', '#e7c6f0', '#ffffff'];
@@ -989,14 +991,15 @@ function fangFace(kind: 'fire' | 'dark' | 'crunch', slope = 0, alignInner = fals
       const cut = (c: number): number => (fade === 1 && c <= 2 && hash(Math.floor((u + 1) * 16), Math.floor((v + 1) * 16), 73) < 0.5 ? -1 : c);
       // 上の歯ぐき（厚み 0.14・幅 0.7）と、炎の舌（ほのおのキバ）
       if (Math.abs(u) < 0.7 && v <= upGum && v >= upGum - 0.14) return cut(v < upGum - 0.08 ? 1 : 2);
-      if (kind === 'fire' && Math.abs(u) < 0.7) {
-        const h = 0.12 + Math.max(0, Math.sin(u * 13 + f * 2.3)) * 0.14;
+      // かみなりのキバ: 炎の舌の代わりに、ぎざぎざの火花（三角波）
+      if ((kind === 'fire' || kind === 'electric') && Math.abs(u) < 0.7) {
+        const h = kind === 'electric' ? 0.08 + Math.abs(((((u * 7 + f * 0.5) % 1) + 1) % 1) - 0.5) * 0.3 : 0.12 + Math.max(0, Math.sin(u * 13 + f * 2.3)) * 0.14;
         if (v < upGum - 0.14 && v >= upGum - 0.14 - h) return cut(v < upGum - 0.14 - h * 0.5 ? 3 : 2);
       }
       // 下の歯ぐき（厚み 0.1・幅 0.5。遠いので小さい）と炎
       if (Math.abs(u - lowShift) < 0.5 && v >= loGum && v <= loGum + 0.1) return cut(v > loGum + 0.05 ? 1 : 2);
-      if (kind === 'fire' && Math.abs(u - lowShift) < 0.5) {
-        const h = 0.08 + Math.max(0, Math.sin(u * 15 + f * 2.7 + 1)) * 0.1;
+      if ((kind === 'fire' || kind === 'electric') && Math.abs(u - lowShift) < 0.5) {
+        const h = kind === 'electric' ? 0.05 + Math.abs(((((u * 8 + f * 0.5 + 0.3) % 1) + 1) % 1) - 0.5) * 0.2 : 0.08 + Math.max(0, Math.sin(u * 15 + f * 2.7 + 1)) * 0.1;
         if (v > loGum + 0.1 && v <= loGum + 0.1 + h) return cut(v > loGum + 0.1 + h * 0.5 ? 3 : 2);
       }
       return -1;
@@ -1012,7 +1015,7 @@ const FANG_TILT = Math.tan((30 * Math.PI) / 180);
  * かみつく・ほのおのキバ（作者の指摘 2026年10月28日: かみくだく の斜めと横を使う）: 下向き・上向きは正面の口、横は かみくだく と同じ肉食のあご（sideJaw）。
  * 斜めは正面の口を縦にずらして歯ぐきを向きに直角にし、下の列はプレイヤーの側（左）にそろえる（左向きは左右を返す）
  */
-function fangFront(kind: 'fire' | 'dark'): SpriteOut {
+function fangFront(kind: 'fire' | 'dark' | 'electric'): SpriteOut {
   const face = fangFace(kind);
   const front = face.parts.main!;
   return {
@@ -1030,7 +1033,7 @@ function fangFront(kind: 'fire' | 'dark'): SpriteOut {
  *   上あごは根元が厚く先が細い鼻先で、先が少し下へ曲がる。先に小さな前歯、その後ろに長い犬歯（下向き）、奥に小さな奥歯と大きな裂肉歯。
  *   下あごは上あごより短く細い。犬歯（上向き）は上の犬歯の少し前に立ち、閉じると上下の犬歯が交差する
  */
-function sideJaw(kind: 'fire' | 'dark' | 'crunch', n: number): string[][] {
+function sideJaw(kind: 'fire' | 'dark' | 'crunch' | 'electric', n: number): string[][] {
   // 色の番号は fangFace と同じ: 0 輪郭・1 あご（濃い）・2 あご・3 あごの照り・火花・炎・4 歯の影・5 白（歯）
   // コマごとの あごの開き（度）・火花・薄れ（0 開く → 1 半分 → 2 閉じる → 3 薄れる → 4 名残り）
   const STEPS = [[54, 0, 0], [28, 0, 0], [3, 1, 0], [3, 0.6, 1], [3, 0, 2]] as const;
@@ -1088,8 +1091,8 @@ function sideJaw(kind: 'fire' | 'dark' | 'crunch', n: number): string[][] {
           const bot = Math.max(0, t - 0.9) * 0.4;
           if (uy >= top && uy <= bot) return thin(uy < top + 0.06 ? 3 : uy > bot - 0.04 ? 1 : 2, u, v, fade);
           // ほのおのキバ: 上あごの背から炎の舌が立つ
-          if (kind === 'fire' && t > 0.08 && t < 0.95) {
-            const h = 0.08 + Math.max(0, Math.sin(ux * 14 + f * 2.3)) * 0.12;
+          if ((kind === 'fire' || kind === 'electric') && t > 0.08 && t < 0.95) {
+            const h = kind === 'electric' ? 0.05 + Math.abs(((((ux * 6 + f * 0.5) % 1) + 1) % 1) - 0.5) * 0.24 : 0.08 + Math.max(0, Math.sin(ux * 14 + f * 2.3)) * 0.12;
             if (uy < top && uy >= top - h) return thin(uy < top - h * 0.5 ? 3 : 2, u, v, fade);
           }
         }
@@ -1099,8 +1102,8 @@ function sideJaw(kind: 'fire' | 'dark' | 'crunch', n: number): string[][] {
           const t = lx / LL;
           const depth = 0.14 * (1 - t) + 0.06 * t;
           if (ly <= 0 && ly >= -depth) return thin(ly > -0.04 ? 1 : 2, u, v, fade);
-          if (kind === 'fire' && t > 0.1 && t < 0.92) {
-            const h = 0.06 + Math.max(0, Math.sin(lx * 15 + f * 2.7 + 1)) * 0.09;
+          if ((kind === 'fire' || kind === 'electric') && t > 0.1 && t < 0.92) {
+            const h = kind === 'electric' ? 0.04 + Math.abs(((((lx * 6 + f * 0.5 + 0.3) % 1) + 1) % 1) - 0.5) * 0.18 : 0.06 + Math.max(0, Math.sin(lx * 15 + f * 2.7 + 1)) * 0.09;
             if (ly < -depth && ly >= -depth - h) return thin(ly < -depth - h * 0.5 ? 3 : 2, u, v, fade);
           }
         }
@@ -3379,6 +3382,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'dark-jaws': () => darkJaws(),
     'fang-front-dark': () => fangFront('dark'),
     'fang-front-fire': () => fangFront('fire'),
+    'fang-front-electric': () => fangFront('electric'),
     'dark-fang': () => fangBite(['#0e0a0a', '#3e2723', '#5d4037', '#bdb4ae', '#ffffff']),
     'flame-crash': () => flameCrash(),
     'impact-crescent': () => impactCrescent(),

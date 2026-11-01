@@ -81,6 +81,8 @@ export interface SimMoveDef {
   readonly passive: readonly Modifiers[];
   /** 出した技が消えるまで次を出さない（ボルテッカー）。省略なら false */
   readonly waitForEnd?: boolean;
+  /** chain: 跳び終えたら自分の所へ戻る線を出す（ボルトチェンジ） */
+  readonly chainReturn?: boolean;
   /** ポイントマックスで増えた本数を威力に変える（太い追従レーザー。07 の122章） */
   readonly bonusCountToPower?: boolean;
   /** lob: 落ちた所でだけ当たる（07 の126章） */

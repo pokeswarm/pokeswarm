@@ -66,6 +66,7 @@ export function buildSimRules(region?: string): SimRules {
       chainMinHop: def.chainMinHop ?? 0,
       learners: def.learners ?? null,
       waitForEnd: def.waitForEnd,
+      ...(def.chainReturn ? { chainReturn: true } : {}),
       ...(def.bonusCountToPower ? { bonusCountToPower: true } : {}),
       ...(def.landOnly ? { landOnly: true } : {}),
       ...(def.sequential ? { sequential: true } : {}),

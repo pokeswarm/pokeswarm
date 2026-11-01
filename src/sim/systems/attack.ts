@@ -305,7 +305,9 @@ export function useMoves(world: World): void {
         if (p.id === world.localPlayerId) selfDamage(world, p, (p.maxHp * formCost.pct) / 100);
       }
       // 消えてから数える技（こなゆき・ふぶき）は、持続の分を足す
-      pm.cooldown = Math.max(scaledMoveStats(world, p, pm, st).cooldownSeconds, def.waitForEnd ? st.durationSeconds : 0) + (def.restAfterEnd ? st.durationSeconds : 0);
+      // 連鎖（しんそく・ボルトチェンジ）は跳ぶたびに遅れるので、消えるまでの長さは 跳ぶ回数 × 遅れ ＋ 持続（戻る線があれば 1 回多い）
+      const ends = st.durationSeconds + (def.pattern === 'chain' ? def.chainHopSeconds * (st.count - 1 + (def.chainReturn ? 1 : 0)) : 0);
+      pm.cooldown = Math.max(scaledMoveStats(world, p, pm, st).cooldownSeconds, def.waitForEnd ? ends : 0) + (def.restAfterEnd ? st.durationSeconds : 0);
       if (abilityPowerMultiplier(world, p) !== 1) {
         pm.truantRest = !pm.truantRest;
         if (!pm.truantRest) continue;
@@ -950,6 +952,7 @@ function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     }
     return;
   }
+  let hops = 0;
   for (let k = 0; k < st.count; k++) {
     // 一番近い敵へ。chainMinHop があれば、それより離れた敵の中で一番近い敵（いなければ一番近い敵。しんそく: 広く倒す）
     let best = -1;
@@ -983,6 +986,13 @@ function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     x = e.x[best]!;
     y = e.y[best]!;
     reach = st.range * 0.5;
+    hops++;
+  }
+  if (world.rules.moves[pm.move]!.chainReturn && hops > 0) {
+    // 最後は自分の所へ戻る線（ボルトチェンジ: 残像が帰ってくる）。出番が来たときに、そのときの自分の位置へ向け直す（orbitRadius −1 の印。飛ばない線では使っていない欄）
+    const len = Math.hypot(p.x - x, p.y - y) || 1;
+    const wait = hop * hops;
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, shape: SHAPE_LINE, length: len, dirX: (p.x - x) / len, dirY: (p.y - y) / len, orbitRadius: -1, ...(wait > 0 ? { life: wait, stage: 3, armLife: st.durationSeconds } : {}) });
   }
 }
 
@@ -1286,6 +1296,16 @@ export function moveProjectiles(world: World): void {
       if (pr.life[i]! <= 0) {
         pr.stage[i] = pr.armStage[i]!;
         pr.life[i] = pr.maxLife[i] = pr.armLife[i]!;
+        // 自分の所へ戻る線（ボルトチェンジ）: 現れるときの自分の位置へ向け直す
+        if (pr.orbitRadius[i] === -1 && pr.shape[i] === SHAPE_LINE) {
+          const o = world.players.find((q) => q.id === pr.owner[i]);
+          if (o) {
+            const len = Math.hypot(o.x - pr.x[i]!, o.y - pr.y[i]!) || 1;
+            pr.length[i] = len;
+            pr.dirX[i] = (o.x - pr.x[i]!) / len;
+            pr.dirY[i] = (o.y - pr.y[i]!) / len;
+          }
+        }
         // 効き方から出た、遅れて伸びる亀裂（じわれ）は、1本ずつ光らせない
         if (pr.stage[i] === 0) world.events.push({ type: 'projectileHit', x: pr.x[i]!, y: pr.y[i]!, owner: pr.owner[i]!, move: pr.move[i]! });
         fireSpawnEffects(world, i, i + 1);

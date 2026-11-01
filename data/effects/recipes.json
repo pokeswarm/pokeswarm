@@ -4342,19 +4342,24 @@
         "shapeAlpha": 0.25
       },
       "sprite": {
-        "id": "fang-bite",
+        "id": "fang-front-electric",
         "fit": "front",
-        "size": 1
+        "size": 1,
+        "directional": true
       }
     },
     "volt-switch": {
       "extends": "electric.base",
-      "sprite": {
-        "id": "zap-orb",
-        "fit": "circle",
-        "size": 1.6,
-        "rotate": "spin",
-        "spinDegPerSec": 540
+      "projectile": {
+        "glowColor": "#fff176",
+        "glowScale": 2.4,
+        "shapeAlpha": 0.3
+      },
+      "ownerGhost": {
+        "tint": "#fff59d",
+        "alpha": 0.85,
+        "afterimages": 4,
+        "spacingTicks": 1
       }
     },
     "thrash": {

@@ -8980,54 +8980,62 @@
       "region": "hoenn"
     },
     "volt-switch": {
-      "pattern": "homing",
+      "pattern": "chain",
       "effect": "volt-switch",
+      "region": "hoenn",
+      "chainHopSeconds": 0.08,
+      "chainMinHop": 70,
+      "chainReturn": true,
+      "waitForEnd": true,
       "base": {
-        "power": 207,
+        "power": 113.4,
         "cooldownSeconds": 1.2,
-        "count": 2,
+        "count": 5,
         "intervalSeconds": 0.1,
-        "speed": 380,
-        "size": 6,
-        "range": 450,
-        "durationSeconds": 2,
-        "pierce": 1,
+        "speed": 0,
+        "size": 16,
+        "range": 520,
+        "durationSeconds": 0.2,
+        "pierce": "infinite",
         "hitIntervalSeconds": 0,
-        "knockback": 60,
+        "knockback": 120,
         "knockbackSeconds": 0.08,
-        "statusChance": 0,
-        "statusSeconds": 0,
+        "statusId": "paralysis",
+        "statusChance": 0.2,
+        "statusSeconds": 2,
         "spreadDegrees": 0,
         "lifestealPct": 0
       },
       "levels": [
         {
           "count": 1,
-          "power": -45.9
+          "power": 7.5
         },
         {
-          "power": 23.2
+          "size": 2,
+          "power": 12.3
         },
         {
-          "count": 1,
-          "power": -28.7
-        },
-        {
-          "power": 17.3
-        },
-        {
-          "cooldownSeconds": -0.2,
-          "power": -14.3
+          "range": 30,
+          "power": 14
         },
         {
           "count": 1,
-          "power": -20.2
+          "power": 4.3
         },
         {
-          "power": 11.6
+          "size": 3,
+          "power": 6.6
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": -7.1
+        },
+        {
+          "count": 1,
+          "power": 2
         }
-      ],
-      "region": "hoenn"
+      ]
     },
     "quick-attack-hoenn": {
       "pattern": "melee",

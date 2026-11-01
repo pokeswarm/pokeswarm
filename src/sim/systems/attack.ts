@@ -219,6 +219,22 @@ function spread(world: World, dx: number, dy: number, degrees: number): [number,
  */
 export function useMoves(world: World): void {
   for (const p of world.players) {
+    // 受けたダメージを返す技（ミラーコート・マジックコート）: その技の当たり判定が出ている間に受けたダメージを、効き方 hurt に渡す
+    if (p.hurtQueue) {
+      const taken = p.hurtQueue;
+      p.hurtQueue = 0;
+      const pr0 = world.projectiles;
+      for (const pm of p.moves) {
+        const def = world.rules.moves[pm.move];
+        if (!def?.effects.some((fx) => fx.trigger === 'hurt')) continue;
+        let active = false;
+        for (let i = 0; i < pr0.count && !active; i++) active = pr0.owner[i] === p.id && pr0.move[i] === pm.move && pr0.stage[i] === 0;
+        if (!active) continue;
+        const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+        const sc = scaledMoveStats(world, p, pm, playerMoveStats(world, p, pm));
+        fireEffects(world, 'hurt', { owner: p.id, move: pm.move, level: pm.level, damage: taken, size: sc.size, x: p.x, y: p.y, dirX: fx, dirY: fy, length: 0 });
+      }
+    }
     // 倒れている間・凍っている間（伝説戦のぜったいれいど）は技を使わない
     if (p.down || p.frozenTicks) continue;
     // ねむる（カビゴン）: 眠っている間と起きる動きの間は、ほかの技を出さない

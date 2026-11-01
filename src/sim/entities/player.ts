@@ -139,6 +139,8 @@ export interface Player {
   buffs?: { index: number; ticksLeft: number; totalTicks: number }[];
   /** 技で付いた一時的な強化（move は技の番号。フレアドライブ。07 の115章） */
   moveBuffs?: { move: number; ticksLeft: number }[];
+  /** この更新で受けたダメージの合計（効き方 hurt: ミラーコートが返す。次の更新の攻撃で使って 0 に戻す。07 の154章） */
+  hurtQueue?: number;
   /** 順番に出す技（group）ごとの、次に出せるまでの秒数と、次に出す番 */
   groupTimers?: Record<string, number>;
   groupCursor?: Record<string, number>;

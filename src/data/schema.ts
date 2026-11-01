@@ -946,7 +946,11 @@ const snakeSchema = z.object({ amplitude: z.number().positive(), wavelength: z.n
  */
 export const moveEffectSchema = z.object({
   /** kill は、この技（技そのもの）で敵を倒したとき。その敵の位置（ぜったいれいど: 凍った敵が氷の破片を飛ばす） */
-  trigger: z.enum(['cast', 'hit', 'end', 'every', 'eachHit', 'spawn', 'kill']),
+  /**
+   * hurt は、この技の当たり判定が出ている間に持ち主がダメージを受けたとき（持ち主の位置。ミラーコート・マジックコート: 受けたダメージを返す）。
+   * explode の威力は、技の威力ではなく**受けたダメージ × powerMultiplier**。本人のブラウザだけで起こる（HP は本人が管理するため。07 の154章）
+   */
+  trigger: z.enum(['cast', 'hit', 'end', 'every', 'eachHit', 'spawn', 'kill', 'hurt']),
   /** 今の姿がこのどれかのときだけ起こる（しんそく: ウィンディなら残像が炎をまとう。作者の案 2026年10月25日。PokeAPI のポケモンの名前） */
   forms: z.array(z.string()).optional(),
   everySeconds: z.number().positive().optional(),

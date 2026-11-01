@@ -53,6 +53,7 @@ export function hurtPlayer(world: World, p: Player, raw: number): void {
   const defense = p.defense * (activeLegendField(world)?.field.defenseMultiplier ?? 1);
   const amount = ((raw * 100) / (100 + defense)) * Math.max(0, 1 + p.mods.damageTakenPct / 100) * guard;
   p.hp -= amount;
+  p.hurtQueue = (p.hurtQueue ?? 0) + amount;
   p.invincibleTicks = Math.round(world.rules.stats.hurtInvincibleSeconds / world.dt);
   world.events.push({ type: 'playerDamaged', playerId: p.id, amount });
   hurtBuffs(world, p);

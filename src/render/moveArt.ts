@@ -3481,6 +3481,263 @@ function dragonClawSlash(): SpriteOut {
   return { palette: DRAGON, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- ホウエンの技の作り直し（3）エスパー・ゴースト・あく（07 の154章） ----------------
+/** エスパーの色: 0 輪郭・1 濃い赤紫・2 桃・3 うすい桃・4 白・5 水色の光 */
+const PSY = ['#4a0e3a', '#ad1457', '#f06292', '#f8bbd0', '#ffffff', '#80deea'];
+/** ゴーストの色: 0 輪郭・1 黒紫・2 濃い紫・3 紫・4 うすい紫・5 目の光（黄緑） */
+const GHOST = ['#0b0410', '#1a0b24', '#4a148c', '#7e57c2', '#d1c4e9', '#b2ff59'];
+/** あくの色: 0 輪郭・1 黒・2 濃い紫・3 紫・4 赤・5 白 */
+const DARK = ['#000000', '#1a1a1a', '#311b5c', '#6a1b9a', '#ff5252', '#f3e5f5'];
+
+/** ねんりき: 敵をつかむ念の力（二重の歪みの輪が中心へ縮み、周りに光の粒）。3 コマで輪が縮む。レシピの spin で回す */
+function psyGrip(): SpriteOut {
+  const frames = [0, 1, 2].map((f) =>
+    shape(24, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      const r1 = 0.85 - f * 0.12;
+      const r2 = 0.5 - f * 0.1;
+      const wob = Math.sin(a * 4 + f) * 0.04;
+      if (Math.abs(d - r1 - wob) < 0.07) return (a + f) % 1.2 < 0.6 ? 3 : 2;
+      if (Math.abs(d - r2 + wob) < 0.07) return 4;
+      if (d < 0.12) return 5;
+      if (hash(Math.floor((u + 1) * 12), Math.floor((v + 1) * 12), 2401 + f) < 0.05 && d < 0.95) return 5;
+      return -1;
+    }),
+  );
+  return { palette: PSY, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/** みらいよち の印: 敵の上に開く目（閉じた線 → 半開き → 見開いて瞳が光る）。3 コマ */
+function futureEye(): SpriteOut {
+  const palette = ['#4a0e3a', '#ad1457', '#f8bbd0', '#ffffff', '#1a0b24', '#80deea'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(24, (u, v) => {
+      const open = 0.12 + f * 0.3;
+      const lid = open * (1 - (u * u) / 1.0);
+      if (Math.abs(u) > 0.95) return -1;
+      if (Math.abs(v) < lid) {
+        const iris = Math.hypot(u, v);
+        if (iris < 0.12 + f * 0.04) return f === 2 ? 5 : 4;
+        if (iris < 0.3 + f * 0.05) return 4;
+        return 3;
+      }
+      if (Math.abs(v) < lid + 0.1) return 1;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 500, parts: { main: frames.map(toRows) } };
+}
+
+/** みらいよち の爆発: 桃色の鋭い星形の光（4 本の長い芒と 4 本の短い芒）が広がって薄れる。4 コマ */
+function futureBurst(): SpriteOut {
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const grow = 0.55 + f * 0.15;
+      const core = 0.28 - f * 0.05;
+      if (d < core * 0.5) return 4;
+      if (d < core) return 3;
+      for (let j = 0; j < 8; j++) {
+        const th = (j * Math.PI) / 4;
+        const len = (j % 2 === 0 ? 1 : 0.6) * grow;
+        const along = u * Math.cos(th) + v * Math.sin(th);
+        const perp = Math.abs(-u * Math.sin(th) + v * Math.cos(th));
+        if (along > 0 && along < len && perp < 0.09 * (1 - along / len) + 0.01) return f === 3 ? 1 : along < len * 0.5 ? 3 : 2;
+      }
+      if (Math.abs(d - grow * 0.8) < 0.04 && f >= 1) return 5;
+      return -1;
+    }),
+  );
+  return { palette: PSY, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** サイコキネシス: 外へ広がる念の波（輪に沿って並べる帯。下が外）。桃色の歪みの帯に白い筋が走る。3 コマ */
+function psyWave(): SpriteOut {
+  const W = 12;
+  const H = 10;
+  const frames = [0, 1, 2].map((f) =>
+    fill(blank(W, H), (x, y) => {
+      const ph = (x / W) * Math.PI * 2;
+      const bend = Math.sin(ph * 2 + f * 2) * 1.2;
+      const yy = y - bend;
+      if (yy < 1 || yy > H - 1.5) return -1;
+      if (Math.abs(yy - 5) < 0.9) return 4;
+      if (Math.abs(yy - 5) < 2.2) return 3;
+      return (x + f) % 3 === 0 ? 1 : 2;
+    }),
+  );
+  return { palette: PSY, frameMs: 80, parts: { middle: frames.map(toRows) } };
+}
+
+/** ミラーコート: 自分を囲む六角形の鏡の板の輪（8 枚。板ごとに映り込みの光）。2 コマで光が動く。レシピの spin でゆっくり回す */
+function mirrorPanels(): SpriteOut {
+  const palette = ['#4a0e3a', '#f8bbd0', '#ffffff', '#80deea', '#ad1457'];
+  const frames = [0, 1].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      if (d < 0.66 || d > 0.98) return -1;
+      const k = ((a / (Math.PI * 2)) * 8 + 8) % 1;
+      if (k < 0.1 || k > 0.9) return 0;
+      const glint = ((k + d * 2 + f * 0.3) % 1) < 0.2;
+      return glint ? 2 : d > 0.9 || d < 0.74 ? 3 : 1;
+    }),
+  );
+  return { palette, frameMs: 150, parts: { main: frames.map(toRows) } };
+}
+
+/** 返した衝撃（ミラーコート・マジックコートの hurt）: 砕けた鏡の破片が外へ飛ぶ帯（輪に沿って並べる。下が外）。2 コマ */
+function mirrorShatter(): SpriteOut {
+  const palette = ['#4a0e3a', '#f8bbd0', '#ffffff', '#80deea'];
+  const W = 12;
+  const H = 10;
+  const frames = [0, 1].map((f) =>
+    fill(blank(W, H), (x, y) => {
+      // 破片: 三角形の欠片が外（下）へ
+      for (const [cx, cy, s] of [[2, 3 + f, 2], [6, 6 + f, 2.5], [10, 2 + f, 1.8], [8, 8 - f, 1.5]] as const) {
+        if (Math.abs(x - cx) < s * (1 - Math.abs(y - cy) / s) && Math.abs(y - cy) < s) return (x + y) % 3 === 0 ? 2 : (x + cx) % 2 === 0 ? 3 : 1;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { middle: frames.map(toRows) } };
+}
+
+/** リフレクター: 自分の周りを回る六角形の光の板（桃色の半透明。縁が明るい）。2 コマで映り込みが動く */
+function reflectPanel(): SpriteOut {
+  const palette = ['#4a0e3a', '#f8bbd0', '#ffffff', '#80deea'];
+  const frames = [0, 1].map((f) =>
+    shape(16, (u, v) => {
+      // 六角形: 6 方向の半平面
+      let inside = true;
+      for (let j = 0; j < 6; j++) {
+        const th = (j * Math.PI) / 3;
+        if (u * Math.cos(th) + v * Math.sin(th) > 0.85) inside = false;
+      }
+      if (!inside) return -1;
+      const edge = Math.max(...[0, 1, 2, 3, 4, 5].map((j) => u * Math.cos((j * Math.PI) / 3) + v * Math.sin((j * Math.PI) / 3)));
+      if (edge > 0.7) return 2;
+      if (Math.abs(u - v * 0.5 + 0.2 - f * 0.3) < 0.12) return 3;
+      return 1;
+    }),
+  );
+  return { palette, frameMs: 180, parts: { main: frames.map(toRows) } };
+}
+
+/** マジックコート: 自分を囲む虹色の光の破片の輪（色が順に変わる）。3 コマで色が回る。レシピの spin で回す */
+function magicCoatRing(): SpriteOut {
+  const palette = ['#4a0e3a', '#ff8a80', '#ffd180', '#ffff8d', '#ccff90', '#80d8ff', '#ea80fc', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      if (d < 0.7 || d > 0.98) return -1;
+      const k = ((a / (Math.PI * 2)) * 12 + 12) % 1;
+      if (k < 0.15) return -1;
+      const idx = (Math.floor((a / (Math.PI * 2)) * 12 + 12) + f) % 6;
+      if (d > 0.92 || d < 0.76) return 7;
+      return 1 + idx;
+    }),
+  );
+  return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
+}
+
+/** ナイトヘッド: 飛ぶ幽霊の顔（暗い紫のもやに、光る 2 つの目と裂けた口）。4 コマでもやが揺れ、目が瞬く */
+function nightFace(): SpriteOut {
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(24, (u, v) => {
+      const a = Math.atan2(v, u);
+      const edge = 0.9 + Math.sin(a * 5 + f * 1.5) * 0.08;
+      const d = Math.hypot(u, v * 1.1);
+      if (d > edge) return -1;
+      // 目: 2 つ。コマ 3 で細くなる（瞬き）
+      const eyeH = f === 3 ? 0.05 : 0.14;
+      for (const ex of [-0.3, 0.3]) if (Math.abs(u - ex) < 0.14 && Math.abs(v + 0.15) < eyeH) return 5;
+      // 口: 裂けた笑い
+      if (v > 0.25 && v < 0.42 && Math.abs(u) < 0.45 && ((u * 7 + 7) % 1) < 0.6) return 1;
+      return d > edge - 0.18 ? 2 : d > 0.4 ? 3 : 2;
+    }),
+  );
+  return { palette: GHOST, frameMs: 110, parts: { main: frames.map(toRows) } };
+}
+
+/** シャドーボール（ホウエン）: 大きな影の球。中は黒く、表面を紫の稲妻が走る。4 コマで稲妻が変わる */
+function shadowSphere(): SpriteOut {
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(24, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.92) return -1;
+      const a = Math.atan2(v, u);
+      // 稲妻: 角度ごとのジグザグの弧
+      const z = Math.sin(a * 6 + f * 1.7) * 0.12 + Math.sin(d * 20 + f) * 0.05;
+      if (Math.abs(d - 0.62 - z) < 0.05 && ((a * 2 + f) % 1.5) < 0.9) return 4;
+      if (Math.abs(d - 0.35 + z) < 0.04 && ((a * 3 - f) % 2) < 1) return 3;
+      return d > 0.78 ? 2 : d > 0.5 ? 1 : 0;
+    }),
+  );
+  return { palette: GHOST, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** シャドーボールの破片: 小さな影のしずく（尾を引く）。2 コマ */
+function shadowShard(): SpriteOut {
+  const frames = [0, 1].map((f) =>
+    shape(12, (u, v) => {
+      const d = Math.hypot(u - 0.2, v);
+      if (d < 0.45) return d < 0.2 ? 3 : 2;
+      if (u < 0.2 && Math.abs(v) < 0.3 * (1 + u) + 0.05 - f * 0.05) return 1;
+      return -1;
+    }),
+  );
+  return { palette: GHOST, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** ふいうち: 敵の影から突き上がる暗い爪のとげ（根元を当たり判定に合わせる originY）。コマ 0 影が広がる → 1 とげが突き上がる → 2 薄れる */
+function shadowAmbush(): SpriteOut {
+  const frames = [0, 1, 2].map((f) =>
+    shape(32, (u, v) => {
+      // 影の楕円（v 0.5 あたり）
+      const pool = Math.hypot(u / 0.8, (v - 0.5) / 0.2);
+      if (pool < 1) return pool < 0.6 ? 1 : 2;
+      if (f === 0) return -1;
+      // とげ: 5 本。根元 v 0.5 から上へ。真ん中ほど高い
+      for (const [cx, h] of [[-0.6, 0.5], [-0.3, 0.9], [0, 1.3], [0.3, 1.0], [0.6, 0.6]] as const) {
+        const top = 0.5 - h * (f === 2 ? 0.8 : 1);
+        if (v < top || v > 0.5) continue;
+        const t = (0.5 - v) / (0.5 - top);
+        const w = 0.13 * (1 - t) + 0.01;
+        if (Math.abs(u - cx) < w) return f === 2 && hash(Math.floor((u + 1) * 10), Math.floor((v + 1) * 10), 2451) < 0.4 ? -1 : Math.abs(u - cx) < w * 0.4 ? 3 : 2;
+      }
+      return -1;
+    }),
+  );
+  return { palette: DARK, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** つじぎり: 飛ぶ黒い三日月の斬撃（右へふくらむ。紫のふちに赤い光）。3 コマで赤い光が走る */
+function nightCrescent(): SpriteOut {
+  const blades = crescent(24, 3, 0.36, (k, a, f) => (Math.abs(a - 0.6 + f * 0.6) < 0.25 && k > 0.5 ? 4 : k > 0.75 ? 3 : k > 0.3 ? 2 : 1), 0.02);
+  return { palette: DARK, frameMs: 70, parts: { main: blades.map((g) => toRows(outline(g, 0))) } };
+}
+
+/** ナイトバースト: 外へ広がる闇の衝撃（輪に沿って並べる帯。下が外）。黒いぎざぎざの闇に紫の火花と赤い光。3 コマ */
+function nightDazeRing(): SpriteOut {
+  const W = 12;
+  const H = 10;
+  const frames = [0, 1, 2].map((f) =>
+    fill(blank(W, H), (x, yy) => {
+      const y = H - 1 - yy;
+      const ph = (x / W) * Math.PI * 2;
+      const tip = 3 + 2.5 * Math.max(0, Math.sin(ph * 2 + f * 1.4)) + 1.5 * Math.max(0, Math.sin(ph * 3 - f * 2));
+      if (y > tip + 1) return -1;
+      if (y > tip) return hash(x, f, 2461) < 0.5 ? 3 : -1;
+      if (hash(x, yy, 2462 + f) < 0.08) return 4;
+      return y > tip - 1.5 ? 2 : y > 1 ? 1 : 0;
+    }),
+  );
+  return { palette: DARK, frameMs: 80, parts: { middle: frames.map(toRows) } };
+}
+
 /**
  * にどげり: 蹴りの当たった所ではじける衝撃（脚は描かない。作者の指摘 2026年11月1日）。白い芯から、細い放射の線が 8 本
  * （長い・短いを交互に）はなれて飛び、間に小さな火花。コマ 0 は短く、コマ 1 で線が外へ伸びて芯が少し縮む
@@ -4267,6 +4524,20 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'dragon-pulse-beam': () => dragonPulseBeam(),
     'rage-claw': () => rageClaw(),
     'dragon-claw-slash': () => dragonClawSlash(),
+    'psy-grip': () => psyGrip(),
+    'future-eye': () => futureEye(),
+    'future-burst': () => futureBurst(),
+    'psy-wave': () => psyWave(),
+    'mirror-panels': () => mirrorPanels(),
+    'mirror-shatter': () => mirrorShatter(),
+    'reflect-panel': () => reflectPanel(),
+    'magic-coat-ring': () => magicCoatRing(),
+    'night-face': () => nightFace(),
+    'shadow-sphere': () => shadowSphere(),
+    'shadow-shard': () => shadowShard(),
+    'shadow-ambush': () => shadowAmbush(),
+    'night-crescent': () => nightCrescent(),
+    'night-daze-ring': () => nightDazeRing(),
     'rain-drop': () => rainDrop(),
     'blade-slash': () => bladeSlash(),
     'blade-ring': () => bladeRing(),

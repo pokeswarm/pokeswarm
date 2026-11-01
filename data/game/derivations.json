@@ -108,7 +108,7 @@
     { "from": "air-cutter", "item": "sharp-beak", "to": "aerial-ace", "line": "bagon" },
     { "from": "dragon-pulse", "to": "outrage", "line": "bagon", "forms": ["salamence"], "needsMoves": [{ "move": "aerial-ace", "level": 8 }], "runStat": { "stat": "moxieMax", "atLeast": 1 } },
     { "from": "water-gun", "item": "mystic-water", "to": "aqua-tail", "line": "feebas" },
-    { "from": "dragon-breath", "item": "dragon-fang", "to": "dragon-pulse", "line": "feebas" },
+    { "from": "water-gun", "item": "dragon-fang", "to": "dragon-pulse", "line": "feebas" },
     { "from": "aqua-tail", "to": "scald", "line": "feebas", "forms": ["milotic"], "needsMoves": [{ "move": "dragon-pulse", "level": 8 }], "weather": ["rain"] },
     { "from": "metal-claw", "item": "metal-coat", "to": "iron-head", "line": "beldum" },
     { "from": "confusion", "item": "twisted-spoon", "to": "psychic", "line": "beldum" },

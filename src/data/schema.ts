@@ -2162,7 +2162,8 @@ export type ShopConfig = z.infer<typeof shopConfigSchema>;
 /** 派生（技 + 持ち物 → 派生技）と固有技（派生技 + 持ち物 → 固有技。その系統だけ） */
 export const derivationsConfigSchema = z.object({
   /** minLevel: このレベル以上でないと候補に出ない（フレアドライブ: 50。07 の115章） */
-  derivations: z.array(z.object({ from: z.string(), item: z.string(), to: z.string(), minLevel: z.number().int().positive().optional() })),
+  /** line: その系統だけの派生（07 の158章。無ければ全体の派生。全体の派生は、派生技がその系統の learnsets に無ければ出ない） */
+  derivations: z.array(z.object({ from: z.string(), item: z.string(), to: z.string(), minLevel: z.number().int().positive().optional(), line: z.string().optional() })),
   unique: z.array(
     z.object({
       from: z.string(),

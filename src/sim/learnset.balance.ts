@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { it } from 'vitest';
-import { derivationsConfig, generated, playablesConfig, regionsConfig } from '../data';
+import { derivationsConfig, generated, learnsetsConfig, playablesConfig, regionsConfig } from '../data';
 import { buildSimRules, playableLoadout } from '../data/simRules';
 import { Simulation } from './simulation';
 import { canLearnNewMove } from './systems/leveling';
@@ -69,8 +69,10 @@ it('技の一覧', () => {
       // 系統（姿が変わると別の系統になるもの: ピチュー → ピカチュウ）
       const lines = [key, loadout.line, ...(def.becomes ?? []).map((b) => b.line)];
       const allDerivations = [...derivationsConfig.derivations, ...derivationsConfig.unique] as Derivation[];
+      // 全体の派生は、派生技がその系統の learnsets に無ければ出ない（leveling.ts の derivationUsable と同じ）
+      const inLearnset = (move: string): boolean => lines.some((l) => !learnsetsConfig.lines[l] || (playablesConfig.pokemon[l]?.allMoveTypes ?? false) || learnsetsConfig.lines[l]!.some((e) => (typeof e === 'string' ? e : e.move) === move));
       const usable = (d: Derivation): boolean =>
-        d.line ? lines.includes(d.line) : !allDerivations.some((x) => !!x.line && lines.includes(x.line) && x.from === d.from && x.item === d.item);
+        d.line ? lines.includes(d.line) : !allDerivations.some((x) => !!x.line && lines.includes(x.line) && x.from === d.from && x.item === d.item) && inLearnset(d.to);
       const derives: unknown[] = [];
       const all = [...(derivationsConfig.derivations as Derivation[]).map((d) => ({ ...d, unique: false })), ...(derivationsConfig.unique as Derivation[]).map((d) => ({ ...d, unique: true }))];
       for (let changed = true; changed; ) {

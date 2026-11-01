@@ -178,7 +178,7 @@ export function buildSimRules(region?: string): SimRules {
   });
   const itemIndex = (key: string): number => items.findIndex((i) => i.key === key);
   const derivations = [
-    ...derivationsConfig.derivations.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: null, ...(d.minLevel ? { minLevel: d.minLevel } : {}) })),
+    ...derivationsConfig.derivations.map((d) => ({ from: moveIndex(d.from), item: itemIndex(d.item), to: moveIndex(d.to), line: d.line ?? null, ...(d.minLevel ? { minLevel: d.minLevel } : {}) })),
     ...derivationsConfig.unique.map((d) => ({ from: moveIndex(d.from), item: d.item ? itemIndex(d.item) : -1, to: moveIndex(d.to), line: d.line, ...(d.minLevel ? { minLevel: d.minLevel } : {}), ...(d.forms ? { forms: d.forms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}), ...(d.withMoves ? { withMoves: d.withMoves.map(moveIndex) } : {}), ...(d.consumes ? { consumes: d.consumes.map(moveIndex) } : {}), ...(d.weather ? { weather: d.weather } : {}), ...(d.runStat ? { runStat: d.runStat } : {}), ...(d.itemLevel ? { itemLevel: { item: itemIndex(d.itemLevel.item), level: d.itemLevel.level } } : {}), ...(d.needsMoves ? { needsMoves: d.needsMoves.map((n) => ({ move: moveIndex(n.move), ...(n.level ? { level: n.level } : {}) })) } : {}), ...(d.inheritLevels ? { inheritLevels: true } : {}), ...(d.levelCap ? { levelCap: d.levelCap } : {}), ...(moveBalanceConfig.tierOverrides[d.to] === 'derived' ? { derivedTier: true } : {}) })),
   ];
   const itemMoves = Object.entries(playablesConfig.pokemon).flatMap(([line, p]) => p.itemMoves.map((im) => ({ line, item: itemIndex(im.item), move: moveIndex(im.move) })));

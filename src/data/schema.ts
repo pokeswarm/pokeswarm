@@ -1165,6 +1165,10 @@ export const moveDefSchema = z.object({
   lobTarget: z.enum(['random', 'nearest']).optional(),
   /** scatter（置く）の数と大きさを、使うたびにランダムにする: 数は countMin〜count、半径は size × sizeMin〜sizeMax（マグニチュード） */
   scatterJitter: z.object({ countMin: z.number().int().positive(), sizeMin: z.number().positive(), sizeMax: z.number().positive() }).optional(),
+  /** nova: 使うたびに強さを min〜max から引き、7 を 1 として威力と届く距離に掛ける（マグニチュード 4〜10。07 の152章） */
+  magnitude: z.object({ min: z.number().positive(), max: z.number().positive() }).optional(),
+  /** scatter: 自分の周り全体ではなく、向いている方向を中心にしたこの角度（度）の扇の中に置く（いわなだれ: 前に岩が降る。07 の152章） */
+  scatterArc: z.number().positive().max(360).optional(),
   /** strike（落雷）: count 個を同時に置かず、intervalSeconds ごとに1つずつ置く（ゴーストダイブ: 大きな影が出ては消え、別の所に出る。07 の148章） */
   sequential: z.boolean().optional(),
   /** scatter（置く）の当たり判定を、置いてからこの秒数待って出す（つららおとし: 空から氷の塊が落ちてくる間） */

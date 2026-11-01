@@ -68,6 +68,8 @@
   - 一緒に出す技（`comboMoves`）は、出す側に `comboOffsetSeconds` を付けると遅れて出る（アクアテールの叩きつけ）。`windupSeconds`（溜め）も効く。
   - かくとうの技の絵: 手足はふつうの大きさで自分の近くに、その先に衝撃や気の演出を伸ばして範囲を見せる（`moveArt.ts` の `kickWave`・`focusPunchWave`・`smashArms`。07 の151章）。
   - 連鎖（chain）は `chainReturn` で最後に自分の所へ戻る線を出す（ボルトチェンジ）。`waitForEnd` と組むと帰ってくるまで次を出さない。
+  - **技の見た目を写しや絵の共用で済ませない**（作者の指摘 2026年11月1日。07 の152章）。1 技ごとに動き・その技だけの絵・当たりの演出を決め、localhost で見てから報告する。「見た目は仮」で量産しない。
+  - nova は `magnitude {min, max}` で使うたびに強さを引く（マグニチュード）。scatter は `scatterArc`（度）で向いている方向の扇に置く（いわなだれ）。`ground` ＋ `every` の `explode` の `pull` で、敵の所に引き寄せる渦を置ける（すなじごく）。
   - 姿で変わる効き方は `forms`（しんそく: ウィンディなら炎）。
 - 派生（`derivations.json`）の形: 元の技（最大）＋ 持ち物 → 派生技。固有技は系統（`line`）付き。追加の条件は `minLevel`・`forms`・`withMoves`（ほかにも最大で持つ技。進化で消費）・`consumes`（持っていれば消費）・`inheritLevels`（材料の強化分を受け継ぐ）。
 - 消費した技は `consumedMoves` に入り、もう候補に出ない。

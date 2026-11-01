@@ -4164,19 +4164,129 @@
     },
     "mud-slap": {
       "extends": "ground.base",
+      "projectile": {
+        "shapeAlpha": 0.15
+      },
+      "impact": {
+        "burst": {
+          "count": 10,
+          "colors": [
+            "#8d6e63",
+            "#6d4c41",
+            "#4e342e"
+          ],
+          "lifespanMs": [
+            200,
+            400
+          ],
+          "speed": [
+            60,
+            180
+          ],
+          "scale": [
+            0.5,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 120,
+          "spread": 2,
+          "blend": "normal"
+        }
+      },
       "sprite": {
-        "id": "sand-grain",
-        "fit": "circle",
+        "id": "mud-spray",
+        "fit": "cone",
         "size": 1
       }
     },
     "mud-shot": {
       "extends": "ground.base",
       "projectile": {
-        "glowScale": 1.3,
-        "coreScale": 0.4,
-        "coreColor": "#d7ccc8",
+        "glowScale": 1.1,
+        "coreScale": 0.2,
         "glowColor": "#8d6e4a"
+      },
+      "impact": {
+        "flash": {
+          "color": "#8d6e63",
+          "radius": 24,
+          "durationMs": 120,
+          "alpha": 0.5
+        },
+        "burst": {
+          "count": 8,
+          "colors": [
+            "#8d6e63",
+            "#6d4c41"
+          ],
+          "lifespanMs": [
+            200,
+            380
+          ],
+          "speed": [
+            60,
+            170
+          ],
+          "scale": [
+            0.5,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 140,
+          "spread": 2,
+          "blend": "normal"
+        }
+      },
+      "sprite": {
+        "id": "mud-ball",
+        "fit": "circle",
+        "size": 1.8,
+        "rotate": "velocity"
+      },
+      "effectSprite": {
+        "id": "mud-splat",
+        "fit": "circle",
+        "size": 1.1
+      },
+      "lingerSprite": {
+        "id": "mud-puddle",
+        "fit": "circle",
+        "size": 1,
+        "alpha": 0.9
+      },
+      "linger": {
+        "colors": [
+          "#a1887f",
+          "#d7ccc8"
+        ],
+        "lifespanMs": [
+          300,
+          600
+        ],
+        "speed": [
+          5,
+          20
+        ],
+        "scale": [
+          0.3,
+          0
+        ],
+        "alpha": [
+          0.8,
+          0
+        ],
+        "gravityY": 0,
+        "blend": "normal",
+        "perSecond": 3,
+        "maxPerSecond": 8,
+        "fillAlpha": 0.05,
+        "spread": 2
       }
     },
     "water-pledge": {
@@ -4591,10 +4701,31 @@
     },
     "sand-tomb": {
       "extends": "ground.base",
+      "hideShape": true,
       "projectile": {
-        "glowScale": 1.05,
-        "coreScale": 0.3,
-        "glowColor": "#1e88e5"
+        "glowScale": 0.4,
+        "coreScale": 0.1
+      },
+      "impact": {
+        "flash": {
+          "color": "#e6cf9b",
+          "radius": 18,
+          "durationMs": 100,
+          "alpha": 0.4
+        }
+      },
+      "sprite": {
+        "id": "sand-vortex",
+        "fit": "circle",
+        "size": 1.25,
+        "rotate": "spin",
+        "spinDegPerSec": 420
+      },
+      "effectSprite": {
+        "id": "sand-ripple",
+        "fit": "circle",
+        "size": 1,
+        "alpha": 0.7
       }
     },
     "dragon-breath": {
@@ -4864,6 +4995,119 @@
         "id": "scald-cone",
         "fit": "cone",
         "size": 1
+      }
+    },
+    "magnitude-hoenn": {
+      "extends": "ground.base",
+      "projectile": {
+        "shapeAlpha": 0.12
+      },
+      "impact": {
+        "flash": {
+          "color": "#d7b98e",
+          "radius": 30,
+          "durationMs": 140,
+          "alpha": 0.6
+        }
+      },
+      "sprite": {
+        "id": "quake-wave",
+        "fit": "ring",
+        "size": 1,
+        "varyTiles": true,
+        "shake": 2
+      }
+    },
+    "earth-power": {
+      "extends": "ground.base",
+      "projectile": {
+        "shapeAlpha": 0.15
+      },
+      "impact": {
+        "flash": {
+          "color": "#ffd54f",
+          "radius": 44,
+          "durationMs": 160,
+          "alpha": 0.6
+        }
+      },
+      "sprite": {
+        "id": "earth-geyser",
+        "fit": "circle",
+        "size": 1.3,
+        "originY": 0.85
+      },
+      "effectSprite": {
+        "id": "sand-ripple",
+        "fit": "circle",
+        "size": 1,
+        "alpha": 0.8
+      }
+    },
+    "earthquake-hoenn": {
+      "extends": "ground.base",
+      "projectile": {
+        "shapeAlpha": 0.12
+      },
+      "impact": {
+        "flash": {
+          "color": "#bcaaa4",
+          "radius": 40,
+          "durationMs": 160,
+          "alpha": 0.6
+        }
+      },
+      "sprite": {
+        "id": "quake-wave-big",
+        "fit": "ring",
+        "size": 1,
+        "varyTiles": true,
+        "shake": 3
+      },
+      "effectLineSprite": {
+        "id": "earth-fissure",
+        "fit": "line",
+        "size": 1.2,
+        "growSeconds": 0.25
+      }
+    },
+    "rock-slide-hoenn": {
+      "extends": "rock.base",
+      "projectile": {
+        "glowScale": 0.6,
+        "coreScale": 0.2
+      },
+      "impact": {
+        "flash": {
+          "color": "#bcaaa4",
+          "radius": 50,
+          "durationMs": 160,
+          "alpha": 0.6
+        }
+      },
+      "sprite": {
+        "id": "boulder",
+        "fit": "circle",
+        "size": 1.7
+      },
+      "effectSprite": {
+        "id": "rock-shard",
+        "fit": "circle",
+        "size": 1.4,
+        "rotate": "spin",
+        "spinDegPerSec": 500
+      },
+      "fall": {
+        "id": "boulder",
+        "height": 300,
+        "size": 1.7,
+        "shards": {
+          "id": "rock-shard",
+          "count": 6,
+          "distance": 60,
+          "seconds": 0.4,
+          "size": 0.5
+        }
       }
     }
   }

@@ -1053,8 +1053,11 @@ function fireScatter(world: World, p: Player, pm: PlayerMove, st: MoveStats): vo
   const wait = world.rules.moves[pm.move]!.scatterDelaySeconds ?? 0;
   const b0 = base(world, p, pm, st);
   const count = jit ? Math.min(st.count, jit.countMin) + world.rng.int(Math.max(1, st.count - Math.min(st.count, jit.countMin) + 1)) : st.count;
+  // 前の扇に置く（いわなだれ）: 向いている方向を中心にした scatterArc 度の中
+  const arc = world.rules.moves[pm.move]!.scatterArc;
+  const [fx, fy] = axisToUnit(p.facingX, p.facingY);
   for (let k = 0; k < count; k++) {
-    const a = world.rng.next() * Math.PI * 2;
+    const a = arc ? Math.atan2(fy, fx) + (world.rng.next() - 0.5) * ((arc * Math.PI) / 180) : world.rng.next() * Math.PI * 2;
     const r = st.range * (0.3 + world.rng.next() * 0.7);
     // speed があれば、置いた場所からランダムな向きへゆっくり動く
     const b = world.rng.next() * Math.PI * 2;
@@ -1242,7 +1245,11 @@ function fireWeather(world: World, p: Player, pm: PlayerMove, st: MoveStats): vo
 }
 
 /** nova: 自分を中心に、大きさ size から range まで広がる輪 */
-function fireNova(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+function fireNova(world: World, p: Player, pm: PlayerMove, st0: MoveStats): void {
+  // マグニチュード: 使うたびに強さ（4〜10）を引き、7 を 1 として威力と届く距離に掛ける（07 の152章）
+  const mag = world.rules.moves[pm.move]!.magnitude;
+  const k = mag ? (mag.min + world.rng.next() * (mag.max - mag.min)) / 7 : 1;
+  const st = k === 1 ? st0 : { ...st0, power: st0.power * k, range: st0.range * k };
   const sc = scaledMoveStats(world, p, pm, st);
   // 外へ進む攻撃なら、中が空いた帯（厚さ band）として広がる
   const band = reachBand(world, pm.move, st.range);

@@ -2981,6 +2981,228 @@ function kick(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- ホウエンの技の作り直し（1）じめん・いわ（07 の152章） ----------------
+/** 泥の色: 0 輪郭・1 濃い・2・3・4・5 明るい */
+const MUD = ['#2a1d14', '#4e342e', '#6d4c41', '#8d6e63', '#a1887f', '#d7ccc8'];
+
+/**
+ * どろかけ: 足元から前へ蹴り上げた泥のかたまりが扇に散る（根元は左）。扇は横に引き伸ばされるので、絵は縦長（32×36）に描く。
+ * 4 コマで外へ飛び、根元ほど小さく密、先ほど大きくまばら。明るい泥（上が光る）
+ */
+function mudSpray(): SpriteOut {
+  const W = 32;
+  const H = 36;
+  const r = rng(2201);
+  const blobs = Array.from({ length: 22 }, () => ({ t: r(), s: -0.9 + r() * 1.8, rad: 1.4 + r() * 1.4 }));
+  const frames = [0, 1, 2, 3].map((f) =>
+    outline(
+      fill(blank(W, H), (x, y) => {
+        const mid = (H - 1) / 2;
+        for (const b of blobs) {
+          const bt = (b.t + f * 0.22) % 1;
+          const half = (H / 2) * (0.12 + 0.85 * bt);
+          const bx = 1 + bt * (W - 3);
+          const by = mid + b.s * half;
+          const rad = b.rad * (0.45 + bt * 0.8);
+          const d = Math.hypot((x - bx) * 1.15, y - by);
+          if (d < rad) return x - bx < -rad * 0.25 && y - by < -rad * 0.1 ? 5 : d > rad * 0.78 ? 2 : 4;
+        }
+        return -1;
+      }),
+      0,
+    ),
+  );
+  return { palette: MUD, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** マッドショット: 飛ぶ泥のかたまり（右向き。後ろに引いた尾が垂れる）。3 コマで尾が揺れる */
+function mudBall(): SpriteOut {
+  const frames = [0, 1, 2].map((f) =>
+    shape(16, (u, v) => {
+      const d = Math.hypot((u - 0.25) / 1.05, v);
+      if (d < 0.55) return u - 0.25 < -0.15 && v < -0.15 ? 5 : d > 0.42 ? 2 : 3;
+      const wob = Math.sin(f * 2.1) * 0.12;
+      if (Math.hypot(u + 0.3, v - 0.08 - wob) < 0.26) return 2;
+      if (Math.hypot(u + 0.68, v - 0.02 + wob) < 0.15) return 1;
+      return -1;
+    }),
+  );
+  return { palette: MUD, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** 泥の飛び散り（マッドショットが当たった所）: 平たいしぶきが 7 つの舌で広がり、3 コマ目で乾いて切れる */
+function mudSplat(): SpriteOut {
+  const r = rng(2202);
+  const ph = r() * 6;
+  const frames = [0, 1, 2].map((f) =>
+    shape(24, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      const edge = (0.42 + f * 0.14) + 0.3 * Math.abs(Math.sin(3.5 * a + ph)) ** 2;
+      if (d > edge) return -1;
+      if (f === 2 && hash(Math.floor((u + 1) * 10), Math.floor((v + 1) * 10), 2203) < 0.3 && d > 0.3) return -1;
+      return d > edge - 0.12 ? 1 : d < 0.2 ? 4 : 3;
+    }),
+  );
+  return { palette: MUD, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** 残る泥（マッドショットの水たまり）: 暗い泥の面に光の筋と、コマで入れ替わる泡 */
+function mudPuddle(): SpriteOut {
+  const frames = [0, 1].map((f) =>
+    shape(24, (u, v) => {
+      const a = Math.atan2(v, u);
+      const edge = 0.82 + (noise(Math.cos(a) * 5 + 5, Math.sin(a) * 5 + 5, 1.3, 2204) - 0.5) * 0.25;
+      const d = Math.hypot(u, v * 1.15);
+      if (d > edge) return -1;
+      if (Math.abs(u - v * 0.4 + 0.25) < 0.07 && d < edge - 0.15) return 4;
+      const bubbles: readonly (readonly [number, number])[] = f === 0 ? [[0.35, 0.3], [-0.4, -0.2]] : [[0.1, -0.4], [-0.2, 0.4]];
+      for (const [bx, by] of bubbles) if (Math.hypot(u - bx, v - by) < 0.1) return 5;
+      return d > edge - 0.14 ? 1 : 2;
+    }),
+  );
+  return { palette: MUD, frameMs: 220, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * マグニチュード・じしん: 外へ進む地面の波（輪に沿って並べる帯。下が外）。盛り上がった土の峰が明るく、外のふちは割れて石くれが飛ぶ。
+ * big（じしん）は暗く、割れ目と石くれが多い。コマで峰がうねる
+ */
+function quakeWave(kind: 'wave' | 'big'): SpriteOut {
+  const W = 12;
+  const H = 10;
+  // 0 輪郭・1 割れ目・2 土の暗い所・3 土・4 峰の明るい所・5 石くれ・6 砂ぼこり
+  const palette = kind === 'big' ? ['#1a110b', '#120b06', '#4e3a2b', '#6d5644', '#9c8569', '#bcaaa4', '#a8957c'] : ['#2a1d14', '#1a110b', '#6d5644', '#8d7560', '#b89f82', '#d7ccc8', '#cbb79a'];
+  const frames = [0, 1, 2].map((f) =>
+    fill(blank(W, H), (x, y) => {
+      const ph = (x / W) * Math.PI * 2;
+      const crest = 4.2 + Math.sin(ph * 2 + f * 2.1) * 1.1;
+      const inner = 1.5 + Math.sin(ph * 3 - f * 1.5) * 0.6;
+      if (y < inner) return -1;
+      // 外のふち: 割れて飛ぶ石くれと砂ぼこり
+      if (y > H - 2.2) return hash(x, f, 2211 + y) < (kind === 'big' ? 0.5 : 0.35) ? 5 : hash(x, f, 2212 + y) < 0.3 ? 6 : -1;
+      if (Math.abs(y - crest) < 0.9) return 4;
+      if (y < crest) return 3;
+      // 峰の外側の斜面: 割れ目が走る
+      if (kind === 'big' && (x + f) % 4 === 0 && y > crest + 1) return 1;
+      return (x + y + f) % 5 === 0 ? 1 : 2;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { middle: frames.map(toRows) } };
+}
+
+/** すなじごく: 上から見た砂の渦（中心へ巻き込む 3 本の腕。中心は暗い穴）。レシピの spin で回す */
+function sandVortex(): SpriteOut {
+  // 0 輪郭・1 穴・2 暗い砂・3 砂・4 明るい砂・5 白い砂
+  const palette = ['#4e3a1e', '#2a1d0e', '#8d6e46', '#c9a86a', '#e6cf9b', '#f7eed3'];
+  const frames = [0, 1].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.96) return -1;
+      const a = Math.atan2(v, u);
+      if (d < 0.16) return 1;
+      const arm = Math.sin(3 * a + Math.log(d + 0.05) * 6 - f * 0.9);
+      if (d > 0.86) return arm > 0.3 ? 4 : 3;
+      if (arm > 0.7) return 5;
+      if (arm > 0.15) return 4;
+      return d < 0.4 ? 2 : 3;
+    }),
+  );
+  return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
+}
+
+/** 砂の波紋（すなじごくが引き寄せる瞬間・だいちのちからの余波）: 砂粒の輪が 2 コマで外へ */
+function sandRipple(): SpriteOut {
+  const palette = ['#4e3a1e', '#a1887f', '#c9a86a', '#e6cf9b'];
+  const frames = [0, 1].map((f) =>
+    shape(24, (u, v) => {
+      const d = Math.hypot(u, v);
+      const ring = 0.55 + f * 0.3;
+      if (Math.abs(d - ring) < 0.09 && hash(Math.floor((u + 1) * 12), Math.floor((v + 1) * 12), 2221 + f) < 0.7) return d < ring ? 3 : 2;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * だいちのちから: 敵の足元が割れて金色の大地の気が柱になって噴き上がる（根元を当たり判定の中心に合わせる originY）。
+ * コマ 0 割れ目が光る → 1 噴き始め → 2 高い柱（上が開く）→ 3 散って消える
+ */
+function earthGeyser(): SpriteOut {
+  // 0 輪郭・1 土・2 土の明るい所・3 濃い金・4 金・5 白
+  const palette = ['#3e2723', '#6d4c41', '#a1887f', '#ff8f00', '#ffd54f', '#fff8e1'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      // 地面の割れ目（楕円）: v 0.7 あたり
+      const ground = Math.hypot(u / 0.75, (v - 0.7) / 0.14);
+      if (ground < 1) return f === 0 ? (ground < 0.5 ? 4 : 3) : f === 3 ? 1 : ground < 0.6 ? 5 : 4;
+      if (ground < 1.3 && f < 3) return 1;
+      if (f === 0) return -1;
+      // 柱: 根元 v 0.7 から上へ。コマ 1 は v −0.1 まで、2 は上端まで（上が開く）、3 は切れ切れ
+      const top = f === 1 ? -0.1 : -0.95;
+      if (v < top || v > 0.7) return -1;
+      const h = (0.7 - v) / (0.7 - top);
+      const w = f === 2 ? 0.28 + Math.max(0, h - 0.7) * 1.2 : 0.22 + h * 0.1;
+      const wob = Math.sin(v * 9 + f * 2) * 0.03;
+      const x = Math.abs(u - wob);
+      if (x > w) {
+        // 柱の横に飛ぶ土のかけら
+        if (x < w + 0.25 && f >= 1 && hash(Math.floor((u + 1) * 10), Math.floor((v + 1) * 10), 2231 + f) < 0.22) return 2;
+        return -1;
+      }
+      if (f === 3) return hash(Math.floor((u + 1) * 9), Math.floor((v + 1) * 9), 2232) < 0.5 ? -1 : 4;
+      return x < w * 0.35 ? 5 : x < w * 0.75 ? 4 : 3;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/** じしんの亀裂（線に並べる）: 暗い割れ目がジグザグに走り、中に熱い光がちらつき、ふちに石くれ */
+function earthFissure(): SpriteOut {
+  const H = 10;
+  // 0 輪郭・1 割れ目・2 熱い光・3 土・4 石くれ
+  const palette = ['#1a110b', '#0d0805', '#ff8f00', '#6d5644', '#bcaaa4'];
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 6, middle: 8, end: 8 }, 3, (x, y, f, part) => {
+    const taper = part === 'end' ? 1 - x / 9 : part === 'start' ? 0.5 + x / 12 : 1;
+    const zig = Math.sin(x * 1.3 + (part === 'middle' ? 0 : 1)) * 1.3;
+    const d = Math.abs(y - mid - zig);
+    const w = 1.6 * taper;
+    if (d < w * 0.45) return (Math.floor(x / 2) + f) % 3 === 0 ? 2 : 1;
+    if (d < w) return 1;
+    if (d < w + 1.2) return 3;
+    if (d < w + 2.2 && hash(x, y, 2241 + f) < 0.35) return 4;
+    return -1;
+  });
+  return { palette, frameMs: 90, parts };
+}
+
+/** いわなだれの大岩（空から落ちてくる・落ちた所に残る）: 面がある丸い岩。2 コマで少し回る */
+function boulder(): SpriteOut {
+  // 0 輪郭・1 影・2 暗い面・3 面・4 明るい面・5 ひかり
+  const palette = ['#2b2118', '#4e3f33', '#7a6a5c', '#9c8b7a', '#bfae9c', '#e0d6c8'];
+  const frames = [0, 1].map((f) =>
+    shape(
+      24,
+      (u, v) => {
+        const a = Math.atan2(v, u);
+        const edge = 0.86 + (noise(Math.cos(a) * 4 + 4, Math.sin(a) * 4 + 4, 1.2, 2251) - 0.5) * 0.2;
+        const d = Math.hypot(u, v);
+        if (d > edge) return -1;
+        // 割れ目の線
+        if (Math.abs(u * 0.7 - v + 0.15) < 0.05 && d > 0.2 && d < 0.75) return 1;
+        if (Math.abs(u + v * 0.5 - 0.45) < 0.05 && d > 0.3) return 1;
+        const l = -u * 0.6 - v * 0.8;
+        if (d > edge - 0.12) return l > 0 ? 3 : 1;
+        return l > 0.55 ? 5 : l > 0.2 ? 4 : l > -0.3 ? 3 : 2;
+      },
+      f * 0.35,
+    ),
+  );
+  return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
+}
+
 /**
  * にどげり: 蹴りの当たった所ではじける衝撃（脚は描かない。作者の指摘 2026年11月1日）。白い芯から、細い放射の線が 8 本
  * （長い・短いを交互に）はなれて飛び、間に小さな火花。コマ 0 は短く、コマ 1 で線が外へ伸びて芯が少し縮む
@@ -3744,6 +3966,17 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'megahorn-lance': () => megahornLance(),
     'ice-chunk': () => iceChunk(),
     'sand-grain': () => sandGrain(),
+    'mud-spray': () => mudSpray(),
+    'mud-ball': () => mudBall(),
+    'mud-splat': () => mudSplat(),
+    'mud-puddle': () => mudPuddle(),
+    'quake-wave': () => quakeWave('wave'),
+    'quake-wave-big': () => quakeWave('big'),
+    'sand-vortex': () => sandVortex(),
+    'sand-ripple': () => sandRipple(),
+    'earth-geyser': () => earthGeyser(),
+    'earth-fissure': () => earthFissure(),
+    'boulder': () => boulder(),
     'rain-drop': () => rainDrop(),
     'blade-slash': () => bladeSlash(),
     'blade-ring': () => bladeRing(),

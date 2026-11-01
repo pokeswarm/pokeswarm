@@ -1513,10 +1513,21 @@ function gustSwirl(): SpriteOut {
   return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
 }
 
-/** エアスラッシュ: 空気の刃（水色がかった白い三日月。右へ進む） */
+/** エアスラッシュ: 空気の刃（水色がかった白い三日月。右へ進む）。3 コマでふちがゆらぎ、後ろに風の線が流れる（07 の157章） */
 function airBlade(): SpriteOut {
   const palette = ['#263238', '#80deea', '#e0f7fa', '#ffffff'];
-  const frames = crescent(16, 2, 0.4, (k, _a, f) => (k > 0.7 ? 1 : (k > 0.35) !== (f === 1) ? 2 : 3), 0.03);
+  const blades = crescent(18, 3, 0.4, (k, _a, f) => (k > 0.7 ? 1 : (k > 0.35) !== (f === 1) ? 2 : 3), 0.03);
+  const frames = blades.map((g, f) => {
+    const n = g.length;
+    return fill(g, (x, y) => {
+      const c = g[y]![x]!;
+      if (c >= 0) return c;
+      const u = (x / (n - 1)) * 2 - 1;
+      const v = (y / (n - 1)) * 2 - 1;
+      if (u < -0.3 && Math.abs(v) < 0.5 && (((v * 3 + f * 0.33) % 1) + 1) % 1 < 0.22 && (((u * 5 + f * 0.5) % 1) + 1) % 1 < 0.55) return 1;
+      return -1;
+    });
+  });
   return { palette, frameMs: 60, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
 }
 
@@ -3921,6 +3932,99 @@ function counterBurst(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- ジョウトの技の作り直し（1）ポッポ系統（07 の157章） ----------------
+/**
+ * ふきとばし: 扇に引き伸ばす大きな風（縦長 32×36）。太い白い風の帯が 3 本、根元から先へ波打ちながら広がり、
+ * 帯の先が「の」の形に巻く（転がる風）。4 コマで帯が先へ流れる
+ */
+function whirlwindCone(): SpriteOut {
+  const W = 32;
+  const H = 36;
+  const palette = ['#37474f', '#90a4ae', '#cfd8dc', '#ffffff', '#b3e5fc'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    outline(
+      fill(blank(W, H), (x, y) => {
+        const mid = (H - 1) / 2;
+        const t = x / (W - 1);
+        const half = (H / 2) * (0.1 + 0.9 * t);
+        const v = (y - mid) / Math.max(0.5, half);
+        if (Math.abs(v) > 1) return -1;
+        // 3 本の帯: 高さ −0.6・0・0.6 を中心に波打ち、先ほど太い。コマで波が先へ
+        for (let j = 0; j < 3; j++) {
+          const c = -0.6 + j * 0.6 + Math.sin(t * 6 - f * 1.6 + j * 2) * 0.14;
+          const thick = (0.09 + t * 0.1) * Math.max(1.5, half);
+          const d = Math.abs(v - c) * Math.max(1.5, half);
+          if (d < thick) return d < thick * 0.45 ? 3 : t > 0.85 ? 4 : 2;
+        }
+        // 帯の先で巻く風（右端の「の」）
+        for (let j = 0; j < 3; j++) {
+          const cx = W - 5 - ((f + j) % 2) * 2;
+          const cy = mid + (-0.6 + j * 0.6) * half * 0.9;
+          const d = Math.hypot(x - cx, y - cy);
+          const ang = Math.atan2(y - cy, x - cx);
+          const spiral = (((ang + f * 0.8 + (d / 4) * 2.5) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+          if (d < 4.2 && d > 1 && spiral < 1.4) return 2;
+        }
+        return -1;
+      }),
+      0,
+    ),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** かぜおこし: 小さなつむじ風（上から見た 2 本の腕の渦と、舞う木の葉 2 枚）。3 コマで渦の筋が変わる。レシピの spin で回す */
+function gustWhirl(): SpriteOut {
+  const palette = ['#37474f', '#b0bec5', '#eceff1', '#ffffff', '#7cb342'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(16, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.95 || d < 0.12) return -1;
+      const a = Math.atan2(v, u);
+      const arm = Math.sin(2 * a + d * 6 + f * 0.7);
+      for (const [lx, ly] of [[0.55, -0.3], [-0.5, 0.35]] as const) if (Math.hypot(u - lx, v - ly) < 0.16 && f !== 1) return 4;
+      return arm > 0.55 ? (d < 0.5 ? 3 : 2) : arm > 0.2 ? 1 : -1;
+    }, 0, -1),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** ぼうふう: 上から見た大きな嵐（2 本の太い雲の腕が中心の目へ巻く。ふちは白く、目は暗い）。3 コマで雲が流れる。レシピの spin で回す */
+function hurricaneEye(): SpriteOut {
+  const palette = ['#37474f', '#546e7a', '#90a4ae', '#cfd8dc', '#ffffff', '#b3e5fc'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.97) return -1;
+      const a = Math.atan2(v, u);
+      if (d < 0.12) return 1;
+      const arm = Math.sin(2 * a + Math.log(d + 0.05) * 5 - f * 0.7);
+      if (d > 0.88) return arm > 0 ? 4 : 5;
+      if (arm > 0.75) return 4;
+      if (arm > 0.3) return 3;
+      if (arm > -0.3) return 2;
+      return d < 0.35 ? 1 : 2;
+    }),
+  );
+  return { palette, frameMs: 100, parts: { main: frames.map(toRows) } };
+}
+
+/** 嵐の波紋（ぼうふうが巻き込む瞬間）: 灰白の弧の輪と、舞う羽 2 枚。2 コマで外へ */
+function stormRipple(): SpriteOut {
+  const palette = ['#37474f', '#cfd8dc', '#ffffff', '#b3e5fc'];
+  const frames = [0, 1].map((f) =>
+    shape(24, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      const ring = 0.5 + f * 0.3;
+      for (const [fx, fy] of [[0.4 + f * 0.2, 0.55], [-0.6, -0.3 - f * 0.2]] as const) if (Math.abs(u - fx) < 0.14 && Math.abs(v - fy) < 0.06) return 3;
+      if (Math.abs(d - ring) < 0.08 && (((a * 3 + f) % 1) + 1) % 1 < 0.55) return d < ring ? 2 : 1;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
 /**
  * にどげり: 蹴りの当たった所ではじける衝撃（脚は描かない。作者の指摘 2026年11月1日）。白い芯から、細い放射の線が 8 本
  * （長い・短いを交互に）はなれて飛び、間に小さな火花。コマ 0 は短く、コマ 1 で線が外へ伸びて芯が少し縮む
@@ -4000,7 +4104,8 @@ function wing(): SpriteOut {
     const a = (-30 + k * 18) * (Math.PI / 180);
     return { dx: Math.cos(a), dy: Math.sin(a), len: 1.62 - k * 0.15, w: 0.12 };
   });
-  const g = shape(28, (u, v) => {
+  const frames = [0, 1, 2].map((fr) =>
+    shape(28, (u, v) => {
     let got = -1;
     // 下の羽から順に塗り、上の羽を重ねる
     for (let k = feathers.length - 1; k >= 0; k--) {
@@ -4009,14 +4114,15 @@ function wing(): SpriteOut {
       const py = v - root[1];
       const along = px * f.dx + py * f.dy;
       const across = -px * f.dy + py * f.dx;
-      if (along < 0 || along > f.len) continue;
-      // 先がとがった羽（先へ行くほど細く、少し反る）
-      const t = along / f.len;
+      const len = f.len + Math.sin(fr * 2.1 + k * 1.3) * 0.07;
+      if (along < 0 || along > len) continue;
+      // 先がとがった羽（先へ行くほど細く、少し反る）。コマで羽の長さが少し変わり、はばたいて見える（07 の157章）
+      const t = along / len;
       const half = f.w * (t < 0.75 ? 1 : (1 - t) / 0.25) + 0.01;
       const bend = across - t * t * 0.12;
       if (Math.abs(bend) > half) continue;
       const side = bend / half;
-      got = t > 0.82 ? 5 : side < -0.55 ? 4 : side < 0.35 ? 3 : 2;
+      got = t > 0.82 ? (fr === 1 ? 4 : 5) : side < -0.55 ? 4 : side < 0.35 ? 3 : 2;
       // 羽の下のふちは濃く（1枚ずつ分かれて見えるように）
       if (side > 0.62) got = 0;
       else if (side > 0.35 && t > 0.3) got = 1;
@@ -4026,8 +4132,9 @@ function wing(): SpriteOut {
     const cv = (v + 0.12) / 0.26;
     if (cu * cu + cv * cv <= 1) got = cv < -0.3 ? 4 : cv < 0.4 ? 3 : 2;
     return got;
-  });
-  return { palette, frameMs: 1000, parts: { main: [toRows(outline(g, 0))] } };
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
 }
 
 function tailSwipe(palette = ['#120a2e', '#283593', '#5c6bc0', '#9fa8da', '#e8eaf6', '#9575cd', '#ffffff']): SpriteOut {
@@ -4730,6 +4837,10 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'steel-beam-heavy': () => steelBeamHeavy(),
     'counter-stance': () => counterStance(),
     'counter-burst': () => counterBurst(),
+    'whirlwind-cone': () => whirlwindCone(),
+    'gust-whirl': () => gustWhirl(),
+    'hurricane-eye': () => hurricaneEye(),
+    'storm-ripple': () => stormRipple(),
     'rain-drop': () => rainDrop(),
     'blade-slash': () => bladeSlash(),
     'blade-ring': () => bladeRing(),

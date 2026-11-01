@@ -544,7 +544,7 @@
     "gust": {
       "extends": "flying.base",
       "sprite": {
-        "id": "gust-swirl",
+        "id": "gust-whirl",
         "fit": "circle",
         "size": 2.6,
         "rotate": "spin",
@@ -3813,22 +3813,43 @@
     },
     "whirlwind": {
       "extends": "normal.base",
+      "projectile": {
+        "shapeAlpha": 0.08
+      },
       "sprite": {
-        "id": "gust-swirl",
-        "fit": "circle",
-        "size": 2.2,
-        "rotate": "spin",
-        "spinDegPerSec": 700
+        "id": "whirlwind-cone",
+        "fit": "cone",
+        "size": 1,
+        "alpha": 0.9
       }
     },
     "hurricane": {
       "extends": "flying.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0.5,
+        "coreScale": 0.1
+      },
+      "impact": {
+        "flash": {
+          "color": "#e1f5fe",
+          "radius": 50,
+          "durationMs": 140,
+          "alpha": 0.6
+        }
+      },
       "sprite": {
-        "id": "gust-swirl",
+        "id": "hurricane-eye",
         "fit": "circle",
-        "size": 1.7,
+        "size": 1.5,
         "rotate": "spin",
-        "spinDegPerSec": 1100
+        "spinDegPerSec": 300
+      },
+      "effectSprite": {
+        "id": "storm-ripple",
+        "fit": "circle",
+        "size": 1,
+        "alpha": 0.7
       }
     },
     "cross-poison": {

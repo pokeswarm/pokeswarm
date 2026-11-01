@@ -48,7 +48,8 @@ describe('data/ から組み立てたシミュレーションの定義', () => {
   it('どの遊べるポケモンも、自分の固有技の元になる技を覚えられる（覚えられる系統を絞っても、固有技にたどり着ける）', () => {
     const all = [...derivationsConfig.derivations.map((d) => ({ ...d, line: null as string | null })), ...derivationsConfig.unique];
     // 元をたどって、派生でない技（最初に覚える技）にする。同じ技へ別の系統から進化するとき（ホウエンの りゅうのはどう）は、その系統の派生を先に見る
-    const sourceOf = (key: string, line: string) => all.find((x) => x.to === key && x.line === line) ?? all.find((x) => x.to === key && x.line === null) ?? all.find((x) => x.to === key);
+    // 同じ技へ複数の元から派生できるとき（つばさでうつ: つつく からも ふきとばし からも）は、その系統の最初の技から来る元を先に見る
+    const sourceOf = (key: string, line: string) => all.find((x) => x.to === key && x.line === line) ?? all.find((x) => x.to === key && x.line === null && (playablesConfig.pokemon[line]?.startingMoves ?? []).includes(x.from)) ?? all.find((x) => x.to === key && x.line === null) ?? all.find((x) => x.to === key);
     const baseOf = (key: string, line: string): string => {
       const d = sourceOf(key, line);
       return d ? baseOf(d.from, line) : key;

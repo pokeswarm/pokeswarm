@@ -26,6 +26,7 @@ PokéSwarm（ポケモン題材のサバイバー系ブラウザゲーム、最�
 | `docs/11_johto_story_chart.md`・`docs/13_hoenn_story_chart.md` | 地方のストーリーチャート・雑魚・タイルと BGM の一覧 |
 | `docs/17_johto_move_plan.md` | ジョウト（とカントー）の技の作り直しと進化ルートの案（相談用。作者が表に直す） |
 | `docs/18_learnsets_audit.md` | 誰がどの技を覚えるかの精査（原作との突き合わせ）と技の重複の整理の案（相談用） |
+| `docs/19_damage_class_plan.md` | 技進化で ぶつり／とくしゅ を入れ替えない案（相談用） |
 
 自動で作る資料（手で直さない。元のデータを直して作り直す）:
 

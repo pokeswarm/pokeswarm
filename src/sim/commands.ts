@@ -188,6 +188,11 @@ export interface BossHpCommand {
   /** 位置（突進などで大きく動くので、補正より短い間隔で送る） */
   readonly x?: number;
   readonly y?: number;
+  /** ホストでの直前の更新の動き（ワールド単位/更新）。ゲストは次が届くまでこの動きで進める */
+  readonly vx?: number;
+  readonly vy?: number;
+  /** 届くまでにかかった更新回数の見込み（往復の半分）。その分だけ先へ進めた位置を目標にする */
+  readonly lead?: number;
 }
 
 /** ゲスト: 伝説が追う相手（ホストが決めた。07 の125章） */

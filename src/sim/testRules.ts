@@ -180,7 +180,7 @@ export function testRules(
     },
     // 既定では障害物を置かない
     obstacles: { cellSize: 500, chance: 0, margin: 50, radius: 20, safeRadius: 0, sections: [['test']] },
-    netSmoothing: { playerBlend: 0.35, predictTicks: 8, enemyBlend: 0.15, snapDistance: 240, predictKillSeconds: 1.5 },
+    netSmoothing: { playerBlend: 0.35, predictTicks: 8, enemyBlend: 0.15, snapDistance: 240, predictKillSeconds: 1.5, bossBlend: 0.3, bossLeadMaxTicks: 6, bossCoastTicks: 9 },
     friendshipDistance: 30000,
   };
 }

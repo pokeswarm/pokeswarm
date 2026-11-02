@@ -1838,6 +1838,13 @@ export const netSmoothingSchema = z.object({
    * この秒数のうちに知らせが来なければ（見込みが外れた）、見せ直す
    */
   predictKillSeconds: z.number().positive(),
+  /**
+   * 中ボス・ボスの位置（07 の166章）。ホストは位置と直前の動きを送る。ゲストは、届いた位置を往復の半分（bossLeadMaxTicks 回まで）
+   * 先へ進めた所を目標に毎回 bossBlend の割合で寄せ、次が届くまで bossCoastTicks 回はホストの動きのまま進める（その後は自分で追う）
+   */
+  bossBlend: z.number().gt(0).max(1),
+  bossLeadMaxTicks: z.number().nonnegative(),
+  bossCoastTicks: z.number().int().positive(),
 });
 export type NetSmoothing = z.infer<typeof netSmoothingSchema>;
 

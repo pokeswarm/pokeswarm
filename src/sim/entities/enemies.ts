@@ -14,6 +14,13 @@ export class EnemyStore {
   /** ホストの位置の補正のうち、まだ寄せていないずれ（ゲストだけ使う） */
   readonly corrX: Float64Array;
   readonly corrY: Float64Array;
+  /**
+   * ゲスト: ホストから届いた中ボス・ボスの動き（ワールド単位/更新）と、その動きで進める残りの更新回数。
+   * 0 でなければ、自分で追う向きを決めずに、ホストの動きをそのまま続ける（突進が飛んで見えないように。07 の166章）
+   */
+  readonly netVx: Float64Array;
+  readonly netVy: Float64Array;
+  readonly netTicks: Uint16Array;
   readonly hp: Float64Array;
   readonly maxHp: Float64Array;
   readonly speed: Float64Array;
@@ -67,6 +74,9 @@ export class EnemyStore {
     this.prevY = new Float64Array(capacity);
     this.corrX = new Float64Array(capacity);
     this.corrY = new Float64Array(capacity);
+    this.netVx = new Float64Array(capacity);
+    this.netVy = new Float64Array(capacity);
+    this.netTicks = new Uint16Array(capacity);
     this.hp = new Float64Array(capacity);
     this.maxHp = new Float64Array(capacity);
     this.speed = new Float64Array(capacity);
@@ -101,6 +111,8 @@ export class EnemyStore {
     this.x[i] = this.prevX[i] = x;
     this.y[i] = this.prevY[i] = y;
     this.corrX[i] = this.corrY[i] = 0;
+    this.netVx[i] = this.netVy[i] = 0;
+    this.netTicks[i] = 0;
     this.hp[i] = this.maxHp[i] = hp;
     this.speed[i] = speed;
     this.radius[i] = radius;
@@ -137,6 +149,9 @@ export class EnemyStore {
     this.prevY[i] = this.prevY[last]!;
     this.corrX[i] = this.corrX[last]!;
     this.corrY[i] = this.corrY[last]!;
+    this.netVx[i] = this.netVx[last]!;
+    this.netVy[i] = this.netVy[last]!;
+    this.netTicks[i] = this.netTicks[last]!;
     this.hp[i] = this.hp[last]!;
     this.maxHp[i] = this.maxHp[last]!;
     this.speed[i] = this.speed[last]!;

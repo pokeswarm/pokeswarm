@@ -25,7 +25,7 @@ export function moveEnemies(world: World): void {
     e.prevY[i] = e.y[i]!;
     // ホストの位置の補正を少しずつ寄せる（ゲストだけ。ソロ・ホストでは常に 0）
     if (e.corrX[i] !== 0 || e.corrY[i] !== 0) {
-      const f = world.rules.netSmoothing.enemyBlend;
+      const f = e.netTicks[i]! > 0 ? world.rules.netSmoothing.bossBlend : world.rules.netSmoothing.enemyBlend;
       const cx = e.corrX[i]! * f;
       const cy = e.corrY[i]! * f;
       e.x[i]! += cx;
@@ -33,6 +33,16 @@ export function moveEnemies(world: World): void {
       e.corrX[i]! -= cx;
       e.corrY[i]! -= cy;
       if (Math.abs(e.corrX[i]!) < 0.01 && Math.abs(e.corrY[i]!) < 0.01) e.corrX[i] = e.corrY[i] = 0;
+    }
+    // ゲスト: ホストから動きが届いている中ボス・ボスは、その動きのまま進める（自分で追う向きを決めると、届くたびに向きが変わって飛んで見える）。
+    // ノックバックもホストの動きに含まれているので、ここでは動かさない
+    if (e.netTicks[i]! > 0) {
+      e.x[i]! += e.netVx[i]!;
+      e.y[i]! += e.netVy[i]!;
+      e.netTicks[i]!--;
+      if (e.kbGuard[i]! > 0) e.kbGuard[i]!--;
+      if (e.kbTicks[i]! > 0) e.kbTicks[i]!--;
+      continue;
     }
     const x = e.x[i]!;
     const y = e.y[i]!;

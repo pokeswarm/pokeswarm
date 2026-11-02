@@ -270,3 +270,40 @@ describe('ボスの位置を送る間隔', () => {
     expect(count({ playerStateIntervalTicks: 1, correctionIntervalTicks: 30, bossIntervalTicks: 3 })).toBe(10);
   });
 });
+
+describe('ボスの動きをゲストで滑らかに見せる（07 の166章）', () => {
+  it.each([0, 3])('ホストで突進するボスを、ゲストは届く間も同じ速さで進め、届いたときに飛ばない（遅れ %i 回）', (delay) => {
+    const rules = testRules({ extraKinds: [{ id: 'boss', rank: 'boss', hp: 1000, moveSpeed: 0, radius: 20, contactDamage: 0, types: [0] }] });
+    const kind = rules.enemies.kinds.length - 1;
+    const make = (role: SimRole): Simulation => {
+      const sim = new Simulation({ tickRate: 30, seed: 7, rules, role, localPlayerId: role === 'host' ? 1 : 2 });
+      sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150 });
+      sim.addPlayer({ id: 2, x: 0, y: 0, radius: 12, moveSpeed: 150 });
+      sim.world.enemies.add(99, kind, 200, 0, 1000, 0, 20);
+      return sim;
+    };
+    const host = make('host');
+    const guest = make('guest');
+    const hostSession = new SyncSession({ playerStateIntervalTicks: 1, correctionIntervalTicks: 30, bossIntervalTicks: 3 }, 1e9, () => 0);
+    const guestSession = new SyncSession({ playerStateIntervalTicks: 1, correctionIntervalTicks: 30 }, 1e9, () => 0);
+    // 突進: 毎秒 300 で上へ（1回の更新で 10）
+    host.world.enemies.knockBack(0, 0, -300, 1000);
+    // 片道 delay 回ぶん遅れて届く（往復の時間も合わせる）
+    guestSession.rttMs = ((delay * 2) / 30) * 1000;
+    const queue: InputCommand[][] = [];
+    let cmds: InputCommand[] = [];
+    let maxStep = 0;
+    for (let t = 0; t < 60; t++) {
+      host.step([]);
+      const gy = guest.world.enemies.y[0]!;
+      guest.step(cmds);
+      if (t > 20) maxStep = Math.max(maxStep, Math.abs(guest.world.enemies.y[0]! - gy));
+      const sent = hostSession.outgoing(host.world).filter((m) => m.t === 'bh');
+      queue.push(guestSession.incoming(guest.world, decode(encode(sent)), 1));
+      cmds = queue.length > delay ? queue.shift()! : [];
+    }
+    // 1回の更新の動きはホストとほぼ同じ（届いた位置へ一気に合わせると、3回ごとに大きく飛ぶ）
+    expect(maxStep).toBeLessThan(12);
+    expect(Math.abs(guest.world.enemies.y[0]! - host.world.enemies.y[0]!)).toBeLessThan(15);
+  });
+});

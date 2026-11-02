@@ -158,7 +158,24 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         if (i !== -1 && e.hp[i]! > 0) {
           e.hp[i] = Math.max(1, cmd.hp);
           e.maxHp[i] = cmd.maxHp;
-          if (cmd.x !== undefined && cmd.y !== undefined) {
+          if (cmd.x !== undefined && cmd.y !== undefined && cmd.vx !== undefined && cmd.vy !== undefined) {
+            // 届いた位置から、届くまでの時間ぶん先へ進めた所を目標に少しずつ寄せ、その間はホストの動きで進める（07 の166章）
+            const ns = world.rules.netSmoothing;
+            const lead = Math.min(cmd.lead ?? 0, ns.bossLeadMaxTicks);
+            const dx = cmd.x + cmd.vx * lead - e.x[i]!;
+            const dy = cmd.y + cmd.vy * lead - e.y[i]!;
+            if (dx * dx + dy * dy > ns.snapDistance ** 2) {
+              e.x[i] = e.prevX[i] = e.x[i]! + dx;
+              e.y[i] = e.prevY[i] = e.y[i]! + dy;
+              e.corrX[i] = e.corrY[i] = 0;
+            } else {
+              e.corrX[i] = dx;
+              e.corrY[i] = dy;
+            }
+            e.netVx[i] = cmd.vx;
+            e.netVy[i] = cmd.vy;
+            e.netTicks[i] = ns.bossCoastTicks;
+          } else if (cmd.x !== undefined && cmd.y !== undefined) {
             e.x[i] = cmd.x;
             e.y[i] = cmd.y;
           }
@@ -241,7 +258,8 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         const snap2 = world.rules.netSmoothing.snapDistance ** 2;
         for (let k = 0; k + 2 < cmd.data.length; k += 3) {
           const i = index.get(cmd.data[k]!);
-          if (i === undefined) continue;
+          // ボスの位置の知らせ（bossHp）で動かしている敵は、それより間隔の長い補正では動かさない
+          if (i === undefined || e.netTicks[i]! > 0) continue;
           const dx = cmd.data[k + 1]! - e.x[i]!;
           const dy = cmd.data[k + 2]! - e.y[i]!;
           if (dx * dx + dy * dy > snap2) {

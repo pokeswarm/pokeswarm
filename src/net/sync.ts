@@ -241,7 +241,8 @@ export class SyncSession {
         const bosses: number[] = [];
         for (let i = 0; i < e.count; i++) {
           if (e.hp[i]! > 0 && (world.rules.enemies.kinds[e.kind[i]!]?.rank ?? 'normal') !== 'normal') {
-            bosses.push(e.id[i]!, Math.ceil(e.hp[i]!), Math.ceil(e.maxHp[i]!), round2(e.x[i]!), round2(e.y[i]!));
+            // 直前の更新の動き（突進・ノックバック・押し合いも含む）も送り、ゲストは次が届くまでその動きで進める（07 の166章）
+            bosses.push(e.id[i]!, Math.ceil(e.hp[i]!), Math.ceil(e.maxHp[i]!), round2(e.x[i]!), round2(e.y[i]!), round2(e.x[i]! - e.prevX[i]!), round2(e.y[i]! - e.prevY[i]!));
           }
         }
         if (bosses.length) out.push({ t: 'bh', e: bosses });
@@ -366,7 +367,13 @@ export class SyncSession {
           }
           break;
         case 'bh':
-          if (guest) for (let k = 0; k + 4 < m.e.length; k += 5) cmds.push({ type: 'bossHp', id: m.e[k]!, hp: m.e[k + 1]!, maxHp: m.e[k + 2]!, x: m.e[k + 3]!, y: m.e[k + 4]! });
+          if (guest) {
+            // 届くまでの時間（往復の半分）を更新回数にしたもの。その分だけ先へ進めて見せる
+            const lead = this.rttMs === null ? 0 : this.rttMs / 2 / 1000 / world.dt;
+            for (let k = 0; k + 6 < m.e.length; k += 7) {
+              cmds.push({ type: 'bossHp', id: m.e[k]!, hp: m.e[k + 1]!, maxHp: m.e[k + 2]!, x: m.e[k + 3]!, y: m.e[k + 4]!, vx: m.e[k + 5]!, vy: m.e[k + 6]!, lead });
+            }
+          }
           break;
         case 'sv':
           if (guest) {

@@ -746,6 +746,15 @@ export const combatConfigSchema = z.object({
    * 自分を中心に押し出し続ける技で、敵が近寄れず放置で勝てていたのを、すき間ができるようにする
    */
   knockbackFatigue: z.object({ seconds: z.number().nonnegative(), multiplier: z.number().min(0).max(1) }).default({ seconds: 1.5, multiplier: 0.25 }),
+  /**
+   * 技の数が増えたときの出方（07 の163章。反対側に同じ扇を出すと違和感があるため）:
+   * - 扇（自分から出る、360° より狭いもの）・往復のなぎ払い: 1 増えるごとに、角度（なぎ払いは払う幅）を元の countWidenPct % 広げる（360° まで）。
+   *   技の countWidens があればそちら（度）
+   * - 前の長方形: 1 増えるごとに、届く距離と幅を boxCountGrowthPct % 大きくする
+   * - 自分の周り全部（360° の扇・まとう技）: 増えた分を威力に変える（bonusCountPowerRate）
+   */
+  countWidenPct: z.number().nonnegative().default(50),
+  boxCountGrowthPct: z.number().nonnegative().default(20),
   /** 光線（beam）: 数が1増えるごとに、幅をこの割合だけ広げる（本数は増やさない。作者の指摘 2026年10月27日） */
   beamWidthPerExtraCount: z.number().nonnegative().default(0.5),
   /** ポイントマックスの増えた分を威力に変える技（bonusCountToPower）: 1 増えるごとに、1 本分の威力のこの割合を足す（0.5 なら 1 本の技は +2 で 2 倍。07 の128章） */

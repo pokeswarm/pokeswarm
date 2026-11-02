@@ -69,7 +69,7 @@ export function playerMoveStats(world: World, p: Player, pm: { move: number; lev
   if (m.amountBonus === 0 && m.durationPct === 0 && m.rangePct === 0 && m.pierceBonus === 0 && !(selfRadius && areaPct !== 0)) return st;
   const rangePct = selfRadius ? areaPct : m.rangePct * (def.rangeBonusScale ?? 1);
   // 太い追従レーザー・円: 本数は増やさず、増えた分を威力に変える（元の本数 n に +k なら ×(n + 割合×k)/n。07 の128章）
-  const toPower = def.bonusCountToPower && st.count > 0 && m.amountBonus !== 0;
+  const toPower = (def.bonusCountToPower || selfAround(def, st)) && st.count > 0 && m.amountBonus !== 0;
   return {
     ...st,
     count: toPower ? st.count : st.count + m.amountBonus,
@@ -78,6 +78,12 @@ export function playerMoveStats(world: World, p: Player, pm: { move: number; lev
     range: st.range * Math.max(0.1, 1 + rangePct / 100),
     pierce: st.pierce + m.pierceBonus,
   };
+}
+
+/** 自分の周り全部に当たる技（360° の扇・まとう技）: 数が増えても向きが無いので、増えた分は威力にする（07 の163章） */
+function selfAround(def: SimMoveDef, st: MoveStats): boolean {
+  if (def.pattern === 'aura') return true;
+  return def.pattern === 'melee' && !def.frontBox && (st.arcDegrees >= 360 || st.range === 0);
 }
 
 /** 自分を中心に円状に広がる出し方（半径は範囲の強化で広がり、射程の強化は効かない） */
@@ -660,19 +666,21 @@ function fireMelee(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   const box = world.rules.moves[pm.move]!.frontBox;
   if (box) {
     // キバの技: 自分の前の長方形（口の絵が描かれる所。届く距離 range + size の start〜end 倍）。体当たりの技は扇形のまま
-    const reach = st.range + scaledMoveStats(world, p, pm, st).size;
+    // 数が増えると、届く距離と幅が大きくなる（07 の163章）
+    const grow = 1 + (world.rules.combat.boxCountGrowthPct / 100) * Math.max(0, st.count - 1);
+    const reach = (st.range + scaledMoveStats(world, p, pm, st).size) * grow;
     world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: reach, shape: SHAPE_BOX, length: reach * box.halfWidth, dirX: fx, dirY: fy, vx: fx, vy: fy });
     return;
   }
   if (st.arcDegrees > 0) {
     // 扇形: 自分を中心に、向いている方向へ（360 度なら自分の周り全部。数が2以上なら反対側にも）
     const sc = scaledMoveStats(world, p, pm, st);
-    // 数で扇を広げる技（かえんほうしゃ）は、本数を増やさず角度を広げる
-    const widen = world.rules.moves[pm.move]!.countWidens ?? 0;
-    const arc = st.arcDegrees + widen * Math.max(0, st.count - 1);
+    // 数が増えたら、本数を増やさず角度を広げる（07 の163章: 反対側に同じ扇を出すと違和感がある）。技の countWidens（度）が無ければ元の角度の countWidenPct %
+    const widen = world.rules.moves[pm.move]!.countWidens ?? (st.arcDegrees * world.rules.combat.countWidenPct) / 100;
+    const arc = Math.min(360, st.arcDegrees + widen * Math.max(0, st.count - 1));
     const half = Math.min(Math.PI, (arc * Math.PI) / 360);
     const sideways = !!world.rules.moves[pm.move]!.sideways;
-    const n = sideways ? 2 : half >= Math.PI || widen > 0 ? 1 : Math.min(st.count, 2);
+    const n = sideways ? 2 : 1;
     // 外へ進む攻撃: 厚さ band の帯が、中心から届く距離まで持続の間に進む
     const reach = st.range + sc.size;
     const band = reachBand(world, pm.move, reach);
@@ -1184,7 +1192,9 @@ function fireSweep(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   const [fx, fy] = def.randomAim ? ((r: number): [number, number] => [Math.cos(r), Math.sin(r)])(world.rng.next() * Math.PI * 2) : axisToUnit(p.facingX, p.facingY);
   if (def.body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: fx, dirY: fy, distance: def.body.lungeDistance, afterimages: def.body.afterimages });
   const half = Math.min(Math.PI, (st.arcDegrees * Math.PI) / 360);
-  const amp = (Math.min(360, st.spreadDegrees) * Math.PI) / 360;
+  // 数が増えたら払う幅を広げる（07 の163章。本数は増やさない）
+  const spread = st.spreadDegrees * (1 + (world.rules.combat.countWidenPct / 100) * Math.max(0, st.count - 1));
+  const amp = (Math.min(360, spread) * Math.PI) / 360;
   const center = Math.atan2(fy, fx);
   if (def.sweepClap) {
     // ねこだまし: 左右の端から1つずつ正面へ払い、正面で合わせる（両手でパチン。07 の141章）。

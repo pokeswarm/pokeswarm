@@ -13,5 +13,7 @@
   "knockbackFatigue": {
     "seconds": 2.5,
     "multiplier": 0.2
-  }
+  },
+  "countWidenPct": 50,
+  "boxCountGrowthPct": 20
 }

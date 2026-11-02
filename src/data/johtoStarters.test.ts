@@ -8,7 +8,7 @@ describe('ジョウトの御三家（07 の48.3・66.3）', () => {
   const move = (key: string): number => rules.moves.findIndex((m) => m.key === key);
   // 系統, 最初の技, 派生の材料, 派生技, 固有技の材料（07 の75章）, 固有技
   const chains = [
-    ['cyndaquil', 'ember', 'charcoal', 'flame-wheel', 'pp-max', 'eruption'],
+    ['cyndaquil', 'ember', 'charcoal', 'flamethrower', 'pp-max', 'eruption'],
     ['chikorita', 'sleep-powder', 'miracle-seed', 'synthesis', 'metronome', 'solar-beam'],
     ['totodile', 'scratch', 'mystic-water', 'bite', 'x-attack', 'crunch'],
   ] as const;
@@ -23,7 +23,8 @@ describe('ジョウトの御三家（07 の48.3・66.3）', () => {
     for (const [line, first, item1, derived, item2, unique] of chains) {
       const d1 = rules.derivations.find((d) => d.from === move(first) && d.to === move(derived))!;
       const d2 = rules.derivations.find((d) => d.from === move(derived) && d.to === move(unique))!;
-      expect([d1.line, d1.item, isUniqueDerivation(d1)]).toEqual([line, itemNo(item1), false]);
+      // ヒノアラシの派生は全体の派生（ひのこ ＋ もくたん → かえんほうしゃ。07 の161章: ぶつり／とくしゅ をそろえる）
+      expect([d1.line, d1.item, isUniqueDerivation(d1)]).toEqual([line === 'cyndaquil' ? null : line, itemNo(item1), false]);
       expect([d2.line, d2.item, isUniqueDerivation(d2)]).toEqual([line, itemNo(item2), true]);
     }
   });

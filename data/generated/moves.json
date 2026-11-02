@@ -1,4 +1,16 @@
 {
+  "acid-spray": {
+    "names": {
+      "ja": "アシッドボム",
+      "en": "Acid Spray",
+      "fr": "Bombe Acide",
+      "de": "Säurespeier",
+      "es": "Bomba Ácida",
+      "it": "Acidobomba"
+    },
+    "type": "poison",
+    "damageClass": "special"
+  },
   "aerial-ace": {
     "names": {
       "ja": "つばめがえし",
@@ -383,6 +395,18 @@
     "type": "dark",
     "damageClass": "special"
   },
+  "dig": {
+    "names": {
+      "ja": "あなをほる",
+      "en": "Dig",
+      "fr": "Tunnel",
+      "de": "Schaufler",
+      "es": "Excavar",
+      "it": "Fossa"
+    },
+    "type": "ground",
+    "damageClass": "physical"
+  },
   "discharge": {
     "names": {
       "ja": "ほうでん",
@@ -513,6 +537,18 @@
       "it": "Codadrago"
     },
     "type": "dragon",
+    "damageClass": "physical"
+  },
+  "dual-wingbeat": {
+    "names": {
+      "ja": "ダブルウイング",
+      "en": "Dual Wingbeat",
+      "fr": "Double Volée",
+      "de": "Doppelflügel",
+      "es": "Ala Bis",
+      "it": "Doppia Ala"
+    },
+    "type": "flying",
     "damageClass": "physical"
   },
   "dynamic-punch": {
@@ -767,6 +803,18 @@
     "type": "fighting",
     "damageClass": "physical"
   },
+  "foul-play": {
+    "names": {
+      "ja": "イカサマ",
+      "en": "Foul Play",
+      "fr": "Tricherie",
+      "de": "Schmarotzer",
+      "es": "Juego Sucio",
+      "it": "Ripicca"
+    },
+    "type": "dark",
+    "damageClass": "physical"
+  },
   "frenzy-plant": {
     "names": {
       "ja": "ハードプラント",
@@ -970,6 +1018,18 @@
     },
     "type": "ice",
     "damageClass": "special"
+  },
+  "ice-shard": {
+    "names": {
+      "ja": "こおりのつぶて",
+      "en": "Ice Shard",
+      "fr": "Éclats Glace",
+      "de": "Eissplitter",
+      "es": "Esquirla Helada",
+      "it": "Geloscheggia"
+    },
+    "type": "ice",
+    "damageClass": "physical"
   },
   "icicle-crash": {
     "names": {
@@ -1425,6 +1485,18 @@
       "it": "Spettrotuffo"
     },
     "type": "ghost",
+    "damageClass": "physical"
+  },
+  "poison-jab": {
+    "names": {
+      "ja": "どくづき",
+      "en": "Poison Jab",
+      "fr": "Direct Toxik",
+      "de": "Gifthieb",
+      "es": "Puya Nociva",
+      "it": "Velenpuntura"
+    },
+    "type": "poison",
     "damageClass": "physical"
   },
   "poison-sting": {

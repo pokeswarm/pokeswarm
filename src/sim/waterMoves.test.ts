@@ -85,10 +85,7 @@ describe('バブルこうせん・みずのはどう', () => {
 
 describe('アクアテール: 往復のなぎ払いの後に、前方長方形の叩きつけ', () => {
   it('叩きつけは 0.4 秒遅れて溜め始め、0.25 秒溜めてから出る（comboOffsetSeconds ＋ windupSeconds）', () => {
-    for (const [key, slamKey] of [
-      ['aqua-tail', 'aqua-tail-slam'],
-      ['aqua-tail-azumarill', 'aqua-tail-slam-azumarill'],
-    ] as const) {
+    for (const [key, slamKey] of [['aqua-tail-azumarill', 'aqua-tail-slam-azumarill']] as const) {
       const t = setup(key);
       const slam = moveIndexOf(t.rules, slamKey);
       expect(t.rules.moves[t.m]!.comboMoves).toEqual([slam]);

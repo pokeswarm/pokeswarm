@@ -87,8 +87,6 @@ describe('ふいうち・つじぎり・ナイトヘッド・ナイトバース�
     expect(n.rules.moves[n.m]!.levels[0]!.critChancePct).toBe(35);
     const f = setup('night-shade');
     expect(f.rules.moves[f.m]!.levels[0]!.pierce).toBe(Infinity);
-    const d = setup('night-daze');
-    expect(d.rules.moves[d.m]!.levels[0]!.status).toBeGreaterThanOrEqual(0);
-    expect(d.rules.moves[d.m]!.levels[0]!.statusChance).toBe(0.4);
+    // ナイトバースト は 161章でしまった（アブソルの固有技は イカサマ）
   });
 });

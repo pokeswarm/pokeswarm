@@ -4027,6 +4027,214 @@ function stormRipple(): SpriteOut {
   return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- 技進化で分類をそろえるための新しい技（07 の161章） ----------------
+/** ギガドレイン: 敵から自分へ吸い取る緑の光の帯（線に並べる。始まり＝自分、終わり＝敵）。2 本の筋がより合わさり、光の粒が自分の方へ流れる。4 コマ */
+function drainLine(): SpriteOut {
+  const H = 12;
+  const TILE = 10;
+  const palette = ['#1b3d14', '#2e7d32', '#66bb6a', '#c5e1a5', '#ffffff'];
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 6, middle: TILE, end: 8 }, 4, (x, y, f, part) => {
+    if (part === 'end') {
+      // 敵の所: 吸い取られる光の輪
+      const d = Math.hypot(x - 3.5, y - mid);
+      if (Math.abs(d - (2.2 + (f % 2))) < 0.7) return 3;
+      return d < 1.4 ? 4 : -1;
+    }
+    if (part === 'start') {
+      // 自分の所: 吸い込む葉の形の光
+      const d = Math.hypot((x - 2.5) / 1.4, y - mid);
+      return d < 1.2 ? 4 : d < 2.2 ? 3 : -1;
+    }
+    const ph = ((x + f * 2.5) / TILE) * Math.PI * 2;
+    const s1 = mid + Math.sin(ph) * 2.4;
+    const s2 = mid - Math.sin(ph) * 2.4;
+    const orb = (((x + f * 2.5) % TILE) + TILE) % TILE;
+    if (orb >= 4 && orb < 6 && Math.abs(y - mid) < 1.4) return 4;
+    if (Math.abs(y - s1) < 0.9) return 2;
+    if (Math.abs(y - s2) < 0.9) return 3;
+    if (Math.abs(y - mid) < 3.4 && ((x + y + f) % 5 === 0)) return 1;
+    return -1;
+  });
+  return { palette, frameMs: 60, parts };
+}
+
+/** どくづき: 前へ突き出す毒の光の切っ先（thrust。柄は無く、根元が太く先がとがる）。紫の芯に黄緑の毒の光が先へ流れ、下に毒のしずく。3 コマ */
+function poisonJab(): SpriteOut {
+  const palette = ['#2a0a2e', '#6a1b9a', '#ab47bc', '#e1bee7', '#ffffff', '#c6ff00'];
+  const frames = [0, 1, 2].map((f) =>
+    wide(48, 16, (u, v) => {
+      const t = (u + 1) / 2;
+      const half = 0.75 * Math.pow(1 - t, 0.75) + 0.02;
+      const a = Math.abs(v);
+      if (a < half) {
+        const band = (((t * 6 - f * 0.6) % 1) + 1) % 1 < 0.18;
+        if (a < half * 0.3) return band ? 5 : 4;
+        if (a < half * 0.6) return band ? 5 : 3;
+        return t > 0.85 ? 3 : 2;
+      }
+      // しずく: 切っ先の下にこぼれる毒
+      for (const [dx, dy] of [[-0.4, 0.75], [0.0, 0.85], [0.3, 0.7]] as const) if (Math.hypot((u - dx - f * 0.05) * 2.2, v - dy) < 0.14) return 5;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** アシッドボム: 放り投げる酸のかたまり（泡立つ紫と黄緑のしずく）。3 コマで表面がぶくぶくする */
+function acidBlob(): SpriteOut {
+  const palette = ['#1b1030', '#6a1b9a', '#9c27b0', '#c6ff00', '#f4ff81', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(16, (u, v) => {
+      const a = Math.atan2(v, u);
+      const edge = 0.82 + Math.sin(a * 5 + f * 2) * 0.07;
+      const d = Math.hypot(u, v);
+      if (d > edge) return -1;
+      // 泡: コマで場所が変わる
+      for (const [bx, by, r] of [[0.3 - f * 0.1, -0.3, 0.16], [-0.35, 0.2 + f * 0.08, 0.12], [0.1, 0.4 - f * 0.1, 0.1]] as const) if (Math.hypot(u - bx, v - by) < r) return 4;
+      if (u < -0.2 && v < -0.2 && d < 0.5) return 5;
+      return d > edge - 0.15 ? 1 : d > 0.4 ? 2 : 3;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/** アシッドボムの飛び散り: 黄緑の酸が 6 つの舌で広がり、ところどころ溶けて穴が空く。3 コマ */
+function acidSplat(): SpriteOut {
+  const palette = ['#1b1030', '#6a1b9a', '#9c27b0', '#c6ff00', '#f4ff81'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(24, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      const edge = 0.4 + f * 0.14 + 0.28 * Math.abs(Math.sin(3 * a + 0.7)) ** 2;
+      if (d > edge) return -1;
+      if (f >= 1 && hash(Math.floor((u + 1) * 9), Math.floor((v + 1) * 9), 2801 + f) < 0.15 + f * 0.1) return -1;
+      return d > edge - 0.12 ? 1 : d < 0.22 ? 4 : (Math.floor((u + v + 2) * 5) + f) % 3 === 0 ? 3 : 2;
+    }),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * ダブルウイング: 両翼で 2 回打つ風の刃（front。64×32、右向き）。コマ 0 は上の翼が振り下ろされる弧、コマ 1 は下の翼が振り上げられる弧、
+ * コマ 2 は 2 枚が X に交わって薄れる。刃の後ろのふちに風切り羽の切れ込み
+ */
+function dualWingX(): SpriteOut {
+  const palette = ['#37474f', '#90a4ae', '#cfd8dc', '#f5f7f8', '#ffffff', '#b3e5fc'];
+  const blade = (u: number, v: number, s: number): number => {
+    // s = 1: 左上 → 右下へ弧を描く刃、s = −1: 左下 → 右上
+    const t = (u + 0.95) / 1.9;
+    if (t < 0 || t > 1) return -1;
+    const c = s * (0.75 - 1.5 * t + 0.35 * Math.sin(t * Math.PI));
+    const half = 0.16 * Math.sin(t * Math.PI) + 0.03;
+    const across = (v - c) * s;
+    if (Math.abs(across) > half) return -1;
+    const notch = across > half * 0.2 && ((t * 10) % 1) < 0.3;
+    if (notch) return -1;
+    return t > 0.85 ? 5 : across < -half * 0.4 ? 4 : across < half * 0.3 ? 3 : 2;
+  };
+  const frames = [0, 1, 2].map((f) =>
+    wide(64, 32, (u, v) => {
+      const a = f === 1 ? -1 : blade(u, v, 1);
+      const b = f === 0 ? -1 : blade(u, v, -1);
+      const c = Math.max(a, b);
+      if (f === 2 && c >= 0 && hash(Math.floor((u + 1) * 20), Math.floor((v + 1) * 10), 2811) < 0.3) return -1;
+      return c;
+    }),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * あなをほる: 敵の足元の地面が割れて、土しぶきと岩が噴き上がる（根元を当たり判定に合わせる originY）。
+ * コマ 0 地割れ → 1 土しぶきが扇に噴き上がる（ふちはぎざぎざ） → 2 岩が高く散る → 3 土が落ちて砂ぼこり
+ */
+function digBurst(): SpriteOut {
+  const palette = ['#2a1d14', '#4e342e', '#6d4c41', '#8d6e63', '#bcaaa4', '#d7ccc8'];
+  const r = rng(2821);
+  const rocks = Array.from({ length: 9 }, () => ({ a: -Math.PI / 2 + (r() - 0.5) * 1.8, d: 0.4 + r() * 0.5, s: 0.06 + r() * 0.06 }));
+  const clods = Array.from({ length: 26 }, () => ({ a: -Math.PI / 2 + (r() - 0.5) * 1.3, d: r(), s: 0.05 + r() * 0.05 }));
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      // 地面の穴（楕円）
+      // 穴は小さく暗い割れ目（ふちの輪は描かない。板のように見えたため）
+      const hole = Math.hypot(u / 0.42, (v - 0.62) / 0.09);
+      if (hole < 1) return f === 0 ? (Math.abs(Math.sin(Math.atan2(v - 0.62, u) * 5)) < 0.35 ? 0 : 1) : 0;
+      // 地割れ: 穴から左右へ走る細い線（コマ 0・1）
+      if (f <= 1 && Math.abs(v - 0.62 - Math.sin(u * 9) * 0.03) < 0.025 && Math.abs(u) < 0.75) return 0;
+      if (f === 0) return -1;
+      const ox = 0;
+      const oy = 0.6;
+      // 土しぶき: 穴から上へ扇に飛ぶ土くれ（コマで高く・広く）
+      const reach = f === 1 ? 0.7 : f === 2 ? 1.05 : 0.6;
+      for (const c of clods) {
+        const dist = c.d * reach;
+        const fall = f === 3 ? 0.25 * c.d : 0;
+        const cx = ox + Math.cos(c.a) * dist * (f === 3 ? 1.3 : 1);
+        const cy = oy + Math.sin(c.a) * dist + fall;
+        if (Math.hypot(u - cx, v - cy) < c.s * (f === 3 ? 0.8 : 1)) return f === 3 ? 4 : c.d < 0.4 ? 2 : 3;
+      }
+      // 岩: 土より遠くへ
+      if (f >= 2) {
+        for (const k of rocks) {
+          const dist = k.d * (f === 2 ? 1.1 : 1.3);
+          const cx = Math.cos(k.a) * dist;
+          const cy = oy + Math.sin(k.a) * dist + (f === 3 ? 0.35 : 0);
+          const d = Math.hypot(u - cx, v - cy);
+          if (d < k.s) return d < k.s * 0.5 ? 4 : 1;
+        }
+      }
+      // 砂ぼこり（最後のコマ）
+      if (f === 3 && v > 0.3 && v < 0.78 && hash(Math.floor((u + 1) * 12), Math.floor((v + 1) * 12), 2823) < 0.14) return 5;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** こおりのつぶて: 速く飛ぶ鋭い氷の結晶（右向き。面で光り、後ろに氷のきらめき）。3 コマでふちが光る */
+function iceShardBolt(): SpriteOut {
+  const palette = ['#0d3550', '#4fc3f7', '#b3e5fc', '#ffffff', '#e1f5fe'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(16, (u, v) => {
+      // 右へとがったひし形（後ろは少し太い）
+      const w = u > 0.1 ? 0.38 * (1 - (u - 0.1) / 0.85) : 0.38 * (1 + (u - 0.1) / 0.6);
+      if (u > 0.95 || u < -0.5) {
+        // 後ろのきらめき
+        if (u < -0.5 && Math.abs(v - Math.sin(u * 9 + f) * 0.15) < 0.05 && ((u * 6 + f) % 1 + 1) % 1 < 0.5) return 4;
+        return -1;
+      }
+      if (Math.abs(v) > w) return -1;
+      if (Math.abs(v) < w * 0.25 && (Math.floor((u + 1) * 6) + f) % 3 === 0) return 3;
+      return v < -w * 0.2 ? 3 : v < w * 0.4 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** イカサマ: 敵の背後から斬った跡（黒い X の斬撃。ふちに赤い光）。3 コマで現れて薄れる */
+function foulSlash(): SpriteOut {
+  const palette = ['#000000', '#1a1a1a', '#311b5c', '#6a1b9a', '#ff5252', '#f3e5f5'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(24, (u, v) => {
+      const len = f === 0 ? 0.6 : 0.95;
+      for (const s of [1, -1]) {
+        const along = (u + s * v) / Math.SQRT2;
+        const across = Math.abs((u - s * v) / Math.SQRT2);
+        if (Math.abs(along) > len) continue;
+        const w = 0.12 * (1 - Math.abs(along) / len) + 0.02;
+        if (across < w) {
+          if (f === 2 && hash(Math.floor((u + 1) * 12), Math.floor((v + 1) * 12), 2831) < 0.4) return -1;
+          return across < w * 0.35 ? 5 : across < w * 0.7 ? 3 : 1;
+        }
+        if (across < w + 0.06 && f < 2) return 4;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
 /**
  * にどげり: 蹴りの当たった所ではじける衝撃（脚は描かない。作者の指摘 2026年11月1日）。白い芯から、細い放射の線が 8 本
  * （長い・短いを交互に）はなれて飛び、間に小さな火花。コマ 0 は短く、コマ 1 で線が外へ伸びて芯が少し縮む
@@ -4839,6 +5047,14 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'steel-beam-heavy': () => steelBeamHeavy(),
     'counter-stance': () => counterStance(),
     'counter-burst': () => counterBurst(),
+    'drain-line': () => drainLine(),
+    'poison-jab': () => poisonJab(),
+    'acid-blob': () => acidBlob(),
+    'acid-splat': () => acidSplat(),
+    'dual-wing-x': () => dualWingX(),
+    'dig-burst': () => digBurst(),
+    'ice-shard-bolt': () => iceShardBolt(),
+    'foul-slash': () => foulSlash(),
     'whirlwind-cone': () => whirlwindCone(),
     'gust-whirl': () => gustWhirl(),
     'hurricane-eye': () => hurricaneEye(),

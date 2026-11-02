@@ -64,7 +64,6 @@
   ],
   "tierOverrides": {
     "pound": "derived",
-    "flame-wheel": "derived",
     "synthesis": "derived",
     "bite": "derived",
     "iron-tail": "derived",
@@ -85,17 +84,13 @@
     "facade": "derived",
     "thunder-fang": "derived",
     "double-edge": "derived",
-    "earth-power": "derived",
     "thrash": "derived",
     "night-slash": "derived",
-    "ice-ball": "derived",
     "surf": "derived",
-    "aqua-tail": "derived",
     "iron-head": "derived",
     "dragon-claw": "derived",
     "reflect": "derived",
     "revenge": "derived",
-    "aqua-tail-slam": "derived",
     "aqua-tail-slam-azumarill": "unique",
     "future-sight": "derived",
     "aerial-ace": "derived",
@@ -108,7 +103,8 @@
     "rock-slide": "derived",
     "bubble-beam": "derived",
     "body-slam": "derived",
-    "flamethrower": "derived"
+    "flamethrower": "derived",
+    "dig": "derived"
   },
   "strengthScale": {
     "giga-impact": 2,
@@ -117,9 +113,7 @@
     "stealth-rock": 0.4,
     "phantom-force": 0.75,
     "surf": 0.9,
-    "aqua-tail": 0.9,
     "aqua-tail-azumarill": 0.8,
-    "aqua-tail-slam": 0.7,
     "aqua-tail-slam-azumarill": 0.7
   }
 }

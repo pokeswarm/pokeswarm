@@ -1,5 +1,5 @@
 {
-  "note": "今は使わない技の定義（作者の決定 2026年10月23日。ゲームは読み込まない）。使うときは data/game/moves.json に戻し、派生と見た目を付ける。はどうだん = ルカリオの固有技の候補、げきりん = カイリューの固有技を はかいこうせん にしたため。ホネブーメラン・ボーンラッシュ = カラカラ・ガラガラ（とルカリオ）の技なので、そのポケモンを入れるまでしまう（作者の決定 2026年10月25日）。からてチョップ・クロスチョップ・にどげり・まわしげり = かくとうの技を選び直したため（作者の決定 2026年10月25日。蹴りの技は破棄） フリーズドライ = フリーザーの固有技を ぜったいれいど にしたため（作者の決定 2026年10月27日）。 おにび・ほのおのうず（ホウエン）= カゲボウズの技を したでなめる → おどろかす → ゴーストダイブ にしたため。ヒトモシ（シャンデラ）を入れるときの候補（作者の決定 2026年11月1日。07 の148章）。",
+  "note": "今は使わない技の定義（作者の決定 2026年10月23日。ゲームは読み込まない）。使うときは data/game/moves.json に戻し、派生と見た目を付ける。はどうだん = ルカリオの固有技の候補、げきりん = カイリューの固有技を はかいこうせん にしたため。ホネブーメラン・ボーンラッシュ = カラカラ・ガラガラ（とルカリオ）の技なので、そのポケモンを入れるまでしまう（作者の決定 2026年10月25日）。からてチョップ・クロスチョップ・にどげり・まわしげり = かくとうの技を選び直したため（作者の決定 2026年10月25日。蹴りの技は破棄） フリーズドライ = フリーザーの固有技を ぜったいれいど にしたため（作者の決定 2026年10月27日）。 おにび・ほのおのうず（ホウエン）= カゲボウズの技を したでなめる → おどろかす → ゴーストダイブ にしたため。ヒトモシ（シャンデラ）を入れるときの候補（作者の決定 2026年11月1日。07 の148章）。 かえんぐるま・アクアテール（ヒンバスの版）とその叩きつけ・アイスボール・てっていこうせん・ナイトバースト・タネばくだん = 技進化で ぶつり／とくしゅ を入れ替えないよう、ルートを同じタイプ・同じ分類の技に差し替えたため（作者の決定 2026年11月3日。07 の161章）。",
   "moves": {
     "aura-sphere": {
       "pattern": "homing",
@@ -645,6 +645,422 @@
       ],
       "region": "hoenn",
       "nameOf": "fire-spin"
+    },
+    "flame-wheel": {
+      "pattern": "spin",
+      "effect": "flame-wheel",
+      "base": {
+        "intervalSeconds": 0.1,
+        "lifestealPct": 0,
+        "spreadDegrees": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0.3,
+        "statusSeconds": 3,
+        "power": 12.6,
+        "cooldownSeconds": 2.6,
+        "count": 1,
+        "speed": 0,
+        "size": 16,
+        "range": 70,
+        "durationSeconds": 2.6,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.3,
+        "knockback": 140,
+        "statusId": "burn",
+        "arcDegrees": 360
+      },
+      "levels": [
+        {
+          "size": 3,
+          "power": 2.5
+        },
+        {
+          "range": 10,
+          "power": 1.2
+        },
+        {
+          "durationSeconds": 0.3,
+          "power": 0.5
+        },
+        {
+          "size": 3,
+          "power": 1.8
+        },
+        {
+          "range": 10,
+          "power": 0.6
+        },
+        {
+          "hitIntervalSeconds": -0.05,
+          "power": -1.8
+        },
+        {
+          "range": 12
+        }
+      ]
+    },
+    "aqua-tail": {
+      "pattern": "sweep",
+      "effect": "aqua-tail",
+      "base": {
+        "power": 54.4,
+        "cooldownSeconds": 1.35,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 60,
+        "range": 30,
+        "durationSeconds": 0.4,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 220,
+        "knockbackSeconds": 0.1,
+        "spreadDegrees": 180,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 50
+      },
+      "levels": [
+        {
+          "power": 12.5
+        },
+        {
+          "size": 6,
+          "power": 8.5
+        },
+        {
+          "power": 11.8
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 0.9
+        },
+        {
+          "spreadDegrees": 60,
+          "power": 1.7
+        },
+        {
+          "power": 9.5
+        },
+        {
+          "size": 6,
+          "power": 4.2
+        }
+      ],
+      "body": {
+        "lungeDistance": 10,
+        "afterimages": 0
+      },
+      "region": "hoenn",
+      "comboMoves": [
+        "aqua-tail-slam"
+      ]
+    },
+    "aqua-tail-slam": {
+      "pattern": "melee",
+      "effect": "aqua-tail-slam",
+      "nameOf": "aqua-tail",
+      "teachOnly": true,
+      "comboOffsetSeconds": 0.4,
+      "region": "hoenn",
+      "frontBox": {
+        "start": 0,
+        "end": 1,
+        "halfWidth": 0.35
+      },
+      "body": {
+        "lungeDistance": 16,
+        "afterimages": 0
+      },
+      "base": {
+        "power": 47.6,
+        "cooldownSeconds": 1.35,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 30,
+        "range": 100,
+        "durationSeconds": 0.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 320,
+        "knockbackSeconds": 0.12,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "critChancePct": 15
+      },
+      "levels": [
+        {
+          "power": 10.9
+        },
+        {
+          "size": 4,
+          "power": 9.3
+        },
+        {
+          "power": 10.7
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 0.7
+        },
+        {
+          "range": 10,
+          "power": 4.9
+        },
+        {
+          "power": 9
+        },
+        {
+          "size": 4,
+          "power": 6.9
+        }
+      ],
+      "windupSeconds": 0.25
+    },
+    "ice-ball": {
+      "pattern": "bounce",
+      "effect": "ice-ball",
+      "bounceAngle": 35,
+      "base": {
+        "power": 13.3,
+        "cooldownSeconds": 2.4,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 420,
+        "size": 20,
+        "range": 420,
+        "durationSeconds": 3.5,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.4,
+        "knockback": 160,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 360,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "size": 2,
+          "power": 2.4
+        },
+        {
+          "durationSeconds": 0.4,
+          "power": 0.9
+        },
+        {
+          "speed": 40,
+          "power": 2.6
+        },
+        {
+          "size": 2,
+          "power": 1.8
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": 0.6
+        },
+        {
+          "durationSeconds": 0.4,
+          "power": -0.1
+        },
+        {
+          "size": 3,
+          "power": 0.9
+        }
+      ],
+      "body": {
+        "lungeDistance": 30,
+        "afterimages": 4
+      },
+      "waitForEnd": true,
+      "growOnHit": {
+        "perHit": 0.12,
+        "maxMultiplier": 2.5
+      },
+      "region": "hoenn"
+    },
+    "steel-beam": {
+      "pattern": "beam",
+      "effect": "steel-beam",
+      "base": {
+        "power": 38.2,
+        "cooldownSeconds": 1.5,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 22,
+        "range": 720,
+        "durationSeconds": 0.5,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.1,
+        "knockback": 200,
+        "knockbackSeconds": 0.12,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "power": 6.4
+        },
+        {
+          "size": 3,
+          "power": 3.7
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 3.1
+        },
+        {
+          "range": 40,
+          "power": 4.4
+        },
+        {
+          "size": 3,
+          "power": 2.6
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 1.7
+        },
+        {
+          "range": 40,
+          "power": 3.6
+        }
+      ],
+      "hpCost": {
+        "pct": 3,
+        "minHpPct": 20
+      },
+      "region": "hoenn",
+      "windupSeconds": 0.35,
+      "aimStrongest": true
+    },
+    "night-daze": {
+      "pattern": "nova",
+      "effect": "night-daze",
+      "sweep": 0.45,
+      "base": {
+        "intervalSeconds": 0.1,
+        "lifestealPct": 0,
+        "spreadDegrees": 0,
+        "knockbackSeconds": 0.14,
+        "statusChance": 0.4,
+        "statusSeconds": 3,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "speed": 0,
+        "count": 1,
+        "power": 146.6,
+        "cooldownSeconds": 1.9,
+        "size": 22,
+        "range": 220,
+        "durationSeconds": 0.5,
+        "knockback": 360,
+        "statusId": "attackDown"
+      },
+      "levels": [
+        {
+          "range": 15,
+          "power": 24.6
+        },
+        {
+          "statusChance": 0.1,
+          "power": 24.5
+        },
+        {
+          "range": 15,
+          "power": 24.6
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": -1.2
+        },
+        {
+          "range": 15,
+          "power": 22
+        },
+        {
+          "statusChance": 0.1,
+          "power": 22
+        },
+        {
+          "range": 20,
+          "power": 22
+        }
+      ],
+      "bonusCountToPower": true,
+      "region": "hoenn"
+    },
+    "seed-bomb": {
+      "pattern": "scatter",
+      "effect": "seed-bomb",
+      "base": {
+        "power": 8.1,
+        "intervalSeconds": 0.1,
+        "count": 4,
+        "speed": 0,
+        "size": 43,
+        "range": 280,
+        "durationSeconds": 3.5,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.5,
+        "knockback": 0,
+        "knockbackSeconds": 0.06,
+        "spreadDegrees": 0,
+        "cooldownSeconds": 1.8,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "count": 1,
+          "power": 0.8
+        },
+        {
+          "size": 4,
+          "power": 1.1
+        },
+        {
+          "durationSeconds": 0.5,
+          "power": 0.1
+        },
+        {
+          "count": 1,
+          "power": 0.4
+        },
+        {
+          "size": 5,
+          "power": 0.6
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": -0.2
+        },
+        {
+          "count": 1,
+          "power": 0.1
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "end",
+          "split": {
+            "sizeMultiplier": 0.35,
+            "powerMultiplier": 0.5,
+            "count": 6,
+            "speed": 260,
+            "durationSeconds": 0.6
+          }
+        }
+      ]
     }
   }
 }

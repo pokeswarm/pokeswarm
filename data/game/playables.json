@@ -54,7 +54,7 @@
     "meowth": { "sprite": "meowth", "startingMoves": ["tackle"], "evolves": false },
     "mareep": { "sprite": "mareep", "startingMoves": ["thunder-wave"] },
     "heracross": { "sprite": "heracross", "startingMoves": ["horn-attack"] },
-    "swinub": { "sprite": "swinub", "startingMoves": ["powder-snow"] },
+    "swinub": { "sprite": "swinub", "startingMoves": ["ice-shard"] },
     "pidgey": { "sprite": "pidgey", "startingMoves": ["whirlwind"] },
     "zubat": { "sprite": "zubat", "startingMoves": ["bite"], "excludeMoveTypes": ["poison"] },
     "miltank": { "sprite": "miltank", "startingMoves": ["rollout"] },

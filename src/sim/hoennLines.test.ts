@@ -24,11 +24,11 @@ function setup(line: string, id = 1) {
 }
 
 describe('固有技の条件', () => {
-  it('ドンメル: バクーダの姿 ＋ ふんえん最大 ＋ だいちのちから Lv8 ＋ ひでりの区間で ふんか', () => {
+  it('ドンメル: バクーダの姿 ＋ ふんえん最大 ＋ じしん Lv8 ＋ ひでりの区間で ふんか', () => {
     const t = setup('numel');
     t.p.moves = [];
     t.give('lava-plume', 8);
-    t.give('earth-power', 8);
+    t.give('earthquake', 8);
     t.p.moves[0]!.level = moveMaxLevel(t.rules, t.p.moves[0]!);
     expect(t.derives('eruption')).toBeUndefined();
     t.p.species = t.species('camerupt');
@@ -41,15 +41,15 @@ describe('固有技の条件', () => {
     expect(t.derives('eruption')).toBeDefined();
   });
 
-  it('アブソル: ランの記録（急所の回数）は本人から届いたコマンドで付き、数に届くと ナイトバースト が出る', () => {
+  it('アブソル: ランの記録（急所の回数）は本人から届いたコマンドで付き、数に届くと イカサマ が出る', () => {
     const t = setup('absol');
     t.p.moves = [];
     t.give('night-slash', 8);
     t.p.moves[0]!.level = moveMaxLevel(t.rules, t.p.moves[0]!);
     t.give('future-sight', 8);
-    expect(t.derives('night-daze')).toBeUndefined();
+    expect(t.derives('foul-play')).toBeUndefined();
     t.sim.step([{ type: 'runStat', playerId: 1, stat: 'crits', value: 150 }]);
-    expect(t.derives('night-daze')).toBeDefined();
+    expect(t.derives('foul-play')).toBeDefined();
   });
 
   it('カゲボウズ: ジュペッタの姿 ＋ おどろかす最大 ＋ シャドーボール Lv8 で ゴーストダイブ（作者の決定 2026年11月1日。07 の148章）', () => {

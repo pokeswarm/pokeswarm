@@ -60,7 +60,8 @@ describe('進化しても見た目の量が減らない（作者の決定。07 2
       const label = `${d.from} → ${d.to}`;
       // 出し方が変わるもの（連射 → 流れ、ひのこ → かえんほうしゃ など）は、射程・大きさ・数の意味が違うので比べない
       // （作者の決定 2026年10月23日: 射程も同じ出し方のときだけ。ばらまく弾の射程に、前へ噴き出す炎の長さをそろえると長すぎた）
-      if (fromDef.pattern === toDef.pattern) {
+      // 連鎖でも、自分の残像が飛び回って戻ってくる技（chainReturn。しんそく・ボルトチェンジ）は、稲妻が跳ぶ連鎖とは数の意味が違うので比べない（07 の161章）
+      if (fromDef.pattern === toDef.pattern && !!fromDef.chainReturn === !!toDef.chainReturn) {
         expect(num(b.range), `${label} の射程`).toBeGreaterThanOrEqual(num(a.range));
         expect(num(b.size), `${label} の大きさ`).toBeGreaterThanOrEqual(num(a.size));
         expect(num(b.pierce), `${label} の貫通`).toBeGreaterThanOrEqual(num(a.pierce));

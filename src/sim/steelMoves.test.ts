@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildSimRules, moveIndexOf } from '../data/simRules';
-import { SHAPE_BOX, SHAPE_LINE } from './entities/projectiles';
+import { SHAPE_BOX } from './entities/projectiles';
 import { Simulation } from './simulation';
 import { hurtPlayer } from './systems/health';
 
@@ -49,15 +49,10 @@ describe('はがね', () => {
     expect(rings).toHaveLength(1);
     expect(t.pr.damage[rings[0]!]).toBeCloseTo(taken * 2.5, 3);
   });
-  it('てっていこうせん は 0.35 秒ためてから太い線を出す', () => {
-    const t = setup('steel-beam');
-    expect(t.rules.moves[t.m]!.windupSeconds).toBe(0.35);
-    t.sim.world.enemies.add(1, 0, 200, 0, 1e6, 0, 10);
-    t.sim.step([]);
-    expect(t.find((i) => t.pr.move[i] === t.m)).toHaveLength(0);
-    for (let k = 0; k < Math.round(0.35 * 30) + 2; k++) t.sim.step([]);
-    const beams = t.find((i) => t.pr.move[i] === t.m && t.pr.shape[i] === SHAPE_LINE);
-    expect(beams).toHaveLength(1);
-    expect(t.pr.radius[beams[0]!]).toBe(22);
+  it('クチートの固有技は アイアンヘッド → メタルバースト（ぶつり のまま。てっていこうせん は 161章でしまった）', () => {
+    const t = setup('metal-burst');
+    const d = t.rules.derivations.filter((x) => x.to === t.m && x.line === 'mawile');
+    expect(d).toHaveLength(1);
+    expect(d[0]!.from).toBe(moveIndexOf(t.rules, 'iron-head'));
   });
 });

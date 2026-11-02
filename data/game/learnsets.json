@@ -4,6 +4,7 @@
       "ember",
       "scratch",
       "fire-fang",
+      "air-cutter",
       "swift",
       "blast-burn",
       "body-slam",
@@ -35,13 +36,13 @@
         ]
       },
       {
-        "move": "air-cutter",
+        "move": "air-slash",
         "forms": [
           "charizard"
         ]
       },
       {
-        "move": "air-slash",
+        "move": "dual-wingbeat",
         "forms": [
           "charizard"
         ]
@@ -57,10 +58,17 @@
       "razor-leaf",
       "sleep-powder",
       "sludge-bomb",
+      "giga-drain",
       "magical-leaf",
-      "seed-bomb",
       "leaf-storm",
+      "acid-spray",
       "grass-pledge",
+      {
+        "move": "poison-jab",
+        "forms": [
+          "venusaur"
+        ]
+      },
       {
         "move": "sludge-wave",
         "forms": [
@@ -102,7 +110,6 @@
       "ember",
       "fire-fang",
       "tackle",
-      "flame-wheel",
       "eruption",
       "body-slam",
       "flamethrower",
@@ -121,8 +128,8 @@
       "solar-beam",
       "body-slam",
       "razor-leaf",
+      "giga-drain",
       "magical-leaf",
-      "seed-bomb",
       "leaf-storm",
       "grass-pledge"
     ],
@@ -150,8 +157,8 @@
       "body-slam",
       "quick-attack",
       "swift",
+      "giga-drain",
       "magical-leaf",
-      "seed-bomb",
       {
         "move": "fury-cutter",
         "forms": [
@@ -270,7 +277,6 @@
       "tackle",
       "magnitude",
       "lava-plume",
-      "earth-power",
       "eruption",
       "body-slam",
       "flamethrower",
@@ -318,6 +324,7 @@
     ],
     "swablu": [
       "peck",
+      "air-cutter",
       "sing",
       "dragon-rage",
       "dragon-pulse",
@@ -327,8 +334,8 @@
       "dragon-breath",
       "hyper-voice",
       "astonish",
-      "air-cutter",
       "aerial-ace",
+      "dual-wingbeat",
       {
         "move": "dragon-rush",
         "forms": [
@@ -342,7 +349,7 @@
       "confusion",
       "night-slash",
       "future-sight",
-      "night-daze",
+      "foul-play",
       "body-slam",
       "quick-attack",
       "swift",
@@ -362,7 +369,6 @@
       "powder-snow",
       "aurora-beam",
       "water-gun",
-      "ice-ball",
       "surf",
       "sheer-cold",
       "body-slam",
@@ -381,6 +387,7 @@
       "ember",
       "air-cutter",
       "dragon-pulse",
+      "dragon-claw",
       "outrage",
       "body-slam",
       "flamethrower",
@@ -405,13 +412,19 @@
         "forms": [
           "salamence"
         ]
+      },
+      {
+        "move": "dual-wingbeat",
+        "forms": [
+          "salamence"
+        ]
       }
     ],
     "feebas": [
       "water-gun",
       "tackle",
       "twister",
-      "aqua-tail",
+      "water-pulse",
       "dragon-pulse",
       "scald",
       "swift",
@@ -475,8 +488,8 @@
       "magnitude",
       "dragon-tail",
       "dragon-breath",
-      "earth-power",
-      "dragon-claw",
+      "dig",
+      "dragon-pulse",
       "earthquake-hoenn",
       "body-slam",
       "earthquake",
@@ -485,13 +498,6 @@
       "astonish",
       {
         "move": "swift",
-        "forms": [
-          "vibrava",
-          "flygon"
-        ]
-      },
-      {
-        "move": "dragon-pulse",
         "forms": [
           "vibrava",
           "flygon"
@@ -555,7 +561,7 @@
       "water-gun",
       "mud-shot",
       "water-pulse",
-      "earthquake-hoenn",
+      "earth-power",
       "hydro-pump",
       "earthquake",
       "swift",
@@ -577,7 +583,7 @@
       "metal-claw",
       "fire-fang",
       "iron-head",
-      "steel-beam",
+      "metal-burst",
       "body-slam",
       "sing",
       "astonish",
@@ -626,18 +632,13 @@
     ],
     "togepi": [
       "metronome-baby",
+      "air-cutter",
       "tackle",
       "pound",
       "body-slam",
       "swift",
       "yawn",
       "hyper-voice",
-      {
-        "move": "air-cutter",
-        "forms": [
-          "togetic"
-        ]
-      },
       {
         "move": "aerial-ace",
         "forms": [
@@ -652,6 +653,12 @@
       },
       {
         "move": "air-slash",
+        "forms": [
+          "togetic"
+        ]
+      },
+      {
+        "move": "dual-wingbeat",
         "forms": [
           "togetic"
         ]
@@ -712,9 +719,10 @@
       "razor-leaf",
       "sleep-powder",
       "sludge-bomb",
+      "giga-drain",
       "magical-leaf",
-      "seed-bomb",
       "leaf-storm",
+      "acid-spray",
       {
         "move": "body-slam",
         "forms": [
@@ -736,6 +744,7 @@
       "body-slam",
       "sludge-bomb",
       "sludge-wave",
+      "acid-spray",
       {
         "move": "psybeam",
         "forms": [
@@ -815,7 +824,8 @@
       "bubble-beam",
       "whirlpool",
       "hyper-voice",
-      "dragon-pulse"
+      "dragon-pulse",
+      "ice-shard"
     ],
     "machop": [
       "mach-punch",
@@ -836,8 +846,10 @@
       "shadow-ball",
       "astonish",
       "sucker-punch",
+      "poison-jab",
       "dark-pulse",
       "sludge-wave",
+      "acid-spray",
       {
         "move": "body-slam",
         "forms": [
@@ -847,6 +859,7 @@
     ],
     "dratini": [
       "dragon-tail",
+      "air-cutter",
       "dragon-rage",
       "swift",
       "hyper-beam",
@@ -868,12 +881,6 @@
         ]
       },
       {
-        "move": "air-cutter",
-        "forms": [
-          "dragonite"
-        ]
-      },
-      {
         "move": "aerial-ace",
         "forms": [
           "dragonite"
@@ -881,6 +888,12 @@
       },
       {
         "move": "air-slash",
+        "forms": [
+          "dragonite"
+        ]
+      },
+      {
+        "move": "dual-wingbeat",
         "forms": [
           "dragonite"
         ]
@@ -1052,12 +1065,12 @@
     "doduo": [
       "swift",
       "peck",
+      "air-cutter",
       "quick-attack",
       "tri-attack",
       "wing-attack",
       "whirlwind",
       "body-slam",
-      "air-cutter",
       "aerial-ace"
     ],
     "meowth": [
@@ -1102,9 +1115,10 @@
       "bulk-up"
     ],
     "swinub": [
-      "powder-snow",
+      "ice-shard",
       "magnitude",
       "tackle",
+      "powder-snow",
       "aurora-beam",
       "icicle-crash",
       "body-slam",
@@ -1129,26 +1143,33 @@
     "pidgey": [
       "whirlwind",
       "gust",
+      "air-cutter",
       "wing-attack",
       "hurricane",
       "tackle",
       "quick-attack",
       "swift",
-      "air-cutter",
       "aerial-ace",
-      "air-slash"
+      "air-slash",
+      {
+        "move": "dual-wingbeat",
+        "forms": [
+          "pidgeot"
+        ]
+      }
     ],
     "zubat": [
       "gust",
+      "air-cutter",
       "cross-poison",
       "wing-attack",
       "whirlwind",
       "swift",
       "sludge-bomb",
       "astonish",
-      "air-cutter",
       "aerial-ace",
       "air-slash",
+      "dual-wingbeat",
       {
         "move": "quick-attack",
         "forms": [
@@ -1268,15 +1289,16 @@
     ],
     "scyther": [
       "scratch",
+      "air-cutter",
       "x-scissor",
       "wing-attack",
       "quick-attack",
       "swift",
       "slash",
       "fury-cutter",
-      "air-cutter",
       "aerial-ace",
       "air-slash",
+      "dual-wingbeat",
       {
         "move": "metal-claw",
         "forms": [
@@ -1305,6 +1327,7 @@
     "articuno": [
       "powder-snow",
       "gust",
+      "air-cutter",
       "aurora-beam",
       "swift",
       "sheer-cold",
@@ -1313,36 +1336,39 @@
       "blizzard",
       "peck",
       "mirror-coat",
-      "air-cutter",
       "aerial-ace",
-      "air-slash"
+      "air-slash",
+      "ice-shard",
+      "dual-wingbeat"
     ],
     "zapdos": [
       "thunder-shock",
+      "air-cutter",
       "swift",
       "zap-cannon",
       "whirlwind",
       "peck",
       "thunderbolt",
       "thunder-wave",
-      "air-cutter",
       "aerial-ace",
-      "wild-charge"
+      "wild-charge",
+      "dual-wingbeat"
     ],
     "moltres": [
       "peck",
       "ember",
       "gust",
+      "air-cutter",
       "swift",
       "sky-attack",
       "wing-attack",
       "whirlwind",
       "flamethrower",
       "fire-spin",
-      "air-cutter",
       "aerial-ace",
       "flare-blitz",
-      "air-slash"
+      "air-slash",
+      "dual-wingbeat"
     ],
     "raikou": [
       "thunder-shock",
@@ -1379,31 +1405,33 @@
     "lugia": [
       "gust",
       "confusion",
+      "air-cutter",
       "whirlwind",
       "body-slam",
       "hydro-pump",
       "psychic",
       "swift",
       "hyper-voice",
-      "air-cutter",
       "aerial-ace",
       "air-slash",
-      "dragon-rush"
+      "dragon-rush",
+      "dual-wingbeat"
     ],
     "ho-oh": [
       "fire-fang",
       "ember",
       "gust",
+      "air-cutter",
       "whirlwind",
       "body-slam",
       "flamethrower",
       "fire-spin",
       "swift",
       "hyper-voice",
-      "air-cutter",
       "aerial-ace",
       "flare-blitz",
-      "air-slash"
+      "air-slash",
+      "dual-wingbeat"
     ],
     "celebi": [
       "magical-leaf",
@@ -1414,7 +1442,7 @@
       "leaf-storm-celebi",
       "psychic",
       "swift",
-      "seed-bomb",
+      "giga-drain",
       "leaf-storm"
     ]
   }

@@ -107,6 +107,10 @@ export interface SimMoveDef {
   readonly healZone?: boolean;
   /** cross: 向きを1発ごとにランダムにする（うたう） */
   readonly crossRandom?: boolean;
+  /** cross: 向いている方を中心にしたこの角度（ラジアン）の中に並べる。無ければ全方向 */
+  readonly crossArc?: number;
+  /** 走っている間だけ次を出すまでの時間が進む（ほうでん） */
+  readonly chargeWhileMoving?: boolean;
   /** 扇を左右の両方へ出す（ハイパーボイス） */
   readonly sideways?: boolean;
   /** この回数当たった雑魚は確定で倒れる（ほろびのうた） */

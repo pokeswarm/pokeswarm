@@ -66,3 +66,43 @@ describe('バークアウト は前へ吠える', () => {
     expect(e.hp[1]!).toBe(1e6);
   });
 });
+
+describe('リーフストーム の渦も向いている方へ進む（07 の165章）', () => {
+  it('はなびらのまい より速く進む', () => {
+    const t = setup('leaf-storm');
+    const petal = t.rules.moves[moveIndexOf(t.rules, 'petal-dance')]!.spiralDrift!;
+    expect(t.rules.moves[t.m]!.spiralDrift!).toBeGreaterThan(petal);
+  });
+});
+
+describe('ほうでん は走って電気をためる（07 の165章）', () => {
+  it('止まっていると次を出さない。走っていると出す', () => {
+    const t = setup('discharge');
+    t.sim.world.enemies.add(1, 0, 60, 0, 1e6, 0, 10);
+    let idle = 0;
+    // 最初の 1 回は出る（はじめは待ち時間 0）。そのあとは止まっている間は出ない
+    for (let k = 0; k < 150; k++) {
+      t.sim.step([]);
+      if (k > 5) idle += t.mine().filter((i) => t.pr.stage[i] === 0 && t.pr.life[i]! > t.pr.maxLife[i]! - 0.04).length;
+    }
+    expect(idle).toBe(0);
+    t.p.inputX = 1;
+    let moving = 0;
+    for (let k = 0; k < 150; k++) {
+      t.sim.step([]);
+      moving += t.mine().filter((i) => t.pr.stage[i] === 0 && t.pr.life[i]! > t.pr.maxLife[i]! - 0.04).length;
+    }
+    expect(moving).toBeGreaterThan(0);
+  });
+});
+
+describe('ヘドロウェーブ は前へ扇に流れる（07 の165章）', () => {
+  it('後ろへ流れる波が無い', () => {
+    const t = setup('sludge-wave', 8);
+    t.sim.world.enemies.add(1, 0, 200, 0, 1e6, 0, 10);
+    t.sim.step([]);
+    const waves = t.mine().filter((i) => t.pr.stage[i] === 0);
+    expect(waves.length).toBeGreaterThan(1);
+    for (const i of waves) expect(t.pr.vx[i]!).toBeGreaterThan(-1e-6);
+  });
+});

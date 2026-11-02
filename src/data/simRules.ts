@@ -78,6 +78,8 @@ export function buildSimRules(region?: string): SimRules {
       rangeBonusScale: def.rangeBonusScale ?? 1,
       ...(def.countWidens ? { countWidens: def.countWidens } : {}),
       ...(def.crossRandom ? { crossRandom: true } : {}),
+      ...(def.crossArcDegrees ? { crossArc: (def.crossArcDegrees * Math.PI) / 180 } : {}),
+      ...(def.chargeWhileMoving ? { chargeWhileMoving: true } : {}),
       ...(def.sideways ? { sideways: true } : {}),
       ...(def.perishHits ? { perishHits: def.perishHits } : {}),
       ...(def.followFacing ? { followFacing: def.followFacing } : {}),

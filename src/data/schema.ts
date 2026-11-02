@@ -1157,6 +1157,10 @@ export const moveDefSchema = z.object({
   healZone: z.boolean().optional(),
   /** cross（十字）: 向きを等しい角度に並べず、1発ごとにランダムにする（うたう: 音符がふわふわ散る） */
   crossRandom: z.boolean().optional(),
+  /** cross（十字）: 全方向ではなく、向いている方を中心にしたこの角度（度）の中に等しく並べて出す（ヘドロウェーブ: 前へ流れる毒の波。07 の165章） */
+  crossArcDegrees: z.number().positive().max(360).optional(),
+  /** 走っている間（移動の入力がある間）だけ次を出すまでの時間が進む（ほうでん: 走って体に電気をためる。07 の165章） */
+  chargeWhileMoving: z.boolean().optional(),
   /** 扇（melee の arcDegrees）を、向いている方向ではなく左右の両方へ1つずつ出す（ハイパーボイス） */
   sideways: z.boolean().optional(),
   /** この技に（1秒以上あけて）この回数当たった雑魚は、確定で倒れる（ほろびのうた。ボスには効かない） */

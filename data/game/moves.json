@@ -2478,7 +2478,8 @@
             "hitIntervalSeconds": 0.5
           }
         }
-      ]
+      ],
+      "crossArcDegrees": 150
     },
     "spark": {
       "pattern": "pulse",
@@ -6413,7 +6414,8 @@
           }
         }
       ],
-      "chainRadial": true
+      "chainRadial": true,
+      "chargeWhileMoving": true
     },
     "horn-attack": {
       "pattern": "melee",
@@ -7193,7 +7195,7 @@
         "count": 10,
         "speed": 0,
         "size": 16,
-        "range": 300,
+        "range": 220,
         "durationSeconds": 1.1,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -7239,7 +7241,8 @@
       "learnMinLevel": 50,
       "learnWithMoves": [
         "grass-pledge"
-      ]
+      ],
+      "spiralDrift": 420
     },
     "healing-wish": {
       "pattern": "heal",
@@ -10904,7 +10907,7 @@
         "count": 10,
         "speed": 0,
         "size": 16,
-        "range": 300,
+        "range": 220,
         "durationSeconds": 1.1,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -10947,7 +10950,8 @@
         }
       ],
       "curve": 260,
-      "nameOf": "leaf-storm"
+      "nameOf": "leaf-storm",
+      "spiralDrift": 420
     },
     "giga-drain": {
       "pattern": "beam",

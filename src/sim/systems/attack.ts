@@ -269,7 +269,8 @@ export function useMoves(world: World): void {
           runSubMove(world, p, sub);
         }
       }
-      pm.cooldown -= world.dt;
+      // 走って電気をためる技（ほうでん）は、止まっている間は次を出すまでの時間が進まない（07 の165章）
+      if (!def.chargeWhileMoving || p.inputX !== 0 || p.inputY !== 0) pm.cooldown -= world.dt;
       if (pm.burstLeft > 0) {
         fireBurst(world, p, pm, st);
         continue;
@@ -1058,7 +1059,9 @@ function fireCross(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   const snake = world.rules.moves[pm.move]!.snake;
   for (let k = 0; k < st.count; k++) {
     // うたう: 音符はランダムな向きへ
-    const a = world.rules.moves[pm.move]!.crossRandom ? world.rng.next() * Math.PI * 2 : start + (k / st.count) * Math.PI * 2;
+    // 前へ流す技（ヘドロウェーブ）: 向いている方を中心にした crossArc の中に、端から端まで等しく並べる
+    const arc = world.rules.moves[pm.move]!.crossArc;
+    const a = world.rules.moves[pm.move]!.crossRandom ? world.rng.next() * Math.PI * 2 : arc !== undefined ? start + (st.count === 1 ? 0 : (k / (st.count - 1) - 0.5) * arc) : start + (k / st.count) * Math.PI * 2;
     const vx = Math.cos(a) * speed;
     const vy = Math.sin(a) * speed;
     // 蛇行する弾（ヘドロウェーブ）: 出した場所を ox・oy に覚え、時間から位置を決める。隣どうしで揺れの向きを逆にする

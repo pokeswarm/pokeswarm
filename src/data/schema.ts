@@ -741,6 +741,11 @@ export function findReappearingKind(
 // ---- 戦闘の共通設定 ----
 
 export const combatConfigSchema = z.object({
+  /**
+   * 押し出しの踏ん張り（07 の162章）: 押し出された敵は seconds の間、次の押し出しが multiplier 倍になる（引き寄せは数えない）。
+   * 自分を中心に押し出し続ける技で、敵が近寄れず放置で勝てていたのを、すき間ができるようにする
+   */
+  knockbackFatigue: z.object({ seconds: z.number().nonnegative(), multiplier: z.number().min(0).max(1) }).default({ seconds: 1.5, multiplier: 0.25 }),
   /** 光線（beam）: 数が1増えるごとに、幅をこの割合だけ広げる（本数は増やさない。作者の指摘 2026年10月27日） */
   beamWidthPerExtraCount: z.number().nonnegative().default(0.5),
   /** ポイントマックスの増えた分を威力に変える技（bonusCountToPower）: 1 増えるごとに、1 本分の威力のこの割合を足す（0.5 なら 1 本の技は +2 で 2 倍。07 の128章） */
@@ -1193,6 +1198,13 @@ export const moveDefSchema = z.object({
    * （にどげり: 前に円 2 個の当たり判定。脚の絵は描かない。作者の指摘 2026年11月1日）。speed は使わない
    */
   barrageAhead: z.boolean().optional(),
+  /**
+   * 止まっているときの倍率（なみのり・だくりゅう: 波に乗る。07 の162章）: 持ち主が移動の入力をしていない間、前の長方形の大きさを size 倍、
+   * 威力を power 倍にし、押し出さない
+   */
+  idleScale: z.object({ size: z.number().positive().max(1), power: z.number().min(0).max(1) }).optional(),
+  /** 押し出す向きを、当たり判定から敵へではなく、技の向き（向いている方向）にする（なみのり・サイコキネシス。07 の162章） */
+  knockbackAlongFacing: z.boolean().optional(),
   /** 向きを、使うたびにランダムに選ぶ（にどげり・まわしげり: 近くのランダムな向きへ。barrage・sweep で使う） */
   randomAim: z.boolean().optional(),
   /** 再使用を、出した技が消えてから数える（こなゆき・ふぶき: 雪が止んでから cooldown の間はダメージが起きない。作者の決定 2026年10月25日） */

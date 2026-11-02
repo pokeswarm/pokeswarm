@@ -145,6 +145,8 @@ export function testRules(
       typeMultipliers: { stab: 1.1, superEffective: 1.2, notVeryEffective: 0.8 },
       maxMoveSlots: 4,
       critMultiplier: 1.5,
+      // 押し出しの踏ん張りは、テストの決まりでは効かせない（07 の162章。押し出しの効き方を確かめるテストのため）
+      knockbackFatigue: { seconds: 0, multiplier: 1 },
     },
     moves: [testMove, ...(overrides.extraMoves ?? [])],
     types: TYPES,

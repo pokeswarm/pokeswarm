@@ -100,6 +100,7 @@ export function moveEnemies(world: World): void {
       e.x[i] = x + ((target.x - x) / d) * step;
       e.y[i] = y + ((target.y - y) / d) * step;
     }
+    if (e.kbGuard[i]! > 0) e.kbGuard[i]!--;
     // ノックバックは止まっていても効く
     if (e.kbTicks[i]! > 0) {
       e.x[i]! += e.kbVx[i]! * world.dt;

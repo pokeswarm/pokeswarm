@@ -9,5 +9,9 @@
     "notVeryEffective": 0.8
   },
   "maxMoveSlots": 4,
-  "critMultiplier": 1.5
+  "critMultiplier": 1.5,
+  "knockbackFatigue": {
+    "seconds": 2.5,
+    "multiplier": 0.2
+  }
 }

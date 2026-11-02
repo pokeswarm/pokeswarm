@@ -1930,9 +1930,26 @@
             "powerMultiplier": 0.15,
             "pull": 320
           }
+        },
+        {
+          "trigger": "eachHit",
+          "split": {
+            "sizeMultiplier": 0.3,
+            "powerMultiplier": 0.4,
+            "count": 1,
+            "speed": 520,
+            "durationSeconds": 0.3,
+            "spreadDegrees": 1,
+            "pierce": 4
+          }
         }
       ],
-      "sweep": 0.35
+      "sweep": 0.35,
+      "knockbackAlongFacing": true,
+      "idleScale": {
+        "size": 1,
+        "power": 0.5
+      }
     },
     "future-sight": {
       "pattern": "strike",
@@ -6106,7 +6123,12 @@
       ],
       "effect": "muddy-water",
       "teachOnly": true,
-      "followFacing": 720
+      "followFacing": 720,
+      "idleScale": {
+        "size": 0.55,
+        "power": 0.5
+      },
+      "knockbackAlongFacing": true
     },
     "lava-plume": {
       "pattern": "nova",
@@ -9316,7 +9338,12 @@
         }
       },
       "region": "hoenn",
-      "followFacing": 720
+      "followFacing": 720,
+      "idleScale": {
+        "size": 0.55,
+        "power": 0.5
+      },
+      "knockbackAlongFacing": true
     },
     "outrage": {
       "pattern": "barrage",

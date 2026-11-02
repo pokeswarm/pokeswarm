@@ -108,6 +108,8 @@ export function buildSimRules(region?: string): SimRules {
       randomAim: def.randomAim,
       ...(def.barrageWidth ? { barrageWidth: def.barrageWidth, barrageWidthPerLevel: def.barrageWidthPerLevel ?? 0 } : {}),
       ...(def.barrageAhead ? { barrageAhead: true } : {}),
+      idleScale: def.idleScale,
+      knockbackAlongFacing: def.knockbackAlongFacing,
       magnitude: def.magnitude,
       scatterArc: def.scatterArc,
       restAfterEnd: def.restAfterEnd,

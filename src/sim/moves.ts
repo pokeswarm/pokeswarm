@@ -166,6 +166,10 @@ export interface SimMoveDef {
   readonly barrageWidthPerLevel?: number;
   /** 連打を向いている方向へ順に置く（にどげり） */
   readonly barrageAhead?: boolean;
+  /** 止まっているときの大きさ・威力の倍率（なみのり。押し出さない） */
+  readonly idleScale?: { readonly size: number; readonly power: number };
+  /** 押し出す向きを技の向きにする */
+  readonly knockbackAlongFacing?: boolean;
   /** nova: 使うたびに強さを引く（マグニチュード） */
   readonly magnitude?: { readonly min: number; readonly max: number };
   /** scatter: 向いている方向の扇（度）の中に置く（いわなだれ） */

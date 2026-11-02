@@ -1,3 +1,4 @@
+import { boxOf } from '../sim/systems/attack';
 import Phaser from 'phaser';
 import { achievementsConfig, derivedStatSources, playablesConfig, effectRecipes, moveSprites, generated, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, regionStage, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig, type RegionStage } from '../data';
 import { buildSimRules, localName, mergeModifiers, permanentModifiers, playableLoadout } from '../data/simRules';
@@ -2281,10 +2282,8 @@ export class RunScene extends Phaser.Scene {
 
 /** 前方の長方形（キバの技）の当たり判定の、向きに沿った始まり・終わりと片側の幅（ワールドの長さ） */
 function boxShape(world: World, i: number): { from: number; to: number; half: number } {
-  const pr = world.projectiles;
-  const box = world.rules.moves[pr.move[i]!]!.frontBox;
-  const reach = pr.radius[i]!;
-  return { from: reach * (box?.start ?? 0), to: reach * (box?.end ?? 1), half: pr.length[i]! };
+  // 当たりの判定と同じ形（波に乗る技は、止まると小さい。07 の162章）
+  return boxOf(world, i);
 }
 
 /** 重なったときの表示の順（作者の決定）: ボス（中ボス・伝説も）2 > スウォーム（ビリリダマなど）1 > 雑魚 0 */

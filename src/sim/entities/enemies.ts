@@ -29,6 +29,8 @@ export class EnemyStore {
   readonly kbVx: Float64Array;
   readonly kbVy: Float64Array;
   readonly kbTicks: Uint16Array;
+  /** 押し出しの踏ん張りの残りの更新回数（0 でなければ、次の押し出しが弱い。07 の162章） */
+  readonly kbGuard: Uint16Array;
   /** 状態異常の残りの更新回数。[敵の index × 状態異常の種類数 + 種類の番号] */
   readonly statusTicks: Uint16Array;
   /** 状態異常を付けたプレイヤー（継続ダメージで倒したときのとどめに使う） */
@@ -76,6 +78,7 @@ export class EnemyStore {
     this.kbVx = new Float64Array(capacity);
     this.kbVy = new Float64Array(capacity);
     this.kbTicks = new Uint16Array(capacity);
+    this.kbGuard = new Uint16Array(capacity);
     this.statusTicks = new Uint16Array(capacity * statusCount);
     this.statusBy = new Uint16Array(capacity * statusCount);
     this.ghostTicks = new Uint16Array(capacity);
@@ -107,6 +110,7 @@ export class EnemyStore {
     this.vy[i] = vy;
     this.kbVx[i] = this.kbVy[i] = 0;
     this.kbTicks[i] = 0;
+    this.kbGuard[i] = 0;
     this.statusTicks.fill(0, i * this.statusCount, (i + 1) * this.statusCount);
     this.ghostTicks[i] = 0;
     this.markTicks[i] = 0;
@@ -144,6 +148,7 @@ export class EnemyStore {
     this.kbVx[i] = this.kbVx[last]!;
     this.kbVy[i] = this.kbVy[last]!;
     this.kbTicks[i] = this.kbTicks[last]!;
+    this.kbGuard[i] = this.kbGuard[last]!;
     this.ghostTicks[i] = this.ghostTicks[last]!;
     this.savedHp[i] = this.savedHp[last]!;
     this.markTicks[i] = this.markTicks[last]!;

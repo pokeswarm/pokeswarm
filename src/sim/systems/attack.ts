@@ -1271,8 +1271,10 @@ function fireNova(world: World, p: Player, pm: PlayerMove, st0: MoveStats): void
   const band = reachBand(world, pm.move, st.range);
   const start = band > 0 ? band : sc.size;
   const growth = Math.max(0, (st.range - start) / st.durationSeconds);
+  // 技の向きへ押す輪（サイコキネシス）は、向いている方向を覚える
+  const [fx, fy] = world.rules.moves[pm.move]!.knockbackAlongFacing ? axisToUnit(p.facingX, p.facingY) : [0, 0];
   for (let k = 0; k < st.count; k++) {
-    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: start, band, growth, life: st.durationSeconds * (1 + k * 0.6) });
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: start, band, growth, life: st.durationSeconds * (1 + k * 0.6), dirX: fx, dirY: fy });
   }
 }
 
@@ -1494,7 +1496,10 @@ export function moveProjectiles(world: World): void {
       const inner = pr.band[i]! > 0 ? pr.radius[i]! - pr.band[i]! - e.radius[j]! : 0;
       if (inner > 0 && d2 < inner * inner) continue;
       if (pr.shape[i] === SHAPE_SECTOR && !inSector(e.x[j]! - x, e.y[j]! - y, e.radius[j]!, pr.dirX[i]!, pr.dirY[i]!, pr.length[i]!)) continue;
-      if (boxDef && !inBox(e.x[j]! - x, e.y[j]! - y, e.radius[j]!, pr.dirX[i]!, pr.dirY[i]!, pr.radius[i]! * boxDef.start, pr.radius[i]! * boxDef.end, pr.length[i]!)) continue;
+      if (boxDef) {
+        const b = boxOf(world, i);
+        if (!inBox(e.x[j]! - x, e.y[j]! - y, e.radius[j]!, pr.dirX[i]!, pr.dirY[i]!, b.from, b.to, b.half)) continue;
+      }
       hitScratch[hits++] = j;
     }
     if (hits === 0) continue;
@@ -1541,10 +1546,17 @@ export function moveProjectiles(world: World): void {
       if (def.growOnHit) pr.radius[i] = Math.min(st.size * def.growOnHit.maxMultiplier, pr.radius[i]! + st.size * def.growOnHit.perHit);
       if (!local) continue;
       // ノックバックの向き: 直線は線の向き、それ以外は当たり判定から敵へ（重なっていれば進む向き）
-      const kx = line ? pr.dirX[i]! : e.x[j]! - x || pr.vx[i]!;
-      const ky = line ? pr.dirY[i]! : e.y[j]! - y || pr.vy[i]!;
+      // 技の向きへ押す技（なみのり・サイコキネシス。07 の162章）は、自分の後ろの敵も前へ押す
+      const along = !!def.knockbackAlongFacing;
+      const kx = line || along ? pr.dirX[i]! : e.x[j]! - x || pr.vx[i]!;
+      const ky = line || along ? pr.dirY[i]! : e.y[j]! - y || pr.vy[i]!;
+      // 波に乗る技は、止まっていると押し出さない
+      const idle = !!def.idleScale && ownerIdle(world, ownerId);
       // 効果（ノックバック・状態異常）は当てたプレイヤーの画面ですぐ付け、相手へは命中と一緒に送る
-      const fx = rollHitEffect(world, st, kx, ky, pr.knockback[i]!, def.randomStatuses);
+      let fx = rollHitEffect(world, st, kx, ky, idle ? 0 : pr.knockback[i]!, def.randomStatuses);
+      // 押し出しの踏ん張り（引き寄せは数えない）
+      const pushKb = Number.isNaN(pr.knockback[i]!) ? st.knockback : pr.knockback[i]!;
+      if (fx.kbTicks > 0 && pushKb > 0) fx = knockbackFatigue(world, j, fx);
       applyHitEffect(world, j, fx, ownerId);
       const kind = world.rules.enemies.kinds[e.kind[j]!];
       // 急所（クリティカットなど・技ごとの急所）の判定は、当てたプレイヤーのブラウザの乱数で行う
@@ -1570,7 +1582,8 @@ export function moveProjectiles(world: World): void {
         : pr.damage[i]! *
           Math.max(...moveTypesOf(def).map((t) => typeMultiplier(world.rules.types, world.rules.combat.typeMultipliers, t, owner?.types ?? [], kind?.types ?? []))) *
           (crit ? world.rules.combat.critMultiplier : 1) *
-          statusBonus;
+          statusBonus *
+          (idle ? def.idleScale!.power : 1);
       // ダメージの数字（設定でオンのときだけ。一撃は出さない）
       if (world.damageNumbers && !instakill) {
         const flags = typeFlags(world.rules.types, def.type, owner?.types ?? [], kind?.types ?? []) | (crit ? DMG_CRIT : 0);
@@ -1750,15 +1763,36 @@ function fxSourceOf(world: World, i: number, x: number, y: number): FxSource {
   const dirY = line || vlen === 0 ? pr.dirY[i]! : pr.vy[i]! / vlen;
   // 前の長方形（frontBox）は、その形も渡す（ブレイズキックの燃える道を長方形に重ねる）
   const box = pr.shape[i] === SHAPE_BOX ? boxOf(world, i) : undefined;
-  return { owner: pr.owner[i]!, move: pr.move[i]!, level: pr.level[i]!, damage: pr.damage[i]!, size: pr.radius[i]!, x, y, dirX, dirY, length: line ? pr.length[i]! : 0, serial: pr.serial[i]!, ...(box ? { box } : {}) };
+  return { owner: pr.owner[i]!, move: pr.move[i]!, level: pr.level[i]!, damage: pr.damage[i]!, size: pr.band[i]! > 0 && world.rules.moves[pr.move[i]!]!.knockbackAlongFacing ? pr.band[i]! : pr.radius[i]!, x, y, dirX, dirY, length: line ? pr.length[i]! : 0, serial: pr.serial[i]!, ...(box ? { box } : {}) };
 }
 
 /** 前の長方形（frontBox）の当たり判定 i の形: 根元から向きに沿った始まり・終わり、片側の幅（ワールドの単位） */
 export function boxOf(world: World, i: number): { from: number; to: number; half: number } {
   const pr = world.projectiles;
-  const box = world.rules.moves[pr.move[i]!]!.frontBox;
-  const reach = pr.radius[i]!;
-  return { from: reach * (box?.start ?? 0), to: reach * (box?.end ?? 1), half: pr.length[i]! };
+  const def = world.rules.moves[pr.move[i]!]!;
+  const box = def.frontBox;
+  // 波に乗る技（なみのり）: 持ち主が止まっていると波が小さい（07 の162章）
+  const k = def.idleScale && ownerIdle(world, pr.owner[i]!) ? def.idleScale.size : 1;
+  const reach = pr.radius[i]! * k;
+  return { from: reach * (box?.start ?? 0), to: reach * (box?.end ?? 1), half: pr.length[i]! * k };
+}
+
+/** 持ち主が移動の入力をしていないか（波に乗る技。どのブラウザでも、届いた入力で同じに決まる） */
+export function ownerIdle(world: World, id: number): boolean {
+  const p = world.players.find((q) => q.id === id);
+  return !!p && p.inputX === 0 && p.inputY === 0;
+}
+
+/**
+ * 押し出しの踏ん張り（07 の162章）: 少し前に押し出された敵への押し出しは弱い。押し出されていなければ、これから踏ん張る。
+ * 当てたプレイヤーのブラウザで決め、弱めた効果を相手へ送る
+ */
+export function knockbackFatigue(world: World, j: number, fx: HitEffect): HitEffect {
+  const f = world.rules.combat.knockbackFatigue;
+  const e = world.enemies;
+  if (e.kbGuard[j]! > 0) return { ...fx, kbx: fx.kbx * f.multiplier, kby: fx.kby * f.multiplier };
+  e.kbGuard[j] = Math.max(1, Math.round(f.seconds / world.dt));
+  return fx;
 }
 
 /** 当たり判定 i を消す。技そのもの（段階 0）なら end の効き方、印（段階 2）なら遅れた爆発を起こす */

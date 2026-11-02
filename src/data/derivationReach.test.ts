@@ -14,6 +14,8 @@ function reach(def: MoveDefData, s: Record<string, unknown>): number {
   if (p === 'melee') return def.frontBox ? (n('range') + n('size')) * def.frontBox.end : n('range') === 0 ? n('size') : n('range') + n('size');
   if (['sweep', 'spin', 'whip'].includes(p)) return n('range') + n('size');
   if (p === 'aura') return n('size');
+  // 前へ進む渦（はなびらのまい）は、中心が進む分も届く
+  if (p === 'spiral') return n('range') + (def.spiralDrift ?? 0) * n('durationSeconds');
   if (['nearest', 'facing', 'homing', 'cross', 'boomerang', 'bounce'].includes(p)) return n('speed') > 0 ? Math.min(n('range') || 9999, n('speed') * n('durationSeconds')) : n('range');
   return n('range');
 }

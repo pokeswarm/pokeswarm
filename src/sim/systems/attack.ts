@@ -984,6 +984,10 @@ function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     }
     return;
   }
+  // 前へ撃つ連鎖（10まんボルト）は、自分から見て向いている方の角度の中の敵へだけ跳ぶ（07 の164章）
+  const facingHalf = world.rules.moves[pm.move]!.chainFacingHalf;
+  const [afx, afy] = axisToUnit(p.facingX, p.facingY);
+  const ahead = (i: number): boolean => facingHalf === undefined || inSector(e.x[i]! - p.x, e.y[i]! - p.y, e.radius[i]!, afx, afy, facingHalf);
   let hops = 0;
   for (let k = 0; k < st.count; k++) {
     // 一番近い敵へ。chainMinHop があれば、それより離れた敵の中で一番近い敵（いなければ一番近い敵。しんそく: 広く倒す）
@@ -992,7 +996,7 @@ function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     let far = -1;
     let farD2 = reach * reach;
     for (const i of enemiesInRange(world, x, y, reach)) {
-      if (used.has(i)) continue;
+      if (used.has(i) || !ahead(i)) continue;
       const d2 = (e.x[i]! - x) ** 2 + (e.y[i]! - y) ** 2;
       if (d2 < bestD2) {
         bestD2 = d2;
@@ -1180,6 +1184,9 @@ function fireSpiral(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
       angularSpeed: turn,
       orbitRadius: 16,
       ox: Math.max(0, st.range - 16) / st.durationSeconds,
+      // うずの中心が前へ進む技（はなびらのまい）は、進む速さを vx・vy に覚える（うずでは使っていない欄）
+      vx: fx * (world.rules.moves[pm.move]!.spiralDrift ?? 0),
+      vy: fy * (world.rules.moves[pm.move]!.spiralDrift ?? 0),
     });
   }
 }
@@ -1435,8 +1442,9 @@ export function moveProjectiles(world: World): void {
     } else if (motion === MOTION_SPIRAL) {
       pr.angle[i]! += pr.angularSpeed[i]! * world.dt;
       pr.orbitRadius[i]! += pr.ox[i]! * world.dt;
-      pr.x[i] = owner.x + Math.cos(pr.angle[i]!) * pr.orbitRadius[i]!;
-      pr.y[i] = owner.y + Math.sin(pr.angle[i]!) * pr.orbitRadius[i]!;
+      const age = pr.maxLife[i]! - pr.life[i]!;
+      pr.x[i] = owner.x + pr.vx[i]! * age + Math.cos(pr.angle[i]!) * pr.orbitRadius[i]!;
+      pr.y[i] = owner.y + pr.vy[i]! * age + Math.sin(pr.angle[i]!) * pr.orbitRadius[i]!;
     } else if (motion === MOTION_ORBIT) {
       pr.angle[i]! += pr.angularSpeed[i]! * world.dt;
       pr.x[i] = owner.x + Math.cos(pr.angle[i]!) * pr.orbitRadius[i]!;

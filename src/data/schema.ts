@@ -1108,6 +1108,10 @@ export const moveDefSchema = z.object({
   chainMinHop: z.number().nonnegative().optional(),
   /** chain（連鎖）: 跳ばずに、自分から count 匹の別々の敵へまっすぐ稲妻を出す（ほうでん: まわりへ放電。作者の依頼 2026年10月28日） */
   chainRadial: z.boolean().optional(),
+  /** chain（連鎖）: 跳ぶ先を、自分から見て向いている方のこの角度（度）の中の敵だけにする（10まんボルト: 前へ撃つ。07 の164章） */
+  chainFacingDegrees: z.number().positive().max(360).optional(),
+  /** spiral（うず）: うずの中心が、出したときに向いていた方へこの速さ（/秒）で進む（はなびらのまい: 花びらの渦が前へ進む。07 の164章） */
+  spiralDrift: z.number().nonnegative().optional(),
   /**
    * chain（連鎖）: 跳び終えたら、最後に自分の所へ戻る線を出す（ボルトチェンジ: 残像が飛んでいって帰ってくる。07 の150章）。
    * 戻る線は、出番が来たときの自分の位置へ向ける。waitForEnd と使うと、帰ってくるまで次を出さない

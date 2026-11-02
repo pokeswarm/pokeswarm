@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import type { EffectRecipe, MoveSpritesData } from '../../data/schema';
-import { MOTION_SNAKE, snakeOffset, type ProjectileStore } from '../../sim/entities/projectiles';
+import { MOTION_SNAKE, SHAPE_SECTOR, snakeOffset, type ProjectileStore } from '../../sim/entities/projectiles';
 import { drawMoveArt, type SpriteOut } from '../moveArt';
 
 export type SpriteSpec = NonNullable<EffectRecipe['sprite']>;
@@ -13,6 +13,8 @@ export interface SpriteItem {
   readonly radius: number;
   /** 輪の帯の厚さ（0 なら半径の 3 割） */
   readonly band: number;
+  /** 扇の当たり判定の片側の開き（ラジアン）。輪の絵をこの角度の中だけに並べる（前へ吠える バークアウト。07 の164章） */
+  readonly arc?: number;
   readonly dirX: number;
   readonly dirY: number;
   readonly length: number;
@@ -240,6 +242,7 @@ export class MoveSprites {
         y: pr.prevY[i]! + (pr.y[i]! - pr.prevY[i]!) * alpha,
         radius: pr.radius[i]!,
         band: pr.band[i]!,
+        ...(pr.shape[i] === SHAPE_SECTOR && pr.length[i]! < Math.PI ? { arc: pr.length[i]! } : {}),
         dirX: pr.dirX[i]!,
         dirY: pr.dirY[i]!,
         length: pr.length[i]!,
@@ -405,13 +408,16 @@ export class MoveSprites {
         const band = (it.band > 0 ? it.band : outer * 0.3) * spec.size;
         const rc = Math.max(1, outer - band / 2);
         // 少なくとも 16 枚並べて、角ばった多角形に見えないようにする
-        const n = Math.max(16, Math.round((Math.PI * 2 * rc) / ((rows[0]!.length * band) / rows.length)));
-        const sx = (Math.PI * 2 * rc) / n / rows[0]!.length;
+        // 扇（arc）なら、向いている方を中心にその角度の中だけに並べる
+        const span = it.arc !== undefined ? it.arc * 2 : Math.PI * 2;
+        const ang0 = it.arc !== undefined ? Math.atan2(it.dirY, it.dirX) - it.arc : 0;
+        const n = Math.max(it.arc !== undefined ? 6 : 16, Math.round((span * rc) / ((rows[0]!.length * band) / rows.length)));
+        const sx = (span * rc) / n / rows[0]!.length;
         const sy = band / rows.length;
         const midFrame = this.frameOf(spec.id, 'middle', elapsed);
         const midCount = sp.parts.middle!.length;
         for (let k = 0; k < n; k++) {
-          const ang = (k / n) * Math.PI * 2;
+          const ang = ang0 + ((k + (it.arc !== undefined ? 0.5 : 0)) / n) * span;
           // varyTiles: 1枚ずつ違うコマ（だいばくはつの端の炎が、そろわずに揺れる）
           const frame = fk('middle', spec.varyTiles ? (midFrame + k * 3 + it.seed) % midCount : midFrame);
           put(frame, x + Math.cos(ang) * rc, y + Math.sin(ang) * rc, spec.upright ? 0 : ang + Math.PI / 2, spec.upright ? sy : sx, sy, a);

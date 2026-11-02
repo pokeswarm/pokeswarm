@@ -102,6 +102,8 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.pledge ? { pledge: def.pledge } : {}),
       aimStrongest: def.aimStrongest,
       aimFacing: def.aimFacing,
+      ...(def.chainFacingDegrees ? { chainFacingHalf: (def.chainFacingDegrees * Math.PI) / 360 } : {}),
+      ...(def.spiralDrift ? { spiralDrift: def.spiralDrift } : {}),
       chainRadial: def.chainRadial,
       frontBox: def.frontBox,
       ...(def.group ? { group: def.group } : {}),

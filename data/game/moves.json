@@ -1014,7 +1014,7 @@
         "count": 8,
         "speed": 0,
         "size": 16,
-        "range": 300,
+        "range": 200,
         "durationSeconds": 1.1,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -1056,7 +1056,8 @@
           "power": 1.9
         }
       ],
-      "curve": 260
+      "curve": 260,
+      "spiralDrift": 340
     },
     "sludge-bomb": {
       "pattern": "lob",
@@ -1500,7 +1501,7 @@
       ],
       "effects": [
         {
-          "trigger": "cast",
+          "trigger": "hit",
           "puddle": {
             "sizeMultiplier": 14,
             "powerMultiplier": 0.5,
@@ -1519,7 +1520,8 @@
           }
         }
       ],
-      "chainHopSeconds": 0.05
+      "chainHopSeconds": 0.05,
+      "chainFacingDegrees": 120
     },
     "rock-throw": {
       "pattern": "lob",
@@ -6010,7 +6012,7 @@
       "bonusCountToPower": true
     },
     "snarl": {
-      "pattern": "nova",
+      "pattern": "melee",
       "effect": "snarl",
       "sweep": 0.45,
       "base": {
@@ -6024,26 +6026,27 @@
         "hitIntervalSeconds": 0,
         "speed": 0,
         "count": 1,
-        "power": 117.3,
+        "power": 129.8,
         "cooldownSeconds": 1.9,
         "size": 22,
         "range": 220,
         "durationSeconds": 0.5,
         "knockback": 220,
-        "statusId": "attackDown"
+        "statusId": "attackDown",
+        "arcDegrees": 150
       },
       "levels": [
         {
           "range": 15,
-          "power": 19.6
+          "power": 13.4
         },
         {
           "statusSeconds": 0.5,
-          "power": 19.7
+          "power": 20.5
         },
         {
           "range": 15,
-          "power": 19.7
+          "power": 12.6
         },
         {
           "cooldownSeconds": -0.2,

@@ -63,13 +63,13 @@ describe('A: なみのり・だくりゅう は波に乗る', () => {
 });
 
 describe('B: サイコキネシス は向いている方向へ投げ飛ばす', () => {
-  it('動いているとき、自分の後ろの敵も前へ飛ばし、飛ばされた敵から前へ衝撃が出る', () => {
+  it('動いているとき、前の扇の敵を向いている方へ飛ばし、飛ばされた敵から前へ衝撃が出る（後ろは前の扇の外。07 の176章）', () => {
     const t = setup('psychic');
     const w = t.sim.world;
     expect(t.rules.moves[t.m]!.knockbackAlongFacing).toBe(true);
     // 動いているときだけ投げ飛ばす（止まっていると念が弱まり、押し出さない）
     t.p.inputX = 1;
-    w.enemies.add(1, 0, -70, 0, 1e6, 0, 10);
+    w.enemies.add(1, 0, 90, 30, 1e6, 0, 10);
     let pushed = false;
     let flung = false;
     for (let k = 0; k < 20; k++) {

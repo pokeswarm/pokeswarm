@@ -1097,7 +1097,7 @@ function fireCross(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
 
 /**
  * scatter（水たまり）: 自分の周り range の中のランダムな場所に、しばらく残る当たり判定を置く。
- * scatterJitter があれば、数と大きさも使うたびにランダムにする（マグニチュード）。
+ * scatterJitter があれば、数と大きさも使うたびにランダムにする（マグニチュード。大きいほど威力も大きい）。
  * scatterDelaySeconds があれば、出番を待つもの（stage 3）として置き、その秒数後に当たり判定が出る（つららおとし）
  */
 function fireScatter(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
@@ -1124,6 +1124,8 @@ function fireScatter(world: World, p: Player, pm: PlayerMove, st: MoveStats): vo
     world.projectiles.add({
       ...b0,
       radius,
+      // 大きさがランダムなもの（マグニチュード）は、大きい揺れほど強い
+      ...(jit ? { damage: b0.damage * (radius / b0.radius) } : {}),
       motion: MOTION_LINEAR,
       x: p.x + Math.cos(a) * r,
       y: p.y + Math.sin(a) * r,

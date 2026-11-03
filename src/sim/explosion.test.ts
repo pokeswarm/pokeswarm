@@ -79,16 +79,15 @@ describe('みらいよち', () => {
 });
 
 describe('持ち物の効き方', () => {
-  it('ポイントマックスで増えた念の当たりは、後から来る爆発を起こさない（サイコキネシス）', () => {
+  it('サイコキネシス（前の扇。07 の176章）は、ポイントマックスで扇が広がり、念の当たりは 1 つのまま', () => {
     const { sim, p, m } = setup('psychic');
     p.mods.amountBonus = 2;
     for (let k = 0; k < 40; k++) sim.world.enemies.add(k + 1, 0, (k % 8) * 40 - 160, Math.floor(k / 8) * 40 - 80, 1e9, 0, 10);
-    const st = playerMoveStats(sim.world, p, p.moves[0]!);
     sim.step([]);
     const pr = sim.world.projectiles;
     const main = [...Array(pr.count).keys()].filter((i) => pr.move[i] === m && pr.stage[i] === 0);
-    expect(main.length).toBe(st.count);
-    expect(main.filter((i) => pr.noFx[i]).length).toBe(2);
+    expect(main.length).toBe(1);
+    expect(pr.noFx[main[0]!]).toBe(0);
   });
 
   it('自分を中心に広がる技の半径は、範囲の強化で広がり、射程の強化は効かない（だいばくはつ）', () => {

@@ -5799,6 +5799,12 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'revenge-swing': () => revengeSwing(),
     'sacred-orb': () => sacredOrb(),
     'sacred-ember': () => sacredEmber(),
+    // 176章（円の技の作り直し その1）
+    'slam-crater': () => slamCrater(),
+    'charge-streak': () => chargeStreak(),
+    'ground-burst': () => groundBurst(),
+    'dark-orb': () => darkOrb(),
+    'dark-burst': () => darkBurst(),
 };
 
 /** 絵の名前の一覧 */
@@ -6278,4 +6284,132 @@ function sacredEmber(): SpriteOut {
     }),
   );
   return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/** のしかかり: 着地点で押しつぶした衝撃（真ん中の影と、外へ飛ぶ土ぼこりのかたまり・放射する衝撃の筋）。4 コマ */
+function slamCrater(): SpriteOut {
+  // 0 輪郭・1 こげ茶・2 茶・3 うす茶・4 クリーム・5 白
+  const palette = ['#2e1f17', '#5d4037', '#8d6e63', '#d7ccc8', '#efebe9', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v * 1.25);
+      const a = Math.atan2(v, u);
+      // 真ん中の押しつぶした影（だ円。コマが進むと薄れる）
+      if (f < 3 && d < 0.36 - f * 0.05) return f === 0 ? 1 : 2;
+      // 放射する衝撃の筋（8 本。最初の 2 コマ）
+      if (f < 2) {
+        for (let j = 0; j < 8; j++) {
+          const th = (j * Math.PI) / 4 + 0.2;
+          let da = Math.abs(a - th) % (Math.PI * 2);
+          if (da > Math.PI) da = Math.PI * 2 - da;
+          if (da * d < 0.025 && d > 0.38 && d < 0.5 + f * 0.2) return 4;
+        }
+      }
+      // 外へ飛ぶ土ぼこりのかたまり（6 つ。外へ進んで小さくなる）
+      for (let j = 0; j < 6; j++) {
+        const th = j * 1.047 + 0.5;
+        const r = 0.5 + f * 0.13;
+        const pr = 0.24 - f * 0.045;
+        const pd = Math.hypot(u - Math.cos(th) * r, v - Math.sin(th) * r * 0.8);
+        if (pd < pr) return pd < pr * 0.5 ? 4 : 3;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** すてみタックル: 前へ突っ込む勢いの筋（右向き。後ろへ流れる白い速さの線と、先の衝撃の弧）。前の四角に合わせて描く。3 コマ */
+function chargeStreak(): SpriteOut {
+  // 0 輪郭・1 灰・2 うす灰・3 白・4 黄
+  const palette = ['#263238', '#90a4ae', '#cfd8dc', '#ffffff', '#ffe082'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(32, (u, v) => {
+      // 先の衝撃の弧（右端の近く）
+      const tip = 0.62 + f * 0.08;
+      const arc = Math.hypot(u - tip + 0.5, v);
+      if (u > tip - 0.2 && Math.abs(arc - 0.5) < 0.05 && Math.abs(v) < 0.42) return f === 2 ? 2 : 3;
+      if (u > tip - 0.2 && Math.abs(arc - 0.5) < 0.09 && Math.abs(v) < 0.42) return 4;
+      // 後ろへ流れる速さの線（5 本。コマで流れる）
+      for (let k = 0; k < 5; k++) {
+        const y = (k - 2) * 0.16 + (k % 2 === 0 ? 0.02 : -0.02);
+        const len = 0.9 - Math.abs(k - 2) * 0.2;
+        const x0 = tip - 0.25 - ((f * 0.3 + k * 0.17) % 0.4);
+        if (Math.abs(v - y) < 0.025 && u < x0 && u > x0 - len) return u > x0 - len * 0.4 ? 3 : 2;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 60, parts: { main: frames.map(toRows) } };
+}
+
+/** マグニチュード: 地面が割れて盛り上がる揺れ（ひびの入った土の輪と、飛び出す土くれ）。大きさは揺れの強さで変わる。4 コマ */
+function groundBurst(): SpriteOut {
+  // 0 輪郭・1 濃い土・2 土・3 明るい土・4 砂
+  const palette = ['#2b1d0e', '#6d4c2f', '#a1774f', '#d7b98e', '#f3e2c0'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 割れた地面（真ん中。ひびが 5 本、外へ）
+      if (d < 0.5) {
+        for (let j = 0; j < 5; j++) {
+          const th = j * 1.257 + 0.3 + Math.sin(d * 10 + j) * 0.15;
+          let da = Math.abs(a - th) % (Math.PI * 2);
+          if (da > Math.PI) da = Math.PI * 2 - da;
+          if (da * d < 0.025) return 1;
+        }
+        if (d < 0.5 - (f === 3 ? 0.2 : 0) && f < 3) return d < 0.2 ? 3 : 2;
+      }
+      // 盛り上がるふち（でこぼこ）
+      const rim = 0.55 + Math.sin(a * 7 + f) * 0.04;
+      if (Math.abs(d - rim) < 0.06 && f < 3) return 4;
+      // 飛び出す土くれ
+      const r = 0.6 + f * 0.12;
+      for (let j = 0; j < 5; j++) {
+        const th = j * 1.257 + 0.9;
+        if (Math.hypot(u - Math.cos(th) * r, v - Math.sin(th) * r) < 0.08 - f * 0.012) return 2;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** あくのはどう: 飛んでいく黒い波動の玉（黒い芯のまわりを紫の渦が巻く。レシピの spin で回す）。2 コマ */
+function darkOrb(): SpriteOut {
+  // 0 輪郭・1 黒・2 濃い紫・3 紫・4 うす紫
+  const palette = ['#05020a', '#120a1c', '#4a148c', '#7e57c2', '#d1c4e9'];
+  const frames = [0, 1].map((f) =>
+    shape(14, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.9) return -1;
+      const a = Math.atan2(v, u) + d * 3 + f * 0.6;
+      const swirl = Math.sin(a * 3);
+      if (d < 0.35) return 1;
+      if (d > 0.75) return swirl > 0.2 ? 3 : 2;
+      return swirl > 0.5 ? 4 : swirl > -0.2 ? 3 : 2;
+    }),
+  );
+  return { palette, frameMs: 100, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/** あくのはどう: 当たった所で弾ける黒い波動（黒い輪が広がり、紫のとげが外へ）。4 コマ */
+function darkBurst(): SpriteOut {
+  const palette = ['#05020a', '#120a1c', '#4a148c', '#7e57c2', '#d1c4e9'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      const r = 0.3 + f * 0.18;
+      if (Math.abs(d - r) < 0.07) return f < 2 ? 1 : 2;
+      if (Math.abs(d - r) < 0.11) return 3;
+      // 外へのとげ（10 本）
+      const spike = ((a / (Math.PI * 2)) * 10 + 10) % 1;
+      if (d > r && d < r + 0.25 - f * 0.04 && Math.abs(spike - 0.5) < 0.12 * (1 - (d - r) / 0.25)) return f < 2 ? 4 : 3;
+      if (f === 0 && d < 0.2) return 1;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }

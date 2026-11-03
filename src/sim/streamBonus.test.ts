@@ -25,7 +25,7 @@ describe('ポイントマックスと太い追従レーザー', () => {
     const pump = at('hydro-pump', 1);
     expect(pump.with.count).toBe(1);
     expect(pump.with.power).toBeCloseTo(pump.base.power * 2);
-    for (const key of ['hyper-beam', 'solar-beam', 'explosion', 'last-resort', 'dark-pulse', 'snarl', 'muddy-water', 'lava-plume']) expect(at(key, 1).with.count).toBe(1);
+    for (const key of ['hyper-beam', 'solar-beam', 'explosion', 'last-resort', 'snarl', 'muddy-water', 'lava-plume']) expect(at(key, 1).with.count).toBe(1);
     const boom = at('explosion', 1);
     expect(boom.with.power).toBeCloseTo(boom.base.power * 2);
     // ふつうの技は本数が増える

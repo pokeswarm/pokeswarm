@@ -16,19 +16,23 @@ function setup(move: string, seed = 1) {
 }
 
 describe('マグニチュード', () => {
-  it('自分から広がる波で、使うたびに強さ（4〜10）を引いて威力と届く距離が変わる', () => {
-    const got = new Set<number>();
-    for (let seed = 1; seed <= 6; seed++) {
+  it('届く範囲のランダムな場所で揺れが起き、使うたびに数と大きさが変わる。大きい揺れほど強い（07 の176章）', () => {
+    const sizes = new Set<number>();
+    const counts = new Set<number>();
+    for (let seed = 1; seed <= 8; seed++) {
       const t = setup('magnitude', seed);
       const def = t.rules.moves[t.m]!;
-      expect(def.pattern).toBe('nova');
-      expect(def.magnitude).toEqual({ min: 4, max: 10 });
+      expect(def.pattern).toBe('scatter');
       t.sim.step([]);
-      const ring = t.find((i) => t.pr.move[i] === t.m);
-      expect(ring).toHaveLength(1);
-      got.add(Math.round(t.pr.growth[ring[0]!]! * 10));
+      const quakes = t.find((i) => t.pr.move[i] === t.m);
+      counts.add(quakes.length);
+      for (const i of quakes) {
+        sizes.add(Math.round(t.pr.radius[i]!));
+        expect(t.pr.damage[i]! / t.pr.radius[i]!).toBeCloseTo(t.pr.damage[quakes[0]!]! / t.pr.radius[quakes[0]!]!);
+      }
     }
-    expect(got.size).toBeGreaterThan(1);
+    expect(sizes.size).toBeGreaterThan(2);
+    expect(counts.size).toBeGreaterThan(1);
   });
 });
 

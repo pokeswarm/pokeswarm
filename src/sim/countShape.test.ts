@@ -42,11 +42,11 @@ describe('技の数が増えたとき', () => {
     expect(ib).toHaveLength(1);
     expect(b.pr.radius[ib[0]!]!).toBeCloseTo(a.pr.radius[ia]! * (1 + (2 * b.rules.combat.boxCountGrowthPct) / 100));
   });
-  it('自分の周り全部（のしかかり）は、数を増やさず威力が上がる', () => {
-    const b = setup('body-slam', 1);
+  it('自分の周り全部（だいばくはつ）は、数を増やさず威力が上がる（のしかかり は前の着地点になった。07 の176章）', () => {
+    const b = setup('explosion', 1);
     const pm = b.p.moves[0]!;
     const st = playerMoveStats(b.sim.world, b.p, pm);
-    const base = setup('body-slam', 0);
+    const base = setup('explosion', 0);
     const st0 = playerMoveStats(base.sim.world, base.p, base.p.moves[0]!);
     expect(st.count).toBe(st0.count);
     expect(st.power).toBeGreaterThan(st0.power);

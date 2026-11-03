@@ -412,7 +412,8 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
       p.consumedMoves = [...(p.consumedMoves ?? []), fromMove.move];
       // ほかの技も使って進化する技（ばくれつパンチ）: 使った技はなくなり、持ち物で覚え直さない
       // 持っていれば消費する技（ばくれつパンチ: ほのおのパンチ・かみなりパンチ）も同じ
-      const d = world.rules.derivations.find((x) => x.to === offer.to && (x.withMoves || x.consumes || x.inheritLevels || x.levelCap));
+      // 同じ技へ進化する派生がほかの系統にもある（ばくれつパンチ: ワンリキーとニョロモ）ので、元の技と系統で探す
+      const d = world.rules.derivations.find((x) => x.to === offer.to && x.from === fromMove.move && (x.line === null || x.line === p.line) && (x.withMoves || x.consumes || x.inheritLevels || x.levelCap));
       const used = [...(d?.withMoves ?? []), ...(d?.consumes ?? [])];
       // 材料にした技の強化分を受け継ぐ（ばくれつパンチ。最大まで）
       // 最大レベルを、持っていて消費した技（consumes）の数で決める（ばくれつパンチ: 0 なら Lv8・1つで Lv16・2つで Lv24）

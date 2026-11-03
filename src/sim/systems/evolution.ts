@@ -32,6 +32,11 @@ export function checkEvolution(world: World, p: Player): void {
   }
 }
 
+/** この持ち物を持つと、今の姿がすぐ進化するか（石・交換の道具）。選択画面の「おや……？」に使う（07 の169章） */
+export function itemEvolvesNow(rules: World['rules'], species: number, item: number): boolean {
+  return !!rules.species[species]?.evolutions.some((e) => (e.trigger === 'item' || e.trigger === 'trade') && e.item === item);
+}
+
 /** 今の区間の時間帯。夜のある地方（ジョウト）だけ。カントーには昼夜を入れない（07 の66.2）ので、時間帯のなつきの進化はしない */
 function timeOfDay(world: World): 'day' | 'night' | null {
   const nights = world.rules.nightSections;

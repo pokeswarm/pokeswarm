@@ -38,15 +38,16 @@ describe('ポッポ: ふきとばし → つばさでうつ → ぼうふう', (
     expect(def.effects.map((e) => e.trigger)).toEqual(['every', 'end']);
     expect(def.effects[0]!.explode?.pull).toBe(240);
   });
-  it('ぼうふう は ピジョット で、つばさでうつ が最大 かつ エアスラッシュ Lv8 を持つときだけ出る', () => {
+  it('ぼうふう は ピジョット で、エアスラッシュ が最大 ＋ スピーダー（カントーの形。07 の169章。支えの技は使わない）', () => {
     const t = setup();
     t.p.moves = [];
-    t.give('wing-attack', 1);
+    t.give('air-slash', 1);
     t.p.moves[0]!.level = moveMaxLevel(t.rules, t.p.moves[0]!);
+    t.p.items = [{ item: t.rules.items.findIndex((i) => i.key === 'x-speed'), level: 1 }];
     expect(t.derives('hurricane')).toBeUndefined();
     t.p.species = t.species('pidgeot');
-    expect(t.derives('hurricane')).toBeUndefined();
-    t.give('air-slash', 8);
     expect(t.derives('hurricane')).toBeDefined();
+    t.p.items = [];
+    expect(t.derives('hurricane')).toBeUndefined();
   });
 });

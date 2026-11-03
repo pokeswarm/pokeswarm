@@ -31,18 +31,18 @@ describe('ポリゴン', () => {
     expect(sim.world.projectiles.count).toBe(0);
   });
 
-  it('新しい技は覚えない。レベル42で、スピードスターが最大ならトライアタックへ（持ち物はいらない）', () => {
+  it('新しい技は覚えない。スピードスターが最大 ＋ アップグレード でトライアタックへ（07 の169章）', () => {
     const { rules, sim, p } = setup();
     const swift = moveIndexOf(rules, 'swift');
     const tri = moveIndexOf(rules, 'tri-attack');
     p.moves[0]!.level = rules.moves[swift]!.levels.length;
     const derives = () => makeOffers(sim.world, p).filter((o) => o.kind === 'derive');
     for (let k = 0; k < 10; k++) expect(makeOffers(sim.world, p).some((o) => o.kind === 'moveNew')).toBe(false);
-    (sim.world as { level: number }).level = 41;
     expect(derives()).toEqual([]);
-    (sim.world as { level: number }).level = 42;
+    const upGrade = rules.items.findIndex((i) => i.key === 'up-grade');
+    p.items.push({ item: upGrade, level: 1 });
     const offer = derives()[0]!;
-    expect(offer).toMatchObject({ kind: 'derive', to: tri, item: -1, unique: true });
+    expect(offer).toMatchObject({ kind: 'derive', to: tri, item: upGrade, unique: true });
     applyOffer(sim.world, p, offer);
     expect(p.moves[0]!.move).toBe(tri);
   });

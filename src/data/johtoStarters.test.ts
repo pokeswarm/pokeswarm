@@ -6,10 +6,10 @@ import { buildSimRules } from './simRules';
 describe('ジョウトの御三家（07 の48.3・66.3）', () => {
   const rules = buildSimRules('johto');
   const move = (key: string): number => rules.moves.findIndex((m) => m.key === key);
-  // 系統, 最初の技, 派生の材料, 派生技, 固有技の材料（07 の75章）, 固有技
+  // 系統, 最初の技, 派生の材料, 派生技, 固有技の材料（07 の75章。持ち物は 169章でイメージに合うものに）, 固有技
   const chains = [
-    ['cyndaquil', 'ember', 'charcoal', 'flamethrower', 'pp-max', 'eruption'],
-    ['chikorita', 'sleep-powder', 'miracle-seed', 'synthesis', 'metronome', 'solar-beam'],
+    ['cyndaquil', 'ember', 'charcoal', 'flamethrower', 'hp-up', 'eruption'],
+    ['chikorita', 'sleep-powder', 'miracle-seed', 'synthesis', 'zoom-lens', 'solar-beam'],
     ['totodile', 'scratch', 'mystic-water', 'bite', 'x-attack', 'crunch'],
   ] as const;
 

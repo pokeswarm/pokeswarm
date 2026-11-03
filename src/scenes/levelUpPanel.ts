@@ -5,6 +5,7 @@ import { localName } from '../data/simRules';
 import { getLocale, t, tMaybe } from '../i18n';
 import type { Player } from '../sim/entities/player';
 import { derivationCompletedBy } from '../sim/systems/leveling';
+import { itemEvolvesNow } from '../sim/systems/evolution';
 import { itemIconKey, moveIconKey } from '../render/Icons';
 import { windowCss, compactScreen } from '../render/pixelUi';
 import { isTouchDevice } from '../render/TouchJoystick';
@@ -21,7 +22,7 @@ export interface OfferText {
   detail: string;
   /** 派生・固有技そのもののカード */
   special: boolean;
-  /** 「おや……？」を出す（以前に達成した派生で、このカードを取ると条件がそろう） */
+  /** 「おや……？」を出す（以前に達成した派生で、このカードを取ると条件がそろう。取るとポケモンが進化する持ち物） */
   evolvable: boolean;
   /** アイコンのテクスチャのキー */
   icon: string;
@@ -160,12 +161,12 @@ export function moveDetail(world: World, move: number): string {
 /**
  * 候補を、カードに出す文章にする（名前は PokeAPI の各言語の名前、それ以外は翻訳ファイル）。
  * 派生の材料などのヒントは出さない。「おや……？」は、以前に達成した派生（discovered に派生先の技のキー）で、
- * このカードを取ると条件がそろうときだけ出す。
+ * このカードを取ると条件がそろうときと、取ると今の姿が進化する持ち物（進化の石・メタルコート など。07 の169章）に出す。
  */
 export function offerText(world: World, p: Player, offer: UpgradeOffer, discovered: ReadonlySet<string>): OfferText {
   const r = world.rules;
   const completes = derivationCompletedBy(world, p, offer);
-  const evolvable = completes !== null && discovered.has(r.moves[completes.to]!.key);
+  const evolvable = (completes !== null && discovered.has(r.moves[completes.to]!.key)) || (offer.kind === 'itemNew' && itemEvolvesNow(r, p.species, offer.item));
   const base = { special: false, evolvable, gains: [] as string[] };
   switch (offer.kind) {
     case 'moveNew':

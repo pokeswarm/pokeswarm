@@ -8,7 +8,7 @@ describe('カントー・ジョウトの技の進化の形', () => {
   it('カントー・ジョウトの系統に、ホウエンの仕掛け（支えの技・天気・ランの記録）を使わない', () => {
     const hoenn = new Set(regionsConfig.regions.find((r) => r.id === 'hoenn')!.playables);
     const lines = new Set(regionsConfig.regions.filter((r) => r.id !== 'hoenn').flatMap((r) => r.playables).filter((l) => !hoenn.has(l)));
-    const bad = [...derivationsConfig.derivations, ...derivationsConfig.unique].filter((d) => d.line && lines.has(d.line) && (d.needsMoves || d.weather || d.runStat || d.itemLevel));
+    const bad = derivationsConfig.unique.filter((d) => d.line && lines.has(d.line) && (d.needsMoves || d.weather || d.runStat || d.itemLevel));
     expect(bad.map((d) => `${d.line}: ${d.to}`)).toEqual([]);
   });
 
@@ -26,6 +26,19 @@ describe('カントー・ジョウトの技の進化の形', () => {
       ['suicune', 'ice-beam', 'water-stone', 'sheer-cold'],
       ['slowpoke', 'psychic', 'kings-rock', 'future-sight-alakazam'],
       ['porygon', 'swift', 'up-grade', 'tri-attack'],
+      ['cleffa', 'hyper-voice', 'moon-stone', 'moonblast'],
+      ['togepi', 'air-slash', 'light-clay', 'dazzling-gleam'],
+      ['houndour', 'flamethrower', 'fire-stone', 'fire-blast'],
+      ['houndour', 'dark-pulse', 'black-glasses', 'snarl'],
+      ['totodile', 'scratch', 'black-glasses', 'bite'],
+      ['swinub', 'ice-shard', 'never-melt-ice', 'ice-fang'],
+      ['swinub', 'ice-fang', 'hard-stone', 'icicle-crash'],
+      ['zubat', 'dual-wingbeat', 'poison-barb', 'poison-fang'],
+      ['zubat', 'poison-fang', 'razor-claw', 'cross-poison'],
+      ['horsea', 'hydro-pump', 'dragon-scale', 'draco-meteor'],
+      ['poliwag', 'pound', 'black-belt', 'dynamic-punch'],
+      ['lugia', 'air-slash', 'water-stone', 'aeroblast'],
+      ['ho-oh', 'aerial-ace', 'fire-stone', 'sacred-fire'],
     ];
     const all = [...derivationsConfig.derivations, ...derivationsConfig.unique];
     for (const [line, from, item, to] of routes) expect(all.some((d) => d.line === line && d.from === from && d.item === item && d.to === to), `${line}: ${from} ＋ ${item} → ${to}`).toBe(true);

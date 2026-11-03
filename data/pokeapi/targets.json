@@ -508,7 +508,10 @@
     "dragon-dance",
     "dive",
     "aqua-ring",
-    "teleport"
+    "teleport",
+    "moonblast",
+    "dazzling-gleam",
+    "poison-fang"
   ],
   "items": [
     "x-attack",
@@ -562,7 +565,8 @@
     "dragon-scale",
     "silver-wing",
     "rainbow-wing",
-    "prism-scale"
+    "prism-scale",
+    "black-glasses"
   ],
   "regions": [
     "kanto",

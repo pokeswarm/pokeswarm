@@ -283,7 +283,8 @@ function applyEffect(world: World, fx: MoveEffect, index: number, src: FxSource)
     for (let k = 0; k < sk.count; k++) {
       // ばらばらの向き・長さは共有の乱数ではなく、時刻と位置から決める（どのブラウザでも同じ形になる）
       const rand = (salt: number): number => hash01(world.seed, world.tick, Math.floor(src.x) * 7919 + Math.floor(src.y), 1000 + k * 7 + salt);
-      const a = sk.randomAngles ? angle0 + ((k + rand(1) * 0.8 - 0.4) / sk.count) * Math.PI * 2 : angle0 + (k / sk.count) * Math.PI * 2;
+      const fixed = sk.anglesDegrees?.[k];
+      const a = fixed !== undefined ? (fixed * Math.PI) / 180 : sk.randomAngles ? angle0 + ((k + rand(1) * 0.8 - 0.4) / sk.count) * Math.PI * 2 : angle0 + (k / sk.count) * Math.PI * 2;
       const len = base * (1 - sk.lengthJitter * rand(2));
       const dx = Math.cos(a);
       const dy = Math.sin(a);

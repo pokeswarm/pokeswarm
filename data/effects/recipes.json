@@ -6353,6 +6353,161 @@
         "originY": 0.85,
         "seconds": 0.4
       }
+    },
+    "moonblast": {
+      "extends": "fairy.base",
+      "projectile": {
+        "glowScale": 1.4,
+        "coreScale": 0.2,
+        "glowColor": "#f8bbd0"
+      },
+      "impact": {
+        "flash": {
+          "color": "#fce4ec",
+          "radius": 46,
+          "durationMs": 160,
+          "alpha": 0.6
+        }
+      },
+      "sprite": {
+        "id": "moon-orb",
+        "fit": "circle",
+        "size": 1.7,
+        "rotate": "spin",
+        "spinDegPerSec": 60
+      },
+      "effectSprite": {
+        "id": "moon-burst",
+        "fit": "circle",
+        "size": 1.1
+      }
+    },
+    "dazzling-gleam": {
+      "extends": "fairy.base",
+      "projectile": {
+        "shapeAlpha": 0.3,
+        "glowColor": "#fce4ec"
+      },
+      "screenFlash": {
+        "color": "#fff0f7",
+        "alpha": 0.18,
+        "durationMs": 160
+      },
+      "sprite": {
+        "id": "gleam-cone",
+        "fit": "cone",
+        "size": 1,
+        "alpha": 0.9
+      }
+    },
+    "fire-blast": {
+      "extends": "fire.base",
+      "impact": {
+        "flash": {
+          "radius": 50
+        }
+      },
+      "sprite": {
+        "id": "fire-blast-ball",
+        "fit": "circle",
+        "size": 1.7,
+        "rotate": "velocity"
+      },
+      "effectLineSprite": {
+        "id": "fire-blast-arm",
+        "fit": "line",
+        "size": 1
+      }
+    },
+    "ice-fang": {
+      "extends": "ice.base",
+      "projectile": {
+        "shapeAlpha": 0.25
+      },
+      "sprite": {
+        "id": "ice-fang-spikes",
+        "fit": "front",
+        "size": 1
+      }
+    },
+    "poison-fang": {
+      "extends": "poison.base",
+      "projectile": {
+        "shapeAlpha": 0.25
+      },
+      "sprite": {
+        "id": "poison-fangs",
+        "fit": "front",
+        "size": 1
+      },
+      "lingerSprite": {
+        "id": "venom-pool",
+        "fit": "circle",
+        "size": 1.1,
+        "alpha": 0.9
+      }
+    },
+    "draco-meteor": {
+      "extends": "dragon.base",
+      "impact": {
+        "flash": {
+          "radius": 60
+        }
+      },
+      "fall": {
+        "id": "draco-meteor",
+        "height": 320,
+        "size": 1.6,
+        "shards": {
+          "id": "draco-flare",
+          "count": 6,
+          "distance": 60,
+          "seconds": 0.4,
+          "size": 0.4
+        }
+      },
+      "lingerSprite": {
+        "id": "draco-flare",
+        "fit": "circle",
+        "size": 1,
+        "alpha": 0.85
+      }
+    },
+    "aeroblast": {
+      "extends": "flying.base",
+      "projectile": {
+        "shapeAlpha": 0.25
+      },
+      "sprite": {
+        "id": "aeroblast-beam",
+        "fit": "line",
+        "size": 1.2
+      }
+    },
+    "sacred-fire": {
+      "extends": "fire.base",
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "radius": 14,
+          "alpha": 0.3
+        }
+      },
+      "projectile": {
+        "glowScale": 1.2,
+        "coreScale": 0.4,
+        "glowColor": "#ffd54f",
+        "shapeAlpha": 0.25
+      },
+      "sprite": {
+        "id": "sacred-flame",
+        "fit": "circle",
+        "size": 1.3,
+        "originY": 0.86,
+        "alpha": 0.95
+      }
     }
   }
 }

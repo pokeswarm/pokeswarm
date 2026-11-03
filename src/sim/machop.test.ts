@@ -133,7 +133,7 @@ describe('ワンリキーのパンチ', () => {
     }
   });
 
-  it('ニョロボンが覚える ばくれつパンチ は最大 Lv8', () => {
+  it('ニョロボンの ばくれつパンチ は はたく（最大）＋ くろおび の技進化で、最大 Lv8（ワンリキーの決まりを使わない。07 の169章）', () => {
     const rules = buildSimRules('johto');
     const sim = new Simulation({ tickRate: 30, seed: 1, rules });
     const lo = playableLoadout(rules, 'poliwag');
@@ -141,6 +141,13 @@ describe('ワンリキーのパンチ', () => {
     p.species = rules.species.findIndex((x) => x.key === 'poliwhirl');
     p.items = [{ item: rules.items.findIndex((it) => it.key === 'water-stone'), level: 1 }];
     checkEvolution(sim.world, p);
+    expect(p.moves.some((m) => m.move === moveIndexOf(rules, 'dynamic-punch'))).toBe(false);
+    const pound = moveIndexOf(rules, 'pound');
+    p.moves.push({ move: pound, level: rules.moves[pound]!.levels.length, cooldown: 0, burstLeft: 0, burstTimer: 0 });
+    p.items.push({ item: rules.items.findIndex((it) => it.key === 'black-belt'), level: 1 });
+    const offer = makeOffers(sim.world, p).find((o) => o.kind === 'derive' && o.to === moveIndexOf(rules, 'dynamic-punch'))!;
+    expect(offer).toBeDefined();
+    applyOffer(sim.world, p, offer);
     const dp = p.moves.find((m) => m.move === moveIndexOf(rules, 'dynamic-punch'))!;
     expect(moveMaxLevel(rules, dp)).toBe(8);
   });

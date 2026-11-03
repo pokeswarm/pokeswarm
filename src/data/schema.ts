@@ -1150,6 +1150,8 @@ export const moveEffectSchema = z.object({
       randomAngles: z.boolean().default(false),
       /** 長さのばらつき（0〜1。1本ごとに 1 − この割合 〜 1 倍） */
       lengthJitter: z.number().min(0).max(1).default(0),
+      /** 等しい角度の代わりに、画面に対するこの向き（度。右が 0・下が 90）に出す（だいもんじ の「大」の字。count はこの数に合わせる。07 の169章） */
+      anglesDegrees: z.array(z.number()).optional(),
     })
     .optional(),
   /** 岩の群れ: その場のまわり radius の中のランダムな場所に、count 個の残る当たり判定を置く（ストーンエッジの突き出す岩。作者の指摘 2026年10月25日） */

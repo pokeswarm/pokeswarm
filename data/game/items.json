@@ -24,6 +24,7 @@
     "never-melt-ice": { "category": "type", "maxLevel": 5, "perLevel": { "typePowerPct": { "ice": 15 } } },
     "black-belt": { "category": "type", "maxLevel": 5, "perLevel": { "typePowerPct": { "fighting": 15 } } },
     "poison-barb": { "category": "type", "maxLevel": 5, "perLevel": { "typePowerPct": { "poison": 15 } } },
+    "black-glasses": { "category": "type", "maxLevel": 5, "perLevel": { "typePowerPct": { "dark": 15 } } },
     "soft-sand": { "category": "type", "maxLevel": 5, "perLevel": { "typePowerPct": { "ground": 15 } } },
     "sharp-beak": { "category": "type", "maxLevel": 5, "perLevel": { "typePowerPct": { "flying": 15 } } },
     "twisted-spoon": { "category": "type", "maxLevel": 5, "perLevel": { "typePowerPct": { "psychic": 15 } } },

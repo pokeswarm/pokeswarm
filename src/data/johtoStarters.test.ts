@@ -10,7 +10,7 @@ describe('ジョウトの御三家（07 の48.3・66.3）', () => {
   const chains = [
     ['cyndaquil', 'ember', 'charcoal', 'flamethrower', 'hp-up', 'eruption'],
     ['chikorita', 'sleep-powder', 'miracle-seed', 'synthesis', 'zoom-lens', 'solar-beam'],
-    ['totodile', 'scratch', 'mystic-water', 'bite', 'x-attack', 'crunch'],
+    ['totodile', 'scratch', 'black-glasses', 'bite', 'x-attack', 'crunch'],
   ] as const;
 
   it('ジョウトの最初の3匹は御三家（次にタマゴ）。最後の姿までプレイヤーのドット絵がある', () => {

@@ -11347,6 +11347,491 @@
           "power": 0.6
         }
       ]
+    },
+    "moonblast": {
+      "pattern": "facing",
+      "effect": "moonblast",
+      "base": {
+        "intervalSeconds": 0.12,
+        "count": 1,
+        "speed": 320,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 358.8,
+        "cooldownSeconds": 1.3,
+        "size": 20,
+        "range": 460,
+        "durationSeconds": 1.6,
+        "knockback": 120
+      },
+      "levels": [
+        {
+          "power": 60.2
+        },
+        {
+          "size": 3,
+          "power": 60.1
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 27
+        },
+        {
+          "count": 1,
+          "power": -224.8
+        },
+        {
+          "size": 3,
+          "power": 28.2
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 6.1
+        },
+        {
+          "power": 26.4
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "hit",
+          "explode": {
+            "sizeMultiplier": 3.2,
+            "powerMultiplier": 0.6
+          }
+        }
+      ]
+    },
+    "dazzling-gleam": {
+      "pattern": "melee",
+      "effect": "dazzling-gleam",
+      "base": {
+        "intervalSeconds": 0.1,
+        "count": 1,
+        "speed": 0,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 92.6,
+        "cooldownSeconds": 1.5,
+        "size": 30,
+        "range": 300,
+        "durationSeconds": 0.3,
+        "knockback": 140,
+        "arcDegrees": 110
+      },
+      "levels": [
+        {
+          "power": 15.5
+        },
+        {
+          "range": 12,
+          "power": 15.5
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 8.1
+        },
+        {
+          "power": 14.7
+        },
+        {
+          "range": 12,
+          "power": 14.7
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 4.8
+        },
+        {
+          "power": 13.9
+        }
+      ]
+    },
+    "fire-blast": {
+      "pattern": "facing",
+      "effect": "fire-blast",
+      "base": {
+        "intervalSeconds": 0.15,
+        "count": 1,
+        "speed": 300,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.3,
+        "statusSeconds": 3,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 496.8,
+        "cooldownSeconds": 1.8,
+        "size": 22,
+        "range": 420,
+        "durationSeconds": 1.4,
+        "knockback": 160,
+        "statusId": "burn"
+      },
+      "levels": [
+        {
+          "power": 83.3
+        },
+        {
+          "size": 3,
+          "power": 83.3
+        },
+        {
+          "cooldownSeconds": -0.1,
+          "power": 41.9
+        },
+        {
+          "power": 78.6
+        },
+        {
+          "size": 3,
+          "power": 78.7
+        },
+        {
+          "cooldownSeconds": -0.1,
+          "power": 23.3
+        },
+        {
+          "power": 74.1
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "end",
+          "spikes": {
+            "sizeMultiplier": 0.9,
+            "powerMultiplier": 0.5,
+            "count": 5,
+            "length": 90,
+            "durationSeconds": 0.8,
+            "hitIntervalSeconds": 0.25,
+            "lengthPerLevel": 6,
+            "anglesDegrees": [
+              0,
+              -90,
+              180,
+              60,
+              120
+            ]
+          }
+        }
+      ]
+    },
+    "ice-fang": {
+      "pattern": "melee",
+      "effect": "ice-fang",
+      "base": {
+        "intervalSeconds": 0.1,
+        "count": 1,
+        "speed": 0,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0.15,
+        "statusSeconds": 1.2,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 41.5,
+        "cooldownSeconds": 0.9,
+        "size": 200,
+        "range": 10,
+        "durationSeconds": 0.4,
+        "knockback": 100,
+        "statusId": "freeze",
+        "arcDegrees": 0
+      },
+      "levels": [
+        {
+          "size": 8,
+          "power": 8
+        },
+        {
+          "power": 9.2
+        },
+        {
+          "cooldownSeconds": -0.06,
+          "power": 4.7
+        },
+        {
+          "size": 8,
+          "power": 6.6
+        },
+        {
+          "statusChance": 0.05,
+          "power": 8.4
+        },
+        {
+          "cooldownSeconds": -0.06,
+          "power": 2.2
+        },
+        {
+          "size": 10,
+          "power": 4.8
+        }
+      ],
+      "body": {
+        "lungeDistance": 20,
+        "afterimages": 0
+      },
+      "frontBox": {
+        "start": 0.05,
+        "end": 1,
+        "halfWidth": 0.18
+      }
+    },
+    "poison-fang": {
+      "pattern": "melee",
+      "effect": "poison-fang",
+      "base": {
+        "intervalSeconds": 0.1,
+        "count": 1,
+        "speed": 400,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.5,
+        "statusSeconds": 4,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 36.5,
+        "cooldownSeconds": 0.8,
+        "size": 118,
+        "range": 60,
+        "durationSeconds": 0.3,
+        "knockback": 160,
+        "statusId": "poison",
+        "arcDegrees": 0
+      },
+      "levels": [
+        {
+          "size": 6,
+          "power": 7.2
+        },
+        {
+          "power": 8.1
+        },
+        {
+          "size": 6,
+          "power": 6.7
+        },
+        {
+          "statusChance": 0.1,
+          "power": 7.9
+        },
+        {
+          "size": 6,
+          "power": 6.1
+        },
+        {
+          "power": 7.7
+        },
+        {
+          "size": 8,
+          "power": 5
+        }
+      ],
+      "body": {
+        "lungeDistance": 26,
+        "afterimages": 0
+      },
+      "frontBox": {
+        "start": 0.25,
+        "end": 0.95,
+        "halfWidth": 0.35
+      },
+      "effects": [
+        {
+          "trigger": "hit",
+          "puddle": {
+            "sizeMultiplier": 0.4,
+            "powerMultiplier": 0.12,
+            "durationSeconds": 2.5,
+            "hitIntervalSeconds": 0.5
+          }
+        }
+      ]
+    },
+    "draco-meteor": {
+      "pattern": "scatter",
+      "effect": "draco-meteor",
+      "base": {
+        "intervalSeconds": 0.1,
+        "count": 4,
+        "speed": 0,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 214.4,
+        "cooldownSeconds": 2.2,
+        "size": 40,
+        "range": 470,
+        "durationSeconds": 0.3,
+        "knockback": 140
+      },
+      "levels": [
+        {
+          "power": 35.9
+        },
+        {
+          "size": 4,
+          "power": 22
+        },
+        {
+          "cooldownSeconds": -0.12,
+          "power": 17.5
+        },
+        {
+          "count": 1,
+          "power": -1.7
+        },
+        {
+          "size": 4,
+          "power": 13.6
+        },
+        {
+          "cooldownSeconds": -0.12,
+          "power": 8.5
+        },
+        {
+          "count": 1,
+          "power": -3.3
+        }
+      ],
+      "scatterDelaySeconds": 0.55,
+      "effects": [
+        {
+          "trigger": "spawn",
+          "puddle": {
+            "sizeMultiplier": 0.8,
+            "powerMultiplier": 0.1,
+            "durationSeconds": 1.5,
+            "hitIntervalSeconds": 0.4
+          }
+        }
+      ]
+    },
+    "aeroblast": {
+      "pattern": "beam",
+      "effect": "aeroblast",
+      "base": {
+        "intervalSeconds": 0.1,
+        "count": 1,
+        "speed": 0,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.12,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 58.5,
+        "cooldownSeconds": 1.4,
+        "size": 20,
+        "range": 480,
+        "durationSeconds": 0.45,
+        "knockback": 120,
+        "critChancePct": 30
+      },
+      "levels": [
+        {
+          "power": 9.9
+        },
+        {
+          "size": 3,
+          "power": 5.5
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 4.5
+        },
+        {
+          "range": 30,
+          "power": 6.6
+        },
+        {
+          "size": 3,
+          "power": 3.9
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 2.3
+        },
+        {
+          "range": 30,
+          "power": 5.2
+        }
+      ]
+    },
+    "sacred-fire": {
+      "pattern": "eruption",
+      "effect": "sacred-fire",
+      "base": {
+        "intervalSeconds": 0.12,
+        "count": 1,
+        "speed": 0,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.25,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.5,
+        "statusSeconds": 4,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 60.4,
+        "size": 34,
+        "range": 340,
+        "durationSeconds": 0.5,
+        "knockback": 120,
+        "cooldownSeconds": 1.5,
+        "statusId": "burn"
+      },
+      "levels": [
+        {
+          "size": 3,
+          "power": 7.1
+        },
+        {
+          "power": 9.7
+        },
+        {
+          "range": 20,
+          "power": 9.7
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 4.5
+        },
+        {
+          "size": 3,
+          "power": 5
+        },
+        {
+          "range": 20,
+          "power": 8.8
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 2.3
+        }
+      ],
+      "eruption": {
+        "stages": 6,
+        "sizeGrowth": 0.06
+      }
     }
   }
 }

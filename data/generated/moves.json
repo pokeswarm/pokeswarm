@@ -431,6 +431,18 @@
     "type": "dark",
     "damageClass": "special"
   },
+  "dazzling-gleam": {
+    "names": {
+      "ja": "マジカルシャイン",
+      "en": "Dazzling Gleam",
+      "fr": "Éclat Magique",
+      "de": "Zauberschein",
+      "es": "Brillo Mágico",
+      "it": "Magibrillio"
+    },
+    "type": "fairy",
+    "damageClass": "special"
+  },
   "dig": {
     "names": {
       "ja": "あなをほる",
@@ -1487,6 +1499,18 @@
     "type": "ice",
     "damageClass": "status"
   },
+  "moonblast": {
+    "names": {
+      "ja": "ムーンフォース",
+      "en": "Moonblast",
+      "fr": "Pouvoir Lunaire",
+      "de": "Mondgewalt",
+      "es": "Fuerza Lunar",
+      "it": "Forza Lunare"
+    },
+    "type": "fairy",
+    "damageClass": "special"
+  },
   "moonlight": {
     "names": {
       "ja": "つきのひかり",
@@ -1665,6 +1689,18 @@
       "it": "Spettrotuffo"
     },
     "type": "ghost",
+    "damageClass": "physical"
+  },
+  "poison-fang": {
+    "names": {
+      "ja": "どくどくのキバ",
+      "en": "Poison Fang",
+      "fr": "Crochet Venin",
+      "de": "Giftzahn",
+      "es": "Colmillo Veneno",
+      "it": "Velenodenti"
+    },
+    "type": "poison",
     "damageClass": "physical"
   },
   "poison-jab": {

@@ -185,7 +185,7 @@ describe('ジョウトだけのポケモン（07 の80章）', () => {
     }
   });
 
-  it('進化したとき技が空いていれば覚える: バンギラス すなあらし、キングドラ たつまき、ニョロボン ばくれつパンチ、ニョロトノ あまごい', () => {
+  it('進化したとき技が空いていれば覚える: バンギラス すなあらし、キングドラ たつまき、ニョロトノ あまごい（ニョロボンの ばくれつパンチ は技進化。07 の169章）', () => {
     for (const [line, steps, move] of [
       ['larvitar', ['pupitar', 'tyranitar'], 'sandstorm'],
       ['horsea', ['seadra', 'kingdra'], 'twister'],
@@ -197,7 +197,7 @@ describe('ジョウトだけのポケモン（07 の80章）', () => {
       expect(s.p.species).toBe(s.species(steps[steps.length - 1]!));
       expect(s.keys()).toContain(move);
     }
-    for (const [item, form, move] of [['water-stone', 'poliwrath', 'dynamic-punch'], ['kings-rock', 'politoed', 'rain-dance']] as const) {
+    for (const [item, form, move] of [['kings-rock', 'politoed', 'rain-dance']] as const) {
       const s = setup('poliwag');
       s.w.level = 30;
       s.p.items = [{ item: s.rules.items.findIndex((it) => it.key === item), level: 1 }];

@@ -42,6 +42,7 @@
       "speedMultiplier": 0,
       "damageTakenMultiplier": 1,
       "breaksOnDamage": true,
+      "wakeDelaySeconds": 0.3,
       "color": "#7986cb"
     },
     {

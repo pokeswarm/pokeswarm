@@ -59,7 +59,7 @@ export class RunSounds {
           audio.sfx.play('evolve');
           break;
         case 'itemCollected':
-          if (ev.kind === 'potion' && ev.by === this.localId) audio.sfx.play('item.potion');
+          if ((ev.kind === 'potion' || ev.kind === 'moomoo-milk') && ev.by === this.localId) audio.sfx.play('item.potion');
           else if (ev.kind === 'magnet') audio.sfx.play('item.magnet');
           else if (ev.kind === 'buff' && ev.by === this.localId) audio.sfx.play('levelUp');
           break;

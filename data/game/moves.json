@@ -4232,13 +4232,13 @@
       "pattern": "sweep",
       "effect": "double-slap",
       "base": {
-        "power": 133.6,
+        "power": 106.1,
         "cooldownSeconds": 0.9,
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 0,
-        "size": 50,
-        "range": 30,
+        "size": 58,
+        "range": 50,
         "durationSeconds": 0.4,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -4252,33 +4252,33 @@
       },
       "levels": [
         {
-          "power": 22.4
+          "power": 17.8
         },
         {
           "size": 6,
-          "power": 13.3
+          "power": 11.6
         },
         {
-          "power": 21.2
+          "power": 17.1
         },
         {
           "cooldownSeconds": -0.1,
-          "power": -2.2
+          "power": -1.9
         },
         {
           "spreadDegrees": 60,
-          "power": 0.7
+          "power": -1
         },
         {
-          "power": 17.2
+          "power": 13.7
         },
         {
           "size": 6,
-          "power": 5.6
+          "power": 5.9
         }
       ],
       "body": {
-        "lungeDistance": 10,
+        "lungeDistance": 18,
         "afterimages": 0
       }
     },
@@ -7714,13 +7714,6 @@
       "pattern": "passive",
       "effect": "bulk-up",
       "region": "hoenn",
-      "learners": [
-        "torchic"
-      ],
-      "learnForms": [
-        "combusken",
-        "blaziken"
-      ],
       "base": {
         "power": 0,
         "cooldownSeconds": 99,
@@ -8363,7 +8356,6 @@
     "arm-thrust": {
       "pattern": "barrage",
       "effect": "arm-thrust",
-      "region": "hoenn",
       "body": {
         "lungeDistance": 10,
         "afterimages": 0
@@ -8806,7 +8798,7 @@
       "effect": "body-slam",
       "sweep": 0.45,
       "base": {
-        "power": 13.7,
+        "power": 17.2,
         "cooldownSeconds": 0.5,
         "count": 1,
         "intervalSeconds": 0.1,
@@ -8816,7 +8808,7 @@
         "durationSeconds": 0.24,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
-        "knockback": 400,
+        "knockback": 260,
         "knockbackSeconds": 0.12,
         "spreadDegrees": 0,
         "statusId": "paralysis",
@@ -8827,32 +8819,34 @@
       },
       "levels": [
         {
-          "power": 3.2
+          "power": 3.9
         },
         {
           "range": 20,
-          "power": 0.6
+          "power": 0.8
         },
         {
           "statusChance": 0.1,
-          "power": 2.8
+          "power": 3.4
         },
         {
-          "power": 2.7
+          "power": 3.5
         },
         {
-          "cooldownSeconds": -0.3,
-          "power": -12.7
+          "power": 3.4
         },
         {
           "range": 20,
-          "power": -0.2
+          "power": -0.6
         },
         {
-          "power": 1
+          "power": 3.1
         }
       ],
-      "region": "hoenn"
+      "hpCost": {
+        "pct": 0.7,
+        "minHpPct": 15
+      }
     },
     "earth-power": {
       "pattern": "strike",
@@ -8920,6 +8914,7 @@
     "yawn": {
       "pattern": "cross",
       "effect": "yawn",
+      "region": "hoenn",
       "base": {
         "power": 7.7,
         "cooldownSeconds": 2.2,
@@ -8971,15 +8966,7 @@
       "snake": {
         "amplitude": 10,
         "wavelength": 90
-      },
-      "learners": [
-        "slakoth"
-      ],
-      "learnForms": [
-        "vigoroth",
-        "slaking"
-      ],
-      "region": "hoenn"
+      }
     },
     "thrash": {
       "pattern": "barrage",
@@ -10342,13 +10329,6 @@
           "power": -1.4
         }
       ],
-      "learners": [
-        "wynaut"
-      ],
-      "learnForms": [
-        "wobbuffet"
-      ],
-      "region": "hoenn",
       "effects": [
         {
           "trigger": "hurt",
@@ -10413,8 +10393,7 @@
       "body": {
         "lungeDistance": 18,
         "afterimages": 0
-      },
-      "region": "hoenn"
+      }
     },
     "stealth-rock": {
       "pattern": "lob",
@@ -11833,6 +11812,573 @@
         "stages": 6,
         "sizeGrowth": 0.06
       }
+    },
+    "harden": {
+      "pattern": "passive",
+      "effect": "harden",
+      "base": {
+        "power": 0,
+        "cooldownSeconds": 99,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 1,
+        "range": 0,
+        "durationSeconds": 0.1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "passive": [
+        {
+          "defensePct": 8
+        },
+        {
+          "defensePct": 8
+        },
+        {
+          "defensePct": 8
+        },
+        {
+          "defensePct": 8
+        },
+        {
+          "defensePct": 8
+        },
+        {
+          "defensePct": 8
+        },
+        {
+          "defensePct": 8
+        },
+        {
+          "defensePct": 8
+        }
+      ]
+    },
+    "defense-curl": {
+      "pattern": "passive",
+      "effect": "defense-curl",
+      "base": {
+        "power": 0,
+        "cooldownSeconds": 99,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 1,
+        "range": 0,
+        "durationSeconds": 0.1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "passive": [
+        {
+          "defensePct": 6,
+          "typePowerPct": {
+            "rock": 5
+          }
+        },
+        {
+          "defensePct": 6,
+          "typePowerPct": {
+            "rock": 5
+          }
+        },
+        {
+          "defensePct": 6,
+          "typePowerPct": {
+            "rock": 5
+          }
+        },
+        {
+          "defensePct": 6,
+          "typePowerPct": {
+            "rock": 5
+          }
+        },
+        {
+          "defensePct": 6,
+          "typePowerPct": {
+            "rock": 5
+          }
+        },
+        {
+          "defensePct": 6,
+          "typePowerPct": {
+            "rock": 5
+          }
+        },
+        {
+          "defensePct": 6,
+          "typePowerPct": {
+            "rock": 5
+          }
+        },
+        {
+          "defensePct": 6,
+          "typePowerPct": {
+            "rock": 5
+          }
+        }
+      ]
+    },
+    "iron-defense": {
+      "pattern": "passive",
+      "effect": "iron-defense",
+      "base": {
+        "power": 0,
+        "cooldownSeconds": 99,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 1,
+        "range": 0,
+        "durationSeconds": 0.1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "passive": [
+        {
+          "defensePct": 20
+        },
+        {
+          "defensePct": 20
+        },
+        {
+          "defensePct": 20
+        },
+        {
+          "defensePct": 20
+        },
+        {
+          "defensePct": 20
+        },
+        {
+          "defensePct": 20
+        },
+        {
+          "defensePct": 20
+        },
+        {
+          "defensePct": 20
+        }
+      ]
+    },
+    "milk-drink": {
+      "pattern": "lob",
+      "effect": "milk-drink",
+      "lobTarget": "random",
+      "harmless": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 0,
+        "count": 1,
+        "speed": 300,
+        "size": 8,
+        "range": 110,
+        "durationSeconds": 0.7,
+        "knockback": 0,
+        "cooldownSeconds": 12
+      },
+      "levels": [
+        {
+          "cooldownSeconds": -0.8
+        },
+        {
+          "range": 10
+        },
+        {
+          "cooldownSeconds": -0.8
+        },
+        {
+          "cooldownSeconds": -0.8
+        },
+        {
+          "range": 10
+        },
+        {
+          "cooldownSeconds": -0.8
+        },
+        {
+          "cooldownSeconds": -0.8
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "end",
+          "pickup": "moomoo-milk"
+        }
+      ]
+    },
+    "snore": {
+      "pattern": "nova",
+      "effect": "snore",
+      "onlyWhileAsleep": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.3,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.3,
+        "statusSeconds": 0.5,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 6.7,
+        "count": 1,
+        "speed": 0,
+        "size": 36,
+        "range": 180,
+        "durationSeconds": 0.5,
+        "knockback": 200,
+        "cooldownSeconds": 1,
+        "statusId": "flinch"
+      },
+      "levels": [
+        {
+          "power": 2.9
+        },
+        {
+          "range": 14,
+          "power": 2.9
+        },
+        {
+          "statusChance": 0.1,
+          "power": 2.8
+        },
+        {
+          "cooldownSeconds": -0.1,
+          "power": 1.1
+        },
+        {
+          "range": 14,
+          "power": 2.6
+        },
+        {
+          "size": 6,
+          "power": 2.6
+        },
+        {
+          "statusChance": 0.1,
+          "power": 2.5
+        }
+      ]
+    },
+    "stomp": {
+      "pattern": "melee",
+      "effect": "stomp",
+      "base": {
+        "intervalSeconds": 0.1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.12,
+        "statusChance": 0.3,
+        "statusSeconds": 0.5,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 11.6,
+        "count": 1,
+        "speed": 0,
+        "size": 44,
+        "range": 36,
+        "durationSeconds": 0.2,
+        "knockback": 260,
+        "cooldownSeconds": 1.3,
+        "arcDegrees": 360,
+        "statusId": "flinch"
+      },
+      "levels": [
+        {
+          "power": 5
+        },
+        {
+          "size": 3,
+          "power": 4.3
+        },
+        {
+          "statusChance": 0.1,
+          "power": 4.8
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 1.3
+        },
+        {
+          "size": 3,
+          "power": 3.4
+        },
+        {
+          "range": 10,
+          "power": 1.1
+        },
+        {
+          "statusChance": 0.1,
+          "power": 3.8
+        }
+      ],
+      "body": {
+        "lungeDistance": 12,
+        "afterimages": 0
+      }
+    },
+    "charm": {
+      "pattern": "melee",
+      "effect": "charm",
+      "damageClass": "physical",
+      "base": {
+        "intervalSeconds": 0.1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0.7,
+        "statusSeconds": 3,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 10.2,
+        "count": 1,
+        "speed": 0,
+        "size": 64,
+        "range": 0,
+        "durationSeconds": 0.3,
+        "knockback": 80,
+        "cooldownSeconds": 1.6,
+        "arcDegrees": 360,
+        "statusId": "attackDown"
+      },
+      "levels": [
+        {
+          "power": 4.3
+        },
+        {
+          "size": 4,
+          "power": 3.5
+        },
+        {
+          "statusChance": 0.1,
+          "power": 4.2
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": 0.9
+        },
+        {
+          "size": 4,
+          "power": 2.5
+        },
+        {
+          "statusSeconds": 1,
+          "power": 3.5
+        },
+        {
+          "statusChance": 0.1,
+          "power": 3.5
+        }
+      ]
+    },
+    "play-rough": {
+      "pattern": "melee",
+      "effect": "play-rough",
+      "base": {
+        "intervalSeconds": 0.1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.15,
+        "knockbackSeconds": 0.06,
+        "statusChance": 0.5,
+        "statusSeconds": 4,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 13.6,
+        "count": 1,
+        "speed": 0,
+        "size": 86,
+        "range": 0,
+        "durationSeconds": 0.6,
+        "knockback": 60,
+        "cooldownSeconds": 1.4,
+        "arcDegrees": 360,
+        "statusId": "attackDown"
+      },
+      "levels": [
+        {
+          "power": 3.1
+        },
+        {
+          "size": 4,
+          "power": 2.4
+        },
+        {
+          "statusChance": 0.1,
+          "power": 3
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 0.3
+        },
+        {
+          "size": 4,
+          "power": 1.8
+        },
+        {
+          "durationSeconds": 0.1,
+          "power": 2.5
+        },
+        {
+          "statusChance": 0.1,
+          "power": 2.6
+        }
+      ]
+    },
+    "disarming-voice": {
+      "pattern": "homing",
+      "effect": "disarming-voice",
+      "base": {
+        "intervalSeconds": 0.1,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 13,
+        "count": 2,
+        "speed": 320,
+        "size": 9,
+        "range": 380,
+        "durationSeconds": 2,
+        "knockback": 60,
+        "cooldownSeconds": 1.3
+      },
+      "levels": [
+        {
+          "power": 5.6
+        },
+        {
+          "count": 1,
+          "power": -2.5
+        },
+        {
+          "power": 3.7
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": 0.1
+        },
+        {
+          "count": 1,
+          "power": -2.6
+        },
+        {
+          "range": 20,
+          "power": 2.3
+        },
+        {
+          "power": 2.4
+        }
+      ]
+    },
+    "dazzling-gleam-jigglypuff": {
+      "pattern": "nova",
+      "effect": "dazzling-gleam-jigglypuff",
+      "nameOf": "dazzling-gleam",
+      "base": {
+        "intervalSeconds": 0.1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.3,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 26.9,
+        "count": 1,
+        "speed": 0,
+        "size": 40,
+        "range": 250,
+        "durationSeconds": 0.5,
+        "knockback": 160,
+        "cooldownSeconds": 1.3
+      },
+      "levels": [
+        {
+          "power": 6.1
+        },
+        {
+          "size": 4,
+          "power": 6.1
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 3.4
+        },
+        {
+          "range": 16,
+          "power": 5.7
+        },
+        {
+          "size": 4,
+          "power": 5.8
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 1.8
+        },
+        {
+          "range": 16,
+          "power": 5.4
+        }
+      ],
+      "chargeWhileMoving": true
     }
   }
 }

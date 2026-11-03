@@ -197,7 +197,7 @@ describe('技の出し方（区切り2で追加）', () => {
 
   it('ねむりはダメージを受けると治る（継続ダメージでは治らない）', () => {
     const r = testRules({ move: { cooldownSeconds: 100, power: 1 } });
-    r.status.kinds.push({ id: 'sleep', damagePerSecond: 0, speedMultiplier: 0, damageTakenMultiplier: 1, contactDamageMultiplier: 1, breaksOnDamage: true, healsAttacker: false, color: '#000000' });
+    r.status.kinds.push({ id: 'sleep', damagePerSecond: 0, speedMultiplier: 0, damageTakenMultiplier: 1, contactDamageMultiplier: 1, breaksOnDamage: true, wakeDelaySeconds: 0, healsAttacker: false, color: '#000000' });
     const sim = new Simulation({ tickRate: 30, seed: 1, rules: r });
     sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150 });
     const e = sim.world.enemies;
@@ -205,6 +205,27 @@ describe('技の出し方（区切り2で追加）', () => {
     const SLEEP = r.status.kinds.length - 1;
     e.applyStatus(0, SLEEP, 300, 1);
     for (let t = 0; t < 30; t++) sim.step([]);
+    expect(e.hasStatus(0, SLEEP)).toBe(false);
+  });
+
+  it('ねむり（wakeDelaySeconds）: 攻撃を受けても少しの間は止まったままで、その後に起きる（07 の173章）', () => {
+    const r = testRules({ move: { cooldownSeconds: 100, power: 1 } });
+    r.status.kinds.push({ id: 'sleep', damagePerSecond: 0, speedMultiplier: 0, damageTakenMultiplier: 1, contactDamageMultiplier: 1, breaksOnDamage: true, wakeDelaySeconds: 0.3, healsAttacker: false, color: '#000000' });
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules: r });
+    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150 });
+    const e = sim.world.enemies;
+    e.add(1, 0, 150, 0, 100, 0, 10);
+    const SLEEP = r.status.kinds.length - 1;
+    e.applyStatus(0, SLEEP, 300, 1);
+    let hitAt = -1;
+    for (let t = 0; t < 60 && hitAt < 0; t++) {
+      sim.step([]);
+      if (e.hp[0]! < 100) hitAt = t;
+    }
+    expect(hitAt).toBeGreaterThanOrEqual(0);
+    // 当たった直後はまだ眠っている。0.3 秒（9 回）たつと起きる
+    expect(e.hasStatus(0, SLEEP)).toBe(true);
+    for (let t = 0; t < 10; t++) sim.step([]);
     expect(e.hasStatus(0, SLEEP)).toBe(false);
   });
 });

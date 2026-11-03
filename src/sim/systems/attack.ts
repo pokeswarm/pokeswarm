@@ -243,14 +243,18 @@ export function useMoves(world: World): void {
     }
     // 倒れている間・凍っている間（伝説戦のぜったいれいど）は技を使わない
     if (p.down || p.frozenTicks) continue;
-    // ねむる（カビゴン）: 眠っている間と起きる動きの間は、ほかの技を出さない
-    if (stepRest(world, p)) continue;
+    // 眠っている間・起きる動きの間は、眠っている間だけ出す技（いびき）のほかは出さない
+    const resting = stepRest(world, p);
+    const asleep = resting && p.sleep?.asleep === true;
+    if (resting && !(asleep && p.moves.some((m) => world.rules.moves[m.move]?.onlyWhileAsleep))) continue;
     // 順番に出す技（ワンリキーのパンチ）の、次に出せるまでの秒数
     if (p.groupTimers) for (const g of Object.keys(p.groupTimers)) p.groupTimers[g]! -= world.dt;
     for (const pm of p.moves) {
       const def = world.rules.moves[pm.move];
       // いつも効く技（かくばる・テクスチャー）は使わない（効果は持ち物と同じく、いつも足されている）
       if (!def || def.pattern === 'passive' || def.pattern === 'rest') continue;
+      // いびき: 眠っている間だけ出す（ほかの技は眠っている間は出さない）
+      if (!!def.onlyWhileAsleep !== asleep) continue;
       const st = playerMoveStats(world, p, pm);
       // 特性が HP の少なさで効いている（こんじょう など）: ランの記録（固有技の条件。07 の134章）
       if (pm === p.moves[0] && pinchMods(world, p)) bumpRunStat(world, p, 'pinch');
@@ -1481,8 +1485,8 @@ export function moveProjectiles(world: World): void {
       expire(world, i);
       continue;
     }
-    // 遅れて弾ける印は当たらない
-    if (pr.stage[i] === 2) continue;
+    // 遅れて弾ける印と、敵に当たらない技（ミルクのみのびん）は当たらない
+    if (pr.stage[i] === 2 || world.rules.moves[pr.move[i]!]!.harmless) continue;
     tickEveryEffects(world, i);
     // 障害物は技も遮る（飛んでいく技は当たると消える）。跳ね返る技（ボルテッカー）は枠の端で跳ね返り続けるので、障害物は通り抜ける
     if ((motion === MOTION_HOMING || motion === MOTION_BOOMERANG || motion === MOTION_LOB || motion === MOTION_SNAKE || (motion === MOTION_LINEAR && (pr.vx[i] !== 0 || pr.vy[i] !== 0))) && insideObstacle(world, pr.x[i]!, pr.y[i]!)) {

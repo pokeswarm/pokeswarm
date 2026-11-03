@@ -511,7 +511,14 @@
     "teleport",
     "moonblast",
     "dazzling-gleam",
-    "poison-fang"
+    "poison-fang",
+    "harden",
+    "defense-curl",
+    "iron-defense",
+    "milk-drink",
+    "charm",
+    "play-rough",
+    "disarming-voice"
   ],
   "items": [
     "x-attack",
@@ -566,7 +573,8 @@
     "silver-wing",
     "rainbow-wing",
     "prism-scale",
-    "black-glasses"
+    "black-glasses",
+    "moomoo-milk"
   ],
   "regions": [
     "kanto",

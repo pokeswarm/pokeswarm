@@ -184,6 +184,10 @@ export interface SimMoveDef {
   readonly scatterArc?: number;
   /** scatter: range の中のランダムな敵の足元に置く（りゅうせいぐん） */
   readonly scatterOnEnemies?: boolean;
+  /** 敵に当たらない（ミルクのみ） */
+  readonly harmless?: boolean;
+  /** ねむる で眠っている間だけ出す（いびき） */
+  readonly onlyWhileAsleep?: boolean;
   /** 向きを使うたびにランダムに選ぶ（にどげり・まわしげり） */
   readonly randomAim?: boolean;
   /** 再使用を、出した技が消えてから数える（こなゆき・ふぶき） */

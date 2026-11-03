@@ -61,10 +61,16 @@ export function tickStatuses(world: World): void {
   }
 }
 
-/** ダメージを受けたら治る状態異常（ねむり）を治す。HP を減らした側（ソロ・ホスト）が呼ぶ */
+/**
+ * ダメージを受けたら治る状態異常（ねむり）を治す。HP を減らした側（ソロ・ホスト）が呼ぶ。
+ * wakeDelaySeconds があれば、残りをその秒数まで縮める（止まったまま少し待ってから動き出す。07 の173章）
+ */
 export function breakOnDamage(world: World, i: number): void {
   const e = world.enemies;
   for (let s = 0; s < world.statusKinds.length; s++) {
-    if (world.statusKinds[s]!.breaksOnDamage) e.statusTicks[i * e.statusCount + s] = 0;
+    const kind = world.statusKinds[s]!;
+    if (!kind.breaksOnDamage) continue;
+    const k = i * e.statusCount + s;
+    e.statusTicks[k] = Math.min(e.statusTicks[k]!, Math.round(kind.wakeDelaySeconds / world.dt));
   }
 }

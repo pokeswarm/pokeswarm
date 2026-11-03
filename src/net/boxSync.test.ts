@@ -18,6 +18,7 @@ function rules() {
       boxes: { max: 0, hits: 1, radius: 14, spawnSeconds: 999, firstSpawnSeconds: 999, distanceMin: 300, distanceMax: 400, despawnDistance: 5000 },
       items: {
         potion: { dropChance: 0, healPct: 30 },
+        'moomoo-milk': { healPct: 15, maxOnMap: 3 },
         magnet: { dropChance: 0, speed: 1400 },
         'rare-candy': { revealSeconds: 1, holdSeconds: 1, levels: [{ levels: 1, weight: 1 }] },
         buff: { buffs: [{ item: 'x-speed', seconds: 10, mods: { moveSpeedPct: 50 }, weight: 1 }] },

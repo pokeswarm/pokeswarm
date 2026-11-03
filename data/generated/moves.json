@@ -311,6 +311,18 @@
     "type": "steel",
     "damageClass": "physical"
   },
+  "charm": {
+    "names": {
+      "ja": "あまえる",
+      "en": "Charm",
+      "fr": "Charme",
+      "de": "Charme",
+      "es": "Encanto",
+      "it": "Fascino"
+    },
+    "type": "fairy",
+    "damageClass": "status"
+  },
   "close-combat": {
     "names": {
       "ja": "インファイト",
@@ -443,6 +455,18 @@
     "type": "fairy",
     "damageClass": "special"
   },
+  "defense-curl": {
+    "names": {
+      "ja": "まるくなる",
+      "en": "Defense Curl",
+      "fr": "Boul’Armure",
+      "de": "Einigler",
+      "es": "Rizo Defensa",
+      "it": "Ricciolscudo"
+    },
+    "type": "normal",
+    "damageClass": "status"
+  },
   "dig": {
     "names": {
       "ja": "あなをほる",
@@ -454,6 +478,18 @@
     },
     "type": "ground",
     "damageClass": "physical"
+  },
+  "disarming-voice": {
+    "names": {
+      "ja": "チャームボイス",
+      "en": "Disarming Voice",
+      "fr": "Voix Enjôleuse",
+      "de": "Säuselstimme",
+      "es": "Voz Cautivadora",
+      "it": "Incantavoce"
+    },
+    "type": "fairy",
+    "damageClass": "special"
   },
   "discharge": {
     "names": {
@@ -1043,6 +1079,18 @@
     "type": "flying",
     "damageClass": "special"
   },
+  "harden": {
+    "names": {
+      "ja": "かたくなる",
+      "en": "Harden",
+      "fr": "Armure",
+      "de": "Härtner",
+      "es": "Fortaleza",
+      "it": "Rafforzatore"
+    },
+    "type": "normal",
+    "damageClass": "status"
+  },
   "healing-wish": {
     "names": {
       "ja": "いやしのねがい",
@@ -1210,6 +1258,18 @@
     },
     "type": "ice",
     "damageClass": "physical"
+  },
+  "iron-defense": {
+    "names": {
+      "ja": "てっぺき",
+      "en": "Iron Defense",
+      "fr": "Mur de Fer",
+      "de": "Eisenabwehr",
+      "es": "Defensa Férrea",
+      "it": "Ferroscudo"
+    },
+    "type": "steel",
+    "damageClass": "status"
   },
   "iron-head": {
     "names": {
@@ -1463,6 +1523,18 @@
     "type": "normal",
     "damageClass": "status"
   },
+  "milk-drink": {
+    "names": {
+      "ja": "ミルクのみ",
+      "en": "Milk Drink",
+      "fr": "Lait à Boire",
+      "de": "Milchgetränk",
+      "es": "Batido",
+      "it": "Buonlatte"
+    },
+    "type": "normal",
+    "damageClass": "status"
+  },
   "mimic": {
     "names": {
       "ja": "ものまね",
@@ -1689,6 +1761,18 @@
       "it": "Spettrotuffo"
     },
     "type": "ghost",
+    "damageClass": "physical"
+  },
+  "play-rough": {
+    "names": {
+      "ja": "じゃれつく",
+      "en": "Play Rough",
+      "fr": "Câlinerie",
+      "de": "Knuddler",
+      "es": "Carantoña",
+      "it": "Carineria"
+    },
+    "type": "fairy",
     "damageClass": "physical"
   },
   "poison-fang": {

@@ -10,7 +10,7 @@ import { addXp, recomputeModifiers } from './leveling';
  * - ふしぎなアメ: 中ボスが落とす。拾うと 1・3・5 レベルのどれかを抽選し、少し待ってから確定でレベルアップする
  * 落とすのと、拾ったかの確定（アメの抽選も）はソロ・ホスト。触れたかは自分のブラウザで判定する（経験値の玉と同じ）。
  */
-export const ITEM_KINDS: readonly ItemKind[] = ['potion', 'magnet', 'rare-candy', 'buff', 'silver-wing', 'rainbow-wing'];
+export const ITEM_KINDS: readonly ItemKind[] = ['potion', 'magnet', 'rare-candy', 'buff', 'silver-wing', 'rainbow-wing', 'moomoo-milk'];
 
 /** 倒した敵の場所に道具を落とす（雑魚はまれに、中ボスは決まった道具）。倒れた敵が取り除かれる前に呼ぶ */
 export function dropItems(world: World): void {
@@ -87,10 +87,10 @@ export function applyItem(world: World, id: number, by: PlayerId, kind: ItemKind
   const k = world.items.findIndex((x) => x.id === id);
   if (k !== -1) world.items.splice(k, 1);
   const cfg = world.rules.pickups.items;
-  if (kind === 'potion') {
-    // HP は本人のブラウザで管理する（ほかの人の分は本人の画面で回復する）
+  if (kind === 'potion' || kind === 'moomoo-milk') {
+    // HP は本人のブラウザで管理する（ほかの人の分は本人の画面で回復する）。モーモーミルク（ミルクのみ）も同じく拾った人が回復する
     const p = world.players.find((x) => x.id === by);
-    if (p) healPlayer(world, by, (p.maxHp * cfg.potion.healPct) / 100);
+    if (p) healPlayer(world, by, (p.maxHp * cfg[kind].healPct) / 100);
   } else if (kind === 'magnet') {
     // すべての玉を、速く吸い寄せる（2 = マグネット）
     const g = world.gems;

@@ -49,7 +49,7 @@ export interface LevelUpState {
 }
 
 /** マップに落ちる道具の種類 */
-export type ItemKind = 'potion' | 'magnet' | 'rare-candy' | 'buff' | 'silver-wing' | 'rainbow-wing';
+export type ItemKind = 'potion' | 'magnet' | 'rare-candy' | 'buff' | 'silver-wing' | 'rainbow-wing' | 'moomoo-milk';
 /** はね（ルギア・ホウオウ戦の権利。箱から出る） */
 export type WingKind = 'silver-wing' | 'rainbow-wing';
 

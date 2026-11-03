@@ -77,7 +77,8 @@ function applyForm(world: World, p: Player): void {
   const lines = world.rules.lines;
   if (!lines) return;
   const learn = (move: number, maxLevel?: number): void => {
-    if (move < 0 || p.moves.some((m) => m.move === move) || p.moves.length >= world.rules.combat.maxMoveSlots) return;
+    // 技進化で使った技（はたく → おうふくビンタ の はたく）は覚え直さない
+    if (move < 0 || p.moves.some((m) => m.move === move) || p.consumedMoves?.includes(move) || p.moves.length >= world.rules.combat.maxMoveSlots) return;
     p.moves.push({ move, level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0, ...(maxLevel && { maxLevel }) });
     world.events.push({ type: 'moveTaught', playerId: p.id, move });
   };

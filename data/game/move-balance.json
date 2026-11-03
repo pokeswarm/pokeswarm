@@ -54,7 +54,11 @@
     "future-sight-gardevoir",
     "facade",
     "giga-impact",
-    "future-sight-alakazam"
+    "future-sight-alakazam",
+    "harden",
+    "defense-curl",
+    "iron-defense",
+    "milk-drink"
   ],
   "heavyHitters": [
     "phantom-force",
@@ -115,6 +119,9 @@
     "surf": 0.9,
     "aqua-tail-azumarill": 0.8,
     "aqua-tail-slam-azumarill": 0.7,
-    "draco-meteor": 1.2
+    "draco-meteor": 1.2,
+    "snore": 1.5,
+    "charm": 0.6,
+    "double-edge": 1.25
   }
 }

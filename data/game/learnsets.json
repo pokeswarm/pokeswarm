@@ -117,7 +117,8 @@
       "quick-attack",
       "swift",
       "flare-blitz",
-      "fire-pledge"
+      "fire-pledge",
+      "double-edge"
     ],
     "chikorita": [
       "sleep-powder",
@@ -165,14 +166,21 @@
           "grovyle",
           "sceptile"
         ]
-      }
+      },
+      "double-edge"
     ],
     "torchic": [
       "double-kick",
       "scratch",
       "ember",
       "fire-fang",
-      "bulk-up",
+      {
+        "move": "bulk-up",
+        "forms": [
+          "combusken",
+          "blaziken"
+        ]
+      },
       "fire-pledge",
       "blaze-kick",
       "fire-punch",
@@ -194,7 +202,8 @@
           "combusken",
           "blaziken"
         ]
-      }
+      },
+      "double-edge"
     ],
     "mudkip": [
       "water-gun",
@@ -294,7 +303,13 @@
     ],
     "slakoth": [
       "scratch",
-      "yawn",
+      {
+        "move": "yawn",
+        "forms": [
+          "vigoroth",
+          "slaking"
+        ]
+      },
       "slash",
       "thrash",
       "giga-impact",
@@ -354,7 +369,8 @@
       "quick-attack",
       "swift",
       "slash",
-      "dark-pulse"
+      "dark-pulse",
+      "double-edge"
     ],
     "shuppet": [
       "lick",
@@ -527,7 +543,9 @@
           "lairon",
           "aggron"
         ]
-      }
+      },
+      "harden",
+      "iron-defense"
     ],
     "azurill": [
       "bubble",
@@ -550,7 +568,12 @@
     ],
     "wynaut": [
       "mirror-coat",
-      "counter",
+      {
+        "move": "counter",
+        "forms": [
+          "wobbuffet"
+        ]
+      },
       "reflect",
       "revenge",
       "magic-coat"
@@ -611,7 +634,8 @@
           "pikachu",
           "raichu"
         ]
-      }
+      },
+      "double-edge"
     ],
     "cleffa": [
       "pound",
@@ -625,10 +649,12 @@
     ],
     "igglybuff": [
       "pound",
+      "double-slap",
       "sing",
-      "body-slam",
-      "swift",
-      "hyper-voice"
+      "charm",
+      "play-rough",
+      "disarming-voice",
+      "dazzling-gleam-jigglypuff"
     ],
     "togepi": [
       "metronome-baby",
@@ -682,6 +708,13 @@
         "forms": [
           "steelix"
         ]
+      },
+      "harden",
+      {
+        "move": "iron-defense",
+        "forms": [
+          "steelix"
+        ]
       }
     ],
     "staryu": [
@@ -709,7 +742,8 @@
       "thunderbolt",
       "thunder-wave",
       "fake-out",
-      "wild-charge"
+      "wild-charge",
+      "double-edge"
     ],
     "oddish": [
       "vine-whip",
@@ -788,7 +822,8 @@
         "forms": [
           "arcanine"
         ]
-      }
+      },
+      "double-edge"
     ],
     "rhyhorn": [
       "magnitude",
@@ -913,11 +948,12 @@
     ],
     "jigglypuff": [
       "pound",
-      "sing",
       "double-slap",
-      "body-slam",
-      "swift",
-      "hyper-voice"
+      "sing",
+      "charm",
+      "play-rough",
+      "disarming-voice",
+      "dazzling-gleam-jigglypuff"
     ],
     "slowpoke": [
       "slack-off",
@@ -938,11 +974,10 @@
     "snorlax": [
       "tackle",
       "rest",
-      "giga-impact",
-      "body-slam",
-      "lick",
+      "snore",
       "yawn",
-      "hyper-voice"
+      "body-slam",
+      "giga-impact"
     ],
     "eevee": [
       "tackle",
@@ -1060,7 +1095,8 @@
         "forms": [
           "umbreon"
         ]
-      }
+      },
+      "double-edge"
     ],
     "doduo": [
       "swift",
@@ -1071,7 +1107,8 @@
       "wing-attack",
       "whirlwind",
       "body-slam",
-      "aerial-ace"
+      "aerial-ace",
+      "double-edge"
     ],
     "meowth": [
       "tackle",
@@ -1083,7 +1120,8 @@
       "body-slam",
       "slash",
       "fake-out",
-      "hyper-voice"
+      "hyper-voice",
+      "double-edge"
     ],
     "mareep": [
       "thunder-wave",
@@ -1112,7 +1150,8 @@
       "focus-punch",
       "arm-thrust",
       "aerial-ace",
-      "bulk-up"
+      "bulk-up",
+      "revenge"
     ],
     "swinub": [
       "ice-shard",
@@ -1156,7 +1195,8 @@
         "forms": [
           "pidgeot"
         ]
-      }
+      },
+      "double-edge"
     ],
     "zubat": [
       "gust",
@@ -1176,12 +1216,17 @@
           "golbat",
           "crobat"
         ]
-      }
+      },
+      "double-edge"
     ],
     "miltank": [
-      "rollout",
       "tackle",
-      "body-slam"
+      "milk-drink",
+      "defense-curl",
+      "stomp",
+      "body-slam",
+      "rollout",
+      "double-edge"
     ],
     "larvitar": [
       "rock-throw",
@@ -1305,7 +1350,8 @@
         "forms": [
           "scizor"
         ]
-      }
+      },
+      "double-edge"
     ],
     "magnemite": [
       "thunder-shock",
@@ -1379,7 +1425,8 @@
       "thunder-wave",
       "quick-attack",
       "swift",
-      "wild-charge"
+      "wild-charge",
+      "double-edge"
     ],
     "entei": [
       "ember",

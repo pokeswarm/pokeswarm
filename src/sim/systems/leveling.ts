@@ -230,6 +230,9 @@ function derivationUsable(world: World, p: Player, d: SimDerivation): boolean {
   // 全体の派生は、派生技がその系統の覚える技（learnsets）に無ければ出ない（07 の158章: 原作で覚えなさそうな派生技へは進化しない）
   const learnset = world.rules.lines?.[p.line]?.learnset;
   if (d.line === null && learnset && !p.learnsAll && !learnset.some((e) => e.move === d.to && (!e.forms || e.forms.includes(p.species)))) return false;
+  // 系統の派生でも、覚える技に姿が書いてあれば、その姿のときだけ出る（てっぺき: ハガネールになってから。07 の173章）
+  const formOnly = learnset?.filter((e) => e.move === d.to) ?? [];
+  if (d.line !== null && !p.learnsAll && formOnly.length > 0 && formOnly.every((e) => e.forms && !e.forms.includes(p.species))) return false;
   if (d.needsMoves && !d.needsMoves.every((n) => p.moves.some((m) => m.move === n.move && m.level >= (n.level ?? 1)))) return false;
   // 天気の区間・ランの記録・持ち物の強化の段階（ホウエンの固有技。07 の134章）
   if (d.weather) {

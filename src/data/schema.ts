@@ -1176,6 +1176,8 @@ export const moveEffectSchema = z.object({
     .optional(),
   /** 波: その場から radius まで広がる輪 */
   wave: z.object({ powerMultiplier: z.number().nonnegative(), radius: z.number().positive(), durationSeconds: z.number().positive() }).optional(),
+  /** 拾える道具を置く（ミルクのみ: 投げたモーモーミルクが落ちた所に残り、だれでも拾える。置くのはソロ・ホスト。07 の173章） */
+  pickup: z.enum(['moomoo-milk']).optional(),
 });
 export type MoveEffect = z.infer<typeof moveEffectSchema>;
 
@@ -1308,6 +1310,10 @@ export const moveDefSchema = z.object({
   scatterArc: z.number().positive().max(360).optional(),
   /** scatter: 場所をランダムにせず、range の中のランダムな敵の足元に置く（敵がいなければランダムな場所。りゅうせいぐん: 流星が敵へ降る。07 の169章） */
   scatterOnEnemies: z.boolean().optional(),
+  /** 敵に当たらない（ミルクのみ: 投げたびんは落ちて道具になるだけ。07 の173章） */
+  harmless: z.boolean().optional(),
+  /** ねむる（rest）で眠っている間だけ出す（いびき。起きている間は出さない。07 の173章） */
+  onlyWhileAsleep: z.boolean().optional(),
   /** strike（落雷）: count 個を同時に置かず、intervalSeconds ごとに1つずつ置く（ゴーストダイブ: 大きな影が出ては消え、別の所に出る。07 の148章） */
   sequential: z.boolean().optional(),
   /** scatter（置く）の当たり判定を、置いてからこの秒数待って出す（つららおとし: 空から氷の塊が落ちてくる間） */
@@ -2016,6 +2022,8 @@ export const statusKindSchema = z.object({
   contactDamageMultiplier: z.number().positive().default(1),
   /** ダメージを受けると治る（ねむり） */
   breaksOnDamage: z.boolean().default(false),
+  /** 治るまでの秒数（ねむり: 攻撃を受けてから、少しだけ止まったままでいてから動き出す。07 の173章） */
+  wakeDelaySeconds: z.number().nonnegative().default(0),
   /** 継続ダメージの分だけ、付けたプレイヤーが回復する（やどりぎ。HP は区切り3で作るので、今は効果なし） */
   healsAttacker: z.boolean().default(false),
   /** かかっている間の敵の色（見た目だけ） */
@@ -2047,6 +2055,8 @@ export const pickupConfigSchema = z.object({
   items: z.object({
     /** 雑魚を倒したときに落とす確率（1体あたり）と、回復する量（最大HPの %） */
     potion: z.object({ dropChance: z.number().min(0).max(1), healPct: z.number().positive() }),
+    /** ミルクのみ（ミルタンク）が投げるモーモーミルク: 回復する量（最大HPの %）と、マップに同時に置ける数（07 の173章） */
+    'moomoo-milk': z.object({ healPct: z.number().positive(), maxOnMap: z.number().int().positive() }),
     /** 雑魚を倒したときに落とす確率と、玉を吸い寄せる速さ */
     magnet: z.object({ dropChance: z.number().min(0).max(1), speed: z.number().positive() }),
     /** 中ボスが落とす。上がるレベルの数とその重み、抽選の演出の時間 */

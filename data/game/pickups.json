@@ -11,6 +11,10 @@
       "dropChance": 0.0006,
       "healPct": 30
     },
+    "moomoo-milk": {
+      "healPct": 15,
+      "maxOnMap": 3
+    },
     "magnet": {
       "dropChance": 0.0012,
       "speed": 1400

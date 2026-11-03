@@ -6508,6 +6508,94 @@
         "originY": 0.86,
         "alpha": 0.95
       }
+    },
+    "harden": {
+      "extends": "normal.base"
+    },
+    "defense-curl": {
+      "extends": "normal.base"
+    },
+    "iron-defense": {
+      "extends": "steel.base"
+    },
+    "milk-drink": {
+      "extends": "normal.base",
+      "hideShape": true,
+      "sprite": {
+        "id": "milk-bottle",
+        "fit": "circle",
+        "size": 2.2,
+        "rotate": "spin",
+        "spinDegPerSec": 360
+      }
+    },
+    "snore": {
+      "extends": "normal.base",
+      "hideShape": true,
+      "sprite": {
+        "id": "snore-ring",
+        "fit": "circle",
+        "size": 1
+      }
+    },
+    "stomp": {
+      "extends": "normal.base",
+      "impact": {
+        "flash": {
+          "color": "#d7ccc8",
+          "radius": 46,
+          "durationMs": 140,
+          "alpha": 0.6
+        }
+      },
+      "sprite": {
+        "id": "hoof-quake",
+        "fit": "circle",
+        "size": 1.1
+      }
+    },
+    "charm": {
+      "extends": "fairy.base",
+      "hideShape": true,
+      "sprite": {
+        "id": "heart-burst",
+        "fit": "circle",
+        "size": 1.15
+      }
+    },
+    "play-rough": {
+      "extends": "fairy.base",
+      "hideShape": true,
+      "sprite": {
+        "id": "rough-cloud",
+        "fit": "circle",
+        "size": 1.1
+      }
+    },
+    "disarming-voice": {
+      "extends": "fairy.base",
+      "sprite": {
+        "id": "voice-heart",
+        "fit": "circle",
+        "size": 2.6
+      }
+    },
+    "dazzling-gleam-jigglypuff": {
+      "extends": "fairy.base",
+      "projectile": {
+        "shapeAlpha": 0.12
+      },
+      "screenFlash": {
+        "color": "#fff0f7",
+        "alpha": 0.12,
+        "durationMs": 140
+      },
+      "sprite": {
+        "id": "gleam-ring",
+        "fit": "ring",
+        "size": 1,
+        "varyTiles": true
+      }
     }
   }
 }

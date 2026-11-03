@@ -3,7 +3,10 @@ import { buildSimRules, moveIndexOf, playableLoadout } from '../data/simRules';
 import { Simulation } from './simulation';
 import { makeOffers } from './systems/leveling';
 
-/** カビゴン（作者の決定 2026年10月25日）: たいあたり と ねむる だけ。止まっていると眠って回復し、眠っている間はほかの技を出さない */
+/**
+ * カビゴン（作者の決定 2026年10月25日・11月4日）: たいあたり・ねむる・いびき・あくび で技が決まっている。
+ * 止まっていると眠って回復し、眠っている間は いびき だけを出す（07 の173章）
+ */
 function setup() {
   const rules = buildSimRules();
   const sim = new Simulation({ tickRate: 30, seed: 1, rules });
@@ -13,27 +16,30 @@ function setup() {
 }
 
 describe('カビゴンの ねむる', () => {
-  it('たいあたり と ねむる だけで、新しい技は候補に出ない', () => {
+  it('たいあたり・ねむる・いびき・あくび で、新しい技は候補に出ない', () => {
     const { rules, sim, p } = setup();
-    expect(p.moves.map((m) => m.move)).toEqual([moveIndexOf(rules, 'tackle'), moveIndexOf(rules, 'rest')]);
+    expect(p.moves.map((m) => m.move)).toEqual(['tackle', 'rest', 'snore', 'yawn'].map((k) => moveIndexOf(rules, k)));
     for (let k = 0; k < 10; k++) expect(makeOffers(sim.world, p).some((o) => o.kind === 'moveNew')).toBe(false);
   });
 
-  it('3 秒止まると眠り、毎秒 1% 回復し、技を出さない。動くと 0.5 秒の起きる動き（動けない）を挟む', () => {
-    const { sim, p } = setup();
+  it('3 秒止まると眠り、毎秒 1% 回復し、いびき だけを出す。動くと 0.5 秒の起きる動き（動けない）を挟む', () => {
+    const { rules, sim, p } = setup();
+    const snore = moveIndexOf(rules, 'snore');
     for (let k = 0; k < 4; k++) sim.world.enemies.add(k + 1, 0, 40, k * 5, 1e9, 0, 10);
     p.hp = p.maxHp / 2;
     for (let t = 0; t < 89; t++) sim.step([]);
     expect(p.sleep?.asleep).toBe(false);
     sim.step([]);
     expect(p.sleep?.asleep).toBe(true);
+    // 眠った瞬間から いびき を出す（起きている間は出していない）
+    const used: number[] = sim.world.events.flatMap((e) => (e.type === 'moveUsed' ? [e.move] : []));
     const hp = p.hp;
-    const used: string[] = [];
     for (let t = 0; t < 30; t++) {
       sim.step([]);
-      for (const e of sim.world.events) if (e.type === 'moveUsed') used.push('used');
+      for (const e of sim.world.events) if (e.type === 'moveUsed') used.push(e.move);
     }
-    expect(used).toEqual([]);
+    expect(used.length).toBeGreaterThan(0);
+    expect(used.every((m) => m === snore)).toBe(true);
     expect(p.hp - hp).toBeCloseTo(p.maxHp * 0.01, 1);
     // 動くと起きる動き: 0.5 秒は動けない
     const x = p.x;

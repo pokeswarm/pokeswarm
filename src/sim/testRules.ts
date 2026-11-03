@@ -117,9 +117,9 @@ export function testRules(
     },
     status: {
       kinds: [
-        { id: 'burn', damagePerSecond: 6, speedMultiplier: 1, damageTakenMultiplier: 1, contactDamageMultiplier: 1, breaksOnDamage: false, healsAttacker: false, color: '#ff0000' },
-        { id: 'freeze', damagePerSecond: 0, speedMultiplier: 0, damageTakenMultiplier: 1, contactDamageMultiplier: 1, breaksOnDamage: false, healsAttacker: false, color: '#00ffff' },
-        { id: 'defenseDown', damagePerSecond: 0, speedMultiplier: 1, damageTakenMultiplier: 2, contactDamageMultiplier: 1, breaksOnDamage: false, healsAttacker: false, color: '#888888' },
+        { id: 'burn', damagePerSecond: 6, speedMultiplier: 1, damageTakenMultiplier: 1, contactDamageMultiplier: 1, breaksOnDamage: false, wakeDelaySeconds: 0, healsAttacker: false, color: '#ff0000' },
+        { id: 'freeze', damagePerSecond: 0, speedMultiplier: 0, damageTakenMultiplier: 1, contactDamageMultiplier: 1, breaksOnDamage: false, wakeDelaySeconds: 0, healsAttacker: false, color: '#00ffff' },
+        { id: 'defenseDown', damagePerSecond: 0, speedMultiplier: 1, damageTakenMultiplier: 2, contactDamageMultiplier: 1, breaksOnDamage: false, wakeDelaySeconds: 0, healsAttacker: false, color: '#888888' },
       ],
     },
     pickups: {
@@ -132,6 +132,7 @@ export function testRules(
       maxItems: 16,
       items: {
         potion: { dropChance: 0, healPct: 30 },
+        'moomoo-milk': { healPct: 15, maxOnMap: 3 },
         magnet: { dropChance: 0, speed: 1400 },
         'rare-candy': { revealSeconds: 1, holdSeconds: 0, levels: [{ levels: 3, weight: 1 }] },
       },

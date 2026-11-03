@@ -14,6 +14,7 @@ import { hash01 } from '../math';
 import { reachBand } from './attack';
 import { rayLengthToObstacle } from '../obstacles';
 import type { World } from '../world';
+import { spawnItem } from './items';
 
 /**
  * 技の「効き方」の部品（作者の決定「技が進化すると遊びが変わる」。07_content_draft.md 22.4）。
@@ -200,6 +201,10 @@ function explode(world: World, ex: NonNullable<MoveEffect['explode']>, src: FxSo
 function applyEffect(world: World, fx: MoveEffect, index: number, src: FxSource): void {
   const ticks = (s: number): number => Math.max(1, Math.round(s / world.dt));
   const angle0 = Math.atan2(src.dirY, src.dirX);
+  // 拾える道具（ミルクのみ）: ソロ・ホストが置き、ゲストへは道具の知らせで届く。マップに置ける数を超えたら置かない
+  if (fx.pickup && world.role !== 'guest' && world.items.filter((it) => it.kind === fx.pickup).length < world.rules.pickups.items[fx.pickup].maxOnMap) {
+    spawnItem(world, world.nextItemId++, fx.pickup, src.x, src.y);
+  }
   if (fx.explode) {
     const ex = fx.explode;
     if (ex.delaySeconds) {

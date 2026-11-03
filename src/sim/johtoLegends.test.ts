@@ -107,7 +107,10 @@ describe('ジョウトの特別な戦い（07 の85章）', () => {
     expect(has()).toBe(true);
     expect(sim.world.legendary).toBeNull();
     expect(e.maxHp[Array.from(e.kind.subarray(0, e.count)).indexOf(kindOf(sim, 'legend-suicune'))]).toBe(44800);
-    const types = steps(sim, 180 * 30);
+    // レベルアップの選択の間は時間が止まるので、回数ではなく制限時間の更新番号まで進める
+    const types: string[] = [];
+    const end = sim.world.intruder!.endTick;
+    for (let k = 0; k < 20000 && sim.world.tick <= end + 5; k++) types.push(...steps(sim, 1));
     expect(types).toContain('intruderLeft');
     expect(has()).toBe(false);
     expect(sim.world.intruder?.done).toBe(true);

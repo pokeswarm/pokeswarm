@@ -669,7 +669,13 @@
       "telegraphSeconds": 0.7,
       "radius": 28,
       "length": 900,
-      "damage": 45
+      "damage": 45,
+      "leaves": {
+        "seconds": 3,
+        "slowPct": 30,
+        "damagePerSecond": 0,
+        "color": "#b2ebf2"
+      }
     },
     {
       "id": "suicune-hydro-pump",
@@ -737,7 +743,7 @@
     {
       "id": "hooh-sacred-fire",
       "move": "sacred-fire",
-      "effect": "flare-blitz",
+      "effect": "boss-sacred-fire",
       "shape": "circle",
       "target": "player",
       "telegraphSeconds": 0.9,
@@ -756,7 +762,7 @@
     {
       "id": "hooh-brave-bird",
       "move": "brave-bird",
-      "effect": "sky-attack",
+      "effect": "boss-brave-bird",
       "shape": "line",
       "target": "player",
       "telegraphSeconds": 0.7,
@@ -764,13 +770,7 @@
       "length": 600,
       "damage": 50,
       "dashSpeed": 1000,
-      "chain": 1,
-      "leaves": {
-        "seconds": 4,
-        "slowPct": 0,
-        "damagePerSecond": 20,
-        "color": "#ff7043"
-      }
+      "chain": 1
     },
     {
       "id": "hooh-sunny-burst",
@@ -1300,6 +1300,307 @@
       "activeSeconds": 1,
       "hitEverySeconds": 0.3,
       "recoilSeconds": 2.5
+    },
+    {
+      "id": "pika-volt-tackle",
+      "move": "volt-tackle",
+      "effect": "boss-volt-tackle",
+      "shape": "circle",
+      "target": "player",
+      "followBoss": true,
+      "telegraphSeconds": 0.6,
+      "radius": 40,
+      "damage": 36,
+      "hitEverySeconds": 0.6,
+      "bounce": {
+        "seconds": 3,
+        "speed": 520,
+        "halfWidth": 360,
+        "halfHeight": 220
+      }
+    },
+    {
+      "id": "pika-iron-tail",
+      "move": "iron-tail",
+      "effect": "boss-jump",
+      "shape": "circle",
+      "target": "player",
+      "teleport": true,
+      "hideBoss": true,
+      "spread": 0,
+      "telegraphSeconds": 1,
+      "radius": 90,
+      "damage": 38,
+      "then": "pika-iron-tail-sweep"
+    },
+    {
+      "id": "pika-iron-tail-sweep",
+      "move": "iron-tail",
+      "effect": "boss-iron-tail",
+      "shape": "cone",
+      "arc": 140,
+      "target": "player",
+      "telegraphSeconds": 0.25,
+      "radius": 170,
+      "damage": 30
+    },
+    {
+      "id": "pika-quick-attack",
+      "move": "quick-attack",
+      "effect": "boss-quick-attack",
+      "shape": "circle",
+      "target": "player",
+      "teleport": true,
+      "hideBoss": true,
+      "spread": 70,
+      "telegraphSeconds": 0.4,
+      "radius": 60,
+      "damage": 26
+    },
+    {
+      "id": "espeon-psybeam",
+      "move": "psybeam",
+      "effect": "boss-psybeam",
+      "shape": "line",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 1,
+      "radius": 22,
+      "length": 700,
+      "damage": 40
+    },
+    {
+      "id": "espeon-swift",
+      "move": "swift",
+      "effect": "boss-swift",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.5,
+      "radius": 20,
+      "damage": 18,
+      "count": 5,
+      "spread": 30,
+      "stagger": 0.1,
+      "travel": {
+        "speed": 260,
+        "homingDegreesPerSecond": 150
+      },
+      "activeSeconds": 3
+    },
+    {
+      "id": "snorlax-giga-impact",
+      "move": "giga-impact",
+      "effect": "boss-giga-impact",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 1.5,
+      "radius": 200,
+      "damage": 60,
+      "recoilSeconds": 1
+    },
+    {
+      "id": "snorlax-rest-snore",
+      "move": "rest",
+      "effect": "boss-rest",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 0.5,
+      "radius": 60,
+      "damage": 0,
+      "healPct": 8,
+      "holdSeconds": 2.5,
+      "recoilSeconds": 2.5,
+      "then": "snorlax-snore"
+    },
+    {
+      "id": "snorlax-snore",
+      "move": "snore",
+      "effect": "boss-snore",
+      "shape": "ring",
+      "target": "self",
+      "followBoss": true,
+      "telegraphSeconds": 0.6,
+      "radius": 130,
+      "damage": 16,
+      "rings": {
+        "count": 3,
+        "step": 60,
+        "width": 50
+      },
+      "stagger": 0.6
+    },
+    {
+      "id": "snorlax-body-slam-jump",
+      "move": "body-slam",
+      "effect": "boss-body-slam",
+      "shape": "circle",
+      "target": "player",
+      "teleport": true,
+      "hideBoss": true,
+      "spread": 0,
+      "telegraphSeconds": 1,
+      "radius": 110,
+      "damage": 50
+    },
+    {
+      "id": "raikou-extreme-speed",
+      "move": "extreme-speed",
+      "effect": "boss-extreme-speed",
+      "shape": "circle",
+      "target": "random",
+      "count": 1,
+      "spread": 220,
+      "teleport": true,
+      "telegraphSeconds": 0.35,
+      "radius": 50,
+      "damage": 30,
+      "repeat": {
+        "count": 3,
+        "everySeconds": 0.35
+      }
+    },
+    {
+      "id": "raikou-volt-switch",
+      "move": "volt-switch",
+      "effect": "boss-volt-switch",
+      "shape": "circle",
+      "target": "self",
+      "telegraphSeconds": 0.55,
+      "radius": 45,
+      "damage": 26,
+      "count": 6,
+      "stagger": 0.1,
+      "around": {
+        "radius": 190,
+        "center": "target"
+      }
+    },
+    {
+      "id": "raikou-thunder-around",
+      "move": "thunder",
+      "effect": "boss-raikou-thunder",
+      "shape": "circle",
+      "target": "self",
+      "telegraphSeconds": 0.6,
+      "radius": 60,
+      "damage": 34,
+      "count": 8,
+      "stagger": 0.15,
+      "around": {
+        "radius": 200
+      }
+    },
+    {
+      "id": "entei-flare-blitz",
+      "move": "flare-blitz",
+      "effect": "boss-flare-blitz",
+      "shape": "circle",
+      "target": "self",
+      "followBoss": true,
+      "telegraphSeconds": 0.5,
+      "radius": 80,
+      "damage": 22,
+      "activeSeconds": 3,
+      "hitEverySeconds": 0.5
+    },
+    {
+      "id": "entei-stomp",
+      "move": "stomp",
+      "effect": "boss-stomp",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.6,
+      "radius": 60,
+      "damage": 36,
+      "count": 3,
+      "stagger": 0.18,
+      "along": {
+        "spacing": 110,
+        "start": 90
+      }
+    },
+    {
+      "id": "suicune-mist",
+      "move": "mist",
+      "effect": "boss-mist",
+      "shape": "circle",
+      "target": "self",
+      "followBoss": true,
+      "hideBoss": true,
+      "telegraphSeconds": 4,
+      "radius": 150,
+      "damage": 30
+    },
+    {
+      "id": "suicune-mirror-coat",
+      "move": "mirror-coat",
+      "effect": "boss-mirror-coat",
+      "shape": "circle",
+      "target": "self",
+      "followBoss": true,
+      "telegraphSeconds": 2,
+      "radius": 170,
+      "damage": 0,
+      "counter": {
+        "ratio": 0.6,
+        "max": 90
+      },
+      "then": "suicune-mirror-burst"
+    },
+    {
+      "id": "suicune-mirror-burst",
+      "move": "mirror-coat",
+      "effect": "boss-mirror-burst",
+      "shape": "circle",
+      "target": "self",
+      "followBoss": true,
+      "telegraphSeconds": 0.15,
+      "radius": 170,
+      "damage": 1
+    },
+    {
+      "id": "lugia-aeroblast-sweep",
+      "move": "aeroblast",
+      "effect": "boss-aeroblast",
+      "shape": "line",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 1.2,
+      "radius": 50,
+      "length": 1000,
+      "damage": 50,
+      "sweep": {
+        "degrees": 60,
+        "seconds": 1.4
+      },
+      "recoilSeconds": 1.6
+    },
+    {
+      "id": "lugia-extrasensory",
+      "move": "extrasensory",
+      "effect": "boss-extrasensory",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 1.4,
+      "radius": 90,
+      "damage": 40,
+      "count": 3,
+      "spread": 200,
+      "stagger": 0.25
+    },
+    {
+      "id": "hooh-recover",
+      "move": "recover",
+      "effect": "boss-recover",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 1.5,
+      "radius": 80,
+      "damage": 0,
+      "healPct": 5
     }
   ],
   "bossRules": {

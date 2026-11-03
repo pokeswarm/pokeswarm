@@ -1349,7 +1349,8 @@
       "radius": 30,
       "contactDamage": 40,
       "xp": 0,
-      "spriteScale": 2.4
+      "spriteScale": 2.4,
+      "motion": {"type":"keepDistance","distance":280}
     },
     {
       "id": "red-snorlax",
@@ -1409,7 +1410,8 @@
       "radius": 40,
       "contactDamage": 40,
       "xp": 0,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "motion": {"type":"keepDistance","distance":280}
     },
     {
       "id": "legend-entei",
@@ -1445,7 +1447,8 @@
       "radius": 46,
       "contactDamage": 45,
       "xp": 0,
-      "spriteScale": 2.8
+      "spriteScale": 2.8,
+      "motion": {"type":"keepDistance","distance":340}
     },
     {
       "id": "legend-ho-oh",

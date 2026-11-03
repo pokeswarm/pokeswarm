@@ -5945,6 +5945,248 @@
         "size": 0.5,
         "along": 0.6
       }
+    },
+    "boss-volt-tackle": {
+      "extends": "volt-tackle"
+    },
+    "boss-jump": {
+      "extends": "normal.base",
+      "bossTelegraph": {
+        "id": "jump-shadow",
+        "fit": "circle",
+        "size": 1.1
+      }
+    },
+    "boss-iron-tail": {
+      "extends": "iron-tail",
+      "strike": {
+        "id": "tail-iron",
+        "fit": "front",
+        "size": 1,
+        "along": 0.55,
+        "seconds": 0.3
+      }
+    },
+    "boss-quick-attack": {
+      "extends": "quick-attack",
+      "strike": {
+        "id": "speed-streak",
+        "fit": "circle",
+        "size": 1.3,
+        "seconds": 0.25
+      }
+    },
+    "boss-psybeam": {
+      "extends": "psybeam",
+      "strike": {
+        "id": "psybeam",
+        "fit": "line",
+        "size": 1,
+        "seconds": 0.4
+      }
+    },
+    "boss-swift": {
+      "extends": "swift",
+      "bossActive": {
+        "id": "star",
+        "fit": "circle",
+        "size": 1.8,
+        "rotate": "spin",
+        "spinDegPerSec": 600
+      }
+    },
+    "boss-giga-impact": {
+      "extends": "giga-impact",
+      "strike": {
+        "id": "giga-ring",
+        "fit": "ring",
+        "size": 1,
+        "seconds": 0.45
+      }
+    },
+    "boss-rest": {
+      "extends": "rest",
+      "bossTelegraph": {
+        "id": "z-letter",
+        "fit": "circle",
+        "size": 0.8
+      }
+    },
+    "boss-snore": {
+      "extends": "normal.base",
+      "strike": {
+        "id": "snore-ring",
+        "fit": "circle",
+        "size": 1,
+        "seconds": 0.4
+      }
+    },
+    "boss-body-slam": {
+      "extends": "body-slam",
+      "bossTelegraph": {
+        "id": "jump-shadow",
+        "fit": "circle",
+        "size": 1.1
+      },
+      "strike": {
+        "id": "dust-ring",
+        "fit": "ring",
+        "size": 1,
+        "seconds": 0.4
+      }
+    },
+    "boss-extreme-speed": {
+      "extends": "extreme-speed"
+    },
+    "boss-volt-switch": {
+      "extends": "volt-switch",
+      "strike": {
+        "id": "volt-node",
+        "fit": "circle",
+        "size": 1.3,
+        "seconds": 0.3
+      }
+    },
+    "boss-raikou-thunder": {
+      "extends": "electric.base",
+      "strike": {
+        "id": "storm-pillar",
+        "fit": "circle",
+        "size": 1.6,
+        "originY": 0.9,
+        "seconds": 0.35
+      }
+    },
+    "boss-flare-blitz": {
+      "extends": "flare-blitz",
+      "bossActive": {
+        "id": "fire-spin-ball",
+        "fit": "circle",
+        "size": 1.3,
+        "rotate": "spin",
+        "spinDegPerSec": 600
+      }
+    },
+    "boss-stomp": {
+      "extends": "fire.base",
+      "strike": {
+        "id": "stomp-pillar",
+        "fit": "circle",
+        "size": 1.3,
+        "originY": 0.9,
+        "seconds": 0.45
+      }
+    },
+    "boss-mist": {
+      "extends": "ice.base",
+      "bossTelegraph": {
+        "id": "mist-cloud",
+        "fit": "circle",
+        "size": 1.4,
+        "alpha": 0.85
+      },
+      "strike": {
+        "id": "mist-cloud",
+        "fit": "circle",
+        "size": 1.6,
+        "alpha": 0.85,
+        "seconds": 0.4
+      }
+    },
+    "boss-mirror-coat": {
+      "extends": "mirror-coat",
+      "bossTelegraph": {
+        "id": "mirror-panels",
+        "fit": "circle",
+        "size": 1
+      }
+    },
+    "boss-mirror-burst": {
+      "extends": "mirror-coat",
+      "strike": {
+        "id": "mirror-shatter",
+        "fit": "circle",
+        "size": 1,
+        "seconds": 0.4
+      }
+    },
+    "boss-aeroblast": {
+      "extends": "flying.base",
+      "bossActive": {
+        "id": "aeroblast-beam",
+        "fit": "line",
+        "size": 1
+      }
+    },
+    "boss-extrasensory": {
+      "extends": "psychic.base",
+      "bossTelegraph": {
+        "id": "extrasensory-eye",
+        "fit": "circle",
+        "size": 1.3
+      },
+      "strike": {
+        "id": "extrasensory-eye",
+        "fit": "circle",
+        "size": 1.3,
+        "seconds": 0.3
+      }
+    },
+    "boss-sacred-fire": {
+      "extends": "fire.base",
+      "strike": {
+        "id": "sacred-flame",
+        "fit": "circle",
+        "size": 1.3,
+        "originY": 0.85,
+        "seconds": 0.6
+      },
+      "linger": {
+        "spread": 0,
+        "blend": "add",
+        "colors": [
+          "#ffeb3b",
+          "#ff7043",
+          "#43a047",
+          "#1e88e5"
+        ],
+        "lifespanMs": [
+          500,
+          900
+        ],
+        "speed": [
+          4,
+          16
+        ],
+        "scale": [
+          0.24,
+          0
+        ],
+        "alpha": [
+          1,
+          0
+        ],
+        "gravityY": -30,
+        "perSecond": 8,
+        "fillAlpha": 0.28
+      }
+    },
+    "boss-brave-bird": {
+      "extends": "brave-bird",
+      "strike": {
+        "id": "brave-aura",
+        "fit": "circle",
+        "size": 1.4,
+        "seconds": 0.35
+      }
+    },
+    "boss-recover": {
+      "extends": "recover",
+      "bossTelegraph": {
+        "id": "heal-rise",
+        "fit": "circle",
+        "size": 1.2
+      }
     }
   }
 }

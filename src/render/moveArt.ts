@@ -5218,6 +5218,203 @@ function thunderCloud(): SpriteOut {
   return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- ボスの技（07 の167章）: レッド戦・ジョウトの伝説 ----------------
+/** 跳び上がったボスの影（のしかかり・アイアンテール）: 地面の黒い楕円が、落ちてくるにつれて濃く大きくなる（コマで大きく） */
+function jumpShadow(): SpriteOut {
+  // 0 輪郭・1 黒・2 濃い灰
+  const palette = ['#000000', '#101010', '#2a2a2a'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    const s = 0.55 + f * 0.15;
+    return shape(24, (u, v) => {
+      const d = Math.hypot(u / s, (v * 1.9) / s);
+      if (d > 1) return -1;
+      // ふちは市松で薄く
+      if (d > 0.8) return (Math.floor((u + 1) * 12) + Math.floor((v + 1) * 12)) % 2 === 0 ? 2 : -1;
+      return 1;
+    }, 0, -1);
+  });
+  return { palette, frameMs: 200, parts: { main: frames.map(toRows) } };
+}
+
+/** いびき（レッドのカビゴン）: 眠っている間に広がる、いびきの音の輪（帯の中に「Z」の字が並ぶ） */
+function snoreRing(): SpriteOut {
+  // 0 輪郭・1 濃い青・2 水色・3 白
+  const palette = ['#0d1b2a', '#1e88e5', '#90caf9', '#ffffff'];
+  const frames = [0, 1].map((f) =>
+    shape(40, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.98 || d < 0.7) return -1;
+      const a = Math.atan2(v, u) + f * 0.12;
+      // 10 個の「Z」: 角度の帯ごとに、上の横棒・斜め・下の横棒
+      const seg = ((a + Math.PI) / (Math.PI * 2)) * 10;
+      const x = (seg - Math.floor(seg)) * 2 - 1;
+      const y = ((d - 0.7) / 0.28) * 2 - 1;
+      if (Math.abs(x) > 0.6) return -1;
+      if (y < -0.65 || y > 0.65 || Math.abs(y + x) < 0.28) return 3;
+      return -1;
+    }, 0, 1),
+  );
+  return { palette, frameMs: 160, parts: { main: frames.map(toRows) } };
+}
+
+/** かみなり（ライコウ）: 空から落ちる太い紫と黄の雷の柱（地面に当たって四方へ散る）。根元を当たり判定の中心に合わせる */
+function stormPillar(): SpriteOut {
+  // 0 輪郭・1 濃い紫・2 紫・3 黄・4 白
+  const palette = ['#12051f', '#4a148c', '#9c27b0', '#ffeb3b', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    const g = fill(blank(16, 40), (x, y) => {
+      // 柱: 上から下へ。ジグザグにゆれる
+      const cx = 7.5 + Math.sin(y * 0.6 + f * 2.1) * 1.6;
+      const w = f === 3 ? 1.2 : 3 - (f === 0 ? 1 : 0);
+      if (y < 34 && Math.abs(x - cx) < w) return Math.abs(x - cx) < w * 0.45 ? 4 : 3;
+      if (y < 34 && Math.abs(x - cx) < w + 1.2) return 2;
+      // 根元: 地面で四方へ散る火花
+      if (y >= 33) {
+        const dx = x - 7.5;
+        const dy = y - 36;
+        const r = Math.hypot(dx, dy * 1.6);
+        if (r < 2 + f * 1.4 && hash(Math.floor(x), Math.floor(y), 1690 + f) < 0.6) return r < 2 ? 4 : 3;
+      }
+      return -1;
+    });
+    return outline(g, 0);
+  });
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** ふみつけ（エンテイ）: 踏んだ所から噴き出す火柱（根元が広く、上へ細く。根元を当たり判定の中心に合わせる） */
+function stompPillar(): SpriteOut {
+  // 0 輪郭・1 濃い赤・2 赤・3 だいだい・4 黄・5 白
+  const palette = ['#3a0a02', '#8b1a07', '#d84315', '#ff9800', '#ffeb3b', '#fffde7'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    const h = [14, 30, 34, 26][f]!;
+    const g = fill(blank(24, 36), (x, y) => {
+      const base = 33;
+      const up = base - y;
+      if (up < -2 || up > h) return -1;
+      const t = up / h;
+      const half = (1 - t) * 9 + 2 + Math.sin(y * 0.8 + f * 1.9) * 1.2;
+      const dx = Math.abs(x - 11.5);
+      // 根元の割れた地面（横長の楕円）
+      if (up < 1 && dx < 11 && hash(Math.floor(x), f, 1691) < 0.7) return 1;
+      if (dx > half) return -1;
+      const heat = 1 - dx / half + (1 - t) * 0.3;
+      return heat > 1 ? 5 : heat > 0.75 ? 4 : heat > 0.5 ? 3 : heat > 0.25 ? 2 : 1;
+    });
+    return outline(g, 0);
+  });
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** しろいきり（スイクン）: 地面に広がる白い霧（ふちがもくもくと動く。中は少し透けて、スイクンが隠れる） */
+function mistCloud(): SpriteOut {
+  // 0 灰・1 うす灰・2 白
+  const palette = ['#90a4ae', '#cfd8dc', '#eceff1'];
+  const r = rng(1692);
+  const puffs = Array.from({ length: 11 }, (_, k) => ({ a: (k / 11) * Math.PI * 2, rad: 0.28 + r() * 0.12, off: r() }));
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      let c = -1;
+      if (Math.hypot(u, v) < 0.6) c = (Math.floor((u + 1) * 16) + Math.floor((v + 1) * 16) + f) % 3 === 0 ? -1 : 1;
+      for (const p of puffs) {
+        const a = p.a + f * 0.05;
+        const d = Math.hypot(u - Math.cos(a) * (0.62 + Math.sin(f + p.off * 6) * 0.04), v - Math.sin(a) * 0.62) / p.rad;
+        if (d < 1) c = d < 0.5 ? 2 : 1;
+      }
+      return c;
+    }, 0, 0),
+  );
+  return { palette, frameMs: 160, parts: { main: frames.map(toRows) } };
+}
+
+/** エアロブラスト（ルギア）: 銀と水色の渦を巻く空気の砲撃（線の絵。途中は渦の筋がらせんに流れる） */
+function aeroblastBeam(): SpriteOut {
+  const H = 16;
+  const TILE = 12;
+  // 0 輪郭・1 濃い青・2 水色・3 うす水色・4 白
+  const palette = ['#0d2b4a', '#1976d2', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 8, middle: TILE, end: 10 }, 4, (x, y, f, part) => {
+    const taper = part === 'start' ? 0.4 + (x / 8) * 0.6 : part === 'end' ? 1 - x / 12 : 1;
+    const half = (H / 2 - 1) * taper;
+    const dy = y - mid;
+    if (Math.abs(dy) > half) return -1;
+    // 芯（白）と、らせんの筋（2本が逆向きにねじれる）
+    if (Math.abs(dy) < half * 0.3) return 4;
+    const ph = ((x + f * 3) / TILE) * Math.PI * 2;
+    const s1 = Math.sin(ph) * half * 0.75;
+    const s2 = -Math.sin(ph) * half * 0.75;
+    if (Math.abs(dy - s1) < 1 || Math.abs(dy - s2) < 1) return 3;
+    return Math.abs(dy) > half * 0.8 ? 1 : 2;
+  });
+  return { palette, frameMs: 60, parts };
+}
+
+/** じんつうりき（ルギア）: 空間がゆがむ所の、内へ縮んでいく何重もの青い輪と、真ん中の光る目 */
+function extrasensoryEye(): SpriteOut {
+  // 0 輪郭・1 濃い青・2 青・3 水色・4 白
+  const palette = ['#0b1640', '#283593', '#5c6bc0', '#9fa8da', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v * 1.2);
+      // 目（真ん中の横長の楕円と瞳）
+      if (Math.hypot(u, v * 2.4) < 0.28) return Math.hypot(u, v) < 0.1 ? 1 : 4;
+      if (d > 0.98) return -1;
+      // 内へ縮む輪（コマで内へ）
+      const ph = (d + f * 0.06) / 0.24;
+      const k = Math.abs(ph - Math.round(ph));
+      if (k < 0.1 && d > 0.32) return Math.round(ph) % 2 === 0 ? 3 : 2;
+      return -1;
+    }, 0, 0),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/** せいなるほのお（ホウオウ）: 虹色に縁取られた聖なる炎（下から立ち上る。中は金色、縁が赤・緑・青に移る） */
+function sacredFlame(): SpriteOut {
+  // 0 輪郭・1 赤・2 だいだい・3 金・4 白・5 緑・6 青
+  const palette = ['#2a0a00', '#e53935', '#ff9800', '#ffd54f', '#fffde7', '#43a047', '#1e88e5'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    const g = fill(blank(28, 32), (x, y) => {
+      const t = 1 - y / 31;
+      const cx = 13.5 + Math.sin(y * 0.5 + f * 1.7) * 1.4 * t;
+      const half = (1 - t) * 11 + 1.5 + Math.sin(y * 0.9 - f * 2) * 1.2;
+      const dx = Math.abs(x - cx);
+      if (dx > half || y < 2) return -1;
+      const edge = half - dx;
+      // 縁は虹色（高さとコマで色が回る）
+      if (edge < 1.3) return [1, 5, 6][(Math.floor(y / 3) + f) % 3]!;
+      const heat = edge / half + (1 - t) * 0.2;
+      return heat > 0.75 ? 4 : heat > 0.5 ? 3 : 2;
+    });
+    return outline(g, 0);
+  });
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** ボルトチェンジ（ライコウ）: 電撃がつないだ点の、はじける電気の結び目（黄と白の稲妻が四方へ短く伸びる） */
+function voltNode(): SpriteOut {
+  // 0 輪郭・1 濃い黄・2 黄・3 白
+  const palette = ['#2b2300', '#f9a825', '#ffeb3b', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(20, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d < 0.22) return 3;
+      const a = Math.atan2(v, u) + f * 0.5;
+      // 6 本のぎざぎざの稲妻（コマで向きと長さが変わる）
+      for (let k = 0; k < 6; k++) {
+        const ka = (k * Math.PI) / 3;
+        const da = Math.atan2(Math.sin(a - ka), Math.cos(a - ka));
+        const zig = Math.sin(d * 18 + k) * 0.08;
+        const reach = 0.6 + ((k + f) % 3) * 0.13;
+        if (d < reach && Math.abs(da * d - zig) < 0.06) return d < 0.45 ? 3 : 2;
+      }
+      return d < 0.3 ? 2 : -1;
+    }),
+  );
+  return { palette, frameMs: 60, parts: { main: frames.map(toRows) } };
+}
+
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
 /** 絵の名前 → 描く関数 */
@@ -5450,6 +5647,15 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'roar-wave': () => roarWave(),
     daimonji: () => daimonji(),
     'thunder-cloud': () => thunderCloud(),
+    'jump-shadow': () => jumpShadow(),
+    'snore-ring': () => snoreRing(),
+    'storm-pillar': () => stormPillar(),
+    'stomp-pillar': () => stompPillar(),
+    'mist-cloud': () => mistCloud(),
+    'aeroblast-beam': () => aeroblastBeam(),
+    'extrasensory-eye': () => extrasensoryEye(),
+    'sacred-flame': () => sacredFlame(),
+    'volt-node': () => voltNode(),
 };
 
 /** 絵の名前の一覧 */

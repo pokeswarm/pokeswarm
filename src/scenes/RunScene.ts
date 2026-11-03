@@ -1499,6 +1499,11 @@ export class RunScene extends Phaser.Scene {
       if (mv?.countdown) this.drawCountdown(h, countdowns++);
       // ダメージの無い技（ため・強化・回復・本物が現れる所）は、赤い予告を出さない（絵だけ。07 の167章）
       if (mv && mv.damage <= 0 && !mv.counter) continue;
+      // 跳ね回る技（ボルテッカー・ころがる）: 走り出す向きを線で見せる
+      if (mv?.bounce) {
+        g.lineStyle(h.radius * 2, 0xff1744, 0.12 + 0.18 * progress).lineBetween(h.x, h.y, h.x + h.dirX * 320, h.y + h.dirY * 320);
+        g.lineStyle(2, 0xff5252, 0.9).lineBetween(h.x, h.y, h.x + h.dirX * 320, h.y + h.dirY * 320);
+      }
       // 落ちた後に進む範囲（玉・刃・波）: 進む道を薄く見せる（向きが分かるように）
       if (mv?.travel && !mv.travel.homingDegreesPerSecond) {
         const reach = mv.travel.speed * (mv.activeSeconds ?? 1);
@@ -2069,6 +2074,14 @@ export class RunScene extends Phaser.Scene {
   /** 状態異常の色（data/game/status.json の並びで先にあるものを優先）。かかっていなければ null */
   private statusTint(i: number): number | null {
     const e = this.sim.world.enemies;
+    // ボスがプレイヤーと同じ技で走っている間（ボルテッカー・ブレイブバード）: プレイヤーの技の残像と同じ色で光らせる（07 の167章）
+    const w = this.sim.world;
+    for (const h of w.hazards) {
+      if (h.dasher !== e.id[i] || (h.activeTicks === undefined && !w.rules.stage.moves[h.move]?.dashSpeed)) continue;
+      const ghost = effectRecipes[w.rules.stage.moves[h.move]?.effect ?? '']?.ownerGhost;
+      if (!ghost) continue;
+      return hexColor(ghost.colors ? ghost.colors[Math.floor(performance.now() / ghost.periodMs) % ghost.colors.length]! : ghost.tint);
+    }
     const kinds = this.sim.world.statusKinds;
     // 遅れて爆発する印（みらいよち）: 黒く点滅（爆発が近いほど速く）
     if (e.markTicks[i]! > 0) {

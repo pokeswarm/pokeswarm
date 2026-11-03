@@ -609,10 +609,10 @@
     "moveSets": {
       "red-pikachu": {
         "moves": [
-          "red-volt-tackle",
-          "zapdos-thunder",
-          "red-volt-tackle",
-          "legend-nova"
+          "pika-volt-tackle",
+          "pika-iron-tail",
+          "pika-quick-attack",
+          "pika-iron-tail"
         ],
         "random": false,
         "moveIntervalSeconds": 1.3,
@@ -637,9 +637,9 @@
       },
       "red-espeon": {
         "moves": [
-          "mewtwo-teleport",
-          "espeon-psychic",
-          "espeon-psychic",
+          "espeon-psybeam",
+          "espeon-swift",
+          "espeon-swift",
           "espeon-morning-sun"
         ],
         "random": false,
@@ -655,10 +655,10 @@
       },
       "red-snorlax": {
         "moves": [
-          "snorlax-body-slam",
-          "earthquake",
-          "snorlax-body-slam",
-          "snorlax-rest"
+          "snorlax-giga-impact",
+          "snorlax-body-slam-jump",
+          "snorlax-rest-snore",
+          "snorlax-body-slam-jump"
         ],
         "random": false,
         "moveIntervalSeconds": 2,
@@ -731,10 +731,9 @@
       },
       "legend-raikou": {
         "moves": [
-          "raikou-dash",
-          "zapdos-thunder",
-          "raikou-dash",
-          "raikou-discharge"
+          "raikou-extreme-speed",
+          "raikou-thunder-around",
+          "raikou-volt-switch"
         ],
         "random": false,
         "moveIntervalSeconds": 1.3,
@@ -757,10 +756,9 @@
       },
       "legend-entei": {
         "moves": [
-          "moltres-flamedash",
+          "entei-flare-blitz",
           "entei-eruption",
-          "moltres-flamedash",
-          "entei-burst"
+          "entei-stomp"
         ],
         "random": false,
         "moveIntervalSeconds": 1.6,
@@ -775,9 +773,9 @@
       },
       "legend-suicune": {
         "moves": [
+          "suicune-mist",
           "suicune-aurora-beam",
-          "suicune-hydro-pump",
-          "suicune-rings"
+          "suicune-mirror-coat"
         ],
         "random": false,
         "moveIntervalSeconds": 1.5,
@@ -793,10 +791,9 @@
       },
       "legend-lugia": {
         "moves": [
-          "lugia-aeroblast",
+          "lugia-aeroblast-sweep",
           "lugia-hurricane",
-          "lugia-hydro-pump",
-          "lugia-hurricane"
+          "lugia-extrasensory"
         ],
         "random": false,
         "moveIntervalSeconds": 1.5,
@@ -816,8 +813,8 @@
         "moves": [
           "hooh-sacred-fire",
           "hooh-brave-bird",
-          "hooh-sacred-fire",
-          "hooh-sunny-burst"
+          "hooh-recover",
+          "hooh-sacred-fire"
         ],
         "random": false,
         "moveIntervalSeconds": 1.5,

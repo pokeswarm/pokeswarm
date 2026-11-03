@@ -216,6 +216,8 @@ export interface LegendaryWarningCommand {
   /** 伝説の乱入（三犬）。伝説戦は始めない */
   readonly intruder?: boolean;
   readonly kind: number;
+  /** 伝説戦の始まり: 逃げられるまでの残りの更新回数（ホストが決めた。ゲストも時間制限を出す。07 の172章） */
+  readonly ticksLeft?: number;
 }
 
 /** ゲスト: ホストが出したマップの箱・なくなった箱 */

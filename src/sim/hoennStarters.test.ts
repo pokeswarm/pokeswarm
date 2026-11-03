@@ -180,3 +180,17 @@ describe('ちかい', () => {
     expect(pledgePowerPct(t.sim.world, a)).toBe(pl.powerPct + pl.perOtherPct);
   });
 });
+
+describe('ストライク・ハッサム（07 の172章）', () => {
+  it.each(['kanto', 'johto'])('%s でも ひっかく → きりさく（シルクのスカーフ）→ つるぎのまい（プラスパワー）', (region) => {
+    const t = setup('scyther', region);
+    t.maxOut('scratch');
+    t.p.items.push({ item: t.item('silk-scarf'), level: 1 });
+    applyOffer(t.sim.world, t.p, t.derives('slash')!);
+    t.maxOut('slash');
+    t.p.items.push({ item: t.item('x-attack'), level: 1 });
+    t.p.species = t.species('scizor');
+    applyOffer(t.sim.world, t.p, t.derives('swords-dance')!);
+    expect(t.p.moves.some((m) => m.move === t.move('swords-dance'))).toBe(true);
+  });
+});

@@ -6,6 +6,8 @@ import type { MoveStats } from '../sim/moves';
 import type { SimRole, World } from '../sim/world';
 import { decode, encode } from './protocol';
 import { SyncSession } from './sync';
+import { buildSimRules } from '../data/simRules';
+import { startLegendary } from '../sim/systems/stage';
 
 const rate = { playerStateIntervalTicks: 1, correctionIntervalTicks: 30 };
 
@@ -305,5 +307,31 @@ describe('ボスの動きをゲストで滑らかに見せる（07 の166章）'
     // 1回の更新の動きはホストとほぼ同じ（届いた位置へ一気に合わせると、3回ごとに大きく飛ぶ）
     expect(maxStep).toBeLessThan(12);
     expect(Math.abs(guest.world.enemies.y[0]! - host.world.enemies.y[0]!)).toBeLessThan(15);
+  });
+});
+
+describe('伝説戦の時間制限をゲストにも出す（07 の172章）', () => {
+  it('ホストで伝説戦が始まると、ゲストも逃げられるまでの時刻をホストと同じに持つ', () => {
+    const rules = buildSimRules();
+    const make = (role: SimRole): Simulation => {
+      const sim = new Simulation({ tickRate: 30, seed: 3, rules, role, localPlayerId: role === 'host' ? 1 : 2 });
+      sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 150 });
+      sim.addPlayer({ id: 2, x: 40, y: 0, radius: 12, moveSpeed: 150 });
+      return sim;
+    };
+    const host = make('host');
+    const guest = make('guest');
+    const hostSession = new SyncSession({ playerStateIntervalTicks: 1, correctionIntervalTicks: 30 }, 1e9, () => 0);
+    const guestSession = new SyncSession({ playerStateIntervalTicks: 1, correctionIntervalTicks: 30 }, 1e9, () => 0);
+    for (let t = 0; t < 5; t++) {
+      host.step([]);
+      guest.step([]);
+    }
+    const kind = rules.enemies.kinds.findIndex((k) => k.rank === 'legendary');
+    startLegendary(host.world, kind);
+    const cmds = guestSession.incoming(guest.world, decode(encode(hostSession.outgoing(host.world))), 1);
+    guest.step(cmds);
+    host.step([]);
+    expect(guest.world.legendary?.endTick).toBe(host.world.legendary!.endTick);
   });
 });

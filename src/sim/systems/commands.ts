@@ -215,7 +215,8 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         }
         if (world.role === 'guest' && (!world.legendary || world.legendary.kind !== cmd.kind)) {
           // 続けて戦うラウンド（レッド戦）は、次の相手に入れ替える
-          world.legendary = { kind: cmd.kind, appearTick: 0, endTick: 0, spawned: false, result: null };
+          // 逃げられるまでの時刻（画面の時間制限）はホストに合わせる。終わりを決めるのはホスト
+          world.legendary = { kind: cmd.kind, appearTick: 0, endTick: cmd.ticksLeft !== undefined ? world.tick + cmd.ticksLeft : 0, spawned: false, result: null };
           world.cleared = true;
           world.hazards.length = 0;
           world.legendAis.clear();

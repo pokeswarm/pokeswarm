@@ -153,7 +153,7 @@ export class SyncSession {
           if (host) hazards.push(ev.move, round2(ev.x), round2(ev.y), round2(ev.dirX), round2(ev.dirY), ev.dasher, ev.delay, round2(ev.radius), round2(ev.inner), ev.follow, ev.group, round2(ev.damage), round2(ev.vx), round2(ev.vy), round2(ev.length));
           break;
         case 'legendaryWarning':
-          if (host) out.push(ev.enraged ? { t: 'lw', k: ev.kind, r: 1 } : { t: 'lw', k: ev.kind });
+          if (host) out.push(ev.enraged ? { t: 'lw', k: ev.kind, r: 1 } : { t: 'lw', k: ev.kind, ...(world.legendary && { e: world.legendary.endTick - world.tick }) });
           break;
         case 'intruderWarning':
           if (host) out.push({ t: 'lw', k: ev.kind, i: 1 });
@@ -386,7 +386,7 @@ export class SyncSession {
           if (guest) cmds.push({ type: 'setLegendTarget', enemyId: m.e, playerId: m.p });
           break;
         case 'lw':
-          if (guest) cmds.push({ type: 'legendaryWarning', kind: m.k, enraged: m.r === 1, intruder: m.i === 1 });
+          if (guest) cmds.push({ type: 'legendaryWarning', kind: m.k, enraged: m.r === 1, intruder: m.i === 1, ...(m.e !== undefined && { ticksLeft: m.e }) });
           break;
         case 'end':
           if (guest) cmds.push({ type: 'endRun', outcome: m.o, legendary: m.lg, ...(m.gt !== undefined && { gateTimeUp: m.gt }) });

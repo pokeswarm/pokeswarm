@@ -937,7 +937,7 @@ function fangBite(palette = ['#3b0d06', '#e53935', '#ff7043', '#cfc4bd', '#fffff
  * 上の列はカメラに近いので広く大きく（両はしに長い犬歯）、下の列は狭く小さい。歯ぐきは上が ∩、下が ∪ に少し反る。上下から閉じ、閉じた所で光る。
  * fire は ほのおのキバ（赤い歯ぐきのふちから炎の舌が立つ）、dark は かみつく（あくの紫）
  */
-function fangFace(kind: 'fire' | 'dark' | 'crunch' | 'electric', slope = 0, alignInner = false): SpriteOut {
+function fangFace(kind: 'fire' | 'dark' | 'crunch' | 'electric' | 'poison', slope = 0, alignInner = false): SpriteOut {
   // 0 輪郭・1 歯ぐき（濃い）・2 歯ぐき（明るい）・3 炎・光・4 歯の影・5 白
   // crunch は かみくだく の下向き・上向き（黒い歯ぐきと白いキバ。光も灰）
   const palette =
@@ -947,6 +947,8 @@ function fangFace(kind: 'fire' | 'dark' | 'crunch' | 'electric', slope = 0, alig
         ? ['#2b2500', '#9e7c00', '#ffca28', '#ffff8d', '#fff3c4', '#ffffff']
       : kind === 'crunch'
         ? ['#000000', '#0a0a0a', '#2a2a2a', '#5a5a5a', '#d6d6d6', '#ffffff']
+      : kind === 'poison'
+        ? ['#1f0716', '#880e4f', '#d81b60', '#b2ff59', '#aed581', '#ffffff']
         : ['#16071f', '#3d1060', '#7b1fa2', '#ce93d8', '#e7c6f0', '#ffffff'];
   const STEPS = [[0.34, 0, 0], [0.17, 0, 0], [-0.04, 1, 0], [-0.04, 0.6, 1], [-0.04, 0, 2]] as const;
   const tooth = (u: number, v: number, x: number, y0: number, dir: number, len: number, w: number): number => {
@@ -1015,7 +1017,7 @@ const FANG_TILT = Math.tan((30 * Math.PI) / 180);
  * かみつく・ほのおのキバ（作者の指摘 2026年10月28日: かみくだく の斜めと横を使う）: 下向き・上向きは正面の口、横は かみくだく と同じ肉食のあご（sideJaw）。
  * 斜めは正面の口を縦にずらして歯ぐきを向きに直角にし、下の列はプレイヤーの側（左）にそろえる（左向きは左右を返す）
  */
-function fangFront(kind: 'fire' | 'dark' | 'electric'): SpriteOut {
+function fangFront(kind: 'fire' | 'dark' | 'electric' | 'poison'): SpriteOut {
   const face = fangFace(kind);
   const front = face.parts.main!;
   return {
@@ -1033,7 +1035,7 @@ function fangFront(kind: 'fire' | 'dark' | 'electric'): SpriteOut {
  *   上あごは根元が厚く先が細い鼻先で、先が少し下へ曲がる。先に小さな前歯、その後ろに長い犬歯（下向き）、奥に小さな奥歯と大きな裂肉歯。
  *   下あごは上あごより短く細い。犬歯（上向き）は上の犬歯の少し前に立ち、閉じると上下の犬歯が交差する
  */
-function sideJaw(kind: 'fire' | 'dark' | 'crunch' | 'electric', n: number): string[][] {
+function sideJaw(kind: 'fire' | 'dark' | 'crunch' | 'electric' | 'poison', n: number): string[][] {
   // 色の番号は fangFace と同じ: 0 輪郭・1 あご（濃い）・2 あご・3 あごの照り・火花・炎・4 歯の影・5 白（歯）
   // コマごとの あごの開き（度）・火花・薄れ（0 開く → 1 半分 → 2 閉じる → 3 薄れる → 4 名残り）
   const STEPS = [[54, 0, 0], [28, 0, 0], [3, 1, 0], [3, 0.6, 1], [3, 0, 2]] as const;
@@ -4059,28 +4061,6 @@ function drainLine(): SpriteOut {
   return { palette, frameMs: 60, parts };
 }
 
-/** どくづき: 前へ突き出す毒の光の切っ先（thrust。柄は無く、根元が太く先がとがる）。紫の芯に黄緑の毒の光が先へ流れ、下に毒のしずく。3 コマ */
-function poisonJab(): SpriteOut {
-  const palette = ['#2a0a2e', '#6a1b9a', '#ab47bc', '#e1bee7', '#ffffff', '#c6ff00'];
-  const frames = [0, 1, 2].map((f) =>
-    wide(48, 16, (u, v) => {
-      const t = (u + 1) / 2;
-      const half = 0.75 * Math.pow(1 - t, 0.75) + 0.02;
-      const a = Math.abs(v);
-      if (a < half) {
-        const band = (((t * 6 - f * 0.6) % 1) + 1) % 1 < 0.18;
-        if (a < half * 0.3) return band ? 5 : 4;
-        if (a < half * 0.6) return band ? 5 : 3;
-        return t > 0.85 ? 3 : 2;
-      }
-      // しずく: 切っ先の下にこぼれる毒
-      for (const [dx, dy] of [[-0.4, 0.75], [0.0, 0.85], [0.3, 0.7]] as const) if (Math.hypot((u - dx - f * 0.05) * 2.2, v - dy) < 0.14) return 5;
-      return -1;
-    }),
-  );
-  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
-}
-
 /** アシッドボム: 放り投げる酸のかたまり（泡立つ紫と黄緑のしずく）。3 コマで表面がぶくぶくする */
 function acidBlob(): SpriteOut {
   const palette = ['#1b1030', '#6a1b9a', '#9c27b0', '#c6ff00', '#f4ff81', '#ffffff'];
@@ -5591,6 +5571,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'fang-front-dark': () => fangFront('dark'),
     'fang-front-fire': () => fangFront('fire'),
     'fang-front-electric': () => fangFront('electric'),
+    'fang-front-poison': () => fangFront('poison'),
     'dark-fang': () => fangBite(['#0e0a0a', '#3e2723', '#5d4037', '#bdb4ae', '#ffffff']),
     'flame-crash': () => flameCrash(),
     'impact-crescent': () => impactCrescent(),
@@ -5601,7 +5582,6 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     fist: () => punch('plain'),
     'fist-mach': () => punch('mach'),
     'fist-bullet': () => punch('bullet'),
-    'fist-focus': () => punch('focus'),
     'fist-fire': () => punch('fire'),
     'fist-thunder': () => punch('thunder'),
     kick: () => kick(),
@@ -5748,7 +5728,6 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'counter-stance': () => counterStance(),
     'counter-burst': () => counterBurst(),
     'drain-line': () => drainLine(),
-    'poison-jab': () => poisonJab(),
     'acid-blob': () => acidBlob(),
     'acid-splat': () => acidSplat(),
     'dual-wing-x': () => dualWingX(),
@@ -5802,10 +5781,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     // ジョウトの新しい技（07 の169章）
     'moon-orb': () => moonOrb(),
     'moon-burst': () => moonBurst(),
-    'gleam-cone': () => gleamCone(),
     'fire-blast-ball': () => fireBlastBall(),
     'fire-blast-arm': () => fireBlastArm(),
-    'poison-fangs': () => poisonFangs(),
     'venom-pool': () => venomPool(),
     'draco-meteor': () => dracoMeteor(),
     'draco-flare': () => dracoFlare(),
@@ -5817,6 +5794,11 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'rough-cloud': () => roughCloud(),
     'voice-heart': () => voiceHeart(),
     'gleam-burst': () => gleamBurst(),
+    // 175章
+    'gleam-ray': () => gleamRay(),
+    'revenge-swing': () => revengeSwing(),
+    'sacred-orb': () => sacredOrb(),
+    'sacred-ember': () => sacredEmber(),
 };
 
 /** 絵の名前の一覧 */
@@ -5890,34 +5872,6 @@ function moonBurst(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
-/** マジカルシャイン: 前へ広がる光の扇（扇に引き伸ばす）。根元から外へ光の筋が放射し、きらめく粒が流れる（桃・白・水色の光）。4 コマ */
-function gleamCone(): SpriteOut {
-  const W = 32;
-  const H = 32;
-  // 0 輪郭・1 桃・2 うす桃・3 白・4 水色・5 うす黄
-  const palette = ['#5a1e3a', '#f48fb1', '#fce4ec', '#ffffff', '#b3e5fc', '#fff9c4'];
-  const mid = (H - 1) / 2;
-  const frames = [0, 1, 2, 3].map((f) =>
-    fill(blank(W, H), (x, y) => {
-      const t = x / (W - 1);
-      const half = (H / 2) * (0.08 + 0.92 * t);
-      const v = (y - mid) / Math.max(0.5, half);
-      if (Math.abs(v) > 1) return -1;
-      // 放射する光の筋（7 本。コマで明るさが外へ流れる）
-      const ray = (v + 1) * 3;
-      const k = Math.abs(ray - Math.round(ray));
-      const pulse = (((t * 4 - f * 0.5) % 1) + 1) % 1;
-      if (k < 0.12) return pulse < 0.3 ? 3 : 2;
-      // きらめく粒
-      const h = hash(Math.floor(x / 2), Math.floor(y / 2), 5200 + f);
-      if (h < 0.08) return [3, 4, 5][Math.floor(h * 37) % 3]!;
-      if (t < 0.18) return 3;
-      return t < 0.9 && k < 0.24 ? 1 : -1;
-    }),
-  );
-  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
-}
-
 /** だいもんじ: 飛んでいく大きな火の玉（右へ進む。後ろへ炎の尾がゆらめき、玉の中に「大」の字がうっすら見える）。3 コマ */
 function fireBlastBall(): SpriteOut {
   // 0 輪郭・1 濃い赤・2 赤・3 だいだい・4 黄・5 白
@@ -5966,43 +5920,6 @@ function fireBlastArm(): SpriteOut {
     return heat > 0.8 ? 5 : heat > 0.6 ? 4 : heat > 0.4 ? 3 : heat > 0.2 ? 2 : 1;
   });
   return { palette, frameMs: 70, parts };
-}
-
-/** どくどくのキバ: 前でかみ合う紫の毒の牙（右向きの前の1枚）。上下の牙が閉じ、牙の先から毒のしずくが垂れる。4 コマ */
-function poisonFangs(): SpriteOut {
-  // 0 輪郭・1 濃い紫・2 紫・3 うす紫・4 白・5 黄緑
-  const palette = ['#1e0a24', '#4a148c', '#8e24aa', '#ce93d8', '#ffffff', '#c6ff00'];
-  const W = 32;
-  const H = 28;
-  const mid = (H - 1) / 2;
-  const frames = [0, 1, 2, 3].map((f) => {
-    const open = [7, 4.5, 2, 1][f]!;
-    const g = fill(blank(W, H), (x, y) => {
-      for (const side of [-1, 1] as const) {
-        // 顎の線（牙の根元）。上の顎は上、下の顎は下
-        const base = mid + side * (open + 6);
-        if (Math.abs(y - base) < 1.2 && x > 6 && x < 28) return 1;
-        // 牙: 3 本の三角が口の中心へ向く
-        for (let k = 0; k < 3; k++) {
-          const cx = 10 + k * 7;
-          const len = 6 - Math.abs(k - 1);
-          const along = (base - y) * side;
-          if (along < 0 || along > len) continue;
-          const half = 2.4 * (1 - along / len);
-          if (Math.abs(x - cx) < half) return Math.abs(x - cx) < half * 0.4 ? 4 : along > len * 0.6 ? 3 : 2;
-        }
-      }
-      // 毒のしずく: 下の牙の先から垂れる（コマで下へ）
-      for (let k = 0; k < 2; k++) {
-        const dx = 13.5 + k * 7;
-        const dy = mid + 3 + f * 2.5 + k;
-        if (Math.hypot(x - dx, (y - dy) * 0.7) < 1.3) return 5;
-      }
-      return -1;
-    });
-    return toRows(outline(g, 0));
-  });
-  return { palette, frameMs: 60, loopFrom: 3, parts: { main: frames } };
 }
 
 /** どくどくのキバ: かんだ所に残る猛毒のたまり（紫の水たまりに黄緑の泡が立ってはじける）。3 コマ */
@@ -6266,4 +6183,99 @@ function gleamBurst(): SpriteOut {
     }),
   );
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** マジカルシャイン（トゲチック）: 前へ走るきらめく光の筋（線の絵。芯は白、ふちは桃と水色。ところどころ十字のきらめき）。4 コマ */
+function gleamRay(): SpriteOut {
+  const H = 10;
+  // 0 輪郭・1 桃・2 うす桃・3 白・4 水色・5 うす黄
+  const palette = ['#5a1e3a', '#f48fb1', '#fce4ec', '#ffffff', '#b3e5fc', '#fff9c4'];
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 6, middle: 8, end: 8 }, 4, (x, y, f, part) => {
+    const taper = part === 'start' ? 0.5 + x / 12 : part === 'end' ? 1 - x / 9 : 1;
+    const d = Math.abs(y - mid);
+    // きらめき（middle の中を流れる）
+    if (part === 'middle') {
+      const cx = (f * 2 + 3) % 8;
+      if ((x === cx && d < 3.6) || (Math.abs(x - cx) <= 2 && d < 0.6)) return x === cx && d < 0.6 ? 3 : 5;
+    }
+    const half = 2.4 * taper;
+    if (d > half) return -1;
+    if (d < half * 0.35) return 3;
+    if (d < half * 0.7) return (x + f) % 4 === 0 ? 4 : 2;
+    return 1;
+  });
+  return { palette, frameMs: 70, parts };
+}
+
+/** リベンジ: 振り向きざまの一撃（後ろへ出る、太い三日月の衝撃。外側ほど明るく、ふちから火花が散る）。右向きに描く。4 コマ */
+function revengeSwing(): SpriteOut {
+  // 0 輪郭・1 濃い赤・2 だいだい・3 黄・4 白
+  const palette = ['#2b0a00', '#bf360c', '#ff7043', '#ffca28', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      // 三日月: 外の円（中心を左に寄せる）から内の円をくり抜く。コマで振り抜く角度が広がり、最後は薄れる
+      const ox = -0.55;
+      const d = Math.hypot(u - ox, v);
+      const a = Math.atan2(v, u - ox);
+      const reach = [0.5, 0.95, 1.2, 1.2][f]!;
+      if (Math.abs(a) > reach) return -1;
+      const outer = 1.35 - Math.abs(a) * 0.12;
+      const inner = 1.0 - Math.abs(a) * 0.05;
+      if (d > outer || d < inner) {
+        // 火花（外へ散る）
+        if (f >= 1 && d > outer && d < outer + 0.18 && hash(Math.floor(u * 14), Math.floor(v * 14), 7700 + f) < 0.12) return 3;
+        return -1;
+      }
+      if (f === 3) return hash(Math.floor(u * 16), Math.floor(v * 16), 7710) < 0.5 ? 2 : -1;
+      const k = (d - inner) / (outer - inner);
+      return k > 0.8 ? 4 : k > 0.55 ? 3 : k > 0.25 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 60, parts: { main: frames.map(toRows) } };
+}
+
+/** せいなるほのお: 大きな青白い炎の塊（右へ進む。後ろへ炎の尾がゆらめき、芯は白）。3 コマ */
+function sacredOrb(): SpriteOut {
+  // 0 輪郭・1 濃い青・2 青・3 水色・4 うす水色・5 白
+  const palette = ['#06142e', '#1565c0', '#42a5f5', '#81d4fa', '#e1f5fe', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(24, (u, v) => {
+      const cx = 0.3;
+      const d = Math.hypot(u - cx, v);
+      // 尾: 左へ 3 本の炎の舌
+      if (u < cx) {
+        for (let k = -1; k <= 1; k++) {
+          const yy = k * 0.26 + Math.sin(u * 7 + f * 2 + k) * 0.08;
+          const len = 0.95 - Math.abs(k) * 0.25 + (f === k + 1 ? 0.08 : 0);
+          const w = 0.16 * ((u + len) / (cx + len));
+          if (u > -len && Math.abs(v - yy) < w) return w > 0.1 ? 3 : 2;
+        }
+      }
+      if (d > 0.5) return -1;
+      // 塊の中でゆらめく炎の筋
+      const flick = Math.sin((v + f * 0.2) * 14 + u * 4) > 0.6;
+      return d < 0.2 ? 5 : d < 0.32 ? (flick ? 5 : 4) : d < 0.42 ? 3 : 2;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** せいなるほのお: 当たった所から飛び出る青白い炎（右へ進む小さな炎の舌）。2 コマ */
+function sacredEmber(): SpriteOut {
+  const palette = ['#06142e', '#1565c0', '#42a5f5', '#81d4fa', '#e1f5fe', '#ffffff'];
+  const frames = [0, 1].map((f) =>
+    shape(12, (u, v) => {
+      const cx = 0.35;
+      const d = Math.hypot(u - cx, v);
+      if (u < cx) {
+        const yy = Math.sin(u * 8 + f * 2) * 0.1;
+        const w = 0.32 * ((u + 0.9) / (cx + 0.9));
+        if (u > -0.9 && Math.abs(v - yy) < w) return w > 0.2 ? 3 : 2;
+      }
+      if (d > 0.42) return -1;
+      return d < 0.18 ? 5 : d < 0.3 ? 4 : 3;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
 }

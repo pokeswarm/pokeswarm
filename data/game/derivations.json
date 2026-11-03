@@ -21,7 +21,6 @@
     { "from": "magnitude", "item": "soft-sand", "to": "earthquake" },
     { "from": "confusion", "item": "twisted-spoon", "to": "psychic" },
     { "from": "thunder-shock", "item": "magnet", "to": "thunderbolt" },
-    { "from": "poison-sting", "item": "poison-barb", "to": "poison-jab" },
     { "from": "acid-spray", "item": "poison-barb", "to": "sludge-bomb" },
     { "from": "gust", "item": "sharp-beak", "to": "air-slash" },
     { "from": "air-cutter", "item": "sharp-beak", "to": "air-slash" },

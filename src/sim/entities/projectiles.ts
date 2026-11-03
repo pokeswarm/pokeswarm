@@ -102,6 +102,8 @@ export interface ProjectileSpawn {
   armStage?: number;
   /** ノックバックの強さの上書き（ワールド単位/秒。マイナスで引き寄せる）。無ければ技の値 */
   knockback?: number;
+  /** 追いかける敵の id（homing。せいなるほのお: 狙った敵を追い続ける）。無ければ一番近い敵を追う */
+  target?: number;
 }
 
 /**
@@ -156,6 +158,8 @@ export class ProjectileStore {
   readonly fxTimer: Float64Array;
   readonly hitFired: Uint8Array;
   readonly knockback: Float64Array;
+  /** 追いかける敵の id + 1（0 は決まった敵なし） */
+  readonly target: Uint32Array;
   /** 残る範囲（1）。見た目だけに使う */
   readonly linger: Uint8Array;
   /** ポイントマックスで増えた分（効き方 = 2段目以降の技を起こさない。作者の決定 2026年10月25日） */
@@ -204,6 +208,7 @@ export class ProjectileStore {
     this.fxTimer = new Float64Array(capacity);
     this.hitFired = new Uint8Array(capacity);
     this.knockback = new Float64Array(capacity);
+    this.target = new Uint32Array(capacity);
     this.linger = new Uint8Array(capacity);
     this.noFx = new Uint8Array(capacity);
   }
@@ -246,6 +251,7 @@ export class ProjectileStore {
     this.fxTimer[i] = 0;
     this.hitFired[i] = 0;
     this.knockback[i] = p.knockback ?? NaN;
+    this.target[i] = p.target === undefined ? 0 : p.target + 1;
     this.linger[i] = p.linger ? 1 : 0;
     this.noFx[i] = 0;
     return i;
@@ -291,6 +297,7 @@ export class ProjectileStore {
     this.fxTimer[i] = this.fxTimer[last]!;
     this.hitFired[i] = this.hitFired[last]!;
     this.knockback[i] = this.knockback[last]!;
+    this.target[i] = this.target[last]!;
     this.linger[i] = this.linger[last]!;
     this.noFx[i] = this.noFx[last]!;
     const m = this.hitMemory;

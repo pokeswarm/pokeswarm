@@ -713,15 +713,6 @@
         "size": 0.9
       }
     },
-    "poison-sting": {
-      "extends": "poison.base",
-      "sprite": {
-        "id": "needle",
-        "fit": "circle",
-        "size": 1.6,
-        "rotate": "velocity"
-      }
-    },
     "sleep-powder": {
       "extends": "poison.base",
       "projectile": {
@@ -5102,15 +5093,19 @@
     },
     "revenge": {
       "extends": "fighting.base",
+      "hideShape": true,
       "impact": {
         "flash": {
-          "radius": 50
+          "color": "#ffab91",
+          "radius": 34,
+          "durationMs": 120,
+          "alpha": 0.6
         }
       },
       "sprite": {
-        "id": "fist-focus",
+        "id": "revenge-swing",
         "fit": "front",
-        "size": 1.1
+        "size": 1
       }
     },
     "stealth-rock": {
@@ -5520,28 +5515,6 @@
         "fit": "line",
         "size": 1.6,
         "growSeconds": 0.1
-      }
-    },
-    "poison-jab": {
-      "extends": "poison.base",
-      "hideShape": true,
-      "projectile": {
-        "glowScale": 1.1,
-        "coreScale": 0.3
-      },
-      "impact": {
-        "flash": {
-          "color": "#e1bee7",
-          "radius": 28,
-          "durationMs": 110,
-          "alpha": 0.5
-        }
-      },
-      "sprite": {
-        "id": "poison-jab",
-        "fit": "thrust",
-        "size": 1,
-        "growSeconds": 0.08
       }
     },
     "acid-spray": {
@@ -6384,20 +6357,15 @@
     },
     "dazzling-gleam": {
       "extends": "fairy.base",
-      "projectile": {
-        "shapeAlpha": 0.3,
-        "glowColor": "#fce4ec"
-      },
       "screenFlash": {
         "color": "#fff0f7",
-        "alpha": 0.18,
-        "durationMs": 160
+        "alpha": 0.1,
+        "durationMs": 120
       },
       "sprite": {
-        "id": "gleam-cone",
-        "fit": "cone",
-        "size": 1,
-        "alpha": 0.9
+        "id": "gleam-ray",
+        "fit": "line",
+        "size": 1.3
       }
     },
     "fire-blast": {
@@ -6436,9 +6404,10 @@
         "shapeAlpha": 0.25
       },
       "sprite": {
-        "id": "poison-fangs",
+        "id": "fang-front-poison",
         "fit": "front",
-        "size": 1
+        "size": 1,
+        "directional": true
       },
       "lingerSprite": {
         "id": "venom-pool",
@@ -6475,38 +6444,45 @@
     },
     "aeroblast": {
       "extends": "flying.base",
-      "projectile": {
-        "shapeAlpha": 0.25
-      },
       "sprite": {
         "id": "aeroblast-beam",
         "fit": "line",
-        "size": 1.2
+        "size": 1.1
+      },
+      "chargeGlow": {
+        "color": "#e1f5fe",
+        "seconds": 0.6,
+        "radius": 60,
+        "alpha": 0.8
       }
     },
     "sacred-fire": {
       "extends": "fire.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 1.3,
+        "coreScale": 0.4,
+        "glowColor": "#b3e5fc"
+      },
       "impact": {
-        "burst": {
-          "count": 0
-        },
         "flash": {
-          "radius": 14,
-          "alpha": 0.3
+          "color": "#e1f5fe",
+          "radius": 50,
+          "durationMs": 160,
+          "alpha": 0.7
         }
       },
-      "projectile": {
-        "glowScale": 1.2,
-        "coreScale": 0.4,
-        "glowColor": "#ffd54f",
-        "shapeAlpha": 0.25
-      },
       "sprite": {
-        "id": "sacred-flame",
+        "id": "sacred-orb",
         "fit": "circle",
-        "size": 1.3,
-        "originY": 0.86,
-        "alpha": 0.95
+        "size": 2.4,
+        "rotate": "velocity"
+      },
+      "effectSprite": {
+        "id": "sacred-ember",
+        "fit": "circle",
+        "size": 2.4,
+        "rotate": "velocity"
       }
     },
     "harden": {

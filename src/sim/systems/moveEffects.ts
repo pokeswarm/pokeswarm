@@ -234,10 +234,13 @@ function applyEffect(world: World, fx: MoveEffect, index: number, src: FxSource)
     // ばらつきは共有の乱数ではなく、時刻と位置から決める（どのブラウザでも同じ形になる）
     const rand = (k: number, salt: number): number => hash01(world.seed, world.tick, Math.floor(src.x) * 7919 + Math.floor(src.y), 2000 + k * 7 + salt);
     const pierce = sp.pierce === undefined ? 3 : sp.pierce === 'infinite' ? Infinity : sp.pierce;
-    for (let k = 0; k < sp.count; k++) {
+    // 技の数を増やす持ち物の分だけ増やす（せいなるほのお: 本体は 1 つのまま、飛び出る炎が増える）
+    const bonus = sp.countPerBonus ? Math.max(0, Math.floor(world.players.find((pl) => pl.id === src.owner)?.mods.amountBonus ?? 0)) * sp.countPerBonus : 0;
+    const count = sp.count + bonus;
+    for (let k = 0; k < count; k++) {
       // 360° なら等しい角度で一周、それ以外は向きを中心に広げる
-      const step = spread >= Math.PI * 2 ? (Math.PI * 2) / sp.count : sp.count === 1 ? 0 : spread / (sp.count - 1);
-      const a0 = spread >= Math.PI * 2 ? angle0 + (k / sp.count) * Math.PI * 2 : angle0 + (sp.count === 1 ? 0 : (k / (sp.count - 1) - 0.5) * spread);
+      const step = spread >= Math.PI * 2 ? (Math.PI * 2) / count : count === 1 ? 0 : spread / (count - 1);
+      const a0 = spread >= Math.PI * 2 ? angle0 + (k / count) * Math.PI * 2 : angle0 + (count === 1 ? 0 : (k / (count - 1) - 0.5) * spread);
       const jitter = sp.jitter ?? 0;
       const a = a0 + ((sp.angleOffsetDegrees ?? 0) * Math.PI) / 180 + (rand(k, 1) - 0.5) * step * jitter;
       const speed = sp.speed * (1 - 0.5 * jitter * rand(k, 2));

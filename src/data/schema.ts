@@ -1119,6 +1119,8 @@ export const moveEffectSchema = z.object({
       angleOffsetDegrees: z.number().optional(),
       lob: z.boolean().optional(),
       snake: snakeSchema.optional(),
+      /** 技の数を増やす持ち物（ポイントマックス）1 つにつき増やす数（せいなるほのお: 本体は 1 つのまま、飛び出る炎が増える。07 の175章） */
+      countPerBonus: z.number().int().nonnegative().optional(),
       /** レベルが1上がるごとに延ばす持続（秒。ハードプラント: 強化で根が遠くまで伸びる） */
       durationPerLevel: z.number().nonnegative().optional(),
       pierce: pierceValue.optional(),
@@ -1345,10 +1347,12 @@ export const moveDefSchema = z.object({
   randomAim: z.boolean().optional(),
   /** 再使用を、出した技が消えてから数える（こなゆき・ふぶき: 雪が止んでから cooldown の間はダメージが起きない。作者の決定 2026年10月25日） */
   restAfterEnd: z.boolean().optional(),
-  /** 狙う敵: 一番近い敵ではなく、届く範囲で HP の一番高い敵（ゴッドバード: ボスへ。作者の決定 2026年10月25日）。beam で使う */
+  /** 狙う敵: 一番近い敵ではなく、届く範囲で HP の一番高い敵（ゴッドバード: ボスへ。作者の決定 2026年10月25日）。beam と homing で使う（homing はその敵を追い続ける。せいなるほのお） */
   aimStrongest: z.boolean().optional(),
   /** beam を、敵を狙わず向いている方へ出す（メガホーン: 前へ槍を突き出す） */
   aimFacing: z.boolean().optional(),
+  /** melee を、向いている方の反対（後ろ）へ出す（リベンジ: 振り向きざまの反撃。前の メガホーン と重ならない。07 の175章） */
+  aimBehind: z.boolean().optional(),
   /**
    * ためている間に出す技（moves.json のキー。最大レベルで出す）と、この技を出してから止めておく秒数
    * （きあいパンチ: ためている間はマッハパンチが出て、きあいパンチを出している間は止まる。作者の決定 2026年10月25日）

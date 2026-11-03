@@ -25,7 +25,7 @@ import type { Player, PlayerMove } from '../entities/player';
 import { DMG_CRIT, type HitEffect } from '../events';
 import { axisToUnit } from '../math';
 import { typeFlags, typeMultiplier, type MoveStats, type SimMoveDef } from '../moves';
-import type { World } from '../world';
+import { findEnemyIndex, type World } from '../world';
 import { abilityPowerMultiplier, killStackPct, pinchMods } from '../ability';
 import { bumpRunStat } from '../runStats';
 import type { Modifiers } from '../upgrades';
@@ -198,13 +198,20 @@ function aim(world: World, p: Player, range: number): [number, number] {
   return [dx / d, dy / d];
 }
 
-/** 届く範囲で HP の一番高い敵への向き（ゴッドバード: ボスを狙う）。いなければ null（同じ HP なら id の小さい方） */
-function aimStrongest(world: World, p: Player, range: number): [number, number] | null {
+/** 届く範囲で HP の一番高い敵の番号。いなければ -1（同じ HP なら先に見つかった方） */
+function strongestEnemy(world: World, p: Player, range: number): number {
   const e = world.enemies;
   let best = -1;
   for (const i of enemiesInRange(world, p.x, p.y, range)) {
     if (best === -1 || e.hp[i]! > e.hp[best]!) best = i;
   }
+  return best;
+}
+
+/** 届く範囲で HP の一番高い敵への向き（ゴッドバード: ボスを狙う）。いなければ null */
+function aimStrongest(world: World, p: Player, range: number): [number, number] | null {
+  const e = world.enemies;
+  const best = strongestEnemy(world, p, range);
   if (best === -1) return null;
   const dx = e.x[best]! - p.x;
   const dy = e.y[best]! - p.y;
@@ -576,7 +583,8 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     // ポイントマックスで増えた分（後ろの発）は、2段目以降の技を起こさない
     const shot = st.count - pm.burstLeft;
     const before = world.projectiles.count;
-    const bonusShot = shot >= st.count - p.mods.amountBonus && def.effects.length > 0;
+    // 数を威力に変える技（せいなるほのお）は、増えた発が無いので印を付けない
+    const bonusShot = shot >= st.count - p.mods.amountBonus && def.effects.length > 0 && !def.bonusCountToPower;
     if (def.pattern === 'barrage') {
       fireBarrageHit(world, p, pm, st);
       if (bonusShot) for (let k = before; k < world.projectiles.count; k++) world.projectiles.noFx[k] = 1;
@@ -593,13 +601,17 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
       continue;
     }
     let dir: [number, number];
+    let target: number | undefined;
     if (def.pattern === 'nearest' || def.pattern === 'homing') {
       const t = nearestEnemy(world, p.x, p.y, st.range);
       if (t === -1) {
         pm.burstLeft = 0;
         return;
       }
-      dir = aim(world, p, st.range);
+      // せいなるほのお: 届く範囲で HP の一番高い敵へ飛び、その敵を追い続ける
+      const strong = def.pattern === 'homing' && def.aimStrongest ? strongestEnemy(world, p, st.range) : -1;
+      if (strong !== -1) target = world.enemies.id[strong]!;
+      dir = strong !== -1 ? aimStrongest(world, p, st.range)! : aim(world, p, st.range);
     } else {
       dir = axisToUnit(p.facingX, p.facingY);
     }
@@ -624,6 +636,7 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
       vy: dy * speed,
       ox: dx * speed,
       oy: dy * speed,
+      ...(target !== undefined ? { target } : {}),
     });
     if (bonusShot) for (let k = before; k < world.projectiles.count; k++) world.projectiles.noFx[k] = 1;
     pm.burstLeft--;
@@ -665,7 +678,11 @@ function fireBarrageHit(world: World, p: Player, pm: PlayerMove, st: MoveStats):
 
 /** melee: 向いている方向 → 反対側 → 左 → 右 の順に当たり判定を出す（持ち主に付いていく。range 0 なら自分の周り） */
 function fireMelee(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
-  const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  // 後ろへ出す技（リベンジ: 振り向きざまの反撃）は、向いている方の反対へ
+  const [ux, uy] = axisToUnit(p.facingX, p.facingY);
+  const back = world.rules.moves[pm.move]!.aimBehind ? -1 : 1;
+  const fx = ux * back;
+  const fy = uy * back;
   const body = world.rules.moves[pm.move]!.body;
   if (body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: fx, dirY: fy, distance: body.lungeDistance, afterimages: body.afterimages });
   const box = world.rules.moves[pm.move]!.frontBox;
@@ -1412,8 +1429,10 @@ export function moveProjectiles(world: World): void {
       pr.x[i] = pr.ox[i]! + dx;
       pr.y[i] = pr.oy[i]! + dy;
     } else if (motion === MOTION_HOMING) {
-      // まだ当たっていない一番近い敵を追う（貫通する弾は、当たった敵の次へ進む。前は当たった敵を追い続けて残っていた）
-      const t = nearestUnhitEnemy(world, i, 300);
+      // まだ当たっていない一番近い敵を追う（貫通する弾は、当たった敵の次へ進む。前は当たった敵を追い続けて残っていた）。
+      // 狙った敵が決まっている弾（せいなるほのお）は、その敵が残っている間はその敵を追う
+      const locked = pr.target[i]! > 0 ? findEnemyIndex(world, pr.target[i]! - 1) : -1;
+      const t = locked !== -1 && e.hp[locked]! > 0 ? locked : nearestUnhitEnemy(world, i, 300);
       if (t !== -1) {
         const dx = e.x[t]! - pr.x[i]!;
         const dy = e.y[t]! - pr.y[i]!;

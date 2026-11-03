@@ -141,6 +141,8 @@ export interface SimMoveDef {
   readonly aimStrongest?: boolean;
   /** beam を向いている方へ出す（メガホーン） */
   readonly aimFacing?: boolean;
+  /** melee を後ろへ出す（リベンジ） */
+  readonly aimBehind?: boolean;
   /** chain: 跳ぶ先を、向いている方のこの角度の中だけにする（ラジアンの半分。無ければ全方向） */
   readonly chainFacingHalf?: number;
   /** spiral: うずの中心が向いていた方へ進む速さ */

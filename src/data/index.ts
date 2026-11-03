@@ -419,8 +419,9 @@ for (const d of [...derivationsConfig.derivations, ...derivationsConfig.unique])
 }
 // いつも効く技（passive）: レベルごとの効果の数は、最大レベルと同じ
 for (const [key, m] of Object.entries(movesConfig.moves)) {
-  if (m.pattern === 'passive') check((m.passive?.length ?? 0) === m.levels.length + 1, `data/game/moves.json の "${key}" はいつも効く技なので、passive の数を最大レベル（${m.levels.length + 1}）にしてください`);
-  else check(!m.passive, `data/game/moves.json の "${key}" の passive は、pattern が passive の技だけに書けます`);
+  // ダメージを受けると効く技（hurtBuff。リベンジ: 攻撃もする）は、攻撃の技でも passive を書ける（受けてからの時間だけ効く）
+  if (m.pattern === 'passive' || m.hurtBuff) check((m.passive?.length ?? 0) === m.levels.length + 1, `data/game/moves.json の "${key}" はいつも効く技なので、passive の数を最大レベル（${m.levels.length + 1}）にしてください`);
+  else check(!m.passive, `data/game/moves.json の "${key}" の passive は、pattern が passive の技（か hurtBuff のある技）だけに書けます`);
 }
 for (const u of derivationsConfig.unique) {
   check(!!playablesConfig.pokemon[u.line], `data/game/derivations.json の固有技 "${u.to}" の系統 "${u.line}" が data/game/playables.json にありません`);

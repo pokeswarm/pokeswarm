@@ -51,7 +51,6 @@
     "bulbasaur": [
       "leech-seed",
       "vine-whip",
-      "poison-sting",
       "tackle",
       "frenzy-plant",
       "body-slam",
@@ -63,12 +62,6 @@
       "leaf-storm",
       "acid-spray",
       "grass-pledge",
-      {
-        "move": "poison-jab",
-        "forms": [
-          "venusaur"
-        ]
-      },
       {
         "move": "sludge-wave",
         "forms": [
@@ -748,7 +741,6 @@
     "oddish": [
       "vine-whip",
       "leech-seed",
-      "poison-sting",
       "petal-dance",
       "razor-leaf",
       "sleep-powder",
@@ -772,7 +764,6 @@
     ],
     "koffing": [
       "smog",
-      "poison-sting",
       "tackle",
       "explosion",
       "body-slam",
@@ -874,14 +865,12 @@
     "gastly": [
       "night-shade",
       "smog",
-      "poison-sting",
       "lick",
       "hex",
       "sludge-bomb",
       "shadow-ball",
       "astonish",
       "sucker-punch",
-      "poison-jab",
       "dark-pulse",
       "sludge-wave",
       "acid-spray",

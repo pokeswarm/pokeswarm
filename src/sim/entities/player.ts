@@ -86,6 +86,18 @@ export interface Player {
   fieldHurtTicks?: number;
   /** 燃える床のダメージまでの残り（更新回数） */
   zoneHurtTicks?: number;
+  /**
+   * ボスの技の効き目（07 の167章。本人のブラウザで）: ねむけ（遅くなる）・やけど（削られ続ける）・冷え（溜まると凍る。しばらく受けないと消える）の残り（更新回数）、
+   * 押し飛ばし（すべる速さと残り）
+   */
+  drowsyTicks?: number;
+  burnTicks?: number;
+  burnHurtTicks?: number;
+  chill?: number;
+  chillTicks?: number;
+  pushVx?: number;
+  pushVy?: number;
+  pushTicks?: number;
   /** ポケモンの種類（SimRules.species の番号）。進化で変わる */
   species: number;
   hp: number;

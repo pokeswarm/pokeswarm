@@ -178,6 +178,21 @@ export const enemyKindSchema = z.object({
   spriteScale: z.number().positive().optional(),
   /** 色違い（名前を「色違いの〇〇」にする。作者の決定 2026年10月24日: 色違いの御三家） */
   shiny: z.boolean().optional(),
+  /**
+   * ボスの技の合間の動き（07 の167章。省略なら一番近いプレイヤーへまっすぐ追う）:
+   * - keepDistance: プレイヤーから distance を保ち、近ければ離れ、遠ければ近づき、その間は横へ回り込む（タッグの遠くの役）
+   * - orbit: プレイヤーの周り distance を、angularDegreesPerSecond で回る（クロバット）
+   * - still: 動かない（ネイティオ。場所は技のテレポートで変える）
+   */
+  motion: z
+    .object({
+      type: z.enum(['keepDistance', 'orbit', 'still']),
+      distance: z.number().nonnegative().default(260),
+      angularDegreesPerSecond: z.number().default(70),
+    })
+    .optional(),
+  /** かげぶんしん の偽物（07 の167章）。少し透けて描き、撃破に数えない */
+  decoy: z.boolean().optional(),
 });
 export type EnemyKind = z.infer<typeof enemyKindSchema>;
 
@@ -496,7 +511,8 @@ export const bossMoveSchema = z.object({
   move: z.string().min(1).optional(),
   /** 範囲に落ちたときの演出（data/effects/recipes.json） */
   effect: z.string().min(1),
-  shape: z.enum(['circle', 'line', 'ring']).default('circle'),
+  /** circle・line・ring・cone（扇。半径 radius、開き arc 度。向きは狙った向き） */
+  shape: z.enum(['circle', 'line', 'ring', 'cone']).default('circle'),
   target: z.enum(['player', 'self', 'random']).default('player'),
   targetPick: z.enum(['nearest', 'random', 'highestHp']).optional(),
   telegraphSeconds: z.number().positive(),
@@ -535,8 +551,93 @@ export const bossMoveSchema = z.object({
       damagePerSecond: z.number().nonnegative().default(0),
       /** 床の色（#rrggbb） */
       color: z.string(),
+      /** 上にいると、床の中心へ毎秒この距離だけ引き寄せられる（すなじごく。07 の167章） */
+      pullPerSecond: z.number().nonnegative().optional(),
+      /** 床をボスに付いていかせる（じゅうりょく: ボスの方へ引き寄せる） */
+      followBoss: z.boolean().optional(),
     })
     .optional(),
+  // ---- ここから 07 の167章（ボスの技の作り直し）で足した部品。後の地方の伝説でも使う ----
+  /** 扇（cone）の開き（度） */
+  arc: z.number().positive().max(360).optional(),
+  /** 中心から count 本の直線を等しい角度で出す（×・大の字・十字）。offsetDegrees は狙った向きからのずれ。予告の場所はボス（self）か狙った人 */
+  arms: z.object({ count: z.number().int().min(2), offsetDegrees: z.number().default(0), /** 狙った向きに関係なく、画面に対して offsetDegrees の向きに出す（絵の×と当たり判定をそろえる。クロスチョップ） */ absolute: z.boolean().default(false) }).optional(),
+  /** 落ちた後、直線の向きを回す（なぎ払い）: 合わせて degrees 度を seconds 秒で。予告は回る範囲の扇で見せる */
+  sweep: z.object({ degrees: z.number(), seconds: z.number().positive() }).optional(),
+  /** 落ちた後に当たる時間（秒。省略なら bossRules.hazardActiveSeconds） */
+  activeSeconds: z.number().positive().optional(),
+  /** 当たる時間の間、この秒数ごとにもう一度当たる（省略なら1回だけ） */
+  hitEverySeconds: z.number().positive().optional(),
+  /** 予告と当たる範囲が、使ったボスに付いていく（ほろびのうた・フレアドライブ・カウンター） */
+  followBoss: z.boolean().optional(),
+  /** 予告が狙ったプレイヤーを seconds 秒だけ追う（speed があればその速さまで。影が這う・雷雲・波紋）。その後は止まって落ちる */
+  follow: z.object({ seconds: z.number().positive(), speed: z.number().positive().optional() }).optional(),
+  /** 予告の間、使ったボスが消える（当たらない・狙われない）。teleport と組むと、落ちた所に現れる（潜る・跳ぶ・飛ぶ） */
+  hideBoss: z.boolean().optional(),
+  /**
+   * 落ちた後、当たる時間の間、予告の向き（line は垂直の向き）へ speed で進む（玉・刃・竜巻・波）。
+   * homingDegreesPerSecond で一番近いプレイヤーへ曲がる。wobble で左右に揺れる（たつまき）
+   */
+  travel: z
+    .object({
+      speed: z.number().positive(),
+      homingDegreesPerSecond: z.number().nonnegative().default(0),
+      wobble: z.object({ amplitude: z.number().positive(), seconds: z.number().positive() }).optional(),
+    })
+    .optional(),
+  /** target self の count 個を、ボスの周り radius に、狙った人の向きから順に（stagger）置く（ライコウのかみなり） */
+  around: z.object({ radius: z.number().positive(), clockwise: z.boolean().default(true) }).optional(),
+  /** 狙った人への向きに沿って count 個の円を spacing ずつ並べ、順に（stagger）置く（エンテイのふみつけ） */
+  along: z.object({ spacing: z.number().positive(), start: z.number().default(80) }).optional(),
+  /** 横に長い帯（全体の長さ length）を、狙った人の手前 distance から押し寄せさせる。1か所 gap の切れ目（ラプラスのなみのり） */
+  wall: z.object({ length: z.number().positive(), gap: z.number().positive(), distance: z.number().positive() }).optional(),
+  /** 狙い直しながら count 回置く（everySeconds ごと。ネイティオのみらいよち: 足跡のように並ぶ） */
+  repeat: z.object({ count: z.number().int().min(2), everySeconds: z.number().positive() }).optional(),
+  /** 当たったプレイヤーにかかる効き目（本人のブラウザで）: ねむけ（遅くなる）・やけど（削られ続ける）・冷え（溜まると凍る）・ひるみ（動けない）・押し飛ばし */
+  onHit: z
+    .object({
+      drowsySeconds: z.number().positive().optional(),
+      burnSeconds: z.number().positive().optional(),
+      chill: z.number().int().positive().optional(),
+      flinchSeconds: z.number().positive().optional(),
+      /** ボス（無ければ範囲の中心）から外へ、速さ pushSpeed で pushSeconds 秒すべらせる（瞬間移動させない。07 の167章 あてみなげ） */
+      pushSpeed: z.number().positive().optional(),
+      pushSeconds: z.number().positive().optional(),
+      /** ねむけ・やけど・冷え・ひるみ・凍る のどれかにかかっている人へは、威力がこの % 増える（たたりめ） */
+      statusBonusPct: z.number().nonnegative().optional(),
+    })
+    .optional(),
+  /** 落ちた後、使ったボスがこの秒数止まる（はかいこうせん の反動・げきりん の後の混乱） */
+  recoilSeconds: z.number().positive().optional(),
+  /**
+   * カウンター・ミラーコート（07 の167章）: 予告の間にボスが受けたダメージの ratio 倍（max まで）を、落ちたときに範囲（radius）へ返す。
+   * 技を止める考え方が無いゲームなので、離れていれば当たらないように範囲は狭くする
+   */
+  counter: z.object({ ratio: z.number().positive(), max: z.number().positive() }).optional(),
+  /** 使ったボスを強くする（落ちたとき）: radiusPct（次の uses 回の技の範囲）、speedPct・intervalPct（重ねる。maxStacks まで。りゅうのまい） */
+  buff: z
+    .object({
+      radiusPct: z.number().default(0),
+      uses: z.number().int().nonnegative().default(0),
+      speedPct: z.number().default(0),
+      intervalPct: z.number().default(0),
+      maxStacks: z.number().int().positive().default(1),
+    })
+    .optional(),
+  /** かげぶんしん: 狙った人の周り radius に count 体の偽物（enemies の kind）を出し、本物はその1か所へ移る。偽物は seconds 秒で消える */
+  decoys: z.object({ kind: z.string().min(1), count: z.number().int().positive(), radius: z.number().positive(), seconds: z.number().positive() }).optional(),
+  /** 予告の間、残りの秒数を大きく出す（ほろびのうた） */
+  countdown: z.boolean().optional(),
+  /** 罠（ふいうち）: 落ちた後 seconds 秒残り、自分のプレイヤーが踏むとその場で当たる */
+  trap: z.object({ seconds: z.number().positive() }).optional(),
+  /** count をボスの残りの HP の割合で減らす（しおふき: HP が多いほど多い。最低 1） */
+  countByHp: z.boolean().optional(),
+  /** 跳ね回る（ボルテッカー・ころがる）: 狙った人を中心にした halfWidth × halfHeight の箱の端で跳ね返りながら seconds 秒走る。跳ね返るたびに範囲が growPct % 大きく */
+  bounce: z
+    .object({ seconds: z.number().positive(), speed: z.number().positive(), halfWidth: z.number().positive(), halfHeight: z.number().positive(), growPct: z.number().nonnegative().default(0) })
+    .optional(),
+  /** then の技を、ボスの今の場所ではなく、この技と同じ場所・向きに置く（つじぎり の二段目） */
+  thenSamePlace: z.boolean().optional(),
 });
 export type BossMove = z.infer<typeof bossMoveSchema>;
 
@@ -594,6 +695,8 @@ export const stageConfigSchema = z.object({
        * doubleChance の確率で2つの技を同時に使う
        */
       enrage: z.object({ hpRatio: z.number().gt(0).lt(1), moveIntervalSeconds: z.number().positive(), doubleChance: z.number().min(0).max(1) }).optional(),
+      /** 段階（変化タイプ。07 の167章）: HP が belowHpPct % を切ったら、技を moves に切り替える（ジョウトのワタルのカイリュー） */
+      phases: z.array(z.object({ belowHpPct: z.number().gt(0).lt(100), moves: z.array(z.string()).min(1) })).optional(),
     }),
   ),
   /** 範囲技の定義 */
@@ -715,6 +818,12 @@ export const stageConfigSchema = z.object({
     spawnDistance: z.number().positive(),
     /** 区間を進める中ボス（gate）が出てから、この秒数で倒せなければ失敗（作者の決定 2026年10月28日: 育たずに逃げ回るランを早く終える。07 の106章）。省略で制限なし */
     gateTimeLimitSeconds: z.number().positive().optional(),
+    /** ボスの技の効き目（07 の167章）: ねむけで遅くなる割合（%）・やけどで毎秒削られる最大 HP の %・冷えが何回で凍るか・凍る秒数・冷えが消えるまでの秒数 */
+    drowsySlowPct: z.number().min(0).max(95).optional(),
+    burnPctPerSecond: z.number().nonnegative().optional(),
+    chillToFreeze: z.number().int().positive().optional(),
+    chillFreezeSeconds: z.number().positive().optional(),
+    chillForgetSeconds: z.number().positive().optional(),
   }),
   /** クリア・失敗が決まってから結果画面に移るまでの時間 */
   endDelaySeconds: z.number().nonnegative(),
@@ -1698,6 +1807,10 @@ export const effectRecipeSchema = z.object({
   sprite: moveSpriteSpec.optional(),
   /** 効き方から出た線（ハードプラントの突き出す根）を、光の線の代わりにこのドット絵で描く */
   effectLineSprite: moveSpriteSpec.optional(),
+  /** ボスの技（07 の167章）: 予告の間、予告の場所に描く絵（這う影・雷雲・構えの光）。円は予告の半径、線は予告の線に合わせる */
+  bossTelegraph: moveSpriteSpec.optional(),
+  /** ボスの技: 落ちた後、当たっている間ずっと、範囲の今の場所・向きに描く絵（進む玉・回るレーザー・押し寄せる波） */
+  bossActive: moveSpriteSpec.optional(),
   /** 効き方から出た円・飛ぶもの（ブラストバーンの火の粉・ハードプラントの根・10まんボルトの周りの電気）を、このドット絵で描く */
   effectSprite: moveSpriteSpec.optional(),
   /** 効き方から出た、残る範囲（puddle・split の land）の絵。無ければ effectSprite（ロックブラスト: 飛ぶ破片と、落ちて残るかけらを分ける） */

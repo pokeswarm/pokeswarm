@@ -95,6 +95,18 @@
     "type": "rock",
     "damageClass": "special"
   },
+  "aqua-ring": {
+    "names": {
+      "ja": "アクアリング",
+      "en": "Aqua Ring",
+      "fr": "Anneau Hydro",
+      "de": "Wasserring",
+      "es": "Acua Aro",
+      "it": "Acquanello"
+    },
+    "type": "water",
+    "damageClass": "status"
+  },
   "aqua-tail": {
     "names": {
       "ja": "アクアテール",
@@ -311,6 +323,18 @@
     "type": "fighting",
     "damageClass": "physical"
   },
+  "confuse-ray": {
+    "names": {
+      "ja": "あやしいひかり",
+      "en": "Confuse Ray",
+      "fr": "Onde Folie",
+      "de": "Konfusstrahl",
+      "es": "Rayo Confuso",
+      "it": "Stordiraggio"
+    },
+    "type": "ghost",
+    "damageClass": "status"
+  },
   "confusion": {
     "names": {
       "ja": "ねんりき",
@@ -383,6 +407,18 @@
     "type": "dark",
     "damageClass": "physical"
   },
+  "curse": {
+    "names": {
+      "ja": "のろい",
+      "en": "Curse",
+      "fr": "Malédiction",
+      "de": "Fluch",
+      "es": "Maldición",
+      "it": "Maledizione"
+    },
+    "type": "ghost",
+    "damageClass": "status"
+  },
   "dark-pulse": {
     "names": {
       "ja": "あくのはどう",
@@ -418,6 +454,18 @@
     },
     "type": "electric",
     "damageClass": "special"
+  },
+  "dive": {
+    "names": {
+      "ja": "ダイビング",
+      "en": "Dive",
+      "fr": "Plongée",
+      "de": "Taucher",
+      "es": "Buceo",
+      "it": "Sub"
+    },
+    "type": "water",
+    "damageClass": "physical"
   },
   "double-edge": {
     "names": {
@@ -455,6 +503,18 @@
     "type": "normal",
     "damageClass": "physical"
   },
+  "double-team": {
+    "names": {
+      "ja": "かげぶんしん",
+      "en": "Double Team",
+      "fr": "Reflet",
+      "de": "Doppelteam",
+      "es": "Doble Equipo",
+      "it": "Doppioteam"
+    },
+    "type": "normal",
+    "damageClass": "status"
+  },
   "draco-meteor": {
     "names": {
       "ja": "りゅうせいぐん",
@@ -490,6 +550,18 @@
     },
     "type": "dragon",
     "damageClass": "physical"
+  },
+  "dragon-dance": {
+    "names": {
+      "ja": "りゅうのまい",
+      "en": "Dragon Dance",
+      "fr": "Danse Draco",
+      "de": "Drachentanz",
+      "es": "Danza Dragón",
+      "it": "Dragodanza"
+    },
+    "type": "dragon",
+    "damageClass": "status"
   },
   "dragon-pulse": {
     "names": {
@@ -538,6 +610,18 @@
     },
     "type": "dragon",
     "damageClass": "physical"
+  },
+  "dream-eater": {
+    "names": {
+      "ja": "ゆめくい",
+      "en": "Dream Eater",
+      "fr": "Dévorêve",
+      "de": "Traumfresser",
+      "es": "Comesueños",
+      "it": "Mangiasogni"
+    },
+    "type": "psychic",
+    "damageClass": "special"
   },
   "dual-wingbeat": {
     "names": {
@@ -622,6 +706,18 @@
     },
     "type": "normal",
     "damageClass": "physical"
+  },
+  "extrasensory": {
+    "names": {
+      "ja": "じんつうりき",
+      "en": "Extrasensory",
+      "fr": "Extrasenseur",
+      "de": "Sondersensor",
+      "es": "Paranormal",
+      "it": "Extrasenso"
+    },
+    "type": "psychic",
+    "damageClass": "special"
   },
   "extreme-speed": {
     "names": {
@@ -815,6 +911,18 @@
     "type": "dark",
     "damageClass": "physical"
   },
+  "freeze-dry": {
+    "names": {
+      "ja": "フリーズドライ",
+      "en": "Freeze-Dry",
+      "fr": "Lyophilisation",
+      "de": "Gefriertrockner",
+      "es": "Liofilización",
+      "it": "Liofilizzazione"
+    },
+    "type": "ice",
+    "damageClass": "special"
+  },
   "frenzy-plant": {
     "names": {
       "ja": "ハードプラント",
@@ -825,6 +933,18 @@
       "it": "Radicalbero"
     },
     "type": "grass",
+    "damageClass": "special"
+  },
+  "frost-breath": {
+    "names": {
+      "ja": "こおりのいぶき",
+      "en": "Frost Breath",
+      "fr": "Souffle Glacé",
+      "de": "Eisesodem",
+      "es": "Vaho Gélido",
+      "it": "Alitogelido"
+    },
+    "type": "ice",
     "damageClass": "special"
   },
   "fury-cutter": {
@@ -886,6 +1006,18 @@
     },
     "type": "grass",
     "damageClass": "special"
+  },
+  "gravity": {
+    "names": {
+      "ja": "じゅうりょく",
+      "en": "Gravity",
+      "fr": "Gravité",
+      "de": "Erdanziehung",
+      "es": "Gravedad",
+      "it": "Gravità"
+    },
+    "type": "psychic",
+    "damageClass": "status"
   },
   "gust": {
     "names": {
@@ -995,6 +1127,18 @@
     "type": "normal",
     "damageClass": "special"
   },
+  "hypnosis": {
+    "names": {
+      "ja": "さいみんじゅつ",
+      "en": "Hypnosis",
+      "fr": "Hypnose",
+      "de": "Hypnose",
+      "es": "Hipnosis",
+      "it": "Ipnosi"
+    },
+    "type": "psychic",
+    "damageClass": "status"
+  },
   "ice-ball": {
     "names": {
       "ja": "アイスボール",
@@ -1018,6 +1162,18 @@
     },
     "type": "ice",
     "damageClass": "special"
+  },
+  "ice-fang": {
+    "names": {
+      "ja": "こおりのキバ",
+      "en": "Ice Fang",
+      "fr": "Crocs Givre",
+      "de": "Eiszahn",
+      "es": "Colmillo Hielo",
+      "it": "Gelodenti"
+    },
+    "type": "ice",
+    "damageClass": "physical"
   },
   "ice-shard": {
     "names": {
@@ -1223,6 +1379,18 @@
     "type": "ground",
     "damageClass": "physical"
   },
+  "mean-look": {
+    "names": {
+      "ja": "くろいまなざし",
+      "en": "Mean Look",
+      "fr": "Regard Noir",
+      "de": "Horrorblick",
+      "es": "Mal de Ojo",
+      "it": "Malosguardo"
+    },
+    "type": "normal",
+    "damageClass": "status"
+  },
   "megahorn": {
     "names": {
       "ja": "メガホーン",
@@ -1306,6 +1474,18 @@
     },
     "type": "psychic",
     "damageClass": "special"
+  },
+  "mist": {
+    "names": {
+      "ja": "しろいきり",
+      "en": "Mist",
+      "fr": "Brume",
+      "de": "Weißnebel",
+      "es": "Neblina",
+      "it": "Nebbia"
+    },
+    "type": "ice",
+    "damageClass": "status"
   },
   "moonlight": {
     "names": {
@@ -1631,6 +1811,18 @@
     "type": "grass",
     "damageClass": "physical"
   },
+  "razor-wind": {
+    "names": {
+      "ja": "かまいたち",
+      "en": "Razor Wind",
+      "fr": "Coupe-Vent",
+      "de": "Klingensturm",
+      "es": "Viento Cortante",
+      "it": "Ventagliente"
+    },
+    "type": "normal",
+    "damageClass": "special"
+  },
   "recover": {
     "names": {
       "ja": "じこさいせい",
@@ -1678,6 +1870,18 @@
     },
     "type": "fighting",
     "damageClass": "physical"
+  },
+  "roar": {
+    "names": {
+      "ja": "ほえる",
+      "en": "Roar",
+      "fr": "Hurlement",
+      "de": "Brüller",
+      "es": "Rugido",
+      "it": "Boato"
+    },
+    "type": "normal",
+    "damageClass": "status"
   },
   "rock-blast": {
     "names": {
@@ -1979,6 +2183,18 @@
     "type": "dark",
     "damageClass": "special"
   },
+  "snore": {
+    "names": {
+      "ja": "いびき",
+      "en": "Snore",
+      "fr": "Ronflement",
+      "de": "Schnarcher",
+      "es": "Ronquido",
+      "it": "Russare"
+    },
+    "type": "normal",
+    "damageClass": "special"
+  },
   "solar-beam": {
     "names": {
       "ja": "ソーラービーム",
@@ -2026,6 +2242,18 @@
     },
     "type": "steel",
     "damageClass": "special"
+  },
+  "stomp": {
+    "names": {
+      "ja": "ふみつけ",
+      "en": "Stomp",
+      "fr": "Écrasement",
+      "de": "Stampfer",
+      "es": "Pisotón",
+      "it": "Pestone"
+    },
+    "type": "normal",
+    "damageClass": "physical"
   },
   "stone-edge": {
     "names": {
@@ -2219,6 +2447,18 @@
     "type": "electric",
     "damageClass": "special"
   },
+  "toxic": {
+    "names": {
+      "ja": "どくどく",
+      "en": "Toxic",
+      "fr": "Toxik",
+      "de": "Toxin",
+      "es": "Tóxico",
+      "it": "Tossina"
+    },
+    "type": "poison",
+    "damageClass": "status"
+  },
   "tri-attack": {
     "names": {
       "ja": "トライアタック",
@@ -2253,6 +2493,18 @@
       "it": "Frustata"
     },
     "type": "grass",
+    "damageClass": "physical"
+  },
+  "vital-throw": {
+    "names": {
+      "ja": "あてみなげ",
+      "en": "Vital Throw",
+      "fr": "Corps Perdu",
+      "de": "Überwurf",
+      "es": "Llave Vital",
+      "it": "Vitaltiro"
+    },
+    "type": "fighting",
     "damageClass": "physical"
   },
   "volt-switch": {

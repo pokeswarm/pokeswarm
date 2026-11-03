@@ -27,6 +27,13 @@ export function movePlayers(world: World): void {
       }
       continue;
     }
+    // ボスの技で押し飛ばされている間（ほえる・あてみなげ。07 の167章）: 瞬間移動させず、短くすべらせる。入力では動けない
+    if (p.pushTicks) {
+      p.pushTicks--;
+      p.x += (p.pushVx ?? 0) * world.dt;
+      p.y += (p.pushVy ?? 0) * world.dt;
+      continue;
+    }
     // 泣いている間（トゲピー）は動けない
     if (p.cryTicks) {
       p.cryTicks--;
@@ -41,7 +48,9 @@ export function movePlayers(world: World): void {
     const scale = p.inputX !== 0 && p.inputY !== 0 ? Math.SQRT1_2 : 1;
     // 凍った床の上は遅くなる（伝説の範囲技が残したもの）
     // すいすい: あめの間は速い（特性。07 の133章）
-    const step = p.moveSpeed * world.dt * scale * (1 - (p.zoneSlowPct ?? 0) / 100) * abilityMoveSpeedFactor(world, p);
+    // ねむけ（ボスの うたう・さいみんじゅつ など。07 の167章）: 遅くなる
+    const drowsy = p.drowsyTicks ? 1 - (world.rules.stage.bossRules.drowsySlowPct ?? 55) / 100 : 1;
+    const step = p.moveSpeed * world.dt * scale * (1 - (p.zoneSlowPct ?? 0) / 100) * abilityMoveSpeedFactor(world, p) * drowsy;
     p.x += p.inputX * step;
     p.y += p.inputY * step;
     p.walked += step;

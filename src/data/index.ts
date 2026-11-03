@@ -292,7 +292,15 @@ for (const m of regionStages.kanto.stage.moves) {
   check(!!effectRecipes[m.effect], `data/game/stage.json の範囲技 "${m.id}" の effect "${m.effect}" のレシピがありません`);
   check(!m.playerMove || !!movesConfig.moves[m.playerMove.move], `data/game/stage.json の範囲技 "${m.id}" のプレイヤーと同じ技 "${m.playerMove?.move}" が data/game/moves.json にありません`);
   check(!m.then || stageMoveIds.has(m.then), `data/game/stage.json の範囲技 "${m.id}" の then "${m.then}" がありません`);
-  check(m.shape !== 'line' || !!m.length, `data/game/stage.json の範囲技 "${m.id}" は直線なので length が必要です`);
+  check(m.shape !== 'line' || !!m.length || !!m.wall, `data/game/stage.json の範囲技 "${m.id}" は直線なので length が必要です`);
+  // 07 の167章の部品
+  check(m.shape !== 'cone' || !!m.arc, `data/game/stage.json の範囲技 "${m.id}" は扇なので arc が必要です`);
+  check(!m.sweep || m.shape === 'line', `data/game/stage.json の範囲技 "${m.id}" のなぎ払い（sweep）は直線の技だけです`);
+  check(!m.wall || m.shape === 'line', `data/game/stage.json の範囲技 "${m.id}" の波の帯（wall）は直線の技だけです`);
+  check(!m.counter || !!m.then, `data/game/stage.json の範囲技 "${m.id}" のカウンターは、返す技（then）が必要です`);
+  check(!m.decoys || !!enemiesConfig.kinds.find((k) => k.id === m.decoys!.kind)?.decoy, `data/game/stage.json の範囲技 "${m.id}" の偽物 "${m.decoys?.kind}" が data/game/enemies.json に無いか、decoy ではありません`);
+  const recipe = effectRecipes[m.effect];
+  for (const spec of [recipe?.bossTelegraph, recipe?.bossActive, recipe?.strike]) check(!spec || !!moveSprites.sprites[spec.id], `data/game/stage.json の範囲技 "${m.id}" の絵 "${spec?.id}" が data/render/move-sprites.json にありません（npm run move-sprites）`);
 }
 // 地方のステージごと: 区間の雑魚・地面・曲・障害物・ボス・伝説・スウォーム（02 の16章）
 for (const rs of Object.values(regionStages)) {

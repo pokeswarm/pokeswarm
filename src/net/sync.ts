@@ -150,7 +150,7 @@ export class SyncSession {
           if (host) out.push({ t: 'ua', i: ev.playerId, o: ev.offer });
           break;
         case 'hazardTelegraphed':
-          if (host) hazards.push(ev.move, round2(ev.x), round2(ev.y), round2(ev.dirX), round2(ev.dirY), ev.dasher, ev.delay, round2(ev.radius), round2(ev.inner), ev.follow);
+          if (host) hazards.push(ev.move, round2(ev.x), round2(ev.y), round2(ev.dirX), round2(ev.dirY), ev.dasher, ev.delay, round2(ev.radius), round2(ev.inner), ev.follow, ev.group, round2(ev.damage), round2(ev.vx), round2(ev.vy), round2(ev.length));
           break;
         case 'legendaryWarning':
           if (host) out.push(ev.enraged ? { t: 'lw', k: ev.kind, r: 1 } : { t: 'lw', k: ev.kind });
@@ -361,8 +361,8 @@ export class SyncSession {
           break;
         case 'hz':
           if (guest) {
-            for (let k = 0; k + 9 < m.e.length; k += 10) {
-              cmds.push({ type: 'addHazard', move: m.e[k]!, x: m.e[k + 1]!, y: m.e[k + 2]!, dirX: m.e[k + 3]!, dirY: m.e[k + 4]!, dasher: m.e[k + 5]!, delay: m.e[k + 6]!, radius: m.e[k + 7]!, inner: m.e[k + 8]!, follow: m.e[k + 9]! });
+            for (let k = 0; k + 14 < m.e.length; k += 15) {
+              cmds.push({ type: 'addHazard', move: m.e[k]!, x: m.e[k + 1]!, y: m.e[k + 2]!, dirX: m.e[k + 3]!, dirY: m.e[k + 4]!, dasher: m.e[k + 5]!, delay: m.e[k + 6]!, radius: m.e[k + 7]!, inner: m.e[k + 8]!, follow: m.e[k + 9]!, group: m.e[k + 10]!, damage: m.e[k + 11]!, vx: m.e[k + 12]!, vy: m.e[k + 13]!, length: m.e[k + 14]! });
             }
           }
           break;

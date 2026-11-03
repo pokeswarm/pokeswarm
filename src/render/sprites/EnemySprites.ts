@@ -43,6 +43,8 @@ export class EnemySprites {
     tintOf: (index: number) => number | null = () => null,
     /** ふつうと違う動き（ドット絵の動作の名前。spin なら向きをくるくる回す）。ふつうなら null（伝説のカメックスの甲羅・ため） */
     poseOf: (index: number) => { anim: string; spin: boolean } | null = () => null,
+    /** 濃さ（1 がふつう。消えているボスは 0、かげぶんしん の偽物は薄く。07 の167章） */
+    alphaOf: (index: number) => number = () => 1,
   ): number {
     for (const slot of this.slots.values()) slot.seen = false;
     let drawn = 0;
@@ -84,6 +86,7 @@ export class EnemySprites {
         slot.sprite.play({ key, startFrame: frame - 1 });
       }
       slot.sprite.setPosition(x, y);
+      slot.sprite.setAlpha(alphaOf(i));
       const tint = tintOf(i);
       if (tint === null) slot.sprite.clearTint();
       else slot.sprite.setTint(tint);

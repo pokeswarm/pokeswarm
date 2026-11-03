@@ -104,7 +104,9 @@ export function moveEnemies(world: World): void {
       e.y[i] = e.prevY[i] = ny;
       continue;
     }
-    if (best > 0) {
+    const motion = world.rules.enemies.kinds[e.kind[i]!]?.motion;
+    if (motion) bossMotion(world, i, target, motion);
+    else if (best > 0) {
       const d = Math.sqrt(best);
       const step = Math.min(e.speed[i]! * speedMultiplier(world, i) * world.dt, d);
       e.x[i] = x + ((target.x - x) / d) * step;
@@ -120,10 +122,51 @@ export function moveEnemies(world: World): void {
   }
 }
 
+/**
+ * ボスの技の合間の動き（07 の167章）: 間合いを保つ（近ければ離れ、遠ければ近づき、その間は横へ回り込む）・周りを回る・動かない。
+ * 速さは今の速さ（予告の間止まる技では 0）
+ */
+function bossMotion(world: World, i: number, target: Player, motion: NonNullable<World['rules']['enemies']['kinds'][number]['motion']>): void {
+  const e = world.enemies;
+  const speed = e.speed[i]! * speedMultiplier(world, i) * world.dt;
+  if (motion.type === 'still' || speed <= 0) return;
+  const x = e.x[i]!;
+  const y = e.y[i]!;
+  let tx: number;
+  let ty: number;
+  if (motion.type === 'orbit') {
+    // 周りを回る: 狙った人の周りの、回る向きに少し進んだ点を目指す（どのブラウザでも同じになるよう、角度は今の位置から決める）
+    const a = Math.atan2(y - target.y, x - target.x) + (motion.angularDegreesPerSecond * Math.PI * world.dt * 6) / 180;
+    tx = target.x + Math.cos(a) * motion.distance;
+    ty = target.y + Math.sin(a) * motion.distance;
+  } else {
+    // 間合いを保つ: 近すぎれば離れ、遠すぎれば近づき、その間は横へ回り込む（回る向きは敵の番号で決める）
+    const dx = x - target.x;
+    const dy = y - target.y;
+    const d = Math.hypot(dx, dy) || 1;
+    const side = e.id[i]! % 2 === 0 ? 1 : -1;
+    const radial = d < motion.distance - 40 ? 1 : d > motion.distance + 40 ? -1 : 0;
+    tx = x + (dx / d) * radial * 100 + (-dy / d) * side * (radial === 0 ? 100 : 40);
+    ty = y + (dy / d) * radial * 100 + (dx / d) * side * (radial === 0 ? 100 : 40);
+  }
+  const mx = tx - x;
+  const my = ty - y;
+  const m = Math.hypot(mx, my);
+  if (m <= 0) return;
+  const step = Math.min(speed, m);
+  e.x[i] = x + (mx / m) * step;
+  e.y[i] = y + (my / m) * step;
+}
+
 export function rebuildEnemyHash(world: World): void {
   const { enemies: e, enemyHash } = world;
   enemyHash.clear();
-  for (let i = 0; i < e.count; i++) enemyHash.insert(i, e.x[i]!, e.y[i]!);
+  // 消えているボス（潜る・跳ぶ技の予告の間。07 の167章）は、狙われず当たらず、触れても痛くない
+  const hidden = world.hiddenEnemies.size > 0;
+  for (let i = 0; i < e.count; i++) {
+    if (hidden && world.hiddenEnemies.has(e.id[i]!)) continue;
+    enemyHash.insert(i, e.x[i]!, e.y[i]!);
+  }
 }
 
 /**

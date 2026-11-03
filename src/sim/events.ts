@@ -249,6 +249,12 @@ export interface HazardTelegraphedEvent {
   readonly inner: number;
   /** 予告が追いかけるプレイヤー（-1 なら追わない） */
   readonly follow: number;
+  /** 1回の技の組・威力の上書き・落ちた後に進む速さ・直線の長さの上書き（無ければ 0。07 の167章） */
+  readonly group: number;
+  readonly damage: number;
+  readonly vx: number;
+  readonly vy: number;
+  readonly length: number;
 }
 
 /** ボスの範囲技が落ちた（演出用） */
@@ -258,7 +264,7 @@ export interface HazardStruckEvent {
   readonly y: number;
   readonly radius: number;
   readonly effect: string;
-  readonly shape: 'circle' | 'line' | 'ring';
+  readonly shape: 'circle' | 'line' | 'ring' | 'cone';
   /** 輪の内側の半径（輪でなければ 0） */
   readonly innerRadius: number;
   readonly dirX: number;

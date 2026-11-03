@@ -5661,6 +5661,126 @@
         "seconds": 0.3,
         "radius": 26
       }
+    },
+    "boss-surf": {
+      "extends": "surf",
+      "bossActive": {
+        "id": "wave-tile",
+        "fit": "scroll",
+        "alpha": 0.95,
+        "scrollSpeed": 120,
+        "scrollTiles": 6
+      }
+    },
+    "boss-sing": {
+      "extends": "sing",
+      "bossActive": {
+        "id": "note-ring",
+        "fit": "circle",
+        "size": 1.6,
+        "upright": true
+      }
+    },
+    "boss-blizzard": {
+      "extends": "blizzard"
+    },
+    "boss-cross-chop": {
+      "extends": "cross-chop",
+      "strike": {
+        "id": "cross-chop",
+        "fit": "circle",
+        "size": 1,
+        "seconds": 0.4
+      }
+    },
+    "boss-bulk-up": {
+      "extends": "fighting.base",
+      "bossTelegraph": {
+        "id": "bulk-aura",
+        "fit": "circle",
+        "size": 2
+      }
+    },
+    "boss-dynamic-punch": {
+      "extends": "dynamic-punch",
+      "bossActive": {
+        "id": "fist",
+        "fit": "front",
+        "size": 0.45,
+        "along": 0.7,
+        "variants": [
+          "fist",
+          "fist-fire",
+          "fist-thunder"
+        ]
+      }
+    },
+    "boss-double-team": {
+      "extends": "ghost.base",
+      "strike": {
+        "id": "shadow-poof",
+        "fit": "circle",
+        "size": 1.8,
+        "seconds": 0.4
+      }
+    },
+    "boss-night-shade": {
+      "extends": "night-shade",
+      "bossTelegraph": {
+        "id": "creeping-shadow",
+        "fit": "circle",
+        "size": 1.1
+      },
+      "strike": {
+        "id": "night-face",
+        "fit": "circle",
+        "size": 1.3,
+        "seconds": 0.5
+      }
+    },
+    "boss-hypnosis": {
+      "extends": "psychic.base",
+      "strike": {
+        "id": "hypno-waves",
+        "fit": "cone",
+        "seconds": 0.6
+      }
+    },
+    "boss-dream-eater": {
+      "extends": "psychic.base",
+      "strike": {
+        "id": "dream-drain",
+        "fit": "circle",
+        "size": 1,
+        "seconds": 0.5
+      }
+    },
+    "boss-hyper-beam": {
+      "extends": "hyper-beam",
+      "bossActive": {
+        "id": "hyper-beam",
+        "fit": "line",
+        "size": 1
+      }
+    },
+    "boss-dragon-rage": {
+      "extends": "dragon-rage",
+      "bossActive": {
+        "id": "rage-orb",
+        "fit": "circle",
+        "size": 1.8,
+        "rotate": "velocity"
+      }
+    },
+    "boss-twister": {
+      "extends": "twister",
+      "bossActive": {
+        "id": "tornado",
+        "fit": "circle",
+        "size": 1.6,
+        "rotate": "spin",
+        "spinDegPerSec": 540
+      }
     }
   }
 }

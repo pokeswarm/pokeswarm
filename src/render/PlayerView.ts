@@ -155,11 +155,16 @@ export class PlayerView {
       // 倒れていたら暗く、無敵時間の間は点滅
       this.pokemon.sprite.setAlpha(player.down ? 0.35 : player.invincibleTicks > 0 && Math.floor(player.invincibleTicks / 3) % 2 === 0 ? 0.4 : 1);
       // 凍っている間（伝説戦のぜったいれいど）は氷の色
+      // ボスの技の効き目（07 の167章）: やけど＝赤く明滅・冷え＝薄い水色（溜まるほど濃く）・ねむけ＝紫がかる（頭の上に Z）
+      const blink = Math.floor(this.scene.time.now / 160) % 2 === 0;
       if (player.frozenTicks) this.pokemon.sprite.setTint(0x80deea);
+      else if (player.burnTicks && blink) this.pokemon.sprite.setTint(0xff8a65);
+      else if (player.chill) this.pokemon.sprite.setTint(player.chill >= 2 ? 0x9be7ff : 0xd4f3ff);
+      else if (player.drowsyTicks) this.pokemon.sprite.setTint(0xc5b3ff);
       else this.pokemon.sprite.clearTint();
     }
-    // 眠っている間は Z が上へゆらゆら
-    const sleeping = player.sleep?.asleep ?? false;
+    // 眠っている間（ねむけ も）は Z が上へゆらゆら
+    const sleeping = (player.sleep?.asleep ?? false) || !!player.drowsyTicks;
     this.zzz.setVisible(sleeping);
     if (sleeping) {
       const k = (this.scene.time.now % 1500) / 1500;

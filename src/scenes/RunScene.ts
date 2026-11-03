@@ -40,7 +40,7 @@ import { abilityOf, pinchMods } from '../sim/ability';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World, gateDeadlineTick } from '../sim/world';
-import { applyDebugOverrides, parseGodParam, parseLegendParam, parseIntruderParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam } from './debugOverrides';
+import { applyDebugOverrides, parseGodParam, parseLegendParam, parseIntruderParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam, parseBossParam } from './debugOverrides';
 import { addXp, applyOffer, itemFits, moveMaxLevel, recomputeModifiers } from '../sim/systems/leveling';
 import { shinySpriteKey } from '../meta/loadoutOptions';
 import { achievementPerks, regionAchieved } from '../meta/achievementPerks';
@@ -223,6 +223,8 @@ export class RunScene extends Phaser.Scene {
   private uiCommands: InputCommand[] = [];
   /** ボスの範囲技の予告 */
   private hazardView!: Phaser.GameObjects.Graphics;
+  /** ほろびのうた の残りの秒数（予告ごとに1つ。07 の167章） */
+  private countdownTexts: Phaser.GameObjects.Text[] = [];
   /** マップに落ちている道具（きずぐすり・マグネット・ふしぎなアメ）の影と、道具ごとのドット絵 */
   private itemView!: Phaser.GameObjects.Graphics;
   private readonly itemImages = new Map<number, Phaser.GameObjects.Image>();
@@ -427,6 +429,23 @@ export class RunScene extends Phaser.Scene {
       w.section = Math.min(startSection, w.waves.length - 1);
       while (w.nextBoss < w.bossSchedule.length && w.bossSchedule[w.nextBoss]!.wave < w.section) w.nextBoss++;
     }
+    // テストプレイ（ソロだけ。07 の167章）: ?boss=lapras でそのボスの区間から始め、すぐ出す（記録を保存しない）
+    this.testRun = false;
+    const testBoss = this.coop ? null : parseBossParam(window.location.search);
+    if (testBoss) {
+      const w = this.sim.world;
+      const at = w.bossSchedule.findIndex((b) => {
+        const id = w.rules.enemies.kinds[b.kind]?.id ?? '';
+        return id === testBoss || id.endsWith('-' + testBoss);
+      });
+      if (at !== -1) {
+        const entry = w.bossSchedule[at]!;
+        w.section = entry.wave;
+        w.nextBoss = w.bossSchedule.findIndex((b) => b.wave === entry.wave && b.afterTicks === entry.afterTicks);
+        w.sectionStartTick = w.tick - entry.afterTicks;
+        this.testRun = true;
+      }
+    }
     // テストプレイ（ソロだけ）: ?legend=mewtwo で最初から伝説と戦う。?god で無敵。どちらかを付けたランは記録を保存しない
     this.testLegend = this.coop ? null : parseLegendParam(this.sim.world.rules, window.location.search);
     this.god = !this.coop && parseGodParam(window.location.search);
@@ -441,7 +460,7 @@ export class RunScene extends Phaser.Scene {
     const testIntruder = this.coop ? null : parseIntruderParam(this.sim.world.rules, window.location.search);
     if (testIntruder !== null) startIntruder(this.sim.world, testIntruder);
     if (!this.coop && parseWingsParam(window.location.search)) for (const w of ['silver-wing', 'rainbow-wing'] as const) this.sim.world.wings.add(w);
-    this.testRun = testIntruder !== null || (!this.coop && parseWingsParam(window.location.search));
+    this.testRun = this.testRun || testIntruder !== null || (!this.coop && parseWingsParam(window.location.search));
     if (this.coop) this.setupNet(this.coop.room);
 
     this.clock = new FixedStepClock(simulationConfig.tickRate, simulationConfig.maxTicksPerFrame);
@@ -525,6 +544,7 @@ export class RunScene extends Phaser.Scene {
     this.strikeSprites = new MoveSprites(this, moveSprites, depths.effects - 0.05, spriteRender.dot);
     this.fallSprites = new MoveSprites(this, moveSprites, depths.effects + 0.25, spriteRender.dot);
     this.strikes = [];
+    this.countdownTexts = [];
     const shape = spriteRender.hitShape;
     this.hitShapes = new HitShapes(this, depths.hitShapes, shape);
     this.shapeColors = rules.moves.map((m) => {
@@ -1447,6 +1467,7 @@ export class RunScene extends Phaser.Scene {
   private drawHazards(hazards: readonly Hazard[]): void {
     const g = this.hazardView;
     g.clear();
+    let countdowns = 0;
     for (const h of hazards) {
       // 飛ぶ玉（サンダーの電気の玉）: 飛んでいる間は黄色い玉
       if (h.activeTicks !== undefined && this.sim.world.rules.stage.moves[h.move]?.bullets) {
@@ -1457,9 +1478,44 @@ export class RunScene extends Phaser.Scene {
         g.lineStyle(2, 0xff1744, 1).strokeCircle(h.x, h.y, h.radius + 1);
         continue;
       }
-      // 落ちた後に少し当たる時間（activeTicks）は、予告を描かない（落ちた所の絵が出ている）
-      if (h.activeTicks !== undefined) continue;
+      const mv = this.sim.world.rules.stage.moves[h.move];
+      // 落ちた後に少し当たる時間（activeTicks）は、予告を描かない（落ちた所の絵が出ている）。
+      // 長く当たり続ける範囲で絵の無いもの（罠・波）は、触れると痛い範囲として薄く見せる（07 の167章）
+      if (h.activeTicks !== undefined) {
+        const recipe = effectRecipes[mv?.effect ?? ''];
+        if (mv && !recipe?.bossActive && (mv.activeSeconds ?? 0) > 0.6) this.drawHazardArea(g, h, mv, 0.1, 0.6);
+        continue;
+      }
       const progress = 1 - h.ticksLeft / h.totalTicks;
+      if (mv?.countdown) this.drawCountdown(h, countdowns++);
+      // ダメージの無い技（ため・強化・回復・本物が現れる所）は、赤い予告を出さない（絵だけ。07 の167章）
+      if (mv && mv.damage <= 0 && !mv.counter) continue;
+      // 落ちた後に進む範囲（玉・刃・波）: 進む道を薄く見せる（向きが分かるように）
+      if (mv?.travel && !mv.travel.homingDegreesPerSecond) {
+        const reach = mv.travel.speed * (mv.activeSeconds ?? 1);
+        const tx = h.vx !== undefined && h.vy !== undefined ? h.vx / mv.travel.speed : h.dirX;
+        const ty = h.vx !== undefined && h.vy !== undefined ? h.vy / mv.travel.speed : h.dirY;
+        const cx = h.shape === 'line' ? h.x + (h.dirX * h.length) / 2 : h.x;
+        const cy = h.shape === 'line' ? h.y + (h.dirY * h.length) / 2 : h.y;
+        const w = h.shape === 'line' ? h.length : h.radius * 2;
+        g.lineStyle(w, 0xff1744, 0.07).lineBetween(cx, cy, cx + tx * reach, cy + ty * reach);
+      }
+      if (h.shape === 'cone' || (h.shape === 'line' && mv?.sweep)) {
+        // 扇・なぎ払い（はかいこうせん・エアロブラスト）: 範囲の扇と、落ちるまでの残りを根元から広がる扇で見せる
+        const reach = h.shape === 'cone' ? h.radius : h.length;
+        const arc = h.shape === 'cone' ? (mv?.arc ?? 90) : Math.abs(mv?.sweep?.degrees ?? 90) + 8;
+        const a0 = Math.atan2(h.dirY, h.dirX) - (arc * Math.PI) / 360;
+        const a1 = a0 + (arc * Math.PI) / 180;
+        g.fillStyle(0xff1744, 0.12).slice(h.x, h.y, reach, a0, a1, false).fillPath();
+        g.fillStyle(0xff1744, 0.25).slice(h.x, h.y, reach * progress, a0, a1, false).fillPath();
+        g.lineStyle(2, 0xff5252, 0.9).slice(h.x, h.y, reach, a0, a1, false).strokePath();
+        // なぎ払い: レーザーが動き始める側の縁を太く（回る向きが分かるように）
+        if (mv?.sweep) {
+          const s0 = Math.atan2(h.dirY, h.dirX) - (mv.sweep.degrees * Math.PI) / 360;
+          g.lineStyle(6, 0xff1744, 0.9).lineBetween(h.x, h.y, h.x + Math.cos(s0) * reach, h.y + Math.sin(s0) * reach);
+        }
+        continue;
+      }
       if (h.shape === 'line') {
         // 直線: 幅 radius*2 の帯。落ちるまでの残りは、始点から伸びる帯で見せる
         const nx = -h.dirY * h.radius;
@@ -1488,6 +1544,7 @@ export class RunScene extends Phaser.Scene {
       g.fillStyle(0xff1744, 0.25).fillCircle(h.x, h.y, h.radius * progress);
       g.lineStyle(2, 0xff5252, 0.9).strokeCircle(h.x, h.y, h.radius);
     }
+    for (let k = countdowns; k < this.countdownTexts.length; k++) this.countdownTexts[k]!.setVisible(false);
     // 伝説の周りの炎の輪（ファイヤーのほのおのうず）: 触れると削られる範囲
     const active = activeLegendField(this.sim.world);
     if (active?.field.aura) {
@@ -1503,6 +1560,79 @@ export class RunScene extends Phaser.Scene {
       // 控えめな粒を出す技は、塗りをうすくする
       g.fillStyle(hexColor(z.color), (this.effects.linger(z.effect)?.fillAlpha ?? 0.3) * fade).fillCircle(z.x, z.y, z.radius);
     }
+  }
+
+  /** 当たっている間の範囲（絵の無い長く残る範囲）を薄く描く */
+  private drawHazardArea(g: Phaser.GameObjects.Graphics, h: Hazard, mv: NonNullable<World['rules']['stage']['moves'][number]>, fill: number, line: number): void {
+    if (h.shape === 'circle') {
+      g.fillStyle(0xff1744, fill).fillCircle(h.x, h.y, h.radius);
+      g.lineStyle(2, 0xff5252, line).strokeCircle(h.x, h.y, h.radius);
+    } else if (h.shape === 'ring') {
+      const inner = h.innerRadius ?? 0;
+      g.lineStyle(2, 0xff5252, line).strokeCircle(h.x, h.y, h.radius).strokeCircle(h.x, h.y, inner);
+    } else if (h.shape === 'cone') {
+      const half = ((mv.arc ?? 90) * Math.PI) / 360;
+      const a = Math.atan2(h.dirY, h.dirX);
+      g.fillStyle(0xff1744, fill).slice(h.x, h.y, h.radius, a - half, a + half, false).fillPath();
+    } else {
+      g.lineStyle(h.radius * 2, 0xff1744, fill).lineBetween(h.x, h.y, h.x + h.dirX * h.length, h.y + h.dirY * h.length);
+    }
+  }
+
+  /** ほろびのうた: 予告の真ん中に、落ちるまでの残りの秒数を大きく出す */
+  private drawCountdown(h: Hazard, k: number): void {
+    let t = this.countdownTexts[k];
+    if (!t) {
+      t = this.add.text(0, 0, '', { fontFamily: uiConfig.font.family, fontSize: '48px', color: '#ff5252', stroke: '#000000', strokeThickness: 6 }).setOrigin(0.5).setDepth(spriteRender.depths.hazards + 0.5);
+      this.countdownTexts[k] = t;
+    }
+    const left = Math.ceil((h.ticksLeft * this.sim.world.dt) - 1e-6);
+    t.setText(String(Math.max(1, left))).setPosition(h.x, h.y - h.radius * 0.35).setVisible(true);
+  }
+
+  /**
+   * ボスの技の絵（07 の167章。data/effects/recipes.json の bossTelegraph・bossActive）: 予告の間は予告の場所に、当たっている間は範囲の今の場所・向きに描く
+   */
+  private hazardSpriteItems(world: World): SpriteItem[] {
+    const out: SpriteItem[] = [];
+    for (const h of world.hazards) {
+      const mv = world.rules.stage.moves[h.move];
+      const recipe = effectRecipes[mv?.effect ?? ''];
+      if (!mv || !recipe) continue;
+      const active = h.activeTicks !== undefined;
+      const spec = active ? recipe.bossActive : recipe.bossTelegraph;
+      if (!spec) continue;
+      const total = active ? Math.max(1, Math.round((mv.bounce?.seconds ?? mv.sweep?.seconds ?? mv.trap?.seconds ?? mv.activeSeconds ?? world.rules.stage.bossRules.hazardActiveSeconds) / world.dt)) : h.totalTicks;
+      const left = active ? (h.activeTicks ?? 0) : h.ticksLeft;
+      const elapsed = (total - left) * world.dt;
+      const grow = 1 + ((mv.bounce?.growPct ?? 0) * (h.bounces ?? 0)) / 100;
+      // 予告の絵は、落ちる前にだんだん濃く（遅れて始まる予告は、始まるまで描かない）
+      if (!active && left > Math.round(mv.telegraphSeconds / world.dt)) continue;
+      const alpha = active ? Math.min(1, left / Math.max(1, total * 0.2)) : Math.min(1, 0.35 + elapsed / Math.max(0.1, mv.telegraphSeconds));
+      // 押し寄せる波の帯（なみのり）: 帯の真ん中を中心に、進む向きへ流す長方形に敷く
+      if (spec.fit === 'scroll' && h.shape === 'line') {
+        const sp = Math.hypot(h.vx ?? 0, h.vy ?? 0) || 1;
+        out.push({ spec, x: h.x + (h.dirX * h.length) / 2, y: h.y + (h.dirY * h.length) / 2, radius: h.radius, band: 0, dirX: (h.vx ?? 0) / sp, dirY: (h.vy ?? 0) / sp, length: h.length, vx: 0, vy: 0, elapsed, alpha, seed: h.group ?? 0, box: { from: -h.radius * 2.2, to: h.radius * 1.2, half: h.length / 2 } });
+        continue;
+      }
+      out.push({
+        spec,
+        x: h.x,
+        y: h.y,
+        radius: (spec.fit === 'front' && h.shape === 'line' ? h.length : h.radius) * grow,
+        band: h.shape === 'ring' ? h.radius - (h.innerRadius ?? 0) : 0,
+        ...(h.shape === 'cone' ? { arc: ((mv.arc ?? 90) * Math.PI) / 360 } : {}),
+        dirX: h.dirX,
+        dirY: h.dirY,
+        length: h.shape === 'cone' ? ((mv.arc ?? 90) * Math.PI) / 360 : h.length,
+        vx: h.vx ?? 0,
+        vy: h.vy ?? 0,
+        elapsed,
+        alpha,
+        seed: h.group ?? 0,
+      });
+    }
+    return out;
   }
 
   /**
@@ -1919,6 +2049,13 @@ export class RunScene extends Phaser.Scene {
     return null;
   }
 
+  /** 敵の濃さ: 消えているボス（潜る・跳ぶ）は見せず、かげぶんしん の偽物は少し透かす（07 の167章） */
+  private enemyAlpha(i: number): number {
+    const w = this.sim.world;
+    if (w.hiddenEnemies.size > 0 && w.hiddenEnemies.has(w.enemies.id[i]!)) return 0;
+    return w.rules.enemies.kinds[w.enemies.kind[i]!]?.decoy ? 0.55 : 1;
+  }
+
   /** 状態異常の色（data/game/status.json の並びで先にあるものを優先）。かかっていなければ null */
   private statusTint(i: number): number | null {
     const e = this.sim.world.enemies;
@@ -2066,13 +2203,13 @@ export class RunScene extends Phaser.Scene {
     );
     this.streamer.update(world);
     const drawn =
-      this.enemySpriteView.update(e, alpha, view, (i) => this.statusTint(i), (i) => this.legendPose(i)) +
+      this.enemySpriteView.update(e, alpha, view, (i) => this.statusTint(i), (i) => this.legendPose(i), (i) => this.enemyAlpha(i)) +
       this.enemyView.update(
         e,
         alpha,
         view,
         (i) => this.statusTint(i) ?? enemyColor,
-        (i) => e.hp[i]! > 0 && this.streamer.manifestOf(e.kind[i]!) === null,
+        (i) => e.hp[i]! > 0 && this.streamer.manifestOf(e.kind[i]!) === null && this.enemyAlpha(i) > 0,
       );
     const sprites = this.streamer.stats();
     const pr = world.projectiles;
@@ -2140,7 +2277,7 @@ export class RunScene extends Phaser.Scene {
         const elapsed = now - s.start;
         const moved = s.drift ? { x: s.item.x + s.drift.x * elapsed, y: s.item.y + s.drift.y * elapsed } : {};
         return { ...s.item, ...moved, elapsed, alpha: Math.min(1, (s.seconds - elapsed) / (s.seconds * 0.3)) };
-      }),
+      }).concat(this.hazardSpriteItems(world)),
     );
     // 天気（こなゆき・ふぶき）: 出ている間、画面じゅうに雪を降らせる
     const weathers = new Set<string>();
@@ -2148,6 +2285,11 @@ export class RunScene extends Phaser.Scene {
       if (pr.stage[i] !== 0) continue;
       const effect = world.rules.moves[pr.move[i]!]!.effect;
       if (effectRecipes[effect]?.weather) weathers.add(effect);
+    }
+    // ボスの技の天気（カンナのラプラスの ふぶき。07 の167章）: 予告と当たっている間、プレイヤーの技と同じ雪を降らせる
+    for (const h of world.hazards) {
+      const fx = world.rules.stage.moves[h.move]?.effect ?? '';
+      if (effectRecipes[fx]?.weather) weathers.add(fx);
     }
     // 伝説戦のマップの効果の天気（フリーザーのふぶき）: プレイヤーの技と同じ雪を画面じゅうに
     const fieldWeather = activeField(world)?.field.weather;

@@ -71,8 +71,9 @@ export type LegendaryResult = 'won' | 'lost' | 'timeUp';
 /** ボスの範囲技の予告中の範囲。ticksLeft が 0 になったときに中にいたらダメージを受ける */
 /** 範囲技が残した床 */
 export interface Zone {
-  readonly x: number;
-  readonly y: number;
+  /** 中心（ボスに付いていく床は動く） */
+  x: number;
+  y: number;
   readonly radius: number;
   ticksLeft: number;
   /** 上にいると遅くなる割合（%） */
@@ -82,12 +83,16 @@ export interface Zone {
   readonly color: string;
   /** 残した技の演出（data/effects/recipes.json。控えめな演出を残す） */
   readonly effect: string;
+  /** 上にいると中心へ引き寄せられる速さ（すなじごく。07 の167章） */
+  readonly pullPerSecond?: number;
+  /** この敵に付いていく床（じゅうりょく） */
+  readonly followEnemy?: number;
 }
 
 export interface Hazard {
   /** 技の番号（stage.moves の並び） */
   readonly move: number;
-  readonly shape: 'circle' | 'line' | 'ring';
+  readonly shape: 'circle' | 'line' | 'ring' | 'cone';
   /** 輪の内側の半径（輪だけ） */
   readonly innerRadius?: number;
   /** 円の中心・直線の始点（追いかける予告・飛ぶ玉は動く） */
@@ -112,6 +117,28 @@ export interface Hazard {
   hitLocal?: boolean;
   /** 予告が追いかけるプレイヤー（必中。-1 なら追わない） */
   follow?: number;
+  // ---- 07 の167章 ----
+  /** 同じ技の1回で出した範囲の組の番号（×の2本など。1回の技で当たるのは1回） */
+  readonly group?: number;
+  /** 半径の上書きの倍率（ビルドアップ） */
+  readonly scale?: number;
+  /** 落ちた後に進む速さ（ワールドの単位/秒） */
+  vx?: number;
+  vy?: number;
+  /** なぎ払いの始めの向き（落ちたときの向き） */
+  baseDirX?: number;
+  baseDirY?: number;
+  /** 当たる時間の残りが何回の更新ごとに、もう一度当たれるか（次に当たれる残り） */
+  rehitTicks?: number;
+  /** 威力の上書き（カウンターの返すダメージ。0 なら技の威力） */
+  readonly damageOverride?: number;
+  /** カウンター: 予告を始めたときのボスの HP（ホスト） */
+  readonly hpAtStart?: number;
+  /** 跳ね回る（ボルテッカー）: 跳ね返る箱の中心 */
+  readonly boxX?: number;
+  readonly boxY?: number;
+  /** 跳ね返った回数 */
+  bounces?: number;
 }
 
 /** シミュレーションの全状態 */
@@ -225,7 +252,29 @@ export interface World {
     /** 第2段階（四天王） */
     enrage?: BossEntry['enrage'];
     enraged?: boolean;
+    // ---- 07 の167章 ----
+    /** 段階で切り替える技（HP の割合の小さい順。変化タイプ） */
+    phases?: readonly { readonly belowRatio: number; readonly moves: readonly number[] }[];
+    /** 今の段階（phases の番号。-1 は最初の技） */
+    phase?: number;
+    /** 技の後に止まっている残り（反動） */
+    stunTicks?: number;
+    /** 次の技の範囲を大きくする（ビルドアップ）: 倍率と残りの回数 */
+    radiusBuff?: { readonly scale: number; uses: number };
+    /** りゅうのまい の重ねた段 */
+    stacks?: number;
+    /** 跳ね回っている（ボルテッカー）: 速度・残り・箱 */
+    bounce?: { vx: number; vy: number; ticks: number; cx: number; cy: number; hw: number; hh: number; hazard: number };
   }[];
+  /** 少し後に使う技（みらいよち を狙い直して置く・かげぶんしん の後など。ソロ・ホスト） */
+  readonly bossQueue: { tick: number; bossId: number; move: number; index: number }[];
+  /** かげぶんしん の偽物（敵の id → 消える更新番号。ソロ・ホスト） */
+  readonly decoys: Map<number, number>;
+  /** 消えているボス（潜る・跳ぶ。狙われず当たらない）。予告から毎回決める（どのブラウザでも） */
+  readonly hiddenEnemies: Set<number>;
+  /** 自分のプレイヤーに当たった範囲の組（1回の技で1回だけ当てる） */
+  readonly hazardGroupsHit: Set<number>;
+  nextHazardGroup: number;
   /** クリアに必要で、まだ倒していない敵の種類（四天王）。最初の数は requiredTotal */
   readonly requiredLeft: Set<number>;
   readonly requiredTotal: number;
@@ -330,6 +379,11 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     nextSwarm: 0,
     hazards: [],
     zones: [],
+    bossQueue: [],
+    decoys: new Map(),
+    hiddenEnemies: new Set(),
+    hazardGroupsHit: new Set(),
+    nextHazardGroup: 1,
     obstacleCache: new Map(),
     bombers: new Map(),
     level: 1,
@@ -388,6 +442,8 @@ export interface BossEntry {
   readonly enrage: { readonly hpRatio: number; readonly interval: number; readonly doubleChance: number } | null;
   /** タッグバトル（ホウエン）: 同じ区間の tag のボスと組になる */
   readonly tag: boolean;
+  /** 段階で切り替える技（HP の割合の大きい順。変化タイプ。07 の167章） */
+  readonly phases?: readonly { readonly belowRatio: number; readonly moves: readonly number[] }[];
 }
 
 export function moveIndexOfStage(rules: SimRules, id: string): number {
@@ -408,6 +464,7 @@ function buildBossSchedule(rules: SimRules, tickRate: number): BossEntry[] {
       interval: Math.round((b.moveIntervalSeconds ?? 4) * tickRate),
       enrage: b.enrage ? { hpRatio: b.enrage.hpRatio, interval: Math.round(b.enrage.moveIntervalSeconds * tickRate), doubleChance: b.enrage.doubleChance } : null,
       tag: b.tag ?? false,
+      ...(b.phases ? { phases: b.phases.map((ph) => ({ belowRatio: ph.belowHpPct / 100, moves: ph.moves.map((id) => moveIndexOfStage(rules, id)) })).sort((x, y) => y.belowRatio - x.belowRatio) } : {}),
     }))
     .sort((a, b) => a.wave - b.wave || a.afterTicks - b.afterTicks);
 }

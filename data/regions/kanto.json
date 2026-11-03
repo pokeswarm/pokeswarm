@@ -341,8 +341,9 @@
       "required": true,
       "kind": "boss-lapras",
       "moves": [
-        "blizzard",
-        "articuno-blizzard"
+        "lapras-surf",
+        "lapras-sing",
+        "lapras-blizzard"
       ],
       "moveIntervalSeconds": 2.8
     },
@@ -353,9 +354,10 @@
       "required": true,
       "kind": "boss-machamp",
       "moves": [
-        "earthquake",
-        "legend-dash",
-        "earthquake"
+        "machamp-cross-chop",
+        "machamp-bulk-up",
+        "machamp-dynamic-punch",
+        "machamp-cross-chop"
       ],
       "moveIntervalSeconds": 2.4,
       "enrage": {
@@ -371,11 +373,11 @@
       "required": true,
       "kind": "boss-gengar",
       "moves": [
-        "shadow-ball",
-        "mewtwo-teleport",
-        "mewtwo-psywave"
+        "gengar-night-shade",
+        "gengar-double-team",
+        "gengar-hypnosis"
       ],
-      "moveIntervalSeconds": 2,
+      "moveIntervalSeconds": 2.4,
       "enrage": {
         "hpRatio": 0.5,
         "moveIntervalSeconds": 1.4,
@@ -388,10 +390,9 @@
       "required": true,
       "kind": "boss-dragonite",
       "moves": [
-        "draco-meteor",
-        "legend-beam",
-        "zapdos-dash",
-        "legend-nova"
+        "dragonite-twister",
+        "dragonite-hyper-beam",
+        "dragonite-dragon-rage"
       ],
       "moveIntervalSeconds": 1.8,
       "enrage": {

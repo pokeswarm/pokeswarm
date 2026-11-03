@@ -483,7 +483,8 @@
       "radius": 38,
       "contactDamage": 26,
       "xp": 300,
-      "spriteScale": 2.8
+      "spriteScale": 2.8,
+      "motion": {"type":"keepDistance","distance":300}
     },
     {
       "id": "boss-machamp",
@@ -519,7 +520,8 @@
       "radius": 36,
       "contactDamage": 36,
       "xp": 300,
-      "spriteScale": 2.8
+      "spriteScale": 2.8,
+      "motion": {"type":"keepDistance","distance":360}
     },
     {
       "id": "legend-mewtwo",
@@ -2339,6 +2341,18 @@
       "radius": 10,
       "contactDamage": 8,
       "xp": 1
+    },
+    {
+      "id": "decoy-gengar",
+      "species": "gengar",
+      "sprite": "enemy/gengar",
+      "hp": 1,
+      "moveSpeed": 70,
+      "radius": 26,
+      "contactDamage": 14,
+      "xp": 0,
+      "spriteScale": 2.6,
+      "decoy": true
     }
   ]
 }

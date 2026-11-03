@@ -110,6 +110,15 @@ export function parseTimeParam(search: string): number | null {
   return Number.isFinite(v) && v > 0 ? v : null;
 }
 
+/**
+ * テストプレイ（07 の167章）: ?boss=lapras で、そのボス（enemies.json の id、または id の末尾。地方は ?region=）が出る区間から始め、すぐ出す。
+ * タッグのボスは組の相手も一緒に出る。無ければ null
+ */
+export function parseBossParam(search: string): string | null {
+  const v = new URLSearchParams(search).get('boss');
+  return v ? v : null;
+}
+
 /** 確認用: ?section=3 で、その区間（data/game/spawn.json の waves の番号）から始める。無ければ null */
 export function parseSectionParam(search: string): number | null {
   const v = Number(new URLSearchParams(search).get('section'));

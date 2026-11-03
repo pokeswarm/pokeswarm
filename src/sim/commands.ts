@@ -177,6 +177,12 @@ export interface AddHazardCommand {
   readonly inner: number;
   /** 予告が追いかけるプレイヤー（-1 なら追わない） */
   readonly follow?: number;
+  /** 1回の技の組・威力の上書き（カウンター）・落ちた後に進む速さ（波）・直線の長さの上書き（波の帯）。無ければ 0（07 の167章） */
+  readonly group?: number;
+  readonly damage?: number;
+  readonly vx?: number;
+  readonly vy?: number;
+  readonly length?: number;
 }
 
 /** ゲスト: 中ボス・ボスの HP（ホストが集計したもの） */

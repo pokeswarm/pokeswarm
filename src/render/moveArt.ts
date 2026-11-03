@@ -4852,6 +4852,145 @@ function smashArms(): SpriteOut {
   return { palette, frameMs: 70, loopFrom: 3, parts: { main: frames } };
 }
 
+// ---------------- ボスの技（07 の167章）: カントーの四天王 ----------------
+/**
+ * ビルドアップ（シバのカイリキー）: 体の周りから赤い気が立ち上る輪。真ん中は空けて、ボスの体が見える。
+ * 外側の炎のような筋が上へゆらめき、コマで脈打つ（力をためている）
+ */
+function bulkAura(): SpriteOut {
+  // 0 輪郭（こげ茶）・1 濃い赤・2 赤・3 だいだい・4 うすいだいだい
+  const palette = ['#3e0a0a', '#b71c1c', '#e53935', '#ff8a65', '#ffccbc'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(28, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 上ほど高く伸びる（立ち上る気）。筋は 9 本、コマで上へ流れる
+      const lift = Math.max(0, -v) * 0.25;
+      const rr = 0.72 + lift + Math.sin(a * 9 + f * 1.6) * 0.08 * (0.6 + lift * 2);
+      if (d > rr || d < 0.5) return -1;
+      const flick = hash(Math.floor((a + Math.PI) * 9), Math.floor(d * 10) - f, 1670);
+      if (d > rr - 0.08) return flick < 0.3 ? -1 : 3;
+      if (flick < 0.18) return -1;
+      return d < 0.58 ? 4 : flick > 0.7 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * かげぶんしん（キクコのゲンガー）: 本物が現れる所の、紫と黒の煙の玉。真ん中から外へふくらみ、ちぎれて消える
+ */
+function shadowPoof(): SpriteOut {
+  // 0 輪郭・1 ほぼ黒・2 暗い紫・3 紫・4 うす紫
+  const palette = ['#06020a', '#1a0b24', '#4a148c', '#7b1fa2', '#ce93d8'];
+  const r = rng(1671);
+  const puffs = Array.from({ length: 9 }, (_, k) => ({ a: (k / 9) * Math.PI * 2 + (r() - 0.5) * 0.4, rad: 0.24 + r() * 0.12, speed: 0.45 + r() * 0.25 }));
+  const frames = [0, 1, 2, 3, 4].map((f) => {
+    const p = f / 4;
+    return shape(28, (u, v) => {
+      let c = -1;
+      // 真ん中のかたまり（縮む）
+      const core = 0.42 * (1 - p);
+      const dc = Math.hypot(u, v);
+      if (dc < core) c = dc < core * 0.5 ? 1 : 2;
+      for (const s of puffs) {
+        const dist = 0.18 + s.speed * p;
+        const cx = Math.cos(s.a) * dist;
+        const cy = Math.sin(s.a) * dist - p * 0.12;
+        const rad = s.rad * (1 - p * 0.55);
+        const d = Math.hypot(u - cx, v - cy) / rad;
+        if (d > 1) continue;
+        // 終わりのコマほど、ちぎれる
+        if (p > 0.5 && hash(Math.floor(u * 14), Math.floor(v * 14), 1672 + f) < (p - 0.5) * 1.4) continue;
+        c = d < 0.45 ? 4 : d < 0.75 ? 3 : 2;
+      }
+      return c;
+    });
+  });
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * ナイトヘッド（キクコのゲンガー）の這う影: 地面を這う黒い影の溜まり。ふちが波打ち、赤い目が2つ光ってまばたきする
+ */
+function creepingShadow(): SpriteOut {
+  // 0 輪郭・1 ほぼ黒・2 暗い紫・3 紫のふち・4 赤い目・5 目の芯（白）
+  const palette = ['#06020a', '#120618', '#2a0f45', '#5e1f7a', '#ff1744', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(24, (u, v) => {
+      const a = Math.atan2(v, u);
+      // 横長の影。ふちが細い指のように波打つ（這っている）
+      const rr = 0.86 + Math.sin(a * 7 + f * 1.4) * 0.07 + Math.sin(a * 3 - f) * 0.04;
+      const d = Math.hypot(u, v * 1.7);
+      if (d > rr) return -1;
+      // 目: 少し上に2つ。4 コマ目はまばたき（細い線）
+      for (const ex of [-0.28, 0.28]) {
+        const ed = Math.hypot((u - ex) * 1.2, (v + 0.12) * (f === 3 ? 4 : 1.6));
+        if (ed < 0.11) return ed < 0.05 && f !== 3 ? 5 : 4;
+      }
+      return d > rr - 0.13 ? 3 : d > 0.45 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 130, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * さいみんじゅつ（キクコのゲンガー）: 扇の中を根元から外へ広がる、紫と桃の輪の波。輪はうず巻くように少しゆがみ、コマで外へ進む
+ */
+function hypnoWaves(): SpriteOut {
+  // 扇は長さに合わせて引き伸ばすので、マスを細かくして輪を細く・多くする（輪の間は 7 マス）
+  const W = 64;
+  const H = 32;
+  // 0 輪郭・1 濃い紫・2 紫・3 桃・4 うす桃
+  const palette = ['#2a0838', '#6a1b9a', '#ab47bc', '#f06292', '#f8bbd0'];
+  const mid = (H - 1) / 2;
+  const P = 7;
+  const frames = [0, 1, 2, 3].map((f) => {
+    const g = fill(blank(W, H), (x, y) => {
+      const t = Math.max(0, Math.min(1, x / (W - 1)));
+      const half = (H / 2) * (0.15 + 0.85 * t);
+      if (Math.abs(y - mid) / Math.max(0.5, half) > 1) return -1;
+      // 根元を中心にした輪（端ほど反らせる）。上下で少しずらして、うず巻いて見せる
+      const r = x - 0.06 * (y - mid) ** 2 + (y - mid) * 0.3;
+      const ph = (r - (f * P) / 4) / P;
+      const k = Math.abs(ph - Math.round(ph));
+      const ring = Math.round(ph);
+      // 先の方は薄れる（輪がちぎれる）
+      if (t > 0.75 && hash(Math.floor(x), Math.floor(y), 1675 + f) < (t - 0.75) * 3) return -1;
+      if (k < 0.07) return ring % 2 === 0 ? 3 : 2;
+      if (k < 0.12) return ring % 2 === 0 ? 4 : 1;
+      return -1;
+    });
+    return outline(g, 0);
+  });
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * ゆめくい（キクコのゲンガー）: 周りから真ん中（ゲンガー）へ吸い込まれる、桃色の夢のもや。渦を巻いて内へ縮む
+ */
+function dreamDrain(): SpriteOut {
+  // 0 輪郭・1 紫・2 桃・3 うす桃・4 白
+  const palette = ['#3a0a3a', '#8e24aa', '#ec407a', '#f8bbd0', '#ffffff'];
+  const frames = [0, 1, 2, 3, 4].map((f) => {
+    const p = f / 4;
+    return shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.98) return -1;
+      const a = Math.atan2(v, u);
+      // 6 本の渦の腕。コマが進むほど内側へ寄る
+      const arm = Math.sin(a * 6 + d * 7 - p * 9);
+      const reach = 1 - p * 0.7;
+      if (d > reach) return -1;
+      if (d < 0.12 + p * 0.1) return 4;
+      if (arm > 0.82) return d < 0.45 ? 3 : 2;
+      if (arm > 0.6) return 1;
+      return -1;
+    }, 0, 0);
+  });
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
 /** 絵の名前 → 描く関数 */
@@ -5068,6 +5207,12 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     // したでなめる の舌・おどろかす の足元の影（07 の147章）
     tongue: () => tongue(),
     'shadow-pool': () => shadowPool(),
+    // ボスの技（07 の167章）
+    'bulk-aura': () => bulkAura(),
+    'shadow-poof': () => shadowPoof(),
+    'creeping-shadow': () => creepingShadow(),
+    'hypno-waves': () => hypnoWaves(),
+    'dream-drain': () => dreamDrain(),
 };
 
 /** 絵の名前の一覧 */

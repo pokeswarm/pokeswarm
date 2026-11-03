@@ -151,7 +151,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         break;
       }
       case 'addHazard':
-        if (world.role === 'guest') addHazard(world, cmd.move, cmd.x, cmd.y, cmd.dirX, cmd.dirY, cmd.dasher, undefined, { delay: cmd.delay, radius: cmd.radius, inner: cmd.inner, follow: cmd.follow ?? -1 });
+        if (world.role === 'guest') addHazard(world, cmd.move, cmd.x, cmd.y, cmd.dirX, cmd.dirY, cmd.dasher, undefined, { delay: cmd.delay, radius: cmd.radius, inner: cmd.inner, follow: cmd.follow ?? -1, group: cmd.group || 0, damage: cmd.damage || 0, vx: cmd.vx ?? 0, vy: cmd.vy ?? 0, length: cmd.length || 0 });
         break;
       case 'bossHp': {
         const i = findEnemyIndex(world, cmd.id);

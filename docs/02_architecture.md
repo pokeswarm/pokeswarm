@@ -310,6 +310,10 @@ pokeswarm/
 ### 12.3 20分の流れ・スウォーム・押し合い（作者の仕様変更。2026年10月21日）
 - ステージ（`data/game/stage.json`・`src/sim/systems/stage.ts`）: `bosses` に出る時刻・種類・使う範囲技・クリアに必要か（`required`。四天王）を並べる。required を全員倒すとクリア（`world.cleared`）、`durationSeconds`（1500秒）で残っていれば失敗。ボスには第2段階（`enrage`: HP の割合を切ると技の間隔を短くし、2つ同時に使う確率を付ける。`legendaryWarning` の `enraged` で DANGER を出す）を付けられる。
 - 範囲技（`stage.moves`）: 円（足元と周り・自分の周り）と直線（ビーム・突進）。直線の突進は、落ちたときにボスがノックバックの仕組みで線に沿って進む。当たったかは受けたプレイヤーのブラウザで判定（`hazardHits`）。協力プレイでは予告を `hz`（技の番号・位置・向き・突進する敵）で送り、ボスの位置も HP と一緒に送る（`bh`）。
+- ボスの技の部品（07 の167章。`bossMoveSchema`・`stage.ts`。後の地方の伝説でも使う）: 扇（`cone`・`arc`）・なぎ払い（`sweep`。予告は扇で、動き始める縁を太く）・中心から何本もの線（`arms`。`absolute`・`angles` で絵の向きとそろえる）・落ちた後に進む（`travel`。曲がる・揺れる）・押し寄せる波の帯（`wall`）・周りに順に（`around`。中心はボスか狙った人）・並べて順に（`along`）・狙い直して何回も（`repeat`。`world.bossQueue`）・予告が決まった秒数だけ追う（`follow`）・消える（`hideBoss`。`world.hiddenEnemies` を予告から毎回決め、近傍検索に入れない）・ボスに付いていく（`followBoss`）・跳ね回る（`bounce`）・反動（`recoilSeconds`）・強化（`buff`）・カウンター（`counter` ＋ `then`。返す威力は予告の知らせの `damage`）・偽物（`decoys`）・罠（`trap`）・段階（`bosses[].phases`）・プレイヤーにかかる効き目（`onHit`: ねむけ・やけど・冷え・ひるみ・押し飛ばし。本人のブラウザ）・引き寄せる床（`leaves.pullPerSecond`）。1回の技で出した範囲は組（`group`）にして、1回の技で当たるのは1回。
+- ボスの動き方（`enemies.json` の `motion`）: 間合いを保つ（`keepDistance`）・周りを回る（`orbit`）・動かない（`still`）。無ければ追う。
+- ボスの技の絵（`recipes.json` の `bossTelegraph`・`bossActive`・`strike`）: 予告の間・当たっている間・落ちた瞬間に描く。プレイヤーの技と同じ名前の技は、プレイヤーの技のレシピを `extends` して使う（作者の決定）。確認用の `?boss=lapras`。
+- 協力プレイの `hz` は 15 個ずつ（技・位置・向き x・y・突進する敵・遅れ・半径・内側の半径・追う人・組・威力の上書き・進む速さ x・y・長さ）。
 - 伝説戦: クリアした時点で `legendary.chance` の確率で始まる。雑魚は消し（`enemyRetired`）、`warningSeconds` 後に伝説を出し、`moves` を順に使う。倒す・全員倒れる・`timeLimitSeconds` で終わり、いずれもクリア（結果は `world.legendary.result`。協力プレイでは `lw`・`end` で送る）。伝説を倒した数は記録 `legendaryKills`（裏実績「でんせつとの であい」）。
 - スウォーム（`stage.swarms`）: rush はプレイヤーを追わずにまっすぐ進む敵（`EnemyStore` の `vx`・`vy`）。離れすぎたら移し替えずに消す。協力プレイでは出現を `sv`（速度つき）で送る。encircle はプレイヤーの周りにぐるりと出て、ふつうに追ってくる。
 - 押し合い（`separateEnemies`）: 重なりを全部解消するまで押し（`strength` 1）、近くの12体まで、1回の更新で2回。大きい敵ほど押されにくい（半径の2乗の比で分ける）。大きな敵も相手として見つかるよう、探す範囲を「自分＋一番大きな敵の半径」にした。

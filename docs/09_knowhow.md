@@ -73,6 +73,7 @@
   - **周りの敵をすぐ倒しきる技も放置で勝てないか確かめる**（押し出さなくても、自分の周り全部に当たり続けると放置できる）。直すときは威力を下げるより、**向きを持たせる**（前へ広がる扇・前へ進む渦・前の敵へ跳ぶ連鎖・前へ流す波。07 の164・165章）。周りへ出すのが技らしさなら、**走っている間だけためる**（ほうでん）。
   - **技進化で届く距離を大きく縮めない**（Lv1 ≥ 元の最大の 6 割。テスト `derivationReach.test.ts`）。**技の数が増えたら**、扇は角度・なぎ払いは幅・前の長方形は大きさ・周り全部は威力が増える（反対側には出さない。`combat.json` の `countWidenPct`・`boxCountGrowthPct`。07 の163章）。
   - **自分を中心に当たり続ける技は放置で勝てないか確かめる**（07 の162章。`npm run balance -- -t "放置"` の `src/sim/afk.balance.ts`）。押し出す技は、止まると弱まる `idleScale`・向いている方向へ押す `knockbackAlongFacing` と、全体の踏ん張り `knockbackFatigue` がある。
+  - **ボスの技は部品の組み合わせ**（07 の167章・`02` の範囲技の項）。新しいボスは、まずバトルタイプ（`20` の3章）を決め、技は原作で覚える技から。予告の形と絵の向きをそろえる（×・大の字・8方向の破片は `arms.absolute`・`angles`。そろえないと見た目と当たり判定がずれる）。なぎ払いの扇は逃げ切れる広さに（はかいこうせん 80° → 60°）。ボスの大きな絵の周りに出す気は、絵より大きくしないと隠れる。扇の絵は長さに合わせて引き伸ばすので、マスを細かく描く。シェルの `node -e "..."` にバッククォートを入れると、コマンドとして実行されて文書が壊れる（Edit を使う）。
   - **技進化で ぶつり／とくしゅ を変えない**（07 の161章。テスト `damageClass.test.ts`）。ルートを作るときは、原作の同じタイプ・同じ分類で威力が上がる技を探す（`docs/19` の探し方）。
   - **誰が覚えるかは `learnsets.json`**（07 の158章）。技を足したら、覚える系統の一覧に入れる（原作のレベル技か自分のタイプのマシン技かを PokeAPI のキャッシュで確かめる。タマゴ技は数えない）。派生技も一覧に書く（全体の派生は、派生技が一覧に無い系統には出ない）。一覧の作り直しは scratchpad の生成の台本ではなく、`docs/18` の決まりで手で直す。**同じ名前の技を地方ごとに写さない**（1 名前 1 技。強さの帯が違う固有技の版だけ別のキー）。
   - 受けたダメージを返す技（ミラーコート・マジックコート・メタルバースト）は、`aura` で輪をまとい、効き方の trigger `hurt` の explode（威力＝受けたダメージ × powerMultiplier。`sweep` で輪）で返す。本人のブラウザだけで起こる（07 の154章）。
@@ -99,6 +100,7 @@
 - 確認用の URL: `?pokemon=X&moves=key:lv,key:lv&level=N&spawn=N&time=秒&debug`。`?pokemon=` はそのポケモンを遊べる最初の地方で始まる（`?region=johto` でも選べる）。
 - **テストプレイ**（作者の依頼 2026年10月26日。ソロだけ）: `?legend=mewtwo`（mewtwo・mew・articuno・zapdos・moltres・charizard（色違い）など）で最初から伝説と戦い、`?god` で無敵になる。無敵の間に受けたはずのダメージの合計と、最大 HP の何回分かを画面の上に出す。どちらかを付けたランは**記録を保存しない**（コイン・実績・解放が進まない）。例: `https://pokeswarm.org/?pokemon=charmander&level=60&moves=blast-burn:8,flare-blitz:8,flamethrower:8,fire-spin:8&legend=mewtwo&god`
   - ジョウト（07 の85章）: `?region=johto&legend=red-pikachu`（レッド戦の1ラウンドから。`red-espeon` で2ラウンド、`red-charizard` で3ラウンド）、`&wings` を足すとはねを持っていて、レッドに勝つとルギア → ホウオウ。`?legend=lugia`・`?legend=ho-oh` でその1戦だけ。`?intruder=raikou`（entei・suicune）で三犬が乱入する（`&time=300` などと一緒に）。どれも記録を保存しない。
+  - ボス（07 の167章）: `?boss=lapras`（enemies.json の id か、その末尾。地方は `?region=`）で、そのボスの区間から始めてすぐ出す。タッグは組の相手も出る。記録を保存しない。例: `?region=johto&pokemon=quilava&boss=dragonite&god`。組み込みのブラウザが隠れているときは `window.game.loop.sleep()` してから `game.step(t, 33)` を回し、`sim.world.hazards` で技の id を見る。
 - **開発版だけの ?restore=50000**（作者の依頼 2026年10月27日）: 伝説以外の実績を全部達成にし（報酬のポケモンも解放）、コインを少なくともその数にして、すぐ保存する。公開版のビルドには入らない（`import.meta.env.DEV`）。localhost も本番と同じ Firebase につながるので、Google でログインしてから開くと、そのアカウントのセーブに入る。
 - 開発サーバーではモジュールをその場で読み込める: `await import('/src/sim/systems/boxes.ts')` で関数を呼び、`window.game.scene.getScene('run')` でシーンを触る。
 - 画面が隠れているとき: `sc.scene.pause()` してから `sc.runSteps(n, true)`・`sc.draw(...)` で進める。

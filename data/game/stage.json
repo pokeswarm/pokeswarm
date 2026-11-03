@@ -1938,7 +1938,12 @@
     "hazardActiveSeconds": 0.4,
     "hazardDamageScalesWithLevel": true,
     "spawnDistance": 380,
-    "gateTimeLimitSeconds": 180
+    "gateTimeLimitSeconds": 180,
+    "drowsySlowPct": 55,
+    "burnPctPerSecond": 1.5,
+    "chillToFreeze": 3,
+    "chillFreezeSeconds": 1.2,
+    "chillForgetSeconds": 4
   },
   "endDelaySeconds": 2.5,
   "legendEscapeDelaySeconds": 3.5

@@ -69,7 +69,6 @@
         "kinds": [
           "paras",
           "oddish",
-          "pineco",
           "venonat",
           "exeggcute",
           "psyduck",
@@ -530,7 +529,7 @@
       "atSeconds": 45,
       "everySeconds": 20,
       "untilSeconds": 1180,
-      "kind": "swarm-voltorb",
+      "kind": "swarm-pineco",
       "pattern": "bomber",
       "count": 1,
       "triggerRange": 110,

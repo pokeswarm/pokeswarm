@@ -422,6 +422,17 @@
       "spriteScale": 1.2
     },
     {
+      "id": "swarm-pineco",
+      "species": "pineco",
+      "sprite": "enemy/pineco",
+      "hp": 10,
+      "moveSpeed": 220,
+      "radius": 12,
+      "contactDamage": 8,
+      "xp": 3,
+      "spriteScale": 1.2
+    },
+    {
       "id": "midboss-onix",
       "species": "onix",
       "rank": "midboss",
@@ -743,14 +754,6 @@
       "sprite": "enemy/oddish",
       "hp": 7,
       "moveSpeed": 41,
-      "radius": 10,
-      "contactDamage": 6
-    },
-    {
-      "id": "pineco",
-      "sprite": "enemy/pineco",
-      "hp": 7,
-      "moveSpeed": 35,
       "radius": 10,
       "contactDamage": 6
     },

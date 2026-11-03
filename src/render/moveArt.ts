@@ -5415,6 +5415,143 @@ function voltNode(): SpriteOut {
   return { palette, frameMs: 60, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- ボスの技（07 の167章）: ホウエンの四天王とミクリ ----------------
+/** くろいまなざし（フヨウのサマヨール）: 囲いの内側の縁にぐるりと並んで見張る、赤い目（ふちは黒いもや）。円に合わせ、目は縁の近くに並ぶ */
+function eyeRing(): SpriteOut {
+  // 0 輪郭・1 黒・2 濃い紫・3 赤・4 白
+  const palette = ['#050208', '#120818', '#3a1650', '#ff1744', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(48, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.99 || d < 0.84) return -1;
+      const a = Math.atan2(v, u) + f * 0.04;
+      // 14 個の目（角度の帯ごと）。まばたきは目ごとにずらす
+      const seg = ((a + Math.PI) / (Math.PI * 2)) * 14;
+      const k = Math.floor(seg);
+      const x = (seg - k) * 2 - 1;
+      const y = ((d - 0.84) / 0.15) * 2 - 1;
+      const blink = (k + f) % 7 === 0;
+      if (Math.hypot(x * 0.9, y * (blink ? 4 : 1.6)) < 0.55) return Math.hypot(x, y) < 0.18 && !blink ? 4 : 3;
+      // 目のまわりのもや
+      return hash(Math.floor(a * 30), Math.floor(d * 40), 1700 + f) < 0.45 ? 2 : 1;
+    }, 0, -1),
+  );
+  return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
+}
+
+/** こおりのキバ（プリムのトドゼルガ）: 牙で噛んだ前に、氷のとげが根元から先へ並んで突き出す（右向き。前の1枚） */
+function iceFangSpikes(): SpriteOut {
+  // 0 輪郭・1 濃い青・2 水色・3 うす水色・4 白
+  const palette = ['#0d2b45', '#0277bd', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    const g = fill(blank(40, 20), (x, y) => {
+      // とげ: 5本が手前から順に伸びる（コマで先のとげが出る）
+      for (let k = 0; k < 5; k++) {
+        if (k > f + 1) continue;
+        const cx = 5 + k * 8;
+        const h = 8 - Math.abs(k - 2) * 0.8;
+        const top = 9.5 - h;
+        const dy = y - top;
+        if (dy < 0 || y > 15) continue;
+        const half = (dy / (15 - top)) * 3;
+        if (Math.abs(x - cx) < half) return Math.abs(x - cx) < half * 0.35 ? 4 : dy < 3 ? 3 : 2;
+      }
+      // 根元の氷の地面
+      if (y >= 14 && y < 17 && x < 8 + (f + 1) * 8) return y === 14 ? 3 : 1;
+      return -1;
+    });
+    return toRows(outline(g, 0));
+  });
+  return { palette, frameMs: 70, loopFrom: 3, parts: { main: frames } };
+}
+
+/** こおりのいぶき（プリムのオニゴーリ）: 口から吹く冷気の筋（線の絵。白い雪の粒と水色の筋が先へ流れる） */
+function frostBreath(): SpriteOut {
+  const H = 12;
+  const TILE = 10;
+  // 0 輪郭・1 青・2 水色・3 うす水色・4 白
+  const palette = ['#0d2b45', '#4fc3f7', '#81d4fa', '#e1f5fe', '#ffffff'];
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 6, middle: TILE, end: 8 }, 4, (x, y, f, part) => {
+    const taper = part === 'start' ? 0.5 + (x / 6) * 0.5 : part === 'end' ? 1 - x / 10 : 1;
+    const half = (H / 2 - 1) * taper;
+    const dy = y - mid;
+    if (Math.abs(dy) > half) return -1;
+    // 雪の粒（論理の 1 マスごとの乱数。コマで先へ流れる）
+    if (hash(Math.floor(x - f * 3), Math.floor(y), 1701) < 0.12) return 4;
+    // 波打つ筋
+    if (Math.abs(dy - Math.sin((x + f * 3) * 0.7) * half * 0.5) < 0.8) return 3;
+    return Math.abs(dy) < half * 0.45 ? 2 : -1;
+  }, -1);
+  return { palette, frameMs: 70, parts };
+}
+
+/** りゅうのまい（ゲンジのボーマンダ）: 体の周りを巡る、炎・水・電気の3色の竜の気（3本のらせんが回る） */
+function dragonDanceAura(): SpriteOut {
+  // 0 輪郭・1 赤・2 青・3 黄・4 白
+  const palette = ['#1a0a2a', '#e53935', '#1e88e5', '#fdd835', '#ffffff'];
+  const frames = [0, 1, 2, 3, 4, 5].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.97 || d < 0.5) return -1;
+      const a = Math.atan2(v, u);
+      for (let k = 0; k < 3; k++) {
+        // らせんの帯: 角度とともに半径が揺れ、コマで回る
+        const ph = a - (f * Math.PI) / 9 + (k * Math.PI * 2) / 3;
+        const rr = 0.73 + Math.sin(ph * 2) * 0.17;
+        if (Math.abs(d - rr) < 0.07) return Math.abs(d - rr) < 0.03 ? 4 : 1 + k;
+      }
+      return -1;
+    }, 0, 0),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** ダイビング（ミクリのホエルオー）: 潜ったホエルオーの背びれの波紋（水の輪が何重にも広がり、真ん中に青い背びれ） */
+function diveRipple(): SpriteOut {
+  // 0 輪郭・1 濃い青・2 青・3 水色・4 白
+  const palette = ['#0b1f3a', '#0d47a1', '#1976d2', '#64b5f6', '#e3f2fd'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      // 背びれ（上を向いた三角）
+      if (v < 0.1 && v > -0.35 && Math.abs(u) < (v + 0.35) * 0.45) return v > 0 ? 1 : 2;
+      const d = Math.hypot(u, v * 1.8);
+      if (d > 0.98) return -1;
+      // 外へ広がる輪
+      const ph = (d - f * 0.07) / 0.28;
+      const k = Math.abs(ph - Math.round(ph));
+      if (k < 0.08 && d > 0.2) return d > 0.7 ? 3 : 4;
+      return -1;
+    }, 0, 0),
+  );
+  return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
+}
+
+/** ダイビング（ミクリのホエルオー）: 浮上した所の、大きく跳ね上がる水しぶき（真ん中から外へ水の玉が散る） */
+function diveSplash(): SpriteOut {
+  // 0 輪郭・1 濃い青・2 青・3 水色・4 白
+  const palette = ['#0b1f3a', '#1565c0', '#42a5f5', '#90caf9', '#ffffff'];
+  const r = rng(1702);
+  const drops = Array.from({ length: 14 }, (_, k) => ({ a: (k / 14) * Math.PI * 2 + (r() - 0.5) * 0.3, speed: 0.55 + r() * 0.35, rad: 0.07 + r() * 0.05 }));
+  const frames = [0, 1, 2, 3, 4].map((f) => {
+    const p = f / 4;
+    return shape(40, (u, v) => {
+      const d = Math.hypot(u, v);
+      // 真ん中の水の柱（縮む）
+      if (d < 0.35 * (1 - p) + 0.05) return d < 0.15 * (1 - p) + 0.03 ? 4 : 3;
+      // 広がる波の輪
+      if (Math.abs(d - (0.3 + p * 0.6)) < 0.04 * (1 - p) + 0.015) return 2;
+      for (const s of drops) {
+        const dist = 0.2 + s.speed * p;
+        const dd = Math.hypot(u - Math.cos(s.a) * dist, v - Math.sin(s.a) * dist);
+        if (dd < s.rad * (1 - p * 0.5)) return dd < s.rad * 0.4 ? 4 : 3;
+      }
+      return -1;
+    });
+  });
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
 /** 絵の名前 → 描く関数 */
@@ -5656,6 +5793,12 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'extrasensory-eye': () => extrasensoryEye(),
     'sacred-flame': () => sacredFlame(),
     'volt-node': () => voltNode(),
+    'eye-ring': () => eyeRing(),
+    'ice-fang-spikes': () => iceFangSpikes(),
+    'frost-breath': () => frostBreath(),
+    'dragon-dance-aura': () => dragonDanceAura(),
+    'dive-ripple': () => diveRipple(),
+    'dive-splash': () => diveSplash(),
 };
 
 /** 絵の名前の一覧 */

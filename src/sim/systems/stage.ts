@@ -187,6 +187,8 @@ function partnerDashing(world: World, bossId: number): boolean {
   for (const [id, w] of world.tagIds) {
     if (id === bossId || w !== wave) continue;
     if (world.hazards.some((h) => h.dasher === id && !!world.rules.stage.moves[h.move]?.dashSpeed)) return true;
+    // 跳ね回っている（ころがる）
+    if (world.bosses.some((b) => b.id === id && b.bounce)) return true;
     const i = findEnemyIndex(world, id);
     if (i !== -1 && world.enemies.kbTicks[i]! > 0) return true;
   }
@@ -666,7 +668,9 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
         // 1つ目は足元、2つ目以降はばらつかせる（動かないと当たり、動けば避けられる）
         const [rx, ry] = c === 0 ? [0, 0] : randomUnit(world.rng);
         const dist = c === 0 ? 0 : world.rng.range(move.radius, move.spread + move.radius);
-        put(t.x + rx * dist, t.y + ry * dist, ux, uy, move.healPct || move.rooted || move.then || move.teleport || move.hideBoss || move.followBoss ? bossId : -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
+        // 狙った人を囲む輪（くろいまなざし）: 内側の半径は rings.width で決める
+        const ring = move.shape === 'ring' && move.rings ? { inner: Math.max(0, move.radius * scale - move.rings.width * scale) } : {};
+        put(t.x + rx * dist, t.y + ry * dist, ux, uy, move.healPct || move.rooted || move.then || move.teleport || move.hideBoss || move.followBoss ? bossId : -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt), ...ring });
       }
     }
   }

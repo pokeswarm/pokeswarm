@@ -501,8 +501,8 @@
       "tag": true,
       "kind": "hoenn-boss-absol",
       "moves": [
-        "legend-dash",
-        "legend-nova"
+        "absol-night-slash",
+        "absol-perish-song"
       ],
       "moveIntervalSeconds": 2.6,
       "enrage": {
@@ -519,9 +519,9 @@
       "tag": true,
       "kind": "hoenn-boss-shiftry",
       "moves": [
-        "mewtwo-psywave",
-        "legend-nova",
-        "mewtwo-teleport"
+        "shiftry-fake-out",
+        "shiftry-leaf-storm",
+        "shiftry-leaf-storm"
       ],
       "moveIntervalSeconds": 2.6,
       "enrage": {
@@ -538,8 +538,9 @@
       "tag": true,
       "kind": "hoenn-boss-dusclops",
       "moves": [
-        "legend-dash",
-        "shadow-ball"
+        "dusclops-mean-look",
+        "dusclops-hex",
+        "dusclops-hex"
       ],
       "moveIntervalSeconds": 2.2,
       "enrage": {
@@ -556,8 +557,8 @@
       "tag": true,
       "kind": "hoenn-boss-banette",
       "moves": [
-        "shadow-ball",
-        "legend-nova"
+        "banette-sucker-punch",
+        "banette-phantom-force"
       ],
       "moveIntervalSeconds": 2.2,
       "enrage": {
@@ -574,8 +575,8 @@
       "tag": true,
       "kind": "hoenn-boss-walrein",
       "moves": [
-        "legend-dash",
-        "earthquake"
+        "walrein-rollout",
+        "walrein-ice-fang"
       ],
       "moveIntervalSeconds": 2.2,
       "enrage": {
@@ -592,8 +593,8 @@
       "tag": true,
       "kind": "hoenn-boss-glalie",
       "moves": [
-        "earthquake",
-        "legend-nova"
+        "glalie-frost-breath",
+        "glalie-sheer-cold"
       ],
       "moveIntervalSeconds": 2.2,
       "enrage": {
@@ -610,8 +611,9 @@
       "tag": true,
       "kind": "hoenn-boss-salamence",
       "moves": [
-        "moltres-flamedash",
-        "shadow-ball"
+        "salamence-dragon-dance",
+        "salamence-outrage",
+        "salamence-outrage"
       ],
       "moveIntervalSeconds": 2,
       "enrage": {
@@ -628,8 +630,8 @@
       "tag": true,
       "kind": "hoenn-boss-flygon",
       "moves": [
-        "shadow-ball",
-        "charizard-blast-burn"
+        "flygon-sand-tomb",
+        "flygon-dragon-pulse"
       ],
       "moveIntervalSeconds": 2,
       "enrage": {
@@ -646,8 +648,9 @@
       "tag": true,
       "kind": "hoenn-boss-milotic",
       "moves": [
-        "draco-meteor",
-        "legend-beam"
+        "milotic-twister",
+        "milotic-recover",
+        "milotic-twister"
       ],
       "moveIntervalSeconds": 1.8,
       "enrage": {
@@ -664,8 +667,8 @@
       "tag": true,
       "kind": "hoenn-boss-wailord",
       "moves": [
-        "zapdos-dash",
-        "legend-nova"
+        "wailord-dive",
+        "wailord-water-spout"
       ],
       "moveIntervalSeconds": 1.8,
       "enrage": {

@@ -1601,6 +1601,328 @@
       "radius": 80,
       "damage": 0,
       "healPct": 5
+    },
+    {
+      "id": "absol-night-slash",
+      "move": "night-slash",
+      "effect": "boss-night-slash",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.6,
+      "radius": 30,
+      "length": 360,
+      "damage": 32,
+      "dashSpeed": 900,
+      "then": "absol-night-slash-cut",
+      "thenSamePlace": true
+    },
+    {
+      "id": "absol-night-slash-cut",
+      "move": "night-slash",
+      "effect": "boss-night-slash-cut",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.6,
+      "radius": 30,
+      "length": 360,
+      "damage": 30
+    },
+    {
+      "id": "absol-perish-song",
+      "move": "perish-song",
+      "effect": "boss-perish-song",
+      "shape": "circle",
+      "target": "self",
+      "followBoss": true,
+      "countdown": true,
+      "telegraphSeconds": 3,
+      "radius": 280,
+      "damage": 70
+    },
+    {
+      "id": "shiftry-leaf-storm",
+      "move": "leaf-storm",
+      "effect": "boss-leaf-storm",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.8,
+      "radius": 30,
+      "damage": 22,
+      "count": 5,
+      "spread": 18,
+      "stagger": 0.05,
+      "travel": {
+        "speed": 240,
+        "wobble": {
+          "amplitude": 25,
+          "seconds": 0.9
+        }
+      },
+      "activeSeconds": 2.5
+    },
+    {
+      "id": "shiftry-fake-out",
+      "move": "fake-out",
+      "effect": "boss-fake-out",
+      "shape": "circle",
+      "target": "player",
+      "teleport": true,
+      "hideBoss": true,
+      "spread": 60,
+      "telegraphSeconds": 0.6,
+      "radius": 70,
+      "damage": 20,
+      "onHit": {
+        "flinchSeconds": 0.5
+      }
+    },
+    {
+      "id": "banette-sucker-punch",
+      "move": "sucker-punch",
+      "effect": "boss-sucker-punch",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.5,
+      "radius": 40,
+      "damage": 30,
+      "count": 3,
+      "spread": 140,
+      "trap": {
+        "seconds": 6
+      }
+    },
+    {
+      "id": "banette-phantom-force",
+      "move": "phantom-force",
+      "effect": "boss-phantom-force",
+      "shape": "circle",
+      "target": "player",
+      "teleport": true,
+      "hideBoss": true,
+      "spread": 0,
+      "telegraphSeconds": 1.1,
+      "radius": 80,
+      "damage": 40
+    },
+    {
+      "id": "dusclops-mean-look",
+      "move": "mean-look",
+      "effect": "boss-mean-look",
+      "shape": "ring",
+      "target": "player",
+      "telegraphSeconds": 0.8,
+      "radius": 1400,
+      "damage": 26,
+      "rings": {
+        "count": 1,
+        "step": 0,
+        "width": 1200
+      },
+      "activeSeconds": 4,
+      "hitEverySeconds": 1
+    },
+    {
+      "id": "dusclops-hex",
+      "move": "hex",
+      "effect": "boss-hex",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.9,
+      "radius": 80,
+      "damage": 26,
+      "onHit": {
+        "statusBonusPct": 120
+      }
+    },
+    {
+      "id": "walrein-rollout",
+      "move": "rollout",
+      "effect": "boss-rollout",
+      "shape": "circle",
+      "target": "player",
+      "followBoss": true,
+      "telegraphSeconds": 0.7,
+      "radius": 50,
+      "damage": 30,
+      "hitEverySeconds": 0.5,
+      "bounce": {
+        "seconds": 3,
+        "speed": 420,
+        "halfWidth": 340,
+        "halfHeight": 220,
+        "growPct": 40
+      }
+    },
+    {
+      "id": "walrein-ice-fang",
+      "move": "ice-fang",
+      "effect": "boss-ice-fang",
+      "shape": "line",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 0.7,
+      "radius": 50,
+      "length": 220,
+      "damage": 34
+    },
+    {
+      "id": "glalie-frost-breath",
+      "move": "frost-breath",
+      "effect": "boss-frost-breath",
+      "shape": "line",
+      "target": "self",
+      "rooted": true,
+      "followBoss": true,
+      "telegraphSeconds": 0.8,
+      "radius": 26,
+      "length": 300,
+      "damage": 14,
+      "arms": {
+        "count": 4
+      },
+      "sweep": {
+        "degrees": 180,
+        "seconds": 2
+      },
+      "hitEverySeconds": 0.5,
+      "onHit": {
+        "chill": 1
+      }
+    },
+    {
+      "id": "glalie-sheer-cold",
+      "move": "sheer-cold",
+      "effect": "boss-sheer-cold",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 2,
+      "radius": 80,
+      "damage": 30,
+      "onHit": {
+        "flinchSeconds": 1.5
+      }
+    },
+    {
+      "id": "salamence-dragon-dance",
+      "move": "dragon-dance",
+      "effect": "boss-dragon-dance",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 1,
+      "radius": 70,
+      "damage": 0,
+      "buff": {
+        "speedPct": 25,
+        "intervalPct": 15,
+        "maxStacks": 3
+      }
+    },
+    {
+      "id": "salamence-outrage",
+      "move": "outrage",
+      "effect": "boss-outrage",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.6,
+      "radius": 50,
+      "length": 240,
+      "damage": 26,
+      "dashSpeed": 360,
+      "activeSeconds": 1,
+      "hitEverySeconds": 0.3,
+      "recoilSeconds": 1.5
+    },
+    {
+      "id": "flygon-sand-tomb",
+      "move": "sand-tomb",
+      "effect": "boss-sand-tomb",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.8,
+      "radius": 120,
+      "damage": 10,
+      "leaves": {
+        "seconds": 4,
+        "slowPct": 0,
+        "damagePerSecond": 0,
+        "color": "#c8a165",
+        "pullPerSecond": 70
+      }
+    },
+    {
+      "id": "flygon-dragon-pulse",
+      "move": "dragon-pulse",
+      "effect": "boss-dragon-pulse",
+      "shape": "line",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 1,
+      "radius": 26,
+      "length": 800,
+      "damage": 42
+    },
+    {
+      "id": "wailord-dive",
+      "move": "dive",
+      "effect": "boss-dive",
+      "shape": "circle",
+      "target": "player",
+      "teleport": true,
+      "hideBoss": true,
+      "follow": {
+        "seconds": 2.2,
+        "speed": 110
+      },
+      "telegraphSeconds": 3,
+      "radius": 130,
+      "damage": 48
+    },
+    {
+      "id": "wailord-water-spout",
+      "move": "water-spout",
+      "effect": "boss-water-spout",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.9,
+      "radius": 55,
+      "damage": 30,
+      "count": 12,
+      "countByHp": true,
+      "spread": 300,
+      "stagger": 0.08
+    },
+    {
+      "id": "milotic-twister",
+      "move": "twister",
+      "effect": "boss-twister",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.8,
+      "radius": 40,
+      "damage": 30,
+      "count": 2,
+      "spread": 30,
+      "travel": {
+        "speed": 130,
+        "wobble": {
+          "amplitude": 40,
+          "seconds": 1.4
+        }
+      },
+      "activeSeconds": 4
+    },
+    {
+      "id": "milotic-recover",
+      "move": "recover",
+      "effect": "boss-recover",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 1.5,
+      "radius": 80,
+      "damage": 0,
+      "healPct": 6
     }
   ],
   "bossRules": {

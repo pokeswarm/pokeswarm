@@ -6187,6 +6187,172 @@
         "fit": "circle",
         "size": 1.2
       }
+    },
+    "boss-night-slash": {
+      "extends": "night-slash"
+    },
+    "boss-night-slash-cut": {
+      "extends": "night-slash",
+      "strike": {
+        "id": "night-crescent",
+        "fit": "circle",
+        "size": 1.6,
+        "seconds": 0.3
+      }
+    },
+    "boss-perish-song": {
+      "extends": "perish-song",
+      "strike": {
+        "id": "perish-ring",
+        "fit": "ring",
+        "size": 1,
+        "seconds": 0.5
+      }
+    },
+    "boss-leaf-storm": {
+      "extends": "leaf-storm",
+      "bossActive": {
+        "id": "leaf",
+        "fit": "circle",
+        "size": 1.8,
+        "rotate": "spin",
+        "spinDegPerSec": 720
+      }
+    },
+    "boss-fake-out": {
+      "extends": "fake-out",
+      "strike": {
+        "id": "palm",
+        "fit": "circle",
+        "size": 1.2,
+        "seconds": 0.3
+      }
+    },
+    "boss-sucker-punch": {
+      "extends": "sucker-punch",
+      "bossActive": {
+        "id": "shadow-ambush",
+        "fit": "circle",
+        "size": 1.2,
+        "alpha": 0.6
+      },
+      "strike": {
+        "id": "shadow-ambush",
+        "fit": "circle",
+        "size": 1.6,
+        "seconds": 0.35
+      }
+    },
+    "boss-phantom-force": {
+      "extends": "phantom-force",
+      "bossTelegraph": {
+        "id": "shadow-pool",
+        "fit": "circle",
+        "size": 1.2
+      }
+    },
+    "boss-mean-look": {
+      "extends": "ghost.base",
+      "bossTelegraph": {
+        "id": "eye-ring",
+        "fit": "circle",
+        "size": 1
+      },
+      "bossActive": {
+        "id": "eye-ring",
+        "fit": "circle",
+        "size": 1
+      }
+    },
+    "boss-hex": {
+      "extends": "hex",
+      "strike": {
+        "id": "burst-shadow",
+        "fit": "circle",
+        "size": 1.2,
+        "seconds": 0.4
+      }
+    },
+    "boss-rollout": {
+      "extends": "rollout"
+    },
+    "boss-ice-fang": {
+      "extends": "ice.base",
+      "strike": {
+        "id": "ice-fang-spikes",
+        "fit": "front",
+        "size": 0.9,
+        "along": 0.5,
+        "seconds": 0.45
+      }
+    },
+    "boss-frost-breath": {
+      "extends": "ice.base",
+      "bossActive": {
+        "id": "frost-breath",
+        "fit": "line",
+        "size": 1
+      }
+    },
+    "boss-sheer-cold": {
+      "extends": "sheer-cold",
+      "strike": {
+        "id": "ice-statue",
+        "fit": "circle",
+        "size": 1,
+        "originY": 0.91,
+        "seconds": 0.8
+      }
+    },
+    "boss-dragon-dance": {
+      "extends": "dragon.base",
+      "bossTelegraph": {
+        "id": "dragon-dance-aura",
+        "fit": "circle",
+        "size": 2
+      }
+    },
+    "boss-sand-tomb": {
+      "extends": "sand-tomb",
+      "strike": {
+        "id": "sand-vortex",
+        "fit": "circle",
+        "size": 1,
+        "seconds": 0.5
+      }
+    },
+    "boss-dragon-pulse": {
+      "extends": "dragon-pulse",
+      "strike": {
+        "id": "dragon-pulse-beam",
+        "fit": "line",
+        "size": 1,
+        "seconds": 0.4
+      }
+    },
+    "boss-dive": {
+      "extends": "water.base",
+      "bossTelegraph": {
+        "id": "dive-ripple",
+        "fit": "circle",
+        "size": 1
+      },
+      "strike": {
+        "id": "dive-splash",
+        "fit": "circle",
+        "size": 1.3,
+        "seconds": 0.4
+      }
+    },
+    "boss-water-spout": {
+      "extends": "water-spout",
+      "strike": {
+        "id": "water-column",
+        "fit": "circle",
+        "size": 1.1,
+        "originY": 0.85,
+        "seconds": 0.4
+      }
     }
   }
 }

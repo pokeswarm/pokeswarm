@@ -1492,7 +1492,7 @@ export class RunScene extends Phaser.Scene {
       // 長く当たり続ける範囲で絵の無いもの（罠・波）は、触れると痛い範囲として薄く見せる（07 の167章）
       if (h.activeTicks !== undefined) {
         const recipe = effectRecipes[mv?.effect ?? ''];
-        if (mv && !recipe?.bossActive && (mv.activeSeconds ?? 0) > 0.6) this.drawHazardArea(g, h, mv, 0.1, 0.6);
+        if (mv && !recipe?.bossActive && ((mv.activeSeconds ?? 0) > 0.6 || mv.bounce)) this.drawHazardArea(g, h, mv, 0.1, 0.6);
         continue;
       }
       const progress = 1 - h.ticksLeft / h.totalTicks;
@@ -1514,7 +1514,7 @@ export class RunScene extends Phaser.Scene {
         const w = h.shape === 'line' ? h.length : h.radius * 2;
         g.lineStyle(w, 0xff1744, 0.07).lineBetween(cx, cy, cx + tx * reach, cy + ty * reach);
       }
-      if (h.shape === 'cone' || (h.shape === 'line' && mv?.sweep)) {
+      if (h.shape === 'cone' || (h.shape === 'line' && mv?.sweep && !mv.arms)) {
         // 扇・なぎ払い（はかいこうせん・エアロブラスト）: 範囲の扇と、落ちるまでの残りを根元から広がる扇で見せる
         const reach = h.shape === 'cone' ? h.radius : h.length;
         const arc = h.shape === 'cone' ? (mv?.arc ?? 90) : Math.abs(mv?.sweep?.degrees ?? 90) + 8;
@@ -1579,8 +1579,9 @@ export class RunScene extends Phaser.Scene {
   /** 当たっている間の範囲（絵の無い長く残る範囲）を薄く描く */
   private drawHazardArea(g: Phaser.GameObjects.Graphics, h: Hazard, mv: NonNullable<World['rules']['stage']['moves'][number]>, fill: number, line: number): void {
     if (h.shape === 'circle') {
-      g.fillStyle(0xff1744, fill).fillCircle(h.x, h.y, h.radius);
-      g.lineStyle(2, 0xff5252, line).strokeCircle(h.x, h.y, h.radius);
+      const r = h.radius * (1 + ((mv.bounce?.growPct ?? 0) * (h.bounces ?? 0)) / 100);
+      g.fillStyle(0xff1744, fill).fillCircle(h.x, h.y, r);
+      g.lineStyle(2, 0xff5252, line).strokeCircle(h.x, h.y, r);
     } else if (h.shape === 'ring') {
       const inner = h.innerRadius ?? 0;
       g.lineStyle(2, 0xff5252, line).strokeCircle(h.x, h.y, h.radius).strokeCircle(h.x, h.y, inner);
@@ -1634,7 +1635,8 @@ export class RunScene extends Phaser.Scene {
         x: h.x,
         y: h.y,
         // 直線の技に、前の1枚（front）や扇（cone）の絵を合わせるときは、届く距離を半径にする（かえんほうしゃ のなぎ払い）
-        radius: ((spec.fit === 'front' || spec.fit === 'cone') && h.shape === 'line' ? h.length : h.radius) * grow,
+        // 輪の範囲に円の絵を合わせるときは、内側の縁に合わせる（くろいまなざし の目の囲い）
+        radius: ((spec.fit === 'front' || spec.fit === 'cone') && h.shape === 'line' ? h.length : spec.fit === 'circle' && h.shape === 'ring' && h.innerRadius ? h.innerRadius / 0.92 : h.radius) * grow,
         band: h.shape === 'ring' ? h.radius - (h.innerRadius ?? 0) : 0,
         ...(h.shape === 'cone' ? { arc: ((mv.arc ?? 90) * Math.PI) / 360 } : {}),
         dirX: h.dirX,

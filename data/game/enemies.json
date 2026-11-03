@@ -2241,7 +2241,8 @@
       "radius": 28,
       "contactDamage": 32,
       "xp": 300,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "motion": {"type":"keepDistance","distance":280}
     },
     {
       "id": "hoenn-boss-dusclops",
@@ -2253,7 +2254,8 @@
       "radius": 30,
       "contactDamage": 34,
       "xp": 300,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "motion": {"type":"keepDistance","distance":240}
     },
     {
       "id": "hoenn-boss-banette",
@@ -2289,7 +2291,8 @@
       "radius": 30,
       "contactDamage": 36,
       "xp": 300,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "motion": {"type":"keepDistance","distance":260}
     },
     {
       "id": "hoenn-boss-salamence",
@@ -2313,7 +2316,8 @@
       "radius": 30,
       "contactDamage": 38,
       "xp": 300,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "motion": {"type":"keepDistance","distance":300}
     },
     {
       "id": "hoenn-boss-milotic",
@@ -2325,7 +2329,8 @@
       "radius": 32,
       "contactDamage": 40,
       "xp": 300,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "motion": {"type":"keepDistance","distance":260}
     },
     {
       "id": "hoenn-boss-wailord",

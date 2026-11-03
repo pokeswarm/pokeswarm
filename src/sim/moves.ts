@@ -182,6 +182,8 @@ export interface SimMoveDef {
   readonly magnitude?: { readonly min: number; readonly max: number };
   /** scatter: 向いている方向の扇（度）の中に置く（いわなだれ） */
   readonly scatterArc?: number;
+  /** scatter: range の中のランダムな敵の足元に置く（りゅうせいぐん） */
+  readonly scatterOnEnemies?: boolean;
   /** 向きを使うたびにランダムに選ぶ（にどげり・まわしげり） */
   readonly randomAim?: boolean;
   /** 再使用を、出した技が消えてから数える（こなゆき・ふぶき） */

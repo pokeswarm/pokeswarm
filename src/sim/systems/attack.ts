@@ -1087,7 +1087,14 @@ function fireScatter(world: World, p: Player, pm: PlayerMove, st: MoveStats): vo
   // 前の扇に置く（いわなだれ）: 向いている方向を中心にした scatterArc 度の中
   const arc = world.rules.moves[pm.move]!.scatterArc;
   const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  // 敵の足元に置く（りゅうせいぐん）: range の中の敵からランダムに選ぶ。足りなければ残りはランダムな場所
+  const targets = world.rules.moves[pm.move]!.scatterOnEnemies ? enemiesInRange(world, p.x, p.y, st.range) : [];
   for (let k = 0; k < count; k++) {
+    if (targets.length > 0) {
+      const i = targets.splice(world.rng.int(targets.length), 1)[0]!;
+      world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: world.enemies.x[i]!, y: world.enemies.y[i]!, vx: 0, vy: 0, ...(wait > 0 ? { life: wait, stage: 3, armLife: st.durationSeconds } : {}) });
+      continue;
+    }
     const a = arc ? Math.atan2(fy, fx) + (world.rng.next() - 0.5) * ((arc * Math.PI) / 180) : world.rng.next() * Math.PI * 2;
     const r = st.range * (0.3 + world.rng.next() * 0.7);
     // speed があれば、置いた場所からランダムな向きへゆっくり動く

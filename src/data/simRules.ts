@@ -116,6 +116,7 @@ export function buildSimRules(region?: string): SimRules {
       knockbackAlongFacing: def.knockbackAlongFacing,
       magnitude: def.magnitude,
       scatterArc: def.scatterArc,
+      ...(def.scatterOnEnemies ? { scatterOnEnemies: true } : {}),
       restAfterEnd: def.restAfterEnd,
       ...(def.snake ? { snake: def.snake } : {}),
       // いつも効く技: レベルごとの効果を、そのレベルまでの合計にしておく

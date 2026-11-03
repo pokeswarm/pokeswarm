@@ -1306,6 +1306,8 @@ export const moveDefSchema = z.object({
   magnitude: z.object({ min: z.number().positive(), max: z.number().positive() }).optional(),
   /** scatter: 自分の周り全体ではなく、向いている方向を中心にしたこの角度（度）の扇の中に置く（いわなだれ: 前に岩が降る。07 の152章） */
   scatterArc: z.number().positive().max(360).optional(),
+  /** scatter: 場所をランダムにせず、range の中のランダムな敵の足元に置く（敵がいなければランダムな場所。りゅうせいぐん: 流星が敵へ降る。07 の169章） */
+  scatterOnEnemies: z.boolean().optional(),
   /** strike（落雷）: count 個を同時に置かず、intervalSeconds ごとに1つずつ置く（ゴーストダイブ: 大きな影が出ては消え、別の所に出る。07 の148章） */
   sequential: z.boolean().optional(),
   /** scatter（置く）の当たり判定を、置いてからこの秒数待って出す（つららおとし: 空から氷の塊が落ちてくる間） */

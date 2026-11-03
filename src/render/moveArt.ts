@@ -6137,7 +6137,7 @@ function hoofQuake(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
-/** じゃれつく: まわりでもくもくする土煙（丸いかたまりがいくつも重なってふくらみ、星と小さなハートが飛び出す）。4 コマ */
+/** じゃれつく: もくもくする土煙（丸いかたまりがいくつも重なってふくらみ、星と小さなハートが飛び出す）。絵いっぱいに描き、前の四角の当たり判定にそのまま重ねる。4 コマ */
 function roughCloud(): SpriteOut {
   // 0 輪郭・1 灰茶・2 うす灰・3 白・4 桃・5 黄
   const palette = ['#3e2a35', '#a1887f', '#d7ccc8', '#fafafa', '#f48fb1', '#ffd54f'];
@@ -6146,7 +6146,7 @@ function roughCloud(): SpriteOut {
       // 星（4 つの角）2 つと小さなハート 1 つが、雲のふちから飛び出す
       for (let j = 0; j < 3; j++) {
         const sa = j * 2.1 + f * 0.7;
-        const sr = 0.66 + ((f + j) % 2) * 0.1;
+        const sr = 0.78 + ((f + j) % 2) * 0.08;
         const su = (u - Math.cos(sa) * sr) / 0.14;
         const sv = (v - Math.sin(sa) * sr) / 0.14;
         if (j === 1) {
@@ -6159,14 +6159,14 @@ function roughCloud(): SpriteOut {
       let inside = -1;
       for (let k = 0; k < 7; k++) {
         const ka = (k * Math.PI * 2) / 7 + f * 0.25;
-        const kr = k === 0 ? 0 : 0.3;
+        const kr = k === 0 ? 0 : 0.46;
         const cx = k === 0 ? 0 : Math.cos(ka) * kr;
         const cy = k === 0 ? 0 : Math.sin(ka) * kr;
-        const rr = (k === 0 ? 0.3 : 0.22) + Math.sin(k * 1.7 + f * 1.3) * 0.03;
+        const rr = (k === 0 ? 0.46 : 0.36) + Math.sin(k * 1.7 + f * 1.3) * 0.04;
         const d = Math.hypot(u - cx, v - cy);
         if (d < rr) {
           const lit = (v - cy) / rr;
-          const c = d > rr - 0.05 ? 1 : lit < -0.35 ? 3 : lit < 0.35 ? 2 : 1;
+          const c = d > rr - 0.06 ? 1 : lit < -0.35 ? 3 : lit < 0.35 ? 2 : 1;
           inside = Math.max(inside, c);
         }
       }

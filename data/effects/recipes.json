@@ -6566,13 +6566,11 @@
     },
     "play-rough": {
       "extends": "fairy.base",
-      "projectile": {
-        "shapeAlpha": 0.2
-      },
+      "hideShape": true,
       "sprite": {
         "id": "rough-cloud",
         "fit": "front",
-        "size": 1
+        "size": 0.8
       }
     },
     "disarming-voice": {

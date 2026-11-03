@@ -5781,6 +5781,170 @@
         "rotate": "spin",
         "spinDegPerSec": 540
       }
+    },
+    "boss-future-sight": {
+      "extends": "future-sight",
+      "bossTelegraph": {
+        "id": "future-eye",
+        "fit": "circle",
+        "size": 1
+      },
+      "strike": {
+        "id": "future-burst",
+        "fit": "circle",
+        "size": 1.2,
+        "seconds": 0.5
+      }
+    },
+    "boss-confuse-ray": {
+      "extends": "psychic.base",
+      "bossActive": {
+        "id": "confuse-orb",
+        "fit": "circle",
+        "size": 1.6
+      }
+    },
+    "boss-psychic-converge": {
+      "extends": "psychic.base",
+      "strike": {
+        "id": "psy-converge",
+        "fit": "circle",
+        "size": 1,
+        "seconds": 0.4
+      }
+    },
+    "boss-teleport": {
+      "extends": "psychic.base",
+      "bossTelegraph": {
+        "id": "teleport-sparkle",
+        "fit": "circle",
+        "size": 1.8
+      },
+      "strike": {
+        "id": "teleport-sparkle",
+        "fit": "circle",
+        "size": 1.8,
+        "seconds": 0.35
+      }
+    },
+    "boss-toxic": {
+      "extends": "poison.base",
+      "strike": {
+        "id": "toxic-splash",
+        "fit": "circle",
+        "size": 1.2,
+        "seconds": 0.4
+      }
+    },
+    "boss-sludge-bomb": {
+      "extends": "sludge-bomb",
+      "strike": {
+        "id": "acid-splat",
+        "fit": "circle",
+        "size": 1.2,
+        "seconds": 0.4
+      }
+    },
+    "boss-cross-poison": {
+      "extends": "cross-poison",
+      "bossActive": {
+        "id": "x-poison",
+        "fit": "circle",
+        "size": 1.6,
+        "rotate": "velocity"
+      }
+    },
+    "boss-counter": {
+      "extends": "counter",
+      "bossTelegraph": {
+        "id": "counter-stance",
+        "fit": "circle",
+        "size": 1
+      }
+    },
+    "boss-counter-burst": {
+      "extends": "counter",
+      "strike": {
+        "id": "counter-burst",
+        "fit": "circle",
+        "size": 1,
+        "seconds": 0.4
+      }
+    },
+    "boss-vital-throw": {
+      "extends": "fighting.base",
+      "bossTelegraph": {
+        "id": "vital-stance",
+        "fit": "circle",
+        "size": 1
+      },
+      "strike": {
+        "id": "throw-swirl",
+        "fit": "circle",
+        "size": 1,
+        "seconds": 0.35
+      }
+    },
+    "boss-rock-slide": {
+      "extends": "rock-slide",
+      "strike": {
+        "id": "boulder",
+        "fit": "circle",
+        "size": 1.4,
+        "seconds": 0.45
+      }
+    },
+    "boss-will-o-wisp": {
+      "extends": "ghost.base",
+      "bossActive": {
+        "id": "wisp-flame",
+        "fit": "circle",
+        "size": 2.4,
+        "rotate": "velocity"
+      }
+    },
+    "boss-flamethrower": {
+      "extends": "flamethrower",
+      "bossActive": {
+        "id": "flame-cone",
+        "fit": "cone",
+        "size": 1
+      }
+    },
+    "boss-roar": {
+      "extends": "normal.base",
+      "strike": {
+        "id": "roar-wave",
+        "fit": "circle",
+        "size": 1,
+        "seconds": 0.35
+      }
+    },
+    "boss-fire-blast": {
+      "extends": "fire.base",
+      "strike": {
+        "id": "daimonji",
+        "fit": "circle",
+        "size": 1,
+        "seconds": 0.6
+      }
+    },
+    "boss-thunder": {
+      "extends": "thunder",
+      "bossTelegraph": {
+        "id": "thunder-cloud",
+        "fit": "circle",
+        "size": 1.3
+      }
+    },
+    "boss-outrage": {
+      "extends": "outrage",
+      "bossActive": {
+        "id": "rage-claw",
+        "fit": "front",
+        "size": 0.5,
+        "along": 0.6
+      }
     }
   }
 }

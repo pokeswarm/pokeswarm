@@ -2363,6 +2363,18 @@
     "type": "normal",
     "damageClass": "physical"
   },
+  "teleport": {
+    "names": {
+      "ja": "テレポート",
+      "en": "Teleport",
+      "fr": "Téléport",
+      "de": "Teleport",
+      "es": "Teletransporte",
+      "it": "Teletrasporto"
+    },
+    "type": "psychic",
+    "damageClass": "status"
+  },
   "thrash": {
     "names": {
       "ja": "あばれる",

@@ -429,9 +429,12 @@
       "required": true,
       "kind": "johto-boss-xatu",
       "moves": [
-        "mewtwo-psywave",
-        "legend-nova",
-        "mewtwo-teleport"
+        "xatu-future-sight",
+        "xatu-confuse-ray",
+        "xatu-teleport",
+        "xatu-psychic",
+        "xatu-confuse-ray",
+        "xatu-teleport"
       ],
       "moveIntervalSeconds": 2.6
     },
@@ -442,9 +445,10 @@
       "required": true,
       "kind": "johto-boss-crobat",
       "moves": [
-        "legend-dash",
-        "shadow-ball",
-        "legend-dash"
+        "crobat-toxic",
+        "crobat-cross-poison",
+        "crobat-sludge-bomb",
+        "crobat-cross-poison"
       ],
       "moveIntervalSeconds": 2.2,
       "enrage": {
@@ -460,9 +464,10 @@
       "required": true,
       "kind": "johto-boss-machamp",
       "moves": [
-        "earthquake",
-        "legend-dash",
-        "earthquake"
+        "machamp-counter",
+        "machamp-rock-slide",
+        "machamp-vital-throw",
+        "machamp-rock-slide"
       ],
       "moveIntervalSeconds": 2.2,
       "enrage": {
@@ -478,9 +483,9 @@
       "required": true,
       "kind": "johto-boss-houndoom",
       "moves": [
-        "moltres-flamedash",
-        "shadow-ball",
-        "charizard-blast-burn"
+        "houndoom-will-o-wisp",
+        "houndoom-flamethrower",
+        "houndoom-roar"
       ],
       "moveIntervalSeconds": 2,
       "enrage": {
@@ -496,10 +501,11 @@
       "required": true,
       "kind": "johto-boss-dragonite",
       "moves": [
-        "draco-meteor",
-        "legend-beam",
-        "zapdos-dash",
-        "legend-nova"
+        "dragonite-fire-blast"
+      ],
+      "phases": [
+        {"belowHpPct":67,"moves":["dragonite-thunder"]},
+        {"belowHpPct":34,"moves":["dragonite-blizzard","dragonite-outrage"]}
       ],
       "moveIntervalSeconds": 1.8,
       "enrage": {

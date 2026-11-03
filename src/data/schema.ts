@@ -561,7 +561,7 @@ export const bossMoveSchema = z.object({
   /** 扇（cone）の開き（度） */
   arc: z.number().positive().max(360).optional(),
   /** 中心から count 本の直線を等しい角度で出す（×・大の字・十字）。offsetDegrees は狙った向きからのずれ。予告の場所はボス（self）か狙った人 */
-  arms: z.object({ count: z.number().int().min(2), offsetDegrees: z.number().default(0), /** 狙った向きに関係なく、画面に対して offsetDegrees の向きに出す（絵の×と当たり判定をそろえる。クロスチョップ） */ absolute: z.boolean().default(false) }).optional(),
+  arms: z.object({ count: z.number().int().min(2), offsetDegrees: z.number().default(0), /** 狙った向きに関係なく、画面に対して offsetDegrees の向きに出す（絵の×と当たり判定をそろえる。クロスチョップ） */ absolute: z.boolean().default(false), /** 等しい角度の代わりに、画面に対するこの向き（度。右が 0・下が 90）に出す（だいもんじ の大の字） */ angles: z.array(z.number()).optional() }).optional(),
   /** 落ちた後、直線の向きを回す（なぎ払い）: 合わせて degrees 度を seconds 秒で。予告は回る範囲の扇で見せる */
   sweep: z.object({ degrees: z.number(), seconds: z.number().positive() }).optional(),
   /** 落ちた後に当たる時間（秒。省略なら bossRules.hazardActiveSeconds） */
@@ -586,7 +586,7 @@ export const bossMoveSchema = z.object({
     })
     .optional(),
   /** target self の count 個を、ボスの周り radius に、狙った人の向きから順に（stagger）置く（ライコウのかみなり） */
-  around: z.object({ radius: z.number().positive(), clockwise: z.boolean().default(true) }).optional(),
+  around: z.object({ radius: z.number().positive(), clockwise: z.boolean().default(true), /** 輪の中心: self（ボス）か target（狙った人。クロバットの どくどく） */ center: z.enum(['self', 'target']).default('self') }).optional(),
   /** 狙った人への向きに沿って count 個の円を spacing ずつ並べ、順に（stagger）置く（エンテイのふみつけ） */
   along: z.object({ spacing: z.number().positive(), start: z.number().default(80) }).optional(),
   /** 横に長い帯（全体の長さ length）を、狙った人の手前 distance から押し寄せさせる。1か所 gap の切れ目（ラプラスのなみのり） */

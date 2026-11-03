@@ -571,12 +571,13 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   }
   if (move.arms) {
     // 中心から何本もの線（×・大の字・十字）。中心はボス（self）か狙った人
+    const arms = move.arms;
     const self = move.target === 'self';
     const cx = self ? bx : target.x;
     const cy = self ? by : target.y;
-    const base = (move.arms.absolute ? 0 : Math.atan2(uy, ux)) + (move.arms.offsetDegrees * Math.PI) / 180;
-    for (let k = 0; k < move.arms.count; k++) {
-      const a = base + (k * Math.PI * 2) / move.arms.count;
+    const base = (arms.absolute ? 0 : Math.atan2(uy, ux)) + (arms.offsetDegrees * Math.PI) / 180;
+    const angles = arms.angles?.map((d) => (d * Math.PI) / 180) ?? Array.from({ length: arms.count }, (_, k) => base + (k * Math.PI * 2) / arms.count);
+    for (const a of angles) {
       // 狙った人が真ん中: 線は中心より少し手前から（×の交わる所も当たる）
       const back = self ? 0 : move.radius;
       put(cx - Math.cos(a) * back, cy - Math.sin(a) * back, Math.cos(a), Math.sin(a), self ? bossId : -1);
@@ -584,12 +585,15 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     return;
   }
   if (move.around) {
-    // ボスの周りに順に（ライコウのかみなり）: 狙った人の向きから回る
-    const start = Math.atan2(uy, ux);
+    // ボスの周りに順に（ライコウのかみなり）: 狙った人の向きから回る。中心を狙った人にすると、その人を囲む（クロバットの どくどく）
+    const around = move.around.center === 'target';
+    const ox = around ? target.x : bx;
+    const oy = around ? target.y : by;
+    const start = around ? Math.atan2(by - target.y, bx - target.x) : Math.atan2(uy, ux);
     const step = ((move.around.clockwise ? 1 : -1) * Math.PI * 2) / move.count;
     for (let c = 0; c < move.count; c++) {
       const a = start + c * step;
-      put(bx + Math.cos(a) * move.around.radius, by + Math.sin(a) * move.around.radius, 0, 0, -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
+      put(ox + Math.cos(a) * move.around.radius, oy + Math.sin(a) * move.around.radius, 0, 0, -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
     }
     return;
   }

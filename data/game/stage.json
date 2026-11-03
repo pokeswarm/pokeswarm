@@ -1000,6 +1000,306 @@
         }
       },
       "activeSeconds": 3.5
+    },
+    {
+      "id": "xatu-future-sight",
+      "move": "future-sight",
+      "effect": "boss-future-sight",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 2.5,
+      "radius": 70,
+      "damage": 34,
+      "repeat": {
+        "count": 4,
+        "everySeconds": 0.5
+      }
+    },
+    {
+      "id": "xatu-confuse-ray",
+      "move": "confuse-ray",
+      "effect": "boss-confuse-ray",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.6,
+      "radius": 22,
+      "damage": 14,
+      "count": 3,
+      "spread": 40,
+      "travel": {
+        "speed": 110,
+        "homingDegreesPerSecond": 120
+      },
+      "activeSeconds": 6,
+      "onHit": {
+        "drowsySeconds": 1.5
+      }
+    },
+    {
+      "id": "xatu-psychic",
+      "move": "psychic",
+      "effect": "boss-psychic-converge",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.9,
+      "radius": 22,
+      "length": 260,
+      "damage": 32,
+      "arms": {
+        "count": 8,
+        "offsetDegrees": 0,
+        "absolute": true
+      }
+    },
+    {
+      "id": "xatu-teleport",
+      "move": "teleport",
+      "effect": "boss-teleport",
+      "shape": "circle",
+      "target": "random",
+      "count": 1,
+      "spread": 320,
+      "teleport": true,
+      "hideBoss": true,
+      "telegraphSeconds": 0.5,
+      "radius": 40,
+      "damage": 0
+    },
+    {
+      "id": "crobat-toxic",
+      "move": "toxic",
+      "effect": "boss-toxic",
+      "shape": "circle",
+      "target": "self",
+      "telegraphSeconds": 0.5,
+      "radius": 45,
+      "damage": 10,
+      "count": 12,
+      "stagger": 0.12,
+      "around": {
+        "radius": 230,
+        "center": "target"
+      },
+      "leaves": {
+        "seconds": 6,
+        "slowPct": 0,
+        "damagePerSecond": 20,
+        "color": "#8e24aa"
+      }
+    },
+    {
+      "id": "crobat-sludge-bomb",
+      "move": "sludge-bomb",
+      "effect": "boss-sludge-bomb",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.8,
+      "radius": 55,
+      "damage": 26,
+      "count": 3,
+      "spread": 160,
+      "stagger": 0.1,
+      "leaves": {
+        "seconds": 4,
+        "slowPct": 0,
+        "damagePerSecond": 18,
+        "color": "#7b1fa2"
+      }
+    },
+    {
+      "id": "crobat-cross-poison",
+      "move": "cross-poison",
+      "effect": "boss-cross-poison",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.6,
+      "radius": 34,
+      "damage": 28,
+      "count": 2,
+      "spread": 24,
+      "travel": {
+        "speed": 420
+      },
+      "activeSeconds": 1.6
+    },
+    {
+      "id": "machamp-counter",
+      "move": "counter",
+      "effect": "boss-counter",
+      "shape": "circle",
+      "target": "self",
+      "followBoss": true,
+      "telegraphSeconds": 2,
+      "radius": 150,
+      "damage": 0,
+      "counter": {
+        "ratio": 0.6,
+        "max": 90
+      },
+      "then": "machamp-counter-burst"
+    },
+    {
+      "id": "machamp-counter-burst",
+      "move": "counter",
+      "effect": "boss-counter-burst",
+      "shape": "circle",
+      "target": "self",
+      "followBoss": true,
+      "telegraphSeconds": 0.15,
+      "radius": 150,
+      "damage": 1
+    },
+    {
+      "id": "machamp-vital-throw",
+      "move": "vital-throw",
+      "effect": "boss-vital-throw",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 1,
+      "radius": 120,
+      "damage": 40,
+      "onHit": {
+        "pushSpeed": 700,
+        "pushSeconds": 0.3
+      }
+    },
+    {
+      "id": "machamp-rock-slide",
+      "move": "rock-slide",
+      "effect": "boss-rock-slide",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.7,
+      "radius": 55,
+      "damage": 30,
+      "count": 5,
+      "stagger": 0.15,
+      "along": {
+        "spacing": 90,
+        "start": 60
+      }
+    },
+    {
+      "id": "houndoom-will-o-wisp",
+      "move": "will-o-wisp",
+      "effect": "boss-will-o-wisp",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.6,
+      "radius": 20,
+      "damage": 10,
+      "count": 5,
+      "spread": 36,
+      "stagger": 0.25,
+      "travel": {
+        "speed": 150,
+        "homingDegreesPerSecond": 90
+      },
+      "activeSeconds": 5,
+      "onHit": {
+        "burnSeconds": 4
+      }
+    },
+    {
+      "id": "houndoom-flamethrower",
+      "move": "flamethrower",
+      "effect": "boss-flamethrower",
+      "shape": "line",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 0.9,
+      "radius": 26,
+      "length": 380,
+      "damage": 28,
+      "sweep": {
+        "degrees": 90,
+        "seconds": 1.5
+      },
+      "recoilSeconds": 1.6
+    },
+    {
+      "id": "houndoom-roar",
+      "move": "roar",
+      "effect": "boss-roar",
+      "shape": "ring",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 0.7,
+      "radius": 120,
+      "damage": 8,
+      "rings": {
+        "count": 3,
+        "step": 70,
+        "width": 40
+      },
+      "stagger": 0.12,
+      "onHit": {
+        "pushSpeed": 600,
+        "pushSeconds": 0.3
+      }
+    },
+    {
+      "id": "dragonite-fire-blast",
+      "move": "fire-blast",
+      "effect": "boss-fire-blast",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.9,
+      "radius": 26,
+      "length": 210,
+      "damage": 38,
+      "arms": {
+        "count": 5,
+        "angles": [
+          0,
+          -90,
+          180,
+          60,
+          120
+        ]
+      }
+    },
+    {
+      "id": "dragonite-thunder",
+      "move": "thunder",
+      "effect": "boss-thunder",
+      "shape": "circle",
+      "target": "player",
+      "follow": {
+        "seconds": 1.5
+      },
+      "telegraphSeconds": 2.1,
+      "radius": 70,
+      "damage": 40
+    },
+    {
+      "id": "dragonite-blizzard",
+      "move": "blizzard",
+      "effect": "boss-blizzard",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.9,
+      "radius": 60,
+      "damage": 32,
+      "count": 9,
+      "spread": 300,
+      "stagger": 0.15
+    },
+    {
+      "id": "dragonite-outrage",
+      "move": "outrage",
+      "effect": "boss-outrage",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.6,
+      "radius": 50,
+      "length": 240,
+      "damage": 24,
+      "dashSpeed": 360,
+      "activeSeconds": 1,
+      "hitEverySeconds": 0.3,
+      "recoilSeconds": 2.5
     }
   ],
   "bossRules": {

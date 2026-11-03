@@ -115,6 +115,8 @@ export class RunScene extends Phaser.Scene {
   private flashMoves = new Map<number, NonNullable<EffectRecipe['burstFlash']>>();
   /** 落雷の稲妻を描く技（かみなり）と、その絵 */
   private boltMoves = new Map<number, NonNullable<EffectRecipe['bolt']>>();
+  /** ボスの技の落雷（プレイヤーの かみなり の稲妻を、落ちた所に。07 の167章）: 場所と消える時刻 */
+  private hazardBolts: { x: number; y: number; until: number; b: NonNullable<EffectRecipe['bolt']> }[] = [];
   private boltView: Phaser.GameObjects.Graphics | null = null;
   /** 空から塊が落ちてくる技（つららおとし）と、その絵・落ちている塊の通し番号・塊の影 */
   private fallMoves = new Map<number, NonNullable<EffectRecipe['fall']>>();
@@ -545,6 +547,7 @@ export class RunScene extends Phaser.Scene {
     this.fallSprites = new MoveSprites(this, moveSprites, depths.effects + 0.25, spriteRender.dot);
     this.strikes = [];
     this.countdownTexts = [];
+    this.hazardBolts = [];
     const shape = spriteRender.hitShape;
     this.hitShapes = new HitShapes(this, depths.hitShapes, shape);
     this.shapeColors = rules.moves.map((m) => {
@@ -1119,6 +1122,8 @@ export class RunScene extends Phaser.Scene {
         const why = this.leaveReasons.get(ev.playerId);
         this.announce(why ? `${t('net.playerLeft', { n: ev.playerId })}\n${why}` : t('net.playerLeft', { n: ev.playerId }), '#ef9a9a');
       } else if (ev.type === 'hazardStruck') {
+        const bolt = effectRecipes[ev.effect]?.bolt;
+        if (bolt) this.hazardBolts.push({ x: ev.x, y: ev.y, until: this.time.now / 1000 + bolt.seconds * 2, b: bolt });
         // 落ちた範囲に合わせたドット絵（案 F）
         const strike = effectRecipes[ev.effect]?.strike;
         if (strike) {
@@ -1352,12 +1357,16 @@ export class RunScene extends Phaser.Scene {
         g.strokePath();
       }
     }
+    const nowS = this.time.now / 1000;
+    this.hazardBolts = this.hazardBolts.filter((h) => h.until > nowS);
+    const bolts: { x: number; y: number; b: NonNullable<EffectRecipe['bolt']> }[] = this.hazardBolts.map((h) => ({ x: h.x, y: h.y, b: h.b }));
     for (let i = 0; i < pr.count; i++) {
       if (pr.stage[i] !== 0) continue;
       const b = this.boltMoves.get(pr.move[i]!);
       if (!b || pr.maxLife[i]! - pr.life[i]! > b.seconds) continue;
-      const x = pr.x[i]!;
-      const y = pr.y[i]!;
+      bolts.push({ x: pr.x[i]!, y: pr.y[i]!, b });
+    }
+    for (const { x, y, b } of bolts) {
       const steps = 7;
       const pts: [number, number][] = [];
       for (let k = 0; k <= steps; k++) {
@@ -1619,12 +1628,13 @@ export class RunScene extends Phaser.Scene {
         spec,
         x: h.x,
         y: h.y,
-        radius: (spec.fit === 'front' && h.shape === 'line' ? h.length : h.radius) * grow,
+        // 直線の技に、前の1枚（front）や扇（cone）の絵を合わせるときは、届く距離を半径にする（かえんほうしゃ のなぎ払い）
+        radius: ((spec.fit === 'front' || spec.fit === 'cone') && h.shape === 'line' ? h.length : h.radius) * grow,
         band: h.shape === 'ring' ? h.radius - (h.innerRadius ?? 0) : 0,
         ...(h.shape === 'cone' ? { arc: ((mv.arc ?? 90) * Math.PI) / 360 } : {}),
         dirX: h.dirX,
         dirY: h.dirY,
-        length: h.shape === 'cone' ? ((mv.arc ?? 90) * Math.PI) / 360 : h.length,
+        length: h.shape === 'cone' ? ((mv.arc ?? 90) * Math.PI) / 360 : spec.fit === 'cone' && h.shape === 'line' ? Math.atan2(h.radius * 1.6, h.length) : h.length,
         vx: h.vx ?? 0,
         vy: h.vy ?? 0,
         elapsed,

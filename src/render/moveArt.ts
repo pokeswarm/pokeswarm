@@ -4991,6 +4991,233 @@ function dreamDrain(): SpriteOut {
   return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- ボスの技（07 の167章）: ジョウトの四天王とワタル ----------------
+/** あやしいひかり（イツキのネイティオ）: ふわふわ漂う、虹色にゆらめく光の玉。芯は白く、外は黄緑・桃・水色が入れ替わる */
+function confuseOrb(): SpriteOut {
+  // 0 輪郭・1 黄緑・2 桃・3 水色・4 うす黄・5 白
+  const palette = ['#1b2a10', '#b2ff59', '#ff80ab', '#80d8ff', '#ffff8d', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(16, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      const rr = 0.78 + Math.sin(a * 4 + f * 1.6) * 0.1;
+      if (d > rr) return -1;
+      if (d < 0.25) return 5;
+      if (d < 0.45) return 4;
+      // 外の帯は、角度とコマで色が回る
+      return 1 + ((Math.floor(((a + Math.PI) / (Math.PI * 2)) * 6) + f) % 3);
+    }),
+  );
+  return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
+}
+
+/** サイコキネシス（イツキのネイティオ）: 8方向から光る破片が真ん中へ集まり、真ん中で弾ける（円に合わせる。半径は破片の来る距離） */
+function psyConverge(): SpriteOut {
+  // 0 輪郭・1 濃い桃・2 桃・3 うす桃・4 白
+  const palette = ['#3a0a2a', '#ad1457', '#f06292', '#f8bbd0', '#ffffff'];
+  const frames = [0, 1, 2, 3, 4].map((f) => {
+    const p = f / 4;
+    return shape(40, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 真ん中の光（最後のコマで大きく弾ける）
+      const core = p < 0.75 ? 0.06 + p * 0.06 : 0.35;
+      if (d < core) return p < 0.75 ? 4 : d < core * 0.5 ? 4 : 3;
+      for (let k = 0; k < 8; k++) {
+        const ka = (k * Math.PI) / 4;
+        const da = Math.atan2(Math.sin(a - ka), Math.cos(a - ka));
+        // 破片: 外から内へ進む細長いひし形
+        const at = 0.92 - p * 0.85;
+        const along = d - at;
+        if (Math.abs(along) < 0.12 && Math.abs(da) * d < 0.05 * (1 - Math.abs(along) / 0.12)) return along < 0 ? 4 : 2;
+        // 通った跡（薄い線）
+        if (p < 0.75 && d > at && d < 0.95 && Math.abs(da) * d < 0.012) return 1;
+      }
+      return -1;
+    }, 0, 0);
+  });
+  return { palette, frameMs: 60, parts: { main: frames.map(toRows) } };
+}
+
+/** テレポート（イツキのネイティオ）: 消える・現れる所の、縦に伸びる光の柱と、きらきら散る桃色の星 */
+function teleportSparkle(): SpriteOut {
+  // 0 輪郭・1 桃・2 うす桃・3 白
+  const palette = ['#4a0e3a', '#f06292', '#f8bbd0', '#ffffff'];
+  const r = rng(1681);
+  const stars = Array.from({ length: 10 }, () => ({ x: (r() - 0.5) * 1.4, y: (r() - 0.5) * 1.6, s: 0.06 + r() * 0.05 }));
+  const frames = [0, 1, 2, 3].map((f) => {
+    const p = f / 3;
+    return shape(24, (u, v) => {
+      // 柱: 真ん中が細くなって消えていく
+      const w = 0.32 * (1 - p);
+      if (Math.abs(u) < w && Math.abs(v) < 0.95 - p * 0.3) return Math.abs(u) < w * 0.4 ? 3 : 2;
+      for (const s of stars) {
+        const sy = s.y - p * 0.3;
+        const dx = Math.abs(u - s.x * (0.6 + p * 0.6));
+        const dy = Math.abs(v - sy);
+        // 十字の星
+        if ((dx < s.s && dy < s.s * 0.3) || (dy < s.s && dx < s.s * 0.3)) return f === 3 ? 1 : 3;
+      }
+      return -1;
+    });
+  });
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** どくどく（キョウのクロバット）: 落ちた毒のしずくが、紫の泡を立てて地面に広がる */
+function toxicSplash(): SpriteOut {
+  // 0 輪郭・1 濃い紫・2 紫・3 明るい紫・4 白（泡の光）
+  const palette = ['#1a0624', '#4a148c', '#8e24aa', '#ce93d8', '#ffffff'];
+  const r = rng(1682);
+  const bubbles = Array.from({ length: 7 }, () => ({ x: (r() - 0.5) * 1.1, y: (r() - 0.5) * 0.6, rad: 0.1 + r() * 0.1 }));
+  const frames = [0, 1, 2, 3].map((f) => {
+    const p = f / 3;
+    return shape(20, (u, v) => {
+      const a = Math.atan2(v, u);
+      // 地面に広がるしみ（上から見て横長）
+      const rr = (0.45 + p * 0.45) * (1 + Math.sin(a * 6) * 0.08);
+      const d = Math.hypot(u, v * 1.8);
+      for (const b of bubbles) {
+        const bd = Math.hypot(u - b.x * (0.5 + p * 0.5), v - b.y - p * 0.05) / (b.rad * (f === 3 ? 0.6 : 1));
+        if (bd < 1) return bd < 0.4 ? 4 : 3;
+      }
+      if (d > rr) return -1;
+      return d > rr - 0.12 ? 3 : d > rr * 0.5 ? 2 : 1;
+    });
+  });
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/** あてみなげ（シバのカイリキー）の構え: 体の周りに青く光る気が、渦を巻いて集まる（つかむ範囲） */
+function vitalStance(): SpriteOut {
+  // 0 輪郭・1 濃い青・2 青・3 水色・4 白
+  const palette = ['#0d1b3a', '#1565c0', '#42a5f5', '#90caf9', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.97 || d < 0.55) return -1;
+      const a = Math.atan2(v, u);
+      // 内へ巻き込む4本の腕（コマで回る）
+      const arm = Math.sin(a * 4 - d * 9 + f * 1.4);
+      if (arm > 0.75) return d > 0.85 ? 3 : 4;
+      if (arm > 0.45) return 2;
+      if (d > 0.93) return 1;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** あてみなげ（シバのカイリキー）: つかんで投げた所の、弧を描く白い軌跡と土ぼこり */
+function throwSwirl(): SpriteOut {
+  // 0 輪郭・1 土・2 うすい土・3 青白・4 白
+  const palette = ['#2b1d12', '#8d6e63', '#d7ccc8', '#bbdefb', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    const p = f / 3;
+    return shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 3/4 周の弧（投げた軌跡）。コマで先へ伸び、後ろから消える
+      const t = (a + Math.PI) / (Math.PI * 2);
+      const head = 0.3 + p * 0.7;
+      if (Math.abs(d - 0.7) < 0.08 && t < head && t > head - 0.6) return t > head - 0.08 ? 4 : 3;
+      // 足元の土ぼこり（外へ散る）
+      if (d > 0.82 && d < 0.82 + p * 0.15 && hash(Math.floor(u * 16), Math.floor(v * 16), 1683 + f) < 0.35) return d < 0.9 ? 1 : 2;
+      return -1;
+    });
+  });
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** おにび（カリンのヘルガー）: ゆらめく青白い火の玉（右へ進む。尾がたなびく） */
+function wispFlame(): SpriteOut {
+  // 0 輪郭・1 濃い青・2 青・3 水色・4 白
+  const palette = ['#0a1030', '#283593', '#3d5afe', '#8c9eff', '#e8eaf6'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(16, (u, v) => {
+      // 頭（右）が丸く、尾（左）が細く揺れる
+      const tail = u < 0 ? v - Math.sin(u * 5 + f * 1.6) * 0.18 * -u : v;
+      const half = u > 0 ? Math.sqrt(Math.max(0, 0.45 ** 2 - (u - 0.2) ** 2)) : 0.45 * (1 + u * 0.9);
+      if (u > 0.65 || u < -0.95 || Math.abs(tail) > Math.max(0.04, half)) return -1;
+      const core = Math.hypot(u - 0.2, v);
+      return core < 0.15 ? 4 : core < 0.28 ? 3 : u < -0.4 ? 1 : 2;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/** ほえる（カリンのヘルガー）: 広がる吠え声の輪（輪の帯に、外へ反った音の筋が並ぶ。真ん中は空ける） */
+function roarWave(): SpriteOut {
+  // 0 輪郭・1 灰・2 うす灰・3 白
+  const palette = ['#212121', '#757575', '#bdbdbd', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(40, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      if (d > 0.98 || d < 0.62) return -1;
+      // 12 本の音の筋（角度の帯ごと）。コマで外へずれる
+      const seg = ((a + Math.PI) / (Math.PI * 2)) * 12;
+      const inSeg = Math.abs(seg - Math.round(seg));
+      if (inSeg > 0.32) return -1;
+      const ph = (d - 0.62 - f * 0.04) / 0.12;
+      const k = Math.abs(ph - Math.round(ph));
+      // 筋の真ん中ほど外へ反らせる
+      if (k < 0.18 + inSeg * 0.2) return d > 0.88 ? 2 : 3;
+      return -1;
+    }, 0, 0),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * だいもんじ（ワタルのカイリュー・ジョウト）: 炎の「大」の字（横の棒・上の棒・左右の足）。当たり判定の5本の線と同じ向き
+ * （右 0°・上 −90°・左 180°・右下 60°・左下 120°）。線のふちが火の粉になってゆらめく
+ */
+function daimonji(): SpriteOut {
+  // 0 輪郭・1 濃い赤・2 赤・3 だいだい・4 黄・5 白
+  const palette = ['#3a0a02', '#b71c1c', '#e64a19', '#ff9800', '#ffeb3b', '#fffde7'];
+  const arms = [0, -90, 180, 60, 120].map((deg) => (deg * Math.PI) / 180);
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(48, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.97) return -1;
+      let best = 9;
+      for (const a of arms) {
+        const along = u * Math.cos(a) + v * Math.sin(a);
+        if (along < -0.05) continue;
+        const side = Math.abs(-u * Math.sin(a) + v * Math.cos(a));
+        best = Math.min(best, side);
+      }
+      // 太さは真ん中ほど太く、ふちはゆらめく
+      const w = 0.11 * (1 - d * 0.35) + Math.sin(d * 22 - f * 1.7) * 0.015;
+      if (best > w) return -1;
+      const heat = 1 - best / w;
+      if (heat < 0.25 && hash(Math.floor(u * 30), Math.floor(v * 30), 1684 + f) < 0.4) return -1;
+      return heat > 0.8 ? 5 : heat > 0.6 ? 4 : heat > 0.4 ? 3 : heat > 0.2 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** かみなり（ワタルのカイリュー・ジョウト）の雷雲: 地面に落ちた黒い雲の影。ふちがもくもくし、ときどき中が黄色く光る */
+function thunderCloud(): SpriteOut {
+  // 0 輪郭・1 黒・2 濃い灰・3 灰・4 黄（光）
+  const palette = ['#050608', '#1c1f26', '#37474f', '#607d8b', '#ffeb3b'];
+  const r = rng(1685);
+  const lumps = Array.from({ length: 7 }, (_, k) => ({ a: (k / 7) * Math.PI * 2 + r() * 0.4, rad: 0.32 + r() * 0.12 }));
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(28, (u, v) => {
+      let inside = Math.hypot(u, v * 1.4) < 0.55;
+      for (const l of lumps) if (Math.hypot(u - Math.cos(l.a + f * 0.08) * 0.48, v * 1.4 - Math.sin(l.a + f * 0.08) * 0.42) < l.rad) inside = true;
+      if (!inside) return -1;
+      // 3 コマ目だけ、中を走る稲光
+      if (f === 2 && Math.abs(v - Math.sin(u * 9) * 0.12) < 0.05 && Math.abs(u) < 0.5) return 4;
+      return Math.hypot(u, v) < 0.3 ? 1 : Math.hypot(u, v) < 0.55 ? 2 : 3;
+    }),
+  );
+  return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
+}
+
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
 /** 絵の名前 → 描く関数 */
@@ -5213,6 +5440,16 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'creeping-shadow': () => creepingShadow(),
     'hypno-waves': () => hypnoWaves(),
     'dream-drain': () => dreamDrain(),
+    'confuse-orb': () => confuseOrb(),
+    'psy-converge': () => psyConverge(),
+    'teleport-sparkle': () => teleportSparkle(),
+    'toxic-splash': () => toxicSplash(),
+    'vital-stance': () => vitalStance(),
+    'throw-swirl': () => throwSwirl(),
+    'wisp-flame': () => wispFlame(),
+    'roar-wave': () => roarWave(),
+    daimonji: () => daimonji(),
+    'thunder-cloud': () => thunderCloud(),
 };
 
 /** 絵の名前の一覧 */

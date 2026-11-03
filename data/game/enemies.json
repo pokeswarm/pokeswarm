@@ -1251,7 +1251,8 @@
       "radius": 30,
       "contactDamage": 32,
       "xp": 300,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "motion": {"type":"still"}
     },
     {
       "id": "johto-boss-crobat",
@@ -1259,11 +1260,12 @@
       "rank": "boss",
       "sprite": "enemy/crobat",
       "hp": 29400,
-      "moveSpeed": 80,
+      "moveSpeed": 200,
       "radius": 30,
       "contactDamage": 34,
       "xp": 300,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "motion": {"type":"orbit","distance":220,"angularDegreesPerSecond":70}
     },
     {
       "id": "johto-boss-machamp",
@@ -1287,7 +1289,8 @@
       "radius": 30,
       "contactDamage": 38,
       "xp": 300,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "motion": {"type":"keepDistance","distance":260}
     },
     {
       "id": "johto-boss-dragonite",
@@ -1299,7 +1302,8 @@
       "radius": 36,
       "contactDamage": 40,
       "xp": 300,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "motion": {"type":"keepDistance","distance":320}
     },
     {
       "id": "johto-boss-pikachu",

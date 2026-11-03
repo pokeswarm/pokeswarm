@@ -32,6 +32,16 @@ export function regionStats(stats: Readonly<Record<string, number>>, region: str
   return out;
 }
 
+/** 全部の地方を合わせた記録（カントーの "<名前>" と、ほかの地方の "<地方>:<名前>" の合計）。タイトル画面の記録のまとめに使う（07 の171章） */
+export function totalStat(stats: Readonly<Record<string, number>>, key: string): number {
+  let sum = 0;
+  for (const [k, v] of Object.entries(stats)) {
+    const colon = k.indexOf(':');
+    if ((colon === -1 ? k : k.slice(colon + 1)) === key) sum += v;
+  }
+  return sum;
+}
+
 /**
  * その地方の解放の名前（セーブの unlocked に入れる名前。07 の66.1: 解放は地方ごと）。カントーはそのまま、ほかの地方は頭に "<地方>:"。
  * カントーで解放したイワークは、ジョウトでは改めて解放する

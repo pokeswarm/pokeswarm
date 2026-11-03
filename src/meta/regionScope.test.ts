@@ -3,7 +3,7 @@ import { achievementsConfig, regionsConfig, shopConfig, unlocksConfig } from '..
 import { achievementPerks, regionAchieved } from './achievementPerks';
 import type { AchievementsConfig, UnlocksConfig } from '../data/schema';
 import { applyProgress, isPlayableUnlocked, meets } from './progress';
-import { regionStatKey, regionStats, regionUpgradesOf } from './regionScope';
+import { regionStatKey, regionStats, regionUpgradesOf, totalStat } from './regionScope';
 import { emptySave, parseSave } from './saveData';
 import { backfillShopSpent, buyPokemon, buyUpgrade, permanentBonus, refundAll, refundableCoins, shopRegionOpen, upgradeLevel } from './shop';
 
@@ -164,5 +164,14 @@ describe('地方ごとの記録・強化・ショップ（02 の17章）', () =>
     expect(applyProgress(save, cfg, unlocks).achievements).toEqual(['johto-clear']);
     save.stats.clears = 1;
     expect(applyProgress(save, cfg, unlocks).achievements).toEqual(['kanto-clear']);
+  });
+});
+
+describe('全部の地方を合わせた記録（07 の171章）', () => {
+  it('カントーの分とほかの地方の分を足し、似た名前の記録は足さない', () => {
+    const stats = { runs: 3, 'johto:runs': 5, 'hoenn:runs': 2, 'runs.coop': 9, 'johto:runs.bulbasaur': 4, clears: 1 };
+    expect(totalStat(stats, 'runs')).toBe(10);
+    expect(totalStat(stats, 'clears')).toBe(1);
+    expect(totalStat(stats, 'kills')).toBe(0);
   });
 });

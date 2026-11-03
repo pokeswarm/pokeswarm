@@ -1,6 +1,7 @@
 import { t, tMaybe } from '../i18n';
 import type { SaveData } from '../meta/saveData';
 import { formatTag } from '../meta/nickname';
+import { totalStat } from '../meta/regionScope';
 import { session } from '../meta/session';
 import { windowCss, compactScreen } from '../render/pixelUi';
 import { openTransferPanel } from './transferPanel';
@@ -8,12 +9,12 @@ import { openTransferPanel } from './transferPanel';
 /** ドット調のボタン（原作をまねた白い窓。作者の決定 2026年10月22日） */
 const BUTTON = `${windowCss('light')};min-height:44px;padding:8px 16px;cursor:pointer;font:inherit;font-size:16px`;
 
-/** 記録の短いまとめ（タイトル画面と、データを選ぶ画面に出す） */
+/** 記録の短いまとめ（タイトル画面と、データを選ぶ画面に出す）。全部の地方を合わせた数（前はカントーの分だけだった。07 の171章） */
 export function saveSummary(d: Readonly<SaveData>): string {
   return t('account.record', {
-    runs: d.stats.runs ?? 0,
-    clears: d.stats.clears ?? 0,
-    kills: d.stats.kills ?? 0,
+    runs: totalStat(d.stats, 'runs'),
+    clears: totalStat(d.stats, 'clears'),
+    kills: totalStat(d.stats, 'kills'),
     coins: d.coins,
   });
 }

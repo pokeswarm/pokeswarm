@@ -5812,10 +5812,11 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     // 技の少ないポケモンの救済（07 の173章）
     'milk-bottle': () => milkBottle(),
     'hoof-quake': () => hoofQuake(),
-    'heart-burst': () => heartBurst(),
+    'charm-heart': () => charmHeart(),
+    'snore-z': () => snoreZ(),
     'rough-cloud': () => roughCloud(),
     'voice-heart': () => voiceHeart(),
-    'gleam-ring': () => gleamRing(),
+    'gleam-burst': () => gleamBurst(),
 };
 
 /** 絵の名前の一覧 */
@@ -6136,31 +6137,6 @@ function hoofQuake(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
-/** あまえる: まわりにふりまくハート（6 つが輪になって外へ広がり、白く光ってから薄れる）。4 コマ */
-function heartBurst(): SpriteOut {
-  // 0 輪郭・1 桃・2 うす桃・3 白・4 濃い桃
-  const palette = ['#4a0e2a', '#ec407a', '#f8bbd0', '#ffffff', '#ad1457'];
-  const frames = [0, 1, 2, 3].map((f) =>
-    shape(32, (u, v) => {
-      const r = 0.3 + f * 0.17;
-      const size = 0.17 - f * 0.012;
-      for (let j = 0; j < 6; j++) {
-        const a = (j * Math.PI) / 3 + f * 0.18;
-        const hx = (u - Math.cos(a) * r) / size;
-        const hy = (v - Math.sin(a) * r) / size;
-        if (hx * hx + hy * hy > 1.6) continue;
-        if (!inHeart(hx, hy)) continue;
-        if (hx < -0.25 && hy < -0.1 && hy > -0.6) return 3;
-        return f === 3 ? 2 : Math.hypot(hx, hy) > 0.8 ? 4 : 1;
-      }
-      // 中のきらめき
-      if (f < 2 && Math.hypot(u, v) < 0.14 && hash(Math.floor(u * 30), Math.floor(v * 30), 7500 + f) < 0.3) return 3;
-      return -1;
-    }),
-  );
-  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
-}
-
 /** じゃれつく: まわりでもくもくする土煙（丸いかたまりがいくつも重なってふくらみ、星と小さなハートが飛び出す）。4 コマ */
 function roughCloud(): SpriteOut {
   // 0 輪郭・1 灰茶・2 うす灰・3 白・4 桃・5 黄
@@ -6220,24 +6196,74 @@ function voiceHeart(): SpriteOut {
   return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
 }
 
-/** マジカルシャイン（プリンの版）: 自分を中心に広がる光の輪（輪に沿って並べる帯。下が外）。桃と白の光に、きらめく十字が散る。3 コマ */
-function gleamRing(): SpriteOut {
-  // 0 輪郭・1 桃・2 うす桃・3 白・4 水色
-  const palette = ['#5a1e3a', '#f48fb1', '#fce4ec', '#ffffff', '#b3e5fc'];
-  const W = 12;
-  const H = 10;
-  const frames = [0, 1, 2].map((f) =>
-    fill(blank(W, H), (x, y) => {
-      // きらめく十字（帯の中に 1 つ。コマで場所が動く）
-      const cx = (f * 4 + 2) % W;
-      const dx = Math.min(Math.abs(x - cx), W - Math.abs(x - cx));
-      if ((dx === 0 && Math.abs(y - 4) <= 2) || (Math.abs(y - 4) === 0 && dx <= 2)) return dx + Math.abs(y - 4) === 0 ? 3 : 4;
-      // 外（下）ほど明るい光の帯
-      const top = 5 + Math.sin(((x + f * 2) / W) * Math.PI * 2) * 0.8;
-      if (y < top) return -1;
-      const k = (y - top) / (H - top);
-      return k > 0.7 ? 3 : k > 0.4 ? 2 : 1;
+/** あまえる: 向いている方へ投げるハート（白い光と濃い桃のふち。コマで少しふくらむ）。2 コマ */
+function charmHeart(): SpriteOut {
+  // 0 輪郭・1 桃・2 うす桃・3 白・4 濃い桃
+  const palette = ['#4a0e2a', '#ec407a', '#f8bbd0', '#ffffff', '#ad1457'];
+  const frames = [0, 1].map((f) => {
+    const k = 0.8 + f * 0.08;
+    const g = shape(12, (u, v) => {
+      const hx = u / k;
+      const hy = v / k;
+      if (!inHeart(hx, hy)) return -1;
+      if (hx < -0.3 && hy < -0.05 && hy > -0.55) return 3;
+      if (hx < -0.1 && hy < 0.1) return 2;
+      return hy > 0.45 ? 4 : 1;
+    });
+    return outline(g, 0);
+  });
+  return { palette, frameMs: 140, parts: { main: frames.map(toRows) } };
+}
+
+/** いびき: 眠りながら飛ばす「Z」（太い青の Z の後ろに、いびきの音の弧が 1 本）。2 コマで上下にゆれる */
+function snoreZ(): SpriteOut {
+  // 0 輪郭（濃い紺）・1 青・2 水色・3 白
+  const palette = ['#0d1b2a', '#1e88e5', '#90caf9', '#ffffff'];
+  const W = 14;
+  const H = 14;
+  const frames = [0, 1].map((f) => {
+    const bob = f === 0 ? 0 : 1;
+    const g = fill(blank(W, H), (x, y) => {
+      const yy = y - bob;
+      // Z（右寄り）: 上の横棒・斜め・下の横棒
+      if (x >= 4 && x <= 12 && yy >= 2 && yy <= 11) {
+        const c = yy < 5 ? 3 : yy < 8 ? 2 : 1;
+        if (yy <= 3.5 || yy >= 9.5) return c;
+        const diag = 12 - ((yy - 3.5) / 6) * 8;
+        if (Math.abs(x - diag) < 1.3) return c;
+      }
+      // 後ろ（左）の音の弧
+      const d = Math.hypot(x - 8, yy - 6.5);
+      if (x < 4 && Math.abs(d - 6.2) < 0.7 && Math.abs(yy - 6.5) < 3.5) return 2;
+      return -1;
+    });
+    return outline(g, 0);
+  });
+  return { palette, frameMs: 160, parts: { main: frames.map(toRows) } };
+}
+
+/** マジカルシャイン（プリンの版）: 敵の足元で弾ける光（桃と白の十字のきらめきが開き、小さな光の粒が散る）。4 コマ */
+function gleamBurst(): SpriteOut {
+  // 0 輪郭・1 桃・2 うす桃・3 白・4 水色・5 うす黄
+  const palette = ['#5a1e3a', '#f48fb1', '#fce4ec', '#ffffff', '#b3e5fc', '#fff9c4'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const grow = 0.45 + f * 0.17;
+      // 4 本の長い芒と 4 本の短い芒（斜め）
+      for (let j = 0; j < 8; j++) {
+        const th = (j * Math.PI) / 4 + Math.PI / 8 * (f % 2);
+        const len = (j % 2 === 0 ? 1 : 0.55) * grow;
+        const along = u * Math.cos(th) + v * Math.sin(th);
+        const perp = Math.abs(-u * Math.sin(th) + v * Math.cos(th));
+        if (along > 0 && along < len && perp < 0.08 * (1 - along / len) + 0.01) return f === 3 ? 2 : along < len * 0.4 ? 3 : j % 2 === 0 ? 1 : 4;
+      }
+      if (d < 0.16 - f * 0.03) return 3;
+      if (d < 0.24 - f * 0.04) return 2;
+      // 散る光の粒
+      if (d > grow * 0.5 && d < grow && hash(Math.floor(u * 16), Math.floor(v * 16), 7600 + f) < 0.05) return 5;
+      return -1;
     }),
   );
-  return { palette, frameMs: 80, parts: { middle: frames.map(toRows) } };
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }

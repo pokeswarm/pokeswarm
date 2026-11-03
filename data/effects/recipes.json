@@ -6531,45 +6531,48 @@
     },
     "snore": {
       "extends": "normal.base",
-      "hideShape": true,
       "sprite": {
-        "id": "snore-ring",
+        "id": "snore-z",
         "fit": "circle",
-        "size": 1
+        "size": 2,
+        "upright": true
       }
     },
     "stomp": {
       "extends": "normal.base",
+      "hideShape": true,
       "impact": {
         "flash": {
           "color": "#d7ccc8",
-          "radius": 46,
-          "durationMs": 140,
+          "radius": 26,
+          "durationMs": 120,
           "alpha": 0.6
         }
       },
       "sprite": {
         "id": "hoof-quake",
         "fit": "circle",
-        "size": 1.1
+        "size": 1.25
       }
     },
     "charm": {
       "extends": "fairy.base",
-      "hideShape": true,
       "sprite": {
-        "id": "heart-burst",
+        "id": "charm-heart",
         "fit": "circle",
-        "size": 1.15
+        "size": 2.2,
+        "upright": true
       }
     },
     "play-rough": {
       "extends": "fairy.base",
-      "hideShape": true,
+      "projectile": {
+        "shapeAlpha": 0.2
+      },
       "sprite": {
         "id": "rough-cloud",
-        "fit": "circle",
-        "size": 1.1
+        "fit": "front",
+        "size": 1
       }
     },
     "disarming-voice": {
@@ -6582,19 +6585,19 @@
     },
     "dazzling-gleam-jigglypuff": {
       "extends": "fairy.base",
-      "projectile": {
-        "shapeAlpha": 0.12
-      },
-      "screenFlash": {
-        "color": "#fff0f7",
-        "alpha": 0.12,
-        "durationMs": 140
+      "hideShape": true,
+      "impact": {
+        "flash": {
+          "color": "#fce4ec",
+          "radius": 36,
+          "durationMs": 140,
+          "alpha": 0.6
+        }
       },
       "sprite": {
-        "id": "gleam-ring",
-        "fit": "ring",
-        "size": 1,
-        "varyTiles": true
+        "id": "gleam-burst",
+        "fit": "circle",
+        "size": 1.3
       }
     }
   }

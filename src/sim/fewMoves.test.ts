@@ -135,16 +135,38 @@ describe('プリン（デバッファー）', () => {
     expect(t.derivable('sing', 'silk-scarf', 'hyper-voice')).toBe(false);
   });
 
-  it('あまえる・じゃれつく: まわりの敵の攻撃を下げる', () => {
+  it('あまえる・じゃれつく: 前の敵の攻撃を下げ、真後ろの敵には当たらない（自分から円が出ない。07 の174章）', () => {
     for (const key of ['charm', 'play-rough']) {
       const t = setup('jigglypuff', 'kanto');
+      t.p.facingX = 1;
+      t.p.facingY = 0;
       t.p.moves = [{ move: t.move(key), level: 8, cooldown: 0, burstLeft: 0, burstTimer: 0 }];
-      for (let k = 0; k < 8; k++) t.sim.world.enemies.add(k + 1, 0, Math.cos(k) * 30, Math.sin(k) * 30, 1e6, 0, 10);
-      for (let k = 0; k < 20; k++) t.sim.step([]);
+      for (let k = 0; k < 6; k++) t.sim.world.enemies.add(k + 1, 0, 70 + k * 12, (k % 3) * 10 - 10, 1e6, 0, 10);
+      t.sim.world.enemies.add(99, 0, -80, 0, 1e6, 0, 10);
+      for (let k = 0; k < 40; k++) t.sim.step([]);
       const down = t.rules.status.kinds.findIndex((s) => s.id === 'attackDown');
-      const n = [...Array(8).keys()].filter((i) => t.sim.world.enemies.hasStatus(i, down)).length;
+      const n = [...Array(6).keys()].filter((i) => t.sim.world.enemies.hasStatus(i, down)).length;
       expect(n, key).toBeGreaterThan(0);
+      expect(t.sim.world.enemies.hp[6], `${key} の後ろ`).toBe(1e6);
     }
+  });
+
+  it('ふみつけ・いびき も真後ろの敵には当たらない。マジカルシャイン（プリン）は離れた敵の足元で弾ける', () => {
+    const behind = (line: string, key: string, extra: string[] = []): number => {
+      const t = setup(line, 'kanto');
+      t.p.facingX = 1;
+      t.p.facingY = 0;
+      t.p.moves = [key, ...extra].map((k) => ({ move: t.move(k), level: 8, cooldown: 0, burstLeft: 0, burstTimer: 0 }));
+      t.sim.world.enemies.add(1, 0, 60, 0, 1e6, 0, 10);
+      t.sim.world.enemies.add(2, 0, -60, 0, 1e6, 0, 10);
+      for (let k = 0; k < 150; k++) t.sim.step([]);
+      expect(t.sim.world.enemies.hp[0], `${key} の前`).toBeLessThan(1e6);
+      return t.sim.world.enemies.hp[1]!;
+    };
+    expect(behind('miltank', 'stomp')).toBe(1e6);
+    expect(behind('snorlax', 'snore', ['rest'])).toBe(1e6);
+    // 光は向きに関係なく、届く範囲の敵の足元で弾ける
+    expect(behind('jigglypuff', 'dazzling-gleam-jigglypuff')).toBeLessThan(1e6);
   });
 
   it('ププリンも同じ技を覚え、プリンになると同じ形になる', () => {

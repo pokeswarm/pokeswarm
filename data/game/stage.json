@@ -581,7 +581,8 @@
       "telegraphSeconds": 1.2,
       "radius": 60,
       "damage": 0,
-      "healPct": 6
+      "healPct": 5,
+      "maxUses": 2
     },
     {
       "id": "snorlax-body-slam",
@@ -1315,11 +1316,93 @@
       "damage": 36,
       "hitEverySeconds": 0.6,
       "bounce": {
-        "seconds": 3,
+        "seconds": 2.4,
         "speed": 520,
         "halfWidth": 360,
         "halfHeight": 220
       }
+    },
+    {
+      "id": "red-venusaur-solar-beam",
+      "minTargetDistance": 240,
+      "move": "solar-beam",
+      "effect": "solar-beam",
+      "shape": "line",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 1.2,
+      "radius": 36,
+      "length": 1600,
+      "damage": 45
+    },
+    {
+      "id": "red-blastoise-hydro-cannon",
+      "move": "hydro-cannon",
+      "effect": "hydro-cannon",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "holdSeconds": 1,
+      "telegraphSeconds": 0.9,
+      "radius": 70,
+      "damage": 0,
+      "playerMove": {
+        "move": "hydro-cannon",
+        "level": 8,
+        "sweepDegreesPerSecond": 360
+      }
+    },
+    {
+      "id": "blastoise-recoil",
+      "effect": "boss-out-of-breath",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "hideTelegraph": true,
+      "telegraphSeconds": 1.3,
+      "radius": 52,
+      "damage": 0
+    },
+    {
+      "id": "blastoise-rapid-spin-run",
+      "move": "rapid-spin",
+      "effect": "boss-rapid-spin",
+      "shape": "circle",
+      "target": "player",
+      "followBoss": true,
+      "spinBody": true,
+      "telegraphSeconds": 0.7,
+      "radius": 56,
+      "damage": 26,
+      "hitEverySeconds": 0.6,
+      "bounce": {
+        "seconds": 2.4,
+        "speed": 430,
+        "halfWidth": 340,
+        "halfHeight": 220
+      }
+    },
+    {
+      "id": "pika-catch-breath",
+      "effect": "boss-out-of-breath",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "hideTelegraph": true,
+      "telegraphSeconds": 1.2,
+      "radius": 40,
+      "damage": 0
+    },
+    {
+      "id": "pika-recoil",
+      "effect": "boss-volt-recoil",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "hideTelegraph": true,
+      "telegraphSeconds": 2.4,
+      "radius": 40,
+      "damage": 0
     },
     {
       "id": "pika-iron-tail",
@@ -1330,7 +1413,7 @@
       "teleport": true,
       "hideBoss": true,
       "spread": 0,
-      "telegraphSeconds": 1,
+      "telegraphSeconds": 0.8,
       "radius": 90,
       "damage": 38,
       "then": "pika-iron-tail-sweep"
@@ -1415,7 +1498,7 @@
       "telegraphSeconds": 1.5,
       "radius": 200,
       "damage": 60,
-      "recoilSeconds": 1
+      "recoilSeconds": 2
     },
     {
       "id": "snorlax-rest-snore",
@@ -1427,10 +1510,11 @@
       "telegraphSeconds": 0.5,
       "radius": 60,
       "damage": 0,
-      "healPct": 8,
+      "healPct": 5,
       "holdSeconds": 2.5,
       "recoilSeconds": 2.5,
-      "then": "snorlax-snore"
+      "then": "snorlax-snore",
+      "maxUses": 2
     },
     {
       "id": "snorlax-snore",
@@ -1460,7 +1544,8 @@
       "spread": 0,
       "telegraphSeconds": 1,
       "radius": 110,
-      "damage": 50
+      "damage": 50,
+      "recoilSeconds": 1
     },
     {
       "id": "raikou-extreme-speed",

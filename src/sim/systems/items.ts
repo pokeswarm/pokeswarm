@@ -27,7 +27,17 @@ export function dropItems(world: World): void {
       if (r < cfg.potion.dropChance) item = 'potion';
       else if (r < cfg.potion.dropChance + cfg.magnet.dropChance) item = 'magnet';
     }
-    if (item) spawnItem(world, world.nextItemId++, item, world.enemies.x[i]!, world.enemies.y[i]!);
+    if (item && kind.dropPerPlayer) spawnItemsAround(world, item, world.enemies.x[i]!, world.enemies.y[i]!, world.players.length);
+    else if (item) spawnItem(world, world.nextItemId++, item, world.enemies.x[i]!, world.enemies.y[i]!);
+  }
+}
+
+/** 道具を count 個、(x, y) のまわりに散らして落とす（ソロ・ホスト。ボスの足元から少し離れた、拾いに行ける所。07 の193章） */
+export function spawnItemsAround(world: World, kind: ItemKind, x: number, y: number, count: number): void {
+  for (let k = 0; k < count; k++) {
+    const a = world.rng.next() * Math.PI * 2;
+    const d = 70 + world.rng.next() * 50;
+    spawnItem(world, world.nextItemId++, kind, Math.round(x + Math.cos(a) * d), Math.round(y + Math.sin(a) * d));
   }
 }
 

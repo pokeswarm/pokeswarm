@@ -7140,6 +7140,36 @@
         "seconds": 0.4
       }
     },
+    "boss-volt-recoil": {
+      "extends": "electric.base",
+      "bossTelegraph": {
+        "id": "volt-fizzle",
+        "fit": "circle",
+        "size": 2.3,
+        "originY": 0.66,
+        "overBoss": true
+      }
+    },
+    "boss-out-of-breath": {
+      "extends": "normal.base",
+      "bossTelegraph": {
+        "id": "daze-stars",
+        "fit": "circle",
+        "size": 2.9,
+        "overBoss": true
+      }
+    },
+    "boss-rapid-spin": {
+      "extends": "water.base",
+      "bossActive": {
+        "id": "shell-spin-water",
+        "fit": "circle",
+        "size": 1.9,
+        "overBoss": true,
+        "rotate": "spin",
+        "spinDegPerSec": 720
+      }
+    },
     "boss-gyro-ball": {
       "extends": "steel.base",
       "bossActive": {

@@ -180,6 +180,8 @@ export const enemyKindSchema = z.object({
   xp: z.number().nonnegative().optional(),
   /** 倒したときに落とす道具（中ボスのふしぎなアメ）。経験値の代わり */
   drop: z.enum(['potion', 'magnet', 'rare-candy']).optional(),
+  /** 落とす道具を人数分にする（レッド戦のきずぐすり。07 の193章） */
+  dropPerPlayer: z.boolean().optional(),
   /** スプライトの大きさの倍率（省略時は 1。中ボス・ボスを大きく描く） */
   spriteScale: z.number().positive().optional(),
   /** 色違い（名前を「色違いの〇〇」にする。作者の決定 2026年10月24日: 色違いの御三家） */
@@ -552,6 +554,8 @@ export const bossMoveSchema = z.object({
   holdSeconds: z.number().positive().optional(),
   /** 落ちたとき、使ったボスが最大 HP のこの % だけ回復する（エーフィの あさのひざし・カビゴンの ねむる） */
   healPct: z.number().positive().optional(),
+  /** 1 回の戦いで使える回数（回復の技を繰り返して HP が減らなくなるのを防ぐ。使い切ったら順番を飛ばす。07 の193章） */
+  maxUses: z.number().int().positive().optional(),
   leaves: z
     .object({
       seconds: z.number().positive(),
@@ -765,6 +769,8 @@ export const stageConfigSchema = z.object({
               })
               .optional(),
             chargePose: z.string().optional(),
+            /** HP がこの割合（%）を切るたびに、道具を人数分落とす（レッド戦。雑魚がいない戦いの回復。07 の193章） */
+            hpDrops: z.object({ atHpPct: z.array(z.number().gt(0).lt(100)).min(1), item: z.enum(['potion']) }).optional(),
           }),
         )
         .default({}),
@@ -791,7 +797,20 @@ export const stageConfigSchema = z.object({
        * 1つ目のラウンドから戦う。ラウンドの相手（kinds）は同時に出て、全員倒すと次のラウンドへ。制限時間はラウンドごと。
        * 最後のラウンドを倒したら stat を記録に数える（レッドを倒す）。bgm があれば、そのラウンドの間の曲（無ければ legendaryBgm）
        */
-      rounds: z.array(z.object({ kinds: z.array(z.string().min(1)).min(1), stat: z.string().optional(), bgm: z.string().optional() })).optional(),
+      rounds: z
+        .array(
+          z.object({
+            kinds: z.array(z.string().min(1)).min(1),
+            stat: z.string().optional(),
+            bgm: z.string().optional(),
+            /**
+             * 交代（07 の193章）: 同時に出ている相手のうち、seconds ごとに 1 体だけが技を使う。ほかの相手は idleSpeedPct % の速さで歩くだけで、
+             * 攻撃するチャンスになる。startDelaySeconds は順番が来てから最初の技までの秒数。markerColor は順番の相手の足元の輪の色
+             */
+            turns: z.object({ seconds: z.number().positive(), idleSpeedPct: z.number().min(0).max(100), startDelaySeconds: z.number().nonnegative(), markerColor: z.string() }).optional(),
+          }),
+        )
+        .optional(),
       /**
        * rounds を全部倒した後、そのランで item（はね）を拾っていれば続けて戦う（ルギア・ホウオウ）。はねは、参加者のだれかが
        * achievement を達成していると、箱から出るようになる
@@ -1851,6 +1870,8 @@ const moveSpriteSpec = z.object({
   directional: z.boolean().default(false),
   /** circle の絵の、当たり判定の中心に合わせる高さ（0 = 絵の上端、1 = 下端）。地面から噴き上がる絵は、根元を中心に合わせる（ブラストバーン） */
   originY: z.number().min(0).max(1).default(0.5),
+  /** ボスの体より手前に描く（頭の上で回る星・体を走る電気。07 の193章） */
+  overBoss: z.boolean().optional(),
   /** front の絵の真ん中を置く所（届く距離に対する割合。向きの先）。口の絵は 0.6。自分を含む長方形（ブレイズキック）は手前に */
   along: z.number().default(0.6),
   /** 描く位置を毎フレーム、この大きさ（ワールドの単位）までランダムにずらす（揺れる地面。画面は揺らさない） */

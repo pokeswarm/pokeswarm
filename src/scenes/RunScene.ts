@@ -53,7 +53,7 @@ import { clearRunProbe, writeRunProbe } from '../meta/runProbe';
 import { session } from '../meta/session';
 import { regionStatKey } from '../meta/regionScope';
 import { LevelUpPanel, offerText } from './levelUpPanel';
-import { activeField, activeLegendField, currentWeather, startIntruder, startLegendary, legendRoundKinds } from '../sim/systems/stage';
+import { activeField, activeLegendField, currentWeather, startIntruder, startLegendary, legendRoundKinds, legendTurnIsActive, legendTurns } from '../sim/systems/stage';
 import { PausePanel } from './pausePanel';
 import { ContestPanel } from './contestPanel';
 import { EvolutionCutscene } from './evolutionCutscene';
@@ -125,6 +125,7 @@ export class RunScene extends Phaser.Scene {
   /** 空から塊が落ちてくる技（つららおとし）と、その絵・落ちている塊の通し番号・塊の影 */
   private fallMoves = new Map<number, NonNullable<EffectRecipe['fall']>>();
   private fallSprites: MoveSprites | null = null;
+  private overBossSprites: MoveSprites | null = null;
   private falling = new Map<number, { x: number; y: number; radius: number; move: number }>();
   private fallShadows: Phaser.GameObjects.Graphics | null = null;
   /** 稲妻の線で描く技 */
@@ -574,6 +575,7 @@ export class RunScene extends Phaser.Scene {
     this.strikeSprites = new MoveSprites(this, moveSprites, depths.effects - 0.05, spriteRender.dot);
     this.floorSprites = new MoveSprites(this, moveSprites, depths.hitShapes + 0.1, spriteRender.dot);
     this.fallSprites = new MoveSprites(this, moveSprites, depths.effects + 0.25, spriteRender.dot);
+    this.overBossSprites = new MoveSprites(this, moveSprites, depths.bosses + 0.1, spriteRender.dot);
     this.strikes = [];
     this.countdownTexts = [];
     this.hazardBolts = [];
@@ -1519,9 +1521,28 @@ export class RunScene extends Phaser.Scene {
   }
 
   /** ボスの範囲技の予告: 範囲の円と、落ちるまでの残りを内側から広がる円で見せる */
+  /** 交代（レッド戦。07 の193章）: 今、技を使う順番の相手の足元に輪を出す */
+  private drawTurnMarker(g: Phaser.GameObjects.Graphics): void {
+    const w = this.sim.world;
+    const lg = w.legendary;
+    if (!lg || lg.result) return;
+    const e = w.enemies;
+    const kinds = legendRoundKinds(w, lg.kind);
+    for (let i = 0; i < e.count; i++) {
+      if (e.hp[i]! <= 0 || !kinds.includes(e.kind[i]!) || w.hiddenEnemies.has(e.id[i]!)) continue;
+      const turns = legendTurns(w, i);
+      if (!turns || !legendTurnIsActive(w, i)) continue;
+      const r = e.radius[i]! * (1.25 + Math.sin(w.tick * 0.2) * 0.08);
+      const color = Phaser.Display.Color.HexStringToColor(turns.markerColor).color;
+      g.lineStyle(4, color, 0.85).strokeEllipse(e.x[i]!, e.y[i]! + e.radius[i]! * 0.55, r * 2.3, r * 1.1);
+      g.lineStyle(2, 0xffffff, 0.55).strokeEllipse(e.x[i]!, e.y[i]! + e.radius[i]! * 0.55, r * 1.95, r * 0.9);
+    }
+  }
+
   private drawHazards(hazards: readonly Hazard[]): void {
     const g = this.hazardView;
     g.clear();
+    this.drawTurnMarker(g);
     let countdowns = 0;
     for (const h of hazards) {
       // 飛ぶ玉（サンダーの電気の玉）: 飛んでいる間は黄色い玉
@@ -1680,7 +1701,7 @@ export class RunScene extends Phaser.Scene {
       const grow = 1 + ((mv.bounce?.growPct ?? 0) * (h.bounces ?? 0)) / 100;
       // 予告の絵は、落ちる前にだんだん濃く（遅れて始まる予告は、始まるまで描かない）
       if (!active && left > Math.round(mv.telegraphSeconds / world.dt)) continue;
-      const alpha = active ? Math.min(1, left / Math.max(1, total * 0.2)) : Math.min(1, 0.35 + elapsed / Math.max(0.1, mv.telegraphSeconds));
+      const alpha = active ? Math.min(1, left / Math.max(1, total * 0.2)) : spec.overBoss ? 1 : Math.min(1, 0.35 + elapsed / Math.max(0.1, mv.telegraphSeconds));
       // 落ちてくる絵（コメットパンチの拳）: 予告の間に上から落ち、落ちる先の赤い円の上に着く
       if (!active && spec.dropHeight) {
         const p = Math.min(1, elapsed / Math.max(0.1, mv.telegraphSeconds));
@@ -2390,13 +2411,15 @@ export class RunScene extends Phaser.Scene {
     // ボスの範囲技が落ちた所の絵: 出てからの時間でコマを進め、最後の 3 割で薄くする
     const now = this.time.now / 1000;
     this.strikes = this.strikes.filter((s) => now - s.start < s.seconds);
+    const hazardItems = this.hazardSpriteItems(world);
     this.strikeSprites?.drawItems(
       this.strikes.map((s) => {
         const elapsed = now - s.start;
         const moved = s.drift ? { x: s.item.x + s.drift.x * elapsed, y: s.item.y + s.drift.y * elapsed } : {};
         return { ...s.item, ...moved, elapsed, alpha: Math.min(1, (s.seconds - elapsed) / (s.seconds * 0.3)) };
-      }).concat(this.hazardSpriteItems(world)),
+      }).concat(hazardItems.filter((it) => !it.spec.overBoss)),
     );
+    this.overBossSprites?.drawItems(hazardItems.filter((it) => it.spec.overBoss));
     // 天気（こなゆき・ふぶき）: 出ている間、画面じゅうに雪を降らせる
     const weathers = new Set<string>();
     for (let i = 0; i < pr.count; i++) {

@@ -3,7 +3,7 @@ import { emptyModifiers } from '../upgrades';
 import type { World } from '../world';
 import type { CasterMoveData } from '../../data/schema';
 import { CASTER_ID_BASE, fireCasterMove, moveStatsOf } from './attack';
-import { legendRoundKinds } from './stage';
+import { legendRoundKinds, legendTurnIsActive } from './stage';
 
 /**
  * 伝説がプレイヤーと同じ技を使う（色違いの御三家。作者の依頼 2026年10月27日）。
@@ -54,6 +54,11 @@ function tickOne(world: World, i: number): void {
   if (ai.holdTicks) ai.holdTicks--;
   const stunned = !!world.bosses.find((b) => b.id === id)?.stunTicks;
   const charging = !!ai.holdTicks || stunned || world.hazards.some((h) => h.dasher === id && h.activeTicks === undefined && world.rules.stage.moves[h.move]?.rooted);
+  // 交代: 順番でない相手は技を出さず、甲羅にもならない（07 の193章）
+  if (!legendTurnIsActive(world, i)) {
+    ai.shell = false;
+    return;
+  }
   // 甲羅の形（カメックス）: 離れたら甲羅、近づいたら戻る。甲羅の間は速い
   if (set.shell && target) {
     const d = Math.hypot(target.x - caster.x, target.y - caster.y);

@@ -1365,76 +1365,88 @@
       "species": "pikachu",
       "rank": "legendary",
       "sprite": "enemy/pikachu",
-      "hp": 60000,
-      "moveSpeed": 175,
+      "hp": 40000,
+      "moveSpeed": 150,
       "radius": 26,
       "contactDamage": 42,
       "xp": 0,
-      "spriteScale": 2.4
+      "spriteScale": 2.4,
+      "drop": "potion",
+      "dropPerPlayer": true
     },
     {
       "id": "red-espeon",
       "species": "espeon",
       "rank": "legendary",
       "sprite": "enemy/espeon",
-      "hp": 40000,
-      "moveSpeed": 170,
+      "hp": 30000,
+      "moveSpeed": 125,
       "radius": 30,
       "contactDamage": 40,
       "xp": 0,
       "spriteScale": 2.4,
       "motion": {
         "type": "keepDistance",
-        "distance": 280
-      }
+        "distance": 220
+      },
+      "drop": "potion",
+      "dropPerPlayer": true
     },
     {
       "id": "red-snorlax",
       "species": "snorlax",
       "rank": "legendary",
       "sprite": "enemy/snorlax",
-      "hp": 40000,
-      "moveSpeed": 110,
+      "hp": 30000,
+      "moveSpeed": 100,
       "radius": 44,
       "contactDamage": 50,
       "xp": 0,
-      "spriteScale": 2.8
+      "spriteScale": 2.8,
+      "drop": "potion",
+      "dropPerPlayer": true
     },
     {
       "id": "red-venusaur",
       "species": "venusaur",
       "rank": "legendary",
       "sprite": "enemy/venusaur",
-      "hp": 36000,
+      "hp": 24000,
       "moveSpeed": 150,
       "radius": 40,
       "contactDamage": 36,
       "xp": 0,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "drop": "potion",
+      "dropPerPlayer": true
     },
     {
       "id": "red-charizard",
       "species": "charizard",
       "rank": "legendary",
       "sprite": "enemy/charizard",
-      "hp": 36000,
-      "moveSpeed": 165,
+      "hp": 24000,
+      "moveSpeed": 150,
       "radius": 40,
       "contactDamage": 36,
       "xp": 0,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "drop": "potion",
+      "dropPerPlayer": true
     },
     {
       "id": "red-blastoise",
       "species": "blastoise",
       "rank": "legendary",
       "sprite": "enemy/blastoise",
-      "hp": 36000,
+      "hp": 24000,
       "moveSpeed": 150,
       "radius": 40,
       "contactDamage": 36,
       "xp": 0,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "drop": "potion",
+      "dropPerPlayer": true
     },
     {
       "id": "legend-raikou",

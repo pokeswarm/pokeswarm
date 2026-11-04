@@ -264,6 +264,13 @@ export interface World {
     radiusBuff?: { readonly scale: number; uses: number };
     /** りゅうのまい の重ねた段 */
     stacks?: number;
+    // ---- 07 の193章 ----
+    /** 使える回数のある技（maxUses）を使った回数（技の番号 → 回数） */
+    uses?: Record<number, number>;
+    /** これから道具を落とす HP の割合（大きい順） */
+    dropsAt?: number[];
+    /** 交代: 順番を待っている（歩くだけ） */
+    waiting?: boolean;
     /** 跳ね回っている（ボルテッカー）: 速度・残り・箱 */
     bounce?: { vx: number; vy: number; ticks: number; cx: number; cy: number; hw: number; hh: number; hazard: number };
   }[];

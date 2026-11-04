@@ -5745,6 +5745,84 @@ function starShard(): SpriteOut {
   return { palette, frameMs: 200, parts: { main: [toRows(outline(g, 0))] } };
 }
 
+/** 息切れ（レッド戦の隙。07 の193章）: 頭の上を回る 3 つの星。手前の星は大きく、奥の星は小さい */
+function dazeStars(): SpriteOut {
+  const palette = ['#8d5a00', '#ffc400', '#fff59d', '#ffffff'];
+  const frames = [0, 1, 2, 3, 4, 5].map((f) =>
+    shape(52, (u, v) => {
+      let best = -1;
+      for (let k = 0; k < 3; k++) {
+        const a = ((f / 6 + k / 3) % 1) * Math.PI * 2;
+        const cx = Math.cos(a) * 0.62;
+        const depth = Math.sin(a);
+        const cy = -0.68 + depth * 0.15;
+        const size = 0.17 + (depth + 1) * 0.055;
+        const x = starRatio(u - cx, v - cy, size, size * 0.46, a);
+        if (x >= 1) continue;
+        // 奥の星は暗く
+        const c = x < 0.45 ? (depth > -0.3 ? 3 : 2) : x < 0.78 ? (depth > -0.3 ? 2 : 1) : depth > -0.3 ? 1 : 0;
+        if (c > best) best = c;
+      }
+      return best;
+    }),
+  );
+  return { palette, frameMs: 110, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/** ボルテッカーの反動（07 の193章）: 自分の電気でしびれる。体のまわりにはじける短い稲妻と、飛び散る火花 */
+function voltFizzle(): SpriteOut {
+  const palette = ['#5d4037', '#f9a825', '#ffee58', '#ffffff'];
+  const frames = [0, 1, 2, 3, 4].map((f) =>
+    shape(60, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      if (d > 0.98) return -1;
+      for (let k = 0; k < 5; k++) {
+        // コマごとに違う場所へはじける
+        const base = hash(f, k, 41) * Math.PI * 2;
+        const from = 0.38 + hash(f, k, 42) * 0.14;
+        const to = from + 0.28 + hash(f, k, 43) * 0.22;
+        if (d < from || d > to) continue;
+        const zig = Math.sin((d - from) * 26 + k * 2.1) * 0.13;
+        let da = a - base - zig;
+        while (da > Math.PI) da -= Math.PI * 2;
+        while (da < -Math.PI) da += Math.PI * 2;
+        const w = Math.abs(da) * d;
+        if (w < 0.022) return 3;
+        if (w < 0.05) return 2;
+        if (w < 0.07) return 1;
+      }
+      // 飛び散る火花
+      if (d > 0.55 && hash(Math.round(u * 24), Math.round(v * 24), f + 60) < 0.012) return 2;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** こうそくスピン（レッドのカメックス。07 の193章）: 回る甲羅のまわりを巻く水の渦と、はじける水しぶき */
+function shellSpinWater(): SpriteOut {
+  const palette = ['#01395e', '#0288d1', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(60, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.98 || d < 0.58) return -1;
+      const a = Math.atan2(v, u);
+      // 渦の筋: 外へ行くほどねじれる 3 本
+      const t = (((a / (Math.PI * 2)) * 3 + (d - 0.58) * 1.6 + f / 4) % 1 + 1) % 1;
+      const edge = 1 - Math.abs(d - 0.78) / 0.2;
+      if (t < 0.1 * edge + 0.02) return 4;
+      if (t < 0.2 * edge + 0.03) return 3;
+      if (t < 0.34 * edge) return 2;
+      if (t < 0.44 * edge) return 1;
+      // 外へはじける水しぶき
+      if (d > 0.84 && hash(Math.round(u * 26), Math.round(v * 26), f + 70) < 0.05) return 3;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 50, parts: { main: frames.map(toRows) } };
+}
+
 /** ねがいごと: ゆっくり昇る小さな星たち（☆） */
 function wishStar(): SpriteOut {
   const palette = ['#b98a0c', '#ffe066', '#ffffff'];
@@ -6101,6 +6179,10 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'heavy-impact': () => heavyImpact(),
     'iron-tail-arc': () => ironTailArc(),
     'star-bullet': () => starBullet(),
+    // レッド戦（07 の193章）
+    'daze-stars': () => dazeStars(),
+    'volt-fizzle': () => voltFizzle(),
+    'shell-spin-water': () => shellSpinWater(),
     // ボスの技（07 の189章）
     'zen-aura': () => zenAura(),
     'precipice-blade': () => precipiceBlade(),

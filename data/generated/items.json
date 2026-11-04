@@ -259,6 +259,16 @@
       "it": "Metalcoperta"
     }
   },
+  "meteorite": {
+    "names": {
+      "ja": "いんせき",
+      "en": "Meteorite",
+      "fr": "Météorite",
+      "de": "Meteorit",
+      "es": "Meteorito",
+      "it": "Meteorite"
+    }
+  },
   "metronome": {
     "names": {
       "ja": "メトロノーム",

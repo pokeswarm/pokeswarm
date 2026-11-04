@@ -1982,7 +1982,8 @@
       "key": "metagross",
       "dex": 376,
       "uses": [
-        "full"
+        "full",
+        "enemy"
       ]
     },
     {
@@ -2059,6 +2060,82 @@
       "key": "shedinja",
       "dex": 292,
       "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "groudon",
+      "dex": 383,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "kyogre",
+      "dex": 382,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "rayquaza",
+      "dex": 384,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "deoxys-normal",
+      "dex": 386,
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "deoxys-attack",
+      "dex": 386,
+      "form": "0001",
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "deoxys-defense",
+      "dex": 386,
+      "form": "0002",
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "deoxys-speed",
+      "dex": 386,
+      "form": "0003",
+      "uses": [
+        "enemy"
+      ]
+    },
+    {
+      "key": "latias",
+      "dex": 380,
+      "uses": [
+        "full",
+        "enemy"
+      ]
+    },
+    {
+      "key": "latios",
+      "dex": 381,
+      "uses": [
+        "full",
+        "enemy"
+      ]
+    },
+    {
+      "key": "jirachi",
+      "dex": 385,
+      "uses": [
+        "full",
         "enemy"
       ]
     }

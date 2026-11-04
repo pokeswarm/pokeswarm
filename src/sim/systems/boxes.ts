@@ -110,7 +110,7 @@ function boxDrop(world: World): ItemKind {
   }
   return 'buff';
 }
-const WINGS: readonly WingKind[] = ['silver-wing', 'rainbow-wing'];
+const WINGS: readonly WingKind[] = ['silver-wing', 'rainbow-wing', 'meteorite'];
 
 /** 点と線分（start から dir の向きへ length）の距離の2乗 */
 function segmentDistance2(px: number, py: number, sx: number, sy: number, dx: number, dy: number, length: number): number {

@@ -50,9 +50,9 @@ export interface LevelUpState {
 }
 
 /** マップに落ちる道具の種類 */
-export type ItemKind = 'potion' | 'magnet' | 'rare-candy' | 'buff' | 'silver-wing' | 'rainbow-wing' | 'moomoo-milk';
+export type ItemKind = 'potion' | 'magnet' | 'rare-candy' | 'buff' | 'silver-wing' | 'rainbow-wing' | 'moomoo-milk' | 'meteorite';
 /** はね（ルギア・ホウオウ戦の権利。箱から出る） */
-export type WingKind = 'silver-wing' | 'rainbow-wing';
+export type WingKind = 'silver-wing' | 'rainbow-wing' | 'meteorite';
 
 /** マップの箱（攻撃を当てると開いて、一時的な強化を落とす）。hits は当たった技の当たり判定の通し番号（同じ技で何度も数えない） */
 export interface Box {
@@ -294,7 +294,10 @@ export interface World {
     round?: number;
   } | null;
   /** 伝説の乱入（三犬）: 出ている伝説（出る前は id -1）と逃げる時刻。乱入が終わったら done。次に確かめる乱入の分の番号 */
-  intruder: { kind: number; id: number; appearTick: number; endTick: number; done: boolean } | null;
+  /** ids: 一緒に乱入した全員（ラティ兄妹） */
+  intruder: { kind: number; id: number; ids?: number[]; appearTick: number; endTick: number; done: boolean } | null;
+  /** 最後の戦いの相手（クリアの後に1回だけ決める。無ければ null。07 の189章） */
+  finaleKinds: readonly number[] | null;
   nextIntruderCheck: number;
   /** はねが箱から出るようになっている（参加者のだれかが実績を達成）。ランを始める前に入れる */
   wingsEnabled: Set<WingKind>;
@@ -379,6 +382,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     legendaryForce: false,
     legendaryChanceBonus: 0,
     intruder: null,
+    finaleKinds: null,
     nextIntruderCheck: 0,
     wingsEnabled: new Set(),
     wings: new Set(),

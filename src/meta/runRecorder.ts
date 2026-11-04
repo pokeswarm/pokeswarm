@@ -117,7 +117,10 @@ export class RunRecorder {
             this.count('bossKills');
             this.runBosses++;
           }
-          if (rank === 'legendary') {
+          if (rank === 'legendary' && kind.asBoss) {
+            this.count('bossKills');
+            this.runBosses++;
+          } else if (rank === 'legendary') {
             this.count('legendaryKills');
             this.runLegendary++;
           }

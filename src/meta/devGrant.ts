@@ -10,7 +10,7 @@ import type { SaveData } from './saveData';
  */
 export function grantDevProgress(save: SaveData, coins: number): { achievements: number; unlocked: number } {
   // レッドの手持ち（red-。伝説戦の形で戦うふつうのポケモン）は伝説に数えない
-  const legends = new Set(enemiesConfig.kinds.filter((k) => k.rank === 'legendary' && !k.id.startsWith('red-')).map((k) => k.species ?? k.id.replace(/^legend-|^shiny-/, '')));
+  const legends = new Set(enemiesConfig.kinds.filter((k) => k.rank === 'legendary' && !k.asBoss && !k.id.startsWith('red-')).map((k) => k.species ?? k.id.replace(/^legend-|^shiny-/, '')));
   const isLegend = (a: (typeof achievementsConfig.achievements)[number]): boolean => {
     const cond = JSON.stringify(a.condition);
     if (cond.includes('"legendaryKills"')) return true;

@@ -282,7 +282,17 @@
     "wynaut",
     "wobbuffet",
     "mawile",
-    "shedinja"
+    "shedinja",
+    "groudon",
+    "kyogre",
+    "rayquaza",
+    "deoxys-normal",
+    "deoxys-attack",
+    "deoxys-defense",
+    "deoxys-speed",
+    "latias",
+    "latios",
+    "jirachi"
   ],
   "moves": [
     "acid-spray",
@@ -517,7 +527,17 @@
     "milk-drink",
     "charm",
     "play-rough",
-    "disarming-voice"
+    "disarming-voice",
+    "zen-headbutt",
+    "precipice-blades",
+    "origin-pulse",
+    "dragon-ascent",
+    "cosmic-power",
+    "mist-ball",
+    "heal-pulse",
+    "luster-purge",
+    "doom-desire",
+    "wish"
   ],
   "items": [
     "x-attack",
@@ -578,7 +598,8 @@
     "salac-berry",
     "ganlon-berry",
     "lansat-berry",
-    "sitrus-berry"
+    "sitrus-berry",
+    "meteorite"
   ],
   "regions": [
     "kanto",

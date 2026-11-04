@@ -673,5 +673,6 @@
   "contest.rank.normal": "Normal",
   "contest.rank.super": "Superior",
   "contest.rank.hyper": "Hiper",
-  "contest.rank.master": "Maestro"
+  "contest.rank.master": "Maestro",
+  "run.meteoriteGot": "¡Has encontrado: {name}! Algo viene del cielo..."
 }

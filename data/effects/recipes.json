@@ -6838,6 +6838,87 @@
         "fit": "circle",
         "size": 1.25
       }
+    },
+    "boss-zen-headbutt": {
+      "extends": "psychic.base",
+      "bossActive": {
+        "id": "zen-aura",
+        "fit": "front",
+        "size": 0.6,
+        "along": 0.5
+      }
+    },
+    "boss-precipice-blades": {
+      "extends": "ground.base",
+      "strike": {
+        "id": "precipice-blade",
+        "fit": "circle",
+        "size": 1.3,
+        "seconds": 0.5
+      }
+    },
+    "boss-origin-pulse": {
+      "extends": "water.base",
+      "bossActive": {
+        "id": "origin-beam",
+        "fit": "line",
+        "size": 1
+      }
+    },
+    "boss-dragon-ascent": {
+      "extends": "dragon.base",
+      "bossTelegraph": {
+        "id": "ascent-shadow",
+        "fit": "circle",
+        "size": 1
+      },
+      "strike": {
+        "id": "ascent-column",
+        "fit": "circle",
+        "size": 1.4,
+        "seconds": 0.5
+      }
+    },
+    "boss-psycho-boost": {
+      "extends": "psychic.base",
+      "bossActive": {
+        "id": "psycho-pillar",
+        "fit": "line",
+        "size": 1
+      }
+    },
+    "boss-cosmic-power": {
+      "extends": "psychic.base",
+      "bossTelegraph": {
+        "id": "cosmic-stars",
+        "fit": "circle",
+        "size": 1.2
+      }
+    },
+    "boss-mist-ball": {
+      "extends": "psychic.base",
+      "bossActive": {
+        "id": "mist-orb",
+        "fit": "circle",
+        "size": 1.2
+      }
+    },
+    "boss-heal-pulse": {
+      "extends": "psychic.base",
+      "bossTelegraph": {
+        "id": "heal-wave",
+        "fit": "circle",
+        "size": 1.2
+      }
+    },
+    "boss-luster-purge": {
+      "extends": "psychic.base",
+      "strike": {
+        "id": "luster-orb",
+        "fit": "circle",
+        "size": 1.2,
+        "seconds": 0.5
+      }
     }
   }
 }

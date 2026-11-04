@@ -28,7 +28,7 @@ export class EnemySprites {
   constructor(
     private readonly scene: Phaser.Scene,
     /** 敵の種類（data/game/enemies.json の並び）ごとのスプライト。まだ読み込んでいなければ null */
-    private readonly manifestOf: (kind: number) => SpriteAnims | null,
+    private readonly manifestOf: (kind: number, hpRatio: number) => SpriteAnims | null,
     private readonly scale: number,
     private readonly animation: string,
     private readonly depth: number,
@@ -60,7 +60,7 @@ export class EnemySprites {
     for (let i = 0; i < e.count; i++) {
       // 先に消して見せている敵（ゲストが倒したと見込んだもの）は描かない
       if (e.hp[i]! <= 0) continue;
-      const manifest = this.manifestOf(e.kind[i]!);
+      const manifest = this.manifestOf(e.kind[i]!, e.hp[i]! / (e.maxHp[i]! || 1));
       if (!manifest) continue;
       const x = e.prevX[i]! + (e.x[i]! - e.prevX[i]!) * alpha;
       const y = e.prevY[i]! + (e.y[i]! - e.prevY[i]!) * alpha;

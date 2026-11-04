@@ -701,5 +701,200 @@
     }
   ],
   "legendaryBgm": null,
-  "intruderBgm": null
+  "intruderBgm": "hoenn-eon",
+  "legendary": {
+    "chance": 1,
+    "kinds": [
+      "steven-metagross"
+    ],
+    "moves": [
+      "legend-dash",
+      "legend-beam",
+      "legend-nova",
+      "legend-meteor"
+    ],
+    "rounds": [
+      {
+        "kinds": [
+          "steven-metagross"
+        ],
+        "stat": "stevenDefeated",
+        "bgm": "hoenn-steven"
+      },
+      {
+        "kinds": [
+          "legend-groudon",
+          "legend-kyogre"
+        ],
+        "bgm": "hoenn-legendary-weather"
+      }
+    ],
+    "finale": {
+      "chance": 0.3,
+      "kinds": [
+        "legend-rayquaza"
+      ],
+      "bgm": "hoenn-legendary-sky",
+      "item": {
+        "item": "meteorite",
+        "kinds": [
+          "legend-deoxys"
+        ],
+        "bgm": "hoenn-legendary-sky"
+      }
+    },
+    "fieldCycleSeconds": 30,
+    "intruders": {
+      "together": true,
+      "minutes": [
+        5,
+        7,
+        9,
+        11,
+        13,
+        15
+      ],
+      "chance": 0.01,
+      "kinds": [
+        "legend-latias",
+        "legend-latios"
+      ],
+      "timeLimitSeconds": 180
+    },
+    "moveSets": {
+      "steven-metagross": {
+        "moves": [
+          "metagross-psychic",
+          "metagross-meteor-mash"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.6,
+        "enrageMoveIntervalSeconds": 1.1,
+        "phases": [
+          {
+            "belowHpPct": 50,
+            "moves": [
+              "metagross-bullet-punch",
+              "metagross-zen-headbutt",
+              "metagross-meteor-mash"
+            ]
+          }
+        ]
+      },
+      "legend-groudon": {
+        "moves": [
+          "groudon-precipice-blades",
+          "groudon-eruption",
+          "groudon-solar-beam"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.9,
+        "enrageMoveIntervalSeconds": 1.3,
+        "field": {
+          "typePowerPct": {
+            "fire": 50,
+            "water": -50
+          },
+          "weather": "sun-weather",
+          "groundTint": "#fff0c8"
+        }
+      },
+      "legend-kyogre": {
+        "moves": [
+          "kyogre-origin-pulse",
+          "kyogre-water-spout",
+          "kyogre-thunder"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.9,
+        "enrageMoveIntervalSeconds": 1.3,
+        "field": {
+          "typePowerPct": {
+            "water": 50,
+            "fire": -50
+          },
+          "weather": "rain-dance",
+          "groundTint": "#a0b4d8"
+        }
+      },
+      "legend-rayquaza": {
+        "moves": [
+          "rayquaza-dragon-ascent",
+          "rayquaza-draco-meteor",
+          "rayquaza-outrage",
+          "rayquaza-hurricane"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.4,
+        "enrageMoveIntervalSeconds": 1,
+        "field": {
+          "overlay": {
+            "color": "#b2dfdb",
+            "alpha": 0.08
+          }
+        }
+      },
+      "legend-deoxys": {
+        "moves": [
+          "deoxys-psycho-boost",
+          "deoxys-swift"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.5,
+        "enrageMoveIntervalSeconds": 1.1,
+        "phases": [
+          {
+            "belowHpPct": 75,
+            "moves": [
+              "deoxys-hyper-beam",
+              "deoxys-thunderbolt"
+            ]
+          },
+          {
+            "belowHpPct": 50,
+            "moves": [
+              "deoxys-cosmic-power",
+              "deoxys-swift",
+              "deoxys-recover"
+            ]
+          },
+          {
+            "belowHpPct": 25,
+            "moves": [
+              "deoxys-agility",
+              "deoxys-teleport",
+              "deoxys-teleport"
+            ]
+          }
+        ]
+      },
+      "legend-latias": {
+        "moves": [
+          "latias-mist-ball",
+          "latias-dragon-breath",
+          "latias-heal-pulse"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.5,
+        "enrageMoveIntervalSeconds": 1.1
+      },
+      "legend-latios": {
+        "moves": [
+          "latios-luster-purge",
+          "latios-dragon-pulse"
+        ],
+        "random": false,
+        "moveIntervalSeconds": 1.7,
+        "enrageMoveIntervalSeconds": 1.2
+      }
+    },
+    "moveIntervalSeconds": 1.5,
+    "warningSeconds": 2,
+    "timeLimitSeconds": 180,
+    "enrage": {
+      "hpRatio": 0.5,
+      "moveIntervalSeconds": 1.1,
+      "doubleChance": 0.35
+    }
+  }
 }

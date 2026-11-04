@@ -351,6 +351,8 @@ export class RunScene extends Phaser.Scene {
     // 会えないほど会いやすく: クリアの回数ごとに、伝説戦の起きる確率を上げる
     if (this.sim.world.legendaryForce && force?.chanceUp) this.sim.world.legendaryChanceBonus = force.chanceUp.step * (myStats[force.chanceUp.stat] ?? 0);
     // はね（ルギア・ホウオウ戦の権利）: 参加者のだれかが条件の実績を達成していれば、箱から出るようになる（どのブラウザでも同じ）
+    // いんせき: 実績に関わらず箱から出る（ホウエン。07 の189章）
+    if (rules.stage.legendary?.finale) this.sim.world.wingsEnabled.add(rules.stage.legendary.finale.item.item);
     for (const b of rules.stage.legendary?.bonusRounds ?? []) if (roster.some((r) => r.achievements.includes(b.achievement))) this.sim.world.wingsEnabled.add(b.item);
     // 実績の報酬（07 23・24章）: 各自の達成した実績から、解放した持ち物・特殊なバフを計算する。協力プレイの経験値は部屋の全員に
     // 報酬は、遊ぶ地方の実績のぶんだけ（02 の17章）
@@ -512,13 +514,20 @@ export class RunScene extends Phaser.Scene {
       this,
       rules.enemies.kinds.map((k) => k.sprite),
       Math.round(spriteRender.enemyPreloadSeconds * simulationConfig.tickRate),
+      (kind) => (rules.enemies.kinds[kind]?.formKinds ?? []).map((f) => rules.enemies.kinds.findIndex((x) => x.id === f.kind)),
     );
     // 雑魚の絵はランが終わったら解放する（07 の114章）
     const streamer = this.streamer;
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => streamer.unloadAll());
     this.enemySpriteView = new EnemySprites(
       this,
-      (kind) => this.streamer.manifestOf(kind),
+      (kind, hpRatio) => {
+        // フォルムの絵（デオキシス）: HP の割合で別の種類の絵を使う。まだ読み込めていなければ元の絵
+        const forms = rules.enemies.kinds[kind]?.formKinds;
+        const form = forms?.filter((f) => hpRatio * 100 < f.belowHpPct).at(-1);
+        const k = form ? rules.enemies.kinds.findIndex((x) => x.id === form.kind) : kind;
+        return this.streamer.manifestOf(k) ?? this.streamer.manifestOf(kind);
+      },
       spriteRender.enemyScale,
       spriteRender.enemyAnimation,
       depths.enemies,
@@ -1107,6 +1116,7 @@ export class RunScene extends Phaser.Scene {
         }
         else if (it.kind === 'magnet') this.announce(t('item.magnet'), '#ef9a9a');
         // はね: だれが拾っても全員に知らせる（全員のランでルギア・ホウオウと戦える）
+        else if (it.kind === 'meteorite') this.announce(t('run.meteoriteGot', { name: localName(generated.items.meteorite?.names, getLocale(), it.kind) }), '#ce93d8');
         else if (it.kind === 'silver-wing' || it.kind === 'rainbow-wing') this.announce(t('run.wingGot', { name: localName(generated.items[it.kind]?.names, getLocale(), it.kind) }), it.kind === 'silver-wing' ? '#e0e0e0' : '#ffcc80');
         // ミルクのみのびん: 原作の回復の言葉（07 の184章）
         else if (it.kind === 'moomoo-milk' && it.by === this.localId) this.announce(t('item.milkDrink'), '#ce93d8');

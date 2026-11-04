@@ -694,5 +694,6 @@
   "contest.rank.normal": "ノーマル",
   "contest.rank.super": "スーパー",
   "contest.rank.hyper": "ハイパー",
-  "contest.rank.master": "マスター"
+  "contest.rank.master": "マスター",
+  "run.meteoriteGot": "{name}を ひろった！ 空から なにかが くる……"
 }

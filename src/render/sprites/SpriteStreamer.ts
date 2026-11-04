@@ -21,6 +21,8 @@ export class SpriteStreamer {
     private readonly spriteOfKind: readonly (string | undefined)[],
     /** 次の時間帯の何回前の更新から読み込み始めるか */
     private readonly lookaheadTicks: number,
+    /** 一緒に読み込む種類（デオキシスのフォルムの絵。07 の189章） */
+    private readonly formsOfKind: (kind: number) => readonly number[] = () => [],
   ) {}
 
   update(world: World): void {
@@ -35,7 +37,10 @@ export class SpriteStreamer {
     const left = ticksUntilNextSection(world);
     if (next && left !== null && left <= this.lookaheadTicks) next.kinds.forEach(add);
     const e = world.enemies;
-    for (let i = 0; i < e.count; i++) add(e.kind[i]!);
+    for (let i = 0; i < e.count; i++) {
+      add(e.kind[i]!);
+      this.formsOfKind(e.kind[i]!).forEach(add);
+    }
 
     for (const key of needed) {
       if (!this.loaded.has(key) && !this.loading.has(key) && !this.failed.has(key)) void this.load(key);

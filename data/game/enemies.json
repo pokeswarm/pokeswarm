@@ -2380,6 +2380,164 @@
       "xp": 0,
       "spriteScale": 2.6,
       "decoy": true
+    },
+    {
+      "id": "steven-metagross",
+      "species": "metagross",
+      "rank": "legendary",
+      "asBoss": true,
+      "sprite": "enemy/metagross",
+      "hp": 80000,
+      "moveSpeed": 90,
+      "radius": 40,
+      "contactDamage": 42,
+      "xp": 0,
+      "spriteScale": 2.6,
+      "motion": {
+        "type": "keepDistance",
+        "distance": 300
+      }
+    },
+    {
+      "id": "legend-groudon",
+      "species": "groudon",
+      "rank": "legendary",
+      "asBoss": true,
+      "sprite": "enemy/groudon",
+      "hp": 64000,
+      "moveSpeed": 95,
+      "radius": 48,
+      "contactDamage": 46,
+      "xp": 0,
+      "spriteScale": 2.4
+    },
+    {
+      "id": "legend-kyogre",
+      "species": "kyogre",
+      "rank": "legendary",
+      "asBoss": true,
+      "sprite": "enemy/kyogre",
+      "hp": 64000,
+      "moveSpeed": 130,
+      "radius": 48,
+      "contactDamage": 46,
+      "xp": 0,
+      "spriteScale": 2.4,
+      "motion": {
+        "type": "keepDistance",
+        "distance": 340
+      }
+    },
+    {
+      "id": "legend-rayquaza",
+      "species": "rayquaza",
+      "rank": "legendary",
+      "asBoss": true,
+      "sprite": "enemy/rayquaza",
+      "hp": 90000,
+      "moveSpeed": 190,
+      "radius": 48,
+      "contactDamage": 50,
+      "xp": 0,
+      "spriteScale": 2.8
+    },
+    {
+      "id": "legend-deoxys",
+      "species": "deoxys-normal",
+      "rank": "legendary",
+      "asBoss": true,
+      "sprite": "enemy/deoxys-normal",
+      "hp": 100000,
+      "moveSpeed": 150,
+      "radius": 36,
+      "contactDamage": 50,
+      "xp": 0,
+      "spriteScale": 2.6,
+      "motion": {
+        "type": "keepDistance",
+        "distance": 300
+      },
+      "formKinds": [
+        {
+          "belowHpPct": 75,
+          "kind": "form-deoxys-attack"
+        },
+        {
+          "belowHpPct": 50,
+          "kind": "form-deoxys-defense"
+        },
+        {
+          "belowHpPct": 25,
+          "kind": "form-deoxys-speed"
+        }
+      ]
+    },
+    {
+      "id": "form-deoxys-attack",
+      "species": "deoxys-attack",
+      "rank": "legendary",
+      "asBoss": true,
+      "sprite": "enemy/deoxys-attack",
+      "hp": 1,
+      "moveSpeed": 0,
+      "radius": 36,
+      "contactDamage": 0,
+      "xp": 0,
+      "spriteScale": 2.6
+    },
+    {
+      "id": "form-deoxys-defense",
+      "species": "deoxys-defense",
+      "rank": "legendary",
+      "asBoss": true,
+      "sprite": "enemy/deoxys-defense",
+      "hp": 1,
+      "moveSpeed": 0,
+      "radius": 36,
+      "contactDamage": 0,
+      "xp": 0,
+      "spriteScale": 2.6
+    },
+    {
+      "id": "form-deoxys-speed",
+      "species": "deoxys-speed",
+      "rank": "legendary",
+      "asBoss": true,
+      "sprite": "enemy/deoxys-speed",
+      "hp": 1,
+      "moveSpeed": 0,
+      "radius": 36,
+      "contactDamage": 0,
+      "xp": 0,
+      "spriteScale": 2.6
+    },
+    {
+      "id": "legend-latias",
+      "species": "latias",
+      "rank": "legendary",
+      "sprite": "enemy/latias",
+      "hp": 44800,
+      "moveSpeed": 175,
+      "radius": 36,
+      "contactDamage": 40,
+      "xp": 0,
+      "spriteScale": 2.4
+    },
+    {
+      "id": "legend-latios",
+      "species": "latios",
+      "rank": "legendary",
+      "sprite": "enemy/latios",
+      "hp": 44800,
+      "moveSpeed": 160,
+      "radius": 36,
+      "contactDamage": 40,
+      "xp": 0,
+      "spriteScale": 2.4,
+      "motion": {
+        "type": "keepDistance",
+        "distance": 300
+      }
     }
   ]
 }

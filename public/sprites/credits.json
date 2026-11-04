@@ -3898,5 +3898,133 @@
     ],
     "license": "CC BY-NC 4.0",
     "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0292"
+  },
+  {
+    "key": "groudon",
+    "dex": 383,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0383"
+  },
+  {
+    "key": "kyogre",
+    "dex": 382,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0382"
+  },
+  {
+    "key": "rayquaza",
+    "dex": 384,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0384"
+  },
+  {
+    "key": "deoxys-normal",
+    "dex": 386,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0386"
+  },
+  {
+    "key": "deoxys-attack",
+    "dex": 386,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0386/0001"
+  },
+  {
+    "key": "deoxys-defense",
+    "dex": 386,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0386/0002"
+  },
+  {
+    "key": "deoxys-speed",
+    "dex": 386,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0386/0003"
+  },
+  {
+    "key": "latias",
+    "dex": 380,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      },
+      {
+        "name": "Emmuffin",
+        "contact": "https://twitter.com/Ernmuffin"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0380"
+  },
+  {
+    "key": "latios",
+    "dex": 381,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0381"
+  },
+  {
+    "key": "jirachi",
+    "dex": 385,
+    "authors": [
+      {
+        "name": "CHUNSOFT",
+        "contact": "https://www.spike-chunsoft.com/"
+      },
+      {
+        "name": "Grimlin",
+        "contact": "https://twitter.com/Griimlin"
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0385"
   }
 ]

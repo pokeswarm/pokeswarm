@@ -694,5 +694,6 @@
   "contest.rank.normal": "Normal",
   "contest.rank.super": "Super",
   "contest.rank.hyper": "Hyper",
-  "contest.rank.master": "Master"
+  "contest.rank.master": "Master",
+  "run.meteoriteGot": "You found a {name}! Something is coming from the sky..."
 }

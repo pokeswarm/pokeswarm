@@ -284,7 +284,7 @@ for (const [region, r] of Object.entries(pickupConfig.regionBuffs)) {
 }
 for (const k of contestConfig.npcPokemon) check(!!generated.pokemon[k], `data/game/contest.json の NPC "${k}" が data/generated/pokemon.json にありません`);
 for (const r of contestConfig.ranks) check(r.npcScores.length >= contestConfig.entrants - 1, `data/game/contest.json のランク "${r.id}" の NPC の点数が足りません`);
-for (const name of ['potion', 'magnet', 'rare-candy', 'candy-box', 'candy-box-open', 'buff', 'buff-box', 'buff-box-open', 'moomoo-milk']) {
+for (const name of ['meteorite', 'potion', 'magnet', 'rare-candy', 'candy-box', 'candy-box-open', 'buff', 'buff-box', 'buff-box-open', 'moomoo-milk']) {
   check(!!itemSprites.sprites[name], `data/render/items.json に "${name}" のドット絵がありません`);
 }
 // BGM: 曲はファイルか楽譜のどちらかを持つ。楽譜は data/audio/music にあるもの
@@ -344,7 +344,7 @@ for (const rs of Object.values(regionStages)) {
     if (b.tag) check(stageConfig.bosses.filter((x) => x.tag && x.wave === b.wave).length >= 2, `${file} の "${b.kind}" は tag なのに、区間 ${b.wave + 1} に組の相手がいません`);
   }
   for (const kinds of rs.obstacles.sections) for (const k of kinds) check(!!obstacleSprites.sprites[k], `${file} の障害物 "${k}" のドット絵が data/render/obstacles.json にありません`);
-  const roundBgm = [...(rs.stage.legendary?.rounds ?? []), ...(rs.stage.legendary?.bonusRounds ?? [])].flatMap((r) => (r.bgm ? [r.bgm] : []));
+  const roundBgm = [...(rs.stage.legendary?.rounds ?? []), ...(rs.stage.legendary?.bonusRounds ?? []), ...(rs.stage.legendary?.finale ? [rs.stage.legendary.finale, rs.stage.legendary.finale.item] : [])].flatMap((r) => (r.bgm ? [r.bgm] : []));
   for (const id of [...rs.bgmRun.sections, rs.bgmRun.legendary, rs.bgmRun.intruder, ...roundBgm]) check(id === null || !!bgmConfig.tracks[id], `${file} の曲 "${id}" が data/audio/bgm.json の tracks にありません`);
   for (const b of stageConfig.bosses) {
     const rank = enemiesConfig.kinds.find((k) => k.id === b.kind)?.rank;
@@ -371,7 +371,7 @@ for (const rs of Object.values(regionStages)) {
     if (force) check(stageConfig.legendary.kinds.includes(force.kind), `${file} の決まった伝説 "${force.kind}" が伝説の候補（kinds）にありません`);
     // 続けて戦うラウンド（レッド）・はねの戦い（ルギア・ホウオウ）・乱入（三犬）の相手も、伝説の敵であること
     const lg = stageConfig.legendary;
-    const roundKinds = [...(lg.rounds ?? []).flatMap((r) => r.kinds), ...(lg.bonusRounds ?? []).flatMap((r) => r.kinds), ...(lg.intruders?.kinds ?? [])];
+    const roundKinds = [...(lg.rounds ?? []).flatMap((r) => r.kinds), ...(lg.bonusRounds ?? []).flatMap((r) => r.kinds), ...(lg.intruders?.kinds ?? []), ...(lg.finale?.kinds ?? []), ...(lg.finale?.item.kinds ?? [])];
     for (const b of lg.bonusRounds ?? []) check(achievementsConfig.achievements.some((a) => a.id === b.achievement), `${file} のはね "${b.item}" の条件の実績 "${b.achievement}" がありません`);
     for (const id of roundKinds) {
       check(enemiesConfig.kinds.find((k) => k.id === id)?.rank === 'legendary', `${file} の伝説のラウンド・乱入の "${id}" が data/game/enemies.json に rank: "legendary" でありません`);

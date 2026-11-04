@@ -61,6 +61,7 @@ function spawnLegend(world: World, kind: number, hpScale = 1): number {
     enrage,
     false,
     hpScale,
+    set?.phases?.map((ph) => ({ belowRatio: ph.belowHpPct / 100, moves: ph.moves.map((m) => world.rules.stage.moves.findIndex((x) => x.id === m)) })),
   );
   const boss = world.bosses.find((b) => b.id === id);
   if (boss && set?.random) boss.random = true;
@@ -230,19 +231,29 @@ export function stepIntruders(world: World): void {
   if (it && !it.done) {
     if (it.id === -1) {
       if (world.tick < it.appearTick) return;
-      it.id = spawnLegend(world, it.kind);
+      // ラティ兄妹は2体一緒に。ほかは1体
+      const kinds = cfg?.together ? cfg.kinds.map((id) => world.rules.enemies.kinds.findIndex((k) => k.id === id)) : [it.kind];
+      const ids = kinds.map((k) => spawnLegend(world, k));
       // 出せなかった（敵の上限）なら、次の更新で出し直す
+      if (ids.some((id) => id === -1)) return;
+      it.id = ids[0]!;
+      it.ids = ids;
       return;
     }
-    const i = findEnemyIndex(world, it.id);
-    if (i === -1 || world.enemies.hp[i]! <= 0) {
+    const alive = (it.ids ?? [it.id]).filter((id) => {
+      const i = findEnemyIndex(world, id);
+      return i !== -1 && world.enemies.hp[i]! > 0;
+    });
+    if (alive.length === 0) {
       it.done = true;
       return;
     }
     if (world.tick >= it.endTick) {
       it.done = true;
-      world.enemies.hp[i] = 0;
-      world.events.push({ type: 'enemyRetired', id: it.id });
+      for (const id of alive) {
+        world.enemies.hp[findEnemyIndex(world, id)] = 0;
+        world.events.push({ type: 'enemyRetired', id });
+      }
       world.events.push({ type: 'intruderLeft', kind: it.kind });
     }
     return;
@@ -251,7 +262,7 @@ export function stepIntruders(world: World): void {
   while (world.nextIntruderCheck < cfg.minutes.length && world.tick >= Math.round((cfg.minutes[world.nextIntruderCheck]! * 60) / world.dt)) {
     world.nextIntruderCheck++;
     if (world.rng.next() >= cfg.chance) continue;
-    const kind = world.rules.enemies.kinds.findIndex((k) => k.id === cfg.kinds[world.rng.int(cfg.kinds.length)]);
+    const kind = world.rules.enemies.kinds.findIndex((k) => k.id === cfg.kinds[cfg.together ? 0 : world.rng.int(cfg.kinds.length)]);
     if (kind !== -1) startIntruder(world, kind);
     return;
   }
@@ -592,7 +603,7 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     const cx = self ? bx : target.x;
     const cy = self ? by : target.y;
     const base = (arms.absolute ? 0 : Math.atan2(uy, ux)) + (arms.offsetDegrees * Math.PI) / 180;
-    const angles = arms.angles?.map((d) => (d * Math.PI) / 180) ?? Array.from({ length: arms.count }, (_, k) => base + (k * Math.PI * 2) / arms.count);
+    const angles = arms.fan?.map((d) => Math.atan2(uy, ux) + (d * Math.PI) / 180) ?? arms.angles?.map((d) => (d * Math.PI) / 180) ?? Array.from({ length: arms.count }, (_, k) => base + (k * Math.PI * 2) / arms.count);
     for (const a of angles) {
       // 狙った人が真ん中: 線は中心より少し手前から（×の交わる所も当たる）
       const back = self ? 0 : move.radius;
@@ -615,9 +626,14 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   }
   if (move.along) {
     // 狙った人への向きに並べて順に（エンテイのふみつけ）
-    for (let c = 0; c < move.count; c++) {
-      const d = move.along.start + c * move.along.spacing;
-      put(bx + ux * d, by + uy * d, ux, uy, -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
+    for (const deg of move.fan ?? [0]) {
+      const a = Math.atan2(uy, ux) + (deg * Math.PI) / 180;
+      const vx = Math.cos(a);
+      const vy = Math.sin(a);
+      for (let c = 0; c < move.count; c++) {
+        const d = move.along.start + c * move.along.spacing;
+        put(bx + vx * d, by + vy * d, vx, vy, -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
+      }
     }
     return;
   }
@@ -1314,14 +1330,18 @@ export function activeLegendField(world: World): { field: LegendField; index: nu
   let out: { field: LegendField; index: number } | null = null;
   if (kinds.size > 0) {
     const e = world.enemies;
+    // 同時に戦う相手の場の効果を、決まった秒数ごとに入れ替える（天気の伝説）。残りが1体ならその場のまま
+    const cycle = world.rules.stage.legendary?.fieldCycleSeconds;
+    const found: { field: LegendField; index: number }[] = [];
     for (let i = 0; i < e.count; i++) {
       if (e.hp[i]! <= 0) continue;
       const field = kinds.get(e.kind[i]!);
       if (field) {
-        out = { field, index: i };
-        break;
+        found.push({ field, index: i });
+        if (!cycle) break;
       }
     }
+    if (found.length > 0) out = found[cycle ? Math.floor(((world.tick - (world.legendary?.appearTick ?? 0)) * world.dt) / cycle) % found.length : 0]!;
   }
   fieldTick.set(world, { tick: world.tick, out });
   return out;
@@ -1381,7 +1401,7 @@ export function legendRoundKinds(world: World, kind: number): readonly number[] 
 /** このランで戦うラウンドの並び: rounds の後に、拾ったはねの bonusRounds（ルギア・ホウオウ） */
 function roundSequence(world: World): readonly (readonly number[])[] {
   const r = legendRounds(world);
-  return [...r.rounds.map((x) => x.kinds), ...r.bonus.filter((b) => world.wings.has(b.item)).map((b) => b.kinds)];
+  return [...r.rounds.map((x) => x.kinds), ...r.bonus.filter((b) => world.wings.has(b.item)).map((b) => b.kinds), ...(world.finaleKinds ? [world.finaleKinds] : [])];
 }
 
 /**
@@ -1481,8 +1501,18 @@ export function counterPick(world: World, ids: readonly string[]): string {
 }
 
 /** クリア: 確率で伝説戦を始める。始めないならランを終える */
+/** 最後の戦いの相手を決める（1回だけ）: いんせきがあればデオキシス、無ければ確率でレックウザ（07 の189章） */
+function rollFinale(world: World): void {
+  const f = world.rules.stage.legendary?.finale;
+  if (!f) return;
+  const idx = (id: string): number => world.rules.enemies.kinds.findIndex((k) => k.id === id);
+  if (world.wings.has(f.item.item)) world.finaleKinds = f.item.kinds.map(idx);
+  else if (world.rng.next() < f.chance) world.finaleKinds = f.kinds.map(idx);
+}
+
 function startLegendaryOrClear(world: World): void {
   const cfg = world.rules.stage.legendary;
+  rollFinale(world);
   // 続けて戦うラウンド（レッド戦）があれば、必ず1つ目から
   const seq = roundSequence(world);
   if (cfg && seq.length > 0) {

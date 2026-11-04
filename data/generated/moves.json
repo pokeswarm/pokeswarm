@@ -402,6 +402,19 @@
     "contestType": "beauty",
     "damageClass": "status"
   },
+  "cosmic-power": {
+    "names": {
+      "ja": "コスモパワー",
+      "en": "Cosmic Power",
+      "fr": "Force Cosmique",
+      "de": "Kosmik-Kraft",
+      "es": "Masa Cósmica",
+      "it": "Cosmoforza"
+    },
+    "type": "psychic",
+    "contestType": "cool",
+    "damageClass": "status"
+  },
   "counter": {
     "names": {
       "ja": "カウンター",
@@ -558,6 +571,19 @@
     "contestType": "beauty",
     "damageClass": "physical"
   },
+  "doom-desire": {
+    "names": {
+      "ja": "はめつのねがい",
+      "en": "Doom Desire",
+      "fr": "Vœu Destructeur",
+      "de": "Kismetwunsch",
+      "es": "Deseo Oculto",
+      "it": "Obbliderio"
+    },
+    "type": "steel",
+    "contestType": "cool",
+    "damageClass": "special"
+  },
   "double-edge": {
     "names": {
       "ja": "すてみタックル",
@@ -622,6 +648,19 @@
     "type": "dragon",
     "contestType": "smart",
     "damageClass": "special"
+  },
+  "dragon-ascent": {
+    "names": {
+      "ja": "ガリョウテンセイ",
+      "en": "Dragon Ascent",
+      "fr": "Draco-Ascension",
+      "de": "Zenitstürmer",
+      "es": "Ascenso Draco",
+      "it": "Ascesa del Drago"
+    },
+    "type": "flying",
+    "contestType": null,
+    "damageClass": "physical"
   },
   "dragon-breath": {
     "names": {
@@ -1182,6 +1221,19 @@
     "contestType": "tough",
     "damageClass": "status"
   },
+  "heal-pulse": {
+    "names": {
+      "ja": "いやしのはどう",
+      "en": "Heal Pulse",
+      "fr": "Vibra Soin",
+      "de": "Heilwoge",
+      "es": "Pulso Cura",
+      "it": "Ondasana"
+    },
+    "type": "psychic",
+    "contestType": null,
+    "damageClass": "status"
+  },
   "healing-wish": {
     "names": {
       "ja": "いやしのねがい",
@@ -1520,6 +1572,19 @@
     "contestType": null,
     "damageClass": "physical"
   },
+  "luster-purge": {
+    "names": {
+      "ja": "ラスターパージ",
+      "en": "Luster Purge",
+      "fr": "Lumi-Éclat",
+      "de": "Scheinwerfer",
+      "es": "Resplandor",
+      "it": "Abbagliante"
+    },
+    "type": "psychic",
+    "contestType": "smart",
+    "damageClass": "special"
+  },
   "mach-punch": {
     "names": {
       "ja": "マッハパンチ",
@@ -1702,6 +1767,19 @@
     "contestType": "beauty",
     "damageClass": "status"
   },
+  "mist-ball": {
+    "names": {
+      "ja": "ミストボール",
+      "en": "Mist Ball",
+      "fr": "Ball’Brume",
+      "de": "Nebelball",
+      "es": "Bola Neblina",
+      "it": "Foschisfera"
+    },
+    "type": "psychic",
+    "contestType": "smart",
+    "damageClass": "special"
+  },
   "moonblast": {
     "names": {
       "ja": "ムーンフォース",
@@ -1818,6 +1896,19 @@
     "type": "dark",
     "contestType": "beauty",
     "damageClass": "physical"
+  },
+  "origin-pulse": {
+    "names": {
+      "ja": "こんげんのはどう",
+      "en": "Origin Pulse",
+      "fr": "Onde Originelle",
+      "de": "Ursprungswoge",
+      "es": "Pulso Primigenio",
+      "it": "Primopulsar"
+    },
+    "type": "water",
+    "contestType": null,
+    "damageClass": "special"
   },
   "outrage": {
     "names": {
@@ -1961,6 +2052,19 @@
     "type": "ice",
     "contestType": "beauty",
     "damageClass": "special"
+  },
+  "precipice-blades": {
+    "names": {
+      "ja": "だんがいのつるぎ",
+      "en": "Precipice Blades",
+      "fr": "Lame Pangéenne",
+      "de": "Abgrundsklinge",
+      "es": "Filo del Abismo",
+      "it": "Spade Telluriche"
+    },
+    "type": "ground",
+    "contestType": null,
+    "damageClass": "physical"
   },
   "psybeam": {
     "names": {
@@ -2989,6 +3093,19 @@
     "contestType": "cool",
     "damageClass": "physical"
   },
+  "wish": {
+    "names": {
+      "ja": "ねがいごと",
+      "en": "Wish",
+      "fr": "Vœu",
+      "de": "Wunschtraum",
+      "es": "Deseo",
+      "it": "Desiderio"
+    },
+    "type": "normal",
+    "contestType": "cute",
+    "damageClass": "status"
+  },
   "x-scissor": {
     "names": {
       "ja": "シザークロス",
@@ -3027,5 +3144,18 @@
     "type": "electric",
     "contestType": "cool",
     "damageClass": "special"
+  },
+  "zen-headbutt": {
+    "names": {
+      "ja": "しねんのずつき",
+      "en": "Zen Headbutt",
+      "fr": "Psykoud’Boul",
+      "de": "Zen-Kopfstoß",
+      "es": "Cabezazo Zen",
+      "it": "Cozzata Zen"
+    },
+    "type": "psychic",
+    "contestType": "beauty",
+    "damageClass": "physical"
   }
 }

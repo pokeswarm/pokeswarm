@@ -1,0 +1,36 @@
+{
+  "key": "enemy/kyogre",
+  "dex": 382,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 64,
+      "frameHeight": 72,
+      "durations": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

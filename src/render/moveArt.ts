@@ -5532,6 +5532,180 @@ function diveSplash(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- ボスの技（07 の189章）: ダイゴ・ホウエンの伝説 ----------------
+/** しねんのずつき: 頭の前に集まる念の光の盾（右向き） */
+function zenAura(): SpriteOut {
+  const palette = ['#2a1050', '#8e44ec', '#d1a6ff', '#ffffff'];
+  const frames = [0, 1].map((f) =>
+    shape(24, (u, v) => {
+      const d = Math.hypot(u + 0.2, v);
+      const a = Math.atan2(v, u + 0.2);
+      if (Math.abs(a) > 1.25) return -1;
+      const r = 0.82 + Math.sin(a * 7 + f * 2) * 0.05;
+      if (d > r || d < r - 0.26) return -1;
+      return d > r - 0.07 ? 3 : d > r - 0.16 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/** だんがいのつるぎ: 地面から突き上がる赤熱した岩の刃（上向き。根元に割れ目の赤い光） */
+function precipiceBlade(): SpriteOut {
+  const palette = ['#2a1208', '#6d3a1c', '#a0623a', '#d9a066', '#ff5a1f', '#ffd27a'];
+  const frames = [0, 1, 2].map((f) => {
+    const h = 0.55 + f * 0.25;
+    return shape(28, (u, v) => {
+      for (const [cx, w, top] of [[0, 0.3, 1], [-0.42, 0.2, 0.6], [0.4, 0.2, 0.7]] as const) {
+        const tip = 0.9 - 1.75 * h * top;
+        if (v < tip || v > 0.9) continue;
+        const k = (v - tip) / (0.9 - tip);
+        const hw = w * k;
+        if (Math.abs(u - cx) > hw) continue;
+        if (v > 0.68) return 4;
+        const side = (u - cx) / Math.max(0.01, hw);
+        return side < -0.3 ? 3 : side < 0.35 ? 2 : 1;
+      }
+      // 根元の亀裂: 細く折れ曲がる赤い光（四角い帯に見えないように）
+      if (Math.abs(u) < 0.7 && Math.abs(v - 0.86 - Math.sin(u * 9) * 0.05) < 0.028 && hash(Math.floor(u * 6), f) > 0.2) return hash(Math.floor(u * 11), f) > 0.5 ? 5 : 4;
+      return -1;
+    });
+  });
+  return { palette, frameMs: 90, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/** こんげんのはどう: 青い光線（真ん中が白く、ふちに波の模様が流れる） */
+function originBeam(): SpriteOut {
+  const palette = ['#06204a', '#0d63c9', '#4fc3f7', '#e1f5fe', '#ffffff'];
+  const H = 10;
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 6, middle: 12, end: 8 }, 3, (x, y, f, part) => {
+    const taper = part === 'start' ? 0.4 + x / 9 : part === 'end' ? 1 - x / 9 : 1;
+    const dy = Math.abs(y - mid);
+    const w = 3.6 * taper + (part === 'middle' ? Math.sin(((x + f * 4) / 12) * Math.PI * 2) * 0.6 : 0);
+    if (dy > w) return -1;
+    return dy < w * 0.3 ? 4 : dy < w * 0.55 ? 3 : dy < w * 0.8 ? 2 : 1;
+  }, 0);
+  return { palette, frameMs: 60, parts };
+}
+
+/** ガリョウテンセイ: 地面を追う細長い竜の影（緑がかった濃い影） */
+function ascentShadow(): SpriteOut {
+  const palette = ['#06281e', '#0c3f30', '#1b6b52'];
+  const frames = [0, 1].map((f) =>
+    shape(30, (u, v) => {
+      const wave = Math.sin(u * 5 + f * 1.5) * 0.14;
+      const d = Math.abs(v - wave);
+      const w = 0.2 * (1 - Math.abs(u) / 0.98);
+      if (Math.abs(u) > 0.98 || d > w) return -1;
+      return d < w * 0.4 ? 0 : d < w * 0.75 ? 1 : 2;
+    }),
+  );
+  return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
+}
+
+/** ガリョウテンセイ: 空から落ちる緑の光の柱が地面で弾ける */
+function ascentColumn(): SpriteOut {
+  const palette = ['#06281e', '#1aa36f', '#66f0b4', '#e8fff5', '#ffe066'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(36, (u, v) => {
+      const w = [0.42, 0.34, 0.2][f]!;
+      const d = Math.hypot(u, v);
+      if (f > 0 && Math.abs(d - (0.45 + f * 0.22)) < 0.06 && hash(Math.floor((Math.atan2(v, u) + 4) * 4), f) > 0.3) return f === 1 ? 2 : 1;
+      if (Math.abs(u) > w || v > 0.6) return -1;
+      const k = Math.abs(u) / w;
+      if (hash(Math.floor(u * 12), Math.floor(v * 6) + f) > 0.93) return 4;
+      return k < 0.35 ? 3 : k < 0.7 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
+}
+
+/** サイコブースト: 太い紫の光の柱（白い芯、ふちに桃色の火花が流れる） */
+function psychoPillar(): SpriteOut {
+  const palette = ['#23063f', '#7b1fd1', '#d05cff', '#ffc4f4', '#ffffff'];
+  const H = 14;
+  const mid = (H - 1) / 2;
+  const parts = lineParts(H, { start: 6, middle: 12, end: 8 }, 3, (x, y, f, part) => {
+    const taper = part === 'start' ? 0.5 + x / 12 : part === 'end' ? 1 - x / 10 : 1;
+    const dy = Math.abs(y - mid);
+    const w = 5.6 * taper;
+    if (dy > w) return part === 'middle' && dy < w + 1.2 && hash(Math.floor((x + f * 3) / 2), Math.floor(y)) > 0.7 ? 3 : -1;
+    return dy < w * 0.3 ? 4 : dy < w * 0.55 ? 3 : dy < w * 0.8 ? 2 : 1;
+  }, -1);
+  return { palette, frameMs: 60, parts };
+}
+
+/** コスモパワー: 体のまわりに集まる星（紺の帯に、白と黄の星が回る） */
+function cosmicStars(): SpriteOut {
+  const palette = ['#0b1038', '#2c3a96', '#ffffff', '#ffe066'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(40, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u) + f * 0.35;
+      for (let k = 0; k < 7; k++) {
+        const ak = (k / 7) * Math.PI * 2;
+        const r = 0.45 + (k % 3) * 0.2;
+        const dx = d * Math.cos(a) - r * Math.cos(ak);
+        const dy = d * Math.sin(a) - r * Math.sin(ak);
+        if (Math.abs(dx) + Math.abs(dy) < 0.09) return k % 2 ? 3 : 2;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/** ミストボール: 白い霧をまとった桃色の玉 */
+function mistOrb(): SpriteOut {
+  const palette = ['#7a3b5e', '#f48fb1', '#fde3ee', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(24, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      if (d < 0.5) return d < 0.22 ? 3 : u + v < -0.1 ? 3 : d < 0.4 ? 2 : 1;
+      if (d < 0.86 + Math.sin(a * 5 + f * 2) * 0.1) return hash(Math.floor((a + 4) * 3), f) > 0.35 ? 2 : -1;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 100, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/** いやしのはどう: 桃色の光が体に集まる（縦の細い光と十字のきらめき） */
+function healWave(): SpriteOut {
+  const palette = ['#c2487c', '#f8a5c8', '#ffe4f1', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(32, (u, v) => {
+      for (let k = 0; k < 6; k++) {
+        const cx = -0.7 + k * 0.28;
+        const cy = 0.6 - ((f * 0.35 + hash(k, 7) * 1.4) % 1.4);
+        const dx = Math.abs(u - cx);
+        const dy = Math.abs(v - cy);
+        if ((dx < 0.025 && dy < 0.14) || (dy < 0.025 && dx < 0.14)) return dx + dy < 0.05 ? 3 : k % 2 ? 2 : 1;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
+}
+
+/** ラスターパージ: 青白い光の玉が弾ける（中が白く、外へ光の筋） */
+function lusterOrb(): SpriteOut {
+  const palette = ['#0b2e6b', '#3f8cff', '#b7ddff', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(36, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      const core = [0.35, 0.5, 0.3][f]!;
+      if (d < core) return d < core * 0.55 ? 3 : 2;
+      const rays = Math.abs(Math.sin(a * 4 + 0.4));
+      if (d < core + 0.15 + f * 0.25 && rays > 0.82) return d < core + 0.15 ? 2 : 1;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
 /** 絵の名前 → 描く関数 */
@@ -5748,6 +5922,17 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     // したでなめる の舌・おどろかす の足元の影（07 の147章）
     tongue: () => tongue(),
     'shadow-pool': () => shadowPool(),
+    // ボスの技（07 の189章）
+    'zen-aura': () => zenAura(),
+    'precipice-blade': () => precipiceBlade(),
+    'origin-beam': () => originBeam(),
+    'ascent-shadow': () => ascentShadow(),
+    'ascent-column': () => ascentColumn(),
+    'psycho-pillar': () => psychoPillar(),
+    'cosmic-stars': () => cosmicStars(),
+    'mist-orb': () => mistOrb(),
+    'heal-wave': () => healWave(),
+    'luster-orb': () => lusterOrb(),
     // ボスの技（07 の167章）
     'bulk-aura': () => bulkAura(),
     'shadow-poof': () => shadowPoof(),

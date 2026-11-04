@@ -1,0 +1,38 @@
+{
+  "key": "enemy/latios",
+  "dex": 381,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 64,
+      "frameHeight": 80,
+      "durations": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

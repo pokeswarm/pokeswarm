@@ -159,5 +159,5 @@ function intruderPresent(world: World, since: number): boolean {
 function legendRoundBgm(world: World, kind: number): string | null {
   const lg = world.rules.stage.legendary;
   const id = world.rules.enemies.kinds[kind]?.id ?? '';
-  return [...(lg?.rounds ?? []), ...(lg?.bonusRounds ?? [])].find((r) => r.kinds.includes(id))?.bgm ?? null;
+  return [...(lg?.rounds ?? []), ...(lg?.bonusRounds ?? []), ...(lg?.finale ? [lg.finale, lg.finale.item] : [])].find((r) => r.kinds.includes(id))?.bgm ?? null;
 }

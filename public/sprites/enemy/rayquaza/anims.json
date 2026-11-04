@@ -1,0 +1,38 @@
+{
+  "key": "enemy/rayquaza",
+  "dex": 384,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 80,
+      "frameHeight": 128,
+      "durations": [
+        8,
+        8,
+        6,
+        4,
+        4,
+        4,
+        8,
+        8,
+        6,
+        6,
+        6,
+        6
+      ],
+      "frameKeyPrefix": "Walk"
+    }
+  },
+  "missing": []
+}

@@ -170,6 +170,10 @@ export const enemyKindSchema = z.object({
   species: z.string().optional(),
   /** 雑魚（normal・省略時）・中ボス（midboss）・ボス（boss）。中ボス・ボスは data/game/stage.json の予定で出す */
   rank: z.enum(['normal', 'midboss', 'boss', 'legendary']).optional(),
+  /** HP が belowHpPct % を切ると、kind の種類の絵で描く（デオキシスのフォルム。見た目だけ。07 の189章） */
+  formKinds: z.array(z.object({ belowHpPct: z.number().gt(0).lt(100), kind: z.string() })).optional(),
+  /** 伝説戦の形で戦うが、記録とコインはボスとして数える（ホウエンのダイゴ・グラードンなど。07 の189章） */
+  asBoss: z.boolean().optional(),
   /** ふしぎなまもり: 弱点のタイプの技でしか傷つかない（ヌケニン。07 の188章） */
   wonderGuard: z.boolean().optional(),
   /** 倒したときに落とす経験値。省略時は pickups.json の xpPerKill（雑魚には時間帯の xpMultiplier を掛ける） */
@@ -565,7 +569,9 @@ export const bossMoveSchema = z.object({
   /** 扇（cone）の開き（度） */
   arc: z.number().positive().max(360).optional(),
   /** 中心から count 本の直線を等しい角度で出す（×・大の字・十字）。offsetDegrees は狙った向きからのずれ。予告の場所はボス（self）か狙った人 */
-  arms: z.object({ count: z.number().int().min(2), offsetDegrees: z.number().default(0), /** 狙った向きに関係なく、画面に対して offsetDegrees の向きに出す（絵の×と当たり判定をそろえる。クロスチョップ） */ absolute: z.boolean().default(false), /** 等しい角度の代わりに、画面に対するこの向き（度。右が 0・下が 90）に出す（だいもんじ の大の字） */ angles: z.array(z.number()).optional() }).optional(),
+  /** along と一緒に: 狙った向きからこの度数ずつずらした列を全部出す（だんがいのつるぎ: 扇に奥へ順に。07 の189章） */
+  fan: z.array(z.number()).optional(),
+  arms: z.object({ count: z.number().int().min(2), offsetDegrees: z.number().default(0), /** 狙った向きからこの度数ずつずらして扇に出す（こんげんのはどう。07 の189章） */ fan: z.array(z.number()).optional(), /** 狙った向きに関係なく、画面に対して offsetDegrees の向きに出す（絵の×と当たり判定をそろえる。クロスチョップ） */ absolute: z.boolean().default(false), /** 等しい角度の代わりに、画面に対するこの向き（度。右が 0・下が 90）に出す（だいもんじ の大の字） */ angles: z.array(z.number()).optional() }).optional(),
   /** 落ちた後、直線の向きを回す（なぎ払い）: 合わせて degrees 度を seconds 秒で。予告は回る範囲の扇で見せる */
   sweep: z.object({ degrees: z.number(), seconds: z.number().positive() }).optional(),
   /** 落ちた後に当たる時間（秒。省略なら bossRules.hazardActiveSeconds） */
@@ -724,6 +730,8 @@ export const stageConfigSchema = z.object({
           z.string(),
           z.object({
             moves: z.array(z.string()).min(1),
+            /** 段階: HP が belowHpPct % を切ったら技を切り替える（デオキシス・メタグロス。07 の189章） */
+            phases: z.array(z.object({ belowHpPct: z.number().gt(0).lt(100), moves: z.array(z.string()).min(1) })).optional(),
             random: z.boolean().default(false),
             moveIntervalSeconds: z.number().positive().optional(),
             enrageMoveIntervalSeconds: z.number().positive().optional(),
@@ -780,13 +788,29 @@ export const stageConfigSchema = z.object({
        * rounds を全部倒した後、そのランで item（はね）を拾っていれば続けて戦う（ルギア・ホウオウ）。はねは、参加者のだれかが
        * achievement を達成していると、箱から出るようになる
        */
+      /**
+       * 最後の戦い（ホウエン。07 の189章）: rounds の後に chance の確率で kinds（レックウザ）と戦う。
+       * item を拾っていれば、確率に関わらず代わりに item.kinds（いんせき: デオキシス）と戦う
+       */
+      finale: z
+        .object({
+          chance: z.number().min(0).max(1),
+          kinds: z.array(z.string().min(1)).min(1),
+          bgm: z.string().optional(),
+          item: z.object({ item: z.literal('meteorite'), kinds: z.array(z.string().min(1)).min(1), bgm: z.string().optional() }),
+        })
+        .optional(),
+      /** 同時に戦う相手の場の効果が違うとき、この秒数ごとに入れ替える（天気の伝説: ひでり ⇄ あめ。片方を倒すと残った方のまま） */
+      fieldCycleSeconds: z.number().positive().optional(),
       bonusRounds: z.array(z.object({ item: z.enum(['silver-wing', 'rainbow-wing']), kinds: z.array(z.string().min(1)).min(1), achievement: z.string().min(1), bgm: z.string().optional() })).optional(),
       /**
        * 伝説の乱入（ジョウトの三犬。作者の決定 2026年10月26日）: ランの minutes 分ちょうどに、それぞれ chance の確率で kinds のどれかが乱入する
        * （1回のランで1回まで）。雑魚はそのまま。timeLimitSeconds で倒せなければ逃げる。技は moveSets
        */
       intruders: z
-        .object({ minutes: z.array(z.number().positive()).min(1), chance: z.number().min(0).max(1), kinds: z.array(z.string().min(1)).min(1), timeLimitSeconds: z.number().positive() })
+        .object({
+          /** kinds を全部同時に出す（ラティアス ＋ ラティオス。07 の189章） */
+          together: z.boolean().optional(), minutes: z.array(z.number().positive()).min(1), chance: z.number().min(0).max(1), kinds: z.array(z.string().min(1)).min(1), timeLimitSeconds: z.number().positive() })
         .optional(),
     })
     .nullable(),

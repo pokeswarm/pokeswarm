@@ -1375,7 +1375,7 @@
       "rooted": true,
       "holdWhileActive": true,
       "telegraphSeconds": 0.5,
-      "radius": 42,
+      "radius": 30,
       "damage": 36,
       "activeSeconds": 6,
       "hitEverySeconds": 0.6,
@@ -1384,7 +1384,7 @@
         "bounceBox": {
           "halfWidth": 520,
           "halfHeight": 340,
-          "angleJitterDegrees": 6
+          "aimEvery": 4
         }
       },
       "pose": "Charge"

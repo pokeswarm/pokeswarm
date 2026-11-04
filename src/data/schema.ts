@@ -608,10 +608,10 @@ export const bossMoveSchema = z.object({
       homingDegreesPerSecond: z.number().nonnegative().default(0),
       wobble: z.object({ amplitude: z.number().positive(), seconds: z.number().positive() }).optional(),
       /**
-       * 自分のプレイヤーを中心にしたこの大きさの箱の端で跳ね返る（画面の端で反射するボルテッカーの残像。どのブラウザでも自分の画面で跳ね返る。07 の194章）。
-       * angleJitterDegrees があれば、跳ね返るたびに向きを ±この角度の範囲でずらす（同じ線をなぞり続けない）
+       * 自分のプレイヤーを中心にしたこの大きさの箱の端で跳ね返る（画面の端を駆け巡るボルテッカーの残像。どのブラウザでも自分の画面で跳ね返る。07 の194章）。
+       * 次に飛ぶ先は別の壁のランダムな点で、aimEvery 回に 1 回はプレイヤーの今の場所を通す（真上下を往復しない・安全地帯を作らない）
        */
-      bounceBox: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), angleJitterDegrees: z.number().nonnegative().optional() }).optional(),
+      bounceBox: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), aimEvery: z.number().int().positive() }).optional(),
     })
     .optional(),
   /** target self の count 個を、ボスの周り radius に、狙った人の向きから順に（stagger）置く（ライコウのかみなり） */
@@ -1933,6 +1933,8 @@ export const effectRecipeSchema = z.object({
       alpha: z.number().min(0).max(1),
       afterimages: z.number().int().nonnegative(),
       spacingTicks: z.number().positive(),
+      /** ボスが放つ残像（ボルテッカー）: 絵を単色で塗る。先頭から順の色（白く光る体から、黄色の軌跡へ。07 の194章） */
+      fillColors: z.array(colorString).min(1).optional(),
       /** 色を periodMs ごとに順に切り替える（ボルテッカー: 10まんボルトのような黒・白・黄。作者の指摘 2026年10月25日）。省略なら tint のまま */
       colors: z.array(colorString).min(1).optional(),
       periodMs: z.number().positive().default(60),
@@ -2025,6 +2027,8 @@ export const effectRecipeSchema = z.object({
    * 予告の赤い範囲はそのまま（避けやすさのため）
    */
   strike: moveSpriteSpec.extend({ seconds: z.number().positive() }).optional(),
+  /** 跳ね返った所に出す絵（ボルテッカーの残像の火花。音は鳴らさない。07 の194章） */
+  bossBounce: moveSpriteSpec.extend({ seconds: z.number().positive() }).optional(),
   /**
    * 稲妻の線（10まんボルト・でんきショック・かみなりの連鎖）: 線の端から端まで1本のジグザグを、毎フレーム形を変えて描く
    * （同じ形の絵を並べると鎖のように見えた。作者の指摘 2026年10月24日）。jitter は折れ目のずれ（太さの何倍か）

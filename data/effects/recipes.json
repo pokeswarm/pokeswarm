@@ -5836,16 +5836,31 @@
     "boss-volt-tackle": {
       "extends": "volt-tackle",
       "ownerGhost": {
-        "tint": "#fff176",
-        "alpha": 0.85,
+        "tint": "#ffffff",
+        "alpha": 0.95,
         "afterimages": 6,
         "spacingTicks": 0.6,
-        "colors": [
-          "#ffeb3b",
-          "#212121",
-          "#ffffff"
-        ],
-        "periodMs": 60
+        "fillColors": [
+          "#ffffff",
+          "#ffffff",
+          "#fffde7",
+          "#fff59d",
+          "#ffee58",
+          "#fdd835",
+          "#f9a825"
+        ]
+      },
+      "bossActive": {
+        "id": "volt-fizzle",
+        "fit": "circle",
+        "size": 3.6,
+        "overBoss": true
+      },
+      "bossBounce": {
+        "id": "burst-thunder",
+        "fit": "circle",
+        "size": 2.2,
+        "seconds": 0.3
       }
     },
     "boss-jump": {

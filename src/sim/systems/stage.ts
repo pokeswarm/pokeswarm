@@ -1194,17 +1194,24 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
     const me = box ? (world.players.find((p) => p.id === world.localPlayerId) ?? nearestPlayer(world, hz.x, hz.y)) : null;
     if (box && me) {
       // 外へ向かっているときだけ跳ね返る（箱の外から出たときは、そのまま中へ入ってくる）
-      const hitX = (hz.x > me.x + box.halfWidth && hz.vx > 0) || (hz.x < me.x - box.halfWidth && hz.vx < 0);
-      const hitY = (hz.y > me.y + box.halfHeight && hz.vy > 0) || (hz.y < me.y - box.halfHeight && hz.vy < 0);
-      if (hitX) hz.vx = -hz.vx;
-      if (hitY) hz.vy = -hz.vy;
-      if ((hitX || hitY) && box.angleJitterDegrees !== undefined) {
-        // ずれは乱数の列を使わず、更新番号から決める（自分のブラウザだけの動きなので、ホストとずらさない）
-        const jitter = ((Math.sin(world.tick * 12.9898) * 43758.5453) % 1) * box.angleJitterDegrees * (Math.PI / 180);
-        const a = Math.atan2(hz.vy, hz.vx) + jitter;
+      const wall = hz.x > me.x + box.halfWidth && hz.vx > 0 ? 0 : hz.x < me.x - box.halfWidth && hz.vx < 0 ? 1 : hz.y > me.y + box.halfHeight && hz.vy > 0 ? 2 : hz.y < me.y - box.halfHeight && hz.vy < 0 ? 3 : -1;
+      if (wall !== -1) {
+        hz.bounces = (hz.bounces ?? 0) + 1;
+        // 乱数の列を使わず、更新番号から決める（自分のブラウザだけの動きなので、ホストとずらさない）
+        const rand = (k: number): number => Math.abs((Math.sin((world.tick + k) * 12.9898) * 43758.5453) % 1);
+        let tx = me.x;
+        let ty = me.y;
+        if (hz.bounces % box.aimEvery !== 0) {
+          // 今の壁以外の 3 辺のどこかへ
+          const side = [0, 1, 2, 3].filter((w) => w !== wall)[Math.floor(rand(1) * 3) % 3]!;
+          const u = rand(2) * 2 - 1;
+          tx = me.x + (side === 0 ? box.halfWidth : side === 1 ? -box.halfWidth : u * box.halfWidth);
+          ty = me.y + (side === 2 ? box.halfHeight : side === 3 ? -box.halfHeight : u * box.halfHeight);
+        }
+        const dir = Math.atan2(ty - hz.y, tx - hz.x);
         const sp = Math.hypot(hz.vx, hz.vy);
-        hz.vx = Math.cos(a) * sp;
-        hz.vy = Math.sin(a) * sp;
+        hz.vx = Math.cos(dir) * sp;
+        hz.vy = Math.sin(dir) * sp;
       }
     }
   }

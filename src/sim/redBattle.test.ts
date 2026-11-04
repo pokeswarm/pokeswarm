@@ -152,32 +152,41 @@ describe('レッド戦（07 の193章）', () => {
     run();
   });
 
-  it('ピカチュウ 行動 3: ボルテッカーは反射で速さが変わらず、反射の角度はほんの少しだけずれる', () => {
+  it('ピカチュウ 行動 3: ボルテッカーは別の壁へ飛び、決めた回数に 1 回プレイヤーを通す。縦や横に固まらない', () => {
     const sim = round(0);
     const w = sim.world;
     const i = indexOf(sim, 'red-pikachu');
     w.enemies.hp[i] = w.enemies.maxHp[i]! * 0.69;
     const m = rules0().stage.moves.find((x) => x.id === 'pika-volt-tackle-ghost')!;
+    const p = w.players[0]!;
     let ghost = null;
     for (let k = 0; k < 30 * 20 && !ghost; k++) {
       sim.step([]);
       ghost = w.hazards.find((h) => moveId(sim, h.move) === 'pika-volt-tackle-ghost' && h.activeTicks !== undefined) ?? null;
     }
-    let flips = 0;
+    let last = 0;
+    let aimed = 0;
+    const dirs: number[] = [];
     while (w.hazards.includes(ghost!)) {
-      const vx = ghost!.vx!;
-      const vy = ghost!.vy!;
       sim.step([]);
-      if (!w.hazards.includes(ghost!) || (ghost!.vx === vx && ghost!.vy === vy)) continue;
-      flips++;
+      if (!w.hazards.includes(ghost!) || (ghost!.bounces ?? 0) === last) continue;
+      last = ghost!.bounces!;
       expect(Math.hypot(ghost!.vx!, ghost!.vy!)).toBeCloseTo(m.travel!.speed, 3);
-      // 本来の反射（x か y の向きが返る）からのずれは、決めた角度まで
       const a = Math.atan2(ghost!.vy!, ghost!.vx!);
-      const candidates = [Math.atan2(vy, -vx), Math.atan2(-vy, vx), Math.atan2(-vy, -vx)];
-      const off = Math.min(...candidates.map((c) => Math.abs(Math.atan2(Math.sin(a - c), Math.cos(a - c)))));
-      expect((off * 180) / Math.PI).toBeLessThanOrEqual(m.travel!.bounceBox!.angleJitterDegrees! + 0.01);
+      dirs.push(a);
+      const toPlayer = Math.atan2(p.y - ghost!.y, p.x - ghost!.x);
+      const off = Math.abs(Math.atan2(Math.sin(a - toPlayer), Math.cos(a - toPlayer)));
+      if (last % m.travel!.bounceBox!.aimEvery === 0) {
+        expect(off).toBeLessThan(0.01);
+        aimed++;
+      }
     }
-    expect(flips).toBeGreaterThanOrEqual(10);
+    expect(last).toBeGreaterThanOrEqual(8);
+    expect(aimed).toBeGreaterThanOrEqual(2);
+    // 向きがばらける（縦だけ・横だけに固まらない）
+    const near = (deg: number): number => dirs.filter((a) => Math.abs(Math.abs(a) - (deg * Math.PI) / 180) < 0.2).length;
+    expect(near(90)).toBeLessThan(dirs.length * 0.6);
+    expect(near(0) + near(180)).toBeLessThan(dirs.length * 0.6);
   });
 
   it('ピカチュウ 行動 3: ボルテッカーは止まっていても動いていても当たりうる', () => {
@@ -208,7 +217,7 @@ describe('レッド戦（07 の193章）', () => {
     const still = hits(false);
     const moving = hits(true);
     console.log('ボルテッカーに当たった回数 止まっている', still, '動いている', moving);
-    expect(still + moving).toBeGreaterThan(0);
+    expect(still).toBeGreaterThanOrEqual(2);
   });
 
   it('交代: 第 3 ラウンドは順番の 1 体だけが動き、順番でない相手は遅く歩いて技を使わない', () => {

@@ -138,6 +138,8 @@ export class RunScene extends Phaser.Scene {
   /** 床に描く技の絵（ふんえんの噴煙）。ダメージの塗りつぶしの上、雑魚の下 */
   private floorSprites: MoveSprites | null = null;
   /** drift: 出てから毎秒この分だけ動かす（からげんきの汗が外の上へ飛ぶ） */
+  /** ボルテッカーの残像が跳ね返った回数（描画で見た分） */
+  private readonly ghostBounces = new WeakMap<object, number>();
   private strikes: { item: Omit<SpriteItem, 'elapsed' | 'alpha'>; start: number; seconds: number; drift?: { x: number; y: number } }[] = [];
   /** プレイヤーごとの、前に見た HP と、最後に HP が減った時刻（秒）と、最後に汗を出した時刻（からげんき。07 の141章） */
   private hurtSeen = new Map<number, { hp: number; hurtAt: number; sweatAt: number }>();
@@ -1514,6 +1516,7 @@ export class RunScene extends Phaser.Scene {
           .setPosition(x - stepX * ghost.spacingTicks * k, y - stepY * ghost.spacingTicks * k)
           .setScale(scaleX, scaleY)
           .setFlipX(frame.flipX)
+          .setTintMode(Phaser.TintModes.MULTIPLY)
           .setTint(hexColor(ghost.colors ? ghost.colors[(Math.floor(performance.now() / ghost.periodMs) + k) % ghost.colors.length]! : ghost.tint))
           .setAlpha(ghost.alpha * fade * (1 - k / (ghost.afterimages + 1)))
           .setDepth(depth - k * 0.001)
@@ -1534,6 +1537,16 @@ export class RunScene extends Phaser.Scene {
       const frames = manifest.animations[spriteRender.enemyAnimation]?.durations.length ?? 1;
       const frame = `${manifest.animations[spriteRender.enemyAnimation]?.frameKeyPrefix}/${directionFromVector(vx, vy)}/${Math.floor(this.time.now / 80) % frames}`;
       const scale = spriteRender.enemyScale * (world.rules.enemies.kinds[world.enemies.kind[i]!]?.spriteScale ?? 1);
+      // 跳ね返った所に火花を出す
+      const spark = effectRecipes[mv!.effect]?.bossBounce;
+      if (spark && (h.bounces ?? 0) !== (this.ghostBounces.get(h) ?? 0)) {
+        this.ghostBounces.set(h, h.bounces ?? 0);
+        this.strikes.push({
+          item: { spec: spark, x: h.x, y: h.y, radius: h.radius, band: 0, dirX: 1, dirY: 0, length: 0, vx: 0, vy: 0, seed: this.strikes.length },
+          start: this.time.now / 1000,
+          seconds: spark.seconds,
+        });
+      }
       for (let k = 0; k <= ghost.afterimages; k++) {
         let img = this.ghostImages[used];
         if (!img) {
@@ -1546,7 +1559,8 @@ export class RunScene extends Phaser.Scene {
           .setPosition(h.x + vx * alpha * world.dt - vx * world.dt * ghost.spacingTicks * k, h.y + vy * alpha * world.dt - vy * world.dt * ghost.spacingTicks * k)
           .setScale(scale, scale)
           .setFlipX(false)
-          .setTint(hexColor(ghost.colors ? ghost.colors[(Math.floor(performance.now() / ghost.periodMs) + k) % ghost.colors.length]! : ghost.tint))
+          .setTintMode(ghost.fillColors ? Phaser.TintModes.FILL : Phaser.TintModes.MULTIPLY)
+          .setTint(hexColor(ghost.fillColors ? ghost.fillColors[Math.min(k, ghost.fillColors.length - 1)]! : ghost.colors ? ghost.colors[(Math.floor(performance.now() / ghost.periodMs) + k) % ghost.colors.length]! : ghost.tint))
           .setAlpha(ghost.alpha * (1 - k / (ghost.afterimages + 1)))
           .setDepth(depth - k * 0.001)
           .setVisible(true);

@@ -1544,6 +1544,7 @@ export class RunScene extends Phaser.Scene {
       if (mv?.countdown) this.drawCountdown(h, countdowns++);
       // ダメージの無い技（ため・強化・回復・本物が現れる所）は、赤い予告を出さない（絵だけ。07 の167章）
       if (mv && mv.damage <= 0 && !mv.counter) continue;
+      if (mv?.hideTelegraph) continue;
       // 跳ね回る技（ボルテッカー・ころがる）: 走り出す向きを線で見せる
       if (mv?.bounce) {
         g.lineStyle(h.radius * 2, 0xff1744, 0.12 + 0.18 * progress).lineBetween(h.x, h.y, h.x + h.dirX * 320, h.y + h.dirY * 320);
@@ -1669,6 +1670,12 @@ export class RunScene extends Phaser.Scene {
       // 予告の絵は、落ちる前にだんだん濃く（遅れて始まる予告は、始まるまで描かない）
       if (!active && left > Math.round(mv.telegraphSeconds / world.dt)) continue;
       const alpha = active ? Math.min(1, left / Math.max(1, total * 0.2)) : Math.min(1, 0.35 + elapsed / Math.max(0.1, mv.telegraphSeconds));
+      // 落ちてくる絵（コメットパンチの拳）: 予告の間に上から落ち、落ちる先の赤い円の上に着く
+      if (!active && spec.dropHeight) {
+        const p = Math.min(1, elapsed / Math.max(0.1, mv.telegraphSeconds));
+        out.push({ spec, x: h.x, y: h.y - spec.dropHeight * (1 - p * p), radius: h.radius, band: 0, dirX: 0, dirY: 1, length: 0, vx: 0, vy: 1, elapsed, alpha: Math.min(1, p * 4), seed: h.group ?? 0 });
+        continue;
+      }
       // 押し寄せる波の帯（なみのり）: 帯の真ん中を中心に、進む向きへ流す長方形に敷く
       if (spec.fit === 'scroll' && h.shape === 'line') {
         const sp = Math.hypot(h.vx ?? 0, h.vy ?? 0) || 1;

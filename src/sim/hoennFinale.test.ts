@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { effectRecipes, stageConfig } from '../data';
 import { buildSimRules, playableLoadout } from '../data/simRules';
 import { Simulation } from './simulation';
 import { activeLegendField, legendRoundKinds, startIntruder } from './systems/stage';
@@ -117,5 +118,38 @@ describe('ホウエンのクリアの後', () => {
   it('デオキシスの技は HP で4段階に変わる', () => {
     const r = buildSimRules('hoenn').stage.legendary!.moveSets['legend-deoxys']!;
     expect(r.phases?.map((p) => p.belowHpPct)).toEqual([75, 50, 25]);
+  });
+});
+
+describe('ボスの技を避けられるように（07 の190章）', () => {
+  const moves = stageConfig.moves;
+  const of = (id: string) => moves.find((m) => m.id === id)!;
+
+  it('スピードスターは追わない、まっすぐの星の弾幕', () => {
+    for (const id of ['espeon-swift', 'deoxys-swift']) {
+      const m = of(id);
+      expect(m.travel?.homingDegreesPerSecond ?? 0).toBe(0);
+      expect(m.arms?.count).toBeGreaterThanOrEqual(7);
+      expect(m.repeat?.count).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it('必中（予告が最後まで追う）はファイヤーとフシギバナだけ（どちらも作者が決めた形）', () => {
+    expect(moves.filter((m) => m.homing).map((m) => m.id).sort()).toEqual(['moltres-skyattack', 'venusaur-solar-beam']);
+  });
+
+  it('追う予告は、止まってから落ちるまでに、プレイヤーの速さで範囲の外へ出られる', () => {
+    const speed = 180;
+    for (const m of moves.filter((x) => x.follow)) {
+      const left = m.telegraphSeconds - m.follow!.seconds;
+      expect(left * speed, m.id).toBeGreaterThan(m.radius);
+    }
+  });
+
+  it('ダメージのある扇の技には、必ず絵がある', () => {
+    for (const m of moves.filter((x) => x.shape === 'cone' && x.damage > 0)) {
+      const r = effectRecipes[m.effect];
+      expect(r?.strike ?? r?.bossActive, m.id).toBeTruthy();
+    }
   });
 });

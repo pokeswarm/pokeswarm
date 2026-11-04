@@ -507,7 +507,10 @@
       "contactDamage": 26,
       "xp": 300,
       "spriteScale": 2.8,
-      "motion": {"type":"keepDistance","distance":300}
+      "motion": {
+        "type": "keepDistance",
+        "distance": 300
+      }
     },
     {
       "id": "boss-machamp",
@@ -544,7 +547,10 @@
       "contactDamage": 36,
       "xp": 300,
       "spriteScale": 2.8,
-      "motion": {"type":"keepDistance","distance":360}
+      "motion": {
+        "type": "keepDistance",
+        "distance": 360
+      }
     },
     {
       "id": "legend-mewtwo",
@@ -1267,7 +1273,9 @@
       "contactDamage": 32,
       "xp": 300,
       "spriteScale": 2.6,
-      "motion": {"type":"still"}
+      "motion": {
+        "type": "still"
+      }
     },
     {
       "id": "johto-boss-crobat",
@@ -1280,7 +1288,11 @@
       "contactDamage": 34,
       "xp": 300,
       "spriteScale": 2.6,
-      "motion": {"type":"orbit","distance":220,"angularDegreesPerSecond":70}
+      "motion": {
+        "type": "orbit",
+        "distance": 220,
+        "angularDegreesPerSecond": 70
+      }
     },
     {
       "id": "johto-boss-machamp",
@@ -1305,7 +1317,10 @@
       "contactDamage": 38,
       "xp": 300,
       "spriteScale": 2.6,
-      "motion": {"type":"keepDistance","distance":260}
+      "motion": {
+        "type": "keepDistance",
+        "distance": 260
+      }
     },
     {
       "id": "johto-boss-dragonite",
@@ -1318,7 +1333,10 @@
       "contactDamage": 40,
       "xp": 300,
       "spriteScale": 2.6,
-      "motion": {"type":"keepDistance","distance":320}
+      "motion": {
+        "type": "keepDistance",
+        "distance": 320
+      }
     },
     {
       "id": "johto-boss-pikachu",
@@ -1365,7 +1383,10 @@
       "contactDamage": 40,
       "xp": 0,
       "spriteScale": 2.4,
-      "motion": {"type":"keepDistance","distance":280}
+      "motion": {
+        "type": "keepDistance",
+        "distance": 280
+      }
     },
     {
       "id": "red-snorlax",
@@ -1426,7 +1447,10 @@
       "contactDamage": 40,
       "xp": 0,
       "spriteScale": 2.6,
-      "motion": {"type":"keepDistance","distance":280}
+      "motion": {
+        "type": "keepDistance",
+        "distance": 280
+      }
     },
     {
       "id": "legend-entei",
@@ -1463,7 +1487,10 @@
       "contactDamage": 45,
       "xp": 0,
       "spriteScale": 2.8,
-      "motion": {"type":"keepDistance","distance":340}
+      "motion": {
+        "type": "keepDistance",
+        "distance": 340
+      }
     },
     {
       "id": "legend-ho-oh",
@@ -2257,7 +2284,10 @@
       "contactDamage": 32,
       "xp": 300,
       "spriteScale": 2.6,
-      "motion": {"type":"keepDistance","distance":280}
+      "motion": {
+        "type": "keepDistance",
+        "distance": 280
+      }
     },
     {
       "id": "hoenn-boss-dusclops",
@@ -2270,7 +2300,10 @@
       "contactDamage": 34,
       "xp": 300,
       "spriteScale": 2.6,
-      "motion": {"type":"keepDistance","distance":240}
+      "motion": {
+        "type": "keepDistance",
+        "distance": 240
+      }
     },
     {
       "id": "hoenn-boss-banette",
@@ -2307,7 +2340,10 @@
       "contactDamage": 36,
       "xp": 300,
       "spriteScale": 2.6,
-      "motion": {"type":"keepDistance","distance":260}
+      "motion": {
+        "type": "keepDistance",
+        "distance": 260
+      }
     },
     {
       "id": "hoenn-boss-salamence",
@@ -2332,7 +2368,10 @@
       "contactDamage": 38,
       "xp": 300,
       "spriteScale": 2.6,
-      "motion": {"type":"keepDistance","distance":300}
+      "motion": {
+        "type": "keepDistance",
+        "distance": 300
+      }
     },
     {
       "id": "hoenn-boss-milotic",
@@ -2345,7 +2384,10 @@
       "contactDamage": 40,
       "xp": 300,
       "spriteScale": 2.6,
-      "motion": {"type":"keepDistance","distance":260}
+      "motion": {
+        "type": "keepDistance",
+        "distance": 260
+      }
     },
     {
       "id": "hoenn-boss-wailord",
@@ -2392,11 +2434,7 @@
       "radius": 40,
       "contactDamage": 42,
       "xp": 0,
-      "spriteScale": 2.6,
-      "motion": {
-        "type": "keepDistance",
-        "distance": 300
-      }
+      "spriteScale": 2.6
     },
     {
       "id": "legend-groudon",
@@ -2521,7 +2559,11 @@
       "radius": 36,
       "contactDamage": 40,
       "xp": 0,
-      "spriteScale": 2.4
+      "spriteScale": 2.4,
+      "motion": {
+        "type": "keepDistance",
+        "distance": 270
+      }
     },
     {
       "id": "legend-latios",

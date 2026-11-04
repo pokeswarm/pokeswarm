@@ -5706,38 +5706,91 @@ function lusterOrb(): SpriteOut {
 }
 
 
-/** はめつのねがい: 空から落ちる、光を引く大きな金の星 */
-function doomStar(): SpriteOut {
-  const palette = ['#5a3b00', '#f4b400', '#ffe066', '#ffffff'];
-  const frames = [0, 1].map((f) =>
-    shape(30, (u, v) => {
-      const a = Math.atan2(v, u) + Math.PI / 2 + f * 0.1;
-      const d = Math.hypot(u, v);
-      const r = 0.3 + 0.66 * Math.abs(Math.cos(a * 2.5)) ** 3;
-      if (d > r) return -1;
-      return d < r * 0.35 ? 3 : d < r * 0.65 ? 2 : 1;
-    }),
-  );
-  return { palette, frameMs: 90, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+/**
+ * 本物の五角の星（☆）の内外: (u, v) が中心からの距離 / その向きの星の縁までの距離。1 未満なら星の中。
+ * R は角までの半径、r はへこみまでの半径（r/R が 0.38 で一筆書きの星。大きいほどふっくらする）、rot は回す角度
+ */
+function starRatio(u: number, v: number, R: number, r: number, rot = 0): number {
+  const seg = (Math.PI * 2) / 5;
+  const half = seg / 2;
+  const a = Math.atan2(v, u) + Math.PI / 2 - rot;
+  const m = ((a % seg) + seg) % seg;
+  const t = m > half ? seg - m : m;
+  const rho = (R * r * Math.sin(half)) / (r * Math.sin(half) * Math.cos(t) + (R - r * Math.cos(half)) * Math.sin(t));
+  return Math.hypot(u, v) / rho;
 }
 
-/** ねがいごと: ゆっくり昇る小さな星たち（黄と白） */
+/** 星の中の塗り分け: 外から 縁の濃い色 → 地の色 → 明るい色 → 白い芯。1 は星の外 */
+function starFill(ratio: number): number {
+  if (ratio >= 1) return -1;
+  if (ratio > 0.8) return 1;
+  if (ratio > 0.5) return 2;
+  return 3;
+}
+
+/** はめつのねがい: 空から落ちる大きな金の星（☆）。ゆっくり回りながら落ちる */
+function doomStar(): SpriteOut {
+  const palette = ['#6b3f00', '#f4a300', '#ffd54f', '#fffde7'];
+  const frames = [0, 1, 2, 3].map((f) => shape(44, (u, v) => starFill(starRatio(u, v, 0.92, 0.42, (f * Math.PI * 2) / 20))));
+  return { palette, frameMs: 80, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/** はめつのねがいの破片: 着いた所から飛び散る小さな星 */
+function starShard(): SpriteOut {
+  const palette = ['#b98a0c', '#ffe066', '#ffffff'];
+  const g = shape(11, (u, v) => {
+    const x = starRatio(u, v, 0.98, 0.45);
+    return x >= 1 ? -1 : x > 0.6 ? 1 : 2;
+  });
+  return { palette, frameMs: 200, parts: { main: [toRows(outline(g, 0))] } };
+}
+
+/** ねがいごと: ゆっくり昇る小さな星たち（☆） */
 function wishStar(): SpriteOut {
   const palette = ['#b98a0c', '#ffe066', '#ffffff'];
-  const frames = [0, 1, 2].map((f) =>
-    shape(36, (u, v) => {
-      for (let k = 0; k < 7; k++) {
-        const cx = -0.75 + k * 0.25;
-        const cy = 0.7 - ((f * 0.28 + hash(k, 3) * 1.4) % 1.4);
-        const dx = Math.abs(u - cx);
-        const dy = Math.abs(v - cy);
-        if (dx + dy < 0.07) return 2;
-        if ((dx < 0.02 && dy < 0.13) || (dy < 0.02 && dx < 0.13)) return k % 2 ? 1 : 0;
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(40, (u, v) => {
+      for (let k = 0; k < 6; k++) {
+        const cx = -0.72 + k * 0.29;
+        const cy = 0.8 - ((f * 0.4 + hash(k, 3) * 1.6) % 1.6);
+        const x = starRatio(u - cx, v - cy, 0.2, 0.09);
+        if (x < 1) return x < 0.55 ? 2 : 1;
       }
       return -1;
     }),
   );
-  return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
+  return { palette, frameMs: 130, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/** ボスのスピードスターの弾: 避けるものとして見やすい、太い縁の星（☆） */
+function starBullet(): SpriteOut {
+  const palette = ['#8a2c00', '#ff9800', '#ffe066', '#ffffff'];
+  const g = shape(24, (u, v) => starFill(starRatio(u, v, 0.94, 0.46)));
+  return { palette, frameMs: 200, parts: { main: [toRows(outline(g, 0))] } };
+}
+
+/** ピカチュウのアイアンテール: 尻尾が扇の端から端へ薙ぐ。先は白く、通った後は鋼の帯が残って薄れる（根元は絵の左端） */
+function ironTailArc(): SpriteOut {
+  const palette = ['#263238', '#78909c', '#cfd8dc', '#ffffff', '#fff176'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    const head = -72 + f * 48;
+    return shape(64, (u, v) => {
+      const x = u + 0.8;
+      const d = Math.hypot(x, v);
+      if (d < 0.75 || d > 1.72) return -1;
+      const a = (Math.atan2(v, x) * 180) / Math.PI;
+      if (Math.abs(a) > 74) return -1;
+      const behind = head - a;
+      if (behind < -2 || behind > 120) return -1;
+      if (d > 1.64 || d < 0.82) return behind < 60 ? 0 : -1;
+      if (behind < 12) return hash(Math.round(u * 32), Math.round(v * 32)) < 0.12 ? 4 : 3;
+      if (behind < 36) return 2;
+      if (behind < 70) return 1;
+      // 通った後はまばらにして薄れて見せる
+      return (Math.round(u * 32) + Math.round(v * 32)) % 2 === 0 ? 1 : -1;
+    });
+  });
+  return { palette, frameMs: 75, parts: { main: frames.map(toRows) } };
 }
 
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
@@ -5958,6 +6011,9 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'shadow-pool': () => shadowPool(),
     'doom-star': () => doomStar(),
     'wish-star': () => wishStar(),
+    'star-shard': () => starShard(),
+    'iron-tail-arc': () => ironTailArc(),
+    'star-bullet': () => starBullet(),
     // ボスの技（07 の189章）
     'zen-aura': () => zenAura(),
     'precipice-blade': () => precipiceBlade(),

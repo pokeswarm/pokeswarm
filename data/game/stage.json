@@ -252,7 +252,7 @@
     {
       "id": "mewtwo-burst",
       "move": "psychic",
-      "effect": "psystrike",
+      "effect": "boss-psystrike",
       "shape": "circle",
       "target": "self",
       "telegraphSeconds": 0.35,
@@ -274,7 +274,7 @@
     {
       "id": "mewtwo-psystrike",
       "move": "psystrike",
-      "effect": "psystrike",
+      "effect": "boss-psystrike",
       "shape": "circle",
       "target": "random",
       "count": 10,
@@ -299,7 +299,7 @@
     {
       "id": "articuno-burst",
       "move": "sheer-cold",
-      "effect": "sheer-cold",
+      "effect": "boss-sheer-cold",
       "shape": "circle",
       "target": "self",
       "telegraphSeconds": 0.8,
@@ -361,7 +361,7 @@
     {
       "id": "mew-stone-edge",
       "move": "stone-edge",
-      "effect": "stone-edge",
+      "effect": "boss-stone-edge",
       "shape": "circle",
       "target": "random",
       "count": 6,
@@ -396,7 +396,7 @@
     {
       "id": "mew-sheer-cold",
       "move": "sheer-cold",
-      "effect": "sheer-cold",
+      "effect": "boss-sheer-cold",
       "shape": "circle",
       "target": "player",
       "telegraphSeconds": 1,
@@ -419,7 +419,7 @@
     {
       "id": "mew-rock-wrecker",
       "move": "rock-wrecker",
-      "effect": "rock-slide",
+      "effect": "boss-rock-wrecker",
       "shape": "circle",
       "target": "player",
       "telegraphSeconds": 0.9,
@@ -429,7 +429,7 @@
     {
       "id": "mew-petal-blizzard",
       "move": "petal-blizzard",
-      "effect": "petal-dance",
+      "effect": "boss-petal-dance",
       "shape": "circle",
       "target": "random",
       "count": 10,
@@ -442,7 +442,7 @@
     {
       "id": "mew-hex",
       "move": "hex",
-      "effect": "hex",
+      "effect": "boss-hex",
       "shape": "circle",
       "target": "random",
       "count": 6,
@@ -454,7 +454,7 @@
     {
       "id": "mew-psycho-boost",
       "move": "psycho-boost",
-      "effect": "psystrike",
+      "effect": "boss-psystrike",
       "shape": "circle",
       "target": "player",
       "count": 4,
@@ -480,7 +480,7 @@
     {
       "id": "mew-dynamic-punch",
       "move": "dynamic-punch",
-      "effect": "dynamic-punch",
+      "effect": "boss-dynamic-punch",
       "shape": "circle",
       "target": "player",
       "telegraphSeconds": 0.7,
@@ -640,7 +640,7 @@
     {
       "id": "entei-eruption",
       "move": "eruption",
-      "effect": "eruption",
+      "effect": "boss-eruption",
       "shape": "circle",
       "target": "player",
       "telegraphSeconds": 0.9,
@@ -663,7 +663,7 @@
     {
       "id": "suicune-aurora-beam",
       "move": "aurora-beam",
-      "effect": "aurora-beam",
+      "effect": "boss-aurora-beam",
       "shape": "line",
       "target": "player",
       "telegraphSeconds": 0.7,
@@ -680,7 +680,7 @@
     {
       "id": "suicune-hydro-pump",
       "move": "hydro-pump",
-      "effect": "hydro-pump",
+      "effect": "boss-hydro-pump",
       "shape": "line",
       "target": "player",
       "rooted": true,
@@ -720,18 +720,20 @@
     {
       "id": "lugia-hurricane",
       "move": "hurricane",
-      "effect": "hurricane",
+      "effect": "boss-hurricane",
       "shape": "circle",
       "target": "player",
-      "homing": true,
-      "telegraphSeconds": 1.2,
+      "telegraphSeconds": 1.5,
       "radius": 95,
-      "damage": 48
+      "damage": 48,
+      "follow": {
+        "seconds": 0.8
+      }
     },
     {
       "id": "lugia-hydro-pump",
       "move": "hydro-pump",
-      "effect": "hydro-pump",
+      "effect": "boss-hydro-pump",
       "shape": "line",
       "target": "player",
       "rooted": true,
@@ -1340,9 +1342,10 @@
       "shape": "cone",
       "arc": 140,
       "target": "player",
-      "telegraphSeconds": 0.25,
+      "telegraphSeconds": 0.35,
       "radius": 170,
-      "damage": 30
+      "damage": 30,
+      "activeSeconds": 0.3
     },
     {
       "id": "pika-quick-attack",
@@ -1374,16 +1377,31 @@
       "move": "swift",
       "effect": "boss-swift",
       "shape": "circle",
-      "target": "player",
-      "telegraphSeconds": 0.5,
-      "radius": 20,
+      "target": "self",
+      "rooted": true,
+      "hideTelegraph": true,
+      "telegraphSeconds": 0.35,
+      "radius": 16,
       "damage": 18,
-      "count": 5,
-      "spread": 30,
-      "stagger": 0.1,
+      "arms": {
+        "count": 7,
+        "fan": [
+          -54,
+          -36,
+          -18,
+          0,
+          18,
+          36,
+          54
+        ],
+        "spinPerRepeat": 9
+      },
+      "repeat": {
+        "count": 3,
+        "everySeconds": 0.55
+      },
       "travel": {
-        "speed": 260,
-        "homingDegreesPerSecond": 150
+        "speed": 290
       },
       "activeSeconds": 3
     },
@@ -1924,34 +1942,459 @@
       "damage": 0,
       "healPct": 6
     },
-    {"id":"metagross-psychic","move":"psychic","effect":"psy","shape":"circle","target":"player","telegraphSeconds":0.7,"radius":80,"damage":46,"count":4,"spread":240,"stagger":0.12},
-    {"id":"metagross-meteor-mash","move":"meteor-mash","effect":"meteor-mash","shape":"circle","target":"player","telegraphSeconds":1.1,"radius":80,"damage":46,"count":3,"spread":200,"stagger":0.35},
-    {"id":"metagross-bullet-punch","move":"bullet-punch","effect":"bullet-punch","shape":"line","target":"player","telegraphSeconds":0.35,"radius":34,"length":260,"damage":30,"dashSpeed":900,"chain":2},
-    {"id":"metagross-zen-headbutt","move":"zen-headbutt","effect":"boss-zen-headbutt","shape":"line","target":"player","telegraphSeconds":0.7,"radius":44,"length":420,"damage":44,"dashSpeed":620,"recoilSeconds":0.8},
-    {"id":"groudon-precipice-blades","move":"precipice-blades","effect":"boss-precipice-blades","shape":"circle","target":"player","rooted":true,"telegraphSeconds":0.8,"radius":62,"damage":44,"count":5,"stagger":0.14,"along":{"spacing":105,"start":90},"fan":[-24,0,24]},
-    {"id":"groudon-eruption","move":"eruption","effect":"eruption","shape":"circle","target":"player","telegraphSeconds":0.9,"radius":65,"damage":46,"count":10,"spread":380,"stagger":0.08},
-    {"id":"groudon-solar-beam","minTargetDistance":240,"move":"solar-beam","effect":"solar-beam","shape":"line","target":"player","homing":true,"rooted":true,"telegraphSeconds":1.8,"radius":36,"length":1600,"damage":72},
-    {"id":"kyogre-origin-pulse","move":"origin-pulse","effect":"boss-origin-pulse","shape":"line","target":"self","rooted":true,"telegraphSeconds":1,"radius":20,"length":900,"damage":42,"arms":{"count":7,"fan":[-45,-30,-15,0,15,30,45]},"repeat":{"count":2,"everySeconds":1}},
-    {"id":"kyogre-water-spout","move":"water-spout","effect":"boss-water-spout","shape":"circle","target":"player","telegraphSeconds":0.9,"radius":55,"damage":36,"count":12,"countByHp":true,"spread":300,"stagger":0.08},
-    {"id":"kyogre-thunder","move":"thunder","effect":"boss-thunder","shape":"circle","target":"player","follow":{"seconds":1.5},"telegraphSeconds":2.1,"radius":70,"damage":44},
-    {"id":"rayquaza-dragon-ascent","move":"dragon-ascent","effect":"boss-dragon-ascent","shape":"circle","target":"player","teleport":true,"hideBoss":true,"follow":{"seconds":2,"speed":130},"telegraphSeconds":2.8,"radius":120,"damage":62},
-    {"id":"rayquaza-draco-meteor","move":"draco-meteor","effect":"meteor","shape":"circle","target":"player","telegraphSeconds":1.4,"radius":70,"damage":42,"count":8,"spread":320},
-    {"id":"rayquaza-outrage","move":"outrage","effect":"boss-outrage","shape":"line","target":"player","telegraphSeconds":0.6,"radius":50,"length":240,"damage":36,"dashSpeed":360,"activeSeconds":1,"hitEverySeconds":0.3,"recoilSeconds":1.5},
-    {"id":"rayquaza-hurricane","move":"hurricane","effect":"hurricane","shape":"circle","target":"player","homing":true,"telegraphSeconds":1.2,"radius":95,"damage":50},
-    {"id":"deoxys-psycho-boost","move":"psycho-boost","effect":"boss-psycho-boost","shape":"line","target":"player","rooted":true,"telegraphSeconds":1.4,"radius":48,"length":1000,"damage":70,"recoilSeconds":1},
-    {"id":"deoxys-swift","move":"swift","effect":"boss-swift","shape":"circle","target":"player","telegraphSeconds":0.5,"radius":20,"damage":22,"count":7,"spread":30,"stagger":0.1,"travel":{"speed":260,"homingDegreesPerSecond":150},"activeSeconds":3},
-    {"id":"deoxys-hyper-beam","move":"hyper-beam","effect":"boss-hyper-beam","shape":"line","target":"player","rooted":true,"telegraphSeconds":0.8,"radius":30,"length":900,"damage":52,"recoilSeconds":0.8},
-    {"id":"deoxys-thunderbolt","move":"thunderbolt","effect":"boss-thunder","shape":"circle","target":"player","telegraphSeconds":0.7,"radius":60,"damage":38,"count":4,"spread":240,"stagger":0.15},
-    {"id":"deoxys-cosmic-power","move":"cosmic-power","effect":"boss-cosmic-power","shape":"circle","target":"self","rooted":true,"telegraphSeconds":1.4,"radius":90,"damage":0,"healPct":3},
-    {"id":"deoxys-recover","move":"recover","effect":"boss-recover","shape":"circle","target":"self","rooted":true,"telegraphSeconds":1.5,"radius":80,"damage":0,"healPct":4},
-    {"id":"deoxys-agility","move":"agility","effect":"boss-cosmic-power","shape":"circle","target":"self","rooted":true,"telegraphSeconds":0.5,"radius":60,"damage":0,"buff":{"speedPct":40,"intervalPct":15,"maxStacks":2}},
-    {"id":"deoxys-teleport","move":"teleport","effect":"boss-teleport","shape":"circle","target":"random","count":1,"spread":320,"teleport":true,"hideBoss":true,"telegraphSeconds":0.5,"radius":40,"damage":0,"then":"deoxys-psycho-boost-fast"},
-    {"id":"deoxys-psycho-boost-fast","move":"psycho-boost","effect":"boss-psycho-boost","shape":"line","target":"player","rooted":true,"telegraphSeconds":0.7,"radius":40,"length":900,"damage":56},
-    {"id":"latias-mist-ball","move":"mist-ball","effect":"boss-mist-ball","shape":"circle","target":"self","rooted":true,"telegraphSeconds":0.6,"radius":34,"damage":32,"arms":{"count":3,"offsetDegrees":25},"travel":{"speed":240,"homingDegreesPerSecond":60},"activeSeconds":3},
-    {"id":"latias-dragon-breath","move":"dragon-breath","effect":"dragon-breath","shape":"cone","arc":60,"target":"player","telegraphSeconds":0.5,"radius":250,"damage":28},
-    {"id":"latias-heal-pulse","move":"heal-pulse","effect":"boss-heal-pulse","shape":"circle","target":"self","rooted":true,"telegraphSeconds":1.2,"radius":70,"damage":0,"healPct":5},
-    {"id":"latios-luster-purge","move":"luster-purge","effect":"boss-luster-purge","shape":"circle","target":"player","homing":true,"telegraphSeconds":1.3,"radius":105,"damage":54},
-    {"id":"latios-dragon-pulse","move":"dragon-pulse","effect":"boss-dragon-pulse","shape":"line","target":"player","rooted":true,"telegraphSeconds":1,"radius":26,"length":800,"damage":44}
+    {
+      "id": "metagross-psychic",
+      "move": "psychic",
+      "effect": "psy",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.7,
+      "radius": 80,
+      "damage": 46,
+      "count": 4,
+      "spread": 240,
+      "stagger": 0.12
+    },
+    {
+      "id": "metagross-meteor-mash",
+      "move": "meteor-mash",
+      "effect": "boss-meteor-mash",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 1.1,
+      "radius": 80,
+      "damage": 46,
+      "count": 3,
+      "spread": 200,
+      "stagger": 0.35
+    },
+    {
+      "id": "metagross-bullet-punch",
+      "move": "bullet-punch",
+      "effect": "boss-bullet-punch",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.35,
+      "radius": 34,
+      "length": 260,
+      "damage": 30,
+      "dashSpeed": 900,
+      "chain": 2
+    },
+    {
+      "id": "metagross-zen-headbutt",
+      "move": "zen-headbutt",
+      "effect": "boss-zen-headbutt",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.7,
+      "radius": 44,
+      "length": 420,
+      "damage": 44,
+      "dashSpeed": 620,
+      "recoilSeconds": 0.8
+    },
+    {
+      "id": "groudon-precipice-blades",
+      "move": "precipice-blades",
+      "effect": "boss-precipice-blades",
+      "shape": "circle",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 0.8,
+      "radius": 62,
+      "damage": 44,
+      "count": 5,
+      "stagger": 0.14,
+      "along": {
+        "spacing": 105,
+        "start": 90
+      },
+      "fan": [
+        -24,
+        0,
+        24
+      ]
+    },
+    {
+      "id": "groudon-eruption",
+      "move": "eruption",
+      "effect": "boss-eruption",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.9,
+      "radius": 65,
+      "damage": 46,
+      "count": 10,
+      "spread": 380,
+      "stagger": 0.08
+    },
+    {
+      "id": "groudon-solar-beam",
+      "minTargetDistance": 240,
+      "move": "solar-beam",
+      "effect": "solar-beam",
+      "shape": "line",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 1.8,
+      "radius": 36,
+      "length": 1600,
+      "damage": 72,
+      "follow": {
+        "seconds": 1.1
+      }
+    },
+    {
+      "id": "kyogre-origin-pulse",
+      "move": "origin-pulse",
+      "effect": "boss-origin-pulse",
+      "shape": "line",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 1,
+      "radius": 20,
+      "length": 900,
+      "damage": 42,
+      "arms": {
+        "count": 7,
+        "fan": [
+          -45,
+          -30,
+          -15,
+          0,
+          15,
+          30,
+          45
+        ]
+      },
+      "repeat": {
+        "count": 2,
+        "everySeconds": 1
+      }
+    },
+    {
+      "id": "kyogre-water-spout",
+      "move": "water-spout",
+      "effect": "boss-water-spout",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.9,
+      "radius": 55,
+      "damage": 36,
+      "count": 12,
+      "countByHp": true,
+      "spread": 300,
+      "stagger": 0.08
+    },
+    {
+      "id": "kyogre-thunder",
+      "move": "thunder",
+      "effect": "boss-thunder",
+      "shape": "circle",
+      "target": "player",
+      "follow": {
+        "seconds": 1.5
+      },
+      "telegraphSeconds": 2.1,
+      "radius": 70,
+      "damage": 44
+    },
+    {
+      "id": "rayquaza-dragon-ascent",
+      "move": "dragon-ascent",
+      "effect": "boss-dragon-ascent",
+      "shape": "circle",
+      "target": "player",
+      "teleport": true,
+      "hideBoss": true,
+      "follow": {
+        "seconds": 2,
+        "speed": 130
+      },
+      "telegraphSeconds": 2.8,
+      "radius": 120,
+      "damage": 62
+    },
+    {
+      "id": "rayquaza-draco-meteor",
+      "move": "draco-meteor",
+      "effect": "meteor",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 1.4,
+      "radius": 70,
+      "damage": 42,
+      "count": 8,
+      "spread": 320
+    },
+    {
+      "id": "rayquaza-outrage",
+      "move": "outrage",
+      "effect": "boss-outrage",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.6,
+      "radius": 50,
+      "length": 240,
+      "damage": 36,
+      "dashSpeed": 360,
+      "activeSeconds": 1,
+      "hitEverySeconds": 0.3,
+      "recoilSeconds": 1.5
+    },
+    {
+      "id": "rayquaza-hurricane",
+      "move": "hurricane",
+      "effect": "boss-hurricane",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 1.5,
+      "radius": 95,
+      "damage": 50,
+      "follow": {
+        "seconds": 0.8
+      }
+    },
+    {
+      "id": "deoxys-psycho-boost",
+      "move": "psycho-boost",
+      "effect": "boss-psycho-boost",
+      "shape": "line",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 1.4,
+      "radius": 48,
+      "length": 1000,
+      "damage": 70,
+      "recoilSeconds": 1
+    },
+    {
+      "id": "deoxys-swift",
+      "move": "swift",
+      "effect": "boss-swift",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "hideTelegraph": true,
+      "telegraphSeconds": 0.35,
+      "radius": 16,
+      "damage": 22,
+      "arms": {
+        "count": 14,
+        "spinPerRepeat": 11
+      },
+      "repeat": {
+        "count": 4,
+        "everySeconds": 0.42
+      },
+      "travel": {
+        "speed": 270
+      },
+      "activeSeconds": 3.2
+    },
+    {
+      "id": "deoxys-hyper-beam",
+      "move": "hyper-beam",
+      "effect": "boss-hyper-beam",
+      "shape": "line",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 0.8,
+      "radius": 30,
+      "length": 900,
+      "damage": 52,
+      "recoilSeconds": 0.8
+    },
+    {
+      "id": "deoxys-thunderbolt",
+      "move": "thunderbolt",
+      "effect": "boss-thunder",
+      "shape": "circle",
+      "target": "player",
+      "telegraphSeconds": 0.7,
+      "radius": 60,
+      "damage": 38,
+      "count": 4,
+      "spread": 240,
+      "stagger": 0.15
+    },
+    {
+      "id": "deoxys-cosmic-power",
+      "move": "cosmic-power",
+      "effect": "boss-cosmic-power",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 1.4,
+      "radius": 90,
+      "damage": 0,
+      "healPct": 3
+    },
+    {
+      "id": "deoxys-recover",
+      "move": "recover",
+      "effect": "boss-recover",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 1.5,
+      "radius": 80,
+      "damage": 0,
+      "healPct": 4
+    },
+    {
+      "id": "deoxys-agility",
+      "move": "agility",
+      "effect": "boss-cosmic-power",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 0.5,
+      "radius": 60,
+      "damage": 0,
+      "buff": {
+        "speedPct": 40,
+        "intervalPct": 15,
+        "maxStacks": 2
+      }
+    },
+    {
+      "id": "deoxys-teleport",
+      "move": "teleport",
+      "effect": "boss-teleport",
+      "shape": "circle",
+      "target": "random",
+      "count": 1,
+      "spread": 320,
+      "teleport": true,
+      "hideBoss": true,
+      "telegraphSeconds": 0.5,
+      "radius": 40,
+      "damage": 0,
+      "then": "deoxys-psycho-boost-fast"
+    },
+    {
+      "id": "deoxys-psycho-boost-fast",
+      "move": "psycho-boost",
+      "effect": "boss-psycho-boost",
+      "shape": "line",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 0.7,
+      "radius": 40,
+      "length": 900,
+      "damage": 56
+    },
+    {
+      "id": "latias-mist-ball",
+      "move": "mist-ball",
+      "effect": "boss-mist-ball",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 0.6,
+      "radius": 34,
+      "damage": 32,
+      "arms": {
+        "count": 3,
+        "fan": [
+          -32,
+          0,
+          32
+        ],
+        "spinPerRepeat": 16
+      },
+      "repeat": {
+        "count": 2,
+        "everySeconds": 0.9
+      },
+      "travel": {
+        "speed": 170
+      },
+      "activeSeconds": 4.5
+    },
+    {
+      "id": "latias-dragon-breath",
+      "move": "dragon-breath",
+      "effect": "boss-dragon-breath",
+      "shape": "cone",
+      "arc": 60,
+      "target": "player",
+      "telegraphSeconds": 0.6,
+      "radius": 300,
+      "damage": 28,
+      "rooted": true,
+      "activeSeconds": 0.45,
+      "maxTargetDistance": 340
+    },
+    {
+      "id": "latias-heal-pulse",
+      "move": "heal-pulse",
+      "effect": "boss-heal-pulse",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 1.2,
+      "radius": 70,
+      "damage": 0,
+      "healPct": 5
+    },
+    {
+      "id": "latios-luster-purge",
+      "move": "luster-purge",
+      "effect": "boss-luster-purge",
+      "shape": "circle",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 0.9,
+      "radius": 78,
+      "damage": 50,
+      "count": 7,
+      "stagger": 0.12,
+      "along": {
+        "spacing": 125,
+        "start": 90
+      }
+    },
+    {
+      "id": "latios-dragon-pulse",
+      "move": "dragon-pulse",
+      "effect": "boss-dragon-pulse",
+      "shape": "line",
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 1,
+      "radius": 26,
+      "length": 800,
+      "damage": 44
+    },
+    {
+      "id": "latias-dragon-rush",
+      "move": "dragon-rush",
+      "effect": "boss-latias-rush",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.6,
+      "radius": 38,
+      "length": 640,
+      "damage": 38,
+      "dashSpeed": 820,
+      "recoilSeconds": 0.5
+    },
+    {
+      "id": "latios-dragon-rush",
+      "move": "dragon-rush",
+      "effect": "boss-latios-rush",
+      "shape": "line",
+      "target": "player",
+      "telegraphSeconds": 0.6,
+      "radius": 38,
+      "length": 640,
+      "damage": 38,
+      "dashSpeed": 820,
+      "recoilSeconds": 0.5
+    }
   ],
   "bossRules": {
     "knockbackMultiplier": 0,
@@ -1960,7 +2403,11 @@
     "legendHpPerExtraPlayerPct": 100,
     "legendHpMultiplier": 5,
     "legendSpeedMultiplier": 1.15,
-    "legendThreat": { "decayPerSecond": 0.6, "switchRatio": 1.25, "holdSeconds": 2 },
+    "legendThreat": {
+      "decayPerSecond": 0.6,
+      "switchRatio": 1.25,
+      "holdSeconds": 2
+    },
     "legendHitsAllPlayers": true,
     "tagHpMultiplier": 0.7,
     "hazardActiveSeconds": 0.4,

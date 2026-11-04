@@ -5595,16 +5595,11 @@
     },
     "boss-dynamic-punch": {
       "extends": "dynamic-punch",
-      "bossActive": {
+      "strike": {
         "id": "fist",
-        "fit": "front",
-        "size": 0.45,
-        "along": 0.7,
-        "variants": [
-          "fist",
-          "fist-fire",
-          "fist-thunder"
-        ]
+        "fit": "circle",
+        "size": 1.2,
+        "seconds": 0.4
       }
     },
     "boss-double-team": {
@@ -5851,12 +5846,11 @@
     },
     "boss-iron-tail": {
       "extends": "iron-tail",
-      "strike": {
-        "id": "tail-iron",
+      "bossActive": {
+        "id": "iron-tail-arc",
         "fit": "front",
-        "size": 1,
-        "along": 0.55,
-        "seconds": 0.3
+        "size": 1.15,
+        "along": 0.42
       }
     },
     "boss-quick-attack": {
@@ -5879,12 +5873,19 @@
     },
     "boss-swift": {
       "extends": "swift",
-      "bossActive": {
-        "id": "star",
+      "bossTelegraph": {
+        "id": "star-bullet",
         "fit": "circle",
-        "size": 1.8,
+        "size": 1.2,
         "rotate": "spin",
-        "spinDegPerSec": 600
+        "spinDegPerSec": 500
+      },
+      "bossActive": {
+        "id": "star-bullet",
+        "fit": "circle",
+        "size": 1.45,
+        "rotate": "spin",
+        "spinDegPerSec": 420
       }
     },
     "boss-giga-impact": {
@@ -6197,8 +6198,8 @@
       "strike": {
         "id": "burst-shadow",
         "fit": "circle",
-        "size": 1.2,
-        "seconds": 0.4
+        "size": 1.1,
+        "seconds": 0.45
       }
     },
     "boss-rollout": {
@@ -6225,11 +6226,10 @@
     "boss-sheer-cold": {
       "extends": "sheer-cold",
       "strike": {
-        "id": "ice-statue",
+        "id": "burst-ice",
         "fit": "circle",
-        "size": 1,
-        "originY": 0.91,
-        "seconds": 0.8
+        "size": 1.1,
+        "seconds": 0.45
       }
     },
     "boss-dragon-dance": {
@@ -6897,10 +6897,15 @@
     },
     "boss-mist-ball": {
       "extends": "psychic.base",
+      "bossTelegraph": {
+        "id": "mist-orb",
+        "fit": "circle",
+        "size": 0.8
+      },
       "bossActive": {
         "id": "mist-orb",
         "fit": "circle",
-        "size": 1.2
+        "size": 1.3
       }
     },
     "boss-heal-pulse": {
@@ -6916,7 +6921,7 @@
       "strike": {
         "id": "luster-orb",
         "fit": "circle",
-        "size": 1.2,
+        "size": 1.25,
         "seconds": 0.5
       }
     },
@@ -6976,14 +6981,14 @@
       },
       "fall": {
         "id": "doom-star",
-        "height": 340,
-        "size": 0.95,
+        "height": 360,
+        "size": 1.1,
         "shards": {
-          "id": "wish-star",
-          "count": 6,
-          "distance": 60,
-          "seconds": 0.4,
-          "size": 0.4
+          "id": "star-shard",
+          "count": 7,
+          "distance": 80,
+          "seconds": 0.45,
+          "size": 0.5
         }
       }
     },
@@ -6993,6 +6998,146 @@
         "id": "wish-star",
         "fit": "circle",
         "size": 1
+      }
+    },
+    "boss-meteor-mash": {
+      "extends": "meteor-mash",
+      "bossTelegraph": {
+        "id": "comet-fist",
+        "fit": "circle",
+        "size": 1,
+        "rotate": "velocity",
+        "dropHeight": 420
+      },
+      "strike": {
+        "id": "comet-burst",
+        "fit": "circle",
+        "size": 1.1,
+        "seconds": 0.45
+      }
+    },
+    "boss-bullet-punch": {
+      "extends": "bullet-punch",
+      "ownerGhost": {
+        "tint": "#90caf9",
+        "alpha": 0.8,
+        "afterimages": 4,
+        "spacingTicks": 1
+      }
+    },
+    "boss-dragon-breath": {
+      "extends": "dragon-breath",
+      "bossActive": {
+        "id": "dragon-breath-cone",
+        "fit": "cone",
+        "size": 1
+      }
+    },
+    "boss-latias-rush": {
+      "extends": "dragon.base",
+      "ownerGhost": {
+        "tint": "#ff8a80",
+        "alpha": 0.8,
+        "afterimages": 5,
+        "spacingTicks": 1
+      }
+    },
+    "boss-latios-rush": {
+      "extends": "dragon.base",
+      "ownerGhost": {
+        "tint": "#82b1ff",
+        "alpha": 0.8,
+        "afterimages": 5,
+        "spacingTicks": 1
+      }
+    },
+    "boss-hurricane": {
+      "extends": "hurricane",
+      "bossTelegraph": {
+        "id": "storm-ripple",
+        "fit": "circle",
+        "size": 1
+      },
+      "strike": {
+        "id": "hurricane-eye",
+        "fit": "circle",
+        "size": 1.15,
+        "rotate": "spin",
+        "spinDegPerSec": 400,
+        "seconds": 0.5
+      }
+    },
+    "boss-eruption": {
+      "extends": "eruption",
+      "strike": {
+        "id": "fire-geyser",
+        "fit": "circle",
+        "size": 1.1,
+        "originY": 0.85,
+        "seconds": 0.45
+      }
+    },
+    "boss-psystrike": {
+      "extends": "psystrike",
+      "strike": {
+        "id": "burst-psy",
+        "fit": "circle",
+        "size": 1.1,
+        "seconds": 0.45
+      }
+    },
+    "boss-stone-edge": {
+      "extends": "stone-edge",
+      "strike": {
+        "id": "rock-spire",
+        "fit": "circle",
+        "size": 1.15,
+        "originY": 0.85,
+        "seconds": 0.5
+      }
+    },
+    "boss-rock-wrecker": {
+      "extends": "rock-slide",
+      "bossTelegraph": {
+        "id": "boulder",
+        "fit": "circle",
+        "size": 1,
+        "dropHeight": 420
+      },
+      "strike": {
+        "id": "rock-rubble",
+        "fit": "circle",
+        "size": 1.1,
+        "seconds": 0.45
+      }
+    },
+    "boss-petal-dance": {
+      "extends": "petal-dance",
+      "strike": {
+        "id": "petal",
+        "fit": "circle",
+        "size": 1.1,
+        "rotate": "spin",
+        "spinDegPerSec": 540,
+        "seconds": 0.45
+      }
+    },
+    "boss-aurora-beam": {
+      "extends": "aurora-beam",
+      "strike": {
+        "id": "aurora-beam",
+        "fit": "line",
+        "size": 2,
+        "seconds": 0.4
+      }
+    },
+    "boss-hydro-pump": {
+      "extends": "hydro-pump",
+      "strike": {
+        "id": "water-stream",
+        "fit": "line",
+        "size": 1,
+        "seconds": 0.4
       }
     }
   }

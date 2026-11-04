@@ -602,8 +602,9 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     const self = move.target === 'self';
     const cx = self ? bx : target.x;
     const cy = self ? by : target.y;
-    const base = (arms.absolute ? 0 : Math.atan2(uy, ux)) + (arms.offsetDegrees * Math.PI) / 180;
-    const angles = arms.fan?.map((d) => Math.atan2(uy, ux) + (d * Math.PI) / 180) ?? arms.angles?.map((d) => (d * Math.PI) / 180) ?? Array.from({ length: arms.count }, (_, k) => base + (k * Math.PI * 2) / arms.count);
+    const spin = (repeatIndex * (arms.spinPerRepeat ?? 0) * Math.PI) / 180;
+    const base = (arms.absolute ? 0 : Math.atan2(uy, ux)) + (arms.offsetDegrees * Math.PI) / 180 + spin;
+    const angles = arms.fan?.map((d) => Math.atan2(uy, ux) + spin + (d * Math.PI) / 180) ?? arms.angles?.map((d) => (d * Math.PI) / 180) ?? Array.from({ length: arms.count }, (_, k) => base + (k * Math.PI * 2) / arms.count);
     for (const a of angles) {
       // 狙った人が真ん中: 線は中心より少し手前から（×の交わる所も当たる）
       const back = self ? 0 : move.radius;
@@ -632,7 +633,8 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
       const vy = Math.sin(a);
       for (let c = 0; c < move.count; c++) {
         const d = move.along.start + c * move.along.spacing;
-        put(bx + vx * d, by + vy * d, vx, vy, -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
+        // 止まって出す技は、落ちた時にまた動けるようボスを結び付ける（無いと止まったままになる）
+        put(bx + vx * d, by + vy * d, vx, vy, move.rooted ? bossId : -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
       }
     }
     return;

@@ -871,6 +871,7 @@
       "legend-latias": {
         "moves": [
           "latias-mist-ball",
+          "latias-dragon-rush",
           "latias-dragon-breath",
           "latias-heal-pulse"
         ],
@@ -881,6 +882,7 @@
       "legend-latios": {
         "moves": [
           "latios-luster-purge",
+          "latios-dragon-rush",
           "latios-dragon-pulse"
         ],
         "random": false,

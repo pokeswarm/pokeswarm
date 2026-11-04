@@ -566,12 +566,14 @@ export const bossMoveSchema = z.object({
     })
     .optional(),
   // ---- ここから 07 の167章（ボスの技の作り直し）で足した部品。後の地方の伝説でも使う ----
+  /** 赤い予告を描かない（数の多い弾幕。弾そのものの絵を見て避ける。07 の190章） */
+  hideTelegraph: z.boolean().optional(),
   /** 扇（cone）の開き（度） */
   arc: z.number().positive().max(360).optional(),
   /** 中心から count 本の直線を等しい角度で出す（×・大の字・十字）。offsetDegrees は狙った向きからのずれ。予告の場所はボス（self）か狙った人 */
   /** along と一緒に: 狙った向きからこの度数ずつずらした列を全部出す（だんがいのつるぎ: 扇に奥へ順に。07 の189章） */
   fan: z.array(z.number()).optional(),
-  arms: z.object({ count: z.number().int().min(2), offsetDegrees: z.number().default(0), /** 狙った向きからこの度数ずつずらして扇に出す（こんげんのはどう。07 の189章） */ fan: z.array(z.number()).optional(), /** 狙った向きに関係なく、画面に対して offsetDegrees の向きに出す（絵の×と当たり判定をそろえる。クロスチョップ） */ absolute: z.boolean().default(false), /** 等しい角度の代わりに、画面に対するこの向き（度。右が 0・下が 90）に出す（だいもんじ の大の字） */ angles: z.array(z.number()).optional() }).optional(),
+  arms: z.object({ count: z.number().int().min(2), offsetDegrees: z.number().default(0), /** repeat の1回ごとに全体をこの度数ずつ回す（星の弾幕: 前の波のすき間へ。07 の190章） */ spinPerRepeat: z.number().optional(), /** 狙った向きからこの度数ずつずらして扇に出す（こんげんのはどう。07 の189章） */ fan: z.array(z.number()).optional(), /** 狙った向きに関係なく、画面に対して offsetDegrees の向きに出す（絵の×と当たり判定をそろえる。クロスチョップ） */ absolute: z.boolean().default(false), /** 等しい角度の代わりに、画面に対するこの向き（度。右が 0・下が 90）に出す（だいもんじ の大の字） */ angles: z.array(z.number()).optional() }).optional(),
   /** 落ちた後、直線の向きを回す（なぎ払い）: 合わせて degrees 度を seconds 秒で。予告は回る範囲の扇で見せる */
   sweep: z.object({ degrees: z.number(), seconds: z.number().positive() }).optional(),
   /** 落ちた後に当たる時間（秒。省略なら bossRules.hazardActiveSeconds） */
@@ -1826,6 +1828,8 @@ const moveSpriteSpec = z.object({
   /** 絵の濃さ（煙など、下が少し透けてほしいもの） */
   alpha: z.number().min(0).max(1).default(1),
   growSeconds: z.number().positive().optional(),
+  /** ボスの予告の絵（bossTelegraph）: 予告の間に、この高さから落ちてくる（コメットパンチの拳・岩。07 の190章） */
+  dropHeight: z.number().positive().optional(),
   /** circle の絵の向き: none（そのまま）・velocity（進む向きに向ける。絵は右向きに描く）・spin（回し続ける） */
   rotate: z.enum(['none', 'velocity', 'spin']).default('none'),
   /** spin の回る速さ（度/秒） */

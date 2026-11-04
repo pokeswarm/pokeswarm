@@ -560,13 +560,7 @@
           "red-espeon",
           "red-snorlax"
         ],
-        "bgm": "johto-red",
-        "turns": {
-          "seconds": 9,
-          "idleSpeedPct": 40,
-          "startDelaySeconds": 0.5,
-          "markerColor": "#ff5252"
-        }
+        "bgm": "johto-red"
       },
       {
         "kinds": [
@@ -575,13 +569,7 @@
           "red-blastoise"
         ],
         "stat": "redDefeated",
-        "bgm": "johto-red",
-        "turns": {
-          "seconds": 8,
-          "idleSpeedPct": 40,
-          "startDelaySeconds": 0.5,
-          "markerColor": "#ff5252"
-        }
+        "bgm": "johto-red"
       }
     ],
     "bonusRounds": [

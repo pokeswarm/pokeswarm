@@ -87,7 +87,6 @@ export function applySoloParam(rules: SimRules, kind: number, search: string): v
   for (const r of rules.stage.legendary?.rounds ?? []) {
     if (!r.kinds.includes(id)) continue;
     r.kinds = [id];
-    delete r.turns;
   }
 }
 

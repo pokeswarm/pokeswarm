@@ -1,11 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { playerConfig } from '../data';
 import { buildSimRules } from '../data/simRules';
 import { Simulation } from './simulation';
 import type { World } from './world';
-import { legendTurnIsActive, legendTurns, startLegendary } from './systems/stage';
+import { startLegendary } from './systems/stage';
 
-/** レッド戦の作り直し（07 の193章）: 隙・交代・回復の回数の上限・きずぐすり */
+/** レッド戦の作り直し（07 の193〜195章）: 隙・回復の回数の上限・きずぐすり・ピカチュウ・エーフィ */
 function round(index: number, players = 1, role: 'host' | 'guest' | undefined = undefined) {
   const rules = buildSimRules('johto');
   const sim = new Simulation({ tickRate: 30, seed: 3, rules, ...(role ? { role, localPlayerId: 1 } : {}) });
@@ -238,17 +238,6 @@ describe('レッド戦（07 の193章）', () => {
   });
 
   describe('エーフィ（07 の195章）', () => {
-    // エーフィだけを動かす: カビゴンの順番を待たずに見るので、交代を切る（データは共有なので、終わったら戻す）
-    const rounds = rules0().stage.legendary!.rounds!;
-    const saved = rounds.map((r) => r.turns);
-    beforeEach(() => {
-      for (const r of rounds) delete r.turns;
-    });
-    afterEach(() => {
-      rounds.forEach((r, k) => {
-        if (saved[k]) r.turns = saved[k];
-      });
-    });
     const espeonRound = (solo = false) => {
       const sim = round(1);
       const w = sim.world;
@@ -332,7 +321,9 @@ describe('レッド戦（07 の193章）', () => {
       hit(max * 0.06);
       expect(w.enemies.hp[indexOf(sim, 'red-espeon')]).toBeCloseTo(before - max * 0.02, 0);
       sim.step([]);
-      const stun = w.hazards.find((z) => moveId(sim, z.move) === 'espeon-stun');
+      // 泡が割れる絵の後に気絶する
+      expect(w.hazards.some((z) => moveId(sim, z.move) === 'espeon-barrier-break')).toBe(true);
+      const stun = until(sim, 'espeon-stun', 2);
       expect(stun).toBeDefined();
       // 壁の絵は消え、止まっている
       expect(w.hazards.some((z) => moveId(sim, z.move) === 'espeon-reflect')).toBe(false);
@@ -365,7 +356,31 @@ describe('レッド戦（07 の193章）', () => {
       }
       const s = indexOf(sim, 'red-snorlax');
       expect(Math.hypot(w.enemies.x[s]! - h.x, w.enemies.y[s]! - h.y)).toBeLessThan(2);
-      expect(w.bosses.find((b) => b.id === snorlaxId)?.stunTicks).toBeGreaterThan(0);
+      // 着地して気絶する（プレイヤーのギガインパクトの反動と同じ動作）
+      const stun = w.hazards.find((z) => z.dasher === snorlaxId && moveId(sim, z.move) === 'snorlax-thrown-stun');
+      expect(stun).toBeDefined();
+      expect(rules0().stage.moves[stun!.move]!.pose).toBe('Hurt');
+    });
+
+    it('スピードスターの間は歩かない', () => {
+      const sim = espeonRound();
+      const w = sim.world;
+      const first = until(sim, 'espeon-swift');
+      void first;
+      const id = w.enemies.id[indexOf(sim, 'red-espeon')]!;
+      let k = 0;
+      sim.step([]);
+      while ((w.bossQueue.some((q) => q.bossId === id) || w.hazards.some((h) => h.dasher === id && h.activeTicks === undefined)) && k++ < 200) {
+        expect(w.enemies.speed[indexOf(sim, 'red-espeon')]).toBe(0);
+        sim.step([]);
+      }
+      expect(k).toBeGreaterThan(30);
+    });
+
+    it('どろかけ は扇でなく玉で、赤い予告を出さない', () => {
+      const m = rules0().stage.moves.find((x) => x.id === 'espeon-mud-slap')!;
+      expect(m.shape).toBe('circle');
+      expect(m.hideTelegraph).toBe(true);
     });
 
     it('サイコキネシス: 予告が止まってから、プレイヤーの速さで範囲の外へ出られる', () => {
@@ -389,51 +404,6 @@ describe('レッド戦（07 の193章）', () => {
       expect(seen.size).toBe(rules0().stage.moves.find((x) => x.id === 'espeon-psychic-burst')!.count);
       expect(h).toBeDefined();
     });
-  });
-
-  it('交代: 第 3 ラウンドは順番の 1 体だけが動き、順番でない相手は遅く歩いて技を使わない', () => {
-    const sim = round(2);
-    const w = sim.world;
-    const ids = ['red-venusaur', 'red-charizard', 'red-blastoise'];
-    const seen = new Set<string>();
-    for (let k = 0; k < 30 * 30; k++) {
-      sim.step([]);
-      const active = ids.filter((id) => legendTurnIsActive(w, indexOf(sim, id)));
-      expect(active.length).toBe(1);
-      seen.add(active[0]!);
-      for (const id of ids) {
-        if (id === active[0]) continue;
-        const i = indexOf(sim, id);
-        const bid = w.enemies.id[i]!;
-        // 順番が変わった直後は前の技の続きが残るので、新しく始めた技だけを見る
-        if (w.hazards.some((h) => h.dasher === bid && h.ticksLeft === h.totalTicks)) throw new Error(`${id} が順番でないのに技を始めた`);
-      }
-    }
-    expect(seen.size).toBe(3);
-  });
-
-  it('交代: 相手が 1 体になると交代は終わり、常に動く', () => {
-    const sim = round(1);
-    const w = sim.world;
-    const espeon = indexOf(sim, 'red-espeon');
-    expect(legendTurns(w, espeon)).not.toBeNull();
-    sim.step([{ type: 'damageEnemy', id: w.enemies.id[espeon]!, amount: 1e9, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);
-    sim.step([]);
-    const snorlax = indexOf(sim, 'red-snorlax');
-    expect(legendTurns(w, snorlax)).toBeNull();
-    expect(legendTurnIsActive(w, snorlax)).toBe(true);
-  });
-
-  it('交代の順番は残り時間から決まるので、ゲストでも同じになる', () => {
-    const host = round(2);
-    const guest = round(2);
-    // ゲストの残り時間は、ホストから届いた残り（ticksLeft）に自分の更新番号を足したもの
-    const left = host.world.legendary!.endTick - host.world.tick;
-    guest.world.tick += 1234;
-    guest.world.legendary!.endTick = guest.world.tick + left;
-    for (const id of ['red-venusaur', 'red-charizard', 'red-blastoise']) {
-      expect(legendTurnIsActive(guest.world, indexOf(guest, id))).toBe(legendTurnIsActive(host.world, indexOf(host, id)));
-    }
   });
 
   it('回復の技は 1 体につき決まった回数まで（ねむる）', () => {

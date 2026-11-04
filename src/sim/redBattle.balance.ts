@@ -6,7 +6,7 @@ import { emptySave } from '../meta/saveData';
 import type { Axis, InputCommand } from './commands';
 import { Simulation } from './simulation';
 import { CASTER_ID_BASE } from './systems/attack';
-import { hazardHits, legendRoundKinds, legendTurnIsActive, startLegendary } from './systems/stage';
+import { hazardHits, legendRoundKinds, startLegendary } from './systems/stage';
 import type { UpgradeOffer } from './world';
 
 /**
@@ -281,7 +281,7 @@ function run(line: string): void {
           if (e.hp[i]! > 0 && (e.x[i]! - p.x) ** 2 + (e.y[i]! - p.y) ** 2 <= (e.radius[i]! + p.radius + 2) ** 2) source = `触れる:${kinds[e.kind[i]!]!.id}`;
         }
         if (!source) {
-          for (let i = 0; i < e.count; i++) if (e.hp[i]! > 0 && legendTurnIsActive(w, i)) source += `${source ? '+' : ''}${kinds[e.kind[i]!]!.id}`;
+          for (let i = 0; i < e.count; i++) if (e.hp[i]! > 0) source += `${source ? '+' : ''}${kinds[e.kind[i]!]!.id}`;
           source = `技:${source}`;
         }
         hurtBy[source] = (hurtBy[source] ?? 0) + (hpBefore - p.hp) / p.maxHp;

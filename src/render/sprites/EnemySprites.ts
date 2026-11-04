@@ -92,8 +92,10 @@ export class EnemySprites {
       const dir = pose?.spin || body?.spin ? Math.floor(this.scene.time.now / 45) % 8 : slot.dir;
       const key = animKey(manifest.key, anim, dir);
       if (slot.sprite.anims.currentAnim?.key !== key) {
+        // コマ数の違う動作へ切り替えるので、新しい動作のコマ数を超えないようにする（超えると Phaser が止まる）
         const frame = slot.sprite.anims.currentFrame?.index ?? 1;
-        slot.sprite.play({ key, startFrame: frame - 1 });
+        const frames = manifest.animations[anim]?.durations.length ?? 1;
+        slot.sprite.play({ key, startFrame: Math.min(frame - 1, frames - 1) });
       }
       // 浮く高さは少しずつ寄せる（ふわっと上がり、ふわっと降りる）
       slot.lift = (slot.lift ?? 0) + ((body?.lift ?? 0) - (slot.lift ?? 0)) * 0.25;

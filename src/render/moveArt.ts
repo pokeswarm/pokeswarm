@@ -5800,32 +5800,48 @@ function voltFizzle(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
-/** リフレクター（レッドのエーフィ。07 の195章）: 体を囲む六角形の光の壁。中は透けていて、縁が光り、面に光の筋が走る */
-function reflectShell(): SpriteOut {
-  const palette = ['#ad1457', '#f48fb1', '#fce4ec', '#ffffff', '#80deea'];
-  const hex = (u: number, v: number): number => {
-    const x = Math.abs(u);
-    const y = Math.abs(v);
-    return Math.max(y, x * 0.866 + y * 0.5);
-  };
+/** リフレクター（レッドのエーフィ。07 の195章）: 体を覆う薄い泡。細い縁と、左上の光だけで、中はそのまま見える */
+function bubbleShield(): SpriteOut {
+  const palette = ['#7e57c2', '#ce93d8', '#f3e5f5', '#ffffff'];
   const frames = [0, 1, 2, 3].map((f) =>
     shape(84, (u, v) => {
-      const d = hex(u, v) / 0.92;
-      if (d > 1) return -1;
-      // 光る縁（外が濃く、内が白い）
-      if (d > 0.965) return 0;
-      if (d > 0.93) return f % 2 === 0 ? 3 : 2;
-      if (d > 0.9) return 1;
-      // 面を斜めに流れる光の筋（すき間だらけにして、中の体を見せる）
-      const px = Math.round((u + 1) * 42);
-      const py = Math.round((v + 1) * 42);
-      const band = (((u - v * 0.6) * 1.2 + f / 4) % 1 + 1) % 1;
-      if (band < 0.1 && (px + py) % 2 === 0) return 2;
-      if (band < 0.16 && (px + py) % 4 === 0) return 4;
+      // 少し揺れる
+      const a = Math.atan2(v, u);
+      const R = 0.93 + Math.sin(a * 2 + (f * Math.PI) / 2) * 0.012;
+      const d = Math.hypot(u, v);
+      if (d > R) return -1;
+      if (d > R - 0.025) return 0;
+      if (d > R - 0.05) return 1;
+      // 左上の光の弧
+      const arc = Math.abs(a + 2.3);
+      if (d > R * 0.72 && d < R * 0.82 && arc < 0.55) return arc < 0.3 ? 3 : 2;
+      // 右下の小さな光
+      if (Math.hypot(u - 0.42, v - 0.46) < 0.05) return 2;
       return -1;
     }),
   );
-  return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
+  return { palette, frameMs: 180, parts: { main: frames.map(toRows) } };
+}
+
+/** リフレクターが割れる（07 の195章）: 泡の縁が破片になって外へ飛び、消えていく */
+function bubbleBurst(): SpriteOut {
+  const palette = ['#7e57c2', '#ce93d8', '#f3e5f5', '#ffffff'];
+  const frames = [0, 1, 2, 3, 4, 5].map((f) =>
+    shape(84, (u, v) => {
+      const a = Math.atan2(v, u);
+      const d = Math.hypot(u, v);
+      const seg = Math.floor(((a + Math.PI) / (Math.PI * 2)) * 14);
+      // 破片ごとに、少しずつ違う速さで広がる
+      const r = 0.62 + f * (0.055 + hash(seg, 5) * 0.03);
+      const w = 0.075 - f * 0.009;
+      const inSeg = ((((a + Math.PI) / (Math.PI * 2)) * 14) % 1 + 1) % 1;
+      // 破片のすき間（広がるほど大きい）
+      if (inSeg < 0.12 + f * 0.05 || inSeg > 0.88 - f * 0.05) return -1;
+      if (Math.abs(d - r) < w) return f < 2 ? 3 : f < 4 ? 2 : 1;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 50, parts: { main: frames.map(toRows) } };
 }
 
 /** 10まんボルト（レッドのピカチュウ。07 の194章）: 自分を中心に広がる稲妻。コマごとに黒・白・黄で明滅する */
@@ -6248,7 +6264,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'daze-stars': () => dazeStars(),
     'volt-fizzle': () => voltFizzle(),
     'thunder-burst-bwy': () => thunderBurstBwy(),
-    'reflect-shell': () => reflectShell(),
+    'bubble-shield': () => bubbleShield(),
+    'bubble-burst': () => bubbleBurst(),
     'shell-spin-water': () => shellSpinWater(),
     // ボスの技（07 の189章）
     'zen-aura': () => zenAura(),

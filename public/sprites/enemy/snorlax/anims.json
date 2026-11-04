@@ -24,6 +24,16 @@
         10
       ],
       "frameKeyPrefix": "Walk"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 48,
+      "frameHeight": 64,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
     }
   },
   "missing": []

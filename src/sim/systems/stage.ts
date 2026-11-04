@@ -385,7 +385,7 @@ export function bossAttacks(world: World): void {
       enrageBoss(world, boss, i);
       switchPhase(world, boss, i);
       // 投げられている間（エーフィの サイコキネシス）は行動しない
-      if (stepThrown(world, boss, i)) continue;
+      if (stepThrown(world, i)) continue;
       fieldLightning(world, boss, i);
       dropAtHp(world, boss, i);
       // 跳ね回っている間（ボルテッカー・ころがる）と、反動で止まっている間は、次の技を使わない（07 の167章）
@@ -406,22 +406,6 @@ export function bossAttacks(world: World): void {
         if (!bossBusy(world, boss.id)) useBossMove(world, boss, i, boss.forced.shift()!);
         boss.cooldown = boss.interval;
         continue;
-      }
-      // 交代: 順番でない相手は歩くだけ。順番が来たら、少し間を置いて技を始める（07 の193章）
-      const turns = legendTurns(world, i);
-      if (turns) {
-        if (bossBusy(world, boss.id)) continue;
-        if (!legendTurnIsActive(world, i)) {
-          boss.waiting = true;
-          boss.cooldown = Math.max(1, Math.round(turns.startDelaySeconds / world.dt));
-          world.enemies.speed[i] = (bossSpeed(world, boss, i) * turns.idleSpeedPct) / 100;
-          continue;
-        }
-      }
-      // 最後の 1 体になったときも、歩く速さを戻す
-      if (boss.waiting && legendTurnIsActive(world, i)) {
-        boss.waiting = false;
-        world.enemies.speed[i] = bossSpeed(world, boss, i);
       }
       // 技が終わってから間隔を数える（間隔のぶん必ず歩く）
       if (boss.intervalAfterMove && bossBusy(world, boss.id)) {
@@ -489,7 +473,7 @@ function aliveOfKind(world: World, kindId: string): number {
  * 投げられている相手（カビゴン。ソロ・ホスト。07 の195章）: サイコキネシスの予告の間は止まって行動せず、
  * 落ちる flightSeconds 前から予告の場所へ飛ぶ。投げられている間なら true
  */
-function stepThrown(world: World, boss: World['bosses'][number], i: number): boolean {
+function stepThrown(world: World, i: number): boolean {
   const kindId = world.rules.enemies.kinds[world.enemies.kind[i]!]?.id;
   const hz = world.hazards.find((h) => h.activeTicks === undefined && world.rules.stage.moves[h.move]?.throwPartner?.kind === kindId);
   const thrown = hz && world.rules.stage.moves[hz.move]!.throwPartner!;
@@ -502,8 +486,6 @@ function stepThrown(world: World, boss: World['bosses'][number], i: number): boo
     e.x[i]! += (hz.x - e.x[i]!) * k;
     e.y[i]! += (hz.y - e.y[i]!) * k;
   }
-  // 着地したら少しの間止まる（反動と同じ）
-  boss.stunTicks = Math.round(thrown.stunSeconds / world.dt);
   return true;
 }
 
@@ -516,40 +498,6 @@ function dropAtHp(world: World, boss: World['bosses'][number], i: number): void 
   at.shift();
   const set = world.rules.stage.legendary?.moveSets[world.rules.enemies.kinds[world.enemies.kind[i]!]?.id ?? ''];
   if (set?.hpDrops) spawnItemsAround(world, set.hpDrops.item, world.enemies.x[i]!, world.enemies.y[i]!, world.players.length);
-}
-
-/**
- * 交代の決まり（07 の193章）: i の相手のラウンドに turns があり、まだ 2 体以上残っていれば返す。
- * どのブラウザでも同じになるよう、順番は残り時間（endTick）と残っている相手から決める
- */
-export function legendTurns(world: World, i: number): NonNullable<NonNullable<NonNullable<World['rules']['stage']['legendary']>['rounds']>[number]['turns']> | null {
-  const lg = world.legendary;
-  if (!lg || lg.result) return null;
-  const id = world.rules.enemies.kinds[world.enemies.kind[i]!]?.id ?? '';
-  const round = world.rules.stage.legendary?.rounds?.find((r) => r.kinds.includes(id));
-  if (!round?.turns || turnAlive(world).length < 2) return null;
-  return round.turns;
-}
-
-/** 交代のあるラウンドで、残っている相手の敵の番号（ラウンドの kinds の順） */
-function turnAlive(world: World): number[] {
-  const lg = world.legendary;
-  if (!lg) return [];
-  const e = world.enemies;
-  const out: number[] = [];
-  for (const k of legendRoundKinds(world, lg.kind)) {
-    for (let i = 0; i < e.count; i++) if (e.kind[i] === k && e.hp[i]! > 0) out.push(i);
-  }
-  return out;
-}
-
-/** 交代で、今が i の相手の順番か（交代が無ければ常に順番） */
-export function legendTurnIsActive(world: World, i: number): boolean {
-  const turns = legendTurns(world, i);
-  if (!turns) return true;
-  const alive = turnAlive(world);
-  const n = Math.floor((Math.max(0, world.legendary!.endTick - world.tick) * world.dt) / turns.seconds);
-  return alive[alive.length - 1 - (n % alive.length)] === i;
 }
 
 /** 段階（変化タイプ）: HP が段階の割合を切ったら技を切り替え、「DANGER」を出す（ソロ・ホスト） */
@@ -1151,7 +1099,7 @@ function strikeHazards(world: World): void {
         const back = move.target === 'self' ? 0 : move.radius;
         world.events.push({ ...struckEvent(hz, move), x: hz.x + hz.dirX * back, y: hz.y + hz.dirY * back, shape: 'circle', radius: hz.length - back });
       }
-    } else if (!move?.trap) world.events.push(struckEvent(hz, move));
+    } else if (!move?.trap && !(move?.hideTelegraph && !move.damage)) world.events.push(struckEvent(hz, move));
     if (world.role !== 'guest' && hz.dasher !== -1) onBossMoveStruck(world, hz, move);
     // 残る床（凍った床・燃える地面・砂の渦）。直線は線に沿って並べる。どのブラウザでも同じものを作る
     if (move?.leaves) {
@@ -1329,6 +1277,11 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
   }
   const holder = move.holdSeconds ? world.legendAis.get(hz.dasher) : undefined;
   if (holder) holder.holdTicks = Math.round(move.holdSeconds! / world.dt);
+  // 投げた相手が着地して気絶する
+  if (move.throwPartner) {
+    const partner = aliveOfKind(world, move.throwPartner.kind);
+    if (partner !== -1) castBossMove(world, world.enemies.id[partner]!, partner, moveIndexOfStage(world.rules, move.throwPartner.recoverMove));
+  }
   // 壁（リフレクター）を張る
   if (move.barrier && boss) {
     boss.barrier = (world.enemies.maxHp[i]! * move.barrier.hpPct) / 100;

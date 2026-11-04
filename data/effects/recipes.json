@@ -7170,20 +7170,36 @@
     "boss-mud-shot": {
       "extends": "ground.base",
       "bossActive": {
-        "id": "mud-spray",
-        "fit": "cone",
-        "size": 1
+        "id": "mud-ball",
+        "fit": "circle",
+        "size": 1.5,
+        "rotate": "spin",
+        "spinDegPerSec": 300
       }
     },
     "boss-reflect": {
       "extends": "psychic.base",
       "bossActive": {
-        "id": "reflect-shell",
+        "id": "bubble-shield",
         "fit": "circle",
-        "size": 2.1,
-        "originY": 0.6,
+        "size": 2,
+        "originY": 0.58,
+        "alpha": 0.85,
         "overBoss": true
       }
+    },
+    "boss-bubble-burst": {
+      "extends": "psychic.base",
+      "bossTelegraph": {
+        "id": "bubble-burst",
+        "fit": "circle",
+        "size": 2.2,
+        "originY": 0.58,
+        "overBoss": true
+      }
+    },
+    "boss-thrown-landing": {
+      "extends": "normal.base"
     },
     "boss-psychic-throw": {
       "extends": "psy",

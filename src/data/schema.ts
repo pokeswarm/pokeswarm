@@ -558,9 +558,9 @@ export const bossMoveSchema = z.object({
   liftBody: z.number().positive().optional(),
   /**
    * 相手を投げ飛ばす（エーフィの サイコキネシス。07 の195章）: 同時に出ている kind の相手を、予告の間は浮かせて行動を止め、
-   * 落ちる flightSeconds 前に予告の場所へ投げる。着地で stunSeconds 止まる。相手がいなければ、代わりに noPartnerMove を使う
+   * 落ちる flightSeconds 前に予告の場所へ投げる。着地で相手が recoverMove を使う（気絶）。相手がいなければ、代わりに noPartnerMove を使う
    */
-  throwPartner: z.object({ kind: z.string().min(1), flightSeconds: z.number().positive(), stunSeconds: z.number().positive(), liftHeight: z.number().positive(), noPartnerMove: z.string().min(1) }).optional(),
+  throwPartner: z.object({ kind: z.string().min(1), flightSeconds: z.number().positive(), recoverMove: z.string().min(1), liftHeight: z.number().positive(), noPartnerMove: z.string().min(1) }).optional(),
   /**
    * ダメージを防ぐ壁（エーフィの リフレクター。07 の195章）: 当たっている間、最大 HP の hpPct % のダメージを受け止める。
    * 受け止めきれず割れると、今の技をやめて breakMove を使う（気絶）。時間が来ると何も起こらず消える
@@ -837,11 +837,6 @@ export const stageConfigSchema = z.object({
             kinds: z.array(z.string().min(1)).min(1),
             stat: z.string().optional(),
             bgm: z.string().optional(),
-            /**
-             * 交代（07 の193章）: 同時に出ている相手のうち、seconds ごとに 1 体だけが技を使う。ほかの相手は idleSpeedPct % の速さで歩くだけで、
-             * 攻撃するチャンスになる。startDelaySeconds は順番が来てから最初の技までの秒数。markerColor は順番の相手の足元の輪の色
-             */
-            turns: z.object({ seconds: z.number().positive(), idleSpeedPct: z.number().min(0).max(100), startDelaySeconds: z.number().nonnegative(), markerColor: z.string() }).optional(),
           }),
         )
         .optional(),

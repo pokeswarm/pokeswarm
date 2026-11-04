@@ -53,7 +53,7 @@ import { clearRunProbe, writeRunProbe } from '../meta/runProbe';
 import { session } from '../meta/session';
 import { regionStatKey } from '../meta/regionScope';
 import { LevelUpPanel, offerText } from './levelUpPanel';
-import { activeField, activeLegendField, currentWeather, startIntruder, startLegendary, legendRoundKinds, legendTurnIsActive, legendTurns } from '../sim/systems/stage';
+import { activeField, activeLegendField, currentWeather, startIntruder, startLegendary, legendRoundKinds } from '../sim/systems/stage';
 import { PausePanel } from './pausePanel';
 import { ContestPanel } from './contestPanel';
 import { EvolutionCutscene } from './evolutionCutscene';
@@ -1572,28 +1572,9 @@ export class RunScene extends Phaser.Scene {
   }
 
   /** ボスの範囲技の予告: 範囲の円と、落ちるまでの残りを内側から広がる円で見せる */
-  /** 交代（レッド戦。07 の193章）: 今、技を使う順番の相手の足元に輪を出す */
-  private drawTurnMarker(g: Phaser.GameObjects.Graphics): void {
-    const w = this.sim.world;
-    const lg = w.legendary;
-    if (!lg || lg.result) return;
-    const e = w.enemies;
-    const kinds = legendRoundKinds(w, lg.kind);
-    for (let i = 0; i < e.count; i++) {
-      if (e.hp[i]! <= 0 || !kinds.includes(e.kind[i]!) || w.hiddenEnemies.has(e.id[i]!)) continue;
-      const turns = legendTurns(w, i);
-      if (!turns || !legendTurnIsActive(w, i)) continue;
-      const r = e.radius[i]! * (1.25 + Math.sin(w.tick * 0.2) * 0.08);
-      const color = Phaser.Display.Color.HexStringToColor(turns.markerColor).color;
-      g.lineStyle(4, color, 0.85).strokeEllipse(e.x[i]!, e.y[i]! + e.radius[i]! * 0.55, r * 2.3, r * 1.1);
-      g.lineStyle(2, 0xffffff, 0.55).strokeEllipse(e.x[i]!, e.y[i]! + e.radius[i]! * 0.55, r * 1.95, r * 0.9);
-    }
-  }
-
   private drawHazards(hazards: readonly Hazard[]): void {
     const g = this.hazardView;
     g.clear();
-    this.drawTurnMarker(g);
     let countdowns = 0;
     for (const h of hazards) {
       // 飛ぶ玉（サンダーの電気の玉）: 飛んでいる間は黄色い玉

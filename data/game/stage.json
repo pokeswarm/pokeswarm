@@ -1479,26 +1479,27 @@
       "travel": {
         "speed": 290
       },
-      "activeSeconds": 3
+      "activeSeconds": 3,
+      "recoilSeconds": 0.7
     },
     {
       "id": "espeon-mud-slap",
       "move": "mud-slap",
       "effect": "boss-mud-shot",
-      "shape": "cone",
-      "arc": 70,
+      "shape": "circle",
       "target": "player",
       "rooted": true,
-      "telegraphSeconds": 0.45,
-      "radius": 70,
+      "hideTelegraph": true,
+      "telegraphSeconds": 0.3,
+      "radius": 20,
       "damage": 14,
-      "activeSeconds": 1.6,
+      "activeSeconds": 2.2,
       "repeat": {
         "count": 3,
-        "everySeconds": 0.45
+        "everySeconds": 0.4
       },
       "travel": {
-        "speed": 240
+        "speed": 260
       },
       "onHit": {
         "mudSeconds": 3
@@ -1519,8 +1520,34 @@
       "activeSeconds": 10,
       "barrier": {
         "hpPct": 8,
-        "breakMove": "espeon-stun"
+        "breakMove": "espeon-barrier-break"
       }
+    },
+    {
+      "id": "espeon-barrier-break",
+      "effect": "boss-bubble-burst",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "hideTelegraph": true,
+      "clearsBarrier": true,
+      "pose": "Hurt",
+      "telegraphSeconds": 0.3,
+      "radius": 46,
+      "damage": 0,
+      "then": "espeon-stun"
+    },
+    {
+      "id": "snorlax-thrown-stun",
+      "effect": "boss-thrown-landing",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "hideTelegraph": true,
+      "pose": "Hurt",
+      "telegraphSeconds": 1.2,
+      "radius": 44,
+      "damage": 0
     },
     {
       "id": "espeon-stun",
@@ -1529,7 +1556,6 @@
       "target": "self",
       "rooted": true,
       "hideTelegraph": true,
-      "clearsBarrier": true,
       "pose": "Hurt",
       "telegraphSeconds": 3,
       "radius": 44,
@@ -1553,9 +1579,9 @@
       "throwPartner": {
         "kind": "red-snorlax",
         "flightSeconds": 0.6,
-        "stunSeconds": 1.2,
         "liftHeight": 40,
-        "noPartnerMove": "espeon-psychic-burst"
+        "noPartnerMove": "espeon-psychic-burst",
+        "recoverMove": "snorlax-thrown-stun"
       }
     },
     {

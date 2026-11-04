@@ -28,7 +28,7 @@
    "id": "first-run",
    "name": "はじめの一歩",
    "hidden": false,
-   "condition": "ランを1回遊ぶ",
+   "condition": "1回 ちょうせんする",
    "stat": "runs ≧ 1",
    "rewardKind": "持ち物",
    "reward": "ダウジングマシンが 出るようになる"
@@ -38,7 +38,7 @@
    "id": "first-clear",
    "name": "チャンピオンへの道",
    "hidden": false,
-   "condition": "ランを1回クリアする",
+   "condition": "でんどういりする",
    "stat": "clears ≧ 1",
    "rewardKind": "持ち物",
    "reward": "しあわせタマゴが 出るようになる"
@@ -48,7 +48,7 @@
    "id": "clear-charmander",
    "name": "ほのおのきずな",
    "hidden": false,
-   "condition": "ヒトカゲでクリアする",
+   "condition": "ヒトカゲで でんどういりする",
    "stat": "clears.charmander ≧ 1",
    "rewardKind": "バフ",
    "reward": "ヒトカゲの 最初の技が Lv2"
@@ -58,7 +58,7 @@
    "id": "clear-bulbasaur",
    "name": "くさのきずな",
    "hidden": false,
-   "condition": "フシギダネでクリアする",
+   "condition": "フシギダネで でんどういりする",
    "stat": "clears.bulbasaur ≧ 1",
    "rewardKind": "バフ",
    "reward": "フシギダネの 最初の技が Lv2"
@@ -68,7 +68,7 @@
    "id": "clear-squirtle",
    "name": "みずのきずな",
    "hidden": false,
-   "condition": "ゼニガメでクリアする",
+   "condition": "ゼニガメで でんどういりする",
    "stat": "clears.squirtle ≧ 1",
    "rewardKind": "バフ",
    "reward": "ゼニガメの 最初の技が Lv2"
@@ -76,9 +76,9 @@
   {
    "region": "kanto",
    "id": "clear-coop",
-   "name": "みんなでクリア",
+   "name": "みんなで でんどういり",
    "hidden": false,
-   "condition": "協力プレイでクリアする",
+   "condition": "協力プレイで でんどういりする",
    "stat": "clears.coop ≧ 1",
    "rewardKind": "バフ",
    "reward": "協力プレイで 経験値 +10%"
@@ -88,7 +88,7 @@
    "id": "gyms-4",
    "name": "バッジ よっつ",
    "hidden": false,
-   "condition": "1ランで ジムリーダーを4人 倒す",
+   "condition": "1回の ちょうせんで ジムリーダーを4人 倒す",
    "stat": "bestMidbosses ≧ 4",
    "rewardKind": "持ち物",
    "reward": "せんせいのツメが 出るようになる"
@@ -98,7 +98,7 @@
    "id": "reach-elite-four",
    "name": "セキエイ高原へ",
    "hidden": false,
-   "condition": "1ランで ジムリーダーを全員倒し、四天王に挑む",
+   "condition": "1回の ちょうせんで ジムリーダーを全員倒し、四天王に挑む",
    "stat": "bestMidbosses ≧ 8",
    "rewardKind": "持ち物",
    "reward": "メトロノームが 出るようになる"
@@ -158,7 +158,7 @@
    "id": "all-starters-clear",
    "name": "御三家マスター",
    "hidden": false,
-   "condition": "ヒトカゲ・フシギダネ・ゼニガメの すべてで クリアする",
+   "condition": "ヒトカゲ・フシギダネ・ゼニガメの すべてで でんどういりする",
    "stat": "clears.charmander ≧ 1 & clears.bulbasaur ≧ 1 & clears.squirtle ≧ 1",
    "rewardKind": "バフ",
    "reward": "持ち物の枠 +1"
@@ -168,7 +168,7 @@
    "id": "level-70",
    "name": "限界の その先へ",
    "hidden": true,
-   "condition": "1ランでレベル70に到達する",
+   "condition": "1回の ちょうせんで レベル70に到達する",
    "stat": "bestLevel ≧ 70",
    "rewardKind": "バフ",
    "reward": "経験値 +5%"
@@ -178,7 +178,7 @@
    "id": "kills-in-run-5000",
    "name": "ぜんぶ たおす",
    "hidden": true,
-   "condition": "1ランで5000体倒す",
+   "condition": "1回の ちょうせんで 5000体倒す",
    "stat": "bestKills ≧ 5000",
    "rewardKind": "バフ",
    "reward": "経験値の玉の 取得範囲 +20%"
@@ -198,7 +198,7 @@
    "id": "pikachu-light-ball",
    "name": "でんきの あいぼう",
    "hidden": false,
-   "condition": "ピカチュウで ランを クリアする",
+   "condition": "ピカチュウで でんどういりする",
    "stat": "clears.pikachu ≧ 1",
    "rewardKind": "持ち物",
    "reward": "でんきだまが 出るようになる"
@@ -208,7 +208,7 @@
    "id": "linking-cord",
    "name": "つながる きずな",
    "hidden": false,
-   "condition": "協力プレイで1回遊ぶ、または1ランで中ボスを8体倒す",
+   "condition": "協力プレイで1回遊ぶ、または 1回の ちょうせんで 中ボスを8体倒す",
    "stat": "runs.coop ≧ 1 | bestMidbosses ≧ 8",
    "rewardKind": "持ち物",
    "reward": " つながりのヒモが 出るようになる"
@@ -298,7 +298,7 @@
    "id": "unlock-scyther",
    "name": "ストライクが なかまに",
    "hidden": false,
-   "condition": "1ランで キョウ（5人目のジムリーダー）まで 倒す",
+   "condition": "1回の ちょうせんで キョウ（5人目のジムリーダー）まで 倒す",
    "stat": "bestMidbosses ≧ 5",
    "rewardKind": "ポケモン",
    "reward": "ストライクが 使えるようになる"
@@ -348,7 +348,7 @@
    "id": "unlock-dragonite",
    "name": "カイリューが なかまに",
    "hidden": false,
-   "condition": "3種類の ポケモンで クリアする",
+   "condition": "3種類の ポケモンで でんどういりする",
    "stat": "distinctClears ≧ 3",
    "rewardKind": "ポケモン",
    "reward": "カイリューが 使えるようになる"
@@ -458,7 +458,7 @@
    "id": "johto-reach-elite-four",
    "name": "ふたたび セキエイ高原へ",
    "hidden": false,
-   "condition": "ジョウトの1ランで ジムリーダーを全員倒し、四天王に挑む",
+   "condition": "ジョウトの 1回の ちょうせんで ジムリーダーを全員倒し、四天王に挑む",
    "stat": "bestMidbosses ≧ 8",
    "rewardKind": "持ち物",
    "reward": "メトロノームが 出るようになる"
@@ -588,7 +588,7 @@
    "id": "johto-unlock-heracross",
    "name": "ジョウトの ヘラクロス",
    "hidden": false,
-   "condition": "ジョウトの1ランで ジムリーダーを8人 倒す",
+   "condition": "ジョウトの 1回の ちょうせんで ジムリーダーを8人 倒す",
    "stat": "bestMidbosses ≧ 8",
    "rewardKind": "ポケモン",
    "reward": "ヘラクロスが 使えるようになる"
@@ -638,7 +638,7 @@
    "id": "johto-unlock-larvitar",
    "name": "ジョウトの ヨーギラス",
    "hidden": false,
-   "condition": "ジョウトを 3種類の ポケモンで クリアする",
+   "condition": "3種類の ポケモンで ジョウトの でんどういりを する",
    "stat": "distinctClears ≧ 3",
    "rewardKind": "ポケモン",
    "reward": "ヨーギラスが 使えるようになる"
@@ -668,7 +668,7 @@
    "id": "johto-silver-wing",
    "name": "ぎんいろの はね",
    "hidden": false,
-   "condition": "ピチュー・ピィ・ププリン・トゲピーで それぞれ ジョウトを クリアする（箱から ぎんいろのはねが 出るようになる）",
+   "condition": "ピチュー・ピィ・ププリン・トゲピーで それぞれ ジョウトの でんどういりを する（箱から ぎんいろのはねが 出るようになる）",
    "stat": "eggClears.pichu ≧ 1 & eggClears.cleffa ≧ 1 & eggClears.igglybuff ≧ 1 & eggClears.togepi ≧ 1",
    "rewardKind": "なし",
    "reward": ""
@@ -758,7 +758,7 @@
    "id": "hoenn-reach-elite-four",
    "name": "サイユウシティへ",
    "hidden": false,
-   "condition": "ホウエンの1ランで ジムリーダーを全員倒し、四天王に挑む",
+   "condition": "ホウエンの 1回の ちょうせんで ジムリーダーを全員倒し、四天王に挑む",
    "stat": "bestMidbosses ≧ 16",
    "rewardKind": "持ち物",
    "reward": "メトロノームが 出るようになる"
@@ -878,7 +878,7 @@
    "id": "hoenn-unlock-beldum",
    "name": "ホウエンの ダンバル",
    "hidden": false,
-   "condition": "ホウエンを クリアする",
+   "condition": "ホウエンの でんどういりを する",
    "stat": "clears ≧ 1",
    "rewardKind": "ポケモン",
    "reward": "ダンバルが 使えるようになる"
@@ -888,7 +888,7 @@
    "id": "hoenn-unlock-ralts",
    "name": "ホウエンの ラルトス",
    "hidden": false,
-   "condition": "ホウエンを 3種類の ポケモンで クリアする",
+   "condition": "3種類の ポケモンで ホウエンの でんどういりを する",
    "stat": "distinctClears ≧ 3",
    "rewardKind": "ポケモン",
    "reward": "ラルトスが 使えるようになる"
@@ -898,7 +898,7 @@
    "id": "hoenn-unlock-trapinch",
    "name": "ホウエンの ナックラー",
    "hidden": false,
-   "condition": "ホウエンの1ランで ジムリーダーを8組 倒す",
+   "condition": "ホウエンの 1回の ちょうせんで ジムリーダーを8組 倒す",
    "stat": "bestMidbosses ≧ 16",
    "rewardKind": "ポケモン",
    "reward": "ナックラーが 使えるようになる"

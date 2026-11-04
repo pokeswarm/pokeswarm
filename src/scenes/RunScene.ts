@@ -60,6 +60,7 @@ import { formatTime, type ResultSceneData } from './ResultScene';
 import { atlasKey } from '../render/sprites/PokemonSprite';
 import { holdScreenAwake } from '../render/screenWakeLock';
 import { DamageNumbers } from '../render/DamageNumbers';
+import { PerishCounts } from '../render/PerishCounts';
 import { displaySettings } from '../render/displaySettings';
 
 /** ソロとホストのプレイヤーの番号（ゲストは部屋でもらった番号 2〜） */
@@ -102,6 +103,7 @@ export class RunScene extends Phaser.Scene {
   private sim!: Simulation;
   /** 自分の攻撃のダメージの数字（設定でオンのときだけ作る） */
   private damageNumbers: DamageNumbers | null = null;
+  private perishCounts: PerishCounts | null = null;
   private clock!: FixedStepClock;
   private keyboard!: KeyboardInput;
   /** スマホのジョイスティック（タッチの端末だけ） */
@@ -540,6 +542,7 @@ export class RunScene extends Phaser.Scene {
     this.effects = new EffectRenderer(this, effectRecipes, depths.effects, spriteRender.effectPixel);
     // ダメージの数字（設定でオン。07 の102章）: プレイヤーより上・画面の表示より下
     this.damageNumbers = null;
+    this.perishCounts = new PerishCounts(this, spriteRender.depths.candy + 1);
     this.setDamageNumbers(displaySettings.current.damageNumbers);
     // 技のドット絵は光の演出の少し下（光の粒が上に重なる）
     this.moveSprites = new MoveSprites(this, moveSprites, depths.effects - 0.1, spriteRender.dot);
@@ -1163,9 +1166,12 @@ export class RunScene extends Phaser.Scene {
         if (escaped) this.announceText.setText(t('run.legendEscaped', { name: this.enemyName(ev.legendary!.kind) })).setColor('#b3e5fc').setAlpha(1);
         // 中ボスを制限時間で倒せなかった（07 の106章）
         else if (ev.gateTimeUp !== undefined) this.announceText.setText(t('run.gateTimeUp', { name: this.enemyName(ev.gateTimeUp) })).setColor('#ef9a9a').setAlpha(1);
+        // 伝説戦の結果（でんどういりはその前に確定している。「でんどういり！」と出さず、勝ち負けを出す。07 の179章）
+        else if (ev.legendary?.result === 'won') this.announceText.setText(t('run.legendWon', { name: this.enemyName(ev.legendary.kind) })).setColor('#ffe082').setAlpha(1);
+        else if (ev.legendary?.result === 'lost') this.announceText.setText(t('run.legendLost', { name: this.enemyName(ev.legendary.kind) })).setColor('#ef9a9a').setAlpha(1);
         else this.announceText.setText(t(`run.${ev.outcome}`)).setColor(clear ? '#ffe082' : '#ef9a9a').setAlpha(1);
         this.legendaryResult = ev.legendary;
-        this.resultAt = performance.now() + (escaped || ev.gateTimeUp !== undefined ? (stageConfig.legendEscapeDelaySeconds ?? stageConfig.endDelaySeconds) : stageConfig.endDelaySeconds) * 1000;
+        this.resultAt = performance.now() + (ev.legendary?.result || ev.gateTimeUp !== undefined ? (stageConfig.legendEscapeDelaySeconds ?? stageConfig.endDelaySeconds) : stageConfig.endDelaySeconds) * 1000;
       }
     }
     if (appeared.length > 0) {
@@ -2072,6 +2078,11 @@ export class RunScene extends Phaser.Scene {
   private enemyAlpha(i: number): number {
     const w = this.sim.world;
     if (w.hiddenEnemies.size > 0 && w.hiddenEnemies.has(w.enemies.id[i]!)) return 0;
+    // ほろびのうた: 倒れる前の 1 秒で薄くなっていく（すっと消える）
+    if (w.enemies.markTicks[i]! > 0 && w.rules.moves[w.enemies.markMove[i]!]?.delayedBlast?.perish) {
+      const left = w.enemies.markTicks[i]! * w.dt;
+      if (left < 1) return Math.max(0.15, left);
+    }
     return w.rules.enemies.kinds[w.enemies.kind[i]!]?.decoy ? 0.55 : 1;
   }
 
@@ -2088,7 +2099,13 @@ export class RunScene extends Phaser.Scene {
     }
     const kinds = this.sim.world.statusKinds;
     // 遅れて爆発する印（みらいよち）: 黒く点滅（爆発が近いほど速く）
-    if (e.markTicks[i]! > 0 && !this.sim.world.rules.moves[e.markMove[i]!]?.delayedBlast?.throw) {
+    // ほろびのうた: 時間とともに色が抜けて暗くなる（3 秒で灰色まで）
+    const mark = e.markTicks[i]! > 0 ? this.sim.world.rules.moves[e.markMove[i]!]?.delayedBlast : undefined;
+    if (mark?.perish) {
+      const v = Math.round(0x50 + (0xff - 0x50) * Math.min(1, (e.markTicks[i]! * this.sim.world.dt) / mark.seconds));
+      return (v << 16) | (v << 8) | v;
+    }
+    if (e.markTicks[i]! > 0 && !mark?.throw) {
       const period = e.markTicks[i]! > 20 ? 8 : 4;
       if (Math.floor(e.markTicks[i]! / period) % 2 === 0) return 0x111111;
     }
@@ -2249,6 +2266,7 @@ export class RunScene extends Phaser.Scene {
         (i) => this.statusTint(i) ?? enemyColor,
         (i) => e.hp[i]! > 0 && this.streamer.manifestOf(e.kind[i]!) === null && this.enemyAlpha(i) > 0,
       );
+    this.perishCounts?.update(world, alpha, view);
     const sprites = this.streamer.stats();
     const pr = world.projectiles;
     this.effects.drawProjectiles(

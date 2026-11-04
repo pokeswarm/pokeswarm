@@ -95,7 +95,10 @@
         "aron",
         "egg-hoenn",
         "barboach",
-        "mawile"
+        "mawile",
+        "latias",
+        "latios",
+        "jirachi"
       ],
       "unlock": {
         "all": [
@@ -112,7 +115,35 @@
     },
     {
       "id": "sinnoh",
-      "available": false
+      "available": false,
+      "unlock": {
+        "all": [
+          {
+            "stat": "hoenn:bossDefeated.groudon",
+            "atLeast": 1
+          },
+          {
+            "stat": "hoenn:bossDefeated.kyogre",
+            "atLeast": 1
+          },
+          {
+            "stat": "hoenn:bossDefeated.rayquaza",
+            "atLeast": 1
+          },
+          {
+            "stat": "hoenn:bossDefeated.deoxys-normal",
+            "atLeast": 1
+          },
+          {
+            "stat": "hoenn:bossDefeated.latias",
+            "atLeast": 1
+          },
+          {
+            "stat": "hoenn:bossDefeated.latios",
+            "atLeast": 1
+          }
+        ]
+      }
     },
     {
       "id": "unova",

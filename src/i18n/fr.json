@@ -443,6 +443,7 @@
   "region.comingSoon": "Bientôt disponible",
   "region.unlock.johto": "🔒 Battez Mew légendaire pour débloquer",
   "region.unlock.hoenn": "🔒 Obtenez Celebi à Johto pour débloquer",
+  "region.unlock.sinnoh": "🔒 Débloqué en obtenant Jirachi à Hoenn",
   "region.unlockedSoon": "🔓 Débloqué — bientôt disponible",
   "guard.title": "PokéSwarm",
   "guard.framed": "Cette page intègre PokéSwarm dans un autre site sans autorisation.\nPokéSwarm est un jeu de fan gratuit et sans publicité, distribué uniquement sur son site officiel.\nJouez sur le site officiel ({url}).",
@@ -640,7 +641,7 @@
   "achievement.hoenn-unlock-feebas.name": "Barpau de Hoenn",
   "achievement.hoenn-unlock-feebas.desc": "Vaincre le Milobellus partenaire à Hoenn",
   "achievement.hoenn-unlock-beldum.name": "Terhal de Hoenn",
-  "achievement.hoenn-unlock-beldum.desc": "Entrer au Panthéon de Hoenn",
+  "achievement.hoenn-unlock-beldum.desc": "Vaincre le Métalosse de Pierre",
   "achievement.hoenn-unlock-ralts.name": "Tarsal de Hoenn",
   "achievement.hoenn-unlock-ralts.desc": "Entrer au Panthéon de Hoenn avec 3 Pokémon différents",
   "achievement.hoenn-unlock-trapinch.name": "Kraknoix de Hoenn",
@@ -674,5 +675,11 @@
   "contest.rank.super": "Super",
   "contest.rank.hyper": "Hyper",
   "contest.rank.master": "Master",
-  "run.meteoriteGot": "Vous avez trouvé : {name} ! Quelque chose arrive du ciel..."
+  "run.meteoriteGot": "Vous avez trouvé : {name} ! Quelque chose arrive du ciel...",
+  "achievement.hoenn-unlock-latias.name": "Latias de Hoenn",
+  "achievement.hoenn-unlock-latias.desc": "Vaincre Latias lors de son intrusion à Hoenn",
+  "achievement.hoenn-unlock-latios.name": "Latios de Hoenn",
+  "achievement.hoenn-unlock-latios.desc": "Vaincre Latios lors de son intrusion à Hoenn",
+  "achievement.hoenn-unlock-jirachi.name": "Jirachi de Hoenn",
+  "achievement.hoenn-unlock-jirachi.desc": "Vaincre tous les légendaires de Hoenn"
 }

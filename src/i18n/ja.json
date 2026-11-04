@@ -464,6 +464,7 @@
   "region.comingSoon": "Coming soon",
   "region.unlock.johto": "🔒 伝説のミュウを倒すと解放",
   "region.unlock.hoenn": "🔒 ジョウトで セレビィを 手に入れると解放",
+  "region.unlock.sinnoh": "🔒 ホウエンで ジラーチを 手に入れると解放",
   "region.unlockedSoon": "🔓 解放済み・準備中",
   "guard.title": "PokéSwarm",
   "guard.framed": "このページは、PokéSwarm をほかのサイトに無断で埋め込んでいます。\nPokéSwarm は無料・広告なしのファンゲームで、公式サイトでしか配っていません。\n公式サイト（{url}）で遊んでください。",
@@ -661,7 +662,7 @@
   "achievement.hoenn-unlock-feebas.name": "ホウエンの ヒンバス",
   "achievement.hoenn-unlock-feebas.desc": "ホウエンで ミロカロス（相棒）を 1回 倒す",
   "achievement.hoenn-unlock-beldum.name": "ホウエンの ダンバル",
-  "achievement.hoenn-unlock-beldum.desc": "ホウエンの でんどういりを する",
+  "achievement.hoenn-unlock-beldum.desc": "ダイゴの メタグロスを 倒す",
   "achievement.hoenn-unlock-ralts.name": "ホウエンの ラルトス",
   "achievement.hoenn-unlock-ralts.desc": "3種類の ポケモンで ホウエンの でんどういりを する",
   "achievement.hoenn-unlock-trapinch.name": "ホウエンの ナックラー",
@@ -695,5 +696,11 @@
   "contest.rank.super": "スーパー",
   "contest.rank.hyper": "ハイパー",
   "contest.rank.master": "マスター",
-  "run.meteoriteGot": "{name}を ひろった！ 空から なにかが くる……"
+  "run.meteoriteGot": "{name}を ひろった！ 空から なにかが くる……",
+  "achievement.hoenn-unlock-latias.name": "ホウエンの ラティアス",
+  "achievement.hoenn-unlock-latias.desc": "ホウエンで 乱入した ラティアスを 倒す",
+  "achievement.hoenn-unlock-latios.name": "ホウエンの ラティオス",
+  "achievement.hoenn-unlock-latios.desc": "ホウエンで 乱入した ラティオスを 倒す",
+  "achievement.hoenn-unlock-jirachi.name": "ホウエンの ジラーチ",
+  "achievement.hoenn-unlock-jirachi.desc": "ホウエンの でんせつを すべて 倒す"
 }

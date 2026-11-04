@@ -1168,6 +1168,10 @@
       "item": "silk-scarf",
       "to": "hyper-beam",
       "line": "bagon"
-    }
+    },
+    {"from":"dragon-breath","item":"dragon-fang","to":"dragon-pulse","line":"latias"},
+    {"from":"dragon-breath","item":"dragon-fang","to":"dragon-pulse","line":"latios"},
+    {"from":"dragon-pulse","to":"mist-ball","line":"latias","minLevel":45,"needsMoves":[{"move":"psychic","level":8}]},
+    {"from":"dragon-pulse","to":"luster-purge","line":"latios","minLevel":45,"needsMoves":[{"move":"psychic","level":8}]}
   ]
 }

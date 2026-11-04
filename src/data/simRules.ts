@@ -318,6 +318,7 @@ export function buildSimRules(region?: string): SimRules {
                   ...(a.enemySlow ? { enemySlow: a.enemySlow } : {}),
                   ...(a.sturdy ? { sturdy: true } : {}),
                   ...(a.intimidateRadius ? { intimidateRadius: a.intimidateRadius } : {}),
+                  ...(a.statusChanceMultiplier ? { statusChanceMultiplier: a.statusChanceMultiplier } : {}),
                 },
               ]),
             ),

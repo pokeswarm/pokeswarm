@@ -464,6 +464,7 @@
   "region.comingSoon": "Coming soon",
   "region.unlock.johto": "🔒 Defeat the legendary Mew to unlock",
   "region.unlock.hoenn": "🔒 Obtain Celebi in Johto to unlock",
+  "region.unlock.sinnoh": "🔒 Unlocked by getting Jirachi in Hoenn",
   "region.unlockedSoon": "🔓 Unlocked — coming soon",
   "guard.title": "PokéSwarm",
   "guard.framed": "This page has embedded PokéSwarm into another site without permission.\nPokéSwarm is a free, ad-free fan game that is only distributed on its official site.\nPlease play on the official site ({url}).",
@@ -661,7 +662,7 @@
   "achievement.hoenn-unlock-feebas.name": "Hoenn Feebas",
   "achievement.hoenn-unlock-feebas.desc": "Defeat the partner Milotic in Hoenn",
   "achievement.hoenn-unlock-beldum.name": "Hoenn Beldum",
-  "achievement.hoenn-unlock-beldum.desc": "Enter Hoenn's Hall of Fame",
+  "achievement.hoenn-unlock-beldum.desc": "Defeat Steven's Metagross",
   "achievement.hoenn-unlock-ralts.name": "Hoenn Ralts",
   "achievement.hoenn-unlock-ralts.desc": "Enter Hoenn's Hall of Fame with 3 different Pokémon",
   "achievement.hoenn-unlock-trapinch.name": "Hoenn Trapinch",
@@ -695,5 +696,11 @@
   "contest.rank.super": "Super",
   "contest.rank.hyper": "Hyper",
   "contest.rank.master": "Master",
-  "run.meteoriteGot": "You found a {name}! Something is coming from the sky..."
+  "run.meteoriteGot": "You found a {name}! Something is coming from the sky...",
+  "achievement.hoenn-unlock-latias.name": "Hoenn Latias",
+  "achievement.hoenn-unlock-latias.desc": "Defeat the Intruding Latias in Hoenn",
+  "achievement.hoenn-unlock-latios.name": "Hoenn Latios",
+  "achievement.hoenn-unlock-latios.desc": "Defeat the Intruding Latios in Hoenn",
+  "achievement.hoenn-unlock-jirachi.name": "Hoenn Jirachi",
+  "achievement.hoenn-unlock-jirachi.desc": "Defeat every Legendary in Hoenn"
 }

@@ -1107,7 +1107,7 @@
       "id": "hoenn-unlock-beldum",
       "region": "hoenn",
       "condition": {
-        "stat": "clears",
+        "stat": "bossDefeated.metagross",
         "atLeast": 1
       },
       "reward": {
@@ -1145,6 +1145,64 @@
       },
       "reward": {
         "pokemon": "aron"
+      }
+    },
+    {
+      "id": "hoenn-unlock-latias",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bossDefeated.latias",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "latias"
+      }
+    },
+    {
+      "id": "hoenn-unlock-latios",
+      "region": "hoenn",
+      "condition": {
+        "stat": "bossDefeated.latios",
+        "atLeast": 1
+      },
+      "reward": {
+        "pokemon": "latios"
+      }
+    },
+    {
+      "id": "hoenn-unlock-jirachi",
+      "region": "hoenn",
+      "hidden": true,
+      "condition": {
+        "all": [
+          {
+            "stat": "bossDefeated.groudon",
+            "atLeast": 1
+          },
+          {
+            "stat": "bossDefeated.kyogre",
+            "atLeast": 1
+          },
+          {
+            "stat": "bossDefeated.rayquaza",
+            "atLeast": 1
+          },
+          {
+            "stat": "bossDefeated.deoxys-normal",
+            "atLeast": 1
+          },
+          {
+            "stat": "bossDefeated.latias",
+            "atLeast": 1
+          },
+          {
+            "stat": "bossDefeated.latios",
+            "atLeast": 1
+          }
+        ]
+      },
+      "reward": {
+        "pokemon": "jirachi"
       }
     }
   ]

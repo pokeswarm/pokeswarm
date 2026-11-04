@@ -71,7 +71,8 @@
     "aqua-tail-slam-azumarill",
     "outrage",
     "outrage-hit",
-    "outrage-last"
+    "outrage-last",
+    "wish"
   ],
   "heavyHitters": [
     "phantom-force",
@@ -125,7 +126,8 @@
     "last-resort-rush": "base",
     "last-resort-stars": "base",
     "last-resort-slam": "base",
-    "last-resort-burst": "base"
+    "last-resort-burst": "base",
+    "doom-desire": "unique"
   },
   "strengthScale": {
     "giga-impact": 2,

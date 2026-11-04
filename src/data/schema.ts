@@ -2345,6 +2345,8 @@ export const abilitiesConfigSchema = z.object({
       enemySlow: z.object({ radius: z.number().positive(), pct: z.number().positive().max(100), ranks: z.enum(['normal', 'boss']) }).optional(),
       sturdy: z.boolean().optional(),
       intimidateRadius: z.number().positive().optional(),
+      /** 技で状態異常にする確率の倍率（てんのめぐみ。07 の189章） */
+      statusChanceMultiplier: z.number().positive().optional(),
     }),
   ),
 });

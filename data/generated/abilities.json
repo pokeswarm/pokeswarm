@@ -79,6 +79,16 @@
       "it": "Prepotenza"
     }
   },
+  "levitate": {
+    "names": {
+      "ja": "ふゆう",
+      "en": "Levitate",
+      "fr": "Lévitation",
+      "de": "Schwebe",
+      "es": "Levitación",
+      "it": "Levitazione"
+    }
+  },
   "moxie": {
     "names": {
       "ja": "じしんかじょう",
@@ -107,6 +117,16 @@
       "de": "Notdünger",
       "es": "Espesura",
       "it": "Erbaiuto"
+    }
+  },
+  "serene-grace": {
+    "names": {
+      "ja": "てんのめぐみ",
+      "en": "Serene Grace",
+      "fr": "Sérénité",
+      "de": "Edelmut",
+      "es": "Dicha",
+      "it": "Leggiadro"
     }
   },
   "shadow-tag": {

@@ -6919,6 +6919,81 @@
         "size": 1.2,
         "seconds": 0.5
       }
+    },
+    "mist-ball": {
+      "extends": "psychic.base",
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3,
+        "shapeAlpha": 0.2
+      },
+      "impact": {
+        "flash": {
+          "radius": 30
+        }
+      },
+      "sprite": {
+        "id": "mist-orb",
+        "fit": "circle",
+        "size": 1.3
+      }
+    },
+    "luster-purge": {
+      "extends": "psychic.base",
+      "chargeGlow": {
+        "color": "#b7ddff",
+        "seconds": 0.45,
+        "radius": 60,
+        "alpha": 1
+      },
+      "projectile": {
+        "glowScale": 1.1,
+        "coreScale": 0.3,
+        "shapeAlpha": 0.2
+      },
+      "impact": {
+        "flash": {
+          "radius": 50
+        }
+      },
+      "sprite": {
+        "id": "luster-orb",
+        "fit": "circle",
+        "size": 1.3
+      },
+      "effectSprite": {
+        "id": "luster-orb",
+        "fit": "circle",
+        "size": 1.1
+      }
+    },
+    "doom-desire": {
+      "extends": "steel.base",
+      "impact": {
+        "flash": {
+          "radius": 60
+        }
+      },
+      "fall": {
+        "id": "doom-star",
+        "height": 340,
+        "size": 0.95,
+        "shards": {
+          "id": "wish-star",
+          "count": 6,
+          "distance": 60,
+          "seconds": 0.4,
+          "size": 0.4
+        }
+      }
+    },
+    "wish": {
+      "extends": "fairy.base",
+      "sprite": {
+        "id": "wish-star",
+        "fit": "circle",
+        "size": 1
+      }
     }
   }
 }

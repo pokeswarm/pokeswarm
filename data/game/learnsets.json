@@ -1535,6 +1535,49 @@
       "swift",
       "giga-drain",
       "leaf-storm"
+    ],
+    "latias": [
+      "mist-ball",
+      "dragon-breath",
+      "twister",
+      "dragon-claw",
+      "dragon-pulse",
+      "outrage",
+      "confusion",
+      "psychic",
+      "future-sight",
+      "recover",
+      "swift",
+      "body-slam",
+      "wish",
+      "healing-wish"
+    ],
+    "latios": [
+      "luster-purge",
+      "dragon-breath",
+      "twister",
+      "dragon-claw",
+      "dragon-pulse",
+      "outrage",
+      "confusion",
+      "psychic",
+      "future-sight",
+      "recover",
+      "swift",
+      "body-slam"
+    ],
+    "jirachi": [
+      "doom-desire",
+      "wish",
+      "healing-wish",
+      "meteor-mash",
+      "confusion",
+      "psychic",
+      "future-sight",
+      "flash-cannon",
+      "iron-head",
+      "swift",
+      "body-slam"
     ]
   }
 }

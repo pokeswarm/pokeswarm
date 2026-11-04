@@ -48,6 +48,7 @@ export interface SimAbility {
   readonly enemySlow?: { readonly radius: number; readonly pct: number; readonly ranks: 'normal' | 'boss' };
   readonly sturdy?: boolean;
   readonly intimidateRadius?: number;
+  readonly statusChanceMultiplier?: number;
 }
 
 /** シミュレーションが使う data/ の定義一式（型だけを参照し、読み込みと組み立ては呼び出し側で行う） */

@@ -443,6 +443,7 @@
   "region.comingSoon": "Demnächst",
   "region.unlock.johto": "🔒 Besiege das legendäre Mew zum Freischalten",
   "region.unlock.hoenn": "🔒 Erhalte Celebi in Johto zum Freischalten",
+  "region.unlock.sinnoh": "🔒 Wird freigeschaltet, wenn du in Hoenn Jirachi erhältst",
   "region.unlockedSoon": "🔓 Freigeschaltet – demnächst",
   "guard.title": "PokéSwarm",
   "guard.framed": "Diese Seite hat PokéSwarm ohne Erlaubnis in eine andere Website eingebettet.\nPokéSwarm ist ein kostenloses, werbefreies Fanspiel, das nur auf der offiziellen Website angeboten wird.\nBitte spiele auf der offiziellen Website ({url}).",
@@ -640,7 +641,7 @@
   "achievement.hoenn-unlock-feebas.name": "Barschwa aus Hoenn",
   "achievement.hoenn-unlock-feebas.desc": "Besiege das Partner-Milotic in Hoenn",
   "achievement.hoenn-unlock-beldum.name": "Tanhel aus Hoenn",
-  "achievement.hoenn-unlock-beldum.desc": "Erreiche in Hoenn die Ruhmeshalle",
+  "achievement.hoenn-unlock-beldum.desc": "Besiege Troys Metagross",
   "achievement.hoenn-unlock-ralts.name": "Trasla aus Hoenn",
   "achievement.hoenn-unlock-ralts.desc": "Erreiche in Hoenn mit 3 verschiedenen Pokémon die Ruhmeshalle",
   "achievement.hoenn-unlock-trapinch.name": "Knacklion aus Hoenn",
@@ -674,5 +675,11 @@
   "contest.rank.super": "Super",
   "contest.rank.hyper": "Hyper",
   "contest.rank.master": "Master",
-  "run.meteoriteGot": "{name} gefunden! Etwas kommt vom Himmel..."
+  "run.meteoriteGot": "{name} gefunden! Etwas kommt vom Himmel...",
+  "achievement.hoenn-unlock-latias.name": "Latias aus Hoenn",
+  "achievement.hoenn-unlock-latias.desc": "Besiege das eindringende Latias in Hoenn",
+  "achievement.hoenn-unlock-latios.name": "Latios aus Hoenn",
+  "achievement.hoenn-unlock-latios.desc": "Besiege das eindringende Latios in Hoenn",
+  "achievement.hoenn-unlock-jirachi.name": "Jirachi aus Hoenn",
+  "achievement.hoenn-unlock-jirachi.desc": "Besiege alle legendären Pokémon in Hoenn"
 }

@@ -135,6 +135,14 @@
         "damageTakenPct": -20
       },
       "intimidateRadius": 160
+    },
+    "levitate": {
+      "typeDamageTakenPct": {
+        "ground": -100
+      }
+    },
+    "serene-grace": {
+      "statusChanceMultiplier": 2
     }
   }
 }

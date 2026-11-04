@@ -888,8 +888,8 @@
    "id": "hoenn-unlock-beldum",
    "name": "ホウエンの ダンバル",
    "hidden": false,
-   "condition": "ホウエンの でんどういりを する",
-   "stat": "clears ≧ 1",
+   "condition": "ダイゴの メタグロスを 倒す",
+   "stat": "bossDefeated.metagross ≧ 1",
    "rewardKind": "ポケモン",
    "reward": "ダンバルが 使えるようになる"
   },
@@ -922,6 +922,36 @@
    "stat": "defeated.aron ≧ 1000",
    "rewardKind": "ポケモン",
    "reward": "ココドラが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-latias",
+   "name": "ホウエンの ラティアス",
+   "hidden": false,
+   "condition": "ホウエンで 乱入した ラティアスを 倒す",
+   "stat": "bossDefeated.latias ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "ラティアスが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-latios",
+   "name": "ホウエンの ラティオス",
+   "hidden": false,
+   "condition": "ホウエンで 乱入した ラティオスを 倒す",
+   "stat": "bossDefeated.latios ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "ラティオスが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-unlock-jirachi",
+   "name": "ホウエンの ジラーチ",
+   "hidden": true,
+   "condition": "ホウエンの でんせつを すべて 倒す",
+   "stat": "bossDefeated.groudon ≧ 1 & bossDefeated.kyogre ≧ 1 & bossDefeated.rayquaza ≧ 1 & bossDefeated.deoxys-normal ≧ 1 & bossDefeated.latias ≧ 1 & bossDefeated.latios ≧ 1",
+   "rewardKind": "ポケモン",
+   "reward": "ジラーチが 使えるようになる"
   }
  ]
 }

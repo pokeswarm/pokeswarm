@@ -5706,6 +5706,40 @@ function lusterOrb(): SpriteOut {
 }
 
 
+/** はめつのねがい: 空から落ちる、光を引く大きな金の星 */
+function doomStar(): SpriteOut {
+  const palette = ['#5a3b00', '#f4b400', '#ffe066', '#ffffff'];
+  const frames = [0, 1].map((f) =>
+    shape(30, (u, v) => {
+      const a = Math.atan2(v, u) + Math.PI / 2 + f * 0.1;
+      const d = Math.hypot(u, v);
+      const r = 0.3 + 0.66 * Math.abs(Math.cos(a * 2.5)) ** 3;
+      if (d > r) return -1;
+      return d < r * 0.35 ? 3 : d < r * 0.65 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/** ねがいごと: ゆっくり昇る小さな星たち（黄と白） */
+function wishStar(): SpriteOut {
+  const palette = ['#b98a0c', '#ffe066', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(36, (u, v) => {
+      for (let k = 0; k < 7; k++) {
+        const cx = -0.75 + k * 0.25;
+        const cy = 0.7 - ((f * 0.28 + hash(k, 3) * 1.4) % 1.4);
+        const dx = Math.abs(u - cx);
+        const dy = Math.abs(v - cy);
+        if (dx + dy < 0.07) return 2;
+        if ((dx < 0.02 && dy < 0.13) || (dy < 0.02 && dx < 0.13)) return k % 2 ? 1 : 0;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
+}
+
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
 /** 絵の名前 → 描く関数 */
@@ -5922,6 +5956,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     // したでなめる の舌・おどろかす の足元の影（07 の147章）
     tongue: () => tongue(),
     'shadow-pool': () => shadowPool(),
+    'doom-star': () => doomStar(),
+    'wish-star': () => wishStar(),
     // ボスの技（07 の189章）
     'zen-aura': () => zenAura(),
     'precipice-blade': () => precipiceBlade(),

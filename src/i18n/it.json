@@ -443,6 +443,7 @@
   "region.comingSoon": "Prossimamente",
   "region.unlock.johto": "🔒 Sconfiggi Mew leggendario per sbloccare",
   "region.unlock.hoenn": "🔒 Ottieni Celebi a Johto per sbloccare",
+  "region.unlock.sinnoh": "🔒 Si sblocca ottenendo Jirachi a Hoenn",
   "region.unlockedSoon": "🔓 Sbloccato — prossimamente",
   "guard.title": "PokéSwarm",
   "guard.framed": "Questa pagina ha incorporato PokéSwarm in un altro sito senza permesso.\nPokéSwarm è un fan game gratuito e senza pubblicità, distribuito solo sul sito ufficiale.\nGioca sul sito ufficiale ({url}).",
@@ -640,7 +641,7 @@
   "achievement.hoenn-unlock-feebas.name": "Feebas di Hoenn",
   "achievement.hoenn-unlock-feebas.desc": "Sconfiggi il Milotic compagno a Hoenn",
   "achievement.hoenn-unlock-beldum.name": "Beldum di Hoenn",
-  "achievement.hoenn-unlock-beldum.desc": "Entra nella Sala d'Onore di Hoenn",
+  "achievement.hoenn-unlock-beldum.desc": "Sconfiggi il Metagross di Rocco",
   "achievement.hoenn-unlock-ralts.name": "Ralts di Hoenn",
   "achievement.hoenn-unlock-ralts.desc": "Entra nella Sala d'Onore di Hoenn con 3 Pokémon diversi",
   "achievement.hoenn-unlock-trapinch.name": "Trapinch di Hoenn",
@@ -674,5 +675,11 @@
   "contest.rank.super": "Super",
   "contest.rank.hyper": "Iper",
   "contest.rank.master": "Master",
-  "run.meteoriteGot": "Hai trovato: {name}! Qualcosa arriva dal cielo..."
+  "run.meteoriteGot": "Hai trovato: {name}! Qualcosa arriva dal cielo...",
+  "achievement.hoenn-unlock-latias.name": "Latias di Hoenn",
+  "achievement.hoenn-unlock-latias.desc": "Sconfiggi Latias quando appare a Hoenn",
+  "achievement.hoenn-unlock-latios.name": "Latios di Hoenn",
+  "achievement.hoenn-unlock-latios.desc": "Sconfiggi Latios quando appare a Hoenn",
+  "achievement.hoenn-unlock-jirachi.name": "Jirachi di Hoenn",
+  "achievement.hoenn-unlock-jirachi.desc": "Sconfiggi tutti i leggendari di Hoenn"
 }

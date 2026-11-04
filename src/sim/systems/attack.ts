@@ -26,7 +26,7 @@ import { DMG_CRIT, DMG_SUPER, type HitEffect } from '../events';
 import { axisToUnit } from '../math';
 import { typeFlags, typeMultiplier, type MoveStats, type SimMoveDef } from '../moves';
 import { findEnemyIndex, type World } from '../world';
-import { abilityPowerMultiplier, killStackPct, pinchMods } from '../ability';
+import { abilityOf, abilityPowerMultiplier, killStackPct, pinchMods } from '../ability';
 import { bumpRunStat } from '../runStats';
 import type { Modifiers } from '../upgrades';
 import { applyHitEffect } from './commands';
@@ -1754,7 +1754,7 @@ export function moveProjectiles(world: World): void {
       // 波に乗る技は、止まっていると押し出さない
       const idle = !!def.idleScale && ownerIdle(world, ownerId);
       // 効果（ノックバック・状態異常）は当てたプレイヤーの画面ですぐ付け、相手へは命中と一緒に送る
-      let fx = rollHitEffect(world, st, kx, ky, idle ? 0 : pr.knockback[i]!, def.randomStatuses);
+      let fx = rollHitEffect(world, st, kx, ky, idle ? 0 : pr.knockback[i]!, def.randomStatuses, (owner && abilityOf(world, owner)?.statusChanceMultiplier) || 1);
       // 押し出しの踏ん張り（引き寄せは数えない）
       const pushKb = Number.isNaN(pr.knockback[i]!) ? st.knockback : pr.knockback[i]!;
       if (fx.kbTicks > 0 && pushKb > 0) fx = knockbackFatigue(world, j, fx);
@@ -2059,7 +2059,7 @@ function tickEveryEffects(world: World, i: number): void {
  * 命中の効果を決める。ノックバックは (dirX, dirY) の向き。
  * 状態異常が付くかの判定は、当てたプレイヤーのブラウザの乱数で行う（03_network.md 3.2）。
  */
-function rollHitEffect(world: World, st: MoveStats, dirX: number, dirY: number, knockback = NaN, randomStatuses: readonly number[] = []): HitEffect {
+function rollHitEffect(world: World, st: MoveStats, dirX: number, dirY: number, knockback = NaN, randomStatuses: readonly number[] = [], chanceMultiplier = 1): HitEffect {
   let kbx = 0;
   let kby = 0;
   let kbTicks = 0;
@@ -2073,7 +2073,7 @@ function rollHitEffect(world: World, st: MoveStats, dirX: number, dirY: number, 
   }
   let status = -1;
   let statusTicks = 0;
-  if ((st.status >= 0 || randomStatuses.length > 0) && st.statusChance > 0 && world.rng.next() < st.statusChance) {
+  if ((st.status >= 0 || randomStatuses.length > 0) && st.statusChance > 0 && world.rng.next() < st.statusChance * chanceMultiplier) {
     // トライアタック: やけど・こおり・まひ のどれか
     status = randomStatuses.length > 0 ? randomStatuses[world.rng.int(randomStatuses.length)]! : st.status;
     statusTicks = Math.round(st.statusSeconds / world.dt);

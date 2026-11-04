@@ -1499,6 +1499,8 @@
       "contactDamage": 45,
       "xp": 0,
       "spriteScale": 2.8,
+      "drop": "potion",
+      "dropPerPlayer": true,
       "motion": {
         "type": "keepDistance",
         "distance": 340
@@ -1514,7 +1516,9 @@
       "radius": 46,
       "contactDamage": 45,
       "xp": 0,
-      "spriteScale": 2.8
+      "spriteScale": 2.8,
+      "drop": "potion",
+      "dropPerPlayer": true
     },
     {
       "id": "poochyena",

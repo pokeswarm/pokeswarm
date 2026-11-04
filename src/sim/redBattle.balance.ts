@@ -23,6 +23,8 @@ const CLEAR_AT_SECONDS = 22 * 60;
 /** 1 ラウンドだけ測る（1〜3）。IDEAL=1 なら、相手を動かさず技も出させない（当たれば出る火力の上限） */
 const ONLY_ROUND = Number(process.env.RED_ROUND ?? 0);
 const IDEAL = process.env.RED_IDEAL === '1';
+/** はねの戦いを 1 戦だけ測る（legend-lugia・legend-ho-oh） */
+const ONLY_KIND = process.env.RED_KIND;
 const PRIORITY: Record<UpgradeOffer['kind'], number> = { derive: 0, moveUp: 1, moveNew: 2, itemNew: 3, itemUp: 4, heal: 5, coins: 6 };
 /** レッド戦に入るときの技（クリアまで来た人の組み立ての例。自動プレイヤーの技の選び方は単純で固有技まで届かないので、ここで入れ替える） */
 const BUILDS: Record<string, string[]> = {
@@ -104,7 +106,8 @@ function run(line: string): void {
     const cmds: InputCommand[] = [];
     if (!forced && !w.levelUp && (w.legendary || w.tick >= CLEAR_AT_SECONDS * tickRate)) {
       forced = true;
-      if (ONLY_ROUND) {
+      if (ONLY_KIND) startLegendary(w, kinds.findIndex((k) => k.id === ONLY_KIND));
+      else if (ONLY_ROUND) {
         const r = rules.stage.legendary!.rounds![ONLY_ROUND - 1]!;
         startLegendary(w, kinds.findIndex((k) => k.id === r.kinds[0]), ONLY_ROUND - 1);
       } else w.requiredLeft.clear();

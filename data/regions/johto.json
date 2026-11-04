@@ -833,6 +833,14 @@
         }
       },
       "legend-lugia": {
+        "hpDrops": {
+          "atHpPct": [
+            75,
+            50,
+            25
+          ],
+          "item": "potion"
+        },
         "moves": [
           "lugia-aeroblast-sweep",
           "lugia-hurricane",
@@ -853,6 +861,14 @@
         }
       },
       "legend-ho-oh": {
+        "hpDrops": {
+          "atHpPct": [
+            75,
+            50,
+            25
+          ],
+          "item": "potion"
+        },
         "moves": [
           "hooh-sacred-fire",
           "hooh-brave-bird",

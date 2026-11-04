@@ -176,6 +176,27 @@ describe('レッド戦（07 の193章）', () => {
     expect(potions()).toBe(8);
   });
 
+  it('はねの戦い（ルギア・ホウオウ）でも、きずぐすりを人数分落とす', () => {
+    for (const id of ['legend-lugia', 'legend-ho-oh']) {
+      const rules = buildSimRules('johto');
+      const sim = new Simulation({ tickRate: 30, seed: 3, rules });
+      for (const k of [1, 2]) sim.addPlayer({ id: k, x: k * 30, y: 0, radius: 12, moveSpeed: 0 });
+      for (const p of sim.world.players) p.invincibleTicks = 1e9;
+      sim.step([]);
+      startLegendary(sim.world, rules.enemies.kinds.findIndex((k) => k.id === id));
+      for (let k = 0; k < 95; k++) sim.step([]);
+      const w = sim.world;
+      const potions = (): number => w.items.filter((x) => x.kind === 'potion').length;
+      const i = indexOf(sim, id);
+      const bossId = w.enemies.id[i]!;
+      w.enemies.hp[i] = w.enemies.maxHp[i]! * 0.7;
+      sim.step([]);
+      expect(potions(), id).toBe(2);
+      sim.step([{ type: 'damageEnemy', id: bossId, amount: 1e9, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);
+      expect(potions(), id).toBe(4);
+    }
+  });
+
   it('次のラウンドが始まっても、落ちているきずぐすりは残る', () => {
     const sim = round(0);
     const w = sim.world;

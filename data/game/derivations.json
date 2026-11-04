@@ -237,7 +237,7 @@
     },
     {
       "from": "flamethrower",
-      "item": "hp-up",
+      "item": "pp-max",
       "to": "eruption",
       "line": "cyndaquil"
     },

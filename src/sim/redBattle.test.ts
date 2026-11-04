@@ -152,41 +152,57 @@ describe('レッド戦（07 の193章）', () => {
     run();
   });
 
-  it('ピカチュウ 行動 3: ボルテッカーは別の壁へ飛び、決めた回数に 1 回プレイヤーを通す。縦や横に固まらない', () => {
-    const sim = round(0);
-    const w = sim.world;
-    const i = indexOf(sim, 'red-pikachu');
-    w.enemies.hp[i] = w.enemies.maxHp[i]! * 0.69;
+  it('ピカチュウ 行動 3: ボルテッカーは今の面と直前の面へは飛ばず、プレイヤーを通すのは左右の面からだけ', () => {
     const m = rules0().stage.moves.find((x) => x.id === 'pika-volt-tackle-ghost')!;
-    const p = w.players[0]!;
-    let ghost = null;
-    for (let k = 0; k < 30 * 20 && !ghost; k++) {
-      sim.step([]);
-      ghost = w.hazards.find((h) => moveId(sim, h.move) === 'pika-volt-tackle-ghost' && h.activeTicks !== undefined) ?? null;
-    }
-    let last = 0;
+    const box = m.travel!.bounceBox!;
     let aimed = 0;
-    const dirs: number[] = [];
-    while (w.hazards.includes(ghost!)) {
-      sim.step([]);
-      if (!w.hazards.includes(ghost!) || (ghost!.bounces ?? 0) === last) continue;
-      last = ghost!.bounces!;
-      expect(Math.hypot(ghost!.vx!, ghost!.vy!)).toBeCloseTo(m.travel!.speed, 3);
-      const a = Math.atan2(ghost!.vy!, ghost!.vx!);
-      dirs.push(a);
-      const toPlayer = Math.atan2(p.y - ghost!.y, p.x - ghost!.x);
-      const off = Math.abs(Math.atan2(Math.sin(a - toPlayer), Math.cos(a - toPlayer)));
-      if (last % m.travel!.bounceBox!.aimEvery === 0) {
-        expect(off).toBeLessThan(0.01);
-        aimed++;
+    let bounces = 0;
+    // 始まりの違う戦いで何度も見る
+    for (let wait = 0; wait < 8; wait++) {
+      const sim = round(0);
+      const w = sim.world;
+      for (let k = 0; k < wait * 11; k++) sim.step([]);
+      const i = indexOf(sim, 'red-pikachu');
+      w.enemies.hp[i] = w.enemies.maxHp[i]! * 0.69;
+      const p = w.players[0]!;
+      let ghost = null;
+      for (let k = 0; k < 30 * 20 && !ghost; k++) {
+        sim.step([]);
+        ghost = w.hazards.find((h) => moveId(sim, h.move) === 'pika-volt-tackle-ghost' && h.activeTicks !== undefined) ?? null;
+      }
+      const walls: number[] = [];
+      let last = 0;
+      let sinceAim = 0;
+      let prevAimed = false;
+      while (w.hazards.includes(ghost!)) {
+        sim.step([]);
+        if (!w.hazards.includes(ghost!) || (ghost!.bounces ?? 0) === last) continue;
+        last = ghost!.bounces!;
+        bounces++;
+        expect(Math.hypot(ghost!.vx!, ghost!.vy!)).toBeCloseTo(m.travel!.speed, 3);
+        const wall = ghost!.lastWall!;
+        const a = Math.atan2(ghost!.vy!, ghost!.vx!);
+        const toPlayer = Math.atan2(p.y - ghost!.y, p.x - ghost!.x);
+        const isAimed = Math.abs(Math.atan2(Math.sin(a - toPlayer), Math.cos(a - toPlayer))) < 0.001;
+        sinceAim++;
+        if (isAimed) {
+          // 左右の面からだけ
+          expect(wall).toBeLessThanOrEqual(1);
+          expect(sinceAim).toBeGreaterThanOrEqual(box.aimEvery);
+          aimed++;
+          sinceAim = 0;
+        }
+        // 届いた面は、今の面でも直前の面でもない（プレイヤーを通した後は除く）
+        if (!prevAimed && walls.length >= 2) {
+          expect(wall).not.toBe(walls.at(-1));
+          expect(wall).not.toBe(walls.at(-2));
+        }
+        walls.push(wall);
+        prevAimed = isAimed;
       }
     }
-    expect(last).toBeGreaterThanOrEqual(8);
-    expect(aimed).toBeGreaterThanOrEqual(2);
-    // 向きがばらける（縦だけ・横だけに固まらない）
-    const near = (deg: number): number => dirs.filter((a) => Math.abs(Math.abs(a) - (deg * Math.PI) / 180) < 0.2).length;
-    expect(near(90)).toBeLessThan(dirs.length * 0.6);
-    expect(near(0) + near(180)).toBeLessThan(dirs.length * 0.6);
+    expect(bounces).toBeGreaterThanOrEqual(8 * 8);
+    expect(aimed).toBeGreaterThanOrEqual(8);
   });
 
   it('ピカチュウ 行動 3: ボルテッカーは止まっていても動いていても当たりうる', () => {
@@ -216,7 +232,6 @@ describe('レッド戦（07 の193章）', () => {
     };
     const still = hits(false);
     const moving = hits(true);
-    console.log('ボルテッカーに当たった回数 止まっている', still, '動いている', moving);
     expect(still).toBeGreaterThanOrEqual(2);
   });
 

@@ -609,7 +609,8 @@ export const bossMoveSchema = z.object({
       wobble: z.object({ amplitude: z.number().positive(), seconds: z.number().positive() }).optional(),
       /**
        * 自分のプレイヤーを中心にしたこの大きさの箱の端で跳ね返る（画面の端を駆け巡るボルテッカーの残像。どのブラウザでも自分の画面で跳ね返る。07 の194章）。
-       * 次に飛ぶ先は別の壁のランダムな点で、aimEvery 回に 1 回はプレイヤーの今の場所を通す（真上下を往復しない・安全地帯を作らない）
+       * 次に飛ぶ先は、今の面と直前にいた面を除いた面のランダムな点。aimEvery 回に 1 回はプレイヤーの今の場所を通す（真上下を往復しない・安全地帯を作らない）。
+       * プレイヤーを通すのは左右の面からだけ（距離が短い上下からは避ける時間が無い。上下の面に来たら、次の左右の面まで待つ）
        */
       bounceBox: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), aimEvery: z.number().int().positive() }).optional(),
     })

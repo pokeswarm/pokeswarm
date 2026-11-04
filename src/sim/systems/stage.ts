@@ -1201,13 +1201,18 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
         const rand = (k: number): number => Math.abs((Math.sin((world.tick + k) * 12.9898) * 43758.5453) % 1);
         let tx = me.x;
         let ty = me.y;
-        if (hz.bounces % box.aimEvery !== 0) {
-          // 今の壁以外の 3 辺のどこかへ
-          const side = [0, 1, 2, 3].filter((w) => w !== wall)[Math.floor(rand(1) * 3) % 3]!;
+        hz.sinceAim = (hz.sinceAim ?? 0) + 1;
+        // プレイヤーを通すのは左右の面からだけ。上下の面に来たら、次の左右の面まで待つ
+        if (hz.sinceAim >= box.aimEvery && wall <= 1) hz.sinceAim = 0;
+        else {
+          // 今の面と直前にいた面を除いた面のどこかへ
+          const sides = [0, 1, 2, 3].filter((w) => w !== wall && w !== hz.lastWall);
+          const side = sides[Math.floor(rand(1) * sides.length) % sides.length]!;
           const u = rand(2) * 2 - 1;
           tx = me.x + (side === 0 ? box.halfWidth : side === 1 ? -box.halfWidth : u * box.halfWidth);
           ty = me.y + (side === 2 ? box.halfHeight : side === 3 ? -box.halfHeight : u * box.halfHeight);
         }
+        hz.lastWall = wall;
         const dir = Math.atan2(ty - hz.y, tx - hz.x);
         const sp = Math.hypot(hz.vx, hz.vy);
         hz.vx = Math.cos(dir) * sp;

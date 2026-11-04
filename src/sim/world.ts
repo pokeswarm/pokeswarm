@@ -135,6 +135,9 @@ export interface Hazard {
   readonly damageOverride?: number;
   /** カウンター: 予告を始めたときのボスの HP（ホスト） */
   readonly hpAtStart?: number;
+  /** 画面の端を駆け巡る残像（ボルテッカー。07 の194章）: 直前にいた面（0 右・1 左・2 下・3 上）と、プレイヤーを通してからの反射の回数 */
+  lastWall?: number;
+  sinceAim?: number;
   /** 跳ね回る（ボルテッカー）: 跳ね返る箱の中心 */
   readonly boxX?: number;
   readonly boxY?: number;

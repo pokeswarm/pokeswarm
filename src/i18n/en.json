@@ -397,6 +397,8 @@
   "achievement.linking-cord.desc": "Play co-op once, or defeat 8 mid-bosses in one challenge",
   "achievement.johto-stones.name": "Gift of the Egg",
   "achievement.johto-stones.desc": "Buy the Egg at the Johto shop",
+  "achievement.johto-light-ball.name": "Little Thunder",
+  "achievement.johto-light-ball.desc": "Enter the Hall of Fame with Pichu",
   "result.rewards": "Rewards: {list}",
   "orientation.rotate": "Please rotate your device to landscape",
   "levelUp.rerollTouch": "Reroll ({count} left)",

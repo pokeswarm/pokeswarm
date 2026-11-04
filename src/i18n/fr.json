@@ -376,6 +376,8 @@
   "achievement.linking-cord.desc": "Jouer une fois en multijoueur, ou vaincre 8 mini-boss en une partie",
   "achievement.johto-stones.name": "Cadeau de l'Œuf",
   "achievement.johto-stones.desc": "Acheter l'Œuf à la boutique de Johto",
+  "achievement.johto-light-ball.name": "Petit tonnerre",
+  "achievement.johto-light-ball.desc": "Entrer au Panthéon avec Pichu",
   "result.rewards": "Récompenses : {list}",
   "orientation.rotate": "Tournez votre appareil à l'horizontale",
   "levelUp.rerollTouch": "Relancer (reste {count})",

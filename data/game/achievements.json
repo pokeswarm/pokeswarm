@@ -623,6 +623,17 @@
       }
     },
     {
+      "id": "johto-light-ball",
+      "region": "johto",
+      "condition": {
+        "stat": "clears.pichu",
+        "atLeast": 1
+      },
+      "reward": {
+        "item": "light-ball"
+      }
+    },
+    {
       "id": "johto-kings-rock",
       "region": "johto",
       "condition": {

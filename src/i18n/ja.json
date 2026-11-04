@@ -397,6 +397,8 @@
   "achievement.linking-cord.desc": "協力プレイで1回遊ぶ、または 1回の ちょうせんで 中ボスを8体倒す",
   "achievement.johto-stones.name": "タマゴの おくりもの",
   "achievement.johto-stones.desc": "ジョウトの ショップで タマゴを 買う",
+  "achievement.johto-light-ball.name": "ちいさな いかずち",
+  "achievement.johto-light-ball.desc": "ピチューで でんどういりする",
   "result.rewards": "報酬: {list}",
   "orientation.rotate": "よこむきに して あそんでね",
   "levelUp.rerollTouch": "リロール のこり {count}",

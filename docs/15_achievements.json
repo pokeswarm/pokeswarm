@@ -475,6 +475,16 @@
   },
   {
    "region": "johto",
+   "id": "johto-light-ball",
+   "name": "ちいさな いかずち",
+   "hidden": false,
+   "condition": "ピチューで でんどういりする",
+   "stat": "clears.pichu ≧ 1",
+   "rewardKind": "持ち物",
+   "reward": "でんきだまが 出るようになる"
+  },
+  {
+   "region": "johto",
    "id": "johto-kings-rock",
    "name": "おうじゃの あかし",
    "hidden": false,

@@ -376,6 +376,8 @@
   "achievement.linking-cord.desc": "Spiele einmal im Mehrspieler oder besiege 8 Zwischenbosse in einer Runde",
   "achievement.johto-stones.name": "Geschenk des Eis",
   "achievement.johto-stones.desc": "Kaufe das Ei im Johto-Laden",
+  "achievement.johto-light-ball.name": "Kleiner Donner",
+  "achievement.johto-light-ball.desc": "Erreiche mit Pichu die Ruhmeshalle",
   "result.rewards": "Belohnungen: {list}",
   "orientation.rotate": "Bitte drehe dein Gerät ins Querformat",
   "levelUp.rerollTouch": "Neu würfeln (noch {count})",

@@ -376,6 +376,8 @@
   "achievement.linking-cord.desc": "Gioca una volta in multigiocatore o sconfiggi 8 miniboss in una partita",
   "achievement.johto-stones.name": "Dono dell'Uovo",
   "achievement.johto-stones.desc": "Compra l'Uovo nel negozio di Johto",
+  "achievement.johto-light-ball.name": "Piccolo tuono",
+  "achievement.johto-light-ball.desc": "Entra nella Sala d'Onore con Pichu",
   "result.rewards": "Ricompense: {list}",
   "orientation.rotate": "Ruota il dispositivo in orizzontale",
   "levelUp.rerollTouch": "Ritira (ne restano {count})",

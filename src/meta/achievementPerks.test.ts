@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { achievementsConfig, playablesConfig, shopConfig, unlocksConfig } from '../data';
 import { applyOffer, makeOffers } from '../sim/systems/leveling';
+import { buildSimRules, playableLoadout } from '../data/simRules';
 import { Simulation } from '../sim/simulation';
 import { testRules } from '../sim/testRules';
 import { emptyModifiers } from '../sim/upgrades';
@@ -70,6 +71,41 @@ describe('実績の報酬', () => {
     expect(backfillBought(old, shopConfig, unlockOf)).toBe(true);
     applyProgress(old, achievementsConfig, unlocksConfig);
     expect(owned(old).has('linking-cord')).toBe(true);
+  });
+
+  it('ジョウトの でんきだま は、ピチューで でんどういりすると解放され、ピカチュウの姿でだけ候補に出て、持つと かみなりのいし は出ない（07 の180章）', () => {
+    const save = emptySave();
+    save.stats = { 'johto:bestLevel.pichu': 60 };
+    applyProgress(save, achievementsConfig, unlocksConfig);
+    expect(save.achievements).not.toContain('johto-light-ball');
+    save.stats['johto:clears.pichu'] = 1;
+    applyProgress(save, achievementsConfig, unlocksConfig);
+    const johto = regionAchieved(achievementsConfig, [...save.achievements, 'johto-stones'], 'johto');
+    const perks = achievementPerks(achievementsConfig, johto, 'johto');
+    expect(perks.items.has('light-ball')).toBe(true);
+    // カントーの でんきだま には効かない
+    expect(achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, save.achievements, 'kanto')).items.has('light-ball')).toBe(false);
+
+    const rules = buildSimRules('johto');
+    const item = (key: string): number => rules.items.findIndex((it) => it.key === key);
+    const unlockedItems = new Set(rules.items.flatMap((it, i) => (perks.items.has(it.key) ? [i] : [])));
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    const lo = playableLoadout(rules, 'pichu');
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, types: lo.types, moveTypes: lo.moveTypes, moves: lo.moves, line: lo.line, species: lo.species, unlockedItems });
+    const offered = (key: string): boolean => Array.from({ length: 200 }, () => makeOffers(sim.world, p)).flat().some((o) => o.kind === 'itemNew' && o.item === item(key));
+    expect(offered('light-ball')).toBe(false);
+    p.species = rules.species.findIndex((x) => x.key === 'pikachu');
+    p.line = 'pikachu';
+    expect(offered('light-ball')).toBe(true);
+    p.items.push({ item: item('light-ball'), level: 1 });
+    expect(offered('thunder-stone')).toBe(false);
+  });
+
+  it('カントーのヤドンは ヤドキングに進化しない（おうじゃのしるし はカントーで出ない。07 の180章）', () => {
+    const ids = achievementsConfig.achievements.filter((a) => a.region === 'kanto').map((a) => a.id);
+    expect(achievementPerks(achievementsConfig, ids, 'kanto').items.has('kings-rock')).toBe(false);
+    const johto = achievementsConfig.achievements.filter((a) => a.region === 'johto').map((a) => a.id);
+    expect(achievementPerks(achievementsConfig, johto, 'johto').items.has('kings-rock')).toBe(true);
   });
 
   it('つながりのヒモは、協力プレイで遊ぶか、1ランで中ボスを8体倒すと解放される', () => {

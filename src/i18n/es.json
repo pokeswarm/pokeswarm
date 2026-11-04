@@ -376,6 +376,8 @@
   "achievement.linking-cord.desc": "Juega una vez en multijugador o derrota a 8 minijefes en una partida",
   "achievement.johto-stones.name": "Regalo del Huevo",
   "achievement.johto-stones.desc": "Compra el Huevo en la tienda de Johto",
+  "achievement.johto-light-ball.name": "Pequeño trueno",
+  "achievement.johto-light-ball.desc": "Entra en el Hall de la Fama con Pichu",
   "result.rewards": "Recompensas: {list}",
   "orientation.rotate": "Gira tu dispositivo en horizontal",
   "levelUp.rerollTouch": "Volver a tirar (quedan {count})",

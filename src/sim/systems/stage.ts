@@ -384,6 +384,8 @@ export function bossAttacks(world: World): void {
       }
       enrageBoss(world, boss, i);
       switchPhase(world, boss, i);
+      // 投げられている間（エーフィの サイコキネシス）は行動しない
+      if (stepThrown(world, boss, i)) continue;
       fieldLightning(world, boss, i);
       dropAtHp(world, boss, i);
       // 跳ね回っている間（ボルテッカー・ころがる）と、反動で止まっている間は、次の技を使わない（07 の167章）
@@ -392,6 +394,17 @@ export function bossAttacks(world: World): void {
       if (world.hiddenEnemies.has(boss.id)) continue;
       if (boss.stunTicks) {
         if (--boss.stunTicks === 0) world.enemies.speed[i] = bossSpeed(world, boss, i);
+        continue;
+      }
+      // HP で放つ大技（ピカチュウのボルテッカー）: 今の技が終わり次第、順に使う
+      const next = boss.hpMoves?.[0];
+      if (next && world.enemies.hp[i]! <= world.enemies.maxHp[i]! * next.belowRatio) {
+        boss.hpMoves!.shift();
+        (boss.forced ??= []).push(...next.moves);
+      }
+      if (boss.forced?.length) {
+        if (!bossBusy(world, boss.id)) useBossMove(world, boss, i, boss.forced.shift()!);
+        boss.cooldown = boss.interval;
         continue;
       }
       // 交代: 順番でない相手は歩くだけ。順番が来たら、少し間を置いて技を始める（07 の193章）
@@ -409,17 +422,6 @@ export function bossAttacks(world: World): void {
       if (boss.waiting && legendTurnIsActive(world, i)) {
         boss.waiting = false;
         world.enemies.speed[i] = bossSpeed(world, boss, i);
-      }
-      // HP で放つ大技（ピカチュウのボルテッカー）: 今の技が終わり次第、順に使う
-      const next = boss.hpMoves?.[0];
-      if (next && world.enemies.hp[i]! <= world.enemies.maxHp[i]! * next.belowRatio) {
-        boss.hpMoves!.shift();
-        (boss.forced ??= []).push(...next.moves);
-      }
-      if (boss.forced?.length) {
-        if (!bossBusy(world, boss.id)) useBossMove(world, boss, i, boss.forced.shift()!);
-        boss.cooldown = boss.interval;
-        continue;
       }
       // 技が終わってから間隔を数える（間隔のぶん必ず歩く）
       if (boss.intervalAfterMove && bossBusy(world, boss.id)) {
@@ -448,6 +450,61 @@ export function bossAttacks(world: World): void {
   }
   markHiddenBosses(world);
   strikeHazards(world);
+}
+
+/**
+ * 壁（リフレクター）がダメージを受け止める（ソロ・ホスト。07 の195章）。受け止めきれなかった分を返す。
+ * 割れたら今の技をやめ、気絶の技を使う
+ */
+export function absorbBarrier(world: World, i: number, amount: number): number {
+  if (world.role === 'guest') return amount;
+  const id = world.enemies.id[i]!;
+  const boss = world.bosses.find((b) => b.id === id);
+  if (!boss?.barrier) return amount;
+  if (amount < boss.barrier) {
+    boss.barrier -= amount;
+    return 0;
+  }
+  const rest = amount - boss.barrier;
+  boss.barrier = undefined;
+  // 今の技をやめる（止まって出す技の予告も、続きも）
+  for (let h = world.hazards.length - 1; h >= 0; h--) {
+    const hz = world.hazards[h]!;
+    if (hz.dasher === id && hz.activeTicks === undefined) world.hazards.splice(h, 1);
+  }
+  for (let q = world.bossQueue.length - 1; q >= 0; q--) if (world.bossQueue[q]!.bossId === id) world.bossQueue.splice(q, 1);
+  if (boss.barrierBreak !== undefined) (boss.forced ??= []).unshift(boss.barrierBreak);
+  return rest;
+}
+
+/** kind の id の相手のうち、生きているものの敵の番号。いなければ -1 */
+function aliveOfKind(world: World, kindId: string): number {
+  const kind = world.rules.enemies.kinds.findIndex((k) => k.id === kindId);
+  const e = world.enemies;
+  for (let i = 0; i < e.count; i++) if (e.kind[i] === kind && e.hp[i]! > 0) return i;
+  return -1;
+}
+
+/**
+ * 投げられている相手（カビゴン。ソロ・ホスト。07 の195章）: サイコキネシスの予告の間は止まって行動せず、
+ * 落ちる flightSeconds 前から予告の場所へ飛ぶ。投げられている間なら true
+ */
+function stepThrown(world: World, boss: World['bosses'][number], i: number): boolean {
+  const kindId = world.rules.enemies.kinds[world.enemies.kind[i]!]?.id;
+  const hz = world.hazards.find((h) => h.activeTicks === undefined && world.rules.stage.moves[h.move]?.throwPartner?.kind === kindId);
+  const thrown = hz && world.rules.stage.moves[hz.move]!.throwPartner!;
+  if (!hz || !thrown) return false;
+  const e = world.enemies;
+  e.speed[i] = 0;
+  const flight = Math.max(1, Math.round(thrown.flightSeconds / world.dt));
+  if (hz.ticksLeft <= flight && hz.ticksLeft > 0) {
+    const k = 1 / hz.ticksLeft;
+    e.x[i]! += (hz.x - e.x[i]!) * k;
+    e.y[i]! += (hz.y - e.y[i]!) * k;
+  }
+  // 着地したら少しの間止まる（反動と同じ）
+  boss.stunTicks = Math.round(thrown.stunSeconds / world.dt);
+  return true;
 }
 
 /** HP が決めた割合を切るたびに、道具を人数分落とす（雑魚のいないレッド戦の回復。ソロ・ホスト。07 の193章） */
@@ -613,7 +670,21 @@ function bossBusy(world: World, id: number): boolean {
 function useBossMove(world: World, boss: World['bosses'][number], i: number, forced?: number): void {
   let moveIdx = forced !== undefined ? forced : boss.random ? boss.moves[world.rng.int(boss.moves.length)]! : boss.moves[boss.next++ % boss.moves.length]!;
   if (moveIdx === -1 && boss.pool && boss.pool.length > 0) moveIdx = boss.pool[world.rng.int(boss.pool.length)]!;
-  const move = world.rules.stage.moves[moveIdx];
+  let move = world.rules.stage.moves[moveIdx];
+  // 投げる相手がいなければ別の技（カビゴンがいないときの サイコキネシス）。いれば、相手の今の技をやめさせる
+  if (move?.throwPartner) {
+    const partner = aliveOfKind(world, move.throwPartner.kind);
+    if (partner === -1) {
+      moveIdx = moveIndexOfStage(world.rules, move.throwPartner.noPartnerMove);
+      move = world.rules.stage.moves[moveIdx];
+    } else {
+      const pid = world.enemies.id[partner]!;
+      for (let h = world.hazards.length - 1; h >= 0; h--) if (world.hazards[h]!.dasher === pid) world.hazards.splice(h, 1);
+      for (let q = world.bossQueue.length - 1; q >= 0; q--) if (world.bossQueue[q]!.bossId === pid) world.bossQueue.splice(q, 1);
+      const pb = world.bosses.find((b) => b.id === pid);
+      if (pb) pb.bounce = undefined;
+    }
+  }
   // 止まる技は、突進が終わってから始める（続けて突進する技の途中で止まると、絵が走っている体から離れる。07 の193章）
   if (move?.rooted && (world.enemies.kbTicks[i]! > 0 || world.hazards.some((h) => h.dasher === boss.id && !!world.rules.stage.moves[h.move]?.dashSpeed))) {
     if (!boss.random) boss.next--;
@@ -924,6 +995,7 @@ function tickZones(world: World): void {
 /** ボスの技の効き目（ねむけ・やけど・冷え）の時間を進める（自分のプレイヤーだけ。07 の167章） */
 function tickPlayerConditions(world: World, me: World['players'][number]): void {
   if (me.drowsyTicks) me.drowsyTicks--;
+  if (me.mudTicks) me.mudTicks--;
   if (me.chillTicks && --me.chillTicks === 0) me.chill = 0;
   if (me.burnTicks) {
     me.burnTicks--;
@@ -950,6 +1022,7 @@ function hitLocal(world: World, me: World['players'][number], hz: World['hazards
   const on = move?.onHit;
   if (!on) return;
   if (on.drowsySeconds) me.drowsyTicks = Math.max(me.drowsyTicks ?? 0, Math.round(on.drowsySeconds / world.dt));
+  if (on.mudSeconds) me.mudTicks = Math.max(me.mudTicks ?? 0, Math.round(on.mudSeconds / world.dt));
   if (on.burnSeconds) me.burnTicks = (me.burnTicks ?? 0) + Math.round(on.burnSeconds / world.dt);
   if (on.flinchSeconds && !me.frozenTicks) me.frozenTicks = Math.round(on.flinchSeconds / world.dt);
   if (on.chill) {
@@ -996,6 +1069,11 @@ function strikeHazards(world: World): void {
     if (hz.activeTicks !== undefined) {
       if (--hz.activeTicks <= 0) {
         world.hazards.splice(h, 1);
+        // 時間が来た壁は、何も起こらず消える
+        if (move?.barrier && world.role !== 'guest') {
+          const b = world.bosses.find((x) => x.id === hz.dasher);
+          if (b) b.barrier = undefined;
+        }
         // 当たっている間止まっていたボスは、また動く
         if (move?.holdWhileActive && world.role !== 'guest') {
           const i = findEnemyIndex(world, hz.dasher);
@@ -1251,6 +1329,11 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
   }
   const holder = move.holdSeconds ? world.legendAis.get(hz.dasher) : undefined;
   if (holder) holder.holdTicks = Math.round(move.holdSeconds! / world.dt);
+  // 壁（リフレクター）を張る
+  if (move.barrier && boss) {
+    boss.barrier = (world.enemies.maxHp[i]! * move.barrier.hpPct) / 100;
+    boss.barrierBreak = moveIndexOfStage(world.rules, move.barrier.breakMove);
+  }
   // 回復（エーフィの あさのひざし・カビゴンの ねむる）: 使ったボスの HP を戻す（HP はゲストへ送る）
   if (move.healPct && world.enemies.hp[i]! > 0) world.enemies.hp[i] = Math.min(world.enemies.maxHp[i]!, world.enemies.hp[i]! + (world.enemies.maxHp[i]! * move.healPct) / 100);
   // 強化（ビルドアップ・りゅうのまい）
@@ -1384,6 +1467,13 @@ export function addHazard(
   const radius = extra.radius || move.radius;
   const length = move.shape === 'line' ? extra.length || (move.length ?? 400) : 0;
   const di = dasher !== -1 ? findEnemyIndex(world, dasher) : -1;
+  // 壁が割れた: 壁の絵を消す（ゲストにも、この技の予告の知らせで届く）
+  if (move.clearsBarrier) {
+    for (let h = world.hazards.length - 1; h >= 0; h--) {
+      const hz = world.hazards[h]!;
+      if (hz.dasher === dasher && world.rules.stage.moves[hz.move]?.barrier) world.hazards.splice(h, 1);
+    }
+  }
   world.hazards.push({
     move: moveIdx,
     shape: move.shape,

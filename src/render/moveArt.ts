@@ -5800,6 +5800,34 @@ function voltFizzle(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
+/** リフレクター（レッドのエーフィ。07 の195章）: 体を囲む六角形の光の壁。中は透けていて、縁が光り、面に光の筋が走る */
+function reflectShell(): SpriteOut {
+  const palette = ['#ad1457', '#f48fb1', '#fce4ec', '#ffffff', '#80deea'];
+  const hex = (u: number, v: number): number => {
+    const x = Math.abs(u);
+    const y = Math.abs(v);
+    return Math.max(y, x * 0.866 + y * 0.5);
+  };
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(84, (u, v) => {
+      const d = hex(u, v) / 0.92;
+      if (d > 1) return -1;
+      // 光る縁（外が濃く、内が白い）
+      if (d > 0.965) return 0;
+      if (d > 0.93) return f % 2 === 0 ? 3 : 2;
+      if (d > 0.9) return 1;
+      // 面を斜めに流れる光の筋（すき間だらけにして、中の体を見せる）
+      const px = Math.round((u + 1) * 42);
+      const py = Math.round((v + 1) * 42);
+      const band = (((u - v * 0.6) * 1.2 + f / 4) % 1 + 1) % 1;
+      if (band < 0.1 && (px + py) % 2 === 0) return 2;
+      if (band < 0.16 && (px + py) % 4 === 0) return 4;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
+}
+
 /** 10まんボルト（レッドのピカチュウ。07 の194章）: 自分を中心に広がる稲妻。コマごとに黒・白・黄で明滅する */
 function thunderBurstBwy(): SpriteOut {
   const palette = ['#212121', '#ffeb3b', '#ffffff', '#f9a825'];
@@ -6220,6 +6248,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'daze-stars': () => dazeStars(),
     'volt-fizzle': () => voltFizzle(),
     'thunder-burst-bwy': () => thunderBurstBwy(),
+    'reflect-shell': () => reflectShell(),
     'shell-spin-water': () => shellSpinWater(),
     // ボスの技（07 の189章）
     'zen-aura': () => zenAura(),

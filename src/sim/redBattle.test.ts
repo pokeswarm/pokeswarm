@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { playerConfig } from '../data';
 import { buildSimRules } from '../data/simRules';
 import { Simulation } from './simulation';
+import type { World } from './world';
 import { legendTurnIsActive, legendTurns, startLegendary } from './systems/stage';
 
 /** レッド戦の作り直し（07 の193章）: 隙・交代・回復の回数の上限・きずぐすり */
@@ -236,6 +237,160 @@ describe('レッド戦（07 の193章）', () => {
     expect(moving).toBeLessThanOrEqual(still);
   });
 
+  describe('エーフィ（07 の195章）', () => {
+    // エーフィだけを動かす: カビゴンの順番を待たずに見るので、交代を切る（データは共有なので、終わったら戻す）
+    const rounds = rules0().stage.legendary!.rounds!;
+    const saved = rounds.map((r) => r.turns);
+    beforeEach(() => {
+      for (const r of rounds) delete r.turns;
+    });
+    afterEach(() => {
+      rounds.forEach((r, k) => {
+        if (saved[k]) r.turns = saved[k];
+      });
+    });
+    const espeonRound = (solo = false) => {
+      const sim = round(1);
+      const w = sim.world;
+      if (solo) {
+        const s = indexOf(sim, 'red-snorlax');
+        sim.step([{ type: 'damageEnemy', id: w.enemies.id[s]!, amount: 1e9, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);
+      }
+      return sim;
+    };
+    const until = (sim: Simulation, id: string, seconds = 40): World['hazards'][number] => {
+      for (let k = 0; k < 30 * seconds; k++) {
+        const h = sim.world.hazards.find((z) => moveId(sim, z.move) === id);
+        if (h) return h;
+        sim.step([]);
+      }
+      throw new Error(id + ' が出ない');
+    };
+
+    it('どろかけ → スピードスター → サイコキネシス の順に使い、消えない', () => {
+      const sim = espeonRound();
+      const w = sim.world;
+      const id = w.enemies.id[indexOf(sim, 'red-espeon')]!;
+      const used: string[] = [];
+      const seen = new Set<unknown>();
+      for (let k = 0; k < 30 * 30; k++) {
+        sim.step([]);
+        expect(w.hiddenEnemies.has(id)).toBe(false);
+        for (const h of w.hazards) {
+          if (h.dasher !== id || seen.has(h)) continue;
+          seen.add(h);
+          const m = moveId(sim, h.move);
+          if (used.at(-1) !== m) used.push(m);
+        }
+      }
+      expect(used.slice(0, 3)).toEqual(['espeon-mud-slap', 'espeon-swift', 'espeon-psychic-throw']);
+    });
+
+    it('どろかけ は 3 発で、当たると足が遅くなる', () => {
+      const sim = espeonRound();
+      const w = sim.world;
+      const seen = new Set<unknown>();
+      const p = w.players[0]!;
+      p.invincibleTicks = 0;
+      p.maxHp = 1e9;
+      p.hp = 1e9;
+      until(sim, 'espeon-mud-slap');
+      for (let k = 0; k < 30 * 2.5; k++) {
+        p.invincibleTicks = 0;
+        for (const h of w.hazards) if (moveId(sim, h.move) === 'espeon-mud-slap') seen.add(h);
+        sim.step([]);
+      }
+      expect(seen.size).toBe(3);
+      expect(p.mudTicks).toBeGreaterThan(0);
+      // 遅くなる
+      p.moveSpeed = 180;
+      p.baseMoveSpeed = 180;
+      p.mudTicks = 90;
+      const x0 = p.x;
+      sim.step([{ type: 'move', playerId: 1, dx: 1, dy: 0 }]);
+      sim.step([]);
+      expect(p.x - x0).toBeLessThan((180 / 30) * 2 * 0.65);
+    });
+
+    it('リフレクター: HP 66% を切ると張り、最大 HP の 8% を受け止め、割れると気絶する。受け止めた分は減らない', () => {
+      const sim = espeonRound();
+      const w = sim.world;
+      let i = indexOf(sim, 'red-espeon');
+      const id = w.enemies.id[i]!;
+      const max = w.enemies.maxHp[i]!;
+      w.enemies.hp[i] = max * 0.65;
+      until(sim, 'espeon-reflect');
+      const refl = w.hazards.find((z) => moveId(sim, z.move) === 'espeon-reflect')!;
+      for (let k = 0; k < 30 && refl.activeTicks === undefined; k++) sim.step([]);
+      expect(refl.activeTicks).toBeDefined();
+      const hit = (amount: number) => sim.step([{ type: 'damageEnemy', id, amount, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);
+      i = indexOf(sim, 'red-espeon');
+      const before = w.enemies.hp[i]!;
+      hit(max * 0.04);
+      expect(w.enemies.hp[indexOf(sim, 'red-espeon')]).toBe(before);
+      // 割れる（残りを超えた分だけ減る）
+      hit(max * 0.06);
+      expect(w.enemies.hp[indexOf(sim, 'red-espeon')]).toBeCloseTo(before - max * 0.02, 0);
+      sim.step([]);
+      const stun = w.hazards.find((z) => moveId(sim, z.move) === 'espeon-stun');
+      expect(stun).toBeDefined();
+      // 壁の絵は消え、止まっている
+      expect(w.hazards.some((z) => moveId(sim, z.move) === 'espeon-reflect')).toBe(false);
+      expect(w.enemies.speed[indexOf(sim, 'red-espeon')]).toBe(0);
+    });
+
+    it('リフレクター: 割らなければ時間で消え、気絶しない。次からはまたダメージが通る', () => {
+      const sim = espeonRound();
+      const w = sim.world;
+      const i = indexOf(sim, 'red-espeon');
+      w.enemies.hp[i] = w.enemies.maxHp[i]! * 0.65;
+      const refl = until(sim, 'espeon-reflect');
+      while (w.hazards.includes(refl)) sim.step([]);
+      expect(w.bosses.find((b) => b.id === w.enemies.id[indexOf(sim, 'red-espeon')])?.barrier).toBeUndefined();
+      expect(w.hazards.some((z) => moveId(sim, z.move) === 'espeon-stun')).toBe(false);
+    });
+
+    it('サイコキネシス: カビゴンを浮かせて行動を止め、予告の場所へ投げ、着地の後しばらく止まる', () => {
+      const sim = espeonRound();
+      const w = sim.world;
+      const h = until(sim, 'espeon-psychic-throw');
+      const snorlaxId = w.enemies.id[indexOf(sim, 'red-snorlax')]!;
+      sim.step([]);
+      // 浮いている間、カビゴンは技を始めない
+      while (h.activeTicks === undefined) {
+        expect(w.enemies.speed[indexOf(sim, 'red-snorlax')]).toBe(0);
+        const before = w.hazards.filter((z) => z.dasher === snorlaxId).length;
+        sim.step([]);
+        if (h.activeTicks === undefined) expect(w.hazards.filter((z) => z.dasher === snorlaxId).length).toBe(before);
+      }
+      const s = indexOf(sim, 'red-snorlax');
+      expect(Math.hypot(w.enemies.x[s]! - h.x, w.enemies.y[s]! - h.y)).toBeLessThan(2);
+      expect(w.bosses.find((b) => b.id === snorlaxId)?.stunTicks).toBeGreaterThan(0);
+    });
+
+    it('サイコキネシス: 予告が止まってから、プレイヤーの速さで範囲の外へ出られる', () => {
+      const rules = rules0();
+      const m = rules.stage.moves.find((x) => x.id === 'espeon-psychic-throw')!;
+      const leftover = m.telegraphSeconds - m.follow!.seconds;
+      expect(leftover * playerConfig.moveSpeed).toBeGreaterThanOrEqual(m.radius + 12);
+    });
+
+    it('サイコキネシス: カビゴンがいなければ、ランダムな場所を爆破する（止まったまま）', () => {
+      const sim = espeonRound(true);
+      const w = sim.world;
+      const h = until(sim, 'espeon-psychic-burst');
+      expect(w.hazards.some((z) => moveId(sim, z.move) === 'espeon-psychic-throw')).toBe(false);
+      const seen = new Set<unknown>();
+      for (let k = 0; k < 30 * 1.6; k++) {
+        for (const z of w.hazards) if (moveId(sim, z.move) === 'espeon-psychic-burst') seen.add(z);
+        expect(w.enemies.speed[indexOf(sim, 'red-espeon')]).toBe(0);
+        sim.step([]);
+      }
+      expect(seen.size).toBe(rules0().stage.moves.find((x) => x.id === 'espeon-psychic-burst')!.count);
+      expect(h).toBeDefined();
+    });
+  });
+
   it('交代: 第 3 ラウンドは順番の 1 体だけが動き、順番でない相手は遅く歩いて技を使わない', () => {
     const sim = round(2);
     const w = sim.world;
@@ -281,10 +436,9 @@ describe('レッド戦（07 の193章）', () => {
     }
   });
 
-  it('回復の技は 1 体につき決まった回数まで（あさのひざし・ねむる）', () => {
+  it('回復の技は 1 体につき決まった回数まで（ねむる）', () => {
     const sim = round(1);
     const w = sim.world;
-    let suns = 0;
     let rests = 0;
     const seen = new Set<unknown>();
     for (let k = 0; k < 30 * 170; k++) {
@@ -292,13 +446,11 @@ describe('レッド戦（07 の193章）', () => {
       for (const h of w.hazards) {
         if (seen.has(h)) continue;
         seen.add(h);
-        if (moveId(sim, h.move) === 'espeon-morning-sun') suns++;
         if (moveId(sim, h.move) === 'snorlax-rest-snore') rests++;
       }
     }
-    expect(suns).toBeLessThanOrEqual(2);
     expect(rests).toBeLessThanOrEqual(2);
-    expect(suns + rests).toBeGreaterThan(0);
+    expect(rests).toBeGreaterThan(0);
   });
 
   it('HP が決めた割合を切るたびと倒したときに、きずぐすりを人数分落とす', () => {

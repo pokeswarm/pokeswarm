@@ -80,6 +80,17 @@ export function parseLegendParam(rules: SimRules, search: string): number | null
   return k === -1 ? null : k;
 }
 
+/** テストプレイ（07 の195章）: ?solo で、同時に出る相手を出さず、?legend= の相手だけと戦う（相方がいないときの技を見る） */
+export function applySoloParam(rules: SimRules, kind: number, search: string): void {
+  if (!new URLSearchParams(search).has('solo')) return;
+  const id = rules.enemies.kinds[kind]?.id ?? '';
+  for (const r of rules.stage.legendary?.rounds ?? []) {
+    if (!r.kinds.includes(id)) continue;
+    r.kinds = [id];
+    delete r.turns;
+  }
+}
+
 /** テストプレイ（07 の194章）: ?bosshp=65 で、伝説が出たときの HP を最大の 65% にする（攻撃しなくても HP で変わる動きを見る）。無ければ null */
 export function parseBossHpParam(search: string): number | null {
   const v = Number(new URLSearchParams(search).get('bosshp'));

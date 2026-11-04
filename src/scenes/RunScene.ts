@@ -40,7 +40,7 @@ import { abilityOf, pinchMods } from '../sim/ability';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World, gateDeadlineTick } from '../sim/world';
-import { applyDebugOverrides, parseBossHpParam, parseGodParam, parseLegendParam, parseIntruderParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam, parseBossParam } from './debugOverrides';
+import { applyDebugOverrides, applySoloParam, parseBossHpParam, parseGodParam, parseLegendParam, parseIntruderParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam, parseBossParam } from './debugOverrides';
 import { addXp, applyOffer, itemFits, moveMaxLevel, recomputeModifiers } from '../sim/systems/leveling';
 import { shinySpriteKey } from '../meta/loadoutOptions';
 import { achievementPerks, regionAchieved } from '../meta/achievementPerks';
@@ -466,6 +466,7 @@ export class RunScene extends Phaser.Scene {
     }
     // テストプレイ（ソロだけ）: ?legend=mewtwo で最初から伝説と戦う。?god で無敵。どちらかを付けたランは記録を保存しない
     this.testLegend = this.coop ? null : parseLegendParam(this.sim.world.rules, window.location.search);
+    if (this.testLegend !== null) applySoloParam(this.sim.world.rules, this.testLegend, window.location.search);
     this.god = !this.coop && parseGodParam(window.location.search);
     this.testBossHp = this.coop ? null : parseBossHpParam(window.location.search);
     this.godDamage = 0;
@@ -2234,6 +2235,10 @@ export class RunScene extends Phaser.Scene {
     const e = this.sim.world.enemies;
     // ボスがプレイヤーと同じ技で走っている間（ボルテッカー・ブレイブバード）: プレイヤーの技の残像と同じ色で光らせる（07 の167章）
     const w = this.sim.world;
+    // サイコキネシスで浮かされている相手は、念力の色に光る
+    for (const h of w.hazards) {
+      if (h.activeTicks === undefined && w.rules.stage.moves[h.move]?.throwPartner?.kind === w.rules.enemies.kinds[e.kind[i]!]?.id) return 0xf48fb1;
+    }
     for (const h of w.hazards) {
       if (h.dasher !== e.id[i] || (h.activeTicks === undefined && !w.rules.stage.moves[h.move]?.dashSpeed)) continue;
       // 体は止まったまま残像だけを放つ技（ボルテッカー）は、体を光らせない
@@ -2264,6 +2269,14 @@ export class RunScene extends Phaser.Scene {
   private enemyBody(i: number): { lift: number; hop: number; shake: number; squash: number; spin: boolean } | null {
     const e = this.sim.world.enemies;
     const kinds = this.sim.world.statusKinds;
+    // 浮く（エーフィの サイコキネシスと、投げられるカビゴン。07 の195章）
+    const w = this.sim.world;
+    for (const h of w.hazards) {
+      if (h.activeTicks !== undefined) continue;
+      const mv = w.rules.stage.moves[h.move];
+      if (mv?.liftBody && h.dasher === e.id[i]) return { lift: mv.liftBody, hop: 0, shake: 0, squash: 1, spin: false };
+      if (mv?.throwPartner && w.rules.enemies.kinds[e.kind[i]!]?.id === mv.throwPartner.kind) return { lift: mv.throwPartner.liftHeight, hop: 0, shake: 2, squash: 1, spin: false };
+    }
     for (let s = 0; s < kinds.length; s++) {
       const body = kinds[s]!.body;
       if (body && e.hasStatus(i, s)) return body;

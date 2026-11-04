@@ -267,6 +267,11 @@ export interface World {
     radiusBuff?: { readonly scale: number; uses: number };
     /** りゅうのまい の重ねた段 */
     stacks?: number;
+    // ---- 07 の195章 ----
+    /** 壁（リフレクター）がまだ受け止められるダメージ */
+    barrier?: number;
+    /** 割れたときに使う技（stage.moves の番号） */
+    barrierBreak?: number;
     // ---- 07 の194章 ----
     /** これから大技を使う HP の割合と技（割合の大きい順） */
     hpMoves?: { belowRatio: number; moves: readonly number[] }[];

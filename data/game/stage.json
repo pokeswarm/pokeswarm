@@ -572,19 +572,6 @@
       "stagger": 0.12
     },
     {
-      "id": "espeon-morning-sun",
-      "move": "morning-sun",
-      "effect": "morning-sun",
-      "shape": "circle",
-      "target": "self",
-      "rooted": true,
-      "telegraphSeconds": 1.2,
-      "radius": 60,
-      "damage": 0,
-      "healPct": 5,
-      "maxUses": 2
-    },
-    {
       "id": "snorlax-body-slam",
       "move": "body-slam",
       "effect": "body-slam",
@@ -1462,18 +1449,6 @@
       }
     },
     {
-      "id": "espeon-psybeam",
-      "move": "psybeam",
-      "effect": "boss-psybeam",
-      "shape": "line",
-      "target": "player",
-      "rooted": true,
-      "telegraphSeconds": 1,
-      "radius": 22,
-      "length": 700,
-      "damage": 40
-    },
-    {
       "id": "espeon-swift",
       "move": "swift",
       "effect": "boss-swift",
@@ -1505,6 +1480,101 @@
         "speed": 290
       },
       "activeSeconds": 3
+    },
+    {
+      "id": "espeon-mud-slap",
+      "move": "mud-slap",
+      "effect": "boss-mud-shot",
+      "shape": "cone",
+      "arc": 70,
+      "target": "player",
+      "rooted": true,
+      "telegraphSeconds": 0.45,
+      "radius": 70,
+      "damage": 14,
+      "activeSeconds": 1.6,
+      "repeat": {
+        "count": 3,
+        "everySeconds": 0.45
+      },
+      "travel": {
+        "speed": 240
+      },
+      "onHit": {
+        "mudSeconds": 3
+      },
+      "recoilSeconds": 0.6
+    },
+    {
+      "id": "espeon-reflect",
+      "move": "reflect",
+      "effect": "boss-reflect",
+      "shape": "circle",
+      "target": "self",
+      "followBoss": true,
+      "hideTelegraph": true,
+      "telegraphSeconds": 0.4,
+      "radius": 46,
+      "damage": 0,
+      "activeSeconds": 10,
+      "barrier": {
+        "hpPct": 8,
+        "breakMove": "espeon-stun"
+      }
+    },
+    {
+      "id": "espeon-stun",
+      "effect": "boss-out-of-breath",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "hideTelegraph": true,
+      "clearsBarrier": true,
+      "pose": "Hurt",
+      "telegraphSeconds": 3,
+      "radius": 44,
+      "damage": 0
+    },
+    {
+      "id": "espeon-psychic-throw",
+      "move": "psychic",
+      "effect": "boss-psychic-throw",
+      "shape": "circle",
+      "target": "player",
+      "rooted": true,
+      "pose": "Charge",
+      "liftBody": 26,
+      "follow": {
+        "seconds": 1.25
+      },
+      "telegraphSeconds": 1.85,
+      "radius": 95,
+      "damage": 55,
+      "throwPartner": {
+        "kind": "red-snorlax",
+        "flightSeconds": 0.6,
+        "stunSeconds": 1.2,
+        "liftHeight": 40,
+        "noPartnerMove": "espeon-psychic-burst"
+      }
+    },
+    {
+      "id": "espeon-psychic-burst",
+      "move": "psychic",
+      "effect": "psy",
+      "shape": "circle",
+      "target": "player",
+      "rooted": true,
+      "pose": "Charge",
+      "liftBody": 26,
+      "scatter": true,
+      "count": 9,
+      "stagger": 0.16,
+      "spread": 360,
+      "telegraphSeconds": 0.9,
+      "radius": 80,
+      "damage": 40,
+      "recoilSeconds": 0.4
     },
     {
       "id": "snorlax-giga-impact",
@@ -2560,6 +2630,7 @@
     "spawnDistance": 380,
     "gateTimeLimitSeconds": 180,
     "drowsySlowPct": 55,
+    "mudSlowPct": 40,
     "burnPctPerSecond": 1.5,
     "chillToFreeze": 3,
     "chillFreezeSeconds": 1.2,

@@ -199,6 +199,7 @@ export class PlayerView {
       else if (player.burnTicks && blink) this.pokemon.sprite.setTint(0xff8a65);
       else if (player.chill) this.pokemon.sprite.setTint(player.chill >= 2 ? 0x9be7ff : 0xd4f3ff);
       else if (player.drowsyTicks) this.pokemon.sprite.setTint(0xc5b3ff);
+      else if (player.mudTicks) this.pokemon.sprite.setTint(0xb08968);
       else this.pokemon.sprite.clearTint();
     }
     // 眠っている間（ねむけ も）は Z が上へゆらゆら

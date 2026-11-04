@@ -7167,6 +7167,34 @@
         "seconds": 0.4
       }
     },
+    "boss-mud-shot": {
+      "extends": "ground.base",
+      "bossActive": {
+        "id": "mud-spray",
+        "fit": "cone",
+        "size": 1
+      }
+    },
+    "boss-reflect": {
+      "extends": "psychic.base",
+      "bossActive": {
+        "id": "reflect-shell",
+        "fit": "circle",
+        "size": 2.1,
+        "originY": 0.6,
+        "overBoss": true
+      }
+    },
+    "boss-psychic-throw": {
+      "extends": "psy",
+      "bossTelegraph": {
+        "id": "psy-grip",
+        "fit": "circle",
+        "size": 1.05,
+        "rotate": "spin",
+        "spinDegPerSec": 180
+      }
+    },
     "boss-thunderbolt-burst": {
       "extends": "electric.base",
       "bossActive": {

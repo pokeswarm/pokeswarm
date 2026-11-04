@@ -1,7 +1,7 @@
 import type { InputCommand } from '../commands';
 import { setRunStat } from '../runStats';
 import { advanceContest, applyContest } from '../contest';
-import { noteLegendThreat } from './stage';
+import { absorbBarrier, noteLegendThreat } from './stage';
 import type { HitEffect } from '../events';
 import { currentWaveIndex, enemyHpScale, findEnemyIndex, findPlayer, type World, enemyMoveSpeed } from '../world';
 import { breakOnDamage, damageTakenMultiplier } from './status';
@@ -77,7 +77,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         noteLegendThreat(world, i, cmd.by, cmd.amount);
         applyHitEffect(world, i, cmd, cmd.by);
         world.events.push({ type: 'enemyAffected', enemyId: cmd.id, by: cmd.by, ...pickEffect(cmd) });
-        e.hp[i]! -= cmd.amount * damageTakenMultiplier(world, i);
+        e.hp[i]! -= absorbBarrier(world, i, cmd.amount * damageTakenMultiplier(world, i));
         breakOnDamage(world, i);
         if (e.hp[i]! <= 0) {
           world.events.push({ type: 'enemyKilled', enemyId: cmd.id, kind: e.kind[i]!, by: cmd.by });

@@ -95,6 +95,8 @@ export interface Player {
    * 押し飛ばし（すべる速さと残り）
    */
   drowsyTicks?: number;
+  /** 泥で足が遅い残り（エーフィの どろかけ。07 の195章） */
+  mudTicks?: number;
   burnTicks?: number;
   burnHurtTicks?: number;
   chill?: number;

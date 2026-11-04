@@ -656,28 +656,35 @@
       },
       "red-espeon": {
         "moves": [
-          "espeon-psybeam",
+          "espeon-mud-slap",
           "espeon-swift",
-          "espeon-swift",
-          "espeon-morning-sun"
+          "espeon-psychic-throw"
         ],
         "random": false,
-        "moveIntervalSeconds": 1.8,
-        "enrageMoveIntervalSeconds": 1.4,
-        "casters": [
-          {
-            "move": "psychic",
-            "level": 8
-          }
-        ],
-        "casterPower": 0.8,
+        "moveIntervalSeconds": 2,
         "hpDrops": {
           "atHpPct": [
             66,
             33
           ],
           "item": "potion"
-        }
+        },
+        "noEnrage": true,
+        "intervalAfterMove": true,
+        "hpMoves": [
+          {
+            "belowHpPct": 66,
+            "moves": [
+              "espeon-reflect"
+            ]
+          },
+          {
+            "belowHpPct": 33,
+            "moves": [
+              "espeon-reflect"
+            ]
+          }
+        ]
       },
       "red-snorlax": {
         "moves": [

@@ -554,6 +554,20 @@ export const bossMoveSchema = z.object({
   holdSeconds: z.number().positive().optional(),
   /** 落ちたとき、使ったボスが最大 HP のこの % だけ回復する（エーフィの あさのひざし・カビゴンの ねむる） */
   healPct: z.number().positive().optional(),
+  /** 予告の間、ボスの体をこの高さまで浮かせる（エーフィの サイコキネシス。07 の195章） */
+  liftBody: z.number().positive().optional(),
+  /**
+   * 相手を投げ飛ばす（エーフィの サイコキネシス。07 の195章）: 同時に出ている kind の相手を、予告の間は浮かせて行動を止め、
+   * 落ちる flightSeconds 前に予告の場所へ投げる。着地で stunSeconds 止まる。相手がいなければ、代わりに noPartnerMove を使う
+   */
+  throwPartner: z.object({ kind: z.string().min(1), flightSeconds: z.number().positive(), stunSeconds: z.number().positive(), liftHeight: z.number().positive(), noPartnerMove: z.string().min(1) }).optional(),
+  /**
+   * ダメージを防ぐ壁（エーフィの リフレクター。07 の195章）: 当たっている間、最大 HP の hpPct % のダメージを受け止める。
+   * 受け止めきれず割れると、今の技をやめて breakMove を使う（気絶）。時間が来ると何も起こらず消える
+   */
+  barrier: z.object({ hpPct: z.number().positive(), breakMove: z.string().min(1) }).optional(),
+  /** この技が始まると、同じボスの壁（barrier の技）を消す（壁が割れたとき。ゲストにも予告の知らせで届く。07 の195章） */
+  clearsBarrier: z.boolean().optional(),
   /** 1 つ目も足元でなく、狙った人のまわりのランダムな場所に置く（ピカチュウの かみなり。07 の194章） */
   scatter: z.boolean().optional(),
   /** 予告の間のボスの動き（ドット絵の動作の名前。止まって出す技だけ。07 の194章） */
@@ -627,6 +641,8 @@ export const bossMoveSchema = z.object({
   onHit: z
     .object({
       drowsySeconds: z.number().positive().optional(),
+      /** 泥で足が遅くなる秒数（遅くなる割合は bossRules.mudSlowPct。エーフィの どろかけ。07 の195章） */
+      mudSeconds: z.number().positive().optional(),
       burnSeconds: z.number().positive().optional(),
       chill: z.number().int().positive().optional(),
       flinchSeconds: z.number().positive().optional(),
@@ -895,6 +911,7 @@ export const stageConfigSchema = z.object({
     gateTimeLimitSeconds: z.number().positive().optional(),
     /** ボスの技の効き目（07 の167章）: ねむけで遅くなる割合（%）・やけどで毎秒削られる最大 HP の %・冷えが何回で凍るか・凍る秒数・冷えが消えるまでの秒数 */
     drowsySlowPct: z.number().min(0).max(95).optional(),
+    mudSlowPct: z.number().min(0).max(95).optional(),
     burnPctPerSecond: z.number().nonnegative().optional(),
     chillToFreeze: z.number().int().positive().optional(),
     chillFreezeSeconds: z.number().positive().optional(),

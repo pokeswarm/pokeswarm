@@ -559,6 +559,10 @@ export const bossMoveSchema = z.object({
    * phase のマスに円を置く。phase 0 と 1 を続けて使うと、順番に全部のマスが危なくなる。ボスから遠いマスほど delayPerPixel 秒ずつ遅れて落ちる（衝撃が広がる）
    */
   gridWave: z.object({ cell: z.number().positive(), halfWidth: z.number().positive(), halfHeight: z.number().positive(), phase: z.number().int().min(0).max(1), delayPerPixel: z.number().nonnegative() }).optional(),
+  /** 落ちる前のボスの体の色（順に切り替える。ギガインパクトで全身が光る。07 の196章） */
+  bodyGlow: z.array(z.string()).min(1).optional(),
+  /** gridWave の衝撃波の輪の色（外から内へ。落ちた瞬間にボスの足元から広がり、輪が通ったマスで地面が爆ぜる。07 の196章） */
+  shockRing: z.array(z.string()).min(1).optional(),
   /** 予告の間、ボスの体をこの高さまで浮かせる（エーフィの サイコキネシス。07 の195章） */
   liftBody: z.number().positive().optional(),
   /**

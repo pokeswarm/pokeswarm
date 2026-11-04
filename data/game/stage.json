@@ -1654,7 +1654,18 @@
         "phase": 0,
         "delayPerPixel": 0.0007
       },
-      "pose": "Charge"
+      "pose": "Charge",
+      "liftBody": 70,
+      "bodyGlow": [
+        "#ffc107",
+        "#ffe082",
+        "#ffb300"
+      ],
+      "shockRing": [
+        "#fb8c00",
+        "#ffc107",
+        "#fffde7"
+      ]
     },
     {
       "id": "snorlax-giga-wave-b",
@@ -1674,7 +1685,18 @@
         "phase": 1,
         "delayPerPixel": 0.0007
       },
-      "pose": "Charge"
+      "pose": "Charge",
+      "liftBody": 70,
+      "bodyGlow": [
+        "#ffc107",
+        "#ffe082",
+        "#ffb300"
+      ],
+      "shockRing": [
+        "#fb8c00",
+        "#ffc107",
+        "#fffde7"
+      ]
     },
     {
       "id": "snorlax-giga-recover",

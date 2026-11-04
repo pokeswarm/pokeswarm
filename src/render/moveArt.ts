@@ -5800,27 +5800,31 @@ function voltFizzle(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
-/** ギガインパクトの予告（レッドのカビゴン。07 の196章）: 地面に入るひび。真ん中から外へ、だんだん伸びていく */
+/** ギガインパクトの予告（レッドのカビゴン。07 の196章）: 地面に走る細いひび。真ん中から外へ伸びる */
 function gigaCrack(): SpriteOut {
-  const palette = ['#2b1a10', '#5d4037', '#ff9800', '#ffe0b2'];
+  const palette = ['#2b1a10', '#4e342e'];
   const frames = [0, 1, 2, 3, 4, 5, 6, 7].map((f) =>
-    shape(64, (u, v) => {
+    shape(96, (u, v) => {
       const d = Math.hypot(u, v);
       const a = Math.atan2(v, u);
-      const reach = 0.28 + f * 0.1;
+      const reach = 0.3 + f * 0.09;
       if (d > reach) return -1;
-      for (let k = 0; k < 7; k++) {
-        const base = (k / 7) * Math.PI * 2 + hash(k, 21) * 0.6;
-        const zig = (Math.sin(d * 17 + k * 2.3) * 0.2 + Math.sin(d * 37 + k) * 0.08) * (0.25 + d);
+      for (let k = 0; k < 5; k++) {
+        const base = (k / 5) * Math.PI * 2 + hash(k, 21) * 0.9;
+        const zig = (Math.sin(d * 21 + k * 2.3) * 0.16 + Math.sin(d * 53 + k) * 0.06) * (0.2 + d);
         let da = a - base - zig;
         while (da > Math.PI) da -= Math.PI * 2;
         while (da < -Math.PI) da += Math.PI * 2;
         const w = Math.abs(da) * d;
-        const width = 0.03 * (1.2 - d * 0.7);
-        // ひびの奥が光る（落ちるのが近いほど）
-        if (w < width * 0.45 && f >= 4) return f >= 6 ? 3 : 2;
-        if (w < width) return 0;
-        if (w < width * 1.8) return 1;
+        if (w < 0.011) return 0;
+        if (w < 0.02) return 1;
+        // 途中で枝分かれ
+        if (d > 0.4) {
+          let db = da - 0.5 * (k % 2 === 0 ? 1 : -1);
+          while (db > Math.PI) db -= Math.PI * 2;
+          while (db < -Math.PI) db += Math.PI * 2;
+          if (Math.abs(db) * d < 0.01 && d < reach * 0.9) return 0;
+        }
       }
       return -1;
     }),
@@ -5828,33 +5832,48 @@ function gigaCrack(): SpriteOut {
   return { palette, frameMs: 180, parts: { main: frames.map(toRows) } };
 }
 
-/** ギガインパクトで地面がめくれる（レッドのカビゴン。07 の196章）: 割れた地面の板が外へ開き、土ぼこりと岩が飛ぶ。光らせない */
+/** ギガインパクトの衝撃で地面が爆ぜる（レッドのカビゴン。07 の196章）: 黄金の輪と光の筋が外へ走り、割れた岩が飛び、土ぼこりが残る。真ん中を白く塗らない */
 function gigaUpheave(): SpriteOut {
-  // 0 輪郭・1 こげ茶・2 茶・3 明るい茶・4 土ぼこり
-  const palette = ['#2b1a10', '#5d4037', '#8d6e63', '#bcaaa4', '#d7ccc8'];
-  const frames = [0, 1, 2, 3].map((f) =>
-    shape(96, (u, v) => {
+  // 0 輪郭・1 こげ茶・2 茶・3 橙・4 黄金・5 薄い金・6 白
+  const palette = ['#2b1a10', '#5d4037', '#8d6e63', '#fb8c00', '#ffc107', '#ffe082', '#ffffff'];
+  const frames = [0, 1, 2, 3, 4, 5].map((f) =>
+    shape(120, (u, v) => {
       const d = Math.hypot(u, v);
       const a = Math.atan2(v, u);
-      // 真ん中の割れた穴
-      if (d < 0.2 + f * 0.04) return d > 0.15 + f * 0.04 ? 1 : 0;
-      // めくれる地面の板（9 枚。外へ開いて進む）
-      const k = (((a / (Math.PI * 2)) * 9) % 1 + 1) % 1;
-      const r = 0.3 + f * 0.13;
-      const w = 0.2 - f * 0.012;
-      if (Math.abs(k - 0.5) < 0.36 - f * 0.03 && d > r && d < r + w) {
-        if (d > r + w - 0.03 || Math.abs(k - 0.5) > 0.32 - f * 0.03) return 0;
-        return d > r + w * 0.55 ? 3 : 2;
+      // 割れた岩（外へ飛ぶ。14 個）
+      for (let k = 0; k < 14; k++) {
+        const ang = (k / 14) * Math.PI * 2 + hash(k, 41) * 0.5;
+        const dist = 0.14 + (0.1 + hash(k, 42) * 0.09) * (f + 1);
+        const size = 0.045 + hash(k, 43) * 0.045;
+        const rx = u - Math.cos(ang) * dist;
+        const ry = v - Math.sin(ang) * dist;
+        if (Math.abs(rx) + Math.abs(ry) < size) return Math.abs(rx) + Math.abs(ry) > size * 0.72 ? 0 : hash(k, 44) < 0.5 ? 2 : 1;
       }
-      // 飛ぶ岩
-      const rock = hash(Math.round(u * 15), Math.round(v * 15), 31);
-      if (d > r + w && d < r + w + 0.22 && rock < 0.07) return 2;
-      // 土ぼこり（後ろのコマで広がる）
-      if (f >= 1 && Math.abs(d - (r - 0.04)) < 0.035 && hash(Math.round(u * 40), Math.round(v * 40), f + 30) < 0.5) return 4;
+      // 黄金の衝撃の輪（白 → 金 → 橙と細くなりながら広がる）
+      const r = 0.2 + f * 0.15;
+      const width = 0.085 - f * 0.012;
+      const dr = Math.abs(d - r);
+      if (dr < width) return f < 2 ? (dr < width * 0.4 ? 6 : 5) : f < 4 ? (dr < width * 0.45 ? 5 : 4) : 3;
+      // 外へ走る光の筋（最初のコマだけ）
+      if (f < 3) {
+        const ray = (((a / (Math.PI * 2)) * 16) % 1 + 1) % 1;
+        if (Math.abs(ray - 0.5) < 0.05 && d > r && d < r + 0.24 - f * 0.05) return f === 0 ? 5 : 4;
+      }
+      // 地面の割れ目（真ん中。後のコマで残る）
+      if (d < r * 0.55) {
+        const crack = (((a / (Math.PI * 2)) * 7) % 1 + 1) % 1;
+        if (Math.abs(crack - 0.5) < 0.09) return 0;
+      }
+      // 土ぼこり（後のコマで輪の内側に）
+      if (f >= 2 && d < r - width && d > r * 0.5) {
+        const px = Math.round((u + 1) * 40);
+        const py = Math.round((v + 1) * 40);
+        if ((px + py) % 2 === 0 && hash(px >> 1, py >> 1, f + 45) < 0.22) return 2;
+      }
       return -1;
     }),
   );
-  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+  return { palette, frameMs: 75, parts: { main: frames.map(toRows) } };
 }
 
 /** 怒りのマーク（レッドのカビゴン。07 の196章）: 頭の上で脈打つ赤い怒りのしるし */

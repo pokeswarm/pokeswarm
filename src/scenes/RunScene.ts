@@ -1572,9 +1572,33 @@ export class RunScene extends Phaser.Scene {
   }
 
   /** ボスの範囲技の予告: 範囲の円と、落ちるまでの残りを内側から広がる円で見せる */
+  /** ギガインパクトの衝撃波（07 の196章）: 叩きつけた瞬間にボスの足元から広がる輪。マスが爆ぜる遅れと同じ速さなので、輪が通った所が爆ぜる */
+  private drawShockRings(g: Phaser.GameObjects.Graphics, hazards: readonly Hazard[]): void {
+    const w = this.sim.world;
+    const drawn = new Set<number>();
+    for (const h of hazards) {
+      const mv = w.rules.stage.moves[h.move];
+      if (!mv?.shockRing || !mv.gridWave || !mv.gridWave.delayPerPixel || h.group === undefined || drawn.has(h.group)) continue;
+      const i = findEnemyIndex(w, h.dasher);
+      if (i === -1) continue;
+      // 落ちるまでの時間は、技の予告の秒数 ＋ 距離の遅れ。予告の秒数を過ぎてからの時間で輪が広がる
+      const delay = (h.activeTicks !== undefined ? 0 : h.ticksLeft) * w.dt;
+      const since = h.activeTicks !== undefined ? null : (h.totalTicks - h.ticksLeft) * w.dt - mv.telegraphSeconds;
+      void delay;
+      if (since === null || since <= 0) continue;
+      drawn.add(h.group);
+      const r = since / mv.gridWave.delayPerPixel;
+      const fade = Math.max(0, 1 - r / 1500);
+      mv.shockRing.forEach((color, k) => {
+        g.lineStyle(26 - k * 8, hexColor(color), (0.55 + k * 0.2) * fade).strokeCircle(w.enemies.x[i]!, w.enemies.y[i]! + 20, Math.max(1, r - k * 5));
+      });
+    }
+  }
+
   private drawHazards(hazards: readonly Hazard[]): void {
     const g = this.hazardView;
     g.clear();
+    this.drawShockRings(g, hazards);
     let countdowns = 0;
     for (const h of hazards) {
       // 飛ぶ玉（サンダーの電気の玉）: 飛んでいる間は黄色い玉
@@ -2216,6 +2240,13 @@ export class RunScene extends Phaser.Scene {
     const e = this.sim.world.enemies;
     // ボスがプレイヤーと同じ技で走っている間（ボルテッカー・ブレイブバード）: プレイヤーの技の残像と同じ色で光らせる（07 の167章）
     const w = this.sim.world;
+    // ギガインパクト: 叩きつけるまで、全身が光る
+    for (const h of w.hazards) {
+      const mv = w.rules.stage.moves[h.move];
+      if (!mv?.bodyGlow || h.dasher !== e.id[i] || h.activeTicks !== undefined) continue;
+      if (mv.gridWave && (h.totalTicks - h.ticksLeft) * w.dt >= mv.telegraphSeconds) continue;
+      return hexColor(mv.bodyGlow[Math.floor(performance.now() / 110) % mv.bodyGlow.length]!);
+    }
     // サイコキネシスで浮かされている相手は、念力の色に光る
     for (const h of w.hazards) {
       if (h.activeTicks === undefined && w.rules.stage.moves[h.move]?.throwPartner?.kind === w.rules.enemies.kinds[e.kind[i]!]?.id) return 0xf48fb1;
@@ -2255,7 +2286,11 @@ export class RunScene extends Phaser.Scene {
     for (const h of w.hazards) {
       if (h.activeTicks !== undefined) continue;
       const mv = w.rules.stage.moves[h.move];
-      if (mv?.liftBody && h.dasher === e.id[i]) return { lift: mv.liftBody, hop: 0, shake: 0, squash: 1, spin: false };
+      if (mv?.liftBody && h.dasher === e.id[i]) {
+        // 市松模様（ギガインパクト）: 落ちるときに叩きつける（遅れて落ちるマスを待たない）
+        if (mv.gridWave && (h.totalTicks - h.ticksLeft) * w.dt >= mv.telegraphSeconds) continue;
+        return { lift: mv.liftBody, hop: 0, shake: 0, squash: 1, spin: false };
+      }
       if (mv?.throwPartner && w.rules.enemies.kinds[e.kind[i]!]?.id === mv.throwPartner.kind) return { lift: mv.throwPartner.liftHeight, hop: 0, shake: 2, squash: 1, spin: false };
     }
     for (let s = 0; s < kinds.length; s++) {

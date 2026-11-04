@@ -942,6 +942,7 @@ export const MOVE_PATTERNS = [
   'nearest',
   'facing',
   'melee',
+  'dash',
   'orbit',
   'beam',
   'boomerang',
@@ -1260,7 +1261,15 @@ export const moveDefSchema = z.object({
    * 当たった敵に印を付け、seconds 後にその敵の位置で爆発させる（みらいよち。作者の決定 2026年10月26日）。
    * 爆発の大きさ・威力は、当たった攻撃の大きさ・威力に掛ける倍率。印が付いている敵には付け直さない
    */
-  delayedBlast: z.object({ seconds: z.number().positive(), sizeMultiplier: z.number().positive(), powerMultiplier: z.number().nonnegative() }).optional(),
+  delayedBlast: z
+    .object({
+      seconds: z.number().positive(),
+      sizeMultiplier: z.number().positive(),
+      powerMultiplier: z.number().nonnegative(),
+      /** 爆発の代わりに、雑魚を持ち主の向いている方へ投げ飛ばす（サイコキネシス: 飛ぶ敵が弾になり、通り道の敵に当たる。ボスは投げず、その場で爆発を受ける。07 の177章） */
+      throw: z.object({ speed: z.number().positive(), seconds: z.number().positive() }).optional(),
+    })
+    .optional(),
   /**
    * 使うたびに、ランの終わりにもらうコインを perUse + perLevel × (レベル − 1) 枚増やす（ネコにこばん。作者の決定 2026年10月26日）。
    * 端数はためて、ランの終わりに切り捨てる
@@ -1314,6 +1323,23 @@ export const moveDefSchema = z.object({
   scatterArc: z.number().positive().max(360).optional(),
   /** scatter: 場所をランダムにせず、range の中のランダムな敵の足元に置く（敵がいなければランダムな場所。りゅうせいぐん: 流星が敵へ降る。07 の169章） */
   scatterOnEnemies: z.boolean().optional(),
+  /**
+   * dash（体が本当に動く技。のしかかり・すてみタックル。07 の177章）: 向いている方へ range だけ seconds 秒で進む（本人のブラウザで動かす）。進んでいる間は入力で動けない。
+   * 届く範囲（range + size）の前の半分に敵がいないと出さない。
+   * hit: land = 着いた所に当たり判定（size）が出る。path = 通っている間ずっと、体のまわり（size）に当たる。
+   * hop は跳ぶ高さ（見た目だけ）、afterimages は残像の数、invincible は進んでいる間の無敵（敵をすり抜ける）
+   */
+  dash: z
+    .object({
+      seconds: z.number().positive(),
+      hit: z.enum(['land', 'path']),
+      hop: z.number().nonnegative().default(0),
+      afterimages: z.number().int().nonnegative().default(0),
+      invincible: z.boolean().default(false),
+    })
+    .optional(),
+  /** screen: 地上の敵だけに当たる（じしん: ひこうタイプには効かない。07 の177章） */
+  groundOnly: z.boolean().optional(),
   /** 敵に当たらない（ミルクのみ: 投げたびんは落ちて道具になるだけ。07 の173章） */
   harmless: z.boolean().optional(),
   /** ねむる（rest）で眠っている間だけ出す（いびき。起きている間は出さない。07 の173章） */
@@ -2026,6 +2052,23 @@ export const statusKindSchema = z.object({
   damageTakenMultiplier: z.number().positive(),
   /** 触れたときのダメージの倍率（こうげきダウン。バークアウト。07 の81章） */
   contactDamageMultiplier: z.number().positive().default(1),
+  /** おびえて逃げる（バークアウト）: 雑魚はプレイヤーから離れる向きへ動く。ボスは逃げない（ほかの効果だけ効く。07 の177章） */
+  flees: z.boolean().default(false),
+  /** ボスには付かない（持ち上げる・つぶす など。07 の177章） */
+  notOnBoss: z.boolean().default(false),
+  /**
+   * かかっている間の敵の体の見た目（描画だけ。07 の177章）: lift = 浮く高さ（影は地面に残る）、hop = 細かく跳ねる高さ、shake = 横にふるえる幅、
+   * squash = 縦につぶれる割合（0.3 なら高さ 3 割で横に広がる）、spin = くるくる回る
+   */
+  body: z
+    .object({
+      lift: z.number().nonnegative().default(0),
+      hop: z.number().nonnegative().default(0),
+      shake: z.number().nonnegative().default(0),
+      squash: z.number().min(0).max(1).default(1),
+      spin: z.boolean().default(false),
+    })
+    .optional(),
   /** ダメージを受けると治る（ねむり） */
   breaksOnDamage: z.boolean().default(false),
   /** 治るまでの秒数（ねむり: 攻撃を受けてから、少しだけ止まったままでいてから動き出す。07 の173章） */

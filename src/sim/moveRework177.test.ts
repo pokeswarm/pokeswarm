@@ -1,0 +1,208 @@
+import { describe, expect, it } from 'vitest';
+import { buildSimRules, moveIndexOf } from '../data/simRules';
+import { Simulation } from './simulation';
+
+/** 07 の177章: 技で起きていることから作り直した技 */
+function setup(move: string, region = 'kanto') {
+  const rules = buildSimRules(region);
+  const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+  const m = moveIndexOf(rules, move);
+  const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100, moves: [{ move: m, level: 1 }] });
+  p.facingX = 1;
+  p.facingY = 0;
+  const pr = sim.world.projectiles;
+  const mine = (): number[] => [...Array(pr.count).keys()].filter((i) => pr.move[i] === m);
+  const status = (id: string): number => rules.status.kinds.findIndex((k) => k.id === id);
+  const kindOf = (rank: 'normal' | 'boss'): number => rules.enemies.kinds.findIndex((k) => (rank === 'normal' ? (k.rank ?? 'normal') === 'normal' : (k.rank ?? 'normal') !== 'normal'));
+  return { rules, sim, p, m, pr, mine, status, kindOf, e: sim.world.enemies };
+}
+
+describe('体が本当に動く技', () => {
+  it('のしかかり: 前に敵がいると跳んで進み、着いた所の敵がぺしゃんこになる。跳んでいる間は無敵', () => {
+    const t = setup('body-slam');
+    t.e.add(1, t.kindOf('normal'), 80, 0, 1e6, 0, 10);
+    t.sim.step([]);
+    expect(t.p.invincibleTicks).toBeGreaterThan(0);
+    expect(t.sim.world.events.some((ev) => ev.type === 'dashStarted')).toBe(true);
+    // 跳んでいる途中はまだ当たらない
+    expect(t.e.hp[0]).toBe(1e6);
+    for (let k = 0; k < 12; k++) t.sim.step([]);
+    expect(t.p.x).toBeCloseTo(80, 0);
+    expect(t.e.hp[0]!).toBeLessThan(1e6);
+    expect(t.e.hasStatus(0, t.status('squashed'))).toBe(true);
+  });
+
+  it('前に敵がいなければ動かない（後ろにだけいるときも）', () => {
+    for (const move of ['body-slam', 'double-edge']) {
+      const t = setup(move);
+      t.e.add(1, t.kindOf('normal'), -80, 0, 1e6, 0, 10);
+      for (let k = 0; k < 40; k++) t.sim.step([]);
+      expect(t.p.x, move).toBe(0);
+    }
+  });
+
+  it('進んでいる間は入力で動けない', () => {
+    const t = setup('body-slam');
+    t.e.add(1, t.kindOf('normal'), 80, 0, 1e6, 0, 10);
+    t.sim.step([]);
+    const y = t.p.y;
+    t.sim.step([{ type: 'move', playerId: 1, dx: 0, dy: 1 }]);
+    t.sim.step([]);
+    expect(t.p.y).toBe(y);
+  });
+
+  it('すてみタックル: 前へ突進し、通った道の敵を前へはね飛ばして回す。反動で HP が減る', () => {
+    const t = setup('double-edge');
+    t.e.add(1, t.kindOf('normal'), 70, 0, 1e6, 0, 10);
+    const hp = t.p.hp;
+    for (let k = 0; k < 8; k++) t.sim.step([]);
+    expect(t.p.x).toBeGreaterThan(60);
+    expect(t.p.hp).toBeLessThan(hp);
+    expect(t.e.hp[0]!).toBeLessThan(1e6);
+    expect(t.e.hasStatus(0, t.status('flung'))).toBe(true);
+    expect(t.e.kbVx[0]!).toBeGreaterThan(0);
+  });
+
+  it('ボスはぺしゃんこにならない', () => {
+    const t = setup('body-slam');
+    t.e.add(1, t.kindOf('boss'), 80, 0, 1e6, 0, 10);
+    for (let k = 0; k < 14; k++) t.sim.step([]);
+    expect(t.e.hp[0]!).toBeLessThan(1e6);
+    expect(t.e.hasStatus(0, t.status('squashed'))).toBe(false);
+  });
+});
+
+describe('サイコキネシス: つかんで投げる', () => {
+  it('雑魚は浮いて止まり、0.5 秒後に向いている方へ飛び、通り道の敵に当たる', () => {
+    const t = setup('psychic');
+    t.p.moves[0]!.level = t.rules.moves[t.m]!.levels.length + 1;
+    t.e.add(1, t.kindOf('normal'), 0, 100, 1e6, 0, 10);
+    t.sim.step([]);
+    expect(t.e.hasStatus(0, t.status('lifted'))).toBe(true);
+    const y = t.e.y[0]!;
+    for (let k = 0; k < 10; k++) t.sim.step([]);
+    expect(t.e.y[0]).toBeCloseTo(y, 3);
+    // 右へ飛んでいく先に別の敵を置く（まだつかまれていない敵）
+    t.e.add(2, t.kindOf('normal'), t.e.x[0]! + 60, t.e.y[0]!, 1e6, 0, 10);
+    t.p.moves[0]!.cooldown = 99;
+    for (let k = 0; k < 16; k++) t.sim.step([]);
+    expect(t.e.x[0]!).toBeGreaterThan(40);
+    expect(t.e.hp[1]!).toBeLessThan(1e6);
+  });
+
+  it('ボスは浮かず、飛ばされず、その場で大きなダメージを受ける', () => {
+    const t = setup('psychic');
+    t.e.add(1, t.kindOf('boss'), 100, 0, 1e6, 0, 10);
+    t.sim.step([]);
+    expect(t.e.hasStatus(0, t.status('lifted'))).toBe(false);
+    const hp = t.e.hp[0]!;
+    t.p.moves[0]!.cooldown = 99;
+    for (let k = 0; k < 18; k++) t.sim.step([]);
+    expect(t.e.hp[0]!).toBeLessThan(hp);
+    expect(t.e.kbTicks[0]).toBe(0);
+  });
+});
+
+describe('じしん: 地面全体が揺れる', () => {
+  it('止まっているとたまらず、走るとたまって、地上の敵が揺れる。ひこうタイプには効かない', () => {
+    const t = setup('earthquake');
+    const flying = t.rules.types.names.indexOf('flying');
+    const air = t.rules.enemies.kinds.findIndex((k) => (k.rank ?? 'normal') === 'normal' && k.types?.includes(flying));
+    const ground = t.rules.enemies.kinds.findIndex((k) => (k.rank ?? 'normal') === 'normal' && !k.types?.includes(flying));
+    expect(air).toBeGreaterThanOrEqual(0);
+    t.e.add(1, ground, -300, 200, 1e6, 0, 10);
+    t.e.add(2, air, 300, -200, 1e6, 0, 10);
+    t.p.moves[0]!.cooldown = 1;
+    for (let k = 0; k < 60; k++) t.sim.step([]);
+    expect(t.e.hp[0]).toBe(1e6);
+    for (let k = 0; k < 40; k++) t.sim.step([{ type: 'move', playerId: 1, dx: 1, dy: 0 }]);
+    expect(t.e.hp[0]!).toBeLessThan(1e6);
+    expect(t.e.hp[1]).toBe(1e6);
+  });
+});
+
+describe('バークアウト: 吠えて、おびえさせる', () => {
+  it('吠え声が口から 3 つ前へ飛び、当たった雑魚はプレイヤーから逃げ出す', () => {
+    const t = setup('snarl', 'johto');
+    t.e.add(1, t.kindOf('normal'), 70, 0, 1e6, 60, 10);
+    const seen: number[] = [];
+    let scared = false;
+    for (let k = 0; k < 12; k++) {
+      t.sim.step([]);
+      seen.push(t.mine().length);
+      if (t.e.hasStatus(0, t.status('scared'))) scared = true;
+    }
+    expect(Math.max(...seen)).toBe(3);
+    expect(scared).toBe(true);
+    const x = t.e.x[0]!;
+    t.p.moves[0]!.cooldown = 99;
+    t.e.kbTicks[0] = 0;
+    t.sim.step([]);
+    expect(t.e.x[0]!).toBeGreaterThan(x);
+  });
+
+  it('ボスは逃げず、追いかけ続ける', () => {
+    const t = setup('snarl', 'johto');
+    t.e.add(1, t.kindOf('boss'), 70, 0, 1e6, 60, 10);
+    for (let k = 0; k < 10; k++) t.sim.step([]);
+    t.p.moves[0]!.cooldown = 99;
+    t.e.kbTicks[0] = 0;
+    const x = t.e.x[0]!;
+    t.sim.step([]);
+    expect(t.e.x[0]!).toBeLessThanOrEqual(x);
+  });
+});
+
+describe('ハイパーボイス: 輪の音波と広がる音の輪', () => {
+  it('一番近い敵を追いかけて飛び、当たった所から音の輪が広がる', () => {
+    const t = setup('hyper-voice');
+    t.e.add(1, t.kindOf('normal'), 0, -120, 1e6, 0, 10);
+    t.e.add(2, t.kindOf('normal'), 30, -130, 1e6, 0, 10);
+    let ring = false;
+    for (let k = 0; k < 30; k++) {
+      t.sim.step([]);
+      if (t.mine().some((i) => t.pr.stage[i] === 1 && t.pr.band[i]! > 0)) ring = true;
+    }
+    expect(ring).toBe(true);
+    expect(t.e.hp[0]!).toBeLessThan(1e6);
+    expect(t.e.hp[1]!).toBeLessThan(1e6);
+  });
+});
+
+describe('そのほか', () => {
+  it('あまえる: 近くの敵へ 1 つ飛び、攻撃を下げる。後ろの敵でも近ければ狙う', () => {
+    const t = setup('charm', 'johto');
+    t.e.add(1, t.kindOf('normal'), -60, 0, 1e6, 0, 10);
+    for (let k = 0; k < 20; k++) t.sim.step([]);
+    expect(t.e.hasStatus(0, t.status('attackDown'))).toBe(true);
+  });
+
+  it('いびき: 眠っている間に Z が漂い出て、触れた敵がうとうとする', () => {
+    const rules = buildSimRules('kanto');
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 100, moves: ['rest', 'snore'].map((k) => ({ move: moveIndexOf(rules, k), level: 8 })) });
+    for (let k = 0; k < 8; k++) sim.world.enemies.add(k + 1, 0, Math.cos(k) * 60, Math.sin(k) * 60, 1e6, 0, 10);
+    const drowsy = rules.status.kinds.findIndex((k) => k.id === 'drowsy');
+    let hit = false;
+    for (let k = 0; k < 240 && !hit; k++) {
+      sim.step([]);
+      hit = [...Array(8).keys()].some((i) => sim.world.enemies.hasStatus(i, drowsy));
+    }
+    expect(p.sleep?.asleep).toBe(true);
+    expect(hit).toBe(true);
+  });
+
+  it('エアカッター: 刃が 3 枚前へ飛ぶ。マジカルシャイン（トゲチック）: 前の扇の光', () => {
+    const a = setup('air-cutter');
+    a.sim.step([]);
+    const blades = a.mine();
+    expect(blades).toHaveLength(3);
+    for (const i of blades) expect(a.pr.vx[i]!).toBeGreaterThan(0);
+    const g = setup('dazzling-gleam', 'johto');
+    g.e.add(1, g.kindOf('normal'), 150, 0, 1e6, 0, 10);
+    g.e.add(2, g.kindOf('normal'), -150, 0, 1e6, 0, 10);
+    for (let k = 0; k < 10; k++) g.sim.step([]);
+    expect(g.e.hp[0]!).toBeLessThan(1e6);
+    expect(g.e.hp[1]).toBe(1e6);
+  });
+});

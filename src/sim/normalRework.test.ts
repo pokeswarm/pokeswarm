@@ -43,19 +43,3 @@ describe('ねこだまし', () => {
   });
 });
 
-describe('ハイパーボイス', () => {
-  it('出ている間、扇の向きが決まった速さで回る', () => {
-    const { sim, p } = setup('hyper-voice', 'kanto');
-    p.facingX = 1;
-    p.facingY = 0;
-    sim.step([]);
-    const pr = sim.world.projectiles;
-    const a0 = Math.atan2(pr.dirY[0]!, pr.dirX[0]!);
-    for (let t = 0; t < 15; t++) sim.step([]);
-    const a1 = Math.atan2(pr.dirY[0]!, pr.dirX[0]!);
-    let d = a1 - a0;
-    while (d < 0) d += Math.PI * 2;
-    // 140 度/秒 × 0.5 秒
-    expect((d * 180) / Math.PI).toBeCloseTo(70, -1);
-  });
-});

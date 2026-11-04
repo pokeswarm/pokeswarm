@@ -96,7 +96,7 @@ export interface SimMoveDef {
   /** heal: 味方の HP を最大 HP の pct % 回復する（いやしのねがい） */
   readonly allyHealPct?: number;
   /** 当たった敵に印を付け、seconds 後にその敵の位置で爆発させる（みらいよち） */
-  readonly delayedBlast?: { readonly seconds: number; readonly sizeMultiplier: number; readonly powerMultiplier: number };
+  readonly delayedBlast?: { readonly seconds: number; readonly sizeMultiplier: number; readonly powerMultiplier: number; readonly throw?: { readonly speed: number; readonly seconds: number } };
   /** 使うたびに、ランのコインを perUse + perLevel × (レベル − 1) 枚増やす（ネコにこばん） */
   readonly coinGain?: { readonly perUse: number; readonly perLevel: number };
   /** 当たるたびに大きくなる（ころがる） */
@@ -186,6 +186,10 @@ export interface SimMoveDef {
   readonly scatterArc?: number;
   /** scatter: range の中のランダムな敵の足元に置く（りゅうせいぐん） */
   readonly scatterOnEnemies?: boolean;
+  /** 体が本当に動く技（のしかかり・すてみタックル） */
+  readonly dash?: { readonly seconds: number; readonly hit: 'land' | 'path'; readonly hop: number; readonly afterimages: number; readonly invincible: boolean };
+  /** screen: 地上の敵だけに当たる（じしん） */
+  readonly groundOnly?: boolean;
   /** 敵に当たらない（ミルクのみ） */
   readonly harmless?: boolean;
   /** ねむる で眠っている間だけ出す（いびき） */

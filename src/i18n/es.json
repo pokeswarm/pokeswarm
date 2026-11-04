@@ -21,6 +21,7 @@
   "pattern.nearest": "enemigo más cercano",
   "pattern.facing": "hacia delante",
   "pattern.melee": "cuerpo a cuerpo",
+  "pattern.dash": "Embestida al frente",
   "pattern.orbit": "gira a tu alrededor",
   "pattern.beam": "rayo en línea recta",
   "pattern.boomerang": "vuelve",

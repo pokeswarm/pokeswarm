@@ -1506,23 +1506,33 @@
     },
     "earthquake": {
       "extends": "ground.base",
+      "hideShape": true,
       "projectile": {
-        "shapeAlpha": 0.12
+        "coreScale": 0,
+        "glowScale": 0
       },
       "impact": {
-        "flash": {
-          "color": "#bcaaa4",
-          "radius": 40,
-          "durationMs": 160,
-          "alpha": 0.6
+        "burst": {
+          "count": 0
         }
       },
-      "sprite": {
-        "id": "quake-wave-big",
-        "fit": "ring",
+      "chargeGlow": {
+        "color": "#a1887f",
+        "seconds": 3,
+        "radius": 56,
+        "alpha": 0.55
+      },
+      "castSprite": {
+        "id": "ground-burst",
+        "fit": "circle",
         "size": 1,
-        "varyTiles": true,
-        "shake": 3
+        "seconds": 0.35,
+        "radius": 70
+      },
+      "sprite": {
+        "id": "quake-dust",
+        "fit": "circle",
+        "size": 1.5
       }
     },
     "bonemerang": {
@@ -1565,30 +1575,30 @@
     },
     "psychic": {
       "extends": "psychic.base",
-      "projectile": {
-        "shapeAlpha": 0.12
-      },
+      "hideShape": true,
       "impact": {
         "flash": {
           "color": "#f48fb1",
-          "radius": 50,
-          "durationMs": 160,
-          "alpha": 0.6
+          "radius": 26,
+          "durationMs": 120,
+          "alpha": 0.4
         }
       },
       "sprite": {
-        "id": "psy-wave",
-        "fit": "ring",
-        "size": 1,
-        "varyTiles": true
+        "id": "psy-grip",
+        "fit": "circle",
+        "size": 1.6,
+        "alpha": 0.8,
+        "rotate": "spin",
+        "spinDegPerSec": 540
       },
       "effectSprite": {
         "id": "psy-grip",
         "fit": "circle",
-        "size": 0.9,
-        "alpha": 0.4,
+        "size": 1.1,
+        "alpha": 0.7,
         "rotate": "spin",
-        "spinDegPerSec": 540
+        "spinDegPerSec": 720
       }
     },
     "future-sight": {
@@ -2908,13 +2918,21 @@
     },
     "hyper-voice": {
       "extends": "normal.base",
+      "hideShape": true,
       "projectile": {
         "glowColor": "#f48fb1",
-        "shapeAlpha": 0.7
+        "glowScale": 1.1,
+        "coreScale": 0.2
       },
       "sprite": {
-        "id": "sound-cone",
-        "fit": "cone",
+        "id": "voice-wave",
+        "fit": "circle",
+        "size": 2.4,
+        "rotate": "velocity"
+      },
+      "effectRingSprite": {
+        "id": "sound-ring",
+        "fit": "ring",
         "size": 1
       }
     },
@@ -3666,19 +3684,16 @@
     },
     "snarl": {
       "extends": "dark.base",
+      "hideShape": true,
       "projectile": {
-        "glowScale": 1.05,
-        "coreScale": 0.3
-      },
-      "screenFlash": {
-        "color": "#1a0f24",
-        "alpha": 0.25,
-        "durationMs": 200
+        "coreScale": 0,
+        "glowScale": 0
       },
       "sprite": {
-        "id": "snarl-ring",
-        "fit": "ring",
-        "size": 1
+        "id": "shout-burst",
+        "fit": "circle",
+        "size": 1.5,
+        "rotate": "velocity"
       }
     },
     "muddy-water": {
@@ -5461,14 +5476,16 @@
     },
     "air-cutter": {
       "extends": "flying.base",
+      "hideShape": true,
       "projectile": {
-        "shapeAlpha": 0.1
+        "coreScale": 0,
+        "glowScale": 0
       },
       "sprite": {
-        "id": "wind-gust",
-        "fit": "cone",
-        "size": 1,
-        "alpha": 0.9
+        "id": "air-cutter-blade",
+        "fit": "circle",
+        "size": 2.2,
+        "rotate": "velocity"
       }
     },
     "aerial-ace": {
@@ -6360,15 +6377,43 @@
     },
     "dazzling-gleam": {
       "extends": "fairy.base",
+      "projectile": {
+        "shapeAlpha": 0.55,
+        "glowColor": "#fce4ec"
+      },
       "screenFlash": {
         "color": "#fff0f7",
         "alpha": 0.1,
-        "durationMs": 120
+        "durationMs": 140
       },
-      "sprite": {
-        "id": "gleam-ray",
-        "fit": "line",
-        "size": 1.3
+      "trail": {
+        "intervalMs": 24,
+        "colors": [
+          "#ffffff",
+          "#fce4ec",
+          "#f8bbd0",
+          "#b3e5fc"
+        ],
+        "lifespanMs": [
+          240,
+          480
+        ],
+        "speed": [
+          20,
+          70
+        ],
+        "scale": [
+          0.22,
+          0
+        ],
+        "alpha": [
+          1,
+          0
+        ],
+        "gravityY": 0,
+        "spread": 4,
+        "blend": "add",
+        "outward": true
       }
     },
     "fire-blast": {
@@ -6510,6 +6555,11 @@
     },
     "snore": {
       "extends": "normal.base",
+      "hideShape": true,
+      "projectile": {
+        "coreScale": 0,
+        "glowScale": 0
+      },
       "sprite": {
         "id": "snore-z",
         "fit": "circle",
@@ -6536,11 +6586,23 @@
     },
     "charm": {
       "extends": "fairy.base",
+      "hideShape": true,
+      "projectile": {
+        "coreScale": 0,
+        "glowScale": 0
+      },
       "sprite": {
         "id": "charm-heart",
         "fit": "circle",
         "size": 2.2,
         "upright": true
+      },
+      "hitSprite": {
+        "id": "heart-eyes",
+        "fit": "circle",
+        "size": 1,
+        "seconds": 0.9,
+        "radius": 16
       }
     },
     "play-rough": {
@@ -6582,8 +6644,9 @@
       "hideShape": true,
       "sprite": {
         "id": "charge-streak",
-        "fit": "front",
-        "size": 1
+        "fit": "circle",
+        "size": 2.4,
+        "rotate": "velocity"
       }
     }
   }

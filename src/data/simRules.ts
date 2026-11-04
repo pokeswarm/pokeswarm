@@ -120,6 +120,8 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.scatterOnEnemies ? { scatterOnEnemies: true } : {}),
       ...(def.onlyWhileAsleep ? { onlyWhileAsleep: true } : {}),
       ...(def.harmless ? { harmless: true } : {}),
+      ...(def.dash ? { dash: def.dash } : {}),
+      ...(def.groundOnly ? { groundOnly: true } : {}),
       restAfterEnd: def.restAfterEnd,
       ...(def.snake ? { snake: def.snake } : {}),
       // いつも効く技: レベルごとの効果を、そのレベルまでの合計にしておく

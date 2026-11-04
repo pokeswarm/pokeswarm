@@ -320,6 +320,11 @@ export function useMoves(world: World): void {
           timers[def.group] = scaledMoveStats(world, p, pm, st).cooldownSeconds / members.length;
         }
       }
+      // 体が動く技（のしかかり・すてみタックル）: 前の半分の届く範囲に敵がいなければ出さない（だれもいないのに勝手に動かない）
+      if (def.dash && !enemyAhead(world, p, st.range + st.size)) {
+        pm.cooldown = 0;
+        continue;
+      }
       // HP を使う技（だいばくはつ）: HP が最大の minHpPct % を下回っていれば出さずに待つ。最大 HP の pct % 相当のダメージを自分が受ける
       // （防御・ディフェンダーの軽減が効く）。HP は本人のブラウザで減らす（ほかの人の分は本人の画面から届く）
       if (def.hpCost) {
@@ -404,6 +409,9 @@ export function useMoves(world: World): void {
           break;
         case 'lob':
           fireLob(world, p, pm, st);
+          break;
+        case 'dash':
+          fireDash(world, p, pm, st);
           break;
         case 'strike':
           if (def.sequential) {
@@ -823,12 +831,15 @@ function fireScreen(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
   const { enemies: e, enemyHash, scratch } = world;
   const n = enemyHash.queryRect(p.x - st.range, p.y - st.range, p.x + st.range, p.y + st.range, scratch);
   const found: { i: number; d2: number }[] = [];
+  const flying = world.rules.moves[pm.move]!.groundOnly ? world.rules.types.names.indexOf('flying') : -1;
   // ハッシュの衝突で同じ敵が2回入っていることがある
   const seen = new Set<number>();
   for (let k = 0; k < n; k++) {
     const i = scratch[k]!;
     if (e.hp[i]! <= 0 || seen.has(i)) continue;
     seen.add(i);
+    // 地上の敵だけ（じしん: ひこうタイプには効かない）
+    if (flying >= 0 && world.rules.enemies.kinds[e.kind[i]!]?.types?.includes(flying)) continue;
     const d2 = (e.x[i]! - p.x) ** 2 + (e.y[i]! - p.y) ** 2;
     if (d2 <= st.range * st.range) found.push({ i, d2 });
   }
@@ -984,6 +995,41 @@ function fireStrike(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
   for (let k = 0; k < st.count && pool.length > 0; k++) {
     const i = pool.splice(world.rng.int(pool.length), 1)[0]!;
     world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]! });
+  }
+}
+
+/** 向いている方の半分（自分より前）で、距離 reach の中に敵がいるか */
+function enemyAhead(world: World, p: Player, reach: number): boolean {
+  const e = world.enemies;
+  const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  for (const i of enemiesInRange(world, p.x, p.y, reach)) {
+    if ((e.x[i]! - p.x) * fx + (e.y[i]! - p.y) * fy >= 0) return true;
+  }
+  return false;
+}
+
+/**
+ * dash（体が本当に動く技。07 の177章）: 向いている方へ range だけ進む。動かすのは本人のブラウザだけ（ほかの人の位置は通信で届く）。
+ * land は着く所に、着く時刻に当たり判定を出す。path は進んでいる間、体に付いて当たる
+ */
+function fireDash(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+  const dash = world.rules.moves[pm.move]!.dash!;
+  const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  const ticks = Math.max(1, Math.round(dash.seconds / world.dt));
+  // 更新回数で割り切って、ちょうど range だけ進む
+  const speed = st.range / (ticks * world.dt);
+  world.events.push({ type: 'dashStarted', playerId: p.id, seconds: dash.seconds, hop: dash.hop, afterimages: dash.afterimages, dirX: fx, dirY: fy, distance: st.range });
+  if (p.id === world.localPlayerId) {
+    p.dashTicks = ticks;
+    p.dashVx = fx * speed;
+    p.dashVy = fy * speed;
+    if (dash.invincible) p.invincibleTicks = Math.max(p.invincibleTicks, ticks + 1);
+  }
+  const b = base(world, p, pm, st);
+  if (dash.hit === 'land') {
+    world.projectiles.add({ ...b, motion: MOTION_LINEAR, x: p.x + fx * st.range, y: p.y + fy * st.range, vx: 0, vy: 0, life: dash.seconds, stage: 3, armLife: st.durationSeconds });
+  } else {
+    world.projectiles.add({ ...b, motion: MOTION_FOLLOW, x: p.x, y: p.y, ox: 0, oy: 0, vx: fx, vy: fy, dirX: fx, dirY: fy, life: dash.seconds + world.dt });
   }
 }
 
@@ -1630,9 +1676,10 @@ export function moveProjectiles(world: World): void {
       const instakill = perishKill || (st.instakillChance > 0 && normalEnemy && world.rng.next() < st.instakillChance);
       // たたりめ: 状態異常の敵へのダメージを上げる
       const statusBonus = st.statusBonusPct > 0 && e.hasAnyStatus(j) ? 1 + st.statusBonusPct / 100 : 1;
+      // つかんで投げる技（サイコキネシス）は、つかむ時にはダメージを与えない（倒れると浮かない。投げた時にまとめて当たる）
       const amount = instakill
         ? INSTAKILL_DAMAGE
-        : pr.damage[i]! *
+        : (def.delayedBlast?.throw && pr.stage[i] === 0 ? 0 : 1) * pr.damage[i]! *
           Math.max(...moveTypesOf(def).map((t) => typeMultiplier(world.rules.types, world.rules.combat.typeMultipliers, t, owner?.types ?? [], kind?.types ?? []))) *
           (crit ? world.rules.combat.critMultiplier : 1) *
           statusBonus *
@@ -1753,6 +1800,22 @@ export function tickMarks(world: World): void {
   for (let i = 0; i < e.count; i++) {
     if (e.markTicks[i] === 0) continue;
     if (--e.markTicks[i]! > 0 || e.hp[i]! <= 0) continue;
+    // つかんで投げる（サイコキネシス）: 雑魚は持ち主の向いている方へ飛び、飛ぶ敵に付いた当たり判定が通り道の敵に当たる。ボスは下の爆発を受ける
+    const thrown = world.rules.moves[e.markMove[i]!]?.delayedBlast?.throw;
+    const owner = thrown ? world.players.find((pl) => pl.id === e.markBy[i]) : undefined;
+    if (thrown && owner && (world.rules.enemies.kinds[e.kind[i]!]?.rank ?? 'normal') === 'normal') {
+      const [fx, fy] = axisToUnit(owner.facingX, owner.facingY);
+      const ticks = Math.max(1, Math.round(thrown.seconds / world.dt));
+      e.knockBack(i, fx * thrown.speed, fy * thrown.speed, ticks);
+      // 飛ぶ敵に付いた当たり判定。投げられた敵自身には、落ちる時に当たる（飛ぶ前に倒れると投げられない）
+      const bullet = world.projectiles.add({
+        owner: e.markBy[i]!, move: e.markMove[i]!, level: 1, motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]!, vx: fx * thrown.speed, vy: fy * thrown.speed, ox: 0, oy: 0,
+        angle: 0, angularSpeed: 0, orbitRadius: 0, life: thrown.seconds, damage: e.markDamage[i]!, radius: e.radius[i]! * 1.4, pierce: Infinity,
+        hitIntervalTicks: Math.max(1, ticks - 2), shape: SHAPE_CIRCLE, length: 0, dirX: fx, dirY: fy, growth: 0, stage: 1,
+      });
+      if (bullet >= 0) world.projectiles.recordHit(bullet, e.id[i]!, world.tick);
+      continue;
+    }
     world.projectiles.add({
       owner: e.markBy[i]!, move: e.markMove[i]!, level: 1, motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]!, vx: 0, vy: 0, ox: 0, oy: 0,
       angle: 0, angularSpeed: 0, orbitRadius: 0, life: 0.25, damage: e.markDamage[i]!, radius: e.markSize[i]!, pierce: Infinity,

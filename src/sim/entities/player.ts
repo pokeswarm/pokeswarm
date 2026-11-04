@@ -95,6 +95,10 @@ export interface Player {
   burnHurtTicks?: number;
   chill?: number;
   chillTicks?: number;
+  /** 体が動く技で進んでいる間（dash。07 の177章）の残りの更新回数と速さ */
+  dashTicks?: number;
+  dashVx?: number;
+  dashVy?: number;
   pushVx?: number;
   pushVy?: number;
   pushTicks?: number;

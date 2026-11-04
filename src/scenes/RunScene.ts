@@ -1090,6 +1090,8 @@ export class RunScene extends Phaser.Scene {
         // ランの記録（固有技の条件）: 自分の世界に付け、ゲストはホストへも伝える（07 の134章）
         this.uiCommands.push({ type: 'runStat', playerId: this.localId, stat: ev.stat, value: ev.value });
         if (this.sync && w.role === 'guest') this.sync.requestRunStat(ev.stat, ev.value);
+      } else if (ev.type === 'dashStarted') {
+        this.playerViews.get(ev.playerId)?.dash(ev.dirX, ev.dirY, ev.distance, ev.seconds, ev.hop, ev.afterimages);
       } else if (ev.type === 'bodyAttack') {
         this.playerViews.get(ev.playerId)?.lunge(ev.dirX, ev.dirY, ev.distance, ev.afterimages);
       } else if (ev.type === 'moveTaught' && ev.playerId === this.localId) {
@@ -2086,12 +2088,23 @@ export class RunScene extends Phaser.Scene {
     }
     const kinds = this.sim.world.statusKinds;
     // 遅れて爆発する印（みらいよち）: 黒く点滅（爆発が近いほど速く）
-    if (e.markTicks[i]! > 0) {
+    if (e.markTicks[i]! > 0 && !this.sim.world.rules.moves[e.markMove[i]!]?.delayedBlast?.throw) {
       const period = e.markTicks[i]! > 20 ? 8 : 4;
       if (Math.floor(e.markTicks[i]! / period) % 2 === 0) return 0x111111;
     }
     for (let s = 0; s < kinds.length; s++) {
       if (e.hasStatus(i, s)) return this.statusColors[s]!;
+    }
+    return null;
+  }
+
+  /** 状態異常による敵の体の見た目（07 の177章）。かかっていなければ null */
+  private enemyBody(i: number): { lift: number; hop: number; shake: number; squash: number; spin: boolean } | null {
+    const e = this.sim.world.enemies;
+    const kinds = this.sim.world.statusKinds;
+    for (let s = 0; s < kinds.length; s++) {
+      const body = kinds[s]!.body;
+      if (body && e.hasStatus(i, s)) return body;
     }
     return null;
   }
@@ -2228,7 +2241,7 @@ export class RunScene extends Phaser.Scene {
     );
     this.streamer.update(world);
     const drawn =
-      this.enemySpriteView.update(e, alpha, view, (i) => this.statusTint(i), (i) => this.legendPose(i), (i) => this.enemyAlpha(i)) +
+      this.enemySpriteView.update(e, alpha, view, (i) => this.statusTint(i), (i) => this.legendPose(i), (i) => this.enemyAlpha(i), (i) => this.enemyBody(i)) +
       this.enemyView.update(
         e,
         alpha,

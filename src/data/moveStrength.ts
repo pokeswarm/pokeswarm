@@ -92,6 +92,10 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
     case 'stream':
       area = range * 2 * size;
       break;
+    case 'dash':
+      // 通った道に当たる（すてみタックル）か、着いた所の円（のしかかり）
+      area = def.dash?.hit === 'path' ? range * 2 * size : Math.PI * size * size;
+      break;
     case 'chain':
       // 1本の線は、だいたい跳ぶ距離（range の半分）の長さ
       area = range * 0.5 * 2 * size;

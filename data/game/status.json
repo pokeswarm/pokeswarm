@@ -74,6 +74,66 @@
       "damageTakenMultiplier": 1,
       "contactDamageMultiplier": 0.6,
       "color": "#5e35b1"
+    },
+    {
+      "id": "lifted",
+      "damagePerSecond": 0,
+      "damageTakenMultiplier": 1,
+      "speedMultiplier": 0,
+      "notOnBoss": true,
+      "body": {
+        "lift": 26
+      },
+      "color": "#f48fb1"
+    },
+    {
+      "id": "scared",
+      "damagePerSecond": 0,
+      "damageTakenMultiplier": 1,
+      "speedMultiplier": 1,
+      "contactDamageMultiplier": 0.6,
+      "flees": true,
+      "color": "#64b5f6"
+    },
+    {
+      "id": "quaked",
+      "damagePerSecond": 0,
+      "damageTakenMultiplier": 1,
+      "speedMultiplier": 0,
+      "body": {
+        "hop": 14,
+        "shake": 2
+      },
+      "color": "#bcaaa4"
+    },
+    {
+      "id": "squashed",
+      "damagePerSecond": 0,
+      "damageTakenMultiplier": 1,
+      "speedMultiplier": 0,
+      "notOnBoss": true,
+      "body": {
+        "squash": 0.35
+      },
+      "color": "#d7ccc8"
+    },
+    {
+      "id": "flung",
+      "damagePerSecond": 0,
+      "damageTakenMultiplier": 1,
+      "speedMultiplier": 1,
+      "notOnBoss": true,
+      "body": {
+        "spin": true
+      },
+      "color": "#fff8e1"
+    },
+    {
+      "id": "drowsy",
+      "damagePerSecond": 0,
+      "damageTakenMultiplier": 1,
+      "speedMultiplier": 0.45,
+      "color": "#b39ddb"
     }
   ]
 }

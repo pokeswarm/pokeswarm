@@ -135,8 +135,8 @@ describe('プリン（デバッファー）', () => {
     expect(t.derivable('sing', 'silk-scarf', 'hyper-voice')).toBe(false);
   });
 
-  it('あまえる・じゃれつく: 前の敵の攻撃を下げ、真後ろの敵には当たらない（自分から円が出ない。07 の174章）', () => {
-    for (const key of ['charm', 'play-rough']) {
+  it('じゃれつく: 前の敵の攻撃を下げ、真後ろの敵には当たらない（07 の174章。あまえる は 177章で近くの敵へ飛ぶ形にした）', () => {
+    for (const key of ['play-rough']) {
       const t = setup('jigglypuff', 'kanto');
       t.p.facingX = 1;
       t.p.facingY = 0;
@@ -151,7 +151,7 @@ describe('プリン（デバッファー）', () => {
     }
   });
 
-  it('ふみつけ・いびき も真後ろの敵には当たらない。マジカルシャイン（プリン）は離れた敵の足元で弾ける', () => {
+  it('ふみつけ も真後ろの敵には当たらない。マジカルシャイン（プリン）は離れた敵の足元で弾ける', () => {
     const behind = (line: string, key: string, extra: string[] = []): number => {
       const t = setup(line, 'kanto');
       t.p.facingX = 1;
@@ -164,7 +164,6 @@ describe('プリン（デバッファー）', () => {
       return t.sim.world.enemies.hp[1]!;
     };
     expect(behind('miltank', 'stomp')).toBe(1e6);
-    expect(behind('snorlax', 'snore', ['rest'])).toBe(1e6);
     // 光は向きに関係なく、届く範囲の敵の足元で弾ける
     expect(behind('jigglypuff', 'dazzling-gleam-jigglypuff')).toBeLessThan(1e6);
   });

@@ -313,6 +313,18 @@ export interface MoveUsedEvent {
   readonly move: number;
 }
 
+/** 体が動く技で進み始めた（見た目: 跳ぶ・残像。07 の177章） */
+export interface DashStartedEvent {
+  readonly type: 'dashStarted';
+  readonly playerId: PlayerId;
+  readonly seconds: number;
+  readonly hop: number;
+  readonly afterimages: number;
+  readonly dirX: number;
+  readonly dirY: number;
+  readonly distance: number;
+}
+
 /** 自分の体で攻撃する技を使った（見た目: 体を前後させる・残像） */
 export interface BodyAttackEvent {
   readonly type: 'bodyAttack';
@@ -416,6 +428,7 @@ export type SimEvent =
   | SectionAdvancedEvent
   | BodyAttackEvent
   | MoveUsedEvent
+  | DashStartedEvent
   | ItemSpawnedEvent
   | ItemRequestedEvent
   | ItemCollectedEvent

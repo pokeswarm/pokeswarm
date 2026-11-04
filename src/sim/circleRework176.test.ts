@@ -16,26 +16,6 @@ function setup(move: string, level = 1) {
 }
 
 describe('円の技の作り直し その1', () => {
-  it('のしかかり・すてみタックル・じしん・サイコキネシス: 前の敵に当たり、真後ろの敵には当たらない', () => {
-    for (const move of ['body-slam', 'double-edge', 'earthquake', 'psychic']) {
-      const t = setup(move);
-      t.p.inputX = 1;
-      t.e.add(1, 0, 80, 0, 1e6, 0, 10);
-      t.e.add(2, 0, -80, 0, 1e6, 0, 10);
-      for (let k = 0; k < 30; k++) t.sim.step([]);
-      expect(t.e.hp[0]!, `${move} の前`).toBeLessThan(1e6);
-      expect(t.e.hp[1]!, `${move} の後ろ`).toBe(1e6);
-    }
-  });
-
-  it('のしかかり: 当たり判定は自分ではなく、前の着地点に出る', () => {
-    const t = setup('body-slam');
-    t.sim.step([]);
-    const hit = t.mine();
-    expect(hit).toHaveLength(1);
-    expect(t.pr.x[hit[0]!]!).toBeCloseTo(60, 0);
-  });
-
   it('あくのはどう: 一番近い敵へ玉が飛び、当たると弾ける', () => {
     const t = setup('dark-pulse');
     t.e.add(1, 0, 0, 150, 1e6, 0, 10);

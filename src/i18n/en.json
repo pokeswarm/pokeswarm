@@ -38,6 +38,7 @@
   "pattern.nearest": "nearest enemy",
   "pattern.facing": "facing direction",
   "pattern.melee": "close range",
+  "pattern.dash": "Dash forward",
   "pattern.orbit": "orbits you",
   "pattern.beam": "straight beam",
   "pattern.boomerang": "returns",

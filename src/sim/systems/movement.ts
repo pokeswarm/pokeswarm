@@ -34,6 +34,13 @@ export function movePlayers(world: World): void {
       p.y += (p.pushVy ?? 0) * world.dt;
       continue;
     }
+    // 体が動く技で進んでいる間（のしかかり・すてみタックル。07 の177章）: 入力では動けない
+    if (p.dashTicks) {
+      p.dashTicks--;
+      p.x += (p.dashVx ?? 0) * world.dt;
+      p.y += (p.dashVy ?? 0) * world.dt;
+      continue;
+    }
     // 泣いている間（トゲピー）は動けない
     if (p.cryTicks) {
       p.cryTicks--;

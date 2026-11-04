@@ -285,7 +285,7 @@ export function applyHitEffect(world: World, i: number, fx: HitEffect, by: numbe
   const br = world.rules.stage.bossRules;
   const kb = boss ? br.knockbackMultiplier : 1;
   world.enemies.knockBack(i, fx.kbx * kb, fx.kby * kb, kb > 0 ? fx.kbTicks : 0);
-  if (fx.status >= 0 && fx.status < world.statusKinds.length) {
+  if (fx.status >= 0 && fx.status < world.statusKinds.length && !(boss && world.statusKinds[fx.status]!.notOnBoss)) {
     const stops = world.statusKinds[fx.status]!.speedMultiplier === 0;
     const ticks = boss && stops ? Math.round(fx.statusTicks * br.stopStatusMultiplier) : fx.statusTicks;
     if (ticks > 0) world.enemies.applyStatus(i, fx.status, ticks, by);

@@ -5795,7 +5795,6 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'voice-heart': () => voiceHeart(),
     'gleam-burst': () => gleamBurst(),
     // 175章
-    'gleam-ray': () => gleamRay(),
     'revenge-swing': () => revengeSwing(),
     'sacred-orb': () => sacredOrb(),
     'sacred-ember': () => sacredEmber(),
@@ -5805,6 +5804,13 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'ground-burst': () => groundBurst(),
     'dark-orb': () => darkOrb(),
     'dark-burst': () => darkBurst(),
+    // 177章
+    'voice-wave': () => voiceWave(),
+    'sound-ring': () => soundRing(),
+    'quake-dust': () => quakeDust(),
+    'shout-burst': () => shoutBurst(),
+    'heart-eyes': () => heartEyes(),
+    'air-cutter-blade': () => airCutterBlade(),
 };
 
 /** 絵の名前の一覧 */
@@ -6191,29 +6197,6 @@ function gleamBurst(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
-/** マジカルシャイン（トゲチック）: 前へ走るきらめく光の筋（線の絵。芯は白、ふちは桃と水色。ところどころ十字のきらめき）。4 コマ */
-function gleamRay(): SpriteOut {
-  const H = 10;
-  // 0 輪郭・1 桃・2 うす桃・3 白・4 水色・5 うす黄
-  const palette = ['#5a1e3a', '#f48fb1', '#fce4ec', '#ffffff', '#b3e5fc', '#fff9c4'];
-  const mid = (H - 1) / 2;
-  const parts = lineParts(H, { start: 6, middle: 8, end: 8 }, 4, (x, y, f, part) => {
-    const taper = part === 'start' ? 0.5 + x / 12 : part === 'end' ? 1 - x / 9 : 1;
-    const d = Math.abs(y - mid);
-    // きらめき（middle の中を流れる）
-    if (part === 'middle') {
-      const cx = (f * 2 + 3) % 8;
-      if ((x === cx && d < 3.6) || (Math.abs(x - cx) <= 2 && d < 0.6)) return x === cx && d < 0.6 ? 3 : 5;
-    }
-    const half = 2.4 * taper;
-    if (d > half) return -1;
-    if (d < half * 0.35) return 3;
-    if (d < half * 0.7) return (x + f) % 4 === 0 ? 4 : 2;
-    return 1;
-  });
-  return { palette, frameMs: 70, parts };
-}
-
 /** リベンジ: 振り向きざまの一撃（後ろへ出る、太い三日月の衝撃。外側ほど明るく、ふちから火花が散る）。右向きに描く。4 コマ */
 function revengeSwing(): SpriteOut {
   // 0 輪郭・1 濃い赤・2 だいだい・3 黄・4 白
@@ -6412,4 +6395,127 @@ function darkBurst(): SpriteOut {
     }),
   );
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** ハイパーボイス: 飛んでいく輪の音波（右へ進む。縦長の輪が 3 つ、前ほど大きく濃い）。2 コマで輪が外へ動く */
+function voiceWave(): SpriteOut {
+  // 0 輪郭・1 濃い桃・2 桃・3 うす桃・4 白
+  const palette = ['#4a0e2a', '#c2185b', '#f06292', '#f8bbd0', '#ffffff'];
+  const frames = [0, 1].map((f) =>
+    shape(20, (u, v) => {
+      // 輪はだ円（横に薄く、縦に長い）。奥（左）ほど小さい
+      for (let k = 0; k < 3; k++) {
+        const cx = 0.55 - k * 0.5 - f * 0.08;
+        const ry = 0.85 - k * 0.22;
+        const rx = ry * 0.28;
+        const d = Math.hypot((u - cx) / rx, v / ry);
+        if (Math.abs(d - 1) < 0.28) return k === 0 ? (d < 1 ? 4 : 2) : k === 1 ? 2 : 3;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
+}
+
+/** ハイパーボイス: 当たった所から広がる音の輪（輪に沿って並べる帯。下が外）。波打つ二重の線。3 コマ */
+function soundRing(): SpriteOut {
+  const palette = ['#4a0e2a', '#f06292', '#f8bbd0', '#ffffff'];
+  const W = 12;
+  const H = 8;
+  const frames = [0, 1, 2].map((f) =>
+    fill(blank(W, H), (x, y) => {
+      const ph = ((x + f * 4) / W) * Math.PI * 2;
+      const outer = 5.6 + Math.sin(ph) * 0.8;
+      const inner = 2.4 + Math.sin(ph + 1.2) * 0.6;
+      if (Math.abs(y - outer) < 0.8) return 3;
+      if (Math.abs(y - outer) < 1.4) return 2;
+      if (Math.abs(y - inner) < 0.6) return 1;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { middle: frames.map(toRows) } };
+}
+
+/** じしん: 跳ね上がった敵の足元で舞う土ぼこり（小さなひびと、外へはねる小石）。4 コマ */
+function quakeDust(): SpriteOut {
+  // 0 輪郭・1 濃い土・2 土・3 明るい土・4 砂
+  const palette = ['#2b1d0e', '#6d4c2f', '#a1774f', '#d7b98e', '#f3e2c0'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(20, (u, v) => {
+      // 足元の土ぼこり（横長で下寄り。コマで広がって薄れる）
+      const rx = 0.45 + f * 0.13;
+      const d = Math.hypot(u / rx, (v - 0.45) / (0.28 + f * 0.03));
+      if (d < 1 && (f < 2 || hash(Math.floor(u * 10), Math.floor(v * 10), 7800 + f) < 0.6 - f * 0.1)) return d < 0.5 ? 4 : 3;
+      // はねる小石（放物線）
+      for (let k = 0; k < 4; k++) {
+        const sx = (k - 1.5) * 0.3 * (1 + f * 0.35);
+        const sy = 0.2 - [0.5, 0.75, 0.75, 0.5][k]! * Math.sin(((f + 1) / 5) * Math.PI);
+        if (Math.hypot(u - sx, v - sy) < 0.09) return k % 2 === 0 ? 1 : 2;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 75, parts: { main: frames.map(toRows) } };
+}
+
+/** バークアウト: 口から飛び出す吠え声（漫画の叫びの吹き出しの形。ギザギザの黒い塊。右へ進む。コマで大きくなる）。3 コマ */
+function shoutBurst(): SpriteOut {
+  // 0 輪郭・1 黒・2 濃い紫・3 紫・4 白
+  const palette = ['#05020a', '#120a1c', '#4a148c', '#9575cd', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(28, (u, v) => {
+      const s = 0.6 + f * 0.17;
+      const a = Math.atan2(v, u);
+      const d = Math.hypot(u, v) / s;
+      // ギザギザのふち（11 本の角）
+      const k = ((a / (Math.PI * 2)) * 11 + 11) % 1;
+      const tooth = Math.abs(k - 0.5) * 2;
+      const edge = 0.68 + (1 - tooth) * 0.34;
+      if (d > edge) return -1;
+      if (d > edge - 0.14) return 3;
+      // 中の「声」: 勢いの線（前へ 3 本。白）
+      for (const y of [-0.22, 0, 0.22]) {
+        if (Math.abs(v / s - y) < 0.045 && u / s > -0.3 + Math.abs(y) && u / s < 0.42 - Math.abs(y)) return 4;
+      }
+      return d > edge - 0.3 ? 2 : 1;
+    }),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** あまえる: 当たった敵の目になるハート 2 つ（ふわっと上がる）。3 コマ */
+function heartEyes(): SpriteOut {
+  const palette = ['#4a0e2a', '#ec407a', '#f8bbd0', '#ffffff'];
+  const frames = [0, 1, 2].map((f) => {
+    const g = shape(18, (u, v) => {
+      for (const sx of [-0.42, 0.42]) {
+        const hx = (u - sx) / 0.38;
+        const hy = (v + f * 0.14) / 0.38;
+        if (hx * hx + hy * hy < 1.7 && inHeart(hx, hy)) return hx < -0.2 && hy < -0.1 ? 3 : 1;
+      }
+      return -1;
+    });
+    return outline(g, 0);
+  });
+  return { palette, frameMs: 200, parts: { main: frames.map(toRows) } };
+}
+
+/** エアカッター: 飛んでいく三日月の空気の刃（右へ進む。白い刃先と水色のふち、後ろへ細い風の筋）。2 コマ */
+function airCutterBlade(): SpriteOut {
+  // 0 輪郭・1 青灰・2 水色・3 白
+  const palette = ['#37474f', '#90a4ae', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1].map((f) =>
+    shape(18, (u, v) => {
+      // 三日月（右が刃）
+      const outer = Math.hypot(u + 0.25, v) < 0.85;
+      const inner = Math.hypot(u + 0.55, v) < 0.8;
+      if (outer && !inner) return Math.hypot(u + 0.25, v) > 0.7 ? 3 : 2;
+      // 風の筋
+      for (const y of [-0.3, 0.3]) {
+        if (Math.abs(v - y) < 0.04 && u < -0.1 - f * 0.1 && u > -0.8) return 1;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
 }

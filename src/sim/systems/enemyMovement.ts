@@ -20,6 +20,7 @@ export function moveEnemies(world: World): void {
   // 倒れているプレイヤーは追わない（全員倒れていれば全員から選ぶ）。協力プレイで、色違いの伝説などが倒れた人をずっと追い続けた（作者の報告 2026年10月26日）
   const alive = players.filter((p) => !p.down);
   const chase = alive.length > 0 ? alive : players;
+  const flee = world.statusKinds.findIndex((k) => k.flees);
   for (let i = 0; i < e.count; i++) {
     e.prevX[i] = e.x[i]!;
     e.prevY[i] = e.y[i]!;
@@ -109,8 +110,10 @@ export function moveEnemies(world: World): void {
     else if (best > 0) {
       const d = Math.sqrt(best);
       const step = Math.min(e.speed[i]! * speedMultiplier(world, i) * world.dt, d);
-      e.x[i] = x + ((target.x - x) / d) * step;
-      e.y[i] = y + ((target.y - y) / d) * step;
+      // おびえている雑魚（バークアウト）は、プレイヤーから離れる向きへ逃げる
+      const away = flee >= 0 && e.hasStatus(i, flee) && (world.rules.enemies.kinds[e.kind[i]!]?.rank ?? 'normal') === 'normal' ? -1 : 1;
+      e.x[i] = x + away * ((target.x - x) / d) * step;
+      e.y[i] = y + away * ((target.y - y) / d) * step;
     }
     if (e.kbGuard[i]! > 0) e.kbGuard[i]!--;
     // ノックバックは止まっていても効く

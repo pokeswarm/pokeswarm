@@ -17,10 +17,7 @@ function setup(move: string) {
 }
 
 describe('ひこう', () => {
-  it('エアカッター は前へ吹く扇、つばさでうつ は往復のなぎ払い（ジョウトの技）、つばめがえし はまっすぐ飛ぶ 1 枚の刃', () => {
-    const g = setup('air-cutter');
-    g.sim.step([]);
-    expect(g.find((i) => g.pr.move[i] === g.m && g.pr.shape[i] === SHAPE_SECTOR)).toHaveLength(1);
+  it('つばさでうつ は往復のなぎ払い（ジョウトの技）、つばめがえし はまっすぐ飛ぶ 1 枚の刃', () => {
     const w = setup('wing-attack');
     w.sim.step([]);
     expect(w.find((i) => w.pr.move[i] === w.m && w.pr.shape[i] === SHAPE_SECTOR)).toHaveLength(1);

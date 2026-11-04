@@ -27,6 +27,9 @@ export class PlayerView {
   /** ためる光で、体の形をその色で光らせる重ね絵（スプライトがあるときだけ。使うときに作る） */
   private chargeBody: Phaser.GameObjects.Image | null = null;
   /** 自分の体で攻撃する技の、体を前後させる動き（始まった時刻・向き・距離） */
+  private hopStart = -1;
+  private hopMs = 0;
+  private hopHeight = 0;
   private lungeStart = -1;
   private lungeX = 0;
   private lungeY = 0;
@@ -72,6 +75,26 @@ export class PlayerView {
    * 自分の体で攻撃する技を使った: 向いている方向へ一瞬体を出して戻す。afterimages があれば前方に残像を残す
    * （でんこうせっか）。見た目だけで、位置（当たり判定）は動かさない
    */
+  /** 体が本当に動く技（dash。07 の177章）の見た目: 弧を描いて跳び、通った所に残像を残す */
+  dash(dirX: number, dirY: number, distance: number, seconds: number, hop: number, afterimages: number): void {
+    this.hopStart = this.scene.time.now;
+    this.hopMs = seconds * 1000;
+    this.hopHeight = hop;
+    const sprite = this.pokemon?.sprite;
+    if (!sprite) return;
+    for (let k = 0; k < afterimages; k++) {
+      const t = k / Math.max(1, afterimages);
+      const ghost = this.scene.add
+        .image(this.container.x + dirX * distance * t, this.container.y + dirY * distance * t, sprite.texture.key, sprite.frame.name)
+        .setScale(sprite.scaleX, sprite.scaleY)
+        .setFlipX(sprite.flipX)
+        .setTint(0xfff8e1)
+        .setAlpha(0)
+        .setDepth(this.container.depth - 0.01);
+      this.scene.tweens.add({ targets: ghost, alpha: { from: 0.5, to: 0 }, duration: 260, delay: seconds * 1000 * t, onComplete: () => ghost.destroy() });
+    }
+  }
+
   lunge(dirX: number, dirY: number, distance: number, afterimages: number): void {
     this.lungeStart = this.scene.time.now;
     this.lungeX = dirX * distance;
@@ -140,7 +163,9 @@ export class PlayerView {
       // 体を前後させる（行って戻る。LUNGE_MS で1往復）
       const t = this.lungeStart < 0 ? 1 : (this.scene.time.now - this.lungeStart) / LUNGE_MS;
       const k = t >= 1 ? 0 : Math.sin(Math.PI * t);
-      this.pokemon.sprite.setPosition(this.lungeX * k, this.lungeY * k);
+      const ht = this.hopStart < 0 ? 1 : (this.scene.time.now - this.hopStart) / Math.max(1, this.hopMs);
+      const hop = ht >= 1 ? 0 : Math.sin(Math.PI * ht) * this.hopHeight;
+      this.pokemon.sprite.setPosition(this.lungeX * k, this.lungeY * k - hop);
     }
     if (this.pokemon) {
       const moving = player.inputX !== 0 || player.inputY !== 0;

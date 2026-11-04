@@ -62,37 +62,3 @@ describe('A: なみのり・だくりゅう は波に乗る', () => {
   });
 });
 
-describe('B: サイコキネシス は向いている方向へ投げ飛ばす', () => {
-  it('動いているとき、前の扇の敵を向いている方へ飛ばし、飛ばされた敵から前へ衝撃が出る（後ろは前の扇の外。07 の176章）', () => {
-    const t = setup('psychic');
-    const w = t.sim.world;
-    expect(t.rules.moves[t.m]!.knockbackAlongFacing).toBe(true);
-    // 動いているときだけ投げ飛ばす（止まっていると念が弱まり、押し出さない）
-    t.p.inputX = 1;
-    w.enemies.add(1, 0, 90, 30, 1e6, 0, 10);
-    let pushed = false;
-    let flung = false;
-    for (let k = 0; k < 20; k++) {
-      t.sim.step([]);
-      if (w.enemies.kbTicks[0]! > 0 && w.enemies.kbVx[0]! > 0) pushed = true;
-      if (t.find((i) => t.pr.move[i] === t.m && t.pr.stage[i] === 1 && t.pr.vx[i]! > 100).length > 0) flung = true;
-    }
-    expect(pushed).toBe(true);
-    expect(flung).toBe(true);
-  });
-});
-
-describe('B: サイコキネシス は止まっていると押し出さない', () => {
-  it('止まっていると、敵は押し出されない', () => {
-    const t = setup('psychic');
-    const w = t.sim.world;
-    t.p.inputX = 0;
-    w.enemies.add(1, 0, 60, 0, 1e6, 0, 10);
-    let pushedOut = false;
-    for (let k = 0; k < 20; k++) {
-      t.sim.step([]);
-      if (w.enemies.kbTicks[0]! > 0 && w.enemies.kbVx[0]! > 0) pushedOut = true;
-    }
-    expect(pushedOut).toBe(false);
-  });
-});

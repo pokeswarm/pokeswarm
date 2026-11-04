@@ -53,14 +53,6 @@ describe('リフレクター・サイコキネシス・みらいよち', () => {
     expect(t.pr.motion[panels[0]!]).toBe(MOTION_ORBIT);
     expect(t.p.mods.damageTakenPct).toBe(-30);
   });
-  it('サイコキネシスは前の扇に念の帯が進む。自分のまわりを引き寄せる念は出さない（07 の176章）', () => {
-    const t = setup('psychic');
-    t.sim.step([]);
-    expect(t.find((i) => t.pr.move[i] === t.m && t.pr.stage[i] === 1)).toHaveLength(0);
-    const band = t.find((i) => t.pr.move[i] === t.m && t.pr.stage[i] === 0 && t.pr.band[i]! > 0);
-    expect(band).toHaveLength(1);
-    expect(t.pr.length[band[0]!]!).toBeCloseTo((100 * Math.PI) / 360);
-  });
   it('みらいよち（2 つ）は敵の足元に印を置く strike で、1.5 秒後に弾ける', () => {
     for (const key of ['future-sight', 'future-sight-gardevoir']) {
       const t = setup(key);

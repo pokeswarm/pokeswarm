@@ -21,6 +21,7 @@
   "pattern.nearest": "nächster Gegner",
   "pattern.facing": "nach vorne",
   "pattern.melee": "Nahkampf",
+  "pattern.dash": "Vorwärtssprung",
   "pattern.orbit": "kreist um dich",
   "pattern.beam": "gerader Strahl",
   "pattern.boomerang": "kehrt zurück",

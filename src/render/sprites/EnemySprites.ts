@@ -8,6 +8,10 @@ interface Slot {
   dir: number;
   /** この描画で使ったか（使わなかった枠はプールへ戻す） */
   seen: boolean;
+  /** 今の浮いている高さ（見た目だけ） */
+  lift?: number;
+  /** 体の見た目を変えている間 */
+  bodied?: boolean;
 }
 
 /**
@@ -18,6 +22,8 @@ interface Slot {
 export class EnemySprites {
   private readonly slots = new Map<number, Slot>();
   private readonly free: Phaser.GameObjects.Sprite[] = [];
+  /** 浮いている敵の足元の影 */
+  private shadows: Phaser.GameObjects.Graphics | null = null;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -45,7 +51,10 @@ export class EnemySprites {
     poseOf: (index: number) => { anim: string; spin: boolean } | null = () => null,
     /** 濃さ（1 がふつう。消えているボスは 0、かげぶんしん の偽物は薄く。07 の167章） */
     alphaOf: (index: number) => number = () => 1,
+    /** 状態異常による体の見た目（07 の177章。浮く・跳ねる・ふるえる・つぶれる・回る）。ふつうなら null */
+    bodyOf: (index: number) => { lift: number; hop: number; shake: number; squash: number; spin: boolean } | null = () => null,
   ): number {
+    this.shadows?.clear();
     for (const slot of this.slots.values()) slot.seen = false;
     let drawn = 0;
     for (let i = 0; i < e.count; i++) {
@@ -79,13 +88,37 @@ export class EnemySprites {
       const pose = poseOf(i);
       const anim = pose && manifest.animations[pose.anim] ? pose.anim : this.resolve(manifest);
       // くるくる回る（甲羅）: 8 つの向きを速く回す
-      const dir = pose?.spin ? Math.floor(this.scene.time.now / 45) % 8 : slot.dir;
+      const body = bodyOf(i);
+      const dir = pose?.spin || body?.spin ? Math.floor(this.scene.time.now / 45) % 8 : slot.dir;
       const key = animKey(manifest.key, anim, dir);
       if (slot.sprite.anims.currentAnim?.key !== key) {
         const frame = slot.sprite.anims.currentFrame?.index ?? 1;
         slot.sprite.play({ key, startFrame: frame - 1 });
       }
-      slot.sprite.setPosition(x, y);
+      // 浮く高さは少しずつ寄せる（ふわっと上がり、ふわっと降りる）
+      slot.lift = (slot.lift ?? 0) + ((body?.lift ?? 0) - (slot.lift ?? 0)) * 0.25;
+      if (slot.lift < 0.5) slot.lift = 0;
+      if (body || slot.lift > 0) {
+        const now = this.scene.time.now;
+        const hop = body?.hop ? Math.abs(Math.sin(now / 70 + id)) * body.hop : 0;
+        const shake = body?.shake ? Math.sin(now / 25 + id) * body.shake : 0;
+        slot.sprite.setPosition(x + shake, y - slot.lift - hop);
+        // 足元に影を残す（浮いている・跳ねている間）
+        if (slot.lift + hop > 2) {
+          this.shadows ??= this.scene.add.graphics().setDepth(this.depth - 0.05);
+          this.shadows.fillStyle(0x000000, 0.3).fillEllipse(x, y + e.radius[i]! * 0.7, e.radius[i]! * 1.6, e.radius[i]! * 0.6);
+        }
+        const base = this.scale * this.scaleOfKind(e.kind[i]!);
+        const sq = body?.squash ?? 1;
+        slot.sprite.setScale(base * (sq < 1 ? 1 + (1 - sq) * 0.5 : 1), base * sq);
+        slot.bodied = true;
+      } else {
+        slot.sprite.setPosition(x, y);
+        if (slot.bodied) {
+          slot.sprite.setScale(this.scale * this.scaleOfKind(e.kind[i]!));
+          slot.bodied = false;
+        }
+      }
       slot.sprite.setAlpha(alphaOf(i));
       const tint = tintOf(i);
       if (tint === null) slot.sprite.clearTint();

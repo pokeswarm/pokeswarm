@@ -38,6 +38,7 @@
   "pattern.nearest": "一番近い敵へ",
   "pattern.facing": "向いている方向へ",
   "pattern.melee": "近くを攻撃",
+  "pattern.dash": "前へ跳ぶ・突っ込む",
   "pattern.orbit": "周りを回る",
   "pattern.beam": "直線のビーム",
   "pattern.boomerang": "飛んで戻る",

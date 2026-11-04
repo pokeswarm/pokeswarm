@@ -19,8 +19,8 @@ function setup(move: string, level = 1) {
 }
 
 describe('175章の作り直し', () => {
-  it('マジカルシャイン（トゲチック）・エアロブラスト: はかいこうせん と同じ、向いている方へ出し続ける光線。真後ろには当たらない', () => {
-    for (const move of ['dazzling-gleam', 'aeroblast']) {
+  it('エアロブラスト: はかいこうせん と同じ、向いている方へ出し続ける光線。真後ろには当たらない', () => {
+    for (const move of ['aeroblast']) {
       const t = setup(move);
       expect(t.rules.moves[t.m]!.pattern, move).toBe('stream');
       t.e.add(1, 0, 150, 0, 1e6, 0, 10);
@@ -29,13 +29,6 @@ describe('175章の作り直し', () => {
       expect(t.e.hp[0]!, `${move} の前`).toBeLessThan(1e6);
       expect(t.e.hp[1]!, `${move} の後ろ`).toBe(1e6);
     }
-  });
-
-  it('マジカルシャイン（トゲチック）: 光の筋が扇に 3 本並ぶ', () => {
-    const t = setup('dazzling-gleam');
-    t.sim.step([]);
-    const dirs = new Set(t.mine().map((i) => Math.round((Math.atan2(t.pr.dirY[i]!, t.pr.dirX[i]!) * 180) / Math.PI)));
-    expect(dirs.size).toBe(3);
   });
 
   it('リベンジ: 後ろの敵に当たり、前の敵には当たらない。ダメージを受けてから 3 秒は ぶつり の技が強くなる', () => {

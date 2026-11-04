@@ -4418,108 +4418,123 @@
       ]
     },
     "last-resort": {
-      "pattern": "nova",
+      "pattern": "sequence",
       "effect": "last-resort",
-      "sweep": 0.3,
+      "bonusCountToPower": true,
+      "sequence": [
+        {
+          "move": "last-resort-rush",
+          "afterSeconds": 0.16,
+          "needsConsumed": [
+            "quick-attack",
+            "double-edge"
+          ]
+        },
+        {
+          "move": "last-resort-stars",
+          "afterSeconds": 0.02,
+          "needsConsumed": [
+            "swift"
+          ]
+        },
+        {
+          "move": "last-resort-slam",
+          "afterSeconds": 0.26
+        },
+        {
+          "move": "last-resort-burst",
+          "afterSeconds": 0
+        }
+      ],
       "base": {
-        "power": 216,
-        "cooldownSeconds": 3.5,
-        "count": 1,
         "intervalSeconds": 0.1,
-        "speed": 0,
-        "size": 20,
-        "range": 320,
-        "durationSeconds": 0.6,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
-        "knockback": 300,
-        "knockbackSeconds": 0.12,
+        "knockbackSeconds": 0.1,
         "statusChance": 0,
         "statusSeconds": 0,
         "spreadDegrees": 0,
-        "lifestealPct": 0
+        "lifestealPct": 0,
+        "power": 216,
+        "count": 1,
+        "speed": 0,
+        "size": 56,
+        "range": 150,
+        "durationSeconds": 0.7,
+        "knockback": 0,
+        "cooldownSeconds": 2.4
       },
       "levels": [
         {
-          "power": 28
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28,
-          "range": 12
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28,
-          "cooldownSeconds": -0.2
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28,
-          "range": 12
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28,
-          "range": 12
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28,
-          "cooldownSeconds": -0.2
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28,
-          "range": 12
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28,
-          "range": 12
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28,
-          "cooldownSeconds": -0.2
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28,
-          "range": 12
+          "cooldownSeconds": -0.035
         },
         {
-          "power": 28
+          "cooldownSeconds": -0.035
         }
-      ],
-      "bonusCountToPower": true
+      ]
     },
     "giga-impact": {
       "pattern": "dash",
@@ -12393,6 +12408,420 @@
         {
           "count": 1,
           "power": -2
+        }
+      ]
+    },
+    "last-resort-rush": {
+      "nameOf": "last-resort",
+      "teachOnly": true,
+      "pattern": "dash",
+      "effect": "last-resort-rush",
+      "bonusCountToPower": true,
+      "knockbackAlongFacing": true,
+      "dash": {
+        "seconds": 0.15,
+        "hit": "path",
+        "hop": 0,
+        "afterimages": 3,
+        "invincible": true
+      },
+      "base": {
+        "intervalSeconds": 0.1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.14,
+        "statusChance": 1,
+        "statusSeconds": 0.3,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 100,
+        "count": 1,
+        "speed": 0,
+        "size": 30,
+        "range": 110,
+        "durationSeconds": 0.15,
+        "knockback": 300,
+        "cooldownSeconds": 2.4,
+        "statusId": "flung"
+      },
+      "levels": [
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        },
+        {
+          "power": 20
+        }
+      ]
+    },
+    "last-resort-stars": {
+      "nameOf": "last-resort",
+      "teachOnly": true,
+      "pattern": "homing",
+      "effect": "last-resort-stars",
+      "base": {
+        "intervalSeconds": 0.1,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 18,
+        "count": 3,
+        "speed": 400,
+        "size": 7,
+        "range": 450,
+        "durationSeconds": 2,
+        "knockback": 60,
+        "cooldownSeconds": 2.4
+      },
+      "levels": [
+        {
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "count": 1,
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "count": 1,
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "count": 1,
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "count": 1,
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "count": 1,
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "power": 3
+        },
+        {
+          "power": 3
+        }
+      ]
+    },
+    "last-resort-slam": {
+      "nameOf": "last-resort",
+      "teachOnly": true,
+      "pattern": "dash",
+      "effect": "last-resort-slam",
+      "bonusCountToPower": true,
+      "dash": {
+        "seconds": 0.24,
+        "hit": "land",
+        "hop": 50,
+        "afterimages": 0,
+        "invincible": true
+      },
+      "base": {
+        "intervalSeconds": 0.1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 1,
+        "statusSeconds": 0.5,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 150,
+        "count": 1,
+        "speed": 0,
+        "size": 56,
+        "range": 70,
+        "durationSeconds": 0.2,
+        "knockback": 0,
+        "cooldownSeconds": 2.4,
+        "statusId": "squashed"
+      },
+      "levels": [
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "size": 3,
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "size": 3,
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "size": 3,
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        },
+        {
+          "power": 28
+        }
+      ]
+    },
+    "last-resort-burst": {
+      "nameOf": "last-resort",
+      "teachOnly": true,
+      "pattern": "nova",
+      "effect": "last-resort-burst",
+      "bonusCountToPower": true,
+      "sweep": 0.3,
+      "base": {
+        "intervalSeconds": 0.1,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockbackSeconds": 0.12,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "power": 125,
+        "count": 1,
+        "speed": 0,
+        "size": 20,
+        "range": 125,
+        "durationSeconds": 0.5,
+        "knockback": 130,
+        "cooldownSeconds": 2.4
+      },
+      "levels": [
+        {
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "range": 8,
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "range": 8,
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "range": 8,
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "range": 8,
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "range": 8,
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "power": 26
+        },
+        {
+          "power": 26
         }
       ]
     }

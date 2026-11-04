@@ -22,6 +22,7 @@
   "pattern.facing": "vers l'avant",
   "pattern.melee": "au corps à corps",
   "pattern.dash": "Élan vers l’avant",
+  "pattern.sequence": "Tout donner",
   "pattern.orbit": "tourne autour de vous",
   "pattern.beam": "rayon en ligne droite",
   "pattern.boomerang": "revient",

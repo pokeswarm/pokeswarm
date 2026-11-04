@@ -158,6 +158,8 @@ export function buildSimRules(region?: string): SimRules {
   moves.forEach((m, k) => {
     const cm = movesConfig.moves[m.key]?.comboMoves;
     if (cm) moves[k] = { ...m, comboMoves: cm.map(moveIndex) };
+    const sq = movesConfig.moves[m.key]?.sequence;
+    if (sq) moves[k] = { ...moves[k]!, sequence: sq.map((s) => ({ move: moveIndex(s.move), afterSeconds: s.afterSeconds, needsConsumed: (s.needsConsumed ?? []).map(moveIndex) })) };
   });
   // ためている間に出す技（きあいパンチのマッハパンチ）
   moves.forEach((m, k) => {

@@ -2973,98 +2973,7 @@
     },
     "last-resort": {
       "extends": "normal.base",
-      "burstFlash": {
-        "colors": [
-          "#ff8a80",
-          "#ffd180",
-          "#ffff8d",
-          "#b9f6ca",
-          "#80d8ff",
-          "#ea80fc"
-        ],
-        "periodMs": 60,
-        "alpha": 0.45
-      },
-      "screenFlash": {
-        "color": "#fffde7",
-        "alpha": 0.35,
-        "durationMs": 300
-      },
-      "impact": {
-        "burst": {
-          "count": 20,
-          "colors": [
-            "#ff8a80",
-            "#ffd180",
-            "#ffff8d",
-            "#b9f6ca",
-            "#80d8ff",
-            "#ea80fc",
-            "#ffffff"
-          ],
-          "lifespanMs": [
-            250,
-            500
-          ],
-          "speed": [
-            80,
-            260
-          ],
-          "scale": [
-            1,
-            0
-          ],
-          "alpha": [
-            1,
-            0
-          ],
-          "gravityY": 0,
-          "spread": 4,
-          "blend": "add"
-        },
-        "flash": {
-          "color": "#fffde7",
-          "radius": 70,
-          "durationMs": 140,
-          "alpha": 0.7
-        }
-      },
-      "trail": {
-        "intervalMs": 40,
-        "colors": [
-          "#ff8a80",
-          "#ffd180",
-          "#ffff8d",
-          "#b9f6ca",
-          "#80d8ff",
-          "#ea80fc",
-          "#ffffff"
-        ],
-        "lifespanMs": [
-          250,
-          450
-        ],
-        "speed": [
-          20,
-          90
-        ],
-        "scale": [
-          0.7,
-          0
-        ],
-        "alpha": [
-          1,
-          0
-        ],
-        "gravityY": 0,
-        "spread": 6,
-        "blend": "add"
-      },
-      "sprite": {
-        "id": "rainbow-stars",
-        "fit": "ring",
-        "size": 0.6
-      }
+      "hideShape": true
     },
     "giga-impact": {
       "extends": "normal.base",
@@ -6674,6 +6583,133 @@
         "fit": "circle",
         "size": 2.4,
         "rotate": "velocity"
+      }
+    },
+    "last-resort-burst": {
+      "extends": "normal.base",
+      "burstFlash": {
+        "colors": [
+          "#ff8a80",
+          "#ffd180",
+          "#ffff8d",
+          "#b9f6ca",
+          "#80d8ff",
+          "#ea80fc"
+        ],
+        "periodMs": 60,
+        "alpha": 0.45
+      },
+      "impact": {
+        "burst": {
+          "count": 6,
+          "colors": [
+            "#ff8a80",
+            "#ffd180",
+            "#ffff8d",
+            "#b9f6ca",
+            "#80d8ff",
+            "#ea80fc",
+            "#ffffff"
+          ],
+          "lifespanMs": [
+            250,
+            500
+          ],
+          "speed": [
+            80,
+            260
+          ],
+          "scale": [
+            1,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 4,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#ffffff",
+          "radius": 1,
+          "durationMs": 1,
+          "alpha": 0
+        }
+      },
+      "trail": {
+        "intervalMs": 40,
+        "colors": [
+          "#ff8a80",
+          "#ffd180",
+          "#ffff8d",
+          "#b9f6ca",
+          "#80d8ff",
+          "#ea80fc",
+          "#ffffff"
+        ],
+        "lifespanMs": [
+          250,
+          450
+        ],
+        "speed": [
+          20,
+          90
+        ],
+        "scale": [
+          0.7,
+          0
+        ],
+        "alpha": [
+          1,
+          0
+        ],
+        "gravityY": 0,
+        "spread": 6,
+        "blend": "add"
+      },
+      "sprite": {
+        "id": "rainbow-stars",
+        "fit": "ring",
+        "size": 0.6
+      }
+    },
+    "last-resort-rush": {
+      "extends": "normal.base",
+      "hideShape": true,
+      "sprite": {
+        "id": "charge-streak",
+        "fit": "circle",
+        "size": 2.4,
+        "rotate": "velocity"
+      }
+    },
+    "last-resort-stars": {
+      "extends": "normal.base",
+      "sprite": {
+        "id": "star",
+        "fit": "circle",
+        "size": 3,
+        "rotate": "spin",
+        "spinDegPerSec": 540
+      }
+    },
+    "last-resort-slam": {
+      "extends": "normal.base",
+      "hideShape": true,
+      "impact": {
+        "flash": {
+          "color": "#d7ccc8",
+          "radius": 40,
+          "durationMs": 140,
+          "alpha": 0.6
+        }
+      },
+      "sprite": {
+        "id": "slam-crater",
+        "fit": "circle",
+        "size": 1.3
       }
     }
   }

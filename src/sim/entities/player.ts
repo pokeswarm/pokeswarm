@@ -20,6 +20,8 @@ export interface PlayerMove {
   subPause?: number;
   /** 一緒に出し続ける技（インファイト）の状態。レベルはこの技と同じ */
   combo?: PlayerMove[];
+  /** 連続技の進み具合（次の段の番号と、次の段までの秒数。とっておき） */
+  seq?: { i: number; timer: number };
   /** なまけ: 次の1回は休む（技が出るのは2回に1回。07 の133章） */
   truantRest?: boolean;
   /** 溜める技の、出すまでの残りの秒数（溜めていなければ無し。07 の130章） */

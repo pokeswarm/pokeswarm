@@ -943,6 +943,7 @@ export const MOVE_PATTERNS = [
   'facing',
   'melee',
   'dash',
+  'sequence',
   'orbit',
   'beam',
   'boomerang',
@@ -1414,6 +1415,11 @@ export const moveDefSchema = z.object({
    * インファイト: 拳の連打（本体）・炎蹴りの薙ぎ払い・突き出す蹴り（07 の132章）
    */
   comboMoves: z.array(z.string()).optional(),
+  /**
+   * sequence（連続技。とっておき）: 使うと、ここに書いた技を順に出す。afterSeconds は次の段までの秒数。
+   * needsConsumed があれば、そのどれかを消費している時だけその段を出す（消費した技の分だけ段が増える。07 の183章）
+   */
+  sequence: z.array(z.object({ move: z.string(), afterSeconds: z.number().nonnegative(), needsConsumed: z.array(z.string()).optional() })).optional(),
   /** 一緒に出す技（comboMoves の側）: 本体より、この秒数だけ遅れて出し始める（アクアテールの叩きつけ: 往復のなぎ払いの後に。07 の149章） */
   comboOffsetSeconds: z.number().nonnegative().optional(),
   /** 出す前に溜める秒数（リーフブレード・ブレイズキック）。溜めている間は体が光る（見た目のレシピの chargeGlow） */

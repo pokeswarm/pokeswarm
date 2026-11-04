@@ -22,6 +22,7 @@
   "pattern.facing": "nach vorne",
   "pattern.melee": "Nahkampf",
   "pattern.dash": "Vorwärtssprung",
+  "pattern.sequence": "Alles auf einmal",
   "pattern.orbit": "kreist um dich",
   "pattern.beam": "gerader Strahl",
   "pattern.boomerang": "kehrt zurück",

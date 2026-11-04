@@ -1515,6 +1515,7 @@
     "facing": "facing",
     "melee": "melee",
     "dash": "melee",
+    "sequence": "eruption",
     "orbit": "orbit",
     "beam": "beam",
     "boomerang": "boomerang",

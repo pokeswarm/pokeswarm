@@ -256,3 +256,74 @@ describe('ギガインパクト・ドラゴンダイブ・ふんえん（07 の1
     expect(t.e.hp[0]!).toBeLessThan(1e6);
   });
 });
+
+describe('とっておき: 消費した技が順に出る連続技（07 の183章）', () => {
+  const run = (consumed: string[]) => {
+    const t = setup('last-resort');
+    t.p.moves[0]!.level = 8;
+    t.p.consumedMoves = consumed.map((k) => moveIndexOf(t.rules, k));
+    // 駆ける段が届かない所に置く（すぐ前だと、星が出たその瞬間に当たって消え、数えられない）
+    t.e.add(1, t.kindOf('normal'), 200, 0, 1e6, 0, 10);
+    // 出た順に、段の技の名前を並べる
+    const order: string[] = [];
+    for (let k = 0; k < 30; k++) {
+      t.sim.step([]);
+      for (let i = 0; i < t.pr.count; i++) {
+        const key = t.rules.moves[t.pr.move[i]!]!.key;
+        if (key.startsWith('last-resort-') && !order.includes(key)) order.push(key);
+      }
+    }
+    return { t, order };
+  };
+
+  it('何も消費していなければ、跳んで踏みつける → 虹の爆発 だけ', () => {
+    expect(run([]).order).toEqual(['last-resort-slam', 'last-resort-burst']);
+  });
+
+  it('スピードスター を使っていると星の段が増える', () => {
+    expect(run(['swift']).order).toEqual(['last-resort-stars', 'last-resort-slam', 'last-resort-burst']);
+  });
+
+  it('でんこうせっか か すてみタックル を使っていると駆ける段が増える。全部で 4 段がこの順に出る', () => {
+    for (const rush of ['quick-attack', 'double-edge']) {
+      expect(run([rush]).order, rush).toEqual(['last-resort-rush', 'last-resort-slam', 'last-resort-burst']);
+      expect(run([rush, 'swift']).order, rush).toEqual(['last-resort-rush', 'last-resort-stars', 'last-resort-slam', 'last-resort-burst']);
+    }
+  });
+
+  it('段を出すと体が前へ進み、敵に当たる', () => {
+    const { t } = run(['swift', 'quick-attack']);
+    expect(t.p.x).toBeGreaterThan(100);
+    expect(t.e.hp[0]!).toBeLessThan(1e6);
+  });
+
+  it('前に敵がいなければ始めない', () => {
+    const t = setup('last-resort');
+    t.e.add(1, t.kindOf('normal'), -90, 0, 1e6, 0, 10);
+    for (let k = 0; k < 40; k++) t.sim.step([]);
+    expect(t.p.x).toBe(0);
+    expect(t.p.moves[0]!.seq).toBeUndefined();
+    expect(t.e.hp[0]).toBe(1e6);
+  });
+
+  it('消費した技が多いほど強い（Lv16 + 星 が Lv8 より、Lv24 + 全段 が Lv16 より）', () => {
+    const lost = (level: number, consumed: string[]): number => {
+      const t = setup('last-resort');
+      t.p.moves[0]!.level = level;
+      t.p.consumedMoves = consumed.map((k) => moveIndexOf(t.rules, k));
+      t.e.add(1, t.kindOf('boss'), 30, 0, 1e9, 0, 28);
+      for (let k = 0; k < 300; k++) {
+        t.e.kbTicks[0] = 0;
+        t.e.x[0] = t.p.x + 30;
+        t.e.y[0] = t.p.y;
+        t.sim.step([]);
+      }
+      return 1e9 - t.e.hp[0]!;
+    };
+    const a = lost(8, []);
+    const b = lost(16, ['swift']);
+    const c = lost(24, ['swift', 'quick-attack']);
+    expect(b).toBeGreaterThan(a * 1.5);
+    expect(c).toBeGreaterThan(b * 1.5);
+  });
+});

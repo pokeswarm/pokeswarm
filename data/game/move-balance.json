@@ -59,7 +59,11 @@
     "defense-curl",
     "iron-defense",
     "milk-drink",
-    "last-resort"
+    "last-resort",
+    "last-resort-rush",
+    "last-resort-stars",
+    "last-resort-slam",
+    "last-resort-burst"
   ],
   "heavyHitters": [
     "phantom-force",
@@ -109,7 +113,11 @@
     "bubble-beam": "derived",
     "body-slam": "derived",
     "flamethrower": "derived",
-    "dig": "derived"
+    "dig": "derived",
+    "last-resort-rush": "base",
+    "last-resort-stars": "base",
+    "last-resort-slam": "base",
+    "last-resort-burst": "base"
   },
   "strengthScale": {
     "giga-impact": 2,

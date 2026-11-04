@@ -92,6 +92,10 @@ export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
     case 'stream':
       area = range * 2 * size;
       break;
+    case 'sequence':
+      // 連続技は段の技の強さで決まる（本体は当たらない）
+      area = 1;
+      break;
     case 'trail':
       // 走った跡に残る範囲（ふんえん）: 再使用ごとに置く 1 つの大きさ
       area = Math.PI * size * size;

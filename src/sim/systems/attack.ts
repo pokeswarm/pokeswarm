@@ -264,6 +264,8 @@ export function useMoves(world: World): void {
       if (!def || def.pattern === 'passive' || def.pattern === 'rest') continue;
       // いびき: 眠っている間だけ出す（ほかの技は眠っている間は出さない）
       if (!!def.onlyWhileAsleep !== asleep) continue;
+      // 連続技（とっておき）の続きを出す
+      if (pm.seq) stepSequence(world, p, pm);
       const st = playerMoveStats(world, p, pm);
       // 特性が HP の少なさで効いている（こんじょう など）: ランの記録（固有技の条件。07 の134章）
       if (pm === p.moves[0] && pinchMods(world, p)) bumpRunStat(world, p, 'pinch');
@@ -290,7 +292,7 @@ export function useMoves(world: World): void {
       }
       if (pm.cooldown > 0) continue;
       // 体が動く技: 行き先に敵がいなければ出さない（だれもいないのに勝手に動かない。溜める技も溜め始めない）
-      if (def.dash && !(def.dash.target === 'crowd' ? enemiesInRange(world, p.x, p.y, st.range).length > 0 : enemyAhead(world, p, st.range + st.size))) {
+      if ((def.dash && !(def.dash.target === 'crowd' ? enemiesInRange(world, p.x, p.y, st.range).length > 0 : enemyAhead(world, p, st.range + st.size))) || (def.sequence && !enemyAhead(world, p, st.range + st.size))) {
         pm.cooldown = 0;
         continue;
       }
@@ -414,6 +416,10 @@ export function useMoves(world: World): void {
           break;
         case 'dash':
           fireDash(world, p, pm, st);
+          break;
+        case 'sequence':
+          pm.seq = { i: 0, timer: 0 };
+          stepSequence(world, p, pm);
           break;
         case 'strike':
           if (def.sequential) {
@@ -887,6 +893,7 @@ function fireMetronome(world: World, p: Player, self?: PlayerMove): void {
 /** 一度に出し終える出し方ごとの出す関数（ゆびをふる・ものまね・ためている間に出す技で使う） */
 const ONE_SHOT_FIRE: Record<string, (w: World, p: Player, pm: PlayerMove, st: MoveStats) => void> = {
   melee: fireMelee,
+  dash: fireDash,
   orbit: fireOrbit,
   beam: fireBeam,
   ground: fireGround,
@@ -998,6 +1005,31 @@ function fireStrike(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
     const i = pool.splice(world.rng.int(pool.length), 1)[0]!;
     world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]! });
   }
+}
+
+/**
+ * 連続技（とっておき。07 の183章）: 時間が来た段を順に出す。消費していない技の段は飛ばす（待たない）。
+ * 段の技は本体のレベルで出す
+ */
+function stepSequence(world: World, p: Player, pm: PlayerMove): void {
+  const steps = world.rules.moves[pm.move]!.sequence!;
+  const seq = pm.seq!;
+  seq.timer -= world.dt;
+  while (seq.timer <= 0 && seq.i < steps.length) {
+    const s = steps[seq.i++]!;
+    if (s.needsConsumed.length > 0 && !s.needsConsumed.some((m) => p.consumedMoves?.includes(m))) continue;
+    const def = world.rules.moves[s.move]!;
+    const sub: PlayerMove = { move: s.move, level: Math.min(pm.level, def.levels.length + 1), cooldown: 0, burstLeft: 0, burstTimer: 0 };
+    const st = playerMoveStats(world, p, sub);
+    if (BURST_PATTERNS.has(def.pattern)) {
+      sub.burstLeft = st.count;
+      fireBurst(world, p, sub, { ...st, intervalSeconds: 0 });
+    } else {
+      ONE_SHOT_FIRE[def.pattern]?.(world, p, sub, st);
+    }
+    seq.timer += s.afterSeconds;
+  }
+  if (seq.i >= steps.length) pm.seq = undefined;
 }
 
 /** 届く範囲で、まわり（radius）に敵が一番多い敵（先頭から決まった数だけ調べる）。いなければ -1 */

@@ -1582,9 +1582,7 @@ export class RunScene extends Phaser.Scene {
       const i = findEnemyIndex(w, h.dasher);
       if (i === -1) continue;
       // 落ちるまでの時間は、技の予告の秒数 ＋ 距離の遅れ。予告の秒数を過ぎてからの時間で輪が広がる
-      const delay = (h.activeTicks !== undefined ? 0 : h.ticksLeft) * w.dt;
       const since = h.activeTicks !== undefined ? null : (h.totalTicks - h.ticksLeft) * w.dt - mv.telegraphSeconds;
-      void delay;
       if (since === null || since <= 0) continue;
       drawn.add(h.group);
       const r = since / mv.gridWave.delayPerPixel;

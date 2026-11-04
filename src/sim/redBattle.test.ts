@@ -233,6 +233,7 @@ describe('レッド戦（07 の193章）', () => {
     const still = hits(false);
     const moving = hits(true);
     expect(still).toBeGreaterThanOrEqual(2);
+    expect(moving).toBeLessThanOrEqual(still);
   });
 
   it('交代: 第 3 ラウンドは順番の 1 体だけが動き、順番でない相手は遅く歩いて技を使わない', () => {

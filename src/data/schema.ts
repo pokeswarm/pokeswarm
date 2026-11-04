@@ -558,7 +558,7 @@ export const bossMoveSchema = z.object({
   scatter: z.boolean().optional(),
   /** 予告の間のボスの動き（ドット絵の動作の名前。止まって出す技だけ。07 の194章） */
   pose: z.string().optional(),
-  /** 当たっている間もボスは止まったままで、次の技を始めない（ボルテッカーの残像を放っている間。07 の194章） */
+  /** 当たっている間もボスは止まったままで、次の技を始めず、pose の動きを続ける（10まんボルト・ボルテッカーの残像を放っている間。07 の194章） */
   holdWhileActive: z.boolean().optional(),
   /** 1 回の戦いで使える回数（回復の技を繰り返して HP が減らなくなるのを防ぐ。使い切ったら順番を飛ばす。07 の193章） */
   maxUses: z.number().int().positive().optional(),
@@ -607,8 +607,11 @@ export const bossMoveSchema = z.object({
       speed: z.number().positive(),
       homingDegreesPerSecond: z.number().nonnegative().default(0),
       wobble: z.object({ amplitude: z.number().positive(), seconds: z.number().positive() }).optional(),
-      /** 自分のプレイヤーを中心にしたこの大きさの箱の端で跳ね返る（画面の端で反射するボルテッカーの残像。どのブラウザでも自分の画面で跳ね返る。07 の194章） */
-      bounceBox: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive() }).optional(),
+      /**
+       * 自分のプレイヤーを中心にしたこの大きさの箱の端で跳ね返る（画面の端で反射するボルテッカーの残像。どのブラウザでも自分の画面で跳ね返る。07 の194章）。
+       * aimJitterDegrees があれば、跳ね返るたびに今のプレイヤーの方へ向け直す（±この角度でぶれる）。止まっていると当たり、動いていれば避けられる
+       */
+      bounceBox: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), aimJitterDegrees: z.number().nonnegative().optional() }).optional(),
     })
     .optional(),
   /** target self の count 個を、ボスの周り radius に、狙った人の向きから順に（stagger）置く（ライコウのかみなり） */

@@ -5834,7 +5834,19 @@
       }
     },
     "boss-volt-tackle": {
-      "extends": "volt-tackle"
+      "extends": "volt-tackle",
+      "ownerGhost": {
+        "tint": "#fff176",
+        "alpha": 0.85,
+        "afterimages": 6,
+        "spacingTicks": 0.6,
+        "colors": [
+          "#ffeb3b",
+          "#212121",
+          "#ffffff"
+        ],
+        "periodMs": 60
+      }
     },
     "boss-jump": {
       "extends": "normal.base",

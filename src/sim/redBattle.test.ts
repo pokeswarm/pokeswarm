@@ -72,6 +72,8 @@ describe('レッド戦（07 の193章）', () => {
       burst = w.hazards.find((h) => moveId(sim, h.move) === 'pika-thunderbolt-burst') ?? null;
     }
     expect(burst).not.toBeNull();
+    // 当たっている間も止まったまま
+    while (w.hazards.includes(burst!) && burst!.activeTicks === undefined) sim.step([]);
     const i = indexOf(sim, 'red-pikachu');
     const p = w.players[0]!;
     expect(Math.hypot(w.enemies.x[i]! - p.x, w.enemies.y[i]! - p.y)).toBeLessThan(60);
@@ -123,8 +125,8 @@ describe('レッド戦（07 の193章）', () => {
       let lastVx = ghost!.vx;
       while (w.hazards.includes(ghost!)) {
         sim.step([]);
-        expect(Math.abs(ghost!.x - p.x)).toBeLessThan(box.halfWidth + 30);
-        expect(Math.abs(ghost!.y - p.y)).toBeLessThan(box.halfHeight + 30);
+        expect(Math.abs(ghost!.x - p.x)).toBeLessThan(box.halfWidth + 60);
+        expect(Math.abs(ghost!.y - p.y)).toBeLessThan(box.halfHeight + 60);
         expect(w.enemies.x[indexOf(sim, 'red-pikachu')]).toBe(x0);
         if (ghost!.vx !== lastVx) flips++;
         lastVx = ghost!.vx;
@@ -148,6 +150,38 @@ describe('レッド戦（07 の193章）', () => {
     }
     w.enemies.hp[indexOf(sim, 'red-pikachu')] = max * 0.39;
     run();
+  });
+
+  it('ピカチュウ 行動 3: ボルテッカーは止まっていると何度も当たり、動いていれば大きく減る', () => {
+    const hits = (moving: boolean): number => {
+      const sim = round(0);
+      const w = sim.world;
+      const p = w.players[0]!;
+      p.moveSpeed = playerConfig.moveSpeed;
+      p.baseMoveSpeed = playerConfig.moveSpeed;
+      p.maxHp = 1e9;
+      p.hp = 1e9;
+      p.invincibleTicks = 0;
+      const i = indexOf(sim, 'red-pikachu');
+      w.enemies.hp[i] = w.enemies.maxHp[i]! * 0.69;
+      let ghost = null;
+      let n = 0;
+      for (let k = 0; k < 30 * 40; k++) {
+        // 0.6 秒ごとに向きを変えて走る
+        const turn = moving && k % 18 === 0 ? [{ type: 'move' as const, playerId: 1, dx: ([1, 0, -1, 0] as const)[(k / 18) % 4]!, dy: ([0, 1, 0, -1] as const)[(k / 18) % 4]! }] : [];
+        sim.step(turn);
+        ghost ??= w.hazards.find((h) => moveId(sim, h.move) === 'pika-volt-tackle-ghost' && h.activeTicks !== undefined) ?? null;
+        if (ghost && !w.hazards.includes(ghost)) break;
+        if (ghost) n += w.events.filter((e) => e.type === 'playerDamaged').length;
+      }
+      expect(ghost).not.toBeNull();
+      return n;
+    };
+    const still = hits(false);
+    const moving = hits(true);
+    console.log('ボルテッカーに当たった回数 止まっている', still, '動いている', moving);
+    expect(still).toBeGreaterThanOrEqual(5);
+    expect(moving).toBeLessThan(still);
   });
 
   it('交代: 第 3 ラウンドは順番の 1 体だけが動き、順番でない相手は遅く歩いて技を使わない', () => {

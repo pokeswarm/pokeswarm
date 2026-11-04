@@ -996,6 +996,12 @@ function strikeHazards(world: World): void {
     if (hz.activeTicks !== undefined) {
       if (--hz.activeTicks <= 0) {
         world.hazards.splice(h, 1);
+        // 当たっている間止まっていたボスは、また動く
+        if (move?.holdWhileActive && world.role !== 'guest') {
+          const i = findEnemyIndex(world, hz.dasher);
+          const boss = world.bosses.find((b) => b.id === hz.dasher);
+          if (i !== -1 && boss) world.enemies.speed[i] = bossSpeed(world, boss, i);
+        }
         // 組の範囲が全部消えたら、当たった印も消す
         if (hz.group !== undefined && !world.hazards.some((o) => o.group === hz.group)) world.hazardGroupsHit.delete(hz.group);
         continue;
@@ -1187,10 +1193,19 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
     const box = tr.bounceBox;
     const me = box ? (world.players.find((p) => p.id === world.localPlayerId) ?? nearestPlayer(world, hz.x, hz.y)) : null;
     if (box && me) {
-      if (hz.x > me.x + box.halfWidth) hz.vx = -Math.abs(hz.vx);
-      else if (hz.x < me.x - box.halfWidth) hz.vx = Math.abs(hz.vx);
-      if (hz.y > me.y + box.halfHeight) hz.vy = -Math.abs(hz.vy);
-      else if (hz.y < me.y - box.halfHeight) hz.vy = Math.abs(hz.vy);
+      // 外へ向かっているときだけ跳ね返る（箱の外から出たときは、そのまま中へ入ってくる）
+      const hitX = (hz.x > me.x + box.halfWidth && hz.vx > 0) || (hz.x < me.x - box.halfWidth && hz.vx < 0);
+      const hitY = (hz.y > me.y + box.halfHeight && hz.vy > 0) || (hz.y < me.y - box.halfHeight && hz.vy < 0);
+      if (hitX) hz.vx = -hz.vx;
+      if (hitY) hz.vy = -hz.vy;
+      if ((hitX || hitY) && box.aimJitterDegrees !== undefined) {
+        // 今のプレイヤーの方へ向け直す。ぶれは乱数の列を使わず、更新番号から決める（自分のブラウザだけの動きなので、ホストとずらさない）
+        const jitter = ((Math.sin(world.tick * 12.9898) * 43758.5453) % 1) * box.aimJitterDegrees * (Math.PI / 180);
+        const a = Math.atan2(me.y - hz.y, me.x - hz.x) + jitter;
+        const sp = Math.hypot(hz.vx, hz.vy);
+        hz.vx = Math.cos(a) * sp;
+        hz.vy = Math.sin(a) * sp;
+      }
     }
   }
 }

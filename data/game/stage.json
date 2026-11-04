@@ -1314,7 +1314,7 @@
       "rooted": true,
       "pose": "Charge",
       "spread": 40,
-      "telegraphSeconds": 0.5,
+      "telegraphSeconds": 1,
       "radius": 60,
       "damage": 26,
       "then": "pika-thunderbolt-burst"
@@ -1329,7 +1329,9 @@
       "telegraphSeconds": 0.7,
       "radius": 150,
       "damage": 34,
-      "activeSeconds": 0.5
+      "activeSeconds": 0.9,
+      "pose": "Shock",
+      "holdWhileActive": true
     },
     {
       "id": "pika-thunder-storm",
@@ -1378,12 +1380,14 @@
       "activeSeconds": 6,
       "hitEverySeconds": 0.6,
       "travel": {
-        "speed": 470,
+        "speed": 1300,
         "bounceBox": {
           "halfWidth": 520,
-          "halfHeight": 340
+          "halfHeight": 340,
+          "aimJitterDegrees": 10
         }
-      }
+      },
+      "pose": "Charge"
     },
     {
       "id": "pika-tired",

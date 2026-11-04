@@ -2191,7 +2191,8 @@ export class RunScene extends Phaser.Scene {
     const charging = w.hazards.some((h) => h.dasher === id && h.activeTicks === undefined && w.rules.stage.moves[h.move]?.rooted);
     // 技ごとの動き（ピカチュウ: ためる・息を整える。07 の194章）
     for (const h of w.hazards) {
-      const pose = h.dasher === id && h.activeTicks === undefined ? w.rules.stage.moves[h.move]?.pose : undefined;
+      const mv = w.rules.stage.moves[h.move];
+      const pose = h.dasher === id && (h.activeTicks === undefined || mv?.holdWhileActive) ? mv?.pose : undefined;
       if (pose) return { anim: pose, spin: false };
     }
     const ai = w.legendAis.get(id);

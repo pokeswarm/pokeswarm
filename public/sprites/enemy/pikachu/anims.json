@@ -59,6 +59,27 @@
         4
       ],
       "frameKeyPrefix": "DeepBreath"
+    },
+    "Shock": {
+      "source": "Shock",
+      "frameWidth": 48,
+      "frameHeight": 64,
+      "durations": [
+        8,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "frameKeyPrefix": "Shock"
     }
   },
   "missing": []

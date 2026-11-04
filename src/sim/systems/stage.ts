@@ -619,6 +619,14 @@ function useBossMove(world: World, boss: World['bosses'][number], i: number, for
   let moveIdx = forced !== undefined ? forced : boss.random ? boss.moves[world.rng.int(boss.moves.length)]! : boss.moves[boss.next++ % boss.moves.length]!;
   if (moveIdx === -1 && boss.pool && boss.pool.length > 0) moveIdx = boss.pool[world.rng.int(boss.pool.length)]!;
   let move = world.rules.stage.moves[moveIdx];
+  // 天気で技が変わる（にほんばれ の間の ソーラービーム など）
+  if (move?.whenWeather) {
+    const weather = move.whenWeather.hazardMove;
+    if (world.hazards.some((h) => world.rules.stage.moves[h.move]?.id === weather)) {
+      moveIdx = moveIndexOfStage(world.rules, move.whenWeather.useMove);
+      move = world.rules.stage.moves[moveIdx];
+    }
+  }
   // 投げる相手がいなければ別の技（カビゴンがいないときの サイコキネシス）。いれば、相手の今の技をやめさせる
   if (move?.throwPartner) {
     const partner = aliveOfKind(world, move.throwPartner.kind);
@@ -755,9 +763,12 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     const oy = around ? target.y : by;
     const start = around ? Math.atan2(by - target.y, bx - target.x) : Math.atan2(uy, ux);
     const step = ((move.around.clockwise ? 1 : -1) * Math.PI * 2) / move.count;
+    // 輪の切れ目は、ボスと反対側（start はボスの向き）
+    const gap = ((move.around.gapDegrees ?? 0) * Math.PI) / 360;
     for (let c = 0; c < move.count; c++) {
       const a = start + c * step;
-      put(ox + Math.cos(a) * move.around.radius, oy + Math.sin(a) * move.around.radius, 0, 0, -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
+      if (gap > 0 && Math.abs(Math.atan2(Math.sin(a - start - Math.PI), Math.cos(a - start - Math.PI))) < gap) continue;
+      put(ox + Math.cos(a) * move.around.radius, oy + Math.sin(a) * move.around.radius, 0, 0, move.rooted ? bossId : -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
     }
     return;
   }
@@ -1441,6 +1452,12 @@ export function addHazard(
   const radius = extra.radius || move.radius;
   const length = move.shape === 'line' ? extra.length || (move.length ?? 400) : 0;
   const di = dasher !== -1 ? findEnemyIndex(world, dasher) : -1;
+  // にほんばれ と あまごい は同時に降らない（ゲストにも、この技の予告の知らせで届く）
+  if (move.clearsMoves) {
+    for (let h = world.hazards.length - 1; h >= 0; h--) {
+      if (move.clearsMoves.includes(world.rules.stage.moves[world.hazards[h]!.move]?.id ?? '')) world.hazards.splice(h, 1);
+    }
+  }
   // 壁が割れた: 壁の絵を消す（ゲストにも、この技の予告の知らせで届く）
   if (move.clearsBarrier) {
     for (let h = world.hazards.length - 1; h >= 0; h--) {

@@ -1412,7 +1412,7 @@
       "rank": "legendary",
       "sprite": "enemy/venusaur",
       "hp": 24000,
-      "moveSpeed": 150,
+      "moveSpeed": 60,
       "radius": 40,
       "contactDamage": 36,
       "xp": 0,
@@ -1426,13 +1426,17 @@
       "rank": "legendary",
       "sprite": "enemy/charizard",
       "hp": 24000,
-      "moveSpeed": 150,
+      "moveSpeed": 140,
       "radius": 40,
       "contactDamage": 36,
       "xp": 0,
       "spriteScale": 2.6,
       "drop": "potion",
-      "dropPerPlayer": true
+      "dropPerPlayer": true,
+      "motion": {
+        "type": "keepDistance",
+        "distance": 280
+      }
     },
     {
       "id": "red-blastoise",
@@ -1440,7 +1444,7 @@
       "rank": "legendary",
       "sprite": "enemy/blastoise",
       "hp": 24000,
-      "moveSpeed": 150,
+      "moveSpeed": 80,
       "radius": 40,
       "contactDamage": 36,
       "xp": 0,

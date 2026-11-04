@@ -24,6 +24,49 @@
         14
       ],
       "frameKeyPrefix": "Walk"
+    },
+    "Charge": {
+      "source": "Charge",
+      "frameWidth": 40,
+      "frameHeight": 40,
+      "durations": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Charge"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 40,
+      "frameHeight": 40,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    },
+    "Withdraw": {
+      "source": "Withdraw",
+      "frameWidth": 32,
+      "frameHeight": 24,
+      "durations": [
+        20,
+        2,
+        2,
+        1,
+        1,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Withdraw"
     }
   },
   "missing": []

@@ -5800,6 +5800,62 @@ function voltFizzle(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
+/** ふぶき（レッドのカメックス。07 の197章）: 砲台から前へ吹き出す吹雪。氷の粒と筋が扇に広がる（右向き） */
+function frostCone(): SpriteOut {
+  const W = 72;
+  const H = 72;
+  const palette = ['#0277bd', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    fill(blank(W, H), (x, y) => {
+      const t = x / (W - 1);
+      const s = (y - (H - 1) / 2) / ((H - 1) / 2);
+      if (t < 0.06 || t > 0.99 || Math.abs(s) > t * 0.98) return -1;
+      const side = s / Math.max(0.05, t);
+      // 風の筋（前へ流れる）
+      const streak = Math.floor((side + 1) * 7);
+      const flow = ((t * 6 - f / 4 + hash(streak, 91)) % 1 + 1) % 1;
+      if (Math.abs(((side + 1) * 7) % 1 - 0.5) < 0.1 && flow < 0.42) return flow < 0.16 ? 3 : 2;
+      // 氷の粒
+      const n = hash(Math.floor(x / 2), Math.floor(y / 2), f + 92);
+      if (n < 0.1) return n < 0.03 ? 3 : n < 0.06 ? 2 : 1;
+      // 扇の縁
+      if (Math.abs(side) > 0.9) return hash(Math.floor(x / 3), 93, f) < 0.45 ? 1 : -1;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** ギガドレイン（レッドのフシギバナ。07 の197章）: 足元の広い範囲から、緑の光の粒が根を伝って本体へ吸い込まれる */
+function drainField(): SpriteOut {
+  const palette = ['#1b5e20', '#43a047', '#a5d6a7', '#f1f8e9'];
+  const frames = [0, 1, 2, 3, 4, 5].map((f) =>
+    shape(96, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.97) return -1;
+      const a = Math.atan2(v, u);
+      // 外の縁
+      if (d > 0.93) return Math.floor((a + Math.PI) * 6) % 2 === 0 ? 0 : -1;
+      // 根 8 本
+      for (let k = 0; k < 8; k++) {
+        const base = (k / 8) * Math.PI * 2 + hash(k, 71) * 0.3;
+        const zig = Math.sin(d * 14 + k * 1.9) * 0.14 * d;
+        let da = a - base - zig;
+        while (da > Math.PI) da -= Math.PI * 2;
+        while (da < -Math.PI) da += Math.PI * 2;
+        const w = Math.abs(da) * d;
+        if (w < 0.02) return 0;
+        // 根を内へ流れる光の粒
+        const pos = ((d * 3 + f / 6 + hash(k, 72)) % 1 + 1) % 1;
+        if (w < 0.045 && pos < 0.22) return pos < 0.1 ? 3 : 2;
+        if (w < 0.04) return 1;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
 /** ギガインパクトの予告（レッドのカビゴン。07 の196章）: 地面に走る細いひび。真ん中から外へ伸びる */
 function gigaCrack(): SpriteOut {
   const palette = ['#2b1a10', '#4e342e'];
@@ -6363,6 +6419,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'thunder-burst-bwy': () => thunderBurstBwy(),
     'bubble-shield': () => bubbleShield(),
     'giga-crack': () => gigaCrack(),
+    'drain-field': () => drainField(),
+    'frost-cone': () => frostCone(),
     'giga-upheave': () => gigaUpheave(),
     'anger-mark': () => angerMark(),
     'bubble-burst': () => bubbleBurst(),

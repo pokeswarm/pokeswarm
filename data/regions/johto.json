@@ -712,76 +712,105 @@
       },
       "red-venusaur": {
         "moves": [
-          "red-venusaur-solar-beam",
-          "blastoise-recoil"
+          "venusaur-sunny-day",
+          "venusaur-solar-beam-red",
+          "venusaur-giga-drain",
+          "venusaur-solar-beam-red"
         ],
         "random": false,
-        "moveIntervalSeconds": 1.2,
-        "enrageMoveIntervalSeconds": 1,
-        "casters": [
-          {
-            "move": "petal-dance",
-            "level": 8,
-            "orbitRadius": 200
-          },
-          {
-            "move": "sludge-bomb",
-            "level": 8,
-            "everySeconds": 2.5
-          }
-        ],
-        "casterPower": 0.45,
+        "moveIntervalSeconds": 2.4,
+        "noEnrage": true,
+        "intervalAfterMove": true,
         "hpDrops": {
           "atHpPct": [
             50
           ],
           "item": "potion"
-        }
+        },
+        "hpMoves": [
+          {
+            "belowHpPct": 66,
+            "moves": [
+              "venusaur-solar-storm",
+              "venusaur-synthesis"
+            ]
+          },
+          {
+            "belowHpPct": 33,
+            "moves": [
+              "venusaur-solar-storm",
+              "venusaur-synthesis"
+            ]
+          }
+        ]
       },
       "red-charizard": {
         "moves": [
-          "charizard-dash",
-          "blastoise-recoil"
+          "charizard-flamethrower",
+          "charizard-wing-attack"
         ],
         "random": false,
-        "moveIntervalSeconds": 1.6,
-        "enrageMoveIntervalSeconds": 1.2,
-        "casters": [
-          {
-            "move": "flamethrower",
-            "level": 8
-          },
-          {
-            "move": "fire-spin",
-            "level": 8
-          }
-        ],
-        "casterPower": 0.45,
+        "moveIntervalSeconds": 2.2,
+        "noEnrage": true,
+        "intervalAfterMove": true,
         "hpDrops": {
           "atHpPct": [
             50
           ],
           "item": "potion"
-        }
+        },
+        "hpMoves": [
+          {
+            "belowHpPct": 66,
+            "moves": [
+              "charizard-fire-ring",
+              "charizard-fire-core",
+              "charizard-tired"
+            ]
+          },
+          {
+            "belowHpPct": 33,
+            "moves": [
+              "charizard-fire-ring",
+              "charizard-fire-core",
+              "charizard-tired"
+            ]
+          }
+        ]
       },
       "red-blastoise": {
         "moves": [
-          "blastoise-rapid-spin-run",
-          "blastoise-recoil",
-          "red-blastoise-hydro-cannon",
-          "blastoise-recoil"
+          "blastoise-surf",
+          "blastoise-rain-dance",
+          "blastoise-blizzard",
+          "blastoise-surf"
         ],
         "random": false,
-        "moveIntervalSeconds": 1.4,
-        "enrageMoveIntervalSeconds": 1.1,
-        "casterPower": 0.45,
-        "chargePose": "Shoot",
+        "moveIntervalSeconds": 2.6,
+        "noEnrage": true,
+        "intervalAfterMove": true,
         "hpDrops": {
           "atHpPct": [
             50
           ],
           "item": "potion"
-        }
+        },
+        "hpMoves": [
+          {
+            "belowHpPct": 66,
+            "moves": [
+              "blastoise-whirlpool",
+              "blastoise-withdraw"
+            ]
+          },
+          {
+            "belowHpPct": 33,
+            "moves": [
+              "blastoise-whirlpool",
+              "blastoise-withdraw"
+            ]
+          }
+        ]
       },
       "legend-raikou": {
         "moves": [

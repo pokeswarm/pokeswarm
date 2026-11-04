@@ -502,6 +502,123 @@ describe('レッド戦（07 の193章）', () => {
     });
   });
 
+  describe('御三家（07 の197章）', () => {
+    const alone = (id: string) => {
+      const sim = round(2);
+      const w = sim.world;
+      for (const other of ['red-venusaur', 'red-charizard', 'red-blastoise']) {
+        if (other !== id) sim.step([{ type: 'damageEnemy', id: w.enemies.id[indexOf(sim, other)]!, amount: 1e9, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);
+      }
+      return sim;
+    };
+    const until = (sim: Simulation, id: string, seconds = 60): World['hazards'][number] => {
+      for (let k = 0; k < 30 * seconds; k++) {
+        const h = sim.world.hazards.find((z) => moveId(sim, z.move) === id);
+        if (h) return h;
+        sim.step([]);
+      }
+      throw new Error(id + ' が出ない');
+    };
+
+    it('3 体とも消えない・追う技が無い。大技の後は止まる', () => {
+      const rules = rules0();
+      for (const id of ['red-venusaur', 'red-charizard', 'red-blastoise']) {
+        const set = rules.stage.legendary!.moveSets[id]!;
+        expect(set.hpMoves?.length, id).toBe(2);
+        for (const m of [...set.moves, ...set.hpMoves!.flatMap((h) => h.moves)]) {
+          const mv = rules.stage.moves.find((x) => x.id === m)!;
+          expect(mv.hideBoss, m).toBeFalsy();
+          expect(mv.homing, m).toBeFalsy();
+          expect(mv.teleport, m).toBeFalsy();
+        }
+        const last = rules.stage.moves.find((x) => x.id === set.hpMoves![0]!.moves.at(-1))!;
+        expect(last.rooted, id).toBe(true);
+        expect(last.damage, id).toBe(0);
+      }
+    });
+
+    it('ソーラービームは撃つ前に狙いが止まり、避ける時間がある（にほんばれ の間も）', () => {
+      const rules = rules0();
+      for (const id of ['venusaur-solar-beam-red', 'venusaur-solar-beam-sun']) {
+        const m = rules.stage.moves.find((x) => x.id === id)!;
+        expect((m.telegraphSeconds - m.follow!.seconds) * playerConfig.moveSpeed, id).toBeGreaterThanOrEqual(m.radius + 12);
+      }
+    });
+
+    it('にほんばれ の間は ソーラービームの溜めが短く、かえんほうしゃ が広い。あまごい で晴れが消える', () => {
+      const sim = round(2);
+      const w = sim.world;
+      // カメックスがいると雨で晴れが消えるので、先に倒す
+      sim.step([{ type: 'damageEnemy', id: w.enemies.id[indexOf(sim, 'red-blastoise')]!, amount: 1e9, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);
+      until(sim, 'venusaur-sunny-day');
+      // 晴れの間に使う技
+      const seen = new Set<string>();
+      for (let k = 0; k < 30 * 13; k++) {
+        sim.step([]);
+        for (const h of w.hazards) seen.add(moveId(sim, h.move));
+        if (seen.has('blastoise-rain-dance')) break;
+      }
+      expect(seen.has('venusaur-solar-beam-sun')).toBe(true);
+      expect(seen.has('charizard-flamethrower-sun')).toBe(true);
+      // 雨が降ると晴れは消える
+      const again = round(2);
+      until(again, 'venusaur-sunny-day');
+      const rain = until(again, 'blastoise-rain-dance');
+      expect(rain).toBeDefined();
+      again.step([]);
+      expect(again.world.hazards.filter((h) => moveId(again, h.move) === 'venusaur-sunny-day').length).toBe(0);
+    });
+
+    it('フシギバナの大技: 光線 8 本がゆっくり回り、その後は止まって こうごうせい', () => {
+      const sim = alone('red-venusaur');
+      const w = sim.world;
+      const i = indexOf(sim, 'red-venusaur');
+      w.enemies.hp[i] = w.enemies.maxHp[i]! * 0.65;
+      const hp = w.enemies.hp[i]!;
+      until(sim, 'venusaur-solar-storm');
+      expect(w.hazards.filter((h) => moveId(sim, h.move) === 'venusaur-solar-storm').length).toBe(8);
+      until(sim, 'venusaur-synthesis');
+      expect(w.enemies.speed[indexOf(sim, 'red-venusaur')]).toBe(0);
+      for (let k = 0; k < 30 * 3.2; k++) sim.step([]);
+      expect(w.enemies.hp[indexOf(sim, 'red-venusaur')]).toBeGreaterThan(hp);
+    });
+
+    it('リザードンの大技: 炎の輪には切れ目がボスと反対側にあり、中心の爆発の前に外へ出られる', () => {
+      const sim = alone('red-charizard');
+      const w = sim.world;
+      const i = indexOf(sim, 'red-charizard');
+      w.enemies.hp[i] = w.enemies.maxHp[i]! * 0.65;
+      until(sim, 'charizard-fire-ring');
+      const p = w.players[0]!;
+      const b = indexOf(sim, 'red-charizard');
+      const ring = w.hazards.filter((h) => moveId(sim, h.move) === 'charizard-fire-ring');
+      expect(ring.length).toBeGreaterThan(10);
+      expect(ring.length).toBeLessThan(18);
+      // ボスと反対側には柱が無い
+      const away = Math.atan2(p.y - w.enemies.y[b]!, p.x - w.enemies.x[b]!);
+      for (const h of ring) {
+        const a = Math.atan2(h.y - p.y, h.x - p.x);
+        expect(Math.abs(Math.atan2(Math.sin(a - away), Math.cos(a - away)))).toBeGreaterThan(0.3);
+      }
+      const core = rules0().stage.moves.find((x) => x.id === 'charizard-fire-core')!;
+      const radius = rules0().stage.moves.find((x) => x.id === 'charizard-fire-ring')!.around!.radius;
+      expect(core.telegraphSeconds * playerConfig.moveSpeed).toBeGreaterThan(radius);
+      until(sim, 'charizard-fire-core');
+      until(sim, 'charizard-tired');
+    });
+
+    it('カメックスの大技: うずしお が 3 つ。引き寄せて、終わると甲羅にこもって止まる', () => {
+      const sim = alone('red-blastoise');
+      const w = sim.world;
+      const i = indexOf(sim, 'red-blastoise');
+      w.enemies.hp[i] = w.enemies.maxHp[i]! * 0.65;
+      until(sim, 'blastoise-whirlpool');
+      expect(w.hazards.filter((h) => moveId(sim, h.move) === 'blastoise-whirlpool').length).toBe(3);
+      const s = until(sim, 'blastoise-withdraw');
+      expect(rules0().stage.moves[s.move]!.pose).toBe('Withdraw');
+    });
+  });
+
   it('HP が決めた割合を切るたびと倒したときに、きずぐすりを人数分落とす', () => {
     const sim = round(0, 2);
     const w = sim.world;

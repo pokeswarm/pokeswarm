@@ -36,6 +36,11 @@
       "uses": [
         "full",
         "enemy"
+      ],
+      "enemyExtraAnimations": [
+        "Charge",
+        "Hurt",
+        "Sleep"
       ]
     },
     {
@@ -83,6 +88,10 @@
       "uses": [
         "full",
         "enemy"
+      ],
+      "enemyExtraAnimations": [
+        "Charge",
+        "Hurt"
       ]
     },
     {
@@ -130,6 +139,11 @@
       "uses": [
         "full",
         "enemy"
+      ],
+      "enemyExtraAnimations": [
+        "Charge",
+        "Hurt",
+        "Withdraw"
       ]
     },
     {

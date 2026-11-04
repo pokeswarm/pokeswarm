@@ -563,6 +563,12 @@ export const bossMoveSchema = z.object({
   bodyGlow: z.array(z.string()).min(1).optional(),
   /** gridWave の衝撃波の輪の色（外から内へ。落ちた瞬間にボスの足元から広がり、輪が通ったマスで地面が爆ぜる。07 の196章） */
   shockRing: z.array(z.string()).min(1).optional(),
+  /**
+   * 天気で技が変わる（御三家。07 の197章）: 技 hazardMove（にほんばれ・あめごい）が出ている間は、この技の代わりに useMove を使う
+   */
+  whenWeather: z.object({ hazardMove: z.string().min(1), useMove: z.string().min(1) }).optional(),
+  /** この技を使うと、出ている技 moves を消す（にほんばれ と あまごい は同時に降らない。ゲストにも予告の知らせで届く。07 の197章） */
+  clearsMoves: z.array(z.string().min(1)).optional(),
   /** 予告の間、ボスの体をこの高さまで浮かせる（エーフィの サイコキネシス。07 の195章） */
   liftBody: z.number().positive().optional(),
   /**
@@ -639,7 +645,7 @@ export const bossMoveSchema = z.object({
     })
     .optional(),
   /** target self の count 個を、ボスの周り radius に、狙った人の向きから順に（stagger）置く（ライコウのかみなり） */
-  around: z.object({ radius: z.number().positive(), clockwise: z.boolean().default(true), /** 輪の中心: self（ボス）か target（狙った人。クロバットの どくどく） */ center: z.enum(['self', 'target']).default('self') }).optional(),
+  around: z.object({ radius: z.number().positive(), clockwise: z.boolean().default(true), /** 輪の中心: self（ボス）か target（狙った人。クロバットの どくどく） */ center: z.enum(['self', 'target']).default('self'), /** 輪の切れ目（度）。ボスと反対側を空ける（リザードンの ほのおのうず。07 の197章） */ gapDegrees: z.number().positive().optional() }).optional(),
   /** 狙った人への向きに沿って count 個の円を spacing ずつ並べ、順に（stagger）置く（エンテイのふみつけ） */
   along: z.object({ spacing: z.number().positive(), start: z.number().default(80) }).optional(),
   /** 横に長い帯（全体の長さ length）を、狙った人の手前 distance から押し寄せさせる。1か所 gap の切れ目（ラプラスのなみのり） */

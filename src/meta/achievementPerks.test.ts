@@ -73,7 +73,7 @@ describe('実績の報酬', () => {
     expect(owned(old).has('linking-cord')).toBe(true);
   });
 
-  it('ジョウトの でんきだま は、ピチューで でんどういりすると解放され、ピカチュウの姿でだけ候補に出て、持つと かみなりのいし は出ない（07 の180章）', () => {
+  it('ジョウトの でんきだま は、ピチューで でんどういりすると解放され、ピカチュウの姿でだけ候補に出て、持つと かみなりのいし は出ない（07 の180.5章）', () => {
     const save = emptySave();
     save.stats = { 'johto:bestLevel.pichu': 60 };
     applyProgress(save, achievementsConfig, unlocksConfig);
@@ -101,7 +101,7 @@ describe('実績の報酬', () => {
     expect(offered('thunder-stone')).toBe(false);
   });
 
-  it('カントーのヤドンは ヤドキングに進化しない（おうじゃのしるし はカントーで出ない。07 の180章）', () => {
+  it('カントーのヤドンは ヤドキングに進化しない（おうじゃのしるし はカントーで出ない。07 の180.5章）', () => {
     const ids = achievementsConfig.achievements.filter((a) => a.region === 'kanto').map((a) => a.id);
     expect(achievementPerks(achievementsConfig, ids, 'kanto').items.has('kings-rock')).toBe(false);
     const johto = achievementsConfig.achievements.filter((a) => a.region === 'johto').map((a) => a.id);

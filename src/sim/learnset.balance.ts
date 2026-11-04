@@ -26,7 +26,7 @@ it('技の一覧', () => {
   for (const region of regionsConfig.regions) {
     if (!region.playables?.length) continue;
     const rules = buildSimRules(region.id);
-    // その地方で手に入る持ち物（実績を全部達成したとき）。手に入らない持ち物の進化・派生は載せない（カントーのヤドキングなど。07 の180章）
+    // その地方で手に入る持ち物（実績を全部達成したとき）。手に入らない持ち物の進化・派生は載せない（カントーのヤドキングなど。07 の180.5章）
     const obtainable = achievementPerks(achievementsConfig, achievementsConfig.achievements.filter((a) => a.region === region.id).map((a) => a.id), region.id).items;
     const moveName = (i: number): string => rules.moves[i]!.key;
     const keys = region.playables.flatMap((k) => playablesConfig.pokemon[k]?.hatch ?? [k]);

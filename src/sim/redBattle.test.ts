@@ -197,6 +197,26 @@ describe('レッド戦（07 の193章）', () => {
     }
   });
 
+  it('ホウオウの じこさいせい は 2 回まで', () => {
+    const rules = buildSimRules('johto');
+    const sim = new Simulation({ tickRate: 30, seed: 3, rules });
+    sim.addPlayer({ id: 1, x: 30, y: 0, radius: 12, moveSpeed: 0 });
+    sim.world.players[0]!.invincibleTicks = 1e9;
+    sim.step([]);
+    startLegendary(sim.world, rules.enemies.kinds.findIndex((k) => k.id === 'legend-ho-oh'));
+    let recovers = 0;
+    const seen = new Set<unknown>();
+    for (let k = 0; k < 30 * 170; k++) {
+      sim.step([]);
+      for (const h of sim.world.hazards) {
+        if (seen.has(h)) continue;
+        seen.add(h);
+        if (moveId(sim, h.move) === 'hooh-recover') recovers++;
+      }
+    }
+    expect(recovers).toBe(2);
+  });
+
   it('次のラウンドが始まっても、落ちているきずぐすりは残る', () => {
     const sim = round(0);
     const w = sim.world;

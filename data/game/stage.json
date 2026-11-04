@@ -1703,7 +1703,8 @@
       "telegraphSeconds": 1.5,
       "radius": 80,
       "damage": 0,
-      "healPct": 5
+      "healPct": 5,
+      "maxUses": 2
     },
     {
       "id": "absol-night-slash",

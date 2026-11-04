@@ -187,7 +187,7 @@ export interface SimMoveDef {
   /** scatter: range の中のランダムな敵の足元に置く（りゅうせいぐん） */
   readonly scatterOnEnemies?: boolean;
   /** 体が本当に動く技（のしかかり・すてみタックル） */
-  readonly dash?: { readonly seconds: number; readonly hit: 'land' | 'path'; readonly hop: number; readonly afterimages: number; readonly invincible: boolean };
+  readonly dash?: { readonly seconds: number; readonly hit: 'land' | 'path'; readonly hop: number; readonly afterimages: number; readonly invincible: boolean; readonly target: 'facing' | 'crowd'; readonly recoverSeconds: number; readonly recoverLines?: Readonly<Record<string, number>> };
   /** screen: 地上の敵だけに当たる（じしん） */
   readonly groundOnly?: boolean;
   /** 敵に当たらない（ミルクのみ） */

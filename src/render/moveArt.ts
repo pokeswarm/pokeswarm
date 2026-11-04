@@ -5812,6 +5812,11 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'shout-burst': () => shoutBurst(),
     'heart-eyes': () => heartEyes(),
     'air-cutter-blade': () => airCutterBlade(),
+    // 182章
+    'giga-rush': () => gigaRush(),
+    'giga-burst': () => gigaBurst(),
+    'dragon-dive-burst': () => dragonDiveBurst(),
+    'plume-smoke': () => plumeSmoke(),
 };
 
 /** 絵の名前の一覧 */
@@ -6541,4 +6546,105 @@ function perishNote(): SpriteOut {
     return outline(g, 0);
   });
   return { palette, frameMs: 260, parts: { main: frames.map(toRows) } };
+}
+
+/** ギガインパクト: 全身で突っ込む勢い（右へ進む。白い芯のまわりに橙の光の筋が後ろへ流れる）。3 コマ */
+function gigaRush(): SpriteOut {
+  // 0 輪郭・1 濃い橙・2 橙・3 黄・4 白
+  const palette = ['#3b1400', '#e65100', '#ff9800', '#ffe082', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(32, (u, v) => {
+      // 前の丸い光（ぶつかる先）
+      const d = Math.hypot(u - 0.35, v);
+      if (d < 0.32) return 4;
+      if (d < 0.44) return 3;
+      if (d < 0.54 && u > 0.1) return 2;
+      // 後ろへ流れる光の筋（7 本。コマで流れる）
+      for (let k = 0; k < 7; k++) {
+        const y = (k - 3) * 0.13;
+        const len = 0.95 - Math.abs(k - 3) * 0.18;
+        const x0 = 0.1 - ((f * 0.27 + k * 0.19) % 0.3);
+        if (Math.abs(v - y) < 0.035 && u < x0 && u > x0 - len) return u > x0 - len * 0.35 ? 3 : u > x0 - len * 0.7 ? 2 : 1;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 55, parts: { main: frames.map(toRows) } };
+}
+
+/** ギガインパクト: 止まった所で地面ごとめくれる衝撃（割れた地面の板が外へ開き、土ぼこりが立つ）。4 コマ */
+function gigaBurst(): SpriteOut {
+  // 0 輪郭・1 こげ茶・2 茶・3 橙・4 クリーム・5 白
+  const palette = ['#2b1a10', '#5d4037', '#8d6e63', '#ff9800', '#ffe0b2', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 真ん中の光（最初の 2 コマ）
+      if (f < 2 && d < 0.3 - f * 0.1) return 5;
+      // めくれる地面の板（7 枚。外へ開いて進む）
+      const k = ((a / (Math.PI * 2)) * 7 + 7) % 1;
+      const r = 0.34 + f * 0.17;
+      if (Math.abs(k - 0.5) < 0.34 - f * 0.03 && d > r && d < r + 0.2 - f * 0.02) return d > r + 0.1 ? 2 : 1;
+      // 土ぼこり
+      if (Math.abs(d - (r - 0.06)) < 0.05 && f < 3) return f === 0 ? 3 : 4;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 75, parts: { main: frames.map(toRows) } };
+}
+
+/** ドラゴンダイブ: 降りた所の衝撃（青い炎の中心から、竜の爪あとが 5 本地面へ走る）。4 コマ */
+function dragonDiveBurst(): SpriteOut {
+  // 0 輪郭・1 濃い藍・2 青・3 水色・4 白
+  const palette = ['#050b2e', '#1a237e', '#2979ff', '#80d8ff', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 真ん中の青い炎（ゆらめくふち。だんだん小さく）
+      const flame = 0.36 - f * 0.08 + Math.sin(a * 6 + f * 2) * 0.05;
+      if (d < flame * 0.5) return 4;
+      if (d < flame * 0.8) return 3;
+      if (d < flame) return 2;
+      // 爪あと（5 本。先へ細くなる）
+      const grow = 0.55 + f * 0.15;
+      for (let j = 0; j < 5; j++) {
+        const th = j * 1.257 - 0.4;
+        const along = u * Math.cos(th) + v * Math.sin(th);
+        const curve = (-u * Math.sin(th) + v * Math.cos(th)) - along * along * 0.25;
+        if (along > 0.15 && along < grow && Math.abs(curve) < 0.06 * (1 - along / grow) + 0.008) return f === 3 ? 1 : along < grow * 0.5 ? 3 : 2;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 75, parts: { main: frames.map(toRows) } };
+}
+
+/** ふんえん: その場に漂う赤黒い噴煙（丸いかたまりがもくもくして、ところどころに火の粉）。4 コマ */
+function plumeSmoke(): SpriteOut {
+  // 0 輪郭（ほぼ黒）・1 黒っぽい赤・2 赤茶・3 灰がかった茶・4 橙・5 黄
+  const palette = ['#160806', '#3b120c', '#6d2a1a', '#7a5a50', '#ff7043', '#ffca28'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(24, (u, v) => {
+      // 火の粉（上へ昇る）
+      for (let k = 0; k < 3; k++) {
+        const sx = [-0.4, 0.15, 0.5][k]!;
+        const sy = 0.5 - (((f * 0.35 + k * 0.5) % 1.3));
+        if (Math.hypot(u - sx, v - sy) < 0.06) return k === 1 ? 5 : 4;
+      }
+      // 煙のかたまり（5 つ。コマでふくらみ、少し上へ）
+      let inside = -1;
+      for (let k = 0; k < 5; k++) {
+        const ka = k * 1.257 + f * 0.2;
+        const cx = k === 0 ? 0 : Math.cos(ka) * 0.38;
+        const cy = (k === 0 ? 0 : Math.sin(ka) * 0.3) - f * 0.03;
+        const rr = (k === 0 ? 0.5 : 0.36) + Math.sin(k * 2.1 + f * 1.4) * 0.05;
+        const d = Math.hypot(u - cx, v - cy);
+        if (d < rr) inside = Math.max(inside, d > rr - 0.08 ? 1 : (v - cy) / rr < -0.25 ? 3 : 2);
+      }
+      return inside;
+    }),
+  );
+  return { palette, frameMs: 150, parts: { main: frames.map(toRows) } };
 }

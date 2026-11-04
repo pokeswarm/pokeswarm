@@ -2602,20 +2602,23 @@
     },
     "dragon-rush": {
       "extends": "dragon.base",
+      "hideShape": true,
       "projectile": {
-        "glowScale": 1.1,
-        "coreScale": 0.3
+        "coreScale": 0,
+        "glowScale": 0
       },
       "impact": {
         "flash": {
-          "radius": 60
+          "color": "#80d8ff",
+          "radius": 60,
+          "durationMs": 160,
+          "alpha": 0.7
         }
       },
       "sprite": {
-        "id": "dragon-shock",
-        "fit": "ring",
-        "size": 1,
-        "varyTiles": true
+        "id": "dragon-dive-burst",
+        "fit": "circle",
+        "size": 1.25
       }
     },
     "outrage": {
@@ -3065,21 +3068,35 @@
     },
     "giga-impact": {
       "extends": "normal.base",
+      "hideShape": true,
+      "projectile": {
+        "coreScale": 0,
+        "glowScale": 0
+      },
       "impact": {
         "flash": {
-          "radius": 120
+          "color": "#ffe0b2",
+          "radius": 90,
+          "durationMs": 180,
+          "alpha": 0.7
         }
       },
       "chargeGlow": {
         "color": "#ffcc80",
-        "seconds": 0.35,
-        "radius": 60,
+        "seconds": 0.5,
+        "radius": 70,
         "alpha": 1
       },
       "sprite": {
-        "id": "giga-ring",
-        "fit": "ring",
-        "size": 1
+        "id": "giga-rush",
+        "fit": "circle",
+        "size": 2,
+        "rotate": "velocity"
+      },
+      "effectSprite": {
+        "id": "giga-burst",
+        "fit": "circle",
+        "size": 1.1
       }
     },
     "tri-attack": {
@@ -3775,43 +3792,20 @@
     },
     "lava-plume": {
       "extends": "fire.base",
+      "hideShape": true,
       "projectile": {
-        "glowScale": 1.05,
-        "coreScale": 0.3,
-        "glowColor": "#e64a19"
+        "coreScale": 0,
+        "glowScale": 0
       },
-      "trail": {
-        "intervalMs": 30,
-        "colors": [
-          "#fff59d",
-          "#ff9800",
-          "#d84315"
-        ],
-        "lifespanMs": [
-          240,
-          440
-        ],
-        "speed": [
-          100,
-          190
-        ],
-        "scale": [
-          0.8,
-          0
-        ],
-        "alpha": [
-          1,
-          0
-        ],
-        "gravityY": -30,
-        "spread": 2,
-        "blend": "add",
-        "outward": true
+      "impact": {
+        "burst": {
+          "count": 0
+        }
       },
       "sprite": {
-        "id": "lava-ring",
-        "fit": "ring",
-        "size": 1
+        "id": "plume-smoke",
+        "fit": "circle",
+        "size": 1.4
       }
     },
     "morning-sun": {
@@ -5986,7 +5980,23 @@
       }
     },
     "boss-giga-impact": {
-      "extends": "giga-impact",
+      "extends": "normal.base",
+      "impact": {
+        "flash": {
+          "radius": 120
+        }
+      },
+      "chargeGlow": {
+        "color": "#ffcc80",
+        "seconds": 0.35,
+        "radius": 60,
+        "alpha": 1
+      },
+      "sprite": {
+        "id": "giga-ring",
+        "fit": "ring",
+        "size": 1
+      },
       "strike": {
         "id": "giga-ring",
         "fit": "ring",

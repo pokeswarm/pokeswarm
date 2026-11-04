@@ -81,6 +81,11 @@ export class PlayerView {
     this.hopMs = seconds * 1000;
     this.hopHeight = hop;
     const sprite = this.pokemon?.sprite;
+    // 跳ぶ技: 地面に影が残り、行き先へ動く
+    if (hop > 0) {
+      const shadow = this.scene.add.ellipse(this.container.x, this.container.y + this.radius * 0.7, this.radius * 2.2, this.radius * 0.9, 0x000000, 0.35).setDepth(this.container.depth - 0.02);
+      this.scene.tweens.add({ targets: shadow, x: this.container.x + dirX * distance, y: this.container.y + this.radius * 0.7 + dirY * distance, duration: seconds * 1000, onComplete: () => shadow.destroy() });
+    }
     if (!sprite) return;
     for (let k = 0; k < afterimages; k++) {
       const t = k / Math.max(1, afterimages);
@@ -173,12 +178,16 @@ export class PlayerView {
       const asleep = player.sleep?.asleep ?? false;
       const waking = (player.sleep?.wakeTicks ?? 0) > 0;
       // 泣いている間（トゲピー）は痛がる動き（自作のなみだを重ねる）
-      const crying = (player.cryTicks ?? 0) > 0;
+      // 技の反動で動けない間（ギガインパクト）も同じ動き
+      const crying = (player.cryTicks ?? 0) > 0 || ((player.recoverTicks ?? 0) > 0 && !player.dashTicks);
       if (asleep) this.pokemon.play('Sleep', 0);
       else if (crying) this.pokemon.play('Hurt', directionIndex(player.facingX, player.facingY));
       else this.pokemon.play(moving && !waking ? this.spriteStyle.walkAnimation : this.spriteStyle.idleAnimation, directionIndex(player.facingX, player.facingY));
       // 倒れていたら暗く、無敵時間の間は点滅
-      this.pokemon.sprite.setAlpha(player.down ? 0.35 : player.invincibleTicks > 0 && Math.floor(player.invincibleTicks / 3) % 2 === 0 ? 0.4 : 1);
+      // 高く跳ぶ技（ドラゴンダイブ）は、上がっている間は見えない（影だけ残る）
+      const ht = this.hopStart < 0 ? 1 : (this.scene.time.now - this.hopStart) / Math.max(1, this.hopMs);
+      const up = ht < 1 && this.hopHeight > 120;
+      this.pokemon.sprite.setAlpha(up ? Math.max(0, 1 - Math.sin(Math.PI * ht) * 2) : player.down ? 0.35 : player.invincibleTicks > 0 && Math.floor(player.invincibleTicks / 3) % 2 === 0 ? 0.4 : 1);
       // 凍っている間（伝説戦のぜったいれいど）は氷の色
       // ボスの技の効き目（07 の167章）: やけど＝赤く明滅・冷え＝薄い水色（溜まるほど濃く）・ねむけ＝紫がかる（頭の上に Z）
       const blink = Math.floor(this.scene.time.now / 160) % 2 === 0;

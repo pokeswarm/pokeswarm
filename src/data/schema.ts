@@ -1338,6 +1338,12 @@ export const moveDefSchema = z.object({
       hop: z.number().nonnegative().default(0),
       afterimages: z.number().int().nonnegative().default(0),
       invincible: z.boolean().default(false),
+      /** 行き先: facing = 向いている方へ range だけ。crowd = 届く範囲で敵が一番多い所へ（ドラゴンダイブ。着く前に、そこの敵に当たらない予告の当たりで状態異常を付ける） */
+      target: z.enum(['facing', 'crowd']).default('facing'),
+      /** 進み終わった後、この秒数は動けず技も出ない（ギガインパクト: 原作の「次のターン動けない」） */
+      recoverSeconds: z.number().nonnegative().default(0),
+      /** recoverSeconds に系統ごとに掛ける倍率（ケッキング: 特性で 2 回に 1 回しか出ないので短くする） */
+      recoverLines: z.record(z.string(), z.number().nonnegative()).optional(),
     })
     .optional(),
   /** screen: 地上の敵だけに当たる（じしん: ひこうタイプには効かない。07 の177章） */

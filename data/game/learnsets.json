@@ -970,16 +970,52 @@
     ],
     "eevee": [
       "tackle",
-      "ember",
-      "fire-fang",
-      "water-gun",
-      "bubble",
-      "confusion",
-      "thunder-shock",
+      {
+        "move": "ember",
+        "forms": [
+          "flareon"
+        ]
+      },
+      {
+        "move": "fire-fang",
+        "forms": [
+          "flareon"
+        ]
+      },
+      {
+        "move": "water-gun",
+        "forms": [
+          "vaporeon"
+        ]
+      },
+      {
+        "move": "bubble",
+        "forms": [
+          "vaporeon"
+        ]
+      },
+      {
+        "move": "confusion",
+        "forms": [
+          "espeon",
+          "umbreon"
+        ]
+      },
+      {
+        "move": "thunder-shock",
+        "forms": [
+          "jolteon"
+        ]
+      },
       "swift",
       "quick-attack",
       "last-resort",
-      "double-kick",
+      {
+        "move": "double-kick",
+        "forms": [
+          "jolteon"
+        ]
+      },
       "body-slam",
       "hyper-voice",
       {

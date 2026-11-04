@@ -6,6 +6,7 @@ export function movePlayers(world: World): void {
     p.prevX = p.x;
     p.prevY = p.y;
     if (p.invincibleTicks > 0) p.invincibleTicks--;
+    if (p.recoverTicks) p.recoverTicks--;
     // 倒れている間は動かない
     if (p.down) continue;
     if (p.remote) {
@@ -41,6 +42,8 @@ export function movePlayers(world: World): void {
       p.y += (p.dashVy ?? 0) * world.dt;
       continue;
     }
+    // 技の反動で動けない間（ギガインパクト）
+    if (p.recoverTicks) continue;
     // 泣いている間（トゲピー）は動けない
     if (p.cryTicks) {
       p.cryTicks--;

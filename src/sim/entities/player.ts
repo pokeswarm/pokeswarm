@@ -99,6 +99,8 @@ export interface Player {
   dashTicks?: number;
   dashVx?: number;
   dashVy?: number;
+  /** 技の反動で動けない残りの更新回数（進んでいる間も含む。ギガインパクト） */
+  recoverTicks?: number;
   pushVx?: number;
   pushVy?: number;
   pushTicks?: number;

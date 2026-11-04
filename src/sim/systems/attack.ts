@@ -254,6 +254,8 @@ export function useMoves(world: World): void {
     const resting = stepRest(world, p);
     const asleep = resting && p.sleep?.asleep === true;
     if (resting && !(asleep && p.moves.some((m) => world.rules.moves[m.move]?.onlyWhileAsleep))) continue;
+    // 技の反動で動けない間（ギガインパクト）は、ほかの技も出ない（進んでいる間は出る）
+    if (p.recoverTicks && !p.dashTicks) continue;
     // 順番に出す技（ワンリキーのパンチ）の、次に出せるまでの秒数
     if (p.groupTimers) for (const g of Object.keys(p.groupTimers)) p.groupTimers[g]! -= world.dt;
     for (const pm of p.moves) {
@@ -287,6 +289,11 @@ export function useMoves(world: World): void {
         continue;
       }
       if (pm.cooldown > 0) continue;
+      // 体が動く技: 行き先に敵がいなければ出さない（だれもいないのに勝手に動かない。溜める技も溜め始めない）
+      if (def.dash && !(def.dash.target === 'crowd' ? enemiesInRange(world, p.x, p.y, st.range).length > 0 : enemyAhead(world, p, st.range + st.size))) {
+        pm.cooldown = 0;
+        continue;
+      }
       // 溜める技（リーフブレード・ブレイズキック）: windupSeconds 溜めてから出す（溜めている間は体が光る。RunScene.chargeOf）
       if (def.windupSeconds) {
         if (pm.windup === undefined) {
@@ -319,11 +326,6 @@ export function useMoves(world: World): void {
           cursor[def.group] = k + 1;
           timers[def.group] = scaledMoveStats(world, p, pm, st).cooldownSeconds / members.length;
         }
-      }
-      // 体が動く技（のしかかり・すてみタックル）: 前の半分の届く範囲に敵がいなければ出さない（だれもいないのに勝手に動かない）
-      if (def.dash && !enemyAhead(world, p, st.range + st.size)) {
-        pm.cooldown = 0;
-        continue;
       }
       // HP を使う技（だいばくはつ）: HP が最大の minHpPct % を下回っていれば出さずに待つ。最大 HP の pct % 相当のダメージを自分が受ける
       // （防御・ディフェンダーの軽減が効く）。HP は本人のブラウザで減らす（ほかの人の分は本人の画面から届く）
@@ -998,6 +1000,23 @@ function fireStrike(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
   }
 }
 
+/** 届く範囲で、まわり（radius）に敵が一番多い敵（先頭から決まった数だけ調べる）。いなければ -1 */
+function crowdCenter(world: World, p: Player, range: number, radius: number): number {
+  const e = world.enemies;
+  const pool = enemiesInRange(world, p.x, p.y, range);
+  let best = -1;
+  let bestCount = -1;
+  for (const i of pool.slice(0, 24)) {
+    let n = 0;
+    for (const j of pool.slice(0, 80)) if ((e.x[i]! - e.x[j]!) ** 2 + (e.y[i]! - e.y[j]!) ** 2 <= radius * radius) n++;
+    if (n > bestCount) {
+      bestCount = n;
+      best = i;
+    }
+  }
+  return best;
+}
+
 /** 向いている方の半分（自分より前）で、距離 reach の中に敵がいるか */
 function enemyAhead(world: World, p: Player, reach: number): boolean {
   const e = world.enemies;
@@ -1014,11 +1033,26 @@ function enemyAhead(world: World, p: Player, reach: number): boolean {
  */
 function fireDash(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const dash = world.rules.moves[pm.move]!.dash!;
-  const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  let [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  let distance = st.range;
+  // 敵が一番多い所へ（ドラゴンダイブ）
+  if (dash.target === 'crowd') {
+    const t = crowdCenter(world, p, st.range, st.size);
+    if (t !== -1) {
+      const dx = world.enemies.x[t]! - p.x;
+      const dy = world.enemies.y[t]! - p.y;
+      distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance > 0) {
+        fx = dx / distance;
+        fy = dy / distance;
+      }
+    }
+  }
   const ticks = Math.max(1, Math.round(dash.seconds / world.dt));
-  // 更新回数で割り切って、ちょうど range だけ進む
-  const speed = st.range / (ticks * world.dt);
-  world.events.push({ type: 'dashStarted', playerId: p.id, seconds: dash.seconds, hop: dash.hop, afterimages: dash.afterimages, dirX: fx, dirY: fy, distance: st.range });
+  // 更新回数で割り切って、ちょうど行き先まで進む
+  const speed = distance / (ticks * world.dt);
+  world.events.push({ type: 'dashStarted', playerId: p.id, seconds: dash.seconds, hop: dash.hop, afterimages: dash.afterimages, dirX: fx, dirY: fy, distance });
+  if (dash.recoverSeconds > 0) p.recoverTicks = ticks + Math.round((dash.recoverSeconds * (dash.recoverLines?.[p.line] ?? 1)) / world.dt);
   if (p.id === world.localPlayerId) {
     p.dashTicks = ticks;
     p.dashVx = fx * speed;
@@ -1027,7 +1061,11 @@ function fireDash(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
   }
   const b = base(world, p, pm, st);
   if (dash.hit === 'land') {
-    world.projectiles.add({ ...b, motion: MOTION_LINEAR, x: p.x + fx * st.range, y: p.y + fy * st.range, vx: 0, vy: 0, life: dash.seconds, stage: 3, armLife: st.durationSeconds });
+    const x = p.x + fx * distance;
+    const y = p.y + fy * distance;
+    world.projectiles.add({ ...b, motion: MOTION_LINEAR, x, y, vx: 0, vy: 0, life: dash.seconds, stage: 3, armLife: st.durationSeconds });
+    // 予告: 着く前に、行き先の敵へ状態異常だけを付ける（ドラゴンダイブ: 殺気ですくむ）
+    if (dash.target === 'crowd') world.projectiles.add({ ...b, motion: MOTION_LINEAR, x, y, vx: 0, vy: 0, life: 0.1, damage: 0, knockback: 0, radius: st.size * 2, stage: 1 });
   } else {
     world.projectiles.add({ ...b, motion: MOTION_FOLLOW, x: p.x, y: p.y, ox: 0, oy: 0, vx: fx, vy: fy, dirX: fx, dirY: fy, life: dash.seconds + world.dt });
   }

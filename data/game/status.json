@@ -134,6 +134,17 @@
       "damageTakenMultiplier": 1,
       "speedMultiplier": 0.45,
       "color": "#b39ddb"
+    },
+    {
+      "id": "cowed",
+      "damagePerSecond": 0,
+      "damageTakenMultiplier": 1,
+      "speedMultiplier": 0,
+      "notOnBoss": true,
+      "body": {
+        "shake": 2
+      },
+      "color": "#90caf9"
     }
   ]
 }

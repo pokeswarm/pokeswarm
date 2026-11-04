@@ -206,3 +206,53 @@ describe('そのほか', () => {
     expect(g.e.hp[1]).toBe(1e6);
   });
 });
+
+describe('ギガインパクト・ドラゴンダイブ・ふんえん（07 の182章）', () => {
+  it('ギガインパクト: ためてから前へ突進し、その後は動けず技も出ない。ケッキングは動けない時間が短い', () => {
+    const t = setup('giga-impact');
+    t.e.add(1, t.kindOf('normal'), 120, 0, 1e6, 0, 10);
+    // ためている間は進まない
+    for (let k = 0; k < 10; k++) t.sim.step([]);
+    expect(t.p.x).toBe(0);
+    for (let k = 0; k < 16; k++) t.sim.step([]);
+    expect(t.p.x).toBeGreaterThan(150);
+    expect(t.p.recoverTicks!).toBeGreaterThan(0);
+    const x = t.p.x;
+    t.sim.step([{ type: 'move', playerId: 1, dx: 1, dy: 0 }]);
+    t.sim.step([]);
+    expect(t.p.x).toBe(x);
+    const def = t.rules.moves[t.m]!.dash!;
+    expect(def.recoverSeconds * def.recoverLines!.slakoth!).toBeLessThan(def.recoverSeconds);
+    for (let k = 0; k < 40; k++) t.sim.step([]);
+    expect(t.p.recoverTicks).toBe(0);
+  });
+
+  it('ドラゴンダイブ: 敵が一番多い所へ降り、着く前からそこの敵がすくむ。降りるまで無敵', () => {
+    const t = setup('dragon-rush');
+    t.e.add(1, t.kindOf('normal'), -200, 0, 1e6, 0, 10);
+    for (let k = 0; k < 6; k++) t.e.add(k + 2, t.kindOf('normal'), 200 + k * 4, k * 4, 1e6, 0, 10);
+    t.sim.step([]);
+    t.sim.step([]);
+    expect(t.p.invincibleTicks).toBeGreaterThan(0);
+    expect(t.e.hasStatus(1, t.status('cowed'))).toBe(true);
+    expect(t.e.hasStatus(0, t.status('cowed'))).toBe(false);
+    for (let k = 0; k < 20; k++) t.sim.step([]);
+    expect(t.p.x).toBeGreaterThan(150);
+    expect(t.e.hp[1]!).toBeLessThan(1e6);
+    expect(t.e.hp[0]).toBe(1e6);
+  });
+
+  it('ふんえん: 走った跡に煙が残って敵を焼く。止まっていると出ない', () => {
+    const t = setup('lava-plume', 'hoenn');
+    for (let k = 0; k < 30; k++) t.sim.step([]);
+    expect(t.mine()).toHaveLength(0);
+    for (let k = 0; k < 30; k++) t.sim.step([{ type: 'move', playerId: 1, dx: 1, dy: 0 }]);
+    const puffs = t.mine();
+    expect(puffs.length).toBeGreaterThan(1);
+    const xs = puffs.map((i) => t.pr.x[i]!);
+    expect(Math.max(...xs)).toBeGreaterThan(Math.min(...xs));
+    t.e.add(1, t.kindOf('normal'), xs[0]!, 0, 1e6, 0, 10);
+    for (let k = 0; k < 10; k++) t.sim.step([]);
+    expect(t.e.hp[0]!).toBeLessThan(1e6);
+  });
+});

@@ -1,11 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { buildSimRules, moveIndexOf, playableLoadout } from '../data/simRules';
 import { Simulation } from './simulation';
-import { applyOffer, derivationCompletedBy, makeOffers } from './systems/leveling';
+import { applyOffer, canLearnNewMove, makeOffers, moveMaxLevel } from './systems/leveling';
 
 /**
- * イーブイの とっておき（作者の決定 2026年10月25日）: かわらずのいし ＋ スピードスター・のしかかり・でんこうせっか が全部最大（Lv8）。
- * 進化すると のしかかり・でんこうせっか は消費される（なくなる。作者の決定 2026年10月25日）
+ * イーブイの とっておき（作者の決定 2026年11月4日。07 の182章）: のしかかり ＋ かわらずのいし で進化し、ほかのノーマルの技を全部消費する
  */
 function setup() {
   const rules = buildSimRules();
@@ -21,33 +20,37 @@ function setup() {
 const offersLastResort = (s: ReturnType<typeof setup>): boolean =>
   makeOffers(s.sim.world, s.p).some((o) => o.kind === 'derive' && o.to === s.move('last-resort'));
 
-describe('イーブイの とっておき', () => {
-  it('かわらずのいし ＋ 3つの技が全部最大のときだけ候補に出る', () => {
+describe('イーブイの とっておき（07 の182章）', () => {
+  it('のしかかり（最大）＋ かわらずのいし で候補に出る', () => {
     const s = setup();
+    s.p.moves = [s.maxed('body-slam')];
+    expect(offersLastResort(s)).toBe(false);
     s.p.items = [{ item: s.everstone, level: 1 }];
-    s.p.moves = [s.maxed('swift'), s.maxed('body-slam')];
-    expect(offersLastResort(s)).toBe(false);
-    s.p.moves.push({ ...s.maxed('quick-attack'), level: 1 });
-    expect(offersLastResort(s)).toBe(false);
-    s.p.moves[2] = s.maxed('quick-attack');
     expect(offersLastResort(s)).toBe(true);
-    s.p.items = [];
-    expect(offersLastResort(s)).toBe(false);
   });
 
-  it('最後にかわらずのいしを取る候補で「おや？」になる', () => {
-    const s = setup();
-    s.p.moves = [s.maxed('swift'), s.maxed('body-slam'), s.maxed('quick-attack')];
-    expect(derivationCompletedBy(s.sim.world, s.p, { kind: 'itemNew', item: s.everstone })?.to).toBe(s.move('last-resort'));
+  it('ほかのノーマルの技を全部消費し、使った数だけ最大レベルが上がる（0 で Lv8・1 つで Lv16・2 つで Lv24）。強化分も受け継ぐ', () => {
+    const cases: [string[], number][] = [[[], 8], [['swift'], 16], [['swift', 'quick-attack'], 24], [['swift', 'double-edge'], 24]];
+    for (const [materials, cap] of cases) {
+      const s = setup();
+      s.p.items = [{ item: s.everstone, level: 1 }];
+      s.p.moves = [s.maxed('body-slam'), ...materials.map((k) => s.maxed(k))];
+      applyOffer(s.sim.world, s.p, { kind: 'derive', slot: 0, to: s.move('last-resort'), item: s.everstone, unique: true });
+      expect(s.p.moves.map((m) => m.move), materials.join()).toEqual([s.move('last-resort')]);
+      expect(moveMaxLevel(s.rules, s.p.moves[0]!), materials.join()).toBe(cap);
+      expect(s.p.moves[0]!.level).toBeGreaterThan(1);
+      for (const k of materials) expect(s.p.consumedMoves).toContain(s.move(k));
+      // もう覚え直さない
+      for (let n = 0; n < 10; n++) expect(makeOffers(s.sim.world, s.p).some((o) => o.kind === 'moveNew' && materials.map(s.move).includes(o.move))).toBe(false);
+    }
   });
 
-  it('進化すると スピードスター・でんこうせっか は消費され、もう候補に出ない（元は のしかかり。07 の161章）', () => {
+  it('進化前はノーマルの技だけ覚える。進化するとその姿のタイプの技を覚える', () => {
     const s = setup();
-    s.p.items = [{ item: s.everstone, level: 1 }];
-    // 派生の元（のしかかり）の枠が 0 番
-    s.p.moves = [s.maxed('body-slam'), s.maxed('swift'), s.maxed('quick-attack')];
-    applyOffer(s.sim.world, s.p, { kind: 'derive', slot: 0, to: s.move('last-resort'), item: s.everstone, unique: true });
-    expect(s.p.moves.map((m) => m.move)).toEqual([s.move('last-resort')]);
-    expect(s.p.consumedMoves).toEqual(expect.arrayContaining([s.move('swift'), s.move('quick-attack')]));
+    for (const k of ['swift', 'quick-attack']) expect(canLearnNewMove(s.sim.world, s.p, s.move(k)), k).toBe(true);
+    for (const k of ['ember', 'fire-fang', 'water-gun', 'bubble', 'confusion', 'thunder-shock', 'double-kick']) expect(canLearnNewMove(s.sim.world, s.p, s.move(k)), k).toBe(false);
+    s.p.species = s.rules.species.findIndex((x) => x.key === 'flareon');
+    expect(canLearnNewMove(s.sim.world, s.p, s.move('ember'))).toBe(true);
+    expect(canLearnNewMove(s.sim.world, s.p, s.move('water-gun'))).toBe(false);
   });
 });

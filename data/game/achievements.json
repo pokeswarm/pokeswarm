@@ -309,63 +309,13 @@
       }
     },
     {
-      "id": "stone-fire",
-      "condition": {
-        "stat": "bestLevel.growlithe",
-        "atLeast": 30
-      },
-      "reward": {
-        "item": "fire-stone"
-      }
-    },
-    {
-      "id": "stone-leaf",
-      "condition": {
-        "stat": "bestLevel.oddish",
-        "atLeast": 30
-      },
-      "reward": {
-        "item": "leaf-stone"
-      }
-    },
-    {
-      "id": "stone-water",
-      "condition": {
-        "stat": "bestLevel.staryu",
-        "atLeast": 30
-      },
-      "reward": {
-        "item": "water-stone"
-      }
-    },
-    {
-      "id": "stone-thunder",
-      "condition": {
-        "stat": "bestLevel.pikachu",
-        "atLeast": 30
-      },
-      "reward": {
-        "item": "thunder-stone"
-      }
-    },
-    {
       "id": "pikachu-light-ball",
       "condition": {
-        "stat": "bestLevel.pikachu",
-        "atLeast": 30
-      },
-      "reward": {
-        "item": "light-ball"
-      }
-    },
-    {
-      "id": "derive-rock-slide",
-      "condition": {
-        "stat": "derived.rock-slide",
+        "stat": "clears.pikachu",
         "atLeast": 1
       },
       "reward": {
-        "item": "moon-stone"
+        "item": "light-ball"
       }
     },
     {
@@ -393,7 +343,8 @@
         "atLeast": 2
       },
       "reward": {
-        "pokemon": "raichu"
+        "pokemon": "raichu",
+        "item": "thunder-stone"
       }
     },
     {
@@ -403,7 +354,8 @@
         "atLeast": 3
       },
       "reward": {
-        "pokemon": "starmie"
+        "pokemon": "starmie",
+        "item": "water-stone"
       }
     },
     {
@@ -413,7 +365,8 @@
         "atLeast": 3
       },
       "reward": {
-        "pokemon": "arcanine"
+        "pokemon": "arcanine",
+        "item": "fire-stone"
       }
     },
     {
@@ -423,7 +376,8 @@
         "atLeast": 4
       },
       "reward": {
-        "pokemon": "vileplume"
+        "pokemon": "vileplume",
+        "item": "leaf-stone"
       }
     },
     {
@@ -433,7 +387,8 @@
         "atLeast": 5
       },
       "reward": {
-        "pokemon": "onix"
+        "pokemon": "onix",
+        "item": "moon-stone"
       }
     },
     {
@@ -651,55 +606,20 @@
       }
     },
     {
-      "id": "johto-stone-thunder",
+      "id": "johto-stones",
       "region": "johto",
       "condition": {
-        "stat": "bestLevel.pichu",
-        "atLeast": 30
+        "stat": "bought.egg",
+        "atLeast": 1
       },
       "reward": {
-        "item": "thunder-stone"
-      }
-    },
-    {
-      "id": "johto-stone-moon",
-      "region": "johto",
-      "condition": {
-        "any": [
-          {
-            "stat": "bestLevel.cleffa",
-            "atLeast": 30
-          },
-          {
-            "stat": "bestLevel.igglybuff",
-            "atLeast": 30
-          }
+        "items": [
+          "thunder-stone",
+          "moon-stone",
+          "water-stone",
+          "fire-stone",
+          "linking-cord"
         ]
-      },
-      "reward": {
-        "item": "moon-stone"
-      }
-    },
-    {
-      "id": "johto-stone-water",
-      "region": "johto",
-      "condition": {
-        "stat": "bestLevel.poliwag",
-        "atLeast": 30
-      },
-      "reward": {
-        "item": "water-stone"
-      }
-    },
-    {
-      "id": "johto-stone-fire",
-      "region": "johto",
-      "condition": {
-        "stat": "bestLevel.cyndaquil",
-        "atLeast": 30
-      },
-      "reward": {
-        "item": "fire-stone"
       }
     },
     {

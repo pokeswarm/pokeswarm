@@ -88,7 +88,21 @@ export function buyPokemon(save: SaveData, cfg: ShopConfig, key: string, unlockN
   save.coins -= item.cost;
   save.unlocked.push(name);
   addSpent(save, item.region, item.cost);
+  // 買った記録（ジョウトは タマゴを買うと進化の道具が解放される。07 の178章）
+  addStat(save, regionStatKey(item.region, `bought.${key}`), 1);
   return true;
+}
+
+/** 前のセーブ: もう解放している、ショップで売っているポケモンの「買った記録」を足す（起動時に、実績の判定より前に）。足したら true */
+export function backfillBought(save: SaveData, cfg: ShopConfig, unlockOf: (key: string) => string): boolean {
+  let changed = false;
+  for (const p of cfg.pokemon) {
+    const stat = regionStatKey(p.region, `bought.${p.key}`);
+    if (save.stats[stat] !== undefined || !save.unlocked.includes(regionUnlockKey(p.region, unlockOf(p.key)))) continue;
+    save.stats[stat] = 1;
+    changed = true;
+  }
+  return changed;
 }
 
 /** 払い戻す地方: その地方と、order（regions.json の並び）でそれより後の地方（作者の決定 07 の48.4） */

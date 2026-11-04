@@ -40,6 +40,7 @@ export function achievementPerks(cfg: AchievementsConfig, achieved: readonly str
     if (!achieved.includes(a.id) || !a.reward) continue;
     const r = a.reward;
     if (r.item) items.add(r.item);
+    for (const it of r.items ?? []) items.add(it);
     if (r.shiny) shiny.add(r.shiny);
     const b = r.buff;
     if (!b) continue;

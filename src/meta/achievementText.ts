@@ -54,8 +54,12 @@ export function visibleAchievementCondition(a: Achievement, stats: Readonly<Reco
 export function achievementReward(a: Achievement, playable: boolean): string | null {
   const r = a.reward;
   if (!r) return null;
-  if (r.pokemon) return t(playable ? 'achievement.reward.pokemon' : 'achievement.reward.pokemonLater', { name: pokemonName(r.pokemon) });
-  if (r.item) return t('achievement.reward.item', { name: localName(generated.items[r.item]?.names, getLocale(), r.item) });
+  // ポケモンと持ち物は一緒にもらえることがある（ガーディの解放と ほのおのいし。07 の178章）
+  const gets = [
+    ...(r.pokemon ? [t(playable ? 'achievement.reward.pokemon' : 'achievement.reward.pokemonLater', { name: pokemonName(r.pokemon) })] : []),
+    ...[...(r.item ? [r.item] : []), ...(r.items ?? [])].map((it) => t('achievement.reward.item', { name: localName(generated.items[it]?.names, getLocale(), it) })),
+  ];
+  if (gets.length) return gets.join(' / ');
   if (r.coins) return t('achievement.reward.coins', { coins: r.coins });
   if (r.shiny) return t('achievement.reward.shiny', { name: pokemonName(r.shiny) });
   const b = r.buff;

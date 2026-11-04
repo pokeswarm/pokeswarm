@@ -195,63 +195,13 @@
   },
   {
    "region": "kanto",
-   "id": "stone-fire",
-   "name": "もえる きずな",
-   "hidden": false,
-   "condition": "ガーディで レベル30に 到達する",
-   "stat": "bestLevel.growlithe ≧ 30",
-   "rewardKind": "持ち物",
-   "reward": "ほのおのいしが 出るようになる"
-  },
-  {
-   "region": "kanto",
-   "id": "stone-leaf",
-   "name": "みどりの きずな",
-   "hidden": false,
-   "condition": "ナゾノクサで レベル30に 到達する",
-   "stat": "bestLevel.oddish ≧ 30",
-   "rewardKind": "持ち物",
-   "reward": "リーフのいしが 出るようになる"
-  },
-  {
-   "region": "kanto",
-   "id": "stone-water",
-   "name": "うみの きずな",
-   "hidden": false,
-   "condition": "ヒトデマンで レベル30に 到達する",
-   "stat": "bestLevel.staryu ≧ 30",
-   "rewardKind": "持ち物",
-   "reward": "みずのいしが 出るようになる"
-  },
-  {
-   "region": "kanto",
-   "id": "stone-thunder",
-   "name": "いかずちの きずな",
-   "hidden": false,
-   "condition": "ピカチュウで レベル30に 到達する",
-   "stat": "bestLevel.pikachu ≧ 30",
-   "rewardKind": "持ち物",
-   "reward": "かみなりのいしが 出るようになる"
-  },
-  {
-   "region": "kanto",
    "id": "pikachu-light-ball",
    "name": "でんきの あいぼう",
    "hidden": false,
-   "condition": "ピカチュウで レベル30に 到達する",
-   "stat": "bestLevel.pikachu ≧ 30",
+   "condition": "ピカチュウで ランを クリアする",
+   "stat": "clears.pikachu ≧ 1",
    "rewardKind": "持ち物",
    "reward": "でんきだまが 出るようになる"
-  },
-  {
-   "region": "kanto",
-   "id": "derive-rock-slide",
-   "name": "くずれる いわ",
-   "hidden": false,
-   "condition": "いわなだれ に派生する",
-   "stat": "derived.rock-slide ≧ 1",
-   "rewardKind": "持ち物",
-   "reward": "つきのいしが 出るようになる"
   },
   {
    "region": "kanto",
@@ -271,7 +221,7 @@
    "condition": "ライチュウを 2回 倒す",
    "stat": "bossDefeated.raichu ≧ 2",
    "rewardKind": "ポケモン",
-   "reward": "ライチュウが 使えるようになる"
+   "reward": "ライチュウが 使えるようになる / かみなりのいしが 出るようになる"
   },
   {
    "region": "kanto",
@@ -281,7 +231,7 @@
    "condition": "スターミーを 3回 倒す",
    "stat": "bossDefeated.starmie ≧ 3",
    "rewardKind": "ポケモン",
-   "reward": "スターミーが 使えるようになる"
+   "reward": "スターミーが 使えるようになる / みずのいしが 出るようになる"
   },
   {
    "region": "kanto",
@@ -291,7 +241,7 @@
    "condition": "ウインディを 3回 倒す",
    "stat": "bossDefeated.arcanine ≧ 3",
    "rewardKind": "ポケモン",
-   "reward": "ウインディが 使えるようになる"
+   "reward": "ウインディが 使えるようになる / ほのおのいしが 出るようになる"
   },
   {
    "region": "kanto",
@@ -301,7 +251,7 @@
    "condition": "ラフレシアを 4回 倒す",
    "stat": "bossDefeated.vileplume ≧ 4",
    "rewardKind": "ポケモン",
-   "reward": "ラフレシアが 使えるようになる"
+   "reward": "ラフレシアが 使えるようになる / リーフのいしが 出るようになる"
   },
   {
    "region": "kanto",
@@ -311,7 +261,7 @@
    "condition": "イワークを 5回 倒す",
    "stat": "bossDefeated.onix ≧ 5",
    "rewardKind": "ポケモン",
-   "reward": "イワークが 使えるようになる"
+   "reward": "イワークが 使えるようになる / つきのいしが 出るようになる"
   },
   {
    "region": "kanto",
@@ -515,43 +465,13 @@
   },
   {
    "region": "johto",
-   "id": "johto-stone-thunder",
-   "name": "ちいさな いかずち",
+   "id": "johto-stones",
+   "name": "タマゴの おくりもの",
    "hidden": false,
-   "condition": "ピチューが かえった ランで レベル30に 到達する",
-   "stat": "bestLevel.pichu ≧ 30",
+   "condition": "ジョウトの ショップで タマゴを 買う",
+   "stat": "bought.egg ≧ 1",
    "rewardKind": "持ち物",
-   "reward": "かみなりのいしが 出るようになる"
-  },
-  {
-   "region": "johto",
-   "id": "johto-stone-moon",
-   "name": "つきの おくりもの",
-   "hidden": false,
-   "condition": "ピィか ププリンが かえった ランで レベル30に 到達する",
-   "stat": "bestLevel.cleffa ≧ 30 | bestLevel.igglybuff ≧ 30",
-   "rewardKind": "持ち物",
-   "reward": "つきのいしが 出るようになる"
-  },
-  {
-   "region": "johto",
-   "id": "johto-stone-water",
-   "name": "うずまきの きずな",
-   "hidden": false,
-   "condition": "ニョロモで レベル30に 到達する",
-   "stat": "bestLevel.poliwag ≧ 30",
-   "rewardKind": "持ち物",
-   "reward": "みずのいしが 出るようになる"
-  },
-  {
-   "region": "johto",
-   "id": "johto-stone-fire",
-   "name": "ひのたまの きずな",
-   "hidden": false,
-   "condition": "ヒノアラシで レベル30に 到達する",
-   "stat": "bestLevel.cyndaquil ≧ 30",
-   "rewardKind": "持ち物",
-   "reward": "ほのおのいしが 出るようになる"
+   "reward": "かみなりのいしが 出るようになる / つきのいしが 出るようになる / みずのいしが 出るようになる / ほのおのいしが 出るようになる /  つながりのヒモが 出るようになる"
   },
   {
    "region": "johto",

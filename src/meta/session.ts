@@ -2,7 +2,7 @@ import type { Account, SaveChooser, TransferConfirm } from '../firebase/account'
 import type { PresenceState, Social } from '../firebase/social';
 import { firebaseOptionsFromEnv } from '../firebase/config';
 import { achievementsConfig, playablesConfig, shopConfig, unlocksConfig } from '../data';
-import { backfillShopSpent, refundLegacy } from './shop';
+import { backfillBought, backfillShopSpent, refundLegacy } from './shop';
 import { applyProgress, applyResets } from './progress';
 import { SaveStore } from './saveStore';
 
@@ -51,6 +51,13 @@ class Session {
     const unlockOf = (key: string): string => playablesConfig.pokemon[key]?.unlock ?? key;
     if (!backfillShopSpent(structuredClone(this.store.current) as Parameters<typeof backfillShopSpent>[0], shopConfig, unlockOf)) return;
     this.store.update((d) => void backfillShopSpent(d, shopConfig, unlockOf));
+  }
+
+  /** 前のセーブ: 売っているポケモンをもう解放していれば、買った記録を足す（起動時に、実績の判定より前に1回） */
+  backfillBought(): void {
+    const unlockOf = (key: string): string => playablesConfig.pokemon[key]?.unlock ?? key;
+    if (!backfillBought(structuredClone(this.store.current) as Parameters<typeof backfillBought>[0], shopConfig, unlockOf)) return;
+    this.store.update((d) => void backfillBought(d, shopConfig, unlockOf));
   }
 
   /** 記録を足した後に呼ぶ: 新しく満たした実績・解放をセーブデータに足して返す（無ければ変更しない） */

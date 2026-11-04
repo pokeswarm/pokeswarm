@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { achievementsConfig, unlocksConfig } from '../data';
+import { achievementsConfig, playablesConfig, shopConfig, unlocksConfig } from '../data';
 import { applyOffer, makeOffers } from '../sim/systems/leveling';
 import { Simulation } from '../sim/simulation';
 import { testRules } from '../sim/testRules';
 import { emptyModifiers } from '../sim/upgrades';
-import { achievementPerks } from './achievementPerks';
+import { achievementPerks, regionAchieved } from './achievementPerks';
 import { applyProgress } from './progress';
 import { startItemChoices } from './loadoutOptions';
 import { emptySave } from './saveData';
+import { backfillBought, buyPokemon } from './shop';
 
 /** 実績の報酬（作者の決定。07 23・24章） */
 describe('実績の報酬', () => {
@@ -16,9 +17,59 @@ describe('実績の報酬', () => {
     expect(start.items.has('charcoal')).toBe(true);
     expect(start.items.has('fire-stone')).toBe(false);
     expect(start.items.has('lucky-egg')).toBe(false);
-    const after = achievementPerks(achievementsConfig, ['stone-fire', 'first-clear']);
+    const after = achievementPerks(achievementsConfig, ['unlock-arcanine', 'first-clear']);
     expect(after.items.has('fire-stone')).toBe(true);
     expect(after.items.has('lucky-egg')).toBe(true);
+  });
+
+  it('カントーで解放するガーディ・ピカチュウ・ナゾノクサ・ヒトデマン・イワークは、進化の石も一緒に解放する（07 の178章）', () => {
+    for (const [stat, id, item] of [
+      ['bossDefeated.arcanine', 'unlock-arcanine', 'fire-stone'],
+      ['bossDefeated.raichu', 'unlock-raichu', 'thunder-stone'],
+      ['bossDefeated.vileplume', 'unlock-vileplume', 'leaf-stone'],
+      ['bossDefeated.starmie', 'unlock-starmie', 'water-stone'],
+      ['bossDefeated.onix', 'unlock-onix', 'moon-stone'],
+    ] as const) {
+      const a = achievementsConfig.achievements.find((x) => x.id === id)!;
+      expect(a.reward?.pokemon, id).toBeDefined();
+      expect(a.reward?.item, id).toBe(item);
+      const save = emptySave();
+      save.stats = { [stat]: 99 };
+      applyProgress(save, achievementsConfig, unlocksConfig);
+      expect(save.achievements).toContain(id);
+      expect(achievementPerks(achievementsConfig, save.achievements).items.has(item), id).toBe(true);
+    }
+  });
+
+  it('でんきだま は、ピカチュウでクリアすると解放される（レベル30では出ない。07 の178章）', () => {
+    const save = emptySave();
+    save.stats = { 'bestLevel.pikachu': 60 };
+    applyProgress(save, achievementsConfig, unlocksConfig);
+    expect(save.achievements).not.toContain('pikachu-light-ball');
+    save.stats['clears.pikachu'] = 1;
+    applyProgress(save, achievementsConfig, unlocksConfig);
+    expect(save.achievements).toContain('pikachu-light-ball');
+  });
+
+  it('ジョウトは ショップでタマゴを買うと進化の道具が解放され、ゴーストが進化できる（前のセーブも。07 の178章）', () => {
+    const owned = (save: ReturnType<typeof emptySave>) => achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, save.achievements, 'johto'), 'johto').items;
+    const save = emptySave();
+    save.coins = 5000;
+    save.stats.shopSpent = 50000;
+    applyProgress(save, achievementsConfig, unlocksConfig);
+    expect(owned(save).has('linking-cord')).toBe(false);
+    expect(buyPokemon(save, shopConfig, 'egg', 'egg', 'johto')).toBe(true);
+    applyProgress(save, achievementsConfig, unlocksConfig);
+    for (const it of ['linking-cord', 'thunder-stone', 'moon-stone', 'water-stone', 'fire-stone']) expect(owned(save).has(it), it).toBe(true);
+    // ほかの地方には効かない
+    expect(achievementPerks(achievementsConfig, regionAchieved(achievementsConfig, save.achievements, 'hoenn'), 'hoenn').items.has('linking-cord')).toBe(false);
+    // タマゴを買った記録が無い前のセーブ
+    const old = emptySave();
+    old.unlocked = ['johto:egg'];
+    const unlockOf = (key: string): string => playablesConfig.pokemon[key]?.unlock ?? key;
+    expect(backfillBought(old, shopConfig, unlockOf)).toBe(true);
+    applyProgress(old, achievementsConfig, unlocksConfig);
+    expect(owned(old).has('linking-cord')).toBe(true);
   });
 
   it('つながりのヒモは、協力プレイで遊ぶか、1ランで中ボスを8体倒すと解放される', () => {
@@ -63,7 +114,7 @@ describe('実績の報酬', () => {
     expect(fire).toContain('charcoal');
     expect(fire).not.toContain('mystic-water');
     expect(fire).not.toContain('fire-stone');
-    save.achievements = ['stone-thunder', 'pikachu-light-ball'];
+    save.achievements = ['unlock-raichu', 'pikachu-light-ball'];
     expect(startItemChoices(save, 'pikachu')).toEqual(expect.arrayContaining(['thunder-stone', 'light-ball']));
     expect(startItemChoices(save, 'charmander')).not.toContain('light-ball');
   });

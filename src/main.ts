@@ -48,6 +48,8 @@ async function start(): Promise<void> {
     migrateOldDiscoveries(session.store);
     // 伝説のリワークに合わせて、伝説を倒した実績と解放を1回だけリセットする（実績の判定より前に）
     session.applyDataResets();
+    // 前のセーブ: 買った記録（タマゴを買うと進化の道具が解放される実績のため。07 の178章）
+    session.backfillBought();
     // 実績の仕組みより前に遊んだ記録でも、条件を満たしていれば達成にする
     session.checkProgress();
     // ショップの強化の一覧を作り直したので、前の版の強化は使ったコインを全額返す

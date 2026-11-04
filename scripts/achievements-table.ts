@@ -22,6 +22,7 @@ interface Achievement {
   hidden?: boolean;
   condition: Condition;
   reward?: {
+    items?: string[];
     pokemon?: string;
     item?: string;
     coins?: number;
@@ -65,8 +66,9 @@ function statText(c: Condition): string {
 function rewardText(a: Achievement): { kind: string; text: string } {
   const r = a.reward;
   if (!r) return { kind: 'なし', text: '' };
-  if (r.pokemon) return { kind: 'ポケモン', text: tr('achievement.reward.pokemon', { name: pokemonName(r.pokemon) }) };
-  if (r.item) return { kind: '持ち物', text: tr('achievement.reward.item', { name: genItems[r.item]?.names.ja ?? r.item }) };
+  const items = [...(r.item ? [r.item] : []), ...(r.items ?? [])].map((it) => tr('achievement.reward.item', { name: genItems[it]?.names.ja ?? it }));
+  if (r.pokemon) return { kind: 'ポケモン', text: [tr('achievement.reward.pokemon', { name: pokemonName(r.pokemon) }), ...items].join(' / ') };
+  if (items.length) return { kind: '持ち物', text: items.join(' / ') };
   if (r.coins) return { kind: 'コイン', text: tr('achievement.reward.coins', { coins: r.coins }) };
   if (r.shiny) return { kind: '色違い', text: tr('achievement.reward.shiny', { name: pokemonName(r.shiny) }) };
   const b = r.buff ?? {};

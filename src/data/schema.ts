@@ -354,6 +354,8 @@ export const achievementRewardSchema = z.object({
   pokemon: z.string().min(1).optional(),
   /** その持ち物が候補に出るようになる（作者の決定 07 24章） */
   item: z.string().min(1).optional(),
+  /** 複数の持ち物が候補に出るようになる（ジョウトの進化の道具。07 の178章） */
+  items: z.array(z.string().min(1)).optional(),
   /** コインをもらう */
   coins: z.number().int().positive().optional(),
   /** 特殊なバフ（ショップでは買えない、小さな永続の効果。07 23章） */

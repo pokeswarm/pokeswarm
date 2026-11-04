@@ -427,6 +427,12 @@
         "forms": [
           "salamence"
         ]
+      },
+      {
+        "move": "hyper-beam",
+        "forms": [
+          "salamence"
+        ]
       }
     ],
     "feebas": [
@@ -918,6 +924,12 @@
       },
       {
         "move": "dual-wingbeat",
+        "forms": [
+          "dragonite"
+        ]
+      },
+      {
+        "move": "outrage",
         "forms": [
           "dragonite"
         ]

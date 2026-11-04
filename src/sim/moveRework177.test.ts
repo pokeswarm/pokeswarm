@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { effectRecipes } from '../data';
 import { buildSimRules, moveIndexOf } from '../data/simRules';
 import { Simulation } from './simulation';
 
@@ -198,12 +199,14 @@ describe('そのほか', () => {
     const blades = a.mine();
     expect(blades).toHaveLength(3);
     for (const i of blades) expect(a.pr.vx[i]!).toBeGreaterThan(0);
+    // マジカルシャイン（トゲチック）は 07 の184章で、敵の所に光の花が咲く技になった
     const g = setup('dazzling-gleam', 'johto');
+    expect(g.rules.moves[g.m]!.pattern).toBe('strike');
     g.e.add(1, g.kindOf('normal'), 150, 0, 1e6, 0, 10);
     g.e.add(2, g.kindOf('normal'), -150, 0, 1e6, 0, 10);
     for (let k = 0; k < 10; k++) g.sim.step([]);
     expect(g.e.hp[0]!).toBeLessThan(1e6);
-    expect(g.e.hp[1]).toBe(1e6);
+    expect(g.e.hp[1]!).toBeLessThan(1e6);
   });
 });
 
@@ -325,5 +328,45 @@ describe('とっておき: 消費した技が順に出る連続技（07 の183�
     const c = lost(24, ['swift', 'quick-attack']);
     expect(b).toBeGreaterThan(a * 1.5);
     expect(c).toBeGreaterThan(b * 1.5);
+  });
+});
+
+describe('ドラゴン 600 族の固有技・げきりん（07 の184章）', () => {
+  it('カイリューは エアスラッシュ ＋ りゅうのキバ で げきりん、ボーマンダは りゅうのはどう ＋ シルクのスカーフ で はかいこうせん', () => {
+    const rules = buildSimRules('kanto');
+    const route = (line: string, from: string, to: string) => rules.derivations.find((d) => d.line === line && d.from === moveIndexOf(rules, from) && d.to === moveIndexOf(rules, to));
+    expect(route('dratini', 'air-slash', 'outrage')).toBeDefined();
+    expect(route('dratini', 'dragon-pulse', 'hyper-beam')).toBeDefined();
+    const hoenn = buildSimRules('hoenn');
+    expect(hoenn.derivations.find((d) => d.line === 'bagon' && d.from === moveIndexOf(hoenn, 'dragon-pulse') && d.to === moveIndexOf(hoenn, 'hyper-beam'))).toBeDefined();
+  });
+
+  it('げきりん: 近くの敵へ次々に飛びかかり、Lv8 は 5 回。終わると少し動けない。周りに敵がいなければ始めない', () => {
+    const none = setup('outrage');
+    none.e.add(1, none.kindOf('normal'), 600, 0, 1e6, 0, 10);
+    for (let k = 0; k < 40; k++) none.sim.step([]);
+    expect(none.p.moves[0]!.seq).toBeUndefined();
+    expect(none.p.x).toBe(0);
+
+    const dashes = (level: number): { n: number; recovered: boolean; hurt: boolean } => {
+      const t = setup('outrage');
+      t.p.moves[0]!.level = level;
+      t.e.add(1, t.kindOf('boss'), 100, 0, 1e9, 0, 28);
+      let n = 0;
+      let recovered = false;
+      for (let k = 0; k < 40; k++) {
+        t.sim.step([]);
+        n += t.sim.world.events.filter((ev) => ev.type === 'dashStarted').length;
+        if (t.p.recoverTicks) recovered = true;
+      }
+      return { n, recovered, hurt: t.e.hp[0]! < 1e9 };
+    };
+    expect(dashes(1)).toEqual({ n: 3, recovered: true, hurt: true });
+    expect(dashes(4)).toEqual({ n: 4, recovered: true, hurt: true });
+    expect(dashes(8)).toEqual({ n: 5, recovered: true, hurt: true });
+  });
+
+  it('ふんえん の絵は床の高さに描く', () => {
+    expect(effectRecipes['lava-plume']!.drawOnFloor).toBe(true);
   });
 });

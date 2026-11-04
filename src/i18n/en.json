@@ -291,6 +291,7 @@
   "shop.banish.name": "Banish",
   "shop.banish.desc": "+1 banish per rank at the start of a challenge (B on the level-up screen)",
   "item.magnet": "Magnet! Pulling in all experience",
+  "item.milkDrink": "Feeling a little better!",
   "item.buff": "{name}! Powered up for {seconds}s",
   "candy.rolling": "{name}! Level +{levels}...",
   "candy.result": "{name}! Level +{levels}!",

@@ -29,7 +29,7 @@ describe('ジョウトの新しい技', () => {
   });
 
   it('ムーンフォース・マジカルシャイン・こおりのキバ・どくどくのキバ・せいなるほのお: 前の敵に当たり、真後ろの敵には当たらない', () => {
-    for (const move of ['moonblast', 'dazzling-gleam', 'ice-fang', 'poison-fang', 'sacred-fire']) {
+    for (const move of ['moonblast', 'ice-fang', 'poison-fang', 'sacred-fire']) {
       const t = setup(move);
       t.e.add(1, 0, 90, 0, 1e6, 0, 10);
       t.e.add(2, 0, -90, 0, 1e6, 0, 10);

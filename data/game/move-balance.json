@@ -63,7 +63,15 @@
     "last-resort-rush",
     "last-resort-stars",
     "last-resort-slam",
-    "last-resort-burst"
+    "last-resort-burst",
+    "aqua-tail-azumarill",
+    "aqua-tail-cw",
+    "aqua-tail-ccw",
+    "aqua-tail-flip",
+    "aqua-tail-slam-azumarill",
+    "outrage",
+    "outrage-hit",
+    "outrage-last"
   ],
   "heavyHitters": [
     "phantom-force",
@@ -126,11 +134,11 @@
     "stealth-rock": 0.4,
     "phantom-force": 0.75,
     "surf": 0.9,
-    "aqua-tail-azumarill": 0.8,
-    "aqua-tail-slam-azumarill": 0.7,
     "draco-meteor": 1.2,
     "snore": 1.5,
     "charm": 0.6,
-    "double-edge": 1.25
+    "double-edge": 1.25,
+    "bullet-punch": 0.4,
+    "x-scissor": 0.9
   }
 }

@@ -76,7 +76,7 @@ export class PlayerView {
    * （でんこうせっか）。見た目だけで、位置（当たり判定）は動かさない
    */
   /** 体が本当に動く技（dash。07 の177章）の見た目: 弧を描いて跳び、通った所に残像を残す */
-  dash(dirX: number, dirY: number, distance: number, seconds: number, hop: number, afterimages: number): void {
+  dash(dirX: number, dirY: number, distance: number, seconds: number, hop: number, afterimages: number, tint?: string): void {
     this.hopStart = this.scene.time.now;
     this.hopMs = seconds * 1000;
     this.hopHeight = hop;
@@ -93,18 +93,22 @@ export class PlayerView {
         .image(this.container.x + dirX * distance * t, this.container.y + dirY * distance * t, sprite.texture.key, sprite.frame.name)
         .setScale(sprite.scaleX, sprite.scaleY)
         .setFlipX(sprite.flipX)
-        .setTint(0xfff8e1)
+        .setTint(tint ? parseInt(tint.slice(1), 16) : 0xfff8e1)
         .setAlpha(0)
         .setDepth(this.container.depth - 0.01);
       this.scene.tweens.add({ targets: ghost, alpha: { from: 0.5, to: 0 }, duration: 260, delay: seconds * 1000 * t, onComplete: () => ghost.destroy() });
     }
   }
 
-  lunge(dirX: number, dirY: number, distance: number, afterimages: number): void {
+  lunge(dirX: number, dirY: number, distance: number, afterimages: number, flip = false): void {
     this.lungeStart = this.scene.time.now;
     this.lungeX = dirX * distance;
     this.lungeY = dirY * distance;
     const sprite = this.pokemon?.sprite;
+    // 体を前へ 1 回転（アクアテールの前転。左向きなら反対回り）
+    if (flip && sprite) {
+      this.scene.tweens.add({ targets: sprite, rotation: { from: 0, to: (dirX < 0 ? -1 : 1) * Math.PI * 2 }, duration: 300, ease: 'Sine.easeInOut', onComplete: () => sprite.setRotation(0) });
+    }
     if (!sprite || afterimages <= 0) return;
     for (let k = 1; k <= afterimages; k++) {
       const t = k / afterimages;

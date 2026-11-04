@@ -83,25 +83,37 @@ describe('バブルこうせん・みずのはどう', () => {
   });
 });
 
-describe('アクアテール: 往復のなぎ払いの後に、前方長方形の叩きつけ', () => {
-  it('叩きつけは 0.4 秒遅れて溜め始め、0.25 秒溜めてから出る（comboOffsetSeconds ＋ windupSeconds）', () => {
-    for (const [key, slamKey] of [['aqua-tail-azumarill', 'aqua-tail-slam-azumarill']] as const) {
-      const t = setup(key);
-      const slam = moveIndexOf(t.rules, slamKey);
-      expect(t.rules.moves[t.m]!.comboMoves).toEqual([slam]);
-      expect(t.rules.moves[slam]!.comboOffsetSeconds).toBe(0.4);
-      t.sim.step([{ type: 'spawnEnemy', id: 1, kind: 0, x: 60, y: 0 }]);
-      expect(t.find((i) => t.pr.move[i] === t.m && t.pr.shape[i] === SHAPE_SECTOR)).toHaveLength(1);
-      expect(t.find((i) => t.pr.move[i] === slam)).toHaveLength(0);
-      expect(t.rules.moves[slam]!.windupSeconds).toBe(0.25);
-      for (let k = 0; k < Math.round(0.4 * 30) + 1; k++) t.sim.step([]);
-      // 溜めている（体が光る）。まだ出ない
-      expect(t.p.moves[0]!.combo?.[0]?.windup).toBeDefined();
-      expect(t.find((i) => t.pr.move[i] === slam)).toHaveLength(0);
-      for (let k = 0; k < Math.round(0.25 * 30) + 1; k++) t.sim.step([]);
-      const boxes = t.find((i) => t.pr.move[i] === slam && t.pr.shape[i] === SHAPE_BOX);
-      expect(boxes).toHaveLength(1);
+describe('アクアテール: 時計回り → 反時計回り → 前転 → 叩きつけ（07 の184章）', () => {
+  it('段が順に出る。払う 2 回は回る向きが反対で、叩きつけは前の長方形', () => {
+    const t = setup('aqua-tail-azumarill');
+    const key = (i: number): string => t.rules.moves[t.pr.move[i]!]!.key;
+    const seen: string[] = [];
+    const speeds: number[] = [];
+    let boxes = 0;
+    t.sim.step([{ type: 'spawnEnemy', id: 1, kind: 0, x: 60, y: 0 }]);
+    for (let k = 0; k < 40; k++) {
+      for (let i = 0; i < t.pr.count; i++) {
+        const name = key(i);
+        if (!name.startsWith('aqua-tail') || seen.includes(name)) continue;
+        seen.push(name);
+        if (t.pr.shape[i] === SHAPE_SECTOR && name !== 'aqua-tail-flip') speeds.push(t.pr.angularSpeed[i]!);
+        if (t.pr.shape[i] === SHAPE_BOX) boxes++;
+      }
+      t.sim.step([]);
     }
+    expect(seen).toEqual(['aqua-tail-cw', 'aqua-tail-ccw', 'aqua-tail-flip', 'aqua-tail-slam-azumarill']);
+    expect(speeds[0]!).toBeGreaterThan(0);
+    expect(speeds[1]!).toBeLessThan(0);
+    expect(boxes).toBe(1);
+  });
+
+  it('前転の段は当たらない（見た目だけ）。敵がいなくても振る', () => {
+    const t = setup('aqua-tail-azumarill');
+    const flip = moveIndexOf(t.rules, 'aqua-tail-flip');
+    expect(t.rules.moves[flip]!.harmless).toBe(true);
+    expect(t.rules.moves[flip]!.body?.flip).toBe(true);
+    t.sim.step([]);
+    expect(t.find((i) => t.rules.moves[t.pr.move[i]!]!.key === 'aqua-tail-cw')).toHaveLength(1);
   });
 });
 

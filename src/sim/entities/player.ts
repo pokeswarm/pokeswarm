@@ -22,6 +22,8 @@ export interface PlayerMove {
   combo?: PlayerMove[];
   /** 連続技の進み具合（次の段の番号と、次の段までの秒数。とっておき） */
   seq?: { i: number; timer: number };
+  /** 次の 1 回はダメージを返す（メタルバースト） */
+  hurtCharge?: boolean;
   /** なまけ: 次の1回は休む（技が出るのは2回に1回。07 の133章） */
   truantRest?: boolean;
   /** 溜める技の、出すまでの残りの秒数（溜めていなければ無し。07 の130章） */

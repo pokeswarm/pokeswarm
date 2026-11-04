@@ -270,6 +270,7 @@
   "shop.banish.name": "Destierro",
   "shop.banish.desc": "+1 destierro por rango al empezar la partida (B en la subida de nivel)",
   "item.magnet": "¡Imán! Atrae toda la Exp.",
+  "item.milkDrink": "¡Se siente un poco mejor!",
   "item.buff": "¡{name}! Potenciado durante {seconds} s",
   "candy.rolling": "¡{name}! Nivel +{levels}...",
   "candy.result": "¡{name}! ¡Nivel +{levels}!",

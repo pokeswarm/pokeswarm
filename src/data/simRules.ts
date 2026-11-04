@@ -95,6 +95,10 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.scatterJitter ? { scatterJitter: def.scatterJitter } : {}),
       ...(def.scatterDelaySeconds ? { scatterDelaySeconds: def.scatterDelaySeconds } : {}),
       sweepOnce: def.sweepOnce,
+      ...(def.sweepReverse ? { sweepReverse: true } : {}),
+      ...(def.strikeRepeat ? { strikeRepeat: true } : {}),
+      ...(def.sequenceGate ? { sequenceGate: def.sequenceGate } : {}),
+      ...(def.hurtRelease ? { hurtRelease: def.hurtRelease } : {}),
       teachOnly: def.teachOnly,
       ...(def.region ? { region: def.region } : {}),
       ...(def.learnForms ? { learnForms: def.learnForms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}),
@@ -159,7 +163,7 @@ export function buildSimRules(region?: string): SimRules {
     const cm = movesConfig.moves[m.key]?.comboMoves;
     if (cm) moves[k] = { ...m, comboMoves: cm.map(moveIndex) };
     const sq = movesConfig.moves[m.key]?.sequence;
-    if (sq) moves[k] = { ...moves[k]!, sequence: sq.map((s) => ({ move: moveIndex(s.move), afterSeconds: s.afterSeconds, needsConsumed: (s.needsConsumed ?? []).map(moveIndex) })) };
+    if (sq) moves[k] = { ...moves[k]!, sequence: sq.map((s) => ({ move: moveIndex(s.move), afterSeconds: s.afterSeconds, needsConsumed: (s.needsConsumed ?? []).map(moveIndex), minLevel: s.minLevel ?? 1 })) };
   });
   // ためている間に出す技（きあいパンチのマッハパンチ）
   moves.forEach((m, k) => {

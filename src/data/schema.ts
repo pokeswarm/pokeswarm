@@ -1201,7 +1201,7 @@ export const moveDefSchema = z.object({
    * 自分の体で攻撃する技（たいあたり・でんこうせっか など）の見た目: 使うたびに、向いている方向へ一瞬
    * lungeDistance だけ体を出して戻す。afterimages があれば、その数の残像を前方に残す（でんこうせっか）
    */
-  body: z.object({ lungeDistance: z.number().positive(), afterimages: z.number().int().nonnegative().default(0) }).optional(),
+  body: z.object({ lungeDistance: z.number().positive(), afterimages: z.number().int().nonnegative().default(0), flip: z.boolean().optional() }).optional(),
   /** eruption（爆炎の柱）の段の数と、外の段ほど半径を大きくする割合（1段ごと） */
   eruption: z.object({ stages: z.number().int().positive(), sizeGrowth: z.number().nonnegative() }).optional(),
   /** 「効き方」の部品（07_content_draft.md 22.4）。進化するたびに増やす */
@@ -1338,6 +1338,8 @@ export const moveDefSchema = z.object({
       hit: z.enum(['land', 'path']),
       hop: z.number().nonnegative().default(0),
       afterimages: z.number().int().nonnegative().default(0),
+      /** 残像の色（げきりん: 赤）。無ければうすい黄 */
+      tint: z.string().optional(),
       invincible: z.boolean().default(false),
       /** 行き先: facing = 向いている方へ range だけ。crowd = 届く範囲で敵が一番多い所へ（ドラゴンダイブ。着く前に、そこの敵に当たらない予告の当たりで状態異常を付ける） */
       target: z.enum(['facing', 'crowd']).default('facing'),
@@ -1359,6 +1361,10 @@ export const moveDefSchema = z.object({
   scatterDelaySeconds: z.number().positive().optional(),
   /** sweep（なぎ払い）を片道だけにする（はたく: 1回払う。おうふくビンタは行って戻る） */
   sweepOnce: z.boolean().optional(),
+  /** sweep: 反対回りに払う（アクアテール: 時計回りの次に反時計回り。07 の184章） */
+  sweepReverse: z.boolean().optional(),
+  /** strike: 敵の数より多く出すときは、同じ敵にも重ねて落とす（マジカルシャイン（トゲチック）: ボス 1 体にも全部咲く。07 の184章） */
+  strikeRepeat: z.boolean().optional(),
   /** sweep: 左右の両端から1つずつ、正面へ向かって払い、正面で合わせる（ねこだまし: 両手でパチン。07 の141章）。sweepOnce と使う */
   sweepClap: z.boolean().optional(),
   /**
@@ -1417,9 +1423,14 @@ export const moveDefSchema = z.object({
   comboMoves: z.array(z.string()).optional(),
   /**
    * sequence（連続技。とっておき）: 使うと、ここに書いた技を順に出す。afterSeconds は次の段までの秒数。
-   * needsConsumed があれば、そのどれかを消費している時だけその段を出す（消費した技の分だけ段が増える。07 の183章）
+   * needsConsumed があれば、そのどれかを消費している時だけその段を出す（消費した技の分だけ段が増える。07 の183章）。
+   * minLevel があれば、そのレベルから出す（げきりん: レベルで飛びかかる回数が増える。07 の184章）
    */
-  sequence: z.array(z.object({ move: z.string(), afterSeconds: z.number().nonnegative(), needsConsumed: z.array(z.string()).optional() })).optional(),
+  sequence: z.array(z.object({ move: z.string(), afterSeconds: z.number().nonnegative(), needsConsumed: z.array(z.string()).optional(), minLevel: z.number().int().positive().optional() })).optional(),
+  /** sequence を始める条件: ahead = 前に敵がいる（とっておき）・any = 届く範囲に敵がいる（げきりん）・none = いつでも（アクアテール） */
+  sequenceGate: z.enum(['ahead', 'any', 'none']).optional(),
+  /** 受けたダメージを返す技（メタルバースト。07 の184章）: 受けるとすぐ次を出し、その 1 回だけ威力が powerMultiplier 倍・数が extraCount 増える */
+  hurtRelease: z.object({ powerMultiplier: z.number().positive(), extraCount: z.number().int().nonnegative() }).optional(),
   /** 一緒に出す技（comboMoves の側）: 本体より、この秒数だけ遅れて出し始める（アクアテールの叩きつけ: 往復のなぎ払いの後に。07 の149章） */
   comboOffsetSeconds: z.number().nonnegative().optional(),
   /** 出す前に溜める秒数（リーフブレード・ブレイズキック）。溜めている間は体が光る（見た目のレシピの chargeGlow） */
@@ -1897,6 +1908,8 @@ export const effectRecipeSchema = z.object({
   clap: z.object({ seconds: z.number().nonnegative(), distance: z.number().nonnegative() }).optional(),
   /** 技が敵に当たった所に seconds の間出す絵（ぜったいれいど: 氷の像）。radius はワールドの単位 */
   hitSprite: moveSpriteSpec.extend({ seconds: z.number().positive(), radius: z.number().positive() }).optional(),
+  /** 技の絵を床の高さに描く（ダメージの塗りつぶしの上、雑魚の下。ふんえんの噴煙。07 の184章） */
+  drawOnFloor: z.boolean().optional(),
   /** 当たり判定の範囲を塗らない（天気: 画面全体なので、降る雪だけで見せる） */
   hideShape: z.boolean().default(false),
   /**

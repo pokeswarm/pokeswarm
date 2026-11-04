@@ -1,160 +1,1156 @@
 {
   "derivations": [
-    { "from": "scratch", "item": "silk-scarf", "to": "slash" },
-    { "from": "scratch", "item": "silver-powder", "to": "fury-cutter" },
-    { "from": "ember", "item": "charcoal", "to": "flamethrower" },
-    { "from": "fire-fang", "item": "x-attack", "to": "flare-blitz", "minLevel": 50 },
-    { "from": "peck", "item": "sharp-beak", "to": "wing-attack" },
-    { "from": "whirlwind", "item": "sharp-beak", "to": "wing-attack", "line": "pidgey" },
-    { "from": "aurora-beam", "item": "never-melt-ice", "to": "ice-beam", "line": "suicune" },
-    { "from": "horn-attack", "item": "silver-powder", "to": "fury-cutter", "line": "heracross" },
-    { "from": "ice-shard", "item": "never-melt-ice", "to": "ice-fang", "line": "swinub" },
-    { "from": "dual-wingbeat", "item": "poison-barb", "to": "poison-fang", "line": "zubat" },
-    { "from": "water-gun", "item": "mystic-water", "to": "hydro-pump" },
-    { "from": "bubble", "item": "mystic-water", "to": "bubble-beam" },
-    { "from": "whirlpool", "item": "mystic-water", "to": "water-spout" },
-    { "from": "leech-seed", "item": "miracle-seed", "to": "giga-drain" },
-    { "from": "vine-whip", "item": "miracle-seed", "to": "razor-leaf" },
-    { "from": "smog", "item": "poison-barb", "to": "sludge-wave" },
-    { "from": "spark", "item": "magnet", "to": "wild-charge" },
-    { "from": "rock-throw", "item": "hard-stone", "to": "rock-slide" },
-    { "from": "magnitude", "item": "soft-sand", "to": "earthquake" },
-    { "from": "confusion", "item": "twisted-spoon", "to": "psychic" },
-    { "from": "thunder-shock", "item": "magnet", "to": "thunderbolt" },
-    { "from": "acid-spray", "item": "poison-barb", "to": "sludge-bomb" },
-    { "from": "gust", "item": "sharp-beak", "to": "air-slash" },
-    { "from": "air-cutter", "item": "sharp-beak", "to": "air-slash" },
-    { "from": "dual-wingbeat", "item": "razor-claw", "to": "aerial-ace" },
-    { "from": "tackle", "item": "silk-scarf", "to": "body-slam" },
-    { "from": "powder-snow", "item": "never-melt-ice", "to": "blizzard" },
-    { "from": "aurora-beam", "item": "never-melt-ice", "to": "ice-beam" },
-    { "from": "night-shade", "item": "spell-tag", "to": "shadow-ball" },
-    { "from": "dragon-tail", "item": "dragon-fang", "to": "dragon-rush" },
-    { "from": "dragon-rage", "item": "dragon-fang", "to": "dragon-pulse" },
-    { "from": "mach-punch", "item": "dire-hit", "to": "focus-punch" },
-    { "from": "sing", "item": "silk-scarf", "to": "hyper-voice" },
-    { "from": "stealth-rock", "item": "pp-max", "to": "rock-blast" },
-    { "from": "lick", "item": "spell-tag", "to": "astonish" },
-    { "from": "quick-attack", "item": "silk-scarf", "to": "double-edge" },
-    { "from": "stomp", "item": "silk-scarf", "to": "double-edge", "line": "miltank" },
-    { "from": "harden", "item": "x-defense", "to": "iron-defense", "line": "onix" },
-    { "from": "harden", "item": "x-defense", "to": "iron-defense", "line": "aron" },
-    { "from": "charm", "item": "x-defense", "to": "play-rough", "line": "jigglypuff" },
-    { "from": "disarming-voice", "item": "x-sp-atk", "to": "dazzling-gleam-jigglypuff", "line": "jigglypuff" },
-    { "from": "counter", "item": "black-belt", "to": "revenge" }
+    {
+      "from": "scratch",
+      "item": "silk-scarf",
+      "to": "slash"
+    },
+    {
+      "from": "scratch",
+      "item": "silver-powder",
+      "to": "fury-cutter"
+    },
+    {
+      "from": "ember",
+      "item": "charcoal",
+      "to": "flamethrower"
+    },
+    {
+      "from": "fire-fang",
+      "item": "x-attack",
+      "to": "flare-blitz",
+      "minLevel": 50
+    },
+    {
+      "from": "peck",
+      "item": "sharp-beak",
+      "to": "wing-attack"
+    },
+    {
+      "from": "whirlwind",
+      "item": "sharp-beak",
+      "to": "wing-attack",
+      "line": "pidgey"
+    },
+    {
+      "from": "aurora-beam",
+      "item": "never-melt-ice",
+      "to": "ice-beam",
+      "line": "suicune"
+    },
+    {
+      "from": "horn-attack",
+      "item": "silver-powder",
+      "to": "fury-cutter",
+      "line": "heracross"
+    },
+    {
+      "from": "ice-shard",
+      "item": "never-melt-ice",
+      "to": "ice-fang",
+      "line": "swinub"
+    },
+    {
+      "from": "dual-wingbeat",
+      "item": "poison-barb",
+      "to": "poison-fang",
+      "line": "zubat"
+    },
+    {
+      "from": "water-gun",
+      "item": "mystic-water",
+      "to": "hydro-pump"
+    },
+    {
+      "from": "bubble",
+      "item": "mystic-water",
+      "to": "bubble-beam"
+    },
+    {
+      "from": "whirlpool",
+      "item": "mystic-water",
+      "to": "water-spout"
+    },
+    {
+      "from": "leech-seed",
+      "item": "miracle-seed",
+      "to": "giga-drain"
+    },
+    {
+      "from": "vine-whip",
+      "item": "miracle-seed",
+      "to": "razor-leaf"
+    },
+    {
+      "from": "smog",
+      "item": "poison-barb",
+      "to": "sludge-wave"
+    },
+    {
+      "from": "spark",
+      "item": "magnet",
+      "to": "wild-charge"
+    },
+    {
+      "from": "rock-throw",
+      "item": "hard-stone",
+      "to": "rock-slide"
+    },
+    {
+      "from": "magnitude",
+      "item": "soft-sand",
+      "to": "earthquake"
+    },
+    {
+      "from": "confusion",
+      "item": "twisted-spoon",
+      "to": "psychic"
+    },
+    {
+      "from": "thunder-shock",
+      "item": "magnet",
+      "to": "thunderbolt"
+    },
+    {
+      "from": "acid-spray",
+      "item": "poison-barb",
+      "to": "sludge-bomb"
+    },
+    {
+      "from": "gust",
+      "item": "sharp-beak",
+      "to": "air-slash"
+    },
+    {
+      "from": "air-cutter",
+      "item": "sharp-beak",
+      "to": "air-slash"
+    },
+    {
+      "from": "dual-wingbeat",
+      "item": "razor-claw",
+      "to": "aerial-ace"
+    },
+    {
+      "from": "tackle",
+      "item": "silk-scarf",
+      "to": "body-slam"
+    },
+    {
+      "from": "powder-snow",
+      "item": "never-melt-ice",
+      "to": "blizzard"
+    },
+    {
+      "from": "aurora-beam",
+      "item": "never-melt-ice",
+      "to": "ice-beam"
+    },
+    {
+      "from": "night-shade",
+      "item": "spell-tag",
+      "to": "shadow-ball"
+    },
+    {
+      "from": "dragon-tail",
+      "item": "dragon-fang",
+      "to": "dragon-rush"
+    },
+    {
+      "from": "dragon-rage",
+      "item": "dragon-fang",
+      "to": "dragon-pulse"
+    },
+    {
+      "from": "mach-punch",
+      "item": "dire-hit",
+      "to": "focus-punch"
+    },
+    {
+      "from": "sing",
+      "item": "silk-scarf",
+      "to": "hyper-voice"
+    },
+    {
+      "from": "stealth-rock",
+      "item": "pp-max",
+      "to": "rock-blast"
+    },
+    {
+      "from": "lick",
+      "item": "spell-tag",
+      "to": "astonish"
+    },
+    {
+      "from": "quick-attack",
+      "item": "silk-scarf",
+      "to": "double-edge"
+    },
+    {
+      "from": "stomp",
+      "item": "silk-scarf",
+      "to": "double-edge",
+      "line": "miltank"
+    },
+    {
+      "from": "harden",
+      "item": "x-defense",
+      "to": "iron-defense",
+      "line": "onix"
+    },
+    {
+      "from": "harden",
+      "item": "x-defense",
+      "to": "iron-defense",
+      "line": "aron"
+    },
+    {
+      "from": "charm",
+      "item": "x-defense",
+      "to": "play-rough",
+      "line": "jigglypuff"
+    },
+    {
+      "from": "disarming-voice",
+      "item": "x-sp-atk",
+      "to": "dazzling-gleam-jigglypuff",
+      "line": "jigglypuff"
+    },
+    {
+      "from": "counter",
+      "item": "black-belt",
+      "to": "revenge"
+    }
   ],
   "unique": [
-    { "from": "flamethrower", "item": "fire-stone", "to": "blast-burn", "line": "charmander" },
-    { "from": "flamethrower", "item": "hp-up", "to": "eruption", "line": "cyndaquil" },
-    { "from": "flamethrower", "item": "fire-stone", "to": "eruption", "line": "entei" },
-    { "from": "sleep-powder", "item": "miracle-seed", "to": "synthesis", "line": "chikorita" },
-    { "from": "synthesis", "item": "zoom-lens", "to": "solar-beam", "line": "chikorita" },
-    { "from": "scratch", "item": "black-glasses", "to": "bite", "line": "totodile" },
-    { "from": "tackle", "item": "dowsing-machine", "to": "pay-day", "line": "meowth" },
-    { "from": "bite", "item": "x-attack", "to": "crunch", "line": "totodile" },
-    { "from": "dark-pulse", "item": "black-glasses", "to": "snarl", "line": "houndour" },
-    { "from": "thunder-wave", "item": "x-sp-atk", "to": "discharge", "line": "mareep" },
-    { "from": "thunderbolt", "item": "x-sp-atk", "to": "zap-cannon", "line": "mareep" },
-    { "from": "fury-cutter", "item": "x-attack", "to": "megahorn", "line": "heracross" },
-    { "from": "ice-fang", "item": "hard-stone", "to": "icicle-crash", "line": "swinub" },
-    { "from": "hyper-voice", "item": "moon-stone", "to": "moonblast", "line": "cleffa" },
-    { "from": "air-slash", "item": "light-clay", "to": "dazzling-gleam", "line": "togepi" },
-    { "from": "flamethrower", "item": "fire-stone", "to": "fire-blast", "line": "houndour" },
-    { "from": "hydro-pump", "item": "dragon-scale", "to": "draco-meteor", "line": "horsea" },
-    { "from": "pound", "item": "black-belt", "to": "dynamic-punch", "line": "poliwag", "forms": ["poliwrath"], "levelCap": { "base": 8, "perConsumed": 0 } },
-    { "from": "air-slash", "item": "water-stone", "to": "aeroblast", "line": "lugia" },
-    { "from": "aerial-ace", "item": "fire-stone", "to": "sacred-fire", "line": "ho-oh" },
-    { "from": "air-slash", "item": "x-speed", "to": "hurricane", "line": "pidgey", "forms": ["pidgeot"] },
-    { "from": "poison-fang", "item": "razor-claw", "to": "cross-poison", "line": "zubat" },
-    { "from": "quick-attack", "item": "x-speed", "to": "extreme-speed", "line": "growlithe" },
-    { "from": "hydro-pump", "item": "water-stone", "to": "hydro-cannon", "line": "squirtle" },
-    { "from": "tackle", "item": "metronome", "to": "rapid-spin", "line": "staryu" },
-    { "from": "giga-drain", "item": "leaf-stone", "to": "frenzy-plant", "line": "bulbasaur" },
-    { "from": "giga-drain", "item": "wide-lens", "to": "petal-dance", "line": "oddish" },
-    { "from": "magical-leaf", "item": "miracle-seed", "to": "leaf-storm-celebi", "line": "celebi" },
-    { "from": "body-slam", "item": "hp-up", "to": "explosion", "line": "koffing" },
-    { "from": "rock-slide", "item": "moon-stone", "to": "stone-edge", "line": "onix" },
-    { "from": "rock-slide", "item": "soft-sand", "to": "stone-edge", "line": "larvitar" },
-    { "from": "body-slam", "item": "hard-stone", "to": "rollout", "line": "miltank" },
-    { "from": "thunderbolt", "item": "thunder-stone", "to": "thunder", "line": "raikou" },
-    { "from": "ice-beam", "item": "water-stone", "to": "sheer-cold", "line": "suicune" },
-    { "from": "psychic", "item": "kings-rock", "to": "future-sight-alakazam", "line": "slowpoke", "forms": ["slowking"] },
-    { "from": "earthquake", "item": "x-defense", "to": "fissure", "line": "rhyhorn" },
-    { "from": "psychic", "item": "quick-claw", "to": "future-sight-alakazam", "line": "abra" },
-    { "from": "quick-attack", "item": "light-ball", "to": "volt-tackle", "line": "pikachu", "minLevel": 51 },
-    { "from": "hyper-voice", "item": "metronome", "to": "perish-song", "line": "lapras" },
-    { "from": "blizzard", "item": "light-clay", "to": "sheer-cold", "line": "articuno" },
-    { "from": "focus-punch", "to": "dynamic-punch", "line": "machop", "forms": ["machamp"], "consumes": ["fire-punch", "thunder-punch"], "inheritLevels": true, "levelCap": { "base": 8, "perConsumed": 8 } },
-    { "from": "shadow-ball", "item": "light-clay", "to": "hex", "line": "gastly" },
-    { "from": "dragon-pulse", "item": "silk-scarf", "to": "hyper-beam", "line": "dratini" },
-    { "from": "psychic", "item": "x-sp-atk", "to": "psystrike", "line": "mewtwo" },
-    { "from": "thunderbolt", "item": "thunder-stone", "to": "zap-cannon", "line": "zapdos" },
-    { "from": "wing-attack", "item": "fire-stone", "to": "sky-attack", "line": "moltres" },
-    { "from": "mimic", "item": "moon-stone", "to": "metronome", "line": "mew" },
-    { "from": "swift", "item": "sharp-beak", "to": "tri-attack", "line": "doduo" },
-    { "from": "swift", "to": "tri-attack", "line": "porygon", "minLevel": 45 },
-    { "from": "thunderbolt", "item": "pp-max", "to": "thunder", "line": "pikachu", "forms": ["raichu"] },
-    { "from": "pound", "item": "x-attack", "to": "double-slap", "line": "jigglypuff" },
-    { "from": "slack-off", "item": "x-defense", "to": "amnesia", "line": "slowpoke" },
-    { "from": "body-slam", "item": "everstone", "to": "last-resort", "line": "eevee", "forms": ["eevee"], "consumes": ["swift", "quick-attack", "double-edge"], "inheritLevels": true, "levelCap": { "base": 8, "perConsumed": 8 } },
-    { "from": "body-slam", "item": "hp-up", "to": "giga-impact", "line": "snorlax" },
-    { "from": "fury-cutter", "item": "razor-claw", "to": "x-scissor", "line": "scyther" },
-    { "from": "slash", "item": "x-attack", "to": "swords-dance", "line": "scyther" },
-    { "from": "thunderbolt", "item": "zoom-lens", "to": "flash-cannon", "line": "magnemite" },
-    { "from": "leafage", "to": "leaf-blade", "line": "treecko", "needsMoves": [{ "move": "swords-dance" }] },
-    { "from": "slash", "item": "x-attack", "to": "swords-dance", "line": "treecko" },
-    { "from": "double-kick", "item": "black-belt", "to": "low-sweep", "line": "torchic" },
-    { "from": "low-sweep", "to": "close-combat", "line": "torchic", "needsMoves": [{ "move": "flare-blitz" }, { "move": "fire-punch" }], "consumes": ["fire-punch"] },
-    { "from": "bulk-up", "item": "charcoal", "to": "flare-blitz", "line": "torchic" },
-    { "from": "water-gun", "item": "mystic-water", "to": "water-pulse", "line": "mudkip" },
-    { "from": "water-pulse", "to": "muddy-water", "line": "mudkip", "needsMoves": [{ "move": "mud-shot", "level": 8 }] },
-    { "from": "mud-slap", "item": "soft-sand", "to": "mud-shot", "line": "mudkip" },
-    { "from": "arm-thrust", "item": "black-belt", "to": "force-palm", "line": "makuhita" },
-    { "from": "fake-out", "item": "silk-scarf", "to": "facade", "line": "makuhita" },
-    { "from": "force-palm", "to": "superpower", "line": "makuhita", "forms": ["hariyama"], "needsMoves": [{ "move": "facade", "level": 8 }], "runStat": { "stat": "pinch", "atLeast": 1 } },
-    { "from": "spark", "item": "magnet", "to": "thunder-fang", "line": "electrike" },
-    { "from": "thunderbolt", "to": "volt-switch", "line": "electrike", "forms": ["manectric"], "needsMoves": [{ "move": "double-edge", "level": 8 }], "itemLevel": { "item": "x-speed", "level": 5 } },
-    { "from": "ember", "item": "charcoal", "to": "lava-plume", "line": "numel" },
-    { "from": "lava-plume", "to": "eruption", "line": "numel", "forms": ["camerupt"], "needsMoves": [{ "move": "earthquake", "level": 8 }], "weather": ["sun"] },
-    { "from": "scratch", "item": "silk-scarf", "to": "slash", "line": "slakoth" },
-    { "from": "yawn", "item": "silk-scarf", "to": "thrash", "line": "slakoth" },
-    { "from": "slash", "to": "giga-impact", "line": "slakoth", "forms": ["slaking"], "needsMoves": [{ "move": "thrash", "level": 8 }], "minLevel": 45 },
-    { "from": "dragon-rage", "item": "dragon-fang", "to": "dragon-pulse", "line": "swablu" },
-    { "from": "wing-attack", "to": "brave-bird", "line": "swablu", "forms": ["altaria"], "needsMoves": [{ "move": "dragon-pulse", "level": 8 }], "minLevel": 45 },
-    { "from": "sucker-punch", "item": "razor-claw", "to": "night-slash", "line": "absol" },
-    { "from": "confusion", "item": "twisted-spoon", "to": "future-sight", "line": "absol" },
-    { "from": "night-slash", "to": "foul-play", "line": "absol", "needsMoves": [{ "move": "future-sight", "level": 8 }], "runStat": { "stat": "crits", "atLeast": 150 } },
-    { "from": "night-shade", "item": "spell-tag", "to": "shadow-ball", "line": "shuppet" },
-    { "from": "astonish", "to": "phantom-force", "line": "shuppet", "forms": ["banette"], "needsMoves": [{ "move": "shadow-ball", "level": 8 }] },
-    { "from": "water-gun", "item": "mystic-water", "to": "surf", "line": "spheal" },
-    { "from": "blizzard", "to": "sheer-cold", "line": "spheal", "forms": ["walrein"], "needsMoves": [{ "move": "surf", "level": 8 }], "weather": ["hail"] },
-    { "from": "dragon-rage", "item": "dragon-fang", "to": "dragon-pulse", "line": "bagon" },
-    { "from": "dragon-tail", "item": "dragon-fang", "to": "dragon-claw", "line": "bagon" },
-    { "from": "dragon-claw", "to": "outrage", "line": "bagon", "forms": ["salamence"], "needsMoves": [{ "move": "air-slash", "level": 8 }], "runStat": { "stat": "moxieMax", "atLeast": 1 } },
-    { "from": "water-gun", "item": "mystic-water", "to": "water-pulse", "line": "feebas" },
-    { "from": "water-gun", "item": "dragon-fang", "to": "dragon-pulse", "line": "feebas" },
-    { "from": "water-pulse", "to": "scald", "line": "feebas", "forms": ["milotic"], "needsMoves": [{ "move": "dragon-pulse", "level": 8 }], "weather": ["rain"] },
-    { "from": "metal-claw", "item": "metal-coat", "to": "iron-head", "line": "beldum" },
-    { "from": "confusion", "item": "twisted-spoon", "to": "psychic", "line": "beldum" },
-    { "from": "iron-head", "to": "meteor-mash", "line": "beldum", "forms": ["metagross"], "needsMoves": [{ "move": "psychic", "level": 8 }], "minLevel": 45 },
-    { "from": "confusion", "item": "twisted-spoon", "to": "psychic", "line": "ralts" },
-    { "from": "night-shade", "item": "spell-tag", "to": "shadow-ball", "line": "ralts" },
-    { "from": "psychic", "item": "moon-stone", "to": "future-sight-gardevoir", "line": "ralts", "forms": ["gardevoir"], "needsMoves": [{ "move": "shadow-ball", "level": 8 }] },
-    { "from": "sand-tomb", "item": "soft-sand", "to": "dig", "line": "trapinch" },
-    { "from": "dragon-breath", "item": "dragon-fang", "to": "dragon-pulse", "line": "trapinch" },
-    { "from": "dig", "to": "earthquake-hoenn", "line": "trapinch", "forms": ["flygon"], "needsMoves": [{ "move": "dragon-pulse", "level": 8 }], "weather": ["sandstorm"] },
-    { "from": "metal-claw", "item": "metal-coat", "to": "iron-head", "line": "aron" },
-    { "from": "rock-throw", "item": "hard-stone", "to": "rock-slide", "line": "aron" },
-    { "from": "iron-head", "to": "metal-burst", "line": "aron", "forms": ["aggron"], "needsMoves": [{ "move": "rock-slide", "level": 8 }], "runStat": { "stat": "sturdy", "atLeast": 1 } },
-    { "from": "bubble", "item": "mystic-water", "to": "bubble-beam", "line": "azurill" },
-    { "from": "tackle", "item": "silk-scarf", "to": "body-slam", "line": "azurill" },
-    { "from": "body-slam", "to": "aqua-tail-azumarill", "line": "azurill", "forms": ["azumarill"], "needsMoves": [{ "move": "bubble-beam", "level": 8 }] },
-    { "from": "mirror-coat", "item": "twisted-spoon", "to": "reflect", "line": "wynaut" },
-    { "from": "reflect", "to": "magic-coat", "line": "wynaut", "forms": ["wobbuffet"], "needsMoves": [{ "move": "revenge", "level": 8 }], "runStat": { "stat": "bossAoeHits", "atLeast": 10 } },
-    { "from": "mud-slap", "item": "soft-sand", "to": "mud-shot", "line": "barboach" },
-    { "from": "water-gun", "item": "mystic-water", "to": "water-pulse", "line": "barboach" },
-    { "from": "mud-shot", "to": "earth-power", "line": "barboach", "forms": ["whiscash"], "needsMoves": [{ "move": "water-pulse", "level": 8 }], "weather": ["rain"] },
-    { "from": "metal-claw", "item": "metal-coat", "to": "iron-head", "line": "mawile" },
-    { "from": "iron-head", "to": "metal-burst", "line": "mawile", "needsMoves": [{ "move": "fire-fang", "level": 8 }], "runStat": { "stat": "intimidateKills", "atLeast": 100 } }
+    {
+      "from": "flamethrower",
+      "item": "fire-stone",
+      "to": "blast-burn",
+      "line": "charmander"
+    },
+    {
+      "from": "flamethrower",
+      "item": "hp-up",
+      "to": "eruption",
+      "line": "cyndaquil"
+    },
+    {
+      "from": "flamethrower",
+      "item": "fire-stone",
+      "to": "eruption",
+      "line": "entei"
+    },
+    {
+      "from": "sleep-powder",
+      "item": "miracle-seed",
+      "to": "synthesis",
+      "line": "chikorita"
+    },
+    {
+      "from": "synthesis",
+      "item": "zoom-lens",
+      "to": "solar-beam",
+      "line": "chikorita"
+    },
+    {
+      "from": "scratch",
+      "item": "black-glasses",
+      "to": "bite",
+      "line": "totodile"
+    },
+    {
+      "from": "tackle",
+      "item": "dowsing-machine",
+      "to": "pay-day",
+      "line": "meowth"
+    },
+    {
+      "from": "bite",
+      "item": "x-attack",
+      "to": "crunch",
+      "line": "totodile"
+    },
+    {
+      "from": "dark-pulse",
+      "item": "black-glasses",
+      "to": "snarl",
+      "line": "houndour"
+    },
+    {
+      "from": "thunder-wave",
+      "item": "x-sp-atk",
+      "to": "discharge",
+      "line": "mareep"
+    },
+    {
+      "from": "thunderbolt",
+      "item": "x-sp-atk",
+      "to": "zap-cannon",
+      "line": "mareep"
+    },
+    {
+      "from": "fury-cutter",
+      "item": "x-attack",
+      "to": "megahorn",
+      "line": "heracross"
+    },
+    {
+      "from": "ice-fang",
+      "item": "hard-stone",
+      "to": "icicle-crash",
+      "line": "swinub"
+    },
+    {
+      "from": "hyper-voice",
+      "item": "moon-stone",
+      "to": "moonblast",
+      "line": "cleffa"
+    },
+    {
+      "from": "air-slash",
+      "item": "light-clay",
+      "to": "dazzling-gleam",
+      "line": "togepi"
+    },
+    {
+      "from": "flamethrower",
+      "item": "fire-stone",
+      "to": "fire-blast",
+      "line": "houndour"
+    },
+    {
+      "from": "hydro-pump",
+      "item": "dragon-scale",
+      "to": "draco-meteor",
+      "line": "horsea"
+    },
+    {
+      "from": "pound",
+      "item": "black-belt",
+      "to": "dynamic-punch",
+      "line": "poliwag",
+      "forms": [
+        "poliwrath"
+      ],
+      "levelCap": {
+        "base": 8,
+        "perConsumed": 0
+      }
+    },
+    {
+      "from": "air-slash",
+      "item": "water-stone",
+      "to": "aeroblast",
+      "line": "lugia"
+    },
+    {
+      "from": "aerial-ace",
+      "item": "fire-stone",
+      "to": "sacred-fire",
+      "line": "ho-oh"
+    },
+    {
+      "from": "air-slash",
+      "item": "x-speed",
+      "to": "hurricane",
+      "line": "pidgey",
+      "forms": [
+        "pidgeot"
+      ]
+    },
+    {
+      "from": "poison-fang",
+      "item": "razor-claw",
+      "to": "cross-poison",
+      "line": "zubat"
+    },
+    {
+      "from": "quick-attack",
+      "item": "x-speed",
+      "to": "extreme-speed",
+      "line": "growlithe"
+    },
+    {
+      "from": "hydro-pump",
+      "item": "water-stone",
+      "to": "hydro-cannon",
+      "line": "squirtle"
+    },
+    {
+      "from": "tackle",
+      "item": "metronome",
+      "to": "rapid-spin",
+      "line": "staryu"
+    },
+    {
+      "from": "giga-drain",
+      "item": "leaf-stone",
+      "to": "frenzy-plant",
+      "line": "bulbasaur"
+    },
+    {
+      "from": "giga-drain",
+      "item": "wide-lens",
+      "to": "petal-dance",
+      "line": "oddish"
+    },
+    {
+      "from": "magical-leaf",
+      "item": "miracle-seed",
+      "to": "leaf-storm-celebi",
+      "line": "celebi"
+    },
+    {
+      "from": "body-slam",
+      "item": "hp-up",
+      "to": "explosion",
+      "line": "koffing"
+    },
+    {
+      "from": "rock-slide",
+      "item": "moon-stone",
+      "to": "stone-edge",
+      "line": "onix"
+    },
+    {
+      "from": "rock-slide",
+      "item": "soft-sand",
+      "to": "stone-edge",
+      "line": "larvitar"
+    },
+    {
+      "from": "body-slam",
+      "item": "hard-stone",
+      "to": "rollout",
+      "line": "miltank"
+    },
+    {
+      "from": "thunderbolt",
+      "item": "thunder-stone",
+      "to": "thunder",
+      "line": "raikou"
+    },
+    {
+      "from": "ice-beam",
+      "item": "water-stone",
+      "to": "sheer-cold",
+      "line": "suicune"
+    },
+    {
+      "from": "psychic",
+      "item": "kings-rock",
+      "to": "future-sight-alakazam",
+      "line": "slowpoke",
+      "forms": [
+        "slowking"
+      ]
+    },
+    {
+      "from": "earthquake",
+      "item": "x-defense",
+      "to": "fissure",
+      "line": "rhyhorn"
+    },
+    {
+      "from": "psychic",
+      "item": "quick-claw",
+      "to": "future-sight-alakazam",
+      "line": "abra"
+    },
+    {
+      "from": "quick-attack",
+      "item": "light-ball",
+      "to": "volt-tackle",
+      "line": "pikachu",
+      "minLevel": 51
+    },
+    {
+      "from": "hyper-voice",
+      "item": "metronome",
+      "to": "perish-song",
+      "line": "lapras"
+    },
+    {
+      "from": "blizzard",
+      "item": "light-clay",
+      "to": "sheer-cold",
+      "line": "articuno"
+    },
+    {
+      "from": "focus-punch",
+      "to": "dynamic-punch",
+      "line": "machop",
+      "forms": [
+        "machamp"
+      ],
+      "consumes": [
+        "fire-punch",
+        "thunder-punch"
+      ],
+      "inheritLevels": true,
+      "levelCap": {
+        "base": 8,
+        "perConsumed": 8
+      }
+    },
+    {
+      "from": "shadow-ball",
+      "item": "light-clay",
+      "to": "hex",
+      "line": "gastly"
+    },
+    {
+      "from": "dragon-pulse",
+      "item": "silk-scarf",
+      "to": "hyper-beam",
+      "line": "dratini"
+    },
+    {
+      "from": "psychic",
+      "item": "x-sp-atk",
+      "to": "psystrike",
+      "line": "mewtwo"
+    },
+    {
+      "from": "thunderbolt",
+      "item": "thunder-stone",
+      "to": "zap-cannon",
+      "line": "zapdos"
+    },
+    {
+      "from": "wing-attack",
+      "item": "fire-stone",
+      "to": "sky-attack",
+      "line": "moltres"
+    },
+    {
+      "from": "mimic",
+      "item": "moon-stone",
+      "to": "metronome",
+      "line": "mew"
+    },
+    {
+      "from": "swift",
+      "item": "sharp-beak",
+      "to": "tri-attack",
+      "line": "doduo"
+    },
+    {
+      "from": "swift",
+      "to": "tri-attack",
+      "line": "porygon",
+      "minLevel": 45
+    },
+    {
+      "from": "thunderbolt",
+      "item": "pp-max",
+      "to": "thunder",
+      "line": "pikachu",
+      "forms": [
+        "raichu"
+      ]
+    },
+    {
+      "from": "pound",
+      "item": "x-attack",
+      "to": "double-slap",
+      "line": "jigglypuff"
+    },
+    {
+      "from": "slack-off",
+      "item": "x-defense",
+      "to": "amnesia",
+      "line": "slowpoke"
+    },
+    {
+      "from": "body-slam",
+      "item": "everstone",
+      "to": "last-resort",
+      "line": "eevee",
+      "forms": [
+        "eevee"
+      ],
+      "consumes": [
+        "swift",
+        "quick-attack",
+        "double-edge"
+      ],
+      "inheritLevels": true,
+      "levelCap": {
+        "base": 8,
+        "perConsumed": 8
+      }
+    },
+    {
+      "from": "body-slam",
+      "item": "hp-up",
+      "to": "giga-impact",
+      "line": "snorlax"
+    },
+    {
+      "from": "fury-cutter",
+      "item": "razor-claw",
+      "to": "x-scissor",
+      "line": "scyther"
+    },
+    {
+      "from": "slash",
+      "item": "x-attack",
+      "to": "swords-dance",
+      "line": "scyther"
+    },
+    {
+      "from": "thunderbolt",
+      "item": "zoom-lens",
+      "to": "flash-cannon",
+      "line": "magnemite"
+    },
+    {
+      "from": "leafage",
+      "to": "leaf-blade",
+      "line": "treecko",
+      "needsMoves": [
+        {
+          "move": "swords-dance"
+        }
+      ]
+    },
+    {
+      "from": "slash",
+      "item": "x-attack",
+      "to": "swords-dance",
+      "line": "treecko"
+    },
+    {
+      "from": "double-kick",
+      "item": "black-belt",
+      "to": "low-sweep",
+      "line": "torchic"
+    },
+    {
+      "from": "low-sweep",
+      "to": "close-combat",
+      "line": "torchic",
+      "needsMoves": [
+        {
+          "move": "flare-blitz"
+        },
+        {
+          "move": "fire-punch"
+        }
+      ],
+      "consumes": [
+        "fire-punch"
+      ]
+    },
+    {
+      "from": "bulk-up",
+      "item": "charcoal",
+      "to": "flare-blitz",
+      "line": "torchic"
+    },
+    {
+      "from": "water-gun",
+      "item": "mystic-water",
+      "to": "water-pulse",
+      "line": "mudkip"
+    },
+    {
+      "from": "water-pulse",
+      "to": "muddy-water",
+      "line": "mudkip",
+      "needsMoves": [
+        {
+          "move": "mud-shot",
+          "level": 8
+        }
+      ]
+    },
+    {
+      "from": "mud-slap",
+      "item": "soft-sand",
+      "to": "mud-shot",
+      "line": "mudkip"
+    },
+    {
+      "from": "arm-thrust",
+      "item": "black-belt",
+      "to": "force-palm",
+      "line": "makuhita"
+    },
+    {
+      "from": "fake-out",
+      "item": "silk-scarf",
+      "to": "facade",
+      "line": "makuhita"
+    },
+    {
+      "from": "force-palm",
+      "to": "superpower",
+      "line": "makuhita",
+      "forms": [
+        "hariyama"
+      ],
+      "needsMoves": [
+        {
+          "move": "facade",
+          "level": 8
+        }
+      ],
+      "runStat": {
+        "stat": "pinch",
+        "atLeast": 1
+      }
+    },
+    {
+      "from": "spark",
+      "item": "magnet",
+      "to": "thunder-fang",
+      "line": "electrike"
+    },
+    {
+      "from": "thunderbolt",
+      "to": "volt-switch",
+      "line": "electrike",
+      "forms": [
+        "manectric"
+      ],
+      "needsMoves": [
+        {
+          "move": "double-edge",
+          "level": 8
+        }
+      ],
+      "itemLevel": {
+        "item": "x-speed",
+        "level": 5
+      }
+    },
+    {
+      "from": "ember",
+      "item": "charcoal",
+      "to": "lava-plume",
+      "line": "numel"
+    },
+    {
+      "from": "lava-plume",
+      "to": "eruption",
+      "line": "numel",
+      "forms": [
+        "camerupt"
+      ],
+      "needsMoves": [
+        {
+          "move": "earthquake",
+          "level": 8
+        }
+      ],
+      "weather": [
+        "sun"
+      ]
+    },
+    {
+      "from": "scratch",
+      "item": "silk-scarf",
+      "to": "slash",
+      "line": "slakoth"
+    },
+    {
+      "from": "yawn",
+      "item": "silk-scarf",
+      "to": "thrash",
+      "line": "slakoth"
+    },
+    {
+      "from": "slash",
+      "to": "giga-impact",
+      "line": "slakoth",
+      "forms": [
+        "slaking"
+      ],
+      "needsMoves": [
+        {
+          "move": "thrash",
+          "level": 8
+        }
+      ],
+      "minLevel": 45
+    },
+    {
+      "from": "dragon-rage",
+      "item": "dragon-fang",
+      "to": "dragon-pulse",
+      "line": "swablu"
+    },
+    {
+      "from": "wing-attack",
+      "to": "brave-bird",
+      "line": "swablu",
+      "forms": [
+        "altaria"
+      ],
+      "needsMoves": [
+        {
+          "move": "dragon-pulse",
+          "level": 8
+        }
+      ],
+      "minLevel": 45
+    },
+    {
+      "from": "sucker-punch",
+      "item": "razor-claw",
+      "to": "night-slash",
+      "line": "absol"
+    },
+    {
+      "from": "confusion",
+      "item": "twisted-spoon",
+      "to": "future-sight",
+      "line": "absol"
+    },
+    {
+      "from": "night-slash",
+      "to": "foul-play",
+      "line": "absol",
+      "needsMoves": [
+        {
+          "move": "future-sight",
+          "level": 8
+        }
+      ],
+      "runStat": {
+        "stat": "crits",
+        "atLeast": 150
+      }
+    },
+    {
+      "from": "night-shade",
+      "item": "spell-tag",
+      "to": "shadow-ball",
+      "line": "shuppet"
+    },
+    {
+      "from": "astonish",
+      "to": "phantom-force",
+      "line": "shuppet",
+      "forms": [
+        "banette"
+      ],
+      "needsMoves": [
+        {
+          "move": "shadow-ball",
+          "level": 8
+        }
+      ]
+    },
+    {
+      "from": "water-gun",
+      "item": "mystic-water",
+      "to": "surf",
+      "line": "spheal"
+    },
+    {
+      "from": "blizzard",
+      "to": "sheer-cold",
+      "line": "spheal",
+      "forms": [
+        "walrein"
+      ],
+      "needsMoves": [
+        {
+          "move": "surf",
+          "level": 8
+        }
+      ],
+      "weather": [
+        "hail"
+      ]
+    },
+    {
+      "from": "dragon-rage",
+      "item": "dragon-fang",
+      "to": "dragon-pulse",
+      "line": "bagon"
+    },
+    {
+      "from": "dragon-tail",
+      "item": "dragon-fang",
+      "to": "dragon-claw",
+      "line": "bagon"
+    },
+    {
+      "from": "dragon-claw",
+      "to": "outrage",
+      "line": "bagon",
+      "forms": [
+        "salamence"
+      ],
+      "needsMoves": [
+        {
+          "move": "air-slash",
+          "level": 8
+        }
+      ],
+      "runStat": {
+        "stat": "moxieMax",
+        "atLeast": 1
+      }
+    },
+    {
+      "from": "water-gun",
+      "item": "mystic-water",
+      "to": "water-pulse",
+      "line": "feebas"
+    },
+    {
+      "from": "water-gun",
+      "item": "dragon-fang",
+      "to": "dragon-pulse",
+      "line": "feebas"
+    },
+    {
+      "from": "water-pulse",
+      "to": "scald",
+      "line": "feebas",
+      "forms": [
+        "milotic"
+      ],
+      "needsMoves": [
+        {
+          "move": "dragon-pulse",
+          "level": 8
+        }
+      ],
+      "weather": [
+        "rain"
+      ]
+    },
+    {
+      "from": "metal-claw",
+      "item": "metal-coat",
+      "to": "iron-head",
+      "line": "beldum"
+    },
+    {
+      "from": "confusion",
+      "item": "twisted-spoon",
+      "to": "psychic",
+      "line": "beldum"
+    },
+    {
+      "from": "iron-head",
+      "to": "meteor-mash",
+      "line": "beldum",
+      "forms": [
+        "metagross"
+      ],
+      "needsMoves": [
+        {
+          "move": "psychic",
+          "level": 8
+        }
+      ],
+      "minLevel": 45
+    },
+    {
+      "from": "confusion",
+      "item": "twisted-spoon",
+      "to": "psychic",
+      "line": "ralts"
+    },
+    {
+      "from": "night-shade",
+      "item": "spell-tag",
+      "to": "shadow-ball",
+      "line": "ralts"
+    },
+    {
+      "from": "psychic",
+      "item": "moon-stone",
+      "to": "future-sight-gardevoir",
+      "line": "ralts",
+      "forms": [
+        "gardevoir"
+      ],
+      "needsMoves": [
+        {
+          "move": "shadow-ball",
+          "level": 8
+        }
+      ]
+    },
+    {
+      "from": "sand-tomb",
+      "item": "soft-sand",
+      "to": "dig",
+      "line": "trapinch"
+    },
+    {
+      "from": "dragon-breath",
+      "item": "dragon-fang",
+      "to": "dragon-pulse",
+      "line": "trapinch"
+    },
+    {
+      "from": "dig",
+      "to": "earthquake-hoenn",
+      "line": "trapinch",
+      "forms": [
+        "flygon"
+      ],
+      "needsMoves": [
+        {
+          "move": "dragon-pulse",
+          "level": 8
+        }
+      ],
+      "weather": [
+        "sandstorm"
+      ]
+    },
+    {
+      "from": "metal-claw",
+      "item": "metal-coat",
+      "to": "iron-head",
+      "line": "aron"
+    },
+    {
+      "from": "rock-throw",
+      "item": "hard-stone",
+      "to": "rock-slide",
+      "line": "aron"
+    },
+    {
+      "from": "iron-head",
+      "to": "metal-burst",
+      "line": "aron",
+      "forms": [
+        "aggron"
+      ],
+      "needsMoves": [
+        {
+          "move": "rock-slide",
+          "level": 8
+        }
+      ],
+      "runStat": {
+        "stat": "sturdy",
+        "atLeast": 1
+      }
+    },
+    {
+      "from": "bubble",
+      "item": "mystic-water",
+      "to": "bubble-beam",
+      "line": "azurill"
+    },
+    {
+      "from": "tackle",
+      "item": "silk-scarf",
+      "to": "body-slam",
+      "line": "azurill"
+    },
+    {
+      "from": "body-slam",
+      "to": "aqua-tail-azumarill",
+      "line": "azurill",
+      "forms": [
+        "azumarill"
+      ],
+      "needsMoves": [
+        {
+          "move": "bubble-beam",
+          "level": 8
+        }
+      ]
+    },
+    {
+      "from": "mirror-coat",
+      "item": "twisted-spoon",
+      "to": "reflect",
+      "line": "wynaut"
+    },
+    {
+      "from": "reflect",
+      "to": "magic-coat",
+      "line": "wynaut",
+      "forms": [
+        "wobbuffet"
+      ],
+      "needsMoves": [
+        {
+          "move": "revenge",
+          "level": 8
+        }
+      ],
+      "runStat": {
+        "stat": "bossAoeHits",
+        "atLeast": 10
+      }
+    },
+    {
+      "from": "mud-slap",
+      "item": "soft-sand",
+      "to": "mud-shot",
+      "line": "barboach"
+    },
+    {
+      "from": "water-gun",
+      "item": "mystic-water",
+      "to": "water-pulse",
+      "line": "barboach"
+    },
+    {
+      "from": "mud-shot",
+      "to": "earth-power",
+      "line": "barboach",
+      "forms": [
+        "whiscash"
+      ],
+      "needsMoves": [
+        {
+          "move": "water-pulse",
+          "level": 8
+        }
+      ],
+      "weather": [
+        "rain"
+      ]
+    },
+    {
+      "from": "metal-claw",
+      "item": "metal-coat",
+      "to": "iron-head",
+      "line": "mawile"
+    },
+    {
+      "from": "iron-head",
+      "to": "metal-burst",
+      "line": "mawile",
+      "needsMoves": [
+        {
+          "move": "fire-fang",
+          "level": 8
+        }
+      ],
+      "runStat": {
+        "stat": "intimidateKills",
+        "atLeast": 100
+      }
+    },
+    {
+      "from": "dragon-pulse",
+      "item": "silk-scarf",
+      "to": "hyper-beam",
+      "line": "bagon"
+    },
+    {
+      "from": "air-slash",
+      "item": "dragon-fang",
+      "to": "outrage",
+      "line": "dratini"
+    }
   ]
 }

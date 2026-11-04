@@ -2623,24 +2623,12 @@
     },
     "outrage": {
       "extends": "dragon.base",
-      "projectile": {
-        "glowScale": 1.1,
-        "coreScale": 0.2,
-        "glowColor": "#ab47bc"
-      },
-      "impact": {
-        "flash": {
-          "color": "#ce93d8",
-          "radius": 24,
-          "durationMs": 100,
-          "alpha": 0.5
-        }
-      },
-      "sprite": {
-        "id": "rage-claw",
-        "fit": "circle",
-        "size": 1.4,
-        "rotate": "velocity"
+      "hideShape": true,
+      "chargeGlow": {
+        "color": "#ff1744",
+        "seconds": 0.5,
+        "radius": 44,
+        "alpha": 0.75
       }
     },
     "dragon-rage": {
@@ -3715,7 +3703,8 @@
         "id": "plume-smoke",
         "fit": "circle",
         "size": 1.4
-      }
+      },
+      "drawOnFloor": true
     },
     "morning-sun": {
       "extends": "grass.base",
@@ -4745,14 +4734,7 @@
     },
     "aqua-tail": {
       "extends": "water.base",
-      "projectile": {
-        "shapeAlpha": 0.25
-      },
-      "sprite": {
-        "id": "tail-swipe",
-        "fit": "front",
-        "size": 1
-      }
+      "hideShape": true
     },
     "metal-claw": {
       "extends": "steel.base",
@@ -4863,52 +4845,46 @@
     },
     "dragon-claw": {
       "extends": "dragon.base",
-      "projectile": {
-        "shapeAlpha": 0.15
-      },
+      "hideShape": true,
       "impact": {
         "flash": {
           "color": "#b2ebf2",
-          "radius": 36,
+          "radius": 30,
           "durationMs": 120,
-          "alpha": 0.6
+          "alpha": 0.5
         }
       },
       "sprite": {
-        "id": "dragon-claw-slash",
+        "id": "dragon-claw-marks",
         "fit": "front",
-        "size": 1.1,
-        "along": 0.5,
-        "afterimages": 3,
-        "afterimageGap": 1
+        "size": 1.05,
+        "along": 0.5
       }
     },
     "metal-burst": {
       "extends": "steel.base",
       "hideShape": true,
       "projectile": {
-        "glowScale": 0.3,
-        "coreScale": 0.1
+        "glowScale": 0.5,
+        "coreScale": 0
+      },
+      "clap": {
+        "seconds": 0,
+        "distance": 0
       },
       "impact": {
         "flash": {
           "color": "#eceff1",
-          "radius": 40,
-          "durationMs": 140,
-          "alpha": 0.6
+          "radius": 26,
+          "durationMs": 120,
+          "alpha": 0.5
         }
       },
       "sprite": {
-        "id": "steel-armor-ring",
+        "id": "metal-shard",
         "fit": "circle",
-        "size": 1.15,
-        "rotate": "spin",
-        "spinDegPerSec": 60
-      },
-      "effectRingSprite": {
-        "id": "metal-burst-shards",
-        "fit": "ring",
-        "size": 1
+        "size": 1.7,
+        "rotate": "velocity"
       }
     },
     "mirror-coat": {
@@ -5185,25 +5161,48 @@
     },
     "aqua-tail-slam": {
       "extends": "water.base",
-      "projectile": {
-        "shapeAlpha": 0.25
-      },
+      "hideShape": true,
       "impact": {
+        "burst": {
+          "count": 10,
+          "colors": [
+            "#ffffff",
+            "#b3e5fc",
+            "#4fc3f7",
+            "#0288d1"
+          ],
+          "lifespanMs": [
+            220,
+            420
+          ],
+          "speed": [
+            60,
+            200
+          ],
+          "scale": [
+            0.6,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 4,
+          "blend": "add"
+        },
         "flash": {
-          "radius": 30
+          "color": "#b3e5fc",
+          "radius": 34,
+          "durationMs": 140,
+          "alpha": 0.5
         }
       },
       "sprite": {
-        "id": "tail-slam",
+        "id": "aqua-tail-splash",
         "fit": "front",
         "size": 1,
         "along": 0.5
-      },
-      "chargeGlow": {
-        "color": "#4fc3f7",
-        "seconds": 0.25,
-        "radius": 50,
-        "alpha": 1
       }
     },
     "scald": {
@@ -6313,43 +6312,23 @@
     },
     "dazzling-gleam": {
       "extends": "fairy.base",
+      "hideShape": true,
+      "impact": {
+        "flash": {
+          "color": "#fce4ec",
+          "radius": 30,
+          "durationMs": 220,
+          "alpha": 0.3
+        }
+      },
+      "sprite": {
+        "id": "gleam-burst-grand",
+        "fit": "circle",
+        "size": 1.15
+      },
       "projectile": {
-        "shapeAlpha": 0.55,
-        "glowColor": "#fce4ec"
-      },
-      "screenFlash": {
-        "color": "#fff0f7",
-        "alpha": 0.1,
-        "durationMs": 140
-      },
-      "trail": {
-        "intervalMs": 24,
-        "colors": [
-          "#ffffff",
-          "#fce4ec",
-          "#f8bbd0",
-          "#b3e5fc"
-        ],
-        "lifespanMs": [
-          240,
-          480
-        ],
-        "speed": [
-          20,
-          70
-        ],
-        "scale": [
-          0.22,
-          0
-        ],
-        "alpha": [
-          1,
-          0
-        ],
-        "gravityY": 0,
-        "spread": 4,
-        "blend": "add",
-        "outward": true
+        "glowScale": 0,
+        "coreScale": 0
       }
     },
     "fire-blast": {
@@ -6632,10 +6611,10 @@
           "blend": "add"
         },
         "flash": {
-          "color": "#ffffff",
-          "radius": 1,
-          "durationMs": 1,
-          "alpha": 0
+          "color": "#fffde7",
+          "radius": 30,
+          "durationMs": 140,
+          "alpha": 0.5
         }
       },
       "trail": {
@@ -6710,6 +6689,154 @@
         "id": "slam-crater",
         "fit": "circle",
         "size": 1.3
+      }
+    },
+    "aqua-tail-cw": {
+      "extends": "water.base",
+      "hideShape": true,
+      "impact": {
+        "burst": {
+          "count": 10,
+          "colors": [
+            "#ffffff",
+            "#b3e5fc",
+            "#4fc3f7",
+            "#0288d1"
+          ],
+          "lifespanMs": [
+            220,
+            420
+          ],
+          "speed": [
+            60,
+            200
+          ],
+          "scale": [
+            0.6,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 4,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#b3e5fc",
+          "radius": 26,
+          "durationMs": 120,
+          "alpha": 0.4
+        }
+      },
+      "sprite": {
+        "id": "aqua-tail-swing-cw",
+        "fit": "front",
+        "size": 1,
+        "along": 0.5,
+        "afterimages": 3,
+        "afterimageGap": 1
+      }
+    },
+    "aqua-tail-ccw": {
+      "extends": "water.base",
+      "hideShape": true,
+      "impact": {
+        "burst": {
+          "count": 10,
+          "colors": [
+            "#ffffff",
+            "#b3e5fc",
+            "#4fc3f7",
+            "#0288d1"
+          ],
+          "lifespanMs": [
+            220,
+            420
+          ],
+          "speed": [
+            60,
+            200
+          ],
+          "scale": [
+            0.6,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 4,
+          "blend": "add"
+        },
+        "flash": {
+          "color": "#b3e5fc",
+          "radius": 26,
+          "durationMs": 120,
+          "alpha": 0.4
+        }
+      },
+      "sprite": {
+        "id": "aqua-tail-swing-ccw",
+        "fit": "front",
+        "size": 1,
+        "along": 0.5,
+        "afterimages": 3,
+        "afterimageGap": 1
+      }
+    },
+    "aqua-tail-flip": {
+      "extends": "water.base",
+      "hideShape": true,
+      "sprite": {
+        "id": "aqua-tail-flip",
+        "fit": "front",
+        "size": 1,
+        "along": 0.45
+      }
+    },
+    "outrage-hit": {
+      "extends": "dragon.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "flash": {
+          "color": "#ff5252",
+          "radius": 30,
+          "durationMs": 110,
+          "alpha": 0.45
+        }
+      },
+      "sprite": {
+        "id": "rage-slash",
+        "fit": "circle",
+        "size": 1.25
+      }
+    },
+    "outrage-last": {
+      "extends": "dragon.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "flash": {
+          "color": "#ff5252",
+          "radius": 30,
+          "durationMs": 110,
+          "alpha": 0.45
+        }
+      },
+      "sprite": {
+        "id": "rage-slash",
+        "fit": "circle",
+        "size": 1.25
       }
     }
   }

@@ -46,7 +46,7 @@ describe('ミルタンク', () => {
     expect(t.sim.world.enemies.hp[0]).toBe(1000);
   });
 
-  it('モーモーミルクを拾うと 最大 HP の 15% 回復する', () => {
+  it('モーモーミルクを拾うと 最大 HP の 10% 回復する（07 の184章）', () => {
     const t = setup('miltank');
     t.p.moves = t.p.moves.filter((m) => m.move === t.move('milk-drink'));
     for (let k = 0; k < 60 && !t.sim.world.items.length; k++) t.sim.step([]);
@@ -55,7 +55,7 @@ describe('ミルタンク', () => {
     t.p.x = it.x;
     t.p.y = it.y;
     t.sim.step([]);
-    expect(t.p.hp).toBeCloseTo(t.p.maxHp * 0.65, 0);
+    expect(t.p.hp).toBeCloseTo(t.p.maxHp * 0.6, 0);
   });
 
   it('すてみタックル: 使うたびに HP を使う（反動）。まるくなる で防御が上がると反動も減る', () => {

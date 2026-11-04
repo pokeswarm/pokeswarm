@@ -320,6 +320,7 @@ export interface DashStartedEvent {
   readonly seconds: number;
   readonly hop: number;
   readonly afterimages: number;
+  readonly tint?: string;
   readonly dirX: number;
   readonly dirY: number;
   readonly distance: number;
@@ -333,6 +334,8 @@ export interface BodyAttackEvent {
   readonly dirY: number;
   readonly distance: number;
   readonly afterimages: number;
+  /** 体を前へ 1 回転させる（アクアテールの前転） */
+  readonly flip?: boolean;
 }
 
 /** 次の区間へ進んだ（中ボスを倒した、または区間の時間がたった） */

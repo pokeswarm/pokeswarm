@@ -46,8 +46,8 @@ describe('ドラゴン', () => {
     b.sim.step([]);
     expect(b.find((i) => b.pr.move[i] === b.m && b.pr.shape[i] === SHAPE_SECTOR)).toHaveLength(1);
     const c = setup('dragon-claw');
-    expect(c.rules.moves[c.m]!.pattern).toBe('sweep');
-    expect(c.rules.moves[c.m]!.sweepOnce).toBe(true);
+    // ドラゴンクロー は 07 の184章で、前を引き裂く 1 撃になった
+    expect(c.rules.moves[c.m]!.pattern).toBe('melee');
     c.sim.step([]);
     expect(c.find((i) => c.pr.move[i] === c.m && c.pr.shape[i] === SHAPE_SECTOR)).toHaveLength(1);
     const p = setup('dragon-pulse');
@@ -64,8 +64,8 @@ describe('ドラゴン', () => {
     const tw = t.find((i) => t.pr.move[i] === t.m);
     expect(tw).toHaveLength(1);
     expect(Math.hypot(t.pr.vx[tw[0]!]!, t.pr.vy[tw[0]!]!)).toBeCloseTo(90, 0);
+    // げきりん は 07 の184章で、次々に飛びかかる連続技になった
     const o = setup('outrage');
-    expect(o.rules.moves[o.m]!.levels[0]!.arcDegrees).toBe(360);
-    expect(o.rules.moves[o.m]!.barrageWidth).toBeUndefined();
+    expect(o.rules.moves[o.m]!.pattern).toBe('sequence');
   });
 });

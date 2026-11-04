@@ -5795,6 +5795,14 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'rough-cloud': () => roughCloud(),
     'voice-heart': () => voiceHeart(),
     'gleam-burst': () => gleamBurst(),
+    'aqua-tail-swing-cw': () => aquaTailSwing(false),
+    'aqua-tail-swing-ccw': () => aquaTailSwing(true),
+    'aqua-tail-flip': () => aquaTailFlip(),
+    'aqua-tail-splash': () => aquaTailSplash(),
+    'dragon-claw-marks': () => dragonClawMarks(),
+    'rage-slash': () => rageSlash(),
+    'metal-shard': () => metalShard(),
+    'gleam-burst-grand': () => gleamBurstGrand(),
     // 175章
     'revenge-swing': () => revengeSwing(),
     'sacred-orb': () => sacredOrb(),
@@ -6546,6 +6554,243 @@ function perishNote(): SpriteOut {
     return outline(g, 0);
   });
   return { palette, frameMs: 260, parts: { main: frames.map(toRows) } };
+}
+
+/** アクアテール: マリルリの尻尾（ぎざぎざの細い尾の先に青い玉）の部品。(bx, 0) に半径 br の玉、そこまでぎざぎざの線 */
+function marillTail(u: number, v: number, bx: number, br: number): number {
+  const d = Math.hypot(u - bx, v);
+  if (d < br) {
+    if (Math.hypot(u - bx + br * 0.32, v + br * 0.36) < br * 0.26) return 5;
+    if (d > br * 0.84) return 0;
+    return u - bx + v > br * 0.35 ? 2 : u - bx + v < -br * 0.45 ? 4 : 3;
+  }
+  if (u > -1 && u < bx - br * 0.8) {
+    const ph = ((u + 1) / 0.32) % 2;
+    const center = (Math.abs(ph - 1) * 2 - 1) * 0.12;
+    if (Math.abs(v - center) < 0.05) return 1;
+  }
+  return -1;
+}
+
+/** アクアテール: 尻尾でなぎ払う（玉の後ろに水の弧としぶきが残る）。mirror で反対回り。3 コマ */
+function aquaTailSwing(mirror: boolean): SpriteOut {
+  // 0 輪郭・1 尾の紺・2 玉の濃い青・3 玉の青・4 玉の明るい青・5 白・6 水
+  const palette = ['#0a1f44', '#1a237e', '#1565c0', '#42a5f5', '#bbdefb', '#ffffff', '#4fc3f7'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(40, (u, v0) => {
+      const v = mirror ? -v0 : v0;
+      const t = marillTail(u, v, 0.6, 0.32);
+      if (t >= 0) return t;
+      // 玉が通った後の水の弧（尾の付け根を中心にした円の一部）
+      const r = Math.hypot(u + 1, v);
+      const a = Math.atan2(v, u + 1);
+      if (a < -0.14 && a > -0.75) {
+        const k = (-a - 0.14) / 0.61;
+        const w = 0.17 * (1 - k) + 0.015;
+        if (Math.abs(r - 1.6) < w) {
+          // 後ろほどちぎれて水滴になる
+          if (k > 0.45 && Math.sin(a * 34 + f * 1.6) < -0.1) return -1;
+          return Math.abs(r - 1.6) < w * 0.4 ? 5 : 6;
+        }
+      }
+      // 飛び散るしぶき
+      for (let k = 0; k < 5; k++) {
+        const sx = 0.72 - k * 0.27 - f * 0.05;
+        const sy = -0.45 - ((k * 37) % 5) * 0.08 - f * 0.05;
+        if (Math.hypot(u - sx, v - sy) < 0.045 - k * 0.003) return k % 2 === 0 ? 6 : 4;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** アクアテール: 前転で尻尾が頭の上を越える（玉が後ろから前へ、近づいて大きく見える）。4 コマ */
+function aquaTailFlip(): SpriteOut {
+  const palette = ['#0a1f44', '#1a237e', '#1565c0', '#42a5f5', '#bbdefb', '#ffffff', '#4fc3f7'];
+  const bx = [-0.5, -0.1, 0.25, 0.5];
+  const br = [0.24, 0.42, 0.52, 0.42];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(40, (u, v) => {
+      const t = marillTail(u, v, bx[f]!, br[f]!);
+      if (t >= 0) return t;
+      // 玉の後ろにこぼれる水
+      for (let k = 0; k < 4; k++) {
+        const sx = bx[f]! - 0.22 - k * 0.2;
+        const sy = (k % 2 === 0 ? 1 : -1) * (0.26 + k * 0.1);
+        if (Math.hypot(u - sx, v - sy) < 0.05) return 6;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 55, parts: { main: frames.map(toRows) } };
+}
+
+/** アクアテール: 尻尾を地面に叩きつける（玉がつぶれ、水の輪と水柱のしぶきが広がる）。4 コマ */
+function aquaTailSplash(): SpriteOut {
+  const palette = ['#0a1f44', '#1a237e', '#1565c0', '#42a5f5', '#bbdefb', '#ffffff', '#4fc3f7'];
+  const cx = 0.32;
+  const drops = Array.from({ length: 12 }, (_, k) => ({ a: k * 0.5236 + (k % 2) * 0.18, s: 0.8 + ((k * 7) % 5) * 0.12 }));
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(44, (u, v) => {
+      // 地面に当たった水の輪
+      const d = Math.hypot(u - cx, (v) * 1.05);
+      const ring = [0.28, 0.42, 0.56, 0.66][f]!;
+      const thick = [0.1, 0.09, 0.06, 0.03][f]!;
+      if (f > 0 && Math.abs(d - ring) < thick) return Math.abs(d - ring) < thick * 0.4 ? 5 : 6;
+      // つぶれる玉と尾
+      if (f < 2) {
+        const r = f === 0 ? 0.36 : 0.26;
+        const t = marillTail(u, v, cx, r);
+        if (t >= 0) return t;
+      }
+      // 飛ぶ水滴
+      if (f > 0) {
+        for (const p of drops) {
+          const q = (0.18 + f * 0.19) * p.s;
+          const size = 0.05 - f * 0.008;
+          if (Math.hypot(u - cx - Math.cos(p.a) * q, v - Math.sin(p.a) * q) < size) return p.s > 1 ? 5 : 6;
+        }
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 75, parts: { main: frames.map(toRows) } };
+}
+
+/** 爪あと 1 本: 向き sign の斜め線に沿って、先へ細くなる傷。reveal（0〜1）まで伸びた分だけ。width は太さの倍率。返り値は 0（中心）〜1（ふち）、外なら -1 */
+function clawGash(u: number, v: number, sign: number, offset: number, reveal: number, width: number): number {
+  const along = (u + v * sign) * Math.SQRT1_2;
+  const across = (v - u * sign) * Math.SQRT1_2 - offset - (along * along * 0.22 - 0.12);
+  const t = (along + 0.95) / 1.9;
+  if (t < 0 || t > 1 || t > reveal) return -1;
+  const w = 0.1 * width * Math.sin(Math.PI * Math.min(1, t * 0.92 + 0.04)) ** 0.7;
+  const c = Math.abs(across) / Math.max(1e-3, w);
+  return c <= 1 ? c : -1;
+}
+
+/** ドラゴンクロー: 竜の爪が 2 回、3 本ずつ交差して引き裂く（一撃目→二撃目で X になり、光が引いていく）。6 コマ */
+function dragonClawMarks(): SpriteOut {
+  // 0 輪郭・1 濃い藍・2 青・3 水色・4 白・5 紫
+  const palette = ['#0d0b3f', '#283593', '#2979ff', '#80d8ff', '#ffffff', '#b388ff'];
+  const a = [0.55, 1, 1, 1, 1, 1];
+  const b = [0, 0, 0.55, 1, 1, 1];
+  const wide = [1.1, 1.2, 1.15, 1.25, 1, 0.65];
+  const frames = [0, 1, 2, 3, 4, 5].map((f) =>
+    outline(
+      shape(40, (u, v) => {
+        let best = -1;
+        for (const off of [-0.34, 0, 0.34]) {
+          for (const [sign, rev] of [[1, a[f]!], [-1, b[f]!]] as const) {
+            if (rev <= 0) continue;
+            const c = clawGash(u, v, sign, off, rev, wide[f]!);
+            if (c >= 0 && (best < 0 || c < best)) best = c;
+          }
+        }
+        if (best < 0) return -1;
+        if (f === 5) return best < 0.5 ? 3 : 1;
+        if (f === 4) return best < 0.4 ? 4 : best < 0.75 ? 3 : 2;
+        return best < 0.45 ? 4 : best < 0.8 ? 3 : best < 1 ? 2 : 5;
+      }),
+      0,
+    ),
+  );
+  return { palette, frameMs: 55, parts: { main: frames.map(toRows) } };
+}
+
+/** げきりん: 怒りのひとかき（赤紫の爪あとが 3 本走り、怒りの火の粉が飛ぶ）。4 コマ */
+function rageSlash(): SpriteOut {
+  // 0 輪郭・1 濃い紫・2 紫・3 赤・4 だいだい・5 白
+  const palette = ['#2a0033', '#6a1b9a', '#d500f9', '#ff1744', '#ffab91', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 真ん中の怒りの光（最初だけ）
+      if (f < 2 && d < 0.3 - f * 0.12) return 5;
+      // 爪あと 3 本
+      for (const off of [-0.32, 0, 0.32]) {
+        const c = clawGash(u, v, 1, off, [0.65, 1, 1, 1][f]!, [1.5, 1.7, 1.2, 0.7][f]!);
+        if (c >= 0) return f === 3 ? (c < 0.5 ? 2 : 1) : c < 0.35 ? 5 : c < 0.65 ? 4 : c < 0.9 ? 3 : 2;
+      }
+      // とげの光と火の粉
+      const r = 0.5 + f * 0.13;
+      const spike = Math.abs(Math.sin(a * 4.5 + 0.6));
+      if (f < 3 && Math.abs(d - r) < 0.05 * spike && spike > 0.5) return f === 2 ? 2 : 3;
+      for (let k = 0; k < 7; k++) {
+        const b = k * 0.9 + 0.3;
+        const q = 0.42 + f * 0.17 + ((k * 3) % 4) * 0.05;
+        if (Math.hypot(u - Math.cos(b) * q, v - Math.sin(b) * q) < 0.05 - f * 0.008) return k % 2 === 0 ? 4 : 3;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 55, parts: { main: frames.map(toRows) } };
+}
+
+/** メタルバースト: 飛び出す鋼の破片（右へ飛ぶ。とがった面に光が走る）。3 コマ */
+function metalShard(): SpriteOut {
+  // 0 輪郭・1 濃い鋼・2 鋼・3 うすい鋼・4 白
+  const palette = ['#263238', '#546e7a', '#90a4ae', '#cfd8dc', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    outline(
+      shape(20, (u, v) => {
+        // 先がとがった破片（後ろは欠けている）
+        const w = u > -0.15 ? 0.5 * (1 - (u + 0.15) / 1.05) : 0.5 * (1 + (u + 0.15) / 0.75);
+        const notch = u < -0.5 && Math.abs(v) < 0.12;
+        if (Math.abs(v) > w || notch) return -1;
+        const glint = Math.abs(u + v - (-0.6 + f * 0.6)) < 0.12;
+        if (glint) return 4;
+        return v < -0.04 ? 3 : v < 0.12 ? 2 : 1;
+      }),
+      0,
+    ),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** マジカルシャイン（トゲチックの固有技）: 大きな光の花（8 本の光が開き、桃色の輪と星くずがゆっくり残る）。点滅させない。6 コマ */
+function gleamBurstGrand(): SpriteOut {
+  // 0 こい桃・1 桃・2 うすい桃・3 ほぼ白・4 白・5 水色
+  const palette = ['#c2185b', '#f48fb1', '#f8bbd0', '#fff0f5', '#ffffff', '#b3e5fc'];
+  const star = (u: number, v: number, cx: number, cy: number, r: number): boolean => {
+    const x = Math.abs(u - cx);
+    const y = Math.abs(v - cy);
+    return x + y * 3 < r || y + x * 3 < r;
+  };
+  const frames = [0, 1, 2, 3, 4, 5].map((f) => {
+    const t = f / 5;
+    const grow = Math.min(1, 0.4 + f * 0.24);
+    const fade = f < 4 ? 1 : f === 4 ? 0.65 : 0.35;
+    return shape(44, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 星くず（だんだん外へ。小さくなるだけで消えたり付いたりしない）
+      if (f >= 1) {
+        for (let k = 0; k < 8; k++) {
+          const b = k * 0.785 + 0.39;
+          const q = 0.34 + t * 0.56;
+          if (star(u, v, Math.cos(b) * q, Math.sin(b) * q, (k % 2 === 0 ? 0.13 : 0.09) * (1.1 - t * 0.7))) return k % 2 === 0 ? 3 : 5;
+        }
+      }
+      // 外へ広がる輪
+      const ring = 0.22 + t * 0.66;
+      if (f >= 1 && f <= 4 && Math.abs(d - ring) < 0.035 * fade) return 1;
+      // 光の花（縦横の長い 4 本と、斜めの短い 4 本）
+      const k8 = ((a / (Math.PI / 4)) % 2 + 2) % 2;
+      const off = Math.min(k8, 2 - k8);
+      const long = Math.round(((a + Math.PI * 2) % (Math.PI * 2)) / (Math.PI / 4)) % 2 === 0;
+      const len = (long ? 0.86 : 0.56) * grow * fade;
+      if (d < len && off * (Math.PI / 4) * d < 0.13 * (1 - d / len) * fade + 0.012) return d < len * 0.45 ? 4 : d < len * 0.75 ? 3 : 2;
+      // 真ん中の光
+      const core = 0.3 * (1 - t * 0.7);
+      // まぶしすぎないよう、真ん中も真っ白にしない
+      if (d < core) return d < core * 0.6 ? 3 : 2;
+      if (d < core * 1.3) return 1;
+      return -1;
+    });
+  });
+  return { palette, frameMs: 85, parts: { main: frames.map(toRows) } };
 }
 
 /** ギガインパクト: 全身で突っ込む勢い（右へ進む。白い芯のまわりに橙の光の筋が後ろへ流れる）。3 コマ */

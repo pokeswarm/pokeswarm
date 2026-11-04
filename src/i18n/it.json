@@ -270,6 +270,7 @@
   "shop.banish.name": "Bando",
   "shop.banish.desc": "+1 bando per grado a inizio partita (B al livello superiore)",
   "item.magnet": "Calamita! Attira tutta l'Esp.",
+  "item.milkDrink": "Si sente un po' meglio!",
   "item.buff": "{name}! Potenziato per {seconds} s",
   "candy.rolling": "{name}! Livello +{levels}...",
   "candy.result": "{name}! Livello +{levels}!",

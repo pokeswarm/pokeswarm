@@ -291,6 +291,7 @@
   "shop.banish.name": "候補の除外",
   "shop.banish.desc": "ちょうせんの始めの除外の回数 +1 / ランク（選択画面で B）",
   "item.magnet": "マグネット！ 経験値を一気に集める",
+  "item.milkDrink": "ちょっぴり げんきに なった！",
   "item.buff": "{name}！ {seconds}秒のあいだ強くなった",
   "candy.rolling": "{name}！ レベル +{levels}…",
   "candy.result": "{name}！ レベル +{levels}！",

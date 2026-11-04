@@ -131,6 +131,8 @@ export class RunScene extends Phaser.Scene {
   private moveSprites: MoveSprites | null = null;
   /** ボスの範囲技が落ちたときのドット絵（案 F） */
   private strikeSprites: MoveSprites | null = null;
+  /** 床に描く技の絵（ふんえんの噴煙）。ダメージの塗りつぶしの上、雑魚の下 */
+  private floorSprites: MoveSprites | null = null;
   /** drift: 出てから毎秒この分だけ動かす（からげんきの汗が外の上へ飛ぶ） */
   private strikes: { item: Omit<SpriteItem, 'elapsed' | 'alpha'>; start: number; seconds: number; drift?: { x: number; y: number } }[] = [];
   /** プレイヤーごとの、前に見た HP と、最後に HP が減った時刻（秒）と、最後に汗を出した時刻（からげんき。07 の141章） */
@@ -547,6 +549,7 @@ export class RunScene extends Phaser.Scene {
     // 技のドット絵は光の演出の少し下（光の粒が上に重なる）
     this.moveSprites = new MoveSprites(this, moveSprites, depths.effects - 0.1, spriteRender.dot);
     this.strikeSprites = new MoveSprites(this, moveSprites, depths.effects - 0.05, spriteRender.dot);
+    this.floorSprites = new MoveSprites(this, moveSprites, depths.hitShapes + 0.1, spriteRender.dot);
     this.fallSprites = new MoveSprites(this, moveSprites, depths.effects + 0.25, spriteRender.dot);
     this.strikes = [];
     this.countdownTexts = [];
@@ -1088,15 +1091,17 @@ export class RunScene extends Phaser.Scene {
         else if (it.kind === 'magnet') this.announce(t('item.magnet'), '#ef9a9a');
         // はね: だれが拾っても全員に知らせる（全員のランでルギア・ホウオウと戦える）
         else if (it.kind === 'silver-wing' || it.kind === 'rainbow-wing') this.announce(t('run.wingGot', { name: localName(generated.items[it.kind]?.names, getLocale(), it.kind) }), it.kind === 'silver-wing' ? '#e0e0e0' : '#ffcc80');
+        // ミルクのみのびん: 原作の回復の言葉（07 の184章）
+        else if (it.kind === 'moomoo-milk' && it.by === this.localId) this.announce(t('item.milkDrink'), '#ce93d8');
         else if (it.by === this.localId) this.announce(localName(generated.items.potion?.names, getLocale(), ''), '#ce93d8');
       } else if (ev.type === 'runStatReached' && ev.playerId === this.localId) {
         // ランの記録（固有技の条件）: 自分の世界に付け、ゲストはホストへも伝える（07 の134章）
         this.uiCommands.push({ type: 'runStat', playerId: this.localId, stat: ev.stat, value: ev.value });
         if (this.sync && w.role === 'guest') this.sync.requestRunStat(ev.stat, ev.value);
       } else if (ev.type === 'dashStarted') {
-        this.playerViews.get(ev.playerId)?.dash(ev.dirX, ev.dirY, ev.distance, ev.seconds, ev.hop, ev.afterimages);
+        this.playerViews.get(ev.playerId)?.dash(ev.dirX, ev.dirY, ev.distance, ev.seconds, ev.hop, ev.afterimages, ev.tint);
       } else if (ev.type === 'bodyAttack') {
-        this.playerViews.get(ev.playerId)?.lunge(ev.dirX, ev.dirY, ev.distance, ev.afterimages);
+        this.playerViews.get(ev.playerId)?.lunge(ev.dirX, ev.dirY, ev.distance, ev.afterimages, ev.flip);
       } else if (ev.type === 'moveTaught' && ev.playerId === this.localId) {
         // 持ち物で技を覚えた（ワンリキー）
         this.announce(t('run.moveTaught', { name: localName(generated.moves[w.rules.moves[ev.move]!.key]?.names, getLocale(), w.rules.moves[ev.move]!.key) }), '#ffcc80');
@@ -1232,6 +1237,11 @@ export class RunScene extends Phaser.Scene {
       const def = world.rules.moves[pm.move]!;
       const c = this.effects.chargeGlow(def.effect);
       if (!c) continue;
+      // 連続技（げきりん）: 出している間ずっと光る
+      if (def.sequence) {
+        if (pm.seq) best = { color: hexColor(c.color), radius: c.radius, alpha: c.alpha, t: 1 };
+        continue;
+      }
       // 溜める技（リーフブレード・ブレイズキック）は溜めている間だけ、ほかは再使用の終わりの c.seconds の間
       // （溜める技で再使用の終わりにも光らせると、溜めが2回あるように見えた。作者の指摘 2026年10月31日）
       const windup = def.windupSeconds && pm.windup !== undefined;
@@ -2299,8 +2309,13 @@ export class RunScene extends Phaser.Scene {
     for (const z of world.zones) lingerItems.push({ recipeId: z.effect, x: z.x, y: z.y, radius: z.radius, line: null });
     this.effects.drawLinger(lingerItems, deltaMs);
     // 技のドット絵（技そのものだけ。効き方から出たものは今までどおり）
+    this.floorSprites?.draw(pr, alpha, (i) => {
+      const effect = world.rules.moves[pr.move[i]!]!.effect;
+      return pr.stage[i] === 0 && effectRecipes[effect]?.drawOnFloor ? (this.effects.sprite(effect) ?? null) : null;
+    });
     this.moveSprites?.draw(pr, alpha, (i) => {
       const effect = world.rules.moves[pr.move[i]!]!.effect;
+      if (effectRecipes[effect]?.drawOnFloor) return null;
       if (pr.stage[i] === 0) {
         // 技そのものの絵と、重ねるもう1枚（だいばくはつの端の炎）
         const main = this.effects.sprite(effect);

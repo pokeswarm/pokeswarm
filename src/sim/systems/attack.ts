@@ -239,6 +239,12 @@ export function useMoves(world: World): void {
       const pr0 = world.projectiles;
       for (const pm of p.moves) {
         const def = world.rules.moves[pm.move];
+        // メタルバースト: 受けたらすぐ次を出す（その 1 回だけ強い）
+        if (def?.hurtRelease) {
+          pm.hurtCharge = true;
+          pm.cooldown = 0;
+          continue;
+        }
         if (!def?.effects.some((fx) => fx.trigger === 'hurt')) continue;
         let active = false;
         for (let i = 0; i < pr0.count && !active; i++) active = pr0.owner[i] === p.id && pr0.move[i] === pm.move && pr0.stage[i] === 0;
@@ -292,7 +298,7 @@ export function useMoves(world: World): void {
       }
       if (pm.cooldown > 0) continue;
       // 体が動く技: 行き先に敵がいなければ出さない（だれもいないのに勝手に動かない。溜める技も溜め始めない）
-      if ((def.dash && !(def.dash.target === 'crowd' ? enemiesInRange(world, p.x, p.y, st.range).length > 0 : enemyAhead(world, p, st.range + st.size))) || (def.sequence && !enemyAhead(world, p, st.range + st.size))) {
+      if ((def.dash && !(def.dash.target === 'crowd' ? enemiesInRange(world, p.x, p.y, st.range).length > 0 : enemyAhead(world, p, st.range + st.size))) || (def.sequence && !sequenceCanStart(world, p, def.sequenceGate ?? 'ahead', st))) {
         pm.cooldown = 0;
         continue;
       }
@@ -700,7 +706,7 @@ function fireMelee(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
   const fx = ux * back;
   const fy = uy * back;
   const body = world.rules.moves[pm.move]!.body;
-  if (body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: fx, dirY: fy, distance: body.lungeDistance, afterimages: body.afterimages });
+  if (body) world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: fx, dirY: fy, distance: body.lungeDistance, afterimages: body.afterimages, ...(body.flip ? { flip: true } : {}) });
   const box = world.rules.moves[pm.move]!.frontBox;
   if (box) {
     // キバの技: 自分の前の長方形（口の絵が描かれる所。届く距離 range + size の start〜end 倍）。体当たりの技は扇形のまま
@@ -1001,10 +1007,19 @@ function enemiesInRange(world: World, x: number, y: number, range: number): numb
 function fireStrike(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const e = world.enemies;
   const pool = enemiesInRange(world, p.x, p.y, st.range);
-  for (let k = 0; k < st.count && pool.length > 0; k++) {
-    const i = pool.splice(world.rng.int(pool.length), 1)[0]!;
+  const all = world.rules.moves[pm.move]!.strikeRepeat ? [...pool] : [];
+  for (let k = 0; k < st.count && (pool.length > 0 || all.length > 0); k++) {
+    // 敵より多く出す技は、一回りしたら同じ敵にも重ねる
+    const i = pool.length > 0 ? pool.splice(world.rng.int(pool.length), 1)[0]! : all[world.rng.int(all.length)]!;
     world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]! });
   }
+}
+
+/** 連続技を始めてよいか（とっておき: 前に敵がいる。げきりん: 届く範囲に敵がいる。アクアテール: いつでも） */
+function sequenceCanStart(world: World, p: Player, gate: 'ahead' | 'any' | 'none', st: MoveStats): boolean {
+  if (gate === 'none') return true;
+  if (gate === 'any') return enemiesInRange(world, p.x, p.y, st.range).length > 0;
+  return enemyAhead(world, p, st.range + st.size);
 }
 
 /**
@@ -1017,10 +1032,16 @@ function stepSequence(world: World, p: Player, pm: PlayerMove): void {
   seq.timer -= world.dt;
   while (seq.timer <= 0 && seq.i < steps.length) {
     const s = steps[seq.i++]!;
+    if (pm.level < s.minLevel) continue;
     if (s.needsConsumed.length > 0 && !s.needsConsumed.some((m) => p.consumedMoves?.includes(m))) continue;
     const def = world.rules.moves[s.move]!;
-    const sub: PlayerMove = { move: s.move, level: Math.min(pm.level, def.levels.length + 1), cooldown: 0, burstLeft: 0, burstTimer: 0 };
+    const sub: PlayerMove = { move: s.move, level: Math.min(pm.level, def.levels.length), cooldown: 0, burstLeft: 0, burstTimer: 0 };
     const st = playerMoveStats(world, p, sub);
+    // 敵が多い所へ飛ぶ段（げきりん）: 途中で周りの敵がいなくなったら、そこで終わる
+    if (def.dash?.target === 'crowd' && enemiesInRange(world, p.x, p.y, st.range).length === 0) {
+      pm.seq = undefined;
+      return;
+    }
     if (BURST_PATTERNS.has(def.pattern)) {
       sub.burstLeft = st.count;
       fireBurst(world, p, sub, { ...st, intervalSeconds: 0 });
@@ -1083,7 +1104,7 @@ function fireDash(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
   const ticks = Math.max(1, Math.round(dash.seconds / world.dt));
   // 更新回数で割り切って、ちょうど行き先まで進む
   const speed = distance / (ticks * world.dt);
-  world.events.push({ type: 'dashStarted', playerId: p.id, seconds: dash.seconds, hop: dash.hop, afterimages: dash.afterimages, dirX: fx, dirY: fy, distance });
+  world.events.push({ type: 'dashStarted', playerId: p.id, seconds: dash.seconds, hop: dash.hop, afterimages: dash.afterimages, ...(dash.tint ? { tint: dash.tint } : {}), dirX: fx, dirY: fy, distance });
   if (dash.recoverSeconds > 0) p.recoverTicks = ticks + Math.round((dash.recoverSeconds * (dash.recoverLines?.[p.line] ?? 1)) / world.dt);
   if (p.id === world.localPlayerId) {
     p.dashTicks = ticks;
@@ -1189,7 +1210,11 @@ function fireTrail(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
 }
 
 /** cross（十字）: 向いている方向から等しい角度で count 方向へ同時に撃つ */
-function fireCross(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+function fireCross(world: World, p: Player, pm: PlayerMove, st0: MoveStats): void {
+  // メタルバースト: 受けた後の 1 回は強く、数が多い
+  const release = pm.hurtCharge ? world.rules.moves[pm.move]!.hurtRelease : undefined;
+  pm.hurtCharge = false;
+  const st = release ? { ...st0, power: st0.power * release.powerMultiplier, count: st0.count + release.extraCount } : st0;
   const [fx, fy] = axisToUnit(p.facingX, p.facingY);
   const start = Math.atan2(fy, fx);
   const speed = scaledMoveStats(world, p, pm, st).speed;
@@ -1386,9 +1411,9 @@ function fireSweep(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     shape: SHAPE_SECTOR,
     length: half,
     angle: Math.atan2(fy, fx),
-    angularSpeed: amp,
-    dirX: Math.cos(Math.atan2(fy, fx) - amp),
-    dirY: Math.sin(Math.atan2(fy, fx) - amp),
+    angularSpeed: def.sweepReverse ? -amp : amp,
+    dirX: Math.cos(Math.atan2(fy, fx) - (def.sweepReverse ? -amp : amp)),
+    dirY: Math.sin(Math.atan2(fy, fx) - (def.sweepReverse ? -amp : amp)),
     // 行きと戻りの両方で当たる。片道だけ（はたく）は orbitRadius 1 の印を付け、同じ敵には1回
     ...(def.sweepOnce ? { orbitRadius: 1, hitIntervalTicks: 0 } : { hitIntervalTicks: Math.max(1, Math.round(st.durationSeconds / 2 / world.dt)) }),
   });
@@ -1699,7 +1724,8 @@ export function moveProjectiles(world: World): void {
         firstX = e.x[j]!;
         firstY = e.y[j]!;
       }
-      if (line) {
+      // 線・扇・外へ広がる輪は、当たった光を敵の所に出す（中心に出すと使ったポケモンの足元に重なって白い円に見える。07 の184章）
+      if (line || pr.shape[i] === SHAPE_SECTOR || pr.band[i]! > 0) {
         hitX = e.x[j]!;
         hitY = e.y[j]!;
       }

@@ -52,7 +52,7 @@ export interface SimMoveDef {
   /** 見た目のレシピ（シミュレーションは使わない） */
   readonly effect: string;
   /** 自分の体で攻撃する技の見た目（使ったときに知らせる）。無ければ null */
-  readonly body: { readonly lungeDistance: number; readonly afterimages: number } | null;
+  readonly body: { readonly lungeDistance: number; readonly afterimages: number; readonly flip?: boolean } | null;
   /** eruption（爆炎の柱）の段の数と、外の段ほど半径を大きくする割合。eruption でなければ null */
   readonly eruption: { readonly stages: number; readonly sizeGrowth: number } | null;
   /** 効き方の部品（07 22.4）。無ければ空 */
@@ -135,6 +135,8 @@ export interface SimMoveDef {
   readonly scatterDelaySeconds?: number;
   /** sweep（なぎ払い）を片道だけにする（はたく） */
   readonly sweepOnce?: boolean;
+  readonly sweepReverse?: boolean;
+  readonly strikeRepeat?: boolean;
   /** sweep: 左右の両端から正面へ払って合わせる（ねこだまし） */
   readonly sweepClap?: boolean;
   /** 届く範囲で HP の一番高い敵を狙う（ゴッドバード） */
@@ -164,7 +166,11 @@ export interface SimMoveDef {
   /** 一緒に出し続ける技の番号（この技と同じレベル。インファイト） */
   readonly comboMoves?: readonly number[];
   /** 連続技: 順に出す技（とっておき） */
-  readonly sequence?: readonly { readonly move: number; readonly afterSeconds: number; readonly needsConsumed: readonly number[] }[];
+  readonly sequence?: readonly { readonly move: number; readonly afterSeconds: number; readonly needsConsumed: readonly number[]; readonly minLevel: number }[];
+  /** 連続技を始める条件（無ければ ahead） */
+  readonly sequenceGate?: 'ahead' | 'any' | 'none';
+  /** 受けたダメージを返す技（メタルバースト） */
+  readonly hurtRelease?: { readonly powerMultiplier: number; readonly extraCount: number };
   /** 一緒に出す技の側: 本体より遅れて出し始める秒数（アクアテールの叩きつけ） */
   readonly comboOffsetSeconds?: number;
   /** 出す前に溜める秒数（リーフブレード・ブレイズキック） */
@@ -189,7 +195,7 @@ export interface SimMoveDef {
   /** scatter: range の中のランダムな敵の足元に置く（りゅうせいぐん） */
   readonly scatterOnEnemies?: boolean;
   /** 体が本当に動く技（のしかかり・すてみタックル） */
-  readonly dash?: { readonly seconds: number; readonly hit: 'land' | 'path'; readonly hop: number; readonly afterimages: number; readonly invincible: boolean; readonly target: 'facing' | 'crowd'; readonly recoverSeconds: number; readonly recoverLines?: Readonly<Record<string, number>> };
+  readonly dash?: { readonly seconds: number; readonly hit: 'land' | 'path'; readonly hop: number; readonly afterimages: number; readonly tint?: string; readonly invincible: boolean; readonly target: 'facing' | 'crowd'; readonly recoverSeconds: number; readonly recoverLines?: Readonly<Record<string, number>> };
   /** screen: 地上の敵だけに当たる（じしん） */
   readonly groundOnly?: boolean;
   /** 敵に当たらない（ミルクのみ） */

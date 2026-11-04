@@ -38,16 +38,27 @@ describe('はがね', () => {
     for (let k = 0; k < 6; k++) t.sim.step([]);
     expect(t.find((i) => t.pr.move[i] === t.m && t.pr.stage[i] === 1)).toHaveLength(1);
   });
-  it('メタルバースト は鋼の輪をまとい、受けたダメージの 2.5 倍を返す', () => {
+  it('メタルバースト: 鋼の破片が全方向へ飛ぶ。ダメージを受けるとすぐ、強く数の多い 1 回を返す（07 の184章）', () => {
     const t = setup('metal-burst');
+    const shards = (): number[] => t.find((i) => t.pr.move[i] === t.m && t.pr.stage[i] === 0);
     t.sim.step([]);
-    const hp0 = t.p.hp;
+    const first = shards();
+    const count = first.length;
+    const power = t.pr.damage[first[0]!]!;
+    expect(count).toBe(8);
+    // 破片は全方向へ
+    expect(first.some((i) => t.pr.vx[i]! > 0)).toBe(true);
+    expect(first.some((i) => t.pr.vx[i]! < 0)).toBe(true);
+    for (let k = 0; k < 30; k++) t.sim.step([]);
+    expect(t.p.moves[0]!.cooldown).toBeGreaterThan(0);
+    const before = t.pr.count;
     hurtPlayer(t.sim.world, t.p, 40);
-    const taken = hp0 - t.p.hp;
     t.sim.step([]);
-    const rings = t.find((i) => t.pr.move[i] === t.m && t.pr.stage[i] === 1 && t.pr.band[i]! > 0);
-    expect(rings).toHaveLength(1);
-    expect(t.pr.damage[rings[0]!]).toBeCloseTo(taken * 2.5, 3);
+    const added = shards().slice(-16);
+    expect(t.pr.count - before).toBe(16);
+    expect(t.pr.damage[added[0]!]).toBeCloseTo(power * 2.5, 3);
+    // 次はふつうの強さに戻る
+    expect(t.p.moves[0]!.hurtCharge).toBe(false);
   });
   it('クチートの固有技は アイアンヘッド → メタルバースト（ぶつり のまま。てっていこうせん は 161章でしまった）', () => {
     const t = setup('metal-burst');

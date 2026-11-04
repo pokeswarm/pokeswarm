@@ -99,7 +99,12 @@ export function applyItem(world: World, id: number, by: PlayerId, kind: ItemKind
     // 箱の強化: 拾った人に、決まった時間だけ効く（同じ強化を重ねて拾ったら時間を延ばす）
     const p = world.players.find((x) => x.id === by);
     const def = cfg.buff?.buffs[levels];
-    if (p && def) {
+    // ポロック: 色ごとに数をためる（コンテストの材料。07 の188章）
+    if (p && def?.contest) (p.pokeblocks ??= {})[def.contest] = (p.pokeblocks[def.contest] ?? 0) + 1;
+    // オボンのみ: 強化でなく回復
+    if (p && def?.healPct) {
+      healPlayer(world, by, (p.maxHp * def.healPct) / 100);
+    } else if (p && def) {
       const ticks = Math.round(def.seconds / world.dt);
       const buffs = (p.buffs ??= []);
       const cur = buffs.find((b) => b.index === levels);

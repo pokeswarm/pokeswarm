@@ -4,7 +4,7 @@
  *   npm run item-icons
  *
  * PokeAPI の公式のアイテム画像（PokeAPI/sprites の items）を取得し、色合いで分かる低解像度のドット絵（size × size）に縮める。
- * 入力: data/game/items.json（持ち物のキー）
+ * 入力: data/game/items.json（持ち物のキー）・data/game/pickups.json（箱から出るきのみ）。ポロックは原作の道具の画像が無いので、ここで描く
  * 出力: data/render/item-icons.json（1文字が1ドットの表と色。クレジットの文も入れる）
  * 取得した画像は scripts/.cache/item-sprites/ に保存し、再取得しない。
  * 権利は任天堂・クリーチャーズ・ゲームフリーク・株式会社ポケモンに帰属する（00_vision.md 4章。クレジットに出す）。
@@ -162,8 +162,20 @@ function shrink(png: PNG): { rows: string[]; palette: Record<string, string> } {
 }
 
 const items = JSON.parse(await readFile(join(ROOT, 'data', 'game', 'items.json'), 'utf8')) as { items: Record<string, unknown> };
+const pickups = JSON.parse(await readFile(join(ROOT, 'data', 'game', 'pickups.json'), 'utf8')) as { regionBuffs?: Record<string, { buffs: { item: string }[] }> };
+const boxItems = Object.values(pickups.regionBuffs ?? {}).flatMap((r) => r.buffs.map((b) => b.item));
 const out: Record<string, { palette: Record<string, string>; rows: string[] }> = {};
-for (const key of Object.keys(items.items)) {
+// ポロック（原作の5色）: 角の丸い四角。左上が明るく、右下が暗い
+const BLOCK = ['..oooooooooo..', '.oLLLLLLMMMMo.', 'oLWWLLLMMMMMMo', 'oLWLLLMMMMMMMo', 'oLLLLMMMMMMMDo', 'oLLLMMMMMMMMDo', 'oLLMMMMMMMMDDo', 'oLMMMMMMMMMDDo', 'oMMMMMMMMMDDDo', 'oMMMMMMMMDDDDo', 'oMMMMMMMDDDDDo', 'oMMMMMDDDDDDDo', '.oMDDDDDDDDDo.', '..oooooooooo..'];
+const BLOCK_COLORS: Record<string, [string, string, string]> = {
+  'pokeblock-red': ['#ff9a8f', '#e53935', '#a31515'],
+  'pokeblock-blue': ['#9cc4ff', '#2f7bea', '#174a9e'],
+  'pokeblock-pink': ['#ffd0e4', '#f582ae', '#c2487c'],
+  'pokeblock-green': ['#b6ecA0', '#55b64a', '#2c7a2c'],
+  'pokeblock-yellow': ['#fff0a0', '#f4c430', '#b98a0c'],
+};
+for (const [key, [l, m, d]] of Object.entries(BLOCK_COLORS)) out[key] = { palette: { o: '#1f1530', L: l, M: m, D: d, W: '#ffffff' }, rows: BLOCK };
+for (const key of [...Object.keys(items.items), ...new Set(boxItems.filter((k) => !BLOCK_COLORS[k]))]) {
   const url = await spriteUrl(key);
   const png = PNG.sync.read(await cached(join(CACHE, 'item-sprites', `${key}.png`), url));
   out[key] = shrink(png);

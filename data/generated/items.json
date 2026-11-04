@@ -109,6 +109,16 @@
       "it": "Pietrafocaia"
     }
   },
+  "ganlon-berry": {
+    "names": {
+      "ja": "リュガのみ",
+      "en": "Ganlon Berry",
+      "fr": "Baie Lingan",
+      "de": "Linganbeere",
+      "es": "Baya Gonlan",
+      "it": "Baccalongan"
+    }
+  },
   "hard-stone": {
     "names": {
       "ja": "かたいいし",
@@ -149,6 +159,16 @@
       "it": "Roccia di Re"
     }
   },
+  "lansat-berry": {
+    "names": {
+      "ja": "サンのみ",
+      "en": "Lansat Berry",
+      "fr": "Baie Lansat",
+      "de": "Lansatbeere",
+      "es": "Baya Zonlan",
+      "it": "Baccalangsa"
+    }
+  },
   "leaf-stone": {
     "names": {
       "ja": "リーフのいし",
@@ -167,6 +187,16 @@
       "de": "Überreste",
       "es": "Restos",
       "it": "Avanzi"
+    }
+  },
+  "liechi-berry": {
+    "names": {
+      "ja": "チイラのみ",
+      "en": "Liechi Berry",
+      "fr": "Baie Lichii",
+      "de": "Lydzibeere",
+      "es": "Baya Lichi",
+      "it": "Baccalici"
     }
   },
   "light-ball": {
@@ -379,6 +409,16 @@
       "it": "Affilartigli"
     }
   },
+  "salac-berry": {
+    "names": {
+      "ja": "カムラのみ",
+      "en": "Salac Berry",
+      "fr": "Baie Sailak",
+      "de": "Salkabeere",
+      "es": "Baya Aslac",
+      "it": "Baccasalak"
+    }
+  },
   "sharp-beak": {
     "names": {
       "ja": "するどいくちばし",
@@ -417,6 +457,16 @@
       "de": "Silberflügel",
       "es": "Ala Plateada",
       "it": "Aladargento"
+    }
+  },
+  "sitrus-berry": {
+    "names": {
+      "ja": "オボンのみ",
+      "en": "Sitrus Berry",
+      "fr": "Baie Sitrus",
+      "de": "Tsitrubeere",
+      "es": "Baya Zidra",
+      "it": "Baccacedro"
     }
   },
   "soft-sand": {

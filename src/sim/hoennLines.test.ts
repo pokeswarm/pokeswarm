@@ -4,6 +4,7 @@ import { Simulation } from './simulation';
 import { abilityOf, abilitySturdy } from './ability';
 import { applyOffer, makeOffers, moveMaxLevel } from './systems/leveling';
 import { hurtPlayer } from './systems/health';
+import { applyItem } from './systems/items';
 import type { UpgradeOffer } from './world';
 
 /** ホウエンの残りのプレイアブル（作者の決定 2026年10月29日。07 の133・134章） */
@@ -203,5 +204,33 @@ describe('どの系統も、固有技と支えの技を最大で持って動か�
       }, line).not.toThrow();
       expect(t.sim.world.events.length + t.sim.world.projectiles.count, line).toBeGreaterThanOrEqual(0);
     }
+  });
+});
+
+describe('箱の中身は地方ごと（07 の188章）', () => {
+  const buffsOf = (region: string) => buildSimRules(region).pickups.items.buff!.buffs;
+  it('カントーは今のまま・ジョウトはきのみ・ホウエンはポロック', () => {
+    expect(buffsOf('kanto').map((b) => b.item)).toContain('x-attack');
+    expect(buffsOf('johto').every((b) => b.item.endsWith('-berry'))).toBe(true);
+    expect(buffsOf('hoenn').every((b) => b.item.startsWith('pokeblock-') && !!b.contest)).toBe(true);
+    expect(new Set(buffsOf('hoenn').map((b) => b.contest)).size).toBe(5);
+  });
+
+  it('ポロックは拾った人が部門ごとにためる。オボンのみは強化でなく回復', () => {
+    const t = setup('treecko');
+    const cool = buffsOf('hoenn').findIndex((b) => b.contest === 'cool');
+    t.sim.world.items.push({ id: 900, kind: 'buff', x: 0, y: 0 } as never);
+    applyItem(t.sim.world, 900, 1, 'buff', cool);
+    expect(t.p.pokeblocks).toEqual({ cool: 1 });
+    expect(t.p.buffs?.length).toBe(1);
+
+    const rules = buildSimRules('johto');
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    const lo = playableLoadout(rules, 'cyndaquil');
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, types: lo.types, moves: lo.moves, line: lo.line, species: lo.species });
+    p.hp = 1;
+    applyItem(sim.world, 901, 1, 'buff', rules.pickups.items.buff!.buffs.findIndex((b) => b.healPct));
+    expect(p.hp).toBeCloseTo(1 + p.maxHp * 0.25);
+    expect(p.buffs ?? []).toEqual([]);
   });
 });

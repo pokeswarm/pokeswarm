@@ -128,6 +128,7 @@ export function testRules(
       maxGems: 50,
       magnetSpeed: 420,
       bigGemValue: 10,
+      regionBuffs: {},
       itemRadius: 10,
       maxItems: 16,
       items: {

@@ -1787,30 +1787,6 @@
     "type": "poison",
     "damageClass": "physical"
   },
-  "poison-jab": {
-    "names": {
-      "ja": "どくづき",
-      "en": "Poison Jab",
-      "fr": "Direct Toxik",
-      "de": "Gifthieb",
-      "es": "Puya Nociva",
-      "it": "Velenpuntura"
-    },
-    "type": "poison",
-    "damageClass": "physical"
-  },
-  "poison-sting": {
-    "names": {
-      "ja": "どくばり",
-      "en": "Poison Sting",
-      "fr": "Dard-Venin",
-      "de": "Giftstachel",
-      "es": "Picotazo Veneno",
-      "it": "Velenospina"
-    },
-    "type": "poison",
-    "damageClass": "physical"
-  },
   "pound": {
     "names": {
       "ja": "はたく",

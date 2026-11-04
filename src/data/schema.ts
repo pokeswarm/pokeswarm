@@ -2115,6 +2115,19 @@ export type StatusConfig = z.infer<typeof statusConfigSchema>;
 
 // ---- 経験値の玉 ----
 
+/**
+ * 箱から出る物の1つ。item は名前とアイコン（プラスパワー・きのみ・ポロック）。healPct があれば強化でなく回復（オボンのみ）。
+ * contest があれば、拾った人がその部門のポロックとしてランの間ためる（ホウエン。07 の188章）
+ */
+const boxBuffSchema = z.object({
+  item: z.string(),
+  seconds: z.number().positive(),
+  mods: modifierSchema,
+  weight: z.number().positive(),
+  healPct: z.number().positive().optional(),
+  contest: z.string().optional(),
+});
+
 export const pickupConfigSchema = z.object({
   /** 雑魚1体が落とす経験値 */
   xpPerKill: z.number().positive(),
@@ -2148,10 +2161,12 @@ export const pickupConfigSchema = z.object({
      */
     buff: z
       .object({
-        buffs: z.array(z.object({ item: z.string(), seconds: z.number().positive(), mods: modifierSchema, weight: z.number().positive() })).min(1),
+        buffs: z.array(boxBuffSchema).min(1),
       })
       .optional(),
   }),
+  /** 地方ごとの箱の中身（カントーは items.buff のまま。ジョウト: きのみ・ホウエン: ポロック。sprite はマップに落ちている絵。07 の188章） */
+  regionBuffs: z.record(z.string(), z.object({ sprite: z.string(), buffs: z.array(boxBuffSchema).min(1) })).default({}),
   /**
    * マップの箱（作者の決定 2026年10月25日）: 攻撃を hits 回当てると開き、一時的な強化（items.buff）を落とす。
    * ソロ・ホストが、だれかの周り distanceMin〜distanceMax に spawnSeconds ごとに出す（同時に max 個まで）。全員から despawnDistance より離れたら消す

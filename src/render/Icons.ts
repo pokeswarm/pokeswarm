@@ -46,6 +46,11 @@ export function ensureIconTextures(scene: Phaser.Scene, data: IconConfig, rules:
     // 公式のアイテム画像を縮めたドット絵（背景はタイプのアイテムならタイプの色）。無ければ自作の絵柄
     addTexture(scene, itemIconKey(rules, i), n, n, sprite ? itemIconPixels(data, sprite, iconColor(data, def.color)) : iconPixels(data, def.glyph, iconColor(data, def.color), 'base'));
   });
+  // 箱の中身（きのみ・ポロック）のアイコン（右上の残り時間の表示）。持ち物ではないので別に作る
+  for (const b of rules.pickups.items.buff?.buffs ?? []) {
+    const sprite = items?.items[b.item];
+    if (sprite) addTexture(scene, `icon:item:${b.item}`, n, n, itemIconPixels(data, sprite, iconColor(data, '#37474f')));
+  }
   for (const tier of ['base', 'derived', 'unique'] as const) {
     const s = starPixels(data, true, tier);
     addTexture(scene, pipKey(true, tier), s.width, s.height, s.pixels);

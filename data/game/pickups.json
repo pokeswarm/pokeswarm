@@ -56,5 +56,101 @@
     "distanceMin": 380,
     "distanceMax": 700,
     "despawnDistance": 1600, "wingChance": 0.01
+  },
+  "regionBuffs": {
+    "johto": {
+      "sprite": "berry",
+      "buffs": [
+        {
+          "item": "liechi-berry",
+          "seconds": 15,
+          "mods": {
+            "powerPct": 50
+          },
+          "weight": 1
+        },
+        {
+          "item": "salac-berry",
+          "seconds": 15,
+          "mods": {
+            "moveSpeedPct": 40
+          },
+          "weight": 1
+        },
+        {
+          "item": "ganlon-berry",
+          "seconds": 15,
+          "mods": {
+            "damageTakenPct": -50
+          },
+          "weight": 1
+        },
+        {
+          "item": "lansat-berry",
+          "seconds": 15,
+          "mods": {
+            "critChancePct": 30
+          },
+          "weight": 1
+        },
+        {
+          "item": "sitrus-berry",
+          "seconds": 1,
+          "mods": {},
+          "weight": 1,
+          "healPct": 25
+        }
+      ]
+    },
+    "hoenn": {
+      "sprite": "pokeblock",
+      "buffs": [
+        {
+          "item": "pokeblock-red",
+          "seconds": 15,
+          "mods": {
+            "powerPct": 50
+          },
+          "weight": 1,
+          "contest": "cool"
+        },
+        {
+          "item": "pokeblock-green",
+          "seconds": 15,
+          "mods": {
+            "moveSpeedPct": 40
+          },
+          "weight": 1,
+          "contest": "smart"
+        },
+        {
+          "item": "pokeblock-yellow",
+          "seconds": 15,
+          "mods": {
+            "damageTakenPct": -50
+          },
+          "weight": 1,
+          "contest": "tough"
+        },
+        {
+          "item": "pokeblock-blue",
+          "seconds": 15,
+          "mods": {
+            "critChancePct": 30
+          },
+          "weight": 1,
+          "contest": "beauty"
+        },
+        {
+          "item": "pokeblock-pink",
+          "seconds": 20,
+          "mods": {
+            "xpPct": 100
+          },
+          "weight": 1,
+          "contest": "cute"
+        }
+      ]
+    }
   }
 }

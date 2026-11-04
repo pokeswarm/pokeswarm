@@ -3,6 +3,131 @@
   "source": "https://github.com/PokeAPI/sprites (sprites/items)",
   "credit": "Item images © Nintendo / Creatures Inc. / GAME FREAK inc. / The Pokémon Company (via PokeAPI/sprites)",
   "items": {
+    "pokeblock-red": {
+      "palette": {
+        "o": "#1f1530",
+        "L": "#ff9a8f",
+        "M": "#e53935",
+        "D": "#a31515",
+        "W": "#ffffff"
+      },
+      "rows": [
+        "..oooooooooo..",
+        ".oLLLLLLMMMMo.",
+        "oLWWLLLMMMMMMo",
+        "oLWLLLMMMMMMMo",
+        "oLLLLMMMMMMMDo",
+        "oLLLMMMMMMMMDo",
+        "oLLMMMMMMMMDDo",
+        "oLMMMMMMMMMDDo",
+        "oMMMMMMMMMDDDo",
+        "oMMMMMMMMDDDDo",
+        "oMMMMMMMDDDDDo",
+        "oMMMMMDDDDDDDo",
+        ".oMDDDDDDDDDo.",
+        "..oooooooooo.."
+      ]
+    },
+    "pokeblock-blue": {
+      "palette": {
+        "o": "#1f1530",
+        "L": "#9cc4ff",
+        "M": "#2f7bea",
+        "D": "#174a9e",
+        "W": "#ffffff"
+      },
+      "rows": [
+        "..oooooooooo..",
+        ".oLLLLLLMMMMo.",
+        "oLWWLLLMMMMMMo",
+        "oLWLLLMMMMMMMo",
+        "oLLLLMMMMMMMDo",
+        "oLLLMMMMMMMMDo",
+        "oLLMMMMMMMMDDo",
+        "oLMMMMMMMMMDDo",
+        "oMMMMMMMMMDDDo",
+        "oMMMMMMMMDDDDo",
+        "oMMMMMMMDDDDDo",
+        "oMMMMMDDDDDDDo",
+        ".oMDDDDDDDDDo.",
+        "..oooooooooo.."
+      ]
+    },
+    "pokeblock-pink": {
+      "palette": {
+        "o": "#1f1530",
+        "L": "#ffd0e4",
+        "M": "#f582ae",
+        "D": "#c2487c",
+        "W": "#ffffff"
+      },
+      "rows": [
+        "..oooooooooo..",
+        ".oLLLLLLMMMMo.",
+        "oLWWLLLMMMMMMo",
+        "oLWLLLMMMMMMMo",
+        "oLLLLMMMMMMMDo",
+        "oLLLMMMMMMMMDo",
+        "oLLMMMMMMMMDDo",
+        "oLMMMMMMMMMDDo",
+        "oMMMMMMMMMDDDo",
+        "oMMMMMMMMDDDDo",
+        "oMMMMMMMDDDDDo",
+        "oMMMMMDDDDDDDo",
+        ".oMDDDDDDDDDo.",
+        "..oooooooooo.."
+      ]
+    },
+    "pokeblock-green": {
+      "palette": {
+        "o": "#1f1530",
+        "L": "#b6ecA0",
+        "M": "#55b64a",
+        "D": "#2c7a2c",
+        "W": "#ffffff"
+      },
+      "rows": [
+        "..oooooooooo..",
+        ".oLLLLLLMMMMo.",
+        "oLWWLLLMMMMMMo",
+        "oLWLLLMMMMMMMo",
+        "oLLLLMMMMMMMDo",
+        "oLLLMMMMMMMMDo",
+        "oLLMMMMMMMMDDo",
+        "oLMMMMMMMMMDDo",
+        "oMMMMMMMMMDDDo",
+        "oMMMMMMMMDDDDo",
+        "oMMMMMMMDDDDDo",
+        "oMMMMMDDDDDDDo",
+        ".oMDDDDDDDDDo.",
+        "..oooooooooo.."
+      ]
+    },
+    "pokeblock-yellow": {
+      "palette": {
+        "o": "#1f1530",
+        "L": "#fff0a0",
+        "M": "#f4c430",
+        "D": "#b98a0c",
+        "W": "#ffffff"
+      },
+      "rows": [
+        "..oooooooooo..",
+        ".oLLLLLLMMMMo.",
+        "oLWWLLLMMMMMMo",
+        "oLWLLLMMMMMMMo",
+        "oLLLLMMMMMMMDo",
+        "oLLLMMMMMMMMDo",
+        "oLLMMMMMMMMDDo",
+        "oLMMMMMMMMMDDo",
+        "oMMMMMMMMMDDDo",
+        "oMMMMMMMMDDDDo",
+        "oMMMMMMMDDDDDo",
+        "oMMMMMDDDDDDDo",
+        ".oMDDDDDDDDDo.",
+        "..oooooooooo.."
+      ]
+    },
     "x-attack": {
       "rows": [
         ".......aaab...",
@@ -1318,6 +1443,156 @@
         "h": "#aab0df",
         "i": "#bc9ed7",
         "j": "#e383c8"
+      }
+    },
+    "liechi-berry": {
+      "rows": [
+        "...abbbbbc....",
+        "..bbdeedffb...",
+        ".bddfefghffb..",
+        "abhgdeehddfdc.",
+        "bdhdedhfeffgia",
+        "bfddefgheedhia",
+        "bfdgdefdddhjgc",
+        "chdhjfefhghgic",
+        "ciddghffhhjia.",
+        "acdfdhhdhjjia.",
+        ".cbhhgghgiic..",
+        "..cciiijjia...",
+        "...accaccc....",
+        ".............."
+      ],
+      "palette": {
+        "a": "#413731",
+        "b": "#858274",
+        "c": "#70523a",
+        "d": "#ccb285",
+        "e": "#f1ebce",
+        "f": "#dcd0ab",
+        "g": "#c77c37",
+        "h": "#c8945a",
+        "i": "#aa622d",
+        "j": "#e08c3e"
+      }
+    },
+    "salac-berry": {
+      "rows": [
+        "....a.........",
+        "...bb.........",
+        "..cdef.gffh...",
+        "...dibhdebfa..",
+        "..afeejiieha..",
+        ".chgjdiiidba..",
+        ".hjeejdidff...",
+        "abieeejgfeebfa",
+        "hdeejjgchjeiba",
+        "bieejgggccffh.",
+        "cjjdjgdggf....",
+        "accccgjchh....",
+        ".cccgjcc......",
+        "..aahg........"
+      ],
+      "palette": {
+        "a": "#313131",
+        "b": "#789465",
+        "c": "#396535",
+        "d": "#7daf69",
+        "e": "#87c078",
+        "f": "#648052",
+        "g": "#518c49",
+        "h": "#516f47",
+        "i": "#abda91",
+        "j": "#67a15d"
+      }
+    },
+    "ganlon-berry": {
+      "rows": [
+        "....abbccbd...",
+        "...dbeeeefbb..",
+        "..bbcfffffbba.",
+        ".dgehibeeeccad",
+        ".ijejhgeefcfbd",
+        "dhjejjfffgbfga",
+        "ijjjgjgfgcagga",
+        "cegjjghiiihgga",
+        "cechjfggghhica",
+        "bcbcjhhcccbiaa",
+        "...bchghibcad.",
+        "....abcchiba..",
+        "......accid...",
+        ".......aaa...."
+      ],
+      "palette": {
+        "a": "#4f4b64",
+        "b": "#686381",
+        "c": "#766f9a",
+        "d": "#3d3b38",
+        "e": "#b9b1e4",
+        "f": "#968ec6",
+        "g": "#938aab",
+        "h": "#998d79",
+        "i": "#766c67",
+        "j": "#bab3a8"
+      }
+    },
+    "lansat-berry": {
+      "rows": [
+        "....a.........",
+        "...bab........",
+        "....aca..dbb..",
+        "...bbccaeefdb.",
+        "feggeacccehd..",
+        "fgggeccccef...",
+        "ddhiiccccadd..",
+        "dfjiiecccadb..",
+        "bfgiiieaaefb..",
+        "bdhggigeejhd..",
+        ".bfjjggjjhhfd.",
+        ".fjjhjjjhfhhd.",
+        "bdfdbdjhd..bb.",
+        ".b....fd......"
+      ],
+      "palette": {
+        "a": "#577e60",
+        "b": "#323332",
+        "c": "#72ac85",
+        "d": "#684738",
+        "e": "#a18d6e",
+        "f": "#8c5d4a",
+        "g": "#de9c7f",
+        "h": "#be7053",
+        "i": "#efb79e",
+        "j": "#d38364"
+      }
+    },
+    "sitrus-berry": {
+      "rows": [
+        "........aaa...",
+        "......aabbba..",
+        "....cdedbbba..",
+        "...aefgfgbba..",
+        ".cdehifijhdc..",
+        "adfiiijijihca.",
+        "cghfjjiijfeca.",
+        "dijjihiigeeec.",
+        "djijfhifijhec.",
+        "chijiijfffgec.",
+        "achijijihgedc.",
+        ".adghhgeegdc..",
+        "..ceeeeedcc...",
+        "..ccccccca...."
+      ],
+      "palette": {
+        "a": "#393f35",
+        "b": "#568247",
+        "c": "#74673c",
+        "d": "#a09048",
+        "e": "#c5a548",
+        "f": "#f5d95c",
+        "g": "#d8bc51",
+        "h": "#e4c855",
+        "i": "#f9e363",
+        "j": "#ffef6b"
       }
     }
   }

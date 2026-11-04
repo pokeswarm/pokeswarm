@@ -267,7 +267,10 @@ export function buildSimRules(region?: string): SimRules {
     enemies: { kinds: enemiesConfig.kinds.map((k) => ({ ...k, types: generated.pokemon[k.species ?? k.id]!.types.map(typeIndex) })) },
     spawn: rs.spawn,
     status: statusConfig,
-    pickups: pickupConfig,
+    // 箱の中身は地方ごと（07 の188章）
+    pickups: pickupConfig.regionBuffs[regionId]
+      ? { ...pickupConfig, items: { ...pickupConfig.items, buff: { buffs: pickupConfig.regionBuffs[regionId]!.buffs } } }
+      : pickupConfig,
     combat: combatConfig,
     moves,
     types,

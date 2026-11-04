@@ -353,6 +353,42 @@
       "...kggggggggk...",
       "....kkkkkkkk....",
       "................"
+    ],
+    "berry": [
+      "................",
+      ".......kk.......",
+      "......kCCk......",
+      ".....kCcCk.kk...",
+      "..kk.kCCkkkcCk..",
+      ".kCCkkkkkCcCCk..",
+      "..kkkRRRRkkkk...",
+      "...kRRwRRRRk....",
+      "..kRRwwRRRRRk...",
+      "..kRRwRRRRRrk...",
+      "..kRRRRRRRRrk...",
+      "..kRRRRRRRrrk...",
+      "...kRRRRrrrk....",
+      "....krrrrrk.....",
+      ".....kkkkk......",
+      "................"
+    ],
+    "pokeblock": [
+      "................",
+      "................",
+      "....kkkkkkkk....",
+      "...kWWWWWWPPk...",
+      "..kWwwWWWPPPPk..",
+      "..kWwWWWPPPPPk..",
+      "..kWWWWPPPPPdk..",
+      "..kWWWPPPPPPdk..",
+      "..kWWPPPPPPddk..",
+      "..kWPPPPPPdddk..",
+      "..kPPPPPPddddk..",
+      "...kPPPddddk....",
+      "....kkkkkkkk....",
+      "................",
+      "................",
+      "................"
     ]
   },
   "candyBurst": [

@@ -1,6 +1,6 @@
 import { boxOf } from '../sim/systems/attack';
 import Phaser from 'phaser';
-import { achievementsConfig, derivedStatSources, playablesConfig, effectRecipes, moveSprites, generated, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, regionStage, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig, type RegionStage } from '../data';
+import { achievementsConfig, pickupConfig, derivedStatSources, playablesConfig, effectRecipes, moveSprites, generated, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, regionStage, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig, type RegionStage } from '../data';
 import { buildSimRules, localName, mergeModifiers, permanentModifiers, playableLoadout } from '../data/simRules';
 import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
@@ -1086,7 +1086,11 @@ export class RunScene extends Phaser.Scene {
         else if (it.kind === 'buff') {
           // 箱の一時的な強化: 拾った人に、道具の名前と効いている時間
           const def = w.rules.pickups.items.buff?.buffs[it.levels];
-          if (def && it.by === this.localId) this.announce(t('item.buff', { name: localName(generated.items[def.item]?.names, getLocale(), def.item), seconds: def.seconds }), '#ffe082');
+          if (def && it.by === this.localId) {
+            // ポロックは原作の道具の名前が無いので翻訳ファイルから
+            const name = generated.items[def.item] ? localName(generated.items[def.item]?.names, getLocale(), def.item) : tMaybe(`item.${def.item}`);
+            this.announce(def.healPct ? t('item.berryHeal', { name }) : t('item.buff', { name, seconds: def.seconds }), '#ffe082');
+          }
         }
         else if (it.kind === 'magnet') this.announce(t('item.magnet'), '#ef9a9a');
         // はね: だれが拾っても全員に知らせる（全員のランでルギア・ホウオウと戦える）
@@ -1683,7 +1687,8 @@ export class RunScene extends Phaser.Scene {
       seen.add(it.id);
       let img = this.itemImages.get(it.id);
       if (!img) {
-        img = this.add.image(it.x, it.y, pixelTextureKey(it.kind)).setScale(itemSprites.dot).setDepth(spriteRender.depths.items + 0.05);
+        // 箱の中身の絵は地方ごと（きのみ・ポロック）
+        img = this.add.image(it.x, it.y, pixelTextureKey((it.kind === 'buff' && pickupConfig.regionBuffs[this.stageOfRegion.id]?.sprite) || it.kind)).setScale(itemSprites.dot).setDepth(spriteRender.depths.items + 0.05);
         this.itemImages.set(it.id, img);
       }
       // ふわふわ上下させて目立たせる。足元に影

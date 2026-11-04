@@ -130,7 +130,7 @@ function mark(s) {
 function card(m) {
   const st = m.max, s1 = m.lv1;
   const status = st.status ? `${st.status.name} ${Math.round(st.status.chance * 100)}%` : null;
-  const from = m.from ? `<div class="chain"><span class="mv" style="--tc2: var(--t-${byKey[m.from.move]?.type ?? "normal"})">${esc(mvName(m.from.move))}</span><span class="how">${esc(m.from.via)}${m.from.line ? `（${esc(pk(m.from.line))}だけ）` : ""}</span><span class="how">→ この技</span></div>` : "";
+  const from = m.from.map((f) => `<div class="chain"><span class="mv" style="--tc2: var(--t-${byKey[f.move]?.type ?? "normal"})">${esc(mvName(f.move))}</span><span class="how">${esc(f.via)}${f.line ? `（${esc(pk(f.line))}だけ）` : ""}</span><span class="how">→ この技</span></div>`).join("");
   const to = m.to.length ? `<div class="chain"><span class="how">この技 →</span>${m.to.map((k) => `<span class="mv" style="--tc2: var(--t-${byKey[k]?.type ?? "normal"})">${esc(mvName(k))}</span>`).join("")}</div>` : "";
   const users = m.users.length >= 20 ? "全員" : m.users.map(pk).join("・");
   const u = url(m);

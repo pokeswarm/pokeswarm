@@ -397,3 +397,20 @@ describe('ドラゴン 600 族の固有技・げきりん（07 の184章）', ()
     expect(effectRecipes['lava-plume']!.drawOnFloor).toBe(true);
   });
 });
+
+describe('ふんか は 3 系統がそれぞれの形で覚える', () => {
+  it('バクフーン: かえんほうしゃ ＋ マックスアップ。エンテイ: かえんほうしゃ ＋ ほのおのいし。ドンメルの条件はほかの系統に掛からない', () => {
+    const rules = buildSimRules('johto');
+    const move = (k: string): number => moveIndexOf(rules, k);
+    const offered = (line: string, form: string, item: string): boolean => {
+      const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+      const lo = playableLoadout(rules, line);
+      const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, types: lo.types, moveTypes: lo.moveTypes, fixedMoves: lo.fixedMoves, line: lo.line, species: rules.species.findIndex((s) => s.key === form), moves: [] });
+      p.moves = [{ move: move('flamethrower'), level: 8, cooldown: 0, burstLeft: 0, burstTimer: 0 }];
+      p.items = [{ item: rules.items.findIndex((x) => x.key === item), level: 1 }];
+      return makeOffers(sim.world, p).some((o) => o.kind === 'derive' && o.to === move('eruption'));
+    };
+    expect(offered('cyndaquil', 'typhlosion', 'hp-up')).toBe(true);
+    expect(offered('entei', 'entei', 'fire-stone')).toBe(true);
+  });
+});

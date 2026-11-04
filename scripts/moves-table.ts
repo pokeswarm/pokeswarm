@@ -183,7 +183,8 @@ const statOf = (def: MoveDef, level: number) => {
 const rows = keys.map((k) => {
   const def = moves[k]!;
   const max = def.levels.length + 1;
-  const from = derivedFrom.get(k) ?? uniqueFrom.get(k) ?? null;
+  // 覚え方は全部載せる（ふんか: バクフーン・エンテイ・バクーダで別々。1 つだけ載せると、その系統の技に見えてしまう）
+  const froms = [...derivations.derivations, ...derivations.unique].filter((d) => d.to === k);
   const raw = def as unknown as { region?: string; teachOnly?: boolean; learners?: string[] };
   const demo = demoUrl(k);
   return {
@@ -200,7 +201,7 @@ const rows = keys.map((k) => {
     maxLevel: max,
     lv1: statOf(def, 1),
     max: statOf(def, max),
-    from: from ? { move: from.from, via: via(from), item: from.item ?? null, line: from.line ?? null } : null,
+    from: froms.map((d) => ({ move: d.from, via: via(d), item: d.item ?? null, line: d.line ?? null })),
     to: derivesTo(k).map((d) => d.to),
     users: userKeys(k),
     demo,

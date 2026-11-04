@@ -3,7 +3,7 @@ import type { World } from '../sim/world';
 import { hexColor } from './color';
 import { DAMAGE_FONT_KEY, ensureDamageFont } from './DamageNumbers';
 
-/** 同時に出す数字の上限（多いと画面が数字で埋まるので、近い敵を優先する） */
+/** 同時に出す数字の上限（多いと画面が数字で埋まるので、超えた分は出さない） */
 const MAX_COUNTS = 48;
 const COUNT_COLOR = hexColor('#ce93d8');
 

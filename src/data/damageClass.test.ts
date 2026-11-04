@@ -18,8 +18,6 @@ describe('技進化で ぶつり／とくしゅ が変わらない', () => {
       const a = classOf(d.from);
       const b = classOf(d.to);
       if (a === 'status' || b === 'status') continue;
-      // カイリューは エアスラッシュ から げきりん を覚える（作者の決定。07 の184章）
-      if (d.from === 'air-slash' && d.to === 'outrage') continue;
       if (a !== b) bad.push(`${d.from}（${a}）→ ${d.to}（${b}）`);
     }
     expect(bad).toEqual([]);

@@ -25,8 +25,6 @@ describe('技進化で届く距離が大きく縮まない', () => {
   it('派生の Lv1 の届く距離 ≥ 元の最大の 6 割', () => {
     const bad: string[] = [];
     for (const d of [...derivationsConfig.derivations, ...derivationsConfig.unique]) {
-      // カイリューの げきりん は近くの敵へ飛びかかる技で、遠くへ届く エアスラッシュ から覚える（作者の決定。07 の184章）
-      if (d.from === 'air-slash' && d.to === 'outrage') continue;
       const a = movesConfig.moves[d.from]!;
       const b = movesConfig.moves[d.to]!;
       if (selfCentered(b) || ['heal', 'rest', 'passive', 'weather'].includes(a.pattern)) continue;

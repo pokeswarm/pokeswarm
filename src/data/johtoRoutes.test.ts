@@ -8,7 +8,8 @@ describe('カントー・ジョウトの技の進化の形', () => {
   it('カントー・ジョウトの系統に、ホウエンの仕掛け（支えの技・天気・ランの記録）を使わない', () => {
     const hoenn = new Set(regionsConfig.regions.find((r) => r.id === 'hoenn')!.playables);
     const lines = new Set(regionsConfig.regions.filter((r) => r.id !== 'hoenn').flatMap((r) => r.playables).filter((l) => !hoenn.has(l)));
-    const bad = derivationsConfig.unique.filter((d) => d.line && lines.has(d.line) && (d.needsMoves || d.weather || d.runStat || d.itemLevel));
+    // カイリューの げきりん だけは例外: ボーマンダと同じく エアスラッシュ を覚えていると進化する（作者の決定。07 の185章）
+    const bad = derivationsConfig.unique.filter((d) => d.line && lines.has(d.line) && !(d.line === 'dratini' && d.to === 'outrage') && (d.needsMoves || d.weather || d.runStat || d.itemLevel));
     expect(bad.map((d) => `${d.line}: ${d.to}`)).toEqual([]);
   });
 

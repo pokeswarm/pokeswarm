@@ -220,6 +220,12 @@
       "from": "counter",
       "item": "black-belt",
       "to": "revenge"
+    },
+    {
+      "from": "dragon-tail",
+      "item": "dragon-fang",
+      "to": "dragon-rush",
+      "line": "dratini"
     }
   ],
   "unique": [
@@ -899,6 +905,23 @@
       }
     },
     {
+      "from": "dragon-tail",
+      "item": "dragon-fang",
+      "to": "dragon-claw",
+      "line": "dratini"
+    },
+    {
+      "from": "dragon-claw",
+      "to": "outrage",
+      "line": "dratini",
+      "needsMoves": [
+        {
+          "move": "air-slash",
+          "level": 8
+        }
+      ]
+    },
+    {
       "from": "water-gun",
       "item": "mystic-water",
       "to": "water-pulse",
@@ -1145,12 +1168,6 @@
       "item": "silk-scarf",
       "to": "hyper-beam",
       "line": "bagon"
-    },
-    {
-      "from": "air-slash",
-      "item": "dragon-fang",
-      "to": "outrage",
-      "line": "dratini"
     }
   ]
 }

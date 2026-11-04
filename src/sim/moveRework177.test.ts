@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { effectRecipes } from '../data';
-import { buildSimRules, moveIndexOf } from '../data/simRules';
+import { buildSimRules, moveIndexOf, playableLoadout } from '../data/simRules';
 import { Simulation } from './simulation';
+import { applyOffer, makeOffers } from './systems/leveling';
 
 /** 07 の177章: 技で起きていることから作り直した技 */
 function setup(move: string, region = 'kanto') {
@@ -332,11 +333,37 @@ describe('とっておき: 消費した技が順に出る連続技（07 の183�
 });
 
 describe('ドラゴン 600 族の固有技・げきりん（07 の184章）', () => {
-  it('カイリューは エアスラッシュ ＋ りゅうのキバ で げきりん、ボーマンダは りゅうのはどう ＋ シルクのスカーフ で はかいこうせん', () => {
+  it('カイリュー: ドラゴンテール ＋ りゅうのキバ → ドラゴンクロー、ドラゴンクロー ＋ エアスラッシュ最大 → げきりん（ボーマンダと同じ。07 の185章）', () => {
     const rules = buildSimRules('kanto');
-    const route = (line: string, from: string, to: string) => rules.derivations.find((d) => d.line === line && d.from === moveIndexOf(rules, from) && d.to === moveIndexOf(rules, to));
-    expect(route('dratini', 'air-slash', 'outrage')).toBeDefined();
-    expect(route('dratini', 'dragon-pulse', 'hyper-beam')).toBeDefined();
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    const lo = playableLoadout(rules, 'dratini');
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, types: lo.types, moveTypes: lo.moveTypes, fixedMoves: lo.fixedMoves, line: lo.line, species: lo.species, moves: [] });
+    const move = (k: string): number => moveIndexOf(rules, k);
+    const pm = (k: string, level: number) => ({ move: move(k), level, cooldown: 0, burstLeft: 0, burstTimer: 0 });
+    const derives = (k: string) => makeOffers(sim.world, p).find((o) => o.kind === 'derive' && o.to === move(k));
+    const seen = (k: string): boolean => Array.from({ length: 40 }, () => derives(k)).some(Boolean);
+    const dragonite = rules.species.findIndex((s) => s.key === 'dragonite');
+    p.items = [{ item: rules.items.findIndex((x) => x.key === 'dragon-fang'), level: 1 }];
+
+    // ミニリュウの間は ドラゴンダイブ だけ。カイリューになると ドラゴンクロー も選べる
+    p.moves = [pm('dragon-tail', 8)];
+    expect(seen('dragon-rush')).toBe(true);
+    expect(seen('dragon-claw')).toBe(false);
+    p.species = dragonite;
+    expect(seen('dragon-rush')).toBe(true);
+    expect(seen('dragon-claw')).toBe(true);
+
+    // げきりん は持ち物がいらない。エアスラッシュ が最大でないと出ない。エアスラッシュ は消費しない
+    p.items = [];
+    p.moves = [pm('dragon-claw', 8), pm('air-slash', 7)];
+    expect(seen('outrage')).toBe(false);
+    p.moves = [pm('dragon-claw', 8), pm('air-slash', 8)];
+    expect(seen('outrage')).toBe(true);
+    applyOffer(sim.world, p, derives('outrage') ?? { kind: 'derive', slot: 0, to: move('outrage'), item: -1, unique: true });
+    expect(p.moves.map((m) => m.move).sort()).toEqual([move('outrage'), move('air-slash')].sort());
+  });
+
+  it('ボーマンダは りゅうのはどう ＋ シルクのスカーフ で はかいこうせん', () => {
     const hoenn = buildSimRules('hoenn');
     expect(hoenn.derivations.find((d) => d.line === 'bagon' && d.from === moveIndexOf(hoenn, 'dragon-pulse') && d.to === moveIndexOf(hoenn, 'hyper-beam'))).toBeDefined();
   });

@@ -26,13 +26,13 @@ export function isBossKind(world: World, kind: number): boolean {
  * ボス・伝説を出す。HP は参加人数に応じて上げる（2.2）。タッグのボスは、その前に bossRules.tagHpMultiplier 倍（ソロの補正。07 の89.5）。
  * 出せなければ -1
  */
-function spawnBoss(world: World, kindIndex: number, moves: readonly number[], interval: number, enrage: BossEntry['enrage'] = null, tag = false, hpScale = 1, phases?: BossEntry['phases']): number {
+function spawnBoss(world: World, kindIndex: number, moves: readonly number[], interval: number, enrage: BossEntry['enrage'] = null, tag = false, hpScale = 1, phases?: BossEntry['phases'], anchor?: { x: number; y: number }): number {
   const rules = world.rules.stage.bossRules;
   const kind = world.rules.enemies.kinds[kindIndex]!;
   const p = world.players[world.rng.int(world.players.length)]!;
   const [ux, uy] = randomUnit(world.rng);
-  const x = p.x + ux * rules.spawnDistance;
-  const y = p.y + uy * rules.spawnDistance;
+  const x = anchor ? p.x + anchor.x : p.x + ux * rules.spawnDistance;
+  const y = anchor ? p.y + anchor.y : p.y + uy * rules.spawnDistance;
   // 伝説は人数倍（07 の123章）
   const perExtra = kind.rank === 'legendary' ? (rules.legendHpPerExtraPlayerPct ?? rules.hpPerExtraPlayerPct) : rules.hpPerExtraPlayerPct;
   const hp = kind.hp * hpScale * (tag ? (rules.tagHpMultiplier ?? 1) : 1) * (1 + (perExtra * (world.players.length - 1)) / 100);
@@ -63,6 +63,7 @@ function spawnLegend(world: World, kind: number, hpScale = 1): number {
     false,
     hpScale,
     set?.phases?.map((ph) => ({ belowRatio: ph.belowHpPct / 100, moves: ph.moves.map((m) => world.rules.stage.moves.findIndex((x) => x.id === m)) })),
+    set?.anchor,
   );
   const boss = world.bosses.find((b) => b.id === id);
   if (boss && set?.random) boss.random = true;
@@ -407,6 +408,10 @@ export function bossAttacks(world: World): void {
         boss.cooldown = boss.interval;
         continue;
       }
+      // 天気で歩く速さが変わる（止まって出す技の間は止まったまま）
+      if (world.rules.stage.legendary?.moveSets[world.rules.enemies.kinds[world.enemies.kind[i]!]?.id ?? '']?.weatherStates && !bossBusy(world, boss.id) && !world.hazards.some((h) => h.dasher === boss.id && world.rules.stage.moves[h.move]?.rooted && h.activeTicks === undefined)) {
+        world.enemies.speed[i] = bossSpeed(world, boss, i);
+      }
       // 技が終わってから間隔を数える（間隔のぶん必ず歩く）
       if (boss.intervalAfterMove && bossBusy(world, boss.id)) {
         boss.cooldown = boss.interval;
@@ -459,6 +464,16 @@ export function absorbBarrier(world: World, i: number, amount: number): number {
   for (let q = world.bossQueue.length - 1; q >= 0; q--) if (world.bossQueue[q]!.bossId === id) world.bossQueue.splice(q, 1);
   if (boss.barrierBreak !== undefined) (boss.forced ??= []).unshift(boss.barrierBreak);
   return rest;
+}
+
+/** 天気の姿（リザードン。07 の198章）: i の相手の今の天気の姿。無ければ null */
+export function legendWeatherState(world: World, i: number): NonNullable<NonNullable<NonNullable<World['rules']['stage']['legendary']>['moveSets'][string]['weatherStates']>>[number] | null {
+  const kind = world.rules.enemies.kinds[world.enemies.kind[i]!];
+  if (kind?.rank !== 'legendary') return null;
+  const states = world.rules.stage.legendary?.moveSets[kind.id]?.weatherStates;
+  if (!states) return null;
+  for (const s of states) if (world.hazards.some((h) => world.rules.stage.moves[h.move]?.id === s.hazardMove)) return s;
+  return null;
 }
 
 /** kind の id の相手のうち、生きているものの敵の番号。いなければ -1 */
@@ -528,7 +543,7 @@ function stackedBuff(world: World, boss: World['bosses'][number]): BossMove['buf
 
 /** ボスの今の速さ（りゅうのまい の段を足す） */
 function bossSpeed(world: World, boss: World['bosses'][number], i: number): number {
-  const base = enemyMoveSpeed(world, world.enemies.kind[i]!);
+  const base = enemyMoveSpeed(world, world.enemies.kind[i]!) * ((legendWeatherState(world, i)?.speedPct ?? 100) / 100);
   return base * (1 + ((boss.stacks ?? 0) * (stackedBuff(world, boss)?.speedPct ?? 0)) / 100);
 }
 
@@ -620,12 +635,11 @@ function useBossMove(world: World, boss: World['bosses'][number], i: number, for
   if (moveIdx === -1 && boss.pool && boss.pool.length > 0) moveIdx = boss.pool[world.rng.int(boss.pool.length)]!;
   let move = world.rules.stage.moves[moveIdx];
   // 天気で技が変わる（にほんばれ の間の ソーラービーム など）
-  if (move?.whenWeather) {
-    const weather = move.whenWeather.hazardMove;
-    if (world.hazards.some((h) => world.rules.stage.moves[h.move]?.id === weather)) {
-      moveIdx = moveIndexOfStage(world.rules, move.whenWeather.useMove);
-      move = world.rules.stage.moves[moveIdx];
-    }
+  for (const alt of move?.whenWeather ?? []) {
+    if (!world.hazards.some((h) => world.rules.stage.moves[h.move]?.id === alt.hazardMove)) continue;
+    moveIdx = moveIndexOfStage(world.rules, alt.useMove);
+    move = world.rules.stage.moves[moveIdx];
+    break;
   }
   // 投げる相手がいなければ別の技（カビゴンがいないときの サイコキネシス）。いれば、相手の今の技をやめさせる
   if (move?.throwPartner) {
@@ -698,8 +712,11 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     if (--boss.radiusBuff.uses <= 0) boss.radiusBuff = undefined;
   }
   const radius = scale !== 1 ? move.radius * scale : undefined;
+  // 天気の姿で威力が変わる（リザードン）
+  const statePct = legendWeatherState(world, i)?.damagePct ?? 100;
+  const stateDamage = statePct !== 100 && move.damage > 0 ? { damage: (move.damage * statePct) / 100 } : {};
   const put = (x: number, y: number, dx: number, dy: number, dasher: number, extra: Parameters<typeof addHazard>[8] = {}): void =>
-    addHazard(world, moveIdx, x, y, dx, dy, dasher, undefined, { group, ...(radius ? { radius } : {}), ...extra });
+    addHazard(world, moveIdx, x, y, dx, dy, dasher, undefined, { group, ...(radius ? { radius } : {}), ...stateDamage, ...extra });
   // 狙い直して何回も置く（みらいよち）: 続きを予定に入れる
   if (move.repeat && repeatIndex === 0) {
     for (let k = 1; k < move.repeat.count; k++) world.bossQueue.push({ tick: world.tick + Math.round((k * move.repeat.everySeconds) / world.dt), bossId, move: moveIdx, index: k });
@@ -721,6 +738,12 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
       const [rx, ry] = randomUnit(world.rng);
       put(bx, by, rx, ry, bossId);
     }
+    return;
+  }
+  if (move.surfRing) {
+    // 足元から広がる波の輪（カメックスの なみのり）: 切れ目の向きは、狙った人の向きから少しずらす
+    const a = Math.atan2(uy, ux) + (world.rng.next() - 0.5) * Math.PI * 0.8;
+    put(bx, by, Math.cos(a), Math.sin(a), move.rooted ? bossId : -1, { radius: move.surfRing.startRadius + move.surfRing.width, inner: move.surfRing.startRadius });
     return;
   }
   if (move.wall) {
@@ -1065,6 +1088,8 @@ function strikeHazards(world: World): void {
         continue;
       }
       stepActiveHazard(world, hz, move);
+      // 全域の削り（カメックスの ふぶき）: 自分のプレイヤーだけ、0.5 秒ごと
+      if (move?.fieldDotPct && me && !me.down && hz.activeTicks % Math.round(0.5 / world.dt) === 0) fieldDamage(world, me, (me.maxHp * move.fieldDotPct * 0.5) / 100);
       if (move?.hitEverySeconds && hz.hitLocal && hz.rehitTicks !== undefined && --hz.rehitTicks <= 0) {
         hz.hitLocal = false;
         if (hz.group !== undefined) world.hazardGroupsHit.delete(hz.group);
@@ -1200,6 +1225,11 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
     // 飛ぶ玉（サンダー）: 向きへまっすぐ進む
     hz.x += hz.dirX * bullets.speed * world.dt;
     hz.y += hz.dirY * bullets.speed * world.dt;
+    return;
+  }
+  if (move.surfRing) {
+    hz.radius += move.surfRing.speed * world.dt;
+    hz.innerRadius = (hz.innerRadius ?? 0) + move.surfRing.speed * world.dt;
     return;
   }
   if (move.bounce) {
@@ -1411,7 +1441,16 @@ export function hazardHits(
   if (hz.shape === 'circle') return (x - hz.x) ** 2 + (y - hz.y) ** 2 <= (radius + r) ** 2;
   if (hz.shape === 'ring') {
     const d = Math.hypot(x - hz.x, y - hz.y);
-    return d <= radius + r && d >= (hz.innerRadius ?? 0) - r;
+    if (d > radius + r || d < (hz.innerRadius ?? 0) - r) return false;
+    // 広がる波の輪の切れ目（向かい合う 2 か所）
+    if (move?.surfRing) {
+      const off = Math.abs(Math.atan2(y - hz.y, x - hz.x) - Math.atan2(hz.dirY, hz.dirX));
+      const k = off % Math.PI;
+      const near = Math.min(k, Math.PI - k);
+      const half = (move.surfRing.gapDegrees * Math.PI) / 360;
+      if (near < half - Math.asin(Math.min(1, r / Math.max(r, d)))) return false;
+    }
+    return true;
   }
   if (hz.shape === 'cone') {
     const dx = x - hz.x;
@@ -1778,7 +1817,7 @@ export function startLegendary(world: World, kind: number, round = roundIndexOf(
   if (!cfg) return;
   world.cleared = true;
   const appearTick = world.tick + Math.round(cfg.warningSeconds / world.dt);
-  world.legendary = { kind, appearTick, endTick: appearTick + Math.round(cfg.timeLimitSeconds / world.dt), spawned: false, result: null, round };
+  world.legendary = { kind, appearTick, endTick: appearTick + Math.round((cfg.rounds?.[round]?.timeLimitSeconds ?? cfg.timeLimitSeconds) / world.dt), spawned: false, result: null, round };
   // 乱入していた伝説（三犬）も、ほかの敵と一緒にいなくなる
   if (world.intruder) world.intruder.done = true;
   world.legendAis.clear();

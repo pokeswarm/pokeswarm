@@ -564,9 +564,16 @@ export const bossMoveSchema = z.object({
   /** gridWave の衝撃波の輪の色（外から内へ。落ちた瞬間にボスの足元から広がり、輪が通ったマスで地面が爆ぜる。07 の196章） */
   shockRing: z.array(z.string()).min(1).optional(),
   /**
-   * 天気で技が変わる（御三家。07 の197章）: 技 hazardMove（にほんばれ・あめごい）が出ている間は、この技の代わりに useMove を使う
+   * 天気で技が変わる（御三家。07 の197章）: 技 hazardMove（にほんばれ・あまごい）が出ている間は、この技の代わりに useMove を使う
    */
-  whenWeather: z.object({ hazardMove: z.string().min(1), useMove: z.string().min(1) }).optional(),
+  whenWeather: z.array(z.object({ hazardMove: z.string().min(1), useMove: z.string().min(1) })).optional(),
+  /**
+   * 足元から広がる波の輪（カメックスの なみのり。07 の198章）: 半径 startRadius から速さ speed で広がる。足元の startRadius の内側は安全。
+   * 向かい合う 2 か所に gapDegrees 度の切れ目があり、抜けられる
+   */
+  surfRing: z.object({ startRadius: z.number().positive(), speed: z.number().positive(), width: z.number().positive(), gapDegrees: z.number().positive() }).optional(),
+  /** 当たっている間、画面のどこにいても毎秒 最大 HP のこの % だけ削られる（カメックスの ふぶき。防御は効かない。07 の198章） */
+  fieldDotPct: z.number().positive().optional(),
   /** この技を使うと、出ている技 moves を消す（にほんばれ と あまごい は同時に降らない。ゲストにも予告の知らせで届く。07 の197章） */
   clearsMoves: z.array(z.string().min(1)).optional(),
   /** 予告の間、ボスの体をこの高さまで浮かせる（エーフィの サイコキネシス。07 の195章） */
@@ -812,6 +819,25 @@ export const stageConfigSchema = z.object({
               })
               .optional(),
             chargePose: z.string().optional(),
+            /** 地面のこの場所（プレイヤーからの距離）に陣取って出る（動かない相手は enemies.json の motion を still にする。07 の198章） */
+            anchor: z.object({ x: z.number(), y: z.number() }).optional(),
+            /**
+             * 天気の姿（リザードン。07 の198章）: 技 hazardMove が出ている間の 歩く速さ（%）・プレイヤーを追うか・技の威力（%）・受けるダメージ（%）・体の色・体に重ねる絵・残像の数
+             */
+            weatherStates: z
+              .array(
+                z.object({
+                  hazardMove: z.string().min(1),
+                  speedPct: z.number().positive(),
+                  chase: z.boolean(),
+                  damagePct: z.number().positive(),
+                  damageTakenPct: z.number().positive(),
+                  tints: z.array(z.string()).min(1),
+                  aura: z.object({ id: z.string().min(1), size: z.number().positive() }),
+                  afterimages: z.number().int().nonnegative().default(0),
+                }),
+              )
+              .optional(),
             /** HP が belowHpPct % を切ったら、今の技が終わり次第 moves を順に使う（ピカチュウのボルテッカー。07 の194章） */
             hpMoves: z.array(z.object({ belowHpPct: z.number().gt(0).lt(100), moves: z.array(z.string()).min(1) })).optional(),
             /** 第 2 段階（技が速くなる・DANGER）を使わない。行動を作者が決めた相手（07 の194章） */
@@ -852,6 +878,8 @@ export const stageConfigSchema = z.object({
             kinds: z.array(z.string().min(1)).min(1),
             stat: z.string().optional(),
             bgm: z.string().optional(),
+            /** このラウンドの制限時間（省略で legendary.timeLimitSeconds。07 の198章） */
+            timeLimitSeconds: z.number().positive().optional(),
           }),
         )
         .optional(),

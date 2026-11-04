@@ -569,7 +569,8 @@
           "red-blastoise"
         ],
         "stat": "redDefeated",
-        "bgm": "johto-red"
+        "bgm": "johto-red",
+        "timeLimitSeconds": 240
       }
     ],
     "bonusRounds": [
@@ -742,7 +743,11 @@
               "venusaur-synthesis"
             ]
           }
-        ]
+        ],
+        "anchor": {
+          "x": -430,
+          "y": -150
+        }
       },
       "red-charizard": {
         "moves": [
@@ -775,6 +780,43 @@
               "charizard-fire-core",
               "charizard-tired"
             ]
+          }
+        ],
+        "anchor": {
+          "x": 0,
+          "y": 320
+        },
+        "weatherStates": [
+          {
+            "hazardMove": "venusaur-sunny-day",
+            "speedPct": 107,
+            "chase": true,
+            "damagePct": 150,
+            "damageTakenPct": 50,
+            "tints": [
+              "#ff8a65",
+              "#ffb74d"
+            ],
+            "aura": {
+              "id": "flame-shroud",
+              "size": 2.6
+            },
+            "afterimages": 3
+          },
+          {
+            "hazardMove": "blastoise-rain-dance",
+            "speedPct": 50,
+            "chase": true,
+            "damagePct": 60,
+            "damageTakenPct": 150,
+            "tints": [
+              "#90caf9"
+            ],
+            "aura": {
+              "id": "steam-wisps",
+              "size": 2.2
+            },
+            "afterimages": 0
           }
         ]
       },
@@ -810,7 +852,11 @@
               "blastoise-withdraw"
             ]
           }
-        ]
+        ],
+        "anchor": {
+          "x": 430,
+          "y": -150
+        }
       },
       "legend-raikou": {
         "moves": [

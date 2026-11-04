@@ -1411,21 +1411,24 @@
       "species": "venusaur",
       "rank": "legendary",
       "sprite": "enemy/venusaur",
-      "hp": 24000,
+      "hp": 30000,
       "moveSpeed": 60,
       "radius": 40,
       "contactDamage": 36,
       "xp": 0,
       "spriteScale": 2.6,
       "drop": "potion",
-      "dropPerPlayer": true
+      "dropPerPlayer": true,
+      "motion": {
+        "type": "still"
+      }
     },
     {
       "id": "red-charizard",
       "species": "charizard",
       "rank": "legendary",
       "sprite": "enemy/charizard",
-      "hp": 24000,
+      "hp": 36000,
       "moveSpeed": 140,
       "radius": 40,
       "contactDamage": 36,
@@ -1443,14 +1446,17 @@
       "species": "blastoise",
       "rank": "legendary",
       "sprite": "enemy/blastoise",
-      "hp": 24000,
+      "hp": 30000,
       "moveSpeed": 80,
       "radius": 40,
       "contactDamage": 36,
       "xp": 0,
       "spriteScale": 2.6,
       "drop": "potion",
-      "dropPerPlayer": true
+      "dropPerPlayer": true,
+      "motion": {
+        "type": "still"
+      }
     },
     {
       "id": "legend-raikou",

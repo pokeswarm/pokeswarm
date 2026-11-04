@@ -53,7 +53,7 @@ import { clearRunProbe, writeRunProbe } from '../meta/runProbe';
 import { session } from '../meta/session';
 import { regionStatKey } from '../meta/regionScope';
 import { LevelUpPanel, offerText } from './levelUpPanel';
-import { activeField, activeLegendField, currentWeather, startIntruder, startLegendary, legendRoundKinds } from '../sim/systems/stage';
+import { activeField, activeLegendField, currentWeather, legendWeatherState, startIntruder, startLegendary, legendRoundKinds } from '../sim/systems/stage';
 import { PausePanel } from './pausePanel';
 import { ContestPanel } from './contestPanel';
 import { EvolutionCutscene } from './evolutionCutscene';
@@ -138,6 +138,8 @@ export class RunScene extends Phaser.Scene {
   /** 床に描く技の絵（ふんえんの噴煙）。ダメージの塗りつぶしの上、雑魚の下 */
   private floorSprites: MoveSprites | null = null;
   /** drift: 出てから毎秒この分だけ動かす（からげんきの汗が外の上へ飛ぶ） */
+  /** 残像を引くボスの少し前の場所（描画だけ） */
+  private readonly bossTrails = new Map<number, { x: number; y: number }[]>();
   /** ボルテッカーの残像が跳ね返った回数（描画で見た分） */
   private readonly ghostBounces = new WeakMap<object, number>();
   private strikes: { item: Omit<SpriteItem, 'elapsed' | 'alpha'>; start: number; seconds: number; drift?: { x: number; y: number } }[] = [];
@@ -1525,6 +1527,51 @@ export class RunScene extends Phaser.Scene {
         used++;
       }
     }
+    // 晴れのリザードンの残像（07 の198章）: 少し前にいた場所に、炎の色の姿を連ねる
+    {
+      const e = world.enemies;
+      for (let i = 0; i < e.count; i++) {
+        if (e.hp[i]! <= 0) continue;
+        const state = legendWeatherState(world, i);
+        const id = e.id[i]!;
+        const trail = this.bossTrails.get(id) ?? [];
+        if (!state?.afterimages) {
+          if (trail.length) this.bossTrails.delete(id);
+          continue;
+        }
+        trail.unshift({ x: e.x[i]!, y: e.y[i]! });
+        trail.length = Math.min(trail.length, state.afterimages * 4 + 1);
+        this.bossTrails.set(id, trail);
+        const manifest = this.streamer.manifestOf(e.kind[i]!);
+        const anim = manifest?.animations[spriteRender.enemyAnimation];
+        if (!manifest || !anim) continue;
+        const scale = spriteRender.enemyScale * (world.rules.enemies.kinds[e.kind[i]!]?.spriteScale ?? 1);
+        const vx = e.x[i]! - (trail[1]?.x ?? e.x[i]!);
+        const vy = e.y[i]! - (trail[1]?.y ?? e.y[i]!);
+        const frame = `${anim.frameKeyPrefix}/${directionFromVector(vx, vy)}/${Math.floor(this.time.now / 90) % anim.durations.length}`;
+        for (let k = 1; k <= state.afterimages; k++) {
+          const at = trail[k * 4];
+          if (!at) break;
+          let img = this.ghostImages[used];
+          if (!img) {
+            img = this.add.image(0, 0, atlasKey(manifest.key), frame);
+            this.ghostImages.push(img);
+          }
+          img
+            .setTexture(atlasKey(manifest.key), frame)
+            .setOrigin(0.5, 0.5)
+            .setPosition(at.x, at.y)
+            .setScale(scale, scale)
+            .setFlipX(false)
+            .setTintMode(Phaser.TintModes.FILL)
+            .setTint(hexColor(state.tints[0]!))
+            .setAlpha(0.42 * (1 - k / (state.afterimages + 1)))
+            .setDepth(depth - k * 0.001)
+            .setVisible(true);
+          used++;
+        }
+      }
+    }
     // ボスが放つ残像（ボルテッカー。07 の194章）: 持ち主の絵を、進む向きで描き、後ろに残像を連ねる
     for (const h of world.hazards) {
       const mv = world.rules.stage.moves[h.move];
@@ -1572,6 +1619,38 @@ export class RunScene extends Phaser.Scene {
   }
 
   /** ボスの範囲技の予告: 範囲の円と、落ちるまでの残りを内側から広がる円で見せる */
+  /** なみのりの波の輪（07 の198章）: 予告は足元の安全な円と切れ目の向き。広がる間は、切れ目のある帯 */
+  private drawSurfRing(g: Phaser.GameObjects.Graphics, h: Hazard, ring: { width: number; startRadius: number; gapDegrees: number }): void {
+    const dir = Math.atan2(h.dirY, h.dirX);
+    const half = (ring.gapDegrees * Math.PI) / 360;
+    if (h.activeTicks === undefined) {
+      g.lineStyle(3, 0x81d4fa, 0.9).strokeCircle(h.x, h.y, ring.startRadius);
+      g.fillStyle(0x81d4fa, 0.1).fillCircle(h.x, h.y, ring.startRadius);
+      // 切れ目の向きを、外へ延びる薄い帯で見せる
+      for (const d of [dir, dir + Math.PI]) {
+        g.lineStyle(ring.startRadius * 2 * Math.sin(half), 0xe1f5fe, 0.18).lineBetween(h.x + Math.cos(d) * ring.startRadius, h.y + Math.sin(d) * ring.startRadius, h.x + Math.cos(d) * 900, h.y + Math.sin(d) * 900);
+      }
+      return;
+    }
+    const inner = h.innerRadius ?? 0;
+    const mid = (h.radius + inner) / 2;
+    const fade = Math.min(1, h.activeTicks / 15);
+    // 向かい合う切れ目の間の 2 本の弧を、濃い青 → 水色 → 白い波頭で重ねる
+    const layers: [number, number, number, number][] = [
+      [ring.width, 0x1565c0, 0.75, mid],
+      [ring.width * 0.55, 0x4fc3f7, 0.85, mid + ring.width * 0.12],
+      [ring.width * 0.16, 0xffffff, 0.95, h.radius - ring.width * 0.06],
+    ];
+    for (const [w, color, a, r] of layers) {
+      for (const from of [dir + half, dir + Math.PI + half]) {
+        g.lineStyle(w, color, a * fade);
+        g.beginPath();
+        g.arc(h.x, h.y, r, from, from + Math.PI - half * 2, false);
+        g.strokePath();
+      }
+    }
+  }
+
   /** ギガインパクトの衝撃波（07 の196章）: 叩きつけた瞬間にボスの足元から広がる輪。マスが爆ぜる遅れと同じ速さなので、輪が通った所が爆ぜる */
   private drawShockRings(g: Phaser.GameObjects.Graphics, hazards: readonly Hazard[]): void {
     const w = this.sim.world;
@@ -1609,6 +1688,12 @@ export class RunScene extends Phaser.Scene {
         continue;
       }
       const mv = this.sim.world.rules.stage.moves[h.move];
+      if (mv?.surfRing) {
+        this.drawSurfRing(g, h, mv.surfRing);
+        continue;
+      }
+      // 威力の無い、予告を出さない技（天気・止まるだけの技）は、範囲を描かない
+      if (mv?.hideTelegraph && mv.damage <= 0) continue;
       // 落ちた後に少し当たる時間（activeTicks）は、予告を描かない（落ちた所の絵が出ている）。
       // 長く当たり続ける範囲で絵の無いもの（罠・波）は、触れると痛い範囲として薄く見せる（07 の167章）
       if (h.activeTicks !== undefined) {
@@ -1733,6 +1818,16 @@ export class RunScene extends Phaser.Scene {
    */
   private hazardSpriteItems(world: World): SpriteItem[] {
     const out: SpriteItem[] = [];
+    // 天気の姿の体の絵（リザードン: 晴れの炎・雨の湯気。07 の198章）
+    {
+      const e = world.enemies;
+      for (let i = 0; i < e.count; i++) {
+        if (e.hp[i]! <= 0) continue;
+        const aura = legendWeatherState(world, i)?.aura;
+        if (!aura) continue;
+        out.push({ spec: { id: aura.id, fit: 'circle', size: aura.size, alpha: 1, rotate: 'none', spinDegPerSec: 0, varyTiles: false, upright: false, directional: false, originY: 0.5, along: 0.6, shake: 0, tail: 0, afterimages: 0, afterimageGap: 2, overBoss: true } as SpriteItem['spec'], x: e.x[i]!, y: e.y[i]!, radius: e.radius[i]!, band: 0, dirX: 1, dirY: 0, length: 0, vx: 0, vy: 0, elapsed: world.tick * world.dt, alpha: 1, seed: e.id[i]! });
+      }
+    }
     // でんじふゆうの体の周りの電気（07 の191章）
     for (const [id, ai] of world.legendAis) {
       if (!ai.shell) continue;
@@ -2238,6 +2333,9 @@ export class RunScene extends Phaser.Scene {
     const e = this.sim.world.enemies;
     // ボスがプレイヤーと同じ技で走っている間（ボルテッカー・ブレイブバード）: プレイヤーの技の残像と同じ色で光らせる（07 の167章）
     const w = this.sim.world;
+    // 天気の姿（リザードン: 晴れは炎の色、雨は青。07 の198章）
+    const state = legendWeatherState(w, i);
+    if (state) return hexColor(state.tints[Math.floor(performance.now() / 140) % state.tints.length]!);
     // ギガインパクト: 叩きつけるまで、全身が光る
     for (const h of w.hazards) {
       const mv = w.rules.stage.moves[h.move];

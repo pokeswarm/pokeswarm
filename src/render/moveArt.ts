@@ -5800,6 +5800,54 @@ function voltFizzle(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
+/** 晴れのリザードン（07 の198章）: 全身を包んで上へ立ちのぼる炎 */
+function flameShroud(): SpriteOut {
+  const palette = ['#b71c1c', '#ef6c00', '#ffb300', '#fff59d'];
+  const frames = [0, 1, 2, 3, 4, 5].map((f) =>
+    shape(72, (u, v) => {
+      const d = Math.hypot(u, v * 0.9);
+      if (d > 0.98) return -1;
+      // 体の中心は開ける（体が見えるように）
+      if (d < 0.52) return -1;
+      // 上へ流れる炎の舌（横の位置で分けて、高さで揺らす）
+      const col = Math.floor((u + 1) * 12);
+      const flow = (v + f / 6 + hash(col, 51)) % 1;
+      const y = (flow + 1) % 1;
+      const body = hash(col, 52);
+      if (y < 0.34 + body * 0.26) {
+        const c = y / (0.34 + body * 0.26);
+        return c < 0.3 ? 3 : c < 0.55 ? 2 : c < 0.8 ? 1 : 0;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** 雨のリザードン（07 の198章）: 炎が雨で消されて立ちのぼる白い湯気 */
+function steamWisps(): SpriteOut {
+  const palette = ['#b0bec5', '#eceff1', '#ffffff'];
+  const frames = [0, 1, 2, 3, 4, 5].map((f) =>
+    shape(60, (u, v) => {
+      for (let k = 0; k < 5; k++) {
+        const x0 = -0.62 + k * 0.31 + Math.sin(k * 2.1) * 0.08;
+        // 上へ昇って消える
+        const rise = (((f / 6 + hash(k, 61)) % 1) + 1) % 1;
+        const y0 = 0.1 - rise * 1;
+        const size = 0.09 + rise * 0.14;
+        const wobble = Math.sin((rise + k) * 7) * 0.08;
+        const d = Math.hypot(u - x0 - wobble, v - y0);
+        if (d < size && rise < 0.86) {
+          if ((Math.round((u + 1) * 30) + Math.round((v + 1) * 30)) % 2 === 1 && rise > 0.45) continue;
+          return d < size * 0.5 ? 2 : rise < 0.5 ? 1 : 0;
+        }
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
+}
+
 /** ふぶき（レッドのカメックス。07 の197章）: 砲台から前へ吹き出す吹雪。氷の粒と筋が扇に広がる（右向き） */
 function frostCone(): SpriteOut {
   const W = 72;
@@ -6421,6 +6469,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'giga-crack': () => gigaCrack(),
     'drain-field': () => drainField(),
     'frost-cone': () => frostCone(),
+    'flame-shroud': () => flameShroud(),
+    'steam-wisps': () => steamWisps(),
     'giga-upheave': () => gigaUpheave(),
     'anger-mark': () => angerMark(),
     'bubble-burst': () => bubbleBurst(),

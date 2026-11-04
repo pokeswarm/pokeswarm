@@ -94,13 +94,13 @@ export interface Hazard {
   /** 技の番号（stage.moves の並び） */
   readonly move: number;
   readonly shape: 'circle' | 'line' | 'ring' | 'cone';
-  /** 輪の内側の半径（輪だけ） */
-  readonly innerRadius?: number;
+  /** 輪の内側の半径（輪だけ。広がる波の輪は動く） */
+  innerRadius?: number;
   /** 円の中心・直線の始点（追いかける予告・飛ぶ玉は動く） */
   x: number;
   y: number;
-  /** 円の半径・直線の幅の半分 */
-  readonly radius: number;
+  /** 円の半径・直線の幅の半分（広がる波の輪は動く） */
+  radius: number;
   /** 直線の向き（長さ1）と長さ（追いかける直線は向きが変わる） */
   dirX: number;
   dirY: number;

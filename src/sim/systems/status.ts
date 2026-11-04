@@ -1,4 +1,4 @@
-import { absorbBarrier } from './stage';
+import { absorbBarrier, legendWeatherState } from './stage';
 import { abilityEnemySlow } from '../ability';
 import type { World } from '../world';
 import { healPlayer } from './health';
@@ -31,6 +31,9 @@ export function damageTakenMultiplier(world: World, i: number): number {
   for (let s = 0; s < world.statusKinds.length; s++) {
     if (e.hasStatus(i, s)) m *= world.statusKinds[s]!.damageTakenMultiplier;
   }
+  // 天気の姿（リザードン: 晴れは硬く、雨はもろい。07 の198章）
+  const state = legendWeatherState(world, i);
+  if (state) m *= state.damageTakenPct / 100;
   return m;
 }
 

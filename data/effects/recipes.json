@@ -7229,9 +7229,9 @@
       "extends": "fire.base",
       "strike": { "id": "burst-fire", "fit": "circle", "size": 1.15, "seconds": 0.55 }
     },
-    "boss-frost-cone": {
-      "extends": "ice.base",
-      "bossActive": { "id": "frost-cone", "fit": "cone", "size": 1 }
+    "boss-surf-ring": {
+      "extends": "water.base",
+      "impact": { "burst": { "count": 0 }, "flash": { "alpha": 0 } }
     },
     "boss-whirlpool": {
       "extends": "water.base",

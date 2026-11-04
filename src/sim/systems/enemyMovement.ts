@@ -1,3 +1,4 @@
+import { legendWeatherState } from './stage';
 import type { Player } from '../entities/player';
 import { legendTargetOf } from './stage';
 import { axisToUnit, hash01 } from '../math';
@@ -106,7 +107,7 @@ export function moveEnemies(world: World): void {
       continue;
     }
     const motion = world.rules.enemies.kinds[e.kind[i]!]?.motion;
-    if (motion) bossMotion(world, i, target, motion);
+    if (motion && !legendWeatherState(world, i)?.chase) bossMotion(world, i, target, motion);
     else if (best > 0) {
       const d = Math.sqrt(best);
       const step = Math.min(e.speed[i]! * speedMultiplier(world, i) * world.dt, d);

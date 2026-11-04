@@ -3,7 +3,8 @@ import { playerConfig } from '../data';
 import { buildSimRules } from '../data/simRules';
 import { Simulation } from './simulation';
 import type { World } from './world';
-import { startLegendary } from './systems/stage';
+import { damageTakenMultiplier } from './systems/status';
+import { addHazard, hazardHits, legendWeatherState, startLegendary } from './systems/stage';
 
 /** レッド戦の作り直し（07 の193〜195章）: 隙・回復の回数の上限・きずぐすり・ピカチュウ・エーフィ */
 function round(index: number, players = 1, role: 'host' | 'guest' | undefined = undefined) {
@@ -567,6 +568,95 @@ describe('レッド戦（07 の193章）', () => {
       expect(rain).toBeDefined();
       again.step([]);
       expect(again.world.hazards.filter((h) => moveId(again, h.move) === 'venusaur-sunny-day').length).toBe(0);
+    });
+
+    it('フシギバナとカメックスは決まった場所に陣取り、歩かない', () => {
+      const sim = round(2);
+      const w = sim.world;
+      const v0 = [w.enemies.x[indexOf(sim, 'red-venusaur')]!, w.enemies.y[indexOf(sim, 'red-venusaur')]!];
+      const b0 = [w.enemies.x[indexOf(sim, 'red-blastoise')]!, w.enemies.y[indexOf(sim, 'red-blastoise')]!];
+      expect(Math.hypot(v0[0]! - b0[0]!, v0[1]! - b0[1]!)).toBeGreaterThan(600);
+      for (let k = 0; k < 30 * 25; k++) sim.step([]);
+      expect(w.enemies.x[indexOf(sim, 'red-venusaur')]).toBe(v0[0]);
+      expect(w.enemies.y[indexOf(sim, 'red-blastoise')]).toBe(b0[1]);
+    });
+
+    it('リザードン: 晴れは追って速く硬く、雨は遅くもろい。天気なしは距離を取る', () => {
+      const sim = alone('red-charizard');
+      const w = sim.world;
+      const i = indexOf(sim, 'red-charizard');
+      const add = (id: string) => addHazard(w, w.rules.stage.moves.findIndex((m) => m.id === id), 0, 0, 0, 0, -1);
+      expect(legendWeatherState(w, i)).toBeNull();
+      w.hazards.length = 0;
+      add('venusaur-sunny-day');
+      const sun = legendWeatherState(w, i)!;
+      expect(sun.chase).toBe(true);
+      expect(damageTakenMultiplier(w, i)).toBeCloseTo(0.5);
+      w.hazards.length = 0;
+      add('blastoise-rain-dance');
+      const rain = legendWeatherState(w, i)!;
+      expect(rain.speedPct).toBeLessThan(sun.speedPct);
+      expect(damageTakenMultiplier(w, i)).toBeCloseTo(1.5);
+      // 晴れでもプレイヤーより遅い（逃げれば離せる）
+      const k = rules0().enemies.kinds.find((x) => x.id === 'red-charizard')!;
+      expect((k.moveSpeed * (rules0().stage.bossRules.legendSpeedMultiplier ?? 1) * sun.speedPct) / 100).toBeLessThan(playerConfig.moveSpeed);
+    });
+
+    it('リザードン: 晴れの技は威力が上がり、雨の技は下がる', () => {
+      const run = (weather: string | null): number => {
+        const sim = alone('red-charizard');
+        const w = sim.world;
+        const idx = w.rules.stage.moves.findIndex((m) => m.id === 'charizard-wing-attack');
+        const b = w.bosses[0]!;
+        b.moves = [idx];
+        b.next = 0;
+        b.cooldown = 1;
+        b.hpMoves = [];
+        w.hazards.length = 0;
+        if (weather) addHazard(w, w.rules.stage.moves.findIndex((m) => m.id === weather), 0, 0, 0, 0, -1);
+        for (let k = 0; k < 90; k++) {
+          sim.step([]);
+          const h = w.hazards.find((z) => z.move === idx);
+          if (h) return h.damageOverride || h.damage;
+          for (const z of w.hazards) if (z.ticksLeft < 2 && !z.activeTicks) z.ticksLeft = 30;
+        }
+        throw new Error('出ない');
+      };
+      expect(run('venusaur-sunny-day')).toBeCloseTo(34 * 1.5);
+      expect(run('blastoise-rain-dance')).toBeCloseTo(34 * 0.6);
+      expect(run(null)).toBe(34);
+    });
+
+    it('なみのり: 足元は安全で、輪は広がり、切れ目を抜けられる', () => {
+      const m = rules0().stage.moves.find((x) => x.id === 'blastoise-surf')!;
+      const r = m.surfRing!;
+      const hz = { shape: 'ring' as const, x: 0, y: 0, radius: 400, innerRadius: 330, dirX: 1, dirY: 0, length: 0 };
+      // 輪の上
+      expect(hazardHits(hz, 0, 365, 12, m)).toBe(true);
+      // 切れ目（向かい合う 2 か所）
+      expect(hazardHits(hz, 365, 0, 12, m)).toBe(false);
+      expect(hazardHits(hz, -365, 0, 12, m)).toBe(false);
+      // 輪の内側・外側
+      expect(hazardHits(hz, 0, 200, 12, m)).toBe(false);
+      expect(hazardHits(hz, 0, 500, 12, m)).toBe(false);
+      // 足元は、輪が出たときから外
+      expect(r.startRadius).toBeGreaterThan(100);
+    });
+
+    it('ふぶき: どこにいても少しずつ削られる', () => {
+      const sim = alone('red-blastoise');
+      const w = sim.world;
+      const p = w.players[0]!;
+      p.maxHp = 1000;
+      p.hp = 1000;
+      p.defense = 0;
+      p.x = 3000;
+      p.y = 3000;
+      const hz = w.rules.stage.moves.findIndex((m) => m.id === 'blastoise-blizzard');
+      addHazard(w, hz, 0, 0, 0, 0, -1);
+      for (let k = 0; k < 30 * 3; k++) sim.step([]);
+      expect(p.hp).toBeLessThan(1000);
+      expect(p.hp).toBeGreaterThan(900);
     });
 
     it('フシギバナの大技: 光線 8 本がゆっくり回り、その後は止まって こうごうせい', () => {

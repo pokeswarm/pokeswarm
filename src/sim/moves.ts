@@ -153,6 +153,8 @@ export interface SimMoveDef {
   readonly chargeMove?: { readonly move: number; readonly pauseSeconds: number };
   /** 候補に出さない（持ち物を持つと覚える技） */
   readonly teachOnly?: boolean;
+  /** コンテストの部門（無ければ null。07 の188章） */
+  readonly contestType?: string | null;
   /** この地方のランだけで使う技（ほかの地方では候補・ゆびをふるに出さない。07 の130章） */
   readonly region?: string;
   /** 今の姿がこのどれか（種類の番号）のときだけ候補に出る（くさのちかい） */

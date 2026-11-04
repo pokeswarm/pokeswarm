@@ -19,6 +19,7 @@ import {
   pickupConfig,
   playablesConfig,
   abilitiesConfig,
+  contestConfig,
   playerSpriteKeys,
   shopConfig,
   statsConfig,
@@ -101,6 +102,7 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.hurtRelease ? { hurtRelease: def.hurtRelease } : {}),
       teachOnly: def.teachOnly,
       ...(def.region ? { region: def.region } : {}),
+      contestType: def.contestType ?? g.contestType ?? null,
       ...(def.learnForms ? { learnForms: def.learnForms.map((f) => Object.keys(generated.pokemon).indexOf(f)) } : {}),
       ...(def.learnMinLevel ? { learnMinLevel: def.learnMinLevel } : {}),
       ...(def.extraTypes ? { extraTypes: def.extraTypes.map(typeIndex) } : {}),
@@ -288,6 +290,7 @@ export function buildSimRules(region?: string): SimRules {
     ...(rs.weather.some((w) => w.kinds.length > 0)
       ? { weatherSections: rs.weather.map((w) => ({ kinds: w.kinds, fields: w.kinds.map((k) => weatherConfig.weathers[k]!), everySeconds: w.everySeconds })) }
       : {}),
+    ...(rs.contest ? { contest: contestConfig } : {}),
     ...(rs.abilities
       ? {
           abilities: {

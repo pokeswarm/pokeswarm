@@ -2,6 +2,7 @@
   "durationSeconds": 2100,
   "natures": true,
   "abilities": true,
+  "contest": true,
   "sections": [
     {
       "tile": "hoenn_route",

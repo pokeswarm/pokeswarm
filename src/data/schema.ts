@@ -1407,6 +1407,8 @@ export const moveDefSchema = z.object({
   chargeMove: z.object({ move: z.string(), pauseSeconds: z.number().nonnegative() }).optional(),
   /** 候補に出さない（持ち物を持つと覚える技。ほのおのパンチ・かみなりパンチ） */
   teachOnly: z.boolean().optional(),
+  /** コンテストの部門（PokeAPI に無い技だけ書く。07 の188章） */
+  contestType: z.string().optional(),
   /**
    * この地方（regions.json の id）のランだけで使う技（ホウエンの御三家の技。07 の130章）。ほかの地方のランでは候補・ゆびをふる・ものまねに出さない
    * （ミュウも覚えない）。技の強さの帯は move-balance.json の regionTierScale を掛ける
@@ -1544,6 +1546,8 @@ export const regionStageSchema = z.object({
   natures: z.boolean().default(false),
   /** 特性のある地方（ホウエン。07 の133章）。プレイアブルの ability が効く */
   abilities: z.boolean().default(false),
+  /** ポケモンコンテストのある地方（ホウエン。07 の188章） */
+  contest: z.boolean().default(false),
 });
 export type RegionStageFile = z.infer<typeof regionStageSchema>;
 
@@ -2245,9 +2249,28 @@ export const generatedPokemonEntrySchema = z.object({
 export type GeneratedPokemon = z.infer<typeof generatedPokemonEntrySchema>;
 export const generatedPokemonSchema = z.record(z.string(), generatedPokemonEntrySchema);
 
+/**
+ * ポケモンコンテスト（data/game/contest.json。07 の188章）: afterSection の区間の後に分岐を出す。entrants 人（足りない分は NPC）で競い、
+ * placementPct の順位の割合でランクの coins をもらう。score は点数の重み
+ */
+export const contestConfigSchema = z.object({
+  afterSection: z.number().int().nonnegative(),
+  entrants: z.number().int().positive(),
+  answerSeconds: z.number().positive(),
+  npcJitter: z.number().min(0).max(1),
+  npcPokemon: z.array(z.string()).min(1),
+  categories: z.array(z.string()).min(1),
+  score: z.object({ pokeblockChosen: z.number(), pokeblockOther: z.number(), moveUp: z.number(), moveMatch: z.number(), moveOther: z.number() }),
+  placementPct: z.array(z.number().nonnegative()).min(1),
+  ranks: z.array(z.object({ id: z.string(), npcScores: z.array(z.number()).min(1), coins: z.number().nonnegative() })).min(1),
+});
+export type ContestConfig = z.infer<typeof contestConfigSchema>;
+
 export const generatedMoveEntrySchema = z.object({
   names: localizedNames,
   type: z.string(),
+  /** コンテストの部門（PokeAPI の contest_type。新しい世代の技には無い。moves.json の contestType で補う） */
+  contestType: z.string().nullable().optional(),
   /** 原作の分類。physical / special / status */
   damageClass: z.enum(['physical', 'special', 'status']),
 });

@@ -83,7 +83,7 @@ export class ResultScene extends Phaser.Scene {
       this.children.removeAll(true);
       this.cameras.main.setBackgroundColor('#000000');
       const { width, height } = this.scale;
-      const clear = summary.outcome === 'clear';
+      const clear = summary.outcome === 'clear' || summary.outcome === 'contest';
       // 画面の高さが低い（横向きのスマホ）ときは、見出しを小さくし、技を右に並べて1画面に収める
       const compact = compactScreen(height);
       const boxW = Math.min(width - 32, compact ? 760 : 720);

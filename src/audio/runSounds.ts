@@ -103,7 +103,7 @@ export class RunSounds {
           if (ev.playerId === this.localId) audio.sfx.play('ui.confirm');
           break;
         case 'runEnded':
-          audio.sfx.play(ev.outcome === 'clear' ? 'clear' : 'fail');
+          audio.sfx.play(ev.outcome === 'clear' || ev.outcome === 'contest' ? 'clear' : 'fail');
           audio.bgm.play(null);
           break;
       }

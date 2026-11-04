@@ -1,3 +1,4 @@
+import type { ContestState } from './contest';
 import type { PlayerId } from './commands';
 import type { Obstacle } from './obstacles';
 import { EnemyStore } from './entities/enemies';
@@ -63,7 +64,7 @@ export interface Box {
 }
 
 /** ランの結果（disconnected: ホストとの接続が切れて終わった） */
-export type RunOutcome = 'clear' | 'fail' | 'disconnected';
+export type RunOutcome = 'clear' | 'fail' | 'disconnected' | 'contest';
 
 /** 伝説戦の結果（won 倒した・lost 全員倒れた・timeUp 逃げられた） */
 export type LegendaryResult = 'won' | 'lost' | 'timeUp';
@@ -318,6 +319,10 @@ export interface World {
   readonly bombers: Map<number, number>;
   /** 時間で消える敵（ヌケニン）: 敵の id → 消える更新の回数 */
   readonly haunts: Map<number, number>;
+  /** ポケモンコンテスト（開いている間はゲームを止める。結果の後も持っておく。07 の188章） */
+  contest: ContestState | null;
+  /** このランで分岐を出した */
+  contestOffered: boolean;
   /** 近傍検索の作業用（更新中にメモリを確保しないため） */
   readonly scratch: Int32Array;
   /** 発射体の命中候補の作業用 */
@@ -389,6 +394,8 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     obstacleCache: new Map(),
     bombers: new Map(),
     haunts: new Map(),
+    contest: null,
+    contestOffered: false,
     level: 1,
     xpIntoLevel: 0,
     pendingLevelUps: 0,

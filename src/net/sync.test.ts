@@ -253,6 +253,15 @@ describe('ポーズ（作者の決定 2026年10月25日）', () => {
   });
 });
 
+describe('ポケモンコンテストの手順（07 の188章）', () => {
+  it('ゲストの要望はホストで送り手の番号に直り、ホストの確定はゲストへそのまま届く', () => {
+    const host = makePeer('host', 1, 2);
+    const guest = makePeer('guest', 2, 2);
+    expect(host.session.incoming(host.sim.world, [{ t: 'ct', c: { op: 'answer', playerId: 9, go: true } }], 2)).toEqual([{ type: 'contest', op: 'answer', playerId: 2, go: true }]);
+    expect(guest.session.incoming(guest.sim.world, [{ t: 'ct', c: { op: 'answer', playerId: 1, go: false } }], 1)).toEqual([{ type: 'contest', op: 'answer', playerId: 1, go: false }]);
+  });
+});
+
 describe('ボスの位置を送る間隔', () => {
   it('bossIntervalTicks があれば、補正とは別にその間隔でボスの HP と位置を送る（無ければ補正の 1/3）', () => {
     const count = (r: { playerStateIntervalTicks: number; correctionIntervalTicks: number; bossIntervalTicks?: number }): number => {

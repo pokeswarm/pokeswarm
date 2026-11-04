@@ -9,6 +9,7 @@
       "it": "Acidobomba"
     },
     "type": "poison",
+    "contestType": null,
     "damageClass": "special"
   },
   "aerial-ace": {
@@ -21,6 +22,7 @@
       "it": "Aeroassalto"
     },
     "type": "flying",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "aeroblast": {
@@ -33,6 +35,7 @@
       "it": "Aerocolpo"
     },
     "type": "flying",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "agility": {
@@ -45,6 +48,7 @@
       "it": "Agilità"
     },
     "type": "psychic",
+    "contestType": "cool",
     "damageClass": "status"
   },
   "air-cutter": {
@@ -57,6 +61,7 @@
       "it": "Aerasoio"
     },
     "type": "flying",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "air-slash": {
@@ -69,6 +74,7 @@
       "it": "Eterelama"
     },
     "type": "flying",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "amnesia": {
@@ -81,6 +87,7 @@
       "it": "Amnesia"
     },
     "type": "psychic",
+    "contestType": "cute",
     "damageClass": "status"
   },
   "ancient-power": {
@@ -93,6 +100,7 @@
       "it": "Forzantica"
     },
     "type": "rock",
+    "contestType": "tough",
     "damageClass": "special"
   },
   "aqua-ring": {
@@ -105,6 +113,7 @@
       "it": "Acquanello"
     },
     "type": "water",
+    "contestType": "beauty",
     "damageClass": "status"
   },
   "aqua-tail": {
@@ -117,6 +126,7 @@
       "it": "Idrondata"
     },
     "type": "water",
+    "contestType": "cute",
     "damageClass": "physical"
   },
   "arm-thrust": {
@@ -129,6 +139,7 @@
       "it": "Sberletese"
     },
     "type": "fighting",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "astonish": {
@@ -141,6 +152,7 @@
       "it": "Sgomento"
     },
     "type": "ghost",
+    "contestType": "smart",
     "damageClass": "physical"
   },
   "aura-sphere": {
@@ -153,6 +165,7 @@
       "it": "Forzasfera"
     },
     "type": "fighting",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "aurora-beam": {
@@ -165,6 +178,7 @@
       "it": "Raggiaurora"
     },
     "type": "ice",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "bite": {
@@ -177,6 +191,7 @@
       "it": "Morso"
     },
     "type": "dark",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "blast-burn": {
@@ -189,6 +204,7 @@
       "it": "Incendio"
     },
     "type": "fire",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "blaze-kick": {
@@ -201,6 +217,7 @@
       "it": "Calciardente"
     },
     "type": "fire",
+    "contestType": "beauty",
     "damageClass": "physical"
   },
   "blizzard": {
@@ -213,6 +230,7 @@
       "it": "Bora"
     },
     "type": "ice",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "body-slam": {
@@ -225,6 +243,7 @@
       "it": "Corposcontro"
     },
     "type": "normal",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "bone-rush": {
@@ -237,6 +256,7 @@
       "it": "Ossoraffica"
     },
     "type": "ground",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "bonemerang": {
@@ -249,6 +269,7 @@
       "it": "Ossomerang"
     },
     "type": "ground",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "brave-bird": {
@@ -261,6 +282,7 @@
       "it": "Baldeali"
     },
     "type": "flying",
+    "contestType": "cute",
     "damageClass": "physical"
   },
   "bubble": {
@@ -273,6 +295,7 @@
       "it": "Bolla"
     },
     "type": "water",
+    "contestType": "cute",
     "damageClass": "special"
   },
   "bubble-beam": {
@@ -285,6 +308,7 @@
       "it": "Bollaraggio"
     },
     "type": "water",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "bulk-up": {
@@ -297,6 +321,7 @@
       "it": "Granfisico"
     },
     "type": "fighting",
+    "contestType": "beauty",
     "damageClass": "status"
   },
   "bullet-punch": {
@@ -309,6 +334,7 @@
       "it": "Pugnoscarica"
     },
     "type": "steel",
+    "contestType": "smart",
     "damageClass": "physical"
   },
   "charm": {
@@ -321,6 +347,7 @@
       "it": "Fascino"
     },
     "type": "fairy",
+    "contestType": "cute",
     "damageClass": "status"
   },
   "close-combat": {
@@ -333,6 +360,7 @@
       "it": "Zuffa"
     },
     "type": "fighting",
+    "contestType": "smart",
     "damageClass": "physical"
   },
   "confuse-ray": {
@@ -345,6 +373,7 @@
       "it": "Stordiraggio"
     },
     "type": "ghost",
+    "contestType": "smart",
     "damageClass": "status"
   },
   "confusion": {
@@ -357,6 +386,7 @@
       "it": "Confusione"
     },
     "type": "psychic",
+    "contestType": "smart",
     "damageClass": "special"
   },
   "conversion": {
@@ -369,6 +399,7 @@
       "it": "Conversione"
     },
     "type": "normal",
+    "contestType": "beauty",
     "damageClass": "status"
   },
   "counter": {
@@ -381,6 +412,7 @@
       "it": "Contrattacco"
     },
     "type": "fighting",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "cross-chop": {
@@ -393,6 +425,7 @@
       "it": "Incrocolpo"
     },
     "type": "fighting",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "cross-poison": {
@@ -405,6 +438,7 @@
       "it": "Velenocroce"
     },
     "type": "poison",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "crunch": {
@@ -417,6 +451,7 @@
       "it": "Sgranocchio"
     },
     "type": "dark",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "curse": {
@@ -429,6 +464,7 @@
       "it": "Maledizione"
     },
     "type": "ghost",
+    "contestType": "tough",
     "damageClass": "status"
   },
   "dark-pulse": {
@@ -441,6 +477,7 @@
       "it": "Neropulsar"
     },
     "type": "dark",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "dazzling-gleam": {
@@ -453,6 +490,7 @@
       "it": "Magibrillio"
     },
     "type": "fairy",
+    "contestType": null,
     "damageClass": "special"
   },
   "defense-curl": {
@@ -465,6 +503,7 @@
       "it": "Ricciolscudo"
     },
     "type": "normal",
+    "contestType": "cute",
     "damageClass": "status"
   },
   "dig": {
@@ -477,6 +516,7 @@
       "it": "Fossa"
     },
     "type": "ground",
+    "contestType": "smart",
     "damageClass": "physical"
   },
   "disarming-voice": {
@@ -489,6 +529,7 @@
       "it": "Incantavoce"
     },
     "type": "fairy",
+    "contestType": null,
     "damageClass": "special"
   },
   "discharge": {
@@ -501,6 +542,7 @@
       "it": "Scarica"
     },
     "type": "electric",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "dive": {
@@ -513,6 +555,7 @@
       "it": "Sub"
     },
     "type": "water",
+    "contestType": "beauty",
     "damageClass": "physical"
   },
   "double-edge": {
@@ -525,6 +568,7 @@
       "it": "Sdoppiatore"
     },
     "type": "normal",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "double-kick": {
@@ -537,6 +581,7 @@
       "it": "Doppiocalcio"
     },
     "type": "fighting",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "double-slap": {
@@ -549,6 +594,7 @@
       "it": "Doppiasberla"
     },
     "type": "normal",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "double-team": {
@@ -561,6 +607,7 @@
       "it": "Doppioteam"
     },
     "type": "normal",
+    "contestType": "cool",
     "damageClass": "status"
   },
   "draco-meteor": {
@@ -573,6 +620,7 @@
       "it": "Dragobolide"
     },
     "type": "dragon",
+    "contestType": "smart",
     "damageClass": "special"
   },
   "dragon-breath": {
@@ -585,6 +633,7 @@
       "it": "Dragospiro"
     },
     "type": "dragon",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "dragon-claw": {
@@ -597,6 +646,7 @@
       "it": "Dragartigli"
     },
     "type": "dragon",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "dragon-dance": {
@@ -609,6 +659,7 @@
       "it": "Dragodanza"
     },
     "type": "dragon",
+    "contestType": "cool",
     "damageClass": "status"
   },
   "dragon-pulse": {
@@ -621,6 +672,7 @@
       "it": "Dragopulsar"
     },
     "type": "dragon",
+    "contestType": "smart",
     "damageClass": "special"
   },
   "dragon-rage": {
@@ -633,6 +685,7 @@
       "it": "Ira di Drago"
     },
     "type": "dragon",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "dragon-rush": {
@@ -645,6 +698,7 @@
       "it": "Dragofuria"
     },
     "type": "dragon",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "dragon-tail": {
@@ -657,6 +711,7 @@
       "it": "Codadrago"
     },
     "type": "dragon",
+    "contestType": null,
     "damageClass": "physical"
   },
   "dream-eater": {
@@ -669,6 +724,7 @@
       "it": "Mangiasogni"
     },
     "type": "psychic",
+    "contestType": "smart",
     "damageClass": "special"
   },
   "dual-wingbeat": {
@@ -681,6 +737,7 @@
       "it": "Doppia Ala"
     },
     "type": "flying",
+    "contestType": null,
     "damageClass": "physical"
   },
   "dynamic-punch": {
@@ -693,6 +750,7 @@
       "it": "Dinamipugno"
     },
     "type": "fighting",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "earth-power": {
@@ -705,6 +763,7 @@
       "it": "Geoforza"
     },
     "type": "ground",
+    "contestType": "smart",
     "damageClass": "special"
   },
   "earthquake": {
@@ -717,6 +776,7 @@
       "it": "Terremoto"
     },
     "type": "ground",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "ember": {
@@ -729,6 +789,7 @@
       "it": "Braciere"
     },
     "type": "fire",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "eruption": {
@@ -741,6 +802,7 @@
       "it": "Eruzione"
     },
     "type": "fire",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "explosion": {
@@ -753,6 +815,7 @@
       "it": "Esplosione"
     },
     "type": "normal",
+    "contestType": "beauty",
     "damageClass": "physical"
   },
   "extrasensory": {
@@ -765,6 +828,7 @@
       "it": "Extrasenso"
     },
     "type": "psychic",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "extreme-speed": {
@@ -777,6 +841,7 @@
       "it": "Extrarapido"
     },
     "type": "normal",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "facade": {
@@ -789,6 +854,7 @@
       "it": "Facciata"
     },
     "type": "normal",
+    "contestType": "cute",
     "damageClass": "physical"
   },
   "fake-out": {
@@ -801,6 +867,7 @@
       "it": "Bruciapelo"
     },
     "type": "normal",
+    "contestType": "cute",
     "damageClass": "physical"
   },
   "fire-blast": {
@@ -813,6 +880,7 @@
       "it": "Fuocobomba"
     },
     "type": "fire",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "fire-fang": {
@@ -825,6 +893,7 @@
       "it": "Rogodenti"
     },
     "type": "fire",
+    "contestType": "beauty",
     "damageClass": "physical"
   },
   "fire-pledge": {
@@ -837,6 +906,7 @@
       "it": "Fiammapatto"
     },
     "type": "fire",
+    "contestType": null,
     "damageClass": "special"
   },
   "fire-punch": {
@@ -849,6 +919,7 @@
       "it": "Fuocopugno"
     },
     "type": "fire",
+    "contestType": "beauty",
     "damageClass": "physical"
   },
   "fire-spin": {
@@ -861,6 +932,7 @@
       "it": "Turbofuoco"
     },
     "type": "fire",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "fissure": {
@@ -873,6 +945,7 @@
       "it": "Abisso"
     },
     "type": "ground",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "flame-wheel": {
@@ -885,6 +958,7 @@
       "it": "Ruotafuoco"
     },
     "type": "fire",
+    "contestType": "beauty",
     "damageClass": "physical"
   },
   "flamethrower": {
@@ -897,6 +971,7 @@
       "it": "Lanciafiamme"
     },
     "type": "fire",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "flare-blitz": {
@@ -909,6 +984,7 @@
       "it": "Fuococarica"
     },
     "type": "fire",
+    "contestType": "smart",
     "damageClass": "physical"
   },
   "flash-cannon": {
@@ -921,6 +997,7 @@
       "it": "Cannonflash"
     },
     "type": "steel",
+    "contestType": "smart",
     "damageClass": "special"
   },
   "focus-punch": {
@@ -933,6 +1010,7 @@
       "it": "Centripugno"
     },
     "type": "fighting",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "force-palm": {
@@ -945,6 +1023,7 @@
       "it": "Palmoforza"
     },
     "type": "fighting",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "foul-play": {
@@ -957,6 +1036,7 @@
       "it": "Ripicca"
     },
     "type": "dark",
+    "contestType": null,
     "damageClass": "physical"
   },
   "freeze-dry": {
@@ -969,6 +1049,7 @@
       "it": "Liofilizzazione"
     },
     "type": "ice",
+    "contestType": null,
     "damageClass": "special"
   },
   "frenzy-plant": {
@@ -981,6 +1062,7 @@
       "it": "Radicalbero"
     },
     "type": "grass",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "frost-breath": {
@@ -993,6 +1075,7 @@
       "it": "Alitogelido"
     },
     "type": "ice",
+    "contestType": null,
     "damageClass": "special"
   },
   "fury-cutter": {
@@ -1005,6 +1088,7 @@
       "it": "Tagliofuria"
     },
     "type": "bug",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "future-sight": {
@@ -1017,6 +1101,7 @@
       "it": "Divinazione"
     },
     "type": "psychic",
+    "contestType": "smart",
     "damageClass": "special"
   },
   "giga-drain": {
@@ -1029,6 +1114,7 @@
       "it": "Gigassorbimento"
     },
     "type": "grass",
+    "contestType": "smart",
     "damageClass": "special"
   },
   "giga-impact": {
@@ -1041,6 +1127,7 @@
       "it": "Gigaimpatto"
     },
     "type": "normal",
+    "contestType": "beauty",
     "damageClass": "physical"
   },
   "grass-pledge": {
@@ -1053,6 +1140,7 @@
       "it": "Erbapatto"
     },
     "type": "grass",
+    "contestType": null,
     "damageClass": "special"
   },
   "gravity": {
@@ -1065,6 +1153,7 @@
       "it": "Gravità"
     },
     "type": "psychic",
+    "contestType": "beauty",
     "damageClass": "status"
   },
   "gust": {
@@ -1077,6 +1166,7 @@
       "it": "Raffica"
     },
     "type": "flying",
+    "contestType": "smart",
     "damageClass": "special"
   },
   "harden": {
@@ -1089,6 +1179,7 @@
       "it": "Rafforzatore"
     },
     "type": "normal",
+    "contestType": "tough",
     "damageClass": "status"
   },
   "healing-wish": {
@@ -1101,6 +1192,7 @@
       "it": "Curardore"
     },
     "type": "psychic",
+    "contestType": "cute",
     "damageClass": "status"
   },
   "hex": {
@@ -1113,6 +1205,7 @@
       "it": "Sciagura"
     },
     "type": "ghost",
+    "contestType": null,
     "damageClass": "special"
   },
   "horn-attack": {
@@ -1125,6 +1218,7 @@
       "it": "Incornata"
     },
     "type": "normal",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "hurricane": {
@@ -1137,6 +1231,7 @@
       "it": "Tifone"
     },
     "type": "flying",
+    "contestType": null,
     "damageClass": "special"
   },
   "hydro-cannon": {
@@ -1149,6 +1244,7 @@
       "it": "Idrocannone"
     },
     "type": "water",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "hydro-pump": {
@@ -1161,6 +1257,7 @@
       "it": "Idropompa"
     },
     "type": "water",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "hyper-beam": {
@@ -1173,6 +1270,7 @@
       "it": "Iper Raggio"
     },
     "type": "normal",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "hyper-voice": {
@@ -1185,6 +1283,7 @@
       "it": "Granvoce"
     },
     "type": "normal",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "hypnosis": {
@@ -1197,6 +1296,7 @@
       "it": "Ipnosi"
     },
     "type": "psychic",
+    "contestType": "smart",
     "damageClass": "status"
   },
   "ice-ball": {
@@ -1209,6 +1309,7 @@
       "it": "Palla Gelo"
     },
     "type": "ice",
+    "contestType": "beauty",
     "damageClass": "physical"
   },
   "ice-beam": {
@@ -1221,6 +1322,7 @@
       "it": "Geloraggio"
     },
     "type": "ice",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "ice-fang": {
@@ -1233,6 +1335,7 @@
       "it": "Gelodenti"
     },
     "type": "ice",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "ice-shard": {
@@ -1245,6 +1348,7 @@
       "it": "Geloscheggia"
     },
     "type": "ice",
+    "contestType": "beauty",
     "damageClass": "physical"
   },
   "icicle-crash": {
@@ -1257,6 +1361,7 @@
       "it": "Scagliagelo"
     },
     "type": "ice",
+    "contestType": null,
     "damageClass": "physical"
   },
   "iron-defense": {
@@ -1269,6 +1374,7 @@
       "it": "Ferroscudo"
     },
     "type": "steel",
+    "contestType": "tough",
     "damageClass": "status"
   },
   "iron-head": {
@@ -1281,6 +1387,7 @@
       "it": "Metaltestata"
     },
     "type": "steel",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "iron-tail": {
@@ -1293,6 +1400,7 @@
       "it": "Codacciaio"
     },
     "type": "steel",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "karate-chop": {
@@ -1305,6 +1413,7 @@
       "it": "Colpokarate"
     },
     "type": "fighting",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "last-resort": {
@@ -1317,6 +1426,7 @@
       "it": "Ultimascelta"
     },
     "type": "normal",
+    "contestType": "cute",
     "damageClass": "physical"
   },
   "lava-plume": {
@@ -1329,6 +1439,7 @@
       "it": "Lavasbuffo"
     },
     "type": "fire",
+    "contestType": "tough",
     "damageClass": "special"
   },
   "leaf-blade": {
@@ -1341,6 +1452,7 @@
       "it": "Fendifoglia"
     },
     "type": "grass",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "leaf-storm": {
@@ -1353,6 +1465,7 @@
       "it": "Verdebufera"
     },
     "type": "grass",
+    "contestType": "cute",
     "damageClass": "special"
   },
   "leafage": {
@@ -1365,6 +1478,7 @@
       "it": "Fogliame"
     },
     "type": "grass",
+    "contestType": null,
     "damageClass": "physical"
   },
   "leech-seed": {
@@ -1377,6 +1491,7 @@
       "it": "Parassiseme"
     },
     "type": "grass",
+    "contestType": "smart",
     "damageClass": "status"
   },
   "lick": {
@@ -1389,6 +1504,7 @@
       "it": "Leccata"
     },
     "type": "ghost",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "low-sweep": {
@@ -1401,6 +1517,7 @@
       "it": "Calciobasso"
     },
     "type": "fighting",
+    "contestType": null,
     "damageClass": "physical"
   },
   "mach-punch": {
@@ -1413,6 +1530,7 @@
       "it": "Pugnorapido"
     },
     "type": "fighting",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "magic-coat": {
@@ -1425,6 +1543,7 @@
       "it": "Magivelo"
     },
     "type": "psychic",
+    "contestType": "beauty",
     "damageClass": "status"
   },
   "magical-leaf": {
@@ -1437,6 +1556,7 @@
       "it": "Fogliamagica"
     },
     "type": "grass",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "magnitude": {
@@ -1449,6 +1569,7 @@
       "it": "Magnitudo"
     },
     "type": "ground",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "mean-look": {
@@ -1461,6 +1582,7 @@
       "it": "Malosguardo"
     },
     "type": "normal",
+    "contestType": "beauty",
     "damageClass": "status"
   },
   "megahorn": {
@@ -1473,6 +1595,7 @@
       "it": "Megacorno"
     },
     "type": "bug",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "metal-burst": {
@@ -1485,6 +1608,7 @@
       "it": "Metalscoppio"
     },
     "type": "steel",
+    "contestType": "beauty",
     "damageClass": "physical"
   },
   "metal-claw": {
@@ -1497,6 +1621,7 @@
       "it": "Ferrartigli"
     },
     "type": "steel",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "meteor-mash": {
@@ -1509,6 +1634,7 @@
       "it": "Meteorpugno"
     },
     "type": "steel",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "metronome": {
@@ -1521,6 +1647,7 @@
       "it": "Metronomo"
     },
     "type": "normal",
+    "contestType": "cute",
     "damageClass": "status"
   },
   "milk-drink": {
@@ -1533,6 +1660,7 @@
       "it": "Buonlatte"
     },
     "type": "normal",
+    "contestType": "cute",
     "damageClass": "status"
   },
   "mimic": {
@@ -1545,6 +1673,7 @@
       "it": "Mimica"
     },
     "type": "normal",
+    "contestType": "cute",
     "damageClass": "status"
   },
   "mirror-coat": {
@@ -1557,6 +1686,7 @@
       "it": "Specchiovelo"
     },
     "type": "psychic",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "mist": {
@@ -1569,6 +1699,7 @@
       "it": "Nebbia"
     },
     "type": "ice",
+    "contestType": "beauty",
     "damageClass": "status"
   },
   "moonblast": {
@@ -1581,6 +1712,7 @@
       "it": "Forza Lunare"
     },
     "type": "fairy",
+    "contestType": null,
     "damageClass": "special"
   },
   "moonlight": {
@@ -1593,6 +1725,7 @@
       "it": "Lucelunare"
     },
     "type": "fairy",
+    "contestType": "beauty",
     "damageClass": "status"
   },
   "morning-sun": {
@@ -1605,6 +1738,7 @@
       "it": "Mattindoro"
     },
     "type": "normal",
+    "contestType": "beauty",
     "damageClass": "status"
   },
   "mud-shot": {
@@ -1617,6 +1751,7 @@
       "it": "Colpodifango"
     },
     "type": "ground",
+    "contestType": "tough",
     "damageClass": "special"
   },
   "mud-slap": {
@@ -1629,6 +1764,7 @@
       "it": "Fangosberla"
     },
     "type": "ground",
+    "contestType": "cute",
     "damageClass": "special"
   },
   "muddy-water": {
@@ -1641,6 +1777,7 @@
       "it": "Fanghiglia"
     },
     "type": "water",
+    "contestType": "tough",
     "damageClass": "special"
   },
   "night-daze": {
@@ -1653,6 +1790,7 @@
       "it": "Urtoscuro"
     },
     "type": "dark",
+    "contestType": null,
     "damageClass": "special"
   },
   "night-shade": {
@@ -1665,6 +1803,7 @@
       "it": "Ombra Notturna"
     },
     "type": "ghost",
+    "contestType": "smart",
     "damageClass": "special"
   },
   "night-slash": {
@@ -1677,6 +1816,7 @@
       "it": "Nottesferza"
     },
     "type": "dark",
+    "contestType": "beauty",
     "damageClass": "physical"
   },
   "outrage": {
@@ -1689,6 +1829,7 @@
       "it": "Oltraggio"
     },
     "type": "dragon",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "pay-day": {
@@ -1701,6 +1842,7 @@
       "it": "Giornopaga"
     },
     "type": "normal",
+    "contestType": "smart",
     "damageClass": "physical"
   },
   "peck": {
@@ -1713,6 +1855,7 @@
       "it": "Beccata"
     },
     "type": "flying",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "perish-song": {
@@ -1725,6 +1868,7 @@
       "it": "Ultimocanto"
     },
     "type": "normal",
+    "contestType": "beauty",
     "damageClass": "status"
   },
   "petal-blizzard": {
@@ -1737,6 +1881,7 @@
       "it": "Fiortempesta"
     },
     "type": "grass",
+    "contestType": null,
     "damageClass": "physical"
   },
   "petal-dance": {
@@ -1749,6 +1894,7 @@
       "it": "Petalodanza"
     },
     "type": "grass",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "phantom-force": {
@@ -1761,6 +1907,7 @@
       "it": "Spettrotuffo"
     },
     "type": "ghost",
+    "contestType": null,
     "damageClass": "physical"
   },
   "play-rough": {
@@ -1773,6 +1920,7 @@
       "it": "Carineria"
     },
     "type": "fairy",
+    "contestType": null,
     "damageClass": "physical"
   },
   "poison-fang": {
@@ -1785,6 +1933,7 @@
       "it": "Velenodenti"
     },
     "type": "poison",
+    "contestType": "smart",
     "damageClass": "physical"
   },
   "pound": {
@@ -1797,6 +1946,7 @@
       "it": "Botta"
     },
     "type": "normal",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "powder-snow": {
@@ -1809,6 +1959,7 @@
       "it": "Polneve"
     },
     "type": "ice",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "psybeam": {
@@ -1821,6 +1972,7 @@
       "it": "Psicoraggio"
     },
     "type": "psychic",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "psychic": {
@@ -1833,6 +1985,7 @@
       "it": "Psichico"
     },
     "type": "psychic",
+    "contestType": "smart",
     "damageClass": "special"
   },
   "psycho-boost": {
@@ -1845,6 +1998,7 @@
       "it": "Psicoslancio"
     },
     "type": "psychic",
+    "contestType": "smart",
     "damageClass": "special"
   },
   "psystrike": {
@@ -1857,6 +2011,7 @@
       "it": "Psicobotta"
     },
     "type": "psychic",
+    "contestType": null,
     "damageClass": "special"
   },
   "quick-attack": {
@@ -1869,6 +2024,7 @@
       "it": "Attacco Rapido"
     },
     "type": "normal",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "rain-dance": {
@@ -1881,6 +2037,7 @@
       "it": "Pioggiadanza"
     },
     "type": "water",
+    "contestType": "tough",
     "damageClass": "status"
   },
   "rapid-spin": {
@@ -1893,6 +2050,7 @@
       "it": "Rapigiro"
     },
     "type": "normal",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "razor-leaf": {
@@ -1905,6 +2063,7 @@
       "it": "Foglielama"
     },
     "type": "grass",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "razor-wind": {
@@ -1917,6 +2076,7 @@
       "it": "Ventagliente"
     },
     "type": "normal",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "recover": {
@@ -1929,6 +2089,7 @@
       "it": "Ripresa"
     },
     "type": "normal",
+    "contestType": "smart",
     "damageClass": "status"
   },
   "reflect": {
@@ -1941,6 +2102,7 @@
       "it": "Riflesso"
     },
     "type": "psychic",
+    "contestType": "smart",
     "damageClass": "status"
   },
   "rest": {
@@ -1953,6 +2115,7 @@
       "it": "Riposo"
     },
     "type": "psychic",
+    "contestType": "cute",
     "damageClass": "status"
   },
   "revenge": {
@@ -1965,6 +2128,7 @@
       "it": "Vendetta"
     },
     "type": "fighting",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "roar": {
@@ -1977,6 +2141,7 @@
       "it": "Boato"
     },
     "type": "normal",
+    "contestType": "cool",
     "damageClass": "status"
   },
   "rock-blast": {
@@ -1989,6 +2154,7 @@
       "it": "Cadutamassi"
     },
     "type": "rock",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "rock-slide": {
@@ -2001,6 +2167,7 @@
       "it": "Frana"
     },
     "type": "rock",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "rock-throw": {
@@ -2013,6 +2180,7 @@
       "it": "Sassata"
     },
     "type": "rock",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "rock-wrecker": {
@@ -2025,6 +2193,7 @@
       "it": "Devastomasso"
     },
     "type": "rock",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "rolling-kick": {
@@ -2037,6 +2206,7 @@
       "it": "Calciorullo"
     },
     "type": "fighting",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "rollout": {
@@ -2049,6 +2219,7 @@
       "it": "Rotolamento"
     },
     "type": "rock",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "sacred-fire": {
@@ -2061,6 +2232,7 @@
       "it": "Magifuoco"
     },
     "type": "fire",
+    "contestType": "beauty",
     "damageClass": "physical"
   },
   "sand-tomb": {
@@ -2073,6 +2245,7 @@
       "it": "Sabbiotomba"
     },
     "type": "ground",
+    "contestType": "smart",
     "damageClass": "physical"
   },
   "sandstorm": {
@@ -2085,6 +2258,7 @@
       "it": "Terrempesta"
     },
     "type": "rock",
+    "contestType": "tough",
     "damageClass": "status"
   },
   "scald": {
@@ -2097,6 +2271,7 @@
       "it": "Idrovampata"
     },
     "type": "water",
+    "contestType": null,
     "damageClass": "special"
   },
   "scratch": {
@@ -2109,6 +2284,7 @@
       "it": "Graffio"
     },
     "type": "normal",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "seed-bomb": {
@@ -2121,6 +2297,7 @@
       "it": "Semebomba"
     },
     "type": "grass",
+    "contestType": "smart",
     "damageClass": "physical"
   },
   "self-destruct": {
@@ -2133,6 +2310,7 @@
       "it": "Autodistruzione"
     },
     "type": "normal",
+    "contestType": "beauty",
     "damageClass": "physical"
   },
   "shadow-ball": {
@@ -2145,6 +2323,7 @@
       "it": "Palla Ombra"
     },
     "type": "ghost",
+    "contestType": "smart",
     "damageClass": "special"
   },
   "sharpen": {
@@ -2157,6 +2336,7 @@
       "it": "Affilatore"
     },
     "type": "normal",
+    "contestType": "cute",
     "damageClass": "status"
   },
   "sheer-cold": {
@@ -2169,6 +2349,7 @@
       "it": "Purogelo"
     },
     "type": "ice",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "sing": {
@@ -2181,6 +2362,7 @@
       "it": "Canto"
     },
     "type": "normal",
+    "contestType": "cute",
     "damageClass": "status"
   },
   "sky-attack": {
@@ -2193,6 +2375,7 @@
       "it": "Aeroattacco"
     },
     "type": "flying",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "slack-off": {
@@ -2205,6 +2388,7 @@
       "it": "Pigro"
     },
     "type": "normal",
+    "contestType": "cute",
     "damageClass": "status"
   },
   "slash": {
@@ -2217,6 +2401,7 @@
       "it": "Lacerazione"
     },
     "type": "normal",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "sleep-powder": {
@@ -2229,6 +2414,7 @@
       "it": "Sonnifero"
     },
     "type": "grass",
+    "contestType": "smart",
     "damageClass": "status"
   },
   "sludge-bomb": {
@@ -2241,6 +2427,7 @@
       "it": "Fangobomba"
     },
     "type": "poison",
+    "contestType": "tough",
     "damageClass": "special"
   },
   "sludge-wave": {
@@ -2253,6 +2440,7 @@
       "it": "Fangonda"
     },
     "type": "poison",
+    "contestType": null,
     "damageClass": "special"
   },
   "smog": {
@@ -2265,6 +2453,7 @@
       "it": "Smog"
     },
     "type": "poison",
+    "contestType": "tough",
     "damageClass": "special"
   },
   "snarl": {
@@ -2277,6 +2466,7 @@
       "it": "Urlorabbia"
     },
     "type": "dark",
+    "contestType": null,
     "damageClass": "special"
   },
   "snore": {
@@ -2289,6 +2479,7 @@
       "it": "Russare"
     },
     "type": "normal",
+    "contestType": "cute",
     "damageClass": "special"
   },
   "solar-beam": {
@@ -2301,6 +2492,7 @@
       "it": "Solarraggio"
     },
     "type": "grass",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "spark": {
@@ -2313,6 +2505,7 @@
       "it": "Scintilla"
     },
     "type": "electric",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "stealth-rock": {
@@ -2325,6 +2518,7 @@
       "it": "Levitoroccia"
     },
     "type": "rock",
+    "contestType": "cool",
     "damageClass": "status"
   },
   "steel-beam": {
@@ -2337,6 +2531,7 @@
       "it": "Raggio d’Acciaio"
     },
     "type": "steel",
+    "contestType": null,
     "damageClass": "special"
   },
   "stomp": {
@@ -2349,6 +2544,7 @@
       "it": "Pestone"
     },
     "type": "normal",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "stone-edge": {
@@ -2361,6 +2557,7 @@
       "it": "Pietrataglio"
     },
     "type": "rock",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "sucker-punch": {
@@ -2373,6 +2570,7 @@
       "it": "Sbigoattacco"
     },
     "type": "dark",
+    "contestType": "smart",
     "damageClass": "physical"
   },
   "sunny-day": {
@@ -2385,6 +2583,7 @@
       "it": "Giornodisole"
     },
     "type": "fire",
+    "contestType": "beauty",
     "damageClass": "status"
   },
   "superpower": {
@@ -2397,6 +2596,7 @@
       "it": "Troppoforte"
     },
     "type": "fighting",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "surf": {
@@ -2409,6 +2609,7 @@
       "it": "Surf"
     },
     "type": "water",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "swift": {
@@ -2421,6 +2622,7 @@
       "it": "Comete"
     },
     "type": "normal",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "swords-dance": {
@@ -2433,6 +2635,7 @@
       "it": "Danzaspada"
     },
     "type": "normal",
+    "contestType": "beauty",
     "damageClass": "status"
   },
   "synthesis": {
@@ -2445,6 +2648,7 @@
       "it": "Sintesi"
     },
     "type": "grass",
+    "contestType": "smart",
     "damageClass": "status"
   },
   "tackle": {
@@ -2457,6 +2661,7 @@
       "it": "Azione"
     },
     "type": "normal",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "teleport": {
@@ -2469,6 +2674,7 @@
       "it": "Teletrasporto"
     },
     "type": "psychic",
+    "contestType": "cool",
     "damageClass": "status"
   },
   "thrash": {
@@ -2481,6 +2687,7 @@
       "it": "Colpo"
     },
     "type": "normal",
+    "contestType": "tough",
     "damageClass": "physical"
   },
   "thunder": {
@@ -2493,6 +2700,7 @@
       "it": "Tuono"
     },
     "type": "electric",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "thunder-fang": {
@@ -2505,6 +2713,7 @@
       "it": "Fulmindenti"
     },
     "type": "electric",
+    "contestType": "smart",
     "damageClass": "physical"
   },
   "thunder-punch": {
@@ -2517,6 +2726,7 @@
       "it": "Tuonopugno"
     },
     "type": "electric",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "thunder-shock": {
@@ -2529,6 +2739,7 @@
       "it": "Tuonoshock"
     },
     "type": "electric",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "thunder-wave": {
@@ -2541,6 +2752,7 @@
       "it": "Tuononda"
     },
     "type": "electric",
+    "contestType": "cool",
     "damageClass": "status"
   },
   "thunderbolt": {
@@ -2553,6 +2765,7 @@
       "it": "Fulmine"
     },
     "type": "electric",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "toxic": {
@@ -2565,6 +2778,7 @@
       "it": "Tossina"
     },
     "type": "poison",
+    "contestType": "smart",
     "damageClass": "status"
   },
   "tri-attack": {
@@ -2577,6 +2791,7 @@
       "it": "Tripletta"
     },
     "type": "normal",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "twister": {
@@ -2589,6 +2804,7 @@
       "it": "Tornado"
     },
     "type": "dragon",
+    "contestType": "cool",
     "damageClass": "special"
   },
   "vine-whip": {
@@ -2601,6 +2817,7 @@
       "it": "Frustata"
     },
     "type": "grass",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "vital-throw": {
@@ -2613,6 +2830,7 @@
       "it": "Vitaltiro"
     },
     "type": "fighting",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "volt-switch": {
@@ -2625,6 +2843,7 @@
       "it": "Invertivolt"
     },
     "type": "electric",
+    "contestType": null,
     "damageClass": "special"
   },
   "volt-tackle": {
@@ -2637,6 +2856,7 @@
       "it": "Locomovolt"
     },
     "type": "electric",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "water-gun": {
@@ -2649,6 +2869,7 @@
       "it": "Pistolacqua"
     },
     "type": "water",
+    "contestType": "cute",
     "damageClass": "special"
   },
   "water-pledge": {
@@ -2661,6 +2882,7 @@
       "it": "Acquapatto"
     },
     "type": "water",
+    "contestType": null,
     "damageClass": "special"
   },
   "water-pulse": {
@@ -2673,6 +2895,7 @@
       "it": "Idropulsar"
     },
     "type": "water",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "water-spout": {
@@ -2685,6 +2908,7 @@
       "it": "Zampillo"
     },
     "type": "water",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "wave-crash": {
@@ -2697,6 +2921,7 @@
       "it": "Ondaschianto"
     },
     "type": "water",
+    "contestType": null,
     "damageClass": "physical"
   },
   "whirlpool": {
@@ -2709,6 +2934,7 @@
       "it": "Mulinello"
     },
     "type": "water",
+    "contestType": "beauty",
     "damageClass": "special"
   },
   "whirlwind": {
@@ -2721,6 +2947,7 @@
       "it": "Turbine"
     },
     "type": "normal",
+    "contestType": "smart",
     "damageClass": "status"
   },
   "wild-charge": {
@@ -2733,6 +2960,7 @@
       "it": "Sprizzalampo"
     },
     "type": "electric",
+    "contestType": null,
     "damageClass": "physical"
   },
   "will-o-wisp": {
@@ -2745,6 +2973,7 @@
       "it": "Fuocofatuo"
     },
     "type": "fire",
+    "contestType": "beauty",
     "damageClass": "status"
   },
   "wing-attack": {
@@ -2757,6 +2986,7 @@
       "it": "Attacco d’Ala"
     },
     "type": "flying",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "x-scissor": {
@@ -2769,6 +2999,7 @@
       "it": "Forbice X"
     },
     "type": "bug",
+    "contestType": "beauty",
     "damageClass": "physical"
   },
   "yawn": {
@@ -2781,6 +3012,7 @@
       "it": "Sbadiglio"
     },
     "type": "normal",
+    "contestType": "cute",
     "damageClass": "status"
   },
   "zap-cannon": {
@@ -2793,6 +3025,7 @@
       "it": "Falcecannone"
     },
     "type": "electric",
+    "contestType": "cool",
     "damageClass": "special"
   }
 }

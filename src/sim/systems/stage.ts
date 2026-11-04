@@ -1,8 +1,9 @@
 import type { BossMove, LegendField } from '../../data/schema';
 import { randomUnit } from '../math';
-import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type World, type BossEntry, type WingKind, gateDeadlineTick, enemyMoveSpeed } from '../world';
+import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type RunOutcome, type World, type BossEntry, type WingKind, gateDeadlineTick, enemyMoveSpeed } from '../world';
 import { hurtPlayer, fieldDamage } from './health';
 import { bumpRunStat } from '../runStats';
+import { maybeOpenContest } from '../contest';
 import { fireCasterMove } from './attack';
 import { casterFor } from './legendCasters';
 
@@ -215,6 +216,7 @@ export function advanceSection(world: World): void {
   world.section++;
   world.sectionStartTick = world.tick;
   world.events.push({ type: 'sectionAdvanced', section: world.section });
+  maybeOpenContest(world, world.section - 1);
 }
 
 /**
@@ -1563,7 +1565,7 @@ function finishLegendary(world: World, result: LegendaryResult): void {
   endRun(world, 'clear');
 }
 
-export function endRun(world: World, outcome: 'clear' | 'fail' | 'disconnected', gateTimeUp?: number): void {
+export function endRun(world: World, outcome: RunOutcome, gateTimeUp?: number): void {
   if (world.outcome) return;
   world.outcome = outcome;
   world.hazards.length = 0;

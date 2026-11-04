@@ -1,5 +1,5 @@
-import type { PlayerId } from './commands';
-import type { ItemKind, UpgradeOffer } from './world';
+import type { ContestCommand, PlayerId } from './commands';
+import type { ItemKind, RunOutcome, UpgradeOffer } from './world';
 
 /** 1回の更新の中で起きた出来事。描画・通信・実績の判定が読む */
 export interface EnemyKilledEvent {
@@ -298,6 +298,12 @@ export interface IntruderLeftEvent {
   readonly kind: number;
 }
 
+/** ホストがコンテストの手順を進めた（全員へ送る。07 の188章） */
+export interface ContestAppliedEvent {
+  readonly type: 'contestApplied';
+  readonly command: ContestCommand;
+}
+
 /** ランの記録が固有技の条件の数に届いた（本人のブラウザだけ。画面が runStat のコマンドにして送る。07 の134章） */
 export interface RunStatReachedEvent {
   readonly type: 'runStatReached';
@@ -385,7 +391,7 @@ export interface LegendTargetEvent {
 /** ランが終わった */
 export interface RunEndedEvent {
   readonly type: 'runEnded';
-  readonly outcome: 'clear' | 'fail' | 'disconnected';
+  readonly outcome: RunOutcome;
   /** 伝説戦があれば、その伝説（敵の種類の番号）と結果 */
   readonly legendary: { readonly kind: number; readonly result: 'won' | 'lost' | 'timeUp' | null } | null;
   /** 中ボスを制限時間で倒せずに失敗した: その中ボス（敵の種類の番号。07 の106章） */
@@ -393,6 +399,7 @@ export interface RunEndedEvent {
 }
 
 export type SimEvent =
+  | ContestAppliedEvent
   | RunStatReachedEvent
   | EnemyKilledEvent
   | ProjectileHitEvent

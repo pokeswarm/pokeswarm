@@ -17,6 +17,7 @@ import combatJson from '../../data/game/combat.json';
 import movesJson from '../../data/game/moves.json';
 import playablesJson from '../../data/game/playables.json';
 import abilitiesJson from '../../data/game/abilities.json';
+import contestJson from '../../data/game/contest.json';
 import regionsJson from '../../data/game/regions.json';
 import siteJson from '../../data/site.json';
 import levelingJson from '../../data/game/leveling.json';
@@ -53,6 +54,7 @@ import {
   derivationsConfigSchema,
   learnsetsConfigSchema,
   abilitiesConfigSchema,
+  contestConfigSchema,
   generatedAbilitiesSchema,
   itemsConfigSchema,
   levelingConfigSchema,
@@ -126,6 +128,8 @@ export const movesConfig = load('game/moves.json', movesConfigSchema, movesJson)
 export const playablesConfig = load('game/playables.json', playablesConfigSchema, playablesJson);
 /** 特性の効き方（ホウエン。07 の133章） */
 export const abilitiesConfig = load('game/abilities.json', abilitiesConfigSchema, abilitiesJson);
+/** ポケモンコンテスト（ホウエン。07 の188章） */
+export const contestConfig = load('game/contest.json', contestConfigSchema, contestJson);
 /** プレイヤーとして描ける（全動作のドット絵がある）ポケモン。これ以外へは進化しない（雑魚・ボス用だけのハガネールなど） */
 export const playerSpriteKeys: ReadonlySet<string> = new Set(
   load('sprites/pokemon.json', spritePokemonListSchema, spritePokemonJson)
@@ -159,6 +163,8 @@ export interface RegionStage {
   readonly natures: boolean;
   /** プレイアブルの特性が効く（ホウエン。07 の133章） */
   readonly abilities: boolean;
+  /** ポケモンコンテストがある（ホウエン。07 の188章） */
+  readonly contest: boolean;
 }
 export interface SectionWeather {
   readonly kinds: readonly string[];
@@ -192,6 +198,7 @@ export const regionStages: Readonly<Record<string, RegionStage>> = Object.fromEn
       ),
       natures: file.natures,
       abilities: file.abilities,
+      contest: file.contest,
     };
     return [id, stage];
   }),
@@ -275,6 +282,8 @@ for (const [region, r] of Object.entries(pickupConfig.regionBuffs)) {
   check(!!itemSprites.sprites[r.sprite], `data/game/pickups.json の ${region} の絵 "${r.sprite}" が data/render/items.json にありません`);
   for (const b of r.buffs) check(!!itemIcons.items[b.item], `data/game/pickups.json の ${region} の "${b.item}" のアイコンがありません（npm run item-icons）`);
 }
+for (const k of contestConfig.npcPokemon) check(!!generated.pokemon[k], `data/game/contest.json の NPC "${k}" が data/generated/pokemon.json にありません`);
+for (const r of contestConfig.ranks) check(r.npcScores.length >= contestConfig.entrants - 1, `data/game/contest.json のランク "${r.id}" の NPC の点数が足りません`);
 for (const name of ['potion', 'magnet', 'rare-candy', 'candy-box', 'candy-box-open', 'buff', 'buff-box', 'buff-box-open', 'moomoo-milk']) {
   check(!!itemSprites.sprites[name], `data/render/items.json に "${name}" のドット絵がありません`);
 }

@@ -169,8 +169,8 @@ async function main(): Promise<void> {
   // 技（名前・タイプ・分類だけ）
   const moves: Record<string, unknown> = {};
   for (const key of targets.moves) {
-    const m = await get<{ names: LocalizedName[]; type: NamedRef; damage_class: NamedRef }>(`move/${key}`);
-    moves[key] = { names: names(m.names, key), type: m.type.name, damageClass: m.damage_class.name };
+    const m = await get<{ names: LocalizedName[]; type: NamedRef; damage_class: NamedRef; contest_type: NamedRef | null }>(`move/${key}`);
+    moves[key] = { names: names(m.names, key), type: m.type.name, damageClass: m.damage_class.name, contestType: m.contest_type?.name ?? null };
   }
 
   // 持ち物（名前だけ）

@@ -1,0 +1,74 @@
+{
+  "afterSection": 7,
+  "entrants": 4,
+  "answerSeconds": 45,
+  "npcJitter": 0.1,
+  "npcPokemon": [
+    "zigzagoon",
+    "wingull",
+    "shroomish",
+    "taillow",
+    "electrike",
+    "numel",
+    "spheal",
+    "altaria"
+  ],
+  "categories": [
+    "cool",
+    "beauty",
+    "cute",
+    "smart",
+    "tough"
+  ],
+  "score": {
+    "pokeblockChosen": 10,
+    "pokeblockOther": 2,
+    "moveUp": 3,
+    "moveMatch": 40,
+    "moveOther": 10
+  },
+  "placementPct": [
+    100,
+    60,
+    35,
+    20
+  ],
+  "ranks": [
+    {
+      "id": "normal",
+      "npcScores": [
+        80,
+        110,
+        140
+      ],
+      "coins": 150
+    },
+    {
+      "id": "super",
+      "npcScores": [
+        150,
+        180,
+        210
+      ],
+      "coins": 250
+    },
+    {
+      "id": "hyper",
+      "npcScores": [
+        200,
+        240,
+        270
+      ],
+      "coins": 350
+    },
+    {
+      "id": "master",
+      "npcScores": [
+        260,
+        300,
+        340
+      ],
+      "coins": 500
+    }
+  ]
+}

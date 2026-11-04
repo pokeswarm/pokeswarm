@@ -1,4 +1,4 @@
-import type { CombatConfig, EnemyKind, LegendField, NatureStat, PickupConfig, SpawnConfig, StageConfig, StatsConfig, StatusConfig, NetSmoothing } from '../data/schema';
+import type { CombatConfig, ContestConfig, EnemyKind, LegendField, NatureStat, PickupConfig, SpawnConfig, StageConfig, StatsConfig, StatusConfig, NetSmoothing } from '../data/schema';
 import type { SimSpecies } from './species';
 import type { ObstacleRules } from './obstacles';
 import type { SimMoveDef, TypeChart } from './moves';
@@ -99,6 +99,8 @@ export interface SimRules {
     readonly lines: Readonly<Record<string, { readonly key: string; readonly forms: Readonly<Record<number, string>> }>>;
     readonly defs: Readonly<Record<string, SimAbility>>;
   };
+  /** ポケモンコンテスト（ホウエン。07 の188章）。無い地方は無し */
+  contest?: ContestConfig;
   /** なつきの進化に要る、ランで歩いた距離（data/game/player.json） */
   friendshipDistance: number;
   /** 協力プレイで届いた位置をなめらかに見せる */

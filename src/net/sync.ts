@@ -1,3 +1,4 @@
+import type { ContestCommand } from '../sim/commands';
 import type { Axis, InputCommand, PlayerId } from '../sim/commands';
 import { levelUpSnapshot } from '../sim/systems/leveling';
 import { ITEM_KINDS } from '../sim/systems/items';
@@ -61,6 +62,11 @@ export class SyncSession {
   /** ゲスト: レベルアップの選択（選ぶ・見送る・リロール）をホストへ頼む */
   requestUpgrade(kind: 'c' | 's' | 'r' | 'b', index = 0): void {
     this.requests.push({ t: 'rq', k: kind, n: index });
+  }
+
+  /** ゲスト: コンテストの答え・出場をホストへ伝える */
+  requestContest(cmd: ContestCommand): void {
+    this.requests.push({ t: 'ct', c: cmd });
   }
 
   /** ゲスト: ランの記録（固有技の条件）をホストへ伝える */
@@ -181,6 +187,9 @@ export class SyncSession {
           break;
         case 'playerRevived':
           if (host) out.push({ t: 'rv', i: ev.playerId, n: ev.revives });
+          break;
+        case 'contestApplied':
+          if (host) out.push({ t: 'ct', c: ev.command });
           break;
         case 'pauseChanged':
           if (host) out.push({ t: 'pz', on: ev.paused ? 1 : 0 });
@@ -355,6 +364,11 @@ export class SyncSession {
             else if (m.k === 'b') cmds.push({ type: 'banUpgrade', playerId: from, index: m.n });
             else cmds.push({ type: 'rerollUpgrades', playerId: from });
           }
+          break;
+        case 'ct':
+          // ゲストからの要望は送り手の番号に直す。ホストからの確定はそのまま
+          if (host) cmds.push({ ...m.c, type: 'contest', playerId: from });
+          else if (guest) cmds.push({ ...m.c, type: 'contest' });
           break;
         case 'rs':
           if (host) cmds.push({ type: 'runStat', playerId: from, stat: m.s, value: m.v });

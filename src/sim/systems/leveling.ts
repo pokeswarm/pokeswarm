@@ -396,6 +396,7 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
       break;
     case 'moveUp':
       p.moves[offer.slot]!.level++;
+      p.moveUps = (p.moveUps ?? 0) + 1;
       break;
     case 'itemNew':
       p.items.push({ item: offer.item, level: 1 });

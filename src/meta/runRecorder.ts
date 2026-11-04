@@ -209,6 +209,18 @@ export class RunRecorder {
 
   /** ラン終了時: 残りを足し、回数・クリア・最高記録を記録する */
   finish(world: World): void {
+    // コンテスト（07 の188章）: 1位ならその部門の次のランクへ
+    const contest = world.contest;
+    const mine = contest?.results?.find((r) => r.playerId === world.localPlayerId);
+    if (world.outcome === 'contest' && contest && mine) {
+      this.count('contestEntries');
+      const category = contest.entries.get(world.localPlayerId)?.category;
+      if (mine.place === 1 && category) {
+        this.count('contestWins');
+        const key = `contestRank.${category}`;
+        if ((this.store.current.stats[regionStatKey(this.region, key)] ?? 0) === contest.rank) this.count(key);
+      }
+    }
     // 続けて戦うラウンドを倒した記録（レッドを倒す。ジョウトの にじいろのはね の実績）
     const legendStats = world.legendary ? legendRoundStats(world, world.legendary.kind, world.legendary.result) : [];
     this.finishWith({ clear: world.outcome === 'clear', coop: world.role !== 'solo', seconds: elapsedSeconds(world), level: world.level, bonusCoins: this.bonusCoins(world), legendStats });

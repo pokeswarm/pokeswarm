@@ -2398,7 +2398,8 @@
           }
         }
       ],
-      "crossArcDegrees": 150
+      "crossArcDegrees": 150,
+      "contestType": "tough"
     },
     "spark": {
       "pattern": "pulse",
@@ -2516,7 +2517,8 @@
             "range": 180
           }
         }
-      ]
+      ],
+      "contestType": "cool"
     },
     "fissure": {
       "pattern": "scatter",
@@ -3245,7 +3247,8 @@
         {
           "power": 24.1
         }
-      ]
+      ],
+      "contestType": "smart"
     },
     "dragon-tail": {
       "pattern": "sweep",
@@ -3299,7 +3302,8 @@
       "body": {
         "lungeDistance": 10,
         "afterimages": 0
-      }
+      },
+      "contestType": "tough"
     },
     "dragon-rush": {
       "pattern": "dash",
@@ -3570,7 +3574,8 @@
         {
           "power": 20.9
         }
-      ]
+      ],
+      "contestType": "smart"
     },
     "zap-cannon": {
       "pattern": "homing",
@@ -6102,7 +6107,8 @@
           "spreadDegrees": 10,
           "power": 12.1
         }
-      ]
+      ],
+      "contestType": "tough"
     },
     "muddy-water": {
       "pattern": "melee",
@@ -6731,7 +6737,8 @@
           "power": -11.4
         }
       ],
-      "scatterDelaySeconds": 0.45
+      "scatterDelaySeconds": 0.45,
+      "contestType": "beauty"
     },
     "whirlwind": {
       "pattern": "melee",
@@ -6856,7 +6863,8 @@
             "powerMultiplier": 0.8
           }
         }
-      ]
+      ],
+      "contestType": "cool"
     },
     "cross-poison": {
       "pattern": "nearest",
@@ -7371,7 +7379,8 @@
           "count": 1,
           "power": -2.3
         }
-      ]
+      ],
+      "contestType": "cute"
     },
     "leaf-blade": {
       "pattern": "nova",
@@ -7523,7 +7532,8 @@
       "levels": [],
       "passive": [
         {}
-      ]
+      ],
+      "contestType": "beauty"
     },
     "double-kick": {
       "pattern": "barrage",
@@ -7640,7 +7650,8 @@
           "size": 6,
           "power": 3.7
         }
-      ]
+      ],
+      "contestType": "tough"
     },
     "close-combat": {
       "pattern": "barrage",
@@ -7837,7 +7848,8 @@
       "levels": [],
       "passive": [
         {}
-      ]
+      ],
+      "contestType": "beauty"
     },
     "blaze-kick": {
       "pattern": "melee",
@@ -8140,7 +8152,8 @@
       "levels": [],
       "passive": [
         {}
-      ]
+      ],
+      "contestType": "beauty"
     },
     "wave-crash": {
       "pattern": "beam",
@@ -8215,7 +8228,8 @@
       "learnMinLevel": 50,
       "learnWithMoves": [
         "water-pledge"
-      ]
+      ],
+      "contestType": "cool"
     },
     "close-combat-sweep": {
       "nameOf": "close-combat",
@@ -8824,7 +8838,8 @@
           "count": 1,
           "power": 2
         }
-      ]
+      ],
+      "contestType": "smart"
     },
     "double-edge": {
       "pattern": "dash",
@@ -9306,7 +9321,8 @@
           }
         }
       ],
-      "region": "hoenn"
+      "region": "hoenn",
+      "contestType": "smart"
     },
     "surf": {
       "pattern": "melee",
@@ -9503,7 +9519,8 @@
           "range": 20,
           "power": 2.9
         }
-      ]
+      ],
+      "contestType": "tough"
     },
     "metal-claw": {
       "pattern": "melee",
@@ -11100,7 +11117,8 @@
           "range": 30,
           "power": 8
         }
-      ]
+      ],
+      "contestType": "smart"
     },
     "dual-wingbeat": {
       "pattern": "melee",
@@ -11160,7 +11178,8 @@
           "range": 8,
           "power": 1.3
         }
-      ]
+      ],
+      "contestType": "cool"
     },
     "dig": {
       "pattern": "strike",
@@ -11325,7 +11344,8 @@
           "count": 1,
           "power": 0.6
         }
-      ]
+      ],
+      "contestType": "smart"
     },
     "moonblast": {
       "pattern": "facing",
@@ -11384,7 +11404,8 @@
             "powerMultiplier": 0.2
           }
         }
-      ]
+      ],
+      "contestType": "beauty"
     },
     "dazzling-gleam": {
       "pattern": "strike",
@@ -11436,7 +11457,8 @@
           "power": -17
         }
       ],
-      "strikeRepeat": true
+      "strikeRepeat": true,
+      "contestType": "beauty"
     },
     "fire-blast": {
       "pattern": "facing",
@@ -12305,7 +12327,8 @@
         "start": 0.2,
         "end": 1,
         "halfWidth": 0.4
-      }
+      },
+      "contestType": "cute"
     },
     "disarming-voice": {
       "pattern": "homing",
@@ -12354,7 +12377,8 @@
         {
           "power": 2.4
         }
-      ]
+      ],
+      "contestType": "cute"
     },
     "dazzling-gleam-jigglypuff": {
       "pattern": "strike",
@@ -12406,7 +12430,8 @@
           "count": 1,
           "power": -2
         }
-      ]
+      ],
+      "contestType": "beauty"
     },
     "last-resort-rush": {
       "nameOf": "last-resort",

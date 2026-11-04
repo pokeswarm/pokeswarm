@@ -1,3 +1,4 @@
+import { stepContest } from './contest';
 import { stepAbilities } from './ability';
 import { tickLegendCasters } from './systems/legendCasters';
 import { stepBoxes, tickBuffs } from './systems/boxes';
@@ -74,6 +75,11 @@ export class Simulation {
     // レベルアップの選択中は全員のゲームを止める（入力の状態と選択だけ受け付ける）
     if (w.levelUp) {
       stepLevelUp(w);
+      return;
+    }
+    // ポケモンコンテストの間も止める（07 の188章）
+    if (w.contest) {
+      stepContest(w);
       return;
     }
     movePlayers(w);

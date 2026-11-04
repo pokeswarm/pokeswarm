@@ -34,7 +34,7 @@ import { EnemySprites } from '../render/sprites/EnemySprites';
 import { SpriteStreamer } from '../render/sprites/SpriteStreamer';
 import { loadPokemonAtRuntime } from '../render/sprites/runtimeLoad';
 import { addSpriteGallery } from '../render/sprites/SpriteGallery';
-import type { Axis, InputCommand, PlayerId } from '../sim/commands';
+import type { Axis, ContestCommand, InputCommand, PlayerId } from '../sim/commands';
 import { SHAPE_BOX, SHAPE_CIRCLE, SHAPE_LINE, SHAPE_SECTOR } from '../sim/entities/projectiles';
 import { abilityOf, pinchMods } from '../sim/ability';
 import { FixedStepClock } from '../sim/fixedStep';
@@ -51,9 +51,11 @@ import { achievementName, achievementRewardById } from '../meta/achievementText'
 import { RunRecorder } from '../meta/runRecorder';
 import { clearRunProbe, writeRunProbe } from '../meta/runProbe';
 import { session } from '../meta/session';
+import { regionStatKey } from '../meta/regionScope';
 import { LevelUpPanel, offerText } from './levelUpPanel';
 import { activeField, activeLegendField, currentWeather, startIntruder, startLegendary, legendRoundKinds } from '../sim/systems/stage';
 import { PausePanel } from './pausePanel';
+import { ContestPanel } from './contestPanel';
 import { EvolutionCutscene } from './evolutionCutscene';
 import { NetPanel } from './netPanel';
 import { formatTime, type ResultSceneData } from './ResultScene';
@@ -203,6 +205,8 @@ export class RunScene extends Phaser.Scene {
   private levelUpPanel!: LevelUpPanel;
   /** ポーズの画面（Esc）と、ゲストが止めずに開いている設定の画面 */
   private pausePanel!: PausePanel;
+  /** ポケモンコンテストの画面（ホウエン。07 の188章） */
+  private contestPanel!: ContestPanel;
   private settingsOpen = false;
   /** テストプレイ: 最初から戦う伝説（無ければ null）・無敵・無敵の間に受けたはずのダメージの合計 */
   private testLegend: number | null = null;
@@ -540,6 +544,15 @@ export class RunScene extends Phaser.Scene {
       },
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.levelUpPanel.hide());
+    this.contestPanel = new ContestPanel(
+      (cmd) => {
+        const full = { ...cmd, playerId: this.localId } as ContestCommand;
+        if (guest) this.sync?.requestContest(full);
+        else this.uiCommands.push({ ...full, type: 'contest' });
+      },
+      (category) => session.store.current.stats[regionStatKey(this.stageOfRegion.id, `contestRank.${category}`)] ?? 0,
+    );
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.contestPanel.hide());
     this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));
     this.effects = new EffectRenderer(this, effectRecipes, depths.effects, spriteRender.effectPixel);
     // ダメージの数字（設定でオン。07 の102章）: プレイヤーより上・画面の表示より下
@@ -1168,7 +1181,7 @@ export class RunScene extends Phaser.Scene {
         const s = w.rules.stage.swarms[ev.swarm];
         if (s) this.announce(tMaybe(`swarm.${s.pattern}`, { name: localName(generated.pokemon[s.kind.replace(/^swarm-/, '')]?.names, getLocale(), s.kind) }), '#ffcc80');
       } else if (ev.type === 'runEnded') {
-        const clear = ev.outcome === 'clear';
+        const clear = ev.outcome === 'clear' || ev.outcome === 'contest';
         this.tweens.killTweensOf(this.announceText);
         // 伝説戦の時間切れ（作者の依頼 2026年10月28日）: クリアの表示で倒したと思わないよう、「〇〇は 去っていった…」を大きく出してから結果画面へ
         const escaped = ev.legendary?.result === 'timeUp';
@@ -2433,6 +2446,7 @@ export class RunScene extends Phaser.Scene {
     }
     // ポーズの画面: 止まっていれば（ゲストにはホストが止めたことを）出す。ゲストは止めずに設定だけを開ける
     const guestView = world.role === 'guest';
+    this.contestPanel.update(world, this.localId);
     if (world.paused) this.pausePanel.show(guestView ? 'hostPaused' : 'paused');
     else if (this.settingsOpen && guestView) this.pausePanel.show('settings');
     else this.pausePanel.hide();

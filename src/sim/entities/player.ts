@@ -147,6 +147,8 @@ export interface Player {
   sleep?: { stillTicks: number; asleep: boolean; wakeTicks: number };
   /** 性格（SimRules.natures の番号。性格の無い地方は無し。07 の89.3） */
   nature?: number;
+  /** 技を強化した回数の累計（技進化でレベルが戻っても減らない。コンテストの材料。07 の188章） */
+  moveUps?: number;
   /** 拾ったポロックの数（部門ごと。コンテストの材料。07 の188章） */
   pokeblocks?: Record<string, number>;
   /** 特性（本人のブラウザ）: がんじょうを使った区間・しぜんかいふくで見た区間・じしんかじょうの重ね（07 の133章） */

@@ -309,6 +309,15 @@ export interface CorrectEnemiesCommand {
   readonly tick?: number;
 }
 
+/** ポケモンコンテストの手順（07 の188章）: 開く・リーグかコンテストかの答え・出場（部門と技2個）・終わる */
+export type ContestCommand =
+  | { readonly op: 'open'; readonly playerId: PlayerId }
+  | { readonly op: 'answer'; readonly playerId: PlayerId; readonly go: boolean }
+  | { readonly op: 'entry'; readonly playerId: PlayerId; readonly category: string; readonly moves: readonly number[]; readonly rank: number }
+  | { readonly op: 'finish'; readonly playerId: PlayerId };
+
+export type ContestInputCommand = ContestCommand & { readonly type: 'contest' };
+
 /** ランの記録（本人のブラウザで数えたもの）を、どのブラウザのプレイヤーにも付ける（07 の134章） */
 export interface RunStatCommand {
   readonly type: 'runStat';
@@ -328,6 +337,7 @@ export type InputCommand =
   | MoveCommand
   | AnswerEvolveCommand
   | RunStatCommand
+  | ContestInputCommand
   | RemotePlayerCommand
   | SpawnEnemyCommand
   | DamageEnemyCommand

@@ -1,5 +1,6 @@
 import type { InputCommand } from '../commands';
 import { setRunStat } from '../runStats';
+import { advanceContest, applyContest } from '../contest';
 import { noteLegendThreat } from './stage';
 import type { HitEffect } from '../events';
 import { currentWaveIndex, enemyHpScale, findEnemyIndex, findPlayer, type World, enemyMoveSpeed } from '../world';
@@ -23,6 +24,9 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         p.inputY = cmd.dy;
         break;
       }
+      case 'contest':
+        applyContest(world, cmd);
+        break;
       case 'runStat': {
         const p = findPlayer(world, cmd.playerId);
         if (p) setRunStat(p, cmd.stat, cmd.value);
@@ -248,6 +252,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
           world.players.splice(k, 1);
           world.events.push({ type: 'playerLeft', playerId: cmd.playerId });
         }
+        advanceContest(world);
         break;
       }
       case 'correctEnemies': {

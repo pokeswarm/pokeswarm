@@ -1129,8 +1129,10 @@ function fireCross(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     // 前へ流す技（ヘドロウェーブ）: 向いている方を中心にした crossArc の中に、端から端まで等しく並べる
     const arc = world.rules.moves[pm.move]!.crossArc;
     const a = world.rules.moves[pm.move]!.crossRandom ? world.rng.next() * Math.PI * 2 : arc !== undefined ? start + (st.count === 1 ? 0 : (k / (st.count - 1) - 0.5) * arc) : start + (k / st.count) * Math.PI * 2;
-    const vx = Math.cos(a) * speed;
-    const vy = Math.sin(a) * speed;
+    const jitter = world.rules.moves[pm.move]!.crossSpeedJitter;
+    const sp = jitter ? speed * (1 - world.rng.next() * jitter) : speed;
+    const vx = Math.cos(a) * sp;
+    const vy = Math.sin(a) * sp;
     // 蛇行する弾（ヘドロウェーブ）: 出した場所を ox・oy に覚え、時間から位置を決める。隣どうしで揺れの向きを逆にする
     if (snake) {
       const omega = (Math.PI * 2 * speed) / snake.wavelength;
@@ -1633,7 +1635,8 @@ export function moveProjectiles(world: World): void {
       }
       // 当たった敵ごとの効き方（かみなり: 落雷を受けた敵から電気が連鎖する）。見た目もそろうように、どのブラウザでも起こす
       // 遅れて爆発する印（みらいよち）: どのブラウザでも付け、時間が来たら付けたプレイヤーの技として爆発させる
-      if (pr.stage[i] === 0 && def.delayedBlast && e.markTicks[j] === 0) {
+      // ほろびのうた は雑魚だけに付く（ボスには効かない）
+      if (pr.stage[i] === 0 && def.delayedBlast && e.markTicks[j] === 0 && (!def.delayedBlast.perish || (world.rules.enemies.kinds[e.kind[j]!]?.rank ?? 'normal') === 'normal')) {
         e.markTicks[j] = Math.max(1, Math.round(def.delayedBlast.seconds / world.dt));
         e.markDamage[j] = pr.damage[i]! * def.delayedBlast.powerMultiplier;
         e.markSize[j] = pr.radius[i]! * def.delayedBlast.sizeMultiplier;
@@ -1664,28 +1667,19 @@ export function moveProjectiles(world: World): void {
       if (crit && local && owner) bumpRunStat(world, owner, 'crits');
       // 一撃（じわれ）: 雑魚だけ。当てたプレイヤーのブラウザの乱数で決め、倒しきる量を送る
       const normalEnemy = (kind?.rank ?? 'normal') === 'normal';
-      // ほろびのうた: 1秒以上あけて決まった回数当たった雑魚は、確定で倒れる（ボスには効かない）
-      let perishKill = false;
-      if (def.perishHits && pr.stage[i] === 0 && normalEnemy) {
-        if (e.perish[j] === 0 || world.tick - e.perishTick[j]! >= Math.round(1 / world.dt)) {
-          e.perish[j] = Math.min(255, e.perish[j]! + 1);
-          e.perishTick[j] = world.tick;
-        }
-        perishKill = e.perish[j]! >= def.perishHits;
-      }
-      const instakill = perishKill || (st.instakillChance > 0 && normalEnemy && world.rng.next() < st.instakillChance);
+      const instakill = (st.instakillChance > 0 && normalEnemy && world.rng.next() < st.instakillChance);
       // たたりめ: 状態異常の敵へのダメージを上げる
       const statusBonus = st.statusBonusPct > 0 && e.hasAnyStatus(j) ? 1 + st.statusBonusPct / 100 : 1;
-      // つかんで投げる技（サイコキネシス）は、つかむ時にはダメージを与えない（倒れると浮かない。投げた時にまとめて当たる）
+      // つかんで投げる技（サイコキネシス）・聞かせる技（ほろびのうた）は、触れた時にはダメージを与えない（倒れると浮かない。投げた時・時間が来た時に効く）
       const amount = instakill
         ? INSTAKILL_DAMAGE
-        : (def.delayedBlast?.throw && pr.stage[i] === 0 ? 0 : 1) * pr.damage[i]! *
+        : ((def.delayedBlast?.throw || def.delayedBlast?.perish) && pr.stage[i] === 0 ? 0 : 1) * pr.damage[i]! *
           Math.max(...moveTypesOf(def).map((t) => typeMultiplier(world.rules.types, world.rules.combat.typeMultipliers, t, owner?.types ?? [], kind?.types ?? []))) *
           (crit ? world.rules.combat.critMultiplier : 1) *
           statusBonus *
           (idle ? def.idleScale!.power : 1);
       // ダメージの数字（設定でオンのときだけ。一撃は出さない）
-      if (world.damageNumbers && !instakill) {
+      if (world.damageNumbers && !instakill && amount > 0) {
         const flags = typeFlags(world.rules.types, def.type, owner?.types ?? [], kind?.types ?? []) | (crit ? DMG_CRIT : 0);
         world.events.push({ type: 'damageNumber', enemyId: e.id[j]!, x: e.x[j]!, y: e.y[j]!, amount: amount * damageTakenMultiplier(world, j), flags });
       }
@@ -1794,12 +1788,33 @@ export function fireCasterMove(world: World, caster: Player, move: number, level
   fireSpawnEffects(world, from, world.projectiles.count);
 }
 
+/** ほろびのうた の時間が来た雑魚を倒す（ゲストはホストへ伝え、自分の画面では先に消して見せる） */
+function perishKill(world: World, i: number): void {
+  const e = world.enemies;
+  const by = e.markBy[i]!;
+  if (world.role === 'guest') {
+    world.events.push({ type: 'damageDealt', enemyId: e.id[i]!, amount: INSTAKILL_DAMAGE, by, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 });
+    e.savedHp[i] = e.hp[i]!;
+    e.hp[i] = 0;
+    e.ghostTicks[i] = Math.max(1, Math.round(world.rules.netSmoothing.predictKillSeconds / world.dt));
+    return;
+  }
+  e.hp[i] = 0;
+  world.events.push({ type: 'enemyKilled', enemyId: e.id[i]!, kind: e.kind[i]!, by });
+  world.stats.kills++;
+}
+
 /** 遅れて爆発する印（みらいよち）の時間を進め、時間が来たら、その敵の位置で付けたプレイヤーの技として爆発させる */
 export function tickMarks(world: World): void {
   const e = world.enemies;
   for (let i = 0; i < e.count; i++) {
     if (e.markTicks[i] === 0) continue;
     if (--e.markTicks[i]! > 0 || e.hp[i]! <= 0) continue;
+    // ほろびのうた: 時間が来た雑魚が、音も爆発もなく倒れる。決めるのは歌ったプレイヤーのブラウザ（ほかの人には撃破の知らせで届く）
+    if (world.rules.moves[e.markMove[i]!]?.delayedBlast?.perish) {
+      if (e.markBy[i] === world.localPlayerId) perishKill(world, i);
+      continue;
+    }
     // つかんで投げる（サイコキネシス）: 雑魚は持ち主の向いている方へ飛び、飛ぶ敵に付いた当たり判定が通り道の敵に当たる。ボスは下の爆発を受ける
     const thrown = world.rules.moves[e.markMove[i]!]?.delayedBlast?.throw;
     const owner = thrown ? world.players.find((pl) => pl.id === e.markBy[i]) : undefined;

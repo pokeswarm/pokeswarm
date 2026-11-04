@@ -1268,6 +1268,8 @@ export const moveDefSchema = z.object({
       powerMultiplier: z.number().nonnegative(),
       /** 爆発の代わりに、雑魚を持ち主の向いている方へ投げ飛ばす（サイコキネシス: 飛ぶ敵が弾になり、通り道の敵に当たる。ボスは投げず、その場で爆発を受ける。07 の177章） */
       throw: z.object({ speed: z.number().positive(), seconds: z.number().positive() }).optional(),
+      /** 爆発の代わりに、時間が来たら雑魚がすっと倒れる（ほろびのうた: 聞いた敵が 3 秒後に倒れる。その場ではダメージも押し出しも無く、ボスには効かない。07 の180章） */
+      perish: z.boolean().optional(),
     })
     .optional(),
   /**
@@ -1283,14 +1285,14 @@ export const moveDefSchema = z.object({
   healZone: z.boolean().optional(),
   /** cross（十字）: 向きを等しい角度に並べず、1発ごとにランダムにする（うたう: 音符がふわふわ散る） */
   crossRandom: z.boolean().optional(),
+  /** cross: 1 つずつ速さをばらつかせる（この割合まで遅くなる。ほろびのうた・いびき: 輪に見えないように漂わせる。07 の180章） */
+  crossSpeedJitter: z.number().gt(0).max(1).optional(),
   /** cross（十字）: 全方向ではなく、向いている方を中心にしたこの角度（度）の中に等しく並べて出す（ヘドロウェーブ: 前へ流れる毒の波。07 の165章） */
   crossArcDegrees: z.number().positive().max(360).optional(),
   /** 走っている間（移動の入力がある間）だけ次を出すまでの時間が進む（ほうでん: 走って体に電気をためる。07 の165章） */
   chargeWhileMoving: z.boolean().optional(),
   /** 扇（melee の arcDegrees）を、向いている方向ではなく左右の両方へ1つずつ出す（ハイパーボイス） */
   sideways: z.boolean().optional(),
-  /** この技に（1秒以上あけて）この回数当たった雑魚は、確定で倒れる（ほろびのうた。ボスには効かない） */
-  perishHits: z.number().int().positive().optional(),
   /** 扇（melee の arcDegrees）: 数が1増えるごとに、扇の角度をこの度数だけ広げる（本数は増やさない。かえんほうしゃ・バブルこうせん。作者の指摘 2026年10月27日） */
   countWidens: z.number().positive().optional(),
   /**

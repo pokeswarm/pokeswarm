@@ -5652,6 +5652,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'sweat-drop': () => sweatDrop(),
     'sound-waves': () => soundWaves(),
     'perish-ring': () => perishRing(),
+    'perish-note': () => perishNote(),
     'heal-rise': () => healRise(),
     'sun-rise': () => healRise(['#5d4a00', '#c0ca33', '#fff176', '#ffffff']),
     // つきのひかり: 同じ形で、月の光の色（淡い黄色と白）
@@ -6518,4 +6519,26 @@ function airCutterBlade(): SpriteOut {
     }),
   );
   return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/** ほろびのうた: 静かに漂う暗い音符（濃い紫に、かすかに白いふち。コマでわずかに揺れる）。3 コマ */
+function perishNote(): SpriteOut {
+  const W = 12;
+  const H = 12;
+  // 0 輪郭（ほぼ黒）・1 濃い紫・2 紫・3 うす紫
+  const palette = ['#0b0612', '#2d1b4e', '#4a2c7a', '#b39ddb'];
+  const frames = [0, 1, 2].map((f) => {
+    const bob = (f - 1) * 0.6;
+    const g = fill(blank(W, H), (x, y) => {
+      const yy = y - bob;
+      const hx = x - 4.2;
+      const hy = yy - 8.2;
+      if (((hx + hy * 0.4) / 2.2) ** 2 + (hy / 1.5) ** 2 < 1) return hx + hy < -1.2 ? 3 : 1;
+      if (Math.abs(x - 6.2) < 0.6 && yy > 2 && yy < 8) return 2;
+      if (x > 6.2 && x < 9.4 && yy > 2 + (x - 6.2) * 0.8 && yy < 4 + (x - 6.2) * 1.1) return 1;
+      return -1;
+    });
+    return outline(g, 0);
+  });
+  return { palette, frameMs: 260, parts: { main: frames.map(toRows) } };
 }

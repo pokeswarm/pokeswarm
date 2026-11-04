@@ -4,6 +4,7 @@ import { DMG_CRIT, DMG_NOT_VERY, DMG_STAB, DMG_SUPER, type DamageNumberEvent } f
 import { hexColor } from './color';
 
 const FONT_KEY = 'damage-digits';
+export const DAMAGE_FONT_KEY = FONT_KEY;
 
 interface Slot {
   text: Phaser.GameObjects.BitmapText;
@@ -22,7 +23,7 @@ interface Slot {
  * 細いドットの字（data/render/ui.json の glyphs。1点 = 1画素）で数字と「!」の画像を作り、レトロフォントとして登録する。
  * 白い字のまわりに1点の黒い縁。色は tint で付け、大きさは拡大で（ドット絵向けの拡大なのでにじまない）
  */
-function ensureFont(scene: Phaser.Scene): void {
+export function ensureDamageFont(scene: Phaser.Scene): void {
   if (scene.cache.bitmapFont.exists(FONT_KEY)) return;
   const glyphs = uiConfig.damageNumbers.glyphs;
   const chars = Object.keys(glyphs).join('');
@@ -78,7 +79,7 @@ export class DamageNumbers {
   };
 
   constructor(scene: Phaser.Scene, depth: number) {
-    ensureFont(scene);
+    ensureDamageFont(scene);
     for (let k = 0; k < this.cfg.maxActive; k++) {
       const text = scene.add.bitmapText(0, 0, FONT_KEY, '').setLetterSpacing(-1).setOrigin(0.5, 1).setDepth(depth).setVisible(false);
       this.slots.push({ text, enemyId: -1, amount: 0, flags: 0, bornAt: 0, mergedAt: 0, x: 0, y: 0, active: false });

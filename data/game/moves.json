@@ -5273,18 +5273,27 @@
       "levels": []
     },
     "perish-song": {
-      "pattern": "pulse",
+      "pattern": "cross",
       "effect": "perish-song",
-      "perishHits": 3,
+      "crossRandom": true,
+      "snake": {
+        "amplitude": 16,
+        "wavelength": 100
+      },
+      "delayedBlast": {
+        "seconds": 3,
+        "sizeMultiplier": 1,
+        "powerMultiplier": 0,
+        "perish": true
+      },
       "base": {
-        "power": 113.4,
-        "cooldownSeconds": 4.5,
-        "count": 3,
-        "intervalSeconds": 1.1,
-        "speed": 0,
-        "size": 40,
-        "range": 280,
-        "durationSeconds": 0.8,
+        "power": 347.5,
+        "intervalSeconds": 0.1,
+        "count": 4,
+        "speed": 70,
+        "size": 16,
+        "range": 240,
+        "durationSeconds": 3.4,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
         "knockback": 0,
@@ -5292,35 +5301,39 @@
         "statusChance": 0,
         "statusSeconds": 0,
         "spreadDegrees": 0,
-        "lifestealPct": 0
+        "lifestealPct": 0,
+        "cooldownSeconds": 4
       },
       "levels": [
         {
-          "power": 19
+          "power": 58.3
         },
         {
-          "range": 20,
-          "power": 19
+          "count": 1,
+          "power": 9.3
         },
         {
-          "power": 19
+          "size": 2,
+          "power": 35.4
         },
         {
-          "cooldownSeconds": -0.4,
-          "power": 2.2
+          "cooldownSeconds": -0.3,
+          "power": 12.7
         },
         {
-          "range": 20,
-          "power": 17.3
+          "count": 1,
+          "power": 2.1
         },
         {
-          "size": 8,
-          "power": 17.3
+          "size": 2,
+          "power": 25.5
         },
         {
-          "power": 17.4
+          "count": 1,
+          "power": 1.6
         }
-      ]
+      ],
+      "crossSpeedJitter": 0.7
     },
     "eruption": {
       "pattern": "lob",
@@ -12029,7 +12042,8 @@
           "statusChance": 0.1,
           "power": 3.7
         }
-      ]
+      ],
+      "crossSpeedJitter": 0.6
     },
     "stomp": {
       "pattern": "barrage",

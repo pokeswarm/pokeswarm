@@ -44,17 +44,31 @@ describe('光線の数', () => {
 });
 
 describe('ほろびのうた', () => {
-  it('3回くらった雑魚は倒れ、ボスは倒れない', () => {
+  it('音符に触れた雑魚は 3 秒後に倒れ（その前は傷つかない）、ボスには効かない（07 の180章）', () => {
     const { rules, sim, m } = setup('perish-song');
     const normal = kindOf(rules, 'normal');
     const boss = kindOf(rules, 'boss');
-    sim.world.enemies.add(900001, normal, 100, 0, 1e7, 0, 10);
-    sim.world.enemies.add(900002, boss, -100, 0, 1e7, 0, 10);
-    for (let t = 0; t < 30 * 4; t++) sim.step([]);
     const e = sim.world.enemies;
-    const alive = [...Array(e.count).keys()].map((i) => e.id[i]);
-    expect(alive).not.toContain(900001);
-    expect(alive).toContain(900002);
+    // 音符は決まった向きに飛ばないので、まわりを敵で囲む
+    for (let k = 0; k < 16; k++) {
+      const a = (k * Math.PI) / 8;
+      e.add(900001 + k, normal, Math.cos(a) * 30, Math.sin(a) * 30, 1e7, 0, 10);
+    }
+    e.add(900100, boss, 0, 30, 1e7, 0, 10);
+    let marked = -1;
+    for (let t = 0; t < 30 && marked < 0; t++) {
+      sim.step([]);
+      for (let i = 0; i < e.count; i++) if (e.markTicks[i]! > 0 && e.id[i]! !== 900100) marked = e.id[i]!;
+    }
+    expect(marked).toBeGreaterThan(0);
+    const idx = (id: number): number => [...Array(e.count).keys()].find((i) => e.id[i] === id) ?? -1;
+    // 倒れる前は HP が減らない
+    expect(e.hp[idx(marked)]).toBe(1e7);
+    expect(e.markTicks[idx(900100)]).toBe(0);
+    for (let t = 0; t < 30 * 3 + 2; t++) sim.step([]);
+    expect(idx(marked)).toBe(-1);
+    expect(idx(900100)).toBeGreaterThanOrEqual(0);
+    expect(e.hp[idx(900100)]).toBe(1e7);
     void m;
   });
 });

@@ -96,7 +96,7 @@ export interface SimMoveDef {
   /** heal: 味方の HP を最大 HP の pct % 回復する（いやしのねがい） */
   readonly allyHealPct?: number;
   /** 当たった敵に印を付け、seconds 後にその敵の位置で爆発させる（みらいよち） */
-  readonly delayedBlast?: { readonly seconds: number; readonly sizeMultiplier: number; readonly powerMultiplier: number; readonly throw?: { readonly speed: number; readonly seconds: number } };
+  readonly delayedBlast?: { readonly seconds: number; readonly sizeMultiplier: number; readonly powerMultiplier: number; readonly throw?: { readonly speed: number; readonly seconds: number }; readonly perish?: boolean };
   /** 使うたびに、ランのコインを perUse + perLevel × (レベル − 1) 枚増やす（ネコにこばん） */
   readonly coinGain?: { readonly perUse: number; readonly perLevel: number };
   /** 当たるたびに大きくなる（ころがる） */
@@ -107,14 +107,14 @@ export interface SimMoveDef {
   readonly healZone?: boolean;
   /** cross: 向きを1発ごとにランダムにする（うたう） */
   readonly crossRandom?: boolean;
+  /** cross: 1 つずつ速さをばらつかせる割合 */
+  readonly crossSpeedJitter?: number;
   /** cross: 向いている方を中心にしたこの角度（ラジアン）の中に並べる。無ければ全方向 */
   readonly crossArc?: number;
   /** 走っている間だけ次を出すまでの時間が進む（ほうでん） */
   readonly chargeWhileMoving?: boolean;
   /** 扇を左右の両方へ出す（ハイパーボイス） */
   readonly sideways?: boolean;
-  /** この回数当たった雑魚は確定で倒れる（ほろびのうた） */
-  readonly perishHits?: number;
   /** 扇: 数が1増えるごとに扇を広げる度数（本数は増やさない） */
   readonly countWidens?: number;
   /** melee を前方の長方形にする（キバの技）。届く距離を 1 とした、始まり・終わり・片側の横幅 */

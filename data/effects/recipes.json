@@ -3366,25 +3366,22 @@
     },
     "perish-song": {
       "extends": "normal.base",
+      "hideShape": true,
       "projectile": {
-        "glowColor": "#ff9800",
-        "coreColor": "#ffe0b2"
+        "coreScale": 0,
+        "glowScale": 0
       },
       "impact": {
         "burst": {
-          "count": 6,
-          "colors": [
-            "#ff9800",
-            "#ffcc80",
-            "#ffffff"
-          ]
+          "count": 0
         }
       },
       "sprite": {
-        "id": "perish-ring",
-        "fit": "ring",
-        "size": 1,
-        "varyTiles": true
+        "id": "perish-note",
+        "fit": "circle",
+        "size": 1.2,
+        "upright": true,
+        "alpha": 0.9
       }
     },
     "flame-wheel": {
@@ -6194,7 +6191,27 @@
       }
     },
     "boss-perish-song": {
-      "extends": "perish-song",
+      "extends": "normal.base",
+      "projectile": {
+        "glowColor": "#ff9800",
+        "coreColor": "#ffe0b2"
+      },
+      "impact": {
+        "burst": {
+          "count": 6,
+          "colors": [
+            "#ff9800",
+            "#ffcc80",
+            "#ffffff"
+          ]
+        }
+      },
+      "sprite": {
+        "id": "perish-ring",
+        "fit": "ring",
+        "size": 1,
+        "varyTiles": true
+      },
       "strike": {
         "id": "perish-ring",
         "fit": "ring",

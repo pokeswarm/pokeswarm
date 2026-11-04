@@ -234,3 +234,23 @@ describe('箱の中身は地方ごと（07 の188章）', () => {
     expect(p.buffs ?? []).toEqual([]);
   });
 });
+
+describe('ヌケニン（ふしぎなまもり。07 の188章）', () => {
+  const run = (moveKey: string) => {
+    const t = setup('treecko');
+    const kind = t.rules.enemies.kinds.findIndex((k) => k.id === 'swarm-shedinja');
+    t.p.moves = [{ move: t.move(moveKey), level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0 }];
+    t.sim.world.enemies.add(1, kind, 60, 0, 1, 0, 12, 0);
+    for (let k = 0; k < 120; k++) t.sim.step([]);
+    return t.sim.world.stats.kills;
+  };
+  it('弱点の ほのお の技で倒れる。みず の技はすり抜ける', () => {
+    expect(run('ember')).toBe(1);
+    expect(run('water-gun')).toBe(0);
+  });
+  it('ホウエンの爆発役は ヌケニンで、25 秒で消える', () => {
+    const r = buildSimRules('hoenn');
+    expect(r.stage.swarms.some((s) => s.kind === 'swarm-shedinja' && s.pattern === 'haunt' && s.lifeSeconds === 25)).toBe(true);
+    expect(r.stage.swarms.some((s) => s.pattern === 'bomber')).toBe(false);
+  });
+});

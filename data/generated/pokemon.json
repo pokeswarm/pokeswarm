@@ -5925,6 +5925,33 @@
     ],
     "evolvesTo": []
   },
+  "shedinja": {
+    "dex": 292,
+    "names": {
+      "ja": "ヌケニン",
+      "en": "Shedinja",
+      "fr": "Munja",
+      "de": "Ninjatom",
+      "es": "Shedinja",
+      "it": "Shedinja"
+    },
+    "types": [
+      "bug",
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 1,
+      "attack": 90,
+      "defense": 45,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 40
+    },
+    "preEvolutions": [
+      "nincada"
+    ],
+    "evolvesTo": []
+  },
   "shelgon": {
     "dex": 372,
     "names": {

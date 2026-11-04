@@ -283,6 +283,7 @@ export function spawnSwarms(world: World): void {
       if (world.enemies.add(id, kindIndex, x, y, hp, kind.moveSpeed, kind.radius, kind.contactDamage * wave.damageMultiplier, vx, vy) === -1) return;
       world.events.push({ type: 'enemySpawned', id, kind: kindIndex, x, y, vx, vy });
       if (s.pattern === 'bomber') world.bombers.set(id, swarm);
+      if (s.pattern === 'haunt') world.haunts.set(id, world.tick + Math.round((s.lifeSeconds ?? 20) / world.dt));
     };
     if (s.pattern === 'rush') {
       // 画面の外（ux, uy の向き）から、プレイヤーのいる場所を通り抜ける向きにまっすぐ進む。横に並べて群れにする
@@ -296,8 +297,8 @@ export function spawnSwarms(world: World): void {
         // 横方向（-uy, ux）に並べ、後ろの列は少し遠くから
         add(p.x + ux * (dist + back) - uy * side, p.y + uy * (dist + back) + ux * side, -ux * speed, -uy * speed);
       }
-    } else if (s.pattern === 'bomber') {
-      // 画面の外から転がってくる（ふつうに追ってくる。プレイヤーより速い）
+    } else if (s.pattern === 'bomber' || s.pattern === 'haunt') {
+      // 画面の外から転がってくる（ふつうに追ってくる。ビリリダマはプレイヤーより速い。ヌケニンはゆっくり）
       const dist = world.rules.spawn.spawnDistanceMin;
       for (let k = 0; k < s.count; k++) {
         const [vx, vy] = k === 0 ? [ux, uy] : randomUnit(world.rng);
@@ -324,6 +325,17 @@ export function spawnSwarms(world: World): void {
  */
 export function armBombers(world: World): void {
   if (world.role === 'guest') return;
+  // 時間で消える敵（ヌケニン）
+  for (const [id, until] of world.haunts) {
+    const i = findEnemyIndex(world, id);
+    if (i === -1 || world.enemies.hp[i]! <= 0) world.haunts.delete(id);
+    else if (world.tick >= until) {
+      world.enemies.hp[i] = 0;
+      world.enemies.ghostTicks[i] = 0;
+      world.haunts.delete(id);
+      world.events.push({ type: 'enemyRetired', id });
+    }
+  }
   for (const [id, swarm] of world.bombers) {
     const i = findEnemyIndex(world, id);
     if (i === -1 || world.enemies.hp[i]! <= 0) {

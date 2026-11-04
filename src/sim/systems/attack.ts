@@ -22,7 +22,7 @@ import {
   type ProjectileSpawn,
 } from '../entities/projectiles';
 import type { Player, PlayerMove } from '../entities/player';
-import { DMG_CRIT, type HitEffect } from '../events';
+import { DMG_CRIT, DMG_SUPER, type HitEffect } from '../events';
 import { axisToUnit } from '../math';
 import { typeFlags, typeMultiplier, type MoveStats, type SimMoveDef } from '../moves';
 import { findEnemyIndex, type World } from '../world';
@@ -1718,6 +1718,9 @@ export function moveProjectiles(world: World): void {
       // ハッシュの衝突で同じ敵が2回入っていることがある
       if (pr.isBlocked(i, e.id[j]!, world.tick)) continue;
       pr.recordHit(i, e.id[j]!, world.tick);
+      // ふしぎなまもり（ヌケニン）: 弱点のタイプの技でなければ、すり抜ける（07 の188章）
+      const guardKind = world.rules.enemies.kinds[e.kind[j]!];
+      if (guardKind?.wonderGuard && !moveTypesOf(def).some((t) => typeFlags(world.rules.types, t, [], guardKind.types) & DMG_SUPER)) continue;
       pr.pierceLeft[i]!--;
       hitAny = true;
       if (Number.isNaN(firstX)) {

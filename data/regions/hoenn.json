@@ -691,13 +691,12 @@
     },
     {
       "atSeconds": 45,
-      "everySeconds": 20,
+      "everySeconds": 30,
       "untilSeconds": 1180,
-      "kind": "swarm-voltorb",
-      "pattern": "bomber",
+      "kind": "swarm-shedinja",
+      "pattern": "haunt",
       "count": 1,
-      "triggerRange": 110,
-      "move": "self-destruct"
+      "lifeSeconds": 25
     }
   ],
   "legendaryBgm": null,

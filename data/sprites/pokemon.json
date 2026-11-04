@@ -2054,6 +2054,13 @@
       "uses": [
         "full"
       ]
+    },
+    {
+      "key": "shedinja",
+      "dex": 292,
+      "uses": [
+        "enemy"
+      ]
     }
   ]
 }

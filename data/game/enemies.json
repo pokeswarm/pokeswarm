@@ -422,6 +422,18 @@
       "spriteScale": 1.2
     },
     {
+      "id": "swarm-shedinja",
+      "species": "shedinja",
+      "sprite": "enemy/shedinja",
+      "hp": 1,
+      "moveSpeed": 90,
+      "radius": 12,
+      "contactDamage": 20,
+      "xp": 6,
+      "spriteScale": 1.2,
+      "wonderGuard": true
+    },
+    {
       "id": "swarm-pineco",
       "species": "pineco",
       "sprite": "enemy/pineco",

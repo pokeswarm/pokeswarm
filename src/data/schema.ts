@@ -170,6 +170,8 @@ export const enemyKindSchema = z.object({
   species: z.string().optional(),
   /** 雑魚（normal・省略時）・中ボス（midboss）・ボス（boss）。中ボス・ボスは data/game/stage.json の予定で出す */
   rank: z.enum(['normal', 'midboss', 'boss', 'legendary']).optional(),
+  /** ふしぎなまもり: 弱点のタイプの技でしか傷つかない（ヌケニン。07 の188章） */
+  wonderGuard: z.boolean().optional(),
   /** 倒したときに落とす経験値。省略時は pickups.json の xpPerKill（雑魚には時間帯の xpMultiplier を掛ける） */
   xp: z.number().nonnegative().optional(),
   /** 倒したときに落とす道具（中ボスのふしぎなアメ）。経験値の代わり */
@@ -655,7 +657,9 @@ export const swarmSchema = z.object({
   everySeconds: z.number().positive(),
   untilSeconds: z.number().positive(),
   kind: z.string().min(1),
-  pattern: z.enum(['rush', 'encircle', 'bomber']),
+  /** haunt: 画面の外から現れてゆっくり追い、lifeSeconds で消える（ヌケニン。07 の188章） */
+  pattern: z.enum(['rush', 'encircle', 'bomber', 'haunt']),
+  lifeSeconds: z.number().positive().optional(),
   count: z.number().int().positive(),
   spacing: z.number().positive().optional(),
   speed: z.number().positive().optional(),

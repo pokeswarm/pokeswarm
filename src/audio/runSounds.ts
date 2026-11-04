@@ -114,6 +114,11 @@ export class RunSounds {
   /** 区間ごとの曲（伝説戦は伝説の曲）。ランが終わったら止める */
   private updateBgm(world: World): void {
     if (world.outcome) return;
+    // コンテストの会場（出場を決めてから）
+    if (world.contest && world.contest.phase !== 'branch' && world.rules.contest) {
+      audio.bgm.play(world.rules.contest.bgm);
+      return;
+    }
     if (this.legendary || world.legendary) {
       // 続けて戦うラウンド（レッド戦）は、ラウンドの曲
       audio.bgm.play((world.legendary && legendRoundBgm(world, world.legendary.kind)) || this.bgmRun.legendary);

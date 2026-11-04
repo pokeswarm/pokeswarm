@@ -952,6 +952,216 @@
    "stat": "bossDefeated.groudon ≧ 1 & bossDefeated.kyogre ≧ 1 & bossDefeated.rayquaza ≧ 1 & bossDefeated.deoxys-normal ≧ 1 & bossDefeated.latias ≧ 1 & bossDefeated.latios ≧ 1",
    "rewardKind": "ポケモン",
    "reward": "ジラーチが 使えるようになる"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-cool-normal",
+   "name": "かっこよさ ノーマルリボン",
+   "hidden": false,
+   "condition": "かっこよさ部門の ノーマルランクで 1位になる",
+   "stat": "contestRank.cool ≧ 1",
+   "rewardKind": "コイン",
+   "reward": "コイン 300"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-cool-super",
+   "name": "かっこよさ スーパーリボン",
+   "hidden": false,
+   "condition": "かっこよさ部門の スーパーランクで 1位になる",
+   "stat": "contestRank.cool ≧ 2",
+   "rewardKind": "コイン",
+   "reward": "コイン 600"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-cool-hyper",
+   "name": "かっこよさ ハイパーリボン",
+   "hidden": false,
+   "condition": "かっこよさ部門の ハイパーランクで 1位になる",
+   "stat": "contestRank.cool ≧ 3",
+   "rewardKind": "コイン",
+   "reward": "コイン 1000"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-cool-master",
+   "name": "かっこよさ マスターリボン",
+   "hidden": false,
+   "condition": "かっこよさ部門の マスターランクで 1位になる",
+   "stat": "contestRank.cool ≧ 4",
+   "rewardKind": "コイン",
+   "reward": "コイン 2000"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-beauty-normal",
+   "name": "うつくしさ ノーマルリボン",
+   "hidden": false,
+   "condition": "うつくしさ部門の ノーマルランクで 1位になる",
+   "stat": "contestRank.beauty ≧ 1",
+   "rewardKind": "コイン",
+   "reward": "コイン 300"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-beauty-super",
+   "name": "うつくしさ スーパーリボン",
+   "hidden": false,
+   "condition": "うつくしさ部門の スーパーランクで 1位になる",
+   "stat": "contestRank.beauty ≧ 2",
+   "rewardKind": "コイン",
+   "reward": "コイン 600"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-beauty-hyper",
+   "name": "うつくしさ ハイパーリボン",
+   "hidden": false,
+   "condition": "うつくしさ部門の ハイパーランクで 1位になる",
+   "stat": "contestRank.beauty ≧ 3",
+   "rewardKind": "コイン",
+   "reward": "コイン 1000"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-beauty-master",
+   "name": "うつくしさ マスターリボン",
+   "hidden": false,
+   "condition": "うつくしさ部門の マスターランクで 1位になる",
+   "stat": "contestRank.beauty ≧ 4",
+   "rewardKind": "コイン",
+   "reward": "コイン 2000"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-cute-normal",
+   "name": "かわいさ ノーマルリボン",
+   "hidden": false,
+   "condition": "かわいさ部門の ノーマルランクで 1位になる",
+   "stat": "contestRank.cute ≧ 1",
+   "rewardKind": "コイン",
+   "reward": "コイン 300"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-cute-super",
+   "name": "かわいさ スーパーリボン",
+   "hidden": false,
+   "condition": "かわいさ部門の スーパーランクで 1位になる",
+   "stat": "contestRank.cute ≧ 2",
+   "rewardKind": "コイン",
+   "reward": "コイン 600"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-cute-hyper",
+   "name": "かわいさ ハイパーリボン",
+   "hidden": false,
+   "condition": "かわいさ部門の ハイパーランクで 1位になる",
+   "stat": "contestRank.cute ≧ 3",
+   "rewardKind": "コイン",
+   "reward": "コイン 1000"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-cute-master",
+   "name": "かわいさ マスターリボン",
+   "hidden": false,
+   "condition": "かわいさ部門の マスターランクで 1位になる",
+   "stat": "contestRank.cute ≧ 4",
+   "rewardKind": "コイン",
+   "reward": "コイン 2000"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-smart-normal",
+   "name": "かしこさ ノーマルリボン",
+   "hidden": false,
+   "condition": "かしこさ部門の ノーマルランクで 1位になる",
+   "stat": "contestRank.smart ≧ 1",
+   "rewardKind": "コイン",
+   "reward": "コイン 300"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-smart-super",
+   "name": "かしこさ スーパーリボン",
+   "hidden": false,
+   "condition": "かしこさ部門の スーパーランクで 1位になる",
+   "stat": "contestRank.smart ≧ 2",
+   "rewardKind": "コイン",
+   "reward": "コイン 600"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-smart-hyper",
+   "name": "かしこさ ハイパーリボン",
+   "hidden": false,
+   "condition": "かしこさ部門の ハイパーランクで 1位になる",
+   "stat": "contestRank.smart ≧ 3",
+   "rewardKind": "コイン",
+   "reward": "コイン 1000"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-smart-master",
+   "name": "かしこさ マスターリボン",
+   "hidden": false,
+   "condition": "かしこさ部門の マスターランクで 1位になる",
+   "stat": "contestRank.smart ≧ 4",
+   "rewardKind": "コイン",
+   "reward": "コイン 2000"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-tough-normal",
+   "name": "たくましさ ノーマルリボン",
+   "hidden": false,
+   "condition": "たくましさ部門の ノーマルランクで 1位になる",
+   "stat": "contestRank.tough ≧ 1",
+   "rewardKind": "コイン",
+   "reward": "コイン 300"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-tough-super",
+   "name": "たくましさ スーパーリボン",
+   "hidden": false,
+   "condition": "たくましさ部門の スーパーランクで 1位になる",
+   "stat": "contestRank.tough ≧ 2",
+   "rewardKind": "コイン",
+   "reward": "コイン 600"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-tough-hyper",
+   "name": "たくましさ ハイパーリボン",
+   "hidden": false,
+   "condition": "たくましさ部門の ハイパーランクで 1位になる",
+   "stat": "contestRank.tough ≧ 3",
+   "rewardKind": "コイン",
+   "reward": "コイン 1000"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-tough-master",
+   "name": "たくましさ マスターリボン",
+   "hidden": false,
+   "condition": "たくましさ部門の マスターランクで 1位になる",
+   "stat": "contestRank.tough ≧ 4",
+   "rewardKind": "コイン",
+   "reward": "コイン 2000"
+  },
+  {
+   "region": "hoenn",
+   "id": "hoenn-ribbon-all",
+   "name": "リボンマスター",
+   "hidden": false,
+   "condition": "すべての部門の マスターランクで 1位になる",
+   "stat": "contestRank.cool ≧ 4 & contestRank.beauty ≧ 4 & contestRank.cute ≧ 4 & contestRank.smart ≧ 4 & contestRank.tough ≧ 4",
+   "rewardKind": "コイン",
+   "reward": "コイン 10000"
   }
  ]
 }

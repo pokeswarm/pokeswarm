@@ -190,6 +190,11 @@
       "volume": 0.7,
       "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
       "score": "hoenn-legendary-sky"
+    },
+    "hoenn-contest": {
+      "volume": 0.7,
+      "credit": "オリジナル曲（Claude が作曲。コードで鳴らす 8bit 音）",
+      "score": "hoenn-contest"
     }
   },
   "scenes": {

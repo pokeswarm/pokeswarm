@@ -560,6 +560,7 @@ export class RunScene extends Phaser.Scene {
         else this.uiCommands.push({ ...full, type: 'contest' });
       },
       (category) => session.store.current.stats[regionStatKey(this.stageOfRegion.id, `contestRank.${category}`)] ?? 0,
+      (w, id) => w.rules.species[w.players.find((p) => p.id === id)?.species ?? -1]?.key ?? '',
     );
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.contestPanel.hide());
     this.statusColors = this.sim.world.statusKinds.map((k) => hexColor(k.color));

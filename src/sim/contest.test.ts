@@ -4,7 +4,7 @@ import { applyContest, contestScore } from './contest';
 import { Simulation } from './simulation';
 import { RunRecorder } from '../meta/runRecorder';
 import { SaveStore } from '../meta/saveStore';
-import { shopConfig } from '../data';
+import { moveSprites, shopConfig } from '../data';
 
 /** ポケモンコンテスト（作者の決定 2026年11月4日。07 の188章） */
 function setup(n = 1, role: 'solo' | 'host' = 'solo') {
@@ -15,6 +15,16 @@ function setup(n = 1, role: 'solo' | 'host' = 'solo') {
     return sim.addPlayer({ id: k + 1, x: 0, y: 0, radius: 12, moveSpeed: 0, types: lo.types, moves: lo.moves, line: lo.line, species: lo.species });
   });
   return { rules, sim, world: sim.world, players, cfg: rules.contest! };
+}
+
+/** 審査を時間切れまで進める（gauge があれば自分の番にアピールする） */
+function perform(world: ReturnType<typeof setup>['world'], gauge?: number) {
+  for (let k = 0; k < 200 && (world.contest?.phase === 'primary' || world.contest?.phase === 'appeal'); k++) {
+    const c = world.contest!;
+    const e = c.phase === 'appeal' ? c.entrants[c.turn] : undefined;
+    if (gauge !== undefined && e?.playerId != null && !c.shown) applyContest(world, { op: 'appeal', playerId: e.playerId, gauge });
+    else applyContest(world, { op: 'advance', playerId: 0 });
+  }
 }
 
 describe('ポケモンコンテスト', () => {
@@ -55,6 +65,8 @@ describe('ポケモンコンテスト', () => {
     applyContest(world, { op: 'answer', playerId: 1, go: true });
     expect(world.contest?.phase).toBe('entry');
     applyContest(world, { op: 'entry', playerId: 1, category: 'cool', moves: [moveIndexOf(rules, 'leafage')], rank: 0 });
+    expect(world.contest?.phase).toBe('primary');
+    perform(world, 1);
     const r = world.contest!.results!;
     expect(r).toHaveLength(4);
     expect(r.filter((x) => x.playerId === null)).toHaveLength(3);
@@ -80,6 +92,7 @@ describe('ポケモンコンテスト', () => {
     applyContest(b.world, { op: 'entry', playerId: 1, category: 'cool', moves: [], rank: 3 });
     applyContest(b.world, { op: 'entry', playerId: 2, category: 'cute', moves: [], rank: 1 });
     expect(b.world.contest!.rank).toBe(1);
+    perform(b.world);
     expect(b.world.contest!.results!.filter((x) => x.playerId === null)).toHaveLength(2);
   });
 
@@ -106,6 +119,7 @@ describe('コンテストの記録', () => {
     applyContest(world, { op: 'open', playerId: 0 });
     applyContest(world, { op: 'answer', playerId: 1, go: true });
     applyContest(world, { op: 'entry', playerId: 1, category: 'cool', moves: [], rank: 0 });
+    perform(world);
     const coins = world.contest!.results![0]!.coins;
     applyContest(world, { op: 'finish', playerId: 1 });
     rec.finish(sim.world);
@@ -115,5 +129,90 @@ describe('コンテストの記録', () => {
     expect(s['hoenn:contestEntries']).toBe(1);
     expect(s['hoenn:clears']).toBeUndefined();
     expect(store.current.coins).toBeGreaterThanOrEqual(coins);
+  });
+});
+
+describe('コンテストの審査（07 の192章）', () => {
+  const enter = (world: ReturnType<typeof setup>['world'], moves: number[], rank = 0, category = 'cool') => {
+    applyContest(world, { op: 'open', playerId: 0 });
+    applyContest(world, { op: 'answer', playerId: 1, go: true });
+    applyContest(world, { op: 'entry', playerId: 1, category, moves, rank });
+  };
+  const scoreOf = (world: ReturnType<typeof setup>['world']) => world.contest!.results!.find((r) => r.playerId === 1)!.score;
+
+  it('マスターの1位は 2000 コイン', () => {
+    const { world, players, cfg } = setup();
+    players[0]!.pokeblocks = { cool: 200 };
+    enter(world, [], cfg.ranks.length - 1);
+    perform(world);
+    expect(world.contest!.results![0]!.playerId).toBe(1);
+    expect(world.contest!.results![0]!.coins).toBe(2000);
+  });
+
+  it('真ん中で止めるほど点が高い。押さないと基本の点だけ', () => {
+    const run = (gauge?: number) => {
+      const { world, rules } = setup();
+      const cool = rules.moves.findIndex((m) => m.contestType === 'cool');
+      enter(world, [cool, cool]);
+      perform(world, gauge);
+      return scoreOf(world);
+    };
+    expect(run(1)).toBeGreaterThan(run(0.6));
+    expect(run(0.6)).toBeGreaterThan(run());
+  });
+
+  it('自分の番でない人のアピールは効かない。NPC の番はすぐ結果になる', () => {
+    const { world, rules } = setup();
+    enter(world, [rules.moves.findIndex((m) => m.contestType === 'cool')]);
+    applyContest(world, { op: 'advance', playerId: 0 });
+    const c = world.contest!;
+    expect(c.phase).toBe('appeal');
+    const first = c.entrants[0]!;
+    // 自分はポロックなしで一番低い → 最初の番
+    if (first.playerId === null) expect(c.shown).toBe(true);
+    applyContest(world, { op: 'appeal', playerId: 99, gauge: 1 });
+    expect(c.entrants.every((e) => e.playerId !== 99)).toBe(true);
+  });
+
+  it('時間で最後まで進む（ソロでも止まらない）', () => {
+    const { sim, world } = setup();
+    enter(world, []);
+    for (let k = 0; k < 30 * 60 && world.contest?.phase !== 'result'; k++) sim.step([]);
+    expect(world.contest?.phase).toBe('result');
+  });
+
+  it('ホストの手順をゲストへ送ると同じ結果になる', () => {
+    const host = setup(2, 'host');
+    const guest = setup(2);
+    const seen: Parameters<typeof applyContest>[1][] = [];
+    const apply = (cmd: Parameters<typeof applyContest>[1]) => {
+      applyContest(host.world, cmd);
+      seen.push(cmd);
+    };
+    const cool = host.rules.moves.findIndex((m) => m.contestType === 'cool');
+    apply({ op: 'open', playerId: 0 });
+    apply({ op: 'answer', playerId: 1, go: true });
+    apply({ op: 'answer', playerId: 2, go: true });
+    apply({ op: 'entry', playerId: 1, category: 'cool', moves: [cool], rank: 0 });
+    apply({ op: 'entry', playerId: 2, category: 'cute', moves: [cool], rank: 0 });
+    for (let k = 0; k < 100 && host.world.contest!.phase !== 'result'; k++) {
+      const c = host.world.contest!;
+      const e = c.phase === 'appeal' ? c.entrants[c.turn] : undefined;
+      if (e?.playerId != null && !c.shown) apply({ op: 'appeal', playerId: e.playerId, gauge: 0.7 });
+      else apply({ op: 'advance', playerId: 0 });
+    }
+    for (const cmd of seen) applyContest(guest.world, cmd);
+    expect(guest.world.contest!.results).toEqual(host.world.contest!.results);
+  });
+
+  it('タイプの絵はどれも技のドット絵にある', () => {
+    const { cfg } = setup();
+    for (const id of Object.values(cfg.typeArt)) expect(moveSprites.sprites[id], id).toBeDefined();
+  });
+
+  it('NPC の技はどれもこの地方の技にある。曲がある', () => {
+    const { rules, cfg } = setup();
+    for (const list of Object.values(cfg.npcMoves)) for (const key of list) expect(rules.moves.some((m) => m.key === key), key).toBe(true);
+    for (const npc of cfg.npcPokemon) expect(cfg.npcMoves[npc], npc).toBeDefined();
   });
 });

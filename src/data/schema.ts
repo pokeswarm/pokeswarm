@@ -2297,6 +2297,27 @@ export const contestConfigSchema = z.object({
   score: z.object({ pokeblockChosen: z.number(), pokeblockOther: z.number(), moveUp: z.number(), moveMatch: z.number(), moveOther: z.number() }),
   placementPct: z.array(z.number().nonnegative()).min(1),
   ranks: z.array(z.object({ id: z.string(), npcScores: z.array(z.number()).min(1), coins: z.number().nonnegative() })).min(1),
+  /** 会場の曲（出場を決めてから終わるまで） */
+  bgm: z.string(),
+  /** 二次審査の回数（技を披露する回数） */
+  rounds: z.number().int().positive(),
+  /** 一次審査を見せる秒数・自分のアピールを待つ秒数・NPC の1回の秒数・アピールの結果を見せる秒数・はやおくりの倍率 */
+  primarySeconds: z.number().positive(),
+  appealSeconds: z.number().positive(),
+  npcTurnSeconds: z.number().positive(),
+  revealSeconds: z.number().positive(),
+  fastMultiplier: z.number().positive(),
+  /** NPC の点のうち一次審査の割合（残りを二次審査の回数で割る） */
+  npcPrimaryShare: z.number().min(0).max(1),
+  /** タイミング: 真ん中で止めると点が (1 + bonus) 倍。great・good は評価の境目（針の値 0〜1）。periodSeconds は針の1往復 */
+  timing: z.object({ bonus: z.number().nonnegative(), great: z.number(), good: z.number(), periodSeconds: z.number().positive() }),
+  /** 観客の盛り上がり: crowdMax に届くと、その人に crowdBonus 点 */
+  crowdMax: z.number().int().positive(),
+  crowdBonus: z.number().nonnegative(),
+  /** NPC の披露する技（技のキー） */
+  npcMoves: z.record(z.string(), z.array(z.string())).default({}),
+  /** 絵の無い技を披露するときの、タイプごとの絵（技のドット絵の id） */
+  typeArt: z.record(z.string(), z.string()).default({}),
 });
 export type ContestConfig = z.infer<typeof contestConfigSchema>;
 

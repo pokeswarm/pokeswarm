@@ -37,38 +37,108 @@
     {
       "id": "normal",
       "npcScores": [
-        80,
-        110,
-        140
+        100,
+        135,
+        170
       ],
-      "coins": 150
+      "coins": 600
     },
     {
       "id": "super",
       "npcScores": [
-        150,
-        180,
-        210
+        185,
+        225,
+        260
       ],
-      "coins": 250
+      "coins": 1000
     },
     {
       "id": "hyper",
       "npcScores": [
-        200,
-        240,
-        270
+        250,
+        295,
+        335
       ],
-      "coins": 350
+      "coins": 1500
     },
     {
       "id": "master",
       "npcScores": [
-        260,
-        300,
-        340
+        320,
+        370,
+        420
       ],
-      "coins": 500
+      "coins": 2000
     }
-  ]
+  ],
+  "bgm": "hoenn-contest",
+  "rounds": 2,
+  "primarySeconds": 3,
+  "appealSeconds": 3.5,
+  "npcTurnSeconds": 1.1,
+  "revealSeconds": 1,
+  "fastMultiplier": 3,
+  "npcPrimaryShare": 0.6,
+  "timing": {
+    "bonus": 1,
+    "great": 0.85,
+    "good": 0.5,
+    "periodSeconds": 1.2
+  },
+  "crowdMax": 5,
+  "crowdBonus": 30,
+  "npcMoves": {
+    "zigzagoon": [
+      "body-slam",
+      "swift"
+    ],
+    "wingull": [
+      "water-gun",
+      "air-cutter"
+    ],
+    "shroomish": [
+      "leech-seed",
+      "giga-drain"
+    ],
+    "taillow": [
+      "aerial-ace",
+      "quick-attack"
+    ],
+    "electrike": [
+      "spark",
+      "thunderbolt"
+    ],
+    "numel": [
+      "ember",
+      "lava-plume"
+    ],
+    "spheal": [
+      "powder-snow",
+      "aurora-beam"
+    ],
+    "altaria": [
+      "dragon-breath",
+      "moonlight"
+    ]
+  },
+  "typeArt": {
+    "normal": "star",
+    "fire": "burst-fire",
+    "water": "water-splash",
+    "grass": "leaf",
+    "electric": "burst-thunder",
+    "ice": "burst-ice",
+    "fighting": "fist",
+    "poison": "sludge",
+    "ground": "quake-dust",
+    "flying": "wind-gust",
+    "psychic": "burst-psy",
+    "bug": "x-scissor",
+    "rock": "rock",
+    "ghost": "burst-shadow",
+    "dragon": "dragon-flame",
+    "dark": "dark-burst",
+    "steel": "metal-shard",
+    "fairy": "gleam-burst"
+  }
 }

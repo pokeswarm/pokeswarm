@@ -1204,6 +1204,257 @@
       "reward": {
         "pokemon": "jirachi"
       }
+    },
+    {
+      "id": "hoenn-ribbon-cool-normal",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.cool",
+        "atLeast": 1
+      },
+      "reward": {
+        "coins": 300
+      }
+    },
+    {
+      "id": "hoenn-ribbon-cool-super",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.cool",
+        "atLeast": 2
+      },
+      "reward": {
+        "coins": 600
+      }
+    },
+    {
+      "id": "hoenn-ribbon-cool-hyper",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.cool",
+        "atLeast": 3
+      },
+      "reward": {
+        "coins": 1000
+      }
+    },
+    {
+      "id": "hoenn-ribbon-cool-master",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.cool",
+        "atLeast": 4
+      },
+      "reward": {
+        "coins": 2000
+      }
+    },
+    {
+      "id": "hoenn-ribbon-beauty-normal",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.beauty",
+        "atLeast": 1
+      },
+      "reward": {
+        "coins": 300
+      }
+    },
+    {
+      "id": "hoenn-ribbon-beauty-super",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.beauty",
+        "atLeast": 2
+      },
+      "reward": {
+        "coins": 600
+      }
+    },
+    {
+      "id": "hoenn-ribbon-beauty-hyper",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.beauty",
+        "atLeast": 3
+      },
+      "reward": {
+        "coins": 1000
+      }
+    },
+    {
+      "id": "hoenn-ribbon-beauty-master",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.beauty",
+        "atLeast": 4
+      },
+      "reward": {
+        "coins": 2000
+      }
+    },
+    {
+      "id": "hoenn-ribbon-cute-normal",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.cute",
+        "atLeast": 1
+      },
+      "reward": {
+        "coins": 300
+      }
+    },
+    {
+      "id": "hoenn-ribbon-cute-super",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.cute",
+        "atLeast": 2
+      },
+      "reward": {
+        "coins": 600
+      }
+    },
+    {
+      "id": "hoenn-ribbon-cute-hyper",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.cute",
+        "atLeast": 3
+      },
+      "reward": {
+        "coins": 1000
+      }
+    },
+    {
+      "id": "hoenn-ribbon-cute-master",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.cute",
+        "atLeast": 4
+      },
+      "reward": {
+        "coins": 2000
+      }
+    },
+    {
+      "id": "hoenn-ribbon-smart-normal",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.smart",
+        "atLeast": 1
+      },
+      "reward": {
+        "coins": 300
+      }
+    },
+    {
+      "id": "hoenn-ribbon-smart-super",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.smart",
+        "atLeast": 2
+      },
+      "reward": {
+        "coins": 600
+      }
+    },
+    {
+      "id": "hoenn-ribbon-smart-hyper",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.smart",
+        "atLeast": 3
+      },
+      "reward": {
+        "coins": 1000
+      }
+    },
+    {
+      "id": "hoenn-ribbon-smart-master",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.smart",
+        "atLeast": 4
+      },
+      "reward": {
+        "coins": 2000
+      }
+    },
+    {
+      "id": "hoenn-ribbon-tough-normal",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.tough",
+        "atLeast": 1
+      },
+      "reward": {
+        "coins": 300
+      }
+    },
+    {
+      "id": "hoenn-ribbon-tough-super",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.tough",
+        "atLeast": 2
+      },
+      "reward": {
+        "coins": 600
+      }
+    },
+    {
+      "id": "hoenn-ribbon-tough-hyper",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.tough",
+        "atLeast": 3
+      },
+      "reward": {
+        "coins": 1000
+      }
+    },
+    {
+      "id": "hoenn-ribbon-tough-master",
+      "region": "hoenn",
+      "condition": {
+        "stat": "contestRank.tough",
+        "atLeast": 4
+      },
+      "reward": {
+        "coins": 2000
+      }
+    },
+    {
+      "id": "hoenn-ribbon-all",
+      "region": "hoenn",
+      "condition": {
+        "all": [
+          {
+            "stat": "contestRank.cool",
+            "atLeast": 4
+          },
+          {
+            "stat": "contestRank.beauty",
+            "atLeast": 4
+          },
+          {
+            "stat": "contestRank.cute",
+            "atLeast": 4
+          },
+          {
+            "stat": "contestRank.smart",
+            "atLeast": 4
+          },
+          {
+            "stat": "contestRank.tough",
+            "atLeast": 4
+          }
+        ]
+      },
+      "reward": {
+        "coins": 10000
+      }
     }
   ]
 }

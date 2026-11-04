@@ -609,9 +609,9 @@ export const bossMoveSchema = z.object({
       wobble: z.object({ amplitude: z.number().positive(), seconds: z.number().positive() }).optional(),
       /**
        * 自分のプレイヤーを中心にしたこの大きさの箱の端で跳ね返る（画面の端で反射するボルテッカーの残像。どのブラウザでも自分の画面で跳ね返る。07 の194章）。
-       * aimJitterDegrees があれば、跳ね返るたびに今のプレイヤーの方へ向け直す（±この角度でぶれる）。止まっていると当たり、動いていれば避けられる
+       * angleJitterDegrees があれば、跳ね返るたびに向きを ±この角度の範囲でずらす（同じ線をなぞり続けない）
        */
-      bounceBox: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), aimJitterDegrees: z.number().nonnegative().optional() }).optional(),
+      bounceBox: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), angleJitterDegrees: z.number().nonnegative().optional() }).optional(),
     })
     .optional(),
   /** target self の count 個を、ボスの周り radius に、狙った人の向きから順に（stagger）置く（ライコウのかみなり） */

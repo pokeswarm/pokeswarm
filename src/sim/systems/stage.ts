@@ -1198,10 +1198,10 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
       const hitY = (hz.y > me.y + box.halfHeight && hz.vy > 0) || (hz.y < me.y - box.halfHeight && hz.vy < 0);
       if (hitX) hz.vx = -hz.vx;
       if (hitY) hz.vy = -hz.vy;
-      if ((hitX || hitY) && box.aimJitterDegrees !== undefined) {
-        // 今のプレイヤーの方へ向け直す。ぶれは乱数の列を使わず、更新番号から決める（自分のブラウザだけの動きなので、ホストとずらさない）
-        const jitter = ((Math.sin(world.tick * 12.9898) * 43758.5453) % 1) * box.aimJitterDegrees * (Math.PI / 180);
-        const a = Math.atan2(me.y - hz.y, me.x - hz.x) + jitter;
+      if ((hitX || hitY) && box.angleJitterDegrees !== undefined) {
+        // ずれは乱数の列を使わず、更新番号から決める（自分のブラウザだけの動きなので、ホストとずらさない）
+        const jitter = ((Math.sin(world.tick * 12.9898) * 43758.5453) % 1) * box.angleJitterDegrees * (Math.PI / 180);
+        const a = Math.atan2(hz.vy, hz.vx) + jitter;
         const sp = Math.hypot(hz.vx, hz.vy);
         hz.vx = Math.cos(a) * sp;
         hz.vy = Math.sin(a) * sp;

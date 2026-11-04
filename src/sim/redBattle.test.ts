@@ -152,7 +152,35 @@ describe('レッド戦（07 の193章）', () => {
     run();
   });
 
-  it('ピカチュウ 行動 3: ボルテッカーは止まっていると何度も当たり、動いていれば大きく減る', () => {
+  it('ピカチュウ 行動 3: ボルテッカーは反射で速さが変わらず、反射の角度はほんの少しだけずれる', () => {
+    const sim = round(0);
+    const w = sim.world;
+    const i = indexOf(sim, 'red-pikachu');
+    w.enemies.hp[i] = w.enemies.maxHp[i]! * 0.69;
+    const m = rules0().stage.moves.find((x) => x.id === 'pika-volt-tackle-ghost')!;
+    let ghost = null;
+    for (let k = 0; k < 30 * 20 && !ghost; k++) {
+      sim.step([]);
+      ghost = w.hazards.find((h) => moveId(sim, h.move) === 'pika-volt-tackle-ghost' && h.activeTicks !== undefined) ?? null;
+    }
+    let flips = 0;
+    while (w.hazards.includes(ghost!)) {
+      const vx = ghost!.vx!;
+      const vy = ghost!.vy!;
+      sim.step([]);
+      if (!w.hazards.includes(ghost!) || (ghost!.vx === vx && ghost!.vy === vy)) continue;
+      flips++;
+      expect(Math.hypot(ghost!.vx!, ghost!.vy!)).toBeCloseTo(m.travel!.speed, 3);
+      // 本来の反射（x か y の向きが返る）からのずれは、決めた角度まで
+      const a = Math.atan2(ghost!.vy!, ghost!.vx!);
+      const candidates = [Math.atan2(vy, -vx), Math.atan2(-vy, vx), Math.atan2(-vy, -vx)];
+      const off = Math.min(...candidates.map((c) => Math.abs(Math.atan2(Math.sin(a - c), Math.cos(a - c)))));
+      expect((off * 180) / Math.PI).toBeLessThanOrEqual(m.travel!.bounceBox!.angleJitterDegrees! + 0.01);
+    }
+    expect(flips).toBeGreaterThanOrEqual(10);
+  });
+
+  it('ピカチュウ 行動 3: ボルテッカーは止まっていても動いていても当たりうる', () => {
     const hits = (moving: boolean): number => {
       const sim = round(0);
       const w = sim.world;
@@ -180,8 +208,7 @@ describe('レッド戦（07 の193章）', () => {
     const still = hits(false);
     const moving = hits(true);
     console.log('ボルテッカーに当たった回数 止まっている', still, '動いている', moving);
-    expect(still).toBeGreaterThanOrEqual(5);
-    expect(moving).toBeLessThan(still);
+    expect(still + moving).toBeGreaterThan(0);
   });
 
   it('交代: 第 3 ラウンドは順番の 1 体だけが動き、順番でない相手は遅く歩いて技を使わない', () => {

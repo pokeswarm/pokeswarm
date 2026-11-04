@@ -1380,11 +1380,11 @@
       "activeSeconds": 6,
       "hitEverySeconds": 0.6,
       "travel": {
-        "speed": 1300,
+        "speed": 1800,
         "bounceBox": {
           "halfWidth": 520,
           "halfHeight": 340,
-          "aimJitterDegrees": 10
+          "angleJitterDegrees": 6
         }
       },
       "pose": "Charge"

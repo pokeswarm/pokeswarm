@@ -266,7 +266,7 @@ async function main(): Promise<void> {
       const variant: Variant =
         use === 'full'
           ? { outKey: entry.key, animations: [...pipeline.animations, ...entry.extraAnimations] }
-          : { outKey: `enemy/${entry.key}`, animations: pipeline.enemyAnimations };
+          : { outKey: `enemy/${entry.key}`, animations: [...pipeline.enemyAnimations, ...entry.enemyExtraAnimations] };
       results.push(await processPokemon(pipeline, entry, variant, creditNames));
     }
   }

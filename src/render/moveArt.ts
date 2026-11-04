@@ -5769,7 +5769,7 @@ function dazeStars(): SpriteOut {
   return { palette, frameMs: 110, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
 }
 
-/** ボルテッカーの反動（07 の193章）: 自分の電気でしびれる。体のまわりにはじける短い稲妻と、飛び散る火花 */
+/** ボルテッカーのため（07 の194章）: 体のまわりにはじける短い稲妻と、飛び散る火花 */
 function voltFizzle(): SpriteOut {
   const palette = ['#5d4037', '#f9a825', '#ffee58', '#ffffff'];
   const frames = [0, 1, 2, 3, 4].map((f) =>
@@ -5798,6 +5798,43 @@ function voltFizzle(): SpriteOut {
     }),
   );
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** 10まんボルト（レッドのピカチュウ。07 の194章）: 自分を中心に広がる稲妻。コマごとに黒・白・黄で明滅する */
+function thunderBurstBwy(): SpriteOut {
+  const palette = ['#212121', '#ffeb3b', '#ffffff', '#f9a825'];
+  // 稲妻の色・まわりの光の色（コマごと）
+  const looks = [
+    [1, 3],
+    [0, 3],
+    [2, 1],
+  ];
+  const frames = looks.map(([core, glow], f) =>
+    shape(72, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.98 || d < 0.05) return -1;
+      const a = Math.atan2(v, u);
+      // 太い稲妻 7 本（どこまで届くかが分かるよう、縁まで伸ばす）
+      for (let k = 0; k < 7; k++) {
+        const base = (k / 7) * Math.PI * 2 + (hash(k, f, 81) - 0.5) * 0.7;
+        const zig = (Math.sin(d * 13 + k * 1.7 + f * 2) * 0.16 + Math.sin(d * 31 + k) * 0.06) * (0.3 + d);
+        let da = a - base - zig;
+        while (da > Math.PI) da -= Math.PI * 2;
+        while (da < -Math.PI) da += Math.PI * 2;
+        const w = Math.abs(da) * d;
+        if (w < 0.03) return core!;
+        if (w < 0.062) return glow!;
+      }
+      // 縁の輪（当たる範囲）
+      if (d > 0.93) return hash(Math.floor(((a + Math.PI) / (Math.PI * 2)) * 40), f, 83) < 0.75 ? core! : glow!;
+      // 範囲の中の、はじける電気（格子に散らす）
+      const px = Math.round((u + 1) * 36);
+      const py = Math.round((v + 1) * 36);
+      if ((px + py) % 2 === 0 && hash(px >> 1, py >> 1, f + 90) < 0.34) return hash(px, py, f + 91) < 0.4 ? core! : glow!;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
 }
 
 /** こうそくスピン（レッドのカメックス。07 の193章）: 回る甲羅のまわりを巻く水の渦と、はじける水しぶき */
@@ -6182,6 +6219,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     // レッド戦（07 の193章）
     'daze-stars': () => dazeStars(),
     'volt-fizzle': () => voltFizzle(),
+    'thunder-burst-bwy': () => thunderBurstBwy(),
     'shell-spin-water': () => shellSpinWater(),
     // ボスの技（07 の189章）
     'zen-aura': () => zenAura(),

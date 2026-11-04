@@ -264,6 +264,13 @@ export interface World {
     radiusBuff?: { readonly scale: number; uses: number };
     /** りゅうのまい の重ねた段 */
     stacks?: number;
+    // ---- 07 の194章 ----
+    /** これから大技を使う HP の割合と技（割合の大きい順） */
+    hpMoves?: { belowRatio: number; moves: readonly number[] }[];
+    /** 今の技が終わり次第、順に使う技 */
+    forced?: number[];
+    /** 技の間隔を、技が終わってから数える */
+    intervalAfterMove?: boolean;
     // ---- 07 の193章 ----
     /** 使える回数のある技（maxUses）を使った回数（技の番号 → 回数） */
     uses?: Record<number, number>;

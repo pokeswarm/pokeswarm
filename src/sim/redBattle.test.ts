@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { playerConfig } from '../data';
 import { buildSimRules } from '../data/simRules';
 import { Simulation } from './simulation';
-import { CASTER_ID_BASE } from './systems/attack';
 import { legendTurnIsActive, legendTurns, startLegendary } from './systems/stage';
 
 /** レッド戦の作り直し（07 の193章）: 隙・交代・回復の回数の上限・きずぐすり */
@@ -18,6 +17,7 @@ function round(index: number, players = 1, role: 'host' | 'guest' | undefined = 
   return sim;
 }
 
+const rules0 = () => buildSimRules('johto');
 const indexOf = (sim: Simulation, id: string): number => {
   const e = sim.world.enemies;
   const kind = sim.world.rules.enemies.kinds.findIndex((k) => k.id === id);
@@ -44,48 +44,110 @@ describe('レッド戦（07 の193章）', () => {
     }
   });
 
-  it('ピカチュウ: 消えているか走っている時間は半分未満で、止まっている隙が 2 割以上ある', () => {
+  it('ピカチュウ: 消えない（攻撃できない時間が無い）。でんこうせっか と かみなり を交互に使う', () => {
     const sim = round(0);
     const w = sim.world;
-    const i = indexOf(sim, 'red-pikachu');
-    const id = w.enemies.id[i]!;
-    let gone = 0;
-    let still = 0;
-    const ticks = 30 * 60;
-    for (let k = 0; k < ticks; k++) {
+    const id = w.enemies.id[indexOf(sim, 'red-pikachu')]!;
+    const used: string[] = [];
+    const seen = new Set<unknown>();
+    for (let k = 0; k < 30 * 40; k++) {
       sim.step([]);
-      const boss = w.bosses.find((b) => b.id === id);
-      if (w.hiddenEnemies.has(id) || boss?.bounce) gone++;
-      else if (w.enemies.speed[indexOf(sim, 'red-pikachu')] === 0) still++;
+      expect(w.hiddenEnemies.has(id)).toBe(false);
+      for (const h of w.hazards) {
+        if (seen.has(h)) continue;
+        seen.add(h);
+        const m = moveId(sim, h.move);
+        if (used.at(-1) !== m) used.push(m);
+      }
     }
-    expect(gone / ticks).toBeLessThan(0.5);
-    expect(still / ticks).toBeGreaterThan(0.2);
+    expect(used.slice(0, 5)).toEqual(['pika-quick-attack', 'pika-thunderbolt-burst', 'pika-thunder-storm', 'pika-quick-attack', 'pika-thunderbolt-burst']);
   });
 
-  it('ボルテッカーの後に反動で止まり、その間は技も 10まんボルトも出さない', () => {
+  it('ピカチュウ 行動 1: でんこうせっか の予告の後にプレイヤーの近くへ現れ、そこを中心に 10まんボルト', () => {
     const sim = round(0);
     const w = sim.world;
-    let recoilAt = -1;
-    for (let k = 0; k < 30 * 30 && recoilAt === -1; k++) {
+    let burst = null;
+    for (let k = 0; k < 30 * 10 && !burst; k++) {
       sim.step([]);
-      if (w.hazards.some((h) => moveId(sim, h.move) === 'pika-recoil')) recoilAt = w.tick;
+      burst = w.hazards.find((h) => moveId(sim, h.move) === 'pika-thunderbolt-burst') ?? null;
     }
-    expect(recoilAt).toBeGreaterThan(-1);
-    // 止まる前に撃った分（2 発目の遅れ）が出終わるのを待つ
-    for (let k = 0; k < 10; k++) sim.step([]);
-    const bossShots = (): number => {
-      let n = 0;
-      for (let i = 0; i < w.projectiles.count; i++) if (w.projectiles.owner[i]! >= CASTER_ID_BASE) n++;
-      return n;
-    };
-    let added = 0;
-    for (let k = 0; k < 30; k++) {
-      const n = bossShots();
+    expect(burst).not.toBeNull();
+    const i = indexOf(sim, 'red-pikachu');
+    const p = w.players[0]!;
+    expect(Math.hypot(w.enemies.x[i]! - p.x, w.enemies.y[i]! - p.y)).toBeLessThan(60);
+    expect(Math.hypot(burst!.x - w.enemies.x[i]!, burst!.y - w.enemies.y[i]!)).toBeLessThan(1);
+    expect(w.enemies.speed[i]).toBe(0);
+  });
+
+  it('ピカチュウ 行動 2: 技の間は歩き、かみなり は止まったままで、たくさん落ちる', () => {
+    const sim = round(0);
+    const w = sim.world;
+    const move = rules0().stage.moves.find((m) => m.id === 'pika-thunder-storm')!;
+    const seen = new Set<unknown>();
+    let walked = 0;
+    let started = false;
+    let done = false;
+    for (let k = 0; k < 30 * 20 && !done; k++) {
       sim.step([]);
+      const i = indexOf(sim, 'red-pikachu');
+      const storm = w.hazards.filter((h) => moveId(sim, h.move) === 'pika-thunder-storm');
+      for (const h of storm) seen.add(h);
+      if (!started && storm.length > 0) started = true;
+      if (!started && w.hazards.length === 0 && w.enemies.speed[i]! > 0) walked++;
+      if (started && storm.some((h) => h.activeTicks === undefined)) expect(w.enemies.speed[i]).toBe(0);
+      if (started && seen.size === move.repeat!.count * move.count && storm.length === 0) done = true;
+    }
+    expect(walked).toBeGreaterThan(30);
+    expect(seen.size).toBe(move.repeat!.count * move.count);
+    // 足元だけでなく、ばらけて落ちる
+    expect(new Set([...seen].map((h) => Math.round((h as { x: number }).x))).size).toBeGreaterThan(10);
+  });
+
+  it('ピカチュウ 行動 3: HP 70%・40% でボルテッカー。体は止まったまま残像が跳ね返り、終わると疲れて止まる', () => {
+    const sim = round(0);
+    const w = sim.world;
+    const i0 = indexOf(sim, 'red-pikachu');
+    const max = w.enemies.maxHp[i0]!;
+    const run = (): number => {
+      let ghost = null;
+      for (let k = 0; k < 30 * 20 && !ghost; k++) {
+        sim.step([]);
+        ghost = w.hazards.find((h) => moveId(sim, h.move) === 'pika-volt-tackle-ghost' && h.activeTicks !== undefined) ?? null;
+      }
+      expect(ghost).not.toBeNull();
+      const p = w.players[0]!;
+      const box = rules0().stage.moves.find((m) => m.id === 'pika-volt-tackle-ghost')!.travel!.bounceBox!;
+      const i = indexOf(sim, 'red-pikachu');
+      const x0 = w.enemies.x[i]!;
+      let flips = 0;
+      let lastVx = ghost!.vx;
+      while (w.hazards.includes(ghost!)) {
+        sim.step([]);
+        expect(Math.abs(ghost!.x - p.x)).toBeLessThan(box.halfWidth + 30);
+        expect(Math.abs(ghost!.y - p.y)).toBeLessThan(box.halfHeight + 30);
+        expect(w.enemies.x[indexOf(sim, 'red-pikachu')]).toBe(x0);
+        if (ghost!.vx !== lastVx) flips++;
+        lastVx = ghost!.vx;
+      }
+      expect(flips).toBeGreaterThan(0);
+      let tired = false;
+      for (let k = 0; k < 10; k++) {
+        sim.step([]);
+        tired ||= w.hazards.some((h) => moveId(sim, h.move) === 'pika-tired');
+      }
+      expect(tired).toBe(true);
       expect(w.enemies.speed[indexOf(sim, 'red-pikachu')]).toBe(0);
-      added += Math.max(0, bossShots() - n);
+      return flips;
+    };
+    w.enemies.hp[i0] = max * 0.69;
+    run();
+    // 同じ割合では 2 回使わない
+    for (let k = 0; k < 30 * 8; k++) {
+      sim.step([]);
+      expect(w.hazards.some((h) => moveId(sim, h.move) === 'pika-volt-tackle-ghost')).toBe(false);
     }
-    expect(added).toBe(0);
+    w.enemies.hp[indexOf(sim, 'red-pikachu')] = max * 0.39;
+    run();
   });
 
   it('交代: 第 3 ラウンドは順番の 1 体だけが動き、順番でない相手は遅く歩いて技を使わない', () => {

@@ -51,7 +51,7 @@ function spawnBoss(world: World, kindIndex: number, moves: readonly number[], in
 function spawnLegend(world: World, kind: number, hpScale = 1): number {
   const cfg = world.rules.stage.legendary!;
   const set = cfg.moveSets[world.rules.enemies.kinds[kind]?.id ?? ''];
-  const enrage = cfg.enrage
+  const enrage = cfg.enrage && !set?.noEnrage
     ? { hpRatio: cfg.enrage.hpRatio, interval: Math.round((set?.enrageMoveIntervalSeconds ?? cfg.enrage.moveIntervalSeconds) / world.dt), doubleChance: cfg.enrage.doubleChance }
     : null;
   const id = spawnBoss(
@@ -69,6 +69,8 @@ function spawnLegend(world: World, kind: number, hpScale = 1): number {
   // "*" は毎回 pool からランダムに選ぶ（ミュウ: テレポートとゆびをふるを交互に）
   if (boss && set?.pool) boss.pool = set.pool.map((m) => world.rules.stage.moves.findIndex((x) => x.id === m)).filter((k) => k >= 0);
   if (boss && set?.hpDrops) boss.dropsAt = [...set.hpDrops.atHpPct].sort((a, b) => b - a);
+  if (boss && set?.hpMoves) boss.hpMoves = [...set.hpMoves].sort((a, b) => b.belowHpPct - a.belowHpPct).map((h) => ({ belowRatio: h.belowHpPct / 100, moves: h.moves.map((m) => world.rules.stage.moves.findIndex((x) => x.id === m)) }));
+  if (boss && set?.intervalAfterMove) boss.intervalAfterMove = true;
   return id;
 }
 
@@ -408,6 +410,22 @@ export function bossAttacks(world: World): void {
         boss.waiting = false;
         world.enemies.speed[i] = bossSpeed(world, boss, i);
       }
+      // HP で放つ大技（ピカチュウのボルテッカー）: 今の技が終わり次第、順に使う
+      const next = boss.hpMoves?.[0];
+      if (next && world.enemies.hp[i]! <= world.enemies.maxHp[i]! * next.belowRatio) {
+        boss.hpMoves!.shift();
+        (boss.forced ??= []).push(...next.moves);
+      }
+      if (boss.forced?.length) {
+        if (!bossBusy(world, boss.id)) useBossMove(world, boss, i, boss.forced.shift()!);
+        boss.cooldown = boss.interval;
+        continue;
+      }
+      // 技が終わってから間隔を数える（間隔のぶん必ず歩く）
+      if (boss.intervalAfterMove && bossBusy(world, boss.id)) {
+        boss.cooldown = boss.interval;
+        continue;
+      }
       if (--boss.cooldown > 0) continue;
       // 止まって出す技・跳ぶ技・続きのある技の途中は、次の技を始めない（テレポートで離れた後に、前の場所から光線が出ていた。07 の191章）
       if (bossBusy(world, boss.id)) {
@@ -586,14 +604,14 @@ function bossBusy(world: World, id: number): boolean {
     if (h.dasher !== id) return false;
     const m = world.rules.stage.moves[h.move];
     // 体が回っている間（ジャイロボール）も次へ行かない
-    if (h.activeTicks !== undefined) return !!m?.spinBody;
+    if (h.activeTicks !== undefined) return !!(m?.spinBody || m?.holdWhileActive);
     return !!(m?.rooted || m?.teleport || m?.hideBoss || m?.spinBody);
   });
 }
 
 /** ボス・伝説が技を1つ使う（予告を置く） */
-function useBossMove(world: World, boss: World['bosses'][number], i: number): void {
-  let moveIdx = boss.random ? boss.moves[world.rng.int(boss.moves.length)]! : boss.moves[boss.next++ % boss.moves.length]!;
+function useBossMove(world: World, boss: World['bosses'][number], i: number, forced?: number): void {
+  let moveIdx = forced !== undefined ? forced : boss.random ? boss.moves[world.rng.int(boss.moves.length)]! : boss.moves[boss.next++ % boss.moves.length]!;
   if (moveIdx === -1 && boss.pool && boss.pool.length > 0) moveIdx = boss.pool[world.rng.int(boss.pool.length)]!;
   const move = world.rules.stage.moves[moveIdx];
   // 止まる技は、突進が終わってから始める（続けて突進する技の途中で止まると、絵が走っている体から離れる。07 の193章）
@@ -756,7 +774,7 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     const base = Math.atan2(uy, ux);
     for (let c = 0; c < move.count; c++) {
       const a = base + (((c - (move.count - 1) / 2) * move.spread) * Math.PI) / 180;
-      put(bx, by, Math.cos(a), Math.sin(a), -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
+      put(bx, by, Math.cos(a), Math.sin(a), move.rooted ? bossId : -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
     }
     return;
   }
@@ -797,8 +815,8 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     for (const t of targets) {
       for (let c = 0; c < count; c++) {
         // 1つ目は足元、2つ目以降はばらつかせる（動かないと当たり、動けば避けられる）
-        const [rx, ry] = c === 0 ? [0, 0] : randomUnit(world.rng);
-        const dist = c === 0 ? 0 : world.rng.range(move.radius, move.spread + move.radius);
+        const [rx, ry] = c === 0 && !move.scatter ? [0, 0] : randomUnit(world.rng);
+        const dist = move.scatter ? world.rng.range(0, move.spread) : c === 0 ? 0 : world.rng.range(move.radius, move.spread + move.radius);
         // 狙った人を囲む輪（くろいまなざし）: 内側の半径は rings.width で決める
         const ring = move.shape === 'ring' && move.rings ? { inner: Math.max(0, move.radius * scale - move.rings.width * scale) } : {};
         put(t.x + rx * dist, t.y + ry * dist, ux, uy, move.healPct || move.rooted || move.then || move.teleport || move.hideBoss || move.followBoss ? bossId : -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt), ...ring });
@@ -1040,7 +1058,7 @@ function strikeHazards(world: World): void {
       if (i !== -1 && move.recoilSeconds && boss && world.role !== 'guest') {
         boss.stunTicks = Math.round(move.recoilSeconds / world.dt);
         world.enemies.speed[i] = 0;
-      } else if (i !== -1 && move.rooted && !move.recoilSeconds) world.enemies.speed[i] = boss ? bossSpeed(world, boss, i) : enemyMoveSpeed(world, world.enemies.kind[i]!);
+      } else if (i !== -1 && move.rooted && !move.recoilSeconds && !move.holdWhileActive) world.enemies.speed[i] = boss ? bossSpeed(world, boss, i) : enemyMoveSpeed(world, world.enemies.kind[i]!);
     }
     if (move?.arms && hz.group !== undefined) {
       if (!armsStruck.has(hz.group)) {
@@ -1165,6 +1183,15 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
     }
     hz.x += vx * world.dt;
     hz.y += vy * world.dt;
+    // 自分の画面の端で跳ね返る（ボルテッカーの残像）
+    const box = tr.bounceBox;
+    const me = box ? (world.players.find((p) => p.id === world.localPlayerId) ?? nearestPlayer(world, hz.x, hz.y)) : null;
+    if (box && me) {
+      if (hz.x > me.x + box.halfWidth) hz.vx = -Math.abs(hz.vx);
+      else if (hz.x < me.x - box.halfWidth) hz.vx = Math.abs(hz.vx);
+      if (hz.y > me.y + box.halfHeight) hz.vy = -Math.abs(hz.vy);
+      else if (hz.y < me.y - box.halfHeight) hz.vy = Math.abs(hz.vy);
+    }
   }
 }
 

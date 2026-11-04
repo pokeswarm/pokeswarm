@@ -620,32 +620,11 @@
     "moveSets": {
       "red-pikachu": {
         "moves": [
-          "pika-volt-tackle",
-          "pika-recoil",
           "pika-quick-attack",
-          "pika-iron-tail",
-          "pika-catch-breath"
+          "pika-thunder-storm"
         ],
         "random": false,
-        "moveIntervalSeconds": 1.6,
-        "enrageMoveIntervalSeconds": 1.2,
-        "casters": [
-          {
-            "move": "thunderbolt",
-            "level": 8
-          },
-          {
-            "move": "thunder-shock",
-            "level": 8
-          }
-        ],
-        "casterPower": 1.2,
-        "field": {
-          "lightning": {
-            "move": "zapdos-field-bolt",
-            "everySeconds": 1.8
-          }
-        },
+        "moveIntervalSeconds": 2.2,
         "hpDrops": {
           "atHpPct": [
             75,
@@ -653,7 +632,27 @@
             25
           ],
           "item": "potion"
-        }
+        },
+        "noEnrage": true,
+        "intervalAfterMove": true,
+        "hpMoves": [
+          {
+            "belowHpPct": 70,
+            "moves": [
+              "pika-volt-tackle-charge",
+              "pika-volt-tackle-ghost",
+              "pika-tired"
+            ]
+          },
+          {
+            "belowHpPct": 40,
+            "moves": [
+              "pika-volt-tackle-charge",
+              "pika-volt-tackle-ghost",
+              "pika-tired"
+            ]
+          }
+        ]
       },
       "red-espeon": {
         "moves": [

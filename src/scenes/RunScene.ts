@@ -40,7 +40,7 @@ import { abilityOf, pinchMods } from '../sim/ability';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World, gateDeadlineTick } from '../sim/world';
-import { applyDebugOverrides, parseGodParam, parseLegendParam, parseIntruderParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam, parseBossParam } from './debugOverrides';
+import { applyDebugOverrides, parseBossHpParam, parseGodParam, parseLegendParam, parseIntruderParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam, parseBossParam } from './debugOverrides';
 import { addXp, applyOffer, itemFits, moveMaxLevel, recomputeModifiers } from '../sim/systems/leveling';
 import { shinySpriteKey } from '../meta/loadoutOptions';
 import { achievementPerks, regionAchieved } from '../meta/achievementPerks';
@@ -60,6 +60,7 @@ import { EvolutionCutscene } from './evolutionCutscene';
 import { NetPanel } from './netPanel';
 import { formatTime, type ResultSceneData } from './ResultScene';
 import { atlasKey } from '../render/sprites/PokemonSprite';
+import { directionFromVector } from '../render/sprites/EnemySprites';
 import { holdScreenAwake } from '../render/screenWakeLock';
 import { DamageNumbers } from '../render/DamageNumbers';
 import { PerishCounts } from '../render/PerishCounts';
@@ -211,6 +212,8 @@ export class RunScene extends Phaser.Scene {
   private settingsOpen = false;
   /** テストプレイ: 最初から戦う伝説（無ければ null）・無敵・無敵の間に受けたはずのダメージの合計 */
   private testLegend: number | null = null;
+  /** ?bosshp: 伝説が出たときの HP の割合（%。一度当てはめたら null） */
+  private testBossHp: number | null = null;
   /** ?legendafter: この更新回数になったら伝説戦を始める（-1 なら始めた後） */
   private testLegendTick = -1;
   /** ?intruder・?wings を付けたラン（記録を保存しない） */
@@ -462,6 +465,7 @@ export class RunScene extends Phaser.Scene {
     // テストプレイ（ソロだけ）: ?legend=mewtwo で最初から伝説と戦う。?god で無敵。どちらかを付けたランは記録を保存しない
     this.testLegend = this.coop ? null : parseLegendParam(this.sim.world.rules, window.location.search);
     this.god = !this.coop && parseGodParam(window.location.search);
+    this.testBossHp = this.coop ? null : parseBossHpParam(window.location.search);
     this.godDamage = 0;
     // ?legendafter=8 で、伝説戦を始めるのを8秒後にする（雑魚の中に「DANGER」。宣伝の動画。作者の依頼 2026年10月30日）
     const legendAfter = Number(new URLSearchParams(window.location.search).get('legendafter')) || 0;
@@ -1517,6 +1521,38 @@ export class RunScene extends Phaser.Scene {
         used++;
       }
     }
+    // ボスが放つ残像（ボルテッカー。07 の194章）: 持ち主の絵を、進む向きで描き、後ろに残像を連ねる
+    for (const h of world.hazards) {
+      const mv = world.rules.stage.moves[h.move];
+      const ghost = mv?.holdWhileActive && h.activeTicks !== undefined ? effectRecipes[mv.effect]?.ownerGhost : undefined;
+      if (!ghost) continue;
+      const i = findEnemyIndex(world, h.dasher);
+      const manifest = i === -1 ? null : this.streamer.manifestOf(world.enemies.kind[i]!);
+      if (!manifest) continue;
+      const vx = h.vx ?? 0;
+      const vy = h.vy ?? 0;
+      const frames = manifest.animations[spriteRender.enemyAnimation]?.durations.length ?? 1;
+      const frame = `${manifest.animations[spriteRender.enemyAnimation]?.frameKeyPrefix}/${directionFromVector(vx, vy)}/${Math.floor(this.time.now / 80) % frames}`;
+      const scale = spriteRender.enemyScale * (world.rules.enemies.kinds[world.enemies.kind[i]!]?.spriteScale ?? 1);
+      for (let k = 0; k <= ghost.afterimages; k++) {
+        let img = this.ghostImages[used];
+        if (!img) {
+          img = this.add.image(0, 0, atlasKey(manifest.key), frame);
+          this.ghostImages.push(img);
+        }
+        img
+          .setTexture(atlasKey(manifest.key), frame)
+          .setOrigin(0.5, 0.5)
+          .setPosition(h.x + vx * alpha * world.dt - vx * world.dt * ghost.spacingTicks * k, h.y + vy * alpha * world.dt - vy * world.dt * ghost.spacingTicks * k)
+          .setScale(scale, scale)
+          .setFlipX(false)
+          .setTint(hexColor(ghost.colors ? ghost.colors[(Math.floor(performance.now() / ghost.periodMs) + k) % ghost.colors.length]! : ghost.tint))
+          .setAlpha(ghost.alpha * (1 - k / (ghost.afterimages + 1)))
+          .setDepth(depth - k * 0.001)
+          .setVisible(true);
+        used++;
+      }
+    }
     for (let k = used; k < this.ghostImages.length; k++) this.ghostImages[k]!.setVisible(false);
   }
 
@@ -1574,7 +1610,8 @@ export class RunScene extends Phaser.Scene {
       }
       // 落ちた後に進む範囲（玉・刃・波）: 進む道を薄く見せる（向きが分かるように）
       if (mv?.travel && !mv.travel.homingDegreesPerSecond) {
-        const reach = mv.travel.speed * (mv.activeSeconds ?? 1);
+        // 跳ね返る残像の予告は、最初に走る向きだけを見せる
+        const reach = mv.travel.bounceBox ? mv.travel.bounceBox.halfHeight : mv.travel.speed * (mv.activeSeconds ?? 1);
         const tx = h.vx !== undefined && h.vy !== undefined ? h.vx / mv.travel.speed : h.dirX;
         const ty = h.vx !== undefined && h.vy !== undefined ? h.vy / mv.travel.speed : h.dirY;
         const cx = h.shape === 'line' ? h.x + (h.dirX * h.length) / 2 : h.x;
@@ -2091,6 +2128,14 @@ export class RunScene extends Phaser.Scene {
         if (!this.sim.world.outcome) startLegendary(this.sim.world, this.testLegend);
       }
       if (this.god) this.applyGod();
+      // ?bosshp: 伝説が出たら一度だけ HP を決めた割合にする（攻撃しなくても HP で変わる動きを見る）
+      const lg = this.sim.world.legendary;
+      if (this.testBossHp !== null && lg?.spawned) {
+        const e = this.sim.world.enemies;
+        const kinds = legendRoundKinds(this.sim.world, lg.kind);
+        for (let k = 0; k < e.count; k++) if (e.hp[k]! > 0 && kinds.includes(e.kind[k]!)) e.hp[k] = (e.maxHp[k]! * this.testBossHp) / 100;
+        this.testBossHp = null;
+      }
       this.simMs = this.simMs * 0.95 + (performance.now() - t0) * 0.05;
       // 記録は、タブが裏にあって描画しないときも数える
       this.recorder.observe(this.sim.world);
@@ -2144,6 +2189,11 @@ export class RunScene extends Phaser.Scene {
     if (!set) return null;
     const id = w.enemies.id[i]!;
     const charging = w.hazards.some((h) => h.dasher === id && h.activeTicks === undefined && w.rules.stage.moves[h.move]?.rooted);
+    // 技ごとの動き（ピカチュウ: ためる・息を整える。07 の194章）
+    for (const h of w.hazards) {
+      const pose = h.dasher === id && h.activeTicks === undefined ? w.rules.stage.moves[h.move]?.pose : undefined;
+      if (pose) return { anim: pose, spin: false };
+    }
     const ai = w.legendAis.get(id);
     const holding = !!ai?.holdTicks;
     if ((charging || holding) && set.chargePose) return { anim: set.chargePose, spin: false };
@@ -2171,6 +2221,8 @@ export class RunScene extends Phaser.Scene {
     const w = this.sim.world;
     for (const h of w.hazards) {
       if (h.dasher !== e.id[i] || (h.activeTicks === undefined && !w.rules.stage.moves[h.move]?.dashSpeed)) continue;
+      // 体は止まったまま残像だけを放つ技（ボルテッカー）は、体を光らせない
+      if (w.rules.stage.moves[h.move]?.holdWhileActive) continue;
       const ghost = effectRecipes[w.rules.stage.moves[h.move]?.effect ?? '']?.ownerGhost;
       if (!ghost) continue;
       return hexColor(ghost.colors ? ghost.colors[Math.floor(performance.now() / ghost.periodMs) % ghost.colors.length]! : ghost.tint);

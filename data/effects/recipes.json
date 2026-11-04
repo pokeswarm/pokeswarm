@@ -7140,7 +7140,15 @@
         "seconds": 0.4
       }
     },
-    "boss-volt-recoil": {
+    "boss-thunderbolt-burst": {
+      "extends": "electric.base",
+      "bossActive": {
+        "id": "thunder-burst-bwy",
+        "fit": "circle",
+        "size": 1.05
+      }
+    },
+    "boss-volt-charge": {
       "extends": "electric.base",
       "bossTelegraph": {
         "id": "volt-fizzle",

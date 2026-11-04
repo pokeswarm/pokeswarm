@@ -24,6 +24,41 @@
         10
       ],
       "frameKeyPrefix": "Walk"
+    },
+    "Charge": {
+      "source": "Charge",
+      "frameWidth": 40,
+      "frameHeight": 40,
+      "durations": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Charge"
+    },
+    "DeepBreath": {
+      "source": "DeepBreath",
+      "frameWidth": 24,
+      "frameHeight": 48,
+      "durations": [
+        12,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        10,
+        4
+      ],
+      "frameKeyPrefix": "DeepBreath"
     }
   },
   "missing": []

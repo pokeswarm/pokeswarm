@@ -80,6 +80,12 @@ export function parseLegendParam(rules: SimRules, search: string): number | null
   return k === -1 ? null : k;
 }
 
+/** テストプレイ（07 の194章）: ?bosshp=65 で、伝説が出たときの HP を最大の 65% にする（攻撃しなくても HP で変わる動きを見る）。無ければ null */
+export function parseBossHpParam(search: string): number | null {
+  const v = Number(new URLSearchParams(search).get('bosshp'));
+  return Number.isFinite(v) && v > 0 && v <= 100 ? v : null;
+}
+
 /** テストプレイ: ?intruder=raikou で、少し後に伝説（三犬）が乱入する（legend-<名前> または id）。知らない名前なら null */
 export function parseIntruderParam(rules: SimRules, search: string): number | null {
   const v = new URLSearchParams(search).get('intruder');

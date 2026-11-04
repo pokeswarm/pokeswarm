@@ -554,6 +554,12 @@ export const bossMoveSchema = z.object({
   holdSeconds: z.number().positive().optional(),
   /** 落ちたとき、使ったボスが最大 HP のこの % だけ回復する（エーフィの あさのひざし・カビゴンの ねむる） */
   healPct: z.number().positive().optional(),
+  /** 1 つ目も足元でなく、狙った人のまわりのランダムな場所に置く（ピカチュウの かみなり。07 の194章） */
+  scatter: z.boolean().optional(),
+  /** 予告の間のボスの動き（ドット絵の動作の名前。止まって出す技だけ。07 の194章） */
+  pose: z.string().optional(),
+  /** 当たっている間もボスは止まったままで、次の技を始めない（ボルテッカーの残像を放っている間。07 の194章） */
+  holdWhileActive: z.boolean().optional(),
   /** 1 回の戦いで使える回数（回復の技を繰り返して HP が減らなくなるのを防ぐ。使い切ったら順番を飛ばす。07 の193章） */
   maxUses: z.number().int().positive().optional(),
   leaves: z
@@ -601,6 +607,8 @@ export const bossMoveSchema = z.object({
       speed: z.number().positive(),
       homingDegreesPerSecond: z.number().nonnegative().default(0),
       wobble: z.object({ amplitude: z.number().positive(), seconds: z.number().positive() }).optional(),
+      /** 自分のプレイヤーを中心にしたこの大きさの箱の端で跳ね返る（画面の端で反射するボルテッカーの残像。どのブラウザでも自分の画面で跳ね返る。07 の194章） */
+      bounceBox: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive() }).optional(),
     })
     .optional(),
   /** target self の count 個を、ボスの周り radius に、狙った人の向きから順に（stagger）置く（ライコウのかみなり） */
@@ -769,6 +777,12 @@ export const stageConfigSchema = z.object({
               })
               .optional(),
             chargePose: z.string().optional(),
+            /** HP が belowHpPct % を切ったら、今の技が終わり次第 moves を順に使う（ピカチュウのボルテッカー。07 の194章） */
+            hpMoves: z.array(z.object({ belowHpPct: z.number().gt(0).lt(100), moves: z.array(z.string()).min(1) })).optional(),
+            /** 第 2 段階（技が速くなる・DANGER）を使わない。行動を作者が決めた相手（07 の194章） */
+            noEnrage: z.boolean().optional(),
+            /** 技の間隔を、技が終わってから数える（間隔のぶん必ず歩く。07 の194章） */
+            intervalAfterMove: z.boolean().optional(),
             /** HP がこの割合（%）を切るたびに、道具を人数分落とす（レッド戦。雑魚がいない戦いの回復。07 の193章） */
             hpDrops: z.object({ atHpPct: z.array(z.number().gt(0).lt(100)).min(1), item: z.enum(['potion']) }).optional(),
           }),
@@ -1698,6 +1712,8 @@ export const spritePokemonListSchema = z.object({
       uses: z.array(z.enum(['full', 'enemy'])).min(1).default(['full']),
       /** full のときに、pipeline の動作のほかに取り込む動作（カビゴン: 寝ている Sleep。作者の決定 2026年10月25日） */
       extraAnimations: z.array(z.string()).default([]),
+      /** enemy のときに、enemyAnimations のほかに取り込む動作（レッドのピカチュウ: ためる Charge・息を整える DeepBreath。07 の194章） */
+      enemyExtraAnimations: z.array(z.string()).default([]),
     }),
   ),
 });

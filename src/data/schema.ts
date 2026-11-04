@@ -554,6 +554,11 @@ export const bossMoveSchema = z.object({
   holdSeconds: z.number().positive().optional(),
   /** 落ちたとき、使ったボスが最大 HP のこの % だけ回復する（エーフィの あさのひざし・カビゴンの ねむる） */
   healPct: z.number().positive().optional(),
+  /**
+   * マップ全域の市松模様（カビゴンの ギガインパクト。07 の196章）: 狙った人のまわり（横 ±halfWidth・縦 ±halfHeight）の、地面に固定した cell の格子の、
+   * phase のマスに円を置く。phase 0 と 1 を続けて使うと、順番に全部のマスが危なくなる。ボスから遠いマスほど delayPerPixel 秒ずつ遅れて落ちる（衝撃が広がる）
+   */
+  gridWave: z.object({ cell: z.number().positive(), halfWidth: z.number().positive(), halfHeight: z.number().positive(), phase: z.number().int().min(0).max(1), delayPerPixel: z.number().nonnegative() }).optional(),
   /** 予告の間、ボスの体をこの高さまで浮かせる（エーフィの サイコキネシス。07 の195章） */
   liftBody: z.number().positive().optional(),
   /**

@@ -276,7 +276,8 @@ describe('レッド戦（07 の193章）', () => {
     });
 
     it('どろかけ は 3 発で、当たると足が遅くなる', () => {
-      const sim = espeonRound();
+      // カビゴンが触れていると無敵の時間で当たらないので、エーフィだけで見る
+      const sim = espeonRound(true);
       const w = sim.world;
       const seen = new Set<unknown>();
       const p = w.players[0]!;
@@ -406,21 +407,99 @@ describe('レッド戦（07 の193章）', () => {
     });
   });
 
-  it('回復の技は 1 体につき決まった回数まで（ねむる）', () => {
-    const sim = round(1);
-    const w = sim.world;
-    let rests = 0;
-    const seen = new Set<unknown>();
-    for (let k = 0; k < 30 * 170; k++) {
-      sim.step([]);
-      for (const h of w.hazards) {
-        if (seen.has(h)) continue;
-        seen.add(h);
-        if (moveId(sim, h.move) === 'snorlax-rest-snore') rests++;
+  describe('カビゴン（07 の196章）', () => {
+    /** エーフィを倒してカビゴンだけにする */
+    const alone = () => {
+      const sim = round(1);
+      const w = sim.world;
+      sim.step([{ type: 'damageEnemy', id: w.enemies.id[indexOf(sim, 'red-espeon')]!, amount: 1e9, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);
+      return sim;
+    };
+
+    it('プレイヤーのところへ飛んでこない（瞬間移動・跳ぶ・突進の技が無い）。走らないのでプレイヤーより遅い', () => {
+      const rules = rules0();
+      const set = rules.stage.legendary!.moveSets['red-snorlax']!;
+      const ids = [...set.moves, ...(set.hpMoves ?? []).flatMap((h) => h.moves)];
+      for (const id of ids) {
+        const m = rules.stage.moves.find((x) => x.id === id)!;
+        expect(m.teleport, id).toBeFalsy();
+        expect(m.hideBoss, id).toBeFalsy();
+        expect(m.dashSpeed, id).toBeFalsy();
+        expect(m.bounce, id).toBeFalsy();
       }
-    }
-    expect(rests).toBeLessThanOrEqual(2);
-    expect(rests).toBeGreaterThan(0);
+    });
+
+    it('エーフィがいなくなると、歩いて眠るだけで、自分からは攻撃しない', () => {
+      const sim = alone();
+      const w = sim.world;
+      const hurt: string[] = [];
+      for (let k = 0; k < 30 * 30; k++) {
+        sim.step([]);
+        for (const h of w.hazards) if (rules0().stage.moves[h.move]!.damage > 0) hurt.push(moveId(sim, h.move));
+      }
+      expect(hurt).toEqual([]);
+    });
+
+    it('HP 66%・33% で 怒る → 市松模様が 2 回 → 疲れる。その間は止まったまま', () => {
+      const sim = alone();
+      const w = sim.world;
+      const i = indexOf(sim, 'red-snorlax');
+      const max = w.enemies.maxHp[i]!;
+      const run = (): void => {
+        const used: string[] = [];
+        const x0 = w.enemies.x[indexOf(sim, 'red-snorlax')]!;
+        const seen = new Set<unknown>();
+        for (let k = 0; k < 30 * 14; k++) {
+          sim.step([]);
+          for (const h of w.hazards) {
+            if (seen.has(h)) continue;
+            seen.add(h);
+            const m = moveId(sim, h.move);
+            if (used.at(-1) !== m && m !== 'snorlax-sleep') used.push(m);
+          }
+          if (used.includes('snorlax-giga-recover')) break;
+        }
+        expect(used).toEqual(['snorlax-giga-rage', 'snorlax-giga-wave-a', 'snorlax-giga-wave-b', 'snorlax-giga-recover']);
+        expect(Math.abs(w.enemies.x[indexOf(sim, 'red-snorlax')]! - x0)).toBeLessThan(30);
+      };
+      w.enemies.hp[i] = max * 0.65;
+      run();
+      for (let k = 0; k < 30 * 4; k++) sim.step([]);
+      w.enemies.hp[indexOf(sim, 'red-snorlax')] = max * 0.32;
+      run();
+    });
+
+    it('全域の市松模様: 2 回で画面のマスが全部危なくなり、1 回目の安全なマスは 2 回目に危ない', () => {
+      const sim = alone();
+      const w = sim.world;
+      const i = indexOf(sim, 'red-snorlax');
+      w.enemies.hp[i] = w.enemies.maxHp[i]! * 0.65;
+      const cells = new Map<string, Set<string>>();
+      for (let k = 0; k < 30 * 12; k++) {
+        sim.step([]);
+        for (const h of w.hazards) {
+          const m = moveId(sim, h.move);
+          if (!m.startsWith('snorlax-giga-wave')) continue;
+          (cells.get(m) ?? cells.set(m, new Set()).get(m)!).add(`${h.x},${h.y}`);
+        }
+      }
+      const a = cells.get('snorlax-giga-wave-a')!;
+      const b = cells.get('snorlax-giga-wave-b')!;
+      expect(a.size).toBeGreaterThanOrEqual(15);
+      expect(b.size).toBeGreaterThanOrEqual(15);
+      for (const c of a) expect(b.has(c)).toBe(false);
+      // プレイヤーのまわりは、どちらかのマスが必ず落ちる
+      const p = w.players[0]!;
+      const cell = 260;
+      const near = [0, 1].map((dx) => `${(Math.round(p.x / cell) + dx) * cell},${Math.round(p.y / cell) * cell}`);
+      expect(near.some((c) => a.has(c))).toBe(true);
+      expect(near.some((c) => b.has(c))).toBe(true);
+    });
+
+    it('避けられる: 市松模様の 2 回の間に、プレイヤーの速さで隣のマスへ動ける', () => {
+      const m = rules0().stage.moves.find((x) => x.id === 'snorlax-giga-wave-b')!;
+      expect(m.telegraphSeconds * playerConfig.moveSpeed).toBeGreaterThanOrEqual(m.gridWave!.cell - m.radius);
+    });
   });
 
   it('HP が決めた割合を切るたびと倒したときに、きずぐすりを人数分落とす', () => {

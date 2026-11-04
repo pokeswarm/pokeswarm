@@ -780,6 +780,27 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     put(bx, by, ux, uy, bossId, { boxX: target.x, boxY: target.y });
     return;
   }
+  if (move.gridWave) {
+    // マップ全域の市松模様（ギガインパクト）: 全員のまわりのマスに、ボスから遠いほど遅れて落とす
+    const g = move.gridWave;
+    const placed = new Set<string>();
+    for (const t of world.players.filter((p) => !p.down)) {
+      const x0 = Math.floor((t.x - g.halfWidth) / g.cell);
+      const x1 = Math.ceil((t.x + g.halfWidth) / g.cell);
+      const y0 = Math.floor((t.y - g.halfHeight) / g.cell);
+      const y1 = Math.ceil((t.y + g.halfHeight) / g.cell);
+      for (let gx = x0; gx <= x1; gx++) {
+        for (let gy = y0; gy <= y1; gy++) {
+          if (Math.abs(gx + gy) % 2 !== g.phase || placed.has(`${gx},${gy}`)) continue;
+          placed.add(`${gx},${gy}`);
+          const x = gx * g.cell;
+          const y = gy * g.cell;
+          put(x, y, 0, 0, bossId, { delay: Math.round((Math.hypot(x - bx, y - by) * g.delayPerPixel) / world.dt) });
+        }
+      }
+    }
+    return;
+  }
   if (move.homing || move.follow) {
     // 必中（ファイヤーのゴッドバード）: 予告が狙ったプレイヤーを追いかける。直線（フシギバナのソーラービーム）は、ボスから狙った人への向きを追う。
     // follow は決まった秒数だけ追う（影が這う・雷雲・波紋）。潜る・跳ぶ技はボスが消え、落ちた所に現れる

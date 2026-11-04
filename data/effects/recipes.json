@@ -7198,6 +7198,48 @@
         "overBoss": true
       }
     },
+    "boss-giga-rage": {
+      "extends": "normal.base",
+      "bossTelegraph": {
+        "id": "anger-mark",
+        "fit": "circle",
+        "size": 2.6,
+        "overBoss": true
+      }
+    },
+    "boss-giga-quake": {
+      "extends": "normal.base",
+      "impact": {
+        "burst": {
+          "count": 10,
+          "colors": ["#8d6e63", "#6d4c41", "#4e342e"],
+          "lifespanMs": [250, 500],
+          "speed": [60, 200],
+          "scale": [0.7, 0],
+          "alpha": [1, 0],
+          "gravityY": 120,
+          "spread": 40,
+          "blend": "normal"
+        },
+        "flash": {
+          "color": "#5d4037",
+          "radius": 40,
+          "durationMs": 100,
+          "alpha": 0.2
+        }
+      },
+      "bossTelegraph": {
+        "id": "giga-crack",
+        "fit": "circle",
+        "size": 1
+      },
+      "strike": {
+        "id": "giga-upheave",
+        "fit": "circle",
+        "size": 1.1,
+        "seconds": 0.4
+      }
+    },
     "boss-thrown-landing": {
       "extends": "normal.base"
     },

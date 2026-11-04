@@ -572,31 +572,6 @@
       "stagger": 0.12
     },
     {
-      "id": "snorlax-body-slam",
-      "move": "body-slam",
-      "effect": "body-slam",
-      "shape": "line",
-      "target": "player",
-      "telegraphSeconds": 0.8,
-      "radius": 50,
-      "length": 460,
-      "damage": 52,
-      "dashSpeed": 850,
-      "chain": 1
-    },
-    {
-      "id": "snorlax-rest",
-      "move": "rest",
-      "effect": "rest",
-      "shape": "circle",
-      "target": "self",
-      "rooted": true,
-      "telegraphSeconds": 2.5,
-      "radius": 60,
-      "damage": 0,
-      "healPct": 10
-    },
-    {
       "id": "raikou-dash",
       "move": "extreme-speed",
       "effect": "zapdos-dash",
@@ -1603,65 +1578,6 @@
       "recoilSeconds": 0.4
     },
     {
-      "id": "snorlax-giga-impact",
-      "move": "giga-impact",
-      "effect": "boss-giga-impact",
-      "shape": "circle",
-      "target": "self",
-      "rooted": true,
-      "telegraphSeconds": 1.5,
-      "radius": 200,
-      "damage": 60,
-      "recoilSeconds": 2
-    },
-    {
-      "id": "snorlax-rest-snore",
-      "move": "rest",
-      "effect": "boss-rest",
-      "shape": "circle",
-      "target": "self",
-      "rooted": true,
-      "telegraphSeconds": 0.5,
-      "radius": 60,
-      "damage": 0,
-      "healPct": 5,
-      "holdSeconds": 2.5,
-      "recoilSeconds": 2.5,
-      "then": "snorlax-snore",
-      "maxUses": 2
-    },
-    {
-      "id": "snorlax-snore",
-      "move": "snore",
-      "effect": "boss-snore",
-      "shape": "ring",
-      "target": "self",
-      "followBoss": true,
-      "telegraphSeconds": 0.6,
-      "radius": 130,
-      "damage": 16,
-      "rings": {
-        "count": 3,
-        "step": 60,
-        "width": 50
-      },
-      "stagger": 0.6
-    },
-    {
-      "id": "snorlax-body-slam-jump",
-      "move": "body-slam",
-      "effect": "boss-body-slam",
-      "shape": "circle",
-      "target": "player",
-      "teleport": true,
-      "hideBoss": true,
-      "spread": 0,
-      "telegraphSeconds": 1,
-      "radius": 110,
-      "damage": 50,
-      "recoilSeconds": 1
-    },
-    {
       "id": "raikou-extreme-speed",
       "move": "extreme-speed",
       "effect": "boss-extreme-speed",
@@ -1693,6 +1609,84 @@
         "radius": 190,
         "center": "target"
       }
+    },
+    {
+      "id": "snorlax-sleep",
+      "move": "rest",
+      "effect": "boss-rest",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "hideTelegraph": true,
+      "pose": "Sleep",
+      "telegraphSeconds": 4,
+      "radius": 60,
+      "damage": 0
+    },
+    {
+      "id": "snorlax-giga-rage",
+      "move": "giga-impact",
+      "effect": "boss-giga-rage",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "hideTelegraph": true,
+      "pose": "Charge",
+      "telegraphSeconds": 1.5,
+      "radius": 60,
+      "damage": 0
+    },
+    {
+      "id": "snorlax-giga-wave-a",
+      "move": "giga-impact",
+      "effect": "boss-giga-quake",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 1.4,
+      "radius": 150,
+      "damage": 60,
+      "recoilSeconds": 0.5,
+      "gridWave": {
+        "cell": 260,
+        "halfWidth": 780,
+        "halfHeight": 520,
+        "phase": 0,
+        "delayPerPixel": 0.0007
+      },
+      "pose": "Charge"
+    },
+    {
+      "id": "snorlax-giga-wave-b",
+      "move": "giga-impact",
+      "effect": "boss-giga-quake",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "telegraphSeconds": 1.4,
+      "radius": 150,
+      "damage": 60,
+      "recoilSeconds": 0.5,
+      "gridWave": {
+        "cell": 260,
+        "halfWidth": 780,
+        "halfHeight": 520,
+        "phase": 1,
+        "delayPerPixel": 0.0007
+      },
+      "pose": "Charge"
+    },
+    {
+      "id": "snorlax-giga-recover",
+      "effect": "boss-out-of-breath",
+      "shape": "circle",
+      "target": "self",
+      "rooted": true,
+      "hideTelegraph": true,
+      "pose": "Hurt",
+      "telegraphSeconds": 2.5,
+      "radius": 60,
+      "damage": 0
     },
     {
       "id": "raikou-thunder-around",

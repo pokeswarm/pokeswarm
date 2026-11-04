@@ -219,7 +219,7 @@ export class MoveSprites {
   private frameOf(id: string, part: string, elapsed: number): number {
     const sp = this.data.sprites[id]!;
     const n = sp.parts[part]!.length;
-    const k = Math.floor((elapsed * 1000) / sp.frameMs);
+    const k = Math.max(0, Math.floor((elapsed * 1000) / sp.frameMs));
     if (k < n) return k;
     const from = Math.min(sp.loopFrom ?? 0, n - 1);
     return from + ((k - from) % (n - from));

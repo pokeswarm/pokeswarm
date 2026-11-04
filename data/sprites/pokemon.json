@@ -801,7 +801,9 @@
         "Sleep"
       ],
       "enemyExtraAnimations": [
-        "Hurt"
+        "Charge",
+        "Hurt",
+        "Sleep"
       ]
     },
     {

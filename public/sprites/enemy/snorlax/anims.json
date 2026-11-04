@@ -25,6 +25,24 @@
       ],
       "frameKeyPrefix": "Walk"
     },
+    "Charge": {
+      "source": "Charge",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "durations": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Charge"
+    },
     "Hurt": {
       "source": "Hurt",
       "frameWidth": 48,
@@ -34,6 +52,16 @@
         8
       ],
       "frameKeyPrefix": "Hurt"
+    },
+    "Sleep": {
+      "source": "Sleep",
+      "frameWidth": 40,
+      "frameHeight": 24,
+      "durations": [
+        30,
+        35
+      ],
+      "frameKeyPrefix": "Sleep"
     }
   },
   "missing": []

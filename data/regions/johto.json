@@ -676,22 +676,39 @@
       },
       "red-snorlax": {
         "moves": [
-          "snorlax-giga-impact",
-          "snorlax-body-slam-jump",
-          "snorlax-rest-snore",
-          "snorlax-body-slam-jump"
+          "snorlax-sleep"
         ],
         "random": false,
-        "moveIntervalSeconds": 2,
-        "enrageMoveIntervalSeconds": 1.4,
-        "chargePose": "Sleep",
+        "moveIntervalSeconds": 5,
         "hpDrops": {
           "atHpPct": [
             66,
             33
           ],
           "item": "potion"
-        }
+        },
+        "noEnrage": true,
+        "intervalAfterMove": true,
+        "hpMoves": [
+          {
+            "belowHpPct": 66,
+            "moves": [
+              "snorlax-giga-rage",
+              "snorlax-giga-wave-a",
+              "snorlax-giga-wave-b",
+              "snorlax-giga-recover"
+            ]
+          },
+          {
+            "belowHpPct": 33,
+            "moves": [
+              "snorlax-giga-rage",
+              "snorlax-giga-wave-a",
+              "snorlax-giga-wave-b",
+              "snorlax-giga-recover"
+            ]
+          }
+        ]
       },
       "red-venusaur": {
         "moves": [

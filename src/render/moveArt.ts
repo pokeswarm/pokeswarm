@@ -5800,6 +5800,84 @@ function voltFizzle(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
+/** ギガインパクトの予告（レッドのカビゴン。07 の196章）: 地面に入るひび。真ん中から外へ、だんだん伸びていく */
+function gigaCrack(): SpriteOut {
+  const palette = ['#2b1a10', '#5d4037', '#ff9800', '#ffe0b2'];
+  const frames = [0, 1, 2, 3, 4, 5, 6, 7].map((f) =>
+    shape(64, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      const reach = 0.28 + f * 0.1;
+      if (d > reach) return -1;
+      for (let k = 0; k < 7; k++) {
+        const base = (k / 7) * Math.PI * 2 + hash(k, 21) * 0.6;
+        const zig = (Math.sin(d * 17 + k * 2.3) * 0.2 + Math.sin(d * 37 + k) * 0.08) * (0.25 + d);
+        let da = a - base - zig;
+        while (da > Math.PI) da -= Math.PI * 2;
+        while (da < -Math.PI) da += Math.PI * 2;
+        const w = Math.abs(da) * d;
+        const width = 0.03 * (1.2 - d * 0.7);
+        // ひびの奥が光る（落ちるのが近いほど）
+        if (w < width * 0.45 && f >= 4) return f >= 6 ? 3 : 2;
+        if (w < width) return 0;
+        if (w < width * 1.8) return 1;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 180, parts: { main: frames.map(toRows) } };
+}
+
+/** ギガインパクトで地面がめくれる（レッドのカビゴン。07 の196章）: 割れた地面の板が外へ開き、土ぼこりと岩が飛ぶ。光らせない */
+function gigaUpheave(): SpriteOut {
+  // 0 輪郭・1 こげ茶・2 茶・3 明るい茶・4 土ぼこり
+  const palette = ['#2b1a10', '#5d4037', '#8d6e63', '#bcaaa4', '#d7ccc8'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(96, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 真ん中の割れた穴
+      if (d < 0.2 + f * 0.04) return d > 0.15 + f * 0.04 ? 1 : 0;
+      // めくれる地面の板（9 枚。外へ開いて進む）
+      const k = (((a / (Math.PI * 2)) * 9) % 1 + 1) % 1;
+      const r = 0.3 + f * 0.13;
+      const w = 0.2 - f * 0.012;
+      if (Math.abs(k - 0.5) < 0.36 - f * 0.03 && d > r && d < r + w) {
+        if (d > r + w - 0.03 || Math.abs(k - 0.5) > 0.32 - f * 0.03) return 0;
+        return d > r + w * 0.55 ? 3 : 2;
+      }
+      // 飛ぶ岩
+      const rock = hash(Math.round(u * 15), Math.round(v * 15), 31);
+      if (d > r + w && d < r + w + 0.22 && rock < 0.07) return 2;
+      // 土ぼこり（後ろのコマで広がる）
+      if (f >= 1 && Math.abs(d - (r - 0.04)) < 0.035 && hash(Math.round(u * 40), Math.round(v * 40), f + 30) < 0.5) return 4;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/** 怒りのマーク（レッドのカビゴン。07 の196章）: 頭の上で脈打つ赤い怒りのしるし */
+function angerMark(): SpriteOut {
+  const palette = ['#7f0000', '#e53935', '#ff8a80'];
+  const frames = [0, 1, 2, 1].map((f) =>
+    shape(56, (u, v) => {
+      const cu = (u - 0.42) / (0.26 + f * 0.035);
+      const cv = (v + 0.58) / (0.26 + f * 0.035);
+      if (Math.abs(cu) > 1 || Math.abs(cv) > 1) return -1;
+      // 四隅から真ん中へ曲がる 4 本（十字のすき間を空ける）
+      const x = Math.abs(cu);
+      const y = Math.abs(cv);
+      if (x < 0.18 || y < 0.18) return -1;
+      const arc = Math.hypot(x - 1, y - 1);
+      if (arc > 0.86) return -1;
+      if (arc < 0.42) return -1;
+      return arc > 0.72 ? 0 : arc > 0.56 ? 1 : 2;
+    }),
+  );
+  return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
+}
+
 /** リフレクター（レッドのエーフィ。07 の195章）: 体を覆う薄い泡。細い縁と、左上の光だけで、中はそのまま見える */
 function bubbleShield(): SpriteOut {
   const palette = ['#7e57c2', '#ce93d8', '#f3e5f5', '#ffffff'];
@@ -6265,6 +6343,9 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'volt-fizzle': () => voltFizzle(),
     'thunder-burst-bwy': () => thunderBurstBwy(),
     'bubble-shield': () => bubbleShield(),
+    'giga-crack': () => gigaCrack(),
+    'giga-upheave': () => gigaUpheave(),
+    'anger-mark': () => angerMark(),
     'bubble-burst': () => bubbleBurst(),
     'shell-spin-water': () => shellSpinWater(),
     // ボスの技（07 の189章）

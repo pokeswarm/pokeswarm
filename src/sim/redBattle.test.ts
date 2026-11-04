@@ -217,6 +217,34 @@ describe('レッド戦（07 の193章）', () => {
     expect(recovers).toBe(2);
   });
 
+  it('ホウオウ: ブレイブバードの 2 回の突進が終わってから、その場で息切れする', () => {
+    const rules = buildSimRules('johto');
+    const sim = new Simulation({ tickRate: 30, seed: 3, rules });
+    sim.addPlayer({ id: 1, x: 30, y: 0, radius: 12, moveSpeed: 0 });
+    const w = sim.world;
+    w.players[0]!.invincibleTicks = 1e9;
+    sim.step([]);
+    startLegendary(w, rules.enemies.kinds.findIndex((k) => k.id === 'legend-ho-oh'));
+    let count = 0;
+    const seen = new Set<unknown>();
+    for (let k = 0; k < 30 * 60; k++) {
+      sim.step([]);
+      // 予告の間が止まっている時間（落ちた後は当たらない残りの時間で、もう動く）
+      const h = w.hazards.find((z) => moveId(sim, z.move) === 'hooh-recoil' && z.activeTicks === undefined);
+      if (!h) continue;
+      const i = indexOf(sim, 'legend-ho-oh');
+      expect(w.enemies.kbTicks[i]).toBe(0);
+      expect(w.enemies.speed[i]).toBe(0);
+      expect(Math.hypot(w.enemies.x[i]! - h.x, w.enemies.y[i]! - h.y)).toBeLessThan(1);
+      expect(w.hazards.some((z) => moveId(sim, z.move) === 'hooh-brave-bird')).toBe(false);
+      if (!seen.has(h)) {
+        seen.add(h);
+        count++;
+      }
+    }
+    expect(count).toBeGreaterThanOrEqual(3);
+  });
+
   it('次のラウンドが始まっても、落ちているきずぐすりは残る', () => {
     const sim = round(0);
     const w = sim.world;

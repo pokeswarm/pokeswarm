@@ -596,6 +596,12 @@ function useBossMove(world: World, boss: World['bosses'][number], i: number): vo
   let moveIdx = boss.random ? boss.moves[world.rng.int(boss.moves.length)]! : boss.moves[boss.next++ % boss.moves.length]!;
   if (moveIdx === -1 && boss.pool && boss.pool.length > 0) moveIdx = boss.pool[world.rng.int(boss.pool.length)]!;
   const move = world.rules.stage.moves[moveIdx];
+  // 止まる技は、突進が終わってから始める（続けて突進する技の途中で止まると、絵が走っている体から離れる。07 の193章）
+  if (move?.rooted && (world.enemies.kbTicks[i]! > 0 || world.hazards.some((h) => h.dasher === boss.id && !!world.rules.stage.moves[h.move]?.dashSpeed))) {
+    if (!boss.random) boss.next--;
+    boss.cooldown = 1;
+    return;
+  }
   // 使える回数のある技（あさのひざし・ねむる）: 使い切ったら順番を飛ばす
   if (move?.maxUses !== undefined) {
     const uses = (boss.uses ??= {});

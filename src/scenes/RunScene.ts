@@ -1656,6 +1656,16 @@ export class RunScene extends Phaser.Scene {
    */
   private hazardSpriteItems(world: World): SpriteItem[] {
     const out: SpriteItem[] = [];
+    // でんじふゆうの体の周りの電気（07 の191章）
+    for (const [id, ai] of world.legendAis) {
+      if (!ai.shell) continue;
+      const i = findEnemyIndex(world, id);
+      if (i === -1) continue;
+      const kind = world.rules.enemies.kinds[world.enemies.kind[i]!];
+      const aura = world.rules.stage.legendary?.moveSets[kind?.id ?? '']?.shell?.aura;
+      if (!aura) continue;
+      out.push({ spec: { id: aura.id, fit: 'circle', size: aura.size, alpha: 1, rotate: 'none', spinDegPerSec: 0, varyTiles: false, upright: false, directional: false, originY: 0.5, along: 0.6, shake: 0, tail: 0, afterimages: 0, afterimageGap: 2 } as SpriteItem['spec'], x: world.enemies.x[i]!, y: world.enemies.y[i]!, radius: world.enemies.radius[i]!, band: 0, dirX: 1, dirY: 0, length: 0, vx: 0, vy: 0, elapsed: world.tick * world.dt, alpha: 1, seed: id });
+    }
     for (const h of world.hazards) {
       const mv = world.rules.stage.moves[h.move];
       const recipe = effectRecipes[mv?.effect ?? ''];
@@ -2115,6 +2125,7 @@ export class RunScene extends Phaser.Scene {
     const ai = w.legendAis.get(id);
     const holding = !!ai?.holdTicks;
     if ((charging || holding) && set.chargePose) return { anim: set.chargePose, spin: false };
+    if (w.hazards.some((h) => h.dasher === id && h.activeTicks !== undefined && w.rules.stage.moves[h.move]?.spinBody)) return { anim: spriteRender.enemyAnimation, spin: true };
     if (set.shell && ai?.shell) return { anim: set.shell.pose, spin: set.shell.spin };
     return null;
   }

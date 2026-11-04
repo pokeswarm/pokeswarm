@@ -537,7 +537,9 @@
     "heal-pulse",
     "luster-purge",
     "doom-desire",
-    "wish"
+    "wish",
+    "gyro-ball",
+    "heavy-slam"
   ],
   "items": [
     "x-attack",

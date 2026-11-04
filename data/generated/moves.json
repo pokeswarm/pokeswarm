@@ -1208,6 +1208,19 @@
     "contestType": "smart",
     "damageClass": "special"
   },
+  "gyro-ball": {
+    "names": {
+      "ja": "ジャイロボール",
+      "en": "Gyro Ball",
+      "fr": "Gyroballe",
+      "de": "Gyroball",
+      "es": "Giro Bola",
+      "it": "Vortexpalla"
+    },
+    "type": "steel",
+    "contestType": "beauty",
+    "damageClass": "physical"
+  },
   "harden": {
     "names": {
       "ja": "かたくなる",
@@ -1246,6 +1259,19 @@
     "type": "psychic",
     "contestType": "cute",
     "damageClass": "status"
+  },
+  "heavy-slam": {
+    "names": {
+      "ja": "ヘビーボンバー",
+      "en": "Heavy Slam",
+      "fr": "Tacle Lourd",
+      "de": "Rammboss",
+      "es": "Cuerpo Pesado",
+      "it": "Pesobomba"
+    },
+    "type": "steel",
+    "contestType": null,
+    "damageClass": "physical"
   },
   "hex": {
     "names": {

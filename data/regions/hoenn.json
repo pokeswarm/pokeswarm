@@ -764,19 +764,36 @@
     "moveSets": {
       "steven-metagross": {
         "moves": [
-          "metagross-psychic",
-          "metagross-meteor-mash"
+          "metagross-meteor-mash",
+          "metagross-gyro-ball",
+          "metagross-heavy-slam",
+          "metagross-psychic"
         ],
         "random": false,
-        "moveIntervalSeconds": 1.6,
-        "enrageMoveIntervalSeconds": 1.1,
+        "moveIntervalSeconds": 1.5,
+        "enrageMoveIntervalSeconds": 1.05,
+        "shell": {
+          "farDistance": 270,
+          "nearDistance": 120,
+          "speedMultiplier": 3.8,
+          "pose": "Walk",
+          "spin": false,
+          "moves": [],
+          "windupSeconds": 0.55,
+          "aura": {
+            "id": "magnet-aura",
+            "size": 1.9
+          }
+        },
         "phases": [
           {
             "belowHpPct": 50,
             "moves": [
+              "metagross-meteor-mash",
               "metagross-bullet-punch",
-              "metagross-zen-headbutt",
-              "metagross-meteor-mash"
+              "metagross-gyro-ball",
+              "metagross-heavy-slam",
+              "metagross-zen-headbutt"
             ]
           }
         ]

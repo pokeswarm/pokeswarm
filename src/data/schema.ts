@@ -566,6 +566,8 @@ export const bossMoveSchema = z.object({
     })
     .optional(),
   // ---- ここから 07 の167章（ボスの技の作り直し）で足した部品。後の地方の伝説でも使う ----
+  /** 当たっている間、ボスの体を回す（ジャイロボール。07 の191章） */
+  spinBody: z.boolean().optional(),
   /** 赤い予告を描かない（数の多い弾幕。弾そのものの絵を見て避ける。07 の190章） */
   hideTelegraph: z.boolean().optional(),
   /** 扇（cone）の開き（度） */
@@ -756,6 +758,10 @@ export const stageConfigSchema = z.object({
                 pose: z.string(),
                 spin: z.boolean().default(false),
                 moves: z.array(casterMoveSchema).default([]),
+                /** この形になるとき、この秒数だけ止まって構える（でんじふゆう: 浮いてから一気に来る。07 の191章） */
+                windupSeconds: z.number().positive().optional(),
+                /** この形の間、体に重ねる技の絵（data/render/move-sprites.json の id と大きさ。半径は体の半径の倍数） */
+                aura: z.object({ id: z.string(), size: z.number().positive() }).optional(),
               })
               .optional(),
             chargePose: z.string().optional(),

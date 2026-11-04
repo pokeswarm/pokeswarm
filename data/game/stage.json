@@ -2394,6 +2394,36 @@
       "damage": 38,
       "dashSpeed": 820,
       "recoilSeconds": 0.5
+    },
+    {
+      "id": "metagross-gyro-ball",
+      "move": "gyro-ball",
+      "effect": "boss-gyro-ball",
+      "shape": "circle",
+      "target": "self",
+      "followBoss": true,
+      "spinBody": true,
+      "maxTargetDistance": 190,
+      "telegraphSeconds": 0.55,
+      "radius": 125,
+      "damage": 32,
+      "activeSeconds": 2.2,
+      "hitEverySeconds": 0.55
+    },
+    {
+      "id": "metagross-heavy-slam",
+      "move": "heavy-slam",
+      "effect": "boss-heavy-slam",
+      "shape": "circle",
+      "target": "player",
+      "teleport": true,
+      "hideBoss": true,
+      "spread": 0,
+      "maxTargetDistance": 460,
+      "telegraphSeconds": 0.95,
+      "radius": 125,
+      "damage": 52,
+      "recoilSeconds": 0.9
     }
   ],
   "bossRules": {

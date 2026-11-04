@@ -390,13 +390,21 @@ export function bossAttacks(world: World): void {
         continue;
       }
       if (--boss.cooldown > 0) continue;
+      // 止まって出す技・跳ぶ技・続きのある技の途中は、次の技を始めない（テレポートで離れた後に、前の場所から光線が出ていた。07 の191章）
+      if (bossBusy(world, boss.id)) {
+        boss.cooldown = 1;
+        continue;
+      }
       // りゅうのまい: 重ねた段だけ技の間隔が短い
       const quick = 1 - (boss.stacks ?? 0) * (stackedBuff(world, boss)?.intervalPct ?? 0) / 100;
       boss.cooldown = Math.max(1, Math.round(boss.interval * Math.max(0.2, quick)));
       // 2つ同時に使う確率: 伝説・四天王の第2段階
       const double = boss.enraged && boss.enrage ? boss.enrage.doubleChance : 0;
       const uses = double > 0 && world.rng.next() < double ? 2 : 1;
-      for (let u = 0; u < uses; u++) useBossMove(world, boss, i);
+      for (let u = 0; u < uses; u++) {
+        if (u > 0 && bossBusy(world, boss.id)) break;
+        useBossMove(world, boss, i);
+      }
     }
     runBossQueue(world);
     retireDecoys(world);
@@ -505,6 +513,18 @@ function enrageBoss(world: World, boss: World['bosses'][number], i: number): voi
   boss.interval = boss.enrage.interval;
   boss.cooldown = Math.min(boss.cooldown, boss.interval);
   world.events.push({ type: 'legendaryWarning', kind: world.enemies.kind[i]!, enraged: true });
+}
+
+/** ボスが自分の場所から出す技の途中か（予告の間止まる・跳ぶ・消える技、波の続きが残っている） */
+function bossBusy(world: World, id: number): boolean {
+  if (world.bossQueue.some((q) => q.bossId === id)) return true;
+  return world.hazards.some((h) => {
+    if (h.dasher !== id) return false;
+    const m = world.rules.stage.moves[h.move];
+    // 体が回っている間（ジャイロボール）も次へ行かない
+    if (h.activeTicks !== undefined) return !!m?.spinBody;
+    return !!(m?.rooted || m?.teleport || m?.hideBoss || m?.spinBody);
+  });
 }
 
 /** ボス・伝説が技を1つ使う（予告を置く） */

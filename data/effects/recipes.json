@@ -7139,6 +7139,38 @@
         "size": 1,
         "seconds": 0.4
       }
+    },
+    "boss-gyro-ball": {
+      "extends": "steel.base",
+      "bossActive": {
+        "id": "gyro-spin",
+        "fit": "circle",
+        "size": 1.05,
+        "rotate": "spin",
+        "spinDegPerSec": 900
+      }
+    },
+    "boss-heavy-slam": {
+      "extends": "steel.base",
+      "impact": {
+        "flash": {
+          "color": "#eceff1",
+          "radius": 80,
+          "durationMs": 140,
+          "alpha": 0.6
+        }
+      },
+      "bossTelegraph": {
+        "id": "jump-shadow",
+        "fit": "circle",
+        "size": 1.1
+      },
+      "strike": {
+        "id": "heavy-impact",
+        "fit": "circle",
+        "size": 1.25,
+        "seconds": 0.4
+      }
     }
   }
 }

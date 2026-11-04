@@ -153,3 +153,62 @@ describe('ボスの技を避けられるように（07 の190章）', () => {
     }
   });
 });
+
+describe('ボスの光線は体から出る・メタグロスの動き（07 の191章）', () => {
+  /** kind だけを伝説として出す（1 ラウンド目を差し替える） */
+  function fight(kindId: string, seed = 3) {
+    const base = buildSimRules('hoenn');
+    const legendary = { ...base.stage.legendary!, rounds: [{ kinds: [kindId] }], finale: undefined, intruders: undefined };
+    const rules = { ...base, stage: { ...base.stage, legendary } } as typeof base;
+    const sim = new Simulation({ tickRate: 30, seed, rules });
+    const lo = playableLoadout(rules, 'treecko');
+    const p = sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0, types: lo.types, moves: [], line: lo.line, species: lo.species });
+    sim.world.requiredLeft.clear();
+    for (let k = 0; k < 400 && !sim.world.bosses.length; k++) sim.step([]);
+    return { rules, sim, w: sim.world, p };
+  }
+  const bossIndex = (w: ReturnType<typeof fight>['w']): number => {
+    for (let i = 0; i < w.enemies.count; i++) if (w.enemies.id[i] === w.bosses[0]!.id) return i;
+    return -1;
+  };
+
+  it('デオキシスの直線の技は、落ちる時も本体の場所から出る', () => {
+    const { sim, w, p } = fight('legend-deoxys');
+    p.invincibleTicks = 1e6;
+    const i0 = bossIndex(w);
+    expect(i0).toBeGreaterThanOrEqual(0);
+    // 第4段階まで見る（テレポートと光線が続く）
+    w.enemies.hp[i0] = w.enemies.maxHp[i0]! * 0.2;
+    let lines = 0;
+    for (let t = 0; t < 30 * 40; t++) {
+      p.hp = p.maxHp;
+      p.x = Math.cos(t / 40) * 250;
+      p.y = Math.sin(t / 40) * 250;
+      sim.step([]);
+      const i = bossIndex(w);
+      if (i < 0) break;
+      for (const h of w.hazards) {
+        const m = w.rules.stage.moves[h.move]!;
+        if (h.shape !== 'line' || !m.rooted || h.activeTicks !== undefined || h.ticksLeft > 1) continue;
+        lines++;
+        expect(Math.hypot(h.x - w.enemies.x[i]!, h.y - w.enemies.y[i]!), m.id).toBeLessThan(40);
+      }
+    }
+    expect(lines).toBeGreaterThan(3);
+  });
+
+  it('メタグロスは離れると一度構えてから一気に来る。プレイヤーより速い', () => {
+    const { sim, w, p } = fight('steven-metagross');
+    p.invincibleTicks = 1e6;
+    const i = bossIndex(w);
+    p.x = w.enemies.x[i]! + 800;
+    p.y = w.enemies.y[i]!;
+    sim.step([]);
+    const ai = w.legendAis.get(w.bosses[0]!.id)!;
+    expect(ai.shell).toBe(true);
+    expect(ai.holdTicks).toBeGreaterThan(0);
+    expect(w.enemies.speed[i]).toBe(0);
+    for (let t = 0; t < 30; t++) sim.step([]);
+    expect(w.enemies.speed[i]).toBeGreaterThan(180);
+  });
+});

@@ -5793,6 +5793,90 @@ function ironTailArc(): SpriteOut {
   return { palette, frameMs: 75, parts: { main: frames.map(toRows) } };
 }
 
+/** ジャイロボール: 体のまわりで高速に回る鋼の歯車の輪。歯と火花が回って見える */
+function gyroSpin(): SpriteOut {
+  const palette = ['#1c2833', '#546e7a', '#90a4ae', '#eceff1', '#ffffff', '#ffb74d'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(60, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u) + (f * Math.PI) / 16;
+      const teeth = (((a / (Math.PI * 2)) * 8) % 1 + 1) % 1 < 0.5;
+      if (d > 0.98 || d < 0.62) return -1;
+      if (d > 0.86) return teeth ? (d > 0.94 ? 0 : 1) : -1;
+      if (d > 0.8) return 0;
+      // 回る帯: 明るい筋が3本
+      const streak = (((a / (Math.PI * 2)) * 3) % 1 + 1) % 1;
+      if (streak < 0.14) return 4;
+      if (streak < 0.3) return 3;
+      if (d < 0.67) return 0;
+      if (hash(Math.round(u * 30), Math.round(v * 30), f) < 0.03) return 5;
+      return 2;
+    }),
+  );
+  return { palette, frameMs: 45, parts: { main: frames.map(toRows) } };
+}
+
+/** でんじふゆう: 体のまわりを走る青白い電気と、足元の磁力の輪（浮いている） */
+function magnetAura(): SpriteOut {
+  const palette = ['#0d47a1', '#42a5f5', '#b3e5fc', '#ffffff', '#fff176'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(56, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 足元の楕円の輪（2本。浮いて見える）
+      const eD = Math.hypot(u, (v - 0.62) * 3.2);
+      if (eD > 0.72 && eD < 0.8) return (Math.round((a + f) * 6) % 2 === 0 ? 2 : 1);
+      if (eD > 0.46 && eD < 0.52) return 1;
+      // 体のまわりの稲妻: 角度ごとにぎざぎざの半径を決める
+      for (let k = 0; k < 3; k++) {
+        const center = ((k * Math.PI * 2) / 3 + f * 1.1 + k) % (Math.PI * 2);
+        let off = a - center;
+        off = Math.atan2(Math.sin(off), Math.cos(off));
+        if (Math.abs(off) > 0.6) continue;
+        const rad = 0.78 + 0.1 * Math.sin(off * 14 + f * 2 + k);
+        if (Math.abs(d - rad) < 0.035) return 3;
+        if (Math.abs(d - rad) < 0.07) return 4;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** ヘビーボンバー: 重い体が落ちた所の、鋼色の割れた地面と飛び散る破片 */
+function heavyImpact(): SpriteOut {
+  const palette = ['#1c2833', '#455a64', '#90a4ae', '#cfd8dc', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    const grow = 0.55 + f * 0.15;
+    return shape(64, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 外へ広がる衝撃の輪
+      if (Math.abs(d - grow) < 0.035) return f < 3 ? 4 : 2;
+      if (Math.abs(d - grow) < 0.07) return 3;
+      // 真ん中から放射状に走る割れ目
+      for (let k = 0; k < 7; k++) {
+        const c = (k * Math.PI * 2) / 7 + hash(k, 5) * 0.5;
+        let off = a - c;
+        off = Math.atan2(Math.sin(off), Math.cos(off));
+        const bend = Math.sin(d * 14 + k) * 0.05;
+        if (Math.abs(off + bend) * d < 0.026 && d < grow * (0.65 + hash(k, 9) * 0.4)) return 0;
+      }
+      // 真ん中のへこみ
+      if (d < 0.26) return d < 0.14 ? 0 : 1;
+      if (d < 0.32) return 2;
+      // 飛ぶ破片
+      for (let k = 0; k < 9; k++) {
+        const c = (k * Math.PI * 2) / 9 + hash(k, 2);
+        const r = 0.3 + f * (0.16 + hash(k, 7) * 0.1);
+        if (Math.abs(u - Math.cos(c) * r) + Math.abs(v - Math.sin(c) * r) < 0.045) return k % 2 ? 3 : 2;
+      }
+      return -1;
+    });
+  });
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
 /** 絵の名前 → 描く関数 */
@@ -6012,6 +6096,9 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'doom-star': () => doomStar(),
     'wish-star': () => wishStar(),
     'star-shard': () => starShard(),
+    'gyro-spin': () => gyroSpin(),
+    'magnet-aura': () => magnetAura(),
+    'heavy-impact': () => heavyImpact(),
     'iron-tail-arc': () => ironTailArc(),
     'star-bullet': () => starBullet(),
     // ボスの技（07 の189章）

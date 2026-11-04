@@ -52,14 +52,18 @@ function tickOne(world: World, i: number): void {
     world.legendAis.set(id, ai);
   }
   if (ai.holdTicks) ai.holdTicks--;
-  const charging = !!ai.holdTicks || world.hazards.some((h) => h.dasher === id && h.activeTicks === undefined && world.rules.stage.moves[h.move]?.rooted);
+  const stunned = !!world.bosses.find((b) => b.id === id)?.stunTicks;
+  const charging = !!ai.holdTicks || stunned || world.hazards.some((h) => h.dasher === id && h.activeTicks === undefined && world.rules.stage.moves[h.move]?.rooted);
   // 甲羅の形（カメックス）: 離れたら甲羅、近づいたら戻る。甲羅の間は速い
   if (set.shell && target) {
     const d = Math.hypot(target.x - caster.x, target.y - caster.y);
-    if (!ai.shell && d > set.shell.farDistance) ai.shell = true;
-    else if (ai.shell && d < set.shell.nearDistance) ai.shell = false;
+    if (!ai.shell && d > set.shell.farDistance && !charging) {
+      ai.shell = true;
+      if (set.shell.windupSeconds) ai.holdTicks = Math.round(set.shell.windupSeconds / world.dt);
+    } else if (ai.shell && d < set.shell.nearDistance) ai.shell = false;
     const base = world.rules.enemies.kinds[kind]?.moveSpeed ?? 0;
-    e.speed[i] = charging ? 0 : ai.shell ? base * set.shell.speedMultiplier : base;
+    const held = charging || !!ai.holdTicks;
+    e.speed[i] = held ? 0 : ai.shell ? base * set.shell.speedMultiplier : base;
   }
   if (charging) return;
   const fire = (list: readonly CasterMoveData[], timers: number[]): void => {

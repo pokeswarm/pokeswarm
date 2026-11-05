@@ -148,7 +148,7 @@ describe('スイクンの技（07 の218章）', () => {
     const dir0 = Math.atan2(beam.dirY, beam.dirX);
     step(1.5);
     expect(Math.atan2(beam.dirY, beam.dirX)).not.toBeCloseTo(dir0, 1);
-    const ice = sim.world.zones.filter((z) => z.sprite);
+    const ice = sim.world.zones.filter((z) => z.unpainted);
     expect(ice.length).toBeGreaterThan(5);
     expect(ice[0]!.damagePerSecond).toBe(0);
     expect(ice[0]!.slowPct).toBeGreaterThan(0);

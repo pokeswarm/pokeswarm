@@ -88,8 +88,8 @@ export interface Zone {
   readonly pullPerSecond?: number;
   /** この敵に付いていく床（じゅうりょく） */
   readonly followEnemy?: number;
-  /** 丸く塗らず、効果 effect の絵で描く床（スイクンの凍った床） */
-  readonly sprite?: boolean;
+  /** 丸く塗らない床（絵は別に描く。スイクンの凍った床。07 の222章） */
+  readonly unpainted?: boolean;
 }
 
 export interface Hazard {

@@ -5990,12 +5990,8 @@
       "extends": "water.base"
     },
     "boss-suicune-aurora": {
-      "extends": "aurora-beam",
-      "bossActive": { "id": "aurora-beam", "fit": "line", "size": 1.7 }
-    },
-    "boss-suicune-ice-patch": {
       "extends": "ice.base",
-      "bossActive": { "id": "suicune-ice-patch", "fit": "circle", "size": 1, "alpha": 0.55 }
+      "bossActive": { "id": "suicune-aurora-glow", "fit": "circle", "size": 2.2 }
     },
     "boss-suicune-mirror": {
       "extends": "water.base",

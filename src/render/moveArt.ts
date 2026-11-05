@@ -6611,7 +6611,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'entei-crack': () => enteiCrack(),
     'suicune-shard': () => suicuneShard(),
     'suicune-mist': () => suicuneMist(),
-    'suicune-ice-patch': () => suicuneIcePatch(),
+    'suicune-aurora-glow': () => suicuneAuroraGlow(),
     'suicune-ice': () => suicuneIce(),
     'raikou-bolt': () => raikouBolt(),
     'raikou-cloud': () => raikouCloud(),
@@ -7240,18 +7240,24 @@ function suicuneMist(): SpriteOut {
   return { palette, frameMs: 140, parts: { main: frames.map(toRows) } };
 }
 
-/** オーロラビームの跡の凍った床: 白い氷が薄く張る。ふちは欠ける */
-function suicuneIcePatch(): SpriteOut {
-  const g = shape(44, (u, v) => {
-    const a = Math.atan2(v, u);
-    const edge = 0.86 + 0.04 * Math.sin(a * 3 + 1) + 0.03 * Math.sin(a * 11);
-    const d = Math.hypot(u, v);
-    if (d > edge) return -1;
-    if (d > edge * 0.72 && hash(Math.round((u + 1) * 22), Math.round((v + 1) * 22), 8100) < 0.4) return -1;
-    const crack = Math.abs(Math.sin(u * 8 + Math.sin(v * 5) * 1.5)) < 0.06;
-    return crack ? 5 : d > edge * 0.72 ? 3 : hash(Math.round((u + 1) * 7), Math.round((v + 1) * 7), 8110) > 0.5 ? 4 : 3;
+/** オーロラビームの出どころの光: 白い芯のまわりで、緑・水色・紫の細い光が回る。6 コマ */
+function suicuneAuroraGlow(): SpriteOut {
+  const palette = ['#7b5cf0', '#5ce2ff', '#76ffc4', '#e2fff0', '#ffffff'];
+  const frames = [0, 1, 2, 3, 4, 5].map((f) => {
+    const ph = (f * Math.PI) / 3;
+    return shape(48, (u, v) => {
+      const a = Math.atan2(v, u);
+      const d = Math.hypot(u, v);
+      if (d < 0.2) return 4;
+      if (d < 0.3) return 3;
+      const ray = Math.abs(Math.sin(a * 4 + ph / 2));
+      const reach = 0.36 + ray * ray * ray * 0.6;
+      if (d > reach) return -1;
+      const k = d / reach;
+      return k < 0.45 ? 3 : k < 0.68 ? 2 : k < 0.85 ? 1 : 0;
+    });
   });
-  return { palette: SUICUNE_ICE_PALETTE, frameMs: 200, parts: { main: [toRows(g)] } };
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
 }
 
 /** ふぶきの氷の塊: とがった結晶が集まった塊。せり上がる 4 コマ。end は崩れて小さくなる（07 の218章） */

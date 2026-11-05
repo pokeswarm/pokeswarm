@@ -19,6 +19,7 @@ import { RunSounds } from '../audio/runSounds';
 import { LavaSea } from '../render/effects/LavaSea';
 import { BlizzardSheet, SnowGround } from '../render/effects/FrostSheets';
 import { WaveSheet } from '../render/effects/WaveSheet';
+import { AuroraSheet } from '../render/effects/AuroraSheet';
 import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
@@ -157,6 +158,8 @@ export class RunScene extends Phaser.Scene {
   private blizzardSheet: BlizzardSheet | null = null;
   /** なみのりの波（07 の221章） */
   private waveSheet: WaveSheet | null = null;
+  /** オーロラビームの光と凍った床（07 の222章） */
+  private auroraSheet: AuroraSheet | null = null;
   private introFading = false;
   /** テストプレイ: ?intruderat で、決まった時刻に乱入させる */
   private testIntruderLater: { kind: number; tick: number } | null = null;
@@ -331,6 +334,7 @@ export class RunScene extends Phaser.Scene {
     this.snowGround = null;
     this.blizzardSheet = null;
     this.waveSheet = null;
+    this.auroraSheet = null;
     this.introFading = false;
     this.overlayLast = null;
     this.overlayLevel = 0;
@@ -1982,7 +1986,7 @@ export class RunScene extends Phaser.Scene {
     for (const z of this.sim.world.zones) {
       const fade = Math.min(1, z.ticksLeft / 30);
       // 控えめな粒を出す技は、塗りをうすくする
-      if (z.sprite) continue;
+      if (z.unpainted) continue;
       g.fillStyle(hexColor(z.color), (this.effects.linger(z.effect)?.fillAlpha ?? 0.3) * fade).fillCircle(z.x, z.y, z.radius);
     }
   }
@@ -2141,11 +2145,6 @@ export class RunScene extends Phaser.Scene {
       const aura = world.rules.stage.legendary?.moveSets[kind?.id ?? '']?.shell?.aura;
       if (!aura) continue;
       out.push({ spec: { id: aura.id, fit: 'circle', size: aura.size, alpha: 1, rotate: 'none', spinDegPerSec: 0, varyTiles: false, upright: false, directional: false, originY: 0.5, along: 0.6, shake: 0, tail: 0, afterimages: 0, afterimageGap: 2 } as SpriteItem['spec'], x: world.enemies.x[i]!, y: world.enemies.y[i]!, radius: world.enemies.radius[i]!, band: 0, dirX: 1, dirY: 0, length: 0, vx: 0, vy: 0, elapsed: world.tick * world.dt, alpha: 1, seed: id });
-    }
-    // 絵で描く床（スイクンの凍った床）
-    for (const z of world.zones) {
-      const spec = z.sprite ? effectRecipes[z.effect]?.bossActive : undefined;
-      if (spec) out.push({ spec, x: z.x, y: z.y, radius: z.radius, band: 0, dirX: 0, dirY: 1, length: 0, vx: 0, vy: 0, elapsed: world.tick * world.dt, alpha: Math.min(1, z.ticksLeft / 30), seed: 0 });
     }
     for (const h of world.hazards) {
       const mv = world.rules.stage.moves[h.move];
@@ -2971,7 +2970,7 @@ export class RunScene extends Phaser.Scene {
         line: pr.shape[i] === SHAPE_LINE ? { length: pr.length[i]!, dirX: pr.dirX[i]!, dirY: pr.dirY[i]! } : null,
       });
     }
-    for (const z of world.zones) lingerItems.push({ recipeId: z.effect, x: z.x, y: z.y, radius: z.radius, line: null });
+    for (const z of world.zones) if (!z.unpainted) lingerItems.push({ recipeId: z.effect, x: z.x, y: z.y, radius: z.radius, line: null });
     this.effects.drawLinger(lingerItems, deltaMs);
     // 技のドット絵（技そのものだけ。効き方から出たものは今までどおり）
     this.floorSprites?.draw(pr, alpha, (i) => {
@@ -3065,6 +3064,8 @@ export class RunScene extends Phaser.Scene {
     this.blizzardSheet.update(world, this.time.now);
     this.waveSheet ??= new WaveSheet(this, spriteRender.depths.effects + 0.45, ARENA_FLOOR_DEPTH + 3);
     this.waveSheet.update(world, this.time.now);
+    this.auroraSheet ??= new AuroraSheet(this, spriteRender.depths.effects + 0.5, ARENA_FLOOR_DEPTH + 3);
+    this.auroraSheet.update(world, this.time.now);
     // 地面の一部なので、障害物・雑魚より下（作者の依頼）
     this.snowGround ??= new SnowGround(this, -500);
     this.snowGround.update(world, this.time.now, this.cameras.main);

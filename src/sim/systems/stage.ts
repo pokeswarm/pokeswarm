@@ -1960,7 +1960,7 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
         const y = hz.y + hz.dirY * d;
         const gap2 = (trail.spacing * 0.8) ** 2;
         if (world.zones.some((z) => (z.x - x) ** 2 + (z.y - y) ** 2 < gap2)) continue;
-        world.zones.push({ x, y, radius: trail.radius, ticksLeft: Math.round(trail.seconds / world.dt), slowPct: trail.slowPct, damagePerSecond: 0, color: '#b2ebf2', effect: trail.effect, sprite: true });
+        world.zones.push({ x, y, radius: trail.radius, ticksLeft: Math.round(trail.seconds / world.dt), slowPct: trail.slowPct, damagePerSecond: 0, color: '#b2ebf2', effect: move.effect, unpainted: true });
       }
     }
   }

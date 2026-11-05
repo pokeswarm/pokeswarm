@@ -16,6 +16,7 @@ import { EdgeArrows, type EdgeTarget } from '../render/EdgeArrows';
 import { EffectRenderer } from '../render/effects/EffectRenderer';
 import { audio } from '../audio';
 import { RunSounds } from '../audio/runSounds';
+import { LavaSea } from '../render/effects/LavaSea';
 import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
@@ -147,6 +148,8 @@ export class RunScene extends Phaser.Scene {
   private fallMoves = new Map<number, NonNullable<EffectRecipe['fall']>>();
   private fallSprites: MoveSprites | null = null;
   private overBossSprites: MoveSprites | null = null;
+  /** 溶岩の海（エンテイの ふんえん。07 の215章） */
+  private lavaSea: LavaSea | null = null;
   private falling = new Map<number, { x: number; y: number; radius: number; move: number }>();
   private fallShadows: Phaser.GameObjects.Graphics | null = null;
   /** 稲妻の線で描く技 */
@@ -312,6 +315,7 @@ export class RunScene extends Phaser.Scene {
     this.boxImages.clear();
     this.buffIcons = [];
     this.fieldOverlay = null;
+    this.lavaSea = null;
     this.overlayLast = null;
     this.overlayLevel = 0;
     this.glyphMarks = new Map();
@@ -1832,13 +1836,12 @@ export class RunScene extends Phaser.Scene {
         continue;
       }
       // 炎の柱の列（せいなるほのお）: 隣と重ならない四角で予告する
-      const gridOf = mv?.pillarRows ?? mv?.checker;
-      if (gridOf && this.sim.world.arena) {
-        if (h.activeTicks === undefined && h.ticksLeft <= Math.round(mv!.telegraphSeconds / this.sim.world.dt)) {
+      if (mv?.pillarRows && this.sim.world.arena) {
+        if (h.activeTicks === undefined && h.ticksLeft <= Math.round(mv.telegraphSeconds / this.sim.world.dt)) {
           const arena = this.sim.world.arena;
-          const cw = (arena.halfWidth * 2) / gridOf.cols;
-          const ch = (arena.halfHeight * 2) / gridOf.rows;
-          const p = 1 - h.ticksLeft / Math.round(mv!.telegraphSeconds / this.sim.world.dt);
+          const cw = (arena.halfWidth * 2) / mv.pillarRows.cols;
+          const ch = (arena.halfHeight * 2) / mv.pillarRows.rows;
+          const p = 1 - h.ticksLeft / Math.round(mv.telegraphSeconds / this.sim.world.dt);
           g.fillStyle(0xff1744, 0.14).fillRect(h.x - cw / 2, h.y - ch / 2, cw, ch);
           g.fillStyle(0xff1744, 0.2).fillRect(h.x - cw / 2, h.y + ch / 2 - ch * p, cw, ch * p);
         }
@@ -3005,6 +3008,8 @@ export class RunScene extends Phaser.Scene {
 
     this.drawHazards(world.hazards);
     this.drawFieldOverlay();
+    this.lavaSea ??= new LavaSea(this, ARENA_FLOOR_DEPTH + 3);
+    this.lavaSea.update(world, this.time.now);
     this.drawItems(timeMs);
     this.drawBoxes();
     this.obstacleView.update(world, view);

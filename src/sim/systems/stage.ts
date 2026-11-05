@@ -1043,20 +1043,13 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     castFireRing(world, move.fireRing, target);
     return;
   }
-  if (move.checker && world.arena) {
+  if (move.lavaRound && world.arena) {
+    put(bx, by, 0, 1, bossId);
     const a = world.arena;
-    const c = move.checker;
-    const w = (a.halfWidth * 2) / c.cols;
-    const h = (a.halfHeight * 2) / c.rows;
-    let first = true;
-    for (let r = 0; r < c.rows; r++) {
-      for (let k = 0; k < c.cols; k++) {
-        if ((r + k) % 2 !== c.odd) continue;
-        // 続きを 1 回だけ使うよう、ボスに結ぶのは 1 つだけ
-        addHazard(world, moveIdx, a.x - a.halfWidth + (k + 0.5) * w, a.y - a.halfHeight + (r + 0.5) * h, 0, 1, first ? bossId : -1, undefined, { group });
-        first = false;
-      }
-    }
+    const r = move.lavaRound;
+    const island = moveIndexOfStage(world.rules, r.island);
+    for (const [fx, fy] of r.layout) addHazard(world, island, a.x + fx * a.halfWidth, a.y + fy * a.halfHeight, 0, 1, -1, undefined, { group: world.nextHazardGroup++ });
+    addHazard(world, moveIndexOfStage(world.rules, r.sea), a.x, a.y, 0, 1, -1, undefined, { delay: Math.round(r.delaySeconds / world.dt) });
     return;
   }
   if (move.zigzag && world.arena && boss) {
@@ -1606,7 +1599,7 @@ function strikeHazards(world: World): void {
         if (hz.group !== undefined) world.hazardGroupsHit.delete(hz.group);
         hz.rehitTicks = Math.round(move.hitEverySeconds / world.dt);
       }
-      if (me && !me.down && me.invincibleTicks <= 0 && !hz.hitLocal && hazardHits(hz, me.x, me.y, me.radius, move)) {
+      if (me && !me.down && me.invincibleTicks <= 0 && !hz.hitLocal && (move?.lavaSea ? lavaSeaHits(world, hz, move, me.x, me.y) : hazardHits(hz, me.x, me.y, me.radius, move))) {
         hitLocal(world, me, hz, move);
         // 罠（ふいうち）: 踏んだ人の画面で、その場で飛び出す
         if (move?.trap) world.events.push(struckEvent(hz, move));
@@ -1728,9 +1721,35 @@ function strikeHazards(world: World): void {
       }
     }
     // 罠は踏んだときだけ当たる。ダメージの無い技（ため・強化・回復）は当てない
-    if (move?.trap || !me || me.down || me.invincibleTicks > 0 || (hz.damage <= 0 && !hz.damageOverride)) continue;
+    if (move?.trap || move?.lavaSea || !me || me.down || me.invincibleTicks > 0 || (hz.damage <= 0 && !hz.damageOverride)) continue;
     if (hazardHits(hz, me.x, me.y, me.radius, move)) hitLocal(world, me, hz, move);
   }
+}
+
+/** 溶岩の海の水位（壁からの距離。ワールドの単位）: 満ちて、そのままで、引く（07 の215章） */
+export function lavaSeaLevel(world: World, hz: World['hazards'][number], move: BossMove): number {
+  const a = world.arena;
+  const s = move.lavaSea;
+  if (!a || !s || hz.activeTicks === undefined) return 0;
+  const total = s.fillSeconds + s.fullSeconds + s.recedeSeconds;
+  const t = total - hz.activeTicks * world.dt;
+  // 真ん中まで届く高さ（見た目の揺らぎの分を足す）
+  const top = Math.min(a.halfWidth, a.halfHeight) + 40;
+  if (t < s.fillSeconds) return (top * t) / s.fillSeconds;
+  if (t < s.fillSeconds + s.fullSeconds) return top;
+  return Math.max(0, top * (1 - (t - s.fillSeconds - s.fullSeconds) / s.recedeSeconds));
+}
+
+/** (x, y) が溶岩の中で、岩の島の上でない */
+function lavaSeaHits(world: World, hz: World['hazards'][number], move: BossMove, x: number, y: number): boolean {
+  const a = world.arena;
+  const s = move.lavaSea;
+  if (!a || !s) return false;
+  const edge = Math.min(a.halfWidth - Math.abs(x - a.x), a.halfHeight - Math.abs(y - a.y));
+  if (edge > lavaSeaLevel(world, hz, move)) return false;
+  const moves = world.rules.stage.moves;
+  for (const h of world.hazards) if (moves[h.move]?.id === s.islands && (x - h.x) ** 2 + (y - h.y) ** 2 <= h.radius ** 2) return false;
+  return true;
 }
 
 /** 落ちたときの演出の知らせ */

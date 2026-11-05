@@ -720,8 +720,13 @@ export const bossMoveSchema = z.object({
    * gap 個分の切れ目は、マップの真ん中の側に開ける（壁に向かって開けない）
    */
   fireRing: z.object({ move: z.string().min(1), count: z.number().int().positive(), radius: z.number().positive(), gap: z.number().int().positive() }).optional(),
-  /** 市松模様（エンテイの ふんえん。07 の214章）: 固定マップを rows 段・cols 列に分け、odd（0 か 1）のマスに置く。予告は四角く描く */
-  checker: z.object({ cols: z.number().int().positive(), rows: z.number().int().positive(), odd: z.number().int().min(0).max(1) }).optional(),
+  /**
+   * 溶岩があふれる 1 回（エンテイの ふんえん。07 の215章）: 技 island の岩の島を layout の場所（マップの半分の広さに対する割合）にせり上げ、
+   * delaySeconds 後に技 sea の溶岩の海を出す
+   */
+  lavaRound: z.object({ island: z.string().min(1), sea: z.string().min(1), delaySeconds: z.number().nonnegative(), layout: z.array(z.tuple([z.number(), z.number()])).min(1) }).optional(),
+  /** 溶岩の海: 壁ぎわから fillSeconds で満ち、fullSeconds そのまま、recedeSeconds で引く。溶岩の中にいて、技 islands の島の上にいなければ当たる */
+  lavaSea: z.object({ islands: z.string().min(1), fillSeconds: z.number().positive(), fullSeconds: z.number().nonnegative(), recedeSeconds: z.number().positive() }).optional(),
   /** この技を使うときに、一緒に使う技（エンテイの ふんか: 止まっている間に火山弾を降らせる） */
   alsoCast: z.string().min(1).optional(),
   /** 使ったあと、次の技をこの秒数待つ（輪が閉じる間など） */

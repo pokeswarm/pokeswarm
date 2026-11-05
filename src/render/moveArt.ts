@@ -6605,9 +6605,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'entei-flame-a': () => ({ ...daimonjiFlame([{ cx: 0, h: 1, w: 0.62, m: 1, o: 0.4 }, { cx: -0.42, h: 0.58, w: 0.36, m: 2, o: 1.7 }, { cx: 0.44, h: 0.7, w: 0.34, m: 1, o: 3 }], 7121), palette: ENTEI_PALETTE }),
     'entei-flame-b': () => ({ ...daimonjiFlame([{ cx: 0.08, h: 0.92, w: 0.58, m: 1, o: 2.4 }, { cx: -0.38, h: 0.78, w: 0.38, m: 1, o: 4.4 }, { cx: 0.46, h: 0.5, w: 0.32, m: 2, o: 1.1 }], 7122), palette: ENTEI_PALETTE }),
     'entei-flame-c': () => ({ ...daimonjiFlame([{ cx: -0.06, h: 0.86, w: 0.66, m: 2, o: 4 }, { cx: 0.36, h: 0.72, w: 0.4, m: 1, o: 5.6 }, { cx: -0.48, h: 0.46, w: 0.3, m: 1, o: 1.4 }], 7123), palette: ENTEI_PALETTE }),
-    'entei-geyser-a': () => enteiGeyser(0),
-    'entei-geyser-b': () => enteiGeyser(2.4),
     'entei-rock': () => enteiRock(),
+    'entei-island': () => enteiIsland(),
     'entei-burst': () => ({ ...fireBlastBurst(), palette: ENTEI_PALETTE }),
     'entei-crack': () => enteiCrack(),
     'raikou-bolt': () => raikouBolt(),
@@ -7108,23 +7107,36 @@ function rainbowFeather(tilt: number): SpriteOut {
 /** エンテイの炎（ホウオウの だいもんじより赤く、黒い煙のふち。07 の214章）。番号は BONFIRE_PALETTE と同じ並び */
 const ENTEI_PALETTE = ['#1c0603', '#6e1003', '#b92207', '#ec4a0a', '#ff8412', '#ffbd3d', '#fff0b8'];
 
-/** ふんえんの溶岩の柱: 太い舌を重ねた噴き上がり。点いて伸びる 2 コマ → 揺れる 6 コマ。end は小さくなる */
-function enteiGeyser(seed: number): SpriteOut {
-  const W = 72;
-  const H = 88;
-  const rootY = 82;
-  const tongues: readonly FlameTongue[] = [
-    { cx: -0.4, h: 0.72, w: 0.44, m: 1, o: seed + 1.1 },
-    { cx: 0.4, h: 0.8, w: 0.42, m: 2, o: seed + 2.7 },
-    { cx: 0, h: 1, w: 0.58, m: 1, o: seed },
-    { cx: -0.62, h: 0.42, w: 0.3, m: 2, o: seed + 4 },
-    { cx: 0.64, h: 0.46, w: 0.28, m: 1, o: seed + 5.2 },
-  ];
-  const n = 7400 + Math.round(seed * 10);
-  const start = [0.5, 0.8].map((hs, f) => bonfire(W, H, rootY, tongues, hs, (f * Math.PI) / 3, n, 0));
-  const loop = [0, 1, 2, 3, 4, 5].map((f) => bonfire(W, H, rootY, tongues, 1 + Math.sin((f * Math.PI) / 3 + seed) * 0.05, (f * Math.PI) / 3, n, 4));
-  const end = [0.7, 0.42].map((hs, f) => bonfire(W, H, rootY, tongues, hs, (f * Math.PI) / 3, n, 0));
-  return { palette: ENTEI_PALETTE, frameMs: 70, loopFrom: 2, parts: { main: [...start, ...loop].map(toRows), end: end.map(toRows) } };
+/** ふんえんの岩の島（07 の215章）: せり上がる溶岩の海の中の足場。平らな岩の上面と、手前に見える側面。4 コマで大きくなる。end は沈む */
+function enteiIsland(): SpriteOut {
+  const palette = ['#120a08', '#241712', '#38261d', '#4d3628', '#654a35', '#7f6245', '#ff7a1a'];
+  const draw = (scale: number): Grid =>
+    shape(112, (u, v) => {
+      const a = Math.atan2(v, u);
+      const wob = 1 + 0.05 * Math.sin(a * 5 + 1) + 0.035 * Math.sin(a * 9 + 2) + 0.02 * Math.sin(a * 17);
+      const R = 0.8 * scale * wob;
+      const top = Math.hypot(u, v + 0.05 * scale);
+      const side = Math.hypot(u, v - 0.08 * scale);
+      if (top > R && side > R) return -1;
+      if (top > R) {
+        // 手前の側面: 下へ暗く、縦の筋
+        const n = hash(Math.floor((u + 1) * 16), 3, 8000);
+        return n > 0.7 ? 2 : v > 0.5 * scale ? 0 : 1;
+      }
+      const edge = 1 - top / R;
+      // 上面のふちは明るく、真ん中はひび割れた岩
+      if (edge < 0.05) return 5;
+      const px = Math.floor((u + 1) * 26);
+      const py = Math.floor((v + 1) * 26);
+      const n = hash(px, py, 8010);
+      const crack = Math.abs(Math.sin(u * 9 + Math.sin(v * 7) * 1.4)) < 0.05 && edge > 0.12;
+      if (crack) return 1;
+      const lit = (-u - v) * 0.45 + 0.5;
+      return n * 0.35 + lit * 0.65 > 0.62 ? 4 : n * 0.35 + lit * 0.65 > 0.42 ? 3 : 2;
+    }, 0, -1);
+  const main = [0.45, 0.65, 0.84, 1, 1].map(draw);
+  const end = [0.8, 0.55].map(draw);
+  return { palette, frameMs: 120, loopFrom: 4, parts: { main: main.map(toRows), end: end.map(toRows) } };
 }
 
 /** ふんかの火山弾: 黒い岩に赤く光るひび。まわりで炎が揺れる。4 コマ */

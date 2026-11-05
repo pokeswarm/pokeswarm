@@ -98,27 +98,63 @@ describe('エンテイ（07 の214章）', () => {
     void rules;
   });
 
-  it('ふんえん: HP 50% で 1 回。中央へ跳び、市松模様が入れ替わって 2 回噴き、そのあと止まる', () => {
+  it('ふんえん: HP 50% で 1 回。中央へ跳び、島の場所を変えて 2 回あふれ、そのあと止まる', () => {
     const { step, of, sim, bossIndex, rules } = setup();
     const e = sim.world.enemies;
     const a = sim.world.arena!;
     e.hp[bossIndex()] = e.maxHp[bossIndex()]! * 0.49;
     const seen: string[] = [];
-    let firstCells: string[] = [];
-    for (let t = 0; t < 30 * 12; t++) {
+    const layouts: string[] = [];
+    for (let t = 0; t < 30 * 20; t++) {
       step(1 / 30);
       for (const h of sim.world.hazards) {
         const id = rules.stage.moves[h.move]?.id ?? '';
         if (!seen.includes(id)) seen.push(id);
       }
-      if (firstCells.length === 0 && of('entei-lava-1').length > 0) {
-        firstCells = of('entei-lava-1').map((h) => h.x + ',' + h.y);
-        expect(firstCells.length).toBe(16);
-        expect(Math.abs(e.x[bossIndex()]! - a.x)).toBeLessThan(5);
-      }
-      for (const h of of('entei-lava-2')) expect(firstCells.includes(h.x + ',' + h.y)).toBe(false);
+      const isl = of('entei-island').map((h) => Math.round(h.x - a.x) + ',' + Math.round(h.y - a.y)).sort().join(' ');
+      if (isl && !layouts.includes(isl)) layouts.push(isl);
     }
-    for (const id of ['entei-to-center', 'entei-lava-1', 'entei-lava-2', 'entei-tired']) expect(seen).toContain(id);
+    for (const id of ['entei-to-center', 'entei-lava-1', 'entei-lava-2', 'entei-lava-sea', 'entei-tired']) expect(seen).toContain(id);
+    expect(layouts.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('溶岩: 壁ぎわから満ちる。溶岩より速く逃げられ、島の上なら当たらず、外なら当たる', () => {
+    const { step, sim, rules, force, p, of } = setup();
+    const a = sim.world.arena!;
+    const sea = rules.stage.moves.find((m) => m.id === 'entei-lava-sea')!.lavaSea!;
+    // 溶岩の先端はプレイヤーより遅い
+    expect((a.halfHeight + 40) / sea.fillSeconds).toBeLessThan(180);
+    const hurt = (x: number, y: number): number => {
+      force('entei-lava-1');
+      step(0.1);
+      p.x = a.x + x;
+      p.y = a.y + y;
+      const hp = p.hp;
+      for (let t = 0; t < 30 * 5.5; t++) {
+        p.x = a.x + x;
+        p.y = a.y + y;
+        p.invincibleTicks = 0;
+        step(1 / 30);
+      }
+      return hp - p.hp;
+    };
+    expect(hurt(336, 198)).toBe(0);
+    sim.world.hazards.length = 0;
+    expect(hurt(700, 0)).toBeGreaterThan(0);
+    void of;
+  });
+
+  it('溶岩: 端にいても、中央にはまだ届かない時間がある', () => {
+    const { step, sim, force, p } = setup();
+    const a = sim.world.arena!;
+    force('entei-lava-1');
+    step(1.5);
+    p.x = a.x + 200;
+    p.y = a.y + 80;
+    const hp = p.hp;
+    p.invincibleTicks = 0;
+    step(0.5);
+    expect(p.hp).toBe(hp);
   });
 
   it('1 分の中で、全部の技を使い、走り去って戻る', () => {

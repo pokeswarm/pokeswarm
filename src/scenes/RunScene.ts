@@ -40,7 +40,7 @@ import { abilityOf, pinchMods } from '../sim/ability';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World, gateDeadlineTick } from '../sim/world';
-import { applyDebugOverrides, applySoloParam, parseBossHpParam, parseGodParam, parseLegendParam, parseIntruderParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam, parseBossParam } from './debugOverrides';
+import { applyArenaParam, applyDebugOverrides, applySoloParam, parseBossHpParam, parseGodParam, parseLegendParam, parseIntruderParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam, parseBossParam } from './debugOverrides';
 import { addXp, applyOffer, itemFits, moveMaxLevel, recomputeModifiers } from '../sim/systems/leveling';
 import { shinySpriteKey } from '../meta/loadoutOptions';
 import { achievementPerks, regionAchieved } from '../meta/achievementPerks';
@@ -106,6 +106,9 @@ const BOSS_BARS_MAX = 4;
 const ARENA_SIDE_MARGIN = 80;
 const ARENA_FADE_MS = 700;
 const ARENA_FRAME_DEPTH = 4.9;
+/** 画面の中央に出す文字を出しておく時間（ミリ秒）。固定マップの登場の文字は短く */
+const ANNOUNCE_HOLD_MS = 2500;
+const ARENA_APPEAR_HOLD_MS = 1000;
 
 export class RunScene extends Phaser.Scene {
   private sim!: Simulation;
@@ -337,7 +340,7 @@ export class RunScene extends Phaser.Scene {
     const releaseWakeLock = holdScreenAwake();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, releaseWakeLock);
     if (this.playerSprite) registerPokemonAnimations(this, this.playerSprite);
-    const rules = applyDebugOverrides(buildSimRules(this.stageOfRegion.id), window.location.search);
+    const rules = applyArenaParam(applyDebugOverrides(buildSimRules(this.stageOfRegion.id), window.location.search), window.location.search);
     this.pathMoves = new Set(rules.moves.flatMap((m, k) => (m.effects.some((fx) => fx.puddle?.path) ? [k] : [])));
     this.lightningMoves = new Set(rules.moves.flatMap((m, k) => (effectRecipes[m.effect]?.lightningLine ? [k] : [])));
     this.boltMoves = new Map(rules.moves.flatMap((m, k) => { const b = effectRecipes[m.effect]?.bolt; return b ? [[k, b] as const] : []; }));
@@ -1120,10 +1123,10 @@ export class RunScene extends Phaser.Scene {
   }
 
   /** 画面の真ん中に、しばらくお知らせを出す */
-  private announce(text: string, color: string): void {
+  private announce(text: string, color: string, holdMs = ANNOUNCE_HOLD_MS): void {
     this.tweens.killTweensOf(this.announceText);
     this.announceText.setText(text).setColor(color).setAlpha(1);
-    this.tweens.add({ targets: this.announceText, alpha: 0, delay: 2500, duration: 600 });
+    this.tweens.add({ targets: this.announceText, alpha: 0, delay: holdMs, duration: 600 });
   }
 
   private onSimEvents(): void {
@@ -1251,7 +1254,8 @@ export class RunScene extends Phaser.Scene {
           : appeared.length === 2
           ? t(boss ? 'run.tagBossAppeared' : 'run.tagAppeared', { a: this.enemyName(appeared[0]!), b: this.enemyName(appeared[1]!) })
           : t(boss ? 'run.bossAppeared' : 'run.midbossAppeared', { name: this.enemyName(appeared[0]!) });
-      this.announce(text, boss ? '#ff8a65' : '#ffe082');
+      // 固定マップは上でボスが構え、すぐ技が始まるので、文字は短く
+      this.announce(text, boss ? '#ff8a65' : '#ffe082', w.arena ? ARENA_APPEAR_HOLD_MS : ANNOUNCE_HOLD_MS);
     }
   }
 

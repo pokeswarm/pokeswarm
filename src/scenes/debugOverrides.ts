@@ -140,3 +140,33 @@ export function parseSectionParam(search: string): number | null {
   const v = Number(new URLSearchParams(search).get('section'));
   return Number.isInteger(v) && v > 0 ? v : null;
 }
+
+/**
+ * テストプレイ: ?arena=1400,780,850 で、固定マップの広さ（横・縦）と見えるワールドの縦を変える（広さの見比べ。07 の204.2）。
+ * ボスの定位置と飛んでいく先は、広さの比で動かす。技の大きさは変えない
+ */
+export function applyArenaParam(rules: SimRules, search: string): SimRules {
+  const parts = (new URLSearchParams(search).get('arena') ?? '').split(',').map(Number);
+  const [width, height, view] = parts;
+  const lg = rules.stage.legendary;
+  if (!lg || parts.length !== 3 || !(width! > 0) || !(height! > 0) || !(view! > 0)) return rules;
+  const base = Object.values(lg.moveSets).find((set) => set.arena)?.arena;
+  if (!base) return rules;
+  const sx = width! / 2 / base.halfWidth;
+  const sy = height! / 2 / base.halfHeight;
+  const moveSets = Object.fromEntries(
+    Object.entries(lg.moveSets).map(([id, set]) => [
+      id,
+      set.arena
+        ? {
+            ...set,
+            arena: { ...set.arena, halfWidth: width! / 2, halfHeight: height! / 2, viewHeight: view! },
+            ...(set.anchor ? { anchor: { x: set.anchor.x * sx, y: set.anchor.y * sy } } : {}),
+          }
+        : set,
+    ]),
+  );
+  const moves = rules.stage.moves.map((m) => (m.flyTo ? { ...m, flyTo: { ...m.flyTo, x: m.flyTo.x * sx, y: m.flyTo.y * sy } } : m));
+  return { ...rules, stage: { ...rules.stage, moves, legendary: { ...lg, moveSets } } };
+}
+

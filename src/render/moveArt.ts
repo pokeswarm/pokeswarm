@@ -6602,7 +6602,15 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'sacred-pillar-c': () => sacredPillar(4.2),
     'sun-orb': () => sunOrb(),
     'rainbow-flame': () => rainbowFlame(),
-    'rainbow-burst': () => rainbowBurst(),
+    'rainbow-flame-out': () => rainbowFlameOut(),
+    'rainbow-feather-a': () => rainbowFeather(-0.14),
+    'rainbow-feather-b': () => rainbowFeather(0.2),
+    'rainbow-feather-c': () => rainbowFeather(0.5),
+    'sacred-flame-a': () => ({ ...daimonjiFlame([{ cx: 0, h: 1, w: 0.62, m: 1, o: 0 }, { cx: -0.42, h: 0.58, w: 0.36, m: 2, o: 1.3 }, { cx: 0.44, h: 0.7, w: 0.34, m: 1, o: 2.6 }], 7111), palette: SACRED_FLAME_PALETTE }),
+    'sacred-flame-b': () => ({ ...daimonjiFlame([{ cx: 0.08, h: 0.92, w: 0.58, m: 1, o: 2 }, { cx: -0.38, h: 0.78, w: 0.38, m: 1, o: 4 }, { cx: 0.46, h: 0.5, w: 0.32, m: 2, o: 0.7 }], 7112), palette: SACRED_FLAME_PALETTE }),
+    'sacred-flame-c': () => ({ ...daimonjiFlame([{ cx: -0.06, h: 0.86, w: 0.66, m: 2, o: 3.6 }, { cx: 0.36, h: 0.72, w: 0.4, m: 1, o: 5.2 }, { cx: -0.48, h: 0.46, w: 0.3, m: 1, o: 1 }], 7113), palette: SACRED_FLAME_PALETTE }),
+    'sacred-drop-orb': () => sacredDropOrb(),
+    'sacred-burst': () => ({ ...fireBlastBurst(), palette: SACRED_FLAME_PALETTE }),
     'venom-pool': () => venomPool(),
     'draco-meteor': () => dracoMeteor(),
     'draco-flare': () => dracoFlare(),
@@ -6889,38 +6897,51 @@ function fireBlastBurst(): SpriteOut {
   return { palette: BONFIRE_PALETTE, frameMs: 80, parts: { main: frames.map(toRows) } };
 }
 
-const SACRED_PALETTE = ['#2a0a00', '#e53935', '#ff9800', '#ffd54f', '#fffde7', '#43a047', '#1e88e5', '#8e24aa'];
+/** せいなるほのおの色（原作は青白い炎。07 の208章）。番号は BONFIRE_PALETTE と同じ並び */
+const SACRED_FLAME_PALETTE = ['#06214f', '#0f4fa8', '#2a86e0', '#5fb0f2', '#a3dcff', '#d9f3ff', '#ffffff'];
 
-/** せいなるほのおの 1 本の柱（幅いっぱいに噴き上がる。金色の芯に、虹色のふちが上へ流れる）。ph は揺れ、hs は高さ */
-function sacredColumn(hs: number, ph: number, seed: number): Grid {
-  const W = 66;
-  const H = 72;
-  const rootY = 66;
-  const g = fill(blank(W, H), (x, y) => {
-    const up = (rootY - y) / ((rootY - 4) * hs);
-    if (up > 1 || up < -0.07) return -1;
-    const q = Math.max(0, up);
-    const sway = Math.sin(q * 5 - ph + seed) * 5 * q;
-    const prof = q < 0.12 ? 0.82 + 0.18 * (q / 0.12) : Math.pow(1 - (q - 0.12) / 0.88, 0.62);
-    const rip = 1 + 0.1 * Math.sin(q * 12 - ph * 2 + seed * 2);
-    const half = 30 * prof * rip;
-    const off = Math.abs(x - (W - 1) / 2 - sway);
-    if (off > half) return -1;
-    const e = 1 - off / half;
-    if (e < 0.22 && q > 0.3 && Math.sin(y * 0.7 - ph * 3 + x * 0.5) > 0.78) return -1;
-    if (e < 0.16) return [1, 2, 3, 5, 6, 7][Math.abs(Math.floor(y / 6 + (ph * 3) / Math.PI)) % 6]!;
-    // 金色の中を、白い筋が上へ流れる（一面の白にしない）
-    const heat = e * (1 - q * 0.5) + Math.sin(x * 0.42 + y * 0.16 - ph * 2 + seed) * 0.13;
-    return heat > 0.72 ? 4 : heat > 0.4 ? 3 : 2;
+/** せいなるほのおが落ちてくる玉: 青いふちが渦を巻き、芯が白く焼ける。6 コマ */
+function sacredDropOrb(): SpriteOut {
+  const frames = [0, 1, 2, 3, 4, 5].map((f) => {
+    const ph = (f * Math.PI) / 3;
+    return shape(36, (u, v) => {
+      const a = Math.atan2(v, u);
+      const d = Math.hypot(u, v);
+      const edge = 0.7 + 0.1 * Math.sin(a * 5 + ph) + 0.07 * Math.sin(a * 8 - ph * 2) + 0.05 * Math.sin(a * 13 + ph * 3);
+      if (d > edge) return -1;
+      const heat = 1 - d / edge;
+      const swirl = Math.sin(a * 3 + d * 10 - ph * 2);
+      if (heat > 0.5) return 6;
+      if (heat > 0.36) return swirl > -0.2 ? 6 : 5;
+      if (heat > 0.24) return swirl > 0 ? 5 : 4;
+      if (heat > 0.12) return swirl > 0 ? 4 : 3;
+      return heat > 0.05 ? 2 : 1;
+    });
   });
-  return outline(g, 0);
+  return { palette: SACRED_FLAME_PALETTE, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
+/**
+ * せいなるほのおの 1 本の柱（青白い炎の舌を重ねる。1 枚の山の形にすると氷に見えた。07 の208章）。
+ * 点いて伸びる 2 コマ → 揺れる 6 コマ。end は小さくなって消える
+ */
 function sacredPillar(seed: number): SpriteOut {
-  const start = [0.28, 0.68].map((hs, f) => sacredColumn(hs, f * 1.05, seed));
-  const loop = [0, 1, 2, 3].map((f) => sacredColumn(1 - (f % 2) * 0.05, (f * Math.PI) / 2, seed));
-  const end = [0.66, 0.3].map((hs, f) => sacredColumn(hs, f * 1.05, seed));
-  return { palette: SACRED_PALETTE, frameMs: 75, loopFrom: 2, parts: { main: [...start, ...loop].map(toRows), end: end.map(toRows) } };
+  const W = 66;
+  const H = 76;
+  const rootY = 70;
+  const o = seed;
+  const tongues: readonly FlameTongue[] = [
+    { cx: -0.34, h: 0.7, w: 0.42, m: 1, o: o + 1.1 },
+    { cx: 0.36, h: 0.78, w: 0.4, m: 2, o: o + 2.7 },
+    { cx: 0.02, h: 1, w: 0.54, m: 1, o: o },
+    { cx: -0.56, h: 0.4, w: 0.28, m: 2, o: o + 4 },
+    { cx: 0.6, h: 0.44, w: 0.26, m: 1, o: o + 5.2 },
+  ];
+  const n = 7200 + Math.round(seed * 10);
+  const start = [0.55, 0.82].map((hs, f) => bonfire(W, H, rootY, tongues, hs, (f * Math.PI) / 3, n, 0));
+  const loop = [0, 1, 2, 3, 4, 5].map((f) => bonfire(W, H, rootY, tongues, 1 + Math.sin((f * Math.PI) / 3 + seed) * 0.05, (f * Math.PI) / 3, n, 4));
+  const end = [0.78, 0.55].map((hs, f) => bonfire(W, H, rootY, tongues, hs, (f * Math.PI) / 3, n, 0));
+  return { palette: SACRED_FLAME_PALETTE, frameMs: 70, loopFrom: 2, parts: { main: [...start, ...loop].map(toRows), end: end.map(toRows) } };
 }
 
 /** にほんばれ: 頭の上で大きくなる小さな太陽（白い丸と、回る光の筋） */
@@ -6944,16 +6965,8 @@ function sunOrb(): SpriteOut {
 
 const RAINBOW_PALETTE = ['#2b0f3a', '#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa', '#ffffff'];
 
-/**
- * 復活の虹炎（ホウオウ）: 灰を包む虹色の炎。色ごとの炎の舌を 7 枚、体のまわりに立てて重ねる（1 枚の絵を縞に塗らない）。
- * 舌はそれぞれ違う高さと揺れで、ふちが濃く、中ほどが明るい。6 コマ
- */
-function rainbowFlame(): SpriteOut {
-  const W = 72;
-  const H = 88;
-  const rootY = 80;
-  // 奥から手前の順（手前ほど低い）。色は RAINBOW_PALETTE の番号
-  const tongues = [
+/** 虹炎の舌（奥から手前の順。手前ほど低い）。c は RAINBOW_PALETTE の番号 */
+const RAINBOW_TONGUES = [
     { c: 5, cx: -0.5, h: 0.74, w: 0.34, m: 1, o: 0.4 },
     { c: 2, cx: 0.52, h: 0.8, w: 0.34, m: 2, o: 2.1 },
     { c: 6, cx: -0.18, h: 1, w: 0.42, m: 1, o: 3.3 },
@@ -6962,12 +6975,21 @@ function rainbowFlame(): SpriteOut {
     { c: 1, cx: 0.02, h: 0.62, w: 0.46, m: 2, o: 4.1 },
     { c: 5, cx: 0.62, h: 0.44, w: 0.28, m: 1, o: 2.8 },
   ];
+
+/**
+ * 復活の虹炎（ホウオウ）: 灰を包む虹色の炎。色ごとの炎の舌を 7 枚、体のまわりに立てて重ねる（1 枚の絵を縞に塗らない）。
+ * 舌はそれぞれ違う高さと揺れで、ふちが濃く、中ほどが明るい。6 コマ
+ */
+function rainbowFlame(): SpriteOut {
+  const W = 72;
+  const H = 88;
+  const rootY = 80;
   const frames = [0, 1, 2, 3, 4, 5].map((f) => {
     const ph = (f * Math.PI) / 3;
     const g = fill(blank(W, H), (x, y) => {
       const up = (rootY - y) / (rootY - 3);
       let col = -1;
-      for (const t of tongues) {
+      for (const t of RAINBOW_TONGUES) {
         const tt = up / t.h;
         if (tt > 1 || tt < -0.06) continue;
         const q = Math.max(0, tt);
@@ -6997,23 +7019,78 @@ function rainbowFlame(): SpriteOut {
   return { palette: RAINBOW_PALETTE, frameMs: 80, parts: { main: frames.map(toRows) } };
 }
 
-/** 復活の虹炎の終わり: 虹色の炎がはじけて外へ開く。5 コマ */
-function rainbowBurst(): SpriteOut {
-  const frames = [0, 1, 2, 3, 4].map((f) => {
-    const R = 0.4 + f * 0.14;
-    const hollow = f < 1 ? 0 : (f - 0.5) * 0.17;
-    return shape(72, (u, v) => {
-      const a = Math.atan2(v, u);
-      const d = Math.hypot(u, v);
-      const edge = R * (1 + 0.14 * Math.sin(a * 11 + f));
-      if (d > edge || d < hollow) return -1;
-      if (f >= 3 && hash(Math.floor(u * 24), Math.floor(v * 24), 7400 + f) < (f - 2) * 0.22) return -1;
-      if ((d - hollow) / Math.max(0.01, edge - hollow) < 0.3) return 7;
-      const band = Math.floor(((a + Math.PI) / (Math.PI * 2)) * 18 + d * 6);
-      return [1, 2, 3, 4, 5, 6][band % 6]!;
+/**
+ * 復活の虹炎の終わり: ホウオウが飛び出したあとの炎。根元から地面を離れて上へ伸び、細くなって消える（地面に何も残さない。07 の208章）。6 コマ
+ */
+function rainbowFlameOut(): SpriteOut {
+  const W = 72;
+  const H = 120;
+  const rootY = 110;
+  const stages = [
+    { st: 1.1, cut: 0.04, thin: 1 },
+    { st: 1.2, cut: 0.2, thin: 0.9 },
+    { st: 1.28, cut: 0.38, thin: 0.76 },
+    { st: 1.34, cut: 0.56, thin: 0.6 },
+    { st: 1.38, cut: 0.72, thin: 0.44 },
+    { st: 1.38, cut: 0.86, thin: 0.3 },
+  ];
+  const frames = stages.map((s, f) => {
+    const ph = (f * Math.PI) / 3;
+    const g = fill(blank(W, H), (x, y) => {
+      const up = (rootY - y) / 77;
+      let col = -1;
+      for (const t of RAINBOW_TONGUES) {
+        const tt = up / (t.h * s.st);
+        // 根元の切れ目はぎざぎざに、上へ上がっていく
+        if (tt > 1 || tt < s.cut + 0.05 * Math.sin(x * 0.9 + t.o)) continue;
+        const q = Math.max(0, tt);
+        const sway = Math.sin(q * 4.6 - ph * t.m + t.o) * W * 0.1 * Math.pow(q, 1.2) + (t.cx * W) / 2;
+        const prof = q < 0.16 ? 0.72 + 0.28 * Math.sqrt(q / 0.16) : Math.pow((1 - q) / 0.84, 0.92);
+        const half = Math.max(0.6, ((t.w * W) / 2) * prof * s.thin);
+        const e = 1 - Math.abs(x - (W - 1) / 2 - sway) / half;
+        if (e <= 0) continue;
+        if (e < 0.22 && Math.sin(y * 0.8 - ph * 2 + x * 0.55 + t.o) > 0.7) continue;
+        col = e > 0.66 && q < 0.62 ? 7 : t.c;
+      }
+      return col;
     });
+    return outline(g, 0);
   });
-  return { palette: RAINBOW_PALETTE, frameMs: 85, parts: { main: frames.map(toRows) } };
+  return { palette: RAINBOW_PALETTE, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * にじいろのはね（復活の虹炎でホウオウが落とす。07 の208章）: 根元の赤から先の紫へ色が移る 1 枚の羽。白い軸が通り、ふちに切れ込みがある。
+ * 軸を左右に揺らしながら落ちる。tilt は揺れの真ん中の傾き。8 コマ（揺れの周期は 8 × 140 ms）
+ */
+function rainbowFeather(tilt: number): SpriteOut {
+  const S = 30;
+  const frames = [0, 1, 2, 3, 4, 5, 6, 7].map((f) => {
+    const ang = tilt + Math.cos((f * Math.PI) / 4) * 0.5;
+    const c = Math.cos(ang);
+    const n = Math.sin(ang);
+    const g = fill(blank(S, S), (x, y) => {
+      const dx = x - (S - 1) / 2;
+      const dy = y - (S - 1) / 2;
+      const along = dx * n - dy * c;
+      const t = (along + 14) / 28;
+      if (t < 0 || t > 1) return -1;
+      // 軸は弓なりに曲がる
+      const across = dx * c + dy * n - 3.2 * (t - 0.45) * (t - 0.45) * 4;
+      // 根元の軸だけの所
+      if (t < 0.24) return Math.abs(across) < 0.8 ? 7 : -1;
+      const q = (t - 0.24) / 0.76;
+      // 細長く、先が丸い。片側は細い（鳥の羽）
+      const half = 5.6 * Math.pow(Math.sin(Math.PI * Math.pow(q, 0.62)), 0.6) * (across > 0 ? 1 : 0.68);
+      if (Math.abs(across) > half) return -1;
+      if (Math.abs(across) < 0.6) return 7;
+      // ふちの切れ込み（羽枝が割れた所）
+      if (Math.abs(across) > half * 0.5 && Math.sin(q * 30 + (across > 0 ? 1.4 : 0)) > 0.88) return -1;
+      return 1 + Math.min(5, Math.floor(q * 6));
+    });
+    return outline(g, 0);
+  });
+  return { palette: RAINBOW_PALETTE, frameMs: 140, parts: { main: frames.map(toRows) } };
 }
 
 /** どくどくのキバ: かんだ所に残る猛毒のたまり（紫の水たまりに黄緑の泡が立ってはじける）。3 コマ */

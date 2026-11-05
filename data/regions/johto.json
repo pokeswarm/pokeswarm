@@ -995,6 +995,13 @@
         ],
         "hpMoves": [
           {
+            "belowHpPct": 66.33,
+            "moves": [
+              "hooh-sacred-circuit",
+              "hooh-fly-top"
+            ]
+          },
+          {
             "belowHpPct": 50,
             "moves": [
               "hooh-sunny-day"

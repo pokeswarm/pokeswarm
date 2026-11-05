@@ -280,7 +280,7 @@ export interface World {
     /** 技の間隔を、技が終わってから数える */
     intervalAfterMove?: boolean;
     /** 飛んでいく先（技の flyTo。07 の203章） */
-    flyTo?: { x: number; y: number; speed: number };
+    flyTo?: { x: number; y: number; speed: number; boost?: number };
     /** 寄られたら割り込む技（ふきとばし。07 の204章）。homeY は定位置の高さ */
     reactive?: { move: number; within: number; every: number; next: number; homeY: number };
     /** ため中に受けられる残りのダメージと、超えたときの技（じこさいせい。07 の204章） */

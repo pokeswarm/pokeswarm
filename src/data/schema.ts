@@ -624,7 +624,16 @@ export const bossMoveSchema = z.object({
    * 技を始めると、ボスが固定マップの中心から (x, y) の場所へ速さ speed で飛んでいく（07 の203章）。
    * randomSide なら x の左右をランダムに選ぶ
    */
-  flyTo: z.object({ x: z.number(), y: z.number(), speed: z.number().positive(), randomSide: z.boolean().optional() }).optional(),
+  flyTo: z
+    .object({
+      x: z.number(),
+      y: z.number(),
+      speed: z.number().positive(),
+      randomSide: z.boolean().optional(),
+      /** 飛び出すときに足す速さ。更新ごとに 15 % ずつ減っていき、speed だけになる（ホウオウが炎から飛び出す。07 の208章） */
+      boost: z.number().positive().optional(),
+    })
+    .optional(),
   /** ボスの HP が belowHpPct % を切ると、count をこの数にする（ルギアの エアロブラストの玉。07 の204章） */
   lowHpCount: z.object({ belowHpPct: z.number().gt(0).lt(100), count: z.number().int().positive() }).optional(),
   /** 狙わず、固定マップを count 個の区画に分けて、区画ごとのランダムな場所へ落とす（ルギアの エアロブラスト。満遍なく。07 の204.1） */
@@ -668,6 +677,29 @@ export const bossMoveSchema = z.object({
   chainPauseSeconds: z.number().nonnegative().optional(),
   /** 突進の通った跡に、技 move の炎を spacing ごとに残す（ホウオウの ブレイブバード。07 の207章） */
   flameTrail: z.object({ move: z.string().min(1), spacing: z.number().positive() }).optional(),
+  /**
+   * 予告の間ずっと、固定マップの中心のまわりの楕円を laps 周する（ホウオウの せいなるほのお。07 の208章）。
+   * 今の場所から楕円へ 0.8 秒で入る。1 周の時間は telegraphSeconds ÷ laps
+   */
+  orbit: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), laps: z.number().positive() }).optional(),
+  /**
+   * 予告の間、飛びながら技 move を everySeconds ごとに落とす（07 の208章）。startSeconds までは落とさない。
+   * 落ちる場所は、自分の場所から中心の方へ 0〜inwardMax ずらし、scatter の分ばらつかせる。aimEvery 回に 1 回は狙った人の場所へ
+   */
+  flyDrop: z
+    .object({
+      move: z.string().min(1),
+      everySeconds: z.number().positive(),
+      startSeconds: z.number().nonnegative().default(0),
+      inwardMax: z.number().nonnegative().default(0),
+      scatter: z.number().nonnegative().default(0),
+      aimEvery: z.number().int().positive().optional(),
+    })
+    .optional(),
+  /** 予告の間は空にいて、触れても当たらない（07 の208章） */
+  airborne: z.boolean().optional(),
+  /** 落ちた所から、技 move を count 個、等しい角度で広げる（bullets の技なら外へ飛ぶ）。radius があれば、その中のばらばらの場所に出す（07 の208章） */
+  scatterOnLand: z.object({ move: z.string().min(1), count: z.number().int().positive(), radius: z.number().positive().optional() }).optional(),
   /** 1 回の戦いで使える回数（回復の技を繰り返して HP が減らなくなるのを防ぐ。使い切ったら順番を飛ばす。07 の193章） */
   maxUses: z.number().int().positive().optional(),
   leaves: z
@@ -2033,6 +2065,10 @@ const moveSpriteSpec = z.object({
   chargeGrow: z.boolean().optional(),
   /** 予告の間に、ボスの場所（offsetY の分ずらす）から当たる場所へ飛んでいく（風の玉。07 の204章） */
   fromBoss: z.boolean().optional(),
+  /** 予告の間に、技の向き（dirX, dirY）の分だけ離れた所から当たる場所へ、山なりに飛んでいく（ホウオウが落とす火の玉。07 の208章） */
+  fromDir: z.boolean().optional(),
+  /** 当たっている間に、pixels だけ下へ落ちながら sway の幅で period 秒ごとに左右へ揺れる（ひらひら落ちる羽。07 の208章） */
+  fall: z.object({ pixels: z.number().positive(), sway: z.number().nonnegative(), period: z.number().positive() }).optional(),
   /** circle: 消える前の seconds 秒は、薄くせず部品 end のコマを進める（炎が小さくなって燃え尽きる。07 の207章） */
   endSeconds: z.number().positive().optional(),
   /** front の絵の真ん中を置く所（届く距離に対する割合。向きの先）。口の絵は 0.6。自分を含む長方形（ブレイズキック）は手前に */

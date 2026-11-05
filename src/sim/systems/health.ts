@@ -7,6 +7,11 @@ import type { PlayerId } from '../commands';
 import type { Player } from '../entities/player';
 import type { World } from '../world';
 
+/** 空を飛んでいる技の途中で、触れても当たらない（ホウオウの周回。予告の知らせはゲストにも届く。07 の208章） */
+function isAirborne(world: World, enemyId: number): boolean {
+  return world.hazards.some((h) => h.dasher === enemyId && h.activeTicks === undefined && !!world.rules.stage.moves[h.move]?.airborne);
+}
+
 /**
  * 自分が敵に触れたかを判定し、ダメージを受ける（01_game_design.md 2.3: 自分に関わることは自分のブラウザで判定する）。
  * 無敵時間の間は受けない。重なっている敵のうち一番大きいダメージを1回だけ受ける。
@@ -29,7 +34,7 @@ export function contactDamage(world: World): void {
     const r = me.radius + e.radius[i]!;
     // あついしぼう: ほのお・こおりタイプの敵からは減る（特性。07 の133章）
     const dmg = e.damage[i]! * contactDamageMultiplier(world, i) * abilityContactTaken(world, me, i);
-    if (dx * dx + dy * dy <= r * r && dmg > worst) {
+    if (dx * dx + dy * dy <= r * r && dmg > worst && !isAirborne(world, e.id[i]!)) {
       worst = dmg;
       worstAt = i;
     }

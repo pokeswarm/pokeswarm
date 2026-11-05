@@ -191,6 +191,104 @@ describe('ホウオウ（07 の207章）', () => {
     expect(e.hp[bossIndex()]! / e.maxHp[bossIndex()]!).toBeCloseTo(0.25, 3);
   });
 
+  it('HP 66.33% で 1 回、マップの中を周回しながら炎を落とし、落ちた所から小さな炎が広がる', () => {
+    const { sim, step, bossIndex, ids } = setup();
+    const e = sim.world.enemies;
+    const a = sim.world.arena!;
+    const moves = sim.world.rules.stage.moves;
+    const boss = sim.world.bosses[0]!;
+    boss.hpMoves = boss.hpMoves!.slice(0, 1);
+    e.hp[bossIndex()] = e.maxHp[bossIndex()]! * 0.6633;
+    let found = false;
+    for (let t = 0; t < 30 * 20 && !found; t++) {
+      step(1 / 30);
+      found = ids().includes('hooh-sacred-circuit');
+    }
+    expect(found).toBe(true);
+    const seen = new Set<unknown>();
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+    const sparkDirs = new Set<string>();
+    for (let t = 0; t < 30 * 14; t++) {
+      step(1 / 30);
+      const i = bossIndex();
+      minX = Math.min(minX, e.x[i]!);
+      maxX = Math.max(maxX, e.x[i]!);
+      minY = Math.min(minY, e.y[i]!);
+      maxY = Math.max(maxY, e.y[i]!);
+      for (const h of sim.world.hazards) {
+        const id = moves[h.move]?.id;
+        if (id === 'hooh-sacred-drop') {
+          seen.add(h);
+          expect(Math.abs(h.x - a.x)).toBeLessThanOrEqual(a.halfWidth);
+          expect(Math.abs(h.y - a.y)).toBeLessThanOrEqual(a.halfHeight);
+        }
+        if (id === 'hooh-sacred-spark') sparkDirs.add(`${h.dirX.toFixed(2)},${h.dirY.toFixed(2)}`);
+      }
+    }
+    // 楕円をひと回りする（端まで行く）。壁の中にいる
+    expect(maxX - a.x).toBeGreaterThan(560);
+    expect(a.x - minX).toBeGreaterThan(560);
+    expect(maxY - a.y).toBeGreaterThan(260);
+    expect(a.y - minY).toBeGreaterThan(260);
+    expect(maxX - a.x).toBeLessThan(a.halfWidth);
+    expect(maxY - a.y).toBeLessThan(a.halfHeight);
+    expect(seen.size).toBeGreaterThan(18);
+    expect(sparkDirs.size).toBeGreaterThan(8);
+    // 小さな炎はプレイヤーより遅く、元の炎より小さい
+    const drop = moves.find((m) => m.id === 'hooh-sacred-drop')!;
+    const spark = moves.find((m) => m.id === 'hooh-sacred-spark')!;
+    expect(spark.bullets!.speed).toBeLessThanOrEqual(180);
+    expect(spark.radius).toBeLessThan(drop.radius);
+    // 周回の後は奥へ戻り、もう周回しない
+    step(4);
+    expect(e.y[bossIndex()]).toBeCloseTo(a.y - 240, 0);
+    for (let t = 0; t < 30 * 20; t++) {
+      step(1 / 30);
+      expect(ids()).not.toContain('hooh-sacred-circuit');
+    }
+  });
+
+  it('周回の間は、触れても当たらない', () => {
+    const { sim, step, force, bossIndex } = setup();
+    const p = sim.world.players[0]!;
+    const e = sim.world.enemies;
+    force('hooh-sacred-circuit');
+    step(1);
+    const hp = p.hp;
+    p.invincibleTicks = 0;
+    p.x = e.x[bossIndex()]!;
+    p.y = e.y[bossIndex()]!;
+    // 落ちてくる炎は当たらないようにして、体だけを確かめる
+    const hz = sim.world.hazards;
+    for (let h = hz.length - 1; h >= 0; h--) if (sim.world.rules.stage.moves[hz[h]!.move]?.id !== 'hooh-sacred-circuit') hz.splice(h, 1);
+    step(1 / 30);
+    expect(p.hp).toBe(hp);
+  });
+
+  it('復活の虹炎: 炎から飛び出して奥へ舞い上がり、羽は当たらず、地面に何も残らない', () => {
+    const { sim, step, force, bossIndex, ids } = setup();
+    const e = sim.world.enemies;
+    const a = sim.world.arena!;
+    sim.world.bosses[0]!.hpMoves = [];
+    e.hp[bossIndex()] = e.maxHp[bossIndex()]! * 0.1;
+    force('hooh-rekindling-flame');
+    sim.world.bosses[0]!.interval = 30 * 100;
+    step(8.3);
+    expect(ids()).toContain('hooh-rekindle-rise');
+    expect(ids()).toContain('hooh-rainbow-feather');
+    // 飛び出しは速い
+    expect(a.y - e.y[bossIndex()]!).toBeGreaterThan(90);
+    const hp = sim.world.players[0]!.hp;
+    step(2);
+    expect(e.y[bossIndex()]).toBeCloseTo(a.y - 240, 0);
+    expect(sim.world.players[0]!.hp).toBe(hp);
+    step(3.5);
+    expect(ids().filter((id) => id !== undefined && id !== 'hooh-fire-blast' && !id.startsWith('hooh-sacred'))).toEqual([]);
+  });
+
   it('突進の途中で HP が切れても、復活の虹炎を捨てない', () => {
     const { sim, step, force, bossIndex, ids } = setup();
     const e = sim.world.enemies;

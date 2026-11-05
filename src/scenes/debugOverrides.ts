@@ -166,7 +166,11 @@ export function applyArenaParam(rules: SimRules, search: string): SimRules {
         : set,
     ]),
   );
-  const moves = rules.stage.moves.map((m) => (m.flyTo ? { ...m, flyTo: { ...m.flyTo, x: m.flyTo.x * sx, y: m.flyTo.y * sy } } : m));
+  const moves = rules.stage.moves.map((m) => ({
+    ...m,
+    ...(m.flyTo ? { flyTo: { ...m.flyTo, x: m.flyTo.x * sx, y: m.flyTo.y * sy } } : {}),
+    ...(m.orbit ? { orbit: { ...m.orbit, halfWidth: m.orbit.halfWidth * sx, halfHeight: m.orbit.halfHeight * sy } } : {}),
+  }));
   return { ...rules, stage: { ...rules.stage, moves, legendary: { ...lg, moveSets } } };
 }
 

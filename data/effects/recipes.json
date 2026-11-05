@@ -6086,6 +6086,20 @@
       "extends": "fire.base",
       "bossActive": { "id": "sacred-pillar-a", "variants": ["sacred-pillar-a", "sacred-pillar-b", "sacred-pillar-c"], "fit": "circle", "size": 1, "originY": 0.55, "endSeconds": 0.16 }
     },
+    "boss-hooh-sacred-drop": {
+      "extends": "fire.base",
+      "bossTelegraph": { "id": "sacred-drop-orb", "fit": "circle", "size": 0.6, "overBoss": true, "fromDir": true },
+      "strike": { "id": "sacred-burst", "fit": "circle", "size": 1.5, "seconds": 0.4 },
+      "bossActive": { "id": "sacred-flame-a", "variants": ["sacred-flame-a", "sacred-flame-b", "sacred-flame-c"], "fit": "circle", "size": 1.25, "originY": 0.86, "endSeconds": 0.3 }
+    },
+    "boss-hooh-sacred-spark": {
+      "extends": "fire.base",
+      "bossActive": { "id": "sacred-flame-a", "variants": ["sacred-flame-a", "sacred-flame-b", "sacred-flame-c"], "fit": "circle", "size": 1.45, "originY": 0.72 }
+    },
+    "boss-hooh-feather": {
+      "extends": "fire.base",
+      "bossActive": { "id": "rainbow-feather-a", "variants": ["rainbow-feather-a", "rainbow-feather-b", "rainbow-feather-c"], "fit": "circle", "size": 1, "overBoss": true, "fall": { "pixels": 230, "sway": 22, "period": 1.12 } }
+    },
     "boss-hooh-trail": {
       "extends": "fire.base",
       "bossActive": { "id": "daimonji-flame-a", "variants": ["daimonji-flame-a", "daimonji-flame-b", "daimonji-flame-c"], "fit": "circle", "size": 1.15, "originY": 0.86, "endSeconds": 0.36 }
@@ -6103,7 +6117,7 @@
     "boss-hooh-rekindle": {
       "extends": "fire.base",
       "bossTelegraph": { "id": "rainbow-flame", "fit": "circle", "size": 1.6, "overBoss": true, "originY": 0.82, "alpha": 0.88 },
-      "strike": { "id": "rainbow-burst", "fit": "circle", "size": 3, "seconds": 0.45 }
+      "strike": { "id": "rainbow-flame-out", "fit": "circle", "size": 1.6, "originY": 0.851, "seconds": 0.42 }
     },
     "boss-aeroblast": {
       "extends": "flying.base",

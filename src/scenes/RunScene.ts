@@ -1794,7 +1794,7 @@ export class RunScene extends Phaser.Scene {
     let countdowns = 0;
     for (const h of hazards) {
       // 飛ぶ玉（サンダーの電気の玉）: 飛んでいる間は黄色い玉
-      if (h.activeTicks !== undefined && this.sim.world.rules.stage.moves[h.move]?.bullets) {
+      if (h.activeTicks !== undefined && this.sim.world.rules.stage.moves[h.move]?.bullets && !effectRecipes[this.sim.world.rules.stage.moves[h.move]?.effect ?? '']?.bossActive) {
         g.fillStyle(0xfff176, 0.35).fillCircle(h.x, h.y, h.radius * 1.6);
         g.fillStyle(0xffeb3b, 1).fillCircle(h.x, h.y, h.radius);
         g.fillStyle(0xffffff, 1).fillCircle(h.x, h.y, h.radius * 0.45);
@@ -2120,7 +2120,7 @@ export class RunScene extends Phaser.Scene {
       if (!baseSpec) continue;
       // 同じ絵が揃って揺れないよう、場所で絵を選ぶ（炎の字）
       const spec = baseSpec.variants?.length ? { ...baseSpec, id: baseSpec.variants[Math.abs(Math.round(h.x * 7 + h.y * 13)) % baseSpec.variants.length]! } : baseSpec;
-      const total = active ? Math.max(1, Math.round((mv.bounce?.seconds ?? mv.sweep?.seconds ?? mv.trap?.seconds ?? mv.activeSeconds ?? world.rules.stage.bossRules.hazardActiveSeconds) / world.dt)) : h.totalTicks;
+      const total = active ? Math.max(1, Math.round((mv.bounce?.seconds ?? mv.sweep?.seconds ?? mv.trap?.seconds ?? mv.activeSeconds ?? mv.bullets?.seconds ?? world.rules.stage.bossRules.hazardActiveSeconds) / world.dt)) : h.totalTicks;
       const left = active ? (h.activeTicks ?? 0) : h.ticksLeft;
       const elapsed = (total - left) * world.dt;
       const grow = 1 + ((mv.bounce?.growPct ?? 0) * (h.bounces ?? 0)) / 100;
@@ -2136,6 +2136,19 @@ export class RunScene extends Phaser.Scene {
         const x = spec.fromBoss ? bx + (h.x - bx) * p : bx;
         const y = spec.fromBoss ? by + (h.y - by) * p : by;
         out.push({ spec, x, y, radius: spec.chargeGrow ? h.radius * (0.15 + 0.85 * p) : h.radius, band: 0, dirX: 0, dirY: 1, length: 0, vx: 0, vy: 1, elapsed, alpha: 1, seed: h.group ?? 0 });
+        continue;
+      }
+      // ホウオウが落とす火の玉: 落としたときのホウオウの場所から、山なりに落ちる先へ
+      if (!active && spec.fromDir) {
+        const p = Math.min(1, elapsed / Math.max(0.1, mv.telegraphSeconds));
+        out.push({ spec, x: h.x + h.dirX * (1 - p), y: h.y + h.dirY * (1 - p) - Math.sin(p * Math.PI) * 70, radius: h.radius, band: 0, dirX: 0, dirY: 1, length: 0, vx: 0, vy: 1, elapsed, alpha: 1, seed: h.group ?? 0 });
+        continue;
+      }
+      // ひらひら落ちる羽: 場所で少しずつ大きさと落ちる長さを変える（地面に着く前に消える）
+      if (active && spec.fall) {
+        const v = Math.abs(Math.round(h.x * 3 + h.y * 5)) % 7;
+        const t = elapsed + v * 0.16;
+        out.push({ spec, x: h.x + Math.sin((t * Math.PI * 2) / spec.fall.period) * spec.fall.sway, y: h.y + (spec.fall.pixels * (0.8 + v * 0.07) * elapsed) / (total * world.dt), radius: h.radius * (0.8 + v * 0.07), band: 0, dirX: 0, dirY: 1, length: 0, vx: 0, vy: 1, elapsed: t, alpha, seed: 0 });
         continue;
       }
       // 落ちてくる絵（コメットパンチの拳）: 予告の間に上から落ち、落ちる先の赤い円の上に着く

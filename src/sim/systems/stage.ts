@@ -430,6 +430,7 @@ export function bossAttacks(world: World): void {
           (boss.forced ??= []).push(re.move);
         }
       }
+      stepBossFlight(world, boss, i);
       // HP で放つ大技（ピカチュウのボルテッカー）: 今の技が終わり次第、順に使う
       const next = boss.hpMoves?.[0];
       if (next && world.enemies.hp[i]! <= world.enemies.maxHp[i]! * next.belowRatio) {
@@ -444,21 +445,6 @@ export function bossAttacks(world: World): void {
       // 天気で歩く速さが変わる（止まって出す技の間は止まったまま）
       if (world.rules.stage.legendary?.moveSets[world.rules.enemies.kinds[world.enemies.kind[i]!]?.id ?? '']?.weatherStates && !bossBusy(world, boss.id) && !world.hazards.some((h) => h.dasher === boss.id && world.rules.stage.moves[h.move]?.rooted && h.activeTicks === undefined)) {
         world.enemies.speed[i] = bossSpeed(world, boss, i);
-      }
-      // 飛んでいく先へ進む（ルギアが降りてくる。07 の203章）
-      if (boss.flyTo) {
-        const dx = boss.flyTo.x - world.enemies.x[i]!;
-        const dy = boss.flyTo.y - world.enemies.y[i]!;
-        const d = Math.hypot(dx, dy);
-        const step = boss.flyTo.speed * world.dt;
-        if (d <= step) {
-          world.enemies.x[i] = boss.flyTo.x;
-          world.enemies.y[i] = boss.flyTo.y;
-          boss.flyTo = undefined;
-        } else {
-          world.enemies.x[i] = world.enemies.x[i]! + (dx / d) * step;
-          world.enemies.y[i] = world.enemies.y[i]! + (dy / d) * step;
-        }
       }
       // 技が終わってから間隔を数える（間隔のぶん必ず歩く）
       if (boss.intervalAfterMove && bossBusy(world, boss.id)) {
@@ -677,6 +663,87 @@ function enrageBoss(world: World, boss: World['bosses'][number], i: number): voi
   world.events.push({ type: 'legendaryWarning', kind: world.enemies.kind[i]!, enraged: true });
 }
 
+/** 楕円へ入るのにかける秒数（周回の始まり。ホウオウの せいなるほのお） */
+const ORBIT_APPROACH_SECONDS = 0.8;
+
+/** ボスが飛ぶ: 周回・飛んでいく先へ進む・飛びながら技を落とす（ソロ・ホスト。位置はゲストへ送る。ルギアが降りてくる。07 の203章・208章） */
+function stepBossFlight(world: World, boss: World['bosses'][number], i: number): void {
+  const e = world.enemies;
+  let orbiting = false;
+  for (const hz of world.hazards) {
+    if (hz.dasher !== boss.id || hz.activeTicks !== undefined) continue;
+    const move = world.rules.stage.moves[hz.move];
+    if (!move) continue;
+    const elapsed = hz.totalTicks - hz.ticksLeft;
+    const a = world.arena;
+    if (move.orbit && a) {
+      orbiting = true;
+      const o = move.orbit;
+      // 始めの場所（予告の場所）の角度から周り始める。始めの 0.8 秒で楕円へ寄せる
+      const th = Math.atan2((hz.y - a.y) / o.halfHeight, (hz.x - a.x) / o.halfWidth) + (Math.PI * 2 * o.laps * elapsed) / Math.max(1, hz.totalTicks);
+      const k = Math.min(1, (elapsed * world.dt) / ORBIT_APPROACH_SECONDS);
+      const blend = k * k * (3 - 2 * k);
+      e.x[i] = hz.x + (a.x + Math.cos(th) * o.halfWidth - hz.x) * blend;
+      e.y[i] = hz.y + (a.y + Math.sin(th) * o.halfHeight - hz.y) * blend;
+    }
+    const drop = move.flyDrop;
+    if (drop) {
+      const from = elapsed - Math.round(drop.startSeconds / world.dt);
+      const every = Math.max(1, Math.round(drop.everySeconds / world.dt));
+      if (from >= 0 && from % every === 0) dropFromFlight(world, boss.id, i, drop, Math.floor(from / every));
+    }
+  }
+  if (orbiting) {
+    boss.flyTo = undefined;
+    return;
+  }
+  if (boss.flyTo) {
+    const dx = boss.flyTo.x - e.x[i]!;
+    const dy = boss.flyTo.y - e.y[i]!;
+    const d = Math.hypot(dx, dy);
+    const step = (boss.flyTo.speed + (boss.flyTo.boost ?? 0)) * world.dt;
+    if (boss.flyTo.boost) boss.flyTo.boost *= 0.85;
+    if (d <= step) {
+      e.x[i] = boss.flyTo.x;
+      e.y[i] = boss.flyTo.y;
+      boss.flyTo = undefined;
+    } else {
+      e.x[i] = e.x[i]! + (dx / d) * step;
+      e.y[i] = e.y[i]! + (dy / d) * step;
+    }
+  }
+}
+
+/** 飛んでいるボスが技を 1 つ落とす。向きは落ちる場所からボスまでの差（飛んでいく絵の出どころ。fromDir） */
+function dropFromFlight(world: World, bossId: number, i: number, drop: NonNullable<BossMove['flyDrop']>, n: number): void {
+  const bx = world.enemies.x[i]!;
+  const by = world.enemies.y[i]!;
+  let x = bx;
+  let y = by;
+  const aimed = drop.aimEvery && n % drop.aimEvery === 0 ? (legendTargetOf(world, bossId) ?? nearestPlayer(world, bx, by)) : null;
+  if (aimed) {
+    x = aimed.x;
+    y = aimed.y;
+  } else {
+    const a = world.arena;
+    if (a && drop.inwardMax > 0) {
+      const dx = a.x - bx;
+      const dy = a.y - by;
+      const d = Math.hypot(dx, dy) || 1;
+      const k = world.rng.range(0, Math.min(drop.inwardMax, d));
+      x += (dx / d) * k;
+      y += (dy / d) * k;
+    }
+    if (drop.scatter > 0) {
+      const [rx, ry] = randomUnit(world.rng);
+      const k = world.rng.range(0, drop.scatter);
+      x += rx * k;
+      y += ry * k;
+    }
+  }
+  addHazard(world, moveIndexOfStage(world.rules, drop.move), x, y, bx - x, by - y, -1, undefined, { group: world.nextHazardGroup++ });
+}
+
 /** ボスが自分の場所から出す技の途中か（予告の間止まる・跳ぶ・消える技、波の続きが残っている） */
 function bossBusy(world: World, id: number): boolean {
   if (world.bossQueue.some((q) => q.bossId === id)) return true;
@@ -789,7 +856,7 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   if (move.rooted) world.enemies.speed[i] = 0;
   if (move.flyTo && boss && world.arena) {
     const side = move.flyTo.randomSide && world.rng.next() < 0.5 ? -1 : 1;
-    boss.flyTo = { x: world.arena.x + move.flyTo.x * side, y: world.arena.y + move.flyTo.y, speed: move.flyTo.speed };
+    boss.flyTo = { x: world.arena.x + move.flyTo.x * side, y: world.arena.y + move.flyTo.y, speed: move.flyTo.speed, ...(move.flyTo.boost ? { boost: move.flyTo.boost } : {}) };
   }
   if (move.interruptDamage && boss) boss.interrupt = { left: (world.enemies.maxHp[i]! * move.interruptDamage.hpPct) / 100, move: moveIndexOfStage(world.rules, move.interruptDamage.breakMove) };
   const dx0 = target.x - bx;
@@ -1286,6 +1353,18 @@ function strikeHazards(world: World): void {
       if (hz.shape === 'line') for (let d = 0; d <= hz.length; d += hz.radius * 1.5) add(hz.x + hz.dirX * d, hz.y + hz.dirY * d);
       else add(hz.x, hz.y);
     }
+    // 落ちた所から広げる（せいなるほのおの小さな炎・復活の虹炎の羽。ホストが決めてゲストへ送る）
+    if (move?.scatterOnLand && world.role !== 'guest') {
+      const sc = move.scatterOnLand;
+      const idx = moveIndexOfStage(world.rules, sc.move);
+      const group = world.nextHazardGroup++;
+      const a0 = world.rng.range(0, Math.PI * 2);
+      for (let k = 0; k < sc.count; k++) {
+        const a = a0 + (k * Math.PI * 2) / sc.count;
+        const d = sc.radius ? world.rng.range(0, sc.radius) : 0;
+        addHazard(world, idx, hz.x + Math.cos(a) * d, hz.y + Math.sin(a) * d, Math.cos(a), Math.sin(a), -1, undefined, { group });
+      }
+    }
     // 突進: 線に沿って進む（ノックバックの仕組みで動かす。ホストが動かし、位置はゲストへ送る）
     if (hz.dasher !== -1 && move?.dashSpeed && world.role !== 'guest') {
       const i = findEnemyIndex(world, hz.dasher);
@@ -1343,6 +1422,9 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
     // 飛ぶ玉（サンダー）: 向きへまっすぐ進む
     hz.x += hz.dirX * bullets.speed * world.dt;
     hz.y += hz.dirY * bullets.speed * world.dt;
+    // 固定マップの壁で消える
+    const a = world.arena;
+    if (a && (Math.abs(hz.x - a.x) > a.halfWidth || Math.abs(hz.y - a.y) > a.halfHeight)) hz.activeTicks = 1;
     return;
   }
   if (move.surfRing) {

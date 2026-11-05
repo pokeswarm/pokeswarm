@@ -1021,7 +1021,17 @@ export const stageConfigSchema = z.object({
       intruders: z
         .object({
           /** kinds を全部同時に出す（ラティアス ＋ ラティオス。07 の189章） */
-          together: z.boolean().optional(), minutes: z.array(z.number().positive()).min(1), chance: z.number().min(0).max(1), kinds: z.array(z.string().min(1)).min(1), timeLimitSeconds: z.number().positive() })
+          together: z.boolean().optional(),
+          minutes: z.array(z.number().positive()).min(1),
+          chance: z.number().min(0).max(1),
+          kinds: z.array(z.string().min(1)).min(1),
+          timeLimitSeconds: z.number().positive(),
+          /**
+           * 乱入の HP = 今いる区間の中ボス（rank midboss）の HP × この倍率（07 の210章）。区間に中ボスがいなければ次の中ボス、後ろにいなければ最後の中ボス。
+           * 省略なら enemies.json の hp のまま。協力プレイの人数倍はこの後にかかる
+           */
+          hpTimesMidboss: z.number().positive().optional(),
+        })
         .optional(),
     })
     .nullable(),

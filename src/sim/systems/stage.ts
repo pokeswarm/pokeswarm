@@ -262,7 +262,7 @@ export function stepIntruders(world: World): void {
       if (world.tick < it.appearTick) return;
       // ラティ兄妹は2体一緒に。ほかは1体
       const kinds = cfg?.together ? cfg.kinds.map((id) => world.rules.enemies.kinds.findIndex((k) => k.id === id)) : [it.kind];
-      const ids = kinds.map((k) => spawnLegend(world, k));
+      const ids = kinds.map((k) => spawnLegend(world, k, intruderHpScale(world, k)));
       // 出せなかった（敵の上限）なら、次の更新で出し直す
       if (ids.some((id) => id === -1)) return;
       it.id = ids[0]!;
@@ -295,6 +295,18 @@ export function stepIntruders(world: World): void {
     if (kind !== -1) startIntruder(world, kind);
     return;
   }
+}
+
+/** 乱入の HP の倍率: 今いる区間の中ボスの HP に合わせる（火力は進むほど伸びるので、いつ出ても倒すまでの時間が揃う。07 の210章） */
+function intruderHpScale(world: World, kind: number): number {
+  const times = world.rules.stage.legendary?.intruders?.hpTimesMidboss;
+  const kinds = world.rules.enemies.kinds;
+  const base = kinds[kind]?.hp;
+  if (!times || !base) return 1;
+  const mids = world.rules.stage.bosses.filter((b) => kinds.find((k) => k.id === b.kind)?.rank === 'midboss');
+  const mid = mids.find((b) => b.wave >= world.section) ?? mids[mids.length - 1];
+  const midHp = mid && kinds.find((k) => k.id === mid.kind)?.hp;
+  return midHp ? (midHp * times) / base : 1;
 }
 
 /** 伝説を乱入させる（「DANGER」の後に出る）。確認用の ?intruder= からも呼ぶ */

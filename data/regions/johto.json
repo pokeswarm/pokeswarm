@@ -604,7 +604,8 @@
         "legend-entei",
         "legend-suicune"
       ],
-      "timeLimitSeconds": 180
+      "timeLimitSeconds": 180,
+      "hpTimesMidboss": 16
     },
     "moveSets": {
       "red-pikachu": {

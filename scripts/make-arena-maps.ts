@@ -622,12 +622,135 @@ function raikouWall(): (Rgb | null)[] {
   return out;
 }
 
+// --- エンテイ: 冷えて固まった溶岩の台地（玄武岩の六角の柱に灰が積もる。真ん中に古い火口の跡。07 の217章） ---
+
+/** 炎の赤と橙が映えるよう、床は赤くせず、青みのある暗い灰色にする（溶岩の海も床の上に出る） */
+const BASALT = ['#201f27', '#28272f', '#312f37', '#3a3840', '#45424a'].map(hex);
+const ASH = ['#3b3a40', '#47454b', '#535056'].map(hex);
+
+function enteiFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
+  const floor: Rgb[] = [];
+  const shimmerA: (Rgb | null)[] = [];
+  const shimmerB: (Rgb | null)[] = [];
+  const seam = hex('#15141b');
+  const seamLight = hex('#514e56');
+  const glintA = hex('#a8532a');
+  const glintB = hex('#d98a4c');
+  const rimLit = hex('#5b5760');
+  const rimDark = hex('#1b1a21');
+  const CALDERA = 150;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const dx = x - W / 2 + 0.5;
+    const dy = y - H / 2 + 0.5;
+    const r = Math.hypot(dx, dy) + (fbm(x / 16, y / 16, 401) - 0.5) * 16;
+    const out = Math.hypot(dx / (W / 2), dy / (H / 2));
+    // 不揃いな玄武岩の柱（揃った六角形は機械のパネルに見えた）。柱ごとの高さで明るさが変わる
+    const cell = worley(x, y, 15, 403);
+    let t = 0.42 + (hash2(cell.id, 1, 403) - 0.5) * 0.5 + (fbm(x / 70, y / 70, 405) - 0.5) * 0.3 - 0.14 * Math.max(0, out - 0.8);
+    // 火口の中は一段低く暗い
+    if (r < CALDERA) t -= 0.18;
+    let col = ramp(BASALT, t, x, y);
+    // 継ぎ目は所々だけ（どこでも引くと石畳に見える）
+    const seamed = fbm(x / 40, y / 40, 406) > 0.44 || r < CALDERA;
+    if (seamed && cell.edge < 0.9) col = seam;
+    else if (seamed && cell.edge < 2 && cell.dy > 0) col = seamLight;
+    // 灰が筋になって積もる（継ぎ目を隠す）
+    const ash = fbm(x / 58 + y / 120, y / 26, 407);
+    if (ash > 0.6 && r > CALDERA + 12) {
+      const k = (ash - 0.6) * 4;
+      if (hash2(x, y, 409) < k + 0.25) col = ramp(ASH, k + (fbm(x / 7, y / 7, 411) - 0.5) * 0.7, x, y);
+    }
+    // 火口のふち: 外へ傾いた砕けた岩
+    const ring = r - CALDERA;
+    const rimW = 8 + 6 * fbm(Math.atan2(dy, dx) * 5 + 9, 3, 412);
+    if (ring > -2 && ring < rimW) {
+      const a = Math.atan2(dy, dx);
+      // 左上から光が当たる: 外側の斜面は上と左が明るく、内側の斜面は下と右が明るい
+      const lit = (-Math.sin(a) * 0.55 - Math.cos(a) * 0.3) * (ring > rimW / 2 ? 1 : -1) + 0.5;
+      const rock = worley(x, y, 7, 413);
+      const v = (hash2(rock.id, 3, 414) - 0.5) * 0.5 + lit;
+      col = rock.edge < 0.7 ? rimDark : v > 0.62 ? rimLit : v > 0.36 ? BASALT[3]! : BASALT[1]!;
+    } else if (ring > -22 && ring <= -2) {
+      // 内側に落ちる影（上の縁の影が深い）
+      const a = Math.atan2(dy, dx);
+      if (-Math.sin(a) * 0.7 + (ring + 22) / 22 > 0.95 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < 0.6) col = rimDark;
+    }
+    // 火口の底から外へ走る古いひび
+    const a2 = Math.atan2(dy, dx);
+    const crack = Math.abs(Math.sin(a2 * 7 + (fbm(r / 22, 3, 415) - 0.5) * 3.2));
+    if (r > 26 && r < CALDERA - 6 && crack < 0.022 + 0.4 / Math.max(30, r)) col = seam;
+    // 残り火: 継ぎ目の所々（まばら・弱く）
+    let glint = 0;
+    if (seamed && cell.edge < 1.2) {
+      const n = valueNoise(x / 6, y / 6, r < CALDERA ? 417 : 419);
+      const th = r < CALDERA ? 0.72 : 0.86;
+      if (n > th) glint = hash2(cell.id, 5, 421) > 0.5 ? 1 : 2;
+    }
+    // 壁ぎわの影
+    const edgeD = Math.min(x, W - 1 - x);
+    const shade = Math.max(0, 1 - y / 20) * 0.65 + Math.max(0, 1 - edgeD / 12) * 0.5 + Math.max(0, 1 - (H - 1 - y) / 8) * 0.45;
+    if (shade > (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16) col = [Math.round(col[0] * 0.62), Math.round(col[1] * 0.62), Math.round(col[2] * 0.68)];
+    floor.push(col);
+    shimmerA.push(glint === 1 ? glintA : null);
+    shimmerB.push(glint === 2 ? glintB : null);
+  }
+  return { floor, shimmerA, shimmerB };
+}
+
+const ASH_SKY = ['#0d0b12', '#141118', '#1c171f', '#251d26'].map(hex);
+
+function enteiWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const dark = hex('#08070c');
+  const rimLight = hex('#5e5a63');
+  const rimDark = hex('#111016');
+  const mountain = hex('#0f0d14');
+  const mountainFar = hex('#17141c');
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = inset(iy, 21) - ix;
+    const fromRight = ix - (W - 1 - inset(iy, 22));
+    const fromTop = inset(ix, 23) - iy;
+    const fromBottom = iy - (H - 1 - inset(ix, 24));
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    let col: Rgb;
+    const ridgeTop = 13 + fbm(x / 22, 7, 431) * 6;
+    if (iy < 0 && -iy > ridgeTop) {
+      // 奥: 灰の空と遠くの山の影（タイマーの後ろは暗いまま）
+      const smoke = fbm(x / 60, y / 11, 433);
+      col = ramp(ASH_SKY, (iy + MARGIN) / MARGIN * 0.5 + (smoke - 0.45) * 0.8, x, y);
+      if (-iy < 26 + fbm(x / 70, 3, 435) * 18) col = mountainFar;
+      if (-iy < 20 + fbm(x / 40, 5, 437) * 8) col = mountain;
+    } else {
+      // 手前の崖: ごつごつした黒い岩（左上が明るい丸い塊）
+      const stone = worley(x, y, 20, 439);
+      const round2 = (stone.dx + stone.dy) / 20;
+      const t = 0.46 + round2 * 0.42 + (hash2(stone.id, 2, 440) - 0.5) * 0.3 + (fbm(x / 34, y / 34, 441) - 0.5) * 0.28 - Math.max(0, dist - 8) * 0.012;
+      col = ramp(BASALT, t, x, y);
+      if (stone.edge < 0.8) col = hex('#111016');
+      if (dist > MARGIN - 14 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (dist - (MARGIN - 14)) / 14) col = dark;
+    }
+    // 歩ける端: 灰をかぶった岩のふち
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 4) col = rimLight;
+    out.push(col);
+  }
+  return out;
+}
+
 const outDir = path.join('public', 'map', 'johto');
 fs.mkdirSync(outDir, { recursive: true });
 const arenas = [
   { id: 'lugia', ...lugiaFloor(), wall: lugiaWall() },
   { id: 'hooh', ...hoohFloor(), wall: hoohWall() },
   { id: 'raikou', ...raikouFloor(), wall: raikouWall() },
+  { id: 'entei', ...enteiFloor(), wall: enteiWall() },
 ];
 for (const a of arenas) {
   fs.writeFileSync(path.join(outDir, `arena-${a.id}-floor.png`), toPng(a.floor, W, H));

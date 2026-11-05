@@ -911,7 +911,14 @@
         "arena": {
           "halfWidth": 800,
           "halfHeight": 440,
-          "viewHeight": 960
+          "viewHeight": 960,
+          "map": {
+            "floor": "map/johto/arena-entei-floor.png",
+            "wall": "map/johto/arena-entei-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2,
+            "shimmer": ["map/johto/arena-entei-shimmer-a.png", "map/johto/arena-entei-shimmer-b.png"]
+          }
         },
         "anchor": {
           "x": 0,

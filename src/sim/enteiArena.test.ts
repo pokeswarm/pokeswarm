@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { buildSimRules } from '../data/simRules';
 import { Simulation } from './simulation';
@@ -35,6 +37,13 @@ function setup() {
 }
 
 describe('エンテイ（07 の214章）', () => {
+  it('固定マップの絵があり、その画像が public にある', () => {
+    const { sim } = setup();
+    const map = sim.world.arena!.map!;
+    expect(map.floor).toBe('map/johto/arena-entei-floor.png');
+    for (const file of [map.floor, map.wall, ...(map.shimmer ?? [])]) expect(fs.existsSync(path.join('public', file))).toBe(true);
+  });
+
   it('歩く速さはプレイヤーより遅く、体のまわりの炎はない', () => {
     const { sim, rules, bossIndex } = setup();
     expect(sim.world.enemies.speed[bossIndex()]).toBeDefined();

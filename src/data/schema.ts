@@ -629,6 +629,8 @@ export const bossMoveSchema = z.object({
       x: z.number(),
       y: z.number(),
       speed: z.number().positive(),
+      /** 狙った人から遠い側の端へ（スイクンの オーロラビームの前。07 の226章） */
+      farSide: z.boolean().optional(),
       randomSide: z.boolean().optional(),
       /** 飛び出すときに足す速さ。更新ごとに 15 % ずつ減っていき、speed だけになる（ホウオウが炎から飛び出す。07 の208章） */
       boost: z.number().positive().optional(),
@@ -733,7 +735,7 @@ export const bossMoveSchema = z.object({
    * 固定マップの端から端まで届く波（スイクンの なみのり。07 の218章）: ボスのいる側の端から反対側へ、技 line の帯を speed で進める。切れ目 gap は狙った人の近く。
    * 予告が終わると、ボスも波と一緒に反対側へ走る
    */
-  arenaWave: z.object({ line: z.string().min(1), speed: z.number().positive(), gap: z.number().positive() }).optional(),
+  arenaWave: z.object({ line: z.string().min(1), speed: z.number().positive(), pastCenter: z.number().nonnegative(), shiftSpeed: z.number().positive() }).optional(),
   /** 専用の光の幕の絵で描く（スイクンの オーロラビーム。07 の222章） */
   auroraBeam: z.boolean().optional(),
   /** 専用の波の絵で描く（スイクンの なみのり。07 の221章） */

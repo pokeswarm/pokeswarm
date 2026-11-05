@@ -80,7 +80,8 @@ export function moveEnemies(world: World): void {
       }
     }
 
-    if (best > relocate2) {
+    // 固定マップでは移し替えない（端にいるボスが、遠い端のプレイヤーのそばへ飛んでしまう。07 の226章）
+    if (best > relocate2 && !world.arena) {
       // 中ボス・ボスは消さない（移し替える）
       if (retire && !waveKinds.includes(e.kind[i]!) && (world.rules.enemies.kinds[e.kind[i]!]?.rank ?? 'normal') === 'normal') {
         e.hp[i] = 0;

@@ -1073,7 +1073,7 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   // 予告の間止まる技（ファイヤーのゴッドバード。ゲストも予告の知らせで止める）
   if (move.rooted) world.enemies.speed[i] = 0;
   if (move.flyTo && boss && world.arena) {
-    const side = move.flyTo.randomSide && world.rng.next() < 0.5 ? -1 : 1;
+    const side = move.flyTo.farSide ? (target.x >= world.arena.x ? -1 : 1) : move.flyTo.randomSide && world.rng.next() < 0.5 ? -1 : 1;
     boss.flyTo = { x: world.arena.x + move.flyTo.x * side, y: world.arena.y + move.flyTo.y, speed: move.flyTo.speed, ...(move.flyTo.boost ? { boost: move.flyTo.boost } : {}) };
   }
   if (move.interruptDamage && boss) boss.interrupt = { left: (world.enemies.maxHp[i]! * move.interruptDamage.hpPct) / 100, move: moveIndexOfStage(world.rules, move.interruptDamage.breakMove) };
@@ -1111,8 +1111,12 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   }
   if (move.arenaWave && world.arena) {
     put(bx, by, 0, 1, bossId);
-    const gapY = castArenaWave(world, move.arenaWave, bx, target);
-    if (boss) boss.waveGapY = gapY;
+    const rideY = castArenaWave(world, move.arenaWave, bx);
+    // 波が来る側へ先に寄る（上か下かが、動きでも分かる）
+    if (boss) {
+      boss.waveRideY = rideY;
+      boss.flyTo = { x: bx, y: rideY, speed: move.arenaWave.shiftSpeed };
+    }
     return;
   }
   if (move.blizzardRound && world.arena) {
@@ -1375,18 +1379,19 @@ function clampToArena(world: World, x: number, y: number): [number, number] {
 }
 
 /** なみのり（07 の218章）: ボスのいる側の端から反対側へ進む帯。切れ目は狙った人の近く */
-function castArenaWave(world: World, w: NonNullable<BossMove['arenaWave']>, bx: number, target: World['players'][number]): number {
+function castArenaWave(world: World, w: NonNullable<BossMove['arenaWave']>, bx: number): number {
   const a = world.arena!;
   const line = moveIndexOfStage(world.rules, w.line);
   const side = bx >= a.x ? 1 : -1;
   const x = a.x + side * a.halfWidth;
   const top = a.y - a.halfHeight;
   const bottom = a.y + a.halfHeight;
-  const gapY = Math.max(top + w.gap / 2 + 20, Math.min(bottom - w.gap / 2 - 20, target.y + world.rng.range(-110, 110)));
-  const group = world.nextHazardGroup++;
-  addHazard(world, line, x, top, 0, 1, -1, undefined, { group, length: gapY - w.gap / 2 - top, vx: -side * w.speed, vy: 0 });
-  addHazard(world, line, x, gapY + w.gap / 2, 0, 1, -1, undefined, { group, length: bottom - (gapY + w.gap / 2), vx: -side * w.speed, vy: 0 });
-  return gapY;
+  // 上か下かの半分（真ん中を少し越える。真ん中に立っていると当たる）
+  const upper = world.rng.next() < 0.5;
+  const from = upper ? top : a.y - w.pastCenter;
+  const to = upper ? a.y + w.pastCenter : bottom;
+  addHazard(world, line, x, from, 0, 1, -1, undefined, { group: world.nextHazardGroup++, length: to - from, vx: -side * w.speed, vy: 0 });
+  return (from + to) / 2;
 }
 
 /** 地割れ（07 の214章）: 割れ目の線（予告と、光る裂け目）と、根元から順に立つ炎 */
@@ -2038,14 +2043,9 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
   // 波と一緒に反対側へ走る（なみのり）
   if (move.arenaWave && boss && world.arena) {
     const side = world.enemies.x[i]! >= world.arena.x ? 1 : -1;
-    // 波の上を走る: 切れ目を通らない高さへ少しずつ寄る
+    // 波の上を走る（波の真ん中の高さ）
     const a = world.arena;
-    const gapY = boss.waveGapY ?? a.y + a.halfHeight;
-    const clear = move.arenaWave.gap / 2 + 110;
-    let rideY = world.enemies.y[i]!;
-    if (Math.abs(rideY - gapY) < clear) rideY = gapY + (gapY > a.y ? -clear : clear);
-    rideY = Math.max(a.y - a.halfHeight + 70, Math.min(a.y + a.halfHeight - 70, rideY));
-    boss.flyTo = { x: a.x - side * (a.halfWidth - 80), y: rideY, speed: move.arenaWave.speed };
+    boss.flyTo = { x: a.x - side * (a.halfWidth - 80), y: boss.waveRideY ?? world.enemies.y[i]!, speed: move.arenaWave.speed };
   }
   // 受けたダメージの分だけ、鏡の破片が飛ぶ（ミラーコート）
   if (move.mirrorShards) {

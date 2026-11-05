@@ -97,7 +97,7 @@ describe('スイクンの登場（07 の218章）', () => {
 });
 
 describe('スイクンの技（07 の218章）', () => {
-  it('なみのり: 端から反対側へ帯が進み、切れ目がある。スイクンも一緒に走る', () => {
+  it('なみのり: 端から反対側へ、上か下かの半分に帯が進む。スイクンも一緒に走る', () => {
     const { step, of, force, sim, bossIndex } = setup();
     const a = sim.world.arena!;
     force('suicune-to-side', 'suicune-surf');
@@ -107,35 +107,65 @@ describe('スイクンの技（07 の218章）', () => {
     expect(Math.abs(startX - a.x)).toBeGreaterThan(600);
     step(1);
     const waves = of('suicune-wave');
-    expect(waves.length).toBe(2);
-    const [w1, w2] = waves;
-    const gap = w2!.y - (w1!.y + w1!.length);
-    expect(gap).toBeGreaterThan(250);
+    expect(waves.length).toBe(1);
+    const w1 = waves[0]!;
+    // 壁から真ん中を越えるまで
+    const upper = w1.y <= a.y - a.halfHeight + 1;
+    if (upper) expect(w1.y + w1.length).toBeGreaterThan(a.y);
+    else {
+      expect(w1.y).toBeLessThan(a.y);
+      expect(w1.y + w1.length).toBeCloseTo(a.y + a.halfHeight, 0);
+    }
+    // スイクンは波の側へ寄る
+    expect(Math.sign(sim.world.enemies.y[bossIndex()]! - a.y)).toBe(upper ? -1 : 1);
     step(2);
     expect(Math.sign(sim.world.enemies.x[bossIndex()]! - startX)).toBe(-Math.sign(startX - a.x));
-    expect(Math.abs(w1!.x - (a.x + Math.sign(startX - a.x) * a.halfWidth))).toBeGreaterThan(100);
+    expect(Math.abs(w1.x - (a.x + Math.sign(startX - a.x) * a.halfWidth))).toBeGreaterThan(100);
   });
 
-  it('なみのり: 切れ目の見た目の中にいれば当たらない', () => {
-    const { step, of, force, sim, p, bossIndex } = setup();
-    const a = sim.world.arena!;
-    const e = sim.world.enemies;
-    e.x[bossIndex()] = a.x - 720;
-    force('suicune-surf');
-    step(0.1);
-    const [w1, w2] = of('suicune-wave');
-    const top = w1!.y + w1!.length;
-    const bottom = w2!.y;
-    // 切れ目の端の近く（プレイヤーの半径の分だけ内側）に立つ
-    const hp = p.hp;
-    for (let t = 0; t < 30 * 5; t++) {
-      p.x = a.x + 300;
-      p.y = top + 14;
-      p.invincibleTicks = 0;
-      step(1 / 30);
-      if (t === 0) expect(bottom - top).toBeGreaterThan(200);
+  it('なみのり: 真ん中に立っていると当たり、波の来ない側へ逃げれば当たらない', () => {
+    const run = (stand: 'middle' | 'away'): number => {
+      const { step, of, force, sim, p, bossIndex } = setup();
+      const a = sim.world.arena!;
+      sim.world.enemies.x[bossIndex()] = a.x - 720;
+      force('suicune-surf');
+      step(0.1);
+      const w = of('suicune-wave')[0]!;
+      const upper = w.y <= a.y - a.halfHeight + 1;
+      // 波の切れ目のすぐ外（プレイヤーの半径の分だけ外）
+      const safeY = upper ? w.y + w.length + 16 : w.y - 16;
+      const hp = p.hp;
+      for (let t = 0; t < 30 * 5; t++) {
+        p.x = a.x + 300;
+        p.y = stand === 'middle' ? a.y : safeY;
+        p.invincibleTicks = 0;
+        step(1 / 30);
+      }
+      return hp - p.hp;
+    };
+    expect(run('middle')).toBeGreaterThan(0);
+    expect(run('away')).toBe(0);
+  });
+
+  it('オーロラビームの前に、狙った人から遠い端へ移ってから撃つ', () => {
+    for (const side of [-1, 1]) {
+      const { step, of, force, sim, p, bossIndex } = setup();
+      const a = sim.world.arena!;
+      sim.world.enemies.x[bossIndex()] = a.x + side * 720;
+      p.x = a.x + side * 500;
+      p.y = a.y;
+      force('suicune-to-far-side', 'suicune-aurora');
+      let n = 0;
+      while (of('suicune-aurora').length === 0 && n++ < 200) {
+        p.x = a.x + side * 500;
+        p.y = a.y;
+        step(1 / 30);
+      }
+      const beam = of('suicune-aurora')[0]!;
+      // 遠い側の端で、スイクンのいる所から撃つ
+      expect(beam.x - a.x).toBeCloseTo(-side * 720, -1);
+      expect(Math.abs(sim.world.enemies.x[bossIndex()]! - beam.x)).toBeLessThan(8);
     }
-    expect(p.hp).toBe(hp);
   });
 
   it('オーロラビーム: 向きが回り、通った跡に凍った床が残る。床は当たらない', () => {
@@ -169,7 +199,9 @@ describe('スイクンの技（07 の218章）', () => {
     expect(none).toBe(8);
     expect(many).toBeGreaterThan(none);
     const shard = buildSimRules('johto').stage.moves.find((m) => m.id === 'suicune-shard')!;
-    expect(shard.bullets!.speed).toBeLessThan(180);
+    // 狙わず放射状に飛ぶので、プレイヤーより速くてよい（作者の依頼。07 の226章）
+    expect(shard.bullets!.speed).toBeGreaterThan(180);
+    expect(shard.homing).toBeUndefined();
   });
 
   it('ふぶき: HP 50% で 1 回。氷の塊の風下は当たらず、外は当たる。風向きが変わる', () => {

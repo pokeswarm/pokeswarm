@@ -142,5 +142,31 @@
     "dark": "dark-burst",
     "steel": "metal-shard",
     "fairy": "gleam-burst"
-  }
+  },
+  "motions": [
+    {
+      "kind": "strut",
+      "seconds": 1,
+      "lift": 2
+    },
+    {
+      "kind": "spin",
+      "seconds": 0.7,
+      "lift": 3
+    },
+    {
+      "kind": "hop",
+      "seconds": 0.7,
+      "lift": 10
+    },
+    {
+      "kind": "pose",
+      "seconds": 1
+    },
+    {
+      "kind": "flip",
+      "seconds": 0.8,
+      "lift": 24
+    }
+  ]
 }

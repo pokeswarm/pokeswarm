@@ -2416,6 +2416,8 @@ export const contestConfigSchema = z.object({
   crowdBonus: z.number().nonnegative(),
   /** NPC の披露する技（技のキー） */
   npcMoves: z.record(z.string(), z.array(z.string())).default({}),
+  /** 技を出していない間に順に回すアピールの動き（strut・spin・hop・flip・pose）。seconds は 1 回の長さ、lift は跳ぶ高さ */
+  motions: z.array(z.object({ kind: z.enum(['strut', 'spin', 'hop', 'flip', 'pose']), seconds: z.number().positive(), lift: z.number().nonnegative().optional() })).default([]),
   /** 絵の無い技を披露するときの、タイプごとの絵（技のドット絵の id） */
   typeArt: z.record(z.string(), z.string()).default({}),
 });

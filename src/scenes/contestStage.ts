@@ -17,6 +17,37 @@ interface Atlas {
   image: HTMLImageElement;
   frames: Record<string, { frame: { x: number; y: number; w: number; h: number } }>;
   blank?: Map<string, number>;
+  counts?: Map<string, number>;
+}
+
+/** 舞台の上の 1 コマの動き */
+interface Motion {
+  /** 使う絵の動き（先に見つかったもの。無ければ歩き） */
+  anim: readonly string[];
+  /** 向き（0 が正面。絵は 8 方向） */
+  dir: number;
+  /** その動きの進み（0〜1） */
+  progress: number;
+  /** 体の回転（ラジアン）と、持ち上げる高さ */
+  rotate: number;
+  lift: number;
+  /** 絵のコマを時間で回し続ける */
+  loop: boolean;
+}
+
+const REST: Motion = { anim: ['Idle', 'Walk'], dir: 0, progress: 0, rotate: 0, lift: 0, loop: true };
+
+/**
+ * アピールの動き: strut（左右に体を揺らして歩く）・spin（その場で 8 方向を回る）・hop（跳ねる）・
+ * flip（跳びながら縦に 1 回転）・pose（決めポーズ。絵に攻撃やためがあれば使う。無ければ胸を張って止まる）
+ */
+function shapeMotion(kind: string, p: number, lift: number): Motion {
+  const arc = 4 * p * (1 - p);
+  if (kind === 'spin') return { anim: ['Walk'], dir: Math.floor(p * 8) % 8, progress: p, rotate: 0, lift: lift * arc, loop: true };
+  if (kind === 'hop') return { anim: ['Walk'], dir: 0, progress: p, rotate: 0, lift: lift * Math.abs(Math.sin(p * Math.PI * 2)), loop: true };
+  if (kind === 'flip') return { anim: ['Walk'], dir: 0, progress: p, rotate: -p * Math.PI * 2, lift: lift * arc, loop: true };
+  if (kind === 'pose') return { anim: ['Charge', 'Attack', 'Idle'], dir: 0, progress: p, rotate: 0, lift: lift * arc, loop: false };
+  return { anim: ['Walk'], dir: 0, progress: p, rotate: Math.sin(p * Math.PI * 2) * 0.16, lift: lift * Math.abs(Math.sin(p * Math.PI * 4)), loop: true };
 }
 
 /**
@@ -34,6 +65,8 @@ export class ContestStage {
   private readonly bits: { x: number; y: number; vx: number; vy: number; life: number; color: string; heart: boolean }[] = [];
   private lastKey = '';
   private keyAt = 0;
+  /** 前のコマの空気（高まっている途中か、冷めている途中か） */
+  private prevAir = 0;
 
   constructor() {
     this.canvas = document.createElement('canvas');
@@ -77,7 +110,9 @@ export class ContestStage {
       const x = isWinner ? W / 2 : SLOT_X[k % SLOT_X.length]!;
       const y = active || isWinner ? FRONT_Y : SLOT_Y;
       const dim = c.phase === 'result' && !isWinner ? 0.45 : 1;
-      this.drawPokemon(g, e.playerId !== null ? spriteKeyOf(e.playerId) : e.npc!, x, y, active || isWinner ? 2 : 1.5, nowMs + k * 130, dim);
+      // 技を出している間は技の形。それ以外はずっとアピールの動きを続ける。自分の番は客の空気と一緒に大きくなる
+      const motion = active && c.shown ? this.castMotion(nowMs - this.keyAt) : active && air !== null ? this.climaxMotion(air, nowMs) : c.phase === 'result' && !isWinner ? REST : this.routineMotion(world, k, nowMs);
+      this.drawPokemon(g, e.playerId !== null ? spriteKeyOf(e.playerId) : e.npc!, x, y, active || isWinner ? 2 : 1.5, motion, nowMs + k * 130, dim);
       // これまでのハートの数を足元に（一次審査の後から見せる）
       if (c.phase !== 'branch' && c.phase !== 'entry') this.drawHearts(g, x, y + 7, e.primary + e.appeals.reduce((a, b) => a + b, 0), c.phase === 'primary' ? (nowMs - this.keyAt) / 180 : 99);
     });
@@ -86,6 +121,7 @@ export class ContestStage {
       const x = SLOT_X[c.turn % SLOT_X.length]!;
       this.drawMoveArt(g, world, c.lastAppeal.move!, x, FRONT_Y - 62, nowMs - this.keyAt);
     }
+    this.prevAir = air ?? 0;
     this.drawAudience(g, this.airOf(c, air, nowMs), category, nowMs);
     this.drawCrowdMeter(g, c, world);
     this.drawBits(g);
@@ -318,27 +354,78 @@ export class ContestStage {
     }
   }
 
-  private drawPokemon(g: CanvasRenderingContext2D, key: string, x: number, y: number, scale: number, nowMs: number, alpha: number): void {
+  /** ふだんのアピールの動きの並び（data の motions）を、人ごとにずらして順に回す */
+  private routineMotion(world: World, k: number, nowMs: number): Motion {
+    const list = world.rules.contest?.motions ?? [];
+    const total = list.reduce((sum, m) => sum + m.seconds, 0);
+    if (!total) return REST;
+    let t = (nowMs / 1000 + k * 1.37) % total;
+    // 人ごとに始める動きも変える
+    for (let i = 0; i < list.length; i++) {
+      const m = list[(i + k) % list.length]!;
+      if (t < m.seconds) return shapeMotion(m.kind, t / m.seconds, m.lift ?? 0);
+      t -= m.seconds;
+    }
+    return REST;
+  }
+
+  /** 自分の番: 客の空気が高まるのに合わせて動きが大きくなり、頂点でバク転を決める。冷めると決めポーズ */
+  private climaxMotion(air: number, nowMs: number): Motion {
+    const rising = air >= this.prevAir;
+    if (!rising) return shapeMotion('pose', 1 - air, 0);
+    if (air < 0.3) return shapeMotion('strut', (nowMs / 900) % 1, 2);
+    if (air < 0.6) return shapeMotion('spin', ((air - 0.3) / 0.3) * 2 % 1, 3);
+    return shapeMotion('flip', (air - 0.6) / 0.4, 26);
+  }
+
+  /** 技を出している間 */
+  private castMotion(ageMs: number): Motion {
+    return { anim: ['Attack', 'Charge'], dir: 0, progress: Math.min(0.999, ageMs / 700), rotate: 0, lift: Math.max(0, 6 - ageMs / 40), loop: false };
+  }
+
+  private drawPokemon(g: CanvasRenderingContext2D, key: string, x: number, y: number, scale: number, motion: Motion, nowMs: number, alpha: number): void {
     const atlas = this.atlas(key);
     g.save();
     g.globalAlpha = alpha;
-    // 足元の影
+    // 足元の影（高く上がるほど小さい）
+    const shrink = Math.max(0.55, 1 - motion.lift / 60);
     g.fillStyle = 'rgba(0,0,0,0.35)';
     g.beginPath();
-    g.ellipse(x, y + 2, 13 * scale, 4 * scale, 0, 0, Math.PI * 2);
+    g.ellipse(x, y + 2, 13 * scale * shrink, 4 * scale * shrink, 0, 0, Math.PI * 2);
     g.fill();
     if (atlas && atlas !== 'loading' && atlas !== 'none') {
-      const frame = atlas.frames[`Walk/0/${Math.floor(nowMs / 180) % 4}`] ?? atlas.frames['Walk/0/0'] ?? Object.values(atlas.frames)[0];
+      // 絵にある動きを使う。無ければ歩きの絵（動かし方は同じ）
+      const anim = motion.anim.find((a) => atlas.frames[`${a}/0/0`]) ?? 'Walk';
+      const count = this.frameCount(atlas, anim);
+      const index = motion.loop ? Math.floor(nowMs / 150) % count : Math.min(count - 1, Math.floor(motion.progress * count));
+      const frame = atlas.frames[`${anim}/${motion.dir}/${index}`] ?? atlas.frames[`${anim}/0/${index}`] ?? atlas.frames['Walk/0/0'] ?? Object.values(atlas.frames)[0];
       if (frame) {
         const f = frame.frame;
         const dw = f.w * scale;
         const dh = f.h * scale;
-        // 枠の下の余白を除いて、足を影の上に置く
+        // 枠の下の余白を除いて、足を影の上に置く。回る動きは体の真ん中を軸に回す
         const blank = this.bottomBlank(atlas, f) * scale;
-        g.drawImage(atlas.image, f.x, f.y, f.w, f.h, Math.round(x - dw / 2), Math.round(y - dh + blank + 2), Math.round(dw), Math.round(dh));
+        const left = Math.round(x - dw / 2);
+        const top = Math.round(y - dh + blank + 2 - motion.lift);
+        const cx = left + dw / 2;
+        const cy = top + dh - blank - (dh - blank) / 2;
+        g.translate(cx, cy);
+        g.rotate(motion.rotate);
+        g.drawImage(atlas.image, f.x, f.y, f.w, f.h, left - cx, top - cy, Math.round(dw), Math.round(dh));
       }
     }
     g.restore();
+  }
+
+  /** その動きの、向き 0 のコマの数（1 回だけ数える） */
+  private frameCount(atlas: Atlas, anim: string): number {
+    const cache = (atlas.counts ??= new Map());
+    const hit = cache.get(anim);
+    if (hit !== undefined) return hit;
+    let n = 0;
+    while (atlas.frames[`${anim}/0/${n}`]) n++;
+    cache.set(anim, Math.max(1, n));
+    return Math.max(1, n);
   }
 
   /** 絵の枠の下の、透明な行の数（1 回だけ数える） */
@@ -374,7 +461,7 @@ export class ContestStage {
   }
 
   private async loadAtlas(key: string): Promise<void> {
-    for (const dir of [`enemy/${key}`, key]) {
+    for (const dir of [key, `enemy/${key}`]) {
       try {
         const base = `${import.meta.env.BASE_URL}sprites/${dir}/`;
         const res = await fetch(`${base}atlas.json`);

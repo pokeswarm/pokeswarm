@@ -100,7 +100,7 @@ describe('ジョウトの特別な戦い（07 の85章）', () => {
   it('三犬の乱入は 5〜15分の奇数分ちょうどに確かめる（1回のランで1回まで）', () => {
     const cfg = buildSimRules('johto').stage.legendary!.intruders!;
     expect(cfg.minutes).toEqual([5, 7, 9, 11, 13, 15]);
-    expect(cfg.chance).toBe(0.01);
+    expect(cfg.chance).toBe(0.02);
     expect(cfg.timeLimitSeconds).toBe(60);
   });
 });

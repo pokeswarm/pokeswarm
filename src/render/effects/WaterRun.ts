@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { findEnemyIndex, type World } from '../../sim/world';
+import type { World } from '../../sim/world';
 
 /** 絵の 1 ドット（ワールドの単位） */
 const DOT = 2;
@@ -14,6 +14,9 @@ const RIPPLE_S = 1.1;
 const RIPPLE_FRAMES = 11;
 /** 走り出しと止まるときの波紋の大きさの倍率 */
 const KICK_SCALE = 1.6;
+/** これより速く動いていれば走っている（ふだん歩く速さより上。ワールドの単位/秒）。1 回の更新でこれ以上動いたら位置の補正で、足跡を付けない */
+const RUN_SPEED = 260;
+const TELEPORT = 200;
 /** 立っているときの波紋の間隔（秒） */
 const IDLE_S = 1.5;
 const IDLE_SCALE = 0.65;
@@ -81,6 +84,8 @@ export class WaterRun {
   private footSide = 1;
   private running = false;
   private lastIdle = -1e9;
+  private lastTick = 0;
+  private slowTicks = 0;
   private dropSeed = 0;
   private arena: World['arena'] = null;
 
@@ -221,50 +226,83 @@ export class WaterRun {
     this.running = false;
   }
 
+  /** 水の上を走る敵（ゲストは world.bosses を持たないので、敵の種類で探す） */
+  private findRunner(world: World): number {
+    if (!world.arena) return -1;
+    const sets = world.rules.stage.legendary?.moveSets;
+    const kinds = world.rules.enemies.kinds;
+    const e = world.enemies;
+    for (let i = 0; i < e.count; i++) {
+      if (e.hp[i]! > 0 && sets?.[kinds[e.kind[i]!]?.id ?? '']?.waterRun) return i;
+    }
+    return -1;
+  }
+
   update(world: World, timeMs: number): void {
-    const boss = world.arena
-      ? world.bosses.find((b) => {
-          const i = findEnemyIndex(world, b.id);
-          return i !== -1 && world.rules.stage.legendary?.moveSets[world.rules.enemies.kinds[world.enemies.kind[i]!]?.id ?? '']?.waterRun;
-        })
-      : undefined;
-    if (!boss) {
+    const i = this.findRunner(world);
+    if (i === -1) {
       if (this.built) this.hideAll();
       return;
     }
     this.build();
     this.arena = world.arena;
-    const i = findEnemyIndex(world, boss.id);
     const x = world.enemies.x[i]!;
     const y = world.enemies.y[i]! + FOOT_Y;
-    const moving = !!boss.flyTo;
     if (Number.isNaN(this.lastX)) {
       this.lastX = x;
       this.lastY = y;
       this.lastStepX = x;
       this.lastStepY = y;
+      this.lastTick = world.tick;
     }
+    // シミュレーションが進んだときだけ測る（描画の方が回数が多い）
+    if (world.tick !== this.lastTick) this.stepRun(world, x, y, timeMs);
+    // 立っているとき
+    if (!this.running && timeMs - this.lastIdle >= IDLE_S * 1000) {
+      this.lastIdle = timeMs;
+      this.addRipple(x, y, timeMs, IDLE_SCALE);
+    }
+    this.draw(timeMs);
+  }
+
+  /** 動いた距離から走っているかを決め、足跡を付ける（ホストの技の予定を見ないので、ゲストの画面でも同じ） */
+  private stepRun(world: World, x: number, y: number, timeMs: number): void {
+    const ticks = world.tick - this.lastTick;
+    this.lastTick = world.tick;
     const dx = x - this.lastX;
     const dy = y - this.lastY;
     const moved = Math.hypot(dx, dy);
-    const ux = moved > 0 ? dx / moved : 0;
-    const uy = moved > 0 ? dy / moved : 1;
-    // 蹴り出しと、止まるとき
-    if (moving && !this.running) {
-      this.running = true;
-      this.travelled = 0;
+    const speed = moved / Math.max(world.dt, ticks * world.dt);
+    // 大きく飛んだとき（位置の補正）は足跡を付けない
+    if (moved > TELEPORT * Math.max(1, ticks)) {
+      this.lastX = x;
+      this.lastY = y;
       this.lastStepX = x;
       this.lastStepY = y;
-      this.addRipple(x, y, timeMs, KICK_SCALE);
-      this.addDrops(x, y, timeMs, 8, 0, 0, 1.1);
-    } else if (!moving && this.running) {
+      this.travelled = 0;
+      return;
+    }
+    const fast = speed >= RUN_SPEED;
+    const ux = moved > 0 ? dx / moved : 0;
+    const uy = moved > 0 ? dy / moved : 1;
+    // 蹴り出しと、止まるとき（止まったと決めるのは 2 回続けて遅いとき）
+    if (fast) this.slowTicks = 0;
+    else this.slowTicks++;
+    if (fast && !this.running) {
+      this.running = true;
+      this.travelled = 0;
+      this.lastStepX = this.lastX;
+      this.lastStepY = this.lastY;
+      this.addRipple(this.lastX, this.lastY, timeMs, KICK_SCALE);
+      this.addDrops(this.lastX, this.lastY, timeMs, 8, 0, 0, 1.1);
+    } else if (!fast && this.running && this.slowTicks >= 2) {
       this.running = false;
       this.addRipple(x, y, timeMs, KICK_SCALE);
       this.addDrops(x, y, timeMs, 8, 0, 0, 1.1);
       this.lastIdle = timeMs;
     }
-    if (moving && moved > 0) {
-      // 走った分の足跡（1 コマで何歩も進むときは間の場所へ）
+    if (this.running && moved > 0) {
+      // 走った分の足跡（1 回で何歩も進むときは間の場所へ）
       let along = 0;
       while (this.travelled + (moved - along) >= STEP) {
         along += STEP - this.travelled;
@@ -274,21 +312,17 @@ export class WaterRun {
         const fy = this.lastY + uy * along + ux * STEP_SIDE * this.footSide * 0.5;
         this.addRipple(fx, fy, timeMs, 1);
         this.addDrops(fx, fy, timeMs, 2, ux, uy, 1);
-        if (this.onFloor(fx, fy)) this.trails[this.nextTrail] = { x: fx, y: fy, born: timeMs, angle: Math.atan2(fy - this.lastStepY, fx - this.lastStepX), length: Math.hypot(fx - this.lastStepX, fy - this.lastStepY) };
-        if (this.onFloor(fx, fy)) this.nextTrail = (this.nextTrail + 1) % MAX_TRAILS;
+        if (this.onFloor(fx, fy)) {
+          this.trails[this.nextTrail] = { x: fx, y: fy, born: timeMs, angle: Math.atan2(fy - this.lastStepY, fx - this.lastStepX), length: Math.hypot(fx - this.lastStepX, fy - this.lastStepY) };
+          this.nextTrail = (this.nextTrail + 1) % MAX_TRAILS;
+        }
         this.lastStepX = fx;
         this.lastStepY = fy;
       }
       this.travelled += moved - along;
     }
-    // 立っているとき
-    if (!moving && timeMs - this.lastIdle >= IDLE_S * 1000) {
-      this.lastIdle = timeMs;
-      this.addRipple(x, y, timeMs, IDLE_SCALE);
-    }
     this.lastX = x;
     this.lastY = y;
-    this.draw(timeMs);
   }
 
   private draw(now: number): void {

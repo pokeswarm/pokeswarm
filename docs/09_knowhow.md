@@ -97,6 +97,7 @@
 - 協力プレイの不具合は、ホストとゲストの状態を通信の遅れの分だけずらして比べる長いテスト（`src/net/boxFuzz.test.ts`）で探すとよい。
 - 「同じ回か」をレベルの数で区別しない。最大レベルの後はレベルが同じまま回が続き、自動選択が2回目を選ばずに時間切れまで待つ不具合になった。回には通し番号（`levelUp.serial`）を使う。
 - ゲーム全体を止めるもの（レベルアップ・ポーズ）はシミュレーションの中で止める。演出のためにローカルだけ止めてよいのはソロだけ（進化の演出・スマホの縦向き）。
+- **`world.bosses` はホスト（ソロ）にしかない。** 技の予定（`flyTo`・`moves`）もゲストには無い。描画でボスを探すときは敵の種類や順位で探し、動きは位置の変化から測る（スイクンの足元の波紋がゲストに出なかった。`07` 228章）。ゲストで効くかは、ホストとゲストをつなぐテスト（`src/net/intruderArenaSync.test.ts`）の形で確かめられる。
 - 組み込みのブラウザは裏のタブを止めるので、2つのタブでの協力プレイの通しの確認はできない。通信はテスト（`src/net/sync.test.ts`）と、待合室でのメッセージの往復で確かめる。
 
 ## 6. 確かめ方（ブラウザ）
@@ -150,6 +151,8 @@
 - **技の部品**: 置いてから待つ `scatterDelaySeconds`（空から落ちる塊 `fall`）・当たるほど大きくなる `growOnHit`・雨でタイプの威力 `rainBoost`・回復の円 `healZone`・味方の回復 `allyHealPct`・向いている方へ出すビーム `aimFacing`。
 - **技の絵**: 向きで描き分け（`directional`。正面・横・斜め）・突き出す1枚（`fit: thrust`）・天気の粒の絵（`weather.texture`。白黒で描いて色を付ける）・空から落ちる絵と破片（`fall`）。
 - **確かめ方**: `?legend=red-pikachu`・`?wings`・`?intruder=raikou`、強さの測り方は地方と強化の段階を選べる（`BALANCE_REGION`・`BALANCE_UPGRADES`）。
+- **固定マップの伝説・準伝説**（`07` 203〜228章）: 単体の戦いはまず固定マップで考える（`moveSets` の `arena`。引きのカメラで、画面全体を使う大技を組める）。**1 体ずつ、わざ → 範囲 → マップの順に、作者が確かめてから次へ。** 準伝説は `intruders` の `timeLimitSeconds`（逃げるまでの秒数）・`hpTimesMidboss`（HP）・`fleeMoves`（逃げる技）。絵は `npm run arena-maps`。大きな絵は `src/render/effects/` のクラスで専用に描く（`LavaSea`・`WaveSheet`・`AuroraSheet`・`FrostSheets`・`MirrorCoat`・`WaterRun`）。確かめ方: `?region=johto&pokemon=psyduck&god&intruder=suicune&section=5`（`&bosshp=52` で HP の大技、`&intruderat=15&section=3` で雑魚がいる所からの登場）。
+- **固定マップの落とし穴**: 遠くの敵を移し替える仕組みは固定マップで止めた（`07` 226章）。大きな絵は元の小さな絵を引き伸ばすと安っぽく見える。場面の演出は誇張せず静かに積み重ね、地面の演出は雑魚より下に描く。絵を描き直したら、見た目と当たりの幅を合わせ直す。実際の火力は DPS 表より高いので、表で「倒せない」と決めない。
 
 ### 9.4 落とし穴（ジョウトで踏んだもの）
 - **派生技の強さの検証**（`moveStrength.test.ts`: 派生技の Lv1 が元の技の最大より弱くない）に何度も落ちた。威力でなく再使用・数・範囲で直す。`npm run balance-moves` は2回回すと落ち着く。

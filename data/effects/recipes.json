@@ -6004,7 +6004,7 @@
     },
     "boss-raikou-cloud": {
       "extends": "electric.base",
-      "bossActive": { "id": "raikou-cloud", "fit": "circle", "size": 1.05, "alpha": 0.82 }
+      "bossActive": { "id": "raikou-cloud", "fit": "circle", "size": 1.25, "alpha": 0.82 }
     },
     "boss-raikou-cloud-bolt": {
       "extends": "electric.base",

@@ -1471,7 +1471,7 @@
       "spriteScale": 2.6,
       "motion": {
         "type": "orbit",
-        "distance": 420,
+        "distance": 300,
         "angularDegreesPerSecond": 60
       }
     },

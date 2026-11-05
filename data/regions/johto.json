@@ -956,7 +956,14 @@
         "arena": {
           "halfWidth": 800,
           "halfHeight": 440,
-          "viewHeight": 960
+          "viewHeight": 960,
+          "map": {
+            "floor": "map/johto/arena-suicune-floor.png",
+            "wall": "map/johto/arena-suicune-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2,
+            "shimmer": ["map/johto/arena-suicune-shimmer-a.png", "map/johto/arena-suicune-shimmer-b.png"]
+          }
         },
         "anchor": {
           "x": 0,

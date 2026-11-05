@@ -744,6 +744,196 @@ function enteiWall(): (Rgb | null)[] {
   return out;
 }
 
+// --- スイクン: 夜明け前の澄んだ湖（透き通った浅い水の底に小石が透ける。水面の筋と、揺れる光。岸は小石と岩と葦。07 の227章） ---
+
+/** 波の青・白い雪・オーロラの光が映えるよう、水は暗く、鮮やかにしない */
+const LAKE = ['#0f2a3b', '#123242', '#163b4a', '#1a4552', '#1f4f5b', '#255a64'].map(hex);
+const SHORE_ROCK = ['#141d26', '#1c2833', '#263541', '#334552', '#465b67'].map(hex);
+const PEBBLE = ['#27343c', '#37474e', '#4a5b60', '#627477', '#83949a'].map(hex);
+
+const mix = (a: Rgb, b: Rgb, k: number): Rgb => [Math.round(a[0] + (b[0] - a[0]) * k), Math.round(a[1] + (b[1] - a[1]) * k), Math.round(a[2] + (b[2] - a[2]) * k)];
+
+function suicuneFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
+  const floor: Rgb[] = [];
+  const shimmerA: (Rgb | null)[] = [];
+  const shimmerB: (Rgb | null)[] = [];
+  const glintA = hex('#5f9fae');
+  const glintB = hex('#93c9d3');
+  const stoneLine = hex('#0d2433');
+  const stoneLight = hex('#2e6370');
+  const gloss = hex('#3b7f8c');
+  const weed = hex('#1c4a44');
+  const weedDark = hex('#123a39');
+  const moon = hex('#5d9aa8');
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const dx = x - W / 2 + 0.5;
+    // 岸からの距離（むらを付けて、浅瀬の形を自然にする）
+    const shore = Math.min(x, W - 1 - x, y * 1.2, (H - 1 - y) * 1.2) + (fbm(x / 46, y / 46, 501) - 0.5) * 70;
+    const deep = Math.max(0, Math.min(1, shore / 130));
+    // 底の小石: 深いほど見えにくい
+    const stone = worley(x, y, 8, 503);
+    const big = worley(x, y, 30, 505);
+    const stoneLit = (hash2(stone.id, 1, 507) - 0.5) * 0.42 + (hash2(big.id, 2, 509) - 0.5) * 0.3;
+    let t = 0.62 - deep * 0.42 + stoneLit * (1 - deep * 0.72) + (fbm(x / 80, y / 80, 511) - 0.5) * 0.28;
+    let col = ramp(LAKE, t, x, y, 0.5);
+    // 底の小石: 網に見えないよう、一部の石だけ丸く浮かせる（線で囲まない）。浅い所に多い
+    if (hash2(stone.id, 3, 515) > 0.5 + deep * 0.42 && fbm(x / 30, y / 30, 513) > 0.4) {
+      const r = Math.hypot(stone.dx, stone.dy);
+      const size = 2.2 + hash2(stone.id, 4, 516) * 2.2;
+      if (r < size) col = stone.dy > 0.4 ? mix(col, stoneLight, 0.5) : stone.dy < -0.8 ? stoneLine : mix(col, stoneLight, 0.2);
+    }
+    // 水底に揺れる光の網（水の透明さ）: 所々だけ
+    const net = Math.abs(fbm(x / 22 + fbm(x / 60, y / 60, 517) * 2, y / 22, 519) - 0.5);
+    if (net < 0.009 && fbm(x / 70, y / 70, 521) > 0.52) col = mix(col, stoneLight, 0.26);
+    // 浅瀬の水草（避ける物に見えないよう、低いコントラストで）
+    const patch = fbm(x / 34, y / 34, 523);
+    if (shore < 96 && patch > 0.56) {
+      const k = (patch - 0.56) * 5;
+      const h0 = hash2(x, Math.floor(y / 4), 525);
+      if (h0 < k * 0.5) col = weed;
+      else if (hash2(x, Math.floor((y - 1) / 4), 525) < k * 0.5) col = weedDark;
+    }
+    // 水面の筋（風で横に長くそろう）
+    const band = fbm(x / 74, y / 5.5, 527);
+    if (band > 0.635) col = mix(col, gloss, Math.min(0.42, (band - 0.635) * 3.4));
+    // 月の映り込み: 奥の真ん中に、切れた横の線が縦に並ぶ（ごく薄く）
+    const moonY = y / H;
+    const moonW = (46 - moonY * 34) * (0.6 + fbm(y / 7, 3, 529) * 0.9);
+    const onMoon = moonY < 0.62 && Math.abs(dx + (fbm(y / 9, 5, 530) - 0.5) * 34) < moonW && valueNoise(x / 16, y / 1.6, 531) > 0.56 + moonY * 0.3;
+    if (onMoon) col = mix(col, moon, 0.34 * (1 - moonY));
+    // きらめき: 水面の短い横線をまばらに。月の所は多く
+    let glint = 0;
+    if (y % 3 === 0) {
+      const lane = Math.floor(y / 3);
+      const v1 = valueNoise(x / 9 + lane * 7.3, lane * 3.1, 533);
+      const v2 = valueNoise(x / 9 + lane * 5.1, lane * 2.3, 535);
+      const th = onMoon ? 0.66 : 0.9;
+      if (v1 > th) glint = 1;
+      else if (v2 > th) glint = 2;
+    }
+    // 壁ぎわの影（水に落ちる岸の影）
+    const edgeD = Math.min(x, W - 1 - x);
+    const shade = Math.max(0, 1 - y / 20) * 0.62 + Math.max(0, 1 - edgeD / 12) * 0.5 + Math.max(0, 1 - (H - 1 - y) / 8) * 0.45;
+    if (shade > (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16) col = [Math.round(col[0] * 0.6), Math.round(col[1] * 0.66), Math.round(col[2] * 0.74)];
+    floor.push(col);
+    shimmerA.push(glint === 1 ? glintA : null);
+    shimmerB.push(glint === 2 ? glintB : null);
+  }
+  // 浮き草（小さく少なく。岸の近くだけ）
+  const pad = hex('#2f6b57');
+  const padDark = hex('#1e4c42');
+  const flower = hex('#c9d8dc');
+  let n = 0;
+  const rand = () => hash2(n++, 11, 541);
+  for (let c = 0; c < 14; c++) {
+    const side = rand();
+    const gx = side < 0.5 ? 16 + rand() * (W - 32) : side < 0.75 ? 18 + rand() * 60 : W - 78 + rand() * 60;
+    const gy = side < 0.25 ? 28 + rand() * 40 : side < 0.5 ? H - 60 + rand() * 40 : 40 + rand() * (H - 80);
+    const count = 2 + Math.floor(rand() * 4);
+    for (let k = 0; k < count; k++) {
+      const cx = gx + (rand() - 0.5) * 26;
+      const cy = gy + (rand() - 0.5) * 14;
+      const rx = 3 + rand() * 2.5;
+      const cut = rand() * Math.PI * 2;
+      const hasFlower = rand() > 0.82;
+      for (let py = Math.floor(cy - rx); py <= cy + rx; py++) for (let px = Math.floor(cx - rx - 1); px <= cx + rx + 1; px++) {
+        if (px < 0 || py < 0 || px >= W || py >= H) continue;
+        const ex = (px - cx) / rx;
+        const ey = (py - cy) / (rx * 0.62);
+        if (ex * ex + ey * ey > 1) continue;
+        // 切れ込み
+        const a = Math.atan2(ey, ex) - cut;
+        if (Math.abs(Math.atan2(Math.sin(a), Math.cos(a))) < 0.28) continue;
+        floor[py * W + px] = ey > 0.45 ? padDark : pad;
+      }
+      if (hasFlower) {
+        const fx = Math.round(cx);
+        const fy = Math.round(cy);
+        if (fx > 0 && fy > 0 && fx < W - 1 && fy < H - 1) {
+          floor[fy * W + fx] = flower;
+          floor[fy * W + fx - 1] = flower;
+          floor[(fy - 1) * W + fx] = flower;
+        }
+      }
+    }
+  }
+  return { floor, shimmerA, shimmerB };
+}
+
+const NIGHT_SKY = ['#080d1c', '#0b1324', '#0f192c', '#142136'].map(hex);
+
+function suicuneWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const dark = hex('#060a14');
+  const rimLight = hex('#7c9ba4');
+  const rimDark = hex('#101c26');
+  const pine = hex('#0a1420');
+  const pineFar = hex('#101c2c');
+  const reed = hex('#2f5449');
+  const reedDark = hex('#1b3a36');
+  const reedHead = hex('#574c3a');
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = inset(iy, 31) - ix;
+    const fromRight = ix - (W - 1 - inset(iy, 32));
+    const fromTop = inset(ix, 33) - iy;
+    const fromBottom = iy - (H - 1 - inset(ix, 34));
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    let col: Rgb;
+    const ridgeTop = 12 + fbm(x / 22, 7, 551) * 6;
+    if (iy < 0 && -iy > ridgeTop) {
+      // 奥: 夜明け前の空と星、遠くの森（タイマーの後ろは暗いまま）
+      col = ramp(NIGHT_SKY, ((iy + MARGIN) / MARGIN) * 0.7 + (fbm(x / 70, y / 10, 553) - 0.5) * 0.4, x, y, 0.5);
+      if (hash2(x, y, 555) > 0.9975) col = hex('#8ea3b8');
+      // 遠くの森と、手前の針葉樹（とがった木の列）
+      const treeLine = (cell: number, base: number, reach: number, seed: number): number => {
+        const c = Math.floor(x / cell);
+        let top = 0;
+        for (let k = c - 2; k <= c + 2; k++) {
+          const cx = (k + hash2(k, 1, seed)) * cell;
+          const tall = base + hash2(k, 2, seed) * reach;
+          top = Math.max(top, tall - Math.abs(x - cx) * (1.1 + hash2(k, 3, seed) * 0.9));
+        }
+        return top;
+      };
+      if (-iy < treeLine(9, 24, 18, 557)) col = pineFar;
+      if (-iy < treeLine(13, 20, 16, 559)) col = pine;
+    } else {
+      // 手前の岸: 岩（左上が明るい丸い塊）
+      const stone = worley(x, y, 20, 561);
+      const round = (stone.dx + stone.dy) / 20;
+      const t = 0.46 + round * 0.42 + (hash2(stone.id, 2, 563) - 0.5) * 0.28 + (fbm(x / 34, y / 34, 565) - 0.5) * 0.28 - Math.max(0, dist - 8) * 0.012;
+      col = ramp(SHORE_ROCK, t, x, y);
+      if (stone.edge < 0.8) col = SHORE_ROCK[0]!;
+      // 葦の茂み（上へ伸びる細い葉。岩にかぶさる）
+      const clump = fbm(x / 26, y / 26, 567);
+      if (clump > 0.55) {
+        const blade = hash2(x, 3, 569);
+        const len = 5 + Math.floor(hash2(x, 5, 571) * 7);
+        const seg = ((y + Math.floor(blade * 24)) % 24);
+        if (blade > 0.5 && seg < len) col = seg === 0 && blade > 0.82 ? reedHead : blade > 0.75 ? reed : reedDark;
+      }
+      if (dist > MARGIN - 14 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (dist - (MARGIN - 14)) / 14) col = dark;
+    }
+    // 歩ける端: ぬれて明るい小石の水際（途切れないよう帯にする）
+    if (dist <= 7) {
+      const peb = worley(x, y, 5, 573);
+      col = ramp(PEBBLE, 0.3 + (hash2(peb.id, 1, 575) - 0.5) * 0.7 + (peb.dx + peb.dy) * 0.06, x, y, 0.3);
+      if (peb.edge < 0.5) col = PEBBLE[0]!;
+    }
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 2.5) col = rimLight;
+    out.push(col);
+  }
+  return out;
+}
+
 const outDir = path.join('public', 'map', 'johto');
 fs.mkdirSync(outDir, { recursive: true });
 const arenas = [
@@ -751,6 +941,7 @@ const arenas = [
   { id: 'hooh', ...hoohFloor(), wall: hoohWall() },
   { id: 'raikou', ...raikouFloor(), wall: raikouWall() },
   { id: 'entei', ...enteiFloor(), wall: enteiWall() },
+  { id: 'suicune', ...suicuneFloor(), wall: suicuneWall() },
 ];
 for (const a of arenas) {
   fs.writeFileSync(path.join(outDir, `arena-${a.id}-floor.png`), toPng(a.floor, W, H));

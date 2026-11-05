@@ -611,8 +611,8 @@ export const bossMoveSchema = z.object({
   flyTo: z.object({ x: z.number(), y: z.number(), speed: z.number().positive(), randomSide: z.boolean().optional() }).optional(),
   /** ボスの HP が belowHpPct % を切ると、count をこの数にする（ルギアの エアロブラストの玉。07 の204章） */
   lowHpCount: z.object({ belowHpPct: z.number().gt(0).lt(100), count: z.number().int().positive() }).optional(),
-  /** count を人数で分ける（協力プレイで全員の足元に count 個ずつ落とすと多すぎる技。07 の204章） */
-  countShared: z.boolean().optional(),
+  /** 狙わず、固定マップを count 個の区画に分けて、区画ごとのランダムな場所へ落とす（ルギアの エアロブラスト。満遍なく。07 の204.1） */
+  arenaScatter: z.boolean().optional(),
   /** 当たっている間に、半径が move の radius の fromPct % から seconds 秒で 100 % に広がる（ルギアの竜巻。07 の204章） */
   growRadius: z.object({ fromPct: z.number().positive().lt(100), seconds: z.number().positive() }).optional(),
   /** ため中に最大 HP の hpPct % のダメージを受けると、技をやめて breakMove を使う（ルギアの じこさいせい。07 の204章） */

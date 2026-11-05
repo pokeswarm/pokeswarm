@@ -916,6 +916,25 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     }
     return;
   }
+  if (move.arenaScatter && world.arena) {
+    // マップ全体へ満遍なく（エアロブラスト）: 区画に分け、区画の順番と区画の中の場所をランダムにする
+    const a = world.arena;
+    const count = countOf(world, move, i);
+    const rows = Math.max(1, Math.round(Math.sqrt((count * a.halfHeight) / a.halfWidth)));
+    const cols = Math.ceil(count / rows);
+    const cells: number[] = Array.from({ length: rows * cols }, (_, k) => k);
+    for (let k = cells.length - 1; k > 0; k--) {
+      const j = world.rng.int(k + 1);
+      [cells[k], cells[j]] = [cells[j]!, cells[k]!];
+    }
+    for (let c = 0; c < count; c++) {
+      const cell = cells[c]!;
+      const x = a.x - a.halfWidth + ((cell % cols) + world.rng.next()) * ((a.halfWidth * 2) / cols);
+      const y = a.y - a.halfHeight + (Math.floor(cell / cols) + world.rng.next()) * ((a.halfHeight * 2) / rows);
+      put(x, y, 0, 0, bossId, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
+    }
+    return;
+  }
   if (move.target === 'random') {
     // だれかの周りのランダムな場所（サイコブレイク・落雷）。テレポートなら、ボスがそこへ現れる
     const alive = world.players.filter((x) => !x.down);
@@ -949,7 +968,7 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     // 協力プレイの伝説は、生きている全員の足元に落とす（逃げる係と攻撃する係に分かれて楽にならないように。07 の125章）
     const legend = world.rules.enemies.kinds[world.enemies.kind[i]!]?.rank === 'legendary';
     const targets = legend && world.rules.stage.bossRules.legendHitsAllPlayers && world.players.length > 1 ? world.players.filter((p) => !p.down) : [target];
-    const count = move.countShared ? Math.ceil(countOf(world, move, i) / targets.length) : countOf(world, move, i);
+    const count = countOf(world, move, i);
     for (const t of targets) {
       for (let c = 0; c < count; c++) {
         // 1つ目は足元、2つ目以降はばらつかせる（動かないと当たり、動けば避けられる）
@@ -1609,8 +1628,8 @@ export function addHazard(
   }
   const ticks = Math.round(move.telegraphSeconds / world.dt) + (extra.delay ?? 0);
   const radius = extra.radius || move.radius;
-  // 固定マップでは、直線は壁までで止まる
-  const length = move.shape === 'line' ? Math.min(extra.length || (move.length ?? 400), rayToArenaWall(world, x, y, dirX, dirY)) : 0;
+  // 固定マップでは、直線は壁までで止まる。なぎ払いは止めず画面の外まで伸ばす（届かないのはボスの近くだけと分かるように。外は壁の絵に隠れる）
+  const length = move.shape === 'line' ? (move.sweep ? extra.length || (move.length ?? 400) : Math.min(extra.length || (move.length ?? 400), rayToArenaWall(world, x, y, dirX, dirY))) : 0;
   const di = dasher !== -1 ? findEnemyIndex(world, dasher) : -1;
   // にほんばれ と あまごい は同時に降らない（ゲストにも、この技の予告の知らせで届く）
   if (move.clearsMoves) {

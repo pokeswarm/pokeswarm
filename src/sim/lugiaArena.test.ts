@@ -50,20 +50,35 @@ describe('固定マップ（07 の203章）', () => {
 });
 
 describe('ルギアの技（07 の204章）', () => {
-  it('エアロブラスト: ためた後に玉を 3 発撃ち、着弾した所に竜巻が広がる', () => {
+  it('エアロブラスト: ためた後に玉を撃ち、着弾した所に竜巻が広がる', () => {
     const { sim, step, force } = setup();
     force('lugia-aeroblast');
     const id = (h: (typeof sim.world.hazards)[number]) => sim.world.rules.stage.moves[h.move]?.id;
     step(1.7);
-    expect(sim.world.hazards.filter((h) => id(h) === 'lugia-aeroblast-shot').length).toBe(3);
+    expect(sim.world.hazards.filter((h) => id(h) === 'lugia-aeroblast-shot').length).toBe(6);
     sim.world.bosses[0]!.cooldown = 1e6;
-    step(1.5);
+    step(2);
     const twisters = sim.world.hazards.filter((h) => id(h) === 'lugia-aero-tornado');
-    expect(twisters.length).toBe(3);
-    const small = twisters[2]!.radius;
-    step(1.5);
-    expect(twisters[2]!.radius).toBeGreaterThan(small);
-    expect(twisters[2]!.radius).toBe(90);
+    expect(twisters.length).toBe(6);
+    const last = twisters[twisters.length - 1]!;
+    const small = last.radius;
+    step(1.2);
+    expect(last.radius).toBeGreaterThan(small);
+    expect(last.radius).toBe(90);
+  });
+
+  it('エアロブラスト: 狙わず、マップ全体へ満遍なく落とす', () => {
+    const { sim, step, force } = setup();
+    const a = sim.world.arena!;
+    const p = sim.world.players[0]!;
+    p.x = a.x - 700;
+    p.y = a.y + 400;
+    force('lugia-aeroblast');
+    step(1.7);
+    const shots = sim.world.hazards.filter((h) => sim.world.rules.stage.moves[h.move]?.id === 'lugia-aeroblast-shot');
+    // 6 発は横 3・縦 2 の区画に 1 発ずつ
+    const cells = new Set(shots.map((h) => `${Math.floor((h.x - (a.x - a.halfWidth)) / ((a.halfWidth * 2) / 3))},${Math.floor((h.y - (a.y - a.halfHeight)) / a.halfHeight)}`));
+    expect(cells.size).toBe(6);
   });
 
   it('エアロブラスト: HP が半分を切ると玉が増える', () => {
@@ -72,7 +87,7 @@ describe('ルギアの技（07 の204章）', () => {
     sim.world.enemies.hp[0] = sim.world.enemies.maxHp[0]! * 0.4;
     force('lugia-aeroblast');
     step(1.7);
-    expect(sim.world.hazards.filter((h) => sim.world.rules.stage.moves[h.move]?.id === 'lugia-aeroblast-shot').length).toBe(5);
+    expect(sim.world.hazards.filter((h) => sim.world.rules.stage.moves[h.move]?.id === 'lugia-aeroblast-shot').length).toBe(9);
   });
 
   it('ハイドロポンプ: 左右の端へ飛び、中央の方へなぎ払い、奥へ戻る', () => {
@@ -83,6 +98,8 @@ describe('ルギアの技（07 の204章）', () => {
     expect(Math.abs(sim.world.enemies.x[0]! - a.x)).toBeCloseTo(640, 0);
     const beam = sim.world.hazards.find((h) => sim.world.rules.stage.moves[h.move]?.id === 'lugia-hydro-sweep')!;
     expect(beam).toBeTruthy();
+    // 壁で止めず、画面の外まで伸びる
+    expect(beam.length).toBeGreaterThan(a.halfWidth * 2);
     expect(beam.dirX).toBe(Math.sign(a.x - sim.world.enemies.x[0]!));
     step(2.4);
     expect(beam.activeTicks).toBeDefined();

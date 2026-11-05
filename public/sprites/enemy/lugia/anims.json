@@ -22,6 +22,63 @@
         4
       ],
       "frameKeyPrefix": "Walk"
+    },
+    "Charge": {
+      "source": "Charge",
+      "frameWidth": 72,
+      "frameHeight": 96,
+      "durations": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Charge"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 88,
+      "frameHeight": 112,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    },
+    "Shoot": {
+      "source": "Shoot",
+      "frameWidth": 88,
+      "frameHeight": 128,
+      "durations": [
+        2,
+        6,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Shoot"
+    },
+    "Sleep": {
+      "source": "Sleep",
+      "frameWidth": 56,
+      "frameHeight": 80,
+      "durations": [
+        30,
+        35
+      ],
+      "frameKeyPrefix": "Sleep"
     }
   },
   "missing": []

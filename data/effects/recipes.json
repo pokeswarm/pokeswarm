@@ -6046,6 +6046,22 @@
         "seconds": 0.4
       }
     },
+    "boss-lugia-twister": {
+      "extends": "boss-twister",
+      "bossActive": {
+        "id": "tornado",
+        "fit": "circle",
+        "size": 1.1,
+        "rotate": "spin",
+        "spinDegPerSec": 540
+      }
+    },
+    "boss-lugia-tired": {
+      "extends": "flying.base"
+    },
+    "boss-aeroblast-full": {
+      "extends": "flying.base"
+    },
     "boss-aeroblast": {
       "extends": "flying.base",
       "bossActive": {

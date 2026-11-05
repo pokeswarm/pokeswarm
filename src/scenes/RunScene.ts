@@ -102,6 +102,13 @@ export interface RunSceneData {
 /** ボスの HP バーを並べる数の上限 */
 const BOSS_BARS_MAX = 4;
 
+/** 固定マップの左右に残す余白・移るときの暗転の長さ（ミリ秒）。吸い込みの筋の本数・速さ・届く広さ */
+const ARENA_SIDE_MARGIN = 80;
+const ARENA_FADE_MS = 700;
+const SUCTION_STREAKS = 110;
+const SUCTION_SPEED = 520;
+const SUCTION_RANGE = 1400;
+
 export class RunScene extends Phaser.Scene {
   private sim!: Simulation;
   /** 自分の攻撃のダメージの数字（設定でオンのときだけ作る） */
@@ -184,6 +191,8 @@ export class RunScene extends Phaser.Scene {
   private pinnedCard: { kind: 'move' | 'item'; slot: number } | null = null;
   /** 画面の外の大事なものの方向を示す矢印 */
   private edgeArrows!: EdgeArrows;
+  /** 固定マップの壁の絵（07 の203章） */
+  private arenaFrame: Phaser.GameObjects.Graphics | null = null;
   /** アイコンの列の上端（画面の y） */
   private hudTop = 0;
   private lastSent: { dx: Axis; dy: Axis } = { dx: 0, dy: 0 };
@@ -1032,6 +1041,22 @@ export class RunScene extends Phaser.Scene {
    * それより横長の画面は、ゲームの描く面（canvas の親）の幅を 16:9 に縮めて真ん中に置き、左右を黒い帯にする（ページの背景が黒）。
    * カメラの描く範囲をずらして帯を作ると、フィルターを掛けた技の光と範囲だけが帯の幅だけ左にずれた（2026年10月22日）ため、カメラはずらさない
    */
+  private showArena(arena: NonNullable<World['arena']>): void {
+    this.applyZoom();
+    this.cameras.main.fadeIn(ARENA_FADE_MS);
+    const g = this.add.graphics().setDepth(spriteRender.depths.obstacles - 1);
+    const { x, y, halfWidth: w, halfHeight: h } = arena;
+    const far = 4000;
+    // マップの外は暗くし、壁の線を引く（絵はマップの調整のときに作る）
+    g.fillStyle(0x0b1020, 1);
+    g.fillRect(x - w - far, y - h - far, far, h * 2 + far * 2);
+    g.fillRect(x + w, y - h - far, far, h * 2 + far * 2);
+    g.fillRect(x - w, y - h - far, w * 2, far);
+    g.fillRect(x - w, y + h, w * 2, far);
+    g.lineStyle(6, 0xb3e5fc, 0.8).strokeRect(x - w, y - h, w * 2, h * 2);
+    this.arenaFrame = g;
+  }
+
   private applyZoom(): void {
     const c = spriteRender.camera;
     const parent = this.game.canvas.parentElement;
@@ -1052,7 +1077,9 @@ export class RunScene extends Phaser.Scene {
     const { width, height } = this.scale;
     const cam = this.cameras.main;
     cam.setViewport(0, 0, width, height);
-    cam.setZoom(height / c.viewHeight);
+    // 固定マップは引きのカメラ。横が足りない端末では、マップの全体が入るまで縮める（07 の203章）
+    const arena = this.sim?.world.arena;
+    cam.setZoom(arena ? Math.min(height / arena.viewHeight, width / (arena.halfWidth * 2 + ARENA_SIDE_MARGIN)) : height / c.viewHeight);
     // 光の演出・当たり判定の塗りの1ドットも、拡大率に合わせてワールドの dot にそろえる
     this.effects?.setZoom(cam.zoom);
     this.hitShapes?.setZoom(cam.zoom);
@@ -1622,6 +1649,73 @@ export class RunScene extends Phaser.Scene {
 
   /** ボスの範囲技の予告: 範囲の円と、落ちるまでの残りを内側から広がる円で見せる */
   /** なみのりの波の輪（07 の198章）: 予告は足元の安全な円と切れ目の向き。広がる間は、切れ目のある帯 */
+  /** 吸い込みの風（ルギア。07 の203章）: マップのあちこちから、ボスへ流れ込む細い筋。明滅はさせない */
+  private drawSuction(g: Phaser.GameObjects.Graphics, h: Hazard): void {
+    const a = this.sim.world.arena;
+    const i = findEnemyIndex(this.sim.world, h.dasher);
+    if (!a || i === -1) return;
+    const bx = this.sim.world.enemies.x[i]!;
+    const by = this.sim.world.enemies.y[i]!;
+    const now = this.time.now / 1000;
+    const grow = Math.min(1, ((h.totalTicks - h.ticksLeft) * this.sim.world.dt) / 0.6);
+    for (let k = 0; k < SUCTION_STREAKS; k++) {
+      const angle = k * 2.399963;
+      const u = (now * SUCTION_SPEED / SUCTION_RANGE + k * 0.37) % 1;
+      const d = SUCTION_RANGE * (1 - u);
+      const len = 50 + 70 * u;
+      const x0 = bx + Math.cos(angle) * d;
+      const y0 = by + Math.sin(angle) * d;
+      if (Math.abs(x0 - a.x) > a.halfWidth || Math.abs(y0 - a.y) > a.halfHeight) continue;
+      const x1 = bx + Math.cos(angle) * Math.max(0, d - len);
+      const y1 = by + Math.sin(angle) * Math.max(0, d - len);
+      g.lineStyle(k % 3 === 0 ? 4 : 2, k % 2 === 0 ? 0xffffff : 0xb3e5fc, 0.55 * grow * Math.min(1, u * 4));
+      g.lineBetween(x0, y0, x1, y1);
+    }
+  }
+
+  /**
+   * エアロブラストの大技（ルギア。07 の203章）: 太さが画面の 3 分の 1 もあるので、絵を引き伸ばさずに描く。
+   * 濃い青 → 水色 → 白の芯を重ね、縁を波打たせ、中を風の筋が流れる。全体の明るさは変えない（明滅させない）
+   */
+  private drawGustBeam(g: Phaser.GameObjects.Graphics, h: Hazard): void {
+    const now = this.time.now / 1000;
+    const fade = Math.min(1, (h.activeTicks ?? 0) / 8);
+    const px = -h.dirY;
+    const py = h.dirX;
+    const at = (t: number, side: number): Phaser.Math.Vector2 => new Phaser.Math.Vector2(h.x + h.dirX * t + px * side, h.y + h.dirY * t + py * side);
+    const layers: [number, number, number][] = [
+      [1, 0x1565c0, 0.85],
+      [0.84, 0x4fc3f7, 0.9],
+      [0.52, 0xb3e5fc, 0.95],
+      [0.24, 0xffffff, 1],
+    ];
+    const seg = 24;
+    layers.forEach(([width, color, alpha], layer) => {
+      const left: Phaser.Math.Vector2[] = [];
+      const right: Phaser.Math.Vector2[] = [];
+      for (let k = 0; k <= seg; k++) {
+        const t = (h.length * k) / seg;
+        // 口元は少し細く、すぐ全部の太さになる。縁は流れるように波打つ
+        const mouth = 0.6 + 0.4 * Math.min(1, t / 90);
+        const wave = 1 + 0.035 * Math.sin(t * 0.03 - now * 16 + layer * 1.7);
+        const half = h.radius * width * mouth * Math.min(1, wave);
+        left.push(at(t, -half));
+        right.unshift(at(t, half));
+      }
+      g.fillStyle(color, alpha * fade).fillPoints([...left, ...right], true);
+    });
+    // 中を流れる風の筋
+    for (let k = 0; k < 26; k++) {
+      const side = ((k * 0.618) % 1) * 2 - 1;
+      const u = (now * 1.9 + k * 0.37) % 1;
+      const t0 = h.length * u;
+      const t1 = Math.min(h.length, t0 + 90 + 60 * ((k * 0.31) % 1));
+      const a = at(t0, side * h.radius * 0.9);
+      const b = at(t1, side * h.radius * 0.9);
+      g.lineStyle(k % 3 === 0 ? 7 : 4, 0xffffff, 0.5 * fade).lineBetween(a.x, a.y, b.x, b.y);
+    }
+  }
+
   private drawSurfRing(g: Phaser.GameObjects.Graphics, h: Hazard, ring: { width: number; startRadius: number; gapDegrees: number }): void {
     const dir = Math.atan2(h.dirY, h.dirX);
     const half = (ring.gapDegrees * Math.PI) / 360;
@@ -1690,6 +1784,11 @@ export class RunScene extends Phaser.Scene {
         continue;
       }
       const mv = this.sim.world.rules.stage.moves[h.move];
+      if (mv?.suction && h.activeTicks === undefined) this.drawSuction(g, h);
+      if (mv?.suction && h.activeTicks !== undefined) {
+        this.drawGustBeam(g, h);
+        continue;
+      }
       if (mv?.surfRing) {
         this.drawSurfRing(g, h, mv.surfRing);
         continue;
@@ -2509,8 +2608,11 @@ export class RunScene extends Phaser.Scene {
     const localView = this.playerViews.get(this.localId);
     if (!local || !localView) return;
     const cam = this.cameras.main;
-    const cx = localView.container.x;
-    const cy = localView.container.y;
+    // 固定マップ: カメラはマップに固定（07 の203章）
+    const arena = world.arena;
+    if (arena && !this.arenaFrame) this.showArena(arena);
+    const cx = arena ? arena.x : localView.container.x;
+    const cy = arena ? arena.y + arena.cameraOffsetY : localView.container.y;
     cam.centerOn(cx, cy);
     this.ground.update(cam, currentWaveIndex(world), deltaMs);
 
@@ -2655,7 +2757,7 @@ export class RunScene extends Phaser.Scene {
     this.drawBoxes();
     this.obstacleView.update(world, view);
     this.drawTopCenter();
-    if (world.outcome || (world.levelUp && !world.levelUp.done.has(this.localId))) this.edgeArrows.hide();
+    if (world.arena || world.outcome || (world.levelUp && !world.levelUp.done.has(this.localId))) this.edgeArrows.hide();
     else this.edgeArrows.update(this.edgeTargets(), this.cameras.main);
 
     const lu = world.levelUp;

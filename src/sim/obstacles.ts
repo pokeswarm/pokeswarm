@@ -58,7 +58,7 @@ export function obstacleInCell(world: World, cx: number, cy: number): Obstacle |
 /** (x0, y0)〜(x1, y1) の範囲にかかるマスの障害物を順に渡す */
 export function forEachObstacleIn(world: World, x0: number, y0: number, x1: number, y1: number, fn: (o: Obstacle) => void): void {
   const size = world.rules.obstacles.cellSize;
-  if (world.rules.obstacles.chance <= 0) return;
+  if (world.rules.obstacles.chance <= 0 || world.arena) return;
   const cx0 = Math.floor(x0 / size);
   const cy0 = Math.floor(y0 / size);
   const cx1 = Math.floor(x1 / size);

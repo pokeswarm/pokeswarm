@@ -279,6 +279,8 @@ export interface World {
     forced?: number[];
     /** 技の間隔を、技が終わってから数える */
     intervalAfterMove?: boolean;
+    /** 飛んでいく先（技の flyTo。07 の203章） */
+    flyTo?: { x: number; y: number; speed: number };
     // ---- 07 の193章 ----
     /** 使える回数のある技（maxUses）を使った回数（技の番号 → 回数） */
     uses?: Record<number, number>;
@@ -323,6 +325,8 @@ export interface World {
   wingsEnabled: Set<WingKind>;
   /** このランで拾ったはね（ルギア・ホウオウ戦の権利） */
   readonly wings: Set<WingKind>;
+  /** 固定マップの戦いの間の、マップの場所と広さ（07 の203章）。ふだんは null */
+  arena: { x: number; y: number; halfWidth: number; halfHeight: number; viewHeight: number; cameraOffsetY: number } | null;
   /** 伝説戦に、相性で選ぶ候補（stage.json の legendary.counter。色違いの御三家）を足す（参加者のだれかが条件の実績を達成している）。ランを始める前に入れる */
   legendaryCounter: boolean;
   /** 伝説戦の相手を legendary.forceKind の伝説に決める（遊ぶ人の記録が条件をまだ満たしていない）。ランを始める前に入れる */
@@ -406,6 +410,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     nextIntruderCheck: 0,
     wingsEnabled: new Set(),
     wings: new Set(),
+    arena: null,
     swarmSchedule: buildSwarmSchedule(rules, tickRate),
     nextSwarm: 0,
     hazards: [],

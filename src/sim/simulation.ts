@@ -18,7 +18,7 @@ import { emptyModifiers } from './upgrades';
 import { checkEvolutionAll } from './systems/evolution';
 import { contactDamage, regenerate, touchRevive } from './systems/health';
 import { blockByObstacles } from './obstacles';
-import { advanceSection, armBombers, bossAttacks, checkRunEnd, spawnBosses, spawnSwarms, stepIntruders, stepTags, stepLegendTargets } from './systems/stage';
+import { advanceSection, armBombers, bossAttacks, checkRunEnd, spawnBosses, spawnSwarms, stepIntruders, stepTags, stepLegendTargets, keepInArena } from './systems/stage';
 import { createWorld, type SimRole, type World } from './world';
 import { drawNature } from './nature';
 
@@ -116,6 +116,7 @@ export class Simulation {
     tickCandies(w);
     checkEvolutionAll(w);
     if (!w.outcome) openLevelUpIfPending(w);
+    keepInArena(w);
     if (w.role === 'guest') w.enemies.stepGhosts();
     w.enemies.removeDead();
     w.tick++;

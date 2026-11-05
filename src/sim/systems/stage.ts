@@ -7,6 +7,13 @@ import { maybeOpenContest } from '../contest';
 import { fireCasterMove } from './attack';
 import { casterFor } from './legendCasters';
 import { spawnItemsAround } from './items';
+import { confirmPickup } from './gems';
+
+/** 固定マップを置く場所（前のマップから十分遠く）。見た目の精度が落ちない程度の遠さ */
+const ARENA_X = 200000;
+/** 固定マップに移ったときのプレイヤーの間隔と、手前からの位置（中心から半分の高さの何倍か） */
+const ARENA_PLAYER_GAP = 80;
+const ARENA_PLAYER_Y = 0.6;
 
 /**
  * ステージの進行（01_game_design.md 7章。2026年10月の作者の決定）:
@@ -31,8 +38,11 @@ function spawnBoss(world: World, kindIndex: number, moves: readonly number[], in
   const kind = world.rules.enemies.kinds[kindIndex]!;
   const p = world.players[world.rng.int(world.players.length)]!;
   const [ux, uy] = randomUnit(world.rng);
-  const x = anchor ? p.x + anchor.x : p.x + ux * rules.spawnDistance;
-  const y = anchor ? p.y + anchor.y : p.y + uy * rules.spawnDistance;
+  // 固定マップでは、マップの中心からの位置（07 の203章）
+  const ox = world.arena ? world.arena.x : p.x;
+  const oy = world.arena ? world.arena.y : p.y;
+  const x = anchor ? ox + anchor.x : p.x + ux * rules.spawnDistance;
+  const y = anchor ? oy + anchor.y : p.y + uy * rules.spawnDistance;
   // 伝説は人数倍（07 の123章）
   const perExtra = kind.rank === 'legendary' ? (rules.legendHpPerExtraPlayerPct ?? rules.hpPerExtraPlayerPct) : rules.hpPerExtraPlayerPct;
   const hp = kind.hp * hpScale * (tag ? (rules.tagHpMultiplier ?? 1) : 1) * (1 + (perExtra * (world.players.length - 1)) / 100);
@@ -412,6 +422,21 @@ export function bossAttacks(world: World): void {
       if (world.rules.stage.legendary?.moveSets[world.rules.enemies.kinds[world.enemies.kind[i]!]?.id ?? '']?.weatherStates && !bossBusy(world, boss.id) && !world.hazards.some((h) => h.dasher === boss.id && world.rules.stage.moves[h.move]?.rooted && h.activeTicks === undefined)) {
         world.enemies.speed[i] = bossSpeed(world, boss, i);
       }
+      // 飛んでいく先へ進む（ルギアが降りてくる。07 の203章）
+      if (boss.flyTo) {
+        const dx = boss.flyTo.x - world.enemies.x[i]!;
+        const dy = boss.flyTo.y - world.enemies.y[i]!;
+        const d = Math.hypot(dx, dy);
+        const step = boss.flyTo.speed * world.dt;
+        if (d <= step) {
+          world.enemies.x[i] = boss.flyTo.x;
+          world.enemies.y[i] = boss.flyTo.y;
+          boss.flyTo = undefined;
+        } else {
+          world.enemies.x[i] = world.enemies.x[i]! + (dx / d) * step;
+          world.enemies.y[i] = world.enemies.y[i]! + (dy / d) * step;
+        }
+      }
       // 技が終わってから間隔を数える（間隔のぶん必ず歩く）
       if (boss.intervalAfterMove && bossBusy(world, boss.id)) {
         boss.cooldown = boss.interval;
@@ -723,11 +748,12 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   }
   // 予告の間止まる技（ファイヤーのゴッドバード。ゲストも予告の知らせで止める）
   if (move.rooted) world.enemies.speed[i] = 0;
+  if (move.flyTo && boss && world.arena) boss.flyTo = { x: world.arena.x + move.flyTo.x, y: world.arena.y + move.flyTo.y, speed: move.flyTo.speed };
   const dx0 = target.x - bx;
   const dy0 = target.y - by;
   const len0 = Math.hypot(dx0, dy0) || 1;
-  const ux = dx0 / len0;
-  const uy = dy0 / len0;
+  const ux = move.fixedAim ? move.fixedAim.x : dx0 / len0;
+  const uy = move.fixedAim ? move.fixedAim.y : dy0 / len0;
   if (move.decoys) {
     castDecoys(world, bossId, i, move, moveIdx, target, put);
     return;
@@ -1054,6 +1080,7 @@ function hitLocal(world: World, me: World['players'][number], hz: World['hazards
 function strikeHazards(world: World): void {
   tickZones(world);
   tickLegendField(world);
+  tickSuction(world);
   const me = world.players.find((p) => p.id === world.localPlayerId);
   // 何本もの線の技（×・大の字）は、落ちたときの絵を組ごとに1つだけ（真ん中に）出す
   const armsStruck = new Set<number>();
@@ -1277,6 +1304,12 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
     }
     hz.x += vx * world.dt;
     hz.y += vy * world.dt;
+    // 固定マップの壁で跳ね返る（ルギアの たつまき）
+    if (tr.arenaBounce && world.arena) {
+      const a = world.arena;
+      if ((hz.x > a.x + a.halfWidth - hz.radius && hz.vx > 0) || (hz.x < a.x - a.halfWidth + hz.radius && hz.vx < 0)) hz.vx = -hz.vx;
+      if ((hz.y > a.y + a.halfHeight - hz.radius && hz.vy > 0) || (hz.y < a.y - a.halfHeight + hz.radius && hz.vy < 0)) hz.vy = -hz.vy;
+    }
     // 自分の画面の端で跳ね返る（ボルテッカーの残像）
     const box = tr.bounceBox;
     const me = box ? (world.players.find((p) => p.id === world.localPlayerId) ?? nearestPlayer(world, hz.x, hz.y)) : null;
@@ -1382,6 +1415,66 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
  * 伝説戦のマップの効果を、自分のプレイヤーに当てる（どのブラウザでも自分の分だけ）:
  * ふぶき（毎秒 最大 HP の % ・遅くなる）・ほのおのうず（伝説の近くで削られる）・ぜったいれいど（HP が少ないと凍る）
  */
+/**
+ * 固定マップへ移る（07 の203章）。kind の伝説に固定マップが無ければ何もしない（別の戦いに移るなら外へ戻さない）。
+ * マップは遠くの決まった場所に置くので、前のマップの玉・道具は見えなくなる。玉の経験値はここでまとめて渡す
+ */
+export function enterArena(world: World, kind: number): void {
+  const a = world.rules.stage.legendary?.moveSets[world.rules.enemies.kinds[kind]?.id ?? '']?.arena;
+  world.arena = a ? { x: ARENA_X, y: 0, halfWidth: a.halfWidth, halfHeight: a.halfHeight, viewHeight: a.viewHeight, cameraOffsetY: a.cameraOffsetY } : null;
+  if (!world.arena) return;
+  if (world.role !== 'guest') for (let g = world.gems.count - 1; g >= 0; g--) confirmPickup(world, world.gems.id[g]!, world.localPlayerId);
+  const n = world.players.length;
+  world.players.forEach((p, k) => {
+    // 手前の真ん中に横に並ぶ（全員の場所はどのブラウザでも同じ）
+    p.x = p.prevX = ARENA_X + (k - (n - 1) / 2) * ARENA_PLAYER_GAP;
+    p.y = p.prevY = world.arena!.y + world.arena!.halfHeight * ARENA_PLAYER_Y;
+    if (p.remote) {
+      p.netX = p.x;
+      p.netY = p.y;
+    }
+  });
+}
+
+/** 固定マップの壁の中へ戻す（自分のブラウザで動かす人だけ。押し飛ばし・突進・風の後にも効く） */
+export function keepInArena(world: World): void {
+  const a = world.arena;
+  if (!a) return;
+  for (const p of world.players) {
+    if (p.remote) continue;
+    p.x = Math.max(a.x - a.halfWidth + p.radius, Math.min(a.x + a.halfWidth - p.radius, p.x));
+    p.y = Math.max(a.y - a.halfHeight + p.radius, Math.min(a.y + a.halfHeight - p.radius, p.y));
+  }
+}
+
+/** (x, y) から向き (dx, dy) に進んで固定マップの壁に当たるまでの長さ（固定マップでなければ無限） */
+function rayToArenaWall(world: World, x: number, y: number, dx: number, dy: number): number {
+  const a = world.arena;
+  if (!a) return Infinity;
+  const tx = dx > 0 ? (a.x + a.halfWidth - x) / dx : dx < 0 ? (a.x - a.halfWidth - x) / dx : Infinity;
+  const ty = dy > 0 ? (a.y + a.halfHeight - y) / dy : dy < 0 ? (a.y - a.halfHeight - y) / dy : Infinity;
+  return Math.max(0, Math.min(tx, ty));
+}
+
+/** 吸い込みの風（ルギア。07 の203章）: 技の予告の間、自分のプレイヤーをボスの方へ引き寄せる（本人のブラウザで） */
+function tickSuction(world: World): void {
+  const me = world.players.find((p) => p.id === world.localPlayerId);
+  if (!me || me.down) return;
+  for (const hz of world.hazards) {
+    const s = world.rules.stage.moves[hz.move]?.suction;
+    if (!s || hz.activeTicks !== undefined) continue;
+    const i = findEnemyIndex(world, hz.dasher);
+    if (i === -1) continue;
+    const dx = world.enemies.x[i]! - me.x;
+    const dy = world.enemies.y[i]! - me.y;
+    const d = Math.hypot(dx, dy);
+    if (d < 1) continue;
+    const step = Math.min(d, s.speed * world.dt);
+    me.x += (dx / d) * step;
+    me.y += (dy / d) * step;
+  }
+}
+
 function tickLegendField(world: World): void {
   const me = world.players.find((p) => p.id === world.localPlayerId);
   if (!me) return;
@@ -1489,7 +1582,8 @@ export function addHazard(
   if (!move) return;
   const ticks = Math.round(move.telegraphSeconds / world.dt) + (extra.delay ?? 0);
   const radius = extra.radius || move.radius;
-  const length = move.shape === 'line' ? extra.length || (move.length ?? 400) : 0;
+  // 固定マップでは、直線は壁までで止まる
+  const length = move.shape === 'line' ? Math.min(extra.length || (move.length ?? 400), rayToArenaWall(world, x, y, dirX, dirY)) : 0;
   const di = dasher !== -1 ? findEnemyIndex(world, dasher) : -1;
   // にほんばれ と あまごい は同時に降らない（ゲストにも、この技の予告の知らせで届く）
   if (move.clearsMoves) {
@@ -1831,6 +1925,7 @@ export function startLegendary(world: World, kind: number, round = roundIndexOf(
   world.bosses.length = 0;
   world.hazards.length = 0;
   world.zones.length = 0;
+  enterArena(world, kind);
   world.events.push({ type: 'legendaryWarning', kind });
 }
 

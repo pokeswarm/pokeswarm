@@ -11,7 +11,7 @@ import { spawnItem } from './items';
  */
 export function stepBoxes(world: World): void {
   const cfg = world.rules.pickups.boxes;
-  if (!cfg || world.players.length === 0) return;
+  if (!cfg || world.players.length === 0 || world.arena) return;
   if (world.role === 'guest') {
     hitBoxes(world, cfg.radius);
     return;

@@ -596,6 +596,12 @@ export const bossMoveSchema = z.object({
   pose: z.string().optional(),
   /** 当たっている間もボスは止まったままで、次の技を始めず、pose の動きを続ける（10まんボルト・ボルテッカーの残像を放っている間。07 の194章） */
   holdWhileActive: z.boolean().optional(),
+  /** 狙わず、決まった向きへ撃つ（ルギアの エアロブラストの大技: 奥からまっすぐ手前へ。07 の203章） */
+  fixedAim: z.object({ x: z.number(), y: z.number() }).optional(),
+  /** 予告の間、自分のプレイヤーをボスの方へ毎秒 speed だけ引き寄せる（ルギアの 吸い込みの風。07 の203章） */
+  suction: z.object({ speed: z.number().positive() }).optional(),
+  /** 技を始めると、ボスが固定マップの中心から (x, y) の場所へ速さ speed で飛んでいく（ルギアが降りてくる。07 の203章） */
+  flyTo: z.object({ x: z.number(), y: z.number(), speed: z.number().positive() }).optional(),
   /** 1 回の戦いで使える回数（回復の技を繰り返して HP が減らなくなるのを防ぐ。使い切ったら順番を飛ばす。07 の193章） */
   maxUses: z.number().int().positive().optional(),
   leaves: z
@@ -649,6 +655,8 @@ export const bossMoveSchema = z.object({
        * プレイヤーを通すのは左右の面からだけ（距離が短い上下からは避ける時間が無い。上下の面に来たら、次の左右の面まで待つ）
        */
       bounceBox: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), aimEvery: z.number().int().positive() }).optional(),
+      /** 固定マップの壁で跳ね返る（ルギアの たつまき。07 の203章） */
+      arenaBounce: z.boolean().optional(),
     })
     .optional(),
   /** target self の count 個を、ボスの周り radius に、狙った人の向きから順に（stagger）置く（ライコウのかみなり） */
@@ -821,6 +829,12 @@ export const stageConfigSchema = z.object({
             chargePose: z.string().optional(),
             /** 地面のこの場所（プレイヤーからの距離）に陣取って出る（動かない相手は enemies.json の motion を still にする。07 の198章） */
             anchor: z.object({ x: z.number(), y: z.number() }).optional(),
+            /**
+             * 固定マップで戦う（1 体の伝説戦。07 の203章）: プレイヤーは決まった広さのマップへ移り、カメラは引きで固定する。
+             * halfWidth・halfHeight は動ける広さの半分。viewHeight は見えるワールドの縦（ふだんの 720 より大きいと小さく映る）。
+             * cameraOffsetY はカメラの中心をマップの中心からずらす量（上の HP バーの分）。anchor はマップの中心からの位置になる
+             */
+            arena: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), viewHeight: z.number().positive(), cameraOffsetY: z.number().default(0) }).optional(),
             /**
              * 天気の姿（リザードン。07 の198章）: 技 hazardMove が出ている間の 歩く速さ（%）・プレイヤーを追うか・技の威力（%）・受けるダメージ（%）・体の色・体に重ねる絵・残像の数
              */

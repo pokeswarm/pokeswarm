@@ -927,19 +927,31 @@
           ],
           "item": "potion"
         },
+        "noEnrage": true,
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960,
+          "cameraOffsetY": -30
+        },
+        "anchor": {
+          "x": 0,
+          "y": -280
+        },
         "moves": [
-          "lugia-aeroblast-sweep",
-          "lugia-hurricane",
-          "lugia-extrasensory"
+          "lugia-twister",
+          "lugia-aeroblast-aim",
+          "lugia-aeroblast-aim",
+          "lugia-twister",
+          "lugia-aeroblast-aim",
+          "lugia-aeroblast-full",
+          "lugia-tired",
+          "lugia-rise"
         ],
         "random": false,
-        "moveIntervalSeconds": 1.5,
-        "enrageMoveIntervalSeconds": 1,
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 1.4,
         "field": {
-          "wind": {
-            "speed": 70,
-            "everySeconds": 4
-          },
           "overlay": {
             "color": "#b3e5fc",
             "alpha": 0.1

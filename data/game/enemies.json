@@ -1511,10 +1511,7 @@
       "spriteScale": 2.8,
       "drop": "potion",
       "dropPerPlayer": true,
-      "motion": {
-        "type": "keepDistance",
-        "distance": 340
-      }
+      "motion": { "type": "still" }
     },
     {
       "id": "legend-ho-oh",

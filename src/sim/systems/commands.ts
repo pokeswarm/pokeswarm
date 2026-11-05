@@ -7,7 +7,7 @@ import { currentWaveIndex, enemyHpScale, findEnemyIndex, findPlayer, type World,
 import { breakOnDamage, damageTakenMultiplier } from './status';
 import { confirmPickup } from './gems';
 import { addXp, applyOffer, banUpgrade, chooseUpgrade, mirrorLevelUp, rerollUpgrades, resumeInvincible, skipUpgrade } from './leveling';
-import { addHazard, endRun } from './stage';
+import { addHazard, endRun, enterArena } from './stage';
 import { applyRevive } from './health';
 import { applyItem, confirmItem, spawnItem } from './items';
 import { addBox, registerBoxHit, removeBox } from './boxes';
@@ -224,6 +224,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
           world.cleared = true;
           world.hazards.length = 0;
           world.legendAis.clear();
+          enterArena(world, cmd.kind);
           world.events.push({ type: 'legendaryWarning', kind: cmd.kind });
         }
         break;

@@ -21,6 +21,7 @@ import { BlizzardSheet, IceCrystals, SnowGround } from '../render/effects/FrostS
 import { WaveSheet } from '../render/effects/WaveSheet';
 import { AuroraSheet } from '../render/effects/AuroraSheet';
 import { MirrorCoat } from '../render/effects/MirrorCoat';
+import { WaterRun } from '../render/effects/WaterRun';
 import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
@@ -165,6 +166,8 @@ export class RunScene extends Phaser.Scene {
   private auroraSheet: AuroraSheet | null = null;
   /** ミラーコートの鏡（07 の223章） */
   private mirrorCoat: MirrorCoat | null = null;
+  /** 水の上を走る足元（07 の225章） */
+  private waterRun: WaterRun | null = null;
   private introFading = false;
   /** テストプレイ: ?intruderat で、決まった時刻に乱入させる */
   private testIntruderLater: { kind: number; tick: number } | null = null;
@@ -342,6 +345,7 @@ export class RunScene extends Phaser.Scene {
     this.waveSheet = null;
     this.auroraSheet = null;
     this.mirrorCoat = null;
+    this.waterRun = null;
     this.introFading = false;
     this.overlayLast = null;
     this.overlayLevel = 0;
@@ -3077,6 +3081,8 @@ export class RunScene extends Phaser.Scene {
     this.auroraSheet.update(world, this.time.now);
     this.mirrorCoat ??= new MirrorCoat(this, spriteRender.depths.bosses);
     this.mirrorCoat.update(world, this.time.now);
+    this.waterRun ??= new WaterRun(this, ARENA_FLOOR_DEPTH + 3.5, spriteRender.depths.bosses - 0.01);
+    this.waterRun.update(world, this.time.now);
     // 地面の一部なので、障害物・雑魚より下（作者の依頼）
     this.snowGround ??= new SnowGround(this, -500);
     this.snowGround.update(world, this.time.now, this.cameras.main);

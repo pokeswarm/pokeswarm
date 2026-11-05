@@ -952,6 +952,7 @@
         }
       },
       "legend-suicune": {
+        "waterRun": true,
         "arena": {
           "halfWidth": 800,
           "halfHeight": 440,

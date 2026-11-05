@@ -1023,6 +1023,8 @@ export const stageConfigSchema = z.object({
             hpMoves: z.array(z.object({ belowHpPct: z.number().gt(0).lt(100), moves: z.array(z.string()).min(1) })).optional(),
             /** 第 2 段階（技が速くなる・DANGER）を使わない。行動を作者が決めた相手（07 の194章） */
             noEnrage: z.boolean().optional(),
+            /** 水の上を走る見た目（足元の波紋・航跡・しぶき。スイクン。07 の225章） */
+            waterRun: z.boolean().optional(),
             /** 技の間隔を、技が終わってから数える（間隔のぶん必ず歩く。07 の194章） */
             intervalAfterMove: z.boolean().optional(),
             /** HP がこの割合（%）を切るたびに、道具を人数分落とす（レッド戦。雑魚がいない戦いの回復。07 の193章） */

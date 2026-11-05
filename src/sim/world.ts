@@ -285,6 +285,8 @@ export interface World {
     dashPath?: { points: readonly (readonly [number, number])[]; next: number; speed: number; move: number };
     dashLeft?: number;
     dashPause?: number;
+    /** なみのりの切れ目の真ん中（波に乗る高さを切れ目から外す。07 の221章） */
+    waveGapY?: number;
     /** この更新回数までは次の技を始めない（かみなりの雲が流れている間） */
     holdUntil?: number;
     /** 飛んでいく先（技の flyTo。07 の203章） */

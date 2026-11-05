@@ -1111,7 +1111,8 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   }
   if (move.arenaWave && world.arena) {
     put(bx, by, 0, 1, bossId);
-    castArenaWave(world, move.arenaWave, bx, target);
+    const gapY = castArenaWave(world, move.arenaWave, bx, target);
+    if (boss) boss.waveGapY = gapY;
     return;
   }
   if (move.blizzardRound && world.arena) {
@@ -1374,7 +1375,7 @@ function clampToArena(world: World, x: number, y: number): [number, number] {
 }
 
 /** なみのり（07 の218章）: ボスのいる側の端から反対側へ進む帯。切れ目は狙った人の近く */
-function castArenaWave(world: World, w: NonNullable<BossMove['arenaWave']>, bx: number, target: World['players'][number]): void {
+function castArenaWave(world: World, w: NonNullable<BossMove['arenaWave']>, bx: number, target: World['players'][number]): number {
   const a = world.arena!;
   const line = moveIndexOfStage(world.rules, w.line);
   const side = bx >= a.x ? 1 : -1;
@@ -1385,6 +1386,7 @@ function castArenaWave(world: World, w: NonNullable<BossMove['arenaWave']>, bx: 
   const group = world.nextHazardGroup++;
   addHazard(world, line, x, top, 0, 1, -1, undefined, { group, length: gapY - w.gap / 2 - top, vx: -side * w.speed, vy: 0 });
   addHazard(world, line, x, gapY + w.gap / 2, 0, 1, -1, undefined, { group, length: bottom - (gapY + w.gap / 2), vx: -side * w.speed, vy: 0 });
+  return gapY;
 }
 
 /** 地割れ（07 の214章）: 割れ目の線（予告と、光る裂け目）と、根元から順に立つ炎 */
@@ -2036,7 +2038,14 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
   // 波と一緒に反対側へ走る（なみのり）
   if (move.arenaWave && boss && world.arena) {
     const side = world.enemies.x[i]! >= world.arena.x ? 1 : -1;
-    boss.flyTo = { x: world.arena.x - side * (world.arena.halfWidth - 80), y: world.enemies.y[i]!, speed: move.arenaWave.speed };
+    // 波の上を走る: 切れ目を通らない高さへ少しずつ寄る
+    const a = world.arena;
+    const gapY = boss.waveGapY ?? a.y + a.halfHeight;
+    const clear = move.arenaWave.gap / 2 + 110;
+    let rideY = world.enemies.y[i]!;
+    if (Math.abs(rideY - gapY) < clear) rideY = gapY + (gapY > a.y ? -clear : clear);
+    rideY = Math.max(a.y - a.halfHeight + 70, Math.min(a.y + a.halfHeight - 70, rideY));
+    boss.flyTo = { x: a.x - side * (a.halfWidth - 80), y: rideY, speed: move.arenaWave.speed };
   }
   // 受けたダメージの分だけ、鏡の破片が飛ぶ（ミラーコート）
   if (move.mirrorShards) {

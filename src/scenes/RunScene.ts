@@ -18,6 +18,7 @@ import { audio } from '../audio';
 import { RunSounds } from '../audio/runSounds';
 import { LavaSea } from '../render/effects/LavaSea';
 import { BlizzardSheet, SnowGround } from '../render/effects/FrostSheets';
+import { WaveSheet } from '../render/effects/WaveSheet';
 import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
@@ -154,6 +155,8 @@ export class RunScene extends Phaser.Scene {
   /** スイクンの登場の積もる雪・ふぶき（07 の218・219章） */
   private snowGround: SnowGround | null = null;
   private blizzardSheet: BlizzardSheet | null = null;
+  /** なみのりの波（07 の221章） */
+  private waveSheet: WaveSheet | null = null;
   private introFading = false;
   /** テストプレイ: ?intruderat で、決まった時刻に乱入させる */
   private testIntruderLater: { kind: number; tick: number } | null = null;
@@ -327,6 +330,7 @@ export class RunScene extends Phaser.Scene {
     this.lavaSea = null;
     this.snowGround = null;
     this.blizzardSheet = null;
+    this.waveSheet = null;
     this.introFading = false;
     this.overlayLast = null;
     this.overlayLevel = 0;
@@ -1888,7 +1892,8 @@ export class RunScene extends Phaser.Scene {
       // 長く当たり続ける範囲で絵の無いもの（罠・波）は、触れると痛い範囲として薄く見せる（07 の167章）
       if (h.activeTicks !== undefined) {
         const recipe = effectRecipes[mv?.effect ?? ''];
-        if (mv && !recipe?.bossActive && ((mv.activeSeconds ?? 0) > 0.6 || mv.bounce)) this.drawHazardArea(g, h, mv, 0.1, 0.6);
+        // 波は絵そのものが範囲（赤く重ねない）
+        if (mv && !mv.waterWall && !recipe?.bossActive && ((mv.activeSeconds ?? 0) > 0.6 || mv.bounce)) this.drawHazardArea(g, h, mv, 0.1, 0.6);
         continue;
       }
       // 続けて突進する技: 前の突進が終わるまで、次の予告は出さない
@@ -3058,6 +3063,8 @@ export class RunScene extends Phaser.Scene {
     this.lavaSea.update(world, this.time.now);
     this.blizzardSheet ??= new BlizzardSheet(this, spriteRender.depths.effects + 0.4);
     this.blizzardSheet.update(world, this.time.now);
+    this.waveSheet ??= new WaveSheet(this, spriteRender.depths.effects + 0.45, ARENA_FLOOR_DEPTH + 3);
+    this.waveSheet.update(world, this.time.now);
     // 地面の一部なので、障害物・雑魚より下（作者の依頼）
     this.snowGround ??= new SnowGround(this, -500);
     this.snowGround.update(world, this.time.now, this.cameras.main);

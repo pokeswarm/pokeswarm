@@ -734,6 +734,8 @@ export const bossMoveSchema = z.object({
    * 予告が終わると、ボスも波と一緒に反対側へ走る
    */
   arenaWave: z.object({ line: z.string().min(1), speed: z.number().positive(), gap: z.number().positive() }).optional(),
+  /** 専用の波の絵で描く（スイクンの なみのり。07 の221章） */
+  waterWall: z.boolean().optional(),
   /** 線の両端を丸めず、四角に切る（波の切れ目の見た目と当たりを揃える。07 の220章） */
   flatEnds: z.boolean().optional(),
   /** なぎ払う線の跡に、凍った床を残す（スイクンの オーロラビーム。07 の218章）。spacing ごとの丸い床。歩くと slowPct % 遅くなる */

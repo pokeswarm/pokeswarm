@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { buildSimRules } from '../data/simRules';
 import { Simulation } from './simulation';
@@ -238,6 +240,14 @@ describe('ライコウの技（07 の211章）', () => {
     expect(seen).toContain('raikou-discharge');
     expect(seen).toContain('raikou-discharge-2');
     expect(seen).toContain('raikou-tired');
+  });
+
+  it('固定マップの絵があり、その画像が public にある', () => {
+    const s = setup();
+    inArena(s);
+    const map = s.sim.world.arena!.map!;
+    expect(map.floor).toBe('map/johto/arena-raikou-floor.png');
+    for (const file of [map.floor, map.wall, ...(map.shimmer ?? [])]) expect(fs.existsSync(path.join('public', file))).toBe(true);
   });
 
   it('動いても、走る速さはプレイヤーより遅く、壁の中にいる', () => {

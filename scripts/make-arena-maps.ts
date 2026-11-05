@@ -477,11 +477,157 @@ function hoohWall(): (Rgb | null)[] {
   return out;
 }
 
+// --- ライコウ: 雷雲の下の夜の草原（風になびく草に、落雷の焦げ跡が枝分かれして残る。07 の213章） ---
+
+/** 黄色い稲妻・赤い予告・暗い雲の影が見えるよう、床は中くらいの暗さの、青みの緑にする */
+const GRASS = ['#1d3626', '#24412c', '#2c4d32', '#355938', '#40653f'].map(hex);
+const SOIL = ['#141c18', '#1a241d', '#212c22'].map(hex);
+
+/** 落雷の焦げ跡（0〜1。1 が焦げの真ん中）。真ん中の大きな跡と、四隅の小さな跡 */
+function raikouBurn(): Float32Array {
+  const burn = new Float32Array(W * H);
+  let n = 0;
+  const rand = () => hash2(n++, 3, 301);
+  const stamp = (cx: number, cy: number, r: number) => {
+    const R = Math.ceil(r);
+    for (let y = Math.max(0, Math.floor(cy) - R); y <= Math.min(H - 1, Math.floor(cy) + R); y++) {
+      for (let x = Math.max(0, Math.floor(cx) - R); x <= Math.min(W - 1, Math.floor(cx) + R); x++) {
+        const v = 1 - Math.hypot(x - cx, y - cy) / r;
+        if (v > 0 && v > burn[y * W + x]!) burn[y * W + x] = v;
+      }
+    }
+  };
+  const branch = (x0: number, y0: number, a0: number, len: number, w0: number): void => {
+    let x = x0, y = y0, a = a0;
+    for (let s = 0; s < len; s++) {
+      x += Math.cos(a) * 2;
+      y += Math.sin(a) * 2;
+      a += (rand() - 0.5) * 0.46;
+      const w = Math.max(0.9, w0 * (1 - s / len));
+      stamp(x, y, w);
+      if (w0 > 1.3 && s > 6 && rand() < 0.055) branch(x, y, a + (rand() < 0.5 ? -1 : 1) * (0.45 + rand() * 0.6), Math.max(8, (len - s) * 0.62), w * 0.72);
+    }
+  };
+  const star = (cx: number, cy: number, arms: number, len: number, w: number, disk: number) => {
+    stamp(cx, cy, disk);
+    for (let k = 0; k < arms; k++) branch(cx, cy, ((k + rand() * 0.6) / arms) * Math.PI * 2, len * (0.7 + rand() * 0.4), w);
+  };
+  star(W / 2, H / 2 + 6, 9, 95, 4.5, 15);
+  star(112, 96, 5, 30, 2.6, 7);
+  star(690, 92, 5, 34, 2.6, 7);
+  star(92, 352, 5, 30, 2.6, 7);
+  star(706, 340, 5, 34, 2.6, 7);
+  return burn;
+}
+
+function raikouFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
+  const burn = raikouBurn();
+  const at = (x: number, y: number) => (x >= 0 && y >= 0 && x < W && y < H ? burn[y * W + x]! : 0);
+  const floor: Rgb[] = [];
+  const shimmerA: (Rgb | null)[] = [];
+  const shimmerB: (Rgb | null)[] = [];
+  const glintA = hex('#7fb2c8');
+  const glintB = hex('#bfe2ee');
+  const blade = hex('#3f6b46');
+  const bladeDark = hex('#1a3323');
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const b = at(x, y);
+    // 風になびく草の帯（斜めの大きな波）
+    const wind = Math.sin(x * 0.016 + y * 0.042 + fbm(x / 90, y / 60, 303) * 5.5);
+    let t = 0.42 + wind * 0.27 + (fbm(x / 22, y / 14, 305) - 0.5) * 0.34;
+    const out = Math.hypot((x - W / 2) / (W / 2), (y - H / 2) / (H / 2));
+    t -= 0.12 * Math.max(0, out - 0.8);
+    let col = ramp(GRASS, t, x, y);
+    // 草の葉（短い縦の線。なびく向きに少しずれる）
+    const lean = wind > 0 ? 1 : 0;
+    const h0 = hash2(x, Math.floor(y / 3), 307);
+    if (h0 > 0.965) col = blade;
+    else if (hash2(x - lean, Math.floor((y - 1) / 3), 307) > 0.965) col = bladeDark;
+    let glint = 0;
+    if (b > 0) {
+      // 焦げ跡: 真ん中は黒い土、ふちは焼けて枯れた草。ふちは崩す
+      const rough = (hash2(x, y, 309) - 0.5) * 0.14;
+      const v = b + rough;
+      if (v > 0.5) col = ramp(SOIL, 0.25 + (v - 0.5) * 1.1 + (fbm(x / 7, y / 7, 311) - 0.5) * 0.7, x, y);
+      else if (v > 0.16) col = hash2(x, y, 313) > 0.5 ? SOIL[2]! : hex('#2a3528');
+      else if (v > 0.03 && hash2(x, y, 315) > 0.45) col = hex('#2e3b2b');
+      // 焦げの真ん中に残る、弱い静電気（所々）
+      if (b > 0.45) {
+        const n = valueNoise(x / 4, y / 4, 317);
+        if (n > 0.8) glint = 1;
+        else if (n < 0.14) glint = 2;
+      }
+    }
+    // 小さな白い花（まばら。焦げの上には咲かない）
+    if (b === 0 && hash2(Math.floor(x / 7), Math.floor(y / 7), 319) > 0.985 && x % 7 === 3 && y % 7 === 3) col = hex('#8fa9a2');
+    // 壁ぎわの影
+    const edgeD = Math.min(x, W - 1 - x);
+    const shade = Math.max(0, 1 - y / 18) * 0.65 + Math.max(0, 1 - edgeD / 12) * 0.5 + Math.max(0, 1 - (H - 1 - y) / 8) * 0.45;
+    if (shade > (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16) col = [Math.round(col[0] * 0.62), Math.round(col[1] * 0.66), Math.round(col[2] * 0.7)];
+    floor.push(col);
+    shimmerA.push(glint === 1 ? glintA : null);
+    shimmerB.push(glint === 2 ? glintB : null);
+  }
+  return { floor, shimmerA, shimmerB };
+}
+
+const STORM_SKY = ['#0a0c1c', '#0e1226', '#141a33', '#1b2340', '#262f50'].map(hex);
+const STONE = ['#11181c', '#1a2428', '#253236', '#324146', '#465a5c'].map(hex);
+
+function raikouWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const dark = hex('#070913');
+  const rimLight = hex('#55716a');
+  const rimDark = hex('#121a1c');
+  const hill = hex('#0e1720');
+  const hillFar = hex('#141d2c');
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = inset(iy, 11) - ix;
+    const fromRight = ix - (W - 1 - inset(iy, 12));
+    const fromTop = inset(ix, 13) - iy;
+    const fromBottom = iy - (H - 1 - inset(ix, 14));
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    let col: Rgb;
+    const ridgeTop = 13 + fbm(x / 26, 7, 321) * 7;
+    if (iy < 0 && -iy > ridgeTop) {
+      // 奥: 嵐の夜空。雲の帯と、遠くの丘（HP バーとタイマーの後ろは暗くする）
+      const k = (iy + MARGIN) / MARGIN;
+      const cloud = fbm(x / 70, y / 9, 323);
+      col = ramp(STORM_SKY, k * 0.55 + (cloud - 0.45) * 0.8, x, y);
+      if (-iy < 30 + fbm(x / 80, 3, 325) * 14) col = hillFar;
+      if (-iy < 22 + fbm(x / 45, 5, 327) * 9) col = hill;
+    } else {
+      // 手前の岩と土手（左上が明るい丸い塊）
+      const stone = worley(x, y, 22, 329);
+      const round = (stone.dx + stone.dy) / 22;
+      let t = 0.5 + round * 0.42 + (hash2(stone.id, 2, 331) - 0.5) * 0.25 + (fbm(x / 30, y / 30, 333) - 0.5) * 0.3 - Math.max(0, dist - 8) * 0.012;
+      col = ramp(STONE, t, x, y);
+      if (stone.edge < 0.8) col = STONE[0]!;
+      // 岩にかぶさる長い草（上から垂れる）
+      if (hash2(x, Math.floor(y / 5), 335) > 0.86) col = hex('#20403a');
+      if (dist > MARGIN - 14 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (dist - (MARGIN - 14)) / 14) col = dark;
+    }
+    // 歩ける端: 雨にぬれて明るい岩のふち（途切れないよう 3 ドット）
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 4) col = rimLight;
+    out.push(col);
+  }
+  return out;
+}
+
 const outDir = path.join('public', 'map', 'johto');
 fs.mkdirSync(outDir, { recursive: true });
 const arenas = [
   { id: 'lugia', ...lugiaFloor(), wall: lugiaWall() },
   { id: 'hooh', ...hoohFloor(), wall: hoohWall() },
+  { id: 'raikou', ...raikouFloor(), wall: raikouWall() },
 ];
 for (const a of arenas) {
   fs.writeFileSync(path.join(outDir, `arena-${a.id}-floor.png`), toPng(a.floor, W, H));

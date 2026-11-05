@@ -83,6 +83,7 @@
   "run.bossAppeared": "Der Boss {name} erscheint!",
   "run.tagAppeared": "Ein wildes {a} und ein wildes {b} erscheinen!",
   "run.tagBossAppeared": "Die Bosse {a} und {b} erscheinen!",
+  "run.trioAppeared": "{a}, {b} und {c} erscheinen!",
   "run.clear": "Ruhmeshalle!",
   "run.legendEscaped": "{name} ist geflohen …",
   "run.legendWon": "{name} besiegt!",

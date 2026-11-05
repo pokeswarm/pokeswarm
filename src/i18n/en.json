@@ -104,6 +104,7 @@
   "run.bossAppeared": "The boss {name} appeared!",
   "run.tagAppeared": "A wild {a} and {b} appeared!",
   "run.tagBossAppeared": "The bosses {a} and {b} appeared!",
+  "run.trioAppeared": "{a}, {b} and {c} appeared!",
   "run.clear": "Hall of Fame!",
   "run.legendEscaped": "{name} fled…",
   "run.legendWon": "Defeated {name}!",

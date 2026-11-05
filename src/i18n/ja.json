@@ -104,6 +104,7 @@
   "run.bossAppeared": "ボスの {name}が あらわれた！",
   "run.tagAppeared": "{a}と {b}が あらわれた！",
   "run.tagBossAppeared": "ボスの {a}と {b}が あらわれた！",
+  "run.trioAppeared": "{a}と {b}と {c}が あらわれた！",
   "run.clear": "でんどういり！",
   "run.legendEscaped": "{name} は 去っていった…",
   "run.legendWon": "{name} を 倒した！",

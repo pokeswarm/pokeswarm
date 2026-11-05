@@ -1221,7 +1221,9 @@ export class RunScene extends Phaser.Scene {
     if (appeared.length > 0) {
       const boss = w.rules.enemies.kinds[appeared[0]!]!.rank === 'boss';
       const text =
-        appeared.length >= 2
+        appeared.length >= 3
+          ? t('run.trioAppeared', { a: this.enemyName(appeared[0]!), b: this.enemyName(appeared[1]!), c: this.enemyName(appeared[2]!) })
+          : appeared.length === 2
           ? t(boss ? 'run.tagBossAppeared' : 'run.tagAppeared', { a: this.enemyName(appeared[0]!), b: this.enemyName(appeared[1]!) })
           : t(boss ? 'run.bossAppeared' : 'run.midbossAppeared', { name: this.enemyName(appeared[0]!) });
       this.announce(text, boss ? '#ff8a65' : '#ffe082');

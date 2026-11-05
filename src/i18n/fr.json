@@ -83,6 +83,7 @@
   "run.bossAppeared": "Le boss {name} apparaît !",
   "run.tagAppeared": "Un {a} et un {b} sauvages apparaissent !",
   "run.tagBossAppeared": "Les boss {a} et {b} apparaissent !",
+  "run.trioAppeared": "{a}, {b} et {c} apparaissent !",
   "run.clear": "Panthéon !",
   "run.legendEscaped": "{name} s’est enfui…",
   "run.legendWon": "{name} vaincu !",

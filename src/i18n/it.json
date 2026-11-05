@@ -83,6 +83,7 @@
   "run.bossAppeared": "È apparso il boss {name}!",
   "run.tagAppeared": "Sono apparsi un {a} e un {b} selvatici!",
   "run.tagBossAppeared": "Sono apparsi i boss {a} e {b}!",
+  "run.trioAppeared": "Sono apparsi {a}, {b} e {c}!",
   "run.clear": "Sala d'Onore!",
   "run.legendEscaped": "{name} se n’è andato…",
   "run.legendWon": "{name} sconfitto!",

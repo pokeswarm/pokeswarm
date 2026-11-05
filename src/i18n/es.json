@@ -83,6 +83,7 @@
   "run.bossAppeared": "¡Apareció el jefe {name}!",
   "run.tagAppeared": "¡Aparecieron un {a} y un {b} salvajes!",
   "run.tagBossAppeared": "¡Aparecieron los jefes {a} y {b}!",
+  "run.trioAppeared": "¡Aparecieron {a}, {b} y {c}!",
   "run.clear": "¡Hall de la Fama!",
   "run.legendEscaped": "{name} se ha marchado…",
   "run.legendWon": "¡{name} derrotado!",

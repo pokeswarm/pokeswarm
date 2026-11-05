@@ -36,6 +36,8 @@ export class SpriteStreamer {
     const next = world.waves[now + 1];
     const left = ticksUntilNextSection(world);
     if (next && left !== null && left <= this.lookaheadTicks) next.kinds.forEach(add);
+    // 乱入が決まったら、出る前に読み込む（スイクンの凍てつく登場の後は、もう目の前にいる）
+    if (world.intruder && !world.intruder.done) add(world.intruder.kind);
     const e = world.enemies;
     for (let i = 0; i < e.count; i++) {
       add(e.kind[i]!);

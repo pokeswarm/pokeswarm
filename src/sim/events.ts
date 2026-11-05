@@ -298,6 +298,13 @@ export interface IntruderLeftEvent {
   readonly kind: number;
 }
 
+/** スイクンの登場: 今のマップが凍てつき始める（ticks 後に固定マップへ。ホスト→ゲスト。07 の218章） */
+export interface IntruderIntroEvent {
+  readonly type: 'intruderIntro';
+  readonly kind: number;
+  readonly ticks: number;
+}
+
 /** 乱入の固定マップの戦いが終わり、元のマップへ戻る（ホスト→ゲスト。07 の211章） */
 export interface IntruderArenaEndedEvent {
   readonly type: 'intruderArenaEnded';
@@ -450,4 +457,5 @@ export type SimEvent =
   | LegendaryWarningEvent
   | IntruderWarningEvent
   | IntruderLeftEvent
-  | IntruderArenaEndedEvent;
+  | IntruderArenaEndedEvent
+  | IntruderIntroEvent;

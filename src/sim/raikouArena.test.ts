@@ -127,6 +127,8 @@ describe('乱入の固定マップ（07 の211章）', () => {
     for (const id of ['legend-entei', 'legend-suicune']) {
       const { sim, kind } = setup(1, 3, id);
       startIntruder(sim.world, kind);
+      // スイクンは凍てつく登場の後に移る
+      for (let t = 0; t < 30 * 4 && !sim.world.arena; t++) sim.step([]);
       expect(sim.world.arena).toBeTruthy();
       for (let t = 0; t < 30 * 70 && sim.world.arena; t++) sim.step([]);
       expect(sim.world.arena).toBeNull();

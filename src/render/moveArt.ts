@@ -6609,6 +6609,10 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'entei-island': () => enteiIsland(),
     'entei-burst': () => ({ ...fireBlastBurst(), palette: ENTEI_PALETTE }),
     'entei-crack': () => enteiCrack(),
+    'suicune-shard': () => suicuneShard(),
+    'suicune-mist': () => suicuneMist(),
+    'suicune-ice-patch': () => suicuneIcePatch(),
+    'suicune-ice': () => suicuneIce(),
     'raikou-bolt': () => raikouBolt(),
     'raikou-cloud': () => raikouCloud(),
     'raikou-charge': () => raikouCharge(),
@@ -7194,6 +7198,96 @@ function enteiCrack(): SpriteOut {
   };
   const fr = [0, 1, 2, 3];
   return { palette, frameMs: 120, parts: { start: fr.map((f) => toRows(cap(f, false))), middle: fr.map((f) => toRows(tile(f % 2, f))), end: fr.map((f) => toRows(cap(f, true))) } };
+}
+
+const SUICUNE_ICE_PALETTE = ['#123a5e', '#1f6a97', '#46a3c9', '#8fd6ea', '#cdf0f8', '#ffffff'];
+
+/** ミラーコートの破片: 光る細長い菱形。回って飛ぶ（07 の218章）。2 コマ */
+function suicuneShard(): SpriteOut {
+  const frames = [0, 1].map((f) =>
+    shape(24, (u, v) => {
+      const d = Math.abs(u) / 0.4 + Math.abs(v) / 0.92;
+      if (d > 1) return -1;
+      if (u > 0 && Math.abs(v + u * 0.4) < 0.1 + f * 0.05) return 5;
+      return d > 0.78 ? 1 : u < 0 ? 3 : 4;
+    }),
+  );
+  return { palette: SUICUNE_ICE_PALETTE, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/** スイクンが消える霧（07 の218章）: 外ほど細かい粒にほどける白い霧。粒でゆっくり渦を巻く。4 コマ */
+function suicuneMist(): SpriteOut {
+  const palette = ['#b9d6e6', '#d3e6f0', '#eaf4f9'];
+  const lobes = [[0, 0, 0.62], [-0.45, -0.18, 0.4], [0.46, -0.14, 0.42], [-0.3, 0.38, 0.38], [0.34, 0.36, 0.4], [0.02, -0.48, 0.34]] as const;
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(128, (u, v) => {
+      let dens = 0;
+      for (const [cx, cy, r] of lobes) {
+        const a = Math.atan2(v - cy, u - cx);
+        const wob = 1 + 0.07 * Math.sin(a * 4 + f * 1.57 + cx * 7);
+        dens = Math.max(dens, 1 - Math.hypot(u - cx, v - cy) / (r * wob));
+      }
+      if (dens <= 0) return -1;
+      // 粒: 濃い所ほど隙間なく、薄い所は点々と
+      const px = Math.round((u + 1) * 64);
+      const py = Math.round((v + 1) * 64);
+      const n = hash(px >> 1, py >> 1, 8200 + (f % 2));
+      if (n > dens * 2.4) return -1;
+      const swirl = Math.sin(Math.atan2(v, u) * 3 + Math.hypot(u, v) * 9 - f * 1.57);
+      return swirl > 0.35 ? 2 : swirl > -0.35 ? 1 : 0;
+    }),
+  );
+  return { palette, frameMs: 140, parts: { main: frames.map(toRows) } };
+}
+
+/** オーロラビームの跡の凍った床: 白い氷が薄く張る。ふちは欠ける */
+function suicuneIcePatch(): SpriteOut {
+  const g = shape(44, (u, v) => {
+    const a = Math.atan2(v, u);
+    const edge = 0.86 + 0.04 * Math.sin(a * 3 + 1) + 0.03 * Math.sin(a * 11);
+    const d = Math.hypot(u, v);
+    if (d > edge) return -1;
+    if (d > edge * 0.72 && hash(Math.round((u + 1) * 22), Math.round((v + 1) * 22), 8100) < 0.4) return -1;
+    const crack = Math.abs(Math.sin(u * 8 + Math.sin(v * 5) * 1.5)) < 0.06;
+    return crack ? 5 : d > edge * 0.72 ? 3 : hash(Math.round((u + 1) * 7), Math.round((v + 1) * 7), 8110) > 0.5 ? 4 : 3;
+  });
+  return { palette: SUICUNE_ICE_PALETTE, frameMs: 200, parts: { main: [toRows(g)] } };
+}
+
+/** ふぶきの氷の塊: とがった結晶が集まった塊。せり上がる 4 コマ。end は崩れて小さくなる（07 の218章） */
+function suicuneIce(): SpriteOut {
+  const W = 72;
+  const H = 88;
+  const rootY = 76;
+  const spires = [
+    { cx: -0.42, h: 0.62, w: 0.26, lean: -0.1 },
+    { cx: 0.44, h: 0.68, w: 0.26, lean: 0.12 },
+    { cx: 0.16, h: 0.84, w: 0.3, lean: 0.06 },
+    { cx: -0.12, h: 1, w: 0.34, lean: -0.05 },
+  ];
+  const draw = (scale: number): Grid => {
+    const g = fill(blank(W, H), (x, y) => {
+      const up = (rootY - y) / (rootY - 4);
+      if (up < -0.14) return -1;
+      let col = -1;
+      for (const s of spires) {
+        const hh = s.h * scale;
+        if (up > hh) continue;
+        const q = Math.max(0, up) / hh;
+        const c = ((s.cx + s.lean * q) * W) / 2 + (W - 1) / 2;
+        const half = ((s.w * W) / 2) * (1 - q * q * 0.1) * (1 - q);
+        const off = x - c;
+        if (Math.abs(off) > Math.max(0.6, half + (up < 0 ? up * 30 : 0))) continue;
+        // 左の面は明るく、右の面は暗い。真ん中の稜線は白い
+        col = Math.abs(off) < 1 ? 5 : off < 0 ? 4 : q < 0.25 ? 2 : 3;
+      }
+      return col;
+    });
+    return outline(g, 0);
+  };
+  const main = [0.4, 0.62, 0.85, 1].map(draw);
+  const end = [0.7, 0.4].map(draw);
+  return { palette: SUICUNE_ICE_PALETTE, frameMs: 110, loopFrom: 3, parts: { main: main.map(toRows), end: end.map(toRows) } };
 }
 
 const RAIKOU_BOLT_PALETTE = ['#3a2a00', '#c98a00', '#ffc400', '#fff176', '#ffffff'];

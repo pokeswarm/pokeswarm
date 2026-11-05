@@ -727,6 +727,21 @@ export const bossMoveSchema = z.object({
   lavaRound: z.object({ island: z.string().min(1), sea: z.string().min(1), delaySeconds: z.number().nonnegative(), layout: z.array(z.tuple([z.number(), z.number()])).min(1) }).optional(),
   /** 溶岩の海: 壁ぎわから fillSeconds で満ち、fullSeconds そのまま、recedeSeconds で引く。溶岩の中にいて、技 islands の島の上にいなければ当たる */
   lavaSea: z.object({ islands: z.string().min(1), fillSeconds: z.number().positive(), fullSeconds: z.number().nonnegative(), recedeSeconds: z.number().positive() }).optional(),
+  /** 今のマップの中の、狙った人から minDistance〜maxDistance の場所へ speed で滑っていく（スイクン。07 の218章） */
+  glide: z.object({ minDistance: z.number().nonnegative(), maxDistance: z.number().positive(), speed: z.number().positive() }).optional(),
+  /**
+   * 固定マップの端から端まで届く波（スイクンの なみのり。07 の218章）: ボスのいる側の端から反対側へ、技 line の帯を speed で進める。切れ目 gap は狙った人の近く。
+   * 予告が終わると、ボスも波と一緒に反対側へ走る
+   */
+  arenaWave: z.object({ line: z.string().min(1), speed: z.number().positive(), gap: z.number().positive() }).optional(),
+  /** なぎ払う線の跡に、凍った床を残す（スイクンの オーロラビーム。07 の218章）。spacing ごとの丸い床。歩くと slowPct % 遅くなる */
+  sweepTrail: z.object({ effect: z.string().min(1), spacing: z.number().positive(), radius: z.number().positive(), seconds: z.number().positive(), slowPct: z.number().min(0).max(95) }).optional(),
+  /** 予告の間に受けたダメージが多いほど、終わりに技 move を多く全方向へ飛ばす（スイクンの ミラーコート。最大 HP の 1 % ごとに perHpPct 個。07 の218章） */
+  mirrorShards: z.object({ move: z.string().min(1), minCount: z.number().int().positive(), perHpPct: z.number().nonnegative(), maxCount: z.number().int().positive() }).optional(),
+  /** 吹雪の 1 回（スイクンの ふぶき。07 の218章）: layout の場所（割合）に技 block の氷の塊をせり上げ、delaySeconds 後に技 front の吹雪を出す。layout が空なら塊はそのまま */
+  blizzardRound: z.object({ block: z.string().min(1), front: z.string().min(1), delaySeconds: z.number().nonnegative(), layout: z.array(z.tuple([z.number(), z.number()])) }).optional(),
+  /** 吹雪の帯: 向き (dirX, dirY) へ speed で吹き抜ける。幅 width の帯の中にいて、技 blocks の塊の風下（leeLength まで）にいなければ当たる */
+  blizzard: z.object({ blocks: z.string().min(1), dirX: z.number(), dirY: z.number(), speed: z.number().positive(), width: z.number().positive(), leeLength: z.number().positive() }).optional(),
   /** この技を使うときに、一緒に使う技（エンテイの ふんか: 止まっている間に火山弾を降らせる） */
   alsoCast: z.string().min(1).optional(),
   /** 使ったあと、次の技をこの秒数待つ（輪が閉じる間など） */
@@ -960,6 +975,8 @@ export const stageConfigSchema = z.object({
             chargePose: z.string().optional(),
             /** 地面のこの場所（プレイヤーからの距離）に陣取って出る（動かない相手は enemies.json の motion を still にする。07 の198章） */
             anchor: z.object({ x: z.number(), y: z.number() }).optional(),
+            /** 乱入の前に、今のマップが seconds 秒かけて凍てつき、「DANGER」は固定マップへ移ってから出す（スイクンだけ。作者の依頼。07 の218章） */
+            freezeIntro: z.object({ seconds: z.number().positive() }).optional(),
             /**
              * 固定マップで戦う（1 体の伝説戦。07 の203章）: プレイヤーは決まった広さのマップへ移り、カメラは引きで固定する。
              * halfWidth・halfHeight は動ける広さの半分。viewHeight は見えるワールドの縦（ふだんの 720 より大きいと小さく映る）。

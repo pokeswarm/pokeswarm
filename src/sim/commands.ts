@@ -208,6 +208,13 @@ export interface SetLegendTargetCommand {
   readonly playerId: number;
 }
 
+/** ゲスト: スイクンの登場で今のマップが凍てつき始める（07 の218章） */
+export interface IntruderIntroCommand {
+  readonly type: 'intruderIntro';
+  readonly kind: number;
+  readonly ticks: number;
+}
+
 /** ゲスト: 乱入の固定マップから元のマップへ戻る（07 の211章） */
 export interface ExitIntruderArenaCommand {
   readonly type: 'exitIntruderArena';
@@ -377,6 +384,7 @@ export type InputCommand =
   | RevivePlayerCommand
   | LegendaryWarningCommand
   | ExitIntruderArenaCommand
+  | IntruderIntroCommand
   | SetLegendTargetCommand
   | SetSectionCommand
   | SpawnItemCommand

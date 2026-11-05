@@ -263,6 +263,16 @@ export function stepIntruders(world: World): void {
   if (world.role === 'guest' || world.players.length === 0) return;
   const cfg = world.rules.stage.legendary?.intruders;
   const it = world.intruder;
+  // 凍てつく登場の終わり: 固定マップへ移り、もう目の前にいる。ここで「DANGER」
+  if (it?.introUntil !== undefined) {
+    if (world.tick < it.introUntil) return;
+    it.introUntil = undefined;
+    const start = it.introStart ?? world.tick;
+    enterIntruderArena(world, it.kind);
+    if (it.arena) it.arena.enterTick = start;
+    world.events.push({ type: 'intruderWarning', kind: it.kind });
+    return;
+  }
   // 固定マップの戦いが終わって、元のマップへ戻る
   if (it?.exitTick !== undefined && world.tick >= it.exitTick) {
     it.exitTick = undefined;
@@ -344,9 +354,32 @@ export function startIntruder(world: World, kind: number): void {
   const lg = world.rules.stage.legendary;
   if (!lg) return;
   const appearTick = world.tick + Math.round(lg.warningSeconds / world.dt);
-  world.intruder = { kind, id: -1, appearTick, endTick: appearTick + Math.round((lg.intruders?.timeLimitSeconds ?? lg.timeLimitSeconds) / world.dt), done: false };
+  const limit = Math.round((lg.intruders?.timeLimitSeconds ?? lg.timeLimitSeconds) / world.dt);
+  // 凍てつく登場（スイクン）: 「DANGER」も固定マップも、凍てついた後
+  const intro = lg.moveSets[world.rules.enemies.kinds[kind]?.id ?? '']?.freezeIntro;
+  if (intro) {
+    const until = world.tick + Math.round(intro.seconds / world.dt);
+    world.intruder = { kind, id: -1, appearTick: until, endTick: until + limit, done: false, introStart: world.tick, introUntil: until };
+    freezeField(world);
+    world.events.push({ type: 'intruderIntro', kind, ticks: until - world.tick });
+    return;
+  }
+  world.intruder = { kind, id: -1, appearTick, endTick: appearTick + limit, done: false };
   enterIntruderArena(world, kind);
   world.events.push({ type: 'intruderWarning', kind });
+}
+
+/** 今のマップの敵を凍らせる（動かず、触れても痛くない。ソロ・ホスト・ゲスト） */
+export function freezeField(world: World): void {
+  const e = world.enemies;
+  for (let i = 0; i < e.count; i++) {
+    e.speed[i] = 0;
+    e.vx[i] = 0;
+    e.vy[i] = 0;
+    e.damage[i] = 0;
+  }
+  world.hazards.length = 0;
+  world.zones.length = 0;
 }
 
 /** 走り去る（固定マップの乱入）: 技をやめ、近い方の壁の外へ一瞬で走る。走った跡に稲妻 */
@@ -1033,6 +1066,41 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   }
   if (move.nextMoveWaitSeconds && boss) boss.holdUntil = world.tick + Math.round(move.nextMoveWaitSeconds / world.dt);
   if (move.alsoCast) castBossMove(world, bossId, i, moveIndexOfStage(world.rules, move.alsoCast));
+  if (move.glide && world.arena && boss) {
+    put(bx, by, 0, 1, bossId);
+    const a = world.arena;
+    const g = move.glide;
+    let x = bx;
+    let y = by;
+    for (let k = 0; k < 16; k++) {
+      const [rx, ry] = randomUnit(world.rng);
+      const d = world.rng.range(g.minDistance, g.maxDistance);
+      const px = target.x + rx * d;
+      const py = target.y + ry * d;
+      if (Math.abs(px - a.x) > a.halfWidth - 90 || Math.abs(py - a.y) > a.halfHeight - 90) continue;
+      x = px;
+      y = py;
+      break;
+    }
+    boss.flyTo = { x, y, speed: g.speed };
+    return;
+  }
+  if (move.arenaWave && world.arena) {
+    put(bx, by, 0, 1, bossId);
+    castArenaWave(world, move.arenaWave, bx, target);
+    return;
+  }
+  if (move.blizzardRound && world.arena) {
+    put(bx, by, 0, 1, bossId);
+    const a = world.arena;
+    const r = move.blizzardRound;
+    if (r.layout.length) {
+      const block = moveIndexOfStage(world.rules, r.block);
+      for (const [fx, fy] of r.layout) addHazard(world, block, a.x + fx * a.halfWidth, a.y + fy * a.halfHeight, 0, 1, -1, undefined, { group: world.nextHazardGroup++ });
+    }
+    addHazard(world, moveIndexOfStage(world.rules, r.front), a.x, a.y, 0, 1, -1, undefined, { delay: Math.round(r.delaySeconds / world.dt) });
+    return;
+  }
   if (move.fissures && world.arena) {
     put(bx, by, ux, uy, bossId);
     castFissures(world, move.fissures, bx, by, ux, uy);
@@ -1279,6 +1347,20 @@ function clampToArena(world: World, x: number, y: number): [number, number] {
   const a = world.arena;
   if (!a) return [x, y];
   return [Math.max(a.x - a.halfWidth + ARENA_LINE_MARGIN, Math.min(a.x + a.halfWidth - ARENA_LINE_MARGIN, x)), Math.max(a.y - a.halfHeight + ARENA_LINE_MARGIN, Math.min(a.y + a.halfHeight - ARENA_LINE_MARGIN, y))];
+}
+
+/** なみのり（07 の218章）: ボスのいる側の端から反対側へ進む帯。切れ目は狙った人の近く */
+function castArenaWave(world: World, w: NonNullable<BossMove['arenaWave']>, bx: number, target: World['players'][number]): void {
+  const a = world.arena!;
+  const line = moveIndexOfStage(world.rules, w.line);
+  const side = bx >= a.x ? 1 : -1;
+  const x = a.x + side * a.halfWidth;
+  const top = a.y - a.halfHeight;
+  const bottom = a.y + a.halfHeight;
+  const gapY = Math.max(top + w.gap / 2 + 20, Math.min(bottom - w.gap / 2 - 20, target.y + world.rng.range(-110, 110)));
+  const group = world.nextHazardGroup++;
+  addHazard(world, line, x, top, 0, 1, -1, undefined, { group, length: gapY - w.gap / 2 - top, vx: -side * w.speed, vy: 0 });
+  addHazard(world, line, x, gapY + w.gap / 2, 0, 1, -1, undefined, { group, length: bottom - (gapY + w.gap / 2), vx: -side * w.speed, vy: 0 });
 }
 
 /** 地割れ（07 の214章）: 割れ目の線（予告と、光る裂け目）と、根元から順に立つ炎 */
@@ -1599,7 +1681,7 @@ function strikeHazards(world: World): void {
         if (hz.group !== undefined) world.hazardGroupsHit.delete(hz.group);
         hz.rehitTicks = Math.round(move.hitEverySeconds / world.dt);
       }
-      if (me && !me.down && me.invincibleTicks <= 0 && !hz.hitLocal && (move?.lavaSea ? lavaSeaHits(world, hz, move, me.x, me.y) : hazardHits(hz, me.x, me.y, me.radius, move))) {
+      if (me && !me.down && me.invincibleTicks <= 0 && !hz.hitLocal && (move?.lavaSea ? lavaSeaHits(world, hz, move, me.x, me.y) : move?.blizzard ? blizzardHits(world, hz, move, me.x, me.y) : hazardHits(hz, me.x, me.y, me.radius, move))) {
         hitLocal(world, me, hz, move);
         // 罠（ふいうち）: 踏んだ人の画面で、その場で飛び出す
         if (move?.trap) world.events.push(struckEvent(hz, move));
@@ -1721,9 +1803,47 @@ function strikeHazards(world: World): void {
       }
     }
     // 罠は踏んだときだけ当たる。ダメージの無い技（ため・強化・回復）は当てない
-    if (move?.trap || move?.lavaSea || !me || me.down || me.invincibleTicks > 0 || (hz.damage <= 0 && !hz.damageOverride)) continue;
+    if (move?.trap || move?.lavaSea || move?.blizzard || !me || me.down || me.invincibleTicks > 0 || (hz.damage <= 0 && !hz.damageOverride)) continue;
     if (hazardHits(hz, me.x, me.y, me.radius, move)) hitLocal(world, me, hz, move);
   }
+}
+
+/** 吹雪の帯の真ん中の位置（マップの中心からの、吹く向きに沿った距離）。吹き始めは帯ごとマップの外 */
+export function blizzardFront(world: World, hz: World['hazards'][number], move: BossMove): number {
+  const a = world.arena;
+  const b = move.blizzard;
+  if (!a || !b || hz.activeTicks === undefined) return Infinity;
+  const span = Math.abs(b.dirX) * a.halfWidth + Math.abs(b.dirY) * a.halfHeight + b.width / 2;
+  const total = Math.max(1, Math.round((move.activeSeconds ?? 1) / world.dt));
+  return -span + ((total - hz.activeTicks) * world.dt) * b.speed;
+}
+
+/** 氷の塊の場所と半径 */
+export function blizzardShelters(world: World, b: NonNullable<BossMove['blizzard']>): { x: number; y: number; radius: number }[] {
+  const moves = world.rules.stage.moves;
+  return world.hazards.filter((h) => moves[h.move]?.id === b.blocks);
+}
+
+/** (x, y) が氷の塊の風下か */
+export function isInLee(shelters: readonly { x: number; y: number; radius: number }[], b: NonNullable<BossMove['blizzard']>, x: number, y: number): boolean {
+  for (const s of shelters) {
+    const dx = x - s.x;
+    const dy = y - s.y;
+    const along = dx * b.dirX + dy * b.dirY;
+    const across = Math.abs(-dx * b.dirY + dy * b.dirX);
+    if (across <= s.radius && along >= -s.radius && along <= b.leeLength) return true;
+  }
+  return false;
+}
+
+/** 吹雪の帯の中にいて、風下でない */
+function blizzardHits(world: World, hz: World['hazards'][number], move: BossMove, x: number, y: number): boolean {
+  const a = world.arena;
+  const b = move.blizzard;
+  if (!a || !b) return false;
+  const along = (x - a.x) * b.dirX + (y - a.y) * b.dirY;
+  if (Math.abs(along - blizzardFront(world, hz, move)) > b.width / 2) return false;
+  return !isInLee(blizzardShelters(world, b), b, x, y);
 }
 
 /** 溶岩の海の水位（壁からの距離。ワールドの単位）: 満ちて、そのままで、引く（07 の215章） */
@@ -1806,6 +1926,17 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
     const a = Math.atan2(hz.baseDirY, hz.baseDirX) + (deg * Math.PI) / 180;
     hz.dirX = Math.cos(a);
     hz.dirY = Math.sin(a);
+    // 通った跡に凍った床（同じ場所には重ねない。どのブラウザでも同じものを作る）
+    const trail = move.sweepTrail;
+    if (trail && (hz.activeTicks ?? 0) % 3 === 0) {
+      for (let d = trail.spacing; d < hz.length; d += trail.spacing) {
+        const x = hz.x + hz.dirX * d;
+        const y = hz.y + hz.dirY * d;
+        const gap2 = (trail.spacing * 0.8) ** 2;
+        if (world.zones.some((z) => (z.x - x) ** 2 + (z.y - y) ** 2 < gap2)) continue;
+        world.zones.push({ x, y, radius: trail.radius, ticksLeft: Math.round(trail.seconds / world.dt), slowPct: trail.slowPct, damagePerSecond: 0, color: '#b2ebf2', effect: trail.effect, sprite: true });
+      }
+    }
   }
   if (move.travel && hz.vx !== undefined && hz.vy !== undefined) {
     const tr = move.travel;
@@ -1878,6 +2009,24 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
   const boss = world.bosses.find((b) => b.id === hz.dasher);
   // 稲妻の形に走り出す（しんそく）
   if (move.zigzag && boss?.dashPath && boss.dashPath.next === 0) boss.dashPath.next = 1;
+  // 波と一緒に反対側へ走る（なみのり）
+  if (move.arenaWave && boss && world.arena) {
+    const side = world.enemies.x[i]! >= world.arena.x ? 1 : -1;
+    boss.flyTo = { x: world.arena.x - side * (world.arena.halfWidth - 80), y: world.enemies.y[i]!, speed: move.arenaWave.speed };
+  }
+  // 受けたダメージの分だけ、鏡の破片が飛ぶ（ミラーコート）
+  if (move.mirrorShards) {
+    const m = move.mirrorShards;
+    const taken = Math.max(0, (hz.hpAtStart ?? world.enemies.hp[i]!) - world.enemies.hp[i]!);
+    const count = Math.min(m.maxCount, m.minCount + Math.floor(((taken / Math.max(1, world.enemies.maxHp[i]!)) * 100) * m.perHpPct));
+    const idx = moveIndexOfStage(world.rules, m.move);
+    const a0 = world.rng.range(0, Math.PI * 2);
+    const group = world.nextHazardGroup++;
+    for (let k = 0; k < count; k++) {
+      const a = a0 + (k * Math.PI * 2) / count;
+      addHazard(world, idx, world.enemies.x[i]!, world.enemies.y[i]!, Math.cos(a), Math.sin(a), -1, undefined, { group });
+    }
+  }
   // ためきった（じこさいせい）: もう止められない
   if (boss && move.interruptDamage) boss.interrupt = undefined;
   // じばく: 爆発した敵はいなくなる（ホストが決めてゲストへ送る）
@@ -2157,7 +2306,7 @@ export function addHazard(
     ...(extra.damage ? { damageOverride: extra.damage } : {}),
     ...(extra.vx !== undefined && extra.vy !== undefined && (extra.vx !== 0 || extra.vy !== 0) ? { vx: extra.vx, vy: extra.vy } : {}),
     ...(extra.boxX !== undefined && extra.boxY !== undefined ? { boxX: extra.boxX, boxY: extra.boxY } : {}),
-    ...(move.counter && di !== -1 ? { hpAtStart: world.enemies.hp[di]! } : {}),
+    ...((move.counter || move.mirrorShards) && di !== -1 ? { hpAtStart: world.enemies.hp[di]! } : {}),
   });
   // 予告の間止まる技（ゲストも同じ知らせで止める）
   if ((move.rooted || move.selfDestruct) && di !== -1) {

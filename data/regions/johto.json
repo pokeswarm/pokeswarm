@@ -608,7 +608,8 @@
       "hpTimesMidboss": 6,
       "fleeMoves": {
         "legend-raikou": "raikou-flee",
-        "legend-entei": "entei-flee"
+        "legend-entei": "entei-flee",
+        "legend-suicune": "suicune-flee"
       }
     },
     "moveSets": {
@@ -960,21 +961,38 @@
           "x": 0,
           "y": -240
         },
+        "noEnrage": true,
+        "freezeIntro": {
+          "seconds": 2.8
+        },
         "moves": [
-          "suicune-mist",
-          "suicune-aurora-beam",
-          "suicune-mirror-coat"
+          "suicune-roar",
+          "suicune-to-side",
+          "suicune-surf",
+          "suicune-surf",
+          "suicune-glide",
+          "suicune-aurora",
+          "suicune-glide",
+          "suicune-mirror-coat",
+          "suicune-glide"
+        ],
+        "hpMoves": [
+          {
+            "belowHpPct": 50,
+            "moves": [
+              "suicune-to-center"
+            ]
+          }
         ],
         "random": false,
-        "moveIntervalSeconds": 1.5,
-        "enrageMoveIntervalSeconds": 1,
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 0.6,
         "field": {
-          "slowPct": 15,
           "overlay": {
-            "color": "#0d47a1",
-            "alpha": 0.12
-          },
-          "weather": "rain-dance"
+            "color": "#06264a",
+            "alpha": 0.3,
+            "fadeSeconds": 2
+          }
         }
       },
       "legend-lugia": {

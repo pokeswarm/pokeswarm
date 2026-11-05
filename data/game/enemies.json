@@ -1493,11 +1493,12 @@
       "rank": "legendary",
       "sprite": "enemy/suicune",
       "hp": 44800,
-      "moveSpeed": 165,
+      "moveSpeed": 120,
       "radius": 40,
       "contactDamage": 40,
       "xp": 0,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "motion": { "type": "still" }
     },
     {
       "id": "legend-lugia",

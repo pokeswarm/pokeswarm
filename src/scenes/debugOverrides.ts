@@ -96,6 +96,12 @@ export function parseBossHpParam(search: string): number | null {
   return Number.isFinite(v) && v > 0 && v <= 100 ? v : null;
 }
 
+/** テストプレイ: ?intruder=suicune&intruderat=20 で、20 秒遊んでから乱入させる（雑魚がいる所で登場を見る。07 の218章）。無ければ 0 */
+export function parseIntruderAtParam(search: string): number {
+  const v = Number(new URLSearchParams(search).get('intruderat'));
+  return Number.isFinite(v) && v > 0 ? v : 0;
+}
+
 /** テストプレイ: ?intruder=raikou で、少し後に伝説（三犬）が乱入する（legend-<名前> または id）。知らない名前なら null */
 export function parseIntruderParam(rules: SimRules, search: string): number | null {
   const v = new URLSearchParams(search).get('intruder');

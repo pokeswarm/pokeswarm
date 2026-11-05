@@ -32,6 +32,8 @@ export type NetMessage =
   | { t: 'lw'; k: number; r?: 1; i?: 1; e?: number }
   /** 乱入の固定マップから元のマップへ戻る（ホスト→ゲスト。07 の211章） */
   | { t: 'ax' }
+  /** スイクンの登場: 今のマップが凍てつき始める（ホスト→ゲスト。07 の218章） */
+  | { t: 'ii'; k: number; n: number }
   | { t: 'lt'; e: number; p: number }
   /** 味方を復活させた（ホスト→ゲスト）: i は復活したプレイヤー、n は残りの復活可能数 */
   | { t: 'rv'; i: number; n: number }

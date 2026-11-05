@@ -88,6 +88,8 @@ export interface Zone {
   readonly pullPerSecond?: number;
   /** この敵に付いていく床（じゅうりょく） */
   readonly followEnemy?: number;
+  /** 丸く塗らず、効果 effect の絵で描く床（スイクンの凍った床） */
+  readonly sprite?: boolean;
 }
 
 export interface Hazard {
@@ -340,6 +342,9 @@ export interface World {
     arena?: { enterTick: number; back: { id: number; x: number; y: number }[] };
     fleeTick?: number;
     exitTick?: number;
+    /** 凍てつく登場の始まりと終わり（スイクン。07 の218章） */
+    introStart?: number;
+    introUntil?: number;
   } | null;
   /** 乱入の固定マップで過ごした更新回数（ランの時計を止める。07 の211章） */
   pausedTicks: number;
@@ -550,7 +555,7 @@ export function elapsedSeconds(world: World): number {
 
 /** 乱入の固定マップにいる（ランの進行は止まる。07 の211章） */
 export function inIntruderArena(world: World): boolean {
-  return !!world.arena && !world.legendary;
+  return (!!world.arena && !world.legendary) || world.intruder?.introUntil !== undefined;
 }
 
 export function findPlayer(world: World, id: PlayerId): Player | undefined {

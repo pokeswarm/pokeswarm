@@ -17,6 +17,7 @@ import { EffectRenderer } from '../render/effects/EffectRenderer';
 import { audio } from '../audio';
 import { RunSounds } from '../audio/runSounds';
 import { LavaSea } from '../render/effects/LavaSea';
+import { BlizzardSheet, FreezeSheet } from '../render/effects/FrostSheets';
 import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
@@ -42,7 +43,7 @@ import { abilityOf, pinchMods } from '../sim/ability';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World, gateDeadlineTick } from '../sim/world';
-import { applyArenaParam, applyDebugOverrides, applySoloParam, parseBossHpParam, parseGodParam, parseLegendParam, parseIntruderParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam, parseBossParam } from './debugOverrides';
+import { applyArenaParam, applyDebugOverrides, applySoloParam, parseBossHpParam, parseGodParam, parseLegendParam, parseIntruderParam, parseIntruderAtParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam, parseBossParam } from './debugOverrides';
 import { addXp, applyOffer, itemFits, moveMaxLevel, recomputeModifiers } from '../sim/systems/leveling';
 import { shinySpriteKey } from '../meta/loadoutOptions';
 import { achievementPerks, regionAchieved } from '../meta/achievementPerks';
@@ -150,6 +151,14 @@ export class RunScene extends Phaser.Scene {
   private overBossSprites: MoveSprites | null = null;
   /** 溶岩の海（エンテイの ふんえん。07 の215章） */
   private lavaSea: LavaSea | null = null;
+  /** スイクンの登場の凍てつき・ふぶき（07 の218章） */
+  private freezeSheet: FreezeSheet | null = null;
+  private blizzardSheet: BlizzardSheet | null = null;
+  private introFading = false;
+  /** テストプレイ: ?intruderat で、決まった時刻に乱入させる */
+  private testIntruderLater: { kind: number; tick: number } | null = null;
+  /** 次に固定マップへ移るときは、白い光から明ける（スイクンの登場） */
+  private arenaFadePale = false;
   private falling = new Map<number, { x: number; y: number; radius: number; move: number }>();
   private fallShadows: Phaser.GameObjects.Graphics | null = null;
   /** 稲妻の線で描く技 */
@@ -316,6 +325,9 @@ export class RunScene extends Phaser.Scene {
     this.buffIcons = [];
     this.fieldOverlay = null;
     this.lavaSea = null;
+    this.freezeSheet = null;
+    this.blizzardSheet = null;
+    this.introFading = false;
     this.overlayLast = null;
     this.overlayLevel = 0;
     this.glyphMarks = new Map();
@@ -523,7 +535,10 @@ export class RunScene extends Phaser.Scene {
     }
     // テストプレイ（ソロだけ）: ?intruder=raikou で三犬が乱入する。?wings ではねを持っている。どちらも記録を保存しない
     const testIntruder = this.coop ? null : parseIntruderParam(this.sim.world.rules, window.location.search);
-    if (testIntruder !== null) startIntruder(this.sim.world, testIntruder);
+    const testIntruderAt = parseIntruderAtParam(window.location.search);
+    this.testIntruderLater = null;
+    if (testIntruder !== null && testIntruderAt > 0) this.testIntruderLater = { kind: testIntruder, tick: this.sim.world.tick + Math.round(testIntruderAt * simulationConfig.tickRate) };
+    else if (testIntruder !== null) startIntruder(this.sim.world, testIntruder);
     if (!this.coop && parseWingsParam(window.location.search)) for (const w of ['silver-wing', 'rainbow-wing'] as const) this.sim.world.wings.add(w);
     this.testRun = this.testRun || testIntruder !== null || (!this.coop && parseWingsParam(window.location.search));
     if (this.coop) this.setupNet(this.coop.room);
@@ -1077,7 +1092,9 @@ export class RunScene extends Phaser.Scene {
    */
   private showArena(arena: NonNullable<World['arena']>): void {
     this.applyZoom();
-    this.cameras.main.fadeIn(ARENA_FADE_MS);
+    if (this.arenaFadePale) this.cameras.main.fadeIn(ARENA_FADE_MS, 214, 238, 255);
+    else this.cameras.main.fadeIn(ARENA_FADE_MS);
+    this.arenaFadePale = false;
     const g = this.add.graphics().setDepth(ARENA_FRAME_DEPTH);
     const { x, y, halfWidth: w, halfHeight: h } = arena;
     const far = 4000;
@@ -1960,6 +1977,7 @@ export class RunScene extends Phaser.Scene {
     for (const z of this.sim.world.zones) {
       const fade = Math.min(1, z.ticksLeft / 30);
       // 控えめな粒を出す技は、塗りをうすくする
+      if (z.sprite) continue;
       g.fillStyle(hexColor(z.color), (this.effects.linger(z.effect)?.fillAlpha ?? 0.3) * fade).fillCircle(z.x, z.y, z.radius);
     }
   }
@@ -2118,6 +2136,11 @@ export class RunScene extends Phaser.Scene {
       const aura = world.rules.stage.legendary?.moveSets[kind?.id ?? '']?.shell?.aura;
       if (!aura) continue;
       out.push({ spec: { id: aura.id, fit: 'circle', size: aura.size, alpha: 1, rotate: 'none', spinDegPerSec: 0, varyTiles: false, upright: false, directional: false, originY: 0.5, along: 0.6, shake: 0, tail: 0, afterimages: 0, afterimageGap: 2 } as SpriteItem['spec'], x: world.enemies.x[i]!, y: world.enemies.y[i]!, radius: world.enemies.radius[i]!, band: 0, dirX: 1, dirY: 0, length: 0, vx: 0, vy: 0, elapsed: world.tick * world.dt, alpha: 1, seed: id });
+    }
+    // 絵で描く床（スイクンの凍った床）
+    for (const z of world.zones) {
+      const spec = z.sprite ? effectRecipes[z.effect]?.bossActive : undefined;
+      if (spec) out.push({ spec, x: z.x, y: z.y, radius: z.radius, band: 0, dirX: 0, dirY: 1, length: 0, vx: 0, vy: 0, elapsed: world.tick * world.dt, alpha: Math.min(1, z.ticksLeft / 30), seed: 0 });
     }
     for (const h of world.hazards) {
       const mv = world.rules.stage.moves[h.move];
@@ -2571,6 +2594,10 @@ export class RunScene extends Phaser.Scene {
         if (!this.sim.world.outcome) startLegendary(this.sim.world, this.testLegend);
       }
       if (this.god) this.applyGod();
+      if (this.testIntruderLater && this.sim.world.tick >= this.testIntruderLater.tick) {
+        startIntruder(this.sim.world, this.testIntruderLater.kind);
+        this.testIntruderLater = null;
+      }
       // ?bosshp: 伝説が出たら一度だけ HP を決めた割合にする（攻撃しなくても HP で変わる動きを見る）
       const lg = this.sim.world.legendary;
       // 乱入の固定マップでも、出たら一度だけ
@@ -2685,6 +2712,8 @@ export class RunScene extends Phaser.Scene {
   /** 状態異常の色（data/game/status.json の並びで先にあるものを優先）。かかっていなければ null */
   private statusTint(i: number): number | null {
     const e = this.sim.world.enemies;
+    // スイクンの登場: 敵が凍りつく
+    if (this.sim.world.intruder?.introUntil !== undefined) return 0xbfe8ff;
     // ボスがプレイヤーと同じ技で走っている間（ボルテッカー・ブレイブバード）: プレイヤーの技の残像と同じ色で光らせる（07 の167章）
     const w = this.sim.world;
     // 天気の姿（リザードン: 晴れは炎の色、雨は青。07 の198章）
@@ -3010,6 +3039,18 @@ export class RunScene extends Phaser.Scene {
     this.drawFieldOverlay();
     this.lavaSea ??= new LavaSea(this, ARENA_FLOOR_DEPTH + 3);
     this.lavaSea.update(world, this.time.now);
+    this.blizzardSheet ??= new BlizzardSheet(this, spriteRender.depths.effects + 0.4);
+    this.blizzardSheet.update(world, this.time.now);
+    this.freezeSheet ??= new FreezeSheet(this, 998, 3);
+    this.freezeSheet.update(world, this.time.now, this.cameras.main, (o) => this.placeUi(o, 0, 0));
+    // 凍てつききったら、白く薄れて固定マップへ（見えるようになると、もう目の前にいる）
+    const introIt = world.intruder;
+    if (introIt?.introUntil !== undefined && !this.introFading && (introIt.introUntil - world.tick) * world.dt <= ARENA_FADE_MS / 1000 / 2) {
+      this.introFading = true;
+      this.arenaFadePale = true;
+      this.cameras.main.fadeOut(ARENA_FADE_MS / 2, 214, 238, 255);
+    }
+    if (introIt?.introUntil === undefined) this.introFading = false;
     this.drawItems(timeMs);
     this.drawBoxes();
     this.obstacleView.update(world, view);

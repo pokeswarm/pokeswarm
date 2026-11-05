@@ -21,6 +21,22 @@
     {"id": "hooh-rekindling-flame", "effect": "boss-hooh-rekindle", "shape": "circle", "target": "self", "rooted": true, "followBoss": true, "pose": "Sleep", "flyTo": {"x": 0, "y": 0, "speed": 420}, "telegraphSeconds": 8, "radius": 70, "damage": 0, "healPct": 20, "scatterOnLand": {"move": "hooh-rainbow-feather", "count": 8, "radius": 90}, "then": "hooh-rekindle-rise"},
     {"id": "hooh-rekindle-rise", "effect": "boss-hooh-fly", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "airborne": true, "flyTo": {"x": 0, "y": -240, "speed": 90, "boost": 450}, "flyDrop": {"move": "hooh-rainbow-feather", "everySeconds": 0.12, "scatter": 120}, "telegraphSeconds": 2, "radius": 60, "damage": 0},
     {"id": "hooh-rainbow-feather", "effect": "boss-hooh-feather", "shape": "circle", "target": "self", "hideTelegraph": true, "quietStrike": true, "telegraphSeconds": 0.05, "radius": 30, "damage": 0, "activeSeconds": 2.6},
+    {"id": "suicune-roar", "move": "roar", "effect": "boss-suicune-plain", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Attack", "telegraphSeconds": 1.2, "radius": 60, "damage": 0, "maxUses": 1},
+    {"id": "suicune-to-side", "effect": "boss-suicune-plain", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "airborne": true, "flyTo": {"x": 720, "y": 0, "speed": 900, "randomSide": true}, "telegraphSeconds": 1, "radius": 60, "damage": 0},
+    {"id": "suicune-surf", "move": "surf", "effect": "boss-suicune-plain", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "airborne": true, "pose": "Attack", "telegraphSeconds": 0.9, "radius": 60, "damage": 0, "nextMoveWaitSeconds": 4.8, "arenaWave": {"line": "suicune-wave", "speed": 420, "gap": 300}},
+    {"id": "suicune-wave", "move": "surf", "effect": "boss-suicune-wave", "shape": "line", "target": "self", "quietStrike": true, "telegraphSeconds": 0.9, "radius": 64, "length": 400, "damage": 38, "travel": {"speed": 420}, "activeSeconds": 3.9},
+    {"id": "suicune-glide", "effect": "boss-suicune-plain", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "airborne": true, "glide": {"minDistance": 300, "maxDistance": 520, "speed": 620}, "telegraphSeconds": 1, "radius": 60, "damage": 0},
+    {"id": "suicune-aurora", "move": "aurora-beam", "effect": "boss-suicune-aurora", "shape": "line", "target": "player", "rooted": true, "holdWhileActive": true, "pose": "Shoot", "telegraphSeconds": 1, "radius": 30, "length": 2400, "damage": 40, "sweep": {"degrees": 140, "seconds": 4}, "sweepTrail": {"effect": "boss-suicune-ice-patch", "spacing": 130, "radius": 44, "seconds": 1.5, "slowPct": 30}},
+    {"id": "suicune-mirror-coat", "move": "mirror-coat", "effect": "boss-suicune-mirror", "shape": "circle", "target": "self", "rooted": true, "followBoss": true, "hideTelegraph": true, "pose": "Charge", "telegraphSeconds": 3, "radius": 90, "damage": 0, "mirrorShards": {"move": "suicune-shard", "minCount": 8, "perHpPct": 2, "maxCount": 30}},
+    {"id": "suicune-shard", "move": "mirror-coat", "effect": "boss-suicune-shard", "shape": "circle", "target": "self", "hideTelegraph": true, "quietStrike": true, "telegraphSeconds": 0.05, "radius": 18, "damage": 24, "bullets": {"count": 1, "speed": 130, "seconds": 3}},
+    {"id": "suicune-to-center", "effect": "boss-suicune-plain", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "airborne": true, "flyTo": {"x": 0, "y": 0, "speed": 1000}, "telegraphSeconds": 1, "radius": 60, "damage": 0, "then": "suicune-blizzard-1"},
+    {"id": "suicune-blizzard-1", "move": "blizzard", "effect": "boss-suicune-plain", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Charge", "telegraphSeconds": 5.2, "radius": 60, "damage": 0, "blizzardRound": {"block": "suicune-ice", "front": "suicune-front-1", "delaySeconds": 1.6, "layout": [[-0.55, -0.45], [0, -0.55], [0.55, -0.45], [-0.55, 0.45], [0, 0.4], [0.55, 0.45]]}, "then": "suicune-blizzard-2"},
+    {"id": "suicune-blizzard-2", "move": "blizzard", "effect": "boss-suicune-plain", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Charge", "telegraphSeconds": 4.6, "radius": 60, "damage": 0, "blizzardRound": {"block": "suicune-ice", "front": "suicune-front-2", "delaySeconds": 1.6, "layout": []}, "then": "suicune-tired"},
+    {"id": "suicune-ice", "effect": "boss-suicune-ice", "shape": "circle", "target": "self", "hideTelegraph": true, "quietStrike": true, "telegraphSeconds": 0.05, "radius": 62, "damage": 0, "activeSeconds": 9.8},
+    {"id": "suicune-front-1", "move": "blizzard", "effect": "boss-suicune-plain", "shape": "circle", "target": "self", "hideTelegraph": true, "quietStrike": true, "telegraphSeconds": 0.05, "radius": 1, "damage": 34, "activeSeconds": 3.2, "hitEverySeconds": 0.7, "blizzard": {"blocks": "suicune-ice", "dirX": 1, "dirY": 0, "speed": 600, "width": 320, "leeLength": 340}},
+    {"id": "suicune-front-2", "move": "blizzard", "effect": "boss-suicune-plain", "shape": "circle", "target": "self", "hideTelegraph": true, "quietStrike": true, "telegraphSeconds": 0.05, "radius": 1, "damage": 34, "activeSeconds": 2.6, "hitEverySeconds": 0.7, "blizzard": {"blocks": "suicune-ice", "dirX": 0, "dirY": 1, "speed": 480, "width": 320, "leeLength": 340}},
+    {"id": "suicune-tired", "effect": "boss-suicune-plain", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Hurt", "telegraphSeconds": 3.5, "radius": 60, "damage": 0},
+    {"id": "suicune-flee", "effect": "boss-suicune-flee", "shape": "circle", "target": "self", "hideTelegraph": true, "quietStrike": true, "telegraphSeconds": 0.05, "radius": 260, "damage": 0, "activeSeconds": 1.4},
     {"id": "entei-roar", "move": "roar", "effect": "boss-entei-plain", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Attack", "telegraphSeconds": 1.2, "radius": 60, "damage": 0, "maxUses": 1},
     {"id": "entei-stomp", "move": "stomp", "effect": "boss-entei-plain", "shape": "circle", "target": "player", "rooted": true, "hideTelegraph": true, "pose": "Strike", "telegraphSeconds": 0.9, "radius": 60, "damage": 0, "repeat": {"count": 2, "everySeconds": 2}, "fissures": {"line": "entei-crack", "flame": "entei-fissure-flame", "count": 3, "spreadDegrees": 32, "spacing": 54, "delayPerPixel": 0.0011, "maxLength": 1100}},
     {"id": "entei-crack", "effect": "boss-entei-crack", "shape": "line", "target": "self", "quietStrike": true, "telegraphSeconds": 0.8, "radius": 30, "length": 400, "damage": 0, "activeSeconds": 1.9},
@@ -660,51 +676,6 @@
         "width": 50
       },
       "stagger": 0.25
-    },
-    {
-      "id": "suicune-aurora-beam",
-      "move": "aurora-beam",
-      "effect": "boss-aurora-beam",
-      "shape": "line",
-      "target": "player",
-      "telegraphSeconds": 0.7,
-      "radius": 28,
-      "length": 900,
-      "damage": 45,
-      "leaves": {
-        "seconds": 3,
-        "slowPct": 30,
-        "damagePerSecond": 0,
-        "color": "#b2ebf2"
-      }
-    },
-    {
-      "id": "suicune-hydro-pump",
-      "move": "hydro-pump",
-      "effect": "boss-hydro-pump",
-      "shape": "line",
-      "target": "player",
-      "rooted": true,
-      "telegraphSeconds": 0.9,
-      "radius": 42,
-      "length": 720,
-      "damage": 48
-    },
-    {
-      "id": "suicune-rings",
-      "move": "surf",
-      "effect": "hydro-pump",
-      "shape": "ring",
-      "target": "self",
-      "telegraphSeconds": 0.7,
-      "radius": 130,
-      "damage": 38,
-      "rings": {
-        "count": 3,
-        "step": 120,
-        "width": 55
-      },
-      "stagger": 0.3
     },
     {
       "id": "lapras-surf",
@@ -1936,45 +1907,6 @@
       "telegraphSeconds": 2.5,
       "radius": 60,
       "damage": 0
-    },
-    {
-      "id": "suicune-mist",
-      "move": "mist",
-      "effect": "boss-mist",
-      "shape": "circle",
-      "target": "self",
-      "followBoss": true,
-      "hideBoss": true,
-      "telegraphSeconds": 4,
-      "radius": 150,
-      "damage": 30
-    },
-    {
-      "id": "suicune-mirror-coat",
-      "move": "mirror-coat",
-      "effect": "boss-mirror-coat",
-      "shape": "circle",
-      "target": "self",
-      "followBoss": true,
-      "telegraphSeconds": 2,
-      "radius": 170,
-      "damage": 0,
-      "counter": {
-        "ratio": 0.6,
-        "max": 90
-      },
-      "then": "suicune-mirror-burst"
-    },
-    {
-      "id": "suicune-mirror-burst",
-      "move": "mirror-coat",
-      "effect": "boss-mirror-burst",
-      "shape": "circle",
-      "target": "self",
-      "followBoss": true,
-      "telegraphSeconds": 0.15,
-      "radius": 170,
-      "damage": 1
     },
     {
       "id": "absol-night-slash",

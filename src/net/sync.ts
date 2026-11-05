@@ -164,6 +164,9 @@ export class SyncSession {
         case 'intruderWarning':
           if (host) out.push({ t: 'lw', k: ev.kind, i: 1, ...(world.intruder && { e: world.intruder.endTick - world.tick }) });
           break;
+        case 'intruderIntro':
+          if (host) out.push({ t: 'ii', k: ev.kind, n: ev.ticks });
+          break;
         case 'intruderArenaEnded':
           if (host) out.push({ t: 'ax' });
           break;
@@ -404,6 +407,9 @@ export class SyncSession {
           break;
         case 'ax':
           if (guest) cmds.push({ type: 'exitIntruderArena' });
+          break;
+        case 'ii':
+          if (guest) cmds.push({ type: 'intruderIntro', kind: m.k, ticks: m.n });
           break;
         case 'lw':
           if (guest) cmds.push({ type: 'legendaryWarning', kind: m.k, enraged: m.r === 1, intruder: m.i === 1, ...(m.e !== undefined && { ticksLeft: m.e }) });

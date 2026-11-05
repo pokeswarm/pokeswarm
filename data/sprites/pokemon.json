@@ -1394,6 +1394,12 @@
       "uses": [
         "enemy",
         "full"
+      ],
+      "enemyExtraAnimations": [
+        "Attack",
+        "Charge",
+        "Hurt",
+        "Shoot"
       ]
     },
     {

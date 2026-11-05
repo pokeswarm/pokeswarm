@@ -5983,6 +5983,38 @@
         "seconds": 0.3
       }
     },
+    "boss-suicune-plain": {
+      "extends": "water.base"
+    },
+    "boss-suicune-wave": {
+      "extends": "surf",
+      "bossActive": { "id": "wave-tile", "fit": "scroll", "alpha": 0.95, "scrollSpeed": 120, "scrollTiles": 7 }
+    },
+    "boss-suicune-aurora": {
+      "extends": "aurora-beam",
+      "bossActive": { "id": "aurora-beam", "fit": "line", "size": 1.7 }
+    },
+    "boss-suicune-ice-patch": {
+      "extends": "ice.base",
+      "bossActive": { "id": "suicune-ice-patch", "fit": "circle", "size": 1, "alpha": 0.55 }
+    },
+    "boss-suicune-mirror": {
+      "extends": "water.base",
+      "bossTelegraph": { "id": "mirror-panels", "fit": "circle", "size": 1.3, "overBoss": true, "rotate": "spin", "spinDegPerSec": 60 },
+      "strike": { "id": "mirror-shatter", "fit": "ring", "size": 1, "seconds": 0.4 }
+    },
+    "boss-suicune-shard": {
+      "extends": "water.base",
+      "bossActive": { "id": "suicune-shard", "fit": "circle", "size": 1.5, "rotate": "spin", "spinDegPerSec": 300 }
+    },
+    "boss-suicune-ice": {
+      "extends": "ice.base",
+      "bossActive": { "id": "suicune-ice", "fit": "circle", "size": 1.45, "originY": 0.82, "endSeconds": 0.3 }
+    },
+    "boss-suicune-flee": {
+      "extends": "water.base",
+      "bossActive": { "id": "suicune-mist", "fit": "circle", "size": 1.05, "alpha": 0.95 }
+    },
     "boss-entei-plain": {
       "extends": "fire.base"
     },

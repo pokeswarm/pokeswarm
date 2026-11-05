@@ -936,18 +936,27 @@
         },
         "anchor": {
           "x": 0,
-          "y": -280
+          "y": -240
         },
         "moves": [
-          "lugia-twister",
-          "lugia-aeroblast-aim",
-          "lugia-aeroblast-aim",
-          "lugia-twister",
-          "lugia-aeroblast-aim",
-          "lugia-aeroblast-full",
-          "lugia-tired",
-          "lugia-rise"
+          "lugia-aeroblast",
+          "lugia-aeroblast",
+          "lugia-fly-side",
+          "lugia-fly-top"
         ],
+        "hpMoves": [
+          {
+            "belowHpPct": 50,
+            "moves": [
+              "lugia-roost"
+            ]
+          }
+        ],
+        "reactive": {
+          "move": "lugia-whirlwind",
+          "withinDistance": 230,
+          "everySeconds": 5
+        },
         "random": false,
         "intervalAfterMove": true,
         "moveIntervalSeconds": 1.4,

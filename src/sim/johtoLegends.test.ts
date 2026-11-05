@@ -80,7 +80,7 @@ describe('ジョウトの特別な戦い（07 の85章）', () => {
     steps(sim, 100);
     const e = sim.world.enemies;
     const lugia = Array.from(e.kind.subarray(0, e.count)).indexOf(kindOf(sim, 'legend-lugia'));
-    expect(e.maxHp[lugia]).toBe(60000 * 5);
+    expect(e.maxHp[lugia]).toBe(80000 * 5);
     killAll(sim, ['legend-lugia']);
     expect(sim.world.legendary?.kind).toBe(kindOf(sim, 'legend-ho-oh'));
     // ホウオウ戦の途中で終わっても、レッドには勝っている

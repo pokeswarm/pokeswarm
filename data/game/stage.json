@@ -1,5 +1,14 @@
 {
   "moves": [
+    {"id": "lugia-aeroblast", "move": "aeroblast", "effect": "boss-lugia-aero-charge", "shape": "circle", "target": "self", "fixedAim": {"x": 0, "y": 1}, "rooted": true, "hideTelegraph": true, "pose": "Charge", "telegraphSeconds": 1.6, "radius": 44, "damage": 0, "then": "lugia-aeroblast-shot"},
+    {"id": "lugia-aeroblast-shot", "move": "aeroblast", "effect": "boss-lugia-aero-shot", "shape": "circle", "target": "player", "rooted": true, "pose": "Shoot", "telegraphSeconds": 0.9, "radius": 80, "damage": 40, "count": 3, "lowHpCount": {"belowHpPct": 50, "count": 5}, "countShared": true, "spread": 320, "stagger": 0.18, "then": "lugia-aero-tornado", "thenSamePlace": true},
+    {"id": "lugia-aero-tornado", "effect": "boss-lugia-aero-tornado", "shape": "circle", "target": "self", "hideTelegraph": true, "telegraphSeconds": 0.05, "radius": 90, "damage": 25, "activeSeconds": 4, "hitEverySeconds": 1, "growRadius": {"fromPct": 30, "seconds": 0.8}},
+    {"id": "lugia-fly-side", "effect": "boss-lugia-fly", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "flyTo": {"x": 640, "y": 0, "speed": 350, "randomSide": true}, "telegraphSeconds": 2, "radius": 60, "damage": 0, "then": "lugia-hydro-sweep"},
+    {"id": "lugia-hydro-sweep", "move": "hydro-pump", "effect": "boss-lugia-hydro-sweep", "shape": "line", "target": "self", "aimCenter": true, "muzzle": {"x": 45, "y": -95}, "rooted": true, "pose": "Charge", "telegraphSeconds": 2.2, "radius": 44, "length": 2400, "damage": 60, "sweep": {"degrees": 130, "seconds": 2.2}, "holdWhileActive": true},
+    {"id": "lugia-fly-top", "effect": "boss-lugia-fly", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "flyTo": {"x": 0, "y": -240, "speed": 350}, "telegraphSeconds": 2, "radius": 60, "damage": 0},
+    {"id": "lugia-whirlwind", "move": "whirlwind", "effect": "boss-lugia-fly", "shape": "cone", "target": "player", "arc": 130, "windWave": true, "rooted": true, "telegraphSeconds": 0.5, "radius": 320, "damage": 12, "activeSeconds": 0.5, "onHit": {"pushSpeed": 700, "pushSeconds": 0.45}},
+    {"id": "lugia-roost", "move": "recover", "effect": "boss-recover", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Sleep", "followBoss": true, "flyTo": {"x": 0, "y": -20, "speed": 320}, "telegraphSeconds": 7, "radius": 80, "damage": 0, "healPct": 25, "interruptDamage": {"hpPct": 5, "breakMove": "lugia-down"}, "then": "lugia-fly-top"},
+    {"id": "lugia-down", "effect": "boss-out-of-breath", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Hurt", "clearsMoves": ["lugia-roost"], "telegraphSeconds": 6, "radius": 60, "damage": 0, "then": "lugia-fly-top"},
     {
       "id": "blizzard",
       "move": "blizzard",
@@ -667,43 +676,6 @@
         "width": 55
       },
       "stagger": 0.3
-    },
-    {
-      "id": "lugia-aeroblast",
-      "move": "aeroblast",
-      "effect": "beam",
-      "shape": "line",
-      "target": "player",
-      "rooted": true,
-      "telegraphSeconds": 1,
-      "radius": 60,
-      "length": 1100,
-      "damage": 55
-    },
-    {
-      "id": "lugia-hurricane",
-      "move": "hurricane",
-      "effect": "boss-hurricane",
-      "shape": "circle",
-      "target": "player",
-      "telegraphSeconds": 1.5,
-      "radius": 95,
-      "damage": 48,
-      "follow": {
-        "seconds": 0.8
-      }
-    },
-    {
-      "id": "lugia-hydro-pump",
-      "move": "hydro-pump",
-      "effect": "boss-hydro-pump",
-      "shape": "line",
-      "target": "player",
-      "rooted": true,
-      "telegraphSeconds": 0.8,
-      "radius": 44,
-      "length": 760,
-      "damage": 50
     },
     {
       "id": "hooh-sacred-fire",
@@ -2093,41 +2065,6 @@
       "telegraphSeconds": 0.15,
       "radius": 170,
       "damage": 1
-    },
-    {"id": "lugia-twister", "move": "twister", "effect": "boss-lugia-twister", "shape": "circle", "target": "player", "hideTelegraph": true, "telegraphSeconds": 0.5, "radius": 56, "damage": 30, "count": 3, "spread": 45, "travel": {"speed": 150, "arenaBounce": true}, "activeSeconds": 10, "hitEverySeconds": 1.2},
-    {"id": "lugia-aeroblast-aim", "move": "aeroblast", "effect": "boss-aeroblast", "shape": "line", "target": "player", "rooted": true, "pose": "Charge", "telegraphSeconds": 1.2, "radius": 70, "length": 2400, "damage": 50, "activeSeconds": 0.5, "holdWhileActive": true},
-    {"id": "lugia-aeroblast-full", "move": "aeroblast", "effect": "boss-aeroblast-full", "shape": "line", "target": "self", "fixedAim": {"x": 0, "y": 1}, "suction": {"speed": 120}, "rooted": true, "pose": "Charge", "telegraphSeconds": 3.2, "radius": 260, "length": 2400, "damage": 90, "activeSeconds": 1, "holdWhileActive": true},
-    {"id": "lugia-tired", "effect": "boss-lugia-tired", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Hurt", "flyTo": {"x": 0, "y": -40, "speed": 220}, "telegraphSeconds": 6, "radius": 60, "damage": 0},
-    {"id": "lugia-rise", "effect": "boss-lugia-tired", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "flyTo": {"x": 0, "y": -280, "speed": 300}, "telegraphSeconds": 1.2, "radius": 60, "damage": 0},
-    {
-      "id": "lugia-aeroblast-sweep",
-      "move": "aeroblast",
-      "effect": "boss-aeroblast",
-      "shape": "line",
-      "target": "player",
-      "rooted": true,
-      "telegraphSeconds": 1.2,
-      "radius": 50,
-      "length": 1000,
-      "damage": 50,
-      "sweep": {
-        "degrees": 60,
-        "seconds": 1.4
-      },
-      "recoilSeconds": 1.6
-    },
-    {
-      "id": "lugia-extrasensory",
-      "move": "extrasensory",
-      "effect": "boss-extrasensory",
-      "shape": "circle",
-      "target": "player",
-      "telegraphSeconds": 1.4,
-      "radius": 90,
-      "damage": 40,
-      "count": 3,
-      "spread": 200,
-      "stagger": 0.25
     },
     {
       "id": "hooh-recoil",

@@ -48,7 +48,7 @@ export class EnemySprites {
     /** 色を付けるなら色、付けないなら null（状態異常の表示） */
     tintOf: (index: number) => number | null = () => null,
     /** ふつうと違う動き（ドット絵の動作の名前。spin なら向きをくるくる回す）。ふつうなら null（伝説のカメックスの甲羅・ため） */
-    poseOf: (index: number) => { anim: string; spin: boolean } | null = () => null,
+    poseOf: (index: number) => { anim: string; spin: boolean; face?: readonly [number, number] } | null = () => null,
     /** 濃さ（1 がふつう。消えているボスは 0、かげぶんしん の偽物は薄く。07 の167章） */
     alphaOf: (index: number) => number = () => 1,
     /** 状態異常による体の見た目（07 の177章。浮く・跳ねる・ふるえる・つぶれる・回る）。ふつうなら null */
@@ -86,6 +86,7 @@ export class EnemySprites {
       const dy = e.y[i]! - e.prevY[i]!;
       if (dx !== 0 || dy !== 0) slot.dir = directionFromVector(dx, dy);
       const pose = poseOf(i);
+      if (pose?.face) slot.dir = directionFromVector(pose.face[0], pose.face[1]);
       const anim = pose && manifest.animations[pose.anim] ? pose.anim : this.resolve(manifest);
       // くるくる回る（甲羅）: 8 つの向きを速く回す
       const body = bodyOf(i);

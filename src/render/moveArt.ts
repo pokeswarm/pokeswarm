@@ -3393,6 +3393,73 @@ function tornado(): SpriteOut {
   return { palette: DRAGON, frameMs: 120, parts: { main: frames.map(toRows) } };
 }
 
+/** エアロブラストの風の玉: 白い芯のまわりを青白い渦の筋が回り、外側は風がほどけてかすれる。4 コマで 1 周 */
+function aeroSphere(): SpriteOut {
+  const palette = ['#0d47a1', '#1e88e5', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(40, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.98) return -1;
+      const a = Math.atan2(v, u);
+      if (d < 0.26) return 4;
+      const arm = Math.sin(3 * a + d * 7.5 - (f * Math.PI) / 2);
+      // 外側は渦の筋だけが残り、すき間は透ける
+      if (d > 0.8) return arm > 0.45 ? 3 : arm > 0.05 ? 2 : -1;
+      if (d < 0.42) return arm > -0.2 ? 4 : 3;
+      if (arm > 0.72) return 4;
+      if (arm > 0.22) return 3;
+      if (arm > -0.4) return 2;
+      return 1;
+    }),
+  );
+  return { palette, frameMs: 60, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * エアロブラストが着弾して立つ竜巻（幅 56×高さ 64。6 コマ）: 上がふくらんで下がすぼまる漏斗。
+ * 帯は太さをばらつかせて斜めに流し、ふちはちぎれ、まわりを風のかけらが回る。ドリルに見えないよう、帯の間隔をそろえない
+ */
+function aeroTornado(): SpriteOut {
+  const W = 56;
+  const H = 64;
+  const palette = ['#1565c0', '#42a5f5', '#90caf9', '#e3f2fd', '#ffffff'];
+  const frames = [0, 1, 2, 3, 4, 5].map((f) => {
+    const ph = (f * Math.PI) / 3;
+    const g = fill(blank(W, H), (x, y) => {
+      const t = (y - 5) / (H - 7);
+      if (t < 0 || t > 1) return -1;
+      // 上の口は丸くふくらむ（平らに切らない）。先は揺れる
+      const rim = Math.min(1, Math.sqrt(Math.min(1, t / 0.14)) * 1.02);
+      const half = 25 * (0.1 + 0.9 * Math.pow(1 - t, 1.55)) * rim;
+      const sway = Math.sin(t * 4.6 + ph) * 4.5 * t;
+      const u = (x - (W - 1) / 2 - sway) / Math.max(1, half);
+      const rough = 0.12 * Math.sin(y * 1.3 + ph * 2) + 0.08 * Math.sin(y * 0.47 - ph);
+      if (Math.abs(u) > 1 + rough) return -1;
+      const wrap = Math.asin(Math.max(-1, Math.min(1, u)));
+      // 間隔がそろわない 2 つの波を重ねる
+      const band = Math.sin(y * 0.46 + wrap * 3 - ph * 2) + 0.55 * Math.sin(y * 0.17 + wrap * 1.2 + ph);
+      if (band > 1.05) return 4;
+      if (band > 0.35) return 3;
+      if (band > -0.35) return 2;
+      return Math.abs(u) > 0.6 ? 0 : 1;
+    });
+    // まわりを回る風のかけら
+    for (let k = 0; k < 7; k++) {
+      const t = ((k * 0.17 + 0.08) % 0.8) + 0.08;
+      const a = k * 2.1 + ph * 2;
+      const half = 25 * (0.1 + 0.9 * Math.pow(1 - t, 1.55)) + 4;
+      const cx = (W - 1) / 2 + Math.cos(a) * half;
+      const cy = 5 + t * (H - 7) + Math.sin(a) * 2;
+      // 手前にあるときだけ見せる（奥は漏斗に隠れる）
+      if (Math.sin(a) < -0.2) continue;
+      set(g, Math.round(cx), Math.round(cy), 4);
+      set(g, Math.round(cx) + 1, Math.round(cy), 3);
+    }
+    return g;
+  });
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
 /** 風の波紋（たつまきが引き寄せる瞬間）: 白い弧の輪。2 コマで外へ */
 function windRipple(): SpriteOut {
   const palette = ['#37474f', '#b3e5fc', '#ffffff'];
@@ -6405,6 +6472,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'rage-orb': () => rageOrb(),
     'rage-burst': () => rageBurst(),
     'tornado': () => tornado(),
+    'aero-sphere': () => aeroSphere(),
+    'aero-tornado': () => aeroTornado(),
     'wind-ripple': () => windRipple(),
     'dragon-breath-cone': () => dragonBreathCone(),
     'dragon-pulse-beam': () => dragonPulseBeam(),

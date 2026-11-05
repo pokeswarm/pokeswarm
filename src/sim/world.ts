@@ -281,6 +281,10 @@ export interface World {
     intervalAfterMove?: boolean;
     /** 飛んでいく先（技の flyTo。07 の203章） */
     flyTo?: { x: number; y: number; speed: number };
+    /** 寄られたら割り込む技（ふきとばし。07 の204章）。homeY は定位置の高さ */
+    reactive?: { move: number; within: number; every: number; next: number; homeY: number };
+    /** ため中に受けられる残りのダメージと、超えたときの技（じこさいせい。07 の204章） */
+    interrupt?: { left: number; move: number };
     // ---- 07 の193章 ----
     /** 使える回数のある技（maxUses）を使った回数（技の番号 → 回数） */
     uses?: Record<number, number>;

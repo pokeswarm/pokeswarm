@@ -102,12 +102,10 @@ export interface RunSceneData {
 /** ボスの HP バーを並べる数の上限 */
 const BOSS_BARS_MAX = 4;
 
-/** 固定マップの左右に残す余白・移るときの暗転の長さ（ミリ秒）。吸い込みの筋の本数・速さ・届く広さ */
+/** 固定マップの左右に残す余白・移るときの暗転の長さ（ミリ秒）・壁の絵の重なり（技の絵より手前、ボスより奥。外へはみ出た技を隠す） */
 const ARENA_SIDE_MARGIN = 80;
 const ARENA_FADE_MS = 700;
-const SUCTION_STREAKS = 110;
-const SUCTION_SPEED = 520;
-const SUCTION_RANGE = 1400;
+const ARENA_FRAME_DEPTH = 4.9;
 
 export class RunScene extends Phaser.Scene {
   private sim!: Simulation;
@@ -1044,7 +1042,7 @@ export class RunScene extends Phaser.Scene {
   private showArena(arena: NonNullable<World['arena']>): void {
     this.applyZoom();
     this.cameras.main.fadeIn(ARENA_FADE_MS);
-    const g = this.add.graphics().setDepth(spriteRender.depths.obstacles - 1);
+    const g = this.add.graphics().setDepth(ARENA_FRAME_DEPTH);
     const { x, y, halfWidth: w, halfHeight: h } = arena;
     const far = 4000;
     // マップの外は暗くし、壁の線を引く（絵はマップの調整のときに作る）
@@ -1649,70 +1647,28 @@ export class RunScene extends Phaser.Scene {
 
   /** ボスの範囲技の予告: 範囲の円と、落ちるまでの残りを内側から広がる円で見せる */
   /** なみのりの波の輪（07 の198章）: 予告は足元の安全な円と切れ目の向き。広がる間は、切れ目のある帯 */
-  /** 吸い込みの風（ルギア。07 の203章）: マップのあちこちから、ボスへ流れ込む細い筋。明滅はさせない */
-  private drawSuction(g: Phaser.GameObjects.Graphics, h: Hazard): void {
-    const a = this.sim.world.arena;
-    const i = findEnemyIndex(this.sim.world, h.dasher);
-    if (!a || i === -1) return;
-    const bx = this.sim.world.enemies.x[i]!;
-    const by = this.sim.world.enemies.y[i]!;
-    const now = this.time.now / 1000;
-    const grow = Math.min(1, ((h.totalTicks - h.ticksLeft) * this.sim.world.dt) / 0.6);
-    for (let k = 0; k < SUCTION_STREAKS; k++) {
-      const angle = k * 2.399963;
-      const u = (now * SUCTION_SPEED / SUCTION_RANGE + k * 0.37) % 1;
-      const d = SUCTION_RANGE * (1 - u);
-      const len = 50 + 70 * u;
-      const x0 = bx + Math.cos(angle) * d;
-      const y0 = by + Math.sin(angle) * d;
-      if (Math.abs(x0 - a.x) > a.halfWidth || Math.abs(y0 - a.y) > a.halfHeight) continue;
-      const x1 = bx + Math.cos(angle) * Math.max(0, d - len);
-      const y1 = by + Math.sin(angle) * Math.max(0, d - len);
-      g.lineStyle(k % 3 === 0 ? 4 : 2, k % 2 === 0 ? 0xffffff : 0xb3e5fc, 0.55 * grow * Math.min(1, u * 4));
-      g.lineBetween(x0, y0, x1, y1);
+  /** ふきとばし（ルギア。07 の204章）: 口もとから外へ広がる風の波と、押し流す細い筋。明滅はさせない */
+  private drawWindWave(g: Phaser.GameObjects.Graphics, h: Hazard, mv: { readonly activeSeconds?: number; readonly arc?: number }): void {
+    const total = Math.max(1, Math.round((mv.activeSeconds ?? 0.5) / this.sim.world.dt));
+    const t = 1 - (h.activeTicks ?? 0) / total;
+    const dir = Math.atan2(h.dirY, h.dirX);
+    const half = ((mv.arc ?? 90) * Math.PI) / 360;
+    for (let k = 0; k < 4; k++) {
+      const u = t * 1.5 - k * 0.22;
+      if (u <= 0 || u >= 1) continue;
+      const r = h.radius * u;
+      g.lineStyle(26 * (1 - u) + 6, k % 2 === 0 ? 0xe1f5fe : 0xb3e5fc, 0.75 * (1 - u * u));
+      g.beginPath();
+      g.arc(h.x, h.y, r, dir - half * (0.55 + 0.45 * u), dir + half * (0.55 + 0.45 * u), false);
+      g.strokePath();
     }
-  }
-
-  /**
-   * エアロブラストの大技（ルギア。07 の203章）: 太さが画面の 3 分の 1 もあるので、絵を引き伸ばさずに描く。
-   * 濃い青 → 水色 → 白の芯を重ね、縁を波打たせ、中を風の筋が流れる。全体の明るさは変えない（明滅させない）
-   */
-  private drawGustBeam(g: Phaser.GameObjects.Graphics, h: Hazard): void {
-    const now = this.time.now / 1000;
-    const fade = Math.min(1, (h.activeTicks ?? 0) / 8);
-    const px = -h.dirY;
-    const py = h.dirX;
-    const at = (t: number, side: number): Phaser.Math.Vector2 => new Phaser.Math.Vector2(h.x + h.dirX * t + px * side, h.y + h.dirY * t + py * side);
-    const layers: [number, number, number][] = [
-      [1, 0x1565c0, 0.85],
-      [0.84, 0x4fc3f7, 0.9],
-      [0.52, 0xb3e5fc, 0.95],
-      [0.24, 0xffffff, 1],
-    ];
-    const seg = 24;
-    layers.forEach(([width, color, alpha], layer) => {
-      const left: Phaser.Math.Vector2[] = [];
-      const right: Phaser.Math.Vector2[] = [];
-      for (let k = 0; k <= seg; k++) {
-        const t = (h.length * k) / seg;
-        // 口元は少し細く、すぐ全部の太さになる。縁は流れるように波打つ
-        const mouth = 0.6 + 0.4 * Math.min(1, t / 90);
-        const wave = 1 + 0.035 * Math.sin(t * 0.03 - now * 16 + layer * 1.7);
-        const half = h.radius * width * mouth * Math.min(1, wave);
-        left.push(at(t, -half));
-        right.unshift(at(t, half));
-      }
-      g.fillStyle(color, alpha * fade).fillPoints([...left, ...right], true);
-    });
-    // 中を流れる風の筋
-    for (let k = 0; k < 26; k++) {
-      const side = ((k * 0.618) % 1) * 2 - 1;
-      const u = (now * 1.9 + k * 0.37) % 1;
-      const t0 = h.length * u;
-      const t1 = Math.min(h.length, t0 + 90 + 60 * ((k * 0.31) % 1));
-      const a = at(t0, side * h.radius * 0.9);
-      const b = at(t1, side * h.radius * 0.9);
-      g.lineStyle(k % 3 === 0 ? 7 : 4, 0xffffff, 0.5 * fade).lineBetween(a.x, a.y, b.x, b.y);
+    for (let k = 0; k < 16; k++) {
+      const a = dir + half * ((((k * 0.618) % 1) * 2 - 1) * 0.92);
+      const u = Math.min(1, t * 1.3 + ((k * 0.37) % 1) * 0.25);
+      const r1 = h.radius * u;
+      const r0 = Math.max(0, r1 - 70);
+      g.lineStyle(k % 3 === 0 ? 4 : 2, 0xffffff, 0.7 * (1 - t));
+      g.lineBetween(h.x + Math.cos(a) * r0, h.y + Math.sin(a) * r0, h.x + Math.cos(a) * r1, h.y + Math.sin(a) * r1);
     }
   }
 
@@ -1784,9 +1740,18 @@ export class RunScene extends Phaser.Scene {
         continue;
       }
       const mv = this.sim.world.rules.stage.moves[h.move];
-      if (mv?.suction && h.activeTicks === undefined) this.drawSuction(g, h);
-      if (mv?.suction && h.activeTicks !== undefined) {
-        this.drawGustBeam(g, h);
+      if (mv?.windWave && h.activeTicks !== undefined) {
+        this.drawWindWave(g, h, mv);
+        continue;
+      }
+      // 広がる竜巻（ルギア。07 の204章）: 当たる広さを地面に見せる
+      if (mv?.growRadius && h.activeTicks !== undefined) {
+        const fade = Math.min(1, h.activeTicks / 15);
+        g.fillStyle(0xb3e5fc, 0.22 * fade).fillCircle(h.x, h.y, h.radius);
+        g.lineStyle(3, 0xe1f5fe, 0.75 * fade);
+        g.beginPath();
+        g.arc(h.x, h.y, h.radius, 0, Math.PI * 2, false);
+        g.strokePath();
         continue;
       }
       if (mv?.surfRing) {
@@ -1953,6 +1918,17 @@ export class RunScene extends Phaser.Scene {
       // 予告の絵は、落ちる前にだんだん濃く（遅れて始まる予告は、始まるまで描かない）
       if (!active && left > Math.round(mv.telegraphSeconds / world.dt)) continue;
       const alpha = active ? Math.min(1, left / Math.max(1, total * 0.2)) : spec.overBoss ? 1 : Math.min(1, 0.35 + elapsed / Math.max(0.1, mv.telegraphSeconds));
+      // 口もとで大きくなる・ボスの口もとから飛んでいく（ルギアの エアロブラスト。07 の204章）
+      if (!active && (spec.chargeGrow || spec.fromBoss)) {
+        const p = Math.min(1, elapsed / Math.max(0.1, mv.telegraphSeconds));
+        const b = findEnemyIndex(world, h.dasher);
+        const bx = b !== -1 ? world.enemies.x[b]! : h.x;
+        const by = (b !== -1 ? world.enemies.y[b]! : h.y) + (spec.offsetY ?? 0);
+        const x = spec.fromBoss ? bx + (h.x - bx) * p : bx;
+        const y = spec.fromBoss ? by + (h.y - by) * p : by;
+        out.push({ spec, x, y, radius: spec.chargeGrow ? h.radius * (0.15 + 0.85 * p) : h.radius, band: 0, dirX: 0, dirY: 1, length: 0, vx: 0, vy: 1, elapsed, alpha: 1, seed: h.group ?? 0 });
+        continue;
+      }
       // 落ちてくる絵（コメットパンチの拳）: 予告の間に上から落ち、落ちる先の赤い円の上に着く
       if (!active && spec.dropHeight) {
         const p = Math.min(1, elapsed / Math.max(0.1, mv.telegraphSeconds));
@@ -2395,7 +2371,7 @@ export class RunScene extends Phaser.Scene {
   }
 
   /** 伝説のふつうと違う動き（カメックスの甲羅でくるくる回る・ためている間の動き）。ふつうなら null */
-  private legendPose(i: number): { anim: string; spin: boolean } | null {
+  private legendPose(i: number): { anim: string; spin: boolean; face?: readonly [number, number] } | null {
     const w = this.sim.world;
     const lg = w.legendary;
     if (!lg || !legendRoundKinds(w, lg.kind).includes(w.enemies.kind[i]!)) return null;
@@ -2407,9 +2383,20 @@ export class RunScene extends Phaser.Scene {
     for (const h of w.hazards) {
       const mv = w.rules.stage.moves[h.move];
       const pose = h.dasher === id && (h.activeTicks === undefined || mv?.holdWhileActive) ? mv?.pose : undefined;
-      if (pose) return { anim: pose, spin: false };
+      if (pose) return { anim: pose, spin: false, ...(w.arena && (mv?.fixedAim || mv?.aimCenter) ? { face: [h.dirX, h.dirY] as const } : {}) };
     }
     const ai = w.legendAis.get(id);
+    // 固定マップ: 撃つ向き（無ければ、止まっている間は自分のプレイヤー）を向く（07 の204章）
+    if (w.arena) {
+      for (const h of w.hazards) {
+        const mv = w.rules.stage.moves[h.move];
+        if (h.dasher !== id || !mv?.rooted || (!mv.fixedAim && !mv.aimCenter && h.shape !== 'line' && h.shape !== 'cone')) continue;
+        if (h.activeTicks !== undefined && !mv.holdWhileActive) continue;
+        return { anim: mv.pose ?? '', spin: false, face: [h.dirX, h.dirY] };
+      }
+      const me = w.players.find((p) => p.id === this.localId);
+      if (me && w.enemies.x[i] === w.enemies.prevX[i] && w.enemies.y[i] === w.enemies.prevY[i]) return { anim: '', spin: false, face: [me.x - w.enemies.x[i]!, me.y - w.enemies.y[i]!] };
+    }
     const holding = !!ai?.holdTicks;
     if ((charging || holding) && set.chargePose) return { anim: set.chargePose, spin: false };
     if (w.hazards.some((h) => h.dasher === id && h.activeTicks !== undefined && w.rules.stage.moves[h.move]?.spinBody)) return { anim: spriteRender.enemyAnimation, spin: true };

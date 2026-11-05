@@ -1503,7 +1503,7 @@
       "species": "lugia",
       "rank": "legendary",
       "sprite": "enemy/lugia",
-      "hp": 60000,
+      "hp": 80000,
       "moveSpeed": 160,
       "radius": 46,
       "contactDamage": 45,

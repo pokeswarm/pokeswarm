@@ -1,34 +1,38 @@
 import { describe, expect, it } from 'vitest';
 import { buildSimRules } from '../data/simRules';
 import { Simulation } from './simulation';
-import { startLegendary } from './systems/stage';
+import { absorbBarrier, startLegendary } from './systems/stage';
 
-/** ルギアの固定マップ（07 の203章）: マップへ移る・壁の中で動く・技が壁までで止まる・吸い込み・飛んでいく */
-function setup(): { sim: Simulation; step: (seconds: number) => void; moveIdx: (id: string) => number } {
+/** ルギアの固定マップと技（07 の203・204章） */
+function setup(): { sim: Simulation; step: (seconds: number) => void; force: (...ids: string[]) => void } {
   const rules = buildSimRules('johto');
   const sim = new Simulation({ tickRate: 30, seed: 7, rules });
   sim.addPlayer({ id: 1, x: 500, y: 500, radius: 12, moveSpeed: 180 });
-  const kind = rules.enemies.kinds.findIndex((k) => k.id === 'legend-lugia');
-  startLegendary(sim.world, kind);
+  sim.world.players[0]!.maxHp = sim.world.players[0]!.hp = 1e9;
+  startLegendary(sim.world, rules.enemies.kinds.findIndex((k) => k.id === 'legend-lugia'));
+  const step = (seconds: number): void => {
+    for (let t = 0; t < seconds * 30; t++) sim.step([]);
+  };
+  step(3.2);
   return {
     sim,
-    step: (seconds) => {
-      for (let t = 0; t < seconds * 30; t++) sim.step([]);
+    step,
+    force: (...ids) => {
+      const boss = sim.world.bosses[0]!;
+      boss.moves = ids.map((id) => rules.stage.moves.findIndex((m) => m.id === id));
+      boss.next = 0;
+      boss.cooldown = 1;
     },
-    moveIdx: (id) => rules.stage.moves.findIndex((m) => m.id === id),
   };
 }
 
-describe('ルギアの固定マップ（07 の203章）', () => {
-  it('伝説戦が始まると、プレイヤーはマップの中へ移り、ルギアは奥に出る', () => {
-    const { sim, step } = setup();
+describe('固定マップ（07 の203章）', () => {
+  it('プレイヤーはマップの中へ移り、ルギアは奥に出る', () => {
+    const { sim } = setup();
     const a = sim.world.arena!;
-    expect(a).not.toBeNull();
     const p = sim.world.players[0]!;
     expect(Math.abs(p.x - a.x)).toBeLessThan(a.halfWidth);
     expect(Math.abs(p.y - a.y)).toBeLessThan(a.halfHeight);
-    step(3.2);
-    expect(sim.world.enemies.count).toBe(1);
     expect(sim.world.enemies.x[0]).toBeCloseTo(a.x);
     expect(sim.world.enemies.y[0]!).toBeLessThan(a.y);
   });
@@ -43,90 +47,100 @@ describe('ルギアの固定マップ（07 の203章）', () => {
     expect(p.x).toBeLessThanOrEqual(a.x + a.halfWidth);
     expect(p.y).toBeLessThanOrEqual(a.y + a.halfHeight);
   });
+});
 
-  it('直線の技は壁までで止まる', () => {
-    const { sim, step } = setup();
-    step(3.2);
+describe('ルギアの技（07 の204章）', () => {
+  it('エアロブラスト: ためた後に玉を 3 発撃ち、着弾した所に竜巻が広がる', () => {
+    const { sim, step, force } = setup();
+    force('lugia-aeroblast');
+    const id = (h: (typeof sim.world.hazards)[number]) => sim.world.rules.stage.moves[h.move]?.id;
+    step(1.7);
+    expect(sim.world.hazards.filter((h) => id(h) === 'lugia-aeroblast-shot').length).toBe(3);
+    sim.world.bosses[0]!.cooldown = 1e6;
+    step(1.5);
+    const twisters = sim.world.hazards.filter((h) => id(h) === 'lugia-aero-tornado');
+    expect(twisters.length).toBe(3);
+    const small = twisters[2]!.radius;
+    step(1.5);
+    expect(twisters[2]!.radius).toBeGreaterThan(small);
+    expect(twisters[2]!.radius).toBe(90);
+  });
+
+  it('エアロブラスト: HP が半分を切ると玉が増える', () => {
+    const { sim, step, force } = setup();
+    sim.world.bosses[0]!.hpMoves = [];
+    sim.world.enemies.hp[0] = sim.world.enemies.maxHp[0]! * 0.4;
+    force('lugia-aeroblast');
+    step(1.7);
+    expect(sim.world.hazards.filter((h) => sim.world.rules.stage.moves[h.move]?.id === 'lugia-aeroblast-shot').length).toBe(5);
+  });
+
+  it('ハイドロポンプ: 左右の端へ飛び、中央の方へなぎ払い、奥へ戻る', () => {
+    const { sim, step, force } = setup();
     const a = sim.world.arena!;
-    const hz = sim.world.hazards;
-    hz.length = 0;
-    const boss = sim.world.bosses[0]!;
-    boss.moves = [sim.world.rules.stage.moves.findIndex((m) => m.id === 'lugia-aeroblast-full')];
-    boss.next = 0;
-    boss.cooldown = 1;
-    step(0.2);
-    const beam = hz.find((h) => h.shape === 'line')!;
+    force('lugia-fly-side', 'lugia-fly-top');
+    step(2.3);
+    expect(Math.abs(sim.world.enemies.x[0]! - a.x)).toBeCloseTo(640, 0);
+    const beam = sim.world.hazards.find((h) => sim.world.rules.stage.moves[h.move]?.id === 'lugia-hydro-sweep')!;
     expect(beam).toBeTruthy();
-    expect(beam.y + beam.length).toBeCloseTo(a.y + a.halfHeight);
+    expect(beam.dirX).toBe(Math.sign(a.x - sim.world.enemies.x[0]!));
+    step(2.4);
+    expect(beam.activeTicks).toBeDefined();
+    expect(Math.abs(beam.dirY)).toBeGreaterThan(0.1);
+    step(5.4);
+    expect(sim.world.enemies.y[0]!).toBeCloseTo(a.y - 240, 0);
   });
 
-  it('大技の予告の間はルギアの方へ引き寄せられ、歩けば逃げられる', () => {
-    const { sim, step, moveIdx } = setup();
-    step(3.2);
-    const boss = sim.world.bosses[0]!;
-    boss.moves = [moveIdx('lugia-aeroblast-full')];
-    boss.next = 0;
-    boss.cooldown = 1;
+  it('ふきとばし: 奥の定位置で寄られたら押し返す', () => {
+    const { sim, step, force } = setup();
+    force('lugia-aeroblast');
+    sim.world.bosses[0]!.cooldown = 1e6;
     const p = sim.world.players[0]!;
-    const by = sim.world.enemies.y[0]!;
-    const before = p.y - by;
-    step(1);
-    expect(p.y - by).toBeLessThan(before);
-    // 真下へ歩くと、引かれる力より速いので遠ざかる
-    const mid = p.y - by;
-    p.inputY = 1;
-    step(1);
-    expect(p.y - by).toBeGreaterThan(mid);
+    p.x = sim.world.enemies.x[0]!;
+    p.y = sim.world.enemies.y[0]! + 150;
+    const y0 = p.y;
+    step(1.2);
+    expect(p.y).toBeGreaterThan(y0 + 100);
   });
 
-  it('たつまきは壁で跳ね返り、マップの外へ出ない', () => {
-    const { sim, step, moveIdx } = setup();
-    step(3.2);
-    const a = sim.world.arena!;
-    const boss = sim.world.bosses[0]!;
-    boss.moves = [moveIdx('lugia-twister')];
-    boss.next = 0;
-    boss.cooldown = 1;
-    step(1);
-    expect(sim.world.hazards.length).toBeGreaterThan(0);
-    for (let t = 0; t < 8 * 30; t++) {
-      sim.step([]);
-      for (const h of sim.world.hazards) {
-        if (h.activeTicks === undefined || sim.world.rules.stage.moves[h.move]?.id !== 'lugia-twister') continue;
-        expect(Math.abs(h.x - a.x)).toBeLessThanOrEqual(a.halfWidth + 10);
-        expect(Math.abs(h.y - a.y)).toBeLessThanOrEqual(a.halfHeight + 10);
-      }
-    }
-  });
-
-  it('疲れると降りてきて、起きると奥へ戻る', () => {
-    const { sim, step, moveIdx } = setup();
-    step(3.2);
-    const a = sim.world.arena!;
-    const boss = sim.world.bosses[0]!;
-    const home = sim.world.enemies.y[0]!;
-    boss.moves = [moveIdx('lugia-tired'), moveIdx('lugia-rise')];
-    boss.next = 0;
-    boss.cooldown = 1;
+  it('じこさいせい: HP が半分を切ると 1 回だけ降りてきて、ためきると回復する', () => {
+    const { sim, step } = setup();
+    const e = sim.world.enemies;
+    sim.world.bosses[0]!.reactive = undefined;
+    e.hp[0] = e.maxHp[0]! * 0.45;
     step(4);
-    expect(sim.world.enemies.y[0]!).toBeCloseTo(a.y - 40, 0);
-    step(5);
-    expect(sim.world.enemies.y[0]!).toBeCloseTo(home, 0);
+    const a = sim.world.arena!;
+    expect(sim.world.bosses[0]!.interrupt).toBeDefined();
+    expect(e.y[0]!).toBeCloseTo(a.y - 20, 0);
+    step(9);
+    expect(e.hp[0]!).toBeCloseTo(e.maxHp[0]! * 0.7, -1);
+    expect(sim.world.bosses[0]!.hpMoves).toEqual([]);
   });
 
-  it('技の流れを通しで回すと、大技の後に降りてきて、また奥へ戻る', () => {
+  it('じこさいせい: ため中に決まった量のダメージを受けると、回復せずに動けなくなる', () => {
+    const { sim, step } = setup();
+    const e = sim.world.enemies;
+    sim.world.bosses[0]!.reactive = undefined;
+    e.hp[0] = e.maxHp[0]! * 0.45;
+    step(4);
+    const hp = e.hp[0]!;
+    const hit = e.maxHp[0]! * 0.06;
+    e.hp[0]! -= absorbBarrier(sim.world, 0, hit);
+    step(0.5);
+    const id = (h: (typeof sim.world.hazards)[number]) => sim.world.rules.stage.moves[h.move]?.id;
+    expect(sim.world.hazards.some((h) => id(h) === 'lugia-down')).toBe(true);
+    expect(sim.world.hazards.some((h) => id(h) === 'lugia-roost')).toBe(false);
+    step(8);
+    expect(e.hp[0]!).toBeLessThanOrEqual(hp - hit + 1);
+  });
+
+  it('技の流れを通しで回せる', () => {
     const { sim } = setup();
-    const p = sim.world.players[0]!;
-    p.maxHp = p.hp = 1e9;
-    const a = sim.world.arena!;
     const used = new Set<string>();
-    let lowest = -Infinity;
     for (let t = 0; t < 60 * 30; t++) {
       sim.step([]);
       for (const h of sim.world.hazards) used.add(sim.world.rules.stage.moves[h.move]?.id ?? '');
-      if (sim.world.enemies.count > 0) lowest = Math.max(lowest, sim.world.enemies.y[0]!);
     }
-    for (const id of ['lugia-twister', 'lugia-aeroblast-aim', 'lugia-aeroblast-full', 'lugia-tired', 'lugia-rise']) expect(used).toContain(id);
-    expect(lowest).toBeCloseTo(a.y - 40, 0);
+    for (const id of ['lugia-aeroblast', 'lugia-aeroblast-shot', 'lugia-aero-tornado', 'lugia-fly-side', 'lugia-hydro-sweep', 'lugia-fly-top']) expect(used).toContain(id);
   });
 });

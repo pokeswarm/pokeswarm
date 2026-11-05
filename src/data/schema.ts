@@ -598,10 +598,25 @@ export const bossMoveSchema = z.object({
   holdWhileActive: z.boolean().optional(),
   /** 狙わず、決まった向きへ撃つ（ルギアの エアロブラストの大技: 奥からまっすぐ手前へ。07 の203章） */
   fixedAim: z.object({ x: z.number(), y: z.number() }).optional(),
-  /** 予告の間、自分のプレイヤーをボスの方へ毎秒 speed だけ引き寄せる（ルギアの 吸い込みの風。07 の203章） */
-  suction: z.object({ speed: z.number().positive() }).optional(),
-  /** 技を始めると、ボスが固定マップの中心から (x, y) の場所へ速さ speed で飛んでいく（ルギアが降りてくる。07 の203章） */
-  flyTo: z.object({ x: z.number(), y: z.number(), speed: z.number().positive() }).optional(),
+  /** 扇の中を外へ広がる風の波で描く（広い扇は絵を引き伸ばすと粗くなる。ルギアの ふきとばし。07 の204章） */
+  windWave: z.boolean().optional(),
+  /** 固定マップの中央の方へまっすぐ狙う（ルギアの ハイドロポンプ: 左右の端から。07 の204章） */
+  aimCenter: z.boolean().optional(),
+  /** aimCenter の直線を出す場所（ボスの場所からのずれ。x は狙う向きが正。口もとから撃つ） */
+  muzzle: z.object({ x: z.number(), y: z.number() }).optional(),
+  /**
+   * 技を始めると、ボスが固定マップの中心から (x, y) の場所へ速さ speed で飛んでいく（07 の203章）。
+   * randomSide なら x の左右をランダムに選ぶ
+   */
+  flyTo: z.object({ x: z.number(), y: z.number(), speed: z.number().positive(), randomSide: z.boolean().optional() }).optional(),
+  /** ボスの HP が belowHpPct % を切ると、count をこの数にする（ルギアの エアロブラストの玉。07 の204章） */
+  lowHpCount: z.object({ belowHpPct: z.number().gt(0).lt(100), count: z.number().int().positive() }).optional(),
+  /** count を人数で分ける（協力プレイで全員の足元に count 個ずつ落とすと多すぎる技。07 の204章） */
+  countShared: z.boolean().optional(),
+  /** 当たっている間に、半径が move の radius の fromPct % から seconds 秒で 100 % に広がる（ルギアの竜巻。07 の204章） */
+  growRadius: z.object({ fromPct: z.number().positive().lt(100), seconds: z.number().positive() }).optional(),
+  /** ため中に最大 HP の hpPct % のダメージを受けると、技をやめて breakMove を使う（ルギアの じこさいせい。07 の204章） */
+  interruptDamage: z.object({ hpPct: z.number().positive(), breakMove: z.string().min(1) }).optional(),
   /** 1 回の戦いで使える回数（回復の技を繰り返して HP が減らなくなるのを防ぐ。使い切ったら順番を飛ばす。07 の193章） */
   maxUses: z.number().int().positive().optional(),
   leaves: z
@@ -655,8 +670,6 @@ export const bossMoveSchema = z.object({
        * プレイヤーを通すのは左右の面からだけ（距離が短い上下からは避ける時間が無い。上下の面に来たら、次の左右の面まで待つ）
        */
       bounceBox: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), aimEvery: z.number().int().positive() }).optional(),
-      /** 固定マップの壁で跳ね返る（ルギアの たつまき。07 の203章） */
-      arenaBounce: z.boolean().optional(),
     })
     .optional(),
   /** target self の count 個を、ボスの周り radius に、狙った人の向きから順に（stagger）置く（ライコウのかみなり） */
@@ -835,6 +848,8 @@ export const stageConfigSchema = z.object({
              * cameraOffsetY はカメラの中心をマップの中心からずらす量（上の HP バーの分）。anchor はマップの中心からの位置になる
              */
             arena: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), viewHeight: z.number().positive(), cameraOffsetY: z.number().default(0) }).optional(),
+            /** 近くに寄られたら割り込む技（ルギアの ふきとばし: 奥の定位置にいるときだけ。07 の204章） */
+            reactive: z.object({ move: z.string().min(1), withinDistance: z.number().positive(), everySeconds: z.number().positive() }).optional(),
             /**
              * 天気の姿（リザードン。07 の198章）: 技 hazardMove が出ている間の 歩く速さ（%）・プレイヤーを追うか・技の威力（%）・受けるダメージ（%）・体の色・体に重ねる絵・残像の数
              */
@@ -1961,6 +1976,12 @@ const moveSpriteSpec = z.object({
   originY: z.number().min(0).max(1).default(0.5),
   /** ボスの体より手前に描く（頭の上で回る星・体を走る電気。07 の193章） */
   overBoss: z.boolean().optional(),
+  /** 描く位置を縦にずらす（ボスの口もと。ワールドの単位。07 の204章） */
+  offsetY: z.number().optional(),
+  /** 予告の間に、0 から大きくなる（口もとで風を圧縮する。07 の204章） */
+  chargeGrow: z.boolean().optional(),
+  /** 予告の間に、ボスの場所（offsetY の分ずらす）から当たる場所へ飛んでいく（風の玉。07 の204章） */
+  fromBoss: z.boolean().optional(),
   /** front の絵の真ん中を置く所（届く距離に対する割合。向きの先）。口の絵は 0.6。自分を含む長方形（ブレイズキック）は手前に */
   along: z.number().default(0.6),
   /** 描く位置を毎フレーム、この大きさ（ワールドの単位）までランダムにずらす（揺れる地面。画面は揺らさない） */

@@ -147,7 +147,8 @@ describe('ボスの技を避けられるように（07 の190章）', () => {
   });
 
   it('ダメージのある扇の技には、必ず絵がある', () => {
-    for (const m of moves.filter((x) => x.shape === 'cone' && x.damage > 0)) {
+    // windWave は絵の代わりに風の波を描く（ふきとばし。07 の204章）
+    for (const m of moves.filter((x) => x.shape === 'cone' && x.damage > 0 && !x.windWave)) {
       const r = effectRecipes[m.effect];
       expect(r?.strike ?? r?.bossActive, m.id).toBeTruthy();
     }

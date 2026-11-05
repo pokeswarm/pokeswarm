@@ -6046,20 +6046,23 @@
         "seconds": 0.4
       }
     },
-    "boss-lugia-twister": {
-      "extends": "boss-twister",
-      "bossActive": {
-        "id": "tornado",
-        "fit": "circle",
-        "size": 1.1,
-        "rotate": "spin",
-        "spinDegPerSec": 540
-      }
+    "boss-lugia-aero-charge": {
+      "extends": "flying.base",
+      "bossTelegraph": { "id": "aero-sphere", "fit": "circle", "size": 1, "rotate": "spin", "spinDegPerSec": 180, "overBoss": true, "offsetY": -100, "chargeGrow": true }
     },
-    "boss-lugia-tired": {
-      "extends": "flying.base"
+    "boss-lugia-aero-shot": {
+      "extends": "flying.base",
+      "bossTelegraph": { "id": "aero-sphere", "fit": "circle", "size": 0.5, "rotate": "spin", "spinDegPerSec": 360, "overBoss": true, "offsetY": -100, "fromBoss": true }
     },
-    "boss-aeroblast-full": {
+    "boss-lugia-aero-tornado": {
+      "extends": "flying.base",
+      "bossActive": { "id": "aero-tornado", "fit": "circle", "size": 1.15, "originY": 0.92, "alpha": 0.92 }
+    },
+    "boss-lugia-hydro-sweep": {
+      "extends": "hydro-pump",
+      "bossActive": { "id": "water-stream", "fit": "line", "size": 1 }
+    },
+    "boss-lugia-fly": {
       "extends": "flying.base"
     },
     "boss-aeroblast": {

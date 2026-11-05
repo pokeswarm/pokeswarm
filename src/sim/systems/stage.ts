@@ -14,6 +14,8 @@ const ARENA_X = 200000;
 /** 固定マップに移ったときのプレイヤーの間隔と、手前からの位置（中心から半分の高さの何倍か） */
 const ARENA_PLAYER_GAP = 80;
 const ARENA_PLAYER_Y = 0.6;
+/** 固定マップの壁から、円の技の中心を離す距離 */
+const ARENA_HAZARD_MARGIN = 40;
 
 /**
  * ステージの進行（01_game_design.md 7章。2026年10月の作者の決定）:
@@ -82,6 +84,15 @@ function spawnLegend(world: World, kind: number, hpScale = 1): number {
   if (boss && set?.hpDrops) boss.dropsAt = [...set.hpDrops.atHpPct].sort((a, b) => b - a);
   if (boss && set?.hpMoves) boss.hpMoves = [...set.hpMoves].sort((a, b) => b.belowHpPct - a.belowHpPct).map((h) => ({ belowRatio: h.belowHpPct / 100, moves: h.moves.map((m) => world.rules.stage.moves.findIndex((x) => x.id === m)) }));
   if (boss && set?.intervalAfterMove) boss.intervalAfterMove = true;
+  if (boss && set?.reactive) {
+    boss.reactive = {
+      move: world.rules.stage.moves.findIndex((m) => m.id === set.reactive!.move),
+      within: set.reactive.withinDistance,
+      every: Math.round(set.reactive.everySeconds / world.dt),
+      next: 0,
+      homeY: (world.arena?.y ?? 0) + (set.anchor?.y ?? 0),
+    };
+  }
   return id;
 }
 
@@ -407,6 +418,15 @@ export function bossAttacks(world: World): void {
         if (--boss.stunTicks === 0) world.enemies.speed[i] = bossSpeed(world, boss, i);
         continue;
       }
+      // 奥の定位置で寄られたら、押し返す（ルギアの ふきとばし。07 の204章）
+      const re = boss.reactive;
+      if (re && world.tick >= re.next && !boss.flyTo && !boss.forced?.length && !bossBusy(world, boss.id) && Math.abs(world.enemies.y[i]! - re.homeY) < 4) {
+        const near = pickPlayer(world, world.enemies.x[i]!, world.enemies.y[i]!, 'nearest');
+        if (near && Math.hypot(near.x - world.enemies.x[i]!, near.y - world.enemies.y[i]!) <= re.within) {
+          re.next = world.tick + re.every;
+          (boss.forced ??= []).push(re.move);
+        }
+      }
       // HP で放つ大技（ピカチュウのボルテッカー）: 今の技が終わり次第、順に使う
       const next = boss.hpMoves?.[0];
       if (next && world.enemies.hp[i]! <= world.enemies.maxHp[i]! * next.belowRatio) {
@@ -474,6 +494,18 @@ export function absorbBarrier(world: World, i: number, amount: number): number {
   if (world.role === 'guest') return amount;
   const id = world.enemies.id[i]!;
   const boss = world.bosses.find((b) => b.id === id);
+  // ため中に受けたダメージが決まった量を超えると、技をやめて動けなくなる（じこさいせい。07 の204章）
+  if (boss?.interrupt) {
+    boss.interrupt.left -= amount;
+    if (boss.interrupt.left <= 0) {
+      for (let h = world.hazards.length - 1; h >= 0; h--) {
+        const hz = world.hazards[h]!;
+        if (hz.dasher === id && hz.activeTicks === undefined) world.hazards.splice(h, 1);
+      }
+      (boss.forced ??= []).unshift(boss.interrupt.move);
+      boss.interrupt = undefined;
+    }
+  }
   if (!boss?.barrier) return amount;
   if (amount < boss.barrier) {
     boss.barrier -= amount;
@@ -748,12 +780,18 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   }
   // 予告の間止まる技（ファイヤーのゴッドバード。ゲストも予告の知らせで止める）
   if (move.rooted) world.enemies.speed[i] = 0;
-  if (move.flyTo && boss && world.arena) boss.flyTo = { x: world.arena.x + move.flyTo.x, y: world.arena.y + move.flyTo.y, speed: move.flyTo.speed };
+  if (move.flyTo && boss && world.arena) {
+    const side = move.flyTo.randomSide && world.rng.next() < 0.5 ? -1 : 1;
+    boss.flyTo = { x: world.arena.x + move.flyTo.x * side, y: world.arena.y + move.flyTo.y, speed: move.flyTo.speed };
+  }
+  if (move.interruptDamage && boss) boss.interrupt = { left: (world.enemies.maxHp[i]! * move.interruptDamage.hpPct) / 100, move: moveIndexOfStage(world.rules, move.interruptDamage.breakMove) };
   const dx0 = target.x - bx;
   const dy0 = target.y - by;
   const len0 = Math.hypot(dx0, dy0) || 1;
-  const ux = move.fixedAim ? move.fixedAim.x : dx0 / len0;
-  const uy = move.fixedAim ? move.fixedAim.y : dy0 / len0;
+  // 固定マップの左右の端から、中央の方へ（ハイドロポンプ）
+  const toCenter = move.aimCenter && world.arena ? Math.sign(world.arena.x - bx) || 1 : 0;
+  const ux = toCenter ? toCenter : move.fixedAim ? move.fixedAim.x : dx0 / len0;
+  const uy = toCenter ? 0 : move.fixedAim ? move.fixedAim.y : dy0 / len0;
   if (move.decoys) {
     castDecoys(world, bossId, i, move, moveIdx, target, put);
     return;
@@ -892,7 +930,7 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   }
   if (move.shape === 'line' || move.shape === 'cone') {
     // 自分から狙ったプレイヤーへ向かう直線・扇
-    put(bx, by, ux, uy, move.dashSpeed || move.rooted || move.playerMove || move.followBoss || move.sweep || move.recoilSeconds ? bossId : -1);
+    put(bx + (move.muzzle?.x ?? 0) * (toCenter || 1), by + (move.muzzle?.y ?? 0), ux, uy, move.dashSpeed || move.rooted || move.playerMove || move.followBoss || move.sweep || move.recoilSeconds ? bossId : -1);
   } else if (move.target === 'self' && move.rings) {
     // 外へ広がる輪（ミュウツー）: 1本ずつ遅らせて、外側ほど遠くに出す
     for (let k = 0; k < move.rings.count; k++) {
@@ -911,7 +949,7 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     // 協力プレイの伝説は、生きている全員の足元に落とす（逃げる係と攻撃する係に分かれて楽にならないように。07 の125章）
     const legend = world.rules.enemies.kinds[world.enemies.kind[i]!]?.rank === 'legendary';
     const targets = legend && world.rules.stage.bossRules.legendHitsAllPlayers && world.players.length > 1 ? world.players.filter((p) => !p.down) : [target];
-    const count = countOf(world, move, i);
+    const count = move.countShared ? Math.ceil(countOf(world, move, i) / targets.length) : countOf(world, move, i);
     for (const t of targets) {
       for (let c = 0; c < count; c++) {
         // 1つ目は足元、2つ目以降はばらつかせる（動かないと当たり、動けば避けられる）
@@ -927,6 +965,7 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
 
 /** 落とす数。countByHp ならボスの残りの HP の割合で減らす（しおふき。最低 1） */
 function countOf(world: World, move: BossMove, i: number): number {
+  if (move.lowHpCount && world.enemies.hp[i]! < (world.enemies.maxHp[i]! * move.lowHpCount.belowHpPct) / 100) return move.lowHpCount.count;
   if (!move.countByHp) return move.count;
   return Math.max(1, Math.round(move.count * (world.enemies.hp[i]! / Math.max(1, world.enemies.maxHp[i]!))));
 }
@@ -1080,7 +1119,6 @@ function hitLocal(world: World, me: World['players'][number], hz: World['hazards
 function strikeHazards(world: World): void {
   tickZones(world);
   tickLegendField(world);
-  tickSuction(world);
   const me = world.players.find((p) => p.id === world.localPlayerId);
   // 何本もの線の技（×・大の字）は、落ちたときの絵を組ごとに1つだけ（真ん中に）出す
   const armsStruck = new Set<number>();
@@ -1264,6 +1302,12 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
     const total = Math.max(1, Math.round(move.bounce.seconds / world.dt));
     hz.bounces = Math.min(2, Math.floor((1 - (hz.activeTicks ?? 0) / total) * 3));
   }
+  if (move.growRadius && move.activeSeconds) {
+    // 広がる竜巻（ルギアの エアロブラスト）
+    const total = Math.max(1, Math.round(move.activeSeconds / world.dt));
+    const k = Math.min(1, ((total - (hz.activeTicks ?? 0)) * world.dt) / move.growRadius.seconds);
+    hz.radius = move.radius * (move.growRadius.fromPct / 100 + (1 - move.growRadius.fromPct / 100) * k);
+  }
   if (move.sweep && hz.baseDirX !== undefined && hz.baseDirY !== undefined) {
     // なぎ払い: 落ちてからの割合で向きを回す。何本もの線（こおりのいぶき）はそのまま回し、1本は扇の端から端へ
     const total = Math.max(1, Math.round(move.sweep.seconds / world.dt));
@@ -1304,12 +1348,6 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
     }
     hz.x += vx * world.dt;
     hz.y += vy * world.dt;
-    // 固定マップの壁で跳ね返る（ルギアの たつまき）
-    if (tr.arenaBounce && world.arena) {
-      const a = world.arena;
-      if ((hz.x > a.x + a.halfWidth - hz.radius && hz.vx > 0) || (hz.x < a.x - a.halfWidth + hz.radius && hz.vx < 0)) hz.vx = -hz.vx;
-      if ((hz.y > a.y + a.halfHeight - hz.radius && hz.vy > 0) || (hz.y < a.y - a.halfHeight + hz.radius && hz.vy < 0)) hz.vy = -hz.vy;
-    }
     // 自分の画面の端で跳ね返る（ボルテッカーの残像）
     const box = tr.bounceBox;
     const me = box ? (world.players.find((p) => p.id === world.localPlayerId) ?? nearestPlayer(world, hz.x, hz.y)) : null;
@@ -1348,6 +1386,8 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
   const i = findEnemyIndex(world, hz.dasher);
   if (i === -1 || !move) return;
   const boss = world.bosses.find((b) => b.id === hz.dasher);
+  // ためきった（じこさいせい）: もう止められない
+  if (boss && move.interruptDamage) boss.interrupt = undefined;
   // じばく: 爆発した敵はいなくなる（ホストが決めてゲストへ送る）
   if (move.selfDestruct) {
     world.enemies.hp[i] = 0;
@@ -1456,25 +1496,6 @@ function rayToArenaWall(world: World, x: number, y: number, dx: number, dy: numb
   return Math.max(0, Math.min(tx, ty));
 }
 
-/** 吸い込みの風（ルギア。07 の203章）: 技の予告の間、自分のプレイヤーをボスの方へ引き寄せる（本人のブラウザで） */
-function tickSuction(world: World): void {
-  const me = world.players.find((p) => p.id === world.localPlayerId);
-  if (!me || me.down) return;
-  for (const hz of world.hazards) {
-    const s = world.rules.stage.moves[hz.move]?.suction;
-    if (!s || hz.activeTicks !== undefined) continue;
-    const i = findEnemyIndex(world, hz.dasher);
-    if (i === -1) continue;
-    const dx = world.enemies.x[i]! - me.x;
-    const dy = world.enemies.y[i]! - me.y;
-    const d = Math.hypot(dx, dy);
-    if (d < 1) continue;
-    const step = Math.min(d, s.speed * world.dt);
-    me.x += (dx / d) * step;
-    me.y += (dy / d) * step;
-  }
-}
-
 function tickLegendField(world: World): void {
   const me = world.players.find((p) => p.id === world.localPlayerId);
   if (!me) return;
@@ -1580,6 +1601,12 @@ export function addHazard(
 ): void {
   const move: BossMove | undefined = world.rules.stage.moves[moveIdx];
   if (!move) return;
+  // 固定マップ: 円の技は壁の中に落とす
+  if (world.arena && move.shape === 'circle') {
+    const a = world.arena;
+    x = Math.max(a.x - a.halfWidth + ARENA_HAZARD_MARGIN, Math.min(a.x + a.halfWidth - ARENA_HAZARD_MARGIN, x));
+    y = Math.max(a.y - a.halfHeight + ARENA_HAZARD_MARGIN, Math.min(a.y + a.halfHeight - ARENA_HAZARD_MARGIN, y));
+  }
   const ticks = Math.round(move.telegraphSeconds / world.dt) + (extra.delay ?? 0);
   const radius = extra.radius || move.radius;
   // 固定マップでは、直線は壁までで止まる

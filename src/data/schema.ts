@@ -859,9 +859,9 @@ export const stageConfigSchema = z.object({
             /**
              * 固定マップで戦う（1 体の伝説戦。07 の203章）: プレイヤーは決まった広さのマップへ移り、カメラは引きで固定する。
              * halfWidth・halfHeight は動ける広さの半分。viewHeight は見えるワールドの縦（ふだんの 720 より大きいと小さく映る）。
-             * cameraOffsetY はカメラの中心をマップの中心からずらす量（上の HP バーの分）。anchor はマップの中心からの位置になる
+             * カメラは、上の HP バーの列の下にマップが収まるよう、画面ごとに計算する（07 の206章）。anchor はマップの中心からの位置になる
              */
-            arena: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), viewHeight: z.number().positive(), cameraOffsetY: z.number().default(0), map: arenaMapSchema.optional() }).optional(),
+            arena: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), viewHeight: z.number().positive(), map: arenaMapSchema.optional() }).optional(),
             /** 近くに寄られたら割り込む技（ルギアの ふきとばし: 奥の定位置にいるときだけ。07 の204章） */
             reactive: z.object({ move: z.string().min(1), withinDistance: z.number().positive(), everySeconds: z.number().positive() }).optional(),
             /**

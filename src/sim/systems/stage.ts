@@ -1480,7 +1480,7 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
  */
 export function enterArena(world: World, kind: number): void {
   const a = world.rules.stage.legendary?.moveSets[world.rules.enemies.kinds[kind]?.id ?? '']?.arena;
-  world.arena = a ? { x: ARENA_X, y: 0, halfWidth: a.halfWidth, halfHeight: a.halfHeight, viewHeight: a.viewHeight, cameraOffsetY: a.cameraOffsetY, map: a.map ?? null } : null;
+  world.arena = a ? { x: ARENA_X, y: 0, halfWidth: a.halfWidth, halfHeight: a.halfHeight, viewHeight: a.viewHeight, map: a.map ?? null } : null;
   if (!world.arena) return;
   if (world.role !== 'guest') for (let g = world.gems.count - 1; g >= 0; g--) confirmPickup(world, world.gems.id[g]!, world.localPlayerId);
   const n = world.players.length;

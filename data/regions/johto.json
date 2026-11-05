@@ -932,7 +932,6 @@
           "halfWidth": 800,
           "halfHeight": 440,
           "viewHeight": 960,
-          "cameraOffsetY": -30,
           "map": {
             "floor": "map/johto/arena-lugia-floor.png",
             "wall": "map/johto/arena-lugia-wall.png",

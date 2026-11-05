@@ -108,6 +108,10 @@ const ARENA_FADE_MS = 700;
 const ARENA_FRAME_DEPTH = 4.9;
 /** 固定マップの床（地面のタイルより手前、ほかの物より奥） */
 const ARENA_FLOOR_DEPTH = -900;
+/** 固定マップの HP バーを、時間のすぐ下に置くすき間（画面のピクセル）。マップの下に残す余白も */
+const ARENA_BAR_GAP = 2;
+const ARENA_BOTTOM_MARGIN = 8;
+const BOSS_BAR_HEIGHT = 12;
 const ARENA_SHIMMER_MS = 2400;
 const ARENA_SHIMMER_MIN = 0.1;
 const ARENA_SHIMMER_MAX = 0.55;
@@ -1086,6 +1090,21 @@ export class RunScene extends Phaser.Scene {
     });
   }
 
+  /** 時間の文字の高さ（画面のピクセル） */
+  private timerHeight(): number {
+    return compactScreen() ? uiConfig.compactHud.timerSize : uiConfig.timer.size;
+  }
+
+  /** 経験値のバーの下の端＋すき間（時間の文字の上の端。画面のピクセル） */
+  private hudRowTop(): number {
+    return (compactScreen() ? uiConfig.compactHud.expBarHeight : uiConfig.expBar.height) + 8;
+  }
+
+  /** 固定マップで、上に空ける画面の高さ（経験値のバー・時間・HP バー） */
+  private arenaHudHeight(): number {
+    return this.hudRowTop() + this.timerHeight() + ARENA_BAR_GAP + BOSS_BAR_HEIGHT + ARENA_BAR_GAP;
+  }
+
   private applyZoom(): void {
     const c = spriteRender.camera;
     const parent = this.game.canvas.parentElement;
@@ -1108,7 +1127,8 @@ export class RunScene extends Phaser.Scene {
     cam.setViewport(0, 0, width, height);
     // 固定マップは引きのカメラ。横が足りない端末では、マップの全体が入るまで縮める（07 の203章）
     const arena = this.sim?.world.arena;
-    cam.setZoom(arena ? Math.min(height / arena.viewHeight, width / (arena.halfWidth * 2 + ARENA_SIDE_MARGIN)) : height / c.viewHeight);
+    // 上の 経験値・時間・HP バーの列の下にマップ全体が収まるようにする（HP バーが遊ぶ場所にかからないように。07 の206章）
+    cam.setZoom(arena ? Math.min(height / arena.viewHeight, (height - this.arenaHudHeight() - ARENA_BOTTOM_MARGIN) / (arena.halfHeight * 2), width / (arena.halfWidth * 2 + ARENA_SIDE_MARGIN)) : height / c.viewHeight);
     // 光の演出・当たり判定の塗りの1ドットも、拡大率に合わせてワールドの dot にそろえる
     this.effects?.setZoom(cam.zoom);
     this.hitShapes?.setZoom(cam.zoom);
@@ -2262,7 +2282,8 @@ export class RunScene extends Phaser.Scene {
     this.timerText.setText(formatTime(legendLeft ?? Math.min(now, limit))).setColor(legendLeft !== null ? '#ff5252' : uiConfig.timer.color);
     this.placeUi(this.timerText, cx, top);
     // テストの表示は、ボスの HP バーを何本も並べたときはその下へ
-    this.drawGodText(cam, top + 56 + Math.max(0, this.bossRows - 1) * 20);
+    // 固定マップでは遊ぶ場所にかからないよう、下の端へ
+    this.drawGodText(cam, w.arena ? cam.height - 20 : top + 56 + Math.max(0, this.bossRows - 1) * 20);
     // 自分の性格（ホウエン。07 の89.3）。あればコインと強化のアイコンをその下へずらす
     const nature = natureLabel(w.rules, w.players.find((p) => p.id === this.localId)?.nature);
     this.natureText.setText(nature).setVisible(nature !== '');
@@ -2288,7 +2309,7 @@ export class RunScene extends Phaser.Scene {
     this.placeUi(this.hudIcons.container, 8, top);
     this.hudTop = top;
     this.placeUi(this.hud, 8, top + this.hudIcons.container.getBounds().height + 8);
-    this.drawBossBars(cam, cx, top + uiConfig.timer.size + 12);
+    this.drawBossBars(cam, cx, w.arena ? top + this.timerHeight() + ARENA_BAR_GAP : top + uiConfig.timer.size + 12);
   }
 
   /**
@@ -2325,7 +2346,7 @@ export class RunScene extends Phaser.Scene {
       const kind = w.rules.enemies.kinds[w.enemies.kind[i]!]!;
       const ratio = Math.max(0, w.enemies.hp[i]! / w.enemies.maxHp[i]!);
       const by = top + k * 20;
-      this.bossBar.fillStyle(hexColor(eb.border)).fillRect(left - 2, by, Math.round(barW + 4), 12);
+      this.bossBar.fillStyle(hexColor(eb.border)).fillRect(left - 2, by, Math.round(barW + 4), BOSS_BAR_HEIGHT);
       this.bossBar.fillStyle(hexColor(eb.back)).fillRect(left, by + 2, Math.round(barW), 8);
       this.bossBar.fillStyle(kind.rank === 'boss' ? 0xf85838 : 0xf8c830).fillRect(left, by + 2, Math.round(barW * ratio), 8);
       let label = this.bossNames[k];
@@ -2631,7 +2652,8 @@ export class RunScene extends Phaser.Scene {
     const arena = world.arena;
     if (arena && !this.arenaFrame) this.showArena(arena);
     const cx = arena ? arena.x : localView.container.x;
-    const cy = arena ? arena.y + arena.cameraOffsetY : localView.container.y;
+    // 固定マップは、上の列を除いた残りの真ん中に置く
+    const cy = arena ? arena.y - this.arenaHudHeight() / 2 / cam.zoom : localView.container.y;
     cam.centerOn(cx, cy);
     this.ground.update(cam, currentWaveIndex(world), deltaMs);
 

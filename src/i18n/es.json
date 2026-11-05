@@ -685,7 +685,7 @@
   "contest.primary": "Primera ronda",
   "contest.primaryNote": "El jurado valora tus Pokécubos y tus movimientos…",
   "contest.appeal": "Actuación {n}",
-  "contest.yourTurn": "¡Luce {move}! ¡Pulsa cuando la aguja esté en el centro!",
+  "contest.yourTurn": "¡Luce {move}! ¡Pulsa cuando el público esté más animado!",
   "contest.appealButton": "¡Actuar!",
   "contest.appealLine": "¡{move} de {name}!",
   "contest.rating.great": "¡Genial! +{n}",

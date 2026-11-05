@@ -314,7 +314,7 @@ export type ContestCommand =
   | { readonly op: 'open'; readonly playerId: PlayerId }
   | { readonly op: 'answer'; readonly playerId: PlayerId; readonly go: boolean }
   | { readonly op: 'entry'; readonly playerId: PlayerId; readonly category: string; readonly moves: readonly number[]; readonly rank: number }
-  /** 自分の番のアピール。gauge は止めた針の値（0〜1） */
+  /** 自分の番のアピール。gauge は押した瞬間の観客の空気（0〜1） */
   | { readonly op: 'appeal'; readonly playerId: PlayerId; readonly gauge: number }
   /** 時間で次へ（ソロ・ホストだけが出す） */
   | { readonly op: 'advance'; readonly playerId: PlayerId }

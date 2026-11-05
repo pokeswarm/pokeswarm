@@ -706,7 +706,7 @@
   "contest.primary": "いちじ しんさ",
   "contest.primaryNote": "ポロックと 技の きたえかたを みている…",
   "contest.appeal": "にじ しんさ {n}かいめ",
-  "contest.yourTurn": "{move}を アピール！ 針が 真ん中に きたら 押す！",
+  "contest.yourTurn": "{move}を アピール！ 観客が いちばん 盛り上がった瞬間に 押そう！",
   "contest.appealButton": "アピール！",
   "contest.appealLine": "{name}の {move}！",
   "contest.rating.great": "すばらしい！ +{n}",

@@ -685,7 +685,7 @@
   "contest.primary": "Premier jugement",
   "contest.primaryNote": "Le jury observe vos Pokéblocs et vos capacités…",
   "contest.appeal": "Prestation {n}",
-  "contest.yourTurn": "Présentez {move} ! Appuyez quand l’aiguille est au centre !",
+  "contest.yourTurn": "Présentez {move} ! Appuyez quand le public est au comble de l'enthousiasme !",
   "contest.appealButton": "Prestation !",
   "contest.appealLine": "{move} de {name} !",
   "contest.rating.great": "Superbe ! +{n}",

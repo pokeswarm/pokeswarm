@@ -706,7 +706,7 @@
   "contest.primary": "First Judging",
   "contest.primaryNote": "Judging your Pokéblocks and move training…",
   "contest.appeal": "Appeal {n}",
-  "contest.yourTurn": "Appeal with {move}! Press when the needle hits the center!",
+  "contest.yourTurn": "Appeal with {move}! Press when the crowd is at its most excited!",
   "contest.appealButton": "Appeal!",
   "contest.appealLine": "{name}'s {move}!",
   "contest.rating.great": "Superb! +{n}",

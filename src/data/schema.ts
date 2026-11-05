@@ -2409,8 +2409,8 @@ export const contestConfigSchema = z.object({
   fastMultiplier: z.number().positive(),
   /** NPC の点のうち一次審査の割合（残りを二次審査の回数で割る） */
   npcPrimaryShare: z.number().min(0).max(1),
-  /** タイミング: 真ん中で止めると点が (1 + bonus) 倍。great・good は評価の境目（針の値 0〜1）。periodSeconds は針の1往復 */
-  timing: z.object({ bonus: z.number().nonnegative(), great: z.number(), good: z.number(), periodSeconds: z.number().positive() }),
+  /** タイミング: 観客が一番盛り上がった瞬間で押すと点が (1 + bonus) 倍。great・good は評価の境目（空気 0〜1）。1 回の高まりの長さは periodMin〜periodMax（番ごと）、riseShare はそのうち高まっていく割合 */
+  timing: z.object({ bonus: z.number().nonnegative(), great: z.number(), good: z.number(), periodMin: z.number().positive(), periodMax: z.number().positive(), riseShare: z.number().gt(0).lt(1) }),
   /** 観客の盛り上がり: crowdMax に届くと、その人に crowdBonus 点 */
   crowdMax: z.number().int().positive(),
   crowdBonus: z.number().nonnegative(),

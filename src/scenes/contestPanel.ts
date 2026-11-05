@@ -5,6 +5,7 @@ import { getLocale, t, tMaybe } from '../i18n';
 import { compactScreen, windowCss } from '../render/pixelUi';
 import { contestScore, type ContestEntrant, type ContestState } from '../sim/contest';
 import type { ContestCommand } from '../sim/commands';
+import { hash01 } from '../sim/math';
 import type { World } from '../sim/world';
 import { ContestStage } from './contestStage';
 
@@ -13,9 +14,11 @@ export type ContestRankOf = (category: string) => number;
 
 /**
  * ポケモンコンテストの画面（ホウエン。07 の188・192章）:
- * リーグかコンテストかを選ぶ → 部門と技を2個選ぶ → 舞台で一次審査・二次審査（針を止めてアピール）→ 順位とコイン
+ * リーグかコンテストかを選ぶ → 部門と技を2個選ぶ → 舞台で一次審査・二次審査（観客の空気を見てアピール）→ 順位とコイン
  */
 export class ContestPanel {
+  /** 画面全体を覆う幕（後ろのマップを見せない） */
+  private readonly shade: HTMLDivElement;
   private readonly root: HTMLDivElement;
   private readonly stage = new ContestStage();
   private readonly status: HTMLDivElement;
@@ -41,8 +44,10 @@ export class ContestPanel {
     private readonly rankOf: ContestRankOf,
     private readonly speciesKeyOf: (world: World, playerId: number) => string,
   ) {
+    this.shade = document.createElement('div');
+    this.shade.style.cssText = 'position:fixed;inset:0;background:#140c24;z-index:24;display:none;align-items:center;justify-content:center';
     this.root = document.createElement('div');
-    this.root.style.cssText = `position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(640px,96vw);max-height:98vh;overflow:auto;${windowCss('dark')};padding:${compactScreen() ? '6px 10px' : '14px 18px'};font-size:16px;line-height:1.5;box-sizing:border-box;z-index:24;display:none;flex-direction:column;gap:8px`;
+    this.root.style.cssText = `width:min(760px,96vw,max(340px,calc((100vh - 170px) * 16 / 9)));max-height:98vh;overflow:auto;${windowCss('dark')};padding:${compactScreen() ? '6px 10px' : '14px 18px'};font-size:16px;line-height:1.5;box-sizing:border-box;display:flex;flex-direction:column;gap:8px`;
     this.status = document.createElement('div');
     this.status.style.cssText = 'min-height:3em;text-align:center';
     this.body = document.createElement('div');
@@ -52,14 +57,15 @@ export class ContestPanel {
       if (this.gauge !== null) this.press();
     });
     document.addEventListener('keydown', this.onKey);
-    document.body.appendChild(this.root);
+    this.shade.append(this.root);
+    document.body.appendChild(this.shade);
   }
 
   /** 毎フレーム呼ぶ。舞台は毎回描き、ボタンは状態が変わったときだけ作り直す */
   update(world: World, localId: number): void {
     const c = world.contest;
     if (!c || world.levelUp || world.outcome) {
-      this.root.style.display = 'none';
+      this.shade.style.display = 'none';
       this.shown = '';
       this.gauge = null;
       return;
@@ -70,7 +76,7 @@ export class ContestPanel {
     const key = `${c.phase}:${c.answers.has(localId)}:${c.entries.has(localId)}:${this.category}:${this.moves.join()}:${c.round}:${c.turn}:${c.shown}:${c.fast}`;
     if (key !== this.shown) {
       this.shown = key;
-      this.root.style.display = 'flex';
+      this.shade.style.display = 'flex';
       this.body.replaceChildren();
       this.status.replaceChildren();
       this.stage.canvas.style.display = c.phase === 'entry' ? 'none' : 'block';
@@ -88,17 +94,17 @@ export class ContestPanel {
         this.turnKey = tk;
         this.turnStart = now;
       }
-      const period = world.rules.contest!.timing.periodSeconds;
-      const sec = (now - this.turnStart) / 1000;
-      this.gauge = ContestStage.gaugeAt(sec, period);
-      this.stage.needleSide = (sec / period) % 1 >= 0.5;
+      const timing = world.rules.contest!.timing;
+      // 高まる速さは番ごとに変わる（画面だけの値。シードから決める）
+      const period = timing.periodMin + (timing.periodMax - timing.periodMin) * hash01(world.seed, c.turn, c.round, 0xa17);
+      this.gauge = ContestStage.airAt((now - this.turnStart) / 1000, period, timing.riseShare);
     } else this.gauge = null;
     this.stage.draw(world, c, (id) => this.speciesKeyOf(world, id), this.gauge, now);
   }
 
   hide(): void {
     document.removeEventListener('keydown', this.onKey);
-    this.root.remove();
+    this.shade.remove();
   }
 
   private press(): void {

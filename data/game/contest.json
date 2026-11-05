@@ -74,16 +74,18 @@
   "bgm": "hoenn-contest",
   "rounds": 2,
   "primarySeconds": 3,
-  "appealSeconds": 3.5,
+  "appealSeconds": 5.5,
   "npcTurnSeconds": 1.1,
   "revealSeconds": 1,
   "fastMultiplier": 3,
   "npcPrimaryShare": 0.6,
   "timing": {
     "bonus": 1,
-    "great": 0.85,
-    "good": 0.5,
-    "periodSeconds": 1.2
+    "great": 0.8,
+    "good": 0.45,
+    "periodMin": 1.5,
+    "periodMax": 2.4,
+    "riseShare": 0.75
   },
   "crowdMax": 5,
   "crowdBonus": 30,

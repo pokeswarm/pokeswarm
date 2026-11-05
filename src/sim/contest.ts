@@ -7,9 +7,9 @@ import type { World } from './world';
 
 /**
  * ポケモンコンテスト（ホウエン。07 の188・192章）: リーグの代わりにコンテストへ進む、もう1つの終わり方。
- * 最大4人（足りない分は NPC）。一次審査（ポロックと技の強化）→ 二次審査（選んだ技を順に披露。タイミングで点が伸びる）→ 順位とコイン。
+ * 最大4人（足りない分は NPC）。一次審査（ポロックと技の強化）→ 二次審査（選んだ技を順に披露。観客の空気を読んだタイミングで点が伸びる）→ 順位とコイン。
  * 手順はソロ・ホストが決めて全員へ送り（contestApplied）、どのブラウザでも同じ結果を計算する。
- * アピールのタイミング（gauge）はブラウザの画面の針の値で、コマンドに載せて送る
+ * アピールのタイミング（gauge）はブラウザの画面の観客の空気の値で、コマンドに載せて送る
  */
 export interface ContestEntry {
   readonly category: string;
@@ -210,7 +210,7 @@ function beginTurn(world: World, cfg: ContestConfig, c: ContestState): void {
   appeal(world, cfg, c, hash01(world.seed, c.turn, c.round, NPC_SALT + 1));
 }
 
-/** アピールの点を決めて、結果を見せる。gauge は針の値（0〜1。真ん中で止めるほど 1） */
+/** アピールの点を決めて、結果を見せる。gauge は押した瞬間の観客の空気（0〜1。一番盛り上がった瞬間が 1） */
 function appeal(world: World, cfg: ContestConfig, c: ContestState, gauge: number): void {
   const e = c.entrants[c.turn]!;
   const move = e.moves.length ? e.moves[c.round % e.moves.length] : undefined;
@@ -243,7 +243,7 @@ function advancePerformance(world: World, cfg: ContestConfig, c: ContestState): 
     beginTurn(world, cfg, c);
     return;
   }
-  // 時間切れ: 押さなかった人は針 0 のアピール
+  // 時間切れ: 押さなかった人は空気 0 のアピール
   if (!c.shown) {
     appeal(world, cfg, c, 0);
     return;

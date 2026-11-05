@@ -685,7 +685,7 @@
   "contest.primary": "Prima prova",
   "contest.primaryNote": "La giuria valuta Pokémelle e mosse allenate…",
   "contest.appeal": "Esibizione {n}",
-  "contest.yourTurn": "Esibisci {move}! Premi quando l’ago è al centro!",
+  "contest.yourTurn": "Esibisci {move}! Premi quando il pubblico è più entusiasta!",
   "contest.appealButton": "Esibisciti!",
   "contest.appealLine": "{move} di {name}!",
   "contest.rating.great": "Magnifico! +{n}",

@@ -685,7 +685,7 @@
   "contest.primary": "Erste Wertung",
   "contest.primaryNote": "Die Jury prüft Pokériegel und Attacken-Training…",
   "contest.appeal": "Vorführung {n}",
-  "contest.yourTurn": "Führe {move} vor! Drücke, wenn die Nadel in der Mitte ist!",
+  "contest.yourTurn": "Führe {move} vor! Drücke, wenn das Publikum am lautesten jubelt!",
   "contest.appealButton": "Vorführen!",
   "contest.appealLine": "{move} von {name}!",
   "contest.rating.great": "Großartig! +{n}",

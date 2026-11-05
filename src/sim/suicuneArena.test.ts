@@ -22,7 +22,7 @@ function setup(enter = true) {
   };
   if (enter) {
     startIntruder(sim.world, kind);
-    step(3.2);
+    step(5.2);
   }
   const of = (id: string) => sim.world.hazards.filter((h) => rules.stage.moves[h.move]?.id === id);
   const force = (...names: string[]): void => {
@@ -38,25 +38,36 @@ function setup(enter = true) {
 }
 
 describe('スイクンの登場（07 の218章）', () => {
-  it('凍てつく間は固定マップへ移らず、「DANGER」も出ない。凍てついた後に移り、すぐ目の前にいて、ここで「DANGER」', () => {
-    const { sim, kind, step, bossIndex } = setup(false);
+  it('雪の間は固定マップへ移らず、「DANGER」も出ない。雑魚は途中で凍り、消えてから固定マップへ移り、すぐ目の前にいて、ここで「DANGER」', () => {
+    const { sim, kind, step, bossIndex, rules } = setup(false);
     step(6);
-    const px = sim.world.players[0]!.x;
     sim.world.events.length = 0;
     startIntruder(sim.world, kind);
     expect(sim.world.arena).toBeNull();
-    expect(sim.world.intruder?.introUntil).toBeDefined();
     const types: string[] = sim.world.events.map((ev) => ev.type);
     expect(types).toContain('intruderIntro');
     expect(types).not.toContain('intruderWarning');
-    // 敵は凍って動かず、触れても痛くない
+    const intro = rules.stage.legendary!.moveSets['legend-suicune']!.freezeIntro!;
     const e = sim.world.enemies;
+    // 凍る前は、雑魚は動いている（新しくは出ない）
     step(1);
+    expect(sim.world.intruder!.frozen).toBeUndefined();
+    const count = e.count;
+    expect(Array.from(e.speed.subarray(0, count)).some((v) => v > 0)).toBe(true);
+    // 凍ると止まり、触れても痛くない
+    step(intro.freezeAtSeconds - 1 + 0.1);
+    expect(sim.world.intruder!.frozen).toBe(true);
     for (let i = 0; i < e.count; i++) {
       expect(e.speed[i]).toBe(0);
       expect(e.damage[i]).toBe(0);
     }
-    for (let t = 0; t < 30 * 2.4 && !sim.world.arena; t++) {
+    // 消える
+    step(intro.goneAtSeconds - intro.freezeAtSeconds);
+    let alive = 0;
+    for (let i = 0; i < e.count; i++) if (e.hp[i]! > 0) alive++;
+    expect(alive).toBe(0);
+    expect(sim.world.arena).toBeNull();
+    for (let t = 0; t < 30 * 2 && !sim.world.arena; t++) {
       sim.step([]);
       types.push(...sim.world.events.map((ev) => ev.type));
     }
@@ -64,8 +75,6 @@ describe('スイクンの登場（07 の218章）', () => {
     expect(types).toContain('intruderWarning');
     step(0.2);
     expect(bossIndex()).not.toBe(-1);
-    expect(sim.world.intruder!.arena!.back[0]!.id).toBe(1);
-    void px;
   });
 
   it('凍てつく間も、ランの時計は止まる', () => {
@@ -76,7 +85,7 @@ describe('スイクンの登場（07 の218章）', () => {
     for (let t = 0; t < 30 * 70 && sim.world.intruder && !sim.world.intruder.done; t++) sim.step([]);
     step(4);
     expect(sim.world.arena).toBeNull();
-    expect(sim.world.sectionStartTick).toBeGreaterThan(start + 62 * 30);
+    expect(sim.world.sectionStartTick).toBeGreaterThan(start + 64 * 30);
   });
 
   it('ほかの準伝説は、すぐ「DANGER」のまま', () => {

@@ -963,7 +963,15 @@
         },
         "noEnrage": true,
         "freezeIntro": {
-          "seconds": 2.8
+          "seconds": 4.8,
+          "freezeAtSeconds": 3.2,
+          "goneAtSeconds": 4.1,
+          "weather": "powder-snow",
+          "overlay": {
+            "color": "#0c1a2c",
+            "alpha": 0.24,
+            "fadeSeconds": 1.6
+          }
         },
         "moves": [
           "suicune-roar",

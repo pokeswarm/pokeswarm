@@ -342,9 +342,12 @@ export interface World {
     arena?: { enterTick: number; back: { id: number; x: number; y: number }[] };
     fleeTick?: number;
     exitTick?: number;
-    /** 凍てつく登場の始まりと終わり（スイクン。07 の218章） */
+    /** 雪の登場（スイクン。07 の219章）: 始まり・雑魚が凍る時刻・雑魚が消える時刻・終わり。frozen は凍らせた後 */
     introStart?: number;
+    introFreeze?: number;
+    introGone?: number;
     introUntil?: number;
+    frozen?: boolean;
   } | null;
   /** 乱入の固定マップで過ごした更新回数（ランの時計を止める。07 の211章） */
   pausedTicks: number;

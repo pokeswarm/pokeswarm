@@ -4,8 +4,6 @@ import type { World } from '../../sim/world';
 
 /** 描き直す間隔（ミリ秒） */
 const REDRAW_MS = 80;
-/** 凍った氷の板の大きさ（ドット） */
-const PLATE = 34;
 /** 決まった乱数（0〜1） */
 function rnd(k: number, salt: number): number {
   const v = Math.sin(k * 127.1 + salt * 311.7) * 43758.5453;
@@ -13,110 +11,104 @@ function rnd(k: number, salt: number): number {
 }
 const abgr = (r: number, g: number, b: number, a: number): number => ((Math.round(a * 255) << 24) | (b << 16) | (g << 8) | r) >>> 0;
 
-/** スイクンの登場（07 の218章）: 今のマップの画面全体が、端から凍てつく。画面に固定して描く。見た目だけ */
-export class FreezeSheet {
-  private image: Phaser.GameObjects.Image | null = null;
+/** 一辺 SNOW_TILE でつながる、なめらかなむら（0〜1）。cells は一辺のマス数 */
+function tileNoise(x: number, y: number, cells: number, salt: number): number {
+  const fx = (x / SNOW_TILE) * cells;
+  const fy = (y / SNOW_TILE) * cells;
+  const x0 = Math.floor(fx);
+  const y0 = Math.floor(fy);
+  const smooth = (t: number): number => t * t * (3 - 2 * t);
+  const tx = smooth(fx - x0);
+  const ty = smooth(fy - y0);
+  const at = (i: number, j: number): number => rnd(((i + cells) % cells) * 97 + ((j + cells) % cells) * 311, salt);
+  const a = at(x0, y0);
+  const b = at(x0 + 1, y0);
+  const c = at(x0, y0 + 1);
+  const d = at(x0 + 1, y0 + 1);
+  return a + (b - a) * tx + (c - a) * ty + (a - b - c + d) * tx * ty;
+}
+
+/** 雪の模様の一辺（ドット）と、1 ドットのワールドの単位 */
+const SNOW_TILE = 256;
+const SNOW_DOT = 2;
+/** 積もりきったときの覆い具合（1 で全部。地面が所々のぞく） */
+const SNOW_COVER = 0.74;
+
+/**
+ * スイクンの登場（07 の218章・219章）: 地面に雪が積もる。雑魚やポケモンより下に描く（地面の一部）。
+ * 模様は地面に固定で、歩いてもずれない。見た目だけ
+ */
+export class SnowGround {
+  private readonly images: Phaser.GameObjects.Image[] = [];
   private tex: Phaser.Textures.CanvasTexture | null = null;
-  private w = 0;
-  private h = 0;
-  private arrival = new Float32Array(0);
-  private lace = new Uint8Array(0);
+  private threshold = new Float32Array(0);
   private lastDraw = -1e9;
 
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly depth: number,
-    /** 1 ドットの画面のピクセル数 */
-    private readonly dot: number,
   ) {}
 
-  private build(width: number, height: number): void {
-    const w = Math.ceil(width / this.dot);
-    const h = Math.ceil(height / this.dot);
-    if (this.w === w && this.h === h && this.tex) return;
-    this.image?.destroy();
-    const key = 'freeze-sheet';
+  private build(): void {
+    if (this.tex) return;
+    const key = 'snow-ground';
     if (this.scene.textures.exists(key)) this.scene.textures.remove(key);
-    this.tex = this.scene.textures.createCanvas(key, w, h);
-    this.image = this.scene.add.image(0, 0, key).setOrigin(0, 0).setScrollFactor(0).setDepth(this.depth).setVisible(false);
-    this.w = w;
-    this.h = h;
-    this.arrival = new Float32Array(w * h);
-    this.lace = new Uint8Array(w * h);
-    for (let y = 0; y < h; y++) {
-      for (let x = 0; x < w; x++) {
-        // 氷の板: 一番近い種と二番目の種。板の境が白い割れ目
-        const cx = Math.floor(x / PLATE);
-        const cy = Math.floor(y / PLATE);
-        let d1 = 1e9;
-        let d2 = 1e9;
-        let id = 0;
-        for (let j = cy - 1; j <= cy + 1; j++) {
-          for (let i = cx - 1; i <= cx + 1; i++) {
-            const k = i * 7919 + j * 131;
-            const px = (i + rnd(k, 1)) * PLATE;
-            const py = (j + rnd(k, 2)) * PLATE;
-            const d = Math.hypot(px - x, py - y);
-            if (d < d1) {
-              d2 = d1;
-              d1 = d;
-              id = k;
-            } else if (d < d2) d2 = d;
-          }
-        }
-        const border = d2 - d1;
-        const edge = Math.min(x, w - 1 - x, y, h - 1 - y);
-        // 板ごとに少し早く・遅く凍る（先端がぎざぎざに進む）
-        this.arrival[y * w + x] = edge * 0.8 + rnd(id, 4) * 26 + border * 0.25;
-        this.lace[y * w + x] = border < 0.8 ? 2 : border < 1.7 ? 1 : 0;
+    this.tex = this.scene.textures.createCanvas(key, SNOW_TILE, SNOW_TILE);
+    this.threshold = new Float32Array(SNOW_TILE * SNOW_TILE);
+    let lo = Infinity;
+    let hi = -Infinity;
+    for (let y = 0; y < SNOW_TILE; y++) {
+      for (let x = 0; x < SNOW_TILE; x++) {
+        // つながるまだら（大きなむら ＋ 小さなむら ＋ 細かい粒）
+        const v = 1.0 * tileNoise(x, y, 4, 11) + 0.55 * tileNoise(x, y, 9, 12) + 0.3 * tileNoise(x, y, 22, 13) + 0.22 * rnd(y * SNOW_TILE + x, 7);
+        this.threshold[y * SNOW_TILE + x] = v;
+        lo = Math.min(lo, v);
+        hi = Math.max(hi, v);
       }
     }
+    for (let i = 0; i < this.threshold.length; i++) this.threshold[i] = (this.threshold[i]! - lo) / (hi - lo);
   }
 
-  /** place: カメラに合わせて画面の左上へ置く（呼ぶ側の placeUi） */
-  update(world: World, timeMs: number, cam: Phaser.Cameras.Scene2D.Camera, place: (o: Phaser.GameObjects.Image) => void): void {
+  update(world: World, timeMs: number, cam: Phaser.Cameras.Scene2D.Camera): void {
     const it = world.intruder;
     if (!it || it.introUntil === undefined || it.introStart === undefined) {
-      this.image?.setVisible(false);
+      for (const img of this.images) img.setVisible(false);
       return;
     }
-    // 画面がまだ大きさを持たないとき（裏のタブなど）は描かない
-    if (cam.width <= 0 || cam.height <= 0) return;
-    this.build(cam.width, cam.height);
-    place(this.image!);
-    this.image!.setVisible(true).setScale(this.dot / cam.zoom);
+    this.build();
+    // 地面に固定した格子で、見えている所に敷く
+    const size = SNOW_TILE * SNOW_DOT;
+    const view = cam.worldView;
+    const x0 = Math.floor(view.x / size) * size;
+    const y0 = Math.floor(view.y / size) * size;
+    let used = 0;
+    for (let y = y0; y < view.bottom; y += size) {
+      for (let x = x0; x < view.right; x += size) {
+        const img = this.images[used] ?? this.scene.add.image(0, 0, 'snow-ground').setOrigin(0, 0).setScale(SNOW_DOT).setDepth(this.depth);
+        this.images[used] = img;
+        img.setPosition(x, y).setVisible(true);
+        used++;
+      }
+    }
+    for (let k = used; k < this.images.length; k++) this.images[k]!.setVisible(false);
     if (timeMs - this.lastDraw < REDRAW_MS) return;
     this.lastDraw = timeMs;
-    const p = Math.min(1, (world.tick - it.introStart) / Math.max(1, it.introUntil - it.introStart));
-    // 全体の 7 割の時間で画面の真ん中まで届く
-    const level = (p / 0.7) * (Math.min(this.w, this.h) * 0.4 + 40);
+    // 雑魚が凍るまでに積もりきる
+    const span = Math.max(1, (it.introFreeze ?? it.introUntil) - it.introStart);
+    const level = Math.min(1, (world.tick - it.introStart) / span) * SNOW_COVER;
     const ctx = this.tex!.getContext();
-    const img = ctx.createImageData(this.w, this.h);
+    const img = ctx.createImageData(SNOW_TILE, SNOW_TILE);
     const out = new Uint32Array(img.data.buffer);
-    const iceAlpha = 0.34 + 0.2 * p;
-    const base = abgr(188, 228, 255, iceAlpha);
-    const line1 = abgr(210, 238, 255, iceAlpha + 0.08);
-    const line2 = abgr(240, 250, 255, iceAlpha + 0.22);
-    const front = abgr(255, 255, 255, 0.92);
+    const edge = abgr(160, 180, 196, 0.6);
+    const soft = abgr(190, 206, 218, 0.85);
+    const bright = abgr(212, 224, 233, 0.9);
     for (let i = 0; i < out.length; i++) {
-      const gap = level - this.arrival[i]!;
+      const gap = level - this.threshold[i]!;
       if (gap <= 0) continue;
-      if (gap < 2.5) out[i] = front;
-      else {
-        const l = this.lace[i]!;
-        out[i] = l === 2 ? line2 : l === 1 ? line1 : base;
-      }
+      out[i] = gap < 0.035 ? edge : gap < 0.11 ? soft : bright;
     }
     ctx.putImageData(img, 0, 0);
     this.tex!.refresh();
-  }
-
-  destroy(): void {
-    this.image?.destroy();
-    this.image = null;
-    this.tex = null;
-    this.w = 0;
-    this.h = 0;
   }
 }
 

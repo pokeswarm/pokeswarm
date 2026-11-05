@@ -975,8 +975,19 @@ export const stageConfigSchema = z.object({
             chargePose: z.string().optional(),
             /** 地面のこの場所（プレイヤーからの距離）に陣取って出る（動かない相手は enemies.json の motion を still にする。07 の198章） */
             anchor: z.object({ x: z.number(), y: z.number() }).optional(),
-            /** 乱入の前に、今のマップが seconds 秒かけて凍てつき、「DANGER」は固定マップへ移ってから出す（スイクンだけ。作者の依頼。07 の218章） */
-            freezeIntro: z.object({ seconds: z.number().positive() }).optional(),
+            /**
+             * 乱入の前の静かな登場（スイクンだけ。作者の依頼。07 の218・219章）: seconds 秒の間、weather の雪が降り、overlay の色で少し暗くなり、地面に雪が積もる。
+             * freezeAtSeconds で雑魚が凍りつき、goneAtSeconds で消える。「DANGER」は固定マップへ移ってから出す
+             */
+            freezeIntro: z
+              .object({
+                seconds: z.number().positive(),
+                freezeAtSeconds: z.number().positive(),
+                goneAtSeconds: z.number().positive(),
+                weather: z.string().min(1),
+                overlay: z.object({ color: z.string(), alpha: z.number().min(0).max(1), fadeSeconds: z.number().positive() }),
+              })
+              .optional(),
             /**
              * 固定マップで戦う（1 体の伝説戦。07 の203章）: プレイヤーは決まった広さのマップへ移り、カメラは引きで固定する。
              * halfWidth・halfHeight は動ける広さの半分。viewHeight は見えるワールドの縦（ふだんの 720 より大きいと小さく映る）。

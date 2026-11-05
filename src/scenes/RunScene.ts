@@ -17,7 +17,7 @@ import { EffectRenderer } from '../render/effects/EffectRenderer';
 import { audio } from '../audio';
 import { RunSounds } from '../audio/runSounds';
 import { LavaSea } from '../render/effects/LavaSea';
-import { BlizzardSheet, FreezeSheet } from '../render/effects/FrostSheets';
+import { BlizzardSheet, SnowGround } from '../render/effects/FrostSheets';
 import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
@@ -151,8 +151,8 @@ export class RunScene extends Phaser.Scene {
   private overBossSprites: MoveSprites | null = null;
   /** 溶岩の海（エンテイの ふんえん。07 の215章） */
   private lavaSea: LavaSea | null = null;
-  /** スイクンの登場の凍てつき・ふぶき（07 の218章） */
-  private freezeSheet: FreezeSheet | null = null;
+  /** スイクンの登場の積もる雪・ふぶき（07 の218・219章） */
+  private snowGround: SnowGround | null = null;
   private blizzardSheet: BlizzardSheet | null = null;
   private introFading = false;
   /** テストプレイ: ?intruderat で、決まった時刻に乱入させる */
@@ -325,7 +325,7 @@ export class RunScene extends Phaser.Scene {
     this.buffIcons = [];
     this.fieldOverlay = null;
     this.lavaSea = null;
-    this.freezeSheet = null;
+    this.snowGround = null;
     this.blizzardSheet = null;
     this.introFading = false;
     this.overlayLast = null;
@@ -1092,7 +1092,7 @@ export class RunScene extends Phaser.Scene {
    */
   private showArena(arena: NonNullable<World['arena']>): void {
     this.applyZoom();
-    if (this.arenaFadePale) this.cameras.main.fadeIn(ARENA_FADE_MS, 214, 238, 255);
+    if (this.arenaFadePale) this.cameras.main.fadeIn(ARENA_FADE_MS, 170, 190, 206);
     else this.cameras.main.fadeIn(ARENA_FADE_MS);
     this.arenaFadePale = false;
     const g = this.add.graphics().setDepth(ARENA_FRAME_DEPTH);
@@ -2280,7 +2280,10 @@ export class RunScene extends Phaser.Scene {
 
   /** 伝説戦のマップの効果: 画面に色を重ねる（サンダーで暗く・フリーザーで白っぽく） */
   private drawFieldOverlay(): void {
-    const current = activeField(this.sim.world)?.field.overlay;
+    // スイクンの登場で少し暗くなる
+    const introIt = this.sim.world.intruder;
+    const introSet = introIt?.introUntil !== undefined ? this.sim.world.rules.stage.legendary?.moveSets[this.sim.world.rules.enemies.kinds[introIt.kind]?.id ?? '']?.freezeIntro : undefined;
+    const current = introSet?.overlay ?? activeField(this.sim.world)?.field.overlay;
     if (current) this.overlayLast = current;
     // ゆっくり変わる色（ホウオウの にほんばれ）: 消えた後も、薄くなるまで前の色を出す
     const fade = this.overlayLast?.fadeSeconds;
@@ -2700,6 +2703,15 @@ export class RunScene extends Phaser.Scene {
   /** 敵の濃さ: 消えているボス（潜る・跳ぶ）は見せず、かげぶんしん の偽物は少し透かす（07 の167章） */
   private enemyAlpha(i: number): number {
     const w = this.sim.world;
+    // スイクンの登場: 凍った雑魚は、少しそのままでいて、薄れて消える
+    const it = w.intruder;
+    if (it?.frozen && it.introUntil !== undefined && it.introFreeze !== undefined) {
+      const intro = w.rules.stage.legendary?.moveSets[w.rules.enemies.kinds[it.kind]?.id ?? '']?.freezeIntro;
+      if (intro) {
+        const p = ((w.tick - it.introFreeze) * w.dt) / Math.max(0.1, intro.goneAtSeconds - intro.freezeAtSeconds);
+        return Math.max(0, Math.min(1, (1 - p) * 2.2));
+      }
+    }
     if (w.hiddenEnemies.size > 0 && w.hiddenEnemies.has(w.enemies.id[i]!)) return 0;
     // ほろびのうた: 倒れる前の 1 秒で薄くなっていく（すっと消える）
     if (w.enemies.markTicks[i]! > 0 && w.rules.moves[w.enemies.markMove[i]!]?.delayedBlast?.perish) {
@@ -2712,8 +2724,8 @@ export class RunScene extends Phaser.Scene {
   /** 状態異常の色（data/game/status.json の並びで先にあるものを優先）。かかっていなければ null */
   private statusTint(i: number): number | null {
     const e = this.sim.world.enemies;
-    // スイクンの登場: 敵が凍りつく
-    if (this.sim.world.intruder?.introUntil !== undefined) return 0xbfe8ff;
+    // スイクンの登場: 雑魚が凍りつく
+    if (this.sim.world.intruder?.frozen && this.sim.world.intruder.introUntil !== undefined) return 0xbfe8ff;
     // ボスがプレイヤーと同じ技で走っている間（ボルテッカー・ブレイブバード）: プレイヤーの技の残像と同じ色で光らせる（07 の167章）
     const w = this.sim.world;
     // 天気の姿（リザードン: 晴れは炎の色、雨は青。07 の198章）
@@ -3015,6 +3027,11 @@ export class RunScene extends Phaser.Scene {
     // 伝説戦のマップの効果の天気（フリーザーのふぶき）: プレイヤーの技と同じ雪を画面じゅうに
     const fieldWeather = activeField(world)?.field.weather;
     if (fieldWeather && effectRecipes[fieldWeather]?.weather) weathers.add(fieldWeather);
+    // スイクンの登場のこなゆき
+    if (world.intruder?.introUntil !== undefined) {
+      const introSnow = world.rules.stage.legendary?.moveSets[world.rules.enemies.kinds[world.intruder.kind]?.id ?? '']?.freezeIntro?.weather;
+      if (introSnow && effectRecipes[introSnow]?.weather) weathers.add(introSnow);
+    }
     this.effects.drawWeather(weathers, this.cameras.main.worldView, deltaMs);
     this.drawGhosts(world, alpha);
     this.drawFalls(world);
@@ -3041,14 +3058,15 @@ export class RunScene extends Phaser.Scene {
     this.lavaSea.update(world, this.time.now);
     this.blizzardSheet ??= new BlizzardSheet(this, spriteRender.depths.effects + 0.4);
     this.blizzardSheet.update(world, this.time.now);
-    this.freezeSheet ??= new FreezeSheet(this, 998, 3);
-    this.freezeSheet.update(world, this.time.now, this.cameras.main, (o) => this.placeUi(o, 0, 0));
-    // 凍てつききったら、白く薄れて固定マップへ（見えるようになると、もう目の前にいる）
+    // 地面の一部なので、障害物・雑魚より下（作者の依頼）
+    this.snowGround ??= new SnowGround(this, -500);
+    this.snowGround.update(world, this.time.now, this.cameras.main);
+    // 雪の中で薄れて固定マップへ（見えるようになると、もう目の前にいる）
     const introIt = world.intruder;
     if (introIt?.introUntil !== undefined && !this.introFading && (introIt.introUntil - world.tick) * world.dt <= ARENA_FADE_MS / 1000 / 2) {
       this.introFading = true;
       this.arenaFadePale = true;
-      this.cameras.main.fadeOut(ARENA_FADE_MS / 2, 214, 238, 255);
+      this.cameras.main.fadeOut(ARENA_FADE_MS / 2, 170, 190, 206);
     }
     if (introIt?.introUntil === undefined) this.introFading = false;
     this.drawItems(timeMs);

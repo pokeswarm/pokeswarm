@@ -260,10 +260,25 @@ export function advanceSection(world: World): void {
  * 「DANGER」の後に出て、雑魚はそのまま湧く。制限時間で倒せなければ逃げる。クリアの後（伝説戦）は乱入しない
  */
 export function stepIntruders(world: World): void {
+  const it = world.intruder;
+  // 雪の登場: 決まった時刻に雑魚が凍りつく（どのブラウザでも）
+  if (it?.introFreeze !== undefined && !it.frozen && world.tick >= it.introFreeze) {
+    it.frozen = true;
+    freezeField(world);
+  }
   if (world.role === 'guest' || world.players.length === 0) return;
   const cfg = world.rules.stage.legendary?.intruders;
-  const it = world.intruder;
-  // 凍てつく登場の終わり: 固定マップへ移り、もう目の前にいる。ここで「DANGER」
+  // 凍った雑魚が消える
+  if (it?.introGone !== undefined && world.tick >= it.introGone) {
+    it.introGone = undefined;
+    const e = world.enemies;
+    for (let i = 0; i < e.count; i++) {
+      if (e.hp[i]! <= 0) continue;
+      e.hp[i] = 0;
+      world.events.push({ type: 'enemyRetired', id: e.id[i]! });
+    }
+  }
+  // 雪の登場の終わり: 固定マップへ移り、もう目の前にいる。ここで「DANGER」
   if (it?.introUntil !== undefined) {
     if (world.tick < it.introUntil) return;
     it.introUntil = undefined;
@@ -359,8 +374,17 @@ export function startIntruder(world: World, kind: number): void {
   const intro = lg.moveSets[world.rules.enemies.kinds[kind]?.id ?? '']?.freezeIntro;
   if (intro) {
     const until = world.tick + Math.round(intro.seconds / world.dt);
-    world.intruder = { kind, id: -1, appearTick: until, endTick: until + limit, done: false, introStart: world.tick, introUntil: until };
-    freezeField(world);
+    world.intruder = {
+      kind,
+      id: -1,
+      appearTick: until,
+      endTick: until + limit,
+      done: false,
+      introStart: world.tick,
+      introFreeze: world.tick + Math.round(intro.freezeAtSeconds / world.dt),
+      introGone: world.tick + Math.round(intro.goneAtSeconds / world.dt),
+      introUntil: until,
+    };
     world.events.push({ type: 'intruderIntro', kind, ticks: until - world.tick });
     return;
   }

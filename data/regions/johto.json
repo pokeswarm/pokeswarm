@@ -976,24 +976,50 @@
           ],
           "item": "potion"
         },
+        "noEnrage": true,
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960
+        },
+        "anchor": {
+          "x": 0,
+          "y": -240
+        },
         "moves": [
           "hooh-sacred-fire",
-          "hooh-brave-bird",
+          "hooh-fire-blast",
+          "hooh-fly-side",
           "hooh-recoil",
-          "hooh-recover",
-          "hooh-sacred-fire"
+          "hooh-fly-top"
+        ],
+        "hpMoves": [
+          {
+            "belowHpPct": 50,
+            "moves": [
+              "hooh-sunny-day"
+            ]
+          },
+          {
+            "belowHpPct": 10,
+            "moves": [
+              "hooh-rekindling-flame"
+            ]
+          }
         ],
         "random": false,
-        "moveIntervalSeconds": 1.5,
-        "enrageMoveIntervalSeconds": 1,
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 1.4,
         "field": {
+          "whileMove": "hooh-sun",
           "typePowerPct": {
             "fire": 50,
             "water": -50
           },
           "overlay": {
             "color": "#ffb74d",
-            "alpha": 0.12
+            "alpha": 0.12,
+            "fadeSeconds": 2
           }
         }
       }

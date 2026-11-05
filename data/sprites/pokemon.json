@@ -1403,6 +1403,12 @@
       "uses": [
         "enemy",
         "full"
+      ],
+      "enemyExtraAnimations": [
+        "Charge",
+        "Hurt",
+        "Shoot",
+        "Sleep"
       ]
     },
     {

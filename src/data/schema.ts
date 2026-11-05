@@ -504,7 +504,7 @@ export const legendFieldSchema = z.object({
   freezeBelowHpPct: z.number().min(0).max(100).optional(),
   freezeSeconds: z.number().positive().optional(),
   defenseMultiplier: z.number().positive().optional(),
-  overlay: z.object({ color: z.string(), alpha: z.number().min(0).max(1) }).optional(),
+  overlay: z.object({ color: z.string(), alpha: z.number().min(0).max(1), fadeSeconds: z.number().positive().optional() }).optional(),
   lightning: z.object({ move: z.string().min(1), everySeconds: z.number().positive() }).optional(),
   aura: z.object({ radius: z.number().positive(), damagePerSecond: z.number().nonnegative(), color: z.string() }).optional(),
   /** 画面じゅうに降らせる天気（プレイヤーの技のレシピ。フリーザー: ふぶき） */
@@ -513,6 +513,8 @@ export const legendFieldSchema = z.object({
   flash: z.object({ color: z.string(), alpha: z.number().min(0).max(1), everySeconds: z.number().positive() }).optional(),
   /** 強い風（ルギア）: プレイヤーを (dirX, dirY) の向きへ、毎秒 speed だけ流す。向きは everySeconds ごとに変わる */
   wind: z.object({ speed: z.number().positive(), everySeconds: z.number().positive() }).optional(),
+  /** この技が残っている間だけ効く（ホウオウの にほんばれ。07 の207章） */
+  whileMove: z.string().min(1).optional(),
   /** 日差し・雨（ホウオウ）: プレイヤーの技の威力を、タイプごとに pct % 変える（例: ほのお +50・みず -50） */
   typePowerPct: z.record(z.string(), z.number()).optional(),
   /** damagePctPerSecond が効かないプレイヤーのタイプ（ホウエンの天気: すなあらしの いわ・じめん・はがね。07 の89.2） */
@@ -631,6 +633,41 @@ export const bossMoveSchema = z.object({
   growRadius: z.object({ fromPct: z.number().positive().lt(100), seconds: z.number().positive() }).optional(),
   /** ため中に最大 HP の hpPct % のダメージを受けると、技をやめて breakMove を使う（ルギアの じこさいせい。07 の204章） */
   interruptDamage: z.object({ hpPct: z.number().positive(), breakMove: z.string().min(1) }).optional(),
+  /**
+   * 炎で字を書く（ホウオウの だいもんじ。07 の207章）: 筆の線（交わる所から外へ向かう折れ線。ワールドの単位）に spacing ごとに炎を立てる。
+   * 炎は交わる所から外へ delayPerPixel 秒/ピクセルで走る。scorch は燃え尽きた後に残す焦げ跡の技
+   */
+  glyph: z
+    .object({
+      strokes: z.array(z.array(z.tuple([z.number(), z.number()])).min(2)).min(1),
+      spacing: z.number().positive(),
+      delayPerPixel: z.number().nonnegative(),
+      scorch: z.string().min(1).optional(),
+    })
+    .optional(),
+  /** この技の場所に、技 id の glyph の字を描く（予告・焦げ跡） */
+  glyphOf: z.string().min(1).optional(),
+  /** 落ちたときの知らせ（絵・光・音）を出さない（炎を何十本も立てる技。絵は bossActive で足りる） */
+  quietStrike: z.boolean().optional(),
+  /**
+   * 炎の柱の列（ホウオウの せいなるほのお。07 の207章）: 固定マップを rows 段・cols 列に分け、奥の段から順に delayPerRow 秒ずつ遅らせて立てる。
+   * 段ごとに gapCols 列の切れ目を空け、切れ目は次の段で最大 maxShift 列ずれる
+   */
+  pillarRows: z
+    .object({
+      rows: z.number().int().positive(),
+      cols: z.number().int().positive(),
+      gapCols: z.number().int().positive(),
+      delayPerRow: z.number().nonnegative(),
+      maxShift: z.number().int().nonnegative(),
+    })
+    .optional(),
+  /** 残っている間、マップに日の光の筋を描く（ホウオウの にほんばれ。07 の207章） */
+  sunRays: z.boolean().optional(),
+  /** 長い突進を続けるとき、前の突進の先に着いてから次の突進まで最低この秒数あける（無いと、着く前に次へ曲がって線から外れる。ホウオウの ブレイブバード） */
+  chainPauseSeconds: z.number().nonnegative().optional(),
+  /** 突進の通った跡に、技 move の炎を spacing ごとに残す（ホウオウの ブレイブバード。07 の207章） */
+  flameTrail: z.object({ move: z.string().min(1), spacing: z.number().positive() }).optional(),
   /** 1 回の戦いで使える回数（回復の技を繰り返して HP が減らなくなるのを防ぐ。使い切ったら順番を飛ばす。07 の193章） */
   maxUses: z.number().int().positive().optional(),
   leaves: z
@@ -1996,6 +2033,8 @@ const moveSpriteSpec = z.object({
   chargeGrow: z.boolean().optional(),
   /** 予告の間に、ボスの場所（offsetY の分ずらす）から当たる場所へ飛んでいく（風の玉。07 の204章） */
   fromBoss: z.boolean().optional(),
+  /** circle: 消える前の seconds 秒は、薄くせず部品 end のコマを進める（炎が小さくなって燃え尽きる。07 の207章） */
+  endSeconds: z.number().positive().optional(),
   /** front の絵の真ん中を置く所（届く距離に対する割合。向きの先）。口の絵は 0.6。自分を含む長方形（ブレイズキック）は手前に */
   along: z.number().default(0.6),
   /** 描く位置を毎フレーム、この大きさ（ワールドの単位）までランダムにずらす（揺れる地面。画面は揺らさない） */

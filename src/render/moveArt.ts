@@ -6591,6 +6591,18 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'moon-burst': () => moonBurst(),
     'fire-blast-ball': () => fireBlastBall(),
     'fire-blast-arm': () => fireBlastArm(),
+    'daimonji-flame-a': () => daimonjiFlame([{ cx: 0, h: 1, w: 0.62, m: 1, o: 0 }, { cx: -0.42, h: 0.58, w: 0.36, m: 2, o: 1.3 }, { cx: 0.44, h: 0.7, w: 0.34, m: 1, o: 2.6 }], 7101),
+    'daimonji-flame-b': () => daimonjiFlame([{ cx: 0.08, h: 0.92, w: 0.58, m: 1, o: 2 }, { cx: -0.38, h: 0.78, w: 0.38, m: 1, o: 4 }, { cx: 0.46, h: 0.5, w: 0.32, m: 2, o: 0.7 }], 7102),
+    'daimonji-flame-c': () => daimonjiFlame([{ cx: -0.06, h: 0.86, w: 0.66, m: 2, o: 3.6 }, { cx: 0.36, h: 0.72, w: 0.4, m: 1, o: 5.2 }, { cx: -0.48, h: 0.46, w: 0.3, m: 1, o: 1 }], 7103),
+    'daimonji-ember': () => daimonjiEmber(),
+    'fire-blast-orb': () => fireBlastOrb(),
+    'fire-blast-burst': () => fireBlastBurst(),
+    'sacred-pillar-a': () => sacredPillar(0),
+    'sacred-pillar-b': () => sacredPillar(2.1),
+    'sacred-pillar-c': () => sacredPillar(4.2),
+    'sun-orb': () => sunOrb(),
+    'rainbow-flame': () => rainbowFlame(),
+    'rainbow-burst': () => rainbowBurst(),
     'venom-pool': () => venomPool(),
     'draco-meteor': () => dracoMeteor(),
     'draco-flare': () => dracoFlare(),
@@ -6753,6 +6765,255 @@ function fireBlastArm(): SpriteOut {
     return heat > 0.8 ? 5 : heat > 0.6 ? 4 : heat > 0.4 ? 3 : heat > 0.2 ? 2 : 1;
   });
   return { palette, frameMs: 70, parts };
+}
+
+/** 炎の舌（1 本の炎の中の 1 枚）: cx は真ん中からのずれ（幅の半分に対する割合）・h は高さ・w は太さ・m は揺れの回数（整数でコマがつながる）・o は揺れのずれ */
+interface FlameTongue {
+  readonly cx: number;
+  readonly h: number;
+  readonly w: number;
+  readonly m: number;
+  readonly o: number;
+}
+
+const BONFIRE_PALETTE = ['#4a0d00', '#b3200a', '#e8410f', '#ff7a0a', '#ffb300', '#ffe14d', '#fffbe0'];
+
+/**
+ * 地面から立ち上がる 1 本の炎（07 の207章）: 根元がふくらみ、先が細く揺れる舌を何枚か重ねる。
+ * 根元ほど白く、先ほど赤い。hs は高さの割合（0 は炭だけ）、ph は揺れ（0〜2π でコマがつながる）
+ */
+function bonfire(W: number, H: number, rootY: number, tongues: readonly FlameTongue[], hs: number, ph: number, seed: number, sparks: number): Grid {
+  const g = fill(blank(W, H), (x, y) => {
+    const up = (rootY - y) / (rootY - 3);
+    let best = -1;
+    if (hs > 0) {
+      for (const t of tongues) {
+        const tt = up / (t.h * hs);
+        if (tt > 1 || tt < -0.1) continue;
+        const q = Math.max(0, tt);
+        const sway = Math.sin(q * 4.4 - ph * t.m + t.o) * W * 0.13 * Math.pow(q, 1.25) + (t.cx * W) / 2;
+        const prof = q < 0.2 ? 0.74 + 0.26 * Math.sqrt(q / 0.2) : Math.pow((1 - q) / 0.8, 0.85);
+        const rip = 1 + 0.14 * Math.sin(q * 10 - ph * 2 * t.m + t.o);
+        const half = Math.max(0.6, ((t.w * W) / 2) * prof * rip * (0.55 + 0.45 * hs));
+        const e = 1 - Math.abs(x - (W - 1) / 2 - sway) / half;
+        if (e > 0) best = Math.max(best, e * (1 - q * 0.6));
+      }
+    }
+    if (best < 0) {
+      // 根元の炭（燃えている間は炎の下に隠れて、茶色の帯に見えるので、小さくなってから）
+      if (hs > 0.5) return -1;
+      const c = Math.hypot((x - (W - 1) / 2) / (W * 0.28), (y - rootY) / 2.4);
+      if (c > 1) return -1;
+      const h = hash(Math.floor(x), Math.floor(y), seed);
+      return h > 0.8 ? 3 : h > 0.5 ? 1 : 0;
+    }
+    // ふちが舐めるように欠ける
+    if (best < 0.3 && up > 0.35 && Math.sin(y * 0.85 - ph * 2 + x * 0.6) > 0.72) return -1;
+    return best < 0.1 ? 1 : best < 0.2 ? 2 : best < 0.34 ? 3 : best < 0.5 ? 4 : best < 0.68 ? 5 : 6;
+  });
+  outline(g, 0);
+  // 舞い上がる火の粉
+  for (let k = 0; k < sparks; k++) {
+    const prog = (ph / (Math.PI * 2) + hash(k, 3, seed)) % 1;
+    const sx = (W - 1) / 2 + (hash(k, 5, seed) - 0.5) * W * 0.8 + Math.sin(prog * 6 + k) * 2;
+    const sy = rootY - 8 - prog * (rootY - 8);
+    if (prog < 0.92) set(g, sx, sy, prog < 0.55 ? 5 : 3);
+  }
+  return g;
+}
+
+/** だいもんじの 1 本の炎（3 種類。隣と同じ揺れにならないように）: 点いて伸びる 3 コマ → 揺れる 6 コマ。end は小さくなって炭になる */
+function daimonjiFlame(tongues: readonly FlameTongue[], seed: number): SpriteOut {
+  const W = 40;
+  const H = 56;
+  const rootY = 50;
+  const start = [0.3, 0.6, 0.88].map((hs, f) => bonfire(W, H, rootY, tongues, hs, (f * Math.PI) / 3, seed, 0));
+  const loop = [0, 1, 2, 3, 4, 5].map((f) => bonfire(W, H, rootY, tongues, 1 + Math.sin((f * Math.PI) / 3 + seed) * 0.05, (f * Math.PI) / 3, seed, 3));
+  const end = [0.72, 0.48, 0.28, 0.12, 0].map((hs, f) => bonfire(W, H, rootY, tongues, hs, (f * Math.PI) / 3, seed, 0));
+  return { palette: BONFIRE_PALETTE, frameMs: 70, loopFrom: 3, parts: { main: [...start, ...loop].map(toRows), end: end.map(toRows) } };
+}
+
+/** だいもんじの予告の火種: 赤い字の中で小さく灯る炭火 */
+function daimonjiEmber(): SpriteOut {
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(14, (u, v) => {
+      const d = Math.hypot(u, v * 1.2);
+      const r = 0.6 + 0.16 * Math.sin((f * Math.PI) / 2);
+      if (d > r) return -1;
+      return d < r * 0.35 ? 5 : d < r * 0.65 ? 4 : 2;
+    }, 0, 0),
+  );
+  return { palette: BONFIRE_PALETTE, frameMs: 110, parts: { main: frames.map(toRows) } };
+}
+
+/** だいもんじの火の玉: ふちが渦を巻いて燃え、白く焼けた芯に「大」の字が浮く。6 コマ */
+function fireBlastOrb(): SpriteOut {
+  const frames = [0, 1, 2, 3, 4, 5].map((f) => {
+    const ph = (f * Math.PI) / 3;
+    return shape(36, (u, v) => {
+      const a = Math.atan2(v, u);
+      const d = Math.hypot(u, v);
+      const edge = 0.68 + 0.1 * Math.sin(a * 5 + ph) + 0.07 * Math.sin(a * 8 - ph * 2) + 0.05 * Math.sin(a * 13 + ph * 3);
+      if (d > edge) return -1;
+      const heat = 1 - d / edge;
+      const swirl = Math.sin(a * 3 + d * 10 - ph * 2);
+      const bar = Math.abs(v + 0.12) < 0.05 && Math.abs(u) < 0.32;
+      const stem = Math.abs(u) < 0.05 && v < -0.12 && v > -0.4;
+      const legs = v > -0.12 && v < 0.34 && Math.abs(Math.abs(u) - (v + 0.12) * 0.7) < 0.055;
+      if (bar || stem || legs) return 3;
+      if (heat > 0.5) return 6;
+      if (heat > 0.36) return swirl > -0.2 ? 6 : 5;
+      if (heat > 0.24) return swirl > 0 ? 5 : 4;
+      if (heat > 0.12) return swirl > 0 ? 4 : 3;
+      return heat > 0.05 ? 2 : 1;
+    });
+  });
+  return { palette: BONFIRE_PALETTE, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** だいもんじの着弾: 花びらのように外へ開く炎の輪。中が抜けていく。5 コマ */
+function fireBlastBurst(): SpriteOut {
+  const frames = [0, 1, 2, 3, 4].map((f) => {
+    const R = 0.34 + f * 0.15;
+    const hollow = f < 1 ? 0 : (f - 0.6) * 0.17;
+    return shape(64, (u, v) => {
+      const a = Math.atan2(v, u);
+      const d = Math.hypot(u, v);
+      const edge = R * (1 + 0.16 * Math.sin(a * 9 + f) + 0.09 * Math.sin(a * 17 - f * 2));
+      if (d > edge || d < hollow) return -1;
+      const k = (d - hollow) / Math.max(0.01, edge - hollow);
+      if (f >= 3 && hash(Math.floor(u * 22), Math.floor(v * 22), 7300 + f) < (f - 2) * 0.2) return -1;
+      return k > 0.88 ? 1 : k > 0.72 ? 2 : k > 0.54 ? 3 : k > 0.36 ? 4 : k > 0.18 ? 5 : 6;
+    });
+  });
+  return { palette: BONFIRE_PALETTE, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+const SACRED_PALETTE = ['#2a0a00', '#e53935', '#ff9800', '#ffd54f', '#fffde7', '#43a047', '#1e88e5', '#8e24aa'];
+
+/** せいなるほのおの 1 本の柱（幅いっぱいに噴き上がる。金色の芯に、虹色のふちが上へ流れる）。ph は揺れ、hs は高さ */
+function sacredColumn(hs: number, ph: number, seed: number): Grid {
+  const W = 66;
+  const H = 72;
+  const rootY = 66;
+  const g = fill(blank(W, H), (x, y) => {
+    const up = (rootY - y) / ((rootY - 4) * hs);
+    if (up > 1 || up < -0.07) return -1;
+    const q = Math.max(0, up);
+    const sway = Math.sin(q * 5 - ph + seed) * 5 * q;
+    const prof = q < 0.12 ? 0.82 + 0.18 * (q / 0.12) : Math.pow(1 - (q - 0.12) / 0.88, 0.62);
+    const rip = 1 + 0.1 * Math.sin(q * 12 - ph * 2 + seed * 2);
+    const half = 30 * prof * rip;
+    const off = Math.abs(x - (W - 1) / 2 - sway);
+    if (off > half) return -1;
+    const e = 1 - off / half;
+    if (e < 0.22 && q > 0.3 && Math.sin(y * 0.7 - ph * 3 + x * 0.5) > 0.78) return -1;
+    if (e < 0.16) return [1, 2, 3, 5, 6, 7][Math.abs(Math.floor(y / 6 + (ph * 3) / Math.PI)) % 6]!;
+    // 金色の中を、白い筋が上へ流れる（一面の白にしない）
+    const heat = e * (1 - q * 0.5) + Math.sin(x * 0.42 + y * 0.16 - ph * 2 + seed) * 0.13;
+    return heat > 0.72 ? 4 : heat > 0.4 ? 3 : 2;
+  });
+  return outline(g, 0);
+}
+
+function sacredPillar(seed: number): SpriteOut {
+  const start = [0.28, 0.68].map((hs, f) => sacredColumn(hs, f * 1.05, seed));
+  const loop = [0, 1, 2, 3].map((f) => sacredColumn(1 - (f % 2) * 0.05, (f * Math.PI) / 2, seed));
+  const end = [0.66, 0.3].map((hs, f) => sacredColumn(hs, f * 1.05, seed));
+  return { palette: SACRED_PALETTE, frameMs: 75, loopFrom: 2, parts: { main: [...start, ...loop].map(toRows), end: end.map(toRows) } };
+}
+
+/** にほんばれ: 頭の上で大きくなる小さな太陽（白い丸と、回る光の筋） */
+function sunOrb(): SpriteOut {
+  const palette = ['#b36b00', '#ff9800', '#ffc107', '#ffeb3b', '#fff9c4', '#ffffff'];
+  const frames = [0, 1, 2, 3, 4, 5].map((f) => {
+    const ph = (f * Math.PI) / 3;
+    return shape(44, (u, v) => {
+      const a = Math.atan2(v, u);
+      const d = Math.hypot(u, v);
+      if (d < 0.44) return d < 0.3 ? 5 : d < 0.38 ? 4 : 3;
+      const ray = Math.abs(Math.sin(a * 6 + ph / 2));
+      const long = Math.abs(Math.sin(a * 3 + ph / 2));
+      const reach = 0.5 + ray * 0.2 + long * 0.26;
+      if (d > reach) return -1;
+      return d < 0.5 ? 2 : d < 0.66 ? 1 : 0;
+    }, 0, -1);
+  });
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+const RAINBOW_PALETTE = ['#2b0f3a', '#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa', '#ffffff'];
+
+/**
+ * 復活の虹炎（ホウオウ）: 灰を包む虹色の炎。色ごとの炎の舌を 7 枚、体のまわりに立てて重ねる（1 枚の絵を縞に塗らない）。
+ * 舌はそれぞれ違う高さと揺れで、ふちが濃く、中ほどが明るい。6 コマ
+ */
+function rainbowFlame(): SpriteOut {
+  const W = 72;
+  const H = 88;
+  const rootY = 80;
+  // 奥から手前の順（手前ほど低い）。色は RAINBOW_PALETTE の番号
+  const tongues = [
+    { c: 5, cx: -0.5, h: 0.74, w: 0.34, m: 1, o: 0.4 },
+    { c: 2, cx: 0.52, h: 0.8, w: 0.34, m: 2, o: 2.1 },
+    { c: 6, cx: -0.18, h: 1, w: 0.42, m: 1, o: 3.3 },
+    { c: 3, cx: 0.2, h: 0.94, w: 0.42, m: 1, o: 5 },
+    { c: 4, cx: -0.62, h: 0.48, w: 0.3, m: 2, o: 1.2 },
+    { c: 1, cx: 0.02, h: 0.62, w: 0.46, m: 2, o: 4.1 },
+    { c: 5, cx: 0.62, h: 0.44, w: 0.28, m: 1, o: 2.8 },
+  ];
+  const frames = [0, 1, 2, 3, 4, 5].map((f) => {
+    const ph = (f * Math.PI) / 3;
+    const g = fill(blank(W, H), (x, y) => {
+      const up = (rootY - y) / (rootY - 3);
+      let col = -1;
+      for (const t of tongues) {
+        const tt = up / t.h;
+        if (tt > 1 || tt < -0.06) continue;
+        const q = Math.max(0, tt);
+        const sway = Math.sin(q * 4.6 - ph * t.m + t.o) * W * 0.1 * Math.pow(q, 1.2) + (t.cx * W) / 2;
+        const prof = q < 0.16 ? 0.72 + 0.28 * Math.sqrt(q / 0.16) : Math.pow((1 - q) / 0.84, 0.92);
+        const rip = 1 + 0.12 * Math.sin(q * 11 - ph * 2 * t.m + t.o);
+        const half = Math.max(0.6, ((t.w * W) / 2) * prof * rip);
+        const e = 1 - Math.abs(x - (W - 1) / 2 - sway) / half;
+        if (e <= 0) continue;
+        // ふちは舐めるように欠ける
+        if (e < 0.22 && q > 0.3 && Math.sin(y * 0.8 - ph * 2 + x * 0.55 + t.o) > 0.7) continue;
+        // 舌の芯は根元ほど白く光る
+        col = e > 0.66 && q < 0.62 ? 7 : t.c;
+      }
+      return col;
+    });
+    outline(g, 0);
+    // 虹色の火の粉
+    for (let k = 0; k < 9; k++) {
+      const prog = (f / 6 + hash(k, 3, 7500)) % 1;
+      const sx = (W - 1) / 2 + (hash(k, 5, 7500) - 0.5) * W * 0.92 + Math.sin(prog * 7 + k) * 2.5;
+      const sy = rootY - prog * (rootY - 2);
+      if (prog < 0.94) set(g, sx, sy, 1 + (k % 6));
+    }
+    return g;
+  });
+  return { palette: RAINBOW_PALETTE, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** 復活の虹炎の終わり: 虹色の炎がはじけて外へ開く。5 コマ */
+function rainbowBurst(): SpriteOut {
+  const frames = [0, 1, 2, 3, 4].map((f) => {
+    const R = 0.4 + f * 0.14;
+    const hollow = f < 1 ? 0 : (f - 0.5) * 0.17;
+    return shape(72, (u, v) => {
+      const a = Math.atan2(v, u);
+      const d = Math.hypot(u, v);
+      const edge = R * (1 + 0.14 * Math.sin(a * 11 + f));
+      if (d > edge || d < hollow) return -1;
+      if (f >= 3 && hash(Math.floor(u * 24), Math.floor(v * 24), 7400 + f) < (f - 2) * 0.22) return -1;
+      if ((d - hollow) / Math.max(0.01, edge - hollow) < 0.3) return 7;
+      const band = Math.floor(((a + Math.PI) / (Math.PI * 2)) * 18 + d * 6);
+      return [1, 2, 3, 4, 5, 6][band % 6]!;
+    });
+  });
+  return { palette: RAINBOW_PALETTE, frameMs: 85, parts: { main: frames.map(toRows) } };
 }
 
 /** どくどくのキバ: かんだ所に残る猛毒のたまり（紫の水たまりに黄緑の泡が立ってはじける）。3 コマ */

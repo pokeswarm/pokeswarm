@@ -1,6 +1,7 @@
 import type { BossMove, LegendField } from '../../data/schema';
 import { randomUnit } from '../math';
 import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type RunOutcome, type World, type BossEntry, type WingKind, gateDeadlineTick, enemyMoveSpeed } from '../world';
+import { glyphPoints } from '../glyph';
 import { hurtPlayer, fieldDamage } from './health';
 import { bumpRunStat } from '../runStats';
 import { maybeOpenContest } from '../contest';
@@ -16,6 +17,8 @@ const ARENA_PLAYER_GAP = 80;
 const ARENA_PLAYER_Y = 0.6;
 /** 固定マップの壁から、円の技の中心を離す距離 */
 const ARENA_HAZARD_MARGIN = 40;
+/** 炎の字（だいもんじ）の炎を立てる、壁からの距離 */
+const ARENA_GLYPH_MARGIN = 20;
 
 /**
  * ステージの進行（01_game_design.md 7章。2026年10月の作者の決定）:
@@ -687,17 +690,19 @@ function bossBusy(world: World, id: number): boolean {
 }
 
 /** ボス・伝説が技を1つ使う（予告を置く） */
+/** 天気で技が変わる（にほんばれ の間の ソーラービーム など） */
+function weatherVariant(world: World, moveIdx: number): number {
+  for (const alt of world.rules.stage.moves[moveIdx]?.whenWeather ?? []) {
+    if (world.hazards.some((h) => world.rules.stage.moves[h.move]?.id === alt.hazardMove)) return moveIndexOfStage(world.rules, alt.useMove);
+  }
+  return moveIdx;
+}
+
 function useBossMove(world: World, boss: World['bosses'][number], i: number, forced?: number): void {
   let moveIdx = forced !== undefined ? forced : boss.random ? boss.moves[world.rng.int(boss.moves.length)]! : boss.moves[boss.next++ % boss.moves.length]!;
   if (moveIdx === -1 && boss.pool && boss.pool.length > 0) moveIdx = boss.pool[world.rng.int(boss.pool.length)]!;
+  moveIdx = weatherVariant(world, moveIdx);
   let move = world.rules.stage.moves[moveIdx];
-  // 天気で技が変わる（にほんばれ の間の ソーラービーム など）
-  for (const alt of move?.whenWeather ?? []) {
-    if (!world.hazards.some((h) => world.rules.stage.moves[h.move]?.id === alt.hazardMove)) continue;
-    moveIdx = moveIndexOfStage(world.rules, alt.useMove);
-    move = world.rules.stage.moves[moveIdx];
-    break;
-  }
   // 投げる相手がいなければ別の技（カビゴンがいないときの サイコキネシス）。いれば、相手の今の技をやめさせる
   if (move?.throwPartner) {
     const partner = aliveOfKind(world, move.throwPartner.kind);
@@ -714,7 +719,9 @@ function useBossMove(world: World, boss: World['bosses'][number], i: number, for
   }
   // 止まる技は、突進が終わってから始める（続けて突進する技の途中で止まると、絵が走っている体から離れる。07 の193章）
   if (move?.rooted && (world.enemies.kbTicks[i]! > 0 || world.hazards.some((h) => h.dasher === boss.id && !!world.rules.stage.moves[h.move]?.dashSpeed))) {
-    if (!boss.random) boss.next--;
+    // HP で使う大技は順番の外なので、捨てずに後でもう一度（ホウオウ: 突進の途中で HP を切っても 復活の虹炎 を使う）
+    if (forced !== undefined) (boss.forced ??= []).unshift(forced);
+    else if (!boss.random) boss.next--;
     boss.cooldown = 1;
     return;
   }
@@ -913,6 +920,23 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     for (let c = 0; c < move.count; c++) {
       const a = base + (((c - (move.count - 1) / 2) * move.spread) * Math.PI) / 180;
       put(bx, by, Math.cos(a), Math.sin(a), move.rooted ? bossId : -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
+    }
+    return;
+  }
+  if (move.pillarRows && world.arena) {
+    // 炎の柱の列（せいなるほのお）: 奥の段から順に。切れ目は段ごとに少しずれる
+    const a = world.arena;
+    const pr = move.pillarRows;
+    const rowH = (a.halfHeight * 2) / pr.rows;
+    const colW = (a.halfWidth * 2) / pr.cols;
+    const last = Math.max(0, pr.cols - pr.gapCols);
+    let gap = world.rng.int(last + 1);
+    for (let r = 0; r < pr.rows; r++) {
+      for (let c = 0; c < pr.cols; c++) {
+        if (c >= gap && c < gap + pr.gapCols) continue;
+        put(a.x - a.halfWidth + (c + 0.5) * colW, a.y - a.halfHeight + (r + 0.5) * rowH, 0, 1, bossId, { delay: Math.round((pr.delayPerRow * r) / world.dt) });
+      }
+      gap = Math.max(0, Math.min(last, gap + world.rng.int(pr.maxShift * 2 + 1) - pr.maxShift));
     }
     return;
   }
@@ -1240,7 +1264,7 @@ function strikeHazards(world: World): void {
         const back = move.target === 'self' ? 0 : move.radius;
         world.events.push({ ...struckEvent(hz, move), x: hz.x + hz.dirX * back, y: hz.y + hz.dirY * back, shape: 'circle', radius: hz.length - back });
       }
-    } else if (!move?.trap && !(move?.hideTelegraph && !move.damage)) world.events.push(struckEvent(hz, move));
+    } else if (!move?.trap && !move?.quietStrike && !(move?.hideTelegraph && !move.damage)) world.events.push(struckEvent(hz, move));
     if (world.role !== 'guest' && hz.dasher !== -1) onBossMoveStruck(world, hz, move);
     // 残る床（凍った床・燃える地面・砂の渦）。直線は線に沿って並べる。どのブラウザでも同じものを作る
     if (move?.leaves) {
@@ -1267,6 +1291,14 @@ function strikeHazards(world: World): void {
       const i = findEnemyIndex(world, hz.dasher);
       if (i !== -1) {
         world.enemies.knockBack(i, hz.dirX * move.dashSpeed, hz.dirY * move.dashSpeed, Math.round(hz.length / move.dashSpeed / world.dt));
+        // 通った跡に炎を残す（鳥が通った順に立つ）
+        if (move.flameTrail) {
+          const trail = weatherVariant(world, moveIndexOfStage(world.rules, move.flameTrail.move));
+          const group = world.nextHazardGroup++;
+          for (let d = move.flameTrail.spacing; d < hz.length; d += move.flameTrail.spacing) {
+            addHazard(world, trail, hz.x + hz.dirX * d, hz.y + hz.dirY * d, 0, 1, -1, undefined, { group, delay: Math.round(d / move.dashSpeed / world.dt) });
+          }
+        }
         // 続けて狙い直す（突進の先から、そのときのプレイヤーへ。予告はもう一度出る）
         const left = hz.chainLeft ?? move.chain ?? 0;
         const target = left > 0 ? nearestPlayer(world, hz.x + hz.dirX * hz.length, hz.y + hz.dirY * hz.length) : null;
@@ -1274,7 +1306,9 @@ function strikeHazards(world: World): void {
           const sx = hz.x + hz.dirX * hz.length;
           const sy = hz.y + hz.dirY * hz.length;
           const len = Math.hypot(target.x - sx, target.y - sy) || 1;
-          addHazard(world, hz.move, sx, sy, (target.x - sx) / len, (target.y - sy) / len, hz.dasher, left - 1);
+          // 予告は着く少し前から。着いてから決まった秒数は止まる
+          const wait = move.chainPauseSeconds === undefined ? 0 : Math.max(0, Math.round((hz.length / move.dashSpeed + move.chainPauseSeconds - move.telegraphSeconds) / world.dt));
+          addHazard(world, hz.move, sx, sy, (target.x - sx) / len, (target.y - sy) / len, hz.dasher, left - 1, { delay: wait });
         }
       }
     }
@@ -1459,15 +1493,35 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
   }
   // 続けて使う技（ミュウツー: テレポートの直後に自分の周り・つじぎり の二段目・カウンターの返し）
   if (move.then) {
-    const next = moveIndexOfStage(world.rules, move.then);
+    const next = weatherVariant(world, moveIndexOfStage(world.rules, move.then));
     if (move.counter) {
       // カウンター: 予告の間に受けたダメージを返す（少なければ返さない）
       const taken = Math.max(0, (hz.hpAtStart ?? world.enemies.hp[i]!) - world.enemies.hp[i]!);
       const amount = Math.min(move.counter.max, taken * move.counter.ratio);
       if (amount >= 1) addHazard(world, next, world.enemies.x[i]!, world.enemies.y[i]!, 0, 0, hz.dasher, undefined, { group: world.nextHazardGroup++, damage: amount });
-    } else if (move.thenSamePlace) addHazard(world, next, hz.x, hz.y, hz.dirX, hz.dirY, -1, undefined, { group: world.nextHazardGroup++ });
+    } else if (move.thenSamePlace && world.rules.stage.moves[next]?.glyph) castGlyph(world, next, hz.x, hz.y);
+    else if (move.thenSamePlace) addHazard(world, next, hz.x, hz.y, hz.dirX, hz.dirY, -1, undefined, { group: world.nextHazardGroup++ });
     else castBossMove(world, hz.dasher, i, next);
   }
+}
+
+/** 炎で字を書く（だいもんじ。07 の207章）: 交わる所から外へ順に炎を立てる。マップの外になる炎は立てない。全部で 1 回の技（当たるのは 1 回） */
+function castGlyph(world: World, moveIdx: number, cx: number, cy: number): void {
+  const move = world.rules.stage.moves[moveIdx];
+  const glyph = move?.glyph;
+  if (!glyph) return;
+  const group = world.nextHazardGroup++;
+  const a = world.arena;
+  let last = 0;
+  for (const p of glyphPoints(glyph)) {
+    const x = cx + p.x;
+    const y = cy + p.y;
+    if (a && (Math.abs(x - a.x) > a.halfWidth - ARENA_GLYPH_MARGIN || Math.abs(y - a.y) > a.halfHeight - ARENA_GLYPH_MARGIN)) continue;
+    const delay = Math.round((p.dist * glyph.delayPerPixel) / world.dt);
+    last = Math.max(last, delay);
+    addHazard(world, moveIdx, x, y, 0, 1, -1, undefined, { group, delay });
+  }
+  if (glyph.scorch) addHazard(world, moveIndexOfStage(world.rules, glyph.scorch), cx, cy, 0, 1, -1, undefined, { group: world.nextHazardGroup++, delay: last });
 }
 
 /**
@@ -1620,8 +1674,8 @@ export function addHazard(
 ): void {
   const move: BossMove | undefined = world.rules.stage.moves[moveIdx];
   if (!move) return;
-  // 固定マップ: 円の技は壁の中に落とす
-  if (world.arena && move.shape === 'circle') {
+  // 固定マップ: 円の技は壁の中に落とす（ボスの足元に出す技は、ボスの場所のまま）
+  if (world.arena && move.shape === 'circle' && !(move.target === 'self' && dasher !== -1)) {
     const a = world.arena;
     x = Math.max(a.x - a.halfWidth + ARENA_HAZARD_MARGIN, Math.min(a.x + a.halfWidth - ARENA_HAZARD_MARGIN, x));
     y = Math.max(a.y - a.halfHeight + ARENA_HAZARD_MARGIN, Math.min(a.y + a.halfHeight - ARENA_HAZARD_MARGIN, y));
@@ -1751,6 +1805,8 @@ export function activeLegendField(world: World): { field: LegendField; index: nu
     for (let i = 0; i < e.count; i++) {
       if (e.hp[i]! <= 0) continue;
       const field = kinds.get(e.kind[i]!);
+      // 技が残っている間だけ効く効果（ホウオウの にほんばれ）
+      if (field?.whileMove && !world.hazards.some((h) => world.rules.stage.moves[h.move]?.id === field.whileMove)) continue;
       if (field) {
         found.push({ field, index: i });
         if (!cycle) break;

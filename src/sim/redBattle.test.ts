@@ -753,27 +753,7 @@ describe('レッド戦（07 の193章）', () => {
     }
   });
 
-  it('ホウオウの じこさいせい は 2 回まで', () => {
-    const rules = buildSimRules('johto');
-    const sim = new Simulation({ tickRate: 30, seed: 3, rules });
-    sim.addPlayer({ id: 1, x: 30, y: 0, radius: 12, moveSpeed: 0 });
-    sim.world.players[0]!.invincibleTicks = 1e9;
-    sim.step([]);
-    startLegendary(sim.world, rules.enemies.kinds.findIndex((k) => k.id === 'legend-ho-oh'));
-    let recovers = 0;
-    const seen = new Set<unknown>();
-    for (let k = 0; k < 30 * 170; k++) {
-      sim.step([]);
-      for (const h of sim.world.hazards) {
-        if (seen.has(h)) continue;
-        seen.add(h);
-        if (moveId(sim, h.move) === 'hooh-recover') recovers++;
-      }
-    }
-    expect(recovers).toBe(2);
-  });
-
-  it('ホウオウ: ブレイブバードの 2 回の突進が終わってから、その場で息切れする', () => {
+  it('ホウオウ: ブレイブバードの 3 回の突進が終わってから、その場で息切れする', () => {
     const rules = buildSimRules('johto');
     const sim = new Simulation({ tickRate: 30, seed: 3, rules });
     sim.addPlayer({ id: 1, x: 30, y: 0, radius: 12, moveSpeed: 0 });
@@ -783,7 +763,7 @@ describe('レッド戦（07 の193章）', () => {
     startLegendary(w, rules.enemies.kinds.findIndex((k) => k.id === 'legend-ho-oh'));
     let count = 0;
     const seen = new Set<unknown>();
-    for (let k = 0; k < 30 * 60; k++) {
+    for (let k = 0; k < 30 * 100; k++) {
       sim.step([]);
       // 予告の間が止まっている時間（落ちた後は当たらない残りの時間で、もう動く）
       const h = w.hazards.find((z) => moveId(sim, z.move) === 'hooh-recoil' && z.activeTicks === undefined);

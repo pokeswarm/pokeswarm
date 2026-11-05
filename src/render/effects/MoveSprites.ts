@@ -30,6 +30,8 @@ export interface SpriteItem {
   readonly serial?: number;
   /** 蛇行して進むもの（snake）: 出した場所・速度・振れ幅・角速度・出てからの秒数（通った道を描く） */
   readonly snake?: { readonly ox: number; readonly oy: number; readonly vx: number; readonly vy: number; readonly amp: number; readonly omega: number; readonly t: number };
+  /** 消えるまでの残りの秒数（spec の endSeconds で、部品 end のコマを進める） */
+  readonly endLeft?: number;
   /** 前の長方形（frontBox）: 根元からの向きに沿った始まり・終わりと片側の幅（scroll の波を敷く範囲） */
   readonly box?: { readonly from: number; readonly to: number; readonly half: number };
 }
@@ -330,6 +332,13 @@ export class MoveSprites {
           spec.rotate === 'velocity' ? (it.vx !== 0 || it.vy !== 0 ? Math.atan2(it.vy, it.vx) : Math.atan2(it.dirY, it.dirX)) : spec.rotate === 'spin' ? (elapsed * spec.spinDegPerSec * Math.PI) / 180 : 0;
         // 地面から噴き上がる絵は、根元（originY）を当たり判定の中心に合わせる（回す絵は真ん中のまま）
         const oy = rot === 0 ? (spec.originY - 0.5) * rows.length * s : 0;
+        // 燃え尽きる: 最後の endSeconds 秒は部品 end のコマを順に
+        const ending = spec.endSeconds !== undefined && it.endLeft !== undefined && it.endLeft < spec.endSeconds ? sp.parts.end : undefined;
+        if (ending && spec.endSeconds !== undefined && it.endLeft !== undefined) {
+          const k = Math.min(ending.length - 1, Math.floor((1 - it.endLeft / spec.endSeconds) * ending.length));
+          put(fk('end', k), x, y - oy, rot, s, s, a);
+          continue;
+        }
         put(fk('main', this.frameOf(spec.id, 'main', elapsed)), x, y - oy, rot, s, s, a);
         continue;
       }

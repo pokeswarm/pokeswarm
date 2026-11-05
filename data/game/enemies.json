@@ -1518,14 +1518,15 @@
       "species": "ho-oh",
       "rank": "legendary",
       "sprite": "enemy/ho-oh",
-      "hp": 60000,
+      "hp": 80000,
       "moveSpeed": 160,
       "radius": 46,
       "contactDamage": 45,
       "xp": 0,
       "spriteScale": 2.8,
       "drop": "potion",
-      "dropPerPlayer": true
+      "dropPerPlayer": true,
+      "motion": { "type": "still" }
     },
     {
       "id": "poochyena",

@@ -2,6 +2,7 @@ import { boxOf } from '../sim/systems/attack';
 import Phaser from 'phaser';
 import { achievementsConfig, pickupConfig, derivedStatSources, playablesConfig, effectRecipes, moveSprites, generated, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, regionStage, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig, type RegionStage } from '../data';
 import { buildSimRules, localName, mergeModifiers, permanentModifiers, playableLoadout } from '../data/simRules';
+import { glyphFinePoints, glyphPoints, glyphReach } from '../sim/glyph';
 import { permanentBonus } from '../meta/shop';
 import { emptySave } from '../meta/saveData';
 import type { EffectRecipe, SpriteAnims } from '../data/schema';
@@ -112,6 +113,8 @@ const ARENA_FLOOR_DEPTH = -900;
 const ARENA_BAR_GAP = 2;
 const ARENA_BOTTOM_MARGIN = 8;
 const BOSS_BAR_HEIGHT = 12;
+/** 固定マップの絵の 1 ドット（ワールドの単位） */
+const ARENA_MAP_DOT = 2;
 const ARENA_SHIMMER_MS = 2400;
 const ARENA_SHIMMER_MIN = 0.1;
 const ARENA_SHIMMER_MAX = 0.55;
@@ -246,6 +249,8 @@ export class RunScene extends Phaser.Scene {
   private godText: Phaser.GameObjects.Text | null = null;
   /** 伝説戦のマップの効果で画面に重ねる色（サンダーで暗く・フリーザーで白っぽく） */
   private fieldOverlay: Phaser.GameObjects.Rectangle | null = null;
+  private overlayLast: { readonly color: string; readonly alpha: number; readonly fadeSeconds?: number | undefined } | null = null;
+  private overlayLevel = 0;
   /** サンダーの空の明滅: 最後に光った時刻・次に光る時刻（ms） */
   private skyFlashAt = -1e9;
   private nextSkyFlashAt = 0;
@@ -260,6 +265,8 @@ export class RunScene extends Phaser.Scene {
   private uiCommands: InputCommand[] = [];
   /** ボスの範囲技の予告 */
   private hazardView!: Phaser.GameObjects.Graphics;
+  /** 炎の字の予告・照り・焦げ跡の絵（字の形の 1 枚の絵を薄くして使う。丸を重ねると濃さのむらが出るので。07 の207章） */
+  private glyphMarks = new Map<Hazard, Phaser.GameObjects.Image[]>();
   /** ほろびのうた の残りの秒数（予告ごとに1つ。07 の167章） */
   private countdownTexts: Phaser.GameObjects.Text[] = [];
   /** マップに落ちている道具（きずぐすり・マグネット・ふしぎなアメ）の影と、道具ごとのドット絵 */
@@ -303,6 +310,9 @@ export class RunScene extends Phaser.Scene {
     this.boxImages.clear();
     this.buffIcons = [];
     this.fieldOverlay = null;
+    this.overlayLast = null;
+    this.overlayLevel = 0;
+    this.glyphMarks = new Map();
     this.godText = null;
     this.boltView = null;
     this.flashedSerials = new Set();
@@ -1780,6 +1790,7 @@ export class RunScene extends Phaser.Scene {
     const g = this.hazardView;
     g.clear();
     this.drawShockRings(g, hazards);
+    const marked = new Set<Hazard>();
     let countdowns = 0;
     for (const h of hazards) {
       // 飛ぶ玉（サンダーの電気の玉）: 飛んでいる間は黄色い玉
@@ -1792,6 +1803,30 @@ export class RunScene extends Phaser.Scene {
         continue;
       }
       const mv = this.sim.world.rules.stage.moves[h.move];
+      if (mv?.glyphOf) {
+        // 撃つ技は予告の間だけ、焦げ跡の技（予告なし）は残っている間だけ
+        if ((h.activeTicks === undefined) !== !!mv.hideTelegraph) {
+          marked.add(h);
+          this.drawGlyphMark(h, mv);
+        }
+        continue;
+      }
+      if (mv?.sunRays && h.activeTicks !== undefined) {
+        this.drawSunRays(g, h, mv);
+        continue;
+      }
+      // 炎の柱の列（せいなるほのお）: 隣と重ならない四角で予告する
+      if (mv?.pillarRows && this.sim.world.arena) {
+        if (h.activeTicks === undefined && h.ticksLeft <= Math.round(mv.telegraphSeconds / this.sim.world.dt)) {
+          const arena = this.sim.world.arena;
+          const cw = (arena.halfWidth * 2) / mv.pillarRows.cols;
+          const ch = (arena.halfHeight * 2) / mv.pillarRows.rows;
+          const p = 1 - h.ticksLeft / Math.round(mv.telegraphSeconds / this.sim.world.dt);
+          g.fillStyle(0xff1744, 0.14).fillRect(h.x - cw / 2, h.y - ch / 2, cw, ch);
+          g.fillStyle(0xff1744, 0.2).fillRect(h.x - cw / 2, h.y + ch / 2 - ch * p, cw, ch * p);
+        }
+        continue;
+      }
       if (mv?.windWave && h.activeTicks !== undefined) {
         this.drawWindWave(g, h, mv);
         continue;
@@ -1819,7 +1854,9 @@ export class RunScene extends Phaser.Scene {
         if (mv && !recipe?.bossActive && ((mv.activeSeconds ?? 0) > 0.6 || mv.bounce)) this.drawHazardArea(g, h, mv, 0.1, 0.6);
         continue;
       }
-      const progress = 1 - h.ticksLeft / h.totalTicks;
+      // 続けて突進する技: 前の突進が終わるまで、次の予告は出さない
+      if (mv?.dashSpeed && h.ticksLeft > Math.round(mv.telegraphSeconds / this.sim.world.dt)) continue;
+      const progress = 1 - h.ticksLeft / Math.min(h.totalTicks, mv?.dashSpeed ? Math.round(mv.telegraphSeconds / this.sim.world.dt) : h.totalTicks);
       if (mv?.countdown) this.drawCountdown(h, countdowns++);
       // ダメージの無い技（ため・強化・回復・本物が現れる所）は、赤い予告を出さない（絵だけ。07 の167章）
       if (mv && mv.damage <= 0 && !mv.counter) continue;
@@ -1884,6 +1921,11 @@ export class RunScene extends Phaser.Scene {
       g.fillStyle(0xff1744, 0.25).fillCircle(h.x, h.y, h.radius * progress);
       g.lineStyle(2, 0xff5252, 0.9).strokeCircle(h.x, h.y, h.radius);
     }
+    for (const [h, parts] of this.glyphMarks) {
+      if (marked.has(h)) continue;
+      for (const part of parts) part.destroy();
+      this.glyphMarks.delete(h);
+    }
     for (let k = countdowns; k < this.countdownTexts.length; k++) this.countdownTexts[k]!.setVisible(false);
     // 伝説の周りの炎の輪（ファイヤーのほのおのうず）: 触れると削られる範囲
     const active = activeLegendField(this.sim.world);
@@ -1899,6 +1941,107 @@ export class RunScene extends Phaser.Scene {
       const fade = Math.min(1, z.ticksLeft / 30);
       // 控えめな粒を出す技は、塗りをうすくする
       g.fillStyle(hexColor(z.color), (this.effects.linger(z.effect)?.fillAlpha ?? 0.3) * fade).fillCircle(z.x, z.y, z.radius);
+    }
+  }
+
+  /**
+   * 炎の字（だいもんじ。07 の207章）: 予告の間は赤い字が交わる所から外へ伸び、燃え尽きた後は焦げ跡が薄くなって消える。
+   * 当たる範囲と同じ点から描くので、見えている形と当たる形が同じ
+   */
+  private drawGlyphMark(h: Hazard, mv: NonNullable<World['rules']['stage']['moves'][number]>): void {
+    const def = this.sim.world.rules.stage.moves.find((m) => m.id === mv.glyphOf);
+    if (!def?.glyph) return;
+    const parts = this.glyphMarks.get(h) ?? this.makeGlyphMark(h, def);
+    const [first, second] = parts;
+    if (!first || !second) return;
+    if (h.activeTicks === undefined) {
+      // 予告: 薄い字の上に、交わる所から広がる濃い字
+      const p = 1 - h.ticksLeft / Math.max(1, h.totalTicks);
+      first.setAlpha(0.16);
+      second.setAlpha(0.3).setScale(ARENA_MAP_DOT * Math.max(0.01, p));
+      return;
+    }
+    // 燃えている間は足元が照らされ、燃え尽きると焦げ跡だけが残って薄くなる
+    const dt = this.sim.world.dt;
+    const burning = (def.activeSeconds ?? 0) + (def.glyph?.delayPerPixel ?? 0) * glyphReach(def.glyph!);
+    const elapsed = (Math.round((mv.activeSeconds ?? 0) / dt) - h.activeTicks) * dt;
+    first.setAlpha(0.55 * Math.min(1, h.activeTicks / Math.round(1 / dt)));
+    second.setAlpha(Math.max(0, Math.min(1, (burning - elapsed) / 0.4)) * 0.26);
+  }
+
+  /**
+   * 字の形の絵（1 ドットはワールドの ARENA_MAP_DOT）を作って置く。color は不透明の色。rough はふちを崩す（焦げ跡）。
+   * 字の交わる所が絵の原点。画面の外へはみ出す分は、固定マップの壁の絵が隠す
+   */
+  private glyphTexture(def: { readonly id: string; readonly radius: number; readonly glyph?: Parameters<typeof glyphFinePoints>[0] | undefined }, rough: boolean): { key: string; originX: number; originY: number } {
+    const key = `glyph:${def.id}:${rough ? 'rough' : 'solid'}`;
+    const points = glyphFinePoints(def.glyph!);
+    const r = def.radius / ARENA_MAP_DOT;
+    const xs = points.map((q) => q.x / ARENA_MAP_DOT);
+    const ys = points.map((q) => q.y / ARENA_MAP_DOT);
+    const x0 = Math.floor(Math.min(...xs) - r - 2);
+    const y0 = Math.floor(Math.min(...ys) - r - 2);
+    const w = Math.ceil(Math.max(...xs) + r + 2) - x0;
+    const h = Math.ceil(Math.max(...ys) + r + 2) - y0;
+    if (!this.textures.exists(key)) {
+      const tex = this.textures.createCanvas(key, w, h);
+      if (tex) {
+        const ctx = tex.getContext();
+        const img = ctx.createImageData(w, h);
+        points.forEach((q, k) => {
+          const wob = rough ? Math.sin(q.dist * 0.17 + q.x * 0.05) * 0.5 + Math.sin(q.dist * 0.41 + q.y * 0.07) * 0.5 : 0;
+          const rr = rough ? r * (0.52 + wob * 0.24) : r;
+          for (let py = Math.floor(ys[k]! - rr); py <= ys[k]! + rr; py++) {
+            for (let px = Math.floor(xs[k]! - rr); px <= xs[k]! + rr; px++) {
+              if ((px - xs[k]!) ** 2 + (py - ys[k]!) ** 2 > rr * rr) continue;
+              const at = ((py - y0) * w + (px - x0)) * 4;
+              img.data[at] = img.data[at + 1] = img.data[at + 2] = 255;
+              img.data[at + 3] = 255;
+            }
+          }
+        });
+        ctx.putImageData(img, 0, 0);
+        tex.refresh();
+      }
+    }
+    return { key, originX: -x0 / w, originY: -y0 / h };
+  }
+
+  /** 予告（赤い字 2 枚）か、残る跡（焦げ跡・照り）の絵を置く */
+  private makeGlyphMark(h: Hazard, def: NonNullable<World['rules']['stage']['moves'][number]>): Phaser.GameObjects.Image[] {
+    const depth = spriteRender.depths.hazards - 0.02;
+    const place = (t: { key: string; originX: number; originY: number }, color: number, d: number): Phaser.GameObjects.Image =>
+      this.add.image(h.x, h.y, t.key).setOrigin(t.originX, t.originY).setScale(ARENA_MAP_DOT).setTint(color).setDepth(d);
+    const solid = this.glyphTexture(def, false);
+    const parts = h.activeTicks === undefined ? [place(solid, 0xff1744, depth), place(solid, 0xff1744, depth + 0.001)] : [place(this.glyphTexture(def, true), 0x1a0d08, depth), place(solid, 0xff8a3d, depth + 0.001)];
+    this.glyphMarks.set(h, parts);
+    return parts;
+  }
+
+  /** にほんばれ（ホウオウ。07 の207章）: 上から斜めに差す光の筋。ゆっくり流れ、明滅はさせない */
+  private drawSunRays(g: Phaser.GameObjects.Graphics, h: Hazard, mv: { readonly activeSeconds?: number }): void {
+    const a = this.sim.world.arena;
+    if (!a) return;
+    const dt = this.sim.world.dt;
+    const total = Math.round((mv.activeSeconds ?? 30) / dt);
+    const left = h.activeTicks ?? 0;
+    const fade = Math.min(1, left / Math.round(2 / dt), (total - left) / Math.round(2 / dt));
+    const top = a.y - a.halfHeight;
+    const bottom = a.y + a.halfHeight;
+    const slant = 360;
+    for (let k = 0; k < 6; k++) {
+      const x = a.x - a.halfWidth + ((k * 340 + (total - left) * dt * 14) % (a.halfWidth * 2 + slant)) - slant / 2;
+      const w = 70 + ((k * 37) % 90);
+      g.fillStyle(0xfff3c4, (0.05 + (k % 3) * 0.018) * fade);
+      g.fillPoints(
+        [
+          new Phaser.Math.Vector2(x, top),
+          new Phaser.Math.Vector2(x + w, top),
+          new Phaser.Math.Vector2(x + w - slant, bottom),
+          new Phaser.Math.Vector2(x - slant, bottom),
+        ],
+        true,
+      );
     }
   }
 
@@ -1961,15 +2104,29 @@ export class RunScene extends Phaser.Scene {
       const recipe = effectRecipes[mv?.effect ?? ''];
       if (!mv || !recipe) continue;
       const active = h.activeTicks !== undefined;
-      const spec = active ? recipe.bossActive : recipe.bossTelegraph;
-      if (!spec) continue;
+      // 炎の字の予告: 赤い字が伸びた所に、火種が灯る
+      if (!active && mv.glyphOf) {
+        const def = world.rules.stage.moves.find((m) => m.id === mv.glyphOf);
+        const ember = effectRecipes[def?.effect ?? '']?.bossTelegraph;
+        if (def?.glyph && ember) {
+          const reach = glyphReach(def.glyph) * (1 - h.ticksLeft / Math.max(1, h.totalTicks));
+          for (const q of glyphPoints(def.glyph)) {
+            // 1 つおきに灯す
+            if (q.dist <= reach && Math.round(q.dist / def.glyph.spacing) % 2 === 0) out.push({ spec: ember, x: h.x + q.x, y: h.y + q.y, radius: def.radius, band: 0, dirX: 0, dirY: 1, length: 0, vx: 0, vy: 1, elapsed: ((h.totalTicks - h.ticksLeft) * world.dt + q.dist * 0.013) % 10, alpha: 1, seed: 0 });
+          }
+        }
+      }
+      const baseSpec = active ? recipe.bossActive : recipe.bossTelegraph;
+      if (!baseSpec) continue;
+      // 同じ絵が揃って揺れないよう、場所で絵を選ぶ（炎の字）
+      const spec = baseSpec.variants?.length ? { ...baseSpec, id: baseSpec.variants[Math.abs(Math.round(h.x * 7 + h.y * 13)) % baseSpec.variants.length]! } : baseSpec;
       const total = active ? Math.max(1, Math.round((mv.bounce?.seconds ?? mv.sweep?.seconds ?? mv.trap?.seconds ?? mv.activeSeconds ?? world.rules.stage.bossRules.hazardActiveSeconds) / world.dt)) : h.totalTicks;
       const left = active ? (h.activeTicks ?? 0) : h.ticksLeft;
       const elapsed = (total - left) * world.dt;
       const grow = 1 + ((mv.bounce?.growPct ?? 0) * (h.bounces ?? 0)) / 100;
       // 予告の絵は、落ちる前にだんだん濃く（遅れて始まる予告は、始まるまで描かない）
       if (!active && left > Math.round(mv.telegraphSeconds / world.dt)) continue;
-      const alpha = active ? Math.min(1, left / Math.max(1, total * 0.2)) : spec.overBoss ? 1 : Math.min(1, 0.35 + elapsed / Math.max(0.1, mv.telegraphSeconds));
+      const alpha = active ? (spec.endSeconds ? 1 : Math.min(1, left / Math.max(1, total * 0.2))) : spec.overBoss ? 1 : Math.min(1, 0.35 + elapsed / Math.max(0.1, mv.telegraphSeconds));
       // 口もとで大きくなる・ボスの口もとから飛んでいく（ルギアの エアロブラスト。07 の204章）
       if (!active && (spec.chargeGrow || spec.fromBoss)) {
         const p = Math.min(1, elapsed / Math.max(0.1, mv.telegraphSeconds));
@@ -2010,6 +2167,7 @@ export class RunScene extends Phaser.Scene {
         elapsed,
         alpha,
         seed: h.group ?? 0,
+        ...(active ? { endLeft: left * world.dt } : {}),
       });
     }
     return out;
@@ -2066,7 +2224,12 @@ export class RunScene extends Phaser.Scene {
 
   /** 伝説戦のマップの効果: 画面に色を重ねる（サンダーで暗く・フリーザーで白っぽく） */
   private drawFieldOverlay(): void {
-    const overlay = activeField(this.sim.world)?.field.overlay;
+    const current = activeField(this.sim.world)?.field.overlay;
+    if (current) this.overlayLast = current;
+    // ゆっくり変わる色（ホウオウの にほんばれ）: 消えた後も、薄くなるまで前の色を出す
+    const fade = this.overlayLast?.fadeSeconds;
+    this.overlayLevel = fade ? Math.max(0, Math.min(1, this.overlayLevel + ((current ? 1 : -1) * this.game.loop.delta) / 1000 / fade)) : current ? 1 : 0;
+    const overlay = current ?? (fade && this.overlayLevel > 0 ? this.overlayLast : undefined);
     if (!overlay) {
       this.fieldOverlay?.setVisible(false);
       return;
@@ -2084,7 +2247,7 @@ export class RunScene extends Phaser.Scene {
     // 2回ちらつく光（0〜90ms と 140〜260ms）
     const lit = flash && (since < 90 || (since > 140 && since < 260));
     if (lit) this.fieldOverlay.setFillStyle(hexColor(flash.color), flash.alpha);
-    else this.fieldOverlay.setFillStyle(hexColor(overlay.color), overlay.alpha);
+    else this.fieldOverlay.setFillStyle(hexColor(overlay.color), overlay.alpha * this.overlayLevel);
     this.fieldOverlay.setSize(cam.width, cam.height).setVisible(true);
     this.placeUi(this.fieldOverlay, 0, 0);
   }
@@ -2436,7 +2599,11 @@ export class RunScene extends Phaser.Scene {
     for (const h of w.hazards) {
       const mv = w.rules.stage.moves[h.move];
       const pose = h.dasher === id && (h.activeTicks === undefined || mv?.holdWhileActive) ? mv?.pose : undefined;
-      if (pose) return { anim: pose, spin: false, ...(w.arena && (mv?.fixedAim || mv?.aimCenter) ? { face: [h.dirX, h.dirY] as const } : {}) };
+      if (pose) {
+        // 固定マップ: 決まった向きへ撃つ技はその向き、狙う技は当たる場所を向く
+        const aimed = mv?.fixedAim || mv?.aimCenter ? ([h.dirX, h.dirY] as const) : mv?.target === 'player' ? ([h.x - w.enemies.x[i]!, h.y - w.enemies.y[i]!] as const) : null;
+        return { anim: pose, spin: false, ...(w.arena && aimed ? { face: aimed } : {}) };
+      }
     }
     const ai = w.legendAis.get(id);
     // 固定マップ: 撃つ向き（無ければ、止まっている間は自分のプレイヤー）を向く（07 の204章）

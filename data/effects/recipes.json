@@ -6065,6 +6065,46 @@
     "boss-lugia-fly": {
       "extends": "flying.base"
     },
+    "boss-hooh-blast-charge": {
+      "extends": "fire.base",
+      "bossTelegraph": { "id": "fire-blast-orb", "fit": "circle", "size": 1.1, "overBoss": true, "offsetY": -70, "chargeGrow": true }
+    },
+    "boss-hooh-blast-shot": {
+      "extends": "fire.base",
+      "bossTelegraph": { "id": "fire-blast-orb", "fit": "circle", "size": 0.55, "overBoss": true, "offsetY": -70, "fromBoss": true },
+      "strike": { "id": "fire-blast-burst", "fit": "circle", "size": 1.5, "seconds": 0.4 }
+    },
+    "boss-hooh-blast-flames": {
+      "extends": "fire.base",
+      "bossTelegraph": { "id": "daimonji-ember", "fit": "circle", "size": 0.3 },
+      "bossActive": { "id": "daimonji-flame-a", "variants": ["daimonji-flame-a", "daimonji-flame-b", "daimonji-flame-c"], "fit": "circle", "size": 1.33, "originY": 0.86, "endSeconds": 0.36 }
+    },
+    "boss-hooh-blast-scorch": {
+      "extends": "fire.base"
+    },
+    "boss-hooh-sacred": {
+      "extends": "fire.base",
+      "bossActive": { "id": "sacred-pillar-a", "variants": ["sacred-pillar-a", "sacred-pillar-b", "sacred-pillar-c"], "fit": "circle", "size": 1, "originY": 0.55, "endSeconds": 0.16 }
+    },
+    "boss-hooh-trail": {
+      "extends": "fire.base",
+      "bossActive": { "id": "daimonji-flame-a", "variants": ["daimonji-flame-a", "daimonji-flame-b", "daimonji-flame-c"], "fit": "circle", "size": 1.15, "originY": 0.86, "endSeconds": 0.36 }
+    },
+    "boss-hooh-fly": {
+      "extends": "fire.base"
+    },
+    "boss-hooh-sunny": {
+      "extends": "fire.base",
+      "bossTelegraph": { "id": "sun-orb", "fit": "circle", "size": 1.2, "overBoss": true, "offsetY": -110, "chargeGrow": true }
+    },
+    "boss-hooh-sun": {
+      "extends": "fire.base"
+    },
+    "boss-hooh-rekindle": {
+      "extends": "fire.base",
+      "bossTelegraph": { "id": "rainbow-flame", "fit": "circle", "size": 1.6, "overBoss": true, "originY": 0.82, "alpha": 0.88 },
+      "strike": { "id": "rainbow-burst", "fit": "circle", "size": 3, "seconds": 0.45 }
+    },
     "boss-aeroblast": {
       "extends": "flying.base",
       "bossActive": {

@@ -7,7 +7,7 @@ import type { Player } from './entities/player';
 import { ProjectileStore } from './entities/projectiles';
 import type { SimEvent } from './events';
 import { Rng } from './rng';
-import type { StatusKind } from '../data/schema';
+import type { ArenaMap, StatusKind } from '../data/schema';
 import type { SimRules } from './rules';
 import { SpatialHash } from './spatial/spatialHash';
 
@@ -330,7 +330,7 @@ export interface World {
   /** このランで拾ったはね（ルギア・ホウオウ戦の権利） */
   readonly wings: Set<WingKind>;
   /** 固定マップの戦いの間の、マップの場所と広さ（07 の203章）。ふだんは null */
-  arena: { x: number; y: number; halfWidth: number; halfHeight: number; viewHeight: number; cameraOffsetY: number } | null;
+  arena: { x: number; y: number; halfWidth: number; halfHeight: number; viewHeight: number; cameraOffsetY: number; map: ArenaMap | null } | null;
   /** 伝説戦に、相性で選ぶ候補（stage.json の legendary.counter。色違いの御三家）を足す（参加者のだれかが条件の実績を達成している）。ランを始める前に入れる */
   legendaryCounter: boolean;
   /** 伝説戦の相手を legendary.forceKind の伝説に決める（遊ぶ人の記録が条件をまだ満たしていない）。ランを始める前に入れる */

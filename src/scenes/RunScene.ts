@@ -106,6 +106,11 @@ const BOSS_BARS_MAX = 4;
 const ARENA_SIDE_MARGIN = 80;
 const ARENA_FADE_MS = 700;
 const ARENA_FRAME_DEPTH = 4.9;
+/** 固定マップの床（地面のタイルより手前、ほかの物より奥） */
+const ARENA_FLOOR_DEPTH = -900;
+const ARENA_SHIMMER_MS = 2400;
+const ARENA_SHIMMER_MIN = 0.1;
+const ARENA_SHIMMER_MAX = 0.55;
 /** 画面の中央に出す文字を出しておく時間（ミリ秒）。固定マップの登場の文字は短く */
 const ANNOUNCE_HOLD_MS = 2500;
 const ARENA_APPEAR_HOLD_MS = 1000;
@@ -331,6 +336,14 @@ export class RunScene extends Phaser.Scene {
 
   preload(): void {
     preloadGroundTiles(this, this.stageOfRegion.ground);
+    // 固定マップの絵（07 の205章）。移ってから読むと絵が遅れて出るので、ランの前に読んでおく
+    for (const set of Object.values(this.stageOfRegion.stage.legendary?.moveSets ?? {})) {
+      const map = set.arena?.map;
+      if (!map) continue;
+      for (const file of [map.floor, map.wall, ...(map.shimmer ?? [])]) {
+        if (!this.textures.exists(file)) this.load.image(file, file);
+      }
+    }
     // ポケモン選択の画面で読み込み済みなら読み直さない
     if (this.playerSprite && !this.textures.exists(atlasKey(this.playerSprite.key))) preloadPokemonAtlas(this, this.playerSprite);
   }
@@ -1048,14 +1061,29 @@ export class RunScene extends Phaser.Scene {
     const g = this.add.graphics().setDepth(ARENA_FRAME_DEPTH);
     const { x, y, halfWidth: w, halfHeight: h } = arena;
     const far = 4000;
-    // マップの外は暗くし、壁の線を引く（絵はマップの調整のときに作る）
+    // マップの外は暗くする。技の絵のはみ出しも隠す
     g.fillStyle(0x0b1020, 1);
     g.fillRect(x - w - far, y - h - far, far, h * 2 + far * 2);
     g.fillRect(x + w, y - h - far, far, h * 2 + far * 2);
     g.fillRect(x - w, y - h - far, w * 2, far);
     g.fillRect(x - w, y + h, w * 2, far);
-    g.lineStyle(6, 0xb3e5fc, 0.8).strokeRect(x - w, y - h, w * 2, h * 2);
     this.arenaFrame = g;
+    const map = arena.map;
+    // 絵が無いマップは壁の線だけ
+    if (!map) {
+      g.lineStyle(6, 0xb3e5fc, 0.8).strokeRect(x - w, y - h, w * 2, h * 2);
+      return;
+    }
+    // 絵は広さに合わせて伸ばす（確認用の ?arena で広さを変えたときも合うように）
+    this.add.image(x, y, map.floor).setDisplaySize(w * 2, h * 2).setDepth(ARENA_FLOOR_DEPTH);
+    const scaleX = (w * 2) / this.textures.get(map.floor).getSourceImage().width;
+    const scaleY = (h * 2) / this.textures.get(map.floor).getSourceImage().height;
+    this.add.image(x, y, map.wall).setScale(scaleX, scaleY).setDepth(ARENA_FRAME_DEPTH);
+    // 水のきらめきは交互にゆっくり濃くする（点滅に見えない速さ）
+    map.shimmer?.forEach((file, k) => {
+      const glint = this.add.image(x, y, file).setDisplaySize(w * 2, h * 2).setDepth(ARENA_FLOOR_DEPTH + 1).setAlpha(k === 0 ? ARENA_SHIMMER_MAX : ARENA_SHIMMER_MIN);
+      this.tweens.add({ targets: glint, alpha: k === 0 ? ARENA_SHIMMER_MIN : ARENA_SHIMMER_MAX, duration: ARENA_SHIMMER_MS, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    });
   }
 
   private applyZoom(): void {

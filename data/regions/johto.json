@@ -932,7 +932,14 @@
           "halfWidth": 800,
           "halfHeight": 440,
           "viewHeight": 960,
-          "cameraOffsetY": -30
+          "cameraOffsetY": -30,
+          "map": {
+            "floor": "map/johto/arena-lugia-floor.png",
+            "wall": "map/johto/arena-lugia-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2,
+            "shimmer": ["map/johto/arena-lugia-shimmer-a.png", "map/johto/arena-lugia-shimmer-b.png"]
+          }
         },
         "anchor": {
           "x": 0,
@@ -959,13 +966,7 @@
         },
         "random": false,
         "intervalAfterMove": true,
-        "moveIntervalSeconds": 1.4,
-        "field": {
-          "overlay": {
-            "color": "#b3e5fc",
-            "alpha": 0.1
-          }
-        }
+        "moveIntervalSeconds": 1.4
       },
       "legend-ho-oh": {
         "hpDrops": {

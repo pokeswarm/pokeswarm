@@ -74,6 +74,7 @@ SpriteCollab ─┘                         └─▶ スプライトアトラ�
 - 時間帯ごとに使うタイルは `data/render/ground.json` で指定する。小物の一覧はステージごとにデータで指定する（小物は未実装）。
 - 生成した元画像は `assets/map/<地方>/` に置き、`node scripts/process-map-tiles.ts` で `public/map/<地方>/` のタイルに変換する（カントー）。
 - 【決定】（作者。2026年10月27日）ジョウトのタイルは、生成AIではなく **Claude がコードで描く**（`npm run map-tiles`。`02` 6章）。試作 2枚（草原・焼け跡）をカントーのタイルと並べて作者が確かめ、この方向で12枚を作った。自作なので出典の表記は要らない。
+- 伝説戦の固定マップの絵も同じく Claude がコードで描く（`npm run arena-maps` = `scripts/make-arena-maps.ts`。出力は `public/map/<地方>/arena-<id>-*.png`。指定は `moveSets` の `arena.map`。`07` の205章）。
 
 ### 5.1 道具のドット絵（自作。2026年10月21日）
 - マップの道具（きずぐすり・マグネット・ふしぎなアメ）とアメの箱は、公式の画像を使わず自作の 16×16 のドット絵にした。`data/render/items.json` に、1文字が1ドットの表と色で書く（`.` は透明）。起動時にテクスチャにする（`src/render/PixelArt.ts`）。

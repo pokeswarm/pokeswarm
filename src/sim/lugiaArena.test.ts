@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { buildSimRules } from '../data/simRules';
 import { Simulation } from './simulation';
@@ -161,3 +163,13 @@ describe('ルギアの技（07 の204章）', () => {
     for (const id of ['lugia-aeroblast', 'lugia-aeroblast-shot', 'lugia-aero-tornado', 'lugia-fly-side', 'lugia-hydro-sweep', 'lugia-fly-top']) expect(used).toContain(id);
   });
 });
+
+describe('固定マップの絵（07 の205章）', () => {
+  it('マップへ移ると絵の指定が渡り、その画像が public にある', () => {
+    const { sim } = setup();
+    const map = sim.world.arena!.map!;
+    expect(map).toBeTruthy();
+    for (const file of [map.floor, map.wall, ...(map.shimmer ?? [])]) expect(fs.existsSync(path.join('public', file))).toBe(true);
+  });
+});
+

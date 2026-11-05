@@ -152,6 +152,20 @@ export const groundConfigSchema = z
   .refine((g) => g.waves.every((w) => w.tile in g.tiles), { message: 'ground の waves に tiles にないタイル ID がある' });
 export type GroundConfig = z.infer<typeof groundConfigSchema>;
 
+/**
+ * 固定マップの絵（`npm run arena-maps`。07 の205章）。パスは public/ から。
+ * floor はマップの広さぴったりの床、wall は床より wallMargin ドット外まである壁（真ん中は透明）、
+ * shimmer は交互にゆっくり濃くする水のきらめき。1 ドットはワールドの pixelScale ピクセル
+ */
+export const arenaMapSchema = z.object({
+  floor: z.string().min(1),
+  wall: z.string().min(1),
+  wallMargin: z.number().nonnegative(),
+  pixelScale: z.number().positive(),
+  shimmer: z.tuple([z.string().min(1), z.string().min(1)]).optional(),
+});
+export type ArenaMap = z.infer<typeof arenaMapSchema>;
+
 /** 区間の番号のときに使うタイル ID（区間が足りなければ最後のタイル） */
 export function groundTileAt(ground: GroundConfig, wave: number): string {
   return ground.waves[Math.min(wave, ground.waves.length - 1)]!.tile;
@@ -847,7 +861,7 @@ export const stageConfigSchema = z.object({
              * halfWidth・halfHeight は動ける広さの半分。viewHeight は見えるワールドの縦（ふだんの 720 より大きいと小さく映る）。
              * cameraOffsetY はカメラの中心をマップの中心からずらす量（上の HP バーの分）。anchor はマップの中心からの位置になる
              */
-            arena: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), viewHeight: z.number().positive(), cameraOffsetY: z.number().default(0) }).optional(),
+            arena: z.object({ halfWidth: z.number().positive(), halfHeight: z.number().positive(), viewHeight: z.number().positive(), cameraOffsetY: z.number().default(0), map: arenaMapSchema.optional() }).optional(),
             /** 近くに寄られたら割り込む技（ルギアの ふきとばし: 奥の定位置にいるときだけ。07 の204章） */
             reactive: z.object({ move: z.string().min(1), withinDistance: z.number().positive(), everySeconds: z.number().positive() }).optional(),
             /**

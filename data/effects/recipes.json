@@ -5983,6 +5983,38 @@
         "seconds": 0.3
       }
     },
+    "boss-entei-plain": {
+      "extends": "fire.base"
+    },
+    "boss-entei-charge": {
+      "extends": "fire.base",
+      "bossTelegraph": { "id": "entei-flame-a", "variants": ["entei-flame-a", "entei-flame-b"], "fit": "circle", "size": 1.9, "originY": 0.86 }
+    },
+    "boss-entei-crack": {
+      "extends": "fire.base",
+      "bossActive": { "id": "entei-crack", "fit": "line", "size": 1, "varyTiles": true }
+    },
+    "boss-entei-flame": {
+      "extends": "fire.base",
+      "bossActive": { "id": "entei-flame-a", "variants": ["entei-flame-a", "entei-flame-b", "entei-flame-c"], "fit": "circle", "size": 1.45, "originY": 0.86, "endSeconds": 0.3 }
+    },
+    "boss-entei-ring": {
+      "extends": "fire.base",
+      "bossActive": { "id": "entei-flame-a", "variants": ["entei-flame-a", "entei-flame-b", "entei-flame-c"], "fit": "circle", "size": 1.4, "originY": 0.8 }
+    },
+    "boss-entei-bomb": {
+      "extends": "fire.base",
+      "bossTelegraph": { "id": "entei-rock", "fit": "circle", "size": 0.9, "overBoss": true, "dropHeight": 460 },
+      "strike": { "id": "entei-burst", "fit": "circle", "size": 1.5, "seconds": 0.38 }
+    },
+    "boss-entei-geyser": {
+      "extends": "fire.base",
+      "bossActive": { "id": "entei-geyser-a", "variants": ["entei-geyser-a", "entei-geyser-b"], "fit": "circle", "size": 1.05, "originY": 0.72, "endSeconds": 0.16 }
+    },
+    "boss-entei-flee": {
+      "extends": "fire.base",
+      "bossActive": { "id": "entei-crack", "fit": "line", "size": 1.2, "varyTiles": true }
+    },
     "boss-raikou-plain": {
       "extends": "electric.base"
     },

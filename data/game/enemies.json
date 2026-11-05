@@ -1481,7 +1481,7 @@
       "rank": "legendary",
       "sprite": "enemy/entei",
       "hp": 44800,
-      "moveSpeed": 165,
+      "moveSpeed": 120,
       "radius": 40,
       "contactDamage": 42,
       "xp": 0,

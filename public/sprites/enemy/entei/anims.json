@@ -24,6 +24,93 @@
         12
       ],
       "frameKeyPrefix": "Walk"
+    },
+    "Attack": {
+      "source": "Attack",
+      "frameWidth": 72,
+      "frameHeight": 88,
+      "durations": [
+        2,
+        3,
+        6,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Attack"
+    },
+    "Charge": {
+      "source": "Charge",
+      "frameWidth": 32,
+      "frameHeight": 56,
+      "durations": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Charge"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 48,
+      "frameHeight": 56,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    },
+    "Shoot": {
+      "source": "Shoot",
+      "frameWidth": 56,
+      "frameHeight": 64,
+      "durations": [
+        2,
+        2,
+        6,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        4
+      ],
+      "frameKeyPrefix": "Shoot"
+    },
+    "Strike": {
+      "source": "Attack",
+      "frameWidth": 72,
+      "frameHeight": 88,
+      "durations": [
+        2,
+        3,
+        6,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Attack"
     }
   },
   "missing": []

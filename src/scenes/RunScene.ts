@@ -1832,12 +1832,13 @@ export class RunScene extends Phaser.Scene {
         continue;
       }
       // 炎の柱の列（せいなるほのお）: 隣と重ならない四角で予告する
-      if (mv?.pillarRows && this.sim.world.arena) {
-        if (h.activeTicks === undefined && h.ticksLeft <= Math.round(mv.telegraphSeconds / this.sim.world.dt)) {
+      const gridOf = mv?.pillarRows ?? mv?.checker;
+      if (gridOf && this.sim.world.arena) {
+        if (h.activeTicks === undefined && h.ticksLeft <= Math.round(mv!.telegraphSeconds / this.sim.world.dt)) {
           const arena = this.sim.world.arena;
-          const cw = (arena.halfWidth * 2) / mv.pillarRows.cols;
-          const ch = (arena.halfHeight * 2) / mv.pillarRows.rows;
-          const p = 1 - h.ticksLeft / Math.round(mv.telegraphSeconds / this.sim.world.dt);
+          const cw = (arena.halfWidth * 2) / gridOf.cols;
+          const ch = (arena.halfHeight * 2) / gridOf.rows;
+          const p = 1 - h.ticksLeft / Math.round(mv!.telegraphSeconds / this.sim.world.dt);
           g.fillStyle(0xff1744, 0.14).fillRect(h.x - cw / 2, h.y - ch / 2, cw, ch);
           g.fillStyle(0xff1744, 0.2).fillRect(h.x - cw / 2, h.y + ch / 2 - ch * p, cw, ch * p);
         }

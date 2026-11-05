@@ -607,7 +607,8 @@
       "timeLimitSeconds": 60,
       "hpTimesMidboss": 6,
       "fleeMoves": {
-        "legend-raikou": "raikou-flee"
+        "legend-raikou": "raikou-flee",
+        "legend-entei": "entei-flee"
       }
     },
     "moveSets": {
@@ -916,19 +917,29 @@
           "x": 0,
           "y": -240
         },
+        "noEnrage": true,
         "moves": [
-          "entei-flare-blitz",
-          "entei-eruption",
-          "entei-stomp"
+          "entei-roar",
+          "entei-stomp",
+          "entei-fire-spin",
+          "entei-eruption"
+        ],
+        "hpMoves": [
+          {
+            "belowHpPct": 50,
+            "moves": [
+              "entei-to-center"
+            ]
+          }
         ],
         "random": false,
-        "moveIntervalSeconds": 1.6,
-        "enrageMoveIntervalSeconds": 1.1,
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 1,
         "field": {
-          "aura": {
-            "radius": 90,
-            "damagePerSecond": 25,
-            "color": "#ff7043"
+          "overlay": {
+            "color": "#2a0805",
+            "alpha": 0.3,
+            "fadeSeconds": 2
           }
         }
       },

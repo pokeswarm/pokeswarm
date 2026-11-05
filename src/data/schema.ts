@@ -710,6 +710,22 @@ export const bossMoveSchema = z.object({
   clouds: z.object({ move: z.string().min(1), holdSeconds: z.number().nonnegative() }).optional(),
   /** 当たっている間、半径 radius の中のランダムな場所へ、技 move を everySeconds ごとに落とす（雲の下の落雷。07 の211章） */
   emit: z.object({ move: z.string().min(1), everySeconds: z.number().positive(), radius: z.number().positive() }).optional(),
+  /**
+   * 地割れ（エンテイの ふみつけ。07 の214章）: 狙った向きを真ん中に spreadDegrees ずつ開いて count 本、壁まで（maxLength まで）割れ目（技 line）を走らせ、
+   * 予告の後、割れ目に沿って spacing ごとに炎（技 flame）を根元から delayPerPixel 秒/ピクセルで順に立てる
+   */
+  fissures: z.object({ line: z.string().min(1), flame: z.string().min(1), count: z.number().int().positive(), spreadDegrees: z.number(), spacing: z.number().positive(), delayPerPixel: z.number().nonnegative(), maxLength: z.number().positive() }).optional(),
+  /**
+   * 炎の輪（エンテイの ほのおのうず。07 の214章）: 狙った人を中心に半径 radius の輪に技 move を count 個置き、内側へ進める（bullets の技）。
+   * gap 個分の切れ目は、マップの真ん中の側に開ける（壁に向かって開けない）
+   */
+  fireRing: z.object({ move: z.string().min(1), count: z.number().int().positive(), radius: z.number().positive(), gap: z.number().int().positive() }).optional(),
+  /** 市松模様（エンテイの ふんえん。07 の214章）: 固定マップを rows 段・cols 列に分け、odd（0 か 1）のマスに置く。予告は四角く描く */
+  checker: z.object({ cols: z.number().int().positive(), rows: z.number().int().positive(), odd: z.number().int().min(0).max(1) }).optional(),
+  /** この技を使うときに、一緒に使う技（エンテイの ふんか: 止まっている間に火山弾を降らせる） */
+  alsoCast: z.string().min(1).optional(),
+  /** 使ったあと、次の技をこの秒数待つ（輪が閉じる間など） */
+  nextMoveWaitSeconds: z.number().nonnegative().optional(),
   /** 予告の間は空にいて、触れても当たらない（07 の208章） */
   airborne: z.boolean().optional(),
   /** 落ちた所から、技 move を count 個、等しい角度で広げる（bullets の技なら外へ飛ぶ）。radius があれば、その中のばらばらの場所に出す（07 の208章） */

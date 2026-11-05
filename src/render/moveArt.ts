@@ -6602,6 +6602,14 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'sacred-pillar-c': () => sacredPillar(4.2),
     'sun-orb': () => sunOrb(),
     'rainbow-flame': () => rainbowFlame(),
+    'entei-flame-a': () => ({ ...daimonjiFlame([{ cx: 0, h: 1, w: 0.62, m: 1, o: 0.4 }, { cx: -0.42, h: 0.58, w: 0.36, m: 2, o: 1.7 }, { cx: 0.44, h: 0.7, w: 0.34, m: 1, o: 3 }], 7121), palette: ENTEI_PALETTE }),
+    'entei-flame-b': () => ({ ...daimonjiFlame([{ cx: 0.08, h: 0.92, w: 0.58, m: 1, o: 2.4 }, { cx: -0.38, h: 0.78, w: 0.38, m: 1, o: 4.4 }, { cx: 0.46, h: 0.5, w: 0.32, m: 2, o: 1.1 }], 7122), palette: ENTEI_PALETTE }),
+    'entei-flame-c': () => ({ ...daimonjiFlame([{ cx: -0.06, h: 0.86, w: 0.66, m: 2, o: 4 }, { cx: 0.36, h: 0.72, w: 0.4, m: 1, o: 5.6 }, { cx: -0.48, h: 0.46, w: 0.3, m: 1, o: 1.4 }], 7123), palette: ENTEI_PALETTE }),
+    'entei-geyser-a': () => enteiGeyser(0),
+    'entei-geyser-b': () => enteiGeyser(2.4),
+    'entei-rock': () => enteiRock(),
+    'entei-burst': () => ({ ...fireBlastBurst(), palette: ENTEI_PALETTE }),
+    'entei-crack': () => enteiCrack(),
     'raikou-bolt': () => raikouBolt(),
     'raikou-cloud': () => raikouCloud(),
     'raikou-charge': () => raikouCharge(),
@@ -7095,6 +7103,85 @@ function rainbowFeather(tilt: number): SpriteOut {
     return outline(g, 0);
   });
   return { palette: RAINBOW_PALETTE, frameMs: 140, parts: { main: frames.map(toRows) } };
+}
+
+/** エンテイの炎（ホウオウの だいもんじより赤く、黒い煙のふち。07 の214章）。番号は BONFIRE_PALETTE と同じ並び */
+const ENTEI_PALETTE = ['#1c0603', '#6e1003', '#b92207', '#ec4a0a', '#ff8412', '#ffbd3d', '#fff0b8'];
+
+/** ふんえんの溶岩の柱: 太い舌を重ねた噴き上がり。点いて伸びる 2 コマ → 揺れる 6 コマ。end は小さくなる */
+function enteiGeyser(seed: number): SpriteOut {
+  const W = 72;
+  const H = 88;
+  const rootY = 82;
+  const tongues: readonly FlameTongue[] = [
+    { cx: -0.4, h: 0.72, w: 0.44, m: 1, o: seed + 1.1 },
+    { cx: 0.4, h: 0.8, w: 0.42, m: 2, o: seed + 2.7 },
+    { cx: 0, h: 1, w: 0.58, m: 1, o: seed },
+    { cx: -0.62, h: 0.42, w: 0.3, m: 2, o: seed + 4 },
+    { cx: 0.64, h: 0.46, w: 0.28, m: 1, o: seed + 5.2 },
+  ];
+  const n = 7400 + Math.round(seed * 10);
+  const start = [0.5, 0.8].map((hs, f) => bonfire(W, H, rootY, tongues, hs, (f * Math.PI) / 3, n, 0));
+  const loop = [0, 1, 2, 3, 4, 5].map((f) => bonfire(W, H, rootY, tongues, 1 + Math.sin((f * Math.PI) / 3 + seed) * 0.05, (f * Math.PI) / 3, n, 4));
+  const end = [0.7, 0.42].map((hs, f) => bonfire(W, H, rootY, tongues, hs, (f * Math.PI) / 3, n, 0));
+  return { palette: ENTEI_PALETTE, frameMs: 70, loopFrom: 2, parts: { main: [...start, ...loop].map(toRows), end: end.map(toRows) } };
+}
+
+/** ふんかの火山弾: 黒い岩に赤く光るひび。まわりで炎が揺れる。4 コマ */
+function enteiRock(): SpriteOut {
+  const frames = [0, 1, 2, 3].map((f) => {
+    const ph = (f * Math.PI) / 2;
+    return shape(40, (u, v) => {
+      const a = Math.atan2(v, u);
+      const d = Math.hypot(u, v);
+      const rock = 0.52 + 0.08 * Math.sin(a * 3 + 1) + 0.05 * Math.sin(a * 7);
+      if (d < rock) {
+        // 2 本の曲がったひびだけが光る。左上が明るい丸い岩
+        const c1 = Math.abs(v - 0.22 * Math.sin(u * 5 + 0.6) + 0.06);
+        const c2 = Math.abs(u + 0.16 * Math.sin(v * 6) - 0.12);
+        if (c1 < 0.035 || (c2 < 0.03 && v > 0)) return d < rock * 0.55 ? 5 : 4;
+        return (u + v) * 0.6 + d * 0.3 < -0.02 ? 2 : (u + v) * 0.6 + d * 0.3 < 0.2 ? 1 : 0;
+      }
+      // 上へ揺れる炎
+      const flame = rock + 0.16 + 0.14 * Math.sin(a * 6 + ph) + 0.1 * Math.sin(a * 11 - ph * 2) + (v < 0 ? -v * 0.42 : 0);
+      if (d > flame) return -1;
+      const k = (d - rock) / Math.max(0.01, flame - rock);
+      return k < 0.3 ? 5 : k < 0.62 ? 4 : 3;
+    });
+  });
+  return { palette: ENTEI_PALETTE, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** 地割れの裂け目: 黒い割れ目の奥で溶岩が光る、折れ曲がった線。4 コマ（光の場所が変わる） */
+function enteiCrack(): SpriteOut {
+  const palette = ['#0d0402', '#2b0a04', '#8e1a05', '#ff6a13', '#ffd27a'];
+  const W = 44;
+  const H = 20;
+  const mid = (H - 1) / 2;
+  const tile = (seed: number, glow: number): Grid => {
+    const g = blank(W, H);
+    const pts: [number, number][] = [[0, mid]];
+    for (let k = 1; k < 5; k++) pts.push([(W * k) / 5, mid + (hash(k, seed, 7950) - 0.5) * 10]);
+    pts.push([W - 1, mid]);
+    strokeBolt(g, pts, 7, 0);
+    strokeBolt(g, pts, 5, 1);
+    strokeBolt(g, pts, 3, 2);
+    strokeBolt(g, pts, 2, 3);
+    // 所々だけ明るく（流れて見える）
+    const bright = pts.filter((_, k) => (k + glow) % 3 === 0);
+    for (const p of bright) strokeBolt(g, [p, [p[0] + 5, p[1]]], 1, 4);
+    return g;
+  };
+  const cap = (seed: number, tip: boolean): Grid => {
+    const g = blank(14, H);
+    const pts: [number, number][] = tip ? [[0, mid], [7, mid + (hash(seed, 1, 7960) - 0.5) * 6], [13, mid]] : [[1, mid], [7, mid + (hash(seed, 2, 7960) - 0.5) * 6], [13, mid]];
+    strokeBolt(g, pts, 5, 0);
+    strokeBolt(g, pts, 3, 2);
+    strokeBolt(g, pts, 1, 3);
+    return g;
+  };
+  const fr = [0, 1, 2, 3];
+  return { palette, frameMs: 120, parts: { start: fr.map((f) => toRows(cap(f, false))), middle: fr.map((f) => toRows(tile(f % 2, f))), end: fr.map((f) => toRows(cap(f, true))) } };
 }
 
 const RAIKOU_BOLT_PALETTE = ['#3a2a00', '#c98a00', '#ffc400', '#fff176', '#ffffff'];

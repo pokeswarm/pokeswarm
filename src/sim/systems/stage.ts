@@ -1031,6 +1031,34 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     castDecoys(world, bossId, i, move, moveIdx, target, put);
     return;
   }
+  if (move.nextMoveWaitSeconds && boss) boss.holdUntil = world.tick + Math.round(move.nextMoveWaitSeconds / world.dt);
+  if (move.alsoCast) castBossMove(world, bossId, i, moveIndexOfStage(world.rules, move.alsoCast));
+  if (move.fissures && world.arena) {
+    put(bx, by, ux, uy, bossId);
+    castFissures(world, move.fissures, bx, by, ux, uy);
+    return;
+  }
+  if (move.fireRing && world.arena) {
+    put(bx, by, ux, uy, bossId);
+    castFireRing(world, move.fireRing, target);
+    return;
+  }
+  if (move.checker && world.arena) {
+    const a = world.arena;
+    const c = move.checker;
+    const w = (a.halfWidth * 2) / c.cols;
+    const h = (a.halfHeight * 2) / c.rows;
+    let first = true;
+    for (let r = 0; r < c.rows; r++) {
+      for (let k = 0; k < c.cols; k++) {
+        if ((r + k) % 2 !== c.odd) continue;
+        // 続きを 1 回だけ使うよう、ボスに結ぶのは 1 つだけ
+        addHazard(world, moveIdx, a.x - a.halfWidth + (k + 0.5) * w, a.y - a.halfHeight + (r + 0.5) * h, 0, 1, first ? bossId : -1, undefined, { group });
+        first = false;
+      }
+    }
+    return;
+  }
   if (move.zigzag && world.arena && boss) {
     castZigzag(world, boss, i, moveIdx, move.zigzag, target, group);
     return;
@@ -1258,6 +1286,42 @@ function clampToArena(world: World, x: number, y: number): [number, number] {
   const a = world.arena;
   if (!a) return [x, y];
   return [Math.max(a.x - a.halfWidth + ARENA_LINE_MARGIN, Math.min(a.x + a.halfWidth - ARENA_LINE_MARGIN, x)), Math.max(a.y - a.halfHeight + ARENA_LINE_MARGIN, Math.min(a.y + a.halfHeight - ARENA_LINE_MARGIN, y))];
+}
+
+/** 地割れ（07 の214章）: 割れ目の線（予告と、光る裂け目）と、根元から順に立つ炎 */
+function castFissures(world: World, f: NonNullable<BossMove['fissures']>, bx: number, by: number, ux: number, uy: number): void {
+  const line = moveIndexOfStage(world.rules, f.line);
+  const flame = moveIndexOfStage(world.rules, f.flame);
+  const wait = world.rules.stage.moves[line]?.telegraphSeconds ?? 0;
+  const base = Math.atan2(uy, ux);
+  const group = world.nextHazardGroup++;
+  for (let k = 0; k < f.count; k++) {
+    const a = base + ((k - (f.count - 1) / 2) * f.spreadDegrees * Math.PI) / 180;
+    const dx = Math.cos(a);
+    const dy = Math.sin(a);
+    const len = Math.min(f.maxLength, rayToArenaWall(world, bx, by, dx, dy));
+    addHazard(world, line, bx, by, dx, dy, -1, undefined, { group: world.nextHazardGroup++, length: len });
+    for (let d = f.spacing; d < len; d += f.spacing) {
+      addHazard(world, flame, bx + dx * d, by + dy * d, 0, 1, -1, undefined, { group, delay: Math.round((wait + d * f.delayPerPixel) / world.dt) });
+    }
+  }
+}
+
+/** 炎の輪（07 の214章）: 狙った人を囲む。切れ目はマップの真ん中の側（壁の外の炎は置かない） */
+function castFireRing(world: World, f: NonNullable<BossMove['fireRing']>, target: World['players'][number]): void {
+  const a = world.arena!;
+  const idx = moveIndexOfStage(world.rules, f.move);
+  const toCenter = Math.atan2(a.y - target.y, a.x - target.x) + world.rng.range(-0.25, 0.25);
+  const step = (Math.PI * 2) / f.count;
+  const group = world.nextHazardGroup++;
+  for (let k = 0; k < f.count - f.gap; k++) {
+    // 切れ目の真ん中が toCenter になるように、その反対側から並べる
+    const ang = toCenter + (f.gap / 2 + 0.5 + k) * step;
+    const x = target.x + Math.cos(ang) * f.radius;
+    const y = target.y + Math.sin(ang) * f.radius;
+    if (Math.abs(x - a.x) > a.halfWidth - ARENA_GLYPH_MARGIN || Math.abs(y - a.y) > a.halfHeight - ARENA_GLYPH_MARGIN) continue;
+    addHazard(world, idx, x, y, -Math.cos(ang), -Math.sin(ang), -1, undefined, { group });
+  }
 }
 
 /** しんそく（07 の211章）: マップの反対側へ稲妻の形の線を引く。途中の角の 1 つは狙った人の場所。線は走る順に当たる */

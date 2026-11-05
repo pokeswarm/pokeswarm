@@ -6613,7 +6613,6 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'suicune-mirror-burst': () => suicuneMirrorBurst(),
     'suicune-mist': () => suicuneMist(),
     'suicune-aurora-glow': () => suicuneAuroraGlow(),
-    'suicune-ice': () => suicuneIce(),
     'raikou-bolt': () => raikouBolt(),
     'raikou-cloud': () => raikouCloud(),
     'raikou-charge': () => raikouCharge(),
@@ -7310,42 +7309,6 @@ function suicuneAuroraGlow(): SpriteOut {
     });
   });
   return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
-}
-
-/** ふぶきの氷の塊: とがった結晶が集まった塊。せり上がる 4 コマ。end は崩れて小さくなる（07 の218章） */
-function suicuneIce(): SpriteOut {
-  const W = 72;
-  const H = 88;
-  const rootY = 76;
-  const spires = [
-    { cx: -0.42, h: 0.62, w: 0.26, lean: -0.1 },
-    { cx: 0.44, h: 0.68, w: 0.26, lean: 0.12 },
-    { cx: 0.16, h: 0.84, w: 0.3, lean: 0.06 },
-    { cx: -0.12, h: 1, w: 0.34, lean: -0.05 },
-  ];
-  const draw = (scale: number): Grid => {
-    const g = fill(blank(W, H), (x, y) => {
-      const up = (rootY - y) / (rootY - 4);
-      if (up < -0.14) return -1;
-      let col = -1;
-      for (const s of spires) {
-        const hh = s.h * scale;
-        if (up > hh) continue;
-        const q = Math.max(0, up) / hh;
-        const c = ((s.cx + s.lean * q) * W) / 2 + (W - 1) / 2;
-        const half = ((s.w * W) / 2) * (1 - q * q * 0.1) * (1 - q);
-        const off = x - c;
-        if (Math.abs(off) > Math.max(0.6, half + (up < 0 ? up * 30 : 0))) continue;
-        // 左の面は明るく、右の面は暗い。真ん中の稜線は白い
-        col = Math.abs(off) < 1 ? 5 : off < 0 ? 4 : q < 0.25 ? 2 : 3;
-      }
-      return col;
-    });
-    return outline(g, 0);
-  };
-  const main = [0.4, 0.62, 0.85, 1].map(draw);
-  const end = [0.7, 0.4].map(draw);
-  return { palette: SUICUNE_ICE_PALETTE, frameMs: 110, loopFrom: 3, parts: { main: main.map(toRows), end: end.map(toRows) } };
 }
 
 const RAIKOU_BOLT_PALETTE = ['#3a2a00', '#c98a00', '#ffc400', '#fff176', '#ffffff'];

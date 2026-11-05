@@ -17,7 +17,7 @@ import { EffectRenderer } from '../render/effects/EffectRenderer';
 import { audio } from '../audio';
 import { RunSounds } from '../audio/runSounds';
 import { LavaSea } from '../render/effects/LavaSea';
-import { BlizzardSheet, SnowGround } from '../render/effects/FrostSheets';
+import { BlizzardSheet, IceCrystals, SnowGround } from '../render/effects/FrostSheets';
 import { WaveSheet } from '../render/effects/WaveSheet';
 import { AuroraSheet } from '../render/effects/AuroraSheet';
 import { MirrorCoat } from '../render/effects/MirrorCoat';
@@ -157,6 +157,8 @@ export class RunScene extends Phaser.Scene {
   /** スイクンの登場の積もる雪・ふぶき（07 の218・219章） */
   private snowGround: SnowGround | null = null;
   private blizzardSheet: BlizzardSheet | null = null;
+  /** ふぶきの氷の結晶（07 の224章） */
+  private iceCrystals: IceCrystals | null = null;
   /** なみのりの波（07 の221章） */
   private waveSheet: WaveSheet | null = null;
   /** オーロラビームの光と凍った床（07 の222章） */
@@ -336,6 +338,7 @@ export class RunScene extends Phaser.Scene {
     this.lavaSea = null;
     this.snowGround = null;
     this.blizzardSheet = null;
+    this.iceCrystals = null;
     this.waveSheet = null;
     this.auroraSheet = null;
     this.mirrorCoat = null;
@@ -3066,6 +3069,8 @@ export class RunScene extends Phaser.Scene {
     this.lavaSea.update(world, this.time.now);
     this.blizzardSheet ??= new BlizzardSheet(this, spriteRender.depths.effects + 0.4);
     this.blizzardSheet.update(world, this.time.now);
+    this.iceCrystals ??= new IceCrystals(this, spriteRender.depths.effects + 0.3);
+    this.iceCrystals.update(world, this.time.now);
     this.waveSheet ??= new WaveSheet(this, spriteRender.depths.effects + 0.45, ARENA_FLOOR_DEPTH + 3);
     this.waveSheet.update(world, this.time.now);
     this.auroraSheet ??= new AuroraSheet(this, spriteRender.depths.effects + 0.5, ARENA_FLOOR_DEPTH + 3);

@@ -6001,10 +6001,6 @@
       "extends": "water.base",
       "bossActive": { "id": "suicune-shard", "fit": "circle", "size": 4.8, "rotate": "velocity" }
     },
-    "boss-suicune-ice": {
-      "extends": "ice.base",
-      "bossActive": { "id": "suicune-ice", "fit": "circle", "size": 1.45, "originY": 0.82, "endSeconds": 0.3 }
-    },
     "boss-suicune-flee": {
       "extends": "water.base",
       "bossActive": { "id": "suicune-mist", "fit": "circle", "size": 1.05, "alpha": 0.95 }

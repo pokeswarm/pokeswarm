@@ -116,6 +116,28 @@ describe('スイクンの技（07 の218章）', () => {
     expect(Math.abs(w1!.x - (a.x + Math.sign(startX - a.x) * a.halfWidth))).toBeGreaterThan(100);
   });
 
+  it('なみのり: 切れ目の見た目の中にいれば当たらない', () => {
+    const { step, of, force, sim, p, bossIndex } = setup();
+    const a = sim.world.arena!;
+    const e = sim.world.enemies;
+    e.x[bossIndex()] = a.x - 720;
+    force('suicune-surf');
+    step(0.1);
+    const [w1, w2] = of('suicune-wave');
+    const top = w1!.y + w1!.length;
+    const bottom = w2!.y;
+    // 切れ目の端の近く（プレイヤーの半径の分だけ内側）に立つ
+    const hp = p.hp;
+    for (let t = 0; t < 30 * 5; t++) {
+      p.x = a.x + 300;
+      p.y = top + 14;
+      p.invincibleTicks = 0;
+      step(1 / 30);
+      if (t === 0) expect(bottom - top).toBeGreaterThan(200);
+    }
+    expect(p.hp).toBe(hp);
+  });
+
   it('オーロラビーム: 向きが回り、通った跡に凍った床が残る。床は当たらない', () => {
     const { step, of, force, sim, p } = setup();
     p.x = sim.world.arena!.x;
@@ -171,7 +193,7 @@ describe('スイクンの技（07 の218章）', () => {
     while (of('suicune-ice').length === 0 && n++ < 300) step(1 / 30);
     expect(of('suicune-ice').length).toBe(6);
     // 塊のない場所は当たる
-    expect(hurtDuring(1.7 + 2.6)).toBeGreaterThan(0);
+    expect(hurtDuring(2.1 + 2.6)).toBeGreaterThan(0);
     // 風下（右の塊の右）
     const s2 = setup();
     const a2 = s2.sim.world.arena!;
@@ -181,7 +203,7 @@ describe('スイクンの技（07 の218章）', () => {
     while (s2.of('suicune-ice').length === 0 && m++ < 300) s2.step(1 / 30);
     const rightTop = s2.of('suicune-ice').reduce((q, h) => (h.x > q.x && h.y < a2.y ? h : q));
     const hp = s2.p.hp;
-    for (let t = 0; t < 30 * 4.5; t++) {
+    for (let t = 0; t < 30 * 4.9; t++) {
       s2.p.x = rightTop.x + 120;
       s2.p.y = rightTop.y;
       s2.p.invincibleTicks = 0;

@@ -734,6 +734,8 @@ export const bossMoveSchema = z.object({
    * 予告が終わると、ボスも波と一緒に反対側へ走る
    */
   arenaWave: z.object({ line: z.string().min(1), speed: z.number().positive(), gap: z.number().positive() }).optional(),
+  /** 線の両端を丸めず、四角に切る（波の切れ目の見た目と当たりを揃える。07 の220章） */
+  flatEnds: z.boolean().optional(),
   /** なぎ払う線の跡に、凍った床を残す（スイクンの オーロラビーム。07 の218章）。spacing ごとの丸い床。歩くと slowPct % 遅くなる */
   sweepTrail: z.object({ effect: z.string().min(1), spacing: z.number().positive(), radius: z.number().positive(), seconds: z.number().positive(), slowPct: z.number().min(0).max(95) }).optional(),
   /** 予告の間に受けたダメージが多いほど、終わりに技 move を多く全方向へ飛ばす（スイクンの ミラーコート。最大 HP の 1 % ごとに perHpPct 個。07 の218章） */

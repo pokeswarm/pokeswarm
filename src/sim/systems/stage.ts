@@ -2262,7 +2262,9 @@ export function hazardHits(
     // 縁の太さ（プレイヤーの半径）ぶん、角度を広げる
     return Math.acos(Math.max(-1, Math.min(1, cos))) <= half + Math.asin(Math.min(1, r / d));
   }
-  const t = Math.max(0, Math.min(hz.length, (x - hz.x) * hz.dirX + (y - hz.y) * hz.dirY));
+  const along = (x - hz.x) * hz.dirX + (y - hz.y) * hz.dirY;
+  if (move?.flatEnds && (along < -r || along > hz.length + r)) return false;
+  const t = Math.max(0, Math.min(hz.length, along));
   const px = hz.x + hz.dirX * t;
   const py = hz.y + hz.dirY * t;
   return (x - px) ** 2 + (y - py) ** 2 <= (radius + r) ** 2;

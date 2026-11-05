@@ -272,24 +272,235 @@ function lugiaWall(): (Rgb | null)[] {
   return out;
 }
 
-const outDir = path.join('public', 'map', 'johto');
-fs.mkdirSync(outDir, { recursive: true });
-const { floor, shimmerA, shimmerB } = lugiaFloor();
-const wall = lugiaWall();
-fs.writeFileSync(path.join(outDir, 'arena-lugia-floor.png'), toPng(floor, W, H));
-fs.writeFileSync(path.join(outDir, 'arena-lugia-shimmer-a.png'), toPng(shimmerA, W, H));
-fs.writeFileSync(path.join(outDir, 'arena-lugia-shimmer-b.png'), toPng(shimmerB, W, H));
-fs.writeFileSync(path.join(outDir, 'arena-lugia-wall.png'), toPng(wall, W + MARGIN * 2, H + MARGIN * 2));
-for (const f of ['floor', 'shimmer-a', 'shimmer-b', 'wall']) {
-  console.log(`${outDir}/arena-lugia-${f}.png ${Math.round(fs.statSync(path.join(outDir, `arena-lugia-${f}.png`)).size / 1024)}KB`);
+// --- ホウオウ: スズのとうの最上階（暗い板張りの床に、金の象嵌で尾羽の紋。まわりは朱の欄干と屋根瓦、その向こうに夕暮れの空。07 の209章） ---
+
+/** 炎の色（赤・橙・青白・虹）と重ならないよう、床は暗く、色の薄い古い木の茶にする */
+const PLANK = ['#231a1a', '#2c2120', '#352928', '#3f3130', '#4a3a37'].map(hex);
+const SEAM = hex('#150f15');
+const SEAM_LIGHT = hex('#443532');
+const INLAY = ['#574528', '#766036', '#967c45'].map(hex);
+
+/** 紋の半径（ドット）。縦のマップに収まる */
+const DISC_R = 180;
+const PLANK_H = 14;
+const PLANK_LEN = 96;
+
+/** 床の金の線か（0 ではない。1 = 暗い線・2 = ふつう・3 = 明るい） */
+function hoohInlay(x: number, y: number): number {
+  const dx = x - W / 2 + 0.5;
+  const dy = y - H / 2 + 0.5;
+  const r = Math.hypot(dx, dy);
+  const a = Math.atan2(dy, dx);
+  // 外の輪と内の輪
+  if (Math.abs(r - DISC_R) < 1.1) return 3;
+  if (Math.abs(r - (DISC_R - 5)) < 0.7) return 1;
+  if (Math.abs(r - 134) < 1) return 2;
+  if (Math.abs(r - 126) < 0.7) return 1;
+  // 輪の間の菱形（30 度ごと）
+  const sec30 = Math.PI / 6;
+  const a30 = a - Math.round(a / sec30) * sec30;
+  if (Math.abs(a30 * 130) + Math.abs(r - 130) < 3.6) return 3;
+  // 尾羽 12 枚（真ん中から外へ）
+  const t = (r - 34) / 88;
+  if (t >= 0 && t <= 1) {
+    const sec = Math.PI / 6;
+    // 同じ向きへ曲げる（花びらでなく、回る尾羽に見せる）
+    const ang = a - sec / 2 - (t * t * 0.42);
+    const k = Math.round(ang / sec);
+    const off = (ang - k * sec) * r;
+    const half = 13 * Math.pow(Math.sin(Math.PI * Math.pow(t, 0.62)), 0.75);
+    if (Math.abs(Math.abs(off) - half) < 0.9) return 2;
+    if (Math.abs(off) < 0.6 && t < 0.68) return 1;
+    // 羽枝（軸から斜め外へ流れる細い線）
+    if (Math.abs(off) < half - 1.5 && t < 0.66 && Math.abs(off) > 1.5 && Math.sin(t * 88 * 0.62 - Math.abs(off) * 0.62) > 0.94) return 1;
+    // 羽の先の目
+    const e = Math.abs(off) / 4.6 + Math.abs(t - 0.78) * 88 / 6.5;
+    if (Math.abs(e - 1) < 0.2) return 3;
+  }
+  // 真ん中の丸
+  if (Math.abs(r - 30) < 1) return 3;
+  if (Math.abs(r - 24) < 0.7) return 1;
+  if (r < 11) return r < 8 ? 2 : 0;
+  // 床のふちの細い線と、四隅の菱形（歩ける端を見やすくする）
+  const bx = Math.min(x - 14, W - 1 - 14 - x);
+  const by = Math.min(y - 24, H - 1 - 14 - y);
+  if (bx >= 0 && by >= 0 && Math.min(bx, by) < 1) return 1;
+  const cx = Math.min(x, W - 1 - x) - 14;
+  const cy = y < H / 2 ? y - 24 : H - 1 - 14 - y;
+  if (Math.abs(cx) + Math.abs(cy) < 7 && Math.abs(cx) + Math.abs(cy) > 4.5) return 3;
+  return 0;
 }
 
-// 床と壁を重ねた確認用の絵（第 1 引数のパスへ。リポジトリに入れない）
+function hoohFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
+  const floor: Rgb[] = [];
+  const shimmerA: (Rgb | null)[] = [];
+  const shimmerB: (Rgb | null)[] = [];
+  const glintA = hex('#d9b868');
+  const glintB = hex('#f4e0a0');
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const dx = x - W / 2 + 0.5;
+    const dy = y - H / 2 + 0.5;
+    const r = Math.hypot(dx, dy);
+    const out = Math.hypot(dx / (W / 2), dy / (H / 2));
+    let t: number;
+    let seam = 0;
+    if (r < DISC_R) {
+      // 紋の中は、外へ向かう放射状の板
+      const a = Math.atan2(dy, dx);
+      const n = r < 126 ? 24 : 36;
+      const k = (a + Math.PI) / (Math.PI * 2) * n;
+      const board = Math.floor(k);
+      const f = k - board;
+      const px = (Math.min(f, 1 - f) * Math.PI * 2 * r) / n;
+      if (px < 0.55 && r > 30) seam = 1;
+      t = 0.4 + (hash2(board, r < 126 ? 3 : 5, 201) - 0.5) * 0.24 + (fbm(r / 12, k * 3, 203) - 0.5) * 0.45;
+    } else {
+      // 外は横に長い床板（継ぎ目は段ごとにずらす）
+      const row = Math.floor(y / PLANK_H);
+      const ox = x + Math.floor(hash2(row, 1, 205) * PLANK_LEN);
+      const col = Math.floor(ox / PLANK_LEN);
+      if (y % PLANK_H === 0) seam = 1;
+      else if (y % PLANK_H === 1) seam = 2;
+      else if (ox % PLANK_LEN === 0) seam = 1;
+      t = 0.42 + (hash2(col, row, 207) - 0.5) * 0.3 + (fbm((x + col * 53) / 46, y / 2.4, 209) - 0.5) * 0.62;
+    }
+    // 古い木のむら。真ん中は上から光が入って少し明るい
+    t += (fbm(x / 80, y / 80, 211) - 0.5) * 0.3 + 0.16 * Math.max(0, 1 - out * 1.1) - 0.12 * Math.max(0, out - 0.8);
+    let col = ramp(PLANK, t, x, y);
+    if (seam === 1) col = SEAM;
+    else if (seam === 2) col = SEAM_LIGHT;
+    const ink = hoohInlay(x, y);
+    let glint = 0;
+    if (ink > 0) {
+      col = INLAY[ink - 1]!;
+      // 金のきらめき: 線の所々を短く
+      if (ink >= 2) {
+        const v = valueNoise(x / 5, y / 5, 213);
+        if (v > 0.8) glint = 1;
+        else if (v < 0.16) glint = 2;
+      }
+    }
+    // 壁ぎわの影（上の欄干の影を長く）
+    const edgeD = Math.min(x, W - 1 - x);
+    const shade = Math.max(0, 1 - y / 22) * 0.7 + Math.max(0, 1 - edgeD / 12) * 0.5 + Math.max(0, 1 - (H - 1 - y) / 7) * 0.4;
+    if (shade > (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16) col = [Math.round(col[0] * 0.66), Math.round(col[1] * 0.62), Math.round(col[2] * 0.68)];
+    floor.push(col);
+    shimmerA.push(glint === 1 ? glintA : null);
+    shimmerB.push(glint === 2 ? glintB : null);
+  }
+  return { floor, shimmerA, shimmerB };
+}
+
+const LACQUER = ['#4a1a1c', '#6d2422', '#8f3129', '#ad4432'].map(hex);
+const GOLD = ['#7a5c2a', '#b08c45', '#dcc074'].map(hex);
+const TILE = ['#171c26', '#212835', '#2e3644', '#3e4856'].map(hex);
+const SKY = ['#110d22', '#1a122d', '#281735', '#3c1f39', '#58293e'].map(hex);
+
+/** 屋根瓦（d は欄干からの距離、along は端に沿った位置）。下へ重なる丸瓦の列 */
+function roofTile(d: number, along: number, x: number, y: number): Rgb {
+  const row = Math.floor(d / 13);
+  const fd = d - row * 13;
+  const a = along + (row % 2 ? 6 : 0);
+  const fa = ((a % 12) + 12) % 12 - 6;
+  // 瓦の先の丸み
+  const edge = 13 - Math.sqrt(Math.max(0, 36 - fa * fa)) * 0.55;
+  if (fd > edge) return TILE[0]!;
+  const t = 0.68 - fd / 22 - Math.abs(fa) / 14 + (hash2(Math.floor(a / 12), row, 221) - 0.5) * 0.22 - d * 0.009;
+  return ramp(TILE, t, x, y, 0.5);
+}
+
+function hoohWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const dark = hex('#090711');
+  // 奥の欄干は低く（上の帯の残りは暗い空。HP バーとタイマーの後ろに赤を置かない）
+  const RAIL = 13;
+  const SIDE = 9;
+  const POST = 64;
+  const gold = (k: number) => GOLD[Math.max(0, Math.min(2, k))]!;
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    if (ix >= 0 && ix < W && iy >= 0 && iy < H) {
+      out.push(null);
+      continue;
+    }
+    let col: Rgb;
+    const insideX = ix >= -SIDE && ix < W + SIDE;
+    if (iy < 0) {
+      // 奥: 夕暮れの空と遠くの山。手前に朱の欄干の内側
+      const k = (iy + MARGIN) / (MARGIN - 4);
+      col = ramp(SKY, k * 0.92 + (fbm(x / 90, y / 7, 225) - 0.5) * 0.3, x, y);
+      const ridge = -14 - fbm(x / 60, 3, 227) * 18 - fbm(x / 17, 5, 229) * 5;
+      if (iy > ridge) col = hex('#150f22');
+      if (insideX && iy >= -RAIL - 4) {
+        // 手すりの段
+        const pix = ((ix % POST) + POST) % POST;
+        const isPost = pix < 7 && iy >= -RAIL - 3;
+        const baluster = iy >= -RAIL && ((ix + 400) % 9) < 2;
+        if (isPost) {
+          const f = pix < 2 ? 3 : pix < 5 ? 2 : 1;
+          col = LACQUER[f]!;
+          if (iy < -RAIL) col = iy === -RAIL - 3 ? gold(2) : gold(pix < 3 ? 1 : 0);
+        } else if (iy >= -RAIL && iy < -RAIL + 3) {
+          col = iy === -RAIL ? LACQUER[3]! : iy < -RAIL + 2 ? LACQUER[2]! : LACQUER[0]!;
+        } else if (iy >= -4) {
+          col = iy === -4 ? LACQUER[2]! : LACQUER[iy < -2 ? 1 : 0]!;
+        } else if (baluster) {
+          col = LACQUER[(ix + 400) % 9 === 0 ? 2 : 1]!;
+        }
+      }
+    } else if (iy >= H && insideX || !insideX || ix < 0 || ix >= W) {
+      // 横と手前: 上から見た欄干と、その外の屋根瓦
+      const dSide = ix < 0 ? -1 - ix : ix >= W ? ix - W : -1;
+      const dBottom = iy >= H ? iy - H : -1;
+      const d = Math.max(dSide, dBottom);
+      const isBottom = dBottom >= dSide;
+      const along = isBottom ? ix : iy;
+      if (d < SIDE) {
+        const k = 1 - Math.abs(d - (SIDE - 1) / 2) / ((SIDE - 1) / 2);
+        col = LACQUER[Math.min(3, Math.floor(k * 3.4))]!;
+        // 柱の頭（金）
+        const pa = ((along % POST) + POST) % POST;
+        if (pa < 8 && d >= 1 && d < SIDE - 1) col = gold(pa === 0 || d === 1 ? 2 : pa < 4 ? 1 : 0);
+      } else {
+        col = roofTile(d - SIDE, along, x, y);
+      }
+    } else {
+      col = dark;
+    }
+    // 外ほど暗い（引きのカメラの外へつなぐ）
+    const far = Math.max(-iy - MARGIN + 12, iy - H - MARGIN + 12 + 0, -ix - MARGIN + 12, ix - W - MARGIN + 12);
+    if (far > 0 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < far / 12) col = dark;
+    out.push(col);
+  }
+  return out;
+}
+
+const outDir = path.join('public', 'map', 'johto');
+fs.mkdirSync(outDir, { recursive: true });
+const arenas = [
+  { id: 'lugia', ...lugiaFloor(), wall: lugiaWall() },
+  { id: 'hooh', ...hoohFloor(), wall: hoohWall() },
+];
+for (const a of arenas) {
+  fs.writeFileSync(path.join(outDir, `arena-${a.id}-floor.png`), toPng(a.floor, W, H));
+  fs.writeFileSync(path.join(outDir, `arena-${a.id}-shimmer-a.png`), toPng(a.shimmerA, W, H));
+  fs.writeFileSync(path.join(outDir, `arena-${a.id}-shimmer-b.png`), toPng(a.shimmerB, W, H));
+  fs.writeFileSync(path.join(outDir, `arena-${a.id}-wall.png`), toPng(a.wall, W + MARGIN * 2, H + MARGIN * 2));
+  for (const f of ['floor', 'shimmer-a', 'shimmer-b', 'wall']) {
+    console.log(`${outDir}/arena-${a.id}-${f}.png ${Math.round(fs.statSync(path.join(outDir, `arena-${a.id}-${f}.png`)).size / 1024)}KB`);
+  }
+}
+
+// 床と壁を重ねた確認用の絵（第 1 引数のパスの後ろに -<id>.png を付けて出す。リポジトリに入れない）
 const previewPath = process.argv[2];
 if (previewPath) {
   const fw = W + MARGIN * 2;
   const fh = H + MARGIN * 2;
-  const merged: (Rgb | null)[] = wall.slice();
-  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) merged[(y + MARGIN) * fw + x + MARGIN] = floor[y * W + x]!;
-  fs.writeFileSync(previewPath, toPng(merged, fw, fh));
+  for (const a of arenas) {
+    const merged: (Rgb | null)[] = a.wall.slice();
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) merged[(y + MARGIN) * fw + x + MARGIN] = a.floor[y * W + x]!;
+    fs.writeFileSync(`${previewPath}-${a.id}.png`, toPng(merged, fw, fh));
+  }
 }

@@ -41,6 +41,15 @@ describe('ホウオウ（07 の207章）', () => {
     expect(sim.world.enemies.maxHp[bossIndex()]).toBe(400000);
   });
 
+  it('固定マップの絵があり、1 ドットが 2 ピクセルでマップの広さに合う', () => {
+    const { sim } = setup();
+    const map = sim.world.arena!.map!;
+    expect(map.floor).toBe('map/johto/arena-hooh-floor.png');
+    const a = sim.world.arena!;
+    expect(a.halfWidth * 2).toBe(800 * map.pixelScale);
+    expect(a.halfHeight * 2).toBe(440 * map.pixelScale);
+  });
+
   it('だいもんじ: 玉が落ちた所に、字の点の数だけ炎が交わる所から外へ順に立つ', () => {
     const { sim, step, force, ids } = setup();
     const a = sim.world.arena!;

@@ -20,6 +20,7 @@ import { LavaSea } from '../render/effects/LavaSea';
 import { BlizzardSheet, SnowGround } from '../render/effects/FrostSheets';
 import { WaveSheet } from '../render/effects/WaveSheet';
 import { AuroraSheet } from '../render/effects/AuroraSheet';
+import { MirrorCoat } from '../render/effects/MirrorCoat';
 import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
 import { ensurePixelTextures, pixelTextureKey } from '../render/PixelArt';
@@ -160,6 +161,8 @@ export class RunScene extends Phaser.Scene {
   private waveSheet: WaveSheet | null = null;
   /** オーロラビームの光と凍った床（07 の222章） */
   private auroraSheet: AuroraSheet | null = null;
+  /** ミラーコートの鏡（07 の223章） */
+  private mirrorCoat: MirrorCoat | null = null;
   private introFading = false;
   /** テストプレイ: ?intruderat で、決まった時刻に乱入させる */
   private testIntruderLater: { kind: number; tick: number } | null = null;
@@ -335,6 +338,7 @@ export class RunScene extends Phaser.Scene {
     this.blizzardSheet = null;
     this.waveSheet = null;
     this.auroraSheet = null;
+    this.mirrorCoat = null;
     this.introFading = false;
     this.overlayLast = null;
     this.overlayLevel = 0;
@@ -3066,6 +3070,8 @@ export class RunScene extends Phaser.Scene {
     this.waveSheet.update(world, this.time.now);
     this.auroraSheet ??= new AuroraSheet(this, spriteRender.depths.effects + 0.5, ARENA_FLOOR_DEPTH + 3);
     this.auroraSheet.update(world, this.time.now);
+    this.mirrorCoat ??= new MirrorCoat(this, spriteRender.depths.bosses);
+    this.mirrorCoat.update(world, this.time.now);
     // 地面の一部なので、障害物・雑魚より下（作者の依頼）
     this.snowGround ??= new SnowGround(this, -500);
     this.snowGround.update(world, this.time.now, this.cameras.main);

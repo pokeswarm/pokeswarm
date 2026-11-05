@@ -6610,6 +6610,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'entei-burst': () => ({ ...fireBlastBurst(), palette: ENTEI_PALETTE }),
     'entei-crack': () => enteiCrack(),
     'suicune-shard': () => suicuneShard(),
+    'suicune-mirror-burst': () => suicuneMirrorBurst(),
     'suicune-mist': () => suicuneMist(),
     'suicune-aurora-glow': () => suicuneAuroraGlow(),
     'suicune-ice': () => suicuneIce(),
@@ -7202,17 +7203,68 @@ function enteiCrack(): SpriteOut {
 
 const SUICUNE_ICE_PALETTE = ['#123a5e', '#1f6a97', '#46a3c9', '#8fd6ea', '#cdf0f8', '#ffffff'];
 
-/** ミラーコートの破片: 光る細長い菱形。回って飛ぶ（07 の218章）。2 コマ */
+/**
+ * ミラーコートの破片（07 の223章）: 右へ飛ぶ、鋭い鏡のかけら。後ろへ光の筋を引く。光の筋がちらちら揺れる 3 コマ
+ * （先端が飛ぶ向き。当たりは絵の真ん中）
+ */
 function suicuneShard(): SpriteOut {
-  const frames = [0, 1].map((f) =>
-    shape(24, (u, v) => {
-      const d = Math.abs(u) / 0.4 + Math.abs(v) / 0.92;
-      if (d > 1) return -1;
-      if (u > 0 && Math.abs(v + u * 0.4) < 0.1 + f * 0.05) return 5;
-      return d > 0.78 ? 1 : u < 0 ? 3 : 4;
-    }),
-  );
-  return { palette: SUICUNE_ICE_PALETTE, frameMs: 90, parts: { main: frames.map(toRows) } };
+  const W = 96;
+  const H = 22;
+  const cy = (H - 1) / 2;
+  const frames = [0, 1, 2].map((f) => {
+    const g = blank(W, H);
+    return fill(g, (x, y) => {
+      const u = x / (W - 1);
+      const v = y - cy;
+      // 刃（絵の真ん中＝当たりの中心）: 先端と後ろが細く、上と下で折れる所が違う
+      const p = (u - 0.34) / 0.32;
+      if (p >= 0 && p <= 1) {
+        const top = p > 0.4 ? ((1 - p) / 0.6) * 10 : (p / 0.4) * 10;
+        const bottom = p > 0.6 ? ((1 - p) / 0.4) * 7 : (p / 0.6) * 7;
+        if (v >= -top && v <= bottom) {
+          if (v - 1 < -top || v + 1 > bottom) return 0;
+          // 稜線で面を分ける。上の面は明るい
+          const ridge = (0.5 - p) * 4;
+          if (Math.abs(v - ridge) < 0.8) return 5;
+          return v < ridge ? 4 : 2;
+        }
+      }
+      // 光の筋: 後ろへ細く薄くなり、粒でほどける
+      if (u < 0.42) {
+        const k = u / 0.42;
+        const half = 0.5 + k * 3;
+        if (Math.abs(v) <= half && hash(x + f * 7, y, 8300) < k * 1.1) return Math.abs(v) < half * 0.5 ? 4 : 3;
+      }
+      return -1;
+    });
+  });
+  return { palette: SUICUNE_ICE_PALETTE, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/** ミラーコートが割れる瞬間（07 の223章）: 光の輪が外へ走り、鏡のかけらが飛び散る。中は抜けていく。5 コマ */
+function suicuneMirrorBurst(): SpriteOut {
+  const shards = Array.from({ length: 14 }, (_, k) => ({ a: (k / 14) * Math.PI * 2 + hash(k, 1, 8400) * 0.4, s: 0.7 + hash(k, 2, 8400) * 0.5, w: 0.05 + hash(k, 3, 8400) * 0.05 }));
+  const frames = [0, 1, 2, 3, 4].map((f) => {
+    const t = (f + 1) / 5;
+    const R = 0.3 + t * 0.62;
+    return shape(96, (u, v) => {
+      const a = Math.atan2(v, u);
+      const d = Math.hypot(u, v);
+      // 飛び散るかけら
+      for (const s of shards) {
+        const r = R * s.s;
+        const off = Math.atan2(Math.sin(a - s.a), Math.cos(a - s.a));
+        const along = d - r;
+        const half = (s.w * (1 - Math.abs(along) / 0.1)) / Math.max(0.1, d);
+        if (Math.abs(along) < 0.1 && Math.abs(off) < half) return along > 0.03 ? 5 : 4;
+      }
+      // 光の輪（だんだん細く、切れていく）
+      const width = 0.07 * (1 - t) + 0.012;
+      if (Math.abs(d - R) < width && hash(Math.floor((a + Math.PI) * 9), f, 8410) > t * 0.6) return Math.abs(d - R) < width * 0.5 ? 5 : 3;
+      return -1;
+    });
+  });
+  return { palette: SUICUNE_ICE_PALETTE, frameMs: 80, parts: { main: frames.map(toRows) } };
 }
 
 /** スイクンが消える霧（07 の218章）: 外ほど細かい粒にほどける白い霧。粒でゆっくり渦を巻く。4 コマ */

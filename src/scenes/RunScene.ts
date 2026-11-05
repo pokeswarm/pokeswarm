@@ -206,6 +206,8 @@ export class RunScene extends Phaser.Scene {
   private edgeArrows!: EdgeArrows;
   /** 固定マップの壁の絵（07 の203章） */
   private arenaFrame: Phaser.GameObjects.Graphics | null = null;
+  /** 固定マップの絵（元のマップへ戻るときに消す。07 の211章） */
+  private arenaObjects: Phaser.GameObjects.GameObject[] = [];
   /** アイコンの列の上端（画面の y） */
   private hudTop = 0;
   private lastSent: { dx: Axis; dy: Axis } = { dx: 0, dy: 0 };
@@ -1089,15 +1091,29 @@ export class RunScene extends Phaser.Scene {
       return;
     }
     // 絵は広さに合わせて伸ばす（確認用の ?arena で広さを変えたときも合うように）
-    this.add.image(x, y, map.floor).setDisplaySize(w * 2, h * 2).setDepth(ARENA_FLOOR_DEPTH);
+    this.arenaObjects.push(this.add.image(x, y, map.floor).setDisplaySize(w * 2, h * 2).setDepth(ARENA_FLOOR_DEPTH));
     const scaleX = (w * 2) / this.textures.get(map.floor).getSourceImage().width;
     const scaleY = (h * 2) / this.textures.get(map.floor).getSourceImage().height;
-    this.add.image(x, y, map.wall).setScale(scaleX, scaleY).setDepth(ARENA_FRAME_DEPTH);
+    this.arenaObjects.push(this.add.image(x, y, map.wall).setScale(scaleX, scaleY).setDepth(ARENA_FRAME_DEPTH));
     // 水のきらめきは交互にゆっくり濃くする（点滅に見えない速さ）
     map.shimmer?.forEach((file, k) => {
       const glint = this.add.image(x, y, file).setDisplaySize(w * 2, h * 2).setDepth(ARENA_FLOOR_DEPTH + 1).setAlpha(k === 0 ? ARENA_SHIMMER_MAX : ARENA_SHIMMER_MIN);
       this.tweens.add({ targets: glint, alpha: k === 0 ? ARENA_SHIMMER_MIN : ARENA_SHIMMER_MAX, duration: ARENA_SHIMMER_MS, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      this.arenaObjects.push(glint);
     });
+  }
+
+  /** 固定マップの絵を消して、ふつうのカメラへ戻す（乱入の戦いの終わり。07 の211章） */
+  private hideArena(): void {
+    for (const o of this.arenaObjects) {
+      this.tweens.killTweensOf(o);
+      o.destroy();
+    }
+    this.arenaObjects = [];
+    this.arenaFrame?.destroy();
+    this.arenaFrame = null;
+    this.applyZoom();
+    this.cameras.main.fadeIn(ARENA_FADE_MS);
   }
 
   /** 時間の文字の高さ（画面のピクセル） */
@@ -2249,6 +2265,8 @@ export class RunScene extends Phaser.Scene {
     }
     const cam = this.cameras.main;
     this.fieldOverlay ??= this.add.rectangle(0, 0, 10, 10, 0x000000, 1).setOrigin(0, 0).setScrollFactor(0).setDepth(999);
+    // 固定マップでは床の上にだけ重ねる（技やポケモンまで暗くすると、光る技が濁る。07 の211章）
+    this.fieldOverlay.setDepth(this.sim.world.arena ? ARENA_FLOOR_DEPTH + 2 : 999);
     // 暗い空が、ときどき雷の光で明滅する（サンダー。見た目だけなので、乱数はシミュレーションのものを使わない）
     const flash = activeLegendField(this.sim.world)?.field.flash;
     const now = this.time.now;
@@ -2454,7 +2472,9 @@ export class RunScene extends Phaser.Scene {
     const gateEnd = gateDeadlineTick(w);
     const gateLimit = w.rules.stage.bossRules.gateTimeLimitSeconds ?? 0;
     const gateLeft = gateEnd !== null && !w.outcome && w.tick >= gateEnd - Math.round(gateLimit / w.dt) ? Math.max(0, (gateEnd - w.tick) * w.dt) : null;
-    const legendLeft = lg && lg.endTick > 0 ? Math.max(0, (lg.endTick - w.tick) * w.dt) : gateLeft;
+    // 乱入の固定マップ: 逃げられるまでの残り（07 の211章）
+    const intruderLeft = !lg && w.arena && w.intruder && w.intruder.endTick > 0 ? Math.max(0, (w.intruder.endTick - w.tick) * w.dt) : null;
+    const legendLeft = lg && lg.endTick > 0 ? Math.max(0, (lg.endTick - w.tick) * w.dt) : intruderLeft ?? gateLeft;
     this.timerText.setText(formatTime(legendLeft ?? Math.min(now, limit))).setColor(legendLeft !== null ? '#ff5252' : uiConfig.timer.color);
     this.placeUi(this.timerText, cx, top);
     // テストの表示は、ボスの HP バーを何本も並べたときはその下へ
@@ -2549,6 +2569,13 @@ export class RunScene extends Phaser.Scene {
       if (this.god) this.applyGod();
       // ?bosshp: 伝説が出たら一度だけ HP を決めた割合にする（攻撃しなくても HP で変わる動きを見る）
       const lg = this.sim.world.legendary;
+      // 乱入の固定マップでも、出たら一度だけ
+      const intr = this.sim.world.intruder;
+      if (this.testBossHp !== null && !lg && intr && intr.id !== -1) {
+        const k = findEnemyIndex(this.sim.world, intr.id);
+        if (k !== -1) this.sim.world.enemies.hp[k] = (this.sim.world.enemies.maxHp[k]! * this.testBossHp) / 100;
+        this.testBossHp = null;
+      }
       if (this.testBossHp !== null && lg?.spawned) {
         const e = this.sim.world.enemies;
         const kinds = legendRoundKinds(this.sim.world, lg.kind);
@@ -2603,7 +2630,9 @@ export class RunScene extends Phaser.Scene {
   private legendPose(i: number): { anim: string; spin: boolean; face?: readonly [number, number] } | null {
     const w = this.sim.world;
     const lg = w.legendary;
-    if (!lg || !legendRoundKinds(w, lg.kind).includes(w.enemies.kind[i]!)) return null;
+    // 乱入の固定マップも同じ（07 の211章）
+    const intruderHere = !lg && !!w.arena && w.intruder?.kind === w.enemies.kind[i]!;
+    if (!intruderHere && (!lg || !legendRoundKinds(w, lg.kind).includes(w.enemies.kind[i]!))) return null;
     const set = w.rules.stage.legendary?.moveSets[w.rules.enemies.kinds[w.enemies.kind[i]!]?.id ?? ''];
     if (!set) return null;
     const id = w.enemies.id[i]!;
@@ -2831,6 +2860,7 @@ export class RunScene extends Phaser.Scene {
     // 固定マップ: カメラはマップに固定（07 の203章）
     const arena = world.arena;
     if (arena && !this.arenaFrame) this.showArena(arena);
+    if (!arena && this.arenaFrame) this.hideArena();
     const cx = arena ? arena.x : localView.container.x;
     // 固定マップは、上の列を除いた残りの真ん中に置く
     const cy = arena ? arena.y - this.arenaHudHeight() / 2 / cam.zoom : localView.container.y;

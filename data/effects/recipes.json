@@ -5983,15 +5983,40 @@
         "seconds": 0.3
       }
     },
-    "boss-raikou-thunder": {
+    "boss-raikou-plain": {
+      "extends": "electric.base"
+    },
+    "boss-raikou-dash": {
       "extends": "electric.base",
-      "strike": {
-        "id": "storm-pillar",
-        "fit": "circle",
-        "size": 1.6,
-        "originY": 0.9,
-        "seconds": 0.35
-      }
+      "bossActive": { "id": "raikou-bolt", "fit": "line", "size": 1.8, "varyTiles": true }
+    },
+    "boss-raikou-volt-line": {
+      "extends": "electric.base",
+      "bossActive": { "id": "raikou-bolt", "fit": "line", "size": 2.2, "varyTiles": true }
+    },
+    "boss-raikou-volt-node": {
+      "extends": "electric.base",
+      "bossActive": { "id": "volt-node", "fit": "circle", "size": 1.3 }
+    },
+    "boss-raikou-charge": {
+      "extends": "electric.base",
+      "bossTelegraph": { "id": "raikou-charge", "fit": "circle", "size": 2.1, "overBoss": true }
+    },
+    "boss-raikou-cloud": {
+      "extends": "electric.base",
+      "bossActive": { "id": "raikou-cloud", "fit": "circle", "size": 1.05, "alpha": 0.82 }
+    },
+    "boss-raikou-cloud-bolt": {
+      "extends": "electric.base",
+      "strike": { "id": "raikou-strike", "fit": "circle", "size": 2.4, "originY": 0.9, "seconds": 0.32 }
+    },
+    "boss-raikou-discharge": {
+      "extends": "electric.base",
+      "bossActive": { "id": "raikou-bolt", "fit": "line", "size": 2, "varyTiles": true }
+    },
+    "boss-raikou-flee": {
+      "extends": "electric.base",
+      "bossActive": { "id": "raikou-bolt", "fit": "line", "size": 1.6, "varyTiles": true }
     },
     "boss-flare-blitz": {
       "extends": "flare-blitz",

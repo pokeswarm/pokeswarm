@@ -298,6 +298,11 @@ export interface IntruderLeftEvent {
   readonly kind: number;
 }
 
+/** 乱入の固定マップの戦いが終わり、元のマップへ戻る（ホスト→ゲスト。07 の211章） */
+export interface IntruderArenaEndedEvent {
+  readonly type: 'intruderArenaEnded';
+}
+
 /** ホストがコンテストの手順を進めた（全員へ送る。07 の188章） */
 export interface ContestAppliedEvent {
   readonly type: 'contestApplied';
@@ -444,4 +449,5 @@ export type SimEvent =
   | ItemCollectedEvent
   | LegendaryWarningEvent
   | IntruderWarningEvent
-  | IntruderLeftEvent;
+  | IntruderLeftEvent
+  | IntruderArenaEndedEvent;

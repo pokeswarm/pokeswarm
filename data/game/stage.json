@@ -21,6 +21,20 @@
     {"id": "hooh-rekindling-flame", "effect": "boss-hooh-rekindle", "shape": "circle", "target": "self", "rooted": true, "followBoss": true, "pose": "Sleep", "flyTo": {"x": 0, "y": 0, "speed": 420}, "telegraphSeconds": 8, "radius": 70, "damage": 0, "healPct": 20, "scatterOnLand": {"move": "hooh-rainbow-feather", "count": 8, "radius": 90}, "then": "hooh-rekindle-rise"},
     {"id": "hooh-rekindle-rise", "effect": "boss-hooh-fly", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "airborne": true, "flyTo": {"x": 0, "y": -240, "speed": 90, "boost": 450}, "flyDrop": {"move": "hooh-rainbow-feather", "everySeconds": 0.12, "scatter": 120}, "telegraphSeconds": 2, "radius": 60, "damage": 0},
     {"id": "hooh-rainbow-feather", "effect": "boss-hooh-feather", "shape": "circle", "target": "self", "hideTelegraph": true, "quietStrike": true, "telegraphSeconds": 0.05, "radius": 30, "damage": 0, "activeSeconds": 2.6},
+    {"id": "raikou-roar", "move": "roar", "effect": "boss-raikou-plain", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Attack", "telegraphSeconds": 1.2, "radius": 60, "damage": 0, "maxUses": 1},
+    {"id": "raikou-extreme-speed", "move": "extreme-speed", "effect": "boss-raikou-dash", "shape": "line", "target": "player", "rooted": true, "quietStrike": true, "pose": "Charge", "telegraphSeconds": 0.9, "radius": 28, "length": 400, "damage": 30, "activeSeconds": 0.35, "zigzag": {"segments": 4, "amplitude": 330, "speed": 3200, "repeats": 2, "pauseSeconds": 0.35}},
+    {"id": "raikou-volt-switch", "move": "volt-switch", "effect": "boss-raikou-plain", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Shoot", "telegraphSeconds": 2.5, "radius": 60, "damage": 0, "voltChain": {"line": "raikou-volt-line", "node": "raikou-volt-node", "stepSeconds": 0.26}},
+    {"id": "raikou-volt-line", "move": "volt-switch", "effect": "boss-raikou-volt-line", "shape": "line", "target": "self", "quietStrike": true, "telegraphSeconds": 0.8, "radius": 22, "length": 400, "damage": 26, "activeSeconds": 0.5},
+    {"id": "raikou-volt-node", "effect": "boss-raikou-volt-node", "shape": "circle", "target": "self", "hideTelegraph": true, "quietStrike": true, "telegraphSeconds": 0.05, "radius": 26, "damage": 0, "activeSeconds": 3.2},
+    {"id": "raikou-charge", "effect": "boss-raikou-charge", "shape": "circle", "target": "self", "rooted": true, "followBoss": true, "hideTelegraph": true, "pose": "Charge", "telegraphSeconds": 3, "radius": 60, "damage": 0},
+    {"id": "raikou-thunder", "move": "thunder", "effect": "boss-raikou-plain", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Attack", "telegraphSeconds": 1, "radius": 60, "damage": 0, "clouds": {"move": "raikou-cloud", "holdSeconds": 5.2}},
+    {"id": "raikou-cloud", "move": "thunder", "effect": "boss-raikou-cloud", "shape": "circle", "target": "self", "hideTelegraph": true, "quietStrike": true, "telegraphSeconds": 0.05, "radius": 170, "damage": 0, "bullets": {"count": 1, "speed": 140, "seconds": 5.6}, "emit": {"move": "raikou-cloud-bolt", "everySeconds": 0.3, "radius": 150}},
+    {"id": "raikou-cloud-bolt", "move": "thunder", "effect": "boss-raikou-cloud-bolt", "shape": "circle", "target": "self", "telegraphSeconds": 0.6, "radius": 44, "damage": 30},
+    {"id": "raikou-to-center", "effect": "boss-raikou-plain", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "airborne": true, "flyTo": {"x": 0, "y": 0, "speed": 1300}, "telegraphSeconds": 0.8, "radius": 60, "damage": 0, "then": "raikou-discharge"},
+    {"id": "raikou-discharge", "move": "discharge", "effect": "boss-raikou-discharge", "shape": "line", "target": "self", "rooted": true, "quietStrike": true, "pose": "Charge", "telegraphSeconds": 1, "radius": 24, "length": 2400, "damage": 40, "activeSeconds": 0.3, "arms": {"count": 10, "absolute": true, "offsetDegrees": 0}, "then": "raikou-discharge-2"},
+    {"id": "raikou-discharge-2", "move": "discharge", "effect": "boss-raikou-discharge", "shape": "line", "target": "self", "rooted": true, "quietStrike": true, "pose": "Charge", "telegraphSeconds": 0.8, "radius": 24, "length": 2400, "damage": 40, "activeSeconds": 0.3, "arms": {"count": 10, "absolute": true, "offsetDegrees": 18}, "then": "raikou-tired"},
+    {"id": "raikou-tired", "effect": "boss-raikou-plain", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Hurt", "telegraphSeconds": 3, "radius": 60, "damage": 0},
+    {"id": "raikou-flee", "effect": "boss-raikou-flee", "shape": "line", "target": "self", "hideTelegraph": true, "quietStrike": true, "telegraphSeconds": 0.05, "radius": 30, "length": 2400, "damage": 0, "activeSeconds": 0.7},
     {"id": "lugia-aeroblast", "move": "aeroblast", "effect": "boss-lugia-aero-charge", "shape": "circle", "target": "self", "fixedAim": {"x": 0, "y": 1}, "rooted": true, "hideTelegraph": true, "pose": "Charge", "telegraphSeconds": 1.6, "radius": 44, "damage": 0, "then": "lugia-aeroblast-shot"},
     {"id": "lugia-aeroblast-shot", "move": "aeroblast", "effect": "boss-lugia-aero-shot", "shape": "circle", "target": "player", "rooted": true, "pose": "Shoot", "telegraphSeconds": 0.9, "radius": 80, "damage": 40, "count": 6, "lowHpCount": {"belowHpPct": 50, "count": 9}, "arenaScatter": true, "stagger": 0.18, "then": "lugia-aero-tornado", "thenSamePlace": true},
     {"id": "lugia-aero-tornado", "effect": "boss-lugia-aero-tornado", "shape": "circle", "target": "self", "hideTelegraph": true, "telegraphSeconds": 0.05, "radius": 90, "damage": 25, "activeSeconds": 4, "hitEverySeconds": 1, "growRadius": {"fromPct": 30, "seconds": 0.8}},
@@ -1830,39 +1844,6 @@
       "recoilSeconds": 0.4
     },
     {
-      "id": "raikou-extreme-speed",
-      "move": "extreme-speed",
-      "effect": "boss-extreme-speed",
-      "shape": "circle",
-      "target": "random",
-      "count": 1,
-      "spread": 220,
-      "teleport": true,
-      "telegraphSeconds": 0.35,
-      "radius": 50,
-      "damage": 30,
-      "repeat": {
-        "count": 3,
-        "everySeconds": 0.35
-      }
-    },
-    {
-      "id": "raikou-volt-switch",
-      "move": "volt-switch",
-      "effect": "boss-volt-switch",
-      "shape": "circle",
-      "target": "self",
-      "telegraphSeconds": 0.55,
-      "radius": 45,
-      "damage": 26,
-      "count": 6,
-      "stagger": 0.1,
-      "around": {
-        "radius": 190,
-        "center": "target"
-      }
-    },
-    {
       "id": "snorlax-sleep",
       "move": "rest",
       "effect": "boss-rest",
@@ -1961,21 +1942,6 @@
       "telegraphSeconds": 2.5,
       "radius": 60,
       "damage": 0
-    },
-    {
-      "id": "raikou-thunder-around",
-      "move": "thunder",
-      "effect": "boss-raikou-thunder",
-      "shape": "circle",
-      "target": "self",
-      "telegraphSeconds": 0.6,
-      "radius": 60,
-      "damage": 34,
-      "count": 8,
-      "stagger": 0.15,
-      "around": {
-        "radius": 200
-      }
     },
     {
       "id": "entei-flare-blitz",

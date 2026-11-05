@@ -208,6 +208,11 @@ export interface SetLegendTargetCommand {
   readonly playerId: number;
 }
 
+/** ゲスト: 乱入の固定マップから元のマップへ戻る（07 の211章） */
+export interface ExitIntruderArenaCommand {
+  readonly type: 'exitIntruderArena';
+}
+
 /** ゲスト: 伝説の乱入（「DANGER」） */
 export interface LegendaryWarningCommand {
   readonly type: 'legendaryWarning';
@@ -371,6 +376,7 @@ export type InputCommand =
   | RemovePlayerCommand
   | RevivePlayerCommand
   | LegendaryWarningCommand
+  | ExitIntruderArenaCommand
   | SetLegendTargetCommand
   | SetSectionCommand
   | SpawnItemCommand

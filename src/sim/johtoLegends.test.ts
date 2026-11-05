@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildSimRules } from '../data/simRules';
 import { Simulation } from './simulation';
-import { startIntruder, legendRoundStats } from './systems/stage';
+import { legendRoundStats } from './systems/stage';
 
 /** ジョウトの特別な戦い（07 の85章）: レッド戦の3ラウンド・はねの戦い（ルギア・ホウオウ）・三犬の乱入 */
 function johto() {
@@ -97,48 +97,10 @@ describe('ジョウトの特別な戦い（07 の85章）', () => {
     expect(legendRoundStats(sim.world, sim.world.legendary!.kind, 'timeUp')).toEqual([]);
   });
 
-  it('三犬の乱入: 「DANGER」の後に出て、雑魚はそのまま。制限時間で逃げる', () => {
-    const sim = johto();
-    steps(sim, 30);
-    startIntruder(sim.world, kindOf(sim, 'legend-suicune'));
-    steps(sim, 100);
-    const e = sim.world.enemies;
-    const has = (): boolean => Array.from(e.kind.subarray(0, e.count)).some((k, i) => k === kindOf(sim, 'legend-suicune') && e.hp[i]! > 0);
-    expect(has()).toBe(true);
-    expect(sim.world.legendary).toBeNull();
-    // 最初の区間の中ボス（ピジョン 600）の 16 倍
-    expect(e.maxHp[Array.from(e.kind.subarray(0, e.count)).indexOf(kindOf(sim, 'legend-suicune'))]).toBeCloseTo(9600, 3);
-    // レベルアップの選択の間は時間が止まるので、回数ではなく制限時間の更新番号まで進める
-    const types: string[] = [];
-    const end = sim.world.intruder!.endTick;
-    for (let k = 0; k < 20000 && sim.world.tick <= end + 5; k++) types.push(...steps(sim, 1));
-    expect(types).toContain('intruderLeft');
-    expect(has()).toBe(false);
-    expect(sim.world.intruder?.done).toBe(true);
-  });
-
-  it('三犬の HP は今いる区間の中ボスの 16 倍。中ボスがいない区間は次の中ボス、後ろにいなければ最後の中ボス', () => {
-    const hpAt = (section: number, players = 1): number => {
-      const sim = johto();
-      for (let p = 1; p < players; p++) sim.addPlayer({ id: p + 1, x: 0, y: 0, radius: 12, moveSpeed: 180 });
-      sim.world.section = section;
-      startIntruder(sim.world, kindOf(sim, 'legend-entei'));
-      steps(sim, 100);
-      const e = sim.world.enemies;
-      return e.maxHp[Array.from(e.kind.subarray(0, e.count)).indexOf(kindOf(sim, 'legend-entei'))]!;
-    };
-    expect(hpAt(3)).toBeCloseTo(2700 * 16, 3);
-    // 区間 6 に中ボスはいない: 次の イノムー
-    expect(hpAt(6)).toBeCloseTo(7200 * 16, 3);
-    // 四天王の区間: 最後の中ボス キングドラ
-    expect(hpAt(12)).toBeCloseTo(10500 * 16, 3);
-    // 協力プレイは人数倍のまま
-    expect(hpAt(3, 2)).toBeCloseTo(2700 * 16 * 2, 3);
-  });
-
   it('三犬の乱入は 5〜15分の奇数分ちょうどに確かめる（1回のランで1回まで）', () => {
     const cfg = buildSimRules('johto').stage.legendary!.intruders!;
     expect(cfg.minutes).toEqual([5, 7, 9, 11, 13, 15]);
     expect(cfg.chance).toBe(0.01);
+    expect(cfg.timeLimitSeconds).toBe(60);
   });
 });

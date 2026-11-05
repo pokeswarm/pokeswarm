@@ -1,6 +1,6 @@
 import { randomUnit } from '../math';
 import type { Player } from '../entities/player';
-import { currentWaveIndex, enemyCap, enemyHpScale, type World } from '../world';
+import { currentWaveIndex, enemyCap, enemyHpScale, type World, inIntruderArena } from '../world';
 
 /**
  * (x, y) が、どのプレイヤーからも r 以上離れているか（全員の周りの半径 r の円の和集合の外か）。
@@ -18,7 +18,7 @@ export function clearOfPlayers(players: readonly Player[], x: number, y: number,
 export function spawnEnemies(world: World): void {
   const { players, enemies, rng } = world;
   // ゲストは出現をホストから受け取る
-  if (players.length === 0 || world.role === 'guest' || world.legendary) return;
+  if (players.length === 0 || world.role === 'guest' || world.legendary || inIntruderArena(world)) return;
   const s = world.rules.spawn;
   const kinds = world.rules.enemies.kinds;
   const wave = world.waves[currentWaveIndex(world)]!;

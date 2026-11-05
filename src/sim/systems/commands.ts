@@ -7,7 +7,7 @@ import { currentWaveIndex, enemyHpScale, findEnemyIndex, findPlayer, type World,
 import { breakOnDamage, damageTakenMultiplier } from './status';
 import { confirmPickup } from './gems';
 import { addXp, applyOffer, banUpgrade, chooseUpgrade, mirrorLevelUp, rerollUpgrades, resumeInvincible, skipUpgrade } from './leveling';
-import { addHazard, endRun, enterArena } from './stage';
+import { addHazard, endRun, enterArena, enterIntruderArena, exitIntruderArena } from './stage';
 import { applyRevive } from './health';
 import { applyItem, confirmItem, spawnItem } from './items';
 import { addBox, registerBoxHit, removeBox } from './boxes';
@@ -210,7 +210,15 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         break;
       case 'legendaryWarning':
         if (cmd.intruder) {
-          if (world.role === 'guest') world.events.push({ type: 'intruderWarning', kind: cmd.kind });
+          if (world.role === 'guest') {
+            // 固定マップの乱入: 一緒に移る（雑魚の始末・戦いの終わりはホストが決める）
+            const id = world.rules.enemies.kinds[cmd.kind]?.id ?? '';
+            if (world.rules.stage.legendary?.moveSets[id]?.arena) {
+              world.intruder = { kind: cmd.kind, id: -1, appearTick: world.tick, endTick: world.tick + (cmd.ticksLeft ?? 0), done: false };
+              enterIntruderArena(world, cmd.kind);
+            }
+            world.events.push({ type: 'intruderWarning', kind: cmd.kind });
+          }
           break;
         }
         if (cmd.enraged) {
@@ -227,6 +235,9 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
           enterArena(world, cmd.kind);
           world.events.push({ type: 'legendaryWarning', kind: cmd.kind });
         }
+        break;
+      case 'exitIntruderArena':
+        if (world.role === 'guest') exitIntruderArena(world);
         break;
       case 'setSection':
         if (world.role === 'guest' && cmd.section > world.section) {

@@ -1,6 +1,6 @@
 import type { BossMove, LegendField } from '../../data/schema';
 import { randomUnit } from '../math';
-import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type RunOutcome, type World, type BossEntry, type WingKind, gateDeadlineTick, enemyMoveSpeed } from '../world';
+import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type RunOutcome, type World, type BossEntry, type WingKind, gateDeadlineTick, enemyMoveSpeed, inIntruderArena } from '../world';
 import { glyphPoints } from '../glyph';
 import { hurtPlayer, fieldDamage } from './health';
 import { bumpRunStat } from '../runStats';
@@ -15,6 +15,11 @@ const ARENA_X = 200000;
 /** 固定マップに移ったときのプレイヤーの間隔と、手前からの位置（中心から半分の高さの何倍か） */
 const ARENA_PLAYER_GAP = 80;
 const ARENA_PLAYER_Y = 0.6;
+/** 乱入の固定マップ: 倒してから戻るまで・走り去る長さ・走り去ってから戻るまで・戻った直後の無敵（秒） */
+const INTRUDER_WIN_SECONDS = 2.5;
+const INTRUDER_FLEE_SECONDS = 0.6;
+const INTRUDER_LEFT_SECONDS = 2.2;
+const INTRUDER_RETURN_INVINCIBLE_SECONDS = 2;
 /** 固定マップの壁から、円の技の中心を離す距離 */
 const ARENA_HAZARD_MARGIN = 40;
 /** 炎の字（だいもんじ）の炎を立てる、壁からの距離 */
@@ -171,6 +176,7 @@ export function spawnBosses(world: World): void {
     }
     return;
   }
+  if (inIntruderArena(world)) return;
   const inSection = world.tick - world.sectionStartTick;
   while (world.nextBoss < world.bossSchedule.length) {
     const b = world.bossSchedule[world.nextBoss]!;
@@ -231,7 +237,7 @@ function partnerDashing(world: World, bossId: number): boolean {
  * 雑魚の種類・地面・次の中ボスがまとめて進む。中ボスのいない区間は時間で進む。ソロ・ホストが決める
  */
 export function advanceSection(world: World): void {
-  if (world.role === 'guest' || world.legendary || world.section >= world.waves.length - 1) return;
+  if (world.role === 'guest' || world.legendary || inIntruderArena(world) || world.section >= world.waves.length - 1) return;
   for (const ev of world.events) if (ev.type === 'enemyKilled') world.gateIds.delete(ev.enemyId);
   const duration = world.waves[world.section]!.durationTicks;
   let done: boolean;
@@ -257,6 +263,13 @@ export function stepIntruders(world: World): void {
   if (world.role === 'guest' || world.players.length === 0) return;
   const cfg = world.rules.stage.legendary?.intruders;
   const it = world.intruder;
+  // 固定マップの戦いが終わって、元のマップへ戻る
+  if (it?.exitTick !== undefined && world.tick >= it.exitTick) {
+    it.exitTick = undefined;
+    exitIntruderArena(world);
+    world.events.push({ type: 'intruderArenaEnded' });
+    return;
+  }
   if (it && !it.done) {
     if (it.id === -1) {
       if (world.tick < it.appearTick) return;
@@ -275,23 +288,40 @@ export function stepIntruders(world: World): void {
     });
     if (alive.length === 0) {
       it.done = true;
+      world.hazards.length = 0;
+      if (it.arena) it.exitTick = world.tick + Math.round(INTRUDER_WIN_SECONDS / world.dt);
       return;
     }
     if (world.tick >= it.endTick) {
+      // 固定マップ: 少しの間、壁の外へ走り去る
+      if (it.arena && it.fleeTick === undefined) {
+        it.fleeTick = world.tick + Math.round(INTRUDER_FLEE_SECONDS / world.dt);
+        startFlee(world, alive, it.kind);
+        return;
+      }
+      if (it.fleeTick !== undefined && world.tick < it.fleeTick) return;
       it.done = true;
       for (const id of alive) {
         world.enemies.hp[findEnemyIndex(world, id)] = 0;
         world.events.push({ type: 'enemyRetired', id });
       }
       world.events.push({ type: 'intruderLeft', kind: it.kind });
+      if (it.arena) it.exitTick = world.tick + Math.round(INTRUDER_LEFT_SECONDS / world.dt);
     }
     return;
   }
   if (!cfg || it || world.legendary || world.cleared) return;
+  // 固定マップへ移る乱入は、中ボスを倒すまで待つ（中ボスを残して移らない。07 の211章）
+  if (cfg.kinds.some((id) => world.rules.stage.legendary?.moveSets[id]?.arena)) {
+    const e = world.enemies;
+    for (let i = 0; i < e.count; i++) if (e.hp[i]! > 0 && (world.rules.enemies.kinds[e.kind[i]!]?.rank ?? 'normal') !== 'normal') return;
+  }
   while (world.nextIntruderCheck < cfg.minutes.length && world.tick >= Math.round((cfg.minutes[world.nextIntruderCheck]! * 60) / world.dt)) {
     world.nextIntruderCheck++;
     if (world.rng.next() >= cfg.chance) continue;
-    const kind = world.rules.enemies.kinds.findIndex((k) => k.id === cfg.kinds[cfg.together ? 0 : world.rng.int(cfg.kinds.length)]);
+    // 選ぶのは 1 回だけ（前は敵の種類ごとに選び直していて、約 3 割は当たっても乱入せず、スイクンが出にくかった）
+    const picked = cfg.kinds[cfg.together ? 0 : world.rng.int(cfg.kinds.length)];
+    const kind = world.rules.enemies.kinds.findIndex((k) => k.id === picked);
     if (kind !== -1) startIntruder(world, kind);
     return;
   }
@@ -315,13 +345,87 @@ export function startIntruder(world: World, kind: number): void {
   if (!lg) return;
   const appearTick = world.tick + Math.round(lg.warningSeconds / world.dt);
   world.intruder = { kind, id: -1, appearTick, endTick: appearTick + Math.round((lg.intruders?.timeLimitSeconds ?? lg.timeLimitSeconds) / world.dt), done: false };
+  enterIntruderArena(world, kind);
   world.events.push({ type: 'intruderWarning', kind });
+}
+
+/** 走り去る（固定マップの乱入）: 技をやめ、近い方の壁の外へ一瞬で走る。走った跡に稲妻 */
+function startFlee(world: World, alive: readonly number[], kind: number): void {
+  const a = world.arena;
+  if (!a) return;
+  world.hazards.length = 0;
+  const flee = world.rules.stage.legendary?.intruders?.fleeMoves?.[world.rules.enemies.kinds[kind]?.id ?? ''];
+  for (const id of alive) {
+    const i = findEnemyIndex(world, id);
+    const boss = world.bosses.find((b) => b.id === id);
+    if (i === -1 || !boss) continue;
+    const side = world.enemies.x[i]! >= a.x ? 1 : -1;
+    boss.forced = [];
+    boss.hpMoves = [];
+    boss.dashPath = undefined;
+    boss.dashLeft = undefined;
+    boss.holdUntil = world.tick + Math.round(60 / world.dt);
+    world.enemies.speed[i] = 0;
+    world.enemies.damage[i] = 0;
+    boss.flyTo = { x: a.x + side * (a.halfWidth + 400), y: world.enemies.y[i]!, speed: 2400 };
+    if (flee) addHazard(world, moveIndexOfStage(world.rules, flee), world.enemies.x[i]!, world.enemies.y[i]!, side, 0, -1, undefined, { group: world.nextHazardGroup++ });
+  }
+}
+
+/**
+ * 乱入で固定マップへ移る（ソロ・ホスト・ゲスト。07 の211章）。その乱入に固定マップが無ければ何もしない（雑魚と一緒に戦う）。
+ * 雑魚はいなくなり、玉の経験値はまとめて渡す。元の場所を覚えておく
+ */
+export function enterIntruderArena(world: World, kind: number): void {
+  const it = world.intruder;
+  const id = world.rules.enemies.kinds[kind]?.id ?? '';
+  if (!it || !world.rules.stage.legendary?.moveSets[id]?.arena) return;
+  const back = world.players.map((p) => ({ id: p.id, x: p.x, y: p.y }));
+  if (world.role !== 'guest') {
+    const e = world.enemies;
+    for (let i = 0; i < e.count; i++) {
+      if (e.hp[i]! <= 0) continue;
+      e.hp[i] = 0;
+      world.events.push({ type: 'enemyRetired', id: e.id[i]! });
+    }
+    world.bosses.length = 0;
+  }
+  world.hazards.length = 0;
+  world.zones.length = 0;
+  enterArena(world, kind);
+  it.arena = { enterTick: world.tick, back };
+}
+
+/** 固定マップから元のマップへ戻る。ランの時計は入っていた分だけ止まっていたことにする（中ボスの予定・締め切り・スウォーム） */
+export function exitIntruderArena(world: World): void {
+  const it = world.intruder;
+  const a = it?.arena;
+  if (!it || !a || !world.arena) return;
+  const spent = world.tick - a.enterTick;
+  world.sectionStartTick += spent;
+  world.pausedTicks += spent;
+  world.arena = null;
+  world.hazards.length = 0;
+  world.zones.length = 0;
+  it.arena = undefined;
+  it.done = true;
+  for (const p of world.players) {
+    const b = a.back.find((q) => q.id === p.id);
+    if (!b) continue;
+    p.x = p.prevX = b.x;
+    p.y = p.prevY = b.y;
+    if (p.remote) {
+      p.netX = p.x;
+      p.netY = p.y;
+    }
+    p.invincibleTicks = Math.max(p.invincibleTicks, Math.round(INTRUDER_RETURN_INVINCIBLE_SECONDS / world.dt));
+  }
 }
 
 /** スウォームイベント（ソロ・ホスト）。伝説戦の間は出さない */
 export function spawnSwarms(world: World): void {
-  if (world.role === 'guest' || world.players.length === 0 || world.legendary) return;
-  while (world.nextSwarm < world.swarmSchedule.length && world.swarmSchedule[world.nextSwarm]!.tick <= world.tick) {
+  if (world.role === 'guest' || world.players.length === 0 || world.legendary || inIntruderArena(world)) return;
+  while (world.nextSwarm < world.swarmSchedule.length && world.swarmSchedule[world.nextSwarm]!.tick <= world.tick - world.pausedTicks) {
     const swarm = world.swarmSchedule[world.nextSwarm++]!.swarm;
     const s = world.rules.stage.swarms[swarm]!;
     const kindIndex = world.rules.enemies.kinds.findIndex((k) => k.id === s.kind);
@@ -457,6 +561,11 @@ export function bossAttacks(world: World): void {
       // 天気で歩く速さが変わる（止まって出す技の間は止まったまま）
       if (world.rules.stage.legendary?.moveSets[world.rules.enemies.kinds[world.enemies.kind[i]!]?.id ?? '']?.weatherStates && !bossBusy(world, boss.id) && !world.hazards.some((h) => h.dasher === boss.id && world.rules.stage.moves[h.move]?.rooted && h.activeTicks === undefined)) {
         world.enemies.speed[i] = bossSpeed(world, boss, i);
+      }
+      // かみなりの雲が流れている間は、次の技を始めない
+      if (boss.holdUntil !== undefined) {
+        if (world.tick < boss.holdUntil) continue;
+        boss.holdUntil = undefined;
       }
       // 技が終わってから間隔を数える（間隔のぶん必ず歩く）
       if (boss.intervalAfterMove && bossBusy(world, boss.id)) {
@@ -681,6 +790,45 @@ const ORBIT_APPROACH_SECONDS = 0.8;
 /** ボスが飛ぶ: 周回・飛んでいく先へ進む・飛びながら技を落とす（ソロ・ホスト。位置はゲストへ送る。ルギアが降りてくる。07 の203章・208章） */
 function stepBossFlight(world: World, boss: World['bosses'][number], i: number): void {
   const e = world.enemies;
+  // 稲妻の形に走る（しんそく）: 1 更新で何本も線をまたぐことがある
+  if (boss.dashPause !== undefined && boss.dashPause > 0 && --boss.dashPause === 0) {
+    boss.dashPause = undefined;
+    if (boss.dashPath) {
+      const again = boss.dashPath.move;
+      boss.dashPath = undefined;
+      castBossMove(world, boss.id, i, again);
+    }
+  }
+  const path = boss.dashPath;
+  if (path && boss.dashPause === undefined && path.next > 0) {
+    let step = path.speed * world.dt;
+    while (step > 0 && path.next < path.points.length) {
+      const [tx, ty] = path.points[path.next]!;
+      const dx = tx - e.x[i]!;
+      const dy = ty - e.y[i]!;
+      const d = Math.hypot(dx, dy);
+      if (d <= step) {
+        e.x[i] = tx;
+        e.y[i] = ty;
+        step -= d;
+        path.next++;
+      } else {
+        e.x[i] = e.x[i]! + (dx / d) * step;
+        e.y[i] = e.y[i]! + (dy / d) * step;
+        step = 0;
+      }
+    }
+    if (path.next >= path.points.length) {
+      const move = world.rules.stage.moves[path.move];
+      if ((boss.dashLeft ?? 0) > 0 && move?.zigzag) {
+        boss.dashLeft = boss.dashLeft! - 1;
+        boss.dashPause = Math.max(1, Math.round(move.zigzag.pauseSeconds / world.dt));
+      } else {
+        boss.dashPath = undefined;
+        boss.dashLeft = undefined;
+      }
+    }
+  }
   let orbiting = false;
   for (const hz of world.hazards) {
     if (hz.dasher !== boss.id || hz.activeTicks !== undefined) continue;
@@ -759,6 +907,7 @@ function dropFromFlight(world: World, bossId: number, i: number, drop: NonNullab
 /** ボスが自分の場所から出す技の途中か（予告の間止まる・跳ぶ・消える技、波の続きが残っている） */
 function bossBusy(world: World, id: number): boolean {
   if (world.bossQueue.some((q) => q.bossId === id)) return true;
+  if (world.bosses.find((b) => b.id === id)?.dashPath) return true;
   return world.hazards.some((h) => {
     if (h.dasher !== id) return false;
     const m = world.rules.stage.moves[h.move];
@@ -882,6 +1031,20 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     castDecoys(world, bossId, i, move, moveIdx, target, put);
     return;
   }
+  if (move.zigzag && world.arena && boss) {
+    castZigzag(world, boss, i, moveIdx, move.zigzag, target, group);
+    return;
+  }
+  if (move.voltChain && world.arena) {
+    castVoltChain(world, bossId, moveIdx, move, move.voltChain, bx, by, target);
+    return;
+  }
+  if (move.clouds && world.arena && boss) {
+    put(bx, by, 0, 1, bossId);
+    castClouds(world, move.clouds.move, target);
+    boss.holdUntil = world.tick + Math.round(move.clouds.holdSeconds / world.dt);
+    return;
+  }
   if (move.bullets) {
     // 飛ぶ玉（サンダー）: 自分からランダムな向きへ
     for (let k = 0; k < move.bullets.count; k++) {
@@ -922,10 +1085,13 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     const spin = (repeatIndex * (arms.spinPerRepeat ?? 0) * Math.PI) / 180;
     const base = (arms.absolute ? 0 : Math.atan2(uy, ux)) + (arms.offsetDegrees * Math.PI) / 180 + spin;
     const angles = arms.fan?.map((d) => Math.atan2(uy, ux) + spin + (d * Math.PI) / 180) ?? arms.angles?.map((d) => (d * Math.PI) / 180) ?? Array.from({ length: arms.count }, (_, k) => base + (k * Math.PI * 2) / arms.count);
+    let first = true;
     for (const a of angles) {
       // 狙った人が真ん中: 線は中心より少し手前から（×の交わる所も当たる）
       const back = self ? 0 : move.radius;
-      put(cx - Math.cos(a) * back, cy - Math.sin(a) * back, Math.cos(a), Math.sin(a), self ? bossId : -1);
+      // 続きのある技（ほうでん）は、続きを 1 回だけ使うよう、ボスに結ぶのは 1 本だけ
+      put(cx - Math.cos(a) * back, cy - Math.sin(a) * back, Math.cos(a), Math.sin(a), self && (first || !move.then) ? bossId : -1);
+      first = false;
     }
     return;
   }
@@ -1082,6 +1248,94 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
         put(t.x + rx * dist, t.y + ry * dist, ux, uy, move.healPct || move.rooted || move.then || move.teleport || move.hideBoss || move.followBoss ? bossId : -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt), ...ring });
       }
     }
+  }
+}
+
+/** 固定マップの壁から、走る線・点を離す距離 */
+const ARENA_LINE_MARGIN = 60;
+
+function clampToArena(world: World, x: number, y: number): [number, number] {
+  const a = world.arena;
+  if (!a) return [x, y];
+  return [Math.max(a.x - a.halfWidth + ARENA_LINE_MARGIN, Math.min(a.x + a.halfWidth - ARENA_LINE_MARGIN, x)), Math.max(a.y - a.halfHeight + ARENA_LINE_MARGIN, Math.min(a.y + a.halfHeight - ARENA_LINE_MARGIN, y))];
+}
+
+/** しんそく（07 の211章）: マップの反対側へ稲妻の形の線を引く。途中の角の 1 つは狙った人の場所。線は走る順に当たる */
+function castZigzag(world: World, boss: World['bosses'][number], i: number, moveIdx: number, z: NonNullable<BossMove['zigzag']>, target: World['players'][number], group: number): void {
+  const a = world.arena!;
+  const bx = world.enemies.x[i]!;
+  const by = world.enemies.y[i]!;
+  const side = bx > a.x ? -1 : 1;
+  const endX = a.x + side * (a.halfWidth - ARENA_LINE_MARGIN);
+  const flip = world.rng.next() < 0.5 ? -1 : 1;
+  const points: [number, number][] = [[bx, by]];
+  for (let k = 1; k <= z.segments; k++) {
+    const x = bx + ((endX - bx) * k) / z.segments;
+    const y = a.y + (k % 2 === 0 ? 1 : -1) * flip * z.amplitude * world.rng.range(0.55, 1);
+    points.push(clampToArena(world, x, y));
+  }
+  // 狙った人に一番近い途中の角を、その人の場所へ
+  let best = 1;
+  for (let k = 2; k < z.segments; k++) if (Math.abs(points[k]![0] - target.x) < Math.abs(points[best]![0] - target.x)) best = k;
+  points[best] = clampToArena(world, target.x, target.y);
+  let along = 0;
+  for (let k = 0; k < z.segments; k++) {
+    const [x0, y0] = points[k]!;
+    const [x1, y1] = points[k + 1]!;
+    const len = Math.hypot(x1 - x0, y1 - y0) || 1;
+    addHazard(world, moveIdx, x0, y0, (x1 - x0) / len, (y1 - y0) / len, k === 0 ? boss.id : -1, undefined, { group, length: len, delay: Math.round(along / z.speed / world.dt) });
+    along += len;
+  }
+  // 走り始めるのは 1 本目が落ちたとき（next: 0 の間は待つ）
+  boss.dashPath = { points, next: 0, speed: z.speed, move: moveIdx };
+  if (boss.dashLeft === undefined) boss.dashLeft = z.repeats - 1;
+}
+
+/** ボルトチェンジ（07 の211章）: 区画ごとの点をマップの外回りの順につなぐ。狙った人のいる区画の点は、その場所 */
+function castVoltChain(world: World, bossId: number, moveIdx: number, move: BossMove, v: NonNullable<BossMove['voltChain']>, bx: number, by: number, target: World['players'][number]): void {
+  const a = world.arena!;
+  const cols = 3;
+  const cw = (a.halfWidth * 2) / cols;
+  const ch = a.halfHeight;
+  // 外回りの順: 上の左・中・右 → 下の右・中・左
+  const cells: [number, number][] = [[0, 0], [1, 0], [2, 0], [2, 1], [1, 1], [0, 1]];
+  const inCell = (c: readonly [number, number]): boolean => Math.floor((target.x - (a.x - a.halfWidth)) / cw) === c[0] && Math.floor((target.y - (a.y - a.halfHeight)) / ch) === c[1];
+  const pts = cells.map((c) => {
+    if (inCell(c)) return clampToArena(world, target.x, target.y);
+    return clampToArena(world, a.x - a.halfWidth + (c[0] + world.rng.range(0.25, 0.75)) * cw, a.y - a.halfHeight + (c[1] + world.rng.range(0.25, 0.75)) * ch);
+  });
+  // ボスに一番近い点から回り始める
+  let start = 0;
+  pts.forEach((p, k) => {
+    if (Math.hypot(p[0] - bx, p[1] - by) < Math.hypot(pts[start]![0] - bx, pts[start]![1] - by)) start = k;
+  });
+  const order = [[bx, by] as [number, number], ...pts.slice(start), ...pts.slice(0, start), [bx, by] as [number, number]];
+  const line = moveIndexOfStage(world.rules, v.line);
+  const node = moveIndexOfStage(world.rules, v.node);
+  const group = world.nextHazardGroup++;
+  for (const p of pts) addHazard(world, node, p[0], p[1], 0, 1, -1, undefined, { group: world.nextHazardGroup++ });
+  for (let k = 0; k + 1 < order.length; k++) {
+    const [x0, y0] = order[k]!;
+    const [x1, y1] = order[k + 1]!;
+    const len = Math.hypot(x1 - x0, y1 - y0) || 1;
+    addHazard(world, line, x0, y0, (x1 - x0) / len, (y1 - y0) / len, -1, undefined, { group, length: len, delay: Math.round((k * v.stepSeconds) / world.dt) });
+  }
+  addHazard(world, moveIdx, bx, by, 0, 1, bossId, undefined, { group: world.nextHazardGroup++ });
+  void move;
+}
+
+/** かみなりの雲（07 の211章）: 3 列に分けて上下の端から交互に流す。1 列は狙った人の場所 */
+function castClouds(world: World, moveId: string, target: World['players'][number]): void {
+  const a = world.arena!;
+  const idx = moveIndexOfStage(world.rules, moveId);
+  const lanes = 3;
+  const lw = (a.halfWidth * 2) / lanes;
+  const mine = Math.max(0, Math.min(lanes - 1, Math.floor((target.x - (a.x - a.halfWidth)) / lw)));
+  const flip = world.rng.next() < 0.5 ? 1 : -1;
+  for (let k = 0; k < lanes; k++) {
+    const dir = (k % 2 === 0 ? 1 : -1) * flip;
+    const x = k === mine ? target.x : a.x - a.halfWidth + (k + world.rng.range(0.35, 0.65)) * lw;
+    addHazard(world, idx, x, a.y - dir * (a.halfHeight - ARENA_LINE_MARGIN), 0, dir, -1, undefined, { group: world.nextHazardGroup++ });
   }
 }
 
@@ -1257,6 +1511,12 @@ function strikeHazards(world: World): void {
     }
     // 落ちた後: 残っている間に触れると当たる（1つの範囲技で1回。hitEverySeconds があればその間隔で何回も）。時間が来たら消す
     if (hz.activeTicks !== undefined) {
+      // 雲の下の落雷（ソロ・ホスト）
+      if (move?.emit && world.role !== 'guest' && hz.activeTicks % Math.max(1, Math.round(move.emit.everySeconds / world.dt)) === 0) {
+        const [rx, ry] = randomUnit(world.rng);
+        const d = world.rng.range(0, move.emit.radius);
+        addHazard(world, moveIndexOfStage(world.rules, move.emit.move), hz.x + rx * d, hz.y + ry * d, 0, 1, -1, undefined, { group: world.nextHazardGroup++ });
+      }
       if (--hz.activeTicks <= 0) {
         world.hazards.splice(h, 1);
         // 時間が来た壁は、何も起こらず消える
@@ -1533,6 +1793,8 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
   const i = findEnemyIndex(world, hz.dasher);
   if (i === -1 || !move) return;
   const boss = world.bosses.find((b) => b.id === hz.dasher);
+  // 稲妻の形に走り出す（しんそく）
+  if (move.zigzag && boss?.dashPath && boss.dashPath.next === 0) boss.dashPath.next = 1;
   // ためきった（じこさいせい）: もう止められない
   if (boss && move.interruptDamage) boss.interrupt = undefined;
   // じばく: 爆発した敵はいなくなる（ホストが決めてゲストへ送る）

@@ -162,7 +162,10 @@ export class SyncSession {
           if (host) out.push(ev.enraged ? { t: 'lw', k: ev.kind, r: 1 } : { t: 'lw', k: ev.kind, ...(world.legendary && { e: world.legendary.endTick - world.tick }) });
           break;
         case 'intruderWarning':
-          if (host) out.push({ t: 'lw', k: ev.kind, i: 1 });
+          if (host) out.push({ t: 'lw', k: ev.kind, i: 1, ...(world.intruder && { e: world.intruder.endTick - world.tick }) });
+          break;
+        case 'intruderArenaEnded':
+          if (host) out.push({ t: 'ax' });
           break;
         case 'legendTarget':
           if (host) out.push({ t: 'lt', e: ev.enemyId, p: ev.playerId });
@@ -398,6 +401,9 @@ export class SyncSession {
           break;
         case 'lt':
           if (guest) cmds.push({ type: 'setLegendTarget', enemyId: m.e, playerId: m.p });
+          break;
+        case 'ax':
+          if (guest) cmds.push({ type: 'exitIntruderArena' });
           break;
         case 'lw':
           if (guest) cmds.push({ type: 'legendaryWarning', kind: m.k, enraged: m.r === 1, intruder: m.i === 1, ...(m.e !== undefined && { ticksLeft: m.e }) });

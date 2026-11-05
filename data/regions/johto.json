@@ -604,8 +604,11 @@
         "legend-entei",
         "legend-suicune"
       ],
-      "timeLimitSeconds": 180,
-      "hpTimesMidboss": 16
+      "timeLimitSeconds": 60,
+      "hpTimesMidboss": 6,
+      "fleeMoves": {
+        "legend-raikou": "raikou-flee"
+      }
     },
     "moveSets": {
       "red-pikachu": {
@@ -860,31 +863,52 @@
         }
       },
       "legend-raikou": {
+        "noEnrage": true,
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960
+        },
+        "anchor": {
+          "x": 0,
+          "y": -240
+        },
         "moves": [
+          "raikou-roar",
           "raikou-extreme-speed",
-          "raikou-thunder-around",
-          "raikou-volt-switch"
+          "raikou-volt-switch",
+          "raikou-charge",
+          "raikou-thunder"
+        ],
+        "hpMoves": [
+          {
+            "belowHpPct": 50,
+            "moves": [
+              "raikou-to-center"
+            ]
+          }
         ],
         "random": false,
-        "moveIntervalSeconds": 1.3,
-        "enrageMoveIntervalSeconds": 0.9,
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 1,
         "field": {
           "overlay": {
-            "color": "#000000",
-            "alpha": 0.2
-          },
-          "flash": {
-            "color": "#fffde7",
-            "alpha": 0.45,
-            "everySeconds": 4
-          },
-          "lightning": {
-            "move": "zapdos-field-bolt",
-            "everySeconds": 0.9
+            "color": "#070a24",
+            "alpha": 0.32,
+            "fadeSeconds": 2
           }
         }
       },
       "legend-entei": {
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960
+        },
+        "anchor": {
+          "x": 0,
+          "y": -240
+        },
         "moves": [
           "entei-flare-blitz",
           "entei-eruption",
@@ -902,6 +926,15 @@
         }
       },
       "legend-suicune": {
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960
+        },
+        "anchor": {
+          "x": 0,
+          "y": -240
+        },
         "moves": [
           "suicune-mist",
           "suicune-aurora-beam",

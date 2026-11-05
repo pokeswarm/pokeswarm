@@ -1464,14 +1464,15 @@
       "rank": "legendary",
       "sprite": "enemy/raikou",
       "hp": 44800,
-      "moveSpeed": 175,
+      "moveSpeed": 150,
       "radius": 40,
       "contactDamage": 40,
       "xp": 0,
       "spriteScale": 2.6,
       "motion": {
-        "type": "keepDistance",
-        "distance": 280
+        "type": "orbit",
+        "distance": 420,
+        "angularDegreesPerSecond": 60
       }
     },
     {

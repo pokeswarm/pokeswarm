@@ -696,6 +696,20 @@ export const bossMoveSchema = z.object({
       aimEvery: z.number().int().positive().optional(),
     })
     .optional(),
+  /**
+   * 稲妻の形に駆け抜ける（ライコウの しんそく。07 の211章）: 固定マップを横切る segments 本の折れ線を予告し（途中の角の 1 つは狙った人の場所）、
+   * 予告が終わると speed でその線を走る。線ごとに当たる。repeats 回続ける
+   */
+  zigzag: z.object({ segments: z.number().int().min(2), amplitude: z.number().positive(), speed: z.number().positive(), repeats: z.number().int().positive(), pauseSeconds: z.number().nonnegative() }).optional(),
+  /**
+   * 電撃が点をつないで回る（ライコウの ボルトチェンジ。07 の211章）: 固定マップの区画ごとに点を置き（狙った人のいる区画は、その場所）、
+   * ボス → 点 → … → ボス の順に、技 line の線を stepSeconds ずつ遅らせて走らせる。node は点の絵の技
+   */
+  voltChain: z.object({ line: z.string().min(1), node: z.string().min(1), stepSeconds: z.number().positive() }).optional(),
+  /** 雲を流す（ライコウの かみなり。07 の211章）: 固定マップを 3 つに分けた列に、技 move を上下の端から交互に流す（1 列は狙った人の場所）。流れている間は次の技を holdSeconds 待つ */
+  clouds: z.object({ move: z.string().min(1), holdSeconds: z.number().nonnegative() }).optional(),
+  /** 当たっている間、半径 radius の中のランダムな場所へ、技 move を everySeconds ごとに落とす（雲の下の落雷。07 の211章） */
+  emit: z.object({ move: z.string().min(1), everySeconds: z.number().positive(), radius: z.number().positive() }).optional(),
   /** 予告の間は空にいて、触れても当たらない（07 の208章） */
   airborne: z.boolean().optional(),
   /** 落ちた所から、技 move を count 個、等しい角度で広げる（bullets の技なら外へ飛ぶ）。radius があれば、その中のばらばらの場所に出す（07 の208章） */
@@ -1031,6 +1045,8 @@ export const stageConfigSchema = z.object({
            * 省略なら enemies.json の hp のまま。協力プレイの人数倍はこの後にかかる
            */
           hpTimesMidboss: z.number().positive().optional(),
+          /** 固定マップの乱入が逃げるときに、走った跡に出す技（kind → 技。07 の211章） */
+          fleeMoves: z.record(z.string(), z.string()).optional(),
         })
         .optional(),
     })

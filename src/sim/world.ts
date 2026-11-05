@@ -279,6 +279,12 @@ export interface World {
     forced?: number[];
     /** 技の間隔を、技が終わってから数える */
     intervalAfterMove?: boolean;
+    /** 稲妻の形に走っている線（しんそく）: 点の並び・今向かっている点・速さ。left はあと何回続けるか、pause は次までの更新回数（07 の211章） */
+    dashPath?: { points: readonly (readonly [number, number])[]; next: number; speed: number; move: number };
+    dashLeft?: number;
+    dashPause?: number;
+    /** この更新回数までは次の技を始めない（かみなりの雲が流れている間） */
+    holdUntil?: number;
     /** 飛んでいく先（技の flyTo。07 の203章） */
     flyTo?: { x: number; y: number; speed: number; boost?: number };
     /** 寄られたら割り込む技（ふきとばし。07 の204章）。homeY は定位置の高さ */
@@ -321,7 +327,22 @@ export interface World {
   } | null;
   /** 伝説の乱入（三犬）: 出ている伝説（出る前は id -1）と逃げる時刻。乱入が終わったら done。次に確かめる乱入の分の番号 */
   /** ids: 一緒に乱入した全員（ラティ兄妹） */
-  intruder: { kind: number; id: number; ids?: number[]; appearTick: number; endTick: number; done: boolean } | null;
+  /**
+   * 乱入。arena: 固定マップへ移っている間（入った時刻と、戻す場所）。fleeTick: 走り去っている間の終わり。exitTick: 元のマップへ戻る時刻（07 の211章）
+   */
+  intruder: {
+    kind: number;
+    id: number;
+    ids?: number[];
+    appearTick: number;
+    endTick: number;
+    done: boolean;
+    arena?: { enterTick: number; back: { id: number; x: number; y: number }[] };
+    fleeTick?: number;
+    exitTick?: number;
+  } | null;
+  /** 乱入の固定マップで過ごした更新回数（ランの時計を止める。07 の211章） */
+  pausedTicks: number;
   /** 最後の戦いの相手（クリアの後に1回だけ決める。無ければ null。07 の189章） */
   finaleKinds: readonly number[] | null;
   nextIntruderCheck: number;
@@ -410,6 +431,7 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     legendaryForce: false,
     legendaryChanceBonus: 0,
     intruder: null,
+    pausedTicks: 0,
     finaleKinds: null,
     nextIntruderCheck: 0,
     wingsEnabled: new Set(),
@@ -523,7 +545,12 @@ function buildSwarmSchedule(rules: SimRules, tickRate: number): { tick: number; 
 
 /** ランの経過秒数（レベルアップの選択で止まっている間は進まない） */
 export function elapsedSeconds(world: World): number {
-  return world.tick * world.dt;
+  return (world.tick - world.pausedTicks) * world.dt;
+}
+
+/** 乱入の固定マップにいる（ランの進行は止まる。07 の211章） */
+export function inIntruderArena(world: World): boolean {
+  return !!world.arena && !world.legendary;
 }
 
 export function findPlayer(world: World, id: PlayerId): Player | undefined {
@@ -564,7 +591,7 @@ export function enemyMoveSpeed(world: World, kindIndex: number): number {
 
 export function gateDeadlineTick(world: World): number | null {
   const limit = world.rules.stage.bossRules.gateTimeLimitSeconds;
-  if (!limit || world.legendary) return null;
+  if (!limit || world.legendary || inIntruderArena(world)) return null;
   let after = -1;
   for (const b of world.bossSchedule) if (b.wave === world.section && b.gate) after = Math.max(after, b.afterTicks);
   return after < 0 ? null : world.sectionStartTick + after + Math.round(limit / world.dt);

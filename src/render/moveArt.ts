@@ -6602,6 +6602,10 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'sacred-pillar-c': () => sacredPillar(4.2),
     'sun-orb': () => sunOrb(),
     'rainbow-flame': () => rainbowFlame(),
+    'raikou-bolt': () => raikouBolt(),
+    'raikou-cloud': () => raikouCloud(),
+    'raikou-charge': () => raikouCharge(),
+    'raikou-strike': () => raikouStrike(),
     'rainbow-flame-out': () => rainbowFlameOut(),
     'rainbow-feather-a': () => rainbowFeather(-0.14),
     'rainbow-feather-b': () => rainbowFeather(0.2),
@@ -7091,6 +7095,159 @@ function rainbowFeather(tilt: number): SpriteOut {
     return outline(g, 0);
   });
   return { palette: RAINBOW_PALETTE, frameMs: 140, parts: { main: frames.map(toRows) } };
+}
+
+const RAIKOU_BOLT_PALETTE = ['#3a2a00', '#c98a00', '#ffc400', '#fff176', '#ffffff'];
+
+/** 折れ曲がる稲妻の線を 1 本引く（点の列を太さごとに塗る）。太い順に塗り重ねる */
+function strokeBolt(g: Grid, pts: readonly (readonly [number, number])[], width: number, col: number): void {
+  for (let k = 0; k + 1 < pts.length; k++) {
+    const [x0, y0] = pts[k]!;
+    const [x1, y1] = pts[k + 1]!;
+    const n = Math.max(1, Math.ceil(Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0))));
+    for (let t = 0; t <= n; t++) {
+      const x = x0 + ((x1 - x0) * t) / n;
+      const y = y0 + ((y1 - y0) * t) / n;
+      for (let dy = -Math.floor(width / 2); dy <= Math.floor((width - 1) / 2); dy++) for (let dx = -Math.floor(width / 2); dx <= Math.floor((width - 1) / 2); dx++) set(g, x + dx, y + dy, col);
+    }
+  }
+}
+
+/** ライコウの稲妻（線の技。07 の211章）: 途中の部品は両端が真ん中の高さでつながる、折れ曲がった線。枝が出る。end は先が割れる。4 コマ */
+function raikouBolt(): SpriteOut {
+  const W = 40;
+  const H = 24;
+  const mid = (H - 1) / 2;
+  const tile = (seed: number): Grid => {
+    const g = blank(W, H);
+    const n = 5;
+    const pts: [number, number][] = [[0, mid]];
+    for (let k = 1; k < n; k++) pts.push([(W * k) / n, mid + (hash(k, seed, 7600) - 0.5) * 15]);
+    pts.push([W - 1, mid]);
+    // 枝
+    const at = 1 + Math.floor(hash(seed, 2, 7600) * 3);
+    const [bx, by] = pts[at]!;
+    const dir = hash(seed, 3, 7600) > 0.5 ? 1 : -1;
+    const branch: [number, number][] = [[bx, by], [bx + 5, by + dir * 5], [bx + 8, by + dir * 9]];
+    strokeBolt(g, pts, 5, 1);
+    strokeBolt(g, branch, 3, 1);
+    strokeBolt(g, pts, 3, 2);
+    strokeBolt(g, branch, 1, 3);
+    strokeBolt(g, pts, 2, 3);
+    strokeBolt(g, pts, 1, 4);
+    return outline(g, 0);
+  };
+  const start = (seed: number): Grid => {
+    const g = blank(16, H);
+    const pts: [number, number][] = [[3, mid + (hash(seed, 5, 7600) - 0.5) * 4], [8, mid + (hash(seed, 6, 7600) - 0.5) * 7], [15, mid]];
+    strokeBolt(g, pts, 5, 1);
+    strokeBolt(g, pts, 3, 2);
+    strokeBolt(g, pts, 1, 4);
+    return outline(g, 0);
+  };
+  const end = (seed: number): Grid => {
+    const g = blank(20, H);
+    const c: [number, number] = [8, mid + (hash(seed, 7, 7600) - 0.5) * 5];
+    const fork1: [number, number][] = [c, [14, mid - 5], [19, mid - 8 + hash(seed, 8, 7600) * 3]];
+    const fork2: [number, number][] = [c, [14, mid + 5], [19, mid + 8 - hash(seed, 9, 7600) * 3]];
+    const stem: [number, number][] = [[0, mid], c];
+    for (const [w, col] of [[5, 1], [3, 2], [1, 4]] as const) {
+      strokeBolt(g, stem, w, col);
+      strokeBolt(g, fork1, Math.max(1, w - 2), col);
+      strokeBolt(g, fork2, Math.max(1, w - 2), col);
+    }
+    return outline(g, 0);
+  };
+  const seeds = [1, 2, 3, 4];
+  return { palette: RAIKOU_BOLT_PALETTE, frameMs: 60, parts: { start: seeds.map((s) => toRows(start(s))), middle: seeds.map((s) => toRows(tile(s))), end: seeds.map((s) => toRows(end(s))) } };
+}
+
+/** ライコウの雷雲の影（かみなり。07 の211章）: 暗い雲の塊。真ん中は濃く、外は格子状に抜ける。中を小さな光が走る。4 コマ */
+function raikouCloud(): SpriteOut {
+  const palette = ['#080a1c', '#10132e', '#191d42', '#262c5a', '#ffe066'];
+  const lobes = [[0, 0, 0.56], [-0.42, -0.2, 0.36], [0.44, -0.16, 0.38], [-0.3, 0.34, 0.34], [0.32, 0.36, 0.36], [0.02, -0.48, 0.3], [0.05, 0.52, 0.28]] as const;
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(72, (u, v) => {
+      let inside = 0;
+      for (const [cx, cy, r] of lobes) {
+        const wob = 1 + 0.08 * Math.sin(Math.atan2(v - cy, u - cx) * 5 + f * 1.57 + cx * 9);
+        inside = Math.max(inside, 1 - Math.hypot(u - cx, v - cy) / (r * wob));
+      }
+      if (inside <= 0) return -1;
+      // 外ほど格子状に抜ける（下の床が見え、影に見える）
+      const px = Math.round((u + 1) * 36);
+      const py = Math.round((v + 1) * 36);
+      if (inside < 0.16 && (px + py) % 2 === 0) return -1;
+      if (inside < 0.08 && py % 2 === 0) return -1;
+      // 中を走る細い光（コマごとに場所が変わる）
+      const a = f * 2.1;
+      if (Math.abs(v - 0.28 * Math.sin(u * 7 + a)) < 0.022 && Math.abs(u - Math.sin(a) * 0.2) < 0.16) return 4;
+      const n = hash(Math.floor(px / 3), Math.floor(py / 3), 7700);
+      return inside > 0.6 ? (n > 0.5 ? 0 : 1) : inside > 0.3 ? (n > 0.5 ? 1 : 2) : n > 0.55 ? 2 : 3;
+    }),
+  );
+  return { palette, frameMs: 120, parts: { main: frames.map(toRows) } };
+}
+
+/** じゅうでん（ライコウ。07 の211章）: 体のまわりを小さな稲妻が走り、外へ飛ぶ火花。6 コマ */
+function raikouCharge(): SpriteOut {
+  const S = 80;
+  const c = (S - 1) / 2;
+  const frames = [0, 1, 2, 3, 4, 5].map((f) => {
+    const g = blank(S, S);
+    for (let k = 0; k < 8; k++) {
+      const a = ((k + hash(k, f, 7800)) / 8) * Math.PI * 2;
+      const r0 = 18 + hash(k, f + 9, 7800) * 8;
+      const pts: [number, number][] = [];
+      const steps = 4;
+      for (let t = 0; t <= steps; t++) {
+        const r = r0 + (t / steps) * (10 + hash(k, f + 20, 7800) * 12);
+        const j = t === 0 ? 0 : (hash(k + t, f + 30, 7800) - 0.5) * 0.5;
+        pts.push([c + Math.cos(a + j) * r, c + Math.sin(a + j) * r]);
+      }
+      strokeBolt(g, pts, 4, 2);
+      strokeBolt(g, pts, 2, 4);
+    }
+    return outline(g, 1);
+  });
+  return { palette: RAIKOU_BOLT_PALETTE, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/** 雲から落ちる雷（ライコウの かみなり。07 の211章）: 上から折れ曲がって地面へ落ち、落ちた所で小さくはじける。細くなって消える。5 コマ */
+function raikouStrike(): SpriteOut {
+  const W = 56;
+  const H = 96;
+  const rootY = 88;
+  const c = (W - 1) / 2;
+  const bolt = (seed: number): [number, number][] => {
+    const pts: [number, number][] = [[c + (hash(seed, 1, 7900) - 0.5) * 10, 0]];
+    for (let k = 1; k < 6; k++) pts.push([c + (hash(seed, k + 1, 7900) - 0.5) * 22, (rootY * k) / 6]);
+    pts.push([c, rootY]);
+    return pts;
+  };
+  const stages = [
+    { w: 7, seed: 1, burst: 0 },
+    { w: 7, seed: 2, burst: 9 },
+    { w: 5, seed: 2, burst: 14 },
+    { w: 3, seed: 3, burst: 17 },
+    { w: 1, seed: 3, burst: 0 },
+  ];
+  const frames = stages.map((s) => {
+    const g = blank(W, H);
+    const pts = bolt(s.seed);
+    strokeBolt(g, pts, s.w, 1);
+    if (s.w > 2) strokeBolt(g, pts, s.w - 2, 2);
+    if (s.w > 3) strokeBolt(g, pts, s.w - 4, 4);
+    if (s.w <= 3) strokeBolt(g, pts, 1, 3);
+    // 地面ではじける（短い線を外へ）
+    for (let k = 0; s.burst > 0 && k < 7; k++) {
+      const a = Math.PI + (k / 6) * Math.PI;
+      const r0 = s.burst * 0.35;
+      strokeBolt(g, [[c + Math.cos(a) * r0, rootY + Math.sin(a) * r0 * 0.5], [c + Math.cos(a) * s.burst, rootY + Math.sin(a) * s.burst * 0.5]], 2, k % 2 ? 2 : 3);
+    }
+    return outline(g, 0);
+  });
+  return { palette: RAIKOU_BOLT_PALETTE, frameMs: 65, parts: { main: frames.map(toRows) } };
 }
 
 /** どくどくのキバ: かんだ所に残る猛毒のたまり（紫の水たまりに黄緑の泡が立ってはじける）。3 コマ */

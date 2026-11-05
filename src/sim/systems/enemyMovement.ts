@@ -160,6 +160,13 @@ function bossMotion(world: World, i: number, target: Player, motion: NonNullable
   const step = Math.min(speed, m);
   e.x[i] = x + (mx / m) * step;
   e.y[i] = y + (my / m) * step;
+  // 固定マップの壁の中を走る（07 の211章）
+  const a = world.arena;
+  if (a) {
+    const r = e.radius[i]!;
+    e.x[i] = Math.max(a.x - a.halfWidth + r, Math.min(a.x + a.halfWidth - r, e.x[i]!));
+    e.y[i] = Math.max(a.y - a.halfHeight + r, Math.min(a.y + a.halfHeight - r, e.y[i]!));
+  }
 }
 
 export function rebuildEnemyHash(world: World): void {

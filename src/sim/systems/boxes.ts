@@ -100,12 +100,14 @@ export function registerBoxHit(world: World, id: number, key: number): boolean {
 
 /**
  * 箱から出る物: ふつうは一時的な強化。はね（ルギア・ホウオウ戦の権利。作者の決定 2026年10月26日）が出るようになっていれば、
- * まだ拾っていないはねが、それぞれ wingChance の確率で出る（ソロ・ホスト）
+ * まだ拾っていないはねが、それぞれ wingChance の確率で出る（ソロ・ホスト）。
+ * 1 回のランで出るはねは 1 枚だけ（どれかが落ちているか拾っていれば、もう出ない。伝説戦を連戦にしない。07 の202章）
  */
-function boxDrop(world: World): ItemKind {
+export function boxDrop(world: World): ItemKind {
   const chance = world.rules.pickups.boxes?.wingChance ?? 0;
+  if (world.wings.size > 0 || world.items.some((it) => (WINGS as readonly ItemKind[]).includes(it.kind))) return 'buff';
   for (const w of WINGS) {
-    if (!world.wingsEnabled.has(w) || world.wings.has(w) || world.items.some((it) => it.kind === w)) continue;
+    if (!world.wingsEnabled.has(w)) continue;
     if (world.rng.next() < chance) return w;
   }
   return 'buff';

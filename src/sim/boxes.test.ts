@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildSimRules } from '../data/simRules';
 import { Simulation } from './simulation';
-import { addBox } from './systems/boxes';
+import { addBox, boxDrop } from './systems/boxes';
 import { applyItem } from './systems/items';
 import { MOTION_LINEAR, SHAPE_CIRCLE } from './entities/projectiles';
 
@@ -62,5 +62,38 @@ describe('マップの箱', () => {
     for (let t = 0; t < def.seconds * 30 + 2; t++) sim.step([]);
     expect(p.buffs).toHaveLength(0);
     expect(p.moveSpeed).toBeCloseTo(before);
+  });
+});
+
+describe('はねは 1 回のランで 1 枚だけ（07 の202章）', () => {
+  const world = () => {
+    const rules = buildSimRules('johto');
+    const sim = new Simulation({ tickRate: 30, seed: 1, rules });
+    sim.addPlayer({ id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0 });
+    const w = sim.world;
+    w.wingsEnabled.add('silver-wing');
+    w.wingsEnabled.add('rainbow-wing');
+    // 必ず出る確率にする（データは共有なので写しを使う）
+    Object.defineProperty(w, 'rules', { value: { ...rules, pickups: { ...rules.pickups, boxes: { ...rules.pickups.boxes!, wingChance: 1 } } } });
+    return w;
+  };
+
+  it('まだ出ていなければ、はねが出る', () => {
+    expect(['silver-wing', 'rainbow-wing']).toContain(boxDrop(world()));
+  });
+
+  it('どちらかを拾っていれば、もう出ない', () => {
+    const w = world();
+    w.wings.add('silver-wing');
+    expect(boxDrop(w)).toBe('buff');
+    const w2 = world();
+    w2.wings.add('rainbow-wing');
+    expect(boxDrop(w2)).toBe('buff');
+  });
+
+  it('どちらかが落ちていれば（まだ拾っていなくても）、もう出ない', () => {
+    const w = world();
+    w.items.push({ id: 1, kind: 'rainbow-wing', x: 0, y: 0, pending: false });
+    expect(boxDrop(w)).toBe('buff');
   });
 });

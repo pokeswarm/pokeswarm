@@ -78,6 +78,27 @@ describe('エンテイ（07 の214章）', () => {
     expect(Math.hypot(flames[0]!.x - p.x, flames[0]!.y - p.y)).toBeLessThan(d0);
   });
 
+  it('ほのおのうず: 輪の真ん中に立ち続けても、狭まりきると当たる', () => {
+    const { step, force, sim, p } = setup();
+    const a = sim.world.arena!;
+    p.x = a.x;
+    p.y = a.y + 100;
+    const e = sim.world.enemies;
+    force('entei-fire-spin');
+    step(0.1);
+    const ring = sim.world.hazards.filter((h) => sim.world.rules.stage.moves[h.move]?.id === 'entei-ring-flame');
+    expect(ring.length).toBeGreaterThan(0);
+    let tick = 0;
+    const closest: number[] = [];
+    for (; tick < 30 * 4.2; tick++) {
+      step(1 / 30);
+      if (ring[0] && ring[0].activeTicks !== undefined) closest.push(Math.hypot(ring[0].x - a.x, ring[0].y - (a.y + 100)));
+    }
+    void e;
+    // 真ん中まで炎が届く距離（炎の半径 30 ＋ プレイヤーの半径 12）まで狭まる
+    expect(Math.min(...closest)).toBeLessThanOrEqual(42);
+  });
+
   it('ふんか: HP が高いほど火山弾が多く、そのあと止まる', () => {
     const { step, of, force, sim, bossIndex, rules } = setup();
     const e = sim.world.enemies;

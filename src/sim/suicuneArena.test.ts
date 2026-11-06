@@ -258,4 +258,9 @@ describe('スイクンの技（07 の218章）', () => {
     for (const id of ['suicune-roar', 'suicune-surf', 'suicune-aurora', 'suicune-mirror-coat', 'suicune-glide', 'suicune-flee']) expect(seen).toContain(id);
     expect(sim.world.arena).toBeNull();
   });
+
+  it('ミラーコートは最初のなみのりの次（HP が半分になる前に見せる。ほえるの直後に置くと目の前で止まり、倒す時間が縮みすぎた。07 の229章）', () => {
+    const { rules } = setup(false);
+    expect(rules.stage.legendary!.moveSets['legend-suicune']!.moves).toEqual(['suicune-roar', 'suicune-to-side', 'suicune-surf', 'suicune-glide', 'suicune-mirror-coat', 'suicune-to-far-side', 'suicune-aurora', 'suicune-surf']);
+  });
 });

@@ -152,6 +152,7 @@
 - **技の絵**: 向きで描き分け（`directional`。正面・横・斜め）・突き出す1枚（`fit: thrust`）・天気の粒の絵（`weather.texture`。白黒で描いて色を付ける）・空から落ちる絵と破片（`fall`）。
 - **確かめ方**: `?legend=red-pikachu`・`?wings`・`?intruder=raikou`、強さの測り方は地方と強化の段階を選べる（`BALANCE_REGION`・`BALANCE_UPGRADES`）。
 - **固定マップの伝説・準伝説**（`07` 203〜228章）: 単体の戦いはまず固定マップで考える（`moveSets` の `arena`。引きのカメラで、画面全体を使う大技を組める）。**1 体ずつ、わざ → 範囲 → マップの順に、作者が確かめてから次へ。** 準伝説は `intruders` の `timeLimitSeconds`（逃げるまでの秒数）・`hpTimesMidboss`（HP）・`fleeMoves`（逃げる技）。絵は `npm run arena-maps`。大きな絵は `src/render/effects/` のクラスで専用に描く（`LavaSea`・`WaveSheet`・`AuroraSheet`・`FrostSheets`・`MirrorCoat`・`WaterRun`）。確かめ方: `?region=johto&pokemon=psyduck&god&intruder=suicune&section=5`（`&bosshp=52` で HP の大技、`&intruderat=15&section=3` で雑魚がいる所からの登場）。
+- **技の順と HP の切り替わり**: HP で大技へ移るボスは、順の後ろの技を見ないまま倒されることがある。見せたい技は HP が半分になる前に出す。ただしボスが止まる技を登場の直後に置くと、攻撃が当たり放題で倒す時間が大きく縮む（`07` 229章）。
 - **固定マップの落とし穴**: 遠くの敵を移し替える仕組みは固定マップで止めた（`07` 226章）。大きな絵は元の小さな絵を引き伸ばすと安っぽく見える。場面の演出は誇張せず静かに積み重ね、地面の演出は雑魚より下に描く。絵を描き直したら、見た目と当たりの幅を合わせ直す。実際の火力は DPS 表より高いので、表で「倒せない」と決めない。
 
 ### 9.4 落とし穴（ジョウトで踏んだもの）

@@ -985,12 +985,11 @@
           "suicune-roar",
           "suicune-to-side",
           "suicune-surf",
-          "suicune-surf",
-          "suicune-to-far-side",
-          "suicune-aurora",
           "suicune-glide",
           "suicune-mirror-coat",
-          "suicune-glide"
+          "suicune-to-far-side",
+          "suicune-aurora",
+          "suicune-surf"
         ],
         "hpMoves": [
           {

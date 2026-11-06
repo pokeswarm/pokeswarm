@@ -369,6 +369,8 @@ export interface ItemSpawnedEvent {
   readonly kind: ItemKind;
   readonly x: number;
   readonly y: number;
+  /** 箱の中身（items.buff.buffs の番号） */
+  readonly variant?: number;
 }
 
 /** ゲスト: 道具に触れた（ホストへ送り、ホストが先着で確定する） */

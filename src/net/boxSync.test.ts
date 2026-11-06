@@ -70,6 +70,9 @@ describe('協力プレイの箱', () => {
     expect(guest.sim.world.boxes).toHaveLength(0);
     expect(host.sim.world.items.map((i) => i.kind)).toEqual(['buff']);
     expect(guest.sim.world.items.map((i) => i.kind)).toEqual(['buff']);
+    // 中身は落ちた時に決まり、ゲストにも同じ番号が届く（拾う前から絵で分かる。07 の230章）
+    expect(host.sim.world.items[0]!.variant).toBeDefined();
+    expect(guest.sim.world.items[0]!.variant).toBe(host.sim.world.items[0]!.variant);
   });
 
   it('ゲストが拾った強化は、両方のブラウザでゲストだけに効き、時間で切れる', () => {

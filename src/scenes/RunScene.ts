@@ -1265,7 +1265,7 @@ export class RunScene extends Phaser.Scene {
           if (def && it.by === this.localId) {
             // ポロックは原作の道具の名前が無いので翻訳ファイルから
             const name = generated.items[def.item] ? localName(generated.items[def.item]?.names, getLocale(), def.item) : tMaybe(`item.${def.item}`);
-            this.announce(def.healPct ? t('item.berryHeal', { name }) : t('item.buff', { name, seconds: def.seconds }), '#ffe082');
+            this.announce(def.contest ? t('item.pokeblock', { name, stat: tMaybe(`contest.category.${def.contest}`) }) : def.healPct ? t('item.berryHeal', { name }) : t('item.buff', { name, seconds: def.seconds }), '#ffe082');
           }
         }
         else if (it.kind === 'magnet') this.announce(t('item.magnet'), '#ef9a9a');
@@ -2257,8 +2257,9 @@ export class RunScene extends Phaser.Scene {
       seen.add(it.id);
       let img = this.itemImages.get(it.id);
       if (!img) {
-        // 箱の中身の絵は地方ごと（きのみ・ポロック）
-        img = this.add.image(it.x, it.y, pixelTextureKey((it.kind === 'buff' && pickupConfig.regionBuffs[this.stageOfRegion.id]?.sprite) || it.kind)).setScale(itemSprites.dot).setDepth(spriteRender.depths.items + 0.05);
+        // 箱の中身の絵は地方ごと（きのみ）。ポロックは部門ごとの絵で、拾う前からどの能力が上がるか分かる
+        const buffArt = it.kind === 'buff' ? (this.sim.world.rules.pickups.items.buff?.buffs[it.variant ?? -1]?.sprite ?? pickupConfig.regionBuffs[this.stageOfRegion.id]?.sprite) : undefined;
+        img = this.add.image(it.x, it.y, pixelTextureKey(buffArt || it.kind)).setScale(itemSprites.dot).setDepth(spriteRender.depths.items + 0.05);
         this.itemImages.set(it.id, img);
       }
       // ふわふわ上下させて目立たせる。足元に影

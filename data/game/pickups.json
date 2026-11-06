@@ -39,11 +39,46 @@
     },
     "buff": {
       "buffs": [
-        { "item": "x-attack", "seconds": 15, "mods": { "powerPct": 50 }, "weight": 1 },
-        { "item": "x-speed", "seconds": 15, "mods": { "moveSpeedPct": 40 }, "weight": 1 },
-        { "item": "x-defense", "seconds": 15, "mods": { "damageTakenPct": -50 }, "weight": 1 },
-        { "item": "dire-hit", "seconds": 15, "mods": { "critChancePct": 30 }, "weight": 1 },
-        { "item": "lucky-egg", "seconds": 20, "mods": { "xpPct": 100 }, "weight": 1 }
+        {
+          "item": "x-attack",
+          "seconds": 15,
+          "mods": {
+            "powerPct": 50
+          },
+          "weight": 1
+        },
+        {
+          "item": "x-speed",
+          "seconds": 15,
+          "mods": {
+            "moveSpeedPct": 40
+          },
+          "weight": 1
+        },
+        {
+          "item": "x-defense",
+          "seconds": 15,
+          "mods": {
+            "damageTakenPct": -50
+          },
+          "weight": 1
+        },
+        {
+          "item": "dire-hit",
+          "seconds": 15,
+          "mods": {
+            "critChancePct": 30
+          },
+          "weight": 1
+        },
+        {
+          "item": "lucky-egg",
+          "seconds": 20,
+          "mods": {
+            "xpPct": 100
+          },
+          "weight": 1
+        }
       ]
     }
   },
@@ -55,7 +90,8 @@
     "firstSpawnSeconds": 20,
     "distanceMin": 380,
     "distanceMax": 700,
-    "despawnDistance": 1600, "wingChance": 0.01
+    "despawnDistance": 1600,
+    "wingChance": 0.01
   },
   "regionBuffs": {
     "johto": {
@@ -112,7 +148,8 @@
             "powerPct": 50
           },
           "weight": 1,
-          "contest": "cool"
+          "contest": "cool",
+          "sprite": "pokeblock-red"
         },
         {
           "item": "pokeblock-green",
@@ -121,7 +158,8 @@
             "moveSpeedPct": 40
           },
           "weight": 1,
-          "contest": "smart"
+          "contest": "smart",
+          "sprite": "pokeblock-green"
         },
         {
           "item": "pokeblock-yellow",
@@ -130,7 +168,8 @@
             "damageTakenPct": -50
           },
           "weight": 1,
-          "contest": "tough"
+          "contest": "tough",
+          "sprite": "pokeblock-yellow"
         },
         {
           "item": "pokeblock-blue",
@@ -139,7 +178,8 @@
             "critChancePct": 30
           },
           "weight": 1,
-          "contest": "beauty"
+          "contest": "beauty",
+          "sprite": "pokeblock-blue"
         },
         {
           "item": "pokeblock-pink",
@@ -148,7 +188,8 @@
             "xpPct": 100
           },
           "weight": 1,
-          "contest": "cute"
+          "contest": "cute",
+          "sprite": "pokeblock-pink"
         }
       ]
     }

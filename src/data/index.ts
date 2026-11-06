@@ -280,7 +280,10 @@ check(!!itemSprites.candyBurst, 'data/render/items.json に candyBurst があり
 // 道具のドット絵: マップの道具ごとと、アメの箱
 for (const [region, r] of Object.entries(pickupConfig.regionBuffs)) {
   check(!!itemSprites.sprites[r.sprite], `data/game/pickups.json の ${region} の絵 "${r.sprite}" が data/render/items.json にありません`);
-  for (const b of r.buffs) check(!!itemIcons.items[b.item], `data/game/pickups.json の ${region} の "${b.item}" のアイコンがありません（npm run item-icons）`);
+  for (const b of r.buffs) {
+    check(!!itemIcons.items[b.item], `data/game/pickups.json の ${region} の "${b.item}" のアイコンがありません（npm run item-icons）`);
+    if (b.sprite) check(!!itemSprites.sprites[b.sprite], `data/game/pickups.json の ${region} の絵 "${b.sprite}" が data/render/items.json にありません`);
+  }
 }
 for (const k of contestConfig.npcPokemon) check(!!generated.pokemon[k], `data/game/contest.json の NPC "${k}" が data/generated/pokemon.json にありません`);
 for (const r of contestConfig.ranks) check(r.npcScores.length >= contestConfig.entrants - 1, `data/game/contest.json のランク "${r.id}" の NPC の点数が足りません`);

@@ -3,9 +3,8 @@ import { generated } from '../data';
 import { localName } from '../data/simRules';
 import { getLocale, t, tMaybe } from '../i18n';
 import { compactScreen, windowCss } from '../render/pixelUi';
-import { contestScore, type ContestEntrant, type ContestState } from '../sim/contest';
+import { crowdAir, primaryScore, type ContestEntrant, type ContestState } from '../sim/contest';
 import type { ContestCommand } from '../sim/commands';
-import { hash01 } from '../sim/math';
 import type { World } from '../sim/world';
 import { ContestStage } from './contestStage';
 
@@ -14,7 +13,7 @@ export type ContestRankOf = (category: string) => number;
 
 /**
  * ポケモンコンテストの画面（ホウエン。07 の188・192章）:
- * リーグかコンテストかを選ぶ → 部門と技を2個選ぶ → 舞台で一次審査・二次審査（観客の空気を見てアピール）→ 順位とコイン
+ * リーグかコンテストかを選ぶ → 部門と技を2個選ぶ → 舞台で制限時間の間、観客を見て好きなときに技を出す → 順位とコイン（07 の230章）
  */
 export class ContestPanel {
   /** 画面全体を覆う幕（後ろのマップを見せない） */
@@ -26,17 +25,18 @@ export class ContestPanel {
   private shown = '';
   private category: string | null = null;
   private moves: number[] = [];
-  /** 自分の番が始まった時刻（針の動き） */
-  private turnStart = 0;
-  private turnKey = '';
   private soundKey = '';
-  /** 今の針の値（自分の番だけ） */
+  /** 舞台の人ごとの、音を鳴らし終えた技の数 */
+  private heard = new Map<number, number>();
+  /** 今の観客の盛り上がり（自分が技を出せるときだけ。出せないときは null） */
   private gauge: number | null = null;
+  /** 技を出すボタンと、残り時間の文字（毎フレーム直す） */
+  private pressButton: HTMLButtonElement | null = null;
+  private timeLine: HTMLDivElement | null = null;
   private readonly onKey = (e: KeyboardEvent): void => {
-    if ((e.key === ' ' || e.key === 'Enter') && this.gauge !== null) {
-      e.preventDefault();
-      this.press();
-    }
+    if (e.key !== ' ' && e.key !== 'Enter') return;
+    if (this.pressButton) e.preventDefault();
+    if (this.gauge !== null) this.press();
   };
 
   constructor(
@@ -71,35 +71,35 @@ export class ContestPanel {
       return;
     }
     const now = performance.now();
-    const onStage = c.phase === 'primary' || c.phase === 'appeal' || c.phase === 'result';
-    const mine = c.phase === 'appeal' && !c.shown && c.entrants[c.turn]?.playerId === localId;
-    const key = `${c.phase}:${c.answers.has(localId)}:${c.entries.has(localId)}:${this.category}:${this.moves.join()}:${c.round}:${c.turn}:${c.shown}:${c.fast}`;
+    const onStage = c.phase === 'appeal' || c.phase === 'result';
+    const me = c.entrants.find((e) => e.playerId === localId);
+    const key = `${c.phase}:${c.answers.has(localId)}:${c.entries.has(localId)}:${this.category}:${this.moves.join()}:${me?.appeals.length ?? 0}`;
     if (key !== this.shown) {
       this.shown = key;
       this.shade.style.display = 'flex';
       this.body.replaceChildren();
       this.status.replaceChildren();
+      this.pressButton = null;
+      this.timeLine = null;
       this.stage.canvas.style.display = c.phase === 'entry' ? 'none' : 'block';
       this.status.style.display = onStage ? 'block' : 'none';
       if (c.phase === 'branch') this.drawBranch(world, c, localId);
       else if (c.phase === 'entry') this.drawEntry(world, c, localId);
       else if (c.phase === 'result') this.drawResult(world, c, localId);
-      else this.drawPerformance(world, c, mine);
+      else this.drawPerformance(world, me);
     }
     this.playSounds(world, c, localId);
     if (c.phase === 'entry') return;
-    if (mine) {
-      const tk = `${c.round}:${c.turn}`;
-      if (tk !== this.turnKey) {
-        this.turnKey = tk;
-        this.turnStart = now;
-      }
-      const timing = world.rules.contest!.timing;
-      // 高まる速さは番ごとに変わる（画面だけの値。シードから決める）
-      const period = timing.periodMin + (timing.periodMax - timing.periodMin) * hash01(world.seed, c.turn, c.round, 0xa17);
-      this.gauge = ContestStage.airAt((now - this.turnStart) / 1000, period, timing.riseShare);
-    } else this.gauge = null;
-    this.stage.draw(world, c, (id) => this.speciesKeyOf(world, id), this.gauge, now);
+    const air = c.phase === 'appeal' ? crowdAir(world.rules.contest!.timing, world.seed, c.elapsed * world.dt) : null;
+    const ready = c.phase === 'appeal' && !!me && c.elapsed >= me.readyAt;
+    this.gauge = ready ? air : null;
+    if (this.pressButton) {
+      // 次の技を出せるまでは押せない
+      this.pressButton.disabled = !ready;
+      this.pressButton.style.opacity = ready ? '1' : '0.45';
+    }
+    if (this.timeLine) this.timeLine.textContent = t('contest.timeLeft', { n: Math.ceil(c.ticksLeft * world.dt) });
+    this.stage.draw(world, c, (id) => this.speciesKeyOf(world, id), localId, air, now);
   }
 
   hide(): void {
@@ -115,16 +115,16 @@ export class ContestPanel {
   }
 
   private playSounds(world: World, c: ContestState, localId: number): void {
-    const key = `${c.phase}:${c.round}:${c.turn}:${c.shown}`;
-    if (key === this.soundKey) return;
-    this.soundKey = key;
-    if (c.phase === 'appeal' && c.shown && c.lastAppeal) {
-      if (c.lastAppeal.cheer) audio.sfx.play('levelUp');
-      else if (c.lastAppeal.move !== null) {
-        const type = world.rules.types.names[world.rules.moves[c.lastAppeal.move]?.type ?? -1];
-        audio.sfx.play(`move.${type ?? 'normal'}`);
-      }
-    } else if (c.phase === 'result') audio.sfx.play(c.results?.[0]?.playerId === localId ? 'clear' : 'section');
+    c.entrants.forEach((e, k) => {
+      if ((this.heard.get(k) ?? 0) === e.appeals.length) return;
+      this.heard.set(k, e.appeals.length);
+      if (e.last?.move === null || !e.last) return;
+      const type = world.rules.types.names[world.rules.moves[e.last.move]?.type ?? -1];
+      audio.sfx.play(`move.${type ?? 'normal'}`);
+    });
+    if (c.phase === this.soundKey) return;
+    this.soundKey = c.phase;
+    if (c.phase === 'result') audio.sfx.play(c.results?.[0]?.playerId === localId ? 'clear' : 'section');
   }
 
   private line(text: string, css = '', parent: HTMLElement = this.body): HTMLDivElement {
@@ -195,40 +195,34 @@ export class ContestPanel {
     }
     const want = Math.min(2, me.moves.length);
     if (this.category && this.moves.length === want) {
-      this.line(t('contest.score', { n: contestScore(world, me, { category: this.category, moves: this.moves }) }));
+      this.line(t('contest.score', { n: primaryScore(world, me, this.category) }));
       const category = this.category;
       this.button(t('contest.enter'), () => this.send({ op: 'entry', category, moves: this.moves, rank: this.rankOf(category) }));
     }
   }
 
-  private drawPerformance(world: World, c: ContestState, mine: boolean): void {
-    const e = c.entrants[c.turn];
-    if (c.phase === 'primary') {
-      this.line(t('contest.primary'), 'font-size:20px', this.status);
-      this.line(t('contest.primaryNote'), '', this.status);
-    } else if (e) {
-      this.line(t('contest.appeal', { n: c.round + 1 }), 'font-size:20px', this.status);
-      if (mine) {
-        const move = e.moves.length ? e.moves[c.round % e.moves.length] : null;
-        this.line(t('contest.yourTurn', { move: this.moveName(world, move) }), 'color:#f8d030', this.status);
-        const b = this.button(t('contest.appealButton'), () => this.press());
-        b.style.minHeight = '56px';
-        b.style.fontSize = '20px';
-      } else if (c.shown && c.lastAppeal) {
-        const name = this.entrantName(world, e);
-        const a = c.lastAppeal;
-        this.line(a.move !== null ? t('contest.appealLine', { name, move: this.moveName(world, a.move) }) : name, '', this.status);
-        this.line(a.cheer ? t('contest.cheer', { n: a.points }) : t(`contest.rating.${a.rating}`, { n: a.points }), a.cheer || a.rating === 'great' ? 'color:#ff8fb0;font-size:20px' : 'color:#ffd54f', this.status);
-      } else this.line(t('contest.watch', { name: this.entrantName(world, e) }), '', this.status);
-    }
-    if (world.role !== 'guest' && !c.fast && !mine) this.button(t('contest.fast'), () => this.send({ op: 'fast' }));
+  private drawPerformance(world: World, me: ContestEntrant | undefined): void {
+    this.line(t('contest.perform'), 'font-size:20px', this.status);
+    this.timeLine = this.line('', 'color:#f8d030', this.status);
+    // 1 回ごとの評価と点だけ見せる。合計は結果まで見せない
+    const a = me?.last;
+    if (a) this.line(t(`contest.rating.${a.rating}`, { n: a.points }), a.rating === 'great' ? 'color:#ff8fb0;font-size:20px' : 'color:#ffd54f', this.status);
+    else this.line(t('contest.performNote'), '', this.status);
+    if (!me) return;
+    const move = me.moves.length ? me.moves[me.appeals.length % me.moves.length] : null;
+    const b = this.button(t('contest.appealMove', { move: this.moveName(world, move) }), () => this.press());
+    b.style.minHeight = '56px';
+    b.style.fontSize = '20px';
+    this.pressButton = b;
   }
 
   private drawResult(world: World, c: ContestState, localId: number): void {
     const cfg = world.rules.contest!;
     this.line(t('contest.resultTitle', { rank: tMaybe(`contest.rank.${cfg.ranks[c.rank]!.id}`) }), 'font-size:20px', this.status);
     for (const r of c.results ?? []) {
-      this.line(t('contest.resultRow', { place: r.place, name: this.entrantName(world, r), score: r.score, coins: r.coins }), r.playerId === localId ? 'color:#f8d030' : '', this.status);
+      const color = r.playerId === localId ? 'color:#f8d030' : '';
+      this.line(t('contest.resultRow', { place: r.place, name: this.entrantName(world, r), score: r.score, coins: r.coins }), color, this.status);
+      this.line(t('contest.resultDetail', { status: r.status, performance: r.performance }), `${color};font-size:13px;opacity:0.8`, this.status);
     }
     if (world.role === 'guest') this.line(t('contest.waitingHost'), 'opacity:0.75');
     else this.button(t('contest.finish'), () => this.send({ op: 'finish' }));

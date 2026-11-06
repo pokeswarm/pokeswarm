@@ -41,10 +41,12 @@ export function spawnItemsAround(world: World, kind: ItemKind, x: number, y: num
   }
 }
 
-export function spawnItem(world: World, id: number, kind: ItemKind, x: number, y: number): void {
+export function spawnItem(world: World, id: number, kind: ItemKind, x: number, y: number, chosen?: number): void {
   if (world.items.length >= world.rules.pickups.maxItems) return;
-  world.items.push({ id, kind, x, y, pending: false });
-  world.events.push({ type: 'itemSpawned', id, kind, x, y });
+  // 箱の中身は落ちた時に決める（拾う前から絵で分かる。07 の230章）。ゲストはホストが決めた番号を受け取る
+  const variant = chosen ?? (kind === 'buff' && world.role !== 'guest' ? rollBuff(world) : undefined);
+  world.items.push({ id, kind, x, y, pending: false, ...(variant !== undefined && { variant }) });
+  world.events.push({ type: 'itemSpawned', id, kind, x, y, ...(variant !== undefined && { variant }) });
 }
 
 /** 自分が触れた道具を拾う。ソロ・ホストはその場で確定し、ゲストは自分の画面で消して見せてホストへ伝える */
@@ -68,8 +70,8 @@ export function confirmItem(world: World, id: number, by: PlayerId): void {
   const k = world.items.findIndex((x) => x.id === id);
   if (k === -1) return;
   const it = world.items[k]!;
-  // アメはレベルの数、箱の強化はどの強化か（items.buff.buffs の番号）を抽選する
-  const levels = it.kind === 'rare-candy' ? rollCandy(world, world.players.find((p) => p.id === by)?.candyWeight ?? 0) : it.kind === 'buff' ? rollBuff(world) : 0;
+  // アメはレベルの数をここで抽選する。箱の強化は落ちた時に決めた番号（items.buff.buffs の番号）
+  const levels = it.kind === 'rare-candy' ? rollCandy(world, world.players.find((p) => p.id === by)?.candyWeight ?? 0) : it.kind === 'buff' ? (it.variant ?? rollBuff(world)) : 0;
   applyItem(world, id, by, it.kind, levels);
 }
 

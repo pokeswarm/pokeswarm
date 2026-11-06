@@ -6,10 +6,12 @@ import { endRun } from './systems/stage';
 import type { World } from './world';
 
 /**
- * ポケモンコンテスト（ホウエン。07 の188・192章）: リーグの代わりにコンテストへ進む、もう1つの終わり方。
- * 最大4人（足りない分は NPC）。一次審査（ポロックと技の強化）→ 二次審査（選んだ技を順に披露。観客の空気を読んだタイミングで点が伸びる）→ 順位とコイン。
+ * ポケモンコンテスト（ホウエン。07 の188・230章）: リーグの代わりにコンテストへ進む、もう1つの終わり方。
+ * 最大4人（足りない分は NPC）が舞台に立ち、制限時間の間、全員が同時に好きなときに技を出す。順番は無い。
+ * 観客の盛り上がりは見えない値（シードから決まる波）で、盛り上がった瞬間に出すほど点が伸びる。
+ * 時間が来たら ステータス（ポロックなど）＋パフォーマンス（技の点）で順位を決める。
  * 手順はソロ・ホストが決めて全員へ送り（contestApplied）、どのブラウザでも同じ結果を計算する。
- * アピールのタイミング（gauge）はブラウザの画面の観客の空気の値で、コマンドに載せて送る
+ * 押した瞬間の盛り上がり（gauge）はブラウザの画面の値で、コマンドに載せて送る
  */
 export interface ContestEntry {
   readonly category: string;
@@ -18,19 +20,31 @@ export interface ContestEntry {
   readonly rank: number;
 }
 
+/** 直前のアピールの出来（画面の文字と音） */
+export interface ContestAppeal {
+  readonly points: number;
+  readonly rating: 'great' | 'good' | 'ok';
+  readonly move: number | null;
+  /** 出した時刻（c.elapsed） */
+  readonly at: number;
+}
+
 /** 舞台に立つ1人（プレイヤーか NPC） */
 export interface ContestEntrant {
   readonly playerId: PlayerId | null;
   readonly npc: string | null;
   readonly category: string | null;
-  /** 披露する技（順番どおり） */
+  /** 披露する技（順番どおりに繰り返す） */
   readonly moves: readonly number[];
-  /** 一次審査の点 */
+  /** ステータスの点（ポロックと技の強化。NPC は決まった割合） */
   readonly primary: number;
-  /** 二次審査の点（1回ごと） */
+  /** パフォーマンスの点（1回ごと） */
   readonly appeals: number[];
   /** NPC の1回の点（プレイヤーは 0） */
-  readonly npcAppeal: number;
+  readonly npcPoints: number;
+  /** 次に技を出せる時刻（c.elapsed） */
+  readyAt: number;
+  last: ContestAppeal | null;
 }
 
 export interface ContestResult {
@@ -38,43 +52,74 @@ export interface ContestResult {
   readonly playerId: PlayerId | null;
   /** NPC のポケモン（data のキー）。プレイヤーは null */
   readonly npc: string | null;
+  /** ステータスの点 */
+  readonly status: number;
+  /** パフォーマンスの点 */
+  readonly performance: number;
   readonly score: number;
   readonly place: number;
   readonly coins: number;
 }
 
-/** 直前のアピールの出来（画面の文字と音） */
-export interface ContestAppeal {
-  readonly points: number;
-  readonly rating: 'great' | 'good' | 'ok' | 'npc';
-  readonly move: number | null;
-  /** 満員の歓声でボーナスが付いた */
-  readonly cheer: boolean;
-}
-
 export interface ContestState {
-  phase: 'branch' | 'entry' | 'primary' | 'appeal' | 'result';
+  phase: 'branch' | 'entry' | 'appeal' | 'result';
   readonly answers: Map<PlayerId, boolean>;
   readonly entries: Map<PlayerId, ContestEntry>;
   rank: number;
   results: ContestResult[] | null;
-  /** 残り時間（branch・entry はホストの待ち時間。primary・appeal は次へ進むまで） */
+  /** 残り時間（branch・entry はホストの待ち時間。appeal は制限時間） */
   ticksLeft: number;
-  /** 舞台に立つ順（一次審査の点の低い順。最後が一番の注目） */
+  /** アピールが始まってからの更新回数（観客の波の時刻） */
+  elapsed: number;
   entrants: ContestEntrant[];
-  /** 二次審査の何回目か・その中の何人目か */
-  round: number;
-  turn: number;
-  /** この人のアピールが終わって、結果を見せている */
-  shown: boolean;
-  lastAppeal: ContestAppeal | null;
-  /** 観客の盛り上がり（0〜crowdMax） */
-  crowd: number;
-  /** はやおくり */
-  fast: boolean;
+  /** NPC が技を出す予定（時刻の順。ソロ・ホスト） */
+  npcPlan: { tick: number; index: number }[];
 }
 
 const NPC_SALT = 0xc0de;
+const CROWD_SALT = 0xa17;
+
+type Timing = ContestConfig['timing'];
+
+/**
+ * 観客の盛り上がり（0〜1。1 が一番盛り上がった瞬間）。全員で共通の、見えない値。
+ * 静かな所からゆっくり高まり（riseShare の間）、頂点の後は早く冷める。波の長さは毎回変わるので、拍子を覚えるのでなく客を見る
+ */
+export function crowdAir(timing: Timing, seed: number, seconds: number): number {
+  let start = 0;
+  for (let n = 0; n < 1000; n++) {
+    const period = wavePeriod(timing, seed, n);
+    if (seconds < start + period) {
+      const f = (seconds - start) / period;
+      return f < timing.riseShare ? f / timing.riseShare : (1 - f) / (1 - timing.riseShare);
+    }
+    start += period;
+  }
+  return 0;
+}
+
+function wavePeriod(timing: Timing, seed: number, n: number): number {
+  return timing.periodMin + (timing.periodMax - timing.periodMin) * hash01(seed, n, 0, CROWD_SALT);
+}
+
+/** 制限時間の中の、波の頂点の時刻（秒） */
+export function crowdPeaks(timing: Timing, seed: number, totalSeconds: number): number[] {
+  const out: number[] = [];
+  let start = 0;
+  for (let n = 0; n < 1000; n++) {
+    const period = wavePeriod(timing, seed, n);
+    const peak = start + period * timing.riseShare;
+    if (peak >= totalSeconds) break;
+    out.push(peak);
+    start += period;
+  }
+  return out;
+}
+
+/** 盛り上がりに応じた点の倍率（頂点で 1 + bonus。静かな時はほとんど入らないので、連打より山を待つ方が伸びる） */
+export function appealMultiplier(timing: Timing, gauge: number): number {
+  return timing.floor + (1 + timing.bonus - timing.floor) * gauge ** timing.curve;
+}
 
 /** 区間が終わったとき（ソロ・ホスト）: 決まった区間の後で分岐を出す */
 export function maybeOpenContest(world: World, endedSection: number): void {
@@ -84,7 +129,7 @@ export function maybeOpenContest(world: World, endedSection: number): void {
 }
 
 function fresh(world: World, cfg: ContestConfig): ContestState {
-  return { phase: 'branch', answers: new Map(), entries: new Map(), rank: 0, results: null, ticksLeft: Math.round(cfg.answerSeconds / world.dt), entrants: [], round: 0, turn: 0, shown: false, lastAppeal: null, crowd: 0, fast: false };
+  return { phase: 'branch', answers: new Map(), entries: new Map(), rank: 0, results: null, ticksLeft: Math.round(cfg.answerSeconds / world.dt), elapsed: 0, entrants: [], npcPlan: [] };
 }
 
 /** コンテストの決まった手順を進める。ホストは全員へも送る（contestApplied） */
@@ -100,12 +145,16 @@ export function applyContest(world: World, cmd: ContestCommand): void {
     if (!c) return;
     if (cmd.op === 'answer' && c.phase === 'branch') c.answers.set(cmd.playerId, cmd.go);
     else if (cmd.op === 'entry' && c.phase === 'entry') c.entries.set(cmd.playerId, { category: cmd.category, moves: cmd.moves, rank: cmd.rank });
-    else if (cmd.op === 'appeal' && c.phase === 'appeal' && !c.shown && c.entrants[c.turn]?.playerId === cmd.playerId) {
-      appeal(world, cfg, c, Math.max(0, Math.min(1, cmd.gauge)));
-    } else if (cmd.op === 'advance' && cmd.playerId === 0 && (c.phase === 'primary' || c.phase === 'appeal')) {
-      advancePerformance(world, cfg, c);
-    } else if (cmd.op === 'fast' && (c.phase === 'primary' || c.phase === 'appeal')) c.fast = true;
-    else if (cmd.op === 'finish' && c.phase === 'result') {
+    else if (cmd.op === 'appeal' && c.phase === 'appeal') {
+      const k = c.entrants.findIndex((e) => e.playerId === cmd.playerId);
+      // 技を出せるかはホストが決める（ゲストは送られてきたものをそのまま当てはめる）
+      if (k === -1 || (world.role !== 'guest' && c.elapsed < c.entrants[k]!.readyAt)) return;
+      appeal(world, cfg, c, k, Math.max(0, Math.min(1, cmd.gauge)));
+    } else if (cmd.op === 'npc' && cmd.playerId === 0 && c.phase === 'appeal' && c.entrants[cmd.index]?.npc) {
+      appeal(world, cfg, c, cmd.index, Math.max(0, Math.min(1, cmd.gauge)));
+    } else if (cmd.op === 'advance' && cmd.playerId === 0 && c.phase === 'appeal') {
+      finishPerformance(cfg, world, c);
+    } else if (cmd.op === 'finish' && c.phase === 'result') {
       if (world.role !== 'guest') endRun(world, 'contest');
       return;
     } else return;
@@ -136,10 +185,16 @@ export function advanceContest(world: World): void {
 /** 時間で進む手順（ソロ・ホスト）。答えない人がいても止まらないように（ソロの分岐と出場はいくらでも待つ） */
 export function stepContest(world: World): void {
   const c = world.contest;
-  if (!c || world.role === 'guest' || c.phase === 'result') return;
-  if (c.phase === 'primary' || c.phase === 'appeal') {
-    c.ticksLeft -= c.fast ? world.rules.contest!.fastMultiplier : 1;
-    if (c.ticksLeft <= 0) applyContest(world, { op: 'advance', playerId: 0 });
+  if (!c || c.phase === 'result') return;
+  if (c.phase === 'appeal') {
+    // 観客の波はどのブラウザでも同じ時刻で見る。NPC と時間切れはソロ・ホストが決める
+    c.elapsed++;
+    if (world.role === 'guest') return;
+    while (c.phase === 'appeal' && c.npcPlan[0] && c.npcPlan[0].tick <= c.elapsed) {
+      const { index } = c.npcPlan.shift()!;
+      applyContest(world, { op: 'npc', playerId: 0, index, gauge: crowdAir(world.rules.contest!.timing, world.seed, c.elapsed * world.dt) });
+    }
+    if (--c.ticksLeft <= 0) applyContest(world, { op: 'advance', playerId: 0 });
     return;
   }
   if (world.role !== 'host' || --c.ticksLeft > 0) return;
@@ -152,7 +207,7 @@ export function stepContest(world: World): void {
   }
 }
 
-/** 一次審査の点: 選んだ部門のポロック・ほかのポロック・技の強化回数の累計 */
+/** ステータスの点: 選んだ部門のポロック・ほかのポロック・技の強化回数の累計 */
 export function primaryScore(world: World, p: Pick<Player, 'pokeblocks' | 'moveUps'>, category: string): number {
   const s = world.rules.contest!.score;
   let score = (p.moveUps ?? 0) * s.moveUp;
@@ -160,16 +215,11 @@ export function primaryScore(world: World, p: Pick<Player, 'pokeblocks' | 'moveU
   return Math.round(score);
 }
 
-/** 二次審査の基本の点（タイミングで増える前）: 技が部門に合っているか */
+/** 技の基本の点（タイミングで増える前）: 技が部門に合っているか */
 export function appealBase(world: World, move: number | undefined, category: string | null): number {
   const s = world.rules.contest!.score;
   if (move === undefined) return 0;
   return world.rules.moves[move]?.contestType === category ? s.moveMatch : s.moveOther;
-}
-
-/** 出る前の見込みの点（タイミングの分を除く） */
-export function contestScore(world: World, p: Pick<Player, 'pokeblocks' | 'moveUps'>, entry: Pick<ContestEntry, 'category' | 'moves'>): number {
-  return primaryScore(world, p, entry.category) + entry.moves.reduce((sum, m) => sum + appealBase(world, m, entry.category), 0);
 }
 
 function startPerformance(world: World, cfg: ContestConfig, c: ContestState): void {
@@ -178,91 +228,51 @@ function startPerformance(world: World, cfg: ContestConfig, c: ContestState): vo
   const rank = cfg.ranks[c.rank]!;
   const rows: ContestEntrant[] = world.players.map((p) => {
     const e = c.entries.get(p.id)!;
-    return { playerId: p.id, npc: null, category: e.category, moves: e.moves, primary: primaryScore(world, p, e.category), appeals: [], npcAppeal: 0 };
+    return { playerId: p.id, npc: null, category: e.category, moves: e.moves, primary: primaryScore(world, p, e.category), appeals: [], npcPoints: 0, readyAt: 0, last: null };
   });
-  // 足りない分は NPC（ランクの強い方から。点数はシードで少しずれる）
+  // 足りない分は NPC（ランクの強い方から。点数はシードで少しずれる）。山ごとに技を出す
   const needed = Math.max(0, cfg.entrants - rows.length);
   const start = Math.floor(hash01(world.seed, 0, c.rank + 100, NPC_SALT) * cfg.npcPokemon.length);
+  const peaks = crowdPeaks(cfg.timing, world.seed, cfg.performanceSeconds);
+  const plan: ContestState['npcPlan'] = [];
   rank.npcScores.slice(-needed || rank.npcScores.length).slice(0, needed).forEach((base, k) => {
     const jitter = 1 - cfg.npcJitter + 2 * cfg.npcJitter * hash01(world.seed, k, c.rank, NPC_SALT);
     const total = base * jitter;
     // ポケモンは並びの続きから取り、同じ会場で被らないようにする
     const npc = cfg.npcPokemon[(start + k) % cfg.npcPokemon.length]!;
     const moves = (cfg.npcMoves[npc] ?? []).map((key) => world.rules.moves.findIndex((m) => m.key === key)).filter((m) => m >= 0);
-    const appealShare = (1 - cfg.npcPrimaryShare) / cfg.rounds;
-    rows.push({ playerId: null, npc, category: null, moves, primary: Math.round(total * cfg.npcPrimaryShare), appeals: [], npcAppeal: Math.round(total * appealShare) });
+    const npcPoints = Math.round((total * (1 - cfg.npcPrimaryShare)) / Math.max(1, peaks.length));
+    const index = rows.length;
+    rows.push({ playerId: null, npc, category: null, moves, primary: Math.round(total * cfg.npcPrimaryShare), appeals: [], npcPoints, readyAt: 0, last: null });
+    peaks.forEach((peak, n) => {
+      const miss = (hash01(world.seed, n, index, NPC_SALT + 2) * 2 - 1) * cfg.npcMissSeconds;
+      plan.push({ tick: Math.max(1, Math.round((peak + miss) / world.dt)), index });
+    });
   });
-  rows.sort((a, b) => a.primary - b.primary);
+  c.npcPlan = plan.sort((a, b) => a.tick - b.tick || a.index - b.index);
   c.entrants = rows;
-  c.phase = 'primary';
-  c.ticksLeft = Math.round(cfg.primarySeconds / world.dt);
+  c.phase = 'appeal';
+  c.elapsed = 0;
+  c.ticksLeft = Math.round(cfg.performanceSeconds / world.dt);
 }
 
-/** その人のアピールを始める。NPC と抜けた人はすぐ結果へ */
-function beginTurn(world: World, cfg: ContestConfig, c: ContestState): void {
-  const e = c.entrants[c.turn]!;
-  c.shown = false;
-  c.lastAppeal = null;
-  if (e.playerId !== null && world.players.some((p) => p.id === e.playerId)) {
-    c.ticksLeft = Math.round(cfg.appealSeconds / world.dt);
-    return;
-  }
-  appeal(world, cfg, c, hash01(world.seed, c.turn, c.round, NPC_SALT + 1));
-}
-
-/** アピールの点を決めて、結果を見せる。gauge は押した瞬間の観客の空気（0〜1。一番盛り上がった瞬間が 1） */
-function appeal(world: World, cfg: ContestConfig, c: ContestState, gauge: number): void {
-  const e = c.entrants[c.turn]!;
-  const move = e.moves.length ? e.moves[c.round % e.moves.length] : undefined;
-  const npc = e.playerId === null;
-  const points = npc ? e.npcAppeal : Math.round(appealBase(world, move, e.category) * (1 + cfg.timing.bonus * gauge));
-  const match = npc || world.rules.moves[move ?? -1]?.contestType === e.category;
-  const rating = npc ? 'npc' : gauge >= cfg.timing.great ? 'great' : gauge >= cfg.timing.good ? 'good' : 'ok';
-  // 盛り上がり: 部門に合った技で上がり、いいタイミングでさらに上がる。合わない技で下がる。いっぱいになると歓声のボーナス
-  let crowd = c.crowd + (match ? 1 : -1) + (rating === 'great' ? 1 : 0);
-  if (npc) crowd = c.crowd + (gauge > 0.5 ? 1 : 0);
-  let cheer = false;
-  let total = points;
-  if (crowd >= cfg.crowdMax) {
-    crowd = 0;
-    cheer = true;
-    total += cfg.crowdBonus;
-  }
-  c.crowd = Math.max(0, crowd);
-  e.appeals.push(total);
-  c.lastAppeal = { points: total, rating, move: move ?? null, cheer };
-  c.shown = true;
-  c.ticksLeft = Math.round((npc ? cfg.npcTurnSeconds : cfg.revealSeconds) / world.dt);
-}
-
-function advancePerformance(world: World, cfg: ContestConfig, c: ContestState): void {
-  if (c.phase === 'primary') {
-    c.phase = 'appeal';
-    c.round = 0;
-    c.turn = 0;
-    beginTurn(world, cfg, c);
-    return;
-  }
-  // 時間切れ: 押さなかった人は空気 0 のアピール
-  if (!c.shown) {
-    appeal(world, cfg, c, 0);
-    return;
-  }
-  c.turn++;
-  if (c.turn >= c.entrants.length) {
-    c.turn = 0;
-    c.round++;
-  }
-  if (c.round >= cfg.rounds) {
-    finishPerformance(cfg, world, c);
-    return;
-  }
-  beginTurn(world, cfg, c);
+/** 技を出して点を決める。gauge は出した瞬間の観客の盛り上がり（0〜1） */
+function appeal(world: World, cfg: ContestConfig, c: ContestState, k: number, gauge: number): void {
+  const e = c.entrants[k]!;
+  const move = e.moves.length ? e.moves[e.appeals.length % e.moves.length] : undefined;
+  const points = e.npc ? e.npcPoints : Math.round(appealBase(world, move, e.category) * appealMultiplier(cfg.timing, gauge));
+  const rating = gauge >= cfg.timing.great ? 'great' : gauge >= cfg.timing.good ? 'good' : 'ok';
+  e.appeals.push(points);
+  e.last = { points, rating, move: move ?? null, at: c.elapsed };
+  e.readyAt = c.elapsed + Math.round(cfg.cooldownSeconds / world.dt);
 }
 
 function finishPerformance(cfg: ContestConfig, world: World, c: ContestState): void {
   const rank = cfg.ranks[c.rank]!;
-  const rows = c.entrants.map((e) => ({ playerId: e.playerId, npc: e.npc, score: e.primary + e.appeals.reduce((a, b) => a + b, 0) }));
+  const rows = c.entrants.map((e) => {
+    const performance = e.appeals.reduce((a, b) => a + b, 0);
+    return { playerId: e.playerId, npc: e.npc, status: e.primary, performance, score: e.primary + performance };
+  });
   // 同点はプレイヤーを上に
   rows.sort((a, b) => b.score - a.score || Number(a.playerId === null) - Number(b.playerId === null));
   c.results = rows.map((r, i) => ({ ...r, place: i + 1, coins: Math.round((rank.coins * (cfg.placementPct[i] ?? 0)) / 100) }));
@@ -271,5 +281,5 @@ function finishPerformance(cfg: ContestConfig, world: World, c: ContestState): v
     if (p) p.bonusCoins = (p.bonusCoins ?? 0) + r.coins;
   }
   c.phase = 'result';
-  c.lastAppeal = null;
+  c.npcPlan = [];
 }

@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { buildSimRules, moveIndexOf, playableLoadout } from '../data/simRules';
-import { applyContest, contestScore } from './contest';
+import { appealMultiplier, applyContest, crowdAir, crowdPeaks, primaryScore } from './contest';
 import { Simulation } from './simulation';
 import { RunRecorder } from '../meta/runRecorder';
 import { SaveStore } from '../meta/saveStore';
-import { moveSprites, shopConfig } from '../data';
+import { itemSprites, moveSprites, shopConfig } from '../data';
+import { confirmItem, spawnItem } from './systems/items';
 
 /** ポケモンコンテスト（作者の決定 2026年11月4日。07 の188章） */
 function setup(n = 1, role: 'solo' | 'host' = 'solo') {
@@ -17,13 +18,12 @@ function setup(n = 1, role: 'solo' | 'host' = 'solo') {
   return { rules, sim, world: sim.world, players, cfg: rules.contest! };
 }
 
-/** 審査を時間切れまで進める（gauge があれば自分の番にアピールする） */
-function perform(world: ReturnType<typeof setup>['world'], gauge?: number) {
-  for (let k = 0; k < 200 && (world.contest?.phase === 'primary' || world.contest?.phase === 'appeal'); k++) {
-    const c = world.contest!;
-    const e = c.phase === 'appeal' ? c.entrants[c.turn] : undefined;
-    if (gauge !== undefined && e?.playerId != null && !c.shown) applyContest(world, { op: 'appeal', playerId: e.playerId, gauge });
-    else applyContest(world, { op: 'advance', playerId: 0 });
+/** 制限時間まで進める（gauge があれば、出せるようになるたびに全員が技を出す） */
+function perform(sim: Simulation, gauge?: number) {
+  const world = sim.world;
+  for (let k = 0; k < 30 * 120 && world.contest?.phase === 'appeal'; k++) {
+    if (gauge !== undefined) for (const e of world.contest.entrants) if (e.playerId !== null) applyContest(world, { op: 'appeal', playerId: e.playerId, gauge });
+    sim.step([]);
   }
 }
 
@@ -43,30 +43,26 @@ describe('ポケモンコンテスト', () => {
     expect(world.contestOffered).toBe(true);
   });
 
-  it('点数はポロック・技の強化回数の累計・選んだ技の部門で決まる', () => {
-    const { world, players, cfg, rules } = setup();
+  it('ステータスの点はポロックと技の強化回数の累計で決まる', () => {
+    const { world, players, cfg } = setup();
     const p = players[0]!;
-    const entry = { category: 'cool', moves: [] as number[] };
-    expect(contestScore(world, p, entry)).toBe(0);
+    expect(primaryScore(world, p, 'cool')).toBe(0);
     p.pokeblocks = { cool: 2, cute: 3 };
     p.moveUps = 5;
     const s = cfg.score;
-    expect(contestScore(world, p, entry)).toBe(2 * s.pokeblockChosen + 3 * s.pokeblockOther + 5 * s.moveUp);
-    const cool = rules.moves.findIndex((m) => m.contestType === 'cool');
-    const cute = rules.moves.findIndex((m) => m.contestType === 'cute');
-    expect(contestScore(world, {}, { category: 'cool', moves: [cool, cute] })).toBe(s.moveMatch + s.moveOther);
+    expect(primaryScore(world, p, 'cool')).toBe(2 * s.pokeblockChosen + 3 * s.pokeblockOther + 5 * s.moveUp);
   });
 
   it('足りない分は NPC で4人。順位が高いほどコインが多く、終わるとランの結果は contest', () => {
-    const { world, players, rules } = setup();
+    const { sim, world, players, rules } = setup();
     const p = players[0]!;
     p.pokeblocks = { cool: 100 };
     applyContest(world, { op: 'open', playerId: 0 });
     applyContest(world, { op: 'answer', playerId: 1, go: true });
     expect(world.contest?.phase).toBe('entry');
     applyContest(world, { op: 'entry', playerId: 1, category: 'cool', moves: [moveIndexOf(rules, 'leafage')], rank: 0 });
-    expect(world.contest?.phase).toBe('primary');
-    perform(world, 1);
+    expect(world.contest?.phase).toBe('appeal');
+    perform(sim, 1);
     const r = world.contest!.results!;
     expect(r).toHaveLength(4);
     expect(r.filter((x) => x.playerId === null)).toHaveLength(3);
@@ -92,7 +88,7 @@ describe('ポケモンコンテスト', () => {
     applyContest(b.world, { op: 'entry', playerId: 1, category: 'cool', moves: [], rank: 3 });
     applyContest(b.world, { op: 'entry', playerId: 2, category: 'cute', moves: [], rank: 1 });
     expect(b.world.contest!.rank).toBe(1);
-    perform(b.world);
+    perform(b.sim);
     expect(b.world.contest!.results!.filter((x) => x.playerId === null)).toHaveLength(2);
   });
 
@@ -119,7 +115,7 @@ describe('コンテストの記録', () => {
     applyContest(world, { op: 'open', playerId: 0 });
     applyContest(world, { op: 'answer', playerId: 1, go: true });
     applyContest(world, { op: 'entry', playerId: 1, category: 'cool', moves: [], rank: 0 });
-    perform(world);
+    perform(sim);
     const coins = world.contest!.results![0]!.coins;
     applyContest(world, { op: 'finish', playerId: 1 });
     rec.finish(sim.world);
@@ -132,7 +128,7 @@ describe('コンテストの記録', () => {
   });
 });
 
-describe('コンテストの審査（07 の192章）', () => {
+describe('コンテストの審査（07 の230章）', () => {
   const enter = (world: ReturnType<typeof setup>['world'], moves: number[], rank = 0, category = 'cool') => {
     applyContest(world, { op: 'open', playerId: 0 });
     applyContest(world, { op: 'answer', playerId: 1, go: true });
@@ -141,37 +137,106 @@ describe('コンテストの審査（07 の192章）', () => {
   const scoreOf = (world: ReturnType<typeof setup>['world']) => world.contest!.results!.find((r) => r.playerId === 1)!.score;
 
   it('マスターの1位は 2000 コイン', () => {
-    const { world, players, cfg } = setup();
+    const { sim, world, players, cfg } = setup();
     players[0]!.pokeblocks = { cool: 200 };
     enter(world, [], cfg.ranks.length - 1);
-    perform(world);
+    perform(sim);
     expect(world.contest!.results![0]!.playerId).toBe(1);
     expect(world.contest!.results![0]!.coins).toBe(2000);
   });
 
-  it('真ん中で止めるほど点が高い。押さないと基本の点だけ', () => {
+  it('順番は無い: 始まってすぐ全員が同じ舞台に立ち、制限時間で終わる。結果はステータスとパフォーマンスの合計', () => {
+    const { sim, world, cfg, players } = setup();
+    players[0]!.pokeblocks = { cool: 3 };
+    enter(world, []);
+    const c = world.contest!;
+    expect(c.phase).toBe('appeal');
+    expect(c.entrants).toHaveLength(cfg.entrants);
+    let steps = 0;
+    while (world.contest!.phase === 'appeal' && steps < 30 * 120) {
+      sim.step([]);
+      steps++;
+    }
+    expect(steps * world.dt).toBeCloseTo(cfg.performanceSeconds, 0);
+    for (const r of c.results!) expect(r.score).toBe(r.status + r.performance);
+    expect(c.results!.find((r) => r.playerId === 1)!.status).toBe(3 * cfg.score.pokeblockChosen);
+  });
+
+  it('盛り上がった瞬間ほど点が高い。出すのをやめると技の点は入らない', () => {
     const run = (gauge?: number) => {
-      const { world, rules } = setup();
+      const { sim, world, rules } = setup();
       const cool = rules.moves.findIndex((m) => m.contestType === 'cool');
       enter(world, [cool, cool]);
-      perform(world, gauge);
+      perform(sim, gauge);
       return scoreOf(world);
     };
     expect(run(1)).toBeGreaterThan(run(0.6));
     expect(run(0.6)).toBeGreaterThan(run());
   });
 
-  it('自分の番でない人のアピールは効かない。NPC の番はすぐ結果になる', () => {
+  it('技を出したら、しばらく次を出せない', () => {
+    const { sim, world, rules, cfg } = setup();
+    enter(world, [rules.moves.findIndex((m) => m.contestType === 'cool')]);
+    applyContest(world, { op: 'appeal', playerId: 1, gauge: 1 });
+    applyContest(world, { op: 'appeal', playerId: 1, gauge: 1 });
+    const me = world.contest!.entrants.find((e) => e.playerId === 1)!;
+    expect(me.appeals).toHaveLength(1);
+    for (let k = 0; k < Math.round(cfg.cooldownSeconds / world.dt); k++) sim.step([]);
+    applyContest(world, { op: 'appeal', playerId: 1, gauge: 1 });
+    expect(me.appeals).toHaveLength(2);
+  });
+
+  it('舞台にいない人は技を出せない', () => {
     const { world, rules } = setup();
     enter(world, [rules.moves.findIndex((m) => m.contestType === 'cool')]);
-    applyContest(world, { op: 'advance', playerId: 0 });
-    const c = world.contest!;
-    expect(c.phase).toBe('appeal');
-    const first = c.entrants[0]!;
-    // 自分はポロックなしで一番低い → 最初の番
-    if (first.playerId === null) expect(c.shown).toBe(true);
     applyContest(world, { op: 'appeal', playerId: 99, gauge: 1 });
-    expect(c.entrants.every((e) => e.playerId !== 99)).toBe(true);
+    expect(world.contest!.entrants.every((e) => e.appeals.length === 0)).toBe(true);
+  });
+
+  it('観客の波: シードで決まり、0〜1 で、山の長さが毎回変わる', () => {
+    const { cfg } = setup();
+    const t = cfg.timing;
+    for (let s = 0; s < 30; s += 0.1) {
+      const a = crowdAir(t, 5, s);
+      expect(a).toBeGreaterThanOrEqual(0);
+      expect(a).toBeLessThanOrEqual(1);
+      expect(a).toBe(crowdAir(t, 5, s));
+    }
+    const peaks = crowdPeaks(t, 5, cfg.performanceSeconds);
+    expect(peaks.length).toBeGreaterThanOrEqual(3);
+    for (const p of peaks) expect(crowdAir(t, 5, p)).toBeCloseTo(1, 5);
+    const gaps = peaks.slice(1).map((p, k) => p - peaks[k]!);
+    expect(new Set(gaps.map((g) => g.toFixed(2))).size).toBeGreaterThan(1);
+  });
+
+  it('連打より、山を待って出す方が点が高い（どのシードでも）', () => {
+    const { cfg } = setup();
+    const t = cfg.timing;
+    for (let seed = 1; seed <= 40; seed++) {
+      // 連打: 出せるようになるたびに出す
+      let spam = 0;
+      for (let s = 0; s < cfg.performanceSeconds; s += cfg.cooldownSeconds) spam += appealMultiplier(t, crowdAir(t, seed, s));
+      // 山を待つ: 頂点の少し手前で出す
+      let wait = 0;
+      for (const p of crowdPeaks(t, seed, cfg.performanceSeconds)) wait += appealMultiplier(t, crowdAir(t, seed, p - 0.3));
+      expect(wait, 'seed ' + seed).toBeGreaterThan(spam);
+    }
+  });
+
+  it('NPC はプレイヤーが押さなくても技を出し、決めた点に近くなる', () => {
+    const { sim, world, cfg } = setup();
+    enter(world, []);
+    perform(sim);
+    const npcs = world.contest!.results!.filter((r) => r.playerId === null);
+    expect(npcs).toHaveLength(cfg.entrants - 1);
+    for (const r of npcs) expect(r.performance).toBeGreaterThan(0);
+    const base = cfg.ranks[0]!.npcScores;
+    const lo = Math.min(...base) * (1 - cfg.npcJitter) - 10;
+    const hi = Math.max(...base) * (1 + cfg.npcJitter) + 10;
+    for (const r of npcs) {
+      expect(r.score).toBeGreaterThanOrEqual(lo);
+      expect(r.score).toBeLessThanOrEqual(hi);
+    }
   });
 
   it('時間で最後まで進む（ソロでも止まらない）', () => {
@@ -195,14 +260,31 @@ describe('コンテストの審査（07 の192章）', () => {
     apply({ op: 'answer', playerId: 2, go: true });
     apply({ op: 'entry', playerId: 1, category: 'cool', moves: [cool], rank: 0 });
     apply({ op: 'entry', playerId: 2, category: 'cute', moves: [cool], rank: 0 });
-    for (let k = 0; k < 100 && host.world.contest!.phase !== 'result'; k++) {
-      const c = host.world.contest!;
-      const e = c.phase === 'appeal' ? c.entrants[c.turn] : undefined;
-      if (e?.playerId != null && !c.shown) apply({ op: 'appeal', playerId: e.playerId, gauge: 0.7 });
-      else apply({ op: 'advance', playerId: 0 });
+    for (let k = 0; k < 30 * 120 && host.world.contest!.phase !== 'result'; k++) {
+      if (k % 150 === 0) apply({ op: 'appeal', playerId: 1 + (k % 2), gauge: 0.7 });
+      host.sim.step([]);
+      for (const ev of host.world.events) if (ev.type === 'contestApplied' && ev.command.op !== 'appeal' && ev.command.op !== 'open' && ev.command.op !== 'answer' && ev.command.op !== 'entry') seen.push(ev.command);
     }
+    // ゲストは cooldown を見ない。受け取った順に当てはめる
+    const g = guest.world as { role: string };
+    g.role = 'guest';
     for (const cmd of seen) applyContest(guest.world, cmd);
     expect(guest.world.contest!.results).toEqual(host.world.contest!.results);
+  });
+
+  it('ポロックは落ちた時に色が決まり、絵はそれぞれ違う。拾うとその部門が増える', () => {
+    const { world, players, rules } = setup();
+    spawnItem(world, 700, 'buff', 0, 0);
+    const it = world.items.find((x) => x.id === 700)!;
+    const def = rules.pickups.items.buff!.buffs[it.variant!]!;
+    expect(def.contest).toBeDefined();
+    expect(world.events.some((e) => e.type === 'itemSpawned' && e.id === 700 && e.variant === it.variant)).toBe(true);
+    confirmItem(world, 700, players[0]!.id);
+    expect(players[0]!.pokeblocks).toEqual({ [def.contest!]: 1 });
+    const art = rules.pickups.items.buff!.buffs.map((b) => b.sprite!);
+    expect(new Set(art).size).toBe(art.length);
+    for (const name of art) expect(itemSprites.sprites[name], name).toBeDefined();
+    expect(new Set(art.map((name) => itemSprites.sprites[name]!.join())).size).toBe(art.length);
   });
 
   it('タイプの絵はどれも技のドット絵にある', () => {

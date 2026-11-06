@@ -164,7 +164,7 @@ export interface World {
   readonly gems: GemStore;
   nextGemId: number;
   /** マップに落ちている道具（少ないので配列で持つ）。pending は拾ってホストの確定を待っている（ゲスト） */
-  readonly items: { id: number; kind: ItemKind; x: number; y: number; pending: boolean }[];
+  readonly items: { id: number; kind: ItemKind; x: number; y: number; pending: boolean; variant?: number }[];
   nextItemId: number;
   /** マップの箱と、次の箱を出すまでの残り（更新回数。ソロ・ホスト） */
   boxes: Box[];

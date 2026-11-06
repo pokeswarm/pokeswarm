@@ -262,7 +262,7 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         }
         break;
       case 'spawnItem':
-        if (world.role === 'guest') spawnItem(world, cmd.id, cmd.kind, cmd.x, cmd.y);
+        if (world.role === 'guest') spawnItem(world, cmd.id, cmd.kind, cmd.x, cmd.y, cmd.variant);
         break;
       case 'requestItem':
         if (world.role === 'host') confirmItem(world, cmd.id, cmd.by);

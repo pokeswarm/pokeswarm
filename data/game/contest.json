@@ -24,8 +24,8 @@
     "pokeblockChosen": 10,
     "pokeblockOther": 2,
     "moveUp": 3,
-    "moveMatch": 40,
-    "moveOther": 10
+    "moveMatch": 15,
+    "moveOther": 4
   },
   "placementPct": [
     100,
@@ -72,23 +72,17 @@
     }
   ],
   "bgm": "hoenn-contest",
-  "rounds": 2,
-  "primarySeconds": 3,
-  "appealSeconds": 5.5,
-  "npcTurnSeconds": 1.1,
-  "revealSeconds": 1,
-  "fastMultiplier": 3,
   "npcPrimaryShare": 0.6,
   "timing": {
     "bonus": 1,
+    "floor": 0.1,
+    "curve": 3,
     "great": 0.8,
     "good": 0.45,
-    "periodMin": 1.5,
-    "periodMax": 2.4,
+    "periodMin": 4,
+    "periodMax": 7,
     "riseShare": 0.75
   },
-  "crowdMax": 5,
-  "crowdBonus": 30,
   "npcMoves": {
     "zigzagoon": [
       "body-slam",
@@ -168,5 +162,8 @@
       "seconds": 0.8,
       "lift": 24
     }
-  ]
+  ],
+  "performanceSeconds": 30,
+  "cooldownSeconds": 3,
+  "npcMissSeconds": 0.9
 }

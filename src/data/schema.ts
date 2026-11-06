@@ -2477,6 +2477,8 @@ const boxBuffSchema = z.object({
   weight: z.number().positive(),
   healPct: z.number().positive().optional(),
   contest: z.string().optional(),
+  /** 地図の上の絵（data/render/items.json）。無ければ地方の絵 */
+  sprite: z.string().optional(),
 });
 
 export const pickupConfigSchema = z.object({
@@ -2608,21 +2610,17 @@ export const contestConfigSchema = z.object({
   ranks: z.array(z.object({ id: z.string(), npcScores: z.array(z.number()).min(1), coins: z.number().nonnegative() })).min(1),
   /** 会場の曲（出場を決めてから終わるまで） */
   bgm: z.string(),
-  /** 二次審査の回数（技を披露する回数） */
-  rounds: z.number().int().positive(),
-  /** 一次審査を見せる秒数・自分のアピールを待つ秒数・NPC の1回の秒数・アピールの結果を見せる秒数・はやおくりの倍率 */
-  primarySeconds: z.number().positive(),
-  appealSeconds: z.number().positive(),
-  npcTurnSeconds: z.number().positive(),
-  revealSeconds: z.number().positive(),
-  fastMultiplier: z.number().positive(),
-  /** NPC の点のうち一次審査の割合（残りを二次審査の回数で割る） */
+  /** アピールの制限時間（秒）・技を出してから次を出せるまで（秒）・NPC が山からずれる幅（秒） */
+  performanceSeconds: z.number().positive(),
+  cooldownSeconds: z.number().positive(),
+  npcMissSeconds: z.number().nonnegative(),
+  /** NPC の点のうちステータスの割合（残りが技の点） */
   npcPrimaryShare: z.number().min(0).max(1),
-  /** タイミング: 観客が一番盛り上がった瞬間で押すと点が (1 + bonus) 倍。great・good は評価の境目（空気 0〜1）。1 回の高まりの長さは periodMin〜periodMax（番ごと）、riseShare はそのうち高まっていく割合 */
-  timing: z.object({ bonus: z.number().nonnegative(), great: z.number(), good: z.number(), periodMin: z.number().positive(), periodMax: z.number().positive(), riseShare: z.number().gt(0).lt(1) }),
-  /** 観客の盛り上がり: crowdMax に届くと、その人に crowdBonus 点 */
-  crowdMax: z.number().int().positive(),
-  crowdBonus: z.number().nonnegative(),
+  /**
+   * 観客の波と技の点: 点の倍率は floor + (1 + bonus - floor) × 盛り上がり^curve（頂点で 1 + bonus）。great・good は評価の境目（0〜1）。
+   * 波の長さは periodMin〜periodMax（毎回変わる）、riseShare はそのうち高まっていく割合
+   */
+  timing: z.object({ bonus: z.number().nonnegative(), floor: z.number().nonnegative(), curve: z.number().positive(), great: z.number(), good: z.number(), periodMin: z.number().positive(), periodMax: z.number().positive(), riseShare: z.number().gt(0).lt(1) }),
   /** NPC の披露する技（技のキー） */
   npcMoves: z.record(z.string(), z.array(z.string())).default({}),
   /** 技を出していない間に順に回すアピールの動き（strut・spin・hop・flip・pose）。seconds は 1 回の長さ、lift は跳ぶ高さ */

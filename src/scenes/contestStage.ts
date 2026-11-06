@@ -10,6 +10,8 @@ const H = 180;
 const SLOT_X = [58, 124, 196, 262];
 const SLOT_Y = 106;
 const FRONT_Y = 136;
+/** 技を出している見た目の長さ（ミリ秒） */
+const CAST_MS = 800;
 /** 客の髪の色（後ろ姿の頭のてっぺん。暗い客席の中で一人ずつ見分けられるように） */
 const HAIR = ['#5b3a29', '#2f2f46', '#8a6a2f', '#6b2f4f', '#3f5a6b', '#4a3a6b'];
 
@@ -51,7 +53,7 @@ function shapeMotion(kind: string, p: number, lift: number): Motion {
 }
 
 /**
- * ポケモンコンテストの舞台（07 の192章）: 会場は自作の絵をコードで描く。Phaser と別に DOM の canvas へ描くので、
+ * ポケモンコンテストの舞台（07 の192・230章）: 会場は自作の絵をコードで描く。Phaser と別に DOM の canvas へ描くので、
  * 止まっているゲームの画面の上に出せる。ポケモンは public/sprites の絵、技は技のドット絵（data/render/move-sprites.json）をそのまま使う
  */
 export class ContestStage {
@@ -63,10 +65,9 @@ export class ContestStage {
   private backdropColor = '';
   /** 飛ぶ紙吹雪・ハート（見た目だけ。乱数はシミュレーションと別） */
   private readonly bits: { x: number; y: number; vx: number; vy: number; life: number; color: string; heart: boolean }[] = [];
-  private lastKey = '';
-  private keyAt = 0;
-  /** 前のコマの空気（高まっている途中か、冷めている途中か） */
-  private prevAir = 0;
+  private lastPhase = '';
+  /** 舞台の人ごとの、紙吹雪を出し終えた技の数 */
+  private burstDone = new Map<number, number>();
 
   constructor() {
     this.canvas = document.createElement('canvas');
@@ -80,50 +81,50 @@ export class ContestStage {
     this.backdrop.height = H;
   }
 
-  /**
-   * 観客の空気（0〜1。1 が一番盛り上がった瞬間）。自分の番に画面と同じ値を送る。
-   * 静かな所からゆっくり高まり（riseShare の間）、頂点の後は早く冷める。1 回の長さは番ごとに変わるので、拍子を覚えるのでなく客を見る
-   */
-  static airAt(seconds: number, periodSeconds: number, riseShare: number): number {
-    const f = (seconds / periodSeconds) % 1;
-    return f < riseShare ? f / riseShare : (1 - f) / (1 - riseShare);
-  }
-
-  /** 舞台を1コマ描く。spriteKeyOf は舞台の人のポケモンのキー。air があれば自分の番の観客の空気 */
-  draw(world: World, c: ContestState, spriteKeyOf: (playerId: number) => string, air: number | null, nowMs: number): void {
+  /** 舞台を1コマ描く。spriteKeyOf は舞台の人のポケモンのキー。air は観客の盛り上がり（アピールの間だけ） */
+  draw(world: World, c: ContestState, spriteKeyOf: (playerId: number) => string, localId: number, air: number | null, nowMs: number): void {
     const g = this.ctx;
-    const category = c.entrants.find((e) => e.category)?.category ?? 'cool';
+    const category = c.entrants.find((e) => e.playerId === localId)?.category ?? c.entrants.find((e) => e.category)?.category ?? 'cool';
+    const crowd = c.phase === 'result' ? 0.9 : (air ?? 0.08);
     this.paintBackdrop(category);
     g.drawImage(this.backdrop, 0, 0);
-    this.drawLights(g, c, nowMs, category);
-    const key = `${c.phase}:${c.round}:${c.turn}:${c.shown}`;
-    if (key !== this.lastKey) {
-      this.lastKey = key;
-      this.keyAt = nowMs;
-      if (c.shown && c.lastAppeal) this.burst(c, c.turn, c.lastAppeal.cheer);
+    if (c.phase !== this.lastPhase) {
+      this.lastPhase = c.phase;
       if (c.phase === 'result') this.confetti();
     }
+    const ageOf = (e: ContestState['entrants'][number]): number => (e.last && c.phase === 'appeal' ? (c.elapsed - e.last.at) * world.dt * 1000 : Infinity);
+    // 今 技を出している人にスポットライト。だれも出していなければ舞台の真ん中
+    const casting = c.entrants.findIndex((e) => ageOf(e) < CAST_MS);
+    this.drawLights(g, casting >= 0 ? SLOT_X[casting % SLOT_X.length]! : W / 2, crowd, nowMs, category);
     const winner = c.phase === 'result' ? c.results?.[0] : undefined;
     c.entrants.forEach((e, k) => {
-      const active = c.phase === 'appeal' && k === c.turn;
+      const age = ageOf(e);
+      const cast = age < CAST_MS;
+      if ((this.burstDone.get(k) ?? 0) !== e.appeals.length) {
+        this.burstDone.set(k, e.appeals.length);
+        if (e.last) this.burst(k, e.last.rating);
+      }
       const isWinner = !!winner && winner.playerId === e.playerId && winner.npc === e.npc;
       const x = isWinner ? W / 2 : SLOT_X[k % SLOT_X.length]!;
-      const y = active || isWinner ? FRONT_Y : SLOT_Y;
+      // 技を出すときは一歩前へ出る
+      const forward = cast ? Math.min(1, age / 120) * Math.min(1, (CAST_MS - age) / 160) : 0;
+      const y = isWinner ? FRONT_Y : SLOT_Y + (FRONT_Y - SLOT_Y) * forward;
       const dim = c.phase === 'result' && !isWinner ? 0.45 : 1;
-      // 技を出している間は技の形。それ以外はずっとアピールの動きを続ける。自分の番は客の空気と一緒に大きくなる
-      const motion = active && c.shown ? this.castMotion(nowMs - this.keyAt) : active && air !== null ? this.climaxMotion(air, nowMs) : c.phase === 'result' && !isWinner ? REST : this.routineMotion(world, k, nowMs);
-      this.drawPokemon(g, e.playerId !== null ? spriteKeyOf(e.playerId) : e.npc!, x, y, active || isWinner ? 2 : 1.5, motion, nowMs + k * 130, dim);
-      // これまでのハートの数を足元に（一次審査の後から見せる）
-      if (c.phase !== 'branch' && c.phase !== 'entry') this.drawHearts(g, x, y + 7, e.primary + e.appeals.reduce((a, b) => a + b, 0), c.phase === 'primary' ? (nowMs - this.keyAt) / 180 : 99);
+      // 技を出している間は技の形。それ以外はずっとアピールの動きを続ける
+      const motion = cast ? this.castMotion(age) : c.phase === 'result' && !isWinner ? REST : this.routineMotion(world, k, nowMs);
+      this.drawPokemon(g, e.playerId !== null ? spriteKeyOf(e.playerId) : e.npc!, x, y, isWinner ? 2 : 1.5 + 0.5 * forward, motion, nowMs + k * 130, dim);
+      // 自分のポケモンの印（足元の小さな三角）
+      if (e.playerId === localId && c.phase === 'appeal') {
+        g.fillStyle = '#f8d030';
+        for (let r = 0; r < 4; r++) g.fillRect(Math.round(x) - 3 + r, Math.round(y) + 12 - r, 7 - r * 2, 1);
+      }
     });
     // 披露している技
-    if (c.phase === 'appeal' && c.shown && c.lastAppeal?.move !== null && c.lastAppeal) {
-      const x = SLOT_X[c.turn % SLOT_X.length]!;
-      this.drawMoveArt(g, world, c.lastAppeal.move!, x, FRONT_Y - 62, nowMs - this.keyAt);
-    }
-    this.prevAir = air ?? 0;
-    this.drawAudience(g, this.airOf(c, air, nowMs), category, nowMs);
-    this.drawCrowdMeter(g, c, world);
+    c.entrants.forEach((e, k) => {
+      const age = ageOf(e);
+      if (age < CAST_MS && e.last?.move !== null && e.last) this.drawMoveArt(g, world, e.last.move!, SLOT_X[k % SLOT_X.length]!, FRONT_Y - 62, age);
+    });
+    this.drawAudience(g, crowd, category, nowMs);
     this.drawBits(g);
   }
 
@@ -133,15 +134,16 @@ export class ContestStage {
     for (let k = 0; k < 60; k++) this.bits.push({ x: Math.random() * W, y: -Math.random() * 60, vx: (Math.random() - 0.5) * 12, vy: 22 + Math.random() * 30, life: 3.5, color: colors[k % colors.length]!, heart: false });
   }
 
-  private burst(c: ContestState, turn: number, cheer: boolean): void {
-    const x = SLOT_X[turn % SLOT_X.length]!;
-    const n = cheer ? 24 : 7;
-    for (let k = 0; k < n; k++) {
-      const a = -Math.PI / 2 + (Math.random() - 0.5) * (cheer ? 2.4 : 1.2);
-      const v = 30 + Math.random() * (cheer ? 70 : 30);
+  /** 技を出した人から上がるハート（出来が良いほど多い） */
+  private burst(k: number, rating: 'great' | 'good' | 'ok'): void {
+    const x = SLOT_X[k % SLOT_X.length]!;
+    const great = rating === 'great';
+    const n = great ? 18 : rating === 'good' ? 7 : 2;
+    for (let i = 0; i < n; i++) {
+      const a = -Math.PI / 2 + (Math.random() - 0.5) * (great ? 2.2 : 1.2);
+      const v = 30 + Math.random() * (great ? 60 : 30);
       this.bits.push({ x, y: FRONT_Y - 20, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, color: '#ff5c8a', heart: true });
     }
-    if (c.lastAppeal?.points === 0) this.bits.length = 0;
   }
 
   private drawBits(g: CanvasRenderingContext2D): void {
@@ -227,11 +229,10 @@ export class ContestStage {
     g.fillRect(W / 2 - 2, 6, 4, 4);
   }
 
-  /** ゆっくり動くスポットライト。盛り上がると広くなる（明滅はさせない） */
-  private drawLights(g: CanvasRenderingContext2D, c: ContestState, nowMs: number, category: string): void {
+  /** ゆっくり動くスポットライト。盛り上がると濃くなる（明滅はさせない） */
+  private drawLights(g: CanvasRenderingContext2D, aim: number, crowd: number, nowMs: number, category: string): void {
     const accent = CATEGORY_COLOR[category] ?? '#ffffff';
     g.save();
-    const aim = c.phase === 'appeal' ? SLOT_X[c.turn % SLOT_X.length]! : W / 2;
     g.globalAlpha = 0.22;
     g.fillStyle = '#fff6c8';
     g.beginPath();
@@ -240,7 +241,7 @@ export class ContestStage {
     g.lineTo(aim + 30, FRONT_Y + 10);
     g.lineTo(aim - 30, FRONT_Y + 10);
     g.fill();
-    g.globalAlpha = 0.1 + 0.02 * c.crowd;
+    g.globalAlpha = 0.1 + 0.1 * crowd;
     g.fillStyle = accent;
     for (const side of [0, 1]) {
       const swing = Math.sin(nowMs / 1400 + side * 2) * 40;
@@ -253,17 +254,6 @@ export class ContestStage {
       g.fill();
     }
     g.restore();
-  }
-
-  /** 今の客の空気: 自分の番はその値。アピールの直後は出来に応じて沸いて冷める。ほかは今までの盛り上がりの分だけ */
-  private airOf(c: ContestState, air: number | null, nowMs: number): number {
-    if (air !== null) return air;
-    const base = 0.08 + c.crowd * 0.08;
-    if (c.phase === 'result') return 0.9;
-    if (c.phase !== 'appeal' || !c.shown || !c.lastAppeal) return base;
-    const a = c.lastAppeal;
-    const peak = a.cheer || a.rating === 'great' ? 1 : a.rating === 'npc' || a.rating === 'good' ? 0.72 : 0.35;
-    return Math.max(base, peak * Math.max(0, 1 - (nowMs - this.keyAt) / 900));
   }
 
   /**
@@ -326,34 +316,6 @@ export class ContestStage {
     }
   }
 
-  /** 集めた点をハートで見せる（点そのものは結果まで出さない）。1 列 8 個 */
-  private drawHearts(g: CanvasRenderingContext2D, x: number, y: number, score: number, upTo: number): void {
-    const n = Math.min(16, Math.ceil(score / 30), Math.floor(upTo));
-    for (let k = 0; k < n; k++) {
-      const hx = Math.round(x - 16 + (k % 8) * 4.5);
-      const hy = y + Math.floor(k / 8) * 5;
-      g.fillStyle = '#3a1020';
-      g.fillRect(hx - 1, hy - 1, 6, 5);
-      g.fillStyle = '#ff5c8a';
-      g.fillRect(hx, hy, 1, 1);
-      g.fillRect(hx + 2, hy, 2, 1);
-      g.fillRect(hx, hy + 1, 4, 1);
-      g.fillRect(hx + 1, hy + 2, 2, 1);
-    }
-  }
-
-  private drawCrowdMeter(g: CanvasRenderingContext2D, c: ContestState, world: World): void {
-    const max = world.rules.contest?.crowdMax ?? 5;
-    if (c.phase !== 'appeal') return;
-    for (let k = 0; k < max; k++) {
-      const x = W - 14 - (max - 1 - k) * 12;
-      g.fillStyle = k < c.crowd ? '#ffd54f' : '#3b2f55';
-      // 小さな星
-      g.fillRect(x - 1, 22, 3, 7);
-      g.fillRect(x - 3, 24, 7, 3);
-    }
-  }
-
   /** ふだんのアピールの動きの並び（data の motions）を、人ごとにずらして順に回す */
   private routineMotion(world: World, k: number, nowMs: number): Motion {
     const list = world.rules.contest?.motions ?? [];
@@ -369,18 +331,9 @@ export class ContestStage {
     return REST;
   }
 
-  /** 自分の番: 客の空気が高まるのに合わせて動きが大きくなり、頂点でバク転を決める。冷めると決めポーズ */
-  private climaxMotion(air: number, nowMs: number): Motion {
-    const rising = air >= this.prevAir;
-    if (!rising) return shapeMotion('pose', 1 - air, 0);
-    if (air < 0.3) return shapeMotion('strut', (nowMs / 900) % 1, 2);
-    if (air < 0.6) return shapeMotion('spin', ((air - 0.3) / 0.3) * 2 % 1, 3);
-    return shapeMotion('flip', (air - 0.6) / 0.4, 26);
-  }
-
   /** 技を出している間 */
   private castMotion(ageMs: number): Motion {
-    return { anim: ['Attack', 'Charge'], dir: 0, progress: Math.min(0.999, ageMs / 700), rotate: 0, lift: Math.max(0, 6 - ageMs / 40), loop: false };
+    return { anim: ['Attack', 'Charge'], dir: 0, progress: Math.min(0.999, ageMs / CAST_MS), rotate: 0, lift: Math.max(0, 6 - ageMs / 40), loop: false };
   }
 
   private drawPokemon(g: CanvasRenderingContext2D, key: string, x: number, y: number, scale: number, motion: Motion, nowMs: number, alpha: number): void {

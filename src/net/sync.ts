@@ -180,7 +180,7 @@ export class SyncSession {
           if (host) out.push({ t: 'sa', s: ev.section });
           break;
         case 'itemSpawned':
-          if (host) itemSpawns.push(ev.id, ITEM_KINDS.indexOf(ev.kind), round2(ev.x), round2(ev.y));
+          if (host) itemSpawns.push(ev.id, ITEM_KINDS.indexOf(ev.kind), round2(ev.x), round2(ev.y), ev.variant ?? -1);
           break;
         case 'itemRequested':
           if (role === 'guest') itemRequests.push(ev.id);
@@ -421,7 +421,7 @@ export class SyncSession {
           if (guest) cmds.push({ type: 'setSection', section: m.s });
           break;
         case 'is':
-          if (guest) for (let k = 0; k + 3 < m.e.length; k += 4) cmds.push({ type: 'spawnItem', id: m.e[k]!, kind: ITEM_KINDS[m.e[k + 1]!]!, x: m.e[k + 2]!, y: m.e[k + 3]! });
+          if (guest) for (let k = 0; k + 4 < m.e.length; k += 5) cmds.push({ type: 'spawnItem', id: m.e[k]!, kind: ITEM_KINDS[m.e[k + 1]!]!, x: m.e[k + 2]!, y: m.e[k + 3]!, ...(m.e[k + 4]! >= 0 && { variant: m.e[k + 4]! }) });
           break;
         case 'iq':
           if (host) for (const id of m.e) cmds.push({ type: 'requestItem', id, by: from });

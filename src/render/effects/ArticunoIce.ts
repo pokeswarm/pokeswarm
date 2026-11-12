@@ -254,7 +254,8 @@ export class ArticunoIce {
 
   /** 雹: 地面の影が濃くなり、上から氷の粒が落ちてくる */
   private drawHail(hz: World['hazards'][number], p: number): void {
-    this.gn.fillStyle(0x0d1b2a, 0.15 + 0.4 * p).fillEllipse(hz.x, hz.y, hz.radius * 1.6 * (0.5 + 0.5 * p), hz.radius * 0.7 * (0.5 + 0.5 * p));
+    // 落ちる直前の影は、当たる広さ（直径）と同じ横幅
+    this.gn.fillStyle(0x0d1b2a, 0.15 + 0.4 * p).fillEllipse(hz.x, hz.y, hz.radius * 2 * (0.5 + 0.5 * p), hz.radius * 0.9 * (0.5 + 0.5 * p));
     const fall = (1 - p) * (1 - p) * 260;
     if (p > 0.35) this.image('articuno-hail').setPosition(hz.x, hz.y - fall).setScale(DOT * 1.3).setRotation(p * 4).setDepth(this.depth + 0.03);
   }

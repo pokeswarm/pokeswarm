@@ -934,21 +934,477 @@ function suicuneWall(): (Rgb | null)[] {
   return out;
 }
 
-const outDir = path.join('public', 'map', 'johto');
-fs.mkdirSync(outDir, { recursive: true });
+// --- ミュウツー: ハナダのどうくつの最深部（暗い岩の床に、地底の水がしみ出した大きな水たまり。07 の250章） ---
+
+/** 技の紫・桃色・青と重ならないよう、床は暗い青灰色。線で囲まず、大きな面の明るさの違いで岩の板を見せる */
+const CAVE = ['#14141e', '#191a25', '#20212d', '#282a37', '#313343'].map(hex);
+const CAVE_WATER = ['#081218', '#0b1820', '#0f2029', '#132833', '#18313d'].map(hex);
+const CAVE_WET = hex('#1d2633');
+const CAVE_SHORE = hex('#394656');
+
+/** 地底の水（0 なら床、0〜1 は深さ）: 左下と右上に大きな水たまり、下の右寄りに細い入り江。真ん中は空ける */
+function caveWater(x: number, y: number): number {
+  const pools = [
+    { cx: 70, cy: 380, rx: 190, ry: 120 },
+    { cx: 760, cy: 50, rx: 170, ry: 100 },
+    { cx: 600, cy: 455, rx: 150, ry: 46 },
+    { cx: 20, cy: 40, rx: 70, ry: 60 },
+  ];
+  let best = 0;
+  for (const p of pools) {
+    const warp = (fbm(x / 60, y / 60, 701 + p.cx) - 0.5) * 0.7 + (fbm(x / 18, y / 18, 709) - 0.5) * 0.14;
+    const d = Math.hypot((x - p.cx) / p.rx, (y - p.cy) / p.ry) + warp;
+    if (d < 1) best = Math.max(best, Math.min(1, (1 - d) / 0.35));
+  }
+  return best;
+}
+
+// --- フリーザー: ふたごじまの最深部（凍えた岩の床を、海水の流れが 2 本斜めに横切る。07 の251章） ---
+
+/** フリーズドライで凍る帯と同じ折れ線（data/game/stage.json の articuno-freeze-dry の arenaPaths。ワールドの単位で、マップの真ん中から） */
+const SEA_PATHS: { radius: number; points: [number, number][] }[] = (() => {
+  const stage = JSON.parse(fs.readFileSync(path.join('data', 'game', 'stage.json'), 'utf8')) as { moves: { id: string; arenaPaths?: { radius: number; points: [number, number][] }[] }[] };
+  return stage.moves.find((m) => m.id === 'articuno-freeze-dry')?.arenaPaths ?? [];
+})();
+
+/** 技の白・水色と重ならないよう、床は暗い青い岩。氷は床の色を少し明るくしたうすい膜だけ */
+const SEA_ROCK = ['#121a24', '#17212d', '#1d2836', '#243141', '#2c3a4c'].map(hex);
+const SEA = ['#071a26', '#0a2231', '#0d2a3b', '#113346', '#163d52'].map(hex);
+const SEA_FOAM = hex('#5f8ea6');
+const FROST_RIM = hex('#4c6a80');
+
+/** 海水の流れの中なら、帯の縁からの深さ（ドット。0 以下は外） */
+function seaDepth(x: number, y: number): number {
+  // ドット → ワールド（マップの真ん中から）
+  const wx = x * 2 - W;
+  const wy = y * 2 - H;
+  let best = -Infinity;
+  for (const path of SEA_PATHS) {
+    for (let k = 0; k + 1 < path.points.length; k++) {
+      const [x0, y0] = path.points[k]!;
+      const [x1, y1] = path.points[k + 1]!;
+      const dx = x1 - x0;
+      const dy = y1 - y0;
+      const t = Math.max(0, Math.min(1, ((wx - x0) * dx + (wy - y0) * dy) / (dx * dx + dy * dy)));
+      const d = Math.hypot(wx - (x0 + dx * t), wy - (y0 + dy * t));
+      best = Math.max(best, (path.radius - d) / 2);
+    }
+  }
+  // 縁は少し内側でゆらす（絵の水は当たる帯からはみ出さない）
+  return best - 3 - fbm(x / 14, y / 14, 801) * 4;
+}
+
+function articunoFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
+  const floor: Rgb[] = [];
+  const shimmerA: (Rgb | null)[] = [];
+  const shimmerB: (Rgb | null)[] = [];
+  const glintA = hex('#6fa7c0');
+  const glintB = hex('#9ccbe0');
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const sea = seaDepth(x, y);
+    let col: Rgb;
+    if (sea > 0) {
+      // 流れの真ん中ほど深い。流れに沿ったゆるいむら
+      const t = 0.7 - Math.min(1, sea / 30) * 0.5 + (fbm(x / 30 + y / 60, y / 18 - x / 40, 811) - 0.5) * 0.35;
+      col = ramp(SEA, t, x, y);
+      // 水ぎわの 1 ドットだけ、ところどころ明るく（輪郭の線に見えないように）
+      if (sea < 1 && fbm(x / 9, y / 9, 843) > 0.45) col = FROST_RIM;
+      // 泡: 流れの向き（斜め）に短く、まばら
+      if (sea > 4 && valueNoise((x + y * 0.62) / 3, (y - x * 0.62) / 16, 813) > 0.9 && hash2(x >> 1, y, 815) > 0.65) col = SEA_FOAM;
+      const g1 = valueNoise((x + y * 0.62) / 3.5, (y - x * 0.62) / 20, 817);
+      shimmerA.push(sea > 6 && g1 > 0.9 && hash2(x >> 2, y, 819) > 0.7 ? glintA : null);
+      const g2 = valueNoise((x + y * 0.62) / 3.5 + 9, (y - x * 0.62) / 20 + 4, 821);
+      shimmerB.push(sea > 6 && g2 > 0.91 && hash2(x >> 2, y, 823) > 0.72 ? glintB : null);
+    } else {
+      // 凍えた岩: 大きな明暗の面（線で囲まない）と、うすい氷の膜
+      const slab = worley(x, y, 64, 831);
+      let t = 0.44 + (fbm(x / 100, y / 100, 833) - 0.5) * 0.45 + (hash2(slab.id, 1, 835) - 0.5) * 0.16 + (fbm(x / 18, y / 18, 837) - 0.5) * 0.14;
+      // 水ぎわはしぶきで暗くぬれる
+      if (sea > -6) t -= 0.12;
+      col = ramp(SEA_ROCK, t, x, y);
+      // 氷の膜: 大きなまだらの所だけ、少し明るい青
+      const ice = fbm(x / 50, y / 50, 839);
+      if (ice > 0.68 && sea < -8) col = ramp(SEA_ROCK, t + 0.14, x, y);
+      // 水ぎわの霜（1〜2 ドット）
+      if (sea > -1.2 && fbm(x / 9, y / 9, 845) > 0.5) col = FROST_RIM;
+      // まばらな雪の粒
+      if (hash2(x, y, 841) > 0.997) col = hex('#5d7489');
+      shimmerA.push(null);
+      shimmerB.push(null);
+    }
+    floor.push(col);
+  }
+  return { floor, shimmerA, shimmerB };
+}
+
+const ICE_WALL = ['#0a0f17', '#0f1620', '#151f2c', '#1d2a3a', '#283849'].map(hex);
+
+function articunoWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const dark = hex('#05080d');
+  const rimLight = hex('#8fb0c6');
+  const rimDark = hex('#0e151e');
+  const icicle = ['#3f6178', '#6f97ae', '#a9cadb'].map(hex);
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = inset(iy, 21) - ix;
+    const fromRight = ix - (W - 1 - inset(iy, 22));
+    const fromTop = inset(ix, 23) - iy;
+    const fromBottom = iy - (H - 1 - inset(ix, 24));
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    const isTop = fromTop >= Math.max(fromLeft, fromRight, fromBottom);
+    const size = isTop ? 24 : 18;
+    const stone = worley(x, y, size, 851);
+    const round = (stone.dx + stone.dy) / size;
+    let t = 0.48 + round * 0.4 + (hash2(stone.id, 2, 853) - 0.5) * 0.22 + (fbm(x / 28, y / 28, 855) - 0.5) * 0.3;
+    t -= Math.max(0, dist - 8) * 0.014;
+    let col = ramp(ICE_WALL, t, x, y);
+    if (stone.edge < 0.8) col = ICE_WALL[0]!;
+    if (dist > MARGIN - 14 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (dist - (MARGIN - 14)) / 14) col = dark;
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 2.5) col = rimLight;
+    // 上の壁の下の縁から垂れる、つらら（長さはまちまち。間をあける）
+    if (isTop && fromTop > 2 && fromTop < 22) {
+      // まばらに、長さも太さもまちまち（くしの歯に見えないように）
+      const col4 = Math.floor(x / 9);
+      const len = hash2(col4, 1, 857) > 0.72 ? 5 + hash2(col4, 2, 859) * 16 : 0;
+      const k = x - col4 * 9 - Math.floor(hash2(col4, 3, 861) * 4);
+      const w = (1 - (fromTop - 2) / Math.max(1, len)) * 2.2;
+      if (len > 0 && fromTop - 2 < len && Math.abs(k - 2) < w) col = icicle[k < 2 ? 2 : k === 2 ? 1 : 0]!;
+    }
+    out.push(col);
+  }
+  return out;
+}
+
+// --- サンダー: 無人発電所（ひび割れたコンクリートの床。壁ぎわに発電機が 6 基。07 の252章） ---
+
+/** 発電機の場所（data/game/stage.json の zapdos-thunderbolt の arenaLinks.nodes。ワールドの単位で、マップの真ん中から） */
+const GENERATORS: [number, number][] = (() => {
+  const stage = JSON.parse(fs.readFileSync(path.join('data', 'game', 'stage.json'), 'utf8')) as { moves: { id: string; arenaLinks?: { nodes: [number, number][] } }[] };
+  return stage.moves.find((m) => m.id === 'zapdos-thunderbolt')?.arenaLinks?.nodes ?? [];
+})();
+
+/** 電撃の黄色と重ならないよう、床は青みの暗い灰色 */
+const CONCRETE = ['#15171c', '#1a1d23', '#20232a', '#272a32', '#2f333b'].map(hex);
+const STAIN = hex('#111317');
+/** 床のひび: 決まった数本だけ、曲がりながら伸びる線（網目に見えないように） */
+const CRACKS: Uint8Array = (() => {
+  const m = new Uint8Array(W * H);
+  for (let k = 0; k < 9; k++) {
+    let x = 40 + hash2(k, 1, 931) * (W - 80);
+    let y = 40 + hash2(k, 2, 933) * (H - 80);
+    let a = hash2(k, 3, 935) * Math.PI * 2;
+    const len = 40 + hash2(k, 4, 937) * 70;
+    for (let t = 0; t < len; t++) {
+      x += Math.cos(a);
+      y += Math.sin(a);
+      a += (hash2(k * 97 + t, 5, 939) - 0.5) * 0.6;
+      const i = Math.round(y) * W + Math.round(x);
+      if (x < 1 || y < 1 || x > W - 2 || y > H - 2) break;
+      m[i] = 1;
+      // 短い枝
+      if (t % 23 === 11) {
+        let bx = x;
+        let by = y;
+        const ba = a + (hash2(k, t, 941) > 0.5 ? 1 : -1);
+        for (let u = 0; u < 9; u++) {
+          bx += Math.cos(ba);
+          by += Math.sin(ba);
+          const j = Math.round(by) * W + Math.round(bx);
+          if (j >= 0 && j < m.length) m[j] = 1;
+        }
+      }
+    }
+  }
+  return m;
+})();
+
+function zapdosFloor(): { floor: Rgb[] } {
+  const floor: Rgb[] = [];
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    // 打ち継ぎの大きな板（境は線で引かず、板ごとの明るさだけ）
+    const slab = worley(x, y, 90, 901);
+    let t = 0.46 + (fbm(x / 120, y / 120, 903) - 0.5) * 0.4 + (hash2(slab.id, 1, 905) - 0.5) * 0.08 + (fbm(x / 16, y / 16, 907) - 0.5) * 0.18;
+    // 発電機のまわりは焦げて暗い
+    let near = Infinity;
+    for (const [gx, gy] of GENERATORS) near = Math.min(near, Math.hypot(x - (gx + W) / 2, y - (gy + H) / 2));
+    t -= Math.max(0, 1 - near / 90) * 0.25;
+    let col = ramp(CONCRETE, t, x, y);
+    // 油のしみ（大きなまだら）
+    if (fbm(x / 46, y / 46, 909) > 0.74) col = mix(col, STAIN, 0.3);
+    // 細いひび（数本だけ。網目にしない）
+    if (CRACKS[y * W + x]) col = CONCRETE[0]!;
+    // まばらな砂粒
+    const r = hash2(x, y, 917);
+    if (r > 0.994) col = CONCRETE[4]!;
+    floor.push(col);
+  }
+  return { floor };
+}
+
+const PLANT_WALL = ['#0b0c10', '#101217', '#16191f', '#1e2229', '#282d35'].map(hex);
+
+function zapdosWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const dark = hex('#050608');
+  const rimLight = hex('#5a606c');
+  const rimDark = hex('#0d0f13');
+  const metal = ['#2a2f38', '#3a414c', '#525b68', '#76808d'].map(hex);
+  const coil = ['#5a3418', '#8a5426', '#c07a38'].map(hex);
+  const stripeY = hex('#c9a227');
+  const stripeK = hex('#16161a');
+  const lamp = ['#7a6a1a', '#ffe066'].map(hex);
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = -ix;
+    const fromRight = ix - (W - 1);
+    const fromTop = -iy;
+    const fromBottom = iy - (H - 1);
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    let col: Rgb | null = null;
+    if (dist > 0) {
+      // 壁: 金属の板（縦の継ぎ目と、ところどころのリベット）
+      const isTop = fromTop >= Math.max(fromLeft, fromRight, fromBottom);
+      const isBottom = fromBottom >= Math.max(fromLeft, fromRight, fromTop);
+      const along = isTop || isBottom ? x : y;
+      const panel = Math.floor((along + 7) / 26);
+      let t = 0.45 + (hash2(panel, isTop ? 1 : isBottom ? 2 : 3, 921) - 0.5) * 0.25 + (fbm(x / 20, y / 20, 923) - 0.5) * 0.2 - Math.max(0, dist - 8) * 0.012;
+      col = ramp(PLANT_WALL, t, x, y);
+      if ((along + 7) % 26 === 0) col = PLANT_WALL[0]!;
+      if ((along + 7) % 26 === 3 && dist % 9 === 4) col = PLANT_WALL[4]!;
+      // 上の壁の 2 本の太い配管
+      if (isTop && (Math.abs(fromTop - 14) < 3 || Math.abs(fromTop - 30) < 2)) {
+        const k = Math.abs(fromTop - 14) < 3 ? fromTop - 14 : fromTop - 30;
+        col = k < -1 ? metal[2]! : k > 1 ? metal[0]! : metal[1]!;
+        if (x % 58 === 0) col = metal[3]!;
+      }
+      if (dist > MARGIN - 14 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (dist - (MARGIN - 14)) / 14) col = dark;
+      if (dist <= 1) col = rimDark;
+      else if (dist <= 2.5) col = rimLight;
+    }
+    // 発電機: 壁にはまった箱。真ん中に銅のコイル、ふちに黄色と黒の帯、ランプ
+    for (const [gx, gy] of GENERATORS) {
+      // 壁の方へ少しずらす（体の 3 分の 2 が壁に入る）
+      const cx = (gx + W) / 2 + MARGIN + Math.sign(gx) * (Math.abs(gx) >= W - 1 ? 9 : 0);
+      const cy = (gy + H) / 2 + MARGIN + Math.sign(gy) * (Math.abs(gy) >= H - 1 ? 9 : 0);
+      const dx = x - cx;
+      const dy = y - cy;
+      const hw = 28;
+      const hh = 22;
+      if (Math.abs(dx) > hw || Math.abs(dy) > hh) continue;
+      const edge = Math.min(hw - Math.abs(dx), hh - Math.abs(dy));
+      if (edge < 1) col = PLANT_WALL[0]!;
+      else if (edge < 3.5) col = (Math.floor((dx + dy + 40) / 3) % 2 === 0 ? stripeY : stripeK);
+      else {
+        col = metal[Math.abs(dy) < 2 ? 2 : dy < 0 ? 1 : 0]!;
+        // コイル（横に巻いた銅線）
+        if (Math.abs(dx) < 16 && Math.abs(dy) < 11) col = coil[Math.abs(dy) < 2 ? 2 : (Math.abs(dy) + (dx & 1)) % 2 ? 1 : 0]!;
+        // ランプ（左上）
+        if (Math.hypot(dx + 21, dy + 15) < 2.6) col = lamp[1]!;
+        else if (Math.hypot(dx + 21, dy + 15) < 3.8) col = lamp[0]!;
+      }
+    }
+    out.push(col);
+  }
+  return out;
+}
+
+// --- ファイヤー: ともしびやまの山頂（暗い火山の岩の頂。縁の外は雲の海と夜空。07 の253章） ---
+
+/** 炎の橙・赤・白と重ならないよう、床は少し紫がかった暗い灰色の岩。溶岩は置かない（エンテイと分ける） */
+const SUMMIT = ['#18161b', '#1e1b21', '#252128', '#2d2830', '#36303a'].map(hex);
+const ASH_PATCH = hex('#3f3a43');
+
+function moltresFloor(): { floor: Rgb[] } {
+  const floor: Rgb[] = [];
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    // ごつごつした岩の面（大きな明暗。境に線を引かない）
+    const rock = worley(x, y, 58, 951);
+    const round = (rock.dx * 0.6 + rock.dy) / 58;
+    let t = 0.44 + round * 0.1 + (hash2(rock.id, 1, 953) - 0.5) * 0.07 + (fbm(x / 90, y / 90, 955) - 0.5) * 0.35 + (fbm(x / 14, y / 14, 957) - 0.5) * 0.14;
+    // 真ん中は踏みならされて平ら（明暗が少ない）
+    const center = Math.hypot((x - W / 2) / (W / 2), (y - H / 2) / (H / 2));
+    if (center < 0.5) t = t * 0.7 + 0.46 * 0.3;
+    let col = ramp(SUMMIT, t, x, y);
+    // 灰が積もった所（風下の大きなまだら）
+    // 境はぼかす（はっきりした形のまだらは迷彩柄に見えた）
+    const ash = fbm(x / 80 + y / 160, y / 60, 959);
+    if (ash > 0.66) col = mix(col, ASH_PATCH, Math.min(0.3, (ash - 0.66) * 3));
+    // 古い噴気孔（小さな暗いくぼみ。数か所だけ）
+    for (const [vx, vy] of [[150, 90], [640, 340], [700, 110], [110, 360]] as const) {
+      const d = Math.hypot((x - vx) / 1.3, y - vy);
+      if (d < 7 + fbm(x / 6, y / 6, 961) * 3) col = SUMMIT[0]!;
+      else if (d < 11) col = mix(col, SUMMIT[1]!, 0.6);
+    }
+    if (hash2(x, y, 963) > 0.995) col = SUMMIT[4]!;
+    floor.push(col);
+  }
+  return { floor };
+}
+
+const CLOUD = ['#2a2a3c', '#3a3a52', '#4f4d68', '#6a6684'].map(hex);
+const NIGHT = ['#07070f', '#0b0b17', '#10101f'].map(hex);
+
+function moltresWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const rimLight = hex('#6a6070');
+  const rimDark = hex('#121014');
+  const cliff = ['#141216', '#1c191f', '#26222a', '#322d37'].map(hex);
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = inset(iy, 31) - ix;
+    const fromRight = ix - (W - 1 - inset(iy, 32));
+    const fromTop = inset(ix, 33) - iy;
+    const fromBottom = iy - (H - 1 - inset(ix, 34));
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    // 頂の縁の岩（内側の 10〜16 ドット。ところどころ欠ける）
+    const lip = 14 + fbm(x / 14, y / 14, 971) * 8;
+    let col: Rgb;
+    if (dist < lip) {
+      const stone = worley(x, y, 16, 973);
+      const round = (stone.dx + stone.dy) / 16;
+      col = ramp(cliff, 0.5 + round * 0.4 + (hash2(stone.id, 1, 975) - 0.5) * 0.3, x, y);
+      if (stone.edge < 0.7) col = cliff[0]!;
+    } else {
+      // 縁の外: 下に雲の海、遠くは夜空（外ほど暗い）
+      const far = (dist - lip) / (MARGIN - lip);
+      // 雲の海: 横に長いやわらかな帯（細かい斑にしない）。縁に近いほど雲が厚い
+      const c = fbm(x / 60, y / 10, 977) * 0.85 + fbm(x / 22, y / 6, 979) * 0.15 - far * 0.35;
+      col = c > 0.36 ? ramp(CLOUD, (c - 0.36) * 2.6, x, y, 0.4) : ramp(NIGHT, 1 - far, x, y);
+      // まばらな星（雲の無い所）
+      if (col === NIGHT[0] || col === NIGHT[1] || col === NIGHT[2]) if (hash2(x, y, 981) > 0.992) col = hex('#8a86a8');
+    }
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 2.5) col = rimLight;
+    out.push(col);
+  }
+  return out;
+}
+
+function mewtwoFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
+  const floor: Rgb[] = [];
+  const shimmerA: (Rgb | null)[] = [];
+  const shimmerB: (Rgb | null)[] = [];
+  const glintA = hex('#5d8ea3');
+  const glintB = hex('#7fb0c2');
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const w = caveWater(x, y);
+    let col: Rgb;
+    if (w > 0) {
+      // 深いほど暗い。水面に天井の暗さが映るむら
+      const t = 0.75 - w * 0.6 + (fbm(x / 40, y / 22, 721) - 0.5) * 0.35;
+      col = ramp(CAVE_WATER, t, x, y);
+      // 岸の 1〜2 ドット: ぬれた岩のふち
+      const near = caveWater(x + 2, y) === 0 || caveWater(x - 2, y) === 0 || caveWater(x, y + 2) === 0 || caveWater(x, y - 2) === 0;
+      if (near && w < 0.25) col = CAVE_SHORE;
+      // 水面の光（ゆっくり交互に）
+      // まばらな短い横の光（細かい点を散らすと砂嵐に見えた）
+      const ripple = valueNoise(x / 22, y / 2.6, 731);
+      shimmerA.push(ripple > 0.9 && hash2(x >> 2, y, 733) > 0.7 && w > 0.4 ? glintA : null);
+      const ripple2 = valueNoise(x / 22 + 7, y / 2.6 + 3, 737);
+      shimmerB.push(ripple2 > 0.91 && hash2(x >> 2, y, 739) > 0.72 && w > 0.4 ? glintB : null);
+    } else {
+      // 岩の板: 大きなむらと、板ごとの明るさ（境に線を引かない）
+      const slab = worley(x, y, 74, 741);
+      const center = Math.hypot((x - W / 2) / (W / 2), (y - H / 2) / (H / 2));
+      let t = 0.4 + Math.max(0, 1 - center) * 0.2 + (fbm(x / 110, y / 110, 743) - 0.5) * 0.5 + (hash2(slab.id, 1, 745) - 0.5) * 0.18 + (fbm(x / 20, y / 20, 747) - 0.5) * 0.16;
+      // 水の近くはぬれて暗い
+      let wet = 0;
+      for (const [dx, dy] of [[6, 0], [-6, 0], [0, 6], [0, -6], [12, 0], [-12, 0], [0, 12], [0, -12]] as const) if (caveWater(x + dx, y + dy) > 0) wet++;
+      t -= wet * 0.035;
+      col = ramp(CAVE, t, x, y);
+      if (wet >= 3 && hash2(x, y, 749) > 0.5) col = CAVE_WET;
+      // 壁ぎわの砂利（細かい明暗）
+      const edge = Math.min(x, y, W - 1 - x, H - 1 - y);
+      if (edge < 26 && hash2(x, y, 753) > 0.55 + edge / 60) col = hash2(x, y, 755) > 0.5 ? CAVE[3]! : CAVE[1]!;
+      // 小さな水たまり（まばら）
+      if (fbm(x / 9, y / 6, 757) > 0.8 && fbm(x / 70, y / 70, 759) > 0.55) col = hash2(x, y, 761) > 0.85 ? CAVE_SHORE : CAVE_WATER[2]!;
+      // まばらな小石（明るい点と影の点。囲む線は描かない）
+      const r = hash2(x, y, 751);
+      if (r > 0.992) col = CAVE[4]!;
+      else if (r < 0.006) col = CAVE[0]!;
+      shimmerA.push(null);
+      shimmerB.push(null);
+    }
+    floor.push(col);
+  }
+  return { floor, shimmerA, shimmerB };
+}
+
+const CAVE_WALL = ['#0c0c14', '#12121c', '#191a25', '#222331', '#2d2e3f'].map(hex);
+
+function mewtwoWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const dark = hex('#06060b');
+  const rimLight = hex('#4a4c60');
+  const rimDark = hex('#101018');
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = inset(iy, 11) - ix;
+    const fromRight = ix - (W - 1 - inset(iy, 12));
+    const fromTop = inset(ix, 13) - iy;
+    const fromBottom = iy - (H - 1 - inset(ix, 14));
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    const isTop = fromTop >= Math.max(fromLeft, fromRight, fromBottom);
+    const size = isTop ? 24 : 18;
+    const stone = worley(x, y, size, 761);
+    const round = (stone.dx + stone.dy) / size;
+    let t = 0.48 + round * 0.4 + (hash2(stone.id, 2, 763) - 0.5) * 0.22 + (fbm(x / 28, y / 28, 765) - 0.5) * 0.3;
+    // 上の壁: 天井から垂れる鍾乳石の縦のすじ
+    if (isTop) t += (fbm(x / 5, y / 40, 767) - 0.5) * 0.35;
+    t -= Math.max(0, dist - 8) * 0.014;
+    let col = ramp(CAVE_WALL, t, x, y);
+    if (stone.edge < 0.8) col = CAVE_WALL[0]!;
+    if (dist > MARGIN - 14 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (dist - (MARGIN - 14)) / 14) col = dark;
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 2.5) col = rimLight;
+    out.push(col);
+  }
+  return out;
+}
+
 const arenas = [
   { id: 'lugia', ...lugiaFloor(), wall: lugiaWall() },
   { id: 'hooh', ...hoohFloor(), wall: hoohWall() },
   { id: 'raikou', ...raikouFloor(), wall: raikouWall() },
   { id: 'entei', ...enteiFloor(), wall: enteiWall() },
   { id: 'suicune', ...suicuneFloor(), wall: suicuneWall() },
+  { id: 'mewtwo', region: 'kanto', ...mewtwoFloor(), wall: mewtwoWall() },
+  { id: 'articuno', region: 'kanto', ...articunoFloor(), wall: articunoWall() },
+  { id: 'zapdos', region: 'kanto', ...zapdosFloor(), shimmerA: null, shimmerB: null, wall: zapdosWall() },
+  { id: 'moltres', region: 'kanto', ...moltresFloor(), shimmerA: null, shimmerB: null, wall: moltresWall() },
 ];
 for (const a of arenas) {
+  const outDir = path.join('public', 'map', 'region' in a ? a.region : 'johto');
+  fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(path.join(outDir, `arena-${a.id}-floor.png`), toPng(a.floor, W, H));
-  fs.writeFileSync(path.join(outDir, `arena-${a.id}-shimmer-a.png`), toPng(a.shimmerA, W, H));
-  fs.writeFileSync(path.join(outDir, `arena-${a.id}-shimmer-b.png`), toPng(a.shimmerB, W, H));
+  if (a.shimmerA && a.shimmerB) {
+    fs.writeFileSync(path.join(outDir, `arena-${a.id}-shimmer-a.png`), toPng(a.shimmerA, W, H));
+    fs.writeFileSync(path.join(outDir, `arena-${a.id}-shimmer-b.png`), toPng(a.shimmerB, W, H));
+  }
   fs.writeFileSync(path.join(outDir, `arena-${a.id}-wall.png`), toPng(a.wall, W + MARGIN * 2, H + MARGIN * 2));
-  for (const f of ['floor', 'shimmer-a', 'shimmer-b', 'wall']) {
+  for (const f of a.shimmerA ? ['floor', 'shimmer-a', 'shimmer-b', 'wall'] : ['floor', 'wall']) {
     console.log(`${outDir}/arena-${a.id}-${f}.png ${Math.round(fs.statSync(path.join(outDir, `arena-${a.id}-${f}.png`)).size / 1024)}KB`);
   }
 }
@@ -960,7 +1416,8 @@ if (previewPath) {
   const fh = H + MARGIN * 2;
   for (const a of arenas) {
     const merged: (Rgb | null)[] = a.wall.slice();
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) merged[(y + MARGIN) * fw + x + MARGIN] = a.floor[y * W + x]!;
+    // ゲームでは壁が床より手前（床の上にはみ出した壁の絵＝発電機などは、床の上に見える）
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) merged[(y + MARGIN) * fw + x + MARGIN] ??= a.floor[y * W + x]!;
     fs.writeFileSync(`${previewPath}-${a.id}.png`, toPng(merged, fw, fh));
   }
 }

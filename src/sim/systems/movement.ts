@@ -61,7 +61,8 @@ export function movePlayers(world: World): void {
     // ねむけ（ボスの うたう・さいみんじゅつ など。07 の167章）: 遅くなる
     const drowsy = p.drowsyTicks ? 1 - (world.rules.stage.bossRules.drowsySlowPct ?? 55) / 100 : 1;
     const mud = p.mudTicks ? 1 - (world.rules.stage.bossRules.mudSlowPct ?? 40) / 100 : 1;
-    const step = p.moveSpeed * world.dt * scale * (1 - (p.zoneSlowPct ?? 0) / 100) * abilityMoveSpeedFactor(world, p) * drowsy * mud;
+    const paralyzed = p.paralyzeTicks ? 1 - (world.rules.stage.bossRules.paralyzeSlowPct ?? 50) / 100 : 1;
+    const step = p.moveSpeed * world.dt * scale * (1 - (p.zoneSlowPct ?? 0) / 100) * abilityMoveSpeedFactor(world, p) * drowsy * mud * paralyzed;
     p.x += p.inputX * step;
     p.y += p.inputY * step;
     p.walked += step;

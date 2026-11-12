@@ -565,7 +565,17 @@ export const bossMoveSchema = z.object({
   then: z.string().min(1).optional(),
   homing: z.boolean().optional(),
   rooted: z.boolean().optional(),
-  bullets: z.object({ count: z.number().int().positive(), speed: z.number().positive(), seconds: z.number().positive() }).optional(),
+  bullets: z
+    .object({
+      count: z.number().int().positive(),
+      speed: z.number().positive(),
+      seconds: z.number().positive(),
+      /** 狙った人の今の場所へまっすぐ撃つ（追わない）。無ければランダムな向き */
+      aimed: z.boolean().optional(),
+      /** 消えるとき（時間が来た・壁に着いた）に、技 move を count 個、全方向へ等しい角度で飛ばす（ミュウツーの はどうだん。07 の250章） */
+      burst: z.object({ move: z.string().min(1), count: z.number().int().positive() }).optional(),
+    })
+    .optional(),
   playerMove: z.lazy(() => casterMoveSchema).optional(),
   /** 狙う相手がこの距離より遠いときだけ使う（フシギバナのソーラービーム: はなびらのまいの外に出たら。作者の指摘 2026年10月27日） */
   minTargetDistance: z.number().nonnegative().optional(),
@@ -592,7 +602,16 @@ export const bossMoveSchema = z.object({
    * 足元から広がる波の輪（カメックスの なみのり。07 の198章）: 半径 startRadius から速さ speed で広がる。足元の startRadius の内側は安全。
    * 向かい合う 2 か所に gapDegrees 度の切れ目があり、抜けられる
    */
-  surfRing: z.object({ startRadius: z.number().positive(), speed: z.number().positive(), width: z.number().positive(), gapDegrees: z.number().positive() }).optional(),
+  surfRing: z
+    .object({
+      startRadius: z.number().positive(),
+      speed: z.number().positive(),
+      width: z.number().positive(),
+      gapDegrees: z.number().positive(),
+      /** 輪でなく、狙った人の向きを真ん中にした arcDegrees 度の弧だけが広がる（切れ目は無視。ファイヤーの ねっぷう。07 の253章） */
+      arcDegrees: z.number().positive().optional(),
+    })
+    .optional(),
   /** 当たっている間、画面のどこにいても毎秒 最大 HP のこの % だけ削られる（カメックスの ふぶき。防御は効かない。07 の198章） */
   fieldDotPct: z.number().positive().optional(),
   /** この技を使うと、出ている技 moves を消す（にほんばれ と あまごい は同時に降らない。ゲストにも予告の知らせで届く。07 の197章） */
@@ -608,7 +627,19 @@ export const bossMoveSchema = z.object({
    * ダメージを防ぐ壁（エーフィの リフレクター。07 の195章）: 当たっている間、最大 HP の hpPct % のダメージを受け止める。
    * 受け止めきれず割れると、今の技をやめて breakMove を使う（気絶）。時間が来ると何も起こらず消える
    */
-  barrier: z.object({ hpPct: z.number().positive(), breakMove: z.string().min(1) }).optional(),
+  barrier: z
+    .object({
+      hpPct: z.number().positive(),
+      breakMove: z.string().min(1),
+      /**
+       * 攻撃では割れず、技 move（飛ぶ岩）が hits 回当たると割れる（ミュウツーの バリアー。07 の250章）。
+       * 当たるたびに技 mark（ひびの印。割れたときの技の clearsMoves で消す）を置く
+       */
+      hitsBy: z.object({ move: z.string().min(1), hits: z.number().int().positive(), mark: z.string().min(1) }).optional(),
+      /** 壁がある間は、ふだんの技の代わりにこの技を順に使う */
+      moves: z.array(z.string().min(1)).optional(),
+    })
+    .optional(),
   /** この技が始まると、同じボスの壁（barrier の技）を消す（壁が割れたとき。ゲストにも予告の知らせで届く。07 の195章） */
   clearsBarrier: z.boolean().optional(),
   /** 1 つ目も足元でなく、狙った人のまわりのランダムな場所に置く（ピカチュウの かみなり。07 の194章） */
@@ -716,7 +747,19 @@ export const bossMoveSchema = z.object({
   /** 雲を流す（ライコウの かみなり。07 の211章）: 固定マップを 3 つに分けた列に、技 move を上下の端から交互に流す（1 列は狙った人の場所）。流れている間は次の技を holdSeconds 待つ */
   clouds: z.object({ move: z.string().min(1), holdSeconds: z.number().nonnegative() }).optional(),
   /** 当たっている間、半径 radius の中のランダムな場所へ、技 move を everySeconds ごとに落とす（雲の下の落雷。07 の211章） */
-  emit: z.object({ move: z.string().min(1), everySeconds: z.number().positive(), radius: z.number().positive() }).optional(),
+  emit: z.object({ move: z.string().min(1), everySeconds: z.number().positive(), radius: z.number().positive(), /** 範囲の中でなく、固定マップ全体のランダムな場所へ（フリーザーの あられ） */ wholeArena: z.boolean().optional() }).optional(),
+  /**
+   * 固定マップの壁ぎわの点（nodes。マップの真ん中から）どうしを結ぶ電撃（サンダーの 10まんボルト。07 の252章）。
+   * pairs（nodes の番号の組）から count 組をランダムに選ぶ（count が組の数以上なら全部）。shape は line
+   */
+  arenaLinks: z.object({ nodes: z.array(z.tuple([z.number(), z.number()])).min(2), pairs: z.array(z.tuple([z.number().int(), z.number().int()])).min(1), count: z.number().int().positive() }).optional(),
+  /** 落ちたら、予告の線の根元から同じ向きへ技 move（bullets の技）を撃つ（フリーザーの こおりのつぶて。07 の251章） */
+  shot: z.object({ move: z.string().min(1) }).optional(),
+  /**
+   * 固定マップの決まった帯（折れ線。マップの真ん中からの x・y。半径は帯の太さの半分）に置く（フリーザーの フリーズドライ: 海水の流れが凍る。07 の251章）。
+   * マップの絵の水は同じ折れ線から描く（scripts/make-arena-maps.ts）。shape は line
+   */
+  arenaPaths: z.array(z.object({ radius: z.number().positive(), points: z.array(z.tuple([z.number(), z.number()])).min(2) })).optional(),
   /**
    * 地割れ（エンテイの ふみつけ。07 の214章）: 狙った向きを真ん中に spreadDegrees ずつ開いて count 本、壁まで（maxLength まで）割れ目（技 line）を走らせ、
    * 予告の後、割れ目に沿って spacing ごとに炎（技 flame）を根元から delayPerPixel 秒/ピクセルで順に立てる
@@ -736,6 +779,17 @@ export const bossMoveSchema = z.object({
   lavaSea: z.object({ islands: z.string().min(1), fillSeconds: z.number().positive(), fullSeconds: z.number().nonnegative(), recedeSeconds: z.number().positive() }).optional(),
   /** 今のマップの中の、狙った人から minDistance〜maxDistance の場所へ speed で滑っていく（スイクン。07 の218章） */
   glide: z.object({ minDistance: z.number().nonnegative(), maxDistance: z.number().positive(), speed: z.number().positive() }).optional(),
+  /** 今のマップの中の、狙った人から minDistance〜maxDistance の場所へ瞬間移動する（予告はその場所。teleport・hideBoss と組む。ミュウツー。07 の250章） */
+  /** この技が出ている間（予告の間も）、使ったボスが受けるダメージをこの % にする（ファイヤーの もえつきた後: 150。07 の253章） */
+  takenPct: z.number().positive().optional(),
+  /** 専用の絵のクラス（src/render/effects）で描く。飛ぶ玉のふつうの黄色い玉を描かない（ミュウツーの岩・はどうだん・フリーザーの こごえるかぜ。07 の250章） */
+  customArt: z.boolean().optional(),
+  blink: z.object({ minDistance: z.number().nonnegative(), maxDistance: z.number().positive(), /** 狙った人に関係なく、マップの真ん中へ（サイコブレイクの前） */ center: z.boolean().optional() }).optional(),
+  /**
+   * 念力で持ち上げて投げる（ミュウツーの サイコキネシス。07 の250章）: 狙った人を囲む minDistance〜maxDistance の場所に count 個（壁があるときは barrierCount 個）、
+   * 狙った人を通る直線の予告を置く。落ちたら、そこから技 rock（bullets の技）を同じ向きへ飛ばす
+   */
+  liftThrow: z.object({ rock: z.string().min(1), count: z.number().int().positive(), barrierCount: z.number().int().positive().optional(), minDistance: z.number().nonnegative(), maxDistance: z.number().positive() }).optional(),
   /**
    * 固定マップの端から端まで届く波（スイクンの なみのり。07 の218章）: ボスのいる側の端から反対側へ、技 line の帯を speed で進める。切れ目 gap は狙った人の近く。
    * 予告が終わると、ボスも波と一緒に反対側へ走る
@@ -834,6 +888,10 @@ export const bossMoveSchema = z.object({
       mudSeconds: z.number().positive().optional(),
       burnSeconds: z.number().positive().optional(),
       chill: z.number().int().positive().optional(),
+      /** まひ（足が遅くなる。遅くなる割合は bossRules.paralyzeSlowPct。サンダーの でんじは・でんじほう。07 の252章） */
+      paralyzeSeconds: z.number().positive().optional(),
+      /** すぐ凍らせる秒数（冷えを溜めずに。フリーザーの ぜったいれいど。07 の251章） */
+      freezeSeconds: z.number().positive().optional(),
       flinchSeconds: z.number().positive().optional(),
       /** ボス（無ければ範囲の中心）から外へ、速さ pushSpeed で pushSeconds 秒すべらせる（瞬間移動させない。07 の167章 あてみなげ） */
       pushSpeed: z.number().positive().optional(),
@@ -1152,6 +1210,8 @@ export const stageConfigSchema = z.object({
     /** ボスの技の効き目（07 の167章）: ねむけで遅くなる割合（%）・やけどで毎秒削られる最大 HP の %・冷えが何回で凍るか・凍る秒数・冷えが消えるまでの秒数 */
     drowsySlowPct: z.number().min(0).max(95).optional(),
     mudSlowPct: z.number().min(0).max(95).optional(),
+    /** まひで遅くなる割合（%。07 の252章） */
+    paralyzeSlowPct: z.number().min(0).max(95).optional(),
     burnPctPerSecond: z.number().nonnegative().optional(),
     chillToFreeze: z.number().int().positive().optional(),
     chillFreezeSeconds: z.number().positive().optional(),

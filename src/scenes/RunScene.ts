@@ -21,6 +21,10 @@ import { BlizzardSheet, IceCrystals, SnowGround } from '../render/effects/FrostS
 import { WaveSheet } from '../render/effects/WaveSheet';
 import { AuroraSheet } from '../render/effects/AuroraSheet';
 import { MirrorCoat } from '../render/effects/MirrorCoat';
+import { MewtwoPsychic } from '../render/effects/MewtwoPsychic';
+import { ArticunoIce } from '../render/effects/ArticunoIce';
+import { ZapdosElectric } from '../render/effects/ZapdosElectric';
+import { MoltresFlame } from '../render/effects/MoltresFlame';
 import { WaterRun } from '../render/effects/WaterRun';
 import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
@@ -170,6 +174,10 @@ export class RunScene extends Phaser.Scene {
   private auroraSheet: AuroraSheet | null = null;
   /** ミラーコートの鏡（07 の223章） */
   private mirrorCoat: MirrorCoat | null = null;
+  private mewtwoPsychic: MewtwoPsychic | null = null;
+  private articunoIce: ArticunoIce | null = null;
+  private zapdosElectric: ZapdosElectric | null = null;
+  private moltresFlame: MoltresFlame | null = null;
   /** 水の上を走る足元（07 の225章） */
   private waterRun: WaterRun | null = null;
   private introFading = false;
@@ -1856,7 +1864,7 @@ export class RunScene extends Phaser.Scene {
     let countdowns = 0;
     for (const h of hazards) {
       // 飛ぶ玉（サンダーの電気の玉）: 飛んでいる間は黄色い玉
-      if (h.activeTicks !== undefined && this.sim.world.rules.stage.moves[h.move]?.bullets && !effectRecipes[this.sim.world.rules.stage.moves[h.move]?.effect ?? '']?.bossActive) {
+      if (h.activeTicks !== undefined && this.sim.world.rules.stage.moves[h.move]?.bullets && !this.sim.world.rules.stage.moves[h.move]?.customArt && !effectRecipes[this.sim.world.rules.stage.moves[h.move]?.effect ?? '']?.bossActive) {
         g.fillStyle(0xfff176, 0.35).fillCircle(h.x, h.y, h.radius * 1.6);
         g.fillStyle(0xffeb3b, 1).fillCircle(h.x, h.y, h.radius);
         g.fillStyle(0xffffff, 1).fillCircle(h.x, h.y, h.radius * 0.45);
@@ -1903,7 +1911,7 @@ export class RunScene extends Phaser.Scene {
         g.strokePath();
         continue;
       }
-      if (mv?.surfRing) {
+      if (mv?.surfRing && !mv.customArt) {
         this.drawSurfRing(g, h, mv.surfRing);
         continue;
       }
@@ -1914,7 +1922,7 @@ export class RunScene extends Phaser.Scene {
       if (h.activeTicks !== undefined) {
         const recipe = effectRecipes[mv?.effect ?? ''];
         // 波は絵そのものが範囲（赤く重ねない）
-        if (mv && !mv.waterWall && !recipe?.bossActive && ((mv.activeSeconds ?? 0) > 0.6 || mv.bounce)) this.drawHazardArea(g, h, mv, 0.1, 0.6);
+        if (mv && !mv.waterWall && !mv.customArt && !recipe?.bossActive && ((mv.activeSeconds ?? 0) > 0.6 || mv.bounce)) this.drawHazardArea(g, h, mv, 0.1, 0.6);
         continue;
       }
       // 続けて突進する技: 前の突進が終わるまで、次の予告は出さない
@@ -1922,7 +1930,8 @@ export class RunScene extends Phaser.Scene {
       const progress = 1 - h.ticksLeft / Math.min(h.totalTicks, mv?.dashSpeed ? Math.round(mv.telegraphSeconds / this.sim.world.dt) : h.totalTicks);
       if (mv?.countdown) this.drawCountdown(h, countdowns++);
       // ダメージの無い技（ため・強化・回復・本物が現れる所）は、赤い予告を出さない（絵だけ。07 の167章）
-      if (mv && mv.damage <= 0 && !mv.counter) continue;
+      // 投げる岩の通り道（サイコキネシス）は、予告の線そのものが避ける場所
+      if (mv && mv.damage <= 0 && !mv.counter && !mv.liftThrow && !mv.shot) continue;
       if (mv?.hideTelegraph) continue;
       // 跳ね回る技（ボルテッカー・ころがる）: 走り出す向きを線で見せる
       if (mv?.bounce) {
@@ -3111,6 +3120,14 @@ export class RunScene extends Phaser.Scene {
     this.auroraSheet.update(world, this.time.now);
     this.mirrorCoat ??= new MirrorCoat(this, spriteRender.depths.bosses);
     this.mirrorCoat.update(world, this.time.now);
+    this.mewtwoPsychic ??= new MewtwoPsychic(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6, spriteRender.depths.bosses + 0.05);
+    this.mewtwoPsychic.update(world, this.time.now);
+    this.articunoIce ??= new ArticunoIce(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);
+    this.articunoIce.update(world, this.time.now);
+    this.zapdosElectric ??= new ZapdosElectric(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6, spriteRender.depths.bosses + 0.05);
+    this.zapdosElectric.update(world, this.time.now);
+    this.moltresFlame ??= new MoltresFlame(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);
+    this.moltresFlame.update(world, this.time.now);
     this.waterRun ??= new WaterRun(this, ARENA_FLOOR_DEPTH + 3.5, spriteRender.depths.bosses - 0.01);
     this.waterRun.update(world, this.time.now);
     // 地面の一部なので、障害物・雑魚より下（作者の依頼）

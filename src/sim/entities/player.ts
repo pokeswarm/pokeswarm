@@ -102,6 +102,8 @@ export interface Player {
   drowsyTicks?: number;
   /** 泥で足が遅い残り（エーフィの どろかけ。07 の195章） */
   mudTicks?: number;
+  /** まひ（足が遅くなる。サンダー） */
+  paralyzeTicks?: number;
   burnTicks?: number;
   burnHurtTicks?: number;
   chill?: number;

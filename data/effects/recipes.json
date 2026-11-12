@@ -6217,6 +6217,42 @@
         "seconds": 0.3
       }
     },
+    "boss-mewtwo-blink": {
+      "extends": "psychic.base"
+    },
+    "boss-mewtwo-lift": {
+      "extends": "psychic.base"
+    },
+    "boss-mewtwo-rock": {
+      "extends": "psychic.base"
+    },
+    "boss-mewtwo-aura-charge": {
+      "extends": "psychic.base"
+    },
+    "boss-mewtwo-aura-orb": {
+      "extends": "psychic.base"
+    },
+    "boss-mewtwo-aura-shard": {
+      "extends": "psychic.base"
+    },
+    "boss-mewtwo-barrier": {
+      "extends": "psychic.base"
+    },
+    "boss-mewtwo-barrier-break": {
+      "extends": "psychic.base"
+    },
+    "boss-mewtwo-psystrike": {
+      "extends": "psychic.base"
+    },
+    "boss-articuno-plain": {
+      "extends": "ice.base"
+    },
+    "boss-zapdos-plain": {
+      "extends": "electric.base"
+    },
+    "boss-moltres-plain": {
+      "extends": "fire.base"
+    },
     "boss-suicune-plain": {
       "extends": "water.base"
     },

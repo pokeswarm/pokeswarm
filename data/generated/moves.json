@@ -194,6 +194,19 @@
     "contestType": "beauty",
     "damageClass": "special"
   },
+  "barrier": {
+    "names": {
+      "ja": "バリアー",
+      "en": "Barrier",
+      "fr": "Bouclier",
+      "de": "Barriere",
+      "es": "Barrera",
+      "it": "Barriera"
+    },
+    "type": "psychic",
+    "contestType": "cool",
+    "damageClass": "status"
+  },
   "bite": {
     "names": {
       "ja": "かみつく",
@@ -362,6 +375,32 @@
     "type": "steel",
     "contestType": "smart",
     "damageClass": "physical"
+  },
+  "burn-up": {
+    "names": {
+      "ja": "もえつきる",
+      "en": "Burn Up",
+      "fr": "Flamme Ultime",
+      "de": "Ausbrennen",
+      "es": "Llama Final",
+      "it": "Ultima Fiamma"
+    },
+    "type": "fire",
+    "contestType": null,
+    "damageClass": "special"
+  },
+  "charge": {
+    "names": {
+      "ja": "じゅうでん",
+      "en": "Charge",
+      "fr": "Chargeur",
+      "de": "Ladevorgang",
+      "es": "Carga",
+      "it": "Sottocarica"
+    },
+    "type": "electric",
+    "contestType": "smart",
+    "damageClass": "status"
   },
   "charm": {
     "names": {
@@ -791,6 +830,19 @@
     "type": "psychic",
     "contestType": "smart",
     "damageClass": "special"
+  },
+  "drill-peck": {
+    "names": {
+      "ja": "ドリルくちばし",
+      "en": "Drill Peck",
+      "fr": "Bec Vrille",
+      "de": "Bohrschnabel",
+      "es": "Pico Taladro",
+      "it": "Perforbecco"
+    },
+    "type": "flying",
+    "contestType": "cool",
+    "damageClass": "physical"
   },
   "dual-wingbeat": {
     "names": {
@@ -1260,6 +1312,19 @@
     "contestType": "beauty",
     "damageClass": "physical"
   },
+  "hail": {
+    "names": {
+      "ja": "あられ",
+      "en": "Hail",
+      "fr": "Grêle",
+      "de": "Hagelsturm",
+      "es": "Granizo",
+      "it": "Grandine"
+    },
+    "type": "ice",
+    "contestType": "beauty",
+    "damageClass": "status"
+  },
   "harden": {
     "names": {
       "ja": "かたくなる",
@@ -1298,6 +1363,19 @@
     "type": "psychic",
     "contestType": "cute",
     "damageClass": "status"
+  },
+  "heat-wave": {
+    "names": {
+      "ja": "ねっぷう",
+      "en": "Heat Wave",
+      "fr": "Canicule",
+      "de": "Hitzewelle",
+      "es": "Onda Ígnea",
+      "it": "Ondacalda"
+    },
+    "type": "fire",
+    "contestType": "beauty",
+    "damageClass": "special"
   },
   "heavy-slam": {
     "names": {
@@ -1480,6 +1558,19 @@
     "type": "ice",
     "contestType": null,
     "damageClass": "physical"
+  },
+  "icy-wind": {
+    "names": {
+      "ja": "こごえるかぜ",
+      "en": "Icy Wind",
+      "fr": "Vent Glace",
+      "de": "Eissturm",
+      "es": "Viento Hielo",
+      "it": "Ventogelato"
+    },
+    "type": "ice",
+    "contestType": "beauty",
+    "damageClass": "special"
   },
   "iron-defense": {
     "names": {
@@ -1832,6 +1923,19 @@
     "contestType": "cute",
     "damageClass": "status"
   },
+  "mind-reader": {
+    "names": {
+      "ja": "こころのめ",
+      "en": "Mind Reader",
+      "fr": "Lire-Esprit",
+      "de": "Willensleser",
+      "es": "Telépata",
+      "it": "Leggimente"
+    },
+    "type": "normal",
+    "contestType": "smart",
+    "damageClass": "status"
+  },
   "mirror-coat": {
     "names": {
       "ja": "ミラーコート",
@@ -2013,6 +2117,19 @@
     "type": "dragon",
     "contestType": "cool",
     "damageClass": "physical"
+  },
+  "overheat": {
+    "names": {
+      "ja": "オーバーヒート",
+      "en": "Overheat",
+      "fr": "Surchauffe",
+      "de": "Hitzekoller",
+      "es": "Sofoco",
+      "it": "Vampata"
+    },
+    "type": "fire",
+    "contestType": "beauty",
+    "damageClass": "special"
   },
   "pay-day": {
     "names": {

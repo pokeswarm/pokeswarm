@@ -141,6 +141,8 @@ export interface Hazard {
   lastWall?: number;
   sinceAim?: number;
   /** 跳ね回る（ボルテッカー）: 跳ね返る箱の中心 */
+  /** 狙った場所までの距離（投げた岩。ここを過ぎてから壁に当たると、壁にひびが入る。ミュウツーの バリアー） */
+  readonly aimDist?: number;
   readonly boxX?: number;
   readonly boxY?: number;
   /** 跳ね返った回数 */
@@ -274,6 +276,11 @@ export interface World {
     barrier?: number;
     /** 割れたときに使う技（stage.moves の番号） */
     barrierBreak?: number;
+    /** 攻撃では割れず、技 move が当たった回数で割れる壁（ミュウツー）: 割れるまでの回数・今の回数・ひびの印の技 */
+    barrierHits?: { move: number; need: number; count: number; mark: number };
+    /** 壁がある間に順に使う技と、次の番号 */
+    barrierMoves?: readonly number[];
+    barrierNext?: number;
     // ---- 07 の194章 ----
     /** これから大技を使う HP の割合と技（割合の大きい順） */
     hpMoves?: { belowRatio: number; moves: readonly number[] }[];

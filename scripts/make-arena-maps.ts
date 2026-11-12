@@ -1083,6 +1083,141 @@ function articunoWall(): (Rgb | null)[] {
   return out;
 }
 
+// --- サンダー: 無人発電所（ひび割れたコンクリートの床。壁ぎわに発電機が 6 基。07 の〔サンダー〕章） ---
+
+/** 発電機の場所（data/game/stage.json の zapdos-thunderbolt の arenaLinks.nodes。ワールドの単位で、マップの真ん中から） */
+const GENERATORS: [number, number][] = (() => {
+  const stage = JSON.parse(fs.readFileSync(path.join('data', 'game', 'stage.json'), 'utf8')) as { moves: { id: string; arenaLinks?: { nodes: [number, number][] } }[] };
+  return stage.moves.find((m) => m.id === 'zapdos-thunderbolt')?.arenaLinks?.nodes ?? [];
+})();
+
+/** 電撃の黄色と重ならないよう、床は青みの暗い灰色 */
+const CONCRETE = ['#15171c', '#1a1d23', '#20232a', '#272a32', '#2f333b'].map(hex);
+const STAIN = hex('#111317');
+/** 床のひび: 決まった数本だけ、曲がりながら伸びる線（網目に見えないように） */
+const CRACKS: Uint8Array = (() => {
+  const m = new Uint8Array(W * H);
+  for (let k = 0; k < 9; k++) {
+    let x = 40 + hash2(k, 1, 931) * (W - 80);
+    let y = 40 + hash2(k, 2, 933) * (H - 80);
+    let a = hash2(k, 3, 935) * Math.PI * 2;
+    const len = 40 + hash2(k, 4, 937) * 70;
+    for (let t = 0; t < len; t++) {
+      x += Math.cos(a);
+      y += Math.sin(a);
+      a += (hash2(k * 97 + t, 5, 939) - 0.5) * 0.6;
+      const i = Math.round(y) * W + Math.round(x);
+      if (x < 1 || y < 1 || x > W - 2 || y > H - 2) break;
+      m[i] = 1;
+      // 短い枝
+      if (t % 23 === 11) {
+        let bx = x;
+        let by = y;
+        const ba = a + (hash2(k, t, 941) > 0.5 ? 1 : -1);
+        for (let u = 0; u < 9; u++) {
+          bx += Math.cos(ba);
+          by += Math.sin(ba);
+          const j = Math.round(by) * W + Math.round(bx);
+          if (j >= 0 && j < m.length) m[j] = 1;
+        }
+      }
+    }
+  }
+  return m;
+})();
+
+function zapdosFloor(): { floor: Rgb[] } {
+  const floor: Rgb[] = [];
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    // 打ち継ぎの大きな板（境は線で引かず、板ごとの明るさだけ）
+    const slab = worley(x, y, 90, 901);
+    let t = 0.46 + (fbm(x / 120, y / 120, 903) - 0.5) * 0.4 + (hash2(slab.id, 1, 905) - 0.5) * 0.08 + (fbm(x / 16, y / 16, 907) - 0.5) * 0.18;
+    // 発電機のまわりは焦げて暗い
+    let near = Infinity;
+    for (const [gx, gy] of GENERATORS) near = Math.min(near, Math.hypot(x - (gx + W) / 2, y - (gy + H) / 2));
+    t -= Math.max(0, 1 - near / 90) * 0.25;
+    let col = ramp(CONCRETE, t, x, y);
+    // 油のしみ（大きなまだら）
+    if (fbm(x / 46, y / 46, 909) > 0.74) col = mix(col, STAIN, 0.3);
+    // 細いひび（数本だけ。網目にしない）
+    if (CRACKS[y * W + x]) col = CONCRETE[0]!;
+    // まばらな砂粒
+    const r = hash2(x, y, 917);
+    if (r > 0.994) col = CONCRETE[4]!;
+    floor.push(col);
+  }
+  return { floor };
+}
+
+const PLANT_WALL = ['#0b0c10', '#101217', '#16191f', '#1e2229', '#282d35'].map(hex);
+
+function zapdosWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const dark = hex('#050608');
+  const rimLight = hex('#5a606c');
+  const rimDark = hex('#0d0f13');
+  const metal = ['#2a2f38', '#3a414c', '#525b68', '#76808d'].map(hex);
+  const coil = ['#5a3418', '#8a5426', '#c07a38'].map(hex);
+  const stripeY = hex('#c9a227');
+  const stripeK = hex('#16161a');
+  const lamp = ['#7a6a1a', '#ffe066'].map(hex);
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = -ix;
+    const fromRight = ix - (W - 1);
+    const fromTop = -iy;
+    const fromBottom = iy - (H - 1);
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    let col: Rgb | null = null;
+    if (dist > 0) {
+      // 壁: 金属の板（縦の継ぎ目と、ところどころのリベット）
+      const isTop = fromTop >= Math.max(fromLeft, fromRight, fromBottom);
+      const isBottom = fromBottom >= Math.max(fromLeft, fromRight, fromTop);
+      const along = isTop || isBottom ? x : y;
+      const panel = Math.floor((along + 7) / 26);
+      let t = 0.45 + (hash2(panel, isTop ? 1 : isBottom ? 2 : 3, 921) - 0.5) * 0.25 + (fbm(x / 20, y / 20, 923) - 0.5) * 0.2 - Math.max(0, dist - 8) * 0.012;
+      col = ramp(PLANT_WALL, t, x, y);
+      if ((along + 7) % 26 === 0) col = PLANT_WALL[0]!;
+      if ((along + 7) % 26 === 3 && dist % 9 === 4) col = PLANT_WALL[4]!;
+      // 上の壁の 2 本の太い配管
+      if (isTop && (Math.abs(fromTop - 14) < 3 || Math.abs(fromTop - 30) < 2)) {
+        const k = Math.abs(fromTop - 14) < 3 ? fromTop - 14 : fromTop - 30;
+        col = k < -1 ? metal[2]! : k > 1 ? metal[0]! : metal[1]!;
+        if (x % 58 === 0) col = metal[3]!;
+      }
+      if (dist > MARGIN - 14 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (dist - (MARGIN - 14)) / 14) col = dark;
+      if (dist <= 1) col = rimDark;
+      else if (dist <= 2.5) col = rimLight;
+    }
+    // 発電機: 壁にはまった箱。真ん中に銅のコイル、ふちに黄色と黒の帯、ランプ
+    for (const [gx, gy] of GENERATORS) {
+      // 壁の方へ少しずらす（体の 3 分の 2 が壁に入る）
+      const cx = (gx + W) / 2 + MARGIN + Math.sign(gx) * (Math.abs(gx) >= W - 1 ? 9 : 0);
+      const cy = (gy + H) / 2 + MARGIN + Math.sign(gy) * (Math.abs(gy) >= H - 1 ? 9 : 0);
+      const dx = x - cx;
+      const dy = y - cy;
+      const hw = 28;
+      const hh = 22;
+      if (Math.abs(dx) > hw || Math.abs(dy) > hh) continue;
+      const edge = Math.min(hw - Math.abs(dx), hh - Math.abs(dy));
+      if (edge < 1) col = PLANT_WALL[0]!;
+      else if (edge < 3.5) col = (Math.floor((dx + dy + 40) / 3) % 2 === 0 ? stripeY : stripeK);
+      else {
+        col = metal[Math.abs(dy) < 2 ? 2 : dy < 0 ? 1 : 0]!;
+        // コイル（横に巻いた銅線）
+        if (Math.abs(dx) < 16 && Math.abs(dy) < 11) col = coil[Math.abs(dy) < 2 ? 2 : (Math.abs(dy) + (dx & 1)) % 2 ? 1 : 0]!;
+        // ランプ（左上）
+        if (Math.hypot(dx + 21, dy + 15) < 2.6) col = lamp[1]!;
+        else if (Math.hypot(dx + 21, dy + 15) < 3.8) col = lamp[0]!;
+      }
+    }
+    out.push(col);
+  }
+  return out;
+}
+
 function mewtwoFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
   const floor: Rgb[] = [];
   const shimmerA: (Rgb | null)[] = [];
@@ -1179,15 +1314,18 @@ const arenas = [
   { id: 'suicune', ...suicuneFloor(), wall: suicuneWall() },
   { id: 'mewtwo', region: 'kanto', ...mewtwoFloor(), wall: mewtwoWall() },
   { id: 'articuno', region: 'kanto', ...articunoFloor(), wall: articunoWall() },
+  { id: 'zapdos', region: 'kanto', ...zapdosFloor(), shimmerA: null, shimmerB: null, wall: zapdosWall() },
 ];
 for (const a of arenas) {
   const outDir = path.join('public', 'map', 'region' in a ? a.region : 'johto');
   fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(path.join(outDir, `arena-${a.id}-floor.png`), toPng(a.floor, W, H));
-  fs.writeFileSync(path.join(outDir, `arena-${a.id}-shimmer-a.png`), toPng(a.shimmerA, W, H));
-  fs.writeFileSync(path.join(outDir, `arena-${a.id}-shimmer-b.png`), toPng(a.shimmerB, W, H));
+  if (a.shimmerA && a.shimmerB) {
+    fs.writeFileSync(path.join(outDir, `arena-${a.id}-shimmer-a.png`), toPng(a.shimmerA, W, H));
+    fs.writeFileSync(path.join(outDir, `arena-${a.id}-shimmer-b.png`), toPng(a.shimmerB, W, H));
+  }
   fs.writeFileSync(path.join(outDir, `arena-${a.id}-wall.png`), toPng(a.wall, W + MARGIN * 2, H + MARGIN * 2));
-  for (const f of ['floor', 'shimmer-a', 'shimmer-b', 'wall']) {
+  for (const f of a.shimmerA ? ['floor', 'shimmer-a', 'shimmer-b', 'wall'] : ['floor', 'wall']) {
     console.log(`${outDir}/arena-${a.id}-${f}.png ${Math.round(fs.statSync(path.join(outDir, `arena-${a.id}-${f}.png`)).size / 1024)}KB`);
   }
 }
@@ -1199,7 +1337,8 @@ if (previewPath) {
   const fh = H + MARGIN * 2;
   for (const a of arenas) {
     const merged: (Rgb | null)[] = a.wall.slice();
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) merged[(y + MARGIN) * fw + x + MARGIN] = a.floor[y * W + x]!;
+    // ゲームでは壁が床より手前（床の上にはみ出した壁の絵＝発電機などは、床の上に見える）
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) merged[(y + MARGIN) * fw + x + MARGIN] ??= a.floor[y * W + x]!;
     fs.writeFileSync(`${previewPath}-${a.id}.png`, toPng(merged, fw, fh));
   }
 }

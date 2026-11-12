@@ -527,7 +527,12 @@
         "moveIntervalSeconds": 0.6
       },
       "legend-zapdos": {
-        "arena": { "halfWidth": 800, "halfHeight": 440, "viewHeight": 960 },
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960,
+          "map": { "floor": "map/kanto/arena-zapdos-floor.png", "wall": "map/kanto/arena-zapdos-wall.png", "wallMargin": 60, "pixelScale": 2 }
+        },
         "anchor": { "x": 0, "y": -220 },
         "noEnrage": true,
         "hpMoves": [

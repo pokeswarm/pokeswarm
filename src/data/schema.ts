@@ -734,6 +734,11 @@ export const bossMoveSchema = z.object({
   clouds: z.object({ move: z.string().min(1), holdSeconds: z.number().nonnegative() }).optional(),
   /** 当たっている間、半径 radius の中のランダムな場所へ、技 move を everySeconds ごとに落とす（雲の下の落雷。07 の211章） */
   emit: z.object({ move: z.string().min(1), everySeconds: z.number().positive(), radius: z.number().positive(), /** 範囲の中でなく、固定マップ全体のランダムな場所へ（フリーザーの あられ） */ wholeArena: z.boolean().optional() }).optional(),
+  /**
+   * 固定マップの壁ぎわの点（nodes。マップの真ん中から）どうしを結ぶ電撃（サンダーの 10まんボルト。07 の〔サンダー〕章）。
+   * pairs（nodes の番号の組）から count 組をランダムに選ぶ（count が組の数以上なら全部）。shape は line
+   */
+  arenaLinks: z.object({ nodes: z.array(z.tuple([z.number(), z.number()])).min(2), pairs: z.array(z.tuple([z.number().int(), z.number().int()])).min(1), count: z.number().int().positive() }).optional(),
   /** 落ちたら、予告の線の根元から同じ向きへ技 move（bullets の技）を撃つ（フリーザーの こおりのつぶて。07 の〔フリーザー〕章） */
   shot: z.object({ move: z.string().min(1) }).optional(),
   /**
@@ -867,6 +872,8 @@ export const bossMoveSchema = z.object({
       mudSeconds: z.number().positive().optional(),
       burnSeconds: z.number().positive().optional(),
       chill: z.number().int().positive().optional(),
+      /** まひ（足が遅くなる。遅くなる割合は bossRules.paralyzeSlowPct。サンダーの でんじは・でんじほう。07 の〔サンダー〕章） */
+      paralyzeSeconds: z.number().positive().optional(),
       /** すぐ凍らせる秒数（冷えを溜めずに。フリーザーの ぜったいれいど。07 の〔フリーザー〕章） */
       freezeSeconds: z.number().positive().optional(),
       flinchSeconds: z.number().positive().optional(),
@@ -1187,6 +1194,8 @@ export const stageConfigSchema = z.object({
     /** ボスの技の効き目（07 の167章）: ねむけで遅くなる割合（%）・やけどで毎秒削られる最大 HP の %・冷えが何回で凍るか・凍る秒数・冷えが消えるまでの秒数 */
     drowsySlowPct: z.number().min(0).max(95).optional(),
     mudSlowPct: z.number().min(0).max(95).optional(),
+    /** まひで遅くなる割合（%。07 の〔サンダー〕章） */
+    paralyzeSlowPct: z.number().min(0).max(95).optional(),
     burnPctPerSecond: z.number().nonnegative().optional(),
     chillToFreeze: z.number().int().positive().optional(),
     chillFreezeSeconds: z.number().positive().optional(),

@@ -592,6 +592,7 @@
     },
     {
       "id": "legend-zapdos",
+      "motion": { "type": "still" },
       "species": "zapdos",
       "rank": "legendary",
       "sprite": "enemy/zapdos",

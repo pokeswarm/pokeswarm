@@ -1168,6 +1168,24 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     put(x, y, 0, 1, bossId);
     return;
   }
+  if (move.arenaLinks && world.arena) {
+    // 発電機を結ぶ電撃（10まんボルト）: 組をランダムに count 組（全部のときは全部）。1 回の技で当たるのは 1 回
+    const a = world.arena;
+    const l = move.arenaLinks;
+    const order = l.pairs.map((_, k) => k);
+    for (let k = order.length - 1; k > 0; k--) {
+      const j = world.rng.int(k + 1);
+      [order[k], order[j]] = [order[j]!, order[k]!];
+    }
+    order.slice(0, Math.min(l.count, order.length)).forEach((pk, n) => {
+      const [i0, i1] = l.pairs[pk]!;
+      const [x0, y0] = l.nodes[i0]!;
+      const [x1, y1] = l.nodes[i1]!;
+      const len = Math.hypot(x1 - x0, y1 - y0) || 1;
+      put(a.x + x0, a.y + y0, (x1 - x0) / len, (y1 - y0) / len, n === 0 && move.rooted ? bossId : -1, { length: len });
+    });
+    return;
+  }
   if (move.arenaPaths && world.arena) {
     // マップの決まった帯（フリーズドライ: 海水の流れが凍る）。折れ線の 1 区間ずつ線で置く。1 回の技で当たるのは 1 回
     const a = world.arena;
@@ -1710,6 +1728,7 @@ function tickZones(world: World): void {
 function tickPlayerConditions(world: World, me: World['players'][number]): void {
   if (me.drowsyTicks) me.drowsyTicks--;
   if (me.mudTicks) me.mudTicks--;
+  if (me.paralyzeTicks) me.paralyzeTicks--;
   if (me.chillTicks && --me.chillTicks === 0) me.chill = 0;
   if (me.burnTicks) {
     me.burnTicks--;
@@ -1737,6 +1756,7 @@ function hitLocal(world: World, me: World['players'][number], hz: World['hazards
   if (!on) return;
   if (on.drowsySeconds) me.drowsyTicks = Math.max(me.drowsyTicks ?? 0, Math.round(on.drowsySeconds / world.dt));
   if (on.mudSeconds) me.mudTicks = Math.max(me.mudTicks ?? 0, Math.round(on.mudSeconds / world.dt));
+  if (on.paralyzeSeconds) me.paralyzeTicks = Math.max(me.paralyzeTicks ?? 0, Math.round(on.paralyzeSeconds / world.dt));
   if (on.burnSeconds) me.burnTicks = (me.burnTicks ?? 0) + Math.round(on.burnSeconds / world.dt);
   if (on.flinchSeconds && !me.frozenTicks) me.frozenTicks = Math.round(on.flinchSeconds / world.dt);
   if (on.freezeSeconds) {
@@ -2474,7 +2494,7 @@ export function addHazard(
     ...(extra.vx !== undefined && extra.vy !== undefined && (extra.vx !== 0 || extra.vy !== 0) ? { vx: extra.vx, vy: extra.vy } : {}),
     ...(extra.boxX !== undefined && extra.boxY !== undefined ? { boxX: extra.boxX, boxY: extra.boxY } : {}),
     ...(extra.aimDist !== undefined ? { aimDist: extra.aimDist } : {}),
-    ...((move.counter || move.mirrorShards) && di !== -1 ? { hpAtStart: world.enemies.hp[di]! } : {}),
+    ...((move.counter || move.mirrorShards || move.interruptDamage) && di !== -1 ? { hpAtStart: world.enemies.hp[di]! } : {}),
   });
   // 予告の間止まる技（ゲストも同じ知らせで止める）
   if ((move.rooted || move.selfDestruct) && di !== -1) {

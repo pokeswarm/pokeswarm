@@ -296,6 +296,8 @@
   ],
   "moves": [
     "barrier",
+    "drill-peck",
+    "charge",
     "icy-wind",
     "hail",
     "mind-reader",

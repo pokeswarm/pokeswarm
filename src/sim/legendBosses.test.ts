@@ -26,34 +26,7 @@ function moveId(sim: Simulation, idx: number): string {
 // ミュウツーは固定マップの戦いに作り直した（07 の〔ミュウツー〕章）。テストは src/sim/mewtwoArena.test.ts
 // フリーザーは固定マップの戦いに作り直した（07 の〔フリーザー〕章）。テストは src/sim/articunoArena.test.ts
 
-describe('サンダー', () => {
-  it('動かず、マップの落雷と、自分から飛ぶ電気の玉を出し続ける', () => {
-    const { sim, i } = legend('legend-zapdos');
-    const e = sim.world.enemies;
-    const x0 = e.x[i]!;
-    const y0 = e.y[i]!;
-    let bolts = 0;
-    let bullets = 0;
-    for (let t = 0; t < 30 * 3; t++) {
-      sim.world.players[0]!.invincibleTicks = 2;
-      sim.step([]);
-      for (const ev of sim.world.events) {
-        if (ev.type !== 'hazardTelegraphed') continue;
-        const id = moveId(sim, ev.move);
-        if (id === 'zapdos-field-bolt') bolts++;
-        if (id === 'zapdos-spray') bullets++;
-      }
-    }
-    expect(bolts).toBeGreaterThanOrEqual(6);
-    expect(bullets).toBeGreaterThanOrEqual(12);
-    expect(e.x[i]).toBeCloseTo(x0);
-    expect(e.y[i]).toBeCloseTo(y0);
-    // 飛ぶ玉は動いている
-    const moving = sim.world.hazards.filter((h) => moveId(sim, h.move) === 'zapdos-spray' && h.activeTicks !== undefined);
-    expect(moving.some((h) => Math.hypot(h.x - x0, h.y - y0) > 50)).toBe(true);
-  });
-});
-
+// サンダーは固定マップの戦いに作り直した（07 の〔サンダー〕章）。テストは src/sim/zapdosArena.test.ts
 describe('ファイヤー', () => {
   it('にらみつけるで防御が下がり、ゴッドバードは一番 HP の多いプレイヤーを追いかける（必中）', () => {
     const { sim } = legend('legend-moltres', 2);

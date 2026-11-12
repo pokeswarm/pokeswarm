@@ -350,6 +350,19 @@
     "contestType": "smart",
     "damageClass": "physical"
   },
+  "charge": {
+    "names": {
+      "ja": "じゅうでん",
+      "en": "Charge",
+      "fr": "Chargeur",
+      "de": "Ladevorgang",
+      "es": "Carga",
+      "it": "Sottocarica"
+    },
+    "type": "electric",
+    "contestType": "smart",
+    "damageClass": "status"
+  },
   "charm": {
     "names": {
       "ja": "あまえる",
@@ -778,6 +791,19 @@
     "type": "psychic",
     "contestType": "smart",
     "damageClass": "special"
+  },
+  "drill-peck": {
+    "names": {
+      "ja": "ドリルくちばし",
+      "en": "Drill Peck",
+      "fr": "Bec Vrille",
+      "de": "Bohrschnabel",
+      "es": "Pico Taladro",
+      "it": "Perforbecco"
+    },
+    "type": "flying",
+    "contestType": "cool",
+    "damageClass": "physical"
   },
   "dual-wingbeat": {
     "names": {

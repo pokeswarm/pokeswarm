@@ -527,29 +527,17 @@
         "moveIntervalSeconds": 0.6
       },
       "legend-zapdos": {
-        "moves": [
-          "zapdos-spray",
-          "zapdos-spray",
-          "zapdos-thunder"
+        "arena": { "halfWidth": 800, "halfHeight": 440, "viewHeight": 960 },
+        "anchor": { "x": 0, "y": -220 },
+        "noEnrage": true,
+        "hpMoves": [
+          { "belowHpPct": 66, "moves": ["zapdos-rain-dance", "zapdos-storm-charge"] },
+          { "belowHpPct": 33, "moves": ["zapdos-to-center", "zapdos-zap-cannon-charge", "zapdos-tired"] }
         ],
+        "moves": ["zapdos-agility", "zapdos-drill-peck", "zapdos-agility", "zapdos-thunder-wave", "zapdos-agility", "zapdos-thunderbolt"],
         "random": false,
-        "moveIntervalSeconds": 0.7,
-        "enrageMoveIntervalSeconds": 0.5,
-        "field": {
-          "overlay": {
-            "color": "#000000",
-            "alpha": 0.3
-          },
-          "flash": {
-            "color": "#fffde7",
-            "alpha": 0.55,
-            "everySeconds": 2.5
-          },
-          "lightning": {
-            "move": "zapdos-field-bolt",
-            "everySeconds": 0.35
-          }
-        }
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 0.6
       },
       "legend-moltres": {
         "moves": [

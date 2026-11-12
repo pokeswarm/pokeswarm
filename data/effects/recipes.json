@@ -6013,6 +6013,9 @@
     "boss-articuno-plain": {
       "extends": "ice.base"
     },
+    "boss-zapdos-plain": {
+      "extends": "electric.base"
+    },
     "boss-suicune-plain": {
       "extends": "water.base"
     },

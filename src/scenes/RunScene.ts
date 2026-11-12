@@ -23,6 +23,7 @@ import { AuroraSheet } from '../render/effects/AuroraSheet';
 import { MirrorCoat } from '../render/effects/MirrorCoat';
 import { MewtwoPsychic } from '../render/effects/MewtwoPsychic';
 import { ArticunoIce } from '../render/effects/ArticunoIce';
+import { ZapdosElectric } from '../render/effects/ZapdosElectric';
 import { WaterRun } from '../render/effects/WaterRun';
 import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
@@ -170,6 +171,7 @@ export class RunScene extends Phaser.Scene {
   private mirrorCoat: MirrorCoat | null = null;
   private mewtwoPsychic: MewtwoPsychic | null = null;
   private articunoIce: ArticunoIce | null = null;
+  private zapdosElectric: ZapdosElectric | null = null;
   /** 水の上を走る足元（07 の225章） */
   private waterRun: WaterRun | null = null;
   private introFading = false;
@@ -1901,7 +1903,7 @@ export class RunScene extends Phaser.Scene {
         g.strokePath();
         continue;
       }
-      if (mv?.surfRing) {
+      if (mv?.surfRing && !mv.customArt) {
         this.drawSurfRing(g, h, mv.surfRing);
         continue;
       }
@@ -3091,6 +3093,8 @@ export class RunScene extends Phaser.Scene {
     this.mewtwoPsychic.update(world, this.time.now);
     this.articunoIce ??= new ArticunoIce(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);
     this.articunoIce.update(world, this.time.now);
+    this.zapdosElectric ??= new ZapdosElectric(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6, spriteRender.depths.bosses + 0.05);
+    this.zapdosElectric.update(world, this.time.now);
     this.waterRun ??= new WaterRun(this, ARENA_FLOOR_DEPTH + 3.5, spriteRender.depths.bosses - 0.01);
     this.waterRun.update(world, this.time.now);
     // 地面の一部なので、障害物・雑魚より下（作者の依頼）

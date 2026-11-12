@@ -444,7 +444,14 @@
         "arena": {
           "halfWidth": 800,
           "halfHeight": 440,
-          "viewHeight": 960
+          "viewHeight": 960,
+          "map": {
+            "floor": "map/kanto/arena-mewtwo-floor.png",
+            "wall": "map/kanto/arena-mewtwo-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2,
+            "shimmer": ["map/kanto/arena-mewtwo-shimmer-a.png", "map/kanto/arena-mewtwo-shimmer-b.png"]
+          }
         },
         "anchor": {
           "x": 0,

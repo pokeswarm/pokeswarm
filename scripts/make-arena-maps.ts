@@ -934,16 +934,130 @@ function suicuneWall(): (Rgb | null)[] {
   return out;
 }
 
-const outDir = path.join('public', 'map', 'johto');
-fs.mkdirSync(outDir, { recursive: true });
+// --- ミュウツー: ハナダのどうくつの最深部（暗い岩の床に、地底の水がしみ出した大きな水たまり。07 の〔ミュウツー〕章） ---
+
+/** 技の紫・桃色・青と重ならないよう、床は暗い青灰色。線で囲まず、大きな面の明るさの違いで岩の板を見せる */
+const CAVE = ['#14141e', '#191a25', '#20212d', '#282a37', '#313343'].map(hex);
+const CAVE_WATER = ['#081218', '#0b1820', '#0f2029', '#132833', '#18313d'].map(hex);
+const CAVE_WET = hex('#1d2633');
+const CAVE_SHORE = hex('#394656');
+
+/** 地底の水（0 なら床、0〜1 は深さ）: 左下と右上に大きな水たまり、下の右寄りに細い入り江。真ん中は空ける */
+function caveWater(x: number, y: number): number {
+  const pools = [
+    { cx: 70, cy: 380, rx: 190, ry: 120 },
+    { cx: 760, cy: 50, rx: 170, ry: 100 },
+    { cx: 600, cy: 455, rx: 150, ry: 46 },
+    { cx: 20, cy: 40, rx: 70, ry: 60 },
+  ];
+  let best = 0;
+  for (const p of pools) {
+    const warp = (fbm(x / 60, y / 60, 701 + p.cx) - 0.5) * 0.7 + (fbm(x / 18, y / 18, 709) - 0.5) * 0.14;
+    const d = Math.hypot((x - p.cx) / p.rx, (y - p.cy) / p.ry) + warp;
+    if (d < 1) best = Math.max(best, Math.min(1, (1 - d) / 0.35));
+  }
+  return best;
+}
+
+function mewtwoFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
+  const floor: Rgb[] = [];
+  const shimmerA: (Rgb | null)[] = [];
+  const shimmerB: (Rgb | null)[] = [];
+  const glintA = hex('#5d8ea3');
+  const glintB = hex('#7fb0c2');
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const w = caveWater(x, y);
+    let col: Rgb;
+    if (w > 0) {
+      // 深いほど暗い。水面に天井の暗さが映るむら
+      const t = 0.75 - w * 0.6 + (fbm(x / 40, y / 22, 721) - 0.5) * 0.35;
+      col = ramp(CAVE_WATER, t, x, y);
+      // 岸の 1〜2 ドット: ぬれた岩のふち
+      const near = caveWater(x + 2, y) === 0 || caveWater(x - 2, y) === 0 || caveWater(x, y + 2) === 0 || caveWater(x, y - 2) === 0;
+      if (near && w < 0.25) col = CAVE_SHORE;
+      // 水面の光（ゆっくり交互に）
+      // まばらな短い横の光（細かい点を散らすと砂嵐に見えた）
+      const ripple = valueNoise(x / 22, y / 2.6, 731);
+      shimmerA.push(ripple > 0.9 && hash2(x >> 2, y, 733) > 0.7 && w > 0.4 ? glintA : null);
+      const ripple2 = valueNoise(x / 22 + 7, y / 2.6 + 3, 737);
+      shimmerB.push(ripple2 > 0.91 && hash2(x >> 2, y, 739) > 0.72 && w > 0.4 ? glintB : null);
+    } else {
+      // 岩の板: 大きなむらと、板ごとの明るさ（境に線を引かない）
+      const slab = worley(x, y, 74, 741);
+      const center = Math.hypot((x - W / 2) / (W / 2), (y - H / 2) / (H / 2));
+      let t = 0.4 + Math.max(0, 1 - center) * 0.2 + (fbm(x / 110, y / 110, 743) - 0.5) * 0.5 + (hash2(slab.id, 1, 745) - 0.5) * 0.18 + (fbm(x / 20, y / 20, 747) - 0.5) * 0.16;
+      // 水の近くはぬれて暗い
+      let wet = 0;
+      for (const [dx, dy] of [[6, 0], [-6, 0], [0, 6], [0, -6], [12, 0], [-12, 0], [0, 12], [0, -12]] as const) if (caveWater(x + dx, y + dy) > 0) wet++;
+      t -= wet * 0.035;
+      col = ramp(CAVE, t, x, y);
+      if (wet >= 3 && hash2(x, y, 749) > 0.5) col = CAVE_WET;
+      // 壁ぎわの砂利（細かい明暗）
+      const edge = Math.min(x, y, W - 1 - x, H - 1 - y);
+      if (edge < 26 && hash2(x, y, 753) > 0.55 + edge / 60) col = hash2(x, y, 755) > 0.5 ? CAVE[3]! : CAVE[1]!;
+      // 小さな水たまり（まばら）
+      if (fbm(x / 9, y / 6, 757) > 0.8 && fbm(x / 70, y / 70, 759) > 0.55) col = hash2(x, y, 761) > 0.85 ? CAVE_SHORE : CAVE_WATER[2]!;
+      // まばらな小石（明るい点と影の点。囲む線は描かない）
+      const r = hash2(x, y, 751);
+      if (r > 0.992) col = CAVE[4]!;
+      else if (r < 0.006) col = CAVE[0]!;
+      shimmerA.push(null);
+      shimmerB.push(null);
+    }
+    floor.push(col);
+  }
+  return { floor, shimmerA, shimmerB };
+}
+
+const CAVE_WALL = ['#0c0c14', '#12121c', '#191a25', '#222331', '#2d2e3f'].map(hex);
+
+function mewtwoWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const dark = hex('#06060b');
+  const rimLight = hex('#4a4c60');
+  const rimDark = hex('#101018');
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = inset(iy, 11) - ix;
+    const fromRight = ix - (W - 1 - inset(iy, 12));
+    const fromTop = inset(ix, 13) - iy;
+    const fromBottom = iy - (H - 1 - inset(ix, 14));
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    const isTop = fromTop >= Math.max(fromLeft, fromRight, fromBottom);
+    const size = isTop ? 24 : 18;
+    const stone = worley(x, y, size, 761);
+    const round = (stone.dx + stone.dy) / size;
+    let t = 0.48 + round * 0.4 + (hash2(stone.id, 2, 763) - 0.5) * 0.22 + (fbm(x / 28, y / 28, 765) - 0.5) * 0.3;
+    // 上の壁: 天井から垂れる鍾乳石の縦のすじ
+    if (isTop) t += (fbm(x / 5, y / 40, 767) - 0.5) * 0.35;
+    t -= Math.max(0, dist - 8) * 0.014;
+    let col = ramp(CAVE_WALL, t, x, y);
+    if (stone.edge < 0.8) col = CAVE_WALL[0]!;
+    if (dist > MARGIN - 14 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (dist - (MARGIN - 14)) / 14) col = dark;
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 2.5) col = rimLight;
+    out.push(col);
+  }
+  return out;
+}
+
 const arenas = [
   { id: 'lugia', ...lugiaFloor(), wall: lugiaWall() },
   { id: 'hooh', ...hoohFloor(), wall: hoohWall() },
   { id: 'raikou', ...raikouFloor(), wall: raikouWall() },
   { id: 'entei', ...enteiFloor(), wall: enteiWall() },
   { id: 'suicune', ...suicuneFloor(), wall: suicuneWall() },
+  { id: 'mewtwo', region: 'kanto', ...mewtwoFloor(), wall: mewtwoWall() },
 ];
 for (const a of arenas) {
+  const outDir = path.join('public', 'map', 'region' in a ? a.region : 'johto');
+  fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(path.join(outDir, `arena-${a.id}-floor.png`), toPng(a.floor, W, H));
   fs.writeFileSync(path.join(outDir, `arena-${a.id}-shimmer-a.png`), toPng(a.shimmerA, W, H));
   fs.writeFileSync(path.join(outDir, `arena-${a.id}-shimmer-b.png`), toPng(a.shimmerB, W, H));

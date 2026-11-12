@@ -141,6 +141,8 @@ export interface Hazard {
   lastWall?: number;
   sinceAim?: number;
   /** 跳ね回る（ボルテッカー）: 跳ね返る箱の中心 */
+  /** 壁に着いて消える飛ぶ玉（はどうだんは壁では弾けない） */
+  atWall?: boolean;
   /** 狙った場所までの距離（投げた岩。ここを過ぎてから壁に当たると、壁にひびが入る。ミュウツーの バリアー） */
   readonly aimDist?: number;
   readonly boxX?: number;

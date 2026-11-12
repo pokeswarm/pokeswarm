@@ -64,7 +64,9 @@ describe('ミュウツー（07 の〔ミュウツー〕章）', () => {
   });
 
   it('サイコキネシス: 狙った人を囲む岩から、その人の場所を通る線。落ちると岩がその向きへ飛ぶ', () => {
-    const { p, force, of, step } = setup();
+    const { w, p, force, of, step } = setup();
+    p.x = w.arena!.x;
+    p.y = w.arena!.y;
     force('mewtwo-psychic');
     step(0.2);
     const lines = of('mewtwo-psychic');
@@ -82,15 +84,29 @@ describe('ミュウツー（07 の〔ミュウツー〕章）', () => {
     expect(rocks.every((r) => r.activeTicks !== undefined)).toBe(true);
   });
 
+  it('壁ぎわにいても、岩はすぐそばに置かれない（壁の外になる岩は反対側へ）', () => {
+    const { w, p, force, of, step } = setup();
+    for (const [x, y] of [[0, 1], [1, 0], [1, 1], [-1, -1]] as const) {
+      p.x = w.arena!.x + x * (w.arena!.halfWidth - 20);
+      p.y = w.arena!.y + y * (w.arena!.halfHeight - 20);
+      force('mewtwo-psychic');
+      step(0.3);
+      const near = Math.min(...of('mewtwo-psychic').map((h) => Math.hypot(h.x - p.x, h.y - p.y)));
+      expect(near).toBeGreaterThan(x !== 0 && y !== 0 ? 150 : 230);
+    }
+  });
+
   it('バリアーを張っている間は、投げる岩が多い', () => {
-    const { boss, force, of, step } = setup();
+    const { w, p, boss, force, of, step } = setup();
+    p.x = w.arena!.x;
+    p.y = w.arena!.y;
     boss.barrier = 1000;
     force('mewtwo-psychic');
     step(0.2);
     expect(of('mewtwo-psychic').length).toBe(8);
   });
 
-  it('はどうだん: ためてから狙った人へまっすぐ撃ち（追わない）、消えるときに 14 個の小さな玉に弾ける', () => {
+  it('はどうだん: ためてから狙った人へまっすぐ撃ち（追わない）、プレイヤーより遠くで 12 個の小さな玉に弾ける', () => {
     const { p, i, w, force, of, step } = setup();
     force('mewtwo-aura-sphere');
     step(1.2);
@@ -105,8 +121,12 @@ describe('ミュウツー（07 の〔ミュウツー〕章）', () => {
     p.x += 200;
     step(1);
     expect([orb.dirX, orb.dirY]).toEqual(dir);
-    step(2);
-    expect(of('mewtwo-aura-shard').length).toBe(14);
+    let shards = 0;
+    for (let t = 0; t < 30 * 4 && shards === 0; t++) {
+      step(1 / 30);
+      shards = of('mewtwo-aura-shard').length;
+    }
+    expect(shards).toBe(12);
   });
 
   it('HP 66% でバリアー: 攻撃では割れず、その場で岩を投げ続ける。プレイヤーの場所を過ぎた岩が 3 回当たると割れて 3 秒ふらつく', () => {

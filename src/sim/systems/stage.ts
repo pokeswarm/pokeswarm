@@ -1432,6 +1432,9 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   }
 }
 
+/** サイコキネシス: 岩を投げてくる向きの最小の開き（度） */
+const MIN_ROCK_GAP_DEGREES = 34;
+
 /** サイコキネシス（07 の〔ミュウツー〕章）: 狙った人を囲む場所から、その人を通る直線。どの線も狙った人の今の場所で交わる */
 function castLiftThrow(
   world: World,
@@ -1444,10 +1447,30 @@ function castLiftThrow(
 ): void {
   const count = boss?.barrier !== undefined ? (lt.barrierCount ?? lt.count) : lt.count;
   const a0 = world.rng.range(0, Math.PI * 2);
+  // 投げてくる向き（狙った人から見た岩の向き）。近い向きの岩は投げない（角で逃げ道が無くならないように）
+  const used: number[] = [];
   for (let k = 0; k < count; k++) {
-    const ang = a0 + (k * Math.PI * 2) / count + world.rng.range(-0.25, 0.25);
+    // ばらつきは間隔の 1 割ほど（数が多いと間隔が狭いので、ばらつきも小さく）
+    const jitter = Math.min(0.25, ((Math.PI * 2) / count) * 0.12);
+    const ang = a0 + (k * Math.PI * 2) / count + world.rng.range(-jitter, jitter);
     const d = world.rng.range(lt.minDistance, lt.maxDistance);
-    const [x, y] = clampToArena(world, target.x + Math.cos(ang) * d, target.y + Math.sin(ang) * d);
+    // 壁の外になる岩は、反対側か横へ（壁ぎわ・角で、すぐそばに岩が置かれないように）。どこも近ければ一番遠い所
+    let x = 0;
+    let y = 0;
+    let best = -1;
+    for (const turn of [0, Math.PI, Math.PI / 2, -Math.PI / 2]) {
+      const [cx, cy] = clampToArena(world, target.x + Math.cos(ang + turn) * d, target.y + Math.sin(ang + turn) * d);
+      const far = Math.hypot(cx - target.x, cy - target.y);
+      if (far > best) {
+        best = far;
+        x = cx;
+        y = cy;
+      }
+      if (far >= d * 0.8) break;
+    }
+    const from = Math.atan2(y - target.y, x - target.x);
+    if (used.some((u) => Math.abs(Math.atan2(Math.sin(from - u), Math.cos(from - u))) < (MIN_ROCK_GAP_DEGREES * Math.PI) / 180)) continue;
+    used.push(from);
     const len = Math.hypot(target.x - x, target.y - y) || 1;
     // 止まって出す技は、落ちた時にまた動けるようボスを結び付ける
     put(x, y, (target.x - x) / len, (target.y - y) / len, bossId, { delay: Math.round((stagger * k) / world.dt), aimDist: len });
@@ -1774,9 +1797,9 @@ function strikeHazards(world: World): void {
       }
       if (--hz.activeTicks <= 0) {
         world.hazards.splice(h, 1);
-        // 消えるときに弾ける玉（はどうだん）: 全方向へ等しい角度で
+        // 消えるときに弾ける玉（はどうだん）: 全方向へ等しい角度で。壁に着いた玉は弾けない（壁ぎわで、すぐ後ろに輪が出ないように）
         const burst = move?.bullets?.burst;
-        if (burst && world.role !== 'guest') {
+        if (burst && !hz.atWall && world.role !== 'guest') {
           const [bx, by] = clampToArena(world, hz.x, hz.y);
           const idx = moveIndexOfStage(world.rules, burst.move);
           const a0 = Math.atan2(hz.dirY, hz.dirX);
@@ -2027,8 +2050,10 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
     hz.y += hz.dirY * bullets.speed * world.dt;
     // 固定マップの壁で消える
     const a = world.arena;
-    if (a && (Math.abs(hz.x - a.x) > a.halfWidth || Math.abs(hz.y - a.y) > a.halfHeight)) hz.activeTicks = 1;
-    else if (hz.activeTicks !== undefined && hz.activeTicks > 1) rockHitsBarrier(world, hz);
+    if (a && (Math.abs(hz.x - a.x) > a.halfWidth || Math.abs(hz.y - a.y) > a.halfHeight)) {
+      hz.activeTicks = 1;
+      hz.atWall = true;
+    } else if (hz.activeTicks !== undefined && hz.activeTicks > 1) rockHitsBarrier(world, hz);
     return;
   }
   if (move.surfRing) {

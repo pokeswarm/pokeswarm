@@ -567,7 +567,7 @@ export const bossMoveSchema = z.object({
       seconds: z.number().positive(),
       /** 狙った人の今の場所へまっすぐ撃つ（追わない）。無ければランダムな向き */
       aimed: z.boolean().optional(),
-      /** 消えるとき（時間が来た・壁に着いた）に、技 move を count 個、全方向へ等しい角度で飛ばす（ミュウツーの はどうだん。07 の〔ミュウツー〕章） */
+      /** 時間が来て消えるときに（壁に着いたときは弾けない）、技 move を count 個、全方向へ等しい角度で飛ばす（ミュウツーの はどうだん。07 の〔ミュウツー〕章） */
       burst: z.object({ move: z.string().min(1), count: z.number().int().positive() }).optional(),
     })
     .optional(),

@@ -22,6 +22,7 @@ import { WaveSheet } from '../render/effects/WaveSheet';
 import { AuroraSheet } from '../render/effects/AuroraSheet';
 import { MirrorCoat } from '../render/effects/MirrorCoat';
 import { MewtwoPsychic } from '../render/effects/MewtwoPsychic';
+import { ArticunoIce } from '../render/effects/ArticunoIce';
 import { WaterRun } from '../render/effects/WaterRun';
 import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
@@ -168,6 +169,7 @@ export class RunScene extends Phaser.Scene {
   /** ミラーコートの鏡（07 の223章） */
   private mirrorCoat: MirrorCoat | null = null;
   private mewtwoPsychic: MewtwoPsychic | null = null;
+  private articunoIce: ArticunoIce | null = null;
   /** 水の上を走る足元（07 の225章） */
   private waterRun: WaterRun | null = null;
   private introFading = false;
@@ -1919,7 +1921,7 @@ export class RunScene extends Phaser.Scene {
       if (mv?.countdown) this.drawCountdown(h, countdowns++);
       // ダメージの無い技（ため・強化・回復・本物が現れる所）は、赤い予告を出さない（絵だけ。07 の167章）
       // 投げる岩の通り道（サイコキネシス）は、予告の線そのものが避ける場所
-      if (mv && mv.damage <= 0 && !mv.counter && !mv.liftThrow) continue;
+      if (mv && mv.damage <= 0 && !mv.counter && !mv.liftThrow && !mv.shot) continue;
       if (mv?.hideTelegraph) continue;
       // 跳ね回る技（ボルテッカー・ころがる）: 走り出す向きを線で見せる
       if (mv?.bounce) {
@@ -3087,6 +3089,8 @@ export class RunScene extends Phaser.Scene {
     this.mirrorCoat.update(world, this.time.now);
     this.mewtwoPsychic ??= new MewtwoPsychic(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6, spriteRender.depths.bosses + 0.05);
     this.mewtwoPsychic.update(world, this.time.now);
+    this.articunoIce ??= new ArticunoIce(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);
+    this.articunoIce.update(world, this.time.now);
     this.waterRun ??= new WaterRun(this, ARENA_FLOOR_DEPTH + 3.5, spriteRender.depths.bosses - 0.01);
     this.waterRun.update(world, this.time.now);
     // 地面の一部なので、障害物・雑魚より下（作者の依頼）

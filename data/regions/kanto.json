@@ -503,23 +503,17 @@
         "enrageMoveIntervalSeconds": 0.4
       },
       "legend-articuno": {
-        "moves": [
-          "articuno-dash",
-          "articuno-burst",
-          "articuno-blizzard"
+        "arena": { "halfWidth": 800, "halfHeight": 440, "viewHeight": 960 },
+        "anchor": { "x": 0, "y": -220 },
+        "noEnrage": true,
+        "hpMoves": [
+          { "belowHpPct": 66, "moves": ["articuno-hail"] },
+          { "belowHpPct": 33, "moves": ["articuno-to-top", "articuno-mind-reader", "articuno-tired"] }
         ],
+        "moves": ["articuno-glide", "articuno-ice-shard", "articuno-glide", "articuno-icy-wind", "articuno-glide", "articuno-freeze-dry"],
         "random": false,
-        "field": {
-          "damagePctPerSecond": 1,
-          "slowPct": 25,
-          "freezeBelowHpPct": 10,
-          "freezeSeconds": 5,
-          "overlay": {
-            "color": "#e1f5fe",
-            "alpha": 0.18
-          },
-          "weather": "blizzard-aura"
-        }
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 0.6
       },
       "legend-zapdos": {
         "moves": [

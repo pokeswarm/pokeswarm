@@ -6010,6 +6010,9 @@
     "boss-mewtwo-psystrike": {
       "extends": "psychic.base"
     },
+    "boss-articuno-plain": {
+      "extends": "ice.base"
+    },
     "boss-suicune-plain": {
       "extends": "water.base"
     },

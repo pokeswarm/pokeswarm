@@ -1234,6 +1234,19 @@
     "contestType": "beauty",
     "damageClass": "physical"
   },
+  "hail": {
+    "names": {
+      "ja": "あられ",
+      "en": "Hail",
+      "fr": "Grêle",
+      "de": "Hagelsturm",
+      "es": "Granizo",
+      "it": "Grandine"
+    },
+    "type": "ice",
+    "contestType": "beauty",
+    "damageClass": "status"
+  },
   "harden": {
     "names": {
       "ja": "かたくなる",
@@ -1454,6 +1467,19 @@
     "type": "ice",
     "contestType": null,
     "damageClass": "physical"
+  },
+  "icy-wind": {
+    "names": {
+      "ja": "こごえるかぜ",
+      "en": "Icy Wind",
+      "fr": "Vent Glace",
+      "de": "Eissturm",
+      "es": "Viento Hielo",
+      "it": "Ventogelato"
+    },
+    "type": "ice",
+    "contestType": "beauty",
+    "damageClass": "special"
   },
   "iron-defense": {
     "names": {
@@ -1778,6 +1804,19 @@
     },
     "type": "normal",
     "contestType": "cute",
+    "damageClass": "status"
+  },
+  "mind-reader": {
+    "names": {
+      "ja": "こころのめ",
+      "en": "Mind Reader",
+      "fr": "Lire-Esprit",
+      "de": "Willensleser",
+      "es": "Telépata",
+      "it": "Leggimente"
+    },
+    "type": "normal",
+    "contestType": "smart",
     "damageClass": "status"
   },
   "mirror-coat": {

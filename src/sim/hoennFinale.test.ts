@@ -148,7 +148,8 @@ describe('ボスの技を避けられるように（07 の190章）', () => {
 
   it('ダメージのある扇の技には、必ず絵がある', () => {
     // windWave は絵の代わりに風の波を描く（ふきとばし。07 の204章）
-    for (const m of moves.filter((x) => x.shape === 'cone' && x.damage > 0 && !x.windWave)) {
+    // customArt は専用の絵のクラスで描く（フリーザーの こごえるかぜ）
+    for (const m of moves.filter((x) => x.shape === 'cone' && x.damage > 0 && !x.windWave && !x.customArt)) {
       const r = effectRecipes[m.effect];
       expect(r?.strike ?? r?.bossActive, m.id).toBeTruthy();
     }

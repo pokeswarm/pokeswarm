@@ -733,7 +733,11 @@ export const bossMoveSchema = z.object({
   /** 雲を流す（ライコウの かみなり。07 の211章）: 固定マップを 3 つに分けた列に、技 move を上下の端から交互に流す（1 列は狙った人の場所）。流れている間は次の技を holdSeconds 待つ */
   clouds: z.object({ move: z.string().min(1), holdSeconds: z.number().nonnegative() }).optional(),
   /** 当たっている間、半径 radius の中のランダムな場所へ、技 move を everySeconds ごとに落とす（雲の下の落雷。07 の211章） */
-  emit: z.object({ move: z.string().min(1), everySeconds: z.number().positive(), radius: z.number().positive() }).optional(),
+  emit: z.object({ move: z.string().min(1), everySeconds: z.number().positive(), radius: z.number().positive(), /** 範囲の中でなく、固定マップ全体のランダムな場所へ（フリーザーの あられ） */ wholeArena: z.boolean().optional() }).optional(),
+  /** 落ちたら、予告の線の根元から同じ向きへ技 move（bullets の技）を撃つ（フリーザーの こおりのつぶて。07 の〔フリーザー〕章） */
+  shot: z.object({ move: z.string().min(1) }).optional(),
+  /** 固定マップの決まった場所（マップの真ん中からの x・y と半径。マップの絵の水と同じ所）に置く（フリーザーの フリーズドライ） */
+  arenaSpots: z.array(z.tuple([z.number(), z.number(), z.number().positive()])).optional(),
   /**
    * 地割れ（エンテイの ふみつけ。07 の214章）: 狙った向きを真ん中に spreadDegrees ずつ開いて count 本、壁まで（maxLength まで）割れ目（技 line）を走らせ、
    * 予告の後、割れ目に沿って spacing ごとに炎（技 flame）を根元から delayPerPixel 秒/ピクセルで順に立てる
@@ -754,7 +758,7 @@ export const bossMoveSchema = z.object({
   /** 今のマップの中の、狙った人から minDistance〜maxDistance の場所へ speed で滑っていく（スイクン。07 の218章） */
   glide: z.object({ minDistance: z.number().nonnegative(), maxDistance: z.number().positive(), speed: z.number().positive() }).optional(),
   /** 今のマップの中の、狙った人から minDistance〜maxDistance の場所へ瞬間移動する（予告はその場所。teleport・hideBoss と組む。ミュウツー。07 の〔ミュウツー〕章） */
-  /** 専用の絵のクラス（src/render/effects）で描く。飛ぶ玉のふつうの黄色い玉を描かない（ミュウツーの岩・はどうだん。07 の〔ミュウツー〕章） */
+  /** 専用の絵のクラス（src/render/effects）で描く。飛ぶ玉のふつうの黄色い玉を描かない（ミュウツーの岩・はどうだん・フリーザーの こごえるかぜ。07 の〔ミュウツー〕章） */
   customArt: z.boolean().optional(),
   blink: z.object({ minDistance: z.number().nonnegative(), maxDistance: z.number().positive(), /** 狙った人に関係なく、マップの真ん中へ（サイコブレイクの前） */ center: z.boolean().optional() }).optional(),
   /**
@@ -860,6 +864,8 @@ export const bossMoveSchema = z.object({
       mudSeconds: z.number().positive().optional(),
       burnSeconds: z.number().positive().optional(),
       chill: z.number().int().positive().optional(),
+      /** すぐ凍らせる秒数（冷えを溜めずに。フリーザーの ぜったいれいど。07 の〔フリーザー〕章） */
+      freezeSeconds: z.number().positive().optional(),
       flinchSeconds: z.number().positive().optional(),
       /** ボス（無ければ範囲の中心）から外へ、速さ pushSpeed で pushSeconds 秒すべらせる（瞬間移動させない。07 の167章 あてみなげ） */
       pushSpeed: z.number().positive().optional(),

@@ -24,24 +24,7 @@ function moveId(sim: Simulation, idx: number): string {
 }
 
 // ミュウツーは固定マップの戦いに作り直した（07 の〔ミュウツー〕章）。テストは src/sim/mewtwoArena.test.ts
-describe('フリーザー', () => {
-  it('戦いの間、毎秒 最大 HP の 1% を削られて遅くなり、HP が 10% を切ると凍る', () => {
-    const { sim, p } = legend('legend-articuno');
-    expect(activeLegendField(sim.world)?.field.damagePctPerSecond).toBe(1);
-    // 範囲技に当たらないよう、ずっと無敵にして数える（ふぶきは無敵でも削られる）
-    const before = p.hp;
-    for (let t = 0; t < 30 * 4; t++) {
-      p.invincibleTicks = 2;
-      sim.step([]);
-    }
-    expect(before - p.hp).toBeCloseTo((p.maxHp * 4) / 100, 0);
-    expect(p.zoneSlowPct).toBeGreaterThan(0);
-    p.hp = p.maxHp * 0.09;
-    p.invincibleTicks = 999;
-    sim.step([]);
-    expect(p.frozenTicks).toBeGreaterThan(0);
-  });
-});
+// フリーザーは固定マップの戦いに作り直した（07 の〔フリーザー〕章）。テストは src/sim/articunoArena.test.ts
 
 describe('サンダー', () => {
   it('動かず、マップの落雷と、自分から飛ぶ電気の玉を出し続ける', () => {
@@ -237,6 +220,11 @@ describe('色違いの御三家（プレイヤーと同じ技）', () => {
     expect(w.legendTargets.get(id)).toBe(1);
     // 足元に落とす技（ふぶき）は、2 人それぞれの近くに落ちる
     const blizzard = w.rules.stage.moves.findIndex((m) => m.id === 'articuno-blizzard');
+    // フリーザーは作り直して ふぶき を使わないので、昔の ふぶき（ミュウの ゆびをふる が使う）を使わせる
+    const boss = w.bosses[0]!;
+    boss.moves = [blizzard];
+    boss.next = 0;
+    boss.hpMoves = [];
     const near = new Set<number>();
     for (let t = 0; t < 30 * 20 && near.size < 2; t++) {
       sim.step([]);

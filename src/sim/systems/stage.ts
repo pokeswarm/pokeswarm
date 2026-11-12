@@ -1168,6 +1168,12 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     put(x, y, 0, 1, bossId);
     return;
   }
+  if (move.arenaSpots && world.arena) {
+    // マップの決まった場所（フリーズドライ: 海水の流れが凍る）。1 回の技で当たるのは 1 回
+    const a = world.arena;
+    move.arenaSpots.forEach(([sx, sy, r], k) => put(a.x + sx, a.y + sy, 0, 1, k === 0 && move.rooted ? bossId : -1, { radius: r }));
+    return;
+  }
   if (move.liftThrow) {
     castLiftThrow(world, boss, move.liftThrow, target, move.stagger ?? 0, put, bossId);
     return;
@@ -1724,6 +1730,11 @@ function hitLocal(world: World, me: World['players'][number], hz: World['hazards
   if (on.mudSeconds) me.mudTicks = Math.max(me.mudTicks ?? 0, Math.round(on.mudSeconds / world.dt));
   if (on.burnSeconds) me.burnTicks = (me.burnTicks ?? 0) + Math.round(on.burnSeconds / world.dt);
   if (on.flinchSeconds && !me.frozenTicks) me.frozenTicks = Math.round(on.flinchSeconds / world.dt);
+  if (on.freezeSeconds) {
+    me.chill = 0;
+    me.frozenTicks = Math.max(me.frozenTicks ?? 0, Math.round(on.freezeSeconds / world.dt));
+    world.events.push({ type: 'playerFrozen', playerId: me.id });
+  }
   if (on.chill) {
     const rules = world.rules.stage.bossRules;
     me.chill = (me.chill ?? 0) + on.chill;
@@ -1768,9 +1779,15 @@ function strikeHazards(world: World): void {
     if (hz.activeTicks !== undefined) {
       // 雲の下の落雷（ソロ・ホスト）
       if (move?.emit && world.role !== 'guest' && hz.activeTicks % Math.max(1, Math.round(move.emit.everySeconds / world.dt)) === 0) {
-        const [rx, ry] = randomUnit(world.rng);
-        const d = world.rng.range(0, move.emit.radius);
-        addHazard(world, moveIndexOfStage(world.rules, move.emit.move), hz.x + rx * d, hz.y + ry * d, 0, 1, -1, undefined, { group: world.nextHazardGroup++ });
+        const a = world.arena;
+        if (move.emit.wholeArena && a) {
+          // 固定マップ全体のランダムな場所（あられ）
+          addHazard(world, moveIndexOfStage(world.rules, move.emit.move), a.x + world.rng.range(-a.halfWidth, a.halfWidth), a.y + world.rng.range(-a.halfHeight, a.halfHeight), 0, 1, -1, undefined, { group: world.nextHazardGroup++ });
+        } else {
+          const [rx, ry] = randomUnit(world.rng);
+          const d = world.rng.range(0, move.emit.radius);
+          addHazard(world, moveIndexOfStage(world.rules, move.emit.move), hz.x + rx * d, hz.y + ry * d, 0, 1, -1, undefined, { group: world.nextHazardGroup++ });
+        }
       }
       if (--hz.activeTicks <= 0) {
         world.hazards.splice(h, 1);
@@ -2158,6 +2175,8 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
       addHazard(world, idx, world.enemies.x[i]!, world.enemies.y[i]!, Math.cos(a), Math.sin(a), -1, undefined, { group });
     }
   }
+  // 予告の線の根元から撃つ（こおりのつぶて）
+  if (move.shot) addHazard(world, moveIndexOfStage(world.rules, move.shot.move), hz.x, hz.y, hz.dirX, hz.dirY, -1, undefined, { group: world.nextHazardGroup++ });
   // 持ち上げた岩を投げる（サイコキネシス）: 予告の線の向きへ
   if (move.liftThrow) addHazard(world, moveIndexOfStage(world.rules, move.liftThrow.rock), hz.x, hz.y, hz.dirX, hz.dirY, -1, undefined, { group: world.nextHazardGroup++, ...(hz.aimDist !== undefined ? { aimDist: hz.aimDist } : {}) });
   // ためきった（じこさいせい）: もう止められない

@@ -296,6 +296,9 @@
   ],
   "moves": [
     "barrier",
+    "icy-wind",
+    "hail",
+    "mind-reader",
     "acid-spray",
     "aerial-ace",
     "aeroblast",

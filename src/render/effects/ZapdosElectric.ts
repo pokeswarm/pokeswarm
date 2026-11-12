@@ -190,8 +190,9 @@ export class ZapdosElectric {
       this.g.lineStyle(3, 0xfff59d, 0.3 + 0.5 * p).strokePoints(pts);
       return;
     }
-    this.g.lineStyle(hz.radius * 2.2, 0xffd600, 0.3).lineBetween(hz.x, hz.y, ex, ey);
-    this.g.lineStyle(hz.radius * 1.4, 0xfff176, 0.7).lineBetween(hz.x, hz.y, ex, ey);
+    // 当たる幅（直径）と同じ太さを、はっきり明るく。外の薄い光は少しだけ外へ
+    this.g.lineStyle(hz.radius * 2.3, 0xffd600, 0.22).lineBetween(hz.x, hz.y, ex, ey);
+    this.g.lineStyle(hz.radius * 2, 0xfff176, 0.6).lineBetween(hz.x, hz.y, ex, ey);
     this.g.lineStyle(hz.radius * 0.6, 0xffffff, 0.95).lineBetween(hz.x, hz.y, ex, ey);
     for (let k = 0; k < 3; k++) {
       const pts = bolt(hz.x, hz.y, ex, ey, phase * 3 + k, hz.radius * 1.1, 30).map(([x, y]) => new Phaser.Math.Vector2(x, y));

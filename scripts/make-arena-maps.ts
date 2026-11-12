@@ -959,6 +959,130 @@ function caveWater(x: number, y: number): number {
   return best;
 }
 
+// --- フリーザー: ふたごじまの最深部（凍えた岩の床を、海水の流れが 2 本斜めに横切る。07 の〔フリーザー〕章） ---
+
+/** フリーズドライで凍る帯と同じ折れ線（data/game/stage.json の articuno-freeze-dry の arenaPaths。ワールドの単位で、マップの真ん中から） */
+const SEA_PATHS: { radius: number; points: [number, number][] }[] = (() => {
+  const stage = JSON.parse(fs.readFileSync(path.join('data', 'game', 'stage.json'), 'utf8')) as { moves: { id: string; arenaPaths?: { radius: number; points: [number, number][] }[] }[] };
+  return stage.moves.find((m) => m.id === 'articuno-freeze-dry')?.arenaPaths ?? [];
+})();
+
+/** 技の白・水色と重ならないよう、床は暗い青い岩。氷は床の色を少し明るくしたうすい膜だけ */
+const SEA_ROCK = ['#121a24', '#17212d', '#1d2836', '#243141', '#2c3a4c'].map(hex);
+const SEA = ['#071a26', '#0a2231', '#0d2a3b', '#113346', '#163d52'].map(hex);
+const SEA_FOAM = hex('#5f8ea6');
+const FROST_RIM = hex('#4c6a80');
+
+/** 海水の流れの中なら、帯の縁からの深さ（ドット。0 以下は外） */
+function seaDepth(x: number, y: number): number {
+  // ドット → ワールド（マップの真ん中から）
+  const wx = x * 2 - W;
+  const wy = y * 2 - H;
+  let best = -Infinity;
+  for (const path of SEA_PATHS) {
+    for (let k = 0; k + 1 < path.points.length; k++) {
+      const [x0, y0] = path.points[k]!;
+      const [x1, y1] = path.points[k + 1]!;
+      const dx = x1 - x0;
+      const dy = y1 - y0;
+      const t = Math.max(0, Math.min(1, ((wx - x0) * dx + (wy - y0) * dy) / (dx * dx + dy * dy)));
+      const d = Math.hypot(wx - (x0 + dx * t), wy - (y0 + dy * t));
+      best = Math.max(best, (path.radius - d) / 2);
+    }
+  }
+  // 縁は少し内側でゆらす（絵の水は当たる帯からはみ出さない）
+  return best - 3 - fbm(x / 14, y / 14, 801) * 4;
+}
+
+function articunoFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
+  const floor: Rgb[] = [];
+  const shimmerA: (Rgb | null)[] = [];
+  const shimmerB: (Rgb | null)[] = [];
+  const glintA = hex('#6fa7c0');
+  const glintB = hex('#9ccbe0');
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const sea = seaDepth(x, y);
+    let col: Rgb;
+    if (sea > 0) {
+      // 流れの真ん中ほど深い。流れに沿ったゆるいむら
+      const t = 0.7 - Math.min(1, sea / 30) * 0.5 + (fbm(x / 30 + y / 60, y / 18 - x / 40, 811) - 0.5) * 0.35;
+      col = ramp(SEA, t, x, y);
+      // 水ぎわの 1 ドットだけ、ところどころ明るく（輪郭の線に見えないように）
+      if (sea < 1 && fbm(x / 9, y / 9, 843) > 0.45) col = FROST_RIM;
+      // 泡: 流れの向き（斜め）に短く、まばら
+      if (sea > 4 && valueNoise((x + y * 0.62) / 3, (y - x * 0.62) / 16, 813) > 0.9 && hash2(x >> 1, y, 815) > 0.65) col = SEA_FOAM;
+      const g1 = valueNoise((x + y * 0.62) / 3.5, (y - x * 0.62) / 20, 817);
+      shimmerA.push(sea > 6 && g1 > 0.9 && hash2(x >> 2, y, 819) > 0.7 ? glintA : null);
+      const g2 = valueNoise((x + y * 0.62) / 3.5 + 9, (y - x * 0.62) / 20 + 4, 821);
+      shimmerB.push(sea > 6 && g2 > 0.91 && hash2(x >> 2, y, 823) > 0.72 ? glintB : null);
+    } else {
+      // 凍えた岩: 大きな明暗の面（線で囲まない）と、うすい氷の膜
+      const slab = worley(x, y, 64, 831);
+      let t = 0.44 + (fbm(x / 100, y / 100, 833) - 0.5) * 0.45 + (hash2(slab.id, 1, 835) - 0.5) * 0.16 + (fbm(x / 18, y / 18, 837) - 0.5) * 0.14;
+      // 水ぎわはしぶきで暗くぬれる
+      if (sea > -6) t -= 0.12;
+      col = ramp(SEA_ROCK, t, x, y);
+      // 氷の膜: 大きなまだらの所だけ、少し明るい青
+      const ice = fbm(x / 50, y / 50, 839);
+      if (ice > 0.68 && sea < -8) col = ramp(SEA_ROCK, t + 0.14, x, y);
+      // 水ぎわの霜（1〜2 ドット）
+      if (sea > -1.2 && fbm(x / 9, y / 9, 845) > 0.5) col = FROST_RIM;
+      // まばらな雪の粒
+      if (hash2(x, y, 841) > 0.997) col = hex('#5d7489');
+      shimmerA.push(null);
+      shimmerB.push(null);
+    }
+    floor.push(col);
+  }
+  return { floor, shimmerA, shimmerB };
+}
+
+const ICE_WALL = ['#0a0f17', '#0f1620', '#151f2c', '#1d2a3a', '#283849'].map(hex);
+
+function articunoWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const dark = hex('#05080d');
+  const rimLight = hex('#8fb0c6');
+  const rimDark = hex('#0e151e');
+  const icicle = ['#3f6178', '#6f97ae', '#a9cadb'].map(hex);
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = inset(iy, 21) - ix;
+    const fromRight = ix - (W - 1 - inset(iy, 22));
+    const fromTop = inset(ix, 23) - iy;
+    const fromBottom = iy - (H - 1 - inset(ix, 24));
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    const isTop = fromTop >= Math.max(fromLeft, fromRight, fromBottom);
+    const size = isTop ? 24 : 18;
+    const stone = worley(x, y, size, 851);
+    const round = (stone.dx + stone.dy) / size;
+    let t = 0.48 + round * 0.4 + (hash2(stone.id, 2, 853) - 0.5) * 0.22 + (fbm(x / 28, y / 28, 855) - 0.5) * 0.3;
+    t -= Math.max(0, dist - 8) * 0.014;
+    let col = ramp(ICE_WALL, t, x, y);
+    if (stone.edge < 0.8) col = ICE_WALL[0]!;
+    if (dist > MARGIN - 14 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (dist - (MARGIN - 14)) / 14) col = dark;
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 2.5) col = rimLight;
+    // 上の壁の下の縁から垂れる、つらら（長さはまちまち。間をあける）
+    if (isTop && fromTop > 2 && fromTop < 22) {
+      // まばらに、長さも太さもまちまち（くしの歯に見えないように）
+      const col4 = Math.floor(x / 9);
+      const len = hash2(col4, 1, 857) > 0.72 ? 5 + hash2(col4, 2, 859) * 16 : 0;
+      const k = x - col4 * 9 - Math.floor(hash2(col4, 3, 861) * 4);
+      const w = (1 - (fromTop - 2) / Math.max(1, len)) * 2.2;
+      if (len > 0 && fromTop - 2 < len && Math.abs(k - 2) < w) col = icicle[k < 2 ? 2 : k === 2 ? 1 : 0]!;
+    }
+    out.push(col);
+  }
+  return out;
+}
+
 function mewtwoFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
   const floor: Rgb[] = [];
   const shimmerA: (Rgb | null)[] = [];
@@ -1054,6 +1178,7 @@ const arenas = [
   { id: 'entei', ...enteiFloor(), wall: enteiWall() },
   { id: 'suicune', ...suicuneFloor(), wall: suicuneWall() },
   { id: 'mewtwo', region: 'kanto', ...mewtwoFloor(), wall: mewtwoWall() },
+  { id: 'articuno', region: 'kanto', ...articunoFloor(), wall: articunoWall() },
 ];
 for (const a of arenas) {
   const outDir = path.join('public', 'map', 'region' in a ? a.region : 'johto');

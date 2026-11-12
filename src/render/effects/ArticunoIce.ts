@@ -128,7 +128,7 @@ export class ArticunoIce {
           const r = Math.hypot(x - c, y - c) / c;
           if (r > 1) continue;
           const i = y * FROST + x;
-          out[i] = mask[i] ? abgr(236, 250, 255, 0.95) : abgr(170, 220, 245, 0.32 + 0.2 * r);
+          out[i] = mask[i] ? abgr(236, 250, 255, 0.95) : 0;
         }
       }
     });
@@ -171,7 +171,7 @@ export class ArticunoIce {
       const seed = (hz.group ?? 0) * 7 + Math.round(hz.x) * 3 + Math.round(hz.y);
       if (move.id === 'articuno-ice-shard-bullet' && hz.activeTicks !== undefined) this.drawIcicle(hz, move.bullets?.speed ?? 0, world.dt, frac);
       else if (move.id === 'articuno-icy-wind' && hz.activeTicks !== undefined) this.drawWind(hz, move.arc ?? 70, timeMs, seed);
-      else if (move.arenaSpots) this.drawFreezeDry(world, hz, move, p, seed);
+      else if (move.arenaPaths) this.drawFreezeDry(world, hz, move, p, seed);
       else if (move.id === 'articuno-hailstone') {
         if (hz.activeTicks === undefined) this.drawHail(hz, p);
         else if (!this.seenHail.has(hz)) {
@@ -227,28 +227,39 @@ export class ArticunoIce {
 
   /** フリーズドライ: 予告の間は水に霜が広がり、落ちると氷のとげが立つ */
   private drawFreezeDry(world: World, hz: World['hazards'][number], move: NonNullable<World['rules']['stage']['moves'][number]>, p: number, seed: number): void {
-    if (hz.activeTicks === undefined) {
-      const s = (hz.radius * 2 * p) / FROST;
-      this.image('articuno-frost').setPosition(hz.x, hz.y).setScale(Math.max(0.05, s)).setRotation(seed).setAlpha(0.35 + 0.55 * p).setDepth(this.floorDepth + 0.01);
-      this.gn.lineStyle(2, 0xe1f5fe, 0.25 + 0.5 * p).strokeCircle(hz.x, hz.y, hz.radius);
-      return;
-    }
+    // 帯（線）に沿って霜の円を並べる。予告の間は霜が広がり、落ちると氷のとげが立つ
+    const step = hz.radius * 1.3;
+    const n = Math.max(1, Math.ceil(hz.length / step));
     const total = Math.round((move.activeSeconds ?? 1) / world.dt);
-    const age = (total - hz.activeTicks) * world.dt;
+    const active = hz.activeTicks !== undefined;
+    const age = active ? (total - hz.activeTicks!) * world.dt : 0;
     const rise = Math.min(1, age / 0.15);
-    const fade = Math.min(1, (hz.activeTicks * world.dt) / 0.4);
-    this.image('articuno-frost').setPosition(hz.x, hz.y).setScale((hz.radius * 2) / FROST).setRotation(seed).setAlpha(0.9 * fade).setDepth(this.floorDepth + 0.01);
-    for (let k = 0; k < 6; k++) {
-      const a = rnd(seed, k) * Math.PI * 2;
-      const d = Math.sqrt(rnd(seed, k + 7)) * hz.radius * 0.75;
-      const x = hz.x + Math.cos(a) * d;
-      const y = hz.y + Math.sin(a) * d * 0.8;
-      this.image(`articuno-spike-${(seed + k) % SPIKE_KINDS}`)
-        .setPosition(x, y)
-        .setOrigin(0.5, 1)
-        .setScale(DOT * (0.9 + rnd(seed, k + 3) * 0.5), DOT * rise * (0.9 + rnd(seed, k + 3) * 0.5))
-        .setAlpha(fade)
-        .setDepth(this.depth + y / 100000);
+    const fade = active ? Math.min(1, (hz.activeTicks! * world.dt) / 0.4) : 1;
+    // 帯全体を薄い霜の色で（円を重ねると数珠に見えた）
+    const ex = hz.x + hz.dirX * hz.length;
+    const ey = hz.y + hz.dirY * hz.length;
+    const band = active ? 0.42 * fade : 0.08 + 0.3 * p;
+    this.gn.lineStyle(hz.radius * 2, 0xcfeaf7, band).lineBetween(hz.x, hz.y, ex, ey);
+    for (let k = 0; k <= n; k++) {
+      const d = (k / n) * hz.length;
+      const x = hz.x + hz.dirX * d;
+      const y = hz.y + hz.dirY * d;
+      const s2 = seed + k * 13;
+      const sc = ((hz.radius * 2) / FROST) * (active ? 1 : Math.max(0.05, p));
+      this.image('articuno-frost').setPosition(x, y).setScale(sc).setRotation(s2).setAlpha(active ? 0.6 * fade : 0.15 + 0.4 * p).setDepth(this.floorDepth + 0.01);
+      if (!active) continue;
+      for (let j = 0; j < 3; j++) {
+        const a = rnd(s2, j) * Math.PI * 2;
+        const r = Math.sqrt(rnd(s2, j + 7)) * hz.radius * 0.7;
+        const sx = x + Math.cos(a) * r;
+        const sy = y + Math.sin(a) * r * 0.8;
+        this.image(`articuno-spike-${(s2 + j) % SPIKE_KINDS}`)
+          .setPosition(sx, sy)
+          .setOrigin(0.5, 1)
+          .setScale(DOT * (0.9 + rnd(s2, j + 3) * 0.5), DOT * rise * (0.9 + rnd(s2, j + 3) * 0.5))
+          .setAlpha(fade)
+          .setDepth(this.depth + sy / 100000);
+      }
     }
   }
 

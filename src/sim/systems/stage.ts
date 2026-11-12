@@ -1168,10 +1168,19 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     put(x, y, 0, 1, bossId);
     return;
   }
-  if (move.arenaSpots && world.arena) {
-    // マップの決まった場所（フリーズドライ: 海水の流れが凍る）。1 回の技で当たるのは 1 回
+  if (move.arenaPaths && world.arena) {
+    // マップの決まった帯（フリーズドライ: 海水の流れが凍る）。折れ線の 1 区間ずつ線で置く。1 回の技で当たるのは 1 回
     const a = world.arena;
-    move.arenaSpots.forEach(([sx, sy, r], k) => put(a.x + sx, a.y + sy, 0, 1, k === 0 && move.rooted ? bossId : -1, { radius: r }));
+    let first = true;
+    for (const path of move.arenaPaths) {
+      for (let k = 0; k + 1 < path.points.length; k++) {
+        const [x0, y0] = path.points[k]!;
+        const [x1, y1] = path.points[k + 1]!;
+        const len = Math.hypot(x1 - x0, y1 - y0) || 1;
+        put(a.x + x0, a.y + y0, (x1 - x0) / len, (y1 - y0) / len, first && move.rooted ? bossId : -1, { radius: path.radius, length: len });
+        first = false;
+      }
+    }
     return;
   }
   if (move.liftThrow) {

@@ -503,7 +503,18 @@
         "enrageMoveIntervalSeconds": 0.4
       },
       "legend-articuno": {
-        "arena": { "halfWidth": 800, "halfHeight": 440, "viewHeight": 960 },
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960,
+          "map": {
+            "floor": "map/kanto/arena-articuno-floor.png",
+            "wall": "map/kanto/arena-articuno-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2,
+            "shimmer": ["map/kanto/arena-articuno-shimmer-a.png", "map/kanto/arena-articuno-shimmer-b.png"]
+          }
+        },
         "anchor": { "x": 0, "y": -220 },
         "noEnrage": true,
         "hpMoves": [

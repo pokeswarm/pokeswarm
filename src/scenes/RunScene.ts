@@ -1912,7 +1912,7 @@ export class RunScene extends Phaser.Scene {
       if (h.activeTicks !== undefined) {
         const recipe = effectRecipes[mv?.effect ?? ''];
         // 波は絵そのものが範囲（赤く重ねない）
-        if (mv && !mv.waterWall && !recipe?.bossActive && ((mv.activeSeconds ?? 0) > 0.6 || mv.bounce)) this.drawHazardArea(g, h, mv, 0.1, 0.6);
+        if (mv && !mv.waterWall && !mv.customArt && !recipe?.bossActive && ((mv.activeSeconds ?? 0) > 0.6 || mv.bounce)) this.drawHazardArea(g, h, mv, 0.1, 0.6);
         continue;
       }
       // 続けて突進する技: 前の突進が終わるまで、次の予告は出さない

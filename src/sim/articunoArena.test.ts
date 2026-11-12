@@ -81,19 +81,30 @@ describe('フリーザー（07 の〔フリーザー〕章）', () => {
     expect(Math.hypot(p.x - x0, p.y - y0)).toBeGreaterThan(40);
   });
 
-  it('フリーズドライ: マップの決まった場所（海水の流れ）が一斉に凍る', () => {
+  it('フリーズドライ: マップの決まった帯（海水の流れ）が一斉に凍る。全部で 1 回の技', () => {
     const { w, rules, force, of, step } = setup();
     force('articuno-freeze-dry');
     step(0.2);
-    const spots = rules.stage.moves.find((m) => m.id === 'articuno-freeze-dry')!.arenaSpots!;
+    const paths = rules.stage.moves.find((m) => m.id === 'articuno-freeze-dry')!.arenaPaths!;
     const hz = of('articuno-freeze-dry');
-    expect(hz.length).toBe(spots.length);
-    for (const [k, [sx, sy, r]] of spots.entries()) {
-      expect(hz[k]!.x).toBeCloseTo(w.arena!.x + sx, 0);
-      expect(hz[k]!.y).toBeCloseTo(w.arena!.y + sy, 0);
-      expect(hz[k]!.radius).toBe(r);
-    }
-    // 全部で 1 回の技（当たるのは 1 回）
+    expect(hz.length).toBe(paths.reduce((n, path) => n + path.points.length - 1, 0));
+    // 帯の真ん中の線の上は当たる、帯の外（真ん中）は当たらない
+    const [x0, y0] = paths[0]!.points[1]!;
+    const [x1, y1] = paths[0]!.points[2]!;
+    const mx = w.arena!.x + (x0 + x1) / 2;
+    const my = w.arena!.y + (y0 + y1) / 2;
+    const inside = hz.some((h) => {
+      const t = (mx - h.x) * h.dirX + (my - h.y) * h.dirY;
+      return t >= 0 && t <= h.length && Math.abs((mx - h.x) * h.dirY - (my - h.y) * h.dirX) <= h.radius;
+    });
+    expect(inside).toBe(true);
+    const cx = w.arena!.x;
+    const cy = w.arena!.y;
+    const center = hz.some((h) => {
+      const t = Math.max(0, Math.min(h.length, (cx - h.x) * h.dirX + (cy - h.y) * h.dirY));
+      return Math.hypot(cx - (h.x + h.dirX * t), cy - (h.y + h.dirY * t)) <= h.radius;
+    });
+    expect(center).toBe(false);
     expect(new Set(hz.map((h) => h.group)).size).toBe(1);
   });
 

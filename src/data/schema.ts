@@ -736,8 +736,11 @@ export const bossMoveSchema = z.object({
   emit: z.object({ move: z.string().min(1), everySeconds: z.number().positive(), radius: z.number().positive(), /** 範囲の中でなく、固定マップ全体のランダムな場所へ（フリーザーの あられ） */ wholeArena: z.boolean().optional() }).optional(),
   /** 落ちたら、予告の線の根元から同じ向きへ技 move（bullets の技）を撃つ（フリーザーの こおりのつぶて。07 の〔フリーザー〕章） */
   shot: z.object({ move: z.string().min(1) }).optional(),
-  /** 固定マップの決まった場所（マップの真ん中からの x・y と半径。マップの絵の水と同じ所）に置く（フリーザーの フリーズドライ） */
-  arenaSpots: z.array(z.tuple([z.number(), z.number(), z.number().positive()])).optional(),
+  /**
+   * 固定マップの決まった帯（折れ線。マップの真ん中からの x・y。半径は帯の太さの半分）に置く（フリーザーの フリーズドライ: 海水の流れが凍る。07 の〔フリーザー〕章）。
+   * マップの絵の水は同じ折れ線から描く（scripts/make-arena-maps.ts）。shape は line
+   */
+  arenaPaths: z.array(z.object({ radius: z.number().positive(), points: z.array(z.tuple([z.number(), z.number()])).min(2) })).optional(),
   /**
    * 地割れ（エンテイの ふみつけ。07 の214章）: 狙った向きを真ん中に spreadDegrees ずつ開いて count 本、壁まで（maxLength まで）割れ目（技 line）を走らせ、
    * 予告の後、割れ目に沿って spacing ごとに炎（技 flame）を根元から delayPerPixel 秒/ピクセルで順に立てる

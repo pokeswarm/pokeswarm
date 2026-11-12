@@ -377,6 +377,7 @@
   "mod.durationPct": "Move duration",
   "mod.rangePct": "Move range",
   "mod.pierceBonus": "Move pierce",
+  "mod.lockOnPct": "Damage to locked-on target",
   "mod.powerMultiplier": "Move power ×{v} (not consumed)",
   "title.menu.start": "SOLO",
   "title.menu.coop": "MULTI",

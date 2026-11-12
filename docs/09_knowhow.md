@@ -66,7 +66,10 @@
 
 - 技は「出し方（`pattern`）× 効き方（`effects`）× 見た目（レシピ）」の組み合わせ。新しい技は、まず既存の部品で作れないかを考える。
   - 出し方の例: facing・nearest・homing・melee・orbit・beam・stream・lob・strike・chain・bounce・scatter・cross・sweep・spiral・pulse・weather・barrage・screen・nova・eruption・spin・rest。
-  - 効き方の部品: explode・puddle（`path` で通った道、`followOwner` で持ち主に付いていく）・split（`lob`・`snake`・`jitter`）・chain・orbit・spikes・cluster・crack・wave。起こるとき（trigger）は cast・hit・end・every・eachHit・spawn（hit は最初に当たった 1 回、eachHit は当たった敵ごと。ウェーブタックルのしぶき）。
+  - 効き方の部品: explode・puddle（`path` で通った道、`followOwner` で持ち主に付いていく）・split（`lob`・`snake`・`jitter`）・chain・orbit・spikes・cluster・crack・wave。起こるとき（trigger）は cast・hit・end・every・eachHit・spawn（hit は最初に当たった 1 回、eachHit は当たった敵ごと。ウェーブタックルのしぶき）。`avoidTarget` を付けると、本体が当たった相手にはその効き方から出たものが当たらない（破片がボスに全部重なるのを防ぐ。07 の233章）。end でも効く（当たった相手のうち、ボス・中ボスがいればそちらを避ける。シザークロス。07 の238章）。
+  - **群れ向けの技をボスにも効かせる部品**（07 の238章）: scatter の `scatterBoss`（ボスの真上に大きな塊を 1 つ。つららおとし）、nearest の `aimStrongest`＋`landAtTarget`＋`stopOnBoss`（HP の一番高い敵へ撃ち、雑魚は貫通してボスで止まり、end で弾ける。ラスターカノン）。どれも追わない・必中にしない。
+  - 体に付いて動く当たり判定を自分の上に描くときは、レシピの `overOwner`（ころがる: 自分が岩になる）。ロックオン（`lockOnPct`）を持つと、ボス・中ボスにロックオンし、追う弾はまずそこを狙う（07 の249章）。追う弾（homing）は出すときに狙いを決め、同じ技の飛んでいる弾の威力で倒れる見込みの敵を飛ばして狙いを分ける（07 の248章）。HP が半分を切った相手に強い技は `lowHpBonus`（しおみず。見積もりの技の表は HP の減らない的で測るので、この倍は表に出ない。07 の247章）。ボスより上・ポケモンより下に描くときは `aboveBoss`（アクアブレイク: ボスに飛びついた所のしぶき。07 の244章）。前の長方形（frontBox）の技の効き方の大きさは、長方形全体の大きさが元になるので、爆発は小さな倍率にする。
+  - 伝説が `playerMove` でプレイヤーの技を借りているとき（色違いの御三家）、プレイヤーの技を変えるとボスも変わる。変えたくなければ `count`・`range`・`power` を書いて固定する（07 の234章）。
   - 絵の fit: circle・line・cone・ring・front・snake・thrust・scroll（前の長方形の中を向きへ流れる波。なみのり）。自分を中心にした正方形の技は `frontBox` を −1〜1 にする（07 の149章）。`followFacing` は扇にも前の長方形にも効く。
   - 一緒に出す技（`comboMoves`）は、出す側に `comboOffsetSeconds` を付けると遅れて出る（アクアテールの叩きつけ）。`windupSeconds`（溜め）も効く。
   - かくとうの技の絵: 手足はふつうの大きさで自分の近くに、その先に衝撃や気の演出を伸ばして範囲を見せる（`moveArt.ts` の `kickWave`・`focusPunchWave`・`smashArms`。07 の151章）。
@@ -201,6 +204,13 @@
 - 最大レベルは `rules.moves[m].levels.length`（シミュレーションの配列は Lv1 を含む）。
 - ポケモンの姿（タイプ一致・性格）で 2〜3 倍変わるので、`docs/14` の値（タイプなし）だけで強さを決めない。持ち物（プラスパワー・ポイントマックス）を持たせた値も見る。
 - 途中で本数が増えて 1 本の威力が半分になる技は、ポイントマックスで本数が 2 倍になり強さも 2 倍になる。単体が強すぎるなら `bonusCountToPower` にする。
+- **群れの火力は、倒れない的で比べない**（07 の231章）。倒れない的では、当たるたびに広がる技（みらいよち・ワイルドボルト）や一撃技の値が何桁も大きく出る。`docs/14` の雑魚の値は技どうしの目安で、ビルドを比べるときは `buildDps.balance.ts` のように、最後の区間の実際の HP の雑魚を倒れた分だけ足して測る。
+- ビルドの総 DPS: `npx vitest run --mode balance src/sim/buildDps.balance.ts`（`BUILD_ONLY=系統` で絞る。`BUILD_MUST=技` でその技を必ず入れる。`BUILD_TOP=数` で実測する案を増やす。結果は `docs/24_build_dps.json`）。案が実際の候補の出し方で作れるかは `BUILD_IN=案.json npx vitest run --mode balance src/sim/buildVerify.balance.ts`。作れない案が出たら、材料が候補に出ない・進化で勝手に技を覚える、などゲーム側の問題のことがある。
+- **強さを知りたいだけなら、まず見積もり**（07 の237章。作者の依頼 2026年11月8日: 毎回測るとテンポが悪くトークンもかさむ）: `npm run build-estimate`（数秒）。技 1 つずつの実測の表（`docs/26_move_items.json`。持ち物なしと、形の持ち物 ポイントマックス・メトロノーム・ひかりのねんど などを 1 つずつ）に、持ち物の割合・種族値・タイプ一致・自分を強くする技（フレアドライブ）の出ている割合・伝説ごとの相性を掛けて、系統ごとの全組み合わせを計算する。結果は `docs/27_build_estimate.json` とページ「ボスへの強さの見積もり」（`docs/pages/README.md`）。
+  - 表は技の定義・形の持ち物・戦いの数値が変わった技だけ自動で測り直す。**技の作り（`src/sim` のコード）を変えたときは目印で分からない**ので `TABLE_REDO=技,技`（全部は `TABLE_REDO=all`。20 分ほど）。
+  - 表のボスの場面では、プレイヤーはボスの方を向く（8 方向）。いつも右を向いたままだと、ボスを突き抜ける体当たり（のしかかり・ころがる）が 1 回で終わり、何十分の 1 に出ていた（07 の238章）。
+  - 見積もりは実測（`docs/24`・`docs/25`）とほぼ合う（リザードンの案で 15,066 と 15,164）。合わないのは、技どうしの組み合わせ（防御を下げてから・状態異常にしてから強くなる）と、ボスの大きさ。伝説の秒数は避ける時間と区切りの間が無い分、本物の戦いより短く出る（ページに本物との比を出す）。
+  - 実測（ビルド案・ボスを倒す秒数）は、見積もりで帯から出た系統と、作りを変えた技を確かめるときだけ回す。
 
 ### 光の強さ（作者の指摘 2026年11月4日。07 の184章）
 

@@ -103,6 +103,19 @@
     "contestType": "tough",
     "damageClass": "special"
   },
+  "aqua-jet": {
+    "names": {
+      "ja": "アクアジェット",
+      "en": "Aqua Jet",
+      "fr": "Aqua-Jet",
+      "de": "Wasserdüse",
+      "es": "Acua Jet",
+      "it": "Acquagetto"
+    },
+    "type": "water",
+    "contestType": "beauty",
+    "damageClass": "physical"
+  },
   "aqua-ring": {
     "names": {
       "ja": "アクアリング",
@@ -284,6 +297,19 @@
     "type": "flying",
     "contestType": "cute",
     "damageClass": "physical"
+  },
+  "brine": {
+    "names": {
+      "ja": "しおみず",
+      "en": "Brine",
+      "fr": "Saumure",
+      "de": "Lake",
+      "es": "Salmuera",
+      "it": "Acquadisale"
+    },
+    "type": "water",
+    "contestType": "smart",
+    "damageClass": "special"
   },
   "bubble": {
     "names": {
@@ -817,6 +843,19 @@
     "type": "ground",
     "contestType": "tough",
     "damageClass": "physical"
+  },
+  "echoed-voice": {
+    "names": {
+      "ja": "エコーボイス",
+      "en": "Echoed Voice",
+      "fr": "Écho",
+      "de": "Widerhall",
+      "es": "Eco Voz",
+      "it": "Echeggiavoce"
+    },
+    "type": "normal",
+    "contestType": null,
+    "damageClass": "special"
   },
   "ember": {
     "names": {
@@ -1584,6 +1623,32 @@
     "type": "ghost",
     "contestType": "tough",
     "damageClass": "physical"
+  },
+  "liquidation": {
+    "names": {
+      "ja": "アクアブレイク",
+      "en": "Liquidation",
+      "fr": "Aqua-Brèche",
+      "de": "Aquadurchstoß",
+      "es": "Hidroariete",
+      "it": "Idrobreccia"
+    },
+    "type": "water",
+    "contestType": null,
+    "damageClass": "physical"
+  },
+  "lock-on": {
+    "names": {
+      "ja": "ロックオン",
+      "en": "Lock-On",
+      "fr": "Verrouillage",
+      "de": "Zielschuss",
+      "es": "Fijar Blanco",
+      "it": "Localizza"
+    },
+    "type": "normal",
+    "contestType": "smart",
+    "damageClass": "status"
   },
   "low-sweep": {
     "names": {
@@ -2688,6 +2753,19 @@
     },
     "type": "rock",
     "contestType": "tough",
+    "damageClass": "physical"
+  },
+  "submission": {
+    "names": {
+      "ja": "じごくぐるま",
+      "en": "Submission",
+      "fr": "Sacrifice",
+      "de": "Überroller",
+      "es": "Sumisión",
+      "it": "Sottomissione"
+    },
+    "type": "fighting",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "sucker-punch": {

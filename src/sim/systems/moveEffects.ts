@@ -39,6 +39,10 @@ export interface FxSource {
   serial?: number;
   /** 元が前の長方形（frontBox）なら、根元 (x, y) から向きに沿った始まり・終わりと片側の幅（ワールドの単位） */
   box?: { from: number; to: number; half: number };
+  /** 元が当たった敵の id（hit の効き方のときだけ） */
+  hitEnemy?: number;
+  /** ここから出すものが当たらない敵の id（avoidTarget の効き方・その着地） */
+  avoid?: number;
 }
 
 /** 段階 0 の当たり判定・技を使ったときに、trigger の効き方を起こす */
@@ -54,7 +58,8 @@ export function fireEffects(world: World, trigger: MoveEffect['trigger'], src: F
     }
     // 確率は共有の乱数ではなく、時刻と位置から決める（どのブラウザでも同じ見た目になる）
     if (fx.chance !== undefined && fx.chance < 1 && hash01(world.seed, world.tick, Math.floor(src.x) * 7919 + Math.floor(src.y), index) >= fx.chance) return;
-    applyEffect(world, fx, index, src);
+    // 本体が当たった相手には当たらない（ストーンエッジの岩: 大きな相手に全部重ならず、まわりへ広がる分だけになる。07 の233章）
+    applyEffect(world, fx, index, fx.avoidTarget && src.hitEnemy !== undefined ? { ...src, avoid: src.hitEnemy } : src);
   });
 }
 
@@ -84,6 +89,7 @@ function spawn(world: World, src: FxSource, over: Partial<ProjectileSpawn>): voi
     dirY: src.dirY,
     growth: 0,
     stage: 1,
+    ...(src.avoid !== undefined ? { avoid: src.avoid } : {}),
     ...over,
   });
 }

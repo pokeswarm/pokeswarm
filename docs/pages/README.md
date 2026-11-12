@@ -7,6 +7,7 @@
 | わざ見本帳（技の強さ・数値・派生・localhost で演出を見るリンク） | `moves.template.html` | `docs/08_moves_table.json`（`npm run moves-table`） | https://claude.ai/artifact/HPN5NrfToRy6yR9wunaKof |
 | わざ図鑑（ポケモンごとの最初の技・覚える技・派生/固有技） | `learnsets.template.html` | `docs/16_learnsets.json`（`npm run learnsets`） | https://claude.ai/artifact/Q6b3TWvrzN4dJDEx22LWrn |
 | 実績と解放の一覧 | `achievements.template.html` | `docs/15_achievements.json`（`npm run achievements-table`） | https://claude.ai/artifact/LsWP1fPsQxGf7ggXZHHQdP |
+| ボスへの強さの見積もり（系統ごとの上位の案・倒す秒数・強い技の順） | `estimate.template.html` | `docs/27_build_estimate.json`（`npm run build-estimate`） | （Claude のメモリに記録） |
 
 ## 作り直し方（Claude の手順）
 

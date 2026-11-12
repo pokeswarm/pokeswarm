@@ -71,6 +71,7 @@
     ],
     "squirtle": [
       "water-gun",
+      "aqua-jet",
       "bubble",
       "whirlpool",
       "tackle",
@@ -130,6 +131,8 @@
     "totodile": [
       "scratch",
       "water-gun",
+      "aqua-jet",
+      "liquidation",
       "bite",
       "crunch",
       "body-slam",
@@ -650,6 +653,7 @@
       "pound",
       "double-slap",
       "sing",
+      "echoed-voice",
       "charm",
       "play-rough",
       "disarming-voice",
@@ -944,9 +948,11 @@
     "psyduck": [
       "confusion",
       "water-gun",
+      "aqua-jet",
       "bubble",
       "scratch",
       "body-slam",
+      "zen-headbutt",
       "hydro-pump",
       "psybeam",
       "bubble-beam",
@@ -957,6 +963,7 @@
       "pound",
       "double-slap",
       "sing",
+      "echoed-voice",
       "charm",
       "play-rough",
       "disarming-voice",
@@ -970,6 +977,7 @@
       "tackle",
       "amnesia",
       "body-slam",
+      "zen-headbutt",
       "hydro-pump",
       "psybeam",
       "bubble-beam",
@@ -984,6 +992,7 @@
       "snore",
       "yawn",
       "body-slam",
+      "heavy-slam",
       "giga-impact"
     ],
     "eevee": [
@@ -1298,6 +1307,7 @@
       "swift",
       "dragon-breath",
       "whirlpool",
+      "brine",
       "dragon-pulse",
       {
         "move": "body-slam",
@@ -1347,6 +1357,13 @@
         "forms": [
           "politoed"
         ]
+      },
+      {
+        "move": "submission",
+        "forms": [
+          "poliwhirl",
+          "poliwrath"
+        ]
       }
     ],
     "houndour": [
@@ -1367,6 +1384,7 @@
       "swift",
       "sharpen",
       "conversion",
+      "lock-on",
       "thunder-shock",
       "tri-attack",
       "tackle",

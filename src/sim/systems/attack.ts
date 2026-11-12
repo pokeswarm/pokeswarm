@@ -168,6 +168,54 @@ function nearestUnhitEnemy(world: World, i: number, range: number): number {
   return best;
 }
 
+/**
+ * 追う弾（homing）の狙い（07 の248章）: (x, y) から range の中で一番近い敵のうち、「もう倒れる見込み」でない敵。
+ * 同じ持ち主・同じ技の飛んでいる追う弾がすでに狙っている敵は、その弾の威力の合計を HP から引いて見る（予約）。
+ * 予約で倒れる見込みの敵は飛ばす（一発目が倒すと残りが引き返す、を避け、群れでは弾が別々の敵へ散る）。
+ * 全部が予約で埋まっていれば（HP の多いボスは埋まらない）一番近い敵。self は今狙いを決める弾（出す前なら -1）。
+ * 貫通する弾は、もう当たった敵（当たり直しを待っている敵）を選ばない
+ */
+function pickHomingTarget(world: World, self: number, owner: number, move: number, x: number, y: number, range: number): number {
+  const { enemies: e, enemyHash, scratch, projectiles: pr } = world;
+  // ロックオンしている相手が届く所にいれば、まずそこへ（貫通して当たった後は、雑魚へ狙い直す。07 の249章）
+  const lockOwner = world.players.find((pl) => pl.id === owner);
+  if (lockOwner?.lockOn) {
+    const j = findEnemyIndex(world, lockOwner.lockOn - 1);
+    if (j !== -1 && e.hp[j]! > 0 && (e.x[j]! - x) ** 2 + (e.y[j]! - y) ** 2 <= range * range && !(self >= 0 && pr.isBlocked(self, e.id[j]!, world.tick))) return j;
+  }
+  const reserved = new Map<number, number>();
+  for (let k = 0; k < pr.count; k++) {
+    if (k === self || pr.motion[k] !== MOTION_HOMING || pr.stage[k] !== 0 || pr.owner[k] !== owner || pr.move[k] !== move || pr.target[k] === 0) continue;
+    const id = pr.target[k]! - 1;
+    reserved.set(id, (reserved.get(id) ?? 0) + pr.damage[k]!);
+  }
+  const n = enemyHash.queryRect(x - range, y - range, x + range, y + range, scratch);
+  let best = -1;
+  let bestD2 = Infinity;
+  let near = -1;
+  let nearD2 = Infinity;
+  const seen = new Set<number>();
+  for (let k = 0; k < n; k++) {
+    const j = scratch[k]!;
+    if (seen.has(j)) continue;
+    seen.add(j);
+    if (e.hp[j]! <= 0 || (self >= 0 && pr.isBlocked(self, e.id[j]!, world.tick))) continue;
+    const d2 = (e.x[j]! - x) ** 2 + (e.y[j]! - y) ** 2;
+    if (d2 > range * range) continue;
+    const closer = (bd: number, b: number): boolean => d2 < bd || (d2 === bd && b !== -1 && e.id[j]! < e.id[b]!);
+    if (closer(nearD2, near)) {
+      nearD2 = d2;
+      near = j;
+    }
+    if (e.hp[j]! - (reserved.get(e.id[j]!) ?? 0) <= 0) continue;
+    if (closer(bestD2, best)) {
+      bestD2 = d2;
+      best = j;
+    }
+  }
+  return best !== -1 ? best : near;
+}
+
 /** 射程内の一番近い敵の index。いなければ -1（同じ距離なら id の小さい方。ハッシュの並び順に左右されないように） */
 function nearestEnemy(world: World, x: number, y: number, range: number): number {
   const { enemies: e, enemyHash, scratch } = world;
@@ -208,6 +256,67 @@ function strongestEnemy(world: World, p: Player, range: number): number {
   return best;
 }
 
+/**
+ * 飛び込む相手（ヘビーボンバー）: 届く範囲で HP の一番高い敵。arcDegrees があれば、向いている方向を中心にしたその角度の扇の中だけから選ぶ
+ * （まわり全部から選ぶと、後ろのボスへ勝手に飛ぶ。作者の指示 2026年11月13日。07 の242章）。いなければ -1
+ */
+function dashTarget(world: World, p: Player, dash: NonNullable<SimMoveDef['dash']>, range: number): number {
+  if (!dash.arcDegrees) return strongestEnemy(world, p, range);
+  const e = world.enemies;
+  const [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  const cosHalf = Math.cos(((dash.arcDegrees / 2) * Math.PI) / 180);
+  let best = -1;
+  for (const i of enemiesInRange(world, p.x, p.y, range)) {
+    const dx = e.x[i]! - p.x;
+    const dy = e.y[i]! - p.y;
+    const d = Math.hypot(dx, dy);
+    // 重なっている相手（中心がほぼ同じ）は前にいるとみなす
+    if (d > 1 && (dx * fx + dy * fy) / d < cosHalf) continue;
+    if (best === -1 || e.hp[i]! > e.hp[best]!) best = i;
+  }
+  return best;
+}
+
+/** 続けて当てるほど強くなる技（エコーボイス）の 1 つの輪: 段で威力と大きさを上げ、こだまの輪の数で威力を分ける。飛ぶ間に広がる */
+function echoShape(echo: NonNullable<SimMoveDef['echo']>, pm: PlayerMove, b: { damage: number; radius: number }): { damage: number; radius: number; growth: number } {
+  const stack = pm.echo ?? 0;
+  const rings = 1 + Math.floor(stack / 2);
+  const size = 1 + echo.sizePerStack * stack;
+  return { damage: (b.damage * (1 + echo.powerPerStack * stack)) / rings, radius: b.radius * size, growth: echo.growPerSecond * size };
+}
+
+/** ロックオンが届く距離（画面くらい） */
+const LOCK_ON_RANGE = 700;
+
+/**
+ * ロックオン（07 の249章）: ロックオン を持っていれば、ボス・中ボスがいる間、そのうち HP の一番高いものにロックオンする。
+ * ロックオンした相手が残っていて届く間は替えない。どのブラウザでも同じ敵の状態から決める
+ */
+function updateLockOn(world: World, p: Player): void {
+  if (p.mods.lockOnPct <= 0) {
+    p.lockOn = 0;
+    return;
+  }
+  const e = world.enemies;
+  if (p.lockOn) {
+    const j = findEnemyIndex(world, p.lockOn - 1);
+    if (j !== -1 && e.hp[j]! > 0 && (e.x[j]! - p.x) ** 2 + (e.y[j]! - p.y) ** 2 <= LOCK_ON_RANGE * LOCK_ON_RANGE) return;
+  }
+  const b = toughestBoss(world, p.x, p.y, LOCK_ON_RANGE);
+  p.lockOn = b !== -1 ? e.id[b]! + 1 : 0;
+}
+
+/** 届く範囲のボス・中ボス（rank が normal でない敵）のうち HP の一番高いものの番号。いなければ -1 */
+function toughestBoss(world: World, x: number, y: number, range: number): number {
+  const e = world.enemies;
+  let best = -1;
+  for (const i of enemiesInRange(world, x, y, range)) {
+    if ((world.rules.enemies.kinds[e.kind[i]!]?.rank ?? 'normal') === 'normal') continue;
+    if (best === -1 || e.hp[i]! > e.hp[best]!) best = i;
+  }
+  return best;
+}
+
 /** 届く範囲で HP の一番高い敵への向き（ゴッドバード: ボスを狙う）。いなければ null */
 function aimStrongest(world: World, p: Player, range: number): [number, number] | null {
   const e = world.enemies;
@@ -232,6 +341,7 @@ function spread(world: World, dx: number, dy: number, degrees: number): [number,
  */
 export function useMoves(world: World): void {
   for (const p of world.players) {
+    updateLockOn(world, p);
     // 受けたダメージを返す技（ミラーコート・マジックコート）: その技の当たり判定が出ている間に受けたダメージを、効き方 hurt に渡す
     if (p.hurtQueue) {
       const taken = p.hurtQueue;
@@ -298,7 +408,7 @@ export function useMoves(world: World): void {
       }
       if (pm.cooldown > 0) continue;
       // 体が動く技: 行き先に敵がいなければ出さない（だれもいないのに勝手に動かない。溜める技も溜め始めない）
-      if ((def.dash && !(def.dash.target === 'crowd' ? enemiesInRange(world, p.x, p.y, st.range).length > 0 : enemyAhead(world, p, st.range + st.size))) || (def.sequence && !sequenceCanStart(world, p, def.sequenceGate ?? 'ahead', st))) {
+      if ((def.dash && !(def.dash.target === 'strongest' ? dashTarget(world, p, def.dash, st.range) !== -1 : def.dash.target === 'crowd' ? enemiesInRange(world, p.x, p.y, st.range).length > 0 : enemyAhead(world, p, st.range + st.size))) || (def.sequence && !sequenceCanStart(world, p, def.sequenceGate ?? 'ahead', st))) {
         pm.cooldown = 0;
         continue;
       }
@@ -384,6 +494,13 @@ export function useMoves(world: World): void {
         case 'barrage':
           pm.burstLeft = st.count;
           pm.burstTimer = 0;
+          // 続けて当てるほど強くなる（エコーボイス）: 前に出した分が当たっていれば 1 段上げ、外れていれば 0 段。2 段ごとにこだまの輪を 1 つ足す（07 の240章）
+          if (def.echo) {
+            const stack = pm.echoHit ? Math.min(def.echo.maxStacks, (pm.echo ?? 0) + 1) : 0;
+            pm.echo = stack;
+            pm.echoHit = false;
+            pm.burstLeft = st.count + Math.floor(stack / 2);
+          }
           // 向きをランダムに選ぶ技（にどげり）は、使うたびに1つの向きを選び、連撃はその向きへ
           pm.aimAngle = def.randomAim ? world.rng.next() * Math.PI * 2 : undefined;
           if (def.pattern === 'barrage' && def.body) {
@@ -435,9 +552,12 @@ export function useMoves(world: World): void {
             fireBurst(world, p, pm, st);
           } else fireStrike(world, p, pm, st);
           break;
-        case 'chain':
-          fireChain(world, p, pm, st);
+        case 'chain': {
+          const hops = fireChain(world, p, pm, st);
+          // 実際に走った分だけ待つ（1 体の相手に、走らなかった分の待ち時間を作らない。07 の234章）
+          if (def.chainTurnBack) pm.cooldown = Math.max(scaledMoveStats(world, p, pm, st).cooldownSeconds, st.durationSeconds + def.chainHopSeconds * hops);
           break;
+        }
         case 'bounce':
           fireBounce(world, p, pm, st);
           break;
@@ -624,16 +744,34 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     }
     let dir: [number, number];
     let target: number | undefined;
+    let landLife: number | undefined;
     if (def.pattern === 'nearest' || def.pattern === 'homing') {
       const t = nearestEnemy(world, p.x, p.y, st.range);
       if (t === -1) {
         pm.burstLeft = 0;
         return;
       }
-      // せいなるほのお: 届く範囲で HP の一番高い敵へ飛び、その敵を追い続ける
-      const strong = def.pattern === 'homing' && def.aimStrongest ? strongestEnemy(world, p, st.range) : -1;
-      if (strong !== -1) target = world.enemies.id[strong]!;
+      // せいなるほのお: 届く範囲で HP の一番高い敵へ飛び、その敵を追い続ける。ラスターカノン（nearest）はその敵へまっすぐ（追わない）
+      const strong = def.aimStrongest ? strongestEnemy(world, p, st.range) : -1;
+      if (strong !== -1 && def.pattern === 'homing') target = world.enemies.id[strong]!;
       dir = strong !== -1 ? aimStrongest(world, p, st.range)! : aim(world, p, st.range);
+      // 追う弾: 倒れる見込みの敵を飛ばして狙いを決め、その敵へ向けて出す（07 の248章）
+      if (def.pattern === 'homing' && strong === -1) {
+        const pick = pickHomingTarget(world, -1, p.id, pm.move, p.x, p.y, st.range);
+        if (pick !== -1) {
+          target = world.enemies.id[pick]!;
+          const ddx = world.enemies.x[pick]! - p.x;
+          const ddy = world.enemies.y[pick]! - p.y;
+          const dd = Math.hypot(ddx, ddy) || 1;
+          dir = [ddx / dd, ddy / dd];
+        }
+      }
+      // 狙った敵の所で止まる（ラスターカノン: 着いた所で弾ける）
+      if (def.landAtTarget) {
+        const t2 = strong !== -1 ? strong : t;
+        const speed0 = scaledMoveStats(world, p, pm, st).speed;
+        landLife = Math.min(st.durationSeconds, Math.hypot(world.enemies.x[t2]! - p.x, world.enemies.y[t2]! - p.y) / Math.max(1, speed0));
+      }
     } else {
       dir = axisToUnit(p.facingX, p.facingY);
     }
@@ -659,6 +797,8 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
       ox: dx * speed,
       oy: dy * speed,
       ...(target !== undefined ? { target } : {}),
+      ...(landLife !== undefined ? { life: Math.max(world.dt, landLife) } : {}),
+      ...(def.echo ? echoShape(def.echo, pm, base(world, p, pm, st)) : {}),
     });
     if (bonusShot) for (let k = before; k < world.projectiles.count; k++) world.projectiles.noFx[k] = 1;
     pm.burstLeft--;
@@ -680,7 +820,7 @@ function fireBarrageHit(world: World, p: Player, pm: PlayerMove, st: MoveStats):
     // 長方形: 自分を通る横の辺のランダムな所から、向きへまっすぐ。奥行き range まで届いたら消える
     const dx = Math.cos(center);
     const dy = Math.sin(center);
-    const off = (world.rng.next() - 0.5) * width;
+    const off = (bdef.barrageSeek ? barrageSeekOffset(world, p, dx, dy, width, st.range) : null) ?? (world.rng.next() - 0.5) * width;
     world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x - dy * off, y: p.y + dx * off, vx: dx * speed0, vy: dy * speed0, life: st.range / Math.max(1, speed0) });
     return;
   }
@@ -696,6 +836,34 @@ function fireBarrageHit(world: World, p: Player, pm: PlayerMove, st: MoveStats):
   const d = st.range * (0.3 + 0.7 * world.rng.next());
   const speed = speed0;
   world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x + Math.cos(a) * d, y: p.y + Math.sin(a) * d, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed });
+}
+
+/**
+ * 長方形の連打で噛みにいく敵の横の位置（自分を通る線の上）: 長方形の中の生きている敵のどれかを選ぶ。だれもいなければ null
+ * 群れではランダムに選ぶので幅いっぱいに広がり、ボス1体なら全部がその正面から出る（07 の233章）
+ */
+function barrageSeekOffset(world: World, p: Player, dx: number, dy: number, width: number, range: number): number | null {
+  const e = world.enemies;
+  let maxR = 0;
+  for (const k of world.rules.enemies.kinds) maxR = Math.max(maxR, k.radius);
+  const r = Math.hypot(range, width / 2) + maxR;
+  const n = world.enemyHash.queryRect(p.x - r, p.y - r, p.x + r, p.y + r, world.scratch);
+  let found = 0;
+  let best: number | null = null;
+  for (let q = 0; q < n; q++) {
+    const j = world.scratch[q]!;
+    if (e.hp[j]! <= 0) continue;
+    const rx = e.x[j]! - p.x;
+    const ry = e.y[j]! - p.y;
+    const along = rx * dx + ry * dy;
+    const side = ry * dx - rx * dy;
+    const er = e.radius[j]!;
+    if (along < -er || along > range + er || Math.abs(side) > width / 2 + er) continue;
+    // 1 つずつ同じ確率で残す（順番に左右されない選び方）。少しだけ横にずらして、同じ列に重ならないようにする
+    found++;
+    if (world.rng.next() * found < 1) best = Math.max(-width / 2, Math.min(width / 2, side)) + (world.rng.next() - 0.5) * er;
+  }
+  return best;
 }
 
 /** melee: 向いている方向 → 反対側 → 左 → 右 の順に当たり判定を出す（持ち主に付いていく。range 0 なら自分の周り） */
@@ -957,12 +1125,20 @@ function fireLob(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   if (target) {
     const T = st.durationSeconds;
     const t0 = target === 'nearest' ? nearestEnemy(world, p.x, p.y, st.range) : -1;
+    // 一部を敵のいる所へ落とす（ふんか: 残りはランダムな地面。伝説が同じ技を出すときは使わない。07 の234章）
+    const share = p.id < CASTER_ID_BASE ? (world.rules.moves[pm.move]!.lobSeekShare ?? 0) : 0;
+    const seek = share > 0 ? Math.round(st.count * share) : 0;
+    const pool = seek > 0 ? enemiesInRange(world, p.x, p.y, st.range) : [];
     for (let k = 0; k < st.count; k++) {
       let dx: number;
       let dy: number;
       if (t0 !== -1 && k === 0) {
         dx = world.enemies.x[t0]! - p.x;
         dy = world.enemies.y[t0]! - p.y;
+      } else if (k < seek && pool.length > 0) {
+        const j = pool[world.rng.int(pool.length)]!;
+        dx = world.enemies.x[j]! - p.x;
+        dy = world.enemies.y[j]! - p.y;
       } else {
         // 自分の周り range の中（近すぎない所）のランダムな場所
         const a = world.rng.next() * Math.PI * 2;
@@ -1034,6 +1210,7 @@ function stepSequence(world: World, p: Player, pm: PlayerMove): void {
     const s = steps[seq.i++]!;
     if (pm.level < s.minLevel) continue;
     if (s.needsConsumed.length > 0 && !s.needsConsumed.some((m) => p.consumedMoves?.includes(m))) continue;
+    if (s.needsMoves.length > 0 && !s.needsMoves.some((m) => p.moves.some((x) => x.move === m))) continue;
     const def = world.rules.moves[s.move]!;
     const sub: PlayerMove = { move: s.move, level: Math.min(pm.level, def.levels.length), cooldown: 0, burstLeft: 0, burstTimer: 0 };
     const st = playerMoveStats(world, p, sub);
@@ -1042,6 +1219,8 @@ function stepSequence(world: World, p: Player, pm: PlayerMove): void {
       pm.seq = undefined;
       return;
     }
+    // 相手の上へ飛び込む段（ギガインパクトのヘビーボンバー）: 前の扇に相手がいなければ、その段だけ飛ばす（待たない）
+    if (def.dash?.target === 'strongest' && dashTarget(world, p, def.dash, st.range) === -1) continue;
     if (BURST_PATTERNS.has(def.pattern)) {
       sub.burstLeft = st.count;
       fireBurst(world, p, sub, { ...st, intervalSeconds: 0 });
@@ -1089,8 +1268,9 @@ function fireDash(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
   let [fx, fy] = axisToUnit(p.facingX, p.facingY);
   let distance = st.range;
   // 敵が一番多い所へ（ドラゴンダイブ）
-  if (dash.target === 'crowd') {
-    const t = crowdCenter(world, p, st.range, st.size);
+  if (dash.target !== 'facing') {
+    // 敵が一番多い所（ドラゴンダイブ）か、HP の一番高い敵の上（ヘビーボンバー）
+    const t = dash.target === 'crowd' ? crowdCenter(world, p, st.range, st.size) : dashTarget(world, p, dash, st.range);
     if (t !== -1) {
       const dx = world.enemies.x[t]! - p.x;
       const dy = world.enemies.y[t]! - p.y;
@@ -1099,6 +1279,8 @@ function fireDash(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
         fx = dx / distance;
         fy = dy / distance;
       }
+      // 相手の手前で止まる（アクアブレイク: ぶつかった所でしぶき）
+      if (dash.stopShort) distance = Math.max(0, distance - world.enemies.radius[t]! - p.radius);
     }
   }
   const ticks = Math.max(1, Math.round(dash.seconds / world.dt));
@@ -1125,7 +1307,7 @@ function fireDash(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
 }
 
 /** chain（連鎖）: 一番近い敵から、近くの敵へ count 回飛び移る線（1回に range の半分まで跳ぶ） */
-function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
+function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): number {
   const e = world.enemies;
   let x = p.x;
   let y = p.y;
@@ -1141,13 +1323,16 @@ function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
       const len = Math.hypot(e.x[i]! - x, e.y[i]! - y) || 1;
       world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, shape: SHAPE_LINE, length: len, dirX: (e.x[i]! - x) / len, dirY: (e.y[i]! - y) / len });
     }
-    return;
+    return 0;
   }
   // 前へ撃つ連鎖（10まんボルト）は、自分から見て向いている方の角度の中の敵へだけ跳ぶ（07 の164章）
   const facingHalf = world.rules.moves[pm.move]!.chainFacingHalf;
   const [afx, afy] = axisToUnit(p.facingX, p.facingY);
   const ahead = (i: number): boolean => facingHalf === undefined || inSector(e.x[i]! - p.x, e.y[i]! - p.y, e.radius[i]!, afx, afy, facingHalf);
   let hops = 0;
+  let lastEnemy = -1;
+  let lastX = 1;
+  let lastY = 0;
   for (let k = 0; k < st.count; k++) {
     // 一番近い敵へ。chainMinHop があれば、それより離れた敵の中で一番近い敵（いなければ一番近い敵。しんそく: 広く倒す）
     let best = -1;
@@ -1182,6 +1367,20 @@ function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     y = e.y[best]!;
     reach = st.range * 0.5;
     hops++;
+    lastEnemy = best;
+    lastX = dx;
+    lastY = dy;
+  }
+  // 切り返し（しんそく）: 敵が足りなければ、最後の敵を突き抜けて少し先へ走る。戻る線はまたその敵を通る（07 の234章）
+  if (world.rules.moves[pm.move]!.chainTurnBack && lastEnemy !== -1 && hops < st.count) {
+    const len = rayLengthToObstacle(world, x, y, lastX, lastY, e.radius[lastEnemy]! + Math.sqrt(minHop2));
+    if (len > 1) {
+      const wait = hop * hops;
+      world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, shape: SHAPE_LINE, length: len, dirX: lastX, dirY: lastY, ...(wait > 0 ? { life: wait, stage: 3, armLife: st.durationSeconds } : {}) });
+      x += lastX * len;
+      y += lastY * len;
+      hops++;
+    }
   }
   if (world.rules.moves[pm.move]!.chainReturn && hops > 0) {
     // 最後は自分の所へ戻る線（ボルトチェンジ: 残像が帰ってくる）。出番が来たときに、そのときの自分の位置へ向け直す（orbitRadius −1 の印。飛ばない線では使っていない欄）
@@ -1189,6 +1388,7 @@ function fireChain(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
     const wait = hop * hops;
     world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, shape: SHAPE_LINE, length: len, dirX: (p.x - x) / len, dirY: (p.y - y) / len, orbitRadius: -1, ...(wait > 0 ? { life: wait, stage: 3, armLife: st.durationSeconds } : {}) });
   }
+  return hops;
 }
 
 /** bounce（跳ね返り）: ランダムな方向へ飛び、自分のまわりの枠の端で跳ね返る */
@@ -1253,6 +1453,25 @@ function fireScatter(world: World, p: Player, pm: PlayerMove, st: MoveStats): vo
   const [fx, fy] = axisToUnit(p.facingX, p.facingY);
   // 敵の足元に置く（りゅうせいぐん）: range の中の敵からランダムに選ぶ。足りなければ残りはランダムな場所
   const targets = world.rules.moves[pm.move]!.scatterOnEnemies ? enemiesInRange(world, p.x, p.y, st.range) : [];
+  // ボス・中ボスがいれば、その真上に大きな塊を 1 つ（つららおとし。置くのは今の場所で、追いかけない。07 の238章）
+  const sb = world.rules.moves[pm.move]!.scatterBoss;
+  if (sb && sb.move >= 0) {
+    const boss = toughestBoss(world, p.x, p.y, sb.range);
+    if (boss !== -1) {
+      world.projectiles.add({
+        ...b0,
+        move: sb.move,
+        motion: MOTION_LINEAR,
+        x: world.enemies.x[boss]!,
+        y: world.enemies.y[boss]!,
+        vx: 0,
+        vy: 0,
+        radius: b0.radius * sb.sizeMultiplier,
+        damage: b0.damage * sb.powerMultiplier,
+        ...(wait > 0 ? { life: wait, stage: 3, armLife: st.durationSeconds } : {}),
+      });
+    }
+  }
   for (let k = 0; k < count; k++) {
     if (targets.length > 0) {
       const i = targets.splice(world.rng.int(targets.length), 1)[0]!;
@@ -1290,6 +1509,10 @@ function fireEruption(world: World, p: Player, pm: PlayerMove, st: MoveStats): v
   const sc = scaledMoveStats(world, p, pm, st);
   const [fx, fy] = axisToUnit(p.facingX, p.facingY);
   const a0 = Math.atan2(fy, fx);
+  // 一番近い敵の足元にも柱を立て、十字の柱はその敵に当てない（ブラストバーン: どの距離でも 1 本ぶん当たり、ボスに全部は重ならない。伝説が同じ技を出すときは使わない。07 の235章）
+  const near = er.targetPillarPower && p.id < CASTER_ID_BASE ? nearestEnemy(world, p.x, p.y, st.range) : -1;
+  const avoid = near !== -1 ? { avoid: world.enemies.id[near]! } : {};
+  if (near !== -1) world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: world.enemies.x[near]!, y: world.enemies.y[near]!, radius: sc.size, damage: sc.power * er.targetPillarPower! });
   for (let k = 0; k < er.stages; k++) {
     const d = (st.range * (k + 1)) / er.stages;
     const radius = sc.size * (1 + er.sizeGrowth * k);
@@ -1298,8 +1521,8 @@ function fireEruption(world: World, p: Player, pm: PlayerMove, st: MoveStats): v
       const a = a0 + (j / st.count) * Math.PI * 2;
       const x = p.x + Math.cos(a) * d;
       const y = p.y + Math.sin(a) * d;
-      if (wait <= 0) world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, radius });
-      else world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, radius, life: wait, stage: 3, armLife: st.durationSeconds });
+      if (wait <= 0) world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, radius, ...avoid });
+      else world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x, y, radius, life: wait, stage: 3, armLife: st.durationSeconds, ...avoid });
     }
   }
 }
@@ -1576,8 +1799,15 @@ export function moveProjectiles(world: World): void {
     } else if (motion === MOTION_HOMING) {
       // まだ当たっていない一番近い敵を追う（貫通する弾は、当たった敵の次へ進む。前は当たった敵を追い続けて残っていた）。
       // 狙った敵が決まっている弾（せいなるほのお）は、その敵が残っている間はその敵を追う
+      // 追う弾は狙いを決めて追い、倒れた・貫通して当たり済みになったら、倒れる見込みの敵を飛ばして狙い直す（07 の248章）。
+      // HP の一番高い敵を狙う弾（せいなるほのお）は、その敵が残っている間は当たった後も追い続ける
       const locked = pr.target[i]! > 0 ? findEnemyIndex(world, pr.target[i]! - 1) : -1;
-      const t = locked !== -1 && e.hp[locked]! > 0 ? locked : nearestUnhitEnemy(world, i, 300);
+      const keep = locked !== -1 && e.hp[locked]! > 0 && (world.rules.moves[pr.move[i]!]!.aimStrongest || !pr.isBlocked(i, pr.target[i]! - 1, world.tick));
+      let t = keep ? locked : -1;
+      if (!keep) {
+        t = pr.stage[i] === 0 ? pickHomingTarget(world, i, pr.owner[i]!, pr.move[i]!, pr.x[i]!, pr.y[i]!, 300) : nearestUnhitEnemy(world, i, 300);
+        pr.target[i] = t !== -1 ? e.id[t]! + 1 : 0;
+      }
       if (t !== -1) {
         const dx = e.x[t]! - pr.x[i]!;
         const dy = e.y[t]! - pr.y[i]!;
@@ -1680,7 +1910,7 @@ export function moveProjectiles(world: World): void {
     let hits = 0;
     for (let k = 0; k < n; k++) {
       const j = scratch[k]!;
-      if (e.hp[j]! <= 0 || pr.isBlocked(i, e.id[j]!, world.tick)) continue;
+      if (e.hp[j]! <= 0 || pr.avoid[i] === e.id[j]! + 1 || pr.isBlocked(i, e.id[j]!, world.tick)) continue;
       const r = pr.radius[i]! + e.radius[j]!;
       const d2 = line
         ? segmentDistance2(e.x[j]!, e.y[j]!, x, y, pr.dirX[i]!, pr.dirY[i]!, len)
@@ -1713,6 +1943,7 @@ export function moveProjectiles(world: World): void {
     let hitY = y;
     let firstX = NaN;
     let firstY = NaN;
+    let firstId = 0;
     for (let k = 0; k < candidates.length && pr.pierceLeft[i]! > 0; k++) {
       const j = candidates[k]!;
       // ハッシュの衝突で同じ敵が2回入っていることがある
@@ -1723,10 +1954,21 @@ export function moveProjectiles(world: World): void {
       if (guardKind?.wonderGuard && !moveTypesOf(def).some((t) => typeFlags(world.rules.types, t, [], guardKind.types) & DMG_SUPER)) continue;
       pr.pierceLeft[i]!--;
       hitAny = true;
+      // 続けて当てるほど強くなる技（エコーボイス）: 当たったことを、出した技に覚えておく（次に出すときに段が上がる）
+      if (def.echo && pr.stage[i] === 0 && owner) {
+        const epm = owner.moves.find((m) => m.move === pr.move[i]);
+        if (epm) epm.echoHit = true;
+      }
       if (Number.isNaN(firstX)) {
         firstX = e.x[j]!;
         firstY = e.y[j]!;
+        firstId = e.id[j]!;
       }
+      // 本体が当たった相手（end の効き方の avoidTarget）: 最初の相手。あとでボス・中ボスに当たったらそちら
+      const bossHit = (world.rules.enemies.kinds[e.kind[j]!]?.rank ?? 'normal') !== 'normal';
+      if (pr.struck[i] === 0 || bossHit) pr.struck[i] = e.id[j]! + 1;
+      // 雑魚は貫通し、ボス・中ボスで止まる（ラスターカノン: そこで弾ける）
+      if (bossHit && pr.stage[i] === 0 && def.stopOnBoss) pr.pierceLeft[i] = 0;
       // 線・扇・外へ広がる輪は、当たった光を敵の所に出す（中心に出すと使ったポケモンの足元に重なって白い円に見える。07 の184章）
       if (line || pr.shape[i] === SHAPE_SECTOR || pr.band[i]! > 0) {
         hitX = e.x[j]!;
@@ -1769,6 +2011,10 @@ export function moveProjectiles(world: World): void {
       const instakill = (st.instakillChance > 0 && normalEnemy && world.rng.next() < st.instakillChance);
       // たたりめ: 状態異常の敵へのダメージを上げる
       const statusBonus = st.statusBonusPct > 0 && e.hasAnyStatus(j) ? 1 + st.statusBonusPct / 100 : 1;
+      // しおみず: HP が半分を切った敵へのダメージを上げる
+      const lowHpBonus = def.lowHpBonus && e.hp[j]! <= (e.maxHp[j]! * def.lowHpBonus.thresholdPct) / 100 ? 1 + def.lowHpBonus.powerPct / 100 : 1;
+      // ロックオンした相手へのダメージを上げる
+      const lockOnBonus = owner && owner.lockOn === e.id[j]! + 1 && owner.mods.lockOnPct > 0 ? 1 + owner.mods.lockOnPct / 100 : 1;
       // つかんで投げる技（サイコキネシス）・聞かせる技（ほろびのうた）は、触れた時にはダメージを与えない（倒れると浮かない。投げた時・時間が来た時に効く）
       const amount = instakill
         ? INSTAKILL_DAMAGE
@@ -1776,6 +2022,8 @@ export function moveProjectiles(world: World): void {
           Math.max(...moveTypesOf(def).map((t) => typeMultiplier(world.rules.types, world.rules.combat.typeMultipliers, t, owner?.types ?? [], kind?.types ?? []))) *
           (crit ? world.rules.combat.critMultiplier : 1) *
           statusBonus *
+          lowHpBonus *
+          lockOnBonus *
           (idle ? def.idleScale!.power : 1);
       // ダメージの数字（設定でオンのときだけ。一撃は出さない）
       if (world.damageNumbers && !instakill && amount > 0) {
@@ -1812,7 +2060,7 @@ export function moveProjectiles(world: World): void {
     // hit の効き方は、その当たり判定が初めて敵に当たったときに1回だけ（当たった敵の位置で）
     if (hitAny && pr.stage[i] === 0 && pr.hitFired[i] === 0 && !pr.noFx[i]) {
       pr.hitFired[i] = 1;
-      fireEffects(world, 'hit', fxSourceOf(world, i, firstX, firstY));
+      fireEffects(world, 'hit', { ...fxSourceOf(world, i, firstX, firstY), hitEnemy: firstId });
     }
     if (pr.pierceLeft[i]! <= 0) expire(world, i);
   }
@@ -1854,12 +2102,12 @@ function hitLocalPlayer(world: World, i: number): void {
  * 術者に、プレイヤーと同じ技を1回出させる（一度に出し終える出し方だけ。続けて撃つ出し方は1発ずつまとめて出す）。
  * count・spreadDegrees は上書き（カメックスのハイドロカノンを一周）
  */
-export function fireCasterMove(world: World, caster: Player, move: number, level: number, over: { count?: number; spreadDegrees?: number; sweepDegreesPerSecond?: number; orbitRadius?: number } = {}): void {
+export function fireCasterMove(world: World, caster: Player, move: number, level: number, over: { count?: number; spreadDegrees?: number; sweepDegreesPerSecond?: number; orbitRadius?: number; range?: number; power?: number } = {}): void {
   const def = world.rules.moves[move];
   if (!def) return;
   const pm: PlayerMove = { move, level, cooldown: 0, burstLeft: 0, burstTimer: 0 };
   const base0 = moveStatsOf(world, pm);
-  const st: MoveStats = { ...base0, ...(over.count !== undefined ? { count: over.count } : {}), ...(over.spreadDegrees !== undefined ? { spreadDegrees: over.spreadDegrees } : {}) };
+  const st: MoveStats = { ...base0, ...(over.count !== undefined ? { count: over.count } : {}), ...(over.spreadDegrees !== undefined ? { spreadDegrees: over.spreadDegrees } : {}), ...(over.range !== undefined ? { range: over.range } : {}), ...(over.power !== undefined ? { power: over.power } : {}) };
   const from = world.projectiles.count;
   if (BURST_PATTERNS.has(def.pattern)) {
     pm.burstLeft = st.count;
@@ -1993,7 +2241,7 @@ function fxSourceOf(world: World, i: number, x: number, y: number): FxSource {
   const dirY = line || vlen === 0 ? pr.dirY[i]! : pr.vy[i]! / vlen;
   // 前の長方形（frontBox）は、その形も渡す（ブレイズキックの燃える道を長方形に重ねる）
   const box = pr.shape[i] === SHAPE_BOX ? boxOf(world, i) : undefined;
-  return { owner: pr.owner[i]!, move: pr.move[i]!, level: pr.level[i]!, damage: pr.damage[i]!, size: pr.band[i]! > 0 && world.rules.moves[pr.move[i]!]!.knockbackAlongFacing ? pr.band[i]! : pr.radius[i]!, x, y, dirX, dirY, length: line ? pr.length[i]! : 0, serial: pr.serial[i]!, ...(box ? { box } : {}) };
+  return { owner: pr.owner[i]!, move: pr.move[i]!, level: pr.level[i]!, damage: pr.damage[i]!, size: pr.band[i]! > 0 && world.rules.moves[pr.move[i]!]!.knockbackAlongFacing ? pr.band[i]! : pr.radius[i]!, x, y, dirX, dirY, length: line ? pr.length[i]! : 0, serial: pr.serial[i]!, ...(box ? { box } : {}), ...(pr.avoid[i]! > 0 ? { avoid: pr.avoid[i]! - 1 } : {}) };
 }
 
 /** 前の長方形（frontBox）の当たり判定 i の形: 根元から向きに沿った始まり・終わり、片側の幅（ワールドの単位） */
@@ -2028,7 +2276,7 @@ export function knockbackFatigue(world: World, j: number, fx: HitEffect): HitEff
 /** 当たり判定 i を消す。技そのもの（段階 0）なら end の効き方、印（段階 2）なら遅れた爆発を起こす */
 function expire(world: World, i: number): void {
   const pr = world.projectiles;
-  if (pr.stage[i] === 0 && !pr.noFx[i]) fireEffects(world, 'end', fxSourceOf(world, i, pr.x[i]!, pr.y[i]!));
+  if (pr.stage[i] === 0 && !pr.noFx[i]) fireEffects(world, 'end', { ...fxSourceOf(world, i, pr.x[i]!, pr.y[i]!), ...(pr.struck[i]! > 0 ? { hitEnemy: pr.struck[i]! - 1 } : {}) });
   else if (pr.stage[i] === 2) fireDelayedExplosion(world, pr.fxIndex[i]!, fxSourceOf(world, i, pr.x[i]!, pr.y[i]!));
   else if (pr.stage[i] === 1 && pr.fxIndex[i]! > 0) fireLanding(world, pr.fxIndex[i]!, fxSourceOf(world, i, pr.x[i]!, pr.y[i]!));
   pr.removeAt(i);

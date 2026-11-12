@@ -225,10 +225,97 @@ describe('ギガインパクト・ドラゴンダイブ・ふんえん（07 の1
     t.sim.step([{ type: 'move', playerId: 1, dx: 1, dy: 0 }]);
     t.sim.step([]);
     expect(t.p.x).toBe(x);
-    const def = t.rules.moves[t.m]!.dash!;
+    // 突進は連続技の段（giga-impact-rush。ヘビーボンバーを消費していなければ、飛び込まずに突進だけ。07 の241章）
+    const def = t.rules.moves[moveIndexOf(t.rules, "giga-impact-rush")]!.dash!;
     expect(def.recoverSeconds * def.recoverLines!.slakoth!).toBeLessThan(def.recoverSeconds);
     for (let k = 0; k < 40; k++) t.sim.step([]);
     expect(t.p.recoverTicks).toBe(0);
+  });
+
+  /** カビゴンのギガインパクト（07 の242章）: ヘビーボンバーを覚えていて、のしかかりを消費している */
+  const snorlaxGiga = () => {
+    const t = setup('giga-impact');
+    t.p.moves.push({ move: moveIndexOf(t.rules, 'heavy-slam'), level: 1, cooldown: 99, burstLeft: 0, burstTimer: 0 });
+    t.p.consumedMoves = [moveIndexOf(t.rules, 'body-slam')];
+    const dashes = (): number => t.sim.world.events.filter((ev) => ev.type === 'dashStarted').length;
+    return { ...t, dashes };
+  };
+
+  it('ギガインパクト（カビゴン）: 前 45° の中の HP の高い相手へヘビーボンバーで飛び込み、のしかかりで弾み、突進して反動で止まる。飛び込む間は無敵（07 の242章）', () => {
+    const t = snorlaxGiga();
+    // 前の近くに雑魚、少し斜め前（45° の中）に HP の高い相手
+    t.e.add(1, t.kindOf('normal'), 60, 0, 1000, 0, 10);
+    t.e.add(2, t.kindOf('boss'), 200, 40, 1e6, 0, 30);
+    let starts = 0;
+    let diveInvincible = false;
+    let landedNear = false;
+    for (let k = 0; k < 60; k++) {
+      t.sim.step([]);
+      starts += t.dashes();
+      if (starts === 1 && t.p.invincibleTicks > 0) diveInvincible = true;
+      if (starts === 2 && Math.hypot(t.p.x - 200, t.p.y - 40) < 10) landedNear = true;
+    }
+    // 飛び込み・のしかかり・突進の 3 回体が動く
+    expect(starts).toBe(3);
+    expect(diveInvincible).toBe(true);
+    expect(landedNear).toBe(true);
+    expect(t.e.hp[1]!).toBeLessThan(1e6);
+    expect(t.p.recoverTicks!).toBeGreaterThan(0);
+  });
+
+  it('ギガインパクト（カビゴン）: HP の高い相手が前 45° の外（真横）なら、そちらへは飛ばず、前の扇の中の相手へ飛び込む（07 の242章）', () => {
+    const t = snorlaxGiga();
+    t.e.add(1, t.kindOf('normal'), 60, 0, 1000, 0, 10);
+    t.e.add(2, t.kindOf('boss'), 0, 150, 1e6, 0, 30);
+    let starts = 0;
+    for (let k = 0; k < 60; k++) {
+      t.sim.step([]);
+      starts += t.dashes();
+    }
+    expect(starts).toBe(3);
+    // 真横の相手のほうへは動かない（飛び散る岩がかすることはある）
+    expect(t.p.y).toBeLessThan(10);
+    expect(t.e.hp[0]!).toBeLessThan(1000);
+  });
+
+  it('アクアブレイク: 前 45° の中の HP の高い相手へ直進し、道中の雑魚にも当たり、相手の手前で止まってしぶきを上げる。着くまで無敵（07 の245章）', () => {
+    const t = setup('liquidation', 'johto');
+    t.e.add(1, t.kindOf('normal'), 70, 0, 1e5, 0, 10);
+    t.e.add(2, t.kindOf('boss'), 160, 0, 1e6, 0, 30);
+    let invincibleWhileMoving = true;
+    let started = false;
+    for (let k = 0; k < 20; k++) {
+      t.sim.step([]);
+      if (t.p.dashTicks) {
+        started = true;
+        if (t.p.invincibleTicks <= 0) invincibleWhileMoving = false;
+      }
+    }
+    expect(started).toBe(true);
+    expect(invincibleWhileMoving).toBe(true);
+    // 道中の雑魚にも、相手にも当たる
+    expect(t.e.hp[0]!).toBeLessThan(1e5);
+    expect(t.e.hp[1]!).toBeLessThan(1e6);
+    // 相手の中心まで行かず、手前（相手の半径 ＋ 自分の半径）で止まる
+    expect(t.p.x).toBeCloseTo(160 - 30 - 12, 0);
+  });
+
+  it('じごくぐるま: 前へ転がり、当たった雑魚を前へ引きずって、転がり終わりに叩きつける。自分も少し傷つく（07 の246章）', () => {
+    const t = setup('submission', 'johto');
+    t.e.add(1, t.kindOf('normal'), 50, 0, 1e6, 0, 10);
+    const hp0 = t.p.hp;
+    let moved = false;
+    for (let k = 0; k < 20; k++) {
+      t.sim.step([]);
+      if (t.p.dashTicks) moved = true;
+    }
+    expect(moved).toBe(true);
+    expect(t.p.x).toBeGreaterThan(100);
+    // 雑魚は前へ引きずられ、ダメージを受ける
+    expect(t.e.x[0]!).toBeGreaterThan(60);
+    expect(t.e.hp[0]!).toBeLessThan(1e6);
+    // 反動
+    expect(t.p.hp).toBeLessThan(hp0);
   });
 
   it('ドラゴンダイブ: 敵が一番多い所へ降り、着く前からそこの敵がすくむ。降りるまで無敵', () => {

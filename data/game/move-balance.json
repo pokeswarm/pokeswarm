@@ -72,6 +72,11 @@
     "outrage",
     "outrage-hit",
     "outrage-last",
+    "icicle-crash-giant",
+    "giga-impact-rush",
+    "body-slam-bounce",
+    "lock-on",
+    "rollout",
     "wish"
   ],
   "heavyHitters": [
@@ -130,6 +135,9 @@
     "doom-desire": "unique"
   },
   "strengthScale": {
+    "flare-blitz": 0.3,
+    "blast-burn": 0.88,
+    "crunch": 1.9,
     "giga-impact": 2,
     "sing": 0.6,
     "yawn": 0.6,
@@ -141,6 +149,11 @@
     "charm": 0.6,
     "double-edge": 1.25,
     "bullet-punch": 0.5,
-    "x-scissor": 0.9
+    "x-scissor": 0.9,
+    "fire-blast": 0.9,
+    "zen-headbutt": 1.8,
+    "echoed-voice": 0.4,
+    "liquidation": 1.6,
+    "submission": 1.6
   }
 }

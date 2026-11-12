@@ -65,7 +65,7 @@
     "horsea": { "sprite": "horsea", "startingMoves": ["water-gun"], "formMoves": [{ "form": "kingdra", "move": "twister" }] },
     "poliwag": { "sprite": "poliwag", "startingMoves": ["bubble"], "formMoves": [{ "form": "politoed", "move": "rain-dance" }] },
     "houndour": { "sprite": "houndour", "startingMoves": ["ember"], "unlock": "houndour" },
-    "porygon": { "sprite": "porygon", "startingMoves": ["swift", "sharpen", "conversion"], "fixedMoves": true, "formMoves": [{ "form": "porygon2", "move": "recover" }] },
+    "porygon": { "sprite": "porygon", "startingMoves": ["swift", "sharpen", "conversion", "lock-on"], "fixedMoves": true },
     "scyther": { "sprite": "scyther", "startingMoves": ["scratch"], "formMoves": [{ "form": "scizor", "move": "bullet-punch" }] },
     "magnemite": { "sprite": "magnemite", "startingMoves": ["thunder-shock"] },
     "mewtwo": { "sprite": "mewtwo", "startingMoves": ["confusion"] },

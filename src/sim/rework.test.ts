@@ -289,4 +289,192 @@ describe('作者の感想で見直した技（2026年10月25日）', () => {
     expect(right).toBeGreaterThan(0);
     expect(behind).toBe(0);
   });
+
+  it('長方形の連打で噛みにいく（barrageSeek）: 長方形の中の敵の正面から出す。だれもいなければ横の線のランダムな所', () => {
+    const shot = { count: 20, intervalSeconds: 0.01, range: 100, size: 8, speed: 400, durationSeconds: 1 };
+    const sim = setup('barrage', shot, [[60, 70]], { barrageWidth: 200, barrageSeek: true });
+    steps(sim, 8);
+    const pr = sim.world.projectiles;
+    expect(pr.count).toBeGreaterThan(5);
+    // 敵（横に 70 の所。半径 10）の正面だけから出る
+    for (let i = 0; i < pr.count; i++) expect(Math.abs(pr.y[i]! - 70)).toBeLessThanOrEqual(5);
+
+    const empty = setup('barrage', shot, [], { barrageWidth: 200, barrageSeek: true });
+    steps(empty, 8);
+    const pe = empty.world.projectiles;
+    const ys = Array.from({ length: pe.count }, (_, i) => pe.y[i]!);
+    expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThan(40);
+  });
+
+  it('長方形の連打で噛みにいく（barrageSeek）: 敵が長方形の外なら寄せない。群れなら幅いっぱいに広がる', () => {
+    const shot = { count: 30, intervalSeconds: 0.01, range: 100, size: 8, speed: 400, durationSeconds: 1 };
+    const behind = setup('barrage', shot, [[-80, 0]], { barrageWidth: 200, barrageSeek: true });
+    steps(behind, 8);
+    const pb = behind.world.projectiles;
+    const yb = Array.from({ length: pb.count }, (_, i) => pb.y[i]!);
+    expect(Math.max(...yb) - Math.min(...yb)).toBeGreaterThan(40);
+
+    const crowd = setup('barrage', shot, [[50, -80], [50, -30], [50, 30], [50, 80]], { barrageWidth: 200, barrageSeek: true });
+    steps(crowd, 15);
+    expect(damage(crowd, 4).every((d) => d > 0)).toBe(true);
+  });
+});
+
+describe('炎の技の作り直し（07 の234章）', () => {
+  it('落とす場所の一部を敵へ（lobSeekShare）: 12 個のうち 3 個が敵のいる所へ落ち、残りはランダムな地面', () => {
+    const lobs = (enemies: [number, number][]): number => {
+      const sim = setup('lob', { count: 12, speed: 500, range: 300, size: 8, durationSeconds: 1 }, enemies, { lobTarget: 'random', lobSeekShare: 0.25 });
+      sim.step([]);
+      const pr = sim.world.projectiles;
+      let onEnemy = 0;
+      // 横の速さ × 持続 = 落ちる場所までの横の距離
+      for (let i = 0; i < pr.count; i++) if (Math.abs(pr.vx[i]! * 1 - 200) < 1) onEnemy++;
+      expect(pr.count).toBe(12);
+      return onEnemy;
+    };
+    expect(lobs([[200, 0]])).toBe(3);
+    expect(lobs([])).toBeLessThanOrEqual(1);
+  });
+
+  it('切り返し（chainTurnBack）: 敵が 1 体なら 行く・突き抜ける・戻る で 3 回当たり、走らなかった分は待たない', () => {
+    const chain = { count: 9, range: 300, size: 10, durationSeconds: 0.2, cooldownSeconds: 0.1, pierce: Infinity };
+    const extra = { chainHopSeconds: 0.08, chainMinHop: 70, chainReturn: true, waitForEnd: true };
+    const sim = setup('chain', chain, [[100, 0]], { ...extra, chainTurnBack: true });
+    sim.step([]);
+    // 行く + 突き抜ける の 2 回ぶん: 0.2 + 0.08 × 2。切り返しが無いと 0.2 + 0.08 × 9 待つ
+    expect(sim.world.players[0]!.moves[0]!.cooldown).toBeLessThan(0.4);
+    steps(sim, 8);
+    expect(damage(sim, 1)[0]).toBe(30);
+
+    const plain = setup('chain', chain, [[100, 0]], extra);
+    plain.step([]);
+    expect(plain.world.players[0]!.moves[0]!.cooldown).toBeGreaterThan(0.85);
+    steps(plain, 8);
+    expect(damage(plain, 1)[0]).toBe(20);
+  });
+
+  it('切り返し（chainTurnBack）: 敵が足りていれば切り返さず、数だけ敵へ跳ぶ', () => {
+    const chain = { count: 3, range: 300, size: 10, durationSeconds: 0.2, cooldownSeconds: 0.1, pierce: Infinity };
+    const sim = setup('chain', chain, [[100, 0], [190, 0], [280, 0], [370, 0]], { chainHopSeconds: 0.08, chainMinHop: 70, chainReturn: true, waitForEnd: true, chainTurnBack: true });
+    sim.step([]);
+    // 3 本 + 戻る線 1 本
+    expect(sim.world.projectiles.count).toBe(4);
+  });
+});
+
+describe('本体が当たった相手を避ける効き方（avoidTarget。07 の233章）', () => {
+  /** 敵 1（本体が当たる）と、すぐ隣の敵 2。hit の効き方つきの弾を 1 発だけ撃つ */
+  const fight = (fx: MoveEffect): { hit: number; next: number; kids: number } => {
+    const sim = setup('nearest', { speed: 400, size: 8, range: 300, durationSeconds: 1, pierce: 1, count: 1 }, [[60, 0], [75, 0]], { effects: [fx] });
+    let kids = 0;
+    for (let t = 0; t < 45; t++) {
+      sim.step([]);
+      const pr = sim.world.projectiles;
+      for (let i = 0; i < pr.count; i++) if (pr.stage[i] === 1) kids = Math.max(kids, pr.count);
+    }
+    const [hit, next] = damage(sim, 2);
+    return { hit: hit!, next: next!, kids };
+  };
+  const rocks = { sizeMultiplier: 2, powerMultiplier: 1, count: 4, radius: 8, durationSeconds: 0.5, hitIntervalSeconds: 0.1 };
+
+  it('岩の群れは、本体が当たった敵には当たらず、隣の敵には当たる', () => {
+    const on = fight({ trigger: 'hit', avoidTarget: true, cluster: rocks });
+    expect(on.kids).toBeGreaterThan(0);
+    expect(on.hit).toBe(10);
+    expect(on.next).toBeGreaterThan(0);
+    // 付けないと、本体が当たった敵にも岩が重なる
+    const off = fight({ trigger: 'hit', cluster: rocks });
+    expect(off.hit).toBeGreaterThan(10);
+    expect(off.next).toBe(on.next);
+  });
+
+  it('破片と、その着地に残る範囲も、本体が当たった敵には当たらない', () => {
+    const shards: MoveEffect = {
+      trigger: 'hit',
+      avoidTarget: true,
+      split: { sizeMultiplier: 2, powerMultiplier: 1, count: 3, speed: 20, durationSeconds: 0.2, spreadDegrees: 360, boomerang: false, pierce: 'infinite', land: { sizeMultiplier: 2, powerMultiplier: 1, durationSeconds: 0.5, hitIntervalSeconds: 0.1 } },
+    };
+    const on = fight(shards);
+    expect(on.hit).toBe(10);
+    expect(on.next).toBeGreaterThan(0);
+    const { avoidTarget: _drop, ...plain } = shards;
+    expect(fight(plain).hit).toBeGreaterThan(10);
+  });
+});
+
+describe('続けて当てるほど強くなる（エコーボイス。07 の240章）', () => {
+  const echo = { maxStacks: 4, powerPerStack: 0.5, sizePerStack: 0.1, growPerSecond: 0 };
+  /** 前の敵へ facing で撃ち続け、出した輪の 1 発目の威力を、出した順に集める（敵がいなければ外れる） */
+  const casts = (enemyAt: [number, number][], n: number): { damage: number; rings: number }[] => {
+    const sim = setup('facing', { speed: 600, size: 10, range: 200, durationSeconds: 0.3, cooldownSeconds: 0.5, count: 1, intervalSeconds: 0.05 }, enemyAt, { echo });
+    const out: { damage: number; rings: number }[] = [];
+    const seen = new Set<number>();
+    for (let t = 0; t < 15 * n + 5; t++) {
+      sim.step([]);
+      const pr = sim.world.projectiles;
+      for (let i = 0; i < pr.count; i++) {
+        if (seen.has(pr.serial[i]!)) continue;
+        seen.add(pr.serial[i]!);
+        const last = out[out.length - 1];
+        // 0.5 秒ごとに出す。同じ回のこだまの輪（0.05 秒あと）は数だけ足す
+        if (last && t - (last as { t?: number }).t! < 5) last.rings++;
+        else out.push(Object.assign({ damage: pr.damage[i]!, rings: 1 }, { t }));
+      }
+    }
+    return out.slice(0, n);
+  };
+
+  it('当たり続けると段が上がって威力が上がり、2 段ごとにこだまの輪が増える。最大で止まる', () => {
+    const got = casts([[100, 0]], 6);
+    // 段 0・1・2・3・4・4。威力は ×(1 + 0.5 × 段) を輪の数で分けた値
+    expect(got.map((g) => g.rings)).toEqual([1, 1, 2, 2, 3, 3]);
+    expect(got.map((g) => Math.round(g.damage * 10) / 10)).toEqual([10, 15, 10, 12.5, 10, 10]);
+  });
+
+  it('外れたら（前に敵がいない）段は上がらない', () => {
+    const got = casts([[-100, 0]], 3);
+    expect(got.map((g) => g.damage)).toEqual([10, 10, 10]);
+    expect(got.map((g) => g.rings)).toEqual([1, 1, 1]);
+  });
+});
+
+describe('HP が半分を切った相手に強い（しおみず。07 の247章）', () => {
+  /** 前の敵へ 1 発だけ撃ち、受けたダメージを返す（敵の HP は最大 1000 のうち hp） */
+  const hitAt = (hp: number, bonus: boolean): number => {
+    const sim = setup('nearest', { speed: 600, size: 8, range: 300, durationSeconds: 1, pierce: 1, count: 1 }, [[60, 0]], bonus ? { lowHpBonus: { thresholdPct: 50, powerPct: 100 } } : {});
+    sim.world.enemies.hp[0] = hp;
+    for (let t = 0; t < 10; t++) sim.step([]);
+    return hp - sim.world.enemies.hp[0]!;
+  };
+
+  it('半分を切っていれば倍、半分より多ければ同じ', () => {
+    expect(hitAt(1000, true)).toBe(10);
+    expect(hitAt(600, true)).toBe(10);
+    expect(hitAt(500, true)).toBe(20);
+    expect(hitAt(300, true)).toBe(20);
+    expect(hitAt(300, false)).toBe(10);
+  });
+});
+
+describe('追う弾は、倒れる見込みの敵を飛ばして狙いを分ける（07 の248章）', () => {
+  /** HP の少ない敵 3 体（1 発で倒れる）へ、追う弾を 3 発続けて撃ち、それぞれの弾が狙った敵の id を返す */
+  const targets = (hp: number): number[] => {
+    const sim = setup('homing', { speed: 200, size: 4, range: 400, durationSeconds: 3, pierce: 1, count: 3, intervalSeconds: 0.03, cooldownSeconds: 100 }, [[120, 0], [120, 60], [120, -60]]);
+    for (let k = 0; k < 3; k++) sim.world.enemies.hp[k] = hp;
+    const got = new Set<number>();
+    for (let t = 0; t < 4; t++) {
+      sim.step([]);
+      const pr = sim.world.projectiles;
+      for (let i = 0; i < pr.count; i++) if (pr.target[i]! > 0) got.add(pr.target[i]! - 1);
+    }
+    return [...got].sort();
+  };
+
+  it('1 発で倒れる敵が 3 体なら、3 発は 3 体に分かれる', () => {
+    expect(targets(5)).toEqual([1, 2, 3]);
+  });
+
+  it('1 発で倒れない（HP の多い）敵なら、一番近い敵に集まる', () => {
+    expect(targets(1000)).toEqual([1]);
+  });
 });

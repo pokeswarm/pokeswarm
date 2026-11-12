@@ -31,6 +31,7 @@ PokéSwarm（ポケモン題材のサバイバー系ブラウザゲーム、最�
 | `docs/21_few_moves_plan.md` | 覚える技が少ないポケモンの救済の案（系統ごとの 4 枠の行き先・DPS・原作で足せる技。相談用） |
 | `docs/22_circle_moves_plan.md` | 自分から円が出る技の作り直しの案（洗い出しと技ごとの案。相談用） |
 | `docs/23_move_presentation_plan.md` | 技に合った演出の案（動詞から決める・演出の道具・技ごとの案。相談用） |
+| `docs/28_weak_lines_plan.md` | 下位の系統の救済（足せる技と足したときの秒数・作り直す固有技・新しい技）と、ゲンガーなど上位の調整の案（相談用） |
 
 自動で作る資料（手で直さない。元のデータを直して作り直す）:
 
@@ -40,6 +41,10 @@ PokéSwarm（ポケモン題材のサバイバー系ブラウザゲーム、最�
 | `docs/14_move_dps.md`・`.json` | `npm run move-dps` | 技の DPS（ボス1体と雑魚 10・50・200）。両方に強い技を探すのに使う |
 | `docs/15_achievements.md`・`.json` | `npm run achievements-table` | 実績と解放の一覧（隠し実績も全部） |
 | `docs/16_learnsets.json` | `npm run learnsets` | ポケモンごとの最初の技・覚えられる技・派生と固有技 |
+| `docs/24_build_dps.json` | `npx vitest run --mode balance src/sim/buildDps.balance.ts`（`docs/09` の単体火力の測り方） | カントー・ジョウトの系統ごとの、総 DPS が一番伸びるビルドと測定値（ボス・群れ） |
+| `docs/25_boss_kill.json` | 同じファイルで `-t ボスを倒す秒数`（系統ごとに `BUILD_ONLY` と `KILL_OUT` で分けて回せる） | 技ごとのボス単独 DPS・その技を抜くと下がる分・四天王と伝説を倒す秒数（計算と本物の戦い）。ナーフの判断に使う |
+| `docs/26_move_items.json` | `npm run build-estimate` などが自動で作る（技の定義が変わった技だけ測り直す。コードを変えたら `TABLE_REDO=技`） | 技 1 つずつの単体 DPS（ミュウ・持ち物なしと、形の持ち物を 1 つずつ）。見積もりとビルド案の元 |
+| `docs/27_build_estimate.json` | `npm run build-estimate`（数秒。測らない） | **ボスへの強さの見積もり**。系統ごとの上位の案（技・持ち物・見積もり DPS・相手ごとの秒数）と、強い技の順。強さを知りたいときはまずこれ（`docs/09` の単体火力の測り方） |
 | `docs/pages/` | `node scripts/make-doc-page.cjs …` | 上の資料を作者が見るページ（Artifact）のひな型。作り方と公開先の URL は `docs/pages/README.md` |
 
 仕様書の印: 【決定】は変更前に作者へ確認、【初期案】は調整可能な形で実装、【要決定】は実装前に作者へ確認。

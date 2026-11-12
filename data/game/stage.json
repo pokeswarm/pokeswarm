@@ -588,7 +588,10 @@
       "damage": 0,
       "playerMove": {
         "move": "blast-burn",
-        "level": 8
+        "level": 8,
+        "count": 8,
+        "range": 460,
+        "power": 68.8
       }
     },
     {

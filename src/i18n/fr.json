@@ -356,6 +356,7 @@
   "mod.durationPct": "Durée des capacités",
   "mod.rangePct": "Portée des capacités",
   "mod.pierceBonus": "Perforation des capacités",
+  "mod.lockOnPct": "Dégâts sur la cible verrouillée",
   "mod.powerMultiplier": "Puissance ×{v} (non consommé)",
   "title.menu.start": "SOLO",
   "title.menu.coop": "MULTI",

@@ -356,6 +356,7 @@
   "mod.durationPct": "Duración de movimientos",
   "mod.rangePct": "Alcance de movimientos",
   "mod.pierceBonus": "Perforación de movimientos",
+  "mod.lockOnPct": "Daño al objetivo fijado",
   "mod.powerMultiplier": "Potencia ×{v} (no se gasta)",
   "title.menu.start": "SOLO",
   "title.menu.coop": "MULTI",

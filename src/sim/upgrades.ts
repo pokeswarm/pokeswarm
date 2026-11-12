@@ -25,6 +25,8 @@ export interface Modifiers {
   rangePct: number;
   /** 技の貫通に足す数 */
   pierceBonus: number;
+  /** ロックオンした相手（ボス・中ボス）へのダメージ（ロックオン。07 の249章） */
+  lockOnPct: number;
 }
 
 /** シミュレーションが使う持ち物の定義 */
@@ -115,6 +117,7 @@ export function emptyModifiers(typeCount: number): Modifiers {
     durationPct: 0,
     rangePct: 0,
     pierceBonus: 0,
+    lockOnPct: 0,
   };
 }
 

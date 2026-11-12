@@ -69,6 +69,8 @@ export function buildSimRules(region?: string): SimRules {
       learners: def.learners ?? null,
       waitForEnd: def.waitForEnd,
       ...(def.chainReturn ? { chainReturn: true } : {}),
+      ...(def.chainTurnBack ? { chainTurnBack: true } : {}),
+      ...(def.lobSeekShare ? { lobSeekShare: def.lobSeekShare } : {}),
       ...(def.bonusCountToPower ? { bonusCountToPower: true } : {}),
       ...(def.landOnly ? { landOnly: true } : {}),
       ...(def.sequential ? { sequential: true } : {}),
@@ -109,6 +111,10 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.windupSeconds ? { windupSeconds: def.windupSeconds } : {}),
       ...(def.pledge ? { pledge: def.pledge } : {}),
       aimStrongest: def.aimStrongest,
+      ...(def.landAtTarget ? { landAtTarget: true } : {}),
+      ...(def.stopOnBoss ? { stopOnBoss: true } : {}),
+      ...(def.lowHpBonus ? { lowHpBonus: def.lowHpBonus } : {}),
+      ...(def.echo ? { echo: def.echo } : {}),
       aimFacing: def.aimFacing,
       ...(def.aimBehind ? { aimBehind: true } : {}),
       ...(def.chainFacingDegrees ? { chainFacingHalf: (def.chainFacingDegrees * Math.PI) / 360 } : {}),
@@ -119,6 +125,7 @@ export function buildSimRules(region?: string): SimRules {
       randomAim: def.randomAim,
       ...(def.barrageWidth ? { barrageWidth: def.barrageWidth, barrageWidthPerLevel: def.barrageWidthPerLevel ?? 0 } : {}),
       ...(def.barrageAhead ? { barrageAhead: true } : {}),
+      ...(def.barrageSeek ? { barrageSeek: true } : {}),
       idleScale: def.idleScale,
       knockbackAlongFacing: def.knockbackAlongFacing,
       magnitude: def.magnitude,
@@ -165,7 +172,12 @@ export function buildSimRules(region?: string): SimRules {
     const cm = movesConfig.moves[m.key]?.comboMoves;
     if (cm) moves[k] = { ...m, comboMoves: cm.map(moveIndex) };
     const sq = movesConfig.moves[m.key]?.sequence;
-    if (sq) moves[k] = { ...moves[k]!, sequence: sq.map((s) => ({ move: moveIndex(s.move), afterSeconds: s.afterSeconds, needsConsumed: (s.needsConsumed ?? []).map(moveIndex), minLevel: s.minLevel ?? 1 })) };
+    if (sq) moves[k] = { ...moves[k]!, sequence: sq.map((s) => ({ move: moveIndex(s.move), afterSeconds: s.afterSeconds, needsConsumed: (s.needsConsumed ?? []).map(moveIndex), needsMoves: (s.needsMoves ?? []).map(moveIndex), minLevel: s.minLevel ?? 1 })) };
+  });
+  // ボスの真上に落とす大きな塊（つららおとし）
+  moves.forEach((m, k) => {
+    const sb = movesConfig.moves[m.key]?.scatterBoss;
+    if (sb) moves[k] = { ...moves[k]!, scatterBoss: { ...sb, move: moveIndex(sb.move) } };
   });
   // ためている間に出す技（きあいパンチのマッハパンチ）
   moves.forEach((m, k) => {

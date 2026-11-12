@@ -356,6 +356,7 @@
   "mod.durationPct": "Dauer der Attacken",
   "mod.rangePct": "Reichweite der Attacken",
   "mod.pierceBonus": "Durchschlag der Attacken",
+  "mod.lockOnPct": "Schaden am anvisierten Ziel",
   "mod.powerMultiplier": "Attackenstärke ×{v} (wird nicht verbraucht)",
   "title.menu.start": "SOLO",
   "title.menu.coop": "MULTI",

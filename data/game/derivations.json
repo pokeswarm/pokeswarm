@@ -62,6 +62,27 @@
       "to": "hydro-pump"
     },
     {
+      "from": "aqua-jet",
+      "item": "mystic-water",
+      "to": "liquidation"
+    },
+    {
+      "from": "counter",
+      "item": "black-belt",
+      "to": "submission",
+      "line": "poliwag",
+      "forms": [
+        "poliwhirl",
+        "poliwrath"
+      ]
+    },
+    {
+      "from": "whirlpool",
+      "item": "mystic-water",
+      "to": "brine",
+      "line": "horsea"
+    },
+    {
       "from": "bubble",
       "item": "mystic-water",
       "to": "bubble-beam"
@@ -209,6 +230,12 @@
       "item": "x-defense",
       "to": "play-rough",
       "line": "jigglypuff"
+    },
+    {
+      "from": "yawn",
+      "item": "x-defense",
+      "to": "heavy-slam",
+      "line": "snorlax"
     },
     {
       "from": "disarming-voice",
@@ -564,10 +591,28 @@
       "line": "jigglypuff"
     },
     {
+      "from": "sing",
+      "item": "metronome",
+      "to": "echoed-voice",
+      "line": "jigglypuff"
+    },
+    {
       "from": "slack-off",
       "item": "x-defense",
       "to": "amnesia",
       "line": "slowpoke"
+    },
+    {
+      "from": "body-slam",
+      "item": "twisted-spoon",
+      "to": "zen-headbutt",
+      "line": "slowpoke"
+    },
+    {
+      "from": "body-slam",
+      "item": "twisted-spoon",
+      "to": "zen-headbutt",
+      "line": "psyduck"
     },
     {
       "from": "body-slam",
@@ -1074,6 +1119,12 @@
       "item": "silk-scarf",
       "to": "body-slam",
       "line": "azurill"
+    },
+    {
+      "from": "scratch",
+      "item": "silk-scarf",
+      "to": "body-slam",
+      "line": "psyduck"
     },
     {
       "from": "body-slam",

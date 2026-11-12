@@ -69,7 +69,8 @@ describe('ボルトチェンジ: 残像が敵から敵へ飛び、最後は自�
     t.sim.step([{ type: 'spawnEnemy', id: 1, kind: 0, x: 150, y: 0 }]);
     t.sim.step([]);
     const lines = t.find((i) => t.pr.move[i] === t.m && t.pr.shape[i] === SHAPE_LINE);
-    expect(lines).toHaveLength(2);
+    // 敵が 1 体なので、行く・突き抜ける（切り返し。07 の234章）・戻る の 3 本
+    expect(lines).toHaveLength(3);
     expect(lines.some((i) => t.pr.orbitRadius[i] === -1)).toBe(true);
   });
 

@@ -115,11 +115,10 @@ describe('ベイビィポケモンの決まり', () => {
 });
 
 describe('カントーにもいるポケモンの、ジョウトで進化した姿（07 の80章）', () => {
-  it('イワーク ＋ メタルコート → ハガネールで アイアンテール、ストライク → ハッサムで バレットパンチ、ポリゴン → ポリゴン2で じこさいせい', () => {
+  it('イワーク ＋ メタルコート → ハガネールで アイアンテール、ストライク → ハッサムで バレットパンチ', () => {
     for (const [line, item, form, move] of [
       ['onix', 'metal-coat', 'steelix', 'iron-tail'],
       ['scyther', 'metal-coat', 'scizor', 'bullet-punch'],
-      ['porygon', 'up-grade', 'porygon2', 'recover'],
     ] as const) {
       const s = setup(line);
       s.p.items = [{ item: s.rules.items.findIndex((it) => it.key === item), level: 1 }];
@@ -128,6 +127,17 @@ describe('カントーにもいるポケモンの、ジョウトで進化した�
       expect(s.keys()).toContain(move);
       expect(s.p.items).toEqual([]);
     }
+  });
+});
+
+describe('ポリゴン → ポリゴン2（07 の80・249章）', () => {
+  it('アップグレードで ポリゴン2 に進化する。技は最初の 4 つのまま（ロックオンで枠が埋まるので じこさいせい は覚えない。作者の決定 2026年11月13日）', () => {
+    const s = setup('porygon');
+    s.p.items = [{ item: s.rules.items.findIndex((it) => it.key === 'up-grade'), level: 1 }];
+    checkEvolution(s.w, s.p);
+    expect(s.p.species).toBe(s.species('porygon2'));
+    expect(s.keys()).toEqual(['swift', 'sharpen', 'conversion', 'lock-on']);
+    expect(s.p.items).toEqual([]);
   });
 });
 

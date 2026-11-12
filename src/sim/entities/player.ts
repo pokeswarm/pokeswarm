@@ -30,9 +30,14 @@ export interface PlayerMove {
   windup?: number;
   /** この技の最大レベル（技の定義より低くするとき。ばくれつパンチ: 消費したパンチの数で 8・16・24。07 の105章） */
   maxLevel?: number;
+  /** 続けて当てるほど強くなる技（エコーボイス）: 今の段と、前に出した分が敵に当たったか（07 の240章） */
+  echo?: number;
+  echoHit?: boolean;
 }
 
 export interface Player {
+  /** ロックオンしている敵の id + 1（0 か無しは無し。ロックオン を持っていて、ボス・中ボスがいる間。07 の249章） */
+  lockOn?: number;
   readonly id: PlayerId;
   /** 別のブラウザが操作するプレイヤー（位置は通信で届いたものを使う） */
   readonly remote: boolean;

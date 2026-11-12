@@ -1277,7 +1277,81 @@ function furySlash(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map((g) => toRows(outline(g, 0))) } };
 }
 
-/** ラスターカノン: 銀色の鋼の光線（ふちが青白く、真ん中に光の筋が流れる） */
+/**
+ * ラスターカノン（07 の238章）: 銀色の光の玉。白い芯を、磨いた鋼のような銀の球が包み、左上に映り込みの光。
+ * 球の外には 4 本の細い光の筋（十字のきらめき）が、コマごとに長さを変えて瞬く。4 コマ
+ */
+function flashOrb(): SpriteOut {
+  // 0 輪郭・1 濃い鋼・2 鋼・3 銀・4 薄い銀・5 白・6 青白い光
+  const palette = ['#263238', '#546e7a', '#90a4ae', '#cfd8dc', '#eceff1', '#ffffff', '#e0f7fa'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    // 球（輪郭あり）: 芯は白、外へ銀・鋼。左上が明るく、映り込みの光
+    const g = shape(24, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d > 0.46) return -1;
+      const l = light(u, v, 0.46);
+      if (d < 0.13) return 5;
+      if (Math.hypot(u + 0.17, v + 0.17) < 0.08) return 5;
+      if (d < 0.24) return 4;
+      return l > 0.35 ? 4 : l > -0.1 ? 3 : l > -0.55 ? 2 : 1;
+    });
+    // 十字のきらめき（輪郭なし。縦横の細い筋で、先が細る。コマで伸び縮み）
+    const len = 0.78 + [0, 0.12, 0.2, 0.08][f]!;
+    const rays = shape(24, (u, v) => {
+      const d = Math.hypot(u, v);
+      if (d <= 0.44 || d >= len) return -1;
+      const w = 0.08 * (1 - d / len) + 0.045;
+      return Math.abs(u) < w || Math.abs(v) < w ? (d < 0.6 ? 5 : 6) : -1;
+    }, 0, -1);
+    for (let y = 0; y < g.length; y++) for (let x = 0; x < g[0]!.length; x++) if (g[y]![x] === -1 && rays[y]![x]! >= 0) g[y]![x] = rays[y]![x]!;
+    return toRows(g);
+  });
+  return { palette, frameMs: 90, parts: { main: frames } };
+}
+
+/**
+ * ラスターカノンの着弾: 光の玉が弾ける。白い光の円がふくらみ、銀の輪が外へ走り、8 本の光の筋が伸びて消える。
+ * 最後のコマは輪と筋の名残だけ（画面全体は光らせない）。4 コマ
+ */
+function flashBurst(): SpriteOut {
+  // 0 輪郭・1 鋼・2 銀・3 薄い銀・4 白・5 青白い光
+  const palette = ['#37474f', '#78909c', '#cfd8dc', '#eceff1', '#ffffff', '#e0f7fa'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    toRows(
+      shape(36, (u, v) => {
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        // 真ん中の光（だんだん小さく、薄く）
+        const core = [0.42, 0.34, 0.18, 0][f]!;
+        if (d < core * 0.6) return 4;
+        if (d < core) return f < 2 ? 3 : 5;
+        // 外へ走る銀の輪（細くなりながら広がる）
+        const r = 0.42 + f * 0.17;
+        const th = 0.09 - f * 0.018;
+        if (Math.abs(d - r) < th) return f < 2 ? 3 : f === 2 ? 2 : 1;
+        // 8 本の光の筋（輪の外側。先が細る。角度の幅なので、外ほど太さを保つよう距離で割る）
+        const k = ((a / (Math.PI * 2)) * 8 + 8.5) % 1;
+        const reach = Math.min(0.98, r + 0.36 - f * 0.04);
+        const halfW = (0.06 * (1 - (d - r) / Math.max(0.01, reach - r)) + 0.035) / Math.max(0.2, d);
+        if (f < 3 && d > r && d < reach && Math.abs(k - 0.5) * ((Math.PI * 2) / 8) < halfW) return f === 0 ? 4 : 5;
+        // 銀のかけら（ひし形。筋の間を外へ飛ぶ）
+        if (f > 0) {
+          for (let j = 0; j < 8; j++) {
+            const th = ((j + 0.5) / 8) * Math.PI * 2 + 0.2;
+            const rr = 0.38 + f * 0.19 + (j % 2) * 0.06;
+            const du = u - Math.cos(th) * rr;
+            const dv = v - Math.sin(th) * rr;
+            if (Math.abs(du) + Math.abs(dv) < 0.1 - f * 0.012) return Math.abs(du) + Math.abs(dv) < 0.045 ? 4 : 2;
+          }
+        }
+        return -1;
+      }, 0, -1),
+    ),
+  );
+  return { palette, frameMs: 75, parts: { main: frames } };
+}
+
+/** ラスターカノン（前の形）: 銀色の鋼の光線（ふちが青白く、真ん中に光の筋が流れる） */
 function steelBeam(): SpriteOut {
   const H = 12;
   const TILE = 8;
@@ -2595,6 +2669,553 @@ function iceChunk(): SpriteOut {
     return d < -0.45 ? 3 : d < 0 ? 2 : d < 0.6 ? 2 : 1;
   });
   return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
+/**
+ * つららおとしの大きなつらら（ボスの真上に落とす 1 本。07 の238章）: 太い根元から鋭く細る主の柱と、左右に寄り添う短い 2 本。
+ * 根元は折れた氷のぎざぎざ。面は左が明るく右が暗い 3 面で、主の柱の稜線に白い光の筋。中に縦の割れ目と小さな気泡
+ */
+function icicleSpear(): SpriteOut {
+  // 0 輪郭・1 濃い青・2 青・3 水色・4 白・5 薄い水色（面の中の明るい所）
+  const palette = ['#0b2e45', '#01579b', '#29b6f6', '#81d4fa', '#ffffff', '#e1f5fe'];
+  const spike = (u: number, v: number, cx: number, top: number, tip: number, half: number): number => {
+    // 根元の割れ口（ぎざぎざ）から先へ。上 2 割は太さを保ち、そこから先へ鋭く細る
+    const jag = top + Math.abs(Math.sin((u - cx) * 11)) * 0.07;
+    if (v < jag || v > tip) return -2;
+    const t = (v - top) / (tip - top);
+    const w = t < 0.18 ? half : half * Math.pow(Math.max(0, (1 - t) / 0.82), 0.85);
+    const d = (u - cx) / Math.max(0.015, w);
+    if (Math.abs(d) > 1) return -2;
+    return d;
+  };
+  const g = shape(40, (u, v) => {
+    const main = spike(u, v, -0.02, -0.92, 0.98, 0.36);
+    const left = spike(u, v, -0.5, -0.78, 0.3, 0.17);
+    const right = spike(u, v, 0.47, -0.82, 0.45, 0.19);
+    // 前に出ているのは主の柱
+    const [d, isMain] = main > -2 ? [main, true] : left > -2 ? [left, false] : right > -2 ? [right, false] : [-2, false];
+    if (d === -2) return -1;
+    // 稜線の光（主の柱だけ。少し左寄りに 1 本）
+    if (isMain && Math.abs(d + 0.12) < 0.07 && v > -0.75) return 4;
+    // 根元の割れ口は明るい
+    if (v < (isMain ? -0.84 : -0.7)) return 5;
+    // 縦の割れ目と気泡（主の柱）
+    if (isMain && Math.abs(d - 0.42) < 0.05 && v > -0.4 && v < 0.35) return 1;
+    if (isMain && (Math.hypot(u + 0.12, v + 0.25) < 0.035 || Math.hypot(u + 0.05, v - 0.1) < 0.025)) return 5;
+    return d < -0.55 ? 3 : d < -0.12 ? 5 : d < 0.3 ? 3 : d < 0.7 ? 2 : 1;
+  });
+  return { palette, frameMs: 1000, parts: { main: [toRows(g)] } };
+}
+
+/**
+ * ころがる（07 の238章）: 自分を包む大きな岩。少しいびつな丸い岩で、表面の割れ目と出っぱりの模様が右へ流れて転がって見える
+ * （絵は進む向きに回すので、右へ転がる形で描く）。光は上から、下は濃い影。後ろに土ぼこり。4 コマ
+ */
+function rolloutBoulder(): SpriteOut {
+  // 0 輪郭・1 濃い茶・2 茶・3 明るい茶・4 薄い土色・5 ほこり
+  const palette = ['#2a1a0f', '#5b3d26', '#87603d', '#b08559', '#d9bc8c', '#c9b69a'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    const turn = (f / 4) * Math.PI * 0.5;
+    const g = shape(30, (u, v) => {
+      const a = Math.atan2(v, u);
+      // いびつな丸（でこぼこのふち）
+      const rim = 0.86 + Math.sin(a * 5 + 0.7) * 0.035 + Math.sin(a * 3 - 1.1) * 0.03;
+      const d = Math.hypot(u, v);
+      if (d > rim) return -1;
+      // 表面の模様: 転がりの角度だけ回した座標で、割れ目の線と出っぱりの面を描く
+      const c = Math.cos(turn);
+      const s = Math.sin(turn);
+      const ru = u * c + v * s;
+      const rv = -u * s + v * c;
+      const crack1 = Math.abs(rv - Math.sin(ru * 3.1) * 0.18 - 0.08) < 0.035 && Math.abs(ru) < 0.62;
+      const crack2 = Math.abs(ru + 0.3 - rv * 0.4) < 0.03 && rv > -0.7 && rv < -0.1;
+      const crack3 = Math.abs(ru - 0.36 + rv * 0.25) < 0.03 && rv > 0.2 && rv < 0.66;
+      // 上からの光（回さない）
+      const l = (-v * 0.9 - u * 0.3) / rim;
+      if (crack1 || crack2 || crack3) return l > 0.4 ? 2 : 1;
+      const bump = Math.hypot(ru + 0.38, rv + 0.36) < 0.16 || Math.hypot(ru - 0.32, rv - 0.3) < 0.13 || Math.hypot(ru - 0.1, rv + 0.52) < 0.1;
+      if (bump && l > -0.2) return l > 0.45 ? 4 : 3;
+      return l > 0.55 ? 4 : l > 0.15 ? 3 : l > -0.45 ? 2 : 1;
+    });
+    // 後ろに舞う土ぼこり（輪郭なし。進む向きに回すので、左右どちらの向きでも後ろに出るよう真後ろの両脇に置く。コマで広がる）
+    const dust = shape(30, (u, v) => {
+      const k = (f + 1) / 4;
+      for (const [cx, cy, r] of [[-0.86, 0.42, 0.1], [-0.94, 0.12, 0.06 + 0.05 * k], [-0.86, -0.42, 0.1], [-0.94, -0.12, 0.08 * k]] as const) if (Math.hypot(u - cx, v - cy) < r) return 5;
+      return -1;
+    }, 0, -1);
+    for (let y = 0; y < g.length; y++) for (let x = 0; x < g[0]!.length; x++) if (g[y]![x] === -1 && dust[y]![x]! >= 0) g[y]![x] = dust[y]![x]!;
+    return toRows(g);
+  });
+  return { palette, frameMs: 60, parts: { main: frames } };
+}
+
+/**
+ * しねんのずつき（07 の239章）: 頭にまとう念の光。進む向き（右）に、頭を包む厚い三日月の光と、その先へ重なる薄い 2 枚の弧
+ * （押し出される念の圧）。後ろ半分は描かないので、使ったポケモンが見える。弧の縁に小さなきらめき。3 コマで弧が前へ脈打つ
+ */
+function zenHeadbuttAura(): SpriteOut {
+  // 0 輪郭・1 濃い紫・2 紫・3 桃・4 薄桃・5 白
+  const palette = ['#3b0a45', '#7b1fa2', '#ba68c8', '#f06292', '#f8bbd0', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    toRows(
+      shape(32, (u, v) => {
+        const d = Math.hypot(u, v);
+        // 前だけ（右へ向いた半円より少し狭く）
+        if (u < 0.05 || Math.abs(v) > u * 2.2 + 0.25) return -1;
+        // 頭を包む厚い三日月（内は 0.42、外は 0.62。前ほど厚い）
+        const a = Math.abs(Math.atan2(v, u));
+        const outer = 0.6 + 0.06 * Math.cos(a) + f * 0.02;
+        if (d > 0.4 && d < outer) {
+          const t = (d - 0.4) / (outer - 0.4);
+          return t < 0.25 ? 5 : t < 0.55 ? 4 : t < 0.85 ? 3 : 2;
+        }
+        // 先へ重なる 2 枚の薄い弧（コマごとに前へ）
+        for (let k = 0; k < 2; k++) {
+          const r = 0.7 + k * 0.13 + f * 0.04;
+          if (r > 0.98) continue;
+          const w = 0.035 - k * 0.008;
+          if (Math.abs(d - r) < w && a < 1.05 - k * 0.2) return k === 0 ? 3 : 2;
+        }
+        // 縁のきらめき（2 つ。コマで場所を変える）
+        const sp = [
+          [0.66, -0.36 + f * 0.12],
+          [0.72, 0.3 - f * 0.1],
+        ];
+        for (const [cx, cy] of sp) if (Math.abs(u - cx!) + Math.abs(v - cy!) < 0.05) return 5;
+        return -1;
+      }, 0, -1),
+    ),
+  );
+  return { palette, frameMs: 70, parts: { main: frames } };
+}
+
+/**
+ * しねんのずつきの念の波紋: 当たった所から広がる、ゆらぐ輪 2 本（念力の波。円ではなく、波打つ縁）。
+ * 真ん中に頭突きの衝撃の星。外の輪ほど薄い。4 コマ
+ */
+function zenRipple(): SpriteOut {
+  // 0 輪郭・1 濃い紫・2 紫・3 桃・4 薄桃・5 白
+  const palette = ['#3b0a45', '#7b1fa2', '#ba68c8', '#f06292', '#f8bbd0', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    toRows(
+      shape(36, (u, v) => {
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        // 衝撃の星（最初の 2 コマ。4 本の尖り）
+        if (f < 2) {
+          const star = (0.2 - f * 0.07) * (0.45 + 0.55 * Math.abs(Math.cos(a * 2)) ** 3);
+          if (d < star) return d < star * 0.5 ? 5 : 4;
+        }
+        // 波打つ輪 2 本（内が濃く、外が薄い。広がるほど細く・薄く）
+        for (let k = 0; k < 2; k++) {
+          const r = 0.25 + f * 0.19 - k * 0.17;
+          if (r <= 0.12) continue;
+          const wave = Math.sin(a * 7 + f * 1.3 + k * 2) * 0.035;
+          const w = 0.06 - f * 0.01;
+          if (Math.abs(d - r - wave) < w) return f === 3 ? (k === 0 ? 2 : 1) : k === 0 ? (f < 2 ? 4 : 3) : 2;
+        }
+        return -1;
+      }, 0, -1),
+    ),
+  );
+  return { palette, frameMs: 85, parts: { main: frames } };
+}
+
+/**
+ * エコーボイス（07 の240章）: 前へ進む声の弧。大きな円の前の縁を切り取った太い弧で、縁は細かく震える（響く声）。
+ * 後ろに同じ形の細い弧が 2 本、だんだん薄く続く（こだま）。ハイパーボイスの桃のだ円とは違い、薄紫と水色の響き。3 コマで縁が震え、こだまが追いつく
+ */
+function echoWave(): SpriteOut {
+  // 0 輪郭・1 濃い藍紫・2 藤色・3 薄紫・4 水色・5 白
+  const palette = ['#1f1446', '#5e35b1', '#9575cd', '#d1c4e9', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    toRows(
+      shape(28, (u, v) => {
+        // 弧の中心は左（後ろ）。半径の差で前の縁だけを残す
+        const cx = -0.75;
+        const d = Math.hypot(u - cx, v);
+        const a = Math.atan2(v, u - cx);
+        if (Math.abs(a) > 1.0) return -1;
+        // 縁の震え（角度に沿った細かい波。コマで動く）
+        const jitter = Math.sin(a * 14 + f * 2.2) * 0.025;
+        // 先頭の太い弧（前の縁が白く、後ろへ藤色）
+        const r0 = 1.5;
+        const t = r0 - (d + jitter);
+        if (t > 0 && t < 0.2 * (1 - Math.abs(a) * 0.35)) return t < 0.05 ? 5 : t < 0.1 ? 4 : t < 0.15 ? 3 : 2;
+        // こだまの弧 2 本（後ろへ。細く薄く。コマで少し前へ追いつく）
+        for (let k = 1; k <= 2; k++) {
+          const rk = r0 - k * 0.3 + f * 0.03;
+          const w = 0.05 - k * 0.012;
+          if (Math.abs(d + jitter * 0.5 - rk) < w && Math.abs(a) < 0.95 - k * 0.12) return k === 1 ? 3 : 1;
+        }
+        return -1;
+      }, 0, -1),
+    ),
+  );
+  return { palette, frameMs: 80, parts: { main: frames } };
+}
+
+/**
+ * ヘビーボンバー（07 の241章）: 上から落ちた重さで、着いた所の地面がへこむ。真ん中に鋼色の衝撃の光、まわりに放射状の割れ目 6 本と、
+ * 押し出されて縁にめくれる地面の塊。割れ目はコマごとに外へ伸び、光は消えていく。4 コマ
+ */
+function heavySlamQuake(): SpriteOut {
+  // 0 輪郭・1 濃い土・2 土・3 明るい土・4 鋼の青灰・5 薄い鋼・6 白
+  const palette = ['#1f1a17', '#4e3b2c', '#7a5c43', '#a88663', '#78909c', '#cfd8dc', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    toRows(
+      shape(34, (u, v) => {
+        const d = Math.hypot(u, v * 1.15);
+        const a = Math.atan2(v, u);
+        // 衝撃の光（最初の 2 コマ）
+        if (f < 2 && d < 0.36 - f * 0.1) return d < 0.16 ? 6 : 5;
+        // へこみの縁（だ円の輪。地面の塊がめくれる）
+        const rim = 0.64 + f * 0.04;
+        const lump = Math.sin(a * 9 + 1.3) * 0.04;
+        if (Math.abs(d - rim - lump) < 0.07 - f * 0.008) return d < rim + lump ? 2 : 3;
+        // へこみの底（薄い影）
+        if (d < rim - 0.06 && f >= 1) {
+          // 放射状の割れ目 6 本（底から外へ伸びる）
+          for (let k = 0; k < 6; k++) {
+            const th = (k / 6) * Math.PI * 2 + 0.3;
+            const along = u * Math.cos(th) + v * Math.sin(th);
+            const side = -u * Math.sin(th) + v * Math.cos(th) - Math.sin(along * 9 + k) * 0.03;
+            if (along > 0.08 && Math.abs(side) < 0.025 && along < rim) return 1;
+          }
+          // へこみの底: 1 コマ目は鋼の光の名残、あとは市松の影（地面が透けて見える）
+          if (f === 1) return 4;
+          return (Math.round((u + 1) * 17) + Math.round((v + 1) * 17)) % 2 === 0 ? 1 : -1;
+        }
+        // 縁の外へ伸びる割れ目（コマで伸びる）
+        for (let k = 0; k < 6; k++) {
+          const th = (k / 6) * Math.PI * 2 + 0.3;
+          const along = u * Math.cos(th) + v * Math.sin(th);
+          const side = -u * Math.sin(th) + v * Math.cos(th) - Math.sin(along * 9 + k) * 0.03;
+          if (along > rim && along < rim + 0.08 + f * 0.08 && Math.abs(side) < 0.024 * (1 - (along - rim) / 0.4)) return 1;
+        }
+        return -1;
+      }, 0, -1),
+    ),
+  );
+  return { palette, frameMs: 90, parts: { main: frames } };
+}
+
+/** ヘビーボンバーの外へ走る衝撃の輪（輪に沿って並べる帯。下が外）: 鋼色の鋭い衝撃の線と、その内側の土ぼこり。3 コマ */
+function heavySlamRing(): SpriteOut {
+  const palette = ['#263238', '#90a4ae', '#cfd8dc', '#ffffff', '#a88663'];
+  const W = 12;
+  const H = 8;
+  const frames = [0, 1, 2].map((f) =>
+    fill(blank(W, H), (x, y) => {
+      const ph = ((x + f * 3) / W) * Math.PI * 2;
+      // 外の縁: のこぎりのような鋭い衝撃
+      const edge = 5.8 + ((x + f * 2) % 3) * 0.35;
+      if (Math.abs(y - edge) < 0.6) return 3;
+      if (Math.abs(y - edge) < 1.2) return 2;
+      // 内の土ぼこり（粒）
+      const dust = 2.6 + Math.sin(ph * 2) * 0.7;
+      if (Math.abs(y - dust) < 0.55 && (x + f) % 2 === 0) return 4;
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * アクアジェット（07 の244章）: 体を包む水の殻。進む向き（右）にとがった しずく の形で、先の縁が白く光り、
+ * 後ろへ 3 本の水の筋が流れる（速さ）。3 コマで筋が後ろへ流れる
+ */
+function aquaJetWrap(): SpriteOut {
+  // 0 輪郭・1 濃い青・2 青・3 水色・4 薄い水色・5 白
+  const palette = ['#06223a', '#0d47a1', '#1e88e5', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    toRows(
+      shape(30, (u, v) => {
+        // しずくの殻: 後ろは丸く（中心 -0.05、半径 0.6）、前（右）はとがる。中は空けて、使ったポケモンが見える
+        const back = Math.hypot(u + 0.05, v) / 0.6;
+        const front = u > -0.05 && Math.abs(v) < 0.6 * Math.max(0, 1 - (u + 0.05) / 0.95) ** 0.8;
+        const inside = back <= 1 || front;
+        const inner = Math.hypot(u + 0.05, v) / 0.47 <= 1 || (u > -0.05 && Math.abs(v) < 0.47 * Math.max(0, 1 - (u + 0.05) / 0.78) ** 0.8);
+        if (inside && !inner) return u > 0.25 ? 5 : u > -0.1 ? 4 : v < 0 ? 3 : 2;
+        // 後ろへ流れる水の筋（3 本）
+        for (const [cy, w] of [[-0.32, 0.035], [0, 0.04], [0.32, 0.035]] as const) {
+          const ph = ((-u * 3 + f * 0.7 + cy * 2) % 1 + 1) % 1;
+          if (u < -0.5 && u > -0.98 && Math.abs(v - cy) < w && ph < 0.6) return ph < 0.2 ? 4 : 2;
+        }
+        return -1;
+      }, 0, -1),
+    ),
+  );
+  return { palette, frameMs: 60, parts: { main: frames } };
+}
+
+/**
+ * アクアブレイク（07 の244章）: 飛びついて着いた所の水しぶき。真ん中で水が砕け、まわりに水の冠が立ち上がり、
+ * 割れた水の板が外へ跳ねる。最後は しずく だけが残る。真ん中は空けてある（自分の上に描く）。4 コマ
+ */
+function liquidationSplash(): SpriteOut {
+  // 0 輪郭・1 濃い藍・2 青・3 水色・4 薄い水色・5 白
+  const palette = ['#06223a', '#0d47a1', '#1e88e5', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    toRows(
+      shape(34, (u, v) => {
+        const d = Math.hypot(u, v * 1.2);
+        const a = Math.atan2(v, u);
+        // 砕ける泡の輪（最初の 2 コマ。真ん中は空ける: 自分の上に描くので、飛びついたポケモンを隠さない）
+        if (f < 2 && Math.abs(d - (0.24 + f * 0.06)) < 0.04) return 5;
+        // 水の冠（ぎざぎざの縁の輪。コマで外へ）
+        const r = 0.4 + f * 0.13;
+        const crown = Math.abs(Math.sin(a * 6)) * 0.08;
+        if (f < 3 && Math.abs(d - r) < 0.06 + crown * (1 - f * 0.3)) return d > r ? 5 : 3;
+        // 外へ跳ねる水の板（8 枚。先がとがる）
+        for (let j = 0; j < 8; j++) {
+          const th = (j / 8) * Math.PI * 2 + 0.2;
+          const along = u * Math.cos(th) + v * Math.sin(th);
+          const side = -u * Math.sin(th) + v * Math.cos(th);
+          const r0 = r + 0.06;
+          const len = 0.24 - f * 0.04;
+          if (f > 0 && along > r0 && along < r0 + len && Math.abs(side) < 0.07 * (1 - (along - r0) / len)) return f === 3 ? 2 : 4;
+        }
+        // しずく（最後のコマ）
+        if (f === 3) for (let j = 0; j < 10; j++) { const th = (j / 10) * Math.PI * 2; const rr = 0.86 + (j % 2) * 0.06; if (Math.hypot(u - Math.cos(th) * rr, v - Math.sin(th) * rr) < 0.05) return 3; }
+        return -1;
+      }),
+    ),
+  );
+  return { palette, frameMs: 75, parts: { main: frames } };
+}
+
+/** アクアブレイクの砕ける水しぶき（当たった所）: 割れた水の板が十字に跳ね、ぐるりと しずく の冠。3 コマ */
+function liquidationBurst(): SpriteOut {
+  const palette = ['#06223a', '#1e88e5', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    toRows(
+      shape(26, (u, v) => {
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        // 真ん中の泡（最初だけ）
+        if (f === 0 && d < 0.22) return d < 0.12 ? 4 : 3;
+        // 跳ねる水の板（6 枚。先がとがる）
+        for (let j = 0; j < 6; j++) {
+          const th = (j / 6) * Math.PI * 2 + 0.25;
+          const along = u * Math.cos(th) + v * Math.sin(th);
+          const side = -u * Math.sin(th) + v * Math.cos(th);
+          const r0 = 0.2 + f * 0.18;
+          const len = 0.42 - f * 0.08;
+          if (along > r0 && along < r0 + len && Math.abs(side) < 0.11 * (1 - (along - r0) / len)) return f === 2 ? 2 : along < r0 + 0.1 ? 4 : 3;
+        }
+        // しずくの冠
+        const ring = 0.55 + f * 0.18;
+        const k = ((a / (Math.PI * 2)) * 12 + 12) % 1;
+        if (Math.abs(d - ring) < 0.06 && Math.abs(k - 0.5) < 0.22) return f === 2 ? 1 : 2;
+        return -1;
+      }),
+    ),
+  );
+  return { palette, frameMs: 80, parts: { main: frames } };
+}
+
+/**
+ * アクアブレイクの突進（07 の245章）: 体を包んで前へ押し寄せる水の奔流。進む向き（右）に厚い水の盾が弧を描き、
+ * 縁は白い泡でちぎれ、左右へ しぶき が跳ね、後ろへ太い水の帯が流れる。アクアジェットの細い殻より厚く荒い。3 コマ
+ */
+function liquidationSurge(): SpriteOut {
+  // 0 輪郭・1 濃い藍・2 青・3 水色・4 薄い水色・5 白
+  const palette = ['#06223a', '#0d47a1', '#1e88e5', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    toRows(
+      shape(34, (u, v) => {
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        // 前の水の盾（中心から 0.42〜0.7 の、前 ±80° の厚い弧。縁はちぎれた泡）
+        const tear = Math.sin(a * 9 + f * 2.1) * 0.04;
+        if (Math.abs(a) < 1.4 && d > 0.42 && d < 0.7 + tear) {
+          const t = (d - 0.42) / (0.28 + tear);
+          return t > 0.78 ? 5 : t > 0.5 ? 4 : Math.abs(a) > 1.05 ? 2 : 3;
+        }
+        // 左右へ跳ねる しずく（前寄りの斜め。コマで外へ）
+        for (const s of [-1, 1]) {
+          for (let j = 0; j < 3; j++) {
+            const th = s * (1.25 + j * 0.18);
+            const r = 0.74 + j * 0.07 + f * 0.06;
+            if (Math.hypot(u - Math.cos(th) * r, v - Math.sin(th) * r) < 0.045 - j * 0.008) return j === 0 ? 5 : 4;
+          }
+        }
+        // 後ろへ流れる太い水の帯（上下 2 本。コマで後ろへ流れる）
+        for (const cy of [-0.3, 0.3]) {
+          const ph = ((-u * 2.4 + f * 0.6 + cy) % 1 + 1) % 1;
+          if (u < -0.35 && u > -0.98 && Math.abs(v - cy) < 0.07 * (1 + (u + 0.35)) + 0.02 && ph < 0.7) return ph < 0.25 ? 4 : 2;
+        }
+        return -1;
+      }, 0, -1),
+    ),
+  );
+  return { palette, frameMs: 60, parts: { main: frames } };
+}
+
+/**
+ * じごくぐるま（07 の246章）: 体ごと転がる「車輪」。体のまわりに、回転の向きに流れる 3 本の弧（燃えるような闘気の帯）と、
+ * 車輪の外側の 6 本の短い放射（回る勢い）。真ん中は空けて、転がるポケモンが見える。回して使う（spin）。3 コマで弧が伸び縮みする
+ */
+function submissionWheel(): SpriteOut {
+  // 0 輪郭・1 こげ茶・2 赤・3 橙・4 黄・5 薄い黄
+  const palette = ['#2b0d05', '#6d2a12', '#d84315', '#ff7043', '#ffca28', '#fff3c4'];
+  const frames = [0, 1, 2].map((f) =>
+    toRows(
+      shape(34, (u, v) => {
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        // 3 本の弧（帯）。先が太く明るく、後ろへ細く暗く（回る向きは時計回り）
+        for (let k = 0; k < 3; k++) {
+          const start = (k / 3) * Math.PI * 2;
+          let t = (a - start) / (Math.PI * 2);
+          t = t - Math.floor(t);
+          const len = 0.24 + f * 0.04;
+          if (t > len) continue;
+          const head = 1 - t / len;
+          const w = 0.05 + head * 0.08;
+          if (Math.abs(d - 0.78) < w) return head > 0.8 ? 5 : head > 0.55 ? 4 : head > 0.3 ? 3 : 2;
+        }
+        // 外の放射（回る勢い。6 本）
+        const k6 = ((a / (Math.PI * 2)) * 6 + 6 + f * 0.17) % 1;
+        if (d > 0.9 && d < 0.99 && Math.abs(k6 - 0.5) < 0.05) return 3;
+        // 内側の薄い輪（車輪の縁）
+        if (Math.abs(d - 0.62) < 0.025 && Math.sin(a * 12 + f) > 0) return 1;
+        return -1;
+      }, 0, -1),
+    ),
+  );
+  return { palette, frameMs: 50, parts: { main: frames } };
+}
+
+/**
+ * じごくぐるまの投げ落とし: 転がり終わりに叩きつけた所。真ん中の衝撃の星（橙と黄）、まわりに土けむりの輪と飛ぶ小石。
+ * ヘビーボンバーのへこみ（割れ目）とは違い、投げた勢いで舞う土けむり。4 コマ
+ */
+function submissionSlam(): SpriteOut {
+  // 0 輪郭・1 こげ茶・2 土・3 土けむり・4 橙・5 黄・6 白
+  const palette = ['#2b0d05', '#5d4037', '#8d6e63', '#d7ccc8', '#ff7043', '#ffca28', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    toRows(
+      shape(34, (u, v) => {
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        // 衝撃の星（5 本のとげ。最初の 2 コマ）
+        if (f < 2) {
+          const star = (0.36 - f * 0.1) * (0.5 + 0.5 * Math.abs(Math.cos(a * 2.5)) ** 2);
+          if (d < star) return d < star * 0.45 ? 6 : d < star * 0.75 ? 5 : 4;
+        }
+        // 土けむりの輪（もこもこの縁。コマで外へ広がり、薄れる）
+        const r = 0.42 + f * 0.14;
+        const puff = Math.abs(Math.sin(a * 7 + f)) * 0.07;
+        if (Math.abs(d - r) < 0.07 + puff && f > 0) return f === 3 ? 2 : d > r ? 3 : 2;
+        // 飛ぶ小石（7 つ）
+        for (let j = 0; j < 7; j++) {
+          const th = (j / 7) * Math.PI * 2 + 0.4;
+          const rr = 0.3 + f * 0.2 + (j % 2) * 0.05;
+          if (Math.hypot(u - Math.cos(th) * rr, v - Math.sin(th) * rr) < 0.045) return 1;
+        }
+        return -1;
+      }),
+    ),
+  );
+  return { palette, frameMs: 80, parts: { main: frames } };
+}
+
+/**
+ * しおみず（07 の247章）: 濃い塩水の弾。深い海の色の重い水の玉に、白い塩の結晶（小さなひし形）がきらめき、
+ * 後ろへ しぶき の尾を引く（右へ進む形で描き、進む向きに回す）。3 コマで結晶がまたたき、尾がゆれる
+ */
+function brineShot(): SpriteOut {
+  // 0 輪郭・1 深い藍・2 海の青・3 水色・4 白い塩・5 薄い水色
+  const palette = ['#03172b', '#0b3d6b', '#1565c0', '#4fc3f7', '#ffffff', '#b3e5fc'];
+  const frames = [0, 1, 2].map((f) => {
+    const g = shape(22, (u, v) => {
+      // 玉（前寄り。中心 0.25、半径 0.5）
+      const d = Math.hypot(u - 0.25, v);
+      if (d <= 0.5) {
+        const l = light(u - 0.25, v, 0.5);
+        return l > 0.45 ? 3 : l > -0.2 ? 2 : 1;
+      }
+      // しぶきの尾（後ろへ細る。コマでゆれる）
+      const t = (0.25 - u) / 1.2;
+      const wob = Math.sin(u * 9 + f * 2) * 0.05;
+      if (u < -0.2 && u > -0.98 && Math.abs(v - wob) < 0.28 * (1 - t) && Math.sin(u * 14 + f * 1.7) > -0.2) return t > 0.6 ? 5 : 3;
+      return -1;
+    });
+    // 塩の結晶（玉の上にひし形 3 つ。コマで場所を変えてまたたく）
+    const salt = shape(22, (u, v) => {
+      const pts = [
+        [0.12 + f * 0.05, -0.18],
+        [0.36, 0.14 - f * 0.06],
+        [0.42 - f * 0.04, -0.3 + f * 0.08],
+      ];
+      for (const [cx, cy] of pts) if (Math.abs(u - cx!) + Math.abs(v - cy!) < 0.09) return 4;
+      return -1;
+    }, 0, -1);
+    for (let y = 0; y < g.length; y++) for (let x = 0; x < g[0]!.length; x++) if (salt[y]![x]! >= 0 && g[y]![x]! >= 1) g[y]![x] = salt[y]![x]!;
+    return toRows(g);
+  });
+  return { palette, frameMs: 80, parts: { main: frames } };
+}
+
+/**
+ * しおみずの弾けた所: 海の色のしぶきの輪と、外へ散る白い塩の結晶（ひし形）。弱った相手に倍で当たる、しみる塩。4 コマ
+ */
+function brineSplash(): SpriteOut {
+  const palette = ['#03172b', '#0b3d6b', '#1565c0', '#4fc3f7', '#ffffff', '#b3e5fc'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    toRows(
+      shape(30, (u, v) => {
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        // しぶきの輪（波打つ縁。外へ広がる）
+        const r = 0.3 + f * 0.17;
+        const wave = Math.sin(a * 8 + f) * 0.04;
+        if (f < 3 && Math.abs(d - r - wave) < 0.06 - f * 0.01) return f === 0 ? 5 : 3;
+        // 真ん中の濃い水（最初だけ）
+        if (f === 0 && d < 0.2) return d < 0.1 ? 3 : 2;
+        // 塩の結晶（9 つのひし形。外へ散り、最後は小さく）
+        for (let j = 0; j < 9; j++) {
+          const th = (j / 9) * Math.PI * 2 + 0.3;
+          const rr = 0.25 + f * 0.2 + (j % 3) * 0.04;
+          const sz = 0.075 - f * 0.012;
+          if (Math.abs(u - Math.cos(th) * rr) + Math.abs(v - Math.sin(th) * rr) < sz) return j % 2 ? 4 : 5;
+        }
+        return -1;
+      }, 0, -1),
+    ),
+  );
+  return { palette, frameMs: 70, parts: { main: frames } };
+}
+
+/**
+ * ロックオン（07 の249章）: ロックオンした敵に重ねる照準。四隅のかぎ括弧と、上下左右から中心へ向かう短い目盛り、
+ * 外を回る点線の輪（ポリゴンの桃と水色。データの画面のような角ばった線）。中心は空ける。2 コマで かぎ括弧 が少し寄る（明滅はしない）
+ */
+function lockOnReticle(): SpriteOut {
+  // 0 輪郭・1 濃い桃・2 桃・3 水色・4 白
+  const palette = ['#2a0f2e', '#c2185b', '#f06292', '#4dd0e1', '#ffffff'];
+  const frames = [0, 1].map((f) =>
+    toRows(
+      shape(32, (u, v) => {
+        const au = Math.abs(u);
+        const av = Math.abs(v);
+        // 四隅のかぎ括弧（L 字。コマで少し内へ）
+        const c = 0.62 - f * 0.05;
+        const w = 0.06;
+        if ((Math.abs(au - c) < w && av > c - 0.22 && av < c + w) || (Math.abs(av - c) < w && au > c - 0.22 && au < c + w)) return au + av > c * 2 - 0.02 ? 4 : 2;
+        // 上下左右の目盛り（外から中心へ。中心は空ける）
+        if ((au < 0.035 && av > 0.22 && av < 0.42) || (av < 0.035 && au > 0.22 && au < 0.42)) return 3;
+        // 外を回る点線の輪
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        if (Math.abs(d - 0.92) < 0.03 && Math.sin(a * 12) > 0.2) return 1;
+        return -1;
+      }, 0, -1),
+    ),
+  );
+  return { palette, frameMs: 400, parts: { main: frames } };
 }
 
 /** すなあらしの砂粒: 小さな粒（白黒で描き、天気の色で茶色にする。天気の粒は落ちる向きに回すので、縦長に描くと横に流れて見える） */
@@ -6386,6 +7007,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     // クロスポイズン: 同じ X の刃を毒の紫で
     'x-poison': () => crossChop(['#1a0624', '#6a1b9a', '#ab47bc', '#e1bee7', '#ffffff', '#f3e5f5']),
     'steel-beam': () => steelBeam(),
+    'flash-orb': () => flashOrb(),
+    'flash-burst': () => flashBurst(),
     rock: () => rock('rock'),
     stone: () => rock('stone'),
     bone: () => bone(),
@@ -6453,6 +7076,22 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     beak: () => horn(['#4a2c05', '#c77800', '#ffb300', '#ffe082', '#fffde7', '#8d5a00']),
     'megahorn-lance': () => megahornLance(),
     'ice-chunk': () => iceChunk(),
+    'icicle-spear': () => icicleSpear(),
+    'rollout-boulder': () => rolloutBoulder(),
+    'zen-headbutt-aura': () => zenHeadbuttAura(),
+    'zen-ripple': () => zenRipple(),
+    'echo-wave': () => echoWave(),
+    'heavy-slam-quake': () => heavySlamQuake(),
+    'heavy-slam-ring': () => heavySlamRing(),
+    'aqua-jet-wrap': () => aquaJetWrap(),
+    'liquidation-splash': () => liquidationSplash(),
+    'liquidation-surge': () => liquidationSurge(),
+    'submission-wheel': () => submissionWheel(),
+    'submission-slam': () => submissionSlam(),
+    'brine-shot': () => brineShot(),
+    'brine-splash': () => brineSplash(),
+    'lock-on-reticle': () => lockOnReticle(),
+    'liquidation-burst': () => liquidationBurst(),
     'sand-grain': () => sandGrain(),
     'mud-spray': () => mudSpray(),
     'mud-ball': () => mudBall(),

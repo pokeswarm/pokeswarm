@@ -153,6 +153,10 @@ export class RunScene extends Phaser.Scene {
   private fallMoves = new Map<number, NonNullable<EffectRecipe['fall']>>();
   private fallSprites: MoveSprites | null = null;
   private overBossSprites: MoveSprites | null = null;
+  /** ポケモンより上に描く技の絵（ころがる。07 の238章） */
+  private overOwnerSprites: MoveSprites | null = null;
+  /** ボスより上・ポケモンより下に描く技の絵（アクアブレイクの突進としぶき。07 の244・245章） */
+  private aboveBossSprites: MoveSprites | null = null;
   /** 溶岩の海（エンテイの ふんえん。07 の215章） */
   private lavaSea: LavaSea | null = null;
   /** スイクンの登場の積もる雪・ふぶき（07 の218・219章） */
@@ -662,6 +666,8 @@ export class RunScene extends Phaser.Scene {
     this.floorSprites = new MoveSprites(this, moveSprites, depths.hitShapes + 0.1, spriteRender.dot);
     this.fallSprites = new MoveSprites(this, moveSprites, depths.effects + 0.25, spriteRender.dot);
     this.overBossSprites = new MoveSprites(this, moveSprites, depths.bosses + 0.1, spriteRender.dot);
+    this.overOwnerSprites = new MoveSprites(this, moveSprites, depths.players + 0.5, spriteRender.dot);
+    this.aboveBossSprites = new MoveSprites(this, moveSprites, depths.bosses + 0.2, spriteRender.dot);
     this.strikes = [];
     this.countdownTexts = [];
     this.hazardBolts = [];
@@ -1421,8 +1427,8 @@ export class RunScene extends Phaser.Scene {
       const def = world.rules.moves[pm.move]!;
       const c = this.effects.chargeGlow(def.effect);
       if (!c) continue;
-      // 連続技（げきりん）: 出している間ずっと光る
-      if (def.sequence) {
+      // 連続技（げきりん）: 出している間ずっと光る。溜めてから始める連続技（ギガインパクト: 溜め → ヘビーボンバー → 突進）は溜めている間だけ（07 の241章）
+      if (def.sequence && !def.windupSeconds) {
         if (pm.seq) best = { color: hexColor(c.color), radius: c.radius, alpha: c.alpha, t: 1 };
         continue;
       }
@@ -2989,9 +2995,24 @@ export class RunScene extends Phaser.Scene {
       const effect = world.rules.moves[pr.move[i]!]!.effect;
       return pr.stage[i] === 0 && effectRecipes[effect]?.drawOnFloor ? (this.effects.sprite(effect) ?? null) : null;
     });
+    // ポケモンより上に描く技（ころがる: 自分が岩になる）
+    this.overOwnerSprites?.draw(pr, alpha, (i) => {
+      const effect = world.rules.moves[pr.move[i]!]!.effect;
+      return pr.stage[i] === 0 && effectRecipes[effect]?.overOwner ? (this.effects.sprite(effect) ?? null) : null;
+    });
+    // ボスより上・ポケモンより下に描く技（アクアブレイクのしぶき）
+    this.aboveBossSprites?.draw(pr, alpha, (i) => {
+      const effect = world.rules.moves[pr.move[i]!]!.effect;
+      if (!effectRecipes[effect]?.aboveBoss) return null;
+      // 技そのもの（突進）と、効き方から出た円（ぶつかった所のしぶき）
+      if (pr.stage[i] === 0) return this.effects.sprite(effect) ?? null;
+      if (pr.stage[i] === 1 && pr.band[i] === 0 && pr.shape[i] !== SHAPE_LINE && pr.linger[i] !== 1) return this.effects.effectSprite(effect) ?? null;
+      return null;
+    });
     this.moveSprites?.draw(pr, alpha, (i) => {
       const effect = world.rules.moves[pr.move[i]!]!.effect;
-      if (effectRecipes[effect]?.drawOnFloor) return null;
+      if (effectRecipes[effect]?.drawOnFloor || (pr.stage[i] === 0 && effectRecipes[effect]?.overOwner)) return null;
+      if (effectRecipes[effect]?.aboveBoss && (pr.stage[i] === 0 || (pr.stage[i] === 1 && pr.band[i] === 0 && pr.shape[i] !== SHAPE_LINE && pr.linger[i] !== 1))) return null;
       if (pr.stage[i] === 0) {
         // 技そのものの絵と、重ねるもう1枚（だいばくはつの端の炎）
         const main = this.effects.sprite(effect);
@@ -3027,7 +3048,15 @@ export class RunScene extends Phaser.Scene {
         return { ...s.item, ...moved, elapsed, alpha: Math.min(1, (s.seconds - elapsed) / (s.seconds * 0.3)) };
       }).concat(hazardItems.filter((it) => !it.spec.overBoss)),
     );
-    this.overBossSprites?.drawItems(hazardItems.filter((it) => it.spec.overBoss));
+    // ロックオンの照準: ロックオンしている敵に重ねる（ボスより上。07 の249章）
+    const lockItems: SpriteItem[] = [];
+    for (const lp of world.players) {
+      if (!lp.lockOn) continue;
+      const li = findEnemyIndex(world, lp.lockOn - 1);
+      if (li === -1 || world.enemies.hp[li]! <= 0) continue;
+      lockItems.push({ spec: { id: 'lock-on-reticle', fit: 'circle', size: 1, alpha: 0.9, rotate: 'spin', spinDegPerSec: 45, varyTiles: false, upright: false, directional: false, originY: 0.5, along: 0.6, shake: 0, tail: 0, afterimages: 0, afterimageGap: 2, overBoss: true } as SpriteItem['spec'], x: world.enemies.x[li]!, y: world.enemies.y[li]!, radius: world.enemies.radius[li]! * 1.35 + 8, band: 0, dirX: 1, dirY: 0, length: 0, vx: 0, vy: 0, elapsed: world.tick * world.dt, alpha: 1, seed: lp.id });
+    }
+    this.overBossSprites?.drawItems([...hazardItems.filter((it) => it.spec.overBoss), ...lockItems]);
     // 天気（こなゆき・ふぶき）: 出ている間、画面じゅうに雪を降らせる
     const weathers = new Set<string>();
     for (let i = 0; i < pr.count; i++) {

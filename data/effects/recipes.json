@@ -3146,14 +3146,36 @@
     },
     "flash-cannon": {
       "extends": "steel.base",
+      "hideShape": true,
+      "projectile": {
+        "coreScale": 0,
+        "glowColor": "#eceff1",
+        "glowScale": 1.5,
+        "glowAlpha": 0.6
+      },
+      "impact": {
+        "flash": {
+          "color": "#ffffff",
+          "radius": 70,
+          "durationMs": 160,
+          "alpha": 0.6
+        }
+      },
       "sprite": {
-        "id": "steel-beam",
-        "fit": "line",
-        "size": 1.4
+        "id": "flash-orb",
+        "fit": "circle",
+        "size": 2,
+        "rotate": "spin",
+        "spinDegPerSec": 90
+      },
+      "effectSprite": {
+        "id": "flash-burst",
+        "fit": "circle",
+        "size": 1.05
       },
       "chargeGlow": {
         "color": "#e0f7fa",
-        "seconds": 0.4,
+        "seconds": 0.45,
         "radius": 50,
         "alpha": 0.9
       }
@@ -3175,6 +3197,9 @@
         "size": 1.2,
         "seconds": 0.4
       }
+    },
+    "lock-on": {
+      "extends": "normal.base"
     },
     "sharpen": {
       "extends": "normal.base"
@@ -3822,6 +3847,26 @@
         }
       }
     },
+    "icicle-crash-giant": {
+      "extends": "ice.base",
+      "impact": {
+        "flash": {
+          "radius": 80
+        }
+      },
+      "fall": {
+        "id": "icicle-spear",
+        "height": 340,
+        "size": 1.25,
+        "shards": {
+          "id": "ice-shard",
+          "count": 14,
+          "distance": 110,
+          "seconds": 0.55,
+          "size": 0.3
+        }
+      }
+    },
     "whirlwind": {
       "extends": "normal.base",
       "projectile": {
@@ -3879,18 +3924,207 @@
         "rotate": "velocity"
       }
     },
-    "rollout": {
-      "extends": "rock.base",
+    "brine": {
+      "extends": "water.base",
+      "hideShape": true,
       "projectile": {
-        "glowScale": 1.1,
-        "coreScale": 0.4
+        "glowColor": "#1565c0",
+        "glowScale": 0.8,
+        "glowAlpha": 0.5,
+        "coreScale": 0
+      },
+      "impact": {
+        "flash": {
+          "color": "#b3e5fc",
+          "radius": 28,
+          "durationMs": 110,
+          "alpha": 0.5
+        }
       },
       "sprite": {
-        "id": "rock",
+        "id": "brine-shot",
+        "fit": "circle",
+        "size": 1.6,
+        "rotate": "velocity"
+      },
+      "effectSprite": {
+        "id": "brine-splash",
+        "fit": "circle",
+        "size": 1
+      }
+    },
+    "submission": {
+      "extends": "fighting.base",
+      "hideShape": true,
+      "aboveBoss": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "flash": {
+          "color": "#ffab91",
+          "radius": 40,
+          "durationMs": 120,
+          "alpha": 0.5
+        }
+      },
+      "sprite": {
+        "id": "submission-wheel",
+        "fit": "circle",
+        "size": 1.25,
+        "rotate": "spin",
+        "spinDegPerSec": 900
+      },
+      "effectSprite": {
+        "id": "submission-slam",
+        "fit": "circle",
+        "size": 1
+      }
+    },
+    "aqua-jet": {
+      "extends": "water.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "flash": {
+          "color": "#b3e5fc",
+          "radius": 26,
+          "durationMs": 100,
+          "alpha": 0.45
+        }
+      },
+      "sprite": {
+        "id": "aqua-jet-wrap",
+        "fit": "circle",
+        "size": 1.25,
+        "rotate": "velocity"
+      }
+    },
+    "liquidation": {
+      "extends": "water.base",
+      "hideShape": true,
+      "aboveBoss": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "flash": {
+          "color": "#b3e5fc",
+          "radius": 40,
+          "durationMs": 120,
+          "alpha": 0.5
+        }
+      },
+      "sprite": {
+        "id": "liquidation-surge",
         "fit": "circle",
         "size": 1.3,
-        "rotate": "spin",
-        "spinDegPerSec": 720
+        "rotate": "velocity"
+      },
+      "effectSprite": {
+        "id": "liquidation-splash",
+        "fit": "circle",
+        "size": 1
+      }
+    },
+    "heavy-slam": {
+      "extends": "steel.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "flash": {
+          "color": "#eceff1",
+          "radius": 60,
+          "durationMs": 150,
+          "alpha": 0.6
+        }
+      },
+      "sprite": {
+        "id": "heavy-slam-quake",
+        "fit": "circle",
+        "size": 1.15
+      },
+      "effectRingSprite": {
+        "id": "heavy-slam-ring",
+        "fit": "ring",
+        "size": 1
+      }
+    },
+    "echoed-voice": {
+      "extends": "normal.base",
+      "hideShape": true,
+      "projectile": {
+        "glowColor": "#b39ddb",
+        "glowScale": 0.6,
+        "glowAlpha": 0.5,
+        "coreScale": 0
+      },
+      "impact": {
+        "flash": {
+          "color": "#d1c4e9",
+          "radius": 26,
+          "durationMs": 120,
+          "alpha": 0.5
+        }
+      },
+      "sprite": {
+        "id": "echo-wave",
+        "fit": "circle",
+        "size": 1.25,
+        "rotate": "velocity"
+      }
+    },
+    "zen-headbutt": {
+      "extends": "psychic.base",
+      "hideShape": true,
+      "overOwner": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "flash": {
+          "color": "#f8bbd0",
+          "radius": 46,
+          "durationMs": 140,
+          "alpha": 0.55
+        }
+      },
+      "sprite": {
+        "id": "zen-headbutt-aura",
+        "fit": "circle",
+        "size": 1,
+        "rotate": "velocity"
+      },
+      "effectSprite": {
+        "id": "zen-ripple",
+        "fit": "circle",
+        "size": 1
+      }
+    },
+    "rollout": {
+      "extends": "rock.base",
+      "hideShape": true,
+      "overOwner": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "sprite": {
+        "id": "rollout-boulder",
+        "fit": "circle",
+        "size": 1.15,
+        "rotate": "velocity",
+        "afterimages": 2,
+        "afterimageGap": 3
       }
     },
     "sandstorm": {

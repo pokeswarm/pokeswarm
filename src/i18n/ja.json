@@ -377,6 +377,7 @@
   "mod.durationPct": "技の持続",
   "mod.rangePct": "技の射程",
   "mod.pierceBonus": "技の貫通",
+  "mod.lockOnPct": "ロックオンした相手へのダメージ",
   "mod.powerMultiplier": "技の威力 ×{v}（なくならない）",
   "title.menu.start": "ソロ",
   "title.menu.coop": "マルチ",

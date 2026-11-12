@@ -51,3 +51,48 @@ describe('ポリゴン', () => {
     expect(p.moves[0]!.move).toBe(tri);
   });
 });
+
+describe('ロックオン（07 の249章）', () => {
+  it('最初から持っていて、ボス・中ボスがいる間はそのうち HP の一番高い敵にロックオンし、その敵へのダメージが上がる', () => {
+    const { rules, sim, p } = setup();
+    expect(p.moves.map((m) => rules.moves[m.move]!.key)).toContain('lock-on');
+    recomputeModifiers(sim.world, p);
+    expect(p.mods.lockOnPct).toBe(20);
+    const e = sim.world.enemies;
+    const boss = rules.enemies.kinds.findIndex((k) => (k.rank ?? 'normal') !== 'normal');
+    const normal = rules.enemies.kinds.findIndex((k) => (k.rank ?? 'normal') === 'normal');
+    e.add(1, normal, 80, 0, 1e6, 0, 10);
+    sim.step([]);
+    expect(p.lockOn ?? 0).toBe(0);
+    e.add(2, boss, 200, 0, 1e6, 0, 30);
+    sim.step([]);
+    expect(p.lockOn).toBe(3);
+  });
+
+  it('追う弾は、近い雑魚より先にロックオンした相手を狙い、貫通して当たった後は雑魚へ向かう', () => {
+    const { rules, sim, p } = setup();
+    const tri = moveIndexOf(rules, 'tri-attack');
+    p.moves[0] = { move: tri, level: 8, cooldown: 0, burstLeft: 0, burstTimer: 0 };
+    p.moves[2]!.level = 3; // テクスチャー Lv3: 貫通 +1
+    recomputeModifiers(sim.world, p);
+    const e = sim.world.enemies;
+    const boss = rules.enemies.kinds.findIndex((k) => (k.rank ?? 'normal') !== 'normal');
+    const normal = rules.enemies.kinds.findIndex((k) => (k.rank ?? 'normal') === 'normal');
+    e.add(1, normal, 60, 80, 1e6, 0, 10);
+    e.add(2, boss, 180, 0, 1e6, 0, 30);
+    let firstTarget = 0;
+    let retargeted = false;
+    for (let t = 0; t < 60; t++) {
+      sim.step([]);
+      const pr = sim.world.projectiles;
+      for (let i = 0; i < pr.count; i++) {
+        if (pr.move[i] !== tri || pr.stage[i] !== 0) continue;
+        if (!firstTarget && pr.target[i]! > 0) firstTarget = pr.target[i]! - 1;
+        if (pr.isBlocked(i, 2, sim.world.tick) && pr.target[i] === 2) retargeted = true;
+      }
+    }
+    expect(firstTarget).toBe(2);
+    expect(retargeted).toBe(true);
+    expect(e.hp[0]!).toBeLessThan(1e6);
+  });
+});

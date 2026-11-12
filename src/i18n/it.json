@@ -356,6 +356,7 @@
   "mod.durationPct": "Durata delle mosse",
   "mod.rangePct": "Portata delle mosse",
   "mod.pierceBonus": "Perforazione delle mosse",
+  "mod.lockOnPct": "Danni al bersaglio agganciato",
   "mod.powerMultiplier": "Potenza ×{v} (non si consuma)",
   "title.menu.start": "SOLO",
   "title.menu.coop": "MULTI",

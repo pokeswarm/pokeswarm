@@ -28,15 +28,15 @@ describe('フレアドライブ', () => {
     expect(offered()).toBe(false);
   });
 
-  it('使うと最大 HP の 2% を使い、5 秒の間 両方の攻撃力と素早さが上がる', () => {
+  it('使うと最大 HP の 2% を使い、5 秒の間 両方の攻撃力が +60%・素早さが +15% 上がる（強化は 07 の236章）', () => {
     const s = setup();
     s.p.moves = [{ move: s.move('flare-blitz'), level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0 }];
     const hp = s.p.hp;
     const before = { ...s.p.mods };
     s.sim.step([]);
     expect(s.p.hp).toBeLessThan(hp);
-    expect(s.p.mods.physicalPowerPct).toBe(before.physicalPowerPct + 20);
-    expect(s.p.mods.specialPowerPct).toBe(before.specialPowerPct + 20);
+    expect(s.p.mods.physicalPowerPct).toBe(before.physicalPowerPct + 60);
+    expect(s.p.mods.specialPowerPct).toBe(before.specialPowerPct + 60);
     expect(s.p.mods.moveSpeedPct).toBe(before.moveSpeedPct + 15);
     // 獄炎の地面が自分に付いて出ている
     expect(s.w.projectiles.count).toBeGreaterThan(0);
@@ -44,5 +44,15 @@ describe('フレアドライブ', () => {
     for (let t = 0; t < 5 * 30 + 2; t++) s.sim.step([]);
     expect(s.p.mods.physicalPowerPct).toBe(before.physicalPowerPct);
     expect(s.p.mods.moveSpeedPct).toBe(before.moveSpeedPct);
+  });
+
+  it('獄炎の地面は強化と同じ 5 秒出ている（07 の236章）', () => {
+    const s = setup();
+    s.p.moves = [{ move: s.move('flare-blitz'), level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0 }];
+    s.sim.step([]);
+    for (let t = 0; t < 4 * 30; t++) s.sim.step([]);
+    expect(s.w.projectiles.count).toBe(1);
+    for (let t = 0; t < 30 + 2; t++) s.sim.step([]);
+    expect(s.w.projectiles.count).toBe(0);
   });
 });

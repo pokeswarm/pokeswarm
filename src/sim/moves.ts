@@ -54,7 +54,7 @@ export interface SimMoveDef {
   /** 自分の体で攻撃する技の見た目（使ったときに知らせる）。無ければ null */
   readonly body: { readonly lungeDistance: number; readonly afterimages: number; readonly flip?: boolean } | null;
   /** eruption（爆炎の柱）の段の数と、外の段ほど半径を大きくする割合。eruption でなければ null */
-  readonly eruption: { readonly stages: number; readonly sizeGrowth: number } | null;
+  readonly eruption: { readonly stages: number; readonly sizeGrowth: number; readonly targetPillarPower?: number | undefined } | null;
   /** 効き方の部品（07 22.4）。無ければ空 */
   readonly effects: readonly MoveEffect[];
   /** 飛ぶ弾が曲がる速さ（ラジアン/秒）。0 なら まっすぐ */
@@ -83,6 +83,10 @@ export interface SimMoveDef {
   readonly waitForEnd?: boolean;
   /** chain: 跳び終えたら自分の所へ戻る線を出す（ボルトチェンジ） */
   readonly chainReturn?: boolean;
+  /** 敵が足りないときは最後の敵を突き抜けて切り返し、再使用は実際に走った分だけ待つ（しんそく。07 の234章） */
+  readonly chainTurnBack?: boolean;
+  /** lobTarget で落とす数のうち、敵のいる所へ落とす割合（ふんか。07 の234章） */
+  readonly lobSeekShare?: number;
   /** ポイントマックスで増えた本数を威力に変える（太い追従レーザー。07 の122章） */
   readonly bonusCountToPower?: boolean;
   /** lob: 落ちた所でだけ当たる（07 の126章） */
@@ -133,6 +137,8 @@ export interface SimMoveDef {
   readonly scatterJitter?: { readonly countMin: number; readonly sizeMin: number; readonly sizeMax: number };
   /** scatter（置く）の当たり判定を出すまで待つ秒数（つららおとし） */
   readonly scatterDelaySeconds?: number;
+  /** scatter: ボス・中ボスの真上に落とす大きな塊（つららおとし。move は塊の技の番号。07 の238章） */
+  readonly scatterBoss?: { readonly move: number; readonly range: number; readonly sizeMultiplier: number; readonly powerMultiplier: number };
   /** sweep（なぎ払い）を片道だけにする（はたく） */
   readonly sweepOnce?: boolean;
   readonly sweepReverse?: boolean;
@@ -141,6 +147,14 @@ export interface SimMoveDef {
   readonly sweepClap?: boolean;
   /** 届く範囲で HP の一番高い敵を狙う（ゴッドバード） */
   readonly aimStrongest?: boolean;
+  /** nearest: 狙った敵の所で止まる（ラスターカノン） */
+  readonly landAtTarget?: boolean;
+  /** 雑魚は貫通し、ボス・中ボスに当たったら消える（ラスターカノン） */
+  readonly stopOnBoss?: boolean;
+  /** HP が最大の thresholdPct % 以下の敵へのダメージを +powerPct %（しおみず。07 の247章） */
+  readonly lowHpBonus?: { readonly thresholdPct: number; readonly powerPct: number };
+  /** 続けて当てるほど強くなる（エコーボイス。07 の240章） */
+  readonly echo?: { readonly maxStacks: number; readonly powerPerStack: number; readonly sizePerStack: number; readonly growPerSecond: number };
   /** beam を向いている方へ出す（メガホーン） */
   readonly aimFacing?: boolean;
   /** melee を後ろへ出す（リベンジ） */
@@ -168,7 +182,7 @@ export interface SimMoveDef {
   /** 一緒に出し続ける技の番号（この技と同じレベル。インファイト） */
   readonly comboMoves?: readonly number[];
   /** 連続技: 順に出す技（とっておき） */
-  readonly sequence?: readonly { readonly move: number; readonly afterSeconds: number; readonly needsConsumed: readonly number[]; readonly minLevel: number }[];
+  readonly sequence?: readonly { readonly move: number; readonly afterSeconds: number; readonly needsConsumed: readonly number[]; readonly needsMoves: readonly number[]; readonly minLevel: number }[];
   /** 連続技を始める条件（無ければ ahead） */
   readonly sequenceGate?: 'ahead' | 'any' | 'none';
   /** 受けたダメージを返す技（メタルバースト） */
@@ -186,6 +200,8 @@ export interface SimMoveDef {
   readonly barrageWidthPerLevel?: number;
   /** 連打を向いている方向へ順に置く（にどげり） */
   readonly barrageAhead?: boolean;
+  /** 長方形の連打の1発を、長方形の中の敵の正面から出す（かみくだく。07 の233章） */
+  readonly barrageSeek?: boolean;
   /** 止まっているときの大きさ・威力の倍率（なみのり。押し出さない） */
   readonly idleScale?: { readonly size: number; readonly power: number };
   /** 押し出す向きを技の向きにする */
@@ -197,7 +213,7 @@ export interface SimMoveDef {
   /** scatter: range の中のランダムな敵の足元に置く（りゅうせいぐん） */
   readonly scatterOnEnemies?: boolean;
   /** 体が本当に動く技（のしかかり・すてみタックル） */
-  readonly dash?: { readonly seconds: number; readonly hit: 'land' | 'path'; readonly hop: number; readonly afterimages: number; readonly tint?: string; readonly invincible: boolean; readonly target: 'facing' | 'crowd'; readonly recoverSeconds: number; readonly recoverLines?: Readonly<Record<string, number>> };
+  readonly dash?: { readonly seconds: number; readonly hit: 'land' | 'path'; readonly hop: number; readonly afterimages: number; readonly tint?: string; readonly invincible: boolean; readonly target: 'facing' | 'crowd' | 'strongest'; readonly arcDegrees?: number; readonly stopShort?: boolean; readonly recoverSeconds: number; readonly recoverLines?: Readonly<Record<string, number>> };
   /** screen: 地上の敵だけに当たる（じしん） */
   readonly groundOnly?: boolean;
   /** 敵に当たらない（ミルクのみ） */

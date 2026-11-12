@@ -104,6 +104,8 @@ export interface ProjectileSpawn {
   knockback?: number;
   /** 追いかける敵の id（homing。せいなるほのお: 狙った敵を追い続ける）。無ければ一番近い敵を追う */
   target?: number;
+  /** 当たらない敵の id（avoidTarget の効き方: 本体が当たった相手。07 の233章） */
+  avoid?: number;
 }
 
 /**
@@ -164,6 +166,10 @@ export class ProjectileStore {
   readonly linger: Uint8Array;
   /** ポイントマックスで増えた分（効き方 = 2段目以降の技を起こさない。作者の決定 2026年10月25日） */
   readonly noFx: Uint8Array;
+  /** 当たらない敵の id + 1（0 は無し。avoidTarget の効き方。07 の233章） */
+  readonly avoid: Uint32Array;
+  /** 本体が当たった相手の id + 1（0 は無し。ボスに当たったらボス）。end の効き方の avoidTarget に使う（シザークロスの破片。07 の238章） */
+  readonly struck: Uint32Array;
 
   constructor(
     readonly capacity: number,
@@ -211,6 +217,8 @@ export class ProjectileStore {
     this.target = new Uint32Array(capacity);
     this.linger = new Uint8Array(capacity);
     this.noFx = new Uint8Array(capacity);
+    this.avoid = new Uint32Array(capacity);
+    this.struck = new Uint32Array(capacity);
   }
 
   add(p: ProjectileSpawn): number {
@@ -254,6 +262,8 @@ export class ProjectileStore {
     this.target[i] = p.target === undefined ? 0 : p.target + 1;
     this.linger[i] = p.linger ? 1 : 0;
     this.noFx[i] = 0;
+    this.avoid[i] = p.avoid === undefined ? 0 : p.avoid + 1;
+    this.struck[i] = 0;
     return i;
   }
 
@@ -300,6 +310,8 @@ export class ProjectileStore {
     this.target[i] = this.target[last]!;
     this.linger[i] = this.linger[last]!;
     this.noFx[i] = this.noFx[last]!;
+    this.avoid[i] = this.avoid[last]!;
+    this.struck[i] = this.struck[last]!;
     const m = this.hitMemory;
     this.hitIds.copyWithin(i * m, last * m, (last + 1) * m);
     this.hitTicks.copyWithin(i * m, last * m, (last + 1) * m);

@@ -361,6 +361,8 @@ export const modifierSchema = z
     rangePct: z.number(),
     /** 技の貫通（何体まで当たるか）に足す数（するどいツメ。何体でも当たる技はそのまま） */
     pierceBonus: z.number(),
+    /** ロックオンした相手（ボス・中ボス）へのダメージ（ロックオン。持っているとボスにロックオンする。07 の249章） */
+    lockOnPct: z.number(),
   })
   .partial();
 export type ModifierData = z.infer<typeof modifierSchema>;
@@ -495,6 +497,9 @@ export const casterMoveSchema = z.object({
   sweepDegreesPerSecond: z.number().optional(),
   /** うず（spiral）の技を、広げずにこの距離で回し続ける（色違いのフシギバナ: はなびらのまいを距離200で周回） */
   orbitRadius: z.number().positive().optional(),
+  /** プレイヤーの技を変えても、ボスの技を変えないための固定値（色違いのリザードンのブラストバーン。07 の234章） */
+  range: z.number().positive().optional(),
+  power: z.number().positive().optional(),
 });
 export type CasterMoveData = z.infer<typeof casterMoveSchema>;
 
@@ -1507,6 +1512,8 @@ export const moveEffectSchema = z.object({
     .optional(),
   /** 波: その場から radius まで広がる輪 */
   wave: z.object({ powerMultiplier: z.number().nonnegative(), radius: z.number().positive(), durationSeconds: z.number().positive() }).optional(),
+  /** 本体が当たった相手には、この効き方から出たものが当たらない（trigger: hit で使う。破片がボスに全部重なるのを防ぎ、まわりの敵へ広がる分だけ残す。07 の233章） */
+  avoidTarget: z.boolean().optional(),
   /** 拾える道具を置く（ミルクのみ: 投げたモーモーミルクが落ちた所に残り、だれでも拾える。置くのはソロ・ホスト。07 の173章） */
   pickup: z.enum(['moomoo-milk']).optional(),
 });
@@ -1528,7 +1535,8 @@ export const moveDefSchema = z.object({
    */
   body: z.object({ lungeDistance: z.number().positive(), afterimages: z.number().int().nonnegative().default(0), flip: z.boolean().optional() }).optional(),
   /** eruption（爆炎の柱）の段の数と、外の段ほど半径を大きくする割合（1段ごと） */
-  eruption: z.object({ stages: z.number().int().positive(), sizeGrowth: z.number().nonnegative() }).optional(),
+  /** targetPillarPower: 一番近い敵の足元にも、まわりの柱のこの倍の威力の柱を立て、まわりの柱はその敵に当てない（ブラストバーン。07 の235章） */
+  eruption: z.object({ stages: z.number().int().positive(), sizeGrowth: z.number().nonnegative(), targetPillarPower: z.number().positive().optional() }).optional(),
   /** 「効き方」の部品（07_content_draft.md 22.4）。進化するたびに増やす */
   effects: z.array(moveEffectSchema).optional(),
   /** 飛ぶ弾が曲がる速さ（度/秒）。十字・向いている方向の弾が渦を巻くように回る（ふぶき・エアスラッシュ） */
@@ -1561,6 +1569,8 @@ export const moveDefSchema = z.object({
    * 戻る線は、出番が来たときの自分の位置へ向ける。waitForEnd と使うと、帰ってくるまで次を出さない
    */
   chainReturn: z.boolean().optional(),
+  /** 敵が足りないときは最後の敵を突き抜けて切り返し、再使用は実際に走った分だけ待つ（しんそく: 1 体の相手でも空振りの時間を作らない。07 の234章） */
+  chainTurnBack: z.boolean().optional(),
   /**
    * この技を候補に出す系統（data/game/playables.json のキー）。省略ならタイプが合えばだれでも。
    * ノーマルの技を、原作で覚えるポケモンたちに絞る（作者の決定 2026年10月24日。どのタイプの技も覚えるミュウは別）
@@ -1643,6 +1653,8 @@ export const moveDefSchema = z.object({
    * どちらも真上寄りに投げ上げ、持続の秒数でちょうどその場所に落ちる（しおふき・ヘドロばくだん）。省略なら向いている側へ放る
    */
   lobTarget: z.enum(['random', 'nearest']).optional(),
+  /** lobTarget で落とす数のうち、この割合を届く範囲の敵のいる所へ落とす（ふんか: 残りはランダムな地面。敵は毎回選ぶ。07 の234章） */
+  lobSeekShare: z.number().min(0).max(1).optional(),
   /** scatter（置く）の数と大きさを、使うたびにランダムにする: 数は countMin〜count、半径は size × sizeMin〜sizeMax（マグニチュード） */
   scatterJitter: z.object({ countMin: z.number().int().positive(), sizeMin: z.number().positive(), sizeMax: z.number().positive() }).optional(),
   /** nova: 使うたびに強さを min〜max から引き、7 を 1 として威力と届く距離に掛ける（マグニチュード 4〜10。07 の152章） */
@@ -1666,8 +1678,15 @@ export const moveDefSchema = z.object({
       /** 残像の色（げきりん: 赤）。無ければうすい黄 */
       tint: z.string().optional(),
       invincible: z.boolean().default(false),
-      /** 行き先: facing = 向いている方へ range だけ。crowd = 届く範囲で敵が一番多い所へ（ドラゴンダイブ。着く前に、そこの敵に当たらない予告の当たりで状態異常を付ける） */
-      target: z.enum(['facing', 'crowd']).default('facing'),
+      /**
+       * 行き先: facing = 向いている方へ range だけ。crowd = 届く範囲で敵が一番多い所へ（ドラゴンダイブ。着く前に、そこの敵に当たらない予告の当たりで状態異常を付ける）。
+       * strongest = 届く範囲で HP の一番高い敵（ボス）の上へ飛び込む（ヘビーボンバー。跳んだときの場所へ落ちるので、動く相手はよけられる。07 の241章）
+       */
+      target: z.enum(['facing', 'crowd', 'strongest']).default('facing'),
+      /** strongest の相手を、向いている方向を中心にしたこの角度（度）の扇の中だけから選ぶ（ヘビーボンバー: 前 45°。07 の242章） */
+      arcDegrees: z.number().positive().max(360).optional(),
+      /** 相手の中心まで行かず、相手の手前（ふちに体が触れる所）で止まる（アクアブレイク: 相手へ直進してぶつかる。07 の245章） */
+      stopShort: z.boolean().optional(),
       /** 進み終わった後、この秒数は動けず技も出ない（ギガインパクト: 原作の「次のターン動けない」） */
       recoverSeconds: z.number().nonnegative().default(0),
       /** recoverSeconds に系統ごとに掛ける倍率（ケッキング: 特性で 2 回に 1 回しか出ないので短くする） */
@@ -1684,6 +1703,19 @@ export const moveDefSchema = z.object({
   sequential: z.boolean().optional(),
   /** scatter（置く）の当たり判定を、置いてからこの秒数待って出す（つららおとし: 空から氷の塊が落ちてくる間） */
   scatterDelaySeconds: z.number().positive().optional(),
+  /**
+   * scatter: ボス・中ボス（rank が normal でない敵）が range の中にいれば、ばらまく分とは別に、その真上へ大きな塊を 1 つ落とす
+   * （つららおとし: ボスがいるときだけ大きなつらら。07 の238章）。move は落とす塊の技（見えない技。絵が別）。
+   * 置くのは使ったときのボスの場所で、追いかけない（動いているボスはよけられる）
+   */
+  scatterBoss: z
+    .object({
+      move: z.string(),
+      range: z.number().positive(),
+      sizeMultiplier: z.number().positive(),
+      powerMultiplier: z.number().positive(),
+    })
+    .optional(),
   /** sweep（なぎ払い）を片道だけにする（はたく: 1回払う。おうふくビンタは行って戻る） */
   sweepOnce: z.boolean().optional(),
   /** sweep: 反対回りに払う（アクアテール: 時計回りの次に反時計回り。07 の184章） */
@@ -1704,6 +1736,8 @@ export const moveDefSchema = z.object({
    * （にどげり: 前に円 2 個の当たり判定。脚の絵は描かない。作者の指摘 2026年11月1日）。speed は使わない
    */
   barrageAhead: z.boolean().optional(),
+  /** 長方形の連打（barrageWidth）の1発を、長方形の中にいる敵のどれかの正面から出す（かみくだく: 口は噛む相手に向かう。だれもいなければ横の線のランダムな所。07 の233章） */
+  barrageSeek: z.boolean().optional(),
   /**
    * 止まっているときの倍率（なみのり・だくりゅう: 波に乗る。07 の162章）: 持ち主が移動の入力をしていない間、前の長方形の大きさを size 倍、
    * 威力を power 倍にし、押し出さない
@@ -1717,6 +1751,28 @@ export const moveDefSchema = z.object({
   restAfterEnd: z.boolean().optional(),
   /** 狙う敵: 一番近い敵ではなく、届く範囲で HP の一番高い敵（ゴッドバード: ボスへ。作者の決定 2026年10月25日）。beam と homing で使う（homing はその敵を追い続ける。せいなるほのお） */
   aimStrongest: z.boolean().optional(),
+  /**
+   * nearest: 狙った敵の所で止まる（飛ぶ時間を、狙った敵までの距離 ÷ 速さにする。durationSeconds が上限）。
+   * 止まった所で end の効き方が起こる（ラスターカノン: 光の玉が着いた所で弾ける。07 の238章）
+   */
+  landAtTarget: z.boolean().optional(),
+  /** 雑魚は貫通し、ボス・中ボス（rank が normal でない敵）に当たったら消える（そこで end の効き方。ラスターカノン。07 の238章） */
+  stopOnBoss: z.boolean().optional(),
+  /** HP が最大の thresholdPct % 以下の敵へのダメージを +powerPct %（しおみず: 半分を切った相手に倍。原作どおり。07 の247章） */
+  lowHpBonus: z.object({ thresholdPct: z.number().positive().max(100), powerPct: z.number().positive() }).optional(),
+  /**
+   * 続けて当てるほど強くなる（エコーボイス。07 の240章）: 前に出した分が敵に当たっていれば、次は 1 段上がる（最大 maxStacks）。外れたら 0 段に戻る。
+   * 段ごとに威力 ×(1 + powerPerStack × 段)・大きさ ×(1 + sizePerStack × 段)。2 段ごとに後ろへ続くこだまの輪が 1 つ増え、威力はその数で分ける。
+   * growPerSecond は、飛ぶ間に広がる速さ（半径／秒。声が広がる）
+   */
+  echo: z
+    .object({
+      maxStacks: z.number().int().positive(),
+      powerPerStack: z.number().nonnegative(),
+      sizePerStack: z.number().nonnegative(),
+      growPerSecond: z.number().nonnegative(),
+    })
+    .optional(),
   /** beam を、敵を狙わず向いている方へ出す（メガホーン: 前へ槍を突き出す） */
   aimFacing: z.boolean().optional(),
   /** melee を、向いている方の反対（後ろ）へ出す（リベンジ: 振り向きざまの反撃。前の メガホーン と重ならない。07 の175章） */
@@ -1753,7 +1809,8 @@ export const moveDefSchema = z.object({
    * needsConsumed があれば、そのどれかを消費している時だけその段を出す（消費した技の分だけ段が増える。07 の183章）。
    * minLevel があれば、そのレベルから出す（げきりん: レベルで飛びかかる回数が増える。07 の184章）
    */
-  sequence: z.array(z.object({ move: z.string(), afterSeconds: z.number().nonnegative(), needsConsumed: z.array(z.string()).optional(), minLevel: z.number().int().positive().optional() })).optional(),
+  /** needsMoves を書くと、そのどれかを今覚えているときだけその段を出す（ギガインパクト: ヘビーボンバーを覚えていれば飛び込む。07 の242章） */
+  sequence: z.array(z.object({ move: z.string(), afterSeconds: z.number().nonnegative(), needsConsumed: z.array(z.string()).optional(), needsMoves: z.array(z.string()).optional(), minLevel: z.number().int().positive().optional() })).optional(),
   /** sequence を始める条件: ahead = 前に敵がいる（とっておき）・any = 届く範囲に敵がいる（げきりん）・none = いつでも（アクアテール） */
   sequenceGate: z.enum(['ahead', 'any', 'none']).optional(),
   /** 受けたダメージを返す技（メタルバースト。07 の184章）: 受けるとすぐ次を出し、その 1 回だけ威力が powerMultiplier 倍・数が extraCount 増える */
@@ -2259,6 +2316,10 @@ export const effectRecipeSchema = z.object({
   hitSprite: moveSpriteSpec.extend({ seconds: z.number().positive(), radius: z.number().positive() }).optional(),
   /** 技の絵を床の高さに描く（ダメージの塗りつぶしの上、雑魚の下。ふんえんの噴煙。07 の184章） */
   drawOnFloor: z.boolean().optional(),
+  /** 技の絵をポケモンより上に描く（ころがる: 自分が岩になって転がる。体に付いて動く当たり判定を岩で覆う。07 の238章） */
+  overOwner: z.boolean().optional(),
+  /** 技の絵（技そのものと、効き方から出た円）をボスより上・ポケモンより下に描く（アクアブレイク: ボスにぶつかった所のしぶきがボスに隠れず、自分も隠さない。07 の244・245章） */
+  aboveBoss: z.boolean().optional(),
   /** 当たり判定の範囲を塗らない（天気: 画面全体なので、降る雪だけで見せる） */
   hideShape: z.boolean().default(false),
   /**

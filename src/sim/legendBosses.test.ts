@@ -23,22 +23,7 @@ function moveId(sim: Simulation, idx: number): string {
   return sim.world.rules.stage.moves[idx]!.id;
 }
 
-describe('ミュウツー', () => {
-  it('ランダムなプレイヤーの場所へテレポートし、現れた直後に自分の周りの範囲技を使う', () => {
-    const { sim, i } = legend('legend-mewtwo');
-    const seen = new Set<string>();
-    for (let t = 0; t < 30 * 3; t++) {
-      sim.step([]);
-      for (const ev of sim.world.events) if (ev.type === 'hazardTelegraphed') seen.add(moveId(sim, ev.move));
-    }
-    expect(seen.has('mewtwo-warp')).toBe(true);
-    expect(seen.has('mewtwo-burst')).toBe(true);
-    // テレポートした先は、プレイヤーのすぐそば
-    const e = sim.world.enemies;
-    expect(Math.hypot(e.x[i]!, e.y[i]!)).toBeLessThan(150);
-  });
-});
-
+// ミュウツーは固定マップの戦いに作り直した（07 の〔ミュウツー〕章）。テストは src/sim/mewtwoArena.test.ts
 describe('フリーザー', () => {
   it('戦いの間、毎秒 最大 HP の 1% を削られて遅くなり、HP が 10% を切ると凍る', () => {
     const { sim, p } = legend('legend-articuno');

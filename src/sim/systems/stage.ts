@@ -1109,6 +1109,28 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     boss.flyTo = { x, y, speed: g.speed };
     return;
   }
+  if (move.blink && world.arena && boss) {
+    // 瞬間移動（ミュウツー）: 狙った人から決まった間合いの、マップの中の場所へ。予告の間は消えている
+    const a = world.arena;
+    let x = move.blink.center ? a.x : bx;
+    let y = move.blink.center ? a.y : by;
+    for (let k = 0; k < (move.blink.center ? 0 : 24); k++) {
+      const [rx, ry] = randomUnit(world.rng);
+      const d = world.rng.range(move.blink.minDistance, move.blink.maxDistance);
+      const px = target.x + rx * d;
+      const py = target.y + ry * d;
+      if (Math.abs(px - a.x) > a.halfWidth - 90 || Math.abs(py - a.y) > a.halfHeight - 90) continue;
+      x = px;
+      y = py;
+      break;
+    }
+    put(x, y, 0, 1, bossId);
+    return;
+  }
+  if (move.liftThrow) {
+    castLiftThrow(world, boss, move.liftThrow, target, move.stagger ?? 0, put, bossId);
+    return;
+  }
   if (move.arenaWave && world.arena) {
     put(bx, by, 0, 1, bossId);
     const rideY = castArenaWave(world, move.arenaWave, bx);
@@ -1164,9 +1186,9 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     return;
   }
   if (move.bullets) {
-    // 飛ぶ玉（サンダー）: 自分からランダムな向きへ
+    // 飛ぶ玉（サンダー）: 自分からランダムな向きへ。aimed なら狙った人の今の場所へまっすぐ（追わない。ミュウツーの はどうだん）
     for (let k = 0; k < move.bullets.count; k++) {
-      const [rx, ry] = randomUnit(world.rng);
+      const [rx, ry] = move.bullets.aimed ? [ux, uy] : randomUnit(world.rng);
       put(bx, by, rx, ry, bossId);
     }
     return;
@@ -1366,6 +1388,28 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
         put(t.x + rx * dist, t.y + ry * dist, ux, uy, move.healPct || move.rooted || move.then || move.teleport || move.hideBoss || move.followBoss ? bossId : -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt), ...ring });
       }
     }
+  }
+}
+
+/** サイコキネシス（07 の〔ミュウツー〕章）: 狙った人を囲む場所から、その人を通る直線。どの線も狙った人の今の場所で交わる */
+function castLiftThrow(
+  world: World,
+  boss: World['bosses'][number] | undefined,
+  lt: NonNullable<BossMove['liftThrow']>,
+  target: World['players'][number],
+  stagger: number,
+  put: (x: number, y: number, dx: number, dy: number, dasher: number, extra?: Parameters<typeof addHazard>[8]) => void,
+  bossId: number,
+): void {
+  const count = boss?.barrier !== undefined ? (lt.barrierCount ?? lt.count) : lt.count;
+  const a0 = world.rng.range(0, Math.PI * 2);
+  for (let k = 0; k < count; k++) {
+    const ang = a0 + (k * Math.PI * 2) / count + world.rng.range(-0.25, 0.25);
+    const d = world.rng.range(lt.minDistance, lt.maxDistance);
+    const [x, y] = clampToArena(world, target.x + Math.cos(ang) * d, target.y + Math.sin(ang) * d);
+    const len = Math.hypot(target.x - x, target.y - y) || 1;
+    // 止まって出す技は、落ちた時にまた動けるようボスを結び付ける
+    put(x, y, (target.x - x) / len, (target.y - y) / len, bossId, { delay: Math.round((stagger * k) / world.dt) });
   }
 }
 
@@ -1689,6 +1733,18 @@ function strikeHazards(world: World): void {
       }
       if (--hz.activeTicks <= 0) {
         world.hazards.splice(h, 1);
+        // 消えるときに弾ける玉（はどうだん）: 全方向へ等しい角度で
+        const burst = move?.bullets?.burst;
+        if (burst && world.role !== 'guest') {
+          const [bx, by] = clampToArena(world, hz.x, hz.y);
+          const idx = moveIndexOfStage(world.rules, burst.move);
+          const a0 = Math.atan2(hz.dirY, hz.dirX);
+          const group = world.nextHazardGroup++;
+          for (let k = 0; k < burst.count; k++) {
+            const a = a0 + (k * Math.PI * 2) / burst.count;
+            addHazard(world, idx, bx, by, Math.cos(a), Math.sin(a), -1, undefined, { group });
+          }
+        }
         // 時間が来た壁は、何も起こらず消える
         if (move?.barrier && world.role !== 'guest') {
           const b = world.bosses.find((x) => x.id === hz.dasher);
@@ -2060,6 +2116,8 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
       addHazard(world, idx, world.enemies.x[i]!, world.enemies.y[i]!, Math.cos(a), Math.sin(a), -1, undefined, { group });
     }
   }
+  // 持ち上げた岩を投げる（サイコキネシス）: 予告の線の向きへ
+  if (move.liftThrow) addHazard(world, moveIndexOfStage(world.rules, move.liftThrow.rock), hz.x, hz.y, hz.dirX, hz.dirY, -1, undefined, { group: world.nextHazardGroup++ });
   // ためきった（じこさいせい）: もう止められない
   if (boss && move.interruptDamage) boss.interrupt = undefined;
   // じばく: 爆発した敵はいなくなる（ホストが決めてゲストへ送る）

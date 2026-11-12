@@ -441,15 +441,37 @@
     ],
     "moveSets": {
       "legend-mewtwo": {
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960
+        },
+        "anchor": {
+          "x": 0,
+          "y": -200
+        },
+        "noEnrage": true,
+        "hpDrops": {
+          "atHpPct": [
+            75,
+            50,
+            25
+          ],
+          "item": "potion"
+        },
+        "hpMoves": [
+          { "belowHpPct": 66, "moves": ["mewtwo-barrier"] },
+          { "belowHpPct": 33, "moves": ["mewtwo-to-center", "mewtwo-psystrike-1", "mewtwo-psystrike-2", "mewtwo-tired"] }
+        ],
         "moves": [
-          "mewtwo-warp",
-          "mewtwo-psybeam",
-          "mewtwo-psystrike",
-          "mewtwo-psywave"
+          "mewtwo-blink",
+          "mewtwo-psychic",
+          "mewtwo-blink",
+          "mewtwo-aura-sphere"
         ],
         "random": false,
-        "moveIntervalSeconds": 1.3,
-        "enrageMoveIntervalSeconds": 0.9
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 0.7
       },
       "legend-mew": {
         "moves": [

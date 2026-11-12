@@ -554,6 +554,7 @@
     },
     {
       "id": "legend-mewtwo",
+      "motion": { "type": "still" },
       "species": "mewtwo",
       "rank": "legendary",
       "sprite": "enemy/mewtwo",

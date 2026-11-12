@@ -181,6 +181,19 @@
     "contestType": "beauty",
     "damageClass": "special"
   },
+  "barrier": {
+    "names": {
+      "ja": "バリアー",
+      "en": "Barrier",
+      "fr": "Bouclier",
+      "de": "Barriere",
+      "es": "Barrera",
+      "it": "Barriera"
+    },
+    "type": "psychic",
+    "contestType": "cool",
+    "damageClass": "status"
+  },
   "bite": {
     "names": {
       "ja": "かみつく",

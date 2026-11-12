@@ -560,7 +560,17 @@ export const bossMoveSchema = z.object({
   then: z.string().min(1).optional(),
   homing: z.boolean().optional(),
   rooted: z.boolean().optional(),
-  bullets: z.object({ count: z.number().int().positive(), speed: z.number().positive(), seconds: z.number().positive() }).optional(),
+  bullets: z
+    .object({
+      count: z.number().int().positive(),
+      speed: z.number().positive(),
+      seconds: z.number().positive(),
+      /** 狙った人の今の場所へまっすぐ撃つ（追わない）。無ければランダムな向き */
+      aimed: z.boolean().optional(),
+      /** 消えるとき（時間が来た・壁に着いた）に、技 move を count 個、全方向へ等しい角度で飛ばす（ミュウツーの はどうだん。07 の〔ミュウツー〕章） */
+      burst: z.object({ move: z.string().min(1), count: z.number().int().positive() }).optional(),
+    })
+    .optional(),
   playerMove: z.lazy(() => casterMoveSchema).optional(),
   /** 狙う相手がこの距離より遠いときだけ使う（フシギバナのソーラービーム: はなびらのまいの外に出たら。作者の指摘 2026年10月27日） */
   minTargetDistance: z.number().nonnegative().optional(),
@@ -731,6 +741,15 @@ export const bossMoveSchema = z.object({
   lavaSea: z.object({ islands: z.string().min(1), fillSeconds: z.number().positive(), fullSeconds: z.number().nonnegative(), recedeSeconds: z.number().positive() }).optional(),
   /** 今のマップの中の、狙った人から minDistance〜maxDistance の場所へ speed で滑っていく（スイクン。07 の218章） */
   glide: z.object({ minDistance: z.number().nonnegative(), maxDistance: z.number().positive(), speed: z.number().positive() }).optional(),
+  /** 今のマップの中の、狙った人から minDistance〜maxDistance の場所へ瞬間移動する（予告はその場所。teleport・hideBoss と組む。ミュウツー。07 の〔ミュウツー〕章） */
+  /** 専用の絵のクラス（src/render/effects）で描く。飛ぶ玉のふつうの黄色い玉を描かない（ミュウツーの岩・はどうだん。07 の〔ミュウツー〕章） */
+  customArt: z.boolean().optional(),
+  blink: z.object({ minDistance: z.number().nonnegative(), maxDistance: z.number().positive(), /** 狙った人に関係なく、マップの真ん中へ（サイコブレイクの前） */ center: z.boolean().optional() }).optional(),
+  /**
+   * 念力で持ち上げて投げる（ミュウツーの サイコキネシス。07 の〔ミュウツー〕章）: 狙った人を囲む minDistance〜maxDistance の場所に count 個（壁があるときは barrierCount 個）、
+   * 狙った人を通る直線の予告を置く。落ちたら、そこから技 rock（bullets の技）を同じ向きへ飛ばす
+   */
+  liftThrow: z.object({ rock: z.string().min(1), count: z.number().int().positive(), barrierCount: z.number().int().positive().optional(), minDistance: z.number().nonnegative(), maxDistance: z.number().positive() }).optional(),
   /**
    * 固定マップの端から端まで届く波（スイクンの なみのり。07 の218章）: ボスのいる側の端から反対側へ、技 line の帯を speed で進める。切れ目 gap は狙った人の近く。
    * 予告が終わると、ボスも波と一緒に反対側へ走る

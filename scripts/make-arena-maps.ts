@@ -1218,6 +1218,84 @@ function zapdosWall(): (Rgb | null)[] {
   return out;
 }
 
+// --- ファイヤー: ともしびやまの山頂（暗い火山の岩の頂。縁の外は雲の海と夜空。07 の〔ファイヤー〕章） ---
+
+/** 炎の橙・赤・白と重ならないよう、床は少し紫がかった暗い灰色の岩。溶岩は置かない（エンテイと分ける） */
+const SUMMIT = ['#18161b', '#1e1b21', '#252128', '#2d2830', '#36303a'].map(hex);
+const ASH_PATCH = hex('#3f3a43');
+
+function moltresFloor(): { floor: Rgb[] } {
+  const floor: Rgb[] = [];
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    // ごつごつした岩の面（大きな明暗。境に線を引かない）
+    const rock = worley(x, y, 58, 951);
+    const round = (rock.dx * 0.6 + rock.dy) / 58;
+    let t = 0.44 + round * 0.1 + (hash2(rock.id, 1, 953) - 0.5) * 0.07 + (fbm(x / 90, y / 90, 955) - 0.5) * 0.35 + (fbm(x / 14, y / 14, 957) - 0.5) * 0.14;
+    // 真ん中は踏みならされて平ら（明暗が少ない）
+    const center = Math.hypot((x - W / 2) / (W / 2), (y - H / 2) / (H / 2));
+    if (center < 0.5) t = t * 0.7 + 0.46 * 0.3;
+    let col = ramp(SUMMIT, t, x, y);
+    // 灰が積もった所（風下の大きなまだら）
+    // 境はぼかす（はっきりした形のまだらは迷彩柄に見えた）
+    const ash = fbm(x / 80 + y / 160, y / 60, 959);
+    if (ash > 0.66) col = mix(col, ASH_PATCH, Math.min(0.3, (ash - 0.66) * 3));
+    // 古い噴気孔（小さな暗いくぼみ。数か所だけ）
+    for (const [vx, vy] of [[150, 90], [640, 340], [700, 110], [110, 360]] as const) {
+      const d = Math.hypot((x - vx) / 1.3, y - vy);
+      if (d < 7 + fbm(x / 6, y / 6, 961) * 3) col = SUMMIT[0]!;
+      else if (d < 11) col = mix(col, SUMMIT[1]!, 0.6);
+    }
+    if (hash2(x, y, 963) > 0.995) col = SUMMIT[4]!;
+    floor.push(col);
+  }
+  return { floor };
+}
+
+const CLOUD = ['#2a2a3c', '#3a3a52', '#4f4d68', '#6a6684'].map(hex);
+const NIGHT = ['#07070f', '#0b0b17', '#10101f'].map(hex);
+
+function moltresWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const rimLight = hex('#6a6070');
+  const rimDark = hex('#121014');
+  const cliff = ['#141216', '#1c191f', '#26222a', '#322d37'].map(hex);
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = inset(iy, 31) - ix;
+    const fromRight = ix - (W - 1 - inset(iy, 32));
+    const fromTop = inset(ix, 33) - iy;
+    const fromBottom = iy - (H - 1 - inset(ix, 34));
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    // 頂の縁の岩（内側の 10〜16 ドット。ところどころ欠ける）
+    const lip = 14 + fbm(x / 14, y / 14, 971) * 8;
+    let col: Rgb;
+    if (dist < lip) {
+      const stone = worley(x, y, 16, 973);
+      const round = (stone.dx + stone.dy) / 16;
+      col = ramp(cliff, 0.5 + round * 0.4 + (hash2(stone.id, 1, 975) - 0.5) * 0.3, x, y);
+      if (stone.edge < 0.7) col = cliff[0]!;
+    } else {
+      // 縁の外: 下に雲の海、遠くは夜空（外ほど暗い）
+      const far = (dist - lip) / (MARGIN - lip);
+      // 雲の海: 横に長いやわらかな帯（細かい斑にしない）。縁に近いほど雲が厚い
+      const c = fbm(x / 60, y / 10, 977) * 0.85 + fbm(x / 22, y / 6, 979) * 0.15 - far * 0.35;
+      col = c > 0.36 ? ramp(CLOUD, (c - 0.36) * 2.6, x, y, 0.4) : ramp(NIGHT, 1 - far, x, y);
+      // まばらな星（雲の無い所）
+      if (col === NIGHT[0] || col === NIGHT[1] || col === NIGHT[2]) if (hash2(x, y, 981) > 0.992) col = hex('#8a86a8');
+    }
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 2.5) col = rimLight;
+    out.push(col);
+  }
+  return out;
+}
+
 function mewtwoFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
   const floor: Rgb[] = [];
   const shimmerA: (Rgb | null)[] = [];
@@ -1315,6 +1393,7 @@ const arenas = [
   { id: 'mewtwo', region: 'kanto', ...mewtwoFloor(), wall: mewtwoWall() },
   { id: 'articuno', region: 'kanto', ...articunoFloor(), wall: articunoWall() },
   { id: 'zapdos', region: 'kanto', ...zapdosFloor(), shimmerA: null, shimmerB: null, wall: zapdosWall() },
+  { id: 'moltres', region: 'kanto', ...moltresFloor(), shimmerA: null, shimmerB: null, wall: moltresWall() },
 ];
 for (const a of arenas) {
   const outDir = path.join('public', 'map', 'region' in a ? a.region : 'johto');

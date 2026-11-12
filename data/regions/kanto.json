@@ -451,14 +451,6 @@
           "y": -200
         },
         "noEnrage": true,
-        "hpDrops": {
-          "atHpPct": [
-            75,
-            50,
-            25
-          ],
-          "item": "potion"
-        },
         "hpMoves": [
           { "belowHpPct": 66, "moves": ["mewtwo-barrier"] },
           { "belowHpPct": 33, "moves": ["mewtwo-to-center", "mewtwo-psystrike-1", "mewtwo-psystrike-2", "mewtwo-tired"] }

@@ -76,6 +76,9 @@ export class MewtwoPsychic {
   /** バリアーが割れた時と場所（破片が散る） */
   private shatter: { x: number; y: number; at: number } | null = null;
   private wasBreaking = false;
+  /** 前の絵で見えていた飛ぶ岩（殻に当たって消えた岩を砕く） */
+  private rocks = new Map<object, { x: number; y: number; kind: number }>();
+  private smashes: { x: number; y: number; at: number; kind: number }[] = [];
   /** 消えたボスの最後の場所（消える瞬間の光） */
   private vanish: { x: number; y: number; at: number } | null = null;
   private wasHidden = false;
@@ -239,6 +242,37 @@ export class MewtwoPsychic {
         }
       });
     }
+    // ひび（段階 1・2。2 は 1 の線に足す）: 当たった所から伸びるギザギザの線。暗い線の隣を明るく
+    for (let level = 1; level <= 2; level++) {
+      put(`mewtwo-shell-crack-${level}`, SHELL_W, SHELL_H, (out) => {
+        const mask = new Uint8Array(SHELL_W * SHELL_H);
+        const starts = level === 1 ? [[0.3, 0.38]] : [[0.3, 0.38], [0.68, 0.6]];
+        starts.forEach(([sx, sy], n) => {
+          for (let k = 0; k < 5; k++) {
+            let a = rnd(n * 9 + k, 2) * Math.PI * 2;
+            let x = sx! * SHELL_W;
+            let y = sy! * SHELL_H;
+            const len = 10 + rnd(n * 9 + k, 3) * 22;
+            for (let t = 0; t < len; t++) {
+              x += Math.cos(a);
+              y += Math.sin(a);
+              a += (rnd(n * 31 + k * 7 + t, 4) - 0.5) * 0.9;
+              const nx = (x - SHELL_W / 2) / (SHELL_W / 2);
+              const ny = (y - SHELL_H / 2) / (SHELL_H / 2);
+              if (nx * nx + ny * ny > 0.96) break;
+              mask[Math.round(y) * SHELL_W + Math.round(x)] = 1;
+            }
+          }
+        });
+        for (let y = 0; y < SHELL_H; y++) {
+          for (let x = 0; x < SHELL_W; x++) {
+            const i = y * SHELL_W + x;
+            if (mask[i]) out[i] = abgr(60, 20, 110, 0.95);
+            else if (x > 0 && mask[i - 1]) out[i] = abgr(255, 250, 255, 0.95);
+          }
+        }
+      });
+    }
     put('mewtwo-shell-bit', 6, 6, (out) => {
       for (let y = 0; y < 6; y++) for (let x = 0; x < 6; x++) if (Math.abs(x - 2.5) + Math.abs(y - 2.5) < 3.2) out[y * 6 + x] = Math.abs(x - 2.5) + Math.abs(y - 2.5) < 1.6 ? abgr(250, 240, 255) : abgr(196, 140, 255, 0.9);
     });
@@ -283,6 +317,28 @@ export class MewtwoPsychic {
       else if (move.id === 'mewtwo-aura-shard' && hz.activeTicks !== undefined) this.drawShard(hz, move.bullets?.speed ?? 0, world.dt, frac);
       else if (move.barrier && hz.activeTicks !== undefined && !world.hiddenEnemies.has(hz.dasher)) this.drawShell(world, hz, timeMs);
       else if (move.arms && move.sweep) this.drawPsystrike(hz, move.sweep, progress, timeMs);
+    }
+    // 殻に当たって消えた岩: その場で砕け、殻に波紋
+    const shell = world.hazards.find((h) => moves[h.move]?.barrier?.hitsBy && h.activeTicks !== undefined);
+    const now = new Map<object, { x: number; y: number; kind: number }>();
+    for (const h of world.hazards) if (moves[h.move]?.id === 'mewtwo-rock' && h.activeTicks !== undefined) now.set(h, { x: h.x, y: h.y, kind: Math.floor(rnd((h.group ?? 0) * 7 + Math.round(h.x) + Math.round(h.y) * 3, 1) * ROCK_KINDS) });
+    if (shell) {
+      const si = findEnemyIndex(world, shell.dasher);
+      for (const [h, r] of this.rocks) {
+        if (now.has(h) || si === -1) continue;
+        if (Math.hypot(r.x - world.enemies.x[si]!, r.y - world.enemies.y[si]!) < shell.radius + 90) this.smashes.push({ x: r.x, y: r.y, at: timeMs, kind: r.kind });
+      }
+    }
+    this.rocks = now;
+    this.smashes = this.smashes.filter((m) => timeMs - m.at < 500);
+    for (const m of this.smashes) {
+      const t = (timeMs - m.at) / 500;
+      for (let k = 0; k < 7; k++) {
+        const a = rnd(k, m.at) * Math.PI * 2;
+        const d = 10 + 60 * t * (0.6 + rnd(k, 3) * 0.6);
+        this.gn.fillStyle(k % 2 ? 0x8d7f78 : 0x5d5249, 1 - t).fillRect(m.x + Math.cos(a) * d - 3, m.y - LIFT + Math.sin(a) * d + t * t * 30 - 3, 6, 6);
+      }
+      this.g.lineStyle(4, 0xe1bee7, 0.8 * (1 - t)).strokeCircle(m.x, m.y - LIFT, 20 + 40 * t);
     }
     // バリアーが割れる: 殻の破片が外へ散る
     const breaking = world.hazards.find((h) => moves[h.move]?.clearsBarrier && moves[h.move]?.id.startsWith('mewtwo-'));
@@ -416,7 +472,12 @@ export class MewtwoPsychic {
     // 消える前の 1.5 秒は、ゆっくり薄くなる（点滅させない）
     const left = (hz.activeTicks ?? 0) * world.dt;
     const fade = Math.min(1, left / 1.5);
-    this.image(`mewtwo-shell-${frame}`).setPosition(world.enemies.x[i]!, world.enemies.y[i]! - 34).setScale(DOT * (1.25 - 0.25 * open)).setAlpha(open * (0.4 + 0.6 * fade)).setDepth(this.frontDepth);
+    const sx = world.enemies.x[i]!;
+    const sy = world.enemies.y[i]! - 34;
+    this.image(`mewtwo-shell-${frame}`).setPosition(sx, sy).setScale(DOT * (1.25 - 0.25 * open)).setAlpha(open * (0.4 + 0.6 * fade)).setDepth(this.frontDepth);
+    // ひび: 岩が当たった回数（ひびの印の数）
+    const cracks = Math.min(2, world.hazards.filter((h) => world.rules.stage.moves[h.move]?.id === 'mewtwo-barrier-crack').length);
+    if (cracks > 0) this.image(`mewtwo-shell-crack-${cracks}`).setPosition(sx, sy).setScale(DOT).setAlpha(open).setDepth(this.frontDepth + 0.001);
   }
 
   /** サイコブレイク: 予告は細い光と回る向きの弧、当たっている間は太い念の光（中は白く、外は桃色） */

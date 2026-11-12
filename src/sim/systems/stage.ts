@@ -604,6 +604,8 @@ export function bossAttacks(world: World): void {
         }
       }
       stepBossFlight(world, boss, i);
+      // 岩が決まった回数当たった壁は割れる（ミュウツーの バリアー）
+      if (boss.barrierHits && boss.barrierHits.count >= boss.barrierHits.need) breakBarrier(world, boss, boss.id);
       // HP で放つ大技（ピカチュウのボルテッカー）: 今の技が終わり次第、順に使う
       const next = boss.hpMoves?.[0];
       if (next && world.enemies.hp[i]! <= world.enemies.maxHp[i]! * next.belowRatio) {
@@ -674,12 +676,22 @@ export function absorbBarrier(world: World, i: number, amount: number): number {
     }
   }
   if (!boss?.barrier) return amount;
+  // 岩でしか割れない壁（ミュウツー）: 攻撃は全部受け止める
+  if (boss.barrierHits) return 0;
   if (amount < boss.barrier) {
     boss.barrier -= amount;
     return 0;
   }
   const rest = amount - boss.barrier;
+  breakBarrier(world, boss, id);
+  return rest;
+}
+
+/** 壁が割れた（ソロ・ホスト）: 今の技をやめ、割れたときの技を使う */
+function breakBarrier(world: World, boss: World['bosses'][number], id: number): void {
   boss.barrier = undefined;
+  boss.barrierHits = undefined;
+  boss.barrierMoves = undefined;
   // 今の技をやめる（止まって出す技の予告も、続きも）
   for (let h = world.hazards.length - 1; h >= 0; h--) {
     const hz = world.hazards[h]!;
@@ -687,7 +699,34 @@ export function absorbBarrier(world: World, i: number, amount: number): number {
   }
   for (let q = world.bossQueue.length - 1; q >= 0; q--) if (world.bossQueue[q]!.bossId === id) world.bossQueue.splice(q, 1);
   if (boss.barrierBreak !== undefined) (boss.forced ??= []).unshift(boss.barrierBreak);
-  return rest;
+}
+
+/**
+ * 飛ぶ岩が、岩でしか割れない壁に当たる（ミュウツーの バリアー）: 岩は壁で止まる（どのブラウザでも）。
+ * ソロ・ホストは当たった回数を数え、ひびの印を置き、決まった回数で割る
+ */
+function rockHitsBarrier(world: World, hz: World['hazards'][number]): void {
+  for (const b of world.hazards) {
+    const hb = b.activeTicks !== undefined ? world.rules.stage.moves[b.move]?.barrier?.hitsBy : undefined;
+    if (!hb || moveIndexOfStage(world.rules, hb.move) !== hz.move) continue;
+    const i = findEnemyIndex(world, b.dasher);
+    if (i === -1 || world.hiddenEnemies.has(b.dasher)) continue;
+    const ex = world.enemies.x[i]!;
+    const ey = world.enemies.y[i]!;
+    if ((hz.x - ex) ** 2 + (hz.y - ey) ** 2 > (b.radius + hz.radius) ** 2) continue;
+    // 狙った場所（投げたときのプレイヤーの場所）を過ぎた岩だけ、ひびを入れる。手前から来た岩は壁で止まるだけ
+    const bl = world.rules.stage.moves[hz.move]?.bullets;
+    const travelled = bl ? (Math.round(bl.seconds / world.dt) - (hz.activeTicks ?? 0)) * world.dt * bl.speed : Infinity;
+    hz.activeTicks = 1;
+    if (world.role === 'guest') return;
+    const boss = world.bosses.find((x) => x.id === b.dasher);
+    if (!boss?.barrierHits) return;
+    if (hz.aimDist !== undefined && travelled < hz.aimDist) return;
+    boss.barrierHits.count++;
+    addHazard(world, boss.barrierHits.mark, ex, ey, hz.dirX, hz.dirY, b.dasher, undefined, { group: world.nextHazardGroup++ });
+    // 割るのは次の更新の頭で（今は範囲の一覧を回している途中）
+    return;
+  }
 }
 
 /** 天気の姿（リザードン。07 の198章）: i の相手の今の天気の姿。無ければ null */
@@ -984,7 +1023,9 @@ function weatherVariant(world: World, moveIdx: number): number {
 }
 
 function useBossMove(world: World, boss: World['bosses'][number], i: number, forced?: number): void {
-  let moveIdx = forced !== undefined ? forced : boss.random ? boss.moves[world.rng.int(boss.moves.length)]! : boss.moves[boss.next++ % boss.moves.length]!;
+  // 壁がある間の技（ミュウツー: その場で岩を投げ続ける）
+  const shield = forced === undefined && boss.barrier !== undefined && boss.barrierMoves?.length ? boss.barrierMoves[(boss.barrierNext = (boss.barrierNext ?? 0) + 1) % boss.barrierMoves.length] : undefined;
+  let moveIdx = forced !== undefined ? forced : shield !== undefined ? shield : boss.random ? boss.moves[world.rng.int(boss.moves.length)]! : boss.moves[boss.next++ % boss.moves.length]!;
   if (moveIdx === -1 && boss.pool && boss.pool.length > 0) moveIdx = boss.pool[world.rng.int(boss.pool.length)]!;
   moveIdx = weatherVariant(world, moveIdx);
   let move = world.rules.stage.moves[moveIdx];
@@ -1409,7 +1450,7 @@ function castLiftThrow(
     const [x, y] = clampToArena(world, target.x + Math.cos(ang) * d, target.y + Math.sin(ang) * d);
     const len = Math.hypot(target.x - x, target.y - y) || 1;
     // 止まって出す技は、落ちた時にまた動けるようボスを結び付ける
-    put(x, y, (target.x - x) / len, (target.y - y) / len, bossId, { delay: Math.round((stagger * k) / world.dt) });
+    put(x, y, (target.x - x) / len, (target.y - y) / len, bossId, { delay: Math.round((stagger * k) / world.dt), aimDist: len });
   }
 }
 
@@ -1987,6 +2028,7 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
     // 固定マップの壁で消える
     const a = world.arena;
     if (a && (Math.abs(hz.x - a.x) > a.halfWidth || Math.abs(hz.y - a.y) > a.halfHeight)) hz.activeTicks = 1;
+    else if (hz.activeTicks !== undefined && hz.activeTicks > 1) rockHitsBarrier(world, hz);
     return;
   }
   if (move.surfRing) {
@@ -2117,7 +2159,7 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
     }
   }
   // 持ち上げた岩を投げる（サイコキネシス）: 予告の線の向きへ
-  if (move.liftThrow) addHazard(world, moveIndexOfStage(world.rules, move.liftThrow.rock), hz.x, hz.y, hz.dirX, hz.dirY, -1, undefined, { group: world.nextHazardGroup++ });
+  if (move.liftThrow) addHazard(world, moveIndexOfStage(world.rules, move.liftThrow.rock), hz.x, hz.y, hz.dirX, hz.dirY, -1, undefined, { group: world.nextHazardGroup++, ...(hz.aimDist !== undefined ? { aimDist: hz.aimDist } : {}) });
   // ためきった（じこさいせい）: もう止められない
   if (boss && move.interruptDamage) boss.interrupt = undefined;
   // じばく: 爆発した敵はいなくなる（ホストが決めてゲストへ送る）
@@ -2153,6 +2195,10 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
   if (move.barrier && boss) {
     boss.barrier = (world.enemies.maxHp[i]! * move.barrier.hpPct) / 100;
     boss.barrierBreak = moveIndexOfStage(world.rules, move.barrier.breakMove);
+    const hb = move.barrier.hitsBy;
+    boss.barrierHits = hb ? { move: moveIndexOfStage(world.rules, hb.move), need: hb.hits, count: 0, mark: moveIndexOfStage(world.rules, hb.mark) } : undefined;
+    boss.barrierMoves = move.barrier.moves?.map((m) => moveIndexOfStage(world.rules, m));
+    boss.barrierNext = 0;
   }
   // 回復（エーフィの あさのひざし・カビゴンの ねむる）: 使ったボスの HP を戻す（HP はゲストへ送る）
   if (move.healPct && world.enemies.hp[i]! > 0) world.enemies.hp[i] = Math.min(world.enemies.maxHp[i]!, world.enemies.hp[i]! + (world.enemies.maxHp[i]! * move.healPct) / 100);
@@ -2351,7 +2397,7 @@ export function addHazard(
    * 予告に足す遅れ（更新回数）・半径の上書き・輪の内側の半径・追いかけるプレイヤー・1回の技の組・威力の上書き（カウンター）・
    * 落ちた後に進む速さ（波）・直線の長さの上書き（波の帯）・跳ね回る箱の中心
    */
-  extra: { delay?: number; radius?: number; inner?: number; follow?: number; group?: number; damage?: number; vx?: number; vy?: number; length?: number; boxX?: number; boxY?: number } = {},
+  extra: { delay?: number; radius?: number; inner?: number; follow?: number; group?: number; damage?: number; vx?: number; vy?: number; length?: number; boxX?: number; boxY?: number; aimDist?: number } = {},
 ): void {
   const move: BossMove | undefined = world.rules.stage.moves[moveIdx];
   if (!move) return;
@@ -2399,6 +2445,7 @@ export function addHazard(
     ...(extra.damage ? { damageOverride: extra.damage } : {}),
     ...(extra.vx !== undefined && extra.vy !== undefined && (extra.vx !== 0 || extra.vy !== 0) ? { vx: extra.vx, vy: extra.vy } : {}),
     ...(extra.boxX !== undefined && extra.boxY !== undefined ? { boxX: extra.boxX, boxY: extra.boxY } : {}),
+    ...(extra.aimDist !== undefined ? { aimDist: extra.aimDist } : {}),
     ...((move.counter || move.mirrorShards) && di !== -1 ? { hpAtStart: world.enemies.hp[di]! } : {}),
   });
   // 予告の間止まる技（ゲストも同じ知らせで止める）

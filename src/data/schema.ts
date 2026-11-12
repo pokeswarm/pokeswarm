@@ -613,7 +613,19 @@ export const bossMoveSchema = z.object({
    * ダメージを防ぐ壁（エーフィの リフレクター。07 の195章）: 当たっている間、最大 HP の hpPct % のダメージを受け止める。
    * 受け止めきれず割れると、今の技をやめて breakMove を使う（気絶）。時間が来ると何も起こらず消える
    */
-  barrier: z.object({ hpPct: z.number().positive(), breakMove: z.string().min(1) }).optional(),
+  barrier: z
+    .object({
+      hpPct: z.number().positive(),
+      breakMove: z.string().min(1),
+      /**
+       * 攻撃では割れず、技 move（飛ぶ岩）が hits 回当たると割れる（ミュウツーの バリアー。07 の〔ミュウツー〕章）。
+       * 当たるたびに技 mark（ひびの印。割れたときの技の clearsMoves で消す）を置く
+       */
+      hitsBy: z.object({ move: z.string().min(1), hits: z.number().int().positive(), mark: z.string().min(1) }).optional(),
+      /** 壁がある間は、ふだんの技の代わりにこの技を順に使う */
+      moves: z.array(z.string().min(1)).optional(),
+    })
+    .optional(),
   /** この技が始まると、同じボスの壁（barrier の技）を消す（壁が割れたとき。ゲストにも予告の知らせで届く。07 の195章） */
   clearsBarrier: z.boolean().optional(),
   /** 1 つ目も足元でなく、狙った人のまわりのランダムな場所に置く（ピカチュウの かみなり。07 の194章） */

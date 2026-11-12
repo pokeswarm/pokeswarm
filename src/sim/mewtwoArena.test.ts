@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildSimRules } from '../data/simRules';
 import { Simulation } from './simulation';
-import { startLegendary } from './systems/stage';
+import { absorbBarrier, addHazard, startLegendary } from './systems/stage';
 
 /** ミュウツーの固定マップの戦い（07 の〔ミュウツー〕章） */
 function setup(seed = 3) {
@@ -109,16 +109,54 @@ describe('ミュウツー（07 の〔ミュウツー〕章）', () => {
     expect(of('mewtwo-aura-shard').length).toBe(14);
   });
 
-  it('HP 66% でバリアー。割れると 3 秒ふらつく', () => {
-    const { w, boss, i, idx, step, of } = setup();
+  it('HP 66% でバリアー: 攻撃では割れず、その場で岩を投げ続ける。プレイヤーの場所を過ぎた岩が 3 回当たると割れて 3 秒ふらつく', () => {
+    const { w, p, boss, i, step, of } = setup();
     w.enemies.hp[i()] = w.enemies.maxHp[i()]! * 0.65;
     step(3);
-    expect(boss.barrier).toBeGreaterThan(0);
-    boss.forced = [idx('mewtwo-barrier-break')];
-    for (let h = w.hazards.length - 1; h >= 0; h--) if (!w.rules.stage.moves[w.hazards[h]!.move]?.barrier) w.hazards.splice(h, 1);
+    expect(boss.barrier).toBeDefined();
+    // 攻撃は全部受け止める
+    const hp = w.enemies.hp[i()]!;
+    absorbBarrier(w, i(), 1e6);
+    expect(boss.barrier).toBeDefined();
+    expect(w.enemies.hp[i()]).toBe(hp);
+    // その場にいて、テレポートしない
+    const seen = new Set<string>();
+    let broke = -1;
+    for (let t = 0; t < 30 * 40 && broke < 0; t++) {
+      // ミュウツーのそばに立つ（岩を引き付ける）
+      p.x = w.enemies.x[i()]!;
+      p.y = w.enemies.y[i()]! + 160;
+      step(1 / 30);
+      for (const h of w.hazards) seen.add(w.rules.stage.moves[h.move]!.id);
+      if (boss.barrier === undefined) broke = t;
+    }
+    expect(broke).toBeGreaterThan(0);
+    expect(seen.has('mewtwo-blink')).toBe(false);
+    expect(seen.has('mewtwo-barrier-crack')).toBe(true);
     step(0.5);
     expect(of('mewtwo-stun').length).toBe(1);
     expect(of('mewtwo-barrier').length).toBe(0);
+    expect(of('mewtwo-barrier-crack').length).toBe(0);
+  });
+
+  it('バリアー: ミュウツーとプレイヤーの間から来た岩は、殻で止まるだけでひびは入らない', () => {
+    const { w, p, boss, i, idx, step } = setup();
+    w.enemies.hp[i()] = w.enemies.maxHp[i()]! * 0.65;
+    step(3);
+    expect(boss.barrierHits).toBeDefined();
+    // 殻とプレイヤーの間に岩を置き、プレイヤーを狙って投げる（殻へ向かわない）。もう 1 つは殻へ向かう岩（手前から）
+    const ex = w.enemies.x[i()]!;
+    const ey = w.enemies.y[i()]!;
+    p.x = ex;
+    p.y = ey + 400;
+    w.hazards.splice(0, w.hazards.length, ...w.hazards.filter((h) => w.rules.stage.moves[h.move]?.barrier));
+    boss.forced = [];
+    boss.cooldown = 999;
+    boss.barrierMoves = [];
+    addHazard(w, idx('mewtwo-rock'), ex, ey + 250, 0, -1, -1, undefined, { group: 9999, aimDist: 400 });
+    step(1.2);
+    expect(boss.barrierHits!.count).toBe(0);
+    expect(w.hazards.some((h) => w.rules.stage.moves[h.move]?.id === 'mewtwo-rock')).toBe(false);
   });
 
   it('HP 33% でマップの真ん中へ移り、4 本の念の光を右回り・左回りに回し、その後疲れて止まる', () => {

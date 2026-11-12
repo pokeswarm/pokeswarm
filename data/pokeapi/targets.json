@@ -296,6 +296,9 @@
   ],
   "moves": [
     "barrier",
+    "heat-wave",
+    "overheat",
+    "burn-up",
     "drill-peck",
     "charge",
     "icy-wind",

@@ -605,6 +605,7 @@
     },
     {
       "id": "legend-moltres",
+      "motion": { "type": "keepDistance", "distance": 320 },
       "species": "moltres",
       "rank": "legendary",
       "sprite": "enemy/moltres",

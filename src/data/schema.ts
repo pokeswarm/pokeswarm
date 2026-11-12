@@ -597,7 +597,16 @@ export const bossMoveSchema = z.object({
    * 足元から広がる波の輪（カメックスの なみのり。07 の198章）: 半径 startRadius から速さ speed で広がる。足元の startRadius の内側は安全。
    * 向かい合う 2 か所に gapDegrees 度の切れ目があり、抜けられる
    */
-  surfRing: z.object({ startRadius: z.number().positive(), speed: z.number().positive(), width: z.number().positive(), gapDegrees: z.number().positive() }).optional(),
+  surfRing: z
+    .object({
+      startRadius: z.number().positive(),
+      speed: z.number().positive(),
+      width: z.number().positive(),
+      gapDegrees: z.number().positive(),
+      /** 輪でなく、狙った人の向きを真ん中にした arcDegrees 度の弧だけが広がる（切れ目は無視。ファイヤーの ねっぷう。07 の〔ファイヤー〕章） */
+      arcDegrees: z.number().positive().optional(),
+    })
+    .optional(),
   /** 当たっている間、画面のどこにいても毎秒 最大 HP のこの % だけ削られる（カメックスの ふぶき。防御は効かない。07 の198章） */
   fieldDotPct: z.number().positive().optional(),
   /** この技を使うと、出ている技 moves を消す（にほんばれ と あまごい は同時に降らない。ゲストにも予告の知らせで届く。07 の197章） */
@@ -766,6 +775,8 @@ export const bossMoveSchema = z.object({
   /** 今のマップの中の、狙った人から minDistance〜maxDistance の場所へ speed で滑っていく（スイクン。07 の218章） */
   glide: z.object({ minDistance: z.number().nonnegative(), maxDistance: z.number().positive(), speed: z.number().positive() }).optional(),
   /** 今のマップの中の、狙った人から minDistance〜maxDistance の場所へ瞬間移動する（予告はその場所。teleport・hideBoss と組む。ミュウツー。07 の〔ミュウツー〕章） */
+  /** この技が出ている間（予告の間も）、使ったボスが受けるダメージをこの % にする（ファイヤーの もえつきた後: 150。07 の〔ファイヤー〕章） */
+  takenPct: z.number().positive().optional(),
   /** 専用の絵のクラス（src/render/effects）で描く。飛ぶ玉のふつうの黄色い玉を描かない（ミュウツーの岩・はどうだん・フリーザーの こごえるかぜ。07 の〔ミュウツー〕章） */
   customArt: z.boolean().optional(),
   blink: z.object({ minDistance: z.number().nonnegative(), maxDistance: z.number().positive(), /** 狙った人に関係なく、マップの真ん中へ（サイコブレイクの前） */ center: z.boolean().optional() }).optional(),

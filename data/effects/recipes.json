@@ -6016,6 +6016,9 @@
     "boss-zapdos-plain": {
       "extends": "electric.base"
     },
+    "boss-moltres-plain": {
+      "extends": "fire.base"
+    },
     "boss-suicune-plain": {
       "extends": "water.base"
     },

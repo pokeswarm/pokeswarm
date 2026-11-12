@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildSimRules } from '../data/simRules';
 import { Simulation } from './simulation';
-import { activeLegendField } from './systems/stage';
 
 /**
  * 伝説ボスの強化（作者の案 2026年10月26日）: 本番のデータで伝説戦を始めて、それぞれの戦い方を確かめる
@@ -27,25 +26,7 @@ function moveId(sim: Simulation, idx: number): string {
 // フリーザーは固定マップの戦いに作り直した（07 の〔フリーザー〕章）。テストは src/sim/articunoArena.test.ts
 
 // サンダーは固定マップの戦いに作り直した（07 の〔サンダー〕章）。テストは src/sim/zapdosArena.test.ts
-describe('ファイヤー', () => {
-  it('にらみつけるで防御が下がり、ゴッドバードは一番 HP の多いプレイヤーを追いかける（必中）', () => {
-    const { sim } = legend('legend-moltres', 2);
-    expect(activeLegendField(sim.world)?.field.defenseMultiplier).toBe(0.75);
-    const [a, b] = sim.world.players;
-    a!.hp = a!.maxHp * 0.3;
-    let homing = null as null | (typeof sim.world.hazards)[number];
-    for (let t = 0; t < 30 * 3 && !homing; t++) {
-      sim.step([]);
-      homing = sim.world.hazards.find((h) => moveId(sim, h.move) === 'moltres-skyattack' && h.activeTicks === undefined) ?? null;
-    }
-    expect(homing?.follow).toBe(b!.id);
-    // 狙われた人が動いても、予告がついて来る
-    b!.x += 200;
-    sim.step([]);
-    expect(homing!.x).toBeCloseTo(b!.x);
-  });
-});
-
+// ファイヤーは固定マップの戦いに作り直した（07 の〔ファイヤー〕章）。テストは src/sim/moltresArena.test.ts
 describe('ミュウ', () => {
   it('テレポートと、カントーの固有技をまねた技を、交互にくり返す', () => {
     const { sim } = legend('legend-mew');

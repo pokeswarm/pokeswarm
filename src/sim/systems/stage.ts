@@ -1269,7 +1269,8 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   }
   if (move.surfRing) {
     // 足元から広がる波の輪（カメックスの なみのり）: 切れ目の向きは、狙った人の向きから少しずらす
-    const a = Math.atan2(uy, ux) + (world.rng.next() - 0.5) * Math.PI * 0.8;
+    // 弧の波（ねっぷう）は狙った人の向きを真ん中に、少しずらす。輪（なみのり）は切れ目の向きを狙った人の向きから少しずらす
+    const a = Math.atan2(uy, ux) + (world.rng.next() - 0.5) * (move.surfRing.arcDegrees ? 0.4 : Math.PI * 0.8);
     put(bx, by, Math.cos(a), Math.sin(a), move.rooted ? bossId : -1, { radius: move.surfRing.startRadius + move.surfRing.width, inner: move.surfRing.startRadius });
     return;
   }
@@ -2402,6 +2403,11 @@ export function hazardHits(
   if (hz.shape === 'ring') {
     const d = Math.hypot(x - hz.x, y - hz.y);
     if (d > radius + r || d < (hz.innerRadius ?? 0) - r) return false;
+    // 弧だけの波（ねっぷう）: 向きから arcDegrees の半分の中だけ当たる
+    if (move?.surfRing?.arcDegrees) {
+      const off = Math.abs(Math.atan2(Math.sin(Math.atan2(y - hz.y, x - hz.x) - Math.atan2(hz.dirY, hz.dirX)), Math.cos(Math.atan2(y - hz.y, x - hz.x) - Math.atan2(hz.dirY, hz.dirX))));
+      return off <= (move.surfRing.arcDegrees * Math.PI) / 360 + Math.asin(Math.min(1, r / Math.max(r, d)));
+    }
     // 広がる波の輪の切れ目（向かい合う 2 か所）
     if (move?.surfRing) {
       const off = Math.abs(Math.atan2(y - hz.y, x - hz.x) - Math.atan2(hz.dirY, hz.dirX));

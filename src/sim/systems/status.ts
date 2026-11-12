@@ -34,6 +34,12 @@ export function damageTakenMultiplier(world: World, i: number): number {
   // 天気の姿（リザードン: 晴れは硬く、雨はもろい。07 の198章）
   const state = legendWeatherState(world, i);
   if (state) m *= state.damageTakenPct / 100;
+  // 弱っている間（ファイヤーの もえつきた後）は多く受ける
+  const id = e.id[i]!;
+  for (const h of world.hazards) {
+    const pct = h.dasher === id ? world.rules.stage.moves[h.move]?.takenPct : undefined;
+    if (pct) m *= pct / 100;
+  }
   return m;
 }
 

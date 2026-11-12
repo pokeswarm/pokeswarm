@@ -545,21 +545,17 @@
         "moveIntervalSeconds": 0.6
       },
       "legend-moltres": {
-        "moves": [
-          "moltres-skyattack",
-          "moltres-flamedash"
+        "arena": { "halfWidth": 800, "halfHeight": 440, "viewHeight": 960 },
+        "anchor": { "x": 0, "y": -220 },
+        "noEnrage": true,
+        "hpMoves": [
+          { "belowHpPct": 66, "moves": ["moltres-overheat-charge"] },
+          { "belowHpPct": 33, "moves": ["moltres-to-center", "moltres-burn-up"] }
         ],
+        "moves": ["moltres-sky-attack", "moltres-heat-wave", "moltres-air-slash", "moltres-heat-wave"],
         "random": false,
-        "moveIntervalSeconds": 1.8,
-        "enrageMoveIntervalSeconds": 1.2,
-        "field": {
-          "defenseMultiplier": 0.75,
-          "aura": {
-            "radius": 85,
-            "damagePerSecond": 25,
-            "color": "#ff7043"
-          }
-        }
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 0.8
       },
       "shiny-charizard": {
         "moves": [

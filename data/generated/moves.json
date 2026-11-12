@@ -350,6 +350,19 @@
     "contestType": "smart",
     "damageClass": "physical"
   },
+  "burn-up": {
+    "names": {
+      "ja": "もえつきる",
+      "en": "Burn Up",
+      "fr": "Flamme Ultime",
+      "de": "Ausbrennen",
+      "es": "Llama Final",
+      "it": "Ultima Fiamma"
+    },
+    "type": "fire",
+    "contestType": null,
+    "damageClass": "special"
+  },
   "charge": {
     "names": {
       "ja": "じゅうでん",
@@ -1312,6 +1325,19 @@
     "contestType": "cute",
     "damageClass": "status"
   },
+  "heat-wave": {
+    "names": {
+      "ja": "ねっぷう",
+      "en": "Heat Wave",
+      "fr": "Canicule",
+      "de": "Hitzewelle",
+      "es": "Onda Ígnea",
+      "it": "Ondacalda"
+    },
+    "type": "fire",
+    "contestType": "beauty",
+    "damageClass": "special"
+  },
   "heavy-slam": {
     "names": {
       "ja": "ヘビーボンバー",
@@ -2026,6 +2052,19 @@
     "type": "dragon",
     "contestType": "cool",
     "damageClass": "physical"
+  },
+  "overheat": {
+    "names": {
+      "ja": "オーバーヒート",
+      "en": "Overheat",
+      "fr": "Surchauffe",
+      "de": "Hitzekoller",
+      "es": "Sofoco",
+      "it": "Vampata"
+    },
+    "type": "fire",
+    "contestType": "beauty",
+    "damageClass": "special"
   },
   "pay-day": {
     "names": {

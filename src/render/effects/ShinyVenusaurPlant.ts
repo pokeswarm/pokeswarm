@@ -41,6 +41,10 @@ export class ShinyVenusaurPlant {
         this.drawPuddle(h.x, h.y, h.radius, timeMs, Math.min(1, t / 0.15) * Math.min(1, left / 0.5), h.x * 0.021 + h.y * 0.017);
       } else if (mv.id === 'venusaur-s-frenzy-plant' && h.activeTicks !== undefined) {
         roots.push({ h, t, left });
+      } else if (mv.id === 'venusaur-s-body-slam' && h.activeTicks !== undefined) {
+        // 着地: 当たりの縁まで土ぼこりの輪が広がる（くぼみの絵は体の下に隠れるので、届いた範囲を輪で見せる）
+        const total0 = Math.max(1, Math.round(world.rules.stage.bossRules.hazardActiveSeconds / world.dt));
+        this.drawSlamDust(h.x, h.y, h.radius, Math.min(1, (total0 - h.activeTicks + alpha) / total0));
       } else if (mv.id === 'venusaur-s-giga-drain' && h.activeTicks !== undefined) {
         this.drawDrain(world, h, timeMs, mv);
       }
@@ -69,13 +73,26 @@ export class ShinyVenusaurPlant {
     }
   }
 
+  /** のしかかりの着地: 土ぼこりの輪が当たりの縁まで広がって薄れる。縁に土の粒 */
+  private drawSlamDust(x: number, y: number, r: number, k: number): void {
+    const e = 1 - (1 - k) * (1 - k);
+    const rr = r * (0.55 + 0.45 * e);
+    this.floor.fillStyle(0x3e2c1f, 0.3 * (1 - k)).fillCircle(x, y, rr);
+    this.g.lineStyle(10 * (1 - k) + 2, 0xd7ccc8, 0.75 * (1 - k)).strokeCircle(x, y, rr);
+    for (let c = 0; c < 12; c++) {
+      const ang = (c / 12) * Math.PI * 2 + 0.3;
+      const d = rr + 4;
+      this.g.fillStyle(0xa1887f, 0.9 * (1 - k)).fillCircle(x + Math.cos(ang) * d, y + Math.sin(ang) * d - Math.sin(Math.PI * e) * 10, 5 * (1 - k) + 2);
+    }
+  }
+
   /** ねむりごなの雲: 重なる淡い塊（ゆっくり揺れる）と、ゆっくり上る胞子。明滅させない */
   private drawCloud(x: number, y: number, r: number, timeMs: number, a: number, seed: number): void {
     if (a <= 0.01) return;
     const n = 9;
     for (let k = 0; k < n; k++) {
       const ang = (k / n) * Math.PI * 2 + seed;
-      const d = k === 0 ? 0 : r * (0.38 + 0.14 * Math.sin(seed * 3 + k * 1.7));
+      const d = k === 0 ? 0 : r * (0.45 + 0.1 * Math.sin(seed * 3 + k * 1.7));
       const wob = Math.sin(timeMs / 900 + k * 1.3 + seed) * r * 0.06;
       const cx = x + Math.cos(ang) * d + wob;
       const cy = y + Math.sin(ang) * d * 0.8 + Math.cos(timeMs / 1100 + k) * r * 0.05;
@@ -83,6 +100,9 @@ export class ShinyVenusaurPlant {
       this.g.fillStyle(k % 3 === 0 ? 0xd9f2e6 : 0xe8def8, 0.16 * a).fillCircle(cx, cy, br);
     }
     this.g.fillStyle(0xf3eefc, 0.12 * a).fillCircle(x, y, r * 0.55);
+    // 当たりの広さ: 縁まで薄く満たし、淡い輪郭（雲の外に見えて当たる所を作らない）
+    this.g.fillStyle(0xe8def8, 0.08 * a).fillCircle(x, y, r);
+    this.g.lineStyle(2, 0xd1c4e9, 0.35 * a).strokeCircle(x, y, r * 0.98);
     // 胞子: ゆっくり上って消える小さな粒
     for (let k = 0; k < 12; k++) {
       const life = ((timeMs / 2600 + k / 12 + seed) % 1 + 1) % 1;

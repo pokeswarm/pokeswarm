@@ -1601,6 +1601,91 @@ function mewtwoWall(): (Rgb | null)[] {
   return out;
 }
 
+/** 色違いのカメックス（07 の256章）: セキチクの南の浜（曇りの日の引き潮）。ぬれた砂は暗くくすんだ茶（青白い水流・紫と緑の体と重ねない） */
+const SAND = ['#2a2622', '#322d28', '#3b352e', '#453e35', '#50483d'].map(hex);
+const WET = hex('#262a2c');
+const SHELL = ['#5e574d', '#6b6357', '#575047'].map(hex);
+
+function blastoiseFloor(): { floor: Rgb[] } {
+  const floor: Rgb[] = [];
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    let t = 0.45 + (fbm(x / 120, y / 90, 1201) - 0.5) * 0.4 + (fbm(x / 18, y / 18, 1203) - 0.5) * 0.12;
+    // 砂の波の跡: ところどころに、ゆるく曲がった薄い明暗（線にしない）
+    const warp = (fbm(x / 70, y / 70, 1205) - 0.5) * 60;
+    const patch = Math.max(0, (fbm(x / 90, y / 90, 1207) - 0.5) / 0.25);
+    t += Math.sin((y + warp + x * 0.18) / 6.5) * 0.06 * Math.min(1, patch);
+    // 海に近い上ほど、ぬれて暗い
+    const wet = Math.max(0, 1 - y / 150) * 0.5 + Math.max(0, fbm(x / 60, y / 40, 1209) - 0.6) * 1.2;
+    let col = ramp(SAND, t, x, y);
+    if (wet > 0) col = mix(col, WET, Math.min(0.5, wet));
+    // 外ほど少し暗い
+    const edge = Math.min(x, y, W - 1 - x, H - 1 - y);
+    if (edge < 40) col = mix(col, SAND[0]!, (1 - edge / 40) * 0.35);
+    // 貝のかけら・小石（まばらな 1〜2 ドット）
+    const r = hash2(x >> 1, y >> 1, 1211);
+    // 多いと星空に見えたので、ごくまばらに暗めで
+    if (r > 0.9995) col = SHELL[Math.floor(hash2(x >> 1, y >> 1, 1213) * 3)]!;
+    else if (hash2(x, y, 1215) > 0.997) col = SAND[0]!;
+    floor.push(col);
+  }
+  return { floor };
+}
+
+/** 外: 上は暗い海（波打ち際にやわらかい泡）、左右と下は暗い砂丘と浜の草 */
+const NIGHT_SEA = ['#0a161d', '#0d1d25', '#11252e', '#152d37', '#1a3540'].map(hex);
+const DUNE = ['#151310', '#1b1814', '#221e19', '#2a251f', '#332d25'].map(hex);
+const BEACH_GRASS = ['#2a2919', '#33311e', '#3c3a23'].map(hex);
+
+function blastoiseWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const rimLight = hex('#5a5145');
+  const rimDark = hex('#120f0c');
+  const foam = hex('#6f8890');
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = inset(iy, 61) - ix;
+    const fromRight = ix - (W - 1 - inset(iy, 62));
+    const fromTop = inset(ix, 63) - iy;
+    const fromBottom = iy - (H - 1 - inset(ix, 64));
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    const isTop = fromTop >= Math.max(fromLeft, fromRight, fromBottom);
+    let col: Rgb;
+    if (isTop) {
+      // 海: 沖ほど暗い。ゆるいうねりの明暗
+      const swell = Math.sin((y + (fbm(x / 80, y / 30, 1221) - 0.5) * 30) / 5.5) * 0.08;
+      const t = 0.62 - dist * 0.012 + swell + (fbm(x / 50, y / 20, 1223) - 0.5) * 0.25;
+      col = ramp(NIGHT_SEA, t, x, y, 0.5);
+      // 波打ち際の泡: 浜に近いほど濃く、とぎれとぎれ（はっきりした線にしない）
+      const f = fbm(x / 14, y / 5, 1225);
+      if (dist < 9 && f > 0.48 + dist * 0.035) col = mix(col, foam, Math.min(0.75, (f - 0.45) * 2.2));
+      else if (dist < 22 && f > 0.72 && hash2(x, y, 1227) > 0.5) col = mix(col, foam, 0.3);
+    } else {
+      // 砂丘: 大きくなだらかな盛り上がり（上が明るい）と、まばらな浜の草
+      const mound = fbm(x / 45, y / 30, 1231);
+      const lit = fbm(x / 45, (y - 6) / 30, 1231) - mound;
+      let t = 0.35 + mound * 0.35 - lit * 2.5 + (hash2(x >> 1, y >> 1, 1233) - 0.5) * 0.1;
+      t -= Math.max(0, dist - 10) * 0.01;
+      col = ramp(DUNE, t, x, y, 0.4);
+      // 浜の草: まばらな株から、細い葉が 3 本ずつ扇に立つ（塊で描くと字に見えた）
+      const tuft = worley(x, y, 22, 1235);
+      if (hash2(tuft.id, 3, 1239) > 0.72 && tuft.dy < 0 && tuft.dy > -9) {
+        const h = -tuft.dy;
+        for (const slant of [-0.55, 0, 0.5]) if (Math.abs(tuft.dx - slant * h) < 0.6) col = BEACH_GRASS[Math.min(2, Math.floor(h / 3.5))]!;
+      }
+    }
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 2.5) col = isTop ? mix(rimLight, foam, 0.5) : rimLight;
+    out.push(col);
+  }
+  return out;
+}
+
 const arenas = [
   { id: 'lugia', ...lugiaFloor(), wall: lugiaWall() },
   { id: 'hooh', ...hoohFloor(), wall: hoohWall() },
@@ -1613,6 +1698,7 @@ const arenas = [
   { id: 'moltres', region: 'kanto', ...moltresFloor(), shimmerA: null, shimmerB: null, wall: moltresWall() },
   { id: 'charizard', region: 'kanto', ...charizardFloor(), shimmerA: null, shimmerB: null, wall: charizardWall() },
   { id: 'venusaur', region: 'kanto', ...venusaurFloor(), shimmerA: null, shimmerB: null, wall: venusaurWall() },
+  { id: 'blastoise', region: 'kanto', ...blastoiseFloor(), shimmerA: null, shimmerB: null, wall: blastoiseWall() },
 ];
 for (const a of arenas) {
   const outDir = path.join('public', 'map', 'region' in a ? a.region : 'johto');

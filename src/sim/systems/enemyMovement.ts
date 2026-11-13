@@ -108,7 +108,10 @@ export function moveEnemies(world: World): void {
       continue;
     }
     const motion = world.rules.enemies.kinds[e.kind[i]!]?.motion;
-    if (motion && !legendWeatherState(world, i)?.chase) bossMotion(world, i, target, motion);
+    // 突進の予告中・突進中は間合いの動きを止める（動くと予告の帯から外れ、突進が帯とずれた所を走った。07 の254章）
+    if (motion && !legendWeatherState(world, i)?.chase) {
+      if (!ownDashPending(world, e.id[i]!)) bossMotion(world, i, target, motion);
+    }
     else if (best > 0) {
       const d = Math.sqrt(best);
       const step = Math.min(e.speed[i]! * speedMultiplier(world, i) * world.dt, d);
@@ -125,6 +128,11 @@ export function moveEnemies(world: World): void {
       e.kbTicks[i]!--;
     }
   }
+}
+
+/** 自分の突進の技（予告中・突進中）があるか */
+function ownDashPending(world: World, id: number): boolean {
+  return world.hazards.some((h) => h.dasher === id && !!world.rules.stage.moves[h.move]?.dashSpeed);
 }
 
 /**

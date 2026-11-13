@@ -64,6 +64,25 @@ describe('色違いのリザードン（07 の254章）', () => {
     void w;
   });
 
+  it('突進は予告の帯の上を走る（予告の間も突進の間も、間合いの動きで帯から外れない）', () => {
+    const { w, i, step, of } = setup();
+    w.enemies.hp[i()] = w.enemies.maxHp[i()]! * 0.65;
+    let checked = 0;
+    for (let t = 0; t < 30 * 8; t++) {
+      step(1 / 30);
+      for (const h of of('charizard-s-blaze-dash')) {
+        const rx = w.enemies.x[i()]! - h.x;
+        const ry = w.enemies.y[i()]! - h.y;
+        const along = rx * h.dirX + ry * h.dirY;
+        // 今走っている帯（と、まだ動いていない予告）だけ: 体は帯の真ん中の線の上
+        if (h.activeTicks === undefined ? Math.abs(along) > 1 : along < 0 || along > h.length) continue;
+        expect(Math.abs(-rx * h.dirY + ry * h.dirX)).toBeLessThan(2);
+        checked++;
+      }
+    }
+    expect(checked).toBeGreaterThan(20);
+  });
+
   it('HP 66% で フレアドライブ: 炎をまとい（体のまわりに当たる）、3 回突進し、反動で HP を 4% 失い、技の間隔が短くなる', () => {
     const { w, i, boss, step, of } = setup();
     w.enemies.hp[i()] = w.enemies.maxHp[i()]! * 0.65;

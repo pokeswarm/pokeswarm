@@ -79,7 +79,7 @@ describe('色違いのカメックス（07 の256章）', () => {
     expect(Math.hypot(w.enemies.x[i()]! - endX, w.enemies.y[i()]! - endY)).toBeLessThan(40);
   });
 
-  it('近くでは ハイドロカノン: 狙った向きの左右 14° に 2 本の流れ（V 字）。出している間は止まっている', () => {
+  it('近くでは ハイドロカノン: 狙った向きの左右 8° に 2 本の流れ（V 字）。出している間は止まっている', () => {
     const { w, p, i, step, of, place } = setup();
     let arms: ReturnType<typeof of> = [];
     for (let t = 0; t < 30 * 4 && arms.length === 0; t++) {
@@ -90,8 +90,8 @@ describe('色違いのカメックス（07 の256章）', () => {
     expect(arms.length).toBe(2);
     const aim = angle(p.x - w.enemies.x[i()]!, p.y - w.enemies.y[i()]!);
     const a = arms.map((h) => diff(angle(h.dirX, h.dirY), aim)).sort((x, y) => x - y);
-    expect(a[0]).toBeCloseTo(-14, 0);
-    expect(a[1]).toBeCloseTo(14, 0);
+    expect(a[0]).toBeCloseTo(-8, 0);
+    expect(a[1]).toBeCloseTo(8, 0);
     // 撃っている間は止まったまま
     for (let t = 0; t < 30 && !arms[0]!.activeTicks; t++) step(1 / 30);
     const at = { x: w.enemies.x[i()]!, y: w.enemies.y[i()]! };
@@ -160,7 +160,7 @@ describe('色違いのカメックス（07 の256章）', () => {
     expect(cannons.size).toBeGreaterThanOrEqual(3);
   });
 
-  it('HP 33% で 究極のハイドロカノン: 真ん中で甲羅にこもり、V 字の 2 本の流れを、ゆっくり回し始めて加速しながら 1 周回す。その後 4 秒止まる', () => {
+  it('HP 33% で 究極のハイドロカノン: 真ん中で甲羅にこもり、開き 90° の V 字の 2 本の流れ（壁まで）を、ゆっくり回し始めて加速しながら 6 秒で 1 周回す。その後 4 秒止まる', () => {
     const { w, i, boss, step, of } = setup();
     w.enemies.hp[i()] = w.enemies.maxHp[i()]! * 0.32;
     // HP 66% の大技は飛ばす
@@ -171,13 +171,14 @@ describe('色違いのカメックス（07 の256章）', () => {
     expect(arms.length).toBe(2);
     // 真ん中で
     expect(Math.hypot(w.enemies.x[i()]! - w.arena!.x, w.enemies.y[i()]! - w.arena!.y)).toBeLessThan(20);
-    // V 字: 2 本の間は 50°
-    expect(Math.abs(diff(angle(arms[0]!.dirX, arms[0]!.dirY), angle(arms[1]!.dirX, arms[1]!.dirY)))).toBeCloseTo(50, 0);
+    // V 字: 2 本の間は 90°。壁まで届く
+    expect(Math.abs(diff(angle(arms[0]!.dirX, arms[0]!.dirY), angle(arms[1]!.dirX, arms[1]!.dirY)))).toBeCloseTo(90, 0);
+    expect(arms[0]!.length).toBeGreaterThan(Math.hypot(w.arena!.halfWidth, w.arena!.halfHeight));
     const a0 = angle(arms[0]!.dirX, arms[0]!.dirY);
     let turned = 0;
     let last = a0;
     const at: number[] = [];
-    for (let t = 0; t < Math.round(3.2 * 30) - 1; t++) {
+    for (let t = 0; t < Math.round(6 * 30) - 1; t++) {
       step(1 / 30);
       const a = angle(arms[0]!.dirX, arms[0]!.dirY);
       turned += diff(a, last);
@@ -186,8 +187,8 @@ describe('色違いのカメックス（07 の256章）', () => {
     }
     // 1 周（ほぼ 360°）回る
     expect(Math.abs(turned)).toBeGreaterThan(340);
-    // 加速: 前半の 1.6 秒で回るのは 1/4 ほど
-    expect(at[47]!).toBeLessThan(110);
+    // 加速: 前半の 3 秒で回るのは 1/4 ほど
+    expect(at[89]!).toBeLessThan(110);
     // 回っている間は止まったまま、その後 4 秒止まる
     let recharge = false;
     for (let t = 0; t < 30 * 3; t++) {
@@ -195,6 +196,57 @@ describe('色違いのカメックス（07 の256章）', () => {
       recharge ||= of('blastoise-s-recharge').length > 0;
     }
     expect(recharge).toBe(true);
+  });
+
+  it('究極のハイドロカノンは、回る向きに早く気づいて V の間に乗って一緒に回れば当たらない。立ち止まると当たる（07 の256章）', () => {
+    const dodge = (ride: boolean): boolean => {
+      const { sim, w, p, i, boss, of } = setup();
+      w.enemies.hp[i()] = w.enemies.maxHp[i()]! * 0.32;
+      boss.hpMoves = boss.hpMoves!.filter((h) => h.belowRatio < 0.5);
+      const ult = (): ReturnType<typeof of> => [...of('blastoise-s-ultimate-cw'), ...of('blastoise-s-ultimate-ccw')];
+      let hit = false;
+      let t0: number | null = null;
+      let base = 0;
+      let sign = 1;
+      for (let t = 0; t < 30 * 16; t++) {
+        const arms = ult();
+        const cx = w.enemies.x[i()]!;
+        const cy = w.enemies.y[i()]!;
+        if (arms.length === 2 && arms[0]!.activeTicks === undefined) {
+          // 予告の間は V の間（狙われた所）にいる
+          base = Math.atan2(arms[0]!.dirY + arms[1]!.dirY, arms[0]!.dirX + arms[1]!.dirX);
+          sign = of('blastoise-s-ultimate-cw').length ? 1 : -1;
+        }
+        if (arms.length === 2 && arms[0]!.activeTicks !== undefined) {
+          t0 ??= w.tick;
+          const el = (w.tick - t0) * w.dt;
+          // 向きが見えて（約 0.8 秒）から 0.2 秒で気づき、少し先の V の真ん中へ、速さ 180 で向かう。速く回るほどボスに寄る（ついていける半径）
+          if (ride && el > 1.0) {
+            const a = base + ((sign * 360 * Math.min(1, (el + 0.1) / 6) ** 2) * Math.PI) / 180;
+            const omega = ((2 * 360 * el) / 36) * (Math.PI / 180);
+            const rad = Math.max(75, Math.min(140, 170 / Math.max(0.01, omega)));
+            const gx = cx + Math.cos(a) * rad;
+            const gy = cy + Math.sin(a) * rad;
+            const d = Math.hypot(gx - p.x, gy - p.y);
+            const s = Math.min(d, 180 * w.dt);
+            if (d > 0) {
+              p.x += ((gx - p.x) / d) * s;
+              p.y += ((gy - p.y) / d) * s;
+            }
+          }
+        } else if (t0 !== null) break;
+        p.maxHp = 1e6;
+        p.hp = 1e6;
+        p.invincibleTicks = 0;
+        sim.step([]);
+        // あわ（ずっと出す技）は数えず、究極のハイドロカノンに当たったかだけ
+        hit ||= ult().some((h) => h.hitLocal);
+      }
+      expect(t0).not.toBeNull();
+      return !hit;
+    };
+    expect(dodge(true)).toBe(true);
+    expect(dodge(false)).toBe(false);
   });
 
   it('究極のハイドロカノンの回る向きは、戦いごとに右回りと左回りがある', () => {

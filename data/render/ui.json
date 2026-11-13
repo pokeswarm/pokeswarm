@@ -1,5 +1,6 @@
 {
   "compactHeight": 520,
+  "bossMoveName": { "holdMs": 700, "fadeMs": 300 },
   "evolutionCancelPresses": 8,
   "compactHud": { "iconScale": 2, "cellWidth": 38, "expBarHeight": 14, "timerSize": 16 },
   "font": {

@@ -186,6 +186,8 @@ export class RunScene extends Phaser.Scene {
   private readonly dashLooks = new Map<number, { pose: string; effect: string; dirX: number; dirY: number }>();
   /** ボスの上に最後に出した技の名前（ボスの id → 技のキー。続きの技・何度も落ちる技で同じ名前を出し直さない。07 の257章） */
   private readonly moveNameShown = new Map<number, string>();
+  /** ボスの上に出している技の名前（ボスの id → 文字と出した時刻。1 体に 1 つだけ。新しい名前が出たら前の名前は消す） */
+  private readonly moveNameLabels = new Map<number, { text: Phaser.GameObjects.Text; born: number }>();
   /** 水の上を走る足元（07 の225章） */
   private waterRun: WaterRun | null = null;
   private introFading = false;
@@ -2802,11 +2804,29 @@ export class RunScene extends Phaser.Scene {
     if (this.moveNameShown.get(bossId) === key) return;
     this.moveNameShown.set(bossId, key);
     const name = localName(generated.moves[key]?.names, getLocale(), key);
-    const x = w.enemies.x[i]!;
-    const y = w.enemies.y[i]! - w.enemies.radius[i]! * 3.4;
-    const text = this.add.text(x, y, name, px(32, '#ffffff', { outline: true, align: 'center' })).setOrigin(0.5).setDepth(spriteRender.depths.candy + 2);
-    this.tweens.add({ targets: text, y: y - 28, duration: 1400, ease: 'Sine.easeOut' });
-    this.tweens.add({ targets: text, alpha: 0, delay: 900, duration: 500, onComplete: () => text.destroy() });
+    this.moveNameLabels.get(bossId)?.text.destroy();
+    const text = this.add.text(0, 0, name, px(32, '#ffffff', { outline: true, align: 'center' })).setOrigin(0.5).setDepth(spriteRender.depths.candy + 2);
+    this.moveNameLabels.set(bossId, { text, born: this.time.now });
+    this.updateMoveNames(1);
+  }
+
+  /** ボスの上の技の名前: ボスについて動き、決まった時間見せて消える（data/render/ui.json の bossMoveName。ゲームの時計で数える） */
+  private updateMoveNames(alpha: number): void {
+    const w = this.sim.world;
+    const { holdMs, fadeMs } = uiConfig.bossMoveName;
+    for (const [id, label] of this.moveNameLabels) {
+      const age = this.time.now - label.born;
+      const i = findEnemyIndex(w, id);
+      if (i === -1 || age >= holdMs + fadeMs) {
+        label.text.destroy();
+        this.moveNameLabels.delete(id);
+        continue;
+      }
+      const e = w.enemies;
+      const x = e.prevX[i]! + (e.x[i]! - e.prevX[i]!) * alpha;
+      const y = e.prevY[i]! + (e.y[i]! - e.prevY[i]!) * alpha;
+      label.text.setPosition(x, y - e.radius[i]! * 3.4).setAlpha(age <= holdMs ? 1 : 1 - (age - holdMs) / fadeMs);
+    }
   }
 
   /** 敵の濃さ: 消えているボス（潜る・跳ぶ）は見せず、かげぶんしん の偽物は少し透かす（07 の167章） */
@@ -3053,6 +3073,7 @@ export class RunScene extends Phaser.Scene {
         (i) => e.hp[i]! > 0 && this.streamer.manifestOf(e.kind[i]!) === null && this.enemyAlpha(i) > 0,
       );
     this.perishCounts?.update(world, alpha, view);
+    this.updateMoveNames(alpha);
     const sprites = this.streamer.stats();
     const pr = world.projectiles;
     this.effects.drawProjectiles(

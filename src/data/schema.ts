@@ -48,6 +48,8 @@ export type PlaceholderRenderConfig = z.infer<typeof placeholderRenderSchema>;
  * 原作をまねた白い窓・黒い窓、画面上部の経験値のバー・経過時間・コイン
  */
 export const uiConfigSchema = z.object({
+  /** ボスの上に出す技の名前（ミュウの ゆびをふる。07 の257章）: 見せる時間と、消えていく時間（ミリ秒） */
+  bossMoveName: z.object({ holdMs: z.number().positive(), fadeMs: z.number().positive() }),
   /** イーブイの進化をキャンセルするのに、演出の間に ← と → を交互に押す回数（07 の81章） */
   evolutionCancelPresses: z.number().int().positive().default(8),
   /** 画面の高さがこれより低いと、つめた表示にする（横向きのスマホ。作者の決定 2026年10月22日） */

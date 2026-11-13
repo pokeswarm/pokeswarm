@@ -112,4 +112,36 @@ describe('色違いのリザードン（07 の254章）', () => {
     expect(pillars).toBe(48);
     expect(recharge).toBe(true);
   });
+
+  it('究極のブラストバーンの柱は、噴き出した後、出した場所の周りを層ごとに逆の向きへ回る（中心からの距離は変わらない）', () => {
+    const { w, i, step, of } = setup();
+    w.enemies.hp[i()] = w.enemies.maxHp[i()]! * 0.32;
+    // 全部の柱が噴き出すまで進める
+    for (let t = 0; t < 30 * 20 && !(of('charizard-s-ultimate').length === 48 && of('charizard-s-ultimate').every((h) => h.activeTicks !== undefined)); t++) step(1 / 30);
+    const pillars = of('charizard-s-ultimate');
+    expect(pillars.every((h) => h.activeTicks !== undefined)).toBe(true);
+    const before = pillars.map((h) => ({ h, a: Math.atan2(h.y - h.orbitY!, h.x - h.orbitX!), d: Math.hypot(h.x - h.orbitX!, h.y - h.orbitY!) }));
+    // 中心は全部同じ（出したときのボスの場所）
+    for (const p of before) {
+      expect(p.h.orbitX).toBeCloseTo(before[0]!.h.orbitX!, 3);
+      expect(p.h.orbitY).toBeCloseTo(before[0]!.h.orbitY!, 3);
+    }
+    step(1);
+    const turned = (p: (typeof before)[number]): number => {
+      const a = Math.atan2(p.h.y - p.h.orbitY!, p.h.x - p.h.orbitX!);
+      return Math.atan2(Math.sin(a - p.a), Math.cos(a - p.a));
+    };
+    const byLayer = new Map<number, number[]>();
+    for (const p of before) {
+      expect(Math.hypot(p.h.x - p.h.orbitX!, p.h.y - p.h.orbitY!)).toBeCloseTo(p.d, 3);
+      const layer = Math.round((p.d - 140) / 120);
+      byLayer.set(layer, [...(byLayer.get(layer) ?? []), turned(p)]);
+    }
+    expect(byLayer.size).toBe(6);
+    for (const [layer, turns] of byLayer) {
+      // 1 層 8 本が同じ向きに回る。隣の層とは逆
+      for (const t of turns) expect(Math.sign(t)).toBe(layer % 2 === 0 ? 1 : -1);
+      expect(Math.abs(turns[0]!)).toBeGreaterThan(0.2);
+    }
+  });
 });

@@ -145,6 +145,10 @@ export interface Hazard {
   readonly aimDist?: number;
   readonly boxX?: number;
   readonly boxY?: number;
+  /** 回る円（色違いのリザードンの究極のブラストバーン）: 回る中心と向き（1 か -1）。予告の遅れから層を決めるので、ゲストも同じになる */
+  readonly orbitX?: number;
+  readonly orbitY?: number;
+  readonly orbitSign?: number;
   /** 跳ね返った回数 */
   bounces?: number;
 }

@@ -2067,6 +2067,22 @@ function struckEvent(hz: World['hazards'][number], move: BossMove | undefined): 
 /** 落ちた後、当たっている間の動き: 進む（玉・波）・曲がる・揺れる・回る（なぎ払い）・大きくなる（ころがる） */
 function stepActiveHazard(world: World, hz: World['hazards'][number], move: BossMove | undefined): void {
   if (!move) return;
+  if (move.spin && hz.orbitX !== undefined && hz.orbitY !== undefined && hz.activeTicks !== undefined) {
+    // 回る円: 噴き出してから少し置いて、出したときのボスの場所の周りを回る（層ごとに逆回り）
+    const total = Math.max(1, Math.round((move.activeSeconds ?? 0) / world.dt));
+    if ((total - hz.activeTicks) * world.dt >= move.spin.afterSeconds) {
+      const a = (((hz.orbitSign ?? 1) * move.spin.degreesPerSecond * Math.PI) / 180) * world.dt;
+      const c = Math.cos(a);
+      const s = Math.sin(a);
+      const rx = hz.x - hz.orbitX;
+      const ry = hz.y - hz.orbitY;
+      hz.x = hz.orbitX + rx * c - ry * s;
+      hz.y = hz.orbitY + rx * s + ry * c;
+      const dx = hz.dirX;
+      hz.dirX = dx * c - hz.dirY * s;
+      hz.dirY = dx * s + hz.dirY * c;
+    }
+  }
   const bullets = move.bullets;
   if (bullets) {
     // 飛ぶ玉（サンダー）: 向きへまっすぐ進む
@@ -2481,6 +2497,13 @@ export function addHazard(
       if (hz.dasher === dasher && world.rules.stage.moves[hz.move]?.barrier) world.hazards.splice(h, 1);
     }
   }
+  // 回る円: 何番目の層か（予告の遅れ ＝ stagger × 層）から、出したときのボスの場所と回る向きを決める
+  let orbit: { orbitX: number; orbitY: number; orbitSign: number } | undefined;
+  if (move.spin && move.along) {
+    const layer = move.stagger ? Math.round(((extra.delay ?? 0) * world.dt) / move.stagger) : 0;
+    const d = move.along.start + layer * move.along.spacing;
+    orbit = { orbitX: x - dirX * d, orbitY: y - dirY * d, orbitSign: move.spin.alternate && layer % 2 === 1 ? -1 : 1 };
+  }
   world.hazards.push({
     move: moveIdx,
     shape: move.shape,
@@ -2502,6 +2525,7 @@ export function addHazard(
     ...(extra.vx !== undefined && extra.vy !== undefined && (extra.vx !== 0 || extra.vy !== 0) ? { vx: extra.vx, vy: extra.vy } : {}),
     ...(extra.boxX !== undefined && extra.boxY !== undefined ? { boxX: extra.boxX, boxY: extra.boxY } : {}),
     ...(extra.aimDist !== undefined ? { aimDist: extra.aimDist } : {}),
+    ...(orbit ?? {}),
     ...((move.counter || move.mirrorShards || move.interruptDamage) && di !== -1 ? { hpAtStart: world.enemies.hp[di]! } : {}),
   });
   // 予告の間止まる技（ゲストも同じ知らせで止める）

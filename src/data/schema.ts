@@ -878,6 +878,11 @@ export const bossMoveSchema = z.object({
   around: z.object({ radius: z.number().positive(), clockwise: z.boolean().default(true), /** 輪の中心: self（ボス）か target（狙った人。クロバットの どくどく） */ center: z.enum(['self', 'target']).default('self'), /** 輪の切れ目（度）。ボスと反対側を空ける（リザードンの ほのおのうず。07 の197章） */ gapDegrees: z.number().positive().optional() }).optional(),
   /** 狙った人への向きに沿って count 個の円を spacing ずつ並べ、順に（stagger）置く（エンテイのふみつけ） */
   along: z.object({ spacing: z.number().positive(), start: z.number().default(80) }).optional(),
+  /**
+   * （spin）along で並べた円が、当たっている間ボスの場所（出したときの）を中心に回る（色違いのリザードンの究極のブラストバーン。07 の254章）。
+   * afterSeconds 噴き出してから回り始めるまで。alternate なら層（根元から何番目か）ごとに逆回り
+   */
+  spin: z.object({ degreesPerSecond: z.number(), afterSeconds: z.number().min(0).default(0), alternate: z.boolean().default(true) }).optional(),
   /** 横に長い帯（全体の長さ length）を、狙った人の手前 distance から押し寄せさせる。1か所 gap の切れ目（ラプラスのなみのり） */
   wall: z.object({ length: z.number().positive(), gap: z.number().positive(), distance: z.number().positive() }).optional(),
   /** 狙い直しながら count 回置く（everySeconds ごと。ネイティオのみらいよち: 足跡のように並ぶ） */

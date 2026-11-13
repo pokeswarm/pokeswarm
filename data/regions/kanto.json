@@ -563,7 +563,12 @@
         "moveIntervalSeconds": 0.8
       },
       "shiny-charizard": {
-        "arena": { "halfWidth": 800, "halfHeight": 440, "viewHeight": 960 },
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960,
+          "map": { "floor": "map/kanto/arena-charizard-floor.png", "wall": "map/kanto/arena-charizard-wall.png", "wallMargin": 60, "pixelScale": 2 }
+        },
         "anchor": { "x": 0, "y": -220 },
         "noEnrage": true,
         "casters": [{ "move": "air-slash", "level": 8, "everySeconds": 2.8 }],

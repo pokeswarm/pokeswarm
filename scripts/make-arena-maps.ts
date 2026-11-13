@@ -1296,6 +1296,138 @@ function moltresWall(): (Rgb | null)[] {
   return out;
 }
 
+// --- 色違いのリザードン: 岩山の頂の岩棚（夕暮れ。縁の外は崖の下の谷と遠い尾根。07 の254章） ---
+
+/**
+ * 体は青みの灰色・翼は深い赤・技は橙の炎なので、床は少し緑がかった土色の岩（灰色にも赤にも寄せない）。
+ * 暗くしすぎない（黒い縁の体が沈む）
+ */
+const LEDGE = ['#29271f', '#333027', '#3e3a2f', '#4a4537', '#575142'].map(hex);
+const DRY_GRASS = ['#56503a', '#665f45', '#787050'].map(hex);
+const SOOT = hex('#17150f');
+
+function charizardFloor(): { floor: Rgb[] } {
+  const floor: Rgb[] = [];
+  // リザードンが炎を吐いた焦げ跡（数か所。ふちはぼかす）
+  const burns = [[210, 120, 30], [590, 300, 36], [660, 95, 24], [140, 330, 26]] as const;
+  // 枯れ草の房: 36 ドットのます目ごとに、まばらに 1 房（細かい点を散らすとカビや迷彩柄に見えた）
+  const tufts = new Map<number, { x: number; y: number; k: number }[]>();
+  for (let gy = 0; gy < H / 36 + 1; gy++) for (let gx = 0; gx < W / 36 + 1; gx++) {
+    if (hash2(gx, gy, 1031) < 0.72) continue;
+    const tx = gx * 36 + Math.floor(hash2(gx, gy, 1033) * 30);
+    const ty = gy * 36 + Math.floor(hash2(gx, gy, 1035) * 30);
+    const c = Math.hypot((tx - W / 2) / (W / 2), (ty - H / 2) / (H / 2));
+    if (c < 0.42 || burns.some(([bx, by, br]) => Math.hypot(tx - bx, ty - by) < br * 1.5)) continue;
+    // 2〜4 房の茂み
+    const n = 2 + Math.floor(hash2(gx, gy, 1039) * 3);
+    const list = [];
+    for (let m = 0; m < n; m++) list.push({ x: tx + Math.floor((hash2(gx * 7 + m, gy, 1047) - 0.5) * 16), y: ty + Math.floor((hash2(gx, gy * 7 + m, 1049) - 0.5) * 9), k: Math.floor(hash2(gx + m, gy, 1037) * 3) });
+    tufts.set(gy * 1000 + gx, list);
+  }
+  // 房の形（下が根元。3〜4 本の短い葉が上へ開く）
+  const BLADES = [
+    ['..x.x..', '.x.x.x.', '..xxx..', '...x...'],
+    ['.x...x.', '..x.x..', '.x.x...', '..xx...'],
+    ['x..x..x', '.x.x.x.', '..xxx..', '...x...'],
+  ];
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    // 大きな岩棚: 斜めにゆるく流れる地層と、板ごとの明るさ。板の上は少し明るく、割れ目はぼかした暗がり（線は引かない）
+    const strata = fbm((x + y * 0.55) / 150, (y - x * 0.2) / 40, 1001);
+    // 板の境は揺らして不揃いに（まっすぐな境と暗い割れ目は敷石に見えた）
+    const wx = x + (fbm(x / 45, y / 45, 1041) - 0.5) * 70;
+    const wy = y + (fbm(x / 45 + 9, y / 45 + 9, 1043) - 0.5) * 70;
+    const slab = worley(wx, wy, 90, 1003);
+    let t = 0.47 + (strata - 0.5) * 0.75 + (hash2(slab.id, 1, 1005) - 0.5) * 0.1 + (fbm(x / 13, y / 13, 1007) - 0.5) * 0.12 + (fbm(x / 4, y / 30, 1045) - 0.5) * 0.08;
+    // 尾根の背: 左上から右下へゆるく曲がって通る明るい帯。両側は下りの斜面で少し暗い（岩山の頂に立っている形）
+    const ridgeY = H * 0.5 + (x - W / 2) * 0.32 + Math.sin(x / 140) * 26;
+    const across = (y - ridgeY) / 120;
+    t += Math.exp(-across * across) * 0.16 - 0.06;
+    // 真ん中（リザードンが降りる所）は平らで明るめ
+    const center = Math.hypot((x - W / 2) / (W / 2), (y - H / 2) / (H / 2));
+    if (center < 0.45) t = t * 0.75 + 0.56 * 0.25;
+    let col = ramp(LEDGE, t, x, y);
+    // 夕日の照り返し: 下の縁（夕日の側）ほど少し暖かい
+    const sun = Math.max(0, (y - H * 0.6) / (H * 0.4));
+    if (sun > 0) col = mix(col, DUSK[3]!, sun * sun * 0.14);
+    for (const [bx, by, br] of burns) {
+      const d = Math.hypot((x - bx) / 1.4, y - by) / (br * (0.8 + fbm(x / 9, y / 9, 1009) * 0.5));
+      if (d < 1) col = mix(col, SOOT, 0.45 * (1 - d * d));
+    }
+    // 枯れ草の房
+    const near: { x: number; y: number; k: number }[] = [];
+    for (const [ox, oy] of [[0, 0], [12, 0], [-12, 0], [0, 8], [0, -8], [12, 8], [-12, -8], [12, -8], [-12, 8]] as const) near.push(...(tufts.get(Math.floor((y + oy) / 36) * 1000 + Math.floor((x + ox) / 36)) ?? []));
+    for (const tf of new Set(near)) {
+      const rows = BLADES[tf.k]!;
+      const ry = y - (tf.y - rows.length + 1);
+      const rx = x - (tf.x - 3);
+      if (ry >= 0 && ry < rows.length && rx >= 0 && rx < 7 && rows[ry]![rx] === 'x') col = DRY_GRASS[ry === 0 ? 2 : ry < 2 ? 1 : 0]!;
+      // 房の根元の影
+      else if (ry === rows.length && rx >= 2 && rx <= 4) col = mix(col, LEDGE[0]!, 0.5);
+    }
+    // 小石（明るい点と影の点）
+    const r = hash2(x, y, 1017);
+    if (r > 0.995) col = LEDGE[4]!;
+    else if (r < 0.003) col = LEDGE[0]!;
+    floor.push(col);
+  }
+  return { floor };
+}
+
+const RIDGE = ['#0f0e14', '#16141c', '#1e1a24', '#28212b'].map(hex);
+/** 夕暮れのもや（下の縁にだけ。上は HUD があるので暗いまま） */
+const DUSK = ['#2a2026', '#3a2a2b', '#4f362e', '#644432'].map(hex);
+
+function charizardWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const rimLight = hex('#6d6550');
+  const rimDark = hex('#14130e');
+  const cliff = ['#18170f', '#211f17', '#2b281e', '#363226'].map(hex);
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = inset(iy, 41) - ix;
+    const fromRight = ix - (W - 1 - inset(iy, 42));
+    const fromTop = inset(ix, 43) - iy;
+    const fromBottom = iy - (H - 1 - inset(ix, 44));
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    // 岩棚の縁（内側の 9〜15 ドット。ごつごつした岩）
+    const lip = 12 + fbm(x / 13, y / 13, 1021) * 7;
+    let col: Rgb;
+    if (dist < lip) {
+      const stone = worley(x, y, 15, 1023);
+      const round = (stone.dx + stone.dy) / 15;
+      col = ramp(cliff, 0.5 + round * 0.4 + (hash2(stone.id, 1, 1025) - 0.5) * 0.3, x, y);
+      if (stone.edge < 0.7) col = cliff[0]!;
+    } else {
+      // 縁の外: 崖の下の暗い谷 → 近い尾根 → 遠い尾根 → 空。尾根の線は縁に沿ってなだらかに上下する
+      const far = (dist - lip) / (MARGIN - lip);
+      const side = Math.max(fromLeft, fromRight) > Math.max(fromTop, fromBottom);
+      const along = side ? y : x;
+      const near1 = 0.3 + fbm(along / 38, side ? 3 : 1, 1027) * 0.28;
+      const near2 = 0.58 + fbm(along / 55, side ? 7 : 5, 1029) * 0.26;
+      // 夕日の側（下）ほど暖かく、上は夜空
+      const warm = Math.min(1, Math.max(0, (y - fh * 0.35) / (fh * 0.6)));
+      if (far < near1) col = ramp(RIDGE, 0.15 + far * 0.6, x, y, 0.4);
+      else if (far < near2) col = mix(RIDGE[2]!, DUSK[0]!, warm * warm * 0.6);
+      else {
+        const sky = (far - near2) / Math.max(0.05, 1 - near2);
+        // 夜空から夕焼けへ、なめらかに混ぜる（境の線を作らない）
+        const k = warm * warm * (3 - 2 * warm);
+        col = mix(mix(RIDGE[1]!, hex('#121628'), 0.6), ramp(DUSK, 0.25 + sky * 0.75, x, y, 0.5), k);
+      }
+    }
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 2.5) col = rimLight;
+    out.push(col);
+  }
+  return out;
+}
+
 function mewtwoFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
   const floor: Rgb[] = [];
   const shimmerA: (Rgb | null)[] = [];
@@ -1394,6 +1526,7 @@ const arenas = [
   { id: 'articuno', region: 'kanto', ...articunoFloor(), wall: articunoWall() },
   { id: 'zapdos', region: 'kanto', ...zapdosFloor(), shimmerA: null, shimmerB: null, wall: zapdosWall() },
   { id: 'moltres', region: 'kanto', ...moltresFloor(), shimmerA: null, shimmerB: null, wall: moltresWall() },
+  { id: 'charizard', region: 'kanto', ...charizardFloor(), shimmerA: null, shimmerB: null, wall: charizardWall() },
 ];
 for (const a of arenas) {
   const outDir = path.join('public', 'map', 'region' in a ? a.region : 'johto');

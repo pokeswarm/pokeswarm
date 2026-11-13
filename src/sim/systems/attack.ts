@@ -1086,6 +1086,8 @@ const ONE_SHOT_FIRE: Record<string, (w: World, p: Player, pm: PlayerMove, st: Mo
   spiral: fireSpiral,
   pulse: firePulse,
   weather: fireWeather,
+  // まとう技（フレアドライブ）: 伝説が同じ技を出すとき（色違いのリザードン。07 の254章）
+  aura: fireWeather,
 };
 
 /**

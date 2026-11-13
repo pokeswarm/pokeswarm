@@ -2251,6 +2251,8 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
   }
   // 回復（エーフィの あさのひざし・カビゴンの ねむる）: 使ったボスの HP を戻す（HP はゲストへ送る）
   if (move.healPct && world.enemies.hp[i]! > 0) world.enemies.hp[i] = Math.min(world.enemies.maxHp[i]!, world.enemies.hp[i]! + (world.enemies.maxHp[i]! * move.healPct) / 100);
+  // 反動（フレアドライブ）: 自分の HP を失う（倒れはしない）
+  if (move.selfDamagePct && world.enemies.hp[i]! > 0) world.enemies.hp[i] = Math.max(1, world.enemies.hp[i]! - (world.enemies.maxHp[i]! * move.selfDamagePct) / 100);
   // 強化（ビルドアップ・りゅうのまい）
   if (move.buff && boss) {
     if (move.buff.radiusPct) boss.radiusBuff = { scale: 1 + move.buff.radiusPct / 100, uses: move.buff.uses };

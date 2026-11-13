@@ -780,6 +780,8 @@ export const bossMoveSchema = z.object({
   /** 今のマップの中の、狙った人から minDistance〜maxDistance の場所へ speed で滑っていく（スイクン。07 の218章） */
   glide: z.object({ minDistance: z.number().nonnegative(), maxDistance: z.number().positive(), speed: z.number().positive() }).optional(),
   /** 今のマップの中の、狙った人から minDistance〜maxDistance の場所へ瞬間移動する（予告はその場所。teleport・hideBoss と組む。ミュウツー。07 の250章） */
+  /** 落ちたとき、使ったボスが最大 HP のこの % を失う（反動。色違いのリザードンの フレアドライブ。倒れはしない。07 の254章） */
+  selfDamagePct: z.number().positive().optional(),
   /** この技が出ている間（予告の間も）、使ったボスが受けるダメージをこの % にする（ファイヤーの もえつきた後: 150。07 の253章） */
   takenPct: z.number().positive().optional(),
   /** 専用の絵のクラス（src/render/effects）で描く。飛ぶ玉のふつうの黄色い玉を描かない（ミュウツーの岩・はどうだん・フリーザーの こごえるかぜ。07 の250章） */

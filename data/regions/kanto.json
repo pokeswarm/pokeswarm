@@ -563,23 +563,19 @@
         "moveIntervalSeconds": 0.8
       },
       "shiny-charizard": {
-        "moves": [
-          "charizard-dash"
+        "arena": { "halfWidth": 800, "halfHeight": 440, "viewHeight": 960 },
+        "anchor": { "x": 0, "y": -220 },
+        "noEnrage": true,
+        "casters": [{ "move": "air-slash", "level": 8, "everySeconds": 2.8 }],
+        "casterPower": 1.2,
+        "hpMoves": [
+          { "belowHpPct": 66, "moves": ["charizard-s-flare-blitz", "charizard-s-blaze-dash", "charizard-s-recoil"] },
+          { "belowHpPct": 33, "moves": ["charizard-s-to-center", "charizard-s-ultimate", "charizard-s-recharge"] }
         ],
+        "moves": ["charizard-s-dragon-rage", "charizard-s-blast-burn", "charizard-s-dragon-rage"],
         "random": false,
-        "moveIntervalSeconds": 3,
-        "enrageMoveIntervalSeconds": 2,
-        "casters": [
-          {
-            "move": "flamethrower",
-            "level": 8
-          },
-          {
-            "move": "fire-spin",
-            "level": 8
-          }
-        ],
-        "casterPower": 1.2
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 1
       },
       "shiny-venusaur": {
         "moves": [

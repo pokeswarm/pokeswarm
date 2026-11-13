@@ -52,31 +52,7 @@ describe('色違いの御三家（プレイヤーと同じ技）', () => {
     return n;
   };
 
-  it('リザードン: かえんほうしゃ・ほのおのうずをずっと出し、プレイヤーに当たる（敵には当たらない）', () => {
-    const { sim, p } = legend('shiny-charizard');
-    let flame = 0;
-    let spin = 0;
-    const hp = p.hp;
-    for (let t = 0; t < 30 * 3; t++) {
-      sim.step([]);
-      flame = Math.max(flame, hostile(sim, 'flamethrower'));
-      spin = Math.max(spin, hostile(sim, 'fire-spin'));
-    }
-    expect(flame).toBeGreaterThan(0);
-    expect(spin).toBeGreaterThan(0);
-    expect(p.hp).toBeLessThan(hp);
-  });
-
-  it('リザードン: 突進の後に、プレイヤーと同じブラストバーンを出す', () => {
-    const { sim } = legend('shiny-charizard');
-    let blast = 0;
-    for (let t = 0; t < 30 * 6; t++) {
-      sim.world.players[0]!.invincibleTicks = 2;
-      sim.step([]);
-      blast = Math.max(blast, hostile(sim, 'blast-burn'));
-    }
-    expect(blast).toBeGreaterThan(0);
-  });
+  // 色違いのリザードンは固定マップの戦いに作り直した（07 の254章）。テストは src/sim/shinyCharizardArena.test.ts
 
   it('フシギバナ: はなびらのまい・ヘドロばくだんを出し、はなびらのまいの外に出たときだけ、狙った人を追うソーラービームを撃つ', () => {
     const { sim, i } = legend('shiny-venusaur');

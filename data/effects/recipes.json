@@ -6253,6 +6253,17 @@
     "boss-moltres-plain": {
       "extends": "fire.base"
     },
+    "boss-sc-plain": {
+      "extends": "fire.base"
+    },
+    "boss-sc-blast-burn": {
+      "extends": "fire.base",
+      "strike": { "id": "fire-geyser", "fit": "circle", "size": 1, "originY": 0.86, "seconds": 0.6 }
+    },
+    "boss-sc-dragon-rage": {
+      "extends": "dragon.base",
+      "bossActive": { "id": "rage-orb", "fit": "circle", "size": 1.8, "rotate": "velocity" }
+    },
     "boss-suicune-plain": {
       "extends": "water.base"
     },

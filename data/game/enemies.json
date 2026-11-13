@@ -618,6 +618,7 @@
     },
     {
       "id": "shiny-charizard",
+      "motion": { "type": "keepDistance", "distance": 280 },
       "species": "charizard",
       "rank": "legendary",
       "sprite": "enemy/charizard-shiny",

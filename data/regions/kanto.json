@@ -481,10 +481,10 @@
           { "belowHpPct": 66, "moves": ["mew-transform"] },
           { "belowHpPct": 33, "moves": ["mew-to-center", "mew-metronome-big", "mew-tired"] }
         ],
-        "moves": ["mew-teleport", "mew-metronome"],
+        "moves": ["mew-teleport", "mew-metronome", "mew-metronome", "mew-metronome"],
         "random": false,
         "intervalAfterMove": true,
-        "moveIntervalSeconds": 0.8
+        "moveIntervalSeconds": 0.3
       },
       "legend-articuno": {
         "arena": {
@@ -505,10 +505,10 @@
           { "belowHpPct": 66, "moves": ["articuno-hail"] },
           { "belowHpPct": 33, "moves": ["articuno-to-top", "articuno-mind-reader", "articuno-tired"] }
         ],
-        "moves": ["articuno-glide", "articuno-ice-shard", "articuno-glide", "articuno-icy-wind", "articuno-glide", "articuno-freeze-dry"],
+        "moves": ["articuno-glide", "articuno-ice-shard", "articuno-icy-wind", "articuno-glide", "articuno-ice-shard", "articuno-icy-wind", "articuno-glide", "articuno-freeze-dry"],
         "random": false,
         "intervalAfterMove": true,
-        "moveIntervalSeconds": 0.6
+        "moveIntervalSeconds": 0.2
       },
       "legend-zapdos": {
         "arena": {
@@ -526,7 +526,7 @@
         "moves": ["zapdos-agility", "zapdos-drill-peck", "zapdos-agility", "zapdos-thunder-wave", "zapdos-agility", "zapdos-thunderbolt"],
         "random": false,
         "intervalAfterMove": true,
-        "moveIntervalSeconds": 0.6
+        "moveIntervalSeconds": 0.3
       },
       "legend-moltres": {
         "arena": {
@@ -595,17 +595,17 @@
         },
         "anchor": { "x": 0, "y": -220 },
         "noEnrage": true,
-        "casters": [{ "move": "bubble", "level": 8, "everySeconds": 2.6 }],
-        "casterPower": 1.2,
+        "casters": [{ "move": "bubble", "level": 8, "everySeconds": 1.6 }],
+        "casterPower": 2,
         "hpMoves": [
           { "belowHpPct": 66, "moves": ["blastoise-s-aqua-jet", "blastoise-s-hydro-cannon", "blastoise-s-aqua-jet", "blastoise-s-hydro-cannon", "blastoise-s-aqua-jet", "blastoise-s-hydro-cannon"] },
           { "belowHpPct": 33, "moves": ["blastoise-s-to-center", "*", "blastoise-s-recharge"] }
         ],
         "pool": ["blastoise-s-ultimate-cw", "blastoise-s-ultimate-ccw"],
-        "moves": ["blastoise-s-hydro-cannon", "blastoise-s-bubble-beam", "blastoise-s-hydro-cannon", "blastoise-s-water-spout"],
+        "moves": ["blastoise-s-hydro-cannon", "blastoise-s-bubble-beam", "blastoise-s-water-spout", "blastoise-s-hydro-cannon", "blastoise-s-water-spout"],
         "random": false,
         "intervalAfterMove": true,
-        "moveIntervalSeconds": 1
+        "moveIntervalSeconds": 0.5
       }
     },
     "moveIntervalSeconds": 1.6,

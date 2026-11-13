@@ -57,7 +57,9 @@ describe('色違いのカメックス（07 の256章）', () => {
   });
 
   it('離れていると、近くの技の代わりに アクアジェット: 狙った人の少し先まで一直線に突っ込む（予告の間は止まる）', () => {
-    const { w, p, i, step, of, place } = setup();
+    const { w, p, i, boss, step, of, place } = setup();
+    // 出てすぐの技が終わるのを待つ
+    for (let t = 0; t < 30 * 3 && w.hazards.some((h) => h.dasher === boss.id); t++) step(1 / 30);
     place(500);
     let jet: ReturnType<typeof of>[number] | undefined;
     for (let t = 0; t < 30 * 4 && !jet; t++) {
@@ -69,7 +71,7 @@ describe('色違いのカメックス（07 の256章）', () => {
     // 長さは狙った人までの距離 + 80
     expect(jet!.length).toBeCloseTo(Math.hypot(p.x - jet!.x, p.y - jet!.y) + 80, 0);
     const start = { x: w.enemies.x[i()]!, y: w.enemies.y[i()]! };
-    step(0.5);
+    step(0.3);
     // 予告の間は動かない
     expect(Math.hypot(w.enemies.x[i()]! - start.x, w.enemies.y[i()]! - start.y)).toBeLessThan(1);
     step(1.2);
@@ -101,6 +103,8 @@ describe('色違いのカメックス（07 の256章）', () => {
 
   it('バブルこうせん: 当たると押し流されて間合いが開く', () => {
     const { w, p, boss, i, step, of, idx, place } = setup();
+    // 出てすぐの技（アクアジェット など）が終わるのを待つ
+    for (let t = 0; t < 30 * 3 && w.hazards.some((h) => h.dasher === boss.id); t++) step(1 / 30);
     boss.forced = [idx('blastoise-s-bubble-beam')];
     place(200);
     let beam: ReturnType<typeof of>[number] | undefined;
@@ -119,7 +123,7 @@ describe('色違いのカメックス（07 の256章）', () => {
     expect(Math.hypot(p.x - w.enemies.x[i()]!, p.y - w.enemies.y[i()]!)).toBeGreaterThan(before + 80);
   });
 
-  it('しおふき: 狙った人のまわりに降らせる。HP が多いほど数が多い（満タンで 12、半分で 6）', () => {
+  it('しおふき: 狙った人のまわりに降らせる。HP が多いほど数が多い（満タンで 28、半分で 14）', () => {
     const count = (hpRatio: number): number => {
       const { w, i, boss, step, of, idx } = setup();
       w.enemies.hp[i()] = w.enemies.maxHp[i()]! * hpRatio;
@@ -132,8 +136,8 @@ describe('色違いのカメックス（07 の256章）', () => {
       }
       return n;
     };
-    expect(count(1)).toBe(12);
-    expect(count(0.5)).toBe(6);
+    expect(count(1)).toBe(28);
+    expect(count(0.5)).toBe(14);
   });
 
   it('HP 66% で アクアジェット 3 連: 突っ込むたびに、止まった所で ハイドロカノン', () => {

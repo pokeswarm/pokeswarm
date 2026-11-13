@@ -32,6 +32,7 @@ function run(kindId: string): void {
   const kind = rules.enemies.kinds.findIndex((k) => k.id === kindId);
   const perSeg = SEGMENTS.map(() => 0);
   const by: Record<string, number> = {};
+  const hits: Record<string, number> = {};
   for (let seed = 1; seed <= SEEDS; seed++) {
     const sim = new Simulation({ tickRate, seed, rules });
     sim.addPlayer({ id: 1, x: 0, y: 200, radius: 12, moveSpeed: 180 });
@@ -119,19 +120,20 @@ function run(kindId: string): void {
             for (let i = 0; i < e.count; i++) if (e.hp[i]! > 0 && (e.x[i]! - p.x) ** 2 + (e.y[i]! - p.y) ** 2 <= (e.radius[i]! + p.radius + 4) ** 2) src = '触れる';
           }
           by[src || 'その他'] = (by[src || 'その他'] ?? 0) + lost;
+          hits[src || 'その他'] = (hits[src || 'その他'] ?? 0) + 1;
         }
       }
     });
   }
   const perMin = (v: number, secs: number): string => ((v / SEEDS) * (60 / secs)).toFixed(2);
   console.log(
-    `${kindId.padEnd(16)} 当たる技 毎分 ${((casts / SEEDS) * 60 / SEGMENTS.reduce((a, [, x]) => a + x, 0)).toFixed(1)} 回 / 受けた 毎分 最大HPの ${SEGMENTS.map(([pct, secs], s) => `HP${pct}%: ${perMin(perSeg[s]!, secs)}`).join(' / ')}`,
+    `${kindId.padEnd(16)} 平均 ${perMin(perSeg.reduce((a, b) => a + b, 0), SEGMENTS.reduce((a, [, x]) => a + x, 0))} / 当たる技 毎分 ${((casts / SEEDS) * 60 / SEGMENTS.reduce((a, [, x]) => a + x, 0)).toFixed(1)} 回 / 受けた 毎分 最大HPの ${SEGMENTS.map(([pct, secs], s) => `HP${pct}%: ${perMin(perSeg[s]!, secs)}`).join(' / ')}`,
   );
   const total = SEGMENTS.reduce((a, [, secs]) => a + secs, 0);
   console.log(
     `${''.padEnd(16)} 内訳（毎分） ${Object.entries(by)
       .sort((a, b) => b[1] - a[1])
-      .map(([k, v]) => `${k} ${perMin(v, total)}`)
+      .map(([k, v]) => `${k} ${perMin(v, total)}（${perMin(hits[k]!, total)}回×${(v / hits[k]!).toFixed(2)}）`)
       .join(' / ')}`,
   );
 }

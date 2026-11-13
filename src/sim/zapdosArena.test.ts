@@ -44,12 +44,12 @@ describe('サンダー（07 の252章）', () => {
     expect(activeLegendField(w)).toBeNull();
   });
 
-  it('10まんボルト: 壁ぎわの発電機どうしを 3 組、壁から壁まで結ぶ', () => {
+  it('10まんボルト: 壁ぎわの発電機どうしを 4 組、壁から壁まで結ぶ', () => {
     const { w, rules, force, of, step } = setup();
     force('zapdos-thunderbolt');
     step(0.2);
     const links = of('zapdos-thunderbolt');
-    expect(links.length).toBe(3);
+    expect(links.length).toBe(4);
     const nodes = rules.stage.moves.find((m) => m.id === 'zapdos-thunderbolt')!.arenaLinks!.nodes;
     for (const h of links) {
       const start = nodes.some(([x, y]) => Math.hypot(h.x - (w.arena!.x + x), h.y - (w.arena!.y + y)) < 1);

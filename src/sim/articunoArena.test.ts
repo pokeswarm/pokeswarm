@@ -44,7 +44,7 @@ describe('フリーザー（07 の251章）', () => {
     expect(activeLegendField(w)).toBeNull();
   });
 
-  it('こおりのつぶて: 狙い直しながら 3 回、予告の線の根元から速い氷の弾をまっすぐ撃つ', () => {
+  it('こおりのつぶて: 狙い直しながら 5 回、予告の線の根元から速い氷の弾をまっすぐ撃つ', () => {
     const { w, p, force, of, step } = setup();
     force('articuno-ice-shard');
     const shots = new Set<object>();
@@ -52,7 +52,7 @@ describe('フリーザー（07 の251章）', () => {
       step(1 / 30);
       for (const h of of('articuno-ice-shard-bullet')) shots.add(h);
     }
-    expect(shots.size).toBe(3);
+    expect(shots.size).toBe(5);
     // 追わない: 撃った後に動いても向きは変わらない
     const b = of('articuno-ice-shard-bullet')[0];
     if (b) {

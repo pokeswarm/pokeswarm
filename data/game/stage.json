@@ -1038,7 +1038,7 @@
       "rooted": true,
       "pose": "Charge",
       "spread": 40,
-      "telegraphSeconds": 1,
+      "telegraphSeconds": 0.65,
       "radius": 60,
       "damage": 26,
       "then": "pika-thunderbolt-burst"
@@ -1050,8 +1050,8 @@
       "shape": "circle",
       "target": "self",
       "rooted": true,
-      "telegraphSeconds": 0.7,
-      "radius": 150,
+      "telegraphSeconds": 0.5,
+      "radius": 160,
       "damage": 34,
       "activeSeconds": 0.9,
       "pose": "Shock",
@@ -1066,15 +1066,15 @@
       "rooted": true,
       "pose": "Charge",
       "spread": 320,
-      "telegraphSeconds": 0.8,
-      "radius": 58,
+      "telegraphSeconds": 0.6,
+      "radius": 62,
       "damage": 30,
       "repeat": {
         "count": 12,
         "everySeconds": 0.25
       },
       "recoilSeconds": 0.5,
-      "count": 2,
+      "count": 3,
       "scatter": true
     },
     {
@@ -1515,7 +1515,7 @@
         "everySeconds": 0.55
       },
       "travel": {
-        "speed": 290
+        "speed": 380
       },
       "activeSeconds": 3,
       "recoilSeconds": 0.7

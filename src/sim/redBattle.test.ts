@@ -434,9 +434,11 @@ describe('レッド戦（07 の193章）', () => {
       const sim = alone();
       const w = sim.world;
       const hurt: string[] = [];
+      // 毎コマ rules0() を作り直すと遅い（カビゴンの眠る間隔を詰めて 5 秒を超えた。07 の260章）
+      const moves = rules0().stage.moves;
       for (let k = 0; k < 30 * 30; k++) {
         sim.step([]);
-        for (const h of w.hazards) if (rules0().stage.moves[h.move]!.damage > 0) hurt.push(moveId(sim, h.move));
+        for (const h of w.hazards) if (moves[h.move]!.damage > 0) hurt.push(moveId(sim, h.move));
       }
       expect(hurt).toEqual([]);
     });

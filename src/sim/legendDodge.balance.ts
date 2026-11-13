@@ -30,8 +30,10 @@ const DIRS: [Axis, Axis][] = [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], 
 
 function run(kindId: string): void {
   const rules = buildSimRules(process.env.DODGE_REGION);
-  const patch = JSON.parse(process.env.DODGE_PATCH ?? '{}') as { set?: Record<string, unknown>; moves?: Record<string, Record<string, unknown>> };
+  const patch = JSON.parse(process.env.DODGE_PATCH ?? '{}') as { set?: Record<string, unknown>; sets?: Record<string, Record<string, unknown>>; moves?: Record<string, Record<string, unknown>> };
   if (patch.set) Object.assign(rules.stage.legendary!.moveSets[kindId]!, patch.set);
+  // 同じラウンドのほかの伝説（レッド戦）: "sets": {"red-snorlax": {...}}
+  for (const [id, v] of Object.entries(patch.sets ?? {})) Object.assign(rules.stage.legendary!.moveSets[id]!, v);
   for (const [id, v] of Object.entries(patch.moves ?? {})) Object.assign(rules.stage.moves.find((m) => m.id === id)!, v);
   const tickRate = 30;
   let casts = 0;

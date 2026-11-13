@@ -619,7 +619,7 @@
           "pika-thunder-storm"
         ],
         "random": false,
-        "moveIntervalSeconds": 2.2,
+        "moveIntervalSeconds": 1.1,
         "hpDrops": {
           "atHpPct": [
             75,
@@ -656,7 +656,7 @@
           "espeon-psychic-throw"
         ],
         "random": false,
-        "moveIntervalSeconds": 2,
+        "moveIntervalSeconds": 1.15,
         "hpDrops": {
           "atHpPct": [
             66,
@@ -686,7 +686,7 @@
           "snorlax-sleep"
         ],
         "random": false,
-        "moveIntervalSeconds": 5,
+        "moveIntervalSeconds": 3.2,
         "hpDrops": {
           "atHpPct": [
             66,
@@ -725,7 +725,7 @@
           "venusaur-solar-beam-red"
         ],
         "random": false,
-        "moveIntervalSeconds": 2.4,
+        "moveIntervalSeconds": 2.3,
         "noEnrage": true,
         "intervalAfterMove": true,
         "hpDrops": {
@@ -761,7 +761,7 @@
           "charizard-wing-attack"
         ],
         "random": false,
-        "moveIntervalSeconds": 2.2,
+        "moveIntervalSeconds": 2.05,
         "noEnrage": true,
         "intervalAfterMove": true,
         "hpDrops": {
@@ -834,7 +834,7 @@
           "blastoise-surf"
         ],
         "random": false,
-        "moveIntervalSeconds": 2.6,
+        "moveIntervalSeconds": 2.45,
         "noEnrage": true,
         "intervalAfterMove": true,
         "hpDrops": {

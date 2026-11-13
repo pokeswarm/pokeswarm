@@ -1686,6 +1686,130 @@ function blastoiseWall(): (Rgb | null)[] {
   return out;
 }
 
+/**
+ * ミュウ（07 の257章）: グレンじまの ポケモンやしき の焼け跡（夜）。ミュウの日記が見つかった洋館。
+ * 7 体の技（炎・氷・電気・念・水・草・毒）が全部の色で出るので、床は色の薄い暗い灰色の大理石。市松はほとんど見えない程度にし、
+ * 焼けて煤けた所・床が抜けて土が出た所・崩れた屋根から月明かりが差す所で場所らしさを出す
+ */
+const MARBLE = ['#1f1e1d', '#262523', '#2d2c29', '#353330', '#3e3c38'].map(hex);
+const MEW_SOOT = hex('#121110');
+const EARTH = ['#1a1612', '#211c16', '#29231b'].map(hex);
+const WEED = ['#1a2119', '#1f281d', '#252f22'].map(hex);
+const MOON = hex('#4a4e57');
+const TILE_D = 40;
+
+/** 焼けた度合い（0〜1。0.78 より上は床が抜けて土） */
+function mewBurn(x: number, y: number): number {
+  // 火元は左下と右上の 2 か所。そこから不揃いに広がる
+  const a = Math.max(0, 1 - Math.hypot((x - 60) / 380, (y - 430) / 240));
+  const b = Math.max(0, 1 - Math.hypot((x - 760) / 300, (y - 20) / 200));
+  return Math.min(1, (a + b) * 1.15 + (fbm(x / 70, y / 70, 1301) - 0.5) * 0.9);
+}
+
+function mewFloor(): { floor: Rgb[] } {
+  const floor: Rgb[] = [];
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const tx = Math.floor(x / TILE_D);
+    const ty = Math.floor(y / TILE_D);
+    // 大理石: 市松（差はごく小さく）・板ごとのむら・細い石目
+    let t = 0.4 + ((tx + ty) % 2 ? 0.025 : -0.015) + (hash2(tx, ty, 1303) - 0.5) * 0.05 + (fbm(x / 40, y / 40, 1305) - 0.5) * 0.2;
+    const vein = Math.abs(fbm(x / 34 + fbm(x / 90, y / 90, 1307) * 2, y / 34, 1309) - 0.5);
+    if (vein < 0.012) t += 0.09;
+    // 崩れた屋根の穴から差す月明かり（斜めの四角。ふちは割れた屋根でぎざぎざ、梁の影が 2 本横切る）
+    const ang = (-14 * Math.PI) / 180;
+    const mx = (x - 450) * Math.cos(ang) - (y - 205) * Math.sin(ang);
+    const my = (x - 450) * Math.sin(ang) + (y - 205) * Math.cos(ang);
+    const jag = (fbm(x / 9, y / 9, 1311) - 0.5) * 22 + (hash2(Math.floor((mx + my) / 13), 1, 1310) - 0.5) * 14;
+    const hole = Math.min(170 - Math.abs(mx), 105 - Math.abs(my)) + jag;
+    let lit = Math.max(0, Math.min(1, hole / 10));
+    // 梁の影（穴の中を、穴の傾きのまま縦に 2 本）
+    for (const bx of [-60, 48]) if (Math.abs(mx - bx - (my * 0.12)) < 5 + (fbm(y / 20, bx, 1308) - 0.5) * 3) lit *= 0.45;
+    t += lit * 0.16;
+    let col = ramp(MARBLE, t, x, y);
+    if (lit > 0) col = mix(col, MOON, lit * 0.22);
+    // 継ぎ目（暗く。煤に埋もれた所では見えない）
+    const burn = mewBurn(x, y);
+    const seam = x % TILE_D === 0 || y % TILE_D === 0;
+    // 継ぎ目はすり減って、ところどころしか見えない
+    if (seam && burn < 0.4 && fbm(x / 25, y / 25, 1312) > 0.5) col = mix(col, MARBLE[0]!, 0.3 * (1 - burn * 2.5));
+    // 床が抜けた所は石の板ごと（板の真ん中の焼け方で決める）。抜けた板の縁は割れて欠ける
+    const tileBurn = mewBurn(tx * TILE_D + TILE_D / 2, ty * TILE_D + TILE_D / 2) + (hash2(tx, ty, 1314) - 0.5) * 0.25;
+    const chip = (fbm(x / 6, y / 6, 1316) - 0.5) * 0.5;
+    if (tileBurn + chip * Math.min(1, Math.min(x % TILE_D, TILE_D - (x % TILE_D), y % TILE_D, TILE_D - (y % TILE_D)) < 6 ? 1 : 0) > 0.86) {
+      col = ramp(EARTH, 0.5 + (fbm(x / 9, y / 9, 1313) - 0.5) * 0.8, x, y, 0.4);
+      // 落ちた石のかけら（まばら）と、土に生えた低い草のむら
+      if (hash2(x >> 2, y >> 2, 1315) > 0.93) col = MARBLE[1]!;
+      else if (fbm(x / 14, y / 14, 1317) > 0.68 && hash2(x, y, 1320) > 0.4) col = WEED[Math.floor(hash2(x >> 1, y >> 1, 1319) * 2)]!;
+    } else if (burn > 0.3) {
+      // 煤: 焼けた所ほど黒く。焦げのむらは細かく（煙に見えないように）
+      const grain = 0.75 + (fbm(x / 7, y / 7, 1318) - 0.5) * 0.6;
+      // ふちの決まった焦げ跡（なだらかに広げると煙に見えた）
+      const k = Math.max(0, Math.min(1, (burn - 0.42) / 0.12));
+      col = mix(col, MEW_SOOT, Math.min(0.88, (0.12 + k * 0.7) * grain));
+    }
+    // 外ほど少し暗い
+    const edge = Math.min(x, y, W - 1 - x, H - 1 - y);
+    if (edge < 30) col = mix(col, MEW_SOOT, (1 - edge / 30) * 0.4);
+    floor.push(col);
+  }
+  return { floor };
+}
+
+/** 外: 焼け残った石の壁（ところどころ崩れて瓦礫）。その外は夜の草地 */
+const BRICK = ['#1a1817', '#22201e', '#2b2825', '#35312d', '#403b36'].map(hex);
+const NIGHT_GRASS = ['#0b0e0b', '#10140f', '#151a13', '#1b2118'].map(hex);
+
+function mewWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const rimLight = hex('#2f2b28');
+  const rimDark = hex('#0e0d0c');
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    // 壁はまっすぐ（洋館）。崩れた所だけ少し床へ張り出す
+    const fromLeft = Math.floor(inset(iy, 71) * 0.4) - ix;
+    const fromRight = ix - (W - 1 - Math.floor(inset(iy, 72) * 0.4));
+    const fromTop = Math.floor(inset(ix, 73) * 0.4) - iy;
+    const fromBottom = iy - (H - 1 - Math.floor(inset(ix, 74) * 0.4));
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    const horiz = Math.max(fromTop, fromBottom) >= Math.max(fromLeft, fromRight);
+    const along = horiz ? x : y;
+    const across = dist;
+    // 壁の厚み 18。崩れた所は低い瓦礫になる
+    const broken = fbm(along / 40, horiz ? 1 : 2, 1321) > 0.6;
+    let col: Rgb;
+    if (across <= 18 && !broken) {
+      // 石積み: 端に沿って長い石を段ごとにずらす
+      const row = Math.floor(across / 6);
+      const a = along + (row % 2 ? 9 : 0);
+      const stone = Math.floor(a / 18);
+      const joint = a % 18 === 0 || across % 6 === 0;
+      const t = 0.55 + (hash2(stone, row, 1323) - 0.5) * 0.3 + (fbm(x / 12, y / 12, 1325) - 0.5) * 0.3 - (fbm(x / 50, y / 50, 1327) > 0.62 ? 0.3 : 0);
+      col = joint ? BRICK[0]! : ramp(BRICK, t, x, y, 0.4);
+    } else if (across <= 26) {
+      // 崩れた石と瓦礫
+      const r = worley(x, y, 7, 1329);
+      const t = 0.4 + (hash2(r.id, 1, 1331) - 0.5) * 0.5 - across * 0.008;
+      col = r.edge < 0.9 ? BRICK[0]! : ramp(BRICK, t, x, y, 0.4);
+      if (hash2(r.id, 2, 1333) > 0.55) col = ramp(NIGHT_GRASS, 0.5, x, y);
+    } else {
+      // 夜の草地: 外ほど暗い。上（HUD の後ろ）はさらに暗く
+      let t = 0.45 + (fbm(x / 30, y / 30, 1335) - 0.5) * 0.5 - (across - 26) * 0.015;
+      if (fromTop >= Math.max(fromLeft, fromRight, fromBottom)) t -= 0.15;
+      col = ramp(NIGHT_GRASS, t, x, y, 0.5);
+    }
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 2.5) col = rimLight;
+    out.push(col);
+  }
+  return out;
+}
+
 const arenas = [
   { id: 'lugia', ...lugiaFloor(), wall: lugiaWall() },
   { id: 'hooh', ...hoohFloor(), wall: hoohWall() },
@@ -1699,6 +1823,7 @@ const arenas = [
   { id: 'charizard', region: 'kanto', ...charizardFloor(), shimmerA: null, shimmerB: null, wall: charizardWall() },
   { id: 'venusaur', region: 'kanto', ...venusaurFloor(), shimmerA: null, shimmerB: null, wall: venusaurWall() },
   { id: 'blastoise', region: 'kanto', ...blastoiseFloor(), shimmerA: null, shimmerB: null, wall: blastoiseWall() },
+  { id: 'mew', region: 'kanto', ...mewFloor(), shimmerA: null, shimmerB: null, wall: mewWall() },
 ];
 for (const a of arenas) {
   const outDir = path.join('public', 'map', 'region' in a ? a.region : 'johto');

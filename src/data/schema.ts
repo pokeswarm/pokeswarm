@@ -784,6 +784,13 @@ export const bossMoveSchema = z.object({
   selfDamagePct: z.number().positive().optional(),
   /** この技が出ている間（予告の間も）、使ったボスが受けるダメージをこの % にする（ファイヤーの もえつきた後: 150。07 の253章） */
   takenPct: z.number().positive().optional(),
+  /**
+   * 跳びかかる（色違いのフシギバナの のしかかり。07 の255章）: 狙った人の今の場所に予告を置き、予告が終わるときに着くよう、そこへ跳んでいく。
+   * height は跳ぶ高さ（絵だけ）。flyTo と組むと、行き先は flyTo の場所（跳ぶ絵だけ付ける）
+   */
+  leap: z.object({ height: z.number().positive() }).optional(),
+  /** 吸い取る（ギガドレイン。07 の255章）: 落ちたときに範囲に入っていた人 1 人ごとに、使ったボスが最大 HP のこの % を回復する（ホストが決める） */
+  drainPct: z.number().positive().optional(),
   /** 専用の絵のクラス（src/render/effects）で描く。飛ぶ玉のふつうの黄色い玉を描かない（ミュウツーの岩・はどうだん・フリーザーの こごえるかぜ。07 の250章） */
   customArt: z.boolean().optional(),
   blink: z.object({ minDistance: z.number().nonnegative(), maxDistance: z.number().positive(), /** 狙った人に関係なく、マップの真ん中へ（サイコブレイクの前） */ center: z.boolean().optional() }).optional(),
@@ -897,6 +904,10 @@ export const bossMoveSchema = z.object({
       chill: z.number().int().positive().optional(),
       /** まひ（足が遅くなる。遅くなる割合は bossRules.paralyzeSlowPct。サンダーの でんじは・でんじほう。07 の252章） */
       paralyzeSeconds: z.number().positive().optional(),
+      /** 眠らせる秒数（動けない・技も出ない。頭の上に Z。色違いのフシギバナの ねむりごな。07 の255章） */
+      sleepSeconds: z.number().positive().optional(),
+      /** どく: この秒数、最大 HP の割合で削られ続ける（割合は bossRules.poisonPctPerSecond。色違いのフシギバナの ヘドロばくだん。07 の255章） */
+      poisonSeconds: z.number().positive().optional(),
       /** すぐ凍らせる秒数（冷えを溜めずに。フリーザーの ぜったいれいど。07 の251章） */
       freezeSeconds: z.number().positive().optional(),
       flinchSeconds: z.number().positive().optional(),
@@ -1220,6 +1231,8 @@ export const stageConfigSchema = z.object({
     /** まひで遅くなる割合（%。07 の252章） */
     paralyzeSlowPct: z.number().min(0).max(95).optional(),
     burnPctPerSecond: z.number().nonnegative().optional(),
+    /** どくで 1 秒に削られる最大 HP の割合（%。07 の255章） */
+    poisonPctPerSecond: z.number().nonnegative().optional(),
     chillToFreeze: z.number().int().positive().optional(),
     chillFreezeSeconds: z.number().positive().optional(),
     chillForgetSeconds: z.number().positive().optional(),
@@ -2274,6 +2287,8 @@ const moveSpriteSpec = z.object({
   chargeGrow: z.boolean().optional(),
   /** 予告の間に、ボスの場所（offsetY の分ずらす）から当たる場所へ飛んでいく（風の玉。07 の204章） */
   fromBoss: z.boolean().optional(),
+  /** fromBoss で飛ぶとき、山なりにこの高さだけ上がる（ヘドロばくだん。07 の255章） */
+  arcHeight: z.number().positive().optional(),
   /** 予告の間に、技の向き（dirX, dirY）の分だけ離れた所から当たる場所へ、山なりに飛んでいく（ホウオウが落とす火の玉。07 の208章） */
   fromDir: z.boolean().optional(),
   /** 当たっている間に、pixels だけ下へ落ちながら sway の幅で period 秒ごとに左右へ揺れる（ひらひら落ちる羽。07 の208章） */

@@ -583,25 +583,19 @@
         "moveIntervalSeconds": 1
       },
       "shiny-venusaur": {
-        "moves": [
-          "venusaur-solar-beam"
+        "arena": { "halfWidth": 800, "halfHeight": 440, "viewHeight": 960 },
+        "anchor": { "x": 0, "y": -220 },
+        "noEnrage": true,
+        "casters": [{ "move": "razor-leaf", "level": 8, "everySeconds": 2.4 }],
+        "casterPower": 1.2,
+        "hpMoves": [
+          { "belowHpPct": 66, "moves": ["venusaur-s-sleep-powder", "venusaur-s-body-slam", "venusaur-s-body-slam", "venusaur-s-body-slam"] },
+          { "belowHpPct": 33, "moves": ["venusaur-s-to-center", "venusaur-s-frenzy-plant", "venusaur-s-recharge"] }
         ],
+        "moves": ["venusaur-s-sludge-bomb", "venusaur-s-body-slam", "venusaur-s-giga-drain", "venusaur-s-body-slam"],
         "random": false,
-        "moveIntervalSeconds": 2.5,
-        "enrageMoveIntervalSeconds": 1.8,
-        "casters": [
-          {
-            "move": "petal-dance",
-            "level": 8,
-            "orbitRadius": 200
-          },
-          {
-            "move": "sludge-bomb",
-            "level": 8,
-            "everySeconds": 2.5
-          }
-        ],
-        "casterPower": 1.2
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 1
       },
       "shiny-blastoise": {
         "moves": [

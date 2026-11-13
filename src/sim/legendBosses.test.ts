@@ -44,50 +44,9 @@ describe('ミュウ', () => {
 });
 
 describe('色違いの御三家（プレイヤーと同じ技）', () => {
-  const hostile = (sim: Simulation, key: string): number => {
-    const pr = sim.world.projectiles;
-    const move = sim.world.rules.moves.findIndex((m) => m.key === key);
-    let n = 0;
-    for (let i = 0; i < pr.count; i++) if (pr.move[i] === move && pr.owner[i]! >= 60000) n++;
-    return n;
-  };
-
   // 色違いのリザードンは固定マップの戦いに作り直した（07 の254章）。テストは src/sim/shinyCharizardArena.test.ts
 
-  it('フシギバナ: はなびらのまい・ヘドロばくだんを出し、はなびらのまいの外に出たときだけ、狙った人を追うソーラービームを撃つ', () => {
-    const { sim, i } = legend('shiny-venusaur');
-    const e = sim.world.enemies;
-    const p = sim.world.players[0]!;
-    let petal = 0;
-    let sludge = 0;
-    const beamOf = () => sim.world.hazards.find((h) => moveId(sim, h.move) === 'venusaur-solar-beam' && h.activeTicks === undefined) ?? null;
-    // 近くにいる間は撃たない
-    for (let t = 0; t < 30 * 4; t++) {
-      p.invincibleTicks = 2;
-      p.x = e.x[i]! + 150;
-      p.y = e.y[i]!;
-      sim.step([]);
-      petal = Math.max(petal, hostile(sim, 'petal-dance'));
-      sludge = Math.max(sludge, hostile(sim, 'sludge-bomb'));
-      expect(beamOf()).toBeNull();
-    }
-    expect(petal).toBeGreaterThan(0);
-    expect(sludge).toBeGreaterThan(0);
-    // 外に出ると撃つ
-    let beam = null as ReturnType<typeof beamOf>;
-    for (let t = 0; t < 30 * 3 && !beam; t++) {
-      p.invincibleTicks = 2;
-      p.x = e.x[i]! + 600;
-      p.y = e.y[i]!;
-      sim.step([]);
-      beam = beamOf();
-    }
-    expect(beam).not.toBeNull();
-    p.y += 300;
-    sim.step([]);
-    const toP = Math.atan2(p.y - beam!.y, p.x - beam!.x);
-    expect(Math.abs(Math.atan2(beam!.dirY, beam!.dirX) - toP)).toBeLessThan(0.05);
-  });
+  // 色違いのフシギバナは固定マップの戦いに作り直した（07 の255章）。テストは src/sim/shinyVenusaurArena.test.ts
 
   it('カメックス: 甲羅の形で速く追い、触れるまで近づくと止まって少しためてから、ハイドロカノンを高速で一周させる', () => {
     const { sim, i, kind } = legend('shiny-blastoise');

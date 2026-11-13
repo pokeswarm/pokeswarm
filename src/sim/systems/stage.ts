@@ -1115,7 +1115,11 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   if (move.rooted) world.enemies.speed[i] = 0;
   if (move.flyTo && boss && world.arena) {
     const side = move.flyTo.farSide ? (target.x >= world.arena.x ? -1 : 1) : move.flyTo.randomSide && world.rng.next() < 0.5 ? -1 : 1;
-    boss.flyTo = { x: world.arena.x + move.flyTo.x * side, y: world.arena.y + move.flyTo.y, speed: move.flyTo.speed, ...(move.flyTo.boost ? { boost: move.flyTo.boost } : {}) };
+    const fx = world.arena.x + move.flyTo.x * side;
+    const fy = world.arena.y + move.flyTo.y;
+    // 跳んで行く（色違いのフシギバナ）: 跳ぶ絵の終わりに着くよう、予告の時間で着く速さにする
+    const speed = move.leap ? Math.max(1, Math.hypot(fx - bx, fy - by) / Math.max(0.1, move.telegraphSeconds)) : move.flyTo.speed;
+    boss.flyTo = { x: fx, y: fy, speed, ...(move.flyTo.boost ? { boost: move.flyTo.boost } : {}) };
   }
   if (move.interruptDamage && boss) boss.interrupt = { left: (world.enemies.maxHp[i]! * move.interruptDamage.hpPct) / 100, move: moveIndexOfStage(world.rules, move.interruptDamage.breakMove) };
   const dx0 = target.x - bx;
@@ -1131,6 +1135,14 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   }
   if (move.nextMoveWaitSeconds && boss) boss.holdUntil = world.tick + Math.round(move.nextMoveWaitSeconds / world.dt);
   if (move.alsoCast) castBossMove(world, bossId, i, moveIndexOfStage(world.rules, move.alsoCast));
+  if (move.leap && boss && !move.flyTo) {
+    // 跳びかかる: 狙った人の今の場所に予告を置き、予告が終わるときに着くよう跳んでいく（1 人だけを狙う）
+    put(target.x, target.y, ux, uy, bossId);
+    const hz = world.hazards[world.hazards.length - 1]!;
+    const d = Math.hypot(hz.x - bx, hz.y - by);
+    boss.flyTo = { x: hz.x, y: hz.y, speed: Math.max(1, d / Math.max(0.1, move.telegraphSeconds)) };
+    return;
+  }
   if (move.glide && world.arena && boss) {
     put(bx, by, 0, 1, bossId);
     const a = world.arena;
@@ -1415,7 +1427,9 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
       const cell = cells[c]!;
       const x = a.x - a.halfWidth + ((cell % cols) + world.rng.next()) * ((a.halfWidth * 2) / cols);
       const y = a.y - a.halfHeight + (Math.floor(cell / cols) + world.rng.next()) * ((a.halfHeight * 2) / rows);
-      put(x, y, 0, 0, bossId, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
+      // 流れる範囲（ねむりごなの雲）: 向きはばらばら
+      const [dx, dy] = move.travel ? randomUnit(world.rng) : [0, 0];
+      put(x, y, dx, dy, bossId, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
     }
     return;
   }
@@ -1731,6 +1745,16 @@ function tickPlayerConditions(world: World, me: World['players'][number]): void 
   if (me.mudTicks) me.mudTicks--;
   if (me.paralyzeTicks) me.paralyzeTicks--;
   if (me.chillTicks && --me.chillTicks === 0) me.chill = 0;
+  if (me.sleepTicks) me.sleepTicks--;
+  if (me.poisonTicks) {
+    me.poisonTicks--;
+    // どく: 0.5 秒ごとに、最大 HP の割合で削られる（防御は効かない）
+    me.poisonHurtTicks = (me.poisonHurtTicks ?? 0) + 1;
+    if (me.poisonHurtTicks >= Math.round(0.5 / world.dt)) {
+      me.poisonHurtTicks = 0;
+      if (!me.down) fieldDamage(world, me, (me.maxHp * (world.rules.stage.bossRules.poisonPctPerSecond ?? 1.5) * 0.5) / 100);
+    }
+  }
   if (me.burnTicks) {
     me.burnTicks--;
     // やけど: 0.5 秒ごとに、最大 HP の割合で削られる（防御は効かない）
@@ -1749,7 +1773,7 @@ function hitLocal(world: World, me: World['players'][number], hz: World['hazards
     world.hazardGroupsHit.add(hz.group);
   }
   hz.hitLocal = true;
-  const conditioned = !!(me.drowsyTicks || me.burnTicks || me.chill || me.frozenTicks);
+  const conditioned = !!(me.drowsyTicks || me.burnTicks || me.chill || me.frozenTicks || me.poisonTicks);
   const bonus = conditioned && move?.onHit?.statusBonusPct ? 1 + move.onHit.statusBonusPct / 100 : 1;
   hurtPlayer(world, me, hazardDamage(world, (hz.damageOverride || hz.damage) * bonus));
   bumpRunStat(world, me, 'bossAoeHits');
@@ -1760,6 +1784,13 @@ function hitLocal(world: World, me: World['players'][number], hz: World['hazards
   if (on.paralyzeSeconds) me.paralyzeTicks = Math.max(me.paralyzeTicks ?? 0, Math.round(on.paralyzeSeconds / world.dt));
   if (on.burnSeconds) me.burnTicks = (me.burnTicks ?? 0) + Math.round(on.burnSeconds / world.dt);
   if (on.flinchSeconds && !me.frozenTicks) me.frozenTicks = Math.round(on.flinchSeconds / world.dt);
+  if (on.sleepSeconds) {
+    // 眠る: 動けず技も出ない（止まる仕組みは凍ると同じ。見た目は Z）
+    const t = Math.round(on.sleepSeconds / world.dt);
+    me.frozenTicks = Math.max(me.frozenTicks ?? 0, t);
+    me.sleepTicks = Math.max(me.sleepTicks ?? 0, t);
+  }
+  if (on.poisonSeconds) me.poisonTicks = Math.max(me.poisonTicks ?? 0, Math.round(on.poisonSeconds / world.dt));
   if (on.freezeSeconds) {
     me.chill = 0;
     me.frozenTicks = Math.max(me.frozenTicks ?? 0, Math.round(on.freezeSeconds / world.dt));
@@ -1838,8 +1869,15 @@ function strikeHazards(world: World): void {
           const b = world.bosses.find((x) => x.id === hz.dasher);
           if (b) b.barrier = undefined;
         }
-        // 当たっている間止まっていたボスは、また動く
-        if (move?.holdWhileActive && world.role !== 'guest') {
+        // 当たっている間止まっていたボスは、また動く（同じボスの止まる技や、続けて出す予定が残っている間は止まったまま。ハードプラントの根）
+        const stillHeld =
+          world.bossQueue.some((q) => q.bossId === hz.dasher) ||
+          world.hazards.some((o) => {
+            if (o === hz || o.dasher !== hz.dasher) return false;
+            const om = world.rules.stage.moves[o.move];
+            return o.activeTicks === undefined ? !!om?.rooted : !!om?.holdWhileActive && o.activeTicks > 1;
+          });
+        if (move?.holdWhileActive && world.role !== 'guest' && !stillHeld) {
           const i = findEnemyIndex(world, hz.dasher);
           const boss = world.bosses.find((b) => b.id === hz.dasher);
           if (i !== -1 && boss) world.enemies.speed[i] = bossSpeed(world, boss, i);
@@ -2267,6 +2305,11 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
   }
   // 回復（エーフィの あさのひざし・カビゴンの ねむる）: 使ったボスの HP を戻す（HP はゲストへ送る）
   if (move.healPct && world.enemies.hp[i]! > 0) world.enemies.hp[i] = Math.min(world.enemies.maxHp[i]!, world.enemies.hp[i]! + (world.enemies.maxHp[i]! * move.healPct) / 100);
+  // 吸い取る（ギガドレイン）: 範囲に入っていた人 1 人ごとに回復する（ホストの見ている場所で決める）
+  if (move.drainPct && world.enemies.hp[i]! > 0) {
+    const caught = world.players.filter((p) => !p.down && hazardHits(hz, p.x, p.y, p.radius, move)).length;
+    if (caught > 0) world.enemies.hp[i] = Math.min(world.enemies.maxHp[i]!, world.enemies.hp[i]! + (world.enemies.maxHp[i]! * move.drainPct * caught) / 100);
+  }
   // 反動（フレアドライブ）: 自分の HP を失う（倒れはしない）
   if (move.selfDamagePct && world.enemies.hp[i]! > 0) world.enemies.hp[i] = Math.max(1, world.enemies.hp[i]! - (world.enemies.maxHp[i]! * move.selfDamagePct) / 100);
   // 強化（ビルドアップ・りゅうのまい）

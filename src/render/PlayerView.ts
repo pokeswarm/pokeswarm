@@ -195,7 +195,9 @@ export class PlayerView {
       // 凍っている間（伝説戦のぜったいれいど）は氷の色
       // ボスの技の効き目（07 の167章）: やけど＝赤く明滅・冷え＝薄い水色（溜まるほど濃く）・ねむけ＝紫がかる（頭の上に Z）
       const blink = Math.floor(this.scene.time.now / 160) % 2 === 0;
-      if (player.frozenTicks) this.pokemon.sprite.setTint(0x80deea);
+      if (player.sleepTicks) this.pokemon.sprite.setTint(0xb39ddb);
+      else if (player.frozenTicks) this.pokemon.sprite.setTint(0x80deea);
+      else if (player.poisonTicks && blink) this.pokemon.sprite.setTint(0xce93d8);
       else if (player.burnTicks && blink) this.pokemon.sprite.setTint(0xff8a65);
       else if (player.chill) this.pokemon.sprite.setTint(player.chill >= 2 ? 0x9be7ff : 0xd4f3ff);
       else if (player.drowsyTicks) this.pokemon.sprite.setTint(0xc5b3ff);
@@ -204,7 +206,7 @@ export class PlayerView {
       else this.pokemon.sprite.clearTint();
     }
     // 眠っている間（ねむけ も）は Z が上へゆらゆら
-    const sleeping = (player.sleep?.asleep ?? false) || !!player.drowsyTicks;
+    const sleeping = (player.sleep?.asleep ?? false) || !!player.drowsyTicks || !!player.sleepTicks;
     this.zzz.setVisible(sleeping);
     if (sleeping) {
       const k = (this.scene.time.now % 1500) / 1500;

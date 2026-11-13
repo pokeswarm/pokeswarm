@@ -26,6 +26,7 @@ import { ArticunoIce } from '../render/effects/ArticunoIce';
 import { ZapdosElectric } from '../render/effects/ZapdosElectric';
 import { MoltresFlame } from '../render/effects/MoltresFlame';
 import { ShinyCharizardFlame } from '../render/effects/ShinyCharizardFlame';
+import { ShinyVenusaurPlant } from '../render/effects/ShinyVenusaurPlant';
 import { WaterRun } from '../render/effects/WaterRun';
 import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
@@ -180,6 +181,7 @@ export class RunScene extends Phaser.Scene {
   private zapdosElectric: ZapdosElectric | null = null;
   private moltresFlame: MoltresFlame | null = null;
   private shinyCharizardFlame: ShinyCharizardFlame | null = null;
+  private shinyVenusaurPlant: ShinyVenusaurPlant | null = null;
   /** 水の上を走る足元（07 の225章） */
   private waterRun: WaterRun | null = null;
   private introFading = false;
@@ -1941,7 +1943,7 @@ export class RunScene extends Phaser.Scene {
         g.lineStyle(2, 0xff5252, 0.9).lineBetween(h.x, h.y, h.x + h.dirX * 320, h.y + h.dirY * 320);
       }
       // 落ちた後に進む範囲（玉・刃・波）: 進む道を薄く見せる（向きが分かるように）
-      if (mv?.travel && !mv.travel.homingDegreesPerSecond) {
+      if (mv?.travel && !mv.travel.homingDegreesPerSecond && !mv.customArt) {
         // 跳ね返る残像の予告は、最初に走る向きだけを見せる
         const reach = mv.travel.bounceBox ? mv.travel.bounceBox.halfHeight : mv.travel.speed * (mv.activeSeconds ?? 1);
         const tx = h.vx !== undefined && h.vy !== undefined ? h.vx / mv.travel.speed : h.dirX;
@@ -2209,7 +2211,8 @@ export class RunScene extends Phaser.Scene {
         const bx = b !== -1 ? world.enemies.x[b]! : h.x;
         const by = (b !== -1 ? world.enemies.y[b]! : h.y) + (spec.offsetY ?? 0);
         const x = spec.fromBoss ? bx + (h.x - bx) * p : bx;
-        const y = spec.fromBoss ? by + (h.y - by) * p : by;
+        // 山なりに飛ぶ（ヘドロばくだん）
+        const y = (spec.fromBoss ? by + (h.y - by) * p : by) - (spec.arcHeight ? Math.sin(Math.PI * p) * spec.arcHeight : 0);
         out.push({ spec, x, y, radius: spec.chargeGrow ? h.radius * (0.15 + 0.85 * p) : h.radius, band: 0, dirX: 0, dirY: 1, length: 0, vx: 0, vy: 1, elapsed, alpha: 1, seed: h.group ?? 0 });
         continue;
       }
@@ -2814,6 +2817,11 @@ export class RunScene extends Phaser.Scene {
     for (const h of w.hazards) {
       if (h.activeTicks !== undefined) continue;
       const mv = w.rules.stage.moves[h.move];
+      // 跳びかかる（色違いのフシギバナの のしかかり）: 予告の間、山なりに高く上がって着地点へ（影は足元に残る）
+      if (mv?.leap && h.dasher === e.id[i]) {
+        const p = Math.min(1, (h.totalTicks - h.ticksLeft) / Math.max(1, h.totalTicks));
+        return { lift: Math.sin(Math.PI * p) * mv.leap.height, hop: 0, shake: 0, squash: p > 0.85 ? 0.85 : 1, spin: false };
+      }
       if (mv?.liftBody && h.dasher === e.id[i]) {
         // 市松模様（ギガインパクト）: 落ちるときに叩きつける（遅れて落ちるマスを待たない）
         if (mv.gridWave && (h.totalTicks - h.ticksLeft) * w.dt >= mv.telegraphSeconds) continue;
@@ -3136,6 +3144,8 @@ export class RunScene extends Phaser.Scene {
     this.moltresFlame.update(world, this.time.now);
     this.shinyCharizardFlame ??= new ShinyCharizardFlame(this, spriteRender.depths.effects + 0.35, spriteRender.depths.bosses + 0.05, ARENA_FLOOR_DEPTH + 3.6);
     this.shinyCharizardFlame.update(world, this.time.now, alpha);
+    this.shinyVenusaurPlant ??= new ShinyVenusaurPlant(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);
+    this.shinyVenusaurPlant.update(world, this.time.now, alpha);
     this.waterRun ??= new WaterRun(this, ARENA_FLOOR_DEPTH + 3.5, spriteRender.depths.bosses - 0.01);
     this.waterRun.update(world, this.time.now);
     // 地面の一部なので、障害物・雑魚より下（作者の依頼）

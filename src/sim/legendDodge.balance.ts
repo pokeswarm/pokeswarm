@@ -10,6 +10,7 @@ import { hazardHits, startLegendary } from './systems/stage';
  * 伝説と戦い、受けたダメージを技ごとに数える。HP 100%（ふだん）・60%（HP 66% の技の後）・30%（HP 33% の技の後）の 3 区間を回す。
  * 例: LEGENDS=legend-mew,shiny-blastoise npx vitest run --mode balance --silent=false src/sim/legendDodge.balance.ts（DODGE_SEEDS=6 で試す数）
  * ジョウトは DODGE_REGION=johto LEGENDS=legend-lugia,legend-ho-oh,legend-raikou,legend-entei,legend-suicune。
+ * レッド戦はラウンドの 1 体目を渡す（LEGENDS=red-pikachu,red-espeon,red-venusaur。同じラウンドの全員を数える）。
  * DODGE_PATCH='{"set":{"moveIntervalSeconds":0.4},"moves":{"mew-metronome":{"telegraphSeconds":0.6}}}' で、測る前にデータを書き換えて案を比べる。
  * 避け方は人より単純なので、数字は伝説どうし・変更の前後を比べるために使う。
  */
@@ -50,17 +51,28 @@ function run(kindId: string): void {
     let dir = '';
     // 出てくるまで待つ
     for (let t = 0; t < tickRate * 6 && !w.bosses.length; t++) sim.step([]);
-    const boss = w.bosses[0];
-    if (!boss) throw new Error(`${kindId} が出ない`);
+    if (!w.bosses.length) throw new Error(`${kindId} が出ない`);
+    // 何体も同時に出る戦い（レッド戦）は、そろうまで少し待つ
+    for (let t = 0; t < tickRate; t++) sim.step([]);
+    const ids = new Set(w.bosses.map((b) => b.id));
+    /** 一番近い、生きている伝説（何体もいるときは全員を数える） */
     const idx = (): number => {
-      for (let k = 0; k < w.enemies.count; k++) if (w.enemies.id[k] === boss.id) return k;
-      return -1;
+      let best = -1;
+      let bd = Infinity;
+      for (let k = 0; k < w.enemies.count; k++) {
+        if (!ids.has(w.enemies.id[k]!) || w.enemies.hp[k]! <= 0) continue;
+        const d = (w.enemies.x[k]! - p.x) ** 2 + (w.enemies.y[k]! - p.y) ** 2;
+        if (d < bd) {
+          bd = d;
+          best = k;
+        }
+      }
+      return best;
     };
     SEGMENTS.forEach(([pct, secs], s) => {
       if (FRESH && s !== only) return;
-      const bi = idx();
-      if (bi < 0) return;
-      w.enemies.hp[bi] = (w.enemies.maxHp[bi]! * pct) / 100;
+      if (idx() < 0) return;
+      for (let k = 0; k < w.enemies.count; k++) if (ids.has(w.enemies.id[k]!) && w.enemies.hp[k]! > 0) w.enemies.hp[k] = (w.enemies.maxHp[k]! * pct) / 100;
       for (let t = 0; t < secs * tickRate; t++) {
         const cmds: InputCommand[] = [];
         if (w.tick % 3 === 0) {

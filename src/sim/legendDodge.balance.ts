@@ -15,12 +15,16 @@ import { hazardHits, startLegendary } from './systems/stage';
  */
 const LEGENDS = (process.env.LEGENDS ?? 'legend-mewtwo,legend-articuno,legend-zapdos,legend-moltres,shiny-charizard,shiny-venusaur,shiny-blastoise,legend-mew').split(',');
 const SEEDS = Number(process.env.DODGE_SEEDS ?? 4);
-/** 区間（HP の割合と秒数） */
-const SEGMENTS: [number, number][] = [
-  [100, 90],
-  [60, 40],
-  [30, 40],
-];
+/** 区間（HP の割合と秒数）。DODGE_SEGMENTS='100:60,45:60' で変える（三犬は 1 分で逃げ、HP 50% で技が変わる） */
+const SEGMENTS: [number, number][] = process.env.DODGE_SEGMENTS
+  ? process.env.DODGE_SEGMENTS.split(',').map((x) => x.split(':').map(Number) as [number, number])
+  : [
+      [100, 90],
+      [60, 40],
+      [30, 40],
+    ];
+/** DODGE_FRESH=1 なら、区間ごとに出会いからやり直す（逃げる三犬を区間ごとに測る） */
+const FRESH = process.env.DODGE_FRESH === '1';
 const DIRS: [Axis, Axis][] = [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 
 function run(kindId: string): void {
@@ -32,9 +36,11 @@ function run(kindId: string): void {
   let casts = 0;
   const kind = rules.enemies.kinds.findIndex((k) => k.id === kindId);
   const perSeg = SEGMENTS.map(() => 0);
+  /** 区間ごとの、伝説がいた秒数（逃げた後は数えない） */
+  const alive = SEGMENTS.map(() => 0);
   const by: Record<string, number> = {};
   const hits: Record<string, number> = {};
-  for (let seed = 1; seed <= SEEDS; seed++) {
+  for (let seed = 1; seed <= SEEDS; seed++) for (let only = 0; only < (FRESH ? SEGMENTS.length : 1); only++) {
     const sim = new Simulation({ tickRate, seed, rules });
     sim.addPlayer({ id: 1, x: 0, y: 200, radius: 12, moveSpeed: 180 });
     const p = sim.world.players[0]!;
@@ -51,6 +57,7 @@ function run(kindId: string): void {
       return -1;
     };
     SEGMENTS.forEach(([pct, secs], s) => {
+      if (FRESH && s !== only) return;
       const bi = idx();
       if (bi < 0) return;
       w.enemies.hp[bi] = (w.enemies.maxHp[bi]! * pct) / 100;
@@ -102,6 +109,9 @@ function run(kindId: string): void {
         }
         p.hp = p.maxHp;
         sim.step(cmds);
+        // 逃げた（三犬）・いなくなった後は数えない
+        if (idx() < 0) break;
+        alive[s]!++;
         for (const ev of w.events) if (ev.type === 'hazardTelegraphed' && ev.delay === 0 && (rules.stage.moves[ev.move]?.damage ?? 0) > 0) casts++;
         const lost = (p.maxHp - p.hp) / p.maxHp;
         if (lost > 0) {
@@ -126,11 +136,12 @@ function run(kindId: string): void {
       }
     });
   }
-  const perMin = (v: number, secs: number): string => ((v / SEEDS) * (60 / secs)).toFixed(2);
+  // 伝説がいた時間あたり（試した数の合計）
+  const perMin = (v: number, ticks: number): string => (ticks ? (v * 60 * tickRate) / ticks : 0).toFixed(2);
+  const total = alive.reduce((a, b) => a + b, 0);
   console.log(
-    `${kindId.padEnd(16)} 平均 ${perMin(perSeg.reduce((a, b) => a + b, 0), SEGMENTS.reduce((a, [, x]) => a + x, 0))} / 当たる技 毎分 ${((casts / SEEDS) * 60 / SEGMENTS.reduce((a, [, x]) => a + x, 0)).toFixed(1)} 回 / 受けた 毎分 最大HPの ${SEGMENTS.map(([pct, secs], s) => `HP${pct}%: ${perMin(perSeg[s]!, secs)}`).join(' / ')}`,
+    `${kindId.padEnd(16)} 平均 ${perMin(perSeg.reduce((a, b) => a + b, 0), total)} / 当たる技 毎分 ${perMin(casts, total)} 回 / 受けた 毎分 最大HPの ${SEGMENTS.map(([pct], s) => `HP${pct}%: ${perMin(perSeg[s]!, alive[s]!)}（${Math.round(alive[s]! / tickRate / SEEDS)}秒）`).join(' / ')}`,
   );
-  const total = SEGMENTS.reduce((a, [, secs]) => a + secs, 0);
   console.log(
     `${''.padEnd(16)} 内訳（毎分） ${Object.entries(by)
       .sort((a, b) => b[1] - a[1])

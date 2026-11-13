@@ -76,7 +76,8 @@ describe('三犬の 1 分戦の同期（07 の228章）', () => {
     expect(at.guestOut).toBe(at.hostOut);
     expect([...seen.host].filter((m) => !seen.guest.has(m))).toEqual([]);
     expect([...seen.hostActive].filter((m) => !seen.guestActive.has(m))).toEqual([]);
-    expect(avgGap).toBeLessThan(60);
+    // ライコウは しんそく（速さ 3200）を 1 周に 2 回使うので、補間の遅れの平均が少し大きい（07 の259章）
+    expect(avgGap).toBeLessThan(id === 'legend-raikou' ? 90 : 60);
     expect(guest.world.arena).toBeNull();
     expect(host.world.arena).toBeNull();
   });

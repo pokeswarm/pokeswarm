@@ -899,7 +899,7 @@
         ],
         "random": false,
         "intervalAfterMove": true,
-        "moveIntervalSeconds": 1,
+        "moveIntervalSeconds": 0.4,
         "field": {
           "overlay": {
             "color": "#070a24",
@@ -1057,7 +1057,7 @@
         },
         "random": false,
         "intervalAfterMove": true,
-        "moveIntervalSeconds": 1.4
+        "moveIntervalSeconds": 0.7
       },
       "legend-ho-oh": {
         "hpDrops": {
@@ -1115,7 +1115,7 @@
         ],
         "random": false,
         "intervalAfterMove": true,
-        "moveIntervalSeconds": 1.4,
+        "moveIntervalSeconds": 0.7,
         "field": {
           "whileMove": "hooh-sun",
           "typePowerPct": {

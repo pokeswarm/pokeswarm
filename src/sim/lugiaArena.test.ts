@@ -57,16 +57,16 @@ describe('ルギアの技（07 の204章）', () => {
     force('lugia-aeroblast');
     const id = (h: (typeof sim.world.hazards)[number]) => sim.world.rules.stage.moves[h.move]?.id;
     step(1.7);
-    expect(sim.world.hazards.filter((h) => id(h) === 'lugia-aeroblast-shot').length).toBe(6);
+    expect(sim.world.hazards.filter((h) => id(h) === 'lugia-aeroblast-shot').length).toBe(14);
     sim.world.bosses[0]!.cooldown = 1e6;
-    step(2);
+    step(3.2);
     const twisters = sim.world.hazards.filter((h) => id(h) === 'lugia-aero-tornado');
-    expect(twisters.length).toBe(6);
+    expect(twisters.length).toBe(14);
     const last = twisters[twisters.length - 1]!;
     const small = last.radius;
     step(1.2);
     expect(last.radius).toBeGreaterThan(small);
-    expect(last.radius).toBe(90);
+    expect(last.radius).toBe(140);
   });
 
   it('エアロブラスト: 狙わず、マップ全体へ満遍なく落とす', () => {
@@ -89,7 +89,7 @@ describe('ルギアの技（07 の204章）', () => {
     sim.world.enemies.hp[0] = sim.world.enemies.maxHp[0]! * 0.4;
     force('lugia-aeroblast');
     step(1.7);
-    expect(sim.world.hazards.filter((h) => sim.world.rules.stage.moves[h.move]?.id === 'lugia-aeroblast-shot').length).toBe(9);
+    expect(sim.world.hazards.filter((h) => sim.world.rules.stage.moves[h.move]?.id === 'lugia-aeroblast-shot').length).toBe(18);
   });
 
   it('ハイドロポンプ: 左右の端へ飛び、中央の方へなぎ払い、奥へ戻る', () => {
@@ -106,8 +106,13 @@ describe('ルギアの技（07 の204章）', () => {
     step(2.4);
     expect(beam.activeTicks).toBeDefined();
     expect(Math.abs(beam.dirY)).toBeGreaterThan(0.1);
-    step(5.4);
-    expect(sim.world.enemies.y[0]!).toBeCloseTo(a.y - 240, 0);
+    // 奥へ戻る（技の間が短いので、戻った後すぐ次の技へ動き出す。一番奥へ来た所で見る）
+    let top = Infinity;
+    for (let t = 0; t < 30 * 5.4; t++) {
+      step(1 / 30);
+      top = Math.min(top, sim.world.enemies.y[0]!);
+    }
+    expect(top).toBeCloseTo(a.y - 240, 0);
   });
 
   it('ふきとばし: 奥の定位置で寄られたら押し返す', () => {

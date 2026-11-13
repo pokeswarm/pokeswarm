@@ -118,7 +118,7 @@ describe('ホウオウ（07 の207章）', () => {
     for (let k = 1; k < ys.length; k++) expect(rows.get(ys[k]!)![0]!.ticksLeft).toBeGreaterThan(rows.get(ys[k - 1]!)![0]!.ticksLeft);
   });
 
-  it('ブレイブバード: 端へ飛んで 3 回突進し、マップの外へ出ず、通った跡に炎が残る', () => {
+  it('ブレイブバード: 端へ飛んで 4 回突進し、マップの外へ出ず、通った跡に炎が残る', () => {
     const { sim, step, force, bossIndex, ids } = setup();
     const a = sim.world.arena!;
     force('hooh-fly-side');
@@ -141,7 +141,7 @@ describe('ホウオウ（07 の207章）', () => {
       expect(Math.abs(sim.world.enemies.x[i]! - a.x)).toBeLessThan(a.halfWidth + 46);
       expect(Math.abs(sim.world.enemies.y[i]! - a.y)).toBeLessThan(a.halfHeight + 46);
     }
-    expect(dashes).toBe(3);
+    expect(dashes).toBe(4);
     expect(trails).toBe(true);
   });
 

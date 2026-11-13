@@ -6367,7 +6367,7 @@
     },
     "boss-raikou-cloud-bolt": {
       "extends": "electric.base",
-      "strike": { "id": "raikou-strike", "fit": "circle", "size": 2.4, "originY": 0.9, "seconds": 0.32 }
+      "strike": { "id": "raikou-strike", "fit": "circle", "size": 1.3, "originY": 0.9, "seconds": 0.32 }
     },
     "boss-raikou-discharge": {
       "extends": "electric.base",

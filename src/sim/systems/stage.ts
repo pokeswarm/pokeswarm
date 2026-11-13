@@ -1073,6 +1073,12 @@ function useBossMove(world: World, boss: World['bosses'][number], i: number, for
     const t = pickPlayer(world, bx, by, move.targetPick ?? 'nearest');
     const d = t ? Math.hypot(t.x - bx, t.y - by) : Infinity;
     if ((move.minTargetDistance !== undefined && d <= move.minTargetDistance) || (move.maxTargetDistance !== undefined && d >= move.maxTargetDistance)) {
+      // 代わりの技（色違いのカメックス: 離れていたら アクアジェット で詰める）。順番の技は、次にもう一度試す
+      if (move.orElse) {
+        if (!boss.random && forced === undefined) boss.next--;
+        castBossMove(world, boss.id, i, moveIndexOfStage(world.rules, move.orElse));
+        return;
+      }
       if (!boss.random) boss.next--;
       boss.cooldown = Math.min(boss.cooldown, Math.max(1, Math.round(0.2 / world.dt)));
       return;
@@ -1447,7 +1453,7 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   }
   if (move.shape === 'line' || move.shape === 'cone') {
     // 自分から狙ったプレイヤーへ向かう直線・扇
-    put(bx + (move.muzzle?.x ?? 0) * (toCenter || 1), by + (move.muzzle?.y ?? 0), ux, uy, move.dashSpeed || move.rooted || move.playerMove || move.followBoss || move.sweep || move.recoilSeconds ? bossId : -1);
+    put(bx + (move.muzzle?.x ?? 0) * (toCenter || 1), by + (move.muzzle?.y ?? 0), ux, uy, move.dashSpeed || move.rooted || move.playerMove || move.followBoss || move.sweep || move.recoilSeconds ? bossId : -1, move.toTarget ? { length: Math.max(1, len0 + move.toTarget.past) } : {});
   } else if (move.target === 'self' && move.rings) {
     // 外へ広がる輪（ミュウツー）: 1本ずつ遅らせて、外側ほど遠くに出す
     for (let k = 0; k < move.rings.count; k++) {
@@ -2152,7 +2158,9 @@ function stepActiveHazard(world: World, hz: World['hazards'][number], move: Boss
     // なぎ払い: 落ちてからの割合で向きを回す。何本もの線（こおりのいぶき）はそのまま回し、1本は扇の端から端へ
     const total = Math.max(1, Math.round(move.sweep.seconds / world.dt));
     const t = 1 - (hz.activeTicks ?? 0) / total;
-    const deg = move.arms ? move.sweep.degrees * t : move.sweep.degrees * (t - 0.5);
+    // power: ゆっくり回り始めて加速していく（究極のハイドロカノン）
+    const e = move.sweep.power === 1 ? t : t ** move.sweep.power;
+    const deg = move.arms ? move.sweep.degrees * e : move.sweep.degrees * (e - 0.5);
     const a = Math.atan2(hz.baseDirY, hz.baseDirX) + (deg * Math.PI) / 180;
     hz.dirX = Math.cos(a);
     hz.dirY = Math.sin(a);

@@ -27,6 +27,7 @@ import { ZapdosElectric } from '../render/effects/ZapdosElectric';
 import { MoltresFlame } from '../render/effects/MoltresFlame';
 import { ShinyCharizardFlame } from '../render/effects/ShinyCharizardFlame';
 import { ShinyVenusaurPlant } from '../render/effects/ShinyVenusaurPlant';
+import { ShinyBlastoiseWater } from '../render/effects/ShinyBlastoiseWater';
 import { WaterRun } from '../render/effects/WaterRun';
 import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
@@ -182,6 +183,9 @@ export class RunScene extends Phaser.Scene {
   private moltresFlame: MoltresFlame | null = null;
   private shinyCharizardFlame: ShinyCharizardFlame | null = null;
   private shinyVenusaurPlant: ShinyVenusaurPlant | null = null;
+  private shinyBlastoiseWater: ShinyBlastoiseWater | null = null;
+  /** 甲羅で走っているボス（色違いのカメックスの アクアジェット）: 走り出した技の動作・絵・向き。止まると消す */
+  private readonly dashLooks = new Map<number, { pose: string; effect: string; dirX: number; dirY: number }>();
   /** 水の上を走る足元（07 の225章） */
   private waterRun: WaterRun | null = null;
   private introFading = false;
@@ -2154,7 +2158,7 @@ export class RunScene extends Phaser.Scene {
   /**
    * ボスの技の絵（07 の167章。data/effects/recipes.json の bossTelegraph・bossActive）: 予告の間は予告の場所に、当たっている間は範囲の今の場所・向きに描く
    */
-  private hazardSpriteItems(world: World): SpriteItem[] {
+  private hazardSpriteItems(world: World, frame = 1): SpriteItem[] {
     const out: SpriteItem[] = [];
     // 天気の姿の体の絵（リザードン: 晴れの炎・雨の湯気。07 の198章）
     {
@@ -2175,6 +2179,14 @@ export class RunScene extends Phaser.Scene {
       const aura = world.rules.stage.legendary?.moveSets[kind?.id ?? '']?.shell?.aura;
       if (!aura) continue;
       out.push({ spec: { id: aura.id, fit: 'circle', size: aura.size, alpha: 1, rotate: 'none', spinDegPerSec: 0, varyTiles: false, upright: false, directional: false, originY: 0.5, along: 0.6, shake: 0, tail: 0, afterimages: 0, afterimageGap: 2 } as SpriteItem['spec'], x: world.enemies.x[i]!, y: world.enemies.y[i]!, radius: world.enemies.radius[i]!, band: 0, dirX: 1, dirY: 0, length: 0, vx: 0, vy: 0, elapsed: world.tick * world.dt, alpha: 1, seed: id });
+    }
+    // 突進している体に重ねる絵（色違いのカメックスの アクアジェット: 水をまとって走る。07 の256章）。走っている間（legendPose が覚えている間）
+    for (const [id, look] of this.dashLooks) {
+      const spec = effectRecipes[look.effect]?.bossDash;
+      const b = findEnemyIndex(world, id);
+      if (!spec || b === -1) continue;
+      const e = world.enemies;
+      out.push({ spec, x: e.prevX[b]! + (e.x[b]! - e.prevX[b]!) * frame, y: e.prevY[b]! + (e.y[b]! - e.prevY[b]!) * frame, radius: e.radius[b]!, band: 0, dirX: look.dirX, dirY: look.dirY, length: 0, vx: look.dirX, vy: look.dirY, elapsed: world.tick * world.dt, alpha: 1, seed: id });
     }
     for (const h of world.hazards) {
       const mv = world.rules.stage.moves[h.move];
@@ -2707,13 +2719,31 @@ export class RunScene extends Phaser.Scene {
     if (!set) return null;
     const id = w.enemies.id[i]!;
     const charging = w.hazards.some((h) => h.dasher === id && h.activeTicks === undefined && w.rules.stage.moves[h.move]?.rooted);
+    // 甲羅で回って走っている間（色違いのカメックスの アクアジェット。07 の256章）
+    // 当たる時間は走り終わる前に終わるので、走り出した技を覚えておき、速く動いている間は甲羅のまま
+    const fast = Math.hypot(w.enemies.x[i]! - w.enemies.prevX[i]!, w.enemies.y[i]! - w.enemies.prevY[i]!) > 6;
+    for (const h of w.hazards) {
+      const mv = w.rules.stage.moves[h.move];
+      if (h.dasher === id && mv?.shellSpin && mv.pose && h.activeTicks !== undefined && mv.dashSpeed) this.dashLooks.set(id, { pose: mv.pose, effect: mv.effect, dirX: h.dirX, dirY: h.dirY });
+    }
+    const look = this.dashLooks.get(id);
+    if (look && !fast) this.dashLooks.delete(id);
+    if (look && fast) return { anim: look.pose, spin: true };
     // 技ごとの動き（ピカチュウ: ためる・息を整える。07 の194章）
     for (const h of w.hazards) {
       const mv = w.rules.stage.moves[h.move];
       const pose = h.dasher === id && (h.activeTicks === undefined || mv?.holdWhileActive) ? mv?.pose : undefined;
       if (pose) {
-        // 固定マップ: 決まった向きへ撃つ技はその向き、狙う技は当たる場所を向く
-        const aimed = mv?.fixedAim || mv?.aimCenter ? ([h.dirX, h.dirY] as const) : mv?.target === 'player' ? ([h.x - w.enemies.x[i]!, h.y - w.enemies.y[i]!] as const) : null;
+        if (mv?.shellSpin && h.activeTicks === undefined) return { anim: pose, spin: true };
+        // 固定マップ: 決まった向きへ撃つ技はその向き、狙う技は当たる場所を向く。何本もの線を扇に出す技（V 字のハイドロカノン）は扇の真ん中
+        const mid = mv?.arms?.fan?.length ? (((mv.arms.fan[0]! + mv.arms.fan[mv.arms.fan.length - 1]!) / 2 - mv.arms.fan[0]!) * Math.PI) / 180 : 0;
+        const aimed = mv?.arms?.fan?.length
+          ? ([Math.cos(Math.atan2(h.dirY, h.dirX) + mid), Math.sin(Math.atan2(h.dirY, h.dirX) + mid)] as const)
+          : mv?.fixedAim || mv?.aimCenter
+            ? ([h.dirX, h.dirY] as const)
+            : mv?.target === 'player'
+              ? ([h.x - w.enemies.x[i]!, h.y - w.enemies.y[i]!] as const)
+              : null;
         return { anim: pose, spin: false, ...(w.arena && aimed ? { face: aimed } : {}) };
       }
     }
@@ -3063,7 +3093,7 @@ export class RunScene extends Phaser.Scene {
     // ボスの範囲技が落ちた所の絵: 出てからの時間でコマを進め、最後の 3 割で薄くする
     const now = this.time.now / 1000;
     this.strikes = this.strikes.filter((s) => now - s.start < s.seconds);
-    const hazardItems = this.hazardSpriteItems(world);
+    const hazardItems = this.hazardSpriteItems(world, alpha);
     this.strikeSprites?.drawItems(
       this.strikes.map((s) => {
         const elapsed = now - s.start;
@@ -3146,6 +3176,8 @@ export class RunScene extends Phaser.Scene {
     this.shinyCharizardFlame.update(world, this.time.now, alpha);
     this.shinyVenusaurPlant ??= new ShinyVenusaurPlant(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);
     this.shinyVenusaurPlant.update(world, this.time.now, alpha);
+    this.shinyBlastoiseWater ??= new ShinyBlastoiseWater(this, spriteRender.depths.bosses + 0.05);
+    this.shinyBlastoiseWater.update(world, alpha);
     this.waterRun ??= new WaterRun(this, ARENA_FLOOR_DEPTH + 3.5, spriteRender.depths.bosses - 0.01);
     this.waterRun.update(world, this.time.now);
     // 地面の一部なので、障害物・雑魚より下（作者の依頼）

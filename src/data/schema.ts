@@ -853,7 +853,14 @@ export const bossMoveSchema = z.object({
   fan: z.array(z.number()).optional(),
   arms: z.object({ count: z.number().int().min(2), offsetDegrees: z.number().default(0), /** repeat の1回ごとに全体をこの度数ずつ回す（星の弾幕: 前の波のすき間へ。07 の190章） */ spinPerRepeat: z.number().optional(), /** 狙った向きからこの度数ずつずらして扇に出す（こんげんのはどう。07 の189章） */ fan: z.array(z.number()).optional(), /** 狙った向きに関係なく、画面に対して offsetDegrees の向きに出す（絵の×と当たり判定をそろえる。クロスチョップ） */ absolute: z.boolean().default(false), /** 等しい角度の代わりに、画面に対するこの向き（度。右が 0・下が 90）に出す（だいもんじ の大の字） */ angles: z.array(z.number()).optional() }).optional(),
   /** 落ちた後、直線の向きを回す（なぎ払い）: 合わせて degrees 度を seconds 秒で。予告は回る範囲の扇で見せる */
-  sweep: z.object({ degrees: z.number(), seconds: z.number().positive() }).optional(),
+  sweep: z
+    .object({
+      degrees: z.number(),
+      seconds: z.number().positive(),
+      /** 回る角度を、経った割合の power 乗にする（2 なら、ゆっくり回り始めて加速していく。色違いのカメックスの究極のハイドロカノン。07 の256章） */
+      power: z.number().positive().default(1),
+    })
+    .optional(),
   /** 落ちた後に当たる時間（秒。省略なら bossRules.hazardActiveSeconds） */
   activeSeconds: z.number().positive().optional(),
   /** 当たる時間の間、この秒数ごとにもう一度当たる（省略なら1回だけ） */
@@ -947,6 +954,12 @@ export const bossMoveSchema = z.object({
   bounce: z
     .object({ seconds: z.number().positive(), speed: z.number().positive(), halfWidth: z.number().positive(), halfHeight: z.number().positive(), growPct: z.number().nonnegative().default(0) })
     .optional(),
+  /** 直線の長さを、狙った人までの距離 + past にする（壁まで。色違いのカメックスの アクアジェット: 狙った人の少し先で止まる。07 の256章） */
+  toTarget: z.object({ past: z.number() }).optional(),
+  /** 予告の間と突進している間、pose の動作のまま向きをくるくる回す（甲羅で回る。色違いのカメックス。07 の256章） */
+  shellSpin: z.boolean().optional(),
+  /** 距離の条件（minTargetDistance・maxTargetDistance）を満たさないときは、待たずに代わりにこの技を使い、この技は次にもう一度試す（色違いのカメックス: 離れていたら アクアジェット で詰める。07 の256章） */
+  orElse: z.string().min(1).optional(),
   /** then の技を、ボスの今の場所ではなく、この技と同じ場所・向きに置く（つじぎり の二段目） */
   thenSamePlace: z.boolean().optional(),
 });
@@ -2366,6 +2379,8 @@ export const effectRecipeSchema = z.object({
   bossTelegraph: moveSpriteSpec.optional(),
   /** ボスの技: 落ちた後、当たっている間ずっと、範囲の今の場所・向きに描く絵（進む玉・回るレーザー・押し寄せる波） */
   bossActive: moveSpriteSpec.optional(),
+  /** ボスの技: 突進している間、ボスの体に重ねる絵（色違いのカメックスの アクアジェット: 水をまとって走る。07 の256章） */
+  bossDash: moveSpriteSpec.optional(),
   /** 効き方から出た円・飛ぶもの（ブラストバーンの火の粉・ハードプラントの根・10まんボルトの周りの電気）を、このドット絵で描く */
   effectSprite: moveSpriteSpec.optional(),
   /** 効き方から出た、残る範囲（puddle・split の land）の絵。無ければ effectSprite（ロックブラスト: 飛ぶ破片と、落ちて残るかけらを分ける） */

@@ -603,28 +603,24 @@
         "moveIntervalSeconds": 1
       },
       "shiny-blastoise": {
-        "moves": [
-          "blastoise-hydro-cannon"
-        ],
-        "random": false,
-        "moveIntervalSeconds": 0.5,
-        "enrageMoveIntervalSeconds": 0.4,
-        "casterPower": 1.2,
-        "shell": {
-          "farDistance": 0,
-          "nearDistance": 0,
-          "speedMultiplier": 4,
-          "pose": "Hurt",
-          "spin": true,
-          "moves": [
-            {
-              "move": "rapid-spin",
-              "level": 8,
-              "everySeconds": 0.4
-            }
-          ]
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960
         },
-        "chargePose": "Shoot"
+        "anchor": { "x": 0, "y": -220 },
+        "noEnrage": true,
+        "casters": [{ "move": "bubble", "level": 8, "everySeconds": 2.6 }],
+        "casterPower": 1.2,
+        "hpMoves": [
+          { "belowHpPct": 66, "moves": ["blastoise-s-aqua-jet", "blastoise-s-hydro-cannon", "blastoise-s-aqua-jet", "blastoise-s-hydro-cannon", "blastoise-s-aqua-jet", "blastoise-s-hydro-cannon"] },
+          { "belowHpPct": 33, "moves": ["blastoise-s-to-center", "*", "blastoise-s-recharge"] }
+        ],
+        "pool": ["blastoise-s-ultimate-cw", "blastoise-s-ultimate-ccw"],
+        "moves": ["blastoise-s-hydro-cannon", "blastoise-s-bubble-beam", "blastoise-s-hydro-cannon", "blastoise-s-water-spout"],
+        "random": false,
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 1
       }
     },
     "moveIntervalSeconds": 1.6,

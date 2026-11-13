@@ -48,43 +48,7 @@ describe('色違いの御三家（プレイヤーと同じ技）', () => {
 
   // 色違いのフシギバナは固定マップの戦いに作り直した（07 の255章）。テストは src/sim/shinyVenusaurArena.test.ts
 
-  it('カメックス: 甲羅の形で速く追い、触れるまで近づくと止まって少しためてから、ハイドロカノンを高速で一周させる', () => {
-    const { sim, i, kind } = legend('shiny-blastoise');
-    const e = sim.world.enemies;
-    const p = sim.world.players[0]!;
-    p.x = e.x[i]! + 600;
-    for (let t = 0; t < 10; t++) {
-      p.invincibleTicks = 2;
-      sim.step([]);
-    }
-    expect([...sim.world.legendAis.values()][0]?.shell).toBe(true);
-    expect(e.speed[i]).toBeGreaterThan(sim.world.rules.enemies.kinds[kind]!.moveSpeed * 2);
-    // 触れるまで待つ（プレイヤーは止まっている）
-    const cannon = sim.world.rules.moves.findIndex((m) => m.key === 'hydro-cannon');
-    const angles: number[] = [];
-    for (let t = 0; t < 30 * 8 && angles.length < 20; t++) {
-      p.invincibleTicks = 2;
-      sim.step([]);
-      const pr = sim.world.projectiles;
-      for (let k = 0; k < pr.count; k++) {
-        if (pr.move[k] === cannon && pr.owner[k]! >= 60000) {
-          angles.push(Math.atan2(pr.dirY[k]!, pr.dirX[k]!));
-          expect(e.speed[i]).toBe(0);
-          break;
-        }
-      }
-    }
-    expect(angles.length).toBeGreaterThanOrEqual(10);
-    // 向きが回っている（1更新で 360°/秒 × 1/30 秒 = 12° ずつ）
-    let turned = 0;
-    for (let k = 1; k < angles.length; k++) {
-      let d = angles[k]! - angles[k - 1]!;
-      while (d > Math.PI) d -= Math.PI * 2;
-      while (d < -Math.PI) d += Math.PI * 2;
-      turned += Math.abs(d);
-    }
-    expect(turned).toBeGreaterThan(Math.PI);
-  });
+  // 色違いのカメックスは固定マップの戦いに作り直した（07 の256章）。テストは src/sim/shinyBlastoiseArena.test.ts
   it('伝説の HP は 5 倍のうえ人数倍（2人で 10 倍）、動く速さは 1.15 倍（作者の依頼 2026年10月29日。07 の123章・124章）', () => {
     const one = legend('legend-mewtwo', 1);
     const two = legend('legend-mewtwo', 2);

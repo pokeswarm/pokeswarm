@@ -308,6 +308,7 @@ for (const m of regionStages.kanto.stage.moves) {
   check(!!effectRecipes[m.effect], `data/game/stage.json の範囲技 "${m.id}" の effect "${m.effect}" のレシピがありません`);
   check(!m.playerMove || !!movesConfig.moves[m.playerMove.move], `data/game/stage.json の範囲技 "${m.id}" のプレイヤーと同じ技 "${m.playerMove?.move}" が data/game/moves.json にありません`);
   check(!m.then || stageMoveIds.has(m.then), `data/game/stage.json の範囲技 "${m.id}" の then "${m.then}" がありません`);
+  check(!m.orElse || stageMoveIds.has(m.orElse), `data/game/stage.json の範囲技 "${m.id}" の orElse "${m.orElse}" がありません`);
   check(m.shape !== 'line' || !!m.length || !!m.wall, `data/game/stage.json の範囲技 "${m.id}" は直線なので length が必要です`);
   // 07 の167章の部品
   check(m.shape !== 'cone' || !!m.arc, `data/game/stage.json の範囲技 "${m.id}" は扇なので arc が必要です`);
@@ -316,7 +317,7 @@ for (const m of regionStages.kanto.stage.moves) {
   check(!m.counter || !!m.then, `data/game/stage.json の範囲技 "${m.id}" のカウンターは、返す技（then）が必要です`);
   check(!m.decoys || !!enemiesConfig.kinds.find((k) => k.id === m.decoys!.kind)?.decoy, `data/game/stage.json の範囲技 "${m.id}" の偽物 "${m.decoys?.kind}" が data/game/enemies.json に無いか、decoy ではありません`);
   const recipe = effectRecipes[m.effect];
-  for (const spec of [recipe?.bossTelegraph, recipe?.bossActive, recipe?.strike]) check(!spec || !!moveSprites.sprites[spec.id], `data/game/stage.json の範囲技 "${m.id}" の絵 "${spec?.id}" が data/render/move-sprites.json にありません（npm run move-sprites）`);
+  for (const spec of [recipe?.bossTelegraph, recipe?.bossActive, recipe?.bossDash, recipe?.strike]) check(!spec || !!moveSprites.sprites[spec.id], `data/game/stage.json の範囲技 "${m.id}" の絵 "${spec?.id}" が data/render/move-sprites.json にありません（npm run move-sprites）`);
 }
 // 地方のステージごと: 区間の雑魚・地面・曲・障害物・ボス・伝説・スウォーム（02 の16章）
 for (const rs of Object.values(regionStages)) {
@@ -384,6 +385,7 @@ for (const rs of Object.values(regionStages)) {
       check(legendaryKinds.includes(kind), `${file} の伝説ごとの技の "${kind}" が伝説の候補にありません`);
       // "*" は pool からランダム（ミュウ）
       for (const id of set.moves) check(stageMoveIds.has(id) || (id === '*' && (set.pool?.length ?? 0) > 0), `${file} の伝説 "${kind}" の範囲技 "${id}" がありません`);
+      for (const id of (set.hpMoves ?? []).flatMap((h) => h.moves)) check(stageMoveIds.has(id) || (id === '*' && (set.pool?.length ?? 0) > 0), `${file} の伝説 "${kind}" の HP で使う範囲技 "${id}" がありません`);
       for (const id of set.pool ?? []) check(stageMoveIds.has(id), `${file} の伝説 "${kind}" の pool の範囲技 "${id}" がありません`);
       for (const c of [...(set.casters ?? []), ...(set.shell?.moves ?? [])]) check(!!movesConfig.moves[c.move], `${file} の伝説 "${kind}" のプレイヤーと同じ技 "${c.move}" が data/game/moves.json にありません`);
       if (set.field?.weather) check(!!effectRecipes[set.field.weather]?.weather, `${file} の伝説 "${kind}" の天気 "${set.field.weather}" が、天気のあるレシピ（data/effects/recipes.json の weather）ではありません`);

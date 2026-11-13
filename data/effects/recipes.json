@@ -6253,6 +6253,11 @@
     "boss-moltres-plain": {
       "extends": "fire.base"
     },
+    "boss-sb-plain": {"extends":"water.base"},
+    "boss-sb-aqua-jet": {"extends":"water.base","bossDash":{"id":"aqua-jet-wrap","fit":"circle","size":1.25,"rotate":"velocity","overBoss":true}},
+    "boss-sb-hydro-cannon": {"extends":"water.base","bossActive":{"id":"water-stream","fit":"line","size":1.1}},
+    "boss-sb-bubble-beam": {"extends":"water.base","bossActive":{"id":"bubble-line","fit":"line","size":2}},
+    "boss-sb-water-spout": {"extends":"water.base","bossTelegraph":{"id":"water-drop","fit":"circle","size":0.6,"rotate":"velocity","fromBoss":true,"arcHeight":220,"offsetY":-50,"overBoss":true},"strike":{"id":"water-splash","fit":"circle","size":1,"seconds":0.4}},
     "boss-sv-plain": {
       "extends": "grass.base"
     },

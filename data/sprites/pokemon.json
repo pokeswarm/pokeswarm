@@ -156,6 +156,12 @@
       ],
       "extraAnimations": [
         "Shoot"
+      ],
+      "enemyExtraAnimations": [
+        "Withdraw",
+        "Shoot",
+        "Charge",
+        "Hurt"
       ]
     },
     {

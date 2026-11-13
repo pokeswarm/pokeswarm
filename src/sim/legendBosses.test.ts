@@ -18,30 +18,12 @@ function legend(id: string, players = 1) {
   return { rules, sim, kind, i, p: sim.world.players[0]! };
 }
 
-function moveId(sim: Simulation, idx: number): string {
-  return sim.world.rules.stage.moves[idx]!.id;
-}
-
 // ミュウツーは固定マップの戦いに作り直した（07 の250章）。テストは src/sim/mewtwoArena.test.ts
 // フリーザーは固定マップの戦いに作り直した（07 の251章）。テストは src/sim/articunoArena.test.ts
 
 // サンダーは固定マップの戦いに作り直した（07 の252章）。テストは src/sim/zapdosArena.test.ts
 // ファイヤーは固定マップの戦いに作り直した（07 の253章）。テストは src/sim/moltresArena.test.ts
-describe('ミュウ', () => {
-  it('テレポートと、カントーの固有技をまねた技を、交互にくり返す', () => {
-    const { sim } = legend('legend-mew');
-    const order: string[] = [];
-    for (let t = 0; t < 30 * 4; t++) {
-      sim.world.players[0]!.invincibleTicks = 2;
-      sim.step([]);
-      for (const ev of sim.world.events) if (ev.type === 'hazardTelegraphed' && ev.delay === 0) order.push(moveId(sim, ev.move));
-    }
-    const teleports = order.filter((m) => m === 'mew-teleport').length;
-    const others = new Set(order.filter((m) => m !== 'mew-teleport'));
-    expect(teleports).toBeGreaterThanOrEqual(3);
-    expect(others.size).toBeGreaterThanOrEqual(3);
-  });
-});
+// ミュウは固定マップの戦いに作り直した（07 の257章）。テストは src/sim/mewArena.test.ts
 
 describe('色違いの御三家（プレイヤーと同じ技）', () => {
   // 色違いのリザードンは固定マップの戦いに作り直した（07 の254章）。テストは src/sim/shinyCharizardArena.test.ts
@@ -71,9 +53,8 @@ describe('色違いの御三家（プレイヤーと同じ技）', () => {
     expect(w.legendTargets.get(id)).toBe(2);
     for (let t = 0; t < 2 * 30 + 2; t++) sim.step([]);
     expect(w.legendTargets.get(id)).toBe(1);
-    // 足元に落とす技（ふぶき）は、2 人それぞれの近くに落ちる
-    const blizzard = w.rules.stage.moves.findIndex((m) => m.id === 'articuno-blizzard');
-    // フリーザーは作り直して ふぶき を使わないので、昔の ふぶき（ミュウの ゆびをふる が使う）を使わせる
+    // 足元に落とす技（色違いのリザードンの ブラストバーン）は、2 人それぞれの近くに落ちる
+    const blizzard = w.rules.stage.moves.findIndex((m) => m.id === 'charizard-s-blast-burn');
     const boss = w.bosses[0]!;
     boss.moves = [blizzard];
     boss.next = 0;

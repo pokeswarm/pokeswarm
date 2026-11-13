@@ -3106,6 +3106,19 @@
     "contestType": "smart",
     "damageClass": "status"
   },
+  "transform": {
+    "names": {
+      "ja": "へんしん",
+      "en": "Transform",
+      "fr": "Morphing",
+      "de": "Wandler",
+      "es": "Transformación",
+      "it": "Trasformazione"
+    },
+    "type": "normal",
+    "contestType": "smart",
+    "damageClass": "status"
+  },
   "tri-attack": {
     "names": {
       "ja": "トライアタック",

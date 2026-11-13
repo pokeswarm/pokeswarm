@@ -960,6 +960,14 @@ export const bossMoveSchema = z.object({
   shellSpin: z.boolean().optional(),
   /** 距離の条件（minTargetDistance・maxTargetDistance）を満たさないときは、待たずに代わりにこの技を使い、この技は次にもう一度試す（色違いのカメックス: 離れていたら アクアジェット で詰める。07 の256章） */
   orElse: z.string().min(1).optional(),
+  /** ゆびをふる（ミュウ。07 の257章）: 落ちたら、この中からランダムに 1 つを次に使う（前に選んだ技は続けて選ばない） */
+  pick: z.array(z.string().min(1)).min(1).optional(),
+  /** へんしん（ミュウ。07 の257章）: この技の範囲が出ている間、ボスをこの敵の種類（data/game/enemies.json）の絵で描く。clearsMoves の技で戻る */
+  look: z.string().min(1).optional(),
+  /** 予告の間は次の技を使わない（止まらずに歩く。へんしんした姿の技の合間。07 の257章） */
+  wait: z.boolean().optional(),
+  /** 落ちたら、これらの技を順に、次に使う（へんしんした姿の技と、元に戻る技） */
+  thenQueue: z.array(z.string().min(1)).min(1).optional(),
   /** then の技を、ボスの今の場所ではなく、この技と同じ場所・向きに置く（つじぎり の二段目） */
   thenSamePlace: z.boolean().optional(),
 });
@@ -1119,6 +1127,8 @@ export const stageConfigSchema = z.object({
             hpMoves: z.array(z.object({ belowHpPct: z.number().gt(0).lt(100), moves: z.array(z.string()).min(1) })).optional(),
             /** 第 2 段階（技が速くなる・DANGER）を使わない。行動を作者が決めた相手（07 の194章） */
             noEnrage: z.boolean().optional(),
+            /** 技の名前（stage.json の move）を、使ったときにボスの上に出す（ミュウの ゆびをふる。07 の257章） */
+            showMoveNames: z.boolean().optional(),
             /** 水の上を走る見た目（足元の波紋・航跡・しぶき。スイクン。07 の225章） */
             waterRun: z.boolean().optional(),
             /** 技の間隔を、技が終わってから数える（間隔のぶん必ず歩く。07 の194章） */

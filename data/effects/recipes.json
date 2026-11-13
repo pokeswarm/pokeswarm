@@ -6241,6 +6241,9 @@
     "boss-mewtwo-barrier-break": {
       "extends": "psychic.base"
     },
+    "boss-mew-plain": { "extends": "psychic.base" },
+    "boss-mew-blink": { "extends": "psychic.base" },
+    "boss-mew-poof": { "extends": "psychic.base", "bossTelegraph": { "id": "teleport-sparkle", "fit": "circle", "size": 2.4, "overBoss": true } },
     "boss-mewtwo-psystrike": {
       "extends": "psychic.base"
     },

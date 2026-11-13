@@ -105,10 +105,4 @@ describe('ファイヤー（07 の253章）', () => {
     expect(sea!.innerRadius).toBeLessThan(160);
     expect(mult).toBeCloseTo(1.5, 5);
   });
-
-  it('ミュウの ゆびをふる が使う昔の炎の突進は残っている', () => {
-    const { rules } = setup();
-    expect(rules.stage.legendary!.moveSets['legend-mew']!.pool).toContain('moltres-flamedash');
-    expect(rules.stage.moves.some((m) => m.id === 'moltres-flamedash')).toBe(true);
-  });
 });

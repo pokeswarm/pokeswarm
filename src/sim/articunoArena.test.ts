@@ -160,10 +160,4 @@ describe('フリーザー（07 の251章）', () => {
     expect(frozen).toBeGreaterThanOrEqual(Math.round(2 / w.dt) - 1);
     for (const id of ['articuno-to-top', 'articuno-tired']) expect(seen).toContain(id);
   });
-
-  it('ミュウの ゆびをふる が使う昔の ふぶき は残っている', () => {
-    const { rules } = setup();
-    expect(rules.stage.legendary!.moveSets['legend-mew']!.pool).toContain('articuno-blizzard');
-    expect(rules.stage.moves.some((m) => m.id === 'articuno-blizzard')).toBe(true);
-  });
 });

@@ -567,6 +567,7 @@
     },
     {
       "id": "legend-mew",
+      "motion": { "type": "keepDistance", "distance": 300 },
       "species": "mew",
       "rank": "legendary",
       "sprite": "enemy/mew",

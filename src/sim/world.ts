@@ -259,6 +259,8 @@ export interface World {
     random?: boolean;
     /** moves の -1 は、毎回ここからランダムに選ぶ（ミュウ） */
     pool?: readonly number[];
+    /** ゆびをふる（pick）で前に選んだ技（続けて同じ技を選ばない。07 の257章） */
+    lastPick?: number;
     /** マップの効果の落雷までの残り（更新回数） */
     lightningTimer?: number;
     /** 第2段階（四天王） */

@@ -180,13 +180,4 @@ describe('ミュウツー（07 の250章）', () => {
     for (const id of ['mewtwo-to-center', 'mewtwo-psystrike-1', 'mewtwo-psystrike-2', 'mewtwo-tired']) expect(seen).toContain(id);
     expect(turned).toBeGreaterThan(1.2);
   });
-
-  it('ミュウの ゆびをふる が使う昔の技（サイコブレイク・サイケこうせん）は残っている', () => {
-    const { rules } = setup();
-    const pool = rules.stage.legendary!.moveSets['legend-mew']!.pool!;
-    for (const id of ['mewtwo-psystrike', 'mewtwo-psybeam']) {
-      expect(pool).toContain(id);
-      expect(rules.stage.moves.some((m) => m.id === id)).toBe(true);
-    }
-  });
 });

@@ -888,7 +888,8 @@
       "uses": [
         "enemy",
         "full"
-      ]
+      ],
+      "enemyExtraAnimations": ["Swing", "Twirl", "Charge", "Shoot", "Attack", "Hurt"]
     },
     {
       "key": "sentret",

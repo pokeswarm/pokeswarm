@@ -1009,7 +1009,7 @@ function bossBusy(world: World, id: number): boolean {
     const m = world.rules.stage.moves[h.move];
     // 体が回っている間（ジャイロボール）も次へ行かない
     if (h.activeTicks !== undefined) return !!(m?.spinBody || m?.holdWhileActive);
-    return !!(m?.rooted || m?.teleport || m?.hideBoss || m?.spinBody);
+    return !!(m?.rooted || m?.teleport || m?.hideBoss || m?.spinBody || m?.wait);
   });
 }
 
@@ -1461,7 +1461,7 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
       put(bx, by, 0, 0, move.followBoss || move.rooted ? bossId : -1, { delay: Math.round(((move.stagger ?? 0) * k) / world.dt), radius: r, inner: Math.max(0, r - move.rings.width * scale) });
     }
   } else if (move.target === 'self') {
-    put(bx, by, ux, uy, move.rooted || move.playerMove || move.followBoss || move.counter || move.buff || move.healPct || move.then || move.recoilSeconds ? bossId : -1);
+    put(bx, by, ux, uy, move.rooted || move.playerMove || move.followBoss || move.counter || move.buff || move.healPct || move.then || move.recoilSeconds || move.pick || move.thenQueue || move.look || move.wait ? bossId : -1);
   } else if (move.teleport) {
     // 瞬間移動（ミュウツー）: 狙ったプレイヤーの後ろ（向いている方向の反対）に予告し、落ちたらそこへ現れる
     const fl = Math.hypot(target.facingX, target.facingY) || 1;
@@ -2345,6 +2345,15 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
     } else if (move.thenSamePlace && world.rules.stage.moves[next]?.glyph) castGlyph(world, next, hz.x, hz.y);
     else if (move.thenSamePlace) addHazard(world, next, hz.x, hz.y, hz.dirX, hz.dirY, -1, undefined, { group: world.nextHazardGroup++ });
     else castBossMove(world, hz.dasher, i, next);
+  }
+  // へんしん（ミュウ）: その姿の技と、元に戻る技を、次に順に使う。ゆびをふる: 選んだ技を次に使う（どちらも距離の条件などは、ふつうの技と同じに見る。07 の257章）
+  if (move.thenQueue && boss) (boss.forced ??= []).unshift(...move.thenQueue.map((m) => moveIndexOfStage(world.rules, m)));
+  if (move.pick && boss) {
+    const all = move.pick.map((m) => moveIndexOfStage(world.rules, m));
+    const choices = all.length > 1 ? all.filter((m) => m !== boss.lastPick) : all;
+    const picked = choices[world.rng.int(choices.length)]!;
+    boss.lastPick = picked;
+    (boss.forced ??= []).unshift(picked);
   }
 }
 

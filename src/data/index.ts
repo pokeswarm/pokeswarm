@@ -309,6 +309,8 @@ for (const m of regionStages.kanto.stage.moves) {
   check(!m.playerMove || !!movesConfig.moves[m.playerMove.move], `data/game/stage.json の範囲技 "${m.id}" のプレイヤーと同じ技 "${m.playerMove?.move}" が data/game/moves.json にありません`);
   check(!m.then || stageMoveIds.has(m.then), `data/game/stage.json の範囲技 "${m.id}" の then "${m.then}" がありません`);
   check(!m.orElse || stageMoveIds.has(m.orElse), `data/game/stage.json の範囲技 "${m.id}" の orElse "${m.orElse}" がありません`);
+  for (const p of [...(m.pick ?? []), ...(m.thenQueue ?? [])]) check(stageMoveIds.has(p), `data/game/stage.json の範囲技 "${m.id}" の pick・thenQueue "${p}" がありません`);
+  check(!m.look || enemiesConfig.kinds.some((k) => k.id === m.look), `data/game/stage.json の範囲技 "${m.id}" の look "${m.look}" が data/game/enemies.json にありません`);
   check(m.shape !== 'line' || !!m.length || !!m.wall, `data/game/stage.json の範囲技 "${m.id}" は直線なので length が必要です`);
   // 07 の167章の部品
   check(m.shape !== 'cone' || !!m.arc, `data/game/stage.json の範囲技 "${m.id}" は扇なので arc が必要です`);

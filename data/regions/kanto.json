@@ -473,34 +473,18 @@
         "moveIntervalSeconds": 0.7
       },
       "legend-mew": {
-        "moves": [
-          "mew-teleport",
-          "*"
+        "arena": { "halfWidth": 800, "halfHeight": 440, "viewHeight": 960 },
+        "anchor": { "x": 0, "y": -220 },
+        "noEnrage": true,
+        "showMoveNames": true,
+        "hpMoves": [
+          { "belowHpPct": 66, "moves": ["mew-transform"] },
+          { "belowHpPct": 33, "moves": ["mew-to-center", "mew-metronome-big", "mew-tired"] }
         ],
-        "pool": [
-          "mew-stone-edge",
-          "mew-volt-tackle",
-          "mew-explosion",
-          "mew-sheer-cold",
-          "mew-extreme-speed",
-          "mew-rock-wrecker",
-          "mew-petal-blizzard",
-          "mew-hex",
-          "mew-psycho-boost",
-          "mew-outrage",
-          "mew-dynamic-punch",
-          "shiny-blast-burn",
-          "shiny-frenzy-plant",
-          "shiny-hydro-cannon",
-          "zapdos-thunder",
-          "articuno-blizzard",
-          "moltres-flamedash",
-          "mewtwo-psystrike",
-          "mewtwo-psybeam"
-        ],
+        "moves": ["mew-teleport", "mew-metronome"],
         "random": false,
-        "moveIntervalSeconds": 0.5,
-        "enrageMoveIntervalSeconds": 0.4
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 0.8
       },
       "legend-articuno": {
         "arena": {

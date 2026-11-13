@@ -12,6 +12,8 @@ interface Slot {
   lift?: number;
   /** 体の見た目を変えている間 */
   bodied?: boolean;
+  /** 今の絵の種類（へんしん中は別の種類。大きさを合わせ直すため） */
+  lookKind?: number;
 }
 
 /**
@@ -53,6 +55,8 @@ export class EnemySprites {
     alphaOf: (index: number) => number = () => 1,
     /** 状態異常による体の見た目（07 の177章。浮く・跳ねる・ふるえる・つぶれる・回る）。ふつうなら null */
     bodyOf: (index: number) => { lift: number; hop: number; shake: number; squash: number; spin: boolean } | null = () => null,
+    /** 別の種類の絵で描くとき（ミュウの へんしん。07 の257章）その種類。ふつうなら null */
+    lookOf: (index: number) => number | null = () => null,
   ): number {
     this.shadows?.clear();
     for (const slot of this.slots.values()) slot.seen = false;
@@ -60,7 +64,11 @@ export class EnemySprites {
     for (let i = 0; i < e.count; i++) {
       // 先に消して見せている敵（ゲストが倒したと見込んだもの）は描かない
       if (e.hp[i]! <= 0) continue;
-      const manifest = this.manifestOf(e.kind[i]!, e.hp[i]! / (e.maxHp[i]! || 1));
+      const look = lookOf(i);
+      // へんしん先の絵がまだ読み込めていなければ、元の絵
+      const lookManifest = look !== null ? this.manifestOf(look, 1) : null;
+      const kind = lookManifest ? look! : e.kind[i]!;
+      const manifest = lookManifest ?? this.manifestOf(e.kind[i]!, e.hp[i]! / (e.maxHp[i]! || 1));
       if (!manifest) continue;
       const x = e.prevX[i]! + (e.x[i]! - e.prevX[i]!) * alpha;
       const y = e.prevY[i]! + (e.y[i]! - e.prevY[i]!) * alpha;
@@ -72,9 +80,9 @@ export class EnemySprites {
       if (!slot) {
         const sprite = this.free.pop() ?? this.scene.add.sprite(0, 0, atlasKey(manifest.key)).setDepth(this.depth);
         // 使い回すスプライトは前の種類の大きさのままなので、毎回合わせる
-        sprite.setScale(this.scale * this.scaleOfKind(e.kind[i]!));
+        sprite.setScale(this.scale * this.scaleOfKind(kind));
         sprite.setDepth(this.depthOfKind(e.kind[i]!) ?? this.depth + this.layerOfKind(e.kind[i]!) * 0.1);
-        slot = { sprite, dir: 0, seen: false };
+        slot = { sprite, dir: 0, seen: false, lookKind: kind };
         this.slots.set(id, slot);
         sprite.setVisible(true);
         // 全員が同じコマで動かないよう、id でずらして始める
@@ -82,6 +90,11 @@ export class EnemySprites {
         sprite.play({ key: animKey(manifest.key, this.resolve(manifest), 0), startFrame: id % frames });
       }
       slot.seen = true;
+      // へんしんした・元に戻った: その種類の大きさにする
+      if (slot.lookKind !== kind) {
+        slot.lookKind = kind;
+        slot.sprite.setScale(this.scale * this.scaleOfKind(kind));
+      }
       const dx = e.x[i]! - e.prevX[i]!;
       const dy = e.y[i]! - e.prevY[i]!;
       if (dx !== 0 || dy !== 0) slot.dir = directionFromVector(dx, dy);
@@ -112,14 +125,14 @@ export class EnemySprites {
           this.shadows ??= this.scene.add.graphics().setDepth(this.depth - 0.05);
           this.shadows.fillStyle(0x000000, 0.3).fillEllipse(x, y + e.radius[i]! * 0.7, e.radius[i]! * 1.6, e.radius[i]! * 0.6);
         }
-        const base = this.scale * this.scaleOfKind(e.kind[i]!);
+        const base = this.scale * this.scaleOfKind(kind);
         const sq = body?.squash ?? 1;
         slot.sprite.setScale(base * (sq < 1 ? 1 + (1 - sq) * 0.5 : 1), base * sq);
         slot.bodied = true;
       } else {
         slot.sprite.setPosition(x, y);
         if (slot.bodied) {
-          slot.sprite.setScale(this.scale * this.scaleOfKind(e.kind[i]!));
+          slot.sprite.setScale(this.scale * this.scaleOfKind(kind));
           slot.bodied = false;
         }
       }

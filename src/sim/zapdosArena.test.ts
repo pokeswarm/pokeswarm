@@ -149,12 +149,6 @@ describe('サンダー（07 の252章）', () => {
     for (const id of ['zapdos-to-center', 'zapdos-zap-cannon-charge', 'zapdos-zap-cannon', 'zapdos-lattice', 'zapdos-tired']) expect(seen).toContain(id);
     expect(latticeAt).toBeGreaterThan(cannonAt);
   });
-
-  it('ミュウの ゆびをふる が使う昔の かみなり は残っている', () => {
-    const { rules } = setup();
-    expect(rules.stage.legendary!.moveSets['legend-mew']!.pool).toContain('zapdos-thunder');
-    expect(rules.stage.moves.some((m) => m.id === 'zapdos-thunder')).toBe(true);
-  });
 });
 
 describe('まひ（07 の252章）', () => {

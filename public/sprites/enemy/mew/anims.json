@@ -26,6 +26,111 @@
         8
       ],
       "frameKeyPrefix": "Walk"
+    },
+    "Swing": {
+      "source": "Swing",
+      "frameWidth": 88,
+      "frameHeight": 104,
+      "durations": [
+        2,
+        1,
+        2,
+        2,
+        3,
+        2,
+        2,
+        1,
+        1
+      ],
+      "frameKeyPrefix": "Swing"
+    },
+    "Twirl": {
+      "source": "Twirl",
+      "frameWidth": 32,
+      "frameHeight": 72,
+      "durations": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        6,
+        2
+      ],
+      "frameKeyPrefix": "Twirl"
+    },
+    "Charge": {
+      "source": "Charge",
+      "frameWidth": 40,
+      "frameHeight": 48,
+      "durations": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Charge"
+    },
+    "Shoot": {
+      "source": "Shoot",
+      "frameWidth": 40,
+      "frameHeight": 64,
+      "durations": [
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Shoot"
+    },
+    "Attack": {
+      "source": "Attack",
+      "frameWidth": 64,
+      "frameHeight": 88,
+      "durations": [
+        2,
+        2,
+        1,
+        3,
+        1,
+        3,
+        2,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Attack"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 40,
+      "frameHeight": 64,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
     }
   },
   "missing": []

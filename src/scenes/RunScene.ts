@@ -184,6 +184,8 @@ export class RunScene extends Phaser.Scene {
   private shinyVenusaurPlant: ShinyVenusaurPlant | null = null;
   /** 甲羅で走っているボス（色違いのカメックスの アクアジェット）: 走り出した技の動作・絵・向き。止まると消す */
   private readonly dashLooks = new Map<number, { pose: string; effect: string; dirX: number; dirY: number }>();
+  /** ボスの上に最後に出した技の名前（ボスの id → 技のキー。続きの技・何度も落ちる技で同じ名前を出し直さない。07 の257章） */
+  private readonly moveNameShown = new Map<number, string>();
   /** 水の上を走る足元（07 の225章） */
   private waterRun: WaterRun | null = null;
   private introFading = false;
@@ -619,7 +621,7 @@ export class RunScene extends Phaser.Scene {
       this,
       rules.enemies.kinds.map((k) => k.sprite),
       Math.round(spriteRender.enemyPreloadSeconds * simulationConfig.tickRate),
-      (kind) => (rules.enemies.kinds[kind]?.formKinds ?? []).map((f) => rules.enemies.kinds.findIndex((x) => x.id === f.kind)),
+      (kind) => [...(rules.enemies.kinds[kind]?.formKinds ?? []).map((f) => rules.enemies.kinds.findIndex((x) => x.id === f.kind)), ...lookKindsOf(rules, kind)],
     );
     // 雑魚の絵はランが終わったら解放する（07 の114章）
     const streamer = this.streamer;
@@ -1272,6 +1274,8 @@ export class RunScene extends Phaser.Scene {
         this.bossId = ev.id;
         this.bossIds.push(ev.id);
         appeared.push(ev.kind);
+      } else if (ev.type === 'hazardTelegraphed' && ev.delay === 0) {
+        this.showBossMoveName(ev);
       } else if (ev.type === 'playerFrozen' && ev.playerId === this.localId) {
         this.announce(t('run.frozen'), '#80deea');
       } else if (ev.type === 'boxHit' || ev.type === 'boxRemoved') {
@@ -2768,6 +2772,43 @@ export class RunScene extends Phaser.Scene {
     return null;
   }
 
+  /** へんしん（ミュウ。07 の257章）: 姿を変える技の範囲が出ている間、その種類の絵で描く。ふつうなら null */
+  private lookKind(i: number): number | null {
+    const w = this.sim.world;
+    const id = w.enemies.id[i]!;
+    for (const h of w.hazards) {
+      if (h.dasher !== id || h.activeTicks === undefined) continue;
+      const look = w.rules.stage.moves[h.move]?.look;
+      if (look) {
+        const k = w.rules.enemies.kinds.findIndex((x) => x.id === look);
+        return k === -1 ? null : k;
+      }
+    }
+    return null;
+  }
+
+  /** 技の名前をボスの上に出す（ミュウの ゆびをふる: 「ゆびをふる」→ 出た技の名前。07 の257章） */
+  private showBossMoveName(ev: { move: number; dasher: number }): void {
+    const w = this.sim.world;
+    const key = w.rules.stage.moves[ev.move]?.move;
+    if (!key) return;
+    const named = (k: number): boolean => k !== -1 && !!w.rules.stage.legendary?.moveSets[w.rules.enemies.kinds[w.enemies.kind[k]!]?.id ?? '']?.showMoveNames;
+    // 使った本人の印が無い技（飛ぶ弾など）は、名前を出す伝説が使ったものとする（その戦いの技は、その伝説しか使わない）
+    let i = ev.dasher !== -1 ? findEnemyIndex(w, ev.dasher) : -1;
+    if (ev.dasher === -1) for (let k = 0; k < w.enemies.count && i === -1; k++) if (w.enemies.hp[k]! > 0 && named(k)) i = k;
+    if (!named(i)) return;
+    const bossId = w.enemies.id[i]!;
+    // 同じ技の続き（はどうだんの弾・何度も落ちる技）は、名前を出し直さない（ゆびをふる は同じ技を続けて選ばない）
+    if (this.moveNameShown.get(bossId) === key) return;
+    this.moveNameShown.set(bossId, key);
+    const name = localName(generated.moves[key]?.names, getLocale(), key);
+    const x = w.enemies.x[i]!;
+    const y = w.enemies.y[i]! - w.enemies.radius[i]! * 3.4;
+    const text = this.add.text(x, y, name, px(32, '#ffffff', { outline: true, align: 'center' })).setOrigin(0.5).setDepth(spriteRender.depths.candy + 2);
+    this.tweens.add({ targets: text, y: y - 28, duration: 1400, ease: 'Sine.easeOut' });
+    this.tweens.add({ targets: text, alpha: 0, delay: 900, duration: 500, onComplete: () => text.destroy() });
+  }
+
   /** 敵の濃さ: 消えているボス（潜る・跳ぶ）は見せず、かげぶんしん の偽物は少し透かす（07 の167章） */
   private enemyAlpha(i: number): number {
     const w = this.sim.world;
@@ -2818,6 +2859,8 @@ export class RunScene extends Phaser.Scene {
       if (!ghost) continue;
       return hexColor(ghost.colors ? ghost.colors[Math.floor(performance.now() / ghost.periodMs) % ghost.colors.length]! : ghost.tint);
     }
+    // へんしん（ミュウ）: 姿を変えている間は、少しミュウの桃色がかる（07 の257章）
+    if (this.lookKind(i) !== null) return 0xffc4e4;
     const kinds = this.sim.world.statusKinds;
     // 遅れて爆発する印（みらいよち）: 黒く点滅（爆発が近いほど速く）
     // ほろびのうた: 時間とともに色が抜けて暗くなる（3 秒で灰色まで）
@@ -3001,7 +3044,7 @@ export class RunScene extends Phaser.Scene {
     );
     this.streamer.update(world);
     const drawn =
-      this.enemySpriteView.update(e, alpha, view, (i) => this.statusTint(i), (i) => this.legendPose(i), (i) => this.enemyAlpha(i), (i) => this.enemyBody(i)) +
+      this.enemySpriteView.update(e, alpha, view, (i) => this.statusTint(i), (i) => this.legendPose(i), (i) => this.enemyAlpha(i), (i) => this.enemyBody(i), (i) => this.lookKind(i)) +
       this.enemyView.update(
         e,
         alpha,
@@ -3336,3 +3379,23 @@ function natureLabel(rules: SimRules, nature: number | undefined): string {
 
 /** 性格の能力 → 翻訳ファイルの select.stat.<キー> */
 const STAT_KEYS: Record<NatureStat, 'attack' | 'defense' | 'specialAttack' | 'specialDefense' | 'speed'> = { attack: 'attack', defense: 'defense', 'special-attack': 'specialAttack', 'special-defense': 'specialDefense', speed: 'speed' };
+
+/** 伝説が へんしん で使う姿の種類（ミュウ。07 の257章）: その伝説の技から辿れる技の look。先に絵を読み込んでおく */
+function lookKindsOf(rules: SimRules, kind: number): number[] {
+  const set = rules.stage.legendary?.moveSets[rules.enemies.kinds[kind]?.id ?? ''];
+  if (!set) return [];
+  const byId = new Map(rules.stage.moves.map((m) => [m.id, m]));
+  const seen = new Set<string>();
+  const todo = [...set.moves, ...(set.pool ?? []), ...(set.hpMoves ?? []).flatMap((h) => h.moves)];
+  const out: number[] = [];
+  while (todo.length) {
+    const id = todo.pop()!;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const m = byId.get(id);
+    if (!m) continue;
+    if (m.look) out.push(rules.enemies.kinds.findIndex((x) => x.id === m.look));
+    todo.push(...(m.pick ?? []), ...(m.thenQueue ?? []), ...(m.then ? [m.then] : []), ...(m.orElse ? [m.orElse] : []));
+  }
+  return out.filter((k) => k !== -1);
+}

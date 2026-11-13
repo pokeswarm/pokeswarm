@@ -64,14 +64,14 @@ describe('色違いのリザードン（07 の254章）', () => {
     void w;
   });
 
-  it('HP 66% で フレアドライブ: 炎をまとって 3 回突進し、反動で HP を 4% 失い、技の間隔が短くなる', () => {
-    const { w, i, boss, step, of, hostile } = setup();
+  it('HP 66% で フレアドライブ: 炎をまとい（体のまわりに当たる）、3 回突進し、反動で HP を 4% 失い、技の間隔が短くなる', () => {
+    const { w, i, boss, step, of } = setup();
     w.enemies.hp[i()] = w.enemies.maxHp[i()]! * 0.65;
     let aura = 0;
     const dashes = new Set<object>();
     for (let t = 0; t < 30 * 8; t++) {
       step(1 / 30);
-      aura = Math.max(aura, hostile('flare-blitz'));
+      aura = Math.max(aura, of('charizard-s-mantle').length);
       for (const h of of('charizard-s-blaze-dash')) dashes.add(h);
     }
     expect(aura).toBeGreaterThan(0);

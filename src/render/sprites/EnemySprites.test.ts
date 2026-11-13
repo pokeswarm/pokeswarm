@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type Phaser from 'phaser';
 import type { SpriteAnims } from '../../data/schema';
 import type { EnemyStore } from '../../sim/entities/enemies';
-import { EnemySprites } from './EnemySprites';
+import { EnemySprites, directionFromVector, directionWithHold } from './EnemySprites';
 
 /** 動作の切り替え（07 の195.1章）: コマ数の違う動作へ切り替えるとき、新しい動作のコマ数を超えて始めない（超えると Phaser が止まる） */
 describe('EnemySprites の動作の切り替え', () => {
@@ -45,5 +45,27 @@ describe('EnemySprites の動作の切り替え', () => {
     const last = plays.at(-1)!;
     expect(last.key).toContain('Walk');
     expect(last.startFrame).toBeLessThanOrEqual(3);
+  });
+});
+
+describe('向かせる向きの遊び（07 の254章）', () => {
+  it('8 方向の境目を少し越えるまで、今の向きのまま。大きく越えたら変わる', () => {
+    // 右（行番号 2）を向いている。右から 25°（境目 22.5° のすぐ外）では変えない
+    const right = directionFromVector(1, 0);
+    const a25 = (25 * Math.PI) / 180;
+    expect(directionWithHold(Math.cos(a25), Math.sin(a25), right)).toBe(right);
+    // 40° まで回ると、右下の向きに変わる
+    const a40 = (40 * Math.PI) / 180;
+    expect(directionWithHold(Math.cos(a40), Math.sin(a40), right)).toBe(directionFromVector(Math.cos(a40), Math.sin(a40)));
+    // 円を描いて回る間、境目のまわりで行ったり来たりしない
+    let dir = right;
+    let changes = 0;
+    for (let k = 0; k < 360; k++) {
+      const a = ((k % 2 ? 23 : 22) * Math.PI) / 180;
+      const next = directionWithHold(Math.cos(a), Math.sin(a), dir);
+      if (next !== dir) changes++;
+      dir = next;
+    }
+    expect(changes).toBe(0);
   });
 });

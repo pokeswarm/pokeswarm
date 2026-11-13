@@ -25,6 +25,7 @@ import { MewtwoPsychic } from '../render/effects/MewtwoPsychic';
 import { ArticunoIce } from '../render/effects/ArticunoIce';
 import { ZapdosElectric } from '../render/effects/ZapdosElectric';
 import { MoltresFlame } from '../render/effects/MoltresFlame';
+import { ShinyCharizardFlame } from '../render/effects/ShinyCharizardFlame';
 import { WaterRun } from '../render/effects/WaterRun';
 import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
@@ -178,6 +179,7 @@ export class RunScene extends Phaser.Scene {
   private articunoIce: ArticunoIce | null = null;
   private zapdosElectric: ZapdosElectric | null = null;
   private moltresFlame: MoltresFlame | null = null;
+  private shinyCharizardFlame: ShinyCharizardFlame | null = null;
   /** 水の上を走る足元（07 の225章） */
   private waterRun: WaterRun | null = null;
   private introFading = false;
@@ -2722,7 +2724,11 @@ export class RunScene extends Phaser.Scene {
         return { anim: mv.pose ?? '', spin: false, face: [h.dirX, h.dirY] };
       }
       const me = w.players.find((p) => p.id === this.localId);
-      if (me && w.enemies.x[i] === w.enemies.prevX[i] && w.enemies.y[i] === w.enemies.prevY[i]) return { anim: '', spin: false, face: [me.x - w.enemies.x[i]!, me.y - w.enemies.y[i]!] };
+      // 間合いを保つ・回り込むボス（色違いのリザードン）は、動いている間もプレイヤーを向く（動く向きを向くと、円を描いて逃げるプレイヤーに合わせて向きがガクガク変わった。07 の254章）。突進の間は突進の向き
+      const motion = w.rules.enemies.kinds[w.enemies.kind[i]!]?.motion?.type;
+      const dashing = w.hazards.some((h) => h.dasher === id && h.activeTicks !== undefined && !!w.rules.stage.moves[h.move]?.dashSpeed);
+      const still = w.enemies.x[i] === w.enemies.prevX[i] && w.enemies.y[i] === w.enemies.prevY[i];
+      if (me && !dashing && (still || motion === 'keepDistance' || motion === 'orbit')) return { anim: '', spin: false, face: [me.x - w.enemies.x[i]!, me.y - w.enemies.y[i]!] };
     }
     const holding = !!ai?.holdTicks;
     if ((charging || holding) && set.chargePose) return { anim: set.chargePose, spin: false };
@@ -3128,6 +3134,8 @@ export class RunScene extends Phaser.Scene {
     this.zapdosElectric.update(world, this.time.now);
     this.moltresFlame ??= new MoltresFlame(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);
     this.moltresFlame.update(world, this.time.now);
+    this.shinyCharizardFlame ??= new ShinyCharizardFlame(this, spriteRender.depths.effects + 0.35, spriteRender.depths.bosses + 0.05, ARENA_FLOOR_DEPTH + 3.6);
+    this.shinyCharizardFlame.update(world, this.time.now, alpha);
     this.waterRun ??= new WaterRun(this, ARENA_FLOOR_DEPTH + 3.5, spriteRender.depths.bosses - 0.01);
     this.waterRun.update(world, this.time.now);
     // 地面の一部なので、障害物・雑魚より下（作者の依頼）

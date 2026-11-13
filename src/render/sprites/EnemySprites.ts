@@ -86,7 +86,8 @@ export class EnemySprites {
       const dy = e.y[i]! - e.prevY[i]!;
       if (dx !== 0 || dy !== 0) slot.dir = directionFromVector(dx, dy);
       const pose = poseOf(i);
-      if (pose?.face) slot.dir = directionFromVector(pose.face[0], pose.face[1]);
+      // 向かせる向きは、8 方向の境目を少し越えるまで変えない（向きが細かく行ったり来たりしないように）
+      if (pose?.face) slot.dir = directionWithHold(pose.face[0], pose.face[1], slot.dir);
       const anim = pose && manifest.animations[pose.anim] ? pose.anim : this.resolve(manifest);
       // くるくる回る（甲羅）: 8 つの向きを速く回す
       const body = bodyOf(i);
@@ -140,6 +141,19 @@ export class EnemySprites {
   private resolve(manifest: SpriteAnims): string {
     return manifest.animations[this.animation] ? this.animation : Object.keys(manifest.animations)[0]!;
   }
+}
+
+/** 今の向き current から、境目を HOLD_DEGREES 越えたときだけ新しい向きにする */
+const HOLD_DEGREES = 12;
+export function directionWithHold(dx: number, dy: number, current: number): number {
+  const next = directionFromVector(dx, dy);
+  if (next === current) return current;
+  // 今の向きの真ん中の角度（行番号から戻す）と、向かせたい角度の差
+  const k = (2 - current + 8) % 8;
+  const center = (k * Math.PI) / 4;
+  const a = Math.atan2(dy, dx);
+  const diff = Math.abs(Math.atan2(Math.sin(a - center), Math.cos(a - center)));
+  return diff > ((22.5 + HOLD_DEGREES) * Math.PI) / 180 ? next : current;
 }
 
 /** 移動の向き（ベクトル）を SpriteCollab の行番号（下, 右下, 右, 右上, 上, 左上, 左, 左下）にする */

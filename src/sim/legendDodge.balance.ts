@@ -9,6 +9,7 @@ import { hazardHits, startLegendary } from './systems/stage';
  * 伝説の技の当たりやすさの測り方（範囲の確認に使う。07 の257章）: 攻撃せず、予告を避けるだけの自動プレイヤー（速さ 180・持ち物なし）で
  * 伝説と戦い、受けたダメージを技ごとに数える。HP 100%（ふだん）・60%（HP 66% の技の後）・30%（HP 33% の技の後）の 3 区間を回す。
  * 例: LEGENDS=legend-mew,shiny-blastoise npx vitest run --mode balance --silent=false src/sim/legendDodge.balance.ts（DODGE_SEEDS=6 で試す数）
+ * ジョウトは DODGE_REGION=johto LEGENDS=legend-lugia,legend-ho-oh,legend-raikou,legend-entei,legend-suicune。
  * DODGE_PATCH='{"set":{"moveIntervalSeconds":0.4},"moves":{"mew-metronome":{"telegraphSeconds":0.6}}}' で、測る前にデータを書き換えて案を比べる。
  * 避け方は人より単純なので、数字は伝説どうし・変更の前後を比べるために使う。
  */
@@ -23,7 +24,7 @@ const SEGMENTS: [number, number][] = [
 const DIRS: [Axis, Axis][] = [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 
 function run(kindId: string): void {
-  const rules = buildSimRules();
+  const rules = buildSimRules(process.env.DODGE_REGION);
   const patch = JSON.parse(process.env.DODGE_PATCH ?? '{}') as { set?: Record<string, unknown>; moves?: Record<string, Record<string, unknown>> };
   if (patch.set) Object.assign(rules.stage.legendary!.moveSets[kindId]!, patch.set);
   for (const [id, v] of Object.entries(patch.moves ?? {})) Object.assign(rules.stage.moves.find((m) => m.id === id)!, v);

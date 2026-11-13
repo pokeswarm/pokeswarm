@@ -200,7 +200,7 @@
 
 ### 伝説の技の当たりやすさの測り方（範囲の確認。07 の257章）
 
-`LEGENDS=legend-mew,shiny-blastoise npx vitest run --mode balance --silent=false src/sim/legendDodge.balance.ts`（`LEGENDS` を付けなければカントーの 8 体）。攻撃せず予告と玉を避けるだけの自動プレイヤー（速さ 180・持ち物なし）が、HP 100%・60%・30% の 3 区間で戦い、受けたダメージ（毎分、最大 HP の何回分か）と技ごとの内訳を出す。`DODGE_PATCH='{"set":{…},"moves":{"技":{…}}}'` で測る前にデータを書き換えて、案どうしを比べられる。避け方は人より単純（ねっぷうのような広い技はほぼ避けられない）なので、伝説どうし・変更の前後を比べるのに使う。
+`LEGENDS=legend-mew,shiny-blastoise npx vitest run --mode balance --silent=false src/sim/legendDodge.balance.ts`（`LEGENDS` を付けなければカントーの 8 体。ジョウトは `DODGE_REGION=johto`）。攻撃せず予告と玉を避けるだけの自動プレイヤー（速さ 180・持ち物なし）が、HP 100%・60%・30% の 3 区間で戦い、受けたダメージ（毎分、最大 HP の何回分か）と技ごとの内訳を出す。`DODGE_PATCH='{"set":{…},"moves":{"技":{…}}}'` で測る前にデータを書き換えて、案どうしを比べられる。避け方は人より単純（ねっぷうのような広い技はほぼ避けられない）なので、伝説どうし・変更の前後を比べるのに使う。
 
 ### 単体火力の測り方（07 の184章）
 

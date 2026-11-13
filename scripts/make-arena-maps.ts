@@ -1428,6 +1428,91 @@ function charizardWall(): (Rgb | null)[] {
   return out;
 }
 
+// --- 色違いのフシギバナ: トキワのもりの奥の空き地（夜。木々の間から月明かり。縁の外は森の木々の茂み。07 の255章） ---
+
+/**
+ * 体は明るい緑・花は金色、技は紫（ヘドロ）・白（ねむりごな）・茶（根）・緑（葉・光線）なので、床は少し青みのある暗い灰緑の土。
+ * 緑の床は葉と体が、茶色の床は根が沈むので使わない
+ */
+const FOREST_FLOOR = ['#171e1f', '#1d2527', '#242e30', '#2c383a', '#354345'].map(hex);
+const MOONLIGHT = hex('#4f636a');
+const MOSS = hex('#22352d');
+const LITTER = ['#3d3a2c', '#33402f', '#45402f'].map(hex);
+
+function venusaurFloor(): { floor: Rgb[] } {
+  const floor: Rgb[] = [];
+  // 木々の間から差す月明かり（真ん中の空き地に大きく、ほかは小さくまばら）
+  const pools = [[W / 2, H / 2, 260, 0.5], [150, 110, 70, 0.28], [640, 360, 80, 0.3], [690, 90, 55, 0.22], [120, 350, 60, 0.24]] as const;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    let t = 0.42 + (fbm(x / 100, y / 100, 1101) - 0.5) * 0.4 + (fbm(x / 16, y / 16, 1103) - 0.5) * 0.16;
+    // 外ほど木の陰で暗い
+    const edge = Math.min(x, y, W - 1 - x, H - 1 - y);
+    t -= Math.max(0, 1 - edge / 90) * 0.18;
+    let col = ramp(FOREST_FLOOR, t, x, y);
+    // 苔のまだら（境はぼかす）
+    const moss = fbm(x / 55, y / 55, 1105);
+    if (moss > 0.6) col = mix(col, MOSS, Math.min(0.55, (moss - 0.6) * 3));
+    // 月明かり: やわらかな明るい溜まり（木の葉の影でまだらに欠ける）
+    let light = 0;
+    for (const [px, py, pr, pa] of pools) {
+      const d = Math.hypot((x - px) / 1.25, y - py) / pr;
+      if (d < 1) light = Math.max(light, pa * (1 - d * d));
+    }
+    // 葉の影でまだらに欠ける（境はなだらかに。くっきりした形は迷彩柄に見えた）
+    const leafShade = fbm(x / 26, y / 26, 1107);
+    const shade = Math.min(1, Math.max(0, (leafShade - 0.42) / 0.32));
+    if (light > 0) col = mix(col, MOONLIGHT, light * (1 - shade * shade * (3 - 2 * shade) * 0.3));
+    // 落ち葉（まばらな 2 ドットの粒）
+    const lr = hash2(x >> 1, y >> 1, 1109);
+    if (lr > 0.993 && fbm(x / 40, y / 40, 1111) > 0.45) col = LITTER[Math.floor(hash2(x >> 1, y >> 1, 1113) * 3)]!;
+    // 小石
+    const r = hash2(x, y, 1115);
+    if (r > 0.996) col = FOREST_FLOOR[4]!;
+    floor.push(col);
+  }
+  return { floor };
+}
+
+/** 上から見た森の茂み（暗い緑。技の緑より暗く、くすませる） */
+const CANOPY = ['#0a110d', '#0f1912', '#152218', '#1b2b1f', '#233626'].map(hex);
+
+function venusaurWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const rimLight = hex('#3c4d4c');
+  const rimDark = hex('#0b1010');
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = inset(iy, 51) - ix;
+    const fromRight = ix - (W - 1 - inset(iy, 52));
+    const fromTop = inset(ix, 53) - iy;
+    const fromBottom = iy - (H - 1 - inset(ix, 54));
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    // 葉の茂み: 丸く盛り上がった房（上が明るく、ふちへなだらかに暗く）。区切りの線は引かない（線で区切ると石畳に見えた）
+    const wx = x + (fbm(x / 20, y / 20, 1129) - 0.5) * 16;
+    const wy = y + (fbm(x / 20 + 5, y / 20 + 5, 1131) - 0.5) * 16;
+    const clump = worley(wx, wy, 26, 1121);
+    const dome = 1 - Math.min(1, Math.hypot(clump.dx, clump.dy) / 26);
+    const lit = Math.max(0, -clump.dy / 26);
+    // 細かい葉の粒（2 ドットのまだら）
+    const leaf = hash2(x >> 1, y >> 1, 1125) - 0.5;
+    let t = 0.2 + dome * 0.45 + lit * 0.25 + (hash2(clump.id, 1, 1123) - 0.5) * 0.15 + leaf * 0.22;
+    t -= Math.max(0, dist - 12) * 0.012;
+    let col = ramp(CANOPY, t, x, y, 0.4);
+    // 月明かりに照らされた葉先（房の上側にまばら）
+    if (hash2(x, y, 1127) > 0.98 && lit > 0.35 && dist < 40) col = hex('#2f4637');
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 2.5) col = rimLight;
+    out.push(col);
+  }
+  return out;
+}
+
 function mewtwoFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
   const floor: Rgb[] = [];
   const shimmerA: (Rgb | null)[] = [];
@@ -1527,6 +1612,7 @@ const arenas = [
   { id: 'zapdos', region: 'kanto', ...zapdosFloor(), shimmerA: null, shimmerB: null, wall: zapdosWall() },
   { id: 'moltres', region: 'kanto', ...moltresFloor(), shimmerA: null, shimmerB: null, wall: moltresWall() },
   { id: 'charizard', region: 'kanto', ...charizardFloor(), shimmerA: null, shimmerB: null, wall: charizardWall() },
+  { id: 'venusaur', region: 'kanto', ...venusaurFloor(), shimmerA: null, shimmerB: null, wall: venusaurWall() },
 ];
 for (const a of arenas) {
   const outDir = path.join('public', 'map', 'region' in a ? a.region : 'johto');

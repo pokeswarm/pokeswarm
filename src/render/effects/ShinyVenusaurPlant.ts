@@ -97,12 +97,14 @@ export class ShinyVenusaurPlant {
       const cx = x + Math.cos(ang) * d + wob;
       const cy = y + Math.sin(ang) * d * 0.8 + Math.cos(timeMs / 1100 + k) * r * 0.05;
       const br = r * (k === 0 ? 0.62 : 0.5 + 0.08 * Math.sin(seed + k * 2.3));
-      this.g.fillStyle(k % 3 === 0 ? 0xd9f2e6 : 0xe8def8, 0.16 * a).fillCircle(cx, cy, br);
+      // ふちをぼかす（外ほど薄い 3 重の丸。ふちのはっきりした丸を重ねるとシャボン玉に見えた）
+      const color = k % 3 === 0 ? 0xcfe3da : 0xd6cde6;
+      for (const [f, al] of [[1, 0.035], [0.75, 0.045], [0.5, 0.05]] as const) this.g.fillStyle(color, al * a).fillCircle(cx, cy, br * f);
     }
-    this.g.fillStyle(0xf3eefc, 0.12 * a).fillCircle(x, y, r * 0.55);
+    this.g.fillStyle(0xe6def0, 0.06 * a).fillCircle(x, y, r * 0.5);
     // 当たりの広さ: 縁まで薄く満たし、淡い輪郭（雲の外に見えて当たる所を作らない）
-    this.g.fillStyle(0xe8def8, 0.08 * a).fillCircle(x, y, r);
-    this.g.lineStyle(2, 0xd1c4e9, 0.35 * a).strokeCircle(x, y, r * 0.98);
+    this.g.fillStyle(0xd6cde6, 0.06 * a).fillCircle(x, y, r);
+    this.g.lineStyle(2, 0xd1c4e9, 0.18 * a).strokeCircle(x, y, r * 0.98);
     // 胞子: ゆっくり上って消える小さな粒
     for (let k = 0; k < 12; k++) {
       const life = ((timeMs / 2600 + k / 12 + seed) % 1 + 1) % 1;

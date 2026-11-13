@@ -98,16 +98,16 @@ describe('色違いのフシギバナ（07 の255章）', () => {
     expect(w.enemies.hp[i()]! / w.enemies.maxHp[i()]!).toBeCloseTo(0.82, 2);
   });
 
-  it('HP 66% で ねむりごな: 流れる雲を 5 つ置き、入ると眠って動けない。その後 のしかかり を 3 回', () => {
+  it('HP 66% で ねむりごな: 流れる雲を 8 つ置き、入ると眠って動けない。その後 のしかかり を 3 回', () => {
     const { w, p, i, step, of } = setup();
     w.enemies.hp[i()] = w.enemies.maxHp[i()]! * 0.65;
     let clouds: ReturnType<typeof of> = [];
     for (let t = 0; t < 30 * 5 && clouds.length === 0; t++) {
       step(1 / 30);
       const c = of('venusaur-s-sleep-powder');
-      if (c.length === 5 && c.every((h) => h.activeTicks !== undefined)) clouds = c;
+      if (c.length === 8 && c.every((h) => h.activeTicks !== undefined)) clouds = c;
     }
-    expect(clouds.length).toBe(5);
+    expect(clouds.length).toBe(8);
     // 雲は流れる
     const x0 = clouds[0]!.x;
     const y0 = clouds[0]!.y;

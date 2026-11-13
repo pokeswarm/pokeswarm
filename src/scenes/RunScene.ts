@@ -27,7 +27,6 @@ import { ZapdosElectric } from '../render/effects/ZapdosElectric';
 import { MoltresFlame } from '../render/effects/MoltresFlame';
 import { ShinyCharizardFlame } from '../render/effects/ShinyCharizardFlame';
 import { ShinyVenusaurPlant } from '../render/effects/ShinyVenusaurPlant';
-import { ShinyBlastoiseWater } from '../render/effects/ShinyBlastoiseWater';
 import { WaterRun } from '../render/effects/WaterRun';
 import { MoveSprites, moveSpriteTexture, type SpriteItem, type SpriteSpec } from '../render/effects/MoveSprites';
 import { HitShapes } from '../render/effects/HitShapes';
@@ -183,7 +182,6 @@ export class RunScene extends Phaser.Scene {
   private moltresFlame: MoltresFlame | null = null;
   private shinyCharizardFlame: ShinyCharizardFlame | null = null;
   private shinyVenusaurPlant: ShinyVenusaurPlant | null = null;
-  private shinyBlastoiseWater: ShinyBlastoiseWater | null = null;
   /** 甲羅で走っているボス（色違いのカメックスの アクアジェット）: 走り出した技の動作・絵・向き。止まると消す */
   private readonly dashLooks = new Map<number, { pose: string; effect: string; dirX: number; dirY: number }>();
   /** 水の上を走る足元（07 の225章） */
@@ -3176,8 +3174,6 @@ export class RunScene extends Phaser.Scene {
     this.shinyCharizardFlame.update(world, this.time.now, alpha);
     this.shinyVenusaurPlant ??= new ShinyVenusaurPlant(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);
     this.shinyVenusaurPlant.update(world, this.time.now, alpha);
-    this.shinyBlastoiseWater ??= new ShinyBlastoiseWater(this, spriteRender.depths.bosses + 0.05);
-    this.shinyBlastoiseWater.update(world, alpha);
     this.waterRun ??= new WaterRun(this, ARENA_FLOOR_DEPTH + 3.5, spriteRender.depths.bosses - 0.01);
     this.waterRun.update(world, this.time.now);
     // 地面の一部なので、障害物・雑魚より下（作者の依頼）

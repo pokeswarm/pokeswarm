@@ -10,6 +10,7 @@ import { itemIconKey, moveIconKey } from '../render/Icons';
 import { windowCss, compactScreen } from '../render/pixelUi';
 import { isTouchDevice } from '../render/TouchJoystick';
 import type { Modifiers } from '../sim/upgrades';
+import type { SimRules } from '../sim/rules';
 import type { UpgradeOffer, World } from '../sim/world';
 
 /** カード1枚の表示用の文章 */
@@ -59,7 +60,7 @@ export function moveGains(world: World, move: number, level: number): string[] {
   if (def.passive.length > 0) {
     const a = def.passive[level - 1];
     const b = def.passive[level];
-    const lines = a && b ? modifierLines(world, modifierDiff(a, b)) : [];
+    const lines = a && b ? modifierLinesOf(world.rules, modifierDiff(a, b)) : [];
     // ダメージを受けると効く技（からげんき）は、効く間を先に書く
     return def.hurtBuffSeconds && lines.length > 0 ? [t('gain.whenHurt', { v: def.hurtBuffSeconds }), ...lines] : lines;
   }
@@ -117,14 +118,14 @@ function modifierDiff(a: Modifiers, b: Modifiers): Modifiers {
 }
 
 /** 持ち物と同じ形の効果を、0 でないものだけ1行ずつ */
-function modifierLines(world: World, mods: Modifiers): string[] {
+export function modifierLinesOf(rules: SimRules, mods: Modifiers): string[] {
   const out: string[] = [];
   const pct = (v: number): string => `${signed(v)}%`;
   for (const [k, v] of Object.entries(mods) as [keyof Modifiers, number | number[]][]) {
     if (Array.isArray(v)) {
       v.forEach((x, type) => {
         if (!x) return;
-        const typeKey = world.rules.types.names[type] ?? '';
+        const typeKey = rules.types.names[type] ?? '';
         out.push(`${t(`mod.${k}`, { type: localName(generated.types[typeKey]?.names, getLocale(), typeKey) })} ${pct(x)}`);
       });
     } else if (v) out.push(`${t(`mod.${k}`)} ${k.endsWith('Pct') ? pct(v) : signed(v)}`);

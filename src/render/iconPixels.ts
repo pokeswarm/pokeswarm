@@ -66,7 +66,8 @@ export function iconPixels(data: IconConfig, glyph: string, color: string, tier:
       }
       if (art) {
         const c = artAt(x, y);
-        put(x, y, c ?? mix(base, black, y < n / 2 ? 0.45 : 0.6));
+        // 技の絵は輪郭が無いので、背景を暗くして形を浮かせる（07 の265章）
+        put(x, y, c ?? mix(base, black, y < n / 2 ? 0.66 : 0.74));
         continue;
       }
       const ch = glyphAt(x, y);

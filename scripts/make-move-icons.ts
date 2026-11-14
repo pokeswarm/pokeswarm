@@ -44,6 +44,8 @@ interface ArtLayer {
   keepDark?: boolean;
   /** 黒に近い色を、同じ色合いのまま明るくして描く（影のたまり・ほろびのうた の音符など、暗い色そのものが絵の技） */
   lift?: boolean;
+  /** 白に寄せる割合（ものまね の写し: 同じ絵をうすく） */
+  tint?: number;
 }
 type Layer = ArtLayer | Draw;
 
@@ -112,6 +114,176 @@ function weather(o: { colors: string[]; count: number; angle: number; len: [numb
       }
     },
   };
+}
+
+function mixHex(a: string, b: string, k: number): string {
+  const p = (h: string): number[] => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const x = p(a);
+  const y = p(b);
+  return '#' + x.map((v, i) => Math.round(v + (y[i]! - v) * k).toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * ゲームの中で何も出ない技（いつも効く技・ネコにこばん など）の絵を、マスごとの色で描く（07 の266章）。
+ * 輪郭は付けない。形は明るい面・暗い面の濃淡で出す（暗い面も黒ではなく、その物の色を暗くしたもの）
+ */
+function paint(fn: (x: number, y: number) => string | null): Draw {
+  return {
+    draw: (px) => {
+      for (let y = 2; y < N - 2; y++) for (let x = 2; x < N - 2; x++) {
+        const c = fn(x + 0.5, y + 0.5);
+        if (c) px[y * N + x] = c;
+      }
+    },
+  };
+}
+
+/** 光のきらめき（十字の小さな光） */
+function glint(cx: number, cy: number, r: number, c = '#ffffff', mid = '#fff9c4'): Draw {
+  return paint((x, y) => {
+    const dx = Math.abs(x - cx);
+    const dy = Math.abs(y - cy);
+    if (dx < 0.6 && dy < 0.6) return c;
+    if ((dx < 0.6 && dy < r) || (dy < 0.6 && dx < r)) return dx + dy < r * 0.55 ? c : mid;
+    return null;
+  });
+}
+
+/** つるぎのまい: 自分のまわりを回る剣（刃は鋼の色で、片側を白く光らせる。つばは金、柄は茶） */
+function swordRing(count: number, twist: number): Draw {
+  return paint((x, y) => {
+    const dx = x - 16;
+    const dy = y - 16;
+    for (let i = 0; i < count; i++) {
+      const a = ((i * 360) / count - 90) * (Math.PI / 180);
+      // 剣の向き（外向きから twist 度ずらして、回っているように）
+      const d = a + (twist * Math.PI) / 180;
+      const ux = Math.cos(d);
+      const uy = Math.sin(d);
+      // 剣の根もと（円の上）
+      const bx = Math.cos(a) * 3.2;
+      const by = Math.sin(a) * 3.2;
+      const along = (dx - bx) * ux + (dy - by) * uy;
+      const side = -(dx - bx) * uy + (dy - by) * ux;
+      if (along > 3.2 && along < 13.4) {
+        const half = along > 11 ? (13.4 - along) * 0.6 : 1.45;
+        if (Math.abs(side) < half) return side < -0.15 ? '#ffffff' : along > 9 ? '#e3eef3' : '#b0c4ce';
+      }
+      if (along > 2.2 && along <= 3.2 && Math.abs(side) < 2.6) return side < 0 ? '#ffe082' : '#ffb300';
+      if (along > 0 && along <= 2.2 && Math.abs(side) < 0.7) return '#a1887f';
+    }
+    return null;
+  });
+}
+
+/** ネコにこばん: 飛ぶ小判（たての楕円の金。左上が明るく、右下は濃い金。横の筋） */
+function koban(cx: number, cy: number, rx: number, ry: number): Draw {
+  return paint((x, y) => {
+    const u = (x - cx) / rx;
+    const v = (y - cy) / ry;
+    const d = u * u + v * v;
+    if (d > 1) return null;
+    if (d > 0.62 && u + v > 0.2) return '#c88a00';
+    if (d < 0.5 && u + v < -0.55) return '#fff59d';
+    if (d < 0.62 && Math.abs(v) < 0.6 && Math.round((y - cy) * 1.0 + 100) % 2 === 0 && Math.abs(u) < 0.62) return '#f2b01e';
+    return '#fdd835';
+  });
+}
+
+/** かくばる: 角ばった結晶（面ごとに明るさを変える。ポリゴンの桃色と水色） */
+function facetGem(cx: number, cy: number, w: number, h: number, rot: number): Draw {
+  const a = (rot * Math.PI) / 180;
+  return paint((x, y) => {
+    const dx = x - cx;
+    const dy = y - cy;
+    const u = dx * Math.cos(a) + dy * Math.sin(a);
+    const v = -dx * Math.sin(a) + dy * Math.cos(a);
+    if (Math.abs(u) / w + Math.abs(v) / h > 1) return null;
+    // 4 つの面と、真ん中の稜線
+    if (Math.abs(v) < 0.5) return '#ffffff';
+    if (v < 0) return u < 0 ? '#f8bbd0' : '#f06292';
+    return u < 0 ? '#80deea' : '#26a69a';
+  });
+}
+
+/** かたくなる: 硬くなった体の表面（六角の板が並んだ丸。板のすきまは同じ色の暗い色、斜めの光の帯） */
+function hardShell(cx: number, cy: number, r: number): Draw {
+  return paint((x, y) => {
+    const dx = x - cx;
+    const dy = y - cy;
+    const d = Math.hypot(dx, dy);
+    if (d > r) return null;
+    // 六角の板: 六角の格子の中心のうち一番近いものの板。2 番目に近い中心との差が小さい所がすきま
+    const s = 7;
+    let best = Infinity;
+    let second = Infinity;
+    let lx = 0;
+    let ly = 0;
+    for (let row = -3; row <= 3; row++) {
+      for (let col = -3; col <= 3; col++) {
+        const px = col * s + (row % 2 ? s / 2 : 0);
+        const py = row * s * 0.866;
+        const e = Math.hypot(dx - px, dy - py);
+        if (e < best) {
+          second = best;
+          best = e;
+          lx = dx - px;
+          ly = dy - py;
+        } else if (e < second) second = e;
+      }
+    }
+    const gap = second - best < 0.9;
+    const shine = Math.abs(dx + dy + r * 0.5) < 1.6;
+    if (d > r - 1.1) return '#8d8174';
+    if (gap) return '#7d7066';
+    if (shine) return '#fafafa';
+    // 板ごとに左上を明るく（ふくらんだ板）
+    return lx + ly < -1.6 ? '#e8e0dc' : lx + ly > 1.6 ? '#a89a90' : '#c9bcb4';
+  });
+}
+
+/** まるくなる: 丸まった体（まり。うずの溝と、左上の光） */
+function curledBall(cx: number, cy: number, r: number): Draw {
+  return paint((x, y) => {
+    const dx = x - cx;
+    const dy = y - cy;
+    const d = Math.hypot(dx, dy);
+    if (d > r) return null;
+    const ang = Math.atan2(dy, dx);
+    // うず: 半径が角度とともに大きくなる線
+    const t = (ang + Math.PI) / (2 * Math.PI);
+    let groove = false;
+    for (let k = 0; k < 3; k++) {
+      const rr = (t + k) * (r / 2.6);
+      if (Math.abs(d - rr) < 0.75 && rr < r - 1.2) groove = true;
+    }
+    if (Math.hypot(dx + r * 0.38, dy + r * 0.42) < r * 0.24) return '#fff3e0';
+    if (groove) return '#a1673f';
+    return dx * 0.6 + dy * 0.8 > r * 0.35 ? '#c98a55' : '#e8b07a';
+  });
+}
+
+/** テクスチャー: 体の色（タイプ）が移り変わるタイル。左上の 1 ドットを明るく */
+function typeTiles(colors: string[]): Draw {
+  return paint((x, y) => {
+    const gx = Math.floor((x - 5) / 7.5);
+    const gy = Math.floor((y - 5) / 7.5);
+    if (gx < 0 || gy < 0 || gx > 2 || gy > 2) return null;
+    const fx = x - 5 - gx * 7.5;
+    const fy = y - 5 - gy * 7.5;
+    if (fx > 6.2 || fy > 6.2) return null;
+    const c = colors[gy * 3 + gx]!;
+    if (fx < 1.5 && fy < 1.5) return mixHex(c, '#ffffff', 0.6);
+    return fx + fy > 9 ? mixHex(c, '#000000', 0.25) : c;
+  });
+}
+
+/** 円に並べた技の絵（ちかい の輪: 属性の粒が自分のまわりを回る） */
+function ringOf(art: string, count: number, r: number, k: number, extra: Partial<ArtLayer> = {}, turn = 90): ArtLayer[] {
+  return Array.from({ length: count }, (_, i) => {
+    const a = (i * 360) / count;
+    return { art, k, x: 16 + Math.cos((a * Math.PI) / 180) * r, y: 16 + Math.sin((a * Math.PI) / 180) * r, rot: a + turn, ...extra };
+  });
 }
 
 /** 技の名前ごとのアイコン（作者に見せる見本から。07 の265章） */
@@ -388,6 +560,52 @@ const ICONS: Record<string, Layer[]> = {
   ],
   // 10まんボルト: 当たった所で弾ける雷
   thunderbolt: [{ art: 'burst-thunder', k: 1.05, x: 16, y: 16 }],
+  // ---- ゲームの中で何も出ない技（07 の266章）: その技で自分に起きる変化を描く ----
+  // つるぎのまい: 自分のまわりを回る剣
+  'swords-dance': [swordRing(4, 28)],
+  // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
+  sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],
+  // かたくなる: 体の表面が硬い板になる
+  harden: [hardShell(16, 16, 12), glint(22.5, 9, 2.8)],
+  // まるくなる: 丸まった体
+  'defense-curl': [curledBall(16, 16.5, 11.5), glint(24.5, 7.5, 2.4)],
+  // てっぺき: 体を囲む鋼の板（ゲームの鋼の輪）と、真ん中の光
+  'iron-defense': [{ art: 'steel-armor-ring', frame: 1, k: 0.82, x: 16, y: 16 }, glint(16, 16, 4)],
+  // ビルドアップ: 体から立ちのぼる赤いオーラ（ゲームの絵）
+  'bulk-up': [{ art: 'bulk-aura', frame: 2, k: 1.05, x: 16, y: 16.5 }],
+  // こうそくいどう: 速くなる体と、置いていかれる筋
+  agility: [
+    { art: 'charge-streak', frame: 1, k: 0.85, x: 14, y: 10 },
+    { art: 'charge-streak', frame: 1, k: 0.85, x: 18, y: 22 },
+  ],
+  // ロックオン: 敵に合わせる照準（ゲームの絵）
+  'lock-on': [{ art: 'lock-on-reticle', frame: 1, k: 0.86, x: 16, y: 16 }],
+  // テクスチャー: 体の色（タイプ）が移り変わる
+  conversion: [typeTiles(['#ff7043', '#42a5f5', '#66bb6a', '#ffee58', '#f5f5f5', '#f06292', '#80deea', '#ab47bc', '#d4a056'])],
+  // ちかい: 属性の粒が自分のまわりを回る（ほかの ちかい と合わせて強くなる）
+  'fire-pledge': [...ringOf('ember', 6, 9, 0.75), { art: 'fire-blast-ball', k: 0.32, x: 16, y: 16 }],
+  'grass-pledge': [...ringOf('leaf', 6, 9, 0.95), { art: 'seed-bomb', frame: 0, k: 0.6, x: 16, y: 16 }],
+  'water-pledge': [...ringOf('water-drop', 6, 9, 0.8), { art: 'bubble', k: 0.75, x: 16, y: 16 }],
+  // ものまね: 同じ技の絵と、それをまねた写し
+  mimic: [
+    { art: 'star', k: 1.05, x: 10.5, y: 12 },
+    { art: 'star', k: 1.05, x: 21.5, y: 20, tint: 0.55 },
+  ],
+  // ゆびをふる: 何が出るか分からない、いろいろな技の絵
+  metronome: [
+    { art: 'ember', k: 1.15, x: 16, y: 9.5, rot: -90 },
+    { art: 'water-drop', k: 1.15, x: 9, y: 21.5, rot: -90 },
+    { art: 'leaf', k: 1.4, x: 22.5, y: 21.5, rot: -60 },
+  ],
+  // ネコにこばん: 弧を描いて飛ぶ小判
+  'pay-day': [koban(8.5, 22, 2.6, 3.6), koban(15.5, 13.5, 3.2, 4.4), koban(23.5, 19.5, 3.8, 5.2), glint(13, 6.5, 2.2), glint(26, 9.5, 2)],
+  // ねむる: 立ちのぼる Z と、回復の光
+  rest: [
+    { art: 'heal-rise', frame: 2, k: 0.6, x: 22, y: 23 },
+    { art: 'snore-z', frame: 0, k: 0.62, x: 9.5, y: 22.5 },
+    { art: 'snore-z', frame: 0, k: 0.82, x: 15.5, y: 15.5 },
+    { art: 'snore-z', frame: 0, k: 1.05, x: 22.5, y: 8 },
+  ],
 };
 
 type Grid = { w: number; h: number; px: (string | null)[] };
@@ -428,8 +646,11 @@ function artGrid(l: ArtLayer): Grid {
     p.forEach((row, y) => [...row].forEach((ch, x) => {
       const c = ch === '.' ? undefined : sp.palette[parseInt(ch, 36)];
       if (c) {
-        if (!nearBlack(c) || l.keepDark) px[(oy + y) * w + ox + x] = c;
-        else if (l.lift) px[(oy + y) * w + ox + x] = liftColor(c);
+        const put = (v: string): void => {
+          px[(oy + y) * w + ox + x] = l.tint ? mixHex(v, '#ffffff', l.tint) : v;
+        };
+        if (!nearBlack(c) || l.keepDark) put(c);
+        else if (l.lift) put(liftColor(c));
       }
     }));
     ox += pw;

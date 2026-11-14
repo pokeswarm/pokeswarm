@@ -3,7 +3,7 @@ import { windowCss } from '../render/pixelUi';
 import type { Player } from '../sim/entities/player';
 import type { World } from '../sim/world';
 import { moveMaxLevel } from '../sim/systems/leveling';
-import { damageClassBadge, itemGains, itemName, moveDetail, moveGains, moveName } from './levelUpPanel';
+import { damageClassBadge, shownDamageClass, itemGains, itemName, moveDetail, moveGains, moveName } from './levelUpPanel';
 
 /**
  * プレイ画面の技・持ち物のアイコンにマウスを乗せたときの詳細カード（作者の案 2026年10月22日。PC だけ）。
@@ -38,7 +38,7 @@ export class HudCard {
       if (!pm) return this.hide();
       const max = moveMaxLevel(r, pm);
       name = moveName(world, pm.move);
-      damageClass = r.moves[pm.move]!.damageClass;
+      damageClass = shownDamageClass(r.moves[pm.move]!);
       level = t('hudCard.level', { level: pm.level, max });
       lines.push(moveDetail(world, pm.move));
       if (pm.level < max) {

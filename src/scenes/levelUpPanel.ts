@@ -10,6 +10,7 @@ import { itemIconKey, moveIconKey } from '../render/Icons';
 import { windowCss, compactScreen } from '../render/pixelUi';
 import { isTouchDevice } from '../render/TouchJoystick';
 import type { Modifiers } from '../sim/upgrades';
+import type { SimMoveDef } from '../sim/moves';
 import type { SimRules } from '../sim/rules';
 import type { UpgradeOffer, World } from '../sim/world';
 
@@ -137,6 +138,15 @@ export function modifierLinesOf(rules: SimRules, mods: Modifiers): string[] {
  * 技の種類（ぶつり／とくしゅ）の札。技名のすぐ右に置く（作者の依頼 2026年10月27日: どちらの攻撃力で強くなるか見えるように）。
  * 色は ぶつり = 赤橙・とくしゅ = 青
  */
+/**
+ * 札に出す技の種類。技そのものがダメージを出さない技（いつも効く技・ねむる・ゆびをふる／ものまね・ダメージの無い技）は札を出さない（null）。
+ * 原作で変化技のものは、データでは とくしゅ の扱いになっていて、つるぎのまい（ぶつりを強くする）に「とくしゅ」と出て紛らわしかった（07 の267章）
+ */
+export function shownDamageClass(def: Pick<SimMoveDef, 'pattern' | 'damageClass' | 'harmless'>): 'physical' | 'special' | null {
+  if (def.pattern === 'passive' || def.pattern === 'rest' || def.pattern === 'metronome' || def.harmless) return null;
+  return def.damageClass;
+}
+
 export function damageClassBadge(damageClass: 'physical' | 'special', fontPx = 16): HTMLSpanElement {
   const b = document.createElement('span');
   b.textContent = t(`damageClass.${damageClass}`);
@@ -171,7 +181,7 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
   const base = { special: false, evolvable, gains: [] as string[] };
   switch (offer.kind) {
     case 'moveNew':
-      return { ...base, icon: moveIconKey(r, offer.move), kind: t('upgrade.kind.moveNew'), name: moveName(world, offer.move), level: t('levelUp.new'), detail: moveDetail(world, offer.move), damageClass: r.moves[offer.move]!.damageClass };
+      return { ...base, icon: moveIconKey(r, offer.move), kind: t('upgrade.kind.moveNew'), name: moveName(world, offer.move), level: t('levelUp.new'), detail: moveDetail(world, offer.move), damageClass: shownDamageClass(r.moves[offer.move]!) ?? undefined };
     case 'moveUp': {
       const pm = p.moves[offer.slot]!;
       return {
@@ -179,7 +189,7 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
         icon: moveIconKey(r, pm.move),
         kind: t('upgrade.kind.moveUp'),
         name: moveName(world, pm.move),
-        damageClass: r.moves[pm.move]!.damageClass,
+        damageClass: shownDamageClass(r.moves[pm.move]!) ?? undefined,
         level: t('levelUp.levelChange', { from: pm.level, to: pm.level + 1 }),
         // 強化は増えるものだけ（説明はできるだけ短く。作者の決定）
         detail: '',
@@ -214,7 +224,7 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
         icon: moveIconKey(r, offer.to),
         kind: t(offer.unique ? 'upgrade.kind.unique' : 'upgrade.kind.derive'),
         name: moveName(world, offer.to),
-        damageClass: r.moves[offer.to]!.damageClass,
+        damageClass: shownDamageClass(r.moves[offer.to]!) ?? undefined,
         level: t('levelUp.new'),
         detail: moveDetail(world, offer.to),
         special: true,

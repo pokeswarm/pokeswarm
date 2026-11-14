@@ -310,7 +310,9 @@ export class LevelUpPanel {
       const icon = document.createElement('img');
       icon.src = this.handlers.iconUrl(o.icon);
       icon.alt = '';
-      icon.style.cssText = 'width:48px;height:48px;image-rendering:pixelated;flex:none';
+      // アイコンは 32 ドット。にじまないよう 1 倍か 2 倍で出す（07 の264章）
+      const iconPx = window.innerWidth >= 1100 ? 64 : 32;
+      icon.style.cssText = `width:${iconPx}px;height:${iconPx}px;image-rendering:pixelated;flex:none`;
       const nameText = document.createElement('span');
       nameText.textContent = o.name;
       name.append(icon, nameText);

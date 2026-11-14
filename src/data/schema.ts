@@ -3230,6 +3230,24 @@ export const moveSpritesSchema = z.object({
 });
 export type MoveSpritesData = z.infer<typeof moveSpritesSchema>;
 
+/**
+ * 技のアイコンの絵（自作。npm run move-icons で計算して作る。作者の案 2026年11月14日: 使い回しをやめ、大きく色数も増やす。07 の264章）。
+ * 技の名前ごとに 1 枚（同じ名前の技 nameOf は同じ絵）。rows の 1 文字が palette の番号（36 進）、. は背景（タイプの色の四角）。
+ * 無い技は icons.json の白い絵柄のまま
+ */
+export const moveIconsSchema = z.object({
+  credit: z.string(),
+  size: z.number().int().positive(),
+  icons: z.record(
+    z.string(),
+    z.object({
+      palette: z.array(z.string().regex(/^#[0-9a-fA-F]{6}$/)).min(1).max(36),
+      rows: z.array(z.string()),
+    }),
+  ),
+});
+export type MoveIconsData = z.infer<typeof moveIconsSchema>;
+
 export const iconConfigSchema = z.object({
   size: z.number().int().positive(),
   dot: z.number().positive(),

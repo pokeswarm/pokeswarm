@@ -10,6 +10,7 @@ import obstaclesJson from '../../data/game/obstacles.json';
 import iconsJson from '../../data/render/icons.json';
 import itemIconsJson from '../../data/render/item-icons.json';
 import moveSpritesJson from '../../data/render/move-sprites.json';
+import moveIconsJson from '../../data/render/move-icons.json';
 import moveBalanceJson from '../../data/game/move-balance.json';
 import enemiesJson from '../../data/game/enemies.json';
 import spawnJson from '../../data/game/spawn.json';
@@ -94,6 +95,7 @@ import {
   iconConfigSchema,
   itemIconsSchema,
   moveSpritesSchema,
+  moveIconsSchema,
   MOVE_PATTERNS,
   moveBalanceSchema,
   spritePokemonListSchema,
@@ -120,6 +122,8 @@ export const iconConfig = load('render/icons.json', iconConfigSchema, iconsJson)
 export const itemIcons = load('render/item-icons.json', itemIconsSchema, itemIconsJson);
 /** 技のドット絵（自作。npm run move-sprites） */
 export const moveSprites = load('render/move-sprites.json', moveSpritesSchema, moveSpritesJson);
+/** 技のアイコンの絵（自作。npm run move-icons。07 の264章） */
+export const moveIcons = load('render/move-icons.json', moveIconsSchema, moveIconsJson);
 /** 技の強さをそろえる目安（段階ごとの総合の強さ） */
 export const moveBalanceConfig = load('game/move-balance.json', moveBalanceSchema, moveBalanceJson);
 export const enemiesConfig = load('game/enemies.json', enemiesConfigSchema, enemiesJson);
@@ -272,6 +276,8 @@ for (const r of regionsConfig.regions) {
 }
 // アイコン: 技の出し方・持ち物・パッシブ・タイプごとに絵柄と色がある
 for (const p of MOVE_PATTERNS) check(!!iconConfig.glyphs[iconConfig.moves[p] ?? ''], `data/render/icons.json に出し方 "${p}" の絵柄がありません`);
+check(moveIcons.size === iconConfig.size, `data/render/move-icons.json の size（${moveIcons.size}）が icons.json（${iconConfig.size}）と違います`);
+for (const [move, art] of Object.entries(moveIcons.icons)) check(art.rows.length === moveIcons.size && art.rows.every((r) => r.length === moveIcons.size) && (!!movesConfig.moves[move] || !!generated.moves[move]), `data/render/move-icons.json の "${move}" の大きさか技の名前が違います`);
 for (const [move, glyph] of Object.entries(iconConfig.moveGlyphs)) check(!!iconConfig.glyphs[glyph], `data/render/icons.json の技 "${move}" の絵柄 "${glyph}" がありません`);
 for (const k of Object.keys(itemsConfig.items)) check(!!itemIcons.items[k], `data/render/item-icons.json に持ち物 "${k}" のアイコンがありません（npm run item-icons）`);
 for (const k of Object.keys(movesConfig.moves)) check(!!iconConfig.typeColors[generated.moves[k]!.type], `data/render/icons.json にタイプ "${generated.moves[k]!.type}" の色がありません`);

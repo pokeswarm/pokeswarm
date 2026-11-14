@@ -20,6 +20,7 @@
     "balance-moves": "node scripts/balance-moves.ts",
     "item-icons": "node scripts/fetch-item-icons.ts",
     "move-sprites": "node scripts/make-move-sprites.ts",
+    "move-icons": "node scripts/make-move-icons.ts",
     "map-tiles": "node scripts/make-map-tiles.ts",
     "arena-maps": "node scripts/make-arena-maps.ts",
     "build-estimate": "vitest run --mode balance src/sim/buildDps.balance.ts -t 見積もり"

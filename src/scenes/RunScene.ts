@@ -2431,7 +2431,7 @@ export class RunScene extends Phaser.Scene {
       const y = top + 40 + k * 32;
       this.placeUi(v.text, cam.width - 8, y);
       this.placeUi(v.icon, cam.width - 14 - v.text.width, y);
-      v.icon.setScale(2 / cam.zoom);
+      v.icon.setScale((2 * 16) / iconConfig.size / cam.zoom);
     });
   }
 

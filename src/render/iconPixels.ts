@@ -1,5 +1,11 @@
 import type { IconConfig, ItemIcons } from '../data/schema';
 
+/** 技ごとの色の付いた絵（size × size。rows の 1 文字が palette の番号（36 進）、. は背景） */
+export interface IconArt {
+  palette: readonly string[];
+  rows: readonly string[];
+}
+
 /** アイコンの枠: タイプの技・派生技・固有技（持ち物・パッシブは base） */
 export type IconTier = 'base' | 'derived' | 'unique';
 
@@ -18,16 +24,26 @@ export function iconColor(data: IconConfig, color: string): string {
 
 /**
  * アイコン1つ（size × size）の RGBA を作る（自作のドット絵。描画とプレビューで同じものを使う）。
- * 角を丸めた四角を色で塗り（上を少し明るく）、白い絵柄（ふちはその色）を重ね、枠を付ける
+ * 角を丸めた四角を色で塗り（上を少し明るく）、白い絵柄（ふちはその色）を重ね、枠を付ける。
+ * art（技ごとの色の付いた絵。data/render/move-icons.json）があれば、白い絵柄の代わりにそれを重ねる（07 の264章）。
+ * 枠と白い絵柄は 16 マスの決まりで描き、size が 32 なら 2 倍の太さにする（見た目の太さを前と同じにする）
  */
-export function iconPixels(data: IconConfig, glyph: string, color: string, tier: IconTier): Uint8ClampedArray {
+export function iconPixels(data: IconConfig, glyph: string, color: string, tier: IconTier, art?: IconArt): Uint8ClampedArray {
   const n = data.size;
+  const u = n / 16;
   const out = new Uint8ClampedArray(n * n * 4);
   const base = rgb(color);
   const black: [number, number, number] = [0, 0, 0];
   const white: [number, number, number] = [255, 255, 255];
   const frame = rgb(data.frame[tier]);
   const rows = data.glyphs[glyph] ?? [];
+  const glyphAt = (x: number, y: number): string => rows[Math.floor(y / u)]?.[Math.floor(x / u)] ?? '.';
+  const artAt = (x: number, y: number): [number, number, number] | null => {
+    const ch = art?.rows[y]?.[x];
+    if (!ch || ch === '.') return null;
+    const c = art!.palette[parseInt(ch, 36)];
+    return c ? rgb(c) : null;
+  };
   const put = (x: number, y: number, c: [number, number, number]): void => {
     const i = (y * n + x) * 4;
     out[i] = c[0];
@@ -37,8 +53,10 @@ export function iconPixels(data: IconConfig, glyph: string, color: string, tier:
   };
   for (let y = 0; y < n; y++) {
     for (let x = 0; x < n; x++) {
-      const ex = Math.min(x, n - 1 - x);
-      const ey = Math.min(y, n - 1 - y);
+      const gx = Math.floor(x / u);
+      const gy = Math.floor(y / u);
+      const ex = Math.min(gx, 15 - gx);
+      const ey = Math.min(gy, 15 - gy);
       // 角を丸める
       if (ex + ey < 1) continue;
       const border = ex === 0 || ey === 0 || ex + ey === 1;
@@ -46,7 +64,12 @@ export function iconPixels(data: IconConfig, glyph: string, color: string, tier:
         put(x, y, frame);
         continue;
       }
-      const ch = rows[y]?.[x] ?? '.';
+      if (art) {
+        const c = artAt(x, y);
+        put(x, y, c ?? mix(base, black, y < n / 2 ? 0.45 : 0.6));
+        continue;
+      }
+      const ch = glyphAt(x, y);
       if (ch === '#') put(x, y, mix(base, white, 0.78));
       else if (ch === '+') put(x, y, mix(base, black, 0.15));
       else put(x, y, mix(base, black, y < n / 2 ? 0.45 : 0.6));
@@ -55,9 +78,11 @@ export function iconPixels(data: IconConfig, glyph: string, color: string, tier:
   // 固有技は内側にもう1本、細い光の枠
   if (tier === 'unique') {
     const glow = mix(frame, white, 0.5);
-    for (let k = 2; k < n - 2; k++) {
-      for (const [x, y] of [[k, 1], [k, n - 2], [1, k], [n - 2, k]] as const) {
-        if ((rows[y]?.[x] ?? '.') === '.') put(x, y, glow);
+    for (let k = 2 * u; k < n - 2 * u; k++) {
+      for (let d = u; d < 2 * u; d++) {
+        for (const [x, y] of [[k, d], [k, n - 1 - d], [d, k], [n - 1 - d, k]] as const) {
+          if (art ? !artAt(x, y) : glyphAt(x, y) === '.') put(x, y, glow);
+        }
       }
     }
   }
@@ -69,22 +94,26 @@ export function iconPixels(data: IconConfig, glyph: string, color: string, tier:
  */
 export function itemIconPixels(data: IconConfig, sprite: ItemIcons['items'][string], background: string): Uint8ClampedArray {
   const n = data.size;
+  // 枠と絵は 16 マスの決まりで描き、size が 32 なら 2 倍にする（持ち物の絵は 14 ドットのまま。07 の264章）
+  const u = n / 16;
   const out = new Uint8ClampedArray(n * n * 4);
   const bg = rgb(background);
   const black: [number, number, number] = [0, 0, 0];
   const frame = rgb(data.frame.base);
   const h = sprite.rows.length;
   const w = sprite.rows[0]?.length ?? 0;
-  const ox = Math.floor((n - w) / 2);
-  const oy = Math.floor((n - h) / 2);
+  const ox = Math.floor((16 - w) / 2);
+  const oy = Math.floor((16 - h) / 2);
   for (let y = 0; y < n; y++) {
     for (let x = 0; x < n; x++) {
-      const ex = Math.min(x, n - 1 - x);
-      const ey = Math.min(y, n - 1 - y);
+      const gx = Math.floor(x / u);
+      const gy = Math.floor(y / u);
+      const ex = Math.min(gx, 15 - gx);
+      const ey = Math.min(gy, 15 - gy);
       if (ex + ey < 1) continue;
       const i = (y * n + x) * 4;
       const border = ex === 0 || ey === 0 || ex + ey === 1;
-      const ch = sprite.rows[y - oy]?.[x - ox] ?? '.';
+      const ch = sprite.rows[gy - oy]?.[gx - ox] ?? '.';
       const c = border ? frame : ch !== '.' && sprite.palette[ch] ? rgb(sprite.palette[ch]!) : mix(bg, black, y < n / 2 ? 0.35 : 0.5);
       out.set([c[0], c[1], c[2], 255], i);
     }

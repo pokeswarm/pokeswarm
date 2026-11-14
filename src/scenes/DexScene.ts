@@ -22,7 +22,7 @@ export interface DexSceneData {
   move?: string;
 }
 
-/** 見つけた技の色（枠の外） */
+/** 見つけた技の色（枠の外）。アイコンは 32 ドットなので、にじまないよう 32・64 で出す（07 の264章） */
 const FOUND_BG = '#ffffff';
 const UNKNOWN_BG = '#c8ced4';
 const MAX_COLOR = '#e0a000';
@@ -162,7 +162,7 @@ export class DexScene extends Phaser.Scene {
   private nodeView(node: DexNode): HTMLElement {
     const box = document.createElement('div');
     box.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:nowrap';
-    box.append(this.moveTile(node.move, this.compact ? 36 : 44));
+    box.append(this.moveTile(node.move, this.compact ? 32 : 64));
     // 見つけていない技の先は見せない（あるかどうかも伏せる）
     if (node.state === 'unknown' || node.edges.length === 0) return box;
     const edges = document.createElement('div');
@@ -193,13 +193,13 @@ export class DexScene extends Phaser.Scene {
     if (d.item) {
       const index = this.rules.items.findIndex((x) => x.key === d.item);
       if (index !== -1) {
-        const img = this.iconImg(itemIconKey(this.rules, index), 24);
+        const img = this.iconImg(itemIconKey(this.rules, index), 32);
         img.title = localName(generated.items[d.item]?.names, getLocale(), d.item);
         mats.append(img);
       }
     }
     for (const need of d.needs) {
-      const tile = this.moveTile(need.move, 22, false);
+      const tile = this.moveTile(need.move, 32, false);
       if (need.level) {
         const w = document.createElement('div');
         w.style.cssText = 'display:flex;flex-direction:column;align-items:center';
@@ -279,7 +279,7 @@ export class DexScene extends Phaser.Scene {
     head.style.flexDirection = 'row';
     head.style.alignItems = 'center';
     head.style.gap = '16px';
-    head.append(this.iconImg(moveIconKey(rules, index), this.compact ? 48 : 64));
+    head.append(this.iconImg(moveIconKey(rules, index), 64));
     const text = document.createElement('div');
     text.style.cssText = 'display:flex;flex-direction:column;gap:2px';
     const name = document.createElement('div');
@@ -335,7 +335,7 @@ export class DexScene extends Phaser.Scene {
     const link = (d: LineDerive, other: string, showMaterials: boolean, forward: boolean): HTMLElement => {
       const r = document.createElement('div');
       r.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap';
-      const tile = this.moveTile(other, this.compact ? 28 : 32);
+      const tile = this.moveTile(other, 32);
       const nm = document.createElement('span');
       nm.textContent = this.state(other) === 'unknown' ? t('dex.unknown') : this.moveName(other);
       const mats = showMaterials ? this.materialText(d) : '';

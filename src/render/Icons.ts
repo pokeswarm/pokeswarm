@@ -1,8 +1,9 @@
 import type Phaser from 'phaser';
+import { moveIcons, movesConfig } from '../data';
 import type { IconConfig, ItemIcons } from '../data/schema';
 import type { SimRules } from '../sim/rules';
 import { isUniqueDerivation } from '../sim/upgrades';
-import { iconColor, iconPixels, itemIconPixels, starPixels, type IconTier } from './iconPixels';
+import { iconColor, iconPixels, itemIconPixels, starPixels, type IconArt, type IconTier } from './iconPixels';
 
 /** レベルの表示のひし形（済んだもの: 段階ごとの色、まだのもの） */
 export function pipKey(on: boolean, tier: IconTier): string {
@@ -13,6 +14,12 @@ export function pipKey(on: boolean, tier: IconTier): string {
 export function moveTier(rules: SimRules, move: number): IconTier {
   const d = rules.derivations.find((x) => x.to === move);
   return !d ? 'base' : isUniqueDerivation(d) ? 'unique' : 'derived';
+}
+
+/** 技の色の付いた絵（同じ名前の技は同じ絵。無ければ白い絵柄。07 の264章） */
+export function moveIconArt(key: string): IconArt | undefined {
+  const nameOf = (movesConfig.moves[key] as { nameOf?: string } | undefined)?.nameOf;
+  return moveIcons.icons[key] ?? (nameOf ? moveIcons.icons[nameOf] : undefined);
 }
 
 export function moveIconKey(rules: SimRules, move: number): string {
@@ -38,7 +45,7 @@ export function ensureIconTextures(scene: Phaser.Scene, data: IconConfig, rules:
   const n = data.size;
   rules.moves.forEach((m, i) => {
     const type = rules.types.names[m.type] ?? 'normal';
-    addTexture(scene, moveIconKey(rules, i), n, n, iconPixels(data, data.moveGlyphs[m.key] ?? data.moves[m.pattern] ?? 'nearest', data.typeColors[type] ?? '#888888', moveTier(rules, i)));
+    addTexture(scene, moveIconKey(rules, i), n, n, iconPixels(data, data.moveGlyphs[m.key] ?? data.moves[m.pattern] ?? 'nearest', data.typeColors[type] ?? '#888888', moveTier(rules, i), moveIconArt(m.key)));
   });
   rules.items.forEach((it, i) => {
     const def = data.items[it.key] ?? { glyph: 'orb', color: '#9e9e9e' };

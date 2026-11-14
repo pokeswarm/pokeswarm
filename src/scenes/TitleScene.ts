@@ -146,6 +146,7 @@ export class TitleScene extends Phaser.Scene {
       { icon: 'start', label: t('title.menu.start'), key: null, go: () => this.scene.start('region', { next: 'solo' }) },
       ...(coop ? [{ icon: 'coop', label: t('title.menu.coop'), key: 'C', go: () => this.scene.start('region', { next: 'coop' }) }] : []),
       ...(coop ? [{ icon: 'friends', label: t('title.menu.friends'), key: 'F', go: () => this.scene.start('friends') }] : []),
+      { icon: 'dex', label: t('title.menu.dex'), key: 'Z', go: () => this.scene.start('region', { next: 'dex' }) },
       { icon: 'achievements', label: t('title.menu.achievements'), key: 'A', go: () => this.scene.start('achievements') },
       { icon: 'shop', label: t('title.menu.shop'), key: 'S', go: () => this.scene.start('shop') },
       { icon: 'settings', label: t('title.menu.settings'), key: 'O', go: () => this.scene.start('settings') },

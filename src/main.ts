@@ -22,6 +22,7 @@ import { SelectScene } from './scenes/SelectScene';
 import { RegionScene } from './scenes/RegionScene';
 import { TitleScene } from './scenes/TitleScene';
 import { SettingsScene } from './scenes/SettingsScene';
+import { DexScene } from './scenes/DexScene';
 import { installAudioUnlock } from './audio';
 
 /**
@@ -130,6 +131,7 @@ async function start(): Promise<void> {
   game.scene.add('achievements', AchievementsScene, false);
   game.scene.add('shop', ShopScene, false);
   game.scene.add('settings', SettingsScene, false);
+  game.scene.add('dex', DexScene, false);
 
   // フレンドからの招待: ラン中でなければ、今の画面を閉じて待合室へ移る
   const running = (): boolean => game.scene.isActive('run');

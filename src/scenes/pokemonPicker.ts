@@ -17,6 +17,10 @@ export interface PokemonPickerOptions {
   onSelect(key: string): void;
   /** 決める（ダブルクリック・Enter）。無ければ選ぶだけ */
   onConfirm?(key: string): void;
+  /** 解放済みのマスを 1 回押したとき（わざ図鑑: 押すと開く）。無ければ選ぶだけ */
+  onClick?(key: string): void;
+  /** 解放済みか（わざ図鑑: タマゴからかえるポケモンは、タマゴを解放していれば押せる）。無ければ isPokemonUnlocked */
+  isUnlocked?(key: string): boolean;
 }
 
 const compact = (): boolean => compactScreen();
@@ -73,6 +77,10 @@ export class PokemonPicker {
   private cursor = 0;
   private hovered: string | null = null;
 
+  private unlocked(key: string): boolean {
+    return this.opts.isUnlocked ? this.opts.isUnlocked(key) : isPokemonUnlocked(key, this.opts.region);
+  }
+
   constructor(private readonly opts: PokemonPickerOptions) {
     this.keys = [...opts.playables];
     this.element = document.createElement('div');
@@ -82,7 +90,7 @@ export class PokemonPicker {
     // マスは横だけ列の幅いっぱいに広げる（一覧の左右の端を、下の詳しい欄の端とそろえる。高さは変えない）
     grid.style.cssText = `display:grid;grid-template-columns:repeat(auto-fill,minmax(${size + 8}px,1fr));gap:6px`;
     for (const key of this.keys) {
-      const unlocked = isPokemonUnlocked(key, opts.region);
+      const unlocked = this.unlocked(key);
       const cell = document.createElement('div');
       cell.style.cssText = `${windowCss('light')};${unlocked ? '' : `background:${uiConfig.picker.lockedFill};box-shadow:none;`}padding:0;width:100%;height:${size + 8}px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;cursor:${unlocked ? 'pointer' : 'default'};border-width:4px`;
       cell.append(pokemonIconImage(key, size - 8, !unlocked));
@@ -96,8 +104,10 @@ export class PokemonPicker {
       };
       cell.onclick = () => {
         this.cursor = this.keys.indexOf(key);
-        if (unlocked) this.select(key);
-        else this.paint();
+        if (unlocked) {
+          this.select(key);
+          this.opts.onClick?.(key);
+        } else this.paint();
       };
       cell.ondblclick = () => {
         if (unlocked) this.opts.onConfirm?.(key);
@@ -107,7 +117,7 @@ export class PokemonPicker {
     }
     const count = document.createElement('div');
     count.style.cssText = 'text-align:center;opacity:0.85';
-    count.textContent = t('select.count', { n: this.keys.filter((k) => isPokemonUnlocked(k, opts.region)).length, total: this.keys.length });
+    count.textContent = t('select.count', { n: this.keys.filter((k) => this.unlocked(k)).length, total: this.keys.length });
     this.detail = document.createElement('div');
     this.detail.style.cssText = `${windowCss('light')};padding:${compact() ? '4px 12px' : '10px 16px'};display:flex;align-items:center;gap:16px;min-height:${compact() ? 64 : 96}px;box-sizing:border-box`;
     this.element.append(count, grid, this.detail);
@@ -130,7 +140,7 @@ export class PokemonPicker {
     if (next < 0 || next >= this.keys.length) return;
     this.cursor = next;
     const key = this.keys[next]!;
-    if (isPokemonUnlocked(key, this.opts.region)) this.select(key);
+    if (this.unlocked(key)) this.select(key);
     else this.paint();
   }
 
@@ -162,7 +172,7 @@ export class PokemonPicker {
       this.detail.replaceChildren();
       return;
     }
-    const unlocked = isPokemonUnlocked(key, this.opts.region);
+    const unlocked = this.unlocked(key);
     const size = compact() ? 48 : 80;
     const icon = pokemonIconImage(key, size, !unlocked);
     icon.style.flex = 'none';

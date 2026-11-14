@@ -8,10 +8,11 @@ import { compactScreen, windowCss } from '../render/pixelUi';
 import type { LobbySceneData } from './LobbyScene';
 import { devAllPokemon, pokemonIconImage } from './pokemonPicker';
 import type { SelectSceneData } from './SelectScene';
+import type { DexSceneData } from './DexScene';
 
 export interface RegionSceneData {
-  /** 地方を決めた後: solo はポケモン選択、coop は部屋を作って待合室 */
-  next: 'solo' | 'coop';
+  /** 地方を決めた後: solo はポケモン選択、coop は部屋を作って待合室、dex は わざ図鑑のポケモンの一覧（07 の262章） */
+  next: 'solo' | 'coop' | 'dex';
 }
 
 type Region = (typeof regionsConfig.regions)[number];
@@ -55,6 +56,7 @@ export class RegionScene extends Phaser.Scene {
       const r = regions.find((x) => x.id === id);
       if (!r || !regionPlayable(r)) return;
       if (data.next === 'coop') this.scene.start('lobby', { mode: 'host', region: id } satisfies LobbySceneData);
+      else if (data.next === 'dex') this.scene.start('dex', { region: id } satisfies DexSceneData);
       else this.scene.start('select', { region: id } satisfies SelectSceneData);
     };
     const title = document.createElement('div');

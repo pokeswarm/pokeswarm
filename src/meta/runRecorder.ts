@@ -1,7 +1,8 @@
 import { legendRoundStats } from '../sim/systems/stage';
 import type { World } from '../sim/world';
 import { elapsedSeconds } from '../sim/world';
-import { addStat, maxStat } from './saveData';
+import { addDexMove, addStat, maxStat } from './saveData';
+import { moveMaxLevel } from '../sim/systems/leveling';
 import type { SaveStore } from './saveStore';
 import type { ShopConfig } from '../data/schema';
 import { coinsForRun, permanentBonus } from './shop';
@@ -33,6 +34,8 @@ export interface RunSnapshot {
   hatchedFrom: string | null;
   coop: boolean;
   pending: [string, number][];
+  /** わざ図鑑のまだ足していない分（技 → 最大まで上げたか）。前の版の写しには無い */
+  pendingDex?: [string, boolean][];
   committedSeconds: number;
   seconds: number;
   runKills: number;
@@ -55,6 +58,10 @@ interface FinishInfo {
 
 export class RunRecorder {
   private readonly pending = new Map<string, number>();
+  /** わざ図鑑（07 の262章）: このランで見つけた技 → 最大まで上げたか。まだセーブデータに足していないもの */
+  private readonly pendingDex = new Map<string, boolean>();
+  /** このランで記録し終えた技（同じ技を何度も足さない。"技" か "技!"） */
+  private readonly dexSeen = new Set<string>();
   private seconds = 0;
   /** このランで自分が倒した数（最高記録に使う） */
   private runKills = 0;
@@ -94,6 +101,7 @@ export class RunRecorder {
   observe(world: World): void {
     if (this.finished) return;
     const me = world.localPlayerId;
+    this.observeDex(world);
     for (const ev of world.events) {
       switch (ev.type) {
         case 'enemyKilled': {
@@ -143,6 +151,21 @@ export class RunRecorder {
     }
   }
 
+  /** わざ図鑑: 自分が今持っている技を見る（最初の技・覚えた技・派生した技・姿や持ち物で変わった技をまとめて拾う） */
+  private observeDex(world: World): void {
+    const p = world.players.find((x) => x.id === world.localPlayerId);
+    if (!p) return;
+    for (const pm of p.moves) {
+      const key = world.rules.moves[pm.move]?.key;
+      if (!key) continue;
+      const maxed = pm.level >= moveMaxLevel(world.rules, pm);
+      if (this.dexSeen.has(maxed ? `${key}!` : key)) continue;
+      this.dexSeen.add(key);
+      if (maxed) this.dexSeen.add(`${key}!`);
+      this.pendingDex.set(key, maxed || (this.pendingDex.get(key) ?? false));
+    }
+  }
+
   /** ここまでに数えた分と遊んだ時間をセーブデータに足す（足すものが無ければ何もしない） */
   commit(world: World): void {
     this.commitSeconds(elapsedSeconds(world));
@@ -155,11 +178,14 @@ export class RunRecorder {
       this.count('playSeconds', seconds);
       this.seconds += seconds;
     }
-    if (this.pending.size === 0) return;
+    if (this.pending.size === 0 && this.pendingDex.size === 0) return;
     const add = [...this.pending];
+    const dex = [...this.pendingDex];
     this.pending.clear();
+    this.pendingDex.clear();
     this.store.update((d) => {
       for (const [key, n] of add) addStat(d, key, n);
+      for (const [move, maxed] of dex) addDexMove(d, this.region, this.pokemon, move, maxed);
     });
   }
 
@@ -186,6 +212,7 @@ export class RunRecorder {
       hatchedFrom: this.hatchedFrom,
       coop: world.role !== 'solo',
       pending: [...this.pending],
+      pendingDex: [...this.pendingDex],
       committedSeconds: this.seconds,
       seconds: elapsedSeconds(world),
       runKills: this.runKills,
@@ -201,6 +228,7 @@ export class RunRecorder {
   static finishFromSnapshot(store: SaveStore, snap: RunSnapshot, shop: ShopConfig | null, derived: DerivedStatSources | null): number {
     const r = new RunRecorder(store, snap.pokemon, shop, derived, snap.region, snap.hatchedFrom);
     for (const [k, n] of snap.pending) r.pending.set(k, n);
+    for (const [k, maxed] of snap.pendingDex ?? []) r.pendingDex.set(k, maxed);
     r.seconds = snap.committedSeconds;
     r.runKills = snap.runKills;
     r.runMidbosses = snap.runMidbosses;

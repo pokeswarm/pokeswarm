@@ -23,12 +23,17 @@ export const saveDataSchema = z.object({
   achievements: z.array(z.string()),
   /** 一度でも達成した派生・固有技（派生先の技のキー）。選択画面の「おや……？」に使う */
   discoveries: z.array(z.string()),
+  /**
+   * わざ図鑑（07 の262章）: "<地方>:<ポケモン>" → そのポケモンで見つけた技のキー。Lv の最大まで上げた技は後ろに "!" を付ける（例 "ember!"）。
+   * 数の記録（stats）にすると技 1 つごとにキーが増えて文書が大きくなるので、ポケモンごとの短い一覧にした。前のセーブには無いので空として読む
+   */
+  dex: z.record(z.string(), z.array(z.string())).default({}),
 });
 export type SaveData = z.infer<typeof saveDataSchema>;
 
 /** coins は新しいアカウントのコイン（shop.json の startingCoins） */
 export function emptySave(now = 0, coins = 0): SaveData {
-  return { version: 1, updatedAt: now, coins, upgrades: {}, regionUpgrades: {}, unlocked: [], stats: {}, achievements: [], discoveries: [] };
+  return { version: 1, updatedAt: now, coins, upgrades: {}, regionUpgrades: {}, unlocked: [], stats: {}, achievements: [], discoveries: [], dex: {} };
 }
 
 /** 読み込んだ値をセーブデータにする。形が違えば null（壊れたデータで上書きしないため、呼び出し側で扱いを決める） */
@@ -46,4 +51,25 @@ export function addStat(save: SaveData, key: string, amount: number): void {
 /** 記録の最大値を更新する（1ランでの最多撃破など） */
 export function maxStat(save: SaveData, key: string, value: number): void {
   if (value > (save.stats[key] ?? 0)) save.stats[key] = value;
+}
+
+/** わざ図鑑の一覧のキー */
+export function dexKey(region: string, pokemon: string): string {
+  return `${region}:${pokemon}`;
+}
+
+/** わざ図鑑に足す: 見つけた（maxed なら最大まで上げた）。足すものが無ければ false */
+export function addDexMove(save: SaveData, region: string, pokemon: string, move: string, maxed: boolean): boolean {
+  const key = dexKey(region, pokemon);
+  const list = (save.dex[key] ??= []);
+  const i = list.findIndex((m) => m === move || m === `${move}!`);
+  if (i === -1) {
+    list.push(maxed ? `${move}!` : move);
+    return true;
+  }
+  if (maxed && list[i] === move) {
+    list[i] = `${move}!`;
+    return true;
+  }
+  return false;
 }

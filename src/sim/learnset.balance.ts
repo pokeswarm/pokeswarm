@@ -1,24 +1,19 @@
 import { writeFileSync } from 'node:fs';
 import { it } from 'vitest';
-import { achievementsConfig, derivationsConfig, generated, learnsetsConfig, playablesConfig, regionsConfig } from '../data';
-import { buildSimRules, playableLoadout } from '../data/simRules';
-import { achievementPerks } from '../meta/achievementPerks';
-import { Simulation } from './simulation';
-import { canLearnNewMove } from './systems/leveling';
+import { generated, playablesConfig, regionsConfig } from '../data';
+import { buildSimRules } from '../data/simRules';
+import { lineMoves, obtainableItems, regionLineKeys } from '../meta/lineMoves';
 
 /**
  * 遊べるポケモンごとの、最初の技・覚えられる技・派生と固有技の一覧（作者の依頼 2026年10月30日。docs/16_learnsets.json を作る）。
  *   npm run learnsets
  *
- * 覚えられる技は、レベルアップの候補と同じ決まり（leveling.ts の canLearnNewMove）で、進化の姿ごとに調べる。
- * ランのレベルの条件（learnMinLevel）は満たしたものとし、覚えている技の条件（learnWithMoves）は、その技を足して調べて条件として書く。
- * 派生・固有技は data/game/derivations.json から、その系統が使えるものをたどる（材料の持ち物・レベル・覚えている技の条件つき）。
+ * 中身の調べ方は src/meta/lineMoves.ts（わざ図鑑と同じ）。
  */
 type Names = { ja: string; en: string };
-type Derivation = { from: string; to: string; item?: string; line?: string; minLevel?: number; needsMoves?: { move: string; level?: number }[] };
 const OUT = process.env.LEARNSET_OUT ?? 'docs/16_learnsets.json';
 const genMoves = generated.moves as Record<string, { names: Names; type: string } | undefined>;
-const genPokemon = generated.pokemon as Record<string, { names: Names; types: string[]; evolvesTo: { to: string; trigger?: string; item?: string }[] } | undefined>;
+const genPokemon = generated.pokemon as Record<string, { names: Names; types: string[] } | undefined>;
 const genItems = generated.items as Record<string, { names: Names } | undefined>;
 
 it('技の一覧', () => {
@@ -27,83 +22,23 @@ it('技の一覧', () => {
     if (!region.playables?.length) continue;
     const rules = buildSimRules(region.id);
     // その地方で手に入る持ち物（実績を全部達成したとき）。手に入らない持ち物の進化・派生は載せない（カントーのヤドキングなど。07 の180.5章）
-    const obtainable = achievementPerks(achievementsConfig, achievementsConfig.achievements.filter((a) => a.region === region.id).map((a) => a.id), region.id).items;
-    const moveName = (i: number): string => rules.moves[i]!.key;
-    const keys = region.playables.flatMap((k) => playablesConfig.pokemon[k]?.hatch ?? [k]);
+    const obtainable = obtainableItems(region.id);
+    const keys = regionLineKeys(region.playables);
     for (const key of keys) {
-      const def = playablesConfig.pokemon[key];
-      if (!def) continue;
-      const loadout = playableLoadout(rules, key);
-      // 進化の姿（系統のキーから、進化先をたどる。分かれる進化はすべて）
-      const forms: string[] = [];
-      const visit = (k: string): void => {
-        if (forms.includes(k) || !genPokemon[k]) return;
-        forms.push(k);
-        for (const e of genPokemon[k]!.evolvesTo) {
-          if (e.trigger === 'item' ? !obtainable.has(e.item!) : e.trigger === 'trade' && !obtainable.has('linking-cord')) continue;
-          visit(e.to);
-        }
-      };
-      visit(def.sprite && genPokemon[key] ? key : def.sprite ?? key);
-      for (const b of def.becomes ?? []) visit(b.form);
-      const learn = new Map<string, { forms: string[]; withMoves?: string[]; minLevel?: number }>();
-      for (const form of forms) {
-        const species = rules.species.findIndex((s) => s.key === form);
-        if (species === -1) continue;
-        const sim = new Simulation({ tickRate: 30, seed: 1, rules });
-        const p = sim.addPlayer({
-          id: 1, x: 0, y: 0, radius: 12, moveSpeed: 0,
-          types: form === key ? loadout.types : [...rules.species[species]!.types],
-          species, moves: loadout.moves, line: loadout.line, moveTypes: loadout.moveTypes, learnsAll: loadout.learnsAll,
-        });
-        sim.world.level = 100;
-        const startMoves = p.moves.map((m) => ({ ...m }));
-        rules.moves.forEach((m, move) => {
-          const withMoves = m.learnWithMoves ?? [];
-          if (withMoves.length) p.moves = [...startMoves, ...withMoves.map((w) => ({ ...startMoves[0]!, move: w, level: 1 }))];
-          const ok = canLearnNewMove(sim.world, p, move);
-          p.moves = startMoves.map((m) => ({ ...m }));
-          if (!ok) return;
-          const row = learn.get(m.key) ?? { forms: [], ...(withMoves.length ? { withMoves: withMoves.map(moveName) } : {}), ...(m.learnMinLevel ? { minLevel: m.learnMinLevel } : {}) };
-          row.forms.push(form);
-          learn.set(m.key, row);
-        });
-      }
-      // 派生・固有技: 最初の技と覚えられる技から、この系統が使えるものをたどる
-      const start = def.startingMoves ?? [];
-      const have = new Set([...start, ...learn.keys(), ...(def.formMoves ?? []).map((f) => f.move), ...(def.itemMoves ?? []).map((f) => f.move)]);
-      // 系統（姿が変わると別の系統になるもの: ピチュー → ピカチュウ）
-      const lines = [key, loadout.line, ...(def.becomes ?? []).map((b) => b.line)];
-      const allDerivations = [...derivationsConfig.derivations, ...derivationsConfig.unique] as Derivation[];
-      // 全体の派生は、派生技がその系統の learnsets に無ければ出ない（leveling.ts の derivationUsable と同じ）
-      const inLearnset = (move: string): boolean => lines.some((l) => !learnsetsConfig.lines[l] || (playablesConfig.pokemon[l]?.allMoveTypes ?? false) || learnsetsConfig.lines[l]!.some((e) => (typeof e === 'string' ? e : e.move) === move));
-      const usable = (d: Derivation): boolean =>
-        d.line ? lines.includes(d.line) : !allDerivations.some((x) => !!x.line && lines.includes(x.line) && x.from === d.from && x.item === d.item) && inLearnset(d.to);
-      const derives: unknown[] = [];
-      const all = [...(derivationsConfig.derivations as Derivation[]).map((d) => ({ ...d, unique: false })), ...(derivationsConfig.unique as Derivation[]).map((d) => ({ ...d, unique: true }))];
-      for (let changed = true; changed; ) {
-        changed = false;
-        for (const d of all) {
-          if ((d.item && !obtainable.has(d.item)) || !have.has(d.from) || !usable(d) || derives.some((x) => (x as { from: string; to: string }).from === d.from && (x as { to: string }).to === d.to)) continue;
-          derives.push({ from: d.from, to: d.to, unique: d.unique, item: d.item ?? null, minLevel: d.minLevel ?? null, needs: (d.needsMoves ?? []).map((n) => ({ move: n.move, level: n.level ?? null })), lineOnly: !!d.line });
-          if (!have.has(d.to)) {
-            have.add(d.to);
-            changed = true;
-          }
-        }
-      }
+      const lm = lineMoves(rules, key, obtainable);
+      if (!lm) continue;
       out.push({
         region: region.id,
         key,
         name: genPokemon[key]?.names.ja ?? key,
         types: (genPokemon[key]?.types ?? []),
-        forms: forms.map((f) => ({ key: f, name: genPokemon[f]?.names.ja ?? f, types: genPokemon[f]?.types ?? [] })),
-        fixedMoves: !!def.fixedMoves,
-        learnsAll: !!def.allMoveTypes,
-        start,
-        learn: [...learn].map(([move, r]) => ({ move, ...r })),
-        special: [...(def.formMoves ?? []).map((f) => ({ move: f.move, how: 'form', form: f.form })), ...(def.itemMoves ?? []).map((f) => ({ move: f.move, how: 'item', item: f.item }))],
-        derives,
+        forms: lm.forms.map((f) => ({ key: f, name: genPokemon[f]?.names.ja ?? f, types: genPokemon[f]?.types ?? [] })),
+        fixedMoves: !!playablesConfig.pokemon[key]!.fixedMoves,
+        learnsAll: !!playablesConfig.pokemon[key]!.allMoveTypes,
+        start: lm.start,
+        learn: [...lm.learn].map(([move, r]) => ({ move, ...r })),
+        special: lm.special,
+        derives: lm.derives,
       });
     }
   }

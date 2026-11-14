@@ -16,7 +16,9 @@ describe('地方ごとの記録・強化・ショップ（02 の17章）', () =>
     const save = parseSave(old)!;
     expect(save).not.toBeNull();
     expect(save.regionUpgrades).toEqual({});
-    expect({ ...save, regionUpgrades: undefined }).toEqual({ ...old, regionUpgrades: undefined });
+    // わざ図鑑（07 の262章）も前のセーブには無いので空として読む
+    expect(save.dex).toEqual({});
+    expect({ ...save, regionUpgrades: undefined, dex: undefined }).toEqual({ ...old, regionUpgrades: undefined, dex: undefined });
   });
 
   it('記録の名前: カントーはそのまま、ほかの地方は頭に "<地方>:"。コインの合計だけは共通', () => {

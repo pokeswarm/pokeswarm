@@ -2,6 +2,10 @@
  * 技のアイコンの絵を書き出す（07 の264・265章）。
  *   npm run move-icons                       data/render/move-icons.json を書き出す
  *   npm run move-icons -- --preview out.png  前の絵（白い絵柄）と新しい絵を並べた確認用の画像も書く
+ *   npm run move-icons -- --pick 技,技 out.png  選んだ技のアイコンを 4 倍で並べた画像を書く（技を足したとき）
+ *   npm run move-icons -- --sheet フォルダ    タイプごとに全部を並べた画像を書く
+ *   npm run move-icons -- --auto             ICONS に書いていない（レシピの絵を 1 つ置いただけの）技を出す
+ * 技を足したときの作り方と決まりは docs/09 の「技のアイコン」。絵の無い技があると止まる（終了コード 1）。
  *
  * 作者の決まり（2026年11月15日）: アイコンのドット絵に黒の輪郭線を使わない。技ごとに「何を発生させたか」から考えて 1 つのアイコンにする。
  * そこで、ゲームの中でその技が出すもの（src/render/moveArt.ts の技の絵: 火の玉・爪あと・水の流れ など）を、
@@ -767,19 +771,56 @@ for (const [k, m] of Object.entries(moves)) {
 }
 const out: Record<string, { palette: string[]; rows: string[] }> = {};
 const missing: string[] = [];
+const auto: string[] = [];
 for (const [name, keys] of byName) {
-  const layers = ICONS[name] ?? autoLayers([...keys].sort((a, b) => (a === name ? -1 : b === name ? 1 : 0)));
+  const own = ICONS[name];
+  const layers = own ?? autoLayers([...keys].sort((a, b) => (a === name ? -1 : b === name ? 1 : 0)));
   if (!layers) {
     missing.push(name);
     continue;
   }
+  if (!own) auto.push(name);
   out[name] = toArt(drawIcon(layers));
 }
 for (const key of Object.keys(ICONS)) if (!byName.has(key)) throw new Error(`技の名前 ${key} が data/game/moves.json にありません`);
-if (missing.length) console.log(`絵の無い技（前の白い絵柄のまま）: ${missing.join(', ')}`);
+const ja = (n: string): string => `${genMoves[n]?.names.ja ?? n}(${n})`;
+if (process.argv.includes('--auto')) console.log(`レシピの絵を 1 つ置いただけの技（${auto.length}）: ${auto.map(ja).join(' ')}`);
+if (missing.length) {
+  // 技を足したときに、アイコンを作り忘れないように止める（docs/09 の「技のアイコン」）
+  console.error(
+    `アイコンの絵が無い技: ${missing.map(ja).join(' ')}\n` +
+      '  ゲームの中で何も出ない技（いつも効く技 など）は、自動では作れません。ICONS に、その技で起きること（自分に起きる変化）を描いてください（docs/09 の「技のアイコン」）。',
+  );
+  process.exitCode = 1;
+}
 const file = path.join(ROOT, 'data/render/move-icons.json');
 fs.writeFileSync(file, JSON.stringify({ credit: '自作（scripts/make-move-icons.ts が src/render/moveArt.ts の技の絵から作る）', size: N, icons: out }, null, 2) + '\n');
 console.log(`${Object.keys(out).length} 個の絵を ${path.relative(ROOT, file)} に書きました`);
+
+// 確認用の画像（選んだ技だけ）: --pick 技,技,… <ファイル> で、4 倍で 8 列に並べる（足した技を見るとき）
+const pickAt = process.argv.indexOf('--pick');
+if (pickAt !== -1) {
+  const icons = read('data/render/icons.json') as Parameters<typeof iconPixels>[0];
+  const names = (process.argv[pickAt + 1] ?? '').split(',').filter(Boolean);
+  for (const n of names) if (!out[n]) throw new Error(`技の名前 ${n} のアイコンがありません`);
+  const S = 4;
+  const cols = Math.min(8, names.length);
+  const cell = N * S + 12;
+  const png = new PNG({ width: cols * cell + 12, height: Math.ceil(names.length / cols) * cell + 12 });
+  for (let i = 0; i < png.data.length; i += 4) png.data.set([42, 44, 56, 255], i);
+  names.forEach((n, i) => {
+    const px = iconPixels(icons, 'nearest', icons.typeColors[genMoves[n]?.type ?? 'normal'] ?? '#888888', 'base', out[n]);
+    const ox = 12 + (i % cols) * cell;
+    const oy = 12 + Math.floor(i / cols) * cell;
+    for (let y = 0; y < N * S; y++) for (let x = 0; x < N * S; x++) {
+      const si = (Math.floor(y / S) * N + Math.floor(x / S)) * 4;
+      if (px[si + 3]) png.data.set([px[si]!, px[si + 1]!, px[si + 2]!, 255], ((oy + y) * png.width + ox + x) * 4);
+    }
+  });
+  const dest = path.resolve(process.argv[pickAt + 2] ?? 'move-icons-pick.png');
+  fs.writeFileSync(dest, PNG.sync.write(png));
+  console.log(`確認用の画像: ${dest}（${names.map((n, i) => `${i + 1}.${ja(n)}`).join(' ')}）`);
+}
 
 // 確認用の画像（タイプごと）: --sheet <フォルダ> で、新しいアイコンを 3 倍で 8 列に並べる（並びは名前の順に出す）
 const sheetAt = process.argv.indexOf('--sheet');

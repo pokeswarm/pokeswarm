@@ -45,6 +45,7 @@ PokéSwarm（ポケモン題材のサバイバー系ブラウザゲーム、最�
 | `docs/25_boss_kill.json` | 同じファイルで `-t ボスを倒す秒数`（系統ごとに `BUILD_ONLY` と `KILL_OUT` で分けて回せる） | 技ごとのボス単独 DPS・その技を抜くと下がる分・四天王と伝説を倒す秒数（計算と本物の戦い）。ナーフの判断に使う |
 | `docs/26_move_items.json` | `npm run build-estimate` などが自動で作る（技の定義が変わった技だけ測り直す。コードを変えたら `TABLE_REDO=技`） | 技 1 つずつの単体 DPS（ミュウ・持ち物なしと、形の持ち物を 1 つずつ）。見積もりとビルド案の元 |
 | `docs/27_build_estimate.json` | `npm run build-estimate`（数秒。測らない） | **ボスへの強さの見積もり**。系統ごとの上位の案（技・持ち物・見積もり DPS・相手ごとの秒数）と、強い技の順。強さを知りたいときはまずこれ（`docs/09` の単体火力の測り方） |
+| `data/render/move-icons.json` | `npm run move-icons`（`--pick 技,技 画像` で見る） | 技のアイコンの絵（32 ドット）。技を足したら回す。絵の無い技があると止まる。決まり（黒の輪郭線を使わない・技が発生させたものから描く）と作り方は `docs/09` の「技のアイコン」 |
 | `docs/pages/` | `node scripts/make-doc-page.cjs …` | 上の資料を作者が見るページ（Artifact）のひな型。作り方と公開先の URL は `docs/pages/README.md` |
 
 仕様書の印: 【決定】は変更前に作者へ確認、【初期案】は調整可能な形で実装、【要決定】は実装前に作者へ確認。

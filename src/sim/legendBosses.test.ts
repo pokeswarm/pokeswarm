@@ -70,3 +70,13 @@ describe('色違いの御三家（プレイヤーと同じ技）', () => {
     expect([...near].sort()).toEqual([1, 2]);
   });
 });
+
+describe('カントーの伝説戦の出方（07 の261章）', () => {
+  it('クリアすると必ず伝説戦。ミュウを倒すまではミュウ、その後は抽選（会えないほど会いやすく、の上乗せは要らなくなった）', () => {
+    const cfg = buildSimRules('kanto').stage.legendary!;
+    expect(cfg.chance).toBe(1);
+    expect(cfg.forceKind?.kind).toBe('legend-mew');
+    expect(cfg.forceKind?.chanceUp).toBeUndefined();
+    expect(cfg.kinds.length).toBeGreaterThan(1);
+  });
+});

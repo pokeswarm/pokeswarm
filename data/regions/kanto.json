@@ -425,7 +425,7 @@
     }
   ],
   "legendary": {
-    "chance": 0.5,
+    "chance": 1,
     "kinds": [
       "legend-mewtwo",
       "legend-mew",
@@ -626,10 +626,6 @@
       "until": {
         "stat": "bossDefeated.mew",
         "atLeast": 1
-      },
-      "chanceUp": {
-        "stat": "clears",
-        "step": 0.1
       }
     },
     "counter": {

@@ -9683,12 +9683,12 @@
       "pattern": "strike",
       "effect": "earth-power",
       "base": {
-        "power": 98.1,
+        "power": 133.6,
         "cooldownSeconds": 1.8,
-        "count": 5,
+        "count": 2,
         "intervalSeconds": 0.08,
         "speed": 0,
-        "size": 40,
+        "size": 52,
         "range": 400,
         "durationSeconds": 0.45,
         "pierce": "infinite",
@@ -9703,31 +9703,31 @@
       "levels": [
         {
           "count": 1,
-          "power": 6.4
-        },
-        {
-          "size": 4,
-          "power": 9.2
-        },
-        {
-          "range": 20,
-          "power": 14.3
-        },
-        {
-          "cooldownSeconds": -0.3,
-          "power": -9.4
-        },
-        {
-          "count": 1,
-          "power": 2.2
+          "power": -6.2
         },
         {
           "size": 6,
-          "power": 1.6
+          "power": 8.3
         },
         {
           "range": 20,
-          "power": 10.2
+          "power": 17
+        },
+        {
+          "cooldownSeconds": -0.3,
+          "power": -11.2
+        },
+        {
+          "size": 8,
+          "power": 0.6
+        },
+        {
+          "size": 10,
+          "power": -2.8
+        },
+        {
+          "range": 20,
+          "power": 11.6
         }
       ],
       "region": "hoenn",
@@ -9736,7 +9736,7 @@
         {
           "trigger": "end",
           "explode": {
-            "sizeMultiplier": 1.4,
+            "sizeMultiplier": 1.25,
             "powerMultiplier": 0.5
           }
         }
@@ -10484,6 +10484,7 @@
       "effects": [
         {
           "trigger": "hit",
+          "avoidTarget": true,
           "explode": {
             "sizeMultiplier": 3,
             "powerMultiplier": 1
@@ -13973,6 +13974,7 @@
       "effects": [
         {
           "trigger": "hit",
+          "avoidTarget": true,
           "explode": {
             "sizeMultiplier": 3.6,
             "powerMultiplier": 0.7

@@ -801,6 +801,7 @@
   "info.extraType": "Zählt auch als {type}-Attacke für Verstärkungen und Typen",
   "info.coin": "Jeder Einsatz: +{v} Münzen",
   "info.hpCost": "Jeder Einsatz kostet {pct}% der max. KP (nicht unter {min}% KP)",
+  "info.hpRecoil": "Bei Treffer Rückstoß von {pct}% der max. KP (kein Rückstoß bei Fehlschlag; nicht unter {min}% KP)",
   "info.selfBuff": "Nach Einsatz für {seconds} s:",
   "info.passive": "Immer aktiv, solange bekannt:",
   "info.hurtBuff": "{seconds} s nach erlittenem Schaden:",

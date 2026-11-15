@@ -801,6 +801,7 @@
   "info.extraType": "Conta anche come mossa di tipo {type} per potenziamenti e tipi",
   "info.coin": "Ogni uso: +{v} monete",
   "info.hpCost": "Ogni uso costa il {pct}% dei PS max (non sotto il {min}%)",
+  "info.hpRecoil": "Se colpisce, il contraccolpo costa il {pct}% dei PS max (nulla se manca; non sotto il {min}%)",
   "info.selfBuff": "Dopo l’uso, per {seconds} s:",
   "info.passive": "Sempre attivo finché conosciuta:",
   "info.hurtBuff": "Per {seconds} s dopo aver subito danni:",

@@ -159,7 +159,7 @@ export function moveInfoLines(rules: SimRules, def: SimMoveDef): string[] {
   if (def.pledge) out.push(t('info.pledge', { v: def.pledge.powerPct, o: def.pledge.perOtherPct }));
   for (const x of def.extraTypes ?? []) out.push(t('info.extraType', { type: typeName(rules, x) }));
   if (def.coinGain) { const c = def.coinGain; out.push(t('info.coin', { v: c.perLevel ? `${round(c.perUse)} → ${round(c.perUse + c.perLevel * (def.levels.length - 1))}` : round(c.perUse) })); }
-  if (def.hpCost) out.push(t('info.hpCost', { pct: def.hpCost.pct, min: def.hpCost.minHpPct }));
+  if (def.hpCost) out.push(t(def.hpCost.onHit ? 'info.hpRecoil' : 'info.hpCost', { pct: def.hpCost.pct, min: def.hpCost.minHpPct }));
   if (def.selfBuff) {
     out.push(t('info.selfBuff', { seconds: def.selfBuff.seconds }));
     out.push(...modifierLinesOf(rules, def.selfBuff.mods).map((l) => `・${l}`));

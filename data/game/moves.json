@@ -5520,7 +5520,8 @@
       "knockbackAlongFacing": true,
       "hpCost": {
         "pct": 2,
-        "minHpPct": 15
+        "minHpPct": 15,
+        "onHit": true
       },
       "dash": {
         "seconds": 0.35,
@@ -9674,7 +9675,8 @@
       ],
       "hpCost": {
         "pct": 1.5,
-        "minHpPct": 15
+        "minHpPct": 15,
+        "onHit": true
       }
     },
     "earth-power": {
@@ -9916,7 +9918,8 @@
       "waitForEnd": true,
       "hpCost": {
         "pct": 4,
-        "minHpPct": 15
+        "minHpPct": 15,
+        "onHit": true
       }
     },
     "sucker-punch": {

@@ -801,6 +801,7 @@
   "info.extraType": "Compte aussi comme capacité {type} pour les bonus et les types",
   "info.coin": "Chaque utilisation : +{v} pièces",
   "info.hpCost": "Chaque utilisation coûte {pct} % des PV max (pas en dessous de {min} %)",
+  "info.hpRecoil": "En touchant, le contrecoup coûte {pct} % des PV max (rien en cas d’échec ; pas en dessous de {min} %)",
   "info.selfBuff": "Après usage, pendant {seconds} s :",
   "info.passive": "Toujours actif tant que connue :",
   "info.hurtBuff": "Pendant {seconds} s après avoir subi des dégâts :",

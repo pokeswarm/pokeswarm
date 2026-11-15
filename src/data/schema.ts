@@ -1691,9 +1691,11 @@ export const moveDefSchema = z.object({
   landOnly: z.boolean().optional(),
   /**
    * 使うたびに自分の HP を使う技（だいばくはつ。作者の決定 2026年10月25日・26日）: 最大 HP の pct % 相当の**ダメージ**を自分が受ける
-   * （防御・ディフェンダーなどの軽減が効く）。HP が最大 HP の minHpPct % を下回っていれば出さない（たまるまで待つ）
+   * （防御・ディフェンダーなどの軽減が効く）。HP が最大 HP の minHpPct % を下回っていれば出さない（たまるまで待つ）。
+   * onHit: 出したときではなく、その 1 回で最初に敵に当たったときに受ける（反動の技: すてみタックル・ブレイブバード・じごくぐるま。
+   * 外れたら受けない。放っておくだけで HP が減らないように。07 の269章）
    */
-  hpCost: z.object({ pct: z.number().positive(), minHpPct: z.number().min(0).max(100) }).optional(),
+  hpCost: z.object({ pct: z.number().positive(), minHpPct: z.number().min(0).max(100), onHit: z.boolean().optional() }).optional(),
   /** 使うたびに、自分を seconds 秒だけ強くする（使い直すと時間が戻る。重ならない。フレアドライブ: 両方の攻撃力と素早さ。07 の115章） */
   selfBuff: z.object({ seconds: z.number().positive(), mods: modifierSchema }).optional(),
   /** heal（回復）: 自分以外のプレイヤー（協力プレイの味方）の HP を、それぞれの最大 HP の pct % 回復する（セレビィの いやしのねがい） */

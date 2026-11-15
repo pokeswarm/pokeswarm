@@ -822,6 +822,7 @@
   "info.extraType": "Also counts as a {type} move for boosts and type matchups",
   "info.coin": "Each use: +{v} coins",
   "info.hpCost": "Each use costs {pct}% of max HP (not used below {min}% HP)",
+  "info.hpRecoil": "On hit, recoil costs {pct}% of max HP (none on a miss; not used below {min}% HP)",
   "info.selfBuff": "After use, for {seconds}s:",
   "info.passive": "Always active while known:",
   "info.hurtBuff": "For {seconds}s after taking damage:",

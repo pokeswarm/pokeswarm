@@ -458,7 +458,8 @@ export function useMoves(world: World): void {
           pm.cooldown = 0;
           continue;
         }
-        if (p.id === world.localPlayerId) selfDamage(world, p, (p.maxHp * def.hpCost.pct) / 100);
+        // 反動の技（onHit）は、当たったときに受ける（07 の269章）
+        if (!def.hpCost.onHit && p.id === world.localPlayerId) selfDamage(world, p, (p.maxHp * def.hpCost.pct) / 100);
       }
       // その姿の間だけ HP を使う技（ピチュー: でんきショック。07 の57章・66.4）
       const formCost = world.rules.lines?.[p.line]?.hpCost;
@@ -1996,7 +1997,10 @@ export function moveProjectiles(world: World): void {
       }
       // 本体が当たった相手（end の効き方の avoidTarget）: 最初の相手。あとでボス・中ボスに当たったらそちら
       const bossHit = (world.rules.enemies.kinds[e.kind[j]!]?.rank ?? 'normal') !== 'normal';
+      const firstStrike = pr.struck[i] === 0;
       if (pr.struck[i] === 0 || bossHit) pr.struck[i] = e.id[j]! + 1;
+      // 反動の技（すてみタックル など）: その 1 回で最初に敵に当たったときに、自分が反動を受ける（本人のブラウザで。07 の269章）
+      if (firstStrike && local && pr.stage[i] === 0 && def.hpCost?.onHit && owner) selfDamage(world, owner, (owner.maxHp * def.hpCost.pct) / 100);
       // 雑魚は貫通し、ボス・中ボスで止まる（ラスターカノン: そこで弾ける）
       if (bossHit && pr.stage[i] === 0 && def.stopOnBoss) pr.pierceLeft[i] = 0;
       // 線・扇・外へ広がる輪は、当たった光を敵の所に出す（中心に出すと使ったポケモンの足元に重なって白い円に見える。07 の184章）

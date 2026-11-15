@@ -822,6 +822,7 @@
   "info.extraType": "{type}の わざ としても、きょうかと あいしょうが きく",
   "info.coin": "つかうたびに コイン +{v}",
   "info.hpCost": "つかうたびに さいだいHPの {pct}% の ダメージを うける（HP が {min}% より すくないと ださない）",
+  "info.hpRecoil": "あいてに あたると はんどうで さいだいHPの {pct}% の ダメージを うける（はずれたら うけない。HP が {min}% より すくないと ださない）",
   "info.selfBuff": "つかうと {seconds}秒の あいだ:",
   "info.passive": "おぼえている あいだ いつも きく:",
   "info.hurtBuff": "ダメージを うけてから {seconds}秒の あいだ:",

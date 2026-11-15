@@ -94,7 +94,7 @@ export interface SimMoveDef {
   /** strike: count 個を同時に置かず、intervalSeconds ごとに1つずつ置く（ゴーストダイブ。07 の148章） */
   readonly sequential?: boolean;
   /** 使うたびに最大 HP の pct % 相当のダメージを自分が受け、HP が最大 HP の minHpPct % を下回っていれば出さない（だいばくはつ） */
-  readonly hpCost?: { readonly pct: number; readonly minHpPct: number };
+  readonly hpCost?: { readonly pct: number; readonly minHpPct: number; readonly onHit?: boolean };
   /** 使うたびに、自分を seconds 秒だけ強くする（フレアドライブ。07 の115章） */
   readonly selfBuff?: { readonly seconds: number; readonly mods: Modifiers };
   /** heal: 味方の HP を最大 HP の pct % 回復する（いやしのねがい） */

@@ -801,6 +801,7 @@
   "info.extraType": "También cuenta como movimiento de tipo {type} para mejoras y tipos",
   "info.coin": "Cada uso: +{v} monedas",
   "info.hpCost": "Cada uso cuesta el {pct}% de los PS máx. (no se usa por debajo del {min}%)",
+  "info.hpRecoil": "Al acertar, el retroceso cuesta el {pct}% de los PS máx. (nada si falla; no se usa por debajo del {min}%)",
   "info.selfBuff": "Tras usarlo, durante {seconds} s:",
   "info.passive": "Siempre activo mientras lo conozcas:",
   "info.hurtBuff": "Durante {seconds} s tras recibir daño:",

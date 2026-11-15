@@ -82,7 +82,7 @@ td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; padding-righ
   </div>
 
   <div class="controls">
-    <div class="group" role="group" aria-label="地方"><span>地方</span><button type="button" id="r-kanto" data-region="kanto">カントー</button><button type="button" id="r-johto" data-region="johto">ジョウト</button></div>
+    <div class="group" role="group" aria-label="地方"><span>地方</span><button type="button" id="r-kanto" data-region="kanto">カントー</button><button type="button" id="r-johto" data-region="johto">ジョウト</button><button type="button" id="r-hoenn" data-region="hoenn">ホウエン</button></div>
     <div class="group"><span>相手</span><select id="target" aria-label="相手"></select></div>
     <div class="group" role="group" aria-label="表示"><span>表示</span><button type="button" id="v-lines" data-view="lines">ポケモン</button><button type="button" id="v-moves" data-view="moves">強い技</button></div>
   </div>
@@ -108,7 +108,7 @@ function targetName(reg, t) {
   const names = t.kinds.map((k) => DATA.kindNames[k] ?? k).join('・');
   const elites = DATA.regions[reg].targets.filter((x) => x.label === 'elite');
   if (t.label === 'elite') return (t.id === elites[elites.length - 1].id ? 'チャンピオン ' : '四天王 ') + names;
-  if (t.label === 'red') return 'レッド ' + t.id.slice(5) + ' 戦目（' + names + '）';
+  if (t.label === 'red') return (reg === 'hoenn' ? 'ダイゴ戦 ' : 'レッド ') + t.id.slice(5) + ' 戦目（' + names + '）';
   if (t.label === 'intruder') return '乱入 ' + names;
   if (t.id.startsWith('shiny-')) return '色違い ' + names;
   return '伝説 ' + names;
@@ -126,7 +126,7 @@ function fillTargets() {
 
 function overHtml() {
   const out = [];
-  for (const reg of ['kanto', 'johto']) {
+  for (const reg of Object.keys(DATA.regions)) {
     const R = DATA.regions[reg];
     if (!R) continue;
     const rows = R.lines.filter((l) => l.builds.length);
@@ -134,10 +134,10 @@ function overHtml() {
     const ratios = rows.map(realRatio).filter((x) => x);
     for (const l of rows) {
       const r = med / l.builds[0].legendAvg;
-      if (r >= 2 || r <= 0.5) out.push({ r, html: '<li><b>' + esc(nm(l.builds[0].form)) + '</b> <span class="sub">' + (reg === 'kanto' ? 'カントー' : 'ジョウト') + '</span> <span class="num">' + (r >= 2 ? '中央の ' + r.toFixed(1) + ' 倍速い' : '中央の ' + (1 / r).toFixed(1) + ' 倍遅い') + '</span></li>' });
+      if (r >= 2 || r <= 0.5) out.push({ r, html: '<li><b>' + esc(nm(l.builds[0].form)) + '</b> <span class="sub">' + ({ kanto: 'カントー', johto: 'ジョウト', hoenn: 'ホウエン' }[reg] || reg) + '</span> <span class="num">' + (r >= 2 ? '中央の ' + r.toFixed(1) + ' 倍速い' : '中央の ' + (1 / r).toFixed(1) + ' 倍遅い') + '</span></li>' });
     }
     out.push({ r: -1, html: '' });
-    if (ratios.length) out.push({ r: -2, reg, html: '<li class="sub">' + (reg === 'kanto' ? 'カントー' : 'ジョウト') + ': 本物の戦いは見積もりの ' + median(ratios).toFixed(2) + ' 倍かかる（中央。' + ratios.length + ' 系統）</li>' });
+    if (ratios.length) out.push({ r: -2, reg, html: '<li class="sub">' + ({ kanto: 'カントー', johto: 'ジョウト', hoenn: 'ホウエン' }[reg] || reg) + ': 本物の戦いは見積もりの ' + median(ratios).toFixed(2) + ' 倍かかる（中央。' + ratios.length + ' 系統）</li>' });
   }
   const flagged = out.filter((x) => x.r > 0).sort((a, b) => b.r - a.r);
   const notes = out.filter((x) => x.r === -2);

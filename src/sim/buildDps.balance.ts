@@ -769,12 +769,25 @@ function targetsOf(region: string, rules: SimRules): Target[] {
     const ids = r.kinds.map(idOf);
     targets.push({ id: ids[0]!, label: 'legend', kinds: ids, hp: ids.map(legendHp), real: true });
   }
+  // ホウエンの最後の戦い（レックウザ。いんせきならデオキシス。07 の189章）
+  const finale = (cfg as { finale?: { kinds: string[]; item: { kinds: string[] } } }).finale;
+  for (const list of finale ? [finale.kinds, finale.item.kinds] : []) {
+    const ids = list.map(idOf);
+    targets.push({ id: ids[0]!, label: 'legend', kinds: ids, hp: ids.map(legendHp), real: true });
+  }
   if (cfg.intruders) {
     const mid = kinds.filter((k) => stageData.bosses.some((b) => (b.kind ?? b.id) === k.id) && k.rank === 'midboss').map((k) => k.hp);
-    for (const k of cfg.intruders.kinds) {
-      const id = idOf(k);
-      targets.push({ id, label: 'intruder', kinds: [id], hp: [Math.max(...mid) * (cfg.intruders.hpTimesMidboss ?? 1)], real: false });
-    }
+    const times = cfg.intruders.hpTimesMidboss;
+    // 中ボスに合わせない乱入（ホウエンのラティ兄妹）は自分の HP。together は全員を一度に倒す
+    const hp = (id: string): number => (times ? Math.max(...mid) * times : hpOf(id));
+    if ((cfg.intruders as { together?: boolean }).together) {
+      const ids = cfg.intruders.kinds.map(idOf);
+      targets.push({ id: ids[0]!, label: 'intruder', kinds: ids, hp: ids.map(hp), real: false });
+    } else
+      for (const k of cfg.intruders.kinds) {
+        const id = idOf(k);
+        targets.push({ id, label: 'intruder', kinds: [id], hp: [hp(id)], real: false });
+      }
   }
   return targets;
 }
@@ -1035,7 +1048,11 @@ it('見積もり', () => {
     : [];
   const TOP_BUILDS = Number(process.env.EST_TOP ?? 5);
   const out: { regions: Record<string, unknown> } = { regions: {} };
-  for (const region of ['kanto', 'johto']) {
+  // 地方は EST_REGIONS で選べる（既定は全部）。選ばなかった地方は前の結果を残す
+  const regions = (process.env.EST_REGIONS ?? 'kanto,johto,hoenn').split(',');
+  const outFile = process.env.EST_OUT ?? 'docs/27_build_estimate.json';
+  if (existsSync(outFile)) Object.assign(out.regions, (JSON.parse(readFileSync(outFile, 'utf8')) as { regions: Record<string, unknown> }).regions);
+  for (const region of regions) {
     const rs = data.pokemon.filter((p) => p.region === region && (!ONLY || ONLY.includes(p.key)));
     if (!rs.length) continue;
     const { rules, allOptions, ctx } = regionSetup(region, rs);
@@ -1123,5 +1140,5 @@ it('見積もり', () => {
         kindNames[id] = (sp && ja(generated.pokemon, sp)) ?? id;
       }
   }
-  writeFileSync(process.env.EST_OUT ?? 'docs/27_build_estimate.json', JSON.stringify({ level: LEVEL, ...out, names, kindNames }, null, 1) + '\n');
+  writeFileSync(outFile, JSON.stringify({ level: LEVEL, ...out, names, kindNames }, null, 1) + '\n');
 }, 7_200_000);

@@ -117,6 +117,8 @@ export interface Player {
   dashTicks?: number;
   dashVx?: number;
   dashVy?: number;
+  /** 体が動く技で進んでいる残りの更新回数（どのブラウザでも数える。ほかの体が動く技を重ねて出さないため。07 の268章） */
+  dashBusyTicks?: number;
   /** 技の反動で動けない残りの更新回数（進んでいる間も含む。ギガインパクト） */
   recoverTicks?: number;
   pushVx?: number;

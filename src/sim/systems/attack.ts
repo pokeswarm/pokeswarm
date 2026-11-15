@@ -412,6 +412,12 @@ export function useMoves(world: World): void {
         pm.cooldown = 0;
         continue;
       }
+      // 体が動く技（のしかかり・すてみタックル・ヘビーボンバー・ギガインパクト など）は重ねて出さない（07 の268章）:
+      // ほかの体が動く技が進んでいる間・溜めている間・連続技の途中は、出せるようになっても待つ（終わったらすぐ出る）
+      if (movesBody(world, pm.move) && pm.windup === undefined && bodyBusy(world, p, pm)) {
+        pm.cooldown = 0;
+        continue;
+      }
       // 溜める技（リーフブレード・ブレイズキック）: windupSeconds 溜めてから出す（溜めている間は体が光る。RunScene.chargeOf）
       if (def.windupSeconds) {
         if (pm.windup === undefined) {
@@ -1193,6 +1199,22 @@ function fireStrike(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
   }
 }
 
+/** 体が動く技か（dash の技と、dash の段を持つ連続技: ギガインパクト・とっておき・げきりん） */
+function movesBody(world: World, move: number): boolean {
+  const def = world.rules.moves[move];
+  if (!def) return false;
+  return !!def.dash || !!def.sequence?.some((s) => !!world.rules.moves[s.move]?.dash);
+}
+
+/**
+ * ほかの体が動く技が使われているか（07 の268章）: 進んでいる間（dashBusyTicks。どのブラウザでも同じに数える）か、
+ * ほかの体が動く技が溜めている・連続技の途中
+ */
+function bodyBusy(world: World, p: Player, self: PlayerMove): boolean {
+  if (p.dashBusyTicks) return true;
+  return p.moves.some((m) => m !== self && (m.windup !== undefined || m.seq !== undefined) && movesBody(world, m.move));
+}
+
 /** 連続技を始めてよいか（とっておき: 前に敵がいる。げきりん: 届く範囲に敵がいる。アクアテール: いつでも） */
 function sequenceCanStart(world: World, p: Player, gate: 'ahead' | 'any' | 'none', st: MoveStats): boolean {
   if (gate === 'none') return true;
@@ -1211,8 +1233,12 @@ function stepSequence(world: World, p: Player, pm: PlayerMove): void {
   while (seq.timer <= 0 && seq.i < steps.length) {
     const s = steps[seq.i++]!;
     if (pm.level < s.minLevel) continue;
-    if (s.needsConsumed.length > 0 && !s.needsConsumed.some((m) => p.consumedMoves?.includes(m))) continue;
-    if (s.needsMoves.length > 0 && !s.needsMoves.some((m) => p.moves.some((x) => x.move === m))) continue;
+    // 段の条件: 消費した技（needsConsumed）か、持っている技（needsMoves）のどれか。両方あればどちらかでよい
+    // （ギガインパクトのヘビーボンバー: 進化で消費していても、後から覚えて持っていても出る。07 の268章）
+    if (s.needsConsumed.length > 0 || s.needsMoves.length > 0) {
+      const ok = s.needsConsumed.some((m) => p.consumedMoves?.includes(m)) || s.needsMoves.some((m) => p.moves.some((x) => x.move === m));
+      if (!ok) continue;
+    }
     const def = world.rules.moves[s.move]!;
     const sub: PlayerMove = { move: s.move, level: Math.min(pm.level, def.levels.length), cooldown: 0, burstLeft: 0, burstTimer: 0 };
     const st = playerMoveStats(world, p, sub);
@@ -1290,6 +1316,8 @@ function fireDash(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
   const speed = distance / (ticks * world.dt);
   world.events.push({ type: 'dashStarted', playerId: p.id, seconds: dash.seconds, hop: dash.hop, afterimages: dash.afterimages, ...(dash.tint ? { tint: dash.tint } : {}), dirX: fx, dirY: fy, distance });
   if (dash.recoverSeconds > 0) p.recoverTicks = ticks + Math.round((dash.recoverSeconds * (dash.recoverLines?.[p.line] ?? 1)) / world.dt);
+  // 進んでいる間は、ほかの体が動く技を出さない（07 の268章）。体を動かすのは本人のブラウザだけだが、これはどのブラウザでも数える
+  p.dashBusyTicks = Math.max(p.dashBusyTicks ?? 0, ticks);
   if (p.id === world.localPlayerId) {
     p.dashTicks = ticks;
     p.dashVx = fx * speed;

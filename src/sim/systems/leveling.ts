@@ -435,7 +435,7 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
       const maxLevel = Math.min(cap ?? Infinity, world.rules.moves[offer.to]!.levels.length);
       let level = 1;
       if (d?.inheritLevels) {
-        const gained = (fromMove.level - 1) + p.moves.filter((m) => used.includes(m.move)).reduce((s, m) => s + m.level - 1, 0);
+        const gained = (d.inheritLevels === 'consumed' ? 0 : fromMove.level - 1) + p.moves.filter((m) => used.includes(m.move)).reduce((s, m) => s + m.level - 1, 0);
         level = Math.min(maxLevel, 1 + gained);
       }
       p.moves[offer.slot] = { move: offer.to, level, cooldown: 0, burstLeft: 0, burstTimer: 0, ...(cap !== undefined && { maxLevel }) };

@@ -76,8 +76,8 @@ export interface SimDerivation {
   readonly runStat?: { readonly stat: string; readonly atLeast: number };
   /** この持ち物（番号）をこのレベル以上で持っている */
   readonly itemLevel?: { readonly item: number; readonly level: number };
-  /** 材料にした技の強化分（レベル − 1）を新しい技のレベルに足す（ばくれつパンチ） */
-  readonly inheritLevels?: boolean;
+  /** 材料にした技の強化分（レベル − 1）を新しい技のレベルに足す（ばくれつパンチ）。"consumed" は消費した技の分だけ（カビゴンのギガインパクト） */
+  readonly inheritLevels?: boolean | 'consumed';
   /** 最大レベル = base + perConsumed × 消費した consumes の数（ばくれつパンチ。07 の105章） */
   readonly levelCap?: { readonly base: number; readonly perConsumed: number };
   /** 系統だけの技でも、段階は派生技（ジョウトの御三家の かえんぐるま など。move-balance.json の tierOverrides） */

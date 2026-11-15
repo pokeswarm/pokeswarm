@@ -637,7 +637,15 @@
       "from": "body-slam",
       "item": "hp-up",
       "to": "giga-impact",
-      "line": "snorlax"
+      "line": "snorlax",
+      "consumes": [
+        "heavy-slam"
+      ],
+      "inheritLevels": "consumed",
+      "levelCap": {
+        "base": 8,
+        "perConsumed": 8
+      }
     },
     {
       "from": "fury-cutter",
@@ -820,6 +828,10 @@
       "forms": [
         "slaking"
       ],
+      "levelCap": {
+        "base": 8,
+        "perConsumed": 0
+      },
       "needsMoves": [
         {
           "move": "thrash",

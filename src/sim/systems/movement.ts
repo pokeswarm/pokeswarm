@@ -7,6 +7,7 @@ export function movePlayers(world: World): void {
     p.prevY = p.y;
     if (p.invincibleTicks > 0) p.invincibleTicks--;
     if (p.recoverTicks) p.recoverTicks--;
+    if (p.dashBusyTicks) p.dashBusyTicks--;
     // 倒れている間は動かない
     if (p.down) continue;
     if (p.remote) {

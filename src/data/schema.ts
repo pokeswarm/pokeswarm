@@ -1914,7 +1914,7 @@ export const moveDefSchema = z.object({
    * needsConsumed があれば、そのどれかを消費している時だけその段を出す（消費した技の分だけ段が増える。07 の183章）。
    * minLevel があれば、そのレベルから出す（げきりん: レベルで飛びかかる回数が増える。07 の184章）
    */
-  /** needsMoves を書くと、そのどれかを今覚えているときだけその段を出す（ギガインパクト: ヘビーボンバーを覚えていれば飛び込む。07 の242章） */
+  /** needsMoves を書くと、そのどれかを今覚えているときだけその段を出す（ギガインパクト: ヘビーボンバーを覚えていれば飛び込む。07 の242章）。needsConsumed と両方書くと、どちらかでよい（07 の268章） */
   sequence: z.array(z.object({ move: z.string(), afterSeconds: z.number().nonnegative(), needsConsumed: z.array(z.string()).optional(), needsMoves: z.array(z.string()).optional(), minLevel: z.number().int().positive().optional() })).optional(),
   /** sequence を始める条件: ahead = 前に敵がいる（とっておき）・any = 届く範囲に敵がいる（げきりん）・none = いつでも（アクアテール） */
   sequenceGate: z.enum(['ahead', 'any', 'none']).optional(),
@@ -3013,9 +3013,10 @@ export const derivationsConfigSchema = z.object({
       itemLevel: z.object({ item: z.string(), level: z.number().int().positive() }).optional(),
       /**
        * 材料にした技（元の技・withMoves・consumes で消費した技）の強化分（レベル − 1）を、すべて新しい技のレベルに足す（最大まで）。
-       * ばくれつパンチ: きあいパンチ・ほのおのパンチ・かみなりパンチ の強化を受け継ぐ（作者の決定 2026年10月25日）
+       * ばくれつパンチ: きあいパンチ・ほのおのパンチ・かみなりパンチ の強化を受け継ぐ（作者の決定 2026年10月25日）。
+       * "consumed" は consumes で消費した技の強化分だけを足す（元の技の分は足さない。カビゴンのギガインパクト: ヘビーボンバー。07 の268章）
        */
-      inheritLevels: z.boolean().optional(),
+      inheritLevels: z.union([z.boolean(), z.literal('consumed')]).optional(),
       /** 最大レベル = base + perConsumed × 持っていて消費した consumes の数（ばくれつパンチ: 8・16・24。作者の決定 2026年10月28日） */
       levelCap: z.object({ base: z.number().int().positive(), perConsumed: z.number().int().nonnegative() }).optional(),
     }),

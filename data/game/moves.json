@@ -4554,6 +4554,9 @@
           "afterSeconds": 0.6,
           "needsMoves": [
             "heavy-slam"
+          ],
+          "needsConsumed": [
+            "heavy-slam"
           ]
         },
         {
@@ -4611,6 +4614,33 @@
         },
         {
           "power": 57.9
+        },
+        {
+          "power": 70
+        },
+        {
+          "power": 70
+        },
+        {
+          "range": 15,
+          "power": 70
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": 20
+        },
+        {
+          "power": 70
+        },
+        {
+          "power": 70
+        },
+        {
+          "range": 15,
+          "power": 70
+        },
+        {
+          "power": 70
         }
       ]
     },
@@ -4675,6 +4705,33 @@
         },
         {
           "power": 57.9
+        },
+        {
+          "power": 70
+        },
+        {
+          "power": 70
+        },
+        {
+          "range": 15,
+          "power": 70
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": 20
+        },
+        {
+          "power": 70
+        },
+        {
+          "power": 70
+        },
+        {
+          "range": 15,
+          "power": 70
+        },
+        {
+          "power": 70
         }
       ],
       "effects": [

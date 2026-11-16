@@ -157,10 +157,10 @@ describe('ミズゴロウ', () => {
     m.p.moves = [{ move: m.move('water-pulse'), level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0 }];
     m.maxOut('water-pulse');
     m.learn('mud-shot', 7);
-    expect(m.derives('muddy-water')).toBeUndefined();
+    expect(m.derives('muddy-water-hoenn')).toBeUndefined();
     m.p.moves[1]!.level = 8;
-    applyOffer(m.sim.world, m.p, m.derives('muddy-water')!);
-    expect(m.p.moves.map((x) => m.rules.moves[x.move]!.key).sort()).toEqual(['mud-shot', 'muddy-water']);
+    applyOffer(m.sim.world, m.p, m.derives('muddy-water-hoenn')!);
+    expect(m.p.moves.map((x) => m.rules.moves[x.move]!.key).sort()).toEqual(['mud-shot', 'muddy-water-hoenn']);
   });
 });
 

@@ -2043,9 +2043,11 @@ export function moveProjectiles(world: World): void {
       if (!local) continue;
       // ノックバックの向き: 直線は線の向き、それ以外は当たり判定から敵へ（重なっていれば進む向き）
       // 技の向きへ押す技（なみのり・サイコキネシス。07 の162章）は、自分の後ろの敵も前へ押す
+      // 向きを持たない進む弾（だくりゅうの波。07 の274章）は、進む向きへ押す
       const along = !!def.knockbackAlongFacing;
-      const kx = line || along ? pr.dirX[i]! : e.x[j]! - x || pr.vx[i]!;
-      const ky = line || along ? pr.dirY[i]! : e.y[j]! - y || pr.vy[i]!;
+      const moving = along && !line && pr.dirX[i] === 0 && pr.dirY[i] === 0;
+      const kx = moving ? pr.vx[i]! : line || along ? pr.dirX[i]! : e.x[j]! - x || pr.vx[i]!;
+      const ky = moving ? pr.vy[i]! : line || along ? pr.dirY[i]! : e.y[j]! - y || pr.vy[i]!;
       // 波に乗る技は、止まっていると押し出さない
       const idle = !!def.idleScale && ownerIdle(world, ownerId);
       // 効果（ノックバック・状態異常）は当てたプレイヤーの画面ですぐ付け、相手へは命中と一緒に送る

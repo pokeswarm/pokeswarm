@@ -4883,6 +4883,104 @@ function counterBurst(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- だくりゅう（ホウエン。ミズゴロウの系統の見直し。07 の274章） ----------------
+/**
+ * 泥の大波（64 ドット・右が進む向き）: 前へふくらむ三日月の波。先に泡立つ白っぽい波頭、後ろへ濃い泥水。
+ * 3 コマで波頭が巻き、泡がずれる。大きく出るので細かく描き、ふちは付けない
+ */
+function mudWave(): SpriteOut {
+  // 0 濃い泥・1 泥・2 明るい泥・3 うすい泥・4 泡（白っぽい）・5 しぶき
+  const palette = ['#3e2723', '#5d4037', '#8d6e4a', '#b89a72', '#efe6d6', '#d7ccc8'];
+  const r = rng(2740);
+  const drops = Array.from({ length: 18 }, () => ({ v: (r() - 0.5) * 1.7, back: 0.03 + r() * 0.35, s: 0.015 + r() * 0.02 }));
+  const frames = [0, 1, 2].map((f) =>
+    shape(
+      64,
+      (u, v) => {
+        const av = Math.abs(v);
+        if (av > 0.97) return -1;
+        // 前の縁: 横に長い弧。両端は後ろへ巻き込む（三日月）。泡のかたまりで縁がでこぼこ（コマで横へ流れる）
+        const lump = Math.sin(v * 13 + f * 1.9) * 0.025 + Math.sin(v * 29 - f * 2.4) * 0.012;
+        const front = 0.55 - av ** 2 * 0.5 + lump;
+        const back = front - u;
+        // 波の厚み: 真ん中が厚く、両端へ細くなる
+        const depth = 0.68 * (1 - av ** 2.5) + 0.05;
+        if (back >= 0 && back <= depth) {
+          const t = back / depth;
+          if (t < 0.14) return 4;
+          if (t < 0.22) return hash(Math.floor((u + 1) * 32), Math.floor((v + 1) * 32), 710 + f) < 0.5 ? 4 : 3;
+          // 巻いた波頭の影（縁に沿う細い暗い筋）
+          if (t < 0.27) return 1;
+          if (t < 0.42) return 3;
+          // 体に流れる筋（縁に沿う。コマで前へ）
+          const ripple = (((t * 3 - f * 0.33) % 1) + 1) % 1;
+          if (ripple < 0.18) return 3;
+          return t < 0.8 ? 2 : 1;
+        }
+        // 波頭の先に飛ぶ泡の粒
+        if (back < 0 && back > -0.12 && hash(Math.floor((u + 1) * 32), Math.floor((v + 1) * 32), 700 + f) < 0.07) return 5;
+        // 後ろに残る泥のしずく（コマで後ろへ流れる）
+        for (const d of drops) {
+          const dv = v - d.v;
+          const db = back - depth - d.back - f * 0.04;
+          if (Math.abs(dv) < d.s && Math.abs(db) < d.s * 1.6) return 1;
+        }
+        return -1;
+      },
+      0,
+      -1,
+    ),
+  );
+  return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * 泥が砕けて弾ける（96 ドット）: ボスに当たった・届ききった所で波が砕ける。真ん中に濃い泥のしみ（縁はでこぼこ）、
+ * まわりへ外向きに伸びたしずくが飛び、白い泡の粒が散る。3 コマで広がる。ふちなし
+ */
+function mudCrash(): SpriteOut {
+  const palette = ['#3e2723', '#5d4037', '#8d6e4a', '#b89a72', '#efe6d6', '#d7ccc8'];
+  const r = rng(2741);
+  const drops = Array.from({ length: 30 }, () => ({ a: r() * Math.PI * 2, d: 0.35 + r() * 0.5, s: 0.03 + r() * 0.045, foam: r() < 0.3 }));
+  const ph = [r() * 6, r() * 6, r() * 6];
+  const frames = [0, 1, 2].map((f) => {
+    const p = f / 2;
+    return shape(
+      96,
+      (u, v) => {
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        // 真ん中のしみ: いくつかの波を重ねた、丸くない縁
+        const edge = 0.27 + p * 0.07 + Math.sin(a * 3 + ph[0]!) * 0.035 + Math.sin(a * 7 + ph[1]!) * 0.025 + Math.sin(a * 11 + ph[2]!) * 0.015;
+        if (d < edge) {
+          const t = d / edge;
+          // 広がるほど明るく薄くなる。縁の内側に明るい筋
+          if (t > 0.82) return f === 0 ? 2 : 3;
+          if (t > 0.55) return f === 2 ? 2 : 1;
+          return f === 2 ? 1 : 0;
+        }
+        // 外向きに伸びたしずく（外へ行くほど小さい。コマで外へ）
+        for (const dr of drops) {
+          const dd = dr.d * (0.7 + p * 0.45);
+          if (dd > 0.95) continue;
+          const cx = Math.cos(dr.a) * dd;
+          const cy = Math.sin(dr.a) * dd;
+          // しずくの向き（外向き）に沿った長さ・横の幅
+          const along = (u - cx) * Math.cos(dr.a) + (v - cy) * Math.sin(dr.a);
+          const across = -(u - cx) * Math.sin(dr.a) + (v - cy) * Math.cos(dr.a);
+          const sz = dr.s * (1 - dd * 0.4);
+          const len = sz * (1.6 + p);
+          if ((along / len) ** 2 + (across / sz) ** 2 < 1) return dr.foam ? 4 : along > 0 ? 3 : 2;
+        }
+        return -1;
+      },
+      0,
+      -1,
+    );
+  });
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
 // ---------------- ジョウトの技の作り直し（1）ポッポ系統（07 の157章） ----------------
 /**
  * ふきとばし: 扇に引き伸ばす大きな風（縦長 32×36）。太い白い風の帯が 3 本、根元から先へ波打ちながら広がり、
@@ -7212,6 +7310,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'bubble-line': () => bubbleLine(),
     'wave-tile': () => waveTile('water'),
     'wave-tile-mud': () => waveTile('mud'),
+    'mud-wave': mudWave,
+    'mud-crash': mudCrash,
     'tail-slam': () => tailSlam(),
     'sound-cone': () => cone('sound'),
     'electric-cone': () => cone('electric'),

@@ -717,7 +717,7 @@
     },
     {
       "from": "water-pulse",
-      "to": "muddy-water",
+      "to": "muddy-water-hoenn",
       "line": "mudkip",
       "needsMoves": [
         {

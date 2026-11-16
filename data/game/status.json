@@ -156,6 +156,14 @@
         "hop": 2
       },
       "color": "#f48fb1"
+    },
+    {
+      "id": "muddied",
+      "damagePerSecond": 0,
+      "speedMultiplier": 0.6,
+      "damageTakenMultiplier": 1,
+      "contactDamageMultiplier": 0.7,
+      "color": "#8d6e4a"
     }
   ]
 }

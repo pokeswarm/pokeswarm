@@ -458,7 +458,7 @@ const ICONS: Record<string, Layer[]> = {
     { art: 'leaf', k: 1.1, x: 16, y: 23, rot: -90 },
   ],
   // リーフブレード: 葉の刃で切る
-  'leaf-blade': [{ art: 'blade-slash', line: 1, k: 1.1, x: 16, y: 16, rot: -40 }],
+  'leaf-blade': [{ art: 'leaf-slash', line: 1, k: 1.1, x: 16, y: 16, rot: -40 }],
   // ---- かくとう ----
   // つっぱり: 続けて突き出す手のひら
   'arm-thrust': [

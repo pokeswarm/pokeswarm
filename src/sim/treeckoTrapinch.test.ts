@@ -16,17 +16,17 @@ function setup(key: string) {
 }
 
 describe('リーフブレード（ジュカイン）', () => {
-  it('溜めてから、前を大きな葉の刃で一振りなぎ払う。後ろの敵には当たらない', () => {
+  it('溜めてから、向いている方へ遠くまで一閃する。後ろの敵には当たらない', () => {
     const t = setup('leaf-blade');
     const e = t.sim.world.enemies;
-    e.add(1, 0, 150, 0, 1e6, 0, 10);
+    e.add(1, 0, 500, 0, 1e6, 0, 10);
     e.add(2, 0, -150, 0, 1e6, 0, 10);
     const front = e.hp[e.id.indexOf(1)]!;
     const back = e.hp[e.id.indexOf(2)]!;
     for (let k = 0; k < 30; k++) t.sim.step([]);
     expect(e.hp[e.id.indexOf(1)]!).toBeLessThan(front);
     expect(e.hp[e.id.indexOf(2)]!).toBe(back);
-    expect(t.rules.moves[t.m]!.pattern).toBe('sweep');
+    expect(t.rules.moves[t.m]!.pattern).toBe('beam');
   });
 });
 

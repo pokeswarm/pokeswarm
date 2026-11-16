@@ -4360,7 +4360,7 @@
       "chargeGlow": { "color": "#ccff90", "seconds": 0.45, "radius": 56, "alpha": 0.9 },
       "projectile": { "glowScale": 0, "coreScale": 0 },
       "impact": { "flash": { "color": "#ccff90", "radius": 36, "durationMs": 110, "alpha": 0.55 } },
-      "sprite": { "id": "leaf-blade-swing", "fit": "front", "size": 1, "along": 0.5, "afterimages": 3, "afterimageGap": 1 }
+      "sprite": { "id": "leaf-slash", "fit": "line", "size": 1.6 }
     },
     "swords-dance": {
       "extends": "normal.base"

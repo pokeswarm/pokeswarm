@@ -2689,40 +2689,36 @@ function megahornLance(): SpriteOut {
 }
 
 /**
- * リーフブレード（07 の278章）: 腕の大きな葉の刃で、前をなぎ払う（右が刃先・左が根元。64 ドット・ふちなし）。
- * 細長く少し反った葉の刃に、明るい葉脈と、刃（上のふち）を走る白い光。3 コマで光が根元から刃先へ走る。
- * ひっかく・きりさく の絵は使わない（作者の指摘 2026年10月29日）
+ * リーフブレード（07 の278章）: 溜めてから、向いている方へ画面の端まで走る一閃の剣筋（線の絵。ふちなし）。
+ * 白い芯を黄緑の光が包み、両端は鋭くとがる。ところどころ斬られた葉の切れ端が舞う。
+ * 3 コマで、光りきった剣筋 → 細る → 薄い筋だけ残る（明滅させない。光の決まり）。ひっかく・きりさく の絵は使わない
  */
-function leafBladeSwing(): SpriteOut {
-  // 0 濃い緑・1 緑・2 明るい緑・3 黄緑・4 白
-  const palette = ['#1b5e20', '#43a047', '#7cb342', '#ccff90', '#ffffff'];
-  const frames = [0, 1, 2].map((f) =>
-    shape(
-      64,
-      (u, v) => {
-        if (u < -0.92 || u > 0.97) return -1;
-        // 刃は少し上へ反る（刃先ほど上）
-        const t = (u + 0.92) / 1.89;
-        const c = 0.06 - 0.34 * t * t;
-        // 根元は太く、刃先へ向かって鋭く細る
-        const w = 0.19 * Math.pow(Math.max(0, 1 - t), 0.6) * Math.min(1, t * 7) + 0.004;
-        const dv = v - c;
-        if (Math.abs(dv) > w) return -1;
-        const k = dv / w;
-        // 刃（上のふち）を走る光: 根元から刃先へ
-        const glint = Math.abs(t - (0.25 + f * 0.3)) < 0.14;
-        if (k < -0.72) return glint ? 4 : 3;
-        // 葉脈（真ん中の線と、刃先へ向かう斜めの線）
-        if (Math.abs(k) < 0.12) return 3;
-        if (k > 0 && ((t * 9 - k * 1.2) % 1 + 1) % 1 < 0.12) return 2;
-        if (k < 0 && ((t * 9 + k * 1.2) % 1 + 1) % 1 < 0.12) return 2;
-        return k > 0.7 ? 0 : 1;
-      },
-      0,
-      -1,
-    ),
-  );
-  return { palette, frameMs: 60, parts: { main: frames.map(toRows) } };
+function leafSlash(): SpriteOut {
+  // 0 緑・1 黄緑・2 薄い黄緑・3 白
+  const palette = ['#558b2f', '#9ccc65', '#e6ffc2', '#ffffff'];
+  const H = 16;
+  const mid = (H - 1) / 2;
+  const W = { start: 14, middle: 16, end: 14 };
+  const thick = [4.5, 3.2, 1.6];
+  const parts = lineParts(H, W, 3, (x, y, f, part) => {
+    // 端ほど細い（start は 0 → 1、end は 1 → 0）
+    const taper = part === 'start' ? Math.pow(x / (W.start - 1), 1.4) : part === 'end' ? Math.pow(1 - x / (W.end - 1), 1.4) : 1;
+    const h = thick[f]! * taper;
+    const d = Math.abs(y - mid);
+    if (d <= h) {
+      const k = h > 0 ? d / h : 1;
+      if (f === 2) return k < 0.5 ? 2 : 1;
+      return k < 0.3 ? 3 : k < 0.6 ? 2 : k < 0.85 ? 1 : 0;
+    }
+    // 斬られた葉の切れ端（途中の部品だけ。上下に舞う小さな葉）
+    if (part === 'middle' && f < 2) {
+      const lx = (x + f * 5) % W.middle;
+      if ((lx === 3 || lx === 4) && y === 1 + f) return 1;
+      if ((lx === 11 || lx === 12) && y === H - 2 - f) return 0;
+    }
+    return -1;
+  }, -1);
+  return { palette, frameMs: 100, parts };
 }
 
 /** ウェーブタックル: 当たった敵から上がる水しぶき（王冠のように外へ散るしずく。2コマで広がる） */
@@ -7800,7 +7796,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'hurricane-eye': () => hurricaneEye(),
     'storm-ripple': () => stormRipple(),
     'rain-drop': () => rainDrop(),
-    'leaf-blade-swing': () => leafBladeSwing(),
+    'leaf-slash': () => leafSlash(),
     'flame-leg': () => flameLeg(),
     'blaze-kick-wave': () => blazeKickWave(),
     'water-splash': () => waterSplash(),

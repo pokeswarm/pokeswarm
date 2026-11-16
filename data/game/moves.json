@@ -8354,59 +8354,58 @@
       "contestType": "cute"
     },
     "leaf-blade": {
-      "pattern": "sweep",
+      "pattern": "beam",
       "effect": "leaf-blade",
       "region": "hoenn",
       "bonusCountToPower": true,
+      "aimFacing": true,
       "windupSeconds": 0.45,
-      "sweepOnce": true,
       "base": {
-        "power": 308.6,
+        "power": 364.4,
         "cooldownSeconds": 1.6,
         "count": 1,
         "intervalSeconds": 0.1,
         "speed": 0,
-        "size": 40,
-        "range": 200,
-        "durationSeconds": 0.26,
+        "size": 22,
+        "range": 640,
+        "durationSeconds": 0.3,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
-        "knockback": 320,
+        "knockback": 260,
         "knockbackSeconds": 0.12,
         "statusChance": 0,
         "statusSeconds": 0,
-        "spreadDegrees": 170,
-        "arcDegrees": 50,
+        "spreadDegrees": 0,
         "lifestealPct": 0,
         "critChancePct": 30
       },
       "levels": [
         {
+          "power": 61.1
+        },
+        {
+          "range": 30,
           "power": 51.7
         },
         {
-          "range": 10,
-          "power": 51.8
+          "cooldownSeconds": -0.1,
+          "power": 26.4
+        },
+        {
+          "size": 3,
+          "power": 26.1
+        },
+        {
+          "range": 30,
+          "power": 42.1
         },
         {
           "cooldownSeconds": -0.1,
-          "power": 22.7
+          "power": 10.6
         },
         {
-          "size": 5,
-          "power": 48.6
-        },
-        {
-          "spreadDegrees": 20,
-          "power": 48.5
-        },
-        {
-          "range": 10,
-          "power": 48.5
-        },
-        {
-          "size": 5,
-          "power": 48.5
+          "size": 3,
+          "power": 18
         }
       ]
     },

@@ -19092,7 +19092,7 @@
       {
        "form": "sceptile",
        "scene": "boss",
-       "est": 13983.851115888498,
+       "est": 13946.792259708389,
        "moves": [
         {
          "move": "fury-cutter",
@@ -19107,7 +19107,7 @@
         {
          "move": "leaf-blade",
          "level": 8,
-         "est": 6229.560715975338
+         "est": 6192.5018597952285
         },
         {
          "move": "grass-pledge",
@@ -19124,28 +19124,28 @@
         "dire-hit"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.3179897056311611,
-        "hoenn-boss-shiftry": 1.5121538186924302,
-        "hoenn-boss-dusclops": 2.2448626911677674,
-        "hoenn-boss-banette": 2.2448626911677674,
-        "hoenn-boss-walrein": 2.378354765345256,
-        "hoenn-boss-glalie": 2.703118024265255,
-        "hoenn-boss-salamence": 4.004619295207785,
-        "hoenn-boss-flygon": 3.203695436166228,
-        "hoenn-boss-milotic": 3.271810788305643,
-        "hoenn-boss-wailord": 3.271810788305643,
-        "round1": 33.12804265930873,
-        "round2": 40.26844047145406,
-        "legend-rayquaza": 40.22497059918534,
-        "legend-deoxys": 33.62218636814187,
-        "legend-latias": 6.912703171165395
+        "hoenn-boss-absol": 1.321282340613744,
+        "hoenn-boss-shiftry": 1.51562048759077,
+        "hoenn-boss-dusclops": 2.2512329179398494,
+        "hoenn-boss-banette": 2.2512329179398494,
+        "hoenn-boss-walrein": 2.3850282338902735,
+        "hoenn-boss-glalie": 2.7103006409009462,
+        "hoenn-boss-salamence": 4.015260208742141,
+        "hoenn-boss-flygon": 3.212208166993714,
+        "hoenn-boss-milotic": 3.280991221224715,
+        "hoenn-boss-wailord": 3.280991221224715,
+        "round1": 33.209584634442415,
+        "round2": 40.38143041507342,
+        "legend-rayquaza": 40.33185477531169,
+        "legend-deoxys": 33.706182158513876,
+        "legend-latias": 6.928550800414948
        },
-       "legendAvg": 36.8109100245225
+       "legendAvg": 36.90726299583535
       },
       {
        "form": "sceptile",
        "scene": "at50",
-       "est": 13104.332176329885,
+       "est": 13071.2325996562,
        "moves": [
         {
          "move": "fury-cutter",
@@ -19155,7 +19155,7 @@
         {
          "move": "leaf-blade",
          "level": 8,
-         "est": 5564.009357430963
+         "est": 5530.909780757276
         },
         {
          "move": "pound",
@@ -19177,28 +19177,28 @@
         "miracle-seed"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.4102331256889404,
-        "hoenn-boss-shiftry": 1.5329734667824009,
-        "hoenn-boss-dusclops": 2.53529851002936,
-        "hoenn-boss-banette": 2.53529851002936,
-        "hoenn-boss-walrein": 2.6587637053198168,
-        "hoenn-boss-glalie": 2.884542263685703,
-        "hoenn-boss-salamence": 4.0009104971831855,
-        "hoenn-boss-flygon": 3.418716756960833,
-        "hoenn-boss-milotic": 3.6575585364187955,
-        "hoenn-boss-wailord": 3.6575585364187955,
-        "round1": 35.46871283084333,
-        "round2": 45.016105063615946,
-        "legend-rayquaza": 40.187717047598966,
-        "legend-deoxys": 35.97533483900358,
-        "legend-latias": 7.007878705290975
+        "hoenn-boss-absol": 1.4135996651816058,
+        "hoenn-boss-shiftry": 1.536154923433804,
+        "hoenn-boss-dusclops": 2.542555803805861,
+        "hoenn-boss-banette": 2.542555803805861,
+        "hoenn-boss-walrein": 2.666212506603721,
+        "hoenn-boss-glalie": 2.8918466343406832,
+        "hoenn-boss-salamence": 4.01039425199891,
+        "hoenn-boss-flygon": 3.427373788848217,
+        "hoenn-boss-milotic": 3.6678055646400396,
+        "hoenn-boss-wailord": 3.6678055646400396,
+        "round1": 35.55218932728924,
+        "round2": 45.14222233403125,
+        "legend-rayquaza": 40.28297797766763,
+        "legend-deoxys": 36.06121594851035,
+        "legend-latias": 7.022422507125961
        },
-       "legendAvg": 39.161967445265454
+       "legendAvg": 39.25965139687462
       },
       {
        "form": "sceptile",
        "scene": "at50",
-       "est": 12749.94283107966,
+       "est": 12716.84325440597,
        "moves": [
         {
          "move": "fury-cutter",
@@ -19208,7 +19208,7 @@
         {
          "move": "leaf-blade",
          "level": 8,
-         "est": 5564.009357430963
+         "est": 5530.909780757276
         },
         {
          "move": "double-edge",
@@ -19230,28 +19230,28 @@
         "x-attack"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.4471329177881314,
-        "hoenn-boss-shiftry": 1.5992143769351663,
-        "hoenn-boss-dusclops": 2.559201483171224,
-        "hoenn-boss-banette": 2.559201483171224,
-        "hoenn-boss-walrein": 2.692701452429971,
-        "hoenn-boss-glalie": 2.964719175670148,
-        "hoenn-boss-salamence": 4.199530316175064,
-        "hoenn-boss-flygon": 3.513741245238694,
-        "hoenn-boss-milotic": 3.7042453842951977,
-        "hoenn-boss-wailord": 3.7042453842951977,
-        "round1": 36.38337142651194,
-        "round2": 45.59071242209474,
-        "legend-rayquaza": 42.18278219372274,
-        "legend-deoxys": 36.916656066023755,
-        "legend-latias": 7.3106942945607605
+        "hoenn-boss-absol": 1.450678159604595,
+        "hoenn-boss-shiftry": 1.602677030581398,
+        "hoenn-boss-dusclops": 2.566596466167556,
+        "hoenn-boss-banette": 2.566596466167556,
+        "hoenn-boss-walrein": 2.700341900804098,
+        "hoenn-boss-glalie": 2.972435788017088,
+        "hoenn-boss-salamence": 4.209980289834076,
+        "hoenn-boss-flygon": 3.5228868598721044,
+        "hoenn-boss-milotic": 3.7147560540162194,
+        "hoenn-boss-wailord": 3.7147560540162194,
+        "round1": 36.47121411033296,
+        "round2": 45.72007451096886,
+        "legend-rayquaza": 42.287748446994065,
+        "legend-deoxys": 37.00709590828048,
+        "legend-latias": 7.326523568372105
        },
-       "legendAvg": 40.2683805270883
+       "legendAvg": 40.371533244144096
       },
       {
        "form": "sceptile",
        "scene": "at50",
-       "est": 12619.985151813384,
+       "est": 12582.926295633275,
        "moves": [
         {
          "move": "fury-cutter",
@@ -19261,7 +19261,7 @@
         {
          "move": "leaf-blade",
          "level": 8,
-         "est": 6229.560715975338
+         "est": 6192.5018597952285
         },
         {
          "move": "pound",
@@ -19278,33 +19278,33 @@
         "silver-powder",
         "miracle-seed",
         "pp-max",
-        "metronome",
         "x-attack",
+        "metronome",
         "dire-hit"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.4508792459341382,
-        "hoenn-boss-shiftry": 1.6242674479699846,
-        "hoenn-boss-dusclops": 2.5480887485904273,
-        "hoenn-boss-banette": 2.5480887485904273,
-        "hoenn-boss-walrein": 2.688084739846671,
-        "hoenn-boss-glalie": 2.995249165928572,
-        "hoenn-boss-salamence": 4.354228562435108,
-        "hoenn-boss-flygon": 3.549924937396826,
-        "hoenn-boss-milotic": 3.697894351111822,
-        "hoenn-boss-wailord": 3.697894351111822,
-        "round1": 36.413115900736855,
-        "round2": 45.512545859837815,
-        "legend-rayquaza": 43.73667082803122,
-        "legend-deoxys": 37.012225661585155,
-        "legend-latias": 7.4252226192913575
+        "hoenn-boss-absol": 1.454870335706878,
+        "hoenn-boss-shiftry": 1.6282679024112476,
+        "hoenn-boss-dusclops": 2.556299273576869,
+        "hoenn-boss-banette": 2.556299273576869,
+        "hoenn-boss-walrein": 2.696612657163719,
+        "hoenn-boss-glalie": 3.0040706837103506,
+        "hoenn-boss-salamence": 4.366811430544685,
+        "hoenn-boss-flygon": 3.5603800695826378,
+        "hoenn-boss-milotic": 3.709625877579719,
+        "hoenn-boss-wailord": 3.709625877579719,
+        "round1": 36.51165563266307,
+        "round2": 45.65693387790424,
+        "legend-rayquaza": 43.863061244310444,
+        "legend-deoxys": 37.11403917619587,
+        "legend-latias": 7.443510411022846
        },
-       "legendAvg": 40.66863956254776
+       "legendAvg": 40.7864224827684
       },
       {
        "form": "sceptile",
        "scene": "at50",
-       "est": 12536.076299708791,
+       "est": 12502.976723035103,
        "moves": [
         {
          "move": "fury-cutter",
@@ -19314,7 +19314,7 @@
         {
          "move": "leaf-blade",
          "level": 8,
-         "est": 5564.009357430963
+         "est": 5530.909780757276
         },
         {
          "move": "double-edge",
@@ -19336,23 +19336,23 @@
         "miracle-seed"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.4703504488588497,
-        "hoenn-boss-shiftry": 1.604275420842597,
-        "hoenn-boss-dusclops": 2.6387443449133263,
-        "hoenn-boss-banette": 2.6387443449133263,
-        "hoenn-boss-walrein": 2.7694583778888364,
-        "hoenn-boss-glalie": 3.0152975377852544,
-        "hoenn-boss-salamence": 4.2148063599690495,
-        "hoenn-boss-flygon": 3.5736859707084494,
-        "hoenn-boss-milotic": 3.8098369219634787,
-        "hoenn-boss-wailord": 3.8098369219634787,
-        "round1": 36.95853383776156,
-        "round2": 46.890300578012045,
-        "legend-rayquaza": 42.336224597903396,
-        "legend-deoxys": 37.50894002190943,
-        "legend-latias": 7.333830495280444
+        "hoenn-boss-absol": 1.4740105054913446,
+        "hoenn-boss-shiftry": 1.6077600496102868,
+        "hoenn-boss-dusclops": 2.646606866657685,
+        "hoenn-boss-banette": 2.646606866657685,
+        "hoenn-boss-walrein": 2.777541278713297,
+        "hoenn-boss-glalie": 3.023280042612447,
+        "hoenn-boss-salamence": 4.225332591993407,
+        "hoenn-boss-flygon": 3.5831467171703077,
+        "hoenn-boss-milotic": 3.8209562564309905,
+        "hoenn-boss-wailord": 3.8209562564309905,
+        "round1": 37.04917923585678,
+        "round2": 47.027153925304496,
+        "legend-rayquaza": 42.441956839219486,
+        "legend-deoxys": 37.60230881355471,
+        "legend-latias": 7.349760226789883
        },
-       "legendAvg": 40.92349975889661
+       "legendAvg": 41.030149703483865
       }
      ],
      "measured": null
@@ -25323,7 +25323,7 @@
     },
     {
      "move": "leaf-blade",
-     "est": 6229.560715975338,
+     "est": 6192.5018597952285,
      "key": "treecko",
      "form": "sceptile",
      "items": [

@@ -992,14 +992,14 @@
     },
     {
       "from": "water-pulse",
-      "to": "scald",
+      "to": "hydro-pump-hoenn",
       "line": "feebas",
       "forms": [
         "milotic"
       ],
       "needsMoves": [
         {
-          "move": "dragon-pulse",
+          "move": "twister",
           "level": 8
         }
       ],

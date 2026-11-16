@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { buildSimRules, moveIndexOf } from '../data/simRules';
 import { MOTION_FOLLOW, SHAPE_BOX, SHAPE_LINE, SHAPE_SECTOR } from './entities/projectiles';
 import { Simulation } from './simulation';
-import { contactDamageMultiplier } from './systems/status';
 
 /** みずの技の組み直し（作者の依頼 2026年11月1日。07 の149章） */
 function setup(move: string, level = 1) {
@@ -117,7 +116,7 @@ describe('アクアテール: 時計回り → 反時計回り → 前転 → �
   });
 });
 
-describe('ウェーブタックル・ねっとう', () => {
+describe('ウェーブタックル', () => {
   it('ウェーブタックル: 当たった敵それぞれから、しぶきの範囲ダメージが出る（eachHit）', () => {
     const t = setup('wave-crash');
     t.p.facingX = 1;
@@ -132,16 +131,4 @@ describe('ウェーブタックル・ねっとう', () => {
     expect(splashes).toHaveLength(3);
   });
 
-  it('ねっとう: 前へ細長い扇で、当たった敵は やけど になり、ぶつかる攻撃の力が半分になる', () => {
-    const t = setup('scald');
-    expect(t.rules.moves[t.m]!.pattern).toBe('melee');
-    expect(t.rules.moves[t.m]!.countWidens).toBe(12);
-    t.p.facingX = 1;
-    t.p.facingY = 0;
-    t.sim.world.enemies.add(1, 0, 60, 0, 1e6, 0, 10);
-    for (let k = 0; k < 3; k++) t.sim.step([]);
-    const burn = t.statusIndex('burn');
-    expect(t.sim.world.enemies.hasStatus(0, burn)).toBe(true);
-    expect(contactDamageMultiplier(t.sim.world, 0)).toBeCloseTo(0.5);
-  });
 });

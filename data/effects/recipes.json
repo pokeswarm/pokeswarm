@@ -2368,6 +2368,14 @@
       "effectSprite": { "id": "mud-crash", "fit": "circle", "size": 1.05 },
       "impact": { "burst": { "count": 6, "colors": ["#d7ccc8", "#8d6e4a", "#4e342e"], "lifespanMs": [200, 380], "speed": [50, 150], "scale": [0.5, 0], "alpha": [1, 0], "gravityY": 160, "spread": 2, "blend": "normal" } }
     },
+    "hydro-pump-hoenn": {
+      "extends": "water.base",
+      "hideShape": true,
+      "trail": { "intervalMs": 30, "colors": ["#ffffff", "#b3e5fc", "#4fc3f7"], "lifespanMs": [200, 380], "speed": [30, 90], "scale": [0.6, 0], "alpha": [0.9, 0], "gravityY": 0, "spread": 30, "blend": "normal" },
+      "sprite": { "id": "torrent", "fit": "line", "size": 1 },
+      "effectSprite": { "id": "torrent-splash", "fit": "circle", "size": 1.1 },
+      "impact": { "burst": { "count": 5, "colors": ["#ffffff", "#b3e5fc", "#0288d1"], "lifespanMs": [180, 320], "speed": [60, 160], "scale": [0.5, 0], "alpha": [1, 0], "gravityY": 120, "spread": 2, "blend": "normal" } }
+    },
     "sheer-cold-hoenn": {
       "extends": "ice.base",
       "projectile": { "glowScale": 1.1, "coreScale": 0.3 },

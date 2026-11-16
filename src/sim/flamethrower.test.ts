@@ -19,18 +19,13 @@ function fire(move: string, level: number, amountBonus = 0) {
   return { sim, p, m, cones, halfOf: (i: number) => pr.length[i]! };
 }
 
-describe('かえんほうしゃ・ねっとう（扇）', () => {
+describe('かえんほうしゃ（扇）', () => {
   it('数が増えると、扇は1つのまま角度が広がる', () => {
     const lv1 = fire('flamethrower', 1);
     const lv8 = fire('flamethrower', 8);
     expect(lv1.cones).toHaveLength(1);
     expect(lv8.cones).toHaveLength(1);
     expect(lv8.halfOf(lv8.cones[0]!)).toBeGreaterThan(lv1.halfOf(lv1.cones[0]!));
-    // ねっとう は前の バブルこうせん の形（バブルこうせんは泡のレーザーにした。07 の149章）
-    const scald = fire('scald', 1, 2);
-    const scald0 = fire('scald', 1);
-    expect(scald.cones).toHaveLength(1);
-    expect(scald.halfOf(scald.cones[0]!)).toBeGreaterThan(scald0.halfOf(scald0.cones[0]!));
   });
 
   it('かえんほうしゃは、出ている間に向いている方向を追う', () => {

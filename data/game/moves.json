@@ -2760,6 +2760,72 @@
         }
       ]
     },
+    "hydro-pump-hoenn": {
+      "pattern": "stream",
+      "effect": "hydro-pump-hoenn",
+      "region": "hoenn",
+      "nameOf": "hydro-pump",
+      "windupSeconds": 0.5,
+      "bonusCountToPower": true,
+      "base": {
+        "power": 44.7,
+        "cooldownSeconds": 3.2,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 120,
+        "size": 34,
+        "range": 480,
+        "durationSeconds": 1.4,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.15,
+        "knockback": 260,
+        "knockbackSeconds": 0.12,
+        "spreadDegrees": 0,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "size": 3,
+          "power": 5.6
+        },
+        {
+          "range": 40,
+          "power": 5.2
+        },
+        {
+          "durationSeconds": 0.2,
+          "power": 0.8
+        },
+        {
+          "knockback": 60,
+          "power": 6.3
+        },
+        {
+          "cooldownSeconds": -0.3,
+          "power": -0.2
+        },
+        {
+          "size": 4,
+          "power": 2.6
+        },
+        {
+          "durationSeconds": 0.2,
+          "power": -6.3
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "every",
+          "everySeconds": 0.25,
+          "explode": {
+            "sizeMultiplier": 1.5,
+            "powerMultiplier": 1.5
+          }
+        }
+      ]
+    },
     "muddy-water-hoenn": {
       "pattern": "facing",
       "effect": "muddy-water-hoenn",
@@ -10370,63 +10436,6 @@
           "cooldownSeconds": -0.06
         }
       ]
-    },
-    "scald": {
-      "pattern": "melee",
-      "countWidens": 12,
-      "effect": "scald",
-      "region": "hoenn",
-      "base": {
-        "power": 125.6,
-        "intervalSeconds": 0.1,
-        "count": 1,
-        "speed": 0,
-        "size": 30,
-        "range": 250,
-        "durationSeconds": 0.6,
-        "pierce": "infinite",
-        "hitIntervalSeconds": 0.2,
-        "knockback": 60,
-        "knockbackSeconds": 0.06,
-        "spreadDegrees": 0,
-        "cooldownSeconds": 1.3,
-        "statusId": "burn",
-        "statusChance": 1,
-        "statusSeconds": 3,
-        "lifestealPct": 0,
-        "arcDegrees": 16
-      },
-      "levels": [
-        {
-          "range": 20,
-          "power": 14.1
-        },
-        {
-          "arcDegrees": 3,
-          "power": 10.3
-        },
-        {
-          "durationSeconds": 0.2,
-          "power": -65.6
-        },
-        {
-          "range": 20,
-          "power": 5
-        },
-        {
-          "cooldownSeconds": -0.15,
-          "power": -2.4
-        },
-        {
-          "arcDegrees": 3,
-          "power": 2.6
-        },
-        {
-          "range": 20,
-          "power": 2.9
-        }
-      ],
-      "contestType": "tough"
     },
     "metal-claw": {
       "pattern": "melee",

@@ -4981,6 +4981,112 @@ function mudCrash(): SpriteOut {
   return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- ハイドロポンプ（ホウエン・ミロカロス。07 の275章） ----------------
+/**
+ * 太い激流（横向き）。高さ H=40 の細かい絵で、黒いふちは付けない（太く引き伸ばしても粗く見えない）。
+ * 途中の部品は幅 TILE で並べてもつなぎ目が出ない。泡の筋と上下の白い波頭が前へ流れる。
+ * 始まりは口から勢いよく広がり、終わりは大きなしぶきが前へ散る
+ */
+function torrent(): SpriteOut {
+  const H = 40;
+  const TILE = 16;
+  // 0 濃い紺・1 濃い青・2 青・3 明るい青・4 水色・5 白（泡）・6 薄い水色（しぶき）
+  const palette = ['#0b2a5a', '#01579b', '#0277bd', '#039be5', '#4fc3f7', '#ffffff', '#b3e5fc'];
+  const FRAMES = 4;
+  const mid = (H - 1) / 2;
+  // 泡の筋: 行ごとに、始まりの位置・長さ・色をばらばらにした横の線（縦にそろって模様に見えないように）
+  const rs = rng(4242);
+  const bands = Array.from({ length: H }, () => ({ at: Math.floor(rs() * TILE), len: 7 + Math.floor(rs() * 8), white: rs() < 0.3, on: rs() < 0.45 }));
+  /** 流れの中の1点（x は流れる方向。half は太さの半分） */
+  const water = (x: number, y: number, f: number, half: number): number => {
+    const phase = ((x + f * 4) / TILE) * Math.PI * 2;
+    const top = mid - half + Math.sin(phase) * 0.8 + Math.sin(phase * 2 + 1) * 0.4;
+    const bottom = mid + half - Math.sin(phase + 1.9) * 0.8 - Math.sin(phase * 2 + 2.5) * 0.4;
+    if (y < top || y > bottom) return -1;
+    const edge = Math.min(y - top, bottom - y);
+    // 上下の縁: 明るい水しぶきの線（ところどころ白）
+    if (edge < 1.2) return Math.sin(phase * 2 + (y < mid ? 0 : 2)) > 0.3 ? 5 : 4;
+    if (edge < 2.4) return 2;
+    const d = Math.abs(y - mid) / Math.max(1, half);
+    const b = bands[Math.floor(Math.max(0, y)) % bands.length]!;
+    const s = (((x + f * 4 - b.at) % TILE) + TILE) % TILE;
+    if (b.on && d < 0.8 && s < b.len) return b.white && d < 0.5 ? 5 : d < 0.45 ? 6 : 4;
+    return d > 0.8 ? 1 : d > 0.55 ? 2 : d > 0.25 ? 3 : 4;
+  };
+  const HALF = 17;
+  const middle: Grid[] = [];
+  const start: Grid[] = [];
+  const end: Grid[] = [];
+  for (let f = 0; f < FRAMES; f++) {
+    middle.push(fill(blank(TILE, H), (x, y) => water(x, y, f, HALF)));
+    // 始まり: 口から勢いよく広がる
+    start.push(fill(blank(TILE, H), (x, y) => water(x, y, f, 7 + (Math.max(0, x) / (TILE - 1)) ** 0.7 * (HALF - 7))));
+    // 終わり: 太さを保って砕け、しぶきが前へ扇に散る
+    const EW = 30;
+    const r = rng(9100 + f * 37);
+    const body = fill(blank(EW, H), (x, y) => (x < 9 ? water(x, y, f, HALF - Math.max(0, x - 3) * 1.2) : -1));
+    for (let k = 0; k < 90; k++) {
+      const x = 6 + Math.floor(r() * (EW - 6));
+      const spread = 0.45 + (x / EW) * 0.55;
+      const y = Math.round(mid + (r() - 0.5) * (H - 2) * spread);
+      if (get(body, x, y) >= 0) continue;
+      const far = x / EW;
+      const col = far > 0.7 ? (r() < 0.6 ? 6 : 5) : r() < 0.5 ? 5 : r() < 0.5 ? 4 : 3;
+      set(body, x, y, col);
+      // 手前のしぶきは粒を大きく
+      if (far < 0.6 && r() < 0.6) {
+        set(body, x + 1, y, col);
+        if (r() < 0.5) set(body, x, y + 1, 4);
+      }
+    }
+    end.push(body);
+  }
+  return { palette, frameMs: 60, parts: { start: start.map(toRows), middle: middle.map(toRows), end: end.map(toRows) } };
+}
+
+/** 激流が当たった所で弾ける水圧のしぶき（64 ドット・ふちなし）。真ん中の白い泡が砕け、しずくが外へ散る */
+function torrentSplash(): SpriteOut {
+  const palette = ['#01579b', '#0288d1', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const r = rng(5531);
+  const drops = Array.from({ length: 22 }, () => ({ a: r() * Math.PI * 2, d: 0.4 + r() * 0.45, s: 0.04 + r() * 0.05, foam: r() < 0.4 }));
+  const ph = [r() * 6, r() * 6];
+  const frames = [0, 1, 2].map((f) => {
+    const p = f / 2;
+    return shape(
+      64,
+      (u, v) => {
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        // 真ん中の泡の塊: 崩れながら薄くなる（最後のコマは輪だけ残る）
+        const edge = 0.3 + p * 0.12 + Math.sin(a * 5 + ph[0]!) * 0.04 + Math.sin(a * 9 + ph[1]!) * 0.025;
+        const hole = f === 2 ? edge * 0.62 : f === 1 ? edge * 0.3 : -1;
+        if (d < edge && d > hole) {
+          const t = d / edge;
+          if (t > 0.8) return f === 0 ? 3 : 2;
+          if (t > 0.5) return f === 2 ? 3 : 4;
+          return f === 0 ? 4 : 3;
+        }
+        // 外へ散るしずく（外向きに伸びる。コマで外へ）
+        for (const dr of drops) {
+          const dd = dr.d * (0.65 + p * 0.5);
+          if (dd > 0.95) continue;
+          const cx = Math.cos(dr.a) * dd;
+          const cy = Math.sin(dr.a) * dd;
+          const along = (u - cx) * Math.cos(dr.a) + (v - cy) * Math.sin(dr.a);
+          const across = -(u - cx) * Math.sin(dr.a) + (v - cy) * Math.cos(dr.a);
+          const sz = dr.s * (1 - dd * 0.45);
+          const len = sz * (1.5 + p * 1.2);
+          if ((along / len) ** 2 + (across / sz) ** 2 < 1) return dr.foam ? 4 : along > 0 ? 2 : 1;
+        }
+        return -1;
+      },
+      0,
+      -1,
+    );
+  });
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
 // ---------------- ジョウトの技の作り直し（1）ポッポ系統（07 の157章） ----------------
 /**
  * ふきとばし: 扇に引き伸ばす大きな風（縦長 32×36）。太い白い風の帯が 3 本、根元から先へ波打ちながら広がり、
@@ -7312,6 +7418,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'wave-tile-mud': () => waveTile('mud'),
     'mud-wave': mudWave,
     'mud-crash': mudCrash,
+    torrent,
+    'torrent-splash': torrentSplash,
     'tail-slam': () => tailSlam(),
     'sound-cone': () => cone('sound'),
     'electric-cone': () => cone('electric'),

@@ -444,17 +444,11 @@
       "twister",
       "water-pulse",
       "dragon-pulse",
-      "scald",
+      "hydro-pump-hoenn",
       "swift",
       "whirlpool",
       {
         "move": "body-slam",
-        "forms": [
-          "milotic"
-        ]
-      },
-      {
-        "move": "hydro-pump",
         "forms": [
           "milotic"
         ]

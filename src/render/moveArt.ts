@@ -2456,7 +2456,7 @@ function iceShatter(): SpriteOut {
   }));
   const frames = [0, 1, 2].map((f) => {
     const p = (f + 1) / 3;
-    return shape(32, (u, v) => {
+    return shape(64, (u, v) => {
       const d = Math.hypot(u, v);
       // 足元の霜の輪（外へ広がり、細くなる）
       const ring = 0.35 + 0.55 * p;
@@ -2486,8 +2486,10 @@ function iceShatter(): SpriteOut {
  * 4 コマで弧が外へ進む（07 の272章）
  */
 function encoreClap(): SpriteOut {
-  const W = 32;
-  const H = 36;
+  // 64×72 で描く（32×36 を扇に引き伸ばすと音の波が粗く見えた。07 の273章）
+  const S = 2;
+  const W = 32 * S;
+  const H = 36 * S;
   const mid = (H - 1) / 2;
   // 0 濃い桃・1 桃・2 うすい桃・3 黄・4 白
   const palette = ['#ad1457', '#f06292', '#f8bbd0', '#ffe082', '#ffffff'];
@@ -2503,17 +2505,17 @@ function encoreClap(): SpriteOut {
       const d = Math.hypot(dx, dy);
       // 音の波: 根元から 3 本の弧が外へ（コマで進む）。外ほど細い
       for (let k = 0; k < 3; k++) {
-        const r = ((k / 3 + f / 12) % 1) * (W - 2) + 3;
-        if (Math.abs(d - r) < 1.1 - r / 60) return k === 1 ? 3 : r < 12 ? 2 : 1;
+        const r = ((k / 3 + f / 12) % 1) * (W - 2 * S) + 3 * S;
+        if (Math.abs(d - r) < (1.1 - r / S / 60) * S) return k === 1 ? 3 : r < 12 * S ? 2 : 1;
       }
       // 音符（玉と棒と旗）: 外へ進みながら上下に跳ねる
       for (const n of notes) {
         const t = (n.t + f * 0.06) % 1;
-        const nx = 4 + t * (W - 9);
-        const ny = mid + n.s * (H / 2) * (0.3 + 0.7 * t) + Math.sin((f + t * 4) * 1.6) * 1.2;
-        if (Math.hypot((x - nx) * 0.9, y - ny) < 1.7) return 0;
-        if (x >= nx + 1 && x < nx + 2 && y > ny - 5 && y <= ny) return 0;
-        if (x >= nx + 2 && x < nx + 4 && y > ny - 5 && y < ny - 3.5) return 1;
+        const nx = 4 * S + t * (W - 9 * S);
+        const ny = mid + n.s * (H / 2) * (0.3 + 0.7 * t) + Math.sin((f + t * 4) * 1.6) * 1.2 * S;
+        if (Math.hypot((x - nx) * 0.9, y - ny) < 1.7 * S) return 0;
+        if (x >= nx + 1 * S && x < nx + 2 * S && y > ny - 5 * S && y <= ny) return 0;
+        if (x >= nx + 2 * S && x < nx + 4 * S && y > ny - 5 * S && y < ny - 3.5 * S) return 1;
       }
       return -1;
     }),
@@ -2597,7 +2599,7 @@ function destinyBurst(): SpriteOut {
   const claws = Array.from({ length: 7 }, (_, k) => ({ a: (k / 7) * Math.PI * 2 + (r() - 0.5) * 0.5, len: 0.7 + r() * 0.25, bend: (r() - 0.5) * 0.8 }));
   const frames = [0, 1, 2].map((f) => {
     const p = (f + 1) / 3;
-    return shape(32, (u, v) => {
+    return shape(64, (u, v) => {
       const d = Math.hypot(u, v);
       const a = Math.atan2(v, u);
       // 真ん中の暗い渦（縮む）
@@ -2612,7 +2614,7 @@ function destinyBurst(): SpriteOut {
         if (Math.abs(da) * d < w) return d > reach * 0.7 ? 3 : 2;
       }
       // 紫の火の粉（ふちは付けない。黒いふちで白黒のまだらに見えた）
-      if (d > 0.5 * p && d < 0.95 && hash(Math.floor((u + 1) * 16), Math.floor((v + 1) * 16), 272 + f) < 0.05) return 3;
+      if (d > 0.5 * p && d < 0.95 && hash(Math.floor((u + 1) * 24), Math.floor((v + 1) * 24), 272 + f) < 0.05) return 3;
       return -1;
     }, 0, -1);
   });
@@ -4806,42 +4808,78 @@ function steelBeamHeavy(): SpriteOut {
 }
 
 // ---------------- カウンター（受けたダメージを返す。07 の156章） ----------------
-/** カウンターの構え: 自分を囲む赤橙の気の輪（立ちのぼる気の舌が 10 本。外ほど薄い）。2 コマでゆらぐ */
+/**
+ * カウンターの構え: 自分を囲む赤橙の気の輪（立ちのぼる気の舌が 10 本。外ほど薄い）。3 コマでゆらぐ。
+ * 64 ドットで描き、ふちは付けない（32 ドットに黒いふちで、引き伸ばすと粗く見えた。07 の273章）
+ */
 function counterStance(): SpriteOut {
-  const palette = ['#4a1203', '#bf360c', '#ff7043', '#ffab91', '#fff3e0'];
-  const frames = [0, 1].map((f) =>
-    shape(32, (u, v) => {
-      const d = Math.hypot(u, v);
-      const a = Math.atan2(v, u);
-      if (d < 0.62) return -1;
-      const tongue = 0.78 + 0.18 * Math.max(0, Math.sin(a * 5 + f * 1.3)) + 0.06 * Math.sin(a * 11 - f);
-      if (d > tongue) return -1;
-      if (d > tongue - 0.08) return 3;
-      return d < 0.7 ? 1 : 2;
-    }),
+  const palette = ['#8c2a0b', '#d84315', '#ff7043', '#ffab91', '#fff3e0'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(
+      64,
+      (u, v) => {
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        if (d < 0.6) return -1;
+        const ph = (f / 3) * Math.PI * 2;
+        const tongue = 0.78 + 0.17 * Math.max(0, Math.sin(a * 5 + ph)) + 0.05 * Math.sin(a * 11 - ph * 1.5);
+        if (d > tongue) return -1;
+        // 舌の先ほど明るく、根元は濃い。内側のふちに細い明るい線
+        if (d > tongue - 0.05) return 4;
+        if (d > tongue - 0.11) return 3;
+        if (d < 0.64) return 3;
+        return d < 0.7 ? 1 : 2;
+      },
+      0,
+      -1,
+    ),
   );
   return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
 }
 
-/** カウンターの反撃（hurt で返す衝撃）: 自分から広がる拳の衝撃。白い芯から橙の衝撃の弧が 3 重に広がり、外に砂ぼこり。3 コマ */
+/**
+ * カウンターの反撃（hurt で返す衝撃）: 自分から広がる拳の衝撃。白い芯から橙の衝撃の弧が 3 重に広がり、外へ速さの筋と砂ぼこり。
+ * 半径 100 を超える大きさで出るので 96 ドットで描き、ふちは付けない（32 ドットを引き伸ばして粗く見えた。作者の指摘 2026年11月16日。07 の273章）。3 コマ
+ */
 function counterBurst(): SpriteOut {
-  const palette = ['#4a1203', '#bf360c', '#ff7043', '#ffab91', '#ffffff', '#d7ccc8'];
-  const frames = [0, 1, 2].map((f) =>
-    shape(32, (u, v) => {
-      const d = Math.hypot(u, v);
-      const a = Math.atan2(v, u);
-      const core = 0.3 - f * 0.08;
-      if (d < core * 0.5) return 4;
-      if (d < core) return 3;
-      for (let k = 0; k < 3; k++) {
-        const r = 0.35 + k * 0.2 + f * 0.15;
-        const gap = ((a * 4 + k + f * 0.7) % 1 + 1) % 1 < 0.25;
-        if (!gap && Math.abs(d - r) < 0.06) return k === 0 ? 3 : k === 1 ? 2 : 1;
-      }
-      if (f >= 1 && d > 0.8 && d < 0.98 && hash(Math.floor((u + 1) * 12), Math.floor((v + 1) * 12), 2601 + f) < 0.25) return 5;
-      return -1;
-    }),
-  );
+  // 0 濃い赤・1 赤橙・2 橙・3 うすい橙・4 白・5 砂
+  const palette = ['#8c2a0b', '#d84315', '#ff7043', '#ffab91', '#ffffff', '#d7ccc8'];
+  const r = rng(2601);
+  const streaks = Array.from({ length: 14 }, (_, k) => ({ a: (k / 14) * Math.PI * 2 + (r() - 0.5) * 0.25, len: 0.12 + r() * 0.1 }));
+  const frames = [0, 1, 2].map((f) => {
+    const p = f / 2;
+    return shape(
+      96,
+      (u, v) => {
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        // 白い芯（縮んで消える）と、そのまわりのうすい橙
+        const core = 0.26 * (1 - p) + 0.02;
+        if (d < core * 0.6) return 4;
+        if (d < core) return 3;
+        // 衝撃の弧 3 重: 内ほど太く明るい。ところどころ切れて、拳で打った衝撃の輪に見せる
+        for (let k = 0; k < 3; k++) {
+          const ring = 0.3 + k * 0.17 + p * 0.22;
+          const w = (0.05 - k * 0.012) * (1 - p * 0.45);
+          const gap = (((a / (Math.PI * 2)) * 5 + k * 0.37 + p * 0.2) % 1 + 1) % 1 < 0.16;
+          const off = d - ring;
+          if (!gap && Math.abs(off) < w) return k === 0 ? (off < -w * 0.3 ? 4 : 3) : k === 1 ? (off < 0 ? 3 : 2) : off < 0 ? 2 : 1;
+        }
+        // 外へ走る速さの筋（細い）
+        for (const s of streaks) {
+          const from = 0.62 + p * 0.22;
+          if (d < from || d > from + s.len) continue;
+          const da = Math.atan2(Math.sin(a - s.a), Math.cos(a - s.a));
+          if (Math.abs(da) * d < 0.012) return 3;
+        }
+        // 外の砂ぼこり（2 コマ目から。粒は小さく）
+        if (f >= 1 && d > 0.78 && d < 0.97 && hash(Math.floor((u + 1) * 40), Math.floor((v + 1) * 40), 2601 + f) < 0.06) return 5;
+        return -1;
+      },
+      0,
+      -1,
+    );
+  });
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 

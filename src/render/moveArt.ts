@@ -5071,6 +5071,74 @@ function torrentSplash(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- じゃれつく（ホウエン・クチート。07 の280章） ----------------
+/**
+ * じゃれつく: 飛びかかった所で、もみくちゃになる土けむり（64 ドット・ふちなし）。丸い煙のかたまりが渦を巻くように回り、
+ * すき間から星と小さな手足（動きの線）がのぞく。4 コマで煙が回り、星の位置が変わる
+ */
+function scuffleCloud(): SpriteOut {
+  // 0 煙の影・1 煙・2 明るい煙・3 白・4 黄の星・5 桃の星
+  const palette = ['#8d6e63', '#bcaaa4', '#d7ccc8', '#f5f5f5', '#fff176', '#f48fb1'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    const r = rng(9400 + f * 29);
+    // 煙のかたまり: 輪の上に並び、コマごとに回る
+    const puffs: [number, number, number][] = [];
+    const n = 8;
+    for (let k = 0; k < n; k++) {
+      const a = (k / n) * Math.PI * 2 + f * 0.35;
+      const d = 0.5 + (k % 2) * 0.12;
+      puffs.push([Math.cos(a) * d, Math.sin(a) * d, 0.3 + (k % 3) * 0.04]);
+    }
+    puffs.push([0, 0, 0.42]);
+    const stars = Array.from({ length: 4 }, (_, k) => {
+      const a = r() * Math.PI * 2;
+      const d = 0.55 + r() * 0.35;
+      return [Math.cos(a) * d, Math.sin(a) * d, k % 2] as const;
+    });
+    // 動きの線（煙から飛び出す手足の気配）
+    const kicks = Array.from({ length: 3 }, () => {
+      const a = r() * Math.PI * 2;
+      return [Math.cos(a), Math.sin(a)] as const;
+    });
+    return toRows(
+      shape(
+        64,
+        (u, v) => {
+          for (const [sx, sy, c] of stars) {
+            const dx = Math.abs(u - sx);
+            const dy = Math.abs(v - sy);
+            // 4 つ角の星
+            if (dx + dy < 0.13 && Math.min(dx, dy) < 0.03) return c === 0 ? 4 : 5;
+            if (dx + dy < 0.05) return 3;
+          }
+          for (const [kx, ky] of kicks) {
+            const t = u * kx + v * ky;
+            const side = Math.abs(u * -ky + v * kx);
+            if (t > 0.72 && t < 0.95 && side < 0.022) return 2;
+          }
+          let best = 9;
+          let shade = 0;
+          let hi = 9;
+          for (const [px, py, pr] of puffs) {
+            const q = Math.hypot(u - px, v - py) / pr;
+            if (q < best) {
+              best = q;
+              // 下側を影に、左上に小さな光
+              shade = (v - py) / pr;
+              hi = Math.hypot(u - px + pr * 0.35, v - py + pr * 0.35) / pr;
+            }
+          }
+          if (best < 1) return hi < 0.22 ? 3 : shade > 0.3 ? 0 : shade < -0.2 ? 2 : 1;
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette, frameMs: 80, parts: { main: frames } };
+}
+
 // ---------------- ゴッドバード（ホウエン・チルタリス。07 の277章） ----------------
 /**
  * ゴッドバード: 飛び抜ける体を包む光と雲（右が前。64 ドット・ふちなし）。前に尖った光の切っ先と、後ろへ流れる綿雲。
@@ -7587,6 +7655,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'mud-crash': mudCrash,
     torrent,
     'torrent-splash': torrentSplash,
+    'scuffle-cloud': scuffleCloud,
     'sky-cloud-wrap': skyCloudWrap,
     'wild-bolt-wrap': wildBoltWrap,
     'wild-discharge': wildDischarge,

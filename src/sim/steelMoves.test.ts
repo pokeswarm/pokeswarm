@@ -60,10 +60,9 @@ describe('はがね', () => {
     // 次はふつうの強さに戻る
     expect(t.p.moves[0]!.hurtCharge).toBe(false);
   });
-  it('クチートの固有技は アイアンヘッド → メタルバースト（ぶつり のまま。てっていこうせん は 161章でしまった）', () => {
+  it('メタルバースト はココドラだけの固有技（クチートは じゃれつく に替えた。07 の280章）', () => {
     const t = setup('metal-burst');
-    const d = t.rules.derivations.filter((x) => x.to === t.m && x.line === 'mawile');
-    expect(d).toHaveLength(1);
-    expect(d[0]!.from).toBe(moveIndexOf(t.rules, 'iron-head'));
+    expect(t.rules.derivations.filter((x) => x.to === t.m && x.line === 'mawile')).toHaveLength(0);
+    expect(t.rules.derivations.filter((x) => x.to === t.m && x.line === 'aron')).toHaveLength(1);
   });
 });

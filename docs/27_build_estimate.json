@@ -24347,17 +24347,17 @@
       {
        "form": "mawile",
        "scene": "boss",
-       "est": 12901.229322416473,
+       "est": 12833.226027146902,
        "moves": [
         {
-         "move": "metal-burst",
+         "move": "play-rough-hoenn",
          "level": 8,
-         "est": 11353.979688990821
+         "est": 11285.97639372125
         },
         {
          "move": "sing",
          "level": 8,
-         "est": 714.9871059735884
+         "est": 714.9871059735883
         },
         {
          "move": "fire-fang",
@@ -24367,35 +24367,35 @@
         {
          "move": "sucker-punch",
          "level": 8,
-         "est": 818.2851410900873
+         "est": 818.2851410900874
         }
        ],
        "items": [
+        "pp-max",
         "x-attack",
         "metronome",
-        "pp-max",
         "dire-hit",
         "silk-scarf",
         "x-sp-atk"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.538754760114465,
-        "hoenn-boss-shiftry": 1.5384171282629482,
-        "hoenn-boss-dusclops": 2.2752091556071465,
-        "hoenn-boss-banette": 2.2752091556071465,
-        "hoenn-boss-walrein": 2.929953344393373,
-        "hoenn-boss-glalie": 2.4909684703306567,
-        "hoenn-boss-salamence": 3.473289899987821,
-        "hoenn-boss-flygon": 3.473289899987821,
-        "hoenn-boss-milotic": 4.8929028682899665,
-        "hoenn-boss-wailord": 4.8929028682899665,
-        "round1": 37.544977232221186,
-        "round2": 54.9140093333034,
-        "legend-rayquaza": 34.8879565846991,
-        "legend-deoxys": 38.27052043018482,
-        "legend-latias": 6.859544989288347
+        "hoenn-boss-absol": 1.3130776124948196,
+        "hoenn-boss-shiftry": 1.3128317459935384,
+        "hoenn-boss-dusclops": 2.287246116601842,
+        "hoenn-boss-banette": 2.287246116601842,
+        "hoenn-boss-walrein": 2.945479174140576,
+        "hoenn-boss-glalie": 2.9448376965546443,
+        "hoenn-boss-salamence": 2.9693207207605674,
+        "hoenn-boss-flygon": 2.9693207207605674,
+        "hoenn-boss-milotic": 4.052864773155146,
+        "hoenn-boss-wailord": 4.052864773155146,
+        "round1": 37.737679573667656,
+        "round2": 49.875979728217246,
+        "legend-rayquaza": 29.825766168353915,
+        "legend-deoxys": 38.470762402806066,
+        "legend-latias": 5.874915627824353
        },
-       "legendAvg": 41.404365895102124
+       "legendAvg": 38.977546968261215
       },
       {
        "form": "mawile",
@@ -25180,7 +25180,20 @@
       "pp-max",
       "dire-hit"
      ],
-     "owners": 2
+     "owners": 1
+    },
+    {
+     "move": "play-rough-hoenn",
+     "est": 11285.97639372125,
+     "key": "mawile",
+     "form": "mawile",
+     "items": [
+      "pp-max",
+      "x-attack",
+      "metronome",
+      "dire-hit"
+     ],
+     "owners": 1
     },
     {
      "move": "giga-impact",
@@ -26998,6 +27011,7 @@
   "whiscash": "ナマズン",
   "earth-power": "だいちのちから",
   "mawile": "クチート",
+  "play-rough-hoenn": "じゃれつく",
   "metal-claw": "メタルクロー",
   "latias": "ラティアス",
   "mist-ball": "ミストボール",

@@ -847,8 +847,8 @@
       "line": "swablu"
     },
     {
-      "from": "wing-attack",
-      "to": "brave-bird",
+      "from": "aerial-ace",
+      "to": "sky-attack-hoenn",
       "line": "swablu",
       "forms": [
         "altaria"
@@ -868,18 +868,12 @@
       "line": "absol"
     },
     {
-      "from": "confusion",
-      "item": "twisted-spoon",
-      "to": "future-sight",
-      "line": "absol"
-    },
-    {
       "from": "night-slash",
       "to": "foul-play",
       "line": "absol",
       "needsMoves": [
         {
-          "move": "future-sight",
+          "move": "slash",
           "level": 8
         }
       ],

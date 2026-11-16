@@ -100,7 +100,7 @@ export interface SimMoveDef {
   /** heal: 味方の HP を最大 HP の pct % 回復する（いやしのねがい） */
   readonly allyHealPct?: number;
   /** 当たった敵に印を付け、seconds 後にその敵の位置で爆発させる（みらいよち） */
-  readonly delayedBlast?: { readonly seconds: number; readonly sizeMultiplier: number; readonly powerMultiplier: number; readonly throw?: { readonly speed: number; readonly seconds: number }; readonly perish?: boolean; readonly tint?: string };
+  readonly delayedBlast?: { readonly seconds: number; readonly sizeMultiplier: number; readonly powerMultiplier: number; readonly throw?: { readonly speed: number; readonly seconds: number }; readonly perish?: boolean; readonly tint?: string; readonly stack?: boolean };
   /** 使うたびに、ランのコインを perUse + perLevel × (レベル − 1) 枚増やす（ネコにこばん） */
   readonly coinGain?: { readonly perUse: number; readonly perLevel: number };
   /** 当たるたびに大きくなる（ころがる） */

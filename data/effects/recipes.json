@@ -2368,6 +2368,16 @@
       "effectSprite": { "id": "mud-crash", "fit": "circle", "size": 1.05 },
       "impact": { "burst": { "count": 6, "colors": ["#d7ccc8", "#8d6e4a", "#4e342e"], "lifespanMs": [200, 380], "speed": [50, 150], "scale": [0.5, 0], "alpha": [1, 0], "gravityY": 160, "spread": 2, "blend": "normal" } }
     },
+    "sky-attack-hoenn": {
+      "extends": "flying.base",
+      "hideShape": true,
+      "aboveBoss": true,
+      "projectile": { "glowScale": 0, "coreScale": 0 },
+      "chargeGlow": { "color": "#fff8e1", "seconds": 0.5, "radius": 46, "alpha": 0.85 },
+      "trail": { "intervalMs": 24, "colors": ["#ffffff", "#fff8e1", "#e1f5fe"], "lifespanMs": [260, 480], "speed": [10, 40], "scale": [0.9, 0], "alpha": [0.85, 0], "gravityY": 0, "spread": 18, "blend": "normal" },
+      "impact": { "flash": { "color": "#fffde7", "radius": 44, "durationMs": 110, "alpha": 0.55 } },
+      "sprite": { "id": "sky-cloud-wrap", "fit": "circle", "size": 1.45, "rotate": "velocity" }
+    },
     "wild-charge-hoenn": {
       "extends": "electric.base",
       "hideShape": true,

@@ -5087,6 +5087,66 @@ function torrentSplash(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- ゴッドバード（ホウエン・チルタリス。07 の277章） ----------------
+/**
+ * ゴッドバード: 飛び抜ける体を包む光と雲（右が前。64 ドット・ふちなし）。前に尖った光の切っ先と、後ろへ流れる綿雲。
+ * 真ん中は空けて、飛ぶポケモンが見える。3 コマで雲が後ろへ流れる
+ */
+function skyCloudWrap(): SpriteOut {
+  // 0 雲の影（水色）・1 雲（薄い水色）・2 白・3 薄い金・4 金
+  const palette = ['#90caf9', '#e1f5fe', '#ffffff', '#fff8e1', '#ffe082'];
+  const frames = [0, 1, 2].map((f) => {
+    const r = rng(8200 + f * 37);
+    // 前の光の切っ先（先から後ろの上下へ 2 本）
+    const edge: [number, number, number, number][] = [
+      [0.94, 0, -0.05, -0.6],
+      [0.94, 0, -0.05, 0.6],
+    ];
+    const inner: [number, number, number, number][] = [
+      [0.74, 0, 0.05, -0.42],
+      [0.74, 0, 0.05, 0.42],
+    ];
+    // 後ろへ流れる綿雲（上下の列。コマごとに後ろへずれる）
+    const puffs: [number, number, number][] = [];
+    for (const side of [-1, 1]) {
+      for (let k = 0; k < 4; k++) {
+        const u = -0.08 - k * 0.24 - f * 0.08 + (r() - 0.5) * 0.05;
+        if (u < -0.98) continue;
+        const v = side * (0.5 - k * 0.07 + (r() - 0.5) * 0.06);
+        puffs.push([u, v, 0.2 - k * 0.03]);
+      }
+    }
+    // 雲の間を流れる風の線
+    const streaks = Array.from({ length: 4 }, () => [(r() - 0.5) * 0.5, -0.35 - r() * 0.2, 0.3 + r() * 0.3] as const);
+    return toRows(
+      shape(
+        64,
+        (u, v) => {
+          const d = Math.hypot(u, v);
+          let e = 9;
+          for (const sg of edge) e = Math.min(e, segDist(u, v, sg));
+          if (e < 0.02) return 2;
+          if (e < 0.045) return 3;
+          if (e < 0.065) return 4;
+          let ie = 9;
+          for (const sg of inner) ie = Math.min(ie, segDist(u, v, sg));
+          if (ie < 0.018) return 3;
+          if (d < 0.4) return -1;
+          for (const [pu, pv, pr] of puffs) {
+            const q = Math.hypot(u - pu, v - pv) / pr;
+            if (q < 1) return q < 0.55 ? 2 : (v - pv) * Math.sign(pv || 1) > pr * 0.35 ? 0 : 1;
+          }
+          for (const [sv, su, len] of streaks) if (Math.abs(v - sv) < 0.018 && u < su && u > su - len) return 1;
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette, frameMs: 60, parts: { main: frames } };
+}
+
 // ---------------- ワイルドボルト（ホウエン・ライボルト。07 の276章） ----------------
 /** 稲妻の折れ線を作る: (x0,y0) から角度 a へ長さ len、segs 回折れる（ずれは jag）。線分の列を返す */
 function boltPath(r: () => number, x0: number, y0: number, a: number, len: number, segs: number, jag: number): [number, number, number, number][] {
@@ -7543,6 +7603,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'mud-crash': mudCrash,
     torrent,
     'torrent-splash': torrentSplash,
+    'sky-cloud-wrap': skyCloudWrap,
     'wild-bolt-wrap': wildBoltWrap,
     'wild-discharge': wildDischarge,
     'tail-slam': () => tailSlam(),

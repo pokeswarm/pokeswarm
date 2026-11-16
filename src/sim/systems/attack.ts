@@ -1194,6 +1194,9 @@ function enemiesInRange(world: World, x: number, y: number, range: number): numb
 }
 
 /** strike（落雷）: range の中のランダムな敵 count 体の足元に、同時に当たり判定を置く */
+/** 重ねる印を並べる向き（三角関数を使わず、どのブラウザでも同じ位置に） */
+const STACK_OFFSETS: readonly (readonly [number, number])[] = [[1, 0], [-0.7, 0.7], [0, -1], [0.7, 0.7], [-1, 0], [0.7, -0.7], [0, 1], [-0.7, -0.7]];
+
 function fireStrike(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const e = world.enemies;
   const pool = enemiesInRange(world, p.x, p.y, st.range);
@@ -1201,6 +1204,15 @@ function fireStrike(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
   const all = def.strikeRepeat ? [...pool] : [];
   // HP の一番高い敵を先に（ぜったいれいど: 1 つ目はボスへ。残りはランダム。07 の271章）
   const first = def.aimStrongest ? strongestEnemy(world, p, st.range) : -1;
+  // 印を重ねる技（サーナイトの みらいよち）: 全部をその敵へ。少しずつずらして、目が並んで見えるように
+  if (first !== -1 && def.delayedBlast?.stack) {
+    const r = e.radius[first]! * 0.6;
+    for (let k = 0; k < st.count; k++) {
+      const [ox, oy] = k === 0 ? [0, 0] : STACK_OFFSETS[(k - 1) % STACK_OFFSETS.length]!;
+      world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: e.x[first]! + ox * r, y: e.y[first]! + oy * r });
+    }
+    return;
+  }
   for (let k = 0; k < st.count && (pool.length > 0 || all.length > 0); k++) {
     // 敵より多く出す技は、一回りしたら同じ敵にも重ねる
     const i = k === 0 && first !== -1 ? pool.splice(pool.indexOf(first), 1)[0]! : pool.length > 0 ? pool.splice(world.rng.int(pool.length), 1)[0]! : all[world.rng.int(all.length)]!;
@@ -2036,6 +2048,10 @@ export function moveProjectiles(world: World): void {
         e.markSize[j] = pr.radius[i]! * def.delayedBlast.sizeMultiplier;
         e.markMove[j] = pr.move[i]!;
         e.markBy[j] = ownerId;
+      } else if (pr.stage[i] === 0 && def.delayedBlast?.stack && e.markTicks[j]! > 0 && e.markMove[j] === pr.move[i] && e.markBy[j] === ownerId) {
+        // 重ねる印（サーナイトの みらいよち）: 威力を足す。時間は最初の印のまま
+        e.markDamage[j] = e.markDamage[j]! + pr.damage[i]! * def.delayedBlast.powerMultiplier;
+        e.markSize[j] = Math.max(e.markSize[j]!, pr.radius[i]! * def.delayedBlast.sizeMultiplier);
       }
       if (pr.stage[i] === 0 && !pr.noFx[i] && def.effects.some((fx) => fx.trigger === 'eachHit')) fireEffects(world, 'eachHit', fxSourceOf(world, i, e.x[j]!, e.y[j]!));
       // ころがる: 当たるたびに大きくなる（どのブラウザでも同じように）

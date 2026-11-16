@@ -3620,7 +3620,7 @@
           "trigger": "hit",
           "explode": {
             "sizeMultiplier": 2.2,
-            "powerMultiplier": 0.8
+            "powerMultiplier": 0.3
           }
         }
       ]
@@ -3628,6 +3628,7 @@
     "dragon-pulse": {
       "pattern": "beam",
       "effect": "dragon-pulse",
+      "bonusCountToPower": true,
       "base": {
         "power": 25.3,
         "cooldownSeconds": 1.1,
@@ -9752,6 +9753,74 @@
       },
       "region": "hoenn"
     },
+    "sky-attack-hoenn": {
+      "pattern": "dash",
+      "effect": "sky-attack-hoenn",
+      "region": "hoenn",
+      "nameOf": "sky-attack",
+      "bonusCountToPower": true,
+      "knockbackAlongFacing": true,
+      "windupSeconds": 0.5,
+      "dash": {
+        "seconds": 0.36,
+        "hit": "path",
+        "hop": 0,
+        "afterimages": 6,
+        "tint": "#fffde7",
+        "invincible": true,
+        "target": "facing"
+      },
+      "base": {
+        "power": 622.4,
+        "cooldownSeconds": 2.4,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 40,
+        "range": 380,
+        "durationSeconds": 0.36,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 360,
+        "knockbackSeconds": 0.14,
+        "statusId": "flinch",
+        "statusChance": 0.3,
+        "statusSeconds": 0.6,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "critChancePct": 30
+      },
+      "levels": [
+        {
+          "power": 104.3
+        },
+        {
+          "range": 30,
+          "power": 77.6
+        },
+        {
+          "size": 4,
+          "power": 64.1
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": 16.4
+        },
+        {
+          "statusChance": 0.1,
+          "power": 88.9
+        },
+        {
+          "range": 30,
+          "power": 56.2
+        },
+        {
+          "size": 4,
+          "power": 43.7
+        }
+      ],
+      "effects": []
+    },
     "wild-charge-hoenn": {
       "pattern": "dash",
       "effect": "wild-charge-hoenn",
@@ -10139,6 +10208,7 @@
       "region": "hoenn"
     },
     "brave-bird": {
+      "teachOnly": true,
       "pattern": "boomerang",
       "effect": "brave-bird",
       "base": {
@@ -10718,10 +10788,12 @@
     "future-sight-gardevoir": {
       "pattern": "strike",
       "effect": "future-sight-gardevoir",
+      "aimStrongest": true,
       "delayedBlast": {
         "seconds": 1.5,
         "sizeMultiplier": 3,
-        "powerMultiplier": 7
+        "powerMultiplier": 4,
+        "stack": true
       },
       "base": {
         "power": 8,
@@ -10772,17 +10844,7 @@
       ],
       "region": "hoenn",
       "nameOf": "future-sight",
-      "effects": [
-        {
-          "trigger": "end",
-          "puddle": {
-            "sizeMultiplier": 2.4,
-            "powerMultiplier": 0.2,
-            "durationSeconds": 1.5,
-            "hitIntervalSeconds": 0.3
-          }
-        }
-      ]
+      "effects": []
     },
     "sand-tomb": {
       "pattern": "ground",

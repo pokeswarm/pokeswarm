@@ -47,7 +47,7 @@ describe('固有技の条件', () => {
     t.p.moves = [];
     t.give('night-slash', 8);
     t.p.moves[0]!.level = moveMaxLevel(t.rules, t.p.moves[0]!);
-    t.give('future-sight', 8);
+    t.give('slash', 8);
     expect(t.derives('foul-play')).toBeUndefined();
     t.sim.step([{ type: 'runStat', playerId: 1, stat: 'crits', value: 150 }]);
     expect(t.derives('foul-play')).toBeDefined();

@@ -1715,6 +1715,11 @@ export const moveDefSchema = z.object({
       perish: z.boolean().optional(),
       /** 印が付いている間の敵の色（点滅させず、この色のまま。ぜったいれいど: 凍りつく青白。省略なら黒く点滅。07 の271章） */
       tint: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+      /**
+       * 印が付いている敵にも、同じ技・同じプレイヤーなら重ねて付ける: 爆発の威力を足し、時間は最初の印のまま（サーナイトの みらいよち:
+       * 一番強い敵に何度も予知を重ね、まとめて弾ける。07 の277章）
+       */
+      stack: z.boolean().optional(),
     })
     .optional(),
   /**

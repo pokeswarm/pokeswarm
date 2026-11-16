@@ -2368,6 +2368,15 @@
       "effectSprite": { "id": "mud-crash", "fit": "circle", "size": 1.05 },
       "impact": { "burst": { "count": 6, "colors": ["#d7ccc8", "#8d6e4a", "#4e342e"], "lifespanMs": [200, 380], "speed": [50, 150], "scale": [0.5, 0], "alpha": [1, 0], "gravityY": 160, "spread": 2, "blend": "normal" } }
     },
+    "wild-charge-hoenn": {
+      "extends": "electric.base",
+      "hideShape": true,
+      "aboveBoss": true,
+      "projectile": { "glowScale": 0, "coreScale": 0 },
+      "impact": { "flash": { "color": "#fff59d", "radius": 40, "durationMs": 100, "alpha": 0.5 } },
+      "sprite": { "id": "wild-bolt-wrap", "fit": "circle", "size": 1.35, "rotate": "velocity" },
+      "effectSprite": { "id": "wild-discharge", "fit": "circle", "size": 1.05 }
+    },
     "hydro-pump-hoenn": {
       "extends": "water.base",
       "hideShape": true,

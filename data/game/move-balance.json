@@ -94,6 +94,7 @@
     "bullet-punch": "derived",
     "rollout": "unique",
     "twister": "derived",
+    "volt-switch": "unique",
     "sandstorm": "derived",
     "muddy-water": "unique",
     "lava-plume": "derived",

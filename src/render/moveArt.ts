@@ -5087,6 +5087,129 @@ function torrentSplash(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- ワイルドボルト（ホウエン・ライボルト。07 の276章） ----------------
+/** 稲妻の折れ線を作る: (x0,y0) から角度 a へ長さ len、segs 回折れる（ずれは jag）。線分の列を返す */
+function boltPath(r: () => number, x0: number, y0: number, a: number, len: number, segs: number, jag: number): [number, number, number, number][] {
+  const out: [number, number, number, number][] = [];
+  let x = x0;
+  let y = y0;
+  const nx = -Math.sin(a);
+  const ny = Math.cos(a);
+  for (let k = 1; k <= segs; k++) {
+    const t = (len * k) / segs;
+    const off = k === segs ? 0 : (r() - 0.5) * 2 * jag;
+    const x2 = x0 + Math.cos(a) * t + nx * off;
+    const y2 = y0 + Math.sin(a) * t + ny * off;
+    out.push([x, y, x2, y2]);
+    x = x2;
+    y = y2;
+  }
+  return out;
+}
+
+/** 点から線分までの距離 */
+function segDist(u: number, v: number, s: [number, number, number, number]): number {
+  const [x1, y1, x2, y2] = s;
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const t = Math.max(0, Math.min(1, ((u - x1) * dx + (v - y1) * dy) / (dx * dx + dy * dy || 1)));
+  return Math.hypot(u - x1 - dx * t, v - y1 - dy * t);
+}
+
+/**
+ * ワイルドボルト: 突っ込む体を包む稲妻（右が前。64 ドット・ふちなし）。前に尖った形に走る稲妻と、後ろへちぎれて流れる稲妻。
+ * 真ん中は空けて、突っ込むポケモンが見える。コマごとに稲妻の形が変わる
+ */
+function wildBoltWrap(): SpriteOut {
+  // 0 濃い黄・1 黄・2 薄い黄・3 白
+  const palette = ['#f9a825', '#fdd835', '#fff59d', '#ffffff'];
+  const frames = [0, 1, 2].map((f) => {
+    const r = rng(6100 + f * 53);
+    const bolts: [number, number, number, number][] = [];
+    // 前の殻のふちを走る稲妻（上下 2 本。前の先から後ろへ）
+    for (const s of [-1, 1]) {
+      bolts.push(...boltPath(r, 0.8, 0, Math.PI - s * 0.66, 1.1, 7, 0.13));
+      bolts.push(...boltPath(r, 0.62, s * 0.05, Math.PI - s * 0.95, 0.75, 5, 0.1));
+    }
+    // 後ろへちぎれて流れる稲妻（3 本）
+    for (const cy of [-0.34, 0.02, 0.36]) bolts.push(...boltPath(r, -0.3, cy + (r() - 0.5) * 0.1, Math.PI + (r() - 0.5) * 0.3, 0.6 + r() * 0.1, 5, 0.12));
+    const sparks = Array.from({ length: 10 }, () => [0.2 + r() * 0.75, (r() - 0.5) * 1.5] as const);
+    return toRows(
+      shape(
+        64,
+        (u, v) => {
+          let best = 9;
+          for (const s of bolts) best = Math.min(best, segDist(u, v, s));
+          if (best < 0.018) return 3;
+          if (best < 0.04) return 1;
+          if (best < 0.06) return 0;
+          for (const [sx, sy] of sparks) if (Math.hypot(u - sx, v - sy) < 0.025 && Math.hypot(sx, sy) > 0.72) return 3;
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette, frameMs: 50, parts: { main: frames } };
+}
+
+/**
+ * ワイルドボルト: ぶつかった所の大きな放電（96 ドット・ふちなし）。白く光る芯から、枝分かれする稲妻が外へ走る。
+ * 3 コマ: 光る芯 → 稲妻が伸びきる → 細い稲妻と火花だけ残る
+ */
+function wildDischarge(): SpriteOut {
+  // 0 濃い黄・1 黄・2 薄い黄・3 白
+  const palette = ['#f9a825', '#fdd835', '#fff59d', '#ffffff'];
+  const frames = [0, 1, 2].map((f) => {
+    const r = rng(7300 + f * 41);
+    const reach = [0.55, 0.92, 0.95][f]!;
+    const bolts: [number, number, number, number][] = [];
+    const twigs: [number, number, number, number][] = [];
+    const n = 9;
+    for (let j = 0; j < n; j++) {
+      const a = (j / n) * Math.PI * 2 + (r() - 0.5) * 0.4;
+      const len = reach * (0.75 + r() * 0.25) - 0.12;
+      const main = boltPath(r, Math.cos(a) * 0.12, Math.sin(a) * 0.12, a, len, 5, 0.06);
+      bolts.push(...main);
+      // 途中から枝分かれ
+      const at = main[1 + Math.floor(r() * 2)]!;
+      twigs.push(...boltPath(r, at[2], at[3], a + (r() < 0.5 ? -1 : 1) * (0.5 + r() * 0.3), len * 0.4, 3, 0.04));
+    }
+    const sparks = Array.from({ length: 16 }, () => {
+      const a = r() * Math.PI * 2;
+      const d = 0.5 + r() * 0.45;
+      return [Math.cos(a) * d, Math.sin(a) * d] as const;
+    });
+    return toRows(
+      shape(
+        96,
+        (u, v) => {
+          const d = Math.hypot(u, v);
+          // 光る芯（最初のコマは大きく、後は小さく）
+          const core = [0.3, 0.16, 0][f]!;
+          if (d < core) return d < core * 0.6 ? 3 : 2;
+          const w = f === 2 ? 0.6 : 1;
+          let best = 9;
+          for (const s of bolts) best = Math.min(best, segDist(u, v, s));
+          if (best < 0.014 * w) return 3;
+          if (best < 0.028 * w) return f === 2 ? 0 : 1;
+          if (f < 2 && best < 0.04) return 0;
+          let tw = 9;
+          for (const s of twigs) tw = Math.min(tw, segDist(u, v, s));
+          if (tw < 0.012) return 2;
+          if (tw < 0.022) return 0;
+          if (f > 0) for (const [sx, sy] of sparks) if (Math.hypot(u - sx, v - sy) < 0.02) return f === 1 ? 3 : 1;
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette, frameMs: 70, parts: { main: frames } };
+}
+
 // ---------------- ジョウトの技の作り直し（1）ポッポ系統（07 の157章） ----------------
 /**
  * ふきとばし: 扇に引き伸ばす大きな風（縦長 32×36）。太い白い風の帯が 3 本、根元から先へ波打ちながら広がり、
@@ -7420,6 +7543,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'mud-crash': mudCrash,
     torrent,
     'torrent-splash': torrentSplash,
+    'wild-bolt-wrap': wildBoltWrap,
+    'wild-discharge': wildDischarge,
     'tail-slam': () => tailSlam(),
     'sound-cone': () => cone('sound'),
     'electric-cone': () => cone('electric'),

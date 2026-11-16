@@ -433,7 +433,7 @@ export function useMoves(world: World): void {
         if (pm.windup > 0) continue;
         pm.windup = undefined;
       }
-      const needsTarget = def.pattern === 'nearest' || def.pattern === 'homing' || def.pattern === 'chain';
+      const needsTarget = def.pattern === 'nearest' || def.pattern === 'homing' || def.pattern === 'chain' || !!def.epicenter;
       // 射程内に敵がいなければ待つ
       if (needsTarget && nearestEnemy(world, p.x, p.y, st.range) === -1) {
         pm.cooldown = 0;
@@ -1743,6 +1743,19 @@ function fireNova(world: World, p: Player, pm: PlayerMove, st0: MoveStats): void
   const growth = Math.max(0, (st.range - start) / st.durationSeconds);
   // 技の向きへ押す輪（サイコキネシス）は、向いている方向を覚える
   const [fx, fy] = world.rules.moves[pm.move]!.knockbackAlongFacing ? axisToUnit(p.facingX, p.facingY) : [0, 0];
+  // 震源（フライゴンの じしん）: 届く範囲のボス・中ボス、いなければ敵が一番多い所。輪はそこに残る
+  if (world.rules.moves[pm.move]!.epicenter) {
+    const e = world.enemies;
+    const t = toughestBoss(world, p.x, p.y, st0.range);
+    const c = t !== -1 ? t : crowdCenter(world, p, st0.range, st.range * 0.5);
+    if (c === -1) return;
+    for (let k = 0; k < st.count; k++) {
+      const j = world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: e.x[c]!, y: e.y[c]!, radius: start, band, growth, life: st.durationSeconds * (1 + k * 0.6), dirX: fx, dirY: fy });
+      // 震源から走る地割れ（spawn の効き方）は 1 回だけ
+      if (k > 0 && j >= 0) world.projectiles.noFx[j] = 1;
+    }
+    return;
+  }
   for (let k = 0; k < st.count; k++) {
     world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: start, band, growth, life: st.durationSeconds * (1 + k * 0.6), dirX: fx, dirY: fy });
   }

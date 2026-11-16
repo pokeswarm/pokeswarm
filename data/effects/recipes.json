@@ -4356,37 +4356,11 @@
     },
     "leaf-blade": {
       "extends": "grass.base",
-      "chargeGlow": {
-        "color": "#ccff90",
-        "seconds": 0.45,
-        "radius": 64,
-        "alpha": 1
-      },
-      "castSprite": {
-        "id": "blade-slash",
-        "fit": "line",
-        "size": 1,
-        "seconds": 0.28,
-        "radius": 8,
-        "lineLength": 900
-      },
-      "screenFlash": {
-        "color": "#ffffff",
-        "alpha": 0.35,
-        "durationMs": 160
-      },
-      "projectile": {
-        "glowColor": "#ccff90",
-        "glowScale": 1.05,
-        "coreScale": 0.2,
-        "shapeAlpha": 0.18
-      },
-      "sprite": {
-        "id": "blade-ring",
-        "fit": "ring",
-        "size": 1,
-        "alpha": 0.85
-      }
+      "hideShape": true,
+      "chargeGlow": { "color": "#ccff90", "seconds": 0.45, "radius": 56, "alpha": 0.9 },
+      "projectile": { "glowScale": 0, "coreScale": 0 },
+      "impact": { "flash": { "color": "#ccff90", "radius": 36, "durationMs": 110, "alpha": 0.55 } },
+      "sprite": { "id": "leaf-blade-swing", "fit": "front", "size": 1, "along": 0.5, "afterimages": 3, "afterimageGap": 1 }
     },
     "swords-dance": {
       "extends": "normal.base"

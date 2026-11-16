@@ -19092,7 +19092,7 @@
       {
        "form": "sceptile",
        "scene": "boss",
-       "est": 11428.365305928199,
+       "est": 13983.851115888498,
        "moves": [
         {
          "move": "fury-cutter",
@@ -19107,7 +19107,7 @@
         {
          "move": "leaf-blade",
          "level": 8,
-         "est": 3674.0749060150392
+         "est": 6229.560715975338
         },
         {
          "move": "grass-pledge",
@@ -19124,81 +19124,28 @@
         "dire-hit"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.5914713977415336,
-        "hoenn-boss-shiftry": 1.7953229763419587,
-        "hoenn-boss-dusclops": 2.7890870785810256,
-        "hoenn-boss-banette": 2.7890870785810256,
-        "hoenn-boss-walrein": 2.946964775667195,
-        "hoenn-boss-glalie": 3.3075596542571253,
-        "hoenn-boss-salamence": 4.900088376677222,
-        "hoenn-boss-flygon": 3.9200707013417784,
-        "hoenn-boss-milotic": 4.054025617319951,
-        "hoenn-boss-wailord": 4.054025617319951,
-        "round1": 39.88046240861821,
-        "round2": 49.89569990547632,
-        "legend-rayquaza": 49.219637712159596,
-        "legend-deoxys": 40.59876014646769,
-        "legend-latias": 8.207190748991811
+        "hoenn-boss-absol": 1.3179897056311611,
+        "hoenn-boss-shiftry": 1.5121538186924302,
+        "hoenn-boss-dusclops": 2.2448626911677674,
+        "hoenn-boss-banette": 2.2448626911677674,
+        "hoenn-boss-walrein": 2.378354765345256,
+        "hoenn-boss-glalie": 2.703118024265255,
+        "hoenn-boss-salamence": 4.004619295207785,
+        "hoenn-boss-flygon": 3.203695436166228,
+        "hoenn-boss-milotic": 3.271810788305643,
+        "hoenn-boss-wailord": 3.271810788305643,
+        "round1": 33.12804265930873,
+        "round2": 40.26844047145406,
+        "legend-rayquaza": 40.22497059918534,
+        "legend-deoxys": 33.62218636814187,
+        "legend-latias": 6.912703171165395
        },
-       "legendAvg": 44.89864004318046
+       "legendAvg": 36.8109100245225
       },
       {
        "form": "sceptile",
        "scene": "at50",
-       "est": 11014.127743408364,
-       "moves": [
-        {
-         "move": "fury-cutter",
-         "level": 8,
-         "est": 4445.323285351938
-        },
-        {
-         "move": "leaf-blade",
-         "level": 8,
-         "est": 2571.852434210527
-        },
-        {
-         "move": "pound",
-         "level": 8,
-         "est": 1377.5773916131427
-        },
-        {
-         "move": "double-edge",
-         "level": 8,
-         "est": 2619.3746322327565
-        }
-       ],
-       "items": [
-        "silver-powder",
-        "silk-scarf",
-        "pp-max",
-        "x-attack",
-        "metronome",
-        "dire-hit"
-       ],
-       "vs": {
-        "hoenn-boss-absol": 1.6466170872959829,
-        "hoenn-boss-shiftry": 1.720985730449567,
-        "hoenn-boss-dusclops": 3.1525875938264467,
-        "hoenn-boss-banette": 3.1525875938264467,
-        "hoenn-boss-walrein": 3.2788312271943467,
-        "hoenn-boss-glalie": 3.4319558371403676,
-        "hoenn-boss-salamence": 4.661474658168755,
-        "hoenn-boss-flygon": 4.067503214388584,
-        "hoenn-boss-milotic": 4.510561476563652,
-        "hoenn-boss-wailord": 4.510561476563652,
-        "round1": 41.235553882778824,
-        "round2": 55.51460278847571,
-        "legend-rayquaza": 46.82284812892723,
-        "legend-deoxys": 42.005537941224055,
-        "legend-latias": 7.867363339198021
-       },
-       "legendAvg": 46.39463568535145
-      },
-      {
-       "form": "sceptile",
-       "scene": "at50",
-       "est": 10467.47900936298,
+       "est": 13104.332176329885,
        "moves": [
         {
          "move": "fury-cutter",
@@ -19208,7 +19155,60 @@
         {
          "move": "leaf-blade",
          "level": 8,
-         "est": 3281.5455357142864
+         "est": 5564.009357430963
+        },
+        {
+         "move": "pound",
+         "level": 8,
+         "est": 1230.4003198596017
+        },
+        {
+         "move": "double-edge",
+         "level": 8,
+         "est": 2339.526915113872
+        }
+       ],
+       "items": [
+        "silver-powder",
+        "silk-scarf",
+        "pp-max",
+        "x-attack",
+        "metronome",
+        "miracle-seed"
+       ],
+       "vs": {
+        "hoenn-boss-absol": 1.4102331256889404,
+        "hoenn-boss-shiftry": 1.5329734667824009,
+        "hoenn-boss-dusclops": 2.53529851002936,
+        "hoenn-boss-banette": 2.53529851002936,
+        "hoenn-boss-walrein": 2.6587637053198168,
+        "hoenn-boss-glalie": 2.884542263685703,
+        "hoenn-boss-salamence": 4.0009104971831855,
+        "hoenn-boss-flygon": 3.418716756960833,
+        "hoenn-boss-milotic": 3.6575585364187955,
+        "hoenn-boss-wailord": 3.6575585364187955,
+        "round1": 35.46871283084333,
+        "round2": 45.016105063615946,
+        "legend-rayquaza": 40.187717047598966,
+        "legend-deoxys": 35.97533483900358,
+        "legend-latias": 7.007878705290975
+       },
+       "legendAvg": 39.161967445265454
+      },
+      {
+       "form": "sceptile",
+       "scene": "at50",
+       "est": 12749.94283107966,
+       "moves": [
+        {
+         "move": "fury-cutter",
+         "level": 8,
+         "est": 3970.395583925448
+        },
+        {
+         "move": "leaf-blade",
+         "level": 8,
+         "est": 5564.009357430963
         },
         {
          "move": "double-edge",
@@ -19230,28 +19230,28 @@
         "x-attack"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.7404341193685273,
-        "hoenn-boss-shiftry": 1.879186194518602,
-        "hoenn-boss-dusclops": 3.1937447759578146,
-        "hoenn-boss-banette": 3.1937447759578146,
-        "hoenn-boss-walrein": 3.3454316676216074,
-        "hoenn-boss-glalie": 3.6111846955879776,
-        "hoenn-boss-salamence": 5.066790826573842,
-        "hoenn-boss-flygon": 4.279922602178344,
-        "hoenn-boss-milotic": 4.602181130061471,
-        "hoenn-boss-wailord": 4.602181130061471,
-        "round1": 43.62972085615821,
-        "round2": 56.642229293064254,
-        "legend-rayquaza": 50.8941042847819,
-        "legend-deoxys": 44.39882957572774,
-        "legend-latias": 8.590565460656466
+        "hoenn-boss-absol": 1.4471329177881314,
+        "hoenn-boss-shiftry": 1.5992143769351663,
+        "hoenn-boss-dusclops": 2.559201483171224,
+        "hoenn-boss-banette": 2.559201483171224,
+        "hoenn-boss-walrein": 2.692701452429971,
+        "hoenn-boss-glalie": 2.964719175670148,
+        "hoenn-boss-salamence": 4.199530316175064,
+        "hoenn-boss-flygon": 3.513741245238694,
+        "hoenn-boss-milotic": 3.7042453842951977,
+        "hoenn-boss-wailord": 3.7042453842951977,
+        "round1": 36.38337142651194,
+        "round2": 45.59071242209474,
+        "legend-rayquaza": 42.18278219372274,
+        "legend-deoxys": 36.916656066023755,
+        "legend-latias": 7.3106942945607605
        },
-       "legendAvg": 48.89122100243303
+       "legendAvg": 40.2683805270883
       },
       {
        "form": "sceptile",
        "scene": "at50",
-       "est": 10377.898675803885,
+       "est": 12619.985151813384,
        "moves": [
         {
          "move": "fury-cutter",
@@ -19261,60 +19261,7 @@
         {
          "move": "leaf-blade",
          "level": 8,
-         "est": 2571.852434210527
-        },
-        {
-         "move": "double-edge",
-         "level": 8,
-         "est": 2619.3746322327565
-        },
-        {
-         "move": "swift",
-         "level": 8,
-         "est": 741.3483240086631
-        }
-       ],
-       "items": [
-        "silver-powder",
-        "silk-scarf",
-        "pp-max",
-        "metronome",
-        "x-attack",
-        "dire-hit"
-       ],
-       "vs": {
-        "hoenn-boss-absol": 1.7395991644715791,
-        "hoenn-boss-shiftry": 1.822816159846751,
-        "hoenn-boss-dusclops": 3.334584964323255,
-        "hoenn-boss-banette": 3.334584964323255,
-        "hoenn-boss-walrein": 3.4703512588204797,
-        "hoenn-boss-glalie": 3.6423558545749595,
-        "hoenn-boss-salamence": 4.991941840400825,
-        "hoenn-boss-flygon": 4.316866198014767,
-        "hoenn-boss-milotic": 4.7740281867371674,
-        "hoenn-boss-wailord": 4.7740281867371674,
-        "round1": 43.51901928013389,
-        "round2": 58.7572699906113,
-        "legend-rayquaza": 50.14227295045471,
-        "legend-deoxys": 44.37752970590763,
-        "legend-latias": 8.332873873585147
-       },
-       "legendAvg": 49.199022981776885
-      },
-      {
-       "form": "sceptile",
-       "scene": "at50",
-       "est": 10064.499341853085,
-       "moves": [
-        {
-         "move": "fury-cutter",
-         "level": 8,
-         "est": 4445.323285351938
-        },
-        {
-         "move": "leaf-blade",
-         "level": 8,
-         "est": 3674.0749060150392
+         "est": 6229.560715975338
         },
         {
          "move": "pound",
@@ -19336,23 +19283,76 @@
         "dire-hit"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.7893719342787706,
-        "hoenn-boss-shiftry": 1.9555824131618609,
-        "hoenn-boss-dusclops": 3.2730039842802077,
-        "hoenn-boss-banette": 3.2730039842802077,
-        "hoenn-boss-walrein": 3.4377782138657844,
-        "hoenn-boss-glalie": 3.755775495240902,
-        "hoenn-boss-salamence": 5.433951808204238,
-        "hoenn-boss-flygon": 4.451289475841069,
-        "hoenn-boss-milotic": 4.729218706905312,
-        "hoenn-boss-wailord": 4.729218706905312,
-        "round1": 44.739405726369185,
-        "round2": 58.20576870037307,
-        "legend-rayquaza": 54.58210521633722,
-        "legend-deoxys": 45.647243221397204,
-        "legend-latias": 8.939805317311363
+        "hoenn-boss-absol": 1.4508792459341382,
+        "hoenn-boss-shiftry": 1.6242674479699846,
+        "hoenn-boss-dusclops": 2.5480887485904273,
+        "hoenn-boss-banette": 2.5480887485904273,
+        "hoenn-boss-walrein": 2.688084739846671,
+        "hoenn-boss-glalie": 2.995249165928572,
+        "hoenn-boss-salamence": 4.354228562435108,
+        "hoenn-boss-flygon": 3.549924937396826,
+        "hoenn-boss-milotic": 3.697894351111822,
+        "hoenn-boss-wailord": 3.697894351111822,
+        "round1": 36.413115900736855,
+        "round2": 45.512545859837815,
+        "legend-rayquaza": 43.73667082803122,
+        "legend-deoxys": 37.012225661585155,
+        "legend-latias": 7.4252226192913575
        },
-       "legendAvg": 50.79363071611917
+       "legendAvg": 40.66863956254776
+      },
+      {
+       "form": "sceptile",
+       "scene": "at50",
+       "est": 12536.076299708791,
+       "moves": [
+        {
+         "move": "fury-cutter",
+         "level": 8,
+         "est": 3970.395583925448
+        },
+        {
+         "move": "leaf-blade",
+         "level": 8,
+         "est": 5564.009357430963
+        },
+        {
+         "move": "double-edge",
+         "level": 8,
+         "est": 2339.526915113872
+        },
+        {
+         "move": "swift",
+         "level": 8,
+         "est": 662.1444432385068
+        }
+       ],
+       "items": [
+        "silver-powder",
+        "silk-scarf",
+        "pp-max",
+        "x-attack",
+        "metronome",
+        "miracle-seed"
+       ],
+       "vs": {
+        "hoenn-boss-absol": 1.4703504488588497,
+        "hoenn-boss-shiftry": 1.604275420842597,
+        "hoenn-boss-dusclops": 2.6387443449133263,
+        "hoenn-boss-banette": 2.6387443449133263,
+        "hoenn-boss-walrein": 2.7694583778888364,
+        "hoenn-boss-glalie": 3.0152975377852544,
+        "hoenn-boss-salamence": 4.2148063599690495,
+        "hoenn-boss-flygon": 3.5736859707084494,
+        "hoenn-boss-milotic": 3.8098369219634787,
+        "hoenn-boss-wailord": 3.8098369219634787,
+        "round1": 36.95853383776156,
+        "round2": 46.890300578012045,
+        "legend-rayquaza": 42.336224597903396,
+        "legend-deoxys": 37.50894002190943,
+        "legend-latias": 7.333830495280444
+       },
+       "legendAvg": 40.92349975889661
       }
      ],
      "measured": null
@@ -23145,13 +23145,13 @@
      "builds": [
       {
        "form": "flygon",
-       "scene": "boss",
-       "est": 12924.115577425753,
+       "scene": "at50",
+       "est": 13055.970567685374,
        "moves": [
         {
          "move": "earthquake-hoenn",
          "level": 8,
-         "est": 8346.786016159638
+         "est": 8478.641006419259
         },
         {
          "move": "dragon-pulse",
@@ -23178,33 +23178,33 @@
         "dire-hit"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.516544778834604,
-        "hoenn-boss-shiftry": 1.7414856319742131,
-        "hoenn-boss-dusclops": 2.289089549303026,
-        "hoenn-boss-banette": 2.289089549303026,
-        "hoenn-boss-walrein": 2.9247649306095935,
-        "hoenn-boss-glalie": 2.9247649306095935,
-        "hoenn-boss-salamence": 3.7056512087942464,
-        "hoenn-boss-flygon": 3.2560505495475747,
-        "hoenn-boss-milotic": 4.0234861479285415,
-        "hoenn-boss-wailord": 4.0234861479285415,
-        "round1": 29.24402684165782,
-        "round2": 49.519829512966666,
-        "legend-rayquaza": 37.22194294547792,
-        "legend-deoxys": 38.687366807005205,
-        "legend-latias": 6.512101099095149
+        "hoenn-boss-absol": 1.5012288744363174,
+        "hoenn-boss-shiftry": 1.7253153029523356,
+        "hoenn-boss-dusclops": 2.265827982738791,
+        "hoenn-boss-banette": 2.265827982738791,
+        "hoenn-boss-walrein": 2.8952271149843263,
+        "hoenn-boss-glalie": 2.8952271149843263,
+        "hoenn-boss-salamence": 3.6735984974788765,
+        "hoenn-boss-flygon": 3.225143416102087,
+        "hoenn-boss-milotic": 3.982852115851454,
+        "hoenn-boss-wailord": 3.982852115851454,
+        "round1": 28.90960307926901,
+        "round2": 49.01971834894097,
+        "legend-rayquaza": 36.899984907711925,
+        "legend-deoxys": 38.29665496011013,
+        "legend-latias": 6.450286832204174
        },
-       "legendAvg": 38.668291526776905
+       "legendAvg": 38.28149032400801
       },
       {
        "form": "flygon",
-       "scene": "boss",
-       "est": 12880.629622855113,
+       "scene": "at50",
+       "est": 13012.484613114733,
        "moves": [
         {
          "move": "earthquake-hoenn",
          "level": 8,
-         "est": 8346.786016159638
+         "est": 8478.641006419259
         },
         {
          "move": "dragon-pulse",
@@ -23231,33 +23231,33 @@
         "dire-hit"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.5216647457374428,
-        "hoenn-boss-shiftry": 1.7595221140712813,
-        "hoenn-boss-dusclops": 2.282497118606164,
-        "hoenn-boss-banette": 2.282497118606164,
-        "hoenn-boss-walrein": 2.9346391524936397,
-        "hoenn-boss-glalie": 2.9346391524936397,
-        "hoenn-boss-salamence": 3.741354534419754,
-        "hoenn-boss-flygon": 3.2663740754656443,
-        "hoenn-boss-milotic": 4.037069733589134,
-        "hoenn-boss-wailord": 4.037069733589134,
-        "round1": 29.0128667959276,
-        "round2": 49.68701210571242,
-        "legend-rayquaza": 37.58057010019842,
-        "legend-deoxys": 38.81797820758783,
-        "legend-latias": 6.532748150931289
+        "hoenn-boss-absol": 1.5062457772473359,
+        "hoenn-boss-shiftry": 1.7430166871863788,
+        "hoenn-boss-dusclops": 2.259368665871004,
+        "hoenn-boss-banette": 2.259368665871004,
+        "hoenn-boss-walrein": 2.9049025704055764,
+        "hoenn-boss-glalie": 2.9049025704055764,
+        "hoenn-boss-salamence": 3.708683925406897,
+        "hoenn-boss-flygon": 3.235271581112681,
+        "hoenn-boss-milotic": 3.9961622661664014,
+        "hoenn-boss-wailord": 3.9961622661664014,
+        "round1": 28.683679301751532,
+        "round2": 49.183535583586476,
+        "legend-rayquaza": 37.25240550073892,
+        "legend-deoxys": 38.42463717467694,
+        "legend-latias": 6.470543162225362
        },
-       "legendAvg": 38.774606802356566
+       "legendAvg": 38.386064390188466
       },
       {
        "form": "flygon",
-       "scene": "boss",
-       "est": 12634.624636963035,
+       "scene": "at150",
+       "est": 12941.476233299554,
        "moves": [
         {
          "move": "earthquake-hoenn",
          "level": 8,
-         "est": 8346.786016159638
+         "est": 8478.641006419259
         },
         {
          "move": "dragon-pulse",
@@ -23272,7 +23272,7 @@
         {
          "move": "magnitude",
          "level": 8,
-         "est": 113.4157573680777
+         "est": 288.41236344497463
         }
        ],
        "items": [
@@ -23284,33 +23284,33 @@
         "dire-hit"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.5512926234990405,
-        "hoenn-boss-shiftry": 1.7911673782380457,
-        "hoenn-boss-dusclops": 2.326938935248561,
-        "hoenn-boss-banette": 2.326938935248561,
-        "hoenn-boss-walrein": 2.991778631033864,
-        "hoenn-boss-glalie": 2.991778631033864,
-        "hoenn-boss-salamence": 3.803873357830323,
-        "hoenn-boss-flygon": 3.326030614976192,
-        "hoenn-boss-milotic": 4.115674307242353,
-        "hoenn-boss-wailord": 4.115674307242353,
-        "round1": 29.64768085294674,
-        "round2": 50.65445301221357,
-        "legend-rayquaza": 38.20854935320637,
-        "legend-deoxys": 39.57379141579185,
-        "legend-latias": 6.652061229952384
+        "hoenn-boss-absol": 1.514510373211325,
+        "hoenn-boss-shiftry": 1.7518667455126637,
+        "hoenn-boss-dusclops": 2.2717655598169872,
+        "hoenn-boss-banette": 2.2717655598169872,
+        "hoenn-boss-walrein": 2.9208414340504123,
+        "hoenn-boss-glalie": 2.9208414340504123,
+        "hoenn-boss-salamence": 3.7262069216032145,
+        "hoenn-boss-flygon": 3.251947348862396,
+        "hoenn-boss-milotic": 4.018088745254536,
+        "hoenn-boss-wailord": 4.018088745254536,
+        "round1": 28.860023998831977,
+        "round2": 49.453399941594284,
+        "legend-rayquaza": 37.42841773931801,
+        "legend-deoxys": 38.63546870437054,
+        "legend-latias": 6.503894697724792
        },
-       "legendAvg": 39.521118658539635
+       "legendAvg": 38.594327596028705
       },
       {
        "form": "flygon",
-       "scene": "boss",
-       "est": 12532.353571592286,
+       "scene": "at50",
+       "est": 12664.208561851907,
        "moves": [
         {
          "move": "earthquake-hoenn",
          "level": 8,
-         "est": 8346.786016159638
+         "est": 8478.641006419259
         },
         {
          "move": "dragon-pulse",
@@ -23337,33 +23337,33 @@
         "dire-hit"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.5639520452429863,
-        "hoenn-boss-shiftry": 1.8046606859411018,
-        "hoenn-boss-dusclops": 2.3459280678644796,
-        "hoenn-boss-banette": 2.3459280678644796,
-        "hoenn-boss-walrein": 3.0161932301114733,
-        "hoenn-boss-glalie": 3.0161932301114733,
-        "hoenn-boss-salamence": 3.8304833274670833,
-        "hoenn-boss-flygon": 3.3514776587692223,
-        "hoenn-boss-milotic": 4.149260528195678,
-        "hoenn-boss-wailord": 4.149260528195678,
-        "round1": 29.919840691445046,
-        "round2": 51.067821885485266,
-        "legend-rayquaza": 38.47583699464705,
-        "legend-deoxys": 39.89673584803536,
-        "legend-latias": 6.702955317538445
+        "hoenn-boss-absol": 1.5476687630556412,
+        "hoenn-boss-shiftry": 1.7873017173742747,
+        "hoenn-boss-dusclops": 2.3215031445834615,
+        "hoenn-boss-banette": 2.3215031445834615,
+        "hoenn-boss-walrein": 2.9847897573215936,
+        "hoenn-boss-glalie": 2.9847897573215936,
+        "hoenn-boss-salamence": 3.796244702165046,
+        "hoenn-boss-flygon": 3.3187414557037234,
+        "hoenn-boss-milotic": 4.106059983617007,
+        "hoenn-boss-wailord": 4.106059983617007,
+        "round1": 29.569874107736517,
+        "round2": 50.53612287528624,
+        "legend-rayquaza": 38.13192223156854,
+        "legend-deoxys": 39.48134599631737,
+        "legend-latias": 6.637482911407447
        },
-       "legendAvg": 39.84005885490318
+       "legendAvg": 39.42981630272716
       },
       {
        "form": "flygon",
-       "scene": "boss",
-       "est": 11445.092022201925,
+       "scene": "at50",
+       "est": 11576.947012461545,
        "moves": [
         {
          "move": "earthquake-hoenn",
          "level": 8,
-         "est": 8346.786016159638
+         "est": 8478.641006419259
         },
         {
          "move": "dragon-rush",
@@ -23390,23 +23390,23 @@
         "dire-hit"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.712524456944397,
-        "hoenn-boss-shiftry": 2.004964369733703,
-        "hoenn-boss-dusclops": 2.5870009559603204,
-        "hoenn-boss-banette": 2.5870009559603204,
-        "hoenn-boss-walrein": 3.3027257383927653,
-        "hoenn-boss-glalie": 3.3027257383927653,
-        "hoenn-boss-salamence": 4.343267560997095,
-        "hoenn-boss-flygon": 3.7382641399189676,
-        "hoenn-boss-milotic": 4.543432232709624,
-        "hoenn-boss-wailord": 4.543432232709624,
-        "round1": 32.01334822363244,
-        "round2": 55.91916594104153,
-        "legend-rayquaza": 43.626571483229746,
-        "legend-deoxys": 43.686848391438694,
-        "legend-latias": 7.476528279837935
+        "hoenn-boss-absol": 1.6930197554590478,
+        "hoenn-boss-shiftry": 1.9835609730480173,
+        "hoenn-boss-dusclops": 2.5573299281281074,
+        "hoenn-boss-banette": 2.5573299281281074,
+        "hoenn-boss-walrein": 3.2651095283853064,
+        "hoenn-boss-glalie": 3.2651095283853064,
+        "hoenn-boss-salamence": 4.299300951598925,
+        "hoenn-boss-flygon": 3.697581762199055,
+        "hoenn-boss-milotic": 4.491685065503597,
+        "hoenn-boss-wailord": 4.491685065503597,
+        "round1": 31.613021182436807,
+        "round2": 55.28227772927503,
+        "legend-rayquaza": 43.18494259418562,
+        "legend-deoxys": 43.189279475996116,
+        "legend-latias": 7.39516352439811
        },
-       "legendAvg": 43.811483509835604
+       "legendAvg": 43.31738024547339
       }
      ],
      "measured": null
@@ -25213,7 +25213,7 @@
     },
     {
      "move": "earthquake-hoenn",
-     "est": 8363.855119935386,
+     "est": 8478.641006419259,
      "key": "trapinch",
      "form": "flygon",
      "items": [
@@ -25221,8 +25221,7 @@
       "metronome",
       "x-attack",
       "dire-hit",
-      "pp-max",
-      "light-clay"
+      "pp-max"
      ],
      "owners": 1
     },
@@ -25318,6 +25317,20 @@
       "metronome",
       "x-sp-atk",
       "pp-max",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
+     "move": "leaf-blade",
+     "est": 6229.560715975338,
+     "key": "treecko",
+     "form": "sceptile",
+     "items": [
+      "pp-max",
+      "miracle-seed",
+      "x-attack",
+      "metronome",
       "dire-hit"
      ],
      "owners": 1
@@ -25518,20 +25531,6 @@
       "dire-hit"
      ],
      "owners": 2
-    },
-    {
-     "move": "leaf-blade",
-     "est": 3674.0749060150392,
-     "key": "treecko",
-     "form": "sceptile",
-     "items": [
-      "pp-max",
-      "miracle-seed",
-      "x-attack",
-      "metronome",
-      "dire-hit"
-     ],
-     "owners": 1
     },
     {
      "move": "flare-blitz",

@@ -1859,6 +1859,11 @@ export const moveDefSchema = z.object({
   idleScale: z.object({ size: z.number().positive().max(1), power: z.number().min(0).max(1) }).optional(),
   /** 押し出す向きを、当たり判定から敵へではなく、技の向き（向いている方向）にする（なみのり・サイコキネシス。07 の162章） */
   knockbackAlongFacing: z.boolean().optional(),
+  /**
+   * nova: 自分を中心にせず、震源（届く範囲のボス・中ボス、いなければ敵が一番多い所）を中心に広がる。
+   * 輪は震源に残り、持ち主に付いていかない。届く範囲に敵がいなければ出さない（フライゴンの じしん。07 の278章）
+   */
+  epicenter: z.boolean().optional(),
   /** 向きを、使うたびにランダムに選ぶ（にどげり・まわしげり: 近くのランダムな向きへ。barrage・sweep で使う） */
   randomAim: z.boolean().optional(),
   /** 再使用を、出した技が消えてから数える（こなゆき・ふぶき: 雪が止んでから cooldown の間はダメージが起きない。作者の決定 2026年10月25日） */

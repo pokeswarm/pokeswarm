@@ -132,6 +132,7 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.barrageSeek ? { barrageSeek: true } : {}),
       idleScale: def.idleScale,
       knockbackAlongFacing: def.knockbackAlongFacing,
+      ...(def.epicenter ? { epicenter: true } : {}),
       magnitude: def.magnitude,
       scatterArc: def.scatterArc,
       ...(def.scatterOnEnemies ? { scatterOnEnemies: true } : {}),

@@ -671,15 +671,10 @@
       "line": "treecko",
       "needsMoves": [
         {
-          "move": "swords-dance"
+          "move": "fury-cutter",
+          "level": 8
         }
       ]
-    },
-    {
-      "from": "slash",
-      "item": "x-attack",
-      "to": "swords-dance",
-      "line": "treecko"
     },
     {
       "from": "double-kick",

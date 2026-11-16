@@ -2689,52 +2689,40 @@ function megahornLance(): SpriteOut {
 }
 
 /**
- * リーフブレード（07 の130章。作者の指摘 2026年10月29日: ひっかく・きりさく の絵は使わない）: 抜刀して画面を横一閃に切る白黒の剣筋。
- * 細い白い芯に黒いふち、両端は細くとがる。2コマで白と黒が入れ替わる（明滅）
+ * リーフブレード（07 の278章）: 腕の大きな葉の刃で、前をなぎ払う（右が刃先・左が根元。64 ドット・ふちなし）。
+ * 細長く少し反った葉の刃に、明るい葉脈と、刃（上のふち）を走る白い光。3 コマで光が根元から刃先へ走る。
+ * ひっかく・きりさく の絵は使わない（作者の指摘 2026年10月29日）
  */
-function bladeSlash(): SpriteOut {
-  const palette = ['#000000', '#ffffff', '#9e9e9e'];
-  const H = 8;
-  const mid = (H - 1) / 2;
-  const parts = lineParts(H, { start: 10, middle: 12, end: 10 }, 2, (x, y, f, part) => {
-    const taper = part === 'start' ? x / 10 : part === 'end' ? 1 - x / 10 : 1;
-    const dy = Math.abs(y - mid);
-    if (dy > 0.6 + 2.6 * taper) return -1;
-    const core = dy < 0.4 + 1.2 * taper;
-    return core === (f === 0) ? 1 : 0;
-  }, -1);
-  return { palette, frameMs: 50, parts };
-}
-
-/**
- * リーフブレードの残像: 自分の周りを1周、刃が通り抜けた後の薄い黄緑の筋（輪に沿って並べる）。
- * 長方形のかたまりに見えないよう、1ドットの細い線を何本か引く（作者の指摘 2026年10月29日）。内側ほど長く明るい
- */
-function bladeRing(): SpriteOut {
-  const palette = ['#33691e', '#9ccc65', '#ccff90', '#f1f8e9'];
-  const W = 16;
-  const H = 8;
-  const lanes: [number, number, number][] = [
-    // [高さ, 線の長さの割合, 色]
-    [1, 0.95, 3],
-    [3, 0.7, 2],
-    [5, 0.5, 2],
-    [7, 0.3, 1],
-  ];
-  const frames: Grid[] = [];
-  for (let f = 0; f < 2; f++) {
-    frames.push(
-      fill(blank(W, H), (x, y) => {
-        for (const [k, [lane, len, c]] of lanes.entries()) {
-          // どの細かさでも実際の1マスの太さの線（並べてつながるよう、線の切れ目は周期 W）
-          if (Math.round((y + 0.5) * K - 0.5) !== Math.round((lane + 0.5) * K - 0.5)) continue;
-          if ((x + f * 5 + k * 7) % W < W * len) return c;
-        }
-        return -1;
-      }),
-    );
-  }
-  return { palette, frameMs: 60, parts: { middle: frames.map(toRows) } };
+function leafBladeSwing(): SpriteOut {
+  // 0 濃い緑・1 緑・2 明るい緑・3 黄緑・4 白
+  const palette = ['#1b5e20', '#43a047', '#7cb342', '#ccff90', '#ffffff'];
+  const frames = [0, 1, 2].map((f) =>
+    shape(
+      64,
+      (u, v) => {
+        if (u < -0.92 || u > 0.97) return -1;
+        // 刃は少し上へ反る（刃先ほど上）
+        const t = (u + 0.92) / 1.89;
+        const c = 0.06 - 0.34 * t * t;
+        // 根元は太く、刃先へ向かって鋭く細る
+        const w = 0.19 * Math.pow(Math.max(0, 1 - t), 0.6) * Math.min(1, t * 7) + 0.004;
+        const dv = v - c;
+        if (Math.abs(dv) > w) return -1;
+        const k = dv / w;
+        // 刃（上のふち）を走る光: 根元から刃先へ
+        const glint = Math.abs(t - (0.25 + f * 0.3)) < 0.14;
+        if (k < -0.72) return glint ? 4 : 3;
+        // 葉脈（真ん中の線と、刃先へ向かう斜めの線）
+        if (Math.abs(k) < 0.12) return 3;
+        if (k > 0 && ((t * 9 - k * 1.2) % 1 + 1) % 1 < 0.12) return 2;
+        if (k < 0 && ((t * 9 + k * 1.2) % 1 + 1) % 1 < 0.12) return 2;
+        return k > 0.7 ? 0 : 1;
+      },
+      0,
+      -1,
+    ),
+  );
+  return { palette, frameMs: 60, parts: { main: frames.map(toRows) } };
 }
 
 /** ウェーブタックル: 当たった敵から上がる水しぶき（王冠のように外へ散るしずく。2コマで広がる） */
@@ -7812,8 +7800,7 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'hurricane-eye': () => hurricaneEye(),
     'storm-ripple': () => stormRipple(),
     'rain-drop': () => rainDrop(),
-    'blade-slash': () => bladeSlash(),
-    'blade-ring': () => bladeRing(),
+    'leaf-blade-swing': () => leafBladeSwing(),
     'flame-leg': () => flameLeg(),
     'blaze-kick-wave': () => blazeKickWave(),
     'water-splash': () => waterSplash(),

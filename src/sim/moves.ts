@@ -210,6 +210,8 @@ export interface SimMoveDef {
   readonly idleScale?: { readonly size: number; readonly power: number };
   /** 押し出す向きを技の向きにする */
   readonly knockbackAlongFacing?: boolean;
+  /** nova: 震源（ボス・敵が一番多い所）を中心に広がる（07 の278章） */
+  readonly epicenter?: boolean;
   /** nova: 使うたびに強さを引く（マグニチュード） */
   readonly magnitude?: { readonly min: number; readonly max: number };
   /** scatter: 向いている方向の扇（度）の中に置く（いわなだれ） */

@@ -67,21 +67,15 @@ describe('キモリ', () => {
     expect(t.offersNew('leaf-storm')).toBe(false);
   });
 
-  it('ひっかく → きりさく（シルクのスカーフ）→ つるぎのまい（プラスパワー）。このはが最大でつるぎのまいを覚えていれば リーフブレード（つるぎのまいは残る）', () => {
+  it('このは が最大で れんぞくぎり Lv8 を覚えていれば リーフブレード（れんぞくぎり は残る。07 の278章）', () => {
     const t = setup('treecko');
-    t.learn('slash');
-    t.maxOut('slash');
-    t.p.items.push({ item: t.item('x-attack'), level: 1 });
-    applyOffer(t.sim.world, t.p, t.derives('swords-dance')!);
-    expect(t.p.moves.some((m) => m.move === t.move('swords-dance'))).toBe(true);
-    const before = t.p.mods.physicalPowerPct;
-    t.p.moves.find((m) => m.move === t.move('swords-dance'))!.level = 8;
-    applyOffer(t.sim.world, t.p, { kind: 'heal' });
-    expect(t.p.mods.physicalPowerPct).toBeGreaterThan(before);
-    expect(t.derives('leaf-blade')).toBeUndefined();
+    t.p.species = t.species('sceptile');
     t.maxOut('leafage');
+    t.learn('fury-cutter', 7);
+    expect(t.derives('leaf-blade')).toBeUndefined();
+    t.p.moves.find((m) => m.move === t.move('fury-cutter'))!.level = 8;
     applyOffer(t.sim.world, t.p, t.derives('leaf-blade')!);
-    expect(t.p.moves.map((m) => t.rules.moves[m.move]!.key).sort()).toEqual(['leaf-blade', 'swords-dance']);
+    expect(t.p.moves.map((m) => t.rules.moves[m.move]!.key).sort()).toEqual(['fury-cutter', 'leaf-blade']);
   });
 
   it('リーフブレードは溜めてから出す（溜めている間は出さない）', () => {

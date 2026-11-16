@@ -2341,6 +2341,14 @@
         }
       }
     },
+    "sheer-cold-hoenn": {
+      "extends": "ice.base",
+      "projectile": { "glowScale": 1.1, "coreScale": 0.3 },
+      "impact": { "flash": { "radius": 70 } },
+      "sprite": { "id": "zero-frost", "fit": "circle", "size": 1.6, "rotate": "spin", "spinDegPerSec": -240 },
+      "hitSprite": { "id": "ice-statue", "fit": "circle", "size": 1, "originY": 0.91, "seconds": 0.8, "radius": 28 },
+      "effectSprite": { "id": "ice-shatter", "fit": "circle", "size": 1.15 }
+    },
     "sheer-cold": {
       "extends": "ice.base",
       "projectile": {

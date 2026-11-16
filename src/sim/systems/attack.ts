@@ -1192,10 +1192,13 @@ function enemiesInRange(world: World, x: number, y: number, range: number): numb
 function fireStrike(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const e = world.enemies;
   const pool = enemiesInRange(world, p.x, p.y, st.range);
-  const all = world.rules.moves[pm.move]!.strikeRepeat ? [...pool] : [];
+  const def = world.rules.moves[pm.move]!;
+  const all = def.strikeRepeat ? [...pool] : [];
+  // HP の一番高い敵を先に（ぜったいれいど: 1 つ目はボスへ。残りはランダム。07 の271章）
+  const first = def.aimStrongest ? strongestEnemy(world, p, st.range) : -1;
   for (let k = 0; k < st.count && (pool.length > 0 || all.length > 0); k++) {
     // 敵より多く出す技は、一回りしたら同じ敵にも重ねる
-    const i = pool.length > 0 ? pool.splice(world.rng.int(pool.length), 1)[0]! : all[world.rng.int(all.length)]!;
+    const i = k === 0 && first !== -1 ? pool.splice(pool.indexOf(first), 1)[0]! : pool.length > 0 ? pool.splice(world.rng.int(pool.length), 1)[0]! : all[world.rng.int(all.length)]!;
     world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]! });
   }
 }
@@ -2090,7 +2093,7 @@ export function moveProjectiles(world: World): void {
         world.stats.kills++;
       }
     }
-    if (hitAny) world.events.push({ type: 'projectileHit', x: hitX, y: hitY, owner: ownerId, move: pr.move[i]! });
+    if (hitAny) world.events.push({ type: 'projectileHit', x: hitX, y: hitY, owner: ownerId, move: pr.move[i]!, ...(pr.stage[i] !== 0 ? { fx: true as const } : {}) });
     // hit の効き方は、その当たり判定が初めて敵に当たったときに1回だけ（当たった敵の位置で）
     if (hitAny && pr.stage[i] === 0 && pr.hitFired[i] === 0 && !pr.noFx[i]) {
       pr.hitFired[i] = 1;
@@ -2217,7 +2220,7 @@ export function tickMarks(world: World): void {
       angle: 0, angularSpeed: 0, orbitRadius: 0, life: 0.25, damage: e.markDamage[i]!, radius: e.markSize[i]!, pierce: Infinity,
       hitIntervalTicks: 0, shape: SHAPE_CIRCLE, length: 0, dirX: 0, dirY: 0, growth: 0, stage: 1,
     });
-    world.events.push({ type: 'projectileHit', x: e.x[i]!, y: e.y[i]!, owner: e.markBy[i]!, move: e.markMove[i]! });
+    world.events.push({ type: 'projectileHit', x: e.x[i]!, y: e.y[i]!, owner: e.markBy[i]!, move: e.markMove[i]!, fx: true });
   }
 }
 

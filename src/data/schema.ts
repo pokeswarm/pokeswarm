@@ -1713,6 +1713,8 @@ export const moveDefSchema = z.object({
       throw: z.object({ speed: z.number().positive(), seconds: z.number().positive() }).optional(),
       /** 爆発の代わりに、時間が来たら雑魚がすっと倒れる（ほろびのうた: 聞いた敵が 3 秒後に倒れる。その場ではダメージも押し出しも無く、ボスには効かない。07 の180章） */
       perish: z.boolean().optional(),
+      /** 印が付いている間の敵の色（点滅させず、この色のまま。ぜったいれいど: 凍りつく青白。省略なら黒く点滅。07 の271章） */
+      tint: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
     })
     .optional(),
   /**
@@ -1856,7 +1858,7 @@ export const moveDefSchema = z.object({
   randomAim: z.boolean().optional(),
   /** 再使用を、出した技が消えてから数える（こなゆき・ふぶき: 雪が止んでから cooldown の間はダメージが起きない。作者の決定 2026年10月25日） */
   restAfterEnd: z.boolean().optional(),
-  /** 狙う敵: 一番近い敵ではなく、届く範囲で HP の一番高い敵（ゴッドバード: ボスへ。作者の決定 2026年10月25日）。beam と homing で使う（homing はその敵を追い続ける。せいなるほのお） */
+  /** 狙う敵: 一番近い敵ではなく、届く範囲で HP の一番高い敵（ゴッドバード: ボスへ。作者の決定 2026年10月25日）。beam と homing で使う。strike では 1 つ目をその敵に置く（ぜったいれいど）（homing はその敵を追い続ける。せいなるほのお） */
   aimStrongest: z.boolean().optional(),
   /**
    * nearest: 狙った敵の所で止まる（飛ぶ時間を、狙った敵までの距離 ÷ 速さにする。durationSeconds が上限）。

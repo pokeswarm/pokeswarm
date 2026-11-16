@@ -201,7 +201,7 @@ function explode(world: World, ex: NonNullable<MoveEffect['explode']>, src: FxSo
     ...(ex.pull ? { knockback: -ex.pull } : {}),
     ...(ex.pierce !== undefined ? { pierce: ex.pierce === 'infinite' ? Infinity : ex.pierce } : {}),
   });
-  world.events.push({ type: 'projectileHit', x: src.x, y: src.y, owner: src.owner, move: src.move });
+  world.events.push({ type: 'projectileHit', x: src.x, y: src.y, owner: src.owner, move: src.move, fx: true });
 }
 
 function applyEffect(world: World, fx: MoveEffect, index: number, src: FxSource): void {

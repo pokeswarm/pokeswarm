@@ -2760,6 +2760,69 @@
         }
       ]
     },
+    "sheer-cold-hoenn": {
+      "pattern": "strike",
+      "effect": "sheer-cold-hoenn",
+      "region": "hoenn",
+      "nameOf": "sheer-cold",
+      "aimStrongest": true,
+      "delayedBlast": {
+        "seconds": 0.8,
+        "sizeMultiplier": 3.2,
+        "powerMultiplier": 1.4,
+        "tint": "#b3e5fc"
+      },
+      "base": {
+        "power": 867.1,
+        "cooldownSeconds": 3,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 26,
+        "range": 420,
+        "durationSeconds": 0.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0.8,
+        "statusSeconds": 2,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "statusId": "freeze",
+        "instakillChance": 0.2
+      },
+      "levels": [
+        {
+          "size": 2,
+          "power": 122.1
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 85.5
+        },
+        {
+          "count": 1,
+          "power": -219.3
+        },
+        {
+          "size": 2,
+          "power": 73
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 39.5
+        },
+        {
+          "count": 1,
+          "power": -105.6
+        },
+        {
+          "size": 3,
+          "power": 38.6
+        }
+      ]
+    },
     "aurora-beam": {
       "pattern": "beam",
       "effect": "aurora-beam",

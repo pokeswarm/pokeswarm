@@ -2398,6 +2398,89 @@ function iceStatue(): SpriteOut {
   return { palette, frameMs: 160, loopFrom: 3, parts: { main: [make(0.45, 0), make(1, 1), make(1, 2), make(1, 3)] } };
 }
 
+/**
+ * ぜったいれいど の冷気（狙った敵に置く当たり判定。07 の271章）: 白い冷気の筋が渦を巻きながら真ん中へ集まり、
+ * 小さな雪の結晶がきらめく。3 コマで筋が内へ縮む（このあと敵が氷の柱に閉じ込められる）
+ */
+function zeroFrost(): SpriteOut {
+  const palette = ['#5b8fbf', '#b3e5fc', '#e1f5fe', '#ffffff'];
+  const frames = [0, 1, 2].map((f) => {
+    const p = f / 2;
+    return shape(
+      32,
+      (u, v) => {
+        const d = Math.hypot(u, v);
+        const a = Math.atan2(v, u);
+        // 真ん中の白い点（集まるほど明るい）
+        if (d < 0.08 + 0.08 * p) return 3;
+        // 内へ巻く筋 5 本: 外ほど角度が遅れる渦。半径は集まるほど小さい
+        const outer = 0.95 - 0.35 * p;
+        if (d > 0.18 && d < outer) {
+          for (let k = 0; k < 5; k++) {
+            const arm = (k / 5) * Math.PI * 2 + d * 3.2 - p * 1.4;
+            const da = Math.atan2(Math.sin(a - arm), Math.cos(a - arm));
+            const w = 0.1 * (1 - d / outer) + 0.03;
+            if (Math.abs(da) * d < w) return d < outer * 0.5 ? 2 : 1;
+          }
+        }
+        // 雪の結晶（十字のきらめき）が 4 つ、内へ寄る
+        for (let k = 0; k < 4; k++) {
+          const ka = (k / 4) * Math.PI * 2 + 0.6;
+          const kd = 0.78 - 0.3 * p;
+          const dx = u - Math.cos(ka) * kd;
+          const dy = v - Math.sin(ka) * kd;
+          if ((Math.abs(dx) < 0.03 && Math.abs(dy) < 0.1) || (Math.abs(dy) < 0.03 && Math.abs(dx) < 0.1)) return 3;
+        }
+        return -1;
+      },
+      0,
+      -1,
+    );
+  });
+  return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * ぜったいれいど の砕ける氷の柱（印の敵が弾ける所。07 の271章）: 真ん中の柱の根元が崩れ、角ばった氷の塊が外へ飛び散り、
+ * 足元に霜の輪が広がる。3 コマ
+ */
+function iceShatter(): SpriteOut {
+  // 0 ふち・1 濃い水色・2 水色・3 うすい水色・4 白
+  const palette = ['#0d3550', '#4fc3f7', '#81d4fa', '#e1f5fe', '#ffffff'];
+  const r = rng(271);
+  const chunks = Array.from({ length: 9 }, (_, k) => ({
+    a: (k / 9) * Math.PI * 2 + (r() - 0.5) * 0.4,
+    speed: 0.75 + r() * 0.3,
+    size: 0.11 + r() * 0.06,
+    tilt: (r() - 0.5) * 1.2,
+  }));
+  const frames = [0, 1, 2].map((f) => {
+    const p = (f + 1) / 3;
+    return shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      // 足元の霜の輪（外へ広がり、細くなる）
+      const ring = 0.35 + 0.55 * p;
+      if (Math.abs(d - ring) < 0.05 * (1 - p) + 0.015) return 3;
+      // 角ばった塊: 外向きに長いひし形が、回りながら飛ぶ
+      for (const c of chunks) {
+        const dist = 0.12 + c.speed * 0.7 * p;
+        const cx = Math.cos(c.a) * dist;
+        const cy = Math.sin(c.a) * dist;
+        const ang = c.a + c.tilt * p;
+        const lx = (u - cx) * Math.cos(ang) + (v - cy) * Math.sin(ang);
+        const ly = -(u - cx) * Math.sin(ang) + (v - cy) * Math.cos(ang);
+        const sz = c.size * (1 - p * 0.35);
+        const k = Math.abs(lx) / (sz * 1.4) + Math.abs(ly) / (sz * 0.75);
+        if (k < 1) return k < 0.4 ? 4 : ly < 0 ? 3 : lx > 0 ? 2 : 1;
+      }
+      // 真ん中に舞う細かい氷の粒（外へ散って減る）
+      if (d < 0.3 + 0.3 * p && hash(Math.floor((u + 1) * 16), Math.floor((v + 1) * 16), 271 + f) < 0.12 * (1 - p)) return 4;
+      return -1;
+    });
+  });
+  return { palette, frameMs: 80, loopFrom: 2, parts: { main: frames.map(toRows) } };
+}
+
 /** フリーズドライ: 細長い氷の結晶の針（右へ進む）。真ん中に小さな枝が2本ずつ出る（雪の結晶の腕のように） */
 function iceNeedle(): SpriteOut {
   const palette = ['#0d3550', '#4fc3f7', '#b3e5fc', '#ffffff'];
@@ -7070,6 +7153,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'crack-line': () => crackLine(),
     'crack-head': () => crackHead(),
     'ice-statue': () => iceStatue(),
+    'zero-frost': () => zeroFrost(),
+    'ice-shatter': () => iceShatter(),
     'ice-needle': () => iceNeedle(),
     horn: () => horn(),
     // つつく: つのでつく と同じ形の、黄色いくちばし（07 の116章）

@@ -19,6 +19,8 @@ export interface ProjectileHitEvent {
   readonly owner: PlayerId;
   /** 技の番号（命中の演出のレシピを引く） */
   readonly move: number;
+  /** 本体ではなく、効き方・遅れた爆発の当たり（当たった所の絵 hitSprite を出さない。ぜったいれいど の像が砕けた後にまた出ないように。07 の271章） */
+  readonly fx?: true;
 }
 
 /** ホスト: 敵を出した（ゲストへ送る）。vx・vy はまっすぐ進む敵（スウォームの突進）の速度 */

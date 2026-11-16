@@ -1332,7 +1332,7 @@ export class RunScene extends Phaser.Scene {
       } else if (ev.type === 'projectileHit') {
         // 当たった所の絵（ぜったいれいど: 氷の像）
         const hs = this.effects.hitSprite(w.rules.moves[ev.move]!.effect);
-        if (hs) this.addStrike(hs, ev.x, ev.y, hs.radius, hs.seconds);
+        if (hs && !ev.fx) this.addStrike(hs, ev.x, ev.y, hs.radius, hs.seconds);
       } else if (ev.type === 'playerLeft') {
         this.playerViews.get(ev.playerId)?.container.destroy();
         this.playerViews.delete(ev.playerId);
@@ -2889,6 +2889,8 @@ export class RunScene extends Phaser.Scene {
       const v = Math.round(0x50 + (0xff - 0x50) * Math.min(1, (e.markTicks[i]! * this.sim.world.dt) / mark.seconds));
       return (v << 16) | (v << 8) | v;
     }
+    // ぜったいれいど: 凍りつく色のまま（点滅させない）
+    if (mark?.tint) return hexColor(mark.tint);
     if (e.markTicks[i]! > 0 && !mark?.throw) {
       const period = e.markTicks[i]! > 20 ? 8 : 4;
       if (Math.floor(e.markTicks[i]! / period) % 2 === 0) return 0x111111;

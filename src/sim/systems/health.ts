@@ -196,10 +196,16 @@ export function regenerate(world: World): void {
   const zones = world.healZones;
   for (let k = zones.length - 1; k >= 0; k--) {
     const z = zones[k]!;
+    // 自分に付いて動く膜（しんぴのまもり）
+    const owner = z.follow !== undefined ? world.players.find((q) => q.id === z.follow) : undefined;
+    if (owner) {
+      z.x = owner.x;
+      z.y = owner.y;
+    }
     for (const p of world.players) {
       const dx = p.x - z.x;
       const dy = p.y - z.y;
-      if (dx * dx + dy * dy <= z.radius * z.radius) healPlayer(world, p.id, (p.maxHp * z.pct * world.dt) / 100);
+      if (z.pct > 0 && dx * dx + dy * dy <= z.radius * z.radius) healPlayer(world, p.id, (p.maxHp * z.pct * world.dt) / 100);
     }
     if (--z.ticks <= 0) zones.splice(k, 1);
   }

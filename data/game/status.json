@@ -145,6 +145,17 @@
         "shake": 2
       },
       "color": "#90caf9"
+    },
+    {
+      "id": "encored",
+      "damagePerSecond": 0,
+      "speedMultiplier": 1.5,
+      "damageTakenMultiplier": 1,
+      "drawnToAttacker": true,
+      "body": {
+        "hop": 2
+      },
+      "color": "#f48fb1"
     }
   ]
 }

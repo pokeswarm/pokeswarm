@@ -859,6 +859,7 @@
   "status.leech": "seeded",
   "status.soaked": "soaked",
   "status.attackDown": "Attack down",
+  "status.encored": "Encored",
   "status.lifted": "lifted",
   "status.scared": "scared",
   "status.quaked": "shaken",

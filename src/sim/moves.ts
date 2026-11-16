@@ -149,6 +149,10 @@ export interface SimMoveDef {
   readonly aimStrongest?: boolean;
   /** nearest: 狙った敵の所で止まる（ラスターカノン） */
   readonly landAtTarget?: boolean;
+  readonly attachToTarget?: boolean;
+  readonly hurtAtLink?: boolean;
+  readonly hurtByHpPct?: boolean;
+  readonly statusGuard?: boolean;
   /** 雑魚は貫通し、ボス・中ボスに当たったら消える（ラスターカノン） */
   readonly stopOnBoss?: boolean;
   /** HP が最大の thresholdPct % 以下の敵へのダメージを +powerPct %（しおみず。07 の247章） */

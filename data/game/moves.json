@@ -11114,7 +11114,7 @@
       "pattern": "aura",
       "effect": "magic-coat",
       "base": {
-        "power": 78.2,
+        "power": 4.5,
         "cooldownSeconds": 3,
         "count": 1,
         "intervalSeconds": 0.1,
@@ -11133,31 +11133,31 @@
       },
       "levels": [
         {
-          "power": 13.1
+          "power": 2
         },
         {
           "size": 6,
-          "power": 6.5
+          "power": 1.4
         },
         {
           "cooldownSeconds": -0.08,
-          "power": 9.3
+          "power": 1.5
         },
         {
           "durationSeconds": 0.5,
-          "power": -2.9
+          "power": 0.4
         },
         {
           "size": 6,
-          "power": 3.4
+          "power": 0.9
         },
         {
           "cooldownSeconds": -0.08,
-          "power": 6.6
+          "power": 1.1
         },
         {
           "durationSeconds": 0.5,
-          "power": -15.2
+          "power": -1.2
         }
       ],
       "region": "hoenn",
@@ -11170,6 +11170,184 @@
             "sweep": 0.3,
             "durationSeconds": 0.45
           }
+        }
+      ]
+    },
+    "encore": {
+      "pattern": "melee",
+      "effect": "encore",
+      "region": "hoenn",
+      "base": {
+        "power": 22.8,
+        "cooldownSeconds": 4,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "speed": 0,
+        "size": 110,
+        "range": 20,
+        "durationSeconds": 0.3,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusId": "encored",
+        "statusChance": 1,
+        "statusSeconds": 3,
+        "arcDegrees": 70
+      },
+      "levels": [
+        {
+          "statusSeconds": 0.5,
+          "power": 9.8
+        },
+        {
+          "size": 10,
+          "power": 7.7
+        },
+        {
+          "cooldownSeconds": -0.3,
+          "power": 5.6
+        },
+        {
+          "arcDegrees": 15,
+          "power": 4.9
+        },
+        {
+          "statusSeconds": 0.5,
+          "power": 8
+        },
+        {
+          "size": 10,
+          "power": 4.6
+        },
+        {
+          "cooldownSeconds": -0.4
+        }
+      ]
+    },
+    "safeguard": {
+      "pattern": "heal",
+      "effect": "safeguard",
+      "region": "hoenn",
+      "healZone": true,
+      "statusGuard": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "speed": 0,
+        "count": 1,
+        "power": 0,
+        "cooldownSeconds": 7,
+        "size": 80,
+        "range": 0,
+        "durationSeconds": 5,
+        "healPct": 0
+      },
+      "levels": [
+        {
+          "size": 8
+        },
+        {
+          "durationSeconds": 0.5
+        },
+        {
+          "cooldownSeconds": -0.4
+        },
+        {
+          "size": 8
+        },
+        {
+          "durationSeconds": 0.5
+        },
+        {
+          "cooldownSeconds": -0.4
+        },
+        {
+          "size": 12
+        }
+      ]
+    },
+    "destiny-bond": {
+      "pattern": "strike",
+      "effect": "destiny-bond",
+      "region": "hoenn",
+      "aimStrongest": true,
+      "attachToTarget": true,
+      "hurtAtLink": true,
+      "hurtByHpPct": true,
+      "effects": [
+        {
+          "trigger": "hurt",
+          "explode": {
+            "sizeMultiplier": 2.5,
+            "powerMultiplier": 1,
+            "durationSeconds": 0.3
+          }
+        },
+        {
+          "trigger": "end",
+          "explode": {
+            "sizeMultiplier": 3,
+            "powerMultiplier": 3,
+            "durationSeconds": 0.3
+          }
+        }
+      ],
+      "base": {
+        "power": 263.7,
+        "cooldownSeconds": 4.5,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "speed": 0,
+        "size": 30,
+        "range": 450,
+        "durationSeconds": 4,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.5,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0
+      },
+      "levels": [
+        {
+          "size": 2,
+          "power": 36.8
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": 27.9
+        },
+        {
+          "durationSeconds": 0.5,
+          "power": 0.2
+        },
+        {
+          "count": 1,
+          "power": -70.4
+        },
+        {
+          "size": 2,
+          "power": 19.1
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": 11.2
+        },
+        {
+          "count": 1,
+          "power": -33.3
         }
       ]
     },

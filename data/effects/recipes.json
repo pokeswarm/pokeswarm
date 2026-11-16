@@ -2341,6 +2341,24 @@
         }
       }
     },
+    "encore": {
+      "extends": "normal.base",
+      "hideShape": true,
+      "impact": { "flash": { "color": "#f8bbd0", "radius": 30, "durationMs": 120, "alpha": 0.5 } },
+      "sprite": { "id": "encore-clap", "fit": "cone", "size": 1 }
+    },
+    "safeguard": {
+      "extends": "normal.base",
+      "sprite": { "id": "safeguard-veil", "fit": "circle", "size": 1, "alpha": 0.75 }
+    },
+    "destiny-bond": {
+      "extends": "ghost.base",
+      "hideShape": true,
+      "impact": { "flash": { "color": "#7e57c2", "radius": 40, "durationMs": 160, "alpha": 0.5 } },
+      "sprite": { "id": "destiny-mark", "fit": "circle", "size": 1.5 },
+      "effectSprite": { "id": "destiny-burst", "fit": "circle", "size": 1.1 },
+      "tether": { "color": "#9575cd", "alpha": 0.9, "width": 5 }
+    },
     "sheer-cold-hoenn": {
       "extends": "ice.base",
       "projectile": { "glowScale": 1.1, "coreScale": 0.3 },

@@ -236,7 +236,8 @@ export interface World {
   /** ホスト: 復活させた直後のプレイヤー（本人からの「倒れている」がまだ届くので、しばらく無視する。残りの更新回数） */
   readonly reviveGrace: Map<PlayerId, number>;
   /** 回復の円（つきのひかり）。どのブラウザでも出した人の技から作り、中にいる自分のプレイヤーを自分のブラウザで回復する */
-  readonly healZones: { x: number; y: number; radius: number; ticks: number; pct: number }[];
+  /** 回復の円（つきのひかり）と、状態異常を防ぐ膜（しんぴのまもり: guard。follow のプレイヤーに付いて動く。07 の272章） */
+  readonly healZones: { x: number; y: number; radius: number; ticks: number; pct: number; guard?: boolean; follow?: number }[];
   /** ランの結果。決まったらシミュレーションは進まない */
   outcome: RunOutcome | null;
   /** 今の区間（waves の番号）と、始まった更新回数。中ボス（gate）を倒すと次へ進む（ソロ・ホストが決める） */

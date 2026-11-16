@@ -14,6 +14,7 @@ import {
   MOTION_ORBIT,
   MOTION_PULSE,
   MOTION_SNAKE,
+  MOTION_ATTACH,
   SHAPE_CIRCLE,
   SHAPE_LINE,
   SHAPE_BOX,
@@ -356,12 +357,16 @@ export function useMoves(world: World): void {
           continue;
         }
         if (!def?.effects.some((fx) => fx.trigger === 'hurt')) continue;
-        let active = false;
-        for (let i = 0; i < pr0.count && !active; i++) active = pr0.owner[i] === p.id && pr0.move[i] === pm.move && pr0.stage[i] === 0;
-        if (!active) continue;
+        let active = -1;
+        for (let i = 0; i < pr0.count && active === -1; i++) if (pr0.owner[i] === p.id && pr0.move[i] === pm.move && pr0.stage[i] === 0) active = i;
+        if (active === -1) continue;
         const [fx, fy] = axisToUnit(p.facingX, p.facingY);
         const sc = scaledMoveStats(world, p, pm, playerMoveStats(world, p, pm));
-        fireEffects(world, 'hurt', { owner: p.id, move: pm.move, level: pm.level, damage: taken, size: sc.size, x: p.x, y: p.y, dirX: fx, dirY: fy, length: 0 });
+        // みちづれ: 自分の所ではなく、結んだ敵（貼り付いた当たり判定）の所で返す（07 の272章）
+        const at = def.hurtAtLink ? { x: pr0.x[active]!, y: pr0.y[active]! } : { x: p.x, y: p.y };
+        // みちづれ: 受けた量そのものではなく、受けた割合（最大 HP の %）× 技の威力で返す（HP の桁に左右されない。07 の272章）
+        const amount = def.hurtByHpPct ? (taken / Math.max(1, p.maxHp)) * 100 * sc.power : taken;
+        fireEffects(world, 'hurt', { owner: p.id, move: pm.move, level: pm.level, damage: amount, size: sc.size, x: at.x, y: at.y, dirX: fx, dirY: fy, length: 0 });
       }
     }
     // 倒れている間・凍っている間（伝説戦のぜったいれいど）は技を使わない
@@ -1199,7 +1204,8 @@ function fireStrike(world: World, p: Player, pm: PlayerMove, st: MoveStats): voi
   for (let k = 0; k < st.count && (pool.length > 0 || all.length > 0); k++) {
     // 敵より多く出す技は、一回りしたら同じ敵にも重ねる
     const i = k === 0 && first !== -1 ? pool.splice(pool.indexOf(first), 1)[0]! : pool.length > 0 ? pool.splice(world.rng.int(pool.length), 1)[0]! : all[world.rng.int(all.length)]!;
-    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]! });
+    // 敵に貼り付く（みちづれ）: その敵の上に乗って動く
+    world.projectiles.add({ ...base(world, p, pm, st), motion: def.attachToTarget ? MOTION_ATTACH : MOTION_LINEAR, x: e.x[i]!, y: e.y[i]!, ...(def.attachToTarget ? { target: e.id[i]! } : {}) });
   }
 }
 
@@ -1587,7 +1593,9 @@ function fireSpin(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
  */
 function fireHeal(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   // 回復の円（つきのひかり）: 出ている間、中のプレイヤーを毎秒回復する（health.ts の regenerate）
-  if (world.rules.moves[pm.move]!.healZone) world.healZones.push({ x: p.x, y: p.y, radius: st.size, ticks: Math.round(st.durationSeconds / world.dt), pct: st.healPct });
+  const zoneDef = world.rules.moves[pm.move]!;
+  // しんぴのまもり: 自分に付いて動く膜。中のプレイヤー（仲間も）は状態異常にならない（stage.ts の hitLocal）
+  if (zoneDef.healZone) world.healZones.push({ x: p.x, y: p.y, radius: st.size, ticks: Math.round(st.durationSeconds / world.dt), pct: st.healPct, ...(zoneDef.statusGuard ? { guard: true, follow: p.id } : {}) });
   else healPlayer(world, p.id, (p.maxHp * st.healPct) / 100);
   // いやしのねがい: 味方を回復する（HP は本人のブラウザで管理するので、どのブラウザでも自分のプレイヤーだけを回復する）
   const ally = world.rules.moves[pm.move]!.allyHealPct;
@@ -1893,6 +1901,14 @@ export function moveProjectiles(world: World): void {
       pr.y[i] = owner.y + Math.sin(pr.angle[i]!) * pr.orbitRadius[i]!;
     } else if (motion === MOTION_STREAM) {
       stepStream(world, i, owner);
+    } else if (motion === MOTION_ATTACH) {
+      // 結んだ敵に貼り付く（みちづれ）。その敵が倒れた・いなくなったら、次で終わる（end の効き方はその場で）
+      const t = pr.target[i]! > 0 ? findEnemyIndex(world, pr.target[i]! - 1) : -1;
+      if (t === -1 || e.hp[t]! <= 0) pr.life[i] = Math.min(pr.life[i]!, world.dt);
+      else {
+        pr.x[i] = e.x[t]!;
+        pr.y[i] = e.y[t]!;
+      }
     } else if (motion === MOTION_PULSE) {
       pr.x[i] = owner.x;
       pr.y[i] = owner.y;

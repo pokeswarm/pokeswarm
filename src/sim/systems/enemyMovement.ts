@@ -22,6 +22,7 @@ export function moveEnemies(world: World): void {
   const alive = players.filter((p) => !p.down);
   const chase = alive.length > 0 ? alive : players;
   const flee = world.statusKinds.findIndex((k) => k.flees);
+  const drawn = world.statusKinds.findIndex((k) => k.drawnToAttacker);
   for (let i = 0; i < e.count; i++) {
     e.prevX[i] = e.x[i]!;
     e.prevY[i] = e.y[i]!;
@@ -65,7 +66,12 @@ export function moveEnemies(world: World): void {
     let best = Infinity;
     // 伝説は、ホストが決めた人を追う（直近に一番ダメージを与えた人。07 の125章）
     const marked = world.legendTargets.size > 0 ? legendTargetOf(world, e.id[i]!) : null;
-    if (marked) {
+    // アンコールに呼ばれた敵は、呼んだプレイヤーを追う（伝説の狙いより先。07 の272章）
+    const caller = drawn >= 0 && e.hasStatus(i, drawn) ? alive.find((p) => p.id === e.statusBy[i * e.statusCount + drawn]) : undefined;
+    if (caller) {
+      target = caller;
+      best = (caller.x - x) ** 2 + (caller.y - y) ** 2;
+    } else if (marked) {
       target = marked;
       best = (marked.x - x) ** 2 + (marked.y - y) ** 2;
     } else {

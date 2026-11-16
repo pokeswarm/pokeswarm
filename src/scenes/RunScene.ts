@@ -155,6 +155,8 @@ export class RunScene extends Phaser.Scene {
   /** ボスの技の落雷（プレイヤーの かみなり の稲妻を、落ちた所に。07 の167章）: 場所と消える時刻 */
   private hazardBolts: { x: number; y: number; until: number; b: NonNullable<EffectRecipe['bolt']> }[] = [];
   private boltView: Phaser.GameObjects.Graphics | null = null;
+  /** 使ったポケモンと技の当たり判定をつなぐ糸（みちづれ。07 の272章） */
+  private tetherView: Phaser.GameObjects.Graphics | null = null;
   /** 空から塊が落ちてくる技（つららおとし）と、その絵・落ちている塊の通し番号・塊の影 */
   private fallMoves = new Map<number, NonNullable<EffectRecipe['fall']>>();
   private fallSprites: MoveSprites | null = null;
@@ -374,6 +376,7 @@ export class RunScene extends Phaser.Scene {
     this.glyphMarks = new Map();
     this.godText = null;
     this.boltView = null;
+    this.tetherView = null;
     this.flashedSerials = new Set();
     this.inbox = [];
     this.uiCommands = [];
@@ -2851,6 +2854,45 @@ export class RunScene extends Phaser.Scene {
   }
 
   /** 状態異常の色（data/game/status.json の並びで先にあるものを優先）。かかっていなければ null */
+  /** 使ったポケモンと、その技の当たり判定（本体）を、ゆらめく糸でつなぐ（みちづれ: 結んだ敵まで影の糸。07 の272章） */
+  private drawTethers(alpha: number, timeMs: number): void {
+    const world = this.sim.world;
+    const pr = world.projectiles;
+    if (!this.tetherView) this.tetherView = this.add.graphics().setDepth(spriteRender.depths.effects - 0.1);
+    const g = this.tetherView;
+    g.clear();
+    for (let i = 0; i < pr.count; i++) {
+      if (pr.stage[i] !== 0) continue;
+      const tether = effectRecipes[world.rules.moves[pr.move[i]!]!.effect]?.tether;
+      if (!tether) continue;
+      const owner = world.players.find((q) => q.id === pr.owner[i]);
+      if (!owner) continue;
+      const from = { x: owner.prevX + (owner.x - owner.prevX) * alpha, y: owner.prevY + (owner.y - owner.prevY) * alpha };
+      const tx = pr.prevX[i]! + (pr.x[i]! - pr.prevX[i]!) * alpha;
+      const ty = pr.prevY[i]! + (pr.y[i]! - pr.prevY[i]!) * alpha;
+      const dx = tx - from.x;
+      const dy = ty - from.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len;
+      const ny = dx / len;
+      // 両端は止め、真ん中ほど横にゆらめく（2 本を少しずらして重ね、影の糸に見せる）
+      for (let k = 0; k < 2; k++) {
+        g.lineStyle(tether.width * (k === 0 ? 1 : 0.5), hexColor(tether.color), tether.alpha * (k === 0 ? 0.55 : 1));
+        g.beginPath();
+        const n = Math.max(6, Math.ceil(len / 24));
+        for (let s = 0; s <= n; s++) {
+          const t = s / n;
+          const wave = Math.sin(t * Math.PI * 3 + timeMs * 0.006 + k * 1.7) * 4 * Math.sin(Math.PI * t);
+          const px = from.x + dx * t + nx * wave;
+          const py = from.y + dy * t + ny * wave;
+          if (s === 0) g.moveTo(px, py);
+          else g.lineTo(px, py);
+        }
+        g.strokePath();
+      }
+    }
+  }
+
   private statusTint(i: number): number | null {
     const e = this.sim.world.enemies;
     // スイクンの登場: 雑魚が凍りつく
@@ -3093,6 +3135,7 @@ export class RunScene extends Phaser.Scene {
       (i) => pr.stage[i] === 0,
       (i) => pr.linger[i] === 1,
     );
+    this.drawTethers(alpha, timeMs);
     // 技が落ちた後に残る範囲（効き方の puddle・ボスの技が残す床）から、控えめな粒を出す（作者の案 2026年10月24日）
     const lingerItems: Parameters<EffectRenderer['drawLinger']>[0][number][] = [];
     for (let i = 0; i < pr.count; i++) {

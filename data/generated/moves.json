@@ -584,6 +584,19 @@
     "contestType": "cute",
     "damageClass": "status"
   },
+  "destiny-bond": {
+    "names": {
+      "ja": "みちづれ",
+      "en": "Destiny Bond",
+      "fr": "Lien du Destin",
+      "de": "Abgangsbund",
+      "es": "Mismo Destino",
+      "it": "Destinobbligato"
+    },
+    "type": "ghost",
+    "contestType": "smart",
+    "damageClass": "status"
+  },
   "dig": {
     "names": {
       "ja": "あなをほる",
@@ -921,6 +934,19 @@
     "type": "fire",
     "contestType": "beauty",
     "damageClass": "special"
+  },
+  "encore": {
+    "names": {
+      "ja": "アンコール",
+      "en": "Encore",
+      "fr": "Encore",
+      "de": "Zugabe",
+      "es": "Otra Vez",
+      "it": "Ripeti"
+    },
+    "type": "normal",
+    "contestType": "cute",
+    "damageClass": "status"
   },
   "eruption": {
     "names": {
@@ -2546,6 +2572,19 @@
     "type": "fire",
     "contestType": "beauty",
     "damageClass": "physical"
+  },
+  "safeguard": {
+    "names": {
+      "ja": "しんぴのまもり",
+      "en": "Safeguard",
+      "fr": "Rune Protect",
+      "de": "Bodyguard",
+      "es": "Velo Sagrado",
+      "it": "Salvaguardia"
+    },
+    "type": "normal",
+    "contestType": "beauty",
+    "damageClass": "status"
   },
   "sand-tomb": {
     "names": {

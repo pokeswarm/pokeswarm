@@ -1865,6 +1865,14 @@ export const moveDefSchema = z.object({
    * 止まった所で end の効き方が起こる（ラスターカノン: 光の玉が着いた所で弾ける。07 の238章）
    */
   landAtTarget: z.boolean().optional(),
+  /** strike: 置いた当たり判定が、その敵に貼り付いて一緒に動く（その敵が倒れたら終わる。みちづれ: 結んだ敵。07 の272章） */
+  attachToTarget: z.boolean().optional(),
+  /** hurt の効き方を、自分の所ではなく、この技の当たり判定（貼り付いた敵）の所で起こす（みちづれ: 受けたダメージを結んだ敵へ返す。07 の272章） */
+  hurtAtLink: z.boolean().optional(),
+  /** hurt の効き方に渡す量を、受けたダメージではなく「受けた割合（最大 HP の %）× この技の威力」にする（みちづれ。HP とボスの HP の桁が違うため。07 の272章） */
+  hurtByHpPct: z.boolean().optional(),
+  /** heal の healZone: 円を自分に付いて動く膜にし、中のプレイヤー（仲間も）を状態異常から守る（しんぴのまもり。07 の272章） */
+  statusGuard: z.boolean().optional(),
   /** 雑魚は貫通し、ボス・中ボス（rank が normal でない敵）に当たったら消える（そこで end の効き方。ラスターカノン。07 の238章） */
   stopOnBoss: z.boolean().optional(),
   /** HP が最大の thresholdPct % 以下の敵へのダメージを +powerPct %（しおみず: 半分を切った相手に倍。原作どおり。07 の247章） */
@@ -2423,6 +2431,8 @@ export const effectRecipeSchema = z.object({
   buffSprite: moveSpriteSpec
     .extend({ seconds: z.number().positive(), radius: z.number().positive(), intervalSeconds: z.number().positive(), distance: z.number().nonnegative() })
     .optional(),
+  /** 使ったポケモンと、この技の当たり判定（本体）をつなぐ糸（みちづれ: 結んだ敵まで影の糸がゆらめく。width はワールドの単位。07 の272章） */
+  tether: z.object({ color: colorString, alpha: z.number().min(0).max(1).default(0.8), width: z.number().positive().default(3) }).optional(),
   /** 技を使ってから seconds 後に、使ったポケモンの向きの distance 先で当たった光（impact）を出す（ねこだまし: 正面で両手を合わせるパチン。07 の141章） */
   clap: z.object({ seconds: z.number().nonnegative(), distance: z.number().nonnegative() }).optional(),
   /** 技が敵に当たった所に seconds の間出す絵（ぜったいれいど: 氷の像）。radius はワールドの単位 */
@@ -2606,6 +2616,8 @@ export const statusKindSchema = z.object({
   contactDamageMultiplier: z.number().positive().default(1),
   /** おびえて逃げる（バークアウト）: 雑魚はプレイヤーから離れる向きへ動く。ボスは逃げない（ほかの効果だけ効く。07 の177章） */
   flees: z.boolean().default(false),
+  /** 付けたプレイヤーを狙って寄ってくる（アンコール: 手拍子に呼ばれた敵は、その人を追う。ボス・伝説も。協力プレイでは仲間から離れる。07 の272章） */
+  drawnToAttacker: z.boolean().default(false),
   /** ボスには付かない（持ち上げる・つぶす など。07 の177章） */
   notOnBoss: z.boolean().default(false),
   /**

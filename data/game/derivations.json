@@ -1154,20 +1154,14 @@
     },
     {
       "from": "mirror-coat",
-      "item": "twisted-spoon",
-      "to": "reflect",
-      "line": "wynaut"
-    },
-    {
-      "from": "reflect",
-      "to": "magic-coat",
+      "to": "destiny-bond",
       "line": "wynaut",
       "forms": [
         "wobbuffet"
       ],
       "needsMoves": [
         {
-          "move": "revenge",
+          "move": "counter",
           "level": 8
         }
       ],

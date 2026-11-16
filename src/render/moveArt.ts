@@ -2481,6 +2481,144 @@ function iceShatter(): SpriteOut {
   return { palette, frameMs: 80, loopFrom: 2, parts: { main: frames.map(toRows) } };
 }
 
+/**
+ * アンコール: 前の扇（右が前・根元が左）に、手拍子の音の波（桃色と黄色の弧）が外へ広がり、音符が 3 つ跳ねる。
+ * 4 コマで弧が外へ進む（07 の272章）
+ */
+function encoreClap(): SpriteOut {
+  const W = 32;
+  const H = 36;
+  const mid = (H - 1) / 2;
+  // 0 濃い桃・1 桃・2 うすい桃・3 黄・4 白
+  const palette = ['#ad1457', '#f06292', '#f8bbd0', '#ffe082', '#ffffff'];
+  const notes = [
+    { t: 0.35, s: -0.45 },
+    { t: 0.6, s: 0.4 },
+    { t: 0.82, s: -0.1 },
+  ];
+  const frames = [0, 1, 2, 3].map((f) =>
+    fill(blank(W, H), (x, y) => {
+      const dx = x;
+      const dy = (y - mid) * (W / H);
+      const d = Math.hypot(dx, dy);
+      // 音の波: 根元から 3 本の弧が外へ（コマで進む）。外ほど細い
+      for (let k = 0; k < 3; k++) {
+        const r = ((k / 3 + f / 12) % 1) * (W - 2) + 3;
+        if (Math.abs(d - r) < 1.1 - r / 60) return k === 1 ? 3 : r < 12 ? 2 : 1;
+      }
+      // 音符（玉と棒と旗）: 外へ進みながら上下に跳ねる
+      for (const n of notes) {
+        const t = (n.t + f * 0.06) % 1;
+        const nx = 4 + t * (W - 9);
+        const ny = mid + n.s * (H / 2) * (0.3 + 0.7 * t) + Math.sin((f + t * 4) * 1.6) * 1.2;
+        if (Math.hypot((x - nx) * 0.9, y - ny) < 1.7) return 0;
+        if (x >= nx + 1 && x < nx + 2 && y > ny - 5 && y <= ny) return 0;
+        if (x >= nx + 2 && x < nx + 4 && y > ny - 5 && y < ny - 3.5) return 1;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 80, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * しんぴのまもり: 自分を包む膜（上から見た円）。うすい青緑の六角の網目がゆっくり回り、ふちが明るく光る。
+ * 小さな光の粒が 3 つふちを回る（07 の272章）
+ */
+function safeguardVeil(): SpriteOut {
+  // 0 濃い青緑・1 青緑・2 うすい青緑・3 白
+  const palette = ['#26a69a', '#80cbc4', '#e0f2f1', '#ffffff'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(
+      32,
+      (u, v) => {
+        const d = Math.hypot(u, v);
+        if (d > 0.97) return -1;
+        // ふち（明るい輪）
+        if (d > 0.88) return 1;
+        if (d > 0.84) return 2;
+        // 回る光の粒
+        for (let k = 0; k < 3; k++) {
+          const a = (k / 3) * Math.PI * 2 + f * 0.4;
+          if (Math.hypot(u - Math.cos(a) * 0.86, v - Math.sin(a) * 0.86) < 0.07) return 3;
+        }
+        // 膜の上を斜めに走る光の帯（コマで左上から右下へ動く）
+        const band = u + v - (-1.1 + f * 0.55);
+        if (Math.abs(band) < 0.1) return 2;
+        if (Math.abs(band - 0.22) < 0.04) return 2;
+        // 内側の十字のきらめき 2 つ
+        for (const [sx, sy, ph] of [[-0.35, -0.3, 0], [0.32, 0.38, 2]] as const) {
+          const s = 0.06 + 0.1 * Math.abs(Math.sin((f + ph) * 0.8));
+          if ((Math.abs(u - sx) < 0.03 && Math.abs(v - sy) < s) || (Math.abs(v - sy) < 0.03 && Math.abs(u - sx) < s)) return 3;
+        }
+        return -1;
+      },
+      0,
+      -1,
+    ),
+  );
+  return { palette, frameMs: 140, parts: { main: frames.map(toRows) } };
+}
+
+/**
+ * みちづれ: 結んだ敵に巻き付く影（上から見た輪）。紫の影の帯が 2 本、敵のまわりをねじれながら回り、
+ * 帯の切れ目から小さな影の手が伸びる（07 の272章）
+ */
+function destinyMark(): SpriteOut {
+  // 0 ふち・1 濃い紫・2 紫・3 うすい紫
+  const palette = ['#120a1f', '#311b5c', '#7e57c2', '#d1c4e9'];
+  const frames = [0, 1, 2, 3].map((f) =>
+    shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // ねじれた 2 本の帯（角度でふくらみが回る）
+      for (let k = 0; k < 2; k++) {
+        const ph = a * 2 + k * Math.PI + f * 0.8;
+        const r = 0.7 + Math.sin(ph) * 0.12;
+        const w = 0.07 + Math.max(0, Math.cos(ph)) * 0.05;
+        if (Math.abs(d - r) < w) return Math.cos(ph) > 0.3 ? 3 : 2;
+      }
+      // 影の手（外へ伸びる短い指 3 本）
+      for (let k = 0; k < 3; k++) {
+        const ha = (k / 3) * Math.PI * 2 - f * 0.5;
+        const da = Math.atan2(Math.sin(a - ha), Math.cos(a - ha));
+        if (d > 0.78 && d < 0.95 && Math.abs(da) * d < 0.05 + (0.95 - d) * 0.1) return 1;
+      }
+      return -1;
+    }),
+  );
+  return { palette, frameMs: 110, parts: { main: frames.map(toRows) } };
+}
+
+/** みちづれ が返す・弾ける所: 黒紫の影が爪のように外へ裂けて広がり、紫の火の粉が散る。3 コマ（07 の272章） */
+function destinyBurst(): SpriteOut {
+  const palette = ['#120a1f', '#311b5c', '#7e57c2', '#b39ddb', '#ede7f6'];
+  const r = rng(272);
+  const claws = Array.from({ length: 7 }, (_, k) => ({ a: (k / 7) * Math.PI * 2 + (r() - 0.5) * 0.5, len: 0.7 + r() * 0.25, bend: (r() - 0.5) * 0.8 }));
+  const frames = [0, 1, 2].map((f) => {
+    const p = (f + 1) / 3;
+    return shape(32, (u, v) => {
+      const d = Math.hypot(u, v);
+      const a = Math.atan2(v, u);
+      // 真ん中の暗い渦（縮む）
+      if (d < 0.25 * (1 - p) + 0.05) return 1;
+      // 爪の形に裂ける影: 外ほど細く、少し曲がる
+      for (const c of claws) {
+        const reach = c.len * (0.45 + 0.55 * p);
+        if (d > reach) continue;
+        const ca = c.a + c.bend * d;
+        const da = Math.atan2(Math.sin(a - ca), Math.cos(a - ca));
+        const w = 0.16 * (1 - d / reach) * (1 - p * 0.4);
+        if (Math.abs(da) * d < w) return d > reach * 0.7 ? 3 : 2;
+      }
+      // 紫の火の粉（ふちは付けない。黒いふちで白黒のまだらに見えた）
+      if (d > 0.5 * p && d < 0.95 && hash(Math.floor((u + 1) * 16), Math.floor((v + 1) * 16), 272 + f) < 0.05) return 3;
+      return -1;
+    }, 0, -1);
+  });
+  return { palette, frameMs: 90, loopFrom: 2, parts: { main: frames.map(toRows) } };
+}
+
 /** フリーズドライ: 細長い氷の結晶の針（右へ進む）。真ん中に小さな枝が2本ずつ出る（雪の結晶の腕のように） */
 function iceNeedle(): SpriteOut {
   const palette = ['#0d3550', '#4fc3f7', '#b3e5fc', '#ffffff'];
@@ -7155,6 +7293,10 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'ice-statue': () => iceStatue(),
     'zero-frost': () => zeroFrost(),
     'ice-shatter': () => iceShatter(),
+    'encore-clap': () => encoreClap(),
+    'safeguard-veil': () => safeguardVeil(),
+    'destiny-mark': () => destinyMark(),
+    'destiny-burst': () => destinyBurst(),
     'ice-needle': () => iceNeedle(),
     horn: () => horn(),
     // つつく: つのでつく と同じ形の、黄色いくちばし（07 の116章）

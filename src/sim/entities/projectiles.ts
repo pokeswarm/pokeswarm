@@ -34,6 +34,8 @@ export const MOTION_SPIRAL = 9;
 export const MOTION_SNAKE = 10;
 /** 広がって縮む輪（pulse）: 持ち主に付いていき、半径を ox から orbitRadius まで、残り時間の前半で広げ、後半で縮める */
 export const MOTION_PULSE = 11;
+/** 敵に貼り付く（attachToTarget。みちづれ: 結んだ敵の上に乗って動く）: target の敵の位置にいる。その敵が倒れたら終わる（end の効き方が起こる。07 の272章） */
+export const MOTION_ATTACH = 12;
 
 /** 蛇行の、出てから t 秒の位置（出した場所からのずれ）。描画でも使う */
 export function snakeOffset(vx: number, vy: number, amplitude: number, omega: number, t: number): [number, number] {

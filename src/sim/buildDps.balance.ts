@@ -5,6 +5,7 @@ import { achievementsConfig, derivationsConfig, generated, playablesConfig, play
 import { buildSimRules, permanentModifiers, playableLoadout } from '../data/simRules';
 import { achievementPerks } from '../meta/achievementPerks';
 import type { Axis, InputCommand } from './commands';
+import { hurtPlayer } from './systems/health';
 import { Simulation } from './simulation';
 import { typeMultiplier } from './moves';
 import { itemFits, recomputeModifiers } from './systems/leveling';
@@ -30,6 +31,11 @@ const SEEDS = [7, 11, 23];
 const LEVEL = Number(process.env.BUILD_LEVEL ?? 100);
 const OUT = process.env.BUILD_OUT ?? 'docs/24_build_dps.json';
 const LEARNSETS = process.env.LEARNSET_IN ?? 'docs/16_learnsets.json';
+/**
+ * ボスの場面で受けるダメージ（毎分、本物の最大 HP の何回分か。伝説の当たりやすさの目安: カントー 10）。受けた分を返す技（ミラーコート・みちづれ）を測るため。
+ * 既定 0（受けない。今までの測り方）。0 以外のときは技の表を別のファイルに分ける（TABLE_FILE。07 の272章）
+ */
+const HURT_PER_MIN = Number(process.env.EST_HURT ?? 0);
 const ONLY = process.env.BUILD_ONLY?.split(',');
 /** 並列に回すとき: BUILD_SHARD=0/8 */
 const SHARD = process.env.BUILD_SHARD?.split('/').map(Number);
@@ -108,6 +114,7 @@ function measure(rules: SimRules, form: string, types: number[], loadout: Loadou
   (p as { permanent?: unknown }).permanent = halfShop(r) ?? undefined;
   p.items = items.map((x) => ({ item: r.items.findIndex((it) => it.key === x.item), level: x.level }));
   recomputeModifiers(w, p);
+  const realMaxHp = p.maxHp;
   p.hp = p.maxHp = 1e9;
   p.facingX = 1;
   p.facingY = 0;
@@ -137,7 +144,15 @@ function measure(rules: SimRules, form: string, types: number[], loadout: Loadou
         p.facingY = (Math.abs(dy) > d * 0.38 ? Math.sign(dy) : 0) as typeof p.facingY;
       }
     }
+    // 伝説から受けるダメージ（EST_HURT）: 1 秒ごとに、本物の最大 HP × 毎分の回数 ÷ 60
+    // 受けた割合で返す技（みちづれ）のため、その時だけ本物の最大 HP に戻してから受ける
+    const hurtNow = HURT_PER_MIN > 0 && scene.boss && t % 30 === 0;
+    if (hurtNow) {
+      p.hp = p.maxHp = realMaxHp;
+      hurtPlayer(w, p, (realMaxHp * HURT_PER_MIN) / 60);
+    }
     sim.step([]);
+    if (hurtNow) p.hp = p.maxHp = 1e9;
     // 倒れた分は、数がいつも同じになるようにすぐ足す（数えるのは倒した数だけ。遠くて消えた雑魚は数えない）
     if (scene.lateHp) {
       for (const ev of w.events) if (ev.type === 'enemyKilled') kills++;

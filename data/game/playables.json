@@ -28,7 +28,7 @@
     "trapinch": { "sprite": "trapinch", "startingMoves": ["sand-tomb"], "ability": "arena-trap" },
     "aron": { "sprite": "aron", "startingMoves": ["metal-claw"], "ability": "sturdy" },
     "azurill": { "sprite": "azurill", "startingMoves": ["bubble"], "moveTypes": ["water"], "ability": "huge-power" },
-    "wynaut": { "sprite": "wynaut", "startingMoves": ["mirror-coat"], "ability": "shadow-tag" },
+    "wynaut": { "sprite": "wynaut", "startingMoves": ["counter", "mirror-coat", "encore", "safeguard"], "fixedMoves": true, "ability": "shadow-tag" },
     "barboach": { "sprite": "barboach", "startingMoves": ["mud-slap"], "ability": "hydration" },
     "mawile": { "sprite": "mawile", "startingMoves": ["metal-claw"], "ability": "intimidate" },
     "egg": { "sprite": "egg", "hatch": ["pichu", "cleffa", "igglybuff", "togepi"] },

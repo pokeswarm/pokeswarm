@@ -569,16 +569,11 @@
       }
     ],
     "wynaut": [
+      "counter",
       "mirror-coat",
-      {
-        "move": "counter",
-        "forms": [
-          "wobbuffet"
-        ]
-      },
-      "reflect",
-      "revenge",
-      "magic-coat"
+      "encore",
+      "safeguard",
+      "destiny-bond"
     ],
     "barboach": [
       "mud-slap",

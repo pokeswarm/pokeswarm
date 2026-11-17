@@ -7382,8 +7382,16 @@
       "extends": "fire.base"
     },
     "boss-primal-kyogre": {
-      "extends": "water.base",
-      "bossTelegraph": { "id": "primal-aura-blue", "fit": "circle", "size": 3.2 }
+      "extends": "water.base"
+    },
+    "boss-kyogre-origin-pulse": {
+      "extends": "water.base"
+    },
+    "boss-kyogre-water-spout": {
+      "extends": "water.base"
+    },
+    "boss-kyogre-thunder": {
+      "extends": "electric.base"
     },
     "boss-origin-pulse": {
       "extends": "water.base",

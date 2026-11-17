@@ -5071,42 +5071,6 @@ function torrentSplash(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
-/**
- * ゲンシカイキ（07 の282章）: 体のまわりから立ちのぼる大地のエネルギー（96 ドット・ふちなし。真ん中は空けて体が見える）。
- * hue で色を変える（グラードン: 赤・橙・金。カイオーガ: 青・水色・白）。3 コマで炎の舌が上へ流れる
- */
-function primalAura(palette: string[]): SpriteOut {
-  const N = 14;
-  const frames = [0, 1, 2].map((f) => {
-    // 炎の舌: 体を囲む楕円の上に並び、根元から上へ伸びる。コマごとに高さが変わる
-    const tongues = Array.from({ length: N }, (_, k) => {
-      const a = (k / N) * Math.PI * 2;
-      const h = 0.32 + 0.16 * Math.sin(k * 2.3 + f * 2.1) ** 2;
-      return { cx: Math.cos(a) * 0.62, cy: Math.sin(a) * 0.36 + 0.3, h, w: 0.1 + 0.02 * Math.cos(k * 1.7) };
-    });
-    return toRows(
-      shape(
-        96,
-        (u, v) => {
-          let best = -1;
-          for (const t of tongues) {
-            if (v > t.cy + 0.05 || v < t.cy - t.h) continue;
-            const up = (t.cy - v) / t.h; // 0 根元 → 1 先
-            const half = t.w * (up < 0 ? 1 + up * 8 : Math.pow(1 - up, 0.7)) * (1 + 0.15 * Math.sin(up * 9 + f));
-            if (Math.abs(u - t.cx - Math.sin(up * 4 + f) * 0.03) > half) continue;
-            const c = up > 0.7 ? 3 : up > 0.4 ? 2 : Math.abs(u - t.cx) > half * 0.6 ? 0 : 1;
-            best = Math.max(best, c);
-          }
-          return best;
-        },
-        0,
-        -1,
-      ),
-    );
-  });
-  return { palette, frameMs: 100, parts: { main: frames } };
-}
-
 // ---------------- じゃれつく（ホウエン・クチート。07 の280章） ----------------
 /**
  * じゃれつく: 飛びかかった所で、もみくちゃになる土けむり（64 ドット・ふちなし）。丸い煙のかたまりが渦を巻くように回り、
@@ -7692,7 +7656,6 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     torrent,
     'torrent-splash': torrentSplash,
     'scuffle-cloud': scuffleCloud,
-    'primal-aura-blue': () => primalAura(['#0d47a1', '#1e88e5', '#4fc3f7', '#e1f5fe']),
     'sky-cloud-wrap': skyCloudWrap,
     'wild-bolt-wrap': wildBoltWrap,
     'wild-discharge': wildDischarge,

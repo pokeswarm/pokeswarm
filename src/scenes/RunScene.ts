@@ -26,6 +26,7 @@ import { ArticunoIce } from '../render/effects/ArticunoIce';
 import { ZapdosElectric } from '../render/effects/ZapdosElectric';
 import { MoltresFlame } from '../render/effects/MoltresFlame';
 import { GroudonEarth } from '../render/effects/GroudonEarth';
+import { KyogreSea } from '../render/effects/KyogreSea';
 import { ShinyCharizardFlame } from '../render/effects/ShinyCharizardFlame';
 import { ShinyVenusaurPlant } from '../render/effects/ShinyVenusaurPlant';
 import { WaterRun } from '../render/effects/WaterRun';
@@ -184,6 +185,7 @@ export class RunScene extends Phaser.Scene {
   private zapdosElectric: ZapdosElectric | null = null;
   private moltresFlame: MoltresFlame | null = null;
   private groudonEarth: GroudonEarth | null = null;
+  private kyogreSea: KyogreSea | null = null;
   private shinyCharizardFlame: ShinyCharizardFlame | null = null;
   private shinyVenusaurPlant: ShinyVenusaurPlant | null = null;
   /** 甲羅で走っているボス（色違いのカメックスの アクアジェット）: 走り出した技の動作・絵・向き。止まると消す */
@@ -644,6 +646,8 @@ export class RunScene extends Phaser.Scene {
         if (aloneForm) {
           const w = this.sim.world;
           for (let i = 0; i < w.enemies.count && !alone; i++) if (w.enemies.kind[i] === kind && isAloneLegend(w, i)) alone = true;
+          // 変身の途中（ゲンシカイキの光）は、まだ元の姿。光が終わってから変わる
+          if (alone && w.hazards.some((h) => w.rules.stage.moves[h.move]?.id.endsWith('primal-reversion'))) alone = false;
         }
         const form = alone ? aloneForm : forms?.filter((f) => f.belowHpPct !== undefined && hpRatio * 100 < f.belowHpPct).at(-1);
         const k = form ? rules.enemies.kinds.findIndex((x) => x.id === form.kind) : kind;
@@ -3290,6 +3294,8 @@ export class RunScene extends Phaser.Scene {
     this.moltresFlame.update(world, this.time.now);
     this.groudonEarth ??= new GroudonEarth(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6, spriteRender.depths.bosses + 0.05);
     this.groudonEarth.update(world, this.time.now);
+    this.kyogreSea ??= new KyogreSea(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6, spriteRender.depths.bosses + 0.05);
+    this.kyogreSea.update(world, this.time.now);
     this.shinyCharizardFlame ??= new ShinyCharizardFlame(this, spriteRender.depths.effects + 0.35, spriteRender.depths.bosses + 0.05, ARENA_FLOOR_DEPTH + 3.6);
     this.shinyCharizardFlame.update(world, this.time.now, alpha);
     this.shinyVenusaurPlant ??= new ShinyVenusaurPlant(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);

@@ -161,6 +161,8 @@ export interface SimMoveDef {
   readonly echo?: { readonly maxStacks: number; readonly powerPerStack: number; readonly sizePerStack: number; readonly growPerSecond: number };
   /** beam を向いている方へ出す（メガホーン） */
   readonly aimFacing?: boolean;
+  /** cross: 1 回に撃った弾は、同じ敵には 1 つだけ当たる（受けて返す 1 回は除く。07 の281章） */
+  readonly oneHitPerCast?: boolean;
   /** melee を後ろへ出す（リベンジ） */
   readonly aimBehind?: boolean;
   /** chain: 跳ぶ先を、向いている方のこの角度の中だけにする（ラジアンの半分。無ければ全方向） */

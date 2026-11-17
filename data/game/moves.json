@@ -11182,8 +11182,9 @@
       "pattern": "cross",
       "effect": "metal-burst",
       "region": "hoenn",
+      "oneHitPerCast": true,
       "hurtRelease": {
-        "powerMultiplier": 2.5,
+        "powerMultiplier": 0.6,
         "extraCount": 8
       },
       "base": {
@@ -11195,7 +11196,7 @@
         "statusSeconds": 0,
         "spreadDegrees": 0,
         "lifestealPct": 0,
-        "power": 175.3,
+        "power": 701.1,
         "count": 8,
         "speed": 360,
         "size": 12,
@@ -11206,31 +11207,31 @@
       },
       "levels": [
         {
-          "power": 29.4
+          "power": 117.6
         },
         {
           "size": 2,
-          "power": 18.9
+          "power": 75.8
         },
         {
           "cooldownSeconds": -0.08,
-          "power": 19
+          "power": 75.7
         },
         {
           "count": 2,
-          "power": -1.5
+          "power": -5.6
         },
         {
           "size": 2,
-          "power": 13.4
+          "power": 53.3
         },
         {
           "cooldownSeconds": -0.08,
-          "power": 12.7
+          "power": 51
         },
         {
           "count": 2,
-          "power": -2.9
+          "power": -11.6
         }
       ]
     },

@@ -1471,6 +1471,14 @@ function fireCross(world: World, p: Player, pm: PlayerMove, st0: MoveStats): voi
   const start = Math.atan2(fy, fx);
   const speed = scaledMoveStats(world, p, pm, st).speed;
   const snake = world.rules.moves[pm.move]!.snake;
+  // 1 回に撃った弾のまとまり（メタルバースト。受けて返す 1 回は除く）。古いまとまり（弾が消えた後）は消す
+  let group = 0;
+  if (world.rules.moves[pm.move]!.oneHitPerCast && !release) {
+    const keep = Math.round(st.durationSeconds / world.dt) + 2;
+    for (const [id, g] of world.castGroups) if (world.tick - g.tick > keep) world.castGroups.delete(id);
+    group = world.nextCastGroup++;
+    world.castGroups.set(group, { tick: world.tick, hit: new Set() });
+  }
   for (let k = 0; k < st.count; k++) {
     // うたう: 音符はランダムな向きへ
     // 前へ流す技（ヘドロウェーブ）: 向いている方を中心にした crossArc の中に、端から端まで等しく並べる
@@ -1486,7 +1494,7 @@ function fireCross(world: World, p: Player, pm: PlayerMove, st0: MoveStats): voi
       world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_SNAKE, x: p.x, y: p.y, vx, vy, ox: p.x, oy: p.y, orbitRadius: snake.amplitude * (k % 2 === 0 ? 1 : -1), angularSpeed: omega });
       continue;
     }
-    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x, y: p.y, vx, vy });
+    world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x, y: p.y, vx, vy, group });
   }
 }
 
@@ -2023,6 +2031,10 @@ export function moveProjectiles(world: World): void {
       const j = candidates[k]!;
       // ハッシュの衝突で同じ敵が2回入っていることがある
       if (pr.isBlocked(i, e.id[j]!, world.tick)) continue;
+      // 1 回に撃った弾のまとまり（メタルバースト）: ほかの弾がもう当てた敵には当たらない
+      const grp = pr.group[i] ? world.castGroups.get(pr.group[i]!) : undefined;
+      if (grp?.hit.has(e.id[j]!)) continue;
+      grp?.hit.add(e.id[j]!);
       pr.recordHit(i, e.id[j]!, world.tick);
       // ふしぎなまもり（ヌケニン）: 弱点のタイプの技でなければ、すり抜ける（07 の188章）
       const guardKind = world.rules.enemies.kinds[e.kind[j]!];

@@ -108,6 +108,8 @@ export interface ProjectileSpawn {
   target?: number;
   /** 当たらない敵の id（avoidTarget の効き方: 本体が当たった相手。07 の233章） */
   avoid?: number;
+  /** 1 回に撃った弾のまとまりの番号（0 は無し）。同じまとまりの弾は、同じ敵には 1 つだけ当たる（メタルバースト。07 の281章） */
+  group?: number;
 }
 
 /**
@@ -172,6 +174,8 @@ export class ProjectileStore {
   readonly avoid: Uint32Array;
   /** 本体が当たった相手の id + 1（0 は無し。ボスに当たったらボス）。end の効き方の avoidTarget に使う（シザークロスの破片。07 の238章） */
   readonly struck: Uint32Array;
+  /** 1 回に撃った弾のまとまりの番号（0 は無し。World.castGroups） */
+  readonly group: Uint32Array;
 
   constructor(
     readonly capacity: number,
@@ -221,6 +225,7 @@ export class ProjectileStore {
     this.noFx = new Uint8Array(capacity);
     this.avoid = new Uint32Array(capacity);
     this.struck = new Uint32Array(capacity);
+    this.group = new Uint32Array(capacity);
   }
 
   add(p: ProjectileSpawn): number {
@@ -266,6 +271,7 @@ export class ProjectileStore {
     this.noFx[i] = 0;
     this.avoid[i] = p.avoid === undefined ? 0 : p.avoid + 1;
     this.struck[i] = 0;
+    this.group[i] = p.group ?? 0;
     return i;
   }
 
@@ -314,6 +320,7 @@ export class ProjectileStore {
     this.noFx[i] = this.noFx[last]!;
     this.avoid[i] = this.avoid[last]!;
     this.struck[i] = this.struck[last]!;
+    this.group[i] = this.group[last]!;
     const m = this.hitMemory;
     this.hitIds.copyWithin(i * m, last * m, (last + 1) * m);
     this.hitTicks.copyWithin(i * m, last * m, (last + 1) * m);

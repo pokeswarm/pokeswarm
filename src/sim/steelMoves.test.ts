@@ -56,11 +56,27 @@ describe('はがね', () => {
     t.sim.step([]);
     const added = shards().slice(-16);
     expect(t.pr.count - before).toBe(16);
-    expect(t.pr.damage[added[0]!]).toBeCloseTo(power * 2.5, 3);
+    expect(t.pr.damage[added[0]!]).toBeCloseTo(power * t.rules.moves[t.m]!.hurtRelease!.powerMultiplier, 3);
     // 次はふつうの強さに戻る
     expect(t.p.moves[0]!.hurtCharge).toBe(false);
   });
-  it('メタルバースト はココドラだけの固有技（クチートは じゃれつく に替えた。07 の280章）', () => {
+  it('メタルバースト: ふだんの 1 回の破片は、密着したボスにも 1 枚だけ当たる。受けて返す 1 回は全部当たる（07 の281章）', () => {
+    const t = setup('metal-burst');
+    const e = t.sim.world.enemies;
+    e.add(1, 0, 30, 0, 1e9, 0, 44);
+    const hp = (): number => e.hp[e.id.indexOf(1)]!;
+    const h0 = hp();
+    t.sim.step([]);
+    const one = t.pr.damage[t.find((i) => t.pr.move[i] === t.m)[0]!]!;
+    for (let k = 0; k < 5; k++) t.sim.step([]);
+    expect(h0 - hp()).toBeCloseTo(one, 0);
+    const h1 = hp();
+    hurtPlayer(t.sim.world, t.p, 40);
+    for (let k = 0; k < 5; k++) t.sim.step([]);
+    const rel = one * t.rules.moves[t.m]!.hurtRelease!.powerMultiplier;
+    expect(h1 - hp()).toBeGreaterThan(rel * 10);
+  });
+    it('メタルバースト はココドラだけの固有技（クチートは じゃれつく に替えた。07 の280章）', () => {
     const t = setup('metal-burst');
     expect(t.rules.derivations.filter((x) => x.to === t.m && x.line === 'mawile')).toHaveLength(0);
     expect(t.rules.derivations.filter((x) => x.to === t.m && x.line === 'aron')).toHaveLength(1);

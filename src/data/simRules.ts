@@ -120,6 +120,7 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.lowHpBonus ? { lowHpBonus: def.lowHpBonus } : {}),
       ...(def.echo ? { echo: def.echo } : {}),
       aimFacing: def.aimFacing,
+      ...(def.oneHitPerCast ? { oneHitPerCast: true } : {}),
       ...(def.aimBehind ? { aimBehind: true } : {}),
       ...(def.chainFacingDegrees ? { chainFacingHalf: (def.chainFacingDegrees * Math.PI) / 360 } : {}),
       ...(def.spiralDrift ? { spiralDrift: def.spiralDrift } : {}),

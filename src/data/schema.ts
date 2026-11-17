@@ -1902,6 +1902,8 @@ export const moveDefSchema = z.object({
     .optional(),
   /** beam を、敵を狙わず向いている方へ出す（メガホーン: 前へ槍を突き出す） */
   aimFacing: z.boolean().optional(),
+  /** cross: 1 回に撃った弾は、同じ敵には 1 つだけ当たる。受けて返す 1 回（hurtRelease）は除く（メタルバースト: 密着したボスに全部の破片が当たらない。07 の281章） */
+  oneHitPerCast: z.boolean().optional(),
   /** melee を、向いている方の反対（後ろ）へ出す（リベンジ: 振り向きざまの反撃。前の メガホーン と重ならない。07 の175章） */
   aimBehind: z.boolean().optional(),
   /**

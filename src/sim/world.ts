@@ -395,6 +395,13 @@ export interface World {
   readonly bombers: Map<number, number>;
   /** 時間で消える敵（ヌケニン）: 敵の id → 消える更新の回数 */
   readonly haunts: Map<number, number>;
+  /**
+   * 1 回に撃った弾のまとまり（メタルバースト: 同じ敵には 1 枚だけ当たる。07 の281章）: 番号 → 出した更新の回数と、当てた敵の id。
+   * どのブラウザでも同じ順に番号を振る。古いものは撃つときに消す
+   */
+  readonly castGroups: Map<number, { tick: number; hit: Set<number> }>;
+  /** 次に振るまとまりの番号 */
+  nextCastGroup: number;
   /** ポケモンコンテスト（開いている間はゲームを止める。結果の後も持っておく。07 の188章） */
   contest: ContestState | null;
   /** このランで分岐を出した */
@@ -473,6 +480,8 @@ export function createWorld(tickRate: number, seed: number, rules: SimRules, rol
     obstacleCache: new Map(),
     bombers: new Map(),
     haunts: new Map(),
+    castGroups: new Map(),
+    nextCastGroup: 1,
     contest: null,
     contestOffered: false,
     level: 1,

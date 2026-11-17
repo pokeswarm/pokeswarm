@@ -2134,6 +2134,11 @@
       "dex": 383,
       "uses": [
         "enemy"
+      ],
+      "enemyExtraAnimations": [
+        "Charge",
+        "Rumble",
+        "Hurt"
       ]
     },
     {
@@ -2141,6 +2146,37 @@
       "dex": 382,
       "uses": [
         "enemy"
+      ],
+      "enemyExtraAnimations": [
+        "Charge",
+        "Swell",
+        "Hurt"
+      ]
+    },
+    {
+      "key": "groudon-primal",
+      "dex": 383,
+      "form": "0001",
+      "uses": [
+        "enemy"
+      ],
+      "enemyExtraAnimations": [
+        "Charge",
+        "Rumble",
+        "Hurt"
+      ]
+    },
+    {
+      "key": "kyogre-primal",
+      "dex": 382,
+      "form": "0001",
+      "uses": [
+        "enemy"
+      ],
+      "enemyExtraAnimations": [
+        "Charge",
+        "Swell",
+        "Hurt"
       ]
     },
     {

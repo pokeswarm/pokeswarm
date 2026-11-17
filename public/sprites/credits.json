@@ -3924,6 +3924,30 @@
     "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0382"
   },
   {
+    "key": "groudon-primal",
+    "dex": 383,
+    "authors": [
+      {
+        "name": "baronessfaron",
+        "contact": null
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0383/0001"
+  },
+  {
+    "key": "kyogre-primal",
+    "dex": 382,
+    "authors": [
+      {
+        "name": "baronessfaron",
+        "contact": null
+      }
+    ],
+    "license": "CC BY-NC 4.0",
+    "source": "https://github.com/PMDCollab/SpriteCollab/tree/f18cffdaa1c27a155ee813c2b728f40bbd134149/sprite/0382/0001"
+  },
+  {
     "key": "rayquaza",
     "dex": 384,
     "authors": [

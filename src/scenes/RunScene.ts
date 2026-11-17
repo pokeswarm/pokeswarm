@@ -66,7 +66,7 @@ import { clearRunProbe, writeRunProbe } from '../meta/runProbe';
 import { session } from '../meta/session';
 import { regionStatKey } from '../meta/regionScope';
 import { LevelUpPanel, offerText } from './levelUpPanel';
-import { activeField, activeLegendField, currentWeather, legendWeatherState, startIntruder, startLegendary, legendRoundKinds } from '../sim/systems/stage';
+import { activeField, activeLegendField, currentWeather, legendWeatherState, startIntruder, startLegendary, legendRoundKinds, isAloneLegend } from '../sim/systems/stage';
 import { PausePanel } from './pausePanel';
 import { ContestPanel } from './contestPanel';
 import { EvolutionCutscene } from './evolutionCutscene';
@@ -636,7 +636,14 @@ export class RunScene extends Phaser.Scene {
       (kind, hpRatio) => {
         // フォルムの絵（デオキシス）: HP の割合で別の種類の絵を使う。まだ読み込めていなければ元の絵
         const forms = rules.enemies.kinds[kind]?.formKinds;
-        const form = forms?.filter((f) => hpRatio * 100 < f.belowHpPct).at(-1);
+        // 1 体だけになった姿（ゲンシカイキ）: 同時に戦う相手がみな倒れたら
+        const aloneForm = forms?.find((f) => f.alone);
+        let alone = false;
+        if (aloneForm) {
+          const w = this.sim.world;
+          for (let i = 0; i < w.enemies.count && !alone; i++) if (w.enemies.kind[i] === kind && isAloneLegend(w, i)) alone = true;
+        }
+        const form = alone ? aloneForm : forms?.filter((f) => f.belowHpPct !== undefined && hpRatio * 100 < f.belowHpPct).at(-1);
         const k = form ? rules.enemies.kinds.findIndex((x) => x.id === form.kind) : kind;
         return this.streamer.manifestOf(k) ?? this.streamer.manifestOf(kind);
       },

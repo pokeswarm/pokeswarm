@@ -30,6 +30,48 @@
         8
       ],
       "frameKeyPrefix": "Walk"
+    },
+    "Charge": {
+      "source": "Charge",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "durations": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Charge"
+    },
+    "Swell": {
+      "source": "Swell",
+      "frameWidth": 72,
+      "frameHeight": 64,
+      "durations": [
+        3,
+        6,
+        3,
+        6,
+        3,
+        6
+      ],
+      "frameKeyPrefix": "Swell"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 64,
+      "frameHeight": 88,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
     }
   },
   "missing": []

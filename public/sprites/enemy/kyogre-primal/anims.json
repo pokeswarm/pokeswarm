@@ -1,0 +1,78 @@
+{
+  "key": "enemy/kyogre-primal",
+  "dex": 382,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 64,
+      "frameHeight": 72,
+      "durations": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "frameKeyPrefix": "Walk"
+    },
+    "Charge": {
+      "source": "Charge",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "durations": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Charge"
+    },
+    "Swell": {
+      "source": "Swell",
+      "frameWidth": 72,
+      "frameHeight": 64,
+      "durations": [
+        3,
+        6,
+        3,
+        6,
+        3,
+        6
+      ],
+      "frameKeyPrefix": "Swell"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 64,
+      "frameHeight": 88,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    }
+  },
+  "missing": []
+}

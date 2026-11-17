@@ -80,7 +80,7 @@ describe('ホウエンのクリアの後', () => {
     }
   });
 
-  it('天気の伝説の場は30秒ごとに入れ替わり、片方を倒すと残った方のまま', () => {
+  it('天気の伝説の場は30秒ごとに入れ替わり、片方を倒すと残った方のゲンシカイキの場のまま（07 の282章）', () => {
     const t = setup(1);
     t.clear();
     t.clearRound();
@@ -90,7 +90,7 @@ describe('ホウエンのクリアの後', () => {
     t.sim.step([]);
     const b = activeLegendField(t.w)!.field.groundTint;
     expect(a).not.toBe(b);
-    // カイオーガを倒すとグラードンの日差しのまま
+    // カイオーガを倒すとグラードンの おおひでり のまま
     const ky = t.kindIndex('legend-kyogre');
     let i = 0;
     while (t.w.enemies.kind[i] !== ky) i++;
@@ -98,7 +98,7 @@ describe('ホウエンのクリアの後', () => {
     for (const add of [0, 30 * 30]) {
       t.w.tick += add;
       t.sim.step([]);
-      expect(activeLegendField(t.w)!.field.typePowerPct).toEqual(t.rules.stage.legendary!.moveSets['legend-groudon']!.field!.typePowerPct);
+      expect(activeLegendField(t.w)!.field.typePowerPct).toEqual(t.rules.stage.legendary!.moveSets['legend-groudon']!.alone!.field!.typePowerPct);
     }
   });
 

@@ -5071,6 +5071,211 @@ function torrentSplash(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- グラードンの だんがいのつるぎ（07 の282章） ----------------
+/**
+ * だんがいのつるぎの予告: 地面に走るぎざぎざの割れ目。奥で溶岩が赤く光る（48 ドット・ふちなし）。
+ * 2 コマで奥の光がゆっくり強まる（明滅させない）
+ */
+function precipiceCrack(): SpriteOut {
+  // 0 暗い土・1 割れ目の黒・2 濃い赤・3 橙・4 黄
+  const palette = ['#4e342e', '#1a0f0a', '#b71c1c', '#ff6d00', '#ffd54f'];
+  const r = rng(8800);
+  const main = boltPath(r, -0.92, 0.04, 0, 1.84, 13, 0.1);
+  const twigs = [...boltPath(r, -0.3, 0.1, -1.1, 0.45, 3, 0.08), ...boltPath(r, 0.35, -0.05, 1.2, 0.4, 3, 0.08)];
+  const frames = [0, 1].map((f) =>
+    toRows(
+      shape(
+        48,
+        (u, v) => {
+          let d = 9;
+          for (const sg of main) d = Math.min(d, segDist(u, v, sg));
+          let t = 9;
+          for (const sg of twigs) t = Math.min(t, segDist(u, v, sg));
+          if (d < 0.022) return f === 1 ? 4 : 3;
+          if (d < 0.045) return f === 1 ? 3 : 2;
+          if (d < 0.07) return 1;
+          if (t < 0.03) return 2;
+          if (t < 0.055) return 1;
+          if (d < 0.11) return 0;
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    ),
+  );
+  return { palette, frameMs: 220, parts: { main: frames } };
+}
+
+/**
+ * だんがいのつるぎ: 割れ目から突き上がる大きな岩の刃（64 ドット・ふちなし。根元が下）。黒っぽい岩に、溶岩の赤い筋が走る。
+ * 3 コマ: 割れ目から先が出る → 伸びきる（根元に砕けた土） → 刃のまま筋の光が残る
+ */
+function precipiceBladeBig(): SpriteOut {
+  // 0 黒い岩・1 暗い岩・2 岩・3 明るい岩・4 濃い赤・5 橙・6 黄・7 土
+  const palette = ['#1b1210', '#3e2723', '#5d4037', '#8d6e63', '#c62828', '#ff6d00', '#ffd54f', '#6d4c41'];
+  const heights = [0.45, 1, 1];
+  const frames = [0, 1, 2].map((f) => {
+    const h = heights[f]!;
+    const r = rng(9100);
+    // 刃: 真ん中の大きな刃と、左右の小さな刃（根元は v = 0.85）
+    const blades = [
+      [0, 0.34, 1.65],
+      [-0.42, 0.2, 0.95],
+      [0.4, 0.18, 0.85],
+    ] as const;
+    const veins = [boltPath(r, 0, 0.8, -Math.PI / 2 - 0.05, 1.35 * h, 7, 0.06), boltPath(r, -0.05, 0.55, -Math.PI / 2 - 0.5, 0.35 * h, 3, 0.04), boltPath(r, 0.04, 0.35, -Math.PI / 2 + 0.45, 0.3 * h, 3, 0.04)].flat();
+    return toRows(
+      shape(
+        64,
+        (u, v) => {
+          const base = 0.85;
+          // 根元の砕けた土
+          if (v > base - 0.04 && v < base + 0.1 && Math.abs(u) < 0.85 - (v - base) * 2) return (Math.floor(u * 9) + f) % 3 === 0 ? 2 : 7;
+          for (const [cx, w, len] of blades) {
+            const top = base - len * h;
+            if (v < top || v > base) continue;
+            const t = (v - top) / (base - top); // 0 刃先 → 1 根元
+            // ぎざぎざの刃: 先が尖り、根元が広い
+            const half = w * Math.pow(t, 0.8) * (1 + 0.12 * Math.sin(v * 23 + cx * 7));
+            const dx = u - cx - (1 - t) * 0.06;
+            if (Math.abs(dx) > half) continue;
+            const k = dx / Math.max(0.001, half);
+            // 溶岩の筋（真ん中の大きな刃）
+            if (cx === 0 && t > 0.1) {
+              let vd = 9;
+              for (const sg of veins) vd = Math.min(vd, segDist(u, v, sg));
+              if (vd < 0.018) return f === 2 ? 4 : t > 0.55 ? 6 : 5;
+              if (vd < 0.035 && f < 2) return 4;
+            }
+            if (t < 0.12) return 3;
+            return k < -0.45 ? 3 : k < 0.1 ? 2 : k < 0.6 ? 1 : 0;
+          }
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette, frameMs: 90, parts: { main: frames } };
+}
+
+/**
+ * グラードンの ふんか: 空から落ちてくる溶岩の塊（48 ドット・ふちなし）。黒く冷えかけた殻のすき間から赤い溶岩がのぞき、上に炎の尾。
+ * 3 コマで尾がゆらぐ
+ */
+function magmaRock(): SpriteOut {
+  // 0 黒い殻・1 暗い殻・2 濃い赤・3 橙・4 黄
+  const palette = ['#1b1210', '#3e2723', '#c62828', '#ff6d00', '#ffd54f'];
+  const r = rng(9300);
+  const cracks = [boltPath(r, -0.45, 0.3, -0.4, 0.75, 5, 0.06), boltPath(r, 0.1, 0.55, -1.9, 0.55, 4, 0.05), boltPath(r, 0.35, 0.05, -2.7, 0.5, 4, 0.05), boltPath(r, -0.1, 0.05, 1.2, 0.5, 4, 0.05), boltPath(r, 0.25, 0.4, -0.3, 0.3, 3, 0.04)].flat();
+  const frames = [0, 1, 2].map((f) =>
+    toRows(
+      shape(
+        48,
+        (u, v) => {
+          // 塊（下寄りの丸）
+          const d = Math.hypot(u, (v - 0.25) * 1.05);
+          const edge = 0.55 + 0.06 * Math.sin(Math.atan2(v - 0.25, u) * 5 + 1) + 0.04 * Math.sin(Math.atan2(v - 0.25, u) * 9);
+          if (d < edge) {
+            let c = 9;
+            for (const sg of cracks) c = Math.min(c, segDist(u, v, sg));
+            if (c < 0.03) return 4;
+            if (c < 0.06) return 3;
+            if (c < 0.09) return 2;
+            return d > edge - 0.08 ? 0 : 1;
+          }
+          // 上の炎の尾
+          if (v < 0.1 && v > -0.95) {
+            const up = (0.1 - v) / 1.05;
+            const half = 0.5 * Math.pow(1 - up, 0.7) * (1 + 0.2 * Math.sin(up * 10 + f * 2));
+            const dx = u + Math.sin(up * 5 + f * 1.7) * 0.06;
+            if (Math.abs(dx) < half) return up > 0.6 ? 2 : Math.abs(dx) < half * 0.4 ? 4 : 3;
+          }
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    ),
+  );
+  return { palette, frameMs: 80, parts: { main: frames } };
+}
+
+/**
+ * グラードンの ふんか: 落ちた所で弾ける溶岩（64 ドット・ふちなし）。真ん中の溶岩だまりから、しずくと岩のかけらが外へ飛ぶ。
+ * 3 コマ: 弾ける → 広がる → 冷えて暗くなる
+ */
+function lavaSplash(): SpriteOut {
+  const palette = ['#1b1210', '#3e2723', '#c62828', '#ff6d00', '#ffd54f', '#fff8e1'];
+  const reach = [0.55, 0.85, 0.95];
+  const frames = [0, 1, 2].map((f) => {
+    const r = rng(9400 + f * 13);
+    const drops = Array.from({ length: 14 }, (_, k) => {
+      const a = (k / 14) * Math.PI * 2 + (r() - 0.5) * 0.4;
+      const d = reach[f]! * (0.7 + r() * 0.3);
+      return [Math.cos(a) * d, Math.sin(a) * d * 0.8, 0.05 + r() * 0.04, k % 3] as const;
+    });
+    return toRows(
+      shape(
+        64,
+        (u, v) => {
+          const pool = Math.hypot(u, v * 1.4);
+          const pr = [0.38, 0.5, 0.52][f]!;
+          if (pool < pr) {
+            if (f === 2) return pool < pr * 0.5 ? 2 : 1;
+            return pool < pr * 0.35 ? 5 : pool < pr * 0.65 ? 4 : pool < pr * 0.85 ? 3 : 2;
+          }
+          for (const [dx, dy, rr, c] of drops) {
+            if (Math.hypot(u - dx, v - dy) < rr) return c === 0 ? (f === 2 ? 1 : 3) : c === 1 ? (f === 2 ? 0 : 2) : 1;
+          }
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette, frameMs: 110, parts: { main: frames } };
+}
+
+/**
+ * ゲンシカイキ（07 の282章）: 体のまわりから立ちのぼる大地のエネルギー（96 ドット・ふちなし。真ん中は空けて体が見える）。
+ * hue で色を変える（グラードン: 赤・橙・金。カイオーガ: 青・水色・白）。3 コマで炎の舌が上へ流れる
+ */
+function primalAura(palette: string[]): SpriteOut {
+  const N = 14;
+  const frames = [0, 1, 2].map((f) => {
+    // 炎の舌: 体を囲む楕円の上に並び、根元から上へ伸びる。コマごとに高さが変わる
+    const tongues = Array.from({ length: N }, (_, k) => {
+      const a = (k / N) * Math.PI * 2;
+      const h = 0.32 + 0.16 * Math.sin(k * 2.3 + f * 2.1) ** 2;
+      return { cx: Math.cos(a) * 0.62, cy: Math.sin(a) * 0.36 + 0.3, h, w: 0.1 + 0.02 * Math.cos(k * 1.7) };
+    });
+    return toRows(
+      shape(
+        96,
+        (u, v) => {
+          let best = -1;
+          for (const t of tongues) {
+            if (v > t.cy + 0.05 || v < t.cy - t.h) continue;
+            const up = (t.cy - v) / t.h; // 0 根元 → 1 先
+            const half = t.w * (up < 0 ? 1 + up * 8 : Math.pow(1 - up, 0.7)) * (1 + 0.15 * Math.sin(up * 9 + f));
+            if (Math.abs(u - t.cx - Math.sin(up * 4 + f) * 0.03) > half) continue;
+            const c = up > 0.7 ? 3 : up > 0.4 ? 2 : Math.abs(u - t.cx) > half * 0.6 ? 0 : 1;
+            best = Math.max(best, c);
+          }
+          return best;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette, frameMs: 100, parts: { main: frames } };
+}
+
 // ---------------- じゃれつく（ホウエン・クチート。07 の280章） ----------------
 /**
  * じゃれつく: 飛びかかった所で、もみくちゃになる土けむり（64 ドット・ふちなし）。丸い煙のかたまりが渦を巻くように回り、
@@ -7655,7 +7860,13 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'mud-crash': mudCrash,
     torrent,
     'torrent-splash': torrentSplash,
+    'precipice-crack': precipiceCrack,
+    'magma-rock': magmaRock,
+    'lava-splash': lavaSplash,
+    'precipice-blade-big': precipiceBladeBig,
     'scuffle-cloud': scuffleCloud,
+    'primal-aura-red': () => primalAura(['#b71c1c', '#e53935', '#ff8f00', '#ffe082']),
+    'primal-aura-blue': () => primalAura(['#0d47a1', '#1e88e5', '#4fc3f7', '#e1f5fe']),
     'sky-cloud-wrap': skyCloudWrap,
     'wild-bolt-wrap': wildBoltWrap,
     'wild-discharge': wildDischarge,

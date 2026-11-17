@@ -2479,6 +2479,25 @@
       "radius": 48,
       "contactDamage": 46,
       "xp": 0,
+      "spriteScale": 2.4,
+      "formKinds": [
+        {
+          "alone": true,
+          "kind": "form-groudon-primal"
+        }
+      ]
+    },
+    {
+      "id": "form-groudon-primal",
+      "species": "groudon-primal",
+      "rank": "legendary",
+      "asBoss": true,
+      "sprite": "enemy/groudon-primal",
+      "hp": 1,
+      "moveSpeed": 0,
+      "radius": 48,
+      "contactDamage": 0,
+      "xp": 0,
       "spriteScale": 2.4
     },
     {
@@ -2496,7 +2515,26 @@
       "motion": {
         "type": "keepDistance",
         "distance": 340
-      }
+      },
+      "formKinds": [
+        {
+          "alone": true,
+          "kind": "form-kyogre-primal"
+        }
+      ]
+    },
+    {
+      "id": "form-kyogre-primal",
+      "species": "kyogre-primal",
+      "rank": "legendary",
+      "asBoss": true,
+      "sprite": "enemy/kyogre-primal",
+      "hp": 1,
+      "moveSpeed": 0,
+      "radius": 48,
+      "contactDamage": 0,
+      "xp": 0,
+      "spriteScale": 2.4
     },
     {
       "id": "legend-rayquaza",

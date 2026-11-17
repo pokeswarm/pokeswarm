@@ -2114,57 +2114,16 @@
       "dashSpeed": 620,
       "recoilSeconds": 0.8
     },
-    {
-      "id": "groudon-precipice-blades",
-      "move": "precipice-blades",
-      "effect": "boss-precipice-blades",
-      "shape": "circle",
-      "target": "player",
-      "rooted": true,
-      "telegraphSeconds": 0.8,
-      "radius": 62,
-      "damage": 44,
-      "count": 5,
-      "stagger": 0.14,
-      "along": {
-        "spacing": 105,
-        "start": 90
-      },
-      "fan": [
-        -24,
-        0,
-        24
-      ]
-    },
-    {
-      "id": "groudon-eruption",
-      "move": "eruption",
-      "effect": "boss-eruption",
-      "shape": "circle",
-      "target": "player",
-      "telegraphSeconds": 0.9,
-      "radius": 65,
-      "damage": 46,
-      "count": 10,
-      "spread": 380,
-      "stagger": 0.08
-    },
-    {
-      "id": "groudon-solar-beam",
-      "minTargetDistance": 240,
-      "move": "solar-beam",
-      "effect": "solar-beam",
-      "shape": "line",
-      "target": "player",
-      "rooted": true,
-      "telegraphSeconds": 1.8,
-      "radius": 36,
-      "length": 1600,
-      "damage": 72,
-      "follow": {
-        "seconds": 1.1
-      }
-    },
+    {"id": "groudon-precipice-blades", "move": "precipice-blades", "effect": "boss-precipice-blades", "shape": "circle", "target": "player", "rooted": true, "pose": "Rumble", "telegraphSeconds": 1, "radius": 50, "damage": 46, "count": 10, "stagger": 0.08, "along": {"spacing": 68, "start": 70}, "fan": [0], "then": "groudon-claws-in"},
+    {"id": "groudon-precipice-blades-primal", "move": "precipice-blades", "effect": "boss-precipice-blades", "shape": "circle", "target": "player", "rooted": true, "pose": "Rumble", "telegraphSeconds": 1, "radius": 50, "damage": 46, "count": 10, "stagger": 0.08, "along": {"spacing": 68, "start": 70}, "fan": [-14,14], "then": "groudon-claws-in"},
+    {"id": "groudon-claws-in", "effect": "boss-out-of-breath", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Hurt", "telegraphSeconds": 1.5, "radius": 50, "damage": 0},
+    {"id": "groudon-eruption", "move": "eruption", "effect": "boss-eruption", "shape": "circle", "target": "player", "rooted": true, "pose": "Charge", "telegraphSeconds": 0.9, "radius": 65, "damage": 46, "count": 12, "countByHp": true, "spread": 380, "stagger": 0.08, "whenWeather": [{"fieldWeather": "sun-weather", "useMove": "groudon-eruption-sun"}]},
+    {"id": "groudon-eruption-sun", "move": "eruption", "effect": "boss-eruption", "shape": "circle", "target": "player", "rooted": true, "pose": "Charge", "telegraphSeconds": 0.9, "radius": 65, "damage": 46, "count": 17, "countByHp": true, "spread": 420, "stagger": 0.06},
+    {"id": "groudon-solar-beam", "minTargetDistance": 240, "move": "solar-beam", "effect": "solar-beam", "shape": "line", "target": "player", "rooted": true, "pose": "Charge", "telegraphSeconds": 1.8, "radius": 36, "length": 1600, "damage": 72, "follow": {"seconds": 1.1}, "whenWeather": [{"fieldWeather": "sun-weather", "useMove": "groudon-solar-beam-sun"},{"fieldWeather": "rain-dance", "useMove": "groudon-solar-beam-rain"}]},
+    {"id": "groudon-solar-beam-sun", "minTargetDistance": 240, "move": "solar-beam", "effect": "solar-beam", "shape": "line", "target": "player", "rooted": true, "pose": "Charge", "telegraphSeconds": 0.9, "radius": 36, "length": 1600, "damage": 72, "follow": {"seconds": 0.45}},
+    {"id": "groudon-solar-beam-rain", "minTargetDistance": 240, "move": "solar-beam", "effect": "solar-beam", "shape": "line", "target": "player", "rooted": true, "pose": "Charge", "telegraphSeconds": 2.8, "radius": 36, "length": 1600, "damage": 72, "follow": {"seconds": 1.6}},
+    {"id": "groudon-primal-reversion", "effect": "boss-primal-groudon", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Rumble", "telegraphSeconds": 2, "radius": 60, "damage": 0},
+    {"id": "kyogre-primal-reversion", "effect": "boss-primal-kyogre", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Swell", "telegraphSeconds": 2, "radius": 60, "damage": 0},
     {
       "id": "kyogre-origin-pulse",
       "move": "origin-pulse",

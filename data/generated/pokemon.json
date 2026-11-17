@@ -2564,6 +2564,31 @@
     "preEvolutions": [],
     "evolvesTo": []
   },
+  "groudon-primal": {
+    "dex": 383,
+    "names": {
+      "ja": "グラードン",
+      "en": "Groudon",
+      "fr": "Groudon",
+      "de": "Groudon",
+      "es": "Groudon",
+      "it": "Groudon"
+    },
+    "types": [
+      "ground",
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 180,
+      "defense": 160,
+      "specialAttack": 150,
+      "specialDefense": 90,
+      "speed": 90
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
+  },
   "grovyle": {
     "dex": 253,
     "names": {
@@ -3426,6 +3451,30 @@
       "defense": 90,
       "specialAttack": 150,
       "specialDefense": 140,
+      "speed": 90
+    },
+    "preEvolutions": [],
+    "evolvesTo": []
+  },
+  "kyogre-primal": {
+    "dex": 382,
+    "names": {
+      "ja": "カイオーガ",
+      "en": "Kyogre",
+      "fr": "Kyogre",
+      "de": "Kyogre",
+      "es": "Kyogre",
+      "it": "Kyogre"
+    },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 150,
+      "defense": 90,
+      "specialAttack": 180,
+      "specialDefense": 160,
       "speed": 90
     },
     "preEvolutions": [],

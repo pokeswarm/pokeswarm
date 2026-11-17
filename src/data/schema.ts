@@ -187,7 +187,18 @@ export const enemyKindSchema = z.object({
   /** 雑魚（normal・省略時）・中ボス（midboss）・ボス（boss）。中ボス・ボスは data/game/stage.json の予定で出す */
   rank: z.enum(['normal', 'midboss', 'boss', 'legendary']).optional(),
   /** HP が belowHpPct % を切ると、kind の種類の絵で描く（デオキシスのフォルム。見た目だけ。07 の189章） */
-  formKinds: z.array(z.object({ belowHpPct: z.number().gt(0).lt(100), kind: z.string() })).optional(),
+  formKinds: z
+    .array(
+      z
+        .object({
+          belowHpPct: z.number().gt(0).lt(100).optional(),
+          /** 同時に戦う相手がみな倒れて 1 体だけになったら（ゲンシカイキ。07 の282章） */
+          alone: z.boolean().optional(),
+          kind: z.string(),
+        })
+        .refine((f) => (f.belowHpPct === undefined) !== !f.alone, { message: 'belowHpPct か alone のどちらか 1 つ' }),
+    )
+    .optional(),
   /** 伝説戦の形で戦うが、記録とコインはボスとして数える（ホウエンのダイゴ・グラードンなど。07 の189章） */
   asBoss: z.boolean().optional(),
   /** ふしぎなまもり: 弱点のタイプの技でしか傷つかない（ヌケニン。07 の188章） */
@@ -599,7 +610,18 @@ export const bossMoveSchema = z.object({
   /**
    * 天気で技が変わる（御三家。07 の197章）: 技 hazardMove（にほんばれ・あまごい）が出ている間は、この技の代わりに useMove を使う
    */
-  whenWeather: z.array(z.object({ hazardMove: z.string().min(1), useMove: z.string().min(1) })).optional(),
+  whenWeather: z
+    .array(
+      z
+        .object({
+          hazardMove: z.string().min(1).optional(),
+          /** 伝説戦のマップの天気（field.weather）がこれの間（グラードン・カイオーガ: ひざし・あめで溜めや数が変わる。07 の282章） */
+          fieldWeather: z.string().min(1).optional(),
+          useMove: z.string().min(1),
+        })
+        .refine((w) => !!w.hazardMove !== !!w.fieldWeather, { message: 'hazardMove か fieldWeather のどちらか 1 つ' }),
+    )
+    .optional(),
   /**
    * 足元から広がる波の輪（カメックスの なみのり。07 の198章）: 半径 startRadius から速さ speed で広がる。足元の startRadius の内側は安全。
    * 向かい合う 2 か所に gapDegrees 度の切れ目があり、抜けられる
@@ -1127,6 +1149,11 @@ export const stageConfigSchema = z.object({
               .optional(),
             /** HP が belowHpPct % を切ったら、今の技が終わり次第 moves を順に使う（ピカチュウのボルテッカー。07 の194章） */
             hpMoves: z.array(z.object({ belowHpPct: z.number().gt(0).lt(100), moves: z.array(z.string()).min(1) })).optional(),
+            /**
+             * 同時に戦う相手（同じラウンドの伝説）がみな倒れて 1 体だけになったときの姿（ゲンシカイキ。07 の282章）: intro を使ってから moves を順に使う。
+             * field はマップの効果をこれに替える（おおひでり・おおあめ）。絵は enemies.json の formKinds の alone
+             */
+            alone: z.object({ moves: z.array(z.string()).min(1), intro: z.string().min(1).optional(), field: legendFieldSchema.optional() }).optional(),
             /** 第 2 段階（技が速くなる・DANGER）を使わない。行動を作者が決めた相手（07 の194章） */
             noEnrage: z.boolean().optional(),
             /** 技の名前（stage.json の move）を、使ったときにボスの上に出す（ミュウの ゆびをふる。07 の257章） */

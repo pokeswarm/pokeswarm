@@ -291,6 +291,8 @@ export interface World {
     // ---- 07 の194章 ----
     /** これから大技を使う HP の割合と技（割合の大きい順） */
     hpMoves?: { belowRatio: number; moves: readonly number[] }[];
+    /** 1 体だけになった姿（ゲンシカイキ）に変わった */
+    alone?: boolean;
     /** 今の技が終わり次第、順に使う技 */
     forced?: number[];
     /** 技の間隔を、技が終わってから数える */

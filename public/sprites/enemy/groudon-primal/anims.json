@@ -1,0 +1,80 @@
+{
+  "key": "enemy/groudon-primal",
+  "dex": 383,
+  "durationUnitMs": 16.666666666666668,
+  "directions": [
+    "down",
+    "downRight",
+    "right",
+    "upRight",
+    "up",
+    "upLeft",
+    "left",
+    "downLeft"
+  ],
+  "animations": {
+    "Walk": {
+      "source": "Walk",
+      "frameWidth": 72,
+      "frameHeight": 80,
+      "durations": [
+        10,
+        12,
+        10,
+        12
+      ],
+      "frameKeyPrefix": "Walk"
+    },
+    "Charge": {
+      "source": "Charge",
+      "frameWidth": 64,
+      "frameHeight": 80,
+      "durations": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Charge"
+    },
+    "Rumble": {
+      "source": "Emit",
+      "frameWidth": 72,
+      "frameHeight": 104,
+      "durations": [
+        1,
+        2,
+        6,
+        2,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Emit"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 72,
+      "frameHeight": 80,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
+    }
+  },
+  "missing": []
+}

@@ -606,6 +606,16 @@ export function bossAttacks(world: World): void {
       stepBossFlight(world, boss, i);
       // 岩が決まった回数当たった壁は割れる（ミュウツーの バリアー）
       if (boss.barrierHits && boss.barrierHits.count >= boss.barrierHits.need) breakBarrier(world, boss, boss.id);
+      // 同時に戦う相手がみな倒れたら、1 体だけの姿になる（ゲンシカイキ。07 の282章）
+      if (!boss.alone && isAloneLegend(world, i)) {
+        const alone = world.rules.stage.legendary?.moveSets[world.rules.enemies.kinds[world.enemies.kind[i]!]?.id ?? '']?.alone;
+        if (alone) {
+          boss.alone = true;
+          boss.moves = alone.moves.map((m) => moveIndexOfStage(world.rules, m));
+          boss.next = 0;
+          if (alone.intro) (boss.forced ??= []).unshift(moveIndexOfStage(world.rules, alone.intro));
+        }
+      }
       // HP で放つ大技（ピカチュウのボルテッカー）: 今の技が終わり次第、順に使う
       const next = boss.hpMoves?.[0];
       if (next && world.enemies.hp[i]! <= world.enemies.maxHp[i]! * next.belowRatio) {
@@ -1017,7 +1027,8 @@ function bossBusy(world: World, id: number): boolean {
 /** 天気で技が変わる（にほんばれ の間の ソーラービーム など） */
 function weatherVariant(world: World, moveIdx: number): number {
   for (const alt of world.rules.stage.moves[moveIdx]?.whenWeather ?? []) {
-    if (world.hazards.some((h) => world.rules.stage.moves[h.move]?.id === alt.hazardMove)) return moveIndexOfStage(world.rules, alt.useMove);
+    if (alt.hazardMove && world.hazards.some((h) => world.rules.stage.moves[h.move]?.id === alt.hazardMove)) return moveIndexOfStage(world.rules, alt.useMove);
+    if (alt.fieldWeather && activeLegendField(world)?.field.weather === alt.fieldWeather) return moveIndexOfStage(world.rules, alt.useMove);
   }
   return moveIdx;
 }
@@ -2683,6 +2694,11 @@ export function activeLegendField(world: World): { field: LegendField; index: nu
       }
     }
     if (found.length > 0) out = found[cycle ? Math.floor(((world.tick - (world.legendary?.appearTick ?? 0)) * world.dt) / cycle) % found.length : 0]!;
+    // 1 体だけになった姿のマップの効果（ゲンシカイキの おおひでり・おおあめ。07 の282章）
+    if (out && found.length === 1 && isAloneLegend(world, out.index)) {
+      const af = world.rules.stage.legendary?.moveSets[world.rules.enemies.kinds[e.kind[out.index]!]?.id ?? '']?.alone?.field;
+      if (af) out = { field: af, index: out.index };
+    }
   }
   fieldTick.set(world, { tick: world.tick, out });
   return out;
@@ -2732,6 +2748,20 @@ export function legendRounds(world: World): LegendRounds {
 }
 
 /** その伝説と同時に戦う相手（ラウンドの相手。ラウンドの無い伝説戦は自分だけ） */
+/**
+ * 敵 i が、同時に戦う伝説（同じラウンドに 2 体以上）の生き残りの 1 体か（ゲンシカイキ。07 の282章）。
+ * 出ている敵だけで決まるので、どのブラウザでも同じ
+ */
+export function isAloneLegend(world: World, i: number): boolean {
+  const lg = world.legendary;
+  const e = world.enemies;
+  if (!lg || lg.result || e.hp[i]! <= 0) return false;
+  const kinds = legendRoundKinds(world, lg.kind);
+  if (kinds.length < 2 || !kinds.includes(e.kind[i]!)) return false;
+  for (let j = 0; j < e.count; j++) if (j !== i && e.hp[j]! > 0 && kinds.includes(e.kind[j]!)) return false;
+  return true;
+}
+
 export function legendRoundKinds(world: World, kind: number): readonly number[] {
   const r = legendRounds(world);
   for (const x of r.rounds) if (x.kinds.includes(kind)) return x.kinds;

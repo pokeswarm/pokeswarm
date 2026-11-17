@@ -799,14 +799,40 @@
         ]
       },
       "legend-groudon": {
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960
+        },
+        "anchor": {
+          "x": -420,
+          "y": -180
+        },
+        "noEnrage": true,
         "moves": [
           "groudon-precipice-blades",
           "groudon-eruption",
           "groudon-solar-beam"
         ],
+        "alone": {
+          "intro": "groudon-primal-reversion",
+          "moves": [
+            "groudon-precipice-blades-primal",
+            "groudon-eruption",
+            "groudon-solar-beam"
+          ],
+          "field": {
+            "typePowerPct": {
+              "fire": 50,
+              "water": -100
+            },
+            "weather": "sun-weather",
+            "groundTint": "#ffd890"
+          }
+        },
         "random": false,
-        "moveIntervalSeconds": 1.9,
-        "enrageMoveIntervalSeconds": 1.3,
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 1.2,
         "field": {
           "typePowerPct": {
             "fire": 50,
@@ -817,11 +843,31 @@
         }
       },
       "legend-kyogre": {
+        "anchor": {
+          "x": 420,
+          "y": -180
+        },
         "moves": [
           "kyogre-origin-pulse",
           "kyogre-water-spout",
           "kyogre-thunder"
         ],
+        "alone": {
+          "intro": "kyogre-primal-reversion",
+          "moves": [
+            "kyogre-origin-pulse",
+            "kyogre-water-spout",
+            "kyogre-thunder"
+          ],
+          "field": {
+            "typePowerPct": {
+              "water": 50,
+              "fire": -100
+            },
+            "weather": "rain-dance",
+            "groundTint": "#8ca0cc"
+          }
+        },
         "random": false,
         "moveIntervalSeconds": 1.9,
         "enrageMoveIntervalSeconds": 1.3,

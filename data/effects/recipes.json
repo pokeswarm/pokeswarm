@@ -7376,13 +7376,10 @@
       }
     },
     "boss-precipice-blades": {
-      "extends": "ground.base",
-      "bossTelegraph": { "id": "precipice-crack", "fit": "circle", "size": 1.25 },
-      "strike": { "id": "precipice-blade-big", "fit": "circle", "size": 1.8, "originY": 0.85, "seconds": 0.6 }
+      "extends": "ground.base"
     },
     "boss-primal-groudon": {
-      "extends": "fire.base",
-      "bossTelegraph": { "id": "primal-aura-red", "fit": "circle", "size": 3.2 }
+      "extends": "fire.base"
     },
     "boss-primal-kyogre": {
       "extends": "water.base",
@@ -7599,9 +7596,7 @@
       }
     },
     "boss-eruption": {
-      "extends": "eruption",
-      "bossTelegraph": { "id": "magma-rock", "fit": "circle", "size": 0.8, "dropHeight": 460 },
-      "strike": { "id": "lava-splash", "fit": "circle", "size": 1.25, "seconds": 0.45 }
+      "extends": "eruption"
     },
     "boss-psystrike": {
       "extends": "psystrike",

@@ -25,6 +25,7 @@ import { MewtwoPsychic } from '../render/effects/MewtwoPsychic';
 import { ArticunoIce } from '../render/effects/ArticunoIce';
 import { ZapdosElectric } from '../render/effects/ZapdosElectric';
 import { MoltresFlame } from '../render/effects/MoltresFlame';
+import { GroudonEarth } from '../render/effects/GroudonEarth';
 import { ShinyCharizardFlame } from '../render/effects/ShinyCharizardFlame';
 import { ShinyVenusaurPlant } from '../render/effects/ShinyVenusaurPlant';
 import { WaterRun } from '../render/effects/WaterRun';
@@ -182,6 +183,7 @@ export class RunScene extends Phaser.Scene {
   private articunoIce: ArticunoIce | null = null;
   private zapdosElectric: ZapdosElectric | null = null;
   private moltresFlame: MoltresFlame | null = null;
+  private groudonEarth: GroudonEarth | null = null;
   private shinyCharizardFlame: ShinyCharizardFlame | null = null;
   private shinyVenusaurPlant: ShinyVenusaurPlant | null = null;
   /** 甲羅で走っているボス（色違いのカメックスの アクアジェット）: 走り出した技の動作・絵・向き。止まると消す */
@@ -3286,6 +3288,8 @@ export class RunScene extends Phaser.Scene {
     this.zapdosElectric.update(world, this.time.now);
     this.moltresFlame ??= new MoltresFlame(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);
     this.moltresFlame.update(world, this.time.now);
+    this.groudonEarth ??= new GroudonEarth(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6, spriteRender.depths.bosses + 0.05);
+    this.groudonEarth.update(world, this.time.now);
     this.shinyCharizardFlame ??= new ShinyCharizardFlame(this, spriteRender.depths.effects + 0.35, spriteRender.depths.bosses + 0.05, ARENA_FLOOR_DEPTH + 3.6);
     this.shinyCharizardFlame.update(world, this.time.now, alpha);
     this.shinyVenusaurPlant ??= new ShinyVenusaurPlant(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);

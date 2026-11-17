@@ -33,24 +33,6 @@
       ],
       "frameKeyPrefix": "Walk"
     },
-    "Charge": {
-      "source": "Charge",
-      "frameWidth": 80,
-      "frameHeight": 120,
-      "durations": [
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2
-      ],
-      "frameKeyPrefix": "Charge"
-    },
     "Hurt": {
       "source": "Hurt",
       "frameWidth": 80,
@@ -60,6 +42,25 @@
         8
       ],
       "frameKeyPrefix": "Hurt"
+    },
+    "QuickStrike": {
+      "source": "QuickStrike",
+      "frameWidth": 152,
+      "frameHeight": 168,
+      "durations": [
+        2,
+        4,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        1
+      ],
+      "frameKeyPrefix": "QuickStrike"
     }
   },
   "missing": []

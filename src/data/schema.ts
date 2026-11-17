@@ -982,6 +982,8 @@ export const bossMoveSchema = z.object({
   toTarget: z.object({ past: z.number() }).optional(),
   /** 予告の間と突進している間、pose の動作のまま向きをくるくる回す（甲羅で回る。色違いのカメックス。07 の256章） */
   shellSpin: z.boolean().optional(),
+  /** 突進している間の体の動作（ドット絵の動作の名前）。突進の向きを向く（レックウザの しんそく: 体を伸ばして駆ける。07 の289章） */
+  dashPose: z.string().optional(),
   /** 距離の条件（minTargetDistance・maxTargetDistance）を満たさないときは、待たずに代わりにこの技を使い、この技は次にもう一度試す（色違いのカメックス: 離れていたら アクアジェット で詰める。07 の256章） */
   orElse: z.string().min(1).optional(),
   /** ゆびをふる（ミュウ。07 の257章）: 落ちたら、この中からランダムに 1 つを次に使う（前に選んだ技は続けて選ばない） */

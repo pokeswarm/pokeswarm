@@ -2186,8 +2186,8 @@
         "enemy"
       ],
       "enemyExtraAnimations": [
-        "Charge",
-        "Hurt"
+        "Hurt",
+        "QuickStrike"
       ]
     },
     {

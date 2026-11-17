@@ -191,7 +191,7 @@ export class RunScene extends Phaser.Scene {
   private shinyCharizardFlame: ShinyCharizardFlame | null = null;
   private shinyVenusaurPlant: ShinyVenusaurPlant | null = null;
   /** 甲羅で走っているボス（色違いのカメックスの アクアジェット）: 走り出した技の動作・絵・向き。止まると消す */
-  private readonly dashLooks = new Map<number, { pose: string; effect: string; dirX: number; dirY: number }>();
+  private readonly dashLooks = new Map<number, { pose: string; effect: string; dirX: number; dirY: number; spin: boolean }>();
   /** ボスの上に最後に出した技の名前（ボスの id → 技のキー。続きの技・何度も落ちる技で同じ名前を出し直さない。07 の257章） */
   private readonly moveNameShown = new Map<number, string>();
   /** ボスの上に出している技の名前（ボスの id → 文字と出した時刻。1 体に 1 つだけ。新しい名前が出たら前の名前は消す） */
@@ -2746,11 +2746,13 @@ export class RunScene extends Phaser.Scene {
     const fast = Math.hypot(w.enemies.x[i]! - w.enemies.prevX[i]!, w.enemies.y[i]! - w.enemies.prevY[i]!) > 6;
     for (const h of w.hazards) {
       const mv = w.rules.stage.moves[h.move];
-      if (h.dasher === id && mv?.shellSpin && mv.pose && h.activeTicks !== undefined && mv.dashSpeed) this.dashLooks.set(id, { pose: mv.pose, effect: mv.effect, dirX: h.dirX, dirY: h.dirY });
+      if (h.dasher === id && mv?.shellSpin && mv.pose && h.activeTicks !== undefined && mv.dashSpeed) this.dashLooks.set(id, { pose: mv.pose, effect: mv.effect, dirX: h.dirX, dirY: h.dirY, spin: true });
+      // 体を伸ばして駆ける（レックウザの しんそく。07 の289章）: 突進の向きを向く
+      if (h.dasher === id && mv?.dashPose && h.activeTicks !== undefined && mv.dashSpeed) this.dashLooks.set(id, { pose: mv.dashPose, effect: mv.effect, dirX: h.dirX, dirY: h.dirY, spin: false });
     }
     const look = this.dashLooks.get(id);
     if (look && !fast) this.dashLooks.delete(id);
-    if (look && fast) return { anim: look.pose, spin: true };
+    if (look && fast) return look.spin ? { anim: look.pose, spin: true } : { anim: look.pose, spin: false, face: [look.dirX, look.dirY] };
     // 技ごとの動き（ピカチュウ: ためる・息を整える。07 の194章）
     for (const h of w.hazards) {
       const mv = w.rules.stage.moves[h.move];

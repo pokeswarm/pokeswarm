@@ -52,7 +52,7 @@ export class RayquazaSky {
       if (!id.startsWith('rayquaza-')) continue;
       const p = hz.activeTicks === undefined ? 1 - hz.ticksLeft / Math.max(1, hz.totalTicks) : 1;
       const key = `${id}:${hz.group ?? 0}:${Math.round(hz.x)}:${Math.round(hz.y)}`;
-      if (id === 'rayquaza-dragon-ascent') {
+      if (id.startsWith('rayquaza-dragon-ascent')) {
         if (hz.activeTicks === undefined) this.drawAscentShadow(hz, p, timeMs);
         else {
           seen.add(key);

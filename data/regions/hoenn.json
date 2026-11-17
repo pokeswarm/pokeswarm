@@ -891,15 +891,33 @@
         }
       },
       "legend-rayquaza": {
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960
+        },
+        "anchor": {
+          "x": 0,
+          "y": -240
+        },
+        "noEnrage": true,
         "moves": [
           "rayquaza-dragon-ascent",
           "rayquaza-draco-meteor",
-          "rayquaza-outrage",
+          "rayquaza-extreme-speed",
           "rayquaza-hurricane"
         ],
+        "hpMoves": [
+          {
+            "belowHpPct": 50,
+            "moves": [
+              "rayquaza-to-center"
+            ]
+          }
+        ],
         "random": false,
-        "moveIntervalSeconds": 1.4,
-        "enrageMoveIntervalSeconds": 1,
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 1.6,
         "field": {
           "overlay": {
             "color": "#b2dfdb",

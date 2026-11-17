@@ -7381,6 +7381,11 @@
     "boss-primal-groudon": {
       "extends": "fire.base"
     },
+    "boss-rayquaza-ascent": { "extends": "dragon.base" },
+    "boss-rayquaza-meteor": { "extends": "dragon.base" },
+    "boss-rayquaza-speed": { "extends": "normal.base" },
+    "boss-rayquaza-hurricane": { "extends": "flying.base" },
+    "boss-rayquaza-beam": { "extends": "normal.base" },
     "boss-primal-kyogre": {
       "extends": "water.base"
     },

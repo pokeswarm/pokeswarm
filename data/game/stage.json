@@ -2135,62 +2135,15 @@
     {"id": "kyogre-thunder", "move": "thunder", "effect": "boss-kyogre-thunder", "customArt": true, "shape": "circle", "target": "player", "radius": 70, "damage": 44, "follow": {"seconds": 1.5}, "telegraphSeconds": 2.1, "whenWeather": [{"fieldWeather": "rain-dance", "useMove": "kyogre-thunder-rain"},{"fieldWeather": "sun-weather", "useMove": "kyogre-thunder-sun"}]},
     {"id": "kyogre-thunder-rain", "move": "thunder", "effect": "boss-kyogre-thunder", "customArt": true, "shape": "circle", "target": "player", "radius": 70, "damage": 44, "follow": {"seconds": 0.7}, "telegraphSeconds": 1.2},
     {"id": "kyogre-thunder-sun", "move": "thunder", "effect": "boss-kyogre-thunder", "customArt": true, "shape": "circle", "target": "player", "radius": 70, "damage": 44, "follow": {"seconds": 1.8}, "telegraphSeconds": 2.8},
-    {
-      "id": "rayquaza-dragon-ascent",
-      "move": "dragon-ascent",
-      "effect": "boss-dragon-ascent",
-      "shape": "circle",
-      "target": "player",
-      "teleport": true,
-      "hideBoss": true,
-      "follow": {
-        "seconds": 2,
-        "speed": 130
-      },
-      "telegraphSeconds": 2.8,
-      "radius": 120,
-      "damage": 62
-    },
-    {
-      "id": "rayquaza-draco-meteor",
-      "move": "draco-meteor",
-      "effect": "meteor",
-      "shape": "circle",
-      "target": "player",
-      "telegraphSeconds": 1.4,
-      "radius": 70,
-      "damage": 42,
-      "count": 8,
-      "spread": 320
-    },
-    {
-      "id": "rayquaza-outrage",
-      "move": "outrage",
-      "effect": "boss-outrage",
-      "shape": "line",
-      "target": "player",
-      "telegraphSeconds": 0.6,
-      "radius": 50,
-      "length": 240,
-      "damage": 36,
-      "dashSpeed": 360,
-      "activeSeconds": 1,
-      "hitEverySeconds": 0.3,
-      "recoilSeconds": 1.5
-    },
-    {
-      "id": "rayquaza-hurricane",
-      "move": "hurricane",
-      "effect": "boss-hurricane",
-      "shape": "circle",
-      "target": "player",
-      "telegraphSeconds": 1.5,
-      "radius": 95,
-      "damage": 50,
-      "follow": {
-        "seconds": 0.8
-      }
-    },
+    {"id": "rayquaza-dragon-ascent", "move": "dragon-ascent", "effect": "boss-rayquaza-ascent", "customArt": true, "shape": "circle", "target": "player", "teleport": true, "hideBoss": true, "follow": {"seconds": 2, "speed": 130}, "telegraphSeconds": 2.8, "radius": 120, "damage": 62, "then": "rayquaza-landed"},
+    {"id": "rayquaza-landed", "effect": "boss-out-of-breath", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Hurt", "telegraphSeconds": 2, "radius": 60, "damage": 0},
+    {"id": "rayquaza-draco-meteor", "move": "draco-meteor", "effect": "boss-rayquaza-meteor", "customArt": true, "shape": "circle", "target": "player", "rooted": true, "pose": "Charge", "arenaScatter": true, "telegraphSeconds": 1.6, "radius": 70, "damage": 42, "count": 12, "lowHpCount": {"belowHpPct": 50, "count": 16}, "stagger": 0.12},
+    {"id": "rayquaza-extreme-speed", "move": "extreme-speed", "effect": "boss-rayquaza-speed", "customArt": true, "shape": "line", "target": "player", "telegraphSeconds": 0.7, "radius": 40, "length": 2400, "damage": 50, "dashSpeed": 1100, "chain": 3, "chainPauseSeconds": 0.5},
+    {"id": "rayquaza-hurricane", "move": "hurricane", "effect": "boss-rayquaza-hurricane", "customArt": true, "shape": "circle", "target": "self", "rooted": true, "pose": "Charge", "telegraphSeconds": 0.9, "radius": 90, "damage": 40, "travel": {"speed": 170}, "activeSeconds": 4, "hitEverySeconds": 0.6, "onHit": {"pushSpeed": 520, "pushSeconds": 0.4}},
+    {"id": "rayquaza-to-center", "effect": "boss-out-of-breath", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "airborne": true, "flyTo": {"x": 0, "y": -140, "speed": 1300}, "telegraphSeconds": 0.8, "radius": 60, "damage": 0, "then": "rayquaza-hyper-beam"},
+    {"id": "rayquaza-hyper-beam", "move": "hyper-beam", "effect": "boss-rayquaza-beam", "customArt": true, "shape": "line", "target": "player", "rooted": true, "holdWhileActive": true, "pose": "Charge", "telegraphSeconds": 1.8, "radius": 38, "length": 2400, "damage": 50, "hitEverySeconds": 0.6, "sweep": {"degrees": 150, "seconds": 3.5}, "then": "rayquaza-beam-hold"},
+    {"id": "rayquaza-beam-hold", "effect": "boss-rayquaza-beam", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Charge", "telegraphSeconds": 3.5, "radius": 60, "damage": 0, "then": "rayquaza-recharge"},
+    {"id": "rayquaza-recharge", "effect": "boss-out-of-breath", "shape": "circle", "target": "self", "rooted": true, "hideTelegraph": true, "pose": "Hurt", "telegraphSeconds": 3, "radius": 60, "damage": 0},
     {
       "id": "deoxys-psycho-boost",
       "move": "psycho-boost",

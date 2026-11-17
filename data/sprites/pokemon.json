@@ -2184,6 +2184,10 @@
       "dex": 384,
       "uses": [
         "enemy"
+      ],
+      "enemyExtraAnimations": [
+        "Charge",
+        "Hurt"
       ]
     },
     {

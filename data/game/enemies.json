@@ -2543,11 +2543,16 @@
       "asBoss": true,
       "sprite": "enemy/rayquaza",
       "hp": 90000,
-      "moveSpeed": 190,
+      "moveSpeed": 170,
       "radius": 48,
-      "contactDamage": 50,
+      "contactDamage": 30,
       "xp": 0,
-      "spriteScale": 2.8
+      "spriteScale": 2.8,
+      "motion": {
+        "type": "orbit",
+        "distance": 430,
+        "angularDegreesPerSecond": 26
+      }
     },
     {
       "id": "legend-deoxys",

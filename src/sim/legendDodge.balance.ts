@@ -56,6 +56,13 @@ function run(kindId: string): void {
     if (!w.bosses.length) throw new Error(`${kindId} が出ない`);
     // 何体も同時に出る戦い（レッド戦）は、そろうまで少し待つ
     for (let t = 0; t < tickRate; t++) sim.step([]);
+    // DODGE_KILL=legend-kyogre: 同時に戦う相手の 1 体を先に倒して、残った方（ゲンシカイキ）を測る（07 の285章）
+    for (const kill of (process.env.DODGE_KILL ?? '').split(',').filter(Boolean)) {
+      for (let k = 0; k < w.enemies.count; k++) {
+        if (rules.enemies.kinds[w.enemies.kind[k]!]?.id === kill) sim.step([{ type: 'damageEnemy', id: w.enemies.id[k]!, amount: 1e9, by: 1, kbx: 0, kby: 0, kbTicks: 0, status: -1, statusTicks: 0 }]);
+      }
+      for (let t = 0; t < tickRate * 3; t++) sim.step([]);
+    }
     const ids = new Set(w.bosses.map((b) => b.id));
     /** 一番近い、生きている伝説（何体もいるときは全員を数える） */
     const idx = (): number => {

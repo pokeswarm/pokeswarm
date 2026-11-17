@@ -52,4 +52,20 @@ describe('グラードン ＋ カイオーガ', () => {
     expect(boss?.alone).toBe(true);
     expect(t.rules.stage.moves[boss!.moves[0]!]!.id).toBe('groudon-precipice-blades-primal');
   });
+
+  it('だんがいのつるぎ の後の止まる技は 1 回だけ（刃の数だけ出ていた。07 の285章）', () => {
+    const t = setup();
+    const moves = t.rules.stage.moves;
+    const k = t.idx('legend-kyogre');
+    const kb = t.w.bosses.find((b) => b.id === t.w.enemies.id[k]);
+    const gb = t.w.bosses.find((b) => b.id === t.w.enemies.id[t.idx('legend-groudon')])!;
+    gb.forced = [moves.findIndex((m) => m.id === 'groudon-precipice-blades')];
+    let claws = 0;
+    for (let s = 0; s < 120; s++) {
+      if (kb) kb.cooldown = 1e6;
+      t.sim.step([]);
+      for (const ev of t.w.events) if (ev.type === 'hazardTelegraphed' && moves[ev.move]?.id === 'groudon-claws-in') claws++;
+    }
+    expect(claws).toBe(1);
+  });
 });

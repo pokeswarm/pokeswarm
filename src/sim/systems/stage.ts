@@ -1357,16 +1357,20 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   }
   if (move.along) {
     // 狙った人への向きに並べて順に（エンテイのふみつけ）
-    for (const deg of move.fan ?? [0]) {
+    const fans = move.fan ?? [0];
+    const along = move.along;
+    fans.forEach((deg, f) => {
       const a = Math.atan2(uy, ux) + (deg * Math.PI) / 180;
       const vx = Math.cos(a);
       const vy = Math.sin(a);
       for (let c = 0; c < move.count; c++) {
-        const d = move.along.start + c * move.along.spacing;
-        // 止まって出す技は、落ちた時にまた動けるようボスを結び付ける（無いと止まったままになる）
-        put(bx + vx * d, by + vy * d, vx, vy, move.rooted ? bossId : -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
+        const d = along.start + c * along.spacing;
+        // 止まって出す技は、落ちた時にまた動けるようボスを結び付ける（無いと止まったままになる）。
+        // 続く技（then）がある技は、最後の 1 つだけに結ぶ（並べた数だけ続く技が出ていた。グラードンのだんがいのつるぎ。07 の285章）
+        const last = f === fans.length - 1 && c === move.count - 1;
+        put(bx + vx * d, by + vy * d, vx, vy, move.rooted && (!move.then || move.thenSamePlace || last) ? bossId : -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt) });
       }
-    }
+    });
     return;
   }
   if (move.bounce) {
@@ -1491,7 +1495,9 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
         const dist = move.scatter ? world.rng.range(0, move.spread) : c === 0 ? 0 : world.rng.range(move.radius, move.spread + move.radius);
         // 狙った人を囲む輪（くろいまなざし）: 内側の半径は rings.width で決める
         const ring = move.shape === 'ring' && move.rings ? { inner: Math.max(0, move.radius * scale - move.rings.width * scale) } : {};
-        put(t.x + rx * dist, t.y + ry * dist, ux, uy, move.healPct || move.rooted || move.then || move.teleport || move.hideBoss || move.followBoss ? bossId : -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt), ...ring });
+        // 続く技（then）がある技は、最後の 1 つだけに結ぶ（しおふき の後の休み。07 の285章）。同じ場所に続く技（thenSamePlace: 毒だまり）は 1 つずつ
+        const tie = (move.healPct || move.rooted || move.then || move.teleport || move.hideBoss || move.followBoss) && (!move.then || move.thenSamePlace || (t === targets[targets.length - 1] && c === count - 1));
+        put(t.x + rx * dist, t.y + ry * dist, ux, uy, tie ? bossId : -1, { delay: Math.round(((move.stagger ?? 0) * c) / world.dt), ...ring });
       }
     }
   }

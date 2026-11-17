@@ -19,7 +19,7 @@ interface Lingering {
 }
 
 const IMPACT_MS = 900;
-const CRATER_MS = 1300;
+const CRATER_MS = 1800;
 
 /**
  * レックウザの技の絵（07 の288章）: ガリョウテンセイの影と落ちてくる緑の光・りゅうせいぐんの降る流星・しんそくの白い筋・
@@ -59,7 +59,7 @@ export class RayquazaSky {
           if (!this.lingering.has(key)) this.lingering.set(key, { kind: 'impact', x: hz.x, y: hz.y, r: hz.radius, seed: rnd(hz.x, hz.y), startMs: timeMs, goneMs: 0 });
         }
       } else if (id === 'rayquaza-draco-meteor') {
-        if (hz.activeTicks === undefined) this.drawMeteorFall(hz, p);
+        if (hz.activeTicks === undefined) this.drawMeteorFall(hz, p, ray, timeMs);
         else {
           seen.add(key);
           if (!this.lingering.has(key)) this.lingering.set(key, { kind: 'crater', x: hz.x, y: hz.y, r: hz.radius, seed: rnd(hz.x, hz.y), startMs: timeMs, goneMs: 0 });
@@ -149,39 +149,163 @@ export class RayquazaSky {
     }
   }
 
-  /** りゅうせいぐんの予告: 落ちる所の影がだんだん濃く大きく、空から斜めに流星が落ちてくる（炎の尾を引く） */
-  private drawMeteorFall(hz: Hz, p: number): void {
+  /**
+   * りゅうせいぐんの予告（07 の291章）: レックウザの口から光の玉が空へ撃ち上がり、空から燃える岩が斜めに落ちてくる。
+   * 岩は暗い芯と、進む側が赤く溶けた面。まわりに白→黄→橙の炎の衣と、竜の紫の光。後ろに長く細る炎の尾・火の粉・煙。
+   * 地面は落ちる所の影と、近づくほど明るくなる橙の照り返し
+   */
+  private drawMeteorFall(hz: Hz, p: number, ray: { x: number; y: number; r: number } | null, timeMs: number): void {
     const r = hz.radius;
-    this.gf.fillStyle(0x000000, 0.12 + 0.3 * p).fillEllipse(hz.x, hz.y, r * 2 * (0.4 + 0.6 * p), r * 0.9 * (0.4 + 0.6 * p));
-    this.gf.lineStyle(3, 0xffab40, 0.2 + 0.5 * p).strokeEllipse(hz.x, hz.y, r * 2, r * 0.9);
-    if (p < 0.25) return;
-    const t = (p - 0.25) / 0.75;
-    const sx = hz.x - 420;
-    const sy = hz.y - 760;
-    const x = sx + (hz.x - sx) * t;
-    const y = sy + (hz.y - sy) * t;
-    const dx = hz.x - sx;
-    const dy = hz.y - sy;
-    const len = Math.hypot(dx, dy);
-    const ux = dx / len;
-    const uy = dy / len;
-    this.ga.lineStyle(30, 0xff6d00, 0.4).lineBetween(x - ux * 220, y - uy * 220, x, y);
-    this.gt.lineStyle(12, 0xffcc80, 0.8).lineBetween(x - ux * 150, y - uy * 150, x, y);
-    this.gt.fillStyle(0xfff3e0, 1).fillCircle(x, y, 16);
-    this.gt.fillStyle(0x7c4dff, 0.55).fillCircle(x, y, 26);
+    const seed = rnd(hz.x, hz.y);
+    // 撃ち上げ: 最初の 2 割、口元から空へ昇る光の玉
+    if (ray && p < 0.22) {
+      const t = p / 0.22;
+      const ox = ray.x + (seed - 0.5) * 60;
+      const oy = ray.y - ray.r * 0.8 - t * 900;
+      this.ga.lineStyle(26, 0x7c4dff, 0.35 * (1 - t)).lineBetween(ox, oy + 140, ox, oy);
+      this.gt.lineStyle(8, 0xffe0b2, 0.9 * (1 - t * 0.5)).lineBetween(ox, oy + 90, ox, oy);
+      this.gt.fillStyle(0xffffff, 1).fillCircle(ox, oy, 13);
+    }
+    // 地面: 落ちる所の影と、近づく炎の照り返し
+    const t = Math.max(0, Math.min(1, (p - 0.18) / 0.82));
+    this.gf.fillStyle(0x000000, 0.12 + 0.32 * p).fillEllipse(hz.x, hz.y, r * 2 * (0.45 + 0.55 * p), r * 0.9 * (0.45 + 0.55 * p));
+    this.gf.lineStyle(3, 0xffab40, 0.25 + 0.5 * p).strokeEllipse(hz.x, hz.y, r * 2, r * 0.9);
+    if (t > 0) this.ga.fillStyle(0xff6d00, 0.4 * t * t).fillEllipse(hz.x, hz.y, r * 2.4, r * 1.05);
+    if (p < 0.18) return;
+    // 落ちる道: 左上から（流星ごとに少し向きが違う）。だんだん速く
+    const sx = hz.x - 260 - seed * 260;
+    const sy = hz.y - 900;
+    const k = Math.pow(t, 1.35);
+    const x = sx + (hz.x - sx) * k;
+    const y = sy + (hz.y - sy) * k;
+    const len = Math.hypot(hz.x - sx, hz.y - sy);
+    const ux = (hz.x - sx) / len;
+    const uy = (hz.y - sy) / len;
+    const nx = -uy;
+    const ny = ux;
+    const R = 30;
+    const flick = (n: number): number => 0.85 + 0.3 * rnd(Math.floor(timeMs / 50) + n, seed * 97);
+    // 煙: 尾のさらに後ろに、暗い紫がかった煙の玉
+    for (let i = 0; i < 7; i++) {
+      const d = 180 + i * 46;
+      const w = Math.sin(timeMs / 140 + i * 1.7 + seed * 9) * 10;
+      this.gn.fillStyle(0x2a2233, 0.28 * (1 - i / 7)).fillCircle(x - ux * d + nx * w, y - uy * d + ny * w, R * (0.9 + i * 0.16));
+    }
+    // 竜の光（紫の大きなかさ）
+    this.ga.fillStyle(0x7c4dff, 0.28).fillCircle(x, y, R * 2.6);
+    this.ga.fillStyle(0xb388ff, 0.22).fillCircle(x - ux * R, y - uy * R, R * 1.8);
+    // 炎の尾: 太い赤橙 → 橙 → 薄い黄 → 白の芯（三角を重ねる。長さはちらつく）
+    const L1 = 320 * flick(1);
+    const L2 = 220 * flick(2);
+    const L3 = 130 * flick(3);
+    const tail = (g: Phaser.GameObjects.Graphics, color: number, alpha: number, w: number, l: number): void => {
+      g.fillStyle(color, alpha).fillTriangle(x + nx * w, y + ny * w, x - nx * w, y - ny * w, x - ux * l, y - uy * l);
+    };
+    tail(this.ga, 0xff3d00, 0.55, R * 1.5, L1);
+    tail(this.ga, 0xff9100, 0.7, R * 1.1, L2);
+    tail(this.gt, 0xffd180, 0.85, R * 0.75, L3);
+    tail(this.gt, 0xfffde7, 0.9, R * 0.4, L3 * 0.6);
+    // 炎の衣（頭のまわり）
+    this.ga.fillStyle(0xff6d00, 0.75).fillCircle(x, y, R * 1.45 * flick(4));
+    this.gt.fillStyle(0xffcc80, 0.9).fillCircle(x + ux * 3, y + uy * 3, R * 1.12);
+    // 岩: 暗い芯（ゆっくり回るでこぼこの形）と、進む側の溶けた面
+    const pts: Phaser.Math.Vector2[] = [];
+    const lit: Phaser.Math.Vector2[] = [];
+    const spin = timeMs / 400 + seed * 6;
+    for (let i = 0; i < 8; i++) {
+      const ang = spin + (i / 8) * Math.PI * 2;
+      const rr = R * (0.72 + 0.3 * rnd(i, seed * 31));
+      pts.push(new Phaser.Math.Vector2(x + Math.cos(ang) * rr, y + Math.sin(ang) * rr));
+      lit.push(new Phaser.Math.Vector2(x + ux * R * 0.22 + Math.cos(ang) * rr * 0.72, y + uy * R * 0.22 + Math.sin(ang) * rr * 0.72));
+    }
+    this.gt.fillStyle(0x3a221a, 1).fillPoints(pts, true);
+    this.gt.fillStyle(0xd84315, 1).fillPoints(lit, true);
+    this.gt.fillStyle(0xffab40, 1).fillCircle(x + ux * R * 0.42, y + uy * R * 0.42, R * 0.38);
+    this.gt.fillStyle(0xffffff, 0.95).fillCircle(x + ux * R * 0.55, y + uy * R * 0.55, R * 0.2);
+    // 岩のひび（溶けて光る）
+    this.gt.lineStyle(3, 0xffd54f, 0.9);
+    for (let i = 0; i < 3; i++) {
+      const ang = spin + i * 2.1;
+      this.gt.lineBetween(x - ux * 4, y - uy * 4, x + Math.cos(ang) * R * 0.6, y + Math.sin(ang) * R * 0.6);
+    }
+    // 火の粉: 尾から横へこぼれて流れる
+    for (let i = 0; i < 10; i++) {
+      const life = (timeMs / 420 + rnd(i, seed * 13)) % 1;
+      const d = 40 + life * 300;
+      const side = (rnd(seed * 7, i) - 0.5) * 2 * (16 + life * 70);
+      const sz = 9 * (1 - life) + 3;
+      this.gt.fillStyle(life < 0.4 ? 0xffe082 : 0xff7043, 1 - life).fillRect(x - ux * d + nx * side - sz / 2, y - uy * d + ny * side - sz / 2, sz, sz);
+    }
   }
 
-  /** りゅうせいぐんが落ちた所: 白い光の爆発と、橙の光の輪。焦げた穴がしばらく残る */
+  /**
+   * りゅうせいぐんが落ちた所（07 の291章）: 白い光、ふくらむ火の玉と衝撃の輪、飛び散る岩と火の粉、立ち昇る煙。
+   * 焦げた穴に溶けたひびがしばらく赤く光って冷えていく
+   */
   private drawCrater(l: Lingering, timeMs: number): void {
     const age = timeMs - l.startMs;
     const t = Math.min(1, age / CRATER_MS);
     const r = l.r;
-    this.gf.fillStyle(0x140c08, 0.6 * (1 - t * 0.7)).fillEllipse(l.x, l.y, r * 1.8, r * 0.8);
-    this.ga.fillStyle(0xff6d00, 0.45 * (1 - t)).fillEllipse(l.x, l.y, r * 1.4, r * 0.6);
-    if (age < 400) {
-      const tt = age / 400;
-      this.gt.fillStyle(0xffffff, 0.9 * (1 - tt)).fillCircle(l.x, l.y - r * 0.2, r * (0.6 + 0.7 * tt));
-      this.ga.lineStyle(10, 0xffab40, 0.8 * (1 - tt)).strokeEllipse(l.x, l.y, r * (1 + 1.6 * tt) * 2, r * (1 + 1.6 * tt) * 0.9);
+    // 焦げた穴と、盛り上がった縁
+    this.gf.fillStyle(0x0d0a09, 0.75 * (1 - t * 0.6)).fillEllipse(l.x, l.y, r * 2.0, r * 0.88);
+    this.gf.lineStyle(6, 0x4e3b30, 0.7 * (1 - t * 0.6)).strokeEllipse(l.x, l.y, r * 2.15, r * 0.95);
+    // 溶けたひび（放射状。赤く光って冷える）
+    for (let k = 0; k < 7; k++) {
+      const a = (k / 7) * Math.PI * 2 + l.seed * 5;
+      const len = r * (0.8 + rnd(k, l.seed) * 0.7);
+      const mx = l.x + Math.cos(a + 0.25) * len * 0.5;
+      const my = l.y + Math.sin(a + 0.25) * len * 0.22;
+      const ex = l.x + Math.cos(a) * len;
+      const ey = l.y + Math.sin(a) * len * 0.44;
+      this.gf.lineStyle(6, 0x0a0706, 0.8 * (1 - t * 0.5)).lineBetween(l.x, l.y, mx, my).lineBetween(mx, my, ex, ey);
+      this.ga.lineStyle(3, t < 0.5 ? 0xffab40 : 0xff3d00, 0.85 * (1 - t)).lineBetween(l.x, l.y, mx, my).lineBetween(mx, my, ex, ey);
+    }
+    this.ga.fillStyle(0xff6d00, 0.5 * (1 - t)).fillEllipse(l.x, l.y, r * 1.2, r * 0.5);
+    // 白い光（一瞬・その場だけ）
+    if (age < 140) this.gt.fillStyle(0xffffff, 0.85 * (1 - age / 140)).fillCircle(l.x, l.y - r * 0.2, r * 1.3);
+    // 火の玉: ふくらんで上へ昇りながら暗くなる
+    if (age < 650) {
+      const tt = age / 650;
+      const fy = l.y - r * 0.3 - tt * r * 0.8;
+      // いくつもの火の塊がもくもくと広がる（丸 1 つの板に見えないように）
+      for (let k = 0; k < 5; k++) {
+        const a = (k / 5) * Math.PI * 2 + l.seed * 4;
+        const d = r * (0.25 + 0.55 * tt);
+        const px = l.x + Math.cos(a) * d;
+        const py = fy + Math.sin(a) * d * 0.6 - tt * r * 0.3 * rnd(k, l.seed);
+        this.ga.fillStyle(k % 2 ? 0xff3d00 : 0xff6d00, 0.6 * (1 - tt)).fillCircle(px, py, r * (0.42 + 0.35 * tt));
+      }
+      this.gt.fillStyle(0xffe0b2, 0.85 * (1 - tt) * (1 - tt)).fillCircle(l.x, fy + r * 0.1, r * (0.45 + 0.35 * tt));
+    }
+    // 煙: 火の玉の後に立ち昇る暗い煙
+    if (age > 250 && age < 1700) {
+      const tt = (age - 250) / 1450;
+      for (let k = 0; k < 4; k++) {
+        const ox = (rnd(k, l.seed) - 0.5) * r * 1.2;
+        this.gn.fillStyle(0x2b2526, 0.4 * (1 - tt)).fillCircle(l.x + ox, l.y - r * 0.5 - tt * r * (1.4 + k * 0.3), r * (0.45 + 0.5 * tt));
+      }
+    }
+    // 衝撃の輪
+    if (age < 450) {
+      const tt = age / 450;
+      const rr = r * (1 + 1.8 * tt);
+      this.ga.lineStyle(14 * (1 - tt), 0xffab40, 0.85 * (1 - tt)).strokeEllipse(l.x, l.y, rr * 2, rr * 0.9);
+      this.gt.lineStyle(4 * (1 - tt), 0xfff3e0, 0.9 * (1 - tt)).strokeEllipse(l.x, l.y, rr * 2, rr * 0.9);
+    }
+    // 飛び散る岩のかけらと火の粉（放物線）
+    if (age < 750) {
+      const tt = age / 750;
+      for (let k = 0; k < 10; k++) {
+        const a = rnd(l.seed, k) * Math.PI * 2;
+        const sp = r * (1.0 + rnd(k, l.seed) * 1.5);
+        const px = l.x + Math.cos(a) * sp * tt;
+        const py = l.y + Math.sin(a) * sp * tt * 0.45 - (r * 1.6 * tt - r * 2.2 * tt * tt);
+        if (k % 3 === 0) this.gt.fillStyle(0xffcc80, 1 - tt).fillRect(px - 3.5, py - 3.5, 7, 7);
+        else {
+          this.gn.fillStyle(0x3e2c24, 1 - tt * 0.6).fillRect(px - 5.5, py - 5.5, 11, 11);
+          this.gn.fillStyle(0xe65100, 1 - tt).fillRect(px - 5.5, py - 5.5, 11, 4);
+        }
+      }
     }
   }
 

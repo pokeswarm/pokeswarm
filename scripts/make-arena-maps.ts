@@ -1937,6 +1937,113 @@ function sootopolisWall(): (Rgb | null)[] {
   return out;
 }
 
+/** そらのはしらの頂上（レックウザ。07 の290章）: 古い塔の屋上。風化した大きな石畳、割れ・欠け・苔。外は雲の海 */
+const PILLAR_STONE = ['#22262a', '#2a2f33', '#33393d', '#3d4448', '#495054'].map(hex);
+const PILLAR_MOSS = ['#1d2a22', '#24332a', '#2c3d31'].map(hex);
+const RUBBLE = ['#121417', '#181b1f', '#1f2328'].map(hex);
+
+function skyPillarFloor(): { floor: Rgb[] } {
+  const floor: Rgb[] = [];
+  const joint = hex('#101215');
+  const jointLit = hex('#555d61');
+  const crack = hex('#14171a');
+  const carve = hex('#191c20');
+  const carveLit = hex('#4d5559');
+  const cx = W / 2;
+  const cy = H / 2;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    // 石板: 大きく不揃い（レンガや敷き詰めた石に見えないよう、ゆがんだ大きな板）
+    const wx = x + (fbm(x / 23, y / 23, 705) - 0.5) * 9;
+    const wy = y + (fbm(x / 23, y / 23, 706) - 0.5) * 9;
+    const slab = worley(wx, wy * 1.25, 44, 701);
+    const id = hash2(slab.id, 1, 703);
+    // 欠けて無くなった石（下のがれきが見える）。真ん中の紋は残す
+    const r = Math.hypot((x - cx) / 1.0, (y - cy) * 1.75);
+    const missing = id < 0.06 && r > 150;
+    let c: Rgb;
+    if (missing) {
+      c = ramp(RUBBLE, 0.4 + (fbm(x / 5, y / 5, 707) - 0.5) * 1.2, x, y);
+      if (slab.edge < 2 && slab.dy > 0) c = hex('#0b0c0e');
+    } else {
+      // 石の明るさ: 石ごとのむら＋風化の大きなむら。左上の縁が明るく、右下が暗い
+      let t = 0.42 + (id - 0.5) * 0.35 + (fbm(x / 70, y / 50, 709) - 0.5) * 0.35 + (fbm(x / 6, y / 6, 711) - 0.5) * 0.18;
+      c = ramp(PILLAR_STONE, t, x, y, 0.5);
+      // 目地: 所々は砂で埋まって見えない。板の左上の縁は明るい
+      const filled = fbm(x / 16, y / 16, 704) > 0.62;
+      if (slab.edge < 1.1 && !filled) c = joint;
+      else if (slab.edge < 2.4 && slab.dx > 0 && slab.dy > 0 && !filled) c = jointLit;
+      // 擦り減った凹み
+      if (fbm(x / 11, y / 11, 708) > 0.7) c = [Math.round(c[0] * 0.85), Math.round(c[1] * 0.86), Math.round(c[2] * 0.88)];
+      // 割れた石: 石の中を走る長いひび
+      if (id > 0.78) {
+        const cr = worley(wx * 0.6, wy, 26, 713 + Math.floor(id * 100));
+        if (cr.edge < 0.7 && slab.edge > 3) c = crack;
+      }
+      // 苔: 目地に沿って、所々のむらで（屋根のない頂上の湿り）
+      const moss = fbm(x / 40, y / 30, 715);
+      if (moss > 0.56 && (slab.edge < 4 || moss > 0.66) && hash2(x, y, 717) < (moss - 0.5) * 2.4) c = ramp(PILLAR_MOSS, (fbm(x / 4, y / 4, 719)), x, y);
+      // 真ん中の古い紋（擦り減った輪と、竜の鱗のような刻み）
+      const ring = Math.abs(r - 112) < 2.2 || Math.abs(r - 84) < 1.6;
+      const scale = r < 84 && r > 20 && Math.abs(((Math.atan2(y - cy, x - cx) * 12) / Math.PI + 100) % 2 - 1) < 0.1;
+      const worn = fbm(x / 14, y / 14, 721) < 0.62;
+      if ((ring || scale) && worn) c = carve;
+      else if (Math.abs(r - 114.5) < 1 && worn) c = carveLit;
+    }
+    // 端は風に削られて暗い
+    const edgeD = Math.min(x, W - 1 - x, y * 1.4, (H - 1 - y) * 1.4);
+    if (Math.max(0, 1 - edgeD / 18) * 0.6 > (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16) c = [Math.round(c[0] * 0.6), Math.round(c[1] * 0.62), Math.round(c[2] * 0.68)];
+    floor.push(c);
+  }
+  return { floor };
+}
+
+/** 崩れた胸壁（欠けた石の縁）と、その外の雲の海。奥は夜明け前の暗い空 */
+const PARAPET = ['#15181c', '#1c2025', '#252a30', '#30363c', '#3c434a'].map(hex);
+const CLOUD_SEA = ['#0b0f18', '#10162a', '#161e33', '#1d273e', '#26314a'].map(hex);
+
+function skyPillarWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const rimDark = hex('#0c0e11');
+  const rimLight = hex('#59626a');
+  const dark = hex('#06080d');
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const dist = Math.max(inset(iy, 51) - ix, ix - (W - 1 - inset(iy, 52)), inset(ix, 53) - iy, iy - (H - 1 - inset(ix, 54)));
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    // 胸壁の厚さ: 所々で崩れて細い（外の雲が見える）
+    const along = dist === inset(iy, 51) - ix || dist === ix - (W - 1 - inset(iy, 52)) ? y : x;
+    const broken = fbm(along / 26, 3, 723);
+    const thick = 6 + Math.max(0, broken - 0.35) * 30 + (hash2(Math.floor(along / 9), 5, 725) < 0.2 ? 6 : 0);
+    let c: Rgb;
+    if (dist < thick) {
+      // 胸壁の石: 横長の切り石
+      const st = worley(x * 0.55, y * 1.1, 14, 727);
+      const t = 0.5 + (st.dx * 0.6 + st.dy * 0.4) / 14 * 0.6 + (hash2(st.id, 7, 729) - 0.5) * 0.35 - dist / thick * 0.25;
+      c = ramp(PARAPET, t, x, y);
+      if (st.edge < 0.7) c = rimDark;
+      if (fbm(x / 9, y / 9, 731) > 0.68) c = ramp(PILLAR_MOSS, 0.3, x, y);
+      if (dist > thick - 1.5) c = rimDark;
+    } else {
+      // 雲の海（遠いほど暗い。横に流れる雲の層）
+      const k = (dist - thick) / (MARGIN - thick + 1);
+      const band = fbm(x / 70, y / 9, 733);
+      const t = 0.15 + band * 0.75 - k * 0.45 + (fbm(x / 20, y / 6, 735) - 0.5) * 0.25;
+      c = ramp(CLOUD_SEA, t, x, y);
+      if (band > 0.66 && fbm(x / 12, y / 4, 737) > 0.55) c = mix(c, hex('#33405a'), 0.45);
+      if (dist > MARGIN - 12 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (dist - (MARGIN - 12)) / 12) c = dark;
+    }
+    if (dist <= 1) c = rimDark;
+    else if (dist <= 3) c = rimLight;
+    out.push(c);
+  }
+  return out;
+}
+
 const arenas = [
   { id: 'lugia', ...lugiaFloor(), wall: lugiaWall() },
   { id: 'hooh', ...hoohFloor(), wall: hoohWall() },
@@ -1952,6 +2059,7 @@ const arenas = [
   { id: 'blastoise', region: 'kanto', ...blastoiseFloor(), shimmerA: null, shimmerB: null, wall: blastoiseWall() },
   { id: 'mew', region: 'kanto', ...mewFloor(), shimmerA: null, shimmerB: null, wall: mewWall() },
   { id: 'sootopolis', region: 'hoenn', ...sootopolisFloor(), wall: sootopolisWall() },
+  { id: 'sky-pillar', region: 'hoenn', ...skyPillarFloor(), shimmerA: null, shimmerB: null, wall: skyPillarWall() },
 ];
 for (const a of arenas) {
   const outDir = path.join('public', 'map', 'region' in a ? a.region : 'johto');

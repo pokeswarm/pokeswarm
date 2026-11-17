@@ -894,7 +894,13 @@
         "arena": {
           "halfWidth": 800,
           "halfHeight": 440,
-          "viewHeight": 960
+          "viewHeight": 960,
+          "map": {
+            "floor": "map/hoenn/arena-sky-pillar-floor.png",
+            "wall": "map/hoenn/arena-sky-pillar-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2
+          }
         },
         "anchor": {
           "x": 0,

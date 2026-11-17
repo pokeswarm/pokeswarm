@@ -1810,6 +1810,133 @@ function mewWall(): (Rgb | null)[] {
   return out;
 }
 
+// --- グラードン ＋ カイオーガ: ルネシティの火口の湖（左はグラードンの日照りで干上がった湖底、右は深い海。07 の287章） ---
+
+/** 技の赤・橙（グラードン）と青・白（カイオーガ）が映えるよう、床は暗く、鮮やかにしない */
+const LAKEBED = ['#1f1b1c', '#272223', '#302a29', '#3a3230', '#453c38'].map(hex);
+const DEEP_SEA = ['#0a1a2c', '#0d2134', '#11293d', '#153246', '#1a3b50'].map(hex);
+const WET_SAND = ['#16171c', '#1b1d23', '#22252b'].map(hex);
+
+/** 陸と海の境（左が陸）: 揺らいだ縦の線で、少し斜め */
+const shoreX = (y: number): number => W / 2 + 24 + (fbm(y / 70, 3, 601) - 0.5) * 110 + (y - H / 2) * 0.12;
+
+function sootopolisFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
+  const floor: Rgb[] = [];
+  const shimmerA: (Rgb | null)[] = [];
+  const shimmerB: (Rgb | null)[] = [];
+  const crackDark = hex('#120f10');
+  const crackLit = hex('#4f4540');
+  const foam = hex('#5d7f92');
+  const foamBright = hex('#8fb0bf');
+  const wave = hex('#21445a');
+  const glintA = hex('#4f7f99');
+  const glintB = hex('#7fa9bd');
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const d = x - shoreX(y) + (fbm(x / 18, y / 18, 603) - 0.5) * 10;
+    let col: Rgb;
+    let glint = 0;
+    if (d < -8) {
+      // 干上がった湖底: 不揃いな泥の割れ（大小 2 段）。岸から遠いほど乾いて明るく、ひびが深い
+      const dry = Math.min(1, -d / 260);
+      const cell = worley(x, y, 13, 605);
+      const big = worley(x, y, 46, 607);
+      let t = 0.32 + dry * 0.28 + (hash2(cell.id, 1, 609) - 0.5) * 0.28 + (fbm(x / 64, y / 64, 611) - 0.5) * 0.25;
+      // 割れの縁は少し反り返って明るい（左上から光）
+      if (cell.edge < 2.2 && cell.dy < 0) t += 0.12;
+      col = ramp(LAKEBED, t, x, y, 0.5);
+      // 乾いて白っぽく粉をふいた所（大きなむら）
+      const salt = fbm(x / 52, y / 40, 612);
+      if (salt > 0.6 && hash2(x, y, 614) < (salt - 0.6) * 3) col = mix(col, hex('#5a524c'), 0.45);
+      // 細かいひびは所々だけ（どこでも引くと石畳に見える）。大きな割れは長くつながる
+      const fine = fbm(x / 36, y / 36, 616) > 0.5 - dry * 0.12;
+      if (fine && cell.edge < 0.7) col = crackDark;
+      else if (big.edge < 1.6) col = crackDark;
+      else if (big.edge < 2.8 && big.dy > 0) col = crackLit;
+      // 岸に近い所は湿って暗い
+      if (d > -40 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (d + 40) / 40 * 0.7) col = ramp(WET_SAND, 0.5 + (fbm(x / 9, y / 9, 613) - 0.5), x, y);
+    } else if (d < 10) {
+      // 波打ち際: 濡れた砂と、寄せる泡の線（切れ切れに）
+      col = ramp(WET_SAND, 0.4 + (fbm(x / 8, y / 8, 615) - 0.5) * 0.8, x, y);
+      const lane = Math.abs(d - 3 - Math.sin(y / 9) * 2);
+      if (lane < 1.3 && fbm(x / 6, y / 14, 617) > 0.42) col = d > 4 ? foam : foamBright;
+    } else {
+      // 深い海: 沖ほど深く暗い。風で横にそろう波の筋
+      const deep = Math.min(1, (d - 10) / 300);
+      let t = 0.75 - deep * 0.55 + (fbm(x / 90, y / 90, 619) - 0.5) * 0.3;
+      col = ramp(DEEP_SEA, t, x, y, 0.5);
+      const band = fbm(x / 60, y / 4.5, 621);
+      if (band > 0.64) col = mix(col, wave, Math.min(0.7, (band - 0.64) * 4));
+      // 岸の近くの泡のすじ（寄せ波）
+      if (d < 34 && Math.abs(((d + fbm(x / 20, y / 20, 623) * 12) % 11) - 5) < 0.7 && fbm(x / 5, y / 12, 625) > 0.5) col = mix(col, foam, 0.45);
+      // きらめき: 短い横線をまばらに
+      if (y % 3 === 0) {
+        const ln = Math.floor(y / 3);
+        if (valueNoise(x / 9 + ln * 7.3, ln * 3.1, 627) > 0.91) glint = 1;
+        else if (valueNoise(x / 9 + ln * 5.1, ln * 2.3, 629) > 0.91) glint = 2;
+      }
+    }
+    // 壁ぎわの影（火口の崖の影）
+    const edgeD = Math.min(x, W - 1 - x);
+    const shade = Math.max(0, 1 - y / 24) * 0.7 + Math.max(0, 1 - edgeD / 14) * 0.5 + Math.max(0, 1 - (H - 1 - y) / 8) * 0.45;
+    if (shade > (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16) col = [Math.round(col[0] * 0.6), Math.round(col[1] * 0.62), Math.round(col[2] * 0.7)];
+    floor.push(col);
+    shimmerA.push(glint === 1 ? glintA : null);
+    shimmerB.push(glint === 2 ? glintB : null);
+  }
+  return { floor, shimmerA, shimmerB };
+}
+
+/** 火口の崖: ルネの白っぽい岩（暗くして HUD を読みやすく）。奥の空は、左が日照りのかすみ、右が雨雲 */
+const CRATER_ROCK = ['#1c1d22', '#25272d', '#30323a', '#3c3f47', '#4b4e57'].map(hex);
+
+function sootopolisWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const dark = hex('#08090c');
+  const rimLight = hex('#5c6068');
+  const rimDark = hex('#111217');
+  const hazeSky = ['#120d0c', '#1a1210', '#231713', '#2e1d16'].map(hex);
+  const rainSky = ['#0a0d14', '#0e121b', '#131924', '#18202d'].map(hex);
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const fromLeft = inset(iy, 41) - ix;
+    const fromRight = ix - (W - 1 - inset(iy, 42));
+    const fromTop = inset(ix, 43) - iy;
+    const fromBottom = iy - (H - 1 - inset(ix, 44));
+    const dist = Math.max(fromLeft, fromRight, fromTop, fromBottom);
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    let col: Rgb;
+    const ridgeTop = 14 + fbm(x / 24, 7, 631) * 7;
+    if (iy < 0 && -iy > ridgeTop) {
+      // 奥の空: 左は日照りの赤茶のかすみ、右は雨雲。真ん中でまざる（タイマーの後ろは暗いまま）
+      const k = Math.max(0, Math.min(1, (x - fw * 0.35) / (fw * 0.3) + (fbm(x / 50, y / 12, 633) - 0.5) * 0.5));
+      const t = ((iy + MARGIN) / MARGIN) * 0.6 + (fbm(x / 60, y / 10, 635) - 0.45) * 0.6;
+      const a = ramp(hazeSky, t, x, y);
+      const b = ramp(rainSky, t, x, y);
+      col = mix(a, b, k);
+      // 雨の筋（右だけ。まばら）
+      if (k > 0.6 && (x + y * 2) % 23 === 0 && hash2(x, y, 637) > 0.5) col = hex('#26334a');
+    } else {
+      // 火口の崖: 縦に割れた岩（左上が明るい）
+      // 縦に長い岩の板（敷き詰めた石に見えないよう大きく）
+      const stone = worley(x * 0.7, y * 0.35, 22, 639);
+      const lit = (stone.dx + stone.dy * 0.4) / 22;
+      const t = 0.45 + lit * 0.4 + (hash2(stone.id, 2, 641) - 0.5) * 0.3 + (fbm(x / 30, y / 30, 643) - 0.5) * 0.25 - Math.max(0, dist - 8) * 0.013;
+      col = ramp(CRATER_ROCK, t, x, y);
+      if (stone.edge < 0.8) col = rimDark;
+      if (dist > MARGIN - 14 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (dist - (MARGIN - 14)) / 14) col = dark;
+    }
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 3) col = rimLight;
+    out.push(col);
+  }
+  return out;
+}
+
 const arenas = [
   { id: 'lugia', ...lugiaFloor(), wall: lugiaWall() },
   { id: 'hooh', ...hoohFloor(), wall: hoohWall() },
@@ -1824,6 +1951,7 @@ const arenas = [
   { id: 'venusaur', region: 'kanto', ...venusaurFloor(), shimmerA: null, shimmerB: null, wall: venusaurWall() },
   { id: 'blastoise', region: 'kanto', ...blastoiseFloor(), shimmerA: null, shimmerB: null, wall: blastoiseWall() },
   { id: 'mew', region: 'kanto', ...mewFloor(), shimmerA: null, shimmerB: null, wall: mewWall() },
+  { id: 'sootopolis', region: 'hoenn', ...sootopolisFloor(), wall: sootopolisWall() },
 ];
 for (const a of arenas) {
   const outDir = path.join('public', 'map', 'region' in a ? a.region : 'johto');

@@ -1153,7 +1153,15 @@ export const stageConfigSchema = z.object({
              * 同時に戦う相手（同じラウンドの伝説）がみな倒れて 1 体だけになったときの姿（ゲンシカイキ。07 の282章）: intro を使ってから moves を順に使う。
              * field はマップの効果をこれに替える（おおひでり・おおあめ）。絵は enemies.json の formKinds の alone
              */
-            alone: z.object({ moves: z.array(z.string()).min(1), intro: z.string().min(1).optional(), field: legendFieldSchema.optional() }).optional(),
+            alone: z
+              .object({
+                moves: z.array(z.string()).min(1),
+                intro: z.string().min(1).optional(),
+                field: legendFieldSchema.optional(),
+                /** 1 体だけになった後の技の間隔（2 体いる間は長く、1 体になったら短く。07 の286章） */
+                moveIntervalSeconds: z.number().positive().optional(),
+              })
+              .optional(),
             /** 第 2 段階（技が速くなる・DANGER）を使わない。行動を作者が決めた相手（07 の194章） */
             noEnrage: z.boolean().optional(),
             /** 技の名前（stage.json の move）を、使ったときにボスの上に出す（ミュウの ゆびをふる。07 の257章） */

@@ -816,6 +816,7 @@
         ],
         "alone": {
           "intro": "groudon-primal-reversion",
+          "moveIntervalSeconds": 2.4,
           "moves": [
             "groudon-precipice-blades-primal",
             "groudon-eruption",
@@ -832,7 +833,7 @@
         },
         "random": false,
         "intervalAfterMove": true,
-        "moveIntervalSeconds": 1.2,
+        "moveIntervalSeconds": 4.6,
         "field": {
           "typePowerPct": {
             "fire": 50,
@@ -855,6 +856,7 @@
         ],
         "alone": {
           "intro": "kyogre-primal-reversion",
+          "moveIntervalSeconds": 2.6,
           "moves": [
             "kyogre-origin-pulse-primal",
             "kyogre-water-spout",
@@ -871,7 +873,7 @@
         },
         "random": false,
         "intervalAfterMove": true,
-        "moveIntervalSeconds": 1.2,
+        "moveIntervalSeconds": 5.0,
         "field": {
           "typePowerPct": {
             "water": 50,

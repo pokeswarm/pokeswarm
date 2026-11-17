@@ -613,6 +613,7 @@ export function bossAttacks(world: World): void {
           boss.alone = true;
           boss.moves = alone.moves.map((m) => moveIndexOfStage(world.rules, m));
           boss.next = 0;
+          if (alone.moveIntervalSeconds) boss.interval = Math.round(alone.moveIntervalSeconds / world.dt);
           if (alone.intro) (boss.forced ??= []).unshift(moveIndexOfStage(world.rules, alone.intro));
         }
       }

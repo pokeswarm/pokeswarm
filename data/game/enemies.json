@@ -2475,9 +2475,9 @@
       "asBoss": true,
       "sprite": "enemy/groudon",
       "hp": 64000,
-      "moveSpeed": 95,
+      "moveSpeed": 60,
       "radius": 48,
-      "contactDamage": 46,
+      "contactDamage": 24,
       "xp": 0,
       "spriteScale": 2.4,
       "formKinds": [
@@ -2509,7 +2509,7 @@
       "hp": 64000,
       "moveSpeed": 130,
       "radius": 48,
-      "contactDamage": 46,
+      "contactDamage": 24,
       "xp": 0,
       "spriteScale": 2.4,
       "motion": {

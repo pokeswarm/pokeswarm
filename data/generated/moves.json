@@ -389,6 +389,19 @@
     "contestType": null,
     "damageClass": "special"
   },
+  "calm-mind": {
+    "names": {
+      "ja": "めいそう",
+      "en": "Calm Mind",
+      "fr": "Plénitude",
+      "de": "Gedankengut",
+      "es": "Paz Mental",
+      "it": "Calmamente"
+    },
+    "type": "psychic",
+    "contestType": "smart",
+    "damageClass": "status"
+  },
   "charge": {
     "names": {
       "ja": "じゅうでん",

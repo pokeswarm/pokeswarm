@@ -1486,17 +1486,10 @@
       "flare-blitz"
     ],
     "suicune": [
-      "water-gun",
-      "bubble",
-      "gust",
-      "body-slam",
-      "hydro-pump",
-      "blizzard",
-      "bubble-beam",
-      "aurora-beam",
-      "swift",
-      "mirror-coat",
-      "whirlpool"
+      "surf-suicune",
+      "mirror-coat-suicune",
+      "sheer-cold-suicune",
+      "calm-mind"
     ],
     "lugia": [
       "gust",

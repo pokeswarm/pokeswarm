@@ -1,6 +1,6 @@
 import type { InputCommand } from '../commands';
 import { setRunStat } from '../runStats';
-import { useSkill } from '../activeSkills';
+import { replaySkill, useSkill } from '../activeSkills';
 import { advanceContest, applyContest } from '../contest';
 import { absorbBarrier, noteLegendThreat } from './stage';
 import type { HitEffect } from '../events';
@@ -29,6 +29,11 @@ export function applyCommands(world: World, commands: readonly InputCommand[]): 
         const p = findPlayer(world, cmd.playerId);
         // レベルアップ・ポーズ・コンテストの間は使えない（その間もコマンドは届く）
         if (p && !p.remote && !world.levelUp && !world.paused && !world.contest) useSkill(world, p, cmd.slot);
+        break;
+      }
+      case 'remoteSkill': {
+        const p = findPlayer(world, cmd.playerId);
+        if (p && p.remote) replaySkill(world, p, cmd.slot, cmd.x, cmd.y, cmd.dirX, cmd.dirY);
         break;
       }
       case 'contest':

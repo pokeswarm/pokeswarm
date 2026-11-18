@@ -1,5 +1,9 @@
 {
-  "keys": ["SPACE", "Q", "E"],
+  "keys": [
+    "SPACE",
+    "Q",
+    "E"
+  ],
   "skills": {
     "teleport": {
       "kind": "teleport",
@@ -8,7 +12,49 @@
       "chargesPerLevel": 1,
       "rechargeSeconds": 8,
       "distance": 300,
-      "buff": { "powerPct": 15, "seconds": 3, "maxStacks": 5 }
+      "buff": {
+        "powerPct": 15,
+        "seconds": 3,
+        "maxStacks": 5
+      }
+    },
+    "surf-suicune": {
+      "kind": "surf",
+      "move": "surf-suicune",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "surf": {
+        "rideSeconds": 0.5,
+        "waterSeconds": 7,
+        "waterSpacing": 60,
+        "waterRows": 3,
+        "waterPowerPct": 8
+      }
+    },
+    "mirror-coat-suicune": {
+      "kind": "mirrorCoat",
+      "move": "mirror-coat-suicune",
+      "trigger": "press",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "mirror": {
+        "shardsPerHit": 3,
+        "maxShards": 30,
+        "absorbPowerPct": 400,
+        "shardSpeed": 520
+      }
+    },
+    "sheer-cold-suicune": {
+      "kind": "sheerCold",
+      "move": "sheer-cold-suicune",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "sheerCold": {
+        "comboMultiplier": 3,
+        "freezeDelaySeconds": 0.45
+      }
     }
   }
 }

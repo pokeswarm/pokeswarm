@@ -326,7 +326,7 @@ export class MewtwoPlayer {
     // 行き先の印（本人が SPACE を押している間）
     const me = world.players.find((p) => p.id === localId);
     const slot = aimSlot !== null ? me?.skills?.[aimSlot] : undefined;
-    if (me && slot && !me.down) {
+    if (me && slot && !me.down && world.rules.activeSkills?.defs[slot.skill]?.kind === 'teleport') {
       const to = teleportDestination(world, me, slot.skill);
       const ready = slot.charges > 0;
       const mark = this.pool.image('m2p-mark', this.floorDepth);

@@ -5,6 +5,7 @@ import type { World } from '../sim/world';
 import { maxCharges, rechargeTicksOf, skillDef } from '../sim/activeSkills';
 import { px } from './pixelUi';
 import { skillIconKey } from './skillIcons';
+import { moveIconKey } from './Icons';
 import { isTouchDevice } from './TouchJoystick';
 
 /** アイコンの倍率（32 ドットのアイコンを 64 で出す） */
@@ -46,7 +47,8 @@ export class SkillHud {
       skills.forEach((s, slot) => {
         const def = skillDef(world, s.skill);
         const x = slot * (32 * ICON_SCALE + GAP);
-        const icon = this.scene.add.image(x, 0, skillIconKey(def.key)).setOrigin(0, 0).setScale(ICON_SCALE);
+        // 技の枠の技を使うスキル（スイクン）は、その技のアイコン
+        const icon = this.scene.add.image(x, 0, def.move >= 0 ? moveIconKey(world.rules, def.move) : skillIconKey(def.key)).setOrigin(0, 0).setScale(ICON_SCALE);
         if (s.charges <= 0) icon.setTint(0x6a5a70);
         if (aiming === slot) icon.setTint(0xffd6ff);
         this.container.add(icon);

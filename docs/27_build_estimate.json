@@ -16481,257 +16481,51 @@
       {
        "form": "suicune",
        "scene": "boss",
-       "est": 5619.639436366659,
+       "est": 10705.22420952172,
        "moves": [
         {
-         "move": "ice-beam",
-         "level": 8,
-         "est": 1966.6800309384275
+         "move": "surf-suicune",
+         "level": 12,
+         "est": 7351.975392680923
         },
         {
-         "move": "bubble-beam",
-         "level": 8,
-         "est": 1906.4105529625172
+         "move": "mirror-coat-suicune",
+         "level": 12,
+         "est": 1878.0368279240804
         },
         {
-         "move": "gust",
-         "level": 8,
-         "est": 828.676065218767
+         "move": "sheer-cold-suicune",
+         "level": 12,
+         "est": 1475.2119889167166
         },
         {
-         "move": "hydro-pump",
-         "level": 8,
-         "est": 917.8727872469468
+         "move": "calm-mind",
+         "level": 12,
+         "est": 0
         }
        ],
        "items": [
-        "never-melt-ice",
-        "mystic-water",
-        "metronome",
-        "light-clay",
         "x-sp-atk",
-        "pp-max"
-       ],
-       "vs": {
-        "johto-boss-xatu": 3.259617503389273,
-        "johto-boss-crobat": 4.88942625508391,
-        "johto-boss-machamp": 6.533716879312595,
-        "johto-boss-houndoom": 7.7359284219690725,
-        "johto-boss-dragonite": 9.54457899179216,
-        "round1": 36.670977672238216,
-        "round2": 53.38420790106118,
-        "round3": 88.00350171059407,
-        "legend-lugia": 66.52280619161782,
-        "legend-ho-oh": 64.6778643315604,
-        "legend-raikou": 11.55135796675504,
-        "legend-entei": 10.878649343394008,
-        "legend-suicune": 13.515117347627308
-       },
-       "legendAvg": 61.85187156141433
-      },
-      {
-       "form": "suicune",
-       "scene": "boss",
-       "est": 5582.928861578148,
-       "moves": [
-        {
-         "move": "ice-beam",
-         "level": 8,
-         "est": 2201.9288384669476
-        },
-        {
-         "move": "bubble-beam",
-         "level": 8,
-         "est": 2134.4500927905697
-        },
-        {
-         "move": "gust",
-         "level": 8,
-         "est": 747.048961210844
-        },
-        {
-         "move": "water-gun",
-         "level": 8,
-         "est": 499.5009691097863
-        }
-       ],
-       "items": [
-        "never-melt-ice",
-        "mystic-water",
         "metronome",
-        "light-clay",
-        "x-sp-atk",
+        "mystic-water",
         "dire-hit"
        ],
        "vs": {
-        "johto-boss-xatu": 3.2540222794854126,
-        "johto-boss-crobat": 4.881033419228118,
-        "johto-boss-machamp": 6.594167281936176,
-        "johto-boss-houndoom": 7.902163725405648,
-        "johto-boss-dragonite": 9.460523788486753,
-        "round1": 36.80855766729492,
-        "round2": 53.73523600929385,
-        "round3": 88.52645435978903,
-        "legend-lugia": 66.4086179486819,
-        "legend-ho-oh": 65.46945860488763,
-        "legend-raikou": 11.594695665197898,
-        "legend-entei": 11.112417738851692,
-        "legend-suicune": 13.648910939847081
+        "johto-boss-xatu": 1.8447650464907095,
+        "johto-boss-crobat": 2.5844168166827313,
+        "johto-boss-machamp": 3.4112963222831563,
+        "johto-boss-houndoom": 3.893969462835941,
+        "johto-boss-dragonite": 5.4565268632448864,
+        "round1": 18.682467184770477,
+        "round2": 28.533202174055198,
+        "round3": 46.70570061177517,
+        "legend-lugia": 37.648266254912436,
+        "legend-ho-oh": 32.852538383187465,
+        "legend-raikou": 5.8849771632026995,
+        "legend-entei": 5.3027728015103195,
+        "legend-suicune": 7.04714797792874
        },
-       "legendAvg": 62.18966491798947
-      },
-      {
-       "form": "suicune",
-       "scene": "boss",
-       "est": 5434.715201960303,
-       "moves": [
-        {
-         "move": "ice-beam",
-         "level": 8,
-         "est": 1966.6800309384275
-        },
-        {
-         "move": "bubble-beam",
-         "level": 8,
-         "est": 1906.4105529625172
-        },
-        {
-         "move": "swift",
-         "level": 8,
-         "est": 643.7518308124105
-        },
-        {
-         "move": "hydro-pump",
-         "level": 8,
-         "est": 917.8727872469468
-        }
-       ],
-       "items": [
-        "never-melt-ice",
-        "mystic-water",
-        "light-clay",
-        "metronome",
-        "x-sp-atk",
-        "pp-max"
-       ],
-       "vs": {
-        "johto-boss-xatu": 3.363045261612998,
-        "johto-boss-crobat": 5.044567892419497,
-        "johto-boss-machamp": 6.955286265297864,
-        "johto-boss-houndoom": 7.991101531985469,
-        "johto-boss-dragonite": 9.879931209791797,
-        "round1": 36.80045643014743,
-        "round2": 55.200684645221145,
-        "round3": 92.01009497469404,
-        "legend-lugia": 68.6335767676122,
-        "legend-ho-oh": 66.67142400610223,
-        "legend-raikou": 11.59214377549644,
-        "legend-entei": 11.237486529354566,
-        "legend-suicune": 14.073424094201194
-       },
-       "legendAvg": 63.86324736475541
-      },
-      {
-       "form": "suicune",
-       "scene": "at50",
-       "est": 5352.030303339511,
-       "moves": [
-        {
-         "move": "ice-beam",
-         "level": 8,
-         "est": 2201.9288384669476
-        },
-        {
-         "move": "bubble-beam",
-         "level": 8,
-         "est": 2134.4500927905697
-        },
-        {
-         "move": "swift",
-         "level": 8,
-         "est": 515.9507574900941
-        },
-        {
-         "move": "water-gun",
-         "level": 8,
-         "est": 499.7006145918998
-        }
-       ],
-       "items": [
-        "never-melt-ice",
-        "mystic-water",
-        "metronome",
-        "light-clay",
-        "x-sp-atk",
-        "dire-hit"
-       ],
-       "vs": {
-        "johto-boss-xatu": 3.3837348283761908,
-        "johto-boss-crobat": 5.075602242564286,
-        "johto-boss-machamp": 7.062740279406471,
-        "johto-boss-houndoom": 8.237603861328036,
-        "johto-boss-dragonite": 9.875444194750928,
-        "round1": 37.368996187335824,
-        "round2": 56.053494281003736,
-        "round3": 93.31401064729872,
-        "legend-lugia": 69.0558128240039,
-        "legend-ho-oh": 68.04039724275495,
-        "legend-raikou": 11.771233799010785,
-        "legend-entei": 11.58413042999255,
-        "legend-suicune": 14.36776892626731
-       },
-       "legendAvg": 64.76654223647942
-      },
-      {
-       "form": "suicune",
-       "scene": "at50",
-       "est": 5109.811622823893,
-       "moves": [
-        {
-         "move": "ice-beam",
-         "level": 8,
-         "est": 1966.6800309384275
-        },
-        {
-         "move": "bubble-beam",
-         "level": 8,
-         "est": 1906.4105529625172
-        },
-        {
-         "move": "hydro-pump",
-         "level": 8,
-         "est": 917.8727872469468
-        },
-        {
-         "move": "whirlpool",
-         "level": 8,
-         "est": 318.8482516760014
-        }
-       ],
-       "items": [
-        "never-melt-ice",
-        "mystic-water",
-        "light-clay",
-        "metronome",
-        "x-sp-atk",
-        "pp-max"
-       ],
-       "vs": {
-        "johto-boss-xatu": 3.561598074649573,
-        "johto-boss-crobat": 5.342397111974359,
-        "johto-boss-machamp": 7.39753297972072,
-        "johto-boss-houndoom": 8.381505263077557,
-        "johto-boss-dragonite": 10.667714158219873,
-        "round1": 39.140386136088466,
-        "round2": 58.71057920413269,
-        "round3": 98.83378559396341,
-        "legend-lugia": 72.68567499284842,
-        "legend-ho-oh": 69.70538047088905,
-        "legend-raikou": 12.329221632867865,
-        "legend-entei": 11.786491776202814,
-        "legend-suicune": 15.411527041084831
-       },
-       "legendAvg": 67.81516127958442
+       "legendAvg": 32.88443492174015
       }
      ],
      "measured": {
@@ -17765,6 +17559,19 @@
      "owners": 2
     },
     {
+     "move": "surf-suicune",
+     "est": 7351.975392680923,
+     "key": "suicune",
+     "form": "suicune",
+     "items": [
+      "mystic-water",
+      "metronome",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
      "move": "aeroblast",
      "est": 7268.4643117770365,
      "key": "lugia",
@@ -18269,7 +18076,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 5
+     "owners": 4
     },
     {
      "move": "ice-shard",
@@ -18306,20 +18113,6 @@
      "form": "celebi",
      "items": [
       "miracle-seed",
-      "light-clay",
-      "metronome",
-      "x-sp-atk",
-      "dire-hit"
-     ],
-     "owners": 2
-    },
-    {
-     "move": "ice-beam",
-     "est": 2201.9288384669476,
-     "key": "suicune",
-     "form": "suicune",
-     "items": [
-      "never-melt-ice",
       "light-clay",
       "metronome",
       "x-sp-atk",
@@ -18400,6 +18193,32 @@
      "owners": 1
     },
     {
+     "move": "mirror-coat-suicune",
+     "est": 1878.0368279240804,
+     "key": "suicune",
+     "form": "suicune",
+     "items": [
+      "x-sp-atk",
+      "metronome",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
+     "move": "ice-beam",
+     "est": 1790.263881710084,
+     "key": "swinub",
+     "form": "piloswine",
+     "items": [
+      "never-melt-ice",
+      "light-clay",
+      "metronome",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
      "move": "poison-fang",
      "est": 1769.9643106239726,
      "key": "zubat",
@@ -18453,7 +18272,7 @@
       "pp-max",
       "dire-hit"
      ],
-     "owners": 5
+     "owners": 4
     },
     {
      "move": "pound",
@@ -18524,7 +18343,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 19
+     "owners": 18
     },
     {
      "move": "thunderbolt",
@@ -18539,6 +18358,18 @@
       "dire-hit"
      ],
      "owners": 4
+    },
+    {
+     "move": "sheer-cold-suicune",
+     "est": 1475.2119889167166,
+     "key": "suicune",
+     "form": "suicune",
+     "items": [
+      "metronome",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 1
     },
     {
      "move": "hex",
@@ -18622,7 +18453,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 6
+     "owners": 5
     },
     {
      "move": "ice-fang",
@@ -18716,19 +18547,6 @@
       "x-attack",
       "light-clay",
       "metronome",
-      "dire-hit"
-     ],
-     "owners": 1
-    },
-    {
-     "move": "sheer-cold",
-     "est": 957.8469001149446,
-     "key": "suicune",
-     "form": "suicune",
-     "items": [
-      "never-melt-ice",
-      "metronome",
-      "x-sp-atk",
       "dire-hit"
      ],
      "owners": 1
@@ -18882,7 +18700,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 6
+     "owners": 5
     },
     {
      "move": "tackle",
@@ -18897,20 +18715,6 @@
       "light-clay"
      ],
      "owners": 13
-    },
-    {
-     "move": "aurora-beam",
-     "est": 687.0548605486313,
-     "key": "suicune",
-     "form": "suicune",
-     "items": [
-      "never-melt-ice",
-      "light-clay",
-      "metronome",
-      "x-sp-atk",
-      "dire-hit"
-     ],
-     "owners": 3
     },
     {
      "move": "disarming-voice",
@@ -18951,7 +18755,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 5
+     "owners": 4
     },
     {
      "move": "magical-leaf",
@@ -18980,6 +18784,20 @@
       "dire-hit"
      ],
      "owners": 1
+    },
+    {
+     "move": "aurora-beam",
+     "est": 558.605473576496,
+     "key": "swinub",
+     "form": "piloswine",
+     "items": [
+      "never-melt-ice",
+      "light-clay",
+      "metronome",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 2
     },
     {
      "move": "whirlwind",
@@ -19058,7 +18876,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 6
+     "owners": 5
     },
     {
      "move": "psychic",
@@ -27206,6 +27024,10 @@
   "raikou": "ライコウ",
   "entei": "エンテイ",
   "suicune": "スイクン",
+  "surf-suicune": "なみのり",
+  "mirror-coat-suicune": "ミラーコート",
+  "sheer-cold-suicune": "ぜったいれいど",
+  "calm-mind": "めいそう",
   "lugia": "ルギア",
   "aeroblast": "エアロブラスト",
   "ho-oh": "ホウオウ",

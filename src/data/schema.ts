@@ -1451,6 +1451,8 @@ export const MOVE_PATTERNS = [
   'spin',
   'heal',
   'passive',
+  /** キーで使う技（アクティブスキルの技。自動では出ない。スイクン。07 の307章） */
+  'skill',
   'sweep',
   'spiral',
   'pulse',
@@ -1940,6 +1942,8 @@ export const moveDefSchema = z.object({
   stopOnBoss: z.boolean().optional(),
   /** 追う弾（homing）: 途中の敵は貫通し、狙った敵（aimStrongest で決めた HP の一番高い敵）に当たったら消える（そこで end の効き方。サイコブレイク。07 の305章） */
   stopOnTarget: z.boolean().optional(),
+  /** めいそう（heal の技。07 の307章）: 使うたびに重ねる数が 1 つ増え（maxStacks まで）、1 つにつき とくしゅの威力 +specialPowerPct %。持続は技の durationSeconds（使うたびに戻る） */
+  calmMind: z.object({ specialPowerPct: z.number().positive(), maxStacks: z.number().int().positive() }).optional(),
   /** HP が最大の thresholdPct % 以下の敵へのダメージを +powerPct %（しおみず: 半分を切った相手に倍。原作どおり。07 の247章） */
   lowHpBonus: z.object({ thresholdPct: z.number().positive().max(100), powerPct: z.number().positive() }).optional(),
   /**
@@ -2957,19 +2961,34 @@ export type AbilitiesConfig = z.infer<typeof abilitiesConfigSchema>;
  *   1 回分は rechargeSeconds で戻り、技の再使用の強化（メトロノーム など）で速くなる。レベルはレベルアップの候補で上がる（maxLevel まで）
  * - teleport: 進む向き（押していなければ向いている向き）へ distance だけ移る。移った後 buff.seconds 秒、技の威力 +buff.powerPct %。
  *   効いている間にまた移ると重なる（buff.maxStacks まで。秒数は移るたびに戻る）
+ * - move があるスキル（スイクン。07 の307章）: 技の枠の技（moves.json の pattern "skill"）をキーで使う。レベルはその技のレベル、
+ *   1 回分が戻る秒数はその技の再使用（cooldownSeconds）、威力・大きさ・数もその技の値。ためておける回数は
+ *   baseCharges + floor((レベル − 1) × chargesPerLevel) + 技の数の強化。trigger は press（押した瞬間）か release（離したとき。押している間は狙いを見せる）
+ * - surf: 向いている方へ、横に並べた count 個の波を進める（1 回で同じ敵には 1 回）。自分も rideSeconds の間、波に乗って進む。
+ *   通った跡に水が waterSeconds 残る（waterRows 列 × waterSpacing ごと。威力は技の waterPowerPct %）
+ * - mirrorCoat: 技の持続（durationSeconds）の間、受けるダメージと状態異常を受けずに吸う。終わると鏡の破片が
+ *   count ＋ 吸った回数 × shardsPerHit 個（maxShards まで）飛び出し、HP の一番高い敵へ向かう。1 個の威力は 技の威力 ×（1 ＋ 吸った量 ÷ 最大 HP × absorbPowerPct %）
+ * - sheerCold: 自分の なみのり の水が残っていれば、水を全部凍らせて、中の敵に 技の威力 × comboMultiplier と こおり。
+ *   水が無ければ、射程の中で HP の一番高い敵の所（いなければ前）を、freezeDelaySeconds 後に凍らせる
  */
 export const activeSkillsConfigSchema = z.object({
   keys: z.array(z.string()).min(1),
   skills: z.record(
     z.string(),
     z.object({
-      kind: z.enum(['teleport']),
-      maxLevel: z.number().int().positive(),
+      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold']),
+      /** 技の枠の技（moves.json のキー）。あればレベル・再使用・威力はその技の値 */
+      move: z.string().optional(),
+      trigger: z.enum(['press', 'release']).default('release'),
+      maxLevel: z.number().int().positive().default(1),
       baseCharges: z.number().int().positive(),
-      chargesPerLevel: z.number().int().min(0),
-      rechargeSeconds: z.number().positive(),
-      distance: z.number().positive(),
+      chargesPerLevel: z.number().min(0),
+      rechargeSeconds: z.number().positive().optional(),
+      distance: z.number().positive().optional(),
       buff: z.object({ powerPct: z.number().positive(), seconds: z.number().positive(), maxStacks: z.number().int().positive() }).optional(),
+      surf: z.object({ rideSeconds: z.number().min(0), waterSeconds: z.number().positive(), waterSpacing: z.number().positive(), waterRows: z.number().int().positive(), waterPowerPct: z.number().min(0) }).optional(),
+      mirror: z.object({ shardsPerHit: z.number().min(0), maxShards: z.number().int().positive(), absorbPowerPct: z.number().min(0), shardSpeed: z.number().positive() }).optional(),
+      sheerCold: z.object({ comboMultiplier: z.number().positive(), freezeDelaySeconds: z.number().positive() }).optional(),
     }),
   ),
 });

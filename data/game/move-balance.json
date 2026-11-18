@@ -18,6 +18,10 @@
     "hoenn": 1.25
   },
   "exempt": [
+    "surf-suicune",
+    "mirror-coat-suicune",
+    "sheer-cold-suicune",
+    "calm-mind",
     "sleep-powder",
     "metronome",
     "hydro-pump",

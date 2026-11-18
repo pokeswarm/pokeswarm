@@ -1,4 +1,5 @@
 import type { BossMove, LegendField } from '../../data/schema';
+import { mirrorActive } from '../activeSkills';
 import { randomUnit } from '../math';
 import { currentWaveIndex, enemyHpScale, findEnemyIndex, moveIndexOfStage, type LegendaryResult, type RunOutcome, type World, type BossEntry, type WingKind, gateDeadlineTick, enemyMoveSpeed, inIntruderArena } from '../world';
 import { glyphPoints } from '../glyph';
@@ -1824,6 +1825,8 @@ function hitLocal(world: World, me: World['players'][number], hz: World['hazards
   bumpRunStat(world, me, 'bossAoeHits');
   const on = move?.onHit;
   if (!on) return;
+  // ミラーコート（スイクン）: 状態異常も受けない（07 の307章）
+  if (mirrorActive(world, me)) return;
   // しんぴのまもり の膜の中: ダメージは受けるが、状態異常（ねむけ・どろ・まひ・やけど・ひるみ・ねむり・どく・こおり）にはならない（07 の272章）
   if (world.healZones.some((z) => z.guard && (me.x - z.x) ** 2 + (me.y - z.y) ** 2 <= z.radius * z.radius)) return;
   if (on.drowsySeconds) me.drowsyTicks = Math.max(me.drowsyTicks ?? 0, Math.round(on.drowsySeconds / world.dt));

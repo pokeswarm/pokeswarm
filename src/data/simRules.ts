@@ -120,6 +120,7 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.statusGuard ? { statusGuard: true } : {}),
       ...(def.stopOnBoss ? { stopOnBoss: true } : {}),
       ...(def.stopOnTarget ? { stopOnTarget: true } : {}),
+      ...(def.calmMind ? { calmMind: def.calmMind } : {}),
       ...(def.lowHpBonus ? { lowHpBonus: def.lowHpBonus } : {}),
       ...(def.echo ? { echo: def.echo } : {}),
       aimFacing: def.aimFacing,
@@ -315,7 +316,10 @@ export function buildSimRules(region?: string): SimRules {
     activeSkills: (() => {
       const keys = Object.keys(activeSkillsConfig.skills);
       return {
-        defs: keys.map((key) => ({ key, ...activeSkillsConfig.skills[key]! })),
+        defs: keys.map((key) => {
+          const d = activeSkillsConfig.skills[key]!;
+          return { ...d, key, move: d.move ? moves.findIndex((m) => m.key === d.move) : -1 };
+        }),
         lines: Object.fromEntries(Object.entries(playablesConfig.pokemon).flatMap(([line, pl]) => (pl.activeSkills.length ? [[line, pl.activeSkills.map((k) => keys.indexOf(k))]] : []))),
       };
     })(),

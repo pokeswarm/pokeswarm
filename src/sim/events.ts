@@ -143,7 +143,23 @@ export interface SkillUsedEvent {
   readonly fromY: number;
   readonly toX: number;
   readonly toY: number;
+  /** 枠の番号と、使った向き（ほかのブラウザへ送って、見た目を出す。07 の307章） */
+  readonly slot: number;
+  readonly dirX: number;
+  readonly dirY: number;
   readonly stacks: number;
+}
+
+/** ミラーコートが受けたダメージを吸った・破片を飛ばした（スイクン。07 の307章。見た目） */
+export interface MirrorAbsorbedEvent {
+  readonly type: 'mirrorAbsorbed';
+  readonly playerId: PlayerId;
+  readonly amount: number;
+}
+export interface MirrorReleasedEvent {
+  readonly type: 'mirrorReleased';
+  readonly playerId: PlayerId;
+  readonly count: number;
 }
 
 /** 歩きすぎて泣き出した（トゲピー。07 の66.4。見た目と音） */
@@ -445,6 +461,8 @@ export type SimEvent =
   | RestChangedEvent
   | CriedEvent
   | SkillUsedEvent
+  | MirrorAbsorbedEvent
+  | MirrorReleasedEvent
   | EvolveAskEvent
   | BoxSpawnedEvent
   | PlayerFrozenEvent

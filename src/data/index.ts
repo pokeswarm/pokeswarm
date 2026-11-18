@@ -431,6 +431,7 @@ for (const [key, p] of Object.entries(playablesConfig.pokemon)) {
   check(!p.ability || (!!abilitiesConfig.abilities[p.ability] && !!generated.abilities[p.ability]), `data/game/playables.json の "${key}" の特性 "${p.ability}" が data/game/abilities.json か data/generated/abilities.json にありません（data/pokeapi/targets.json の abilities に足して npm run pokeapi）`);
   check(!!generated.pokemon[key], `data/game/playables.json の "${key}" が data/generated/pokemon.json にありません`);
   check(p.activeSkills.length <= activeSkillsConfig.keys.length, `data/game/playables.json の "${key}" のアクティブスキルが、data/game/active-skills.json の keys の数より多いです`);
+  for (const s of p.activeSkills) check(!activeSkillsConfig.skills[s]?.move || p.startingMoves.includes(activeSkillsConfig.skills[s]!.move!), `data/game/playables.json の "${key}" のアクティブスキル "${s}" の技を、最初の技に入れてください`);
   for (const s of p.activeSkills) check(!!activeSkillsConfig.skills[s], `data/game/playables.json の "${key}" のアクティブスキル "${s}" が data/game/active-skills.json にありません`);
   for (const m of p.startingMoves) check(!!movesConfig.moves[m], `data/game/playables.json の "${key}" の最初の技 "${m}" が data/game/moves.json にありません`);
   if (p.unlock) {

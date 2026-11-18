@@ -373,8 +373,10 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
     if (it.level < rules.items[it.item]!.maxLevel) pool.push({ kind: 'itemUp', slot });
   });
   // アクティブスキルの強化（技と同じ重み。07 の305章）
+  // 技の枠の技を持つスキル（スイクン）は、その技の強化で上がる
   p.skills?.forEach((s, slot) => {
-    if (s.level < skillDef(world, s.skill).maxLevel) pool.push({ kind: 'skillUp', slot });
+    const d = skillDef(world, s.skill);
+    if (d.move < 0 && s.level < d.maxLevel) pool.push({ kind: 'skillUp', slot });
   });
   if (p.items.length < rules.leveling.maxItemSlots + p.extraItemSlots) {
     rules.items.forEach((_, item) => {

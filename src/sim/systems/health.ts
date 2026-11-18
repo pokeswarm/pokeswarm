@@ -3,6 +3,7 @@ import { applyHitEffect } from './commands';
 import { contactDamageMultiplier } from './status';
 import { activeLegendField } from './stage';
 import { recomputeModifiers } from './leveling';
+import { absorbIntoMirror, mirrorActive } from '../activeSkills';
 import type { PlayerId } from '../commands';
 import type { Player } from '../entities/player';
 import type { World } from '../world';
@@ -52,6 +53,11 @@ export function contactDamage(world: World): void {
 
 /** ダメージを受ける（防御・受けるダメージの倍率を掛ける）。HP が無くなったら復活するか倒れる */
 export function hurtPlayer(world: World, p: Player, raw: number): void {
+  // ミラーコート（スイクン）: 受けずに吸う（07 の307章）
+  if (mirrorActive(world, p)) {
+    absorbIntoMirror(world, p, raw);
+    return;
+  }
   // ドわすれの守り: 決まった間、受けるダメージを減らす
   const guard = p.guardUntilTick !== undefined && world.tick < p.guardUntilTick ? 1 - (p.guardPct ?? 0) / 100 : 1;
   // にらみつける（ファイヤー）: 伝説戦の間、防御が下がる
@@ -98,6 +104,7 @@ export function selfDamage(world: World, p: Player, raw: number): void {
 /** 伝説戦のマップの効果のダメージ（ふぶき）: 防御は効かず、無敵時間も付けない。HP が無くなれば倒れる */
 export function fieldDamage(world: World, p: Player, amount: number): void {
   if (amount <= 0 || p.down) return;
+  if (mirrorActive(world, p)) return;
   p.hp -= amount;
   world.events.push({ type: 'playerDamaged', playerId: p.id, amount });
   if (p.hp <= 0) downOrRevive(world, p);

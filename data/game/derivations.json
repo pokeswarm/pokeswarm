@@ -33,12 +33,6 @@
       "line": "pidgey"
     },
     {
-      "from": "aurora-beam",
-      "item": "never-melt-ice",
-      "to": "ice-beam",
-      "line": "suicune"
-    },
-    {
       "from": "horn-attack",
       "item": "silver-powder",
       "to": "fury-cutter",
@@ -475,12 +469,6 @@
       "item": "thunder-stone",
       "to": "thunder",
       "line": "raikou"
-    },
-    {
-      "from": "ice-beam",
-      "item": "water-stone",
-      "to": "sheer-cold",
-      "line": "suicune"
     },
     {
       "from": "psychic",

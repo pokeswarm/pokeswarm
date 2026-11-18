@@ -28,7 +28,7 @@ import { axisToUnit } from '../math';
 import { typeFlags, typeMultiplier, type MoveStats, type SimMoveDef } from '../moves';
 import { findEnemyIndex, type World } from '../world';
 import { abilityOf, abilityPowerMultiplier, killStackPct, pinchMods } from '../ability';
-import { skillPowerPct } from '../activeSkills';
+import { autoSkillMove, skillPowerPct } from '../activeSkills';
 import { bumpRunStat } from '../runStats';
 import type { Modifiers } from '../upgrades';
 import { applyHitEffect } from './commands';
@@ -134,7 +134,7 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
   // 特性: HP が少ない間だけ威力が上がる（しんりょく など。07 の133章）
   const pinch = pinchMods(world, p);
   // じしんかじょう: 倒すたびに重なる物理の威力
-  const classPct = (def.damageClass === 'physical' ? m.physicalPowerPct + (pinch?.physicalPowerPct ?? 0) + killStackPct(world, p) : m.specialPowerPct + (pinch?.specialPowerPct ?? 0)) + (pinch?.powerPct ?? 0);
+  const classPct = (def.damageClass === 'physical' ? m.physicalPowerPct + (pinch?.physicalPowerPct ?? 0) + killStackPct(world, p) : m.specialPowerPct + (pinch?.specialPowerPct ?? 0) + calmPowerPct(world, p)) + (pinch?.powerPct ?? 0);
   return {
     // ポケモンのステータス（物理・特殊の威力。種族値のランクとレベル）と、持ち物の効果を掛ける
     power:
@@ -386,6 +386,11 @@ export function useMoves(world: World): void {
       const def = world.rules.moves[pm.move];
       // いつも効く技（かくばる・テクスチャー）は使わない（効果は持ち物と同じく、いつも足されている）
       if (!def || def.pattern === 'passive' || def.pattern === 'rest') continue;
+      // キーで使う技（スイクン）: 自分のスキルの枠にあれば自動では出さない。枠に無い（技の表を測るミュウ など）ときは、使えるようになるたびに出す
+      if (def.pattern === 'skill') {
+        autoSkillMove(world, p, pm);
+        continue;
+      }
       // いびき: 眠っている間だけ出す（ほかの技は眠っている間は出さない）
       if (!!def.onlyWhileAsleep !== asleep) continue;
       // 連続技（とっておき）の続きを出す
@@ -1623,6 +1628,12 @@ function fireHeal(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
   // いやしのねがい: 味方を回復する（HP は本人のブラウザで管理するので、どのブラウザでも自分のプレイヤーだけを回復する）
   const ally = world.rules.moves[pm.move]!.allyHealPct;
   if (ally) for (const q of world.players) if (q.id !== p.id) healPlayer(world, q.id, (q.maxHp * ally) / 100);
+  // めいそう: 重ねる数が 1 つ増え、持続が戻る（07 の307章）
+  const calm = zoneDef.calmMind;
+  if (calm) {
+    const live = p.calm && world.tick < p.calm.untilTick ? p.calm.stacks : 0;
+    p.calm = { stacks: Math.min(calm.maxStacks, live + 1), untilTick: world.tick + Math.round(st.durationSeconds / world.dt) };
+  }
   if (st.guardPct > 0) {
     p.guardPct = st.guardPct;
     p.guardUntilTick = world.tick + Math.round(st.durationSeconds / world.dt);
@@ -2435,4 +2446,127 @@ function fieldTypePct(world: World, type: number): number {
   const pct = activeField(world)?.field.typePowerPct;
   if (!pct) return 0;
   return pct[world.rules.types.names[type] ?? ''] ?? 0;
+}
+
+/**
+ * アクティブスキルの技（スイクン。07 の307章）: キーで使う技の、今のレベルの性能（持ち物の効果を掛ける。数の強化は回数に回すので足さない）
+ */
+export function skillMoveStats(world: World, p: Player, pm: PlayerMove): { st: MoveStats; sc: ReturnType<typeof scaledMoveStats> } {
+  const st = moveStatsOf(world, pm);
+  return { st, sc: scaledMoveStats(world, p, pm, st) };
+}
+
+/** 1 回に出したもののまとまり（同じ敵には 1 つだけ当たる）を作る */
+function newCastGroup(world: World, keepSeconds: number): number {
+  const keep = Math.round(keepSeconds / world.dt) + 2;
+  for (const [id, g] of world.castGroups) if (world.tick - g.tick > keep) world.castGroups.delete(id);
+  const group = world.nextCastGroup++;
+  world.castGroups.set(group, { tick: world.tick, hit: new Set() });
+  return group;
+}
+
+/**
+ * なみのり（スイクン）: (x, y) から向き (dirX, dirY) へ、横に並べた count 個の波を進める（1 回で同じ敵には 1 回）。
+ * 通った跡に水（同じ技の stage 1）を残す: 波が通る時に現れ（出番を待つもの）、waterSeconds 残る
+ */
+export function fireSurfWave(world: World, p: Player, pm: PlayerMove, x: number, y: number, dirX: number, dirY: number, cfg: { waterSeconds: number; waterSpacing: number; waterRows: number; waterPowerPct: number }): void {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const n = Math.max(1, st.count);
+  const spacing = sc.size * 1.6;
+  const speed = Math.max(1, sc.speed);
+  const life = st.range / speed;
+  const group = newCastGroup(world, life);
+  const px = -dirY;
+  const py = dirX;
+  const b0 = base(world, p, pm, st);
+  for (let k = 0; k < n; k++) {
+    const off = (k - (n - 1) / 2) * spacing;
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: x + px * off + dirX * 20, y: y + py * off + dirY * 20, vx: dirX * speed, vy: dirY * speed, life, group, dirX, dirY });
+  }
+  if (cfg.waterSeconds <= 0) return;
+  const width = spacing * (n - 1) + sc.size * 2;
+  const rowSp = width / cfg.waterRows;
+  for (let d = cfg.waterSpacing; d <= st.range; d += cfg.waterSpacing) {
+    for (let r = 0; r < cfg.waterRows; r++) {
+      const off = (r - (cfg.waterRows - 1) / 2) * rowSp;
+      world.projectiles.add({
+        ...b0,
+        motion: MOTION_LINEAR,
+        x: x + dirX * d + px * off,
+        y: y + dirY * d + py * off,
+        radius: rowSp * 0.62,
+        damage: (sc.power * cfg.waterPowerPct) / 100,
+        hitIntervalTicks: Math.round(0.6 / world.dt),
+        knockback: 0,
+        life: d / speed,
+        stage: 3,
+        armStage: 1,
+        armLife: cfg.waterSeconds,
+      });
+    }
+  }
+}
+
+/**
+ * ぜったいれいど（スイクン）: 自分の なみのり の水（waterMove の stage 1 か、まだ現れていない水）が残っていれば、水を全部凍らせる
+ * （freezeDelaySeconds 後に、水の所に 技の威力 × comboMultiplier。1 回で同じ敵には 1 回）。水が無ければ、射程の中で HP の一番高い敵の所
+ * （いなければ向いている方）を凍らせる。返り値: 凍らせた水の数
+ */
+export function fireSheerCold(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, waterMove: number, cfg: { comboMultiplier: number; freezeDelaySeconds: number }): number {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const group = newCastGroup(world, cfg.freezeDelaySeconds + st.durationSeconds);
+  const b0 = base(world, p, pm, st);
+  const pr = world.projectiles;
+  let frozen = 0;
+  const spots: { x: number; y: number; r: number }[] = [];
+  for (let i = 0; i < pr.count; i++) {
+    if (pr.owner[i] !== p.id || pr.move[i] !== waterMove || !(pr.stage[i] === 1 || (pr.stage[i] === 3 && pr.armStage[i] === 1))) continue;
+    spots.push({ x: pr.x[i]!, y: pr.y[i]!, r: pr.radius[i]! });
+    // 水は凍って消える（待っている水も、待つのをやめて消える）
+    pr.stage[i] = 1;
+    pr.life[i] = 0;
+    frozen++;
+  }
+  for (const s of spots) {
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: s.x, y: s.y, radius: s.r * 1.15, damage: sc.power * cfg.comboMultiplier, group, life: cfg.freezeDelaySeconds, stage: 3, armStage: 1, armLife: st.durationSeconds });
+  }
+  if (frozen > 0) return frozen;
+  const t = strongestEnemy(world, p, st.range);
+  const x = t !== -1 ? world.enemies.x[t]! : p.x + dirX * st.range * 0.5;
+  const y = t !== -1 ? world.enemies.y[t]! : p.y + dirY * st.range * 0.5;
+  world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x, y, group, life: cfg.freezeDelaySeconds, stage: 3, armStage: 0, armLife: st.durationSeconds });
+  return 0;
+}
+
+/** ミラーコート（スイクン）: 鏡の破片を count 個、自分のまわりから HP の一番高い敵へ飛ばす（1 個の威力は 技の威力 × mult） */
+export function fireMirrorShards(world: World, p: Player, pm: PlayerMove, count: number, mult: number, speed: number): void {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const t = strongestEnemy(world, p, st.range);
+  const target = t !== -1 ? world.enemies.id[t]! : undefined;
+  const b0 = base(world, p, pm, st);
+  // 殻のまわりから、少しずつ遅れて次々に飛び出す（まとめて出すと輪のまま並んで飛ぶ）
+  for (let k = 0; k < count; k++) {
+    const a = (k / count) * Math.PI * 2 * 2.618;
+    const r = 26 + ((k * 37) % 24);
+    world.projectiles.add({
+      ...b0,
+      motion: MOTION_HOMING,
+      x: p.x + Math.cos(a) * r,
+      y: p.y - 14 + Math.sin(a) * r,
+      vx: Math.cos(a) * speed,
+      vy: Math.sin(a) * speed,
+      damage: sc.power * mult,
+      pierce: 1,
+      ...(k > 0 ? { life: k * 0.035, stage: 3, armStage: 0, armLife: 2.4 } : { life: 2.4 }),
+      ...(target !== undefined ? { target } : {}),
+    });
+  }
+}
+
+/** めいそう の重ねたとくしゅの威力（%） */
+export function calmPowerPct(world: World, p: Player): number {
+  if (!p.calm || world.tick >= p.calm.untilTick) return 0;
+  let per = 0;
+  for (const pm of p.moves) per = Math.max(per, world.rules.moves[pm.move]?.calmMind?.specialPowerPct ?? 0);
+  return per * p.calm.stacks;
 }

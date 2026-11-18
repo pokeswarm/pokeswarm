@@ -32,6 +32,7 @@ import { DeoxysCosmos } from '../render/effects/DeoxysCosmos';
 import { LatiEon } from '../render/effects/LatiEon';
 import { MewtwoPlayer } from '../render/effects/MewtwoPlayer';
 import { CelebiPlayer } from '../render/effects/CelebiPlayer';
+import { SuicunePlayer } from '../render/effects/SuicunePlayer';
 import { SkillHud } from '../render/SkillHud';
 import { ensureSkillIcons } from '../render/skillIcons';
 import { ShinyCharizardFlame } from '../render/effects/ShinyCharizardFlame';
@@ -200,10 +201,14 @@ export class RunScene extends Phaser.Scene {
   private mewtwoPlayer: MewtwoPlayer | null = null;
   /** 遊べるセレビィの技（エナジーボール・リーフストーム・みらいよち。07 の306章） */
   private celebiPlayer: CelebiPlayer | null = null;
+  /** 遊べるスイクンの技（なみのり・ぜったいれいど・ミラーコート・めいそう。07 の307章） */
+  private suicunePlayer: SuicunePlayer | null = null;
   /** アクティブスキルのボタン（右下）とキー、押している枠（SPACE を押している間は行き先の印を出す）、スマホでボタンを押している指 */
   private skillHud: SkillHud | null = null;
   private skillKeys: Phaser.Input.Keyboard.Key[] = [];
   private skillAim: number | null = null;
+  /** 前の更新で押していたスキルの枠（押した瞬間に使うスキルのため） */
+  private skillDown: boolean[] = [];
   private skillTouch: { pointer: number; slot: number } | null = null;
   private shinyCharizardFlame: ShinyCharizardFlame | null = null;
   private shinyVenusaurPlant: ShinyVenusaurPlant | null = null;
@@ -388,8 +393,10 @@ export class RunScene extends Phaser.Scene {
     this.lavaSea = null;
     this.mewtwoPlayer = null;
     this.celebiPlayer = null;
+    this.suicunePlayer = null;
     this.skillHud = null;
     this.skillAim = null;
+    this.skillDown = [];
     this.skillTouch = null;
     this.snowGround = null;
     this.blizzardSheet = null;
@@ -1341,7 +1348,9 @@ export class RunScene extends Phaser.Scene {
       } else if (ev.type === 'hazardTelegraphed' && ev.delay === 0) {
         this.showBossMoveName(ev);
       } else if (ev.type === 'skillUsed') {
-        this.mewtwoPlayer?.onSkillUsed(ev, this.time.now);
+        if (w.rules.activeSkills?.defs[ev.skill]?.kind === 'teleport') this.mewtwoPlayer?.onSkillUsed(ev, this.time.now);
+      } else if (ev.type === 'mirrorAbsorbed') {
+        this.suicunePlayer?.onAbsorbed(ev.playerId, this.time.now);
       } else if (ev.type === 'playerFrozen' && ev.playerId === this.localId) {
         this.announce(t('run.frozen'), '#80deea');
       } else if (ev.type === 'boxHit' || ev.type === 'boxRemoved') {
@@ -3154,12 +3163,30 @@ export class RunScene extends Phaser.Scene {
       out.push({ type: 'move', playerId: this.localId, dx, dy });
     }
     // アクティブスキル: 押している間は行き先を見せ、離したら使う（移動の向きを先に当ててから。07 の305章）
-    const me = this.sim.world.players.find((p) => p.id === this.localId);
+    // 押した瞬間に使うスキル（ミラーコート）は押したとき、ほかは離したとき（07 の307章）
+    const w = this.sim.world;
+    const me = w.players.find((p) => p.id === this.localId);
     const slots = me?.skills?.length ?? 0;
-    let held: number | null = this.skillTouch && this.skillTouch.slot < slots ? this.skillTouch.slot : null;
-    for (let k = 0; k < slots && held === null; k++) if (this.skillKeys[k]?.isDown) held = k;
-    if (this.sim.world.levelUp || this.sim.world.paused) held = null;
-    if (this.skillAim !== null && held !== this.skillAim && !this.sim.world.levelUp && !this.sim.world.paused) out.push({ type: 'useSkill', playerId: this.localId, slot: this.skillAim });
+    const blocked = !!w.levelUp || w.paused;
+    const down = (k: number): boolean => !blocked && (!!this.skillKeys[k]?.isDown || (this.skillTouch?.slot === k));
+    let held: number | null = null;
+    for (let k = 0; k < slots; k++) {
+      const press = w.rules.activeSkills?.defs[me!.skills![k]!.skill]?.trigger === 'press';
+      const key = this.skillKeys[k];
+      // 更新の間に押して離した短い操作も取りこぼさない（Phaser の JustDown・JustUp）
+      const jd = !!key && Phaser.Input.Keyboard.JustDown(key);
+      const ju = !!key && Phaser.Input.Keyboard.JustUp(key);
+      const now = down(k);
+      const was = !!this.skillDown[k];
+      this.skillDown[k] = now;
+      if (blocked) continue;
+      if (press) {
+        if (jd || (now && !was)) out.push({ type: 'useSkill', playerId: this.localId, slot: k });
+        continue;
+      }
+      if (now && held === null) held = k;
+      if (ju || (!now && was)) out.push({ type: 'useSkill', playerId: this.localId, slot: k });
+    }
     this.skillAim = held;
     return out;
   }
@@ -3388,6 +3415,8 @@ export class RunScene extends Phaser.Scene {
     this.mewtwoPlayer.update(world, this.time.now, this.localId, this.skillAim);
     this.celebiPlayer ??= new CelebiPlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.bosses + 0.05);
     this.celebiPlayer.update(world, this.time.now);
+    this.suicunePlayer ??= new SuicunePlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.players + 0.1);
+    this.suicunePlayer.update(world, this.time.now, this.localId, this.skillAim);
     this.shinyCharizardFlame ??= new ShinyCharizardFlame(this, spriteRender.depths.effects + 0.35, spriteRender.depths.bosses + 0.05, ARENA_FLOOR_DEPTH + 3.6);
     this.shinyCharizardFlame.update(world, this.time.now, alpha);
     this.shinyVenusaurPlant ??= new ShinyVenusaurPlant(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);

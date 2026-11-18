@@ -1539,6 +1539,7 @@
     "sweep": "whip",
     "spiral": "orbit",
     "passive": "plus",
+    "skill": "plus",
     "pulse": "pulse",
     "weather": "weather",
     "aura": "eruption",

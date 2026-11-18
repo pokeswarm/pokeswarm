@@ -15,7 +15,6 @@ describe('派生の材料が候補に出る', () => {
     ['totodile', 'black-glasses', 'scratch'],
     ['swinub', 'hard-stone', 'ice-fang'],
     ['miltank', 'hard-stone', 'body-slam'],
-    ['suicune', 'never-melt-ice', 'aurora-beam'],
   ])('%s は %s を、元の技（%s）を覚えているときだけ候補に出す', (pokemon, item, from) => {
     expect(fits('johto', pokemon, item, [from])).toBe(true);
     expect(fits('johto', pokemon, item, [])).toBe(false);

@@ -353,6 +353,17 @@ export interface UseSkillCommand {
   readonly slot: number;
 }
 
+/** ほかのブラウザのプレイヤーが使ったスキル（見た目だけ出す。07 の307章） */
+export interface RemoteSkillCommand {
+  readonly type: 'remoteSkill';
+  readonly playerId: PlayerId;
+  readonly slot: number;
+  readonly x: number;
+  readonly y: number;
+  readonly dirX: number;
+  readonly dirY: number;
+}
+
 /** 時間帯のなつきの進化（イーブイ）への本人の答え（07 の81章） */
 export interface AnswerEvolveCommand {
   readonly type: 'answerEvolve';
@@ -363,6 +374,7 @@ export interface AnswerEvolveCommand {
 export type InputCommand =
   | MoveCommand
   | UseSkillCommand
+  | RemoteSkillCommand
   | AnswerEvolveCommand
   | RunStatCommand
   | ContestInputCommand

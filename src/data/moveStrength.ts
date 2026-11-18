@@ -32,7 +32,7 @@ export function moveStrength(def: MoveDefData, s: MoveStatsAt): number {
   const interval = s.hitIntervalSeconds as number;
   const hits = interval > 0 ? Math.max(1, Math.floor((s.durationSeconds as number) / interval)) : 1;
   // ゆびをふるは、出る技が毎回変わるので数えない
-  if (def.pattern === 'metronome') return NaN;
+  if (def.pattern === 'metronome' || def.pattern === 'skill') return NaN;
   // 当たり判定が別々の場所に出るもの（周回・画面じゅう・十字・落雷・水たまり・連鎖・横なぎ・足あと・放物線・跳ね返り）は、1体に同時に当たるのはおおむね1つ
   const perTarget = SPREAD_PATTERNS.has(def.pattern) ? 1 : (s.count as number);
   return ((s.power as number) * perTarget * hits) / (s.cooldownSeconds as number);
@@ -56,7 +56,7 @@ const CROWD_MAX_PER_CAST = 40;
  * 飛ぶ技は通り道の広さ、近接の扇形は扇の広さ、ビームは線の広さ、周りに広がる技は円の広さ、周回は当たり判定の近くで数える
  */
 export function moveCrowdStrength(def: MoveDefData, s: MoveStatsAt): number {
-  if (def.pattern === 'metronome') return NaN;
+  if (def.pattern === 'metronome' || def.pattern === 'skill') return NaN;
   const num = (k: string): number => (typeof s[k] === 'number' ? (s[k] as number) : 0);
   const size = num('size');
   const range = num('range');

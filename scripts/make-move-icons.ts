@@ -263,6 +263,67 @@ function futureSightCelebiIcon(): Draw {
   });
 }
 
+/** なみのり（スイクンの版。07 の307章）: 右へ巻く波頭と白い泡、下に残る水 */
+function surfSuicuneIcon(): Draw {
+  return paint((x, y) => {
+    const crest = 13 + Math.sin(x * 0.45) * 2.5 - Math.max(0, (x - 14) * 0.5);
+    if (y > 25) return (x + y) % 3 === 0 ? '#90caf9' : '#1e88e5';
+    if (y < crest - 3) return x > 18 && y > crest - 7 && (x * 7 + y * 3) % 5 === 0 ? '#ffffff' : null;
+    if (y < crest) return '#ffffff';
+    if (y < crest + 2) return '#bbdefb';
+    const k = (y - crest) / (26 - crest);
+    return k < 0.35 ? '#42a5f5' : k < 0.7 ? '#1e88e5' : '#1565c0';
+  });
+}
+
+/** ミラーコート（スイクンの版）: 六角の鏡の殻と、飛び出す破片 */
+function mirrorCoatSuicuneIcon(): Draw {
+  return paint((x, y) => {
+    for (const [cx, cy] of [[5, 6], [27, 8], [26, 26], [5, 25]] as const) {
+      const d = Math.abs(x - cx) + Math.abs(y - cy) * 0.6;
+      if (d < 2.6) return x < cx ? '#ffffff' : '#b3e5fc';
+    }
+    const nx = (x - 16) / 11;
+    const ny = (y - 16) / 11;
+    const hex = Math.max(Math.abs(nx) * 0.866 + Math.abs(ny) * 0.5, Math.abs(ny));
+    if (hex > 1) return null;
+    if (hex > 0.86) return '#e1f5fe';
+    if (Math.abs(nx + ny * 0.6 - 0.1) < 0.12) return ['#f8bbd0', '#fff59d', '#b2ebf2'][(x + y) % 3]!;
+    if (Math.abs(nx) < 0.06 || Math.abs(ny * 0.866 + nx * 0.5) < 0.06 || Math.abs(ny * 0.866 - nx * 0.5) < 0.06) return '#b3e5fc';
+    return '#5d8fb0';
+  });
+}
+
+/** ぜったいれいど（スイクンの版）: 凍った水の板から突き出す氷のとげ */
+function sheerColdSuicuneIcon(): Draw {
+  return paint((x, y) => {
+    for (const [bx, top, w] of [[16, 4, 4], [9, 11, 3], [23, 9, 3], [4, 17, 2], [28, 16, 2]] as const) {
+      if (y < top || y > 24) continue;
+      const k = (y - top) / (24 - top);
+      const dx = x - bx;
+      if (Math.abs(dx) <= w * k + 0.4) return k < 0.2 ? '#ffffff' : dx < 0 ? '#e1f5fe' : '#7fc3e6';
+    }
+    if (y >= 24 && y <= 28) return (x * 3 + y) % 7 === 0 ? '#ffffff' : '#b3e5fc';
+    return null;
+  });
+}
+
+/** めいそう: 心を静めて力を高める（立ちのぼる光と、回る 3 つの結晶） */
+function calmMindIcon(): Draw {
+  return paint((x, y) => {
+    for (let k = 0; k < 3; k++) {
+      const a = (k / 3) * Math.PI * 2 - Math.PI / 2;
+      const cx = 16 + Math.cos(a) * 9;
+      const cy = 15 + Math.sin(a) * 9;
+      const d = Math.abs(x - cx) / 2.4 + Math.abs(y - cy) / 3.4;
+      if (d < 1) return x < cx ? '#e1f5fe' : '#9575cd';
+    }
+    const dx = Math.abs(x - 16);
+    if (y > 6 && y < 28 && dx < 3.2 - (28 - y) * 0.08) return dx < 1 ? '#ffffff' : (y + Math.floor(x)) % 4 === 0 ? '#b39ddb' : '#80deea';
+    return null;
+  });
+}
+
 /** 光のきらめき（十字の小さな光） */
 function glint(cx: number, cy: number, r: number, c = '#ffffff', mid = '#fff9c4'): Draw {
   return paint((x, y) => {
@@ -692,6 +753,10 @@ const ICONS: Record<string, Layer[]> = {
   'energy-ball': [energyBallIcon()],
   'leaf-storm-celebi': [leafStormCelebiIcon()],
   'future-sight-celebi': [futureSightCelebiIcon()],
+  'surf-suicune': [surfSuicuneIcon()],
+  'mirror-coat-suicune': [mirrorCoatSuicuneIcon()],
+  'sheer-cold-suicune': [sheerColdSuicuneIcon()],
+  'calm-mind': [calmMindIcon()],
   // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
   sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],
   // かたくなる: 体の表面が硬い板になる
@@ -909,7 +974,7 @@ for (const [name, keys] of byName) {
   out[name] = toArt(drawIcon(layers));
 }
 for (const key of Object.keys(ICONS)) if (!byName.has(key)) throw new Error(`技の名前 ${key} が data/game/moves.json にありません`);
-const ja = (n: string): string => `${genMoves[n]?.names.ja ?? n}(${n})`;
+const ja = (n: string): string => `${genMoves[moves[n]?.nameOf ?? n]?.names.ja ?? n}(${n})`;
 if (process.argv.includes('--auto')) console.log(`レシピの絵を 1 つ置いただけの技（${auto.length}）: ${auto.map(ja).join(' ')}`);
 if (missing.length) {
   // 技を足したときに、アイコンを作り忘れないように止める（docs/09 の「技のアイコン」）
@@ -935,7 +1000,7 @@ if (pickAt !== -1) {
   const png = new PNG({ width: cols * cell + 12, height: Math.ceil(names.length / cols) * cell + 12 });
   for (let i = 0; i < png.data.length; i += 4) png.data.set([42, 44, 56, 255], i);
   names.forEach((n, i) => {
-    const px = iconPixels(icons, 'nearest', icons.typeColors[genMoves[n]?.type ?? 'normal'] ?? '#888888', 'base', out[n]);
+    const px = iconPixels(icons, 'nearest', icons.typeColors[genMoves[moves[n]?.nameOf ?? n]?.type ?? 'normal'] ?? '#888888', 'base', out[n]);
     const ox = 12 + (i % cols) * cell;
     const oy = 12 + Math.floor(i / cols) * cell;
     for (let y = 0; y < N * S; y++) for (let x = 0; x < N * S; x++) {
@@ -956,7 +1021,7 @@ if (sheetAt !== -1) {
   fs.mkdirSync(dir, { recursive: true });
   const byType = new Map<string, string[]>();
   for (const name of Object.keys(out)) {
-    const t = genMoves[name]?.type ?? 'normal';
+    const t = genMoves[moves[name]?.nameOf ?? name]?.type ?? 'normal';
     byType.set(t, [...(byType.get(t) ?? []), name]);
   }
   for (const [type, names] of byType) {
@@ -974,7 +1039,7 @@ if (sheetAt !== -1) {
       }
     });
     fs.writeFileSync(path.join(dir, `${type}.png`), PNG.sync.write(png));
-    console.log(`${type}: ${names.map((n, i) => `${i + 1}.${genMoves[n]?.names.ja ?? n}`).join(' ')}`);
+    console.log(`${type}: ${names.map((n, i) => `${i + 1}.${genMoves[moves[n]?.nameOf ?? n]?.names.ja ?? n}`).join(' ')}`);
   }
 }
 
@@ -1001,7 +1066,7 @@ if (previewAt !== -1) {
     }
   };
   keys.forEach((k, i) => {
-    const color = icons.typeColors[gen[k]?.type ?? 'normal'] ?? '#888888';
+    const color = icons.typeColors[gen[moves[k]?.nameOf ?? k]?.type ?? 'normal'] ?? '#888888';
     const glyph = icons.moveGlyphs[k] ?? icons.moves[moves[byName.get(k)![0]!]!.pattern] ?? 'nearest';
     const ox = 8 + (i % cols) * cellW;
     const oy = 8 + Math.floor(i / cols) * cellH;

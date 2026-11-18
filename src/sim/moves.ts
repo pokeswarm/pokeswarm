@@ -159,6 +159,8 @@ export interface SimMoveDef {
   readonly stopOnBoss?: boolean;
   /** 追う弾が、狙った敵に当たったら消える（サイコブレイク。07 の305章） */
   readonly stopOnTarget?: boolean;
+  /** めいそう: 重ねるとくしゅの威力（07 の307章） */
+  readonly calmMind?: { readonly specialPowerPct: number; readonly maxStacks: number };
   /** HP が最大の thresholdPct % 以下の敵へのダメージを +powerPct %（しおみず。07 の247章） */
   readonly lowHpBonus?: { readonly thresholdPct: number; readonly powerPct: number };
   /** 続けて当てるほど強くなる（エコーボイス。07 の240章） */

@@ -197,6 +197,10 @@ export class SyncSession {
         case 'contestApplied':
           if (host) out.push({ t: 'ct', c: ev.command });
           break;
+        case 'skillUsed':
+          // 自分のスキルだけ送る（ほかのブラウザで見た目を出す。07 の307章）
+          if (ev.playerId === world.localPlayerId) out.push({ t: 'su', i: ev.playerId, s: ev.slot, x: round2(ev.fromX), y: round2(ev.fromY), dx: round2(ev.dirX), dy: round2(ev.dirY) });
+          break;
         case 'pauseChanged':
           if (host) out.push({ t: 'pz', on: ev.paused ? 1 : 0 });
           break;
@@ -378,6 +382,13 @@ export class SyncSession {
           break;
         case 'rs':
           if (host) cmds.push({ type: 'runStat', playerId: from, stat: m.s, value: m.v });
+          break;
+        case 'su':
+          if (m.i === world.localPlayerId) break;
+          // ホスト: 送り手の分だけ、ほかのゲストへ中継する
+          if (host && m.i === from) relay.push(m);
+          if (host && m.i !== from) break;
+          cmds.push({ type: 'remoteSkill', playerId: m.i, slot: m.s, x: m.x, y: m.y, dirX: m.dx, dirY: m.dy });
           break;
         case 'hz':
           if (guest) {

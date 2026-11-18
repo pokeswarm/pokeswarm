@@ -23,8 +23,6 @@ describe('カントー・ジョウトの技の進化の形', () => {
       ['larvitar', 'rock-slide', 'soft-sand', 'stone-edge'],
       ['raikou', 'thunderbolt', 'thunder-stone', 'thunder'],
       ['entei', 'flamethrower', 'fire-stone', 'eruption'],
-      ['suicune', 'aurora-beam', 'never-melt-ice', 'ice-beam'],
-      ['suicune', 'ice-beam', 'water-stone', 'sheer-cold'],
       ['slowpoke', 'psychic', 'kings-rock', 'future-sight-alakazam'],
       ['cleffa', 'hyper-voice', 'moon-stone', 'moonblast'],
       ['togepi', 'air-slash', 'light-clay', 'dazzling-gleam'],

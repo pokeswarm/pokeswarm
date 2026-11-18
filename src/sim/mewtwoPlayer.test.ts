@@ -41,7 +41,7 @@ describe('遊べるミュウツー', () => {
     sim.step([{ type: 'move', playerId: 1, dx: 1, dy: 0 }]);
     const x0 = p.x;
     sim.step([{ type: 'useSkill', playerId: 1, slot: 0 }]);
-    expect(p.x - x0).toBeGreaterThan(d.distance - 10);
+    expect(p.x - x0).toBeGreaterThan(d.distance! - 10);
     expect(p.skills![0]!.charges).toBe(1);
     expect(p.skillBuff?.stacks).toBe(1);
     sim.step([{ type: 'useSkill', playerId: 1, slot: 0 }]);
@@ -61,7 +61,7 @@ describe('遊べるミュウツー', () => {
     const d = rules.activeSkills!.defs[0]!;
     sim.step([{ type: 'useSkill', playerId: 1, slot: 0 }]);
     expect(p.skills![0]!.charges).toBe(0);
-    for (let k = 0; k < Math.round(d.rechargeSeconds * 30) + 2; k++) sim.step([]);
+    for (let k = 0; k < Math.round(d.rechargeSeconds! * 30) + 2; k++) sim.step([]);
     expect(p.skills![0]!.charges).toBe(1);
     const before = maxCharges(sim.world, p, p.skills![0]!);
     p.mods.amountBonus += 1;

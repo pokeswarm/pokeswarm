@@ -2785,6 +2785,8 @@ export const pickupConfigSchema = z.object({
       despawnDistance: z.number().positive(),
       /** はね（ジョウトのルギア・ホウオウ戦の権利）が、出るようになっているとき箱から出る確率（それぞれ） */
       wingChance: z.number().min(0).max(1).optional(),
+      /** はねごとの確率（書いたものだけ wingChance の代わりに使う。ぎんいろ・にじいろ 10%、いんせき は wingChance のまま。07 の301章） */
+      wingChanceByItem: z.partialRecord(z.enum(['silver-wing', 'rainbow-wing', 'meteorite']), z.number().min(0).max(1)).optional(),
     })
     .optional(),
 });

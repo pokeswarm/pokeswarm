@@ -91,7 +91,11 @@
     "distanceMin": 380,
     "distanceMax": 700,
     "despawnDistance": 1600,
-    "wingChance": 0.01
+    "wingChance": 0.01,
+    "wingChanceByItem": {
+      "silver-wing": 0.1,
+      "rainbow-wing": 0.1
+    }
   },
   "regionBuffs": {
     "johto": {

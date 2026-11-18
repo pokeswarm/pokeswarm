@@ -74,7 +74,7 @@ describe('はねは 1 回のランで 1 枚だけ（07 の202章）', () => {
     w.wingsEnabled.add('silver-wing');
     w.wingsEnabled.add('rainbow-wing');
     // 必ず出る確率にする（データは共有なので写しを使う）
-    Object.defineProperty(w, 'rules', { value: { ...rules, pickups: { ...rules.pickups, boxes: { ...rules.pickups.boxes!, wingChance: 1 } } } });
+    Object.defineProperty(w, 'rules', { value: { ...rules, pickups: { ...rules.pickups, boxes: { ...rules.pickups.boxes!, wingChance: 1, wingChanceByItem: {} } } } });
     return w;
   };
 

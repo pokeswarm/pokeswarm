@@ -104,11 +104,11 @@ export function registerBoxHit(world: World, id: number, key: number): boolean {
  * 1 回のランで出るはねは 1 枚だけ（どれかが落ちているか拾っていれば、もう出ない。伝説戦を連戦にしない。07 の202章）
  */
 export function boxDrop(world: World): ItemKind {
-  const chance = world.rules.pickups.boxes?.wingChance ?? 0;
+  const boxes = world.rules.pickups.boxes;
   if (world.wings.size > 0 || world.items.some((it) => (WINGS as readonly ItemKind[]).includes(it.kind))) return 'buff';
   for (const w of WINGS) {
     if (!world.wingsEnabled.has(w)) continue;
-    if (world.rng.next() < chance) return w;
+    if (world.rng.next() < (boxes?.wingChanceByItem?.[w] ?? boxes?.wingChance ?? 0)) return w;
   }
   return 'buff';
 }

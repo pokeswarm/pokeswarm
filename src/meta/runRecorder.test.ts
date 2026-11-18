@@ -48,6 +48,14 @@ describe('ランの記録', () => {
     expect(Object.keys(s).every((k) => k.startsWith('johto:') || k === 'coinsEarned')).toBe(true);
   });
 
+  it('タマゴからかえったランは、進化してもかえったポケモンの名前で eggClears を数える（ぎんいろのはね）', () => {
+    const { store, sim } = setup();
+    const rec = new RunRecorder(store, 'igglybuff', null, null, 'johto', 'egg');
+    sim.world.outcome = 'clear';
+    rec.finish(sim.world);
+    expect(store.current.stats['johto:eggClears.igglybuff']).toBe(1);
+  });
+
   it('途中の記録と終了時の記録を、同じ分を2回足さずにまとめる', () => {
     const { store, sim, rec, kill } = setup();
     for (let k = 0; k < 3; k++) kill(0, 1);

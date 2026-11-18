@@ -467,7 +467,13 @@
     {
       "from": "thunderbolt",
       "item": "thunder-stone",
-      "to": "thunder",
+      "to": "thunder-raikou",
+      "line": "raikou"
+    },
+    {
+      "from": "bite",
+      "item": "black-glasses",
+      "to": "crunch",
       "line": "raikou"
     },
     {

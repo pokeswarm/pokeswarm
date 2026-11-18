@@ -73,7 +73,7 @@
     "articuno": { "sprite": "articuno", "startingMoves": ["powder-snow"] },
     "zapdos": { "sprite": "zapdos", "startingMoves": ["thunder-shock"] },
     "moltres": { "sprite": "moltres", "startingMoves": ["peck"] },
-    "raikou": { "sprite": "raikou", "startingMoves": ["thunder-shock"] },
+    "raikou": { "sprite": "raikou", "startingMoves": ["thunder-shock", "extreme-speed-raikou", "bite", "spark"], "fixedMoves": true, "activeSkills": ["extreme-speed-raikou"] },
     "entei": { "sprite": "entei", "startingMoves": ["ember"] },
     "suicune": { "sprite": "suicune", "startingMoves": ["surf-suicune", "mirror-coat-suicune", "sheer-cold-suicune", "calm-mind"], "fixedMoves": true, "activeSkills": ["surf-suicune", "mirror-coat-suicune", "sheer-cold-suicune"] },
     "lugia": { "sprite": "lugia", "startingMoves": ["gust"] },

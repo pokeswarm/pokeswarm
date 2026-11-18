@@ -1,7 +1,7 @@
 import type { Player, PlayerMove } from './entities/player';
 import type { SimActiveSkill } from './rules';
 import type { World } from './world';
-import { fireMirrorShards, fireSheerCold, fireSurfWave, scaledMoveStats, skillMoveStats } from './systems/attack';
+import { extremeSpeedPath, fireExtremeSpeed, fireMirrorShards, fireSheerCold, fireSurfWave, scaledMoveStats, skillMoveStats } from './systems/attack';
 
 /**
  * アクティブスキル（作者の案 2026年11月18日。07 の305・307章）: キー（SPACE・Q・E）で使う技。
@@ -99,6 +99,14 @@ export function surfLane(world: World, p: Player, skill: number): { length: numb
   return { length: st.range, width: sc.size * 1.6 * (Math.max(1, st.count) - 1) + sc.size * 2 };
 }
 
+/** しんそくの折れ線（狙いを見せる） */
+export function extremeSpeedPreview(world: World, p: Player, skill: number): { x: number; y: number }[] | null {
+  const pm = skillMove(world, p, { skill });
+  if (!pm) return null;
+  const [dx, dy] = aimOf(p);
+  return extremeSpeedPath(world, p, pm, dx, dy);
+}
+
 /** 今スキルを使えるか（回数があり、動ける状態） */
 export function canUseSkill(p: Player, slot: number): boolean {
   const s = p.skills?.[slot];
@@ -156,6 +164,17 @@ function runSkill(world: World, p: Player, d: SimActiveSkill, pm: PlayerMove | u
       if (!pm || !d.sheerCold) return;
       const surf = world.rules.activeSkills!.defs.find((x) => x.kind === 'surf' && x.move >= 0);
       fireSheerCold(world, p, pm, dx, dy, surf?.move ?? -1, d.sheerCold);
+      return;
+    }
+    case 'extremeSpeed': {
+      if (!pm) return;
+      const pts = fireExtremeSpeed(world, p, pm, dx, dy);
+      // 自分は折れ線の終点へ（ほかのブラウザのプレイヤーは位置で届く）
+      if (!p.remote) {
+        const end = pts[pts.length - 1]!;
+        p.x = p.prevX = end.x;
+        p.y = p.prevY = end.y;
+      }
       return;
     }
     case 'mirrorCoat': {

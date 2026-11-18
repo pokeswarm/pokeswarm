@@ -324,6 +324,47 @@ function calmMindIcon(): Draw {
   });
 }
 
+/** かみなり（ライコウの版。07 の309章）: 暗い雷雲と、その下に落ちる 2 本の雷と焦げ */
+function thunderRaikouIcon(): Draw {
+  const bolt = (x: number, y: number, x0: number, top: number, seed: number): string | null => {
+    if (y < top || y > 27) return null;
+    const t = (y - top) / (27 - top);
+    const cx = x0 + Math.sin(t * 9 + seed) * 2.2;
+    const d = Math.abs(x - cx);
+    if (d < 0.7) return '#ffffff';
+    if (d < 1.6) return '#ffd600';
+    return null;
+  };
+  return paint((x, y) => {
+    // 雲（上）
+    const top = 4 + Math.abs(Math.sin(x * 0.55)) * 2.5;
+    if (y >= top && y < 12 && x > 3 && x < 29) return y < top + 1.5 ? '#9fa4cc' : y < 9 ? '#575a8c' : '#2b2a52';
+    const b = bolt(x, y, 12, 12, 0) ?? bolt(x, y, 21, 12, 2);
+    if (b) return b;
+    if (y > 26 && y < 29 && (Math.abs(x - 12) < 4 || Math.abs(x - 21) < 4)) return '#fff176';
+    return null;
+  });
+}
+
+/** しんそく（ライコウの版）: 3 回折れて駆け抜ける稲妻の道と、その先の光 */
+function extremeSpeedRaikouIcon(): Draw {
+  const pts: [number, number][] = [[4, 26], [12, 14], [17, 22], [27, 6]];
+  return paint((x, y) => {
+    for (let k = 1; k < pts.length; k++) {
+      const [ax, ay] = pts[k - 1]!;
+      const [bx, by] = pts[k]!;
+      const l2 = (bx - ax) ** 2 + (by - ay) ** 2;
+      const t = Math.max(0, Math.min(1, ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / l2));
+      const d = Math.hypot(x - (ax + (bx - ax) * t), y - (ay + (by - ay) * t));
+      if (d < 0.8) return '#ffffff';
+      if (d < 2) return '#ffd600';
+      if (d < 2.8 && (Math.floor(x) + Math.floor(y)) % 2 === 0) return '#f9a825';
+    }
+    if (Math.hypot(x - 27, y - 6) < 3.4) return '#fff59d';
+    return null;
+  });
+}
+
 /** 光のきらめき（十字の小さな光） */
 function glint(cx: number, cy: number, r: number, c = '#ffffff', mid = '#fff9c4'): Draw {
   return paint((x, y) => {
@@ -757,6 +798,8 @@ const ICONS: Record<string, Layer[]> = {
   'mirror-coat-suicune': [mirrorCoatSuicuneIcon()],
   'sheer-cold-suicune': [sheerColdSuicuneIcon()],
   'calm-mind': [calmMindIcon()],
+  'thunder-raikou': [thunderRaikouIcon()],
+  'extreme-speed-raikou': [extremeSpeedRaikouIcon()],
   // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
   sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],
   // かたくなる: 体の表面が硬い板になる

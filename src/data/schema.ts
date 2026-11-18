@@ -2975,13 +2975,15 @@ export type AbilitiesConfig = z.infer<typeof abilitiesConfigSchema>;
  *   count ＋ 吸った回数 × shardsPerHit 個（maxShards まで）飛び出し、HP の一番高い敵へ向かう。1 個の威力は 技の威力 ×（1 ＋ 吸った量 ÷ 最大 HP × absorbPowerPct %）
  * - sheerCold: 自分の なみのり の水が残っていれば、水を全部凍らせて、中の敵に 技の威力 × comboMultiplier と こおり。
  *   水が無ければ、射程の中で HP の一番高い敵の所（いなければ前）を、freezeDelaySeconds 後に凍らせる
+ * - extremeSpeed（ライコウ。07 の309章）: 前の扇の近い敵を角にして（技の count 個まで）折れる稲妻の線を、技の range の長さだけ駆け抜けて終点へ移る。
+ *   区間ごとに線の当たり（1 回で同じ敵には 1 回）。押している間は折れ線の道を見せる
  */
 export const activeSkillsConfigSchema = z.object({
   keys: z.array(z.string()).min(1),
   skills: z.record(
     z.string(),
     z.object({
-      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold']),
+      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed']),
       /** 技の枠の技（moves.json のキー）。あればレベル・再使用・威力はその技の値 */
       move: z.string().optional(),
       trigger: z.enum(['press', 'release']).default('release'),

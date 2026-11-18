@@ -2570,3 +2570,75 @@ export function calmPowerPct(world: World, p: Player): number {
   for (const pm of p.moves) per = Math.max(per, world.rules.moves[pm.move]?.calmMind?.specialPowerPct ?? 0);
   return per * p.calm.stacks;
 }
+
+/**
+ * しんそく（ライコウ。07 の309章）の稲妻の折れ線: 自分から向き (dirX, dirY) へ、全部で range の長さ。角は count 個まで、
+ * 前の扇（±60°）の中の近い敵から順に（いなければ左右に折れる稲妻の形）。固定マップの中に収める
+ */
+export function extremeSpeedPath(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number): { x: number; y: number }[] {
+  const { st } = skillMoveStats(world, p, pm);
+  const corners = Math.max(1, st.count);
+  const pts = [{ x: p.x, y: p.y }];
+  const e = world.enemies;
+  const used = new Set<number>();
+  let left = st.range;
+  let cx = p.x;
+  let cy = p.y;
+  for (let k = 0; k < corners && left > 40; k++) {
+    // 前の扇の中で、まだ角にしていない一番近い敵
+    let best = -1;
+    let bestD = Infinity;
+    for (const i of enemiesInRange(world, cx, cy, left)) {
+      if (used.has(i) || e.hp[i]! <= 0) continue;
+      const dx = e.x[i]! - cx;
+      const dy = e.y[i]! - cy;
+      const d = Math.hypot(dx, dy);
+      if (d < 30 || (dx * dirX + dy * dirY) / d < 0.5) continue;
+      if (d < bestD) {
+        best = i;
+        bestD = d;
+      }
+    }
+    let nx: number;
+    let ny: number;
+    if (best !== -1) {
+      used.add(best);
+      nx = e.x[best]!;
+      ny = e.y[best]!;
+    } else {
+      // 敵がいなければ、左右に 35° ずつ折れる稲妻の形
+      const a = Math.atan2(dirY, dirX) + (k % 2 === 0 ? 0.6 : -0.6);
+      const seg = left / (corners - k + 1);
+      nx = cx + Math.cos(a) * seg;
+      ny = cy + Math.sin(a) * seg;
+    }
+    left -= Math.hypot(nx - cx, ny - cy);
+    cx = nx;
+    cy = ny;
+    pts.push({ x: cx, y: cy });
+  }
+  // 最後の角から、残りの長さだけ向きへ駆け抜ける
+  if (left > 20) pts.push({ x: cx + dirX * Math.min(left, 160), y: cy + dirY * Math.min(left, 160) });
+  const a = world.arena;
+  if (a) for (const q of pts) {
+    q.x = Math.max(a.x - a.halfWidth + p.radius, Math.min(a.x + a.halfWidth - p.radius, q.x));
+    q.y = Math.max(a.y - a.halfHeight + p.radius, Math.min(a.y + a.halfHeight - p.radius, q.y));
+  }
+  return pts;
+}
+
+/** しんそく: 折れ線の区間ごとに線の当たり判定を出す（1 回で同じ敵には 1 回）。返り値は折れ線 */
+export function fireExtremeSpeed(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number): { x: number; y: number }[] {
+  const { st } = skillMoveStats(world, p, pm);
+  const pts = extremeSpeedPath(world, p, pm, dirX, dirY);
+  const group = newCastGroup(world, st.durationSeconds);
+  const b0 = base(world, p, pm, st);
+  for (let k = 1; k < pts.length; k++) {
+    const a = pts[k - 1]!;
+    const b = pts[k]!;
+    const len = Math.hypot(b.x - a.x, b.y - a.y);
+    if (len < 1) continue;
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: a.x, y: a.y, shape: SHAPE_LINE, length: len, dirX: (b.x - a.x) / len, dirY: (b.y - a.y) / len, group });
+  }
+  return pts;
+}

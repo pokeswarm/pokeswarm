@@ -3753,17 +3753,47 @@
         "knockbackSeconds": 0.1
       },
       "levels": [
-        { "power": 48 },
-        { "power": 48, "size": 1 },
-        { "power": 48, "cooldownSeconds": -0.2 },
-        { "power": 48 },
-        { "power": 48, "count": 1 },
-        { "power": 48, "cooldownSeconds": -0.2 },
-        { "power": 48, "size": 1 },
-        { "power": 48 },
-        { "power": 48, "cooldownSeconds": -0.2 },
-        { "power": 48, "count": 1 },
-        { "power": 48, "cooldownSeconds": -0.2 }
+        {
+          "power": 48
+        },
+        {
+          "power": 48,
+          "size": 1
+        },
+        {
+          "power": 48,
+          "cooldownSeconds": -0.2
+        },
+        {
+          "power": 48
+        },
+        {
+          "power": 48,
+          "count": 1
+        },
+        {
+          "power": 48,
+          "cooldownSeconds": -0.2
+        },
+        {
+          "power": 48,
+          "size": 1
+        },
+        {
+          "power": 48
+        },
+        {
+          "power": 48,
+          "cooldownSeconds": -0.2
+        },
+        {
+          "power": 48,
+          "count": 1
+        },
+        {
+          "power": 48,
+          "cooldownSeconds": -0.2
+        }
       ]
     },
     "mirror-coat-suicune": {
@@ -3791,17 +3821,49 @@
         "knockbackSeconds": 0.1
       },
       "levels": [
-        { "power": 13.5 },
-        { "power": 13.5, "durationSeconds": 0.05 },
-        { "power": 13.5, "cooldownSeconds": -0.3 },
-        { "power": 13.5, "count": 1 },
-        { "power": 13.5, "durationSeconds": 0.05 },
-        { "power": 13.5, "cooldownSeconds": -0.3 },
-        { "power": 13.5, "count": 1 },
-        { "power": 13.5, "durationSeconds": 0.1 },
-        { "power": 13.5, "cooldownSeconds": -0.3 },
-        { "power": 13.5, "count": 1 },
-        { "power": 13.5, "cooldownSeconds": -0.3 }
+        {
+          "power": 13.5
+        },
+        {
+          "power": 13.5,
+          "durationSeconds": 0.05
+        },
+        {
+          "power": 13.5,
+          "cooldownSeconds": -0.3
+        },
+        {
+          "power": 13.5,
+          "count": 1
+        },
+        {
+          "power": 13.5,
+          "durationSeconds": 0.05
+        },
+        {
+          "power": 13.5,
+          "cooldownSeconds": -0.3
+        },
+        {
+          "power": 13.5,
+          "count": 1
+        },
+        {
+          "power": 13.5,
+          "durationSeconds": 0.1
+        },
+        {
+          "power": 13.5,
+          "cooldownSeconds": -0.3
+        },
+        {
+          "power": 13.5,
+          "count": 1
+        },
+        {
+          "power": 13.5,
+          "cooldownSeconds": -0.3
+        }
       ]
     },
     "sheer-cold-suicune": {
@@ -3829,24 +3891,56 @@
         "knockbackSeconds": 0.1
       },
       "levels": [
-        { "power": 80 },
-        { "power": 80, "size": 3 },
-        { "power": 80, "cooldownSeconds": -0.25 },
-        { "power": 80 },
-        { "power": 80, "size": 3 },
-        { "power": 80, "cooldownSeconds": -0.25 },
-        { "power": 80 },
-        { "power": 80, "size": 3 },
-        { "power": 80, "cooldownSeconds": -0.25 },
-        { "power": 80 },
-        { "power": 80, "cooldownSeconds": -0.25 }
+        {
+          "power": 80
+        },
+        {
+          "power": 80,
+          "size": 3
+        },
+        {
+          "power": 80,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 80
+        },
+        {
+          "power": 80,
+          "size": 3
+        },
+        {
+          "power": 80,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 80
+        },
+        {
+          "power": 80,
+          "size": 3
+        },
+        {
+          "power": 80,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 80
+        },
+        {
+          "power": 80,
+          "cooldownSeconds": -0.25
+        }
       ]
     },
     "calm-mind": {
       "pattern": "heal",
       "effect": "calm-mind",
       "teachOnly": true,
-      "calmMind": {"specialPowerPct":10,"maxStacks":4},
+      "calmMind": {
+        "specialPowerPct": 10,
+        "maxStacks": 4
+      },
       "base": {
         "power": 0,
         "cooldownSeconds": 5,
@@ -3868,17 +3962,174 @@
         "knockbackSeconds": 0.1
       },
       "levels": [
-        { "guardPct": 1.5 },
-        { "guardPct": 1.5 },
-        { "guardPct": 1.5, "cooldownSeconds": -0.2 },
-        { "guardPct": 1.5 },
-        { "guardPct": 1.5 },
-        { "guardPct": 1.5, "cooldownSeconds": -0.2 },
-        { "guardPct": 1.5 },
-        { "guardPct": 1.5 },
-        { "guardPct": 1.5, "cooldownSeconds": -0.2 },
-        { "guardPct": 1.5 },
-        { "guardPct": 1.5 }
+        {
+          "guardPct": 1.5
+        },
+        {
+          "guardPct": 1.5
+        },
+        {
+          "guardPct": 1.5,
+          "cooldownSeconds": -0.2
+        },
+        {
+          "guardPct": 1.5
+        },
+        {
+          "guardPct": 1.5
+        },
+        {
+          "guardPct": 1.5,
+          "cooldownSeconds": -0.2
+        },
+        {
+          "guardPct": 1.5
+        },
+        {
+          "guardPct": 1.5
+        },
+        {
+          "guardPct": 1.5,
+          "cooldownSeconds": -0.2
+        },
+        {
+          "guardPct": 1.5
+        },
+        {
+          "guardPct": 1.5
+        }
+      ]
+    },
+    "extreme-speed-raikou": {
+      "pattern": "skill",
+      "effect": "extreme-speed-raikou",
+      "nameOf": "extreme-speed",
+      "teachOnly": true,
+      "base": {
+        "power": 520,
+        "cooldownSeconds": 5,
+        "count": 3,
+        "speed": 0,
+        "size": 26,
+        "range": 540,
+        "durationSeconds": 0.15,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 240,
+        "statusId": "paralysis",
+        "statusChance": 0.3,
+        "statusSeconds": 2,
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1
+      },
+      "levels": [
+        {
+          "power": 40
+        },
+        {
+          "power": 40,
+          "range": 10
+        },
+        {
+          "power": 40,
+          "cooldownSeconds": -0.15
+        },
+        {
+          "power": 40
+        },
+        {
+          "power": 40,
+          "count": 1
+        },
+        {
+          "power": 40,
+          "cooldownSeconds": -0.15
+        },
+        {
+          "power": 40,
+          "range": 10
+        },
+        {
+          "power": 40
+        },
+        {
+          "power": 40,
+          "cooldownSeconds": -0.15
+        },
+        {
+          "power": 40,
+          "count": 1
+        },
+        {
+          "power": 40,
+          "cooldownSeconds": -0.15
+        }
+      ]
+    },
+    "thunder-raikou": {
+      "pattern": "homing",
+      "effect": "thunder-raikou",
+      "nameOf": "thunder",
+      "aimStrongest": true,
+      "effects": [
+        {
+          "trigger": "every",
+          "everySeconds": 0.22,
+          "explode": {
+            "sizeMultiplier": 0.9,
+            "powerMultiplier": 0.85
+          }
+        }
+      ],
+      "base": {
+        "power": 74.9,
+        "cooldownSeconds": 2.8,
+        "count": 1,
+        "speed": 170,
+        "size": 56,
+        "range": 520,
+        "durationSeconds": 2.6,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0.5,
+        "knockback": 0,
+        "statusId": "paralysis",
+        "statusChance": 0.3,
+        "statusSeconds": 2,
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1
+      },
+      "levels": [
+        {
+          "power": 12.6
+        },
+        {
+          "size": 3,
+          "power": 10.2
+        },
+        {
+          "durationSeconds": 0.2,
+          "power": 8.6
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 5.5
+        },
+        {
+          "size": 3,
+          "power": 8.4
+        },
+        {
+          "durationSeconds": 0.2,
+          "power": -14.3
+        },
+        {
+          "size": 4,
+          "power": 5.6
+        }
       ]
     },
     "psystrike": {

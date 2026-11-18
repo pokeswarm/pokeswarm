@@ -55,6 +55,13 @@
         "comboMultiplier": 3,
         "freezeDelaySeconds": 0.45
       }
+    },
+    "extreme-speed-raikou": {
+      "kind": "extremeSpeed",
+      "move": "extreme-speed-raikou",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2
     }
   }
 }

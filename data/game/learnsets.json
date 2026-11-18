@@ -1467,14 +1467,13 @@
     ],
     "raikou": [
       "thunder-shock",
+      "extreme-speed-raikou",
+      "bite",
       "spark",
-      "body-slam",
       "thunderbolt",
-      "thunder-wave",
-      "quick-attack",
-      "swift",
-      "wild-charge",
-      "double-edge"
+      "thunder-raikou",
+      "crunch",
+      "wild-charge"
     ],
     "entei": [
       "ember",

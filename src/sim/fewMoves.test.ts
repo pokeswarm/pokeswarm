@@ -86,7 +86,8 @@ describe('でんこうせっか → すてみタックル（だれでもの派�
   it('原作で すてみタックル を覚える系統なら、どの地方でも出る', () => {
     expect(setup('eevee', 'kanto').derivable('quick-attack', 'silk-scarf', 'double-edge')).toBe(true);
     expect(setup('cyndaquil').derivable('quick-attack', 'silk-scarf', 'double-edge')).toBe(true);
-    expect(setup('raikou').derivable('quick-attack', 'silk-scarf', 'double-edge')).toBe(true);
+    // ライコウは 07 の309章で技を決めた（でんこうせっか は持たない）ので、ピチューで見る
+    expect(setup('pichu').derivable('quick-attack', 'silk-scarf', 'double-edge')).toBe(true);
   });
 });
 

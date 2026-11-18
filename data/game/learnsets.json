@@ -1531,15 +1531,13 @@
     ],
     "celebi": [
       "magical-leaf",
-      "recover",
-      "healing-wish",
-      "leech-seed",
       "confusion",
+      "leech-seed",
+      "healing-wish",
+      "energy-ball",
       "leaf-storm-celebi",
-      "psychic",
-      "swift",
-      "giga-drain",
-      "leaf-storm"
+      "future-sight-celebi",
+      "giga-drain"
     ],
     "latias": [
       "mist-ball",

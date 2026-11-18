@@ -948,6 +948,19 @@
     "contestType": "cute",
     "damageClass": "status"
   },
+  "energy-ball": {
+    "names": {
+      "ja": "エナジーボール",
+      "en": "Energy Ball",
+      "fr": "Éco-Sphère",
+      "de": "Energieball",
+      "es": "Energibola",
+      "it": "Energipalla"
+    },
+    "type": "grass",
+    "contestType": "beauty",
+    "damageClass": "special"
+  },
   "eruption": {
     "names": {
       "ja": "ふんか",

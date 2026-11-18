@@ -2744,6 +2744,54 @@
         "growSeconds": 0.1
       }
     },
+    "leaf-storm-celebi": {
+      "extends": "grass.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      }
+    },
+    "energy-ball": {
+      "extends": "grass.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      }
+    },
+    "future-sight-celebi": {
+      "extends": "psychic.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      }
+    },
     "psystrike": {
       "extends": "psychic.base",
       "hideShape": true,
@@ -5674,20 +5722,6 @@
         "fit": "circle",
         "size": 2.4,
         "rotate": "velocity"
-      }
-    },
-    "leaf-storm-celebi": {
-      "extends": "grass.base",
-      "projectile": {
-        "glowScale": 1.05,
-        "coreScale": 0.2
-      },
-      "sprite": {
-        "id": "leaf",
-        "fit": "circle",
-        "size": 1.6,
-        "rotate": "spin",
-        "spinDegPerSec": 720
       }
     },
     "giga-drain": {

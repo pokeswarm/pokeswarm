@@ -431,7 +431,19 @@
     {
       "from": "magical-leaf",
       "item": "miracle-seed",
+      "to": "energy-ball",
+      "line": "celebi"
+    },
+    {
+      "from": "energy-ball",
+      "item": "x-sp-atk",
       "to": "leaf-storm-celebi",
+      "line": "celebi"
+    },
+    {
+      "from": "confusion",
+      "item": "twisted-spoon",
+      "to": "future-sight-celebi",
       "line": "celebi"
     },
     {

@@ -12291,59 +12291,200 @@
       ]
     },
     "leaf-storm-celebi": {
-      "pattern": "spiral",
-      "effect": "leaf-storm",
+      "pattern": "nearest",
+      "effect": "leaf-storm-celebi",
+      "nameOf": "leaf-storm",
+      "aimStrongest": true,
+      "landAtTarget": true,
       "base": {
-        "power": 14.5,
+        "power": 95.1,
         "intervalSeconds": 0.1,
-        "count": 10,
-        "speed": 0,
-        "size": 16,
-        "range": 220,
-        "durationSeconds": 1.1,
+        "count": 1,
+        "speed": 260,
+        "size": 46,
+        "range": 480,
+        "durationSeconds": 2.2,
         "pierce": "infinite",
-        "hitIntervalSeconds": 0,
-        "knockback": 100,
+        "hitIntervalSeconds": 0.25,
+        "knockback": 40,
         "knockbackSeconds": 0.08,
         "spreadDegrees": 0,
-        "cooldownSeconds": 1.05,
+        "cooldownSeconds": 2.4,
         "statusChance": 0,
         "statusSeconds": 0,
         "critChancePct": 20,
         "lifestealPct": 0
       },
+      "effects": [
+        {
+          "trigger": "end",
+          "puddle": {
+            "sizeMultiplier": 1.1,
+            "powerMultiplier": 0.8,
+            "durationSeconds": 2.2,
+            "hitIntervalSeconds": 0.25
+          }
+        }
+      ],
       "levels": [
         {
-          "power": 2.4
-        },
-        {
-          "count": 2,
-          "power": 0.8
+          "size": 2,
+          "power": 13.8
         },
         {
           "size": 2,
-          "power": 2.2
+          "power": 13.4
         },
         {
-          "range": 30,
-          "power": 2.2
+          "size": 3,
+          "power": 11.7
         },
         {
-          "cooldownSeconds": -0.15,
-          "power": -1.3
+          "cooldownSeconds": -0.2,
+          "power": 2.6
         },
         {
-          "count": 2,
-          "power": 0.3
+          "size": 3,
+          "power": 9.9
         },
         {
-          "range": 30,
-          "power": 1.7
+          "size": 2,
+          "power": 10.9
+        },
+        {
+          "size": 4,
+          "power": 8
         }
       ],
-      "curve": 260,
-      "nameOf": "leaf-storm",
-      "spiralDrift": 420
+      "contestType": "beauty"
+    },
+    "energy-ball": {
+      "pattern": "homing",
+      "effect": "energy-ball",
+      "base": {
+        "power": 83.2,
+        "cooldownSeconds": 0.9,
+        "count": 1,
+        "intervalSeconds": 0.15,
+        "speed": 420,
+        "size": 14,
+        "range": 420,
+        "durationSeconds": 1.2,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockback": 120,
+        "knockbackSeconds": 0.1,
+        "spreadDegrees": 0,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0
+      },
+      "effects": [
+        {
+          "trigger": "hit",
+          "avoidTarget": true,
+          "split": {
+            "sizeMultiplier": 0.55,
+            "powerMultiplier": 0.35,
+            "count": 5,
+            "speed": 260,
+            "durationSeconds": 0.5,
+            "spreadDegrees": 360,
+            "jitter": 0.4,
+            "pierce": 1
+          }
+        }
+      ],
+      "levels": [
+        {
+          "power": 18.9
+        },
+        {
+          "size": 2,
+          "power": 19
+        },
+        {
+          "size": 2,
+          "power": 19
+        },
+        {
+          "cooldownSeconds": -0.1,
+          "power": 1.3
+        },
+        {
+          "power": 16.9
+        },
+        {
+          "size": 2,
+          "power": 16.8
+        },
+        {
+          "size": 2,
+          "power": 16.9
+        }
+      ],
+      "contestType": "beauty"
+    },
+    "future-sight-celebi": {
+      "pattern": "scatter",
+      "effect": "future-sight-celebi",
+      "nameOf": "future-sight",
+      "scatterOnEnemies": true,
+      "scatterDelaySeconds": 1.5,
+      "scatterBoss": {
+        "move": "future-sight-celebi",
+        "range": 480,
+        "sizeMultiplier": 1.8,
+        "powerMultiplier": 3
+      },
+      "base": {
+        "power": 216.8,
+        "cooldownSeconds": 2.6,
+        "count": 2,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 56,
+        "range": 420,
+        "durationSeconds": 0.3,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 100,
+        "knockbackSeconds": 0.1,
+        "spreadDegrees": 0,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "power": 49.5
+        },
+        {
+          "size": 3,
+          "power": 38.6
+        },
+        {
+          "count": 1,
+          "power": -17
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": 13.9
+        },
+        {
+          "size": 3,
+          "power": 24.5
+        },
+        {
+          "count": 1,
+          "power": -13.6
+        },
+        {
+          "size": 4,
+          "power": 15.1
+        }
+      ],
+      "contestType": "smart"
     },
     "giga-drain": {
       "pattern": "beam",

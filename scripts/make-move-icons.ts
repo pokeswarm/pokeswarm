@@ -186,6 +186,83 @@ function psystrikeOrb(): Draw {
   });
 }
 
+/** セレビィの技の葉（中心 cx,cy・向き a 度・長さ len）: 2 色の緑と明るい葉脈、先は金 */
+function leafAt(x: number, y: number, cx: number, cy: number, a: number, len: number): string | null {
+  const r = (a * Math.PI) / 180;
+  const u = (x - cx) * Math.cos(r) + (y - cy) * Math.sin(r);
+  const v = -(x - cx) * Math.sin(r) + (y - cy) * Math.cos(r);
+  const t = u / len + 0.5;
+  if (t < 0 || t > 1) return null;
+  const half = Math.sin(t * Math.PI) * len * 0.28;
+  if (Math.abs(v) > half) return null;
+  if (t > 0.85) return '#f5c84a';
+  if (Math.abs(v) < 0.45) return '#e6f5c0';
+  return v < 0 ? '#7cc35a' : '#3f9a44';
+}
+
+/** エナジーボール（07 の306章）: 光の筋が回る緑の玉と、散る葉 */
+function energyBallIcon(): Draw {
+  return paint((x, y) => {
+    for (const [cx, cy, a] of [[25, 8, -30], [26, 23, 30], [7, 26, 120]] as const) {
+      const l = leafAt(x, y, cx, cy, a, 7);
+      if (l) return l;
+    }
+    const dx = x - 15;
+    const dy = y - 15;
+    const r = Math.hypot(dx, dy);
+    if (r > 10) return null;
+    if (r > 9) return '#2e7d32';
+    const a = Math.atan2(dy, dx);
+    if (r < 2.5) return '#f1f8e0';
+    if (Math.sin(a * 2 + r * 0.7) > 0.55) return '#c5e1a5';
+    return r < 6 ? '#66bb6a' : '#43a047';
+  });
+}
+
+/** リーフストーム（セレビィの版）: 巻き込む緑の渦と、回る葉。金の光 */
+function leafStormCelebiIcon(): Draw {
+  return paint((x, y) => {
+    for (const [cx, cy, a] of [[6, 9, 60], [26, 7, 150], [27, 24, -120], [6, 25, -30]] as const) {
+      const l = leafAt(x, y, cx, cy, a, 7);
+      if (l) return l;
+    }
+    const dx = x - 16;
+    const dy = y - 16;
+    const r = Math.hypot(dx, dy) / 12;
+    if (r > 1 || r < 0.08) return null;
+    const a = Math.atan2(dy, dx);
+    const arm = Math.sin(a * 3 + Math.log(r) * 4.2);
+    if (arm < 0.35) return null;
+    if (arm > 0.9 && r < 0.5) return '#f1f8e0';
+    if (arm > 0.85 && (Math.floor(x) + Math.floor(y)) % 5 === 0) return '#f5c84a';
+    return r < 0.45 ? '#9ccc65' : r < 0.75 ? '#66bb6a' : '#2e7d32';
+  });
+}
+
+/** みらいよち（セレビィの版）: 金の文字盤と針、淡い緑の面（未来から落ちる光の柱の手前の文字盤） */
+function futureSightCelebiIcon(): Draw {
+  return paint((x, y) => {
+    const dx = x - 16;
+    const dy = y - 17;
+    const r = Math.hypot(dx, dy);
+    // 上から差す光の柱
+    if (Math.abs(dx) < 2.2 && y < 6) return Math.abs(dx) < 0.9 ? '#f1f8e0' : '#c5e1a5';
+    if (r > 12.5) return null;
+    if (r > 11) return '#f5c84a';
+    if (r > 10) return '#2e7d32';
+    const a = Math.atan2(dy, dx);
+    const k = Math.round((a / (Math.PI * 2)) * 12);
+    if (Math.abs(a - (k / 12) * Math.PI * 2) * r < 0.8 && r > 7.5) return '#fff3c0';
+    // 針: 真上から 2 時の向きへ
+    const ha = -Math.PI / 2 + Math.PI / 3;
+    const along = dx * Math.cos(ha) + dy * Math.sin(ha);
+    const side = Math.abs(-dx * Math.sin(ha) + dy * Math.cos(ha));
+    if (along > -1 && along < 8.5 && side < 1.1 - along * 0.05) return '#f5c84a';
+    if (r < 1.6) return '#f5c84a';
+    return Math.sin(a * 5 + r * 0.9) > 0.6 ? '#9ccc65' : '#d7ecb0';
+  });
+}
+
 /** 光のきらめき（十字の小さな光） */
 function glint(cx: number, cy: number, r: number, c = '#ffffff', mid = '#fff9c4'): Draw {
   return paint((x, y) => {
@@ -612,6 +689,9 @@ const ICONS: Record<string, Layer[]> = {
   // つるぎのまい: 自分のまわりを回る剣
   'swords-dance': [swordRing(4, 28)],
   psystrike: [psystrikeOrb()],
+  'energy-ball': [energyBallIcon()],
+  'leaf-storm-celebi': [leafStormCelebiIcon()],
+  'future-sight-celebi': [futureSightCelebiIcon()],
   // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
   sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],
   // かたくなる: 体の表面が硬い板になる
@@ -811,7 +891,8 @@ function autoLayers(keys: string[]): Layer[] | null {
 // 技の名前ごと（同じ名前 nameOf の技はまとめて 1 枚）
 const byName = new Map<string, string[]>();
 for (const [k, m] of Object.entries(moves)) {
-  const n = m.nameOf ?? k;
+  // 名前が同じ技（nameOf）でも、ICONS にその技の絵があれば別の 1 枚にする（セレビィの リーフストーム・みらいよち。07 の306章）
+  const n = m.nameOf && !ICONS[k] ? m.nameOf : k;
   byName.set(n, [...(byName.get(n) ?? []), k]);
 }
 const out: Record<string, { palette: string[]; rows: string[] }> = {};

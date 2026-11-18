@@ -31,6 +31,7 @@ import { RayquazaSky } from '../render/effects/RayquazaSky';
 import { DeoxysCosmos } from '../render/effects/DeoxysCosmos';
 import { LatiEon } from '../render/effects/LatiEon';
 import { MewtwoPlayer } from '../render/effects/MewtwoPlayer';
+import { CelebiPlayer } from '../render/effects/CelebiPlayer';
 import { SkillHud } from '../render/SkillHud';
 import { ensureSkillIcons } from '../render/skillIcons';
 import { ShinyCharizardFlame } from '../render/effects/ShinyCharizardFlame';
@@ -197,6 +198,8 @@ export class RunScene extends Phaser.Scene {
   private latiEon: LatiEon | null = null;
   /** 遊べるミュウツーの技（サイコブレイク・テレポート。07 の305章） */
   private mewtwoPlayer: MewtwoPlayer | null = null;
+  /** 遊べるセレビィの技（エナジーボール・リーフストーム・みらいよち。07 の306章） */
+  private celebiPlayer: CelebiPlayer | null = null;
   /** アクティブスキルのボタン（右下）とキー、押している枠（SPACE を押している間は行き先の印を出す）、スマホでボタンを押している指 */
   private skillHud: SkillHud | null = null;
   private skillKeys: Phaser.Input.Keyboard.Key[] = [];
@@ -384,6 +387,7 @@ export class RunScene extends Phaser.Scene {
     this.fieldOverlay = null;
     this.lavaSea = null;
     this.mewtwoPlayer = null;
+    this.celebiPlayer = null;
     this.skillHud = null;
     this.skillAim = null;
     this.skillTouch = null;
@@ -3382,6 +3386,8 @@ export class RunScene extends Phaser.Scene {
     this.latiEon.update(world, this.time.now);
     this.mewtwoPlayer ??= new MewtwoPlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.players + 0.1);
     this.mewtwoPlayer.update(world, this.time.now, this.localId, this.skillAim);
+    this.celebiPlayer ??= new CelebiPlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.bosses + 0.05);
+    this.celebiPlayer.update(world, this.time.now);
     this.shinyCharizardFlame ??= new ShinyCharizardFlame(this, spriteRender.depths.effects + 0.35, spriteRender.depths.bosses + 0.05, ARENA_FLOOR_DEPTH + 3.6);
     this.shinyCharizardFlame.update(world, this.time.now, alpha);
     this.shinyVenusaurPlant ??= new ShinyVenusaurPlant(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);

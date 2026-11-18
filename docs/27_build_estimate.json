@@ -17296,23 +17296,23 @@
      "builds": [
       {
        "form": "celebi",
-       "scene": "at50",
-       "est": 5039.36095246421,
+       "scene": "at150",
+       "est": 18499.655657461466,
        "moves": [
         {
          "move": "leaf-storm-celebi",
          "level": 8,
-         "est": 4793.3614326245715
+         "est": 11112.877929775317
         },
         {
-         "move": "future-sight",
+         "move": "future-sight-celebi",
          "level": 8,
-         "est": 245.99951983963817
+         "est": 6024.558547356174
         },
         {
-         "move": "recover",
+         "move": "giga-drain",
          "level": 8,
-         "est": 0
+         "est": 1362.2191803299754
         },
         {
          "move": "healing-wish",
@@ -17322,48 +17322,48 @@
        ],
        "items": [
         "miracle-seed",
-        "metronome",
         "x-sp-atk",
-        "light-clay",
+        "twisted-spoon",
+        "metronome",
         "pp-max",
         "dire-hit"
        ],
        "vs": {
-        "johto-boss-xatu": 4.861727554566156,
-        "johto-boss-crobat": 7.11883613863714,
-        "johto-boss-machamp": 7.428426438532093,
-        "johto-boss-houndoom": 11.112520124722643,
-        "johto-boss-dragonite": 12.742947148610908,
-        "round1": 39.68757187400944,
-        "round2": 59.824829009530376,
-        "round3": 105.43899173697619,
-        "legend-lugia": 99.2189296850236,
-        "legend-ho-oh": 98.02267037393007,
-        "legend-raikou": 12.501585140312974,
-        "legend-entei": 15.438570583893984,
-        "legend-suicune": 10.503442960349062
+        "johto-boss-xatu": 1.3243489745777195,
+        "johto-boss-crobat": 1.7083539959393712,
+        "johto-boss-machamp": 1.9183369670645103,
+        "johto-boss-houndoom": 3.027083370463359,
+        "johto-boss-dragonite": 3.249058537478786,
+        "round1": 10.811012037369139,
+        "round2": 16.781414320240998,
+        "round3": 27.10750170697954,
+        "legend-lugia": 27.027530093422847,
+        "legend-ho-oh": 24.992757980606047,
+        "legend-raikou": 3.4054687917712787,
+        "legend-entei": 3.9363593819454525,
+        "legend-suicune": 3.000760895869641
        },
-       "legendAvg": 80.43859853589393
+       "legendAvg": 21.344043227723713
       },
       {
        "form": "celebi",
-       "scene": "at50",
-       "est": 918.1662303684851,
+       "scene": "at150",
+       "est": 17279.746106681272,
        "moves": [
         {
-         "move": "future-sight",
+         "move": "leaf-storm-celebi",
          "level": 8,
-         "est": 443.028113178454
+         "est": 11112.877929775317
         },
         {
-         "move": "magical-leaf",
+         "move": "future-sight-celebi",
          "level": 8,
-         "est": 475.1381171900311
+         "est": 6024.558547356174
         },
         {
-         "move": "recover",
+         "move": "leech-seed",
          "level": 8,
-         "est": 0
+         "est": 142.30962954978267
         },
         {
          "move": "healing-wish",
@@ -17372,29 +17372,182 @@
         }
        ],
        "items": [
+        "miracle-seed",
         "x-sp-atk",
         "twisted-spoon",
-        "miracle-seed",
-        "light-clay",
+        "metronome",
         "pp-max",
         "dire-hit"
        ],
        "vs": {
-        "johto-boss-xatu": 26.68362132003862,
-        "johto-boss-crobat": 32.24588546503798,
-        "johto-boss-machamp": 37.54574572899111,
-        "johto-boss-houndoom": 60.99113444580256,
-        "johto-boss-dragonite": 63.17283573165198,
-        "round1": 217.82548016358058,
-        "round2": 344.18772494331074,
-        "round3": 531.2417179793013,
-        "legend-lugia": 544.5637004089514,
-        "legend-ho-oh": 485.9448902434768,
-        "legend-raikou": 68.61502625152788,
-        "legend-entei": 76.5363202133476,
-        "legend-suicune": 62.179611298779456
+        "johto-boss-xatu": 1.4178449063280503,
+        "johto-boss-crobat": 1.8110562800483339,
+        "johto-boss-machamp": 2.044939126055615,
+        "johto-boss-houndoom": 3.2407883573212577,
+        "johto-boss-dragonite": 3.4600444656925475,
+        "round1": 11.574244133290206,
+        "round2": 18.012038950578106,
+        "round3": 28.897343451128034,
+        "legend-lugia": 28.935610333225515,
+        "legend-ho-oh": 26.615726659173443,
+        "legend-raikou": 3.645886901986415,
+        "legend-entei": 4.191976948819817,
+        "legend-suicune": 3.2256770250721356
        },
-       "legendAvg": 424.7527027477242
+       "legendAvg": 22.80699270547906
+      },
+      {
+       "form": "celebi",
+       "scene": "at150",
+       "est": 14853.727418054594,
+       "moves": [
+        {
+         "move": "future-sight-celebi",
+         "level": 8,
+         "est": 6024.558547356174
+        },
+        {
+         "move": "energy-ball",
+         "level": 8,
+         "est": 7466.949690368444
+        },
+        {
+         "move": "giga-drain",
+         "level": 8,
+         "est": 1362.2191803299754
+        },
+        {
+         "move": "healing-wish",
+         "level": 8,
+         "est": 0
+        }
+       ],
+       "items": [
+        "twisted-spoon",
+        "miracle-seed",
+        "pp-max",
+        "metronome",
+        "x-sp-atk",
+        "dire-hit"
+       ],
+       "vs": {
+        "johto-boss-xatu": 1.649417638445447,
+        "johto-boss-crobat": 2.056978967605878,
+        "johto-boss-machamp": 2.3538731831396404,
+        "johto-boss-houndoom": 3.770097459303879,
+        "johto-boss-dragonite": 3.9731374210988406,
+        "round1": 13.464633783228141,
+        "round2": 21.088439829774035,
+        "round3": 33.27346770034006,
+        "legend-lugia": 33.66158445807035,
+        "legend-ho-oh": 30.56259554691416,
+        "legend-raikou": 4.241359641716865,
+        "legend-entei": 4.81360879863898,
+        "legend-suicune": 3.7907138023348814
+       },
+       "legendAvg": 26.410144263665348
+      },
+      {
+       "form": "celebi",
+       "scene": "at150",
+       "est": 13796.232864214131,
+       "moves": [
+        {
+         "move": "leaf-storm-celebi",
+         "level": 8,
+         "est": 11112.877929775317
+        },
+        {
+         "move": "giga-drain",
+         "level": 8,
+         "est": 2277.572802887637
+        },
+        {
+         "move": "confusion",
+         "level": 8,
+         "est": 405.7821315511779
+        },
+        {
+         "move": "healing-wish",
+         "level": 8,
+         "est": 0
+        }
+       ],
+       "items": [
+        "miracle-seed",
+        "x-sp-atk",
+        "pp-max",
+        "metronome",
+        "dire-hit",
+        "light-clay"
+       ],
+       "vs": {
+        "johto-boss-xatu": 1.7758470910961666,
+        "johto-boss-crobat": 2.6251642734065705,
+        "johto-boss-machamp": 2.723855273398596,
+        "johto-boss-houndoom": 4.059079065362666,
+        "johto-boss-dragonite": 4.677040160430997,
+        "round1": 14.496710947723809,
+        "round2": 21.809402624473268,
+        "round3": 38.68852791616684,
+        "legend-lugia": 36.24177736930952,
+        "legend-ho-oh": 35.977232003315365,
+        "legend-raikou": 4.566463948533,
+        "legend-entei": 5.66641404052217,
+        "legend-suicune": 3.8241328617208183
+       },
+       "legendAvg": 29.442730172197763
+      },
+      {
+       "form": "celebi",
+       "scene": "at150",
+       "est": 13633.817867274402,
+       "moves": [
+        {
+         "move": "future-sight-celebi",
+         "level": 8,
+         "est": 6024.558547356174
+        },
+        {
+         "move": "energy-ball",
+         "level": 8,
+         "est": 7466.949690368444
+        },
+        {
+         "move": "leech-seed",
+         "level": 8,
+         "est": 142.30962954978267
+        },
+        {
+         "move": "healing-wish",
+         "level": 8,
+         "est": 0
+        }
+       ],
+       "items": [
+        "twisted-spoon",
+        "miracle-seed",
+        "pp-max",
+        "metronome",
+        "x-sp-atk",
+        "dire-hit"
+       ],
+       "vs": {
+        "johto-boss-xatu": 1.7970021485183523,
+        "johto-boss-crobat": 2.2077247110127804,
+        "johto-boss-machamp": 2.5473878881948147,
+        "johto-boss-houndoom": 4.107433482327663,
+        "johto-boss-dragonite": 4.293274930417727,
+        "round1": 14.669405294027365,
+        "round2": 23.070694452275742,
+        "round3": 36.022524026141795,
+        "legend-lugia": 36.67351323506841,
+        "legend-ho-oh": 33.02519177244406,
+        "legend-raikou": 4.620862667618621,
+        "legend-entei": 5.201467704159939,
+        "legend-suicune": 4.156860179531669
+       },
+       "legendAvg": 28.692265755991475
       }
      ],
      "measured": {
@@ -17440,6 +17593,20 @@
       "x-attack"
      ],
      "owners": 2
+    },
+    {
+     "move": "leaf-storm-celebi",
+     "est": 11112.877929775317,
+     "key": "celebi",
+     "form": "celebi",
+     "items": [
+      "miracle-seed",
+      "x-sp-atk",
+      "pp-max",
+      "metronome",
+      "dire-hit"
+     ],
+     "owners": 1
     },
     {
      "move": "future-sight-alakazam",
@@ -17570,6 +17737,20 @@
      "owners": 1
     },
     {
+     "move": "energy-ball",
+     "est": 7497.058358474768,
+     "key": "celebi",
+     "form": "celebi",
+     "items": [
+      "miracle-seed",
+      "pp-max",
+      "metronome",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
      "move": "eruption",
      "est": 7474.011459112636,
      "key": "cyndaquil",
@@ -17670,6 +17851,20 @@
      "owners": 6
     },
     {
+     "move": "future-sight-celebi",
+     "est": 6024.558547356174,
+     "key": "celebi",
+     "form": "celebi",
+     "items": [
+      "twisted-spoon",
+      "metronome",
+      "x-sp-atk",
+      "dire-hit",
+      "pp-max"
+     ],
+     "owners": 1
+    },
+    {
      "move": "x-scissor",
      "est": 5829.879267107365,
      "key": "scyther",
@@ -17764,36 +17959,6 @@
       "x-attack",
       "dire-hit",
       "zoom-lens"
-     ],
-     "owners": 1
-    },
-    {
-     "move": "leaf-storm",
-     "est": 4793.3614326245715,
-     "key": "celebi",
-     "form": "celebi",
-     "items": [
-      "miracle-seed",
-      "metronome",
-      "light-clay",
-      "x-sp-atk",
-      "pp-max",
-      "dire-hit"
-     ],
-     "owners": 0
-    },
-    {
-     "move": "leaf-storm-celebi",
-     "est": 4793.3614326245715,
-     "key": "celebi",
-     "form": "celebi",
-     "items": [
-      "miracle-seed",
-      "metronome",
-      "light-clay",
-      "x-sp-atk",
-      "pp-max",
-      "dire-hit"
      ],
      "owners": 1
     },
@@ -17920,6 +18085,21 @@
       "dire-hit"
      ],
      "owners": 1
+    },
+    {
+     "move": "leaf-storm",
+     "est": 4168.14037619528,
+     "key": "chikorita",
+     "form": "meganium",
+     "items": [
+      "miracle-seed",
+      "metronome",
+      "light-clay",
+      "x-sp-atk",
+      "pp-max",
+      "dire-hit"
+     ],
+     "owners": 0
     },
     {
      "move": "flare-blitz",
@@ -18131,7 +18311,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 1
+     "owners": 2
     },
     {
      "move": "ice-beam",
@@ -18660,7 +18840,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 3
+     "owners": 4
     },
     {
      "move": "metronome-baby",
@@ -18866,18 +19046,6 @@
      "owners": 1
     },
     {
-     "move": "future-sight",
-     "est": 443.028113178454,
-     "key": "celebi",
-     "form": "celebi",
-     "items": [
-      "twisted-spoon",
-      "x-sp-atk",
-      "dire-hit"
-     ],
-     "owners": 1
-    },
-    {
      "move": "whirlpool",
      "est": 403.5516461819831,
      "key": "eevee",
@@ -18988,7 +19156,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 1
+     "owners": 2
     },
     {
      "move": "sleep-powder",
@@ -27044,7 +27212,9 @@
   "sacred-fire": "せいなるほのお",
   "celebi": "セレビィ",
   "leaf-storm-celebi": "リーフストーム",
+  "future-sight-celebi": "みらいよち",
   "healing-wish": "いやしのねがい",
+  "energy-ball": "エナジーボール",
   "hurricane": "ぼうふう",
   "poison-fang": "どくどくのキバ",
   "ice-fang": "こおりのキバ",

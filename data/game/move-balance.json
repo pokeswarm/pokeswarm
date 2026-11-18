@@ -87,6 +87,8 @@
     "superpower"
   ],
   "tierOverrides": {
+    "energy-ball": "derived",
+    "future-sight-celebi": "derived",
     "pound": "derived",
     "synthesis": "derived",
     "bite": "derived",
@@ -139,6 +141,8 @@
   },
   "strengthScale": {
     "psystrike": 1.7,
+    "future-sight-celebi": 2.2,
+    "leaf-storm-celebi": 3.6,
     "flare-blitz": 0.3,
     "blast-burn": 0.88,
     "crunch": 1.9,

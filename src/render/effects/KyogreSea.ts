@@ -1,12 +1,9 @@
 import Phaser from 'phaser';
 import type { World } from '../../sim/world';
-
-function rnd(a: number, b: number): number {
-  const v = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
-  return v - Math.floor(v);
-}
+import { c, DOT, DotPool, makeTexture, on, rnd, shade } from './dotArt';
 
 type Hz = World['hazards'][number];
+type Body = { x: number; y: number; r: number };
 
 interface Lingering {
   kind: 'splash' | 'bolt';
@@ -20,32 +17,209 @@ interface Lingering {
 
 const SPLASH_LINGER_MS = 1200;
 const BOLT_LINGER_MS = 500;
+const FR = 8;
+const BEAM_W = 48;
+const BEAM_H = 60;
+const WATER = [0x0d2a6b, 0x0d47a1, 0x1565c0, 0x1e88e5, 0x4fc3f7, 0xb3e5fc, 0xffffff];
+const CLOUD = [0x1e272c, 0x37474f, 0x546e7a, 0x78909c, 0xb0bec5];
 
 /**
- * カイオーガの技の絵（07 の284章）: こんげんのはどうの深い青の光線・しおふきの打ち上がって落ちる潮・かみなりの雷雲と稲妻・
- * ゲンシカイキの水の輪と光。見た目だけ（当たりはシミュレーション）
+ * カイオーガの技の絵（07 の284・297章）: こんげんのはどうの深い青の光線・しおふきの打ち上がって落ちる潮・かみなりの雷雲と稲妻・
+ * ゲンシカイキの水の輪と水の筋。1 ドットずつ計算したドット絵のテクスチャで描く（半透明の塗りは使わない）。見た目だけ
  */
 export class KyogreSea {
-  private readonly gf: Phaser.GameObjects.Graphics;
-  private readonly gn: Phaser.GameObjects.Graphics;
-  private readonly ga: Phaser.GameObjects.Graphics;
-  private readonly gt: Phaser.GameObjects.Graphics;
+  private built = false;
+  private readonly pool: DotPool;
   private readonly lingering = new Map<string, Lingering>();
 
-  constructor(scene: Phaser.Scene, depth: number, floorDepth: number, topDepth: number) {
-    this.gf = scene.add.graphics().setDepth(floorDepth);
-    this.gn = scene.add.graphics().setDepth(depth);
-    this.ga = scene.add.graphics().setDepth(depth + 0.01).setBlendMode(Phaser.BlendModes.ADD);
-    this.gt = scene.add.graphics().setDepth(topDepth);
+  constructor(
+    private readonly scene: Phaser.Scene,
+    private readonly depth: number,
+    private readonly floorDepth: number,
+    private readonly topDepth: number,
+  ) {
+    this.pool = new DotPool(scene, topDepth + 0.01);
+  }
+
+  private build(): void {
+    if (this.built) return;
+    this.built = true;
+    const s = this.scene;
+    // 光線の 1 区切り: 深い青の外側（ディザで細る）・青・水色・白い芯。先へ流れる波頭の白い筋
+    for (let f = 0; f < 2; f++) {
+      makeTexture(s, `ky-beam-${f}`, BEAM_W, BEAM_H, (x, y) => {
+        const yy = (y - (BEAM_H - 1) / 2) / (BEAM_H / 2);
+        const v = Math.abs(yy) + (f ? 0.03 * Math.sin((x / BEAM_W) * Math.PI * 6) : 0);
+        const crest = Math.abs(yy - 0.45 * Math.sin((x / BEAM_W) * Math.PI * 2)) < 0.06 || Math.abs(yy + 0.45 * Math.sin((x / BEAM_W) * Math.PI * 2 + 1)) < 0.05;
+        if (crest && v < 0.8) return c(0xe1f5fe);
+        if (v < 0.14) return c(0xffffff);
+        if (v < 0.32) return c(0xb3e5fc);
+        if (v < 0.55) return c(0x4fc3f7);
+        if (v < 0.78) return c(0x1e88e5);
+        if (v < 1 && on((1 - v) / 0.22, x, y)) return c(0x0d47a1);
+        return 0;
+      });
+    }
+    // 溜めの玉・水の塊（回る 8 コマ）
+    for (let f = 0; f < FR; f++) {
+      const S = 32;
+      makeTexture(s, `ky-orb-${f}`, S, S, (x, y) => {
+        const dx = x - (S - 1) / 2;
+        const dy = y - (S - 1) / 2;
+        const r = Math.hypot(dx, dy) / (S / 2);
+        if (r > 1) return 0;
+        const sw = Math.sin(Math.atan2(dy, dx) * 3 + r * 7 - (f / FR) * Math.PI * 2);
+        if (r < 0.3) return c(0xffffff);
+        if (r < 0.6) return c(sw > 0.3 ? 0xb3e5fc : 0x4fc3f7);
+        if (r < 0.85) return c(sw > 0.4 ? 0x29b6f6 : 0x1565c0);
+        return on((1 - r) / 0.15, x, y) && sw > -0.2 ? c(0x0d47a1) : 0;
+      });
+      const W = 22;
+      makeTexture(s, `ky-water-${f}`, W, W, (x, y) => {
+        const dx = x - (W - 1) / 2;
+        const dy = y - (W - 1) / 2;
+        const r = Math.hypot(dx, dy * (1.05 + 0.08 * Math.sin((f / FR) * Math.PI * 2))) / (W / 2);
+        if (r > 1) return 0;
+        const hl = Math.hypot(dx + 3, dy + 3) / (W / 2);
+        if (hl < 0.18) return c(0xffffff);
+        if (hl < 0.35) return c(0xb3e5fc);
+        if (r > 0.88) return c(0x0d47a1);
+        return shade(WATER, 0.62 - r * 0.35 + (dy < 0 ? 0.08 : 0), x, y);
+      });
+    }
+    // 落ちる所の影・印
+    makeTexture(s, 'ky-shadow', 32, 14, (x, y) => {
+      const r = Math.hypot((x - 15.5) / 16, (y - 6.5) / 7);
+      return r < 1 && on(0.65 - r * 0.4, x, y) ? c(0x081a33) : 0;
+    });
+    makeTexture(s, 'ky-mark', 48, 22, (x, y) => {
+      const r = Math.hypot((x - 23.5) / 24, (y - 10.5) / 11);
+      if (r > 1) return 0;
+      if (r > 0.86) return c(0xfff59d);
+      return on(0.22 * r, x, y) ? c(0x0a0f1e) : 0;
+    });
+    // しぶきの王冠と波紋（8 コマ）・引いていく水たまり（8 コマ）
+    for (let f = 0; f < FR; f++) {
+      const t = f / (FR - 1);
+      const W = 64;
+      const H = 44;
+      makeTexture(s, `ky-splash-${f}`, W, H, (x, y) => {
+        const gy = H - 10;
+        // 波紋（地面の輪）
+        const rr = Math.hypot((x - (W - 1) / 2) / (W / 2), (y - gy) / 9);
+        if (Math.abs(rr - (0.35 + 0.6 * t)) < 0.06 && on(1.1 - t, x, y)) return c(0xe1f5fe);
+        // 王冠: 輪の上に立つしずくの柱（上がって落ちる）
+        const h = 26 * Math.sin(Math.min(1, t * 1.4) * Math.PI) * (t < 0.85 ? 1 : 0);
+        for (let k = 0; k < 10; k++) {
+          const a = (k / 10) * Math.PI * 2;
+          const bx = (W - 1) / 2 + Math.cos(a) * (W / 2) * (0.3 + 0.3 * t);
+          const by = gy + Math.sin(a) * 9 * (0.3 + 0.3 * t);
+          const top = by - h * (0.7 + 0.3 * rnd(k, 1));
+          if (Math.abs(x - bx) < 1.4 && y <= by && y >= top) return c(y < top + 2 ? 0xffffff : 0x4fc3f7);
+        }
+        return 0;
+      });
+      makeTexture(s, `ky-puddle-${f}`, 48, 22, (x, y) => {
+        const r = Math.hypot((x - 23.5) / 24, (y - 10.5) / 11);
+        if (r > 1) return 0;
+        const d = 1 - t;
+        if (r < 0.45 && on(d * 0.8, x, y)) return c(0x81d4fa);
+        return on(d * 0.7, x, y) ? c(0x1565c0) : 0;
+      });
+    }
+    // 雷雲（中の光がゆっくり強まる 8 コマ。明滅させない）
+    for (let f = 0; f < FR; f++) {
+      const glow = f / (FR - 1);
+      const W = 96;
+      const H = 44;
+      makeTexture(s, `ky-cloud-${f}`, W, H, (x, y) => {
+        let best = 99;
+        let lit = 0;
+        for (let k = 0; k < 7; k++) {
+          const cx = 10 + k * 12.6;
+          const cy = H * 0.55 + (k % 2 ? -4 : 3);
+          const rr = 13 + rnd(k, 3) * 5;
+          const d = Math.hypot(x - cx, y - cy) / rr;
+          if (d < best) {
+            best = d;
+            lit = (cy - rr * 0.4 - y) / rr;
+          }
+        }
+        if (best > 1) return 0;
+        // 下の真ん中が雷の光で黄色く
+        const core = Math.hypot((x - W / 2) / (W * 0.35), (y - H * 0.75) / (H * 0.3));
+        if (core < 1 && on(glow * (1 - core), x, y)) return c(core < 0.4 ? 0xffffff : 0xfff59d);
+        return shade(CLOUD, 0.35 + lit * 0.5 + (1 - best) * 0.2, x, y);
+      });
+    }
+    // 稲妻（4 種）: 雲から地面へ、枝分かれ
+    for (let k = 0; k < 4; k++) {
+      const W = 40;
+      const H = 100;
+      // 折れ点を 10 ドットごとに決め、その間をまっすぐつなぐ（ぎざぎざの 1 本の線）
+      const knot = (y: number): number => (y === 0 ? W / 2 : W / 2 + (rnd(k, y) - 0.5) * 18 * (1 - (y / H) * 0.5));
+      const path: number[] = [];
+      for (let y = 0; y < H; y++) {
+        const y0 = Math.floor(y / 10) * 10;
+        const f = (y - y0) / 10;
+        path.push(knot(y0) + (knot(y0 + 10) - knot(y0)) * f);
+      }
+      const branch = 25 + Math.floor(rnd(k, 99) * 30);
+      makeTexture(s, `ky-bolt-${k}`, W, H, (x, y) => {
+        const d = Math.abs(x - path[y]!);
+        if (d < 2) return c(0xffffff);
+        if (d < 3.6) return c(0xfff176);
+        if (d < 5 && on(0.6, x, y)) return c(0xffd600);
+        // 枝: 斜め下へ
+        if (y > branch && y < branch + 22) {
+          const bx = path[branch]! + (y - branch) * (k % 2 ? 1 : -1);
+          const bd = Math.abs(x - bx);
+          if (bd < 0.9) return c(0xffffff);
+          if (bd < 1.8) return c(0xfff176);
+        }
+        return 0;
+      });
+    }
+    // 焦げ（消えていく 8 コマ）
+    for (let f = 0; f < FR; f++) {
+      const t = f / (FR - 1);
+      makeTexture(s, `ky-scorch-${f}`, 40, 18, (x, y) => {
+        const r = Math.hypot((x - 19.5) / 20, (y - 8.5) / 9);
+        if (r > 1) return 0;
+        if (r < 0.35 && t < 0.4) return c(0xfff59d);
+        return on((1 - t) * (0.8 - r * 0.5), x, y) ? c(0x15151a) : 0;
+      });
+    }
+    // ゲンシカイキの水の輪（広がって消える 8 コマ）と、体のまわりを昇る水の舌
+    for (let f = 0; f < FR; f++) {
+      const t = f / (FR - 1);
+      makeTexture(s, `ky-ripple-${f}`, 96, 44, (x, y) => {
+        const r = Math.hypot((x - 47.5) / 48, (y - 21.5) / 22);
+        const R = 0.3 + 0.65 * t;
+        const d = Math.abs(r - R);
+        if (d < 0.025 && on(1.1 - t, x, y)) return c(0xffffff);
+        if (d < 0.07 && on(1 - t, x, y)) return c(0x1e88e5);
+        return 0;
+      });
+      const W = 56;
+      const H = 64;
+      makeTexture(s, `ky-aura-${f}`, W, H, (x, y) => {
+        const nx = (x - (W - 1) / 2) / (W / 2);
+        const tt = 1 - y / H;
+        const edge = Math.abs(Math.abs(nx) - (0.72 + 0.12 * Math.sin(tt * 5 + f * 0.8)));
+        const tongue = Math.sin(x * 0.9 + f * 1.3 + tt * 3) > 0.2;
+        if (edge < 0.15 && tongue && on(1 - tt * 0.9, x, y)) return c(edge < 0.06 ? 0xe1f5fe : 0x29b6f6);
+        return 0;
+      });
+    }
   }
 
   update(world: World, timeMs: number): void {
-    this.gf.clear();
-    this.gn.clear();
-    this.ga.clear();
-    this.gt.clear();
+    this.pool.begin();
     const moves = world.rules.stage.moves;
+    if (world.hazards.some((h) => moves[h.move]?.id.startsWith('kyogre-'))) this.build();
     const kyogre = this.kyogre(world);
+    const frame = Math.floor(timeMs / 80) % FR;
     const seen = new Set<string>();
     let pulseCharge = -1;
     for (const hz of world.hazards) {
@@ -57,24 +231,24 @@ export class KyogreSea {
         if (hz.activeTicks === undefined) {
           this.drawPulseAim(hz, p);
           pulseCharge = Math.max(pulseCharge, p);
-        } else this.drawPulseBeam(hz, timeMs);
+        } else this.drawPulseBeam(hz, timeMs, frame);
       } else if (id.startsWith('kyogre-water-spout')) {
-        if (hz.activeTicks === undefined) this.drawSpoutFlight(hz, kyogre, p, timeMs);
+        if (hz.activeTicks === undefined) this.drawSpoutFlight(hz, kyogre, p, frame);
         else {
           seen.add(key);
           if (!this.lingering.has(key)) this.lingering.set(key, { kind: 'splash', x: hz.x, y: hz.y, r: hz.radius, seed: rnd(hz.x, hz.y), startMs: timeMs, goneMs: 0 });
         }
       } else if (id.startsWith('kyogre-thunder')) {
-        if (hz.activeTicks === undefined) this.drawStormCloud(hz, p, timeMs);
+        if (hz.activeTicks === undefined) this.drawStormCloud(hz, p);
         else {
           seen.add(key);
           if (!this.lingering.has(key)) this.lingering.set(key, { kind: 'bolt', x: hz.x, y: hz.y, r: hz.radius, seed: rnd(hz.x, hz.y + timeMs), startMs: timeMs, goneMs: 0 });
         }
       } else if (id === 'kyogre-primal-reversion' && kyogre) {
-        this.drawReversion(kyogre, p, timeMs);
+        this.drawReversion(kyogre, p, timeMs, frame);
       }
     }
-    if (pulseCharge >= 0 && kyogre) this.drawPulseCharge(kyogre, pulseCharge, timeMs);
+    if (pulseCharge >= 0 && kyogre) this.drawPulseCharge(kyogre, pulseCharge, timeMs, frame);
     for (const [key, l] of this.lingering) {
       if (!seen.has(key) && l.goneMs === 0) l.goneMs = timeMs;
       const limit = l.kind === 'splash' ? SPLASH_LINGER_MS : BOLT_LINGER_MS;
@@ -86,9 +260,10 @@ export class KyogreSea {
       else this.drawBolt(l, timeMs);
     }
     if (!world.legendary) this.lingering.clear();
+    this.pool.end();
   }
 
-  private kyogre(world: World): { x: number; y: number; r: number } | null {
+  private kyogre(world: World): Body | null {
     const e = world.enemies;
     for (let i = 0; i < e.count; i++) {
       if (e.hp[i]! <= 0) continue;
@@ -97,16 +272,15 @@ export class KyogreSea {
     return null;
   }
 
-  /** こんげんのはどうの予告: 光線の通る道に、細く光る青い線（だんだん濃く） */
+  /** こんげんのはどうの予告: 光線の通る道に、水色の点線（だんだん濃く） */
   private drawPulseAim(hz: Hz, p: number): void {
-    const x1 = hz.x + hz.dirX * hz.length;
-    const y1 = hz.y + hz.dirY * hz.length;
-    this.gf.lineStyle(hz.radius * 2, 0x1e88e5, 0.08 + 0.14 * p).lineBetween(hz.x, hz.y, x1, y1);
-    this.gt.lineStyle(3, 0x81d4fa, 0.35 + 0.5 * p).lineBetween(hz.x, hz.y, x1, y1);
+    for (let d = 30; d < hz.length; d += 22) {
+      if (((d / 22) | 0) % 2 === 0 && rnd(d, hz.x) < 0.35 + 0.65 * p) this.pool.dot(hz.x + hz.dirX * d, hz.y + hz.dirY * d, 5, 0x81d4fa);
+    }
   }
 
-  /** こんげんのはどうの溜め: 体のまわりの水が光の粒になって口元へ集まり、口元に深い青の光の玉 */
-  private drawPulseCharge(k: { x: number; y: number; r: number }, p: number, timeMs: number): void {
+  /** こんげんのはどうの溜め: 水の光の粒が口元へ集まり、口元に深い青の玉が育つ */
+  private drawPulseCharge(k: Body, p: number, timeMs: number, frame: number): void {
     const mx = k.x;
     const my = k.y - k.r * 0.6;
     for (let i = 0; i < 12; i++) {
@@ -115,158 +289,80 @@ export class KyogreSea {
       const d = k.r * (3.6 - 3.0 * t);
       const px = mx + Math.cos(a) * d;
       const py = my + Math.sin(a) * d * 0.8;
-      this.gt.lineStyle(8, 0x4fc3f7, 0.5 * (0.4 + 0.6 * t)).lineBetween(px, py, px - (mx - px) * 0.35, py - (my - py) * 0.35);
-      this.gt.fillStyle(0xe1f5fe, 0.45 + 0.5 * t).fillCircle(px, py, 9 + t * 4);
+      for (let j = 1; j <= 2; j++) this.pool.dot(px - (mx - px) * 0.14 * j, py - (my - py) * 0.14 * j, 7 - j * 2, 0x4fc3f7);
+      this.pool.dot(px, py, 8 + t * 4, 0xe1f5fe);
     }
-    const rr = k.r * (0.3 + 0.5 * p);
-    this.gt.fillStyle(0x1565c0, 0.5).fillCircle(mx, my, rr * 1.8);
-    this.gt.fillStyle(0x4fc3f7, 0.85).fillCircle(mx, my, rr);
-    this.gt.fillStyle(0xffffff, 0.9).fillCircle(mx, my, rr * 0.5);
+    this.pool.image(`ky-orb-${frame}`, this.topDepth).setPosition(mx, my).setScale(DOT * (0.4 + 1.3 * p));
   }
 
-  /** こんげんのはどうの光線: 深い青の太い帯に、白く光る芯。波打つ光の筋が先へ流れ、先で水しぶきが散る */
-  private drawPulseBeam(hz: Hz, timeMs: number): void {
-    const len = hz.length;
-    const x1 = hz.x + hz.dirX * len;
-    const y1 = hz.y + hz.dirY * len;
-    const w = hz.radius * 2;
-    const nx = -hz.dirY;
-    const ny = hz.dirX;
-    this.gn.lineStyle(w * 1.5, 0x0d47a1, 0.55).lineBetween(hz.x, hz.y, x1, y1);
-    this.ga.lineStyle(w, 0x1e88e5, 0.85).lineBetween(hz.x, hz.y, x1, y1);
-    this.ga.lineStyle(w * 0.45, 0x81d4fa, 0.9).lineBetween(hz.x, hz.y, x1, y1);
-    this.gt.lineStyle(w * 0.2, 0xffffff, 0.85).lineBetween(hz.x, hz.y, x1, y1);
-    // 波打つ光の筋（先へ流れる）
-    for (let k = 0; k < 10; k++) {
-      const t = ((timeMs / 380 + k / 10) % 1 + 1) % 1;
-      const d = t * len;
-      const off = Math.sin(t * 18 + k) * w * 0.4;
-      const cx = hz.x + hz.dirX * d + nx * off;
-      const cy = hz.y + hz.dirY * d + ny * off;
-      this.ga.lineStyle(4, 0xe1f5fe, 0.8 * (1 - t)).lineBetween(cx, cy, cx + hz.dirX * 30, cy + hz.dirY * 30);
+  /** こんげんのはどうの光線: 区切りをつないで先へ流す（波頭の白い筋が流れる）。根元に水の玉 */
+  private drawPulseBeam(hz: Hz, timeMs: number, frame: number): void {
+    const rot = Math.atan2(hz.dirY, hz.dirX);
+    const seg = BEAM_W * DOT;
+    const sy = (hz.radius * 2 * 1.3) / BEAM_H;
+    const off = (timeMs * 0.8) % seg;
+    const f = Math.floor(timeMs / 90) % 2;
+    for (let d = -seg + off; d < hz.length; d += seg) {
+      const dd = Math.max(0, d);
+      this.pool.image(`ky-beam-${f}`, this.depth).setOrigin(0, 0.5).setRotation(rot).setScale(DOT, sy).setPosition(hz.x + hz.dirX * dd, hz.y + hz.dirY * dd);
     }
-    // 根元の光
-    this.ga.fillStyle(0x4fc3f7, 0.6).fillCircle(hz.x, hz.y, w * 1.1);
+    this.pool.image(`ky-orb-${frame}`, this.depth + 0.01).setPosition(hz.x, hz.y).setScale((hz.radius * 2.4) / 32);
   }
 
-  /** しおふきの潮: カイオーガの背中から水の塊が打ち上がり、放物線で落ちる所へ（予告の終わりに着く）。落ちる所に影 */
-  private drawSpoutFlight(hz: Hz, k: { x: number; y: number; r: number } | null, p: number, timeMs: number): void {
-    this.gf.fillStyle(0x0d2a4a, 0.12 + 0.3 * p).fillEllipse(hz.x, hz.y, hz.radius * 1.6 * (0.5 + 0.5 * p), hz.radius * 0.7 * (0.5 + 0.5 * p));
+  /** しおふきの潮: 背中から水の塊が打ち上がり、放物線で落ちる所へ。落ちる所に影 */
+  private drawSpoutFlight(hz: Hz, k: Body | null, p: number, frame: number): void {
+    this.pool.image('ky-shadow', this.floorDepth).setPosition(hz.x, hz.y).setScale((hz.radius * 1.6 * (0.5 + 0.5 * p)) / 32);
     if (!k) return;
     const sx = k.x;
     const sy = k.y - k.r * 1.3;
     const peak = 170 + rnd(hz.x, hz.y) * 90;
     const pos = (t: number): [number, number] => [sx + (hz.x - sx) * t, sy + (hz.y - sy) * t - peak * 4 * t * (1 - t)];
-    const [x, y] = pos(p);
     for (let s = 1; s <= 5; s++) {
       const [xx, yy] = pos(Math.max(0, p - s * 0.03));
-      this.gt.fillStyle(0xb3e5fc, 0.55 - s * 0.09).fillCircle(xx, yy, 11 - s);
+      this.pool.dot(xx, yy, 11 - s * 1.6, s < 3 ? 0xb3e5fc : 0x4fc3f7);
     }
-    const rr = 17 + rnd(hz.y, hz.x) * 6;
-    this.gt.fillStyle(0x1e88e5, 0.95).fillCircle(x, y, rr);
-    this.gt.fillStyle(0x81d4fa, 0.95).fillCircle(x - rr * 0.25, y - rr * 0.25, rr * 0.55);
-    this.gt.fillStyle(0xffffff, 0.9).fillCircle(x - rr * 0.35, y - rr * 0.35, rr * 0.22);
-    // 揺れる水面の光
-    this.gt.lineStyle(2, 0xe1f5fe, 0.5 + 0.3 * Math.sin(timeMs / 70)).strokeCircle(x, y, rr * 1.15);
+    const [x, y] = pos(p);
+    this.pool.image(`ky-water-${frame}`, this.topDepth).setPosition(x, y).setScale(DOT * (1.4 + rnd(hz.y, hz.x) * 0.4));
   }
 
-  /** しおふきの着いた所: 水しぶきが王冠のように跳ね、波紋が広がり、水たまりがしばらく光ってから引く */
+  /** しおふきの着いた所: 王冠のしぶきと波紋、水たまりが引いていく */
   private drawSplash(l: Lingering, timeMs: number): void {
     const age = timeMs - l.startMs;
     const fade = Math.min(1, age / (SPLASH_LINGER_MS + 300));
-    const r = l.r;
-    this.gf.fillStyle(0x1565c0, 0.45 * (1 - fade)).fillEllipse(l.x, l.y, r * 1.8, r * 0.95);
-    this.gf.fillStyle(0x81d4fa, 0.35 * (1 - fade)).fillEllipse(l.x, l.y, r * 1.0, r * 0.5);
-    // 波紋（2 重に広がる）
-    for (let k = 0; k < 2; k++) {
-      const t = Math.min(1, (age - k * 160) / 700);
-      if (t <= 0) continue;
-      this.gf.lineStyle(4, 0xe1f5fe, 0.7 * (1 - t)).strokeEllipse(l.x, l.y, r * (1 + 1.6 * t), r * (0.5 + 0.8 * t));
-    }
-    if (age < 550) {
-      const t = age / 550;
-      // 王冠のしぶき
-      for (let k = 0; k < 12; k++) {
-        const a = (k / 12) * Math.PI * 2 + l.seed * 3;
-        const d = r * (0.5 + 0.7 * t);
-        const up = -r * 1.6 * t * (1 - t) * (0.7 + 0.6 * rnd(k, l.seed));
-        this.gt.fillStyle(k % 3 ? 0x81d4fa : 0xffffff, 1 - t).fillCircle(l.x + Math.cos(a) * d, l.y + Math.sin(a) * d * 0.5 + up, 7 * (1 - t * 0.5));
-      }
-    }
+    this.pool.image(`ky-puddle-${Math.min(FR - 1, Math.floor(fade * FR))}`, this.floorDepth).setPosition(l.x, l.y).setScale((l.r * 1.8) / 48);
+    if (age < 700) this.pool.image(`ky-splash-${Math.min(FR - 1, Math.floor((age / 700) * FR))}`, this.depth).setOrigin(0.5, (44 - 10) / 44).setPosition(l.x, l.y).setScale((l.r * 2.2) / 64);
   }
 
-  /** かみなりの予告: 狙った所の上に黒い雷雲が広がり、中で光がちらつく（明滅させず、ゆっくり強まる） */
-  private drawStormCloud(hz: Hz, p: number, timeMs: number): void {
-    const cx = hz.x;
-    const cy = hz.y - 170;
-    // 地面の影と、落ちる所の印
-    this.gf.fillStyle(0x0a0f1e, 0.15 + 0.3 * p).fillEllipse(hz.x, hz.y, hz.radius * 2.1, hz.radius * 1.0);
-    this.gf.lineStyle(3, 0xfff59d, 0.25 + 0.5 * p).strokeEllipse(hz.x, hz.y, hz.radius * 2, hz.radius);
-    for (let k = 0; k < 7; k++) {
-      const ox = (k - 3) * hz.radius * 0.45 + Math.sin(timeMs / 600 + k) * 6;
-      const oy = (k % 2) * 14 - 8;
-      const rr = hz.radius * (0.55 + 0.25 * rnd(k, 2)) * (0.6 + 0.4 * p);
-      this.gt.fillStyle(0x263238, 0.75).fillCircle(cx + ox, cy + oy, rr);
-      this.gt.fillStyle(0x455a64, 0.55).fillCircle(cx + ox - rr * 0.2, cy + oy - rr * 0.25, rr * 0.6);
-    }
-    // 雲の中の光（だんだん強く）
-    this.gt.fillStyle(0xfff59d, 0.15 + 0.35 * p * (0.6 + 0.4 * Math.sin(timeMs / 140))).fillEllipse(cx, cy + 6, hz.radius * 1.6, hz.radius * 0.6);
+  /** かみなりの予告: 狙った所の上に雷雲が広がり、中の光がゆっくり強まる。地面に印 */
+  private drawStormCloud(hz: Hz, p: number): void {
+    this.pool.image('ky-mark', this.floorDepth).setPosition(hz.x, hz.y).setScale((hz.radius * 2) / 48);
+    this.pool.image(`ky-cloud-${Math.min(FR - 1, Math.floor(p * FR))}`, this.topDepth).setPosition(hz.x, hz.y - 170).setScale(((hz.radius * 4.4) / 96) * (0.6 + 0.4 * p));
   }
 
-  /** かみなり: 雲から地面へ、枝分かれする太い稲妻。着いた所に焦げと火花 */
+  /** かみなり: 雲から地面へ枝分かれする稲妻、着いた所に焦げと火花 */
   private drawBolt(l: Lingering, timeMs: number): void {
     const age = timeMs - l.startMs;
     const t = Math.min(1, age / (BOLT_LINGER_MS + 200));
-    const top = l.y - 190;
-    const pts: [number, number][] = [[l.x + (l.seed - 0.5) * 20, top]];
-    const steps = 7;
-    for (let s = 1; s <= steps; s++) {
-      const f = s / steps;
-      pts.push([l.x + (rnd(l.seed * 9, s) - 0.5) * 46 * (1 - f * 0.6), top + (l.y - top) * f]);
-    }
-    const strokeAll = (g: Phaser.GameObjects.Graphics, w: number, c: number, a: number): void => {
-      g.lineStyle(w, c, a).beginPath().moveTo(pts[0]![0], pts[0]![1]);
-      for (const [x, y] of pts.slice(1)) g.lineTo(x, y);
-      g.strokePath();
-    };
-    if (age < 260) {
-      strokeAll(this.ga, 40, 0xfff176, 0.55 * (1 - t));
-      strokeAll(this.gt, 16, 0xfff59d, 1 - t);
-      strokeAll(this.gt, 7, 0xffffff, 1 - t);
-      // 枝
-      for (let b = 2; b < 5; b++) {
-        const [x0, y0] = pts[b]!;
-        const dir = rnd(b, l.seed) < 0.5 ? -1 : 1;
-        this.gt.lineStyle(7, 0xfff59d, 0.9 * (1 - t)).lineBetween(x0, y0, x0 + dir * 55, y0 + 44);
-      }
-    }
-    // 焦げと火花
-    this.gf.fillStyle(0x1a1a1a, 0.45 * (1 - t)).fillEllipse(l.x, l.y, l.r * 1.7, l.r * 0.8);
-    this.ga.fillStyle(0xfff59d, 0.6 * (1 - t)).fillEllipse(l.x, l.y, l.r * 1.4 * (0.5 + t), l.r * 0.6 * (0.5 + t));
+    this.pool.image(`ky-scorch-${Math.min(FR - 1, Math.floor(t * FR))}`, this.floorDepth).setPosition(l.x, l.y).setScale((l.r * 1.7) / 40);
+    if (age < 260) this.pool.image(`ky-bolt-${Math.floor(l.seed * 4) % 4}`, this.topDepth).setOrigin(0.5, 1).setPosition(l.x, l.y).setScale(DOT);
     for (let k = 0; k < 8; k++) {
       const a = (k / 8) * Math.PI * 2 + l.seed;
       const d = l.r * (0.4 + 1.2 * t);
-      this.gt.fillStyle(0xfff9c4, 1 - t).fillRect(l.x + Math.cos(a) * d - 3, l.y + Math.sin(a) * d * 0.5 - 3 - 30 * t * (1 - t), 6, 6);
+      this.pool.dot(l.x + Math.cos(a) * d, l.y + Math.sin(a) * d * 0.5 - 30 * t * (1 - t), 7 * (1 - t), 0xfff9c4);
     }
   }
 
-  /** ゲンシカイキ: まわりの水面に光の輪が次々と広がり、体のまわりを水の筋が上へ流れる。終わりに一度だけ強く光る */
-  private drawReversion(k: { x: number; y: number; r: number }, p: number, timeMs: number): void {
-    const { x, y, r } = k;
+  /** ゲンシカイキ: まわりに水の輪が次々と広がり、体のまわりを水の舌が昇る */
+  private drawReversion(k: Body, p: number, timeMs: number, frame: number): void {
     for (let i = 0; i < 4; i++) {
       const t = ((timeMs / 900 + i / 4) % 1 + 1) % 1;
-      this.gf.lineStyle(18, 0x1565c0, 0.75 * p * (1 - t)).strokeEllipse(x, y + r * 0.3, r * (1.5 + 5 * t), r * (0.7 + 2.4 * t));
-      this.gf.lineStyle(7, 0xffffff, 0.85 * p * (1 - t)).strokeEllipse(x, y + r * 0.3, r * (1.5 + 5 * t), r * (0.7 + 2.4 * t));
+      this.pool.image(`ky-ripple-${Math.min(FR - 1, Math.floor(t * FR))}`, this.floorDepth).setPosition(k.x, k.y + k.r * 0.3).setScale((k.r * 6.5) / 96);
     }
-    for (let i = 0; i < 16; i++) {
-      const a = (i / 16) * Math.PI * 2;
+    if (p > 0.15) this.pool.image(`ky-aura-${frame}`, this.topDepth).setOrigin(0.5, 1).setPosition(k.x, k.y + k.r * 0.4).setScale((k.r * 4.2) / 56);
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * Math.PI * 2;
       const t = ((timeMs / 560 + rnd(i, 5)) % 1 + 1) % 1;
-      const bx = x + Math.cos(a) * r * 1.2;
-      const by = y + r * 0.2 - t * r * 3;
-      this.gt.lineStyle(12, i % 2 ? 0x4fc3f7 : 0xb3e5fc, 0.55 * p * (1 - t)).lineBetween(bx, by, bx, by - r * 0.8);
+      this.pool.dot(k.x + Math.cos(a) * k.r * 1.3, k.y + k.r * 0.2 - t * k.r * 3, 9 * (1 - t) * p + 1, i % 2 ? 0x4fc3f7 : 0xe1f5fe);
     }
-    const flash = p > 0.8 ? (p - 0.8) / 0.2 : 0;
-    this.ga.fillStyle(0x1e88e5, 0.3 * p + 0.3 * flash).fillEllipse(x, y - r * 0.6, r * 4.2, r * 3.6);
-    this.gt.fillStyle(0xb3e5fc, 0.12 * p + 0.45 * flash).fillEllipse(x, y - r * 0.6, r * 3.2, r * 2.8);
   }
 }

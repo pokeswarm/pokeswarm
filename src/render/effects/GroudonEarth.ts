@@ -1,21 +1,16 @@
 import Phaser from 'phaser';
 import type { World } from '../../sim/world';
-
-function rnd(a: number, b: number): number {
-  const v = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
-  return v - Math.floor(v);
-}
+import { c, DOT, DotPool, makeTexture, on, rnd, shade } from './dotArt';
 
 type Hz = World['hazards'][number];
+type Body = { x: number; y: number; r: number };
 
-/** 消えた後もしばらく描く物（岩の刃が崩れる・溶岩が冷える） */
+/** 消えた後もしばらく描く物（岩の刃が沈む・溶岩が冷える） */
 interface Lingering {
   kind: 'blade' | 'splash';
   x: number;
   y: number;
   r: number;
-  dirX: number;
-  dirY: number;
   seed: number;
   startMs: number;
   /** 当たり判定が消えた時刻（0 はまだある） */
@@ -24,38 +19,155 @@ interface Lingering {
 
 const BLADE_LINGER_MS = 900;
 const SPLASH_LINGER_MS = 1600;
+const FR = 8;
+/** 割れ目の 1 区切り（ドット） */
+const CRACK_W = 12;
+const CRACK_H = 12;
+/** 岩の刃（ドット） */
+const BLADE_W = 22;
+const BLADE_H = 64;
+const ROCK = [0x2b120c, 0x4a1c14, 0x6d2c1d, 0x9c4a33, 0xc66f4e];
+const LAVA = [0x5d0f05, 0xb71c1c, 0xe64a19, 0xff7043, 0xffab40, 0xffe0b2];
 
 /**
- * グラードンの技の絵（07 の283章）: だんがいのつるぎの裂ける割れ目と突き上がる岩の刃・ふんかの打ち上がって落ちる溶岩と飛び散り・
- * ソーラービームの集まる日の光・ゲンシカイキの体の溶岩の筋と放射状の割れ目。見た目だけ（当たりはシミュレーション）
+ * グラードンの技の絵（07 の283・297章）: だんがいのつるぎの裂ける割れ目と突き上がる岩の刃・ふんかの打ち上がって落ちる溶岩と溶岩だまり・
+ * ソーラービームの集まる日の光・ゲンシカイキの放射状の割れ目と体の熱。
+ * 1 ドットずつ計算したドット絵のテクスチャで描く（半透明の塗りは使わない）。見た目だけ（当たりはシミュレーション）
  */
 export class GroudonEarth {
-  /** 地面（割れ目・影・溶岩だまり） */
-  private readonly gf: Phaser.GameObjects.Graphics;
-  /** 岩の刃・溶岩の塊（ふつうの重ね方） */
-  private readonly gn: Phaser.GameObjects.Graphics;
-  /** 光（加算） */
-  private readonly ga: Phaser.GameObjects.Graphics;
-  /** ボスより手前（溜めの光・ゲンシカイキの体の光） */
-  private readonly gt: Phaser.GameObjects.Graphics;
+  private built = false;
+  private readonly pool: DotPool;
   private readonly lingering = new Map<string, Lingering>();
 
-  constructor(scene: Phaser.Scene, depth: number, floorDepth: number, topDepth: number) {
-    this.gf = scene.add.graphics().setDepth(floorDepth);
-    this.gn = scene.add.graphics().setDepth(depth);
-    this.ga = scene.add.graphics().setDepth(depth + 0.01).setBlendMode(Phaser.BlendModes.ADD);
-    this.gt = scene.add.graphics().setDepth(topDepth);
+  constructor(
+    private readonly scene: Phaser.Scene,
+    private readonly depth: number,
+    private readonly floorDepth: number,
+    private readonly topDepth: number,
+  ) {
+    this.pool = new DotPool(scene, topDepth + 0.01);
+  }
+
+  private build(): void {
+    if (this.built) return;
+    this.built = true;
+    const s = this.scene;
+    // 割れ目の 1 区切り: 黒い裂け目の奥に赤、芯に橙（コマで脈打つ）。横につなぐ
+    for (let f = 0; f < FR; f++) {
+      makeTexture(s, `gr-crack-${f}`, CRACK_W, CRACK_H, (x, y) => {
+        const mid = CRACK_H / 2 - 0.5 + Math.sin((x / CRACK_W) * Math.PI * 2) * 1.2;
+        const d = Math.abs(y - mid);
+        const pulse = 0.5 + 0.5 * Math.sin((f / FR) * Math.PI * 2 + x * 0.5);
+        if (d < 0.8) return c(pulse > 0.5 ? 0xffd180 : 0xff9100);
+        if (d < 1.8) return c(0xe64a19);
+        if (d < 3.2) return c(0x8e1b10);
+        if (d < 4.6) return c(0x1a0f0a);
+        if (d < 5.6 && rnd(x, y) > 0.5) return c(0x3e2723);
+        return 0;
+      });
+    }
+    // 岩の刃（3 種）: 左の面は光が当たり、右の面は影。ふちは熱で赤い。根もとほど赤く焼ける
+    for (let k = 0; k < 3; k++) {
+      const lean = (k - 1) * 0.18;
+      makeTexture(s, `gr-blade-${k}`, BLADE_W, BLADE_H, (x, y) => {
+        const t = 1 - y / BLADE_H;
+        const cx = BLADE_W / 2 + lean * (BLADE_H - y) * 0.5;
+        const shoulder = t > 0.55 ? 1 - (t - 0.55) / 0.45 : 1;
+        const half = (BLADE_W / 2 - 1) * (0.25 + 0.75 * shoulder) * (1 - t * 0.35) + (rnd(k, Math.floor(y / 5)) - 0.5) * 2;
+        const dx = x - cx;
+        if (Math.abs(dx) > half) return 0;
+        if (Math.abs(dx) > half - 1.2) return c(t < 0.4 ? 0xff3d00 : 0xbf360c);
+        const lit = dx < -half * 0.1;
+        let col = shade(ROCK, (lit ? 0.75 : 0.3) + (rnd(x + k * 13, y) - 0.5) * 0.15, x, y);
+        if (Math.abs(dx + half * 0.1) < 0.6) col = c(0x2b0f0a);
+        if (t < 0.18 && on((0.18 - t) / 0.18, x, y)) col = shade(LAVA, 0.5 + (0.18 - t) * 2, x, y);
+        return col;
+      });
+    }
+    // 溶岩だまり（冷えていく 8 コマ）: 赤く光る溶岩の上に黒い皮が広がる
+    for (let f = 0; f < FR; f++) {
+      const cool = f / (FR - 1);
+      const W = 48;
+      const H = 22;
+      makeTexture(s, `gr-pool-${f}`, W, H, (x, y) => {
+        const nx = (x - (W - 1) / 2) / (W / 2);
+        const ny = (y - (H - 1) / 2) / (H / 2);
+        const r = Math.hypot(nx, ny) + (rnd(x, y) - 0.5) * 0.08;
+        if (r > 1) return 0;
+        const crust = rnd(Math.floor(x / 3), Math.floor(y / 2)) < cool * 1.1 + r * 0.3;
+        if (crust) return shade([0x0d0907, 0x1b1210, 0x2b1b17], 0.3 + (1 - r) * 0.5, x, y);
+        return shade(LAVA, (1 - r) * 0.9 + 0.1 - cool * 0.4, x, y);
+      });
+    }
+    // 溶岩の塊（回る 8 コマ）: 黒い皮のひびから溶岩が光る
+    for (let f = 0; f < FR; f++) {
+      const S = 20;
+      makeTexture(s, `gr-lava-${f}`, S, S, (x, y) => {
+        const dx = x - (S - 1) / 2;
+        const dy = y - (S - 1) / 2;
+        const r = Math.hypot(dx, dy) / (S / 2);
+        if (r > 1) return 0;
+        const a = Math.atan2(dy, dx) + (f / FR) * Math.PI * 2;
+        const vein = Math.abs(Math.sin(a * 3 + r * 6)) < 0.25;
+        if (r < 0.35) return c(0xffe082);
+        if (vein) return c(r < 0.7 ? 0xff9100 : 0xe64a19);
+        return shade([0x1a0f0a, 0x2b1b17, 0x4a2a20], 0.8 - r * 0.6 + (dy < 0 ? 0.2 : 0), x, y);
+      });
+    }
+    // 落ちる所の影（ディザ）
+    makeTexture(s, 'gr-shadow', 32, 14, (x, y) => {
+      const r = Math.hypot((x - 15.5) / 16, (y - 6.5) / 7);
+      return r < 1 && on(0.7 - r * 0.4, x, y) ? c(0x0d0907) : 0;
+    });
+    // 着いた所の光の輪（広がって消える 8 コマ）
+    for (let f = 0; f < FR; f++) {
+      const t = f / (FR - 1);
+      makeTexture(s, `gr-ring-${f}`, 64, 30, (x, y) => {
+        const r = Math.hypot((x - 31.5) / 32, (y - 14.5) / 15);
+        const R = 0.4 + 0.55 * t;
+        return Math.abs(r - R) < 0.07 && on(1.1 - t, x, y) ? c(t < 0.4 ? 0xffd180 : 0xff6d00) : 0;
+      });
+    }
+    // 日の光の玉（回る光の筋）
+    for (let f = 0; f < FR; f++) {
+      const S = 32;
+      makeTexture(s, `gr-sun-${f}`, S, S, (x, y) => {
+        const dx = x - (S - 1) / 2;
+        const dy = y - (S - 1) / 2;
+        const r = Math.hypot(dx, dy) / (S / 2);
+        const a = Math.atan2(dy, dx) + (f / FR) * (Math.PI / 4);
+        const ray = Math.abs(Math.cos(a * 4)) > 0.92 && r < 1;
+        if (r < 0.32) return c(0xffffff);
+        if (r < 0.55) return c(0xfff59d);
+        if (r < 0.7) return c(0xffee58);
+        if (ray) return c(r < 0.85 ? 0xfff176 : 0xffd600);
+        return 0;
+      });
+    }
+    // ゲンシカイキの体の熱（下から昇る炎の舌の輪。8 コマ）
+    for (let f = 0; f < FR; f++) {
+      const W = 56;
+      const H = 64;
+      makeTexture(s, `gr-heat-${f}`, W, H, (x, y) => {
+        const nx = (x - (W - 1) / 2) / (W / 2);
+        const t = 1 - y / H;
+        const body = Math.abs(nx) < 0.62 + 0.12 * Math.sin(t * 6 + f);
+        const edge = Math.abs(Math.abs(nx) - (0.7 + 0.15 * Math.sin(t * 5 + f * 0.8)));
+        if (body) return 0;
+        const tongue = Math.sin(x * 0.9 + f * 1.3 + t * 3) > 0.2;
+        if (edge < 0.16 && tongue && on(1 - t * 0.9, x, y)) return c(edge < 0.07 ? 0xffab40 : 0xe64a19);
+        return 0;
+      });
+    }
   }
 
   update(world: World, timeMs: number): void {
-    this.gf.clear();
-    this.gn.clear();
-    this.ga.clear();
-    this.gt.clear();
+    this.pool.begin();
     const moves = world.rules.stage.moves;
+    if (world.hazards.some((h) => moves[h.move]?.id.startsWith('groudon-'))) this.build();
     const groudon = this.groudon(world);
+    const frame = Math.floor(timeMs / 80) % FR;
     const seen = new Set<string>();
-    // だんがいのつるぎは、1 回の技の割れ目を 1 本の線で描く（組ごとに集める）
     const cracks = new Map<number, Hz[]>();
     for (const hz of world.hazards) {
       const id = moves[hz.move]?.id ?? '';
@@ -68,22 +180,21 @@ export class GroudonEarth {
         cracks.set(hz.group ?? 0, list);
         if (hz.activeTicks !== undefined) {
           seen.add(key);
-          if (!this.lingering.has(key)) this.lingering.set(key, { kind: 'blade', x: hz.x, y: hz.y, r: hz.radius, dirX: hz.dirX, dirY: hz.dirY, seed: rnd(hz.x, hz.y), startMs: timeMs, goneMs: 0 });
+          if (!this.lingering.has(key)) this.lingering.set(key, { kind: 'blade', x: hz.x, y: hz.y, r: hz.radius, seed: rnd(hz.x, hz.y), startMs: timeMs, goneMs: 0 });
         }
       } else if (id.startsWith('groudon-eruption')) {
-        if (hz.activeTicks === undefined) this.drawLavaFlight(hz, groudon, p, timeMs);
+        if (hz.activeTicks === undefined) this.drawLavaFlight(hz, groudon, p, frame);
         else {
           seen.add(key);
-          if (!this.lingering.has(key)) this.lingering.set(key, { kind: 'splash', x: hz.x, y: hz.y, r: hz.radius, dirX: 0, dirY: 1, seed: rnd(hz.x, hz.y), startMs: timeMs, goneMs: 0 });
+          if (!this.lingering.has(key)) this.lingering.set(key, { kind: 'splash', x: hz.x, y: hz.y, r: hz.radius, seed: rnd(hz.x, hz.y), startMs: timeMs, goneMs: 0 });
         }
       } else if (id.startsWith('groudon-solar-beam') && hz.activeTicks === undefined && groudon) {
-        this.drawSunGather(groudon, p, timeMs, id.endsWith('-sun'));
+        this.drawSunGather(groudon, p, timeMs, id.endsWith('-sun'), frame);
       } else if (id === 'groudon-primal-reversion' && groudon) {
-        this.drawReversion(groudon, p, timeMs);
+        this.drawReversion(groudon, p, timeMs, frame);
       }
     }
-    for (const list of cracks.values()) this.drawCrack(list, groudon, timeMs);
-    // 消えた刃・溶岩も、しばらく崩れる・冷えるまで描く
+    for (const list of cracks.values()) this.drawCrack(list, groudon, frame);
     for (const [key, l] of this.lingering) {
       if (!seen.has(key) && l.goneMs === 0) l.goneMs = timeMs;
       const limit = l.kind === 'blade' ? BLADE_LINGER_MS : SPLASH_LINGER_MS;
@@ -95,10 +206,11 @@ export class GroudonEarth {
       else this.drawSplash(l, timeMs);
     }
     if (!world.legendary) this.lingering.clear();
+    this.pool.end();
   }
 
   /** グラードン（ゲンシの姿も同じ敵）の足元の位置と体の大きさ */
-  private groudon(world: World): { x: number; y: number; r: number } | null {
+  private groudon(world: World): Body | null {
     const e = world.enemies;
     for (let i = 0; i < e.count; i++) {
       if (e.hp[i]! <= 0) continue;
@@ -107,16 +219,28 @@ export class GroudonEarth {
     return null;
   }
 
+  /** 割れ目の絵を (x0,y0) から (x1,y1) へ、区切りをつないで置く（limit の長さまで） */
+  private crackLine(x0: number, y0: number, x1: number, y1: number, frame: number, limit: number): number {
+    const len = Math.hypot(x1 - x0, y1 - y0);
+    const step = CRACK_W * DOT - 2;
+    const rot = Math.atan2(y1 - y0, x1 - x0);
+    let used = 0;
+    for (let d = 0; d < len && used < limit; d += step) {
+      const t = d / len;
+      this.pool.image(`gr-crack-${(frame + Math.floor(d / step)) % FR}`, this.floorDepth).setOrigin(0, 0.5).setRotation(rot).setPosition(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t);
+      used += step;
+    }
+    return used;
+  }
+
   /**
-   * だんがいのつるぎの割れ目: グラードンの足元から、刃の並ぶ所を通って 1 本の割れ目が伸びる（予告の間に先へ伸び、奥が赤く光る）。
-   * 刃が出た所から先は、割れ目の奥の光が強い
+   * だんがいのつるぎの割れ目: グラードンの足元から、刃の並ぶ所を通って割れ目が伸びる（予告の 7 割で端まで）。
+   * 予告の間は、刃の出る所にディザの赤い印
    */
-  private drawCrack(list: Hz[], groudon: { x: number; y: number; r: number } | null, timeMs: number): void {
-    // グラードンに近い順
+  private drawCrack(list: Hz[], groudon: Body | null, frame: number): void {
     const ox = groudon?.x ?? list[0]!.x;
     const oy = groudon?.y ?? list[0]!.y;
     const sorted = [...list].sort((a, b) => Math.hypot(a.x - ox, a.y - oy) - Math.hypot(b.x - ox, b.y - oy));
-    // 2 本同時（ゲンシカイキ）は向きで分ける: 隣り合う点が離れすぎたら別の線
     const lines: Hz[][] = [];
     for (const h of sorted) {
       const line = lines.find((l) => Math.hypot(l[l.length - 1]!.x - h.x, l[l.length - 1]!.y - h.y) < h.radius * 2.2);
@@ -126,100 +250,42 @@ export class GroudonEarth {
     for (const line of lines) {
       const first = line[0]!;
       const p = first.activeTicks === undefined ? 1 - first.ticksLeft / Math.max(1, first.totalTicks) : 1;
-      // 割れ目の折れ線（グラードンの足元から）。ぎざぎざは場所から決める（どのフレームでも同じ形）
       const pts: [number, number][] = [[ox, oy]];
-      for (const h of line) pts.push([h.x, h.y]);
+      for (const h of line) pts.push([h.x + (rnd(h.x, 1) - 0.5) * 14, h.y + (rnd(h.y, 2) - 0.5) * 8]);
       const last = line[line.length - 1]!;
       pts.push([last.x + last.dirX * last.radius, last.y + last.dirY * last.radius]);
-      const jag: [number, number][] = [];
-      for (let k = 0; k < pts.length - 1; k++) {
-        const [x0, y0] = pts[k]!;
-        const [x1, y1] = pts[k + 1]!;
-        const len = Math.hypot(x1 - x0, y1 - y0) || 1;
-        const nx = -(y1 - y0) / len;
-        const ny = (x1 - x0) / len;
-        const steps = Math.max(2, Math.round(len / 14));
-        for (let s = 0; s < steps; s++) {
-          const t = s / steps;
-          const off = (rnd(Math.round(x0 + x1), k * 31 + s) - 0.5) * 16;
-          jag.push([x0 + (x1 - x0) * t + nx * off, y0 + (y1 - y0) * t + ny * off]);
-        }
-      }
-      jag.push(pts[pts.length - 1]!);
-      // 予告の間に先へ伸びる（予告の 7 割で端まで）
-      const reach = Math.min(1, p / 0.7);
-      const n = Math.max(2, Math.ceil(jag.length * reach));
-      const glow = 0.35 + 0.65 * p;
-      // 当たる幅の帯（予告の間だけ。赤い丸の代わり）
-      if (first.activeTicks === undefined) this.strokePath(this.gf, jag, n, first.radius * 2, 0xff1744, 0.1 + 0.12 * p);
-      // 外側の暗い割れ目 → 奥の赤 → 芯の橙
-      this.strokePath(this.gf, jag, n, 13, 0x1a0f0a, 0.85);
-      this.strokePath(this.gf, jag, n, 7, 0x8e1b10, 0.9 * glow);
-      this.strokePath(this.ga, jag, n, 3, 0xff6d00, 0.9 * glow);
-      // 割れ目から立ちのぼる熱の粒
-      for (let k = 0; k < n; k += 3) {
-        const [x, y] = jag[k]!;
-        const t = ((timeMs / 700 + rnd(x, y)) % 1 + 1) % 1;
-        this.ga.fillStyle(0xffab40, 0.5 * (1 - t) * glow).fillCircle(x + (rnd(y, x) - 0.5) * 6, y - t * 26, 2.2);
-      }
+      let total = 0;
+      for (let k = 0; k < pts.length - 1; k++) total += Math.hypot(pts[k + 1]![0] - pts[k]![0], pts[k + 1]![1] - pts[k]![1]);
+      let left = total * Math.min(1, p / 0.7);
+      for (let k = 0; k < pts.length - 1 && left > 0; k++) left -= this.crackLine(pts[k]![0], pts[k]![1], pts[k + 1]![0], pts[k + 1]![1], frame, left);
     }
   }
 
-  private strokePath(g: Phaser.GameObjects.Graphics, pts: [number, number][], n: number, width: number, color: number, alpha: number): void {
-    g.lineStyle(width, color, alpha);
-    g.beginPath();
-    g.moveTo(pts[0]![0], pts[0]![1]);
-    for (let k = 1; k < n; k++) g.lineTo(pts[k]![0], pts[k]![1]);
-    g.strokePath();
-  }
-
   /**
-   * だんがいのつるぎの刃: 割れ目から、赤く焼けた岩の刃が 3 本、外へ開いて一気に突き上がる（0.12 秒）。
-   * 刃は光の当たる面と影の面に分かれ、ふちは溶岩の熱で赤く光る。根元は溶岩が噴き、岩のかけらが飛ぶ。当たり判定が消えた後は沈む
+   * だんがいのつるぎの刃: 割れ目から、焼けた岩の刃が 3 本、一気に突き上がる（0.14 秒。下から現れる）。
+   * 根もとに溶岩だまり、岩のかけらと火の粉が飛ぶ。当たり判定が消えた後は沈む
    */
   private drawBlade(l: Lingering, timeMs: number): void {
     const age = timeMs - l.startMs;
     const rise = 1 - Math.pow(1 - Math.min(1, age / 140), 3);
     const sink = l.goneMs > 0 ? Math.min(1, (timeMs - l.goneMs) / BLADE_LINGER_MS) : 0;
-    const alpha = 1 - sink * 0.5;
     const bx = l.x;
     const by = l.y + l.r * 0.3;
-    const heat = 1 - sink;
-    // 根元: 溶岩が噴いて光る
-    this.gf.fillStyle(0x1a0f0a, 0.7 * alpha).fillEllipse(bx, by, l.r * 2.6, l.r * 0.9);
-    this.ga.fillStyle(0xff3d00, 0.55 * heat).fillEllipse(bx, by, l.r * 2.0, l.r * 0.6);
-    this.ga.fillStyle(0xffab40, 0.45 * heat).fillEllipse(bx, by, l.r * 1.0, l.r * 0.3);
-    // 3 本の刃（真ん中が一番高い。左右は外へ傾く）
+    const sc = (l.r * 0.9) / (BLADE_W * DOT) * DOT;
+    this.pool.image(`gr-pool-${Math.min(FR - 1, Math.floor(sink * FR))}`, this.floorDepth).setPosition(bx, by).setScale((l.r * 2.4) / 48);
     const shards = [
-      { off: -0.55, w: 0.45, h: 2.3, lean: -0.45 },
-      { off: 0.55, w: 0.42, h: 2.0, lean: 0.4 },
-      { off: 0, w: 0.62, h: 3.6 + l.seed * 0.8, lean: (l.seed - 0.5) * 0.2 },
+      { k: 0, off: -0.6, h: 0.62 },
+      { k: 2, off: 0.6, h: 0.56 },
+      { k: 1, off: 0, h: 1 },
     ];
     for (const sh of shards) {
-      const h = l.r * sh.h * rise * (1 - sink * 0.9);
-      if (h < 3) continue;
-      const w = l.r * sh.w;
-      const x0 = bx + l.r * sh.off;
-      const tipX = x0 + sh.lean * h;
-      const tipY = by - h;
-      const left = new Phaser.Math.Vector2(x0 - w, by);
-      const right = new Phaser.Math.Vector2(x0 + w, by);
-      const mid = new Phaser.Math.Vector2(x0 + w * 0.15 + sh.lean * h * 0.05, by);
-      const tip = new Phaser.Math.Vector2(tipX, tipY);
-      // 肩の折れ（刃らしいぎざぎざ）
-      const sl = new Phaser.Math.Vector2(x0 - w * 0.75 + sh.lean * h * 0.45, by - h * 0.45);
-      const sr = new Phaser.Math.Vector2(x0 + w * 0.6 + sh.lean * h * 0.5, by - h * 0.55);
-      this.gn.fillStyle(0x9c4a33, alpha).fillPoints([left, sl, tip, mid], true);
-      this.gn.fillStyle(0x4a1c14, alpha).fillPoints([mid, tip, sr, right], true);
-      // 面の境目の暗い線と、光の当たる面の明るい筋
-      this.gn.lineStyle(2, 0x2b0f0a, 0.8 * alpha).lineBetween(mid.x, mid.y, tip.x, tip.y);
-      this.gn.lineStyle(2, 0xd7835f, 0.7 * alpha).lineBetween(left.x + w * 0.25, by - 4, (sl.x + tip.x) / 2, (sl.y + tip.y) / 2);
-      // ふちが熱で赤く光る（下ほど強い）
-      this.ga.lineStyle(3, 0xff3d00, 0.75 * heat).beginPath().moveTo(left.x, left.y).lineTo(sl.x, sl.y).lineTo(tip.x, tip.y).lineTo(sr.x, sr.y).lineTo(right.x, right.y).strokePath();
-      this.ga.lineStyle(1.5, 0xffd180, 0.6 * heat).beginPath().moveTo(left.x, left.y).lineTo(sl.x, sl.y).strokePath();
-      this.ga.fillStyle(0xffab40, 0.6 * heat).fillCircle(tip.x, tip.y, 3);
+      const vis = Math.max(0, rise * sh.h * (1 - sink));
+      if (vis <= 0.02) continue;
+      const scale = sc * (0.85 + 0.3 * sh.h);
+      const shown = Math.ceil(BLADE_H * vis);
+      // 下から現れる（上を切る）
+      this.pool.image(`gr-blade-${sh.k}`, this.depth).setOrigin(0.5, 1).setPosition(bx + l.r * sh.off, by).setScale(scale).setCrop(0, BLADE_H - shown, BLADE_W, shown);
     }
-    // 突き上がった瞬間の岩のかけらと火の粉
     if (age < 600) {
       const t = age / 600;
       for (let k = 0; k < 10; k++) {
@@ -227,126 +293,79 @@ export class GroudonEarth {
         const sp = l.r * (1.4 + rnd(k, l.seed) * 1.8);
         const x = bx + Math.cos(a) * sp * t;
         const y = by + Math.sin(a) * sp * t + 260 * t * t;
-        if (k % 3 === 0) this.ga.fillStyle(0xffab40, 1 - t).fillCircle(x, y, 2.5);
-        else this.gn.fillStyle(k % 2 ? 0x4a1c14 : 0x9c4a33, 1 - t).fillRect(x - 3.5, y - 3.5, 7, 7);
+        this.pool.dot(x, y, k % 3 === 0 ? 5 * (1 - t) + 1 : 8 * (1 - t * 0.5), k % 3 === 0 ? 0xffab40 : k % 2 ? 0x4a1c14 : 0x9c4a33);
       }
-    }
-    // 熱でゆらめく煙（残っている間）
-    for (let k = 0; k < 3; k++) {
-      const t = ((timeMs / 900 + k / 3 + l.seed) % 1 + 1) % 1;
-      this.gf.fillStyle(0x3e2723, 0.18 * (1 - t) * alpha).fillCircle(bx + (k - 1) * l.r * 0.6, by - l.r * 0.3 - t * l.r * 2.2, l.r * (0.35 + t * 0.4));
     }
   }
 
-  /**
-   * ふんかの溶岩の塊: グラードンの背中から打ち上がり、放物線を描いて落ちる場所へ向かう（予告の終わりに着く）。
-   * 落ちる所の地面には影が広がる
-   */
-  private drawLavaFlight(hz: Hz, groudon: { x: number; y: number; r: number } | null, p: number, timeMs: number): void {
-    // 着く所の影（だんだん濃く大きく）
-    this.gf.fillStyle(0x000000, 0.12 + 0.3 * p).fillEllipse(hz.x, hz.y, hz.radius * 1.6 * (0.5 + 0.5 * p), hz.radius * 0.7 * (0.5 + 0.5 * p));
+  /** ふんかの溶岩の塊: グラードンの背中から打ち上がり、放物線を描いて落ちる。落ちる所に影 */
+  private drawLavaFlight(hz: Hz, groudon: Body | null, p: number, frame: number): void {
+    this.pool.image('gr-shadow', this.floorDepth).setPosition(hz.x, hz.y).setScale((hz.radius * 1.6 * (0.5 + 0.5 * p)) / 32);
     if (!groudon) return;
     const sx = groudon.x;
     const sy = groudon.y - groudon.r * 1.6;
-    const t = p;
-    const x = sx + (hz.x - sx) * t;
     const peak = 170 + rnd(hz.x, hz.y) * 90;
-    const y = sy + (hz.y - sy) * t - peak * 4 * t * (1 - t);
-    // 尾（少し前の位置を結ぶ）
-    for (let k = 1; k <= 5; k++) {
-      const tt = Math.max(0, t - k * 0.025);
-      const xx = sx + (hz.x - sx) * tt;
-      const yy = sy + (hz.y - sy) * tt - peak * 4 * tt * (1 - tt);
-      this.ga.fillStyle(k < 3 ? 0xffab40 : 0xff3d00, 0.5 - k * 0.08).fillCircle(xx, yy, 9 - k);
+    const at = (t: number): [number, number] => [sx + (hz.x - sx) * t, sy + (hz.y - sy) * t - peak * 4 * t * (1 - t)];
+    for (let k = 1; k <= 6; k++) {
+      const [xx, yy] = at(Math.max(0, p - k * 0.02));
+      this.pool.dot(xx, yy, 10 - k * 1.4, k < 3 ? 0xffab40 : 0xe64a19);
     }
-    const rr = 19 + rnd(hz.y, hz.x) * 7;
-    this.gn.fillStyle(0x2b1b17, 1).fillCircle(x, y, rr);
-    this.ga.fillStyle(0xff6d00, 0.85).fillCircle(x - rr * 0.2, y - rr * 0.15, rr * 0.55);
-    this.ga.fillStyle(0xffe082, 0.8).fillCircle(x - rr * 0.25, y - rr * 0.25, rr * 0.25);
-    // 揺らめく光
-    this.ga.fillStyle(0xff3d00, 0.18 + 0.08 * Math.sin(timeMs / 60)).fillCircle(x, y, rr * 1.9);
+    const [x, y] = at(p);
+    this.pool.image(`gr-lava-${(frame + Math.floor(rnd(hz.x, 3) * FR)) % FR}`, this.depth + 0.02).setPosition(x, y).setScale(DOT * (1 + rnd(hz.y, hz.x) * 0.4));
   }
 
-  /** ふんかの着いた所: 溶岩が飛び散り、溶岩だまりがしばらく赤く光ってから冷えて黒くなる */
+  /** ふんかの着いた所: 溶岩だまりが光ってから冷えて黒くなる。しずくが飛び、光の輪が広がる */
   private drawSplash(l: Lingering, timeMs: number): void {
     const age = timeMs - l.startMs;
     const cool = Math.min(1, age / (SPLASH_LINGER_MS + 400));
-    const r = l.r;
-    // 溶岩だまり
-    this.gf.fillStyle(0x1b1210, 0.75 * (1 - cool * 0.5)).fillEllipse(l.x, l.y, r * 1.9, r * 1.0);
-    this.ga.fillStyle(0xff3d00, 0.7 * (1 - cool)).fillEllipse(l.x, l.y, r * 1.5, r * 0.75);
-    this.ga.fillStyle(0xffab40, 0.6 * (1 - cool) ** 2).fillEllipse(l.x, l.y, r * 0.8, r * 0.4);
-    // 飛び散るしずく（最初の 0.5 秒）
+    this.pool.image(`gr-pool-${Math.min(FR - 1, Math.floor(cool * FR))}`, this.floorDepth).setPosition(l.x, l.y).setScale((l.r * 1.9) / 48);
     if (age < 500) {
       const t = age / 500;
+      this.pool.image(`gr-ring-${Math.min(FR - 1, Math.floor(t * FR))}`, this.floorDepth + 0.01).setPosition(l.x, l.y).setScale((l.r * 2.6) / 64);
       for (let k = 0; k < 12; k++) {
         const a = (k / 12) * Math.PI * 2 + l.seed * 3;
-        const d = r * (0.6 + rnd(k, l.seed) * 0.9) * t;
-        const up = -r * 1.3 * t * (1 - t) * (0.6 + rnd(l.seed, k));
-        const x = l.x + Math.cos(a) * d;
-        const y = l.y + Math.sin(a) * d * 0.5 + up;
-        this.ga.fillStyle(k % 3 ? 0xff6d00 : 0xffd54f, 1 - t).fillCircle(x, y, 3.5 * (1 - t * 0.5));
+        const d = l.r * (0.6 + rnd(k, l.seed) * 0.9) * t;
+        const up = -l.r * 1.3 * t * (1 - t) * (0.6 + rnd(l.seed, k));
+        this.pool.dot(l.x + Math.cos(a) * d, l.y + Math.sin(a) * d * 0.5 + up, 7 * (1 - t * 0.6), k % 3 ? 0xff6d00 : 0xffd54f);
       }
-      // 着いた瞬間の光の輪
-      this.ga.lineStyle(4, 0xffab40, 0.8 * (1 - t)).strokeEllipse(l.x, l.y, r * 2.2 * t + r, (r * 2.2 * t + r) * 0.5);
     }
   }
 
-  /** ソーラービームの溜め: 日の光の粒がまわりから口元へ集まり、口元の光の玉が大きくなる（ひざしの間は集まるのが速い） */
-  private drawSunGather(groudon: { x: number; y: number; r: number }, p: number, timeMs: number, sun: boolean): void {
-    const mx = groudon.x + groudon.r * 0.3;
-    const my = groudon.y - groudon.r * 1.5;
+  /** ソーラービームの溜め: 日の光の粒がまわりから口元へ集まり、口元の光の玉が大きくなる（ひざしの間は速い） */
+  private drawSunGather(g: Body, p: number, timeMs: number, sun: boolean, frame: number): void {
+    const mx = g.x + g.r * 0.3;
+    const my = g.y - g.r * 1.5;
     const speed = sun ? 420 : 760;
     for (let k = 0; k < 14; k++) {
       const a = (k / 14) * Math.PI * 2 + rnd(k, 3) * 0.5;
       const t = ((timeMs / speed + rnd(k, 7)) % 1 + 1) % 1;
-      const d = groudon.r * (4.6 - 4.0 * t);
+      const d = g.r * (4.6 - 4.0 * t);
       const px = mx + Math.cos(a) * d;
       const py = my + Math.sin(a) * d * 0.8;
-      // 光の尾（口元へ向かう）と粒。草の上でも見えるよう、ふつうの重ね方で白と黄
-      const al = 0.45 + 0.5 * t;
-      this.gt.lineStyle(9, 0xfff176, 0.6 * al).lineBetween(px, py, px - (mx - px) * 0.4, py - (my - py) * 0.4);
-      this.gt.fillStyle(0xfff59d, al).fillCircle(px, py, 13 + t * 5);
-      this.gt.fillStyle(0xffffff, al).fillCircle(px, py, 7 + t * 3);
+      // 粒と、口元へ向かう短い尾（点を並べる）
+      for (let j = 1; j <= 3; j++) this.pool.dot(px - (mx - px) * 0.12 * j, py - (my - py) * 0.12 * j, 8 - j * 2, 0xfff176);
+      this.pool.dot(px, py, 10 + t * 4, 0xfff59d);
+      this.pool.dot(px, py, 5 + t * 2, 0xffffff);
     }
-    // 口元の光の玉（だんだん大きく）
-    const rr = groudon.r * (0.25 + 0.55 * p);
-    this.gt.fillStyle(0xffee58, 0.25 + 0.25 * p).fillCircle(mx, my, rr * 2);
-    this.gt.fillStyle(0xfff59d, 0.85).fillCircle(mx, my, rr);
-    this.gt.fillStyle(0xffffff, 0.95).fillCircle(mx, my, rr * 0.55);
+    this.pool.image(`gr-sun-${frame}`, this.topDepth).setPosition(mx, my).setScale(DOT * (0.4 + 1.3 * p));
   }
 
-  /**
-   * ゲンシカイキ: 地面に割れ目が放射状に走り、割れ目と体のまわりに溶岩の光が満ちていく。終わりの少し前に強く光って、姿が変わる
-   */
-  private drawReversion(groudon: { x: number; y: number; r: number }, p: number, timeMs: number): void {
-    const { x, y, r } = groudon;
-    // 放射状の割れ目
+  /** ゲンシカイキ: 地面に割れ目が放射状に走り、体のまわりに炎の舌が昇る */
+  private drawReversion(g: Body, p: number, timeMs: number, frame: number): void {
+    const by = g.y + g.r * 0.3;
     for (let k = 0; k < 9; k++) {
       const a = (k / 9) * Math.PI * 2 + rnd(k, 1) * 0.4;
-      const len = r * (3.6 + rnd(k, 2) * 2.4) * Math.min(1, p * 1.6);
-      const pts: [number, number][] = [[x, y + r * 0.3]];
-      const steps = 10;
-      for (let s = 1; s <= steps; s++) {
-        const t = s / steps;
-        const off = (rnd(k * 7, s) - 0.5) * 30 * (1 - t * 0.4);
-        pts.push([x + Math.cos(a) * len * t - Math.sin(a) * off, y + r * 0.3 + (Math.sin(a) * len * t + Math.cos(a) * off) * 0.55]);
-      }
-      this.strokePath(this.gf, pts, pts.length, 16, 0x1a0f0a, 0.85);
-      this.strokePath(this.gf, pts, pts.length, 9, 0xd84315, 0.5 + 0.5 * p);
-      this.strokePath(this.gf, pts, pts.length, 4, 0xffd180, 0.3 + 0.7 * p);
+      const len = g.r * (3.6 + rnd(k, 2) * 2.4) * Math.min(1, p * 1.6);
+      const mx = g.x + Math.cos(a + 0.15) * len * 0.5;
+      const my = by + Math.sin(a + 0.15) * len * 0.5 * 0.55;
+      const used = this.crackLine(g.x, by, mx, my, frame, len);
+      this.crackLine(mx, my, g.x + Math.cos(a) * len, by + Math.sin(a) * len * 0.55, frame, Math.max(0, len - used));
     }
-    // 体のまわりの熱（下から上へ流れる光の筋）
-    for (let k = 0; k < 16; k++) {
-      const a = (k / 16) * Math.PI * 2;
+    if (p > 0.15) this.pool.image(`gr-heat-${frame}`, this.topDepth).setOrigin(0.5, 1).setPosition(g.x, g.y + g.r * 0.4).setScale((g.r * 4.2) / 56);
+    for (let k = 0; k < 12; k++) {
       const t = ((timeMs / 520 + rnd(k, 5)) % 1 + 1) % 1;
-      const bx = x + Math.cos(a) * r * 1.1;
-      const by = y + r * 0.2 - t * r * 3.2;
-      this.gt.lineStyle(13, k % 2 ? 0xff6d00 : 0xffab40, 0.55 * p * (1 - t)).lineBetween(bx, by, bx, by - r * 0.9);
+      const a = (k / 12) * Math.PI * 2;
+      this.pool.dot(g.x + Math.cos(a) * g.r * 1.3, g.y + g.r * 0.2 - t * g.r * 3.4, 9 * (1 - t) * p + 1, k % 2 ? 0xff6d00 : 0xffab40);
     }
-    // 終わりに体が強く光る（一度だけ。明滅させない）
-    const flash = p > 0.8 ? (p - 0.8) / 0.2 : 0;
-    this.ga.fillStyle(0xff6d00, 0.3 * p + 0.3 * flash).fillEllipse(x, y - r * 1.1, r * 4, r * 4.4);
-    this.gt.fillStyle(0xffab40, 0.12 * p + 0.45 * flash).fillEllipse(x, y - r * 1.1, r * 3, r * 3.4);
   }
 }

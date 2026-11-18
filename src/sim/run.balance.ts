@@ -90,6 +90,9 @@ function simulateRun(pokemon: string): void {
         });
         cmds.push(offers.length ? { type: 'chooseUpgrade', playerId: 1, index: best } : { type: 'skipUpgrade', playerId: 1 });
       }
+    } else if (w.contest) {
+      // ホウエンのコンテストの誘い: リーグへ進む（答えないと止まったままになる。07 の188章）
+      if (w.contest.phase === 'branch' && !w.contest.answers.has(1)) cmds.push({ type: 'contest', op: 'answer', playerId: 1, go: false });
     } else {
       if (w.tick % Math.round(RETARGET_SECONDS * tickRate) === 0) {
         const [dx, dy] = w.gems.count >= w.gems.capacity * 0.8 ? towardBiggestGem(sim, p.x, p.y) : towardNearestEnemy(sim, p.x, p.y);

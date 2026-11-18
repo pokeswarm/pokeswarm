@@ -442,7 +442,7 @@ export class DeoxysCosmos {
         if (!active && boss) this.drawZapCharge(boss, p, timeMs, frame);
       } else if (id === 'deoxys-zap-orb') {
         if (active) this.drawZapOrb(hz, timeMs, frame);
-      } else if (id === 'deoxys-zap-burst') {
+      } else if (id === 'deoxys-zap-burst' || id === 'deoxys-zap-spark') {
         if (active) linger('zap');
         else this.drawZapWarn(hz, p, timeMs);
       } else if (id === 'deoxys-iron-defense') {

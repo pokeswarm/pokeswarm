@@ -855,24 +855,45 @@
       }
     },
     {
-      "id": "johto-silver-wing",
+      "id": "johto-all-starters-clear",
       "region": "johto",
       "condition": {
         "all": [
           {
-            "stat": "eggClears.pichu",
+            "stat": "clears.chikorita",
             "atLeast": 1
           },
           {
-            "stat": "eggClears.cleffa",
+            "stat": "clears.cyndaquil",
             "atLeast": 1
           },
           {
-            "stat": "eggClears.igglybuff",
+            "stat": "clears.totodile",
+            "atLeast": 1
+          }
+        ]
+      },
+      "reward": {
+        "buff": {
+          "itemSlots": 1
+        }
+      }
+    },
+    {
+      "id": "johto-silver-wing",
+      "region": "johto",
+      "condition": {
+        "any": [
+          {
+            "stat": "bossDefeated.raikou",
             "atLeast": 1
           },
           {
-            "stat": "eggClears.togepi",
+            "stat": "bossDefeated.entei",
+            "atLeast": 1
+          },
+          {
+            "stat": "bossDefeated.suicune",
             "atLeast": 1
           }
         ]

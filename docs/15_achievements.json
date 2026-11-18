@@ -675,11 +675,21 @@
   },
   {
    "region": "johto",
+   "id": "johto-all-starters-clear",
+   "name": "ジョウトの 御三家マスター",
+   "hidden": false,
+   "condition": "チコリータ・ヒノアラシ・ワニノコの すべてで ジョウトの でんどういりを する",
+   "stat": "clears.chikorita ≧ 1 & clears.cyndaquil ≧ 1 & clears.totodile ≧ 1",
+   "rewardKind": "バフ",
+   "reward": "持ち物の枠 +1"
+  },
+  {
+   "region": "johto",
    "id": "johto-silver-wing",
    "name": "ぎんいろの はね",
    "hidden": false,
-   "condition": "ピチュー・ピィ・ププリン・トゲピーで それぞれ ジョウトの でんどういりを する（箱から ぎんいろのはねが 出るようになる）",
-   "stat": "eggClears.pichu ≧ 1 & eggClears.cleffa ≧ 1 & eggClears.igglybuff ≧ 1 & eggClears.togepi ≧ 1",
+   "condition": "ライコウ・エンテイ・スイクンの どれかを 倒す（箱から ぎんいろのはねが 出るようになる）",
+   "stat": "bossDefeated.raikou ≧ 1 | bossDefeated.entei ≧ 1 | bossDefeated.suicune ≧ 1",
    "rewardKind": "なし",
    "reward": ""
   },

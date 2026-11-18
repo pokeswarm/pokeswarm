@@ -1153,6 +1153,16 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
   }
   if (move.nextMoveWaitSeconds && boss) boss.holdUntil = world.tick + Math.round(move.nextMoveWaitSeconds / world.dt);
   if (move.alsoCast) castBossMove(world, bossId, i, moveIndexOfStage(world.rules, move.alsoCast));
+  // 相方にも使わせる（交差するドラゴンダイブ）: 今の技が終わり次第、相方が使う
+  if (move.partnerMove) {
+    const pm = moveIndexOfStage(world.rules, move.partnerMove);
+    for (const b of world.bosses) {
+      if (b.id === bossId) continue;
+      const j = findEnemyIndex(world, b.id);
+      if (j === -1 || world.enemies.hp[j]! <= 0 || world.rules.enemies.kinds[world.enemies.kind[j]!]?.rank !== 'legendary') continue;
+      (b.forced ??= []).unshift(pm);
+    }
+  }
   if (move.leap && boss && !move.flyTo) {
     // 跳びかかる: 狙った人の今の場所に予告を置き、予告が終わるときに着くよう跳んでいく（1 人だけを狙う）
     put(target.x, target.y, ux, uy, bossId);
@@ -2349,6 +2359,15 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
     const cap = at >= 0 && boss?.phases ? boss.phases[at]!.belowRatio * world.enemies.maxHp[i]! - 1 : world.enemies.maxHp[i]!;
     world.enemies.hp[i] = Math.max(world.enemies.hp[i]!, Math.min(cap, world.enemies.hp[i]! + (world.enemies.maxHp[i]! * move.healPct) / 100));
   }
+  // 仲間を回復する（ラティアスの いやしのはどう）: ほかの生きている伝説の HP を戻す
+  if (move.healPartnerPct && world.role !== 'guest') {
+    for (const b of world.bosses) {
+      if (b.id === hz.dasher) continue;
+      const j = findEnemyIndex(world, b.id);
+      if (j === -1 || world.enemies.hp[j]! <= 0 || world.rules.enemies.kinds[world.enemies.kind[j]!]?.rank !== 'legendary') continue;
+      world.enemies.hp[j] = Math.min(world.enemies.maxHp[j]!, world.enemies.hp[j]! + (world.enemies.maxHp[j]! * move.healPartnerPct) / 100);
+    }
+  }
   // 吸い取る（ギガドレイン）: 範囲に入っていた人 1 人ごとに回復する（ホストの見ている場所で決める）
   if (move.drainPct && world.enemies.hp[i]! > 0) {
     const caught = world.players.filter((p) => !p.down && hazardHits(hz, p.x, p.y, p.radius, move)).length;
@@ -2780,8 +2799,15 @@ export function legendRounds(world: World): LegendRounds {
 export function isAloneLegend(world: World, i: number): boolean {
   const lg = world.legendary;
   const e = world.enemies;
-  if (!lg || lg.result || e.hp[i]! <= 0) return false;
-  const kinds = legendRoundKinds(world, lg.kind);
+  if (e.hp[i]! <= 0) return false;
+  let kinds: readonly number[];
+  if (lg && !lg.result) kinds = legendRoundKinds(world, lg.kind);
+  else {
+    // 2 体一緒の乱入（ラティ兄妹。07 の298章）
+    const cfg = world.rules.stage.legendary?.intruders;
+    if (lg || !world.intruder || world.intruder.done || !cfg?.together) return false;
+    kinds = cfg.kinds.map((id) => world.rules.enemies.kinds.findIndex((k) => k.id === id));
+  }
   if (kinds.length < 2 || !kinds.includes(e.kind[i]!)) return false;
   for (let j = 0; j < e.count; j++) if (j !== i && e.hp[j]! > 0 && kinds.includes(e.kind[j]!)) return false;
   return true;

@@ -2224,6 +2224,115 @@ function meteorFallsWall(): (Rgb | null)[] {
   return out;
 }
 
+/**
+ * 南の孤島（ラティ兄妹。07 の298章）: 島の奥の森の中の、ひらけた草地。真ん中に古い石の台座、まわりに花と小石、
+ * 縁は砂浜へ。夕方の光（少し暗く、暖かい色）
+ */
+const ISLAND_GRASS = ['#1f3a24', '#27472b', '#305434', '#3b623c', '#467045'].map(hex);
+const ISLAND_SAND = ['#5a4e3a', '#6b5d44', '#7c6c4f', '#8d7c5b'].map(hex);
+const FLOWERS = ['#e57373', '#f8bbd0', '#90caf9', '#fff59d'].map(hex);
+
+function islandFloor(): { floor: Rgb[] } {
+  const floor: Rgb[] = [];
+  const cx = W / 2;
+  const cy = H / 2 + 10;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    // 島の形: 真ん中が草地、外へ行くほど砂浜（縁はゆらぐ）
+    const nx = (x - cx) / (W * 0.46);
+    const ny = (y - cy) / (H * 0.46);
+    const r = Math.hypot(nx, ny) + (fbm(x / 40, y / 40, 901) - 0.5) * 0.35;
+    let col: Rgb;
+    if (r < 0.95) {
+      // 草: 風で一方へなびく筋、むら
+      const blade = fbm(x / 3 + y / 9, y / 2, 903);
+      let t = 0.45 + (fbm(x / 60, y / 40, 905) - 0.5) * 0.45 + (blade - 0.5) * 0.35 - Math.max(0, r - 0.7) * 0.4;
+      col = ramp(ISLAND_GRASS, t, x, y, 0.5);
+      // 草の穂: 短い縦の筋（根もとが暗く、先が明るい）
+      const tuft = hash2(Math.floor(x / 3), Math.floor(y / 5), 904);
+      const ly = y % 5;
+      if (tuft > 0.55 && x % 3 === 1) col = ly < 2 ? ramp(ISLAND_GRASS, t + 0.35, x, y) : ly > 3 ? ramp(ISLAND_GRASS, t - 0.3, x, y) : col;
+      // 低い茂み（もこもこの塊。上が明るい）
+      const bush = worley(x, y * 1.5, 34, 906);
+      const br = Math.hypot(bush.dx, bush.dy * 1.5);
+      if (hash2(bush.id, 3, 908) > 0.86 && br < 9 && r < 0.85 && Math.hypot(x - cx, (y - cy) * 1.7) > 130) col = ramp(ISLAND_GRASS, 0.55 - bush.dy / 9 * 0.4 + (hash2(x, y, 910) - 0.5) * 0.2, x, y);
+      // 花（まばらな群れ）
+      const patch = fbm(x / 30, y / 30, 907);
+      if (patch > 0.62 && hash2(x, y, 909) > 0.93) col = FLOWERS[Math.floor(hash2(x, y, 911) * 4)]!;
+      // 草地の縁は砂が混じる
+      if (r > 0.82 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (r - 0.82) / 0.13) col = ramp(ISLAND_SAND, 0.5, x, y);
+    } else {
+      // 砂浜: 小さな粒と、波で湿った暗い所
+      col = ramp(ISLAND_SAND, 0.55 + (fbm(x / 8, y / 8, 913) - 0.5) * 0.5 - Math.min(0.4, (r - 0.95) * 0.8), x, y);
+      if (hash2(x, y, 915) > 0.985) col = hex('#b5a789');
+      // 下の砂浜: 波打ち際の湿った帯と泡の線
+      const shore = H - 1 - y - (fbm(x / 30, 1, 916) - 0.5) * 10;
+      if (shore < 22) col = ramp(ISLAND_SAND, 0.15, x, y);
+      if (Math.abs(shore - 10) < 1 && fbm(x / 6, y, 918) > 0.45) col = hex('#9fb4bf');
+    }
+    // 真ん中の古い石の台座（丸い石畳と、四方の石柱の跡）
+    const pr = Math.hypot((x - cx) / 70, (y - cy) / 40);
+    if (pr < 1) {
+      const ring = Math.floor(pr * 4);
+      const seg = Math.floor(((Math.atan2(y - cy, x - cx) / Math.PI + 1) * (6 + ring * 4)));
+      col = ramp(['#4a4a45', '#5a5a54', '#6b6b64', '#7c7c74'].map(hex), 0.5 + (hash2(ring, seg, 917) - 0.5) * 0.5, x, y);
+      if (Math.abs(pr * 4 - Math.round(pr * 4)) < 0.08) col = hex('#2d2d2a');
+      if (fbm(x / 10, y / 10, 919) > 0.66) col = ramp(ISLAND_GRASS, 0.4, x, y);
+    }
+    for (const [ox, oy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]] as const) {
+      const px = cx + ox * 92;
+      const py = cy + oy * 54;
+      if (Math.hypot(x - px, (y - py) * 1.6) < 9) col = Math.hypot(x - px - 2, (y - py) * 1.6 + 3) < 6 ? hex('#7c7c74') : hex('#3a3a36');
+    }
+    // 小石
+    const peb = worley(x, y * 1.4, 26, 921);
+    if (peb.dx * peb.dx + peb.dy * peb.dy < 4 && hash2(peb.id, 1, 923) > 0.75) col = hash2(peb.id, 2, 925) > 0.5 ? hex('#6f6a5e') : hex('#4d483f');
+    // 壁ぎわの影（木々の影）
+    const edgeD = Math.min(x, W - 1 - x);
+    const shade = Math.max(0, 1 - y / 28) * 0.8 + Math.max(0, 1 - edgeD / 18) * 0.6 + Math.max(0, 1 - (H - 1 - y) / 12) * 0.5;
+    if (shade > (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16) col = [Math.round(col[0] * 0.55), Math.round(col[1] * 0.6), Math.round(col[2] * 0.6)];
+    floor.push(col);
+  }
+  return { floor };
+}
+
+/** 島の縁: 茂った木々（奥）と、手前と左右の海（夕方の暗い色） */
+function islandWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const dark = hex('#06080a');
+  const rimLight = hex('#5a6a50');
+  const rimDark = hex('#0d140e');
+  const leaves = ['#0b1a10', '#102416', '#16301c', '#1d3c23', '#264a2b'].map(hex);
+  const sea = ['#08141c', '#0b1a24', '#0f222e', '#132a38'].map(hex);
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const dist = Math.max(inset(iy, 71) - ix, ix - (W - 1 - inset(iy, 72)), inset(ix, 73) - iy, iy - (H - 1 - inset(ix, 74)));
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    let col: Rgb;
+    if (iy < H * 0.55) {
+      // 木々の葉の塊（丸いもこもこ、上が明るい）
+      // 丸い葉の塊が重なる（下の塊の上の縁が明るい。網目に見えないよう線は引かない）
+      const leaf = worley(x * 0.9, y * 1.1, 16, 931);
+      const t = 0.55 + (-leaf.dy / 16) * 0.45 + (hash2(leaf.id, 1, 933) - 0.5) * 0.25 + (fbm(x / 5, y / 5, 934) - 0.5) * 0.25 - Math.max(0, dist - 10) * 0.012;
+      col = ramp(leaves, t, x, y);
+    } else {
+      // 海: 横にそろう波の筋
+      const band = fbm(x / 50, y / 4, 935);
+      col = ramp(sea, 0.4 + band * 0.5 - Math.min(0.3, dist * 0.006), x, y);
+      if (band > 0.66 && fbm(x / 6, y / 3, 937) > 0.55) col = hex('#3d5a6e');
+    }
+    if (dist > MARGIN - 14 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (dist - (MARGIN - 14)) / 14) col = dark;
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 3) col = rimLight;
+    out.push(col);
+  }
+  return out;
+}
+
 const arenas = [
   { id: 'lugia', ...lugiaFloor(), wall: lugiaWall() },
   { id: 'hooh', ...hoohFloor(), wall: hoohWall() },
@@ -2241,6 +2350,7 @@ const arenas = [
   { id: 'sootopolis', region: 'hoenn', ...sootopolisFloor(), wall: sootopolisWall() },
   { id: 'sky-pillar', region: 'hoenn', ...skyPillarFloor(), shimmerA: null, shimmerB: null, wall: skyPillarWall() },
   { id: 'meteor-falls', region: 'hoenn', ...meteorFallsFloor(), wall: meteorFallsWall() },
+  { id: 'southern-island', region: 'hoenn', ...islandFloor(), shimmerA: null, shimmerB: null, wall: islandWall() },
 ];
 for (const a of arenas) {
   const outDir = path.join('public', 'map', 'region' in a ? a.region : 'johto');

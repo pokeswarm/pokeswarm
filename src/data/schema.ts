@@ -852,6 +852,10 @@ export const bossMoveSchema = z.object({
   scatterOnLand: z.object({ move: z.string().min(1), count: z.number().int().positive(), radius: z.number().positive().optional() }).optional(),
   /** 1 回の戦いで使える回数（回復の技を繰り返して HP が減らなくなるのを防ぐ。使い切ったら順番を飛ばす。07 の193章） */
   maxUses: z.number().int().positive().optional(),
+  /** 落ちたとき、同じ戦いの仲間（ほかの生きている伝説）の HP を最大 HP の healPartnerPct % 戻す（ラティアスの いやしのはどう。07 の298章） */
+  healPartnerPct: z.number().positive().optional(),
+  /** 使ったとき、同じ戦いの仲間（ほかの生きている伝説）にも、この技を次に使わせる（ラティ兄妹の交差するドラゴンダイブ。07 の298章） */
+  partnerMove: z.string().min(1).optional(),
   leaves: z
     .object({
       seconds: z.number().positive(),

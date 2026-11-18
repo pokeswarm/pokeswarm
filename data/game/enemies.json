@@ -2650,10 +2650,7 @@
       "contactDamage": 40,
       "xp": 0,
       "spriteScale": 2.4,
-      "motion": {
-        "type": "keepDistance",
-        "distance": 270
-      }
+      "motion": {"type": "orbit", "distance": 300, "angularDegreesPerSecond": 40}
     },
     {
       "id": "legend-latios",
@@ -2666,10 +2663,7 @@
       "contactDamage": 40,
       "xp": 0,
       "spriteScale": 2.4,
-      "motion": {
-        "type": "keepDistance",
-        "distance": 300
-      }
+      "motion": {"type": "orbit", "distance": 360, "angularDegreesPerSecond": -34}
     }
   ]
 }

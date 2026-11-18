@@ -2250,6 +2250,11 @@
       "uses": [
         "full",
         "enemy"
+      ],
+      "enemyExtraAnimations": [
+        "Attack",
+        "Shoot",
+        "Hurt"
       ]
     },
     {
@@ -2258,6 +2263,11 @@
       "uses": [
         "full",
         "enemy"
+      ],
+      "enemyExtraAnimations": [
+        "Attack",
+        "Shoot",
+        "Hurt"
       ]
     },
     {

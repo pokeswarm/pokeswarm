@@ -34,6 +34,55 @@
         4
       ],
       "frameKeyPrefix": "Walk"
+    },
+    "Attack": {
+      "source": "Attack",
+      "frameWidth": 72,
+      "frameHeight": 72,
+      "durations": [
+        2,
+        2,
+        6,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Attack"
+    },
+    "Shoot": {
+      "source": "Shoot",
+      "frameWidth": 64,
+      "frameHeight": 80,
+      "durations": [
+        2,
+        6,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Shoot"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 48,
+      "frameHeight": 80,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
     }
   },
   "missing": []

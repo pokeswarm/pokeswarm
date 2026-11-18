@@ -759,7 +759,7 @@
         "legend-latias",
         "legend-latios"
       ],
-      "timeLimitSeconds": 180
+      "timeLimitSeconds": 90
     },
     "moveSets": {
       "steven-metagross": {
@@ -1027,25 +1027,74 @@
         ]
       },
       "legend-latias": {
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960,
+          "map": {
+            "floor": "map/hoenn/arena-southern-island-floor.png",
+            "wall": "map/hoenn/arena-southern-island-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2
+          }
+        },
+        "anchor": {
+          "x": -300,
+          "y": -200
+        },
+        "noEnrage": true,
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 1.2,
         "moves": [
           "latias-mist-ball",
-          "latias-dragon-rush",
           "latias-dragon-breath",
-          "latias-heal-pulse"
+          "latias-refraction",
+          "latias-heal-pulse",
+          "latias-mist-ball",
+          "latias-refraction"
         ],
         "random": false,
-        "moveIntervalSeconds": 1.5,
-        "enrageMoveIntervalSeconds": 1.1
+        "alone": {
+          "moves": ["latias-refraction-a", "latias-mist-ball-alone", "latias-dragon-breath", "latias-refraction-a"],
+          "moveIntervalSeconds": 0.6
+        }
       },
       "legend-latios": {
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960,
+          "map": {
+            "floor": "map/hoenn/arena-southern-island-floor.png",
+            "wall": "map/hoenn/arena-southern-island-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2
+          }
+        },
+        "anchor": {
+          "x": 300,
+          "y": -200
+        },
+        "noEnrage": true,
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 1.25,
         "moves": [
           "latios-luster-purge",
+          "latios-dragon-pulse",
+          "latios-dragon-dance",
           "latios-dragon-rush",
-          "latios-dragon-pulse"
+          "latios-cross"
         ],
         "random": false,
-        "moveIntervalSeconds": 1.7,
-        "enrageMoveIntervalSeconds": 1.2
+        "alone": {
+          "moves": [
+            "latios-luster-purge",
+            "latios-dragon-rush",
+            "latios-dragon-pulse",
+            "latios-dragon-rush"
+          ],
+          "moveIntervalSeconds": 1.25
+        }
       }
     },
     "moveIntervalSeconds": 1.5,

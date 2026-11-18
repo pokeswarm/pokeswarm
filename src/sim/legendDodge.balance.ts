@@ -3,7 +3,7 @@ import { buildSimRules } from '../data/simRules';
 import type { Axis, InputCommand } from './commands';
 import { Simulation } from './simulation';
 import { CASTER_ID_BASE } from './systems/attack';
-import { hazardHits, startLegendary } from './systems/stage';
+import { hazardHits, startIntruder, startLegendary } from './systems/stage';
 
 /**
  * 伝説の技の当たりやすさの測り方（範囲の確認に使う。07 の257章）: 攻撃せず、予告を避けるだけの自動プレイヤー（速さ 180・持ち物なし）で
@@ -49,7 +49,9 @@ function run(kindId: string): void {
     const p = sim.world.players[0]!;
     const w = sim.world;
     w.cleared = true;
-    startLegendary(w, kind);
+    // DODGE_INTRUDER=1: 乱入として出す（ラティ兄妹は 2 体一緒に。07 の298章）
+    if (process.env.DODGE_INTRUDER === '1') startIntruder(w, kind);
+    else startLegendary(w, kind);
     let dir = '';
     // 出てくるまで待つ
     for (let t = 0; t < tickRate * 6 && !w.bosses.length; t++) sim.step([]);

@@ -935,7 +935,14 @@
         "arena": {
           "halfWidth": 800,
           "halfHeight": 440,
-          "viewHeight": 960
+          "viewHeight": 960,
+          "map": {
+            "floor": "map/hoenn/arena-meteor-falls-floor.png",
+            "wall": "map/hoenn/arena-meteor-falls-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2,
+            "shimmer": ["map/hoenn/arena-meteor-falls-shimmer-a.png", "map/hoenn/arena-meteor-falls-shimmer-b.png"]
+          }
         },
         "anchor": {
           "x": 0,

@@ -2044,6 +2044,186 @@ function skyPillarWall(): (Rgb | null)[] {
   return out;
 }
 
+/**
+ * りゅうせいのたきの奥（デオキシス。07 の296章）: 隕石が落ちた洞くつ。暗い岩の床、真ん中に隕石の穴（盛り上がった縁・放射状に飛び散った跡・
+ * 紫に光るひびの入った隕石）、まわりに紫の結晶の群れ、奥の右に滝つぼ（滝は壁の絵）
+ */
+const METEOR_ROCK = ['#15141c', '#1b1a24', '#22202c', '#2a2835', '#33303f'].map(hex);
+const CRYSTAL = ['#2a1240', '#4a1f6e', '#6d34a0', '#9a5ad0', '#d2a8f5'].map(hex);
+const POOL = ['#08131c', '#0b1a26', '#0f2230', '#132a3a'].map(hex);
+/** 隕石の穴の中心と大きさ（ドット）。デオキシスのディフェンスが立つマップの真ん中 */
+const CRATER = { x: W / 2, y: H / 2, rx: 150, ry: 84 };
+/** 滝つぼ（奥の右） */
+const FALL_POOL = { x: 600, y: 18, rx: 96, ry: 34 };
+
+/** 結晶の群れの場所（壁ぎわを中心に。真ん中の穴と滝つぼは避ける） */
+const CRYSTALS: { x: number; y: number; s: number }[] = (() => {
+  const out: { x: number; y: number; s: number }[] = [];
+  for (let k = 0; out.length < 16 && k < 400; k++) {
+    const x = 30 + hash2(k, 1, 801) * (W - 60);
+    const y = 30 + hash2(k, 2, 801) * (H - 50);
+    const edge = Math.min(x, W - x, y * 1.6, (H - y) * 1.6);
+    if (edge > 150 && hash2(k, 3, 801) > 0.2) continue;
+    if (((x - CRATER.x) / (CRATER.rx + 60)) ** 2 + ((y - CRATER.y) / (CRATER.ry + 40)) ** 2 < 1) continue;
+    if (((x - FALL_POOL.x) / (FALL_POOL.rx + 30)) ** 2 + ((y - FALL_POOL.y) / (FALL_POOL.ry + 30)) ** 2 < 1) continue;
+    if (out.some((o) => Math.hypot(o.x - x, o.y - y) < 60)) continue;
+    out.push({ x, y, s: 0.7 + hash2(k, 4, 801) * 0.6 });
+  }
+  return out;
+})();
+
+/** 結晶 1 本（上へ伸びる六角柱を正面から見た形）: 中なら 0〜1 の明るさ（左の面は明るく、右は暗い）、外なら -1 */
+function crystalShard(px: number, py: number, bx: number, by: number, h: number, w: number, lean: number): number {
+  const t = (by - py) / h;
+  if (t < 0 || t > 1) return -1;
+  const cx = bx + lean * t * h;
+  const half = t > 0.78 ? w * (1 - t) / 0.22 : w;
+  const dx = px - cx;
+  if (Math.abs(dx) > half) return -1;
+  if (dx < -half * 0.2) return 0.85;
+  if (dx < half * 0.35) return 0.6;
+  return 0.3;
+}
+
+function meteorFallsFloor(): { floor: Rgb[]; shimmerA: (Rgb | null)[]; shimmerB: (Rgb | null)[] } {
+  const floor: Rgb[] = [];
+  const shimmerA: (Rgb | null)[] = [];
+  const shimmerB: (Rgb | null)[] = [];
+  const crack = hex('#0c0b11');
+  const crackLit = hex('#3d3a4a');
+  const rimLit = hex('#4a4558');
+  const glowA = hex('#b06cf0');
+  const glowB = hex('#e8c8ff');
+  const foam = hex('#6f93ad');
+  const meteor = ['#1a1520', '#251d2c', '#33283c'].map(hex);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    let glint = 0;
+    // 洞くつの床: 大きな岩の板（ゆがんだ）と割れ。濡れて暗いむら
+    const wx = x + (fbm(x / 20, y / 20, 803) - 0.5) * 10;
+    const wy = y + (fbm(x / 20, y / 20, 804) - 0.5) * 10;
+    const slab = worley(wx, wy * 1.3, 40, 805);
+    let t = 0.45 + (hash2(slab.id, 1, 807) - 0.5) * 0.3 + (fbm(x / 70, y / 50, 809) - 0.5) * 0.4 + (fbm(x / 6, y / 6, 811) - 0.5) * 0.15;
+    let col = ramp(METEOR_ROCK, t, x, y, 0.5);
+    if (slab.edge < 1.1 && fbm(x / 16, y / 16, 812) < 0.62) col = crack;
+    else if (slab.edge < 2.3 && slab.dx > 0 && slab.dy > 0) col = crackLit;
+    // 隕石の穴: 外へ飛び散った筋 → 盛り上がった縁 → 中は深く暗い → 真ん中に隕石
+    const nx = (x - CRATER.x) / CRATER.rx;
+    const ny = (y - CRATER.y) / CRATER.ry;
+    const r = Math.hypot(nx, ny);
+    const ang = Math.atan2(ny, nx);
+    if (r > 1.05 && r < 1.9) {
+      // 放射状の飛び散った跡（明るい細い筋が外へ細る）
+      const ray = Math.abs(Math.sin(ang * 13 + fbm(ang * 3, 1, 813) * 4));
+      if (ray < 0.08 * (1.9 - r) && hash2(x, y, 815) < 1.6 - r * 0.7) col = mix(col, rimLit, 0.6);
+    }
+    if (r <= 1.12) {
+      const rim = 1.12 - r;
+      if (r > 0.92) {
+        // 縁: 外側が明るく盛り上がる（上が光る）
+        col = ramp(METEOR_ROCK, 0.7 + (ny < 0 ? 0.25 : -0.1) + (fbm(x / 8, y / 8, 817) - 0.5) * 0.3, x, y);
+        if (rim < 0.03 && ny > 0) col = crack;
+      } else {
+        // 穴の中: 中ほど深く暗い。底の砕けた岩
+        const deep = 1 - r / 0.92;
+        col = ramp(METEOR_ROCK, 0.42 - deep * 0.35 + (ny > 0 ? 0.12 : -0.05) + (fbm(x / 10, y / 10, 819) - 0.5) * 0.25, x, y);
+        const rubble = worley(x, y, 9, 821);
+        if (rubble.edge < 0.6 && fbm(x / 12, y / 12, 822) > 0.55) col = crack;
+        // 穴の中の紫のひびの光（隕石から外へ）
+        const vein = Math.abs(Math.sin(ang * 7 + fbm(r * 4, ang, 823) * 3));
+        if (vein < 0.05 && r > 0.18 && r < 0.85 && fbm(x / 7, y / 7, 825) > 0.35) col = r < 0.5 ? glowA : hex('#6d34a0');
+      }
+      // 隕石: でこぼこの黒い塊に、紫に光るひび
+      const mr = Math.hypot((x - CRATER.x) / 30, (y - CRATER.y + 4) / 22) + (fbm(x / 6, y / 6, 827) - 0.5) * 0.35;
+      if (mr < 1) {
+        col = ramp(meteor, 0.6 - mr * 0.5 + ((y - CRATER.y) < -4 ? 0.3 : 0), x, y);
+        const mc = worley(x, y, 11, 829);
+        const lit = mc.edge < 0.7 && fbm(x / 6, y / 6, 830) > 0.45;
+        if (lit) col = mr < 0.45 ? glowB : glowA;
+        if (lit && hash2(x, y, 831) > 0.5) glint = mr < 0.45 ? 2 : 1;
+      }
+    }
+    // 結晶の群れ（足もとの影と、3〜5 本の柱）
+    for (const cr of CRYSTALS) {
+      const dx = x - cr.x;
+      const dy = y - cr.y;
+      if (Math.abs(dx) > 40 || dy > 8 || dy < -60) continue;
+      if ((dx / (26 * cr.s)) ** 2 + ((dy - 2) / (7 * cr.s)) ** 2 < 1) col = mix(col, hex('#07060a'), 0.6);
+      const n = 3 + Math.floor(hash2(cr.x, cr.y, 833) * 3);
+      let best = -1;
+      for (let k = 0; k < n; k++) {
+        const ox = (k - (n - 1) / 2) * 9 * cr.s + (hash2(k, cr.x, 835) - 0.5) * 6;
+        const hgt = (22 + hash2(k, cr.y, 837) * 30) * cr.s * (k === Math.floor(n / 2) ? 1.3 : 1);
+        const v = crystalShard(x, y, cr.x + ox, cr.y + 2 - Math.abs(ox) * 0.15, hgt, 4.5 * cr.s, (ox / 30) * 0.6);
+        if (v > best) best = v;
+      }
+      if (best >= 0) {
+        col = ramp(CRYSTAL, best, x, y, 0.3);
+        if (best > 0.8 && hash2(x, y, 839) > 0.9) glint = 1;
+      }
+    }
+    // 滝つぼ: 深い水、落ちた水の泡の輪
+    const pn = Math.hypot((x - FALL_POOL.x) / FALL_POOL.rx, (y - FALL_POOL.y) / FALL_POOL.ry);
+    if (pn < 1) {
+      col = ramp(POOL, 0.75 - pn * 0.4 + (fbm(x / 20, y / 6, 841) - 0.5) * 0.3, x, y);
+      if (pn < 0.45 && fbm(x / 5, y / 4, 843) > 0.5) col = foam;
+      if (Math.abs(pn - 0.92) < 0.05) col = hex('#3d5a70');
+      if (y % 3 === 0 && valueNoise(x / 7 + y, y * 0.3, 845) > 0.88) glint = (x + y) % 2 ? 1 : 2;
+    } else if (pn < 1.12) col = mix(col, hex('#101a24'), 0.5);
+    // 壁ぎわの影
+    const edgeD = Math.min(x, W - 1 - x);
+    const shade = Math.max(0, 1 - y / 26) * 0.75 + Math.max(0, 1 - edgeD / 16) * 0.55 + Math.max(0, 1 - (H - 1 - y) / 10) * 0.5;
+    if (shade > (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16) col = [Math.round(col[0] * 0.55), Math.round(col[1] * 0.55), Math.round(col[2] * 0.6)];
+    floor.push(col);
+    shimmerA.push(glint === 1 ? glowB : null);
+    shimmerB.push(glint === 2 ? hex('#ffffff') : null);
+  }
+  return { floor, shimmerA, shimmerB };
+}
+
+/** 洞くつの壁: 垂れ下がるつらら石の縁、奥の右から落ちる滝 */
+const CAVE_ROCK = ['#0b0a10', '#111017', '#18161f', '#201d29', '#2a2634'].map(hex);
+
+function meteorFallsWall(): (Rgb | null)[] {
+  const fw = W + MARGIN * 2;
+  const fh = H + MARGIN * 2;
+  const out: (Rgb | null)[] = [];
+  const dark = hex('#050408');
+  const rimLight = hex('#4a4558');
+  const rimDark = hex('#0c0b11');
+  const water = ['#3d6b8a', '#5f8fae', '#8fbad4', '#d8eef8'].map(hex);
+  for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+    const ix = x - MARGIN, iy = y - MARGIN;
+    const dist = Math.max(inset(iy, 61) - ix, ix - (W - 1 - inset(iy, 62)), inset(ix, 63) - iy, iy - (H - 1 - inset(ix, 64)));
+    // 滝: 奥の壁の、滝つぼの上（壁の上から床の縁まで）
+    const fallX = (ix - FALL_POOL.x) / (FALL_POOL.rx * 0.6);
+    if (iy < FALL_POOL.y && Math.abs(fallX) < 1 && dist > -2) {
+      const streak = fbm(ix / 3, (iy - 0) / 30 + ((ix * 7) % 5), 851);
+      const edgeFall = Math.abs(fallX) > 0.85;
+      let c2 = ramp(water, 0.35 + streak * 0.6 + (edgeFall ? -0.3 : 0), x, y);
+      if (iy > FALL_POOL.y - 10 && hash2(x, y, 853) > 0.5) c2 = water[3]!;
+      out.push(c2);
+      continue;
+    }
+    if (dist <= 0) {
+      out.push(null);
+      continue;
+    }
+    let col: Rgb;
+    // 岩の壁: 縦に流れた跡のある岩。上の壁は つらら石が垂れる
+    const stone = worley(x * 0.8, y * 0.45, 20, 855);
+    const t = 0.45 + (stone.dx * 0.5 + stone.dy * 0.3) / 20 * 0.5 + (hash2(stone.id, 3, 857) - 0.5) * 0.3 - Math.max(0, dist - 6) * 0.014;
+    col = ramp(CAVE_ROCK, t, x, y);
+    if (stone.edge < 0.8) col = rimDark;
+    // 壁にも小さな紫の結晶
+    if (dist < 14 && hash2(Math.floor(x / 6), Math.floor(y / 6), 859) > 0.96) col = ramp(CRYSTAL, 0.5 + hash2(x, y, 861) * 0.5, x, y);
+    if (dist > MARGIN - 14 && (BAYER[(y & 3) * 4 + (x & 3)]! + 0.5) / 16 < (dist - (MARGIN - 14)) / 14) col = dark;
+    if (dist <= 1) col = rimDark;
+    else if (dist <= 3) col = rimLight;
+    out.push(col);
+  }
+  return out;
+}
+
 const arenas = [
   { id: 'lugia', ...lugiaFloor(), wall: lugiaWall() },
   { id: 'hooh', ...hoohFloor(), wall: hoohWall() },
@@ -2060,6 +2240,7 @@ const arenas = [
   { id: 'mew', region: 'kanto', ...mewFloor(), shimmerA: null, shimmerB: null, wall: mewWall() },
   { id: 'sootopolis', region: 'hoenn', ...sootopolisFloor(), wall: sootopolisWall() },
   { id: 'sky-pillar', region: 'hoenn', ...skyPillarFloor(), shimmerA: null, shimmerB: null, wall: skyPillarWall() },
+  { id: 'meteor-falls', region: 'hoenn', ...meteorFallsFloor(), wall: meteorFallsWall() },
 ];
 for (const a of arenas) {
   const outDir = path.join('public', 'map', 'region' in a ? a.region : 'johto');

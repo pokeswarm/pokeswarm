@@ -885,16 +885,6 @@
   },
   {
    "region": "hoenn",
-   "id": "hoenn-unlock-beldum",
-   "name": "ホウエンの ダンバル",
-   "hidden": false,
-   "condition": "ダイゴの メタグロスを 倒す",
-   "stat": "bossDefeated.metagross ≧ 1",
-   "rewardKind": "ポケモン",
-   "reward": "ダンバルが 使えるようになる"
-  },
-  {
-   "region": "hoenn",
    "id": "hoenn-unlock-ralts",
    "name": "ホウエンの ラルトス",
    "hidden": false,

@@ -1104,17 +1104,6 @@
       }
     },
     {
-      "id": "hoenn-unlock-beldum",
-      "region": "hoenn",
-      "condition": {
-        "stat": "bossDefeated.metagross",
-        "atLeast": 1
-      },
-      "reward": {
-        "pokemon": "beldum"
-      }
-    },
-    {
       "id": "hoenn-unlock-ralts",
       "region": "hoenn",
       "condition": {

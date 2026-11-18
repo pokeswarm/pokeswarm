@@ -1,5 +1,5 @@
 {
-  "note": "ダイゴ（メタグロス）の伝説戦。1 プレイの時間を縮めるため、いったん外した（07 の299章）。戻すときは data/regions/hoenn.json の legendary.rounds の先頭に {kinds:[steven-metagross], stat:stevenDefeated, bgm:hoenn-steven} を、legendary.moveSets に moveSet を戻す",
+  "note": "ダイゴ（メタグロス）の伝説戦。1 プレイの時間を縮めるため、いったん外した（07 の299章）。戻すときは data/regions/hoenn.json の legendary.rounds の先頭に {kinds:[steven-metagross], stat:stevenDefeated, bgm:hoenn-steven} を、legendary.moveSets に moveSet を戻す。ダンバル（メタグロスの系統）も一緒にしまった: data/game/regions.json のホウエンの playables に beldum を、data/game/achievements.json に下の achievement を戻す（07 の300章）",
   "round": {
     "kinds": [
       "steven-metagross"
@@ -42,5 +42,17 @@
         ]
       }
     ]
-  }
+  },
+  "achievement": {
+    "id": "hoenn-unlock-beldum",
+    "region": "hoenn",
+    "condition": {
+      "stat": "bossDefeated.metagross",
+      "atLeast": 1
+    },
+    "reward": {
+      "pokemon": "beldum"
+    }
+  },
+  "playable": "beldum"
 }

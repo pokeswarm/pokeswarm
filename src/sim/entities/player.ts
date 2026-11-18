@@ -188,6 +188,8 @@ export interface Player {
   mirror?: { untilTick: number; absorbed: number; hits: number; slot: number };
   /** めいそう: 重ねた数と、切れる更新番号 */
   calm?: { stacks: number; untilTick: number };
+  /** じゅうでん（ライコウ。07 の310章）: 重ねた数と、次の ライジングボルト の威力 +pct %（使うと消える） */
+  charged?: { stacks: number; pct: number };
   /** テレポートの後の強化（技の威力 +pct %。重ねた数 stacks。untilTick まで） */
   skillBuff?: { pct: number; stacks: number; untilTick: number };
   /** 技で付いた一時的な強化（move は技の番号。フレアドライブ。07 の115章） */

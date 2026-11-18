@@ -1949,6 +1949,8 @@ export const moveDefSchema = z.object({
   stopOnTarget: z.boolean().optional(),
   /** めいそう（heal の技。07 の307章）: 使うたびに重ねる数が 1 つ増え（maxStacks まで）、1 つにつき とくしゅの威力 +specialPowerPct %。持続は技の durationSeconds（使うたびに戻る） */
   calmMind: z.object({ specialPowerPct: z.number().positive(), maxStacks: z.number().int().positive() }).optional(),
+  /** びりびり（エレキフィールド。ライコウ。07 の310章）: 当たるたびに敵に 1 つ重ねる（maxStacks まで）。当たらないまま seconds 経つと消える。重ねきった敵は ライジングボルト のコンボの相手 */
+  shockStack: z.object({ maxStacks: z.number().int().positive(), seconds: z.number().positive() }).optional(),
   /** HP が最大の thresholdPct % 以下の敵へのダメージを +powerPct %（しおみず: 半分を切った相手に倍。原作どおり。07 の247章） */
   lowHpBonus: z.object({ thresholdPct: z.number().positive().max(100), powerPct: z.number().positive() }).optional(),
   /**
@@ -2977,13 +2979,16 @@ export type AbilitiesConfig = z.infer<typeof abilitiesConfigSchema>;
  *   水が無ければ、射程の中で HP の一番高い敵の所（いなければ前）を、freezeDelaySeconds 後に凍らせる
  * - extremeSpeed（ライコウ。07 の309章）: 前の扇の近い敵を角にして（技の count 個まで）折れる稲妻の線を、技の range の長さだけ駆け抜けて終点へ移る。
  *   区間ごとに線の当たり（1 回で同じ敵には 1 回）。押している間は折れ線の道を見せる
+ * - charge（じゅうでん。ライコウ。07 の310章）: 電気をためる。次の ライジングボルト の威力 +（powerPct + (レベル − 1) × powerPctPerLevel）% を 1 つ重ねる（maxStacks まで。ライジングボルト で全部使う）
+ * - risingVoltage（ライジングボルト。07 の310章）: 射程の中に びりびり を重ねきった敵がいれば、その全員（maxTargets まで。HP の高い順）の足元から comboDelaySeconds 後に
+ *   大きな雷の柱（大きさ × comboSizeMultiplier・威力 × comboMultiplier。重ねは消える）。いなければ、HP の一番高い敵の足元から delaySeconds 後に雷の柱
  */
 export const activeSkillsConfigSchema = z.object({
   keys: z.array(z.string()).min(1),
   skills: z.record(
     z.string(),
     z.object({
-      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed']),
+      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed', 'charge', 'risingVoltage']),
       /** 技の枠の技（moves.json のキー）。あればレベル・再使用・威力はその技の値 */
       move: z.string().optional(),
       trigger: z.enum(['press', 'release']).default('release'),
@@ -2996,6 +3001,8 @@ export const activeSkillsConfigSchema = z.object({
       surf: z.object({ rideSeconds: z.number().min(0), waterSeconds: z.number().positive(), waterSpacing: z.number().positive(), waterRows: z.number().int().positive(), waterPowerPct: z.number().min(0) }).optional(),
       mirror: z.object({ shardsPerHit: z.number().min(0), maxShards: z.number().int().positive(), absorbPowerPct: z.number().min(0), shardSpeed: z.number().positive() }).optional(),
       sheerCold: z.object({ comboMultiplier: z.number().positive(), freezeDelaySeconds: z.number().positive() }).optional(),
+      charge: z.object({ powerPct: z.number().positive(), powerPctPerLevel: z.number().min(0), maxStacks: z.number().int().positive() }).optional(),
+      risingVoltage: z.object({ comboMultiplier: z.number().positive(), delaySeconds: z.number().positive(), comboDelaySeconds: z.number().positive(), comboSizeMultiplier: z.number().positive(), maxTargets: z.number().int().positive() }).optional(),
     }),
   ),
 });

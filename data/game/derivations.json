@@ -465,18 +465,6 @@
       "line": "miltank"
     },
     {
-      "from": "thunderbolt",
-      "item": "thunder-stone",
-      "to": "thunder-raikou",
-      "line": "raikou"
-    },
-    {
-      "from": "bite",
-      "item": "black-glasses",
-      "to": "crunch",
-      "line": "raikou"
-    },
-    {
       "from": "psychic",
       "item": "kings-rock",
       "to": "future-sight-alakazam",

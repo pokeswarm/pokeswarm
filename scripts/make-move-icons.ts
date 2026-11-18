@@ -324,25 +324,71 @@ function calmMindIcon(): Draw {
   });
 }
 
-/** かみなり（ライコウの版。07 の309章）: 暗い雷雲と、その下に落ちる 2 本の雷と焦げ */
-function thunderRaikouIcon(): Draw {
-  const bolt = (x: number, y: number, x0: number, top: number, seed: number): string | null => {
-    if (y < top || y > 27) return null;
-    const t = (y - top) / (27 - top);
-    const cx = x0 + Math.sin(t * 9 + seed) * 2.2;
-    const d = Math.abs(x - cx);
-    if (d < 0.7) return '#ffffff';
-    if (d < 1.6) return '#ffd600';
-    return null;
-  };
+/** じゅうでん（ライコウの版。07 の310章）: まわりから集まる 6 本の短い稲妻と、真ん中にたまった電気の玉 */
+function chargeRaikouIcon(): Draw {
   return paint((x, y) => {
-    // 雲（上）
-    const top = 4 + Math.abs(Math.sin(x * 0.55)) * 2.5;
-    if (y >= top && y < 12 && x > 3 && x < 29) return y < top + 1.5 ? '#9fa4cc' : y < 9 ? '#575a8c' : '#2b2a52';
-    const b = bolt(x, y, 12, 12, 0) ?? bolt(x, y, 21, 12, 2);
-    if (b) return b;
-    if (y > 26 && y < 29 && (Math.abs(x - 12) < 4 || Math.abs(x - 21) < 4)) return '#fff176';
+    const dx = x - 16;
+    const dy = y - 16;
+    const r = Math.hypot(dx, dy);
+    if (r < 3.2) return '#ffffff';
+    if (r < 5.4) return (Math.floor(x) + Math.floor(y)) % 3 === 0 ? '#fff59d' : '#ffd600';
+    if (r > 8 && r < 14.5) {
+      const a = Math.atan2(dy, dx);
+      const k = Math.round((a / (Math.PI * 2)) * 6);
+      // 外から内へ、少し折れながら集まる稲妻
+      const off = (a - (k / 6) * Math.PI * 2) * r - Math.sin(r * 1.3) * 1.1;
+      if (Math.abs(off) < 0.7) return '#ffffff';
+      if (Math.abs(off) < 1.6) return '#ffd600';
+    }
     return null;
+  });
+}
+
+/** ライジングボルト（ライコウの版。07 の310章）: 地面の光る輪から立ちのぼる雷の柱と、横へ散る火花 */
+function risingVoltageRaikouIcon(): Draw {
+  return paint((x, y) => {
+    // 地面の輪
+    const ex = (x - 16) / 13;
+    const ey = (y - 26) / 3.6;
+    const er = Math.hypot(ex, ey);
+    if (er < 1 && er > 0.62) return y < 26 ? '#fff176' : '#f9a825';
+    // 柱: 下が太く、上へ細くなりながら折れる
+    if (y >= 2 && y <= 26) {
+      const t = (26 - y) / 24;
+      const cx = 16 + Math.sin(t * 11) * 1.6 * t;
+      const w = 3.6 - t * 2.4;
+      const d = Math.abs(x - cx);
+      if (d < w * 0.45) return '#ffffff';
+      if (d < w) return '#ffd600';
+    }
+    // 散る火花
+    for (const [sx, sy, ex2, ey2] of [[11, 22, 4, 17], [21, 22, 28, 16], [12, 15, 6, 10]] as const) {
+      const l2 = (ex2 - sx) ** 2 + (ey2 - sy) ** 2;
+      const t = Math.max(0, Math.min(1, ((x - sx) * (ex2 - sx) + (y - sy) * (ey2 - sy)) / l2));
+      if (Math.hypot(x - (sx + (ex2 - sx) * t), y - (sy + (ey2 - sy) * t)) < 0.7) return '#fff59d';
+    }
+    return null;
+  });
+}
+
+/** エレキフィールド（ライコウの版。07 の310章）: 電気が走る地面の広がりと、立つ火花 */
+function electricTerrainRaikouIcon(): Draw {
+  return paint((x, y) => {
+    const ex = (x - 16) / 15;
+    const ey = (y - 20) / 9;
+    const er = Math.hypot(ex, ey);
+    if (er > 1) {
+      // 地面から立つ小さな火花
+      for (const [sx, sy] of [[8, 6], [23, 4], [16, 9]] as const) if (Math.abs(x - sx) + Math.abs(y - sy) < 1.8 && (x + y) % 2 === 0) return '#fff59d';
+      return null;
+    }
+    if (er > 0.9) return '#fbc02d';
+    // 地面を走る稲妻の筋
+    const line1 = Math.abs(y - 20 - Math.sin(x * 0.9) * 2.2);
+    const line2 = Math.abs(x - 16 - Math.sin(y * 1.2) * 2);
+    if (line1 < 0.6 || line2 < 0.6) return '#ffffff';
+    if (line1 < 1.4 || line2 < 1.4) return '#ffd600';
+    return (Math.floor(x) * 3 + Math.floor(y)) % 5 === 0 ? '#f9a825' : '#a67c00';
   });
 }
 
@@ -798,7 +844,9 @@ const ICONS: Record<string, Layer[]> = {
   'mirror-coat-suicune': [mirrorCoatSuicuneIcon()],
   'sheer-cold-suicune': [sheerColdSuicuneIcon()],
   'calm-mind': [calmMindIcon()],
-  'thunder-raikou': [thunderRaikouIcon()],
+  'charge-raikou': [chargeRaikouIcon()],
+  'rising-voltage-raikou': [risingVoltageRaikouIcon()],
+  'electric-terrain-raikou': [electricTerrainRaikouIcon()],
   'extreme-speed-raikou': [extremeSpeedRaikouIcon()],
   // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
   sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],

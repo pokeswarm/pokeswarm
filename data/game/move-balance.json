@@ -19,6 +19,9 @@
   },
   "exempt": [
     "extreme-speed-raikou",
+    "electric-terrain-raikou",
+    "rising-voltage-raikou",
+    "charge-raikou",
     "surf-suicune",
     "mirror-coat-suicune",
     "sheer-cold-suicune",
@@ -146,7 +149,6 @@
   },
   "strengthScale": {
     "psystrike": 1.7,
-    "thunder-raikou": 1.6,
     "future-sight-celebi": 2.2,
     "leaf-storm-celebi": 3.6,
     "flare-blitz": 0.3,

@@ -935,6 +935,19 @@
     "contestType": null,
     "damageClass": "special"
   },
+  "electric-terrain": {
+    "names": {
+      "ja": "エレキフィールド",
+      "en": "Electric Terrain",
+      "fr": "Champ Électrifié",
+      "de": "Elektrofeld",
+      "es": "Campo Eléctrico",
+      "it": "Campo Elettrico"
+    },
+    "type": "electric",
+    "contestType": null,
+    "damageClass": "status"
+  },
   "ember": {
     "names": {
       "ja": "ひのこ",
@@ -2494,6 +2507,19 @@
     "type": "fighting",
     "contestType": "tough",
     "damageClass": "physical"
+  },
+  "rising-voltage": {
+    "names": {
+      "ja": "ライジングボルト",
+      "en": "Rising Voltage",
+      "fr": "Monte-Tension",
+      "de": "Hochspannung",
+      "es": "Alto Voltaje",
+      "it": "Elettroimpennata"
+    },
+    "type": "electric",
+    "contestType": null,
+    "damageClass": "special"
   },
   "roar": {
     "names": {

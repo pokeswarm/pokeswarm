@@ -2872,7 +2872,39 @@
         }
       }
     },
-    "thunder-raikou": {
+    "charge-raikou": {
+      "extends": "electric.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      }
+    },
+    "rising-voltage-raikou": {
+      "extends": "electric.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      }
+    },
+    "electric-terrain-raikou": {
       "extends": "electric.base",
       "hideShape": true,
       "projectile": {

@@ -7,8 +7,8 @@ import { moveIcons, movesConfig } from './index';
  */
 describe('技のアイコン', () => {
   it('すべての技の名前に絵がある', () => {
-    const names = new Set(Object.entries(movesConfig.moves).map(([key, def]) => def.nameOf ?? key));
-    const missing = [...names].filter((n) => !moveIcons.icons[n]);
+    // 技のキーの絵があればそれ（名前を借りる技でも自分の絵を持てる。セレビィ・ライコウ）、無ければ名前（nameOf）の絵
+    const missing = [...new Set(Object.entries(movesConfig.moves).filter(([key, def]) => !moveIcons.icons[key] && !moveIcons.icons[def.nameOf ?? key]).map(([key, def]) => def.nameOf ?? key))];
     expect(missing, `アイコンの絵が無い技（npm run move-icons を回す。止まったら ICONS に描く）: ${missing.join(', ')}`).toEqual([]);
   });
 

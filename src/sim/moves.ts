@@ -161,6 +161,8 @@ export interface SimMoveDef {
   readonly stopOnTarget?: boolean;
   /** めいそう: 重ねるとくしゅの威力（07 の307章） */
   readonly calmMind?: { readonly specialPowerPct: number; readonly maxStacks: number };
+  /** びりびり（エレキフィールド。07 の310章） */
+  readonly shockStack?: { readonly maxStacks: number; readonly seconds: number };
   /** HP が最大の thresholdPct % 以下の敵へのダメージを +powerPct %（しおみず。07 の247章） */
   readonly lowHpBonus?: { readonly thresholdPct: number; readonly powerPct: number };
   /** 続けて当てるほど強くなる（エコーボイス。07 の240章） */

@@ -55,7 +55,7 @@ export interface SimAbility {
 /** アクティブスキルの定義（data/game/active-skills.json を番号に直したもの。07 の305章） */
 export interface SimActiveSkill {
   readonly key: string;
-  readonly kind: 'teleport' | 'surf' | 'mirrorCoat' | 'sheerCold' | 'extremeSpeed';
+  readonly kind: 'teleport' | 'surf' | 'mirrorCoat' | 'sheerCold' | 'extremeSpeed' | 'charge' | 'risingVoltage';
   /** 技の枠の技の番号（無ければ -1。あればレベル・再使用・威力はその技の値。07 の307章） */
   readonly move: number;
   readonly trigger: 'press' | 'release';
@@ -68,6 +68,8 @@ export interface SimActiveSkill {
   readonly surf?: { readonly rideSeconds: number; readonly waterSeconds: number; readonly waterSpacing: number; readonly waterRows: number; readonly waterPowerPct: number };
   readonly mirror?: { readonly shardsPerHit: number; readonly maxShards: number; readonly absorbPowerPct: number; readonly shardSpeed: number };
   readonly sheerCold?: { readonly comboMultiplier: number; readonly freezeDelaySeconds: number };
+  readonly charge?: { readonly powerPct: number; readonly powerPctPerLevel: number; readonly maxStacks: number };
+  readonly risingVoltage?: { readonly comboMultiplier: number; readonly delaySeconds: number; readonly comboDelaySeconds: number; readonly comboSizeMultiplier: number; readonly maxTargets: number };
 }
 
 export interface SimRules {

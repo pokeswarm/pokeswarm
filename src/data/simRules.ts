@@ -121,6 +121,7 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.stopOnBoss ? { stopOnBoss: true } : {}),
       ...(def.stopOnTarget ? { stopOnTarget: true } : {}),
       ...(def.calmMind ? { calmMind: def.calmMind } : {}),
+      ...(def.shockStack ? { shockStack: def.shockStack } : {}),
       ...(def.lowHpBonus ? { lowHpBonus: def.lowHpBonus } : {}),
       ...(def.echo ? { echo: def.echo } : {}),
       aimFacing: def.aimFacing,

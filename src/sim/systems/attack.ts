@@ -251,6 +251,11 @@ function aim(world: World, p: Player, range: number): [number, number] {
 }
 
 /** 届く範囲で HP の一番高い敵の番号。いなければ -1（同じ HP なら先に見つかった方） */
+/** HP の一番高い敵（スキルの狙いを見せるため。07 の310章） */
+export function strongestEnemyIndex(world: World, p: Player, range: number): number {
+  return strongestEnemy(world, p, range);
+}
+
 function strongestEnemy(world: World, p: Player, range: number): number {
   const e = world.enemies;
   let best = -1;
@@ -2094,6 +2099,12 @@ export function moveProjectiles(world: World): void {
         e.markDamage[j] = e.markDamage[j]! + pr.damage[i]! * def.delayedBlast.powerMultiplier;
         e.markSize[j] = Math.max(e.markSize[j]!, pr.radius[i]! * def.delayedBlast.sizeMultiplier);
       }
+      // びりびり（エレキフィールド。07 の310章）: 当たるたびに 1 つ重ねる。見た目とコンボの相手がそろうように、どのブラウザでも数える
+      if (def.shockStack) {
+        e.shock[j] = Math.min(def.shockStack.maxStacks, e.shock[j]! + 1);
+        e.shockTicks[j] = Math.max(1, Math.round(def.shockStack.seconds / world.dt));
+        e.shockBy[j] = ownerId;
+      }
       if (pr.stage[i] === 0 && !pr.noFx[i] && def.effects.some((fx) => fx.trigger === 'eachHit')) fireEffects(world, 'eachHit', fxSourceOf(world, i, e.x[j]!, e.y[j]!));
       // ころがる: 当たるたびに大きくなる（どのブラウザでも同じように）
       if (def.growOnHit) pr.radius[i] = Math.min(st.size * def.growOnHit.maxMultiplier, pr.radius[i]! + st.size * def.growOnHit.perHit);
@@ -2266,6 +2277,8 @@ function perishKill(world: World, i: number): void {
 /** 遅れて爆発する印（みらいよち）の時間を進め、時間が来たら、その敵の位置で付けたプレイヤーの技として爆発させる */
 export function tickMarks(world: World): void {
   const e = world.enemies;
+  // びりびり: 当たらないまま時間が経つと消える
+  for (let i = 0; i < e.count; i++) if (e.shockTicks[i]! > 0 && --e.shockTicks[i]! === 0) e.shock[i] = 0;
   for (let i = 0; i < e.count; i++) {
     if (e.markTicks[i] === 0) continue;
     if (--e.markTicks[i]! > 0 || e.hp[i]! <= 0) continue;
@@ -2572,8 +2585,9 @@ export function calmPowerPct(world: World, p: Player): number {
 }
 
 /**
- * しんそく（ライコウ。07 の309章）の稲妻の折れ線: 自分から向き (dirX, dirY) へ、全部で range の長さ。角は count 個まで、
- * 前の扇（±60°）の中の近い敵から順に（いなければ左右に折れる稲妻の形）。固定マップの中に収める
+ * しんそく（ライコウ。07 の309・310章）の稲妻の折れ線: 自分から向き (dirX, dirY) へ、全部で range の長さ。
+ * 1 つ目の角は前の扇（±60°）の中の一番近い敵（いなければ前へ少し右）。そこから左右に交互に折れて稲妻の形に抜けていく
+ * （折れる先の近くに敵がいれば、その敵を角にする）。角は count 個まで。固定マップの中に収める
  */
 export function extremeSpeedPath(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number): { x: number; y: number }[] {
   const { st } = skillMoveStats(world, p, pm);
@@ -2581,36 +2595,57 @@ export function extremeSpeedPath(world: World, p: Player, pm: PlayerMove, dirX: 
   const pts = [{ x: p.x, y: p.y }];
   const e = world.enemies;
   const used = new Set<number>();
+  const heading = Math.atan2(dirY, dirX);
   let left = st.range;
   let cx = p.x;
   let cy = p.y;
-  for (let k = 0; k < corners && left > 40; k++) {
-    // 前の扇の中で、まだ角にしていない一番近い敵
+  // 1 つ目: 前の扇の中の一番近い敵
+  let first = -1;
+  let firstD = Infinity;
+  for (const i of enemiesInRange(world, cx, cy, st.range * 0.6)) {
+    if (e.hp[i]! <= 0) continue;
+    const dx = e.x[i]! - cx;
+    const dy = e.y[i]! - cy;
+    const d = Math.hypot(dx, dy);
+    if (d < 30 || (dx * dirX + dy * dirY) / d < 0.5) continue;
+    if (d < firstD) {
+      first = i;
+      firstD = d;
+    }
+  }
+  // 1 つ目の敵が向きより右にいれば、次は左へ折れる（交互）
+  let side = 1;
+  if (first !== -1) {
+    used.add(first);
+    const nx = e.x[first]!;
+    const ny = e.y[first]!;
+    side = (nx - cx) * -dirY + (ny - cy) * dirX > 0 ? -1 : 1;
+    left -= Math.hypot(nx - cx, ny - cy);
+    cx = nx;
+    cy = ny;
+    pts.push({ x: cx, y: cy });
+  }
+  for (let k = pts.length - 1; k < corners && left > 40; k++) {
+    const seg = Math.min(left / (corners - k + 0.6), 150);
+    const a = heading + side * 0.65;
+    side = -side;
+    let nx = cx + Math.cos(a) * seg;
+    let ny = cy + Math.sin(a) * seg;
+    // 折れる先の近く（半径 70）に敵がいれば、その敵を角にする
     let best = -1;
-    let bestD = Infinity;
-    for (const i of enemiesInRange(world, cx, cy, left)) {
+    let bestD = 70;
+    for (const i of enemiesInRange(world, nx, ny, 70)) {
       if (used.has(i) || e.hp[i]! <= 0) continue;
-      const dx = e.x[i]! - cx;
-      const dy = e.y[i]! - cy;
-      const d = Math.hypot(dx, dy);
-      if (d < 30 || (dx * dirX + dy * dirY) / d < 0.5) continue;
-      if (d < bestD) {
+      const d = Math.hypot(e.x[i]! - nx, e.y[i]! - ny);
+      if (d < bestD && (e.x[i]! - cx) * dirX + (e.y[i]! - cy) * dirY > 20) {
         best = i;
         bestD = d;
       }
     }
-    let nx: number;
-    let ny: number;
     if (best !== -1) {
       used.add(best);
       nx = e.x[best]!;
       ny = e.y[best]!;
-    } else {
-      // 敵がいなければ、左右に 35° ずつ折れる稲妻の形
-      const a = Math.atan2(dirY, dirX) + (k % 2 === 0 ? 0.6 : -0.6);
-      const seg = left / (corners - k + 1);
-      nx = cx + Math.cos(a) * seg;
-      ny = cy + Math.sin(a) * seg;
     }
     left -= Math.hypot(nx - cx, ny - cy);
     cx = nx;
@@ -2619,10 +2654,10 @@ export function extremeSpeedPath(world: World, p: Player, pm: PlayerMove, dirX: 
   }
   // 最後の角から、残りの長さだけ向きへ駆け抜ける
   if (left > 20) pts.push({ x: cx + dirX * Math.min(left, 160), y: cy + dirY * Math.min(left, 160) });
-  const a = world.arena;
-  if (a) for (const q of pts) {
-    q.x = Math.max(a.x - a.halfWidth + p.radius, Math.min(a.x + a.halfWidth - p.radius, q.x));
-    q.y = Math.max(a.y - a.halfHeight + p.radius, Math.min(a.y + a.halfHeight - p.radius, q.y));
+  const ar = world.arena;
+  if (ar) for (const q of pts) {
+    q.x = Math.max(ar.x - ar.halfWidth + p.radius, Math.min(ar.x + ar.halfWidth - p.radius, q.x));
+    q.y = Math.max(ar.y - ar.halfHeight + p.radius, Math.min(ar.y + ar.halfHeight - p.radius, q.y));
   }
   return pts;
 }
@@ -2641,4 +2676,50 @@ export function fireExtremeSpeed(world: World, p: Player, pm: PlayerMove, dirX: 
     world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: a.x, y: a.y, shape: SHAPE_LINE, length: len, dirX: (b.x - a.x) / len, dirY: (b.y - a.y) / len, group });
   }
   return pts;
+}
+
+/** びりびりを重ねきった数（エレキフィールドの maxStacks。無ければ 0） */
+export function shockFull(world: World): number {
+  for (const m of world.rules.moves) if (m.shockStack) return m.shockStack.maxStacks;
+  return 0;
+}
+
+/** ライジングボルト（ライコウ。07 の310章）: 射程の中の、びりびりを重ねきった自分の相手（HP の高い順に max 体まで） */
+export function risingVoltageTargets(world: World, p: Player, pm: PlayerMove, max: number): number[] {
+  const { st } = skillMoveStats(world, p, pm);
+  const e = world.enemies;
+  const out: number[] = [];
+  const full = shockFull(world);
+  if (full <= 0) return out;
+  for (const i of enemiesInRange(world, p.x, p.y, st.range)) {
+    if (e.hp[i]! > 0 && e.shockBy[i] === p.id && e.shock[i]! >= full) out.push(i);
+  }
+  out.sort((a, b) => e.hp[b]! - e.hp[a]! || e.id[a]! - e.id[b]!);
+  return out.slice(0, max);
+}
+
+/**
+ * ライジングボルト: 重ねきった相手がいればその全員の足元からコンボの雷の柱（同じ技の stage 1。重ねは消える）、
+ * いなければ HP の一番高い敵（いなければ前）の足元から雷の柱（stage 0）。じゅうでん の分だけ強くなり、使い切る（1 回で同じ敵には 1 回）。
+ * 返り値: コンボの相手の数
+ */
+export function fireRisingVoltage(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { comboMultiplier: number; delaySeconds: number; comboDelaySeconds: number; comboSizeMultiplier: number; maxTargets: number }): number {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const charge = 1 + (p.charged?.pct ?? 0) / 100;
+  p.charged = undefined;
+  const group = newCastGroup(world, cfg.comboDelaySeconds + st.durationSeconds);
+  const b0 = base(world, p, pm, st);
+  const e = world.enemies;
+  const combo = risingVoltageTargets(world, p, pm, cfg.maxTargets);
+  for (const [k, i] of combo.entries()) {
+    e.shock[i] = 0;
+    e.shockTicks[i] = 0;
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]!, radius: sc.size * cfg.comboSizeMultiplier, damage: sc.power * cfg.comboMultiplier * charge, group, life: cfg.comboDelaySeconds + k * 0.04, stage: 3, armStage: 1, armLife: st.durationSeconds });
+  }
+  if (combo.length > 0) return combo.length;
+  const t = strongestEnemy(world, p, st.range);
+  const x = t !== -1 ? e.x[t]! : p.x + dirX * st.range * 0.4;
+  const y = t !== -1 ? e.y[t]! : p.y + dirY * st.range * 0.4;
+  world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x, y, damage: sc.power * charge, group, life: cfg.delaySeconds, stage: 3, armStage: 0, armLife: st.durationSeconds });
+  return 0;
 }

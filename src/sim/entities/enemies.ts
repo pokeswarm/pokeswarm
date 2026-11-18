@@ -57,6 +57,10 @@ export class EnemyStore {
   readonly markSize: Float64Array;
   readonly markMove: Int16Array;
   readonly markBy: Uint16Array;
+  /** びりびり（エレキフィールド。07 の310章）: 重ねた数・消えるまでの残りの更新回数・重ねたプレイヤー。どのブラウザでも同じように数える */
+  readonly shock: Uint8Array;
+  readonly shockTicks: Uint16Array;
+  readonly shockBy: Uint16Array;
 
   constructor(
     readonly capacity: number,
@@ -95,6 +99,9 @@ export class EnemyStore {
     this.markSize = new Float64Array(capacity);
     this.markMove = new Int16Array(capacity);
     this.markBy = new Uint16Array(capacity);
+    this.shock = new Uint8Array(capacity);
+    this.shockTicks = new Uint16Array(capacity);
+    this.shockBy = new Uint16Array(capacity);
   }
 
   /** 追加して index を返す。満杯なら -1 */
@@ -121,6 +128,8 @@ export class EnemyStore {
     this.statusTicks.fill(0, i * this.statusCount, (i + 1) * this.statusCount);
     this.ghostTicks[i] = 0;
     this.markTicks[i] = 0;
+    this.shock[i] = 0;
+    this.shockTicks[i] = 0;
     return i;
   }
 
@@ -165,6 +174,9 @@ export class EnemyStore {
     this.markSize[i] = this.markSize[last]!;
     this.markMove[i] = this.markMove[last]!;
     this.markBy[i] = this.markBy[last]!;
+    this.shock[i] = this.shock[last]!;
+    this.shockTicks[i] = this.shockTicks[last]!;
+    this.shockBy[i] = this.shockBy[last]!;
     const n = this.statusCount;
     this.statusTicks.copyWithin(i * n, last * n, (last + 1) * n);
     this.statusBy.copyWithin(i * n, last * n, (last + 1) * n);

@@ -1,7 +1,7 @@
 import type { Player, PlayerMove } from './entities/player';
 import type { SimActiveSkill } from './rules';
 import type { World } from './world';
-import { extremeSpeedPath, fireExtremeSpeed, fireMirrorShards, fireSheerCold, fireSurfWave, scaledMoveStats, skillMoveStats } from './systems/attack';
+import { extremeSpeedPath, fireExtremeSpeed, fireMirrorShards, fireRisingVoltage, fireSheerCold, fireSurfWave, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
 
 /**
  * アクティブスキル（作者の案 2026年11月18日。07 の305・307章）: キー（SPACE・Q・E）で使う技。
@@ -107,6 +107,28 @@ export function extremeSpeedPreview(world: World, p: Player, skill: number): { x
   return extremeSpeedPath(world, p, pm, dx, dy);
 }
 
+/**
+ * ライジングボルトの狙い（押している間に見せる）: コンボの相手（重ねきった敵）の位置。いなければ HP の一番高い敵の位置 1 つ（combo: false）
+ */
+export function risingVoltagePreview(world: World, p: Player, skill: number): { combo: boolean; spots: { x: number; y: number }[] } | null {
+  const pm = skillMove(world, p, { skill });
+  const cfg = skillDef(world, skill).risingVoltage;
+  if (!pm || !cfg) return null;
+  const e = world.enemies;
+  const combo = risingVoltageTargets(world, p, pm, cfg.maxTargets);
+  if (combo.length > 0) return { combo: true, spots: combo.map((i) => ({ x: e.x[i]!, y: e.y[i]! })) };
+  const t = strongestEnemyIndex(world, p, skillMoveStats(world, p, pm).st.range);
+  return { combo: false, spots: t !== -1 ? [{ x: e.x[t]!, y: e.y[t]! }] : [] };
+}
+
+/** じゅうでん の 1 つ分の威力（%） */
+export function chargePct(world: World, p: Player, skill: number): number {
+  const d = skillDef(world, skill);
+  const pm = skillMove(world, p, { skill });
+  if (!d.charge) return 0;
+  return d.charge.powerPct + ((pm?.level ?? 1) - 1) * d.charge.powerPctPerLevel;
+}
+
 /** 今スキルを使えるか（回数があり、動ける状態） */
 export function canUseSkill(p: Player, slot: number): boolean {
   const s = p.skills?.[slot];
@@ -129,7 +151,7 @@ export function useSkill(world: World, p: Player, slot: number): void {
   const fromX = p.x;
   const fromY = p.y;
   runSkill(world, p, d, pm, dx, dy);
-  world.events.push({ type: 'skillUsed', playerId: p.id, skill: s.skill, slot, fromX, fromY, toX: p.x, toY: p.y, dirX: dx, dirY: dy, stacks: p.skillBuff?.stacks ?? 0 });
+  world.events.push({ type: 'skillUsed', playerId: p.id, skill: s.skill, slot, fromX, fromY, toX: p.x, toY: p.y, dirX: dx, dirY: dy, stacks: p.skillBuff?.stacks ?? p.charged?.stacks ?? 0 });
 }
 
 /** スキルの中身（自分のブラウザ: 当たりも効き目も。ほかのブラウザ: 見た目だけ。当たりは当てた人のブラウザで決まる） */
@@ -175,6 +197,19 @@ function runSkill(world: World, p: Player, d: SimActiveSkill, pm: PlayerMove | u
         p.x = p.prevX = end.x;
         p.y = p.prevY = end.y;
       }
+      return;
+    }
+    case 'charge': {
+      if (!d.charge) return;
+      // じゅうでん: 次の ライジングボルト の威力を 1 つ分上げる（重ねられる）
+      const pct = chargePct(world, p, world.rules.activeSkills!.defs.indexOf(d));
+      const stacks = Math.min(d.charge.maxStacks, (p.charged?.stacks ?? 0) + 1);
+      p.charged = { stacks, pct: stacks * pct };
+      return;
+    }
+    case 'risingVoltage': {
+      if (!pm || !d.risingVoltage) return;
+      fireRisingVoltage(world, p, pm, dx, dy, d.risingVoltage);
       return;
     }
     case 'mirrorCoat': {

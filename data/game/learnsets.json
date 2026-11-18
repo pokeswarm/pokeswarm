@@ -1466,14 +1466,10 @@
       "dual-wingbeat"
     ],
     "raikou": [
-      "thunder-shock",
       "extreme-speed-raikou",
-      "bite",
-      "spark",
-      "thunderbolt",
-      "thunder-raikou",
-      "crunch",
-      "wild-charge"
+      "charge-raikou",
+      "rising-voltage-raikou",
+      "electric-terrain-raikou"
     ],
     "entei": [
       "ember",

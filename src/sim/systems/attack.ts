@@ -2099,12 +2099,6 @@ export function moveProjectiles(world: World): void {
         e.markDamage[j] = e.markDamage[j]! + pr.damage[i]! * def.delayedBlast.powerMultiplier;
         e.markSize[j] = Math.max(e.markSize[j]!, pr.radius[i]! * def.delayedBlast.sizeMultiplier);
       }
-      // びりびり（エレキフィールド。07 の310章）: 当たるたびに 1 つ重ねる。見た目とコンボの相手がそろうように、どのブラウザでも数える
-      if (def.shockStack) {
-        e.shock[j] = Math.min(def.shockStack.maxStacks, e.shock[j]! + 1);
-        e.shockTicks[j] = Math.max(1, Math.round(def.shockStack.seconds / world.dt));
-        e.shockBy[j] = ownerId;
-      }
       if (pr.stage[i] === 0 && !pr.noFx[i] && def.effects.some((fx) => fx.trigger === 'eachHit')) fireEffects(world, 'eachHit', fxSourceOf(world, i, e.x[j]!, e.y[j]!));
       // ころがる: 当たるたびに大きくなる（どのブラウザでも同じように）
       if (def.growOnHit) pr.radius[i] = Math.min(st.size * def.growOnHit.maxMultiplier, pr.radius[i]! + st.size * def.growOnHit.perHit);
@@ -2277,8 +2271,9 @@ function perishKill(world: World, i: number): void {
 /** 遅れて爆発する印（みらいよち）の時間を進め、時間が来たら、その敵の位置で付けたプレイヤーの技として爆発させる */
 export function tickMarks(world: World): void {
   const e = world.enemies;
-  // びりびり: 当たらないまま時間が経つと消える
+  // びりびり: 当たらないまま時間が経つと消える。エレキフィールドの中で重なる
   for (let i = 0; i < e.count; i++) if (e.shockTicks[i]! > 0 && --e.shockTicks[i]! === 0) e.shock[i] = 0;
+  stepElectricField(world);
   for (let i = 0; i < e.count; i++) {
     if (e.markTicks[i] === 0) continue;
     if (--e.markTicks[i]! > 0 || e.hp[i]! <= 0) continue;
@@ -2662,20 +2657,56 @@ export function extremeSpeedPath(world: World, p: Player, pm: PlayerMove, dirX: 
   return pts;
 }
 
-/** しんそく: 折れ線の区間ごとに線の当たり判定を出す（1 回で同じ敵には 1 回）。返り値は折れ線 */
-export function fireExtremeSpeed(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number): { x: number; y: number }[] {
-  const { st } = skillMoveStats(world, p, pm);
+/**
+ * しんそく: 折れ線を作り、自分に付いて動く当たり（1 回で同じ敵には 1 回）を出す。体は折れ線に沿って駆け抜ける（activeSkills の stepSkills が進める。07 の311章）。
+ * 返り値は折れ線と、駆け抜けにかかる秒数
+ */
+export function fireExtremeSpeed(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number): { pts: { x: number; y: number }[]; seconds: number; speed: number } {
+  const { st, sc } = skillMoveStats(world, p, pm);
   const pts = extremeSpeedPath(world, p, pm, dirX, dirY);
-  const group = newCastGroup(world, st.durationSeconds);
-  const b0 = base(world, p, pm, st);
-  for (let k = 1; k < pts.length; k++) {
-    const a = pts[k - 1]!;
-    const b = pts[k]!;
-    const len = Math.hypot(b.x - a.x, b.y - a.y);
-    if (len < 1) continue;
-    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: a.x, y: a.y, shape: SHAPE_LINE, length: len, dirX: (b.x - a.x) / len, dirY: (b.y - a.y) / len, group });
+  let len = 0;
+  for (let k = 1; k < pts.length; k++) len += Math.hypot(pts[k]!.x - pts[k - 1]!.x, pts[k]!.y - pts[k - 1]!.y);
+  const speed = Math.max(1, sc.speed);
+  const seconds = len / speed + world.dt * 2;
+  const group = newCastGroup(world, seconds);
+  world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, ox: 0, oy: 0, life: seconds, group });
+  return { pts, seconds, speed };
+}
+
+/**
+ * エレキフィールド（ライコウ。07 の311章）: いつも、自分の足元の楕円（横の半径 = 技の size、縦はその半分。見えている地面と同じ）の中の敵に、
+ * hitIntervalSeconds ごとに びりびり を 1 つ重ねる（ダメージは無い）。どのブラウザでも同じように数える
+ */
+function stepElectricField(world: World): void {
+  const e = world.enemies;
+  for (const p of world.players) {
+    if (p.down) continue;
+    for (const pm of p.moves) {
+      const def = world.rules.moves[pm.move];
+      if (!def?.shockStack) continue;
+      const st = moveStatsOf(world, pm);
+      const every = Math.max(1, Math.round(st.hitIntervalSeconds / world.dt));
+      if (world.tick % every !== 0) continue;
+      const rx = st.size;
+      const ry = st.size * 0.5;
+      const keep = Math.max(1, Math.round(def.shockStack.seconds / world.dt));
+      for (const i of enemiesInRange(world, p.x, p.y, rx + 40)) {
+        if (e.hp[i]! <= 0) continue;
+        const dx = (e.x[i]! - p.x) / (rx + e.radius[i]! * 0.5);
+        const dy = (e.y[i]! - p.y) / (ry + e.radius[i]! * 0.5);
+        if (dx * dx + dy * dy > 1) continue;
+        e.shock[i] = Math.min(def.shockStack.maxStacks, e.shock[i]! + 1);
+        e.shockTicks[i] = keep;
+        e.shockBy[i] = p.id;
+      }
+    }
   }
-  return pts;
+}
+
+/** エレキフィールドの楕円の横の半径（持っていなければ 0。絵で使う） */
+export function electricFieldRadius(world: World, p: Player): number {
+  for (const pm of p.moves) if (world.rules.moves[pm.move]?.shockStack) return moveStatsOf(world, pm).size;
+  return 0;
 }
 
 /** びりびりを重ねきった数（エレキフィールドの maxStacks。無ければ 0） */
@@ -2711,10 +2742,11 @@ export function fireRisingVoltage(world: World, p: Player, pm: PlayerMove, dirX:
   const b0 = base(world, p, pm, st);
   const e = world.enemies;
   const combo = risingVoltageTargets(world, p, pm, cfg.maxTargets);
-  for (const [k, i] of combo.entries()) {
+  // 全員に同時に落とす（ずらすと、着いた瞬間の反転の光が続けて点滅して見える）
+  for (const i of combo) {
     e.shock[i] = 0;
     e.shockTicks[i] = 0;
-    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]!, radius: sc.size * cfg.comboSizeMultiplier, damage: sc.power * cfg.comboMultiplier * charge, group, life: cfg.comboDelaySeconds + k * 0.04, stage: 3, armStage: 1, armLife: st.durationSeconds });
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]!, radius: sc.size * cfg.comboSizeMultiplier, damage: sc.power * cfg.comboMultiplier * charge, group, life: cfg.comboDelaySeconds, stage: 3, armStage: 1, armLife: st.durationSeconds });
   }
   if (combo.length > 0) return combo.length;
   const t = strongestEnemy(world, p, st.range);

@@ -45,9 +45,49 @@ export function rechargeTicksOf(world: World, p: Player, s: { skill: number }): 
   return Math.max(1, Math.round(seconds / world.dt));
 }
 
-/** 毎回の更新: 回数を時間で戻す・強化の切れ目・ミラーコートの終わり */
+/**
+ * しんそく で駆け抜けている間（毎回の更新）: 折れ線に沿って速さ × 1 回分だけ進める（角をまたいでも止まらない）。
+ * 体が動く技の間（dashTicks）は入力で動けない。終点に着いたら止まる
+ */
+function advanceExtremeSpeed(world: World, p: Player): void {
+  const d = p.esDash!;
+  let budget = d.speed * world.dt;
+  p.dashVx = 0;
+  p.dashVy = 0;
+  while (budget > 0) {
+    const q = d.pts[d.k];
+    if (!q) break;
+    const dx = q.x - p.x;
+    const dy = q.y - p.y;
+    const dist = Math.hypot(dx, dy);
+    // 向き（8 方向）も進む方へ
+    if (dist > 0.5) {
+      p.facingX = dx / dist > 0.38 ? 1 : dx / dist < -0.38 ? -1 : 0;
+      p.facingY = dy / dist > 0.38 ? 1 : dy / dist < -0.38 ? -1 : 0;
+    }
+    if (dist <= budget) {
+      p.x = q.x;
+      p.y = q.y;
+      budget -= dist;
+      d.k++;
+      continue;
+    }
+    p.x += (dx / dist) * budget;
+    p.y += (dy / dist) * budget;
+    budget = 0;
+  }
+  if (!d.pts[d.k]) {
+    p.esDash = undefined;
+    p.dashTicks = 0;
+  }
+}
+
+/** 毎回の更新: 回数を時間で戻す・強化の切れ目・ミラーコートの終わり・しんそく の駆け抜け */
 export function stepSkills(world: World): void {
   for (const p of world.players) {
+    // 止められた（押し飛ばし など）ら、駆け抜けもやめる
+    if (p.esDash && !p.dashTicks) p.esDash = undefined;
+    if (p.esDash) advanceExtremeSpeed(world, p);
     if (p.skillBuff && world.tick >= p.skillBuff.untilTick) p.skillBuff = undefined;
     if (p.calm && world.tick >= p.calm.untilTick) p.calm = undefined;
     if (p.mirror && world.tick >= p.mirror.untilTick) releaseMirror(world, p);
@@ -190,12 +230,14 @@ function runSkill(world: World, p: Player, d: SimActiveSkill, pm: PlayerMove | u
     }
     case 'extremeSpeed': {
       if (!pm) return;
-      const pts = fireExtremeSpeed(world, p, pm, dx, dy);
-      // 自分は折れ線の終点へ（ほかのブラウザのプレイヤーは位置で届く）
-      if (!p.remote) {
-        const end = pts[pts.length - 1]!;
-        p.x = p.prevX = end.x;
-        p.y = p.prevY = end.y;
+      const run = fireExtremeSpeed(world, p, pm, dx, dy);
+      // 自分は折れ線に沿って駆け抜ける（体が動く技と同じ。入力では動けない。ほかのブラウザのプレイヤーは位置で届く）
+      if (!p.remote && run.pts.length > 1) {
+        p.esDash = { pts: run.pts, k: 1, speed: run.speed };
+        p.dashTicks = Math.ceil(run.seconds / world.dt) + 1;
+        p.dashBusyTicks = p.dashTicks;
+        p.dashVx = 0;
+        p.dashVy = 0;
       }
       return;
     }

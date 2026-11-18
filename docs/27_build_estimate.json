@@ -15937,25 +15937,25 @@
       {
        "form": "raikou",
        "scene": "boss",
-       "est": 8171.5808575124975,
+       "est": 6266.283395292673,
        "moves": [
         {
          "move": "rising-voltage-raikou",
          "level": 12,
-         "est": 3647.4147152772816
+         "est": 4439.2920362557215
         },
         {
          "move": "extreme-speed-raikou",
          "level": 12,
-         "est": 980.3368325976443
-        },
-        {
-         "move": "electric-terrain-raikou",
-         "level": 12,
-         "est": 3543.829309637572
+         "est": 1826.9913590369515
         },
         {
          "move": "charge-raikou",
+         "level": 12,
+         "est": 0
+        },
+        {
+         "move": "electric-terrain-raikou",
          "level": 12,
          "est": 0
         }
@@ -15963,27 +15963,27 @@
        "items": [
         "magnet",
         "metronome",
-        "pp-max",
         "x-sp-atk",
-        "light-clay",
-        "dire-hit"
+        "dire-hit",
+        "silk-scarf",
+        "x-attack"
        ],
        "vs": {
-        "johto-boss-xatu": 2.039578295179719,
-        "johto-boss-crobat": 3.0593674427695787,
-        "johto-boss-machamp": 4.625787917799134,
-        "johto-boss-houndoom": 5.482415309984159,
-        "johto-boss-dragonite": 6.363517770517328,
-        "round1": 29.702975947081878,
-        "round2": 36.71260252221535,
-        "round3": 56.61707060364341,
-        "legend-lugia": 41.62404684040243,
-        "legend-ho-oh": 41.62404684040243,
-        "legend-raikou": 9.35643742333079,
-        "legend-entei": 7.709646529665224,
-        "legend-suicune": 6.555787377363383
+        "johto-boss-xatu": 2.7396717231731103,
+        "johto-boss-crobat": 4.109507584759665,
+        "johto-boss-machamp": 6.032283830060404,
+        "johto-boss-houndoom": 7.1493734282197385,
+        "johto-boss-dragonite": 8.298379872040767,
+        "round1": 37.18560739336944,
+        "round2": 47.875268492542894,
+        "round3": 74.01633149641107,
+        "legend-lugia": 55.911667819859396,
+        "legend-ho-oh": 55.911667819859396,
+        "legend-raikou": 11.713466328911371,
+        "legend-entei": 10.053806383434008,
+        "legend-suicune": 8.806087681627854
        },
-       "legendAvg": 41.2561485507491
+       "legendAvg": 54.18010860440844
       }
      ],
      "measured": {
@@ -17662,6 +17662,19 @@
      "owners": 1
     },
     {
+     "move": "rising-voltage-raikou",
+     "est": 4439.2920362557215,
+     "key": "raikou",
+     "form": "raikou",
+     "items": [
+      "magnet",
+      "metronome",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
      "move": "sludge-bomb",
      "est": 4352.490783134342,
      "key": "gastly",
@@ -17741,34 +17754,6 @@
       "black-belt",
       "metronome",
       "x-attack",
-      "dire-hit"
-     ],
-     "owners": 1
-    },
-    {
-     "move": "rising-voltage-raikou",
-     "est": 3647.4147152772816,
-     "key": "raikou",
-     "form": "raikou",
-     "items": [
-      "magnet",
-      "metronome",
-      "x-sp-atk",
-      "dire-hit"
-     ],
-     "owners": 1
-    },
-    {
-     "move": "electric-terrain-raikou",
-     "est": 3543.829309637572,
-     "key": "raikou",
-     "form": "raikou",
-     "items": [
-      "pp-max",
-      "magnet",
-      "light-clay",
-      "metronome",
-      "x-sp-atk",
       "dire-hit"
      ],
      "owners": 1
@@ -17975,19 +17960,6 @@
      "owners": 6
     },
     {
-     "move": "extreme-speed-raikou",
-     "est": 1960.6736651952885,
-     "key": "raikou",
-     "form": "raikou",
-     "items": [
-      "silk-scarf",
-      "metronome",
-      "x-attack",
-      "dire-hit"
-     ],
-     "owners": 1
-    },
-    {
      "move": "air-cutter",
      "est": 1926.6368793496194,
      "key": "ho-oh",
@@ -18037,6 +18009,19 @@
      "items": [
       "x-sp-atk",
       "metronome",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
+     "move": "extreme-speed-raikou",
+     "est": 1826.9913590369515,
+     "key": "raikou",
+     "form": "raikou",
+     "items": [
+      "silk-scarf",
+      "metronome",
+      "x-attack",
       "dire-hit"
      ],
      "owners": 1
@@ -26861,8 +26846,8 @@
   "raikou": "ライコウ",
   "rising-voltage-raikou": "ライジングボルト",
   "extreme-speed-raikou": "しんそく",
-  "electric-terrain-raikou": "エレキフィールド",
   "charge-raikou": "じゅうでん",
+  "electric-terrain-raikou": "エレキフィールド",
   "entei": "エンテイ",
   "suicune": "スイクン",
   "surf-suicune": "なみのり",

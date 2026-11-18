@@ -3424,7 +3424,7 @@ export class RunScene extends Phaser.Scene {
     this.celebiPlayer.update(world, this.time.now);
     this.suicunePlayer ??= new SuicunePlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.players + 0.1);
     this.suicunePlayer.update(world, this.time.now, this.localId, this.skillAim);
-    this.raikouPlayer ??= new RaikouPlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.bosses + 0.05);
+    this.raikouPlayer ??= new RaikouPlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.players + 0.1);
     this.raikouPlayer.update(world, this.time.now, this.localId, this.skillAim);
     this.shinyCharizardFlame ??= new ShinyCharizardFlame(this, spriteRender.depths.effects + 0.35, spriteRender.depths.bosses + 0.05, ARENA_FLOOR_DEPTH + 3.6);
     this.shinyCharizardFlame.update(world, this.time.now, alpha);

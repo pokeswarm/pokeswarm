@@ -20,7 +20,7 @@ describe('遊べるライコウ', () => {
     expect(rules.derivations.filter((d) => d.line === 'raikou')).toEqual([]);
   });
 
-  it('しんそく: 前の敵を角にして駆け抜け、終点へ移る。通り道の敵に当たる', () => {
+  it('しんそく: 1 体目から折れる道に沿って駆け抜け（一瞬では移らない）、通り道の敵に当たる', () => {
     const { sim, p } = setup([{ key: 'extreme-speed-raikou', level: 1 }]);
     const e = sim.world.enemies;
     e.add(1, 0, 150, 40, 1e6, 0, 12, 0, 0, 0);
@@ -29,8 +29,17 @@ describe('遊べるライコウ', () => {
     sim.step([{ type: 'move', playerId: 1, dx: 0, dy: 0 }]);
     const hp = [e.hp[0]!, e.hp[1]!];
     sim.step([{ type: 'useSkill', playerId: 1, slot: 0 }]);
+    // 一瞬では移らず、道に沿って少しずつ進む（入力では動けない）
+    expect(p.x).toBeGreaterThan(0);
+    expect(p.x).toBeLessThan(100);
+    const xs: number[] = [];
+    for (let k = 0; k < 20; k++) {
+      sim.step([{ type: 'move', playerId: 1, dx: -1, dy: 0 }]);
+      xs.push(p.x);
+    }
     expect(p.x).toBeGreaterThan(250);
-    sim.step([]);
+    expect(Math.max(...xs.slice(0, 3))).toBeLessThan(250);
+    expect(p.esDash).toBeUndefined();
     expect(e.hp[0]!).toBeLessThan(hp[0]!);
     expect(e.hp[1]!).toBeLessThan(hp[1]!);
   });
@@ -42,12 +51,16 @@ describe('遊べるライコウ', () => {
     expect(Math.abs(p.x)).toBeLessThan(1);
   });
 
-  it('エレキフィールド: 中の敵に びりびり が重なり、当たらないと消える', () => {
+  it('エレキフィールド: いつも足元の楕円の中の敵に びりびり が重なり（ダメージは無い）、出ると消える', () => {
     const { sim } = setup([{ key: 'electric-terrain-raikou', level: 1 }]);
     const e = sim.world.enemies;
     e.add(1, 0, 60, 0, 1e6, 0, 12, 0, 0, 0);
+    // 楕円の外（縦は横の半分）
+    e.add(2, 0, 0, 110, 1e6, 0, 12, 0, 0, 0);
     for (let k = 0; k < 90; k++) sim.step([]);
     expect(e.shock[0]).toBe(5);
+    expect(e.hp[0]).toBe(1e6);
+    expect(e.shock[1]).toBe(0);
     e.x[0] = 2000;
     for (let k = 0; k < 120; k++) sim.step([]);
     expect(e.shock[0]).toBe(0);

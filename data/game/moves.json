@@ -4009,16 +4009,15 @@
         "power": 520,
         "cooldownSeconds": 5,
         "count": 3,
-        "speed": 0,
-        "size": 26,
+        "speed": 1300,
+        "size": 34,
         "range": 540,
         "durationSeconds": 0.15,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
         "knockback": 240,
-        "statusId": "paralysis",
-        "statusChance": 0.3,
-        "statusSeconds": 2,
+        "statusChance": 0,
+        "statusSeconds": 0,
         "intervalSeconds": 0.1,
         "spreadDegrees": 0,
         "lifestealPct": 0,
@@ -4121,7 +4120,7 @@
       "nameOf": "rising-voltage",
       "teachOnly": true,
       "base": {
-        "power": 800,
+        "power": 1100,
         "cooldownSeconds": 6,
         "count": 1,
         "speed": 0,
@@ -4131,9 +4130,8 @@
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
         "knockback": 0,
-        "statusId": "paralysis",
-        "statusChance": 0.3,
-        "statusSeconds": 2,
+        "statusChance": 0,
+        "statusSeconds": 0,
         "intervalSeconds": 0.1,
         "spreadDegrees": 0,
         "lifestealPct": 0,
@@ -4141,49 +4139,49 @@
       },
       "levels": [
         {
-          "power": 70
+          "power": 90
         },
         {
-          "power": 70,
+          "power": 90,
           "size": 3
         },
         {
-          "power": 70,
+          "power": 90,
           "cooldownSeconds": -0.15
         },
         {
-          "power": 70
+          "power": 90
         },
         {
-          "power": 70,
+          "power": 90,
           "size": 3
         },
         {
-          "power": 70,
+          "power": 90,
           "cooldownSeconds": -0.15
         },
         {
-          "power": 70
+          "power": 90
         },
         {
-          "power": 70,
+          "power": 90,
           "size": 3
         },
         {
-          "power": 70,
+          "power": 90,
           "cooldownSeconds": -0.15
         },
         {
-          "power": 70
+          "power": 90
         },
         {
-          "power": 70,
+          "power": 90,
           "cooldownSeconds": -0.15
         }
       ]
     },
     "electric-terrain-raikou": {
-      "pattern": "aura",
+      "pattern": "passive",
       "effect": "electric-terrain-raikou",
       "nameOf": "electric-terrain",
       "teachOnly": true,
@@ -4191,24 +4189,19 @@
         "maxStacks": 5,
         "seconds": 3
       },
-      "rainBoost": {
-        "type": "electric",
-        "pct": 30
-      },
       "base": {
-        "power": 24,
-        "cooldownSeconds": 6,
+        "power": 0,
+        "cooldownSeconds": 99,
         "count": 1,
         "speed": 0,
         "size": 140,
         "range": 0,
-        "durationSeconds": 4.5,
+        "durationSeconds": 0.1,
         "pierce": "infinite",
         "hitIntervalSeconds": 0.5,
         "knockback": 0,
-        "statusId": "paralysis",
-        "statusChance": 0.08,
-        "statusSeconds": 1.5,
+        "statusChance": 0,
+        "statusSeconds": 0,
         "intervalSeconds": 0.1,
         "spreadDegrees": 0,
         "lifestealPct": 0,
@@ -4216,45 +4209,56 @@
       },
       "levels": [
         {
-          "power": 2
+          "size": 12
         },
         {
-          "power": 2,
-          "size": 4
+          "size": 12
         },
         {
-          "power": 2,
-          "durationSeconds": 0.2
+          "size": 12
         },
         {
-          "power": 2
+          "size": 12
         },
         {
-          "power": 2,
-          "size": 4
+          "size": 12
         },
         {
-          "power": 2,
-          "durationSeconds": 0.2
+          "size": 12
         },
         {
-          "power": 2
+          "size": 12
         },
         {
-          "power": 2,
-          "size": 4
+          "size": 12
         },
         {
-          "power": 2,
-          "durationSeconds": 0.2
+          "size": 12
         },
         {
-          "power": 2
+          "size": 12
         },
         {
-          "power": 2,
-          "durationSeconds": 0.2
+          "size": 12
         }
+      ],
+      "passive": [
+        {
+          "typePowerPct": {
+            "electric": 30
+          }
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
       ]
     },
     "psystrike": {

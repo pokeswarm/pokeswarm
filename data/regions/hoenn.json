@@ -932,36 +932,90 @@
         }
       },
       "legend-deoxys": {
+        "arena": {
+          "halfWidth": 800,
+          "halfHeight": 440,
+          "viewHeight": 960
+        },
+        "anchor": {
+          "x": 0,
+          "y": -200
+        },
+        "noEnrage": true,
+        "intervalAfterMove": true,
+        "moveIntervalSeconds": 1.3,
         "moves": [
           "deoxys-psycho-boost",
-          "deoxys-swift"
+          "deoxys-night-shade",
+          "deoxys-swift",
+          "deoxys-night-shade",
+          "deoxys-teleport"
         ],
         "random": false,
-        "moveIntervalSeconds": 1.5,
-        "enrageMoveIntervalSeconds": 1.1,
         "phases": [
           {
             "belowHpPct": 75,
             "moves": [
-              "deoxys-hyper-beam",
-              "deoxys-thunderbolt"
+              "deoxys-superpower",
+              "deoxys-zap-cannon",
+              "deoxys-psycho-boost-double"
             ]
           },
           {
             "belowHpPct": 50,
             "moves": [
+              "deoxys-mirror-coat",
               "deoxys-cosmic-power",
-              "deoxys-swift",
+              "deoxys-iron-defense",
+              "deoxys-cosmic-power",
               "deoxys-recover"
             ]
           },
           {
             "belowHpPct": 25,
             "moves": [
-              "deoxys-agility",
-              "deoxys-teleport",
-              "deoxys-teleport"
+              "deoxys-teleport-a",
+              "deoxys-swift-fast",
+              "deoxys-double-team",
+              "deoxys-swift-fast"
             ]
+          }
+        ],
+        "hpMoves": [
+          {
+            "belowHpPct": 75,
+            "moves": [
+              "deoxys-form-change"
+            ]
+          },
+          {
+            "belowHpPct": 50,
+            "moves": [
+              "deoxys-form-change-center"
+            ]
+          },
+          {
+            "belowHpPct": 25,
+            "moves": [
+              "deoxys-form-change"
+            ]
+          }
+        ],
+        "weatherStates": [
+          {
+            "hazardMove": "deoxys-iron-defense",
+            "speedPct": 100,
+            "chase": false,
+            "damagePct": 100,
+            "damageTakenPct": 30,
+            "tints": [
+              "#b0bec5"
+            ],
+            "aura": {
+              "id": "magnet-aura",
+              "size": 1.6
+            },
+            "afterimages": 0
           }
         ]
       },

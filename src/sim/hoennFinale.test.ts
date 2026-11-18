@@ -191,7 +191,8 @@ describe('ボスの光線は体から出る・メタグロスの動き（07 の1
       if (i < 0) break;
       for (const h of w.hazards) {
         const m = w.rules.stage.moves[h.move]!;
-        if (h.shape !== 'line' || !m.rooted || h.activeTicks !== undefined || h.ticksLeft > 1) continue;
+        // 分身から撃つ光線（かげぶんしん。07 の293章）は本体から出ない
+        if (h.shape !== 'line' || !m.rooted || h.activeTicks !== undefined || h.ticksLeft > 1 || h.dasher === -1) continue;
         lines++;
         expect(Math.hypot(h.x - w.enemies.x[i]!, h.y - w.enemies.y[i]!), m.id).toBeLessThan(40);
       }

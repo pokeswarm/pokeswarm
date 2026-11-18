@@ -113,7 +113,7 @@ export function moveEnemies(world: World): void {
       e.y[i] = e.prevY[i] = ny;
       continue;
     }
-    const motion = world.rules.enemies.kinds[e.kind[i]!]?.motion;
+    const motion = formMotion(world, i);
     // 突進の予告中・突進中は間合いの動きを止める（動くと予告の帯から外れ、突進が帯とずれた所を走った。07 の254章）
     if (motion && !legendWeatherState(world, i)?.chase) {
       if (!ownDashPending(world, e.id[i]!)) bossMotion(world, i, target, motion);
@@ -139,6 +139,21 @@ export function moveEnemies(world: World): void {
 /** 自分の突進の技（予告中・突進中）があるか */
 function ownDashPending(world: World, id: number): boolean {
   return world.hazards.some((h) => h.dasher === id && !!world.rules.stage.moves[h.move]?.dashSpeed);
+}
+
+/**
+ * 今の姿の合間の動き（デオキシスのフォルム: HP で姿が変わると、その姿の motion で動く。07 の293章）。姿に motion が無ければ元の種類の motion
+ */
+function formMotion(world: World, i: number): World['rules']['enemies']['kinds'][number]['motion'] {
+  const kinds = world.rules.enemies.kinds;
+  const kind = kinds[world.enemies.kind[i]!];
+  if (kind?.formKinds) {
+    const pct = (world.enemies.hp[i]! / Math.max(1, world.enemies.maxHp[i]!)) * 100;
+    const form = kind.formKinds.filter((f) => f.belowHpPct !== undefined && pct < f.belowHpPct).at(-1);
+    const fm = form ? kinds.find((k) => k.id === form.kind)?.motion : undefined;
+    if (fm) return fm;
+  }
+  return kind?.motion;
 }
 
 /**

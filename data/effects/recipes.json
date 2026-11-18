@@ -7381,6 +7381,17 @@
     "boss-primal-groudon": {
       "extends": "fire.base"
     },
+    "boss-deoxys-psycho": { "extends": "psychic.base" },
+    "boss-deoxys-swift": { "extends": "normal.base" },
+    "boss-deoxys-night": { "extends": "ghost.base" },
+    "boss-deoxys-teleport": { "extends": "psychic.base" },
+    "boss-deoxys-form": { "extends": "psychic.base" },
+    "boss-deoxys-superpower": { "extends": "fighting.base" },
+    "boss-deoxys-zap": { "extends": "electric.base" },
+    "boss-deoxys-guard": { "extends": "steel.base" },
+    "boss-deoxys-mirror": { "extends": "psychic.base" },
+    "boss-deoxys-cosmic": { "extends": "psychic.base" },
+    "boss-deoxys-recover": { "extends": "psychic.base" },
     "boss-rayquaza-ascent": { "extends": "dragon.base" },
     "boss-rayquaza-meteor": { "extends": "dragon.base" },
     "boss-rayquaza-speed": { "extends": "normal.base" },

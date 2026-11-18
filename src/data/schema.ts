@@ -955,7 +955,17 @@ export const bossMoveSchema = z.object({
    * カウンター・ミラーコート（07 の167章）: 予告の間にボスが受けたダメージの ratio 倍（max まで）を、落ちたときに範囲（radius）へ返す。
    * 技を止める考え方が無いゲームなので、離れていれば当たらないように範囲は狭くする
    */
-  counter: z.object({ ratio: z.number().positive(), max: z.number().positive() }).optional(),
+  counter: z
+    .object({
+      ratio: z.number().positive(),
+      max: z.number().positive(),
+      /** 返す輪の半径を、返すダメージ 1 につき radiusPerDamage 広げる（maxRadius まで。デオキシスの ミラーコート。07 の293章） */
+      radiusPerDamage: z.number().nonnegative().optional(),
+      maxRadius: z.number().positive().optional(),
+    })
+    .optional(),
+  /** 直線を、ボスからに加えて、出ている分身（かげぶんしん の偽物）からも狙った人へ撃つ（デオキシスの かげぶんしん。07 の293章） */
+  fromDecoys: z.boolean().optional(),
   /** 使ったボスを強くする（落ちたとき）: radiusPct（次の uses 回の技の範囲）、speedPct・intervalPct（重ねる。maxStacks まで。りゅうのまい） */
   buff: z
     .object({

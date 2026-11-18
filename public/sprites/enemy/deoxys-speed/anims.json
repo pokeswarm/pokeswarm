@@ -28,6 +28,35 @@
         4
       ],
       "frameKeyPrefix": "Walk"
+    },
+    "Shoot": {
+      "source": "Shoot",
+      "frameWidth": 56,
+      "frameHeight": 72,
+      "durations": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        1,
+        1,
+        1,
+        3
+      ],
+      "frameKeyPrefix": "Shoot"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 32,
+      "frameHeight": 64,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
     }
   },
   "missing": []

@@ -26,6 +26,37 @@
         8
       ],
       "frameKeyPrefix": "Walk"
+    },
+    "Withdraw": {
+      "source": "Withdraw",
+      "frameWidth": 40,
+      "frameHeight": 64,
+      "durations": [
+        6,
+        1,
+        2,
+        2,
+        2,
+        1,
+        4,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Withdraw"
+    },
+    "Hurt": {
+      "source": "Hurt",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "durations": [
+        2,
+        8
+      ],
+      "frameKeyPrefix": "Hurt"
     }
   },
   "missing": []

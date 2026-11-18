@@ -1467,6 +1467,17 @@ function castBossMove(world: World, bossId: number, i: number, moveIdx: number, 
     }
     return;
   }
+  if (move.shape === 'line' && move.fromDecoys) {
+    // 分身からも撃つ（かげぶんしん）: 出ている偽物から、それぞれ狙った人へ
+    for (const [id] of world.decoys) {
+      const k = findEnemyIndex(world, id);
+      if (k === -1 || world.enemies.hp[k]! <= 0) continue;
+      const ddx = target.x - world.enemies.x[k]!;
+      const ddy = target.y - world.enemies.y[k]!;
+      const dl = Math.hypot(ddx, ddy) || 1;
+      put(world.enemies.x[k]!, world.enemies.y[k]!, ddx / dl, ddy / dl, -1);
+    }
+  }
   if (move.shape === 'line' || move.shape === 'cone') {
     // 自分から狙ったプレイヤーへ向かう直線・扇
     put(bx + (move.muzzle?.x ?? 0) * (toCenter || 1), by + (move.muzzle?.y ?? 0), ux, uy, move.dashSpeed || move.rooted || move.playerMove || move.followBoss || move.sweep || move.recoilSeconds ? bossId : -1, move.toTarget ? { length: Math.max(1, len0 + move.toTarget.past) } : {});
@@ -2332,7 +2343,12 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
     boss.barrierNext = 0;
   }
   // 回復（エーフィの あさのひざし・カビゴンの ねむる）: 使ったボスの HP を戻す（HP はゲストへ送る）
-  if (move.healPct && world.enemies.hp[i]! > 0) world.enemies.hp[i] = Math.min(world.enemies.maxHp[i]!, world.enemies.hp[i]! + (world.enemies.maxHp[i]! * move.healPct) / 100);
+  if (move.healPct && world.enemies.hp[i]! > 0) {
+    // 段階（姿）のあるボスは、今の段階の境を超えて戻らない（デオキシスが じこさいせい でディフェンスからアタックの姿に戻らないように。07 の293章）
+    const at = boss?.phase ?? -1;
+    const cap = at >= 0 && boss?.phases ? boss.phases[at]!.belowRatio * world.enemies.maxHp[i]! - 1 : world.enemies.maxHp[i]!;
+    world.enemies.hp[i] = Math.max(world.enemies.hp[i]!, Math.min(cap, world.enemies.hp[i]! + (world.enemies.maxHp[i]! * move.healPct) / 100));
+  }
   // 吸い取る（ギガドレイン）: 範囲に入っていた人 1 人ごとに回復する（ホストの見ている場所で決める）
   if (move.drainPct && world.enemies.hp[i]! > 0) {
     const caught = world.players.filter((p) => !p.down && hazardHits(hz, p.x, p.y, p.radius, move)).length;
@@ -2361,7 +2377,9 @@ function onBossMoveStruck(world: World, hz: World['hazards'][number], move: Boss
       // カウンター: 予告の間に受けたダメージを返す（少なければ返さない）
       const taken = Math.max(0, (hz.hpAtStart ?? world.enemies.hp[i]!) - world.enemies.hp[i]!);
       const amount = Math.min(move.counter.max, taken * move.counter.ratio);
-      if (amount >= 1) addHazard(world, next, world.enemies.x[i]!, world.enemies.y[i]!, 0, 0, hz.dasher, undefined, { group: world.nextHazardGroup++, damage: amount });
+      const nm = world.rules.stage.moves[next];
+      const grow = move.counter.radiusPerDamage && nm ? { radius: Math.min(move.counter.maxRadius ?? Infinity, nm.radius + amount * move.counter.radiusPerDamage) } : {};
+      if (amount >= 1) addHazard(world, next, world.enemies.x[i]!, world.enemies.y[i]!, 0, 0, hz.dasher, undefined, { group: world.nextHazardGroup++, damage: amount, ...grow });
     } else if (move.thenSamePlace && world.rules.stage.moves[next]?.glyph) castGlyph(world, next, hz.x, hz.y);
     else if (move.thenSamePlace) addHazard(world, next, hz.x, hz.y, hz.dirX, hz.dirY, -1, undefined, { group: world.nextHazardGroup++ });
     else castBossMove(world, hz.dasher, i, next);

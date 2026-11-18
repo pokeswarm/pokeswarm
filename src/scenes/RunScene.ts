@@ -28,6 +28,7 @@ import { MoltresFlame } from '../render/effects/MoltresFlame';
 import { GroudonEarth } from '../render/effects/GroudonEarth';
 import { KyogreSea } from '../render/effects/KyogreSea';
 import { RayquazaSky } from '../render/effects/RayquazaSky';
+import { DeoxysCosmos } from '../render/effects/DeoxysCosmos';
 import { ShinyCharizardFlame } from '../render/effects/ShinyCharizardFlame';
 import { ShinyVenusaurPlant } from '../render/effects/ShinyVenusaurPlant';
 import { WaterRun } from '../render/effects/WaterRun';
@@ -188,6 +189,7 @@ export class RunScene extends Phaser.Scene {
   private groudonEarth: GroudonEarth | null = null;
   private kyogreSea: KyogreSea | null = null;
   private rayquazaSky: RayquazaSky | null = null;
+  private deoxysCosmos: DeoxysCosmos | null = null;
   private shinyCharizardFlame: ShinyCharizardFlame | null = null;
   private shinyVenusaurPlant: ShinyVenusaurPlant | null = null;
   /** 甲羅で走っているボス（色違いのカメックスの アクアジェット）: 走り出した技の動作・絵・向き。止まると消す */
@@ -3302,6 +3304,8 @@ export class RunScene extends Phaser.Scene {
     this.kyogreSea.update(world, this.time.now);
     this.rayquazaSky ??= new RayquazaSky(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6, spriteRender.depths.bosses + 0.05);
     this.rayquazaSky.update(world, this.time.now);
+    this.deoxysCosmos ??= new DeoxysCosmos(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6, spriteRender.depths.bosses + 0.05);
+    this.deoxysCosmos.update(world, this.time.now);
     this.shinyCharizardFlame ??= new ShinyCharizardFlame(this, spriteRender.depths.effects + 0.35, spriteRender.depths.bosses + 0.05, ARENA_FLOOR_DEPTH + 3.6);
     this.shinyCharizardFlame.update(world, this.time.now, alpha);
     this.shinyVenusaurPlant ??= new ShinyVenusaurPlant(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);

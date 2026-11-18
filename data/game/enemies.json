@@ -2596,7 +2596,8 @@
       "radius": 36,
       "contactDamage": 0,
       "xp": 0,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "motion": {"type": "keepDistance", "distance": 160}
     },
     {
       "id": "form-deoxys-defense",
@@ -2609,7 +2610,8 @@
       "radius": 36,
       "contactDamage": 0,
       "xp": 0,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "motion": {"type": "still"}
     },
     {
       "id": "form-deoxys-speed",
@@ -2622,7 +2624,20 @@
       "radius": 36,
       "contactDamage": 0,
       "xp": 0,
-      "spriteScale": 2.6
+      "spriteScale": 2.6,
+      "motion": {"type": "orbit", "distance": 380, "angularDegreesPerSecond": 55}
+    },
+    {
+      "id": "decoy-deoxys",
+      "species": "deoxys-speed",
+      "sprite": "enemy/deoxys-speed",
+      "hp": 1,
+      "moveSpeed": 0,
+      "radius": 30,
+      "contactDamage": 0,
+      "xp": 0,
+      "spriteScale": 2.6,
+      "decoy": true
     },
     {
       "id": "legend-latias",

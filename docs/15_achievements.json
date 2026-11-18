@@ -684,6 +684,16 @@
    "reward": "持ち物の枠 +1"
   },
   {
+   "region": "hoenn",
+   "id": "hoenn-all-starters-clear",
+   "name": "ホウエンの 御三家マスター",
+   "hidden": false,
+   "condition": "キモリ・アチャモ・ミズゴロウの すべてで ホウエンの でんどういりを する",
+   "stat": "clears.treecko ≧ 1 & clears.torchic ≧ 1 & clears.mudkip ≧ 1",
+   "rewardKind": "バフ",
+   "reward": "持ち物の枠 +1"
+  },
+  {
    "region": "johto",
    "id": "johto-silver-wing",
    "name": "ぎんいろの はね",

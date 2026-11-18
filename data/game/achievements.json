@@ -880,6 +880,31 @@
       }
     },
     {
+      "id": "hoenn-all-starters-clear",
+      "region": "hoenn",
+      "condition": {
+        "all": [
+          {
+            "stat": "clears.treecko",
+            "atLeast": 1
+          },
+          {
+            "stat": "clears.torchic",
+            "atLeast": 1
+          },
+          {
+            "stat": "clears.mudkip",
+            "atLeast": 1
+          }
+        ]
+      },
+      "reward": {
+        "buff": {
+          "itemSlots": 1
+        }
+      }
+    },
+    {
       "id": "johto-silver-wing",
       "region": "johto",
       "condition": {

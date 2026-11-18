@@ -44,17 +44,16 @@ function seedWhere(hit: boolean): number {
     const t = setup(s);
     t.clear();
     t.clearRound();
-    t.clearRound();
     if ((t.w.legendary?.result === null && !t.w.outcome) === hit) return s;
   }
   throw new Error('no seed');
 }
 
 describe('ホウエンのクリアの後', () => {
-  it('ダイゴはメタグロスだけ。次にグラードン ＋ カイオーガ。外れならそこで勝って終わる', () => {
+  // ダイゴ（メタグロス）は 1 プレイの時間を縮めるため、いったん外した（07 の299章）
+  it('クリアの後はグラードン ＋ カイオーガ。外れならそこで勝って終わる', () => {
     const t = setup(seedWhere(false));
     t.clear();
-    expect(t.clearRound()).toEqual(['steven-metagross']);
     expect(t.clearRound().sort()).toEqual(['legend-groudon', 'legend-kyogre']);
     expect(t.w.outcome).toBeTruthy();
   });
@@ -62,7 +61,6 @@ describe('ホウエンのクリアの後', () => {
   it('当たればレックウザ', () => {
     const t = setup(seedWhere(true));
     t.clear();
-    t.clearRound();
     t.clearRound();
     expect(t.clearRound()).toEqual(['legend-rayquaza']);
     expect(t.w.outcome).toBeTruthy();
@@ -75,7 +73,6 @@ describe('ホウエンのクリアの後', () => {
       applyItem(t.w, 900, 1, 'meteorite', 0);
       t.clear();
       t.clearRound();
-      t.clearRound();
       expect(t.clearRound()).toEqual(['legend-deoxys']);
     }
   });
@@ -83,7 +80,6 @@ describe('ホウエンのクリアの後', () => {
   it('天気の伝説の場は30秒ごとに入れ替わり、片方を倒すと残った方のゲンシカイキの場のまま（07 の282章）', () => {
     const t = setup(1);
     t.clear();
-    t.clearRound();
     for (let k = 0; k < 200 && !t.w.legendary!.spawned; k++) t.sim.step([]);
     const a = activeLegendField(t.w)!.field.groundTint;
     t.w.tick += 30 * 30;
@@ -200,18 +196,5 @@ describe('ボスの光線は体から出る・メタグロスの動き（07 の1
     expect(lines).toBeGreaterThan(3);
   });
 
-  it('メタグロスは離れると一度構えてから一気に来る。プレイヤーより速い', () => {
-    const { sim, w, p } = fight('steven-metagross');
-    p.invincibleTicks = 1e6;
-    const i = bossIndex(w);
-    p.x = w.enemies.x[i]! + 800;
-    p.y = w.enemies.y[i]!;
-    sim.step([]);
-    const ai = w.legendAis.get(w.bosses[0]!.id)!;
-    expect(ai.shell).toBe(true);
-    expect(ai.holdTicks).toBeGreaterThan(0);
-    expect(w.enemies.speed[i]).toBe(0);
-    for (let t = 0; t < 30; t++) sim.step([]);
-    expect(w.enemies.speed[i]).toBeGreaterThan(180);
-  });
+  // メタグロス（ダイゴ）の動きのテストは、ダイゴ戦をいったん外したので外した（07 の299章。技の組は docs/shelved/steven-metagross.json）
 });

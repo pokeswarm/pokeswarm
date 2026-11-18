@@ -705,7 +705,7 @@
   "legendary": {
     "chance": 1,
     "kinds": [
-      "steven-metagross"
+      "legend-groudon"
     ],
     "moves": [
       "legend-dash",
@@ -714,13 +714,6 @@
       "legend-meteor"
     ],
     "rounds": [
-      {
-        "kinds": [
-          "steven-metagross"
-        ],
-        "stat": "stevenDefeated",
-        "bgm": "hoenn-steven"
-      },
       {
         "kinds": [
           "legend-groudon",
@@ -762,42 +755,6 @@
       "timeLimitSeconds": 90
     },
     "moveSets": {
-      "steven-metagross": {
-        "moves": [
-          "metagross-meteor-mash",
-          "metagross-gyro-ball",
-          "metagross-heavy-slam",
-          "metagross-psychic"
-        ],
-        "random": false,
-        "moveIntervalSeconds": 1.5,
-        "enrageMoveIntervalSeconds": 1.05,
-        "shell": {
-          "farDistance": 270,
-          "nearDistance": 120,
-          "speedMultiplier": 3.8,
-          "pose": "Walk",
-          "spin": false,
-          "moves": [],
-          "windupSeconds": 0.55,
-          "aura": {
-            "id": "magnet-aura",
-            "size": 1.9
-          }
-        },
-        "phases": [
-          {
-            "belowHpPct": 50,
-            "moves": [
-              "metagross-meteor-mash",
-              "metagross-bullet-punch",
-              "metagross-gyro-ball",
-              "metagross-heavy-slam",
-              "metagross-zen-headbutt"
-            ]
-          }
-        ]
-      },
       "legend-groudon": {
         "arena": {
           "halfWidth": 800,

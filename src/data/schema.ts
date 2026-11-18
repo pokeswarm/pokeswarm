@@ -82,6 +82,11 @@ export const uiConfigSchema = z.object({
   /** スマホのジョイスティック（作者の決定 2026年10月22日）: 輪の半径・つまみの半径・止まったままの遊び（px） */
   joystick: z.object({ radius: z.number().positive(), knob: z.number().positive(), deadzone: z.number().nonnegative() }),
   /**
+   * スマホのスキルのボタン（07 の308章）: 右下の角に 1 つ目（SPACE）を大きな丸で、2 つ目から（Q・E）は小さな丸で、1 つ目のまわりの弧に並べる。
+   * main・sub は半径（px）、distance は 1 つ目の中心から小さな丸の中心まで、angles は小さな丸を置く向き（度。0 が右、90 が下）、margin は画面の端から、compactScale は横向きの低い画面での倍率
+   */
+  skillButtons: z.object({ main: z.number().positive(), sub: z.number().positive(), distance: z.number().positive(), angles: z.array(z.number()), margin: z.number().min(0), compactScale: z.number().positive() }),
+  /**
    * 画面の外にいる大事なもの（ボス・中ボス・伝説・ふしぎなアメ・味方）の方向を、画面の端に矢印で出す（作者の依頼 2026年10月22日）。
    * dot は矢印のドットの大きさ、margin* は画面の端からの距離（上は HUD をよけて広め）、iconGap は矢印から目印までの距離（px）
    */

@@ -70,6 +70,14 @@
     "knob": 24,
     "deadzone": 12
   },
+  "skillButtons": {
+    "main": 46,
+    "sub": 32,
+    "distance": 96,
+    "angles": [190, 245, 300],
+    "margin": 28,
+    "compactScale": 0.8
+  },
   "donate": {
     "url": "https://ko-fi.com/pokeswarm"
   },

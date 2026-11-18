@@ -2662,9 +2662,12 @@ export class RunScene extends Phaser.Scene {
     if (this.skillHud) {
       const me = w.players.find((p) => p.id === this.localId);
       if (me?.skills?.length) {
-        this.skillHud.update(w, me, this.skillAim);
+        // 押しているボタン（スマホ: 指で押している枠。押した瞬間に使うスキルも押している間は縮んで見える）
+        const pressed = me.skills.map((_, k) => this.skillTouch?.slot === k || !!this.skillKeys[k]?.isDown);
+        this.skillHud.update(w, me, this.skillAim, pressed);
         this.skillHud.container.setVisible(true);
-        this.placeUi(this.skillHud.container, cam.width - 16 - this.skillHud.width, cam.height - 16 - this.skillHud.height);
+        const m = this.skillHud.margin;
+        this.placeUi(this.skillHud.container, cam.width - m - this.skillHud.width, cam.height - m - this.skillHud.height);
       } else this.skillHud.container.setVisible(false);
     }
     this.hudTop = top;

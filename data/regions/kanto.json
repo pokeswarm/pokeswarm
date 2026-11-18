@@ -14,7 +14,7 @@
         "capPerPlayer": 60,
         "hpMultiplier": 1,
         "damageMultiplier": 1,
-        "xpMultiplier": 1,
+        "xpMultiplier": 1.15,
         "kinds": [
           "rattata",
           "pidgey",
@@ -36,7 +36,7 @@
         "capPerPlayer": 120,
         "hpMultiplier": 1.1,
         "damageMultiplier": 1.15,
-        "xpMultiplier": 1.3,
+        "xpMultiplier": 1.5,
         "kinds": [
           "pidgey",
           "spearow",
@@ -59,7 +59,7 @@
         "capPerPlayer": 180,
         "hpMultiplier": 1.2,
         "damageMultiplier": 1.3,
-        "xpMultiplier": 1.6,
+        "xpMultiplier": 1.84,
         "kinds": [
           "mankey",
           "meowth",
@@ -81,7 +81,7 @@
         "capPerPlayer": 240,
         "hpMultiplier": 1.55,
         "damageMultiplier": 1.45,
-        "xpMultiplier": 1.9,
+        "xpMultiplier": 2.18,
         "kinds": [
           "vulpix",
           "cubone",
@@ -102,7 +102,7 @@
         "capPerPlayer": 300,
         "hpMultiplier": 1.85,
         "damageMultiplier": 1.6,
-        "xpMultiplier": 2.2,
+        "xpMultiplier": 2.53,
         "kinds": [
           "doduo",
           "raticate",
@@ -125,7 +125,7 @@
         "capPerPlayer": 360,
         "hpMultiplier": 2.45,
         "damageMultiplier": 1.75,
-        "xpMultiplier": 2.5,
+        "xpMultiplier": 2.88,
         "kinds": [
           "pidgeotto",
           "ditto",
@@ -145,7 +145,7 @@
         "capPerPlayer": 420,
         "hpMultiplier": 2.9,
         "damageMultiplier": 1.9,
-        "xpMultiplier": 2.8,
+        "xpMultiplier": 3.22,
         "kinds": [
           "tentacool",
           "magikarp",
@@ -168,7 +168,7 @@
         "capPerPlayer": 480,
         "hpMultiplier": 3.8,
         "damageMultiplier": 2.05,
-        "xpMultiplier": 3.1,
+        "xpMultiplier": 3.57,
         "kinds": [
           "fearow",
           "tangela",
@@ -185,13 +185,13 @@
         "rock"
       ],
       "wave": {
-        "durationSeconds": 45,
+        "durationSeconds": 30,
         "spawnPerSecond": 17,
         "minimum": 330,
         "capPerPlayer": 520,
         "hpMultiplier": 4.4,
         "damageMultiplier": 2.2,
-        "xpMultiplier": 3.4,
+        "xpMultiplier": 3.91,
         "kinds": [
           "golbat",
           "graveler",
@@ -213,7 +213,7 @@
         "capPerPlayer": 600,
         "hpMultiplier": 5.6,
         "damageMultiplier": 2.4,
-        "xpMultiplier": 3.7,
+        "xpMultiplier": 4.26,
         "kinds": [
           "dewgong",
           "cloyster",
@@ -235,7 +235,7 @@
         "capPerPlayer": 600,
         "hpMultiplier": 7.2,
         "damageMultiplier": 2.65,
-        "xpMultiplier": 4,
+        "xpMultiplier": 4.6,
         "kinds": [
           "onix",
           "hitmonlee",
@@ -256,7 +256,7 @@
         "capPerPlayer": 600,
         "hpMultiplier": 9,
         "damageMultiplier": 2.9,
-        "xpMultiplier": 4.3,
+        "xpMultiplier": 4.94,
         "kinds": [
           "haunter",
           "arbok"
@@ -276,7 +276,7 @@
         "capPerPlayer": 600,
         "hpMultiplier": 11.2,
         "damageMultiplier": 3.2,
-        "xpMultiplier": 4.6,
+        "xpMultiplier": 5.29,
         "kinds": [
           "gyarados",
           "dragonair",
@@ -288,55 +288,55 @@
   "bosses": [
     {
       "wave": 0,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "kind": "midboss-onix"
     },
     {
       "wave": 1,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "kind": "midboss-starmie"
     },
     {
       "wave": 2,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "kind": "midboss-raichu"
     },
     {
       "wave": 3,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "kind": "midboss-vileplume"
     },
     {
       "wave": 4,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "kind": "midboss-weezing"
     },
     {
       "wave": 5,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "kind": "midboss-alakazam"
     },
     {
       "wave": 6,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "kind": "midboss-arcanine"
     },
     {
       "wave": 7,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "kind": "midboss-rhydon"
     },
     {
       "wave": 9,
-      "afterSeconds": 40,
+      "afterSeconds": 20,
       "gate": true,
       "required": true,
       "kind": "boss-lapras",
@@ -349,7 +349,7 @@
     },
     {
       "wave": 10,
-      "afterSeconds": 40,
+      "afterSeconds": 20,
       "gate": true,
       "required": true,
       "kind": "boss-machamp",
@@ -368,7 +368,7 @@
     },
     {
       "wave": 11,
-      "afterSeconds": 40,
+      "afterSeconds": 20,
       "gate": true,
       "required": true,
       "kind": "boss-gengar",
@@ -386,7 +386,7 @@
     },
     {
       "wave": 12,
-      "afterSeconds": 40,
+      "afterSeconds": 20,
       "required": true,
       "kind": "boss-dragonite",
       "moves": [
@@ -450,7 +450,10 @@
             "wall": "map/kanto/arena-mewtwo-wall.png",
             "wallMargin": 60,
             "pixelScale": 2,
-            "shimmer": ["map/kanto/arena-mewtwo-shimmer-a.png", "map/kanto/arena-mewtwo-shimmer-b.png"]
+            "shimmer": [
+              "map/kanto/arena-mewtwo-shimmer-a.png",
+              "map/kanto/arena-mewtwo-shimmer-b.png"
+            ]
           }
         },
         "anchor": {
@@ -459,8 +462,21 @@
         },
         "noEnrage": true,
         "hpMoves": [
-          { "belowHpPct": 66, "moves": ["mewtwo-barrier"] },
-          { "belowHpPct": 33, "moves": ["mewtwo-to-center", "mewtwo-psystrike-1", "mewtwo-psystrike-2", "mewtwo-tired"] }
+          {
+            "belowHpPct": 66,
+            "moves": [
+              "mewtwo-barrier"
+            ]
+          },
+          {
+            "belowHpPct": 33,
+            "moves": [
+              "mewtwo-to-center",
+              "mewtwo-psystrike-1",
+              "mewtwo-psystrike-2",
+              "mewtwo-tired"
+            ]
+          }
         ],
         "moves": [
           "mewtwo-blink",
@@ -477,16 +493,41 @@
           "halfWidth": 800,
           "halfHeight": 440,
           "viewHeight": 960,
-          "map": { "floor": "map/kanto/arena-mew-floor.png", "wall": "map/kanto/arena-mew-wall.png", "wallMargin": 60, "pixelScale": 2 }
+          "map": {
+            "floor": "map/kanto/arena-mew-floor.png",
+            "wall": "map/kanto/arena-mew-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2
+          }
         },
-        "anchor": { "x": 0, "y": -220 },
+        "anchor": {
+          "x": 0,
+          "y": -220
+        },
         "noEnrage": true,
         "showMoveNames": true,
         "hpMoves": [
-          { "belowHpPct": 66, "moves": ["mew-transform"] },
-          { "belowHpPct": 33, "moves": ["mew-to-center", "mew-metronome-big", "mew-tired"] }
+          {
+            "belowHpPct": 66,
+            "moves": [
+              "mew-transform"
+            ]
+          },
+          {
+            "belowHpPct": 33,
+            "moves": [
+              "mew-to-center",
+              "mew-metronome-big",
+              "mew-tired"
+            ]
+          }
         ],
-        "moves": ["mew-teleport", "mew-metronome", "mew-metronome", "mew-metronome"],
+        "moves": [
+          "mew-teleport",
+          "mew-metronome",
+          "mew-metronome",
+          "mew-metronome"
+        ],
         "random": false,
         "intervalAfterMove": true,
         "moveIntervalSeconds": 0.3
@@ -501,16 +542,43 @@
             "wall": "map/kanto/arena-articuno-wall.png",
             "wallMargin": 60,
             "pixelScale": 2,
-            "shimmer": ["map/kanto/arena-articuno-shimmer-a.png", "map/kanto/arena-articuno-shimmer-b.png"]
+            "shimmer": [
+              "map/kanto/arena-articuno-shimmer-a.png",
+              "map/kanto/arena-articuno-shimmer-b.png"
+            ]
           }
         },
-        "anchor": { "x": 0, "y": -220 },
+        "anchor": {
+          "x": 0,
+          "y": -220
+        },
         "noEnrage": true,
         "hpMoves": [
-          { "belowHpPct": 66, "moves": ["articuno-hail"] },
-          { "belowHpPct": 33, "moves": ["articuno-to-top", "articuno-mind-reader", "articuno-tired"] }
+          {
+            "belowHpPct": 66,
+            "moves": [
+              "articuno-hail"
+            ]
+          },
+          {
+            "belowHpPct": 33,
+            "moves": [
+              "articuno-to-top",
+              "articuno-mind-reader",
+              "articuno-tired"
+            ]
+          }
         ],
-        "moves": ["articuno-glide", "articuno-ice-shard", "articuno-icy-wind", "articuno-glide", "articuno-ice-shard", "articuno-icy-wind", "articuno-glide", "articuno-freeze-dry"],
+        "moves": [
+          "articuno-glide",
+          "articuno-ice-shard",
+          "articuno-icy-wind",
+          "articuno-glide",
+          "articuno-ice-shard",
+          "articuno-icy-wind",
+          "articuno-glide",
+          "articuno-freeze-dry"
+        ],
         "random": false,
         "intervalAfterMove": true,
         "moveIntervalSeconds": 0.2
@@ -520,15 +588,43 @@
           "halfWidth": 800,
           "halfHeight": 440,
           "viewHeight": 960,
-          "map": { "floor": "map/kanto/arena-zapdos-floor.png", "wall": "map/kanto/arena-zapdos-wall.png", "wallMargin": 60, "pixelScale": 2 }
+          "map": {
+            "floor": "map/kanto/arena-zapdos-floor.png",
+            "wall": "map/kanto/arena-zapdos-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2
+          }
         },
-        "anchor": { "x": 0, "y": -220 },
+        "anchor": {
+          "x": 0,
+          "y": -220
+        },
         "noEnrage": true,
         "hpMoves": [
-          { "belowHpPct": 66, "moves": ["zapdos-rain-dance", "zapdos-storm-charge"] },
-          { "belowHpPct": 33, "moves": ["zapdos-to-center", "zapdos-zap-cannon-charge", "zapdos-tired"] }
+          {
+            "belowHpPct": 66,
+            "moves": [
+              "zapdos-rain-dance",
+              "zapdos-storm-charge"
+            ]
+          },
+          {
+            "belowHpPct": 33,
+            "moves": [
+              "zapdos-to-center",
+              "zapdos-zap-cannon-charge",
+              "zapdos-tired"
+            ]
+          }
         ],
-        "moves": ["zapdos-agility", "zapdos-drill-peck", "zapdos-agility", "zapdos-thunder-wave", "zapdos-agility", "zapdos-thunderbolt"],
+        "moves": [
+          "zapdos-agility",
+          "zapdos-drill-peck",
+          "zapdos-agility",
+          "zapdos-thunder-wave",
+          "zapdos-agility",
+          "zapdos-thunderbolt"
+        ],
         "random": false,
         "intervalAfterMove": true,
         "moveIntervalSeconds": 0.3
@@ -538,15 +634,39 @@
           "halfWidth": 800,
           "halfHeight": 440,
           "viewHeight": 960,
-          "map": { "floor": "map/kanto/arena-moltres-floor.png", "wall": "map/kanto/arena-moltres-wall.png", "wallMargin": 60, "pixelScale": 2 }
+          "map": {
+            "floor": "map/kanto/arena-moltres-floor.png",
+            "wall": "map/kanto/arena-moltres-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2
+          }
         },
-        "anchor": { "x": 0, "y": -220 },
+        "anchor": {
+          "x": 0,
+          "y": -220
+        },
         "noEnrage": true,
         "hpMoves": [
-          { "belowHpPct": 66, "moves": ["moltres-overheat-charge"] },
-          { "belowHpPct": 33, "moves": ["moltres-to-center", "moltres-burn-up"] }
+          {
+            "belowHpPct": 66,
+            "moves": [
+              "moltres-overheat-charge"
+            ]
+          },
+          {
+            "belowHpPct": 33,
+            "moves": [
+              "moltres-to-center",
+              "moltres-burn-up"
+            ]
+          }
         ],
-        "moves": ["moltres-sky-attack", "moltres-heat-wave", "moltres-air-slash", "moltres-heat-wave"],
+        "moves": [
+          "moltres-sky-attack",
+          "moltres-heat-wave",
+          "moltres-air-slash",
+          "moltres-heat-wave"
+        ],
         "random": false,
         "intervalAfterMove": true,
         "moveIntervalSeconds": 0.8
@@ -556,17 +676,49 @@
           "halfWidth": 800,
           "halfHeight": 440,
           "viewHeight": 960,
-          "map": { "floor": "map/kanto/arena-charizard-floor.png", "wall": "map/kanto/arena-charizard-wall.png", "wallMargin": 60, "pixelScale": 2 }
+          "map": {
+            "floor": "map/kanto/arena-charizard-floor.png",
+            "wall": "map/kanto/arena-charizard-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2
+          }
         },
-        "anchor": { "x": 0, "y": -220 },
+        "anchor": {
+          "x": 0,
+          "y": -220
+        },
         "noEnrage": true,
-        "casters": [{ "move": "air-slash", "level": 8, "everySeconds": 2.8 }],
+        "casters": [
+          {
+            "move": "air-slash",
+            "level": 8,
+            "everySeconds": 2.8
+          }
+        ],
         "casterPower": 1.2,
         "hpMoves": [
-          { "belowHpPct": 66, "moves": ["charizard-s-flare-blitz", "charizard-s-blaze-dash", "charizard-s-recoil"] },
-          { "belowHpPct": 33, "moves": ["charizard-s-to-center", "charizard-s-ultimate", "charizard-s-recharge"] }
+          {
+            "belowHpPct": 66,
+            "moves": [
+              "charizard-s-flare-blitz",
+              "charizard-s-blaze-dash",
+              "charizard-s-recoil"
+            ]
+          },
+          {
+            "belowHpPct": 33,
+            "moves": [
+              "charizard-s-to-center",
+              "charizard-s-ultimate",
+              "charizard-s-recharge"
+            ]
+          }
         ],
-        "moves": ["charizard-s-dragon-rage", "charizard-s-blast-burn", "charizard-s-dragon-rage"],
+        "moves": [
+          "charizard-s-dragon-rage",
+          "charizard-s-blast-burn",
+          "charizard-s-dragon-rage"
+        ],
         "random": false,
         "intervalAfterMove": true,
         "moveIntervalSeconds": 1
@@ -576,17 +728,51 @@
           "halfWidth": 800,
           "halfHeight": 440,
           "viewHeight": 960,
-          "map": { "floor": "map/kanto/arena-venusaur-floor.png", "wall": "map/kanto/arena-venusaur-wall.png", "wallMargin": 60, "pixelScale": 2 }
+          "map": {
+            "floor": "map/kanto/arena-venusaur-floor.png",
+            "wall": "map/kanto/arena-venusaur-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2
+          }
         },
-        "anchor": { "x": 0, "y": -220 },
+        "anchor": {
+          "x": 0,
+          "y": -220
+        },
         "noEnrage": true,
-        "casters": [{ "move": "razor-leaf", "level": 8, "everySeconds": 2.4 }],
+        "casters": [
+          {
+            "move": "razor-leaf",
+            "level": 8,
+            "everySeconds": 2.4
+          }
+        ],
         "casterPower": 1.2,
         "hpMoves": [
-          { "belowHpPct": 66, "moves": ["venusaur-s-sleep-powder", "venusaur-s-body-slam", "venusaur-s-body-slam", "venusaur-s-body-slam"] },
-          { "belowHpPct": 33, "moves": ["venusaur-s-to-center", "venusaur-s-frenzy-plant", "venusaur-s-recharge"] }
+          {
+            "belowHpPct": 66,
+            "moves": [
+              "venusaur-s-sleep-powder",
+              "venusaur-s-body-slam",
+              "venusaur-s-body-slam",
+              "venusaur-s-body-slam"
+            ]
+          },
+          {
+            "belowHpPct": 33,
+            "moves": [
+              "venusaur-s-to-center",
+              "venusaur-s-frenzy-plant",
+              "venusaur-s-recharge"
+            ]
+          }
         ],
-        "moves": ["venusaur-s-sludge-bomb", "venusaur-s-body-slam", "venusaur-s-giga-drain", "venusaur-s-body-slam"],
+        "moves": [
+          "venusaur-s-sludge-bomb",
+          "venusaur-s-body-slam",
+          "venusaur-s-giga-drain",
+          "venusaur-s-body-slam"
+        ],
         "random": false,
         "intervalAfterMove": true,
         "moveIntervalSeconds": 1
@@ -596,18 +782,58 @@
           "halfWidth": 800,
           "halfHeight": 440,
           "viewHeight": 960,
-          "map": { "floor": "map/kanto/arena-blastoise-floor.png", "wall": "map/kanto/arena-blastoise-wall.png", "wallMargin": 60, "pixelScale": 2 }
+          "map": {
+            "floor": "map/kanto/arena-blastoise-floor.png",
+            "wall": "map/kanto/arena-blastoise-wall.png",
+            "wallMargin": 60,
+            "pixelScale": 2
+          }
         },
-        "anchor": { "x": 0, "y": -220 },
+        "anchor": {
+          "x": 0,
+          "y": -220
+        },
         "noEnrage": true,
-        "casters": [{ "move": "bubble", "level": 8, "everySeconds": 1.6 }],
+        "casters": [
+          {
+            "move": "bubble",
+            "level": 8,
+            "everySeconds": 1.6
+          }
+        ],
         "casterPower": 2,
         "hpMoves": [
-          { "belowHpPct": 66, "moves": ["blastoise-s-aqua-jet", "blastoise-s-hydro-cannon", "blastoise-s-aqua-jet", "blastoise-s-hydro-cannon", "blastoise-s-aqua-jet", "blastoise-s-hydro-cannon"] },
-          { "belowHpPct": 33, "moves": ["blastoise-s-to-center", "*", "blastoise-s-recharge"] }
+          {
+            "belowHpPct": 66,
+            "moves": [
+              "blastoise-s-aqua-jet",
+              "blastoise-s-hydro-cannon",
+              "blastoise-s-aqua-jet",
+              "blastoise-s-hydro-cannon",
+              "blastoise-s-aqua-jet",
+              "blastoise-s-hydro-cannon"
+            ]
+          },
+          {
+            "belowHpPct": 33,
+            "moves": [
+              "blastoise-s-to-center",
+              "*",
+              "blastoise-s-recharge"
+            ]
+          }
         ],
-        "pool": ["blastoise-s-ultimate-cw", "blastoise-s-ultimate-ccw"],
-        "moves": ["blastoise-s-hydro-cannon", "blastoise-s-bubble-beam", "blastoise-s-water-spout", "blastoise-s-hydro-cannon", "blastoise-s-water-spout"],
+        "pool": [
+          "blastoise-s-ultimate-cw",
+          "blastoise-s-ultimate-ccw"
+        ],
+        "moves": [
+          "blastoise-s-hydro-cannon",
+          "blastoise-s-bubble-beam",
+          "blastoise-s-water-spout",
+          "blastoise-s-hydro-cannon",
+          "blastoise-s-water-spout"
+        ],
         "random": false,
         "intervalAfterMove": true,
         "moveIntervalSeconds": 0.5

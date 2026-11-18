@@ -20,10 +20,10 @@ describe('地方のステージ（data/regions/<地方>.json）', () => {
     }
   });
 
-  it('ホウエン: 16区間、区間3 は 3a（113番道路・60秒）→ 3b、天気は区間ごと、ボスは全部タッグ（07 の89章・13 の1章）', () => {
+  it('ホウエン: 16区間、区間3 は 3a（113番道路・30秒。07 の302章）→ 3b、天気は区間ごと、ボスは全部タッグ（07 の89章・13 の1章）', () => {
     const hoenn = regionStage('hoenn');
     expect(hoenn.spawn.waves).toHaveLength(16);
-    expect(hoenn.spawn.waves[3]!.durationSeconds).toBe(60);
+    expect(hoenn.spawn.waves[3]!.durationSeconds).toBe(30);
     expect(hoenn.weather.map((w) => w.kinds.join('/'))).toEqual(['', '', '', 'ash', 'sun', 'sandstorm', 'rain', '', 'sun/rain', '', '', '', 'hail', '', 'rain', '']);
     expect(hoenn.weather[8]!.everySeconds).toBe(30);
     expect(hoenn.stage.bosses.every((b) => b.tag)).toBe(true);
@@ -39,10 +39,10 @@ describe('地方のステージ（data/regions/<地方>.json）', () => {
     for (const id of Object.keys(regionStages)) expect(regionsConfig.regions.some((r) => r.id === id)).toBe(true);
   });
 
-  it('ジョウト: 区間6 は いかりのみずうみ（60秒）→ こおりのぬけみち に分け、夜は 2・5・6b・7（07 の61章）', () => {
+  it('ジョウト: 区間6 は いかりのみずうみ（30秒。07 の302章）→ こおりのぬけみち に分け、夜は 2・5・6b・7（07 の61章）', () => {
     const johto = regionStage('johto');
     expect(johto.ground.waves[6]!.tile).toBe('johto_lake_meadow');
-    expect(johto.spawn.waves[6]!.durationSeconds).toBe(60);
+    expect(johto.spawn.waves[6]!.durationSeconds).toBe(30);
     expect(johto.ground.waves[7]!.tile).toBe('johto_ice');
     expect(johto.night.flatMap((n, i) => (n ? [i] : []))).toEqual([2, 5, 7, 8]);
     // レッド戦（3ラウンド）・はね・三犬の乱入（07 の85章）

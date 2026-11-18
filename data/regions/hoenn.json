@@ -17,7 +17,7 @@
         "capPerPlayer": 60,
         "hpMultiplier": 1.4,
         "damageMultiplier": 1.2,
-        "xpMultiplier": 1,
+        "xpMultiplier": 1.15,
         "kinds": [
           "poochyena",
           "zigzagoon",
@@ -41,7 +41,7 @@
         "capPerPlayer": 120,
         "hpMultiplier": 1.54,
         "damageMultiplier": 1.38,
-        "xpMultiplier": 1.3,
+        "xpMultiplier": 1.5,
         "kinds": [
           "zubat",
           "makuhita",
@@ -65,7 +65,7 @@
         "capPerPlayer": 180,
         "hpMultiplier": 1.68,
         "damageMultiplier": 1.56,
-        "xpMultiplier": 1.6,
+        "xpMultiplier": 1.84,
         "kinds": [
           "electrike",
           "plusle",
@@ -84,13 +84,13 @@
       ],
       "weather": "ash",
       "wave": {
-        "durationSeconds": 60,
+        "durationSeconds": 30,
         "spawnPerSecond": 7,
         "minimum": 100,
         "capPerPlayer": 240,
         "hpMultiplier": 2.17,
         "damageMultiplier": 1.74,
-        "xpMultiplier": 1.9,
+        "xpMultiplier": 2.18,
         "kinds": [
           "spinda",
           "sandshrew",
@@ -113,7 +113,7 @@
         "capPerPlayer": 300,
         "hpMultiplier": 2.59,
         "damageMultiplier": 1.92,
-        "xpMultiplier": 2.2,
+        "xpMultiplier": 2.53,
         "kinds": [
           "numel",
           "torkoal",
@@ -137,7 +137,7 @@
         "capPerPlayer": 360,
         "hpMultiplier": 3.43,
         "damageMultiplier": 2.1,
-        "xpMultiplier": 2.5,
+        "xpMultiplier": 2.88,
         "kinds": [
           "sandshrew-2",
           "trapinch",
@@ -161,7 +161,7 @@
         "capPerPlayer": 420,
         "hpMultiplier": 4.06,
         "damageMultiplier": 2.28,
-        "xpMultiplier": 2.8,
+        "xpMultiplier": 3.22,
         "kinds": [
           "zigzagoon-2",
           "linoone",
@@ -186,7 +186,7 @@
         "capPerPlayer": 420,
         "hpMultiplier": 4.06,
         "damageMultiplier": 2.28,
-        "xpMultiplier": 2.8,
+        "xpMultiplier": 3.22,
         "kinds": [
           "shuppet",
           "duskull",
@@ -216,7 +216,7 @@
         "capPerPlayer": 480,
         "hpMultiplier": 5.32,
         "damageMultiplier": 2.46,
-        "xpMultiplier": 3.1,
+        "xpMultiplier": 3.57,
         "kinds": [
           "tentacool",
           "tentacruel",
@@ -235,13 +235,13 @@
         "rock"
       ],
       "wave": {
-        "durationSeconds": 60,
+        "durationSeconds": 30,
         "spawnPerSecond": 17,
         "minimum": 330,
         "capPerPlayer": 520,
         "hpMultiplier": 6.16,
         "damageMultiplier": 2.64,
-        "xpMultiplier": 3.4,
+        "xpMultiplier": 3.91,
         "kinds": [
           "hariyama",
           "lairon",
@@ -264,7 +264,7 @@
         "capPerPlayer": 600,
         "hpMultiplier": 7.84,
         "damageMultiplier": 2.88,
-        "xpMultiplier": 3.7,
+        "xpMultiplier": 4.26,
         "kinds": [
           "mightyena-2",
           "cacturne",
@@ -284,7 +284,7 @@
         "capPerPlayer": 600,
         "hpMultiplier": 10.08,
         "damageMultiplier": 3.18,
-        "xpMultiplier": 4,
+        "xpMultiplier": 4.6,
         "kinds": [
           "sableye-3",
           "duskull-2",
@@ -305,7 +305,7 @@
         "capPerPlayer": 600,
         "hpMultiplier": 12.6,
         "damageMultiplier": 3.48,
-        "xpMultiplier": 4.3,
+        "xpMultiplier": 4.94,
         "kinds": [
           "sealeo",
           "spheal",
@@ -325,7 +325,7 @@
         "capPerPlayer": 600,
         "hpMultiplier": 15.68,
         "damageMultiplier": 3.84,
-        "xpMultiplier": 4.6,
+        "xpMultiplier": 5.29,
         "kinds": [
           "shelgon",
           "bagon",
@@ -347,7 +347,7 @@
         "capPerPlayer": 600,
         "hpMultiplier": 18.03,
         "damageMultiplier": 4.42,
-        "xpMultiplier": 4.6,
+        "xpMultiplier": 5.29,
         "kinds": [
           "tentacruel-2",
           "ludicolo",
@@ -369,7 +369,7 @@
         "capPerPlayer": 600,
         "hpMultiplier": 20.38,
         "damageMultiplier": 4.99,
-        "xpMultiplier": 4.6,
+        "xpMultiplier": 5.29,
         "kinds": [
           "golbat-2",
           "solrock",
@@ -384,42 +384,42 @@
   "bosses": [
     {
       "wave": 0,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "tag": true,
       "kind": "hoenn-midboss-nosepass"
     },
     {
       "wave": 0,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "tag": true,
       "kind": "hoenn-midboss-geodude"
     },
     {
       "wave": 1,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "tag": true,
       "kind": "hoenn-midboss-hariyama"
     },
     {
       "wave": 1,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "tag": true,
       "kind": "hoenn-midboss-meditite"
     },
     {
       "wave": 2,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "tag": true,
       "kind": "hoenn-midboss-manectric"
     },
     {
       "wave": 2,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "tag": true,
       "kind": "hoenn-midboss-magneton"
@@ -440,63 +440,63 @@
     },
     {
       "wave": 5,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "tag": true,
       "kind": "hoenn-midboss-slaking"
     },
     {
       "wave": 5,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "tag": true,
       "kind": "hoenn-midboss-vigoroth"
     },
     {
       "wave": 6,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "tag": true,
       "kind": "hoenn-midboss-altaria"
     },
     {
       "wave": 6,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "tag": true,
       "kind": "hoenn-midboss-skarmory"
     },
     {
       "wave": 7,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "tag": true,
       "kind": "hoenn-midboss-solrock"
     },
     {
       "wave": 7,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "tag": true,
       "kind": "hoenn-midboss-lunatone"
     },
     {
       "wave": 8,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "tag": true,
       "kind": "hoenn-midboss-kingdra"
     },
     {
       "wave": 8,
-      "afterSeconds": 100,
+      "afterSeconds": 70,
       "gate": true,
       "tag": true,
       "kind": "hoenn-midboss-crawdaunt"
     },
     {
       "wave": 10,
-      "afterSeconds": 40,
+      "afterSeconds": 20,
       "gate": true,
       "required": true,
       "tag": true,
@@ -514,7 +514,7 @@
     },
     {
       "wave": 10,
-      "afterSeconds": 40,
+      "afterSeconds": 20,
       "gate": true,
       "required": true,
       "tag": true,
@@ -533,7 +533,7 @@
     },
     {
       "wave": 11,
-      "afterSeconds": 40,
+      "afterSeconds": 20,
       "gate": true,
       "required": true,
       "tag": true,
@@ -552,7 +552,7 @@
     },
     {
       "wave": 11,
-      "afterSeconds": 40,
+      "afterSeconds": 20,
       "gate": true,
       "required": true,
       "tag": true,
@@ -570,7 +570,7 @@
     },
     {
       "wave": 12,
-      "afterSeconds": 40,
+      "afterSeconds": 20,
       "gate": true,
       "required": true,
       "tag": true,
@@ -588,7 +588,7 @@
     },
     {
       "wave": 12,
-      "afterSeconds": 40,
+      "afterSeconds": 20,
       "gate": true,
       "required": true,
       "tag": true,
@@ -606,7 +606,7 @@
     },
     {
       "wave": 13,
-      "afterSeconds": 40,
+      "afterSeconds": 20,
       "gate": true,
       "required": true,
       "tag": true,
@@ -625,7 +625,7 @@
     },
     {
       "wave": 13,
-      "afterSeconds": 40,
+      "afterSeconds": 20,
       "gate": true,
       "required": true,
       "tag": true,
@@ -643,7 +643,7 @@
     },
     {
       "wave": 14,
-      "afterSeconds": 40,
+      "afterSeconds": 20,
       "gate": true,
       "required": true,
       "tag": true,
@@ -662,7 +662,7 @@
     },
     {
       "wave": 14,
-      "afterSeconds": 40,
+      "afterSeconds": 20,
       "gate": true,
       "required": true,
       "tag": true,
@@ -765,7 +765,10 @@
             "wall": "map/hoenn/arena-sootopolis-wall.png",
             "wallMargin": 60,
             "pixelScale": 2,
-            "shimmer": ["map/hoenn/arena-sootopolis-shimmer-a.png", "map/hoenn/arena-sootopolis-shimmer-b.png"]
+            "shimmer": [
+              "map/hoenn/arena-sootopolis-shimmer-a.png",
+              "map/hoenn/arena-sootopolis-shimmer-b.png"
+            ]
           }
         },
         "anchor": {
@@ -837,7 +840,7 @@
         },
         "random": false,
         "intervalAfterMove": true,
-        "moveIntervalSeconds": 5.0,
+        "moveIntervalSeconds": 5,
         "field": {
           "typePowerPct": {
             "water": 50,
@@ -898,7 +901,10 @@
             "wall": "map/hoenn/arena-meteor-falls-wall.png",
             "wallMargin": 60,
             "pixelScale": 2,
-            "shimmer": ["map/hoenn/arena-meteor-falls-shimmer-a.png", "map/hoenn/arena-meteor-falls-shimmer-b.png"]
+            "shimmer": [
+              "map/hoenn/arena-meteor-falls-shimmer-a.png",
+              "map/hoenn/arena-meteor-falls-shimmer-b.png"
+            ]
           }
         },
         "anchor": {
@@ -1012,7 +1018,12 @@
         ],
         "random": false,
         "alone": {
-          "moves": ["latias-refraction-a", "latias-mist-ball-alone", "latias-dragon-breath", "latias-refraction-a"],
+          "moves": [
+            "latias-refraction-a",
+            "latias-mist-ball-alone",
+            "latias-dragon-breath",
+            "latias-refraction-a"
+          ],
           "moveIntervalSeconds": 0.6
         }
       },

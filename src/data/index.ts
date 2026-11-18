@@ -18,6 +18,7 @@ import combatJson from '../../data/game/combat.json';
 import movesJson from '../../data/game/moves.json';
 import playablesJson from '../../data/game/playables.json';
 import abilitiesJson from '../../data/game/abilities.json';
+import activeSkillsJson from '../../data/game/active-skills.json';
 import contestJson from '../../data/game/contest.json';
 import regionsJson from '../../data/game/regions.json';
 import siteJson from '../../data/site.json';
@@ -55,6 +56,7 @@ import {
   derivationsConfigSchema,
   learnsetsConfigSchema,
   abilitiesConfigSchema,
+  activeSkillsConfigSchema,
   contestConfigSchema,
   generatedAbilitiesSchema,
   itemsConfigSchema,
@@ -132,6 +134,8 @@ export const movesConfig = load('game/moves.json', movesConfigSchema, movesJson)
 export const playablesConfig = load('game/playables.json', playablesConfigSchema, playablesJson);
 /** 特性の効き方（ホウエン。07 の133章） */
 export const abilitiesConfig = load('game/abilities.json', abilitiesConfigSchema, abilitiesJson);
+/** アクティブスキル（ミュウツーの テレポート。07 の305章） */
+export const activeSkillsConfig = load('game/active-skills.json', activeSkillsConfigSchema, activeSkillsJson);
 /** ポケモンコンテスト（ホウエン。07 の188章） */
 export const contestConfig = load('game/contest.json', contestConfigSchema, contestJson);
 /** プレイヤーとして描ける（全動作のドット絵がある）ポケモン。これ以外へは進化しない（雑魚・ボス用だけのハガネールなど） */
@@ -426,6 +430,8 @@ for (const [key, p] of Object.entries(playablesConfig.pokemon)) {
   check(p.startingMoves.length > 0, `data/game/playables.json の "${key}" に最初の技がありません`);
   check(!p.ability || (!!abilitiesConfig.abilities[p.ability] && !!generated.abilities[p.ability]), `data/game/playables.json の "${key}" の特性 "${p.ability}" が data/game/abilities.json か data/generated/abilities.json にありません（data/pokeapi/targets.json の abilities に足して npm run pokeapi）`);
   check(!!generated.pokemon[key], `data/game/playables.json の "${key}" が data/generated/pokemon.json にありません`);
+  check(p.activeSkills.length <= activeSkillsConfig.keys.length, `data/game/playables.json の "${key}" のアクティブスキルが、data/game/active-skills.json の keys の数より多いです`);
+  for (const s of p.activeSkills) check(!!activeSkillsConfig.skills[s], `data/game/playables.json の "${key}" のアクティブスキル "${s}" が data/game/active-skills.json にありません`);
   for (const m of p.startingMoves) check(!!movesConfig.moves[m], `data/game/playables.json の "${key}" の最初の技 "${m}" が data/game/moves.json にありません`);
   if (p.unlock) {
     const u = p.unlock;

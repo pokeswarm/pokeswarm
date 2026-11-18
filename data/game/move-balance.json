@@ -138,6 +138,7 @@
     "doom-desire": "unique"
   },
   "strengthScale": {
+    "psystrike": 1.7,
     "flare-blitz": 0.3,
     "blast-burn": 0.88,
     "crunch": 1.9,

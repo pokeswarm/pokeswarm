@@ -52,6 +52,18 @@ export interface SimAbility {
 }
 
 /** シミュレーションが使う data/ の定義一式（型だけを参照し、読み込みと組み立ては呼び出し側で行う） */
+/** アクティブスキルの定義（data/game/active-skills.json を番号に直したもの。07 の305章） */
+export interface SimActiveSkill {
+  readonly key: string;
+  readonly kind: 'teleport';
+  readonly maxLevel: number;
+  readonly baseCharges: number;
+  readonly chargesPerLevel: number;
+  readonly rechargeSeconds: number;
+  readonly distance: number;
+  readonly buff?: { readonly powerPct: number; readonly seconds: number; readonly maxStacks: number };
+}
+
 export interface SimRules {
   /** 地方（regions.json の id）。技の region と比べて、ほかの地方の技を候補に出さない（07 の130章）。省略はカントー */
   region?: string;
@@ -102,6 +114,14 @@ export interface SimRules {
   };
   /** ポケモンコンテスト（ホウエン。07 の188章）。無い地方は無し */
   contest?: ContestConfig;
+  /**
+   * アクティブスキル（data/game/active-skills.json。07 の305章）: defs は並び順の番号、lines は系統（playables.json のキー）ごとのスキルの番号（並びが枠＝キーの順）。
+   * 無ければどの系統もスキルを持たない（テスト用の簡便さ）
+   */
+  activeSkills?: {
+    readonly defs: readonly SimActiveSkill[];
+    readonly lines: Readonly<Record<string, readonly number[]>>;
+  };
   /** なつきの進化に要る、ランで歩いた距離（data/game/player.json） */
   friendshipDistance: number;
   /** 協力プレイで届いた位置をなめらかに見せる */

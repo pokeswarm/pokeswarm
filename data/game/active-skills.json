@@ -1,0 +1,14 @@
+{
+  "keys": ["SPACE", "Q", "E"],
+  "skills": {
+    "teleport": {
+      "kind": "teleport",
+      "maxLevel": 5,
+      "baseCharges": 1,
+      "chargesPerLevel": 1,
+      "rechargeSeconds": 8,
+      "distance": 300,
+      "buff": { "powerPct": 15, "seconds": 3, "maxStacks": 5 }
+    }
+  }
+}

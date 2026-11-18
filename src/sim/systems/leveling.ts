@@ -1,4 +1,5 @@
 import type { LevelUpSnapshot, PlayerId } from '../commands';
+import { skillDef } from '../activeSkills';
 import type { Player, PlayerMove } from '../entities/player';
 import { deriveStats } from '../species';
 import type { NatureStat } from '../../data/schema';
@@ -190,6 +191,8 @@ export function banKey(p: Player, offer: UpgradeOffer): string | null {
       return `item:${offer.item}`;
     case 'itemUp':
       return `item:${p.items[offer.slot]?.item}`;
+    case 'skillUp':
+      return `skill:${p.skills?.[offer.slot]?.skill}`;
     default:
       return null;
   }
@@ -369,6 +372,10 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
   p.items.forEach((it, slot) => {
     if (it.level < rules.items[it.item]!.maxLevel) pool.push({ kind: 'itemUp', slot });
   });
+  // アクティブスキルの強化（技と同じ重み。07 の305章）
+  p.skills?.forEach((s, slot) => {
+    if (s.level < skillDef(world, s.skill).maxLevel) pool.push({ kind: 'skillUp', slot });
+  });
   if (p.items.length < rules.leveling.maxItemSlots + p.extraItemSlots) {
     rules.items.forEach((_, item) => {
       // 自分がすでに持っている持ち物は「強化」で出す（ほかの人が持っていても出る。作者の決定で「誰かが持っていれば出さない」は廃止）
@@ -386,7 +393,7 @@ export function makeOffers(world: World, p: Player): UpgradeOffer[] {
   // 必ず出すものを先に、残りは乱数で選ぶ（シード付きの乱数なので再現できる）
   const out = guaranteed.slice(0, count);
   // 技は持ち物の2倍の重みで選ぶ（作者の決定。07_content_draft.md 21）
-  const weightOf = (o: UpgradeOffer): number => (o.kind === 'moveNew' || o.kind === 'moveUp' ? rules.leveling.moveOfferWeight : 1);
+  const weightOf = (o: UpgradeOffer): number => (o.kind === 'moveNew' || o.kind === 'moveUp' || o.kind === 'skillUp' ? rules.leveling.moveOfferWeight : 1);
   while (out.length < count && pool.length > 0) {
     let r = world.rng.next() * pool.reduce((sum, o) => sum + weightOf(o), 0);
     let k = 0;
@@ -413,6 +420,15 @@ export function applyOffer(world: World, p: Player, offer: UpgradeOffer): void {
     case 'itemUp':
       p.items[offer.slot]!.level++;
       break;
+    case 'skillUp': {
+      // 回数が 1 つ増え、増えた分はすぐ使える
+      const s = p.skills?.[offer.slot];
+      if (s) {
+        s.level++;
+        s.charges++;
+      }
+      break;
+    }
     case 'heal':
       p.hp = Math.min(p.maxHp, p.hp + (p.maxHp * world.rules.leveling.fallback.healPct) / 100);
       break;

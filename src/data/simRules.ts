@@ -19,6 +19,7 @@ import {
   pickupConfig,
   playablesConfig,
   abilitiesConfig,
+  activeSkillsConfig,
   contestConfig,
   playerSpriteKeys,
   shopConfig,
@@ -72,6 +73,7 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.chainTurnBack ? { chainTurnBack: true } : {}),
       ...(def.lobSeekShare ? { lobSeekShare: def.lobSeekShare } : {}),
       ...(def.bonusCountToPower ? { bonusCountToPower: true } : {}),
+      ...(def.bonusCountSizePct ? { bonusCountSizePct: def.bonusCountSizePct } : {}),
       ...(def.landOnly ? { landOnly: true } : {}),
       ...(def.sequential ? { sequential: true } : {}),
       ...(def.comboOffsetSeconds ? { comboOffsetSeconds: def.comboOffsetSeconds } : {}),
@@ -117,6 +119,7 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.hurtByHpPct ? { hurtByHpPct: true } : {}),
       ...(def.statusGuard ? { statusGuard: true } : {}),
       ...(def.stopOnBoss ? { stopOnBoss: true } : {}),
+      ...(def.stopOnTarget ? { stopOnTarget: true } : {}),
       ...(def.lowHpBonus ? { lowHpBonus: def.lowHpBonus } : {}),
       ...(def.echo ? { echo: def.echo } : {}),
       aimFacing: def.aimFacing,
@@ -309,6 +312,13 @@ export function buildSimRules(region?: string): SimRules {
       ? { weatherSections: rs.weather.map((w) => ({ kinds: w.kinds, fields: w.kinds.map((k) => weatherConfig.weathers[k]!), everySeconds: w.everySeconds })) }
       : {}),
     ...(rs.contest ? { contest: contestConfig } : {}),
+    activeSkills: (() => {
+      const keys = Object.keys(activeSkillsConfig.skills);
+      return {
+        defs: keys.map((key) => ({ key, ...activeSkillsConfig.skills[key]! })),
+        lines: Object.fromEntries(Object.entries(playablesConfig.pokemon).flatMap(([line, pl]) => (pl.activeSkills.length ? [[line, pl.activeSkills.map((k) => keys.indexOf(k))]] : []))),
+      };
+    })(),
     ...(rs.abilities
       ? {
           abilities: {

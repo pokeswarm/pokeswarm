@@ -25,7 +25,7 @@ const ONLY_ROUND = Number(process.env.RED_ROUND ?? 0);
 const IDEAL = process.env.RED_IDEAL === '1';
 /** はねの戦いを 1 戦だけ測る（legend-lugia・legend-ho-oh） */
 const ONLY_KIND = process.env.RED_KIND;
-const PRIORITY: Record<UpgradeOffer['kind'], number> = { derive: 0, moveUp: 1, moveNew: 2, itemNew: 3, itemUp: 4, heal: 5, coins: 6 };
+const PRIORITY: Record<UpgradeOffer['kind'], number> = { derive: 0, moveUp: 1, moveNew: 2, itemNew: 3, itemUp: 4, skillUp: 4, heal: 5, coins: 6 };
 /** レッド戦に入るときの技（クリアまで来た人の組み立ての例。自動プレイヤーの技の選び方は単純で固有技まで届かないので、ここで入れ替える） */
 const BUILDS: Record<string, string[]> = {
   cyndaquil: ['flare-blitz', 'eruption', 'flamethrower', 'swift'],

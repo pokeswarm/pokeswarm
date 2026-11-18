@@ -346,6 +346,13 @@ export interface RunStatCommand {
   readonly value: number;
 }
 
+/** アクティブスキルを使う（slot は枠＝キーの順。SPACE を離したとき。07 の305章） */
+export interface UseSkillCommand {
+  readonly type: 'useSkill';
+  readonly playerId: PlayerId;
+  readonly slot: number;
+}
+
 /** 時間帯のなつきの進化（イーブイ）への本人の答え（07 の81章） */
 export interface AnswerEvolveCommand {
   readonly type: 'answerEvolve';
@@ -355,6 +362,7 @@ export interface AnswerEvolveCommand {
 
 export type InputCommand =
   | MoveCommand
+  | UseSkillCommand
   | AnswerEvolveCommand
   | RunStatCommand
   | ContestInputCommand

@@ -86,6 +86,7 @@
   - nova は `magnitude {min, max}` で使うたびに強さを引く（マグニチュード）。scatter は `scatterArc`（度）で向いている方向の扇に置く（いわなだれ）。`ground` ＋ `every` の `explode` の `pull` で、敵の所に引き寄せる渦を置ける（すなじごく）。
   - 姿で変わる効き方は `forms`（しんそく: ウィンディなら炎）。
   - **体が動く技（`dash`・`dash` の段を持つ連続技）は重ねて出ない**（07 の268章）。ほかの体が動く技が進んでいる・溜めている・連続技の途中は待つ。体が動く技を足すときは、ほかの体が動く技と一緒に持ったときの出る間隔も見る。
+- **アクティブスキル**（07 の305章）: キー（SPACE・Q・E）で使う、技の枠とは別の技。定義は `data/game/active-skills.json`、持たせるのは `playables.json` の `activeSkills`（並びがキーの順）。回数・戻る秒数・レベルアップの候補（`skillUp`）は全部のスキルで共通（`src/sim/activeSkills.ts`）。新しい種類（`kind`）を足すときは、シミュレーションの `useSkill` と、絵（ミュウツーは `src/render/effects/MewtwoPlayer.ts`）・アイコン（`src/render/skillIcons.ts`）を足す。
 - 派生（`derivations.json`）の形: 元の技（最大）＋ 持ち物 → 派生技。固有技は系統（`line`）付き。追加の条件は `minLevel`・`forms`・`withMoves`（ほかにも最大で持つ技。進化で消費）・`consumes`（持っていれば消費）・`inheritLevels`（材料の強化分を受け継ぐ）。
 - 消費した技は `consumedMoves` に入り、もう候補に出ない。
 - `inheritLevels: "consumed"` は、消費した技の強化分だけを受け継ぐ（元の技の分は足さない。カビゴンのギガインパクト: ヘビーボンバー。07 の268章）。`levelCap` で最大レベルを上げるときは、技の `levels` もその分だけ書き足す（足りないと最大は `levels` の数で止まる）。

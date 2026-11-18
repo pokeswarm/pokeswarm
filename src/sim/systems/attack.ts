@@ -28,6 +28,7 @@ import { axisToUnit } from '../math';
 import { typeFlags, typeMultiplier, type MoveStats, type SimMoveDef } from '../moves';
 import { findEnemyIndex, type World } from '../world';
 import { abilityOf, abilityPowerMultiplier, killStackPct, pinchMods } from '../ability';
+import { skillPowerPct } from '../activeSkills';
 import { bumpRunStat } from '../runStats';
 import type { Modifiers } from '../upgrades';
 import { applyHitEffect } from './commands';
@@ -75,6 +76,8 @@ export function playerMoveStats(world: World, p: Player, pm: { move: number; lev
     ...st,
     count: toPower ? st.count : st.count + m.amountBonus,
     ...(toPower ? { power: (st.power * Math.max(1, st.count + world.rules.combat.bonusCountPowerRate * m.amountBonus)) / st.count } : {}),
+    // サイコブレイク: 玉は 1 つのまま、増えた分だけ大きくなる（07 の305章）
+    ...(toPower && def.bonusCountSizePct ? { size: st.size * Math.max(0.1, 1 + (def.bonusCountSizePct * m.amountBonus) / 100) } : {}),
     durationSeconds: st.durationSeconds * Math.max(0.1, 1 + m.durationPct / 100),
     range: st.range * Math.max(0.1, 1 + rangePct / 100),
     pierce: st.pierce + m.pierceBonus,
@@ -137,7 +140,7 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
     power:
       st.power *
       (def.damageClass === 'physical' ? p.physicalPower : p.specialPower) *
-      Math.max(0, 1 + (m.powerPct + classPct + typePowerPctOf(world, p, def, pinch)) / 100) *
+      Math.max(0, 1 + (m.powerPct + classPct + typePowerPctOf(world, p, def, pinch) + skillPowerPct(world, p)) / 100) *
       heldPowerMultiplier(world, p) *
       // なまけ: 2回に1回しか出ない分、強い
       abilityPowerMultiplier(world, p) *
@@ -2059,6 +2062,8 @@ export function moveProjectiles(world: World): void {
       if (firstStrike && local && pr.stage[i] === 0 && def.hpCost?.onHit && owner) selfDamage(world, owner, (owner.maxHp * def.hpCost.pct) / 100);
       // 雑魚は貫通し、ボス・中ボスで止まる（ラスターカノン: そこで弾ける）
       if (bossHit && pr.stage[i] === 0 && def.stopOnBoss) pr.pierceLeft[i] = 0;
+      // 途中の敵は貫通し、狙った敵で止まる（サイコブレイク: そこで弾ける。07 の305章）
+      if (pr.stage[i] === 0 && def.stopOnTarget && pr.target[i] === e.id[j]! + 1) pr.pierceLeft[i] = 0;
       // 線・扇・外へ広がる輪は、当たった光を敵の所に出す（中心に出すと使ったポケモンの足元に重なって白い円に見える。07 の184章）
       if (line || pr.shape[i] === SHAPE_SECTOR || pr.band[i]! > 0) {
         hitX = e.x[j]!;

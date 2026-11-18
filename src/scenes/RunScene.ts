@@ -1,6 +1,6 @@
 import { boxOf } from '../sim/systems/attack';
 import Phaser from 'phaser';
-import { achievementsConfig, pickupConfig, derivedStatSources, playablesConfig, effectRecipes, moveSprites, generated, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, regionStage, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig, type RegionStage } from '../data';
+import { activeSkillsConfig, achievementsConfig, pickupConfig, derivedStatSources, playablesConfig, effectRecipes, moveSprites, generated, iconConfig, itemIcons, itemSprites, obstacleSprites, networkConfig, placeholderRender, playerConfig, saveConfig, regionStage, shopConfig, simulationConfig, spriteRender, stageConfig, uiConfig, type RegionStage } from '../data';
 import { buildSimRules, localName, mergeModifiers, permanentModifiers, playableLoadout } from '../data/simRules';
 import { glyphFinePoints, glyphPoints, glyphReach } from '../sim/glyph';
 import { permanentBonus } from '../meta/shop';
@@ -30,6 +30,9 @@ import { KyogreSea } from '../render/effects/KyogreSea';
 import { RayquazaSky } from '../render/effects/RayquazaSky';
 import { DeoxysCosmos } from '../render/effects/DeoxysCosmos';
 import { LatiEon } from '../render/effects/LatiEon';
+import { MewtwoPlayer } from '../render/effects/MewtwoPlayer';
+import { SkillHud } from '../render/SkillHud';
+import { ensureSkillIcons } from '../render/skillIcons';
 import { ShinyCharizardFlame } from '../render/effects/ShinyCharizardFlame';
 import { ShinyVenusaurPlant } from '../render/effects/ShinyVenusaurPlant';
 import { WaterRun } from '../render/effects/WaterRun';
@@ -192,6 +195,13 @@ export class RunScene extends Phaser.Scene {
   private rayquazaSky: RayquazaSky | null = null;
   private deoxysCosmos: DeoxysCosmos | null = null;
   private latiEon: LatiEon | null = null;
+  /** 遊べるミュウツーの技（サイコブレイク・テレポート。07 の305章） */
+  private mewtwoPlayer: MewtwoPlayer | null = null;
+  /** アクティブスキルのボタン（右下）とキー、押している枠（SPACE を押している間は行き先の印を出す）、スマホでボタンを押している指 */
+  private skillHud: SkillHud | null = null;
+  private skillKeys: Phaser.Input.Keyboard.Key[] = [];
+  private skillAim: number | null = null;
+  private skillTouch: { pointer: number; slot: number } | null = null;
   private shinyCharizardFlame: ShinyCharizardFlame | null = null;
   private shinyVenusaurPlant: ShinyVenusaurPlant | null = null;
   /** 甲羅で走っているボス（色違いのカメックスの アクアジェット）: 走り出した技の動作・絵・向き。止まると消す */
@@ -373,6 +383,10 @@ export class RunScene extends Phaser.Scene {
     this.buffIcons = [];
     this.fieldOverlay = null;
     this.lavaSea = null;
+    this.mewtwoPlayer = null;
+    this.skillHud = null;
+    this.skillAim = null;
+    this.skillTouch = null;
     this.snowGround = null;
     this.blizzardSheet = null;
     this.iceCrystals = null;
@@ -672,6 +686,7 @@ export class RunScene extends Phaser.Scene {
     // ゲストの選択はホストが確定するので、要望としてホストへ送る
     const guest = role === 'guest';
     ensureIconTextures(this, iconConfig, rules, itemIcons);
+    ensureSkillIcons(this, rules);
     this.levelUpPanel = new LevelUpPanel({
       iconUrl: (key) => iconDataUrl(this, key),
       choose: (index) => (guest ? this.sync?.requestUpgrade('c', index) : this.uiCommands.push({ type: 'chooseUpgrade', playerId: this.localId, index })),
@@ -727,6 +742,27 @@ export class RunScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(1000);
     this.hudIcons = new HudIcons(this);
+    // アクティブスキル（07 の305章）: キーは横取りしない（ランの後の文字の入力を邪魔しないため）
+    this.skillHud = new SkillHud(this, activeSkillsConfig.keys);
+    this.skillKeys = activeSkillsConfig.keys.map((k) => this.input.keyboard!.addKey(k, false));
+    if (isTouchDevice()) {
+      const onSkillDown = (ev: PointerEvent): void => {
+        if (ev.pointerType === 'mouse' || ev.target !== this.game.canvas || this.skillTouch) return;
+        const slot = this.skillButtonAt(ev.clientX, ev.clientY);
+        if (slot !== null) this.skillTouch = { pointer: ev.pointerId, slot };
+      };
+      const onSkillUp = (ev: PointerEvent): void => {
+        if (this.skillTouch && ev.pointerId === this.skillTouch.pointer) this.skillTouch = null;
+      };
+      window.addEventListener('pointerdown', onSkillDown);
+      window.addEventListener('pointerup', onSkillUp);
+      window.addEventListener('pointercancel', onSkillUp);
+      this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+        window.removeEventListener('pointerdown', onSkillDown);
+        window.removeEventListener('pointerup', onSkillUp);
+        window.removeEventListener('pointercancel', onSkillUp);
+      });
+    }
     const card = new HudCard((key) => iconDataUrl(this, key));
     this.hudCard = card;
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => card.destroy());
@@ -1300,6 +1336,8 @@ export class RunScene extends Phaser.Scene {
         appeared.push(ev.kind);
       } else if (ev.type === 'hazardTelegraphed' && ev.delay === 0) {
         this.showBossMoveName(ev);
+      } else if (ev.type === 'skillUsed') {
+        this.mewtwoPlayer?.onSkillUsed(ev, this.time.now);
       } else if (ev.type === 'playerFrozen' && ev.playerId === this.localId) {
         this.announce(t('run.frozen'), '#80deea');
       } else if (ev.type === 'boxHit' || ev.type === 'boxRemoved') {
@@ -2607,6 +2645,15 @@ export class RunScene extends Phaser.Scene {
     this.placeUi(this.announceText, cx, cam.height * 0.3);
     this.placeUi(this.downText, cx, cam.height * 0.7);
     this.placeUi(this.hudIcons.container, 8, top);
+    // アクティブスキルのボタン: 右下（スマホの右の親指の位置）
+    if (this.skillHud) {
+      const me = w.players.find((p) => p.id === this.localId);
+      if (me?.skills?.length) {
+        this.skillHud.update(w, me, this.skillAim);
+        this.skillHud.container.setVisible(true);
+        this.placeUi(this.skillHud.container, cam.width - 16 - this.skillHud.width, cam.height - 16 - this.skillHud.height);
+      } else this.skillHud.container.setVisible(false);
+    }
     this.hudTop = top;
     this.placeUi(this.hud, 8, top + this.hudIcons.container.getBounds().height + 8);
     this.drawBossBars(cam, cx, w.arena ? top + this.timerHeight() + ARENA_BAR_GAP : top + uiConfig.timer.size + 12);
@@ -3079,15 +3126,38 @@ export class RunScene extends Phaser.Scene {
     this.hudCard.show(w, local, target, iconKey, rect.left + cam.x + 8, rect.top + cam.y + this.hudTop + this.hudIcons.fullHeight + 4);
   }
 
+  /** 画面の座標にあるスキルのボタンの枠（無ければ null） */
+  private skillButtonAt(clientX: number, clientY: number): number | null {
+    const hud = this.skillHud;
+    if (!hud?.container.visible) return null;
+    const cam = this.cameras.main;
+    const rect = this.game.canvas.getBoundingClientRect();
+    const z = cam.zoom;
+    // placeUi の逆: 入れ物の左上の画面の座標
+    const left = cam.width / 2 + (hud.container.x - cam.width / 2) * z;
+    const top = cam.height / 2 + (hud.container.y - cam.height / 2) * z;
+    return hud.hit(clientX - rect.left - cam.x - left, clientY - rect.top - cam.y - top);
+  }
+
   /** ローカルの入力を、変化があったときだけコマンドにする */
   private collectCommands(): InputCommand[] {
     const out = this.uiCommands.splice(0);
     // キーボードを優先し、押していなければジョイスティック
     const key = this.keyboard.read();
     const { dx, dy } = key.dx || key.dy || !this.joystick ? key : this.joystick.read();
-    if (dx === this.lastSent.dx && dy === this.lastSent.dy) return out;
-    this.lastSent = { dx, dy };
-    return [...out, { type: 'move', playerId: this.localId, dx, dy }];
+    if (dx !== this.lastSent.dx || dy !== this.lastSent.dy) {
+      this.lastSent = { dx, dy };
+      out.push({ type: 'move', playerId: this.localId, dx, dy });
+    }
+    // アクティブスキル: 押している間は行き先を見せ、離したら使う（移動の向きを先に当ててから。07 の305章）
+    const me = this.sim.world.players.find((p) => p.id === this.localId);
+    const slots = me?.skills?.length ?? 0;
+    let held: number | null = this.skillTouch && this.skillTouch.slot < slots ? this.skillTouch.slot : null;
+    for (let k = 0; k < slots && held === null; k++) if (this.skillKeys[k]?.isDown) held = k;
+    if (this.sim.world.levelUp || this.sim.world.paused) held = null;
+    if (this.skillAim !== null && held !== this.skillAim && !this.sim.world.levelUp && !this.sim.world.paused) out.push({ type: 'useSkill', playerId: this.localId, slot: this.skillAim });
+    this.skillAim = held;
+    return out;
   }
 
   private draw(alpha: number, deltaMs: number, timeMs: number): void {
@@ -3310,6 +3380,8 @@ export class RunScene extends Phaser.Scene {
     this.deoxysCosmos.update(world, this.time.now);
     this.latiEon ??= new LatiEon(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6, spriteRender.depths.bosses + 0.05);
     this.latiEon.update(world, this.time.now);
+    this.mewtwoPlayer ??= new MewtwoPlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.players + 0.1);
+    this.mewtwoPlayer.update(world, this.time.now, this.localId, this.skillAim);
     this.shinyCharizardFlame ??= new ShinyCharizardFlame(this, spriteRender.depths.effects + 0.35, spriteRender.depths.bosses + 0.05, ARENA_FLOOR_DEPTH + 3.6);
     this.shinyCharizardFlame.update(world, this.time.now, alpha);
     this.shinyVenusaurPlant ??= new ShinyVenusaurPlant(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);

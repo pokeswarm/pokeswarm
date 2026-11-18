@@ -25,6 +25,8 @@ export type UpgradeOffer =
   | { readonly kind: 'moveUp'; readonly slot: number }
   | { readonly kind: 'itemNew'; readonly item: number }
   | { readonly kind: 'itemUp'; readonly slot: number }
+  /** アクティブスキルの強化（ためておける回数が増える。07 の305章） */
+  | { readonly kind: 'skillUp'; readonly slot: number }
   /** 派生・固有技: slot の技を to に置き換える（材料の持ち物が消える持ち物ならなくなる） */
   | { readonly kind: 'derive'; readonly slot: number; readonly to: number; readonly item: number; readonly unique: boolean }
   /** 候補が1つも無いときだけ出す: HP の回復・コイン（leveling.json の fallback） */

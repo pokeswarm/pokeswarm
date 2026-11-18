@@ -68,7 +68,7 @@
     "porygon": { "sprite": "porygon", "startingMoves": ["swift", "sharpen", "conversion", "lock-on"], "fixedMoves": true },
     "scyther": { "sprite": "scyther", "startingMoves": ["scratch"], "formMoves": [{ "form": "scizor", "move": "bullet-punch" }] },
     "magnemite": { "sprite": "magnemite", "startingMoves": ["thunder-shock"] },
-    "mewtwo": { "sprite": "mewtwo", "startingMoves": ["confusion"] },
+    "mewtwo": { "sprite": "mewtwo", "startingMoves": ["confusion", "psybeam", "recover", "future-sight"], "fixedMoves": true, "activeSkills": ["teleport"] },
     "mew": { "sprite": "mew", "startingMoves": ["mimic"], "allMoveTypes": true },
     "articuno": { "sprite": "articuno", "startingMoves": ["powder-snow"] },
     "zapdos": { "sprite": "zapdos", "startingMoves": ["thunder-shock"] },

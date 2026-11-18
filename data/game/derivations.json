@@ -546,6 +546,12 @@
       "line": "mewtwo"
     },
     {
+      "from": "psybeam",
+      "item": "spell-tag",
+      "to": "shadow-ball",
+      "line": "mewtwo"
+    },
+    {
       "from": "thunderbolt",
       "item": "thunder-stone",
       "to": "zap-cannon",

@@ -1412,11 +1412,12 @@
     ],
     "mewtwo": [
       "confusion",
-      "swift",
-      "psystrike",
-      "body-slam",
       "psybeam",
-      "psychic"
+      "recover",
+      "future-sight",
+      "psychic",
+      "psystrike",
+      "shadow-ball"
     ],
     "articuno": [
       "powder-snow",

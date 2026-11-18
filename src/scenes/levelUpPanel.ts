@@ -7,6 +7,8 @@ import type { Player } from '../sim/entities/player';
 import { derivationCompletedBy } from '../sim/systems/leveling';
 import { itemEvolvesNow } from '../sim/systems/evolution';
 import { itemIconKey, moveIconKey } from '../render/Icons';
+import { skillIconKey } from '../render/skillIcons';
+import { maxCharges, skillDef } from '../sim/activeSkills';
 import { windowCss, compactScreen } from '../render/pixelUi';
 import { isTouchDevice } from '../render/TouchJoystick';
 import type { Modifiers } from '../sim/upgrades';
@@ -163,6 +165,11 @@ export function itemName(key: string): string {
   return localName(generated.items[key]?.names, getLocale(), key);
 }
 
+/** アクティブスキルの名前（PokeAPI の技の名前。テレポート。07 の305章） */
+export function skillName(key: string): string {
+  return localName(generated.moves[key]?.names, getLocale(), key);
+}
+
 export function moveDetail(world: World, move: number): string {
   const def = world.rules.moves[move]!;
   const typeKey = world.rules.types.names[def.type] ?? '';
@@ -213,6 +220,20 @@ export function offerText(world: World, p: Player, offer: UpgradeOffer, discover
         level: t('levelUp.levelChange', { from: it.level, to: it.level + 1 }),
         detail: '',
         gains: itemGains(world, it.item, it.level, it.level + 1),
+      };
+    }
+    case 'skillUp': {
+      const s = p.skills![offer.slot]!;
+      const def = skillDef(world, s.skill);
+      const from = maxCharges(world, p, s);
+      return {
+        ...base,
+        icon: skillIconKey(def.key),
+        kind: t('upgrade.kind.skillUp'),
+        name: skillName(def.key),
+        level: t('levelUp.levelChange', { from: s.level, to: s.level + 1 }),
+        detail: '',
+        gains: [t('upgrade.skill.charges', { from, to: from + def.chargesPerLevel })],
       };
     }
     case 'heal':

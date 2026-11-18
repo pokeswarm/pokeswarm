@@ -134,6 +134,18 @@ export interface MoveTaughtEvent {
   readonly move: number;
 }
 
+/** アクティブスキルを使った（テレポート: 消えた所と現れた所・重ねた強化の数。07 の305章。本人のブラウザだけ） */
+export interface SkillUsedEvent {
+  readonly type: 'skillUsed';
+  readonly playerId: PlayerId;
+  readonly skill: number;
+  readonly fromX: number;
+  readonly fromY: number;
+  readonly toX: number;
+  readonly toY: number;
+  readonly stacks: number;
+}
+
 /** 歩きすぎて泣き出した（トゲピー。07 の66.4。見た目と音） */
 export interface CriedEvent {
   readonly type: 'cried';
@@ -432,6 +444,7 @@ export type SimEvent =
   | MoveTaughtEvent
   | RestChangedEvent
   | CriedEvent
+  | SkillUsedEvent
   | EvolveAskEvent
   | BoxSpawnedEvent
   | PlayerFrozenEvent

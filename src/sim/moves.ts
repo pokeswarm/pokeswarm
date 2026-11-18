@@ -89,6 +89,8 @@ export interface SimMoveDef {
   readonly lobSeekShare?: number;
   /** ポイントマックスで増えた本数を威力に変える（太い追従レーザー。07 の122章） */
   readonly bonusCountToPower?: boolean;
+  /** bonusCountToPower の技の、増えた 1 本ごとの大きさ（%。サイコブレイク） */
+  readonly bonusCountSizePct?: number;
   /** lob: 落ちた所でだけ当たる（07 の126章） */
   readonly landOnly?: boolean;
   /** strike: count 個を同時に置かず、intervalSeconds ごとに1つずつ置く（ゴーストダイブ。07 の148章） */
@@ -155,6 +157,8 @@ export interface SimMoveDef {
   readonly statusGuard?: boolean;
   /** 雑魚は貫通し、ボス・中ボスに当たったら消える（ラスターカノン） */
   readonly stopOnBoss?: boolean;
+  /** 追う弾が、狙った敵に当たったら消える（サイコブレイク。07 の305章） */
+  readonly stopOnTarget?: boolean;
   /** HP が最大の thresholdPct % 以下の敵へのダメージを +powerPct %（しおみず。07 の247章） */
   readonly lowHpBonus?: { readonly thresholdPct: number; readonly powerPct: number };
   /** 続けて当てるほど強くなる（エコーボイス。07 の240章） */

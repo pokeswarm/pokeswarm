@@ -179,6 +179,13 @@ export interface Player {
   consumedMoves?: number[];
   /** 箱から拾った一時的な強化（index は pickups.json の items.buff.buffs の番号） */
   buffs?: { index: number; ticksLeft: number; totalTicks: number }[];
+  /**
+   * アクティブスキル（07 の305章）: 枠（キー）ごとのスキルの番号・レベル・今ためている回数・次の 1 回が戻るまでの残り（更新回数）。
+   * 自分のプレイヤーだけ使う（ほかのブラウザのプレイヤーは本人のブラウザで使う）
+   */
+  skills?: { skill: number; level: number; charges: number; rechargeTicks: number }[];
+  /** テレポートの後の強化（技の威力 +pct %。重ねた数 stacks。untilTick まで） */
+  skillBuff?: { pct: number; stacks: number; untilTick: number };
   /** 技で付いた一時的な強化（move は技の番号。フレアドライブ。07 の115章） */
   moveBuffs?: { move: number; ticksLeft: number }[];
   /** この更新で受けたダメージの合計（効き方 hurt: ミラーコートが返す。次の更新の攻撃で使って 0 に戻す。07 の154章） */

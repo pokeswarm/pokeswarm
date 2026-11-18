@@ -142,6 +142,50 @@ function paint(fn: (x: number, y: number) => string | null): Draw {
   };
 }
 
+/**
+ * サイコブレイク（07 の305章）: 紫のエネルギーの玉が右上へ飛ぶ。中は暗い紫の渦、縁は桃色に光り、
+ * 後ろに尾を引き、まわりに黄色い稲妻の筋が走る（ゲームの中の玉と同じ色）
+ */
+function psystrikeOrb(): Draw {
+  const cx = 19;
+  const cy = 13;
+  return paint((x, y) => {
+    const dx = x - cx;
+    const dy = y - cy;
+    const r = Math.hypot(dx, dy);
+    // 黄色い稲妻の筋（玉の外の 3 本）
+    const bolts: [number, number, number, number][] = [[6, 8, 11, 6], [24, 25, 29, 22], [8, 22, 5, 26]];
+    for (const [x0, y0, x1, y1] of bolts) {
+      const t = ((x - x0) * (x1 - x0) + (y - y0) * (y1 - y0)) / ((x1 - x0) ** 2 + (y1 - y0) ** 2);
+      if (t < 0 || t > 1) continue;
+      const zig = Math.sin(t * 9) * 1.1;
+      const px = x0 + (x1 - x0) * t + zig * 0.6;
+      const py = y0 + (y1 - y0) * t - zig * 0.6;
+      if (Math.hypot(x - px, y - py) < 0.75) return t > 0.4 && t < 0.6 ? '#fffde7' : '#ffd54f';
+    }
+    if (r < 9.2) {
+      const a = Math.atan2(dy, dx);
+      const swirl = Math.sin(a * 3 + r * 0.9);
+      if (r > 7.8) return dx > 2 && dy > -1 ? '#ffb74d' : '#f48fb1';
+      if (r > 6.4) return swirl > 0 ? '#e040fb' : '#ab47bc';
+      if (r < 2.2) return '#f3e5f5';
+      if (r < 3.6) return '#ce93d8';
+      return swirl > 0.35 ? '#8e24aa' : '#5e1f8c';
+    }
+    // 尾（左下へ。玉と同じ太さから細くなる彗星の尾。筋が流れ、先は粒にほどける）
+    const along = -(dx * 0.72 - dy * 0.69);
+    const side = dx * 0.69 + dy * 0.72;
+    const half = 8.6 - along * 0.42;
+    if (along > 3 && along < 21 && Math.abs(side) < half) {
+      const streak = Math.sin(side * 1.3 + along * 0.35);
+      if (along > 14 && (Math.floor(x) + Math.floor(y)) % 2 === 1) return null;
+      if (Math.abs(side) < half * 0.3) return along < 10 ? '#f3e5f5' : '#ce93d8';
+      return streak > 0.3 ? (along < 12 ? '#e040fb' : '#ab47bc') : along < 12 ? '#9c27b0' : '#6a1b9a';
+    }
+    return null;
+  });
+}
+
 /** 光のきらめき（十字の小さな光） */
 function glint(cx: number, cy: number, r: number, c = '#ffffff', mid = '#fff9c4'): Draw {
   return paint((x, y) => {
@@ -567,6 +611,7 @@ const ICONS: Record<string, Layer[]> = {
   // ---- ゲームの中で何も出ない技（07 の266章）: その技で自分に起きる変化を描く ----
   // つるぎのまい: 自分のまわりを回る剣
   'swords-dance': [swordRing(4, 28)],
+  psystrike: [psystrikeOrb()],
   // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
   sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],
   // かたくなる: 体の表面が硬い板になる

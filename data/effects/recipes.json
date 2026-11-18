@@ -2746,19 +2746,18 @@
     },
     "psystrike": {
       "extends": "psychic.base",
+      "hideShape": true,
       "projectile": {
-        "glowScale": 1.3,
-        "coreScale": 0.5
+        "glowScale": 0,
+        "coreScale": 0
       },
       "impact": {
+        "burst": {
+          "count": 0
+        },
         "flash": {
-          "radius": 60
+          "alpha": 0
         }
-      },
-      "sprite": {
-        "id": "burst-psy",
-        "fit": "circle",
-        "size": 1.1
       }
     },
     "zap-cannon": {

@@ -1738,6 +1738,8 @@ export const moveDefSchema = z.object({
   waitForEnd: z.boolean().optional(),
   /** 技の数を増やす持ち物（ポイントマックス）で本数を増やさず、増えた分を威力に変える（元の本数 n に +k なら威力 ×(n + 割合×k)/n。割合は combat.json の bonusCountPowerRate）。太い追従レーザー（ハイドロポンプ・ハイドロカノン・はかいこうせん・ソーラービーム。07 の122章）と、自分を中心に広がる円（だいばくはつ など。重なって同じ所に何度も当たるため。07 の128章） */
   bonusCountToPower: z.boolean().optional(),
+  /** bonusCountToPower の技で、増えた 1 本ごとに大きさも +この割合 %（サイコブレイク: 玉は 1 つのまま、大きく強くなる。07 の305章） */
+  bonusCountSizePct: z.number().positive().optional(),
   /** lob: 落ちた所でだけ当たる（飛んでいる途中は当たらない。ふんか: 投げた瞬間にすぐそばのボスへ全部当たっていた。07 の126章） */
   landOnly: z.boolean().optional(),
   /**
@@ -1936,6 +1938,8 @@ export const moveDefSchema = z.object({
   statusGuard: z.boolean().optional(),
   /** 雑魚は貫通し、ボス・中ボス（rank が normal でない敵）に当たったら消える（そこで end の効き方。ラスターカノン。07 の238章） */
   stopOnBoss: z.boolean().optional(),
+  /** 追う弾（homing）: 途中の敵は貫通し、狙った敵（aimStrongest で決めた HP の一番高い敵）に当たったら消える（そこで end の効き方。サイコブレイク。07 の305章） */
+  stopOnTarget: z.boolean().optional(),
   /** HP が最大の thresholdPct % 以下の敵へのダメージを +powerPct %（しおみず: 半分を切った相手に倍。原作どおり。07 の247章） */
   lowHpBonus: z.object({ thresholdPct: z.number().positive().max(100), powerPct: z.number().positive() }).optional(),
   /**
@@ -2165,6 +2169,8 @@ export const playablesConfigSchema = z.object({
       moveTypes: z.array(z.string()).optional(),
       /** 新しい技を覚えない（プリン: 最初の2つだけで戦う） */
       fixedMoves: z.boolean().default(false),
+      /** アクティブスキル（data/game/active-skills.json のキー。並びが active-skills.json の keys の順。ミュウツー: テレポート。07 の305章） */
+      activeSkills: z.array(z.string()).default([]),
       /** 持つと技を覚える持ち物（ワンリキー: ほのおのいし → ほのおのパンチ、かみなりのいし → かみなりパンチ）。消費された技は覚え直さない */
       itemMoves: z.array(z.object({ item: z.string(), move: z.string() })).default([]),
       /** どのタイプの技も覚えられる（ミュウ） */
@@ -2943,6 +2949,31 @@ export const abilitiesConfigSchema = z.object({
 });
 export type AbilityDef = AbilitiesConfig['abilities'][string];
 export type AbilitiesConfig = z.infer<typeof abilitiesConfigSchema>;
+
+/**
+ * アクティブスキル（data/game/active-skills.json。作者の案 2026年11月18日。07 の305章）: キーを押して使う技。技の枠とは別。
+ * - keys: スキルの枠ごとのキー（playables.json の activeSkills の 1 つ目が SPACE、2 つ目が Q…）
+ * - ためておける回数 = baseCharges + (レベル − 1) × chargesPerLevel + 技の数の強化（ポイントマックス）。
+ *   1 回分は rechargeSeconds で戻り、技の再使用の強化（メトロノーム など）で速くなる。レベルはレベルアップの候補で上がる（maxLevel まで）
+ * - teleport: 進む向き（押していなければ向いている向き）へ distance だけ移る。移った後 buff.seconds 秒、技の威力 +buff.powerPct %。
+ *   効いている間にまた移ると重なる（buff.maxStacks まで。秒数は移るたびに戻る）
+ */
+export const activeSkillsConfigSchema = z.object({
+  keys: z.array(z.string()).min(1),
+  skills: z.record(
+    z.string(),
+    z.object({
+      kind: z.enum(['teleport']),
+      maxLevel: z.number().int().positive(),
+      baseCharges: z.number().int().positive(),
+      chargesPerLevel: z.number().int().min(0),
+      rechargeSeconds: z.number().positive(),
+      distance: z.number().positive(),
+      buff: z.object({ powerPct: z.number().positive(), seconds: z.number().positive(), maxStacks: z.number().int().positive() }).optional(),
+    }),
+  ),
+});
+export type ActiveSkillsConfig = z.infer<typeof activeSkillsConfigSchema>;
 
 export const generatedNaturesSchema = z.record(
   z.string(),

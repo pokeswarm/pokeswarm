@@ -21,6 +21,7 @@ import { blockByObstacles } from './obstacles';
 import { advanceSection, armBombers, bossAttacks, checkRunEnd, spawnBosses, spawnSwarms, stepIntruders, stepTags, stepLegendTargets, keepInArena } from './systems/stage';
 import { createWorld, type SimRole, type World } from './world';
 import { drawNature } from './nature';
+import { initSkills, stepSkills } from './activeSkills';
 
 export interface SimulationOptions {
   tickRate: number;
@@ -60,6 +61,7 @@ export class Simulation {
     p.maxHp = 0;
     recomputeModifiers(this.world, p);
     p.hp = p.maxHp;
+    initSkills(this.world, p);
     this.world.players.push(p);
     return p;
   }
@@ -83,6 +85,7 @@ export class Simulation {
       return;
     }
     movePlayers(w);
+    stepSkills(w);
     spawnEnemies(w);
     spawnBosses(w);
     stepIntruders(w);

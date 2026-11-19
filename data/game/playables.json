@@ -71,7 +71,7 @@
     "mewtwo": { "sprite": "mewtwo", "startingMoves": ["confusion", "psybeam", "recover", "future-sight"], "fixedMoves": true, "activeSkills": ["teleport"] },
     "mew": { "sprite": "mew", "startingMoves": ["mimic"], "allMoveTypes": true },
     "articuno": { "sprite": "articuno", "startingMoves": ["freeze-dry-articuno", "icy-wind-articuno", "blizzard-articuno", "ice-shard-articuno"], "fixedMoves": true, "activeSkills": ["freeze-dry-articuno", "icy-wind-articuno", "blizzard-articuno"] },
-    "zapdos": { "sprite": "zapdos", "startingMoves": ["thunder-shock"] },
+    "zapdos": { "sprite": "zapdos", "startingMoves": ["drill-peck-zapdos", "zap-cannon-zapdos", "thunderbolt-zapdos", "thunder-shock-zapdos"], "fixedMoves": true, "activeSkills": ["drill-peck-zapdos", "zap-cannon-zapdos", "thunderbolt-zapdos"] },
     "moltres": { "sprite": "moltres", "startingMoves": ["sky-attack-moltres", "heat-wave-moltres", "burn-up-moltres", "ember-moltres"], "fixedMoves": true, "activeSkills": ["sky-attack-moltres", "heat-wave-moltres", "burn-up-moltres"] },
     "raikou": { "sprite": "raikou", "startingMoves": ["extreme-speed-raikou", "charge-raikou", "rising-voltage-raikou", "electric-terrain-raikou"], "fixedMoves": true, "activeSkills": ["extreme-speed-raikou", "charge-raikou", "rising-voltage-raikou"] },
     "entei": { "sprite": "entei", "startingMoves": ["eruption-entei", "lava-plume-entei", "overheat-entei", "sacred-fire-entei"], "fixedMoves": true, "activeSkills": ["eruption-entei", "lava-plume-entei", "overheat-entei"] },

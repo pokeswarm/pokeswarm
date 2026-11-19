@@ -3009,6 +3009,12 @@ export type AbilitiesConfig = z.infer<typeof abilitiesConfigSchema>;
  *   通り道に featherSpacing ごとに燃える羽が落ち、featherSeconds 燃える（中の敵に技の威力の featherPowerPct % ずつ）
  * - heatWave（ねっぷう。07 の315章）: 向きへ開き arcDegrees の弧の熱波を、技の count 回 waveDelaySeconds ごとに送る（1 回ごとに turnDegrees ずつ向きをずらす）。
  *   熱波は厚さ = 技の size の帯で、技の durationSeconds で 技の range まで広がる（自分に付いて動く）
+ * - drillPeck（ドリルくちばし。サンダー。07 の316章）: chargeSeconds 構えてから、回りながら向きへ技の range だけ技の speed で突き抜ける（体が動く技。通り道の敵に 1 回ずつ当たる）
+ * - zapCannon（でんじほう。07 の316章）: 向きへ大きな電気の球（半径 = 技の size）をゆっくり（技の speed）放つ。球は技の durationSeconds 進み、触れた敵に hitIntervalSeconds ごとに当たる。
+ *   自分の球どうしが linkDistance より近いと電気の帯（太さ bandWidth）でつながって共鳴し、帯に触れた敵に bandIntervalSeconds ごとに技の威力の bandPowerPct % が当たる。
+ *   自分の球は maxSpheres まで（超えたら古い球から消える）
+ * - thunderbolt（10まんボルト。07 の316章）: 向きへ稲妻をまっすぐ放つ（長さ = 技の range・太さ = 技の size。1 回当たる）。稲妻が自分の でんじほう の球か帯に当たると、
+ *   そこからつながった球と帯がすべて burstDelaySeconds 後にはじける（球: 半径 × burstSizeMultiplier・10まんボルト の威力 × burstMultiplier。帯: 線の上に 威力 × bandBurstMultiplier）
  * - burnUp（もえつきる。07 の315章）: chargeSeconds 体の炎を集めて、巨大な炎の玉を投げる（flightSeconds で落ちる。落ちる所は ふんか と同じ選び方・areaDistance。半径 = 技の size）。
  *   投げた後 burnoutSeconds の間、ほのおタイプを失う代わりに、移動が speedPct % 速く、ゴッドバード の回数が rechargeMultiplier 倍の速さで戻る
  */
@@ -3017,7 +3023,7 @@ export const activeSkillsConfigSchema = z.object({
   skills: z.record(
     z.string(),
     z.object({
-      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed', 'charge', 'risingVoltage', 'eruption', 'lavaPlume', 'overheat', 'freezeDry', 'icyWind', 'blizzard', 'skyAttack', 'heatWave', 'burnUp']),
+      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed', 'charge', 'risingVoltage', 'eruption', 'lavaPlume', 'overheat', 'freezeDry', 'icyWind', 'blizzard', 'skyAttack', 'heatWave', 'burnUp', 'drillPeck', 'zapCannon', 'thunderbolt']),
       /** 技の枠の技（moves.json のキー）。あればレベル・再使用・威力はその技の値 */
       move: z.string().optional(),
       trigger: z.enum(['press', 'release']).default('release'),
@@ -3040,6 +3046,9 @@ export const activeSkillsConfigSchema = z.object({
       blizzard: z.object({ width: z.number().positive(), startDistance: z.number().min(0) }).optional(),
       skyAttack: z.object({ chargeSeconds: z.number().min(0), featherSpacing: z.number().positive(), featherSeconds: z.number().positive(), featherPowerPct: z.number().min(0) }).optional(),
       heatWave: z.object({ arcDegrees: z.number().positive().max(360), waveDelaySeconds: z.number().min(0), turnDegrees: z.number() }).optional(),
+      drillPeck: z.object({ chargeSeconds: z.number().min(0) }).optional(),
+      zapCannon: z.object({ linkDistance: z.number().positive(), bandWidth: z.number().positive(), bandPowerPct: z.number().min(0), bandIntervalSeconds: z.number().positive(), maxSpheres: z.number().int().positive() }).optional(),
+      thunderbolt: z.object({ burstMultiplier: z.number().positive(), burstSizeMultiplier: z.number().positive(), bandBurstMultiplier: z.number().min(0), burstDelaySeconds: z.number().min(0) }).optional(),
       burnUp: z.object({ chargeSeconds: z.number().min(0), flightSeconds: z.number().positive(), areaDistance: z.number().positive(), burnoutSeconds: z.number().positive(), speedPct: z.number().min(0), rechargeMultiplier: z.number().int().positive() }).optional(),
     }),
   ),

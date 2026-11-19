@@ -2282,6 +2282,7 @@ export function tickMarks(world: World): void {
   // しもやけ・氷漬け: 時間が来ると消える
   for (let i = 0; i < e.count; i++) if (e.frostTicks[i]! > 0 && --e.frostTicks[i]! === 0) e.frost[i] = 0;
   stepElectricField(world);
+  stepZapBands(world);
   for (let i = 0; i < e.count; i++) {
     if (e.markTicks[i] === 0) continue;
     if (--e.markTicks[i]! > 0 || e.hp[i]! <= 0) continue;
@@ -3088,7 +3089,7 @@ export function fireSkyAttack(world: World, p: Player, pm: PlayerMove, dirX: num
   const group = newCastGroup(world, cfg.chargeSeconds + seconds);
   const b0 = base(world, p, pm, st);
   world.projectiles.add({ ...b0, motion: MOTION_FOLLOW, x: p.x, y: p.y, ox: 0, oy: 0, dirX, dirY, group, life: Math.max(world.dt, cfg.chargeSeconds), stage: 3, armStage: 0, armLife: seconds });
-  for (let d = cfg.featherSpacing * 0.5; d <= len; d += cfg.featherSpacing) {
+  for (let d = cfg.featherSpacing * 0.5; cfg.featherSeconds > 0 && d <= len; d += cfg.featherSpacing) {
     world.projectiles.add({
       ...b0,
       motion: MOTION_LINEAR,
@@ -3140,4 +3141,165 @@ export function fireBurnUp(world: World, p: Player, pm: PlayerMove, dirX: number
   const c = burnUpCenter(world, p, st.range, dirX, dirY, cfg.areaDistance);
   const group = newCastGroup(world, cfg.chargeSeconds + cfg.flightSeconds + st.durationSeconds);
   world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: c.x, y: c.y, group, life: Math.max(world.dt, cfg.chargeSeconds + cfg.flightSeconds), stage: 3, armStage: 0, armLife: st.durationSeconds });
+}
+
+/** でんじほう（サンダー。07 の316章）のスキルの定義（無ければ undefined） */
+function zapCannonSkill(world: World): { move: number; cfg: { linkDistance: number; bandWidth: number; bandPowerPct: number; bandIntervalSeconds: number; maxSpheres: number } } | undefined {
+  const d = world.rules.activeSkills?.defs.find((x) => x.kind === 'zapCannon' && x.move >= 0 && x.zapCannon);
+  return d ? { move: d.move, cfg: d.zapCannon! } : undefined;
+}
+
+/**
+ * プレイヤー owner の でんじほう の球（出ているもの。古い順）と、共鳴の帯（球の番号の組。linkDistance より近い球どうし）。描画でも使う
+ */
+export function zapNetwork(world: World, owner: number): { spheres: { i: number; x: number; y: number; r: number; serial: number }[]; links: [number, number][]; bandWidth: number } {
+  const zc = zapCannonSkill(world);
+  const spheres: { i: number; x: number; y: number; r: number; serial: number }[] = [];
+  const links: [number, number][] = [];
+  if (!zc) return { spheres, links, bandWidth: 0 };
+  const pr = world.projectiles;
+  for (let i = 0; i < pr.count; i++) {
+    if (pr.move[i] !== zc.move || pr.owner[i] !== owner || pr.stage[i] !== 0 || pr.shape[i] !== SHAPE_CIRCLE) continue;
+    spheres.push({ i, x: pr.x[i]!, y: pr.y[i]!, r: pr.radius[i]!, serial: pr.serial[i]! });
+  }
+  spheres.sort((a, b) => a.serial - b.serial);
+  for (let a = 0; a < spheres.length; a++) {
+    for (let b = a + 1; b < spheres.length; b++) {
+      if (Math.hypot(spheres[a]!.x - spheres[b]!.x, spheres[a]!.y - spheres[b]!.y) <= zc.cfg.linkDistance) links.push([a, b]);
+    }
+  }
+  return { spheres, links, bandWidth: zc.cfg.bandWidth };
+}
+
+/** 線分 a（(ax,ay) から (bx,by)）と線分 c（(cx,cy) から (ex,ey)）のいちばん近い距離 */
+function segSegDistance(ax: number, ay: number, bx: number, by: number, cx: number, cy: number, ex: number, ey: number): number {
+  const ptSeg = (px: number, py: number, sx: number, sy: number, tx: number, ty: number): number => {
+    const vx = tx - sx;
+    const vy = ty - sy;
+    const l2 = vx * vx + vy * vy || 1;
+    const t = Math.max(0, Math.min(1, ((px - sx) * vx + (py - sy) * vy) / l2));
+    return Math.hypot(px - sx - vx * t, py - sy - vy * t);
+  };
+  // 交わっていれば 0
+  const cross = (ux: number, uy: number, vx: number, vy: number): number => ux * vy - uy * vx;
+  const d1 = cross(bx - ax, by - ay, cx - ax, cy - ay);
+  const d2 = cross(bx - ax, by - ay, ex - ax, ey - ay);
+  const d3 = cross(ex - cx, ey - cy, ax - cx, ay - cy);
+  const d4 = cross(ex - cx, ey - cy, bx - cx, by - cy);
+  if (d1 * d2 < 0 && d3 * d4 < 0) return 0;
+  return Math.min(ptSeg(ax, ay, cx, cy, ex, ey), ptSeg(bx, by, cx, cy, ex, ey), ptSeg(cx, cy, ax, ay, bx, by), ptSeg(ex, ey, ax, ay, bx, by));
+}
+
+/**
+ * 10まんボルト の稲妻（(x,y) から向き (dx,dy) に長さ len・太さ r）が当たる、プレイヤー owner の でんじほう の網。
+ * 当たった球・帯からつながっているものをすべて返す（spheres は球、links は帯。どちらも zapNetwork の中の番号）
+ */
+export function zapNetworkHit(world: World, owner: number, x: number, y: number, dx: number, dy: number, len: number, r: number): { spheres: number[]; links: number[]; net: ReturnType<typeof zapNetwork> } {
+  const net = zapNetwork(world, owner);
+  const ex = x + dx * len;
+  const ey = y + dy * len;
+  const hit = new Set<number>();
+  net.spheres.forEach((s, k) => {
+    if (segSegDistance(x, y, ex, ey, s.x, s.y, s.x, s.y) <= s.r + r) hit.add(k);
+  });
+  net.links.forEach(([a, b]) => {
+    const A = net.spheres[a]!;
+    const B = net.spheres[b]!;
+    if (segSegDistance(x, y, ex, ey, A.x, A.y, B.x, B.y) <= net.bandWidth / 2 + r) {
+      hit.add(a);
+      hit.add(b);
+    }
+  });
+  // つながっている球をたどる
+  const queue = [...hit];
+  while (queue.length > 0) {
+    const k = queue.pop()!;
+    for (const [a, b] of net.links) {
+      const o = a === k ? b : b === k ? a : -1;
+      if (o !== -1 && !hit.has(o)) {
+        hit.add(o);
+        queue.push(o);
+      }
+    }
+  }
+  const links: number[] = [];
+  net.links.forEach(([a, b], k) => {
+    if (hit.has(a) && hit.has(b)) links.push(k);
+  });
+  return { spheres: [...hit].sort((a, b) => a - b), links, net };
+}
+
+/** でんじほう（07 の316章）: 向きへ大きな電気の球をゆっくり放つ（自分の球が maxSpheres を超えたら古い球から消す） */
+export function fireZapCannon(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { maxSpheres: number }): void {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const net = zapNetwork(world, p.id);
+  const extra = net.spheres.length + 1 - cfg.maxSpheres;
+  if (extra > 0) {
+    const old = net.spheres.slice(0, extra).map((s) => s.i).sort((a, b) => b - a);
+    for (const i of old) world.projectiles.removeAt(i);
+  }
+  world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: p.x + dirX * 30, y: p.y + dirY * 30, vx: dirX * sc.speed, vy: dirY * sc.speed, dirX, dirY });
+}
+
+/**
+ * 共鳴の帯（07 の316章）: bandIntervalSeconds ごとに、自分の球どうしの帯の上に当たりを出す（自分のブラウザだけ。同じ技の線の stage 1。1 回で同じ敵には 1 回）
+ */
+function stepZapBands(world: World): void {
+  const zc = zapCannonSkill(world);
+  if (!zc) return;
+  const every = Math.max(1, Math.round(zc.cfg.bandIntervalSeconds / world.dt));
+  if (world.tick % every !== 0) return;
+  const p = world.players.find((q) => q.id === world.localPlayerId);
+  const pm = p?.moves.find((m) => m.move === zc.move);
+  if (!p || !pm || p.down) return;
+  const net = zapNetwork(world, p.id);
+  if (net.links.length === 0) return;
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const b0 = base(world, p, pm, st);
+  const group = newCastGroup(world, 0.2);
+  for (const [a, b] of net.links) {
+    const A = net.spheres[a]!;
+    const B = net.spheres[b]!;
+    const len = Math.hypot(B.x - A.x, B.y - A.y);
+    if (len < 1) continue;
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: A.x, y: A.y, shape: SHAPE_LINE, length: len, dirX: (B.x - A.x) / len, dirY: (B.y - A.y) / len, radius: zc.cfg.bandWidth / 2, damage: (sc.power * zc.cfg.bandPowerPct) / 100, knockback: 0, pierce: Infinity, life: world.dt * 2.5, stage: 1, group });
+  }
+}
+
+/**
+ * 10まんボルト（07 の316章）: 向きへ稲妻をまっすぐ放つ（同じ技の線の stage 0）。自分の でんじほう の網に当たると、つながった球と帯をすべてはじけさせる
+ * （球は消えて burstDelaySeconds 後に大きな爆発。帯は線の上に。どちらも同じ技の stage 1）。返り値: はじけた球の数
+ */
+export function fireThunderbolt(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { burstMultiplier: number; burstSizeMultiplier: number; bandBurstMultiplier: number; burstDelaySeconds: number }): number {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const b0 = base(world, p, pm, st);
+  let len = st.range;
+  const ar = world.arena;
+  if (ar) {
+    for (let d = 0; d <= st.range; d += 10) {
+      if (Math.abs(p.x + dirX * d - ar.x) > ar.halfWidth || Math.abs(p.y + dirY * d - ar.y) > ar.halfHeight) {
+        len = Math.max(10, d - 10);
+        break;
+      }
+    }
+  }
+  world.projectiles.add({ ...b0, motion: MOTION_FOLLOW, x: p.x, y: p.y, ox: 0, oy: 0, shape: SHAPE_LINE, length: len, dirX, dirY, radius: sc.size, life: st.durationSeconds });
+  const hit = zapNetworkHit(world, p.id, p.x, p.y, dirX, dirY, len, sc.size);
+  if (hit.spheres.length === 0) return 0;
+  const { net } = hit;
+  for (const k of hit.links) {
+    const [a, b] = net.links[k]!;
+    const A = net.spheres[a]!;
+    const B = net.spheres[b]!;
+    const l = Math.hypot(B.x - A.x, B.y - A.y) || 1;
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: A.x, y: A.y, shape: SHAPE_LINE, length: l, dirX: (B.x - A.x) / l, dirY: (B.y - A.y) / l, radius: net.bandWidth, damage: sc.power * cfg.bandBurstMultiplier, life: Math.max(world.dt, cfg.burstDelaySeconds), stage: 3, armStage: 1, armLife: 0.2 });
+  }
+  for (const k of hit.spheres) {
+    const s = net.spheres[k]!;
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: s.x, y: s.y, radius: s.r * cfg.burstSizeMultiplier, damage: sc.power * cfg.burstMultiplier, life: Math.max(world.dt, cfg.burstDelaySeconds), stage: 3, armStage: 1, armLife: 0.2 });
+  }
+  // 球は消す（番号の大きい方から）
+  const idx = hit.spheres.map((k) => net.spheres[k]!.i).sort((a, b) => b - a);
+  for (const i of idx) world.projectiles.removeAt(i);
+  return hit.spheres.length;
 }

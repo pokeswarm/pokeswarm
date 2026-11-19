@@ -1426,17 +1426,10 @@
       "ice-shard-articuno"
     ],
     "zapdos": [
-      "thunder-shock",
-      "air-cutter",
-      "swift",
-      "zap-cannon",
-      "whirlwind",
-      "peck",
-      "thunderbolt",
-      "thunder-wave",
-      "aerial-ace",
-      "wild-charge",
-      "dual-wingbeat"
+      "drill-peck-zapdos",
+      "zap-cannon-zapdos",
+      "thunderbolt-zapdos",
+      "thunder-shock-zapdos"
     ],
     "moltres": [
       "sky-attack-moltres",

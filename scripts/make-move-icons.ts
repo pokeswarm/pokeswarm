@@ -612,6 +612,78 @@ function emberMoltresIcon(): Draw {
   });
 }
 
+/** ドリルくちばし（サンダーの版。07 の316章）: 右上へ突き抜ける、ねじれた黄色いくちばしの渦と、後ろの光の筋 */
+function drillPeckZapdosIcon(): Draw {
+  return paint((x, y) => {
+    const u = (x - 4) * 0.707 - (y - 28) * 0.707;
+    const v = (x - 4) * 0.707 + (y - 28) * 0.707;
+    // ドリル（先がとがる円すい。ねじれの筋）
+    if (u > 14 && u < 34) {
+      const w = (34 - u) * 0.36;
+      if (Math.abs(v) < w) return (Math.floor(u * 0.8 + v * 1.2) % 3 + 3) % 3 === 0 ? '#fff59d' : u > 28 ? '#ffffff' : '#fbc02d';
+    }
+    // 後ろの光の筋
+    for (const o of [-4, 0, 4]) if (u > 2 && u < 14 && Math.abs(v - o) < 0.7 && (Math.floor(u) + o) % 3 !== 0) return '#ffeb3b';
+    return null;
+  });
+}
+
+/** でんじほう（サンダーの版）: 大きな電気の球 2 つと、それをつなぐ共鳴の帯 */
+function zapCannonZapdosIcon(): Draw {
+  return paint((x, y) => {
+    for (const [cx, cy] of [[9, 21], [23, 10]] as const) {
+      const d = Math.hypot(x - cx, y - cy);
+      if (d < 2.5) return '#ffffff';
+      if (d < 4.5) return '#fff59d';
+      if (d < 6.5) return (Math.floor(Math.atan2(y - cy, x - cx) * 3) % 2 === 0) ? '#ffd600' : '#f9a825';
+    }
+    // 帯（ぎざぎざ）
+    const t = ((x - 9) * 14 + (y - 21) * -11) / (14 * 14 + 11 * 11);
+    if (t > 0 && t < 1) {
+      const px = 9 + 14 * t;
+      const py = 21 - 11 * t + Math.sin(t * 18) * 1.4;
+      if (Math.hypot(x - px, y - py) < 0.9) return '#ffffff';
+      if (Math.hypot(x - px, y - py) < 1.7) return '#ffd600';
+    }
+    return null;
+  });
+}
+
+/** 10まんボルト（サンダーの版）: 左下から右上へ走る太い稲妻と、先ではじける光 */
+function thunderboltZapdosIcon(): Draw {
+  const pts: [number, number][] = [[4, 28], [11, 19], [9, 16], [18, 10], [16, 8], [26, 3]];
+  return paint((x, y) => {
+    for (let k = 1; k < pts.length; k++) {
+      const [ax, ay] = pts[k - 1]!;
+      const [bx, by] = pts[k]!;
+      const l2 = (bx - ax) ** 2 + (by - ay) ** 2;
+      const t = Math.max(0, Math.min(1, ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / l2));
+      const d = Math.hypot(x - (ax + (bx - ax) * t), y - (ay + (by - ay) * t));
+      if (d < 0.9) return '#ffffff';
+      if (d < 2.1) return '#ffd600';
+    }
+    const d = Math.hypot(x - 26, y - 4);
+    if (d < 4 && (Math.round(x) + Math.round(y)) % 2 === 0) return '#fff59d';
+    return null;
+  });
+}
+
+/** でんきショック（サンダーの版）: 小さな電気の粒と、まわりの火花 */
+function thunderShockZapdosIcon(): Draw {
+  return paint((x, y) => {
+    const d = Math.hypot(x - 16, y - 16);
+    if (d < 3) return '#ffffff';
+    if (d < 5.5) return '#ffd600';
+    for (let k = 0; k < 6; k++) {
+      const a = (k / 6) * Math.PI * 2 + 0.3;
+      const t = (x - 16) * Math.cos(a) + (y - 16) * Math.sin(a);
+      const s = -(x - 16) * Math.sin(a) + (y - 16) * Math.cos(a);
+      if (t > 8 && t < 13 && Math.abs(s - Math.sin(t * 2) * 1.2) < 0.8) return k % 2 ? '#fff59d' : '#fbc02d';
+    }
+    return null;
+  });
+}
+
 /** しんそく（ライコウの版）: 3 回折れて駆け抜ける稲妻の道と、その先の光 */
 function extremeSpeedRaikouIcon(): Draw {
   const pts: [number, number][] = [[4, 26], [12, 14], [17, 22], [27, 6]];
@@ -1080,6 +1152,10 @@ const ICONS: Record<string, Layer[]> = {
   'heat-wave-moltres': [heatWaveMoltresIcon()],
   'burn-up-moltres': [burnUpMoltresIcon()],
   'ember-moltres': [emberMoltresIcon()],
+  'drill-peck-zapdos': [drillPeckZapdosIcon()],
+  'zap-cannon-zapdos': [zapCannonZapdosIcon()],
+  'thunderbolt-zapdos': [thunderboltZapdosIcon()],
+  'thunder-shock-zapdos': [thunderShockZapdosIcon()],
   // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
   sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],
   // かたくなる: 体の表面が硬い板になる

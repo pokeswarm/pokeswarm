@@ -534,12 +534,6 @@
       "line": "mewtwo"
     },
     {
-      "from": "thunderbolt",
-      "item": "thunder-stone",
-      "to": "zap-cannon",
-      "line": "zapdos"
-    },
-    {
       "from": "mimic",
       "item": "moon-stone",
       "to": "metronome",

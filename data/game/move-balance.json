@@ -18,6 +18,10 @@
     "hoenn": 1.25
   },
   "exempt": [
+    "drill-peck-zapdos",
+    "zap-cannon-zapdos",
+    "thunderbolt-zapdos",
+    "thunder-shock-zapdos",
     "sky-attack-moltres",
     "heat-wave-moltres",
     "burn-up-moltres",

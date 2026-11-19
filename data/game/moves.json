@@ -5074,6 +5074,269 @@
         }
       ]
     },
+    "drill-peck-zapdos": {
+      "pattern": "skill",
+      "effect": "drill-peck-zapdos",
+      "nameOf": "drill-peck",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "knockback": 100,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 1100,
+        "count": 1,
+        "power": 650,
+        "cooldownSeconds": 4,
+        "size": 34,
+        "range": 420,
+        "durationSeconds": 0.3
+      },
+      "levels": [
+        {
+          "power": 58
+        },
+        {
+          "power": 58,
+          "range": 15
+        },
+        {
+          "power": 58,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 58
+        },
+        {
+          "power": 58,
+          "range": 15
+        },
+        {
+          "power": 58
+        },
+        {
+          "power": 58,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 58,
+          "range": 15
+        },
+        {
+          "power": 58
+        },
+        {
+          "power": 58
+        },
+        {
+          "power": 58,
+          "range": 15,
+          "cooldownSeconds": -0.25
+        }
+      ]
+    },
+    "zap-cannon-zapdos": {
+      "pattern": "skill",
+      "effect": "zap-cannon-zapdos",
+      "nameOf": "zap-cannon",
+      "teachOnly": true,
+      "passObstacles": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.3,
+        "statusSeconds": 1.5,
+        "knockback": 0,
+        "hitIntervalSeconds": 0.5,
+        "pierce": "infinite",
+        "speed": 80,
+        "count": 1,
+        "power": 160,
+        "cooldownSeconds": 3.5,
+        "size": 34,
+        "range": 480,
+        "durationSeconds": 6,
+        "statusId": "paralysis"
+      },
+      "levels": [
+        {
+          "power": 14
+        },
+        {
+          "power": 14,
+          "size": 2
+        },
+        {
+          "power": 14,
+          "cooldownSeconds": -0.2
+        },
+        {
+          "power": 14
+        },
+        {
+          "power": 14,
+          "size": 2
+        },
+        {
+          "power": 14
+        },
+        {
+          "power": 14,
+          "cooldownSeconds": -0.2
+        },
+        {
+          "power": 14,
+          "size": 2
+        },
+        {
+          "power": 14
+        },
+        {
+          "power": 14
+        },
+        {
+          "power": 14,
+          "size": 2,
+          "cooldownSeconds": -0.2
+        }
+      ]
+    },
+    "thunderbolt-zapdos": {
+      "pattern": "skill",
+      "effect": "thunderbolt-zapdos",
+      "nameOf": "thunderbolt",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.3,
+        "statusSeconds": 1.5,
+        "knockback": 40,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 0,
+        "count": 1,
+        "power": 600,
+        "cooldownSeconds": 4,
+        "size": 16,
+        "range": 520,
+        "durationSeconds": 0.15,
+        "statusId": "paralysis"
+      },
+      "levels": [
+        {
+          "power": 52
+        },
+        {
+          "power": 52,
+          "range": 15
+        },
+        {
+          "power": 52,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 52
+        },
+        {
+          "power": 52,
+          "range": 15
+        },
+        {
+          "power": 52
+        },
+        {
+          "power": 52,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 52,
+          "range": 15
+        },
+        {
+          "power": 52
+        },
+        {
+          "power": 52
+        },
+        {
+          "power": 52,
+          "range": 15,
+          "cooldownSeconds": -0.25
+        }
+      ]
+    },
+    "thunder-shock-zapdos": {
+      "pattern": "nearest",
+      "effect": "thunder-shock-zapdos",
+      "nameOf": "thunder-shock",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.1,
+        "statusSeconds": 1,
+        "knockback": 40,
+        "hitIntervalSeconds": 0,
+        "pierce": 1,
+        "speed": 600,
+        "count": 1,
+        "power": 9,
+        "cooldownSeconds": 0.8,
+        "size": 9,
+        "range": 360,
+        "durationSeconds": 0.7,
+        "statusId": "paralysis"
+      },
+      "levels": [
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1,
+          "count": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1,
+          "count": 1
+        },
+        {
+          "power": 1
+        }
+      ]
+    },
     "psystrike": {
       "pattern": "homing",
       "effect": "psystrike",

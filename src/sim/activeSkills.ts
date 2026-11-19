@@ -1,7 +1,7 @@
 import type { Player, PlayerMove } from './entities/player';
 import type { SimActiveSkill } from './rules';
 import type { World } from './world';
-import { burnUpCenter, eruptionCenter, extremeSpeedPath, fireBlizzard, fireBurnUp, fireHeatWave, fireSkyAttack, skyAttackPath, fireEnteiEruption, fireFreezeDry, fireIcyWind, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
+import { fireThunderbolt, fireZapCannon, zapNetworkHit, burnUpCenter, eruptionCenter, extremeSpeedPath, fireBlizzard, fireBurnUp, fireHeatWave, fireSkyAttack, skyAttackPath, fireEnteiEruption, fireFreezeDry, fireIcyWind, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
 
 /**
  * アクティブスキル（作者の案 2026年11月18日。07 の305・307章）: キー（SPACE・Q・E）で使う技。
@@ -217,19 +217,28 @@ export function articunoReach(world: World, p: Player, skill: number): { length:
   return null;
 }
 
-/** ファイヤーの技の狙い（押している間に見せる。07 の315章）: ゴッドバード は突き抜ける道、もえつきる は炎の玉が落ちる所と半径 */
+/** ファイヤー・サンダーの技の狙い（押している間に見せる。07 の315・316章）: ゴッドバード・ドリルくちばし は突き抜ける道、もえつきる は炎の玉が落ちる所と半径 */
 export function moltresAim(world: World, p: Player, skill: number): { path?: { x: number; y: number }[]; width?: number; x?: number; y?: number; r?: number } | null {
   const pm = skillMove(world, p, { skill });
   const d = skillDef(world, skill);
   if (!pm) return null;
   const [dx, dy] = aimOf(p);
   const { st, sc } = skillMoveStats(world, p, pm);
-  if (d.skyAttack) return { path: skyAttackPath(world, p, pm, dx, dy), width: sc.size };
+  if (d.skyAttack || d.drillPeck) return { path: skyAttackPath(world, p, pm, dx, dy), width: sc.size };
   if (d.burnUp) {
     const c = burnUpCenter(world, p, st.range, dx, dy, d.burnUp.areaDistance);
     return { x: c.x, y: c.y, r: sc.size };
   }
   return null;
+}
+
+/** 10まんボルト の稲妻の道（押している間に見せる。07 の316章）: 始まり・向き・長さと、自分の でんじほう に当たるか */
+export function thunderboltAim(world: World, p: Player, skill: number): { x: number; y: number; dx: number; dy: number; len: number; hits: boolean } | null {
+  const pm = skillMove(world, p, { skill });
+  if (!pm || !skillDef(world, skill).thunderbolt) return null;
+  const [dx, dy] = aimOf(p);
+  const { st, sc } = skillMoveStats(world, p, pm);
+  return { x: p.x, y: p.y, dx, dy, len: st.range, hits: zapNetworkHit(world, p.id, p.x, p.y, dx, dy, st.range, sc.size).spheres.length > 0 };
 }
 
 /** じゅうでん の 1 つ分の威力（%） */
@@ -367,6 +376,29 @@ function runSkill(world: World, p: Player, d: SimActiveSkill, pm: PlayerMove | u
         p.dashVx = 0;
         p.dashVy = 0;
       }
+      return;
+    }
+    case 'drillPeck': {
+      if (!pm || !d.drillPeck) return;
+      const run = fireSkyAttack(world, p, pm, dx, dy, { chargeSeconds: d.drillPeck.chargeSeconds, featherSpacing: 1, featherSeconds: 0, featherPowerPct: 0 });
+      if (!p.remote && run.pts.length > 1) {
+        const wait = Math.round(d.drillPeck.chargeSeconds / world.dt);
+        p.esDash = { pts: run.pts, k: 1, speed: run.speed, wait };
+        p.dashTicks = wait + Math.ceil(run.seconds / world.dt) + 1;
+        p.dashBusyTicks = p.dashTicks;
+        p.dashVx = 0;
+        p.dashVy = 0;
+      }
+      return;
+    }
+    case 'zapCannon': {
+      if (!pm || !d.zapCannon) return;
+      fireZapCannon(world, p, pm, dx, dy, d.zapCannon);
+      return;
+    }
+    case 'thunderbolt': {
+      if (!pm || !d.thunderbolt) return;
+      fireThunderbolt(world, p, pm, dx, dy, d.thunderbolt);
       return;
     }
     case 'heatWave': {

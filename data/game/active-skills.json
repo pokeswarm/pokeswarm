@@ -206,6 +206,43 @@
         "speedPct": 35,
         "rechargeMultiplier": 2
       }
+    },
+    "drill-peck-zapdos": {
+      "kind": "drillPeck",
+      "move": "drill-peck-zapdos",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "drillPeck": {
+        "chargeSeconds": 0.12
+      }
+    },
+    "zap-cannon-zapdos": {
+      "kind": "zapCannon",
+      "move": "zap-cannon-zapdos",
+      "trigger": "press",
+      "baseCharges": 3,
+      "chargesPerLevel": 0.2,
+      "zapCannon": {
+        "linkDistance": 320,
+        "bandWidth": 14,
+        "bandPowerPct": 25,
+        "bandIntervalSeconds": 0.5,
+        "maxSpheres": 6
+      }
+    },
+    "thunderbolt-zapdos": {
+      "kind": "thunderbolt",
+      "move": "thunderbolt-zapdos",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "thunderbolt": {
+        "burstMultiplier": 3,
+        "burstSizeMultiplier": 3,
+        "bandBurstMultiplier": 1.5,
+        "burstDelaySeconds": 0.15
+      }
     }
   }
 }

@@ -831,6 +831,75 @@ function confusionLatiasIcon(): Draw {
   });
 }
 
+/** ラスターパージ（ラティオスの版。07 の320章）: 左下から右上へ順に並ぶ 3 つの光の爆発（白い十字の芯と青い輪。先ほど大きい） */
+function lusterPurgeLatiosIcon(): Draw {
+  return paint((x, y) => {
+    for (const [cx, cy, r] of [[7, 24, 3.6], [15, 16, 4.6], [24, 7, 5.6]] as const) {
+      const dx = x - cx;
+      const dy = y - cy;
+      const d = Math.hypot(dx, dy);
+      if ((Math.abs(dx) < 0.7 && Math.abs(dy) < r * 1.25) || (Math.abs(dy) < 0.7 && Math.abs(dx) < r * 1.25)) return '#ffffff';
+      if (d < r * 0.45) return '#e3f2fd';
+      if (Math.abs(d - r) < 0.8) return '#64b5f6';
+      if (d < r * 0.8 && (Math.round(x) + Math.round(y)) % 2 === 0) return '#90caf9';
+    }
+    return null;
+  });
+}
+
+/** りゅうのまい（ラティオスの版）: 体のまわりを螺旋に昇る青い竜の気（下から上へ細くなる 2 本の帯）と、上の光 */
+function dragonDanceLatiosIcon(): Draw {
+  return paint((x, y) => {
+    const t = (29 - y) / 25;
+    if (t < 0 || t > 1) return null;
+    // 上の炎の先（白い芯の竜の気が立ちのぼる）
+    if (t > 0.72) {
+      const w2 = (1 - t) * 14;
+      const d = Math.abs(x - 16 - Math.sin(t * 12) * 1.2);
+      if (d < w2 * 0.35) return '#ffffff';
+      if (d < w2) return '#90caf9';
+      return null;
+    }
+    const w = 9 * (1 - t * 0.5);
+    for (const ph of [0, Math.PI]) {
+      const cx = 16 + Math.sin(t * 7 + ph) * w;
+      const front = Math.cos(t * 7 + ph) > 0;
+      const d = Math.abs(x - cx);
+      if (d < 2.6 - t * 0.8) return front ? (d < 0.9 ? '#e3f2fd' : '#42a5f5') : '#2a72c8';
+    }
+    return null;
+  });
+}
+
+/** りゅうせいぐん（ラティオスの版）: 右上から斜めに降る 3 つの流星（青白い頭と、橙の炎の尾） */
+function dracoMeteorLatiosIcon(): Draw {
+  return paint((x, y) => {
+    for (const [hx, hy, r] of [[12, 18, 3.6], [22, 12, 3], [19, 26, 2.6]] as const) {
+      const d = Math.hypot(x - hx, y - hy);
+      if (d < r * 0.5) return '#ffffff';
+      if (d < r) return '#90caf9';
+      // 尾（右上へ）
+      const u = (x - hx) * 0.6 - (y - hy) * 0.8;
+      const v = (x - hx) * 0.8 + (y - hy) * 0.6;
+      if (u > 0 && u < r * 4 && Math.abs(v) < r * (1 - u / (r * 4))) return u < r * 1.4 ? '#ffb74d' : '#e64a19';
+    }
+    return null;
+  });
+}
+
+/** りゅうのいぶき（ラティオスの版）: 右へ広がる青紫の息の塊 3 つ */
+function dragonBreathLatiosIcon(): Draw {
+  return paint((x, y) => {
+    for (const [cx, cy, r] of [[9, 16, 3.5], [16, 14, 4.5], [24, 17, 5.5]] as const) {
+      const d = Math.hypot(x - cx, y - cy);
+      if (d < r * 0.4) return '#f3e5f5';
+      if (d < r * 0.75) return '#9575cd';
+      if (d < r) return '#7e57c2';
+    }
+    return null;
+  });
+}
+
 /** しんそく（ライコウの版）: 3 回折れて駆け抜ける稲妻の道と、その先の光 */
 function extremeSpeedRaikouIcon(): Draw {
   const pts: [number, number][] = [[4, 26], [12, 14], [17, 22], [27, 6]];
@@ -1311,6 +1380,10 @@ const ICONS: Record<string, Layer[]> = {
   'dragon-pulse-latias': [dragonPulseLatiasIcon()],
   'heal-pulse-latias': [healPulseLatiasIcon()],
   'confusion-latias': [confusionLatiasIcon()],
+  'luster-purge-latios': [lusterPurgeLatiosIcon()],
+  'dragon-dance-latios': [dragonDanceLatiosIcon()],
+  'draco-meteor-latios': [dracoMeteorLatiosIcon()],
+  'dragon-breath-latios': [dragonBreathLatiosIcon()],
   // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
   sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],
   // かたくなる: 体の表面が硬い板になる

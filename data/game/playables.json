@@ -11,7 +11,7 @@
     "mudkip": { "sprite": "mudkip", "startingMoves": ["water-gun"], "moveTypes": ["ground"], "ability": "torrent" },
     "egg-hoenn": { "sprite": "egg", "hatch": ["azurill", "wynaut"] },
     "latias": { "sprite": "latias", "startingMoves": ["mist-ball-latias", "dragon-pulse-latias", "heal-pulse-latias", "confusion-latias"], "evolves": false, "ability": "levitate", "fixedMoves": true, "activeSkills": ["mist-ball-latias", "dragon-pulse-latias", "heal-pulse-latias"] },
-    "latios": { "sprite": "latios", "startingMoves": ["dragon-breath"], "evolves": false, "ability": "levitate" },
+    "latios": { "sprite": "latios", "startingMoves": ["luster-purge-latios", "dragon-dance-latios", "draco-meteor-latios", "dragon-breath-latios"], "evolves": false, "ability": "levitate", "fixedMoves": true, "activeSkills": ["luster-purge-latios", "dragon-dance-latios", "draco-meteor-latios"] },
     "jirachi": { "sprite": "jirachi", "startingMoves": ["doom-desire", "wish", "healing-wish", "meteor-mash"], "evolves": false, "ability": "serene-grace" },
     "makuhita": { "sprite": "makuhita", "startingMoves": ["arm-thrust"], "ability": "guts" },
     "electrike": { "sprite": "electrike", "startingMoves": ["spark"], "ability": "static" },

@@ -1,7 +1,7 @@
 import type { Player, PlayerMove } from './entities/player';
 import type { SimActiveSkill } from './rules';
 import type { World } from './world';
-import { fireDragonPulse, fireHealPulse, fireMistBall, fireAeroblast, fireExtrasensory, fireHydroPump, fireThunderbolt, fireZapCannon, zapNetworkHit, burnUpCenter, eruptionCenter, extremeSpeedPath, fireBlizzard, fireBurnUp, fireHeatWave, fireSkyAttack, skyAttackPath, fireEnteiEruption, fireFreezeDry, fireIcyWind, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
+import { fireDracoMeteor, fireLusterPurge, fireDragonPulse, fireHealPulse, fireMistBall, fireAeroblast, fireExtrasensory, fireHydroPump, fireThunderbolt, fireZapCannon, zapNetworkHit, burnUpCenter, eruptionCenter, extremeSpeedPath, fireBlizzard, fireBurnUp, fireHeatWave, fireSkyAttack, skyAttackPath, fireEnteiEruption, fireFreezeDry, fireIcyWind, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
 
 /**
  * アクティブスキル（作者の案 2026年11月18日。07 の305・307章）: キー（SPACE・Q・E）で使う技。
@@ -96,6 +96,7 @@ export function stepSkills(world: World): void {
     if (p.skillBuff && world.tick >= p.skillBuff.untilTick) p.skillBuff = undefined;
     if (p.calm && world.tick >= p.calm.untilTick) p.calm = undefined;
     if (p.overheat && world.tick >= p.overheat.untilTick) p.overheat = undefined;
+    if (p.dance && world.tick >= p.dance.untilTick) p.dance = undefined;
     // もえつきる: 炎の玉が落ちたら ほのおタイプを失い、切れたら戻る
     if (p.burnedOut && world.tick >= p.burnedOut.offTick && world.tick < p.burnedOut.untilTick) p.types = p.burnedOut.types.filter((t) => t !== p.burnedOut!.lostType);
     if (p.burnedOut && world.tick >= p.burnedOut.untilTick) {
@@ -228,6 +229,14 @@ export function moltresAim(world: World, p: Player, skill: number): { path?: { x
   if (d.burnUp) {
     const c = burnUpCenter(world, p, st.range, dx, dy, d.burnUp.areaDistance);
     return { x: c.x, y: c.y, r: sc.size };
+  }
+  if (d.lusterPurge) {
+    const c = burnUpCenter(world, p, st.range, dx, dy, d.lusterPurge.areaDistance);
+    return { x: c.x, y: c.y, r: sc.size, path: [c, { x: c.x + dx * d.lusterPurge.spacing * Math.max(0, st.count - 1), y: c.y + dy * d.lusterPurge.spacing * Math.max(0, st.count - 1) }] };
+  }
+  if (d.dracoMeteor) {
+    const c = burnUpCenter(world, p, st.range, dx, dy, d.dracoMeteor.areaDistance);
+    return { x: c.x, y: c.y, r: d.dracoMeteor.areaRadius };
   }
   if (d.aeroblast) {
     const c = burnUpCenter(world, p, st.range, dx, dy, d.aeroblast.areaDistance);
@@ -383,6 +392,26 @@ function runSkill(world: World, p: Player, d: SimActiveSkill, pm: PlayerMove | u
       }
       return;
     }
+    case 'lusterPurge': {
+      if (!pm || !d.lusterPurge) return;
+      fireLusterPurge(world, p, pm, dx, dy, d.lusterPurge);
+      return;
+    }
+    case 'dragonDance': {
+      if (!d.dragonDance) return;
+      // りゅうのまい: 重ねる（切れていれば 1 から）
+      const live = p.dance && world.tick < p.dance.untilTick;
+      const stacks = Math.min(d.dragonDance.maxStacks, (live ? p.dance!.stacks : 0) + 1);
+      p.dance = { stacks, powerPct: d.dragonDance.powerPct, speedPct: d.dragonDance.speedPct, untilTick: world.tick + Math.round(d.dragonDance.seconds / world.dt) };
+      return;
+    }
+    case 'dracoMeteor': {
+      if (!pm || !d.dracoMeteor) return;
+      const stacks = p.dance && world.tick < p.dance.untilTick ? p.dance.stacks : 0;
+      fireDracoMeteor(world, p, pm, dx, dy, d.dracoMeteor, stacks);
+      p.dance = undefined;
+      return;
+    }
     case 'mistBall': {
       if (!pm || !d.mistBall) return;
       fireMistBall(world, p, pm, dx, dy, d.mistBall);
@@ -530,5 +559,6 @@ export function autoSkillMove(world: World, p: Player, pm: PlayerMove): void {
 
 /** スキルの強化で上がる技の威力（%） */
 export function skillPowerPct(world: World, p: Player): number {
-  return p.skillBuff && world.tick < p.skillBuff.untilTick ? p.skillBuff.pct : 0;
+  const dance = p.dance && world.tick < p.dance.untilTick ? p.dance.stacks * p.dance.powerPct : 0;
+  return (p.skillBuff && world.tick < p.skillBuff.untilTick ? p.skillBuff.pct : 0) + dance;
 }

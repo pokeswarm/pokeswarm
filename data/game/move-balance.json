@@ -18,6 +18,11 @@
     "hoenn": 1.25
   },
   "exempt": [
+    "luster-purge-latios",
+    "dragon-dance-latios",
+    "draco-meteor-latios",
+    "dragon-breath-latios",
+    "luster-purge",
     "mist-ball-latias",
     "dragon-pulse-latias",
     "heal-pulse-latias",

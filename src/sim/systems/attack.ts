@@ -3480,3 +3480,41 @@ export function fireHealPulse(world: World, p: Player, pm: PlayerMove, cfg: { he
   }
   return lit;
 }
+
+/**
+ * ラスターパージ（ラティオス。07 の320章）: 光の玉を撃ち、落ちる所から向きへ光の爆発を順に走らせる（同じ技の円の stage 3 → 0。爆発ごとに当たる）。
+ * 最初の爆発は angle 1（光の玉が飛んでいく先。描画で玉を描く）
+ */
+export function fireLusterPurge(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { areaDistance: number; spacing: number; staggerSeconds: number }): void {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const c = eruptionCenter(world, p, st.range, dirX, dirY, cfg.areaDistance);
+  const flight = Math.max(world.dt, Math.hypot(c.x - p.x, c.y - p.y) / Math.max(1, sc.speed));
+  const b0 = base(world, p, pm, st);
+  const n = Math.max(1, st.count);
+  const ar = world.arena;
+  for (let k = 0; k < n; k++) {
+    const x = c.x + dirX * cfg.spacing * k;
+    const y = c.y + dirY * cfg.spacing * k;
+    if (ar && (Math.abs(x - ar.x) > ar.halfWidth || Math.abs(y - ar.y) > ar.halfHeight)) break;
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x, y, dirX, dirY, angle: k === 0 ? 1 : 0, life: flight + k * cfg.staggerSeconds, stage: 3, armStage: 0, armLife: st.durationSeconds });
+  }
+}
+
+/** りゅうせいぐん（ラティオス。07 の320章）: 向きの先の区画へ、流星 技の count ＋ 重ね × perStack 個をばらばらに落とす（同じ技の円の stage 3 → 0。流星ごとに当たる） */
+export function fireDracoMeteor(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { perStack: number; areaRadius: number; areaDistance: number; delaySeconds: number; spreadSeconds: number }, stacks: number): number {
+  const { st } = skillMoveStats(world, p, pm);
+  const c = eruptionCenter(world, p, st.range, dirX, dirY, cfg.areaDistance);
+  const n = Math.max(1, st.count + stacks * cfg.perStack);
+  const b0 = base(world, p, pm, st);
+  for (let k = 0; k < n; k++) {
+    const a = world.rng.next() * Math.PI * 2;
+    const r = Math.sqrt(world.rng.next()) * cfg.areaRadius;
+    // 半分は狙った敵のそばへ
+    const near = k % 2 === 0 && c.target !== -1 ? 0.35 : 1;
+    const x = c.x + Math.cos(a) * r * near;
+    const y = c.y + Math.sin(a) * r * 0.7 * near;
+    const wait = cfg.delaySeconds + (n > 1 ? (k / (n - 1)) * cfg.spreadSeconds : 0);
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x, y, life: Math.max(world.dt, wait), stage: 3, armStage: 0, armLife: st.durationSeconds });
+  }
+  return n;
+}

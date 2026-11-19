@@ -64,7 +64,7 @@ export function movePlayers(world: World): void {
     const mud = p.mudTicks ? 1 - (world.rules.stage.bossRules.mudSlowPct ?? 40) / 100 : 1;
     const paralyzed = p.paralyzeTicks ? 1 - (world.rules.stage.bossRules.paralyzeSlowPct ?? 50) / 100 : 1;
     // もえつきる の後（ファイヤー。07 の315章）: 体が軽くなって速い
-    const light = p.burnedOut && world.tick < p.burnedOut.untilTick ? 1 + p.burnedOut.speedPct / 100 : 1;
+    const light = (p.burnedOut && world.tick < p.burnedOut.untilTick ? 1 + p.burnedOut.speedPct / 100 : 1) * (p.dance && world.tick < p.dance.untilTick ? 1 + (p.dance.stacks * p.dance.speedPct) / 100 : 1);
     const step = p.moveSpeed * world.dt * scale * (1 - (p.zoneSlowPct ?? 0) / 100) * abilityMoveSpeedFactor(world, p) * drowsy * mud * paralyzed * light;
     p.x += p.inputX * step;
     p.y += p.inputY * step;

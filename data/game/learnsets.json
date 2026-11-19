@@ -1494,18 +1494,10 @@
       "confusion-latias"
     ],
     "latios": [
-      "luster-purge",
-      "dragon-breath",
-      "twister",
-      "dragon-claw",
-      "dragon-pulse",
-      "outrage",
-      "confusion",
-      "psychic",
-      "future-sight",
-      "recover",
-      "swift",
-      "body-slam"
+      "luster-purge-latios",
+      "dragon-dance-latios",
+      "draco-meteor-latios",
+      "dragon-breath-latios"
     ],
     "jirachi": [
       "doom-desire",

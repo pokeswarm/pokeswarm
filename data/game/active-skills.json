@@ -321,6 +321,45 @@
         "travelSeconds": 0.35,
         "burstSizeMultiplier": 1.3
       }
+    },
+    "luster-purge-latios": {
+      "kind": "lusterPurge",
+      "move": "luster-purge-latios",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "lusterPurge": {
+        "areaDistance": 220,
+        "spacing": 72,
+        "staggerSeconds": 0.09
+      }
+    },
+    "dragon-dance-latios": {
+      "kind": "dragonDance",
+      "move": "dragon-dance-latios",
+      "trigger": "press",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "dragonDance": {
+        "powerPct": 12,
+        "speedPct": 10,
+        "seconds": 8,
+        "maxStacks": 3
+      }
+    },
+    "draco-meteor-latios": {
+      "kind": "dracoMeteor",
+      "move": "draco-meteor-latios",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "dracoMeteor": {
+        "perStack": 3,
+        "areaRadius": 130,
+        "areaDistance": 280,
+        "delaySeconds": 0.45,
+        "spreadSeconds": 0.8
+      }
     }
   }
 }

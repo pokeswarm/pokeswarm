@@ -193,6 +193,8 @@ export interface Player {
   /** しんそく（ライコウ。07 の311章）で駆け抜けている折れ線・次に向かう角の番号・速さ */
   esDash?: { pts: { x: number; y: number }[]; k: number; speed: number; wait?: number };
   /** もえつきる（ファイヤー。07 の315章）の後: untilTick まで 移動 +speedPct %・ゴッドバード の回数が rechargeMultiplier 倍の速さで戻る。offTick から lostType（ほのお）を失う（types は元のタイプ）。fromTick は使った時 */
+  /** りゅうのまい（ラティオス。07 の320章）: 重ねた数、1 つにつきの威力 % と移動 %、切れる更新番号 */
+  dance?: { stacks: number; powerPct: number; speedPct: number; untilTick: number };
   burnedOut?: { untilTick: number; fromTick: number; offTick: number; lostType: number; speedPct: number; rechargeMultiplier: number; types: number[] };
   /** オーバーヒート（エンテイ。07 の313章）の後: untilTick まで タイプ type の技の威力 −pct %。fromTick は使った時（赤熱の絵） */
   overheat?: { type: number; pct: number; fromTick: number; untilTick: number };

@@ -23360,263 +23360,55 @@
      "builds": [
       {
        "form": "latios",
-       "scene": "at150",
-       "est": 19090.175257856074,
+       "scene": "boss",
+       "est": 17497.556232549374,
        "moves": [
         {
-         "move": "luster-purge",
-         "level": 8,
-         "est": 16089.217430589273
+         "move": "draco-meteor-latios",
+         "level": 12,
+         "est": 9649.552040367564
         },
         {
-         "move": "swift",
-         "level": 8,
-         "est": 816.7152838902747
+         "move": "luster-purge-latios",
+         "level": 12,
+         "est": 7182.052511296392
         },
         {
-         "move": "twister",
-         "level": 8,
-         "est": 1740.791647095511
+         "move": "dragon-breath-latios",
+         "level": 12,
+         "est": 665.9516808854179
         },
         {
-         "move": "confusion",
-         "level": 8,
-         "est": 443.45089628101766
-        }
-       ],
-       "items": [
-        "dragon-fang",
-        "pp-max",
-        "twisted-spoon",
-        "metronome",
-        "x-sp-atk",
-        "dire-hit"
-       ],
-       "vs": {
-        "hoenn-boss-absol": 1.2417920088438759,
-        "hoenn-boss-shiftry": 1.2417920088438759,
-        "hoenn-boss-dusclops": 1.5533502747662895,
-        "hoenn-boss-banette": 1.5533502747662895,
-        "hoenn-boss-walrein": 1.9800761118965828,
-        "hoenn-boss-glalie": 1.9800761118965828,
-        "hoenn-boss-salamence": 2.304724311827183,
-        "hoenn-boss-flygon": 2.304724311827183,
-        "hoenn-boss-milotic": 2.723914228005881,
-        "hoenn-boss-wailord": 2.723914228005881,
-        "round1": 33.52509819084161,
-        "legend-rayquaza": 23.1501325964784,
-        "legend-deoxys": 31.678367572547856,
-        "legend-latias": 5.857994796458103
-       },
-       "legendAvg": 29.45119945328929
-      },
-      {
-       "form": "latios",
-       "scene": "at150",
-       "est": 19045.51836401758,
-       "moves": [
-        {
-         "move": "luster-purge",
-         "level": 8,
-         "est": 16089.217430589273
-        },
-        {
-         "move": "swift",
-         "level": 8,
-         "est": 816.7152838902747
-        },
-        {
-         "move": "future-sight",
-         "level": 8,
-         "est": 398.79400244252366
-        },
-        {
-         "move": "twister",
-         "level": 8,
-         "est": 1740.791647095511
-        }
-       ],
-       "items": [
-        "dragon-fang",
-        "pp-max",
-        "twisted-spoon",
-        "x-sp-atk",
-        "metronome",
-        "dire-hit"
-       ],
-       "vs": {
-        "hoenn-boss-absol": 1.244609121845283,
-        "hoenn-boss-shiftry": 1.244609121845283,
-        "hoenn-boss-dusclops": 1.5570239933493195,
-        "hoenn-boss-banette": 1.5570239933493195,
-        "hoenn-boss-walrein": 1.9847188864869645,
-        "hoenn-boss-glalie": 1.9847188864869645,
-        "hoenn-boss-salamence": 2.3100312905165357,
-        "hoenn-boss-flygon": 2.3100312905165357,
-        "hoenn-boss-milotic": 2.7303011136857713,
-        "hoenn-boss-wailord": 2.7303011136857713,
-        "round1": 33.60370601459411,
-        "legend-rayquaza": 23.203439302063416,
-        "legend-deoxys": 31.750232700134774,
-        "legend-latias": 5.870996717056625
-       },
-       "legendAvg": 29.519126005597432
-      },
-      {
-       "form": "latios",
-       "scene": "at150",
-       "est": 18966.55914004956,
-       "moves": [
-        {
-         "move": "luster-purge",
-         "level": 8,
-         "est": 16089.217430589273
-        },
-        {
-         "move": "swift",
-         "level": 8,
-         "est": 816.7152838902747
-        },
-        {
-         "move": "twister",
-         "level": 8,
-         "est": 1740.791647095511
-        },
-        {
-         "move": "psychic",
-         "level": 8,
-         "est": 319.8347784745066
-        }
-       ],
-       "items": [
-        "dragon-fang",
-        "twisted-spoon",
-        "pp-max",
-        "x-sp-atk",
-        "metronome",
-        "dire-hit"
-       ],
-       "vs": {
-        "hoenn-boss-absol": 1.2496215512973645,
-        "hoenn-boss-shiftry": 1.2496215512973645,
-        "hoenn-boss-dusclops": 1.5635623113514097,
-        "hoenn-boss-banette": 1.5635623113514097,
-        "hoenn-boss-walrein": 1.992981421716181,
-        "hoenn-boss-glalie": 1.992981421716181,
-        "hoenn-boss-salamence": 2.3194747772426214,
-        "hoenn-boss-flygon": 2.3194747772426214,
-        "hoenn-boss-milotic": 2.741667564265646,
-        "hoenn-boss-wailord": 2.741667564265646,
-        "round1": 33.74360079096179,
-        "legend-rayquaza": 23.298295753553116,
-        "legend-deoxys": 31.878100798402155,
-        "legend-latias": 5.89412761123061
-       },
-       "legendAvg": 29.63999911430569
-      },
-      {
-       "form": "latios",
-       "scene": "at150",
-       "est": 18672.253976408323,
-       "moves": [
-        {
-         "move": "luster-purge",
-         "level": 8,
-         "est": 16089.217430589273
-        },
-        {
-         "move": "future-sight",
-         "level": 8,
-         "est": 398.79400244252366
-        },
-        {
-         "move": "twister",
-         "level": 8,
-         "est": 1740.791647095511
-        },
-        {
-         "move": "confusion",
-         "level": 8,
-         "est": 443.45089628101766
-        }
-       ],
-       "items": [
-        "dragon-fang",
-        "pp-max",
-        "twisted-spoon",
-        "x-sp-atk",
-        "metronome",
-        "dire-hit"
-       ],
-       "vs": {
-        "hoenn-boss-absol": 1.2822222525209153,
-        "hoenn-boss-shiftry": 1.2822222525209153,
-        "hoenn-boss-dusclops": 1.5745287118066074,
-        "hoenn-boss-banette": 1.5745287118066074,
-        "hoenn-boss-walrein": 2.0243940580370667,
-        "hoenn-boss-glalie": 2.0243940580370667,
-        "hoenn-boss-salamence": 2.35536429387886,
-        "hoenn-boss-flygon": 2.35536429387886,
-        "hoenn-boss-milotic": 2.784880714759986,
-        "hoenn-boss-wailord": 2.784880714759986,
-        "round1": 34.27545495089213,
-        "legend-rayquaza": 23.658793130479623,
-        "legend-deoxys": 32.70975133981926,
-        "legend-latias": 6.044472024477738
-       },
-       "legendAvg": 30.214666473730336
-      },
-      {
-       "form": "latios",
-       "scene": "at150",
-       "est": 18646.724361575056,
-       "moves": [
-        {
-         "move": "luster-purge",
-         "level": 8,
-         "est": 16089.217430589273
-        },
-        {
-         "move": "swift",
-         "level": 8,
-         "est": 816.7152838902747
-        },
-        {
-         "move": "twister",
-         "level": 8,
-         "est": 1740.791647095511
-        },
-        {
-         "move": "recover",
-         "level": 8,
+         "move": "dragon-dance-latios",
+         "level": 12,
          "est": 0
         }
        ],
        "items": [
-        "dragon-fang",
-        "pp-max",
-        "twisted-spoon",
         "x-sp-atk",
         "metronome",
-        "dire-hit"
+        "dragon-fang",
+        "twisted-spoon",
+        "dire-hit",
+        "pp-max"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.2703448913898747,
-        "hoenn-boss-shiftry": 1.2703448913898747,
-        "hoenn-boss-dusclops": 1.5906180538714418,
-        "hoenn-boss-banette": 1.5906180538714418,
-        "hoenn-boss-walrein": 2.027165697686492,
-        "hoenn-boss-glalie": 2.027165697686492,
-        "hoenn-boss-salamence": 2.358529964559378,
-        "hoenn-boss-flygon": 2.358529964559378,
-        "hoenn-boss-milotic": 2.7886935523729517,
-        "hoenn-boss-wailord": 2.7886935523729517,
-        "round1": 34.322382183051715,
-        "legend-rayquaza": 23.690591161868753,
-        "legend-deoxys": 32.40675743341517,
-        "legend-latias": 5.989717004112679
+        "hoenn-boss-absol": 1.2203363526573259,
+        "hoenn-boss-shiftry": 1.2203363526573259,
+        "hoenn-boss-dusclops": 1.6802346344405177,
+        "hoenn-boss-banette": 1.6802346344405177,
+        "hoenn-boss-walrein": 2.160301672852094,
+        "hoenn-boss-glalie": 2.160301672852094,
+        "hoenn-boss-salamence": 2.2903116215950874,
+        "hoenn-boss-flygon": 2.2903116215950874,
+        "hoenn-boss-milotic": 2.971843571119283,
+        "hoenn-boss-wailord": 2.971843571119283,
+        "round1": 36.57653625992964,
+        "legend-rayquaza": 23.005362270486366,
+        "legend-deoxys": 31.13102940452362,
+        "legend-latias": 5.214009869747969
        },
-       "legendAvg": 30.139910259445212
+       "legendAvg": 30.237642644979875
       }
      ],
      "measured": null
@@ -23710,21 +23502,6 @@
      "owners": 1
     },
     {
-     "move": "luster-purge",
-     "est": 16089.217430589273,
-     "key": "latios",
-     "form": "latios",
-     "items": [
-      "dragon-fang",
-      "pp-max",
-      "twisted-spoon",
-      "x-sp-atk",
-      "metronome",
-      "dire-hit"
-     ],
-     "owners": 1
-    },
-    {
      "move": "play-rough-hoenn",
      "est": 11285.97639372125,
      "key": "mawile",
@@ -23761,6 +23538,19 @@
       "twisted-spoon",
       "metronome",
       "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
+     "move": "draco-meteor-latios",
+     "est": 9649.552040367564,
+     "key": "latios",
+     "form": "latios",
+     "items": [
+      "dragon-fang",
+      "x-sp-atk",
+      "metronome",
       "dire-hit"
      ],
      "owners": 1
@@ -23815,6 +23605,19 @@
      "form": "walrein",
      "items": [
       "never-melt-ice",
+      "metronome",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
+     "move": "luster-purge-latios",
+     "est": 7182.052511296392,
+     "key": "latios",
+     "form": "latios",
+     "items": [
+      "twisted-spoon",
       "metronome",
       "x-sp-atk",
       "dire-hit"
@@ -23973,21 +23776,6 @@
      "owners": 1
     },
     {
-     "move": "dragon-pulse",
-     "est": 4521.684220102626,
-     "key": "latios",
-     "form": "latios",
-     "items": [
-      "dragon-fang",
-      "pp-max",
-      "metronome",
-      "light-clay",
-      "x-sp-atk",
-      "dire-hit"
-     ],
-     "owners": 5
-    },
-    {
      "move": "future-sight-gardevoir",
      "est": 4516.354659653099,
      "key": "ralts",
@@ -24026,6 +23814,21 @@
       "dire-hit"
      ],
      "owners": 1
+    },
+    {
+     "move": "dragon-pulse",
+     "est": 4053.923783540285,
+     "key": "bagon",
+     "form": "salamence",
+     "items": [
+      "dragon-fang",
+      "pp-max",
+      "metronome",
+      "light-clay",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 4
     },
     {
      "move": "double-edge",
@@ -24366,21 +24169,6 @@
      "owners": 4
     },
     {
-     "move": "twister",
-     "est": 1743.0234230620958,
-     "key": "latios",
-     "form": "latios",
-     "items": [
-      "pp-max",
-      "dragon-fang",
-      "metronome",
-      "x-sp-atk",
-      "dire-hit",
-      "light-clay"
-     ],
-     "owners": 2
-    },
-    {
      "move": "air-cutter",
      "est": 1733.9736108770437,
      "key": "bagon",
@@ -24555,20 +24343,6 @@
      "owners": 1
     },
     {
-     "move": "swift",
-     "est": 1168.429423709306,
-     "key": "latios",
-     "form": "latios",
-     "items": [
-      "silk-scarf",
-      "pp-max",
-      "metronome",
-      "x-sp-atk",
-      "dire-hit"
-     ],
-     "owners": 13
-    },
-    {
      "move": "sand-tomb",
      "est": 1114.2546560811356,
      "key": "mudkip",
@@ -24624,6 +24398,20 @@
       "dire-hit"
      ],
      "owners": 3
+    },
+    {
+     "move": "swift",
+     "est": 1047.5574143600675,
+     "key": "torchic",
+     "form": "blaziken",
+     "items": [
+      "silk-scarf",
+      "pp-max",
+      "metronome",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 12
     },
     {
      "move": "dual-wingbeat",
@@ -24730,6 +24518,20 @@
       "metronome",
       "x-sp-atk",
       "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
+     "move": "twister",
+     "est": 879.7077464357285,
+     "key": "feebas",
+     "form": "milotic",
+     "items": [
+      "pp-max",
+      "x-sp-atk",
+      "metronome",
+      "dire-hit",
+      "light-clay"
      ],
      "owners": 1
     },
@@ -24859,18 +24661,18 @@
      "owners": 2
     },
     {
-     "move": "confusion",
-     "est": 657.8205098591883,
+     "move": "dragon-breath-latios",
+     "est": 665.9516808854178,
      "key": "latios",
      "form": "latios",
      "items": [
-      "twisted-spoon",
-      "light-clay",
+      "pp-max",
+      "dragon-fang",
       "metronome",
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 3
+     "owners": 1
     },
     {
      "move": "flamethrower",
@@ -24968,6 +24770,20 @@
      "owners": 1
     },
     {
+     "move": "confusion",
+     "est": 589.7701122875482,
+     "key": "ralts",
+     "form": "gardevoir",
+     "items": [
+      "twisted-spoon",
+      "light-clay",
+      "metronome",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 2
+    },
+    {
      "move": "magical-leaf",
      "est": 582.0440702056634,
      "key": "treecko",
@@ -25010,32 +24826,6 @@
      "owners": 5
     },
     {
-     "move": "dragon-breath",
-     "est": 505.2943445139065,
-     "key": "latios",
-     "form": "latios",
-     "items": [
-      "dragon-fang",
-      "metronome",
-      "light-clay",
-      "x-sp-atk",
-      "dire-hit"
-     ],
-     "owners": 2
-    },
-    {
-     "move": "future-sight",
-     "est": 502.74033388046166,
-     "key": "latios",
-     "form": "latios",
-     "items": [
-      "twisted-spoon",
-      "x-sp-atk",
-      "dire-hit"
-     ],
-     "owners": 1
-    },
-    {
      "move": "spark",
      "est": 478.1943876444184,
      "key": "electrike",
@@ -25062,6 +24852,18 @@
      "owners": 2
     },
     {
+     "move": "future-sight",
+     "est": 398.7250923879524,
+     "key": "jirachi",
+     "form": "jirachi",
+     "items": [
+      "twisted-spoon",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 0
+    },
+    {
      "move": "bubble",
      "est": 388.54284855655203,
      "key": "azurill",
@@ -25070,6 +24872,20 @@
       "mystic-water",
       "pp-max",
       "metronome",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
+     "move": "dragon-breath",
+     "est": 348.4788582854528,
+     "key": "trapinch",
+     "form": "flygon",
+     "items": [
+      "dragon-fang",
+      "metronome",
+      "light-clay",
       "x-sp-atk",
       "dire-hit"
      ],
@@ -25106,16 +24922,16 @@
     },
     {
      "move": "psychic",
-     "est": 319.8347784745066,
-     "key": "latios",
-     "form": "latios",
+     "est": 286.74842208059215,
+     "key": "ralts",
+     "form": "gardevoir",
      "items": [
       "twisted-spoon",
       "metronome",
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 2
+     "owners": 1
     },
     {
      "move": "whirlwind",
@@ -25637,7 +25453,10 @@
   "confusion-latias": "ねんりき",
   "heal-pulse-latias": "いやしのはどう",
   "latios": "ラティオス",
-  "luster-purge": "ラスターパージ",
+  "draco-meteor-latios": "りゅうせいぐん",
+  "luster-purge-latios": "ラスターパージ",
+  "dragon-breath-latios": "りゅうのいぶき",
+  "dragon-dance-latios": "りゅうのまい",
   "jirachi": "ジラーチ",
   "meteor-mash": "コメットパンチ",
   "doom-desire": "はめつのねがい",

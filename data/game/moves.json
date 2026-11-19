@@ -5856,6 +5856,246 @@
         }
       ]
     },
+    "luster-purge-latios": {
+      "pattern": "skill",
+      "effect": "luster-purge-latios",
+      "nameOf": "luster-purge",
+      "teachOnly": true,
+      "region": "hoenn",
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.5,
+        "statusSeconds": 3,
+        "knockback": 60,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 900,
+        "count": 5,
+        "power": 950,
+        "cooldownSeconds": 5,
+        "size": 52,
+        "range": 480,
+        "durationSeconds": 0.2,
+        "statusId": "defenseDown"
+      },
+      "levels": [
+        {
+          "power": 82
+        },
+        {
+          "power": 82
+        },
+        {
+          "power": 82,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 82,
+          "count": 1
+        },
+        {
+          "power": 82
+        },
+        {
+          "power": 82
+        },
+        {
+          "power": 82,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 82,
+          "count": 1
+        },
+        {
+          "power": 82
+        },
+        {
+          "power": 82
+        },
+        {
+          "power": 82,
+          "cooldownSeconds": -0.25
+        }
+      ]
+    },
+    "dragon-dance-latios": {
+      "pattern": "skill",
+      "effect": "dragon-dance-latios",
+      "nameOf": "dragon-dance",
+      "teachOnly": true,
+      "region": "hoenn",
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "knockback": 0,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 0,
+        "count": 1,
+        "power": 0,
+        "cooldownSeconds": 6,
+        "size": 40,
+        "range": 0,
+        "durationSeconds": 0.1
+      },
+      "levels": [
+        {},
+        {
+          "cooldownSeconds": -0.4
+        },
+        {},
+        {},
+        {
+          "cooldownSeconds": -0.4
+        },
+        {},
+        {},
+        {
+          "cooldownSeconds": -0.4
+        },
+        {},
+        {},
+        {
+          "cooldownSeconds": -0.4
+        }
+      ]
+    },
+    "draco-meteor-latios": {
+      "pattern": "skill",
+      "effect": "draco-meteor-latios",
+      "nameOf": "draco-meteor",
+      "teachOnly": true,
+      "region": "hoenn",
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "knockback": 80,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 0,
+        "count": 6,
+        "power": 1000,
+        "cooldownSeconds": 10,
+        "size": 56,
+        "range": 520,
+        "durationSeconds": 0.2
+      },
+      "levels": [
+        {
+          "power": 87
+        },
+        {
+          "power": 87
+        },
+        {
+          "power": 87,
+          "cooldownSeconds": -0.5
+        },
+        {
+          "power": 87
+        },
+        {
+          "power": 87,
+          "count": 1
+        },
+        {
+          "power": 87
+        },
+        {
+          "power": 87,
+          "cooldownSeconds": -0.5
+        },
+        {
+          "power": 87
+        },
+        {
+          "power": 87,
+          "count": 1
+        },
+        {
+          "power": 87
+        },
+        {
+          "power": 87,
+          "cooldownSeconds": -0.5
+        }
+      ]
+    },
+    "dragon-breath-latios": {
+      "pattern": "nearest",
+      "effect": "dragon-breath-latios",
+      "nameOf": "dragon-breath",
+      "teachOnly": true,
+      "region": "hoenn",
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.1,
+        "statusSeconds": 1,
+        "knockback": 40,
+        "hitIntervalSeconds": 0,
+        "pierce": 2,
+        "speed": 360,
+        "count": 1,
+        "power": 9,
+        "cooldownSeconds": 0.9,
+        "size": 14,
+        "range": 380,
+        "durationSeconds": 1,
+        "statusId": "paralysis"
+      },
+      "levels": [
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1,
+          "count": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1,
+          "count": 1
+        },
+        {
+          "power": 1
+        }
+      ]
+    },
     "psystrike": {
       "pattern": "homing",
       "effect": "psystrike",

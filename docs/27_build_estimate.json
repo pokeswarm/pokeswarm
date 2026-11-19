@@ -15937,12 +15937,17 @@
       {
        "form": "raikou",
        "scene": "boss",
-       "est": 6266.283395292673,
+       "est": 7790.370484946474,
        "moves": [
         {
          "move": "rising-voltage-raikou",
          "level": 12,
-         "est": 4439.2920362557215
+         "est": 4110.062174270595
+        },
+        {
+         "move": "electric-terrain-raikou",
+         "level": 12,
+         "est": 1853.316951638927
         },
         {
          "move": "extreme-speed-raikou",
@@ -15951,11 +15956,6 @@
         },
         {
          "move": "charge-raikou",
-         "level": 12,
-         "est": 0
-        },
-        {
-         "move": "electric-terrain-raikou",
          "level": 12,
          "est": 0
         }
@@ -15969,21 +15969,21 @@
         "x-attack"
        ],
        "vs": {
-        "johto-boss-xatu": 2.7396717231731103,
-        "johto-boss-crobat": 4.109507584759665,
-        "johto-boss-machamp": 6.032283830060404,
-        "johto-boss-houndoom": 7.1493734282197385,
-        "johto-boss-dragonite": 8.298379872040767,
-        "round1": 37.18560739336944,
-        "round2": 47.875268492542894,
-        "round3": 74.01633149641107,
-        "legend-lugia": 55.911667819859396,
-        "legend-ho-oh": 55.911667819859396,
-        "legend-raikou": 11.713466328911371,
-        "legend-entei": 10.053806383434008,
-        "legend-suicune": 8.806087681627854
+        "johto-boss-xatu": 2.1818878945220415,
+        "johto-boss-crobat": 3.272831841783062,
+        "johto-boss-machamp": 4.85214407620817,
+        "johto-boss-houndoom": 5.750689275505979,
+        "johto-boss-dragonite": 6.674907194783725,
+        "round1": 30.313618667393246,
+        "round2": 38.50907996990611,
+        "round3": 59.471081612395636,
+        "legend-lugia": 44.528324378000846,
+        "legend-ho-oh": 44.528324378000846,
+        "legend-raikou": 9.548789880228872,
+        "legend-entei": 8.086906793680283,
+        "legend-suicune": 7.013211089535133
        },
-       "legendAvg": 54.18010860440844
+       "legendAvg": 43.47008580113933
       }
      ],
      "measured": {
@@ -17662,19 +17662,6 @@
      "owners": 1
     },
     {
-     "move": "rising-voltage-raikou",
-     "est": 4439.2920362557215,
-     "key": "raikou",
-     "form": "raikou",
-     "items": [
-      "magnet",
-      "metronome",
-      "x-sp-atk",
-      "dire-hit"
-     ],
-     "owners": 1
-    },
-    {
      "move": "sludge-bomb",
      "est": 4352.490783134342,
      "key": "gastly",
@@ -17716,6 +17703,19 @@
       "dire-hit"
      ],
      "owners": 0
+    },
+    {
+     "move": "rising-voltage-raikou",
+     "est": 4110.062174270595,
+     "key": "raikou",
+     "form": "raikou",
+     "items": [
+      "magnet",
+      "metronome",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 1
     },
     {
      "move": "flare-blitz",
@@ -18009,6 +18009,18 @@
      "items": [
       "x-sp-atk",
       "metronome",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
+     "move": "electric-terrain-raikou",
+     "est": 1853.316951638927,
+     "key": "raikou",
+     "form": "raikou",
+     "items": [
+      "magnet",
+      "x-sp-atk",
       "dire-hit"
      ],
      "owners": 1
@@ -26845,9 +26857,9 @@
   "submission": "じごくぐるま",
   "raikou": "ライコウ",
   "rising-voltage-raikou": "ライジングボルト",
+  "electric-terrain-raikou": "エレキフィールド",
   "extreme-speed-raikou": "しんそく",
   "charge-raikou": "じゅうでん",
-  "electric-terrain-raikou": "エレキフィールド",
   "entei": "エンテイ",
   "suicune": "スイクン",
   "surf-suicune": "なみのり",

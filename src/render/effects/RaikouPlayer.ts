@@ -1,13 +1,13 @@
 import Phaser from 'phaser';
 import type { World } from '../../sim/world';
 import { extremeSpeedPreview, risingVoltagePreview } from '../../sim/activeSkills';
-import { electricFieldRadius, shockFull } from '../../sim/systems/attack';
+import { electricFieldEvery, electricFieldRadius, shockFull } from '../../sim/systems/attack';
 import { DotPool, c, makeTexture, on, rnd, shade } from './dotArt';
 
 /**
  * 遊べるライコウの技の絵（07 の309〜311章）:
  * - しんそく: 1 体目から左右に折れる道を、ライコウが駆け抜ける。通った跡に稲妻と光の粒が残る。押している間は道を見せる
- * - エレキフィールド: いつもライコウの足元に広がる、電気が走る楕円の地面（雑魚より下。当たりの楕円と同じ大きさ）。中の敵に びりびり の火花が重なる
+ * - エレキフィールド: いつもライコウの足元に広がる、電気が走る楕円の地面（雑魚より下。当たりの楕円と同じ大きさ）。中の敵に びりびり の火花が重なり、当たるたびに地面から小さな稲妻が走る
  * - じゅうでん: まわりから電気が集まり、ためている間は体に電気を纏う（重ねた数だけ多く）
  * - ライジングボルト: 足元に輪 → 空から雷が落ち、着いた瞬間だけ黒・青・白に反転した光 → 岩が弾け飛び、焦げが残る。コンボは大きく、岩が多い
  * 地面・輪・反転の光・岩・焦げは 1 ドットずつ計算した不透明のドット絵、稲妻は不透明の線（薄い塗りは使わない。画面全体は光らせない）
@@ -29,6 +29,8 @@ const NEG_MS = 110;
 /** 落ちてくる時間（待ちの終わりのこの秒数で、空から落ちる） */
 const DROP_SECONDS = 0.1;
 const CHARGE_MS = 520;
+/** エレキフィールドの当たりの小さな稲妻が見えている時間 */
+const ZAP_MS = 130;
 /** 雷が落ちてくる高さ */
 const SKY = 420;
 
@@ -45,6 +47,8 @@ export class RaikouPlayer {
   private readonly lines: Phaser.GameObjects.Graphics;
   private trails = new Map<number, Trail>();
   private strikes: Strike[] = [];
+  private zaps: { x: number; y: number; r: number; at: number; seed: number }[] = [];
+  private beats = new Map<number, number>();
   private charges = new Map<number, { stacks: number; at: number }>();
   private seen = new Set<number>();
 
@@ -171,7 +175,7 @@ export class RaikouPlayer {
     this.lines.clear();
     this.pool.begin();
     this.front.begin();
-    let any = this.trails.size > 0 || this.strikes.length > 0 || aimSlot !== null || this.charges.size > 0;
+    let any = this.trails.size > 0 || this.zaps.length > 0 || this.strikes.length > 0 || aimSlot !== null || this.charges.size > 0;
     for (const p of world.players) if (p.charged || electricFieldRadius(world, p) > 0) any = true;
     for (let i = 0; i < pr.count && !any; i++) if (pr.move[i] === es || pr.move[i] === rv) any = true;
     if (!any) {
@@ -186,6 +190,19 @@ export class RaikouPlayer {
       const r = electricFieldRadius(world, p);
       if (r <= 0 || p.down) continue;
       this.pool.image(`rk-field-${frame}`, this.floorDepth).setPosition(p.x, p.y).setScale((r * 2) / FIELD_W, r / FIELD_H);
+      // 中の敵に効く拍子（シミュレーションと同じ間隔）が来たら、楕円の中の敵へ地面から小さな稲妻（当たりはすぐ消えるので、絵は拍子で出す）
+      const every = electricFieldEvery(world, p);
+      const beat = Math.floor(world.tick / every);
+      if (this.beats.get(p.id) !== beat) {
+        this.beats.set(p.id, beat);
+        const e = world.enemies;
+        for (let i = 0; i < e.count; i++) {
+          if (e.hp[i]! <= 0) continue;
+          const dx = (e.x[i]! - p.x) / (r + e.radius[i]! * 0.5);
+          const dy = (e.y[i]! - p.y) / (r * 0.5 + e.radius[i]! * 0.5);
+          if (dx * dx + dy * dy <= 1 && this.zaps.length < 80) this.zaps.push({ x: e.x[i]!, y: e.y[i]!, r: e.radius[i]!, at: timeMs, seed: e.id[i]! * 7 + beat });
+        }
+      }
     }
     const live = new Set<number>();
     for (let i = 0; i < pr.count; i++) {
@@ -211,6 +228,12 @@ export class RaikouPlayer {
       }
     }
     if (this.seen.size > 600) this.seen.clear();
+    // エレキフィールドの当たり: 地面から敵の体へ走る小さな稲妻
+    this.zaps = this.zaps.filter((z) => timeMs - z.at < ZAP_MS);
+    for (const z of this.zaps) {
+      const t = (timeMs - z.at) / ZAP_MS;
+      this.bolt(z.x + (rnd(z.seed, 1) - 0.5) * 26, z.y + 8, z.x + (rnd(z.seed, 2) - 0.5) * 8, z.y - 10 - z.r * 2, z.seed + Math.floor(timeMs / 40), 3 * (1 - t) + 1, false, 3);
+    }
     this.drawShock(world, timeMs);
     this.drawStrikes(timeMs);
     this.drawCharge(world, timeMs);

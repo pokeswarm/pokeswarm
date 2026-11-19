@@ -2674,8 +2674,9 @@ export function fireExtremeSpeed(world: World, p: Player, pm: PlayerMove, dirX: 
 }
 
 /**
- * エレキフィールド（ライコウ。07 の311章）: いつも、自分の足元の楕円（横の半径 = 技の size、縦はその半分。見えている地面と同じ）の中の敵に、
- * hitIntervalSeconds ごとに びりびり を 1 つ重ねる（ダメージは無い）。どのブラウザでも同じように数える
+ * エレキフィールド（ライコウ。07 の311・312章）: いつも、自分の足元の楕円（横の半径 = 技の size、縦はその半分。見えている地面と同じ）の中の敵に、
+ * hitIntervalSeconds ごとに びりびり を 1 つ重ね（どのブラウザでも同じように数える）、技の威力のダメージ（自分のブラウザだけ。
+ * その敵の足元に小さな当たりを出して、ふつうの技と同じ道で当てる。1 回で同じ敵には 1 回）
  */
 function stepElectricField(world: World): void {
   const e = world.enemies;
@@ -2690,6 +2691,9 @@ function stepElectricField(world: World): void {
       const rx = st.size;
       const ry = st.size * 0.5;
       const keep = Math.max(1, Math.round(def.shockStack.seconds / world.dt));
+      const hurt = p.id === world.localPlayerId && st.power > 0;
+      const b0 = hurt ? base(world, p, pm, st) : undefined;
+      const group = hurt ? newCastGroup(world, 0.2) : 0;
       for (const i of enemiesInRange(world, p.x, p.y, rx + 40)) {
         if (e.hp[i]! <= 0) continue;
         const dx = (e.x[i]! - p.x) / (rx + e.radius[i]! * 0.5);
@@ -2698,6 +2702,7 @@ function stepElectricField(world: World): void {
         e.shock[i] = Math.min(def.shockStack.maxStacks, e.shock[i]! + 1);
         e.shockTicks[i] = keep;
         e.shockBy[i] = p.id;
+        if (b0) world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]!, radius: Math.max(4, e.radius[i]! * 0.5), pierce: 1, life: world.dt * 2.5, group });
       }
     }
   }
@@ -2706,6 +2711,12 @@ function stepElectricField(world: World): void {
 /** エレキフィールドの楕円の横の半径（持っていなければ 0。絵で使う） */
 export function electricFieldRadius(world: World, p: Player): number {
   for (const pm of p.moves) if (world.rules.moves[pm.move]?.shockStack) return moveStatsOf(world, pm).size;
+  return 0;
+}
+
+/** エレキフィールドが中の敵に効く間隔（更新回数。持っていなければ 0。絵で使う） */
+export function electricFieldEvery(world: World, p: Player): number {
+  for (const pm of p.moves) if (world.rules.moves[pm.move]?.shockStack) return Math.max(1, Math.round(moveStatsOf(world, pm).hitIntervalSeconds / world.dt));
   return 0;
 }
 

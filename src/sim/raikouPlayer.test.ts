@@ -51,7 +51,7 @@ describe('遊べるライコウ', () => {
     expect(Math.abs(p.x)).toBeLessThan(1);
   });
 
-  it('エレキフィールド: いつも足元の楕円の中の敵に びりびり が重なり（ダメージは無い）、出ると消える', () => {
+  it('エレキフィールド: いつも足元の楕円の中の敵に びりびり が重なってダメージが入り、出ると消える', () => {
     const { sim } = setup([{ key: 'electric-terrain-raikou', level: 1 }]);
     const e = sim.world.enemies;
     e.add(1, 0, 60, 0, 1e6, 0, 12, 0, 0, 0);
@@ -59,7 +59,9 @@ describe('遊べるライコウ', () => {
     e.add(2, 0, 0, 110, 1e6, 0, 12, 0, 0, 0);
     for (let k = 0; k < 90; k++) sim.step([]);
     expect(e.shock[0]).toBe(5);
-    expect(e.hp[0]).toBe(1e6);
+    // ダメージも入る（312章）。楕円の外の敵には入らない
+    expect(e.hp[0]).toBeLessThan(1e6);
+    expect(e.hp[1]).toBe(1e6);
     expect(e.shock[1]).toBe(0);
     e.x[0] = 2000;
     for (let k = 0; k < 120; k++) sim.step([]);

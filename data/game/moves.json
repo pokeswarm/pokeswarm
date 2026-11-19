@@ -4120,7 +4120,7 @@
       "nameOf": "rising-voltage",
       "teachOnly": true,
       "base": {
-        "power": 1100,
+        "power": 1000,
         "cooldownSeconds": 6,
         "count": 1,
         "speed": 0,
@@ -4139,43 +4139,43 @@
       },
       "levels": [
         {
-          "power": 90
+          "power": 85
         },
         {
-          "power": 90,
+          "power": 85,
           "size": 3
         },
         {
-          "power": 90,
+          "power": 85,
           "cooldownSeconds": -0.15
         },
         {
-          "power": 90
+          "power": 85
         },
         {
-          "power": 90,
+          "power": 85,
           "size": 3
         },
         {
-          "power": 90,
+          "power": 85,
           "cooldownSeconds": -0.15
         },
         {
-          "power": 90
+          "power": 85
         },
         {
-          "power": 90,
+          "power": 85,
           "size": 3
         },
         {
-          "power": 90,
+          "power": 85,
           "cooldownSeconds": -0.15
         },
         {
-          "power": 90
+          "power": 85
         },
         {
-          "power": 90,
+          "power": 85,
           "cooldownSeconds": -0.15
         }
       ]
@@ -4190,7 +4190,7 @@
         "seconds": 3
       },
       "base": {
-        "power": 0,
+        "power": 45,
         "cooldownSeconds": 99,
         "count": 1,
         "speed": 0,
@@ -4209,37 +4209,48 @@
       },
       "levels": [
         {
-          "size": 12
+          "size": 12,
+          "power": 4
         },
         {
-          "size": 12
+          "size": 12,
+          "power": 4
         },
         {
-          "size": 12
+          "size": 12,
+          "power": 4
         },
         {
-          "size": 12
+          "size": 12,
+          "power": 4
         },
         {
-          "size": 12
+          "size": 12,
+          "power": 4
         },
         {
-          "size": 12
+          "size": 12,
+          "power": 4
         },
         {
-          "size": 12
+          "size": 12,
+          "power": 4
         },
         {
-          "size": 12
+          "size": 12,
+          "power": 4
         },
         {
-          "size": 12
+          "size": 12,
+          "power": 4
         },
         {
-          "size": 12
+          "size": 12,
+          "power": 4
         },
         {
-          "size": 12
+          "size": 12,
+          "power": 4
         }
       ],
       "passive": [

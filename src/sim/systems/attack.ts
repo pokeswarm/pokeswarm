@@ -3373,26 +3373,44 @@ export function fireHydroPump(world: World, p: Player, pm: PlayerMove, dirX: num
 }
 
 /**
- * 水を吸った竜巻（07 の317章）: ハイドロポンプ の水流が、同じプレイヤーの エアロブラスト の竜巻に触れると、竜巻が大きく強くなって長く残る（どのブラウザでも同じように）
+ * 水の渦の爆発（07 の318章）: ハイドロポンプ の水流が、同じプレイヤーの エアロブラスト の風の渦（stage 1・angle 0）に触れると、渦が水を巻き上げ（angle 1。spoutSeconds で消える）、
+ * spoutSeconds 後に着弾点で爆発する（エアロブラスト の円の stage 0・angle 2。どのブラウザでも同じように起こし、当たりは持ち主のブラウザで決まる）
  */
 function stepWetTornadoes(world: World): void {
   const defs = world.rules.activeSkills?.defs;
   const hp = defs?.find((d) => d.kind === 'hydroPump' && d.move >= 0 && d.hydroPump);
   const ab = defs?.find((d) => d.kind === 'aeroblast' && d.move >= 0);
   if (!hp || !ab) return;
+  const cfg = hp.hydroPump!;
   const pr = world.projectiles;
-  for (let b = 0; b < pr.count; b++) {
+  const n = pr.count;
+  for (let b = 0; b < n; b++) {
     if (pr.move[b] !== hp.move || pr.stage[b] !== 0 || pr.shape[b] !== SHAPE_LINE) continue;
-    for (let t = 0; t < pr.count; t++) {
+    for (let t = 0; t < n; t++) {
       if (pr.move[t] !== ab.move || pr.stage[t] !== 1 || pr.angle[t] !== 0 || pr.owner[t] !== pr.owner[b]) continue;
       const d2 = segmentDistance2(pr.x[t]!, pr.y[t]!, pr.x[b]!, pr.y[b]!, pr.dirX[b]!, pr.dirY[b]!, pr.length[b]!);
       const r = pr.radius[t]! + pr.radius[b]!;
       if (d2 > r * r) continue;
       pr.angle[t] = 1;
-      pr.radius[t] = pr.radius[t]! * hp.hydroPump!.wetRadiusMultiplier;
-      pr.damage[t] = pr.damage[t]! * hp.hydroPump!.wetPowerMultiplier;
-      pr.life[t] = pr.life[t]! + hp.hydroPump!.wetExtraSeconds;
-      pr.maxLife[t] = pr.maxLife[t]! + hp.hydroPump!.wetExtraSeconds;
+      pr.life[t] = Math.min(pr.life[t]!, cfg.spoutSeconds);
+      const owner = world.players.find((q) => q.id === pr.owner[t]);
+      const pm = owner?.moves.find((m) => m.move === ab.move);
+      if (!owner || !pm) continue;
+      const { st, sc } = skillMoveStats(world, owner, pm);
+      world.projectiles.add({
+        ...base(world, owner, pm, st),
+        motion: MOTION_LINEAR,
+        x: pr.x[t]!,
+        y: pr.y[t]!,
+        radius: pr.radius[t]! * cfg.burstSizeMultiplier,
+        damage: sc.power * cfg.burstMultiplier,
+        angle: 2,
+        group: newCastGroup(world, cfg.spoutSeconds + 0.3),
+        life: cfg.spoutSeconds,
+        stage: 3,
+        armStage: 0,
+        armLife: 0.25,
+      });
     }
   }
 }

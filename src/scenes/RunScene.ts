@@ -3449,7 +3449,7 @@ export class RunScene extends Phaser.Scene {
     this.moltresPlayer.update(world, this.time.now, this.localId, this.skillAim);
     this.zapdosPlayer ??= new ZapdosPlayer(this, spriteRender.depths.effects + 0.36, spriteRender.depths.players + 0.1);
     this.zapdosPlayer.update(world, this.time.now, this.localId, this.skillAim);
-    this.lugiaPlayer ??= new LugiaPlayer(this, spriteRender.depths.effects + 0.36, spriteRender.depths.players + 0.1);
+    this.lugiaPlayer ??= new LugiaPlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.players + 0.1);
     this.lugiaPlayer.update(world, this.time.now, this.localId, this.skillAim);
     this.shinyCharizardFlame ??= new ShinyCharizardFlame(this, spriteRender.depths.effects + 0.35, spriteRender.depths.bosses + 0.05, ARENA_FLOOR_DEPTH + 3.6);
     this.shinyCharizardFlame.update(world, this.time.now, alpha);

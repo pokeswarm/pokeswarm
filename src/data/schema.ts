@@ -3009,11 +3009,11 @@ export type AbilitiesConfig = z.infer<typeof abilitiesConfigSchema>;
  *   通り道に featherSpacing ごとに燃える羽が落ち、featherSeconds 燃える（中の敵に技の威力の featherPowerPct % ずつ）
  * - heatWave（ねっぷう。07 の315章）: 向きへ開き arcDegrees の弧の熱波を、技の count 回 waveDelaySeconds ごとに送る（1 回ごとに turnDegrees ずつ向きをずらす）。
  *   熱波は厚さ = 技の size の帯で、技の durationSeconds で 技の range まで広がる（自分に付いて動く）
- * - aeroblast（エアロブラスト。ルギア。07 の317章）: chargeSeconds 口もとに風の玉をためてから撃ち、flightSeconds で落ちる所（ふんか と同じ選び方・areaDistance）で風が爆ぜる（半径 = 技の size）。
- *   そこに竜巻（半径 tornadoRadius）が tornadoSeconds 残り、0.5 秒ごとに技の威力の tornadoPowerPct % が当たって、中の敵を pull の強さで中心へ吸い寄せる
+ * - aeroblast（エアロブラスト。ルギア。07 の317・318章）: chargeSeconds 口の前で風の弾をためてから放ち、flightSeconds で着弾する所（ふんか と同じ選び方・areaDistance）で
+ *   風が螺旋に炸裂する（半径 = 技の size）。そこに風の渦（半径 tornadoRadius）が tornadoSeconds 残り、0.5 秒ごとに技の威力の tornadoPowerPct % が当たって、中の敵を pull の強さで中心へ吸い寄せる
  * - extrasensory（じんつうりき。07 の317章）: 向きの開き spreadDegrees の中の近い敵 技の count 体の頭の上に目の模様を浮かべ、delaySeconds 後にはじけさせる（技の威力。ひるみ）
  * - hydroPump（ハイドロポンプ。07 の317章）: chargeSeconds ためてから、太い水流（長さ = 技の range・太さ = 技の size）を、向きを真ん中に sweepDegrees なぎ払う（技の durationSeconds で片道）。
- *   水流が自分の エアロブラスト の竜巻に当たると、水を吸った竜巻になる（半径 × wetRadiusMultiplier・威力 × wetPowerMultiplier・残る時間 +wetExtraSeconds）
+ *   水流が自分の エアロブラスト の風の渦に当たると、渦が水を巻き上げ（spoutSeconds）、着弾点で爆発する（渦の半径 × burstSizeMultiplier・エアロブラスト の威力 × burstMultiplier。渦は消える）
  * - drillPeck（ドリルくちばし。サンダー。07 の316章）: chargeSeconds 構えてから、回りながら向きへ技の range だけ技の speed で突き抜ける（体が動く技。通り道の敵に 1 回ずつ当たる）
  * - zapCannon（でんじほう。07 の316章）: 向きへ大きな電気の球（半径 = 技の size）をゆっくり（技の speed）放つ。球は技の durationSeconds 進み、触れた敵に hitIntervalSeconds ごとに当たる。
  *   自分の球どうしが linkDistance より近いと電気の帯（太さ bandWidth）でつながって共鳴し、帯に触れた敵に bandIntervalSeconds ごとに技の威力の bandPowerPct % が当たる。
@@ -3053,7 +3053,7 @@ export const activeSkillsConfigSchema = z.object({
       heatWave: z.object({ arcDegrees: z.number().positive().max(360), waveDelaySeconds: z.number().min(0), turnDegrees: z.number() }).optional(),
       aeroblast: z.object({ chargeSeconds: z.number().min(0), flightSeconds: z.number().positive(), areaDistance: z.number().positive(), tornadoSeconds: z.number().positive(), tornadoRadius: z.number().positive(), tornadoPowerPct: z.number().min(0), pull: z.number().min(0) }).optional(),
       extrasensory: z.object({ spreadDegrees: z.number().positive().max(360), delaySeconds: z.number().min(0) }).optional(),
-      hydroPump: z.object({ chargeSeconds: z.number().min(0), sweepDegrees: z.number().positive(), wetRadiusMultiplier: z.number().positive(), wetPowerMultiplier: z.number().positive(), wetExtraSeconds: z.number().min(0) }).optional(),
+      hydroPump: z.object({ chargeSeconds: z.number().min(0), sweepDegrees: z.number().positive(), spoutSeconds: z.number().positive(), burstMultiplier: z.number().positive(), burstSizeMultiplier: z.number().positive() }).optional(),
       drillPeck: z.object({ chargeSeconds: z.number().min(0) }).optional(),
       zapCannon: z.object({ linkDistance: z.number().positive(), bandWidth: z.number().positive(), bandPowerPct: z.number().min(0), bandIntervalSeconds: z.number().positive(), maxSpheres: z.number().int().positive() }).optional(),
       thunderbolt: z.object({ burstMultiplier: z.number().positive(), burstSizeMultiplier: z.number().positive(), bandBurstMultiplier: z.number().min(0), burstDelaySeconds: z.number().min(0) }).optional(),

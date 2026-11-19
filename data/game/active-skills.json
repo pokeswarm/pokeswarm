@@ -280,9 +280,9 @@
       "hydroPump": {
         "chargeSeconds": 0.6,
         "sweepDegrees": 90,
-        "wetRadiusMultiplier": 1.5,
-        "wetPowerMultiplier": 2,
-        "wetExtraSeconds": 2
+        "spoutSeconds": 0.6,
+        "burstMultiplier": 2.5,
+        "burstSizeMultiplier": 1.8
       }
     }
   }

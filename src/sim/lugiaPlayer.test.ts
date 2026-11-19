@@ -77,7 +77,7 @@ describe('遊べるルギア', () => {
     expect(behind()).toBe(1e7);
   });
 
-  it('ハイドロポンプ: ためてから扇をなぎ払う。竜巻に当たると水を吸って大きく強くなる', () => {
+  it('ハイドロポンプ: ためてから扇をなぎ払う。風の渦に当たると水を巻き上げ、着弾点で爆発する', () => {
     const { rules, sim, p } = setup(all);
     const ab = rules.moves.findIndex((m) => m.key === 'aeroblast-lugia');
     p.facingX = 1;
@@ -90,14 +90,27 @@ describe('遊べるルギア', () => {
     let t = -1;
     for (let i = 0; i < pr.count; i++) if (pr.move[i] === ab && pr.stage[i] === 1) t = i;
     expect(t).not.toBe(-1);
-    const r0 = pr.radius[t]!;
+    // 渦のそばに敵（自然に出る敵と番号が重ならないように）
+    const near = target(sim, 9002, pr.x[t]!, pr.y[t]!);
+    const hp0 = near();
     sim.step([{ type: 'useSkill', playerId: 1, slot: 2 }]);
-    for (let k = 0; k < 50; k++) sim.step([]);
+    let spout = false;
+    let burst = false;
+    for (let k = 0; k < 60; k++) {
+      sim.step([]);
+      for (let i = 0; i < pr.count; i++) {
+        if (pr.move[i] !== ab) continue;
+        if (pr.stage[i] === 1 && pr.angle[i] === 1) spout = true;
+        if (pr.stage[i] === 0 && pr.angle[i] === 2) burst = true;
+      }
+    }
     expect(side()).toBeLessThan(1e7);
-    let wet = -1;
-    for (let i = 0; i < pr.count; i++) if (pr.move[i] === ab && pr.stage[i] === 1) wet = i;
-    expect(wet).not.toBe(-1);
-    expect(pr.angle[wet]).toBe(1);
-    expect(pr.radius[wet]!).toBeGreaterThan(r0 * 1.4);
+    expect(spout).toBe(true);
+    expect(burst).toBe(true);
+    // 渦は消える。爆発で大きなダメージ（エアロブラスト の威力より大きい）
+    let left = 0;
+    for (let i = 0; i < pr.count; i++) if (pr.move[i] === ab && pr.stage[i] === 1) left++;
+    expect(left).toBe(0);
+    expect(hp0 - near()).toBeGreaterThan(1150 * 2);
   });
 });

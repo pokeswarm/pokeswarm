@@ -23419,18 +23419,117 @@
      "builds": [
       {
        "form": "jirachi",
-       "scene": "at150",
-       "est": 18241.42667592257,
+       "scene": "boss",
+       "est": 17425.807956799963,
        "moves": [
-        {
-         "move": "meteor-mash",
-         "level": 8,
-         "est": 16694.02944454772
-        },
         {
          "move": "doom-desire",
          "level": 8,
-         "est": 1547.3972313748504
+         "est": 17035.443203767478
+        },
+        {
+         "move": "confusion",
+         "level": 8,
+         "est": 390.36475303248363
+        },
+        {
+         "move": "wish",
+         "level": 8,
+         "est": 0
+        },
+        {
+         "move": "healing-wish",
+         "level": 8,
+         "est": 0
+        }
+       ],
+       "items": [
+        "x-sp-atk",
+        "dire-hit",
+        "light-clay",
+        "twisted-spoon"
+       ],
+       "vs": {
+        "hoenn-boss-absol": 1.1298304933181442,
+        "hoenn-boss-shiftry": 1.1298304933181442,
+        "hoenn-boss-dusclops": 1.6871527605999712,
+        "hoenn-boss-banette": 1.6871527605999712,
+        "hoenn-boss-walrein": 2.169196406485677,
+        "hoenn-boss-glalie": 1.8144380366405264,
+        "hoenn-boss-salamence": 2.5708994447237656,
+        "hoenn-boss-flygon": 2.5708994447237656,
+        "hoenn-boss-milotic": 3.709325996739119,
+        "hoenn-boss-wailord": 3.709325996739119,
+        "round1": 41.19018898070719,
+        "legend-rayquaza": 25.82376674387711,
+        "legend-deoxys": 28.822206462197556,
+        "legend-latias": 5.447397021355338
+       },
+       "legendAvg": 31.94538739559395
+      },
+      {
+       "form": "jirachi",
+       "scene": "boss",
+       "est": 17228.226376696137,
+       "moves": [
+        {
+         "move": "doom-desire",
+         "level": 8,
+         "est": 17035.443203767478
+        },
+        {
+         "move": "psychic",
+         "level": 8,
+         "est": 192.78317292865958
+        },
+        {
+         "move": "wish",
+         "level": 8,
+         "est": 0
+        },
+        {
+         "move": "healing-wish",
+         "level": 8,
+         "est": 0
+        }
+       ],
+       "items": [
+        "twisted-spoon",
+        "x-sp-atk",
+        "dire-hit"
+       ],
+       "vs": {
+        "hoenn-boss-absol": 1.1402196955526658,
+        "hoenn-boss-shiftry": 1.1402196955526658,
+        "hoenn-boss-dusclops": 1.7065018393169065,
+        "hoenn-boss-banette": 1.7065018393169065,
+        "hoenn-boss-walrein": 2.1940737934074512,
+        "hoenn-boss-glalie": 1.8318111435679838,
+        "hoenn-boss-salamence": 2.6003837551495717,
+        "hoenn-boss-flygon": 2.6003837551495717,
+        "hoenn-boss-milotic": 3.7623530705993247,
+        "hoenn-boss-wailord": 3.7623530705993247,
+        "round1": 41.72711165255872,
+        "legend-rayquaza": 26.119926111993465,
+        "legend-deoxys": 29.087237131445555,
+        "legend-latias": 5.4974878178432105
+       },
+       "legendAvg": 32.31142496533258
+      },
+      {
+       "form": "jirachi",
+       "scene": "boss",
+       "est": 10241.968098345273,
+       "moves": [
+        {
+         "move": "meteor-mash-jirachi",
+         "level": 8,
+         "est": 9824.592326572547
+        },
+        {
+         "move": "confusion",
+         "level": 8,
+         "est": 417.3757717727264
         },
         {
          "move": "wish",
@@ -23445,28 +23544,133 @@
        ],
        "items": [
         "pp-max",
-        "metronome",
         "x-attack",
+        "metronome",
+        "dire-hit",
+        "twisted-spoon",
+        "light-clay"
+       ],
+       "vs": {
+        "hoenn-boss-absol": 1.929420053551783,
+        "hoenn-boss-shiftry": 1.929420053551783,
+        "hoenn-boss-dusclops": 2.8705420401328885,
+        "hoenn-boss-banette": 2.8705420401328885,
+        "hoenn-boss-walrein": 3.6906969087422854,
+        "hoenn-boss-glalie": 3.0966127032368416,
+        "hoenn-boss-salamence": 4.374159299250116,
+        "hoenn-boss-flygon": 4.374159299250116,
+        "hoenn-boss-milotic": 6.282431821175323,
+        "hoenn-boss-wailord": 6.282431821175323,
+        "round1": 69.90511389418414,
+        "legend-rayquaza": 43.93686796121768,
+        "legend-deoxys": 49.21989932530059,
+        "legend-latias": 9.30256097248181
+       },
+       "legendAvg": 54.35396039356747
+      },
+      {
+       "form": "jirachi",
+       "scene": "boss",
+       "est": 10078.254392259225,
+       "moves": [
+        {
+         "move": "meteor-mash-jirachi",
+         "level": 8,
+         "est": 9824.592326572547
+        },
+        {
+         "move": "psychic",
+         "level": 8,
+         "est": 253.6620656866777
+        },
+        {
+         "move": "wish",
+         "level": 8,
+         "est": 0
+        },
+        {
+         "move": "healing-wish",
+         "level": 8,
+         "est": 0
+        }
+       ],
+       "items": [
+        "twisted-spoon",
+        "pp-max",
+        "x-attack",
+        "metronome",
         "dire-hit",
         "x-sp-atk"
        ],
        "vs": {
-        "hoenn-boss-absol": 1.0744773612400973,
-        "hoenn-boss-shiftry": 1.0744773612400973,
-        "hoenn-boss-dusclops": 1.611716041860146,
-        "hoenn-boss-banette": 1.611716041860146,
-        "hoenn-boss-walrein": 2.0722063395344734,
-        "hoenn-boss-glalie": 1.7268386162787277,
-        "hoenn-boss-salamence": 2.4559482542630793,
-        "hoenn-boss-flygon": 2.4559482542630793,
-        "hoenn-boss-milotic": 3.563317779622771,
-        "hoenn-boss-wailord": 3.563317779622771,
-        "round1": 39.470596943513776,
-        "legend-rayquaza": 24.66912308969611,
-        "legend-deoxys": 27.41013676632901,
-        "legend-latias": 5.180515848836183
+        "hoenn-boss-absol": 1.9546204975475279,
+        "hoenn-boss-shiftry": 1.9546204975475279,
+        "hoenn-boss-dusclops": 2.9171718489842022,
+        "hoenn-boss-banette": 2.9171718489842022,
+        "hoenn-boss-walrein": 3.7506495201225456,
+        "hoenn-boss-glalie": 3.138707751440125,
+        "hoenn-boss-salamence": 4.445214246071165,
+        "hoenn-boss-flygon": 4.445214246071165,
+        "hoenn-boss-milotic": 6.409200909246948,
+        "hoenn-boss-wailord": 6.409200909246948,
+        "round1": 71.19276669367636,
+        "legend-rayquaza": 44.6505895252684,
+        "legend-deoxys": 49.862767794579796,
+        "legend-latias": 9.424063113175581
        },
-       "legendAvg": 30.516618933179632
+       "legendAvg": 55.23537467117486
+      },
+      {
+       "form": "jirachi",
+       "scene": "boss",
+       "est": 1291.8892053119646,
+       "moves": [
+        {
+         "move": "swift",
+         "level": 8,
+         "est": 926.6854050108291
+        },
+        {
+         "move": "confusion",
+         "level": 8,
+         "est": 365.2038003011355
+        },
+        {
+         "move": "wish",
+         "level": 8,
+         "est": 0
+        },
+        {
+         "move": "healing-wish",
+         "level": 8,
+         "est": 0
+        }
+       ],
+       "items": [
+        "x-sp-atk",
+        "metronome",
+        "silk-scarf",
+        "pp-max",
+        "dire-hit",
+        "light-clay"
+       ],
+       "vs": {
+        "hoenn-boss-absol": 16.080752349773782,
+        "hoenn-boss-shiftry": 16.080752349773782,
+        "hoenn-boss-dusclops": 26.569015009878516,
+        "hoenn-boss-banette": 26.569015009878516,
+        "hoenn-boss-walrein": 29.259475073074924,
+        "hoenn-boss-glalie": 29.259475073074924,
+        "hoenn-boss-salamence": 34.67789638290361,
+        "hoenn-boss-flygon": 34.67789638290361,
+        "hoenn-boss-milotic": 40.25112973015598,
+        "hoenn-boss-wailord": 40.25112973015598,
+        "round1": 495.3985197557659,
+        "legend-rayquaza": 348.3270842032729,
+        "legend-deoxys": 410.223274228923,
+        "legend-latias": 77.53219882926645
+       },
+       "legendAvg": 417.9829593959873
       }
      ],
      "measured": null
@@ -23489,14 +23693,12 @@
      "owners": 1
     },
     {
-     "move": "meteor-mash",
-     "est": 16787.553418767162,
+     "move": "doom-desire",
+     "est": 17035.443203767478,
      "key": "jirachi",
      "form": "jirachi",
      "items": [
-      "pp-max",
-      "x-attack",
-      "metronome",
+      "x-sp-atk",
       "dire-hit"
      ],
      "owners": 1
@@ -23506,6 +23708,19 @@
      "est": 11285.97639372125,
      "key": "mawile",
      "form": "mawile",
+     "items": [
+      "pp-max",
+      "x-attack",
+      "metronome",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
+     "move": "meteor-mash-jirachi",
+     "est": 9824.592326572547,
+     "key": "jirachi",
+     "form": "jirachi",
      "items": [
       "pp-max",
       "x-attack",
@@ -24196,19 +24411,6 @@
      "owners": 1
     },
     {
-     "move": "doom-desire",
-     "est": 1547.3972313748502,
-     "key": "jirachi",
-     "form": "jirachi",
-     "items": [
-      "metronome",
-      "x-sp-atk",
-      "pp-max",
-      "dire-hit"
-     ],
-     "owners": 1
-    },
-    {
      "move": "bubble-beam",
      "est": 1419.8733653320955,
      "key": "azurill",
@@ -24411,7 +24613,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 12
+     "owners": 13
     },
     {
      "move": "dual-wingbeat",
@@ -24781,7 +24983,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 2
+     "owners": 3
     },
     {
      "move": "magical-leaf",
@@ -24852,18 +25054,6 @@
      "owners": 2
     },
     {
-     "move": "future-sight",
-     "est": 398.7250923879524,
-     "key": "jirachi",
-     "form": "jirachi",
-     "items": [
-      "twisted-spoon",
-      "x-sp-atk",
-      "dire-hit"
-     ],
-     "owners": 0
-    },
-    {
      "move": "bubble",
      "est": 388.54284855655203,
      "key": "azurill",
@@ -24931,7 +25121,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 1
+     "owners": 2
     },
     {
      "move": "whirlwind",
@@ -25458,9 +25648,9 @@
   "dragon-breath-latios": "りゅうのいぶき",
   "dragon-dance-latios": "りゅうのまい",
   "jirachi": "ジラーチ",
-  "meteor-mash": "コメットパンチ",
   "doom-desire": "はめつのねがい",
   "wish": "ねがいごと",
+  "meteor-mash-jirachi": "コメットパンチ",
   "blaze-kick": "ブレイズキック",
   "force-palm": "はっけい",
   "thunder-fang": "かみなりのキバ",

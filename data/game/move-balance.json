@@ -18,6 +18,8 @@
     "hoenn": 1.25
   },
   "exempt": [
+    "meteor-mash-jirachi",
+    "doom-desire",
     "luster-purge-latios",
     "dragon-dance-latios",
     "draco-meteor-latios",

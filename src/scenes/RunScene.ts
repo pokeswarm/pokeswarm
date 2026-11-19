@@ -41,6 +41,7 @@ import { ZapdosPlayer } from '../render/effects/ZapdosPlayer';
 import { LugiaPlayer } from '../render/effects/LugiaPlayer';
 import { LatiasPlayer } from '../render/effects/LatiasPlayer';
 import { LatiosPlayer } from '../render/effects/LatiosPlayer';
+import { JirachiPlayer } from '../render/effects/JirachiPlayer';
 import { SkillHud } from '../render/SkillHud';
 import { ensureSkillIcons } from '../render/skillIcons';
 import { ShinyCharizardFlame } from '../render/effects/ShinyCharizardFlame';
@@ -220,6 +221,7 @@ export class RunScene extends Phaser.Scene {
   private lugiaPlayer: LugiaPlayer | null = null;
   private latiasPlayer: LatiasPlayer | null = null;
   private latiosPlayer: LatiosPlayer | null = null;
+  private jirachiPlayer: JirachiPlayer | null = null;
   /** アクティブスキルのボタン（右下）とキー、押している枠（SPACE を押している間は行き先の印を出す）、スマホでボタンを押している指 */
   private skillHud: SkillHud | null = null;
   private skillKeys: Phaser.Input.Keyboard.Key[] = [];
@@ -419,6 +421,7 @@ export class RunScene extends Phaser.Scene {
     this.lugiaPlayer = null;
     this.latiasPlayer = null;
     this.latiosPlayer = null;
+    this.jirachiPlayer = null;
     this.skillHud = null;
     this.skillAim = null;
     this.skillDown = [];
@@ -3464,6 +3467,8 @@ export class RunScene extends Phaser.Scene {
     this.latiasPlayer.update(world, this.time.now, this.localId, this.skillAim);
     this.latiosPlayer ??= new LatiosPlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.players + 0.1);
     this.latiosPlayer.update(world, this.time.now, this.localId, this.skillAim);
+    this.jirachiPlayer ??= new JirachiPlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.players + 0.1);
+    this.jirachiPlayer.update(world, this.time.now);
     this.shinyCharizardFlame ??= new ShinyCharizardFlame(this, spriteRender.depths.effects + 0.35, spriteRender.depths.bosses + 0.05, ARENA_FLOOR_DEPTH + 3.6);
     this.shinyCharizardFlame.update(world, this.time.now, alpha);
     this.shinyVenusaurPlant ??= new ShinyVenusaurPlant(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);

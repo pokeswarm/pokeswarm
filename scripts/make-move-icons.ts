@@ -900,6 +900,42 @@ function dragonBreathLatiosIcon(): Draw {
   });
 }
 
+/** 星の形（中心 cx, cy・半径 r・とがり 5 本）の中か。0（中心）〜1（縁） */
+function starAt(x: number, y: number, cx: number, cy: number, r: number): number {
+  const a = Math.atan2(y - cy, x - cx) + Math.PI / 2;
+  const seg = ((a / (Math.PI * 2)) * 5 + 50) % 1;
+  const edge = 0.45 + 0.55 * Math.abs(1 - seg * 2) ** 1.6;
+  return Math.hypot(x - cx, y - cy) / (r * edge);
+}
+
+/** コメットパンチ（ジラーチの版。07 の321章）: 右上へ飛ぶ金色の星の拳と、後ろの青い流れ星の尾 */
+function meteorMashJirachiIcon(): Draw {
+  return paint((x, y) => {
+    const k = starAt(x, y, 20, 12, 8);
+    if (k < 1) return k < 0.4 ? '#ffffff' : k < 0.85 ? '#ffd95e' : '#c9861b';
+    // 尾（左下へ）
+    const u = (x - 20) * -0.707 + (y - 12) * 0.707;
+    const v = (x - 20) * 0.707 + (y - 12) * 0.707;
+    if (u > 5 && u < 22 && Math.abs(v) < 4 * (1 - (u - 5) / 17)) return u < 11 ? '#fff3b0' : u < 16 ? '#b7c8ff' : '#6a8ff0';
+    return null;
+  });
+}
+
+/** はめつのねがい（ジラーチの版）: 上から落ちる光の柱と大きな星、下の金の輪 */
+function doomDesireJirachiIcon(): Draw {
+  return paint((x, y) => {
+    const k = starAt(x, y, 16, 14, 8.5);
+    if (k < 1) return k < 0.35 ? '#ffffff' : k < 0.85 ? '#ffd95e' : '#c9861b';
+    // 光の柱
+    const w = 2.2 + (y / 32) * 2.5;
+    if (Math.abs(x - 16) < w && y < 26) return Math.abs(x - 16) < w * 0.4 ? '#fff3b0' : '#6a8ff0';
+    // 地面の金の輪
+    const e = Math.hypot((x - 16) / 11, (y - 27) / 3);
+    if (Math.abs(e - 1) < 0.18) return '#c9861b';
+    return null;
+  });
+}
+
 /** しんそく（ライコウの版）: 3 回折れて駆け抜ける稲妻の道と、その先の光 */
 function extremeSpeedRaikouIcon(): Draw {
   const pts: [number, number][] = [[4, 26], [12, 14], [17, 22], [27, 6]];
@@ -1384,6 +1420,8 @@ const ICONS: Record<string, Layer[]> = {
   'dragon-dance-latios': [dragonDanceLatiosIcon()],
   'draco-meteor-latios': [dracoMeteorLatiosIcon()],
   'dragon-breath-latios': [dragonBreathLatiosIcon()],
+  'meteor-mash-jirachi': [meteorMashJirachiIcon()],
+  'doom-desire': [doomDesireJirachiIcon()],
   // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
   sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],
   // かたくなる: 体の表面が硬い板になる

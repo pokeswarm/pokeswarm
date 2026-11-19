@@ -1500,17 +1500,13 @@
       "dragon-breath-latios"
     ],
     "jirachi": [
-      "doom-desire",
+      "swift",
+      "confusion",
       "wish",
       "healing-wish",
-      "meteor-mash",
-      "confusion",
-      "psychic",
-      "future-sight",
-      "flash-cannon",
-      "iron-head",
-      "swift",
-      "body-slam"
+      "meteor-mash-jirachi",
+      "doom-desire",
+      "psychic"
     ]
   }
 }

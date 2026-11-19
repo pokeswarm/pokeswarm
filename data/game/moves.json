@@ -13250,6 +13250,71 @@
         }
       ]
     },
+    "meteor-mash-jirachi": {
+      "pattern": "nearest",
+      "effect": "meteor-mash-jirachi",
+      "nameOf": "meteor-mash",
+      "region": "hoenn",
+      "teachOnly": true,
+      "base": {
+        "power": 480,
+        "intervalSeconds": 0.15,
+        "count": 1,
+        "speed": 560,
+        "size": 18,
+        "range": 420,
+        "durationSeconds": 1.1,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockback": 160,
+        "knockbackSeconds": 0.12,
+        "spreadDegrees": 0,
+        "cooldownSeconds": 1.2,
+        "statusChance": 0.2,
+        "statusSeconds": 0.5,
+        "lifestealPct": 0,
+        "statusId": "flinch"
+      },
+      "levels": [
+        {
+          "power": 80
+        },
+        {
+          "size": 3,
+          "power": 80
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 35
+        },
+        {
+          "speed": 40,
+          "power": 75
+        },
+        {
+          "size": 3,
+          "power": 75
+        },
+        {
+          "cooldownSeconds": -0.08,
+          "power": 14
+        },
+        {
+          "speed": 40,
+          "power": 70
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "hit",
+          "avoidTarget": true,
+          "explode": {
+            "sizeMultiplier": 3,
+            "powerMultiplier": 0.8
+          }
+        }
+      ]
+    },
     "future-sight-gardevoir": {
       "pattern": "strike",
       "effect": "future-sight-gardevoir",
@@ -17102,11 +17167,20 @@
       ]
     },
     "doom-desire": {
-      "pattern": "scatter",
-      "effect": "doom-desire",
+      "pattern": "strike",
+      "effect": "doom-desire-jirachi",
+      "region": "hoenn",
+      "teachOnly": true,
+      "contestType": "smart",
+      "aimStrongest": true,
+      "delayedBlast": {
+        "seconds": 2,
+        "sizeMultiplier": 8.5,
+        "powerMultiplier": 8
+      },
       "base": {
         "intervalSeconds": 0.1,
-        "count": 2,
+        "count": 1,
         "speed": 0,
         "pierce": "infinite",
         "hitIntervalSeconds": 0,
@@ -17115,48 +17189,42 @@
         "statusSeconds": 0,
         "spreadDegrees": 0,
         "lifestealPct": 0,
-        "power": 314.1,
-        "cooldownSeconds": 2.6,
-        "size": 70,
+        "power": 1450,
+        "cooldownSeconds": 2.8,
+        "size": 12,
         "range": 470,
-        "durationSeconds": 0.3,
-        "knockback": 140
+        "durationSeconds": 0.2,
+        "knockback": 0
       },
       "levels": [
         {
-          "power": 52.6
+          "power": 216
         },
         {
-          "size": 4,
-          "power": 35.2
-        },
-        {
-          "cooldownSeconds": -0.12,
-          "power": 29.6
-        },
-        {
-          "count": 1,
-          "power": -39.8
-        },
-        {
-          "size": 4,
-          "power": 21.9
+          "size": 1,
+          "power": 151
         },
         {
           "cooldownSeconds": -0.12,
-          "power": 15.8
+          "power": 130
+        },
+        {
+          "size": 1,
+          "power": 120
+        },
+        {
+          "size": 1,
+          "power": 108
+        },
+        {
+          "cooldownSeconds": -0.12,
+          "power": 86
         },
         {
           "count": 1,
-          "power": -26.4
+          "power": -65
         }
-      ],
-      "scatterDelaySeconds": 1.6,
-      "effects": [],
-      "scatterOnEnemies": true,
-      "region": "hoenn",
-      "teachOnly": true,
-      "contestType": "smart"
+      ]
     },
     "wish": {
       "pattern": "heal",

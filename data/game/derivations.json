@@ -250,6 +250,8 @@
     }
   ],
   "unique": [
+    {"from":"swift","item":"metal-coat","to":"meteor-mash-jirachi","line":"jirachi"},
+    {"from":"meteor-mash-jirachi","to":"doom-desire","line":"jirachi","needsMoves":[{"move":"wish","level":8}]},
     {
       "from": "flamethrower",
       "item": "fire-stone",

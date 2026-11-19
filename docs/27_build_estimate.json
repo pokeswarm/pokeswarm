@@ -16005,257 +16005,53 @@
       {
        "form": "entei",
        "scene": "at50",
-       "est": 12815.070647931489,
+       "est": 16934.405203089827,
        "moves": [
         {
-         "move": "eruption",
-         "level": 8,
-         "est": 7431.044810691387
+         "move": "overheat-entei",
+         "level": 12,
+         "est": 6432.13412841797
         },
         {
-         "move": "flare-blitz",
-         "level": 8,
-         "est": 3272.670432508679
+         "move": "lava-plume-entei",
+         "level": 12,
+         "est": 6146.302685418381
         },
         {
-         "move": "swift",
-         "level": 8,
-         "est": 827.6809253302421
+         "move": "eruption-entei",
+         "level": 12,
+         "est": 3207.4853728926814
         },
         {
-         "move": "fire-spin",
-         "level": 8,
-         "est": 1283.674479401181
-        }
-       ],
-       "items": [
-        "charcoal",
-        "x-attack",
-        "pp-max",
-        "metronome",
-        "x-sp-atk",
-        "light-clay"
-       ],
-       "vs": {
-        "johto-boss-xatu": 1.5294492350819529,
-        "johto-boss-crobat": 2.294173852622929,
-        "johto-boss-machamp": 2.9496520962294803,
-        "johto-boss-houndoom": 4.300417694898961,
-        "johto-boss-dragonite": 4.991556253007722,
-        "round1": 15.606624847775029,
-        "round2": 23.409937271662542,
-        "round3": 41.537464660387,
-        "legend-lugia": 31.213249695550058,
-        "legend-ho-oh": 38.396586561597864,
-        "legend-raikou": 4.916086827049134,
-        "legend-entei": 6.047462383451664,
-        "legend-suicune": 6.047462383451664
-       },
-       "legendAvg": 30.0327726073945
-      },
-      {
-       "form": "entei",
-       "scene": "at50",
-       "est": 9461.212357859777,
-       "moves": [
-        {
-         "move": "eruption",
-         "level": 8,
-         "est": 6933.271474090051
-        },
-        {
-         "move": "fire-fang",
-         "level": 8,
-         "est": 609.4985302131009
-        },
-        {
-         "move": "swift",
-         "level": 8,
-         "est": 720.7556383258567
-        },
-        {
-         "move": "fire-spin",
-         "level": 8,
-         "est": 1197.6867152307673
+         "move": "sacred-fire-entei",
+         "level": 12,
+         "est": 1148.4830163607965
         }
        ],
        "items": [
         "charcoal",
         "metronome",
         "x-sp-atk",
-        "pp-max",
         "dire-hit",
-        "light-clay"
-       ],
-       "vs": {
-        "johto-boss-xatu": 2.0716161162705076,
-        "johto-boss-crobat": 3.107424174405761,
-        "johto-boss-machamp": 3.995259652807407,
-        "johto-boss-houndoom": 5.8082843402764,
-        "johto-boss-dragonite": 6.741758609249393,
-        "round1": 21.13893996194395,
-        "round2": 31.708409942915928,
-        "round3": 56.165978423618874,
-        "legend-lugia": 42.2778799238879,
-        "legend-ho-oh": 51.85968160961072,
-        "legend-raikou": 6.658766088012345,
-        "legend-entei": 8.167899853513688,
-        "legend-suicune": 8.167899853513688
-       },
-       "legendAvg": 40.63017797239547
-      },
-      {
-       "form": "entei",
-       "scene": "at50",
-       "est": 6219.381438601549,
-       "moves": [
-        {
-         "move": "flare-blitz",
-         "level": 8,
-         "est": 3664.1381875934494
-        },
-        {
-         "move": "swift",
-         "level": 8,
-         "est": 720.7556383258567
-        },
-        {
-         "move": "fire-spin",
-         "level": 8,
-         "est": 1197.6867152307673
-        },
-        {
-         "move": "flamethrower",
-         "level": 8,
-         "est": 636.8008974514755
-        }
-       ],
-       "items": [
-        "x-attack",
-        "charcoal",
         "pp-max",
-        "light-clay",
-        "metronome",
-        "dire-hit"
+        "x-attack"
        ],
        "vs": {
-        "johto-boss-xatu": 3.151438803600239,
-        "johto-boss-crobat": 4.727158205400358,
-        "johto-boss-machamp": 6.077774835514747,
-        "johto-boss-houndoom": 8.750587454031145,
-        "johto-boss-dragonite": 10.156931866286149,
-        "round1": 32.15753881224734,
-        "round2": 48.23630821837101,
-        "round3": 84.95175682388117,
-        "legend-lugia": 64.31507762449468,
-        "legend-ho-oh": 78.13024512527807,
-        "legend-raikou": 10.12962472585791,
-        "legend-entei": 12.305513607231296,
-        "legend-suicune": 12.305513607231296
+        "johto-boss-xatu": 1.1574070517944033,
+        "johto-boss-crobat": 1.7361105776916048,
+        "johto-boss-machamp": 2.232142171317778,
+        "johto-boss-houndoom": 3.3068772908411517,
+        "johto-boss-dragonite": 3.8383397125834797,
+        "round1": 11.810276038718401,
+        "round2": 17.715414058077602,
+        "round3": 31.7401168540557,
+        "legend-lugia": 23.620552077436802,
+        "legend-ho-oh": 29.525690096795998,
+        "legend-raikou": 3.7202369521962964,
+        "legend-entei": 4.65029619024537,
+        "legend-suicune": 4.65029619024537
        },
-       "legendAvg": 61.558185320854456
-      },
-      {
-       "form": "entei",
-       "scene": "at50",
-       "est": 5853.798343153067,
-       "moves": [
-        {
-         "move": "flare-blitz",
-         "level": 8,
-         "est": 3664.1381875934494
-        },
-        {
-         "move": "swift",
-         "level": 8,
-         "est": 720.7556383258567
-        },
-        {
-         "move": "fire-spin",
-         "level": 8,
-         "est": 1197.6867152307673
-        },
-        {
-         "move": "ember",
-         "level": 8,
-         "est": 271.21780200299406
-        }
-       ],
-       "items": [
-        "x-attack",
-        "pp-max",
-        "metronome",
-        "charcoal",
-        "light-clay",
-        "dire-hit"
-       ],
-       "vs": {
-        "johto-boss-xatu": 3.3482533649156645,
-        "johto-boss-crobat": 5.022380047373497,
-        "johto-boss-machamp": 6.457345775194496,
-        "johto-boss-houndoom": 9.280762065684089,
-        "johto-boss-dragonite": 10.772313111954746,
-        "round1": 34.16585066240474,
-        "round2": 51.24877599360711,
-        "round3": 90.16379255260522,
-        "legend-lugia": 68.33170132480949,
-        "legend-ho-oh": 82.86394701503652,
-        "legend-raikou": 10.762242958657493,
-        "legend-entei": 13.05107165486825,
-        "legend-suicune": 13.05107165486825
-       },
-       "legendAvg": 65.3548135096926
-      },
-      {
-       "form": "entei",
-       "scene": "at50",
-       "est": 3164.7417812212,
-       "moves": [
-        {
-         "move": "fire-fang",
-         "level": 8,
-         "est": 609.4985302131009
-        },
-        {
-         "move": "swift",
-         "level": 8,
-         "est": 720.7556383258567
-        },
-        {
-         "move": "fire-spin",
-         "level": 8,
-         "est": 1197.6867152307673
-        },
-        {
-         "move": "flamethrower",
-         "level": 8,
-         "est": 636.8008974514755
-        }
-       ],
-       "items": [
-        "charcoal",
-        "metronome",
-        "light-clay",
-        "x-sp-atk",
-        "pp-max",
-        "dire-hit"
-       ],
-       "vs": {
-        "johto-boss-xatu": 6.193238297134251,
-        "johto-boss-crobat": 9.289857445701376,
-        "johto-boss-machamp": 11.944102430187483,
-        "johto-boss-houndoom": 16.741751975303856,
-        "johto-boss-dragonite": 19.432390685620547,
-        "round1": 63.19630915443113,
-        "round2": 94.79446373164669,
-        "round3": 164.37702366231127,
-        "legend-lugia": 126.39261830886225,
-        "legend-ho-oh": 149.47992835092728,
-        "legend-raikou": 19.906837383645804,
-        "legend-entei": 23.543088715271047,
-        "legend-suicune": 23.543088715271047
-       },
-       "legendAvg": 119.64806864163572
+       "legendAvg": 22.8824098250169
       }
      ],
      "measured": {
@@ -17352,7 +17148,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 2
+     "owners": 1
     },
     {
      "move": "surf-suicune",
@@ -17440,6 +17236,19 @@
      "owners": 1
     },
     {
+     "move": "overheat-entei",
+     "est": 6432.13412841797,
+     "key": "entei",
+     "form": "entei",
+     "items": [
+      "charcoal",
+      "x-sp-atk",
+      "metronome",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
      "move": "air-slash",
      "est": 6176.902235305021,
      "key": "ho-oh",
@@ -17452,6 +17261,19 @@
       "dire-hit"
      ],
      "owners": 6
+    },
+    {
+     "move": "lava-plume-entei",
+     "est": 6146.302685418381,
+     "key": "entei",
+     "form": "entei",
+     "items": [
+      "charcoal",
+      "metronome",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 1
     },
     {
      "move": "future-sight-celebi",
@@ -17730,7 +17552,7 @@
       "metronome",
       "dire-hit"
      ],
-     "owners": 5
+     "owners": 4
     },
     {
      "move": "double-slap",
@@ -17800,6 +17622,19 @@
       "dire-hit"
      ],
      "owners": 12
+    },
+    {
+     "move": "eruption-entei",
+     "est": 3207.4853728926814,
+     "key": "entei",
+     "form": "entei",
+     "items": [
+      "charcoal",
+      "metronome",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 1
     },
     {
      "move": "acid-spray",
@@ -18177,7 +18012,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 17
+     "owners": 16
     },
     {
      "move": "thunderbolt",
@@ -18232,7 +18067,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 5
+     "owners": 4
     },
     {
      "move": "night-shade",
@@ -18288,6 +18123,20 @@
       "dire-hit"
      ],
      "owners": 5
+    },
+    {
+     "move": "sacred-fire-entei",
+     "est": 1155.8754437512425,
+     "key": "entei",
+     "form": "entei",
+     "items": [
+      "pp-max",
+      "charcoal",
+      "metronome",
+      "x-attack",
+      "dire-hit"
+     ],
+     "owners": 1
     },
     {
      "move": "ice-fang",
@@ -18423,7 +18272,7 @@
       "x-attack",
       "dire-hit"
      ],
-     "owners": 7
+     "owners": 6
     },
     {
      "move": "spark",
@@ -18520,7 +18369,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 5
+     "owners": 4
     },
     {
      "move": "water-gun",
@@ -18575,7 +18424,7 @@
       "x-sp-atk",
       "dire-hit"
      ],
-     "owners": 5
+     "owners": 4
     },
     {
      "move": "bubble",
@@ -26861,6 +26710,10 @@
   "extreme-speed-raikou": "しんそく",
   "charge-raikou": "じゅうでん",
   "entei": "エンテイ",
+  "overheat-entei": "オーバーヒート",
+  "lava-plume-entei": "ふんえん",
+  "eruption-entei": "ふんか",
+  "sacred-fire-entei": "せいなるほのお",
   "suicune": "スイクン",
   "surf-suicune": "なみのり",
   "mirror-coat-suicune": "ミラーコート",

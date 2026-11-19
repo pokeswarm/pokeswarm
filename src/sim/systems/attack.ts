@@ -123,6 +123,8 @@ function typePowerPctOf(world: World, p: Player, def: SimMoveDef, pinch: Modifie
   let pct = 0;
   for (const t of moveTypesOf(def)) {
     pct += (p.mods.typePowerPct[t] ?? 0) + (pinch?.typePowerPct[t] ?? 0) + (p.rain && p.rain.type === t && world.tick < p.rain.untilTick ? p.rain.pct : 0) + fieldTypePct(world, t);
+    // オーバーヒートの後（エンテイ。07 の313章）: ほのおの技が弱まる
+    if (p.overheat && p.overheat.type === t && world.tick < p.overheat.untilTick) pct -= p.overheat.pct;
   }
   return pct;
 }
@@ -2765,4 +2767,158 @@ export function fireRisingVoltage(world: World, p: Player, pm: PlayerMove, dirX:
   const y = t !== -1 ? e.y[t]! : p.y + dirY * st.range * 0.4;
   world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x, y, damage: sc.power * charge, group, life: cfg.delaySeconds, stage: 3, armStage: 0, armLife: st.durationSeconds });
   return 0;
+}
+
+/** ふんえん（エンテイ。07 の313章）の残っている割れ目（自分の。線の始まり・向き・長さ） */
+export function lavaCracks(world: World, p: Player, lavaMove: number): { x: number; y: number; dx: number; dy: number; len: number }[] {
+  const pr = world.projectiles;
+  const out: { x: number; y: number; dx: number; dy: number; len: number }[] = [];
+  if (lavaMove < 0) return out;
+  for (let i = 0; i < pr.count; i++) {
+    if (pr.owner[i] !== p.id || pr.move[i] !== lavaMove || pr.shape[i] !== SHAPE_LINE) continue;
+    if (!(pr.stage[i] === 1 || (pr.stage[i] === 3 && pr.armStage[i] === 1))) continue;
+    out.push({ x: pr.x[i]!, y: pr.y[i]!, dx: pr.dirX[i]!, dy: pr.dirY[i]!, len: pr.length[i]! });
+  }
+  return out;
+}
+
+/**
+ * ふんえん（エンテイ）: 向きへ count 本の地割れを走らせ、根元から順に溶岩を噴かせる（1 回で同じ敵には 1 回）。
+ * 割れ目（同じ技の線。stage 1）は crackSeconds 残り、中の敵に少しずつ当たる。固定マップの中で止める
+ */
+export function fireLavaPlume(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { spreadDegrees: number; spacing: number; delayPerPixel: number; crackSeconds: number; crackPowerPct: number }): void {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const n = Math.max(1, st.count);
+  const group = newCastGroup(world, st.range * cfg.delayPerPixel + st.durationSeconds);
+  const b0 = base(world, p, pm, st);
+  const heading = Math.atan2(dirY, dirX);
+  const ar = world.arena;
+  for (let c = 0; c < n; c++) {
+    const a = heading + ((c - (n - 1) / 2) * cfg.spreadDegrees * Math.PI) / 180;
+    const dx = Math.cos(a);
+    const dy = Math.sin(a);
+    let len = st.range;
+    if (ar) {
+      // 固定マップの外へは割れない
+      for (let d = 0; d <= st.range; d += 10) {
+        const x = p.x + dx * d;
+        const y = p.y + dy * d;
+        if (Math.abs(x - ar.x) > ar.halfWidth || Math.abs(y - ar.y) > ar.halfHeight) {
+          len = Math.max(0, d - 10);
+          break;
+        }
+      }
+    }
+    for (let d = cfg.spacing * 0.6; d <= len; d += cfg.spacing) {
+      world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: p.x + dx * d, y: p.y + dy * d, group, life: Math.max(world.dt, d * cfg.delayPerPixel), stage: 3, armStage: 0, armLife: st.durationSeconds });
+    }
+    if (len > 10) {
+      world.projectiles.add({
+        ...b0,
+        motion: MOTION_LINEAR,
+        x: p.x,
+        y: p.y,
+        shape: SHAPE_LINE,
+        length: len,
+        dirX: dx,
+        dirY: dy,
+        radius: sc.size * 0.6,
+        damage: (sc.power * cfg.crackPowerPct) / 100,
+        hitIntervalTicks: Math.round(0.6 / world.dt),
+        life: world.dt,
+        stage: 3,
+        armStage: 1,
+        armLife: cfg.crackSeconds,
+      });
+    }
+  }
+}
+
+/**
+ * ふんか（エンテイ）: 火山弾を、HP が多いほど多く落とす。自分の ふんえん の割れ目が残っていれば全部そこへ落ちて噴火する（stage 3 → 1）。
+ * 無ければ向きの先の区画へばらばらに（stage 3 → 0）。返り値: 割れ目に落ちた数
+ */
+export function fireEnteiEruption(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, lavaMove: number, cfg: { minCountPct: number; delaySeconds: number; spreadSeconds: number; areaRadius: number; areaDistance: number; comboMultiplier: number; comboSizeMultiplier: number }): number {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const hp = Math.max(0, Math.min(1, p.hp / Math.max(1, p.maxHp)));
+  const n = Math.max(1, Math.round(st.count * (cfg.minCountPct / 100 + (1 - cfg.minCountPct / 100) * hp)));
+  const group = newCastGroup(world, cfg.delaySeconds + cfg.spreadSeconds + st.durationSeconds);
+  const b0 = base(world, p, pm, st);
+  const cracks = lavaCracks(world, p, lavaMove).filter((c) => Math.hypot(c.x - p.x, c.y - p.y) <= st.range);
+  const total = cracks.reduce((s, c) => s + c.len, 0);
+  const center = eruptionCenter(world, p, st.range, dirX, dirY, cfg.areaDistance);
+  // 割れ目の中で、狙う敵に一番近い所（割れ目の始まりからの長さを、全部をつないだ長さで）
+  let near = -1;
+  if (total > 0 && center.target !== -1) {
+    let best = Infinity;
+    let acc = 0;
+    for (const cr of cracks) {
+      const t = Math.max(0, Math.min(cr.len, (center.x - cr.x) * cr.dx + (center.y - cr.y) * cr.dy));
+      const d = Math.hypot(cr.x + cr.dx * t - center.x, cr.y + cr.dy * t - center.y);
+      if (d < best) {
+        best = d;
+        near = acc + t;
+      }
+      acc += cr.len;
+    }
+  }
+  for (let k = 0; k < n; k++) {
+    const wait = cfg.delaySeconds + (n > 1 ? (k / (n - 1)) * cfg.spreadSeconds : 0);
+    if (total > 0) {
+      // 割れ目の上に落ちる: 半分は狙う敵に一番近い所のまわり、残りは割れ目に沿って並べる（少しずらす）
+      let at = near >= 0 && k % 2 === 0 ? near + (world.rng.next() - 0.5) * 50 : ((k + 0.5) / n) * total + (world.rng.next() - 0.5) * 20;
+      at = Math.max(0, Math.min(total - 0.01, at));
+      let c = cracks[0]!;
+      for (const cr of cracks) {
+        if (at <= cr.len) {
+          c = cr;
+          break;
+        }
+        at -= cr.len;
+      }
+      const d = Math.max(0, Math.min(c.len, at));
+      world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: c.x + c.dx * d, y: c.y + c.dy * d, radius: sc.size * cfg.comboSizeMultiplier, damage: sc.power * cfg.comboMultiplier, group, life: wait, stage: 3, armStage: 1, armLife: st.durationSeconds });
+      continue;
+    }
+    const a = world.rng.next() * Math.PI * 2;
+    const r = Math.sqrt(world.rng.next()) * cfg.areaRadius;
+    const x = center.x + Math.cos(a) * r;
+    const y = center.y + Math.sin(a) * r * 0.7;
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x, y, group, life: wait, stage: 3, armStage: 0, armLife: st.durationSeconds });
+  }
+  return total > 0 ? n : 0;
+}
+
+/**
+ * ふんか の落ちる区画の中心: 向きの扇（±50°）の中で射程の中の HP の一番高い敵（target はその番号）。扇の中にいなければ射程の中で HP の一番高い敵。
+ * 敵がいなければ向きの areaDistance 先
+ */
+export function eruptionCenter(world: World, p: Player, range: number, dirX: number, dirY: number, areaDistance: number): { x: number; y: number; target: number } {
+  const e = world.enemies;
+  let best = -1;
+  for (const i of enemiesInRange(world, p.x, p.y, range)) {
+    if (e.hp[i]! <= 0) continue;
+    const dx = e.x[i]! - p.x;
+    const dy = e.y[i]! - p.y;
+    const d = Math.hypot(dx, dy) || 1;
+    if ((dx * dirX + dy * dirY) / d < 0.64) continue;
+    if (best === -1 || e.hp[i]! > e.hp[best]! || (e.hp[i] === e.hp[best] && e.id[i]! < e.id[best]!)) best = i;
+  }
+  // 扇の中にいなければ、射程の中で HP の一番高い敵
+  if (best === -1) best = strongestEnemy(world, p, range);
+  if (best !== -1) return { x: e.x[best]!, y: e.y[best]!, target: best };
+  const dist = Math.min(areaDistance, range);
+  return { x: p.x + dirX * dist, y: p.y + dirY * dist, target: -1 };
+}
+
+/**
+ * オーバーヒート（エンテイ）: chargeSeconds 赤熱してから、向きへ巨大な炎（自分に付いて動く線。長さ range・半径 size。hitInterval ごとに当たる）。
+ * 使った後 debuffSeconds の間、ほのおの技が弱まる（自分の。炎そのものの威力は使った時に決まるので弱まらない）
+ */
+export function fireOverheat(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { chargeSeconds: number; debuffPct: number; debuffSeconds: number }): void {
+  const { st } = skillMoveStats(world, p, pm);
+  const b0 = base(world, p, pm, st);
+  world.projectiles.add({ ...b0, motion: MOTION_FOLLOW, x: p.x, y: p.y, ox: 0, oy: 0, shape: SHAPE_LINE, length: st.range, dirX, dirY, life: Math.max(world.dt, cfg.chargeSeconds), stage: 3, armStage: 0, armLife: st.durationSeconds });
+  const def = world.rules.moves[pm.move]!;
+  p.overheat = { type: def.type, pct: cfg.debuffPct, fromTick: world.tick, untilTick: world.tick + Math.round((cfg.chargeSeconds + st.durationSeconds + cfg.debuffSeconds) / world.dt) };
 }

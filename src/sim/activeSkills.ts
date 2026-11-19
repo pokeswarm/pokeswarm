@@ -1,7 +1,7 @@
 import type { Player, PlayerMove } from './entities/player';
 import type { SimActiveSkill } from './rules';
 import type { World } from './world';
-import { extremeSpeedPath, fireExtremeSpeed, fireMirrorShards, fireRisingVoltage, fireSheerCold, fireSurfWave, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
+import { eruptionCenter, extremeSpeedPath, fireEnteiEruption, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
 
 /**
  * アクティブスキル（作者の案 2026年11月18日。07 の305・307章）: キー（SPACE・Q・E）で使う技。
@@ -90,6 +90,7 @@ export function stepSkills(world: World): void {
     if (p.esDash) advanceExtremeSpeed(world, p);
     if (p.skillBuff && world.tick >= p.skillBuff.untilTick) p.skillBuff = undefined;
     if (p.calm && world.tick >= p.calm.untilTick) p.calm = undefined;
+    if (p.overheat && world.tick >= p.overheat.untilTick) p.overheat = undefined;
     if (p.mirror && world.tick >= p.mirror.untilTick) releaseMirror(world, p);
     if (!p.skills || p.remote) continue;
     for (const s of p.skills) {
@@ -159,6 +160,35 @@ export function risingVoltagePreview(world: World, p: Player, skill: number): { 
   if (combo.length > 0) return { combo: true, spots: combo.map((i) => ({ x: e.x[i]!, y: e.y[i]! })) };
   const t = strongestEnemyIndex(world, p, skillMoveStats(world, p, pm).st.range);
   return { combo: false, spots: t !== -1 ? [{ x: e.x[t]!, y: e.y[t]! }] : [] };
+}
+
+/** ふんえん のスキルの技の番号（ふんか のコンボの相手。無ければ -1） */
+function lavaPlumeMove(world: World): number {
+  return world.rules.activeSkills?.defs.find((x) => x.kind === 'lavaPlume' && x.move >= 0)?.move ?? -1;
+}
+
+/**
+ * ふんか の狙い（押している間に見せる。エンテイ。07 の313章）: 割れ目があれば割れ目（combo: true）、無ければ火山弾が落ちる区画の中心（向きの先の HP の一番高い敵）と半径
+ */
+export function eruptionPreview(world: World, p: Player, skill: number): { combo: boolean; x: number; y: number; r: number; cracks: { x: number; y: number; dx: number; dy: number; len: number }[]; count: number } | null {
+  const pm = skillMove(world, p, { skill });
+  const cfg = skillDef(world, skill).eruption;
+  if (!pm || !cfg) return null;
+  const { st } = skillMoveStats(world, p, pm);
+  const cracks = lavaCracks(world, p, lavaPlumeMove(world)).filter((c) => Math.hypot(c.x - p.x, c.y - p.y) <= st.range);
+  const [dx, dy] = aimOf(p);
+  const center = eruptionCenter(world, p, st.range, dx, dy, cfg.areaDistance);
+  const hp = Math.max(0, Math.min(1, p.hp / Math.max(1, p.maxHp)));
+  const count = Math.max(1, Math.round(st.count * (cfg.minCountPct / 100 + (1 - cfg.minCountPct / 100) * hp)));
+  return { combo: cracks.length > 0, x: center.x, y: center.y, r: cfg.areaRadius, cracks, count };
+}
+
+/** オーバーヒート の炎の範囲（押している間に見せる）: 長さと半径 */
+export function overheatReach(world: World, p: Player, skill: number): { length: number; radius: number } | null {
+  const pm = skillMove(world, p, { skill });
+  if (!pm) return null;
+  const { st, sc } = skillMoveStats(world, p, pm);
+  return { length: st.range, radius: sc.size };
 }
 
 /** じゅうでん の 1 つ分の威力（%） */
@@ -252,6 +282,21 @@ function runSkill(world: World, p: Player, d: SimActiveSkill, pm: PlayerMove | u
     case 'risingVoltage': {
       if (!pm || !d.risingVoltage) return;
       fireRisingVoltage(world, p, pm, dx, dy, d.risingVoltage);
+      return;
+    }
+    case 'eruption': {
+      if (!pm || !d.eruption) return;
+      fireEnteiEruption(world, p, pm, dx, dy, lavaPlumeMove(world), d.eruption);
+      return;
+    }
+    case 'lavaPlume': {
+      if (!pm || !d.lavaPlume) return;
+      fireLavaPlume(world, p, pm, dx, dy, d.lavaPlume);
+      return;
+    }
+    case 'overheat': {
+      if (!pm || !d.overheat) return;
+      fireOverheat(world, p, pm, dx, dy, d.overheat);
       return;
     }
     case 'mirrorCoat': {

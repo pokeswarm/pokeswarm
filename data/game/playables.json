@@ -74,7 +74,7 @@
     "zapdos": { "sprite": "zapdos", "startingMoves": ["thunder-shock"] },
     "moltres": { "sprite": "moltres", "startingMoves": ["peck"] },
     "raikou": { "sprite": "raikou", "startingMoves": ["extreme-speed-raikou", "charge-raikou", "rising-voltage-raikou", "electric-terrain-raikou"], "fixedMoves": true, "activeSkills": ["extreme-speed-raikou", "charge-raikou", "rising-voltage-raikou"] },
-    "entei": { "sprite": "entei", "startingMoves": ["ember"] },
+    "entei": { "sprite": "entei", "startingMoves": ["eruption-entei", "lava-plume-entei", "overheat-entei", "sacred-fire-entei"], "fixedMoves": true, "activeSkills": ["eruption-entei", "lava-plume-entei", "overheat-entei"] },
     "suicune": { "sprite": "suicune", "startingMoves": ["surf-suicune", "mirror-coat-suicune", "sheer-cold-suicune", "calm-mind"], "fixedMoves": true, "activeSkills": ["surf-suicune", "mirror-coat-suicune", "sheer-cold-suicune"] },
     "lugia": { "sprite": "lugia", "startingMoves": ["gust"] },
     "ho-oh": { "sprite": "ho-oh", "startingMoves": ["fire-fang"] },

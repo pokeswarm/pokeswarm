@@ -4272,6 +4272,265 @@
         {}
       ]
     },
+    "eruption-entei": {
+      "pattern": "skill",
+      "effect": "eruption-entei",
+      "nameOf": "eruption",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.2,
+        "statusSeconds": 3,
+        "knockback": 120,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 0,
+        "count": 8,
+        "power": 940,
+        "cooldownSeconds": 7,
+        "size": 46,
+        "range": 560,
+        "durationSeconds": 0.25,
+        "statusId": "burn"
+      },
+      "levels": [
+        {
+          "power": 80
+        },
+        {
+          "power": 80
+        },
+        {
+          "power": 80,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 80,
+          "count": 1
+        },
+        {
+          "power": 80
+        },
+        {
+          "power": 80
+        },
+        {
+          "power": 80,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 80
+        },
+        {
+          "power": 80,
+          "count": 1
+        },
+        {
+          "power": 80
+        },
+        {
+          "power": 80,
+          "cooldownSeconds": -0.25
+        }
+      ]
+    },
+    "lava-plume-entei": {
+      "pattern": "skill",
+      "effect": "lava-plume-entei",
+      "nameOf": "lava-plume",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.3,
+        "statusSeconds": 3,
+        "knockback": 0,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 0,
+        "count": 3,
+        "power": 610,
+        "cooldownSeconds": 6,
+        "size": 36,
+        "range": 320,
+        "durationSeconds": 0.3,
+        "statusId": "burn"
+      },
+      "levels": [
+        {
+          "power": 54
+        },
+        {
+          "power": 54,
+          "range": 20
+        },
+        {
+          "power": 54
+        },
+        {
+          "power": 54
+        },
+        {
+          "power": 54,
+          "range": 20
+        },
+        {
+          "power": 54,
+          "cooldownSeconds": -0.5
+        },
+        {
+          "power": 54
+        },
+        {
+          "power": 54,
+          "range": 20
+        },
+        {
+          "power": 54
+        },
+        {
+          "power": 54
+        },
+        {
+          "power": 54,
+          "range": 20
+        }
+      ]
+    },
+    "overheat-entei": {
+      "pattern": "skill",
+      "effect": "overheat-entei",
+      "nameOf": "overheat",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.3,
+        "statusSeconds": 3,
+        "knockback": 80,
+        "hitIntervalSeconds": 0.2,
+        "pierce": "infinite",
+        "speed": 0,
+        "count": 1,
+        "power": 650,
+        "cooldownSeconds": 10,
+        "size": 62,
+        "range": 440,
+        "durationSeconds": 0.7,
+        "statusId": "burn"
+      },
+      "levels": [
+        {
+          "power": 58
+        },
+        {
+          "power": 58,
+          "range": 15
+        },
+        {
+          "power": 58,
+          "cooldownSeconds": -0.5
+        },
+        {
+          "power": 58
+        },
+        {
+          "power": 58,
+          "range": 15
+        },
+        {
+          "power": 58
+        },
+        {
+          "power": 58,
+          "cooldownSeconds": -0.5
+        },
+        {
+          "power": 58,
+          "range": 15
+        },
+        {
+          "power": 58
+        },
+        {
+          "power": 58
+        },
+        {
+          "power": 58,
+          "cooldownSeconds": -0.5,
+          "range": 15
+        }
+      ]
+    },
+    "sacred-fire-entei": {
+      "pattern": "nearest",
+      "effect": "sacred-fire-entei",
+      "nameOf": "sacred-fire",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.2,
+        "statusSeconds": 3,
+        "knockback": 60,
+        "hitIntervalSeconds": 0,
+        "pierce": 1,
+        "speed": 320,
+        "count": 1,
+        "power": 11,
+        "cooldownSeconds": 1.1,
+        "size": 15,
+        "range": 480,
+        "durationSeconds": 1.6,
+        "statusId": "burn"
+      },
+      "levels": [
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1,
+          "count": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1,
+          "count": 1
+        },
+        {
+          "power": 1
+        }
+      ]
+    },
     "psystrike": {
       "pattern": "homing",
       "effect": "psystrike",

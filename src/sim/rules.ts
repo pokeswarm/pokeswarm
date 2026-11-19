@@ -55,7 +55,7 @@ export interface SimAbility {
 /** アクティブスキルの定義（data/game/active-skills.json を番号に直したもの。07 の305章） */
 export interface SimActiveSkill {
   readonly key: string;
-  readonly kind: 'teleport' | 'surf' | 'mirrorCoat' | 'sheerCold' | 'extremeSpeed' | 'charge' | 'risingVoltage';
+  readonly kind: 'teleport' | 'surf' | 'mirrorCoat' | 'sheerCold' | 'extremeSpeed' | 'charge' | 'risingVoltage' | 'eruption' | 'lavaPlume' | 'overheat';
   /** 技の枠の技の番号（無ければ -1。あればレベル・再使用・威力はその技の値。07 の307章） */
   readonly move: number;
   readonly trigger: 'press' | 'release';
@@ -70,6 +70,9 @@ export interface SimActiveSkill {
   readonly sheerCold?: { readonly comboMultiplier: number; readonly freezeDelaySeconds: number };
   readonly charge?: { readonly powerPct: number; readonly powerPctPerLevel: number; readonly maxStacks: number };
   readonly risingVoltage?: { readonly comboMultiplier: number; readonly delaySeconds: number; readonly comboDelaySeconds: number; readonly comboSizeMultiplier: number; readonly maxTargets: number };
+  readonly eruption?: { readonly minCountPct: number; readonly delaySeconds: number; readonly spreadSeconds: number; readonly areaRadius: number; readonly areaDistance: number; readonly comboMultiplier: number; readonly comboSizeMultiplier: number };
+  readonly lavaPlume?: { readonly spreadDegrees: number; readonly spacing: number; readonly delayPerPixel: number; readonly crackSeconds: number; readonly crackPowerPct: number };
+  readonly overheat?: { readonly chargeSeconds: number; readonly debuffPct: number; readonly debuffSeconds: number };
 }
 
 export interface SimRules {

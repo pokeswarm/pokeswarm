@@ -19,6 +19,10 @@
   },
   "exempt": [
     "extreme-speed-raikou",
+    "sacred-fire-entei",
+    "overheat-entei",
+    "lava-plume-entei",
+    "eruption-entei",
     "electric-terrain-raikou",
     "rising-voltage-raikou",
     "charge-raikou",

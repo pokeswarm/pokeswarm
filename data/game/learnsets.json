@@ -1472,13 +1472,10 @@
       "electric-terrain-raikou"
     ],
     "entei": [
-      "ember",
-      "fire-fang",
-      "body-slam",
-      "flamethrower",
-      "fire-spin",
-      "swift",
-      "flare-blitz"
+      "eruption-entei",
+      "lava-plume-entei",
+      "overheat-entei",
+      "sacred-fire-entei"
     ],
     "suicune": [
       "surf-suicune",

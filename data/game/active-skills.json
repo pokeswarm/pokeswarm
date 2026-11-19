@@ -88,6 +88,48 @@
         "comboSizeMultiplier": 1.3,
         "maxTargets": 12
       }
+    },
+    "eruption-entei": {
+      "kind": "eruption",
+      "move": "eruption-entei",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "eruption": {
+        "minCountPct": 40,
+        "delaySeconds": 0.5,
+        "spreadSeconds": 0.6,
+        "areaRadius": 100,
+        "areaDistance": 240,
+        "comboMultiplier": 2.5,
+        "comboSizeMultiplier": 1.4
+      }
+    },
+    "lava-plume-entei": {
+      "kind": "lavaPlume",
+      "move": "lava-plume-entei",
+      "trigger": "press",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "lavaPlume": {
+        "spreadDegrees": 32,
+        "spacing": 44,
+        "delayPerPixel": 0.0012,
+        "crackSeconds": 4,
+        "crackPowerPct": 8
+      }
+    },
+    "overheat-entei": {
+      "kind": "overheat",
+      "move": "overheat-entei",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "overheat": {
+        "chargeSeconds": 0.35,
+        "debuffPct": 30,
+        "debuffSeconds": 4
+      }
     }
   }
 }

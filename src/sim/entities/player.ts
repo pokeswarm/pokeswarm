@@ -192,6 +192,8 @@ export interface Player {
   charged?: { stacks: number; pct: number };
   /** しんそく（ライコウ。07 の311章）で駆け抜けている折れ線・次に向かう角の番号・速さ */
   esDash?: { pts: { x: number; y: number }[]; k: number; speed: number };
+  /** オーバーヒート（エンテイ。07 の313章）の後: untilTick まで タイプ type の技の威力 −pct %。fromTick は使った時（赤熱の絵） */
+  overheat?: { type: number; pct: number; fromTick: number; untilTick: number };
   /** テレポートの後の強化（技の威力 +pct %。重ねた数 stacks。untilTick まで） */
   skillBuff?: { pct: number; stacks: number; untilTick: number };
   /** 技で付いた一時的な強化（move は技の番号。フレアドライブ。07 の115章） */

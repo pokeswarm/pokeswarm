@@ -392,6 +392,72 @@ function electricTerrainRaikouIcon(): Draw {
   });
 }
 
+/** ふんか（エンテイの版。07 の313章）: 弧を描いて飛ぶ 3 つの火山弾（黒い岩に赤いひび）と、下の溶岩 */
+function eruptionEnteiIcon(): Draw {
+  const rock = (x: number, y: number, cx: number, cy: number, r: number): string | null => {
+    const d = Math.hypot(x - cx, y - cy);
+    if (d > r) return null;
+    if (Math.abs(y - cy - Math.sin((x - cx) * 1.3) * 0.8) < 0.6 && d < r * 0.8) return '#ff8412';
+    return x + y < cx + cy ? '#6d655b' : '#3a3430';
+  };
+  return paint((x, y) => {
+    const r = rock(x, y, 8, 9, 3.6) ?? rock(x, y, 18, 5, 3) ?? rock(x, y, 26, 11, 3.3);
+    if (r) return r;
+    // 火の尾（岩の後ろ下へ）
+    for (const [cx, cy] of [[8, 9], [18, 5], [26, 11]] as const) if (Math.abs(x - cx) < 1.4 && y > cy + 3 && y < cy + 7) return (y + x) % 2 ? '#ffbd3d' : '#ec4a0a';
+    if (y > 24) return (x * 3 + y) % 5 === 0 ? '#ffd27a' : y > 27 ? '#8e1a05' : '#ec4a0a';
+    if (y > 21 && Math.abs(x - 16) < 6 - (24 - y)) return '#ff8412';
+    return null;
+  });
+}
+
+/** ふんえん（エンテイの版）: 下の真ん中から扇に開く 3 本の割れ目と、噴き上がる溶岩 */
+function lavaPlumeEnteiIcon(): Draw {
+  return paint((x, y) => {
+    for (const a of [-0.55, 0, 0.55]) {
+      const dx = Math.sin(a);
+      const dy = -Math.cos(a);
+      const t = (x - 16) * dx + (y - 29) * dy;
+      if (t < 0 || t > 22) continue;
+      const side = Math.abs(-(x - 16) * dy + (y - 29) * dx - Math.sin(t * 0.9) * 1.2);
+      if (side < 0.7) return '#ffd27a';
+      if (side < 1.6) return '#ec4a0a';
+      if (side < 2.3) return '#4a1206';
+    }
+    // 割れ目の先の噴き上げ
+    for (const [cx, cy] of [[5, 9], [16, 5], [27, 9]] as const) if (Math.abs(x - cx) < 1.8 - (cy - y) * 0.15 && y > cy - 4 && y < cy + 2) return y < cy - 2 ? '#ffd27a' : '#ff8412';
+    return null;
+  });
+}
+
+/** オーバーヒート（エンテイの版）: 左から右へ広がる炎の奔流（白い芯）と、上へ揺らぐ熱 */
+function overheatEnteiIcon(): Draw {
+  return paint((x, y) => {
+    const w = 2.5 + x * 0.32 + Math.sin(x * 0.9) * 1.2;
+    const d = Math.abs(y - 17);
+    if (x > 2 && d < w) {
+      const k = d / w;
+      return k < 0.25 ? '#fff0b8' : k < 0.5 ? '#ffbd3d' : k < 0.78 ? '#ff8412' : '#b92207';
+    }
+    if (y < 8 && x > 6 && (x + Math.round(Math.sin(y) * 2)) % 6 === 0) return '#ec4a0a';
+    return null;
+  });
+}
+
+/** せいなるほのお（エンテイの版）: 青白い炎の玉と、後ろへなびく尾 */
+function sacredFireEnteiIcon(): Draw {
+  return paint((x, y) => {
+    const d = Math.hypot(x - 19, y - 16);
+    if (d < 7) return d < 2.5 ? '#ffffff' : d < 4.5 ? '#e3f2ff' : '#8fc4ff';
+    if (x < 19) {
+      const t = (19 - x) / 16;
+      const wob = Math.sin(x * 0.8) * 2;
+      if (t < 1 && Math.abs(y - 16 - wob) < 6 * (1 - t)) return t < 0.4 ? '#8fc4ff' : '#3d6be0';
+    }
+    return null;
+  });
+}
+
 /** しんそく（ライコウの版）: 3 回折れて駆け抜ける稲妻の道と、その先の光 */
 function extremeSpeedRaikouIcon(): Draw {
   const pts: [number, number][] = [[4, 26], [12, 14], [17, 22], [27, 6]];
@@ -848,6 +914,10 @@ const ICONS: Record<string, Layer[]> = {
   'rising-voltage-raikou': [risingVoltageRaikouIcon()],
   'electric-terrain-raikou': [electricTerrainRaikouIcon()],
   'extreme-speed-raikou': [extremeSpeedRaikouIcon()],
+  'eruption-entei': [eruptionEnteiIcon()],
+  'lava-plume-entei': [lavaPlumeEnteiIcon()],
+  'overheat-entei': [overheatEnteiIcon()],
+  'sacred-fire-entei': [sacredFireEnteiIcon()],
   // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
   sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],
   // かたくなる: 体の表面が硬い板になる

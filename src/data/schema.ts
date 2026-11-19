@@ -2982,13 +2982,20 @@ export type AbilitiesConfig = z.infer<typeof abilitiesConfigSchema>;
  * - charge（じゅうでん。ライコウ。07 の310章）: 電気をためる。次の ライジングボルト の威力 +（powerPct + (レベル − 1) × powerPctPerLevel）% を 1 つ重ねる（maxStacks まで。ライジングボルト で全部使う）
  * - risingVoltage（ライジングボルト。07 の310章）: 射程の中に びりびり を重ねきった敵がいれば、その全員（maxTargets まで。HP の高い順）の足元から comboDelaySeconds 後に
  *   大きな雷の柱（大きさ × comboSizeMultiplier・威力 × comboMultiplier。重ねは消える）。いなければ、HP の一番高い敵の足元から delaySeconds 後に雷の柱
+ * - eruption（ふんか。エンテイ。07 の313章）: 背中から火山弾を噴き上げ、技の count ×（minCountPct % ＋ 残りを HP の割合で）個を落とす（HP が多いほど多い。原作どおり）。
+ *   自分の ふんえん の割れ目が射程の中に残っていれば、火山弾は全部その割れ目に落ちて噴火する（大きさ × comboSizeMultiplier・威力 × comboMultiplier）。
+ *   無ければ、向きの areaDistance 先の半径 areaRadius の中へばらばらに落とす。落ちるのは delaySeconds ＋ 0〜spreadSeconds 後
+ * - lavaPlume（ふんえん。07 の313章）: 前足で踏み、向きへ count 本の地割れ（spreadDegrees ずつ開く。長さは技の range）を走らせ、根元から順に spacing ごとに溶岩が噴く
+ *   （delayPerPixel 秒/距離。1 回で同じ敵には 1 回）。割れ目は crackSeconds 残り、中の敵に技の威力の crackPowerPct % ずつ当たる
+ * - overheat（オーバーヒート。07 の313章）: 体が赤熱して chargeSeconds 後、向きへ巨大な炎（長さ = 技の range・半径 = 技の size。自分に付いて動く）。
+ *   使うと、そのあと debuffSeconds の間 ほのおの技の威力 −debuffPct %（原作の とくこう が下がる）
  */
 export const activeSkillsConfigSchema = z.object({
   keys: z.array(z.string()).min(1),
   skills: z.record(
     z.string(),
     z.object({
-      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed', 'charge', 'risingVoltage']),
+      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed', 'charge', 'risingVoltage', 'eruption', 'lavaPlume', 'overheat']),
       /** 技の枠の技（moves.json のキー）。あればレベル・再使用・威力はその技の値 */
       move: z.string().optional(),
       trigger: z.enum(['press', 'release']).default('release'),
@@ -3003,6 +3010,9 @@ export const activeSkillsConfigSchema = z.object({
       sheerCold: z.object({ comboMultiplier: z.number().positive(), freezeDelaySeconds: z.number().positive() }).optional(),
       charge: z.object({ powerPct: z.number().positive(), powerPctPerLevel: z.number().min(0), maxStacks: z.number().int().positive() }).optional(),
       risingVoltage: z.object({ comboMultiplier: z.number().positive(), delaySeconds: z.number().positive(), comboDelaySeconds: z.number().positive(), comboSizeMultiplier: z.number().positive(), maxTargets: z.number().int().positive() }).optional(),
+      eruption: z.object({ minCountPct: z.number().min(0).max(100), delaySeconds: z.number().positive(), spreadSeconds: z.number().min(0), areaRadius: z.number().positive(), areaDistance: z.number().positive(), comboMultiplier: z.number().positive(), comboSizeMultiplier: z.number().positive() }).optional(),
+      lavaPlume: z.object({ spreadDegrees: z.number().min(0), spacing: z.number().positive(), delayPerPixel: z.number().min(0), crackSeconds: z.number().positive(), crackPowerPct: z.number().min(0) }).optional(),
+      overheat: z.object({ chargeSeconds: z.number().min(0), debuffPct: z.number().min(0), debuffSeconds: z.number().min(0) }).optional(),
     }),
   ),
 });

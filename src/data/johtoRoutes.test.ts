@@ -21,7 +21,6 @@ describe('カントー・ジョウトの技の進化の形', () => {
       ['heracross', 'fury-cutter', 'x-attack', 'megahorn'],
       ['miltank', 'body-slam', 'hard-stone', 'rollout'],
       ['larvitar', 'rock-slide', 'soft-sand', 'stone-edge'],
-      ['entei', 'flamethrower', 'fire-stone', 'eruption'],
       ['slowpoke', 'psychic', 'kings-rock', 'future-sight-alakazam'],
       ['cleffa', 'hyper-voice', 'moon-stone', 'moonblast'],
       ['togepi', 'air-slash', 'light-clay', 'dazzling-gleam'],

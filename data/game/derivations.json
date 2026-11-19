@@ -263,12 +263,6 @@
       "line": "cyndaquil"
     },
     {
-      "from": "flamethrower",
-      "item": "fire-stone",
-      "to": "eruption",
-      "line": "entei"
-    },
-    {
       "from": "sleep-powder",
       "item": "miracle-seed",
       "to": "synthesis",

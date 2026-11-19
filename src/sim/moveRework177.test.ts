@@ -486,7 +486,7 @@ describe('ドラゴン 600 族の固有技・げきりん（07 の184章）', ()
 });
 
 describe('ふんか は 3 系統がそれぞれの形で覚える', () => {
-  it('バクフーン: かえんほうしゃ ＋ ポイントマックス。エンテイ: かえんほうしゃ ＋ ほのおのいし。ドンメルの条件はほかの系統に掛からない', () => {
+  it('バクフーン: かえんほうしゃ ＋ ポイントマックス。ドンメルの条件はほかの系統に掛からない（エンテイは最初から自分の ふんか を持つ。07 の313章）', () => {
     const rules = buildSimRules('johto');
     const move = (k: string): number => moveIndexOf(rules, k);
     const offered = (line: string, form: string, item: string): boolean => {
@@ -499,6 +499,6 @@ describe('ふんか は 3 系統がそれぞれの形で覚える', () => {
     };
     expect(offered('cyndaquil', 'typhlosion', 'pp-max')).toBe(true);
     expect(offered('cyndaquil', 'typhlosion', 'hp-up')).toBe(false);
-    expect(offered('entei', 'entei', 'fire-stone')).toBe(true);
+    expect(offered('entei', 'entei', 'fire-stone')).toBe(false);
   });
 });

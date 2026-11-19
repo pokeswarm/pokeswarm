@@ -540,6 +540,78 @@ function iceShardArticunoIcon(): Draw {
   }
 }
 
+/** ゴッドバード（ファイヤーの版。07 の315章）: 白い光に包まれて右上へ突き抜ける炎の鳥の形と、後ろに落ちる燃える羽 */
+function skyAttackMoltresIcon(): Draw {
+  return paint((x, y) => {
+    // 進む向き（右上）に沿った座標
+    const u = (x - 6) * 0.707 - (y - 26) * 0.707;
+    const v = (x - 6) * 0.707 + (y - 26) * 0.707;
+    // 体（先がとがる）と左右へ広がる翼
+    const body = u > 14 && u < 30 && Math.abs(v) < (30 - u) * 0.28 + 0.6;
+    const wing = u > 10 && u < 22 && Math.abs(v) < (u - 10) * 0.8 && Math.abs(v) > 1.5 && u + Math.abs(v) * 0.4 < 24;
+    if (body) return u > 25 ? '#ffffff' : '#fff3c4';
+    if (wing) return Math.abs(v) > 6 ? '#ff8412' : '#ffbd3d';
+    // 光の尾
+    if (u > 2 && u <= 14 && Math.abs(v) < 1.4 + (u - 2) * 0.12) return u > 8 ? '#fff3c4' : '#ffbd3d';
+    // 燃える羽
+    for (const [fx, fy] of [[5, 13], [11, 27], [3, 21]] as const) {
+      const d = Math.hypot(x - fx, (y - fy) * 1.6);
+      if (d < 1.6) return '#fff0b8';
+      if (d < 2.8) return '#ec4a0a';
+    }
+    return null;
+  });
+}
+
+/** ねっぷう（ファイヤーの版）: 左下から右上へ広がる 3 本の弧の熱波 */
+function heatWaveMoltresIcon(): Draw {
+  return paint((x, y) => {
+    const dx = x - 4;
+    const dy = 28 - y;
+    const r = Math.hypot(dx, dy);
+    const a = Math.atan2(dy, dx);
+    if (a < 0.05 || a > 1.52) return null;
+    for (const [rr, col] of [[9, '#ffbd3d'], [16, '#ff8412'], [23, '#ec4a0a']] as const) {
+      const w = Math.sin(a * 6 + rr) * 0.8;
+      if (Math.abs(r - rr - w) < 1.3) return col;
+      if (Math.abs(r - rr - w + 1.8) < 0.6) return '#fff0b8';
+    }
+    return null;
+  });
+}
+
+/** もえつきる（ファイヤーの版）: 大きな炎の玉と、燃え尽きて上る灰色の煙 */
+function burnUpMoltresIcon(): Draw {
+  return paint((x, y) => {
+    const d = Math.hypot(x - 17, y - 19);
+    const R = 9.5 + Math.sin(Math.atan2(y - 19, x - 17) * 6) * 1.2;
+    if (d < R) {
+      const k = d / R;
+      return k < 0.3 ? '#ffffff' : k < 0.55 ? '#fff0b8' : k < 0.8 ? '#ffbd3d' : '#ec4a0a';
+    }
+    // 上へ立つ炎の舌
+    if (y < 11 && y > 3 && Math.abs(x - 17 - Math.sin(y * 0.9) * 2) < (y - 3) * 0.45) return '#ff8412';
+    // 燃え尽きた灰（左上へ流れる）
+    for (const [cx, cy, r] of [[6, 8, 2.2], [9, 4, 1.6], [4, 13, 1.4]] as const) if (Math.hypot(x - cx, y - cy) < r) return '#9e9e9e';
+    return null;
+  });
+}
+
+/** ひのこ（ファイヤーの版）: 小さな火の粉 3 つ */
+function emberMoltresIcon(): Draw {
+  return paint((x, y) => {
+    for (const [cx, cy, r] of [[20, 10, 4.5], [11, 18, 3.5], [21, 24, 3]] as const) {
+      const d = Math.hypot(x - cx, (y - cy) * 0.9);
+      if (d < r * 0.4) return '#fff0b8';
+      if (d < r * 0.75) return '#ffbd3d';
+      if (d < r) return '#ec4a0a';
+      // 上へ揺れる炎の先
+      if (y < cy && y > cy - r * 1.8 && Math.abs(x - cx) < (y - (cy - r * 1.8)) * 0.35) return '#ff8412';
+    }
+    return null;
+  });
+}
+
 /** しんそく（ライコウの版）: 3 回折れて駆け抜ける稲妻の道と、その先の光 */
 function extremeSpeedRaikouIcon(): Draw {
   const pts: [number, number][] = [[4, 26], [12, 14], [17, 22], [27, 6]];
@@ -1004,6 +1076,10 @@ const ICONS: Record<string, Layer[]> = {
   'icy-wind-articuno': [icyWindArticunoIcon()],
   'blizzard-articuno': [blizzardArticunoIcon()],
   'ice-shard-articuno': [iceShardArticunoIcon()],
+  'sky-attack-moltres': [skyAttackMoltresIcon()],
+  'heat-wave-moltres': [heatWaveMoltresIcon()],
+  'burn-up-moltres': [burnUpMoltresIcon()],
+  'ember-moltres': [emberMoltresIcon()],
   // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
   sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],
   // かたくなる: 体の表面が硬い板になる

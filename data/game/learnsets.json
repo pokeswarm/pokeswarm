@@ -1439,20 +1439,10 @@
       "dual-wingbeat"
     ],
     "moltres": [
-      "peck",
-      "ember",
-      "gust",
-      "air-cutter",
-      "swift",
-      "sky-attack",
-      "wing-attack",
-      "whirlwind",
-      "flamethrower",
-      "fire-spin",
-      "aerial-ace",
-      "flare-blitz",
-      "air-slash",
-      "dual-wingbeat"
+      "sky-attack-moltres",
+      "heat-wave-moltres",
+      "burn-up-moltres",
+      "ember-moltres"
     ],
     "raikou": [
       "extreme-speed-raikou",

@@ -1,7 +1,7 @@
 import type { Player, PlayerMove } from './entities/player';
 import type { SimActiveSkill } from './rules';
 import type { World } from './world';
-import { eruptionCenter, extremeSpeedPath, fireBlizzard, fireEnteiEruption, fireFreezeDry, fireIcyWind, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
+import { burnUpCenter, eruptionCenter, extremeSpeedPath, fireBlizzard, fireBurnUp, fireHeatWave, fireSkyAttack, skyAttackPath, fireEnteiEruption, fireFreezeDry, fireIcyWind, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
 
 /**
  * アクティブスキル（作者の案 2026年11月18日。07 の305・307章）: キー（SPACE・Q・E）で使う技。
@@ -54,6 +54,11 @@ function advanceExtremeSpeed(world: World, p: Player): void {
   let budget = d.speed * world.dt;
   p.dashVx = 0;
   p.dashVy = 0;
+  // ためている間（ゴッドバード）は止まって待つ
+  if (d.wait && d.wait > 0) {
+    d.wait--;
+    return;
+  }
   while (budget > 0) {
     const q = d.pts[d.k];
     if (!q) break;
@@ -91,6 +96,12 @@ export function stepSkills(world: World): void {
     if (p.skillBuff && world.tick >= p.skillBuff.untilTick) p.skillBuff = undefined;
     if (p.calm && world.tick >= p.calm.untilTick) p.calm = undefined;
     if (p.overheat && world.tick >= p.overheat.untilTick) p.overheat = undefined;
+    // もえつきる: 炎の玉が落ちたら ほのおタイプを失い、切れたら戻る
+    if (p.burnedOut && world.tick >= p.burnedOut.offTick && world.tick < p.burnedOut.untilTick) p.types = p.burnedOut.types.filter((t) => t !== p.burnedOut!.lostType);
+    if (p.burnedOut && world.tick >= p.burnedOut.untilTick) {
+      p.types = p.burnedOut.types;
+      p.burnedOut = undefined;
+    }
     if (p.mirror && world.tick >= p.mirror.untilTick) releaseMirror(world, p);
     if (!p.skills || p.remote) continue;
     for (const s of p.skills) {
@@ -101,6 +112,8 @@ export function stepSkills(world: World): void {
         continue;
       }
       if (s.rechargeTicks <= 0) s.rechargeTicks = rechargeTicksOf(world, p, s);
+      // もえつきる の後は ゴッドバード の回数が速く戻る
+      if (p.burnedOut && world.tick < p.burnedOut.untilTick && skillDef(world, s.skill).kind === 'skyAttack') s.rechargeTicks -= p.burnedOut.rechargeMultiplier - 1;
       if (--s.rechargeTicks <= 0) {
         s.charges++;
         if (s.charges < max) s.rechargeTicks = rechargeTicksOf(world, p, s);
@@ -201,6 +214,21 @@ export function articunoReach(world: World, p: Player, skill: number): { length:
   const { st, sc } = skillMoveStats(world, p, pm);
   if (d.freezeDry) return { length: st.range, spreadDegrees: d.freezeDry.spreadDegrees, count: Math.max(1, st.count), width: 0, depth: 0, start: 0 };
   if (d.blizzard) return { length: d.blizzard.startDistance + sc.speed * st.durationSeconds, spreadDegrees: 0, count: 1, width: d.blizzard.width, depth: sc.size * 2, start: d.blizzard.startDistance };
+  return null;
+}
+
+/** ファイヤーの技の狙い（押している間に見せる。07 の315章）: ゴッドバード は突き抜ける道、もえつきる は炎の玉が落ちる所と半径 */
+export function moltresAim(world: World, p: Player, skill: number): { path?: { x: number; y: number }[]; width?: number; x?: number; y?: number; r?: number } | null {
+  const pm = skillMove(world, p, { skill });
+  const d = skillDef(world, skill);
+  if (!pm) return null;
+  const [dx, dy] = aimOf(p);
+  const { st, sc } = skillMoveStats(world, p, pm);
+  if (d.skyAttack) return { path: skyAttackPath(world, p, pm, dx, dy), width: sc.size };
+  if (d.burnUp) {
+    const c = burnUpCenter(world, p, st.range, dx, dy, d.burnUp.areaDistance);
+    return { x: c.x, y: c.y, r: sc.size };
+  }
   return null;
 }
 
@@ -325,6 +353,43 @@ function runSkill(world: World, p: Player, d: SimActiveSkill, pm: PlayerMove | u
     case 'blizzard': {
       if (!pm || !d.blizzard) return;
       fireBlizzard(world, p, pm, dx, dy, d.blizzard);
+      return;
+    }
+    case 'skyAttack': {
+      if (!pm || !d.skyAttack) return;
+      const run = fireSkyAttack(world, p, pm, dx, dy, d.skyAttack);
+      // ためてから、まっすぐ突き抜ける（体が動く技と同じ。入力では動けない。ほかのブラウザのプレイヤーは位置で届く）
+      if (!p.remote && run.pts.length > 1) {
+        const wait = Math.round(d.skyAttack.chargeSeconds / world.dt);
+        p.esDash = { pts: run.pts, k: 1, speed: run.speed, wait };
+        p.dashTicks = wait + Math.ceil(run.seconds / world.dt) + 1;
+        p.dashBusyTicks = p.dashTicks;
+        p.dashVx = 0;
+        p.dashVy = 0;
+      }
+      return;
+    }
+    case 'heatWave': {
+      if (!pm || !d.heatWave) return;
+      fireHeatWave(world, p, pm, dx, dy, d.heatWave);
+      return;
+    }
+    case 'burnUp': {
+      if (!pm || !d.burnUp) return;
+      fireBurnUp(world, p, pm, dx, dy, d.burnUp);
+      if (p.remote) return;
+      // 燃え尽きる: すぐ体が軽くなり、炎の玉が落ちた後に技のタイプ（ほのお）を失う（玉そのものはタイプが一致したまま。重ねて使っても元のタイプを覚えておく）
+      const types = p.burnedOut?.types ?? p.types;
+      p.types = types;
+      p.burnedOut = {
+        untilTick: world.tick + Math.round((d.burnUp.chargeSeconds + d.burnUp.burnoutSeconds) / world.dt),
+        fromTick: world.tick,
+        offTick: world.tick + Math.round((d.burnUp.chargeSeconds + d.burnUp.flightSeconds) / world.dt) + 2,
+        lostType: world.rules.moves[pm.move]!.type,
+        speedPct: d.burnUp.speedPct,
+        rechargeMultiplier: d.burnUp.rechargeMultiplier,
+        types,
+      };
       return;
     }
     case 'mirrorCoat': {

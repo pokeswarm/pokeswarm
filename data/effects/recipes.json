@@ -3048,6 +3048,70 @@
         }
       }
     },
+    "sky-attack-moltres": {
+      "extends": "normal.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      }
+    },
+    "heat-wave-moltres": {
+      "extends": "normal.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      }
+    },
+    "burn-up-moltres": {
+      "extends": "normal.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      }
+    },
+    "ember-moltres": {
+      "extends": "normal.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      }
+    },
     "psystrike": {
       "extends": "psychic.base",
       "hideShape": true,

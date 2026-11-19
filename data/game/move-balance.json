@@ -18,6 +18,11 @@
     "hoenn": 1.25
   },
   "exempt": [
+    "sky-attack-moltres",
+    "heat-wave-moltres",
+    "burn-up-moltres",
+    "ember-moltres",
+    "sky-attack",
     "freeze-dry-articuno",
     "icy-wind-articuno",
     "blizzard-articuno",

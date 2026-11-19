@@ -3052,3 +3052,92 @@ export function fireBlizzard(world: World, p: Player, pm: PlayerMove, dirX: numb
   const half = cfg.width / 2;
   world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: cx - px * half, y: cy - py * half, shape: SHAPE_LINE, length: cfg.width, dirX: px, dirY: py, radius: sc.size, vx: dirX * sc.speed, vy: dirY * sc.speed });
 }
+
+/** ゴッドバード（ファイヤー。07 の315章）の道: 今の場所から向きへ 技の range（固定マップの中に収める） */
+export function skyAttackPath(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number): { x: number; y: number }[] {
+  const { st } = skillMoveStats(world, p, pm);
+  const ar = world.arena;
+  let len = st.range;
+  if (ar) {
+    // 固定マップの壁の手前で止まる
+    for (let d = 0; d <= st.range; d += 10) {
+      const x = p.x + dirX * d;
+      const y = p.y + dirY * d;
+      if (Math.abs(x - ar.x) > ar.halfWidth - p.radius || Math.abs(y - ar.y) > ar.halfHeight - p.radius) {
+        len = Math.max(0, d - 10);
+        break;
+      }
+    }
+  }
+  return [
+    { x: p.x, y: p.y },
+    { x: p.x + dirX * len, y: p.y + dirY * len },
+  ];
+}
+
+/**
+ * ゴッドバード: chargeSeconds ためてから、道に沿って突き抜ける当たり（自分に付いて動く。1 回で同じ敵には 1 回）と、
+ * 通り道に落ちて燃える羽（同じ技の stage 1。featherSeconds 燃える）を出す。返り値: 道・突き抜ける秒数・速さ
+ */
+export function fireSkyAttack(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { chargeSeconds: number; featherSpacing: number; featherSeconds: number; featherPowerPct: number }): { pts: { x: number; y: number }[]; seconds: number; speed: number } {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const pts = skyAttackPath(world, p, pm, dirX, dirY);
+  const len = Math.hypot(pts[1]!.x - pts[0]!.x, pts[1]!.y - pts[0]!.y);
+  const speed = Math.max(1, sc.speed);
+  const seconds = len / speed + world.dt * 2;
+  const group = newCastGroup(world, cfg.chargeSeconds + seconds);
+  const b0 = base(world, p, pm, st);
+  world.projectiles.add({ ...b0, motion: MOTION_FOLLOW, x: p.x, y: p.y, ox: 0, oy: 0, dirX, dirY, group, life: Math.max(world.dt, cfg.chargeSeconds), stage: 3, armStage: 0, armLife: seconds });
+  for (let d = cfg.featherSpacing * 0.5; d <= len; d += cfg.featherSpacing) {
+    world.projectiles.add({
+      ...b0,
+      motion: MOTION_LINEAR,
+      x: p.x + dirX * d,
+      y: p.y + dirY * d,
+      dirX,
+      dirY,
+      radius: sc.size * 0.6,
+      damage: (sc.power * cfg.featherPowerPct) / 100,
+      hitIntervalTicks: Math.round(0.5 / world.dt),
+      knockback: 0,
+      life: Math.max(world.dt, cfg.chargeSeconds + d / speed),
+      stage: 3,
+      armStage: 1,
+      armLife: cfg.featherSeconds,
+    });
+  }
+  return { pts, seconds, speed };
+}
+
+/**
+ * ねっぷう（07 の315章）: 向きへ弧の熱波を count 回、waveDelaySeconds ごとに送る（自分に付いて動く。1 回ごとに turnDegrees ずつ向きをずらす）。
+ * 熱波は厚さ 技の size の帯で、技の durationSeconds で 技の range まで広がる
+ */
+export function fireHeatWave(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { arcDegrees: number; waveDelaySeconds: number; turnDegrees: number }): void {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const n = Math.max(1, st.count);
+  const half = Math.min(Math.PI, (cfg.arcDegrees * Math.PI) / 360);
+  const band = Math.max(1, sc.size);
+  const growth = Math.max(0, (st.range - band) / Math.max(world.dt, st.durationSeconds));
+  const heading = Math.atan2(dirY, dirX);
+  const b0 = base(world, p, pm, st);
+  for (let k = 0; k < n; k++) {
+    const a = heading + ((k % 2 === 0 ? 1 : -1) * Math.ceil(k / 2) * cfg.turnDegrees * Math.PI) / 180;
+    const dx = Math.cos(a);
+    const dy = Math.sin(a);
+    world.projectiles.add({ ...b0, motion: MOTION_FOLLOW, x: p.x, y: p.y, ox: 0, oy: 0, radius: band, band, growth, shape: SHAPE_SECTOR, length: half, dirX: dx, dirY: dy, vx: dx, vy: dy, life: Math.max(world.dt, k * cfg.waveDelaySeconds), stage: 3, armStage: 0, armLife: st.durationSeconds });
+  }
+}
+
+/** もえつきる の炎の玉が落ちる所（ふんか と同じ選び方: 向きの扇の中の HP の一番高い敵 → 射程の中の一番高い敵 → 向きの areaDistance 先） */
+export function burnUpCenter(world: World, p: Player, range: number, dirX: number, dirY: number, areaDistance: number): { x: number; y: number; target: number } {
+  return eruptionCenter(world, p, range, dirX, dirY, areaDistance);
+}
+
+/** もえつきる（07 の315章）: chargeSeconds 体の炎を集め、巨大な炎の玉を投げる（flightSeconds で落ちて、半径 技の size で爆発する） */
+export function fireBurnUp(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { chargeSeconds: number; flightSeconds: number; areaDistance: number }): void {
+  const { st } = skillMoveStats(world, p, pm);
+  const c = burnUpCenter(world, p, st.range, dirX, dirY, cfg.areaDistance);
+  const group = newCastGroup(world, cfg.chargeSeconds + cfg.flightSeconds + st.durationSeconds);
+  world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: c.x, y: c.y, group, life: Math.max(world.dt, cfg.chargeSeconds + cfg.flightSeconds), stage: 3, armStage: 0, armLife: st.durationSeconds });
+}

@@ -166,6 +166,46 @@
         "width": 320,
         "startDistance": 70
       }
+    },
+    "sky-attack-moltres": {
+      "kind": "skyAttack",
+      "move": "sky-attack-moltres",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "skyAttack": {
+        "chargeSeconds": 0.6,
+        "featherSpacing": 50,
+        "featherSeconds": 1.5,
+        "featherPowerPct": 6
+      }
+    },
+    "heat-wave-moltres": {
+      "kind": "heatWave",
+      "move": "heat-wave-moltres",
+      "trigger": "press",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "heatWave": {
+        "arcDegrees": 100,
+        "waveDelaySeconds": 0.22,
+        "turnDegrees": 10
+      }
+    },
+    "burn-up-moltres": {
+      "kind": "burnUp",
+      "move": "burn-up-moltres",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "burnUp": {
+        "chargeSeconds": 0.4,
+        "flightSeconds": 0.5,
+        "areaDistance": 280,
+        "burnoutSeconds": 8,
+        "speedPct": 35,
+        "rechargeMultiplier": 2
+      }
     }
   }
 }

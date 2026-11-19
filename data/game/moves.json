@@ -4811,6 +4811,269 @@
         }
       ]
     },
+    "sky-attack-moltres": {
+      "pattern": "skill",
+      "effect": "sky-attack-moltres",
+      "nameOf": "sky-attack",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.3,
+        "statusSeconds": 0.5,
+        "knockback": 80,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 1400,
+        "count": 1,
+        "power": 1150,
+        "cooldownSeconds": 6,
+        "size": 40,
+        "range": 620,
+        "durationSeconds": 0.3,
+        "statusId": "flinch"
+      },
+      "levels": [
+        {
+          "power": 100
+        },
+        {
+          "power": 100,
+          "range": 20
+        },
+        {
+          "power": 100,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 100
+        },
+        {
+          "power": 100,
+          "range": 20
+        },
+        {
+          "power": 100
+        },
+        {
+          "power": 100,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 100,
+          "range": 20
+        },
+        {
+          "power": 100
+        },
+        {
+          "power": 100
+        },
+        {
+          "power": 100,
+          "range": 20,
+          "cooldownSeconds": -0.25
+        }
+      ]
+    },
+    "heat-wave-moltres": {
+      "pattern": "skill",
+      "effect": "heat-wave-moltres",
+      "nameOf": "heat-wave",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.3,
+        "statusSeconds": 3,
+        "knockback": 30,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 0,
+        "count": 3,
+        "power": 260,
+        "cooldownSeconds": 5,
+        "size": 50,
+        "range": 360,
+        "durationSeconds": 0.45,
+        "statusId": "burn"
+      },
+      "levels": [
+        {
+          "power": 23
+        },
+        {
+          "power": 23,
+          "range": 10
+        },
+        {
+          "power": 23,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 23
+        },
+        {
+          "power": 23,
+          "range": 10
+        },
+        {
+          "power": 23
+        },
+        {
+          "power": 23,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 23,
+          "range": 10
+        },
+        {
+          "power": 23
+        },
+        {
+          "power": 23
+        },
+        {
+          "power": 23,
+          "range": 10,
+          "cooldownSeconds": -0.25
+        }
+      ]
+    },
+    "burn-up-moltres": {
+      "pattern": "skill",
+      "effect": "burn-up-moltres",
+      "nameOf": "burn-up",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.5,
+        "statusSeconds": 3,
+        "knockback": 120,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 0,
+        "count": 1,
+        "power": 1900,
+        "cooldownSeconds": 14,
+        "size": 150,
+        "range": 480,
+        "durationSeconds": 0.3,
+        "statusId": "burn"
+      },
+      "levels": [
+        {
+          "power": 165
+        },
+        {
+          "power": 165,
+          "size": 5
+        },
+        {
+          "power": 165,
+          "cooldownSeconds": -0.5
+        },
+        {
+          "power": 165
+        },
+        {
+          "power": 165,
+          "size": 5
+        },
+        {
+          "power": 165
+        },
+        {
+          "power": 165,
+          "cooldownSeconds": -0.5
+        },
+        {
+          "power": 165,
+          "size": 5
+        },
+        {
+          "power": 165
+        },
+        {
+          "power": 165
+        },
+        {
+          "power": 165,
+          "size": 5,
+          "cooldownSeconds": -0.5
+        }
+      ]
+    },
+    "ember-moltres": {
+      "pattern": "nearest",
+      "effect": "ember-moltres",
+      "nameOf": "ember",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.1,
+        "statusSeconds": 3,
+        "knockback": 40,
+        "hitIntervalSeconds": 0,
+        "pierce": 1,
+        "speed": 420,
+        "count": 1,
+        "power": 9,
+        "cooldownSeconds": 0.9,
+        "size": 11,
+        "range": 380,
+        "durationSeconds": 1,
+        "statusId": "burn"
+      },
+      "levels": [
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1,
+          "count": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1,
+          "count": 1
+        },
+        {
+          "power": 1
+        }
+      ]
+    },
     "psystrike": {
       "pattern": "homing",
       "effect": "psystrike",

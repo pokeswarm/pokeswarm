@@ -72,7 +72,7 @@
     "mew": { "sprite": "mew", "startingMoves": ["mimic"], "allMoveTypes": true },
     "articuno": { "sprite": "articuno", "startingMoves": ["freeze-dry-articuno", "icy-wind-articuno", "blizzard-articuno", "ice-shard-articuno"], "fixedMoves": true, "activeSkills": ["freeze-dry-articuno", "icy-wind-articuno", "blizzard-articuno"] },
     "zapdos": { "sprite": "zapdos", "startingMoves": ["thunder-shock"] },
-    "moltres": { "sprite": "moltres", "startingMoves": ["peck"] },
+    "moltres": { "sprite": "moltres", "startingMoves": ["sky-attack-moltres", "heat-wave-moltres", "burn-up-moltres", "ember-moltres"], "fixedMoves": true, "activeSkills": ["sky-attack-moltres", "heat-wave-moltres", "burn-up-moltres"] },
     "raikou": { "sprite": "raikou", "startingMoves": ["extreme-speed-raikou", "charge-raikou", "rising-voltage-raikou", "electric-terrain-raikou"], "fixedMoves": true, "activeSkills": ["extreme-speed-raikou", "charge-raikou", "rising-voltage-raikou"] },
     "entei": { "sprite": "entei", "startingMoves": ["eruption-entei", "lava-plume-entei", "overheat-entei", "sacred-fire-entei"], "fixedMoves": true, "activeSkills": ["eruption-entei", "lava-plume-entei", "overheat-entei"] },
     "suicune": { "sprite": "suicune", "startingMoves": ["surf-suicune", "mirror-coat-suicune", "sheer-cold-suicune", "calm-mind"], "fixedMoves": true, "activeSkills": ["surf-suicune", "mirror-coat-suicune", "sheer-cold-suicune"] },

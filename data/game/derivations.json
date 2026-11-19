@@ -540,12 +540,6 @@
       "line": "zapdos"
     },
     {
-      "from": "wing-attack",
-      "item": "fire-stone",
-      "to": "sky-attack",
-      "line": "moltres"
-    },
-    {
       "from": "mimic",
       "item": "moon-stone",
       "to": "metronome",

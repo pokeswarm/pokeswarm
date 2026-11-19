@@ -3005,13 +3005,19 @@ export type AbilitiesConfig = z.infer<typeof abilitiesConfigSchema>;
  *   技の hitIntervalSeconds ごとに当たり、しもやけ を重ねる
  * - blizzard（ふぶき。07 の314章）: 向きの startDistance 先に、幅 width・奥行き = 技の size × 2 の吹雪の帯を出し、技の speed で前へ進める（持続 = 技の durationSeconds）。
  *   帯の中の敵に hitIntervalSeconds ごとに当たり、しもやけ を重ねる
+ * - skyAttack（ゴッドバード。ファイヤー。07 の315章）: chargeSeconds 白い光に包まれてためてから、向きへ技の range だけ技の speed でまっすぐ突き抜ける（体が動く技。通り道の敵に 1 回ずつ当たる）。
+ *   通り道に featherSpacing ごとに燃える羽が落ち、featherSeconds 燃える（中の敵に技の威力の featherPowerPct % ずつ）
+ * - heatWave（ねっぷう。07 の315章）: 向きへ開き arcDegrees の弧の熱波を、技の count 回 waveDelaySeconds ごとに送る（1 回ごとに turnDegrees ずつ向きをずらす）。
+ *   熱波は厚さ = 技の size の帯で、技の durationSeconds で 技の range まで広がる（自分に付いて動く）
+ * - burnUp（もえつきる。07 の315章）: chargeSeconds 体の炎を集めて、巨大な炎の玉を投げる（flightSeconds で落ちる。落ちる所は ふんか と同じ選び方・areaDistance。半径 = 技の size）。
+ *   投げた後 burnoutSeconds の間、ほのおタイプを失う代わりに、移動が speedPct % 速く、ゴッドバード の回数が rechargeMultiplier 倍の速さで戻る
  */
 export const activeSkillsConfigSchema = z.object({
   keys: z.array(z.string()).min(1),
   skills: z.record(
     z.string(),
     z.object({
-      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed', 'charge', 'risingVoltage', 'eruption', 'lavaPlume', 'overheat', 'freezeDry', 'icyWind', 'blizzard']),
+      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed', 'charge', 'risingVoltage', 'eruption', 'lavaPlume', 'overheat', 'freezeDry', 'icyWind', 'blizzard', 'skyAttack', 'heatWave', 'burnUp']),
       /** 技の枠の技（moves.json のキー）。あればレベル・再使用・威力はその技の値 */
       move: z.string().optional(),
       trigger: z.enum(['press', 'release']).default('release'),
@@ -3032,6 +3038,9 @@ export const activeSkillsConfigSchema = z.object({
       freezeDry: z.object({ spreadDegrees: z.number().min(0), spacing: z.number().positive(), delayPerPixel: z.number().min(0), spikeDelaySeconds: z.number().min(0), frostSeconds: z.number().positive(), frostPowerPct: z.number().min(0) }).optional(),
       icyWind: z.object({ spreadDegrees: z.number().positive().max(180) }).optional(),
       blizzard: z.object({ width: z.number().positive(), startDistance: z.number().min(0) }).optional(),
+      skyAttack: z.object({ chargeSeconds: z.number().min(0), featherSpacing: z.number().positive(), featherSeconds: z.number().positive(), featherPowerPct: z.number().min(0) }).optional(),
+      heatWave: z.object({ arcDegrees: z.number().positive().max(360), waveDelaySeconds: z.number().min(0), turnDegrees: z.number() }).optional(),
+      burnUp: z.object({ chargeSeconds: z.number().min(0), flightSeconds: z.number().positive(), areaDistance: z.number().positive(), burnoutSeconds: z.number().positive(), speedPct: z.number().min(0), rechargeMultiplier: z.number().int().positive() }).optional(),
     }),
   ),
 });

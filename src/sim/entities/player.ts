@@ -191,7 +191,9 @@ export interface Player {
   /** じゅうでん（ライコウ。07 の310章）: 重ねた数と、次の ライジングボルト の威力 +pct %（使うと消える） */
   charged?: { stacks: number; pct: number };
   /** しんそく（ライコウ。07 の311章）で駆け抜けている折れ線・次に向かう角の番号・速さ */
-  esDash?: { pts: { x: number; y: number }[]; k: number; speed: number };
+  esDash?: { pts: { x: number; y: number }[]; k: number; speed: number; wait?: number };
+  /** もえつきる（ファイヤー。07 の315章）の後: untilTick まで 移動 +speedPct %・ゴッドバード の回数が rechargeMultiplier 倍の速さで戻る。offTick から lostType（ほのお）を失う（types は元のタイプ）。fromTick は使った時 */
+  burnedOut?: { untilTick: number; fromTick: number; offTick: number; lostType: number; speedPct: number; rechargeMultiplier: number; types: number[] };
   /** オーバーヒート（エンテイ。07 の313章）の後: untilTick まで タイプ type の技の威力 −pct %。fromTick は使った時（赤熱の絵） */
   overheat?: { type: number; pct: number; fromTick: number; untilTick: number };
   /** テレポートの後の強化（技の威力 +pct %。重ねた数 stacks。untilTick まで） */

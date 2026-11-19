@@ -55,7 +55,7 @@ export interface SimAbility {
 /** アクティブスキルの定義（data/game/active-skills.json を番号に直したもの。07 の305章） */
 export interface SimActiveSkill {
   readonly key: string;
-  readonly kind: 'teleport' | 'surf' | 'mirrorCoat' | 'sheerCold' | 'extremeSpeed' | 'charge' | 'risingVoltage' | 'eruption' | 'lavaPlume' | 'overheat' | 'freezeDry' | 'icyWind' | 'blizzard' | 'skyAttack' | 'heatWave' | 'burnUp' | 'drillPeck' | 'zapCannon' | 'thunderbolt';
+  readonly kind: 'teleport' | 'surf' | 'mirrorCoat' | 'sheerCold' | 'extremeSpeed' | 'charge' | 'risingVoltage' | 'eruption' | 'lavaPlume' | 'overheat' | 'freezeDry' | 'icyWind' | 'blizzard' | 'skyAttack' | 'heatWave' | 'burnUp' | 'drillPeck' | 'zapCannon' | 'thunderbolt' | 'aeroblast' | 'extrasensory' | 'hydroPump';
   /** 技の枠の技の番号（無ければ -1。あればレベル・再使用・威力はその技の値。07 の307章） */
   readonly move: number;
   readonly trigger: 'press' | 'release';
@@ -78,6 +78,9 @@ export interface SimActiveSkill {
   readonly blizzard?: { readonly width: number; readonly startDistance: number };
   readonly skyAttack?: { readonly chargeSeconds: number; readonly featherSpacing: number; readonly featherSeconds: number; readonly featherPowerPct: number };
   readonly heatWave?: { readonly arcDegrees: number; readonly waveDelaySeconds: number; readonly turnDegrees: number };
+  readonly aeroblast?: { readonly chargeSeconds: number; readonly flightSeconds: number; readonly areaDistance: number; readonly tornadoSeconds: number; readonly tornadoRadius: number; readonly tornadoPowerPct: number; readonly pull: number };
+  readonly extrasensory?: { readonly spreadDegrees: number; readonly delaySeconds: number };
+  readonly hydroPump?: { readonly chargeSeconds: number; readonly sweepDegrees: number; readonly wetRadiusMultiplier: number; readonly wetPowerMultiplier: number; readonly wetExtraSeconds: number };
   readonly drillPeck?: { readonly chargeSeconds: number };
   readonly zapCannon?: { readonly linkDistance: number; readonly bandWidth: number; readonly bandPowerPct: number; readonly bandIntervalSeconds: number; readonly maxSpheres: number };
   readonly thunderbolt?: { readonly burstMultiplier: number; readonly burstSizeMultiplier: number; readonly bandBurstMultiplier: number; readonly burstDelaySeconds: number };

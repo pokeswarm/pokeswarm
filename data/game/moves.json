@@ -5337,6 +5337,264 @@
         }
       ]
     },
+    "aeroblast-lugia": {
+      "pattern": "skill",
+      "effect": "aeroblast-lugia",
+      "nameOf": "aeroblast",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "knockback": 120,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 0,
+        "count": 1,
+        "power": 1150,
+        "cooldownSeconds": 6,
+        "size": 80,
+        "range": 520,
+        "durationSeconds": 0.25
+      },
+      "levels": [
+        {
+          "power": 100
+        },
+        {
+          "power": 100,
+          "size": 4
+        },
+        {
+          "power": 100,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 100
+        },
+        {
+          "power": 100,
+          "size": 4
+        },
+        {
+          "power": 100
+        },
+        {
+          "power": 100,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 100,
+          "size": 4
+        },
+        {
+          "power": 100
+        },
+        {
+          "power": 100
+        },
+        {
+          "power": 100,
+          "size": 4,
+          "cooldownSeconds": -0.25
+        }
+      ]
+    },
+    "extrasensory-lugia": {
+      "pattern": "skill",
+      "effect": "extrasensory-lugia",
+      "nameOf": "extrasensory",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.3,
+        "statusSeconds": 0.6,
+        "knockback": 0,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 0,
+        "count": 5,
+        "power": 520,
+        "cooldownSeconds": 4,
+        "size": 26,
+        "range": 380,
+        "durationSeconds": 0.1,
+        "statusId": "flinch"
+      },
+      "levels": [
+        {
+          "power": 46
+        },
+        {
+          "power": 46
+        },
+        {
+          "power": 46,
+          "cooldownSeconds": -0.2
+        },
+        {
+          "power": 46,
+          "count": 1
+        },
+        {
+          "power": 46
+        },
+        {
+          "power": 46
+        },
+        {
+          "power": 46,
+          "cooldownSeconds": -0.2
+        },
+        {
+          "power": 46,
+          "count": 1
+        },
+        {
+          "power": 46
+        },
+        {
+          "power": 46
+        },
+        {
+          "power": 46,
+          "cooldownSeconds": -0.2
+        }
+      ]
+    },
+    "hydro-pump-lugia": {
+      "pattern": "skill",
+      "effect": "hydro-pump-lugia",
+      "nameOf": "hydro-pump",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "knockback": 90,
+        "hitIntervalSeconds": 0.25,
+        "pierce": "infinite",
+        "speed": 0,
+        "count": 1,
+        "power": 450,
+        "cooldownSeconds": 8,
+        "size": 34,
+        "range": 600,
+        "durationSeconds": 0.8
+      },
+      "levels": [
+        {
+          "power": 40
+        },
+        {
+          "power": 40,
+          "range": 15
+        },
+        {
+          "power": 40,
+          "cooldownSeconds": -0.4
+        },
+        {
+          "power": 40
+        },
+        {
+          "power": 40,
+          "range": 15
+        },
+        {
+          "power": 40
+        },
+        {
+          "power": 40,
+          "cooldownSeconds": -0.4
+        },
+        {
+          "power": 40,
+          "range": 15
+        },
+        {
+          "power": 40
+        },
+        {
+          "power": 40
+        },
+        {
+          "power": 40,
+          "range": 15,
+          "cooldownSeconds": -0.4
+        }
+      ]
+    },
+    "gust-lugia": {
+      "pattern": "nearest",
+      "effect": "gust-lugia",
+      "nameOf": "gust",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "knockback": 60,
+        "hitIntervalSeconds": 0,
+        "pierce": 2,
+        "speed": 380,
+        "count": 1,
+        "power": 9,
+        "cooldownSeconds": 0.9,
+        "size": 14,
+        "range": 380,
+        "durationSeconds": 1
+      },
+      "levels": [
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1,
+          "count": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1,
+          "count": 1
+        },
+        {
+          "power": 1
+        }
+      ]
+    },
     "psystrike": {
       "pattern": "homing",
       "effect": "psystrike",

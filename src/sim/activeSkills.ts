@@ -1,7 +1,7 @@
 import type { Player, PlayerMove } from './entities/player';
 import type { SimActiveSkill } from './rules';
 import type { World } from './world';
-import { fireThunderbolt, fireZapCannon, zapNetworkHit, burnUpCenter, eruptionCenter, extremeSpeedPath, fireBlizzard, fireBurnUp, fireHeatWave, fireSkyAttack, skyAttackPath, fireEnteiEruption, fireFreezeDry, fireIcyWind, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
+import { fireAeroblast, fireExtrasensory, fireHydroPump, fireThunderbolt, fireZapCannon, zapNetworkHit, burnUpCenter, eruptionCenter, extremeSpeedPath, fireBlizzard, fireBurnUp, fireHeatWave, fireSkyAttack, skyAttackPath, fireEnteiEruption, fireFreezeDry, fireIcyWind, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
 
 /**
  * アクティブスキル（作者の案 2026年11月18日。07 の305・307章）: キー（SPACE・Q・E）で使う技。
@@ -217,7 +217,7 @@ export function articunoReach(world: World, p: Player, skill: number): { length:
   return null;
 }
 
-/** ファイヤー・サンダーの技の狙い（押している間に見せる。07 の315・316章）: ゴッドバード・ドリルくちばし は突き抜ける道、もえつきる は炎の玉が落ちる所と半径 */
+/** ファイヤー・サンダー・ルギアの技の狙い（押している間に見せる。07 の315〜317章）: ハイドロポンプ は自分の所と水流の長さ（r）、エアロブラスト は竜巻の出る所。ゴッドバード・ドリルくちばし は突き抜ける道、もえつきる は炎の玉が落ちる所と半径 */
 export function moltresAim(world: World, p: Player, skill: number): { path?: { x: number; y: number }[]; width?: number; x?: number; y?: number; r?: number } | null {
   const pm = skillMove(world, p, { skill });
   const d = skillDef(world, skill);
@@ -229,6 +229,11 @@ export function moltresAim(world: World, p: Player, skill: number): { path?: { x
     const c = burnUpCenter(world, p, st.range, dx, dy, d.burnUp.areaDistance);
     return { x: c.x, y: c.y, r: sc.size };
   }
+  if (d.aeroblast) {
+    const c = burnUpCenter(world, p, st.range, dx, dy, d.aeroblast.areaDistance);
+    return { x: c.x, y: c.y, r: d.aeroblast.tornadoRadius };
+  }
+  if (d.hydroPump) return { x: p.x, y: p.y, r: st.range };
   return null;
 }
 
@@ -376,6 +381,21 @@ function runSkill(world: World, p: Player, d: SimActiveSkill, pm: PlayerMove | u
         p.dashVx = 0;
         p.dashVy = 0;
       }
+      return;
+    }
+    case 'aeroblast': {
+      if (!pm || !d.aeroblast) return;
+      fireAeroblast(world, p, pm, dx, dy, d.aeroblast);
+      return;
+    }
+    case 'extrasensory': {
+      if (!pm || !d.extrasensory) return;
+      fireExtrasensory(world, p, pm, dx, dy, d.extrasensory);
+      return;
+    }
+    case 'hydroPump': {
+      if (!pm || !d.hydroPump) return;
+      fireHydroPump(world, p, pm, dx, dy, d.hydroPump);
       return;
     }
     case 'drillPeck': {

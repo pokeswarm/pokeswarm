@@ -18,6 +18,11 @@
     "hoenn": 1.25
   },
   "exempt": [
+    "aeroblast-lugia",
+    "extrasensory-lugia",
+    "hydro-pump-lugia",
+    "gust-lugia",
+    "aeroblast",
     "drill-peck-zapdos",
     "zap-cannon-zapdos",
     "thunderbolt-zapdos",

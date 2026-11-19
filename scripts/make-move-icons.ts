@@ -684,6 +684,80 @@ function thunderShockZapdosIcon(): Draw {
   });
 }
 
+/** エアロブラスト（ルギアの版。07 の317章）: 右上へ飛ぶ青白い風の玉と、下に残る竜巻 */
+function aeroblastLugiaIcon(): Draw {
+  return paint((x, y) => {
+    const d = Math.hypot(x - 21, y - 9);
+    if (d < 2.5) return '#ffffff';
+    if (d < 5.5) {
+      const a = Math.atan2(y - 9, x - 21);
+      return Math.sin(a * 3 + d * 1.3) > 0.3 ? '#e1f5fe' : '#81d4fa';
+    }
+    // 玉の後ろの風の筋
+    if (x < 18 && x > 6 && Math.abs(y - 9 - (18 - x) * 0.35 - Math.sin(x) * 0.8) < 0.7) return '#b3e5fc';
+    // 竜巻（下が細く、上が広い渦）
+    if (y > 15 && y < 29) {
+      const t = (29 - y) / 14;
+      const w = 1.2 + t * 6;
+      const cx = 12 + Math.sin(y * 0.6) * 1.5;
+      const dx = x - cx;
+      if (Math.abs(dx) < w) return Math.sin(dx * 1.4 + y * 1.1) > 0 ? '#e1f5fe' : '#4fc3f7';
+    }
+    return null;
+  });
+}
+
+/** じんつうりき（ルギアの版）: 青紫の目の模様と、まわりのゆがみの輪 */
+function extrasensoryLugiaIcon(): Draw {
+  return paint((x, y) => {
+    const nx = (x - 16) / 11;
+    const ny = (y - 16) / 6.5;
+    const e = nx * nx + ny * ny;
+    const d = Math.hypot(x - 16, y - 16);
+    if (d < 2.5) return '#ffffff';
+    if (d < 4.8) return '#7c4dff';
+    if (e < 1 && e > 0.72) return '#b388ff';
+    if (e < 0.72 && Math.abs(nx) > 0.35) return '#5e35b1';
+    // ゆがみの輪
+    if (Math.abs(d - 13.5) < 0.8 && (Math.floor(Math.atan2(y - 16, x - 16) * 4) % 2 === 0)) return '#9575cd';
+    return null;
+  });
+}
+
+/** ハイドロポンプ（ルギアの版）: 左下から扇に振れる太い水流と、先のしぶき */
+function hydroPumpLugiaIcon(): Draw {
+  return paint((x, y) => {
+    // 水流（左下から右上へ。太さが先で広がる）
+    const u = (x - 4) * 0.8 - (y - 27) * 0.6;
+    const v = (x - 4) * 0.6 + (y - 27) * 0.8;
+    if (u > 0 && u < 26) {
+      const w = 2 + u * 0.12;
+      if (Math.abs(v) < w * 0.35) return '#e1f5fe';
+      if (Math.abs(v) < w * 0.75) return '#4fc3f7';
+      if (Math.abs(v) < w) return '#0288d1';
+    }
+    // なぎ払う向きの弧（点線）
+    const r = Math.hypot(x - 4, y - 27);
+    const a = Math.atan2(27 - y, x - 4);
+    if (Math.abs(r - 24) < 0.8 && a > 0.1 && a < 1.45 && Math.floor(a * 12) % 2 === 0) return '#81d4fa';
+    // しぶき
+    for (const [cx, cy] of [[27, 7], [24, 4], [29, 11]] as const) if (Math.hypot(x - cx, y - cy) < 1.3) return '#ffffff';
+    return null;
+  });
+}
+
+/** かぜおこし（ルギアの版）: 右へ流れる三日月形の風 2 つ */
+function gustLugiaIcon(): Draw {
+  return paint((x, y) => {
+    for (const [cx, cy, r] of [[12, 12, 7], [20, 21, 6]] as const) {
+      const d = Math.hypot(x - cx, y - cy);
+      const d2 = Math.hypot(x - cx + 3, y - cy);
+      if (d < r && d2 > r - 0.5) return d > r - 1.2 ? '#e1f5fe' : '#81d4fa';
+    }
+    return null;
+  });
+}
+
 /** しんそく（ライコウの版）: 3 回折れて駆け抜ける稲妻の道と、その先の光 */
 function extremeSpeedRaikouIcon(): Draw {
   const pts: [number, number][] = [[4, 26], [12, 14], [17, 22], [27, 6]];
@@ -1156,6 +1230,10 @@ const ICONS: Record<string, Layer[]> = {
   'zap-cannon-zapdos': [zapCannonZapdosIcon()],
   'thunderbolt-zapdos': [thunderboltZapdosIcon()],
   'thunder-shock-zapdos': [thunderShockZapdosIcon()],
+  'aeroblast-lugia': [aeroblastLugiaIcon()],
+  'extrasensory-lugia': [extrasensoryLugiaIcon()],
+  'hydro-pump-lugia': [hydroPumpLugiaIcon()],
+  'gust-lugia': [gustLugiaIcon()],
   // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
   sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],
   // かたくなる: 体の表面が硬い板になる

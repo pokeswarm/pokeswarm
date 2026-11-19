@@ -243,6 +243,47 @@
         "bandBurstMultiplier": 1.5,
         "burstDelaySeconds": 0.15
       }
+    },
+    "aeroblast-lugia": {
+      "kind": "aeroblast",
+      "move": "aeroblast-lugia",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "aeroblast": {
+        "chargeSeconds": 0.5,
+        "flightSeconds": 0.3,
+        "areaDistance": 260,
+        "tornadoSeconds": 3,
+        "tornadoRadius": 90,
+        "tornadoPowerPct": 15,
+        "pull": 70
+      }
+    },
+    "extrasensory-lugia": {
+      "kind": "extrasensory",
+      "move": "extrasensory-lugia",
+      "trigger": "press",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "extrasensory": {
+        "spreadDegrees": 110,
+        "delaySeconds": 0.3
+      }
+    },
+    "hydro-pump-lugia": {
+      "kind": "hydroPump",
+      "move": "hydro-pump-lugia",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "hydroPump": {
+        "chargeSeconds": 0.6,
+        "sweepDegrees": 90,
+        "wetRadiusMultiplier": 1.5,
+        "wetPowerMultiplier": 2,
+        "wetExtraSeconds": 2
+      }
     }
   }
 }

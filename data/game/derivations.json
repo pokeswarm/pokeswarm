@@ -360,12 +360,6 @@
       }
     },
     {
-      "from": "air-slash",
-      "item": "water-stone",
-      "to": "aeroblast",
-      "line": "lugia"
-    },
-    {
       "from": "aerial-ace",
       "item": "fire-stone",
       "to": "sacred-fire",

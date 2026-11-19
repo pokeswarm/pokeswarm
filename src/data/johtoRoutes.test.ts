@@ -33,7 +33,6 @@ describe('カントー・ジョウトの技の進化の形', () => {
       ['zubat', 'poison-fang', 'razor-claw', 'cross-poison'],
       ['horsea', 'hydro-pump', 'dragon-scale', 'draco-meteor'],
       ['poliwag', 'pound', 'black-belt', 'dynamic-punch'],
-      ['lugia', 'air-slash', 'water-stone', 'aeroblast'],
       ['ho-oh', 'aerial-ace', 'fire-stone', 'sacred-fire'],
     ];
     const all = [...derivationsConfig.derivations, ...derivationsConfig.unique];

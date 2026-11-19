@@ -2283,6 +2283,7 @@ export function tickMarks(world: World): void {
   for (let i = 0; i < e.count; i++) if (e.frostTicks[i]! > 0 && --e.frostTicks[i]! === 0) e.frost[i] = 0;
   stepElectricField(world);
   stepZapBands(world);
+  stepWetTornadoes(world);
   for (let i = 0; i < e.count; i++) {
     if (e.markTicks[i] === 0) continue;
     if (--e.markTicks[i]! > 0 || e.hp[i]! <= 0) continue;
@@ -3302,4 +3303,96 @@ export function fireThunderbolt(world: World, p: Player, pm: PlayerMove, dirX: n
   const idx = hit.spheres.map((k) => net.spheres[k]!.i).sort((a, b) => b - a);
   for (const i of idx) world.projectiles.removeAt(i);
   return hit.spheres.length;
+}
+
+/**
+ * エアロブラスト（ルギア。07 の317章）: ためてから風の玉を撃ち、落ちる所で風が爆ぜる（同じ技の円の stage 0。1 回で同じ敵には 1 回）。
+ * そこに竜巻（同じ技の円の stage 1。angle 0 = ふつう、1 = 水を吸った竜巻）が残って、中の敵を中心へ吸い寄せる
+ */
+export function fireAeroblast(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { chargeSeconds: number; flightSeconds: number; areaDistance: number; tornadoSeconds: number; tornadoRadius: number; tornadoPowerPct: number; pull: number }): void {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const c = eruptionCenter(world, p, st.range, dirX, dirY, cfg.areaDistance);
+  const wait = Math.max(world.dt, cfg.chargeSeconds + cfg.flightSeconds);
+  const group = newCastGroup(world, wait + st.durationSeconds);
+  const b0 = base(world, p, pm, st);
+  world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: c.x, y: c.y, group, life: wait, stage: 3, armStage: 0, armLife: st.durationSeconds });
+  world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: c.x, y: c.y, radius: cfg.tornadoRadius, damage: (sc.power * cfg.tornadoPowerPct) / 100, hitIntervalTicks: Math.round(0.5 / world.dt), knockback: -cfg.pull, angle: 0, life: wait + world.dt, stage: 3, armStage: 1, armLife: cfg.tornadoSeconds });
+}
+
+/** じんつうりき（07 の317章）: 向きの扇の中の近い敵 count 体の所に、delaySeconds 後にはじける印（同じ技の円。待つ間は stage 3）。敵がいなければ前に 1 つ */
+export function fireExtrasensory(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { spreadDegrees: number; delaySeconds: number }): void {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const e = world.enemies;
+  const cos = Math.cos((cfg.spreadDegrees * Math.PI) / 360);
+  const cands: { i: number; d: number }[] = [];
+  for (const i of enemiesInRange(world, p.x, p.y, st.range)) {
+    if (e.hp[i]! <= 0) continue;
+    const dx = e.x[i]! - p.x;
+    const dy = e.y[i]! - p.y;
+    const d = Math.hypot(dx, dy) || 1;
+    if ((dx * dirX + dy * dirY) / d < cos) continue;
+    cands.push({ i, d });
+  }
+  cands.sort((a, b) => a.d - b.d || e.id[a.i]! - e.id[b.i]!);
+  const group = newCastGroup(world, cfg.delaySeconds + st.durationSeconds);
+  const b0 = base(world, p, pm, st);
+  const n = Math.max(1, st.count);
+  const picks = cands.slice(0, n);
+  if (picks.length === 0) {
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: p.x + dirX * st.range * 0.5, y: p.y + dirY * st.range * 0.5, group, life: Math.max(world.dt, cfg.delaySeconds), stage: 3, armStage: 0, armLife: st.durationSeconds });
+    return;
+  }
+  for (const { i } of picks) {
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: e.x[i]!, y: e.y[i]!, radius: Math.max(sc.size, e.radius[i]! + 10), group, life: Math.max(world.dt, cfg.delaySeconds), stage: 3, armStage: 0, armLife: st.durationSeconds });
+  }
+}
+
+/** ハイドロポンプ（07 の317章）: ためてから、向きを真ん中に sweepDegrees を片道でなぎ払う太い水流（自分に付いて動く線） */
+export function fireHydroPump(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { chargeSeconds: number; sweepDegrees: number }): void {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const half = (cfg.sweepDegrees * Math.PI) / 360;
+  const a = Math.atan2(dirY, dirX);
+  world.projectiles.add({
+    ...base(world, p, pm, st),
+    motion: MOTION_SWEEP,
+    x: p.x,
+    y: p.y,
+    shape: SHAPE_LINE,
+    length: st.range,
+    radius: sc.size,
+    dirX: Math.cos(a - half),
+    dirY: Math.sin(a - half),
+    angle: a,
+    angularSpeed: half,
+    orbitRadius: 1,
+    life: Math.max(world.dt, cfg.chargeSeconds),
+    stage: 3,
+    armStage: 0,
+    armLife: st.durationSeconds,
+  });
+}
+
+/**
+ * 水を吸った竜巻（07 の317章）: ハイドロポンプ の水流が、同じプレイヤーの エアロブラスト の竜巻に触れると、竜巻が大きく強くなって長く残る（どのブラウザでも同じように）
+ */
+function stepWetTornadoes(world: World): void {
+  const defs = world.rules.activeSkills?.defs;
+  const hp = defs?.find((d) => d.kind === 'hydroPump' && d.move >= 0 && d.hydroPump);
+  const ab = defs?.find((d) => d.kind === 'aeroblast' && d.move >= 0);
+  if (!hp || !ab) return;
+  const pr = world.projectiles;
+  for (let b = 0; b < pr.count; b++) {
+    if (pr.move[b] !== hp.move || pr.stage[b] !== 0 || pr.shape[b] !== SHAPE_LINE) continue;
+    for (let t = 0; t < pr.count; t++) {
+      if (pr.move[t] !== ab.move || pr.stage[t] !== 1 || pr.angle[t] !== 0 || pr.owner[t] !== pr.owner[b]) continue;
+      const d2 = segmentDistance2(pr.x[t]!, pr.y[t]!, pr.x[b]!, pr.y[b]!, pr.dirX[b]!, pr.dirY[b]!, pr.length[b]!);
+      const r = pr.radius[t]! + pr.radius[b]!;
+      if (d2 > r * r) continue;
+      pr.angle[t] = 1;
+      pr.radius[t] = pr.radius[t]! * hp.hydroPump!.wetRadiusMultiplier;
+      pr.damage[t] = pr.damage[t]! * hp.hydroPump!.wetPowerMultiplier;
+      pr.life[t] = pr.life[t]! + hp.hydroPump!.wetExtraSeconds;
+      pr.maxLife[t] = pr.maxLife[t]! + hp.hydroPump!.wetExtraSeconds;
+    }
+  }
 }

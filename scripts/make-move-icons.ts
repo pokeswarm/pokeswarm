@@ -758,6 +758,79 @@ function gustLugiaIcon(): Draw {
   });
 }
 
+/** ミストボール（ラティアスの版。07 の319章）: 扇に開いて飛ぶ 3 つの霧の玉（桃色の芯に白い霧の渦）と、下に残る霧 */
+function mistBallLatiasIcon(): Draw {
+  return paint((x, y) => {
+    for (const [cx, cy, r] of [[9, 9, 4.2], [19, 6, 3.6], [24, 15, 3.8]] as const) {
+      const d = Math.hypot(x - cx, y - cy);
+      if (d < r) {
+        const sw = Math.sin(Math.atan2(y - cy, x - cx) * 2 + d * 1.6);
+        if (d < r * 0.35) return '#ffffff';
+        if (sw > 0.5) return '#fce4ec';
+        return d < r * 0.75 ? '#ff8a80' : '#e57373';
+      }
+    }
+    // 下に残る霧（ふわふわの白い塊）
+    for (const [cx, cy, r] of [[8, 25, 4], [14, 23, 5], [21, 25, 4.5], [26, 26, 3]] as const) {
+      const d = Math.hypot(x - cx, (y - cy) * 1.4);
+      if (d < r) return d < r * 0.6 ? '#fce4ec' : (x + y) % 2 ? '#f8bbd0' : '#fce4ec';
+    }
+    return null;
+  });
+}
+
+/** りゅうのはどう（ラティアスの版）: 左下から右上へ走る太い青紫の竜の気の波動と、まわりのらせん */
+function dragonPulseLatiasIcon(): Draw {
+  return paint((x, y) => {
+    const u = (x - 3) * 0.707 - (y - 29) * 0.707;
+    const v = (x - 3) * 0.707 + (y - 29) * 0.707;
+    if (u < 0 || u > 38) return null;
+    const w = 3.2 + u * 0.08;
+    const spiral = Math.abs(v - Math.sin(u * 0.55) * (w + 1.2)) < 0.7;
+    if (spiral) return '#e1bee7';
+    const a = Math.abs(v);
+    if (a < w * 0.3) return '#ffffff';
+    if (a < w * 0.6) return '#b3e5fc';
+    if (a < w * 0.85) return '#7986cb';
+    if (a < w) return '#5e35b1';
+    return null;
+  });
+}
+
+/** いやしのはどう（ラティアスの版）: 真ん中の桃色の光と、外へ届く光の筋、先で光る霧 */
+function healPulseLatiasIcon(): Draw {
+  return paint((x, y) => {
+    const d = Math.hypot(x - 11, y - 20);
+    if (d < 2.5) return '#ffffff';
+    if (d < 4.5) return '#f8bbd0';
+    // 光の筋（3 本。右上の霧へ）
+    for (const [tx, ty] of [[26, 6], [27, 18], [20, 28]] as const) {
+      const l2 = (tx - 11) ** 2 + (ty - 20) ** 2;
+      const t = Math.max(0, Math.min(1, ((x - 11) * (tx - 11) + (y - 20) * (ty - 20)) / l2));
+      const dd = Math.hypot(x - 11 - (tx - 11) * t, y - 20 - (ty - 20) * t);
+      if (dd < 0.7 && t < 0.85) return (Math.floor(t * 8) % 2 === 0) ? '#ffffff' : '#f48fb1';
+      // 先の光る霧
+      const e = Math.hypot(x - tx, y - ty);
+      if (e < 3) return e < 1.4 ? '#ffffff' : '#fff59d';
+    }
+    // 十字の小さな光
+    if ((Math.abs(x - 11) < 0.6 && Math.abs(y - 20) < 7) || (Math.abs(y - 20) < 0.6 && Math.abs(x - 11) < 7)) return '#fce4ec';
+    return null;
+  });
+}
+
+/** ねんりき（ラティアスの版）: 小さな念の輪 2 つ */
+function confusionLatiasIcon(): Draw {
+  return paint((x, y) => {
+    for (const [cx, cy, r] of [[12, 13, 6], [21, 21, 5]] as const) {
+      const d = Math.hypot(x - cx, y - cy);
+      if (Math.abs(d - r) < 0.9) return '#f48fb1';
+      if (Math.abs(d - r * 0.5) < 0.7) return '#fce4ec';
+    }
+    return null;
+  });
+}
+
 /** しんそく（ライコウの版）: 3 回折れて駆け抜ける稲妻の道と、その先の光 */
 function extremeSpeedRaikouIcon(): Draw {
   const pts: [number, number][] = [[4, 26], [12, 14], [17, 22], [27, 6]];
@@ -1234,6 +1307,10 @@ const ICONS: Record<string, Layer[]> = {
   'extrasensory-lugia': [extrasensoryLugiaIcon()],
   'hydro-pump-lugia': [hydroPumpLugiaIcon()],
   'gust-lugia': [gustLugiaIcon()],
+  'mist-ball-latias': [mistBallLatiasIcon()],
+  'dragon-pulse-latias': [dragonPulseLatiasIcon()],
+  'heal-pulse-latias': [healPulseLatiasIcon()],
+  'confusion-latias': [confusionLatiasIcon()],
   // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
   sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],
   // かたくなる: 体の表面が硬い板になる

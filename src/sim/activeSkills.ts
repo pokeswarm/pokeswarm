@@ -1,7 +1,7 @@
 import type { Player, PlayerMove } from './entities/player';
 import type { SimActiveSkill } from './rules';
 import type { World } from './world';
-import { fireAeroblast, fireExtrasensory, fireHydroPump, fireThunderbolt, fireZapCannon, zapNetworkHit, burnUpCenter, eruptionCenter, extremeSpeedPath, fireBlizzard, fireBurnUp, fireHeatWave, fireSkyAttack, skyAttackPath, fireEnteiEruption, fireFreezeDry, fireIcyWind, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
+import { fireDragonPulse, fireHealPulse, fireMistBall, fireAeroblast, fireExtrasensory, fireHydroPump, fireThunderbolt, fireZapCannon, zapNetworkHit, burnUpCenter, eruptionCenter, extremeSpeedPath, fireBlizzard, fireBurnUp, fireHeatWave, fireSkyAttack, skyAttackPath, fireEnteiEruption, fireFreezeDry, fireIcyWind, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
 
 /**
  * アクティブスキル（作者の案 2026年11月18日。07 の305・307章）: キー（SPACE・Q・E）で使う技。
@@ -381,6 +381,21 @@ function runSkill(world: World, p: Player, d: SimActiveSkill, pm: PlayerMove | u
         p.dashVx = 0;
         p.dashVy = 0;
       }
+      return;
+    }
+    case 'mistBall': {
+      if (!pm || !d.mistBall) return;
+      fireMistBall(world, p, pm, dx, dy, d.mistBall);
+      return;
+    }
+    case 'dragonPulse': {
+      if (!pm || !d.dragonPulse) return;
+      fireDragonPulse(world, p, pm, dx, dy, d.dragonPulse);
+      return;
+    }
+    case 'healPulse': {
+      if (!pm || !d.healPulse) return;
+      fireHealPulse(world, p, pm, d.healPulse);
       return;
     }
     case 'aeroblast': {

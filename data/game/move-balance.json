@@ -18,6 +18,11 @@
     "hoenn": 1.25
   },
   "exempt": [
+    "mist-ball-latias",
+    "dragon-pulse-latias",
+    "heal-pulse-latias",
+    "confusion-latias",
+    "mist-ball",
     "aeroblast-lugia",
     "extrasensory-lugia",
     "hydro-pump-lugia",

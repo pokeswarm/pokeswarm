@@ -39,6 +39,7 @@ import { ArticunoPlayer } from '../render/effects/ArticunoPlayer';
 import { MoltresPlayer } from '../render/effects/MoltresPlayer';
 import { ZapdosPlayer } from '../render/effects/ZapdosPlayer';
 import { LugiaPlayer } from '../render/effects/LugiaPlayer';
+import { LatiasPlayer } from '../render/effects/LatiasPlayer';
 import { SkillHud } from '../render/SkillHud';
 import { ensureSkillIcons } from '../render/skillIcons';
 import { ShinyCharizardFlame } from '../render/effects/ShinyCharizardFlame';
@@ -216,6 +217,7 @@ export class RunScene extends Phaser.Scene {
   private moltresPlayer: MoltresPlayer | null = null;
   private zapdosPlayer: ZapdosPlayer | null = null;
   private lugiaPlayer: LugiaPlayer | null = null;
+  private latiasPlayer: LatiasPlayer | null = null;
   /** アクティブスキルのボタン（右下）とキー、押している枠（SPACE を押している間は行き先の印を出す）、スマホでボタンを押している指 */
   private skillHud: SkillHud | null = null;
   private skillKeys: Phaser.Input.Keyboard.Key[] = [];
@@ -413,6 +415,7 @@ export class RunScene extends Phaser.Scene {
     this.moltresPlayer = null;
     this.zapdosPlayer = null;
     this.lugiaPlayer = null;
+    this.latiasPlayer = null;
     this.skillHud = null;
     this.skillAim = null;
     this.skillDown = [];
@@ -1368,6 +1371,7 @@ export class RunScene extends Phaser.Scene {
         this.showBossMoveName(ev);
       } else if (ev.type === 'skillUsed') {
         if (w.rules.activeSkills?.defs[ev.skill]?.kind === 'teleport') this.mewtwoPlayer?.onSkillUsed(ev, this.time.now);
+        if (w.rules.activeSkills?.defs[ev.skill]?.kind === 'healPulse') this.latiasPlayer?.onSkillUsed(ev, this.time.now);
       } else if (ev.type === 'mirrorAbsorbed') {
         this.suicunePlayer?.onAbsorbed(ev.playerId, this.time.now);
       } else if (ev.type === 'playerFrozen' && ev.playerId === this.localId) {
@@ -3451,6 +3455,8 @@ export class RunScene extends Phaser.Scene {
     this.zapdosPlayer.update(world, this.time.now, this.localId, this.skillAim);
     this.lugiaPlayer ??= new LugiaPlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.players + 0.1);
     this.lugiaPlayer.update(world, this.time.now, this.localId, this.skillAim);
+    this.latiasPlayer ??= new LatiasPlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.players + 0.1);
+    this.latiasPlayer.update(world, this.time.now, this.localId, this.skillAim);
     this.shinyCharizardFlame ??= new ShinyCharizardFlame(this, spriteRender.depths.effects + 0.35, spriteRender.depths.bosses + 0.05, ARENA_FLOOR_DEPTH + 3.6);
     this.shinyCharizardFlame.update(world, this.time.now, alpha);
     this.shinyVenusaurPlant ??= new ShinyVenusaurPlant(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);

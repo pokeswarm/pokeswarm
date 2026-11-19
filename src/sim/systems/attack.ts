@@ -3414,3 +3414,69 @@ function stepWetTornadoes(world: World): void {
     }
   }
 }
+
+/**
+ * ミストボール（ラティアス。07 の319章）: 霧の玉を扇に飛ばす。玉ごとに、通り道で最初に触れる敵（いなければ射程の先）を決め、
+ * そこで弾ける当たり（同じ技の円の stage 0。1 回で同じ敵には 1 回）と、残る霧（stage 1。angle 0 = ふつう、1 = いやしのはどう の光が届いた）を、玉が着く時間だけ待って出す
+ */
+export function fireMistBall(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { spreadDegrees: number; mistSeconds: number; mistRadius: number; mistPowerPct: number }): void {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const e = world.enemies;
+  const n = Math.max(1, st.count);
+  const speed = Math.max(1, sc.speed);
+  const heading = Math.atan2(dirY, dirX);
+  const b0 = base(world, p, pm, st);
+  const near = enemiesInRange(world, p.x, p.y, st.range + 40);
+  for (let k = 0; k < n; k++) {
+    const a = heading + (n > 1 ? (k / (n - 1) - 0.5) * ((cfg.spreadDegrees * Math.PI) / 180) : 0);
+    const dx = Math.cos(a);
+    const dy = Math.sin(a);
+    let dist = clipToArena(world, p.x, p.y, dx, dy, st.range);
+    for (const i of near) {
+      if (e.hp[i]! <= 0) continue;
+      const t = (e.x[i]! - p.x) * dx + (e.y[i]! - p.y) * dy;
+      if (t < 0 || t > dist) continue;
+      const side = Math.abs(-(e.x[i]! - p.x) * dy + (e.y[i]! - p.y) * dx);
+      if (side <= sc.size + e.radius[i]!) dist = t;
+    }
+    const x = p.x + dx * dist;
+    const y = p.y + dy * dist;
+    const wait = Math.max(world.dt, dist / speed);
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x, y, radius: sc.size * 1.3, dirX: dx, dirY: dy, life: wait, stage: 3, armStage: 0, armLife: st.durationSeconds });
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x, y, radius: cfg.mistRadius, damage: (sc.power * cfg.mistPowerPct) / 100, hitIntervalTicks: Math.round(0.5 / world.dt), knockback: 0, angle: 0, life: wait + world.dt, stage: 3, armStage: 1, armLife: cfg.mistSeconds });
+  }
+}
+
+/** りゅうのはどう（ラティアス。07 の319章）: ためてから、向きへ太い竜の気の波動（自分に付いて動く線。1 回当たる） */
+export function fireDragonPulse(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { chargeSeconds: number }): void {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const len = clipToArena(world, p.x, p.y, dirX, dirY, st.range);
+  world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, ox: 0, oy: 0, shape: SHAPE_LINE, length: Math.max(10, len), dirX, dirY, radius: sc.size, life: Math.max(world.dt, cfg.chargeSeconds), stage: 3, armStage: 0, armLife: st.durationSeconds });
+}
+
+/**
+ * いやしのはどう（ラティアス。07 の319章）: 自分と近くの仲間を回復し（回復は自分のブラウザのプレイヤーにだけ効くので、どのブラウザでも呼ぶ）、
+ * 近くに残っている自分の ミストボール の霧へ光を届けて弾けさせる（同じ技の円の stage 3 → 0。霧は光が届いたら消える）。返り値: 弾けさせた霧の数
+ */
+export function fireHealPulse(world: World, p: Player, pm: PlayerMove, cfg: { healPct: number; allyRadius: number; mistRange: number; travelSeconds: number; burstSizeMultiplier: number }): number {
+  for (const q of world.players) {
+    if (q.down || Math.hypot(q.x - p.x, q.y - p.y) > cfg.allyRadius) continue;
+    healPlayer(world, q.id, (q.maxHp * cfg.healPct) / 100);
+  }
+  const mist = world.rules.activeSkills?.defs.find((d) => d.kind === 'mistBall' && d.move >= 0)?.move ?? -1;
+  if (mist < 0) return 0;
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const pr = world.projectiles;
+  const b0 = base(world, p, pm, st);
+  const n = pr.count;
+  let lit = 0;
+  for (let i = 0; i < n; i++) {
+    if (pr.move[i] !== mist || pr.owner[i] !== p.id || pr.stage[i] !== 1 || pr.angle[i] !== 0) continue;
+    if (Math.hypot(pr.x[i]! - p.x, pr.y[i]! - p.y) > cfg.mistRange) continue;
+    pr.angle[i] = 1;
+    pr.life[i] = Math.min(pr.life[i]!, cfg.travelSeconds + world.dt);
+    world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: pr.x[i]!, y: pr.y[i]!, radius: pr.radius[i]! * cfg.burstSizeMultiplier, damage: sc.power, group: newCastGroup(world, cfg.travelSeconds + st.durationSeconds), life: cfg.travelSeconds, stage: 3, armStage: 0, armLife: st.durationSeconds });
+    lit++;
+  }
+  return lit;
+}

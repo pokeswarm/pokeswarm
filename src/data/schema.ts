@@ -3009,6 +3009,11 @@ export type AbilitiesConfig = z.infer<typeof abilitiesConfigSchema>;
  *   通り道に featherSpacing ごとに燃える羽が落ち、featherSeconds 燃える（中の敵に技の威力の featherPowerPct % ずつ）
  * - heatWave（ねっぷう。07 の315章）: 向きへ開き arcDegrees の弧の熱波を、技の count 回 waveDelaySeconds ごとに送る（1 回ごとに turnDegrees ずつ向きをずらす）。
  *   熱波は厚さ = 技の size の帯で、技の durationSeconds で 技の range まで広がる（自分に付いて動く）
+ * - mistBall（ミストボール。ラティアス。07 の319章）: 霧の玉 技の count 個を、向きを真ん中に spreadDegrees の扇へ技の speed で飛ばす。玉は通り道で最初に触れる敵（いなければ 技の range の先）で弾け（半径 技の size × 1.3）、
+ *   そこに霧（半径 mistRadius）が mistSeconds 残る。霧は 0.5 秒ごとに技の威力の mistPowerPct % が当たり、技の状態異常（こうげきダウン）を付ける
+ * - dragonPulse（りゅうのはどう。07 の319章）: chargeSeconds ためてから、向きへ太い竜の気の波動（長さ 技の range・太さ 技の size。自分に付いて動く。1 回当たる）
+ * - healPulse（いやしのはどう。07 の319章）: 自分と allyRadius の中の仲間の HP を最大の healPct % 回復する（回復はそれぞれのブラウザで）。
+ *   同時に、mistRange の中に残っている自分の ミストボール の霧へ光が届き（travelSeconds）、霧が光って弾ける（霧の半径 × burstSizeMultiplier・技の威力。霧は消える）
  * - aeroblast（エアロブラスト。ルギア。07 の317・318章）: chargeSeconds 口の前で風の弾をためてから放ち、flightSeconds で着弾する所（ふんか と同じ選び方・areaDistance）で
  *   風が螺旋に炸裂する（半径 = 技の size）。そこに風の渦（半径 tornadoRadius）が tornadoSeconds 残り、0.5 秒ごとに技の威力の tornadoPowerPct % が当たって、中の敵を pull の強さで中心へ吸い寄せる
  * - extrasensory（じんつうりき。07 の317章）: 向きの開き spreadDegrees の中の近い敵 技の count 体の頭の上に目の模様を浮かべ、delaySeconds 後にはじけさせる（技の威力。ひるみ）
@@ -3028,7 +3033,7 @@ export const activeSkillsConfigSchema = z.object({
   skills: z.record(
     z.string(),
     z.object({
-      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed', 'charge', 'risingVoltage', 'eruption', 'lavaPlume', 'overheat', 'freezeDry', 'icyWind', 'blizzard', 'skyAttack', 'heatWave', 'burnUp', 'drillPeck', 'zapCannon', 'thunderbolt', 'aeroblast', 'extrasensory', 'hydroPump']),
+      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed', 'charge', 'risingVoltage', 'eruption', 'lavaPlume', 'overheat', 'freezeDry', 'icyWind', 'blizzard', 'skyAttack', 'heatWave', 'burnUp', 'drillPeck', 'zapCannon', 'thunderbolt', 'aeroblast', 'extrasensory', 'hydroPump', 'mistBall', 'dragonPulse', 'healPulse']),
       /** 技の枠の技（moves.json のキー）。あればレベル・再使用・威力はその技の値 */
       move: z.string().optional(),
       trigger: z.enum(['press', 'release']).default('release'),
@@ -3051,6 +3056,9 @@ export const activeSkillsConfigSchema = z.object({
       blizzard: z.object({ width: z.number().positive(), startDistance: z.number().min(0) }).optional(),
       skyAttack: z.object({ chargeSeconds: z.number().min(0), featherSpacing: z.number().positive(), featherSeconds: z.number().positive(), featherPowerPct: z.number().min(0) }).optional(),
       heatWave: z.object({ arcDegrees: z.number().positive().max(360), waveDelaySeconds: z.number().min(0), turnDegrees: z.number() }).optional(),
+      mistBall: z.object({ spreadDegrees: z.number().min(0), mistSeconds: z.number().positive(), mistRadius: z.number().positive(), mistPowerPct: z.number().min(0) }).optional(),
+      dragonPulse: z.object({ chargeSeconds: z.number().min(0) }).optional(),
+      healPulse: z.object({ healPct: z.number().min(0), allyRadius: z.number().positive(), mistRange: z.number().positive(), travelSeconds: z.number().positive(), burstSizeMultiplier: z.number().positive() }).optional(),
       aeroblast: z.object({ chargeSeconds: z.number().min(0), flightSeconds: z.number().positive(), areaDistance: z.number().positive(), tornadoSeconds: z.number().positive(), tornadoRadius: z.number().positive(), tornadoPowerPct: z.number().min(0), pull: z.number().min(0) }).optional(),
       extrasensory: z.object({ spreadDegrees: z.number().positive().max(360), delaySeconds: z.number().min(0) }).optional(),
       hydroPump: z.object({ chargeSeconds: z.number().min(0), sweepDegrees: z.number().positive(), spoutSeconds: z.number().positive(), burstMultiplier: z.number().positive(), burstSizeMultiplier: z.number().positive() }).optional(),

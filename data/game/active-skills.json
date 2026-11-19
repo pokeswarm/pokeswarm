@@ -284,6 +284,43 @@
         "burstMultiplier": 2.5,
         "burstSizeMultiplier": 1.8
       }
+    },
+    "mist-ball-latias": {
+      "kind": "mistBall",
+      "move": "mist-ball-latias",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "mistBall": {
+        "spreadDegrees": 60,
+        "mistSeconds": 3,
+        "mistRadius": 70,
+        "mistPowerPct": 10
+      }
+    },
+    "dragon-pulse-latias": {
+      "kind": "dragonPulse",
+      "move": "dragon-pulse-latias",
+      "trigger": "press",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "dragonPulse": {
+        "chargeSeconds": 0.25
+      }
+    },
+    "heal-pulse-latias": {
+      "kind": "healPulse",
+      "move": "heal-pulse-latias",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "healPulse": {
+        "healPct": 20,
+        "allyRadius": 400,
+        "mistRange": 520,
+        "travelSeconds": 0.35,
+        "burstSizeMultiplier": 1.3
+      }
     }
   }
 }

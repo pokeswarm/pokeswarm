@@ -1488,20 +1488,10 @@
       "giga-drain"
     ],
     "latias": [
-      "mist-ball",
-      "dragon-breath",
-      "twister",
-      "dragon-claw",
-      "dragon-pulse",
-      "outrage",
-      "confusion",
-      "psychic",
-      "future-sight",
-      "recover",
-      "swift",
-      "body-slam",
-      "wish",
-      "healing-wish"
+      "mist-ball-latias",
+      "dragon-pulse-latias",
+      "heal-pulse-latias",
+      "confusion-latias"
     ],
     "latios": [
       "luster-purge",

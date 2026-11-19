@@ -493,12 +493,6 @@
       "line": "lapras"
     },
     {
-      "from": "blizzard",
-      "item": "light-clay",
-      "to": "sheer-cold",
-      "line": "articuno"
-    },
-    {
       "from": "focus-punch",
       "to": "dynamic-punch",
       "line": "machop",

@@ -18,6 +18,11 @@
     "hoenn": 1.25
   },
   "exempt": [
+    "freeze-dry-articuno",
+    "icy-wind-articuno",
+    "blizzard-articuno",
+    "ice-shard-articuno",
+    "sheer-cold",
     "extreme-speed-raikou",
     "sacred-fire-entei",
     "overheat-entei",

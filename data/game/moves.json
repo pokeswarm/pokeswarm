@@ -4531,6 +4531,286 @@
         }
       ]
     },
+    "freeze-dry-articuno": {
+      "pattern": "skill",
+      "effect": "freeze-dry-articuno",
+      "nameOf": "freeze-dry",
+      "teachOnly": true,
+      "frostStack": {
+        "maxStacks": 5,
+        "seconds": 4,
+        "slowPctPerStack": 8
+      },
+      "frostCombo": {
+        "multiplier": 2.5,
+        "freezeSeconds": 2
+      },
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "knockback": 0,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 0,
+        "count": 2,
+        "power": 640,
+        "cooldownSeconds": 6,
+        "size": 30,
+        "range": 480,
+        "durationSeconds": 0.3
+      },
+      "levels": [
+        {
+          "power": 56
+        },
+        {
+          "power": 56,
+          "range": 20
+        },
+        {
+          "power": 56,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 56
+        },
+        {
+          "power": 56,
+          "range": 20
+        },
+        {
+          "power": 56
+        },
+        {
+          "power": 56,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 56,
+          "range": 20
+        },
+        {
+          "power": 56
+        },
+        {
+          "power": 56
+        },
+        {
+          "power": 56,
+          "range": 20,
+          "cooldownSeconds": -0.25
+        }
+      ]
+    },
+    "icy-wind-articuno": {
+      "pattern": "skill",
+      "effect": "icy-wind-articuno",
+      "nameOf": "icy-wind",
+      "teachOnly": true,
+      "followFacing": 200,
+      "frostStack": {
+        "maxStacks": 5,
+        "seconds": 4,
+        "slowPctPerStack": 8
+      },
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "knockback": 30,
+        "hitIntervalSeconds": 0.2,
+        "pierce": "infinite",
+        "speed": 0,
+        "count": 1,
+        "power": 150,
+        "cooldownSeconds": 5,
+        "size": 20,
+        "range": 340,
+        "durationSeconds": 0.8
+      },
+      "levels": [
+        {
+          "power": 13
+        },
+        {
+          "power": 13,
+          "range": 10
+        },
+        {
+          "power": 13,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 13
+        },
+        {
+          "power": 13,
+          "range": 10
+        },
+        {
+          "power": 13
+        },
+        {
+          "power": 13,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 13,
+          "range": 10
+        },
+        {
+          "power": 13
+        },
+        {
+          "power": 13
+        },
+        {
+          "power": 13,
+          "range": 10,
+          "cooldownSeconds": -0.25
+        }
+      ]
+    },
+    "blizzard-articuno": {
+      "pattern": "skill",
+      "effect": "blizzard-articuno",
+      "nameOf": "blizzard",
+      "teachOnly": true,
+      "passObstacles": true,
+      "frostStack": {
+        "maxStacks": 5,
+        "seconds": 4,
+        "slowPctPerStack": 8
+      },
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "knockback": 0,
+        "hitIntervalSeconds": 0.3,
+        "pierce": "infinite",
+        "speed": 110,
+        "count": 1,
+        "power": 120,
+        "cooldownSeconds": 9,
+        "size": 70,
+        "range": 400,
+        "durationSeconds": 3
+      },
+      "levels": [
+        {
+          "power": 10
+        },
+        {
+          "power": 10,
+          "durationSeconds": 0.1
+        },
+        {
+          "power": 10,
+          "cooldownSeconds": -0.5
+        },
+        {
+          "power": 10
+        },
+        {
+          "power": 10,
+          "durationSeconds": 0.1
+        },
+        {
+          "power": 10
+        },
+        {
+          "power": 10,
+          "cooldownSeconds": -0.5
+        },
+        {
+          "power": 10,
+          "durationSeconds": 0.1
+        },
+        {
+          "power": 10
+        },
+        {
+          "power": 10
+        },
+        {
+          "power": 10,
+          "durationSeconds": 0.1,
+          "cooldownSeconds": -0.5
+        }
+      ]
+    },
+    "ice-shard-articuno": {
+      "pattern": "nearest",
+      "effect": "ice-shard-articuno",
+      "nameOf": "ice-shard",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "knockback": 80,
+        "hitIntervalSeconds": 0,
+        "pierce": 1,
+        "speed": 760,
+        "count": 1,
+        "power": 10,
+        "cooldownSeconds": 0.8,
+        "size": 9,
+        "range": 320,
+        "durationSeconds": 0.45
+      },
+      "levels": [
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1,
+          "count": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1,
+          "count": 1
+        },
+        {
+          "power": 1
+        }
+      ]
+    },
     "psystrike": {
       "pattern": "homing",
       "effect": "psystrike",

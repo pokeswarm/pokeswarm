@@ -1951,6 +1951,15 @@ export const moveDefSchema = z.object({
   calmMind: z.object({ specialPowerPct: z.number().positive(), maxStacks: z.number().int().positive() }).optional(),
   /** びりびり（エレキフィールド。ライコウ。07 の310章）: 当たるたびに敵に 1 つ重ねる（maxStacks まで）。当たらないまま seconds 経つと消える。重ねきった敵は ライジングボルト のコンボの相手 */
   shockStack: z.object({ maxStacks: z.number().int().positive(), seconds: z.number().positive() }).optional(),
+  /**
+   * しもやけ（フリーザー。07 の314章）: 当たるたびに敵に 1 つ重ねる（maxStacks まで。どのブラウザでも同じように数える）。当たらないまま seconds 経つと消える。
+   * 1 つにつき敵の動きが slowPctPerStack % 遅くなる。frostCombo もある技では、地面に残る線（stage 1）だけが重ねる
+   */
+  frostStack: z.object({ maxStacks: z.number().int().positive(), seconds: z.number().positive(), slowPctPerStack: z.number().min(0).max(100) }).optional(),
+  /** フリーズドライ（07 の314章）: 氷のとげ（stage 0）が しもやけ を重ねきった自分の相手に当たると、威力 × multiplier・freezeSeconds の間 氷漬け（こおり。重ねは消える） */
+  frostCombo: z.object({ multiplier: z.number().positive(), freezeSeconds: z.number().positive() }).optional(),
+  /** 進む当たりでも障害物で消えない（ふぶき の帯は岩の上を吹き抜ける。07 の314章） */
+  passObstacles: z.boolean().optional(),
   /** HP が最大の thresholdPct % 以下の敵へのダメージを +powerPct %（しおみず: 半分を切った相手に倍。原作どおり。07 の247章） */
   lowHpBonus: z.object({ thresholdPct: z.number().positive().max(100), powerPct: z.number().positive() }).optional(),
   /**
@@ -2989,13 +2998,20 @@ export type AbilitiesConfig = z.infer<typeof abilitiesConfigSchema>;
  *   （delayPerPixel 秒/距離。1 回で同じ敵には 1 回）。割れ目は crackSeconds 残り、中の敵に技の威力の crackPowerPct % ずつ当たる
  * - overheat（オーバーヒート。07 の313章）: 体が赤熱して chargeSeconds 後、向きへ巨大な炎（長さ = 技の range・半径 = 技の size。自分に付いて動く）。
  *   使うと、そのあと debuffSeconds の間 ほのおの技の威力 −debuffPct %（原作の とくこう が下がる）
+ * - freezeDry（フリーズドライ。フリーザー。07 の314章）: 向きへ count 本の霜の線（spreadDegrees ずつ開く。長さは技の range）を走らせ（delayPerPixel 秒/距離）、
+ *   霜が通った spikeDelaySeconds 後に spacing ごとに氷のとげが根元から順に立つ（1 回で同じ敵には 1 回）。霜の線は frostSeconds 残り、
+ *   中の敵に技の威力の frostPowerPct % ずつ当たって しもやけ を重ねる。とげが しもやけ を重ねきった敵に当たると氷漬け（技の frostCombo）
+ * - icyWind（こごえるかぜ。07 の314章）: 向きへ開き spreadDegrees・長さ = 技の range の扇の冷たい風を、技の持続の間 吹かせる（自分に付いて動き、向きを追う）。
+ *   技の hitIntervalSeconds ごとに当たり、しもやけ を重ねる
+ * - blizzard（ふぶき。07 の314章）: 向きの startDistance 先に、幅 width・奥行き = 技の size × 2 の吹雪の帯を出し、技の speed で前へ進める（持続 = 技の durationSeconds）。
+ *   帯の中の敵に hitIntervalSeconds ごとに当たり、しもやけ を重ねる
  */
 export const activeSkillsConfigSchema = z.object({
   keys: z.array(z.string()).min(1),
   skills: z.record(
     z.string(),
     z.object({
-      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed', 'charge', 'risingVoltage', 'eruption', 'lavaPlume', 'overheat']),
+      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed', 'charge', 'risingVoltage', 'eruption', 'lavaPlume', 'overheat', 'freezeDry', 'icyWind', 'blizzard']),
       /** 技の枠の技（moves.json のキー）。あればレベル・再使用・威力はその技の値 */
       move: z.string().optional(),
       trigger: z.enum(['press', 'release']).default('release'),
@@ -3013,6 +3029,9 @@ export const activeSkillsConfigSchema = z.object({
       eruption: z.object({ minCountPct: z.number().min(0).max(100), delaySeconds: z.number().positive(), spreadSeconds: z.number().min(0), areaRadius: z.number().positive(), areaDistance: z.number().positive(), comboMultiplier: z.number().positive(), comboSizeMultiplier: z.number().positive() }).optional(),
       lavaPlume: z.object({ spreadDegrees: z.number().min(0), spacing: z.number().positive(), delayPerPixel: z.number().min(0), crackSeconds: z.number().positive(), crackPowerPct: z.number().min(0) }).optional(),
       overheat: z.object({ chargeSeconds: z.number().min(0), debuffPct: z.number().min(0), debuffSeconds: z.number().min(0) }).optional(),
+      freezeDry: z.object({ spreadDegrees: z.number().min(0), spacing: z.number().positive(), delayPerPixel: z.number().min(0), spikeDelaySeconds: z.number().min(0), frostSeconds: z.number().positive(), frostPowerPct: z.number().min(0) }).optional(),
+      icyWind: z.object({ spreadDegrees: z.number().positive().max(180) }).optional(),
+      blizzard: z.object({ width: z.number().positive(), startDistance: z.number().min(0) }).optional(),
     }),
   ),
 });

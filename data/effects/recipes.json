@@ -2984,6 +2984,70 @@
         }
       }
     },
+    "freeze-dry-articuno": {
+      "extends": "normal.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      }
+    },
+    "icy-wind-articuno": {
+      "extends": "normal.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      }
+    },
+    "blizzard-articuno": {
+      "extends": "normal.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      }
+    },
+    "ice-shard-articuno": {
+      "extends": "normal.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "burst": {
+          "count": 0
+        },
+        "flash": {
+          "alpha": 0
+        }
+      }
+    },
     "psystrike": {
       "extends": "psychic.base",
       "hideShape": true,

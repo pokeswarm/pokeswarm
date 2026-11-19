@@ -2,6 +2,7 @@ import { absorbBarrier, legendWeatherState } from './stage';
 import { abilityEnemySlow } from '../ability';
 import type { World } from '../world';
 import { healPlayer } from './health';
+import { frostSlowMultiplier } from './attack';
 
 /** 状態異常による移動の速さの倍率（かかっているもののうち一番遅いもの） */
 export function speedMultiplier(world: World, i: number): number {
@@ -10,8 +11,8 @@ export function speedMultiplier(world: World, i: number): number {
   for (let s = 0; s < world.statusKinds.length; s++) {
     if (e.hasStatus(i, s)) m = Math.min(m, world.statusKinds[s]!.speedMultiplier);
   }
-  // 特性（ありじごく・かげふみ）: 近くの敵を遅くする
-  return m * abilityEnemySlow(world, i);
+  // 特性（ありじごく・かげふみ）: 近くの敵を遅くする。しもやけ（フリーザー。07 の314章）: 重ねるほど遅くなる
+  return m * abilityEnemySlow(world, i) * frostSlowMultiplier(world, i);
 }
 
 /** 状態異常による、触れたときのダメージの倍率（こうげきダウン。かかっているものを掛け合わせる） */

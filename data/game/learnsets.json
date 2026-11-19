@@ -1420,21 +1420,10 @@
       "shadow-ball"
     ],
     "articuno": [
-      "powder-snow",
-      "gust",
-      "air-cutter",
-      "aurora-beam",
-      "swift",
-      "sheer-cold",
-      "whirlwind",
-      "ice-beam",
-      "blizzard",
-      "peck",
-      "mirror-coat",
-      "aerial-ace",
-      "air-slash",
-      "ice-shard",
-      "dual-wingbeat"
+      "freeze-dry-articuno",
+      "icy-wind-articuno",
+      "blizzard-articuno",
+      "ice-shard-articuno"
     ],
     "zapdos": [
       "thunder-shock",

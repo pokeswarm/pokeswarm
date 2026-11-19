@@ -70,7 +70,7 @@
     "magnemite": { "sprite": "magnemite", "startingMoves": ["thunder-shock"] },
     "mewtwo": { "sprite": "mewtwo", "startingMoves": ["confusion", "psybeam", "recover", "future-sight"], "fixedMoves": true, "activeSkills": ["teleport"] },
     "mew": { "sprite": "mew", "startingMoves": ["mimic"], "allMoveTypes": true },
-    "articuno": { "sprite": "articuno", "startingMoves": ["powder-snow"] },
+    "articuno": { "sprite": "articuno", "startingMoves": ["freeze-dry-articuno", "icy-wind-articuno", "blizzard-articuno", "ice-shard-articuno"], "fixedMoves": true, "activeSkills": ["freeze-dry-articuno", "icy-wind-articuno", "blizzard-articuno"] },
     "zapdos": { "sprite": "zapdos", "startingMoves": ["thunder-shock"] },
     "moltres": { "sprite": "moltres", "startingMoves": ["peck"] },
     "raikou": { "sprite": "raikou", "startingMoves": ["extreme-speed-raikou", "charge-raikou", "rising-voltage-raikou", "electric-terrain-raikou"], "fixedMoves": true, "activeSkills": ["extreme-speed-raikou", "charge-raikou", "rising-voltage-raikou"] },

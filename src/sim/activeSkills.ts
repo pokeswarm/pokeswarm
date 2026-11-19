@@ -1,7 +1,7 @@
 import type { Player, PlayerMove } from './entities/player';
 import type { SimActiveSkill } from './rules';
 import type { World } from './world';
-import { eruptionCenter, extremeSpeedPath, fireEnteiEruption, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
+import { eruptionCenter, extremeSpeedPath, fireBlizzard, fireEnteiEruption, fireFreezeDry, fireIcyWind, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
 
 /**
  * アクティブスキル（作者の案 2026年11月18日。07 の305・307章）: キー（SPACE・Q・E）で使う技。
@@ -191,6 +191,19 @@ export function overheatReach(world: World, p: Player, skill: number): { length:
   return { length: st.range, radius: sc.size };
 }
 
+/**
+ * フリーザーの技の狙い（押している間に見せる。07 の314章）: フリーズドライ は霜の線の長さと向きの開き、ふぶき は帯の幅・奥行き・進む距離
+ */
+export function articunoReach(world: World, p: Player, skill: number): { length: number; spreadDegrees: number; count: number; width: number; depth: number; start: number } | null {
+  const pm = skillMove(world, p, { skill });
+  const d = skillDef(world, skill);
+  if (!pm) return null;
+  const { st, sc } = skillMoveStats(world, p, pm);
+  if (d.freezeDry) return { length: st.range, spreadDegrees: d.freezeDry.spreadDegrees, count: Math.max(1, st.count), width: 0, depth: 0, start: 0 };
+  if (d.blizzard) return { length: d.blizzard.startDistance + sc.speed * st.durationSeconds, spreadDegrees: 0, count: 1, width: d.blizzard.width, depth: sc.size * 2, start: d.blizzard.startDistance };
+  return null;
+}
+
 /** じゅうでん の 1 つ分の威力（%） */
 export function chargePct(world: World, p: Player, skill: number): number {
   const d = skillDef(world, skill);
@@ -297,6 +310,21 @@ function runSkill(world: World, p: Player, d: SimActiveSkill, pm: PlayerMove | u
     case 'overheat': {
       if (!pm || !d.overheat) return;
       fireOverheat(world, p, pm, dx, dy, d.overheat);
+      return;
+    }
+    case 'freezeDry': {
+      if (!pm || !d.freezeDry) return;
+      fireFreezeDry(world, p, pm, dx, dy, d.freezeDry);
+      return;
+    }
+    case 'icyWind': {
+      if (!pm || !d.icyWind) return;
+      fireIcyWind(world, p, pm, dx, dy, d.icyWind);
+      return;
+    }
+    case 'blizzard': {
+      if (!pm || !d.blizzard) return;
+      fireBlizzard(world, p, pm, dx, dy, d.blizzard);
       return;
     }
     case 'mirrorCoat': {

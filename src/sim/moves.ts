@@ -163,6 +163,12 @@ export interface SimMoveDef {
   readonly calmMind?: { readonly specialPowerPct: number; readonly maxStacks: number };
   /** びりびり（エレキフィールド。07 の310章） */
   readonly shockStack?: { readonly maxStacks: number; readonly seconds: number };
+  /** しもやけ（フリーザー。07 の314章） */
+  readonly frostStack?: { readonly maxStacks: number; readonly seconds: number; readonly slowPctPerStack: number };
+  /** フリーズドライ: しもやけを重ねきった相手に当たると氷漬け（07 の314章） */
+  readonly frostCombo?: { readonly multiplier: number; readonly freezeSeconds: number };
+  /** 進む当たりでも障害物で消えない（ふぶき。07 の314章） */
+  readonly passObstacles?: boolean;
   /** HP が最大の thresholdPct % 以下の敵へのダメージを +powerPct %（しおみず。07 の247章） */
   readonly lowHpBonus?: { readonly thresholdPct: number; readonly powerPct: number };
   /** 続けて当てるほど強くなる（エコーボイス。07 の240章） */

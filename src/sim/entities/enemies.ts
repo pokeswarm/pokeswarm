@@ -61,6 +61,12 @@ export class EnemyStore {
   readonly shock: Uint8Array;
   readonly shockTicks: Uint16Array;
   readonly shockBy: Uint16Array;
+  /**
+   * しもやけ（フリーザー。07 の314章）: 重ねた数（FROST_ENCASED は氷漬け）・消えるまでの残りの更新回数・重ねたプレイヤー。どのブラウザでも同じように数える
+   */
+  readonly frost: Uint8Array;
+  readonly frostTicks: Uint16Array;
+  readonly frostBy: Uint16Array;
 
   constructor(
     readonly capacity: number,
@@ -102,6 +108,9 @@ export class EnemyStore {
     this.shock = new Uint8Array(capacity);
     this.shockTicks = new Uint16Array(capacity);
     this.shockBy = new Uint16Array(capacity);
+    this.frost = new Uint8Array(capacity);
+    this.frostTicks = new Uint16Array(capacity);
+    this.frostBy = new Uint16Array(capacity);
   }
 
   /** 追加して index を返す。満杯なら -1 */
@@ -130,6 +139,8 @@ export class EnemyStore {
     this.markTicks[i] = 0;
     this.shock[i] = 0;
     this.shockTicks[i] = 0;
+    this.frost[i] = 0;
+    this.frostTicks[i] = 0;
     return i;
   }
 
@@ -177,6 +188,9 @@ export class EnemyStore {
     this.shock[i] = this.shock[last]!;
     this.shockTicks[i] = this.shockTicks[last]!;
     this.shockBy[i] = this.shockBy[last]!;
+    this.frost[i] = this.frost[last]!;
+    this.frostTicks[i] = this.frostTicks[last]!;
+    this.frostBy[i] = this.frostBy[last]!;
     const n = this.statusCount;
     this.statusTicks.copyWithin(i * n, last * n, (last + 1) * n);
     this.statusBy.copyWithin(i * n, last * n, (last + 1) * n);

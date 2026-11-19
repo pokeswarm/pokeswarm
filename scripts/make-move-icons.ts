@@ -458,6 +458,88 @@ function sacredFireEnteiIcon(): Draw {
   });
 }
 
+/** フリーズドライ（フリーザーの版。07 の314章）: 下から 2 本、少し開いて走る霜の線と、線に沿って立つ氷のとげ */
+function freezeDryArticunoIcon(): Draw {
+  return paint((x, y) => {
+    for (const a of [-0.28, 0.28]) {
+      const dx = Math.sin(a);
+      const dy = -Math.cos(a);
+      const t = (x - 16) * dx + (y - 29) * dy;
+      if (t < 0 || t > 25) continue;
+      const side = -(x - 16) * dy + (y - 29) * dx;
+      // とげ（線の上に 3 本ずつ。先がとがる）
+      for (const at of [7, 14, 21]) {
+        const h = 7 - Math.abs(t - at) * 2.4;
+        if (h > 0 && side < 0.6 && side > -h) return side > -h * 0.5 ? '#e3f6ff' : '#9fd8f5';
+      }
+      if (Math.abs(side) < 0.8) return '#ffffff';
+      if (Math.abs(side) < 1.8) return '#7ec8ee';
+    }
+    return null;
+  });
+}
+
+/** こごえるかぜ（フリーザーの版）: 左下から右上へ扇に開いて流れる雪の筋 */
+function icyWindArticunoIcon(): Draw {
+  return paint((x, y) => {
+    const dx = x - 3;
+    const dy = 29 - y;
+    const r = Math.hypot(dx, dy);
+    const a = Math.atan2(dy, dx);
+    if (r < 4 || r > 28 || a < 0.15 || a > 1.42) return null;
+    // 筋（角度ごとに 4 本。外ほど切れ切れ）
+    const band = ((a - 0.15) / 1.27) * 4;
+    const f = band - Math.floor(band);
+    if (Math.abs(f - 0.5) < 0.14 && (Math.floor(r / 3) + Math.floor(band)) % 3 !== 0) return r > 20 ? '#e3f6ff' : '#ffffff';
+    if ((Math.floor(x) * 7 + Math.floor(y) * 3) % 23 === 0) return '#9fd8f5';
+    return null;
+  });
+}
+
+/** ふぶき（フリーザーの版）: 前へ進む吹雪の帯（横に長い雪の壁）と、吹き付ける雪の粒 */
+function blizzardArticunoIcon(): Draw {
+  return paint((x, y) => {
+    const edge = 11 + Math.sin(x * 0.7) * 1.5;
+    const back = 21 + Math.sin(x * 0.5 + 1) * 1.5;
+    if (x >= 3 && x <= 28 && y >= edge && y <= back) {
+      const k = (y - edge) / (back - edge);
+      if ((Math.floor(x) + Math.floor(y) * 2) % 5 === 0) return '#ffffff';
+      return k < 0.35 ? '#e3f6ff' : k < 0.75 ? '#b3e5fc' : '#6fb8e0';
+    }
+    // 前へ飛ぶ雪の粒
+    if (y < edge && y > 3 && (Math.floor(x) * 5 + Math.floor(y) * 3) % 11 === 0) return '#e3f6ff';
+    return null;
+  });
+}
+
+/** こおりのつぶて（フリーザーの版）: 右上へ飛ぶ小さなつらら 2 本 */
+function iceShardArticunoIcon(): Draw {
+  const shard = (x: number, y: number, ax: number, ay: number, len: number): string | null => {
+    const dx = 0.707;
+    const dy = -0.707;
+    const t = (x - ax) * dx + (y - ay) * dy;
+    if (t < 0 || t > len) return null;
+    const side = -(x - ax) * dy + (y - ay) * dx;
+    const w = 2.6 * (1 - t / len) + 0.4;
+    if (Math.abs(side) > w) return null;
+    return side < -w * 0.3 ? '#ffffff' : side < w * 0.4 ? '#b3e5fc' : '#6fb8e0';
+  };
+  return paint((x, y) => shard(x, y, 24, 8, -14) ?? shard(x, y, 18, 26, -1) ?? shard2(x, y));
+  function shard2(x: number, y: number): string | null {
+    const dx = 0.707;
+    const dy = -0.707;
+    for (const [ax, ay, len] of [[5, 21, 16], [12, 28, 12]] as const) {
+      const t = (x - ax) * dx + (y - ay) * dy;
+      if (t < 0 || t > len) continue;
+      const side = -(x - ax) * dy + (y - ay) * dx;
+      const w = 2.8 * (t / len) + 0.3;
+      if (Math.abs(side) > w) continue;
+      return side < -w * 0.3 ? '#ffffff' : side < w * 0.4 ? '#b3e5fc' : '#6fb8e0';
+    }
+    return null;
+  }
+}
+
 /** しんそく（ライコウの版）: 3 回折れて駆け抜ける稲妻の道と、その先の光 */
 function extremeSpeedRaikouIcon(): Draw {
   const pts: [number, number][] = [[4, 26], [12, 14], [17, 22], [27, 6]];
@@ -918,6 +1000,10 @@ const ICONS: Record<string, Layer[]> = {
   'lava-plume-entei': [lavaPlumeEnteiIcon()],
   'overheat-entei': [overheatEnteiIcon()],
   'sacred-fire-entei': [sacredFireEnteiIcon()],
+  'freeze-dry-articuno': [freezeDryArticunoIcon()],
+  'icy-wind-articuno': [icyWindArticunoIcon()],
+  'blizzard-articuno': [blizzardArticunoIcon()],
+  'ice-shard-articuno': [iceShardArticunoIcon()],
   // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
   sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],
   // かたくなる: 体の表面が硬い板になる

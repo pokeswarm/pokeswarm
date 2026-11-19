@@ -1987,7 +1987,7 @@ export function moveProjectiles(world: World): void {
     if (pr.stage[i] === 2 || world.rules.moves[pr.move[i]!]!.harmless) continue;
     tickEveryEffects(world, i);
     // 障害物は技も遮る（飛んでいく技は当たると消える）。跳ね返る技（ボルテッカー）は枠の端で跳ね返り続けるので、障害物は通り抜ける
-    if ((motion === MOTION_HOMING || motion === MOTION_BOOMERANG || motion === MOTION_LOB || motion === MOTION_SNAKE || (motion === MOTION_LINEAR && (pr.vx[i] !== 0 || pr.vy[i] !== 0))) && insideObstacle(world, pr.x[i]!, pr.y[i]!)) {
+    if ((motion === MOTION_HOMING || motion === MOTION_BOOMERANG || motion === MOTION_LOB || motion === MOTION_SNAKE || (motion === MOTION_LINEAR && (pr.vx[i] !== 0 || pr.vy[i] !== 0))) && !world.rules.moves[pr.move[i]!]!.passObstacles && insideObstacle(world, pr.x[i]!, pr.y[i]!)) {
       world.events.push({ type: 'projectileHit', x: pr.x[i]!, y: pr.y[i]!, owner: pr.owner[i]!, move: pr.move[i]! });
       expire(world, i);
       continue;
@@ -2101,6 +2101,8 @@ export function moveProjectiles(world: World): void {
         e.markDamage[j] = e.markDamage[j]! + pr.damage[i]! * def.delayedBlast.powerMultiplier;
         e.markSize[j] = Math.max(e.markSize[j]!, pr.radius[i]! * def.delayedBlast.sizeMultiplier);
       }
+      // しもやけ（フリーザー。07 の314章）: どのブラウザでも同じように重ね、フリーズドライ のとげが重ねきった相手に当たったら氷漬け
+      const frozeSolid = def.frostStack || def.frostCombo ? frostOnHit(world, j, def, pr.stage[i]!, ownerId) : false;
       if (pr.stage[i] === 0 && !pr.noFx[i] && def.effects.some((fx) => fx.trigger === 'eachHit')) fireEffects(world, 'eachHit', fxSourceOf(world, i, e.x[j]!, e.y[j]!));
       // ころがる: 当たるたびに大きくなる（どのブラウザでも同じように）
       if (def.growOnHit) pr.radius[i] = Math.min(st.size * def.growOnHit.maxMultiplier, pr.radius[i]! + st.size * def.growOnHit.perHit);
@@ -2119,6 +2121,7 @@ export function moveProjectiles(world: World): void {
       // 押し出しの踏ん張り（引き寄せは数えない）
       const pushKb = Number.isNaN(pr.knockback[i]!) ? st.knockback : pr.knockback[i]!;
       if (fx.kbTicks > 0 && pushKb > 0) fx = knockbackFatigue(world, j, fx);
+      if (frozeSolid) fx = { ...fx, status: world.statusKinds.findIndex((s) => s.id === 'freeze'), statusTicks: Math.max(1, Math.round(def.frostCombo!.freezeSeconds / world.dt)) };
       applyHitEffect(world, j, fx, ownerId);
       const kind = world.rules.enemies.kinds[e.kind[j]!];
       // 急所（クリティカットなど・技ごとの急所）の判定は、当てたプレイヤーのブラウザの乱数で行う
@@ -2143,6 +2146,7 @@ export function moveProjectiles(world: World): void {
           statusBonus *
           lowHpBonus *
           lockOnBonus *
+          (frozeSolid ? def.frostCombo!.multiplier : 1) *
           (idle ? def.idleScale!.power : 1);
       // ダメージの数字（設定でオンのときだけ。一撃は出さない）
       if (world.damageNumbers && !instakill && amount > 0) {
@@ -2275,6 +2279,8 @@ export function tickMarks(world: World): void {
   const e = world.enemies;
   // びりびり: 当たらないまま時間が経つと消える。エレキフィールドの中で重なる
   for (let i = 0; i < e.count; i++) if (e.shockTicks[i]! > 0 && --e.shockTicks[i]! === 0) e.shock[i] = 0;
+  // しもやけ・氷漬け: 時間が来ると消える
+  for (let i = 0; i < e.count; i++) if (e.frostTicks[i]! > 0 && --e.frostTicks[i]! === 0) e.frost[i] = 0;
   stepElectricField(world);
   for (let i = 0; i < e.count; i++) {
     if (e.markTicks[i] === 0) continue;
@@ -2921,4 +2927,128 @@ export function fireOverheat(world: World, p: Player, pm: PlayerMove, dirX: numb
   world.projectiles.add({ ...b0, motion: MOTION_FOLLOW, x: p.x, y: p.y, ox: 0, oy: 0, shape: SHAPE_LINE, length: st.range, dirX, dirY, life: Math.max(world.dt, cfg.chargeSeconds), stage: 3, armStage: 0, armLife: st.durationSeconds });
   const def = world.rules.moves[pm.move]!;
   p.overheat = { type: def.type, pct: cfg.debuffPct, fromTick: world.tick, untilTick: world.tick + Math.round((cfg.chargeSeconds + st.durationSeconds + cfg.debuffSeconds) / world.dt) };
+}
+
+/** しもやけ の、氷漬けの印（重ねた数の代わりに入れる。07 の314章） */
+export const FROST_ENCASED = 255;
+
+const frostDefCache = new WeakMap<object, { maxStacks: number; seconds: number; slowPctPerStack: number } | null>();
+
+/** しもやけ の決まり（最初に frostStack を持つ技の値。無ければ null） */
+export function frostDef(world: World): { maxStacks: number; seconds: number; slowPctPerStack: number } | null {
+  const ms = world.rules.moves;
+  let d = frostDefCache.get(ms);
+  if (d === undefined) {
+    const m = ms.find((x) => x.frostStack);
+    d = m?.frostStack ? { ...m.frostStack } : null;
+    frostDefCache.set(ms, d);
+  }
+  return d;
+}
+
+/** しもやけ を重ねきった数（無ければ 0） */
+export function frostFull(world: World): number {
+  return frostDef(world)?.maxStacks ?? 0;
+}
+
+/**
+ * 当たった敵の しもやけ（どのブラウザでも同じように）: frostCombo の技のとげ（stage 0）は、自分が重ねきった相手を氷漬けにする（返り値 true）。
+ * それ以外の frostStack の技は 1 つ重ねる（氷漬けの間は重ねない）
+ */
+function frostOnHit(world: World, j: number, def: World['rules']['moves'][number], stage: number, by: number): boolean {
+  const e = world.enemies;
+  if (def.frostCombo && stage === 0) {
+    const full = frostFull(world);
+    if (full > 0 && e.frost[j] !== FROST_ENCASED && e.frost[j]! >= full && e.frostBy[j] === by) {
+      e.frost[j] = FROST_ENCASED;
+      e.frostTicks[j] = Math.max(1, Math.round(def.frostCombo.freezeSeconds / world.dt));
+      return true;
+    }
+    return false;
+  }
+  if (!def.frostStack || e.frost[j] === FROST_ENCASED) return false;
+  e.frost[j] = Math.min(def.frostStack.maxStacks, e.frost[j]! + 1);
+  e.frostTicks[j] = Math.max(1, Math.round(def.frostStack.seconds / world.dt));
+  e.frostBy[j] = by;
+  return false;
+}
+
+/** しもやけ で遅くなる倍率（1 つにつき slowPctPerStack %） */
+export function frostSlowMultiplier(world: World, i: number): number {
+  const n = world.enemies.frost[i]!;
+  if (n === 0 || n === FROST_ENCASED) return 1;
+  const d = frostDef(world);
+  return d ? Math.max(0, 1 - (d.slowPctPerStack * n) / 100) : 1;
+}
+
+/** 固定マップの中に収まる、向き (dx, dy) の線の長さ（固定マップが無ければ len のまま） */
+function clipToArena(world: World, x: number, y: number, dx: number, dy: number, len: number): number {
+  const ar = world.arena;
+  if (!ar) return len;
+  for (let d = 0; d <= len; d += 10) {
+    if (Math.abs(x + dx * d - ar.x) > ar.halfWidth || Math.abs(y + dy * d - ar.y) > ar.halfHeight) return Math.max(0, d - 10);
+  }
+  return len;
+}
+
+/**
+ * フリーズドライ（フリーザー。07 の314章）: 向きへ count 本の霜の線を走らせ、霜が通った spikeDelaySeconds 後に、根元から順に氷のとげを立てる（1 回で同じ敵には 1 回）。
+ * 霜の線（同じ技の線。stage 1）は frostSeconds 残り、中の敵に少しずつ当たって しもやけ を重ねる
+ */
+export function fireFreezeDry(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { spreadDegrees: number; spacing: number; delayPerPixel: number; spikeDelaySeconds: number; frostSeconds: number; frostPowerPct: number }): void {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const n = Math.max(1, st.count);
+  const group = newCastGroup(world, st.range * cfg.delayPerPixel + cfg.spikeDelaySeconds + st.durationSeconds);
+  const b0 = base(world, p, pm, st);
+  const heading = Math.atan2(dirY, dirX);
+  for (let c = 0; c < n; c++) {
+    const a = heading + ((c - (n - 1) / 2) * cfg.spreadDegrees * Math.PI) / 180;
+    const dx = Math.cos(a);
+    const dy = Math.sin(a);
+    const len = clipToArena(world, p.x, p.y, dx, dy, st.range);
+    for (let d = cfg.spacing * 0.6; d <= len; d += cfg.spacing) {
+      world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: p.x + dx * d, y: p.y + dy * d, group, life: Math.max(world.dt, d * cfg.delayPerPixel + cfg.spikeDelaySeconds), stage: 3, armStage: 0, armLife: st.durationSeconds });
+    }
+    if (len > 10) {
+      world.projectiles.add({
+        ...b0,
+        motion: MOTION_LINEAR,
+        x: p.x,
+        y: p.y,
+        shape: SHAPE_LINE,
+        length: len,
+        dirX: dx,
+        dirY: dy,
+        radius: sc.size * 0.5,
+        damage: (sc.power * cfg.frostPowerPct) / 100,
+        hitIntervalTicks: Math.round(0.5 / world.dt),
+        knockback: 0,
+        life: world.dt,
+        stage: 3,
+        armStage: 1,
+        armLife: cfg.frostSeconds,
+      });
+    }
+  }
+}
+
+/** こごえるかぜ（07 の314章）: 向きへ扇の冷たい風（自分に付いて動き、向きを追う。技の hitIntervalSeconds ごとに当たる） */
+export function fireIcyWind(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { spreadDegrees: number }): void {
+  const { st } = skillMoveStats(world, p, pm);
+  const half = (cfg.spreadDegrees * Math.PI) / 360;
+  world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_FOLLOW, x: p.x, y: p.y, radius: st.range, shape: SHAPE_SECTOR, length: half, dirX, dirY, vx: dirX, vy: dirY });
+}
+
+/**
+ * ふぶき（07 の314章）: 向きの startDistance 先に、幅 width・奥行き 技の size × 2 の吹雪の帯（向きに直角な線）を出し、技の speed で前へ進める。
+ * 岩の上も吹き抜ける。帯の中の敵に hitIntervalSeconds ごとに当たる
+ */
+export function fireBlizzard(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { width: number; startDistance: number }): void {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const px = -dirY;
+  const py = dirX;
+  const cx = p.x + dirX * cfg.startDistance;
+  const cy = p.y + dirY * cfg.startDistance;
+  const half = cfg.width / 2;
+  world.projectiles.add({ ...base(world, p, pm, st), motion: MOTION_LINEAR, x: cx - px * half, y: cy - py * half, shape: SHAPE_LINE, length: cfg.width, dirX: px, dirY: py, radius: sc.size, vx: dirX * sc.speed, vy: dirY * sc.speed });
 }

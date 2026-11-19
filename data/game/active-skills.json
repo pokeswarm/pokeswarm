@@ -130,6 +130,42 @@
         "debuffPct": 30,
         "debuffSeconds": 4
       }
+    },
+    "freeze-dry-articuno": {
+      "kind": "freezeDry",
+      "move": "freeze-dry-articuno",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "freezeDry": {
+        "spreadDegrees": 14,
+        "spacing": 40,
+        "delayPerPixel": 0.0009,
+        "spikeDelaySeconds": 0.2,
+        "frostSeconds": 3,
+        "frostPowerPct": 5
+      }
+    },
+    "icy-wind-articuno": {
+      "kind": "icyWind",
+      "move": "icy-wind-articuno",
+      "trigger": "press",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "icyWind": {
+        "spreadDegrees": 70
+      }
+    },
+    "blizzard-articuno": {
+      "kind": "blizzard",
+      "move": "blizzard-articuno",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "blizzard": {
+        "width": 320,
+        "startDistance": 70
+      }
     }
   }
 }

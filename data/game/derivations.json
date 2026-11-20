@@ -616,6 +616,15 @@
       ]
     },
     {
+      "from": "fire-fang",
+      "item": "charcoal",
+      "to": "temper-flare",
+      "line": "eevee",
+      "forms": [
+        "flareon"
+      ]
+    },
+    {
       "from": "body-slam",
       "item": "hp-up",
       "to": "giga-impact",

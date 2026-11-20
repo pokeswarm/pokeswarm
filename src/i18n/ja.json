@@ -835,6 +835,8 @@
   "info.hpCost": "つかうたびに さいだいHPの {pct}% の ダメージを うける（HP が {min}% より すくないと ださない）",
   "info.hpRecoil": "あいてに あたると はんどうで さいだいHPの {pct}% の ダメージを うける（はずれたら うけない。HP が {min}% より すくないと ださない）",
   "info.selfBuff": "つかうと {seconds}秒の あいだ:",
+  "info.hitBuff": "当てるたびに 重なる（最大 {n}回。{seconds}秒 当てないと 消える）。1回につき:",
+  "info.hurtPower": "ダメージを受けてから {seconds}秒の あいだ、威力 {v}倍（やけになる）",
   "info.passive": "おぼえている あいだ いつも きく:",
   "info.passiveTypeScaled": "{type}の技の威力の強化（持ち物など）が、この効果に掛かる",
   "info.hurtBuff": "ダメージを うけてから {seconds}秒の あいだ:",

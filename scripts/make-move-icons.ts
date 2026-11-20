@@ -1536,6 +1536,10 @@ const ICONS: Record<string, Layer[]> = {
     { art: 'speed-streak', k: 0.8, x: 10, y: 17 },
     { art: 'electro-ball', frame: 0, k: 0.5, x: 20, y: 15 },
   ],
+  // ニトロチャージ: 炎をまとって右上へ突っ込む体（ゲームの絵。07 の328章）
+  'flame-charge': [{ art: 'nitro-wrap', frame: 0, k: 0.47, x: 16, y: 16.5, rot: -35 }],
+  // ★やけっぱち: 前へ叩きつける荒れた爆炎（ゲームの絵）
+  'temper-flare': [{ art: 'temper-blast', frame: 1, k: 0.5, x: 16.5, y: 16, rot: -30 }],
   agility: [
     { art: 'charge-streak', frame: 1, k: 0.85, x: 14, y: 10 },
     { art: 'charge-streak', frame: 1, k: 0.85, x: 18, y: 22 },

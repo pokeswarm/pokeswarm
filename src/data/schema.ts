@@ -1825,6 +1825,16 @@ export const moveDefSchema = z.object({
    * 受け直すと時間が戻る
    */
   hurtBuff: z.object({ seconds: z.number().positive() }).optional(),
+  /**
+   * 攻撃の技に hurtBuff を付けたとき: ダメージを受けてから hurtBuff.seconds 秒の間、威力を power 倍・大きさを size 倍にする
+   * （★やけっぱち（ブースター）: やけになって 2 倍。07 の328章）
+   */
+  hurtPower: z.object({ power: z.number().positive(), size: z.number().positive().default(1) }).optional(),
+  /**
+   * 当てるたびに自分を強くする（ニトロチャージ。07 の328章）: 1 回使って敵に当たると 1 つ重ねる（maxStacks まで）。
+   * 1 つにつき mods。当てるたびに seconds 秒に戻り、当てないまま seconds 経つと全部消える
+   */
+  hitBuff: z.object({ seconds: z.number().positive(), maxStacks: z.number().int().positive(), mods: modifierSchema }).optional(),
   /** 射程の強化（ズームレンズ）の効き方の倍率（ねんりき: 0.5 で半分だけ伸びる）。省略で 1 */
   rangeBonusScale: z.number().nonnegative().optional(),
   /**

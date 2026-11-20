@@ -134,11 +134,25 @@ export function speedBonusOf(p: Player): number {
   return Math.max(0, (p.speedFactor ?? 1) - 1);
 }
 
+/** 当てるたびに重なる強化を 1 つ重ねる（maxStacks まで）。時間は seconds に戻す（ニトロチャージ。07 の328章） */
+function addHitBuff(world: World, p: Player, move: number, buff: NonNullable<SimMoveDef['hitBuff']>): void {
+  const ticks = Math.max(1, Math.round(buff.seconds / world.dt));
+  const had = p.moveBuffs?.find((b) => b.move === move);
+  if (had) {
+    had.ticksLeft = ticks;
+    if ((had.stacks ?? 0) >= buff.maxStacks) return;
+    had.stacks = (had.stacks ?? 0) + 1;
+  } else p.moveBuffs = [...(p.moveBuffs ?? []), { move, ticksLeft: ticks, stacks: 1 }];
+  recomputeModifiers(world, p);
+}
+
 /** 持ち物の効果を掛けた、その技の威力・大きさ・速さ・クールダウン */
 export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: MoveStats) {
   const def = world.rules.moves[pm.move]!;
   const m = p.mods;
   const fast = def.speedScale ? speedBonusOf(p) : 0;
+  // ★やけっぱち: ダメージを受けてからしばらく、威力と大きさが上がる（07 の328章）
+  const temper = def.hurtPower && p.moveBuffs?.some((b) => b.move === pm.move) ? def.hurtPower : undefined;
   // 特性: HP が少ない間だけ威力が上がる（しんりょく など。07 の133章）
   const pinch = pinchMods(world, p);
   // じしんかじょう: 倒すたびに重なる物理の威力
@@ -157,8 +171,9 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
       // とっておき: 覚えているほかの技が多いほど強い
       (1 + (st.perMovePowerPct * Math.max(0, p.moves.length - 1)) / 100) *
       // エレキボール: 速いほど強い（07 の325章）
-      (1 + (def.speedScale?.power ?? 0) * fast),
-    size: st.size * Math.max(0.1, 1 + (m.areaPct + typeAreaPctOf(m, def)) / 100) * (1 + (def.speedScale?.size ?? 0) * fast),
+      (1 + (def.speedScale?.power ?? 0) * fast) *
+      (temper?.power ?? 1),
+    size: st.size * Math.max(0.1, 1 + (m.areaPct + typeAreaPctOf(m, def)) / 100) * (1 + (def.speedScale?.size ?? 0) * fast) * (temper?.size ?? 1),
     speed: st.speed * Math.max(0.1, 1 + m.projectileSpeedPct / 100),
     cooldownSeconds: st.cooldownSeconds * Math.max(0.2, 1 + m.cooldownPct / 100),
   };
@@ -2122,6 +2137,8 @@ export function moveProjectiles(world: World): void {
       if (pr.struck[i] === 0 || bossHit) pr.struck[i] = e.id[j]! + 1;
       // 反動の技（すてみタックル など）: その 1 回で最初に敵に当たったときに、自分が反動を受ける（本人のブラウザで。07 の269章）
       if (firstStrike && local && pr.stage[i] === 0 && def.hpCost?.onHit && owner) selfDamage(world, owner, (owner.maxHp * def.hpCost.pct) / 100);
+      // 当てるたびに重なる強化（ニトロチャージ: 当てるたびに速くなる。どのブラウザでも同じように重ねる。07 の328章）
+      if (firstStrike && pr.stage[i] === 0 && def.hitBuff && owner) addHitBuff(world, owner, pr.move[i]!, def.hitBuff);
       // 雑魚は貫通し、ボス・中ボスで止まる（ラスターカノン: そこで弾ける）
       if (bossHit && pr.stage[i] === 0 && def.stopOnBoss) pr.pierceLeft[i] = 0;
       // 途中の敵は貫通し、狙った敵で止まる（サイコブレイク: そこで弾ける。07 の305章）

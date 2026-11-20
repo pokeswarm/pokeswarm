@@ -187,7 +187,9 @@
     "last-resort-slam": "base",
     "last-resort-burst": "base",
     "doom-desire": "unique",
-    "pin-missile": "derived"
+    "pin-missile": "derived",
+    "flame-charge": "derived",
+    "temper-flare": "unique"
   },
   "strengthScale": {
     "psystrike": 1.7,

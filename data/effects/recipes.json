@@ -1923,6 +1923,20 @@
       "dashPathSprite": { "id": "wild-zigzag", "fit": "line", "size": 1, "seconds": 0.33, "radius": 12 },
       "lightningLine": { "color": "#fffde7", "glowColor": "#ffeb3b", "width": 2.5, "jitter": 3 }
     },
+    "flame-charge": {
+      "extends": "fire.base",
+      "hideShape": true,
+      "projectile": { "glowScale": 0, "coreScale": 0 },
+      "impact": { "flash": { "alpha": 0 }, "burst": { "count": 6, "colors": ["#fff3c4", "#ffb300", "#f4511e"], "lifespanMs": [160, 300], "speed": [60, 160], "scale": [0.55, 0], "alpha": [1, 0], "gravityY": -60, "spread": 6, "blend": "normal" } },
+      "sprite": { "id": "nitro-wrap", "fit": "circle", "size": 1.25, "rotate": "velocity" }
+    },
+    "temper-flare": {
+      "extends": "fire.base",
+      "hideShape": true,
+      "projectile": { "glowScale": 0, "coreScale": 0 },
+      "impact": { "flash": { "alpha": 0 }, "burst": { "count": 8, "colors": ["#fff3c4", "#ffb300", "#f4511e", "#8d2a0b"], "lifespanMs": [180, 340], "speed": [80, 200], "scale": [0.6, 0], "alpha": [1, 0], "gravityY": -80, "spread": 8, "blend": "normal" } },
+      "sprite": { "id": "temper-blast", "fit": "front", "size": 1, "directional": true }
+    },
     "bone-rush": {
       "extends": "ground.base",
       "projectile": {

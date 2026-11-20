@@ -2533,6 +2533,143 @@
         }
       ]
     },
+    "flame-charge": {
+      "pattern": "dash",
+      "effect": "flame-charge",
+      "bonusCountToPower": true,
+      "dash": {
+        "seconds": 0.2,
+        "hit": "path",
+        "hop": 0,
+        "afterimages": 3,
+        "invincible": true
+      },
+      "knockbackAlongFacing": true,
+      "hitBuff": {
+        "seconds": 4,
+        "maxStacks": 3,
+        "mods": {
+          "moveSpeedPct": 8
+        }
+      },
+      "base": {
+        "power": 91.8,
+        "cooldownSeconds": 1.5,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 32,
+        "range": 100,
+        "durationSeconds": 0.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 320,
+        "knockbackSeconds": 0.14,
+        "statusId": "burn",
+        "statusChance": 0.2,
+        "statusSeconds": 3,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "power": 20.9
+        },
+        {
+          "size": 3,
+          "power": 17.6
+        },
+        {
+          "statusChance": 0.1,
+          "power": 20.4
+        },
+        {
+          "range": 12,
+          "power": 14.7
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": 1.3
+        },
+        {
+          "size": 3,
+          "power": 13.1
+        },
+        {
+          "range": 12,
+          "power": 11
+        }
+      ]
+    },
+    "temper-flare": {
+      "pattern": "melee",
+      "effect": "temper-flare",
+      "hurtBuff": {
+        "seconds": 4
+      },
+      "hurtPower": {
+        "power": 2,
+        "size": 1.25
+      },
+      "base": {
+        "power": 236.1,
+        "cooldownSeconds": 1.2,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 400,
+        "size": 66,
+        "range": 14,
+        "durationSeconds": 0.18,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 260,
+        "knockbackSeconds": 0.1,
+        "statusId": "burn",
+        "statusChance": 0.3,
+        "statusSeconds": 3,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "arcDegrees": 0
+      },
+      "levels": [
+        {
+          "size": 4,
+          "power": 32.9
+        },
+        {
+          "power": 38.6
+        },
+        {
+          "size": 4,
+          "power": 30.3
+        },
+        {
+          "statusChance": 0.1,
+          "power": 37.7
+        },
+        {
+          "size": 4,
+          "power": 27.7
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": -18.2
+        },
+        {
+          "size": 4,
+          "power": 22.1
+        }
+      ],
+      "body": {
+        "lungeDistance": 14,
+        "afterimages": 0
+      },
+      "frontBox": {
+        "start": 0.1,
+        "end": 1,
+        "halfWidth": 0.42
+      }
+    },
     "fissure": {
       "pattern": "scatter",
       "effect": "fissure",

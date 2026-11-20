@@ -18,10 +18,10 @@ function setup(region = 'kanto') {
 }
 
 describe('イーブイの進化で技が変わる', () => {
-  it('石で進化すると たいあたり が だくりゅう・ふんえん・ミサイルばり になり、強化の段階は受け継ぐ', () => {
+  it('石で進化すると たいあたり が だくりゅう・ニトロチャージ・ミサイルばり になり、強化の段階は受け継ぐ（ブースターは 07 の328章）', () => {
     for (const [item, to] of [
       ['water-stone', 'muddy-water'],
-      ['fire-stone', 'lava-plume'],
+      ['fire-stone', 'flame-charge'],
       ['thunder-stone', 'pin-missile'],
     ] as const) {
       const s = setup();

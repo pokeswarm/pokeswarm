@@ -814,6 +814,8 @@
   "info.hpCost": "Ogni uso costa il {pct}% dei PS max (non sotto il {min}%)",
   "info.hpRecoil": "Se colpisce, il contraccolpo costa il {pct}% dei PS max (nulla se manca; non sotto il {min}%)",
   "info.selfBuff": "Dopo l’uso, per {seconds} s:",
+  "info.hitBuff": "Si accumula a ogni colpo (fino a {n}; si perde dopo {seconds} s senza colpire). Per ogni accumulo:",
+  "info.hurtPower": "Per {seconds} s dopo aver subito danni, potenza ×{v} (furia)",
   "info.passive": "Sempre attivo finché conosciuta:",
   "info.passiveTypeScaled": "I bonus alle mosse di tipo {type} (strumenti, ecc.) potenziano questo effetto",
   "info.hurtBuff": "Per {seconds} s dopo aver subito danni:",

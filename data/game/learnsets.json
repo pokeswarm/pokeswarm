@@ -1146,6 +1146,12 @@
         "forms": [
           "jolteon"
         ]
+      },
+      {
+        "move": "temper-flare",
+        "forms": [
+          "flareon"
+        ]
       }
     ],
     "doduo": [

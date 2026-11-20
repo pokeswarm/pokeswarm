@@ -814,6 +814,8 @@
   "info.hpCost": "Cada uso cuesta el {pct}% de los PS máx. (no se usa por debajo del {min}%)",
   "info.hpRecoil": "Al acertar, el retroceso cuesta el {pct}% de los PS máx. (nada si falla; no se usa por debajo del {min}%)",
   "info.selfBuff": "Tras usarlo, durante {seconds} s:",
+  "info.hitBuff": "Se acumula cada vez que golpea (hasta {n}; se pierde tras {seconds} s sin golpear). Por cada uno:",
+  "info.hurtPower": "Durante {seconds} s tras recibir daño, potencia ×{v} (temerario)",
   "info.passive": "Siempre activo mientras lo conozcas:",
   "info.passiveTypeScaled": "Las mejoras de movimientos de tipo {type} (objetos, etc.) aumentan este efecto",
   "info.hurtBuff": "Durante {seconds} s tras recibir daño:",

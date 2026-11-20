@@ -566,7 +566,9 @@
     "rising-voltage",
     "electric-terrain",
     "pin-missile",
-    "electro-ball"
+    "electro-ball",
+    "flame-charge",
+    "temper-flare"
   ],
   "items": [
     "x-attack",

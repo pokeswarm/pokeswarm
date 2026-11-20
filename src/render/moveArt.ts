@@ -5388,6 +5388,108 @@ function wildDischarge(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames } };
 }
 
+// ---------------- ブースターの作り直し（07 の328章） ----------------
+/** 炎のゆらめき: 角度 a で 0〜1 に揺れる値（周波数の違う波を重ねて、そろった縞にしない） */
+function flicker(a: number, f: number, seed: number): number {
+  const r = rng(seed);
+  const p1 = r() * 6.28;
+  const p2 = r() * 6.28;
+  const p3 = r() * 6.28;
+  return (Math.sin(a * 5.3 + p1 + f * 1.7) * 0.5 + Math.sin(a * 11.7 + p2 - f * 2.3) * 0.32 + Math.sin(a * 23.1 + p3 + f * 3.1) * 0.18) * 0.5 + 0.5;
+}
+
+/**
+ * ニトロチャージ: 突っ込む体を包む炎（右が前。64 ドット・ふちなし）。前は尖った炎の殻で、ふちから炎の舌がゆらめき、
+ * 後ろへ 3 本の炎の筋がちぎれて流れる。真ん中は空けて、突っ込むポケモンが見える。根元ほど白く熱く、先ほど赤い
+ */
+function nitroWrap(): SpriteOut {
+  // 0 こげ茶・1 赤・2 だいだい・3 黄だいだい・4 黄・5 白
+  const palette = ['#5d1a07', '#c62828', '#ef6c00', '#ffb300', '#fff176', '#fffde7'];
+  const frames = [0, 1, 2].map((f) => {
+    const r = rng(8300 + f * 61);
+    const streams = [-0.36, 0.02, 0.38].map((cy) => ({ cy: cy + (r() - 0.5) * 0.08, len: 0.55 + r() * 0.3, ph: r() * 6.28 }));
+    const embers = Array.from({ length: 7 }, () => [-0.95 + r() * 0.6, (r() - 0.5) * 1.3] as const);
+    return toRows(
+      shape(
+        64,
+        (u, v) => {
+          const d = Math.hypot(u, v);
+          const a = Math.atan2(v, u);
+          // 前の殻（後ろへ回るほど薄く）。内側のふちは体を空ける
+          const front = Math.max(0, Math.cos(a));
+          const inner = 0.5 + 0.06 * front;
+          const outer = inner + (0.12 + 0.3 * front) * (0.55 + 0.45 * flicker(a, f, 8400));
+          if (Math.abs(a) < 2.2 && d >= inner && d <= outer) {
+            const k = (d - inner) / (outer - inner);
+            return k < 0.18 ? 5 : k < 0.38 ? 4 : k < 0.6 ? 3 : k < 0.82 ? 2 : 1;
+          }
+          // 後ろへちぎれて流れる炎の筋（先へ細くなり、途中でちぎれる）
+          if (u < -0.3) {
+            for (const s of streams) {
+              const t = (-0.3 - u) / s.len;
+              if (t > 1) continue;
+              const wob = Math.sin(t * 9 + s.ph + f * 2) * 0.05;
+              const half = 0.09 * (1 - t) + 0.015;
+              const dv = Math.abs(v - s.cy - wob);
+              if (dv > half) continue;
+              if (t > 0.45 && Math.sin(t * 17 + s.ph + f * 3) > 0.55) continue;
+              const k = dv / half;
+              return t < 0.3 ? (k < 0.4 ? 4 : 3) : t < 0.65 ? (k < 0.5 ? 3 : 2) : k < 0.5 ? 2 : 1;
+            }
+          }
+          for (const [ex, ey] of embers) if (Math.hypot(u - ex, v - ey) < 0.03) return f === 2 ? 1 : 3;
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette, frameMs: 60, parts: { main: frames } };
+}
+
+/**
+ * ★やけっぱち: 体から前へ叩きつける荒れた爆炎（右が前・左のふちが体の側。64 ドット・ふちなし。やけのときは半径 100 を超える）。
+ * 舌の長さがばらばらに荒れる炎が前へはじけ、根元ほど白い。3 コマ: 根元で燃え上がる → 前いっぱいにはじける → ちぎれて火の粉と煙だけ残る
+ */
+function temperBlast(): SpriteOut {
+  // 0 すす・1 こげ茶・2 赤・3 だいだい・4 黄・5 白
+  const palette = ['#3e2723', '#5d1a07', '#c62828', '#ef6c00', '#ffb300', '#fffde7'];
+  const frames = [0, 1, 2].map((f) => {
+    const r = rng(8700 + f * 43);
+    const grow = [0.55, 1, 1][f]!;
+    const embers = Array.from({ length: 12 }, () => [-0.4 + r() * 1.35, (r() - 0.5) * 1.6] as const);
+    const smoke = Array.from({ length: 6 }, () => [0.1 + r() * 0.8, (r() - 0.5) * 1.2, 0.05 + r() * 0.06] as const);
+    return toRows(
+      shape(
+        64,
+        (u, v) => {
+          const ox = u + 0.95;
+          const d = Math.hypot(ox, v);
+          const a = Math.atan2(v, ox);
+          if (Math.abs(a) < 0.95 && Math.abs(v) < 0.9) {
+            // 舌の長さ: 真ん中ほど長く、角度でばらばらに荒れる
+            const len = grow * (1.05 + 0.85 * Math.cos(a * 1.4)) * (0.6 + 0.4 * flicker(a * 2.2, f, 8800));
+            const k = d / len;
+            // 最後のコマは、ちぎれて穴が空く
+            if (f === 2) {
+              // 最後のコマ: 根元は燃え尽き、残った炎はちぎれた塊になって暗くなる
+              const torn = k < 0.4 || Math.sin(u * 9.1 + v * 5.3 + 1.2) * Math.sin(u * 4.1 - v * 8.7 + 0.4) > 0.12;
+              if (k <= 1 && !torn) return k < 0.6 ? 3 : k < 0.85 ? 2 : 1;
+            } else if (k <= 1) return k < 0.22 ? 5 : k < 0.42 ? 4 : k < 0.64 ? 3 : k < 0.86 ? 2 : 1;
+          }
+          if (f > 0) for (const [ex, ey] of embers) if (Math.hypot(u - ex, v - ey) < 0.035) return f === 1 ? 4 : 2;
+          if (f === 2) for (const [sx, sy, sr] of smoke) if (Math.hypot(u - sx, v - sy) < sr) return 0;
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette, frameMs: 70, parts: { main: frames } };
+}
+
 // ---------------- ジョウトの技の作り直し（1）ポッポ系統（07 の157章） ----------------
 /**
  * ふきとばし: 扇に引き伸ばす大きな風（縦長 32×36）。太い白い風の帯が 3 本、根元から先へ波打ちながら広がり、
@@ -8234,6 +8336,9 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'electro-burst': electroBurst,
     // 326章
     'wild-zigzag': wildZigzag,
+    // 328章（ブースター）
+    'nitro-wrap': nitroWrap,
+    'temper-blast': temperBlast,
 };
 
 /** 絵の名前の一覧 */

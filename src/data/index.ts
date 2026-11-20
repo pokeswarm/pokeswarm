@@ -453,7 +453,8 @@ for (const d of [...derivationsConfig.derivations, ...derivationsConfig.unique])
 // いつも効く技（passive）: レベルごとの効果の数は、最大レベルと同じ
 for (const [key, m] of Object.entries(movesConfig.moves)) {
   // ダメージを受けると効く技（hurtBuff。リベンジ: 攻撃もする）は、攻撃の技でも passive を書ける（受けてからの時間だけ効く）
-  if (m.pattern === 'passive' || m.hurtBuff) check((m.passive?.length ?? 0) === m.levels.length + 1, `data/game/moves.json の "${key}" はいつも効く技なので、passive の数を最大レベル（${m.levels.length + 1}）にしてください`);
+  // ★やけっぱち（hurtPower）は、自分の威力だけが上がるので passive を書かない（07 の328章）
+  if (m.pattern === 'passive' || (m.hurtBuff && !m.hurtPower)) check((m.passive?.length ?? 0) === m.levels.length + 1, `data/game/moves.json の "${key}" はいつも効く技なので、passive の数を最大レベル（${m.levels.length + 1}）にしてください`);
   else check(!m.passive, `data/game/moves.json の "${key}" の passive は、pattern が passive の技（か hurtBuff のある技）だけに書けます`);
 }
 for (const u of derivationsConfig.unique) {

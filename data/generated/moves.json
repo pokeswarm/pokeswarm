@@ -1156,6 +1156,19 @@
     "contestType": "tough",
     "damageClass": "physical"
   },
+  "flame-charge": {
+    "names": {
+      "ja": "ニトロチャージ",
+      "en": "Flame Charge",
+      "fr": "Nitrocharge",
+      "de": "Nitroladung",
+      "es": "Nitrocarga",
+      "it": "Nitrocarica"
+    },
+    "type": "fire",
+    "contestType": null,
+    "damageClass": "physical"
+  },
   "flame-wheel": {
     "names": {
       "ja": "かえんぐるま",
@@ -3118,6 +3131,19 @@
     "type": "psychic",
     "contestType": "cool",
     "damageClass": "status"
+  },
+  "temper-flare": {
+    "names": {
+      "ja": "やけっぱち",
+      "en": "Temper Flare",
+      "fr": "Indignition",
+      "de": "Frustflamme",
+      "es": "Cólera Ardiente",
+      "it": "Rabbia Bruciante"
+    },
+    "type": "fire",
+    "contestType": null,
+    "damageClass": "physical"
   },
   "thrash": {
     "names": {

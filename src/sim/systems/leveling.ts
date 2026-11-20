@@ -502,6 +502,9 @@ export function recomputeModifiers(world: World, p: Player): void {
   for (const b of p.moveBuffs ?? []) {
     const buff = world.rules.moves[b.move]?.selfBuff;
     if (buff) addModifiers(mods, buff.mods, 1);
+    // 当てるたびに重なる強化（ニトロチャージ。07 の328章）
+    const hit = world.rules.moves[b.move]?.hitBuff;
+    if (hit && b.stacks) addModifiers(mods, hit.mods, b.stacks);
   }
   // いつも効く技（かくばる・テクスチャー）: そのレベルまでの効果
   // タイプの強化が掛かる技（つるぎのまい）は、持ち物・箱の強化まで足した時点のタイプの威力で掛ける（ほかの いつも効く技の分は掛けない）

@@ -90,6 +90,8 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.followFacing ? { followFacing: def.followFacing } : {}),
       ...(def.spinDegPerSec ? { spinDegPerSec: def.spinDegPerSec } : {}),
       ...(def.hurtBuff ? { hurtBuffSeconds: def.hurtBuff.seconds } : {}),
+      ...(def.hurtPower ? { hurtPower: def.hurtPower } : {}),
+      ...(def.hitBuff ? { hitBuff: { seconds: def.hitBuff.seconds, maxStacks: def.hitBuff.maxStacks, mods: resolveModifiers(def.hitBuff.mods, types.names) } } : {}),
       ...(def.passiveScalesWithType ? { passiveScalesWithType: true } : {}),
       ...(def.sweepClap ? { sweepClap: true } : {}),
       ...(def.coinGain ? { coinGain: def.coinGain } : {}),

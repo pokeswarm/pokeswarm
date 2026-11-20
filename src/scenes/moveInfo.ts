@@ -171,6 +171,12 @@ export function moveInfoLines(rules: SimRules, def: SimMoveDef): string[] {
     out.push(t('info.selfBuff', { seconds: def.selfBuff.seconds }));
     out.push(...modifierLinesOf(rules, def.selfBuff.mods).map((l) => `・${l}`));
   }
+  // ニトロチャージ・★やけっぱち（07 の328章）
+  if (def.hitBuff) {
+    out.push(t('info.hitBuff', { n: def.hitBuff.maxStacks, seconds: def.hitBuff.seconds }));
+    out.push(...modifierLinesOf(rules, def.hitBuff.mods).map((l) => `・${l}`));
+  }
+  if (def.hurtPower && def.hurtBuffSeconds) out.push(t('info.hurtPower', { seconds: def.hurtBuffSeconds, v: def.hurtPower.power }));
   const seen = new Set<string>();
   for (const e of def.effects) {
     const line = effectLine(e);

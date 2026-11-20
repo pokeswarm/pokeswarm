@@ -133,6 +133,10 @@ export interface SimMoveDef {
   readonly spinDegPerSec?: number;
   /** passive の効果を、ダメージを受けてからこの秒数の間だけ効かせる（からげんき） */
   readonly hurtBuffSeconds?: number;
+  /** 攻撃の技: ダメージを受けてから hurtBuffSeconds の間、威力・大きさを掛ける（★やけっぱち。07 の328章） */
+  readonly hurtPower?: { readonly power: number; readonly size: number };
+  /** 当てるたびに重なる自分の強化（ニトロチャージ。07 の328章） */
+  readonly hitBuff?: { readonly seconds: number; readonly maxStacks: number; readonly mods: Modifiers };
   /** 射程の強化の効き方の倍率（ねんりき 0.5） */
   readonly rangeBonusScale?: number;
   /** lob（放物線）の落とす場所（しおふき・ヘドロばくだん）。省略なら向いている側へ放る */

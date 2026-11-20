@@ -835,6 +835,8 @@
   "info.hpCost": "Each use costs {pct}% of max HP (not used below {min}% HP)",
   "info.hpRecoil": "On hit, recoil costs {pct}% of max HP (none on a miss; not used below {min}% HP)",
   "info.selfBuff": "After use, for {seconds}s:",
+  "info.hitBuff": "Stacks each time it hits (up to {n}; lost after {seconds}s without a hit). Per stack:",
+  "info.hurtPower": "For {seconds}s after you take damage, power ×{v} (reckless)",
   "info.passive": "Always active while known:",
   "info.passiveTypeScaled": "{type} move power boosts (items, etc.) also scale this effect",
   "info.hurtBuff": "For {seconds}s after taking damage:",

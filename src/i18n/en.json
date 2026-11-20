@@ -823,6 +823,7 @@
   "info.delayedBlast": "Hit enemies explode {seconds}s later",
   "info.dash": "You move with the attack",
   "info.dashInvincible": "You move with the attack and take no damage while moving",
+  "info.dashInput": "Only while walking: you dash where you are heading, zigzagging like lightning (faster means farther)",
   "info.chargeMoving": "Charges only while you are moving",
   "info.speedScale": "The faster you are, the stronger and bigger it gets (move speed boosts count)",
   "info.burstCount": "Fires between {min} and the max count at random each time",

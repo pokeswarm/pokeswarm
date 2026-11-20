@@ -164,6 +164,10 @@ export class EffectRenderer {
     return this.recipe(id).pathSprite ?? null;
   }
 
+  dashPathSprite(id: string): EffectRecipe['dashPathSprite'] | null {
+    return this.recipe(id).dashPathSprite ?? null;
+  }
+
   castSprite(id: string): EffectRecipe['castSprite'] | null {
     return this.recipe(id).castSprite ?? null;
   }

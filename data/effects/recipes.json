@@ -1916,27 +1916,12 @@
     },
     "wild-charge": {
       "extends": "electric.base",
-      "projectile": {
-        "glowScale": 1.2,
-        "coreScale": 0.4
-      },
-      "impact": {
-        "flash": {
-          "radius": 60
-        }
-      },
-      "sprite": {
-        "id": "electric-ring",
-        "fit": "ring",
-        "size": 1,
-        "varyTiles": true
-      },
-      "lightningLine": {
-        "color": "#fffde7",
-        "glowColor": "#ffeb3b",
-        "width": 2.5,
-        "jitter": 3
-      }
+      "hideShape": true,
+      "projectile": { "glowScale": 0, "coreScale": 0 },
+      "impact": { "flash": { "alpha": 0 }, "burst": { "count": 4, "colors": ["#ffffff", "#fff59d", "#fdd835"], "lifespanMs": [120, 220], "speed": [80, 180], "scale": [0.5, 0], "alpha": [1, 0], "gravityY": 0, "spread": 4, "blend": "normal" } },
+      "sprite": { "id": "wild-bolt-wrap", "fit": "circle", "size": 1.15, "rotate": "velocity" },
+      "dashPathSprite": { "id": "wild-zigzag", "fit": "line", "size": 1, "seconds": 0.33, "radius": 12 },
+      "lightningLine": { "color": "#fffde7", "glowColor": "#ffeb3b", "width": 2.5, "jitter": 3 }
     },
     "bone-rush": {
       "extends": "ground.base",

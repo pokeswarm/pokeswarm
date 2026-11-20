@@ -157,7 +157,7 @@ export function moveInfoLines(rules: SimRules, def: SimMoveDef): string[] {
   if (def.stopOnBoss) out.push(t('info.stopOnBoss'));
   if (def.groundOnly) out.push(t('info.groundOnly'));
   if (def.delayedBlast) out.push(t('info.delayedBlast', { seconds: def.delayedBlast.seconds }));
-  if (def.dash) out.push(t(def.dash.invincible ? 'info.dashInvincible' : 'info.dash'));
+  if (def.dash) out.push(t(def.dash.target === 'input' ? 'info.dashInput' : def.dash.invincible ? 'info.dashInvincible' : 'info.dash'));
   if (def.chargeWhileMoving) out.push(t('info.chargeMoving'));
   if (def.speedScale) out.push(t('info.speedScale'));
   if (def.burstCountMin) out.push(t('info.burstCount', { min: def.burstCountMin }));

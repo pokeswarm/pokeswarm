@@ -38,6 +38,13 @@ export function movePlayers(world: World): void {
     }
     // 体が動く技で進んでいる間（のしかかり・すてみタックル。07 の177章）: 入力では動けない
     if (p.dashTicks) {
+      // 折れて進む技（ワイルドボルト。07 の326章）: 進んだ回数から、今の線の速さを選ぶ
+      if (p.dashLegs && p.dashTotalTicks) {
+        const n = p.dashLegs.length / 2;
+        const k = Math.min(n - 1, Math.floor(((p.dashTotalTicks - p.dashTicks) * n) / p.dashTotalTicks));
+        p.dashVx = p.dashLegs[k * 2]!;
+        p.dashVy = p.dashLegs[k * 2 + 1]!;
+      }
       p.dashTicks--;
       p.x += (p.dashVx ?? 0) * world.dt;
       p.y += (p.dashVy ?? 0) * world.dt;

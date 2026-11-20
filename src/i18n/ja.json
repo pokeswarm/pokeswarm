@@ -823,6 +823,7 @@
   "info.delayedBlast": "あたった てきが {seconds}秒ごに ばくはつする",
   "info.dash": "からだごと うごいて こうげきする",
   "info.dashInvincible": "からだごと うごいて こうげきする。うごいている あいだは ダメージを うけない",
+  "info.dashInput": "あるいている あいだだけ でる。おしている ほうへ いなずまのように おれながら はしる（はやいほど とおくまで）",
   "info.chargeMoving": "はしっている あいだだけ たまる",
   "info.speedScale": "速いほど 威力と大きさが上がる（移動速度の強化が効く）",
   "info.burstCount": "数は 使うたびに {min}〜最大の数 のどれか",

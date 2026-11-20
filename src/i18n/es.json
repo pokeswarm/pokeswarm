@@ -802,6 +802,7 @@
   "info.delayedBlast": "Los enemigos alcanzados explotan {seconds} s después",
   "info.dash": "Te mueves con el ataque",
   "info.dashInvincible": "Te mueves con el ataque y no recibes daño mientras",
+  "info.dashInput": "Solo al caminar: corres hacia donde vas en zigzag como un rayo (cuanto más rápido, más lejos)",
   "info.chargeMoving": "Solo se carga mientras te mueves",
   "info.speedScale": "Cuanto más rápido seas, más fuerte y grande (cuentan las mejoras de velocidad)",
   "info.burstCount": "Lanza al azar entre {min} y el máximo cada vez",

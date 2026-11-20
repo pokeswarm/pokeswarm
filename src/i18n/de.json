@@ -802,6 +802,7 @@
   "info.delayedBlast": "Getroffene Gegner explodieren nach {seconds} s",
   "info.dash": "Du bewegst dich mit dem Angriff",
   "info.dashInvincible": "Du bewegst dich mit dem Angriff und erleidest dabei keinen Schaden",
+  "info.dashInput": "Nur beim Laufen: Du sprintest in Laufrichtung im Blitz-Zickzack (je schneller, desto weiter)",
   "info.chargeMoving": "Lädt sich nur auf, während du läufst",
   "info.speedScale": "Je schneller du bist, desto stärker und größer (Tempo-Boni zählen)",
   "info.burstCount": "Feuert jedes Mal zufällig zwischen {min} und der Höchstzahl",

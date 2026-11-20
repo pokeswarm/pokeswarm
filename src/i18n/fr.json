@@ -802,6 +802,7 @@
   "info.delayedBlast": "Les ennemis touchés explosent {seconds} s plus tard",
   "info.dash": "Tu te déplaces avec l’attaque",
   "info.dashInvincible": "Tu te déplaces avec l’attaque, sans subir de dégâts pendant ce temps",
+  "info.dashInput": "Seulement en marchant : tu fonces vers où tu vas en zigzag comme un éclair (plus tu es rapide, plus tu vas loin)",
   "info.chargeMoving": "Ne se charge que pendant que tu bouges",
   "info.speedScale": "Plus tu es rapide, plus elle est puissante et grande (les bonus de vitesse comptent)",
   "info.burstCount": "Tire au hasard entre {min} et le nombre maximal à chaque fois",

@@ -372,6 +372,10 @@ export interface DashStartedEvent {
   readonly dirX: number;
   readonly dirY: number;
   readonly distance: number;
+  /** 折れて進む道（ワイルドボルト）: 進み始めの所からの折れ目の位置 [x, y, x, y, …]（始まりと終わりも入れる） */
+  readonly path?: readonly number[];
+  /** 使った技（通った道の絵を選ぶ） */
+  readonly move?: number;
 }
 
 /** 自分の体で攻撃する技を使った（見た目: 体を前後させる・残像） */

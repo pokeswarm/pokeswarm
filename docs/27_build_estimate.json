@@ -1455,12 +1455,17 @@
       {
        "form": "pikachu",
        "scene": "at50",
-       "est": 17445.426559157586,
+       "est": 19249.03165349531,
        "moves": [
         {
          "move": "volt-tackle",
          "level": 8,
          "est": 14736.880883325748
+        },
+        {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 3041.8945167691654
         },
         {
          "move": "thunderbolt",
@@ -1471,11 +1476,6 @@
          "move": "swift",
          "level": 8,
          "est": 577.6191699300012
-        },
-        {
-         "move": "wild-charge",
-         "level": 8,
-         "est": 1238.28942243144
         }
        ],
        "items": [
@@ -1487,25 +1487,25 @@
         "dire-hit"
        ],
        "vs": {
-        "boss-lapras": 0.6724630407163298,
-        "boss-machamp": 1.2037538852253813,
-        "boss-gengar": 1.5580006667194186,
-        "boss-dragonite": 1.8342916346291525,
-        "legend-mewtwo": 10.74780254665519,
-        "legend-mew": 8.598242037324152,
-        "legend-articuno": 7.925457265585315,
-        "legend-zapdos": 9.458066241056567,
-        "legend-moltres": 7.925457265585315,
-        "shiny-charizard": 8.645953380638526,
-        "shiny-venusaur": 12.791481367956429,
-        "shiny-blastoise": 8.645953380638526
+        "boss-lapras": 0.6091375642565053,
+        "boss-machamp": 1.0909639704492222,
+        "boss-gengar": 1.411136956939474,
+        "boss-dragonite": 1.6624212883035767,
+        "legend-mewtwo": 9.74074973615377,
+        "legend-mew": 7.792599788923016,
+        "legend-articuno": 7.1791212930230985,
+        "legend-zapdos": 8.571859767815317,
+        "legend-moltres": 7.1791212930230985,
+        "shiny-charizard": 7.831768683297926,
+        "shiny-venusaur": 11.601863374072876,
+        "shiny-blastoise": 7.831768683297926
        },
-       "legendAvg": 9.342301685680003
+       "legendAvg": 8.466106577450878
       },
       {
        "form": "pikachu",
        "scene": "at50",
-       "est": 16971.343415936677,
+       "est": 18774.948510274404,
        "moves": [
         {
          "move": "volt-tackle",
@@ -1513,14 +1513,14 @@
          "est": 14736.880883325748
         },
         {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 3041.8945167691654
+        },
+        {
          "move": "thunderbolt",
          "level": 8,
          "est": 892.6370834703949
-        },
-        {
-         "move": "wild-charge",
-         "level": 8,
-         "est": 1238.28942243144
         },
         {
          "move": "thunder-wave",
@@ -1537,90 +1537,40 @@
         "dire-hit"
        ],
        "vs": {
-        "boss-lapras": 0.6874333033477633,
-        "boss-machamp": 1.2373799460259742,
-        "boss-gengar": 1.5909170734619669,
-        "boss-dragonite": 1.8855313463252943,
-        "legend-mewtwo": 11.04803523237477,
-        "legend-mew": 8.838428185899817,
-        "legend-articuno": 8.101892503741496,
-        "legend-zapdos": 9.722271004489798,
-        "legend-moltres": 8.101892503741496,
-        "shiny-charizard": 8.838428185899815,
-        "shiny-venusaur": 13.257642278849724,
-        "shiny-blastoise": 8.838428185899815
+        "boss-lapras": 0.6213954014458255,
+        "boss-machamp": 1.1185117226024859,
+        "boss-gengar": 1.4380865004889105,
+        "boss-dragonite": 1.7043988153942642,
+        "legend-mewtwo": 9.986711808950767,
+        "legend-mew": 7.989369447160613,
+        "legend-articuno": 7.323588659897229,
+        "legend-zapdos": 8.788306391876676,
+        "legend-moltres": 7.323588659897229,
+        "shiny-charizard": 7.989369447160613,
+        "shiny-venusaur": 11.984054170740919,
+        "shiny-blastoise": 7.989369447160613
        },
-       "legendAvg": 9.593377260112092
+       "legendAvg": 8.671794754105582
       },
       {
        "form": "pikachu",
        "scene": "at50",
-       "est": 16821.035328990518,
+       "est": 18554.549951425084,
        "moves": [
         {
          "move": "volt-tackle",
          "level": 8,
          "est": 14736.880883325748
-        },
-        {
-         "move": "thunderbolt",
-         "level": 8,
-         "est": 892.6370834703949
-        },
-        {
-         "move": "swift",
-         "level": 8,
-         "est": 577.6191699300012
-        },
-        {
-         "move": "spark",
-         "level": 8,
-         "est": 613.8981922643737
-        }
-       ],
-       "items": [
-        "light-ball",
-        "magnet",
-        "pp-max",
-        "quick-claw",
-        "x-attack",
-        "dire-hit"
-       ],
-       "vs": {
-        "boss-lapras": 0.6975683270089721,
-        "boss-machamp": 1.2484368286063325,
-        "boss-gengar": 1.6162330622485797,
-        "boss-dragonite": 1.9023799293048878,
-        "legend-mewtwo": 11.146757398270827,
-        "legend-mew": 8.91740591861666,
-        "legend-articuno": 8.221340996891456,
-        "legend-zapdos": 9.809146510478326,
-        "legend-moltres": 8.221340996891456,
-        "shiny-charizard": 8.968735632972498,
-        "shiny-venusaur": 13.262255407993768,
-        "shiny-blastoise": 8.968735632972498
-       },
-       "legendAvg": 9.689464811885935
-      },
-      {
-       "form": "pikachu",
-       "scene": "at50",
-       "est": 16750.94485708736,
-       "moves": [
-        {
-         "move": "volt-tackle",
-         "level": 8,
-         "est": 14736.880883325748
-        },
-        {
-         "move": "swift",
-         "level": 8,
-         "est": 577.6191699300012
         },
         {
          "move": "wild-charge",
          "level": 8,
-         "est": 1238.28942243144
+         "est": 3041.8945167691654
+        },
+        {
+         "move": "swift",
+         "level": 8,
+         "est": 577.6191699300012
         },
         {
          "move": "thunder-shock",
@@ -1637,25 +1587,25 @@
         "dire-hit"
        ],
        "vs": {
-        "boss-lapras": 0.7005040128292096,
-        "boss-machamp": 1.2536606250670603,
-        "boss-gengar": 1.6230427809735326,
-        "boss-dragonite": 1.910340000102187,
-        "legend-mewtwo": 11.193398438098752,
-        "legend-mew": 8.954718750479001,
-        "legend-articuno": 8.255940151201399,
-        "legend-zapdos": 9.850190625526903,
-        "legend-moltres": 8.255940151201399,
-        "shiny-charizard": 9.00648016494698,
-        "shiny-venusaur": 13.31727396394713,
-        "shiny-blastoise": 9.00648016494698
+        "boss-lapras": 0.6320559992549114,
+        "boss-machamp": 1.131797863865035,
+        "boss-gengar": 1.4642855771251495,
+        "boss-dragonite": 1.7246443639848152,
+        "legend-mewtwo": 10.105338070223528,
+        "legend-mew": 8.084270456178821,
+        "legend-articuno": 7.449231419790028,
+        "legend-zapdos": 8.892697501796704,
+        "legend-moltres": 7.449231419790028,
+        "shiny-charizard": 8.126434276134576,
+        "shiny-venusaur": 12.03275814512084,
+        "shiny-blastoise": 8.126434276134576
        },
-       "legendAvg": 9.730052801293567
+       "legendAvg": 8.783299445646136
       },
       {
        "form": "pikachu",
        "scene": "at50",
-       "est": 16656.325502396285,
+       "est": 18459.930596734008,
        "moves": [
         {
          "move": "volt-tackle",
@@ -1663,14 +1613,14 @@
          "est": 14736.880883325748
         },
         {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 3041.8945167691654
+        },
+        {
          "move": "swift",
          "level": 8,
          "est": 577.6191699300012
-        },
-        {
-         "move": "wild-charge",
-         "level": 8,
-         "est": 1238.28942243144
         },
         {
          "move": "thunder-wave",
@@ -1687,20 +1637,70 @@
         "dire-hit"
        ],
        "vs": {
-        "boss-lapras": 0.7045064895774968,
-        "boss-machamp": 1.2607822773983859,
-        "boss-gengar": 1.632327171394888,
-        "boss-dragonite": 1.921192041749921,
-        "legend-mewtwo": 11.256984619628444,
-        "legend-mew": 9.005587695702756,
-        "legend-articuno": 8.303112198591927,
-        "legend-zapdos": 9.90614646527303,
-        "legend-moltres": 8.303112198591927,
-        "shiny-charizard": 9.057940580282102,
-        "shiny-venusaur": 13.392274981557481,
-        "shiny-blastoise": 9.057940580282102
+        "boss-lapras": 0.6353126881929663,
+        "boss-machamp": 1.1375990765488246,
+        "boss-gengar": 1.4718382746957457,
+        "boss-dragonite": 1.7334843071220185,
+        "legend-mewtwo": 10.157134612043077,
+        "legend-mew": 8.125707689634462,
+        "legend-articuno": 7.487613825131388,
+        "legend-zapdos": 8.938278458597907,
+        "legend-moltres": 7.487613825131388,
+        "shiny-charizard": 8.168305991052422,
+        "shiny-venusaur": 12.093955268642116,
+        "shiny-blastoise": 8.168305991052422
        },
-       "legendAvg": 9.78538741498872
+       "legendAvg": 8.828364457660648
+      },
+      {
+       "form": "pikachu",
+       "scene": "at50",
+       "est": 18080.46680820418,
+       "moves": [
+        {
+         "move": "volt-tackle",
+         "level": 8,
+         "est": 14736.880883325748
+        },
+        {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 3041.8945167691654
+        },
+        {
+         "move": "thunder-shock",
+         "level": 8,
+         "est": 198.15538140017168
+        },
+        {
+         "move": "thunder-wave",
+         "level": 8,
+         "est": 103.53602670909613
+        }
+       ],
+       "items": [
+        "light-ball",
+        "magnet",
+        "pp-max",
+        "quick-claw",
+        "x-attack",
+        "dire-hit"
+       ],
+       "vs": {
+        "boss-lapras": 0.6452635759035165,
+        "boss-machamp": 1.1614744366263297,
+        "boss-gengar": 1.4933242756624237,
+        "boss-dragonite": 1.7698658081925023,
+        "legend-mewtwo": 10.370307469877943,
+        "legend-mew": 8.296245975902353,
+        "legend-articuno": 7.604892144577158,
+        "legend-zapdos": 9.12587057349259,
+        "legend-moltres": 7.604892144577158,
+        "shiny-charizard": 8.296245975902353,
+        "shiny-venusaur": 12.44436896385353,
+        "shiny-blastoise": 8.296245975902353
+       },
+       "legendAvg": 9.00488365301068
       }
      ],
      "measured": {
@@ -5143,6 +5143,106 @@
      "name": "イーブイ",
      "builds": [
       {
+       "form": "jolteon",
+       "scene": "at50",
+       "est": 13075.381678531672,
+       "moves": [
+        {
+         "move": "electro-ball",
+         "level": 8,
+         "est": 10428.431465580203
+        },
+        {
+         "move": "pin-missile",
+         "level": 8,
+         "est": 959.4758816158142
+        },
+        {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 1687.4743313356562
+        },
+        {
+         "move": "agility",
+         "level": 8,
+         "est": 0
+        }
+       ],
+       "items": [
+        "magnet",
+        "x-speed",
+        "pp-max",
+        "metronome",
+        "x-sp-atk",
+        "dire-hit"
+       ],
+       "vs": {
+        "boss-lapras": 0.903309561435668,
+        "boss-machamp": 1.629993557753186,
+        "boss-gengar": 2.095706002825525,
+        "boss-dragonite": 2.4837997070524738,
+        "legend-mewtwo": 14.132515817018543,
+        "legend-mew": 11.306012653614834,
+        "legend-articuno": 10.779616024069492,
+        "legend-zapdos": 12.807092239489318,
+        "legend-moltres": 10.779616024069492,
+        "shiny-charizard": 11.759581117166718,
+        "shiny-venusaur": 16.897916977476175,
+        "shiny-blastoise": 11.613980075601447
+       },
+       "legendAvg": 12.509541366063251
+      },
+      {
+       "form": "jolteon",
+       "scene": "at50",
+       "est": 12426.361828976887,
+       "moves": [
+        {
+         "move": "electro-ball",
+         "level": 8,
+         "est": 8964.644372700537
+        },
+        {
+         "move": "pin-missile",
+         "level": 8,
+         "est": 959.4758816158142
+        },
+        {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 1687.4743313356562
+        },
+        {
+         "move": "swift",
+         "level": 8,
+         "est": 814.7672433248816
+        }
+       ],
+       "items": [
+        "magnet",
+        "x-speed",
+        "pp-max",
+        "metronome",
+        "x-sp-atk",
+        "dire-hit"
+       ],
+       "vs": {
+        "boss-lapras": 0.9617507885161227,
+        "boss-machamp": 1.7164622370722618,
+        "boss-gengar": 2.23667070927599,
+        "boss-dragonite": 2.6155615041101132,
+        "legend-mewtwo": 14.859421544611456,
+        "legend-mew": 11.887537235689164,
+        "legend-articuno": 11.4863389472926,
+        "legend-zapdos": 13.48648900556777,
+        "legend-moltres": 11.4863389472926,
+        "shiny-charizard": 12.530551578864655,
+        "shiny-venusaur": 17.482622608893262,
+        "shiny-blastoise": 12.365367280921578
+       },
+       "legendAvg": 13.198083393641635
+      },
+      {
        "form": "eevee",
        "scene": "boss",
        "est": 12324.959941994783,
@@ -5286,106 +5386,6 @@
         "shiny-blastoise": 12.59766613300875
        },
        "legendAvg": 13.442016218426561
-      },
-      {
-       "form": "flareon",
-       "scene": "at50",
-       "est": 12122.288861355588,
-       "moves": [
-        {
-         "move": "double-edge",
-         "level": 8,
-         "est": 4557.711860084995
-        },
-        {
-         "move": "body-slam",
-         "level": 8,
-         "est": 3865.3499464495544
-        },
-        {
-         "move": "flare-blitz",
-         "level": 8,
-         "est": 2860.8463541595006
-        },
-        {
-         "move": "fire-spin",
-         "level": 8,
-         "est": 838.3807006615369
-        }
-       ],
-       "items": [
-        "silk-scarf",
-        "x-attack",
-        "pp-max",
-        "metronome",
-        "dire-hit",
-        "light-clay"
-       ],
-       "vs": {
-        "boss-lapras": 1.1548974092368258,
-        "boss-machamp": 1.7323461138552387,
-        "boss-gengar": 2.5867826043347946,
-        "boss-dragonite": 2.811347154015485,
-        "legend-mewtwo": 15.467376016564632,
-        "legend-mew": 12.373900813251705,
-        "legend-articuno": 12.828353094951856,
-        "legend-zapdos": 13.611290894576877,
-        "legend-moltres": 14.496008762892343,
-        "shiny-charizard": 15.813827741337102,
-        "shiny-venusaur": 13.994567012674752,
-        "shiny-blastoise": 15.813827741337102
-       },
-       "legendAvg": 14.299894009698297
-      },
-      {
-       "form": "flareon",
-       "scene": "boss",
-       "est": 12070.312105973442,
-       "moves": [
-        {
-         "move": "double-edge",
-         "level": 8,
-         "est": 4557.711860084995
-        },
-        {
-         "move": "body-slam",
-         "level": 8,
-         "est": 3865.3499464495544
-        },
-        {
-         "move": "flare-blitz",
-         "level": 8,
-         "est": 2860.8463541595006
-        },
-        {
-         "move": "smog",
-         "level": 8,
-         "est": 786.4039452793918
-        }
-       ],
-       "items": [
-        "silk-scarf",
-        "x-attack",
-        "pp-max",
-        "metronome",
-        "dire-hit",
-        "light-clay"
-       ],
-       "vs": {
-        "boss-lapras": 1.1598705880249427,
-        "boss-machamp": 1.739805882037414,
-        "boss-gengar": 2.639704153415571,
-        "boss-dragonite": 2.7830581389369287,
-        "legend-mewtwo": 15.533981089619767,
-        "legend-mew": 12.427184871695815,
-        "legend-articuno": 13.051235361336497,
-        "legend-zapdos": 13.669903358865396,
-        "legend-moltres": 14.350143528893538,
-        "shiny-charizard": 15.654702031520223,
-        "shiny-venusaur": 14.237711303276178,
-        "shiny-blastoise": 15.654702031520223
-       },
-       "legendAvg": 14.322445447090953
       }
      ],
      "measured": {
@@ -6319,7 +6319,7 @@
       {
        "form": "magneton",
        "scene": "at50",
-       "est": 7815.3717980677075,
+       "est": 8829.739251339883,
        "moves": [
         {
          "move": "flash-cannon",
@@ -6327,14 +6327,14 @@
          "est": 6123.9737859726765
         },
         {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 1687.4743313356562
+        },
+        {
          "move": "swift",
          "level": 8,
          "est": 814.7672433248816
-        },
-        {
-         "move": "wild-charge",
-         "level": 8,
-         "est": 673.1068780634811
         },
         {
          "move": "tackle",
@@ -6346,30 +6346,30 @@
         "magnet",
         "zoom-lens",
         "pp-max",
-        "x-sp-atk",
         "metronome",
+        "x-sp-atk",
         "dire-hit"
        ],
        "vs": {
-        "boss-lapras": 1.7610078014090647,
-        "boss-machamp": 2.687012280745504,
-        "boss-gengar": 3.547164478434994,
-        "boss-dragonite": 4.094494903993149,
-        "legend-mewtwo": 23.991181078084857,
-        "legend-mew": 19.192944862467886,
-        "legend-articuno": 17.984066906303415,
-        "legend-zapdos": 25.035744059542846,
-        "legend-moltres": 24.534592108914726,
-        "shiny-charizard": 26.765009573361517,
-        "shiny-venusaur": 23.435210116157673,
-        "shiny-blastoise": 26.765009573361517
+        "boss-lapras": 1.5271781892327756,
+        "boss-machamp": 2.3783261772779216,
+        "boss-gengar": 3.130042475048504,
+        "boss-dragonite": 3.6241160796615945,
+        "legend-mewtwo": 21.235055154267158,
+        "legend-mew": 16.988044123413726,
+        "legend-articuno": 15.877554035679191,
+        "legend-zapdos": 21.696410818911954,
+        "legend-moltres": 20.774474001326336,
+        "shiny-charizard": 22.663062546901457,
+        "shiny-venusaur": 21.195810181392698,
+        "shiny-blastoise": 22.663062546901457
        },
-       "legendAvg": 23.4629697847743
+       "legendAvg": 20.386684176099244
       },
       {
        "form": "magneton",
        "scene": "at50",
-       "est": 7742.876309016503,
+       "est": 8757.243762288677,
        "moves": [
         {
          "move": "flash-cannon",
@@ -6377,14 +6377,14 @@
          "est": 6123.9737859726765
         },
         {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 1687.4743313356562
+        },
+        {
          "move": "swift",
          "level": 8,
          "est": 814.7672433248816
-        },
-        {
-         "move": "wild-charge",
-         "level": 8,
-         "est": 673.1068780634811
         },
         {
          "move": "thunder-wave",
@@ -6396,25 +6396,75 @@
         "magnet",
         "zoom-lens",
         "pp-max",
-        "x-sp-atk",
         "metronome",
+        "x-sp-atk",
         "dire-hit"
        ],
        "vs": {
-        "boss-lapras": 1.771321537959862,
-        "boss-machamp": 2.712170408242956,
-        "boss-gengar": 3.562041526996206,
-        "boss-dragonite": 4.1328310982749805,
-        "legend-mewtwo": 24.215807216454962,
-        "legend-mew": 19.37264577316397,
-        "legend-articuno": 18.07526252314668,
-        "legend-zapdos": 25.314196928677326,
-        "legend-moltres": 24.704635096840494,
-        "shiny-charizard": 26.950511014735085,
-        "shiny-venusaur": 23.740283661050196,
-        "shiny-blastoise": 26.950511014735085
+        "boss-lapras": 1.5349287887175498,
+        "boss-machamp": 2.3980147829654244,
+        "boss-gengar": 3.1416206591484928,
+        "boss-dragonite": 3.654117764518742,
+        "legend-mewtwo": 21.410846276477006,
+        "legend-mew": 17.128677021181602,
+        "legend-articuno": 15.948594773760865,
+        "legend-zapdos": 21.905226293388996,
+        "legend-moltres": 20.896260755932097,
+        "shiny-charizard": 22.795920824653194,
+        "shiny-venusaur": 21.445055487832285,
+        "shiny-blastoise": 22.795920824653194
        },
-       "legendAvg": 23.665481653600473
+       "legendAvg": 20.540812782234905
+      },
+      {
+       "form": "magneton",
+       "scene": "at50",
+       "est": 8146.000409670464,
+       "moves": [
+        {
+         "move": "flash-cannon",
+         "level": 8,
+         "est": 6123.9737859726765
+        },
+        {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 1687.4743313356562
+        },
+        {
+         "move": "tackle",
+         "level": 8,
+         "est": 203.52389070666803
+        },
+        {
+         "move": "thunder-wave",
+         "level": 8,
+         "est": 131.0284016554634
+        }
+       ],
+       "items": [
+        "magnet",
+        "zoom-lens",
+        "pp-max",
+        "metronome",
+        "x-sp-atk",
+        "dire-hit"
+       ],
+       "vs": {
+        "boss-lapras": 1.6451811963717562,
+        "boss-machamp": 2.577952239613198,
+        "boss-gengar": 3.3311554849364855,
+        "boss-dragonite": 3.9283081746486825,
+        "legend-mewtwo": 23.017430710832123,
+        "legend-mew": 18.4139445686657,
+        "legend-articuno": 16.950030577526263,
+        "legend-zapdos": 23.839777097357945,
+        "legend-moltres": 22.649570974705213,
+        "shiny-charizard": 24.7086228814966,
+        "shiny-venusaur": 23.12940945055552,
+        "shiny-blastoise": 24.7086228814966
+       },
+       "legendAvg": 22.1771761428295
       },
       {
        "form": "magneton",
@@ -6515,56 +6565,6 @@
         "shiny-blastoise": 28.747624246149574
        },
        "legendAvg": 24.97685812955328
-      },
-      {
-       "form": "magneton",
-       "scene": "at50",
-       "est": 7273.293321659689,
-       "moves": [
-        {
-         "move": "flash-cannon",
-         "level": 8,
-         "est": 6123.9737859726765
-        },
-        {
-         "move": "swift",
-         "level": 8,
-         "est": 814.7672433248816
-        },
-        {
-         "move": "tackle",
-         "level": 8,
-         "est": 203.52389070666803
-        },
-        {
-         "move": "thunder-wave",
-         "level": 8,
-         "est": 131.0284016554634
-        }
-       ],
-       "items": [
-        "magnet",
-        "zoom-lens",
-        "pp-max",
-        "x-sp-atk",
-        "metronome",
-        "dire-hit"
-       ],
-       "vs": {
-        "boss-lapras": 1.917939847129481,
-        "boss-machamp": 2.8872752783752738,
-        "boss-gengar": 3.819150442383613,
-        "boss-dragonite": 4.3996575670480365,
-        "legend-mewtwo": 25.77924355692209,
-        "legend-mew": 20.62339484553767,
-        "legend-articuno": 19.356442265050394,
-        "legend-zapdos": 27.279497257281786,
-        "legend-moltres": 27.161816172588715,
-        "shiny-charizard": 29.631072188278598,
-        "shiny-venusaur": 24.837563571537117,
-        "shiny-blastoise": 29.631072188278598
-       },
-       "legendAvg": 25.53751275568437
       }
      ],
      "measured": {
@@ -7875,6 +7875,21 @@
      "owners": 1
     },
     {
+     "move": "wild-charge",
+     "est": 4218.685828339141,
+     "key": "pikachu",
+     "form": "pikachu",
+     "items": [
+      "magnet",
+      "pp-max",
+      "light-ball",
+      "metronome",
+      "x-attack",
+      "dire-hit"
+     ],
+     "owners": 4
+    },
+    {
      "move": "flare-blitz",
      "est": 4086.923363085001,
      "key": "eevee",
@@ -8343,21 +8358,6 @@
       "dire-hit"
      ],
      "owners": 1
-    },
-    {
-     "move": "wild-charge",
-     "est": 1682.7671951587029,
-     "key": "pikachu",
-     "form": "pikachu",
-     "items": [
-      "magnet",
-      "light-ball",
-      "pp-max",
-      "metronome",
-      "x-attack",
-      "dire-hit"
-     ],
-     "owners": 3
     },
     {
      "move": "pound",
@@ -10169,13 +10169,18 @@
      "builds": [
       {
        "form": "pikachu",
-       "scene": "at50",
-       "est": 12705.543100167984,
+       "scene": "boss",
+       "est": 15992.179074439133,
        "moves": [
         {
          "move": "volt-tackle",
          "level": 8,
-         "est": 9046.798198677956
+         "est": 9797.515539768667
+        },
+        {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 4218.685828339141
         },
         {
          "move": "thunderbolt",
@@ -10186,11 +10191,6 @@
          "move": "swift",
          "level": 8,
          "est": 761.0463261825818
-        },
-        {
-         "move": "wild-charge",
-         "level": 8,
-         "est": 1682.7671951587029
         }
        ],
        "items": [
@@ -10202,21 +10202,174 @@
         "metronome"
        ],
        "vs": {
-        "johto-boss-xatu": 1.2984911538453618,
-        "johto-boss-crobat": 1.9477367307680429,
-        "johto-boss-machamp": 2.9750794359589583,
-        "johto-boss-houndoom": 3.526020072247654,
-        "johto-boss-dragonite": 4.09270186957317,
-        "round1": 19.3861496952185,
-        "round2": 23.611741555229827,
-        "round3": 36.40196333105517,
-        "legend-lugia": 26.499819466231877,
-        "legend-ho-oh": 26.499819466231877,
-        "legend-raikou": 6.106637153993828,
-        "legend-entei": 4.958465726598264,
-        "legend-suicune": 4.173721565931521
+        "johto-boss-xatu": 1.0294979730444938,
+        "johto-boss-crobat": 1.5442469595667405,
+        "johto-boss-machamp": 2.3636553732953804,
+        "johto-boss-houndoom": 2.8013693313130434,
+        "johto-boss-dragonite": 3.2515894024169256,
+        "round1": 15.448843923771294,
+        "round2": 18.759169629328415,
+        "round3": 28.920017182863315,
+        "legend-lugia": 21.01016271519375,
+        "legend-ho-oh": 21.01016271519375,
+        "legend-raikou": 4.866385835987957,
+        "legend-entei": 3.9394256221589674,
+        "legend-suicune": 3.3091006276430153
        },
-       "legendAvg": 26.479898702793452
+       "legendAvg": 21.029671233270108
+      },
+      {
+       "form": "pikachu",
+       "scene": "boss",
+       "est": 15368.208614603804,
+       "moves": [
+        {
+         "move": "volt-tackle",
+         "level": 8,
+         "est": 9797.515539768667
+        },
+        {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 4218.685828339141
+        },
+        {
+         "move": "thunderbolt",
+         "level": 8,
+         "est": 1214.9313801487417
+        },
+        {
+         "move": "thunder-wave",
+         "level": 8,
+         "est": 137.07586634725402
+        }
+       ],
+       "items": [
+        "light-ball",
+        "magnet",
+        "pp-max",
+        "x-attack",
+        "dire-hit",
+        "metronome"
+       ],
+       "vs": {
+        "johto-boss-xatu": 1.0628000792371084,
+        "johto-boss-crobat": 1.5942001188556625,
+        "johto-boss-machamp": 2.459623040520165,
+        "johto-boss-houndoom": 2.91510878876464,
+        "johto-boss-dragonite": 3.383608415530386,
+        "round1": 16.267348151588394,
+        "round2": 19.52081778190607,
+        "round3": 30.094594080438526,
+        "legend-lugia": 21.68979753545119,
+        "legend-ho-oh": 21.68979753545119,
+        "legend-raikou": 5.124214667750343,
+        "legend-entei": 4.099371734200275,
+        "legend-suicune": 3.416143111833563
+       },
+       "legendAvg": 21.852471016967076
+      },
+      {
+       "form": "pikachu",
+       "scene": "boss",
+       "est": 15038.60780941303,
+       "moves": [
+        {
+         "move": "volt-tackle",
+         "level": 8,
+         "est": 9797.515539768667
+        },
+        {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 4218.685828339141
+        },
+        {
+         "move": "swift",
+         "level": 8,
+         "est": 761.0463261825818
+        },
+        {
+         "move": "thunder-shock",
+         "level": 8,
+         "est": 261.3601151226402
+        }
+       ],
+       "items": [
+        "light-ball",
+        "magnet",
+        "pp-max",
+        "x-attack",
+        "dire-hit",
+        "metronome"
+       ],
+       "vs": {
+        "johto-boss-xatu": 1.0953318678890087,
+        "johto-boss-crobat": 1.642997801833513,
+        "johto-boss-machamp": 2.513530539465233,
+        "johto-boss-houndoom": 2.978999157884721,
+        "johto-boss-dragonite": 3.457766879687622,
+        "round1": 16.416189119621976,
+        "round2": 19.948655075120897,
+        "round3": 30.753953901113057,
+        "legend-lugia": 22.353711589571603,
+        "legend-ho-oh": 22.353711589571603,
+        "legend-raikou": 5.171099572680922,
+        "legend-entei": 4.1892175657753885,
+        "legend-suicune": 3.5207095753575275
+       },
+       "legendAvg": 22.36524425499983
+      },
+      {
+       "form": "pikachu",
+       "scene": "boss",
+       "est": 14414.6373495777,
+       "moves": [
+        {
+         "move": "volt-tackle",
+         "level": 8,
+         "est": 9797.515539768667
+        },
+        {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 4218.685828339141
+        },
+        {
+         "move": "thunder-shock",
+         "level": 8,
+         "est": 261.3601151226402
+        },
+        {
+         "move": "thunder-wave",
+         "level": 8,
+         "est": 137.07586634725402
+        }
+       ],
+       "items": [
+        "light-ball",
+        "magnet",
+        "pp-max",
+        "x-attack",
+        "dire-hit",
+        "metronome"
+       ],
+       "vs": {
+        "johto-boss-xatu": 1.133107475215937,
+        "johto-boss-crobat": 1.6996612128239055,
+        "johto-boss-machamp": 2.6223344426425967,
+        "johto-boss-houndoom": 3.1079519320208555,
+        "johto-boss-dragonite": 3.6074442068099217,
+        "round1": 17.343481763509235,
+        "round2": 20.812178116211086,
+        "round3": 32.08544126249208,
+        "legend-lugia": 23.124642351345653,
+        "legend-ho-oh": 23.124642351345653,
+        "legend-raikou": 5.463196755505409,
+        "legend-entei": 4.3705574044043285,
+        "legend-suicune": 3.64213117033694
+       },
+       "legendAvg": 23.298077168980743
       },
       {
        "form": "pikachu",
@@ -10268,159 +10421,6 @@
         "legend-suicune": 4.213624281943082
        },
        "legendAvg": 26.730993867478208
-      },
-      {
-       "form": "pikachu",
-       "scene": "boss",
-       "est": 12082.901249278711,
-       "moves": [
-        {
-         "move": "volt-tackle",
-         "level": 8,
-         "est": 9797.515539768667
-        },
-        {
-         "move": "thunderbolt",
-         "level": 8,
-         "est": 892.6370834703949
-        },
-        {
-         "move": "wild-charge",
-         "level": 8,
-         "est": 1238.6597975570967
-        },
-        {
-         "move": "thunder-wave",
-         "level": 8,
-         "est": 154.08882848255152
-        }
-       ],
-       "items": [
-        "light-ball",
-        "magnet",
-        "pp-max",
-        "x-attack",
-        "dire-hit",
-        "light-clay"
-       ],
-       "vs": {
-        "johto-boss-xatu": 1.3517724755309373,
-        "johto-boss-crobat": 2.0276587132964057,
-        "johto-boss-machamp": 3.1283877290858824,
-        "johto-boss-houndoom": 3.7077187900277124,
-        "johto-boss-dragonite": 4.303602166996452,
-        "round1": 20.69039503363679,
-        "round2": 24.828474040364146,
-        "round3": 38.27723081222806,
-        "legend-lugia": 27.58719337818239,
-        "legend-ho-oh": 27.58719337818239,
-        "legend-raikou": 6.517474435595588,
-        "legend-entei": 5.213979548476471,
-        "legend-suicune": 4.344982957063727
-       },
-       "legendAvg": 27.794097328518756
-      },
-      {
-       "form": "pikachu",
-       "scene": "boss",
-       "est": 11962.453245260174,
-       "moves": [
-        {
-         "move": "volt-tackle",
-         "level": 8,
-         "est": 9797.515539768667
-        },
-        {
-         "move": "thunderbolt",
-         "level": 8,
-         "est": 1214.9313801487417
-        },
-        {
-         "move": "spark",
-         "level": 8,
-         "est": 812.9304589955112
-        },
-        {
-         "move": "thunder-wave",
-         "level": 8,
-         "est": 137.07586634725402
-        }
-       ],
-       "items": [
-        "light-ball",
-        "magnet",
-        "pp-max",
-        "x-attack",
-        "dire-hit",
-        "metronome"
-       ],
-       "vs": {
-        "johto-boss-xatu": 1.3653832536235837,
-        "johto-boss-crobat": 2.0480748804353754,
-        "johto-boss-machamp": 3.1598869583860076,
-        "johto-boss-houndoom": 3.745051209938972,
-        "johto-boss-dragonite": 4.346934440107735,
-        "round1": 20.89872326974873,
-        "round2": 25.078467923698476,
-        "round3": 38.66263804903515,
-        "legend-lugia": 27.864964359664974,
-        "legend-ho-oh": 27.864964359664974,
-        "legend-raikou": 6.58309782997085,
-        "legend-entei": 5.26647826397668,
-        "legend-suicune": 4.388731886647234
-       },
-       "legendAvg": 28.073951592362466
-      },
-      {
-       "form": "pikachu",
-       "scene": "boss",
-       "est": 11910.569112447245,
-       "moves": [
-        {
-         "move": "volt-tackle",
-         "level": 8,
-         "est": 9797.515539768667
-        },
-        {
-         "move": "thunderbolt",
-         "level": 8,
-         "est": 1214.9313801487417
-        },
-        {
-         "move": "swift",
-         "level": 8,
-         "est": 761.0463261825818
-        },
-        {
-         "move": "thunder-wave",
-         "level": 8,
-         "est": 137.07586634725402
-        }
-       ],
-       "items": [
-        "light-ball",
-        "magnet",
-        "pp-max",
-        "x-attack",
-        "dire-hit",
-        "metronome"
-       ],
-       "vs": {
-        "johto-boss-xatu": 1.386092181763214,
-        "johto-boss-crobat": 2.079138272644821,
-        "johto-boss-machamp": 3.1736518753328737,
-        "johto-boss-houndoom": 3.7613651855797023,
-        "johto-boss-dragonite": 4.365870304690726,
-        "round1": 20.659738684229776,
-        "round2": 25.18771329629265,
-        "round3": 38.83207033877746,
-        "legend-lugia": 28.28759554618804,
-        "legend-ho-oh": 28.28759554618804,
-        "legend-raikou": 6.50781768553238,
-        "legend-entei": 5.289419792221456,
-        "legend-suicune": 4.455296298524616
-       },
-       "legendAvg": 28.250942682335193
       }
      ],
      "measured": {
@@ -12561,6 +12561,108 @@
      "name": "イーブイ",
      "builds": [
       {
+       "form": "jolteon",
+       "scene": "at50",
+       "est": 13075.381678531672,
+       "moves": [
+        {
+         "move": "electro-ball",
+         "level": 8,
+         "est": 10428.431465580203
+        },
+        {
+         "move": "pin-missile",
+         "level": 8,
+         "est": 959.4758816158142
+        },
+        {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 1687.4743313356562
+        },
+        {
+         "move": "agility",
+         "level": 8,
+         "est": 0
+        }
+       ],
+       "items": [
+        "magnet",
+        "x-speed",
+        "pp-max",
+        "metronome",
+        "x-sp-atk",
+        "dire-hit"
+       ],
+       "vs": {
+        "johto-boss-xatu": 1.2646333860099352,
+        "johto-boss-crobat": 1.920731582470564,
+        "johto-boss-machamp": 2.933988403955735,
+        "johto-boss-houndoom": 3.4262862149222486,
+        "johto-boss-dragonite": 4.03617452396027,
+        "round1": 18.77546330830686,
+        "round2": 22.777953105363434,
+        "round3": 35.519495328064735,
+        "legend-lugia": 25.808844612447658,
+        "legend-ho-oh": 26.13240248259271,
+        "legend-raikou": 5.914270942116661,
+        "legend-entei": 4.889980673259558,
+        "legend-suicune": 4.064893026460506
+       },
+       "legendAvg": 25.802831767355077
+      },
+      {
+       "form": "jolteon",
+       "scene": "at50",
+       "est": 12426.361828976887,
+       "moves": [
+        {
+         "move": "electro-ball",
+         "level": 8,
+         "est": 8964.644372700537
+        },
+        {
+         "move": "pin-missile",
+         "level": 8,
+         "est": 959.4758816158142
+        },
+        {
+         "move": "wild-charge",
+         "level": 8,
+         "est": 1687.4743313356562
+        },
+        {
+         "move": "swift",
+         "level": 8,
+         "est": 814.7672433248816
+        }
+       ],
+       "items": [
+        "magnet",
+        "x-speed",
+        "pp-max",
+        "metronome",
+        "x-sp-atk",
+        "dire-hit"
+       ],
+       "vs": {
+        "johto-boss-xatu": 1.3464511039225717,
+        "johto-boss-crobat": 2.046656757881227,
+        "johto-boss-machamp": 3.089632026730071,
+        "johto-boss-houndoom": 3.6052386544492374,
+        "johto-boss-dragonite": 4.250287444178934,
+        "round1": 19.425136232103625,
+        "round2": 23.95864880192545,
+        "round3": 37.40387648704369,
+        "legend-lugia": 27.478593957603508,
+        "legend-ho-oh": 27.84567017525479,
+        "legend-raikou": 6.118917913112641,
+        "legend-entei": 5.149386711216785,
+        "legend-suicune": 4.327878548322552
+       },
+       "legendAvg": 27.22238513078621
+      },
+      {
        "form": "eevee",
        "scene": "boss",
        "est": 12324.959941994783,
@@ -12707,108 +12809,6 @@
         "legend-suicune": 4.409183146553062
        },
        "legendAvg": 27.725534147231524
-      },
-      {
-       "form": "flareon",
-       "scene": "at50",
-       "est": 12122.288861355588,
-       "moves": [
-        {
-         "move": "double-edge",
-         "level": 8,
-         "est": 4557.711860084995
-        },
-        {
-         "move": "body-slam",
-         "level": 8,
-         "est": 3865.3499464495544
-        },
-        {
-         "move": "flare-blitz",
-         "level": 8,
-         "est": 2860.8463541595006
-        },
-        {
-         "move": "fire-spin",
-         "level": 8,
-         "est": 838.3807006615369
-        }
-       ],
-       "items": [
-        "silk-scarf",
-        "x-attack",
-        "pp-max",
-        "metronome",
-        "dire-hit",
-        "light-clay"
-       ],
-       "vs": {
-        "johto-boss-xatu": 1.6168563729315562,
-        "johto-boss-crobat": 2.4252845593973342,
-        "johto-boss-machamp": 3.1182230049394297,
-        "johto-boss-houndoom": 3.9358860156216786,
-        "johto-boss-dragonite": 4.568439125275162,
-        "round1": 16.498534417668942,
-        "round2": 24.74780162650341,
-        "round3": 40.65415670301365,
-        "legend-lugia": 32.997068835337885,
-        "legend-ho-oh": 35.14183942519356,
-        "legend-raikou": 5.197038341565716,
-        "legend-entei": 5.5348397094679855,
-        "legend-suicune": 5.5348397094679855
-       },
-       "legendAvg": 30.007880201543493
-      },
-      {
-       "form": "flareon",
-       "scene": "boss",
-       "est": 12070.312105973442,
-       "moves": [
-        {
-         "move": "double-edge",
-         "level": 8,
-         "est": 4557.711860084995
-        },
-        {
-         "move": "body-slam",
-         "level": 8,
-         "est": 3865.3499464495544
-        },
-        {
-         "move": "flare-blitz",
-         "level": 8,
-         "est": 2860.8463541595006
-        },
-        {
-         "move": "smog",
-         "level": 8,
-         "est": 786.4039452793918
-        }
-       ],
-       "items": [
-        "silk-scarf",
-        "x-attack",
-        "pp-max",
-        "metronome",
-        "dire-hit",
-        "light-clay"
-       ],
-       "vs": {
-        "johto-boss-xatu": 1.6238188232349198,
-        "johto-boss-crobat": 2.467885731001931,
-        "johto-boss-machamp": 3.131650587667345,
-        "johto-boss-houndoom": 3.8962813945117003,
-        "johto-boss-dragonite": 4.5224694757725095,
-        "round1": 16.56957982892775,
-        "round2": 24.85436974339163,
-        "round3": 40.56504647718389,
-        "legend-lugia": 33.1391596578555,
-        "legend-ho-oh": 34.78822673671161,
-        "legend-raikou": 5.219417646112242,
-        "legend-entei": 5.4791457110320785,
-        "legend-suicune": 5.4791457110320785
-       },
-       "legendAvg": 29.983276488814077
       }
      ],
      "measured": {
@@ -16723,6 +16723,21 @@
      "owners": 1
     },
     {
+     "move": "wild-charge",
+     "est": 4218.685828339141,
+     "key": "pichu",
+     "form": "pikachu",
+     "items": [
+      "magnet",
+      "pp-max",
+      "light-ball",
+      "metronome",
+      "x-attack",
+      "dire-hit"
+     ],
+     "owners": 2
+    },
+    {
      "move": "megahorn",
      "est": 4194.294671253755,
      "key": "heracross",
@@ -17149,21 +17164,6 @@
       "dire-hit"
      ],
      "owners": 2
-    },
-    {
-     "move": "wild-charge",
-     "est": 1682.7671951587029,
-     "key": "pichu",
-     "form": "pikachu",
-     "items": [
-      "magnet",
-      "light-ball",
-      "pp-max",
-      "metronome",
-      "x-attack",
-      "dire-hit"
-     ],
-     "owners": 1
     },
     {
      "move": "stomp",
@@ -25211,13 +25211,12 @@
   "confusion": "ねんりき",
   "pikachu": "ピカチュウ",
   "volt-tackle": "ボルテッカー",
-  "thunderbolt": "１０まんボルト",
   "wild-charge": "ワイルドボルト",
+  "thunderbolt": "１０まんボルト",
   "light-ball": "でんきだま",
   "magnet": "じしゃく",
   "quick-claw": "せんせいのツメ",
   "thunder-wave": "でんじは",
-  "spark": "スパーク",
   "thunder-shock": "でんきショック",
   "oddish": "ナゾノクサ",
   "vileplume": "ラフレシア",
@@ -25304,15 +25303,14 @@
   "snore": "いびき",
   "heavy-slam": "ヘビーボンバー",
   "eevee": "イーブイ",
-  "last-resort": "とっておき",
-  "everstone": "かわらずのいし",
-  "flareon": "ブースター",
   "jolteon": "サンダース",
   "electro-ball": "エレキボール",
   "pin-missile": "ミサイルばり",
   "agility": "こうそくいどう",
   "x-speed": "スピーダー",
-  "smog": "スモッグ",
+  "last-resort": "とっておき",
+  "everstone": "かわらずのいし",
+  "flareon": "ブースター",
   "doduo": "ドードー",
   "dodrio": "ドードリオ",
   "tri-attack": "トライアタック",
@@ -25336,6 +25334,7 @@
   "magneton": "レアコイル",
   "flash-cannon": "ラスターカノン",
   "zoom-lens": "フォーカスレンズ",
+  "spark": "スパーク",
   "mewtwo": "ミュウツー",
   "psystrike": "サイコブレイク",
   "future-sight": "みらいよち",
@@ -25371,6 +25370,7 @@
   "mach-punch": "マッハパンチ",
   "arm-thrust": "つっぱり",
   "stomp": "ふみつけ",
+  "smog": "スモッグ",
   "revenge": "リベンジ",
   "hex": "たたりめ",
   "dragon-claw": "ドラゴンクロー",

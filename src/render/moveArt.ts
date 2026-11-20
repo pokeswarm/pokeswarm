@@ -5229,6 +5229,72 @@ function segDist(u: number, v: number, s: [number, number, number, number]): num
 }
 
 /**
+ * ワイルドボルト（カントー・ジョウト。07 の326章）: 走った道に残る稲妻（線に並べる。ふちなし）。
+ * 途中の部品は、端で真ん中の高さに戻るギザギザの太い稲妻と、そこから跳ねる細い枝。3 コマ: 太く光る → 細くなる → ちぎれた火花だけ残る
+ */
+function wildZigzag(): SpriteOut {
+  // ゲームでは太さ 24（1 ドット 2）で描くので、高さ 12 ドットの細かさで描く（細い線が消えないように）
+  const H = 12;
+  const TILE = 16;
+  // 0 濃い黄・1 黄・2 薄い黄・3 白
+  const palette = ['#f9a825', '#fdd835', '#fff59d', '#ffffff'];
+  const mid = (H - 1) / 2;
+  const frames = 3;
+  // コマごとの形（端は真ん中の高さ。並べるとつながる）。上下へ交互に鋭く折れ、高さと間隔はばらつかせる
+  const shapes = Array.from({ length: frames }, (_, f) => {
+    const r = rng(9100 + f * 37);
+    const sgn = r() < 0.5 ? 1 : -1;
+    const pts: [number, number][] = [[0, mid], [2.5 + r() * 2, mid + sgn * (1.5 + r() * 1.5)], [6 + r() * 2, mid - sgn * (2.5 + r() * 2)], [9.5 + r() * 1.5, mid + sgn * (1 + r() * 1.5)], [12.5 + r() * 1.5, mid - sgn * (1.5 + r() * 2)], [TILE, mid]];
+    const main: [number, number, number, number][] = [];
+    for (let k = 0; k < pts.length - 1; k++) main.push([pts[k]![0], pts[k]![1], pts[k + 1]![0], pts[k + 1]![1]]);
+    // 折れ目から跳ねる細い枝
+    const twigs: [number, number, number, number][] = [];
+    for (const k of [1, 2, 3, 4]) {
+      if (r() < 0.45) continue;
+      const [x, y] = pts[k]!;
+      const up = y < mid ? -1 : 1;
+      twigs.push([x, y, x + 1 + r() * 1.5, y + up * (1.2 + r() * 1.5)]);
+    }
+    const sparks = Array.from({ length: 3 }, () => [1 + r() * (TILE - 2), 0.5 + r() * (H - 1)] as const);
+    return { main, twigs, sparks };
+  });
+  const parts = lineParts(
+    H,
+    { start: 3, middle: TILE, end: 4 },
+    frames,
+    (x, y, f, part) => {
+      // 細くなっていく（最後のコマは途切れ途切れ）
+      const w = [1, 0.8, 0.6][f]!;
+      if (part !== 'middle') {
+        // 始まり・終わり: 細くなって消える先
+        const len = part === 'start' ? 3 : 4;
+        const along = part === 'start' ? (x + 0.5) / len : 1 - (x + 0.5) / len;
+        const d = Math.abs(y - mid);
+        const r0 = (0.35 + 0.9 * along) * w;
+        if (f === 2 && (x + y) % 2 === 0) return -1;
+        return d < r0 * 0.5 ? 3 : d < r0 ? 1 : -1;
+      }
+      const sh = shapes[f]!;
+      let best = 9;
+      for (const seg of sh.main) best = Math.min(best, segDist(x, y, seg));
+      if (f === 2 && Math.floor(x / 2.5) % 2 === 1) best += 2;
+      if (best < 0.45 * w) return 3;
+      if (best < 0.85 * w) return 2;
+      if (best < 1.25 * w) return 1;
+      if (best < 1.55 * w && f === 0) return 0;
+      let twig = 9;
+      for (const seg of sh.twigs) twig = Math.min(twig, segDist(x, y, seg));
+      if (twig < 0.5) return f === 0 ? 3 : 2;
+      if (twig < 0.85 && f < 2) return 1;
+      for (const [sx, sy] of sh.sparks) if (Math.hypot(x - sx, y - sy) < 0.5 && f > 0) return 2;
+      return -1;
+    },
+    -1,
+  );
+  return { palette, frameMs: 110, parts };
+}
+
+/**
  * ワイルドボルト: 突っ込む体を包む稲妻（右が前。64 ドット・ふちなし）。前に尖った形に走る稲妻と、後ろへちぎれて流れる稲妻。
  * 真ん中は空けて、突っ込むポケモンが見える。コマごとに稲妻の形が変わる
  */
@@ -8166,6 +8232,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'pin-needle': pinNeedle,
     'electro-ball': electroBall,
     'electro-burst': electroBurst,
+    // 326章
+    'wild-zigzag': wildZigzag,
 };
 
 /** 絵の名前の一覧 */

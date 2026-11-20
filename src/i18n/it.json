@@ -802,6 +802,7 @@
   "info.delayedBlast": "I nemici colpiti esplodono dopo {seconds} s",
   "info.dash": "Ti muovi insieme all’attacco",
   "info.dashInvincible": "Ti muovi con l’attacco e non subisci danni nel frattempo",
+  "info.dashInput": "Solo camminando: scatti nella direzione in cui vai a zigzag come un fulmine (più sei veloce, più lontano vai)",
   "info.chargeMoving": "Si carica solo mentre ti muovi",
   "info.speedScale": "Più sei veloce, più è potente e grande (contano i bonus di velocità)",
   "info.burstCount": "Ne lancia a caso tra {min} e il numero massimo ogni volta",

@@ -76,7 +76,7 @@ export class PlayerView {
    * （でんこうせっか）。見た目だけで、位置（当たり判定）は動かさない
    */
   /** 体が本当に動く技（dash。07 の177章）の見た目: 弧を描いて跳び、通った所に残像を残す */
-  dash(dirX: number, dirY: number, distance: number, seconds: number, hop: number, afterimages: number, tint?: string): void {
+  dash(dirX: number, dirY: number, distance: number, seconds: number, hop: number, afterimages: number, tint?: string, path?: readonly number[]): void {
     this.hopStart = this.scene.time.now;
     this.hopMs = seconds * 1000;
     this.hopHeight = hop;
@@ -89,8 +89,19 @@ export class PlayerView {
     if (!sprite) return;
     for (let k = 0; k < afterimages; k++) {
       const t = k / Math.max(1, afterimages);
+      // 折れて進む道（ワイルドボルト）では、道に沿った所に残す。どの線も同じ秒数で進むので、時間の割合で線を選ぶ
+      let ox = dirX * distance * t;
+      let oy = dirY * distance * t;
+      if (path && path.length >= 4) {
+        const n = path.length / 2 - 1;
+        const at = t * n;
+        const j = Math.min(n - 1, Math.floor(at));
+        const u = at - j;
+        ox = path[j * 2]! + (path[j * 2 + 2]! - path[j * 2]!) * u;
+        oy = path[j * 2 + 1]! + (path[j * 2 + 3]! - path[j * 2 + 1]!) * u;
+      }
       const ghost = this.scene.add
-        .image(this.container.x + dirX * distance * t, this.container.y + dirY * distance * t, sprite.texture.key, sprite.frame.name)
+        .image(this.container.x + ox, this.container.y + oy, sprite.texture.key, sprite.frame.name)
         .setScale(sprite.scaleX, sprite.scaleY)
         .setFlipX(sprite.flipX)
         .setTint(tint ? parseInt(tint.slice(1), 16) : 0xfff8e1)

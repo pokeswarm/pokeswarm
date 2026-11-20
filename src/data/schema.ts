@@ -1861,7 +1861,19 @@ export const moveDefSchema = z.object({
        * 行き先: facing = 向いている方へ range だけ。crowd = 届く範囲で敵が一番多い所へ（ドラゴンダイブ。着く前に、そこの敵に当たらない予告の当たりで状態異常を付ける）。
        * strongest = 届く範囲で HP の一番高い敵（ボス）の上へ飛び込む（ヘビーボンバー。跳んだときの場所へ落ちるので、動く相手はよけられる。07 の241章）
        */
-      target: z.enum(['facing', 'crowd', 'strongest']).default('facing'),
+      target: z.enum(['facing', 'crowd', 'strongest', 'input']).default('facing'),
+      /**
+       * input（ワイルドボルト。07 の326章）: 押している方向へ進む。歩いていない間は出さない（敵がいなくても、歩いていれば出る）。
+       * zigzag: 進む道を legs 本の斜めの線に折る（稲妻の形）。side は前へ 1 進む間に横へずれる量（1 本ごとに左右を入れ替え、使うたびに最初の向きも入れ替える）。
+       * minForwardSpeed: 前へ進む速さを、少なくとも自分の歩く速さのこの倍にする（速くなっても、技が出た瞬間に遅くならない）
+       */
+      zigzag: z
+        .object({
+          legs: z.number().int().positive(),
+          side: z.number().nonnegative(),
+          minForwardSpeed: z.number().nonnegative().default(0),
+        })
+        .optional(),
       /** strongest の相手を、向いている方向を中心にしたこの角度（度）の扇の中だけから選ぶ（ヘビーボンバー: 前 45°。07 の242章） */
       arcDegrees: z.number().positive().max(360).optional(),
       /** 相手の中心まで行かず、相手の手前（ふちに体が触れる所）で止まる（アクアブレイク: 相手へ直進してぶつかる。07 の245章） */
@@ -2520,6 +2532,8 @@ export const effectRecipeSchema = z.object({
   pathSprite: moveSpriteSpec.optional(),
   /** 技そのものに、もう1枚重ねる絵（だいばくはつ: 広がる爆発の端に、派手な炎の帯を輪に沿って並べる） */
   edgeSprite: moveSpriteSpec.optional(),
+  /** 折れて進む dash（ワイルドボルト。07 の326章）の通った道に、1 本ずつ seconds の間残す絵（fit line。太さは radius） */
+  dashPathSprite: moveSpriteSpec.extend({ seconds: z.number().positive(), radius: z.number().positive() }).optional(),
   /** 技を使った瞬間に、使ったポケモンの位置に seconds の間出す絵（しおふき: 真上へ噴き上がる潮）。radius はワールドの単位 */
   castSprite: moveSpriteSpec
     .extend({

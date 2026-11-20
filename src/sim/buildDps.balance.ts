@@ -86,6 +86,26 @@ function lateEnemyHp(rules: SimRules, kindHp: number, lastWaveHp: number): numbe
   return kindHp * lastWaveHp * (1 + (rules.spawn.hpPerTwoGymsPct * Math.floor(gyms / 2)) / 100) * (1 + (rules.spawn.hpPerLevelPct * (LEVEL - 1)) / 100);
 }
 
+/** 一番近い敵の方へ入力を向ける（8 方向。-1・0・1） */
+function aimInput(w: Simulation['world'], p: Simulation['world']['players'][number]): void {
+  let best = -1;
+  let bd = Infinity;
+  for (let i = 0; i < w.enemies.count; i++) {
+    const d = (w.enemies.x[i]! - p.x) ** 2 + (w.enemies.y[i]! - p.y) ** 2;
+    if (d < bd) {
+      bd = d;
+      best = i;
+    }
+  }
+  if (best === -1) return;
+  const dx = w.enemies.x[best]! - p.x;
+  const dy = w.enemies.y[best]! - p.y;
+  const d = Math.sqrt(bd) || 1;
+  p.inputX = (Math.abs(dx) > d * 0.38 ? Math.sign(dx) : 0) as typeof p.inputX;
+  p.inputY = (Math.abs(dy) > d * 0.38 ? Math.sign(dy) : 0) as typeof p.inputY;
+  if (p.inputX === 0 && p.inputY === 0) p.inputX = 1;
+}
+
 function measure(rules: SimRules, form: string, types: number[], loadout: Loadout, moves: Build['moves'], items: Build['items'], sceneKey: keyof typeof SCENES, seedNo: number, target?: SimEnemyKind): number {
   const scene = SCENES[sceneKey];
   const r: SimRules = { ...rules, enemies: { ...rules.enemies, kinds: [...rules.enemies.kinds] } };
@@ -129,6 +149,7 @@ function measure(rules: SimRules, form: string, types: number[], loadout: Loadou
   };
   for (let k = 0; k < scene.count; k++) spawn();
   let kills = 0;
+  const walks = moves.some((m) => r.moves[moveIdx(m.move)]?.dash?.target === 'input');
   for (let t = 0; t < SECONDS * 30; t++) {
     p.hp = p.maxHp;
     p.facingX = 1;
@@ -151,6 +172,8 @@ function measure(rules: SimRules, form: string, types: number[], loadout: Loadou
       p.hp = p.maxHp = realMaxHp;
       hurtPlayer(w, p, (realMaxHp * HURT_PER_MIN) / 60);
     }
+    // 歩いている間だけ出る技（ワイルドボルト。07 の326章）: 一番近い敵の方へ歩き続ける（人は敵の群れの中を走り回る）
+    if (walks) aimInput(w, p);
     sim.step([]);
     if (hurtNow) p.hp = p.maxHp = 1e9;
     // 倒れた分は、数がいつも同じになるようにすぐ足す（数えるのは倒した数だけ。遠くて消えた雑魚は数えない）

@@ -1414,7 +1414,25 @@ export class RunScene extends Phaser.Scene {
         this.uiCommands.push({ type: 'runStat', playerId: this.localId, stat: ev.stat, value: ev.value });
         if (this.sync && w.role === 'guest') this.sync.requestRunStat(ev.stat, ev.value);
       } else if (ev.type === 'dashStarted') {
-        this.playerViews.get(ev.playerId)?.dash(ev.dirX, ev.dirY, ev.distance, ev.seconds, ev.hop, ev.afterimages, ev.tint);
+        this.playerViews.get(ev.playerId)?.dash(ev.dirX, ev.dirY, ev.distance, ev.seconds, ev.hop, ev.afterimages, ev.tint, ev.path);
+        // 折れて進む技（ワイルドボルト。07 の326章）: 通った道に、1 本ずつ稲妻を残す（進むのに合わせて順に出す）
+        const ps = ev.path && ev.move !== undefined ? this.effects.dashPathSprite(w.rules.moves[ev.move]!.effect) : null;
+        const q = ps ? w.players.find((pp) => pp.id === ev.playerId) : undefined;
+        if (ps && q && ev.path) {
+          const legs = ev.path.length / 2 - 1;
+          for (let k = 0; k < legs; k++) {
+            const x0 = q.x + ev.path[k * 2]!;
+            const y0 = q.y + ev.path[k * 2 + 1]!;
+            const dx = ev.path[k * 2 + 2]! - ev.path[k * 2]!;
+            const dy = ev.path[k * 2 + 3]! - ev.path[k * 2 + 1]!;
+            const len = Math.hypot(dx, dy) || 1;
+            this.strikes.push({
+              item: { spec: ps, x: x0, y: y0, radius: ps.radius, band: 0, dirX: dx / len, dirY: dy / len, length: len, vx: 0, vy: 0, seed: this.strikes.length },
+              start: this.time.now / 1000 + (ev.seconds * k) / legs,
+              seconds: ps.seconds,
+            });
+          }
+        }
       } else if (ev.type === 'bodyAttack') {
         this.playerViews.get(ev.playerId)?.lunge(ev.dirX, ev.dirY, ev.distance, ev.afterimages, ev.flip);
       } else if (ev.type === 'moveTaught' && ev.playerId === this.localId) {
@@ -3361,8 +3379,9 @@ export class RunScene extends Phaser.Scene {
     const now = this.time.now / 1000;
     this.strikes = this.strikes.filter((s) => now - s.start < s.seconds);
     const hazardItems = this.hazardSpriteItems(world, alpha);
+    // 出る時刻がまだ先のもの（ワイルドボルトの 2 本目からの稲妻）は描かない
     this.strikeSprites?.drawItems(
-      this.strikes.map((s) => {
+      this.strikes.filter((s) => now >= s.start).map((s) => {
         const elapsed = now - s.start;
         const moved = s.drift ? { x: s.item.x + s.drift.x * elapsed, y: s.item.y + s.drift.y * elapsed } : {};
         return { ...s.item, ...moved, elapsed, alpha: Math.min(1, (s.seconds - elapsed) / (s.seconds * 0.3)) };

@@ -107,6 +107,13 @@
       "to": "wild-charge"
     },
     {
+      "from": "quick-attack",
+      "item": "magnet",
+      "to": "wild-charge",
+      "line": "eevee",
+      "forms": ["jolteon"]
+    },
+    {
       "from": "rock-throw",
       "item": "hard-stone",
       "to": "rock-slide"

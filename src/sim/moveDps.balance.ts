@@ -72,10 +72,29 @@ function measure(moveKey: string, scene: { count: number; boss: boolean; still?:
     w.enemies.add(w.nextEnemyId++, kind, Math.cos(a) * d, Math.sin(a) * d, HP, scene.still !== undefined ? 0 : 60, scene.boss ? 28 : 12, 0);
   }
   let instakill = false;
+  // 歩いている間だけ出る技（ワイルドボルト。07 の326章）: 一番近い敵の方へ歩き続ける
+  const walks = rules.moves[move]!.dash?.target === 'input';
   for (let t = 0; t < SECONDS * 30; t++) {
     p.hp = p.maxHp;
     p.facingX = 1;
     p.facingY = 0;
+    if (walks) {
+      let best = -1;
+      let bd = Infinity;
+      for (let i = 0; i < w.enemies.count; i++) {
+        const d = (w.enemies.x[i]! - p.x) ** 2 + (w.enemies.y[i]! - p.y) ** 2;
+        if (d < bd) {
+          bd = d;
+          best = i;
+        }
+      }
+      const dx = best === -1 ? 1 : w.enemies.x[best]! - p.x;
+      const dy = best === -1 ? 0 : w.enemies.y[best]! - p.y;
+      const d = Math.hypot(dx, dy) || 1;
+      p.inputX = (Math.abs(dx) > d * 0.38 ? Math.sign(dx) : 0) as typeof p.inputX;
+      p.inputY = (Math.abs(dy) > d * 0.38 ? Math.sign(dy) : 0) as typeof p.inputY;
+      if (p.inputX === 0 && p.inputY === 0) p.inputX = 1;
+    }
     sim.step([]);
     for (const ev of w.events) if (ev.type === 'enemyKilled') instakill = true;
   }

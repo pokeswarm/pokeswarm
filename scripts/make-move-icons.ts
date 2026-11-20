@@ -1074,6 +1074,28 @@ function koban(cx: number, cy: number, rx: number, ry: number): Draw {
   });
 }
 
+/** ワイルドボルト（07 の326章）: 斜め・斜め・斜めに折れて走った稲妻の道（左下から右上へ。白い芯・黄・濃い黄） */
+function zigzagRun(): Draw {
+  const pts: [number, number][] = [[3, 27], [10, 15], [14, 24], [22, 11]];
+  const seg = (x: number, y: number, [x1, y1]: [number, number], [x2, y2]: [number, number]): number => {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const t = Math.max(0, Math.min(1, ((x - x1) * dx + (y - y1) * dy) / (dx * dx + dy * dy)));
+    return Math.hypot(x - x1 - dx * t, y - y1 - dy * t);
+  };
+  return paint((x, y) => {
+    let d = 9;
+    for (let k = 0; k < pts.length - 1; k++) d = Math.min(d, seg(x, y, pts[k]!, pts[k + 1]!));
+    // 走り始め（左下）ほど細く
+    const w = 0.5 + Math.min(1, Math.max(0, (x - 3) / 18)) * 0.45;
+    if (d < 0.5 * w) return '#ffffff';
+    if (d < 1.25 * w) return '#fff59d';
+    if (d < 1.9 * w) return '#fdd835';
+    if (d < 2.4 * w) return '#f9a825';
+    return null;
+  });
+}
+
 /** かくばる: 角ばった結晶（面ごとに明るさを変える。ポリゴンの桃色と水色） */
 function facetGem(cx: number, cy: number, w: number, h: number, rot: number): Draw {
   const a = (rot * Math.PI) / 180;
@@ -1380,12 +1402,10 @@ const ICONS: Record<string, Layer[]> = {
   // ---- でんき・どく のキバ ----
   'thunder-fang': [{ art: 'fang-front-electric', part: 'front', frame: 0, k: 1.1, x: 16, y: 16.5 }],
   'poison-fang': [{ art: 'fang-front-poison', part: 'front', frame: 0, k: 1.1, x: 16, y: 16.5 }],
-  // スパーク・ワイルドボルト: 体のまわりの電気の輪
+  // スパーク: 体のまわりの電気の輪
   spark: Array.from({ length: 8 }, (_, i) => ({ art: 'electric-ring', part: 'middle', k: 0.75, x: 16 + Math.cos((i * Math.PI) / 4) * 9, y: 16 + Math.sin((i * Math.PI) / 4) * 9, rot: i * 45 + 90 })),
-  'wild-charge': [
-    ...Array.from({ length: 8 }, (_, i) => ({ art: 'electric-ring', part: 'middle', k: 0.7, x: 13 + Math.cos((i * Math.PI) / 4) * 7.5, y: 19 + Math.sin((i * Math.PI) / 4) * 7.5, rot: i * 45 + 90 })),
-    { art: 'speed-streak', k: 0.6, x: 23, y: 8, rot: -40 },
-  ],
+  // ワイルドボルト（07 の326章）: 斜め・斜め・斜めに折れて走った稲妻の道と、その先の電気をまとった体
+  'wild-charge': [zigzagRun(), { art: 'wild-bolt-wrap', frame: 0, k: 0.34, x: 24.5, y: 8, rot: -58 }],
   // ---- いわ ----
   'rock-blast': [
     { art: 'rock', k: 0.75, x: 10, y: 21 },

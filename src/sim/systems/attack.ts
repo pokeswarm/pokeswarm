@@ -438,7 +438,8 @@ export function useMoves(world: World): void {
       }
       if (pm.cooldown > 0) continue;
       // 体が動く技: 行き先に敵がいなければ出さない（だれもいないのに勝手に動かない。溜める技も溜め始めない）
-      if ((def.dash && !(def.dash.target === 'strongest' ? dashTarget(world, p, def.dash, st.range) !== -1 : def.dash.target === 'crowd' ? enemiesInRange(world, p.x, p.y, st.range).length > 0 : enemyAhead(world, p, st.range + st.size))) || (def.sequence && !sequenceCanStart(world, p, def.sequenceGate ?? 'ahead', st))) {
+      // 押している方へ進む技（ワイルドボルト）: 歩いている間だけ出す（止まっている間は出さない。07 の326章）
+      if ((def.dash && !(def.dash.target === 'input' ? p.inputX !== 0 || p.inputY !== 0 : def.dash.target === 'strongest' ? dashTarget(world, p, def.dash, st.range) !== -1 : def.dash.target === 'crowd' ? enemiesInRange(world, p.x, p.y, st.range).length > 0 : enemyAhead(world, p, st.range + st.size))) || (def.sequence && !sequenceCanStart(world, p, def.sequenceGate ?? 'ahead', st))) {
         pm.cooldown = 0;
         continue;
       }
@@ -1345,10 +1346,13 @@ function enemyAhead(world: World, p: Player, reach: number): boolean {
  */
 function fireDash(world: World, p: Player, pm: PlayerMove, st: MoveStats): void {
   const dash = world.rules.moves[pm.move]!.dash!;
-  let [fx, fy] = axisToUnit(p.facingX, p.facingY);
+  let [fx, fy] = dash.target === 'input' ? axisToUnit(p.inputX, p.inputY) : axisToUnit(p.facingX, p.facingY);
   let distance = st.range;
+  // 前へ進む速さを、自分の歩く速さの決まった倍より遅くしない（ワイルドボルト: 速いサンダースでも、技が出た瞬間に遅くならない。07 の326章）
+  const zig = dash.zigzag;
+  if (zig && zig.minForwardSpeed > 0) distance = Math.max(distance, zig.minForwardSpeed * p.moveSpeed * dash.seconds);
   // 敵が一番多い所へ（ドラゴンダイブ）
-  if (dash.target !== 'facing') {
+  if (dash.target !== 'facing' && dash.target !== 'input') {
     // 敵が一番多い所（ドラゴンダイブ）か、HP の一番高い敵の上（ヘビーボンバー）
     const t = dash.target === 'crowd' ? crowdCenter(world, p, st.range, st.size) : dashTarget(world, p, dash, st.range);
     if (t !== -1) {
@@ -1363,10 +1367,33 @@ function fireDash(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
       if (dash.stopShort) distance = Math.max(0, distance - world.enemies.radius[t]! - p.radius);
     }
   }
-  const ticks = Math.max(1, Math.round(dash.seconds / world.dt));
+  // 折れて進む技は、更新回数を線の本数で割り切れる数にする（どの線も同じ長さに折れる）
+  const ticks = zig ? Math.max(1, Math.round(dash.seconds / world.dt / zig.legs)) * zig.legs : Math.max(1, Math.round(dash.seconds / world.dt));
   // 更新回数で割り切って、ちょうど行き先まで進む
   const speed = distance / (ticks * world.dt);
-  world.events.push({ type: 'dashStarted', playerId: p.id, seconds: dash.seconds, hop: dash.hop, afterimages: dash.afterimages, ...(dash.tint ? { tint: dash.tint } : {}), dirX: fx, dirY: fy, distance });
+  // 稲妻の形に折れて進む（ワイルドボルト）: 前へ distance / legs ずつ、横へ side 倍ずつずれる線を、左右を入れ替えながらつなぐ
+  let legs: number[] | undefined;
+  let path: number[] | undefined;
+  if (zig) {
+    const step = distance / zig.legs;
+    const norm = Math.sqrt(1 + zig.side * zig.side);
+    const legSpeed = (step * norm) / ((ticks * world.dt) / zig.legs);
+    p.zigFlip = !p.zigFlip;
+    legs = [];
+    path = [0, 0];
+    let px = 0;
+    let py = 0;
+    for (let k = 0; k < zig.legs; k++) {
+      const s = (k % 2 === 0) === p.zigFlip ? 1 : -1;
+      const dx = (fx - s * zig.side * fy) / norm;
+      const dy = (fy + s * zig.side * fx) / norm;
+      legs.push(dx * legSpeed, dy * legSpeed);
+      px += dx * step * norm;
+      py += dy * step * norm;
+      path.push(px, py);
+    }
+  }
+  world.events.push({ type: 'dashStarted', playerId: p.id, seconds: dash.seconds, hop: dash.hop, afterimages: dash.afterimages, ...(dash.tint ? { tint: dash.tint } : {}), dirX: fx, dirY: fy, distance, ...(path ? { path, move: pm.move } : {}) });
   if (dash.recoverSeconds > 0) p.recoverTicks = ticks + Math.round((dash.recoverSeconds * (dash.recoverLines?.[p.line] ?? 1)) / world.dt);
   // 進んでいる間は、ほかの体が動く技を出さない（07 の268章）。体を動かすのは本人のブラウザだけだが、これはどのブラウザでも数える
   p.dashBusyTicks = Math.max(p.dashBusyTicks ?? 0, ticks);
@@ -1374,6 +1401,8 @@ function fireDash(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
     p.dashTicks = ticks;
     p.dashVx = fx * speed;
     p.dashVy = fy * speed;
+    p.dashLegs = legs;
+    p.dashTotalTicks = ticks;
     if (dash.invincible) p.invincibleTicks = Math.max(p.invincibleTicks, ticks + 1);
   }
   const b = base(world, p, pm, st);

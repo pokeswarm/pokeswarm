@@ -2456,20 +2456,34 @@
       ]
     },
     "wild-charge": {
-      "pattern": "pulse",
+      "pattern": "dash",
       "effect": "wild-charge",
+      "bonusCountToPower": true,
+      "dash": {
+        "seconds": 0.24,
+        "hit": "path",
+        "hop": 0,
+        "afterimages": 4,
+        "invincible": false,
+        "target": "input",
+        "zigzag": {
+          "legs": 3,
+          "side": 0.7,
+          "minForwardSpeed": 1.5
+        }
+      },
       "base": {
-        "power": 7.5,
+        "power": 66.4,
         "cooldownSeconds": 1.1,
-        "count": 2,
-        "intervalSeconds": 0.15,
+        "count": 1,
+        "intervalSeconds": 0.1,
         "speed": 0,
-        "size": 18,
-        "range": 130,
-        "durationSeconds": 0.5,
+        "size": 28,
+        "range": 120,
+        "durationSeconds": 0.24,
         "pierce": "infinite",
-        "hitIntervalSeconds": 0.25,
-        "knockback": 200,
+        "hitIntervalSeconds": 0,
+        "knockback": 220,
         "knockbackSeconds": 0.1,
         "statusId": "paralysis",
         "statusChance": 0.3,
@@ -2479,32 +2493,31 @@
       },
       "levels": [
         {
-          "range": 15,
-          "power": 0.8
-        },
-        {
-          "size": 2,
-          "power": 1.5
-        },
-        {
-          "statusChance": 0.1,
-          "power": 1.6
-        },
-        {
-          "cooldownSeconds": -0.2,
-          "power": -0.9
-        },
-        {
-          "range": 15,
-          "power": 0.3
+          "power": 15.1
         },
         {
           "size": 3,
-          "power": 1.1
+          "power": 12.3
         },
         {
-          "count": 1,
-          "power": -2
+          "statusChance": 0.1,
+          "power": 14.8
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": -2.2
+        },
+        {
+          "range": 20,
+          "power": 7.2
+        },
+        {
+          "size": 3,
+          "power": 8.4
+        },
+        {
+          "range": 20,
+          "power": 5.9
         }
       ],
       "effects": [
@@ -2518,8 +2531,7 @@
             "range": 180
           }
         }
-      ],
-      "contestType": "cool"
+      ]
     },
     "fissure": {
       "pattern": "scatter",

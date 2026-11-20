@@ -119,6 +119,10 @@ export interface Player {
   dashTicks?: number;
   dashVx?: number;
   dashVy?: number;
+  /** 折れて進む dash（ワイルドボルト。07 の326章）: 1 本ごとの速さ [vx, vy, vx, vy, …] と、進み始めたときの更新回数・最初に折れる向き（使うたびに入れ替える） */
+  dashLegs?: number[];
+  dashTotalTicks?: number;
+  zigFlip?: boolean;
   /** 体が動く技で進んでいる残りの更新回数（どのブラウザでも数える。ほかの体が動く技を重ねて出さないため。07 の268章） */
   dashBusyTicks?: number;
   /** 技の反動で動けない残りの更新回数（進んでいる間も含む。ギガインパクト） */

@@ -1949,6 +1949,11 @@ export const moveDefSchema = z.object({
    * 基準のプレイヤー＝1）から、威力を ×(1 + power × (F − 1))・大きさを ×(1 + size × (F − 1)) にする（F が 1 より小さいときは掛けない）
    */
   speedScale: z.object({ power: z.number().min(0), size: z.number().min(0) }).optional(),
+  /**
+   * HP が多いほど強い（★だくりゅう（シャワーズ）。07 の329章）: HP の倍率 H（種族値の HP のランク × 最大 HP の強化。基準のプレイヤー＝1）から、
+   * 威力を ×(1 + power × (H − 1))・大きさを ×(1 + size × (H − 1)) にする（H が 1 より小さいときは掛けない）
+   */
+  hpScale: z.object({ power: z.number().min(0), size: z.number().min(0) }).optional(),
   /** 続けて撃つ技（facing・nearest など）の数を、使うたびに burstCountMin〜count のどれかにする（ミサイルばり: 原作は 2〜5 回。07 の325章） */
   burstCountMin: z.number().int().positive().optional(),
   /** 押し出す向きを、当たり判定から敵へではなく、技の向き（向いている方向）にする（なみのり・サイコキネシス。07 の162章） */
@@ -1977,6 +1982,8 @@ export const moveDefSchema = z.object({
   hurtByHpPct: z.boolean().optional(),
   /** heal の healZone: 円を自分に付いて動く膜にし、中のプレイヤー（仲間も）を状態異常から守る（しんぴのまもり。07 の272章） */
   statusGuard: z.boolean().optional(),
+  /** heal の healZone: 円を自分に付いて動かす（守る膜にはしない。アクアリング: 水の泡をまとって回復し続ける。07 の329章） */
+  healFollow: z.boolean().optional(),
   /** 雑魚は貫通し、ボス・中ボス（rank が normal でない敵）に当たったら消える（そこで end の効き方。ラスターカノン。07 の238章） */
   stopOnBoss: z.boolean().optional(),
   /** 追う弾（homing）: 途中の敵は貫通し、狙った敵（aimStrongest で決めた HP の一番高い敵）に当たったら消える（そこで end の効き方。サイコブレイク。07 の305章） */

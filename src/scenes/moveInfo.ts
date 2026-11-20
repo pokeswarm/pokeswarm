@@ -160,6 +160,8 @@ export function moveInfoLines(rules: SimRules, def: SimMoveDef): string[] {
   if (def.dash) out.push(t(def.dash.target === 'input' ? 'info.dashInput' : def.dash.invincible ? 'info.dashInvincible' : 'info.dash'));
   if (def.chargeWhileMoving) out.push(t('info.chargeMoving'));
   if (def.speedScale) out.push(t('info.speedScale'));
+  if (def.hpScale) out.push(t('info.hpScale'));
+  if (def.healFollow) out.push(t('info.healFollow'));
   if (def.burstCountMin) out.push(t('info.burstCount', { min: def.burstCountMin }));
   if (def.hurtRelease) out.push(t('info.hurtRelease'));
   if (def.rainBoost) out.push(t('info.rainBoost', { type: typeName(rules, def.rainBoost.type), v: def.rainBoost.pct }));

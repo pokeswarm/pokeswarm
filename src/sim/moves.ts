@@ -161,6 +161,8 @@ export interface SimMoveDef {
   readonly hurtAtLink?: boolean;
   readonly hurtByHpPct?: boolean;
   readonly statusGuard?: boolean;
+  /** heal の healZone を自分に付いて動かす（アクアリング。07 の329章） */
+  readonly healFollow?: boolean;
   /** 雑魚は貫通し、ボス・中ボスに当たったら消える（ラスターカノン） */
   readonly stopOnBoss?: boolean;
   /** 追う弾が、狙った敵に当たったら消える（サイコブレイク。07 の305章） */
@@ -232,6 +234,8 @@ export interface SimMoveDef {
   readonly idleScale?: { readonly size: number; readonly power: number };
   /** 速いほど強い（エレキボール。07 の325章）: 速さの倍率 F から 威力 ×(1 + power(F − 1))・大きさ ×(1 + size(F − 1)) */
   readonly speedScale?: { readonly power: number; readonly size: number };
+  /** HP が多いほど強い（★だくりゅう。07 の329章）: HP の倍率 H から 威力 ×(1 + power(H − 1))・大きさ ×(1 + size(H − 1)) */
+  readonly hpScale?: { readonly power: number; readonly size: number };
   /** 続けて撃つ数を、使うたびに burstCountMin〜count のどれかにする（ミサイルばり） */
   readonly burstCountMin?: number;
   /** 押し出す向きを技の向きにする */

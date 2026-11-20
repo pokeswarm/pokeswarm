@@ -2670,6 +2670,118 @@
         "halfWidth": 0.42
       }
     },
+    "water-pulse-vaporeon": {
+      "pattern": "nearest",
+      "effect": "water-pulse-vaporeon",
+      "nameOf": "water-pulse",
+      "base": {
+        "power": 36,
+        "cooldownSeconds": 1.3,
+        "count": 2,
+        "intervalSeconds": 0.18,
+        "speed": 420,
+        "size": 22,
+        "range": 420,
+        "durationSeconds": 1.2,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockback": 160,
+        "knockbackSeconds": 0.1,
+        "statusId": "soaked",
+        "statusChance": 0.2,
+        "statusSeconds": 2,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "power": 8.3
+        },
+        {
+          "size": 3,
+          "power": 8.2
+        },
+        {
+          "statusChance": 0.1,
+          "power": 8.2
+        },
+        {
+          "count": 1,
+          "power": -14.7
+        },
+        {
+          "cooldownSeconds": -0.15,
+          "power": -0.5
+        },
+        {
+          "size": 3,
+          "power": 4.9
+        },
+        {
+          "range": 40,
+          "power": 4.8
+        }
+      ],
+      "effects": [
+        {
+          "trigger": "hit",
+          "explode": {
+            "sizeMultiplier": 2.6,
+            "powerMultiplier": 0.5,
+            "durationSeconds": 0.25
+          }
+        }
+      ]
+    },
+    "aqua-ring": {
+      "pattern": "heal",
+      "effect": "aqua-ring",
+      "teachOnly": true,
+      "healZone": true,
+      "healFollow": true,
+      "base": {
+        "power": 0,
+        "cooldownSeconds": 10,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 40,
+        "range": 0,
+        "durationSeconds": 6,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 0,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "healPct": 1.5
+      },
+      "levels": [
+        {
+          "healPct": 0.2
+        },
+        {
+          "durationSeconds": 1
+        },
+        {
+          "healPct": 0.2
+        },
+        {
+          "cooldownSeconds": -1
+        },
+        {
+          "healPct": 0.2
+        },
+        {
+          "durationSeconds": 1
+        },
+        {
+          "healPct": 0.2
+        }
+      ]
+    },
     "fissure": {
       "pattern": "scatter",
       "effect": "fissure",
@@ -9824,27 +9936,29 @@
       "contestType": "tough"
     },
     "muddy-water": {
-      "pattern": "melee",
-      "frontBox": {
-        "start": -1,
-        "end": 1,
-        "halfWidth": 1
-      },
+      "pattern": "facing",
+      "effect": "muddy-water",
+      "stopOnBoss": true,
+      "knockbackAlongFacing": true,
       "bonusCountToPower": true,
+      "hpScale": {
+        "power": 0.35,
+        "size": 0.15
+      },
       "base": {
-        "power": 46.5,
+        "power": 188.6,
         "cooldownSeconds": 2.2,
         "count": 1,
-        "intervalSeconds": 0.1,
-        "speed": 0,
-        "size": 20,
-        "range": 90,
-        "durationSeconds": 1.2,
+        "intervalSeconds": 0.3,
+        "speed": 300,
+        "size": 44,
+        "range": 420,
+        "durationSeconds": 1.4,
         "pierce": "infinite",
-        "hitIntervalSeconds": 0.3,
-        "knockback": 140,
-        "knockbackSeconds": 0.1,
-        "statusId": "soaked",
+        "hitIntervalSeconds": 0,
+        "knockback": 520,
+        "knockbackSeconds": 0.12,
+        "statusId": "muddied",
         "statusChance": 1,
         "statusSeconds": 2,
         "spreadDegrees": 0,
@@ -9852,42 +9966,44 @@
       },
       "levels": [
         {
-          "range": 10,
-          "power": 3.6
-        },
-        {
-          "durationSeconds": 0.2,
-          "power": 7.2
-        },
-        {
-          "range": 10,
-          "power": 2.6
-        },
-        {
-          "cooldownSeconds": -0.2,
-          "power": 0.6
-        },
-        {
-          "range": 10,
-          "power": 1.6
+          "size": 4,
+          "power": 23.4
         },
         {
           "statusSeconds": 1,
-          "power": 5.7
+          "power": 30.4
         },
         {
-          "range": 15,
-          "power": -0.7
+          "range": 40,
+          "power": 30.4
+        },
+        {
+          "cooldownSeconds": -0.2,
+          "power": 2.9
+        },
+        {
+          "size": 4,
+          "power": 17
+        },
+        {
+          "count": 1,
+          "power": -133
+        },
+        {
+          "size": 6,
+          "power": 5
         }
       ],
-      "effect": "muddy-water",
-      "teachOnly": true,
-      "followFacing": 720,
-      "idleScale": {
-        "size": 0.55,
-        "power": 0.5
-      },
-      "knockbackAlongFacing": true
+      "effects": [
+        {
+          "trigger": "end",
+          "explode": {
+            "sizeMultiplier": 2.2,
+            "powerMultiplier": 0.3,
+            "durationSeconds": 0.35
+          }
+        }
+      ]
     },
     "lava-plume": {
       "pattern": "trail",

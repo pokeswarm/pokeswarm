@@ -805,6 +805,8 @@
   "info.dashInput": "Seulement en marchant : tu fonces vers où tu vas en zigzag comme un éclair (plus tu es rapide, plus tu vas loin)",
   "info.chargeMoving": "Ne se charge que pendant que tu bouges",
   "info.speedScale": "Plus tu es rapide, plus elle est puissante et grande (les bonus de vitesse comptent)",
+  "info.hpScale": "Plus tu as de PV, plus elle est puissante et grande (les bonus de PV max comptent)",
+  "info.healFollow": "Le cercle te suit (les alliés proches sont aussi soignés)",
   "info.burstCount": "Tire au hasard entre {min} et le nombre maximal à chaque fois",
   "info.hurtRelease": "Accumule les dégâts subis et les renvoie",
   "info.rainBoost": "Tant que c’est actif, capacités {type} +{v} % de puissance",

@@ -30,9 +30,9 @@ describe('C: 押し出しの踏ん張り', () => {
   });
 });
 
-describe('A: なみのり・だくりゅう は波に乗る', () => {
+describe('A: なみのり は波に乗る（だくりゅう は 07 の329章で前へ浴びせる大波にした）', () => {
   it('止まっていると波が小さい（動くと戻る）', () => {
-    for (const key of ['surf', 'muddy-water']) {
+    for (const key of ['surf']) {
       const t = setup(key);
       t.p.inputX = 1;
       t.sim.step([]);

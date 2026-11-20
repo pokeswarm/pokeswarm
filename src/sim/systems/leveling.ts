@@ -1,7 +1,7 @@
 import type { LevelUpSnapshot, PlayerId } from '../commands';
 import { skillDef } from '../activeSkills';
 import type { Player, PlayerMove } from '../entities/player';
-import { deriveStats } from '../species';
+import { deriveStats, rankMultiplier } from '../species';
 import type { NatureStat } from '../../data/schema';
 import { defenseStatOf, natureFactor } from '../nature';
 import { abilityOf } from '../ability';
@@ -525,6 +525,8 @@ export function recomputeModifiers(world: World, p: Player): void {
   const d = sp ? deriveStats(world.rules.stats, sp, world.level) : null;
   const oldMax = p.maxHp;
   p.maxHp = (d?.maxHp ?? 100) * Math.max(0.1, 1 + mods.maxHpPct / 100);
+  // HP の倍率（★だくりゅう: HP が多いほど強い。レベルで増える分は数えない。07 の329章）
+  p.hpFactor = (sp ? rankMultiplier(world.rules.stats, sp.baseStats.hp) : 1) * Math.max(0.1, 1 + mods.maxHpPct / 100);
   if (p.maxHp > oldMax && !p.down) p.hp += p.maxHp - oldMax;
   p.hp = Math.min(p.hp, p.maxHp);
   // 性格（ホウエン。07 の89.3）

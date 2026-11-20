@@ -826,6 +826,8 @@
   "info.dashInput": "Only while walking: you dash where you are heading, zigzagging like lightning (faster means farther)",
   "info.chargeMoving": "Charges only while you are moving",
   "info.speedScale": "The faster you are, the stronger and bigger it gets (move speed boosts count)",
+  "info.hpScale": "The more HP you have, the stronger and bigger it gets (max HP boosts count)",
+  "info.healFollow": "The circle moves with you (nearby allies heal too)",
   "info.burstCount": "Fires between {min} and the max count at random each time",
   "info.hurtRelease": "Stores damage you take and releases it",
   "info.rainBoost": "While active, {type} moves +{v}% power",

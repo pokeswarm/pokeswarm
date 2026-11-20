@@ -826,6 +826,8 @@
   "info.dashInput": "あるいている あいだだけ でる。おしている ほうへ いなずまのように おれながら はしる（はやいほど とおくまで）",
   "info.chargeMoving": "はしっている あいだだけ たまる",
   "info.speedScale": "速いほど 威力と大きさが上がる（移動速度の強化が効く）",
+  "info.hpScale": "HP が多いほど 威力と大きさが上がる（最大HPの強化が効く）",
+  "info.healFollow": "わは じぶんに ついて うごく（ちかくの なかまも かいふくする）",
   "info.burstCount": "数は 使うたびに {min}〜最大の数 のどれか",
   "info.hurtRelease": "うけた ダメージを ためて かえす",
   "info.rainBoost": "でている あいだ、{type}の わざの いりょく +{v}%",

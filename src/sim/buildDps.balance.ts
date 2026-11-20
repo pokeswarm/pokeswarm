@@ -377,6 +377,9 @@ function candidatesFor(ctx: Ctx, row: Row, forms: FormOptions, scene: SceneKey):
     // 速いほど強い技（エレキボール。07 の325章）: 表はミュウの速さで測っているので、その姿の速さとの違いを掛ける
     const speedRank = rankMul(sp.baseStats.speed);
     const mewSpeedRank = rankMul(mewSp.baseStats.speed);
+    // HP のランク（★だくりゅう: HP が多いほど強い。07 の329章）
+    const hpRank = rankMul(sp.baseStats.hp);
+    const mewHpRank = rankMul(mewSp.baseStats.hp);
     const moveDef = (k: string) => moveByKey.get(k);
     const finalLine = lineAt(rules, row, lo, info.path);
     // 持てる持ち物: 道のどれかの姿で候補に出るもの
@@ -538,6 +541,8 @@ function candidatesFor(ctx: Ctx, row: Row, forms: FormOptions, scene: SceneKey):
         // 速さの倍率（持ち物の移動速度・いつも効く技の移動速度 こうそくいどう）
         const speedPct = allItems.reduce((s2, it) => s2 + (itemByKey.get(it)?.perLevel.moveSpeedPct ?? 0) * lv(it), 0) + opts.reduce((s2, o) => s2 + (moveDef(o.end)?.passive[moveDef(o.end)!.levels.length - 1]?.moveSpeedPct ?? 0), 0);
         const speedFactor = speedRank * (1 + speedPct / 100);
+        const hpPct = allItems.reduce((s2, it) => s2 + (itemByKey.get(it)?.perLevel.maxHpPct ?? 0) * lv(it), 0);
+        const hpFactor = hpRank * (1 + hpPct / 100);
         for (const o of opts) {
           const md = moveDef(o.end)!;
           const row2 = table.get(o.end);
@@ -568,6 +573,7 @@ function candidatesFor(ctx: Ctx, row: Row, forms: FormOptions, scene: SceneKey):
           v *= ((1 + add / 100) / 1.25) * (physical ? physicalMult : 1) * crit * (physical ? atk : spa) * (types.includes(md.type) ? rules.combat.typeMultipliers.stab : 1);
           if (allItems.includes('light-ball')) v *= 2;
           if (md.speedScale) v *= (1 + md.speedScale.power * Math.max(0, speedFactor - 1)) / (1 + md.speedScale.power * Math.max(0, mewSpeedRank - 1));
+          if (md.hpScale) v *= (1 + md.hpScale.power * Math.max(0, hpFactor - 1)) / (1 + md.hpScale.power * Math.max(0, mewHpRank - 1));
           per.push(v);
           total += v;
         }

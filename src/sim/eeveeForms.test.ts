@@ -18,9 +18,9 @@ function setup(region = 'kanto') {
 }
 
 describe('イーブイの進化で技が変わる', () => {
-  it('石で進化すると たいあたり が だくりゅう・ニトロチャージ・ミサイルばり になり、強化の段階は受け継ぐ（ブースターは 07 の328章）', () => {
+  it('石で進化すると たいあたり が みずのはどう・ニトロチャージ・ミサイルばり になり、強化の段階は受け継ぐ（07 の328・329章）', () => {
     for (const [item, to] of [
-      ['water-stone', 'muddy-water'],
+      ['water-stone', 'water-pulse-vaporeon'],
       ['fire-stone', 'flame-charge'],
       ['thunder-stone', 'pin-missile'],
     ] as const) {

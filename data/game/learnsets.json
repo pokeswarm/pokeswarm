@@ -1152,6 +1152,12 @@
         "forms": [
           "flareon"
         ]
+      },
+      {
+        "move": "aqua-ring",
+        "forms": [
+          "vaporeon"
+        ]
       }
     ],
     "doduo": [

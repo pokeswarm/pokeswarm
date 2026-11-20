@@ -127,7 +127,8 @@
     "rollout",
     "wish",
     "safeguard",
-    "electro-ball"
+    "electro-ball",
+    "aqua-ring"
   ],
   "heavyHitters": [
     "phantom-force",
@@ -189,7 +190,8 @@
     "doom-desire": "unique",
     "pin-missile": "derived",
     "flame-charge": "derived",
-    "temper-flare": "unique"
+    "temper-flare": "unique",
+    "water-pulse-vaporeon": "derived"
   },
   "strengthScale": {
     "psystrike": 1.7,
@@ -220,6 +222,8 @@
     "encore": 0.5,
     "destiny-bond": 1.7,
     "metal-burst": 4,
-    "pin-missile": 2
+    "pin-missile": 2,
+    "muddy-water": 0.9,
+    "water-pulse-vaporeon": 0.6
   }
 }

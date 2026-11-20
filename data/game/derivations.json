@@ -625,6 +625,15 @@
       ]
     },
     {
+      "from": "bubble-beam",
+      "item": "hp-up",
+      "to": "muddy-water",
+      "line": "eevee",
+      "forms": [
+        "vaporeon"
+      ]
+    },
+    {
       "from": "body-slam",
       "item": "hp-up",
       "to": "giga-impact",

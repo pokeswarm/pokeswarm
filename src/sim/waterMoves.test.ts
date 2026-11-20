@@ -45,19 +45,7 @@ describe('なみのり・だくりゅう: 自分を中心にした正方形の�
     expect(t.p.moveSpeed).toBeCloseTo(before * 1.2);
   });
 
-  it('だくりゅう: 速くならず、当たった敵は必ず みずびたし（遅くなる）', () => {
-    for (const key of ['muddy-water', 'muddy-water']) {
-      const t = setup(key);
-      expect(t.rules.moves[t.m]!.levels[0]!.statusChance).toBe(1);
-      const before = t.p.moveSpeed;
-      // 倒れないよう HP の多い敵
-      t.sim.world.enemies.add(1, 0, 40, 0, 1e6, 0, 10);
-      for (let k = 0; k < 3; k++) t.sim.step([]);
-      expect(t.sim.world.enemies.hasStatus(0, t.statusIndex('soaked'))).toBe(true);
-      expect(t.p.moveBuffs ?? []).toHaveLength(0);
-      expect(t.p.moveSpeed).toBeCloseTo(before);
-    }
-  });
+  // だくりゅう（シャワーズ）は 07 の329章で、ホウエンと同じ前へ浴びせる泥の大波にした（vaporeon.test.ts）
 });
 
 describe('バブルこうせん・みずのはどう', () => {

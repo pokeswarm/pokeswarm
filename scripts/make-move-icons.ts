@@ -1536,6 +1536,8 @@ const ICONS: Record<string, Layer[]> = {
     { art: 'speed-streak', k: 0.8, x: 10, y: 17 },
     { art: 'electro-ball', frame: 0, k: 0.5, x: 20, y: 15 },
   ],
+  // アクアリング: 体をとりまく水の泡（ゲームの絵。07 の329章）
+  'aqua-ring': [{ art: 'aqua-ring-bubbles', frame: 0, k: 0.74, x: 16, y: 16 }],
   // ニトロチャージ: 炎をまとって右上へ突っ込む体（ゲームの絵。07 の328章）
   'flame-charge': [{ art: 'nitro-wrap', frame: 0, k: 0.47, x: 16, y: 16.5, rot: -35 }],
   // ★やけっぱち: 前へ叩きつける荒れた爆炎（ゲームの絵）

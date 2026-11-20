@@ -151,6 +151,8 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
   const def = world.rules.moves[pm.move]!;
   const m = p.mods;
   const fast = def.speedScale ? speedBonusOf(p) : 0;
+  // ★だくりゅう: HP が多いほど強い（07 の329章）
+  const bulk = def.hpScale ? Math.max(0, (p.hpFactor ?? 1) - 1) : 0;
   // ★やけっぱち: ダメージを受けてからしばらく、威力と大きさが上がる（07 の328章）
   const temper = def.hurtPower && p.moveBuffs?.some((b) => b.move === pm.move) ? def.hurtPower : undefined;
   // 特性: HP が少ない間だけ威力が上がる（しんりょく など。07 の133章）
@@ -172,8 +174,9 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
       (1 + (st.perMovePowerPct * Math.max(0, p.moves.length - 1)) / 100) *
       // エレキボール: 速いほど強い（07 の325章）
       (1 + (def.speedScale?.power ?? 0) * fast) *
+      (1 + (def.hpScale?.power ?? 0) * bulk) *
       (temper?.power ?? 1),
-    size: st.size * Math.max(0.1, 1 + (m.areaPct + typeAreaPctOf(m, def)) / 100) * (1 + (def.speedScale?.size ?? 0) * fast) * (temper?.size ?? 1),
+    size: st.size * Math.max(0.1, 1 + (m.areaPct + typeAreaPctOf(m, def)) / 100) * (1 + (def.speedScale?.size ?? 0) * fast) * (1 + (def.hpScale?.size ?? 0) * bulk) * (temper?.size ?? 1),
     speed: st.speed * Math.max(0.1, 1 + m.projectileSpeedPct / 100),
     cooldownSeconds: st.cooldownSeconds * Math.max(0.2, 1 + m.cooldownPct / 100),
   };
@@ -1689,7 +1692,7 @@ function fireHeal(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
   // 回復の円（つきのひかり）: 出ている間、中のプレイヤーを毎秒回復する（health.ts の regenerate）
   const zoneDef = world.rules.moves[pm.move]!;
   // しんぴのまもり: 自分に付いて動く膜。中のプレイヤー（仲間も）は状態異常にならない（stage.ts の hitLocal）
-  if (zoneDef.healZone) world.healZones.push({ x: p.x, y: p.y, radius: st.size, ticks: Math.round(st.durationSeconds / world.dt), pct: st.healPct, ...(zoneDef.statusGuard ? { guard: true, follow: p.id } : {}) });
+  if (zoneDef.healZone) world.healZones.push({ x: p.x, y: p.y, radius: st.size, ticks: Math.round(st.durationSeconds / world.dt), pct: st.healPct, ...(zoneDef.statusGuard ? { guard: true, follow: p.id } : zoneDef.healFollow ? { follow: p.id } : {}) });
   else healPlayer(world, p.id, (p.maxHp * st.healPct) / 100);
   // いやしのねがい: 味方を回復する（HP は本人のブラウザで管理するので、どのブラウザでも自分のプレイヤーだけを回復する）
   const ally = world.rules.moves[pm.move]!.allyHealPct;

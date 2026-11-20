@@ -5490,6 +5490,94 @@ function temperBlast(): SpriteOut {
   return { palette, frameMs: 70, parts: { main: frames } };
 }
 
+// ---------------- シャワーズの作り直し（07 の329章） ----------------
+/**
+ * みずのはどう（シャワーズ）: 水の輪が当たって弾けるしぶき（64 ドット・ふちなし）。
+ * 3 コマ: 輪がつぶれて白く盛り上がる → でこぼこの水の環が外へ割れて、しずくが飛ぶ → 細かいしずくだけ残る
+ */
+function pulseSplash(): SpriteOut {
+  // 0 濃い青・1 青・2 水色・3 薄い水色・4 白
+  const palette = ['#01579b', '#0288d1', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const frames = [0, 1, 2].map((f) => {
+    const r = rng(9500 + f * 29);
+    const radius = [0.3, 0.62, 0.8][f]!;
+    const drops = Array.from({ length: 14 }, () => {
+      const a = r() * Math.PI * 2;
+      const d = radius + 0.05 + r() * 0.25;
+      return [Math.cos(a) * d, Math.sin(a) * d, 0.03 + r() * 0.04] as const;
+    });
+    return toRows(
+      shape(
+        64,
+        (u, v) => {
+          const d = Math.hypot(u, v);
+          const a = Math.atan2(v, u);
+          if (f === 0) {
+            // 盛り上がる水: 真ん中ほど白い、でこぼこの丸
+            const edge = radius * (0.85 + 0.15 * flicker(a, 0, 9600));
+            if (d < edge) return d < edge * 0.45 ? 4 : d < edge * 0.75 ? 3 : 2;
+            return -1;
+          }
+          // 外へ割れる水の環（太さがばらばらで、ところどころ切れる）
+          const wob = flicker(a * 1.5, f, 9700);
+          const thick = (f === 1 ? 0.13 : 0.06) * (0.5 + wob);
+          const off = Math.abs(d - radius * (0.92 + 0.12 * flicker(a, f, 9800)));
+          if (off < thick && wob > (f === 1 ? 0.18 : 0.42)) {
+            const k = off / thick;
+            return f === 1 ? (k < 0.35 ? 4 : k < 0.7 ? 3 : 2) : k < 0.5 ? 2 : 1;
+          }
+          for (const [dx, dy, dr] of drops) if (Math.hypot(u - dx, v - dy) < dr * (f === 2 ? 0.7 : 1)) return f === 1 ? 3 : 2;
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette, frameMs: 80, parts: { main: frames } };
+}
+
+/**
+ * アクアリング: 体のまわりをめぐる水の泡（48 ドット・ふちなし）。大きさのばらばらな泡が、体をとりまくゆるい輪に並んで回る。
+ * 泡は水色の膜に白い光。4 コマで少しずつ回り、小さな泡が浮かぶ
+ */
+function aquaRingBubbles(): SpriteOut {
+  // 0 青・1 水色・2 薄い水色・3 白
+  const palette = ['#0288d1', '#4fc3f7', '#b3e5fc', '#ffffff'];
+  const r0 = rng(9900);
+  const bubbles = Array.from({ length: 8 }, (_, k) => ({ a: (k / 8) * Math.PI * 2 + (r0() - 0.5) * 0.4, d: 0.74 + (r0() - 0.5) * 0.14, s: 0.12 + r0() * 0.09 }));
+  const frames = [0, 1, 2, 3].map((f) => {
+    const turn = (f / 4) * ((Math.PI * 2) / 8);
+    const r = rng(9950 + f * 13);
+    const floaters = Array.from({ length: 4 }, () => [(r() - 0.5) * 1.2, -0.2 - r() * 0.7, 0.025 + r() * 0.02] as const);
+    return toRows(
+      shape(
+        48,
+        (u, v) => {
+          for (const b of bubbles) {
+            const bx = Math.cos(b.a + turn) * b.d;
+            const by = Math.sin(b.a + turn) * b.d * 0.9;
+            const dd = Math.hypot(u - bx, v - by);
+            if (dd > b.s) continue;
+            // 左上の光・膜・中は薄く
+            if (Math.hypot(u - bx + b.s * 0.35, v - by + b.s * 0.35) < b.s * 0.3) return 3;
+            const k = dd / b.s;
+            return k > 0.7 ? 0 : k > 0.45 ? 1 : 2;
+          }
+          for (const [fx, fy, fr] of floaters) {
+            const dd = Math.hypot(u - fx, v - fy);
+            if (dd < fr) return dd < fr * 0.5 ? 3 : 1;
+          }
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette, frameMs: 120, parts: { main: frames } };
+}
+
 // ---------------- ジョウトの技の作り直し（1）ポッポ系統（07 の157章） ----------------
 /**
  * ふきとばし: 扇に引き伸ばす大きな風（縦長 32×36）。太い白い風の帯が 3 本、根元から先へ波打ちながら広がり、
@@ -8339,6 +8427,9 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     // 328章（ブースター）
     'nitro-wrap': nitroWrap,
     'temper-blast': temperBlast,
+    // 329章（シャワーズ）
+    'pulse-splash': pulseSplash,
+    'aqua-ring-bubbles': aquaRingBubbles,
 };
 
 /** 絵の名前の一覧 */

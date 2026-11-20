@@ -42,6 +42,7 @@ import { LugiaPlayer } from '../render/effects/LugiaPlayer';
 import { LatiasPlayer } from '../render/effects/LatiasPlayer';
 import { LatiosPlayer } from '../render/effects/LatiosPlayer';
 import { JirachiPlayer } from '../render/effects/JirachiPlayer';
+import { HoohPlayer } from '../render/effects/HoohPlayer';
 import { SkillHud } from '../render/SkillHud';
 import { ensureSkillIcons } from '../render/skillIcons';
 import { ShinyCharizardFlame } from '../render/effects/ShinyCharizardFlame';
@@ -222,6 +223,7 @@ export class RunScene extends Phaser.Scene {
   private latiasPlayer: LatiasPlayer | null = null;
   private latiosPlayer: LatiosPlayer | null = null;
   private jirachiPlayer: JirachiPlayer | null = null;
+  private hoohPlayer: HoohPlayer | null = null;
   /** アクティブスキルのボタン（右下）とキー、押している枠（SPACE を押している間は行き先の印を出す）、スマホでボタンを押している指 */
   private skillHud: SkillHud | null = null;
   private skillKeys: Phaser.Input.Keyboard.Key[] = [];
@@ -422,6 +424,7 @@ export class RunScene extends Phaser.Scene {
     this.latiasPlayer = null;
     this.latiosPlayer = null;
     this.jirachiPlayer = null;
+    this.hoohPlayer = null;
     this.skillHud = null;
     this.skillAim = null;
     this.skillDown = [];
@@ -1380,6 +1383,7 @@ export class RunScene extends Phaser.Scene {
         if (w.rules.activeSkills?.defs[ev.skill]?.kind === 'healPulse') this.latiasPlayer?.onSkillUsed(ev, this.time.now);
         const lk = w.rules.activeSkills?.defs[ev.skill]?.kind;
         if (lk === 'dragonDance' || lk === 'dracoMeteor') this.latiosPlayer?.onSkillUsed(ev, lk, this.time.now);
+        if (lk === 'rebirth') this.hoohPlayer?.onSkillUsed(ev, w, this.time.now);
       } else if (ev.type === 'mirrorAbsorbed') {
         this.suicunePlayer?.onAbsorbed(ev.playerId, this.time.now);
       } else if (ev.type === 'playerFrozen' && ev.playerId === this.localId) {
@@ -3469,6 +3473,8 @@ export class RunScene extends Phaser.Scene {
     this.latiosPlayer.update(world, this.time.now, this.localId, this.skillAim);
     this.jirachiPlayer ??= new JirachiPlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.players + 0.1);
     this.jirachiPlayer.update(world, this.time.now);
+    this.hoohPlayer ??= new HoohPlayer(this, spriteRender.depths.effects + 0.36, ARENA_FLOOR_DEPTH + 3.7, spriteRender.depths.players + 0.1);
+    this.hoohPlayer.update(world, this.time.now, this.localId, this.skillAim);
     this.shinyCharizardFlame ??= new ShinyCharizardFlame(this, spriteRender.depths.effects + 0.35, spriteRender.depths.bosses + 0.05, ARENA_FLOOR_DEPTH + 3.6);
     this.shinyCharizardFlame.update(world, this.time.now, alpha);
     this.shinyVenusaurPlant ??= new ShinyVenusaurPlant(this, spriteRender.depths.effects + 0.35, ARENA_FLOOR_DEPTH + 3.6);

@@ -55,7 +55,7 @@ export interface SimAbility {
 /** アクティブスキルの定義（data/game/active-skills.json を番号に直したもの。07 の305章） */
 export interface SimActiveSkill {
   readonly key: string;
-  readonly kind: 'teleport' | 'surf' | 'mirrorCoat' | 'sheerCold' | 'extremeSpeed' | 'charge' | 'risingVoltage' | 'eruption' | 'lavaPlume' | 'overheat' | 'freezeDry' | 'icyWind' | 'blizzard' | 'skyAttack' | 'heatWave' | 'burnUp' | 'drillPeck' | 'zapCannon' | 'thunderbolt' | 'aeroblast' | 'extrasensory' | 'hydroPump' | 'mistBall' | 'dragonPulse' | 'healPulse' | 'lusterPurge' | 'dragonDance' | 'dracoMeteor';
+  readonly kind: 'teleport' | 'surf' | 'mirrorCoat' | 'sheerCold' | 'extremeSpeed' | 'charge' | 'risingVoltage' | 'eruption' | 'lavaPlume' | 'overheat' | 'freezeDry' | 'icyWind' | 'blizzard' | 'skyAttack' | 'heatWave' | 'burnUp' | 'drillPeck' | 'zapCannon' | 'thunderbolt' | 'aeroblast' | 'extrasensory' | 'hydroPump' | 'mistBall' | 'dragonPulse' | 'healPulse' | 'lusterPurge' | 'dragonDance' | 'dracoMeteor' | 'skyLoop' | 'rebirth' | 'sacredFire';
   /** 技の枠の技の番号（無ければ -1。あればレベル・再使用・威力はその技の値。07 の307章） */
   readonly move: number;
   readonly trigger: 'press' | 'release';
@@ -78,6 +78,9 @@ export interface SimActiveSkill {
   readonly blizzard?: { readonly width: number; readonly startDistance: number };
   readonly skyAttack?: { readonly chargeSeconds: number; readonly featherSpacing: number; readonly featherSeconds: number; readonly featherPowerPct: number };
   readonly heatWave?: { readonly arcDegrees: number; readonly waveDelaySeconds: number; readonly turnDegrees: number };
+  readonly skyLoop?: { readonly widthRatio: number; readonly points: number; readonly spacing: number; readonly burnSeconds: number; readonly burnPowerPct: number; readonly sacredBurnMultiplier: number };
+  readonly rebirth?: { readonly healPct: number; readonly allyRadius: number; readonly allyHealPct: number };
+  readonly sacredFire?: { readonly areaDistance: number; readonly embers: number; readonly emberSpread: number; readonly emberRadius: number; readonly emberSeconds: number; readonly emberPowerPct: number; readonly stateSeconds: number };
   readonly lusterPurge?: { readonly areaDistance: number; readonly spacing: number; readonly staggerSeconds: number };
   readonly dragonDance?: { readonly powerPct: number; readonly speedPct: number; readonly seconds: number; readonly maxStacks: number };
   readonly dracoMeteor?: { readonly perStack: number; readonly areaRadius: number; readonly areaDistance: number; readonly delaySeconds: number; readonly spreadSeconds: number };

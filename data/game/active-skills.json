@@ -360,6 +360,49 @@
         "delaySeconds": 0.45,
         "spreadSeconds": 0.8
       }
+    },
+    "sky-attack-hooh": {
+      "kind": "skyLoop",
+      "move": "sky-attack-hooh",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "skyLoop": {
+        "widthRatio": 0.55,
+        "points": 16,
+        "spacing": 46,
+        "burnSeconds": 2.5,
+        "burnPowerPct": 10,
+        "sacredBurnMultiplier": 1.6
+      }
+    },
+    "recover-hooh": {
+      "kind": "rebirth",
+      "move": "recover-hooh",
+      "trigger": "press",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "rebirth": {
+        "healPct": 30,
+        "allyRadius": 380,
+        "allyHealPct": 25
+      }
+    },
+    "sacred-fire-hooh": {
+      "kind": "sacredFire",
+      "move": "sacred-fire-hooh",
+      "trigger": "release",
+      "baseCharges": 1,
+      "chargesPerLevel": 0.2,
+      "sacredFire": {
+        "areaDistance": 260,
+        "embers": 6,
+        "emberSpread": 120,
+        "emberRadius": 34,
+        "emberSeconds": 3,
+        "emberPowerPct": 8,
+        "stateSeconds": 8
+      }
     }
   }
 }

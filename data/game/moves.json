@@ -5595,6 +5595,250 @@
         }
       ]
     },
+    "sky-attack-hooh": {
+      "pattern": "skill",
+      "effect": "sky-attack-hooh",
+      "nameOf": "sky-attack",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.3,
+        "statusSeconds": 3,
+        "knockback": 80,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 950,
+        "count": 1,
+        "power": 800,
+        "cooldownSeconds": 5,
+        "size": 40,
+        "range": 480,
+        "durationSeconds": 0.3,
+        "statusId": "burn"
+      },
+      "levels": [
+        {
+          "power": 70
+        },
+        {
+          "power": 70,
+          "range": 15
+        },
+        {
+          "power": 70,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 70
+        },
+        {
+          "power": 70,
+          "range": 15
+        },
+        {
+          "power": 70
+        },
+        {
+          "power": 70,
+          "cooldownSeconds": -0.25
+        },
+        {
+          "power": 70,
+          "range": 15
+        },
+        {
+          "power": 70
+        },
+        {
+          "power": 70
+        },
+        {
+          "power": 70,
+          "range": 15,
+          "cooldownSeconds": -0.25
+        }
+      ]
+    },
+    "recover-hooh": {
+      "pattern": "skill",
+      "effect": "recover-hooh",
+      "nameOf": "recover",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "knockback": 0,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 0,
+        "count": 1,
+        "power": 0,
+        "cooldownSeconds": 12,
+        "size": 40,
+        "range": 0,
+        "durationSeconds": 0.1
+      },
+      "levels": [
+        {
+          "cooldownSeconds": -0.4
+        },
+        {},
+        {
+          "cooldownSeconds": -0.4
+        },
+        {},
+        {
+          "cooldownSeconds": -0.4
+        },
+        {},
+        {
+          "cooldownSeconds": -0.4
+        },
+        {},
+        {
+          "cooldownSeconds": -0.4
+        },
+        {},
+        {
+          "cooldownSeconds": -0.4
+        }
+      ]
+    },
+    "sacred-fire-hooh": {
+      "pattern": "skill",
+      "effect": "sacred-fire-hooh",
+      "nameOf": "sacred-fire",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0.5,
+        "statusSeconds": 3,
+        "knockback": 120,
+        "hitIntervalSeconds": 0,
+        "pierce": "infinite",
+        "speed": 620,
+        "count": 1,
+        "power": 1500,
+        "cooldownSeconds": 8,
+        "size": 90,
+        "range": 520,
+        "durationSeconds": 0.25,
+        "statusId": "burn"
+      },
+      "levels": [
+        {
+          "power": 130
+        },
+        {
+          "power": 130,
+          "size": 4
+        },
+        {
+          "power": 130,
+          "cooldownSeconds": -0.4
+        },
+        {
+          "power": 130
+        },
+        {
+          "power": 130,
+          "size": 4
+        },
+        {
+          "power": 130
+        },
+        {
+          "power": 130,
+          "cooldownSeconds": -0.4
+        },
+        {
+          "power": 130,
+          "size": 4
+        },
+        {
+          "power": 130
+        },
+        {
+          "power": 130
+        },
+        {
+          "power": 130,
+          "size": 4,
+          "cooldownSeconds": -0.4
+        }
+      ]
+    },
+    "gust-hooh": {
+      "pattern": "nearest",
+      "effect": "gust-hooh",
+      "nameOf": "gust",
+      "teachOnly": true,
+      "base": {
+        "intervalSeconds": 0.1,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "knockback": 60,
+        "hitIntervalSeconds": 0,
+        "pierce": 2,
+        "speed": 380,
+        "count": 1,
+        "power": 9,
+        "cooldownSeconds": 0.9,
+        "size": 14,
+        "range": 380,
+        "durationSeconds": 1
+      },
+      "levels": [
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1,
+          "count": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1
+        },
+        {
+          "power": 1,
+          "count": 1
+        },
+        {
+          "power": 1
+        }
+      ]
+    },
     "mist-ball-latias": {
       "pattern": "skill",
       "effect": "mist-ball-latias",

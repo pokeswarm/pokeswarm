@@ -936,6 +936,73 @@ function doomDesireJirachiIcon(): Draw {
   });
 }
 
+/** ゴッドバード（ホウオウの版。07 の322章）: 楕円を描いて回る炎の鳥の軌跡（橙の炎の帯）と、先の白い光 */
+function skyAttackHoohIcon(): Draw {
+  return paint((x, y) => {
+    const nx = (x - 16) / 12.5;
+    const ny = (y - 16) / 7.5;
+    const r = Math.hypot(nx, ny);
+    const a = Math.atan2(ny, nx);
+    // 楕円の帯（先へ太く明るい）
+    const t = ((a + Math.PI) / (Math.PI * 2) + 0.25) % 1;
+    const w = 0.08 + t * 0.16;
+    if (Math.abs(r - 1) < w) return t > 0.85 ? '#ffffff' : t > 0.6 ? '#ffd166' : t > 0.3 ? '#ff8412' : '#b92207';
+    // 先の光
+    if (Math.hypot(x - 16, y - 8.5) < 2.4) return '#fff0b8';
+    return null;
+  });
+}
+
+/** じこさいせい（ホウオウの版）: 舞い落ちる虹色の羽 3 枚 */
+function recoverHoohIcon(): Draw {
+  const cols = ['#ef5350', '#ffa726', '#ffee58', '#66bb6a', '#42a5f5', '#ab47bc'];
+  return paint((x, y) => {
+    for (const [cx, cy, rot, len] of [[10, 13, 0.9, 18], [22, 17, -0.7, 16]] as const) {
+      const u = (x - cx) * Math.cos(rot) + (y - cy) * Math.sin(rot);
+      const v = -(x - cx) * Math.sin(rot) + (y - cy) * Math.cos(rot);
+      if (Math.abs(u) > len / 2) continue;
+      const w = 4.2 * Math.sin(Math.PI * (u / len + 0.5));
+      if (Math.abs(v) < 0.5) return '#fff8e1';
+      if (Math.abs(v) < w) return cols[Math.floor(((u / len + 0.5) * cols.length) % cols.length)]!;
+    }
+    return null;
+  });
+}
+
+/** せいなるほのお（ホウオウの版）: 青白い炎弾と、着弾で散る飛び火 */
+function sacredFireHoohIcon(): Draw {
+  return paint((x, y) => {
+    const d = Math.hypot(x - 13, y - 13);
+    if (d < 3) return '#ffffff';
+    if (d < 5.5) return '#cfe8ff';
+    if (d < 7.5) return '#6fa8ff';
+    // 尾（左上へ）
+    const u = (13 - x) * 0.707 + (13 - y) * 0.707;
+    const v = (x - 13) * 0.707 - (y - 13) * 0.707;
+    if (u > 5 && u < 13 && Math.abs(v) < 3.5 * (1 - (u - 5) / 8)) return '#3d6be0';
+    // 飛び火（右下）
+    for (const [cx, cy] of [[24, 19], [19, 26], [27, 26]] as const) {
+      const e = Math.hypot(x - cx, (y - cy) * 1.2);
+      if (e < 1.4) return '#ffffff';
+      if (e < 2.6) return '#8fc4ff';
+      if (y < cy && y > cy - 4 && Math.abs(x - cx) < (y - (cy - 4)) * 0.5) return '#6fa8ff';
+    }
+    return null;
+  });
+}
+
+/** かぜおこし（ホウオウの版）: 金色の三日月の風 2 つ */
+function gustHoohIcon(): Draw {
+  return paint((x, y) => {
+    for (const [cx, cy, r] of [[12, 12, 7], [20, 21, 6]] as const) {
+      const d = Math.hypot(x - cx, y - cy);
+      const d2 = Math.hypot(x - cx + 3, y - cy);
+      if (d < r && d2 > r - 0.5) return d > r - 1.2 ? '#fff3b0' : '#ffd166';
+    }
+    return null;
+  });
+}
+
 /** しんそく（ライコウの版）: 3 回折れて駆け抜ける稲妻の道と、その先の光 */
 function extremeSpeedRaikouIcon(): Draw {
   const pts: [number, number][] = [[4, 26], [12, 14], [17, 22], [27, 6]];
@@ -1422,6 +1489,10 @@ const ICONS: Record<string, Layer[]> = {
   'dragon-breath-latios': [dragonBreathLatiosIcon()],
   'meteor-mash-jirachi': [meteorMashJirachiIcon()],
   'doom-desire': [doomDesireJirachiIcon()],
+  'sky-attack-hooh': [skyAttackHoohIcon()],
+  'recover-hooh': [recoverHoohIcon()],
+  'sacred-fire-hooh': [sacredFireHoohIcon()],
+  'gust-hooh': [gustHoohIcon()],
   // かくばる: 体が角ばる（角ばった結晶と、とがった先の光）
   sharpen: [facetGem(13, 18, 6.5, 10.5, 35), facetGem(22, 10, 3.6, 6, 35), glint(23.5, 21.5, 2.6)],
   // かたくなる: 体の表面が硬い板になる

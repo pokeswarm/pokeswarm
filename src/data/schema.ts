@@ -3009,6 +3009,12 @@ export type AbilitiesConfig = z.infer<typeof abilitiesConfigSchema>;
  *   通り道に featherSpacing ごとに燃える羽が落ち、featherSeconds 燃える（中の敵に技の威力の featherPowerPct % ずつ）
  * - heatWave（ねっぷう。07 の315章）: 向きへ開き arcDegrees の弧の熱波を、技の count 回 waveDelaySeconds ごとに送る（1 回ごとに turnDegrees ずつ向きをずらす）。
  *   熱波は厚さ = 技の size の帯で、技の durationSeconds で 技の range まで広がる（自分に付いて動く）
+ * - skyLoop（ゴッドバード。ホウオウ。07 の322章）: 向きへ、長さ 技の range・幅 range × widthRatio の楕円を、points 個の角でたどって行って帰ってくる（体が動く技。技の speed。
+ *   通り道の敵に 1 回ずつ当たる）。通った所に spacing ごとに燃える場所が、通った時から burnSeconds 残る（技の威力の burnPowerPct %）。聖炎の間は青白い火で × sacredBurnMultiplier
+ * - rebirth（じこさいせい。ホウオウ。07 の322章）: 自分の HP を最大の healPct % 回復する。聖炎の間は、allyRadius の中の味方も allyHealPct % 回復し、
+ *   中で倒れている味方をすぐ起こす（復活の数は使わない。決めるのはホスト）
+ * - sacredFire（せいなるほのお。ホウオウ。07 の322章）: 青白い炎弾を、落ちる所（ふんか と同じ選び方・areaDistance）へ技の speed で飛ばし、着弾で爆発（半径 技の size）、
+ *   まわり emberSpread に飛び火 embers 個（半径 emberRadius・emberSeconds 燃える・技の威力の emberPowerPct %）。使うと stateSeconds の間、聖炎の状態になる
  * - lusterPurge（ラスターパージ。ラティオス。07 の320章）: 光の玉を撃ち（技の speed）、落ちる所（ふんか と同じ選び方・areaDistance）から向きへ、光の爆発 技の count 個を spacing ごとに staggerSeconds ずつ遅らせて走らせる
  *   （半径 技の size。爆発ごとに当たる。技の状態異常 = ぼうぎょダウン）
  * - dragonDance（りゅうのまい。07 の320章）: 使うたびに重ねる数が 1 つ増え（maxStacks まで。seconds 続き、使うたびに戻る）、1 つにつき技の威力 +powerPct %・移動 +speedPct %
@@ -3038,7 +3044,7 @@ export const activeSkillsConfigSchema = z.object({
   skills: z.record(
     z.string(),
     z.object({
-      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed', 'charge', 'risingVoltage', 'eruption', 'lavaPlume', 'overheat', 'freezeDry', 'icyWind', 'blizzard', 'skyAttack', 'heatWave', 'burnUp', 'drillPeck', 'zapCannon', 'thunderbolt', 'aeroblast', 'extrasensory', 'hydroPump', 'mistBall', 'dragonPulse', 'healPulse', 'lusterPurge', 'dragonDance', 'dracoMeteor']),
+      kind: z.enum(['teleport', 'surf', 'mirrorCoat', 'sheerCold', 'extremeSpeed', 'charge', 'risingVoltage', 'eruption', 'lavaPlume', 'overheat', 'freezeDry', 'icyWind', 'blizzard', 'skyAttack', 'heatWave', 'burnUp', 'drillPeck', 'zapCannon', 'thunderbolt', 'aeroblast', 'extrasensory', 'hydroPump', 'mistBall', 'dragonPulse', 'healPulse', 'lusterPurge', 'dragonDance', 'dracoMeteor', 'skyLoop', 'rebirth', 'sacredFire']),
       /** 技の枠の技（moves.json のキー）。あればレベル・再使用・威力はその技の値 */
       move: z.string().optional(),
       trigger: z.enum(['press', 'release']).default('release'),
@@ -3061,6 +3067,9 @@ export const activeSkillsConfigSchema = z.object({
       blizzard: z.object({ width: z.number().positive(), startDistance: z.number().min(0) }).optional(),
       skyAttack: z.object({ chargeSeconds: z.number().min(0), featherSpacing: z.number().positive(), featherSeconds: z.number().positive(), featherPowerPct: z.number().min(0) }).optional(),
       heatWave: z.object({ arcDegrees: z.number().positive().max(360), waveDelaySeconds: z.number().min(0), turnDegrees: z.number() }).optional(),
+      skyLoop: z.object({ widthRatio: z.number().positive(), points: z.number().int().min(4), spacing: z.number().positive(), burnSeconds: z.number().positive(), burnPowerPct: z.number().min(0), sacredBurnMultiplier: z.number().positive() }).optional(),
+      rebirth: z.object({ healPct: z.number().min(0), allyRadius: z.number().positive(), allyHealPct: z.number().min(0) }).optional(),
+      sacredFire: z.object({ areaDistance: z.number().positive(), embers: z.number().int().min(0), emberSpread: z.number().positive(), emberRadius: z.number().positive(), emberSeconds: z.number().positive(), emberPowerPct: z.number().min(0), stateSeconds: z.number().positive() }).optional(),
       lusterPurge: z.object({ areaDistance: z.number().positive(), spacing: z.number().positive(), staggerSeconds: z.number().min(0) }).optional(),
       dragonDance: z.object({ powerPct: z.number().min(0), speedPct: z.number().min(0), seconds: z.number().positive(), maxStacks: z.number().int().positive() }).optional(),
       dracoMeteor: z.object({ perStack: z.number().int().min(0), areaRadius: z.number().positive(), areaDistance: z.number().positive(), delaySeconds: z.number().min(0), spreadSeconds: z.number().min(0) }).optional(),

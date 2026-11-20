@@ -77,7 +77,7 @@
     "entei": { "sprite": "entei", "startingMoves": ["eruption-entei", "lava-plume-entei", "overheat-entei", "sacred-fire-entei"], "fixedMoves": true, "activeSkills": ["eruption-entei", "lava-plume-entei", "overheat-entei"] },
     "suicune": { "sprite": "suicune", "startingMoves": ["surf-suicune", "mirror-coat-suicune", "sheer-cold-suicune", "calm-mind"], "fixedMoves": true, "activeSkills": ["surf-suicune", "mirror-coat-suicune", "sheer-cold-suicune"] },
     "lugia": { "sprite": "lugia", "startingMoves": ["aeroblast-lugia", "extrasensory-lugia", "hydro-pump-lugia", "gust-lugia"], "fixedMoves": true, "activeSkills": ["aeroblast-lugia", "extrasensory-lugia", "hydro-pump-lugia"] },
-    "ho-oh": { "sprite": "ho-oh", "startingMoves": ["fire-fang"] },
+    "ho-oh": { "sprite": "ho-oh", "startingMoves": ["sky-attack-hooh", "recover-hooh", "sacred-fire-hooh", "gust-hooh"], "fixedMoves": true, "activeSkills": ["sky-attack-hooh", "recover-hooh", "sacred-fire-hooh"] },
     "celebi": { "sprite": "celebi", "startingMoves": ["magical-leaf", "confusion", "leech-seed", "healing-wish"], "fixedMoves": true }
   },
   "default": "charmander"

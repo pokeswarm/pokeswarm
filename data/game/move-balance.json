@@ -18,6 +18,11 @@
     "hoenn": 1.25
   },
   "exempt": [
+    "sky-attack-hooh",
+    "recover-hooh",
+    "sacred-fire-hooh",
+    "gust-hooh",
+    "sacred-fire",
     "meteor-mash-jirachi",
     "doom-desire",
     "luster-purge-latios",

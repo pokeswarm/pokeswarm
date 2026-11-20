@@ -3518,3 +3518,133 @@ export function fireDracoMeteor(world: World, p: Player, pm: PlayerMove, dirX: n
   }
   return n;
 }
+
+/** ゴッドバード（ホウオウ。07 の322章）の楕円の道: 今の場所から向きへ長さ range・幅 range × widthRatio の楕円を、points 個の角でたどって戻る（固定マップの中に収める） */
+export function skyLoopPath(world: World, p: Player, range: number, dirX: number, dirY: number, cfg: { widthRatio: number; points: number }): { x: number; y: number }[] {
+  const half = range / 2;
+  const w = (range * cfg.widthRatio) / 2;
+  const px = -dirY;
+  const py = dirX;
+  const cx = p.x + dirX * half;
+  const cy = p.y + dirY * half;
+  const ar = world.arena;
+  const pts: { x: number; y: number }[] = [];
+  for (let k = 0; k <= cfg.points; k++) {
+    // 自分の所（角度 π）から始めて、一周して戻る
+    const a = Math.PI + (k / cfg.points) * Math.PI * 2;
+    let x = cx + dirX * Math.cos(a) * half + px * Math.sin(a) * w;
+    let y = cy + dirY * Math.cos(a) * half + py * Math.sin(a) * w;
+    if (ar) {
+      x = Math.max(ar.x - ar.halfWidth + p.radius, Math.min(ar.x + ar.halfWidth - p.radius, x));
+      y = Math.max(ar.y - ar.halfHeight + p.radius, Math.min(ar.y + ar.halfHeight - p.radius, y));
+    }
+    pts.push({ x, y });
+  }
+  pts[0] = { x: p.x, y: p.y };
+  pts[pts.length - 1] = { x: p.x, y: p.y };
+  return pts;
+}
+
+/**
+ * ゴッドバード（ホウオウ）: 楕円をたどる当たり（自分に付いて動く。1 回で同じ敵には 1 回）と、通った所に燃える場所（同じ技の円の stage 3 → 1。
+ * angle 1 は聖炎の青白い火）を、ホウオウが通る時に現れるように出す。返り値: 道・秒数・速さ
+ */
+export function fireSkyLoop(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { widthRatio: number; points: number; spacing: number; burnSeconds: number; burnPowerPct: number; sacredBurnMultiplier: number }): { pts: { x: number; y: number }[]; seconds: number; speed: number } {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const pts = skyLoopPath(world, p, st.range, dirX, dirY, cfg);
+  const speed = Math.max(1, sc.speed);
+  let len = 0;
+  for (let k = 1; k < pts.length; k++) len += Math.hypot(pts[k]!.x - pts[k - 1]!.x, pts[k]!.y - pts[k - 1]!.y);
+  const seconds = len / speed + world.dt * 2;
+  const group = newCastGroup(world, seconds);
+  const b0 = base(world, p, pm, st);
+  world.projectiles.add({ ...b0, motion: MOTION_FOLLOW, x: p.x, y: p.y, ox: 0, oy: 0, group, life: seconds });
+  const sacred = !!p.sacredFlame && world.tick < p.sacredFlame.untilTick;
+  const mult = sacred ? cfg.sacredBurnMultiplier : 1;
+  let acc = 0;
+  let next = cfg.spacing * 0.5;
+  for (let k = 1; k < pts.length; k++) {
+    const a = pts[k - 1]!;
+    const b = pts[k]!;
+    const l = Math.hypot(b.x - a.x, b.y - a.y);
+    while (next <= acc + l) {
+      const t = l > 0 ? (next - acc) / l : 0;
+      world.projectiles.add({
+        ...b0,
+        motion: MOTION_LINEAR,
+        x: a.x + (b.x - a.x) * t,
+        y: a.y + (b.y - a.y) * t,
+        radius: sc.size * 0.85,
+        damage: (sc.power * cfg.burnPowerPct * mult) / 100,
+        hitIntervalTicks: Math.round(0.5 / world.dt),
+        knockback: 0,
+        angle: sacred ? 1 : 0,
+        life: Math.max(world.dt, next / speed),
+        stage: 3,
+        armStage: 1,
+        armLife: cfg.burnSeconds * (sacred ? 1.3 : 1),
+      });
+      next += cfg.spacing;
+    }
+    acc += l;
+  }
+  return { pts, seconds, speed };
+}
+
+/**
+ * じこさいせい（ホウオウ。07 の322章）: 自分を回復する。聖炎の間は、近くの味方も回復し、近くで倒れている味方をすぐ起こす（起こすのはホストかソロ。復活の数は使わない）。
+ * 回復は自分のブラウザのプレイヤーにだけ効くので、どのブラウザでも呼ぶ（ほかのブラウザでは見た目と、そこのプレイヤーの回復）
+ */
+export function fireRebirth(world: World, p: Player, cfg: { healPct: number; allyRadius: number; allyHealPct: number }): number {
+  healPlayer(world, p.id, (p.maxHp * cfg.healPct) / 100);
+  const sacred = !!p.sacredFlame && world.tick < p.sacredFlame.untilTick;
+  if (!sacred) return 0;
+  let raised = 0;
+  for (const q of world.players) {
+    if (q === p || Math.hypot(q.x - p.x, q.y - p.y) > cfg.allyRadius) continue;
+    if (q.down) {
+      if (world.role === 'guest') continue;
+      const rv = world.rules.stats.revive;
+      q.down = false;
+      q.hp = (q.maxHp * rv.hpPct) / 100;
+      q.invincibleTicks = Math.round(rv.invincibleSeconds / world.dt);
+      world.reviveTouch.delete(q.id);
+      world.events.push({ type: 'playerRevived', playerId: q.id, revives: world.revives });
+      raised++;
+      continue;
+    }
+    healPlayer(world, q.id, (q.maxHp * cfg.allyHealPct) / 100);
+  }
+  return raised;
+}
+
+/**
+ * せいなるほのお（ホウオウ。07 の322章）: 青白い炎弾を落ちる所へ飛ばし、着弾で爆発（同じ技の円の stage 3 → 0。angle 1 は炎弾が飛んでいく先）と、
+ * まわりに飛び火（stage 3 → 1。少しずつ遅れて落ち、燃え続ける）
+ */
+export function fireSacredFire(world: World, p: Player, pm: PlayerMove, dirX: number, dirY: number, cfg: { areaDistance: number; embers: number; emberSpread: number; emberRadius: number; emberSeconds: number; emberPowerPct: number }): void {
+  const { st, sc } = skillMoveStats(world, p, pm);
+  const c = eruptionCenter(world, p, st.range, dirX, dirY, cfg.areaDistance);
+  const flight = Math.max(world.dt, Math.hypot(c.x - p.x, c.y - p.y) / Math.max(1, sc.speed));
+  const b0 = base(world, p, pm, st);
+  world.projectiles.add({ ...b0, motion: MOTION_LINEAR, x: c.x, y: c.y, angle: 1, group: newCastGroup(world, flight + st.durationSeconds), life: flight, stage: 3, armStage: 0, armLife: st.durationSeconds });
+  for (let k = 0; k < cfg.embers; k++) {
+    const a = (k / Math.max(1, cfg.embers)) * Math.PI * 2 + world.rng.next() * 0.8;
+    const r = cfg.emberSpread * (0.55 + world.rng.next() * 0.45);
+    world.projectiles.add({
+      ...b0,
+      motion: MOTION_LINEAR,
+      x: c.x + Math.cos(a) * r,
+      y: c.y + Math.sin(a) * r * 0.7,
+      radius: cfg.emberRadius,
+      damage: (sc.power * cfg.emberPowerPct) / 100,
+      hitIntervalTicks: Math.round(0.5 / world.dt),
+      knockback: 0,
+      angle: 0,
+      life: flight + 0.12 + world.rng.next() * 0.25,
+      stage: 3,
+      armStage: 1,
+      armLife: cfg.emberSeconds,
+    });
+  }
+}

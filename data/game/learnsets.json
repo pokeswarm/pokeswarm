@@ -1462,20 +1462,10 @@
       "gust-lugia"
     ],
     "ho-oh": [
-      "fire-fang",
-      "ember",
-      "gust",
-      "air-cutter",
-      "whirlwind",
-      "body-slam",
-      "flamethrower",
-      "fire-spin",
-      "swift",
-      "hyper-voice",
-      "aerial-ace",
-      "flare-blitz",
-      "air-slash",
-      "dual-wingbeat"
+      "sky-attack-hooh",
+      "recover-hooh",
+      "sacred-fire-hooh",
+      "gust-hooh"
     ],
     "celebi": [
       "magical-leaf",

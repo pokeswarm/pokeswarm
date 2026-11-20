@@ -362,12 +362,6 @@
       }
     },
     {
-      "from": "aerial-ace",
-      "item": "fire-stone",
-      "to": "sacred-fire",
-      "line": "ho-oh"
-    },
-    {
       "from": "air-slash",
       "item": "x-speed",
       "to": "hurricane",

@@ -33,7 +33,6 @@ describe('カントー・ジョウトの技の進化の形', () => {
       ['zubat', 'poison-fang', 'razor-claw', 'cross-poison'],
       ['horsea', 'hydro-pump', 'dragon-scale', 'draco-meteor'],
       ['poliwag', 'pound', 'black-belt', 'dynamic-punch'],
-      ['ho-oh', 'aerial-ace', 'fire-stone', 'sacred-fire'],
     ];
     const all = [...derivationsConfig.derivations, ...derivationsConfig.unique];
     for (const [line, from, item, to] of routes) expect(all.some((d) => d.line === line && d.from === from && d.item === item && d.to === to), `${line}: ${from} ＋ ${item} → ${to}`).toBe(true);

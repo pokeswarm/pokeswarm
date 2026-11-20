@@ -1,7 +1,7 @@
 import type { Player, PlayerMove } from './entities/player';
 import type { SimActiveSkill } from './rules';
 import type { World } from './world';
-import { fireDracoMeteor, fireLusterPurge, fireDragonPulse, fireHealPulse, fireMistBall, fireAeroblast, fireExtrasensory, fireHydroPump, fireThunderbolt, fireZapCannon, zapNetworkHit, burnUpCenter, eruptionCenter, extremeSpeedPath, fireBlizzard, fireBurnUp, fireHeatWave, fireSkyAttack, skyAttackPath, fireEnteiEruption, fireFreezeDry, fireIcyWind, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
+import { fireRebirth, fireSacredFire, fireSkyLoop, skyLoopPath, fireDracoMeteor, fireLusterPurge, fireDragonPulse, fireHealPulse, fireMistBall, fireAeroblast, fireExtrasensory, fireHydroPump, fireThunderbolt, fireZapCannon, zapNetworkHit, burnUpCenter, eruptionCenter, extremeSpeedPath, fireBlizzard, fireBurnUp, fireHeatWave, fireSkyAttack, skyAttackPath, fireEnteiEruption, fireFreezeDry, fireIcyWind, fireExtremeSpeed, fireLavaPlume, fireMirrorShards, fireOverheat, fireRisingVoltage, fireSheerCold, fireSurfWave, lavaCracks, risingVoltageTargets, scaledMoveStats, skillMoveStats, strongestEnemyIndex } from './systems/attack';
 
 /**
  * アクティブスキル（作者の案 2026年11月18日。07 の305・307章）: キー（SPACE・Q・E）で使う技。
@@ -97,6 +97,7 @@ export function stepSkills(world: World): void {
     if (p.calm && world.tick >= p.calm.untilTick) p.calm = undefined;
     if (p.overheat && world.tick >= p.overheat.untilTick) p.overheat = undefined;
     if (p.dance && world.tick >= p.dance.untilTick) p.dance = undefined;
+    if (p.sacredFlame && world.tick >= p.sacredFlame.untilTick) p.sacredFlame = undefined;
     // もえつきる: 炎の玉が落ちたら ほのおタイプを失い、切れたら戻る
     if (p.burnedOut && world.tick >= p.burnedOut.offTick && world.tick < p.burnedOut.untilTick) p.types = p.burnedOut.types.filter((t) => t !== p.burnedOut!.lostType);
     if (p.burnedOut && world.tick >= p.burnedOut.untilTick) {
@@ -228,6 +229,11 @@ export function moltresAim(world: World, p: Player, skill: number): { path?: { x
   if (d.skyAttack || d.drillPeck) return { path: skyAttackPath(world, p, pm, dx, dy), width: sc.size };
   if (d.burnUp) {
     const c = burnUpCenter(world, p, st.range, dx, dy, d.burnUp.areaDistance);
+    return { x: c.x, y: c.y, r: sc.size };
+  }
+  if (d.skyLoop) return { path: skyLoopPath(world, p, st.range, dx, dy, d.skyLoop), width: sc.size };
+  if (d.sacredFire) {
+    const c = burnUpCenter(world, p, st.range, dx, dy, d.sacredFire.areaDistance);
     return { x: c.x, y: c.y, r: sc.size };
   }
   if (d.lusterPurge) {
@@ -390,6 +396,30 @@ function runSkill(world: World, p: Player, d: SimActiveSkill, pm: PlayerMove | u
         p.dashVx = 0;
         p.dashVy = 0;
       }
+      return;
+    }
+    case 'skyLoop': {
+      if (!pm || !d.skyLoop) return;
+      const run = fireSkyLoop(world, p, pm, dx, dy, d.skyLoop);
+      // 楕円をたどって行って帰ってくる（体が動く技と同じ。入力では動けない）
+      if (!p.remote && run.pts.length > 1) {
+        p.esDash = { pts: run.pts, k: 1, speed: run.speed };
+        p.dashTicks = Math.ceil(run.seconds / world.dt) + 1;
+        p.dashBusyTicks = p.dashTicks;
+        p.dashVx = 0;
+        p.dashVy = 0;
+      }
+      return;
+    }
+    case 'rebirth': {
+      if (!d.rebirth) return;
+      fireRebirth(world, p, d.rebirth);
+      return;
+    }
+    case 'sacredFire': {
+      if (!pm || !d.sacredFire) return;
+      fireSacredFire(world, p, pm, dx, dy, d.sacredFire);
+      p.sacredFlame = { fromTick: world.tick, untilTick: world.tick + Math.round(d.sacredFire.stateSeconds / world.dt) };
       return;
     }
     case 'lusterPurge': {

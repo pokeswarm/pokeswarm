@@ -381,6 +381,11 @@ export const modifierSchema = z
     pierceBonus: z.number(),
     /** ロックオンした相手（ボス・中ボス）へのダメージ（ロックオン。持っているとボスにロックオンする。07 の249章） */
     lockOnPct: z.number(),
+    /**
+     * 物理の技の威力を、ほかの % の強化（プラスパワー・タイプの持ち物など）と足し合わせず、別に掛ける（つるぎのまい。07 の324章）。
+     * 例: プラスパワー +50% と これ +32% なら ×1.5 × 1.32
+     */
+    physicalPowerMultPct: z.number(),
   })
   .partial();
 export type ModifierData = z.infer<typeof modifierSchema>;
@@ -2042,6 +2047,10 @@ export const moveDefSchema = z.object({
    * 数は最大レベル（levels の数 + 1）と同じ（作者の決定 2026年10月24日: ポリゴンの かくばる・テクスチャー）
    */
   passive: z.array(modifierSchema).optional(),
+  /**
+   * passive の効果に、この技のタイプの威力の強化（持ち物・箱の強化など）を掛ける（つるぎのまい: ノーマルの技なので シルクのスカーフ +75% で効果が 1.75 倍。07 の324章）
+   */
+  passiveScalesWithType: z.boolean().optional(),
 });
 export type MoveDefData = z.infer<typeof moveDefSchema>;
 

@@ -79,6 +79,8 @@ export interface SimMoveDef {
   readonly learners: readonly string[] | null;
   /** いつも効く技（passive）: レベルごとの効果の合計（[0] がレベル1）。ほかの技は空 */
   readonly passive: readonly Modifiers[];
+  /** passive の効果に、この技のタイプの威力の強化を掛ける（つるぎのまい と シルクのスカーフ。07 の324章） */
+  readonly passiveScalesWithType?: boolean;
   /** 出した技が消えるまで次を出さない（ボルテッカー）。省略なら false */
   readonly waitForEnd?: boolean;
   /** chain: 跳び終えたら自分の所へ戻る線を出す（ボルトチェンジ） */

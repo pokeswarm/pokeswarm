@@ -390,10 +390,12 @@ function candidatesFor(ctx: Ctx, row: Row, forms: FormOptions, scene: SceneKey):
       // ロックオン（ボスへのダメージ）も、ボスを相手にした見積もりでは威力と同じに数える
       return (pa?.powerPct ?? 0) + (pa?.physicalPowerPct ?? 0) + (pa?.specialPowerPct ?? 0) + (pa?.lockOnPct ?? 0);
     };
+    // 別に掛ける物理の威力（つるぎのまい。07 の324章）。typeScale はその技のタイプの持ち物の強化（シルクのスカーフ）
+    const passiveMultPct = (o: Option): number => moveDef(o.end)?.passive[moveDef(o.end)!.levels.length - 1]?.physicalPowerMultPct ?? 0;
     const ranked = [...usable].sort((a, b) => value(b) - value(a));
     const keep = new Set<Option>();
     for (const o of ranked.slice(0, row.learnsAll ? 16 : 24)) keep.add(o);
-    for (const o of usable) if (starts.includes(o.root) || passivePct(o) > 0 || MUST?.includes(o.end)) keep.add(o);
+    for (const o of usable) if (starts.includes(o.root) || passivePct(o) > 0 || passiveMultPct(o) > 0 || MUST?.includes(o.end)) keep.add(o);
     for (const r of roots) {
       const bestOf = ranked.find((o) => o.root === r);
       if (bestOf) keep.add(bestOf);
@@ -455,7 +457,7 @@ function candidatesFor(ctx: Ctx, row: Row, forms: FormOptions, scene: SceneKey):
       if (n > 0) for (const it of ['pp-max', 'metronome', 'light-clay']) if (t?.[it]) shaped *= t[it]![scene] / n;
       quickOne.set(o, [v, shaped]);
     }
-    const quick = (opts: Option[], which: 0 | 1): number => opts.reduce((sum, o) => sum + quickOne.get(o)![which], 0) * (1 + opts.reduce((p2, o) => p2 + passivePct(o), 0) / 100);
+    const quick = (opts: Option[], which: 0 | 1): number => opts.reduce((sum, o) => sum + quickOne.get(o)![which], 0) * (1 + opts.reduce((p2, o) => p2 + passivePct(o), 0) / 100) * opts.reduce((m2, o) => m2 * (1 + passiveMultPct(o) / 100), 1);
     // single: 技 1 つだけの見積もり（ほかの技が要る・姿で自動で覚える技の枠、は見ない）
     const evaluate = (opts: Option[], single = false): Candidate | null => {
       // 消費する技を持っている必要があるもの・ほかの技が要るものは満たす
@@ -501,6 +503,12 @@ function candidatesFor(ctx: Ctx, row: Row, forms: FormOptions, scene: SceneKey):
         // 持ち物の数値（最大レベル）。会心は 1.5 倍（基本の会心率 9% に足す）
         const lv = (it: string): number => itemByKey.get(it)?.maxLevel ?? 0;
         const critItem = allItems.reduce((s, it) => s + (itemByKey.get(it)?.perLevel.critChancePct ?? 0) * lv(it), 0);
+        // 別に掛ける物理の威力（つるぎのまい）。タイプの強化が掛かる技は、持ち物のそのタイプの % を掛ける
+        const physicalMult = opts.reduce((m2, o) => {
+          const pd = moveDef(o.end)!;
+          const typeScale = pd.passiveScalesWithType ? 1 + allItems.reduce((s2, it) => s2 + (itemByKey.get(it)?.perLevel.typePowerPct?.[pd.type] ?? 0) * lv(it), 0) / 100 : 1;
+          return m2 * (1 + (passiveMultPct(o) * typeScale) / 100);
+        }, 1);
         for (const o of opts) {
           const md = moveDef(o.end)!;
           const row2 = table.get(o.end);
@@ -528,7 +536,7 @@ function candidatesFor(ctx: Ctx, row: Row, forms: FormOptions, scene: SceneKey):
           }
           for (const b of buffs) if (b.end !== o.end) add += b.up * ((b.mods.powerPct ?? 0) + (physical ? b.mods.physicalPowerPct : b.mods.specialPowerPct));
           const crit = (100 + (rules.combat.critMultiplier - 1) * (9 + critItem)) / (100 + (rules.combat.critMultiplier - 1) * 9);
-          v *= ((1 + add / 100) / 1.25) * crit * (physical ? atk : spa) * (types.includes(md.type) ? rules.combat.typeMultipliers.stab : 1);
+          v *= ((1 + add / 100) / 1.25) * (physical ? physicalMult : 1) * crit * (physical ? atk : spa) * (types.includes(md.type) ? rules.combat.typeMultipliers.stab : 1);
           if (allItems.includes('light-ball')) v *= 2;
           per.push(v);
           total += v;

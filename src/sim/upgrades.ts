@@ -27,6 +27,8 @@ export interface Modifiers {
   pierceBonus: number;
   /** ロックオンした相手（ボス・中ボス）へのダメージ（ロックオン。07 の249章） */
   lockOnPct: number;
+  /** 物理の技の威力。ほかの % と足さずに別に掛ける（つるぎのまい。07 の324章） */
+  physicalPowerMultPct: number;
 }
 
 /** シミュレーションが使う持ち物の定義 */
@@ -118,6 +120,7 @@ export function emptyModifiers(typeCount: number): Modifiers {
     rangePct: 0,
     pierceBonus: 0,
     lockOnPct: 0,
+    physicalPowerMultPct: 0,
   };
 }
 

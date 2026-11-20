@@ -11045,6 +11045,7 @@
       "pattern": "passive",
       "effect": "swords-dance",
       "region": "hoenn",
+      "passiveScalesWithType": true,
       "base": {
         "power": 0,
         "cooldownSeconds": 99,
@@ -11074,28 +11075,28 @@
       ],
       "passive": [
         {
-          "physicalPowerPct": 4
+          "physicalPowerMultPct": 6
         },
         {
-          "physicalPowerPct": 4
+          "physicalPowerMultPct": 6
         },
         {
-          "physicalPowerPct": 4
+          "physicalPowerMultPct": 6
         },
         {
-          "physicalPowerPct": 4
+          "physicalPowerMultPct": 6
         },
         {
-          "physicalPowerPct": 4
+          "physicalPowerMultPct": 6
         },
         {
-          "physicalPowerPct": 4
+          "physicalPowerMultPct": 6
         },
         {
-          "physicalPowerPct": 4
+          "physicalPowerMultPct": 6
         },
         {
-          "physicalPowerPct": 4
+          "physicalPowerMultPct": 6
         }
       ]
     },

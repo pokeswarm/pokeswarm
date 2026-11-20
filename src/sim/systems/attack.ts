@@ -143,6 +143,8 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
       st.power *
       (def.damageClass === 'physical' ? p.physicalPower : p.specialPower) *
       Math.max(0, 1 + (m.powerPct + classPct + typePowerPctOf(world, p, def, pinch) + skillPowerPct(world, p)) / 100) *
+      // つるぎのまい: ほかの % と足さずに別に掛ける（07 の324章）
+      (def.damageClass === 'physical' ? Math.max(0, 1 + m.physicalPowerMultPct / 100) : 1) *
       heldPowerMultiplier(world, p) *
       // なまけ: 2回に1回しか出ない分、強い
       abilityPowerMultiplier(world, p) *

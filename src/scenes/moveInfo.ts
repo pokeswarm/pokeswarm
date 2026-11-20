@@ -118,6 +118,11 @@ export function moveInfoLines(rules: SimRules, def: SimMoveDef): string[] {
     if (mods.length) {
       out.push(def.hurtBuffSeconds ? t('info.hurtBuff', { seconds: def.hurtBuffSeconds }) : t('info.passive'));
       out.push(...mods.map((l) => `・${l}`));
+      // つるぎのまい: シルクのスカーフ（ノーマルの強化）で効果が上がる（07 の324章）
+      if (def.passiveScalesWithType) {
+        const typeKey = rules.types.names[def.type] ?? '';
+        out.push(`・${t('info.passiveTypeScaled', { type: localName(generated.types[typeKey]?.names, getLocale(), typeKey) })}`);
+      }
     }
     if (def.pledge) out.push(t('info.pledge', { v: def.pledge.powerPct, o: def.pledge.perOtherPct }));
     return out;

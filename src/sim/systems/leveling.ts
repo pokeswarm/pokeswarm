@@ -504,11 +504,14 @@ export function recomputeModifiers(world: World, p: Player): void {
     if (buff) addModifiers(mods, buff.mods, 1);
   }
   // いつも効く技（かくばる・テクスチャー）: そのレベルまでの効果
+  // タイプの強化が掛かる技（つるぎのまい）は、持ち物・箱の強化まで足した時点のタイプの威力で掛ける（ほかの いつも効く技の分は掛けない）
+  const typePctBefore = [...mods.typePowerPct];
   for (const pm of p.moves) {
-    const passive = world.rules.moves[pm.move]?.passive[pm.level - 1];
+    const def = world.rules.moves[pm.move];
+    const passive = def?.passive[pm.level - 1];
     // ダメージを受けると効く技（からげんき）は、受けてからの時間の間だけ
-    if (world.rules.moves[pm.move]?.hurtBuffSeconds && !p.moveBuffs?.some((b) => b.move === pm.move)) continue;
-    if (passive) addModifiers(mods, passive, 1);
+    if (def?.hurtBuffSeconds && !p.moveBuffs?.some((b) => b.move === pm.move)) continue;
+    if (passive) addModifiers(mods, passive, def.passiveScalesWithType ? Math.max(0, 1 + (typePctBefore[def.type] ?? 0) / 100) : 1);
   }
   mods.powerPct += pledgePowerPct(world, p);
   // 特性のいつも効く効果（07 の133章）

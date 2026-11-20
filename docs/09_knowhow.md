@@ -230,6 +230,7 @@
 - 自分で測るときは `moveDps.balance.ts` と同じように**自動で出るものを止める**（`wave` の `spawnPerSecond`・`nextBoss`・`swarmSchedule`・`boxTimer`）。止めないと雑魚が混ざり、敵の番号がずれて値が誤る。
 - 最大レベルは `rules.moves[m].levels.length`（シミュレーションの配列は Lv1 を含む）。
 - ポケモンの姿（タイプ一致・性格）で 2〜3 倍変わるので、`docs/14` の値（タイプなし）だけで強さを決めない。持ち物（プラスパワー・ポイントマックス）を持たせた値も見る。
+- 威力の % の強化（プラスパワー・タイプの持ち物・いつも効く技の `physicalPowerPct` など）は**全部足してから 1 回掛ける**ので、持ち物がそろうほど 1 つの +% の効きは薄くなる。持ち物と別に効かせたい技は `physicalPowerMultPct`（別に掛ける。つるぎのまい。07 の324章）を使う。
 - 途中で本数が増えて 1 本の威力が半分になる技は、ポイントマックスで本数が 2 倍になり強さも 2 倍になる。単体が強すぎるなら `bonusCountToPower` にする。
 - **群れの火力は、倒れない的で比べない**（07 の231章）。倒れない的では、当たるたびに広がる技（みらいよち・ワイルドボルト）や一撃技の値が何桁も大きく出る。`docs/14` の雑魚の値は技どうしの目安で、ビルドを比べるときは `buildDps.balance.ts` のように、最後の区間の実際の HP の雑魚を倒れた分だけ足して測る。
 - ビルドの総 DPS: `npx vitest run --mode balance src/sim/buildDps.balance.ts`（`BUILD_ONLY=系統` で絞る。`BUILD_MUST=技` でその技を必ず入れる。`BUILD_TOP=数` で実測する案を増やす。結果は `docs/24_build_dps.json`）。案が実際の候補の出し方で作れるかは `BUILD_IN=案.json npx vitest run --mode balance src/sim/buildVerify.balance.ts`。作れない案が出たら、材料が候補に出ない・進化で勝手に技を覚える、などゲーム側の問題のことがある。

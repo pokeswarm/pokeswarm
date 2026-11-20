@@ -71,6 +71,27 @@ describe('ワイルドボルト（07 の326章）', () => {
     }
   });
 
+  it('走っている間だけ無敵（07 の327章）', () => {
+    const t = setup();
+    t.p.moves = [t.pm('wild-charge')];
+    recomputeModifiers(t.w, t.p);
+    t.p.inputX = 1;
+    let ran = false;
+    for (let k = 0; k < 20; k++) {
+      t.sim.step([]);
+      if (t.p.dashTicks) {
+        ran = true;
+        expect(t.p.invincibleTicks).toBeGreaterThan(0);
+      }
+      if (ran && !t.p.dashTicks) break;
+    }
+    expect(ran).toBe(true);
+    // 走り終わったら、すぐに無敵が切れる（長く残さない）
+    t.sim.step([]);
+    t.sim.step([]);
+    expect(t.p.invincibleTicks).toBe(0);
+  });
+
   it('でんこうせっか ＋ じしゃく → ワイルドボルト はサンダースだけ', () => {
     for (const [form, ok] of [['jolteon', true], ['eevee', false]] as const) {
       const t = setup('eevee', form);

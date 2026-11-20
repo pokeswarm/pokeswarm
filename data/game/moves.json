@@ -2464,7 +2464,7 @@
         "hit": "path",
         "hop": 0,
         "afterimages": 4,
-        "invincible": false,
+        "invincible": true,
         "target": "input",
         "zigzag": {
           "legs": 3,

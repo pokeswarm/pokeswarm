@@ -7623,6 +7623,151 @@ function heavyImpact(): SpriteOut {
   return { palette, frameMs: 90, parts: { main: frames.map(toRows) } };
 }
 
+// ---------------- サンダースの技（07 の325章） ----------------
+/**
+ * ミサイルばり: サンダースが逆立てた毛の針（右が前。32 ドット・ふちなし）。細い軸の先は白く鋭く、根元は後ろへ逆立つ毛のとげが 2 本ずつ（矢羽ではなく、とがった毛先）。
+ * 軸のまわりで小さな電気がはぜる（3 コマで場所が変わる）。どくばり（紫の細い針）と色・根元の形で分ける
+ */
+function pinNeedle(): SpriteOut {
+  // 0 濃い黄・1 黄・2 薄い黄・3 白・4 電気の明るい黄
+  const palette = ['#c49000', '#f6c21c', '#fde58a', '#ffffff', '#fff59d'];
+  // 根元の毛のとげ（元の点 → 後ろの先。上下 2 本ずつ）
+  const barbs: [number, number, number, number][] = [
+    [-0.3, 0, -0.78, -0.3],
+    [-0.3, 0, -0.78, 0.3],
+    [-0.52, 0, -0.95, -0.17],
+    [-0.52, 0, -0.95, 0.17],
+  ];
+  const frames = [0, 1, 2].map((f) => {
+    const r = rng(8200 + f * 37);
+    const sparks = Array.from({ length: 3 }, () => [-0.4 + r() * 1.1, (r() < 0.5 ? -1 : 1) * (0.14 + r() * 0.12)] as const);
+    return toRows(
+      shape(
+        32,
+        (u, v) => {
+          // 軸: 根元から先へ細くなる
+          if (u > -0.62 && u < 0.97) {
+            const w = 0.085 * (1 - (u + 0.62) / 1.59) + 0.012;
+            if (Math.abs(v) < w) {
+              if (u > 0.6) return 3;
+              return v < -w * 0.2 ? 3 : v < w * 0.5 ? 2 : 1;
+            }
+          }
+          // 毛のとげ: 元は太く、後ろの先へ細くなる
+          for (const [x1, y1, x2, y2] of barbs) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const t = Math.max(0, Math.min(1, ((u - x1) * dx + (v - y1) * dy) / (dx * dx + dy * dy)));
+            const d = Math.hypot(u - x1 - dx * t, v - y1 - dy * t);
+            const w = 0.07 * (1 - t) + 0.012;
+            if (d < w) return d < w * 0.45 && t < 0.6 ? 2 : y2 < 0 ? 1 : 0;
+          }
+          for (const [sx, sy] of sparks) {
+            const dx = u - sx;
+            const dy = v - sy;
+            if ((Math.abs(dx) < 0.07 && Math.abs(dy) < 0.02) || (Math.abs(dy) < 0.07 && Math.abs(dx) < 0.02)) return 4;
+          }
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette, frameMs: 60, parts: { main: frames } };
+}
+
+/**
+ * エレキボール: 稲妻を巻き取った玉（48 ドット・ふちなし）。白い芯のまわりを、玉の形に沿って巻く稲妻の糸が回り、
+ * ふちから短い稲妻がはぜる。4 コマで糸が回り、はぜる向きが変わる。でんじほう（芯と放射の線）と形で分ける
+ */
+function electroBall(): SpriteOut {
+  // 0 濃い橙・1 黄・2 薄い黄・3 白・4 芯のまわりの明るい黄
+  const palette = ['#e08a00', '#fdd835', '#fff59d', '#ffffff', '#ffee58'];
+  const frames = [0, 1, 2, 3].map((f) => {
+    const r = rng(8400 + f * 29);
+    // 玉の外へはぜる短い稲妻（3 本）
+    const out: [number, number, number, number][] = [];
+    for (let k = 0; k < 3; k++) {
+      const a = (k / 3) * Math.PI * 2 + f * 1.1 + r() * 0.6;
+      out.push(...boltPath(r, Math.cos(a) * 0.62, Math.sin(a) * 0.62, a + (r() - 0.5) * 0.5, 0.3, 3, 0.07));
+    }
+    const turn = (f * Math.PI) / 4;
+    return toRows(
+      shape(
+        48,
+        (u, v) => {
+          const d = Math.hypot(u, v);
+          let best = 9;
+          for (const sg of out) best = Math.min(best, segDist(u, v, sg));
+          if (best < 0.022) return 3;
+          if (best < 0.045) return 1;
+          if (d > 0.66) return -1;
+          if (d < 0.2) return 3;
+          if (d < 0.3) return 4;
+          // 玉に巻き付く稲妻の糸: 傾けた輪を 3 本、それぞれ回す（糸の上は明るく、すき間は暗い黄）
+          for (let k = 0; k < 3; k++) {
+            const tilt = turn + (k * Math.PI) / 3;
+            const x = u * Math.cos(tilt) + v * Math.sin(tilt);
+            const y = -u * Math.sin(tilt) + v * Math.cos(tilt);
+            const e = Math.abs(Math.hypot(x, y * 2.6) - 0.58 + Math.sin(x * 22 + f * 2 + k) * 0.03);
+            if (e < 0.04) return e < 0.02 ? 3 : 2;
+          }
+          const l = light(u, v, 0.66);
+          return d > 0.6 ? 0 : l > 0.35 ? 2 : 1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette, frameMs: 70, parts: { main: frames } };
+}
+
+/**
+ * エレキボール: 当たって弾ける電気（64 ドット・ふちなし）。3 コマ: 玉がふくらんで白く光る → 短い稲妻が輪の形に外へはじける → 火花だけ残る。
+ * ワイルドボルトの放電（枝分かれして長く伸びる）より短く、輪の形にそろって広がる
+ */
+function electroBurst(): SpriteOut {
+  const palette = ['#e08a00', '#fdd835', '#fff59d', '#ffffff'];
+  const frames = [0, 1, 2].map((f) => {
+    const r = rng(8600 + f * 31);
+    const reach = [0.5, 0.86, 0.96][f]!;
+    const bolts: [number, number, number, number][] = [];
+    const n = 12;
+    for (let j = 0; j < n; j++) {
+      const a = (j / n) * Math.PI * 2 + (r() - 0.5) * 0.25;
+      const from = f === 0 ? 0.3 : reach - 0.34;
+      bolts.push(...boltPath(r, Math.cos(a) * from, Math.sin(a) * from, a + (r() - 0.5) * 0.3, f === 2 ? 0.12 : 0.3, 3, 0.05));
+    }
+    const sparks = Array.from({ length: 18 }, () => {
+      const a = r() * Math.PI * 2;
+      const d = reach * (0.55 + r() * 0.45);
+      return [Math.cos(a) * d, Math.sin(a) * d] as const;
+    });
+    return toRows(
+      shape(
+        64,
+        (u, v) => {
+          const d = Math.hypot(u, v);
+          const core = [0.36, 0.14, 0][f]!;
+          if (d < core) return d < core * 0.65 ? 3 : 2;
+          let best = 9;
+          for (const sg of bolts) best = Math.min(best, segDist(u, v, sg));
+          const w = f === 2 ? 0.6 : 1;
+          if (best < 0.018 * w) return 3;
+          if (best < 0.036 * w) return f === 2 ? 0 : 1;
+          if (f > 0) for (const [sx, sy] of sparks) if (Math.hypot(u - sx, v - sy) < 0.022) return f === 1 ? 2 : 1;
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette, frameMs: 70, parts: { main: frames } };
+}
+
 export const MOVE_ART_CREDIT = '自作（src/render/moveArt.ts で計算して描いた。公式の素材は使っていない）';
 
 /** 絵の名前 → 描く関数 */
@@ -8017,6 +8162,10 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'giga-burst': () => gigaBurst(),
     'dragon-dive-burst': () => dragonDiveBurst(),
     'plume-smoke': () => plumeSmoke(),
+    // 325章（サンダース）
+    'pin-needle': pinNeedle,
+    'electro-ball': electroBall,
+    'electro-burst': electroBurst,
 };
 
 /** 絵の名前の一覧 */

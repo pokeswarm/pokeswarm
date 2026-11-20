@@ -129,10 +129,16 @@ function typePowerPctOf(world: World, p: Player, def: SimMoveDef, pinch: Modifie
   return pct;
 }
 
+/** 速いほど強い技（エレキボール）の、速さの倍率 F − 1（F が 1 より小さければ 0。07 の325章） */
+export function speedBonusOf(p: Player): number {
+  return Math.max(0, (p.speedFactor ?? 1) - 1);
+}
+
 /** 持ち物の効果を掛けた、その技の威力・大きさ・速さ・クールダウン */
 export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: MoveStats) {
   const def = world.rules.moves[pm.move]!;
   const m = p.mods;
+  const fast = def.speedScale ? speedBonusOf(p) : 0;
   // 特性: HP が少ない間だけ威力が上がる（しんりょく など。07 の133章）
   const pinch = pinchMods(world, p);
   // じしんかじょう: 倒すたびに重なる物理の威力
@@ -149,8 +155,10 @@ export function scaledMoveStats(world: World, p: Player, pm: PlayerMove, st: Mov
       // なまけ: 2回に1回しか出ない分、強い
       abilityPowerMultiplier(world, p) *
       // とっておき: 覚えているほかの技が多いほど強い
-      (1 + (st.perMovePowerPct * Math.max(0, p.moves.length - 1)) / 100),
-    size: st.size * Math.max(0.1, 1 + (m.areaPct + typeAreaPctOf(m, def)) / 100),
+      (1 + (st.perMovePowerPct * Math.max(0, p.moves.length - 1)) / 100) *
+      // エレキボール: 速いほど強い（07 の325章）
+      (1 + (def.speedScale?.power ?? 0) * fast),
+    size: st.size * Math.max(0.1, 1 + (m.areaPct + typeAreaPctOf(m, def)) / 100) * (1 + (def.speedScale?.size ?? 0) * fast),
     speed: st.speed * Math.max(0.1, 1 + m.projectileSpeedPct / 100),
     cooldownSeconds: st.cooldownSeconds * Math.max(0.2, 1 + m.cooldownPct / 100),
   };
@@ -522,6 +530,11 @@ export function useMoves(world: World): void {
         case 'boomerang':
         case 'barrage':
           pm.burstLeft = st.count;
+          // ミサイルばり: 数は使うたびに burstCountMin〜count のどれか（増えた分は上に足す。07 の325章）
+          if (def.burstCountMin && def.burstCountMin < st.count - p.mods.amountBonus) {
+            const top = st.count - p.mods.amountBonus;
+            pm.burstLeft = def.burstCountMin + Math.floor(world.rng.next() * (top - def.burstCountMin + 1)) + p.mods.amountBonus;
+          }
           pm.burstTimer = 0;
           // 続けて当てるほど強くなる（エコーボイス）: 前に出した分が当たっていれば 1 段上げ、外れていれば 0 段。2 段ごとにこだまの輪を 1 つ足す（07 の240章）
           if (def.echo) {

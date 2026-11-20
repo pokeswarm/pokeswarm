@@ -1504,6 +1504,18 @@ const ICONS: Record<string, Layer[]> = {
   // ビルドアップ: 体から立ちのぼる赤いオーラ（ゲームの絵）
   'bulk-up': [{ art: 'bulk-aura', frame: 2, k: 1.05, x: 16, y: 16.5 }],
   // こうそくいどう: 速くなる体と、置いていかれる筋
+  // ミサイルばり: 逆立てた毛の針が扇に連なって飛ぶ（07 の325章）
+  'pin-missile': [
+    { art: 'pin-needle', frame: 0, k: 0.62, x: 9, y: 13, rot: -28 },
+    { art: 'pin-needle', frame: 1, k: 0.62, x: 15, y: 19, rot: -40 },
+    { art: 'pin-needle', frame: 2, k: 0.62, x: 21, y: 9, rot: -52 },
+    { art: 'pin-needle', frame: 0, k: 0.62, x: 23, y: 22, rot: -36 },
+  ],
+  // エレキボール: 速く飛ぶ電気の玉（後ろに速さの筋。速いほど強い）
+  'electro-ball': [
+    { art: 'speed-streak', k: 0.8, x: 10, y: 17 },
+    { art: 'electro-ball', frame: 0, k: 0.5, x: 20, y: 15 },
+  ],
   agility: [
     { art: 'charge-streak', frame: 1, k: 0.85, x: 14, y: 10 },
     { art: 'charge-streak', frame: 1, k: 0.85, x: 18, y: 22 },

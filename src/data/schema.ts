@@ -1922,6 +1922,13 @@ export const moveDefSchema = z.object({
    * 威力を power 倍にし、押し出さない
    */
   idleScale: z.object({ size: z.number().positive().max(1), power: z.number().min(0).max(1) }).optional(),
+  /**
+   * 速いほど強い（エレキボール: 原作は相手より速いほど威力が上がる。07 の325章）: 速さの倍率 F（種族値の速さのランク × 移動速度の強化 × 性格。
+   * 基準のプレイヤー＝1）から、威力を ×(1 + power × (F − 1))・大きさを ×(1 + size × (F − 1)) にする（F が 1 より小さいときは掛けない）
+   */
+  speedScale: z.object({ power: z.number().min(0), size: z.number().min(0) }).optional(),
+  /** 続けて撃つ技（facing・nearest など）の数を、使うたびに burstCountMin〜count のどれかにする（ミサイルばり: 原作は 2〜5 回。07 の325章） */
+  burstCountMin: z.number().int().positive().optional(),
   /** 押し出す向きを、当たり判定から敵へではなく、技の向き（向いている方向）にする（なみのり・サイコキネシス。07 の162章） */
   knockbackAlongFacing: z.boolean().optional(),
   /**

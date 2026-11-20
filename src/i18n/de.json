@@ -803,6 +803,8 @@
   "info.dash": "Du bewegst dich mit dem Angriff",
   "info.dashInvincible": "Du bewegst dich mit dem Angriff und erleidest dabei keinen Schaden",
   "info.chargeMoving": "Lädt sich nur auf, während du läufst",
+  "info.speedScale": "Je schneller du bist, desto stärker und größer (Tempo-Boni zählen)",
+  "info.burstCount": "Feuert jedes Mal zufällig zwischen {min} und der Höchstzahl",
   "info.hurtRelease": "Speichert erlittenen Schaden und gibt ihn zurück",
   "info.rainBoost": "Solange aktiv: {type}-Attacken +{v}% Stärke",
   "info.pledge": "+{v}% Stärke; +{o}% für jedes andere Gelöbnis, das du oder ein Verbündeter kennt",

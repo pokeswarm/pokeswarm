@@ -948,6 +948,19 @@
     "contestType": null,
     "damageClass": "status"
   },
+  "electro-ball": {
+    "names": {
+      "ja": "エレキボール",
+      "en": "Electro Ball",
+      "fr": "Boule Élek",
+      "de": "Elektroball",
+      "es": "Bola Voltio",
+      "it": "Energisfera"
+    },
+    "type": "electric",
+    "contestType": null,
+    "damageClass": "special"
+  },
   "ember": {
     "names": {
       "ja": "ひのこ",
@@ -2272,6 +2285,19 @@
     },
     "type": "ghost",
     "contestType": null,
+    "damageClass": "physical"
+  },
+  "pin-missile": {
+    "names": {
+      "ja": "ミサイルばり",
+      "en": "Pin Missile",
+      "fr": "Dard-Nuée",
+      "de": "Nadelrakete",
+      "es": "Pin Misil",
+      "it": "Missilspillo"
+    },
+    "type": "bug",
+    "contestType": "cool",
     "damageClass": "physical"
   },
   "play-rough": {

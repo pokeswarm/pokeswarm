@@ -530,7 +530,8 @@ export function recomputeModifiers(world: World, p: Player): void {
   p.physicalPower = (d?.physicalPower ?? 1) * nf('attack');
   p.specialPower = (d?.specialPower ?? 1) * nf('special-attack');
   p.defense = (d?.defense ?? 0) * Math.max(0, 1 + mods.defensePct / 100) * (sp ? nf(defenseStatOf(sp)) : 1);
-  p.moveSpeed = p.baseMoveSpeed * (d?.speed ?? 1) * (1 + mods.moveSpeedPct / 100) * nf('speed');
+  p.speedFactor = (d?.speed ?? 1) * Math.max(0, 1 + mods.moveSpeedPct / 100) * nf('speed');
+  p.moveSpeed = p.baseMoveSpeed * p.speedFactor;
   p.pickupRange = p.basePickupRange * (1 + mods.pickupRangePct / 100);
 }
 

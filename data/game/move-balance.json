@@ -126,7 +126,8 @@
     "lock-on",
     "rollout",
     "wish",
-    "safeguard"
+    "safeguard",
+    "electro-ball"
   ],
   "heavyHitters": [
     "phantom-force",
@@ -185,7 +186,8 @@
     "last-resort-stars": "base",
     "last-resort-slam": "base",
     "last-resort-burst": "base",
-    "doom-desire": "unique"
+    "doom-desire": "unique",
+    "pin-missile": "derived"
   },
   "strengthScale": {
     "psystrike": 1.7,
@@ -215,6 +217,7 @@
     "submission": 1.6,
     "encore": 0.5,
     "destiny-bond": 1.7,
-    "metal-burst": 4
+    "metal-burst": 4,
+    "pin-missile": 2
   }
 }

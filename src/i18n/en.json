@@ -824,6 +824,8 @@
   "info.dash": "You move with the attack",
   "info.dashInvincible": "You move with the attack and take no damage while moving",
   "info.chargeMoving": "Charges only while you are moving",
+  "info.speedScale": "The faster you are, the stronger and bigger it gets (move speed boosts count)",
+  "info.burstCount": "Fires between {min} and the max count at random each time",
   "info.hurtRelease": "Stores damage you take and releases it",
   "info.rainBoost": "While active, {type} moves +{v}% power",
   "info.pledge": "+{v}% power while known; +{o}% for each other Pledge you or an ally knows",

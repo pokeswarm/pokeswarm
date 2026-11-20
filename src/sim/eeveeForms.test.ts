@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildSimRules, moveIndexOf, playableLoadout } from '../data/simRules';
 import { Simulation } from './simulation';
 import { answerEvolution, checkEvolution } from './systems/evolution';
-import { makeOffers } from './systems/leveling';
+import { canLearnNewMove, makeOffers, recomputeModifiers } from './systems/leveling';
 
 /** イーブイの進化で たいあたり などが固有技に変わる（作者の依頼 2026年10月28日。07 の103章） */
 function setup(region = 'kanto') {
@@ -18,11 +18,11 @@ function setup(region = 'kanto') {
 }
 
 describe('イーブイの進化で技が変わる', () => {
-  it('石で進化すると たいあたり が だくりゅう・ふんえん・こうそくいどう になり、強化の段階は受け継ぐ', () => {
+  it('石で進化すると たいあたり が だくりゅう・ふんえん・ミサイルばり になり、強化の段階は受け継ぐ', () => {
     for (const [item, to] of [
       ['water-stone', 'muddy-water'],
       ['fire-stone', 'lava-plume'],
-      ['thunder-stone', 'agility'],
+      ['thunder-stone', 'pin-missile'],
     ] as const) {
       const s = setup();
       s.p.moves = [s.has('swift'), s.has('tackle')];
@@ -44,11 +44,15 @@ describe('イーブイの進化で技が変わる', () => {
     expect(s.keys()).toEqual(['swift']);
   });
 
-  it('こうそくいどう は段階ごとに移動速度が 4% ずつ上がる', () => {
+  it('サンダースは のしかかり でも ミサイルばり になり、こうそくいどう を覚えられる（段階ごとに移動速度 +4%。07 の325章）', () => {
     const s = setup();
-    s.p.moves = [s.has('tackle')];
+    s.p.moves = [s.has('body-slam')];
     s.p.items = s.stone('thunder-stone');
     checkEvolution(s.w, s.p);
+    expect(s.keys()).toEqual(['pin-missile']);
+    expect(canLearnNewMove(s.w, s.p, s.move('agility'))).toBe(true);
+    s.p.moves.push(s.has('agility'));
+    recomputeModifiers(s.w, s.p);
     expect(s.p.mods.moveSpeedPct).toBeCloseTo(4 * 5);
   });
 

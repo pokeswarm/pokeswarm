@@ -3480,6 +3480,58 @@
         }
       }
     },
+    "pin-missile": {
+      "extends": "bug.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "burst": {
+          "count": 5,
+          "colors": ["#ffffff", "#fff59d", "#fdd835"]
+        },
+        "flash": {
+          "alpha": 0
+        }
+      },
+      "sprite": {
+        "id": "pin-needle",
+        "fit": "circle",
+        "size": 2.6,
+        "rotate": "velocity"
+      }
+    },
+    "electro-ball": {
+      "extends": "electric.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "flash": {
+          "alpha": 0
+        },
+        "burst": {
+          "count": 6,
+          "blend": "normal"
+        }
+      },
+      "sprite": {
+        "id": "electro-ball",
+        "fit": "circle",
+        "size": 1.35,
+        "rotate": "spin",
+        "spinDegPerSec": 300
+      },
+      "effectSprite": {
+        "id": "electro-burst",
+        "fit": "circle",
+        "size": 1.1
+      }
+    },
     "zap-cannon": {
       "extends": "electric.base",
       "projectile": {

@@ -803,6 +803,8 @@
   "info.dash": "Ti muovi insieme all’attacco",
   "info.dashInvincible": "Ti muovi con l’attacco e non subisci danni nel frattempo",
   "info.chargeMoving": "Si carica solo mentre ti muovi",
+  "info.speedScale": "Più sei veloce, più è potente e grande (contano i bonus di velocità)",
+  "info.burstCount": "Ne lancia a caso tra {min} e il numero massimo ogni volta",
   "info.hurtRelease": "Accumula i danni subiti e li restituisce",
   "info.rainBoost": "Mentre è attivo, mosse di tipo {type} +{v}% di potenza",
   "info.pledge": "+{v}% di potenza; +{o}% per ogni altro Giuramento conosciuto da te o da un alleato",

@@ -141,6 +141,8 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.barrageAhead ? { barrageAhead: true } : {}),
       ...(def.barrageSeek ? { barrageSeek: true } : {}),
       idleScale: def.idleScale,
+      ...(def.speedScale ? { speedScale: def.speedScale } : {}),
+      ...(def.burstCountMin ? { burstCountMin: def.burstCountMin } : {}),
       knockbackAlongFacing: def.knockbackAlongFacing,
       ...(def.epicenter ? { epicenter: true } : {}),
       magnitude: def.magnitude,

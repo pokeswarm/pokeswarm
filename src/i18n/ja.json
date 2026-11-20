@@ -824,6 +824,8 @@
   "info.dash": "からだごと うごいて こうげきする",
   "info.dashInvincible": "からだごと うごいて こうげきする。うごいている あいだは ダメージを うけない",
   "info.chargeMoving": "はしっている あいだだけ たまる",
+  "info.speedScale": "速いほど 威力と大きさが上がる（移動速度の強化が効く）",
+  "info.burstCount": "数は 使うたびに {min}〜最大の数 のどれか",
   "info.hurtRelease": "うけた ダメージを ためて かえす",
   "info.rainBoost": "でている あいだ、{type}の わざの いりょく +{v}%",
   "info.pledge": "おぼえていると いりょく +{v}%。じぶんか なかまが おぼえている ほかの ちかい 1しゅるいにつき +{o}%",

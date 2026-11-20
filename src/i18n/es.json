@@ -803,6 +803,8 @@
   "info.dash": "Te mueves con el ataque",
   "info.dashInvincible": "Te mueves con el ataque y no recibes daño mientras",
   "info.chargeMoving": "Solo se carga mientras te mueves",
+  "info.speedScale": "Cuanto más rápido seas, más fuerte y grande (cuentan las mejoras de velocidad)",
+  "info.burstCount": "Lanza al azar entre {min} y el máximo cada vez",
   "info.hurtRelease": "Acumula el daño recibido y lo devuelve",
   "info.rainBoost": "Mientras dura, movimientos de tipo {type} +{v}% de potencia",
   "info.pledge": "+{v}% de potencia; +{o}% por cada otra Promesa que conozcas tú o un aliado",

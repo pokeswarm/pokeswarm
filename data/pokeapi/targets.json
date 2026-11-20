@@ -564,7 +564,9 @@
     "safeguard",
     "destiny-bond",
     "rising-voltage",
-    "electric-terrain"
+    "electric-terrain",
+    "pin-missile",
+    "electro-ball"
   ],
   "items": [
     "x-attack",

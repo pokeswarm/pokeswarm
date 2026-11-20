@@ -600,6 +600,15 @@
       }
     },
     {
+      "from": "thunderbolt",
+      "item": "x-speed",
+      "to": "electro-ball",
+      "line": "eevee",
+      "forms": [
+        "jolteon"
+      ]
+    },
+    {
       "from": "body-slam",
       "item": "hp-up",
       "to": "giga-impact",

@@ -803,6 +803,8 @@
   "info.dash": "Tu te déplaces avec l’attaque",
   "info.dashInvincible": "Tu te déplaces avec l’attaque, sans subir de dégâts pendant ce temps",
   "info.chargeMoving": "Ne se charge que pendant que tu bouges",
+  "info.speedScale": "Plus tu es rapide, plus elle est puissante et grande (les bonus de vitesse comptent)",
+  "info.burstCount": "Tire au hasard entre {min} et le nombre maximal à chaque fois",
   "info.hurtRelease": "Accumule les dégâts subis et les renvoie",
   "info.rainBoost": "Tant que c’est actif, capacités {type} +{v} % de puissance",
   "info.pledge": "+{v} % de puissance ; +{o} % par autre Aire connue par toi ou un allié",

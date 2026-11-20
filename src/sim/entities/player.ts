@@ -59,6 +59,8 @@ export interface Player {
   facingY: Axis;
   radius: number;
   moveSpeed: number;
+  /** 速さの倍率（種族値の速さのランク × 移動速度の強化 × 性格。基準のプレイヤー＝1。エレキボール。07 の325章）。recomputeModifiers が決める */
+  speedFactor?: number;
   /** 経験値の玉を吸い寄せ始める距離 */
   pickupRange: number;
   /** タイプの番号（タイプ一致の判定に使う） */

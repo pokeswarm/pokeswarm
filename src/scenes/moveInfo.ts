@@ -159,6 +159,8 @@ export function moveInfoLines(rules: SimRules, def: SimMoveDef): string[] {
   if (def.delayedBlast) out.push(t('info.delayedBlast', { seconds: def.delayedBlast.seconds }));
   if (def.dash) out.push(t(def.dash.invincible ? 'info.dashInvincible' : 'info.dash'));
   if (def.chargeWhileMoving) out.push(t('info.chargeMoving'));
+  if (def.speedScale) out.push(t('info.speedScale'));
+  if (def.burstCountMin) out.push(t('info.burstCount', { min: def.burstCountMin }));
   if (def.hurtRelease) out.push(t('info.hurtRelease'));
   if (def.rainBoost) out.push(t('info.rainBoost', { type: typeName(rules, def.rainBoost.type), v: def.rainBoost.pct }));
   if (def.pledge) out.push(t('info.pledge', { v: def.pledge.powerPct, o: def.pledge.perOtherPct }));

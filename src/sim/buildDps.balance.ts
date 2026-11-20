@@ -351,6 +351,9 @@ function candidatesFor(ctx: Ctx, row: Row, forms: FormOptions, scene: SceneKey):
     const types = [...sp.types];
     const atk = rankMul(sp.baseStats.attack) / rankMul(mewSp.baseStats.attack);
     const spa = rankMul(sp.baseStats.specialAttack) / rankMul(mewSp.baseStats.specialAttack);
+    // 速いほど強い技（エレキボール。07 の325章）: 表はミュウの速さで測っているので、その姿の速さとの違いを掛ける
+    const speedRank = rankMul(sp.baseStats.speed);
+    const mewSpeedRank = rankMul(mewSp.baseStats.speed);
     const moveDef = (k: string) => moveByKey.get(k);
     const finalLine = lineAt(rules, row, lo, info.path);
     // 持てる持ち物: 道のどれかの姿で候補に出るもの
@@ -395,7 +398,7 @@ function candidatesFor(ctx: Ctx, row: Row, forms: FormOptions, scene: SceneKey):
     const ranked = [...usable].sort((a, b) => value(b) - value(a));
     const keep = new Set<Option>();
     for (const o of ranked.slice(0, row.learnsAll ? 16 : 24)) keep.add(o);
-    for (const o of usable) if (starts.includes(o.root) || passivePct(o) > 0 || passiveMultPct(o) > 0 || MUST?.includes(o.end)) keep.add(o);
+    for (const o of usable) if (starts.includes(o.root) || passivePct(o) > 0 || passiveMultPct(o) > 0 || (moveDef(o.end)?.passive[moveDef(o.end)!.levels.length - 1]?.moveSpeedPct ?? 0) > 0 || MUST?.includes(o.end)) keep.add(o);
     for (const r of roots) {
       const bestOf = ranked.find((o) => o.root === r);
       if (bestOf) keep.add(bestOf);
@@ -509,6 +512,9 @@ function candidatesFor(ctx: Ctx, row: Row, forms: FormOptions, scene: SceneKey):
           const typeScale = pd.passiveScalesWithType ? 1 + allItems.reduce((s2, it) => s2 + (itemByKey.get(it)?.perLevel.typePowerPct?.[pd.type] ?? 0) * lv(it), 0) / 100 : 1;
           return m2 * (1 + (passiveMultPct(o) * typeScale) / 100);
         }, 1);
+        // 速さの倍率（持ち物の移動速度・いつも効く技の移動速度 こうそくいどう）
+        const speedPct = allItems.reduce((s2, it) => s2 + (itemByKey.get(it)?.perLevel.moveSpeedPct ?? 0) * lv(it), 0) + opts.reduce((s2, o) => s2 + (moveDef(o.end)?.passive[moveDef(o.end)!.levels.length - 1]?.moveSpeedPct ?? 0), 0);
+        const speedFactor = speedRank * (1 + speedPct / 100);
         for (const o of opts) {
           const md = moveDef(o.end)!;
           const row2 = table.get(o.end);
@@ -538,6 +544,7 @@ function candidatesFor(ctx: Ctx, row: Row, forms: FormOptions, scene: SceneKey):
           const crit = (100 + (rules.combat.critMultiplier - 1) * (9 + critItem)) / (100 + (rules.combat.critMultiplier - 1) * 9);
           v *= ((1 + add / 100) / 1.25) * (physical ? physicalMult : 1) * crit * (physical ? atk : spa) * (types.includes(md.type) ? rules.combat.typeMultipliers.stab : 1);
           if (allItems.includes('light-ball')) v *= 2;
+          if (md.speedScale) v *= (1 + md.speedScale.power * Math.max(0, speedFactor - 1)) / (1 + md.speedScale.power * Math.max(0, mewSpeedRank - 1));
           per.push(v);
           total += v;
         }

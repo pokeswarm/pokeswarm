@@ -226,6 +226,10 @@ export interface SimMoveDef {
   readonly barrageSeek?: boolean;
   /** 止まっているときの大きさ・威力の倍率（なみのり。押し出さない） */
   readonly idleScale?: { readonly size: number; readonly power: number };
+  /** 速いほど強い（エレキボール。07 の325章）: 速さの倍率 F から 威力 ×(1 + power(F − 1))・大きさ ×(1 + size(F − 1)) */
+  readonly speedScale?: { readonly power: number; readonly size: number };
+  /** 続けて撃つ数を、使うたびに burstCountMin〜count のどれかにする（ミサイルばり） */
+  readonly burstCountMin?: number;
   /** 押し出す向きを技の向きにする */
   readonly knockbackAlongFacing?: boolean;
   /** nova: 震源（ボス・敵が一番多い所）を中心に広がる（07 の278章） */

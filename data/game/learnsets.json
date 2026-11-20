@@ -1134,7 +1134,19 @@
           "umbreon"
         ]
       },
-      "double-edge"
+      "double-edge",
+      {
+        "move": "agility",
+        "forms": [
+          "jolteon"
+        ]
+      },
+      {
+        "move": "electro-ball",
+        "forms": [
+          "jolteon"
+        ]
+      }
     ],
     "doduo": [
       "swift",

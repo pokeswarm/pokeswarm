@@ -563,15 +563,8 @@ export function useMoves(world: World): void {
           }
           pm.burstTimer = 0;
           // ★アシストパワー: 強化の数だけ念の玉が増える（07 の331章）
-          if (def.boostShots) {
-            pm.burstLeft += Math.min(def.boostShots.max, def.boostShots.perBoost * boostCountOf(world, p, pm.move));
-            // 撃つときに舞う（体をくるりと回して少し前へ。07 の332章）
-            const body = def.body;
-            if (body) {
-              const [bx, by] = axisToUnit(p.facingX, p.facingY);
-              world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: bx, dirY: by, distance: body.lungeDistance, afterimages: body.afterimages, ...(body.flip ? { flip: true } : {}) });
-            }
-          }
+          // 撃つときの舞い（エーフィの Hop）は、描画の側で技を使った知らせから再生する（castAnimation。07 の333章）
+          if (def.boostShots) pm.burstLeft += Math.min(def.boostShots.max, def.boostShots.perBoost * boostCountOf(world, p, pm.move));
           // 続けて当てるほど強くなる（エコーボイス）: 前に出した分が当たっていれば 1 段上げ、外れていれば 0 段。2 段ごとにこだまの輪を 1 つ足す（07 の240章）
           if (def.echo) {
             const stack = pm.echoHit ? Math.min(def.echo.maxStacks, (pm.echo ?? 0) + 1) : 0;

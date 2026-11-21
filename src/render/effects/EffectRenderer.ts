@@ -168,6 +168,11 @@ export class EffectRenderer {
     return this.recipe(id).dashPathSprite ?? null;
   }
 
+  /** 技を使った瞬間に再生するスプライトの動作（07 の333章） */
+  castAnimation(id: string): string | null {
+    return this.recipe(id).castAnimation ?? null;
+  }
+
   castSprite(id: string): EffectRecipe['castSprite'] | null {
     return this.recipe(id).castSprite ?? null;
   }

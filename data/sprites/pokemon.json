@@ -1324,6 +1324,9 @@
         "full",
         "enemy"
       ],
+      "extraAnimations": [
+        "Hop"
+      ],
       "enemyExtraAnimations": [
         "Charge",
         "Hurt"

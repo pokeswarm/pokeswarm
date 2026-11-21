@@ -1440,6 +1440,9 @@ export class RunScene extends Phaser.Scene {
         this.announce(t('run.moveTaught', { name: localName(generated.moves[w.rules.moves[ev.move]!.key]?.names, getLocale(), w.rules.moves[ev.move]!.key) }), '#ffcc80');
       } else if (ev.type === 'moveUsed') {
         // 使った瞬間の絵（しおふき: 真上へ噴き上がる潮）
+        // 使ったポケモンの動作を 1 回分（★アシストパワー: エーフィが跳ねて舞う。07 の333章）
+        const castAnim = this.effects.castAnimation(w.rules.moves[ev.move]!.effect);
+        if (castAnim) this.playerViews.get(ev.playerId)?.playOnce(castAnim);
         const cs = this.effects.castSprite(w.rules.moves[ev.move]!.effect);
         const p = cs ? w.players.find((q) => q.id === ev.playerId) : undefined;
         if (cs && p) this.addStrike(cs, cs.lineLength ? p.x - cs.lineLength / 2 : p.x, p.y, cs.radius, cs.seconds, cs.lineLength ?? 0);

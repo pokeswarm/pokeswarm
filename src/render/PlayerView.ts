@@ -31,6 +31,9 @@ export class PlayerView {
   private hopMs = 0;
   private hopHeight = 0;
   private lungeStart = -1;
+  /** 1 回だけ再生する動作（技を使った瞬間の Hop など。07 の333章）と、終わる時刻 */
+  private onceAnim = '';
+  private onceUntil = -1;
   private lungeX = 0;
   private lungeY = 0;
   /** ねむる（カビゴン）で眠っている間に、頭の上に出す Z の文字 */
@@ -109,6 +112,14 @@ export class PlayerView {
         .setDepth(this.container.depth - 0.01);
       this.scene.tweens.add({ targets: ghost, alpha: { from: 0.5, to: 0 }, duration: 260, delay: seconds * 1000 * t, onComplete: () => ghost.destroy() });
     }
+  }
+
+  /** スプライトの動作を 1 回分だけ再生する（その動作の絵が無ければ何もしない。07 の333章） */
+  playOnce(animation: string): void {
+    const ms = this.pokemon?.animationMs(animation) ?? 0;
+    if (ms <= 0) return;
+    this.onceAnim = animation;
+    this.onceUntil = this.scene.time.now + ms;
   }
 
   lunge(dirX: number, dirY: number, distance: number, afterimages: number, flip = false): void {
@@ -196,6 +207,7 @@ export class PlayerView {
       // 技の反動で動けない間（ギガインパクト）も同じ動き
       const crying = (player.cryTicks ?? 0) > 0 || ((player.recoverTicks ?? 0) > 0 && !player.dashTicks);
       if (asleep) this.pokemon.play('Sleep', 0);
+      else if (this.scene.time.now < this.onceUntil) this.pokemon.play(this.onceAnim, directionIndex(player.facingX, player.facingY));
       else if (crying) this.pokemon.play('Hurt', directionIndex(player.facingX, player.facingY));
       else this.pokemon.play(moving && !waking ? this.spriteStyle.walkAnimation : this.spriteStyle.idleAnimation, directionIndex(player.facingX, player.facingY));
       // 倒れていたら暗く、無敵時間の間は点滅

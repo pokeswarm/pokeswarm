@@ -56,18 +56,21 @@ describe('エーフィ（07 の331章）', () => {
     expect(shots(3) - base).toBe(6);
   });
 
-  it('★アシストパワー を撃つと、舞って（体をくるりと回す）1 秒だけ少し速くなる。自分の加速は玉の数に数えない', () => {
+  it('★アシストパワー を撃つと 1 秒だけ少し速くなる（体は回さない。舞いはスプライトの Hop。07 の333章）。自分の加速は玉の数に数えない', () => {
     const t = setup();
     t.p.moves = [t.pm('stored-power')];
     recomputeModifiers(t.w, t.p);
     const before = t.p.moveSpeed;
     t.w.enemies.add(1, 0, 200, 0, 1e9, 0, 10);
+    let used = false;
     let spun = false;
-    for (let k = 0; k < 3 && !spun; k++) {
+    for (let k = 0; k < 3 && !used; k++) {
       t.sim.step([]);
-      spun = t.w.events.some((ev) => ev.type === 'bodyAttack' && ev.flip === true);
+      used = t.w.events.some((ev) => ev.type === 'moveUsed');
+      spun ||= t.w.events.some((ev) => ev.type === 'bodyAttack');
     }
-    expect(spun).toBe(true);
+    expect(used).toBe(true);
+    expect(spun).toBe(false);
     expect(t.p.moveSpeed).toBeCloseTo(before * 1.25);
     expect(boostCountOf(t.w, t.p, t.p.moves[0]!.move)).toBe(0);
   });

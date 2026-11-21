@@ -2560,6 +2560,11 @@ export const effectRecipeSchema = z.object({
   edgeSprite: moveSpriteSpec.optional(),
   /** 折れて進む dash（ワイルドボルト。07 の326章）の通った道に、1 本ずつ seconds の間残す絵（fit line。太さは radius） */
   dashPathSprite: moveSpriteSpec.extend({ seconds: z.number().positive(), radius: z.number().positive() }).optional(),
+  /**
+   * 技を使った瞬間に、使ったポケモンのスプライトの動作（SpriteCollab の Hop など）を 1 回分再生する（★アシストパワー: エーフィが跳ねて舞う。07 の333章）。
+   * その動作の絵が無いポケモンでは何もしない（体を回すなどの代わりはしない）
+   */
+  castAnimation: z.string().min(1).optional(),
   /** 技を使った瞬間に、使ったポケモンの位置に seconds の間出す絵（しおふき: 真上へ噴き上がる潮）。radius はワールドの単位 */
   castSprite: moveSpriteSpec
     .extend({

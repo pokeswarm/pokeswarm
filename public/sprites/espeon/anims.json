@@ -75,6 +75,24 @@
         8
       ],
       "frameKeyPrefix": "Hurt"
+    },
+    "Hop": {
+      "source": "Hop",
+      "frameWidth": 32,
+      "frameHeight": 88,
+      "durations": [
+        2,
+        1,
+        2,
+        3,
+        4,
+        4,
+        3,
+        2,
+        1,
+        2
+      ],
+      "frameKeyPrefix": "Hop"
     }
   },
   "missing": [

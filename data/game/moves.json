@@ -2838,11 +2838,6 @@
           "power": 4.4
         }
       ],
-      "body": {
-        "lungeDistance": 8,
-        "afterimages": 0,
-        "flip": true
-      },
       "selfBuff": {
         "seconds": 1,
         "mods": {

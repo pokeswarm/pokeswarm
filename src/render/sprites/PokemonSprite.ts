@@ -73,6 +73,12 @@ export class PokemonSpriteView {
     return Object.keys(this.manifest.animations)[0]!;
   }
 
+  /** その動作の絵があれば、1 回分の長さ（ミリ秒）。無ければ 0 */
+  animationMs(animation: string): number {
+    const a = this.manifest.animations[animation];
+    return a ? a.durations.reduce((s, d) => s + d, 0) * this.manifest.durationUnitMs : 0;
+  }
+
   play(animation: string, dir: number): void {
     const key = animKey(this.manifest.key, this.resolve(animation), dir);
     if (key === this.current) return;

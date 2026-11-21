@@ -129,6 +129,15 @@ describe('エーフィ（07 の331章）', () => {
     }
   });
 
+  it('★アシストパワー を持って進化しても サイコキネシス を覚え直さない（同居しない。07 の335章）', () => {
+    const t = setup('eevee');
+    t.p.moves = [t.pm('tackle', 3), t.pm('stored-power')];
+    t.p.evolveAsk = t.rules.species.findIndex((x) => x.key === 'espeon');
+    answerEvolution(t.w, t.p, true);
+    expect(t.p.moves.map((m) => t.rules.moves[m.move]!.key)).toEqual(['future-sight', 'stored-power']);
+    expect(canLearnNewMove(t.w, t.p, moveIndexOf(t.rules, 'psychic'))).toBe(false);
+  });
+
   it('サイコキネシス ＋ スペシャルアップ → ★アシストパワー はエーフィだけ', () => {
     for (const [form, ok] of [['espeon', true], ['umbreon', false]] as const) {
       const t = setup(form);

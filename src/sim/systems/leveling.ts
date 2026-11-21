@@ -271,7 +271,7 @@ export function canLearnNewMove(world: World, p: Player, move: number): boolean 
   const rules = world.rules;
   const m = rules.moves[move]!;
   // 進化で使った技（派生・固有技の元の技）は、もう候補に出さない（作者の指摘 2026年10月25日）
-  if (!isBaseMove(world, move) || (m.teachOnly && !rules.lines?.[p.line]?.learnset) || p.moves.some((pm) => pm.move === move) || p.consumedMoves?.includes(move)) return false;
+  if (!isBaseMove(world, move) || (m.teachOnly && !rules.lines?.[p.line]?.learnset) || p.moves.some((pm) => pm.move === move) || p.consumedMoves?.includes(move) || holdsDerivedFrom(world, p, move)) return false;
   if (!learnable(world, p, move)) return false;
   // 系統ごとの覚える技（learnsets.json。07 の158章）: あればその一覧だけ。learners・teachOnly・タイプは見ない（ミュウは何でも）
   const learnset = rules.lines?.[p.line]?.learnset;
@@ -286,6 +286,25 @@ export function canLearnNewMove(world: World, p: Player, move: number): boolean 
   if (rules.lines?.[p.line]?.excludeMoveTypes.includes(m.type)) return false;
   const normal = rules.types.names.indexOf('normal');
   return m.type === normal || p.types.includes(m.type) || p.moveTypes.includes(m.type) || (!!m.region && !!m.learners?.includes(p.line));
+}
+
+/**
+ * その技から技進化した先の技（派生・固有技。何段先でも）を持っているか。持っていれば、元の技は覚え直さない
+ * （確認用の ?moves= で ★アシストパワー から始めると、エーフィに進化したときに サイコキネシス を覚えて同居していた。07 の335章）
+ */
+export function holdsDerivedFrom(world: World, p: Player, move: number): boolean {
+  const seen = new Set<number>([move]);
+  const todo = [move];
+  while (todo.length) {
+    const from = todo.pop()!;
+    for (const d of world.rules.derivations) {
+      if (d.from !== from || seen.has(d.to)) continue;
+      if (p.moves.some((m) => m.move === d.to)) return true;
+      seen.add(d.to);
+      todo.push(d.to);
+    }
+  }
+  return false;
 }
 
 /** 派生していない技（タイプの技）かどうか。派生先・固有技は候補に直接は出さない */

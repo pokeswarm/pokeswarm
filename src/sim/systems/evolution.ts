@@ -1,6 +1,6 @@
 import type { Player } from '../entities/player';
 import type { World } from '../world';
-import { recomputeModifiers } from './leveling';
+import { holdsDerivedFrom, recomputeModifiers } from './leveling';
 
 /**
  * 進化の条件を満たしていれば進化する（01_game_design.md 5.2）。
@@ -78,7 +78,7 @@ function applyForm(world: World, p: Player): void {
   if (!lines) return;
   const learn = (move: number, maxLevel?: number): void => {
     // 技進化で使った技（はたく → おうふくビンタ の はたく）は覚え直さない
-    if (move < 0 || p.moves.some((m) => m.move === move) || p.consumedMoves?.includes(move) || p.moves.length >= world.rules.combat.maxMoveSlots) return;
+    if (move < 0 || p.moves.some((m) => m.move === move) || p.consumedMoves?.includes(move) || holdsDerivedFrom(world, p, move) || p.moves.length >= world.rules.combat.maxMoveSlots) return;
     p.moves.push({ move, level: 1, cooldown: 0, burstLeft: 0, burstTimer: 0, ...(maxLevel && { maxLevel }) });
     world.events.push({ type: 'moveTaught', playerId: p.id, move });
   };

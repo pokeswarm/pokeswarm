@@ -1547,8 +1547,8 @@ const ICONS: Record<string, Layer[]> = {
   ],
   // ★イカサマ（ブラッキー）: 回して薙ぐしっぽと、その先の影の一撃（ゲームの絵。07 の336章）
   'foul-play-umbreon': [
-    { art: 'umbra-tail', frame: 0, k: 0.72, x: 19, y: 19, rot: 160 },
-    { art: 'umbra-strike', frame: 0, k: 0.5, x: 21, y: 11 },
+    { art: 'umbra-tail', frame: 0, k: 0.95, x: 3, y: 29, rot: -45 },
+    { art: 'umbra-strike', frame: 1, k: 0.36, x: 25, y: 7 },
   ],
   // アクアリング: 体をとりまく水の泡（ゲームの絵。07 の329章）
   'aqua-ring': [{ art: 'aqua-ring-bubbles', frame: 0, k: 0.74, x: 16, y: 16 }],

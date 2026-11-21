@@ -5789,46 +5789,47 @@ function umbraStrike(): SpriteOut {
 }
 
 /**
- * ★イカサマ（ブラッキー）2 段目: 体を回してしっぽで薙ぐ、しっぽの通り道（64 ドット・ふちなし。回して使う）。
- * 右上（角度 −0.35 の所）が回る向きの先で、ふさふさのしっぽの先に月の輪の帯が 1 本巻いている。しっぽの後ろへ（時計回りに）
- * 速さの筋が流れ、しっぽに近いほど太く詰まり、後ろほど細く切れていく（半透明の面は使わない）。2 コマで筋が少しずれる
+ * ★イカサマ（ブラッキー）2 段目: 体を回して振り回すしっぽ（64 ドット・ふちなし。まん中が体。回して使う）。
+ * しっぽは体から外へまっすぐ生え（右・角度 0 の向き。時計の針のように回る）、根元が細く先がふさふさで、先の近くに月の輪の帯が 1 本。
+ * 回る向きの後ろ（時計回りの側）へ、扇に速さの筋が流れる（外ほど速いので長い。先の金の帯は金の筋を引く）。
+ * しっぽは回る勢いで先が少し後ろへしなる。半透明の面は使わない。2 コマで筋が少しずれる（作者の指摘「尻尾でフックパンチしているよう」で描き直し。07 の337章）
  */
 function umbraTail(): SpriteOut {
   const frames = [0, 1].map((f) => {
     const r = rng(9200 + f * 53);
-    const streaks = Array.from({ length: 7 }, (_, k) => ({ rad: 0.5 + k * 0.07, len: 3.3 - Math.abs(k - 2.5) * 0.45 + (r() - 0.5) * 0.3, ph: r() * 6.28 }));
+    // 速さの筋: 半径ごとの長さ（ラジアン）。外ほど長い
+    const streaks = [0.42, 0.56, 0.69, 0.8, 0.92].map((rad) => ({ rad, len: 0.25 + rad * 0.9 + (r() - 0.5) * 0.2, ph: r() * 6.28 }));
     return toRows(
       shape(
         64,
         (u, v) => {
           const d = Math.hypot(u, v);
           let a = Math.atan2(v, u);
-          if (a < -1.2) a += Math.PI * 2;
-          // しっぽ: 角度 −0.35（先）〜 1.0（根元）に、半径 0.72 を中心にふくらむ房。先が一番太い
-          if (a >= -0.35 && a <= 1.0) {
-            const t = (a + 0.35) / 1.35;
-            const half = 0.17 * Math.sqrt(Math.max(0, 1 - Math.pow(Math.max(0, 0.25 - t) / 0.25, 2))) * (1 - t * 0.7) + (t < 0.25 ? 0 : 0.01);
-            const dd = Math.abs(d - 0.72);
-            if (dd < half) {
+          if (a < -1.5) a += Math.PI * 2;
+          // しっぽ（根元 0.3 〜 先 0.97）。回る勢いで、外ほど後ろ（時計回り）へ少ししなる
+          if (d > 0.28 && d < 0.98) {
+            const t = (d - 0.28) / 0.7;
+            const bend = 0.22 * t * t;
+            // しっぽの太さ（ワールドの長さ）: 根元は細く、先 3 割でふくらみ、先は丸い
+            const half = (0.028 + 0.095 * Math.pow(Math.sin(Math.min(1, t * 1.1) * Math.PI * 0.6), 1.6)) * (t > 0.84 ? Math.sqrt(Math.max(0, 1 - ((t - 0.84) / 0.16) ** 2)) : 1);
+            const off = (a - bend) * d;
+            if (Math.abs(off) < half) {
               // 月の輪の帯（しっぽを横切る）
-              if (a > -0.13 && a < 0.0) return dd < half * 0.5 ? 5 : 4;
-              return light(u - 0.72, v, 0.2) > 0.2 && t < 0.5 ? 2 : 1;
+              if (t > 0.62 && t < 0.72) return Math.abs(off) < half * 0.55 ? 5 : 4;
+              // 前のふち（回る向きの側）を少し明るく
+              return off < -half * 0.35 && t > 0.2 ? 2 : 1;
             }
           }
-          // 月の輪の帯が残す金の筋（細く、後ろへ暗い金になって切れる）
-          if (a > 0 && a < 2.4 && Math.abs(d - 0.72) < 0.022) {
-            const t = a / 2.4;
-            if (!(t > 0.55 && Math.sin(a * 9 + f * 1.7) < -1 + t * 1.5)) return t < 0.4 ? 4 : 3;
-          }
-          // 後ろへ流れる速さの筋（しっぽの房のふちから。近いほど太く、後ろほど細く切れる）
-          for (const s of streaks) {
-            if (Math.abs(s.rad - 0.72) < 0.04) continue;
-            if (a < 0.7 || a > s.len) continue;
-            const t = (a - 0.7) / (s.len - 0.7);
-            const w = 0.028 * (1 - t) + 0.011;
-            if (Math.abs(d - s.rad) > w) continue;
-            if (t > 0.5 && Math.sin(a * (5 + t * 8) + s.ph + f * 1.4) < -1 + (t - 0.5) * 3) continue;
-            return t < 0.45 ? 2 : 1;
+          // 後ろへ流れる速さの筋（しっぽのすぐ後ろから。後ろほど細く、切れていく）
+          for (const sk of streaks) {
+            const bend = 0.22 * ((sk.rad - 0.28) / 0.7) ** 2;
+            const from = bend + 0.12 / sk.rad;
+            if (a < from || a > from + sk.len) continue;
+            const t = (a - from) / sk.len;
+            if (Math.abs(d - sk.rad) > 0.011 + 0.01 * (1 - t)) continue;
+            if (t > 0.3 && Math.sin(a * (9 + t * 12) + sk.ph + f * 1.5) < -1 + (t - 0.3) * 2.6) continue;
+            const gold = sk.rad > 0.66 && sk.rad < 0.72;
+            return gold ? (t < 0.4 ? 4 : 3) : t < 0.45 ? 2 : 1;
           }
           return -1;
         },

@@ -585,7 +585,7 @@ function candidatesFor(ctx: Ctx, row: Row, forms: FormOptions, scene: SceneKey):
           // ★アシストパワー: 強化の数だけ玉が足される（ポイントマックスなどで増えた数に足す。掛け算ではない）
           if (md.boostShots) {
             const cnt = (md.levels[md.levels.length - 1]?.count ?? 1) + allItems.reduce((s2, it) => s2 + (itemByKey.get(it)?.perLevel.amountBonus ?? 0) * lv(it), 0);
-            v *= 1 + Math.min(md.boostShots.max, calmStacks + buffs.length) / Math.max(1, cnt);
+            v *= 1 + Math.min(md.boostShots.max, md.boostShots.perBoost * (calmStacks + buffs.filter((b) => b.end !== o.end).length)) / Math.max(1, cnt);
           }
           if (md.hpScale) v *= (1 + md.hpScale.power * Math.max(0, hpFactor - 1)) / (1 + md.hpScale.power * Math.max(0, mewHpRank - 1));
           per.push(v);

@@ -12710,6 +12710,57 @@
        "legendAvg": 28.447448721688794
       },
       {
+       "form": "espeon",
+       "scene": "at150",
+       "est": 13178.201290953055,
+       "moves": [
+        {
+         "move": "stored-power",
+         "level": 8,
+         "est": 10883.025059829473
+        },
+        {
+         "move": "double-edge",
+         "level": 8,
+         "est": 1781.1747499182743
+        },
+        {
+         "move": "future-sight",
+         "level": 8,
+         "est": 514.0014812053062
+        },
+        {
+         "move": "calm-mind",
+         "level": 12,
+         "est": 0
+        }
+       ],
+       "items": [
+        "x-sp-atk",
+        "silk-scarf",
+        "twisted-spoon",
+        "metronome",
+        "pp-max",
+        "dire-hit"
+       ],
+       "vs": {
+        "johto-boss-xatu": 1.798363785415269,
+        "johto-boss-crobat": 1.90197620902046,
+        "johto-boss-machamp": 2.4453979830263055,
+        "johto-boss-houndoom": 4.1105457952349,
+        "johto-boss-dragonite": 3.9459102841067115,
+        "round1": 15.176578015795045,
+        "round2": 25.145421665534567,
+        "round3": 34.745313976166216,
+        "legend-lugia": 36.701301743168756,
+        "legend-ho-oh": 30.35315603159009,
+        "legend-raikou": 4.7806220749754385,
+        "legend-entei": 4.7806220749754385,
+        "legend-suicune": 4.7806220749754385
+       },
+       "legendAvg": 28.42435428645093
+      },
+      {
        "form": "flareon",
        "scene": "boss",
        "est": 13085.141470340546,
@@ -12759,57 +12810,6 @@
         "legend-suicune": 5.611106589659583
        },
        "legendAvg": 28.767266833013412
-      },
-      {
-       "form": "espeon",
-       "scene": "boss",
-       "est": 13078.278128953385,
-       "moves": [
-        {
-         "move": "stored-power",
-         "level": 8,
-         "est": 10783.101897829803
-        },
-        {
-         "move": "double-edge",
-         "level": 8,
-         "est": 1781.1747499182743
-        },
-        {
-         "move": "future-sight",
-         "level": 8,
-         "est": 514.0014812053062
-        },
-        {
-         "move": "calm-mind",
-         "level": 12,
-         "est": 0
-        }
-       ],
-       "items": [
-        "x-sp-atk",
-        "silk-scarf",
-        "pp-max",
-        "metronome",
-        "twisted-spoon",
-        "dire-hit"
-       ],
-       "vs": {
-        "johto-boss-xatu": 1.811651561625843,
-        "johto-boss-crobat": 1.9168455694849762,
-        "johto-boss-machamp": 2.4645157321949696,
-        "johto-boss-houndoom": 4.140917855144784,
-        "johto-boss-dragonite": 3.976058582580504,
-        "round1": 15.292533009925014,
-        "round2": 25.334080076008885,
-        "round3": 35.012503800483294,
-        "legend-lugia": 36.972480849507,
-        "legend-ho-oh": 30.58506601985003,
-        "legend-raikou": 4.81714789812638,
-        "legend-entei": 4.81714789812638,
-        "legend-suicune": 4.81714789812638
-       },
-       "legendAvg": 28.639332751154843
       },
       {
        "form": "jolteon",
@@ -16692,6 +16692,20 @@
      "owners": 4
     },
     {
+     "move": "stored-power",
+     "est": 4690.9590775127035,
+     "key": "eevee",
+     "form": "espeon",
+     "items": [
+      "twisted-spoon",
+      "x-sp-atk",
+      "pp-max",
+      "metronome",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
      "move": "solar-beam",
      "est": 4687.4910628994785,
      "key": "chikorita",
@@ -16872,20 +16886,6 @@
       "dire-hit"
      ],
      "owners": 3
-    },
-    {
-     "move": "stored-power",
-     "est": 3983.904642055347,
-     "key": "eevee",
-     "form": "espeon",
-     "items": [
-      "twisted-spoon",
-      "x-sp-atk",
-      "pp-max",
-      "metronome",
-      "dire-hit"
-     ],
-     "owners": 1
     },
     {
      "move": "double-slap",

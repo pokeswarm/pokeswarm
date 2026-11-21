@@ -135,9 +135,9 @@ export function speedBonusOf(p: Player): number {
 }
 
 /** 自分にかかっている強化の数（めいそう の重ね ＋ 技で付いた一時的な強化。重ねる技は重ねた数。★アシストパワー。07 の331章） */
-export function boostCountOf(world: World, p: Player): number {
+export function boostCountOf(world: World, p: Player, except = -1): number {
   let n = p.calm && world.tick < p.calm.untilTick ? p.calm.stacks : 0;
-  for (const b of p.moveBuffs ?? []) n += b.stacks ?? 1;
+  for (const b of p.moveBuffs ?? []) if (b.move !== except) n += b.stacks ?? 1;
   return n;
 }
 
@@ -563,7 +563,15 @@ export function useMoves(world: World): void {
           }
           pm.burstTimer = 0;
           // ★アシストパワー: 強化の数だけ念の玉が増える（07 の331章）
-          if (def.boostShots) pm.burstLeft += Math.min(def.boostShots.max, boostCountOf(world, p));
+          if (def.boostShots) {
+            pm.burstLeft += Math.min(def.boostShots.max, def.boostShots.perBoost * boostCountOf(world, p, pm.move));
+            // 撃つときに舞う（体をくるりと回して少し前へ。07 の332章）
+            const body = def.body;
+            if (body) {
+              const [bx, by] = axisToUnit(p.facingX, p.facingY);
+              world.events.push({ type: 'bodyAttack', playerId: p.id, dirX: bx, dirY: by, distance: body.lungeDistance, afterimages: body.afterimages, ...(body.flip ? { flip: true } : {}) });
+            }
+          }
           // 続けて当てるほど強くなる（エコーボイス）: 前に出した分が当たっていれば 1 段上げ、外れていれば 0 段。2 段ごとにこだまの輪を 1 つ足す（07 の240章）
           if (def.echo) {
             const stack = pm.echoHit ? Math.min(def.echo.maxStacks, (pm.echo ?? 0) + 1) : 0;
@@ -1980,8 +1988,21 @@ export function moveProjectiles(world: World): void {
         const dy = e.y[t]! - pr.y[i]!;
         const d = Math.sqrt(dx * dx + dy * dy) || 1;
         const sp = Math.sqrt(pr.vx[i]! * pr.vx[i]! + pr.vy[i]! * pr.vy[i]!);
-        pr.vx[i] = (dx / d) * sp;
-        pr.vy[i] = (dy / d) * sp;
+        const turn = world.rules.moves[pr.move[i]!]!.homingTurn;
+        if (turn) {
+          // 曲がる速さに上限のある玉（★アシストパワー）: 今の向きから、敵の方へ少しずつ曲がる
+          const cur = Math.atan2(pr.vy[i]!, pr.vx[i]!);
+          let diff = Math.atan2(dy, dx) - cur;
+          while (diff > Math.PI) diff -= Math.PI * 2;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          const step = ((turn * Math.PI) / 180) * world.dt;
+          const a = cur + Math.max(-step, Math.min(step, diff));
+          pr.vx[i] = Math.cos(a) * sp;
+          pr.vy[i] = Math.sin(a) * sp;
+        } else {
+          pr.vx[i] = (dx / d) * sp;
+          pr.vy[i] = (dy / d) * sp;
+        }
       }
       pr.x[i]! += pr.vx[i]! * world.dt;
       pr.y[i]! += pr.vy[i]! * world.dt;

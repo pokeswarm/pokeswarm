@@ -805,7 +805,7 @@
   "info.dashInput": "Solo al caminar: corres hacia donde vas en zigzag como un rayo (cuanto más rápido, más lejos)",
   "info.chargeMoving": "Solo se carga mientras te mueves",
   "info.speedScale": "Cuanto más rápido seas, más fuerte y grande (cuentan las mejoras de velocidad)",
-  "info.boostShots": "Una esfera extra por cada mejora propia activa, como Paz Mental (hasta {n} más)",
+  "info.boostShots": "{k} esferas extra por cada mejora propia activa, como Paz Mental (hasta {n} más)",
   "info.detonateMarks": "Al golpear una marca de Premonición, estalla al instante (×{v})",
   "info.hpScale": "Cuantos más PS tengas, más fuerte y grande (cuentan las mejoras de PS máx.)",
   "info.healFollow": "El círculo se mueve contigo (los aliados cercanos también se curan)",

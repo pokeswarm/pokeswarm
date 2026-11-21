@@ -237,9 +237,11 @@ export interface SimMoveDef {
   /** HP が多いほど強い（★だくりゅう。07 の329章）: HP の倍率 H から 威力 ×(1 + power(H − 1))・大きさ ×(1 + size(H − 1)) */
   readonly hpScale?: { readonly power: number; readonly size: number };
   /** 強化の数だけ数が増える（★アシストパワー。07 の331章） */
-  readonly boostShots?: { readonly max: number };
+  readonly boostShots?: { readonly max: number; readonly perBoost: number };
   /** 自分の みらいよち の印をその場で爆発させる（★アシストパワー。07 の331章） */
   readonly detonateMarks?: { readonly powerMultiplier: number };
+  /** homing の向きを変える速さの上限（度/秒。★アシストパワー） */
+  readonly homingTurn?: number;
   /** 続けて撃つ数を、使うたびに burstCountMin〜count のどれかにする（ミサイルばり） */
   readonly burstCountMin?: number;
   /** 押し出す向きを技の向きにする */

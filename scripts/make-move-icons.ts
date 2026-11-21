@@ -1539,9 +1539,11 @@ const ICONS: Record<string, Layer[]> = {
   ],
   // ★アシストパワー: 連なって飛ぶ念の玉（07 の331章）
   'stored-power': [
-    { art: 'stored-orb', frame: 0, k: 0.42, x: 8, y: 23 },
-    { art: 'stored-orb', frame: 1, k: 0.5, x: 15, y: 16 },
-    { art: 'stored-orb', frame: 2, k: 0.6, x: 23, y: 9 },
+    { art: 'fairy-orb', frame: 3, k: 0.6, x: 6, y: 25 },
+    { art: 'fairy-orb', frame: 1, k: 0.75, x: 11, y: 19 },
+    { art: 'fairy-orb', frame: 2, k: 0.7, x: 20, y: 21 },
+    { art: 'fairy-orb', frame: 0, k: 0.9, x: 16, y: 12 },
+    { art: 'fairy-orb', frame: 0, k: 1.05, x: 24, y: 7 },
   ],
   // アクアリング: 体をとりまく水の泡（ゲームの絵。07 の329章）
   'aqua-ring': [{ art: 'aqua-ring-bubbles', frame: 0, k: 0.74, x: 16, y: 16 }],

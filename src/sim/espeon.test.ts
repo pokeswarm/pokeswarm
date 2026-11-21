@@ -32,7 +32,7 @@ describe('エーフィ（07 の331章）', () => {
     expect(canLearnNewMove(t.w, t.p, moveIndexOf(t.rules, 'morning-sun'))).toBe(true);
   });
 
-  it('★アシストパワー は強化の数だけ念の玉が増える（めいそう の重ね）', () => {
+  it('★アシストパワー は強化 1 つにつき念の玉が 2 つ増える（めいそう の重ね。07 の332章）', () => {
     const shots = (stacks: number): number => {
       const t = setup();
       t.p.moves = [t.pm('stored-power')];
@@ -52,7 +52,24 @@ describe('エーフィ（07 の331章）', () => {
     };
     const base = shots(0);
     expect(base).toBeGreaterThanOrEqual(1);
-    expect(shots(3) - base).toBe(3);
+    expect(base).toBe(4 + 2);
+    expect(shots(3) - base).toBe(6);
+  });
+
+  it('★アシストパワー を撃つと、舞って（体をくるりと回す）1 秒だけ少し速くなる。自分の加速は玉の数に数えない', () => {
+    const t = setup();
+    t.p.moves = [t.pm('stored-power')];
+    recomputeModifiers(t.w, t.p);
+    const before = t.p.moveSpeed;
+    t.w.enemies.add(1, 0, 200, 0, 1e9, 0, 10);
+    let spun = false;
+    for (let k = 0; k < 3 && !spun; k++) {
+      t.sim.step([]);
+      spun = t.w.events.some((ev) => ev.type === 'bodyAttack' && ev.flip === true);
+    }
+    expect(spun).toBe(true);
+    expect(t.p.moveSpeed).toBeCloseTo(before * 1.25);
+    expect(boostCountOf(t.w, t.p, t.p.moves[0]!.move)).toBe(0);
   });
 
   it('★アシストパワー が自分の みらいよち の印に当たると、その場で 1.5 倍の爆発', () => {

@@ -5705,6 +5705,40 @@ function storedOrb(): SpriteOut {
   return { palette: ESPEON_PALETTE, frameMs: 90, parts: { main: frames } };
 }
 
+/**
+ * ★アシストパワー: 妖精のような小さな光の玉（16 ドット・ふちなし。07 の332章）。白い芯を桃色と藤色の光がふんわり包み、
+ * 十字のきらめきの腕が、コマごとに伸び縮みしてまたたく（4 コマ）
+ */
+function fairyOrb(): SpriteOut {
+  const frames = [0, 1, 2, 3].map((f) => {
+    const arm = [0.95, 0.62, 0.85, 0.55][f]!;
+    const rot = 0;
+    return toRows(
+      shape(
+        16,
+        (u, v) => {
+          const d = Math.hypot(u, v);
+          if (d < 0.22) return 4;
+          if (d < 0.36) return 3;
+          // きらめきの腕（コマ 1・3 は斜めの腕）。根元は桃色、先は白く細る
+          const c = Math.cos(rot);
+          const s = Math.sin(rot);
+          const x = Math.abs(u * c + v * s);
+          const y = Math.abs(-u * s + v * c);
+          const along = Math.max(x, y);
+          const across = Math.min(x, y);
+          if (along < arm && across < 0.13 * (1 - along / arm) + 0.05) return along > arm * 0.7 ? 4 : 3;
+          if (d < 0.48) return 2;
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette: ESPEON_PALETTE, frameMs: 70, parts: { main: frames } };
+}
+
 // ---------------- ジョウトの技の作り直し（1）ポッポ系統（07 の157章） ----------------
 /**
  * ふきとばし: 扇に引き伸ばす大きな風（縦長 32×36）。太い白い風の帯が 3 本、根元から先へ波打ちながら広がり、
@@ -8561,6 +8595,8 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'foresight-mark': foresightMark,
     'foresight-bloom': foresightBloom,
     'stored-orb': storedOrb,
+    // 332章
+    'fairy-orb': fairyOrb,
 };
 
 /** 絵の名前の一覧 */

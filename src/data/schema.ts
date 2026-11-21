@@ -1956,11 +1956,13 @@ export const moveDefSchema = z.object({
   hpScale: z.object({ power: z.number().min(0), size: z.number().min(0) }).optional(),
   /**
    * 強化の数だけ数が増える（★アシストパワー（エーフィ）: 原作は能力が上がっているほど威力が上がる。07 の331章）。
-   * 強化の数 = めいそう の重ね ＋ 技で付いた一時的な強化（重ねる技は重ねた数）。max まで
+   * 強化の数 = めいそう の重ね ＋ 技で付いた一時的な強化（重ねる技は重ねた数。この技自身の強化は数えない）。強化 1 つにつき perBoost 個、max 個まで増える
    */
-  boostShots: z.object({ max: z.number().int().positive() }).optional(),
+  boostShots: z.object({ max: z.number().int().positive(), perBoost: z.number().int().positive().default(1) }).optional(),
   /** 自分の遅れて爆発する印（みらいよち）が付いた敵に当たると、印をその場で爆発させる（威力を powerMultiplier 倍。★アシストパワー。07 の331章） */
   detonateMarks: z.object({ powerMultiplier: z.number().positive() }).optional(),
+  /** homing: 向きを変える速さの上限（度/秒）。広く散って出た玉が、弧を描いて敵へ集まる（★アシストパワー。07 の332章）。省略ならすぐ向き直る */
+  homingTurn: z.number().positive().optional(),
   /** 続けて撃つ技（facing・nearest など）の数を、使うたびに burstCountMin〜count のどれかにする（ミサイルばり: 原作は 2〜5 回。07 の325章） */
   burstCountMin: z.number().int().positive().optional(),
   /** 押し出す向きを、当たり判定から敵へではなく、技の向き（向いている方向）にする（なみのり・サイコキネシス。07 の162章） */

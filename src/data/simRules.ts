@@ -148,6 +148,7 @@ export function buildSimRules(region?: string): SimRules {
       ...(def.hpScale ? { hpScale: def.hpScale } : {}),
       ...(def.boostShots ? { boostShots: def.boostShots } : {}),
       ...(def.detonateMarks ? { detonateMarks: def.detonateMarks } : {}),
+      ...(def.homingTurn ? { homingTurn: def.homingTurn } : {}),
       ...(def.burstCountMin ? { burstCountMin: def.burstCountMin } : {}),
       knockbackAlongFacing: def.knockbackAlongFacing,
       ...(def.epicenter ? { epicenter: true } : {}),

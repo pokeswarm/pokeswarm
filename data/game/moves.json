@@ -2786,18 +2786,19 @@
       "pattern": "homing",
       "effect": "stored-power",
       "boostShots": {
-        "max": 6
+        "max": 10,
+        "perBoost": 2
       },
       "detonateMarks": {
         "powerMultiplier": 1.5
       },
       "base": {
-        "power": 64,
+        "power": 33,
         "cooldownSeconds": 1.4,
-        "count": 1,
-        "intervalSeconds": 0.09,
-        "speed": 380,
-        "size": 18,
+        "count": 4,
+        "intervalSeconds": 0.05,
+        "speed": 340,
+        "size": 9,
         "range": 440,
         "durationSeconds": 1.6,
         "pierce": 1,
@@ -2806,35 +2807,49 @@
         "knockbackSeconds": 0.08,
         "statusChance": 0,
         "statusSeconds": 0,
-        "spreadDegrees": 0,
+        "spreadDegrees": 150,
         "lifestealPct": 0
       },
       "levels": [
         {
-          "power": 11
+          "power": 5.5
         },
         {
-          "size": 2,
-          "power": 11
+          "size": 1,
+          "power": 4.4
         },
         {
-          "power": 11
+          "count": 1,
+          "power": 2.2
         },
         {
-          "speed": 40,
-          "power": 11
+          "speed": 30,
+          "power": 4.4
         },
         {
           "cooldownSeconds": -0.15
         },
         {
-          "size": 2,
-          "power": 9
+          "count": 1,
+          "power": 2.2
         },
         {
-          "power": 9
+          "size": 1,
+          "power": 4.4
         }
-      ]
+      ],
+      "body": {
+        "lungeDistance": 8,
+        "afterimages": 0,
+        "flip": true
+      },
+      "selfBuff": {
+        "seconds": 1,
+        "mods": {
+          "moveSpeedPct": 25
+        }
+      },
+      "homingTurn": 480
     },
     "fissure": {
       "pattern": "scatter",

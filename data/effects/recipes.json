@@ -1601,40 +1601,7 @@
         "spinDegPerSec": 720
       }
     },
-    "future-sight": {
-      "extends": "psychic.base",
-      "projectile": {
-        "glowScale": 1.1,
-        "coreScale": 0.3
-      },
-      "impact": {
-        "flash": {
-          "color": "#f48fb1",
-          "radius": 60,
-          "durationMs": 160,
-          "alpha": 0.6
-        }
-      },
-      "sprite": {
-        "id": "psy-grip",
-        "fit": "circle",
-        "size": 1.2,
-        "rotate": "spin",
-        "spinDegPerSec": 360
-      },
-      "hitSprite": {
-        "id": "future-eye",
-        "fit": "circle",
-        "size": 1,
-        "seconds": 1.5,
-        "radius": 22
-      },
-      "effectSprite": {
-        "id": "future-burst",
-        "fit": "circle",
-        "size": 1.1
-      }
-    },
+    "future-sight": {"extends":"psychic.base","projectile":{"glowScale":0,"coreScale":0},"impact":{"flash":{"alpha":0},"burst":{"count":8,"colors":["#ffffff","#f8bbd0","#ce93d8","#ff4f81"],"lifespanMs":[200,380],"speed":[50,150],"scale":[0.5,0],"alpha":[1,0],"gravityY":0,"spread":6,"blend":"normal"}},"sprite":{"id":"foresight-mark","fit":"circle","size":1.4},"hitSprite":{"id":"foresight-mark","fit":"circle","size":1,"seconds":1.5,"radius":22},"effectSprite":{"id":"foresight-bloom","fit":"circle","size":1.1},"hideShape":true},
     "stone-edge": {
       "extends": "rock.base",
       "projectile": {
@@ -4474,6 +4441,7 @@
     "muddy-water": {"extends":"water.base","hideShape":true,"projectile":{"glowScale":1.05,"coreScale":0,"glowColor":"#8d6e4a","glowAlpha":0.3},"trail":{"intervalMs":35,"colors":["#8d6e4a","#5d4037","#b89a72"],"lifespanMs":[260,460],"speed":[20,60],"scale":[0.9,0.2],"alpha":[0.9,0.1],"gravityY":0,"spread":40,"blend":"normal"},"sprite":{"id":"mud-wave","fit":"circle","size":1.55,"rotate":"velocity"},"effectSprite":{"id":"mud-crash","fit":"circle","size":1.05},"impact":{"burst":{"count":6,"colors":["#d7ccc8","#8d6e4a","#4e342e"],"lifespanMs":[200,380],"speed":[50,150],"scale":[0.5,0],"alpha":[1,0],"gravityY":160,"spread":2,"blend":"normal"}}},
     "water-pulse-vaporeon": {"extends":"water.base","hideShape":true,"projectile":{"glowScale":0,"coreScale":0},"impact":{"flash":{"alpha":0},"burst":{"count":6,"colors":["#ffffff","#b3e5fc","#4fc3f7","#0277bd"],"lifespanMs":[180,320],"speed":[60,170],"scale":[0.5,0],"alpha":[1,0],"gravityY":120,"spread":4,"blend":"normal"}},"sprite":{"id":"water-ring","fit":"circle","size":1,"rotate":"velocity"},"effectSprite":{"id":"pulse-splash","fit":"circle","size":1}},
     "aqua-ring": {"extends":"water.base","hideShape":true,"sprite":{"id":"aqua-ring-bubbles","fit":"circle","size":1.3}},
+    "stored-power": {"extends":"psychic.base","hideShape":true,"projectile":{"glowScale":0,"coreScale":0},"trail":{"intervalMs":40,"colors":["#ffffff","#f8bbd0","#ce93d8"],"lifespanMs":[160,300],"speed":[5,25],"scale":[0.4,0],"alpha":[1,0],"gravityY":0,"spread":4,"blend":"normal"},"impact":{"flash":{"alpha":0},"burst":{"count":8,"colors":["#ffffff","#f8bbd0","#ce93d8","#ff4f81"],"lifespanMs":[200,380],"speed":[50,150],"scale":[0.5,0],"alpha":[1,0],"gravityY":0,"spread":6,"blend":"normal"}},"sprite":{"id":"stored-orb","fit":"circle","size":1.5}},
     "lava-plume": {
       "extends": "fire.base",
       "hideShape": true,
@@ -6239,48 +6207,7 @@
         "growSeconds": 0.25
       }
     },
-    "future-sight-gardevoir": {
-      "extends": "psychic.base",
-      "projectile": {
-        "glowScale": 1.1,
-        "coreScale": 0.3
-      },
-      "impact": {
-        "flash": {
-          "color": "#f48fb1",
-          "radius": 70,
-          "durationMs": 180,
-          "alpha": 0.6
-        }
-      },
-      "sprite": {
-        "id": "psy-grip",
-        "fit": "circle",
-        "size": 1.2,
-        "rotate": "spin",
-        "spinDegPerSec": 360
-      },
-      "hitSprite": {
-        "id": "future-eye",
-        "fit": "circle",
-        "size": 1,
-        "seconds": 1.5,
-        "radius": 26
-      },
-      "effectSprite": {
-        "id": "future-burst",
-        "fit": "circle",
-        "size": 1.1
-      },
-      "lingerSprite": {
-        "id": "psy-grip",
-        "fit": "circle",
-        "size": 1,
-        "alpha": 0.45,
-        "rotate": "spin",
-        "spinDegPerSec": 120
-      }
-    },
+    "future-sight-gardevoir": {"extends":"psychic.base","projectile":{"glowScale":0,"coreScale":0},"impact":{"flash":{"alpha":0},"burst":{"count":8,"colors":["#ffffff","#f8bbd0","#ce93d8","#ff4f81"],"lifespanMs":[200,380],"speed":[50,150],"scale":[0.5,0],"alpha":[1,0],"gravityY":0,"spread":6,"blend":"normal"}},"sprite":{"id":"foresight-mark","fit":"circle","size":1.4},"hitSprite":{"id":"foresight-mark","fit":"circle","size":1,"seconds":1.5,"radius":26},"effectSprite":{"id":"foresight-bloom","fit":"circle","size":1.1},"lingerSprite":{"id":"psy-grip","fit":"circle","size":1,"alpha":0.45,"rotate":"spin","spinDegPerSec":120},"hideShape":true},
     "steel-beam": {
       "extends": "steel.base",
       "impact": {
@@ -6309,40 +6236,7 @@
         "durationMs": 100
       }
     },
-    "future-sight-alakazam": {
-      "extends": "psychic.base",
-      "projectile": {
-        "glowScale": 1.1,
-        "coreScale": 0.3
-      },
-      "impact": {
-        "flash": {
-          "color": "#f48fb1",
-          "radius": 60,
-          "durationMs": 160,
-          "alpha": 0.6
-        }
-      },
-      "sprite": {
-        "id": "psy-grip",
-        "fit": "circle",
-        "size": 1.2,
-        "rotate": "spin",
-        "spinDegPerSec": 360
-      },
-      "hitSprite": {
-        "id": "future-eye",
-        "fit": "circle",
-        "size": 1,
-        "seconds": 1.5,
-        "radius": 22
-      },
-      "effectSprite": {
-        "id": "future-burst",
-        "fit": "circle",
-        "size": 1.1
-      }
-    },
+    "future-sight-alakazam": {"extends":"psychic.base","projectile":{"glowScale":0,"coreScale":0},"impact":{"flash":{"alpha":0},"burst":{"count":8,"colors":["#ffffff","#f8bbd0","#ce93d8","#ff4f81"],"lifespanMs":[200,380],"speed":[50,150],"scale":[0.5,0],"alpha":[1,0],"gravityY":0,"spread":6,"blend":"normal"}},"sprite":{"id":"foresight-mark","fit":"circle","size":1.4},"hitSprite":{"id":"foresight-mark","fit":"circle","size":1,"seconds":1.5,"radius":22},"effectSprite":{"id":"foresight-bloom","fit":"circle","size":1.1},"hideShape":true},
     "air-cutter": {
       "extends": "flying.base",
       "hideShape": true,

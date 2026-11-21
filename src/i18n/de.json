@@ -805,6 +805,8 @@
   "info.dashInput": "Nur beim Laufen: Du sprintest in Laufrichtung im Blitz-Zickzack (je schneller, desto weiter)",
   "info.chargeMoving": "Lädt sich nur auf, während du läufst",
   "info.speedScale": "Je schneller du bist, desto stärker und größer (Tempo-Boni zählen)",
+  "info.boostShots": "Pro aktiver Selbststärkung (z. B. Gedankengut) eine Kugel mehr (bis {n} mehr)",
+  "info.detonateMarks": "Trifft es ein Seher-Zeichen, explodiert es sofort (×{v})",
   "info.hpScale": "Je mehr KP du hast, desto stärker und größer (Max-KP-Boni zählen)",
   "info.healFollow": "Der Kreis bewegt sich mit dir (Verbündete in der Nähe heilen auch)",
   "info.burstCount": "Feuert jedes Mal zufällig zwischen {min} und der Höchstzahl",

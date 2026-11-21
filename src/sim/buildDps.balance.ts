@@ -523,6 +523,14 @@ function candidatesFor(ctx: Ctx, row: Row, forms: FormOptions, scene: SceneKey):
         const st = md.levels[(o.maxLevel ?? md.levels.length) - 1]!;
         return [{ end: o.end, up: Math.min(1, sb.seconds / Math.max(0.1, st.cooldownSeconds)), mods: sb.mods }];
       });
+      // めいそう: 使い続ければ重ねきった数のまま（再使用が持続より短い）。とくしゅの威力と、★アシストパワー の玉の数に効く（07 の331章）
+      const calmStacks = opts.reduce((s, o) => {
+        const md = moveDef(o.end)!;
+        if (!md.calmMind) return s;
+        const st = md.levels[(o.maxLevel ?? md.levels.length) - 1]!;
+        return Math.max(s, md.calmMind.maxStacks * Math.min(1, st.durationSeconds / Math.max(0.1, st.cooldownSeconds)));
+      }, 0);
+      const calmPct = opts.reduce((s, o) => Math.max(s, moveDef(o.end)!.calmMind?.specialPowerPct ?? 0), 0) * calmStacks;
       let per: number[] = [];
       const estimateWith = (fill: string[]): number => {
         const allItems = [...keepItems, ...fill];
@@ -569,10 +577,16 @@ function candidatesFor(ctx: Ctx, row: Row, forms: FormOptions, scene: SceneKey):
             add += lv(it) * ((p.powerPct ?? 0) + (physical ? (p.physicalPowerPct ?? 0) : (p.specialPowerPct ?? 0)) + (p.typePowerPct?.[md.type] ?? 0));
           }
           for (const b of buffs) if (b.end !== o.end) add += b.up * ((b.mods.powerPct ?? 0) + (physical ? b.mods.physicalPowerPct : b.mods.specialPowerPct));
+          if (!physical) add += calmPct;
           const crit = (100 + (rules.combat.critMultiplier - 1) * (9 + critItem)) / (100 + (rules.combat.critMultiplier - 1) * 9);
           v *= ((1 + add / 100) / 1.25) * (physical ? physicalMult : 1) * crit * (physical ? atk : spa) * (types.includes(md.type) ? rules.combat.typeMultipliers.stab : 1);
           if (allItems.includes('light-ball')) v *= 2;
           if (md.speedScale) v *= (1 + md.speedScale.power * Math.max(0, speedFactor - 1)) / (1 + md.speedScale.power * Math.max(0, mewSpeedRank - 1));
+          // ★アシストパワー: 強化の数だけ玉が足される（ポイントマックスなどで増えた数に足す。掛け算ではない）
+          if (md.boostShots) {
+            const cnt = (md.levels[md.levels.length - 1]?.count ?? 1) + allItems.reduce((s2, it) => s2 + (itemByKey.get(it)?.perLevel.amountBonus ?? 0) * lv(it), 0);
+            v *= 1 + Math.min(md.boostShots.max, calmStacks + buffs.length) / Math.max(1, cnt);
+          }
           if (md.hpScale) v *= (1 + md.hpScale.power * Math.max(0, hpFactor - 1)) / (1 + md.hpScale.power * Math.max(0, mewHpRank - 1));
           per.push(v);
           total += v;

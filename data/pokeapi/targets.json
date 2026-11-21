@@ -569,7 +569,8 @@
     "electro-ball",
     "flame-charge",
     "temper-flare",
-    "aqua-ring"
+    "aqua-ring",
+    "stored-power"
   ],
   "items": [
     "x-attack",

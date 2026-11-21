@@ -1388,7 +1388,8 @@ const ICONS: Record<string, Layer[]> = {
   // ねんりき: 小さくつかむ念の輪
   confusion: [{ art: 'psy-grip', k: 0.75, x: 16, y: 16 }],
   // みらいよち: 未来を見る目
-  'future-sight': [{ art: 'future-eye', k: 1.05, x: 16, y: 16 }],
+  // みらいよち: 予知の印（灯りきった星。07 の331章で目の絵から描き直した）
+  'future-sight': [{ art: 'foresight-mark', frame: 3, k: 0.66, x: 16, y: 16 }],
   // ---- ゴースト・あく ----
   'shadow-ball': [{ art: 'shadow-sphere', frame: 0, k: 1.05, x: 16, y: 16 }],
   'phantom-force': [{ art: 'shadow-pool', k: 1.55, x: 16, y: 16, lift: true }],
@@ -1535,6 +1536,12 @@ const ICONS: Record<string, Layer[]> = {
   'electro-ball': [
     { art: 'speed-streak', k: 0.8, x: 10, y: 17 },
     { art: 'electro-ball', frame: 0, k: 0.5, x: 20, y: 15 },
+  ],
+  // ★アシストパワー: 連なって飛ぶ念の玉（07 の331章）
+  'stored-power': [
+    { art: 'stored-orb', frame: 0, k: 0.42, x: 8, y: 23 },
+    { art: 'stored-orb', frame: 1, k: 0.5, x: 15, y: 16 },
+    { art: 'stored-orb', frame: 2, k: 0.6, x: 23, y: 9 },
   ],
   // アクアリング: 体をとりまく水の泡（ゲームの絵。07 の329章）
   'aqua-ring': [{ art: 'aqua-ring-bubbles', frame: 0, k: 0.74, x: 16, y: 16 }],

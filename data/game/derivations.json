@@ -634,6 +634,15 @@
       ]
     },
     {
+      "from": "psychic",
+      "item": "x-sp-atk",
+      "to": "stored-power",
+      "line": "eevee",
+      "forms": [
+        "espeon"
+      ]
+    },
+    {
       "from": "body-slam",
       "item": "hp-up",
       "to": "giga-impact",

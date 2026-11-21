@@ -2782,6 +2782,60 @@
         }
       ]
     },
+    "stored-power": {
+      "pattern": "homing",
+      "effect": "stored-power",
+      "boostShots": {
+        "max": 6
+      },
+      "detonateMarks": {
+        "powerMultiplier": 1.5
+      },
+      "base": {
+        "power": 64,
+        "cooldownSeconds": 1.4,
+        "count": 1,
+        "intervalSeconds": 0.09,
+        "speed": 380,
+        "size": 18,
+        "range": 440,
+        "durationSeconds": 1.6,
+        "pierce": 1,
+        "hitIntervalSeconds": 0,
+        "knockback": 80,
+        "knockbackSeconds": 0.08,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0
+      },
+      "levels": [
+        {
+          "power": 11
+        },
+        {
+          "size": 2,
+          "power": 11
+        },
+        {
+          "power": 11
+        },
+        {
+          "speed": 40,
+          "power": 11
+        },
+        {
+          "cooldownSeconds": -0.15
+        },
+        {
+          "size": 2,
+          "power": 9
+        },
+        {
+          "power": 9
+        }
+      ]
+    },
     "fissure": {
       "pattern": "scatter",
       "effect": "fissure",

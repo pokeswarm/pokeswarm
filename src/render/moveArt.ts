@@ -5578,6 +5578,133 @@ function aquaRingBubbles(): SpriteOut {
   return { palette, frameMs: 120, parts: { main: frames } };
 }
 
+// ---------------- エーフィの作り直し（07 の331章） ----------------
+// エーフィの色: 0 濃い紫・1 紫・2 藤色・3 桃色・4 白・5 ひたいの玉の赤
+const ESPEON_PALETTE = ['#4a148c', '#8e24aa', '#ce93d8', '#f8bbd0', '#ffffff', '#ff4f81'];
+
+/** 4 つの先がとがった星（きらり）。(u, v) から中心 (cx, cy)・大きさ r・細さ k（小さいほど細い）の内側なら 0〜1（中ほど 1）、外なら -1 */
+function sparkleStar(u: number, v: number, cx: number, cy: number, r: number, k = 0.55): number {
+  const x = Math.abs(u - cx) / r;
+  const y = Math.abs(v - cy) / r;
+  // 星形: x^k + y^k が 1 より内（k が小さいほど腕が細い）
+  const s = Math.pow(x, k) + Math.pow(y, k);
+  return s <= 1 ? 1 - s : -1;
+}
+
+/**
+ * みらいよち: 予知した敵に付く印（48 ドット・ふちなし）。まん中のきらりと光る星を、小さなひし形 8 つが輪に囲み、
+ * 時間が進むにつれて 1 つずつ灯る（4 コマで 2 つずつ。灯りきると弾ける）。藤色と桃色、灯ると白
+ */
+function foresightMark(): SpriteOut {
+  const frames = [0, 1, 2, 3].map((f) => {
+    const lit = (f + 1) * 2;
+    return toRows(
+      shape(
+        48,
+        (u, v) => {
+          // まん中の星（コマごとに少し大きく）
+          const st = sparkleStar(u, v, 0, 0, 0.5 + f * 0.06, 0.5);
+          if (st >= 0) return st > 0.55 ? 4 : st > 0.25 ? 3 : 2;
+          // まわりの 8 つのひし形（上から右回りに灯る）
+          for (let k = 0; k < 8; k++) {
+            const a = -Math.PI / 2 + (k / 8) * Math.PI * 2;
+            const cx = Math.cos(a) * 0.78;
+            const cy = Math.sin(a) * 0.78;
+            const d = Math.abs(u - cx) + Math.abs(v - cy);
+            const on = k < lit;
+            const r = on ? 0.13 : 0.09;
+            if (d < r) return on ? (d < r * 0.45 ? 4 : 5) : d < r * 0.5 ? 2 : 1;
+          }
+          // 星のまわりの小さなきらめき（左上と右下）
+          if (sparkleStar(u, v, -0.46, -0.44, 0.17) >= 0 || sparkleStar(u, v, 0.48, 0.46, 0.14) >= 0) return f % 2 ? 4 : 3;
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette: ESPEON_PALETTE, frameMs: 375, parts: { main: frames } };
+}
+
+/**
+ * みらいよち: 予知が弾ける念の花（64 ドット・ふちなし）。まん中の赤い玉から、藤色の花びら 6 枚がひらき、先から星のかけらに散る。
+ * 3 コマ: つぼみが光る → 花びらが開ききる → 花びらがほどけて、きらりと光るかけらだけ残る
+ */
+function foresightBloom(): SpriteOut {
+  const frames = [0, 1, 2].map((f) => {
+    const r = rng(12100 + f * 17);
+    const open = [0.45, 0.95, 1][f]!;
+    const bits = Array.from({ length: 10 }, () => {
+      const a = r() * Math.PI * 2;
+      const d = 0.55 + r() * 0.4;
+      return [Math.cos(a) * d, Math.sin(a) * d, 0.06 + r() * 0.05] as const;
+    });
+    return toRows(
+      shape(
+        64,
+        (u, v) => {
+          const d = Math.hypot(u, v);
+          const a = Math.atan2(v, u);
+          // まん中の玉
+          const core = [0.2, 0.14, 0][f]!;
+          if (d < core) return d < core * 0.5 ? 4 : 5;
+          // 花びら 6 枚（先がとがった しずくの形。コマ 3 は先だけ残る）
+          if (f < 2 || d > 0.62) {
+            const k = ((a + Math.PI / 6) / (Math.PI / 3)) % 1;
+            const w = Math.abs((k < 0 ? k + 1 : k) - 0.5) * 2;
+            const len = open * 0.92;
+            const half = 0.85 * Math.sin(Math.PI * Math.min(1, d / len)) * (1 - (d / len) * 0.3);
+            if (d < len && w < half) {
+              const t = d / len;
+              if (f === 2) return w < half * 0.4 ? 3 : 2;
+              return w < half * 0.3 && t < 0.7 ? 4 : t < 0.45 ? 3 : w < half * 0.7 ? 2 : 1;
+            }
+          }
+          if (f > 0) for (const [bx, by, br] of bits) if (sparkleStar(u, v, bx, by, br * (f === 2 ? 1.7 : 1.3)) >= 0) return f === 1 ? 3 : 4;
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette: ESPEON_PALETTE, frameMs: 80, parts: { main: frames } };
+}
+
+/**
+ * ★アシストパワー: 念の玉（32 ドット・ふちなし）。藤色の玉の中に桃色の星が光り、まわりを小さな星 2 つが回る（3 コマ）
+ */
+function storedOrb(): SpriteOut {
+  const frames = [0, 1, 2].map((f) => {
+    const turn = (f / 3) * Math.PI * 2;
+    return toRows(
+      shape(
+        32,
+        (u, v) => {
+          const d = Math.hypot(u, v);
+          // まわりを回る小さな星 2 つ
+          for (const s of [0, Math.PI]) {
+            const a = turn + s;
+            if (sparkleStar(u, v, Math.cos(a) * 0.76, Math.sin(a) * 0.6, 0.26) >= 0) return 4;
+          }
+          if (d > 0.54) return -1;
+          // 中の星
+          const st = sparkleStar(u, v, 0, 0, 0.5, 0.5);
+          if (st > 0.45) return 4;
+          if (st >= 0) return 3;
+          // 玉（左上が明るい）
+          if (Math.hypot(u + 0.2, v + 0.2) < 0.14) return 4;
+          return d > 0.46 ? 1 : 2;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette: ESPEON_PALETTE, frameMs: 90, parts: { main: frames } };
+}
+
 // ---------------- ジョウトの技の作り直し（1）ポッポ系統（07 の157章） ----------------
 /**
  * ふきとばし: 扇に引き伸ばす大きな風（縦長 32×36）。太い白い風の帯が 3 本、根元から先へ波打ちながら広がり、
@@ -8430,6 +8557,10 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     // 329章（シャワーズ）
     'pulse-splash': pulseSplash,
     'aqua-ring-bubbles': aquaRingBubbles,
+    // 331章（エーフィ）
+    'foresight-mark': foresightMark,
+    'foresight-bloom': foresightBloom,
+    'stored-orb': storedOrb,
 };
 
 /** 絵の名前の一覧 */

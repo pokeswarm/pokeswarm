@@ -161,6 +161,8 @@ export function moveInfoLines(rules: SimRules, def: SimMoveDef): string[] {
   if (def.chargeWhileMoving) out.push(t('info.chargeMoving'));
   if (def.speedScale) out.push(t('info.speedScale'));
   if (def.hpScale) out.push(t('info.hpScale'));
+  if (def.boostShots) out.push(t('info.boostShots', { n: def.boostShots.max }));
+  if (def.detonateMarks) out.push(t('info.detonateMarks', { v: def.detonateMarks.powerMultiplier }));
   if (def.healFollow) out.push(t('info.healFollow'));
   if (def.burstCountMin) out.push(t('info.burstCount', { min: def.burstCountMin }));
   if (def.hurtRelease) out.push(t('info.hurtRelease'));

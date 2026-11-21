@@ -1954,6 +1954,13 @@ export const moveDefSchema = z.object({
    * 威力を ×(1 + power × (H − 1))・大きさを ×(1 + size × (H − 1)) にする（H が 1 より小さいときは掛けない）
    */
   hpScale: z.object({ power: z.number().min(0), size: z.number().min(0) }).optional(),
+  /**
+   * 強化の数だけ数が増える（★アシストパワー（エーフィ）: 原作は能力が上がっているほど威力が上がる。07 の331章）。
+   * 強化の数 = めいそう の重ね ＋ 技で付いた一時的な強化（重ねる技は重ねた数）。max まで
+   */
+  boostShots: z.object({ max: z.number().int().positive() }).optional(),
+  /** 自分の遅れて爆発する印（みらいよち）が付いた敵に当たると、印をその場で爆発させる（威力を powerMultiplier 倍。★アシストパワー。07 の331章） */
+  detonateMarks: z.object({ powerMultiplier: z.number().positive() }).optional(),
   /** 続けて撃つ技（facing・nearest など）の数を、使うたびに burstCountMin〜count のどれかにする（ミサイルばり: 原作は 2〜5 回。07 の325章） */
   burstCountMin: z.number().int().positive().optional(),
   /** 押し出す向きを、当たり判定から敵へではなく、技の向き（向いている方向）にする（なみのり・サイコキネシス。07 の162章） */

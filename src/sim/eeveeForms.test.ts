@@ -56,13 +56,13 @@ describe('イーブイの進化で技が変わる', () => {
     expect(s.p.mods.moveSpeedPct).toBeCloseTo(4 * 5);
   });
 
-  it('エーフィ・ブラッキーは のしかかり でも あさのひざし・つきのひかり になる（たいあたり が先）', () => {
+  it('エーフィは のしかかり でも みらいよち（07 の331章）・ブラッキーは つきのひかり になる（たいあたり が先）', () => {
     const s = setup('johto');
     const espeon = s.rules.species.findIndex((x) => x.key === 'espeon');
     s.p.moves = [s.has('body-slam'), s.has('tackle')];
     // 進化の聞き方は 81章（babies.test.ts）。ここでは姿を直接変えて、変わり方だけを見る
     s.p.evolveAsk = espeon;
     answerEvolution(s.w, s.p, true);
-    expect(s.keys()).toEqual(['body-slam', 'morning-sun', 'psychic']);
+    expect(s.keys()).toEqual(['body-slam', 'future-sight', 'psychic']);
   });
 });

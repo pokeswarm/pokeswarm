@@ -1158,6 +1158,24 @@
         "forms": [
           "vaporeon"
         ]
+      },
+      {
+        "move": "calm-mind",
+        "forms": [
+          "espeon"
+        ]
+      },
+      {
+        "move": "morning-sun",
+        "forms": [
+          "espeon"
+        ]
+      },
+      {
+        "move": "stored-power",
+        "forms": [
+          "espeon"
+        ]
       }
     ],
     "doduo": [

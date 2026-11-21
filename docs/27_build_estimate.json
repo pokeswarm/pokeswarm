@@ -6855,18 +6855,68 @@
      "builds": [
       {
        "form": "mew",
-       "scene": "boss",
-       "est": 36468.58938092878,
+       "scene": "at50",
+       "est": 32648.041688504723,
        "moves": [
         {
          "move": "sacred-fire",
          "level": 8,
-         "est": 8328.868859703438
+         "est": 13881.463486191915
         },
         {
          "move": "metronome",
          "level": 8,
-         "est": 18242.91910307603
+         "est": 8607.079121580146
+        },
+        {
+         "move": "hyper-voice",
+         "level": 8,
+         "est": 8112.132309958451
+        },
+        {
+         "move": "flare-blitz",
+         "level": 8,
+         "est": 2047.366770774208
+        }
+       ],
+       "items": [
+        "silk-scarf",
+        "x-attack",
+        "pp-max",
+        "metronome",
+        "charcoal",
+        "dire-hit"
+       ],
+       "vs": {
+        "boss-lapras": 0.42881591899367605,
+        "boss-machamp": 0.6432238784905141,
+        "boss-gengar": 0.9213696518177442,
+        "boss-dragonite": 1.0861347030401114,
+        "legend-mewtwo": 5.7430703436653046,
+        "legend-mew": 4.594456274932243,
+        "legend-articuno": 4.604590201456217,
+        "legend-zapdos": 5.053901902425467,
+        "legend-moltres": 5.600382062550574,
+        "shiny-charizard": 6.1095077046006265,
+        "shiny-venusaur": 5.02318931067951,
+        "shiny-blastoise": 6.1095077046006265
+       },
+       "legendAvg": 5.354825688113821
+      },
+      {
+       "form": "mew",
+       "scene": "at50",
+       "est": 32196.681909740215,
+       "moves": [
+        {
+         "move": "sacred-fire",
+         "level": 8,
+         "est": 11799.243963263129
+        },
+        {
+         "move": "metronome",
+         "level": 8,
+         "est": 10500.63652832778
         },
         {
          "move": "hyper-voice",
@@ -6883,40 +6933,40 @@
         "silk-scarf",
         "pp-max",
         "metronome",
-        "zoom-lens",
-        "x-sp-atk",
-        "dire-hit"
+        "charcoal",
+        "dire-hit",
+        "x-sp-atk"
        ],
        "vs": {
-        "boss-lapras": 0.38389200782526806,
-        "boss-machamp": 0.5758380117379022,
-        "boss-gengar": 0.8754680635820764,
-        "boss-dragonite": 0.9194658374633273,
-        "legend-mewtwo": 5.141410819088412,
-        "legend-mew": 4.11312865527073,
-        "legend-articuno": 4.326806228245204,
-        "legend-zapdos": 4.524441520797803,
-        "legend-moltres": 4.740995724420282,
-        "shiny-charizard": 5.171995335731217,
-        "shiny-venusaur": 4.720152248994768,
-        "shiny-blastoise": 5.171995335731217
+        "boss-lapras": 0.4348274160439088,
+        "boss-machamp": 0.6522411240658632,
+        "boss-gengar": 0.9602665078274736,
+        "boss-dragonite": 1.0724998820894822,
+        "legend-mewtwo": 5.8235814648737785,
+        "legend-mew": 4.658865171899023,
+        "legend-articuno": 4.774784871230568,
+        "legend-zapdos": 5.124751689088925,
+        "legend-moltres": 5.5300775170238925,
+        "shiny-charizard": 6.032811836753337,
+        "shiny-venusaur": 5.20885622316062,
+        "shiny-blastoise": 6.032811836753337
        },
-       "legendAvg": 4.738865733534953
+       "legendAvg": 5.398317576347935
       },
       {
        "form": "mew",
-       "scene": "boss",
-       "est": 35498.85927396683,
+       "scene": "at50",
+       "est": 31404.643174979326,
        "moves": [
         {
          "move": "sacred-fire",
          "level": 8,
-         "est": 8004.9684040483035
+         "est": 11475.343148585318
         },
         {
          "move": "metronome",
          "level": 8,
-         "est": 17824.229156448055
+         "est": 10259.638312923535
         },
         {
          "move": "hyper-voice",
@@ -6933,40 +6983,40 @@
         "silk-scarf",
         "pp-max",
         "metronome",
-        "zoom-lens",
-        "x-sp-atk",
-        "dire-hit"
+        "charcoal",
+        "dire-hit",
+        "x-sp-atk"
        ],
        "vs": {
-        "boss-lapras": 0.39437886980968234,
-        "boss-machamp": 0.5915683047145235,
-        "boss-gengar": 0.8999975670070834,
-        "boss-dragonite": 0.9440122391204393,
-        "legend-mewtwo": 5.281859863522532,
-        "legend-mew": 4.225487890818025,
-        "legend-articuno": 4.4474569805203705,
-        "legend-zapdos": 4.648036679899827,
-        "legend-moltres": 4.867563107964766,
-        "shiny-charizard": 5.310068845052471,
-        "shiny-venusaur": 4.851771251476768,
-        "shiny-blastoise": 5.310068845052471
+        "boss-lapras": 0.4457939522507954,
+        "boss-machamp": 0.668690928376193,
+        "boss-gengar": 0.9847264130173615,
+        "boss-dragonite": 1.099294665067792,
+        "legend-mewtwo": 5.97045471764458,
+        "legend-mew": 4.776363774115665,
+        "legend-articuno": 4.896184304371577,
+        "legend-zapdos": 5.254000151527231,
+        "legend-moltres": 5.668238116755802,
+        "shiny-charizard": 6.183532491006329,
+        "shiny-venusaur": 5.341291968405357,
+        "shiny-blastoise": 6.183532491006329
        },
-       "legendAvg": 4.867789183038404
+       "legendAvg": 5.53419975185411
       },
       {
        "form": "mew",
-       "scene": "boss",
-       "est": 33196.24420611534,
+       "scene": "at50",
+       "est": 29424.822447332746,
        "moves": [
         {
          "move": "sacred-fire",
          "level": 8,
-         "est": 14671.425096051675
+         "est": 16426.398458660435
         },
         {
          "move": "metronome",
          "level": 8,
-         "est": 16293.889284371324
+         "est": 10500.63652832778
         },
         {
          "move": "lock-on",
@@ -6976,132 +7026,82 @@
         {
          "move": "flare-blitz",
          "level": 8,
-         "est": 2230.92982569234
+         "est": 2497.787460344534
         }
        ],
        "items": [
         "x-attack",
         "pp-max",
         "metronome",
-        "zoom-lens",
-        "silk-scarf",
-        "charcoal"
+        "charcoal",
+        "dire-hit",
+        "silk-scarf"
        ],
        "vs": {
-        "boss-lapras": 0.42173445625577577,
-        "boss-machamp": 0.6326016843836636,
-        "boss-gengar": 0.9018799281484441,
-        "boss-dragonite": 1.0732574252556666,
-        "legend-mewtwo": 5.64822932485414,
-        "legend-mew": 4.5185834598833114,
-        "legend-articuno": 4.511066648298065,
-        "legend-zapdos": 4.970441805871643,
-        "legend-moltres": 5.5339835989745305,
-        "shiny-charizard": 6.037073017063125,
-        "shiny-venusaur": 4.9211636163251615,
-        "shiny-blastoise": 6.037073017063125
+        "boss-lapras": 0.4757887672919178,
+        "boss-machamp": 0.7136831509378767,
+        "boss-gengar": 0.9881171540987455,
+        "boss-dragonite": 1.2480506393080584,
+        "legend-mewtwo": 6.372170990516756,
+        "legend-mew": 5.097736792413405,
+        "legend-articuno": 4.968433938579547,
+        "legend-zapdos": 5.607510471654746,
+        "legend-moltres": 6.435261108932176,
+        "shiny-charizard": 7.0202848461078275,
+        "shiny-venusaur": 5.420109751177687,
+        "shiny-blastoise": 7.0202848461078275
        },
-       "legendAvg": 5.272201811041637
+       "legendAvg": 5.992724093186247
       },
       {
        "form": "mew",
-       "scene": "boss",
-       "est": 32568.2667016149,
+       "scene": "at50",
+       "est": 29103.735013461115,
        "moves": [
+        {
+         "move": "sacred-fire",
+         "level": 8,
+         "est": 9254.30899079461
+        },
         {
          "move": "metronome",
          "level": 8,
-         "est": 21113.935879953566
+         "est": 8607.079121580146
         },
         {
          "move": "hyper-voice",
          "level": 8,
-         "est": 11454.330821661331
+         "est": 8112.132309958451
         },
         {
-         "move": "lock-on",
+         "move": "aeroblast",
          "level": 8,
-         "est": 0
-        },
-        {
-         "move": "sharpen",
-         "level": 8,
-         "est": 0
+         "est": 3130.214591127908
         }
        ],
        "items": [
         "silk-scarf",
         "pp-max",
         "metronome",
-        "zoom-lens",
         "x-sp-atk",
+        "charcoal",
         "dire-hit"
        ],
        "vs": {
-        "boss-lapras": 0.429866290652361,
-        "boss-machamp": 0.6447994359785415,
-        "boss-gengar": 1.036284807822656,
-        "boss-dragonite": 0.9825515214911108,
-        "legend-mewtwo": 5.757137821236977,
-        "legend-mew": 4.605710256989582,
-        "legend-articuno": 5.06628128268854,
-        "legend-zapdos": 5.06628128268854,
-        "legend-moltres": 5.06628128268854,
-        "shiny-charizard": 5.5268523083874985,
-        "shiny-venusaur": 5.5268523083874985,
-        "shiny-blastoise": 5.5268523083874985
+        "boss-lapras": 0.4810379146705635,
+        "boss-machamp": 0.7063624911108974,
+        "boss-gengar": 1.0481410107558178,
+        "boss-dragonite": 1.174188121274213,
+        "legend-mewtwo": 6.442472071480761,
+        "legend-mew": 5.153977657184609,
+        "legend-articuno": 5.3303876320579535,
+        "legend-zapdos": 5.794008849038906,
+        "legend-moltres": 6.054407500320161,
+        "shiny-charizard": 6.604808182167448,
+        "shiny-venusaur": 5.699694545132634,
+        "shiny-blastoise": 6.604808182167448
        },
-       "legendAvg": 5.267781106431833
-      },
-      {
-       "form": "mew",
-       "scene": "boss",
-       "est": 32481.788717142088,
-       "moves": [
-        {
-         "move": "sacred-fire",
-         "level": 8,
-         "est": 14382.129389932345
-        },
-        {
-         "move": "metronome",
-         "level": 8,
-         "est": 15919.931169648047
-        },
-        {
-         "move": "sharpen",
-         "level": 8,
-         "est": 0
-        },
-        {
-         "move": "flare-blitz",
-         "level": 8,
-         "est": 2179.7281575616958
-        }
-       ],
-       "items": [
-        "x-attack",
-        "pp-max",
-        "metronome",
-        "zoom-lens",
-        "silk-scarf",
-        "charcoal"
-       ],
-       "vs": {
-        "boss-lapras": 0.4310107464190103,
-        "boss-machamp": 0.6465161196285155,
-        "boss-gengar": 0.9215708248245201,
-        "boss-dragonite": 1.0970394016516387,
-        "legend-mewtwo": 5.772465353826031,
-        "legend-mew": 4.617972283060825,
-        "legend-articuno": 4.609690490159726,
-        "legend-zapdos": 5.079769511366908,
-        "legend-moltres": 5.656609414766263,
-        "shiny-charizard": 6.170846634290468,
-        "shiny-venusaur": 5.028753261992428,
-        "shiny-blastoise": 6.170846634290468
-       },
-       "legendAvg": 5.38836919796914
+       "legendAvg": 5.96057057744374
       }
      ],
      "measured": {
@@ -7334,21 +7334,6 @@
      "owners": 1
     },
     {
-     "move": "metronome",
-     "est": 14953.212379570516,
-     "key": "mew",
-     "form": "mew",
-     "items": [
-      "metronome",
-      "silk-scarf",
-      "zoom-lens",
-      "pp-max",
-      "x-sp-atk",
-      "dire-hit"
-     ],
-     "owners": 1
-    },
-    {
      "move": "volt-tackle",
      "est": 14736.880883325748,
      "key": "pikachu",
@@ -7403,6 +7388,21 @@
       "x-attack",
       "metronome",
       "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
+     "move": "metronome",
+     "est": 9355.88645562961,
+     "key": "mew",
+     "form": "mew",
+     "items": [
+      "pp-max",
+      "silk-scarf",
+      "x-sp-atk",
+      "metronome",
+      "dire-hit",
+      "light-clay"
      ],
      "owners": 1
     },
@@ -8770,7 +8770,7 @@
       "dire-hit",
       "light-clay"
      ],
-     "owners": 0
+     "owners": 1
     },
     {
      "move": "dragon-tail",
@@ -10591,7 +10591,7 @@
       {
        "form": "clefable",
        "scene": "at50",
-       "est": 11918.976668777246,
+       "est": 11802.822345794848,
        "moves": [
         {
          "move": "hyper-voice",
@@ -10606,7 +10606,7 @@
         {
          "move": "metronome-baby",
          "level": 8,
-         "est": 2704.78244552828
+         "est": 2588.628122545883
         },
         {
          "move": "moonlight",
@@ -10623,21 +10623,21 @@
         "light-clay"
        ],
        "vs": {
-        "johto-boss-xatu": 1.6444364767777284,
-        "johto-boss-crobat": 2.4666547151665923,
-        "johto-boss-machamp": 3.1714132052141903,
-        "johto-boss-houndoom": 3.758711946920522,
-        "johto-boss-dragonite": 4.3627906526756055,
-        "round1": 16.77996404875233,
-        "round2": 25.169946073128497,
-        "round3": 40.271913717005596,
-        "legend-lugia": 33.55992809750466,
-        "legend-ho-oh": 33.55992809750466,
-        "legend-raikou": 5.285688675356984,
-        "legend-entei": 5.285688675356984,
-        "legend-suicune": 5.285688675356984
+        "johto-boss-xatu": 1.660619759051373,
+        "johto-boss-crobat": 2.490929638577059,
+        "johto-boss-machamp": 3.2026238210276476,
+        "johto-boss-houndoom": 3.795702306403138,
+        "johto-boss-dragonite": 4.4057258913607855,
+        "round1": 16.945099582156868,
+        "round2": 25.4176493732353,
+        "round3": 40.66823899717647,
+        "legend-lugia": 33.890199164313735,
+        "legend-ho-oh": 33.890199164313735,
+        "legend-raikou": 5.337706368379413,
+        "legend-entei": 5.337706368379413,
+        "legend-suicune": 5.337706368379413
        },
-       "legendAvg": 29.868336006779153
+       "legendAvg": 30.162277256239225
       },
       {
        "form": "clefable",
@@ -11033,7 +11033,7 @@
       {
        "form": "togetic",
        "scene": "at50",
-       "est": 11044.18099902241,
+       "est": 10953.968239812744,
        "moves": [
         {
          "move": "dazzling-gleam",
@@ -11053,7 +11053,7 @@
         {
          "move": "metronome-baby",
          "level": 8,
-         "est": 2100.7043148101466
+         "est": 2010.4915556004812
         }
        ],
        "items": [
@@ -11065,26 +11065,26 @@
         "x-sp-atk"
        ],
        "vs": {
-        "johto-boss-xatu": 1.7746902193775091,
-        "johto-boss-crobat": 3.0505372858049586,
-        "johto-boss-machamp": 3.0359701023011465,
-        "johto-boss-houndoom": 4.056434787148593,
-        "johto-boss-dragonite": 4.176466807398403,
-        "round1": 18.109083871199072,
-        "round2": 27.16362580679861,
-        "round3": 47.822537539985575,
-        "legend-lugia": 36.218167742398144,
-        "legend-ho-oh": 41.5039086504076,
-        "legend-raikou": 5.704361419427708,
-        "legend-entei": 6.536865612439197,
-        "legend-suicune": 5.704361419427708
+        "johto-boss-xatu": 1.7893059000082565,
+        "johto-boss-crobat": 3.079361511566029,
+        "johto-boss-machamp": 3.058128039209139,
+        "johto-boss-houndoom": 4.0898420571617295,
+        "johto-boss-dragonite": 4.20694862536707,
+        "round1": 18.258223469472007,
+        "round2": 27.387335204208007,
+        "round3": 48.25792946662065,
+        "legend-lugia": 36.516446938944014,
+        "legend-ho-oh": 41.89607498729291,
+        "legend-raikou": 5.751340392883682,
+        "legend-entei": 6.598631810498634,
+        "legend-suicune": 5.751340392883682
        },
-       "legendAvg": 34.1634647221578
+       "legendAvg": 34.463202013307516
       },
       {
        "form": "togetic",
        "scene": "at50",
-       "est": 10933.513462848867,
+       "est": 10843.300703639201,
        "moves": [
         {
          "move": "dazzling-gleam",
@@ -11104,7 +11104,7 @@
         {
          "move": "metronome-baby",
          "level": 8,
-         "est": 2100.7043148101466
+         "est": 2010.4915556004812
         }
        ],
        "items": [
@@ -11116,26 +11116,26 @@
         "x-sp-atk"
        ],
        "vs": {
-        "johto-boss-xatu": 1.792653392397522,
-        "johto-boss-crobat": 3.0859730148704854,
-        "johto-boss-machamp": 3.0631971708016175,
-        "johto-boss-houndoom": 4.097493468337193,
-        "johto-boss-dragonite": 4.213922033906987,
-        "round1": 18.292381555076755,
-        "round2": 27.438572332615134,
-        "round3": 48.357758782200776,
-        "legend-lugia": 36.58476311015351,
-        "legend-ho-oh": 41.986027413203885,
-        "legend-raikou": 5.762100189849178,
-        "legend-entei": 6.612799317579611,
-        "legend-suicune": 5.762100189849178
+        "johto-boss-xatu": 1.8075676895524901,
+        "johto-boss-crobat": 3.1154740255387208,
+        "johto-boss-machamp": 3.0857557982640773,
+        "johto-boss-houndoom": 4.1315832904056915,
+        "johto-boss-dragonite": 4.244955066395026,
+        "round1": 18.444568260739693,
+        "round2": 27.66685239110954,
+        "round3": 48.80303260466287,
+        "legend-lugia": 36.88913652147939,
+        "legend-ho-oh": 42.38740170800981,
+        "legend-raikou": 5.810039002133004,
+        "legend-entei": 6.676015769011545,
+        "legend-suicune": 5.810039002133004
        },
-       "legendAvg": 34.531900638650015
+       "legendAvg": 34.83819829720026
       },
       {
        "form": "togetic",
        "scene": "at50",
-       "est": 10629.18668956208,
+       "est": 10558.484058181491,
        "moves": [
         {
          "move": "dazzling-gleam",
@@ -11155,7 +11155,7 @@
         {
          "move": "metronome-baby",
          "level": 8,
-         "est": 1646.3893146693877
+         "est": 1575.6866832887983
         }
        ],
        "items": [
@@ -11167,26 +11167,26 @@
         "dire-hit"
        ],
        "vs": {
-        "johto-boss-xatu": 1.8439792782308835,
-        "johto-boss-crobat": 3.2470378040976353,
-        "johto-boss-machamp": 3.097353523195302,
-        "johto-boss-houndoom": 4.214809778813448,
-        "johto-boss-dragonite": 4.260909608628458,
-        "round1": 18.816115083988606,
-        "round2": 28.224172625982913,
-        "round3": 50.55842901204655,
-        "legend-lugia": 37.63223016797721,
-        "legend-ho-oh": 44.177385089763746,
-        "legend-raikou": 5.927076251456412,
-        "legend-entei": 6.95793815163779,
-        "legend-suicune": 5.927076251456412
+        "johto-boss-xatu": 1.8563270912752363,
+        "johto-boss-crobat": 3.2725923105536343,
+        "johto-boss-machamp": 3.1154023383226486,
+        "johto-boss-houndoom": 4.243033351486254,
+        "johto-boss-dragonite": 4.285738666475601,
+        "round1": 18.94211317627792,
+        "round2": 28.41316976441688,
+        "round3": 50.93976387821862,
+        "legend-lugia": 37.88422635255584,
+        "legend-ho-oh": 44.52506544970931,
+        "legend-raikou": 5.966765650527545,
+        "legend-entei": 7.012697808329217,
+        "legend-suicune": 5.966765650527545
        },
-       "legendAvg": 35.88166639595181
+       "legendAvg": 36.14086772423572
       },
       {
        "form": "togetic",
        "scene": "at50",
-       "est": 10602.07955961819,
+       "est": 10511.866800408525,
        "moves": [
         {
          "move": "dazzling-gleam",
@@ -11201,7 +11201,7 @@
         {
          "move": "metronome-baby",
          "level": 8,
-         "est": 2100.7043148101466
+         "est": 2010.4915556004812
         },
         {
          "move": "dual-wingbeat",
@@ -11218,72 +11218,72 @@
         "x-sp-atk"
        ],
        "vs": {
-        "johto-boss-xatu": 1.848693917998277,
-        "johto-boss-crobat": 3.197200361883068,
-        "johto-boss-machamp": 3.1291048515283943,
-        "johto-boss-houndoom": 4.225586098281776,
-        "johto-boss-dragonite": 4.330224932888753,
-        "round1": 18.99233957426421,
-        "round2": 28.296335479565464,
-        "round3": 49.90922170091194,
-        "legend-lugia": 37.72844730608728,
-        "legend-ho-oh": 43.49932465147032,
-        "legend-raikou": 5.982586965893226,
-        "legend-entei": 6.851143632606575,
-        "legend-suicune": 5.942230450708747
+        "johto-boss-xatu": 1.8645593948392003,
+        "johto-boss-crobat": 3.2288772141713276,
+        "johto-boss-machamp": 3.1526483945829793,
+        "johto-boss-houndoom": 4.261850045346743,
+        "johto-boss-dragonite": 4.363001270035556,
+        "round1": 19.156448206901988,
+        "round2": 28.539174410804087,
+        "round3": 50.38370059640248,
+        "legend-lugia": 38.05223254773878,
+        "legend-ho-oh": 43.9303022336235,
+        "legend-raikou": 6.034281185174126,
+        "legend-entei": 6.919022601795701,
+        "legend-suicune": 5.993226626268858
        },
-       "legendAvg": 35.68513374245985
+       "legendAvg": 36.012371599094166
       },
       {
        "form": "togetic",
        "scene": "at50",
-       "est": 10564.122124650672,
+       "est": 10476.69620345385,
        "moves": [
         {
          "move": "dazzling-gleam",
          "level": 8,
-         "est": 7032.672487994718
+         "est": 7873.901254501262
         },
         {
-         "move": "body-slam",
+         "move": "swift",
          "level": 8,
-         "est": 1111.1124809226249
+         "est": 626.744033326832
         },
         {
          "move": "metronome-baby",
          "level": 8,
-         "est": 2100.7043148101466
+         "est": 1575.6866832887983
         },
         {
-         "move": "magical-leaf",
+         "move": "dual-wingbeat",
          "level": 8,
-         "est": 319.63284092318355
+         "est": 400.3642323369567
         }
        ],
        "items": [
         "sharp-beak",
         "light-clay",
-        "silk-scarf",
-        "pp-max",
         "metronome",
-        "x-sp-atk"
+        "x-sp-atk",
+        "pp-max",
+        "dire-hit"
        ],
        "vs": {
-        "johto-boss-xatu": 1.8666319017201818,
-        "johto-boss-crobat": 3.233021311183849,
-        "johto-boss-machamp": 3.157721517944297,
-        "johto-boss-houndoom": 4.266587203931844,
-        "johto-boss-dragonite": 4.367277981770243,
-        "round1": 18.932003780353256,
-        "round2": 28.398005670529884,
-        "round3": 50.402612079895896,
-        "legend-lugia": 38.09452860653432,
-        "legend-ho-oh": 43.98668450590271,
-        "legend-raikou": 5.963581190811276,
-        "legend-entei": 6.927902809679677,
-        "legend-suicune": 5.927710892260986
+        "johto-boss-xatu": 1.8708187790668658,
+        "johto-boss-crobat": 3.3026598045521127,
+        "johto-boss-machamp": 3.115842755338789,
+        "johto-boss-houndoom": 4.276157209295693,
+        "johto-boss-dragonite": 4.314824013219793,
+        "round1": 19.237015051199425,
+        "round2": 28.634981312247945,
+        "round3": 51.237944432509714,
+        "legend-lugia": 38.17997508299726,
+        "legend-ho-oh": 44.93414700070902,
+        "legend-raikou": 6.0596597411278195,
+        "legend-entei": 7.07712815261167,
+        "legend-suicune": 6.013346075572069
        },
-       "legendAvg": 35.962766928643205
+       "legendAvg": 36.444812575932666
       }
      ],
      "measured": {
@@ -12761,6 +12761,57 @@
        "legendAvg": 28.767266833013412
       },
       {
+       "form": "espeon",
+       "scene": "boss",
+       "est": 13078.278128953385,
+       "moves": [
+        {
+         "move": "stored-power",
+         "level": 8,
+         "est": 10783.101897829803
+        },
+        {
+         "move": "double-edge",
+         "level": 8,
+         "est": 1781.1747499182743
+        },
+        {
+         "move": "future-sight",
+         "level": 8,
+         "est": 514.0014812053062
+        },
+        {
+         "move": "calm-mind",
+         "level": 12,
+         "est": 0
+        }
+       ],
+       "items": [
+        "x-sp-atk",
+        "silk-scarf",
+        "pp-max",
+        "metronome",
+        "twisted-spoon",
+        "dire-hit"
+       ],
+       "vs": {
+        "johto-boss-xatu": 1.811651561625843,
+        "johto-boss-crobat": 1.9168455694849762,
+        "johto-boss-machamp": 2.4645157321949696,
+        "johto-boss-houndoom": 4.140917855144784,
+        "johto-boss-dragonite": 3.976058582580504,
+        "round1": 15.292533009925014,
+        "round2": 25.334080076008885,
+        "round3": 35.012503800483294,
+        "legend-lugia": 36.972480849507,
+        "legend-ho-oh": 30.58506601985003,
+        "legend-raikou": 4.81714789812638,
+        "legend-entei": 4.81714789812638,
+        "legend-suicune": 4.81714789812638
+       },
+       "legendAvg": 28.639332751154843
+      },
+      {
        "form": "jolteon",
        "scene": "at50",
        "est": 13075.381678531672,
@@ -12810,57 +12861,6 @@
         "legend-suicune": 4.064893026460506
        },
        "legendAvg": 25.802831767355077
-      },
-      {
-       "form": "flareon",
-       "scene": "at50",
-       "est": 13040.141080694739,
-       "moves": [
-        {
-         "move": "temper-flare",
-         "level": 8,
-         "est": 5046.456321890197
-        },
-        {
-         "move": "flame-charge",
-         "level": 8,
-         "est": 3766.0279610707175
-        },
-        {
-         "move": "double-edge",
-         "level": 8,
-         "est": 3798.0932167374963
-        },
-        {
-         "move": "smog",
-         "level": 8,
-         "est": 429.5635809963277
-        }
-       ],
-       "items": [
-        "charcoal",
-        "silk-scarf",
-        "pp-max",
-        "metronome",
-        "x-attack",
-        "dire-hit"
-       ],
-       "vs": {
-        "johto-boss-xatu": 1.5030512230436521,
-        "johto-boss-crobat": 2.2695292357651007,
-        "johto-boss-machamp": 2.8987416444413294,
-        "johto-boss-houndoom": 3.9724608357704296,
-        "johto-boss-dragonite": 4.610892041519249,
-        "round1": 15.337257377996451,
-        "round2": 23.005886066994677,
-        "round3": 39.39475924413898,
-        "legend-lugia": 30.674514755992902,
-        "legend-ho-oh": 35.46840031937884,
-        "legend-raikou": 4.831236074068882,
-        "legend-entei": 5.586273050302167,
-        "legend-suicune": 5.586273050302167
-       },
-       "legendAvg": 28.776163552900368
       }
      ],
      "measured": {
@@ -15733,22 +15733,22 @@
       {
        "form": "suicune",
        "scene": "boss",
-       "est": 10705.22420952172,
+       "est": 12647.997144771422,
        "moves": [
         {
          "move": "surf-suicune",
          "level": 12,
-         "est": 7351.975392680923
+         "est": 8528.29145550987
         },
         {
          "move": "mirror-coat-suicune",
          "level": 12,
-         "est": 1878.0368279240804
+         "est": 2307.3023885924417
         },
         {
          "move": "sheer-cold-suicune",
          "level": 12,
-         "est": 1475.2119889167166
+         "est": 1812.403300669109
         },
         {
          "move": "calm-mind",
@@ -15757,27 +15757,27 @@
         }
        ],
        "items": [
-        "x-sp-atk",
         "metronome",
+        "x-sp-atk",
         "mystic-water",
         "dire-hit"
        ],
        "vs": {
-        "johto-boss-xatu": 1.8447650464907095,
-        "johto-boss-crobat": 2.5844168166827313,
-        "johto-boss-machamp": 3.4112963222831563,
-        "johto-boss-houndoom": 3.893969462835941,
-        "johto-boss-dragonite": 5.4565268632448864,
-        "round1": 18.682467184770477,
-        "round2": 28.533202174055198,
-        "round3": 46.70570061177517,
-        "legend-lugia": 37.648266254912436,
-        "legend-ho-oh": 32.852538383187465,
-        "legend-raikou": 5.8849771632026995,
-        "legend-entei": 5.3027728015103195,
-        "legend-suicune": 7.04714797792874
+        "johto-boss-xatu": 1.5618752838549104,
+        "johto-boss-crobat": 2.1823140355326953,
+        "johto-boss-machamp": 2.8834144850624686,
+        "johto-boss-houndoom": 3.311230304881799,
+        "johto-boss-dragonite": 4.599808067391754,
+        "round1": 15.812780293256024,
+        "round2": 24.168250437807764,
+        "round3": 39.46653762747446,
+        "legend-lugia": 31.875005792957356,
+        "legend-ho-oh": 27.867465663157788,
+        "legend-raikou": 4.981025792375648,
+        "legend-entei": 4.502838468520941,
+        "legend-suicune": 5.954711192489658
        },
-       "legendAvg": 32.88443492174015
+       "legendAvg": 27.838007962930682
       }
      ],
      "measured": {
@@ -16874,6 +16874,20 @@
      "owners": 3
     },
     {
+     "move": "stored-power",
+     "est": 3983.904642055347,
+     "key": "eevee",
+     "form": "espeon",
+     "items": [
+      "twisted-spoon",
+      "x-sp-atk",
+      "pp-max",
+      "metronome",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
      "move": "double-slap",
      "est": 3872.6574169586684,
      "key": "igglybuff",
@@ -17024,21 +17038,6 @@
      "owners": 1
     },
     {
-     "move": "metronome-baby",
-     "est": 2704.78244552828,
-     "key": "cleffa",
-     "form": "clefable",
-     "items": [
-      "metronome",
-      "pp-max",
-      "light-clay",
-      "silk-scarf",
-      "x-sp-atk",
-      "dire-hit"
-     ],
-     "owners": 2
-    },
-    {
      "move": "slash",
      "est": 2616.206762916441,
      "key": "scyther",
@@ -17064,6 +17063,21 @@
       "x-attack",
       "dire-hit",
       "metronome"
+     ],
+     "owners": 2
+    },
+    {
+     "move": "metronome-baby",
+     "est": 2588.628122545883,
+     "key": "cleffa",
+     "form": "clefable",
+     "items": [
+      "metronome",
+      "pp-max",
+      "light-clay",
+      "silk-scarf",
+      "x-sp-atk",
+      "dire-hit"
      ],
      "owners": 2
     },
@@ -17866,6 +17880,18 @@
       "dire-hit"
      ],
      "owners": 2
+    },
+    {
+     "move": "future-sight",
+     "est": 558.6006644423985,
+     "key": "eevee",
+     "form": "espeon",
+     "items": [
+      "twisted-spoon",
+      "x-sp-atk",
+      "dire-hit"
+     ],
+     "owners": 1
     },
     {
      "move": "peck",
@@ -25437,6 +25463,7 @@
   "recover": "じこさいせい",
   "mew": "ミュウ",
   "sacred-fire": "せいなるほのお",
+  "aeroblast": "エアロブラスト",
   "articuno": "フリーザー",
   "freeze-dry-articuno": "フリーズドライ",
   "icy-wind-articuno": "こごえるかぜ",
@@ -25458,7 +25485,6 @@
   "everstone": "かわらずのいし",
   "muddy-water": "だくりゅう",
   "vaporeon": "シャワーズ",
-  "aeroblast": "エアロブラスト",
   "leaf-storm": "リーフストーム",
   "hyper-beam": "はかいこうせん",
   "liquidation": "アクアブレイク",
@@ -25511,6 +25537,9 @@
   "slowking": "ヤドキング",
   "amnesia": "ドわすれ",
   "porygon2": "ポリゴン２",
+  "espeon": "エーフィ",
+  "stored-power": "アシストパワー",
+  "calm-mind": "めいそう",
   "houndour": "デルビル",
   "houndoom": "ヘルガー",
   "snarl": "バークアウト",
@@ -25558,7 +25587,6 @@
   "surf-suicune": "なみのり",
   "mirror-coat-suicune": "ミラーコート",
   "sheer-cold-suicune": "ぜったいれいど",
-  "calm-mind": "めいそう",
   "lugia": "ルギア",
   "aeroblast-lugia": "エアロブラスト",
   "hydro-pump-lugia": "ハイドロポンプ",
@@ -25577,7 +25605,6 @@
   "hurricane": "ぼうふう",
   "poison-fang": "どくどくのキバ",
   "ice-fang": "こおりのキバ",
-  "espeon": "エーフィ",
   "treecko": "キモリ",
   "sceptile": "ジュカイン",
   "leaf-blade": "リーフブレード",

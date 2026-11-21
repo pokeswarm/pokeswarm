@@ -134,6 +134,13 @@ export function speedBonusOf(p: Player): number {
   return Math.max(0, (p.speedFactor ?? 1) - 1);
 }
 
+/** 自分にかかっている強化の数（めいそう の重ね ＋ 技で付いた一時的な強化。重ねる技は重ねた数。★アシストパワー。07 の331章） */
+export function boostCountOf(world: World, p: Player): number {
+  let n = p.calm && world.tick < p.calm.untilTick ? p.calm.stacks : 0;
+  for (const b of p.moveBuffs ?? []) n += b.stacks ?? 1;
+  return n;
+}
+
 /** 当てるたびに重なる強化を 1 つ重ねる（maxStacks まで）。時間は seconds に戻す（ニトロチャージ。07 の328章） */
 function addHitBuff(world: World, p: Player, move: number, buff: NonNullable<SimMoveDef['hitBuff']>): void {
   const ticks = Math.max(1, Math.round(buff.seconds / world.dt));
@@ -555,6 +562,8 @@ export function useMoves(world: World): void {
             pm.burstLeft = def.burstCountMin + Math.floor(world.rng.next() * (top - def.burstCountMin + 1)) + p.mods.amountBonus;
           }
           pm.burstTimer = 0;
+          // ★アシストパワー: 強化の数だけ念の玉が増える（07 の331章）
+          if (def.boostShots) pm.burstLeft += Math.min(def.boostShots.max, boostCountOf(world, p));
           // 続けて当てるほど強くなる（エコーボイス）: 前に出した分が当たっていれば 1 段上げ、外れていれば 0 段。2 段ごとにこだまの輪を 1 つ足す（07 の240章）
           if (def.echo) {
             const stack = pm.echoHit ? Math.min(def.echo.maxStacks, (pm.echo ?? 0) + 1) : 0;
@@ -2160,6 +2169,10 @@ export function moveProjectiles(world: World): void {
         e.markSize[j] = pr.radius[i]! * def.delayedBlast.sizeMultiplier;
         e.markMove[j] = pr.move[i]!;
         e.markBy[j] = ownerId;
+      } else if (pr.stage[i] === 0 && def.detonateMarks && e.markTicks[j]! > 1 && e.markBy[j] === ownerId && !world.rules.moves[e.markMove[j]!]?.delayedBlast?.perish && !world.rules.moves[e.markMove[j]!]?.delayedBlast?.throw) {
+        // ★アシストパワー: 自分の みらいよち の印を、その場で強く爆発させる（次の更新で弾ける。07 の331章）
+        e.markDamage[j] = e.markDamage[j]! * def.detonateMarks.powerMultiplier;
+        e.markTicks[j] = 1;
       } else if (pr.stage[i] === 0 && def.delayedBlast?.stack && e.markTicks[j]! > 0 && e.markMove[j] === pr.move[i] && e.markBy[j] === ownerId) {
         // 重ねる印（サーナイトの みらいよち）: 威力を足す。時間は最初の印のまま
         e.markDamage[j] = e.markDamage[j]! + pr.damage[i]! * def.delayedBlast.powerMultiplier;

@@ -3002,6 +3002,19 @@
     "contestType": "tough",
     "damageClass": "physical"
   },
+  "stored-power": {
+    "names": {
+      "ja": "アシストパワー",
+      "en": "Stored Power",
+      "fr": "Force Ajoutée",
+      "de": "Kraftvorrat",
+      "es": "Poder Reserva",
+      "it": "Veicolaforza"
+    },
+    "type": "psychic",
+    "contestType": null,
+    "damageClass": "special"
+  },
   "submission": {
     "names": {
       "ja": "じごくぐるま",

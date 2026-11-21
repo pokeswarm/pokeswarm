@@ -15839,6 +15839,79 @@
       ],
       "contestType": "smart"
     },
+    "foul-play-umbreon": {
+      "pattern": "dash",
+      "effect": "foul-play-umbreon",
+      "nameOf": "foul-play",
+      "dash": {
+        "seconds": 0.2,
+        "hit": "land",
+        "hop": 0,
+        "afterimages": 4,
+        "tint": "#ffd54f",
+        "invincible": true,
+        "target": "strongest",
+        "stopShort": true,
+        "pose": "Charge",
+        "followUp": {
+          "seconds": 0.53,
+          "distance": 120,
+          "sizeMultiplier": 1.35,
+          "powerMultiplier": 0.2,
+          "hitIntervalSeconds": 0.13,
+          "pose": "Swing"
+        }
+      },
+      "base": {
+        "power": 311.8,
+        "cooldownSeconds": 1.6,
+        "count": 1,
+        "intervalSeconds": 0.1,
+        "speed": 0,
+        "size": 40,
+        "range": 260,
+        "durationSeconds": 0.2,
+        "pierce": "infinite",
+        "hitIntervalSeconds": 0,
+        "knockback": 200,
+        "knockbackSeconds": 0.1,
+        "statusChance": 0,
+        "statusSeconds": 0,
+        "spreadDegrees": 0,
+        "lifestealPct": 0,
+        "critChancePct": 20
+      },
+      "levels": [
+        {
+          "power": 52.3
+        },
+        {
+          "size": 3,
+          "power": 37
+        },
+        {
+          "range": 20,
+          "power": 50.4
+        },
+        {
+          "cooldownSeconds": -0.1,
+          "power": 19
+        },
+        {
+          "size": 3,
+          "power": 28.2
+        },
+        {
+          "critChancePct": 10,
+          "power": 45.5
+        },
+        {
+          "cooldownSeconds": -0.1,
+          "power": 6.2
+        }
+      ],
+      "contestType": "smart"
+    },
     "moonblast": {
       "pattern": "facing",
       "effect": "moonblast",

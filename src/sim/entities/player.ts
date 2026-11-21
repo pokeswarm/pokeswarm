@@ -126,6 +126,8 @@ export interface Player {
   /** 折れて進む dash（ワイルドボルト。07 の326章）: 1 本ごとの速さ [vx, vy, vx, vy, …] と、進み始めたときの更新回数・最初に折れる向き（使うたびに入れ替える） */
   dashLegs?: number[];
   dashTotalTicks?: number;
+  /** 進み終わったら続けて進む 2 段目（★イカサマ のしっぽの回転。07 の336章）の更新回数と速さ */
+  dashNext?: { ticks: number; vx: number; vy: number };
   zigFlip?: boolean;
   /** 体が動く技で進んでいる残りの更新回数（どのブラウザでも数える。ほかの体が動く技を重ねて出さないため。07 の268章） */
   dashBusyTicks?: number;

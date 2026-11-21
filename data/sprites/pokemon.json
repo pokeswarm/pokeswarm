@@ -1124,6 +1124,10 @@
       "uses": [
         "enemy",
         "full"
+      ],
+      "extraAnimations": [
+        "Swing",
+        "Charge"
       ]
     },
     {

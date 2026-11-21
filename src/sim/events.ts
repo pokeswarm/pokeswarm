@@ -376,6 +376,9 @@ export interface DashStartedEvent {
   readonly path?: readonly number[];
   /** 使った技（通った道の絵を選ぶ） */
   readonly move?: number;
+  /** 進んでいる間の体の動作（★イカサマ: Charge）と、続けて進む 2 段目（秒数・体の動作。07 の336章） */
+  readonly pose?: string;
+  readonly followUp?: { readonly seconds: number; readonly distance: number; readonly pose?: string };
 }
 
 /** 自分の体で攻撃する技を使った（見た目: 体を前後させる・残像） */

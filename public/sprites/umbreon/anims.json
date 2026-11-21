@@ -86,6 +86,41 @@
         10
       ],
       "frameKeyPrefix": "Faint"
+    },
+    "Swing": {
+      "source": "Swing",
+      "frameWidth": 72,
+      "frameHeight": 80,
+      "durations": [
+        2,
+        1,
+        2,
+        2,
+        3,
+        2,
+        2,
+        1,
+        1
+      ],
+      "frameKeyPrefix": "Swing"
+    },
+    "Charge": {
+      "source": "Charge",
+      "frameWidth": 32,
+      "frameHeight": 40,
+      "durations": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "frameKeyPrefix": "Charge"
     }
   },
   "missing": []

@@ -1892,6 +1892,22 @@ export const moveDefSchema = z.object({
       recoverSeconds: z.number().nonnegative().default(0),
       /** recoverSeconds に系統ごとに掛ける倍率（ケッキング: 特性で 2 回に 1 回しか出ないので短くする） */
       recoverLines: z.record(z.string(), z.number().nonnegative()).optional(),
+      /** 進んでいる間の体の動作（ドット絵の動作の名前。★イカサマ（ブラッキー）: Charge。07 の336章）。その絵が無いポケモンでは何もしない */
+      pose: z.string().optional(),
+      /**
+       * 進み終わったら、続けて同じ向きへ distance だけ seconds 秒で進む 2 段目（★イカサマ（ブラッキー）: しっぽを回して進む。07 の336章）。
+       * 2 段目の間は、体のまわり（技の size × sizeMultiplier）に hitIntervalSeconds ごとに当たる（威力 × powerMultiplier）。pose は 2 段目の体の動作（Swing）
+       */
+      followUp: z
+        .object({
+          seconds: z.number().positive(),
+          distance: z.number().nonnegative(),
+          sizeMultiplier: z.number().positive(),
+          powerMultiplier: z.number().positive(),
+          hitIntervalSeconds: z.number().positive(),
+          pose: z.string().optional(),
+        })
+        .optional(),
     })
     .optional(),
   /** screen: 地上の敵だけに当たる（じしん: ひこうタイプには効かない。07 の177章） */

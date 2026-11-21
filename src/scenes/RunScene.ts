@@ -1415,6 +1415,9 @@ export class RunScene extends Phaser.Scene {
         if (this.sync && w.role === 'guest') this.sync.requestRunStat(ev.stat, ev.value);
       } else if (ev.type === 'dashStarted') {
         this.playerViews.get(ev.playerId)?.dash(ev.dirX, ev.dirY, ev.distance, ev.seconds, ev.hop, ev.afterimages, ev.tint, ev.path);
+        // 進む間の体の動作と、続けて進む 2 段目の動作（★イカサマ: Charge → Swing。07 の336章）
+        if (ev.pose) this.playerViews.get(ev.playerId)?.playFor(ev.pose, ev.seconds * 1000, 0, ev.dirX, ev.dirY);
+        if (ev.followUp?.pose) this.playerViews.get(ev.playerId)?.playFor(ev.followUp.pose, ev.followUp.seconds * 1000, ev.seconds * 1000, ev.dirX, ev.dirY);
         // 折れて進む技（ワイルドボルト。07 の326章）: 通った道に、1 本ずつ稲妻を残す（進むのに合わせて順に出す）
         const ps = ev.path && ev.move !== undefined ? this.effects.dashPathSprite(w.rules.moves[ev.move]!.effect) : null;
         const q = ps ? w.players.find((pp) => pp.id === ev.playerId) : undefined;

@@ -257,7 +257,7 @@ export interface SimMoveDef {
   /** scatter: range の中のランダムな敵の足元に置く（りゅうせいぐん） */
   readonly scatterOnEnemies?: boolean;
   /** 体が本当に動く技（のしかかり・すてみタックル） */
-  readonly dash?: { readonly seconds: number; readonly hit: 'land' | 'path'; readonly hop: number; readonly afterimages: number; readonly tint?: string; readonly invincible: boolean; readonly target: 'facing' | 'crowd' | 'strongest' | 'input'; readonly zigzag?: { readonly legs: number; readonly side: number; readonly minForwardSpeed: number }; readonly arcDegrees?: number; readonly stopShort?: boolean; readonly recoverSeconds: number; readonly recoverLines?: Readonly<Record<string, number>> };
+  readonly dash?: { readonly seconds: number; readonly hit: 'land' | 'path'; readonly hop: number; readonly afterimages: number; readonly tint?: string; readonly invincible: boolean; readonly target: 'facing' | 'crowd' | 'strongest' | 'input'; readonly zigzag?: { readonly legs: number; readonly side: number; readonly minForwardSpeed: number }; readonly arcDegrees?: number; readonly stopShort?: boolean; readonly recoverSeconds: number; readonly recoverLines?: Readonly<Record<string, number>>; readonly pose?: string; readonly followUp?: { readonly seconds: number; readonly distance: number; readonly sizeMultiplier: number; readonly powerMultiplier: number; readonly hitIntervalSeconds: number; readonly pose?: string } };
   /** screen: 地上の敵だけに当たる（じしん） */
   readonly groundOnly?: boolean;
   /** 敵に当たらない（ミルクのみ） */

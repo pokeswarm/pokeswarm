@@ -142,7 +142,7 @@ describe('ポリゴン → ポリゴン2（07 の80・249章）', () => {
 });
 
 describe('イーブイの昼と夜の進化（07 の81章）', () => {
-  it('なつきが十分で、夜の区間ならブラッキー・昼ならエーフィに進化してよいか聞く。答えで進化し、たいあたりは みらいよち（07 の331章）・つきのひかり に変わり、空きがあれば サイコキネシス・バークアウト を覚える（07 の103章）', () => {
+  it('なつきが十分で、夜の区間ならブラッキー・昼ならエーフィに進化してよいか聞く。答えで進化し、たいあたりは みらいよち（07 の331章）・バークアウト（07 の336章）に変わり、空きがあれば サイコキネシス・かみつく を覚える（07 の103章）', () => {
     const s = setup('eevee');
     s.p.walked = 30000;
     s.w.section = 2;
@@ -152,7 +152,7 @@ describe('イーブイの昼と夜の進化（07 の81章）', () => {
     expect(s.w.events.some((e) => e.type === 'evolveAsk')).toBe(true);
     answerEvolution(s.w, s.p, true);
     expect(s.p.species).toBe(s.species('umbreon'));
-    expect(s.keys()).toEqual(['moonlight', 'snarl']);
+    expect(s.keys()).toEqual(['snarl', 'bite']);
 
     const d = setup('eevee');
     d.p.walked = 30000;

@@ -34,6 +34,8 @@ export class PlayerView {
   /** 1 回だけ再生する動作（技を使った瞬間の Hop など。07 の333章）と、終わる時刻 */
   private onceAnim = '';
   private onceUntil = -1;
+  /** 決まった時間だけ続ける体の動作（★イカサマ: 駆ける間の Charge → しっぽを回す Swing。07 の336章）。dir は向き（無ければ向いている方） */
+  private poses: { anim: string; from: number; until: number; dir?: number }[] = [];
   private lungeX = 0;
   private lungeY = 0;
   /** ねむる（カビゴン）で眠っている間に、頭の上に出す Z の文字 */
@@ -112,6 +114,18 @@ export class PlayerView {
         .setDepth(this.container.depth - 0.01);
       this.scene.tweens.add({ targets: ghost, alpha: { from: 0.5, to: 0 }, duration: 260, delay: seconds * 1000 * t, onComplete: () => ghost.destroy() });
     }
+  }
+
+  /**
+   * スプライトの動作を、delayMs 後から ms の間だけ続ける（その動作の絵が無ければ何もしない。07 の336章）。
+   * dirX・dirY があればその向きで描く（駆ける向き）
+   */
+  playFor(animation: string, ms: number, delayMs = 0, dirX?: number, dirY?: number): void {
+    if ((this.pokemon?.animationMs(animation) ?? 0) <= 0 || ms <= 0) return;
+    const now = this.scene.time.now;
+    const ax = (v: number): number => (v > 0.38 ? 1 : v < -0.38 ? -1 : 0);
+    this.poses = this.poses.filter((p) => p.until > now);
+    this.poses.push({ anim: animation, from: now + delayMs, until: now + delayMs + ms, ...(dirX !== undefined && dirY !== undefined ? { dir: directionIndex(ax(dirX), ax(dirY)) } : {}) });
   }
 
   /** スプライトの動作を 1 回分だけ再生する（その動作の絵が無ければ何もしない。07 の333章） */
@@ -206,7 +220,10 @@ export class PlayerView {
       // 泣いている間（トゲピー）は痛がる動き（自作のなみだを重ねる）
       // 技の反動で動けない間（ギガインパクト）も同じ動き
       const crying = (player.cryTicks ?? 0) > 0 || ((player.recoverTicks ?? 0) > 0 && !player.dashTicks);
+      const now = this.scene.time.now;
+      const pose = this.poses.find((p) => p.from <= now && now < p.until);
       if (asleep) this.pokemon.play('Sleep', 0);
+      else if (pose) this.pokemon.play(pose.anim, pose.dir ?? directionIndex(player.facingX, player.facingY));
       else if (this.scene.time.now < this.onceUntil) this.pokemon.play(this.onceAnim, directionIndex(player.facingX, player.facingY));
       else if (crying) this.pokemon.play('Hurt', directionIndex(player.facingX, player.facingY));
       else this.pokemon.play(moving && !waking ? this.spriteStyle.walkAnimation : this.spriteStyle.idleAnimation, directionIndex(player.facingX, player.facingY));

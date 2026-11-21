@@ -78,6 +78,8 @@ describe('data/ から組み立てたシミュレーションの定義', () => {
       const ok =
         inLearnset ||
         chain.some((k) => pl.startingMoves.includes(k)) ||
+        // 進化した姿で覚える技（formMoves。ブラッキーの かみつく。07 の336章）
+        chain.some((k) => ((pl as { formMoves?: { move: string }[] }).formMoves ?? []).some((f) => f.move === k)) ||
         pl.allMoveTypes ||
         (def.learners ? def.learners.includes(u.line) : type === 'normal' || typesOf(u.line).has(type) || (pl.moveTypes ?? []).includes(type));
       expect(ok, `${u.line} が ${u.to} の元 ${base} を覚えられない`).toBe(true);

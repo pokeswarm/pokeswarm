@@ -5739,6 +5739,107 @@ function fairyOrb(): SpriteOut {
   return { palette: ESPEON_PALETTE, frameMs: 70, parts: { main: frames } };
 }
 
+// ---------------- ブラッキーの作り直し（07 の336章） ----------------
+// 0 夜の黒・1 濃い紺・2 灰青・3 こがね・4 月の黄・5 淡い月の光
+const UMBREON_PALETTE = ['#0b0d17', '#1c2230', '#3d4b5c', '#d99a00', '#ffd54f', '#fff8c4'];
+
+/**
+ * ★イカサマ（ブラッキー）1 段目: いちばん強い敵へ駆け込んだ所の、影の一撃（48 ドット・ふちなし）。
+ * 黒い影のとげが四方へ裂け、まん中にブラッキーの体の模様のような月の輪が光って、広がりながら切れていく（3 コマ）
+ */
+function umbraStrike(): SpriteOut {
+  const frames = [0, 1, 2].map((f) => {
+    const r = rng(9100 + f * 37);
+    const spikes = Array.from({ length: 10 }, (_, k) => ({ a: (k / 10) * Math.PI * 2 + (r() - 0.5) * 0.4, len: 0.72 + r() * 0.26 }));
+    const ringR = [0.26, 0.46, 0.66][f]!;
+    const ringW = [0.09, 0.075, 0.06][f]!;
+    const reach = [0.8, 1, 0.95][f]!;
+    return toRows(
+      shape(
+        48,
+        (u, v) => {
+          const d = Math.hypot(u, v);
+          const a = Math.atan2(v, u);
+          // 月の輪（4 つに切れた弧。後のコマほど切れ目が広がる）
+          if (Math.abs(d - ringR) < ringW) {
+            const seg = ((a + Math.PI + 0.4) / (Math.PI / 2)) % 1;
+            const gap = [0.08, 0.16, 0.36][f]!;
+            if (seg > gap / 2 && seg < 1 - gap / 2) return Math.abs(d - ringR) < ringW * 0.45 ? 5 : 4;
+          }
+          // 影のとげ（輪の外へ裂ける。根元が太く先がとがる。先ほど灰青。最後のコマは根元から消える）
+          for (const sp of spikes) {
+            let da = a - sp.a;
+            while (da > Math.PI) da -= Math.PI * 2;
+            while (da < -Math.PI) da += Math.PI * 2;
+            const t = d / (sp.len * reach);
+            if (t > 1 || t < (f === 2 ? 0.55 : 0.1)) continue;
+            const half = 0.17 * (1 - t) + 0.02;
+            if (Math.abs(da) < half) return t > 0.72 ? 2 : Math.abs(da) < half * 0.45 ? 0 : 1;
+          }
+          // まん中の小さな影（最初の 2 コマ）
+          if (f < 2 && d < ringR * 0.55) return 0;
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette: UMBREON_PALETTE, frameMs: 70, parts: { main: frames } };
+}
+
+/**
+ * ★イカサマ（ブラッキー）2 段目: 体を回してしっぽで薙ぐ、しっぽの通り道（64 ドット・ふちなし。回して使う）。
+ * 右上（角度 −0.35 の所）が回る向きの先で、ふさふさのしっぽの先に月の輪の帯が 1 本巻いている。しっぽの後ろへ（時計回りに）
+ * 速さの筋が流れ、しっぽに近いほど太く詰まり、後ろほど細く切れていく（半透明の面は使わない）。2 コマで筋が少しずれる
+ */
+function umbraTail(): SpriteOut {
+  const frames = [0, 1].map((f) => {
+    const r = rng(9200 + f * 53);
+    const streaks = Array.from({ length: 7 }, (_, k) => ({ rad: 0.5 + k * 0.07, len: 3.3 - Math.abs(k - 2.5) * 0.45 + (r() - 0.5) * 0.3, ph: r() * 6.28 }));
+    return toRows(
+      shape(
+        64,
+        (u, v) => {
+          const d = Math.hypot(u, v);
+          let a = Math.atan2(v, u);
+          if (a < -1.2) a += Math.PI * 2;
+          // しっぽ: 角度 −0.35（先）〜 1.0（根元）に、半径 0.72 を中心にふくらむ房。先が一番太い
+          if (a >= -0.35 && a <= 1.0) {
+            const t = (a + 0.35) / 1.35;
+            const half = 0.17 * Math.sqrt(Math.max(0, 1 - Math.pow(Math.max(0, 0.25 - t) / 0.25, 2))) * (1 - t * 0.7) + (t < 0.25 ? 0 : 0.01);
+            const dd = Math.abs(d - 0.72);
+            if (dd < half) {
+              // 月の輪の帯（しっぽを横切る）
+              if (a > -0.13 && a < 0.0) return dd < half * 0.5 ? 5 : 4;
+              return light(u - 0.72, v, 0.2) > 0.2 && t < 0.5 ? 2 : 1;
+            }
+          }
+          // 月の輪の帯が残す金の筋（細く、後ろへ暗い金になって切れる）
+          if (a > 0 && a < 2.4 && Math.abs(d - 0.72) < 0.022) {
+            const t = a / 2.4;
+            if (!(t > 0.55 && Math.sin(a * 9 + f * 1.7) < -1 + t * 1.5)) return t < 0.4 ? 4 : 3;
+          }
+          // 後ろへ流れる速さの筋（しっぽの房のふちから。近いほど太く、後ろほど細く切れる）
+          for (const s of streaks) {
+            if (Math.abs(s.rad - 0.72) < 0.04) continue;
+            if (a < 0.7 || a > s.len) continue;
+            const t = (a - 0.7) / (s.len - 0.7);
+            const w = 0.028 * (1 - t) + 0.011;
+            if (Math.abs(d - s.rad) > w) continue;
+            if (t > 0.5 && Math.sin(a * (5 + t * 8) + s.ph + f * 1.4) < -1 + (t - 0.5) * 3) continue;
+            return t < 0.45 ? 2 : 1;
+          }
+          return -1;
+        },
+        0,
+        -1,
+      ),
+    );
+  });
+  return { palette: UMBREON_PALETTE, frameMs: 80, parts: { main: frames } };
+}
+
 // ---------------- ジョウトの技の作り直し（1）ポッポ系統（07 の157章） ----------------
 /**
  * ふきとばし: 扇に引き伸ばす大きな風（縦長 32×36）。太い白い風の帯が 3 本、根元から先へ波打ちながら広がり、
@@ -8597,6 +8698,9 @@ const MOVE_ART: Record<string, () => SpriteOut> = {
     'stored-orb': storedOrb,
     // 332章
     'fairy-orb': fairyOrb,
+    // 336章（ブラッキー）
+    'umbra-strike': umbraStrike,
+    'umbra-tail': umbraTail,
 };
 
 /** 絵の名前の一覧 */

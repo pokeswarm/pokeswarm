@@ -17,7 +17,7 @@
   {
    "id": "hoenn",
    "name": "ホウエン",
-   "available": false,
+   "available": true,
    "condition": "ジョウトで セレビィを 手に入れると解放",
    "stat": "johto:bossDefeated.lugia ≧ 1 & johto:bossDefeated.ho-oh ≧ 1"
   }

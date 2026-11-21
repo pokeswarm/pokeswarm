@@ -1433,17 +1433,26 @@ function fireDash(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
       path.push(px, py);
     }
   }
-  world.events.push({ type: 'dashStarted', playerId: p.id, seconds: dash.seconds, hop: dash.hop, afterimages: dash.afterimages, ...(dash.tint ? { tint: dash.tint } : {}), dirX: fx, dirY: fy, distance, ...(path ? { path, move: pm.move } : {}) });
-  if (dash.recoverSeconds > 0) p.recoverTicks = ticks + Math.round((dash.recoverSeconds * (dash.recoverLines?.[p.line] ?? 1)) / world.dt);
+  // 続けて進む 2 段目（★イカサマ: しっぽを回して同じ向きへ。07 の336章）
+  const fu = dash.followUp;
+  const ticks2 = fu ? Math.max(1, Math.round(fu.seconds / world.dt)) : 0;
+  world.events.push({
+    type: 'dashStarted', playerId: p.id, seconds: dash.seconds, hop: dash.hop, afterimages: dash.afterimages, ...(dash.tint ? { tint: dash.tint } : {}), dirX: fx, dirY: fy, distance, ...(path ? { path, move: pm.move } : {}),
+    ...(dash.pose ? { pose: dash.pose } : {}),
+    ...(fu ? { followUp: { seconds: fu.seconds, distance: fu.distance, ...(fu.pose ? { pose: fu.pose } : {}) } } : {}),
+  });
+  if (dash.recoverSeconds > 0) p.recoverTicks = ticks + ticks2 + Math.round((dash.recoverSeconds * (dash.recoverLines?.[p.line] ?? 1)) / world.dt);
   // 進んでいる間は、ほかの体が動く技を出さない（07 の268章）。体を動かすのは本人のブラウザだけだが、これはどのブラウザでも数える
-  p.dashBusyTicks = Math.max(p.dashBusyTicks ?? 0, ticks);
+  p.dashBusyTicks = Math.max(p.dashBusyTicks ?? 0, ticks + ticks2);
   if (p.id === world.localPlayerId) {
     p.dashTicks = ticks;
     p.dashVx = fx * speed;
     p.dashVy = fy * speed;
     p.dashLegs = legs;
     p.dashTotalTicks = ticks;
-    if (dash.invincible) p.invincibleTicks = Math.max(p.invincibleTicks, ticks + 1);
+    const speed2 = fu ? fu.distance / (ticks2 * world.dt) : 0;
+    p.dashNext = fu ? { ticks: ticks2, vx: fx * speed2, vy: fy * speed2 } : undefined;
+    if (dash.invincible) p.invincibleTicks = Math.max(p.invincibleTicks, ticks + ticks2 + 1);
   }
   const b = base(world, p, pm, st);
   if (dash.hit === 'land') {
@@ -1454,6 +1463,14 @@ function fireDash(world: World, p: Player, pm: PlayerMove, st: MoveStats): void 
     if (dash.target === 'crowd') world.projectiles.add({ ...b, motion: MOTION_LINEAR, x, y, vx: 0, vy: 0, life: 0.1, damage: 0, knockback: 0, radius: st.size * 2, stage: 1 });
   } else {
     world.projectiles.add({ ...b, motion: MOTION_FOLLOW, x: p.x, y: p.y, ox: 0, oy: 0, vx: fx, vy: fy, dirX: fx, dirY: fy, life: dash.seconds + world.dt });
+  }
+  // 2 段目の当たり: 1 段目が終わるまで待ち、体に付いて回りに当たり続ける（効き方の部品として描き分ける: stage 1。07 の336章）
+  if (fu) {
+    world.projectiles.add({
+      ...b, motion: MOTION_FOLLOW, x: p.x, y: p.y, ox: 0, oy: 0, vx: fx, vy: fy, dirX: fx, dirY: fy,
+      damage: b.damage * fu.powerMultiplier, radius: st.size * fu.sizeMultiplier, hitIntervalTicks: Math.max(1, Math.round(fu.hitIntervalSeconds / world.dt)),
+      life: dash.seconds, stage: 3, armLife: fu.seconds + world.dt, armStage: 1,
+    });
   }
 }
 
@@ -1938,6 +1955,14 @@ export function moveProjectiles(world: World): void {
         // 効き方から出た、遅れて伸びる亀裂（じわれ）は、1本ずつ光らせない
         if (pr.stage[i] === 0) world.events.push({ type: 'projectileHit', x: pr.x[i]!, y: pr.y[i]!, owner: pr.owner[i]!, move: pr.move[i]! });
         fireSpawnEffects(world, i, i + 1);
+      }
+      // 持ち主に付いていくもの（★イカサマ の 2 段目のしっぽ）は、待っている間も持ち主の所にいる（現れた瞬間に、出した所から飛んで見えない。07 の336章）
+      if (pr.motion[i] === MOTION_FOLLOW) {
+        const o = world.players.find((q) => q.id === pr.owner[i]);
+        if (o) {
+          pr.x[i] = pr.prevX[i] = o.x + pr.ox[i]!;
+          pr.y[i] = pr.prevY[i] = o.y + pr.oy[i]!;
+        }
       }
       continue;
     }

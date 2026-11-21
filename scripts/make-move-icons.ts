@@ -1545,6 +1545,11 @@ const ICONS: Record<string, Layer[]> = {
     { art: 'fairy-orb', frame: 0, k: 0.9, x: 16, y: 12 },
     { art: 'fairy-orb', frame: 0, k: 1.05, x: 24, y: 7 },
   ],
+  // ★イカサマ（ブラッキー）: 回して薙ぐしっぽと、その先の影の一撃（ゲームの絵。07 の336章）
+  'foul-play-umbreon': [
+    { art: 'umbra-tail', frame: 0, k: 0.72, x: 19, y: 19, rot: 160 },
+    { art: 'umbra-strike', frame: 0, k: 0.5, x: 21, y: 11 },
+  ],
   // アクアリング: 体をとりまく水の泡（ゲームの絵。07 の329章）
   'aqua-ring': [{ art: 'aqua-ring-bubbles', frame: 0, k: 0.74, x: 16, y: 16 }],
   // ニトロチャージ: 炎をまとって右上へ突っ込む体（ゲームの絵。07 の328章）

@@ -48,6 +48,14 @@ export function movePlayers(world: World): void {
       p.dashTicks--;
       p.x += (p.dashVx ?? 0) * world.dt;
       p.y += (p.dashVy ?? 0) * world.dt;
+      // 続けて進む 2 段目（★イカサマ のしっぽの回転。07 の336章）
+      if (p.dashTicks === 0 && p.dashNext) {
+        p.dashTicks = p.dashNext.ticks;
+        p.dashVx = p.dashNext.vx;
+        p.dashVy = p.dashNext.vy;
+        p.dashLegs = undefined;
+        p.dashNext = undefined;
+      }
       continue;
     }
     // 技の反動で動けない間（ギガインパクト）

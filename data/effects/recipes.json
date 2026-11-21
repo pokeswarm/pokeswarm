@@ -6404,6 +6404,59 @@
         "radius": 26
       }
     },
+    "foul-play-umbreon": {
+      "extends": "dark.base",
+      "hideShape": true,
+      "projectile": {
+        "glowScale": 0,
+        "coreScale": 0
+      },
+      "impact": {
+        "flash": {
+          "alpha": 0
+        },
+        "burst": {
+          "count": 8,
+          "colors": [
+            "#fff8c4",
+            "#ffd54f",
+            "#3d4b5c",
+            "#0b0d17"
+          ],
+          "lifespanMs": [
+            160,
+            300
+          ],
+          "speed": [
+            70,
+            190
+          ],
+          "scale": [
+            0.55,
+            0
+          ],
+          "alpha": [
+            1,
+            0
+          ],
+          "gravityY": 0,
+          "spread": 6,
+          "blend": "normal"
+        }
+      },
+      "sprite": {
+        "id": "umbra-strike",
+        "fit": "circle",
+        "size": 1.4
+      },
+      "effectSprite": {
+        "id": "umbra-tail",
+        "fit": "circle",
+        "size": 1.05,
+        "rotate": "spin",
+        "spinDegPerSec": -1350
+      }
+    },
     "boss-surf": {
       "extends": "surf",
       "bossActive": {

@@ -1176,6 +1176,24 @@
         "forms": [
           "espeon"
         ]
+      },
+      {
+        "move": "bite",
+        "forms": [
+          "umbreon"
+        ]
+      },
+      {
+        "move": "moonlight",
+        "forms": [
+          "umbreon"
+        ]
+      },
+      {
+        "move": "foul-play-umbreon",
+        "forms": [
+          "umbreon"
+        ]
       }
     ],
     "doduo": [

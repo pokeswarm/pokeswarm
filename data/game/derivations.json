@@ -643,6 +643,15 @@
       ]
     },
     {
+      "from": "bite",
+      "item": "black-glasses",
+      "to": "foul-play-umbreon",
+      "line": "eevee",
+      "forms": [
+        "umbreon"
+      ]
+    },
+    {
       "from": "body-slam",
       "item": "hp-up",
       "to": "giga-impact",

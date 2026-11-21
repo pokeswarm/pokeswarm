@@ -9,7 +9,7 @@
 |---|---|---|---|
 | カントー | 公開 | 最初から | — |
 | ジョウト | 公開 | 伝説のミュウを倒すと解放 | `bossDefeated.mew ≧ 1` |
-| ホウエン | 未公開 | ジョウトで セレビィを 手に入れると解放 | `johto:bossDefeated.lugia ≧ 1 & johto:bossDefeated.ho-oh ≧ 1` |
+| ホウエン | 公開 | ジョウトで セレビィを 手に入れると解放 | `johto:bossDefeated.lugia ≧ 1 & johto:bossDefeated.ho-oh ≧ 1` |
 
 ## カントー（42）
 

@@ -1963,6 +1963,11 @@ export const moveDefSchema = z.object({
   detonateMarks: z.object({ powerMultiplier: z.number().positive() }).optional(),
   /** homing: 向きを変える速さの上限（度/秒）。広く散って出た玉が、弧を描いて敵へ集まる（★アシストパワー。07 の332章）。省略ならすぐ向き直る */
   homingTurn: z.number().positive().optional(),
+  /**
+   * homing: 出た玉はまず持ち主の周りを回りながら広がり（seconds 秒で半径 radius まで。spinDegPerSec 度/秒で回る）、広がりきったら狙った敵へ技の速さで飛び出す。
+   * 続けて出す玉は、持ち主の周りの輪に等しい間隔で並ぶ（★アシストパワー。07 の334章）
+   */
+  orbitLaunch: z.object({ seconds: z.number().positive(), radius: z.number().positive(), spinDegPerSec: z.number() }).optional(),
   /** 続けて撃つ技（facing・nearest など）の数を、使うたびに burstCountMin〜count のどれかにする（ミサイルばり: 原作は 2〜5 回。07 の325章） */
   burstCountMin: z.number().int().positive().optional(),
   /** 押し出す向きを、当たり判定から敵へではなく、技の向き（向いている方向）にする（なみのり・サイコキネシス。07 の162章） */

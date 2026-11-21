@@ -565,6 +565,7 @@ export function useMoves(world: World): void {
           // ★アシストパワー: 強化の数だけ念の玉が増える（07 の331章）
           // 撃つときの舞い（エーフィの Hop）は、描画の側で技を使った知らせから再生する（castAnimation。07 の333章）
           if (def.boostShots) pm.burstLeft += Math.min(def.boostShots.max, def.boostShots.perBoost * boostCountOf(world, p, pm.move));
+          pm.burstTotal = pm.burstLeft;
           // 続けて当てるほど強くなる（エコーボイス）: 前に出した分が当たっていれば 1 段上げ、外れていれば 0 段。2 段ごとにこだまの輪を 1 つ足す（07 の240章）
           if (def.echo) {
             const stack = pm.echoHit ? Math.min(def.echo.maxStacks, (pm.echo ?? 0) + 1) : 0;
@@ -574,6 +575,8 @@ export function useMoves(world: World): void {
           }
           // 向きをランダムに選ぶ技（にどげり）は、使うたびに1つの向きを選び、連撃はその向きへ
           pm.aimAngle = def.randomAim ? world.rng.next() * Math.PI * 2 : undefined;
+          // 輪に並べて出す技（★アシストパワー）: 輪の始まりは使ったときの向き
+          if (def.orbitLaunch) pm.aimAngle = Math.atan2(axisToUnit(p.facingX, p.facingY)[1], axisToUnit(p.facingX, p.facingY)[0]);
           if (def.pattern === 'barrage' && def.body) {
             const [fx, fy] = axisToUnit(p.facingX, p.facingY);
             const a = pm.aimAngle ?? Math.atan2(fy, fx);
@@ -857,6 +860,14 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
       continue;
     }
     const motion = def.pattern === 'homing' ? MOTION_HOMING : def.pattern === 'boomerang' ? MOTION_BOOMERANG : MOTION_LINEAR;
+    // 輪に並べて出す玉（★アシストパワー。07 の334章）: k 発目を輪の k / 数 の所に。後から出る玉ほど遅れて回り始めるので、その分だけ先へずらして、輪が崩れないようにする
+    let orbit: { angle: number; angularSpeed: number; orbitRadius: number } | undefined;
+    if (def.orbitLaunch && motion === MOTION_HOMING) {
+      const total = Math.max(1, pm.burstTotal ?? st.count);
+      const k = total - pm.burstLeft;
+      const w = (def.orbitLaunch.spinDegPerSec * Math.PI) / 180;
+      orbit = { angle: (pm.aimAngle ?? 0) + (Math.PI * 2 * k) / total + w * k * st.intervalSeconds, angularSpeed: w, orbitRadius: def.orbitLaunch.radius };
+    }
     // boomerang は出したときの速度を ox・oy に覚えておき、時間とともに減速・反転させる
     world.projectiles.add({
       ...base(world, p, pm, st),
@@ -869,6 +880,7 @@ function fireBurst(world: World, p: Player, pm: PlayerMove, st: MoveStats): void
       oy: dy * speed,
       ...(target !== undefined ? { target } : {}),
       ...(landLife !== undefined ? { life: Math.max(world.dt, landLife) } : {}),
+      ...(orbit ?? {}),
       ...(def.echo ? echoShape(def.echo, pm, base(world, p, pm, st)) : {}),
     });
     if (bonusShot) for (let k = before; k < world.projectiles.count; k++) world.projectiles.noFx[k] = 1;
@@ -1964,6 +1976,29 @@ export function moveProjectiles(world: World): void {
       const [dx, dy] = snakeOffset(pr.vx[i]!, pr.vy[i]!, pr.orbitRadius[i]!, pr.angularSpeed[i]!, pr.maxLife[i]! - pr.life[i]! + world.dt);
       pr.x[i] = pr.ox[i]! + dx;
       pr.y[i] = pr.oy[i]! + dy;
+    } else if (motion === MOTION_HOMING && owner && pr.stage[i] === 0 && pr.orbitRadius[i]! > 0 && world.rules.moves[pr.move[i]!]!.orbitLaunch) {
+      // 持ち主の周りを回りながら広がる（★アシストパワー。07 の334章）。広がりきったら、狙った敵へまっすぐ向けて飛び出す
+      const ol = world.rules.moves[pr.move[i]!]!.orbitLaunch!;
+      const age = pr.maxLife[i]! - pr.life[i]! + world.dt;
+      pr.angle[i]! += pr.angularSpeed[i]! * world.dt;
+      const u = Math.min(1, age / ol.seconds);
+      const r = pr.orbitRadius[i]! * (1 - (1 - u) * (1 - u));
+      pr.x[i] = owner.x + Math.cos(pr.angle[i]!) * r;
+      pr.y[i] = owner.y + Math.sin(pr.angle[i]!) * r;
+      if (u >= 1) {
+        pr.orbitRadius[i] = 0;
+        const sp = Math.sqrt(pr.vx[i]! * pr.vx[i]! + pr.vy[i]! * pr.vy[i]!);
+        const locked = pr.target[i]! > 0 ? findEnemyIndex(world, pr.target[i]! - 1) : -1;
+        let t = locked !== -1 && e.hp[locked]! > 0 ? locked : pickHomingTarget(world, i, pr.owner[i]!, pr.move[i]!, pr.x[i]!, pr.y[i]!, (world.rules.moves[pr.move[i]!]!.levels[Math.max(0, pr.level[i]! - 1)] ?? world.rules.moves[pr.move[i]!]!.levels[0]!).range);
+        pr.target[i] = t !== -1 ? e.id[t]! + 1 : 0;
+        // 敵がいなければ、輪の外へ
+        const dx = t !== -1 ? e.x[t]! - pr.x[i]! : Math.cos(pr.angle[i]!);
+        const dy = t !== -1 ? e.y[t]! - pr.y[i]! : Math.sin(pr.angle[i]!);
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        pr.vx[i] = (dx / d) * sp;
+        pr.vy[i] = (dy / d) * sp;
+        t = -1;
+      }
     } else if (motion === MOTION_HOMING) {
       // まだ当たっていない一番近い敵を追う（貫通する弾は、当たった敵の次へ進む。前は当たった敵を追い続けて残っていた）。
       // 狙った敵が決まっている弾（せいなるほのお）は、その敵が残っている間はその敵を追う

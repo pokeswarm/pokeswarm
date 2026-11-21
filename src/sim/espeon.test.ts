@@ -98,6 +98,37 @@ describe('エーフィ（07 の331章）', () => {
     expect(e.markTicks[0]).toBe(0);
   });
 
+  it('★アシストパワー の玉は自分の周りを回りながら輪に広がり、広がりきると速く敵へ飛ぶ（07 の334章）', () => {
+    const t = setup();
+    t.p.moves = [t.pm('stored-power')];
+    recomputeModifiers(t.w, t.p);
+    t.w.enemies.add(1, 0, 300, 0, 1e9, 0, 10);
+    const m = t.p.moves[0]!.move;
+    const pr = t.w.projectiles;
+    const track = new Map<number, { x: number; y: number }[]>();
+    for (let k = 0; k < 30; k++) {
+      t.sim.step([]);
+      for (let i = 0; i < pr.count; i++) if (pr.move[i] === m) track.set(pr.serial[i]!, [...(track.get(pr.serial[i]!) ?? []), { x: pr.x[i]!, y: pr.y[i]! }]);
+    }
+    const paths = [...track.values()].filter((v) => v.length >= 14);
+    expect(paths.length).toBeGreaterThanOrEqual(4);
+    // 回っている 0.4 秒（12 回）の間は、自分から半径 56 の輪の中にいて、最後は輪の上
+    for (const v of paths) {
+      for (const q of v.slice(0, 11)) expect(Math.hypot(q.x, q.y)).toBeLessThanOrEqual(57);
+      expect(Math.hypot(v[11]!.x, v[11]!.y)).toBeGreaterThan(50);
+    }
+    // 輪の上の位置は、ぐるりと散っている（玉ごとの角度が 180 度より広く散る）
+    const angles = paths.map((v) => Math.atan2(v[11]!.y, v[11]!.x)).sort((a, b) => a - b);
+    const gaps = angles.map((a, k) => (k + 1 < angles.length ? angles[k + 1]! - a : angles[0]! + Math.PI * 2 - a));
+    expect(Math.max(...gaps)).toBeLessThan(Math.PI);
+    // 飛び出した後は、1 回で 20 より速く（毎秒 600 より速く）敵へ近づく
+    for (const v of paths) {
+      const a = v[12]!;
+      const b = v[13]!;
+      expect(Math.hypot(300 - a.x, a.y) - Math.hypot(300 - b.x, b.y)).toBeGreaterThan(20);
+    }
+  });
+
   it('サイコキネシス ＋ スペシャルアップ → ★アシストパワー はエーフィだけ', () => {
     for (const [form, ok] of [['espeon', true], ['umbreon', false]] as const) {
       const t = setup(form);

@@ -242,6 +242,8 @@ export interface SimMoveDef {
   readonly detonateMarks?: { readonly powerMultiplier: number };
   /** homing の向きを変える速さの上限（度/秒。★アシストパワー） */
   readonly homingTurn?: number;
+  /** homing: 持ち主の周りを回りながら広がってから飛び出す（★アシストパワー。07 の334章） */
+  readonly orbitLaunch?: { readonly seconds: number; readonly radius: number; readonly spinDegPerSec: number };
   /** 続けて撃つ数を、使うたびに burstCountMin〜count のどれかにする（ミサイルばり） */
   readonly burstCountMin?: number;
   /** 押し出す向きを技の向きにする */

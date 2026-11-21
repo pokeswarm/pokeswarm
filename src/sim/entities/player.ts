@@ -11,6 +11,8 @@ export interface PlayerMove {
   /** まとめて出す分の残り数と、次を出すまでの時間（秒） */
   burstLeft: number;
   burstTimer: number;
+  /** まとめて出す分の、その回に出す数（輪に並べて出す技 orbitLaunch が、玉の間隔を決めるのに使う） */
+  burstTotal?: number;
   /** spin（回転）: 使った回数（扇形を出す向きを、回数ごとに時計回りへずらす） */
   spinStep?: number;
   /** 向きをランダムに選ぶ技（にどげり・まわしげり）が、今回選んだ向き（ラジアン） */

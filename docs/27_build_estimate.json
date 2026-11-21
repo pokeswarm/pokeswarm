@@ -12711,13 +12711,13 @@
       },
       {
        "form": "espeon",
-       "scene": "at150",
-       "est": 13178.201290953055,
+       "scene": "boss",
+       "est": 13155.8895191089,
        "moves": [
         {
          "move": "stored-power",
          "level": 8,
-         "est": 10883.025059829473
+         "est": 10860.713287985318
         },
         {
          "move": "double-edge",
@@ -12744,21 +12744,21 @@
         "dire-hit"
        ],
        "vs": {
-        "johto-boss-xatu": 1.798363785415269,
-        "johto-boss-crobat": 1.90197620902046,
-        "johto-boss-machamp": 2.4453979830263055,
-        "johto-boss-houndoom": 4.1105457952349,
-        "johto-boss-dragonite": 3.9459102841067115,
-        "round1": 15.176578015795045,
-        "round2": 25.145421665534567,
-        "round3": 34.745313976166216,
-        "legend-lugia": 36.701301743168756,
-        "legend-ho-oh": 30.35315603159009,
-        "legend-raikou": 4.7806220749754385,
-        "legend-entei": 4.7806220749754385,
-        "legend-suicune": 4.7806220749754385
+        "johto-boss-xatu": 1.8013138730556988,
+        "johto-boss-crobat": 1.905276338884723,
+        "johto-boss-machamp": 2.449641007137501,
+        "johto-boss-houndoom": 4.11728885269874,
+        "johto-boss-dragonite": 3.9526023629546385,
+        "round1": 15.202316780594764,
+        "round2": 25.18730294046418,
+        "round3": 34.804620335352396,
+        "legend-lugia": 36.76150761338161,
+        "legend-ho-oh": 30.404633561189527,
+        "legend-raikou": 4.788729785887351,
+        "legend-entei": 4.788729785887351,
+        "legend-suicune": 4.788729785887351
        },
-       "legendAvg": 28.42435428645093
+       "legendAvg": 28.47207624619649
       },
       {
        "form": "flareon",
@@ -16692,20 +16692,6 @@
      "owners": 4
     },
     {
-     "move": "stored-power",
-     "est": 4690.9590775127035,
-     "key": "eevee",
-     "form": "espeon",
-     "items": [
-      "twisted-spoon",
-      "x-sp-atk",
-      "pp-max",
-      "metronome",
-      "dire-hit"
-     ],
-     "owners": 1
-    },
-    {
      "move": "solar-beam",
      "est": 4687.4910628994785,
      "key": "chikorita",
@@ -16729,6 +16715,20 @@
       "miracle-seed",
       "metronome",
       "x-attack",
+      "pp-max",
+      "dire-hit"
+     ],
+     "owners": 1
+    },
+    {
+     "move": "stored-power",
+     "est": 4681.34193447643,
+     "key": "eevee",
+     "form": "espeon",
+     "items": [
+      "twisted-spoon",
+      "x-sp-atk",
+      "metronome",
       "pp-max",
       "dire-hit"
      ],

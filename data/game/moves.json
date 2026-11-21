@@ -2796,8 +2796,8 @@
         "power": 33,
         "cooldownSeconds": 1.4,
         "count": 4,
-        "intervalSeconds": 0.05,
-        "speed": 340,
+        "intervalSeconds": 0.03,
+        "speed": 780,
         "size": 9,
         "range": 440,
         "durationSeconds": 1.6,
@@ -2807,7 +2807,7 @@
         "knockbackSeconds": 0.08,
         "statusChance": 0,
         "statusSeconds": 0,
-        "spreadDegrees": 150,
+        "spreadDegrees": 0,
         "lifestealPct": 0
       },
       "levels": [
@@ -2823,7 +2823,7 @@
           "power": 2.2
         },
         {
-          "speed": 30,
+          "speed": 60,
           "power": 4.4
         },
         {
@@ -2844,7 +2844,12 @@
           "moveSpeedPct": 25
         }
       },
-      "homingTurn": 480
+      "homingTurn": 900,
+      "orbitLaunch": {
+        "seconds": 0.4,
+        "radius": 56,
+        "spinDegPerSec": 420
+      }
     },
     "fissure": {
       "pattern": "scatter",

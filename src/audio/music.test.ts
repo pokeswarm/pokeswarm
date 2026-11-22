@@ -24,6 +24,17 @@ describe('8bit の曲（楽譜）', () => {
     expect(notes.filter((n) => n.channel === 'd').map((n) => n.drum)).toEqual(['k', 's', 'k', 's']);
   });
 
+  it('"+" でつないだ音は同時に鳴らす（和音）', () => {
+    const { notes } = parseScore({
+      bpm: 60,
+      stepsPerBeat: 1,
+      channels: { a: { wave: 'square', duty: 0.5, volume: 1 } },
+      patterns: { P: { a: 'C4+E4+G4 - A4' } },
+      order: ['P'],
+    });
+    expect(notes.map((n) => [n.time, n.duration, Math.round(n.freq)])).toEqual([[0, 2, 262], [0, 2, 330], [0, 2, 392], [2, 1, 440]]);
+  });
+
   it('どの曲も、パターンの中のパートの長さがそろっていて、音符が読める', () => {
     for (const [name, score] of Object.entries(musicScores)) {
       for (const [p, parts] of Object.entries(score.patterns)) {

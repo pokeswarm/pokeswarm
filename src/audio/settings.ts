@@ -10,8 +10,8 @@ export interface AudioSettings {
 }
 
 const KEY = 'pokeswarm.audio';
-/** 初めての人の音量（作者の指摘 2026年10月25日: 大きすぎたので全体を半分に） */
-const DEFAULTS: AudioSettings = { master: 0.4, bgm: 0.6, sfx: 0.8, muted: false };
+/** 初めての人の音量（作者の指摘 2026年10月25日: 大きすぎたので全体を半分に。2026年11月22日: 曲に和音と副旋律を足したので、さらに半分に） */
+const DEFAULTS: AudioSettings = { master: 0.2, bgm: 0.6, sfx: 0.8, muted: false };
 
 export class AudioSettingsStore {
   private value: AudioSettings;

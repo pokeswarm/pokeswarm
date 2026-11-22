@@ -7,6 +7,16 @@
       "duty": 0.25,
       "volume": 0.2
     },
+    "counter": {
+      "wave": "square",
+      "duty": 0.25,
+      "volume": 0.09
+    },
+    "chords": {
+      "wave": "square",
+      "duty": 0.25,
+      "volume": 0.035
+    },
     "harmony": {
       "wave": "square",
       "duty": 0.125,
@@ -26,14 +36,18 @@
   "patterns": {
     "A": {
       "lead": "F5 - F5 - Ab5 - C6 - - - Bb5 - Ab5 - G5 - Ab5 - - - F5 - Db6 - - - - - C6 - Bb5 - G5 - Bb5 - Eb6 - - - Db6 - C6 - Bb5 - - - C6 - - - - - - - E5 - G5 - C6 - - - F6 - - - Eb6 - C6 - Ab5 - C6 - F6 - - - F6 - - - Eb6 - Db6 - Ab5 - - - F5 - - - Db6 - - - C6 - Bb5 - F5 - Bb5 - Db6 - - - C6 - - - E6 - - - G5 - - - C6 - - -",
+      "counter": "C4 - - - - - - - Ab3 - - - - - - - Db4 - - - - - - - Ab3 - - - - - - - Bb3 - - - - - - - G3 - - - - - - - E4 - - - G4 - - - C5 - - - - - - - Ab4 - - - - - - - C5 - - - - - - - Ab4 - - - - - - - Db5 - - - - - - - Bb4 - - - - - - - Db5 - - - - - - - G4 - - - - - - - C5 - - - - - - -",
+      "chords": "F3+Ab3+C4 - - - - - F3+Ab3+C4 - - - F3+Ab3+C4 - - - - - Db4+F4+Ab4 - - - - - Db4+F4+Ab4 - - - Db4+F4+Ab4 - - - - - Eb4+G4+Bb4 - - - - - Eb4+G4+Bb4 - - - Eb4+G4+Bb4 - - - - - C4+E4+G4 - - - - - C4+E4+G4 - - - C4+E4+G4 - - - - - F3+Ab3+C4 - - - - - F3+Ab3+C4 - - - F3+Ab3+C4 - - - - - Db4+F4+Ab4 - - - - - Db4+F4+Ab4 - - - Db4+F4+Ab4 - - - - - Bb3+Db4+F4 - - - - - Bb3+Db4+F4 - - - Bb3+Db4+F4 - - - - - C4+E4+G4 - - - - - C4+E4+G4 - - - C4+E4+G4 - - - - -",
       "harmony": "F3 - Ab3 - C4 - Ab3 - F3 - Ab3 - C4 - Ab3 - Db4 - F4 - Ab4 - F4 - Db4 - F4 - Ab4 - F4 - Eb4 - G4 - Bb4 - G4 - Eb4 - G4 - Bb4 - G4 - C4 - E4 - G4 - E4 - C4 - E4 - G4 - E4 - F3 - Ab3 - C4 - Ab3 - F3 - Ab3 - C4 - Ab3 - Db4 - F4 - Ab4 - F4 - Db4 - F4 - Ab4 - F4 - Bb3 - Db4 - F4 - Db4 - Bb3 - Db4 - F4 - Db4 - C4 - E4 - G4 - E4 - C4 - E4 - G4 - E4 -",
-      "bass": "F2 . F2 . F3 . F2 . F2 . F2 . F3 . F2 F3 Db2 . Db2 . Db3 . Db2 . Db2 . Db2 . Db3 . Db2 Db3 Eb2 . Eb2 . Eb3 . Eb2 . Eb2 . Eb2 . Eb3 . Eb2 Eb3 C2 . C2 . C3 . C2 . C2 . C2 . C3 . C2 C3 F2 . F2 . F3 . F2 . F2 . F2 . F3 . F2 F3 Db2 . Db2 . Db3 . Db2 . Db2 . Db2 . Db3 . Db2 Db3 Bb2 . Bb2 . Bb3 . Bb2 . Bb2 . Bb2 . Bb3 . Bb2 Bb3 C2 . C2 . C3 . C2 . C2 . C2 . C3 . C2 C3",
+      "bass": "F3 . F3 . F4 . F3 . F3 . F3 . F4 . F3 F4 Db3 . Db3 . Db4 . Db3 . Db3 . Db3 . Db4 . Db3 Db4 Eb3 . Eb3 . Eb4 . Eb3 . Eb3 . Eb3 . Eb4 . Eb3 Eb4 C3 . C3 . C4 . C3 . C3 . C3 . C4 . C3 C4 F3 . F3 . F4 . F3 . F3 . F3 . F4 . F3 F4 Db3 . Db3 . Db4 . Db3 . Db3 . Db3 . Db4 . Db3 Db4 Bb3 . Bb3 . Bb4 . Bb3 . Bb3 . Bb3 . Bb4 . Bb3 Bb4 C3 . C3 . C4 . C3 . C3 . C3 . C4 . C3 C4",
       "drums": "k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . s s s . s s"
     },
     "B": {
       "lead": "Db6 - - - - - Eb6 - F6 - - - - - - - Eb6 - - - - - Db6 - Bb5 - - - - - - - C6 - - - Ab5 - F5 - C6 - - - - - - - Ab5 - - - Bb5 - C6 - F6 - - - - - - - F6 - Eb6 - Db6 - - - Ab5 - Db6 - F6 - - - G5 - Bb5 - Eb6 - - - G5 - Bb5 - Eb6 - - - E6 - - - C6 - G5 - E5 - - - G5 - - - C6 - - - - - - - - - - - . . . .",
+      "counter": "Ab4 - - - - - - - Db4 - - - Ab3 - - - Bb3 - - - - - - - Eb4 - - - G4 - - - F4 - - - - - - - Ab3 - - - C4 - - - F4 - - - - - - - C4 - - - Ab3 - - - Db4 - - - - - - - F4 - - - - - - - Bb4 - - - - - - - Eb4 - - - - - - - C4 - - - - - - - G4 - - - - - - - E4 - - - C4 - - - G3 - - - C4 - - -",
+      "chords": "Db4+F4+Ab4 - - - - - Db4+F4+Ab4 - - - Db4+F4+Ab4 - - - - - Eb4+G4+Bb4 - - - - - Eb4+G4+Bb4 - - - Eb4+G4+Bb4 - - - - - F3+Ab3+C4 - - - - - F3+Ab3+C4 - - - F3+Ab3+C4 - - - - - F3+Ab3+C4 - - - - - F3+Ab3+C4 - - - F3+Ab3+C4 - - - - - Db4+F4+Ab4 - - - - - Db4+F4+Ab4 - - - Db4+F4+Ab4 - - - - - Eb4+G4+Bb4 - - - - - Eb4+G4+Bb4 - - - Eb4+G4+Bb4 - - - - - C4+E4+G4 - - - - - C4+E4+G4 - - - C4+E4+G4 - - - - - C4+E4+G4 - - - - - C4+E4+G4 - - - C4+E4+G4 - - - - -",
       "harmony": "Db4 - F4 - Ab4 - F4 - Db4 - F4 - Ab4 - F4 - Eb4 - G4 - Bb4 - G4 - Eb4 - G4 - Bb4 - G4 - F3 - Ab3 - C4 - Ab3 - F3 - Ab3 - C4 - Ab3 - F3 - Ab3 - C4 - Ab3 - F3 - Ab3 - C4 - Ab3 - Db4 - F4 - Ab4 - F4 - Db4 - F4 - Ab4 - F4 - Eb4 - G4 - Bb4 - G4 - Eb4 - G4 - Bb4 - G4 - C4 - E4 - G4 - E4 - C4 - E4 - G4 - E4 - C4 - E4 - G4 - E4 - C4 - E4 - G4 - E4 -",
-      "bass": "Db2 . Db2 . Db3 . Db2 . Db2 . Db2 . Db3 . Db2 Db3 Eb2 . Eb2 . Eb3 . Eb2 . Eb2 . Eb2 . Eb3 . Eb2 Eb3 F2 . F2 . F3 . F2 . F2 . F2 . F3 . F2 F3 F2 . F2 . F3 . F2 . F2 . F2 . F3 . F2 F3 Db2 . Db2 . Db3 . Db2 . Db2 . Db2 . Db3 . Db2 Db3 Eb2 . Eb2 . Eb3 . Eb2 . Eb2 . Eb2 . Eb3 . Eb2 Eb3 C2 . C2 . C3 . C2 . C2 . C2 . C3 . C2 C3 C2 . C2 . C3 . C2 . C2 . C2 . C3 . C2 C3",
+      "bass": "Db3 . Db3 . Db4 . Db3 . Db3 . Db3 . Db4 . Db3 Db4 Eb3 . Eb3 . Eb4 . Eb3 . Eb3 . Eb3 . Eb4 . Eb3 Eb4 F3 . F3 . F4 . F3 . F3 . F3 . F4 . F3 F4 F3 . F3 . F4 . F3 . F3 . F3 . F4 . F3 F4 Db3 . Db3 . Db4 . Db3 . Db3 . Db3 . Db4 . Db3 Db4 Eb3 . Eb3 . Eb4 . Eb3 . Eb3 . Eb3 . Eb4 . Eb3 Eb4 C3 . C3 . C4 . C3 . C3 . C3 . C4 . C3 C4 C3 . C3 . C4 . C3 . C3 . C3 . C4 . C3 C4",
       "drums": "k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . h k s . h h k . h k s . h . k . s s s . s s"
     }
   },

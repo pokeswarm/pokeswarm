@@ -35,16 +35,17 @@ export function parseScore(score: MusicScore): { notes: MusicNote[]; length: num
       const tokens = text.trim().split(/\s+/);
       steps = Math.max(steps, tokens.length);
       const drums = score.channels[channel]?.wave === 'noise';
-      let open: { start: number; freq: number; drum: string | null } | null = null;
+      let open: { start: number; freqs: number[]; drum: string | null } | null = null;
       const close = (end: number): void => {
-        if (open) notes.push({ channel, time: offset + open.start * step, duration: (end - open.start) * step, freq: open.freq, drum: open.drum });
+        if (open) for (const freq of open.freqs) notes.push({ channel, time: offset + open.start * step, duration: (end - open.start) * step, freq, drum: open.drum });
         open = null;
       };
       tokens.forEach((tok, i) => {
         if (tok === '-') return;
         close(i);
         if (tok === '.') return;
-        open = drums ? { start: i, freq: 0, drum: tok } : { start: i, freq: noteFrequency(tok), drum: null };
+        // "C4+E4+G4" は同時に鳴らす和音（1 つずつ別の音として予約する）
+        open = drums ? { start: i, freqs: [0], drum: tok } : { start: i, freqs: tok.split('+').map(noteFrequency), drum: null };
       });
       close(tokens.length);
     }

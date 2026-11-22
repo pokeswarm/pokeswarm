@@ -2708,6 +2708,11 @@ const syncRateSchema = z.object({
    * ゲストで飛んで見えるようになったので、ボスは別に決める（作者の報告 2026年10月30日。ボスは数体なので送る量は小さい）
    */
   bossIntervalTicks: z.number().int().positive().optional(),
+  /**
+   * 敵の位置の補正を、この数の敵ごとに分けて送る（無ければ 1 通）。敵 300 体で 1 通 約 5KB になり、送り直さないチャンネルの中で
+   * 割られて届いていた。スマホがゲストのときだけページごと落ちるので、割られない大きさにする（作者の報告 2026年11月22日。07 の346章）
+   */
+  correctionChunkEnemies: z.number().int().positive().optional(),
 });
 
 /**
@@ -2745,7 +2750,11 @@ export const networkConfigSchema = z.object({
    * batchTicks: 直接接続で、この更新回数ぶんをまとめて1回に送る（位置・補正は最新だけ）。
    * スマホの協力プレイが数分でページごと落ちるので、送る回数を減らす（作者の報告 2026年10月29日。07 の119章）
    */
-  p2p: syncRateSchema.extend({ batchTicks: z.number().int().positive().default(1) }),
+  p2p: syncRateSchema.extend({
+    batchTicks: z.number().int().positive().default(1),
+    /** 送り直さないチャンネルの 1 通の大きさの上限（文字数）。超える分は別の 1 通にする（07 の346章） */
+    lossyMaxBytes: z.number().int().positive().optional(),
+  }),
   /** 中継時は送る頻度を下げ、まとめて書き込む（通信量と書き込み回数を抑える） */
   relay: syncRateSchema.extend({ flushIntervalMs: z.number().int().positive() }),
   /** 往復時間を測る間隔（更新回数） */

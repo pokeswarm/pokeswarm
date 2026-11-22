@@ -9,7 +9,9 @@
     "playerStateIntervalTicks": 1,
     "correctionIntervalTicks": 30,
     "bossIntervalTicks": 3,
-    "batchTicks": 3
+    "batchTicks": 3,
+    "correctionChunkEnemies": 40,
+    "lossyMaxBytes": 1000
   },
   "relay": {
     "playerStateIntervalTicks": 3,

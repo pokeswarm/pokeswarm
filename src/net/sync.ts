@@ -13,6 +13,8 @@ export interface SyncRate {
   playerStateIntervalTicks: number;
   correctionIntervalTicks: number;
   bossIntervalTicks?: number;
+  /** 敵の位置の補正を、この数の敵ごとに分けて送る（無ければ 1 通にまとめる） */
+  correctionChunkEnemies?: number;
 }
 
 /** ホストが中継する、あるゲストから届いたメッセージ（そのゲスト以外へ送る） */
@@ -252,7 +254,10 @@ export class SyncSession {
           if (e.hp[i]! <= 0) continue;
           data.push(e.id[i]!, Math.round(e.x[i]! * 10) / 10, Math.round(e.y[i]! * 10) / 10);
         }
-        out.push({ t: 'c', e: data, k: world.tick });
+        // 小分けにして送る（07 の346章）。分けないときは今までどおり 1 通
+        const size = (this.rate.correctionChunkEnemies ?? Infinity) * 3;
+        if (data.length <= size) out.push({ t: 'c', e: data, k: world.tick });
+        else for (let from = 0, n = 0; from < data.length; from += size, n++) out.push({ t: 'c', e: data.slice(from, from + size), k: world.tick, n });
       }
       // 中ボス・ボスの HP と位置は、HP のバーと突進などの動きが飛ばないよう補正より短い間隔で送る
       if (world.tick % (this.rate.bossIntervalTicks ?? Math.max(1, Math.round(this.rate.correctionIntervalTicks / 3))) === 0) {
@@ -355,8 +360,8 @@ export class SyncSession {
           if (host) for (let k = 0; k + 1 < m.e.length; k += 2) if (m.e[k + 1] === from) cmds.push({ type: 'requestPickup', id: m.e[k]!, by: from });
           break;
         case 'c':
-          // 古い補正が後から届いたら捨てる
-          if (guest && m.k > this.lastCorrectionTick) {
+          // 古い補正が後から届いたら捨てる（同じ更新回数のものは、小分けの残り）
+          if (guest && m.k >= this.lastCorrectionTick) {
             this.lastCorrectionTick = m.k;
             cmds.push({ type: 'correctEnemies', data: m.e, tick: m.k });
           }

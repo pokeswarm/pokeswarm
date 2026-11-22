@@ -28,6 +28,8 @@ export class PeerTransport implements Transport {
     private readonly channel: RTCDataChannel,
     /** この回数の send をまとめて1回に送る（1 ならそのつど送る） */
     private readonly batchTicks = 1,
+    /** 送り直さないチャンネルの 1 通の大きさの上限（文字数）。超える分は別の 1 通にする（07 の346章） */
+    private readonly lossyMaxBytes = Infinity,
   ) {
     this.listen(channel);
     channel.onclose = () => this.onClose?.();
@@ -68,7 +70,20 @@ export class PeerTransport implements Transport {
     const lossy = fastOpen ? messages.filter((m) => LOSSY.has(m.t)) : [];
     const reliable = fastOpen ? messages.filter((m) => !LOSSY.has(m.t)) : messages;
     if (reliable.length) this.write(this.channel, reliable);
-    if (lossy.length) this.write(this.fast!, lossy);
+    // 送り直さないチャンネルは、1 通が大きいと中で割られ、かけらが 1 つ落ちると全部が捨てられる。上限までで区切って送る
+    let group: NetMessage[] = [];
+    let size = 2;
+    for (const m of lossy) {
+      const len = encode([m]).length - 1;
+      if (group.length && size + len > this.lossyMaxBytes) {
+        this.write(this.fast!, group);
+        group = [];
+        size = 2;
+      }
+      group.push(m);
+      size += len;
+    }
+    if (group.length) this.write(this.fast!, group);
   }
 
   buffered(): number {

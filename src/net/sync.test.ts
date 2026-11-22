@@ -223,6 +223,24 @@ describe('順番を待たないチャンネル（03_network.md 6.4）', () => {
     expect(g.session.incoming(w, [c(30)], 1)).toHaveLength(1);
     expect(g.session.incoming(w, [c(20)], 1)).toHaveLength(0);
   });
+
+  it('補正は敵の数で小分けにして送り、ゲストは同じ更新回数の残りも受け取る（07 の346章）', () => {
+    const host = makePeer('host', 1, 2);
+    const hs = new SyncSession({ ...rate, correctionChunkEnemies: 4 }, 1e9, () => 0);
+    const hw = host.sim.world;
+    for (let id = 1; id <= 10; id++) host.sim.step([{ type: 'spawnEnemy', id: 9000 + id, kind: 0, x: 400 + id * 20, y: 400 }]);
+    while (hw.tick % rate.correctionIntervalTicks !== 0) host.sim.step([]);
+    const sent = hs.outgoing(hw).filter((m): m is Extract<typeof m, { t: 'c' }> => m.t === 'c');
+    const alive = sent.reduce((n, m) => n + m.e.length / 3, 0);
+    expect(alive).toBeGreaterThanOrEqual(10);
+    expect(sent.length).toBe(Math.ceil(alive / 4));
+    expect(sent.every((m) => m.e.length <= 12)).toBe(true);
+    expect(sent.map((m) => m.n)).toEqual(sent.map((_, i) => i));
+    // ゲスト: 小分けは全部受け取り、その前の更新回数のものは捨てる
+    const g = makePeer('guest', 2, 2);
+    expect(g.session.incoming(g.sim.world, decode(encode(sent)), 1)).toHaveLength(sent.length);
+    expect(g.session.incoming(g.sim.world, [{ t: 'c', e: [], k: sent[0]!.k - 1 }], 1)).toHaveLength(0);
+  });
 });
 
 describe('ポーズ（作者の決定 2026年10月25日）', () => {

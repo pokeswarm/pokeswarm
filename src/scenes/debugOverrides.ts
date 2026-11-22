@@ -115,9 +115,14 @@ export function parseWingsParam(search: string): boolean {
   return new URLSearchParams(search).has('wings');
 }
 
-/** テストプレイ: ?god で自分は無敵（受けたはずのダメージは数えて出す） */
+/** テストプレイ: ?god で自分は無敵（画面には何も出さない。撮影のため） */
 export function parseGodParam(search: string): boolean {
   return new URLSearchParams(search).has('god');
+}
+
+/** テストプレイ: ?god=count のときだけ、受けたはずのダメージを画面に出す（当たりやすさを測るとき） */
+export function parseGodCountParam(search: string): boolean {
+  return new URLSearchParams(search).get('god') === 'count';
 }
 
 /** 確認用: ?level=15 で、そのレベルから始める（進化などの確認用）。無ければ null */

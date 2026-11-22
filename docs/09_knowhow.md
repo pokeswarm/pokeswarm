@@ -139,7 +139,7 @@
 ## 6. 確かめ方（ブラウザ）
 
 - 確認用の URL: `?pokemon=X&moves=key:lv,key:lv&level=N&spawn=N&time=秒&debug`。`?pokemon=` はそのポケモンを遊べる最初の地方で始まる（`?region=johto` でも選べる）。
-- **テストプレイ**（作者の依頼 2026年10月26日。ソロだけ）: `?legend=mewtwo`（mewtwo・mew・articuno・zapdos・moltres・charizard（色違い）など）で最初から伝説と戦い、`?god` で無敵になる。無敵の間に受けたはずのダメージの合計と、最大 HP の何回分かを画面の上に出す。どちらかを付けたランは**記録を保存しない**（コイン・実績・解放が進まない）。例: `https://pokeswarm.org/?pokemon=charmander&level=60&moves=blast-burn:8,flare-blitz:8,flamethrower:8,fire-spin:8&legend=mewtwo&god`
+- **テストプレイ**（作者の依頼 2026年10月26日。ソロだけ）: `?legend=mewtwo`（mewtwo・mew・articuno・zapdos・moltres・charizard（色違い）など）で最初から伝説と戦い、`?god` で無敵になる（画面には何も出さない。339章）。`?god=count` にすると、無敵の間に受けたはずのダメージの合計と、最大 HP の何回分かを画面の上に出す。どちらかを付けたランは**記録を保存しない**（コイン・実績・解放が進まない）。例: `https://pokeswarm.org/?pokemon=charmander&level=60&moves=blast-burn:8,flare-blitz:8,flamethrower:8,fire-spin:8&legend=mewtwo&god`
   - ジョウト（07 の85章）: `?region=johto&legend=red-pikachu`（レッド戦の1ラウンドから。`red-espeon` で2ラウンド、`red-charizard` で3ラウンド）、`&wings` を足すとはねを持っていて、レッドに勝つとルギア → ホウオウ。`?legend=lugia`・`?legend=ho-oh` でその1戦だけ。`?intruder=raikou`（entei・suicune）で三犬が乱入する（`&time=300` などと一緒に）。どれも記録を保存しない。
   - 伝説を見るだけ（07 の194章）: `?region=johto&pokemon=psyduck&moves=none&god&legend=red-pikachu`。無敵で技なし（`moves=none`）のコダックで始める。`&bosshp=69` で、伝説が出たときの HP を決められる（攻撃しなくても HP で変わる動きを見る）。`&solo` で同時に出る相手を出さない（相方がいないときの技を見る。07 の195章）。
   - ボス（07 の167章）: `?boss=lapras`（enemies.json の id か、その末尾。地方は `?region=`）で、そのボスの区間から始めてすぐ出す。タッグは組の相手も出る。記録を保存しない。例: `?region=johto&pokemon=quilava&boss=dragonite&god`。組み込みのブラウザが隠れているときは `window.game.loop.sleep()` してから `game.step(t, 33)` を回し、`sim.world.hazards` で技の id を見る。

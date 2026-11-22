@@ -73,7 +73,7 @@ import { abilityOf, pinchMods } from '../sim/ability';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World, gateDeadlineTick } from '../sim/world';
-import { applyArenaParam, applyDebugOverrides, applySoloParam, parseBossHpParam, parseGodParam, parseLegendParam, parseIntruderParam, parseIntruderAtParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam, parseBossParam } from './debugOverrides';
+import { applyArenaParam, applyDebugOverrides, applySoloParam, parseBossHpParam, parseGodParam, parseGodCountParam,parseLegendParam, parseIntruderParam, parseIntruderAtParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam, parseBossParam } from './debugOverrides';
 import { addXp, applyOffer, itemFits, moveMaxLevel, recomputeModifiers } from '../sim/systems/leveling';
 import { shinySpriteKey } from '../meta/loadoutOptions';
 import { achievementPerks, regionAchieved } from '../meta/achievementPerks';
@@ -346,6 +346,7 @@ export class RunScene extends Phaser.Scene {
   /** ?intruder・?wings を付けたラン（記録を保存しない） */
   private testRun = false;
   private god = false;
+  private godCount = false;
   private godDamage = 0;
   private godText: Phaser.GameObjects.Text | null = null;
   /** 伝説戦のマップの効果で画面に重ねる色（サンダーで暗く・フリーザーで白っぽく） */
@@ -635,6 +636,7 @@ export class RunScene extends Phaser.Scene {
     this.testLegend = this.coop ? null : parseLegendParam(this.sim.world.rules, window.location.search);
     if (this.testLegend !== null) applySoloParam(this.sim.world.rules, this.testLegend, window.location.search);
     this.god = !this.coop && parseGodParam(window.location.search);
+    this.godCount = this.god && parseGodCountParam(window.location.search);
     this.testBossHp = this.coop ? null : parseBossHpParam(window.location.search);
     this.godDamage = 0;
     // ?legendafter=8 で、伝説戦を始めるのを8秒後にする（雑魚の中に「DANGER」。宣伝の動画。作者の依頼 2026年10月30日）
@@ -2451,13 +2453,13 @@ export class RunScene extends Phaser.Scene {
     me.frozenTicks = 0;
   }
 
-  /** テストプレイの表示: 無敵であることと、受けたはずのダメージ（最大 HP の何回分か） */
+  /** テストプレイの表示: ?god=count のときだけ、受けたはずのダメージ（最大 HP の何回分か）を出す。ふだんは何も出さない（撮影のため。作者の依頼 2026年11月22日） */
   private drawGodText(cam: Phaser.Cameras.Scene2D.Camera, y: number): void {
-    if (!this.god && this.testLegend === null) return;
+    if (!this.godCount) return;
     const me = this.sim.world.players.find((p) => p.id === this.localId);
     if (!me) return;
     this.godText ??= this.add.text(0, 0, '', px(16, '#ffcc80', { outline: true })).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1001);
-    const text = this.god ? t('run.godMode', { damage: Math.round(this.godDamage), times: (this.godDamage / Math.max(1, me.maxHp)).toFixed(1) }) : t('run.testMode');
+    const text = t('run.godMode', { damage: Math.round(this.godDamage), times: (this.godDamage / Math.max(1, me.maxHp)).toFixed(1) });
     if (this.godText.text !== text) this.godText.setText(text);
     this.placeUi(this.godText, cam.width / 2, y);
   }

@@ -1,6 +1,8 @@
 import { bgmConfig, itemIcons, uiConfig, siteConfig } from '../data';
 import { t } from '../i18n';
+import { loadCrashReport } from '../meta/runProbe';
 import { compactScreen, windowCss } from '../render/pixelUi';
+import { showCrashNotice } from './crashNotice';
 
 /** SpriteCollab の取得結果（public/sprites/credits.json）の1件 */
 interface SpriteCredit {
@@ -56,7 +58,21 @@ export class TitleFooter {
       ev.stopPropagation();
       void this.openCredits();
     };
-    this.root.append(notice, button);
+    this.root.append(notice);
+    // クラッシュレポート（07 の344章）: 前にページごと落ちたランの記録が残っているときだけ出す。押すと窓で見られる
+    const report = loadCrashReport();
+    if (report) {
+      const crash = document.createElement('button');
+      crash.style.cssText = button.style.cssText;
+      crash.textContent = t('run.crash.button');
+      crash.onpointerdown = (ev) => ev.stopPropagation();
+      crash.onclick = (ev) => {
+        ev.stopPropagation();
+        showCrashNotice(report, () => this.layout());
+      };
+      this.root.append(crash);
+    }
+    this.root.append(button);
   }
 
   /** 下の帯の高さ（ログインの窓をその上に置くため） */

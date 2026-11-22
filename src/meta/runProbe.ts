@@ -30,6 +30,12 @@ export interface RunProbe {
   heapMB: number | null;
   /** 1秒あたりの描画の回数 */
   fps: number;
+  /** 協力プレイの役（ホスト・ゲスト。ソロは null。前の版の記録には無い） */
+  role?: 'host' | 'guest' | null;
+  /** 直前の書き込みからの間で、描画が一番長く空いた時間（ms）。落ちる直前に固まっていたかを見る（07 の344章） */
+  worstFrameMs?: number;
+  /** シミュレーション 1 回の時間（ms。ならした値） */
+  simMs?: number;
   /**
    * 30 秒ごとの数の移り変わり（古い順。最大 trendSamples 個）。何が増え続けていたかを見る（07 の118章）。
    * 値は「名前: 数」。名前は RunScene.probeCounts を見る
@@ -42,6 +48,46 @@ export interface RunProbe {
 }
 
 const KEY = 'pokeswarm.runProbe';
+const REPORT_KEY = 'pokeswarm.crashReport';
+
+/**
+ * クラッシュレポート（07 の344章）: ページごと落ちたランの、落ちる直前の様子。タイトルのボタンから見て、作者へ送れるように残しておく。
+ * 次に落ちるまで（または消すまで）残る。セーブの写しは入れない
+ */
+export interface CrashReport {
+  probe: Omit<RunProbe, 'snapshot'>;
+  /** 失敗として保存したコイン（テストプレイは null） */
+  coins: number | null;
+  /** 端末とブラウザ（navigator.userAgent）・画面の大きさ */
+  device: string;
+}
+
+export function saveCrashReport(probe: RunProbe, coins: number | null): void {
+  try {
+    const { snapshot: _snapshot, ...rest } = probe;
+    const device = `${navigator.userAgent} / ${window.innerWidth}x${window.innerHeight} @${window.devicePixelRatio}`;
+    localStorage.setItem(REPORT_KEY, JSON.stringify({ probe: rest, coins, device } satisfies CrashReport));
+  } catch {
+    // 保存できない環境では何もしない
+  }
+}
+
+export function loadCrashReport(): CrashReport | null {
+  try {
+    const raw = localStorage.getItem(REPORT_KEY);
+    return raw ? (JSON.parse(raw) as CrashReport) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearCrashReport(): void {
+  try {
+    localStorage.removeItem(REPORT_KEY);
+  } catch {
+    // 何もしない
+  }
+}
 
 export function writeRunProbe(probe: RunProbe): void {
   try {

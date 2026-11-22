@@ -8,7 +8,7 @@ import { migrateOldDiscoveries } from './meta/discoveries';
 import { session } from './meta/session';
 import { loadSpriteManifest } from './render/sprites/spriteManifest';
 import { shinySpriteKey } from './meta/loadoutOptions';
-import { takeRunProbe } from './meta/runProbe';
+import { saveCrashReport, takeRunProbe } from './meta/runProbe';
 import { RunRecorder } from './meta/runRecorder';
 import { showCrashNotice } from './scenes/crashNotice';
 import { AchievementsScene } from './scenes/AchievementsScene';
@@ -44,6 +44,10 @@ async function start(): Promise<void> {
   }
   // スマホは横向きだけ（縦向きのときは案内を出す）
   startOrientationGuard();
+  // 前回のランの記録は先に取り出す。ページごと落ちていたら、タイトルが出る前にクラッシュレポートとして残す
+  // （タイトルの下の帯のボタンは、開いたときに残っているかを見る。コインはセーブの読み込みの後で書き足す。07 の344章）
+  const probe = takeRunProbe();
+  if (probe && !probe.closed) saveCrashReport(probe, null);
   // ログインとセーブデータの読み込みは待たずに始める（タイトル画面に状態を出す）
   const sessionReady = session.start().then(() => {
     migrateOldDiscoveries(session.store);
@@ -58,7 +62,6 @@ async function start(): Promise<void> {
     // ジョウトのショップの解放に使う、ショップで使ったコインの合計（前のセーブは今の強化から数える）
     session.backfillShopSpent();
     // 前回のランが途中で終わっていた（ページが落ちた・閉じた）: そこまでの記録を失敗として足し、様子を知らせる（07 の112章）
-    const probe = takeRunProbe();
     if (probe) {
       console.info('[runProbe] 前回のランは途中で終わりました', probe);
       const coins = probe.snapshot ? RunRecorder.finishFromSnapshot(session.store, probe.snapshot, shopConfig, derivedStatSources) : null;
@@ -66,7 +69,9 @@ async function start(): Promise<void> {
         session.checkProgress();
         void session.store.flush();
       }
-      if (saveConfig.crashNotice) showCrashNotice(probe, coins);
+      // クラッシュレポートに、失敗として保存したコインを書き足す（閉じただけのときは残さない）
+      if (!probe.closed) saveCrashReport(probe, coins);
+      if (saveConfig.crashNotice) showCrashNotice({ probe, coins, device: '' });
     }
   });
   const q = new URLSearchParams(window.location.search);

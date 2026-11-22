@@ -331,6 +331,9 @@ export class RunScene extends Phaser.Scene {
   private hiddenTimer: ReturnType<typeof setInterval> | null = null;
   /** 最後に描画のタイミングが来た時刻 */
   private lastFrameAt = 0;
+  /** 描画が一番長く空いた時間（ms）: 直前の記録の書き込みから・直前の数の移り変わりから（落ちる直前に固まっていたかを見る。07 の344章） */
+  private worstFrameMs = 0;
+  private worstFrameTrendMs = 0;
   private levelUpPanel!: LevelUpPanel;
   /** ポーズの画面（Esc）と、ゲストが止めずに開いている設定の画面 */
   private pausePanel!: PausePanel;
@@ -1001,7 +1004,13 @@ export class RunScene extends Phaser.Scene {
   }
 
   override update(time: number, delta: number): void {
-    this.lastFrameAt = performance.now();
+    const frameAt = performance.now();
+    if (this.lastFrameAt > 0) {
+      const gap = frameAt - this.lastFrameAt;
+      if (gap > this.worstFrameMs) this.worstFrameMs = gap;
+      if (gap > this.worstFrameTrendMs) this.worstFrameTrendMs = gap;
+    }
+    this.lastFrameAt = frameAt;
     // スマホが縦向きの間は、ソロのランを止める（協力プレイは止められない）
     // 自分の進化の演出の間も、ソロは止める
     const paused = !this.coop && ((orientationGuard?.blocked ?? false) || this.evolutionCutscene.active);
@@ -1090,7 +1099,17 @@ export class RunScene extends Phaser.Scene {
       }
     };
     walk(this.children.list);
+    // 重さと通信（07 の344章）: 描画の回数・この 30 秒で描画が一番空いた時間・シミュレーション 1 回の時間（µs）・送受信の量（ここまでの合計）・往復時間
+    const transports = this.coop ? [...this.coop.room.transports.values()] : [];
+    const frameMs = Math.round(this.worstFrameTrendMs);
+    this.worstFrameTrendMs = 0;
     return {
+      fps: Math.round(this.game.loop.actualFps),
+      frameMs,
+      simUs: Math.round(this.simMs * 1000),
+      sentKB: Math.round(transports.reduce((s, tr) => s + tr.stats.sentBytes, 0) / 1024),
+      recvKB: Math.round(transports.reduce((s, tr) => s + tr.stats.receivedBytes, 0) / 1024),
+      rttMs: Math.round(this.sync?.rttMs ?? 0),
       objs,
       emitters,
       particles,
@@ -1131,7 +1150,12 @@ export class RunScene extends Phaser.Scene {
     }
     const transports = this.coop ? [...this.coop.room.transports.values()] : [];
     const heap = (performance as Performance & { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize;
+    const worstFrameMs = Math.round(this.worstFrameMs);
+    this.worstFrameMs = 0;
     writeRunProbe({
+      role: this.coop ? this.coop.room.role : null,
+      worstFrameMs,
+      simMs: Math.round(this.simMs * 100) / 100,
       at: Date.now(),
       version: __APP_VERSION__,
       seconds: Math.floor(elapsedSeconds(w)),

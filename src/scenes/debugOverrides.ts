@@ -125,6 +125,11 @@ export function parseGodCountParam(search: string): boolean {
   return new URLSearchParams(search).get('god') === 'count';
 }
 
+/** 確認用: ?friendship で、なつきの進化に要る距離を歩いたことにする（イーブイは昼の区間でエーフィ・夜の区間でブラッキーを聞かれる） */
+export function parseFriendshipParam(search: string): boolean {
+  return new URLSearchParams(search).has('friendship');
+}
+
 /** 確認用: ?level=15 で、そのレベルから始める（進化などの確認用）。無ければ null */
 export function parseLevelParam(search: string): number | null {
   const v = Number(new URLSearchParams(search).get('level'));

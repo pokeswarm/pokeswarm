@@ -14,6 +14,7 @@
     "sprites": "node scripts/fetch-sprites.ts",
     "pokeapi": "node scripts/fetch-pokeapi.ts",
     "moves-table": "node scripts/moves-table.ts",
+    "promo-links": "node scripts/promo-links.cjs",
     "achievements-table": "node scripts/achievements-table.ts",
     "learnsets": "vitest run --mode balance src/sim/learnset.balance.ts",
     "move-dps": "vitest run --mode balance src/sim/moveDps.balance.ts && node scripts/move-dps-report.ts",

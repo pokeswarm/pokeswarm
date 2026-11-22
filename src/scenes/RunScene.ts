@@ -73,7 +73,7 @@ import { abilityOf, pinchMods } from '../sim/ability';
 import { FixedStepClock } from '../sim/fixedStep';
 import { Simulation } from '../sim/simulation';
 import { currentWaveIndex, elapsedSeconds, enemyCap, findEnemyIndex, type Hazard, type SimRole, type World, gateDeadlineTick } from '../sim/world';
-import { applyArenaParam, applyDebugOverrides, applySoloParam, parseBossHpParam, parseGodParam, parseGodCountParam,parseLegendParam, parseIntruderParam, parseIntruderAtParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam, parseBossParam } from './debugOverrides';
+import { applyArenaParam, applyDebugOverrides, applySoloParam, parseBossHpParam, parseGodParam, parseGodCountParam, parseFriendshipParam, parseLegendParam, parseIntruderParam, parseIntruderAtParam, parseWingsParam, parseLevelParam, parseMovesParam, parseItemsParam, parseSectionParam, parseTimeParam, parseBossParam } from './debugOverrides';
 import { addXp, applyOffer, itemFits, moveMaxLevel, recomputeModifiers } from '../sim/systems/leveling';
 import { shinySpriteKey } from '../meta/loadoutOptions';
 import { achievementPerks, regionAchieved } from '../meta/achievementPerks';
@@ -579,8 +579,10 @@ export class RunScene extends Phaser.Scene {
         for (const it of debugItems) if (!p.items.some((x) => x.item === it.item)) p.items.push({ ...it });
         recomputeModifiers(this.sim.world, p);
       }
+      // 確認用の ?friendship（ソロだけ）: なつきの進化に要る距離を歩いたことにする（エーフィ・ブラッキー・クロバットなどをすぐ出す。07 の340章）
+      if (!this.coop && parseFriendshipParam(window.location.search)) p.walked = rules.friendshipDistance;
       if (shiny) this.shinyPlayers.add(id);
-      const spriteKey = playablesConfig.pokemon[pokemon]?.sprite ?? pokemon;
+      const spriteKey =playablesConfig.pokemon[pokemon]?.sprite ?? pokemon;
       const sprite = id === this.localId ? this.playerSprite : (this.coop?.sprites.get(shiny ? shinySpriteKey(spriteKey) : spriteKey) ?? null);
       const view = new PlayerView(this, p, placeholderRender, spriteRender, sprite, true);
       // 自分をほかのプレイヤーより手前に

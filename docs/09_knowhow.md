@@ -144,6 +144,7 @@
   - 伝説を見るだけ（07 の194章）: `?region=johto&pokemon=psyduck&moves=none&god&legend=red-pikachu`。無敵で技なし（`moves=none`）のコダックで始める。`&bosshp=69` で、伝説が出たときの HP を決められる（攻撃しなくても HP で変わる動きを見る）。`&solo` で同時に出る相手を出さない（相方がいないときの技を見る。07 の195章）。
   - ボス（07 の167章）: `?boss=lapras`（enemies.json の id か、その末尾。地方は `?region=`）で、そのボスの区間から始めてすぐ出す。タッグは組の相手も出る。記録を保存しない。例: `?region=johto&pokemon=quilava&boss=dragonite&god`。組み込みのブラウザが隠れているときは `window.game.loop.sleep()` してから `game.step(t, 33)` を回し、`sim.world.hazards` で技の id を見る。
 - **開発版だけの ?restore=50000**（作者の依頼 2026年10月27日）: 伝説以外の実績を全部達成にし（報酬のポケモンも解放）、コインを少なくともその数にして、すぐ保存する。公開版のビルドには入らない（`import.meta.env.DEV`）。localhost も本番と同じ Firebase につながるので、Google でログインしてから開くと、そのアカウントのセーブに入る。
+- **宣伝の動画を撮るリンク**は `docs/31_promo_links.md`（`npm run promo-links`。07 の340章）。`?friendship` で、なつきの進化に要る距離を歩いたことにする。
 - 開発サーバーではモジュールをその場で読み込める: `await import('/src/sim/systems/boxes.ts')` で関数を呼び、`window.game.scene.getScene('run')` でシーンを触る。
 - 画面が隠れているとき: `sc.scene.pause()` してから `sc.runSteps(n, true)`・`sc.draw(...)` で進める。
 - スクリーンショットは演出に遅れることがある。DOM の変化は `MutationObserver` で回数と時刻を数える方が確か。

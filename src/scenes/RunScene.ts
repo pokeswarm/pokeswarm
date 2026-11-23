@@ -1106,6 +1106,7 @@ export class RunScene extends Phaser.Scene {
   }
   /** レベルアップの選択の画面が出ているか（出た・消えたを残すため） */
   private crumbPanelShown = false;
+  private crumbOffersSerial = -1;
 
   /** 増え続けていないかを見る数（画面の物・粒・アニメーション・DOM・届いて待っているコマンド など） */
   private probeCounts(): Record<string, number> {
@@ -3599,8 +3600,16 @@ export class RunScene extends Phaser.Scene {
         }
         this.levelUpPanel.hide();
       } else {
+        // その回の最初だけ: 候補の中身と、文にした・画面を作った を 1 手ずつ残す（どの 1 手で落ちたかを見る。07 の350章）
+        const first = this.crumbOffersSerial !== lu.serial;
+        if (first) {
+          this.crumbOffersSerial = lu.serial;
+          this.crumb(`offers ${lu.serial} lv${lu.level} ${JSON.stringify(raw)}`);
+        }
         const offers = raw.map((o) => offerText(world, local, o, new Set(session.store.current.discoveries)));
+        if (first) this.crumb(`panel:text ${offers.map((o) => o.icon).join(',')}`);
         this.levelUpPanel.show(lu.level, offers, local.rerolls, Math.ceil(lu.ticksLeft * world.dt), local.bans, Math.max(0, world.level - lu.level), fallback, lu.serial);
+        if (first) this.crumb('panel:built');
       }
     } else {
       this.levelUpPanel.hide();

@@ -738,7 +738,11 @@ export class RunScene extends Phaser.Scene {
     ensureSkillIcons(this, rules);
     this.levelUpPanel = new LevelUpPanel({
       iconUrl: (key) => iconDataUrl(this, key),
-      choose: (index) => (guest ? this.sync?.requestUpgrade('c', index) : this.uiCommands.push({ type: 'chooseUpgrade', playerId: this.localId, index })),
+      choose: (index) => {
+        this.crumb(`choose ${index}`);
+        if (guest) this.sync?.requestUpgrade('c', index);
+        else this.uiCommands.push({ type: 'chooseUpgrade', playerId: this.localId, index });
+      },
       reroll: () => (guest ? this.sync?.requestUpgrade('r') : this.uiCommands.push({ type: 'rerollUpgrades', playerId: this.localId })),
       skip: () => (guest ? this.sync?.requestUpgrade('s') : this.uiCommands.push({ type: 'skipUpgrade', playerId: this.localId })),
       ban: (index) => (guest ? this.sync?.requestUpgrade('b', index) : this.uiCommands.push({ type: 'banUpgrade', playerId: this.localId, index })),
@@ -1052,11 +1056,19 @@ export class RunScene extends Phaser.Scene {
       delay: saveConfig.autosaveSeconds * 1000,
       loop: true,
       callback: () => {
+        // 途中の保存の 1 手ずつを、落ちる直前の出来事に残す（3 回のレポートとも、途中の保存のあたりで落ちていた。07 の350章）
+        this.crumb(`autosave:start scene=${Math.round(this.time.now / 1000)}`);
         this.recorder.commit(this.sim.world);
         // 足した分を写しからも外す（落ちたときに同じ分を2回足さない）
         this.writeProbe(false);
+        this.crumb('autosave:probe');
         this.noteProgress();
-        void session.store.flush();
+        this.crumb('autosave:progress');
+        void session.store.flush().then(
+          (ok) => this.crumb(`autosave:flushed ${ok}`),
+          () => this.crumb('autosave:flushFailed'),
+        );
+        this.crumb('autosave:flush');
       },
     });
     const onHidden = (): void => {
@@ -1087,6 +1099,13 @@ export class RunScene extends Phaser.Scene {
   private crumbs = new RunCrumbs(saveConfig.crumbs.max);
   private static readonly CRUMB_SKIP_EVENTS = new Set<string>(saveConfig.crumbs.skipEvents);
   private static readonly CRUMB_SKIP_MESSAGES = new Set<string>(saveConfig.crumbs.skipMessages);
+  /** 落ちる直前の出来事に 1 つ足して、すぐ書く */
+  private crumb(label: string): void {
+    this.crumbs.add(elapsedSeconds(this.sim.world), label);
+    this.crumbs.flush();
+  }
+  /** レベルアップの選択の画面が出ているか（出た・消えたを残すため） */
+  private crumbPanelShown = false;
 
   /** 増え続けていないかを見る数（画面の物・粒・アニメーション・DOM・届いて待っているコマンド など） */
   private probeCounts(): Record<string, number> {
@@ -3585,6 +3604,11 @@ export class RunScene extends Phaser.Scene {
       }
     } else {
       this.levelUpPanel.hide();
+    }
+    const panelShown = !!lu && !lu.done.has(this.localId) && !world.outcome;
+    if (panelShown !== this.crumbPanelShown) {
+      this.crumbPanelShown = panelShown;
+      this.crumb(panelShown ? `panel:show ${lu?.serial ?? ''}` : 'panel:hide');
     }
     // 協力プレイのレベルアップ: 自分は選び終えて、ほかの人を待っている（全員が選んだら、再開までの短い間）
     const waiting = !!lu && lu.done.has(this.localId) && world.players.length > 1 && !world.outcome;

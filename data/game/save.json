@@ -7,7 +7,7 @@
   "crumbs": {
     "max": 60,
     "skipEvents": ["enemyKilled", "projectileHit", "enemySpawned", "damageDealt", "damageNumber", "enemyAffected", "enemyRetired", "gemSpawned", "gemMerged", "gemCollected", "pickupRequested", "moveUsed", "playerDamaged", "boxHit", "boxHitRequested", "cried", "dashStarted", "bodyAttack", "itemRequested", "skillUsed", "mirrorAbsorbed", "mirrorReleased", "restChanged"],
-    "skipMessages": ["p", "c", "sp", "k", "rt", "d", "fx", "g", "gm", "gc", "pr", "bh", "sv", "ping", "pong", "bx", "iq", "su", "lu"]
+    "skipMessages": ["p", "c", "sp", "k", "rt", "d", "fx", "g", "gm", "gc", "pr", "bh", "sv", "ping", "pong", "bx", "iq", "su"]
   },
   "transferHours": 24
 }

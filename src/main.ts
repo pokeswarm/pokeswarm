@@ -8,7 +8,7 @@ import { migrateOldDiscoveries } from './meta/discoveries';
 import { session } from './meta/session';
 import { loadSpriteManifest } from './render/sprites/spriteManifest';
 import { shinySpriteKey } from './meta/loadoutOptions';
-import { saveCrashReport, takeRunProbe } from './meta/runProbe';
+import { saveCrashReport, takeRunCrumbs, takeRunProbe } from './meta/runProbe';
 import { RunRecorder } from './meta/runRecorder';
 import { showCrashNotice } from './scenes/crashNotice';
 import { AchievementsScene } from './scenes/AchievementsScene';
@@ -47,7 +47,9 @@ async function start(): Promise<void> {
   // 前回のランの記録は先に取り出す。ページごと落ちていたら、タイトルが出る前にクラッシュレポートとして残す
   // （タイトルの下の帯のボタンは、開いたときに残っているかを見る。コインはセーブの読み込みの後で書き足す。07 の344章）
   const probe = takeRunProbe();
-  if (probe && !probe.closed) saveCrashReport(probe, null);
+  // 落ちる直前の出来事と、最後の記録からページが開き直るまでの時間（07 の348章）
+  const crashExtra = { crumbs: takeRunCrumbs(), reloadGapMs: probe ? Date.now() - probe.at : 0 };
+  if (probe && !probe.closed) saveCrashReport(probe, null, crashExtra);
   // ログインとセーブデータの読み込みは待たずに始める（タイトル画面に状態を出す）
   const sessionReady = session.start().then(() => {
     migrateOldDiscoveries(session.store);
@@ -70,7 +72,7 @@ async function start(): Promise<void> {
         void session.store.flush();
       }
       // クラッシュレポートに、失敗として保存したコインを書き足す（閉じただけのときは残さない）
-      if (!probe.closed) saveCrashReport(probe, coins);
+      if (!probe.closed) saveCrashReport(probe, coins, crashExtra);
       if (saveConfig.crashNotice) showCrashNotice({ probe, coins, device: '' });
     }
   });

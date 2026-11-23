@@ -45,6 +45,9 @@ export function crashReportText(report: CrashReport): string {
   const { probe, device } = report;
   const out = [`PokéSwarm crash report v${probe.version}`, new Date(probe.at).toISOString(), device, ...summaryLines(report)];
   out.push(`role=${probe.role ?? '-'} worstFrameMs=${probe.worstFrameMs ?? '-'} simMs=${probe.simMs ?? '-'} closed=${probe.closed}`);
+  // 落ちる直前の出来事（07 の348章）。名前は調べる人が読むもので、翻訳しない
+  if (report.reloadGapMs !== undefined) out.push(`reloadGapMs=${report.reloadGapMs}`);
+  if (report.crumbs?.length) out.push('events:', ...report.crumbs);
   const trend = probe.trend ?? [];
   if (trend.length > 0) {
     const keys = Object.keys(trend[trend.length - 1]!.counts);

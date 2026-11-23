@@ -82,7 +82,7 @@ import { meets } from '../meta/progress';
 import { addDiscovery } from '../meta/discoveries';
 import { achievementName, achievementRewardById } from '../meta/achievementText';
 import { RunRecorder } from '../meta/runRecorder';
-import { clearRunProbe, writeRunProbe } from '../meta/runProbe';
+import { clearRunProbe, RunCrumbs, writeRunProbe } from '../meta/runProbe';
 import { session } from '../meta/session';
 import { regionStatKey } from '../meta/regionScope';
 import { LevelUpPanel, offerText } from './levelUpPanel';
@@ -899,6 +899,10 @@ export class RunScene extends Phaser.Scene {
       this.lastHeard.set(id, start);
       room.attach(id, (messages) => {
         this.lastHeard.set(id, performance.now());
+        // 届いた知らせの種類を、当てはめる前に書いておく（当てはめている最中に固まっても残るように）
+        const sec = elapsedSeconds(this.sim.world);
+        for (const m of messages) if (!RunScene.CRUMB_SKIP_MESSAGES.has(m.t)) this.crumbs.add(sec, `<${m.t}`);
+        this.crumbs.flush();
         if (this.sync) this.inbox.push(...this.sync.incoming(this.sim.world, messages, id));
       });
     }
@@ -1079,6 +1083,10 @@ export class RunScene extends Phaser.Scene {
   /** 数の移り変わり（30 秒ごと。07 の118章） */
   private probeTrend: { seconds: number; counts: Record<string, number> }[] = [];
   private probeTrendAt = 0;
+  /** 落ちる直前の出来事の記録（07 の348章）。数の多い出来事・知らせは入れない */
+  private crumbs = new RunCrumbs(saveConfig.crumbs.max);
+  private static readonly CRUMB_SKIP_EVENTS = new Set<string>(saveConfig.crumbs.skipEvents);
+  private static readonly CRUMB_SKIP_MESSAGES = new Set<string>(saveConfig.crumbs.skipMessages);
 
   /** 増え続けていないかを見る数（画面の物・粒・アニメーション・DOM・届いて待っているコマンド など） */
   private probeCounts(): Record<string, number> {
@@ -2843,6 +2851,9 @@ export class RunScene extends Phaser.Scene {
       this.simMs = this.simMs * 0.95 + (performance.now() - t0) * 0.05;
       // 記録は、タブが裏にあって描画しないときも数える
       this.recorder.observe(this.sim.world);
+      const crumbSec = elapsedSeconds(this.sim.world);
+      for (const ev of this.sim.world.events) if (!RunScene.CRUMB_SKIP_EVENTS.has(ev.type)) this.crumbs.add(crumbSec, ev.type);
+      this.crumbs.flush();
       for (const ev of this.sim.world.events) {
         // 派生・固有技を達成したら記録する（次からの「おや……？」の表示に使う）
         if (ev.type === 'upgradeChosen' && ev.playerId === this.localId && ev.offer.kind === 'derive') {

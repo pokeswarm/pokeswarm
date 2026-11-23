@@ -60,13 +60,17 @@ export interface CrashReport {
   coins: number | null;
   /** 端末とブラウザ（navigator.userAgent）・画面の大きさ */
   device: string;
+  /** 落ちる直前の出来事（古い順。「分:秒 名前」。07 の348章） */
+  crumbs?: string[];
+  /** 最後の記録から、次にページが開くまでの時間（ms）。長ければ、固まってから落ちている */
+  reloadGapMs?: number;
 }
 
-export function saveCrashReport(probe: RunProbe, coins: number | null): void {
+export function saveCrashReport(probe: RunProbe, coins: number | null, extra: { crumbs?: string[]; reloadGapMs?: number } = {}): void {
   try {
     const { snapshot: _snapshot, ...rest } = probe;
     const device = `${navigator.userAgent} / ${window.innerWidth}x${window.innerHeight} @${window.devicePixelRatio}`;
-    localStorage.setItem(REPORT_KEY, JSON.stringify({ probe: rest, coins, device } satisfies CrashReport));
+    localStorage.setItem(REPORT_KEY, JSON.stringify({ probe: rest, coins, device, ...extra } satisfies CrashReport));
   } catch {
     // 保存できない環境では何もしない
   }
@@ -89,6 +93,58 @@ export function clearCrashReport(): void {
   }
 }
 
+const CRUMBS_KEY = 'pokeswarm.runCrumbs';
+
+/**
+ * 落ちる直前の出来事の記録（07 の348章）。ランの様子の記録は 5 秒ごとなので、きっかけの出来事の直後に落ちると写らない。
+ * まれな出来事（区間が進んだ・ボスが出た・届いた知らせの種類など）は、起きたその場でブラウザへ書く。
+ * 同じ名前が続いたら数だけ増やす（「名前 ×3」）
+ */
+export class RunCrumbs {
+  private list: { at: string; label: string; n: number }[] = [];
+  private dirty = false;
+
+  constructor(private readonly max: number) {}
+
+  add(seconds: number, label: string): void {
+    const last = this.list[this.list.length - 1];
+    if (last && last.label === label) last.n++;
+    else {
+      const s = Math.max(0, Math.floor(seconds));
+      this.list.push({ at: `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`, label, n: 1 });
+      if (this.list.length > this.max) this.list.shift();
+    }
+    this.dirty = true;
+  }
+
+  lines(): string[] {
+    return this.list.map((c) => `${c.at} ${c.label}${c.n > 1 ? ` ×${c.n}` : ''}`);
+  }
+
+  /** 変わっていたら書く */
+  flush(): void {
+    if (!this.dirty) return;
+    this.dirty = false;
+    try {
+      localStorage.setItem(CRUMBS_KEY, JSON.stringify(this.lines()));
+    } catch {
+      // 保存できない環境では何もしない
+    }
+  }
+}
+
+/** 前のランの出来事の記録を取り出して消す */
+export function takeRunCrumbs(): string[] {
+  try {
+    const raw = localStorage.getItem(CRUMBS_KEY);
+    localStorage.removeItem(CRUMBS_KEY);
+    const v: unknown = raw ? JSON.parse(raw) : [];
+    return Array.isArray(v) ? v.map(String) : [];
+  } catch {
+    return [];
+  }
+}
+
 export function writeRunProbe(probe: RunProbe): void {
   try {
     localStorage.setItem(KEY, JSON.stringify(probe));
@@ -101,6 +157,7 @@ export function writeRunProbe(probe: RunProbe): void {
 export function clearRunProbe(): void {
   try {
     localStorage.removeItem(KEY);
+    localStorage.removeItem(CRUMBS_KEY);
   } catch {
     // 何もしない
   }

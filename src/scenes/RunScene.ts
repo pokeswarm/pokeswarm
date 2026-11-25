@@ -906,6 +906,16 @@ export class RunScene extends Phaser.Scene {
         // 届いた知らせの種類を、当てはめる前に書いておく（当てはめている最中に固まっても残るように）
         const sec = elapsedSeconds(this.sim.world);
         for (const m of messages) if (!RunScene.CRUMB_SKIP_MESSAGES.has(m.t)) this.crumbs.add(sec, `<${m.t}`);
+        // 受け取りのあふれ（1 秒に届いた知らせの数が多いとき）も残す（07 の352章）
+        const nowMs = performance.now();
+        if (nowMs - this.burstAt >= 1000) {
+          if (this.burstCorrections >= saveConfig.crumbs.burstCorrections) this.crumbs.add(sec, `burst ${this.burstCount}msg ${this.burstCorrections}c`);
+          this.burstAt = nowMs;
+          this.burstCount = 0;
+          this.burstCorrections = 0;
+        }
+        this.burstCount += messages.length;
+        for (const m of messages) if (m.t === 'c') this.burstCorrections++;
         this.crumbs.flush();
         if (this.sync) this.inbox.push(...this.sync.incoming(this.sim.world, messages, id));
       });
@@ -1107,6 +1117,9 @@ export class RunScene extends Phaser.Scene {
   /** レベルアップの選択の画面が出ているか（出た・消えたを残すため） */
   private crumbPanelShown = false;
   private crumbOffersSerial = -1;
+  private burstAt = 0;
+  private burstCount = 0;
+  private burstCorrections = 0;
 
   /** 増え続けていないかを見る数（画面の物・粒・アニメーション・DOM・届いて待っているコマンド など） */
   private probeCounts(): Record<string, number> {

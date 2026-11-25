@@ -45,6 +45,12 @@ export class SyncSession {
    */
   private readonly lastPlayerTick = new Map<PlayerId, number>();
   private lastCorrectionTick = -Infinity;
+  /**
+   * ホスト: 最後に補正・ボスの HP を送った更新回数。レベルアップの選択・ポーズの間は更新回数が進まないので、
+   * 止まった回がちょうど送る回だと、止まっている間じゅう毎回送り続けていた（07 の352章）。同じ回には 1 度だけ送る
+   */
+  private sentCorrectionTick = -1;
+  private sentBossTick = -1;
   /** 自分の位置に付ける通し番号（ゲストの更新回数はホストに合わせて戻ることがあるので、更新回数とは別に数える） */
   private sendSeq = 0;
 
@@ -247,7 +253,8 @@ export class SyncSession {
         this.lastLevelUp = key;
         out.push({ t: 'lu', s, r });
       }
-      if (world.tick % this.rate.correctionIntervalTicks === 0) {
+      if (world.tick % this.rate.correctionIntervalTicks === 0 && world.tick !== this.sentCorrectionTick) {
+        this.sentCorrectionTick = world.tick;
         const e = world.enemies;
         const data: number[] = [];
         for (let i = 0; i < e.count; i++) {
@@ -260,7 +267,8 @@ export class SyncSession {
         else for (let from = 0, n = 0; from < data.length; from += size, n++) out.push({ t: 'c', e: data.slice(from, from + size), k: world.tick, n });
       }
       // 中ボス・ボスの HP と位置は、HP のバーと突進などの動きが飛ばないよう補正より短い間隔で送る
-      if (world.tick % (this.rate.bossIntervalTicks ?? Math.max(1, Math.round(this.rate.correctionIntervalTicks / 3))) === 0) {
+      if (world.tick % (this.rate.bossIntervalTicks ?? Math.max(1, Math.round(this.rate.correctionIntervalTicks / 3))) === 0 && world.tick !== this.sentBossTick) {
+        this.sentBossTick = world.tick;
         const e = world.enemies;
         const bosses: number[] = [];
         for (let i = 0; i < e.count; i++) {

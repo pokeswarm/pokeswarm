@@ -224,6 +224,17 @@ describe('順番を待たないチャンネル（03_network.md 6.4）', () => {
     expect(g.session.incoming(w, [c(20)], 1)).toHaveLength(0);
   });
 
+  it('更新回数が進まない間（レベルアップの選択・ポーズ）は、補正とボスの HP を送り続けない（07 の352章）', () => {
+    const host = makePeer('host', 1, 2);
+    const hw = host.sim.world;
+    while (hw.tick === 0 || hw.tick % rate.correctionIntervalTicks !== 0) host.sim.step([]);
+    const count = (): number => host.session.outgoing(hw).filter((m) => m.t === 'c' || m.t === 'bh').length;
+    expect(count()).toBeGreaterThan(0);
+    // 止まっている間の 2 回目からは送らない
+    expect(count()).toBe(0);
+    expect(count()).toBe(0);
+  });
+
   it('補正は敵の数で小分けにして送り、ゲストは同じ更新回数の残りも受け取る（07 の346章）', () => {
     const host = makePeer('host', 1, 2);
     const hs = new SyncSession({ ...rate, correctionChunkEnemies: 4 }, 1e9, () => 0);

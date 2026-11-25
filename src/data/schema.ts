@@ -475,7 +475,7 @@ export const saveConfigSchema = z.object({
    * 落ちる直前の出来事の記録（07 の348章）: 残す数と、数が多いので入れない出来事（src/sim/events.ts の type）・知らせ（src/net/protocol.ts の t）。
    * きっかけの出来事の直後にページごと落ちると 5 秒ごとの記録には写らないので、まれな出来事は起きたその場で書く
    */
-  crumbs: z.object({ max: z.number().int().positive(), skipEvents: z.array(z.string()), skipMessages: z.array(z.string()) }),
+  crumbs: z.object({ max: z.number().int().positive(), burstCorrections: z.number().int().positive(), skipEvents: z.array(z.string()), skipMessages: z.array(z.string()) }),
   /** 引き継ぎコードの有効期限（時間。作者の決定 2026年10月22日: 24時間）。firestore.rules の上限（25時間）より短くする */
   transferHours: z.number().positive().max(24),
 });
